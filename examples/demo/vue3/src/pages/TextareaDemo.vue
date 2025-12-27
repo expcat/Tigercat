@@ -1,0 +1,66 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { Textarea, Space, Divider, FormItem } from '@tigercat/vue'
+
+const text = ref('')
+const disabled = ref('禁用的文本域')
+const readonly = ref('只读的文本域')
+</script>
+
+<template>
+  <div class="max-w-5xl mx-auto p-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold mb-2">Textarea 文本域</h1>
+      <p class="text-gray-600">输入多行文本时使用。</p>
+    </div>
+
+    <!-- 基础用法 -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-4">基础用法</h2>
+      <p class="text-gray-600 mb-6">基础的文本域组件。</p>
+      <div class="p-6 bg-gray-50 rounded-lg">
+        <Space direction="vertical" class="w-full max-w-md">
+          <Textarea v-model="text" placeholder="请输入内容" :rows="4" />
+          <p class="text-sm text-gray-600">输入的内容：{{ text }}</p>
+        </Space>
+      </div>
+      <Divider class="my-6" />
+    </section>
+
+    <!-- 不同行数 -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-4">不同行数</h2>
+      <p class="text-gray-600 mb-6">通过 rows 属性设置文本域的行数。</p>
+      <div class="p-6 bg-gray-50 rounded-lg">
+        <Space direction="vertical" class="w-full max-w-md">
+          <FormItem label="2行">
+            <Textarea placeholder="2行文本域" :rows="2" />
+          </FormItem>
+          <FormItem label="4行">
+            <Textarea placeholder="4行文本域" :rows="4" />
+          </FormItem>
+          <FormItem label="6行">
+            <Textarea placeholder="6行文本域" :rows="6" />
+          </FormItem>
+        </Space>
+      </div>
+      <Divider class="my-6" />
+    </section>
+
+    <!-- 禁用和只读 -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-4">禁用和只读</h2>
+      <p class="text-gray-600 mb-6">文本域可以设置为禁用或只读状态。</p>
+      <div class="p-6 bg-gray-50 rounded-lg">
+        <Space direction="vertical" class="w-full max-w-md">
+          <Textarea v-model="disabled" disabled :rows="3" />
+          <Textarea v-model="readonly" readonly :rows="3" />
+        </Space>
+      </div>
+    </section>
+
+    <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+      <router-link to="/" class="text-blue-600 hover:text-blue-800">← 返回首页</router-link>
+    </div>
+  </div>
+</template>

@@ -1,0 +1,37 @@
+import { createRouter, createWebHistory } from 'vue-router'
+import Home from './pages/Home.vue'
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: '/', component: Home },
+    { path: '/button', component: () => import('./pages/ButtonDemo.vue') },
+    { path: '/input', component: () => import('./pages/InputDemo.vue') },
+    { path: '/textarea', component: () => import('./pages/TextareaDemo.vue') },
+    { path: '/checkbox', component: () => import('./pages/CheckboxDemo.vue') },
+    { path: '/checkbox-group', component: () => import('./pages/CheckboxGroupDemo.vue') },
+    { path: '/radio', component: () => import('./pages/RadioDemo.vue') },
+    { path: '/radio-group', component: () => import('./pages/RadioGroupDemo.vue') },
+    { path: '/switch', component: () => import('./pages/SwitchDemo.vue') },
+    { path: '/slider', component: () => import('./pages/SliderDemo.vue') },
+    { path: '/select', component: () => import('./pages/SelectDemo.vue') },
+    { path: '/form', component: () => import('./pages/FormDemo.vue') },
+    { path: '/form-item', component: () => import('./pages/FormItemDemo.vue') },
+    { path: '/space', component: () => import('./pages/SpaceDemo.vue') },
+    { path: '/divider', component: () => import('./pages/DividerDemo.vue') },
+    { path: '/layout', component: () => import('./pages/LayoutDemo.vue') },
+    { path: '/container', component: () => import('./pages/ContainerDemo.vue') },
+    { path: '/header', component: () => import('./pages/HeaderDemo.vue') },
+    { path: '/sidebar', component: () => import('./pages/SidebarDemo.vue') },
+    { path: '/content', component: () => import('./pages/ContentDemo.vue') },
+    { path: '/footer', component: () => import('./pages/FooterDemo.vue') },
+    { path: '/grid', component: () => import('./pages/GridDemo.vue') },
+    { path: '/row', component: () => import('./pages/RowDemo.vue') },
+    { path: '/col', component: () => import('./pages/ColDemo.vue') },
+    { path: '/link', component: () => import('./pages/LinkDemo.vue') },
+    { path: '/text', component: () => import('./pages/TextDemo.vue') },
+    { path: '/icon', component: () => import('./pages/IconDemo.vue') },
+  ],
+})
+
+export default router
