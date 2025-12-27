@@ -1,0 +1,39 @@
+{
+  "name": "@tigercat/core",
+  "version": "0.0.1",
+  "description": "Core utilities for Tigercat UI library",
+  "license": "MIT",
+  "author": "Yizhe Wang",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/expcats/Tigercat.git",
+    "directory": "packages/core"
+  },
+  "keywords": [
+    "tigercat",
+    "ui",
+    "utilities"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}
