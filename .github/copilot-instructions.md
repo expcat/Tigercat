@@ -1,7 +1,5 @@
 # GitHub Copilot Instructions for Tigercat
 
-## ⚠️ Important: No "Initial Plan" Commits
-
 When working on issues:
 - Start directly with meaningful implementation work
 - Use `report_progress` only when you have actual code changes to commit
