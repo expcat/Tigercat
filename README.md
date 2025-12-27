@@ -38,6 +38,24 @@ pnpm build
 pnpm dev
 ```
 
+### Testing
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests with UI
+pnpm test:ui
+
+# Run tests with coverage
+pnpm test:coverage
+```
+
+For detailed testing guidelines, see:
+- [Quick Start Guide](./tests/QUICK_START.md) - Get started writing tests
+- [Testing Guide](./tests/TESTING_GUIDE.md) - Comprehensive testing documentation
+- [Component Checklist](./tests/COMPONENT_TEST_CHECKLIST.md) - Track testing progress
+
 ### Project Structure
 
 ```
@@ -46,6 +64,9 @@ tigercat/
 │   ├── core/           # Core utilities
 │   ├── vue/            # Vue 3 components
 │   └── react/          # React components
+├── tests/              # Test infrastructure and utilities
+│   ├── vue/            # Vue component tests
+│   └── utils/          # Test helpers and utilities
 ├── package.json
 ├── pnpm-workspace.yaml
 └── tsconfig.json

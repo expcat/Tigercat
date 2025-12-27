@@ -1,0 +1,264 @@
+/**
+ * Template for Vue Component Tests
+ * 
+ * This file provides a template structure for creating comprehensive tests
+ * for Vue components in the Tigercat UI library.
+ * 
+ * Instructions:
+ * 1. Copy this file to tests/vue/[ComponentName].spec.ts
+ * 2. Replace all occurrences of ComponentName with your actual component name
+ * 3. Import the component from @tigercat/vue
+ * 4. Fill in the test cases based on your component's functionality
+ * 5. Remove sections that don't apply to your component
+ * 6. Add custom test sections as needed
+ */
+
+/**
+ * @vitest-environment happy-dom
+ */
+
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/vue'
+// TODO: Import your component
+// import { ComponentName } from '@tigercat/vue'
+import {
+  renderWithProps,
+  renderWithSlots,
+  expectNoA11yViolations,
+  // Import other utilities as needed:
+  // setThemeVariables,
+  // clearThemeVariables,
+  // componentSizes,
+  // createMockHandlers,
+} from '../utils'
+
+describe('ComponentName', () => {
+  /**
+   * Basic Rendering Tests
+   * Test that the component renders correctly with default and custom props
+   */
+  describe('Rendering', () => {
+    it('should render with default props', () => {
+      // TODO: Implement test
+      // Example:
+      // const { getByRole } = render(ComponentName, {
+      //   slots: { default: 'Content' }
+      // })
+      // expect(getByRole('button')).toBeInTheDocument()
+    })
+
+    it('should render with custom content', () => {
+      // TODO: Test rendering with custom slot content
+    })
+
+    it('should apply custom classes', () => {
+      // TODO: Test that custom classes are applied
+    })
+  })
+
+  /**
+   * Props Tests
+   * Test all prop combinations and their effects
+   */
+  describe('Props', () => {
+    it('should handle size prop', () => {
+      // TODO: Test different size props if applicable
+      // Example:
+      // const sizes = ['sm', 'md', 'lg']
+      // sizes.forEach(size => {
+      //   const { container } = renderWithProps(ComponentName, { size })
+      //   expect(container.querySelector('[role="..."]')).toBeInTheDocument()
+      // })
+    })
+
+    it('should handle variant prop', () => {
+      // TODO: Test different variant props if applicable
+    })
+
+    it('should handle custom props', () => {
+      // TODO: Test component-specific props
+    })
+  })
+
+  /**
+   * Events Tests
+   * Test that all events are emitted correctly
+   */
+  describe('Events', () => {
+    it('should emit click event when clicked', async () => {
+      // TODO: Test click events if applicable
+      // Example:
+      // const handleClick = vi.fn()
+      // const { getByRole } = render(ComponentName, {
+      //   props: { onClick: handleClick },
+      //   slots: { default: 'Click me' }
+      // })
+      // await fireEvent.click(getByRole('button'))
+      // expect(handleClick).toHaveBeenCalledTimes(1)
+    })
+
+    it('should emit change event with correct payload', async () => {
+      // TODO: Test change events if applicable
+    })
+
+    it('should emit custom events', async () => {
+      // TODO: Test component-specific events
+    })
+  })
+
+  /**
+   * States Tests
+   * Test different component states (disabled, loading, error, etc.)
+   */
+  describe('States', () => {
+    it('should be disabled when disabled prop is true', () => {
+      // TODO: Test disabled state if applicable
+      // Example:
+      // const { getByRole } = renderWithProps(
+      //   ComponentName,
+      //   { disabled: true },
+      //   { slots: { default: 'Disabled' } }
+      // )
+      // expect(getByRole('button')).toBeDisabled()
+    })
+
+    it('should show loading state', () => {
+      // TODO: Test loading state if applicable
+    })
+
+    it('should show error state', () => {
+      // TODO: Test error state if applicable
+    })
+
+    it('should handle focus state', () => {
+      // TODO: Test focus state if applicable
+    })
+  })
+
+  /**
+   * Theme Support Tests
+   * Test that the component supports theme customization
+   */
+  describe('Theme Support', () => {
+    // TODO: Add afterEach to clean up theme variables
+    // afterEach(() => {
+    //   clearThemeVariables([
+    //     '--tiger-primary',
+    //     '--tiger-primary-hover',
+    //   ])
+    // })
+
+    it('should support custom theme colors', () => {
+      // TODO: Test theme customization if applicable
+      // Example:
+      // setThemeVariables({
+      //   '--tiger-primary': '#ff0000',
+      //   '--tiger-primary-hover': '#cc0000',
+      // })
+      // const { container } = renderWithProps(ComponentName, { variant: 'primary' })
+      // const rootStyles = window.getComputedStyle(document.documentElement)
+      // expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
+    })
+  })
+
+  /**
+   * Accessibility Tests
+   * Test that the component meets accessibility standards
+   */
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      // TODO: Implement accessibility test
+      // Example:
+      // const { container } = render(ComponentName, {
+      //   slots: { default: 'Accessible Content' }
+      // })
+      // await expectNoA11yViolations(container)
+    })
+
+    it('should have proper ARIA attributes', () => {
+      // TODO: Test ARIA attributes if applicable
+    })
+
+    it('should be keyboard accessible', async () => {
+      // TODO: Test keyboard navigation if applicable
+    })
+
+    it('should have proper semantic role', () => {
+      // TODO: Test semantic HTML roles
+    })
+  })
+
+  /**
+   * Slots Tests (Vue-specific)
+   * Test that slots work correctly
+   */
+  describe('Slots', () => {
+    it('should render default slot content', () => {
+      // TODO: Test default slot if applicable
+    })
+
+    it('should render named slots', () => {
+      // TODO: Test named slots if applicable
+      // Example:
+      // const { getByText } = renderWithSlots(ComponentName, {
+      //   header: 'Header Content',
+      //   footer: 'Footer Content',
+      // })
+      // expect(getByText('Header Content')).toBeInTheDocument()
+      // expect(getByText('Footer Content')).toBeInTheDocument()
+    })
+
+    it('should render scoped slots', () => {
+      // TODO: Test scoped slots if applicable
+    })
+  })
+
+  /**
+   * Edge Cases Tests
+   * Test boundary conditions and unusual scenarios
+   */
+  describe('Edge Cases', () => {
+    it('should handle empty content', () => {
+      // TODO: Test with empty content
+    })
+
+    it('should handle very long content', () => {
+      // TODO: Test with very long text
+    })
+
+    it('should handle special characters', () => {
+      // TODO: Test with special characters
+    })
+
+    it('should handle rapid interactions', async () => {
+      // TODO: Test rapid clicks/interactions
+    })
+  })
+
+  /**
+   * Snapshot Tests
+   * Capture snapshots for regression testing
+   */
+  describe('Snapshots', () => {
+    it('should match snapshot for default state', () => {
+      // TODO: Create snapshot for default state
+      // Example:
+      // const { container } = render(ComponentName, {
+      //   slots: { default: 'Default Content' }
+      // })
+      // expect(container.firstChild).toMatchSnapshot()
+    })
+
+    it('should match snapshot for each variant', () => {
+      // TODO: Create snapshots for all major variants
+    })
+
+    it('should match snapshot for different sizes', () => {
+      // TODO: Create snapshots for different sizes
+    })
+
+    it('should match snapshot for different states', () => {
+      // TODO: Create snapshots for different states
+    })
+  })
+})
