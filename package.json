@@ -22,15 +22,28 @@
     "build": "pnpm -r build",
     "dev": "pnpm -r dev",
     "clean": "pnpm -r clean && rm -rf node_modules",
-    "lint": "eslint packages --ext .ts,.tsx"
+    "lint": "eslint packages --ext .ts,.tsx",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/vue": "^8.1.0",
     "@types/node": "^25.0.3",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",
+    "@vitejs/plugin-vue": "^6.0.3",
+    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/ui": "^4.0.16",
+    "axe-core": "^4.11.0",
     "eslint": "^9.39.2",
-    "typescript": "^5.9.3"
+    "happy-dom": "^20.0.11",
+    "jest-axe": "^10.0.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16",
+    "vue": "^3.5.26"
   },
   "packageManager": "pnpm@10.26.2",
   "engines": {
