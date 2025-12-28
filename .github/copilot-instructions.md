@@ -1,5 +1,10 @@
 # GitHub Copilot Instructions for Tigercat
 
+<!-- 
+STRUCTURE NAVIGATION TAGS:
+#core-utilities #vue-components #react-components #types #theme #testing #documentation #examples
+-->
+
 When working on issues:
 - Start directly with meaningful implementation work
 - Use `report_progress` only when you have actual code changes to commit
@@ -10,7 +15,7 @@ When working on issues:
 
 Tigercat is a Tailwind CSS-based UI component library supporting both Vue 3 and React. This is a TypeScript monorepo managed with pnpm workspaces.
 
-## Project Structure
+## Project Structure Overview
 
 ```
 tigercat/
@@ -18,10 +23,114 @@ tigercat/
 │   ├── core/           # Core utilities (@tigercat/core)
 │   ├── vue/            # Vue 3 components (@tigercat/vue)
 │   └── react/          # React components (@tigercat/react)
+├── docs/               # Component documentation
+├── examples/           # Usage examples and demos
+├── tests/              # Test suites and testing utilities
 ├── package.json
 ├── pnpm-workspace.yaml
 └── tsconfig.json
 ```
+
+## Detailed Directory Structure & Functionality
+
+### Core Package Structure (`packages/core/`)
+
+**Purpose**: Framework-agnostic utilities, types, and theme configuration shared by both Vue and React implementations.
+
+| Path | Content/Functionality |
+|------|----------------------|
+| `packages/core/src/utils/` | Shared utility functions (className merging, form validation, grid calculations, input styling) |
+| `packages/core/src/types/` | TypeScript type definitions for all component prop interfaces |
+| `packages/core/src/theme/` | Theme configuration and CSS variable management |
+| `packages/core/dist/` | Build output (generated) |
+
+**When to modify**: Adding shared utilities, defining component types, modifying theme utilities
+
+### Vue Package Structure (`packages/vue/`)
+
+**Purpose**: Vue 3 component implementations using Composition API with `<script setup>` syntax.
+
+| Path | Content/Functionality |
+|------|----------------------|
+| `packages/vue/src/components/` | Vue component files organized by category (Basic, Form, Layout) |
+| `packages/vue/src/index.ts` | Re-exports all Vue components and core utilities |
+| `packages/vue/dist/` | Build output (generated) |
+
+**When to modify**: Implementing Vue 3 components, fixing Vue-specific bugs, adding Vue-specific features (slots, emits, directives)
+
+### React Package Structure (`packages/react/`)
+
+**Purpose**: React component implementations using functional components with hooks.
+
+| Path | Content/Functionality |
+|------|----------------------|
+| `packages/react/src/components/` | React component files organized by category (Basic, Form, Layout) |
+| `packages/react/src/index.tsx` | Re-exports all React components, types, and core utilities |
+| `packages/react/dist/` | Build output (generated) |
+
+**When to modify**: Implementing React components, fixing React-specific bugs, adding React-specific features (hooks, context, refs)
+
+### Documentation Structure (`docs/`)
+
+| Path | Content/Functionality |
+|------|----------------------|
+| `docs/components/` | Component API documentation with props, events, and usage examples |
+| `docs/theme.md` | Theme system documentation and customization guide |
+
+### Examples & Demos (`examples/`)
+
+| Path | Content/Functionality |
+|------|----------------------|
+| `examples/demo/` | Interactive demo applications |
+| `examples/README.md` | How to run and use the examples |
+
+### Testing Structure (`tests/`)
+
+| Path | Content/Functionality |
+|------|----------------------|
+| `tests/vue/` | Vue component unit and integration tests |
+| `tests/utils/` | Utility function tests |
+| `tests/setup.ts` | Vitest configuration |
+
+## Package Responsibilities Summary
+
+### `@tigercat/core` - Core Utilities & Types
+- Framework-agnostic utilities, TypeScript type definitions, theme configuration
+- No external dependencies (pure TypeScript)
+- Re-exported by both `@tigercat/vue` and `@tigercat/react`
+- Changes affect both Vue and React packages
+
+### `@tigercat/vue` - Vue 3 Components
+- Vue 3 component implementations using Composition API
+- Depends on: `@tigercat/core` (workspace), `vue` (peer dependency)
+- Component style: `<script setup>`, slots for content, kebab-case events
+
+### `@tigercat/react` - React Components
+- React component implementations using functional components and hooks
+- Depends on: `@tigercat/core` (workspace), `react` (peer dependency)
+- Component style: Functional components, children prop, camelCase event handlers
+
+## Decision Guide: Where to Add/Modify Code
+
+### Adding a New Component
+
+1. **Core** (`packages/core/src/`): Create type definitions, shared utilities, theme config
+2. **Vue** (`packages/vue/src/components/`): Implement Vue component using Composition API
+3. **React** (`packages/react/src/components/`): Implement React component using hooks
+4. **Documentation** (`docs/components/`): Document API, props, events, examples
+5. **Tests** (`tests/`): Add component and utility tests
+
+### Modifying Existing Code
+
+- **Framework-agnostic** (types, utilities, theme): Modify `packages/core/src/`
+- **Vue-specific**: Modify `packages/vue/src/components/`
+- **React-specific**: Modify `packages/react/src/components/`
+
+### Adding Utilities
+
+- **Shared utilities**: Add to `packages/core/src/utils/`
+- **Vue-only utilities**: Add to `packages/vue/src/`
+- **React-only utilities**: Add to `packages/react/src/`
 
 ## Technology Stack
 
