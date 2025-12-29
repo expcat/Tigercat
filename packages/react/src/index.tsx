@@ -71,4 +71,7 @@ export type { DatePickerProps } from './components/DatePicker'
 export { TimePicker } from './components/TimePicker'
 export type { TimePickerProps } from './components/TimePicker'
 
+export { Upload } from './components/Upload'
+export type { UploadProps } from './components/Upload'
+
 export const version = '0.0.1'
