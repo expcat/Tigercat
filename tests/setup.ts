@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 import { expect, afterEach, beforeAll, afterAll } from 'vitest'
-import { cleanup } from '@testing-library/vue'
+import { cleanup as cleanupVue } from '@testing-library/vue'
+import { cleanup as cleanupReact } from '@testing-library/react'
 import * as matchers from '@testing-library/jest-dom/matchers'
 import { toHaveNoViolations } from 'jest-axe'
 
@@ -8,9 +9,10 @@ import { toHaveNoViolations } from 'jest-axe'
 expect.extend(matchers)
 expect.extend(toHaveNoViolations)
 
-// Cleanup after each test case
+// Cleanup after each test case (both Vue and React)
 afterEach(() => {
-  cleanup()
+  cleanupVue()
+  cleanupReact()
 })
 
 // Mock matchMedia for components that use responsive features

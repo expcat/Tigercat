@@ -1,0 +1,126 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Button > Snapshots > should match snapshot for default state 1`] = `
+<button
+  class="inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-primary-hover,#1d4ed8)] text-white focus:ring-[var(--tiger-primary,#2563eb)] disabled:bg-[var(--tiger-primary-disabled,#93c5fd)] px-4 py-2 text-base"
+  type="button"
+>
+  Default Button
+</button>
+`;
+
+exports[`Button > Snapshots > should match snapshot for disabled state 1`] = `
+<button
+  class="inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-primary-hover,#1d4ed8)] text-white focus:ring-[var(--tiger-primary,#2563eb)] disabled:bg-[var(--tiger-primary-disabled,#93c5fd)] px-4 py-2 text-base cursor-not-allowed opacity-60"
+  disabled=""
+  type="button"
+>
+  Disabled
+</button>
+`;
+
+exports[`Button > Snapshots > should match snapshot for each size 1`] = `
+<button
+  class="inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-primary-hover,#1d4ed8)] text-white focus:ring-[var(--tiger-primary,#2563eb)] disabled:bg-[var(--tiger-primary-disabled,#93c5fd)] px-3 py-1.5 text-sm"
+  type="button"
+>
+  sm
+</button>
+`;
+
+exports[`Button > Snapshots > should match snapshot for each size 2`] = `
+<button
+  class="inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-primary-hover,#1d4ed8)] text-white focus:ring-[var(--tiger-primary,#2563eb)] disabled:bg-[var(--tiger-primary-disabled,#93c5fd)] px-4 py-2 text-base"
+  type="button"
+>
+  md
+</button>
+`;
+
+exports[`Button > Snapshots > should match snapshot for each size 3`] = `
+<button
+  class="inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-primary-hover,#1d4ed8)] text-white focus:ring-[var(--tiger-primary,#2563eb)] disabled:bg-[var(--tiger-primary-disabled,#93c5fd)] px-6 py-3 text-lg"
+  type="button"
+>
+  lg
+</button>
+`;
+
+exports[`Button > Snapshots > should match snapshot for each variant 1`] = `
+<button
+  class="inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-primary-hover,#1d4ed8)] text-white focus:ring-[var(--tiger-primary,#2563eb)] disabled:bg-[var(--tiger-primary-disabled,#93c5fd)] px-4 py-2 text-base"
+  type="button"
+>
+  primary
+</button>
+`;
+
+exports[`Button > Snapshots > should match snapshot for each variant 2`] = `
+<button
+  class="inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-[var(--tiger-secondary,#4b5563)] hover:bg-[var(--tiger-secondary-hover,#374151)] text-white focus:ring-[var(--tiger-secondary,#4b5563)] disabled:bg-[var(--tiger-secondary-disabled,#9ca3af)] px-4 py-2 text-base"
+  type="button"
+>
+  secondary
+</button>
+`;
+
+exports[`Button > Snapshots > should match snapshot for each variant 3`] = `
+<button
+  class="inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-transparent hover:bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)] border-2 border-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)] disabled:border-[var(--tiger-primary-disabled,#93c5fd)] disabled:text-[var(--tiger-primary-disabled,#93c5fd)] px-4 py-2 text-base"
+  type="button"
+>
+  outline
+</button>
+`;
+
+exports[`Button > Snapshots > should match snapshot for each variant 4`] = `
+<button
+  class="inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-transparent hover:bg-[var(--tiger-ghost-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)] disabled:text-[var(--tiger-primary-disabled,#93c5fd)] px-4 py-2 text-base"
+  type="button"
+>
+  ghost
+</button>
+`;
+
+exports[`Button > Snapshots > should match snapshot for each variant 5`] = `
+<button
+  class="inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-transparent hover:underline text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)] disabled:text-[var(--tiger-primary-disabled,#93c5fd)] px-4 py-2 text-base"
+  type="button"
+>
+  link
+</button>
+`;
+
+exports[`Button > Snapshots > should match snapshot for loading state 1`] = `
+<button
+  class="inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-[var(--tiger-primary,#2563eb)] hover:bg-[var(--tiger-primary-hover,#1d4ed8)] text-white focus:ring-[var(--tiger-primary,#2563eb)] disabled:bg-[var(--tiger-primary-disabled,#93c5fd)] px-4 py-2 text-base cursor-not-allowed opacity-60"
+  disabled=""
+  type="button"
+>
+  <span
+    class="mr-2"
+  >
+    <svg
+      class="animate-spin h-4 w-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      />
+      <path
+        class="opacity-75"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        fill="currentColor"
+      />
+    </svg>
+  </span>
+  Loading
+</button>
+`;
