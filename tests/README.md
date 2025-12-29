@@ -239,6 +239,134 @@ it('should match snapshot', () => {
 8. **Test Edge Cases**: Include error states, empty states, boundary values
 9. **Maintain Snapshots**: Update snapshots only when changes are intentional
 
+## Testing Workflow
+
+### For New Contributors
+
+1. **Read the Testing Guide**:
+   - Vue: [TESTING_GUIDE.md](./TESTING_GUIDE.md) or [QUICK_START.md](./QUICK_START.md)
+   - React: [REACT_TESTING_GUIDE.md](./REACT_TESTING_GUIDE.md) or [REACT_QUICK_START.md](./REACT_QUICK_START.md)
+
+2. **Look at Examples**:
+   - Vue: `vue/Button.spec.ts`
+   - React: `react/Button.spec.tsx`
+
+3. **Run Tests in Watch Mode**:
+   ```bash
+   pnpm test
+   ```
+
+4. **Use Test UI for Debugging**:
+   ```bash
+   pnpm test:ui
+   ```
+
+### Writing Tests for New Components
+
+1. Create test file in appropriate directory:
+   - Vue: `tests/vue/YourComponent.spec.ts`
+   - React: `tests/react/YourComponent.spec.tsx`
+
+2. Follow the standard test structure:
+   ```typescript
+   describe('YourComponent', () => {
+     describe('Rendering', () => { /* ... */ })
+     describe('Props', () => { /* ... */ })
+     describe('Events', () => { /* ... */ })
+     describe('States', () => { /* ... */ })
+     describe('Theme Support', () => { /* ... */ })
+     describe('Accessibility', () => { /* ... */ })
+     describe('Snapshots', () => { /* ... */ })
+   })
+   ```
+
+3. Use helper functions from `tests/utils/`:
+   - `renderWithProps(component, props)`
+   - `expectNoA11yViolations(container)`
+   - `setThemeVariables(variables)`
+
+4. Run your tests:
+   ```bash
+   pnpm test YourComponent
+   ```
+
+5. Update the test checklist:
+   - Vue: [COMPONENT_TEST_CHECKLIST.md](./COMPONENT_TEST_CHECKLIST.md)
+   - React: [REACT_COMPONENT_TEST_CHECKLIST.md](./REACT_COMPONENT_TEST_CHECKLIST.md)
+
+## Troubleshooting Tests
+
+### Common Issues
+
+#### 1. Tests Failing After Changes
+
+**Problem**: Tests fail after updating dependencies or making changes.
+
+**Solution**:
+```bash
+# Clear Vitest cache
+rm -rf node_modules/.vitest
+
+# Rebuild packages
+pnpm build
+
+# Rerun tests
+pnpm test
+```
+
+#### 2. Accessibility Tests Failing
+
+**Problem**: `jest-axe` reports violations you can't see.
+
+**Solution**:
+- Run tests with UI: `pnpm test:ui`
+- Check the detailed violation messages
+- Use browser dev tools to inspect the rendered component
+- Refer to [WCAG guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+
+#### 3. Snapshot Mismatches
+
+**Problem**: Snapshot tests fail after intentional changes.
+
+**Solution**:
+```bash
+# Review the snapshot diff carefully
+pnpm test -- -u  # Update snapshots (only if changes are intentional)
+```
+
+#### 4. Flaky Tests
+
+**Problem**: Tests pass/fail inconsistently.
+
+**Solution**:
+- Use `waitFor` for async operations
+- Avoid relying on timing (use proper async utilities)
+- Ensure tests are independent (no shared state)
+- Use `beforeEach`/`afterEach` for setup/cleanup
+
+#### 5. Component Not Rendering
+
+**Problem**: Test can't find rendered component.
+
+**Solution**:
+```typescript
+// Debug by logging the rendered output
+const { container } = render(Component)
+console.log(container.innerHTML)
+
+// Use screen.debug() for better formatting
+import { screen } from '@testing-library/vue'
+screen.debug()
+```
+
+### Getting Help
+
+- Check existing test files for examples
+- Read [Vue Testing Library docs](https://testing-library.com/docs/vue-testing-library/intro/)
+- Read [React Testing Library docs](https://testing-library.com/docs/react-testing-library/intro/)
+- Search [GitHub Issues](https://github.com/expcats/Tigercat/issues)
+- Ask in [GitHub Discussions](https://github.com/expcats/Tigercat/discussions)
+
 ## Debugging Tests
 
 ```bash

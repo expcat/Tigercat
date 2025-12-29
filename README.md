@@ -22,20 +22,49 @@ This is a monorepo managed with pnpm workspaces containing:
 
 ### Prerequisites
 
-- Node.js >= 18
-- pnpm >= 8
+- Node.js >= 18 (recommended: 20.19.6)
+- pnpm >= 8 (recommended: 10.26.2)
 
-### Setup
+### Quick Setup
+
+For first-time contributors, we provide a setup script:
 
 ```bash
+# Clone and setup
+git clone https://github.com/expcats/Tigercat.git
+cd Tigercat
+./scripts/setup.sh
+```
+
+Or manually:
+
+```bash
+# Install pnpm if not already installed
+npm install -g pnpm@10.26.2
+
 # Install dependencies
 pnpm install
 
 # Build all packages
 pnpm build
 
-# Development mode
+# Verify your environment
+pnpm dev:check
+```
+
+### Development Workflow
+
+```bash
+# Development mode (watch all packages)
 pnpm dev
+
+# Run all tests
+pnpm test
+
+# Run demos
+pnpm demo:vue    # Vue3 demo on http://localhost:5173
+pnpm demo:react  # React demo on http://localhost:5174
+pnpm demo:all    # Run both demos simultaneously
 ```
 
 ### Testing
@@ -44,7 +73,11 @@ pnpm dev
 # Run all tests
 pnpm test
 
-# Run tests with UI
+# Run specific framework tests
+pnpm test:vue     # Vue tests only
+pnpm test:react   # React tests only
+
+# Run tests with UI (great for debugging)
 pnpm test:ui
 
 # Run tests with coverage
@@ -62,6 +95,24 @@ For detailed testing guidelines, see:
 - [Testing Guide](./tests/REACT_TESTING_GUIDE.md) - Comprehensive testing documentation
 - [Quick Start Guide](./tests/REACT_QUICK_START.md) - Get started writing tests
 - [Component Test Checklist](./tests/REACT_COMPONENT_TEST_CHECKLIST.md) - Track testing progress
+
+### Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `pnpm build` | Build all packages |
+| `pnpm dev` | Watch mode for all packages |
+| `pnpm test` | Run all tests |
+| `pnpm test:vue` | Run Vue tests only |
+| `pnpm test:react` | Run React tests only |
+| `pnpm test:ui` | Run tests with interactive UI |
+| `pnpm test:coverage` | Run tests with coverage report |
+| `pnpm demo:vue` | Run Vue3 demo (port 5173) |
+| `pnpm demo:react` | Run React demo (port 5174) |
+| `pnpm demo:all` | Run both demos simultaneously |
+| `pnpm dev:check` | Verify development environment |
+| `pnpm lint` | Lint all packages |
+| `pnpm clean` | Clean build artifacts |
 
 ### Project Structure
 
@@ -96,6 +147,53 @@ Component documentation can be found in the `docs/components/` directory. Each c
 - Accessibility guidelines
 
 See [docs/components/](./docs/components/) for the complete list of available components.
+
+## Contributing
+
+We welcome contributions! Please read our [Contributing Guide](./CONTRIBUTING.md) to get started.
+
+For detailed development documentation, see [DEVELOPMENT.md](./DEVELOPMENT.md).
+
+### Quick Links
+
+- [Contributing Guide](./CONTRIBUTING.md) - How to contribute
+- [Development Guide](./DEVELOPMENT.md) - Development documentation
+- [Roadmap](./ROADMAP.md) - Project roadmap and progress
+
+## Troubleshooting
+
+### Common Issues
+
+**pnpm not found?**
+```bash
+npm install -g pnpm@10.26.2
+```
+
+**Demo not loading components?**
+```bash
+# Build packages first
+pnpm build
+# Then run demo
+pnpm demo:vue
+```
+
+**Tests failing after changes?**
+```bash
+# Clear cache and rebuild
+pnpm clean
+pnpm install
+pnpm build
+pnpm test
+```
+
+**Port already in use?**
+```bash
+# Check what's using the port
+lsof -i :5173  # or :5174
+# Kill the process or use a different port
+```
+
+For more troubleshooting tips, see [DEVELOPMENT.md](./DEVELOPMENT.md#troubleshooting).
 
 ## License
 

@@ -1,0 +1,108 @@
+#!/bin/bash
+
+# Environment Check Script for Tigercat Development
+# This script checks if your development environment meets the requirements
+
+set -e
+
+echo "🐯 Tigercat Development Environment Check"
+echo "=========================================="
+echo ""
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Function to check version
+check_version() {
+    local name=$1
+    local current=$2
+    local required=$3
+    
+    if [ -z "$current" ]; then
+        echo -e "${RED}✗${NC} $name is not installed"
+        return 1
+    fi
+    
+    # Simple version comparison (assumes semver format)
+    local current_major=$(echo $current | cut -d. -f1)
+    local required_major=$(echo $required | cut -d. -f1)
+    
+    if [ "$current_major" -ge "$required_major" ]; then
+        echo -e "${GREEN}✓${NC} $name: $current (required: >= $required)"
+        return 0
+    else
+        echo -e "${RED}✗${NC} $name: $current (required: >= $required)"
+        return 1
+    fi
+}
+
+# Track overall status
+has_errors=0
+
+# Check Node.js
+echo "Checking Node.js..."
+if command -v node &> /dev/null; then
+    NODE_VERSION=$(node --version | cut -d'v' -f2)
+    if ! check_version "Node.js" "$NODE_VERSION" "18.0.0"; then
+        has_errors=1
+    fi
+else
+    echo -e "${RED}✗${NC} Node.js is not installed"
+    has_errors=1
+fi
+echo ""
+
+# Check pnpm
+echo "Checking pnpm..."
+if command -v pnpm &> /dev/null; then
+    PNPM_VERSION=$(pnpm --version)
+    if ! check_version "pnpm" "$PNPM_VERSION" "8.0.0"; then
+        has_errors=1
+    fi
+else
+    echo -e "${RED}✗${NC} pnpm is not installed"
+    echo -e "${YELLOW}ℹ${NC} Install pnpm: npm install -g pnpm@10.26.2"
+    has_errors=1
+fi
+echo ""
+
+# Check if node_modules exists
+echo "Checking dependencies..."
+if [ -d "node_modules" ]; then
+    echo -e "${GREEN}✓${NC} Dependencies are installed"
+else
+    echo -e "${YELLOW}⚠${NC} Dependencies are not installed"
+    echo -e "${YELLOW}ℹ${NC} Run: pnpm install"
+    has_errors=1
+fi
+echo ""
+
+# Check if packages are built
+echo "Checking build artifacts..."
+if [ -f "packages/core/dist/index.js" ] && [ -f "packages/vue/dist/index.js" ] && [ -f "packages/react/dist/index.js" ]; then
+    echo -e "${GREEN}✓${NC} All packages are built"
+else
+    echo -e "${YELLOW}⚠${NC} Some packages are not built"
+    echo -e "${YELLOW}ℹ${NC} Run: pnpm build"
+    has_errors=1
+fi
+echo ""
+
+# Summary
+echo "=========================================="
+if [ $has_errors -eq 0 ]; then
+    echo -e "${GREEN}✓${NC} Environment check passed! You're ready to develop."
+    echo ""
+    echo "Quick start commands:"
+    echo "  pnpm test              # Run all tests"
+    echo "  pnpm demo:vue          # Run Vue3 demo"
+    echo "  pnpm demo:react        # Run React demo"
+    echo "  pnpm dev               # Watch mode for all packages"
+    exit 0
+else
+    echo -e "${RED}✗${NC} Environment check failed. Please install missing dependencies."
+    exit 1
+fi
