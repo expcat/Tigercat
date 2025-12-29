@@ -29,6 +29,8 @@ const ColDemo = lazy(() => import('./pages/ColDemo'))
 const LinkDemo = lazy(() => import('./pages/LinkDemo'))
 const TextDemo = lazy(() => import('./pages/TextDemo'))
 const IconDemo = lazy(() => import('./pages/IconDemo'))
+const DatePickerDemo = lazy(() => import('./pages/DatePickerDemo'))
+const TimePickerDemo = lazy(() => import('./pages/TimePickerDemo'))
 
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
@@ -58,6 +60,8 @@ const router = createBrowserRouter([
   { path: '/link', element: <LinkDemo /> },
   { path: '/text', element: <TextDemo /> },
   { path: '/icon', element: <IconDemo /> },
+  { path: '/datepicker', element: <DatePickerDemo /> },
+  { path: '/timepicker', element: <TimePickerDemo /> },
 ])
 
 export default router

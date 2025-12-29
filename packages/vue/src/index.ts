@@ -34,5 +34,6 @@ export { Link } from './components/Link'
 export { Text } from './components/Text'
 export { Icon } from './components/Icon'
 export { DatePicker } from './components/DatePicker'
+export { TimePicker } from './components/TimePicker'
 
 export const version = '0.0.1'

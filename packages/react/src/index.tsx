@@ -68,4 +68,7 @@ export type { SelectProps } from './components/Select'
 export { DatePicker } from './components/DatePicker'
 export type { DatePickerProps } from './components/DatePicker'
 
+export { TimePicker } from './components/TimePicker'
+export type { TimePickerProps } from './components/TimePicker'
+
 export const version = '0.0.1'
