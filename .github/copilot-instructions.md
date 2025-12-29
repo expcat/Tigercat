@@ -89,8 +89,18 @@ tigercat/
 | Path | Content/Functionality |
 |------|----------------------|
 | `tests/vue/` | Vue component unit and integration tests |
-| `tests/utils/` | Utility function tests |
-| `tests/setup.ts` | Vitest configuration |
+| `tests/react/` | React component unit and integration tests |
+| `tests/utils/` | Shared test utilities and helpers (Vue and React) |
+| `tests/utils/render-helpers.ts` | Vue-specific render helpers |
+| `tests/utils/render-helpers-react.ts` | React-specific render helpers |
+| `tests/utils/a11y-helpers.ts` | Accessibility testing utilities |
+| `tests/utils/theme-helpers.ts` | Theme testing utilities |
+| `tests/utils/test-fixtures.ts` | Common test data and fixtures |
+| `tests/setup.ts` | Vitest global configuration |
+| `tests/TESTING_GUIDE.md` | Vue testing guide |
+| `tests/REACT_TESTING_GUIDE.md` | React testing guide |
+| `tests/COMPONENT_TEST_CHECKLIST.md` | Vue component test progress |
+| `tests/REACT_COMPONENT_TEST_CHECKLIST.md` | React component test progress |
 
 ## Package Responsibilities Summary
 
@@ -213,11 +223,67 @@ tigercat/
 
 ### Testing
 
-- Write tests for all components
-- Test both Vue and React implementations
+#### General Testing Principles
+- Write tests for all components (both Vue and React)
 - Test component behavior, not implementation details
-- Include accessibility tests
+- Include accessibility tests with jest-axe
 - Test edge cases and error states
+- Maintain test independence and reproducibility
+
+#### Vue Component Testing
+- **Location**: `tests/vue/[ComponentName].spec.ts`
+- **Framework**: @testing-library/vue with Vitest
+- **Style**: Use `renderWithProps`, `renderWithSlots` helpers
+- **Events**: Test emitted events with kebab-case names
+- **Guide**: See `tests/TESTING_GUIDE.md`
+- **Example**: `tests/vue/Button.spec.ts`
+
+#### React Component Testing
+- **Location**: `tests/react/[ComponentName].spec.tsx`
+- **Framework**: @testing-library/react with Vitest
+- **Style**: Use `renderWithProps`, `renderWithChildren` helpers
+- **Events**: Test event handler props (onClick, onChange, etc.)
+- **User Interactions**: Prefer `userEvent` over `fireEvent`
+- **Guide**: See `tests/REACT_TESTING_GUIDE.md`
+- **Example**: `tests/react/Button.spec.tsx`
+
+#### Test Structure (Consistent for Both Frameworks)
+```typescript
+describe('ComponentName', () => {
+  describe('Rendering', () => {
+    // Basic rendering tests
+  })
+  
+  describe('Props', () => {
+    // Props validation tests
+  })
+  
+  describe('Events', () => {
+    // Event/handler tests
+  })
+  
+  describe('States', () => {
+    // Different states (disabled, loading, etc.)
+  })
+  
+  describe('Theme Support', () => {
+    // Theme customization tests
+  })
+  
+  describe('Accessibility', () => {
+    // a11y tests with jest-axe
+  })
+  
+  describe('Snapshots', () => {
+    // Snapshot tests for regression
+  })
+})
+```
+
+#### Shared Test Utilities
+- **Accessibility**: `expectNoA11yViolations`, `expectProperAriaLabels`
+- **Theme**: `setThemeVariables`, `clearThemeVariables`
+- **Fixtures**: `buttonVariants`, `componentSizes`, `inputTypes`
 
 ### Documentation
 
