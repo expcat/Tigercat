@@ -1,29 +1,44 @@
-# Tigercat Vue Component Tests
+# Tigercat Component Tests
 
-This directory contains comprehensive test suites for all Vue components in the Tigercat UI library.
+This directory contains comprehensive test suites for all Vue and React components in the Tigercat UI library.
 
 ## Structure
 
 ```
 tests/
-├── vue/              # Vue component test files
+├── vue/                # Vue component test files
 │   ├── Button.spec.ts
 │   ├── Input.spec.ts
 │   └── ...
-├── utils/            # Test utilities and helpers
-│   ├── render-helpers.ts
+├── react/              # React component test files
+│   ├── Button.spec.tsx
+│   ├── Input.spec.tsx
+│   └── ...
+├── utils/              # Shared test utilities and helpers
+│   ├── render-helpers.ts        # Vue render helpers
+│   ├── render-helpers-react.ts  # React render helpers
 │   ├── a11y-helpers.ts
 │   ├── theme-helpers.ts
 │   ├── test-fixtures.ts
 │   └── index.ts
-└── setup.ts          # Global test setup
+├── setup.ts            # Global test setup
+├── TESTING_GUIDE.md    # Vue testing guide
+├── REACT_TESTING_GUIDE.md  # React testing guide
+├── COMPONENT_TEST_CHECKLIST.md  # Vue test progress
+└── REACT_COMPONENT_TEST_CHECKLIST.md  # React test progress
 ```
 
 ## Running Tests
 
 ```bash
-# Run all tests
+# Run all tests (Vue and React)
 pnpm test
+
+# Run Vue tests only
+pnpm test tests/vue
+
+# Run React tests only
+pnpm test tests/react
 
 # Run tests in watch mode
 pnpm test
@@ -33,19 +48,34 @@ pnpm test:ui
 
 # Run tests with coverage
 pnpm test:coverage
+
+# Run specific test file
+pnpm test Button.spec
 ```
 
-## Test Guidelines
+## Framework-Specific Guides
 
-### Test Structure
+### Vue Testing
+See [TESTING_GUIDE.md](./TESTING_GUIDE.md) for comprehensive Vue testing guidelines.
 
-Each component should have its own `.spec.ts` file following this structure:
+**Quick Start:**
+- Test template: `vue/ComponentTemplate.spec.ts.template`
+- Example test: `vue/Button.spec.ts`
+- Progress tracker: `COMPONENT_TEST_CHECKLIST.md`
+
+### React Testing
+See [REACT_TESTING_GUIDE.md](./REACT_TESTING_GUIDE.md) for comprehensive React testing guidelines.
+
+**Quick Start:**
+- Test template: `react/ComponentTemplate.spec.tsx.template`
+- Example test: `react/Button.spec.tsx`
+- Progress tracker: `REACT_COMPONENT_TEST_CHECKLIST.md`
+
+## Test Structure
+
+Both Vue and React tests follow a similar structure:
 
 ```typescript
-import { describe, it, expect } from 'vitest'
-import { render } from '@testing-library/vue'
-import { ComponentName } from '@tigercat/vue'
-
 describe('ComponentName', () => {
   describe('Rendering', () => {
     // Basic rendering tests
@@ -56,7 +86,7 @@ describe('ComponentName', () => {
   })
 
   describe('Events', () => {
-    // Event emission tests
+    // Event/handler tests
   })
 
   describe('States', () => {
@@ -77,7 +107,7 @@ describe('ComponentName', () => {
 })
 ```
 
-### Test Coverage
+## Test Coverage Requirements
 
 All component tests should cover:
 
