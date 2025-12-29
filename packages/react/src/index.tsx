@@ -65,4 +65,7 @@ export type { ReactFooterProps as FooterProps } from './components/Footer'
 export { Select } from './components/Select'
 export type { SelectProps } from './components/Select'
 
+export { DatePicker } from './components/DatePicker'
+export type { DatePickerProps } from './components/DatePicker'
+
 export const version = '0.0.1'
