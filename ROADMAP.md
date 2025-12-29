@@ -30,7 +30,7 @@
 | 选择器 | Select | ✅ | ✅ | ✅ | ⬜ |
 | 开关 | Switch | ✅ | ✅ | ✅ | ⬜ |
 | 滑块 | Slider | ✅ | ✅ | ✅ | ⬜ |
-| 日期选择器 | DatePicker | ⬜ | ⬜ | ⬜ | ⬜ |
+| 日期选择器 | DatePicker | ✅ | ✅ | ✅ | ✅ |
 | 时间选择器 | TimePicker | ✅ | ✅ | ✅ | ✅ |
 | 上传 | Upload | ✅ | ✅ | ✅ | ✅ |
 
