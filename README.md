@@ -52,25 +52,50 @@ pnpm test:coverage
 ```
 
 For detailed testing guidelines, see:
-- [Quick Start Guide](./tests/QUICK_START.md) - Get started writing tests
+
+**Vue Testing**:
 - [Testing Guide](./tests/TESTING_GUIDE.md) - Comprehensive testing documentation
-- [Component Checklist](./tests/COMPONENT_TEST_CHECKLIST.md) - Track testing progress
+- [Quick Start Guide](./tests/QUICK_START.md) - Get started writing tests
+- [Component Test Checklist](./tests/COMPONENT_TEST_CHECKLIST.md) - Track testing progress
+
+**React Testing**:
+- [Testing Guide](./tests/REACT_TESTING_GUIDE.md) - Comprehensive testing documentation
+- [Quick Start Guide](./tests/REACT_QUICK_START.md) - Get started writing tests
+- [Component Test Checklist](./tests/REACT_COMPONENT_TEST_CHECKLIST.md) - Track testing progress
 
 ### Project Structure
 
 ```
 tigercat/
 ├── packages/
-│   ├── core/           # Core utilities
+│   ├── core/           # Core utilities and types
 │   ├── vue/            # Vue 3 components
 │   └── react/          # React components
+├── docs/               # Component documentation
+│   ├── components/     # Individual component docs
+│   └── theme.md        # Theme customization guide
 ├── tests/              # Test infrastructure and utilities
 │   ├── vue/            # Vue component tests
+│   ├── react/          # React component tests
 │   └── utils/          # Test helpers and utilities
+├── examples/           # Demo applications
+│   └── demo/
+│       ├── vue3/       # Vue 3 demo app
+│       └── react/      # React demo app
 ├── package.json
 ├── pnpm-workspace.yaml
 └── tsconfig.json
 ```
+
+## Documentation
+
+Component documentation can be found in the `docs/components/` directory. Each component includes:
+- API reference (props, events, types)
+- Usage examples for both Vue 3 and React
+- Styling and customization options
+- Accessibility guidelines
+
+See [docs/components/](./docs/components/) for the complete list of available components.
 
 ## License
 
