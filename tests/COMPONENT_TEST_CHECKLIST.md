@@ -4,10 +4,10 @@ This document tracks the testing progress for all Vue components in the Tigercat
 
 ## Progress Overview
 
-- **Total Components**: 25
-- **Components Tested**: 1
+- **Total Components**: 28
+- **Components Tested**: 4
 - **Components Remaining**: 24
-- **Progress**: 4%
+- **Progress**: 14%
 
 ## Testing Status
 
@@ -18,7 +18,7 @@ This document tracks the testing progress for all Vue components in the Tigercat
 - [ ] Icon
 - [ ] Text
 
-### Form Components (11 total, 0 tested)
+### Form Components (14 total, 3 tested)
 
 - [ ] Form
 - [ ] FormItem
@@ -31,6 +31,9 @@ This document tracks the testing progress for all Vue components in the Tigercat
 - [ ] Select
 - [ ] Switch
 - [ ] Slider
+- [x] DatePicker - ✅ Completed
+- [x] TimePicker - ✅ Completed
+- [x] Upload - ✅ Completed
 
 ### Layout Components (10 total, 0 tested)
 
@@ -65,6 +68,21 @@ Each completed component test should include:
 - **Tests**: 23
 - **Coverage**: 100% lines, 84.61% branches
 - **Notes**: Comprehensive test covering all features including loading spinner
+
+### TimePicker ✅
+- **Test File**: `tests/vue/TimePicker.spec.ts`
+- **Tests**: Comprehensive
+- **Notes**: Full test coverage for time selection, validation, and accessibility
+
+### DatePicker ✅
+- **Test File**: `tests/vue/DatePicker.spec.ts`
+- **Tests**: Comprehensive
+- **Notes**: Full test coverage for date selection, navigation, and accessibility
+
+### Upload ✅
+- **Test File**: `tests/vue/Upload.spec.ts`
+- **Tests**: Comprehensive
+- **Notes**: Full test coverage for file upload, validation, drag-and-drop, and accessibility
 
 ### Link
 - **Priority**: High (Basic Component)
