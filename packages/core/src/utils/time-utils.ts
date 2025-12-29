@@ -2,6 +2,40 @@
  * Time utility functions for TimePicker component
  */
 
+import type { TimeFormat } from '../types/timepicker'
+
+/**
+ * Validate time component value
+ * @param value - Value to validate
+ * @param min - Minimum allowed value
+ * @param max - Maximum allowed value
+ * @returns True if value is within range
+ */
+function isValidTimeValue(value: number, min: number, max: number): boolean {
+  return !isNaN(value) && value >= min && value <= max
+}
+
+/**
+ * Validate and normalize step value
+ * Ensures step is at least 1 and rounds to integer
+ * @param step - Step value to validate
+ * @returns Valid step value (minimum 1)
+ */
+function validateStep(step: number): number {
+  return Math.max(1, Math.floor(step))
+}
+
+/**
+ * Clamp a value between min and max
+ * @param value - Value to clamp
+ * @param min - Minimum value
+ * @param max - Maximum value
+ * @returns Clamped value
+ */
+function clampValue(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value))
+}
+
 /**
  * Parse time string to hours, minutes, and seconds
  * @param timeString - Time string in 'HH:mm' or 'HH:mm:ss' format
@@ -21,16 +55,11 @@ export function parseTime(timeString: string | null | undefined): {
   const minutes = parseInt(timeParts[1], 10)
   const seconds = timeParts.length === 3 ? parseInt(timeParts[2], 10) : 0
 
+  // Validate all components
   if (
-    isNaN(hours) ||
-    isNaN(minutes) ||
-    isNaN(seconds) ||
-    hours < 0 ||
-    hours > 23 ||
-    minutes < 0 ||
-    minutes > 59 ||
-    seconds < 0 ||
-    seconds > 59
+    !isValidTimeValue(hours, 0, 23) ||
+    !isValidTimeValue(minutes, 0, 59) ||
+    !isValidTimeValue(seconds, 0, 59)
   ) {
     return null
   }
@@ -42,7 +71,7 @@ export function parseTime(timeString: string | null | undefined): {
  * Format time components to string
  * @param hours - Hours (0-23)
  * @param minutes - Minutes (0-59)
- * @param seconds - Seconds (0-59)
+ * @param seconds - Seconds (0-59), defaults to 0
  * @param showSeconds - Whether to include seconds in output
  * @returns Formatted time string
  */
@@ -52,9 +81,10 @@ export function formatTime(
   seconds: number = 0,
   showSeconds: boolean = false
 ): string {
-  const h = hours.toString().padStart(2, '0')
-  const m = minutes.toString().padStart(2, '0')
-  const s = seconds.toString().padStart(2, '0')
+  // Clamp values to valid ranges
+  const h = clampValue(hours, 0, 23).toString().padStart(2, '0')
+  const m = clampValue(minutes, 0, 59).toString().padStart(2, '0')
+  const s = clampValue(seconds, 0, 59).toString().padStart(2, '0')
 
   return showSeconds ? `${h}:${m}:${s}` : `${h}:${m}`
 }
@@ -92,7 +122,7 @@ export function to24HourFormat(hours: number, period: 'AM' | 'PM'): number {
  * Format time for display based on format preference
  * @param hours - Hours (0-23)
  * @param minutes - Minutes (0-59)
- * @param seconds - Seconds (0-59)
+ * @param seconds - Seconds (0-59), defaults to 0
  * @param format - '12' or '24' hour format
  * @param showSeconds - Whether to show seconds
  * @returns Formatted display string
@@ -101,19 +131,18 @@ export function formatTimeDisplay(
   hours: number,
   minutes: number,
   seconds: number = 0,
-  format: '12' | '24' = '24',
+  format: TimeFormat = '24',
   showSeconds: boolean = false
 ): string {
   if (format === '12') {
     const { hours: hours12, period } = to12HourFormat(hours)
     const h = hours12.toString().padStart(2, '0')
-    const m = minutes.toString().padStart(2, '0')
-    const s = seconds.toString().padStart(2, '0')
+    const m = clampValue(minutes, 0, 59).toString().padStart(2, '0')
+    const s = clampValue(seconds, 0, 59).toString().padStart(2, '0')
     const timeStr = showSeconds ? `${h}:${m}:${s}` : `${h}:${m}`
     return `${timeStr} ${period}`
-  } else {
-    return formatTime(hours, minutes, seconds, showSeconds)
   }
+  return formatTime(hours, minutes, seconds, showSeconds)
 }
 
 /**
@@ -153,16 +182,17 @@ export function isTimeInRange(
 
 /**
  * Generate list of hours based on step
- * @param step - Hour step
+ * @param step - Hour step, defaults to 1
  * @param format - '12' or '24' hour format
  * @returns Array of hour values
  */
-export function generateHours(step: number = 1, format: '12' | '24' = '24'): number[] {
+export function generateHours(step: number = 1, format: TimeFormat = '24'): number[] {
   const max = format === '12' ? 12 : 23
   const start = format === '12' ? 1 : 0
   const hours: number[] = []
+  const validStep = validateStep(step)
 
-  for (let i = start; i <= max; i += step) {
+  for (let i = start; i <= max; i += validStep) {
     hours.push(i)
   }
 
@@ -171,13 +201,14 @@ export function generateHours(step: number = 1, format: '12' | '24' = '24'): num
 
 /**
  * Generate list of minutes based on step
- * @param step - Minute step
+ * @param step - Minute step, defaults to 1
  * @returns Array of minute values
  */
 export function generateMinutes(step: number = 1): number[] {
   const minutes: number[] = []
+  const validStep = validateStep(step)
 
-  for (let i = 0; i < 60; i += step) {
+  for (let i = 0; i < 60; i += validStep) {
     minutes.push(i)
   }
 
@@ -186,13 +217,14 @@ export function generateMinutes(step: number = 1): number[] {
 
 /**
  * Generate list of seconds based on step
- * @param step - Second step
+ * @param step - Second step, defaults to 1
  * @returns Array of second values
  */
 export function generateSeconds(step: number = 1): number[] {
   const seconds: number[] = []
+  const validStep = validateStep(step)
 
-  for (let i = 0; i < 60; i += step) {
+  for (let i = 0; i < 60; i += validStep) {
     seconds.push(i)
   }
 

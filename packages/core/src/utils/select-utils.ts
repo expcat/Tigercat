@@ -3,6 +3,7 @@
  */
 
 import type { SelectSize, SelectOption, SelectOptionGroup } from '../types/select'
+import { classNames } from './class-names'
 
 /**
  * Base select container classes
@@ -12,14 +13,36 @@ export const selectBaseClasses = 'relative inline-block w-full'
 /**
  * Select trigger button base classes
  */
-export const selectTriggerBaseClasses =
-  'w-full flex items-center justify-between gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:border-[var(--tiger-primary,#2563eb)]'
+const SELECT_TRIGGER_BASE_CLASSES = [
+  'w-full',
+  'flex',
+  'items-center',
+  'justify-between',
+  'gap-2',
+  'px-3',
+  'py-2',
+  'bg-white',
+  'border',
+  'border-gray-300',
+  'rounded-md',
+  'shadow-sm',
+  'cursor-pointer',
+  'transition-colors',
+  'focus:outline-none',
+  'focus:ring-2',
+  'focus:ring-[var(--tiger-primary,#2563eb)]',
+  'focus:border-[var(--tiger-primary,#2563eb)]',
+] as const
 
 /**
- * Select trigger disabled classes
+ * Select trigger disabled classes (combined string for performance)
  */
-export const selectTriggerDisabledClasses =
-  'disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed disabled:border-gray-200'
+const SELECT_TRIGGER_DISABLED_CLASSES_STRING = [
+  'disabled:bg-gray-50',
+  'disabled:text-gray-500',
+  'disabled:cursor-not-allowed',
+  'disabled:border-gray-200',
+].join(' ')
 
 /**
  * Select dropdown base classes
@@ -64,63 +87,79 @@ export const selectEmptyStateClasses =
   'px-3 py-8 text-center text-gray-500 text-sm'
 
 /**
+ * Select size classes map (constant for performance)
+ */
+const SELECT_SIZE_CLASSES: Record<SelectSize, string> = {
+  sm: 'text-sm py-1.5',
+  md: 'text-base py-2',
+  lg: 'text-lg py-2.5',
+}
+
+/**
  * Get select size classes
+ * @param size - Select size variant
+ * @returns Size-specific class string
  */
 export function getSelectSizeClasses(size: SelectSize): string {
-  const sizeClasses = {
-    sm: 'text-sm py-1.5',
-    md: 'text-base py-2',
-    lg: 'text-lg py-2.5',
-  }
-
-  return sizeClasses[size] || sizeClasses.md
+  return SELECT_SIZE_CLASSES[size]
 }
 
 /**
  * Get select trigger classes
+ * @param size - Select size
+ * @param disabled - Whether the select is disabled
+ * @param isOpen - Whether the dropdown is open
+ * @returns Complete trigger class string
  */
 export function getSelectTriggerClasses(
   size: SelectSize,
   disabled: boolean,
   isOpen: boolean
 ): string {
-  const classes = [
-    selectTriggerBaseClasses,
+  return classNames(
+    ...SELECT_TRIGGER_BASE_CLASSES,
     getSelectSizeClasses(size),
-    disabled && selectTriggerDisabledClasses,
-    isOpen && 'ring-2 ring-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)]',
-  ].filter(Boolean)
-
-  return classes.join(' ')
+    disabled && SELECT_TRIGGER_DISABLED_CLASSES_STRING,
+    isOpen && 'ring-2 ring-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)]'
+  )
 }
 
 /**
  * Get select option classes
+ * @param isSelected - Whether the option is selected
+ * @param isDisabled - Whether the option is disabled
+ * @param size - Select size
+ * @returns Complete option class string
  */
 export function getSelectOptionClasses(
   isSelected: boolean,
   isDisabled: boolean,
   size: SelectSize
 ): string {
-  const classes = [
+  return classNames(
     selectOptionBaseClasses,
     getSelectSizeClasses(size),
     isSelected && selectOptionSelectedClasses,
-    isDisabled && selectOptionDisabledClasses,
-  ].filter(Boolean)
-
-  return classes.join(' ')
+    isDisabled && selectOptionDisabledClasses
+  )
 }
 
 /**
- * Check if options are grouped
+ * Type guard to check if an option is a group
+ * @param option - Option to check
+ * @returns True if option is a SelectOptionGroup
  */
-export function isOptionGroup(option: SelectOption | SelectOptionGroup | null | undefined): option is SelectOptionGroup {
+export function isOptionGroup(
+  option: SelectOption | SelectOptionGroup | null | undefined
+): option is SelectOptionGroup {
   return !!option && typeof option === 'object' && 'options' in option && Array.isArray(option.options)
 }
 
 /**
  * Filter options based on search query
+ * @param options - Array of options or option groups to filter
+ * @param query - Search query string
+ * @returns Filtered options array
  */
 export function filterOptions(
   options: (SelectOption | SelectOptionGroup)[],
@@ -132,11 +171,14 @@ export function filterOptions(
 
   const searchLower = query.toLowerCase()
 
-  return options.reduce((filtered: (SelectOption | SelectOptionGroup)[], option: SelectOption | SelectOptionGroup) => {
+  return options.reduce<(SelectOption | SelectOptionGroup)[]>((filtered, option) => {
     if (isOptionGroup(option)) {
-      const filteredGroupOptions = option.options.filter((opt: SelectOption) =>
+      // Filter options within the group
+      const filteredGroupOptions = option.options.filter((opt) =>
         opt.label.toLowerCase().includes(searchLower)
       )
+      
+      // Only include the group if it has matching options
       if (filteredGroupOptions.length > 0) {
         filtered.push({
           ...option,
@@ -144,6 +186,7 @@ export function filterOptions(
         })
       }
     } else {
+      // Include option if label matches
       if (option.label.toLowerCase().includes(searchLower)) {
         filtered.push(option)
       }

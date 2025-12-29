@@ -5,17 +5,148 @@
 import type { FormRule, FormRules, FormValues, FormError, FormValidationResult } from '../types/form'
 
 /**
- * Email validation pattern
+ * Email validation pattern (RFC 5322 compliant)
  */
 const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
 /**
- * URL validation pattern
+ * URL validation pattern (supports http and https)
  */
 const URL_PATTERN = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/
 
 /**
+ * Check if a value is considered empty for form validation
+ * @param value - Value to check
+ * @returns True if value is empty
+ * 
+ * Note: This function treats the following as empty:
+ * - null
+ * - undefined
+ * - empty string ('')
+ * - empty array ([])
+ * Objects (even empty ones) are NOT considered empty by this function,
+ * as they may contain properties that need to be validated separately.
+ */
+function isEmpty(value: unknown): boolean {
+  if (value === null || value === undefined || value === '') {
+    return true
+  }
+  if (Array.isArray(value) && value.length === 0) {
+    return true
+  }
+  return false
+}
+
+/**
+ * Validate value type
+ * @param value - Value to validate
+ * @param type - Expected type
+ * @param customMessage - Custom error message
+ * @returns Error message if validation fails, null otherwise
+ */
+function validateType(
+  value: unknown,
+  type: FormRule['type'],
+  customMessage?: string
+): string | null {
+  switch (type) {
+    case 'string':
+      if (typeof value !== 'string') {
+        return customMessage || 'Value must be a string'
+      }
+      break
+    case 'number':
+      if (typeof value !== 'number' && isNaN(Number(value))) {
+        return customMessage || 'Value must be a number'
+      }
+      break
+    case 'boolean':
+      if (typeof value !== 'boolean') {
+        return customMessage || 'Value must be a boolean'
+      }
+      break
+    case 'array':
+      if (!Array.isArray(value)) {
+        return customMessage || 'Value must be an array'
+      }
+      break
+    case 'object':
+      if (typeof value !== 'object' || Array.isArray(value)) {
+        return customMessage || 'Value must be an object'
+      }
+      break
+    case 'email':
+      if (typeof value === 'string' && !EMAIL_PATTERN.test(value)) {
+        return customMessage || 'Please enter a valid email address'
+      }
+      break
+    case 'url':
+      if (typeof value === 'string' && !URL_PATTERN.test(value)) {
+        return customMessage || 'Please enter a valid URL'
+      }
+      break
+    case 'date':
+      if (!(value instanceof Date) && isNaN(Date.parse(String(value)))) {
+        return customMessage || 'Please enter a valid date'
+      }
+      break
+  }
+  return null
+}
+
+/**
+ * Validate value range (min/max)
+ * @param value - Value to validate
+ * @param min - Minimum value/length
+ * @param max - Maximum value/length
+ * @param customMessage - Custom error message
+ * @returns Error message if validation fails, null otherwise
+ */
+function validateRange(
+  value: unknown,
+  min: number | undefined,
+  max: number | undefined,
+  customMessage?: string
+): string | null {
+  // String length validation
+  if (typeof value === 'string') {
+    if (min !== undefined && value.length < min) {
+      return customMessage || `Minimum length is ${min} characters`
+    }
+    if (max !== undefined && value.length > max) {
+      return customMessage || `Maximum length is ${max} characters`
+    }
+  }
+  
+  // Number range validation
+  if (typeof value === 'number') {
+    if (min !== undefined && value < min) {
+      return customMessage || `Minimum value is ${min}`
+    }
+    if (max !== undefined && value > max) {
+      return customMessage || `Maximum value is ${max}`
+    }
+  }
+  
+  // Array length validation
+  if (Array.isArray(value)) {
+    if (min !== undefined && value.length < min) {
+      return customMessage || `Minimum ${min} items required`
+    }
+    if (max !== undefined && value.length > max) {
+      return customMessage || `Maximum ${max} items allowed`
+    }
+  }
+  
+  return null
+}
+
+/**
  * Validate a single value against a rule
+ * @param value - Value to validate
+ * @param rule - Validation rule to apply
+ * @param allValues - All form values for cross-field validation
+ * @returns Error message string if validation fails, null if passes
  */
 export async function validateRule(
   value: unknown,
@@ -23,7 +154,7 @@ export async function validateRule(
   allValues?: FormValues
 ): Promise<string | null> {
   // Skip validation if value is empty and not required
-  if (!rule.required && (value === '' || value === null || value === undefined)) {
+  if (!rule.required && isEmpty(value)) {
     return null
   }
   
@@ -31,89 +162,20 @@ export async function validateRule(
   const transformedValue = rule.transform ? rule.transform(value) : value
   
   // Required validation
-  if (rule.required) {
-    if (transformedValue === '' || transformedValue === null || transformedValue === undefined) {
-      return rule.message || 'This field is required'
-    }
-    if (Array.isArray(transformedValue) && transformedValue.length === 0) {
-      return rule.message || 'This field is required'
-    }
+  if (rule.required && isEmpty(transformedValue)) {
+    return rule.message || 'This field is required'
   }
   
   // Type validation
-  if (rule.type && transformedValue !== null && transformedValue !== undefined && transformedValue !== '') {
-    switch (rule.type) {
-      case 'string':
-        if (typeof transformedValue !== 'string') {
-          return rule.message || 'Value must be a string'
-        }
-        break
-      case 'number':
-        if (typeof transformedValue !== 'number' && isNaN(Number(transformedValue))) {
-          return rule.message || 'Value must be a number'
-        }
-        break
-      case 'boolean':
-        if (typeof transformedValue !== 'boolean') {
-          return rule.message || 'Value must be a boolean'
-        }
-        break
-      case 'array':
-        if (!Array.isArray(transformedValue)) {
-          return rule.message || 'Value must be an array'
-        }
-        break
-      case 'object':
-        if (typeof transformedValue !== 'object' || Array.isArray(transformedValue)) {
-          return rule.message || 'Value must be an object'
-        }
-        break
-      case 'email':
-        if (typeof transformedValue === 'string' && !EMAIL_PATTERN.test(transformedValue)) {
-          return rule.message || 'Please enter a valid email address'
-        }
-        break
-      case 'url':
-        if (typeof transformedValue === 'string' && !URL_PATTERN.test(transformedValue)) {
-          return rule.message || 'Please enter a valid URL'
-        }
-        break
-      case 'date':
-        if (!(transformedValue instanceof Date) && isNaN(Date.parse(String(transformedValue)))) {
-          return rule.message || 'Please enter a valid date'
-        }
-        break
-    }
+  if (rule.type && !isEmpty(transformedValue)) {
+    const typeError = validateType(transformedValue, rule.type, rule.message)
+    if (typeError) return typeError
   }
   
-  // Min/Max validation for strings
-  if (typeof transformedValue === 'string') {
-    if (rule.min !== undefined && transformedValue.length < rule.min) {
-      return rule.message || `Minimum length is ${rule.min} characters`
-    }
-    if (rule.max !== undefined && transformedValue.length > rule.max) {
-      return rule.message || `Maximum length is ${rule.max} characters`
-    }
-  }
-  
-  // Min/Max validation for numbers
-  if (typeof transformedValue === 'number') {
-    if (rule.min !== undefined && transformedValue < rule.min) {
-      return rule.message || `Minimum value is ${rule.min}`
-    }
-    if (rule.max !== undefined && transformedValue > rule.max) {
-      return rule.message || `Maximum value is ${rule.max}`
-    }
-  }
-  
-  // Min/Max validation for arrays
-  if (Array.isArray(transformedValue)) {
-    if (rule.min !== undefined && transformedValue.length < rule.min) {
-      return rule.message || `Minimum ${rule.min} items required`
-    }
-    if (rule.max !== undefined && transformedValue.length > rule.max) {
-      return rule.message || `Maximum ${rule.max} items allowed`
-    }
+  // Min/Max validation based on value type
+  if (!isEmpty(transformedValue)) {
+    const rangeError = validateRange(transformedValue, rule.min, rule.max, rule.message)
+    if (rangeError) return rangeError
   }
   
   // Pattern validation

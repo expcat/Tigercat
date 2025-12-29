@@ -5,25 +5,72 @@
 
 /**
  * Button color scheme interface
+ * Defines all color-related classes for button variants
  */
 export interface ButtonColorScheme {
+  /**
+   * Background color class
+   */
   bg: string
+  
+  /**
+   * Hover background color class
+   */
   bgHover: string
+  
+  /**
+   * Text color class
+   */
   text: string
+  
+  /**
+   * Border color class (optional, for outline variants)
+   */
   border?: string
+  
+  /**
+   * Border hover color class (optional, for outline variants)
+   */
   borderHover?: string
+  
+  /**
+   * Focus ring color class
+   */
   focus: string
+  
+  /**
+   * Disabled state color class
+   */
   disabled: string
 }
 
 /**
- * Theme colors configuration
+ * Theme colors configuration for all button variants
  */
 export interface ThemeColors {
+  /**
+   * Primary button theme (solid background with primary color)
+   */
   primary: ButtonColorScheme
+  
+  /**
+   * Secondary button theme (solid background with secondary color)
+   */
   secondary: ButtonColorScheme
+  
+  /**
+   * Outline button theme (transparent background with colored border)
+   */
   outline: ButtonColorScheme
+  
+  /**
+   * Ghost button theme (transparent background, no border)
+   */
   ghost: ButtonColorScheme
+  
+  /**
+   * Link button theme (text-only appearance)
+   */
   link: ButtonColorScheme
 }
 
@@ -72,6 +119,9 @@ export const defaultThemeColors: ThemeColors = {
 
 /**
  * Get button variant classes based on theme colors
+ * @param variant - Button variant type
+ * @param colors - Theme colors configuration (uses default if not provided)
+ * @returns Combined class string for the button variant
  */
 export function getButtonVariantClasses(
   variant: keyof ThemeColors,
@@ -93,15 +143,47 @@ export function getButtonVariantClasses(
 
 /**
  * Radio color scheme interface
+ * Defines all color-related classes for radio buttons
  */
 export interface RadioColorScheme {
+  /**
+   * Border color in unchecked state
+   */
   border: string
+  
+  /**
+   * Border color in checked state
+   */
   borderChecked: string
+  
+  /**
+   * Background color in unchecked state
+   */
   bg: string
+  
+  /**
+   * Background color in checked state
+   */
   bgChecked: string
+  
+  /**
+   * Inner dot color in checked state
+   */
   innerDot: string
+  
+  /**
+   * Focus ring color
+   */
   focus: string
+  
+  /**
+   * Disabled state styles
+   */
   disabled: string
+  
+  /**
+   * Text color when disabled
+   */
   textDisabled: string
 }
 
@@ -121,6 +203,8 @@ export const defaultRadioColors: RadioColorScheme = {
 
 /**
  * Get radio color classes
+ * @param colors - Radio color scheme (uses default if not provided)
+ * @returns Radio color scheme with all class strings
  */
 export function getRadioColorClasses(
   colors: RadioColorScheme = defaultRadioColors
@@ -130,20 +214,47 @@ export function getRadioColorClasses(
 
 /**
  * Link color scheme interface
+ * Defines all color-related classes for link variants
  */
 export interface LinkColorScheme {
+  /**
+   * Text color in normal state
+   */
   text: string
+  
+  /**
+   * Text color on hover
+   */
   textHover: string
+  
+  /**
+   * Focus ring color
+   */
   focus: string
+  
+  /**
+   * Disabled state text color
+   */
   disabled: string
 }
 
 /**
- * Link theme colors configuration
+ * Link theme colors configuration for all variants
  */
 export interface LinkThemeColors {
+  /**
+   * Primary link theme (uses primary color)
+   */
   primary: LinkColorScheme
+  
+  /**
+   * Secondary link theme (uses secondary color)
+   */
   secondary: LinkColorScheme
+  
+  /**
+   * Default link theme (uses gray color)
+   */
   default: LinkColorScheme
 }
 
