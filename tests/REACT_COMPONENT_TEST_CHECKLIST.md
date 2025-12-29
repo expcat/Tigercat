@@ -4,10 +4,10 @@ This document tracks the testing progress for all React components in the Tigerc
 
 ## Progress Overview
 
-- **Total Components**: 25
-- **Components Tested**: 1
+- **Total Components**: 28
+- **Components Tested**: 4
 - **Components Remaining**: 24
-- **Progress**: 4%
+- **Progress**: 14%
 
 ## Testing Status
 
@@ -18,7 +18,7 @@ This document tracks the testing progress for all React components in the Tigerc
 - [ ] Icon
 - [ ] Text
 
-### Form Components (11 total, 0 tested)
+### Form Components (14 total, 3 tested)
 
 - [ ] Form
 - [ ] FormItem
@@ -31,6 +31,9 @@ This document tracks the testing progress for all React components in the Tigerc
 - [ ] Select
 - [ ] Switch
 - [ ] Slider
+- [x] DatePicker - ✅ Completed (All passing)
+- [x] TimePicker - ✅ Completed (All passing)
+- [x] Upload - ✅ Completed (All passing)
 
 ### Layout Components (10 total, 0 tested)
 
@@ -63,6 +66,7 @@ Each completed component test should include:
 
 ### Button
 - **Priority**: High (Basic Component)
+- **Status**: ✅ Completed (40 tests, all passing)
 - **Special Considerations**: 
   - Test all variants (primary, secondary, outline, ghost)
   - Test all sizes (sm, md, lg)
@@ -70,6 +74,41 @@ Each completed component test should include:
   - Test disabled state
   - Test onClick handler
   - Test type prop (button, submit, reset)
+
+### TimePicker
+- **Priority**: High (Form Component)
+- **Status**: ✅ Completed (All passing)
+- **Special Considerations**:
+  - Test time selection and input
+  - Test hour/minute/second controls
+  - Test onChange handler
+  - Test disabled state
+  - Test time format validation
+  - Test accessibility
+
+### DatePicker
+- **Priority**: High (Form Component)
+- **Status**: ✅ Completed (All passing)
+- **Special Considerations**:
+  - Test date selection
+  - Test calendar navigation
+  - Test onChange handler
+  - Test disabled dates
+  - Test date format
+  - Test accessibility
+
+### Upload
+- **Priority**: High (Form Component)
+- **Status**: ✅ Completed (All passing)
+- **Special Considerations**:
+  - Test file selection
+  - Test drag and drop
+  - Test file validation (size, type)
+  - Test multiple file upload
+  - Test onChange handler
+  - Test file list display
+  - Test file removal
+  - Test accessibility
 
 ### Link
 - **Priority**: High (Basic Component)

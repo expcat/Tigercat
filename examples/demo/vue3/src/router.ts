@@ -31,6 +31,9 @@ const router = createRouter({
     { path: '/link', component: () => import('./pages/LinkDemo.vue') },
     { path: '/text', component: () => import('./pages/TextDemo.vue') },
     { path: '/icon', component: () => import('./pages/IconDemo.vue') },
+    { path: '/datepicker', component: () => import('./pages/DatePickerDemo.vue') },
+    { path: '/timepicker', component: () => import('./pages/TimePickerDemo.vue') },
+    { path: '/upload', component: () => import('./pages/UploadDemo.vue') },
   ],
 })
 
