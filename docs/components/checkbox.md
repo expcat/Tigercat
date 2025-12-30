@@ -404,6 +404,301 @@ Checkbox 组件使用 Tailwind CSS 构建，支持通过 CSS 变量进行主题�
 - 支持不确定状态的视觉反馈
 - 建议为复选框提供清晰的标签文本
 
+## CheckboxGroup 使用
+
+当需要管理一组复选框时，建议使用 CheckboxGroup 组件。它提供了统一的状态管理和样式配置。
+
+详细文档请参考：[CheckboxGroup 复选框组](./checkbox-group.md)
+
+### 基本示例
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import { CheckboxGroup, Checkbox } from '@tigercat/vue'
+
+const selectedValues = ref(['apple', 'banana'])
+</script>
+
+<template>
+  <CheckboxGroup v-model="selectedValues">
+    <Checkbox value="apple">苹果</Checkbox>
+    <Checkbox value="banana">香蕉</Checkbox>
+    <Checkbox value="orange">橙子</Checkbox>
+  </CheckboxGroup>
+</template>
+```
+
+## 表单验证
+
+Checkbox 可以与 Form 和 FormItem 组件配合使用，实现表单验证。
+
+### Vue 3
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import { Form, FormItem, Checkbox, CheckboxGroup, Button } from '@tigercat/vue'
+
+const formData = ref({
+  agree: false,
+  interests: [],
+})
+
+const rules = {
+  agree: [
+    {
+      validator: (value) => value === true,
+      message: '请同意服务条款',
+    },
+  ],
+  interests: [
+    {
+      validator: (value) => value.length > 0,
+      message: '请至少选择一项兴趣',
+    },
+  ],
+}
+
+const formRef = ref(null)
+
+const handleSubmit = async () => {
+  const valid = await formRef.value?.validate()
+  if (valid) {
+    console.log('表单验证通过:', formData.value)
+  }
+}
+</script>
+
+<template>
+  <Form ref="formRef" :model="formData" :rules="rules">
+    <FormItem name="agree" required>
+      <Checkbox v-model="formData.agree">
+        我已阅读并同意《用户协议》和《隐私政策》
+      </Checkbox>
+    </FormItem>
+
+    <FormItem label="兴趣爱好" name="interests" required>
+      <CheckboxGroup v-model="formData.interests">
+        <Checkbox value="reading">阅读</Checkbox>
+        <Checkbox value="sports">运动</Checkbox>
+        <Checkbox value="music">音乐</Checkbox>
+        <Checkbox value="travel">旅行</Checkbox>
+      </CheckboxGroup>
+    </FormItem>
+
+    <FormItem>
+      <Button @click="handleSubmit">提交</Button>
+    </FormItem>
+  </Form>
+</template>
+```
+
+### React
+
+```tsx
+import { useState } from 'react'
+import { Form, FormItem, Checkbox, CheckboxGroup, Button } from '@tigercat/react'
+
+function ValidationExample() {
+  const [formData, setFormData] = useState({
+    agree: false,
+    interests: [],
+  })
+
+  const rules = {
+    agree: [
+      {
+        validator: (value: boolean) => value === true,
+        message: '请同意服务条款',
+      },
+    ],
+    interests: [
+      {
+        validator: (value: any[]) => value.length > 0,
+        message: '请至少选择一项兴趣',
+      },
+    ],
+  }
+
+  const handleSubmit = async () => {
+    // 表单验证逻辑
+    console.log('表单数据:', formData)
+  }
+
+  return (
+    <Form model={formData} rules={rules}>
+      <FormItem name="agree" required>
+        <Checkbox
+          checked={formData.agree}
+          onChange={(checked) => setFormData({ ...formData, agree: checked })}
+        >
+          我已阅读并同意《用户协议》和《隐私政策》
+        </Checkbox>
+      </FormItem>
+
+      <FormItem label="兴趣爱好" name="interests" required>
+        <CheckboxGroup
+          value={formData.interests}
+          onChange={(interests) => setFormData({ ...formData, interests })}
+        >
+          <Checkbox value="reading">阅读</Checkbox>
+          <Checkbox value="sports">运动</Checkbox>
+          <Checkbox value="music">音乐</Checkbox>
+          <Checkbox value="travel">旅行</Checkbox>
+        </CheckboxGroup>
+      </FormItem>
+
+      <FormItem>
+        <Button onClick={handleSubmit}>提交</Button>
+      </FormItem>
+    </Form>
+  )
+}
+```
+
+## 最佳实践
+
+### 1. 使用清晰的标签
+
+确保复选框的标签清晰明确，用户能够理解选择的含义。
+
+```vue
+<!-- ✅ 好的实践 -->
+<Checkbox v-model="emailNotifications">
+  接收每周邮件通知
+</Checkbox>
+
+<!-- ❌ 不好的实践 -->
+<Checkbox v-model="emailNotifications">
+  邮件
+</Checkbox>
+```
+
+### 2. 限制选择数量
+
+当使用 CheckboxGroup 时，可以限制用户的最大选择数量。
+
+```vue
+<script setup>
+import { ref, watch } from 'vue'
+
+const selectedValues = ref([])
+const maxSelection = 3
+
+watch(selectedValues, (newValues) => {
+  if (newValues.length > maxSelection) {
+    selectedValues.value = newValues.slice(0, maxSelection)
+  }
+})
+</script>
+
+<template>
+  <div>
+    <CheckboxGroup v-model="selectedValues">
+      <Checkbox value="1">选项 1</Checkbox>
+      <Checkbox value="2">选项 2</Checkbox>
+      <Checkbox value="3">选项 3</Checkbox>
+      <Checkbox value="4">选项 4</Checkbox>
+    </CheckboxGroup>
+    <p class="text-sm text-gray-500">
+      已选择 {{ selectedValues.length }} / {{ maxSelection }}
+    </p>
+  </div>
+</template>
+```
+
+### 3. 提供禁用说明
+
+当禁用复选框时，最好提供说明原因。
+
+```vue
+<template>
+  <div>
+    <Checkbox v-model="premium" disabled>
+      高级功能（需要升级到专业版）
+    </Checkbox>
+  </div>
+</template>
+```
+
+### 4. 使用不确定状态表示部分选中
+
+```vue
+<script setup>
+import { ref, computed } from 'vue'
+
+const allItems = ['item1', 'item2', 'item3']
+const selectedItems = ref(['item1'])
+
+const allChecked = computed(() => selectedItems.value.length === allItems.length)
+const indeterminate = computed(() => 
+  selectedItems.value.length > 0 && !allChecked.value
+)
+
+const toggleAll = (checked) => {
+  selectedItems.value = checked ? [...allItems] : []
+}
+</script>
+
+<template>
+  <div>
+    <Checkbox 
+      :model-value="allChecked" 
+      :indeterminate="indeterminate"
+      @update:model-value="toggleAll"
+    >
+      全选
+    </Checkbox>
+    <CheckboxGroup v-model="selectedItems" class="ml-4">
+      <Checkbox value="item1">项目 1</Checkbox>
+      <Checkbox value="item2">项目 2</Checkbox>
+      <Checkbox value="item3">项目 3</Checkbox>
+    </CheckboxGroup>
+  </div>
+</template>
+```
+
+## 常见问题
+
+### 1. 为什么 CheckboxGroup 中的复选框没有响应？
+
+确保在 CheckboxGroup 中的 Checkbox 设置了 `value` 属性：
+
+```vue
+<!-- ✅ 正确 -->
+<CheckboxGroup v-model="selectedValues">
+  <Checkbox value="option1">选项 1</Checkbox>
+</CheckboxGroup>
+
+<!-- ❌ 错误：没有 value -->
+<CheckboxGroup v-model="selectedValues">
+  <Checkbox>选项 1</Checkbox>
+</CheckboxGroup>
+```
+
+### 2. 如何实现条件禁用？
+
+可以根据其他状态动态设置 `disabled` 属性：
+
+```vue
+<script setup>
+const isPremiumUser = ref(false)
+</script>
+
+<template>
+  <Checkbox :disabled="!isPremiumUser" v-model="advancedFeature">
+    高级功能（仅限高级用户）
+  </Checkbox>
+</template>
+```
+
+### 3. v-model 和 onChange 哪个更好？
+
+- Vue 中使用 `v-model` 更简洁
+- React 中使用 `checked` + `onChange` 组合
+- 两者都支持，根据使用场景选择
+
 ## TypeScript 支持
 
 Checkbox 组件完全使用 TypeScript 编写，提供完整的类型定义：
@@ -427,6 +722,14 @@ import type {
   CheckboxGroupProps as ReactCheckboxGroupProps
 } from '@tigercat/react'
 ```
+
+## 相关组件
+
+- [CheckboxGroup 复选框组](./checkbox-group.md) - 管理一组复选框
+- [Radio 单选框](./radio.md) - 单选框组件
+- [RadioGroup 单选框组](./radio-group.md) - 单选框组组件
+- [Form 表单](./form.md) - 表单容器组件
+- [FormItem 表单项](./form-item.md) - 表单项组件
 
 ## 示例
 
