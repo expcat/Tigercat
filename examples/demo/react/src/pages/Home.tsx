@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import ThemeSwitch from '../components/ThemeSwitch'
 
 const components = [
   { name: 'Button', path: '/button', category: '基础组件' },
@@ -40,8 +41,20 @@ const categories = ['基础组件', '表单组件', '布局组件']
 const Home: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto p-8">
-      <h1 className="text-4xl font-bold mb-4">Tigercat React 组件演示</h1>
-      <p className="text-gray-600 mb-8">基于 Tailwind CSS 的 React UI 组件库</p>
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Tigercat React 组件演示</h1>
+            <p className="text-gray-600">基于 Tailwind CSS 的 React UI 组件库</p>
+          </div>
+          <ThemeSwitch />
+        </div>
+        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <p className="text-sm text-blue-800">
+            <strong>💡 提示：</strong> 使用右上角的主题切换器可以实时预览不同主题效果。所有组件都支持主题自定义。
+          </p>
+        </div>
+      </div>
       
       {categories.map(category => (
         <div key={category} className="mb-12">

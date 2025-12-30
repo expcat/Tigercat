@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import ThemeSwitch from '../components/ThemeSwitch.vue'
+
 const components = [
   { name: 'Button', path: '/button', category: '基础组件' },
   { name: 'Icon', path: '/icon', category: '基础组件' },
@@ -38,8 +40,20 @@ const categories = ['基础组件', '表单组件', '布局组件']
 
 <template>
   <div class="max-w-7xl mx-auto p-8">
-    <h1 class="text-4xl font-bold mb-4">Tigercat Vue3 组件演示</h1>
-    <p class="text-gray-600 mb-8">基于 Tailwind CSS 的 Vue 3 UI 组件库</p>
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h1 class="text-4xl font-bold mb-2">Tigercat Vue3 组件演示</h1>
+          <p class="text-gray-600">基于 Tailwind CSS 的 Vue 3 UI 组件库</p>
+        </div>
+        <ThemeSwitch />
+      </div>
+      <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <p class="text-sm text-blue-800">
+          <strong>💡 提示：</strong> 使用右上角的主题切换器可以实时预览不同主题效果。所有组件都支持主题自定义。
+        </p>
+      </div>
+    </div>
     
     <div v-for="category in categories" :key="category" class="mb-12">
       <h2 class="text-2xl font-bold mb-6">{{ category }}</h2>
