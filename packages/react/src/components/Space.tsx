@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { 
   classNames,
   getSpaceGapSize,
@@ -36,21 +36,21 @@ export const Space: React.FC<SpaceProps> = ({
   style,
   ...props
 }) => {
-  const gapSize = getSpaceGapSize(size)
+  const gapSize = useMemo(() => getSpaceGapSize(size), [size])
   
-  const spaceClasses = classNames(
+  const spaceClasses = useMemo(() => classNames(
     baseClasses,
     getSpaceDirectionClass(direction),
     getSpaceAlignClass(align),
     gapSize.class,
     wrap && 'flex-wrap',
     className,
-  )
+  ), [direction, align, gapSize.class, wrap, className])
 
-  const spaceStyle: React.CSSProperties = {
+  const spaceStyle = useMemo((): React.CSSProperties => ({
     ...style,
     ...(gapSize.style ? { gap: gapSize.style } : {}),
-  }
+  }), [style, gapSize.style])
 
   return (
     <div className={spaceClasses} style={spaceStyle} {...props}>

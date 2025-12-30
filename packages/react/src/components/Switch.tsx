@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { 
+  classNames,
   type SwitchProps as CoreSwitchProps,
   getSwitchClasses,
   getSwitchThumbClasses
@@ -31,27 +32,25 @@ export const Switch: React.FC<SwitchProps> = ({
   'aria-label': ariaLabel,
   ...props
 }) => {
-  const switchClasses = [
+  const switchClasses = useMemo(() => classNames(
     getSwitchClasses(size, checked, disabled),
     className
-  ].filter(Boolean).join(' ')
+  ), [size, checked, disabled, className])
 
-  const thumbClasses = getSwitchThumbClasses(size, checked)
+  const thumbClasses = useMemo(() => getSwitchThumbClasses(size, checked), [size, checked])
 
-  const handleClick = () => {
+  const handleClick = useCallback(() => {
     if (!disabled && onChange) {
       onChange(!checked)
     }
-  }
+  }, [disabled, checked, onChange])
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (!disabled && (event.key === ' ' || event.key === 'Enter')) {
       event.preventDefault()
-      if (onChange) {
-        onChange(!checked)
-      }
+      onChange?.(!checked)
     }
-  }
+  }, [disabled, checked, onChange])
 
   return (
     <button

@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import {
+  classNames,
   getCheckboxClasses,
   getCheckboxLabelClasses,
   type CheckboxSize,
@@ -75,15 +76,15 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   // Internal state for uncontrolled mode
   const [internalChecked, setInternalChecked] = useState(defaultChecked)
   
-  // Determine if controlled or uncontrolled
+  // Determine if controlled or uncontrolled - simple comparison, no need to memoize
   const isControlled = controlledChecked !== undefined
   
-  // Determine effective size and disabled state
+  // Determine effective size and disabled state - simple logical operations
   const effectiveSize = propSize || groupContext?.size || 'md'
   const effectiveDisabled = propDisabled !== undefined ? propDisabled : (groupContext?.disabled || false)
   
   // Current checked state
-  const checked = React.useMemo(() => {
+  const checked = useMemo(() => {
     // If in a group and has a value, check if value is in group's selected values
     if (groupContext && value !== undefined) {
       return groupContext.value.includes(value)
@@ -101,7 +102,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
     }
   }, [indeterminate])
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     if (effectiveDisabled) return
     
     const newValue = event.target.checked
@@ -117,9 +118,17 @@ export const Checkbox: React.FC<CheckboxProps> = ({
       
       onChange?.(newValue, event)
     }
-  }
+  }, [effectiveDisabled, groupContext, value, isControlled, onChange])
 
-  const checkboxClasses = getCheckboxClasses(effectiveSize, effectiveDisabled)
+  const checkboxClasses = useMemo(() => 
+    getCheckboxClasses(effectiveSize, effectiveDisabled),
+    [effectiveSize, effectiveDisabled]
+  )
+  
+  const labelClasses = useMemo(() => 
+    classNames(getCheckboxLabelClasses(effectiveSize, effectiveDisabled), className),
+    [effectiveSize, effectiveDisabled, className]
+  )
   
   const checkboxElement = (
     <input
@@ -140,9 +149,8 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   }
   
   // Return label with checkbox and content
-  const labelClasses = getCheckboxLabelClasses(effectiveSize, effectiveDisabled)
   return (
-    <label className={`${labelClasses} ${className || ''}`}>
+    <label className={labelClasses}>
       {checkboxElement}
       <span className="ml-2">{children}</span>
     </label>

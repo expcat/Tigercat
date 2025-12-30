@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react'
 import { type CheckboxSize } from '@tigercat/core'
 
 export interface CheckboxGroupContext {
@@ -66,13 +66,13 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   // Internal state for uncontrolled mode
   const [internalValue, setInternalValue] = useState<(string | number | boolean)[]>(defaultValue)
   
-  // Determine if controlled or uncontrolled
+  // Determine if controlled or uncontrolled - simple comparison, no need to memoize
   const isControlled = controlledValue !== undefined
   
-  // Current selected values
-  const value = isControlled ? controlledValue : internalValue
+  // Current selected values - don't use nullish coalescing here to allow proper controlled/uncontrolled switching
+  const value = isControlled ? controlledValue! : internalValue
   
-  const updateValue = (val: string | number | boolean, checked: boolean) => {
+  const updateValue = useCallback((val: string | number | boolean, checked: boolean) => {
     if (disabled) return
     
     const currentValue = [...value]
@@ -90,14 +90,14 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
     }
     
     onChange?.(currentValue)
-  }
+  }, [disabled, value, isControlled, onChange])
   
-  const context: CheckboxGroupContext = {
+  const context: CheckboxGroupContext = useMemo(() => ({
     value,
     disabled,
     size,
     updateValue,
-  }
+  }), [value, disabled, size, updateValue])
   
   return (
     <CheckboxGroupContextProvider.Provider value={context}>

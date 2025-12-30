@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { classNames, getButtonVariantClasses, type ButtonProps as CoreButtonProps } from '@tigercat/core'
 
 export interface ButtonProps extends CoreButtonProps {
@@ -30,7 +30,7 @@ const sizeClasses = {
   sm: 'px-3 py-1.5 text-sm',
   md: 'px-4 py-2 text-base',
   lg: 'px-6 py-3 text-lg',
-}
+} as const
 
 export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
@@ -43,19 +43,19 @@ export const Button: React.FC<ButtonProps> = ({
   className,
   ...props
 }) => {
-  const buttonClasses = classNames(
+  const buttonClasses = useMemo(() => classNames(
     baseClasses,
     getButtonVariantClasses(variant),
     sizeClasses[size],
     (disabled || loading) && 'cursor-not-allowed opacity-60',
     className,
-  )
+  ), [variant, size, disabled, loading, className])
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     if (!disabled && !loading && onClick) {
       onClick(event)
     }
-  }
+  }, [disabled, loading, onClick])
 
   return (
     <button
