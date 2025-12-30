@@ -216,3 +216,66 @@ When adding new scripts:
 - [DEVELOPMENT.md](../DEVELOPMENT.md) - Development guide
 - [CONTRIBUTING.md](../CONTRIBUTING.md) - Contributing guide
 - [README.md](../README.md) - Project overview
+
+---
+
+### ✅ validate-tests.sh ⭐ NEW
+
+Validates test files against quality standards defined in `tests/TEST_QUALITY_GUIDELINES.md`.
+
+**Usage**:
+```bash
+./scripts/validate-tests.sh
+# Or via npm script
+pnpm test:validate
+```
+
+**What it checks**:
+- Test file structure (required describe blocks)
+- Test naming conventions ("should" statements)
+- Edge case coverage
+- Accessibility testing
+- Type safety (no 'any' usage)
+- Test count per file
+
+**Quality Checks**:
+1. **Test Categories**: Rendering, Props, Events, States, Accessibility, Snapshots
+2. **Test Naming**: "should" statement format
+3. **Edge Cases**: Edge Cases or Boundary describe blocks
+4. **Accessibility**: `expectNoA11yViolations` usage
+5. **Type Safety**: Avoidance of 'any' type
+6. **Test Count**: Minimum based on component complexity
+
+**Example output**:
+```
+🐯 Tigercat Test Quality Validation
+====================================
+
+Checking: Button.spec.tsx
+  📊 Test count: 48
+  ✓ All checks passed
+
+Checking: Upload.spec.tsx
+  📊 Test count: 38
+  ⚠ Test count below recommended minimum (50)
+  ⚠ No Edge Cases or Boundary tests found
+  ✗ 1 issue(s) found
+
+====================================
+📈 Validation Summary
+====================================
+Total files checked: 8
+Passed: 1
+Failed: 7
+Warnings: 18
+
+❌ Validation failed! Please address the issues above.
+See tests/TEST_QUALITY_GUIDELINES.md for detailed standards.
+```
+
+**Exit Codes**:
+- `0`: All tests pass quality standards
+- `1`: One or more tests failed
+
+**CI Integration**: Can be added to CI/CD pipeline to enforce quality before merge.
+
