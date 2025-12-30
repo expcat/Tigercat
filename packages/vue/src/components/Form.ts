@@ -23,42 +23,86 @@ export interface FormContext {
 export const Form = defineComponent({
   name: 'TigerForm',
   props: {
+    /**
+     * Form data model
+     * @default {}
+     */
     model: {
       type: Object as PropType<FormValues>,
       default: () => ({}),
     },
+    /**
+     * Form validation rules
+     */
     rules: {
       type: Object as PropType<FormRules>,
     },
+    /**
+     * Label width (string or number in pixels)
+     */
     labelWidth: {
       type: [String, Number] as PropType<string | number>,
     },
+    /**
+     * Label position
+     * @default 'right'
+     */
     labelPosition: {
       type: String as PropType<FormLabelPosition>,
-      default: 'right',
+      default: 'right' as FormLabelPosition,
     },
+    /**
+     * Label alignment
+     * @default 'right'
+     */
     labelAlign: {
       type: String as PropType<FormLabelAlign>,
-      default: 'right',
+      default: 'right' as FormLabelAlign,
     },
+    /**
+     * Form size (applies to all form items)
+     * @default 'md'
+     */
     size: {
       type: String as PropType<FormSize>,
-      default: 'md',
+      default: 'md' as FormSize,
     },
+    /**
+     * Show inline validation messages
+     * @default true
+     */
     inlineMessage: {
       type: Boolean,
       default: true,
     },
+    /**
+     * Show required asterisk on required fields
+     * @default true
+     */
     showRequiredAsterisk: {
       type: Boolean,
       default: true,
     },
+    /**
+     * Disable all form controls
+     * @default false
+     */
     disabled: {
       type: Boolean,
       default: false,
     },
   },
-  emits: ['submit', 'validate'],
+  emits: {
+    /**
+     * Emitted when form is submitted
+     */
+    submit: (_data: { valid: boolean; values: FormValues; errors: FormError[] }) => true,
+    /**
+     * Emitted when field is validated
+     */
+    validate: (fieldName: string, isValid: boolean, _errorMessage?: string) => 
+      typeof fieldName === 'string' && typeof isValid === 'boolean',
+  },
   setup(props, { slots, emit, expose }) {
     const errors = reactive<FormError[]>([])
     
@@ -87,7 +131,7 @@ export const Form = defineComponent({
         })
       }
       
-      emit('validate', fieldName, !error, error)
+      emit('validate', fieldName, !error, error || undefined)
     }
     
     const validate = async (): Promise<boolean> => {

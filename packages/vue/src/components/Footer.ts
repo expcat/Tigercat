@@ -4,10 +4,17 @@ import { classNames } from '@tigercat/core'
 export const Footer = defineComponent({
   name: 'TigerFooter',
   props: {
+    /**
+     * Additional CSS classes
+     */
     className: {
       type: String as PropType<string>,
       default: '',
     },
+    /**
+     * Footer height (CSS value)
+     * @default 'auto'
+     */
     height: {
       type: String as PropType<string>,
       default: 'auto',

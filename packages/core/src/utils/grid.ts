@@ -5,31 +5,67 @@
 import type { Align, Justify, GutterSize, ColSpan, Breakpoint } from '../types/grid'
 
 /**
+ * Breakpoint order for responsive classes
+ */
+const BREAKPOINT_ORDER: Breakpoint[] = ['xs', 'sm', 'md', 'lg', 'xl', '2xl']
+
+/**
+ * Align class map for Row component
+ */
+const ALIGN_MAP: Record<Align, string> = {
+  top: 'items-start',
+  middle: 'items-center',
+  bottom: 'items-end',
+  stretch: 'items-stretch',
+}
+
+/**
+ * Justify class map for Row component
+ */
+const JUSTIFY_MAP: Record<Justify, string> = {
+  start: 'justify-start',
+  end: 'justify-end',
+  center: 'justify-center',
+  'space-around': 'justify-around',
+  'space-between': 'justify-between',
+  'space-evenly': 'justify-evenly',
+}
+
+/**
+ * Validate span or offset value (should be between 0 and 24)
+ * @param value - Value to validate
+ * @param fieldName - Name of the field for warning message
+ * @returns True if valid
+ */
+function validateGridValue(value: number, fieldName: string): boolean {
+  if (value < 0 || value > 24) {
+    console.warn(`Invalid ${fieldName} value: ${value}. ${fieldName} should be between 0 and 24.`)
+    return false
+  }
+  return true
+}
+
+/**
+ * Convert grid value (0-24) to percentage
+ * @param value - Grid value
+ * @returns Percentage string
+ */
+function toPercentage(value: number): string {
+  return ((value / 24) * 100).toFixed(6).replace(/\.?0+$/, '')
+}
+
+/**
  * Get align classes for Row component
  */
 export function getAlignClasses(align: Align): string {
-  const alignMap: Record<Align, string> = {
-    top: 'items-start',
-    middle: 'items-center',
-    bottom: 'items-end',
-    stretch: 'items-stretch',
-  }
-  return alignMap[align] || 'items-start'
+  return ALIGN_MAP[align] || 'items-start'
 }
 
 /**
  * Get justify classes for Row component
  */
 export function getJustifyClasses(justify: Justify): string {
-  const justifyMap: Record<Justify, string> = {
-    start: 'justify-start',
-    end: 'justify-end',
-    center: 'justify-center',
-    'space-around': 'justify-around',
-    'space-between': 'justify-between',
-    'space-evenly': 'justify-evenly',
-  }
-  return justifyMap[justify] || 'justify-start'
+  return JUSTIFY_MAP[justify] || 'justify-start'
 }
 
 /**
@@ -67,32 +103,21 @@ export function getSpanClasses(span: ColSpan | undefined): string {
   if (span === undefined || span === null) return 'w-full'
 
   if (typeof span === 'number') {
-    // Validate span value
-    if (span < 0 || span > 24) {
-      console.warn(`Invalid span value: ${span}. Span should be between 0 and 24.`)
-    }
-    // Convert to percentage: span/24 * 100%
-    const percentage = ((span / 24) * 100).toFixed(6).replace(/\.?0+$/, '')
+    validateGridValue(span, 'span')
+    const percentage = toPercentage(span)
     return `w-[${percentage}%]`
   }
 
   // Handle responsive object
   const classes: string[] = []
-  const breakpointOrder: Breakpoint[] = ['xs', 'sm', 'md', 'lg', 'xl', '2xl']
 
-  breakpointOrder.forEach((bp) => {
+  BREAKPOINT_ORDER.forEach((bp) => {
     const value = span[bp]
     if (value !== undefined) {
-      // Validate value
-      if (value < 0 || value > 24) {
-        console.warn(`Invalid span value for ${bp}: ${value}. Span should be between 0 and 24.`)
-      }
-      const percentage = ((value / 24) * 100).toFixed(6).replace(/\.?0+$/, '')
-      if (bp === 'xs') {
-        classes.push(`w-[${percentage}%]`)
-      } else {
-        classes.push(`${bp}:w-[${percentage}%]`)
-      }
+      validateGridValue(value, `span.${bp}`)
+      const percentage = toPercentage(value)
+      const prefix = bp === 'xs' ? '' : `${bp}:`
+      classes.push(`${prefix}w-[${percentage}%]`)
     }
   })
 
@@ -109,31 +134,21 @@ export function getOffsetClasses(offset: number | Partial<Record<Breakpoint, num
     // offset=0 means no offset, return empty string
     if (offset === 0) return ''
     
-    // Validate offset value
-    if (offset < 0 || offset > 24) {
-      console.warn(`Invalid offset value: ${offset}. Offset should be between 0 and 24.`)
-    }
-    const percentage = ((offset / 24) * 100).toFixed(6).replace(/\.?0+$/, '')
+    validateGridValue(offset, 'offset')
+    const percentage = toPercentage(offset)
     return `ml-[${percentage}%]`
   }
 
   // Handle responsive object
   const classes: string[] = []
-  const breakpointOrder: Breakpoint[] = ['xs', 'sm', 'md', 'lg', 'xl', '2xl']
 
-  breakpointOrder.forEach((bp) => {
+  BREAKPOINT_ORDER.forEach((bp) => {
     const value = offset[bp]
     if (value !== undefined && value !== 0) {
-      // Validate value
-      if (value < 0 || value > 24) {
-        console.warn(`Invalid offset value for ${bp}: ${value}. Offset should be between 0 and 24.`)
-      }
-      const percentage = ((value / 24) * 100).toFixed(6).replace(/\.?0+$/, '')
-      if (bp === 'xs') {
-        classes.push(`ml-[${percentage}%]`)
-      } else {
-        classes.push(`${bp}:ml-[${percentage}%]`)
-      }
+      validateGridValue(value, `offset.${bp}`)
+      const percentage = toPercentage(value)
+      const prefix = bp === 'xs' ? '' : `${bp}:`
+      classes.push(`${prefix}ml-[${percentage}%]`)
     }
   })
 
@@ -152,9 +167,8 @@ export function getOrderClasses(order: number | Partial<Record<Breakpoint, numbe
 
   // Handle responsive object
   const classes: string[] = []
-  const breakpointOrder: Breakpoint[] = ['xs', 'sm', 'md', 'lg', 'xl', '2xl']
 
-  breakpointOrder.forEach((bp) => {
+  BREAKPOINT_ORDER.forEach((bp) => {
     const value = order[bp]
     if (value !== undefined) {
       if (bp === 'xs') {

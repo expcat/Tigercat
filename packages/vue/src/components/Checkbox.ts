@@ -14,31 +14,28 @@ export const Checkbox = defineComponent({
      */
     modelValue: {
       type: Boolean,
-      default: undefined,
     },
     /**
      * Checkbox value (for use in checkbox groups)
      */
     value: {
       type: [String, Number, Boolean] as PropType<string | number | boolean>,
-      default: undefined,
     },
     /**
      * Checkbox size
      */
     size: {
       type: String as PropType<CheckboxSize>,
-      default: undefined,
     },
     /**
      * Whether the checkbox is disabled
      */
     disabled: {
       type: Boolean,
-      default: undefined,
     },
     /**
      * Whether the checkbox is in indeterminate state
+     * @default false
      */
     indeterminate: {
       type: Boolean,
@@ -46,13 +43,24 @@ export const Checkbox = defineComponent({
     },
     /**
      * Default checked state (uncontrolled mode)
+     * @default false
      */
     defaultChecked: {
       type: Boolean,
       default: false,
     },
   },
-  emits: ['update:modelValue', 'change'],
+  emits: {
+    /**
+     * Emitted when checked state changes (for v-model)
+     */
+    'update:modelValue': (value: boolean) => typeof value === 'boolean',
+    /**
+     * Emitted when checked state changes
+     */
+    change: (value: boolean, event: Event) => 
+      typeof value === 'boolean' && event instanceof Event,
+  },
   setup(props, { slots, emit }) {
     // Get group context if inside CheckboxGroup
     const groupContextRef = inject<CheckboxGroupContext | null>(CheckboxGroupKey, null)

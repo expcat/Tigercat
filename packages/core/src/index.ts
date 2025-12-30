@@ -20,6 +20,7 @@ export * from './utils/time-utils'
 export * from './utils/timepicker-styles'
 export * from './utils/timepicker-icons'
 export * from './utils/upload-utils'
+export * from './utils/space'
 
 // Types
 export * from './types/button'

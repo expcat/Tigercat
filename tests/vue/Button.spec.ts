@@ -236,6 +236,173 @@ describe('Button', () => {
     })
   })
 
+  describe('Edge Cases', () => {
+    it('should handle empty slot content', () => {
+      const { getByRole } = render(Button)
+      
+      const button = getByRole('button')
+      expect(button).toBeInTheDocument()
+      expect(button.textContent).toBe('')
+    })
+
+    it('should handle very long text content', () => {
+      const longText = 'Button '.repeat(100)
+      const { getByRole } = renderWithSlots(Button, {
+        default: longText,
+      })
+      
+      const button = getByRole('button')
+      expect(button).toBeInTheDocument()
+      expect(button.textContent).toContain('Button')
+    })
+
+    it('should handle special characters in content', () => {
+      const specialText = '<>&"\'\`§±!@#$%^&*()'
+      const { getByRole } = renderWithSlots(Button, {
+        default: specialText,
+      })
+      
+      const button = getByRole('button')
+      expect(button.textContent).toBe(specialText)
+    })
+
+    it('should handle unicode characters', () => {
+      const unicodeText = '你好世界 🌍 مرحبا'
+      const { getByText } = renderWithSlots(Button, {
+        default: unicodeText,
+      })
+      
+      expect(getByText(unicodeText)).toBeInTheDocument()
+    })
+
+    it('should handle rapid clicks when not disabled', async () => {
+      const handleClick = vi.fn()
+      const { getByRole } = render(Button, {
+        props: {
+          onClick: handleClick,
+        },
+        slots: {
+          default: 'Click me',
+        },
+      })
+      
+      const button = getByRole('button')
+      
+      // Simulate rapid clicking
+      await fireEvent.click(button)
+      await fireEvent.click(button)
+      await fireEvent.click(button)
+      await fireEvent.click(button)
+      await fireEvent.click(button)
+      
+      expect(handleClick).toHaveBeenCalledTimes(5)
+    })
+
+    it('should not emit click when both disabled and loading', async () => {
+      const handleClick = vi.fn()
+      const { getByRole } = render(Button, {
+        props: {
+          disabled: true,
+          loading: true,
+          onClick: handleClick,
+        },
+        slots: {
+          default: 'Button',
+        },
+      })
+      
+      const button = getByRole('button')
+      await fireEvent.click(button)
+      
+      expect(handleClick).not.toHaveBeenCalled()
+      expect(button).toBeDisabled()
+    })
+
+    it('should handle whitespace-only content', () => {
+      const { getByRole } = renderWithSlots(Button, {
+        default: '   ',
+      })
+      
+      const button = getByRole('button')
+      expect(button).toBeInTheDocument()
+    })
+
+    it('should maintain state through multiple prop changes', async () => {
+      const { getByRole, rerender } = renderWithProps(
+        Button,
+        { disabled: false },
+        { slots: { default: 'Button' } }
+      )
+      
+      let button = getByRole('button')
+      expect(button).not.toBeDisabled()
+      
+      await rerender({ disabled: true })
+      button = getByRole('button')
+      expect(button).toBeDisabled()
+      
+      await rerender({ disabled: false, loading: true })
+      button = getByRole('button')
+      expect(button).toBeDisabled() // loading also disables
+    })
+
+    it('should handle multiple variants in sequence', async () => {
+      const { getByRole, rerender } = renderWithProps(
+        Button,
+        { variant: 'primary' },
+        { slots: { default: 'Button' } }
+      )
+      
+      const button = getByRole('button')
+      expect(button).toBeInTheDocument()
+      
+      for (const variant of buttonVariants) {
+        await rerender({ variant })
+        expect(button).toBeInTheDocument()
+      }
+    })
+  })
+
+  describe('Boundary Conditions', () => {
+    it('should handle negative scenarios gracefully', async () => {
+      const handleClick = vi.fn()
+      
+      // Test with undefined onClick
+      const { getByRole } = render(Button, {
+        slots: { default: 'Button' },
+      })
+      
+      await fireEvent.click(getByRole('button'))
+      // Should not throw error even without onClick handler
+    })
+
+    it('should handle conflicting props correctly', () => {
+      // Test disabled takes precedence over other states
+      const { getByRole } = renderWithProps(
+        Button,
+        { disabled: true, loading: false },
+        { slots: { default: 'Button' } }
+      )
+      
+      expect(getByRole('button')).toBeDisabled()
+    })
+
+    it('should handle all size-variant combinations', () => {
+      for (const size of componentSizes) {
+        for (const variant of buttonVariants) {
+          const { getByRole, unmount } = renderWithProps(
+            Button,
+            { size, variant },
+            { slots: { default: `${size} ${variant}` } }
+          )
+          
+          expect(getByRole('button')).toBeInTheDocument()
+          unmount() // Clean up before next render
+        }
+      }
+    })
+  })
+
   describe('Snapshots', () => {
     it('should match snapshot for default button', () => {
       const { container } = render(Button, {

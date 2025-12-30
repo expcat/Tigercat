@@ -25,7 +25,15 @@
     "lint": "eslint packages --ext .ts,.tsx",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "test:vue": "vitest tests/vue",
+    "test:react": "vitest tests/react",
+    "test:validate": "./scripts/validate-tests.sh",
+    "demo:vue": "pnpm --filter @tigercat-demo/vue3 dev",
+    "demo:react": "pnpm --filter @tigercat-demo/react dev",
+    "demo:all": "./scripts/run-demos.sh",
+    "dev:check": "./scripts/check-env.sh",
+    "setup": "./scripts/setup.sh"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

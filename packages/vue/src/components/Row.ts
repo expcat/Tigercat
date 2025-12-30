@@ -18,18 +18,34 @@ const RowContextKey: InjectionKey<RowContext> = Symbol('RowContext')
 export const Row = defineComponent({
   name: 'TigerRow',
   props: {
+    /**
+     * Gutter size between columns (number or [horizontal, vertical])
+     * @default 0
+     */
     gutter: {
       type: [Number, Array] as PropType<GutterSize>,
       default: 0,
     },
+    /**
+     * Vertical alignment of columns
+     * @default 'top'
+     */
     align: {
       type: String as PropType<Align>,
-      default: 'top',
+      default: 'top' as Align,
     },
+    /**
+     * Horizontal alignment of columns
+     * @default 'start'
+     */
     justify: {
       type: String as PropType<Justify>,
-      default: 'start',
+      default: 'start' as Justify,
     },
+    /**
+     * Whether to wrap columns
+     * @default true
+     */
     wrap: {
       type: Boolean,
       default: true,

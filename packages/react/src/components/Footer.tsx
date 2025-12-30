@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { classNames, type FooterProps } from '@tigercat/core'
 
 export interface ReactFooterProps extends FooterProps {
@@ -14,16 +14,18 @@ export const Footer: React.FC<ReactFooterProps> = ({
   children,
   ...props
 }) => {
-  const footerClasses = classNames(
+  const footerClasses = useMemo(() => classNames(
     'tiger-footer',
     'bg-white border-t border-gray-200 p-4',
     className
-  )
+  ), [className])
+  
+  const footerStyle = useMemo((): React.CSSProperties => ({ height }), [height])
 
   return (
     <footer 
       className={footerClasses}
-      style={{ height }}
+      style={footerStyle}
       {...props}
     >
       {children}

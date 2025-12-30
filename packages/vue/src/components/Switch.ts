@@ -8,20 +8,41 @@ import {
 export const Switch = defineComponent({
   name: 'TigerSwitch',
   props: {
+    /**
+     * Whether the switch is checked
+     * @default false
+     */
     checked: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Whether the switch is disabled
+     * @default false
+     */
     disabled: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Switch size
+     * @default 'md'
+     */
     size: {
       type: String as PropType<SwitchSize>,
-      default: 'md',
+      default: 'md' as SwitchSize,
     },
   },
-  emits: ['update:checked', 'change'],
+  emits: {
+    /**
+     * Emitted when checked state changes (for v-model:checked)
+     */
+    'update:checked': (value: boolean) => typeof value === 'boolean',
+    /**
+     * Emitted when checked state changes
+     */
+    change: (value: boolean) => typeof value === 'boolean',
+  },
   setup(props, { emit }) {
     const switchClasses = computed(() => {
       return getSwitchClasses(props.size, props.checked, props.disabled)

@@ -5,43 +5,53 @@
 import type { DividerOrientation, DividerLineStyle, DividerSpacing } from '../types/divider'
 
 /**
+ * Spacing map for horizontal and vertical orientations
+ */
+const SPACING_MAP: Record<DividerSpacing, { horizontal: string; vertical: string }> = {
+  none: { horizontal: '', vertical: '' },
+  xs: { horizontal: 'my-1', vertical: 'mx-1' },
+  sm: { horizontal: 'my-2', vertical: 'mx-2' },
+  md: { horizontal: 'my-4', vertical: 'mx-4' },
+  lg: { horizontal: 'my-6', vertical: 'mx-6' },
+  xl: { horizontal: 'my-8', vertical: 'mx-8' },
+} as const
+
+/**
+ * Line style map for border styles
+ */
+const LINE_STYLE_MAP: Record<DividerLineStyle, string> = {
+  solid: 'border-solid',
+  dashed: 'border-dashed',
+  dotted: 'border-dotted',
+} as const
+
+/**
  * Get spacing classes based on spacing type and orientation
+ * @param spacing - Spacing size
+ * @param orientation - Divider orientation
+ * @returns Spacing class string
  */
 export function getDividerSpacingClasses(
   spacing: DividerSpacing,
   orientation: DividerOrientation
 ): string {
-  const spacingMap: Record<DividerSpacing, { horizontal: string; vertical: string }> = {
-    none: { horizontal: '', vertical: '' },
-    xs: { horizontal: 'my-1', vertical: 'mx-1' },
-    sm: { horizontal: 'my-2', vertical: 'mx-2' },
-    md: { horizontal: 'my-4', vertical: 'mx-4' },
-    lg: { horizontal: 'my-6', vertical: 'mx-6' },
-    xl: { horizontal: 'my-8', vertical: 'mx-8' },
-  }
-  
-  return spacingMap[spacing][orientation]
+  return SPACING_MAP[spacing][orientation]
 }
 
 /**
  * Get border style classes based on line style
+ * @param lineStyle - Line style type
+ * @returns Border style class string
  */
 export function getDividerLineStyleClasses(lineStyle: DividerLineStyle): string {
-  const styleMap: Record<DividerLineStyle, string> = {
-    solid: 'border-solid',
-    dashed: 'border-dashed',
-    dotted: 'border-dotted',
-  }
-  
-  return styleMap[lineStyle]
+  return LINE_STYLE_MAP[lineStyle]
 }
 
 /**
  * Get base divider classes based on orientation
+ * @param orientation - Divider orientation
+ * @returns Base divider class string
  */
 export function getDividerOrientationClasses(orientation: DividerOrientation): string {
-  if (orientation === 'horizontal') {
-    return 'w-full border-t'
-  }
-  return 'h-full border-l'
+  return orientation === 'horizontal' ? 'w-full border-t' : 'h-full border-l'
 }

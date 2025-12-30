@@ -12,52 +12,109 @@ const sizeClasses = {
 export const Textarea = defineComponent({
   name: 'TigerTextarea',
   props: {
+    /**
+     * Textarea value (for v-model)
+     */
     modelValue: {
       type: String,
       default: '',
     },
+    /**
+     * Textarea size
+     * @default 'md'
+     */
     size: {
       type: String as PropType<TextareaSize>,
-      default: 'md',
+      default: 'md' as TextareaSize,
     },
+    /**
+     * Whether the textarea is disabled
+     * @default false
+     */
     disabled: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Whether the textarea is readonly
+     * @default false
+     */
     readonly: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Placeholder text
+     */
     placeholder: {
       type: String,
       default: '',
     },
+    /**
+     * Number of visible text rows
+     * @default 3
+     */
     rows: {
       type: Number,
       default: 3,
     },
+    /**
+     * Auto-resize height based on content
+     * @default false
+     */
     autoResize: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Maximum number of rows (only with autoResize)
+     */
     maxRows: {
       type: Number,
-      default: undefined,
     },
+    /**
+     * Minimum number of rows (only with autoResize)
+     */
     minRows: {
       type: Number,
-      default: undefined,
     },
+    /**
+     * Maximum character length
+     */
     maxLength: {
       type: Number,
-      default: undefined,
     },
+    /**
+     * Show character count
+     * @default false
+     */
     showCount: {
       type: Boolean,
       default: false,
     },
   },
-  emits: ['update:modelValue', 'input', 'change', 'focus', 'blur'],
+  emits: {
+    /**
+     * Emitted when value changes (for v-model)
+     */
+    'update:modelValue': (value: string) => typeof value === 'string',
+    /**
+     * Emitted on input event
+     */
+    input: (event: Event) => event instanceof Event,
+    /**
+     * Emitted on change event
+     */
+    change: (event: Event) => event instanceof Event,
+    /**
+     * Emitted on focus event
+     */
+    focus: (event: FocusEvent) => event instanceof FocusEvent,
+    /**
+     * Emitted on blur event
+     */
+    blur: (event: FocusEvent) => event instanceof FocusEvent,
+  },
   setup(props, { emit, attrs }) {
     const textareaRef = ref<HTMLTextAreaElement | null>(null)
     

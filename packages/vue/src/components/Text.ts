@@ -16,38 +16,72 @@ import {
 export const Text = defineComponent({
   name: 'TigerText',
   props: {
+    /**
+     * HTML tag to render
+     * @default 'p'
+     */
     tag: {
       type: String as PropType<TextTag>,
-      default: 'p',
+      default: 'p' as TextTag,
     },
+    /**
+     * Text size
+     * @default 'base'
+     */
     size: {
       type: String as PropType<TextSize>,
-      default: 'base',
+      default: 'base' as TextSize,
     },
+    /**
+     * Font weight
+     * @default 'normal'
+     */
     weight: {
       type: String as PropType<TextWeight>,
-      default: 'normal',
+      default: 'normal' as TextWeight,
     },
+    /**
+     * Text alignment
+     */
     align: {
       type: String as PropType<TextAlign>,
-      default: undefined,
     },
+    /**
+     * Text color
+     * @default 'default'
+     */
     color: {
       type: String as PropType<TextColor>,
-      default: 'default',
+      default: 'default' as TextColor,
     },
+    /**
+     * Truncate text with ellipsis
+     * @default false
+     */
     truncate: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Italic text style
+     * @default false
+     */
     italic: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Underline text decoration
+     * @default false
+     */
     underline: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Line-through text decoration
+     * @default false
+     */
     lineThrough: {
       type: Boolean,
       default: false,

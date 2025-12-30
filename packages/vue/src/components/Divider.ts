@@ -12,25 +12,41 @@ import {
 export const Divider = defineComponent({
   name: 'TigerDivider',
   props: {
+    /**
+     * Divider orientation
+     * @default 'horizontal'
+     */
     orientation: {
       type: String as PropType<DividerOrientation>,
-      default: 'horizontal',
+      default: 'horizontal' as DividerOrientation,
     },
+    /**
+     * Line style (solid, dashed, dotted)
+     * @default 'solid'
+     */
     lineStyle: {
       type: String as PropType<DividerLineStyle>,
-      default: 'solid',
+      default: 'solid' as DividerLineStyle,
     },
+    /**
+     * Spacing around the divider
+     * @default 'md'
+     */
     spacing: {
       type: String as PropType<DividerSpacing>,
-      default: 'md',
+      default: 'md' as DividerSpacing,
     },
+    /**
+     * Custom border color (CSS color value)
+     */
     color: {
       type: String,
-      default: undefined,
     },
+    /**
+     * Custom border thickness (CSS size value)
+     */
     thickness: {
       type: String,
-      default: undefined,
     },
   },
   setup(props) {

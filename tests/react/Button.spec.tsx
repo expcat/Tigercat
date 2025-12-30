@@ -280,6 +280,13 @@ describe('Button', () => {
       expect(getByText(specialText)).toBeInTheDocument()
     })
 
+    it('should handle unicode characters', () => {
+      const unicodeText = '你好世界 🌍 مرحبا'
+      const { getByText } = render(<Button>{unicodeText}</Button>)
+      
+      expect(getByText(unicodeText)).toBeInTheDocument()
+    })
+
     it('should handle rapid clicks', async () => {
       const handleClick = vi.fn()
       const { getByRole } = render(<Button onClick={handleClick}>Button</Button>)
@@ -290,6 +297,76 @@ describe('Button', () => {
       await userEvent.click(button)
       
       expect(handleClick).toHaveBeenCalledTimes(3)
+    })
+
+    it('should handle both disabled and loading props', () => {
+      const handleClick = vi.fn()
+      const { getByRole } = render(
+        <Button disabled loading onClick={handleClick}>
+          Button
+        </Button>
+      )
+      
+      const button = getByRole('button')
+      expect(button).toBeDisabled()
+    })
+
+    it('should handle whitespace-only children', () => {
+      const { getByRole } = render(<Button>   </Button>)
+      
+      expect(getByRole('button')).toBeInTheDocument()
+    })
+
+    it('should handle null children gracefully', () => {
+      const { getByRole } = render(<Button>{null}</Button>)
+      
+      expect(getByRole('button')).toBeInTheDocument()
+    })
+
+    it('should handle undefined onClick gracefully', async () => {
+      const { getByRole } = render(<Button>Click me</Button>)
+      
+      // Should not throw error even without onClick
+      await userEvent.click(getByRole('button'))
+    })
+
+    it('should handle multiple rapid state changes', () => {
+      const { getByRole, rerender } = render(<Button>Button</Button>)
+      
+      rerender(<Button disabled>Button</Button>)
+      expect(getByRole('button')).toBeDisabled()
+      
+      rerender(<Button loading>Button</Button>)
+      expect(getByRole('button')).toBeDisabled()
+      
+      rerender(<Button>Button</Button>)
+      expect(getByRole('button')).not.toBeDisabled()
+    })
+
+    it('should handle all size-variant combinations', () => {
+      componentSizes.forEach(size => {
+        buttonVariants.forEach(variant => {
+          const { getByRole, unmount } = render(
+            <Button size={size} variant={variant}>
+              {size} {variant}
+            </Button>
+          )
+          expect(getByRole('button')).toBeInTheDocument()
+          unmount() // Clean up before next render
+        })
+      })
+    })
+
+    it('should preserve custom props through re-renders', () => {
+      const customDataAttr = 'custom-test-value'
+      const { getByRole, rerender } = render(
+        <Button data-custom={customDataAttr}>Button</Button>
+      )
+      
+      expect(getByRole('button')).toHaveAttribute('data-custom', customDataAttr)
+      
+      rerender(<Button data-custom={customDataAttr} disabled>Button</Button>)
+      expect(getByRole('button')).toHaveAttribute('data-custom', customDataAttr)
     })
   })
 

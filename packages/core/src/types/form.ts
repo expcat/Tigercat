@@ -3,51 +3,59 @@
  */
 
 /**
- * Form validation rule types
+ * Supported form validation rule types
  */
 export type FormRuleType = 'string' | 'number' | 'boolean' | 'array' | 'object' | 'email' | 'url' | 'date'
 
 /**
- * Form validation trigger types
+ * When to trigger form validation
  */
 export type FormRuleTrigger = 'blur' | 'change' | 'submit'
 
 /**
  * Form validation rule interface
+ * Defines how a field should be validated
  */
 export interface FormRule {
   /**
-   * Rule type
+   * Rule type - determines the validation logic to apply
    */
   type?: FormRuleType
   
   /**
    * Whether the field is required
+   * @default false
    */
   required?: boolean
   
   /**
-   * Minimum length for strings or minimum value for numbers
+   * Minimum length for strings, minimum value for numbers, or minimum items for arrays
    */
   min?: number
   
   /**
-   * Maximum length for strings or maximum value for numbers
+   * Maximum length for strings, maximum value for numbers, or maximum items for arrays
    */
   max?: number
   
   /**
-   * Pattern to match (RegExp)
+   * Regular expression pattern to match against string values
    */
   pattern?: RegExp
   
   /**
    * Custom validator function
+   * Should return:
+   * - true if validation passes
+   * - false if validation fails (uses the default/custom message)
+   * - string with custom error message if validation fails
+   * Can be async for server-side validation
    */
   validator?: (value: unknown, values?: Record<string, unknown>) => boolean | string | Promise<boolean | string>
   
   /**
-   * Error message when validation fails
+   * Error message to display when validation fails
+   * If not provided, a default message will be used
    */
   message?: string
   
@@ -59,48 +67,65 @@ export interface FormRule {
   
   /**
    * Transform value before validation
+   * Useful for trimming strings, converting types, etc.
    */
   transform?: (value: unknown) => unknown
 }
 
 /**
- * Form validation rules
+ * Form validation rules mapped by field name
+ * Each field can have a single rule or an array of rules
  */
 export type FormRules = Record<string, FormRule | FormRule[]>
 
 /**
- * Form field error
+ * Form field error with field name and message
  */
 export interface FormError {
+  /**
+   * Field name that failed validation
+   */
   field: string
+  
+  /**
+   * Error message describing the validation failure
+   */
   message: string
 }
 
 /**
- * Form values type
+ * Form values - key-value pairs representing form data
+ * Values can be of any type (string, number, boolean, arrays, objects, etc.)
  */
 export type FormValues = Record<string, unknown>
 
 /**
- * Form validation result
+ * Form validation result containing validity status and any errors
  */
 export interface FormValidationResult {
+  /**
+   * Whether the entire form is valid (no errors)
+   */
   valid: boolean
+  
+  /**
+   * Array of validation errors (empty if form is valid)
+   */
   errors: FormError[]
 }
 
 /**
- * Form item label alignment
+ * Form item label alignment (horizontal positioning)
  */
 export type FormLabelAlign = 'left' | 'right' | 'top'
 
 /**
- * Form item label position
+ * Form item label position relative to the input
  */
 export type FormLabelPosition = 'left' | 'right' | 'top'
 
 /**
- * Form size
+ * Form size - affects all form items within the form
  */
 export type FormSize = 'sm' | 'md' | 'lg'
 

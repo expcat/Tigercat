@@ -4,14 +4,25 @@ import { classNames } from '@tigercat/core'
 export const Sidebar = defineComponent({
   name: 'TigerSidebar',
   props: {
+    /**
+     * Additional CSS classes
+     */
     className: {
       type: String as PropType<string>,
       default: '',
     },
+    /**
+     * Sidebar width (CSS value)
+     * @default '256px'
+     */
     width: {
       type: String as PropType<string>,
       default: '256px',
     },
+    /**
+     * Whether the sidebar is collapsed
+     * @default false
+     */
     collapsed: {
       type: Boolean as PropType<boolean>,
       default: false,
