@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { classNames, type HeaderProps } from '@tigercat/core'
 
 export interface ReactHeaderProps extends HeaderProps {
@@ -14,16 +14,18 @@ export const Header: React.FC<ReactHeaderProps> = ({
   children,
   ...props
 }) => {
-  const headerClasses = classNames(
+  const headerClasses = useMemo(() => classNames(
     'tiger-header',
     'bg-white border-b border-gray-200',
     className
-  )
+  ), [className])
+  
+  const headerStyle = useMemo((): React.CSSProperties => ({ height }), [height])
 
   return (
     <header 
       className={headerClasses} 
-      style={{ height }}
+      style={headerStyle}
       {...props}
     >
       {children}

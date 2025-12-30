@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { classNames, getLinkVariantClasses, type LinkProps as CoreLinkProps } from '@tigercat/core'
 
 export interface LinkProps extends CoreLinkProps {
@@ -24,7 +24,7 @@ const sizeClasses = {
   sm: 'text-sm',
   md: 'text-base',
   lg: 'text-lg',
-}
+} as const
 
 const disabledClasses = 'cursor-not-allowed opacity-60 pointer-events-none'
 
@@ -41,27 +41,27 @@ export const Link: React.FC<LinkProps> = ({
   className,
   ...props
 }) => {
-  const linkClasses = classNames(
+  const linkClasses = useMemo(() => classNames(
     baseClasses,
     getLinkVariantClasses(variant),
     sizeClasses[size],
     underline && 'hover:underline',
     disabled && disabledClasses,
     className,
-  )
+  ), [variant, size, underline, disabled, className])
 
   // Automatically add security attributes for target="_blank"
-  const computedRel = target === '_blank' && !rel ? 'noopener noreferrer' : rel
+  const computedRel = useMemo(() => 
+    target === '_blank' && !rel ? 'noopener noreferrer' : rel
+  , [target, rel])
 
-  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = useCallback((event: React.MouseEvent<HTMLAnchorElement>) => {
     if (disabled) {
       event.preventDefault()
       return
     }
-    if (onClick) {
-      onClick(event)
-    }
-  }
+    onClick?.(event)
+  }, [disabled, onClick])
 
   return (
     <a

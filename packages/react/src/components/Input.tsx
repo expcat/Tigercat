@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { getInputClasses, type InputProps as CoreInputProps } from '@tigercat/core'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { classNames, getInputClasses, type InputProps as CoreInputProps } from '@tigercat/core'
 
 export interface InputProps extends CoreInputProps {
   /**
@@ -53,7 +53,7 @@ export const Input: React.FC<InputProps> = ({
   const inputRef = useRef<HTMLInputElement>(null)
   const [internalValue, setInternalValue] = useState<string | number>(defaultValue ?? '')
   
-  // Determine if the component is controlled
+  // Determine if the component is controlled - simple comparison, no need to memoize
   const isControlled = value !== undefined
   const inputValue = isControlled ? value : internalValue
 
@@ -68,11 +68,11 @@ export const Input: React.FC<InputProps> = ({
    * For number inputs, returns the numeric value if valid (using Number.isNaN to properly handle 0),
    * otherwise returns the string value to preserve user input for invalid numbers.
    */
-  const getInputValue = (target: HTMLInputElement): string | number => {
+  const getInputValue = useCallback((target: HTMLInputElement): string | number => {
     return type === 'number' ? (Number.isNaN(target.valueAsNumber) ? target.value : target.valueAsNumber) : target.value
-  }
+  }, [type])
 
-  const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
+  const handleInput = useCallback((event: React.FormEvent<HTMLInputElement>) => {
     const target = event.target as HTMLInputElement
     const newValue = getInputValue(target)
     
@@ -80,12 +80,10 @@ export const Input: React.FC<InputProps> = ({
       setInternalValue(newValue)
     }
     
-    if (onInput) {
-      onInput(event)
-    }
-  }
+    onInput?.(event)
+  }, [isControlled, getInputValue, onInput])
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target
     const newValue = getInputValue(target)
     
@@ -93,12 +91,10 @@ export const Input: React.FC<InputProps> = ({
       setInternalValue(newValue)
     }
     
-    if (onChange) {
-      onChange(event)
-    }
-  }
+    onChange?.(event)
+  }, [isControlled, getInputValue, onChange])
 
-  const inputClasses = `${getInputClasses(size)}${className ? ` ${className}` : ''}`
+  const inputClasses = useMemo(() => classNames(getInputClasses(size), className), [size, className])
 
   return (
     <input

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { classNames, type ContentProps } from '@tigercat/core'
 
 export interface ReactContentProps extends ContentProps {
@@ -13,11 +13,11 @@ export const Content: React.FC<ReactContentProps> = ({
   children,
   ...props
 }) => {
-  const contentClasses = classNames(
+  const contentClasses = useMemo(() => classNames(
     'tiger-content',
     'flex-1 bg-gray-50 p-6',
     className
-  )
+  ), [className])
 
   return (
     <main className={contentClasses} {...props}>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import {
   classNames,
   getSelectTriggerClasses,
@@ -59,69 +59,70 @@ export const Select: React.FC<SelectProps> = ({
   const triggerRef = useRef<HTMLButtonElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const filteredOptions = searchable && searchQuery
-    ? filterOptions(options, searchQuery)
-    : options
+  const filteredOptions = useMemo(() => 
+    searchable && searchQuery ? filterOptions(options, searchQuery) : options,
+    [searchable, searchQuery, options]
+  )
 
-  const hasOptions = filteredOptions.length > 0
+  const hasOptions = useMemo(() => filteredOptions.length > 0, [filteredOptions])
 
-  const getAllOptions = (): SelectOption[] => {
-    const allOptions: SelectOption[] = []
+  const allOptions = useMemo((): SelectOption[] => {
+    const result: SelectOption[] = []
     options.forEach((item) => {
       if (isOptionGroup(item)) {
-        allOptions.push(...(item as SelectOptionGroup).options)
+        result.push(...(item as SelectOptionGroup).options)
       } else {
-        allOptions.push(item as SelectOption)
+        result.push(item as SelectOption)
       }
     })
-    return allOptions
-  }
+    return result
+  }, [options])
 
-  const getDisplayText = (): string => {
+  const displayText = useMemo((): string => {
     if (multiple && Array.isArray(value)) {
       if (value.length === 0) {
         return placeholder
       }
-      const selectedOptions = getAllOptions().filter((opt) => value.includes(opt.value))
+      const selectedOptions = allOptions.filter((opt) => value.includes(opt.value))
       return selectedOptions.map((opt) => opt.label).join(', ')
     } else {
       if (value === undefined || value === null || value === '') {
         return placeholder
       }
-      const option = getAllOptions().find((opt) => opt.value === value)
+      const option = allOptions.find((opt) => opt.value === value)
       return option ? option.label : placeholder
     }
-  }
+  }, [multiple, value, placeholder, allOptions])
 
-  const displayText = getDisplayText()
-
-  const showClearButton =
+  const showClearButton = useMemo(() =>
     clearable &&
     !disabled &&
     value !== undefined &&
     value !== null &&
     value !== '' &&
-    (!Array.isArray(value) || value.length > 0)
+    (!Array.isArray(value) || value.length > 0),
+    [clearable, disabled, value]
+  )
 
-  const isSelected = (option: SelectOption): boolean => {
+  const isSelected = useCallback((option: SelectOption): boolean => {
     if (multiple && Array.isArray(value)) {
       return value.includes(option.value)
     }
     return value === option.value
-  }
+  }, [multiple, value])
 
-  const toggleDropdown = () => {
+  const toggleDropdown = useCallback(() => {
     if (!disabled) {
       setIsOpen(!isOpen)
     }
-  }
+  }, [disabled, isOpen])
 
-  const closeDropdown = () => {
+  const closeDropdown = useCallback(() => {
     setIsOpen(false)
     setSearchQuery('')
-  }
+  }, [])
 
-  const selectOption = (option: SelectOption) => {
+  const selectOption = useCallback((option: SelectOption) => {
     if (option.disabled) {
       return
     }
@@ -141,25 +142,25 @@ export const Select: React.FC<SelectProps> = ({
       onChange?.(option.value)
       closeDropdown()
     }
-  }
+  }, [multiple, value, onChange, closeDropdown])
 
-  const clearSelection = (event: React.MouseEvent) => {
+  const clearSelection = useCallback((event: React.MouseEvent) => {
     event.stopPropagation()
     const newValue = multiple ? [] : undefined
     onChange?.(newValue)
-  }
+  }, [multiple, onChange])
 
-  const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchInput = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value
     setSearchQuery(query)
     onSearch?.(query)
-  }
+  }, [onSearch])
 
   useEffect(() => {
     if (isOpen && searchable && searchInputRef.current) {
       searchInputRef.current.focus()
     }
-  }, [isOpen]) // Only re-run when dropdown opens/closes
+  }, [isOpen, searchable])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -179,11 +180,14 @@ export const Select: React.FC<SelectProps> = ({
         document.removeEventListener('click', handleClickOutside)
       }
     }
-  }, [isOpen])
+  }, [isOpen]) // closeDropdown is stable (memoized with no deps), no need to include it
 
-  const triggerClasses = getSelectTriggerClasses(size, disabled, isOpen)
+  const triggerClasses = useMemo(() => 
+    getSelectTriggerClasses(size, disabled, isOpen),
+    [size, disabled, isOpen]
+  )
 
-  const renderOption = (option: SelectOption) => {
+  const renderOption = useCallback((option: SelectOption) => {
     const optionSelected = isSelected(option)
 
     return (
@@ -213,9 +217,9 @@ export const Select: React.FC<SelectProps> = ({
         </span>
       </button>
     )
-  }
+  }, [isSelected, size, selectOption])
 
-  const renderOptions = () => {
+  const renderOptions = useCallback(() => {
     if (!hasOptions) {
       return (
         <div className={selectEmptyStateClasses}>
@@ -237,10 +241,12 @@ export const Select: React.FC<SelectProps> = ({
         return renderOption(item as SelectOption)
       }
     })
-  }
+  }, [hasOptions, options.length, noDataText, noOptionsText, filteredOptions, renderOption])
+
+  const containerClasses = useMemo(() => classNames(selectBaseClasses, className), [className])
 
   return (
-    <div className={classNames(selectBaseClasses, className)} {...props}>
+    <div className={containerClasses} {...props}>
       {/* Trigger button */}
       <button
         ref={triggerRef}

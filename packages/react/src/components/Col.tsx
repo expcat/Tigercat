@@ -38,19 +38,21 @@ export const Col: React.FC<ColProps> = ({
   ...props
 }) => {
   const { gutter } = useContext(RowContext)
-  const { colStyle } = getGutterStyles(gutter || 0)
+  
+  const gutterStyles = useMemo(() => getGutterStyles(gutter || 0), [gutter])
 
-  const colClasses = classNames(
+  const colClasses = useMemo(() => classNames(
     getSpanClasses(span),
     getOffsetClasses(offset),
     getOrderClasses(order),
     getFlexClasses(flex),
     className
-  )
+  ), [span, offset, order, flex, className])
 
-  const mergedStyle = useMemo(() => {
-    return { ...colStyle, ...style }
-  }, [colStyle, style])
+  const mergedStyle = useMemo((): React.CSSProperties => ({
+    ...gutterStyles.colStyle,
+    ...style
+  }), [gutterStyles.colStyle, style])
 
   return (
     <div className={colClasses} style={mergedStyle} {...props}>
