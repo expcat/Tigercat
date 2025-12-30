@@ -18,10 +18,10 @@ export const CheckboxGroup = defineComponent({
      */
     modelValue: {
       type: Array as PropType<(string | number | boolean)[]>,
-      default: undefined,
     },
     /**
      * Default selected values (uncontrolled mode)
+     * @default []
      */
     defaultValue: {
       type: Array as PropType<(string | number | boolean)[]>,
@@ -29,6 +29,7 @@ export const CheckboxGroup = defineComponent({
     },
     /**
      * Whether all checkboxes are disabled
+     * @default false
      */
     disabled: {
       type: Boolean,
@@ -36,13 +37,23 @@ export const CheckboxGroup = defineComponent({
     },
     /**
      * Checkbox size for all checkboxes
+     * @default 'md'
      */
     size: {
       type: String as PropType<CheckboxSize>,
-      default: 'md',
+      default: 'md' as CheckboxSize,
     },
   },
-  emits: ['update:modelValue', 'change'],
+  emits: {
+    /**
+     * Emitted when selected values change (for v-model)
+     */
+    'update:modelValue': (value: (string | number | boolean)[]) => Array.isArray(value),
+    /**
+     * Emitted when selected values change
+     */
+    change: (value: (string | number | boolean)[]) => Array.isArray(value),
+  },
   setup(props, { slots, emit }) {
     // Internal state for uncontrolled mode
     const internalValue = ref<(string | number | boolean)[]>(props.defaultValue)

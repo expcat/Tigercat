@@ -22,28 +22,53 @@ const sizeClasses = {
 export const Radio = defineComponent({
   name: 'TigerRadio',
   props: {
+    /**
+     * Radio value (required for radio groups)
+     */
     value: {
       type: [String, Number] as PropType<string | number>,
       required: true,
     },
+    /**
+     * Radio size
+     * @default 'md'
+     */
     size: {
       type: String as PropType<RadioSize>,
-      default: 'md',
+      default: 'md' as RadioSize,
     },
+    /**
+     * Whether the radio is disabled
+     * @default false
+     */
     disabled: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Input name attribute
+     */
     name: {
       type: String,
-      default: undefined,
     },
+    /**
+     * Whether the radio is checked (controlled mode)
+     */
     checked: {
       type: Boolean,
-      default: undefined,
     },
   },
-  emits: ['change', 'update:checked'],
+  emits: {
+    /**
+     * Emitted when radio value changes
+     */
+    change: (value: string | number) => 
+      typeof value === 'string' || typeof value === 'number',
+    /**
+     * Emitted when checked state changes (for v-model:checked)
+     */
+    'update:checked': (value: boolean) => typeof value === 'boolean',
+  },
   setup(props, { slots, emit }) {
     // Inject from RadioGroup if available
     const groupValue = inject<{ value: string | number | undefined }>('radioGroupValue', { value: undefined })

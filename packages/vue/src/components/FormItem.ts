@@ -5,28 +5,53 @@ import { FormContextKey, type FormContext } from './Form'
 export const FormItem = defineComponent({
   name: 'TigerFormItem',
   props: {
+    /**
+     * Field name (for validation)
+     */
     name: {
       type: String,
     },
+    /**
+     * Field label text
+     */
     label: {
       type: String,
     },
+    /**
+     * Label width (overrides form-level setting)
+     */
     labelWidth: {
       type: [String, Number] as PropType<string | number>,
     },
+    /**
+     * Mark field as required
+     */
     required: {
       type: Boolean,
     },
+    /**
+     * Field validation rules (overrides form-level rules)
+     */
     rules: {
       type: [Object, Array] as PropType<FormRule | FormRule[]>,
     },
+    /**
+     * Custom error message
+     */
     error: {
       type: String,
     },
+    /**
+     * Show validation message
+     * @default true
+     */
     showMessage: {
       type: Boolean,
       default: true,
     },
+    /**
+     * Field size (overrides form-level size)
+     */
     size: {
       type: String as PropType<FormSize>,
     },

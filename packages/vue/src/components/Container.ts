@@ -13,14 +13,26 @@ const maxWidthClasses: Record<Exclude<ContainerMaxWidth, false>, string> = {
 export const Container = defineComponent({
   name: 'TigerContainer',
   props: {
+    /**
+     * Maximum width constraint (false for no constraint)
+     * @default false
+     */
     maxWidth: {
       type: [String, Boolean] as PropType<ContainerMaxWidth>,
       default: false,
     },
+    /**
+     * Center container horizontally
+     * @default true
+     */
     center: {
       type: Boolean,
       default: true,
     },
+    /**
+     * Add responsive horizontal padding
+     * @default true
+     */
     padding: {
       type: Boolean,
       default: true,

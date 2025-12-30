@@ -12,48 +12,95 @@ import {
 export const Slider = defineComponent({
   name: 'TigerSlider',
   props: {
+    /**
+     * Slider value (for v-model:value) - controlled mode
+     */
     value: {
       type: [Number, Array] as PropType<number | [number, number]>,
-      default: undefined,
     },
+    /**
+     * Default slider value - uncontrolled mode
+     */
     defaultValue: {
       type: [Number, Array] as PropType<number | [number, number]>,
-      default: undefined,
     },
+    /**
+     * Minimum value
+     * @default 0
+     */
     min: {
       type: Number,
       default: 0,
     },
+    /**
+     * Maximum value
+     * @default 100
+     */
     max: {
       type: Number,
       default: 100,
     },
+    /**
+     * Step size for value changes
+     * @default 1
+     */
     step: {
       type: Number,
       default: 1,
     },
+    /**
+     * Whether the slider is disabled
+     * @default false
+     */
     disabled: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Marks to display (true for default marks or object with custom marks)
+     * @default false
+     */
     marks: {
       type: [Boolean, Object] as PropType<boolean | Record<number, string>>,
       default: false,
     },
+    /**
+     * Show value tooltip on thumb
+     * @default true
+     */
     tooltip: {
       type: Boolean,
       default: true,
     },
+    /**
+     * Slider size
+     * @default 'md'
+     */
     size: {
       type: String as PropType<SliderSize>,
-      default: 'md',
+      default: 'md' as SliderSize,
     },
+    /**
+     * Enable range selection mode
+     * @default false
+     */
     range: {
       type: Boolean,
       default: false,
     },
   },
-  emits: ['update:value', 'change'],
+  emits: {
+    /**
+     * Emitted when value changes (for v-model:value)
+     */
+    'update:value': (value: number | [number, number]) => 
+      typeof value === 'number' || Array.isArray(value),
+    /**
+     * Emitted when value changes
+     */
+    change: (value: number | [number, number]) => 
+      typeof value === 'number' || Array.isArray(value),
+  },
   setup(props, { emit }) {
     // Initialize internal value
     const getInitialValue = (): number | [number, number] => {

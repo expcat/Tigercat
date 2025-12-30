@@ -4,6 +4,9 @@ import { classNames } from '@tigercat/core'
 export const Content = defineComponent({
   name: 'TigerContent',
   props: {
+    /**
+     * Additional CSS classes
+     */
     className: {
       type: String as PropType<string>,
       default: '',

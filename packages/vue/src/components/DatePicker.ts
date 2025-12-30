@@ -58,56 +58,110 @@ const ChevronRightIcon = createIcon(ChevronRightIconPath, 'w-5 h-5')
 export const DatePicker = defineComponent({
   name: 'TigerDatePicker',
   props: {
+    /**
+     * Selected date value (for v-model)
+     */
     modelValue: {
       type: [Date, String, null] as PropType<Date | string | null>,
       default: null,
     },
+    /**
+     * Date picker size
+     * @default 'md'
+     */
     size: {
       type: String as PropType<DatePickerSize>,
-      default: 'md',
+      default: 'md' as DatePickerSize,
     },
+    /**
+     * Date format string
+     * @default 'yyyy-MM-dd'
+     */
     format: {
       type: String as PropType<DateFormat>,
-      default: 'yyyy-MM-dd',
+      default: 'yyyy-MM-dd' as DateFormat,
     },
+    /**
+     * Placeholder text
+     * @default 'Select date'
+     */
     placeholder: {
       type: String,
       default: 'Select date',
     },
+    /**
+     * Whether the date picker is disabled
+     * @default false
+     */
     disabled: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Whether the date picker is readonly
+     * @default false
+     */
     readonly: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Whether the date picker is required
+     * @default false
+     */
     required: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Minimum selectable date
+     */
     minDate: {
       type: [Date, String, null] as PropType<Date | string | null>,
       default: null,
     },
+    /**
+     * Maximum selectable date
+     */
     maxDate: {
       type: [Date, String, null] as PropType<Date | string | null>,
       default: null,
     },
+    /**
+     * Show clear button
+     * @default true
+     */
     clearable: {
       type: Boolean,
       default: true,
     },
+    /**
+     * Input name attribute
+     */
     name: {
       type: String,
-      default: undefined,
     },
+    /**
+     * Input id attribute
+     */
     id: {
       type: String,
-      default: undefined,
     },
   },
-  emits: ['update:modelValue', 'change', 'clear'],
+  emits: {
+    /**
+     * Emitted when date changes (for v-model)
+     */
+    'update:modelValue': (value: Date | null) => value === null || value instanceof Date,
+    /**
+     * Emitted when date changes
+     */
+    change: (value: Date | null) => value === null || value instanceof Date,
+    /**
+     * Emitted when clear button is clicked
+     */
+    clear: () => true,
+  },
   setup(props, { emit }) {
     const isOpen = ref(false)
     const calendarRef = ref<HTMLElement | null>(null)
