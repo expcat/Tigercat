@@ -14,18 +14,34 @@ const baseClasses = 'inline-flex'
 export const Space = defineComponent({
   name: 'TigerSpace',
   props: {
+    /**
+     * Layout direction
+     * @default 'horizontal'
+     */
     direction: {
       type: String as PropType<SpaceDirection>,
-      default: 'horizontal',
+      default: 'horizontal' as SpaceDirection,
     },
+    /**
+     * Gap size between items
+     * @default 'md'
+     */
     size: {
       type: [String, Number] as PropType<SpaceSize>,
-      default: 'md',
+      default: 'md' as SpaceSize,
     },
+    /**
+     * Alignment of items
+     * @default 'start'
+     */
     align: {
       type: String as PropType<SpaceAlign>,
-      default: 'start',
+      default: 'start' as SpaceAlign,
     },
+    /**
+     * Whether to wrap items
+     * @default false
+     */
     wrap: {
       type: Boolean,
       default: false,

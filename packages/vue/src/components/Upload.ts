@@ -17,14 +17,14 @@ export const Upload = defineComponent({
   name: 'TigerUpload',
   props: {
     /**
-     * Accepted file types
+     * Accepted file types (e.g., 'image/*', '.pdf')
      */
     accept: {
       type: String,
-      default: undefined,
     },
     /**
      * Whether to allow multiple file selection
+     * @default false
      */
     multiple: {
       type: Boolean,
@@ -35,17 +35,16 @@ export const Upload = defineComponent({
      */
     limit: {
       type: Number,
-      default: undefined,
     },
     /**
      * Maximum file size in bytes
      */
     maxSize: {
       type: Number,
-      default: undefined,
     },
     /**
      * Whether the upload is disabled
+     * @default false
      */
     disabled: {
       type: Boolean,
@@ -53,6 +52,7 @@ export const Upload = defineComponent({
     },
     /**
      * Whether to enable drag and drop
+     * @default false
      */
     drag: {
       type: Boolean,
@@ -60,13 +60,15 @@ export const Upload = defineComponent({
     },
     /**
      * List type for displaying files
+     * @default 'text'
      */
     listType: {
       type: String as PropType<UploadListType>,
-      default: 'text',
+      default: 'text' as UploadListType,
     },
     /**
      * List of uploaded files (v-model:file-list)
+     * @default []
      */
     fileList: {
       type: Array as PropType<UploadFile[]>,
@@ -74,6 +76,7 @@ export const Upload = defineComponent({
     },
     /**
      * Whether to show the file list
+     * @default true
      */
     showFileList: {
       type: Boolean,
@@ -81,36 +84,61 @@ export const Upload = defineComponent({
     },
     /**
      * Whether to auto upload when file is selected
+     * @default true
      */
     autoUpload: {
       type: Boolean,
       default: true,
     },
     /**
-     * Custom upload request
+     * Custom upload request function
      */
     customRequest: {
       type: Function as PropType<(options: UploadRequestOptions) => void>,
-      default: undefined,
     },
     /**
-     * Before upload callback
+     * Before upload callback - return false to prevent upload
      */
     beforeUpload: {
       type: Function as PropType<(file: File) => boolean | Promise<boolean>>,
-      default: undefined,
     },
   },
-  emits: [
-    'update:file-list',
-    'change',
-    'remove',
-    'preview',
-    'progress',
-    'success',
-    'error',
-    'exceed',
-  ],
+  emits: {
+    /**
+     * Emitted when file list changes (for v-model:file-list)
+     */
+    'update:file-list': (files: UploadFile[]) => Array.isArray(files),
+    /**
+     * Emitted when file list changes
+     */
+    change: (_file: UploadFile, _fileList: UploadFile[]) => true,
+    /**
+     * Emitted when file is removed
+     */
+    remove: (_file: UploadFile, _fileList: UploadFile[]) => true,
+    /**
+     * Emitted when file is previewed
+     */
+    preview: (_file: UploadFile) => true,
+    /**
+     * Emitted on upload progress
+     */
+    progress: (progress: number, _file: UploadFile) => 
+      typeof progress === 'number',
+    /**
+     * Emitted on upload success
+     */
+    success: (_response: unknown, _file: UploadFile) => true,
+    /**
+     * Emitted on upload error
+     */
+    error: (error: Error, _file: UploadFile) => error instanceof Error,
+    /**
+     * Emitted when file limit is exceeded
+     */
+    exceed: (files: File[], fileList: UploadFile[]) => 
+      Array.isArray(files) && Array.isArray(fileList),
+  },
   setup(props, { emit, slots }) {
     const inputRef = ref<HTMLInputElement | null>(null)
     const isDragging = ref(false)

@@ -11,14 +11,25 @@ const sizeClasses: Record<IconSize, string> = {
 export const Icon = defineComponent({
   name: 'TigerIcon',
   props: {
+    /**
+     * Icon size
+     * @default 'md'
+     */
     size: {
       type: String as PropType<IconSize>,
-      default: 'md',
+      default: 'md' as IconSize,
     },
+    /**
+     * Icon color (CSS color value)
+     * @default 'currentColor'
+     */
     color: {
       type: String,
       default: 'currentColor',
     },
+    /**
+     * Additional CSS classes
+     */
     className: {
       type: String,
       default: '',

@@ -4,10 +4,17 @@ import { classNames } from '@tigercat/core'
 export const Header = defineComponent({
   name: 'TigerHeader',
   props: {
+    /**
+     * Additional CSS classes
+     */
     className: {
       type: String as PropType<string>,
       default: '',
     },
+    /**
+     * Header height (CSS value)
+     * @default '64px'
+     */
     height: {
       type: String as PropType<string>,
       default: '64px',

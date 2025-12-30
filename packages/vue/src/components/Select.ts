@@ -72,42 +72,68 @@ const CheckIcon = h(
 export const Select = defineComponent({
   name: 'TigerSelect',
   props: {
+    /**
+     * Selected value(s) (for v-model)
+     */
     modelValue: {
       type: [String, Number, Array] as PropType<string | number | (string | number)[]>,
-      default: undefined,
     },
+    /**
+     * Available options or option groups
+     * @default []
+     */
     options: {
       type: Array as PropType<SelectOption[] | SelectOptionGroup[]>,
       default: () => [],
     },
+    /**
+     * Select size
+     * @default 'md'
+     */
     size: {
       type: String as PropType<SelectSize>,
-      default: 'md',
+      default: 'md' as SelectSize,
     },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
+    /**
+     * Whether the select is disabled
+     */
+    disabled: Boolean,
+    /**
+     * Placeholder text
+     * @default 'Select an option'
+     */
     placeholder: {
       type: String,
       default: 'Select an option',
     },
-    searchable: {
-      type: Boolean,
-      default: false,
-    },
-    multiple: {
-      type: Boolean,
-      default: false,
-    },
+    /**
+     * Enable search functionality
+     */
+    searchable: Boolean,
+    /**
+     * Allow multiple selection
+     */
+    multiple: Boolean,
+    /**
+     * Show clear button
+     * @default true
+     */
     clearable: {
       type: Boolean,
       default: true,
     },
+    /**
+     * Text shown when no search results
+     * @default 'No options found'
+     */
     noOptionsText: {
       type: String,
       default: 'No options found',
     },
+    /**
+     * Text shown when no data available
+     * @default 'No options available'
+     */
     noDataText: {
       type: String,
       default: 'No options available',

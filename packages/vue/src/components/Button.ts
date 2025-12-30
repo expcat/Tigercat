@@ -37,22 +37,30 @@ const LoadingSpinner = h(
 export const Button = defineComponent({
   name: 'TigerButton',
   props: {
+    /**
+     * Button variant style
+     * @default 'primary'
+     */
     variant: {
       type: String as PropType<ButtonVariant>,
-      default: 'primary',
+      default: 'primary' as ButtonVariant,
     },
+    /**
+     * Button size
+     * @default 'md'
+     */
     size: {
       type: String as PropType<ButtonSize>,
-      default: 'md',
+      default: 'md' as ButtonSize,
     },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
+    /**
+     * Whether the button is disabled
+     */
+    disabled: Boolean,
+    /**
+     * Whether the button is in loading state
+     */
+    loading: Boolean,
   },
   emits: ['click'],
   setup(props, { slots, emit }) {

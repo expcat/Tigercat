@@ -14,36 +14,63 @@ const disabledClasses = 'cursor-not-allowed opacity-60 pointer-events-none'
 export const Link = defineComponent({
   name: 'TigerLink',
   props: {
+    /**
+     * Link variant style
+     * @default 'primary'
+     */
     variant: {
       type: String as PropType<LinkVariant>,
-      default: 'primary',
+      default: 'primary' as LinkVariant,
     },
+    /**
+     * Link size
+     * @default 'md'
+     */
     size: {
       type: String as PropType<LinkSize>,
-      default: 'md',
+      default: 'md' as LinkSize,
     },
+    /**
+     * Whether the link is disabled
+     * @default false
+     */
     disabled: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Link URL
+     */
     href: {
       type: String,
-      default: undefined,
     },
+    /**
+     * Link target attribute
+     */
     target: {
       type: String as PropType<'_blank' | '_self' | '_parent' | '_top'>,
-      default: undefined,
     },
+    /**
+     * Link rel attribute (auto-set for target="_blank")
+     */
     rel: {
       type: String,
-      default: undefined,
     },
+    /**
+     * Show underline on hover
+     * @default true
+     */
     underline: {
       type: Boolean,
       default: true,
     },
   },
-  emits: ['click'],
+  emits: {
+    /**
+     * Emitted when link is clicked (if not disabled)
+     */
+    click: (event: MouseEvent) => event instanceof MouseEvent,
+  },
   setup(props, { slots, emit }) {
     const linkClasses = computed(() => {
       return classNames(
