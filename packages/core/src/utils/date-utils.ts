@@ -5,25 +5,44 @@
 import type { DateFormat } from '../types/datepicker'
 
 /**
+ * Validate if a value is a valid date
+ * @param value - Value to validate
+ * @returns True if value is a valid date
+ */
+function isValidDate(value: Date | string | null | undefined): boolean {
+  if (!value) return false
+  const date = value instanceof Date ? value : new Date(value)
+  return !isNaN(date.getTime())
+}
+
+/**
  * Parse a date string or Date object to a Date instance
+ * @param value - Date string, Date object, or null/undefined
+ * @returns Date instance or null if invalid
  */
 export function parseDate(value: Date | string | null | undefined): Date | null {
   if (!value) return null
-  if (value instanceof Date) return value
+  if (value instanceof Date) {
+    return isNaN(value.getTime()) ? null : value
+  }
   const parsed = new Date(value)
   return isNaN(parsed.getTime()) ? null : parsed
 }
 
 /**
  * Format a date according to the specified format
+ * @param date - Date to format
+ * @param format - Date format string
+ * @returns Formatted date string, empty string if date is null
  */
 export function formatDate(date: Date | null, format: DateFormat = 'yyyy-MM-dd'): string {
-  if (!date) return ''
+  if (!date || !isValidDate(date)) return ''
   
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   
+  // Use switch for better performance (no object allocation per call)
   switch (format) {
     case 'yyyy-MM-dd':
       return `${year}-${month}-${day}`
@@ -51,27 +70,62 @@ export function isSameDay(date1: Date | null, date2: Date | null): boolean {
 }
 
 /**
+ * Normalize a date to midnight (00:00:00.000)
+ * @param date - Date to normalize
+ * @returns Normalized date
+ */
+export function normalizeDate(date: Date): Date {
+  const normalized = new Date(date)
+  normalized.setHours(0, 0, 0, 0)
+  return normalized
+}
+
+/**
  * Check if a date is within a range
+ * @param date - Date to check
+ * @param minDate - Minimum allowed date
+ * @param maxDate - Maximum allowed date
+ * @returns True if date is within the range (inclusive)
  */
 export function isDateInRange(
   date: Date,
   minDate: Date | null | undefined,
   maxDate: Date | null | undefined
 ): boolean {
-  if (minDate && date < minDate) return false
-  if (maxDate && date > maxDate) return false
+  if (!isValidDate(date)) return false
+  
+  // Normalize dates to midnight for accurate comparison
+  const normalizedDate = normalizeDate(date)
+  
+  if (minDate && isValidDate(minDate)) {
+    const normalizedMin = normalizeDate(minDate)
+    if (normalizedDate < normalizedMin) return false
+  }
+  
+  if (maxDate && isValidDate(maxDate)) {
+    const normalizedMax = normalizeDate(maxDate)
+    if (normalizedDate > normalizedMax) return false
+  }
+  
   return true
 }
 
 /**
  * Get the days in a month
+ * @param year - Year
+ * @param month - Month (0-11)
+ * @returns Number of days in the month
  */
 export function getDaysInMonth(year: number, month: number): number {
+  // month + 1, day 0 gives the last day of the previous month
   return new Date(year, month + 1, 0).getDate()
 }
 
 /**
  * Get the first day of the month (0 = Sunday, 6 = Saturday)
+ * @param year - Year
+ * @param month - Month (0-11)
+ * @returns Day of week (0-6)
  */
 export function getFirstDayOfMonth(year: number, month: number): number {
   return new Date(year, month, 1).getDay()
@@ -144,13 +198,4 @@ export function getShortDayNames(): string[] {
 export function isToday(date: Date): boolean {
   const today = new Date()
   return isSameDay(date, today)
-}
-
-/**
- * Normalize a date to midnight (00:00:00.000)
- */
-export function normalizeDate(date: Date): Date {
-  const normalized = new Date(date)
-  normalized.setHours(0, 0, 0, 0)
-  return normalized
 }

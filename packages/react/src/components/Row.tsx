@@ -40,19 +40,20 @@ export const Row: React.FC<RowProps> = ({
   style,
   ...props
 }) => {
-  const { rowStyle } = getGutterStyles(gutter)
+  const gutterStyles = useMemo(() => getGutterStyles(gutter), [gutter])
 
-  const rowClasses = classNames(
+  const rowClasses = useMemo(() => classNames(
     'flex',
     wrap && 'flex-wrap',
     getAlignClasses(align),
     getJustifyClasses(justify),
     className
-  )
+  ), [wrap, align, justify, className])
 
-  const mergedStyle = useMemo(() => {
-    return { ...rowStyle, ...style }
-  }, [rowStyle, style])
+  const mergedStyle = useMemo((): React.CSSProperties => ({
+    ...gutterStyles.rowStyle,
+    ...style
+  }), [gutterStyles.rowStyle, style])
 
   const contextValue = useMemo(() => ({ gutter }), [gutter])
 

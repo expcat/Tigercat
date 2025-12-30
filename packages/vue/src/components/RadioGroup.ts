@@ -4,28 +4,53 @@ import { type RadioSize } from '@tigercat/core'
 export const RadioGroup = defineComponent({
   name: 'TigerRadioGroup',
   props: {
+    /**
+     * Selected value (for v-model:value)
+     */
     value: {
       type: [String, Number] as PropType<string | number | undefined>,
-      default: undefined,
     },
+    /**
+     * Default selected value (uncontrolled mode)
+     */
     defaultValue: {
       type: [String, Number] as PropType<string | number | undefined>,
-      default: undefined,
     },
+    /**
+     * Input name attribute for all radios
+     */
     name: {
       type: String,
-      default: undefined,
     },
+    /**
+     * Whether all radios are disabled
+     * @default false
+     */
     disabled: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Radio size for all radios
+     * @default 'md'
+     */
     size: {
       type: String as PropType<RadioSize>,
-      default: 'md',
+      default: 'md' as RadioSize,
     },
   },
-  emits: ['update:value', 'change'],
+  emits: {
+    /**
+     * Emitted when value changes (for v-model:value)
+     */
+    'update:value': (value: string | number) => 
+      typeof value === 'string' || typeof value === 'number',
+    /**
+     * Emitted when value changes
+     */
+    change: (value: string | number) => 
+      typeof value === 'string' || typeof value === 'number',
+  },
   setup(props, { slots, emit }) {
     // Internal state for uncontrolled mode
     const internalValue = ref<string | number | undefined>(props.defaultValue)

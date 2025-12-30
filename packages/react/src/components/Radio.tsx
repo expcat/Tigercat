@@ -1,4 +1,4 @@
-import React, { useContext, useCallback } from 'react'
+import React, { useContext, useCallback, useMemo } from 'react'
 import { classNames, getRadioColorClasses, type RadioProps as CoreRadioProps } from '@tigercat/core'
 import { RadioGroupContext } from './RadioGroup'
 
@@ -40,7 +40,7 @@ const sizeClasses = {
     dot: 'w-2.5 h-2.5',
     label: 'text-lg',
   },
-}
+} as const
 
 export const Radio: React.FC<RadioProps> = ({
   value,
@@ -55,20 +55,20 @@ export const Radio: React.FC<RadioProps> = ({
 }) => {
   const groupContext = useContext(RadioGroupContext)
 
-  // Determine actual values (props override group values)
+  // Determine actual values (props override group values) - simple logical operations, no need to memoize
   const actualSize = size || groupContext?.size || 'md'
   const actualDisabled = disabled || groupContext?.disabled || false
   const actualName = name || groupContext?.name || ''
   
-  const isChecked = checked !== undefined 
-    ? checked 
-    : groupContext?.value !== undefined 
-      ? groupContext.value === value 
-      : false
+  const isChecked = useMemo(() => {
+    if (checked !== undefined) return checked
+    if (groupContext?.value !== undefined) return groupContext.value === value
+    return false
+  }, [checked, groupContext?.value, value])
 
-  const colors = getRadioColorClasses()
+  const colors = getRadioColorClasses() // Static object, no need to memoize
 
-  const radioClasses = classNames(
+  const radioClasses = useMemo(() => classNames(
     'relative inline-flex items-center justify-center rounded-full border-2 cursor-pointer transition-all',
     sizeClasses[actualSize].radio,
     isChecked ? colors.borderChecked : colors.border,
@@ -76,21 +76,21 @@ export const Radio: React.FC<RadioProps> = ({
     actualDisabled && colors.disabled,
     actualDisabled && 'cursor-not-allowed',
     !actualDisabled && 'hover:border-[var(--tiger-primary,#2563eb)]',
-  )
+  ), [actualSize, isChecked, actualDisabled, colors])
 
-  const dotClasses = classNames(
+  const dotClasses = useMemo(() => classNames(
     'rounded-full transition-all',
     sizeClasses[actualSize].dot,
     colors.innerDot,
     isChecked ? 'scale-100' : 'scale-0',
-  )
+  ), [actualSize, isChecked, colors.innerDot])
 
-  const labelClasses = classNames(
+  const labelClasses = useMemo(() => classNames(
     'ml-2 cursor-pointer select-none',
     sizeClasses[actualSize].label,
     actualDisabled ? colors.textDisabled : 'text-gray-900',
     actualDisabled && 'cursor-not-allowed',
-  )
+  ), [actualSize, actualDisabled, colors.textDisabled])
 
   const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     if (actualDisabled) {
@@ -117,9 +117,11 @@ export const Radio: React.FC<RadioProps> = ({
     }
   }, [actualDisabled])
 
+  const wrapperClasses = useMemo(() => classNames('inline-flex items-center', className), [className])
+
   return (
     <label
-      className={classNames('inline-flex items-center', className)}
+      className={wrapperClasses}
       tabIndex={actualDisabled ? -1 : 0}
       onKeyDown={handleKeyDown}
       {...props}

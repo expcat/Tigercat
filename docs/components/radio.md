@@ -616,3 +616,51 @@ function PreferenceForm() {
   </div>
 </RadioGroup>
 ```
+
+## RadioGroup 使用
+
+当需要管理一组单选框时，建议使用 RadioGroup 组件。它提供了统一的状态管理、键盘导航和样式配置。
+
+详细文档请参考：[RadioGroup 单选框组](./radio-group.md)
+
+## 表单验证
+
+Radio 可以与 Form 和 FormItem 组件配合使用，实现表单验证。详细示例请参考 [RadioGroup 文档](./radio-group.md#表单验证)。
+
+## 最佳实践
+
+### 1. 使用 RadioGroup 管理一组选项
+
+始终使用 RadioGroup 来管理相关的单选框，而不是使用独立的 Radio 组件。
+
+### 2. 提供清晰的标签
+
+确保单选框的标签清晰明确，避免歧义。
+
+### 3. 限制选项数量
+
+单选框选项不宜过多（建议不超过 7 个）。选项过多时考虑使用 Select 组件。
+
+### 4. 提供默认选项
+
+通常应该为 RadioGroup 提供一个默认选中的选项。
+
+## 常见问题
+
+### 1. 为什么 RadioGroup 中的单选框不能切换？
+
+确保在 RadioGroup 中的 Radio 设置了唯一的 `value` 属性。
+
+### 2. 单选框和复选框如何选择？
+
+- **单选框（Radio）**：用户只能选择一个选项（如性别、支付方式）
+- **复选框（Checkbox）**：用户可以选择多个选项（如兴趣爱好、功能偏好）
+
+## 相关组件
+
+- [RadioGroup 单选框组](./radio-group.md) - 管理一组单选框
+- [Checkbox 复选框](./checkbox.md) - 复选框组件  
+- [CheckboxGroup 复选框组](./checkbox-group.md) - 复选框组组件
+- [Select 选择器](./select.md) - 下拉选择组件
+- [Form 表单](./form.md) - 表单容器组件
+- [FormItem 表单项](./form-item.md) - 表单项组件

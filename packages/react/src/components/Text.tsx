@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
   classNames,
   textSizeClasses,
@@ -35,7 +35,7 @@ export const Text: React.FC<TextProps> = ({
   className,
   ...props
 }) => {
-  const textClasses = classNames(
+  const textClasses = useMemo(() => classNames(
     textSizeClasses[size],
     textWeightClasses[weight],
     align && textAlignClasses[align],
@@ -45,7 +45,7 @@ export const Text: React.FC<TextProps> = ({
     underline && textDecorationClasses.underline,
     lineThrough && textDecorationClasses.lineThrough,
     className
-  )
+  ), [size, weight, align, color, truncate, italic, underline, lineThrough, className])
 
   return React.createElement(
     tag,

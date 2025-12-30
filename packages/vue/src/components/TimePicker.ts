@@ -57,72 +57,144 @@ const CloseIcon = createIcon(TimePickerCloseIconPath, 'w-4 h-4')
 export const TimePicker = defineComponent({
   name: 'TigerTimePicker',
   props: {
+    /**
+     * Selected time value (for v-model)
+     */
     modelValue: {
       type: [String, null] as PropType<string | null>,
       default: null,
     },
+    /**
+     * Time picker size
+     * @default 'md'
+     */
     size: {
       type: String as PropType<TimePickerSize>,
-      default: 'md',
+      default: 'md' as TimePickerSize,
     },
+    /**
+     * Time format (12-hour or 24-hour)
+     * @default '24'
+     */
     format: {
       type: String as PropType<TimeFormat>,
-      default: '24',
+      default: '24' as TimeFormat,
     },
+    /**
+     * Show seconds selector
+     * @default false
+     */
     showSeconds: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Step size for hours
+     * @default 1
+     */
     hourStep: {
       type: Number,
       default: 1,
     },
+    /**
+     * Step size for minutes
+     * @default 1
+     */
     minuteStep: {
       type: Number,
       default: 1,
     },
+    /**
+     * Step size for seconds
+     * @default 1
+     */
     secondStep: {
       type: Number,
       default: 1,
     },
+    /**
+     * Placeholder text
+     * @default 'Select time'
+     */
     placeholder: {
       type: String,
       default: 'Select time',
     },
+    /**
+     * Whether the time picker is disabled
+     * @default false
+     */
     disabled: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Whether the time picker is readonly
+     * @default false
+     */
     readonly: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Whether the time picker is required
+     * @default false
+     */
     required: {
       type: Boolean,
       default: false,
     },
+    /**
+     * Minimum selectable time
+     */
     minTime: {
       type: [String, null] as PropType<string | null>,
       default: null,
     },
+    /**
+     * Maximum selectable time
+     */
     maxTime: {
       type: [String, null] as PropType<string | null>,
       default: null,
     },
+    /**
+     * Show clear button
+     * @default true
+     */
     clearable: {
       type: Boolean,
       default: true,
     },
+    /**
+     * Input name attribute
+     */
     name: {
       type: String,
-      default: undefined,
     },
+    /**
+     * Input id attribute
+     */
     id: {
       type: String,
-      default: undefined,
     },
   },
-  emits: ['update:modelValue', 'change', 'clear'],
+  emits: {
+    /**
+     * Emitted when time changes (for v-model)
+     */
+    'update:modelValue': (value: string | null) => 
+      value === null || typeof value === 'string',
+    /**
+     * Emitted when time changes
+     */
+    change: (value: string | null) => 
+      value === null || typeof value === 'string',
+    /**
+     * Emitted when clear button is clicked
+     */
+    clear: () => true,
+  },
   setup(props, { emit }) {
     const isOpen = ref(false)
     const panelRef = ref<HTMLElement | null>(null)

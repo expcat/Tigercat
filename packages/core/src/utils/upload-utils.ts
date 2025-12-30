@@ -3,12 +3,25 @@
  */
 
 import type { UploadFile, UploadFileStatus } from '../types/upload'
+import { classNames } from './class-names'
 
 /**
  * Generate a unique ID for uploaded files
+ * Uses timestamp and random string for uniqueness
+ * @returns Unique file ID string
  */
 export function generateFileId(): string {
   return `upload-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
+}
+
+/**
+ * Extract file extension from filename
+ * @param fileName - Name of the file
+ * @returns File extension with dot (e.g., '.png') or empty string
+ */
+function getFileExtension(fileName: string): string {
+  if (!fileName.includes('.')) return ''
+  return `.${fileName.split('.').pop()?.toLowerCase() || ''}`
 }
 
 /**
@@ -27,14 +40,16 @@ export function fileToUploadFile(file: File): UploadFile {
 
 /**
  * Validate file type against accept pattern
+ * @param file - File to validate
+ * @param accept - Accept pattern (e.g., 'image/*', '.png,.jpg', 'image/png')
+ * @returns True if file type is accepted
  */
 export function validateFileType(file: File, accept?: string): boolean {
   if (!accept) return true
 
   const acceptList = accept.split(',').map((item) => item.trim())
-  const fileName = file.name
   const fileType = file.type
-  const fileExtension = fileName.includes('.') ? `.${fileName.split('.').pop()}` : ''
+  const fileExtension = getFileExtension(file.name)
 
   return acceptList.some((acceptItem) => {
     // Check for exact MIME type match (e.g., 'image/png')
@@ -48,7 +63,7 @@ export function validateFileType(file: File, accept?: string): boolean {
 
     // Check for file extension match (e.g., '.png')
     if (acceptItem.startsWith('.')) {
-      return fileExtension.toLowerCase() === acceptItem.toLowerCase()
+      return fileExtension === acceptItem.toLowerCase()
     }
 
     return false
@@ -57,6 +72,9 @@ export function validateFileType(file: File, accept?: string): boolean {
 
 /**
  * Validate file size
+ * @param file - File to validate
+ * @param maxSize - Maximum file size in bytes (0 or undefined means no limit)
+ * @returns True if file size is within limit
  */
 export function validateFileSize(file: File, maxSize?: number): boolean {
   if (!maxSize) return true
@@ -78,6 +96,9 @@ export function formatFileSize(bytes: number): string {
 
 /**
  * Get upload button classes
+ * @param drag - Whether in drag mode
+ * @param disabled - Whether the button is disabled
+ * @returns Complete button class string
  */
 export function getUploadButtonClasses(drag: boolean, disabled: boolean): string {
   const baseClasses = [
@@ -96,30 +117,27 @@ export function getUploadButtonClasses(drag: boolean, disabled: boolean): string
     'duration-200',
   ]
 
-  if (disabled) {
-    baseClasses.push(
-      'bg-gray-100',
-      'text-gray-400',
-      'cursor-not-allowed'
-    )
-  } else {
-    baseClasses.push(
-      'bg-white',
-      'text-gray-700',
-      'hover:bg-gray-50',
-      'focus:outline-none',
-      'focus:ring-2',
-      'focus:ring-offset-2',
-      'focus:ring-[var(--tiger-primary,#2563eb)]',
-      'cursor-pointer'
-    )
-  }
+  const stateClasses = disabled
+    ? ['bg-gray-100', 'text-gray-400', 'cursor-not-allowed']
+    : [
+        'bg-white',
+        'text-gray-700',
+        'hover:bg-gray-50',
+        'focus:outline-none',
+        'focus:ring-2',
+        'focus:ring-offset-2',
+        'focus:ring-[var(--tiger-primary,#2563eb)]',
+        'cursor-pointer',
+      ]
 
-  return baseClasses.join(' ')
+  return classNames(...baseClasses, ...stateClasses)
 }
 
 /**
  * Get drag area classes
+ * @param isDragging - Whether currently dragging
+ * @param disabled - Whether the drag area is disabled
+ * @returns Complete drag area class string
  */
 export function getDragAreaClasses(isDragging: boolean, disabled: boolean): string {
   const baseClasses = [
@@ -137,33 +155,47 @@ export function getDragAreaClasses(isDragging: boolean, disabled: boolean): stri
     'duration-200',
   ]
 
+  let stateClasses: string[]
   if (disabled) {
-    baseClasses.push(
-      'border-gray-200',
-      'bg-gray-50',
-      'cursor-not-allowed',
-      'text-gray-400'
-    )
+    stateClasses = ['border-gray-200', 'bg-gray-50', 'cursor-not-allowed', 'text-gray-400']
   } else if (isDragging) {
-    baseClasses.push(
-      'border-[var(--tiger-primary,#2563eb)]',
-      'bg-blue-50',
-      'cursor-copy'
-    )
+    stateClasses = ['border-[var(--tiger-primary,#2563eb)]', 'bg-blue-50', 'cursor-copy']
   } else {
-    baseClasses.push(
+    stateClasses = [
       'border-gray-300',
       'hover:border-[var(--tiger-primary,#2563eb)]',
       'hover:bg-gray-50',
-      'cursor-pointer'
-    )
+      'cursor-pointer',
+    ]
   }
 
-  return baseClasses.join(' ')
+  return classNames(...baseClasses, ...stateClasses)
+}
+
+/**
+ * File list item status classes (constant for performance)
+ */
+const FILE_LIST_STATUS_CLASSES: Record<NonNullable<UploadFileStatus>, string[]> = {
+  ready: ['bg-gray-50', 'hover:bg-gray-100'],
+  uploading: ['bg-blue-50', 'text-blue-700'],
+  success: ['bg-green-50', 'text-green-700', 'hover:bg-green-100'],
+  error: ['bg-red-50', 'text-red-700', 'hover:bg-red-100'],
+}
+
+/**
+ * Picture card status classes (constant for performance)
+ */
+const PICTURE_CARD_STATUS_CLASSES: Record<NonNullable<UploadFileStatus>, string[]> = {
+  ready: ['border-gray-300'],
+  uploading: ['border-blue-400', 'bg-blue-50'],
+  success: ['border-gray-300', 'hover:border-blue-400'],
+  error: ['border-red-400', 'bg-red-50'],
 }
 
 /**
  * Get file list item classes based on status
+ * @param status - Upload file status
+ * @returns Complete file list item class string
  */
 export function getFileListItemClasses(status?: UploadFileStatus): string {
   const baseClasses = [
@@ -177,25 +209,15 @@ export function getFileListItemClasses(status?: UploadFileStatus): string {
     'duration-200',
   ]
 
-  switch (status) {
-    case 'uploading':
-      baseClasses.push('bg-blue-50', 'text-blue-700')
-      break
-    case 'success':
-      baseClasses.push('bg-green-50', 'text-green-700', 'hover:bg-green-100')
-      break
-    case 'error':
-      baseClasses.push('bg-red-50', 'text-red-700', 'hover:bg-red-100')
-      break
-    default:
-      baseClasses.push('bg-gray-50', 'hover:bg-gray-100')
-  }
+  const stateClasses = status ? FILE_LIST_STATUS_CLASSES[status] : FILE_LIST_STATUS_CLASSES.ready
 
-  return baseClasses.join(' ')
+  return classNames(...baseClasses, ...stateClasses)
 }
 
 /**
  * Get picture card item classes
+ * @param status - Upload file status
+ * @returns Complete picture card class string
  */
 export function getPictureCardClasses(status?: UploadFileStatus): string {
   const baseClasses = [
@@ -212,19 +234,7 @@ export function getPictureCardClasses(status?: UploadFileStatus): string {
     'duration-200',
   ]
 
-  switch (status) {
-    case 'uploading':
-      baseClasses.push('border-blue-400', 'bg-blue-50')
-      break
-    case 'success':
-      baseClasses.push('border-gray-300', 'hover:border-blue-400')
-      break
-    case 'error':
-      baseClasses.push('border-red-400', 'bg-red-50')
-      break
-    default:
-      baseClasses.push('border-gray-300')
-  }
+  const stateClasses = status ? PICTURE_CARD_STATUS_CLASSES[status] : PICTURE_CARD_STATUS_CLASSES.ready
 
-  return baseClasses.join(' ')
+  return classNames(...baseClasses, ...stateClasses)
 }

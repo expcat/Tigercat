@@ -9,21 +9,22 @@ export const Input = defineComponent({
      */
     modelValue: {
       type: [String, Number] as PropType<string | number>,
-      default: undefined,
     },
     /**
      * Input size
+     * @default 'md'
      */
     size: {
       type: String as PropType<InputSize>,
-      default: 'md',
+      default: 'md' as InputSize,
     },
     /**
      * Input type
+     * @default 'text'
      */
     type: {
       type: String as PropType<InputType>,
-      default: 'text',
+      default: 'text' as InputType,
     },
     /**
      * Placeholder text
@@ -35,68 +36,57 @@ export const Input = defineComponent({
     /**
      * Whether the input is disabled
      */
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
+    disabled: Boolean,
     /**
      * Whether the input is readonly
      */
-    readonly: {
-      type: Boolean,
-      default: false,
-    },
+    readonly: Boolean,
     /**
      * Whether the input is required
      */
-    required: {
-      type: Boolean,
-      default: false,
-    },
+    required: Boolean,
     /**
      * Maximum length
      */
     maxLength: {
       type: Number,
-      default: undefined,
     },
     /**
      * Minimum length
      */
     minLength: {
       type: Number,
-      default: undefined,
     },
     /**
      * Input name attribute
      */
     name: {
       type: String,
-      default: undefined,
     },
     /**
      * Input id attribute
      */
     id: {
       type: String,
-      default: undefined,
     },
     /**
      * Autocomplete attribute
      */
     autoComplete: {
       type: String,
-      default: undefined,
     },
     /**
      * Whether to autofocus on mount
      */
-    autoFocus: {
-      type: Boolean,
-      default: false,
-    },
+    autoFocus: Boolean,
   },
-  emits: ['update:modelValue', 'input', 'change', 'focus', 'blur'],
+  emits: {
+    'update:modelValue': null,
+    input: null,
+    change: null,
+    focus: null,
+    blur: null,
+  },
   setup(props, { emit, attrs }) {
     const inputRef = ref<HTMLInputElement | null>(null)
     const localValue = ref<string | number>(props.modelValue ?? '')
@@ -126,17 +116,9 @@ export const Input = defineComponent({
       emit('input', event)
     }
 
-    const handleChange = (event: Event) => {
-      emit('change', event)
-    }
-
-    const handleFocus = (event: FocusEvent) => {
-      emit('focus', event)
-    }
-
-    const handleBlur = (event: FocusEvent) => {
-      emit('blur', event)
-    }
+    const handleChange = (event: Event) => emit('change', event)
+    const handleFocus = (event: FocusEvent) => emit('focus', event)
+    const handleBlur = (event: FocusEvent) => emit('blur', event)
 
     return () => {
       return h('input', {

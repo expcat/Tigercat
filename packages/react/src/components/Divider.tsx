@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
   classNames,
   getDividerSpacingClasses,
@@ -23,26 +23,30 @@ export const Divider: React.FC<DividerProps> = ({
   className,
   ...props
 }) => {
-  const dividerClasses = classNames(
+  const dividerClasses = useMemo(() => classNames(
     getDividerOrientationClasses(orientation),
     getDividerLineStyleClasses(lineStyle),
     getDividerSpacingClasses(spacing, orientation),
     className
-  )
+  ), [orientation, lineStyle, spacing, className])
 
-  const dividerStyle: React.CSSProperties = {}
-  
-  if (color) {
-    dividerStyle.borderColor = color
-  }
-  
-  if (thickness) {
-    if (orientation === 'horizontal') {
-      dividerStyle.borderTopWidth = thickness
-    } else {
-      dividerStyle.borderLeftWidth = thickness
+  const dividerStyle = useMemo((): React.CSSProperties => {
+    const style: React.CSSProperties = {}
+    
+    if (color) {
+      style.borderColor = color
     }
-  }
+    
+    if (thickness) {
+      if (orientation === 'horizontal') {
+        style.borderTopWidth = thickness
+      } else {
+        style.borderLeftWidth = thickness
+      }
+    }
+    
+    return style
+  }, [color, thickness, orientation])
 
   return (
     <div

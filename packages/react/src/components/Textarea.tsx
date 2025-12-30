@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react'
+import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle, useMemo } from 'react'
 import { classNames, type TextareaProps as CoreTextareaProps } from '@tigercat/core'
 
 export interface TextareaProps extends CoreTextareaProps {
@@ -54,7 +54,7 @@ const sizeClasses = {
   sm: 'px-2 py-1.5 text-sm',
   md: 'px-3 py-2 text-base',
   lg: 'px-4 py-3 text-lg',
-}
+} as const
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(({
   size = 'md',
@@ -84,17 +84,17 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(({
   // Expose the textarea element to parent components via ref
   useImperativeHandle(ref, () => textareaRef.current as HTMLTextAreaElement)
   
-  // Determine if component is controlled or uncontrolled
+  // Determine if component is controlled or uncontrolled - simple comparison, no need to memoize
   const isControlled = value !== undefined
   const currentValue = isControlled ? value : internalValue
 
-  const textareaClasses = classNames(
+  const textareaClasses = useMemo(() => classNames(
     baseClasses,
     sizeClasses[size],
     autoResize && 'resize-none',
     !autoResize && 'resize-y',
     className,
-  )
+  ), [size, autoResize, className])
 
   const adjustHeight = useCallback(() => {
     if (!autoResize || !textareaRef.current) return
@@ -125,7 +125,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(({
     textarea.style.height = `${newHeight}px`
   }, [autoResize, maxRows, minRows])
 
-  const handleInput = (event: React.FormEvent<HTMLTextAreaElement>) => {
+  const handleInput = useCallback((event: React.FormEvent<HTMLTextAreaElement>) => {
     const target = event.target as HTMLTextAreaElement
     const newValue = target.value
     
@@ -133,20 +133,16 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(({
       setInternalValue(newValue)
     }
     
-    if (onInput) {
-      onInput(event)
-    }
+    onInput?.(event)
     
     if (autoResize) {
       adjustHeight()
     }
-  }
+  }, [isControlled, onInput, autoResize, adjustHeight])
 
-  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (onChange) {
-      onChange(event)
-    }
-  }
+  const handleChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onChange?.(event)
+  }, [onChange])
 
   // Adjust height when value changes or on mount
   useEffect(() => {
@@ -162,7 +158,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(({
     }
   }, [autoResize, adjustHeight])
 
-  const currentLength = currentValue?.length || 0
+  const currentLength = useMemo(() => currentValue?.length || 0, [currentValue])
 
   return (
     <div className="w-full">
