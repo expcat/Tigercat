@@ -1,8 +1,19 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Radio } from '@tigercat/react'
+import { Radio, RadioGroup, Space, Divider } from '@tigercat/react'
 
 const RadioDemo: React.FC = () => {
+  const [gender, setGender] = useState('male')
+  const [size, setSize] = useState('medium')
+
+  const handleGenderChange = (value: string | number) => {
+    setGender(String(value))
+  }
+
+  const handleSizeChange = (value: string | number) => {
+    setSize(String(value))
+  }
+
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
@@ -13,9 +24,30 @@ const RadioDemo: React.FC = () => {
       {/* 基础用法 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">基础用法</h2>
-        <p className="text-gray-600 mb-6">基础的 Radio 用法。</p>
+        <p className="text-gray-600 mb-6">单选框组合使用时，需要通过 RadioGroup 组件进行包裹。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <Radio value="option1">选项 1</Radio>
+          <Space direction="vertical">
+            <RadioGroup value={gender} onChange={handleGenderChange}>
+              <Radio value="male">男</Radio>
+              <Radio value="female">女</Radio>
+              <Radio value="other">其他</Radio>
+            </RadioGroup>
+            <p className="text-sm text-gray-600">选中的性别：{gender}</p>
+          </Space>
+        </div>
+        <Divider className="my-6" />
+      </section>
+
+      {/* 禁用状态 */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold mb-4">禁用状态</h2>
+        <p className="text-gray-600 mb-6">单选框不可用的状态。</p>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <RadioGroup value={size} onChange={handleSizeChange}>
+            <Radio value="small">小</Radio>
+            <Radio value="medium">中</Radio>
+            <Radio value="large" disabled>大（禁用）</Radio>
+          </RadioGroup>
         </div>
       </section>
 
