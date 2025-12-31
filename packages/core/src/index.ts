@@ -42,6 +42,7 @@ export * from './utils/drawer-utils'
 export * from './utils/modal-utils'
 export * from './utils/alert-utils'
 export * from './utils/message-utils'
+export * from './utils/notification-utils'
 
 // Types
 export * from './types/button'
@@ -85,6 +86,7 @@ export * from './types/drawer'
 export * from './types/modal'
 export * from './types/alert'
 export * from './types/message'
+export * from './types/notification'
 
 // Theme
 export * from './theme'
