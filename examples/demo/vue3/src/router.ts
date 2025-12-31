@@ -53,6 +53,7 @@ const router = createRouter({
     { path: '/modal', component: () => import('./pages/ModalDemo.vue') },
     { path: '/steps', component: () => import('./pages/StepsDemo.vue') },
     { path: '/pagination', component: () => import('./pages/PaginationDemo.vue') },
+    { path: '/drawer', component: () => import('./pages/DrawerDemo.vue') },
   ],
 })
 
