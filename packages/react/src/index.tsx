@@ -86,4 +86,7 @@ export type { BadgeProps } from './components/Badge'
 export { Card } from './components/Card'
 export type { CardProps } from './components/Card'
 
+export { Avatar } from './components/Avatar'
+export type { AvatarProps } from './components/Avatar'
+
 export const version = '0.0.1'
