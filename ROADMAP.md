@@ -47,7 +47,7 @@
 | 描述列表 | Descriptions | ✅ | ✅ | ✅ | ✅ |
 | 时间线 | Timeline | ✅ | ✅ | ✅ | ✅ |
 | 树形控件 | Tree | ✅ | ✅ | ✅ | ✅ |
-| 进度条 | Progress | ⬜ | ⬜ | ⬜ | ⬜ |
+| 进度条 | Progress | ✅ | ✅ | ✅ | ✅ |
 | 骨架屏 | Skeleton | ✅ | ✅ | ✅ | ✅ |
 
 ### 导航组件 (Navigation Components)

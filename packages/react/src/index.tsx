@@ -103,4 +103,7 @@ export type { TreeProps } from './components/Tree'
 
 export { Skeleton } from './components/Skeleton'
 
+export { Progress } from './components/Progress'
+export type { ProgressProps } from './components/Progress'
+
 export const version = '0.0.1'
