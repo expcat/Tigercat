@@ -40,5 +40,6 @@ export { Table } from './components/Table'
 export { Tag } from './components/Tag'
 export { Badge } from './components/Badge'
 export { Card } from './components/Card'
+export { Avatar } from './components/Avatar'
 
 export const version = '0.0.1'

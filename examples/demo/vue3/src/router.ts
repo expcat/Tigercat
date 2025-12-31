@@ -38,6 +38,7 @@ const router = createRouter({
     { path: '/tag', component: () => import('./pages/TagDemo.vue') },
     { path: '/badge', component: () => import('./pages/BadgeDemo.vue') },
     { path: '/card', component: () => import('./pages/CardDemo.vue') },
+    { path: '/avatar', component: () => import('./pages/AvatarDemo.vue') },
   ],
 })
 

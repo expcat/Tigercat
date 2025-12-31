@@ -38,6 +38,7 @@ const components = [
   { name: 'Tag', path: '/tag', category: '数据展示' },
   { name: 'Badge', path: '/badge', category: '数据展示' },
   { name: 'Card', path: '/card', category: '数据展示' },
+  { name: 'Avatar', path: '/avatar', category: '数据展示' },
 ]
 
 const categories = ['基础组件', '表单组件', '布局组件', '数据展示']
