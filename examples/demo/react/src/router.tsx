@@ -42,6 +42,7 @@ const DescriptionsDemo = lazy(() => import('./pages/DescriptionsDemo'))
 const TimelineDemo = lazy(() => import('./pages/TimelineDemo'))
 const ProgressDemo = lazy(() => import('./pages/ProgressDemo'))
 const MenuDemo = lazy(() => import('./pages/MenuDemo'))
+const BreadcrumbDemo = lazy(() => import('./pages/BreadcrumbDemo'))
 
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
@@ -84,6 +85,7 @@ const router = createBrowserRouter([
   { path: '/timeline', element: <TimelineDemo /> },
   { path: '/progress', element: <ProgressDemo /> },
   { path: '/menu', element: <MenuDemo /> },
+  { path: '/breadcrumb', element: <BreadcrumbDemo /> },
 ])
 
 export default router

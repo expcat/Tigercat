@@ -34,6 +34,7 @@ export * from './utils/skeleton-utils'
 export * from './utils/progress-utils'
 export * from './utils/menu-utils'
 export * from './utils/tabs-utils'
+export * from './utils/breadcrumb-utils'
 
 // Types
 export * from './types/button'
@@ -69,6 +70,7 @@ export * from './types/skeleton'
 export * from './types/progress'
 export * from './types/menu'
 export * from './types/tabs'
+export * from './types/breadcrumb'
 
 // Theme
 export * from './theme'

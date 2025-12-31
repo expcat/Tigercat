@@ -53,5 +53,7 @@ export { SubMenu } from './components/SubMenu'
 export { MenuItemGroup } from './components/MenuItemGroup'
 export { Tabs } from './components/Tabs'
 export { TabPane } from './components/TabPane'
+export { Breadcrumb } from './components/Breadcrumb'
+export { BreadcrumbItem } from './components/BreadcrumbItem'
 
 export const version = '0.0.1'

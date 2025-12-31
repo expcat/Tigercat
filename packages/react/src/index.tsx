@@ -124,4 +124,10 @@ export type { TabsProps, TabsContextValue } from './components/Tabs'
 export { TabPane } from './components/TabPane'
 export type { TabPaneProps } from './components/TabPane'
 
+export { Breadcrumb, useBreadcrumbContext } from './components/Breadcrumb'
+export type { BreadcrumbProps, BreadcrumbContextValue } from './components/Breadcrumb'
+
+export { BreadcrumbItem } from './components/BreadcrumbItem'
+export type { BreadcrumbItemProps } from './components/BreadcrumbItem'
+
 export const version = '0.0.1'
