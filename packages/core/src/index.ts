@@ -35,6 +35,7 @@ export * from './utils/progress-utils'
 export * from './utils/menu-utils'
 export * from './utils/tabs-utils'
 export * from './utils/breadcrumb-utils'
+export * from './utils/pagination-utils'
 export * from './utils/dropdown-utils'
 
 // Types
@@ -72,6 +73,7 @@ export * from './types/progress'
 export * from './types/menu'
 export * from './types/tabs'
 export * from './types/breadcrumb'
+export * from './types/pagination'
 export * from './types/dropdown'
 
 // Theme
