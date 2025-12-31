@@ -33,6 +33,7 @@ export * from './utils/tree-utils'
 export * from './utils/skeleton-utils'
 export * from './utils/progress-utils'
 export * from './utils/menu-utils'
+export * from './utils/tabs-utils'
 
 // Types
 export * from './types/button'
@@ -67,6 +68,7 @@ export * from './types/tree'
 export * from './types/skeleton'
 export * from './types/progress'
 export * from './types/menu'
+export * from './types/tabs'
 
 // Theme
 export * from './theme'

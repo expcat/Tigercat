@@ -118,4 +118,10 @@ export type { SubMenuProps } from './components/SubMenu'
 export { MenuItemGroup } from './components/MenuItemGroup'
 export type { MenuItemGroupProps } from './components/MenuItemGroup'
 
+export { Tabs, useTabsContext } from './components/Tabs'
+export type { TabsProps, TabsContextValue } from './components/Tabs'
+
+export { TabPane } from './components/TabPane'
+export type { TabPaneProps } from './components/TabPane'
+
 export const version = '0.0.1'
