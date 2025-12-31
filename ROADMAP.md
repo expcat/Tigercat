@@ -44,7 +44,7 @@
 | 卡片 | Card | ✅ | ✅ | ✅ | ✅ |
 | 头像 | Avatar | ✅ | ✅ | ✅ | ✅ |
 | 列表 | List | ✅ | ✅ | ✅ | ✅ |
-| 描述列表 | Descriptions | ⬜ | ⬜ | ⬜ | ⬜ |
+| 描述列表 | Descriptions | ✅ | ✅ | ✅ | ✅ |
 | 时间线 | Timeline | ⬜ | ⬜ | ⬜ | ⬜ |
 | 树形控件 | Tree | ⬜ | ⬜ | ⬜ | ⬜ |
 | 进度条 | Progress | ⬜ | ⬜ | ⬜ | ⬜ |
