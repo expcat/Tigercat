@@ -43,5 +43,6 @@ export { Card } from './components/Card'
 export { Avatar } from './components/Avatar'
 export { List } from './components/List'
 export { Descriptions } from './components/Descriptions'
+export { Timeline } from './components/Timeline'
 
 export const version = '0.0.1'

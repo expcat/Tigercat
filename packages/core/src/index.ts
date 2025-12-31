@@ -28,6 +28,7 @@ export * from './utils/card-utils'
 export * from './utils/avatar-utils'
 export * from './utils/list-utils'
 export * from './utils/descriptions-utils'
+export * from './utils/timeline-utils'
 
 // Types
 export * from './types/button'
@@ -57,6 +58,7 @@ export * from './types/card'
 export * from './types/avatar'
 export * from './types/list'
 export * from './types/descriptions'
+export * from './types/timeline'
 
 // Theme
 export * from './theme'
