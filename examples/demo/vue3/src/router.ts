@@ -36,6 +36,7 @@ const router = createRouter({
     { path: '/upload', component: () => import('./pages/UploadDemo.vue') },
     { path: '/table', component: () => import('./pages/TableDemo.vue') },
     { path: '/tag', component: () => import('./pages/TagDemo.vue') },
+    { path: '/badge', component: () => import('./pages/BadgeDemo.vue') },
   ],
 })
 
