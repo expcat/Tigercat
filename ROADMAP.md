@@ -54,12 +54,12 @@
 
 | 组件 | Component | Vue | React | 文档 | 测试 |
 |------|-----------|-----|-------|------|------|
-| 菜单 | Menu | ⬜ | ⬜ | ⬜ | ⬜ |
-| 标签页 | Tabs | ⬜ | ⬜ | ⬜ | ⬜ |
-| 面包屑 | Breadcrumb | ⬜ | ⬜ | ⬜ | ⬜ |
-| 下拉菜单 | Dropdown | ⬜ | ⬜ | ⬜ | ⬜ |
-| 分页 | Pagination | ⬜ | ⬜ | ⬜ | ⬜ |
-| 步骤条 | Steps | ⬜ | ⬜ | ⬜ | ⬜ |
+| 菜单 | Menu | ✅ | ✅ | ✅ | ✅ |
+| 标签页 | Tabs | ✅ | ✅ | ✅ | ✅ |
+| 面包屑 | Breadcrumb | ✅ | ✅ | ✅ | ✅ |
+| 下拉菜单 | Dropdown | ✅ | ✅ | ✅ | ✅ |
+| 分页 | Pagination | ✅ | ✅ | ✅ | ✅ |
+| 步骤条 | Steps | ✅ | ✅ | ✅ | ✅ |
 
 ### 反馈组件 (Feedback Components)
 
