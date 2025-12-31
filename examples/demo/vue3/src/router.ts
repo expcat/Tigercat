@@ -44,6 +44,7 @@ const router = createRouter({
     { path: '/timeline', component: () => import('./pages/TimelineDemo.vue') },
     { path: '/progress', component: () => import('./pages/ProgressDemo.vue') },
     { path: '/menu', component: () => import('./pages/MenuDemo.vue') },
+    { path: '/breadcrumb', component: () => import('./pages/BreadcrumbDemo.vue') },
   ],
 })
 
