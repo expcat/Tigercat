@@ -33,6 +33,7 @@ const DatePickerDemo = lazy(() => import('./pages/DatePickerDemo'))
 const TimePickerDemo = lazy(() => import('./pages/TimePickerDemo'))
 const UploadDemo = lazy(() => import('./pages/UploadDemo'))
 const TableDemo = lazy(() => import('./pages/TableDemo'))
+const TagDemo = lazy(() => import('./pages/TagDemo'))
 
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
@@ -66,6 +67,7 @@ const router = createBrowserRouter([
   { path: '/timepicker', element: <TimePickerDemo /> },
   { path: '/upload', element: <UploadDemo /> },
   { path: '/table', element: <TableDemo /> },
+  { path: '/tag', element: <TagDemo /> },
 ])
 
 export default router

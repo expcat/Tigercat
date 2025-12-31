@@ -34,9 +34,12 @@ const components = [
   { name: 'Col', path: '/col', category: '布局组件' },
   { name: 'Space', path: '/space', category: '布局组件' },
   { name: 'Divider', path: '/divider', category: '布局组件' },
+  
+  { name: 'Table', path: '/table', category: '数据展示' },
+  { name: 'Tag', path: '/tag', category: '数据展示' },
 ]
 
-const categories = ['基础组件', '表单组件', '布局组件']
+const categories = ['基础组件', '表单组件', '布局组件', '数据展示']
 
 const Home: React.FC = () => {
   return (

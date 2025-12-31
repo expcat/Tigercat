@@ -37,5 +37,6 @@ export { DatePicker } from './components/DatePicker'
 export { TimePicker } from './components/TimePicker'
 export { Upload } from './components/Upload'
 export { Table } from './components/Table'
+export { Tag } from './components/Tag'
 
 export const version = '0.0.1'

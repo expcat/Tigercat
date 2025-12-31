@@ -35,6 +35,7 @@ const router = createRouter({
     { path: '/timepicker', component: () => import('./pages/TimePickerDemo.vue') },
     { path: '/upload', component: () => import('./pages/UploadDemo.vue') },
     { path: '/table', component: () => import('./pages/TableDemo.vue') },
+    { path: '/tag', component: () => import('./pages/TagDemo.vue') },
   ],
 })
 
