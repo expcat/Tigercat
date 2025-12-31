@@ -38,5 +38,6 @@ export { TimePicker } from './components/TimePicker'
 export { Upload } from './components/Upload'
 export { Table } from './components/Table'
 export { Tag } from './components/Tag'
+export { Badge } from './components/Badge'
 
 export const version = '0.0.1'

@@ -485,3 +485,115 @@ export function getTagVariantClasses(
   
   return classes.join(' ')
 }
+
+/**
+ * Badge color scheme interface
+ * Defines all color-related classes for badge variants
+ */
+export interface BadgeColorScheme {
+  /**
+   * Background color class
+   */
+  bg: string
+  
+  /**
+   * Text color class
+   */
+  text: string
+  
+  /**
+   * Border color class (optional)
+   */
+  border?: string
+}
+
+/**
+ * Badge theme colors configuration for all variants
+ */
+export interface BadgeThemeColors {
+  /**
+   * Default badge theme (gray background)
+   */
+  default: BadgeColorScheme
+  
+  /**
+   * Primary badge theme (blue background)
+   */
+  primary: BadgeColorScheme
+  
+  /**
+   * Success badge theme (green background)
+   */
+  success: BadgeColorScheme
+  
+  /**
+   * Warning badge theme (yellow background)
+   */
+  warning: BadgeColorScheme
+  
+  /**
+   * Danger badge theme (red background)
+   */
+  danger: BadgeColorScheme
+  
+  /**
+   * Info badge theme (light blue background)
+   */
+  info: BadgeColorScheme
+}
+
+/**
+ * Default badge theme colors using Tailwind CSS classes
+ */
+export const defaultBadgeThemeColors: BadgeThemeColors = {
+  default: {
+    bg: 'bg-gray-500',
+    text: 'text-white',
+    border: 'border-gray-500',
+  },
+  primary: {
+    bg: 'bg-[var(--tiger-primary,#2563eb)]',
+    text: 'text-white',
+    border: 'border-[var(--tiger-primary,#2563eb)]',
+  },
+  success: {
+    bg: 'bg-green-500',
+    text: 'text-white',
+    border: 'border-green-500',
+  },
+  warning: {
+    bg: 'bg-yellow-500',
+    text: 'text-white',
+    border: 'border-yellow-500',
+  },
+  danger: {
+    bg: 'bg-red-500',
+    text: 'text-white',
+    border: 'border-red-500',
+  },
+  info: {
+    bg: 'bg-sky-500',
+    text: 'text-white',
+    border: 'border-sky-500',
+  },
+}
+
+/**
+ * Get badge variant classes based on theme colors
+ * @param variant - Badge variant type
+ * @param colors - Badge theme colors configuration (uses default if not provided)
+ * @returns Combined class string for the badge variant
+ */
+export function getBadgeVariantClasses(
+  variant: keyof BadgeThemeColors,
+  colors: BadgeThemeColors = defaultBadgeThemeColors
+): string {
+  const scheme = colors[variant]
+  const classes = [
+    scheme.bg,
+    scheme.text,
+    scheme.border,
+  ].filter(Boolean)
+  
+  return classes.join(' ')
+}

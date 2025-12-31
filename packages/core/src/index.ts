@@ -23,6 +23,7 @@ export * from './utils/upload-utils'
 export * from './utils/space'
 export * from './utils/table-utils'
 export * from './utils/tag-utils'
+export * from './utils/badge-utils'
 
 // Types
 export * from './types/button'
@@ -47,6 +48,7 @@ export * from './types/timepicker'
 export * from './types/upload'
 export * from './types/table'
 export * from './types/tag'
+export * from './types/badge'
 
 // Theme
 export * from './theme'

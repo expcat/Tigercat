@@ -80,4 +80,7 @@ export type { TableProps } from './components/Table'
 export { Tag } from './components/Tag'
 export type { TagProps } from './components/Tag'
 
+export { Badge } from './components/Badge'
+export type { BadgeProps } from './components/Badge'
+
 export const version = '0.0.1'
