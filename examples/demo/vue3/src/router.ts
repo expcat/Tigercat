@@ -34,6 +34,15 @@ const router = createRouter({
     { path: '/datepicker', component: () => import('./pages/DatePickerDemo.vue') },
     { path: '/timepicker', component: () => import('./pages/TimePickerDemo.vue') },
     { path: '/upload', component: () => import('./pages/UploadDemo.vue') },
+    { path: '/table', component: () => import('./pages/TableDemo.vue') },
+    { path: '/tag', component: () => import('./pages/TagDemo.vue') },
+    { path: '/badge', component: () => import('./pages/BadgeDemo.vue') },
+    { path: '/card', component: () => import('./pages/CardDemo.vue') },
+    { path: '/avatar', component: () => import('./pages/AvatarDemo.vue') },
+    { path: '/list', component: () => import('./pages/ListDemo.vue') },
+    { path: '/descriptions', component: () => import('./pages/DescriptionsDemo.vue') },
+    { path: '/timeline', component: () => import('./pages/TimelineDemo.vue') },
+    { path: '/progress', component: () => import('./pages/ProgressDemo.vue') },
   ],
 })
 

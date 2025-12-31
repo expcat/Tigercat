@@ -1,0 +1,623 @@
+import { defineComponent, computed, ref, h, PropType } from 'vue'
+import {
+  classNames,
+  getTableWrapperClasses,
+  getTableHeaderClasses,
+  getTableHeaderCellClasses,
+  getTableRowClasses,
+  getTableCellClasses,
+  getSortIconClasses,
+  getCheckboxCellClasses,
+  tableBaseClasses,
+  tableEmptyStateClasses,
+  tableLoadingOverlayClasses,
+  tablePaginationContainerClasses,
+  sortData,
+  filterData,
+  paginateData,
+  calculatePagination,
+  getRowKey,
+  type TableColumn,
+  type TableSize,
+  type SortDirection,
+  type SortState,
+  type PaginationConfig,
+  type RowSelectionConfig,
+} from '@tigercat/core'
+
+// Sort icons
+const SortIcon = (direction: SortDirection) => {
+  if (direction === 'asc') {
+    return h('svg', {
+      class: getSortIconClasses(true),
+      width: '16',
+      height: '16',
+      viewBox: '0 0 16 16',
+      fill: 'currentColor',
+    }, [
+      h('path', {
+        d: 'M8 3l4 4H4l4-4z',
+      }),
+    ])
+  }
+  
+  if (direction === 'desc') {
+    return h('svg', {
+      class: getSortIconClasses(true),
+      width: '16',
+      height: '16',
+      viewBox: '0 0 16 16',
+      fill: 'currentColor',
+    }, [
+      h('path', {
+        d: 'M8 13l-4-4h8l-4 4z',
+      }),
+    ])
+  }
+  
+  return h('svg', {
+    class: getSortIconClasses(false),
+    width: '16',
+    height: '16',
+    viewBox: '0 0 16 16',
+    fill: 'currentColor',
+  }, [
+    h('path', {
+      d: 'M8 3l4 4H4l4-4zM8 13l-4-4h8l-4 4z',
+    }),
+  ])
+}
+
+// Loading spinner
+const LoadingSpinner = () => {
+  return h('svg', {
+    class: 'animate-spin h-8 w-8 text-[var(--tiger-primary,#2563eb)]',
+    xmlns: 'http://www.w3.org/2000/svg',
+    fill: 'none',
+    viewBox: '0 0 24 24',
+  }, [
+    h('circle', {
+      class: 'opacity-25',
+      cx: '12',
+      cy: '12',
+      r: '10',
+      stroke: 'currentColor',
+      'stroke-width': '4',
+    }),
+    h('path', {
+      class: 'opacity-75',
+      fill: 'currentColor',
+      d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z',
+    }),
+  ])
+}
+
+export const Table = defineComponent({
+  name: 'TigerTable',
+  props: {
+    /**
+     * Table columns configuration
+     */
+    columns: {
+      type: Array as PropType<TableColumn[]>,
+      required: true,
+    },
+    /**
+     * Table data source
+     */
+    dataSource: {
+      type: Array as PropType<Record<string, unknown>[]>,
+      default: () => [],
+    },
+    /**
+     * Table size
+     */
+    size: {
+      type: String as PropType<TableSize>,
+      default: 'md' as TableSize,
+    },
+    /**
+     * Whether to show border
+     */
+    bordered: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * Whether to show striped rows
+     */
+    striped: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * Whether to highlight row on hover
+     */
+    hoverable: {
+      type: Boolean,
+      default: true,
+    },
+    /**
+     * Loading state
+     */
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * Empty state text
+     */
+    emptyText: {
+      type: String,
+      default: 'No data',
+    },
+    /**
+     * Pagination configuration
+     */
+    pagination: {
+      type: [Object, Boolean] as PropType<PaginationConfig | false>,
+      default: () => ({
+        current: 1,
+        pageSize: 10,
+        total: 0,
+        pageSizeOptions: [10, 20, 50, 100],
+        showSizeChanger: true,
+        showTotal: true,
+      }),
+    },
+    /**
+     * Row selection configuration
+     */
+    rowSelection: {
+      type: Object as PropType<RowSelectionConfig>,
+    },
+    /**
+     * Function to get row key
+     */
+    rowKey: {
+      type: [String, Function] as PropType<string | ((record: Record<string, unknown>) => string | number)>,
+      default: 'id',
+    },
+    /**
+     * Custom row class name
+     */
+    rowClassName: {
+      type: [String, Function] as PropType<string | ((record: Record<string, unknown>, index: number) => string)>,
+    },
+    /**
+     * Whether table head is sticky
+     */
+    stickyHeader: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * Max height for scrollable table
+     */
+    maxHeight: {
+      type: [String, Number] as PropType<string | number>,
+    },
+  },
+  emits: ['change', 'row-click', 'selection-change', 'sort-change', 'filter-change', 'page-change'],
+  setup(props, { emit, slots }) {
+    const sortState = ref<SortState>({
+      key: null,
+      direction: null,
+    })
+    
+    const filterState = ref<Record<string, unknown>>({})
+    
+    const currentPage = ref(
+      props.pagination && typeof props.pagination === 'object' ? props.pagination.current || 1 : 1
+    )
+    
+    const currentPageSize = ref(
+      props.pagination && typeof props.pagination === 'object' ? props.pagination.pageSize || 10 : 10
+    )
+    
+    const selectedRowKeys = ref<(string | number)[]>(
+      props.rowSelection?.selectedRowKeys || []
+    )
+
+    // Process data with sorting, filtering, and pagination
+    const processedData = computed(() => {
+      let data = [...props.dataSource]
+      
+      // Apply filters
+      data = filterData(data, filterState.value)
+      
+      // Apply sorting
+      if (sortState.value.key && sortState.value.direction) {
+        const column = props.columns.find(col => col.key === sortState.value.key)
+        data = sortData(data, sortState.value.key, sortState.value.direction, column?.sortFn)
+      }
+      
+      return data
+    })
+
+    const paginatedData = computed(() => {
+      if (props.pagination === false) {
+        return processedData.value
+      }
+      
+      return paginateData(processedData.value, currentPage.value, currentPageSize.value)
+    })
+
+    const paginationInfo = computed(() => {
+      if (props.pagination === false) {
+        return null
+      }
+      
+      const total = processedData.value.length
+      return calculatePagination(total, currentPage.value, currentPageSize.value)
+    })
+
+    function handleSort(columnKey: string) {
+      const column = props.columns.find(col => col.key === columnKey)
+      if (!column || !column.sortable) {
+        return
+      }
+
+      let newDirection: SortDirection = 'asc'
+      
+      if (sortState.value.key === columnKey) {
+        if (sortState.value.direction === 'asc') {
+          newDirection = 'desc'
+        } else if (sortState.value.direction === 'desc') {
+          newDirection = null
+        }
+      }
+
+      sortState.value = {
+        key: newDirection ? columnKey : null,
+        direction: newDirection,
+      }
+
+      emit('sort-change', sortState.value)
+      emit('change', {
+        sort: sortState.value,
+        filters: filterState.value,
+        pagination: props.pagination !== false ? {
+          current: currentPage.value,
+          pageSize: currentPageSize.value,
+        } : null,
+      })
+    }
+
+    function handleFilter(columnKey: string, value: unknown) {
+      filterState.value = {
+        ...filterState.value,
+        [columnKey]: value,
+      }
+
+      // Reset to first page when filtering
+      currentPage.value = 1
+
+      emit('filter-change', filterState.value)
+      emit('change', {
+        sort: sortState.value,
+        filters: filterState.value,
+        pagination: props.pagination !== false ? {
+          current: currentPage.value,
+          pageSize: currentPageSize.value,
+        } : null,
+      })
+    }
+
+    function handlePageChange(page: number) {
+      currentPage.value = page
+      
+      emit('page-change', { current: page, pageSize: currentPageSize.value })
+      emit('change', {
+        sort: sortState.value,
+        filters: filterState.value,
+        pagination: {
+          current: page,
+          pageSize: currentPageSize.value,
+        },
+      })
+    }
+
+    function handlePageSizeChange(pageSize: number) {
+      currentPageSize.value = pageSize
+      currentPage.value = 1
+      
+      emit('page-change', { current: 1, pageSize })
+      emit('change', {
+        sort: sortState.value,
+        filters: filterState.value,
+        pagination: {
+          current: 1,
+          pageSize,
+        },
+      })
+    }
+
+    function handleRowClick(record: Record<string, unknown>, index: number) {
+      emit('row-click', record, index)
+    }
+
+    function handleSelectRow(key: string | number, checked: boolean) {
+      let newKeys: (string | number)[]
+      
+      if (props.rowSelection?.type === 'radio') {
+        newKeys = checked ? [key] : []
+      } else {
+        if (checked) {
+          newKeys = [...selectedRowKeys.value, key]
+        } else {
+          newKeys = selectedRowKeys.value.filter(k => k !== key)
+        }
+      }
+      
+      selectedRowKeys.value = newKeys
+      emit('selection-change', newKeys)
+    }
+
+    function handleSelectAll(checked: boolean) {
+      if (checked) {
+        selectedRowKeys.value = paginatedData.value.map((record, index) => 
+          getRowKey(record, props.rowKey, index)
+        )
+      } else {
+        selectedRowKeys.value = []
+      }
+      
+      emit('selection-change', selectedRowKeys.value)
+    }
+
+    const allSelected = computed(() => {
+      if (paginatedData.value.length === 0) {
+        return false
+      }
+      
+      return paginatedData.value.every((record, index) => {
+        const key = getRowKey(record, props.rowKey, index)
+        return selectedRowKeys.value.includes(key)
+      })
+    })
+
+    const someSelected = computed(() => {
+      return selectedRowKeys.value.length > 0 && !allSelected.value
+    })
+
+    function renderTableHeader() {
+      const headerCells = []
+
+      // Selection checkbox column
+      if (props.rowSelection && props.rowSelection.showCheckbox !== false && props.rowSelection.type !== 'radio') {
+        headerCells.push(
+          h('th', {
+            class: getCheckboxCellClasses(props.size),
+          }, [
+            h('input', {
+              type: 'checkbox',
+              class: 'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]',
+              checked: allSelected.value,
+              indeterminate: someSelected.value,
+              onChange: (e: Event) => handleSelectAll((e.target as HTMLInputElement).checked),
+            }),
+          ])
+        )
+      }
+
+      // Column headers
+      props.columns.forEach((column) => {
+        const isSorted = sortState.value.key === column.key
+        const sortDirection = isSorted ? sortState.value.direction : null
+
+        headerCells.push(
+          h('th', {
+            key: column.key,
+            class: getTableHeaderCellClasses(
+              props.size,
+              column.align || 'left',
+              !!column.sortable,
+              column.headerClassName
+            ),
+            style: column.width ? { width: typeof column.width === 'number' ? `${column.width}px` : column.width } : undefined,
+            onClick: column.sortable ? () => handleSort(column.key) : undefined,
+          }, [
+            h('div', { class: 'flex items-center gap-2' }, [
+              column.renderHeader
+                ? slots[`header-${column.key}`]?.() || column.title
+                : column.title,
+              column.sortable && SortIcon(sortDirection),
+            ]),
+            // Filter input
+            column.filter && h('div', { class: 'mt-2' }, [
+              column.filter.type === 'select' && column.filter.options
+                ? h('select', {
+                    class: 'w-full px-2 py-1 text-sm border border-gray-300 rounded',
+                    onChange: (e: Event) => handleFilter(column.key, (e.target as HTMLSelectElement).value),
+                    onClick: (e: Event) => e.stopPropagation(),
+                  }, [
+                    h('option', { value: '' }, 'All'),
+                    ...column.filter.options.map(opt =>
+                      h('option', { value: opt.value }, opt.label)
+                    ),
+                  ])
+                : h('input', {
+                    type: 'text',
+                    class: 'w-full px-2 py-1 text-sm border border-gray-300 rounded',
+                    placeholder: column.filter.placeholder || 'Filter...',
+                    onInput: (e: Event) => handleFilter(column.key, (e.target as HTMLInputElement).value),
+                    onClick: (e: Event) => e.stopPropagation(),
+                  }),
+            ]),
+          ])
+        )
+      })
+
+      return h('thead', { class: getTableHeaderClasses(props.stickyHeader) }, [
+        h('tr', headerCells),
+      ])
+    }
+
+    function renderTableBody() {
+      if (props.loading) {
+        return null
+      }
+
+      if (paginatedData.value.length === 0) {
+        return h('tbody', [
+          h('tr', [
+            h('td', {
+              colspan: props.columns.length + (props.rowSelection ? 1 : 0),
+              class: tableEmptyStateClasses,
+            }, props.emptyText),
+          ]),
+        ])
+      }
+
+      const rows = paginatedData.value.map((record, index) => {
+        const key = getRowKey(record, props.rowKey, index)
+        const isSelected = selectedRowKeys.value.includes(key)
+        const rowClass = typeof props.rowClassName === 'function'
+          ? props.rowClassName(record, index)
+          : props.rowClassName
+
+        const cells = []
+
+        // Selection checkbox cell
+        if (props.rowSelection && props.rowSelection.showCheckbox !== false) {
+          const checkboxProps = props.rowSelection?.getCheckboxProps?.(record) || {}
+          
+          cells.push(
+            h('td', {
+              class: getCheckboxCellClasses(props.size),
+            }, [
+              h('input', {
+                type: props.rowSelection?.type === 'radio' ? 'radio' : 'checkbox',
+                class: props.rowSelection?.type === 'radio'
+                  ? 'border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
+                  : 'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]',
+                checked: isSelected,
+                disabled: checkboxProps.disabled,
+                onChange: (e: Event) => handleSelectRow(key, (e.target as HTMLInputElement).checked),
+              }),
+            ])
+          )
+        }
+
+        // Data cells
+        props.columns.forEach((column) => {
+          const dataKey = column.dataKey || column.key
+          const cellValue = record[dataKey]
+
+          cells.push(
+            h('td', {
+              key: column.key,
+              class: getTableCellClasses(props.size, column.align || 'left', column.className),
+            }, [
+              column.render
+                ? slots[`cell-${column.key}`]?.({ record, index }) || (column.render(record, index) as string)
+                : cellValue as string,
+            ])
+          )
+        })
+
+        return h('tr', {
+          key,
+          class: getTableRowClasses(props.hoverable, props.striped, index % 2 === 0, rowClass),
+          onClick: () => handleRowClick(record, index),
+        }, cells)
+      })
+
+      return h('tbody', rows)
+    }
+
+    function renderPagination() {
+      if (props.pagination === false || !paginationInfo.value) {
+        return null
+      }
+
+      const { totalPages, startIndex, endIndex, hasNext, hasPrev } = paginationInfo.value
+      const total = processedData.value.length
+      const paginationConfig = props.pagination as PaginationConfig
+
+      return h('div', { class: tablePaginationContainerClasses }, [
+        // Total info
+        paginationConfig.showTotal !== false && h('div', { class: 'text-sm text-gray-700' }, 
+          paginationConfig.totalText
+            ? paginationConfig.totalText(total, [startIndex, endIndex])
+            : `Showing ${startIndex} to ${endIndex} of ${total} results`
+        ),
+        
+        // Pagination controls
+        h('div', { class: 'flex items-center gap-2' }, [
+          // Page size selector
+          paginationConfig.showSizeChanger !== false && h('select', {
+            class: 'px-3 py-1 border border-gray-300 rounded text-sm',
+            value: currentPageSize.value,
+            onChange: (e: Event) => handlePageSizeChange(Number((e.target as HTMLSelectElement).value)),
+          }, 
+            (paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map(size =>
+              h('option', { value: size }, `${size} / page`)
+            )
+          ),
+          
+          // Page buttons
+          h('div', { class: 'flex gap-1' }, [
+            // Previous button
+            h('button', {
+              class: classNames(
+                'px-3 py-1 border border-gray-300 rounded text-sm',
+                hasPrev
+                  ? 'hover:bg-gray-50 text-gray-700'
+                  : 'text-gray-400 cursor-not-allowed'
+              ),
+              disabled: !hasPrev,
+              onClick: () => handlePageChange(currentPage.value - 1),
+            }, 'Previous'),
+            
+            // Current page indicator
+            h('span', { class: 'px-3 py-1 text-sm text-gray-700' },
+              `Page ${currentPage.value} of ${totalPages}`
+            ),
+            
+            // Next button
+            h('button', {
+              class: classNames(
+                'px-3 py-1 border border-gray-300 rounded text-sm',
+                hasNext
+                  ? 'hover:bg-gray-50 text-gray-700'
+                  : 'text-gray-400 cursor-not-allowed'
+              ),
+              disabled: !hasNext,
+              onClick: () => handlePageChange(currentPage.value + 1),
+            }, 'Next'),
+          ]),
+        ]),
+      ])
+    }
+
+    return () => {
+      const wrapperStyle = props.maxHeight
+        ? { maxHeight: typeof props.maxHeight === 'number' ? `${props.maxHeight}px` : props.maxHeight }
+        : undefined
+
+      return h('div', { class: 'relative' }, [
+        h('div', {
+          class: getTableWrapperClasses(props.bordered, props.maxHeight),
+          style: wrapperStyle,
+        }, [
+          h('table', { class: tableBaseClasses }, [
+            renderTableHeader(),
+            renderTableBody(),
+          ]),
+          
+          // Loading overlay
+          props.loading && h('div', { class: tableLoadingOverlayClasses }, [
+            LoadingSpinner(),
+          ]),
+        ]),
+        
+        // Pagination
+        renderPagination(),
+      ])
+    }
+  },
+})
+
+export default Table
