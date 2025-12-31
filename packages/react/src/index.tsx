@@ -152,5 +152,7 @@ export { Modal } from './components/Modal'
 export type { ModalProps } from './components/Modal'
 export { Alert } from './components/Alert'
 export type { AlertProps } from './components/Alert'
+export { MessageContainer, message } from './components/Message'
+export type { MessageContainerProps } from './components/Message'
 
 export const version = '0.0.1'

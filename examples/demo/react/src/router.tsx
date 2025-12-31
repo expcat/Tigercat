@@ -48,6 +48,7 @@ const TabsDemo = lazy(() => import('./pages/TabsDemo'))
 const TreeDemo = lazy(() => import('./pages/TreeDemo'))
 const SkeletonDemo = lazy(() => import('./pages/SkeletonDemo'))
 const AlertDemo = lazy(() => import('./pages/AlertDemo'))
+const MessageDemo = lazy(() => import('./pages/MessageDemo'))
 const ModalDemo = lazy(() => import('./pages/ModalDemo'))
 const StepsDemo = lazy(() => import('./pages/StepsDemo'))
 const PaginationDemo = lazy(() => import('./pages/PaginationDemo'))
@@ -100,6 +101,7 @@ const router = createBrowserRouter([
   { path: '/tree', element: <TreeDemo /> },
   { path: '/skeleton', element: <SkeletonDemo /> },
   { path: '/alert', element: <AlertDemo /> },
+  { path: '/message', element: <MessageDemo /> },
   { path: '/modal', element: <ModalDemo /> },
   { path: '/steps', element: <StepsDemo /> },
   { path: '/pagination', element: <PaginationDemo /> },

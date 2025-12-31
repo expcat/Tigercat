@@ -50,6 +50,7 @@ const router = createRouter({
     { path: '/tree', component: () => import('./pages/TreeDemo.vue') },
     { path: '/skeleton', component: () => import('./pages/SkeletonDemo.vue') },
     { path: '/alert', component: () => import('./pages/AlertDemo.vue') },
+    { path: '/message', component: () => import('./pages/MessageDemo.vue') },
     { path: '/modal', component: () => import('./pages/ModalDemo.vue') },
     { path: '/steps', component: () => import('./pages/StepsDemo.vue') },
     { path: '/pagination', component: () => import('./pages/PaginationDemo.vue') },
