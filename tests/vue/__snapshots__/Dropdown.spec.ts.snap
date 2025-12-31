@@ -1,0 +1,104 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Dropdown > Snapshots > should match snapshot for click trigger dropdown 1`] = `
+<div>
+  <div
+    class="tiger-dropdown relative inline-block tiger-dropdown-container"
+  >
+    <div
+      class="tiger-dropdown-trigger cursor-pointer"
+    >
+      <button>
+        Trigger
+      </button>
+    </div>
+    <div
+      class="tiger-dropdown-menu-wrapper absolute z-50 top-full left-0 mt-2 hidden"
+    >
+      <div
+        class="tiger-dropdown-menu min-w-[160px] py-1 bg-white rounded-md shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+        role="menu"
+      >
+        <div
+          aria-disabled="false"
+          class="tiger-dropdown-item flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 transition-colors duration-150 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600"
+          role="menuitem"
+        >
+          Item 1
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Dropdown > Snapshots > should match snapshot for default dropdown 1`] = `
+<div>
+  <div
+    class="tiger-dropdown relative inline-block tiger-dropdown-container"
+  >
+    <div
+      class="tiger-dropdown-trigger cursor-pointer"
+    >
+      <button>
+        Trigger
+      </button>
+    </div>
+    <div
+      class="tiger-dropdown-menu-wrapper absolute z-50 top-full left-0 mt-2 hidden"
+    >
+      <div
+        class="tiger-dropdown-menu min-w-[160px] py-1 bg-white rounded-md shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+        role="menu"
+      >
+        <div
+          aria-disabled="false"
+          class="tiger-dropdown-item flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 transition-colors duration-150 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600"
+          role="menuitem"
+        >
+          Item 1
+        </div>
+        <div
+          aria-disabled="false"
+          class="tiger-dropdown-item flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 transition-colors duration-150 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600"
+          role="menuitem"
+        >
+          Item 2
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Dropdown > Snapshots > should match snapshot for disabled dropdown 1`] = `
+<div>
+  <div
+    class="tiger-dropdown relative inline-block tiger-dropdown-container"
+  >
+    <div
+      class="tiger-dropdown-trigger cursor-pointer cursor-not-allowed opacity-50"
+    >
+      <button>
+        Trigger
+      </button>
+    </div>
+    <div
+      class="tiger-dropdown-menu-wrapper absolute z-50 top-full left-0 mt-2 hidden"
+    >
+      <div
+        class="tiger-dropdown-menu min-w-[160px] py-1 bg-white rounded-md shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+        role="menu"
+      >
+        <div
+          aria-disabled="false"
+          class="tiger-dropdown-item flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 transition-colors duration-150 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 active:bg-gray-200 dark:active:bg-gray-600"
+          role="menuitem"
+        >
+          Item 1
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
