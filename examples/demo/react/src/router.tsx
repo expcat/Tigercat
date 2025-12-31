@@ -35,6 +35,7 @@ const UploadDemo = lazy(() => import('./pages/UploadDemo'))
 const TableDemo = lazy(() => import('./pages/TableDemo'))
 const TagDemo = lazy(() => import('./pages/TagDemo'))
 const BadgeDemo = lazy(() => import('./pages/BadgeDemo'))
+const CardDemo = lazy(() => import('./pages/CardDemo'))
 
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
@@ -70,6 +71,7 @@ const router = createBrowserRouter([
   { path: '/table', element: <TableDemo /> },
   { path: '/tag', element: <TagDemo /> },
   { path: '/badge', element: <BadgeDemo /> },
+  { path: '/card', element: <CardDemo /> },
 ])
 
 export default router
