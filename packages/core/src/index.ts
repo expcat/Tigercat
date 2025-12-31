@@ -38,6 +38,7 @@ export * from './utils/breadcrumb-utils'
 export * from './utils/steps-utils'
 export * from './utils/pagination-utils'
 export * from './utils/dropdown-utils'
+export * from './utils/alert-utils'
 
 // Types
 export * from './types/button'
@@ -77,6 +78,7 @@ export * from './types/breadcrumb'
 export * from './types/steps'
 export * from './types/pagination'
 export * from './types/dropdown'
+export * from './types/alert'
 
 // Theme
 export * from './theme'
