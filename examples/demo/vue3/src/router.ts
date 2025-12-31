@@ -43,6 +43,7 @@ const router = createRouter({
     { path: '/descriptions', component: () => import('./pages/DescriptionsDemo.vue') },
     { path: '/timeline', component: () => import('./pages/TimelineDemo.vue') },
     { path: '/progress', component: () => import('./pages/ProgressDemo.vue') },
+    { path: '/menu', component: () => import('./pages/MenuDemo.vue') },
   ],
 })
 
