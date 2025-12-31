@@ -89,4 +89,7 @@ export type { CardProps } from './components/Card'
 export { Avatar } from './components/Avatar'
 export type { AvatarProps } from './components/Avatar'
 
+export { List } from './components/List'
+export type { ListProps } from './components/List'
+
 export const version = '0.0.1'
