@@ -64,5 +64,6 @@ export { DropdownItem } from './components/DropdownItem'
 export { Drawer } from './components/Drawer'
 export { Modal } from './components/Modal'
 export { Alert } from './components/Alert'
+export { MessageContainer, message } from './components/Message'
 
 export const version = '0.0.1'

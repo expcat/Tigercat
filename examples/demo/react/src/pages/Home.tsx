@@ -44,6 +44,9 @@ const components = [
   { name: 'Descriptions', path: '/descriptions', category: '数据展示' },
   { name: 'Timeline', path: '/timeline', category: '数据展示' },
   
+  { name: 'Alert', path: '/alert', category: '反馈组件' },
+  { name: 'Message', path: '/message', category: '反馈组件' },
+  { name: 'Modal', path: '/modal', category: '反馈组件' },
   { name: 'Drawer', path: '/drawer', category: '反馈组件' },
 ]
 

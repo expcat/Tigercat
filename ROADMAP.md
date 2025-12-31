@@ -68,7 +68,7 @@
 | 警告提示 | Alert | ✅ | ✅ | ✅ | ✅ |
 | 对话框 | Modal/Dialog | ✅ | ✅ | ✅ | ✅ |
 | 抽屉 | Drawer | ✅ | ✅ | ✅ | ✅ |
-| 消息提示 | Message | ⬜ | ⬜ | ⬜ | ⬜ |
+| 消息提示 | Message | ✅ | ✅ | ✅ | ⬜ |
 | 通知 | Notification | ⬜ | ⬜ | ⬜ | ⬜ |
 | 加载中 | Loading/Spinner | ⬜ | ⬜ | ⬜ | ⬜ |
 | 弹出确认 | Popconfirm | ⬜ | ⬜ | ⬜ | ⬜ |
