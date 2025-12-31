@@ -98,4 +98,7 @@ export type { DescriptionsProps } from './components/Descriptions'
 export { Timeline } from './components/Timeline'
 export type { TimelineProps } from './components/Timeline'
 
+export { Tree } from './components/Tree'
+export type { TreeProps } from './components/Tree'
+
 export const version = '0.0.1'

@@ -29,6 +29,7 @@ export * from './utils/avatar-utils'
 export * from './utils/list-utils'
 export * from './utils/descriptions-utils'
 export * from './utils/timeline-utils'
+export * from './utils/tree-utils'
 
 // Types
 export * from './types/button'
@@ -59,6 +60,7 @@ export * from './types/avatar'
 export * from './types/list'
 export * from './types/descriptions'
 export * from './types/timeline'
+export * from './types/tree'
 
 // Theme
 export * from './theme'
