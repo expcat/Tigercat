@@ -95,4 +95,7 @@ export type { ListProps } from './components/List'
 export { Descriptions } from './components/Descriptions'
 export type { DescriptionsProps } from './components/Descriptions'
 
+export { Timeline } from './components/Timeline'
+export type { TimelineProps } from './components/Timeline'
+
 export const version = '0.0.1'

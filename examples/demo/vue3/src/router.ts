@@ -41,6 +41,7 @@ const router = createRouter({
     { path: '/avatar', component: () => import('./pages/AvatarDemo.vue') },
     { path: '/list', component: () => import('./pages/ListDemo.vue') },
     { path: '/descriptions', component: () => import('./pages/DescriptionsDemo.vue') },
+    { path: '/timeline', component: () => import('./pages/TimelineDemo.vue') },
   ],
 })
 
