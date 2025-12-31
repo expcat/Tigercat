@@ -146,6 +146,8 @@ export type { DropdownMenuProps } from './components/DropdownMenu'
 export { DropdownItem } from './components/DropdownItem'
 export type { DropdownItemProps } from './components/DropdownItem'
 
+export { Modal } from './components/Modal'
+export type { ModalProps } from './components/Modal'
 export { Alert } from './components/Alert'
 export type { AlertProps } from './components/Alert'
 

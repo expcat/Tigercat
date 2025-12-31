@@ -1,0 +1,140 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Modal > Snapshots > should match snapshot for centered modal 1`] = `
+<div
+  class="fixed inset-0 overflow-y-auto transition-opacity duration-300 opacity-100"
+  style="z-index: 1000;"
+>
+  <div
+    aria-hidden="true"
+    class="fixed inset-0 bg-black bg-opacity-50 transition-opacity transition-opacity duration-300 opacity-100"
+  />
+  <div
+    class="flex min-h-full items-center justify-center p-4"
+  >
+    <div
+      aria-labelledby="modal-title"
+      aria-modal="true"
+      class="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all max-w-md w-full transition-all duration-300 opacity-100 scale-100 translate-y-0"
+      role="dialog"
+    >
+      <div
+        class="flex items-center justify-between px-6 py-4 border-b border-gray-200"
+      >
+        <h3
+          class="text-lg font-semibold text-gray-900"
+          id="modal-title"
+        >
+          Centered Modal
+        </h3>
+        <button
+          aria-label="Close"
+          class="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] rounded-md p-1 transition-colors"
+          type="button"
+        >
+          <svg
+            class="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6 18L18 6M6 6l12 12"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Modal > Snapshots > should match snapshot for default modal 1`] = `
+<div
+  class="fixed inset-0 overflow-y-auto transition-opacity duration-300 opacity-100"
+  style="z-index: 1000;"
+>
+  <div
+    aria-hidden="true"
+    class="fixed inset-0 bg-black bg-opacity-50 transition-opacity transition-opacity duration-300 opacity-100"
+  />
+  <div
+    class="flex min-h-full items-start justify-center pt-16 pb-4 px-4"
+  >
+    <div
+      aria-labelledby="modal-title"
+      aria-modal="true"
+      class="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all max-w-md w-full transition-all duration-300 opacity-100 scale-100 translate-y-0"
+      role="dialog"
+    >
+      <div
+        class="flex items-center justify-between px-6 py-4 border-b border-gray-200"
+      >
+        <h3
+          class="text-lg font-semibold text-gray-900"
+          id="modal-title"
+        >
+          Snapshot Modal
+        </h3>
+        <button
+          aria-label="Close"
+          class="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] rounded-md p-1 transition-colors"
+          type="button"
+        >
+          <svg
+            class="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M6 18L18 6M6 6l12 12"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Modal > Snapshots > should match snapshot for modal without close button 1`] = `
+<div
+  class="fixed inset-0 overflow-y-auto transition-opacity duration-300 opacity-100"
+  style="z-index: 1000;"
+>
+  <div
+    aria-hidden="true"
+    class="fixed inset-0 bg-black bg-opacity-50 transition-opacity transition-opacity duration-300 opacity-100"
+  />
+  <div
+    class="flex min-h-full items-start justify-center pt-16 pb-4 px-4"
+  >
+    <div
+      aria-labelledby="modal-title"
+      aria-modal="true"
+      class="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all max-w-md w-full transition-all duration-300 opacity-100 scale-100 translate-y-0"
+      role="dialog"
+    >
+      <div
+        class="flex items-center justify-between px-6 py-4 border-b border-gray-200"
+      >
+        <h3
+          class="text-lg font-semibold text-gray-900"
+          id="modal-title"
+        >
+          No Close Button
+        </h3>
+      </div>
+    </div>
+  </div>
+</div>
+`;
