@@ -130,6 +130,11 @@ export type { BreadcrumbProps, BreadcrumbContextValue } from './components/Bread
 export { BreadcrumbItem } from './components/BreadcrumbItem'
 export type { BreadcrumbItemProps } from './components/BreadcrumbItem'
 
+export { Steps, useStepsContext } from './components/Steps'
+export type { StepsProps, StepsContextValue } from './components/Steps'
+
+export { StepsItem } from './components/StepsItem'
+export type { StepsItemProps } from './components/StepsItem'
 export { Pagination } from './components/Pagination'
 export type { PaginationProps } from './components/Pagination'
 export { Dropdown } from './components/Dropdown'
