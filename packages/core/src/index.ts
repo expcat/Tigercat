@@ -24,6 +24,7 @@ export * from './utils/space'
 export * from './utils/table-utils'
 export * from './utils/tag-utils'
 export * from './utils/badge-utils'
+export * from './utils/card-utils'
 
 // Types
 export * from './types/button'
@@ -49,6 +50,7 @@ export * from './types/upload'
 export * from './types/table'
 export * from './types/tag'
 export * from './types/badge'
+export * from './types/card'
 
 // Theme
 export * from './theme'
