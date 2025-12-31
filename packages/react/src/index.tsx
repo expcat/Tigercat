@@ -74,4 +74,36 @@ export type { TimePickerProps } from './components/TimePicker'
 export { Upload } from './components/Upload'
 export type { UploadProps } from './components/Upload'
 
+export { Table } from './components/Table'
+export type { TableProps } from './components/Table'
+
+export { Tag } from './components/Tag'
+export type { TagProps } from './components/Tag'
+
+export { Badge } from './components/Badge'
+export type { BadgeProps } from './components/Badge'
+
+export { Card } from './components/Card'
+export type { CardProps } from './components/Card'
+
+export { Avatar } from './components/Avatar'
+export type { AvatarProps } from './components/Avatar'
+
+export { List } from './components/List'
+export type { ListProps } from './components/List'
+
+export { Descriptions } from './components/Descriptions'
+export type { DescriptionsProps } from './components/Descriptions'
+
+export { Timeline } from './components/Timeline'
+export type { TimelineProps } from './components/Timeline'
+
+export { Tree } from './components/Tree'
+export type { TreeProps } from './components/Tree'
+
+export { Skeleton } from './components/Skeleton'
+
+export { Progress } from './components/Progress'
+export type { ProgressProps } from './components/Progress'
+
 export const version = '0.0.1'

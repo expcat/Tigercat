@@ -362,3 +362,347 @@ export const textDecorationClasses = {
   underline: 'underline',
   lineThrough: 'line-through',
 } as const
+
+/**
+ * Tag color scheme interface
+ * Defines all color-related classes for tag variants
+ */
+export interface TagColorScheme {
+  /**
+   * Background color class
+   */
+  bg: string
+  
+  /**
+   * Text color class
+   */
+  text: string
+  
+  /**
+   * Border color class (optional)
+   */
+  border?: string
+  
+  /**
+   * Close button hover background color class
+   */
+  closeBgHover: string
+}
+
+/**
+ * Tag theme colors configuration for all variants
+ */
+export interface TagThemeColors {
+  /**
+   * Default tag theme (gray background)
+   */
+  default: TagColorScheme
+  
+  /**
+   * Primary tag theme (blue background)
+   */
+  primary: TagColorScheme
+  
+  /**
+   * Success tag theme (green background)
+   */
+  success: TagColorScheme
+  
+  /**
+   * Warning tag theme (yellow background)
+   */
+  warning: TagColorScheme
+  
+  /**
+   * Danger tag theme (red background)
+   */
+  danger: TagColorScheme
+  
+  /**
+   * Info tag theme (light blue background)
+   */
+  info: TagColorScheme
+}
+
+/**
+ * Default tag theme colors using Tailwind CSS classes
+ */
+export const defaultTagThemeColors: TagThemeColors = {
+  default: {
+    bg: 'bg-gray-100',
+    text: 'text-gray-700',
+    border: 'border-gray-200',
+    closeBgHover: 'hover:bg-gray-200',
+  },
+  primary: {
+    bg: 'bg-blue-100',
+    text: 'text-[var(--tiger-primary,#2563eb)]',
+    border: 'border-blue-200',
+    closeBgHover: 'hover:bg-blue-200',
+  },
+  success: {
+    bg: 'bg-green-100',
+    text: 'text-green-700',
+    border: 'border-green-200',
+    closeBgHover: 'hover:bg-green-200',
+  },
+  warning: {
+    bg: 'bg-yellow-100',
+    text: 'text-yellow-700',
+    border: 'border-yellow-200',
+    closeBgHover: 'hover:bg-yellow-200',
+  },
+  danger: {
+    bg: 'bg-red-100',
+    text: 'text-red-700',
+    border: 'border-red-200',
+    closeBgHover: 'hover:bg-red-200',
+  },
+  info: {
+    bg: 'bg-sky-100',
+    text: 'text-sky-700',
+    border: 'border-sky-200',
+    closeBgHover: 'hover:bg-sky-200',
+  },
+}
+
+/**
+ * Get tag variant classes based on theme colors
+ * @param variant - Tag variant type
+ * @param colors - Tag theme colors configuration (uses default if not provided)
+ * @returns Combined class string for the tag variant
+ */
+export function getTagVariantClasses(
+  variant: keyof TagThemeColors,
+  colors: TagThemeColors = defaultTagThemeColors
+): string {
+  const scheme = colors[variant]
+  const classes = [
+    scheme.bg,
+    scheme.text,
+    scheme.border,
+  ].filter(Boolean)
+  
+  return classes.join(' ')
+}
+
+/**
+ * Badge color scheme interface
+ * Defines all color-related classes for badge variants
+ */
+export interface BadgeColorScheme {
+  /**
+   * Background color class
+   */
+  bg: string
+  
+  /**
+   * Text color class
+   */
+  text: string
+  
+  /**
+   * Border color class (optional)
+   */
+  border?: string
+}
+
+/**
+ * Badge theme colors configuration for all variants
+ */
+export interface BadgeThemeColors {
+  /**
+   * Default badge theme (gray background)
+   */
+  default: BadgeColorScheme
+  
+  /**
+   * Primary badge theme (blue background)
+   */
+  primary: BadgeColorScheme
+  
+  /**
+   * Success badge theme (green background)
+   */
+  success: BadgeColorScheme
+  
+  /**
+   * Warning badge theme (yellow background)
+   */
+  warning: BadgeColorScheme
+  
+  /**
+   * Danger badge theme (red background)
+   */
+  danger: BadgeColorScheme
+  
+  /**
+   * Info badge theme (light blue background)
+   */
+  info: BadgeColorScheme
+}
+
+/**
+ * Default badge theme colors using Tailwind CSS classes
+ */
+export const defaultBadgeThemeColors: BadgeThemeColors = {
+  default: {
+    bg: 'bg-gray-500',
+    text: 'text-white',
+    border: 'border-gray-500',
+  },
+  primary: {
+    bg: 'bg-[var(--tiger-primary,#2563eb)]',
+    text: 'text-white',
+    border: 'border-[var(--tiger-primary,#2563eb)]',
+  },
+  success: {
+    bg: 'bg-green-500',
+    text: 'text-white',
+    border: 'border-green-500',
+  },
+  warning: {
+    bg: 'bg-yellow-500',
+    text: 'text-white',
+    border: 'border-yellow-500',
+  },
+  danger: {
+    bg: 'bg-red-500',
+    text: 'text-white',
+    border: 'border-red-500',
+  },
+  info: {
+    bg: 'bg-sky-500',
+    text: 'text-white',
+    border: 'border-sky-500',
+  },
+}
+
+/**
+ * Get badge variant classes based on theme colors
+ * @param variant - Badge variant type
+ * @param colors - Badge theme colors configuration (uses default if not provided)
+ * @returns Combined class string for the badge variant
+ */
+export function getBadgeVariantClasses(
+  variant: keyof BadgeThemeColors,
+  colors: BadgeThemeColors = defaultBadgeThemeColors
+): string {
+  const scheme = colors[variant]
+  const classes = [
+    scheme.bg,
+    scheme.text,
+    scheme.border,
+  ].filter(Boolean)
+  
+  return classes.join(' ')
+}
+
+/**
+ * Progress color scheme interface
+ * Defines all color-related classes for progress bars
+ */
+export interface ProgressColorScheme {
+  /**
+   * Progress bar fill color
+   */
+  bg: string
+  
+  /**
+   * Text color for percentage display
+   */
+  text?: string
+}
+
+/**
+ * Progress theme colors interface
+ */
+export interface ProgressThemeColors {
+  /**
+   * Default progress theme (gray)
+   */
+  default: ProgressColorScheme
+  
+  /**
+   * Primary progress theme (blue)
+   */
+  primary: ProgressColorScheme
+  
+  /**
+   * Success progress theme (green)
+   */
+  success: ProgressColorScheme
+  
+  /**
+   * Warning progress theme (yellow)
+   */
+  warning: ProgressColorScheme
+  
+  /**
+   * Danger progress theme (red)
+   */
+  danger: ProgressColorScheme
+  
+  /**
+   * Info progress theme (light blue)
+   */
+  info: ProgressColorScheme
+}
+
+/**
+ * Default progress theme colors using Tailwind CSS classes
+ */
+export const defaultProgressThemeColors: ProgressThemeColors = {
+  default: {
+    bg: 'bg-gray-500',
+    text: 'text-gray-700',
+  },
+  primary: {
+    bg: 'bg-[var(--tiger-primary,#2563eb)]',
+    text: 'text-[var(--tiger-primary,#2563eb)]',
+  },
+  success: {
+    bg: 'bg-green-500',
+    text: 'text-green-600',
+  },
+  warning: {
+    bg: 'bg-yellow-500',
+    text: 'text-yellow-600',
+  },
+  danger: {
+    bg: 'bg-red-500',
+    text: 'text-red-600',
+  },
+  info: {
+    bg: 'bg-sky-500',
+    text: 'text-sky-600',
+  },
+}
+
+/**
+ * Get progress variant classes based on theme colors
+ * @param variant - Progress variant type
+ * @param colors - Progress theme colors configuration (uses default if not provided)
+ * @returns Combined class string for the progress variant
+ */
+export function getProgressVariantClasses(
+  variant: keyof ProgressThemeColors,
+  colors: ProgressThemeColors = defaultProgressThemeColors
+): string {
+  const scheme = colors[variant]
+  return scheme.bg
+}
+
+/**
+ * Get progress text color classes based on theme colors
+ * @param variant - Progress variant type
+ * @param colors - Progress theme colors configuration (uses default if not provided)
+ * @returns Text color class string
+ */
+export function getProgressTextColorClasses(
+  variant: keyof ProgressThemeColors,
+  colors: ProgressThemeColors = defaultProgressThemeColors
+): string {
+  const scheme = colors[variant]
+  return scheme.text || 'text-gray-700'
+}

@@ -32,6 +32,15 @@ const IconDemo = lazy(() => import('./pages/IconDemo'))
 const DatePickerDemo = lazy(() => import('./pages/DatePickerDemo'))
 const TimePickerDemo = lazy(() => import('./pages/TimePickerDemo'))
 const UploadDemo = lazy(() => import('./pages/UploadDemo'))
+const TableDemo = lazy(() => import('./pages/TableDemo'))
+const TagDemo = lazy(() => import('./pages/TagDemo'))
+const BadgeDemo = lazy(() => import('./pages/BadgeDemo'))
+const CardDemo = lazy(() => import('./pages/CardDemo'))
+const AvatarDemo = lazy(() => import('./pages/AvatarDemo'))
+const ListDemo = lazy(() => import('./pages/ListDemo'))
+const DescriptionsDemo = lazy(() => import('./pages/DescriptionsDemo'))
+const TimelineDemo = lazy(() => import('./pages/TimelineDemo'))
+const ProgressDemo = lazy(() => import('./pages/ProgressDemo'))
 
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
@@ -64,6 +73,15 @@ const router = createBrowserRouter([
   { path: '/datepicker', element: <DatePickerDemo /> },
   { path: '/timepicker', element: <TimePickerDemo /> },
   { path: '/upload', element: <UploadDemo /> },
+  { path: '/table', element: <TableDemo /> },
+  { path: '/tag', element: <TagDemo /> },
+  { path: '/badge', element: <BadgeDemo /> },
+  { path: '/card', element: <CardDemo /> },
+  { path: '/avatar', element: <AvatarDemo /> },
+  { path: '/list', element: <ListDemo /> },
+  { path: '/descriptions', element: <DescriptionsDemo /> },
+  { path: '/timeline', element: <TimelineDemo /> },
+  { path: '/progress', element: <ProgressDemo /> },
 ])
 
 export default router
