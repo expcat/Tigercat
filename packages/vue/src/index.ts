@@ -61,6 +61,7 @@ export { Pagination } from './components/Pagination'
 export { Dropdown } from './components/Dropdown'
 export { DropdownMenu } from './components/DropdownMenu'
 export { DropdownItem } from './components/DropdownItem'
+export { Drawer } from './components/Drawer'
 export { Modal } from './components/Modal'
 export { Alert } from './components/Alert'
 

@@ -42,9 +42,11 @@ const components = [
   { name: 'List', path: '/list', category: '数据展示' },
   { name: 'Descriptions', path: '/descriptions', category: '数据展示' },
   { name: 'Timeline', path: '/timeline', category: '数据展示' },
+  
+  { name: 'Drawer', path: '/drawer', category: '反馈组件' },
 ]
 
-const categories = ['基础组件', '表单组件', '布局组件', '数据展示']
+const categories = ['基础组件', '表单组件', '布局组件', '数据展示', '反馈组件']
 </script>
 
 <template>
