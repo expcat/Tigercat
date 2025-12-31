@@ -21,6 +21,7 @@ export * from './utils/timepicker-styles'
 export * from './utils/timepicker-icons'
 export * from './utils/upload-utils'
 export * from './utils/space'
+export * from './utils/table-utils'
 
 // Types
 export * from './types/button'
@@ -43,6 +44,7 @@ export * from './types/icon'
 export * from './types/datepicker'
 export * from './types/timepicker'
 export * from './types/upload'
+export * from './types/table'
 
 // Theme
 export * from './theme'
