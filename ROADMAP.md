@@ -58,7 +58,7 @@
 | 标签页 | Tabs | ✅ | ✅ | ✅ | ✅ |
 | 面包屑 | Breadcrumb | ✅ | ✅ | ✅ | ✅ |
 | 下拉菜单 | Dropdown | ✅ | ✅ | ✅ | ✅ |
-| 分页 | Pagination | ⬜ | ⬜ | ⬜ | ⬜ |
+| 分页 | Pagination | ✅ | ✅ | ✅ | ✅ |
 | 步骤条 | Steps | ⬜ | ⬜ | ⬜ | ⬜ |
 
 ### 反馈组件 (Feedback Components)

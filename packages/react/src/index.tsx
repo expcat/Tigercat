@@ -130,6 +130,8 @@ export type { BreadcrumbProps, BreadcrumbContextValue } from './components/Bread
 export { BreadcrumbItem } from './components/BreadcrumbItem'
 export type { BreadcrumbItemProps } from './components/BreadcrumbItem'
 
+export { Pagination } from './components/Pagination'
+export type { PaginationProps } from './components/Pagination'
 export { Dropdown } from './components/Dropdown'
 export type { DropdownProps, DropdownContextValue } from './components/Dropdown'
 
