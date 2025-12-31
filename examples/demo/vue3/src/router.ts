@@ -34,6 +34,7 @@ const router = createRouter({
     { path: '/datepicker', component: () => import('./pages/DatePickerDemo.vue') },
     { path: '/timepicker', component: () => import('./pages/TimePickerDemo.vue') },
     { path: '/upload', component: () => import('./pages/UploadDemo.vue') },
+    { path: '/table', component: () => import('./pages/TableDemo.vue') },
   ],
 })
 
