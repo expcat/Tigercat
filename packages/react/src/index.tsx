@@ -101,4 +101,6 @@ export type { TimelineProps } from './components/Timeline'
 export { Tree } from './components/Tree'
 export type { TreeProps } from './components/Tree'
 
+export { Skeleton } from './components/Skeleton'
+
 export const version = '0.0.1'
