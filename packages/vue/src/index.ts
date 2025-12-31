@@ -61,5 +61,6 @@ export { Pagination } from './components/Pagination'
 export { Dropdown } from './components/Dropdown'
 export { DropdownMenu } from './components/DropdownMenu'
 export { DropdownItem } from './components/DropdownItem'
+export { Alert } from './components/Alert'
 
 export const version = '0.0.1'
