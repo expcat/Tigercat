@@ -597,3 +597,112 @@ export function getBadgeVariantClasses(
   
   return classes.join(' ')
 }
+
+/**
+ * Progress color scheme interface
+ * Defines all color-related classes for progress bars
+ */
+export interface ProgressColorScheme {
+  /**
+   * Progress bar fill color
+   */
+  bg: string
+  
+  /**
+   * Text color for percentage display
+   */
+  text?: string
+}
+
+/**
+ * Progress theme colors interface
+ */
+export interface ProgressThemeColors {
+  /**
+   * Default progress theme (gray)
+   */
+  default: ProgressColorScheme
+  
+  /**
+   * Primary progress theme (blue)
+   */
+  primary: ProgressColorScheme
+  
+  /**
+   * Success progress theme (green)
+   */
+  success: ProgressColorScheme
+  
+  /**
+   * Warning progress theme (yellow)
+   */
+  warning: ProgressColorScheme
+  
+  /**
+   * Danger progress theme (red)
+   */
+  danger: ProgressColorScheme
+  
+  /**
+   * Info progress theme (light blue)
+   */
+  info: ProgressColorScheme
+}
+
+/**
+ * Default progress theme colors using Tailwind CSS classes
+ */
+export const defaultProgressThemeColors: ProgressThemeColors = {
+  default: {
+    bg: 'bg-gray-500',
+    text: 'text-gray-700',
+  },
+  primary: {
+    bg: 'bg-[var(--tiger-primary,#2563eb)]',
+    text: 'text-[var(--tiger-primary,#2563eb)]',
+  },
+  success: {
+    bg: 'bg-green-500',
+    text: 'text-green-600',
+  },
+  warning: {
+    bg: 'bg-yellow-500',
+    text: 'text-yellow-600',
+  },
+  danger: {
+    bg: 'bg-red-500',
+    text: 'text-red-600',
+  },
+  info: {
+    bg: 'bg-sky-500',
+    text: 'text-sky-600',
+  },
+}
+
+/**
+ * Get progress variant classes based on theme colors
+ * @param variant - Progress variant type
+ * @param colors - Progress theme colors configuration (uses default if not provided)
+ * @returns Combined class string for the progress variant
+ */
+export function getProgressVariantClasses(
+  variant: keyof ProgressThemeColors,
+  colors: ProgressThemeColors = defaultProgressThemeColors
+): string {
+  const scheme = colors[variant]
+  return scheme.bg
+}
+
+/**
+ * Get progress text color classes based on theme colors
+ * @param variant - Progress variant type
+ * @param colors - Progress theme colors configuration (uses default if not provided)
+ * @returns Text color class string
+ */
+export function getProgressTextColorClasses(
+  variant: keyof ProgressThemeColors,
+  colors: ProgressThemeColors = defaultProgressThemeColors
+): string {
+  const scheme = colors[variant]
+  return scheme.text || 'text-gray-700'
+}

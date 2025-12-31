@@ -40,6 +40,7 @@ const AvatarDemo = lazy(() => import('./pages/AvatarDemo'))
 const ListDemo = lazy(() => import('./pages/ListDemo'))
 const DescriptionsDemo = lazy(() => import('./pages/DescriptionsDemo'))
 const TimelineDemo = lazy(() => import('./pages/TimelineDemo'))
+const ProgressDemo = lazy(() => import('./pages/ProgressDemo'))
 
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
@@ -80,6 +81,7 @@ const router = createBrowserRouter([
   { path: '/list', element: <ListDemo /> },
   { path: '/descriptions', element: <DescriptionsDemo /> },
   { path: '/timeline', element: <TimelineDemo /> },
+  { path: '/progress', element: <ProgressDemo /> },
 ])
 
 export default router

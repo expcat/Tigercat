@@ -31,6 +31,7 @@ export * from './utils/descriptions-utils'
 export * from './utils/timeline-utils'
 export * from './utils/tree-utils'
 export * from './utils/skeleton-utils'
+export * from './utils/progress-utils'
 
 // Types
 export * from './types/button'
@@ -63,6 +64,7 @@ export * from './types/descriptions'
 export * from './types/timeline'
 export * from './types/tree'
 export * from './types/skeleton'
+export * from './types/progress'
 
 // Theme
 export * from './theme'
