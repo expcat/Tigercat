@@ -39,6 +39,7 @@ const router = createRouter({
     { path: '/badge', component: () => import('./pages/BadgeDemo.vue') },
     { path: '/card', component: () => import('./pages/CardDemo.vue') },
     { path: '/avatar', component: () => import('./pages/AvatarDemo.vue') },
+    { path: '/list', component: () => import('./pages/ListDemo.vue') },
   ],
 })
 
