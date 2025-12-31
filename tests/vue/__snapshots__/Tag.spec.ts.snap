@@ -1,0 +1,54 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Tag > Snapshots > should match snapshot for closable tag 1`] = `
+<span
+  class="inline-flex items-center gap-1 rounded-md border font-medium transition-colors bg-gray-100 text-gray-700 border-gray-200 px-2.5 py-1 text-sm"
+  role="status"
+>
+  <span>
+    Closable Tag
+  </span>
+  <button
+    aria-label="Close tag"
+    class="inline-flex items-center justify-center rounded-full p-0.5 transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-offset-1 hover:bg-gray-200 text-gray-700"
+    type="button"
+  >
+    <svg
+      class="h-3 w-3"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M6 18L18 6M6 6l12 12"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </button>
+</span>
+`;
+
+exports[`Tag > Snapshots > should match snapshot for default tag 1`] = `
+<span
+  class="inline-flex items-center gap-1 rounded-md border font-medium transition-colors bg-gray-100 text-gray-700 border-gray-200 px-2.5 py-1 text-sm"
+  role="status"
+>
+  <span>
+    Default Tag
+  </span>
+</span>
+`;
+
+exports[`Tag > Snapshots > should match snapshot for primary variant 1`] = `
+<span
+  class="inline-flex items-center gap-1 rounded-md border font-medium transition-colors bg-blue-100 text-[var(--tiger-primary,#2563eb)] border-blue-200 px-2.5 py-1 text-sm"
+  role="status"
+>
+  <span>
+    Primary Tag
+  </span>
+</span>
+`;

@@ -362,3 +362,126 @@ export const textDecorationClasses = {
   underline: 'underline',
   lineThrough: 'line-through',
 } as const
+
+/**
+ * Tag color scheme interface
+ * Defines all color-related classes for tag variants
+ */
+export interface TagColorScheme {
+  /**
+   * Background color class
+   */
+  bg: string
+  
+  /**
+   * Text color class
+   */
+  text: string
+  
+  /**
+   * Border color class (optional)
+   */
+  border?: string
+  
+  /**
+   * Close button hover background color class
+   */
+  closeBgHover: string
+}
+
+/**
+ * Tag theme colors configuration for all variants
+ */
+export interface TagThemeColors {
+  /**
+   * Default tag theme (gray background)
+   */
+  default: TagColorScheme
+  
+  /**
+   * Primary tag theme (blue background)
+   */
+  primary: TagColorScheme
+  
+  /**
+   * Success tag theme (green background)
+   */
+  success: TagColorScheme
+  
+  /**
+   * Warning tag theme (yellow background)
+   */
+  warning: TagColorScheme
+  
+  /**
+   * Danger tag theme (red background)
+   */
+  danger: TagColorScheme
+  
+  /**
+   * Info tag theme (light blue background)
+   */
+  info: TagColorScheme
+}
+
+/**
+ * Default tag theme colors using Tailwind CSS classes
+ */
+export const defaultTagThemeColors: TagThemeColors = {
+  default: {
+    bg: 'bg-gray-100',
+    text: 'text-gray-700',
+    border: 'border-gray-200',
+    closeBgHover: 'hover:bg-gray-200',
+  },
+  primary: {
+    bg: 'bg-blue-100',
+    text: 'text-[var(--tiger-primary,#2563eb)]',
+    border: 'border-blue-200',
+    closeBgHover: 'hover:bg-blue-200',
+  },
+  success: {
+    bg: 'bg-green-100',
+    text: 'text-green-700',
+    border: 'border-green-200',
+    closeBgHover: 'hover:bg-green-200',
+  },
+  warning: {
+    bg: 'bg-yellow-100',
+    text: 'text-yellow-700',
+    border: 'border-yellow-200',
+    closeBgHover: 'hover:bg-yellow-200',
+  },
+  danger: {
+    bg: 'bg-red-100',
+    text: 'text-red-700',
+    border: 'border-red-200',
+    closeBgHover: 'hover:bg-red-200',
+  },
+  info: {
+    bg: 'bg-sky-100',
+    text: 'text-sky-700',
+    border: 'border-sky-200',
+    closeBgHover: 'hover:bg-sky-200',
+  },
+}
+
+/**
+ * Get tag variant classes based on theme colors
+ * @param variant - Tag variant type
+ * @param colors - Tag theme colors configuration (uses default if not provided)
+ * @returns Combined class string for the tag variant
+ */
+export function getTagVariantClasses(
+  variant: keyof TagThemeColors,
+  colors: TagThemeColors = defaultTagThemeColors
+): string {
+  const scheme = colors[variant]
+  const classes = [
+    scheme.bg,
+    scheme.text,
+    scheme.border,
+  ].filter(Boolean)
+  
+  return classes.join(' ')
+}

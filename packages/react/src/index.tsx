@@ -77,4 +77,7 @@ export type { UploadProps } from './components/Upload'
 export { Table } from './components/Table'
 export type { TableProps } from './components/Table'
 
+export { Tag } from './components/Tag'
+export type { TagProps } from './components/Tag'
+
 export const version = '0.0.1'
