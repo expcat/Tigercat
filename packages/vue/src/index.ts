@@ -55,5 +55,8 @@ export { Tabs } from './components/Tabs'
 export { TabPane } from './components/TabPane'
 export { Breadcrumb } from './components/Breadcrumb'
 export { BreadcrumbItem } from './components/BreadcrumbItem'
+export { Dropdown } from './components/Dropdown'
+export { DropdownMenu } from './components/DropdownMenu'
+export { DropdownItem } from './components/DropdownItem'
 
 export const version = '0.0.1'

@@ -130,4 +130,13 @@ export type { BreadcrumbProps, BreadcrumbContextValue } from './components/Bread
 export { BreadcrumbItem } from './components/BreadcrumbItem'
 export type { BreadcrumbItemProps } from './components/BreadcrumbItem'
 
+export { Dropdown } from './components/Dropdown'
+export type { DropdownProps, DropdownContextValue } from './components/Dropdown'
+
+export { DropdownMenu } from './components/DropdownMenu'
+export type { DropdownMenuProps } from './components/DropdownMenu'
+
+export { DropdownItem } from './components/DropdownItem'
+export type { DropdownItemProps } from './components/DropdownItem'
+
 export const version = '0.0.1'
