@@ -92,4 +92,7 @@ export type { AvatarProps } from './components/Avatar'
 export { List } from './components/List'
 export type { ListProps } from './components/List'
 
+export { Descriptions } from './components/Descriptions'
+export type { DescriptionsProps } from './components/Descriptions'
+
 export const version = '0.0.1'

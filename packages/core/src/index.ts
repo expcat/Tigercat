@@ -27,6 +27,7 @@ export * from './utils/badge-utils'
 export * from './utils/card-utils'
 export * from './utils/avatar-utils'
 export * from './utils/list-utils'
+export * from './utils/descriptions-utils'
 
 // Types
 export * from './types/button'
@@ -55,6 +56,7 @@ export * from './types/badge'
 export * from './types/card'
 export * from './types/avatar'
 export * from './types/list'
+export * from './types/descriptions'
 
 // Theme
 export * from './theme'
