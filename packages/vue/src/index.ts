@@ -45,5 +45,6 @@ export { List } from './components/List'
 export { Descriptions } from './components/Descriptions'
 export { Timeline } from './components/Timeline'
 export { Tree } from './components/Tree'
+export { Skeleton } from './components/Skeleton'
 
 export const version = '0.0.1'
