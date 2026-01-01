@@ -54,6 +54,7 @@ const PopconfirmDemo = lazy(() => import('./pages/PopconfirmDemo'))
 const StepsDemo = lazy(() => import('./pages/StepsDemo'))
 const PaginationDemo = lazy(() => import('./pages/PaginationDemo'))
 const DrawerDemo = lazy(() => import('./pages/DrawerDemo'))
+const LoadingDemo = lazy(() => import('./pages/LoadingDemo'))
 
 const router = createBrowserRouter([
   { path: '/', element: <Home /> },
@@ -108,6 +109,7 @@ const router = createBrowserRouter([
   { path: '/steps', element: <StepsDemo /> },
   { path: '/pagination', element: <PaginationDemo /> },
   { path: '/drawer', element: <DrawerDemo /> },
+  { path: '/loading', element: <LoadingDemo /> },
 ])
 
 export default router

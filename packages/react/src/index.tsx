@@ -156,6 +156,8 @@ export { MessageContainer, message } from './components/Message'
 export type { MessageContainerProps } from './components/Message'
 export { NotificationContainer, notification } from './components/Notification'
 export type { NotificationContainerProps } from './components/Notification'
+export { Loading } from './components/Loading'
+export type { LoadingProps } from './components/Loading'
 export { Popconfirm } from './components/Popconfirm'
 export type { PopconfirmProps } from './components/Popconfirm'
 

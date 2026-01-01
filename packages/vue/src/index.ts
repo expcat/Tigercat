@@ -66,6 +66,7 @@ export { Modal } from './components/Modal'
 export { Alert } from './components/Alert'
 export { MessageContainer, message } from './components/Message'
 export { NotificationContainer, notification } from './components/Notification'
+export { Loading } from './components/Loading'
 export { Popconfirm } from './components/Popconfirm'
 
 export const version = '0.0.1'
