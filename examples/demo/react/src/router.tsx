@@ -51,6 +51,9 @@ const AlertDemo = lazy(() => import('./pages/AlertDemo'))
 const MessageDemo = lazy(() => import('./pages/MessageDemo'))
 const ModalDemo = lazy(() => import('./pages/ModalDemo'))
 const PopconfirmDemo = lazy(() => import('./pages/PopconfirmDemo'))
+const PopoverDemo = lazy(() => import('./pages/PopoverDemo'))
+const TooltipDemo = lazy(() => import('./pages/TooltipDemo'))
+const NotificationDemo = lazy(() => import('./pages/NotificationDemo'))
 const StepsDemo = lazy(() => import('./pages/StepsDemo'))
 const PaginationDemo = lazy(() => import('./pages/PaginationDemo'))
 const DrawerDemo = lazy(() => import('./pages/DrawerDemo'))
@@ -106,6 +109,9 @@ const router = createBrowserRouter([
   { path: '/message', element: <MessageDemo /> },
   { path: '/modal', element: <ModalDemo /> },
   { path: '/popconfirm', element: <PopconfirmDemo /> },
+  { path: '/popover', element: <PopoverDemo /> },
+  { path: '/tooltip', element: <TooltipDemo /> },
+  { path: '/notification', element: <NotificationDemo /> },
   { path: '/steps', element: <StepsDemo /> },
   { path: '/pagination', element: <PaginationDemo /> },
   { path: '/drawer', element: <DrawerDemo /> },

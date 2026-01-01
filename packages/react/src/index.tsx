@@ -162,5 +162,7 @@ export { Popconfirm } from './components/Popconfirm'
 export type { PopconfirmProps } from './components/Popconfirm'
 export { Popover } from './components/Popover'
 export type { PopoverProps } from './components/Popover'
+export { Tooltip } from './components/Tooltip'
+export type { TooltipProps } from './components/Tooltip'
 
 export const version = '0.0.1'

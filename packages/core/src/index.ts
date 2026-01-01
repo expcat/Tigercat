@@ -46,6 +46,7 @@ export * from './utils/notification-utils'
 export * from './utils/loading-utils'
 export * from './utils/popconfirm-utils'
 export * from './utils/popover-utils'
+export * from './utils/tooltip-utils'
 
 // Types
 export * from './types/button'
@@ -93,6 +94,7 @@ export * from './types/notification'
 export * from './types/loading'
 export * from './types/popconfirm'
 export * from './types/popover'
+export * from './types/tooltip'
 
 // Theme
 export * from './theme'
