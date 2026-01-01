@@ -1,0 +1,54 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Checkbox > Snapshots > should match snapshot for checked state 1`] = `
+<label
+  class="inline-flex items-center cursor-pointer select-none text-base"
+>
+  <input
+    checked=""
+    class="rounded border-2 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 w-5 h-5 border-[var(--tiger-primary,#2563eb)] text-white checked:bg-[var(--tiger-primary,#2563eb)] checked:border-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
+    type="checkbox"
+    value="false"
+  />
+  <span
+    class="ml-2"
+  >
+    Checked
+  </span>
+</label>
+`;
+
+exports[`Checkbox > Snapshots > should match snapshot for disabled state 1`] = `
+<label
+  class="inline-flex items-center cursor-pointer select-none text-base cursor-not-allowed opacity-50"
+>
+  <input
+    class="rounded border-2 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 w-5 h-5 border-[var(--tiger-primary,#2563eb)] text-white checked:bg-[var(--tiger-primary,#2563eb)] checked:border-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)] cursor-not-allowed opacity-50 disabled:bg-gray-100 disabled:border-gray-300"
+    disabled=""
+    type="checkbox"
+    value="false"
+  />
+  <span
+    class="ml-2"
+  >
+    Disabled
+  </span>
+</label>
+`;
+
+exports[`Checkbox > Snapshots > should match snapshot for unchecked state 1`] = `
+<label
+  class="inline-flex items-center cursor-pointer select-none text-base"
+>
+  <input
+    class="rounded border-2 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 w-5 h-5 border-[var(--tiger-primary,#2563eb)] text-white checked:bg-[var(--tiger-primary,#2563eb)] checked:border-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
+    type="checkbox"
+    value="false"
+  />
+  <span
+    class="ml-2"
+  >
+    Unchecked
+  </span>
+</label>
+`;
