@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Text (React) > Snapshots > should match snapshot for default text 1`] = `
+<p
+  class="text-base font-normal text-gray-900"
+>
+  Default text
+</p>
+`;
+
+exports[`Text (React) > Snapshots > should match snapshot for styled heading 1`] = `
+<h1
+  class="text-3xl font-bold text-[var(--tiger-primary,#2563eb)]"
+>
+  Styled Heading
+</h1>
+`;
