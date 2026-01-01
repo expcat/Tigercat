@@ -72,7 +72,7 @@
 | 通知 | Notification | ✅ | ✅ | ✅ | ✅ |
 | 加载中 | Loading/Spinner | ✅ | ✅ | ✅ | ✅ |
 | 弹出确认 | Popconfirm | ✅ | ✅ | ✅ | ✅ |
-| 气泡提示 | Tooltip | ⬜ | ⬜ | ⬜ | ⬜ |
+| 气泡提示 | Tooltip | ✅ | ✅ | ✅ | ✅ |
 | 气泡卡片 | Popover | ✅ | ✅ | ✅ | ✅ |
 
 ### 布局组件 (Layout Components)
