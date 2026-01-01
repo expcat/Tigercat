@@ -1,0 +1,50 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Switch > Snapshots > should match snapshot for checked state 1`] = `
+<button
+  aria-checked="true"
+  aria-disabled="false"
+  class="relative inline-flex items-center cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)] rounded-full h-6 w-11 bg-[var(--tiger-primary,#2563eb)]"
+  role="switch"
+  tabindex="0"
+  type="button"
+>
+  <span
+    aria-hidden="true"
+    class="inline-block transform rounded-full bg-white shadow-lg transition-transform h-5 w-5 translate-x-5"
+  />
+</button>
+`;
+
+exports[`Switch > Snapshots > should match snapshot for disabled state 1`] = `
+<button
+  aria-checked="false"
+  aria-disabled="true"
+  class="relative inline-flex items-center cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)] rounded-full h-6 w-11 bg-gray-200 cursor-not-allowed opacity-50"
+  disabled=""
+  role="switch"
+  tabindex="-1"
+  type="button"
+>
+  <span
+    aria-hidden="true"
+    class="inline-block transform rounded-full bg-white shadow-lg transition-transform h-5 w-5 translate-x-0.5"
+  />
+</button>
+`;
+
+exports[`Switch > Snapshots > should match snapshot for unchecked state 1`] = `
+<button
+  aria-checked="false"
+  aria-disabled="false"
+  class="relative inline-flex items-center cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)] rounded-full h-6 w-11 bg-gray-200"
+  role="switch"
+  tabindex="0"
+  type="button"
+>
+  <span
+    aria-hidden="true"
+    class="inline-block transform rounded-full bg-white shadow-lg transition-transform h-5 w-5 translate-x-0.5"
+  />
+</button>
+`;

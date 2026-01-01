@@ -1,0 +1,48 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Input > Snapshots > should match snapshot for default input 1`] = `
+<input
+  class="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:border-transparent transition-colors disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed placeholder:text-gray-400 px-3 py-2 text-base"
+  placeholder=""
+  type="text"
+  value=""
+/>
+`;
+
+exports[`Input > Snapshots > should match snapshot for disabled state 1`] = `
+<input
+  class="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:border-transparent transition-colors disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed placeholder:text-gray-400 px-3 py-2 text-base"
+  disabled=""
+  placeholder=""
+  type="text"
+  value=""
+/>
+`;
+
+exports[`Input > Snapshots > should match snapshot for password type 1`] = `
+<input
+  class="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:border-transparent transition-colors disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed placeholder:text-gray-400 px-3 py-2 text-base"
+  placeholder=""
+  type="password"
+  value=""
+/>
+`;
+
+exports[`Input > Snapshots > should match snapshot for readonly state 1`] = `
+<input
+  class="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:border-transparent transition-colors disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed placeholder:text-gray-400 px-3 py-2 text-base"
+  placeholder=""
+  readonly=""
+  type="text"
+  value=""
+/>
+`;
+
+exports[`Input > Snapshots > should match snapshot with placeholder 1`] = `
+<input
+  class="w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:border-transparent transition-colors disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed placeholder:text-gray-400 px-3 py-2 text-base"
+  placeholder="Enter text"
+  type="text"
+  value=""
+/>
+`;
