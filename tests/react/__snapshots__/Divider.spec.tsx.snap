@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Divider (React) > Snapshots > should match snapshot for horizontal divider 1`] = `
+<div
+  aria-orientation="horizontal"
+  class="w-full border-t border-solid my-4"
+  role="separator"
+/>
+`;
+
+exports[`Divider (React) > Snapshots > should match snapshot for vertical divider 1`] = `
+<div
+  aria-orientation="vertical"
+  class="h-full border-l border-dashed mx-4"
+  role="separator"
+/>
+`;
