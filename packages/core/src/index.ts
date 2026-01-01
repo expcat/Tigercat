@@ -43,6 +43,7 @@ export * from './utils/modal-utils'
 export * from './utils/alert-utils'
 export * from './utils/message-utils'
 export * from './utils/notification-utils'
+export * from './utils/loading-utils'
 export * from './utils/popconfirm-utils'
 
 // Types
@@ -88,6 +89,7 @@ export * from './types/modal'
 export * from './types/alert'
 export * from './types/message'
 export * from './types/notification'
+export * from './types/loading'
 export * from './types/popconfirm'
 
 // Theme

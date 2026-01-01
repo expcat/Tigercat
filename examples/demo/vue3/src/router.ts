@@ -56,6 +56,7 @@ const router = createRouter({
     { path: '/steps', component: () => import('./pages/StepsDemo.vue') },
     { path: '/pagination', component: () => import('./pages/PaginationDemo.vue') },
     { path: '/drawer', component: () => import('./pages/DrawerDemo.vue') },
+    { path: '/loading', component: () => import('./pages/LoadingDemo.vue') },
   ],
 })
 
