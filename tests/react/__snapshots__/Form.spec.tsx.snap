@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Form > Snapshots > should match snapshot for default state 1`] = `
+<form
+  class="tiger-form tiger-form--label-right"
+>
+  <div>
+    Form content
+  </div>
+</form>
+`;
+
+exports[`Form > Snapshots > should match snapshot with disabled state 1`] = `
+<form
+  class="tiger-form tiger-form--label-right tiger-form--disabled"
+>
+  <div>
+    Form content
+  </div>
+</form>
+`;
+
+exports[`Form > Snapshots > should match snapshot with inline layout 1`] = `
+<form
+  class="tiger-form tiger-form--label-right"
+>
+  <div>
+    Form content
+  </div>
+</form>
+`;

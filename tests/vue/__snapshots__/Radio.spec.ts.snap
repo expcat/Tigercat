@@ -1,0 +1,84 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Radio > Snapshots > should match snapshot for checked state 1`] = `
+<label
+  class="inline-flex items-center"
+  tabindex="0"
+>
+  <input
+    checked=""
+    class="sr-only"
+    name=""
+    type="radio"
+    value="option1"
+  />
+  <span
+    aria-hidden="true"
+    class="relative inline-flex items-center justify-center rounded-full border-2 cursor-pointer transition-all w-5 h-5 border-[var(--tiger-primary,#2563eb)] bg-[var(--tiger-primary,#2563eb)] hover:border-[var(--tiger-primary,#2563eb)]"
+  >
+    <span
+      class="rounded-full transition-all w-2 h-2 bg-white scale-100"
+    />
+  </span>
+  <span
+    class="ml-2 cursor-pointer select-none text-base text-gray-900"
+  >
+    Checked
+  </span>
+</label>
+`;
+
+exports[`Radio > Snapshots > should match snapshot for disabled state 1`] = `
+<label
+  class="inline-flex items-center"
+  tabindex="-1"
+>
+  <input
+    class="sr-only"
+    disabled=""
+    name=""
+    type="radio"
+    value="option1"
+  />
+  <span
+    aria-hidden="true"
+    class="relative inline-flex items-center justify-center rounded-full border-2 cursor-pointer transition-all w-5 h-5 border-gray-300 bg-white disabled:bg-gray-100 disabled:border-gray-200 cursor-not-allowed"
+  >
+    <span
+      class="rounded-full transition-all w-2 h-2 bg-white scale-0"
+    />
+  </span>
+  <span
+    class="ml-2 cursor-pointer select-none text-base text-gray-400 cursor-not-allowed"
+  >
+    Disabled
+  </span>
+</label>
+`;
+
+exports[`Radio > Snapshots > should match snapshot for unchecked state 1`] = `
+<label
+  class="inline-flex items-center"
+  tabindex="0"
+>
+  <input
+    class="sr-only"
+    name=""
+    type="radio"
+    value="option1"
+  />
+  <span
+    aria-hidden="true"
+    class="relative inline-flex items-center justify-center rounded-full border-2 cursor-pointer transition-all w-5 h-5 border-gray-300 bg-white hover:border-[var(--tiger-primary,#2563eb)]"
+  >
+    <span
+      class="rounded-full transition-all w-2 h-2 bg-white scale-0"
+    />
+  </span>
+  <span
+    class="ml-2 cursor-pointer select-none text-base text-gray-900"
+  >
+    Unchecked
+  </span>
+</label>
+`;
