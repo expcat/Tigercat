@@ -52,6 +52,7 @@ const router = createRouter({
     { path: '/alert', component: () => import('./pages/AlertDemo.vue') },
     { path: '/message', component: () => import('./pages/MessageDemo.vue') },
     { path: '/modal', component: () => import('./pages/ModalDemo.vue') },
+    { path: '/popconfirm', component: () => import('./pages/PopconfirmDemo.vue') },
     { path: '/steps', component: () => import('./pages/StepsDemo.vue') },
     { path: '/pagination', component: () => import('./pages/PaginationDemo.vue') },
     { path: '/drawer', component: () => import('./pages/DrawerDemo.vue') },

@@ -156,5 +156,7 @@ export { MessageContainer, message } from './components/Message'
 export type { MessageContainerProps } from './components/Message'
 export { NotificationContainer, notification } from './components/Notification'
 export type { NotificationContainerProps } from './components/Notification'
+export { Popconfirm } from './components/Popconfirm'
+export type { PopconfirmProps } from './components/Popconfirm'
 
 export const version = '0.0.1'

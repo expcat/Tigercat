@@ -50,6 +50,7 @@ const SkeletonDemo = lazy(() => import('./pages/SkeletonDemo'))
 const AlertDemo = lazy(() => import('./pages/AlertDemo'))
 const MessageDemo = lazy(() => import('./pages/MessageDemo'))
 const ModalDemo = lazy(() => import('./pages/ModalDemo'))
+const PopconfirmDemo = lazy(() => import('./pages/PopconfirmDemo'))
 const StepsDemo = lazy(() => import('./pages/StepsDemo'))
 const PaginationDemo = lazy(() => import('./pages/PaginationDemo'))
 const DrawerDemo = lazy(() => import('./pages/DrawerDemo'))
@@ -103,6 +104,7 @@ const router = createBrowserRouter([
   { path: '/alert', element: <AlertDemo /> },
   { path: '/message', element: <MessageDemo /> },
   { path: '/modal', element: <ModalDemo /> },
+  { path: '/popconfirm', element: <PopconfirmDemo /> },
   { path: '/steps', element: <StepsDemo /> },
   { path: '/pagination', element: <PaginationDemo /> },
   { path: '/drawer', element: <DrawerDemo /> },
