@@ -65,15 +65,15 @@
 
 | 组件 | Component | Vue | React | 文档 | 测试 |
 |------|-----------|-----|-------|------|------|
-| 警告提示 | Alert | ⬜ | ⬜ | ⬜ | ⬜ |
-| 对话框 | Modal/Dialog | ⬜ | ⬜ | ⬜ | ⬜ |
-| 抽屉 | Drawer | ⬜ | ⬜ | ⬜ | ⬜ |
-| 消息提示 | Message | ⬜ | ⬜ | ⬜ | ⬜ |
-| 通知 | Notification | ⬜ | ⬜ | ⬜ | ⬜ |
-| 加载中 | Loading/Spinner | ⬜ | ⬜ | ⬜ | ⬜ |
-| 弹出确认 | Popconfirm | ⬜ | ⬜ | ⬜ | ⬜ |
-| 气泡提示 | Tooltip | ⬜ | ⬜ | ⬜ | ⬜ |
-| 气泡卡片 | Popover | ⬜ | ⬜ | ⬜ | ⬜ |
+| 警告提示 | Alert | ✅ | ✅ | ✅ | ✅ |
+| 对话框 | Modal/Dialog | ✅ | ✅ | ✅ | ✅ |
+| 抽屉 | Drawer | ✅ | ✅ | ✅ | ✅ |
+| 消息提示 | Message | ✅ | ✅ | ✅ | ⬜ |
+| 通知 | Notification | ✅ | ✅ | ✅ | ✅ |
+| 加载中 | Loading/Spinner | ✅ | ✅ | ✅ | ✅ |
+| 弹出确认 | Popconfirm | ✅ | ✅ | ✅ | ✅ |
+| 气泡提示 | Tooltip | ✅ | ✅ | ✅ | ✅ |
+| 气泡卡片 | Popover | ✅ | ✅ | ✅ | ✅ |
 
 ### 布局组件 (Layout Components)
 

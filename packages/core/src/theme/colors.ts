@@ -706,3 +706,133 @@ export function getProgressTextColorClasses(
   const scheme = colors[variant]
   return scheme.text || 'text-gray-700'
 }
+
+/**
+ * Alert color scheme interface
+ * Defines all color-related classes for alert types
+ */
+export interface AlertColorScheme {
+  /**
+   * Background color class
+   */
+  bg: string
+  
+  /**
+   * Border color class
+   */
+  border: string
+  
+  /**
+   * Icon color class
+   */
+  icon: string
+  
+  /**
+   * Title text color class
+   */
+  title: string
+  
+  /**
+   * Description text color class
+   */
+  description: string
+  
+  /**
+   * Close button color class
+   */
+  closeButton: string
+  
+  /**
+   * Close button hover background color class
+   */
+  closeButtonHover: string
+  
+  /**
+   * Focus ring color class
+   */
+  focus: string
+}
+
+/**
+ * Alert theme colors interface
+ */
+export interface AlertThemeColors {
+  /**
+   * Success alert theme (green)
+   */
+  success: AlertColorScheme
+  
+  /**
+   * Warning alert theme (yellow)
+   */
+  warning: AlertColorScheme
+  
+  /**
+   * Error alert theme (red)
+   */
+  error: AlertColorScheme
+  
+  /**
+   * Info alert theme (blue)
+   */
+  info: AlertColorScheme
+}
+
+/**
+ * Default alert theme colors using Tailwind CSS classes
+ */
+export const defaultAlertThemeColors: AlertThemeColors = {
+  success: {
+    bg: 'bg-green-50',
+    border: 'border-green-200',
+    icon: 'text-green-500',
+    title: 'text-green-800',
+    description: 'text-green-700',
+    closeButton: 'text-green-500',
+    closeButtonHover: 'hover:bg-green-100',
+    focus: 'focus:ring-green-500',
+  },
+  warning: {
+    bg: 'bg-yellow-50',
+    border: 'border-yellow-200',
+    icon: 'text-yellow-500',
+    title: 'text-yellow-800',
+    description: 'text-yellow-700',
+    closeButton: 'text-yellow-500',
+    closeButtonHover: 'hover:bg-yellow-100',
+    focus: 'focus:ring-yellow-500',
+  },
+  error: {
+    bg: 'bg-red-50',
+    border: 'border-red-200',
+    icon: 'text-red-500',
+    title: 'text-red-800',
+    description: 'text-red-700',
+    closeButton: 'text-red-500',
+    closeButtonHover: 'hover:bg-red-100',
+    focus: 'focus:ring-red-500',
+  },
+  info: {
+    bg: 'bg-blue-50',
+    border: 'border-blue-200',
+    icon: 'text-blue-500',
+    title: 'text-blue-800',
+    description: 'text-blue-700',
+    closeButton: 'text-blue-500',
+    closeButtonHover: 'hover:bg-blue-100',
+    focus: 'focus:ring-blue-500',
+  },
+}
+
+/**
+ * Get alert type classes based on theme colors
+ * @param type - Alert type
+ * @param colors - Alert theme colors configuration (uses default if not provided)
+ * @returns Alert color scheme object
+ */
+export function getAlertTypeClasses(
+  type: 'success' | 'warning' | 'error' | 'info',
+  colors: AlertThemeColors = defaultAlertThemeColors
+): AlertColorScheme {
+  return colors[type]
+}
