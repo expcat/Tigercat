@@ -29,8 +29,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.tsx --format cjs,esm --dts --external react",
-    "dev": "tsup src/index.tsx --format cjs,esm --dts --external react --watch",
+    "build": "tsup src/index.tsx --format cjs,esm --dts --external react --external react-dom --external react-dom/client",
+    "dev": "tsup src/index.tsx --format cjs,esm --dts --external react --external react-dom --external react-dom/client --watch",
     "clean": "rm -rf dist"
   },
   "dependencies": {
@@ -40,10 +40,12 @@
     "@types/node": "^25.0.3",
     "@types/react": "^19.2.7",
     "react": "^19.2.3",
+    "react-dom": "^19.2.3",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "react": "^19.0.0"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }
