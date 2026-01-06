@@ -1,4 +1,12 @@
-import { defineComponent, computed, ref, h, PropType, watch } from 'vue'
+import {
+  defineComponent,
+  computed,
+  ref,
+  h,
+  PropType,
+  watch,
+  type VNodeChild,
+} from 'vue';
 import {
   classNames,
   getTreeNodeClasses,
@@ -25,48 +33,54 @@ import {
   type TreeCheckedState,
   type TreeLoadDataFn,
   type TreeFilterFn,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 // Expand icon component
 const ExpandIcon = (expanded: boolean, hasChildren: boolean) => {
   if (!hasChildren) {
-    return h('span', { class: treeNodeIndentClasses })
+    return h('span', { class: treeNodeIndentClasses });
   }
 
-  return h('svg', {
-    class: getTreeNodeExpandIconClasses(expanded),
-    width: '16',
-    height: '16',
-    viewBox: '0 0 16 16',
-    fill: 'currentColor',
-  }, [
-    h('path', { d: 'M6 4l4 4-4 4V4z' }),
-  ])
-}
+  return h(
+    'svg',
+    {
+      class: getTreeNodeExpandIconClasses(expanded),
+      width: '16',
+      height: '16',
+      viewBox: '0 0 16 16',
+      fill: 'currentColor',
+    },
+    [h('path', { d: 'M6 4l4 4-4 4V4z' })]
+  );
+};
 
 // Loading spinner
 const LoadingSpinner = () => {
-  return h('svg', {
-    class: treeLoadingClasses,
-    xmlns: 'http://www.w3.org/2000/svg',
-    fill: 'none',
-    viewBox: '0 0 24 24',
-  }, [
-    h('circle', {
-      class: 'opacity-25',
-      cx: '12',
-      cy: '12',
-      r: '10',
-      stroke: 'currentColor',
-      'stroke-width': '4',
-    }),
-    h('path', {
-      class: 'opacity-75',
-      fill: 'currentColor',
-      d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z',
-    }),
-  ])
-}
+  return h(
+    'svg',
+    {
+      class: treeLoadingClasses,
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: '0 0 24 24',
+    },
+    [
+      h('circle', {
+        class: 'opacity-25',
+        cx: '12',
+        cy: '12',
+        r: '10',
+        stroke: 'currentColor',
+        'stroke-width': '4',
+      }),
+      h('path', {
+        class: 'opacity-75',
+        fill: 'currentColor',
+        d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z',
+      }),
+    ]
+  );
+};
 
 export const Tree = defineComponent({
   name: 'TigerTree',
@@ -234,161 +248,184 @@ export const Tree = defineComponent({
   ],
   setup(props, { emit }) {
     // Internal state for expanded keys
-    const internalExpandedKeys = ref<Set<string | number>>(new Set())
+    const internalExpandedKeys = ref<Set<string | number>>(new Set());
 
     // Internal state for selected keys
     const internalSelectedKeys = ref<Set<string | number>>(
       new Set(props.selectedKeys || props.defaultSelectedKeys)
-    )
+    );
 
     // Internal state for checked keys
     const internalCheckedState = ref<TreeCheckedState>(
       (() => {
         if (props.checkedKeys) {
           if (Array.isArray(props.checkedKeys)) {
-            return calculateCheckedState(props.treeData, props.checkedKeys, props.checkStrictly)
+            return calculateCheckedState(
+              props.treeData,
+              props.checkedKeys,
+              props.checkStrictly
+            );
           }
-          return props.checkedKeys
+          return props.checkedKeys;
         }
-        return calculateCheckedState(props.treeData, props.defaultCheckedKeys, props.checkStrictly)
+        return calculateCheckedState(
+          props.treeData,
+          props.defaultCheckedKeys,
+          props.checkStrictly
+        );
       })()
-    )
+    );
 
     // Initialize expanded keys based on props
     watch(
       () => [props.treeData, props.defaultExpandAll] as const,
       () => {
         if (props.expandedKeys === undefined) {
-          const keys = props.expandedKeys ||
+          const keys =
+            props.expandedKeys ||
             props.defaultExpandedKeys ||
-            (props.defaultExpandAll ? getAllKeys(props.treeData) : [])
-          internalExpandedKeys.value = new Set(keys)
+            (props.defaultExpandAll ? getAllKeys(props.treeData) : []);
+          internalExpandedKeys.value = new Set(keys);
         }
       },
       { immediate: true }
-    )
+    );
 
     // Loading state for lazy loading nodes
-    const loadingNodes = ref<Set<string | number>>(new Set())
+    const loadingNodes = ref<Set<string | number>>(new Set());
 
     // Filtered node keys
-    const filteredNodeKeys = ref<Set<string | number>>(new Set())
+    const filteredNodeKeys = ref<Set<string | number>>(new Set());
 
     // Computed expanded keys
     const computedExpandedKeys = computed(() => {
       if (props.expandedKeys !== undefined) {
-        return new Set(props.expandedKeys)
+        return new Set(props.expandedKeys);
       }
-      return internalExpandedKeys.value
-    })
+      return internalExpandedKeys.value;
+    });
 
     // Computed selected keys
     const computedSelectedKeys = computed(() => {
       if (props.selectedKeys !== undefined) {
-        return new Set(props.selectedKeys)
+        return new Set(props.selectedKeys);
       }
-      return internalSelectedKeys.value
-    })
+      return internalSelectedKeys.value;
+    });
 
     // Computed checked state
     const computedCheckedState = computed(() => {
       if (props.checkedKeys !== undefined) {
         if (Array.isArray(props.checkedKeys)) {
-          return calculateCheckedState(props.treeData, props.checkedKeys, props.checkStrictly)
+          return calculateCheckedState(
+            props.treeData,
+            props.checkedKeys,
+            props.checkStrictly
+          );
         }
-        return props.checkedKeys
+        return props.checkedKeys;
       }
-      return internalCheckedState.value
-    })
+      return internalCheckedState.value;
+    });
 
     // Watch filter value changes
     watch(
       () => props.filterValue,
       (newValue) => {
         if (newValue) {
-          const matched = filterTreeNodes(props.treeData, newValue, props.filterFn)
-          filteredNodeKeys.value = matched
+          const matched = filterTreeNodes(
+            props.treeData,
+            newValue,
+            props.filterFn
+          );
+          filteredNodeKeys.value = matched;
 
           if (props.autoExpandParent) {
-            const autoExpand = getAutoExpandKeys(props.treeData, matched)
+            const autoExpand = getAutoExpandKeys(props.treeData, matched);
             if (props.expandedKeys === undefined) {
               internalExpandedKeys.value = new Set([
                 ...internalExpandedKeys.value,
                 ...autoExpand,
-              ])
+              ]);
             }
           }
         } else {
-          filteredNodeKeys.value = new Set()
+          filteredNodeKeys.value = new Set();
         }
       },
       { immediate: true }
-    )
+    );
 
     function handleExpand(nodeKey: string | number) {
-      const node = findNode(props.treeData, nodeKey)
-      if (!node) return
+      const node = findNode(props.treeData, nodeKey);
+      if (!node) return;
 
-      const newExpandedKeys = new Set(computedExpandedKeys.value)
-      const isExpanded = newExpandedKeys.has(nodeKey)
+      const newExpandedKeys = new Set(computedExpandedKeys.value);
+      const isExpanded = newExpandedKeys.has(nodeKey);
 
       if (isExpanded) {
-        newExpandedKeys.delete(nodeKey)
-        emit('node-collapse', node, nodeKey)
+        newExpandedKeys.delete(nodeKey);
+        emit('node-collapse', node, nodeKey);
       } else {
-        newExpandedKeys.add(nodeKey)
-        emit('node-expand', node, nodeKey)
+        newExpandedKeys.add(nodeKey);
+        emit('node-expand', node, nodeKey);
 
         // Lazy loading
-        if (props.loadData && !node.children && !node.isLeaf && !loadingNodes.value.has(nodeKey)) {
-          loadingNodes.value.add(nodeKey)
-          props.loadData(node)
+        if (
+          props.loadData &&
+          !node.children &&
+          !node.isLeaf &&
+          !loadingNodes.value.has(nodeKey)
+        ) {
+          loadingNodes.value.add(nodeKey);
+          props
+            .loadData(node)
             .then((children) => {
               // Update node children
-              node.children = children
-              loadingNodes.value.delete(nodeKey)
+              node.children = children;
+              loadingNodes.value.delete(nodeKey);
             })
             .catch(() => {
-              loadingNodes.value.delete(nodeKey)
-              newExpandedKeys.delete(nodeKey)
-            })
+              loadingNodes.value.delete(nodeKey);
+              newExpandedKeys.delete(nodeKey);
+            });
         }
       }
 
       if (props.expandedKeys === undefined) {
-        internalExpandedKeys.value = newExpandedKeys
+        internalExpandedKeys.value = newExpandedKeys;
       }
 
-      emit('update:expandedKeys', Array.from(newExpandedKeys))
+      emit('update:expandedKeys', Array.from(newExpandedKeys));
       emit('expand', Array.from(newExpandedKeys), {
         expanded: !isExpanded,
         node,
-      })
+      });
     }
 
     function handleSelect(nodeKey: string | number, event: MouseEvent) {
-      const node = findNode(props.treeData, nodeKey)
-      if (!node || node.disabled || !props.selectable) return
+      const node = findNode(props.treeData, nodeKey);
+      if (!node || node.disabled || !props.selectable) return;
 
-      const newSelectedKeys = new Set(computedSelectedKeys.value)
+      const newSelectedKeys = new Set(computedSelectedKeys.value);
 
       if (props.multiple) {
         if (newSelectedKeys.has(nodeKey)) {
-          newSelectedKeys.delete(nodeKey)
+          newSelectedKeys.delete(nodeKey);
         } else {
-          newSelectedKeys.add(nodeKey)
+          newSelectedKeys.add(nodeKey);
         }
       } else {
-        newSelectedKeys.clear()
-        newSelectedKeys.add(nodeKey)
+        newSelectedKeys.clear();
+        newSelectedKeys.add(nodeKey);
       }
 
       if (props.selectedKeys === undefined) {
-        internalSelectedKeys.value = newSelectedKeys
+        internalSelectedKeys.value = newSelectedKeys;
       }
 
-      const selectedKeysArray = Array.from(newSelectedKeys)
-      emit('update:selectedKeys', selectedKeysArray)
+      const selectedKeysArray = Array.from(newSelectedKeys);
+      emit('update:selectedKeys', selectedKeysArray);
       emit('select', selectedKeysArray, {
         selected: newSelectedKeys.has(nodeKey),
         selectedNodes: selectedKeysArray
@@ -396,33 +433,33 @@ export const Tree = defineComponent({
           .filter(Boolean) as TreeNode[],
         node,
         event,
-      })
+      });
     }
 
     function handleCheck(nodeKey: string | number, checked: boolean) {
-      const node = findNode(props.treeData, nodeKey)
-      if (!node || node.disabled) return
+      const node = findNode(props.treeData, nodeKey);
+      if (!node || node.disabled) return;
 
-      const currentCheckedKeys = computedCheckedState.value.checked
+      const currentCheckedKeys = computedCheckedState.value.checked;
       const newCheckedState = handleNodeCheck(
         props.treeData,
         nodeKey,
         checked,
         currentCheckedKeys,
         props.checkStrictly
-      )
+      );
 
       if (props.checkedKeys === undefined) {
-        internalCheckedState.value = newCheckedState
+        internalCheckedState.value = newCheckedState;
       }
 
       const returnKeys = getCheckedKeysByStrategy(
         newCheckedState,
         props.treeData,
         props.checkStrategy
-      )
+      );
 
-      emit('update:checkedKeys', returnKeys)
+      emit('update:checkedKeys', returnKeys);
       emit('check', returnKeys, {
         checked,
         checkedNodes: newCheckedState.checked
@@ -430,123 +467,165 @@ export const Tree = defineComponent({
           .filter(Boolean) as TreeNode[],
         node,
         checkedNodesPositions: newCheckedState,
-      })
+      });
     }
 
     function handleNodeClick(node: TreeNode, event: MouseEvent) {
-      if (node.disabled) return
-      emit('node-click', node, event)
+      if (node.disabled) return;
+      emit('node-click', node, event);
     }
 
     function renderTreeNode(
       node: TreeNode,
       level: number,
       _parentKey?: string | number
-    ): any {
-      const hasChildren = !!(node.children && node.children.length > 0)
-      const isExpanded = computedExpandedKeys.value.has(node.key)
-      const isSelected = computedSelectedKeys.value.has(node.key)
-      const isChecked = computedCheckedState.value.checked.includes(node.key)
-      const isHalfChecked = computedCheckedState.value.halfChecked.includes(node.key)
-      const isLoading = loadingNodes.value.has(node.key)
-      const isFiltered = filteredNodeKeys.value.size > 0
-      const isMatched = filteredNodeKeys.value.has(node.key)
-      const isVisible = !isFiltered || isMatched
+    ): VNodeChild {
+      const hasChildren = !!(node.children && node.children.length > 0);
+      const isExpanded = computedExpandedKeys.value.has(node.key);
+      const isSelected = computedSelectedKeys.value.has(node.key);
+      const isChecked = computedCheckedState.value.checked.includes(node.key);
+      const isHalfChecked = computedCheckedState.value.halfChecked.includes(
+        node.key
+      );
+      const isLoading = loadingNodes.value.has(node.key);
+      const isFiltered = filteredNodeKeys.value.size > 0;
+      const isMatched = filteredNodeKeys.value.has(node.key);
+      const isVisible = !isFiltered || isMatched;
 
       if (!isVisible) {
-        return null
+        return null;
       }
 
-      const indent = []
+      const indent = [];
       for (let i = 0; i < level; i++) {
-        indent.push(h('span', { key: i, class: treeNodeIndentClasses }))
+        indent.push(h('span', { key: i, class: treeNodeIndentClasses }));
       }
 
       // Node content
-      const nodeContent: any[] = [
+      const nodeContent: VNodeChild[] = [
         // Indentation
         ...indent,
 
         // Expand icon
-        h('span', {
-          class: hasChildren || (props.loadData && !node.isLeaf) ? 'cursor-pointer' : '',
-          onClick: (e: MouseEvent) => {
-            e.stopPropagation()
-            if (hasChildren || (props.loadData && !node.isLeaf)) {
-              handleExpand(node.key)
-            }
+        h(
+          'span',
+          {
+            class:
+              hasChildren || (props.loadData && !node.isLeaf)
+                ? 'cursor-pointer'
+                : '',
+            onClick: (e: MouseEvent) => {
+              e.stopPropagation();
+              if (hasChildren || (props.loadData && !node.isLeaf)) {
+                handleExpand(node.key);
+              }
+            },
           },
-        }, [
-          ExpandIcon(isExpanded, hasChildren || !!(props.loadData && !node.isLeaf)),
-        ]),
+          [
+            ExpandIcon(
+              isExpanded,
+              hasChildren || !!(props.loadData && !node.isLeaf)
+            ),
+          ]
+        ),
 
         // Checkbox
-        props.checkable ? h('input', {
-          type: 'checkbox',
-          class: treeNodeCheckboxClasses,
-          checked: isChecked,
-          indeterminate: isHalfChecked,
-          disabled: node.disabled,
-          'aria-label': `Select ${node.label}`,
-          onClick: (e: MouseEvent) => e.stopPropagation(),
-          onChange: (e: Event) => {
-            const target = e.target as HTMLInputElement
-            handleCheck(node.key, target.checked)
-          },
-        }) : null,
+        props.checkable
+          ? h('input', {
+              type: 'checkbox',
+              class: treeNodeCheckboxClasses,
+              checked: isChecked,
+              indeterminate: isHalfChecked,
+              disabled: node.disabled,
+              'aria-label': `Select ${node.label}`,
+              onClick: (e: MouseEvent) => e.stopPropagation(),
+              onChange: (e: Event) => {
+                const target = e.target as HTMLInputElement;
+                handleCheck(node.key, target.checked);
+              },
+            })
+          : null,
 
         // Icon (if provided)
-        node.icon ? h('span', { class: treeNodeIconClasses }, node.icon as never) : null,
+        node.icon
+          ? h('span', { class: treeNodeIconClasses }, node.icon as never)
+          : null,
 
         // Label
-        h('span', {
-          class: classNames(
-            treeNodeLabelClasses,
-            isFiltered && isMatched ? 'font-semibold text-[var(--tiger-primary,#2563eb)]' : ''
-          ),
-        }, node.label),
+        h(
+          'span',
+          {
+            class: classNames(
+              treeNodeLabelClasses,
+              isFiltered && isMatched
+                ? 'font-semibold text-[var(--tiger-primary,#2563eb)]'
+                : ''
+            ),
+          },
+          node.label
+        ),
 
         // Loading indicator
         isLoading ? LoadingSpinner() : null,
-      ].filter(Boolean)
+      ].filter(Boolean);
 
       // Tree node wrapper
-      const treeNode = h('div', {
-        key: node.key,
-        class: treeNodeWrapperClasses,
-      }, [
-        // Node content
-        h('div', {
-          class: getTreeNodeClasses(isSelected, !!node.disabled, props.blockNode),
-          onClick: (e: MouseEvent) => {
-            handleNodeClick(node, e)
-            if (props.selectable && !node.disabled) {
-              handleSelect(node.key, e)
-            }
-          },
-        }, nodeContent),
+      const treeNode = h(
+        'div',
+        {
+          key: node.key,
+          class: treeNodeWrapperClasses,
+        },
+        [
+          // Node content
+          h(
+            'div',
+            {
+              class: getTreeNodeClasses(
+                isSelected,
+                !!node.disabled,
+                props.blockNode
+              ),
+              onClick: (e: MouseEvent) => {
+                handleNodeClick(node, e);
+                if (props.selectable && !node.disabled) {
+                  handleSelect(node.key, e);
+                }
+              },
+            },
+            nodeContent
+          ),
 
-        // Children
-        hasChildren && isExpanded && h('div', {
-          class: treeNodeChildrenClasses,
-        }, node.children!.map((child) => renderTreeNode(child, level + 1, node.key))),
-      ])
+          // Children
+          hasChildren &&
+            isExpanded &&
+            h(
+              'div',
+              {
+                class: treeNodeChildrenClasses,
+              },
+              node.children!.map((child) =>
+                renderTreeNode(child, level + 1, node.key)
+              )
+            ),
+        ]
+      );
 
-      return treeNode
+      return treeNode;
     }
 
     return () => {
       if (!props.treeData || props.treeData.length === 0) {
         return h('div', { class: classNames(treeBaseClasses, 'p-4') }, [
           h('div', { class: treeEmptyStateClasses }, props.emptyText),
-        ])
+        ]);
       }
 
       return h('div', { class: treeBaseClasses }, [
         props.treeData.map((node) => renderTreeNode(node, 0)),
-      ])
-    }
+      ]);
+    };
   },
-})
+});
 
-export default Tree
+export default Tree;

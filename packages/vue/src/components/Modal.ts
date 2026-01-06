@@ -1,6 +1,14 @@
-import { defineComponent, computed, h, Transition, Teleport, watch, ref, PropType } from 'vue'
-import { 
-  classNames,
+import {
+  defineComponent,
+  computed,
+  h,
+  Transition,
+  Teleport,
+  watch,
+  ref,
+  PropType,
+} from 'vue';
+import {
   getModalContentClasses,
   modalWrapperClasses,
   modalMaskClasses,
@@ -11,7 +19,7 @@ import {
   modalBodyClasses,
   modalFooterClasses,
   type ModalSize,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 export const Modal = defineComponent({
   name: 'TigerModal',
@@ -106,44 +114,43 @@ export const Modal = defineComponent({
   },
   emits: ['update:visible', 'close', 'cancel', 'ok'],
   setup(props, { slots, emit }) {
-    const hasRendered = ref(false)
+    const hasRendered = ref(false);
     const shouldRender = computed(() => {
       if (props.visible) {
-        hasRendered.value = true
-        return true
+        hasRendered.value = true;
+        return true;
       }
-      return !props.destroyOnClose && hasRendered.value
-    })
+      return !props.destroyOnClose && hasRendered.value;
+    });
 
     // Watch for visible changes to emit events
-    watch(() => props.visible, (newVal) => {
-      if (!newVal) {
-        emit('close')
+    watch(
+      () => props.visible,
+      (newVal) => {
+        if (!newVal) {
+          emit('close');
+        }
       }
-    })
+    );
 
     const handleClose = () => {
-      emit('update:visible', false)
-      emit('cancel')
-    }
+      emit('update:visible', false);
+      emit('cancel');
+    };
 
     const handleMaskClick = (event: MouseEvent) => {
       if (props.maskClosable && event.target === event.currentTarget) {
-        handleClose()
+        handleClose();
       }
-    }
-
-    const handleOk = () => {
-      emit('ok')
-    }
+    };
 
     const contentClasses = computed(() => {
-      return getModalContentClasses(props.size, props.className)
-    })
+      return getModalContentClasses(props.size, props.className);
+    });
 
     const containerClasses = computed(() => {
-      return getModalContainerClasses(props.centered)
-    })
+      return getModalContainerClasses(props.centered);
+    });
 
     // Close button icon (X)
     const CloseIcon = h(
@@ -163,11 +170,11 @@ export const Modal = defineComponent({
           d: 'M6 18L18 6M6 6l12 12',
         }),
       ]
-    )
+    );
 
     return () => {
       if (!shouldRender.value) {
-        return null
+        return null;
       }
 
       const modalContent = h(
@@ -192,7 +199,9 @@ export const Modal = defineComponent({
                         class: contentClasses.value,
                         role: 'dialog',
                         'aria-modal': 'true',
-                        'aria-labelledby': props.title ? 'modal-title' : undefined,
+                        'aria-labelledby': props.title
+                          ? 'modal-title'
+                          : undefined,
                       },
                       [
                         // Header
@@ -223,17 +232,27 @@ export const Modal = defineComponent({
                           ]),
 
                         // Body
-                        slots.default && h('div', { class: modalBodyClasses }, slots.default()),
+                        slots.default &&
+                          h(
+                            'div',
+                            { class: modalBodyClasses },
+                            slots.default()
+                          ),
 
                         // Footer
-                        slots.footer && h('div', { class: modalFooterClasses }, slots.footer()),
+                        slots.footer &&
+                          h(
+                            'div',
+                            { class: modalFooterClasses },
+                            slots.footer()
+                          ),
                       ]
                     )
                   : null,
             }
           ),
         ]
-      )
+      );
 
       return h(
         Teleport,
@@ -259,10 +278,19 @@ export const Modal = defineComponent({
                             [
                               // Mask
                               props.mask &&
-                                h(Transition, { name: 'modal-mask', appear: true }, {
-                                  default: () =>
-                                    props.visible ? h('div', { class: modalMaskClasses, 'aria-hidden': 'true' }) : null,
-                                }),
+                                h(
+                                  Transition,
+                                  { name: 'modal-mask', appear: true },
+                                  {
+                                    default: () =>
+                                      props.visible
+                                        ? h('div', {
+                                            class: modalMaskClasses,
+                                            'aria-hidden': 'true',
+                                          })
+                                        : null,
+                                  }
+                                ),
                               // Content
                               modalContent,
                             ]
@@ -272,9 +300,9 @@ export const Modal = defineComponent({
                 )
               : null,
         }
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Modal
+export default Modal;

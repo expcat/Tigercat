@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   classNames,
   getTableWrapperClasses,
@@ -17,55 +17,57 @@ import {
   paginateData,
   calculatePagination,
   getRowKey,
-  type TableColumn,
   type TableProps as CoreTableProps,
   type SortState,
   type PaginationConfig,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
-export interface TableProps<T = Record<string, unknown>> extends CoreTableProps<T> {
+export interface TableProps<T = Record<string, unknown>>
+  extends CoreTableProps<T> {
   /**
    * Change event handler (for sort, filter, pagination changes)
    */
   onChange?: (params: {
-    sort: SortState
-    filters: Record<string, unknown>
-    pagination: { current: number; pageSize: number } | null
-  }) => void
+    sort: SortState;
+    filters: Record<string, unknown>;
+    pagination: { current: number; pageSize: number } | null;
+  }) => void;
 
   /**
    * Row click handler
    */
-  onRowClick?: (record: T, index: number) => void
+  onRowClick?: (record: T, index: number) => void;
 
   /**
    * Selection change handler
    */
-  onSelectionChange?: (selectedKeys: (string | number)[]) => void
+  onSelectionChange?: (selectedKeys: (string | number)[]) => void;
 
   /**
    * Sort change handler
    */
-  onSortChange?: (sort: SortState) => void
+  onSortChange?: (sort: SortState) => void;
 
   /**
    * Filter change handler
    */
-  onFilterChange?: (filters: Record<string, unknown>) => void
+  onFilterChange?: (filters: Record<string, unknown>) => void;
 
   /**
    * Page change handler
    */
-  onPageChange?: (page: { current: number; pageSize: number }) => void
+  onPageChange?: (page: { current: number; pageSize: number }) => void;
 
   /**
    * Additional CSS classes
    */
-  className?: string
+  className?: string;
 }
 
 // Sort icons
-const SortIcon: React.FC<{ direction: 'asc' | 'desc' | null }> = ({ direction }) => {
+const SortIcon: React.FC<{ direction: 'asc' | 'desc' | null }> = ({
+  direction,
+}) => {
   if (direction === 'asc') {
     return (
       <svg
@@ -73,11 +75,10 @@ const SortIcon: React.FC<{ direction: 'asc' | 'desc' | null }> = ({ direction })
         width="16"
         height="16"
         viewBox="0 0 16 16"
-        fill="currentColor"
-      >
+        fill="currentColor">
         <path d="M8 3l4 4H4l4-4z" />
       </svg>
-    )
+    );
   }
 
   if (direction === 'desc') {
@@ -87,11 +88,10 @@ const SortIcon: React.FC<{ direction: 'asc' | 'desc' | null }> = ({ direction })
         width="16"
         height="16"
         viewBox="0 0 16 16"
-        fill="currentColor"
-      >
+        fill="currentColor">
         <path d="M8 13l-4-4h8l-4 4z" />
       </svg>
-    )
+    );
   }
 
   return (
@@ -100,12 +100,11 @@ const SortIcon: React.FC<{ direction: 'asc' | 'desc' | null }> = ({ direction })
       width="16"
       height="16"
       viewBox="0 0 16 16"
-      fill="currentColor"
-    >
+      fill="currentColor">
       <path d="M8 3l4 4H4l4-4zM8 13l-4-4h8l-4 4z" />
     </svg>
-  )
-}
+  );
+};
 
 // Loading spinner
 const LoadingSpinner: React.FC = () => (
@@ -113,8 +112,7 @@ const LoadingSpinner: React.FC = () => (
     className="animate-spin h-8 w-8 text-[var(--tiger-primary,#2563eb)]"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
-    viewBox="0 0 24 24"
-  >
+    viewBox="0 0 24 24">
     <circle
       className="opacity-25"
       cx="12"
@@ -129,9 +127,11 @@ const LoadingSpinner: React.FC = () => (
       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
     />
   </svg>
-)
+);
 
-export function Table<T extends Record<string, unknown> = Record<string, unknown>>({
+export function Table<
+  T extends Record<string, unknown> = Record<string, unknown>
+>({
   columns,
   dataSource = [],
   size = 'md',
@@ -165,209 +165,256 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   const [sortState, setSortState] = useState<SortState>({
     key: null,
     direction: null,
-  })
+  });
 
-  const [filterState, setFilterState] = useState<Record<string, unknown>>({})
+  const [filterState, setFilterState] = useState<Record<string, unknown>>({});
 
   const [currentPage, setCurrentPage] = useState(
     pagination && typeof pagination === 'object' ? pagination.current || 1 : 1
-  )
+  );
 
   const [currentPageSize, setCurrentPageSize] = useState(
-    pagination && typeof pagination === 'object' ? pagination.pageSize || 10 : 10
-  )
+    pagination && typeof pagination === 'object'
+      ? pagination.pageSize || 10
+      : 10
+  );
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>(
     rowSelection?.selectedRowKeys || []
-  )
+  );
 
   // Process data with sorting, filtering, and pagination
   const processedData = useMemo(() => {
-    let data = [...dataSource]
+    let data = [...dataSource];
 
     // Apply filters
-    data = filterData(data, filterState)
+    data = filterData(data, filterState);
 
     // Apply sorting
     if (sortState.key && sortState.direction) {
-      const column = columns.find(col => col.key === sortState.key)
-      data = sortData(data, sortState.key, sortState.direction, column?.sortFn)
+      const column = columns.find((col) => col.key === sortState.key);
+      data = sortData(data, sortState.key, sortState.direction, column?.sortFn);
     }
 
-    return data
-  }, [dataSource, filterState, sortState, columns])
+    return data;
+  }, [dataSource, filterState, sortState, columns]);
 
   const paginatedData = useMemo(() => {
     if (pagination === false) {
-      return processedData
+      return processedData;
     }
 
-    return paginateData(processedData, currentPage, currentPageSize)
-  }, [processedData, currentPage, currentPageSize, pagination])
+    return paginateData(processedData, currentPage, currentPageSize);
+  }, [processedData, currentPage, currentPageSize, pagination]);
 
   const paginationInfo = useMemo(() => {
     if (pagination === false) {
-      return null
+      return null;
     }
 
-    const total = processedData.length
-    return calculatePagination(total, currentPage, currentPageSize)
-  }, [processedData.length, currentPage, currentPageSize, pagination])
+    const total = processedData.length;
+    return calculatePagination(total, currentPage, currentPageSize);
+  }, [processedData.length, currentPage, currentPageSize, pagination]);
 
-  const handleSort = useCallback((columnKey: string) => {
-    const column = columns.find(col => col.key === columnKey)
-    if (!column || !column.sortable) {
-      return
-    }
-
-    let newDirection: 'asc' | 'desc' | null = 'asc'
-
-    if (sortState.key === columnKey) {
-      if (sortState.direction === 'asc') {
-        newDirection = 'desc'
-      } else if (sortState.direction === 'desc') {
-        newDirection = null
+  const handleSort = useCallback(
+    (columnKey: string) => {
+      const column = columns.find((col) => col.key === columnKey);
+      if (!column || !column.sortable) {
+        return;
       }
-    }
 
-    const newSortState: SortState = {
-      key: newDirection ? columnKey : null,
-      direction: newDirection,
-    }
+      let newDirection: 'asc' | 'desc' | null = 'asc';
 
-    setSortState(newSortState)
-    onSortChange?.(newSortState)
-    onChange?.({
-      sort: newSortState,
-      filters: filterState,
-      pagination: pagination !== false ? {
-        current: currentPage,
-        pageSize: currentPageSize,
-      } : null,
-    })
-  }, [columns, sortState, filterState, currentPage, currentPageSize, pagination, onSortChange, onChange])
+      if (sortState.key === columnKey) {
+        if (sortState.direction === 'asc') {
+          newDirection = 'desc';
+        } else if (sortState.direction === 'desc') {
+          newDirection = null;
+        }
+      }
 
-  const handleFilter = useCallback((columnKey: string, value: unknown) => {
-    const newFilterState = {
-      ...filterState,
-      [columnKey]: value,
-    }
+      const newSortState: SortState = {
+        key: newDirection ? columnKey : null,
+        direction: newDirection,
+      };
 
-    setFilterState(newFilterState)
-    setCurrentPage(1) // Reset to first page when filtering
+      setSortState(newSortState);
+      onSortChange?.(newSortState);
+      onChange?.({
+        sort: newSortState,
+        filters: filterState,
+        pagination:
+          pagination !== false
+            ? {
+                current: currentPage,
+                pageSize: currentPageSize,
+              }
+            : null,
+      });
+    },
+    [
+      columns,
+      sortState,
+      filterState,
+      currentPage,
+      currentPageSize,
+      pagination,
+      onSortChange,
+      onChange,
+    ]
+  );
 
-    onFilterChange?.(newFilterState)
-    onChange?.({
-      sort: sortState,
-      filters: newFilterState,
-      pagination: pagination !== false ? {
-        current: 1,
-        pageSize: currentPageSize,
-      } : null,
-    })
-  }, [filterState, sortState, currentPageSize, pagination, onFilterChange, onChange])
+  const handleFilter = useCallback(
+    (columnKey: string, value: unknown) => {
+      const newFilterState = {
+        ...filterState,
+        [columnKey]: value,
+      };
 
-  const handlePageChange = useCallback((page: number) => {
-    setCurrentPage(page)
+      setFilterState(newFilterState);
+      setCurrentPage(1); // Reset to first page when filtering
 
-    onPageChange?.({ current: page, pageSize: currentPageSize })
-    onChange?.({
-      sort: sortState,
-      filters: filterState,
-      pagination: {
-        current: page,
-        pageSize: currentPageSize,
-      },
-    })
-  }, [currentPageSize, sortState, filterState, onPageChange, onChange])
+      onFilterChange?.(newFilterState);
+      onChange?.({
+        sort: sortState,
+        filters: newFilterState,
+        pagination:
+          pagination !== false
+            ? {
+                current: 1,
+                pageSize: currentPageSize,
+              }
+            : null,
+      });
+    },
+    [
+      filterState,
+      sortState,
+      currentPageSize,
+      pagination,
+      onFilterChange,
+      onChange,
+    ]
+  );
 
-  const handlePageSizeChange = useCallback((pageSize: number) => {
-    setCurrentPageSize(pageSize)
-    setCurrentPage(1)
+  const handlePageChange = useCallback(
+    (page: number) => {
+      setCurrentPage(page);
 
-    onPageChange?.({ current: 1, pageSize })
-    onChange?.({
-      sort: sortState,
-      filters: filterState,
-      pagination: {
-        current: 1,
-        pageSize,
-      },
-    })
-  }, [sortState, filterState, onPageChange, onChange])
+      onPageChange?.({ current: page, pageSize: currentPageSize });
+      onChange?.({
+        sort: sortState,
+        filters: filterState,
+        pagination: {
+          current: page,
+          pageSize: currentPageSize,
+        },
+      });
+    },
+    [currentPageSize, sortState, filterState, onPageChange, onChange]
+  );
 
-  const handleRowClick = useCallback((record: T, index: number) => {
-    onRowClick?.(record, index)
-  }, [onRowClick])
+  const handlePageSizeChange = useCallback(
+    (pageSize: number) => {
+      setCurrentPageSize(pageSize);
+      setCurrentPage(1);
 
-  const handleSelectRow = useCallback((key: string | number, checked: boolean) => {
-    let newKeys: (string | number)[]
+      onPageChange?.({ current: 1, pageSize });
+      onChange?.({
+        sort: sortState,
+        filters: filterState,
+        pagination: {
+          current: 1,
+          pageSize,
+        },
+      });
+    },
+    [sortState, filterState, onPageChange, onChange]
+  );
 
-    if (rowSelection?.type === 'radio') {
-      newKeys = checked ? [key] : []
-    } else {
-      if (checked) {
-        newKeys = [...selectedRowKeys, key]
+  const handleRowClick = useCallback(
+    (record: T, index: number) => {
+      onRowClick?.(record, index);
+    },
+    [onRowClick]
+  );
+
+  const handleSelectRow = useCallback(
+    (key: string | number, checked: boolean) => {
+      let newKeys: (string | number)[];
+
+      if (rowSelection?.type === 'radio') {
+        newKeys = checked ? [key] : [];
       } else {
-        newKeys = selectedRowKeys.filter(k => k !== key)
+        if (checked) {
+          newKeys = [...selectedRowKeys, key];
+        } else {
+          newKeys = selectedRowKeys.filter((k) => k !== key);
+        }
       }
-    }
 
-    setSelectedRowKeys(newKeys)
-    onSelectionChange?.(newKeys)
-  }, [rowSelection, selectedRowKeys, onSelectionChange])
+      setSelectedRowKeys(newKeys);
+      onSelectionChange?.(newKeys);
+    },
+    [rowSelection, selectedRowKeys, onSelectionChange]
+  );
 
-  const handleSelectAll = useCallback((checked: boolean) => {
-    if (checked) {
-      const newKeys = paginatedData.map((record, index) =>
-        getRowKey(record, rowKey, index)
-      )
-      setSelectedRowKeys(newKeys)
-      onSelectionChange?.(newKeys)
-    } else {
-      setSelectedRowKeys([])
-      onSelectionChange?.([])
-    }
-  }, [paginatedData, rowKey, onSelectionChange])
+  const handleSelectAll = useCallback(
+    (checked: boolean) => {
+      if (checked) {
+        const newKeys = paginatedData.map((record, index) =>
+          getRowKey(record, rowKey, index)
+        );
+        setSelectedRowKeys(newKeys);
+        onSelectionChange?.(newKeys);
+      } else {
+        setSelectedRowKeys([]);
+        onSelectionChange?.([]);
+      }
+    },
+    [paginatedData, rowKey, onSelectionChange]
+  );
 
   const allSelected = useMemo(() => {
     if (paginatedData.length === 0) {
-      return false
+      return false;
     }
 
     return paginatedData.every((record, index) => {
-      const key = getRowKey(record, rowKey, index)
-      return selectedRowKeys.includes(key)
-    })
-  }, [paginatedData, rowKey, selectedRowKeys])
+      const key = getRowKey(record, rowKey, index);
+      return selectedRowKeys.includes(key);
+    });
+  }, [paginatedData, rowKey, selectedRowKeys]);
 
   const someSelected = useMemo(() => {
-    return selectedRowKeys.length > 0 && !allSelected
-  }, [selectedRowKeys.length, allSelected])
+    return selectedRowKeys.length > 0 && !allSelected;
+  }, [selectedRowKeys.length, allSelected]);
 
   const renderTableHeader = useCallback(() => {
     return (
       <thead className={getTableHeaderClasses(stickyHeader)}>
         <tr>
           {/* Selection checkbox column */}
-          {rowSelection && rowSelection.showCheckbox !== false && rowSelection.type !== 'radio' && (
-            <th className={getCheckboxCellClasses(size)}>
-              <input
-                type="checkbox"
-                className="rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
-                checked={allSelected}
-                ref={(el) => {
-                  if (el) el.indeterminate = someSelected
-                }}
-                onChange={(e) => handleSelectAll(e.target.checked)}
-              />
-            </th>
-          )}
+          {rowSelection &&
+            rowSelection.showCheckbox !== false &&
+            rowSelection.type !== 'radio' && (
+              <th className={getCheckboxCellClasses(size)}>
+                <input
+                  type="checkbox"
+                  className="rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
+                  checked={allSelected}
+                  ref={(el) => {
+                    if (el) el.indeterminate = someSelected;
+                  }}
+                  onChange={(e) => handleSelectAll(e.target.checked)}
+                />
+              </th>
+            )}
 
           {/* Column headers */}
           {columns.map((column) => {
-            const isSorted = sortState.key === column.key
-            const sortDirection = isSorted ? sortState.direction : null
+            const isSorted = sortState.key === column.key;
+            const sortDirection = isSorted ? sortState.direction : null;
 
             return (
               <th
@@ -378,27 +425,39 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                   !!column.sortable,
                   column.headerClassName
                 )}
-                style={column.width ? {
-                  width: typeof column.width === 'number' ? `${column.width}px` : column.width
-                } : undefined}
-                onClick={column.sortable ? () => handleSort(column.key) : undefined}
-              >
+                style={
+                  column.width
+                    ? {
+                        width:
+                          typeof column.width === 'number'
+                            ? `${column.width}px`
+                            : column.width,
+                      }
+                    : undefined
+                }
+                onClick={
+                  column.sortable ? () => handleSort(column.key) : undefined
+                }>
                 <div className="flex items-center gap-2">
-                  {column.renderHeader ? (column.renderHeader() as React.ReactNode) : column.title}
+                  {column.renderHeader
+                    ? (column.renderHeader() as React.ReactNode)
+                    : column.title}
                   {column.sortable && <SortIcon direction={sortDirection} />}
                 </div>
 
                 {/* Filter input */}
                 {column.filter && (
                   <div className="mt-2">
-                    {column.filter.type === 'select' && column.filter.options ? (
+                    {column.filter.type === 'select' &&
+                    column.filter.options ? (
                       <select
                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                        onChange={(e) => handleFilter(column.key, e.target.value)}
-                        onClick={(e) => e.stopPropagation()}
-                      >
+                        onChange={(e) =>
+                          handleFilter(column.key, e.target.value)
+                        }
+                        onClick={(e) => e.stopPropagation()}>
                         <option value="">All</option>
-                        {column.filter.options.map(opt => (
+                        {column.filter.options.map((opt) => (
                           <option key={opt.value} value={opt.value}>
                             {opt.label}
                           </option>
@@ -409,23 +468,39 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                         type="text"
                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
                         placeholder={column.filter.placeholder || 'Filter...'}
-                        onInput={(e) => handleFilter(column.key, (e.target as HTMLInputElement).value)}
+                        onInput={(e) =>
+                          handleFilter(
+                            column.key,
+                            (e.target as HTMLInputElement).value
+                          )
+                        }
                         onClick={(e) => e.stopPropagation()}
                       />
                     )}
                   </div>
                 )}
               </th>
-            )
+            );
           })}
         </tr>
       </thead>
-    )
-  }, [columns, size, stickyHeader, sortState, rowSelection, allSelected, someSelected, handleSort, handleFilter, handleSelectAll])
+    );
+  }, [
+    columns,
+    size,
+    stickyHeader,
+    sortState,
+    rowSelection,
+    allSelected,
+    someSelected,
+    handleSort,
+    handleFilter,
+    handleSelectAll,
+  ]);
 
   const renderTableBody = useCallback(() => {
     if (loading) {
-      return null
+      return null;
     }
 
     if (paginatedData.length === 0) {
@@ -434,30 +509,34 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           <tr>
             <td
               colSpan={columns.length + (rowSelection ? 1 : 0)}
-              className={tableEmptyStateClasses}
-            >
+              className={tableEmptyStateClasses}>
               {emptyText}
             </td>
           </tr>
         </tbody>
-      )
+      );
     }
 
     return (
       <tbody>
         {paginatedData.map((record, index) => {
-          const key = getRowKey(record, rowKey, index)
-          const isSelected = selectedRowKeys.includes(key)
-          const rowClass = typeof rowClassName === 'function'
-            ? rowClassName(record, index)
-            : rowClassName
+          const key = getRowKey(record, rowKey, index);
+          const isSelected = selectedRowKeys.includes(key);
+          const rowClass =
+            typeof rowClassName === 'function'
+              ? rowClassName(record, index)
+              : rowClassName;
 
           return (
             <tr
               key={key}
-              className={getTableRowClasses(hoverable, striped, index % 2 === 0, rowClass)}
-              onClick={() => handleRowClick(record, index)}
-            >
+              className={getTableRowClasses(
+                hoverable,
+                striped,
+                index % 2 === 0,
+                rowClass
+              )}
+              onClick={() => handleRowClick(record, index)}>
               {/* Selection checkbox cell */}
               {rowSelection && rowSelection.showCheckbox !== false && (
                 <td className={getCheckboxCellClasses(size)}>
@@ -469,7 +548,9 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                         : 'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
                     }
                     checked={isSelected}
-                    disabled={rowSelection?.getCheckboxProps?.(record)?.disabled}
+                    disabled={
+                      rowSelection?.getCheckboxProps?.(record)?.disabled
+                    }
                     onChange={(e) => handleSelectRow(key, e.target.checked)}
                   />
                 </td>
@@ -477,23 +558,28 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
 
               {/* Data cells */}
               {columns.map((column) => {
-                const dataKey = column.dataKey || column.key
-                const cellValue = record[dataKey]
+                const dataKey = column.dataKey || column.key;
+                const cellValue = record[dataKey];
 
                 return (
                   <td
                     key={column.key}
-                    className={getTableCellClasses(size, column.align || 'left', column.className)}
-                  >
-                    {column.render ? (column.render(record, index) as React.ReactNode) : (cellValue as React.ReactNode)}
+                    className={getTableCellClasses(
+                      size,
+                      column.align || 'left',
+                      column.className
+                    )}>
+                    {column.render
+                      ? (column.render(record, index) as React.ReactNode)
+                      : (cellValue as React.ReactNode)}
                   </td>
-                )
+                );
               })}
             </tr>
-          )
+          );
         })}
       </tbody>
-    )
+    );
   }, [
     loading,
     paginatedData,
@@ -508,16 +594,17 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     size,
     handleRowClick,
     handleSelectRow,
-  ])
+  ]);
 
   const renderPagination = useCallback(() => {
     if (pagination === false || !paginationInfo) {
-      return null
+      return null;
     }
 
-    const { totalPages, startIndex, endIndex, hasNext, hasPrev } = paginationInfo
-    const total = processedData.length
-    const paginationConfig = pagination as PaginationConfig
+    const { totalPages, startIndex, endIndex, hasNext, hasPrev } =
+      paginationInfo;
+    const total = processedData.length;
+    const paginationConfig = pagination as PaginationConfig;
 
     return (
       <div className={tablePaginationContainerClasses}>
@@ -537,13 +624,14 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
             <select
               className="px-3 py-1 border border-gray-300 rounded text-sm"
               value={currentPageSize}
-              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-            >
-              {(paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map(size => (
-                <option key={size} value={size}>
-                  {size} / page
-                </option>
-              ))}
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}>
+              {(paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map(
+                (size) => (
+                  <option key={size} value={size}>
+                    {size} / page
+                  </option>
+                )
+              )}
             </select>
           )}
 
@@ -558,8 +646,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                   : 'text-gray-400 cursor-not-allowed'
               )}
               disabled={!hasPrev}
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
+              onClick={() => handlePageChange(currentPage - 1)}>
               Previous
             </button>
 
@@ -577,14 +664,13 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                   : 'text-gray-400 cursor-not-allowed'
               )}
               disabled={!hasNext}
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
+              onClick={() => handlePageChange(currentPage + 1)}>
               Next
             </button>
           </div>
         </div>
       </div>
-    )
+    );
   }, [
     pagination,
     paginationInfo,
@@ -593,21 +679,24 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     currentPageSize,
     handlePageChange,
     handlePageSizeChange,
-  ])
+  ]);
 
-  const wrapperStyle = useMemo(() => 
-    maxHeight
-      ? { maxHeight: typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight }
-      : undefined,
+  const wrapperStyle = useMemo(
+    () =>
+      maxHeight
+        ? {
+            maxHeight:
+              typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight,
+          }
+        : undefined,
     [maxHeight]
-  )
+  );
 
   return (
     <div className={classNames('relative', className)} {...props}>
       <div
         className={getTableWrapperClasses(bordered, maxHeight)}
-        style={wrapperStyle}
-      >
+        style={wrapperStyle}>
         <table className={tableBaseClasses}>
           {renderTableHeader()}
           {renderTableBody()}
@@ -624,5 +713,5 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       {/* Pagination */}
       {renderPagination()}
     </div>
-  )
+  );
 }

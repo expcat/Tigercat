@@ -1,0 +1,64 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Tooltip > Snapshots > should match snapshot for default state 1`] = `
+<div
+  class="tiger-tooltip relative inline-block"
+>
+  <div
+    class="tiger-tooltip-trigger"
+  >
+    <button>
+      Trigger
+    </button>
+  </div>
+  <div
+    class="tiger-dropdown-menu-wrapper absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 hidden"
+  >
+    <div
+      class="tiger-tooltip-content max-w-[300px] px-2 py-1 text-xs text-white bg-gray-900 dark:bg-gray-700 rounded shadow-md whitespace-nowrap"
+    />
+  </div>
+</div>
+`;
+
+exports[`Tooltip > Snapshots > should match snapshot for disabled state 1`] = `
+<div
+  class="tiger-tooltip relative inline-block"
+>
+  <div
+    class="tiger-tooltip-trigger"
+  >
+    <button>
+      Trigger
+    </button>
+  </div>
+  <div
+    class="tiger-dropdown-menu-wrapper absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 hidden"
+  >
+    <div
+      class="tiger-tooltip-content max-w-[300px] px-2 py-1 text-xs text-white bg-gray-900 dark:bg-gray-700 rounded shadow-md whitespace-nowrap"
+    />
+  </div>
+</div>
+`;
+
+exports[`Tooltip > Snapshots > should match snapshot for visible state 1`] = `
+<div
+  class="tiger-tooltip relative inline-block"
+>
+  <div
+    class="tiger-tooltip-trigger"
+  >
+    <button>
+      Trigger
+    </button>
+  </div>
+  <div
+    class="tiger-dropdown-menu-wrapper absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 hidden"
+  >
+    <div
+      class="tiger-tooltip-content max-w-[300px] px-2 py-1 text-xs text-white bg-gray-900 dark:bg-gray-700 rounded shadow-md whitespace-nowrap"
+    />
+  </div>
+</div>
+`;

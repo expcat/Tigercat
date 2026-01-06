@@ -2,33 +2,40 @@
  * Pagination utility functions
  */
 
-import type { PaginationSize, PaginationAlign } from '../types/pagination'
-import { classNames } from './class-names'
+import type { PaginationSize, PaginationAlign } from '../types/pagination';
+import { classNames } from './class-names';
 
 /**
  * Calculate total number of pages
  */
 export function getTotalPages(total: number, pageSize: number): number {
-  if (pageSize <= 0) return 0
-  return Math.ceil(total / pageSize)
+  if (pageSize <= 0) return 0;
+  return Math.ceil(total / pageSize);
 }
 
 /**
  * Calculate the range of items shown on current page
  */
-export function getPageRange(current: number, pageSize: number, total: number): [number, number] {
-  const start = (current - 1) * pageSize + 1
-  const end = Math.min(current * pageSize, total)
-  return [start, end]
+export function getPageRange(
+  current: number,
+  pageSize: number,
+  total: number
+): [number, number] {
+  const start = (current - 1) * pageSize + 1;
+  const end = Math.min(current * pageSize, total);
+  return [start, end];
 }
 
 /**
  * Validate and adjust current page number
  */
-export function validateCurrentPage(current: number, totalPages: number): number {
-  if (current < 1) return 1
-  if (current > totalPages && totalPages > 0) return totalPages
-  return current
+export function validateCurrentPage(
+  current: number,
+  totalPages: number
+): number {
+  if (current < 1) return 1;
+  if (current > totalPages && totalPages > 0) return totalPages;
+  return current;
 }
 
 /**
@@ -43,47 +50,50 @@ export function getPageNumbers(
   totalPages: number,
   showLessItems: boolean = false
 ): (number | string)[] {
-  if (totalPages <= 0) return []
+  if (totalPages <= 0) return [];
 
   // Show fewer page numbers in less items mode
-  const pageRange = showLessItems ? 1 : 2
-  const pages: (number | string)[] = []
+  const pageRange = showLessItems ? 1 : 2;
+  const pages: (number | string)[] = [];
 
   // Always show first page
-  pages.push(1)
+  pages.push(1);
 
   // Calculate range around current page
-  const rangeStart = Math.max(2, current - pageRange)
-  const rangeEnd = Math.min(totalPages - 1, current + pageRange)
+  const rangeStart = Math.max(2, current - pageRange);
+  const rangeEnd = Math.min(totalPages - 1, current + pageRange);
 
   // Add ellipsis before range if needed
   if (rangeStart > 2) {
-    pages.push('...')
+    pages.push('...');
   }
 
   // Add pages in range
   for (let i = rangeStart; i <= rangeEnd; i++) {
-    pages.push(i)
+    pages.push(i);
   }
 
   // Add ellipsis after range if needed
   if (rangeEnd < totalPages - 1) {
-    pages.push('...')
+    pages.push('...');
   }
 
   // Always show last page if there's more than one page
   if (totalPages > 1) {
-    pages.push(totalPages)
+    pages.push(totalPages);
   }
 
-  return pages
+  return pages;
 }
 
 /**
  * Default total text function
  */
-export function defaultTotalText(total: number, range: [number, number]): string {
-  return `共 ${total} 条`
+export function defaultTotalText(
+  total: number,
+  _range: [number, number]
+): string {
+  return `共 ${total} 条`;
 }
 
 /**
@@ -97,24 +107,22 @@ export function getPaginationContainerClasses(
     left: 'justify-start',
     center: 'justify-center',
     right: 'justify-end',
-  }
+  };
 
-  return classNames(
-    'flex items-center gap-1',
-    alignClasses[align],
-    className
-  )
+  return classNames('flex items-center gap-1', alignClasses[align], className);
 }
 
 /**
  * Get base button classes for pagination buttons
  */
-export function getPaginationButtonBaseClasses(size: PaginationSize = 'medium'): string {
+export function getPaginationButtonBaseClasses(
+  size: PaginationSize = 'medium'
+): string {
   const sizeClasses = {
     small: 'min-w-7 h-7 text-sm px-2',
     medium: 'min-w-8 h-8 text-base px-2.5',
     large: 'min-w-10 h-10 text-lg px-3',
-  }
+  };
 
   return classNames(
     'inline-flex items-center justify-center',
@@ -125,7 +133,7 @@ export function getPaginationButtonBaseClasses(size: PaginationSize = 'medium'):
     'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-opacity-50',
     'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-gray-300 disabled:hover:text-gray-700',
     sizeClasses[size]
-  )
+  );
 }
 
 /**
@@ -137,35 +145,39 @@ export function getPaginationButtonActiveClasses(): string {
     'bg-[var(--tiger-primary,#2563eb)]',
     'text-white',
     'hover:border-[var(--tiger-primary-hover,#1d4ed8)] hover:bg-[var(--tiger-primary-hover,#1d4ed8)] hover:text-white'
-  )
+  );
 }
 
 /**
  * Get ellipsis classes
  */
-export function getPaginationEllipsisClasses(size: PaginationSize = 'medium'): string {
+export function getPaginationEllipsisClasses(
+  size: PaginationSize = 'medium'
+): string {
   const sizeClasses = {
     small: 'min-w-7 h-7 text-sm',
     medium: 'min-w-8 h-8 text-base',
     large: 'min-w-10 h-10 text-lg',
-  }
+  };
 
   return classNames(
     'inline-flex items-center justify-center',
     'text-gray-500 cursor-default',
     sizeClasses[size]
-  )
+  );
 }
 
 /**
  * Get quick jumper input classes
  */
-export function getQuickJumperInputClasses(size: PaginationSize = 'medium'): string {
+export function getQuickJumperInputClasses(
+  size: PaginationSize = 'medium'
+): string {
   const sizeClasses = {
     small: 'w-12 h-7 text-sm',
     medium: 'w-14 h-8 text-base',
     large: 'w-16 h-10 text-lg',
-  }
+  };
 
   return classNames(
     'inline-block',
@@ -177,18 +189,20 @@ export function getQuickJumperInputClasses(size: PaginationSize = 'medium'): str
     'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-opacity-50',
     'disabled:cursor-not-allowed disabled:opacity-50',
     sizeClasses[size]
-  )
+  );
 }
 
 /**
  * Get page size selector classes
  */
-export function getPageSizeSelectorClasses(size: PaginationSize = 'medium'): string {
+export function getPageSizeSelectorClasses(
+  size: PaginationSize = 'medium'
+): string {
   const sizeClasses = {
     small: 'h-7 text-sm',
     medium: 'h-8 text-base',
     large: 'h-10 text-lg',
-  }
+  };
 
   return classNames(
     'inline-block',
@@ -200,7 +214,7 @@ export function getPageSizeSelectorClasses(size: PaginationSize = 'medium'): str
     'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-opacity-50',
     'disabled:cursor-not-allowed disabled:opacity-50',
     sizeClasses[size]
-  )
+  );
 }
 
 /**
@@ -211,11 +225,7 @@ export function getTotalTextClasses(size: PaginationSize = 'medium'): string {
     small: 'text-sm',
     medium: 'text-base',
     large: 'text-lg',
-  }
+  };
 
-  return classNames(
-    'text-gray-600',
-    'mr-2',
-    sizeClasses[size]
-  )
+  return classNames('text-gray-600', 'mr-2', sizeClasses[size]);
 }

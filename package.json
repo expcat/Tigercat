@@ -44,7 +44,6 @@
     "@testing-library/vue": "^8.1.0",
     "@types/node": "^25.0.3",
     "@types/react-dom": "^19.2.3",
-    "@types/react-dom": "^19.2.2",
     "@types/react-test-renderer": "^19.1.0",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",

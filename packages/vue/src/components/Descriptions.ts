@@ -1,4 +1,11 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import {
+  defineComponent,
+  computed,
+  h,
+  PropType,
+  type VNode,
+  type VNodeArrayChildren,
+} from 'vue';
 import {
   classNames,
   getDescriptionsClasses,
@@ -15,7 +22,15 @@ import {
   type DescriptionsSize,
   type DescriptionsLayout,
   type DescriptionsItem,
-} from '@tigercat/core'
+} from '@tigercat/core';
+
+type RawChildren =
+  | string
+  | number
+  | boolean
+  | VNode
+  | VNodeArrayChildren
+  | (() => unknown);
 
 export const Descriptions = defineComponent({
   name: 'TigerDescriptions',
@@ -92,99 +107,124 @@ export const Descriptions = defineComponent({
   },
   setup(props, { slots }) {
     const descriptionsClasses = computed(() => {
-      return getDescriptionsClasses(props.bordered, props.size)
-    })
+      return getDescriptionsClasses(props.bordered, props.size);
+    });
 
     const tableClasses = computed(() => {
-      return getDescriptionsTableClasses(props.bordered)
-    })
+      return getDescriptionsTableClasses(props.bordered);
+    });
 
     // Render header section
     function renderHeader() {
       if (!props.title && !slots.title && !slots.extra) {
-        return null
+        return null;
       }
 
       return h('div', { class: descriptionsHeaderClasses }, [
-        h('div', { class: descriptionsTitleClasses }, slots.title?.() || props.title),
-        slots.extra && h('div', { class: descriptionsExtraClasses }, slots.extra()),
-      ])
+        h(
+          'div',
+          { class: descriptionsTitleClasses },
+          slots.title?.() || props.title
+        ),
+        slots.extra &&
+          h('div', { class: descriptionsExtraClasses }, slots.extra()),
+      ]);
     }
 
     // Render horizontal layout (table-based)
     function renderHorizontalLayout() {
-      const items = props.items
+      const items = props.items;
       if (items.length === 0 && !slots.default) {
-        return null
+        return null;
       }
 
       // Group items into rows
-      const rows = groupItemsIntoRows(items, props.column)
+      const rows = groupItemsIntoRows(items, props.column);
 
       return h('table', { class: tableClasses.value }, [
-        h('tbody', {}, rows.map(row => renderRow(row))),
-      ])
+        h(
+          'tbody',
+          {},
+          rows.map((row) => renderRow(row))
+        ),
+      ]);
     }
 
     // Render a single row in horizontal layout
     function renderRow(rowItems: DescriptionsItem[]) {
-      const cells: any[] = []
+      const cells: VNode[] = [];
 
-      rowItems.forEach(item => {
-        const span = Math.min(item.span || 1, props.column)
+      rowItems.forEach((item) => {
+        const span = Math.min(item.span || 1, props.column);
         const labelClass = classNames(
           getDescriptionsLabelClasses(props.bordered, props.size, props.layout),
           item.labelClassName
-        )
+        );
         const contentClass = classNames(
-          getDescriptionsContentClasses(props.bordered, props.size, props.layout),
+          getDescriptionsContentClasses(
+            props.bordered,
+            props.size,
+            props.layout
+          ),
           item.contentClassName
-        )
+        );
 
         // Label cell
         cells.push(
-          h('th', {
-            class: labelClass,
-            style: props.labelStyle,
-          }, [
-            item.label,
-            props.colon && props.layout === 'horizontal' ? ':' : '',
-          ])
-        )
+          h(
+            'th',
+            {
+              class: labelClass,
+              style: props.labelStyle,
+            },
+            [
+              item.label,
+              props.colon && props.layout === 'horizontal' ? ':' : '',
+            ]
+          )
+        );
 
         // Content cell
         cells.push(
-          h('td', {
-            class: contentClass,
-            style: props.contentStyle,
-            colspan: span > 1 ? span * 2 - 1 : 1,
-          }, item.content as any)
-        )
-      })
+          h(
+            'td',
+            {
+              class: contentClass,
+              style: props.contentStyle,
+              colspan: span > 1 ? span * 2 - 1 : 1,
+            },
+            (item.content ?? undefined) as unknown as RawChildren
+          )
+        );
+      });
 
-      return h('tr', {}, cells)
+      return h('tr', {}, cells);
     }
 
     // Render vertical layout (stacked)
     function renderVerticalLayout() {
-      const items = props.items
+      const items = props.items;
       if (items.length === 0 && !slots.default) {
-        return null
+        return null;
       }
 
       if (props.bordered) {
         // Use table for bordered vertical layout
         return h('table', { class: tableClasses.value }, [
-          h('tbody', {},
-            items.map(item => renderVerticalItem(item))
+          h(
+            'tbody',
+            {},
+            items.map((item) => renderVerticalItem(item))
           ),
-        ])
+        ]);
       }
 
       // Use simple div layout for non-bordered vertical
-      return h('div', { class: descriptionsVerticalWrapperClasses },
-        items.map(item => renderVerticalItem(item))
-      )
+      return h(
+        'div',
+        { class: descriptionsVerticalWrapperClasses },
+        items.map((item) => renderVerticalItem(item))
+      );
     }
 
     // Render a single item in vertical layout
@@ -192,56 +232,78 @@ export const Descriptions = defineComponent({
       const labelClass = classNames(
         getDescriptionsLabelClasses(props.bordered, props.size, props.layout),
         item.labelClassName
-      )
+      );
       const contentClass = classNames(
         getDescriptionsContentClasses(props.bordered, props.size, props.layout),
         item.contentClassName
-      )
+      );
 
       if (props.bordered) {
         // Table row for bordered layout
         return h('tr', {}, [
-          h('th', {
-            class: labelClass,
-            style: props.labelStyle,
-          }, [
-            item.label,
-            props.colon ? ':' : '',
-          ]),
-          h('td', {
-            class: contentClass,
-            style: props.contentStyle,
-          }, item.content as any),
-        ])
+          h(
+            'th',
+            {
+              class: labelClass,
+              style: props.labelStyle,
+            },
+            [item.label, props.colon ? ':' : '']
+          ),
+          h(
+            'td',
+            {
+              class: contentClass,
+              style: props.contentStyle,
+            },
+            (item.content ?? undefined) as unknown as RawChildren
+          ),
+        ]);
       }
 
       // Simple div for non-bordered layout
-      const itemClasses = getDescriptionsVerticalItemClasses(props.bordered, props.size)
+      const itemClasses = getDescriptionsVerticalItemClasses(
+        props.bordered,
+        props.size
+      );
       return h('div', { class: itemClasses }, [
-        h('div', {
-          class: labelClass,
-          style: props.labelStyle,
-        }, [
-          item.label,
-          props.colon ? ':' : '',
-        ]),
-        h('div', {
-          class: contentClass,
-          style: props.contentStyle,
-        }, item.content as any),
-      ])
+        h(
+          'div',
+          {
+            class: labelClass,
+            style: props.labelStyle,
+          },
+          [item.label, props.colon ? ':' : '']
+        ),
+        h(
+          'div',
+          {
+            class: contentClass,
+            style: props.contentStyle,
+          },
+          (item.content ?? undefined) as unknown as RawChildren
+        ),
+      ]);
     }
 
     return () => {
-      return h('div', { class: classNames(descriptionsWrapperClasses, descriptionsClasses.value) }, [
-        renderHeader(),
-        props.layout === 'horizontal'
-          ? renderHorizontalLayout()
-          : renderVerticalLayout(),
-        slots.default?.(),
-      ])
-    }
+      return h(
+        'div',
+        {
+          class: classNames(
+            descriptionsWrapperClasses,
+            descriptionsClasses.value
+          ),
+        },
+        [
+          renderHeader(),
+          props.layout === 'horizontal'
+            ? renderHorizontalLayout()
+            : renderVerticalLayout(),
+          slots.default?.(),
+        ]
+      );
+    };
   },
-})
+});
 
-export default Descriptions
+export default Descriptions;

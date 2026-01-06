@@ -1,5 +1,5 @@
-import { defineComponent, computed, h, PropType } from 'vue'
-import { 
+import { defineComponent, computed, h, PropType } from 'vue';
+import {
   classNames,
   getProgressVariantClasses,
   getProgressTextColorClasses,
@@ -22,7 +22,7 @@ import {
   type ProgressSize,
   type ProgressType,
   type ProgressStatus,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 export const Progress = defineComponent({
   name: 'TigerProgress',
@@ -130,155 +130,190 @@ export const Progress = defineComponent({
     },
   },
   setup(props) {
-    const clampedPercentage = computed(() => clampPercentage(props.percentage))
-    
+    const clampedPercentage = computed(() => clampPercentage(props.percentage));
+
     // Determine effective variant based on status
     const effectiveVariant = computed(() => {
-      const statusVariant = getStatusVariant(props.status)
-      return statusVariant || props.variant
-    })
-    
+      const statusVariant = getStatusVariant(props.status);
+      return statusVariant || props.variant;
+    });
+
     // Determine if text should be shown
     const shouldShowText = computed(() => {
       if (props.showText !== undefined) {
-        return props.showText
+        return props.showText;
       }
-      return props.type === 'line'
-    })
-    
+      return props.type === 'line';
+    });
+
     // Get formatted text
     const displayText = computed(() => {
       if (!shouldShowText.value) {
-        return ''
+        return '';
       }
-      return formatProgressText(clampedPercentage.value, props.text, props.format)
-    })
-    
+      return formatProgressText(
+        clampedPercentage.value,
+        props.text,
+        props.format
+      );
+    });
+
     // Line progress classes
     const lineTrackClasses = computed(() => {
-      const heightClass = props.height 
+      const heightClass = props.height
         ? `h-[${props.height}px]`
-        : progressLineSizeClasses[props.size]
-      
+        : progressLineSizeClasses[props.size];
+
       return classNames(
         progressLineBaseClasses,
         progressTrackBgClasses,
         heightClass
-      )
-    })
-    
+      );
+    });
+
     const lineBarClasses = computed(() => {
       return classNames(
         progressLineInnerClasses,
         getProgressVariantClasses(effectiveVariant.value as ProgressVariant),
         props.striped && progressStripedClasses,
-        props.striped && props.stripedAnimation && progressStripedAnimationClasses
-      )
-    })
-    
+        props.striped &&
+          props.stripedAnimation &&
+          progressStripedAnimationClasses
+      );
+    });
+
     const textClasses = computed(() => {
       return classNames(
         progressTextBaseClasses,
         progressTextSizeClasses[props.size],
         getProgressTextColorClasses(effectiveVariant.value as ProgressVariant)
-      )
-    })
-    
+      );
+    });
+
     // Render line progress
     const renderLineProgress = () => {
-      const containerStyle = props.width !== 'auto'
-        ? { width: typeof props.width === 'number' ? `${props.width}px` : props.width }
-        : {}
-      
-      return h('div', { class: 'flex items-center', style: containerStyle }, [
-        h('div', { class: lineTrackClasses.value, style: { flex: 1 } }, [
-          h('div', {
-            class: lineBarClasses.value,
-            style: { width: `${clampedPercentage.value}%` },
-            role: 'progressbar',
-            'aria-label': `Progress: ${clampedPercentage.value}%`,
-            'aria-valuenow': clampedPercentage.value,
-            'aria-valuemin': 0,
-            'aria-valuemax': 100,
-          })
-        ]),
-        shouldShowText.value
-          ? h('span', { class: textClasses.value }, displayText.value)
-          : undefined
-      ].filter(Boolean))
-    }
-    
+      const containerStyle =
+        props.width !== 'auto'
+          ? {
+              width:
+                typeof props.width === 'number'
+                  ? `${props.width}px`
+                  : props.width,
+            }
+          : {};
+
+      return h(
+        'div',
+        { class: 'flex items-center', style: containerStyle },
+        [
+          h('div', { class: lineTrackClasses.value, style: { flex: 1 } }, [
+            h('div', {
+              class: lineBarClasses.value,
+              style: { width: `${clampedPercentage.value}%` },
+              role: 'progressbar',
+              'aria-label': `Progress: ${clampedPercentage.value}%`,
+              'aria-valuenow': clampedPercentage.value,
+              'aria-valuemin': 0,
+              'aria-valuemax': 100,
+            }),
+          ]),
+          shouldShowText.value
+            ? h('span', { class: textClasses.value }, displayText.value)
+            : undefined,
+        ].filter(Boolean)
+      );
+    };
+
     // Render circle progress
     const renderCircleProgress = () => {
-      const { width, height, radius, cx, cy } = getCircleSize(props.size, props.strokeWidth)
-      const { circumference, strokeDasharray, strokeDashoffset } = calculateCirclePath(
+      const { width, height, radius, cx, cy } = getCircleSize(
+        props.size,
+        props.strokeWidth
+      );
+      const { strokeDasharray, strokeDashoffset } = calculateCirclePath(
         radius,
         props.strokeWidth,
         clampedPercentage.value
-      )
-      
-      return h('div', { 
-        class: progressCircleBaseClasses,
-        style: { width: `${width}px`, height: `${height}px` }
-      }, [
-        h('svg', {
-          width,
-          height,
-          viewBox: `0 0 ${width} ${height}`,
-        }, [
-          // Background circle
-          h('circle', {
-            cx,
-            cy,
-            r: radius,
-            fill: 'none',
-            stroke: '#e5e7eb',
-            'stroke-width': props.strokeWidth,
-          }),
-          // Progress circle
-          h('circle', {
-            cx,
-            cy,
-            r: radius,
-            fill: 'none',
-            stroke: 'currentColor',
-            class: getProgressVariantClasses(effectiveVariant.value as ProgressVariant).replace('bg-', 'text-'),
-            'stroke-width': props.strokeWidth,
-            'stroke-linecap': 'round',
-            'stroke-dasharray': strokeDasharray,
-            'stroke-dashoffset': strokeDashoffset,
-            style: {
-              transition: 'stroke-dashoffset 0.3s ease',
-              transform: 'rotate(-90deg)',
-              transformOrigin: 'center',
+      );
+
+      return h(
+        'div',
+        {
+          class: progressCircleBaseClasses,
+          style: { width: `${width}px`, height: `${height}px` },
+        },
+        [
+          h(
+            'svg',
+            {
+              width,
+              height,
+              viewBox: `0 0 ${width} ${height}`,
             },
-            role: 'progressbar',
-            'aria-label': `Progress: ${clampedPercentage.value}%`,
-            'aria-valuenow': clampedPercentage.value,
-            'aria-valuemin': 0,
-            'aria-valuemax': 100,
-          })
-        ]),
-        shouldShowText.value
-          ? h('div', { 
-              class: classNames(
-                progressCircleTextClasses,
-                progressTextSizeClasses[props.size],
-                'font-medium',
-                getProgressTextColorClasses(effectiveVariant.value as ProgressVariant)
+            [
+              // Background circle
+              h('circle', {
+                cx,
+                cy,
+                r: radius,
+                fill: 'none',
+                stroke: '#e5e7eb',
+                'stroke-width': props.strokeWidth,
+              }),
+              // Progress circle
+              h('circle', {
+                cx,
+                cy,
+                r: radius,
+                fill: 'none',
+                stroke: 'currentColor',
+                class: getProgressVariantClasses(
+                  effectiveVariant.value as ProgressVariant
+                ).replace('bg-', 'text-'),
+                'stroke-width': props.strokeWidth,
+                'stroke-linecap': 'round',
+                'stroke-dasharray': strokeDasharray,
+                'stroke-dashoffset': strokeDashoffset,
+                style: {
+                  transition: 'stroke-dashoffset 0.3s ease',
+                  transform: 'rotate(-90deg)',
+                  transformOrigin: 'center',
+                },
+                role: 'progressbar',
+                'aria-label': `Progress: ${clampedPercentage.value}%`,
+                'aria-valuenow': clampedPercentage.value,
+                'aria-valuemin': 0,
+                'aria-valuemax': 100,
+              }),
+            ]
+          ),
+          shouldShowText.value
+            ? h(
+                'div',
+                {
+                  class: classNames(
+                    progressCircleTextClasses,
+                    progressTextSizeClasses[props.size],
+                    'font-medium',
+                    getProgressTextColorClasses(
+                      effectiveVariant.value as ProgressVariant
+                    )
+                  ),
+                },
+                displayText.value
               )
-            }, displayText.value)
-          : undefined
-      ].filter(Boolean))
-    }
-    
+            : undefined,
+        ].filter(Boolean)
+      );
+    };
+
     return () => {
       if (props.type === 'circle') {
-        return renderCircleProgress()
+        return renderCircleProgress();
       }
-      return renderLineProgress()
-    }
+      return renderLineProgress();
+    };
   },
-})
+});
 
-export default Progress
+export default Progress;

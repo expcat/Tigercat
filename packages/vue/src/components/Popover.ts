@@ -1,12 +1,12 @@
-import { 
-  defineComponent, 
-  computed, 
-  ref, 
+import {
+  defineComponent,
+  computed,
+  ref,
   h,
   onBeforeUnmount,
   watch,
   PropType,
-} from 'vue'
+} from 'vue';
 import {
   classNames,
   getPopoverContainerClasses,
@@ -17,7 +17,7 @@ import {
   getDropdownMenuWrapperClasses,
   type PopoverTrigger,
   type DropdownPlacement,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 export const Popover = defineComponent({
   name: 'TigerPopover',
@@ -94,138 +94,140 @@ export const Popover = defineComponent({
   emits: ['update:visible', 'visible-change'],
   setup(props, { slots, emit }) {
     // Internal state for uncontrolled mode
-    const internalVisible = ref(props.defaultVisible)
+    const internalVisible = ref(props.defaultVisible);
 
     // Computed visible state (controlled or uncontrolled)
     const currentVisible = computed(() => {
-      return props.visible !== undefined ? props.visible : internalVisible.value
-    })
+      return props.visible !== undefined
+        ? props.visible
+        : internalVisible.value;
+    });
 
     // Ref to the container element
-    const containerRef = ref<HTMLElement | null>(null)
-    
+    const containerRef = ref<HTMLElement | null>(null);
+
     // Ref to the trigger element
-    const triggerRef = ref<HTMLElement | null>(null)
+    const triggerRef = ref<HTMLElement | null>(null);
 
     // Handle visibility change
     const setVisible = (visible: boolean) => {
-      if (props.disabled) return
+      if (props.disabled) return;
 
       // Update internal state if uncontrolled
       if (props.visible === undefined) {
-        internalVisible.value = visible
+        internalVisible.value = visible;
       }
 
       // Emit events
-      emit('update:visible', visible)
-      emit('visible-change', visible)
-    }
+      emit('update:visible', visible);
+      emit('visible-change', visible);
+    };
 
     // Handle trigger click
     const handleTriggerClick = () => {
-      if (props.disabled || props.trigger !== 'click') return
-      setVisible(!currentVisible.value)
-    }
+      if (props.disabled || props.trigger !== 'click') return;
+      setVisible(!currentVisible.value);
+    };
 
     // Handle trigger mouse enter
     const handleTriggerMouseEnter = () => {
-      if (props.disabled || props.trigger !== 'hover') return
-      setVisible(true)
-    }
+      if (props.disabled || props.trigger !== 'hover') return;
+      setVisible(true);
+    };
 
     // Handle trigger mouse leave
     const handleTriggerMouseLeave = () => {
-      if (props.disabled || props.trigger !== 'hover') return
-      setVisible(false)
-    }
+      if (props.disabled || props.trigger !== 'hover') return;
+      setVisible(false);
+    };
 
     // Handle trigger focus
     const handleTriggerFocus = () => {
-      if (props.disabled || props.trigger !== 'focus') return
-      setVisible(true)
-    }
+      if (props.disabled || props.trigger !== 'focus') return;
+      setVisible(true);
+    };
 
     // Handle trigger blur
     const handleTriggerBlur = () => {
-      if (props.disabled || props.trigger !== 'focus') return
-      setVisible(false)
-    }
+      if (props.disabled || props.trigger !== 'focus') return;
+      setVisible(false);
+    };
 
     // Handle outside click to close popover (only for click trigger)
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement
-      
+      const target = event.target as HTMLElement;
+
       if (containerRef.value && !containerRef.value.contains(target)) {
-        setVisible(false)
+        setVisible(false);
       }
-    }
+    };
 
     // Setup and cleanup event listeners based on visibility and trigger
     watch([currentVisible, () => props.trigger], ([visible, trigger]) => {
       if (visible && trigger === 'click') {
         // Use setTimeout to avoid immediate triggering on the same click that opened it
         setTimeout(() => {
-          document.addEventListener('click', handleClickOutside)
-        }, 0)
+          document.addEventListener('click', handleClickOutside);
+        }, 0);
       } else {
-        document.removeEventListener('click', handleClickOutside)
+        document.removeEventListener('click', handleClickOutside);
       }
-    })
+    });
 
     onBeforeUnmount(() => {
-      document.removeEventListener('click', handleClickOutside)
-    })
+      document.removeEventListener('click', handleClickOutside);
+    });
 
     // Container classes
     const containerClasses = computed(() => {
-      return classNames(
-        getPopoverContainerClasses(),
-        props.className
-      )
-    })
+      return classNames(getPopoverContainerClasses(), props.className);
+    });
 
     // Trigger classes
     const triggerClasses = computed(() => {
-      return getPopoverTriggerClasses(props.disabled)
-    })
+      return getPopoverTriggerClasses(props.disabled);
+    });
 
     // Content wrapper classes
     const contentWrapperClasses = computed(() => {
-      return getDropdownMenuWrapperClasses(currentVisible.value, props.placement)
-    })
+      return getDropdownMenuWrapperClasses(
+        currentVisible.value,
+        props.placement
+      );
+    });
 
     // Content classes
     const contentClasses = computed(() => {
-      return getPopoverContentClasses(props.width)
-    })
+      return getPopoverContentClasses(props.width);
+    });
 
     // Title classes
     const titleClasses = computed(() => {
-      return getPopoverTitleClasses()
-    })
+      return getPopoverTitleClasses();
+    });
 
     // Content text classes
     const contentTextClasses = computed(() => {
-      return getPopoverContentTextClasses()
-    })
+      return getPopoverContentTextClasses();
+    });
 
     return () => {
-      const defaultSlot = slots.default?.()
+      const defaultSlot = slots.default?.();
       if (!defaultSlot || defaultSlot.length === 0) {
-        return null
+        return null;
       }
 
       // Build trigger event handlers
-      const triggerHandlers: Record<string, any> = {}
-      
+      const triggerHandlers: Record<string, unknown> = {};
+
       if (props.trigger === 'click') {
-        triggerHandlers.onClick = handleTriggerClick
+        triggerHandlers.onClick = handleTriggerClick;
       } else if (props.trigger === 'hover') {
-        triggerHandlers.onMouseenter = handleTriggerMouseEnter
-        triggerHandlers.onMouseleave = handleTriggerMouseLeave
+        triggerHandlers.onMouseenter = handleTriggerMouseEnter;
+        triggerHandlers.onMouseleave = handleTriggerMouseLeave;
       } else if (props.trigger === 'focus') {
-        triggerHandlers.onFocus = handleTriggerFocus
-        triggerHandlers.onBlur = handleTriggerBlur
+        triggerHandlers.onFocus = handleTriggerFocus;
+        triggerHandlers.onBlur = handleTriggerBlur;
       }
 
       // Trigger element
@@ -237,7 +239,7 @@ export const Popover = defineComponent({
           ...triggerHandlers,
         },
         defaultSlot
-      )
+      );
 
       // Popover content
       const content = h(
@@ -273,7 +275,7 @@ export const Popover = defineComponent({
             ].filter(Boolean)
           ),
         ]
-      )
+      );
 
       return h(
         'div',
@@ -282,9 +284,9 @@ export const Popover = defineComponent({
           class: containerClasses.value,
         },
         [trigger, content]
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Popover
+export default Popover;

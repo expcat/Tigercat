@@ -39,6 +39,12 @@ check_version() {
     fi
 }
 
+# Extract major version from a semver/range string (e.g. "^19.2.3" -> "19")
+extract_major() {
+    local version_range=$1
+    echo "$version_range" | sed -E 's/[^0-9]*([0-9]+).*/\1/'
+}
+
 # Track overall status
 has_errors=0
 
@@ -77,6 +83,46 @@ else
     echo -e "${YELLOW}⚠${NC} Dependencies are not installed"
     echo -e "${YELLOW}ℹ${NC} Run: pnpm install"
     has_errors=1
+fi
+echo ""
+
+# Check framework versions (React / Vue)
+echo "Checking framework versions..."
+if [ -d "node_modules" ]; then
+    REACT_REQUIRED=$(node -e "const p=require('./package.json'); process.stdout.write(p.devDependencies?.react ?? '')" 2>/dev/null)
+    VUE_REQUIRED=$(node -e "const p=require('./package.json'); process.stdout.write(p.devDependencies?.vue ?? '')" 2>/dev/null)
+
+    if node -e "require.resolve('react/package.json')" &> /dev/null; then
+        REACT_VERSION=$(node -e "process.stdout.write(require('react/package.json').version)" 2>/dev/null)
+        REACT_REQUIRED_MAJOR=$(extract_major "$REACT_REQUIRED")
+        if ! check_version "react" "$REACT_VERSION" "${REACT_REQUIRED_MAJOR}.0.0"; then
+            echo -e "${YELLOW}ℹ${NC} Declared range: ${REACT_REQUIRED}"
+            has_errors=1
+        else
+            echo -e "${YELLOW}ℹ${NC} Declared range: ${REACT_REQUIRED}"
+        fi
+    else
+        echo -e "${RED}✗${NC} react is not installed"
+        echo -e "${YELLOW}ℹ${NC} Declared range: ${REACT_REQUIRED}"
+        has_errors=1
+    fi
+
+    if node -e "require.resolve('vue/package.json')" &> /dev/null; then
+        VUE_VERSION=$(node -e "process.stdout.write(require('vue/package.json').version)" 2>/dev/null)
+        VUE_REQUIRED_MAJOR=$(extract_major "$VUE_REQUIRED")
+        if ! check_version "vue" "$VUE_VERSION" "${VUE_REQUIRED_MAJOR}.0.0"; then
+            echo -e "${YELLOW}ℹ${NC} Declared range: ${VUE_REQUIRED}"
+            has_errors=1
+        else
+            echo -e "${YELLOW}ℹ${NC} Declared range: ${VUE_REQUIRED}"
+        fi
+    else
+        echo -e "${RED}✗${NC} vue is not installed"
+        echo -e "${YELLOW}ℹ${NC} Declared range: ${VUE_REQUIRED}"
+        has_errors=1
+    fi
+else
+    echo -e "${YELLOW}⚠${NC} Dependencies are not installed; skipping React/Vue version check"
 fi
 echo ""
 

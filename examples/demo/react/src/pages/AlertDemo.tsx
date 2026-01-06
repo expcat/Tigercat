@@ -1,22 +1,26 @@
-import { useState } from 'react'
-import { Alert, Space, Divider } from '@tigercat/react'
+import { useState } from 'react';
+import { Alert, Divider } from '@tigercat/react';
 
 export default function AlertDemo() {
-  const [showAlert1, setShowAlert1] = useState(true)
-  const [showAlert2, setShowAlert2] = useState(true)
-  const [showAlert3, setShowAlert3] = useState(true)
+  const [showAlert1, setShowAlert1] = useState(true);
+  const [showAlert2, setShowAlert2] = useState(true);
+  const [showAlert3, setShowAlert3] = useState(true);
 
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Alert 警告提示</h1>
-        <p className="text-gray-600">用于页面中展示重要的提示信息，支持成功、警告、失败、信息等多种状态。</p>
+        <p className="text-gray-600">
+          用于页面中展示重要的提示信息，支持成功、警告、失败、信息等多种状态。
+        </p>
       </div>
 
       {/* 基本用法 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">基本用法</h2>
-        <p className="text-gray-600 mb-6">最简单的用法，适用于简短的警告提示。</p>
+        <p className="text-gray-600 mb-6">
+          最简单的用法，适用于简短的警告提示。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg space-y-4">
           <Alert title="这是一条提示信息" />
           <Alert type="success" title="这是一条成功提示" />
@@ -29,9 +33,16 @@ export default function AlertDemo() {
       {/* 提示类型 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">提示类型</h2>
-        <p className="text-gray-600 mb-6">Alert 组件支持 4 种不同的类型：info（信息）、success（成功）、warning（警告）、error（错误）。</p>
+        <p className="text-gray-600 mb-6">
+          Alert 组件支持 4
+          种不同的类型：info（信息）、success（成功）、warning（警告）、error（错误）。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg space-y-4">
-          <Alert type="info" title="信息提示" description="这是一条信息提示的详细内容" />
+          <Alert
+            type="info"
+            title="信息提示"
+            description="这是一条信息提示的详细内容"
+          />
           <Alert type="success" title="成功提示" description="操作成功完成" />
           <Alert type="warning" title="警告提示" description="请注意相关事项" />
           <Alert type="error" title="错误提示" description="操作失败，请重试" />
@@ -42,11 +53,28 @@ export default function AlertDemo() {
       {/* 尺寸大小 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">尺寸大小</h2>
-        <p className="text-gray-600 mb-6">Alert 组件支持 3 种不同的尺寸：小、中、大。</p>
+        <p className="text-gray-600 mb-6">
+          Alert 组件支持 3 种不同的尺寸：小、中、大。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg space-y-4">
-          <Alert size="sm" type="info" title="小尺寸提示" description="这是小尺寸的提示内容" />
-          <Alert size="md" type="success" title="中等尺寸提示" description="这是中等尺寸的提示内容" />
-          <Alert size="lg" type="warning" title="大尺寸提示" description="这是大尺寸的提示内容" />
+          <Alert
+            size="sm"
+            type="info"
+            title="小尺寸提示"
+            description="这是小尺寸的提示内容"
+          />
+          <Alert
+            size="md"
+            type="success"
+            title="中等尺寸提示"
+            description="这是中等尺寸的提示内容"
+          />
+          <Alert
+            size="lg"
+            type="warning"
+            title="大尺寸提示"
+            description="这是大尺寸的提示内容"
+          />
         </div>
         <Divider className="my-6" />
       </section>
@@ -54,7 +82,9 @@ export default function AlertDemo() {
       {/* 带图标 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">带图标</h2>
-        <p className="text-gray-600 mb-6">默认情况下会显示图标，可以通过 showIcon 属性控制。</p>
+        <p className="text-gray-600 mb-6">
+          默认情况下会显示图标，可以通过 showIcon 属性控制。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg space-y-4">
           <Alert type="success" title="带图标的成功提示" showIcon={true} />
           <Alert type="warning" title="不带图标的警告提示" showIcon={false} />
@@ -65,21 +95,23 @@ export default function AlertDemo() {
       {/* 可关闭 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">可关闭</h2>
-        <p className="text-gray-600 mb-6">通过设置 closable 属性可以让 Alert 显示关闭按钮。</p>
+        <p className="text-gray-600 mb-6">
+          通过设置 closable 属性可以让 Alert 显示关闭按钮。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg space-y-4">
           {showAlert1 && (
-            <Alert 
-              type="info" 
-              title="可关闭的提示" 
+            <Alert
+              type="info"
+              title="可关闭的提示"
               description="点击右侧关闭按钮可以关闭此提示"
               closable
               onClose={() => setShowAlert1(false)}
             />
           )}
           {showAlert2 && (
-            <Alert 
-              type="success" 
-              title="操作成功" 
+            <Alert
+              type="success"
+              title="操作成功"
               description="您的操作已成功完成"
               closable
               onClose={() => setShowAlert2(false)}
@@ -88,10 +120,12 @@ export default function AlertDemo() {
           {(!showAlert1 || !showAlert2) && (
             <div className="text-gray-500 text-center py-4">
               提示已关闭
-              <button 
+              <button
                 className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={() => { setShowAlert1(true); setShowAlert2(true); }}
-              >
+                onClick={() => {
+                  setShowAlert1(true);
+                  setShowAlert2(true);
+                }}>
                 重置
               </button>
             </div>
@@ -103,7 +137,9 @@ export default function AlertDemo() {
       {/* 带描述信息 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">带描述信息</h2>
-        <p className="text-gray-600 mb-6">使用 description 属性可以添加详细的描述内容。</p>
+        <p className="text-gray-600 mb-6">
+          使用 description 属性可以添加详细的描述内容。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg space-y-4">
           <Alert
             type="success"
@@ -127,9 +163,11 @@ export default function AlertDemo() {
       {/* 自定义内容 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">自定义内容</h2>
-        <p className="text-gray-600 mb-6">可以使用 titleSlot 和 descriptionSlot 自定义标题和描述内容。</p>
+        <p className="text-gray-600 mb-6">
+          可以使用 titleSlot 和 descriptionSlot 自定义标题和描述内容。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg space-y-4">
-          <Alert 
+          <Alert
             type="info"
             titleSlot={<strong>自定义标题内容</strong>}
             descriptionSlot={
@@ -144,9 +182,7 @@ export default function AlertDemo() {
             }
           />
 
-          <Alert type="warning">
-            这是通过 children 传入的内容
-          </Alert>
+          <Alert type="warning">这是通过 children 传入的内容</Alert>
         </div>
         <Divider className="my-6" />
       </section>
@@ -170,10 +206,9 @@ export default function AlertDemo() {
           {!showAlert3 && (
             <div className="text-gray-500 text-center py-4">
               提示已关闭
-              <button 
+              <button
                 className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                onClick={() => setShowAlert3(true)}
-              >
+                onClick={() => setShowAlert3(true)}>
                 重置
               </button>
             </div>
@@ -186,7 +221,7 @@ export default function AlertDemo() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">实际应用场景</h2>
         <p className="text-gray-600 mb-6">模拟真实的使用场景。</p>
-        
+
         <div className="space-y-6">
           {/* 表单提交成功 */}
           <div>
@@ -242,5 +277,5 @@ export default function AlertDemo() {
         </div>
       </section>
     </div>
-  )
+  );
 }

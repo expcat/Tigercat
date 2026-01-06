@@ -1,0 +1,214 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Popconfirm > Snapshots > should match snapshot for basic popconfirm 1`] = `
+<div>
+  <div
+    class="tiger-popconfirm relative inline-block"
+  >
+    <div
+      class="tiger-popconfirm-trigger"
+    >
+      <button>
+        Delete
+      </button>
+    </div>
+    <div
+      class="tiger-dropdown-menu-wrapper absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 hidden"
+    >
+      <div
+        class="tiger-popconfirm-content min-w-[280px] max-w-[320px] p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+      >
+        <div
+          class="flex items-start"
+        >
+          <div
+            class="tiger-popconfirm-icon flex-shrink-0 w-5 h-5 mr-2 text-[var(--tiger-warning,#eab308)]"
+          >
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <div
+            class="flex-1"
+          >
+            <div
+              class="tiger-popconfirm-title text-sm font-medium text-gray-900 dark:text-gray-100 mb-2"
+            >
+              确定要执行此操作吗？
+            </div>
+            <!---->
+          </div>
+        </div>
+        <div
+          class="tiger-popconfirm-buttons flex items-center justify-end gap-2 mt-3"
+        >
+          <button
+            class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+            type="button"
+          >
+            取消
+          </button>
+          <button
+            class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-[var(--tiger-primary,#2563eb)] text-white hover:bg-[var(--tiger-primary-hover,#1d4ed8)] focus:ring-[var(--tiger-primary,#2563eb)]"
+            type="button"
+          >
+            确定
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Popconfirm > Snapshots > should match snapshot for danger popconfirm 1`] = `
+<div>
+  <div
+    class="tiger-popconfirm relative inline-block"
+  >
+    <div
+      class="tiger-popconfirm-trigger"
+    >
+      <button>
+        Delete
+      </button>
+    </div>
+    <div
+      class="tiger-dropdown-menu-wrapper absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 hidden"
+    >
+      <div
+        class="tiger-popconfirm-content min-w-[280px] max-w-[320px] p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+      >
+        <div
+          class="flex items-start"
+        >
+          <div
+            class="tiger-popconfirm-icon flex-shrink-0 w-5 h-5 mr-2 text-[var(--tiger-warning,#eab308)]"
+          >
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <div
+            class="flex-1"
+          >
+            <div
+              class="tiger-popconfirm-title text-sm font-medium text-gray-900 dark:text-gray-100 mb-2"
+            >
+              确定要执行此操作吗？
+            </div>
+            <!---->
+          </div>
+        </div>
+        <div
+          class="tiger-popconfirm-buttons flex items-center justify-end gap-2 mt-3"
+        >
+          <button
+            class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+            type="button"
+          >
+            取消
+          </button>
+          <button
+            class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-[var(--tiger-primary,#2563eb)] text-white hover:bg-[var(--tiger-primary-hover,#1d4ed8)] focus:ring-[var(--tiger-primary,#2563eb)]"
+            type="button"
+          >
+            确定
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Popconfirm > Snapshots > should match snapshot for popconfirm with description 1`] = `
+<div>
+  <div
+    class="tiger-popconfirm relative inline-block"
+  >
+    <div
+      class="tiger-popconfirm-trigger"
+    >
+      <button>
+        Delete
+      </button>
+    </div>
+    <div
+      class="tiger-dropdown-menu-wrapper absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 hidden"
+    >
+      <div
+        class="tiger-popconfirm-content min-w-[280px] max-w-[320px] p-4 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
+      >
+        <div
+          class="flex items-start"
+        >
+          <div
+            class="tiger-popconfirm-icon flex-shrink-0 w-5 h-5 mr-2 text-[var(--tiger-warning,#eab308)]"
+          >
+            <svg
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <div
+            class="flex-1"
+          >
+            <div
+              class="tiger-popconfirm-title text-sm font-medium text-gray-900 dark:text-gray-100 mb-2"
+            >
+              确定要执行此操作吗？
+            </div>
+            <!---->
+          </div>
+        </div>
+        <div
+          class="tiger-popconfirm-buttons flex items-center justify-end gap-2 mt-3"
+        >
+          <button
+            class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600"
+            type="button"
+          >
+            取消
+          </button>
+          <button
+            class="px-3 py-1.5 text-xs font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-[var(--tiger-primary,#2563eb)] text-white hover:bg-[var(--tiger-primary-hover,#1d4ed8)] focus:ring-[var(--tiger-primary,#2563eb)]"
+            type="button"
+          >
+            确定
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
