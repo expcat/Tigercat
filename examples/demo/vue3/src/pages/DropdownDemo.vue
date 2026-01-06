@@ -23,13 +23,11 @@ const handleCommand = (command: string) => {
       <div class="p-6 bg-gray-50 rounded-lg">
         <Dropdown>
           <Button>悬浮触发</Button>
-          <template #default>
-            <DropdownMenu>
-              <DropdownItem>菜单项 1</DropdownItem>
-              <DropdownItem>菜单项 2</DropdownItem>
-              <DropdownItem>菜单项 3</DropdownItem>
-            </DropdownMenu>
-          </template>
+          <DropdownMenu>
+            <DropdownItem>菜单项 1</DropdownItem>
+            <DropdownItem>菜单项 2</DropdownItem>
+            <DropdownItem>菜单项 3</DropdownItem>
+          </DropdownMenu>
         </Dropdown>
       </div>
       <Divider class="my-6" />
@@ -43,24 +41,20 @@ const handleCommand = (command: string) => {
         <div class="flex gap-4">
           <Dropdown trigger="hover">
             <Button>悬浮触发</Button>
-            <template #default>
-              <DropdownMenu>
-                <DropdownItem>菜单项 1</DropdownItem>
-                <DropdownItem>菜单项 2</DropdownItem>
-                <DropdownItem>菜单项 3</DropdownItem>
-              </DropdownMenu>
-            </template>
+            <DropdownMenu>
+              <DropdownItem>菜单项 1</DropdownItem>
+              <DropdownItem>菜单项 2</DropdownItem>
+              <DropdownItem>菜单项 3</DropdownItem>
+            </DropdownMenu>
           </Dropdown>
 
           <Dropdown trigger="click">
             <Button>点击触发</Button>
-            <template #default>
-              <DropdownMenu>
-                <DropdownItem>菜单项 1</DropdownItem>
-                <DropdownItem>菜单项 2</DropdownItem>
-                <DropdownItem>菜单项 3</DropdownItem>
-              </DropdownMenu>
-            </template>
+            <DropdownMenu>
+              <DropdownItem>菜单项 1</DropdownItem>
+              <DropdownItem>菜单项 2</DropdownItem>
+              <DropdownItem>菜单项 3</DropdownItem>
+            </DropdownMenu>
           </Dropdown>
         </div>
       </div>
@@ -76,64 +70,52 @@ const handleCommand = (command: string) => {
           <div class="flex gap-4">
             <Dropdown placement="bottom-start">
               <Button>底部-左对齐</Button>
-              <template #default>
-                <DropdownMenu>
-                  <DropdownItem>菜单项 1</DropdownItem>
-                  <DropdownItem>菜单项 2</DropdownItem>
-                </DropdownMenu>
-              </template>
+              <DropdownMenu>
+                <DropdownItem>菜单项 1</DropdownItem>
+                <DropdownItem>菜单项 2</DropdownItem>
+              </DropdownMenu>
             </Dropdown>
 
             <Dropdown placement="bottom">
               <Button>底部-居中</Button>
-              <template #default>
-                <DropdownMenu>
-                  <DropdownItem>菜单项 1</DropdownItem>
-                  <DropdownItem>菜单项 2</DropdownItem>
-                </DropdownMenu>
-              </template>
+              <DropdownMenu>
+                <DropdownItem>菜单项 1</DropdownItem>
+                <DropdownItem>菜单项 2</DropdownItem>
+              </DropdownMenu>
             </Dropdown>
 
             <Dropdown placement="bottom-end">
               <Button>底部-右对齐</Button>
-              <template #default>
-                <DropdownMenu>
-                  <DropdownItem>菜单项 1</DropdownItem>
-                  <DropdownItem>菜单项 2</DropdownItem>
-                </DropdownMenu>
-              </template>
+              <DropdownMenu>
+                <DropdownItem>菜单项 1</DropdownItem>
+                <DropdownItem>菜单项 2</DropdownItem>
+              </DropdownMenu>
             </Dropdown>
           </div>
 
           <div class="flex gap-4">
             <Dropdown placement="top-start">
               <Button>顶部-左对齐</Button>
-              <template #default>
-                <DropdownMenu>
-                  <DropdownItem>菜单项 1</DropdownItem>
-                  <DropdownItem>菜单项 2</DropdownItem>
-                </DropdownMenu>
-              </template>
+              <DropdownMenu>
+                <DropdownItem>菜单项 1</DropdownItem>
+                <DropdownItem>菜单项 2</DropdownItem>
+              </DropdownMenu>
             </Dropdown>
 
             <Dropdown placement="top">
               <Button>顶部-居中</Button>
-              <template #default>
-                <DropdownMenu>
-                  <DropdownItem>菜单项 1</DropdownItem>
-                  <DropdownItem>菜单项 2</DropdownItem>
-                </DropdownMenu>
-              </template>
+              <DropdownMenu>
+                <DropdownItem>菜单项 1</DropdownItem>
+                <DropdownItem>菜单项 2</DropdownItem>
+              </DropdownMenu>
             </Dropdown>
 
             <Dropdown placement="top-end">
               <Button>顶部-右对齐</Button>
-              <template #default>
-                <DropdownMenu>
-                  <DropdownItem>菜单项 1</DropdownItem>
-                  <DropdownItem>菜单项 2</DropdownItem>
-                </DropdownMenu>
-              </template>
+              <DropdownMenu>
+                <DropdownItem>菜单项 1</DropdownItem>
+                <DropdownItem>菜单项 2</DropdownItem>
+              </DropdownMenu>
             </Dropdown>
           </div>
         </div>
@@ -149,23 +131,19 @@ const handleCommand = (command: string) => {
         <div class="flex gap-4">
           <Dropdown disabled>
             <Button disabled>禁用的下拉菜单</Button>
-            <template #default>
-              <DropdownMenu>
-                <DropdownItem>菜单项 1</DropdownItem>
-                <DropdownItem>菜单项 2</DropdownItem>
-              </DropdownMenu>
-            </template>
+            <DropdownMenu>
+              <DropdownItem>菜单项 1</DropdownItem>
+              <DropdownItem>菜单项 2</DropdownItem>
+            </DropdownMenu>
           </Dropdown>
 
           <Dropdown>
             <Button>部分禁用</Button>
-            <template #default>
-              <DropdownMenu>
-                <DropdownItem>编辑</DropdownItem>
-                <DropdownItem disabled>删除（已禁用）</DropdownItem>
-                <DropdownItem>复制</DropdownItem>
-              </DropdownMenu>
-            </template>
+            <DropdownMenu>
+              <DropdownItem>编辑</DropdownItem>
+              <DropdownItem disabled>删除（已禁用）</DropdownItem>
+              <DropdownItem>复制</DropdownItem>
+            </DropdownMenu>
           </Dropdown>
         </div>
       </div>
@@ -179,14 +157,12 @@ const handleCommand = (command: string) => {
       <div class="p-6 bg-gray-50 rounded-lg">
         <Dropdown>
           <Button>操作菜单</Button>
-          <template #default>
-            <DropdownMenu>
-              <DropdownItem>编辑</DropdownItem>
-              <DropdownItem>复制</DropdownItem>
-              <DropdownItem divided>删除</DropdownItem>
-              <DropdownItem>下载</DropdownItem>
-            </DropdownMenu>
-          </template>
+          <DropdownMenu>
+            <DropdownItem>编辑</DropdownItem>
+            <DropdownItem>复制</DropdownItem>
+            <DropdownItem divided>删除</DropdownItem>
+            <DropdownItem>下载</DropdownItem>
+          </DropdownMenu>
         </Dropdown>
       </div>
       <Divider class="my-6" />
@@ -199,13 +175,11 @@ const handleCommand = (command: string) => {
       <div class="p-6 bg-gray-50 rounded-lg">
         <Dropdown>
           <Button>操作</Button>
-          <template #default>
-            <DropdownMenu>
-              <DropdownItem @click="handleCommand('edit')">编辑</DropdownItem>
-              <DropdownItem @click="handleCommand('copy')">复制</DropdownItem>
-              <DropdownItem @click="handleCommand('delete')" divided>删除</DropdownItem>
-            </DropdownMenu>
-          </template>
+          <DropdownMenu>
+            <DropdownItem @click="handleCommand('edit')">编辑</DropdownItem>
+            <DropdownItem @click="handleCommand('copy')">复制</DropdownItem>
+            <DropdownItem @click="handleCommand('delete')" divided>删除</DropdownItem>
+          </DropdownMenu>
         </Dropdown>
       </div>
       <Divider class="my-6" />
@@ -219,13 +193,11 @@ const handleCommand = (command: string) => {
         <div class="flex gap-4 items-center">
           <Dropdown v-model:visible="visible1">
             <Button>受控下拉菜单</Button>
-            <template #default>
-              <DropdownMenu>
-                <DropdownItem>菜单项 1</DropdownItem>
-                <DropdownItem>菜单项 2</DropdownItem>
-                <DropdownItem>菜单项 3</DropdownItem>
-              </DropdownMenu>
-            </template>
+            <DropdownMenu>
+              <DropdownItem>菜单项 1</DropdownItem>
+              <DropdownItem>菜单项 2</DropdownItem>
+              <DropdownItem>菜单项 3</DropdownItem>
+            </DropdownMenu>
           </Dropdown>
           <Button @click="visible1 = !visible1">
             {{ visible1 ? '关闭' : '打开' }}下拉菜单
@@ -243,35 +215,29 @@ const handleCommand = (command: string) => {
         <div class="flex gap-4">
           <Dropdown>
             <Button variant="primary">主要按钮</Button>
-            <template #default>
-              <DropdownMenu>
-                <DropdownItem>菜单项 1</DropdownItem>
-                <DropdownItem>菜单项 2</DropdownItem>
-                <DropdownItem>菜单项 3</DropdownItem>
-              </DropdownMenu>
-            </template>
+            <DropdownMenu>
+              <DropdownItem>菜单项 1</DropdownItem>
+              <DropdownItem>菜单项 2</DropdownItem>
+              <DropdownItem>菜单项 3</DropdownItem>
+            </DropdownMenu>
           </Dropdown>
 
           <Dropdown>
             <Button variant="secondary">次要按钮</Button>
-            <template #default>
-              <DropdownMenu>
-                <DropdownItem>菜单项 1</DropdownItem>
-                <DropdownItem>菜单项 2</DropdownItem>
-                <DropdownItem>菜单项 3</DropdownItem>
-              </DropdownMenu>
-            </template>
+            <DropdownMenu>
+              <DropdownItem>菜单项 1</DropdownItem>
+              <DropdownItem>菜单项 2</DropdownItem>
+              <DropdownItem>菜单项 3</DropdownItem>
+            </DropdownMenu>
           </Dropdown>
 
           <Dropdown>
             <Button variant="outline">轮廓按钮</Button>
-            <template #default>
-              <DropdownMenu>
-                <DropdownItem>菜单项 1</DropdownItem>
-                <DropdownItem>菜单项 2</DropdownItem>
-                <DropdownItem>菜单项 3</DropdownItem>
-              </DropdownMenu>
-            </template>
+            <DropdownMenu>
+              <DropdownItem>菜单项 1</DropdownItem>
+              <DropdownItem>菜单项 2</DropdownItem>
+              <DropdownItem>菜单项 3</DropdownItem>
+            </DropdownMenu>
           </Dropdown>
         </div>
       </div>

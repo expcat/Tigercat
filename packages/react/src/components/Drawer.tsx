@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useEffect } from 'react'
-import { createPortal } from 'react-dom'
+import React, { useCallback, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   classNames,
   getDrawerMaskClasses,
@@ -11,38 +11,38 @@ import {
   getDrawerCloseButtonClasses,
   getDrawerTitleClasses,
   type DrawerProps as CoreDrawerProps,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 export interface DrawerProps extends CoreDrawerProps {
   /**
    * Callback when drawer requests to close
    */
-  onClose?: () => void
+  onClose?: () => void;
 
   /**
    * Callback after drawer enter transition completes
    */
-  onAfterEnter?: () => void
+  onAfterEnter?: () => void;
 
   /**
    * Callback after drawer leave transition completes
    */
-  onAfterLeave?: () => void
+  onAfterLeave?: () => void;
 
   /**
    * Header content (alternative to title prop)
    */
-  header?: React.ReactNode
+  header?: React.ReactNode;
 
   /**
    * Drawer body content
    */
-  children?: React.ReactNode
+  children?: React.ReactNode;
 
   /**
    * Footer content
    */
-  footer?: React.ReactNode
+  footer?: React.ReactNode;
 }
 
 const CloseIcon: React.FC = () => (
@@ -51,8 +51,7 @@ const CloseIcon: React.FC = () => (
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+    xmlns="http://www.w3.org/2000/svg">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -60,7 +59,7 @@ const CloseIcon: React.FC = () => (
       d="M6 18L18 6M6 6l12 12"
     />
   </svg>
-)
+);
 
 export const Drawer: React.FC<DrawerProps> = ({
   visible = false,
@@ -82,78 +81,75 @@ export const Drawer: React.FC<DrawerProps> = ({
   footer,
 }) => {
   // Track if drawer has ever been opened (for destroyOnClose)
-  const [hasBeenOpened, setHasBeenOpened] = React.useState(visible)
+  const [hasBeenOpened, setHasBeenOpened] = React.useState(visible);
 
   React.useEffect(() => {
     if (visible) {
-      setHasBeenOpened(true)
+      setHasBeenOpened(true);
     }
-  }, [visible])
+  }, [visible]);
 
   // Handle close request
   const handleClose = useCallback(() => {
-    onClose?.()
-  }, [onClose])
+    onClose?.();
+  }, [onClose]);
 
   // Handle mask click
   const handleMaskClick = useCallback(() => {
     if (maskClosable) {
-      handleClose()
+      handleClose();
     }
-  }, [maskClosable, handleClose])
+  }, [maskClosable, handleClose]);
 
   // Handle panel click (stop propagation)
   const handlePanelClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-  }, [])
+    e.stopPropagation();
+  }, []);
 
   // Handle ESC key
   useEffect(() => {
     const handleEscKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && visible) {
-        handleClose()
+        handleClose();
       }
-    }
+    };
 
-    document.addEventListener('keydown', handleEscKey)
+    document.addEventListener('keydown', handleEscKey);
     return () => {
-      document.removeEventListener('keydown', handleEscKey)
-    }
-  }, [visible, handleClose])
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [visible, handleClose]);
 
   // Track transition state for callbacks
-  const [isTransitioning, setIsTransitioning] = React.useState(false)
-  const previousVisible = React.useRef(visible)
+  const [, setIsTransitioning] = React.useState(false);
+  const previousVisible = React.useRef(visible);
 
   useEffect(() => {
     if (visible !== previousVisible.current) {
-      setIsTransitioning(true)
-      previousVisible.current = visible
+      setIsTransitioning(true);
+      previousVisible.current = visible;
 
       // Trigger after transition callbacks
       const timer = setTimeout(() => {
-        setIsTransitioning(false)
+        setIsTransitioning(false);
         if (visible) {
-          onAfterEnter?.()
+          onAfterEnter?.();
         } else {
-          onAfterLeave?.()
+          onAfterLeave?.();
         }
-      }, 300) // Match transition duration
+      }, 300); // Match transition duration
 
-      return () => clearTimeout(timer)
+      return () => clearTimeout(timer);
     }
-  }, [visible, onAfterEnter, onAfterLeave])
+  }, [visible, onAfterEnter, onAfterLeave]);
 
   // Computed classes
-  const maskClasses = useMemo(
-    () => getDrawerMaskClasses(visible),
-    [visible]
-  )
+  const maskClasses = useMemo(() => getDrawerMaskClasses(visible), [visible]);
 
   const containerClasses = useMemo(
     () => getDrawerContainerClasses(zIndex),
     [zIndex]
-  )
+  );
 
   const panelClasses = useMemo(
     () =>
@@ -163,29 +159,29 @@ export const Drawer: React.FC<DrawerProps> = ({
         className
       ),
     [placement, visible, size, className]
-  )
+  );
 
-  const headerClasses = useMemo(() => getDrawerHeaderClasses(), [])
+  const headerClasses = useMemo(() => getDrawerHeaderClasses(), []);
 
   const bodyClasses = useMemo(
     () => getDrawerBodyClasses(bodyClassName),
     [bodyClassName]
-  )
+  );
 
-  const footerClasses = useMemo(() => getDrawerFooterClasses(), [])
+  const footerClasses = useMemo(() => getDrawerFooterClasses(), []);
 
-  const closeButtonClasses = useMemo(() => getDrawerCloseButtonClasses(), [])
+  const closeButtonClasses = useMemo(() => getDrawerCloseButtonClasses(), []);
 
-  const titleClasses = useMemo(() => getDrawerTitleClasses(), [])
+  const titleClasses = useMemo(() => getDrawerTitleClasses(), []);
 
   // Don't render if destroyOnClose is true and drawer has never been opened
   if (destroyOnClose && !hasBeenOpened) {
-    return null
+    return null;
   }
 
   // Don't render if destroyOnClose is true and drawer is not visible
   if (destroyOnClose && !visible) {
-    return null
+    return null;
   }
 
   // Render drawer content
@@ -203,8 +199,7 @@ export const Drawer: React.FC<DrawerProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? 'drawer-title' : undefined}
-        onClick={handlePanelClick}
-      >
+        onClick={handlePanelClick}>
         {(title || header || closable) && (
           <div className={headerClasses}>
             {(title || header) && (
@@ -217,8 +212,7 @@ export const Drawer: React.FC<DrawerProps> = ({
                 type="button"
                 className={closeButtonClasses}
                 onClick={handleClose}
-                aria-label="Close drawer"
-              >
+                aria-label="Close drawer">
                 <CloseIcon />
               </button>
             )}
@@ -228,12 +222,12 @@ export const Drawer: React.FC<DrawerProps> = ({
         {footer && <div className={footerClasses}>{footer}</div>}
       </div>
     </div>
-  )
+  );
 
   // Use portal to render at document body
   if (typeof document !== 'undefined') {
-    return createPortal(drawerContent, document.body)
+    return createPortal(drawerContent, document.body);
   }
 
-  return null
-}
+  return null;
+};

@@ -1,6 +1,13 @@
-import { defineComponent, computed, inject, PropType, h } from 'vue'
 import {
-  classNames,
+  defineComponent,
+  computed,
+  inject,
+  PropType,
+  h,
+  type VNode,
+  type VNodeArrayChildren,
+} from 'vue';
+import {
   getStepItemClasses,
   getStepIconClasses,
   getStepTailClasses,
@@ -9,8 +16,16 @@ import {
   getStepDescriptionClasses,
   calculateStepStatus,
   type StepStatus,
-} from '@tigercat/core'
-import { StepsContextKey, type StepsContext } from './Steps'
+} from '@tigercat/core';
+import { StepsContextKey, type StepsContext } from './Steps';
+
+type RawChildren =
+  | string
+  | number
+  | boolean
+  | VNode
+  | VNodeArrayChildren
+  | (() => unknown);
 
 export const StepsItem = defineComponent({
   name: 'TigerStepsItem',
@@ -60,13 +75,14 @@ export const StepsItem = defineComponent({
       size: 'default',
       simple: false,
       clickable: false,
-    })
+    });
 
     // Get step index from parent
     const stepIndex = computed(() => {
       // This will be passed by the parent during rendering
-      return (attrs as any).stepIndex ?? 0
-    })
+      const stepIndexValue = (attrs as Record<string, unknown>).stepIndex;
+      return typeof stepIndexValue === 'number' ? stepIndexValue : 0;
+    });
 
     // Calculate step status
     const stepStatus = computed(() => {
@@ -75,13 +91,14 @@ export const StepsItem = defineComponent({
         stepsContext.current,
         stepsContext.status,
         props.status
-      )
-    })
+      );
+    });
 
     // Check if this is the last step
     const isLast = computed(() => {
-      return (attrs as any).isLast ?? false
-    })
+      const isLastValue = (attrs as Record<string, unknown>).isLast;
+      return typeof isLastValue === 'boolean' ? isLastValue : false;
+    });
 
     // Item classes
     const itemClasses = computed(() => {
@@ -89,19 +106,19 @@ export const StepsItem = defineComponent({
         stepsContext.direction,
         isLast.value,
         stepsContext.simple
-      )
-    })
+      );
+    });
 
     // Icon classes
     const iconClasses = computed(() => {
-      const hasCustomIcon = !!(props.icon || slots.icon)
+      const hasCustomIcon = !!(props.icon || slots.icon);
       return getStepIconClasses(
         stepStatus.value,
         stepsContext.size,
         stepsContext.simple,
         hasCustomIcon
-      )
-    })
+      );
+    });
 
     // Tail classes
     const tailClasses = computed(() => {
@@ -109,16 +126,13 @@ export const StepsItem = defineComponent({
         stepsContext.direction,
         stepStatus.value,
         isLast.value
-      )
-    })
+      );
+    });
 
     // Content classes
     const contentClasses = computed(() => {
-      return getStepContentClasses(
-        stepsContext.direction,
-        stepsContext.simple
-      )
-    })
+      return getStepContentClasses(stepsContext.direction, stepsContext.simple);
+    });
 
     // Title classes
     const titleClasses = computed(() => {
@@ -126,32 +140,36 @@ export const StepsItem = defineComponent({
         stepStatus.value,
         stepsContext.size,
         stepsContext.clickable && !props.disabled
-      )
-    })
+      );
+    });
 
     // Description classes
     const descriptionClasses = computed(() => {
-      return getStepDescriptionClasses(stepStatus.value, stepsContext.size)
-    })
+      return getStepDescriptionClasses(stepStatus.value, stepsContext.size);
+    });
 
     // Handle click
     const handleClick = () => {
       if (props.disabled || !stepsContext.handleStepClick) {
-        return
+        return;
       }
-      stepsContext.handleStepClick(stepIndex.value)
-    }
+      stepsContext.handleStepClick(stepIndex.value);
+    };
 
     // Render icon
     const renderIcon = () => {
       // Custom icon from slot
       if (slots.icon) {
-        return h('div', { class: iconClasses.value }, slots.icon())
+        return h('div', { class: iconClasses.value }, slots.icon());
       }
 
       // Custom icon from prop
       if (props.icon) {
-        return h('div', { class: iconClasses.value }, props.icon as any)
+        return h(
+          'div',
+          { class: iconClasses.value },
+          props.icon as unknown as RawChildren
+        );
       }
 
       // Default: show step number or checkmark for finished steps
@@ -174,16 +192,20 @@ export const StepsItem = defineComponent({
               d: 'M5 13l4 4L19 7',
             })
           )
-        )
+        );
       }
 
       // Default: show step number
-      return h('div', { class: iconClasses.value }, String(stepIndex.value + 1))
-    }
+      return h(
+        'div',
+        { class: iconClasses.value },
+        String(stepIndex.value + 1)
+      );
+    };
 
     // Render content
     const renderContent = () => {
-      const children = []
+      const children = [];
 
       // Title
       children.push(
@@ -195,7 +217,7 @@ export const StepsItem = defineComponent({
           },
           props.title
         )
-      )
+      );
 
       // Description (if not simple mode)
       if (!stepsContext.simple && (props.description || slots.description)) {
@@ -205,11 +227,11 @@ export const StepsItem = defineComponent({
             { class: descriptionClasses.value },
             slots.description ? slots.description() : props.description
           )
-        )
+        );
       }
 
-      return h('div', { class: contentClasses.value }, children)
-    }
+      return h('div', { class: contentClasses.value }, children);
+    };
 
     return () => {
       // For vertical layout
@@ -222,7 +244,7 @@ export const StepsItem = defineComponent({
           ]),
           // Content
           renderContent(),
-        ])
+        ]);
       }
 
       // For horizontal layout
@@ -233,9 +255,9 @@ export const StepsItem = defineComponent({
         h('div', { class: tailClasses.value }),
         // Content
         renderContent(),
-      ])
-    }
+      ]);
+    };
   },
-})
+});
 
-export default StepsItem
+export default StepsItem;

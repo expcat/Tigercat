@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react';
 import {
   classNames,
   getListClasses,
@@ -24,7 +24,7 @@ import {
   type ListItemLayout,
   type ListItem,
   type ListPaginationConfig,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 // Loading spinner component
 const LoadingSpinner: React.FC = () => (
@@ -32,8 +32,7 @@ const LoadingSpinner: React.FC = () => (
     className="animate-spin h-8 w-8 text-[var(--tiger-primary,#2563eb)]"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
-    viewBox="0 0 24 24"
-  >
+    viewBox="0 0 24 24">
     <circle
       className="opacity-25"
       cx="12"
@@ -48,94 +47,94 @@ const LoadingSpinner: React.FC = () => (
       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
     />
   </svg>
-)
+);
 
 export interface ListProps {
   /**
    * List data source
    */
-  dataSource?: ListItem[]
+  dataSource?: ListItem[];
   /**
    * List size
    * @default 'md'
    */
-  size?: ListSize
+  size?: ListSize;
   /**
    * Border style
    * @default 'divided'
    */
-  bordered?: ListBorderStyle
+  bordered?: ListBorderStyle;
   /**
    * Loading state
    * @default false
    */
-  loading?: boolean
+  loading?: boolean;
   /**
    * Empty state text
    * @default 'No data'
    */
-  emptyText?: string
+  emptyText?: string;
   /**
    * Whether to show split line between items
    * @default true
    */
-  split?: boolean
+  split?: boolean;
   /**
    * Item layout
    * @default 'horizontal'
    */
-  itemLayout?: ListItemLayout
+  itemLayout?: ListItemLayout;
   /**
    * List header content
    */
-  header?: React.ReactNode
+  header?: React.ReactNode;
   /**
    * List footer content
    */
-  footer?: React.ReactNode
+  footer?: React.ReactNode;
   /**
    * Pagination configuration, set to false to disable
    * @default false
    */
-  pagination?: ListPaginationConfig | false
+  pagination?: ListPaginationConfig | false;
   /**
    * Grid configuration
    */
   grid?: {
-    gutter?: number
-    column?: number
-    xs?: number
-    sm?: number
-    md?: number
-    lg?: number
-    xl?: number
-    xxl?: number
-  }
+    gutter?: number;
+    column?: number;
+    xs?: number;
+    sm?: number;
+    md?: number;
+    lg?: number;
+    xl?: number;
+    xxl?: number;
+  };
   /**
    * Function to get item key
    */
-  rowKey?: string | ((item: ListItem, index: number) => string | number)
+  rowKey?: string | ((item: ListItem, index: number) => string | number);
   /**
    * Whether items are hoverable
    * @default false
    */
-  hoverable?: boolean
+  hoverable?: boolean;
   /**
    * Custom render function for list items
    */
-  renderItem?: (item: ListItem, index: number) => React.ReactNode
+  renderItem?: (item: ListItem, index: number) => React.ReactNode;
   /**
    * Item click handler
    */
-  onItemClick?: (item: ListItem, index: number) => void
+  onItemClick?: (item: ListItem, index: number) => void;
   /**
    * Page change handler
    */
-  onPageChange?: (page: { current: number; pageSize: number }) => void
+  onPageChange?: (page: { current: number; pageSize: number }) => void;
   /**
    * Additional CSS classes
    */
-  className?: string
+  className?: string;
 }
 
 export const List: React.FC<ListProps> = ({
@@ -159,30 +158,32 @@ export const List: React.FC<ListProps> = ({
 }) => {
   const [currentPage, setCurrentPage] = useState(
     pagination && typeof pagination === 'object' ? pagination.current || 1 : 1
-  )
+  );
 
   const [currentPageSize, setCurrentPageSize] = useState(
-    pagination && typeof pagination === 'object' ? pagination.pageSize || 10 : 10
-  )
+    pagination && typeof pagination === 'object'
+      ? pagination.pageSize || 10
+      : 10
+  );
 
   // Paginated data
   const paginatedData = useMemo(() => {
     if (pagination === false) {
-      return dataSource
+      return dataSource;
     }
 
-    return paginateData(dataSource, currentPage, currentPageSize)
-  }, [dataSource, currentPage, currentPageSize, pagination])
+    return paginateData(dataSource, currentPage, currentPageSize);
+  }, [dataSource, currentPage, currentPageSize, pagination]);
 
   // Pagination info
   const paginationInfo = useMemo(() => {
     if (pagination === false) {
-      return null
+      return null;
     }
 
-    const total = dataSource.length
-    return calculatePagination(total, currentPage, currentPageSize)
-  }, [dataSource.length, currentPage, currentPageSize, pagination])
+    const total = dataSource.length;
+    return calculatePagination(total, currentPage, currentPageSize);
+  }, [dataSource.length, currentPage, currentPageSize, pagination]);
 
   // List classes
   const listClasses = useMemo(() => {
@@ -190,12 +191,12 @@ export const List: React.FC<ListProps> = ({
       getListClasses(bordered),
       listSizeClasses[size],
       className
-    )
-  }, [bordered, size, className])
+    );
+  }, [bordered, size, className]);
 
   // Grid classes
   const gridClasses = useMemo(() => {
-    if (!grid) return ''
+    if (!grid) return '';
 
     return classNames(
       listGridContainerClasses,
@@ -208,56 +209,52 @@ export const List: React.FC<ListProps> = ({
         grid.xl,
         grid.xxl
       )
-    )
-  }, [grid])
+    );
+  }, [grid]);
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page)
-    onPageChange?.({ current: page, pageSize: currentPageSize })
-  }
+    setCurrentPage(page);
+    onPageChange?.({ current: page, pageSize: currentPageSize });
+  };
 
   const handlePageSizeChange = (pageSize: number) => {
-    setCurrentPageSize(pageSize)
-    setCurrentPage(1)
-    onPageChange?.({ current: 1, pageSize })
-  }
+    setCurrentPageSize(pageSize);
+    setCurrentPage(1);
+    onPageChange?.({ current: 1, pageSize });
+  };
 
   const handleItemClick = (item: ListItem, index: number) => {
-    onItemClick?.(item, index)
-  }
+    onItemClick?.(item, index);
+  };
 
   const getItemKey = (item: ListItem, index: number): string | number => {
     if (typeof rowKey === 'function') {
-      return rowKey(item, index)
+      return rowKey(item, index);
     }
-    return (item[rowKey] as string | number) || index
-  }
+    return (item[rowKey] as string | number) || index;
+  };
 
   const renderListHeader = () => {
-    if (!header) return null
+    if (!header) return null;
 
     return (
-      <div className={getListHeaderFooterClasses(size, false)}>
-        {header}
-      </div>
-    )
-  }
+      <div className={getListHeaderFooterClasses(size, false)}>{header}</div>
+    );
+  };
 
   const renderListFooter = () => {
-    if (!footer) return null
+    if (!footer) return null;
 
     return (
-      <div className={getListHeaderFooterClasses(size, true)}>
-        {footer}
-      </div>
-    )
-  }
+      <div className={getListHeaderFooterClasses(size, true)}>{footer}</div>
+    );
+  };
 
-  const renderDefaultListItem = (item: ListItem, index: number) => {
-    const itemContent: React.ReactNode[] = []
+  const renderDefaultListItem = (item: ListItem, _index: number) => {
+    const itemContent: React.ReactNode[] = [];
 
     // Meta section (avatar + content)
-    const metaContent: React.ReactNode[] = []
+    const metaContent: React.ReactNode[] = [];
 
     if (item.avatar) {
       metaContent.push(
@@ -272,23 +269,23 @@ export const List: React.FC<ListProps> = ({
             item.avatar
           )}
         </div>
-      )
+      );
     }
 
-    const contentChildren: React.ReactNode[] = []
+    const contentChildren: React.ReactNode[] = [];
     if (item.title) {
       contentChildren.push(
         <div key="title" className={listItemTitleClasses}>
           {item.title}
         </div>
-      )
+      );
     }
     if (item.description) {
       contentChildren.push(
         <div key="description" className={listItemDescriptionClasses}>
           {item.description}
         </div>
-      )
+      );
     }
 
     if (contentChildren.length > 0) {
@@ -296,7 +293,7 @@ export const List: React.FC<ListProps> = ({
         <div key="content" className={listItemContentClasses}>
           {contentChildren}
         </div>
-      )
+      );
     }
 
     if (metaContent.length > 0) {
@@ -304,7 +301,7 @@ export const List: React.FC<ListProps> = ({
         <div key="meta" className={listItemMetaClasses}>
           {metaContent}
         </div>
-      )
+      );
     }
 
     // Extra content
@@ -313,58 +310,62 @@ export const List: React.FC<ListProps> = ({
         <div key="extra" className={listItemExtraClasses}>
           {item.extra as React.ReactNode}
         </div>
-      )
+      );
     }
 
-    return itemContent
-  }
+    return itemContent;
+  };
 
   const renderListItem = (item: ListItem, index: number) => {
-    const key = getItemKey(item, index)
+    const key = getItemKey(item, index);
     const itemClasses = getListItemClasses(
       size,
       itemLayout,
       split && bordered === 'divided' && !grid,
       hoverable
-    )
+    );
 
     return (
       <div
         key={key}
         className={itemClasses}
-        onClick={() => handleItemClick(item, index)}
-      >
-        {renderItem ? renderItem(item, index) : renderDefaultListItem(item, index)}
+        onClick={() => handleItemClick(item, index)}>
+        {renderItem
+          ? renderItem(item, index)
+          : renderDefaultListItem(item, index)}
       </div>
-    )
-  }
+    );
+  };
 
   const renderListItems = () => {
     if (loading) {
-      return null
+      return null;
     }
 
     if (paginatedData.length === 0) {
-      return <div className={listEmptyStateClasses}>{emptyText}</div>
+      return <div className={listEmptyStateClasses}>{emptyText}</div>;
     }
 
-    const items = paginatedData.map((item, index) => renderListItem(item, index))
+    const items = paginatedData.map((item, index) =>
+      renderListItem(item, index)
+    );
 
     if (grid) {
-      return <div className={gridClasses}>{items}</div>
+      return <div className={gridClasses}>{items}</div>;
     }
 
-    return items
-  }
+    return items;
+  };
 
   const renderPagination = () => {
     if (pagination === false || !paginationInfo) {
-      return null
+      return null;
     }
 
-    const { totalPages, startIndex, endIndex, hasNext, hasPrev } = paginationInfo
-    const total = dataSource.length
-    const paginationConfig = pagination as ListPaginationConfig
+    const { totalPages, startIndex, endIndex, hasNext, hasPrev } =
+      paginationInfo;
+    const total = dataSource.length;
+    const paginationConfig = pagination as ListPaginationConfig;
 
     return (
       <div className={listPaginationContainerClasses}>
@@ -384,13 +385,14 @@ export const List: React.FC<ListProps> = ({
             <select
               className="px-3 py-1 border border-gray-300 rounded text-sm"
               value={currentPageSize}
-              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-            >
-              {(paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map((size) => (
-                <option key={size} value={size}>
-                  {size} / page
-                </option>
-              ))}
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}>
+              {(paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map(
+                (size) => (
+                  <option key={size} value={size}>
+                    {size} / page
+                  </option>
+                )
+              )}
             </select>
           )}
 
@@ -405,8 +407,7 @@ export const List: React.FC<ListProps> = ({
                   : 'text-gray-400 cursor-not-allowed'
               )}
               disabled={!hasPrev}
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
+              onClick={() => handlePageChange(currentPage - 1)}>
               Previous
             </button>
 
@@ -424,15 +425,14 @@ export const List: React.FC<ListProps> = ({
                   : 'text-gray-400 cursor-not-allowed'
               )}
               disabled={!hasNext}
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
+              onClick={() => handlePageChange(currentPage + 1)}>
               Next
             </button>
           </div>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className={listWrapperClasses}>
@@ -454,5 +454,5 @@ export const List: React.FC<ListProps> = ({
       {/* Pagination */}
       {renderPagination()}
     </div>
-  )
-}
+  );
+};

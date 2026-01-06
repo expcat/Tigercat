@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useMemo, useCallback, ReactElement } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useCallback,
+  ReactElement,
+} from 'react';
 import {
   classNames,
   getStepsContainerClasses,
@@ -6,43 +12,44 @@ import {
   type StepStatus,
   type StepSize,
   type StepsProps as CoreStepsProps,
-} from '@tigercat/core'
+} from '@tigercat/core';
+import { StepsItem, type StepsItemProps } from './StepsItem';
 
 // Steps context interface
 export interface StepsContextValue {
-  current: number
-  status: StepStatus
-  direction: StepsDirection
-  size: StepSize
-  simple: boolean
-  clickable: boolean
-  handleStepClick?: (index: number) => void
+  current: number;
+  status: StepStatus;
+  direction: StepsDirection;
+  size: StepSize;
+  simple: boolean;
+  clickable: boolean;
+  handleStepClick?: (index: number) => void;
 }
 
 // Create steps context
-const StepsContext = createContext<StepsContextValue | null>(null)
+const StepsContext = createContext<StepsContextValue | null>(null);
 
 // Hook to use steps context
 export function useStepsContext(): StepsContextValue | null {
-  return useContext(StepsContext)
+  return useContext(StepsContext);
 }
 
 export interface StepsProps extends CoreStepsProps {
   /**
    * Step change event handler
    */
-  onChange?: (current: number) => void
+  onChange?: (current: number) => void;
 
   /**
    * Whether steps are clickable
    * @default false
    */
-  clickable?: boolean
+  clickable?: boolean;
 
   /**
    * Step items
    */
-  children?: React.ReactNode
+  children?: React.ReactNode;
 }
 
 export const Steps: React.FC<StepsProps> = ({
@@ -59,20 +66,20 @@ export const Steps: React.FC<StepsProps> = ({
 }) => {
   // Container classes
   const containerClasses = useMemo(() => {
-    return classNames(getStepsContainerClasses(direction), className)
-  }, [direction, className])
+    return classNames(getStepsContainerClasses(direction), className);
+  }, [direction, className]);
 
   // Handle step click
   const handleStepClick = useCallback(
     (index: number) => {
       if (!clickable) {
-        return
+        return;
       }
 
-      onChange?.(index)
+      onChange?.(index);
     },
     [clickable, onChange]
-  )
+  );
 
   // Context value
   const contextValue = useMemo<StepsContextValue>(
@@ -86,29 +93,31 @@ export const Steps: React.FC<StepsProps> = ({
       handleStepClick: clickable ? handleStepClick : undefined,
     }),
     [current, status, direction, size, simple, clickable, handleStepClick]
-  )
+  );
 
   // Add step index and isLast props to each step item
   const stepsWithProps = useMemo(() => {
-    const items: ReactElement[] = []
+    const items: ReactElement[] = [];
 
     React.Children.forEach(children, (child, index) => {
-      if (React.isValidElement(child) && child.type === StepsItem) {
-        const totalCount = React.Children.count(children)
+      if (
+        React.isValidElement<StepsItemProps>(child) &&
+        child.type === StepsItem
+      ) {
+        const totalCount = React.Children.count(children);
         items.push(
           React.cloneElement(child, {
-            ...(child.props as object),
             stepIndex: index,
             isLast: index === totalCount - 1,
-          } as any)
-        )
+          })
+        );
       } else {
-        items.push(child as ReactElement)
+        items.push(child as ReactElement);
       }
-    })
+    });
 
-    return items
-  }, [children])
+    return items;
+  }, [children]);
 
   return (
     <StepsContext.Provider value={contextValue}>
@@ -116,8 +125,5 @@ export const Steps: React.FC<StepsProps> = ({
         {stepsWithProps}
       </div>
     </StepsContext.Provider>
-  )
-}
-
-// Import StepsItem to check the type
-import { StepsItem } from './StepsItem'
+  );
+};

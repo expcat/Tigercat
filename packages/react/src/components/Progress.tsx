@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react'
-import { 
+import React, { useMemo } from 'react';
+import {
   classNames,
   getProgressVariantClasses,
   getProgressTextColorClasses,
@@ -20,14 +20,11 @@ import {
   progressCircleTextClasses,
   type ProgressProps as CoreProgressProps,
   type ProgressVariant,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
-export interface ProgressProps extends CoreProgressProps {
-  /**
-   * Additional props
-   */
-  [key: string]: any
-}
+export interface ProgressProps
+  extends CoreProgressProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreProgressProps> {}
 
 export const Progress: React.FC<ProgressProps> = ({
   variant = 'primary',
@@ -46,68 +43,75 @@ export const Progress: React.FC<ProgressProps> = ({
   className,
   ...props
 }) => {
-  const clampedPercentage = useMemo(() => clampPercentage(percentage), [percentage])
-  
+  const clampedPercentage = useMemo(
+    () => clampPercentage(percentage),
+    [percentage]
+  );
+
   // Determine effective variant based on status
   const effectiveVariant = useMemo(() => {
-    const statusVariant = getStatusVariant(status)
-    return (statusVariant || variant) as ProgressVariant
-  }, [status, variant])
-  
+    const statusVariant = getStatusVariant(status);
+    return (statusVariant || variant) as ProgressVariant;
+  }, [status, variant]);
+
   // Determine if text should be shown
   const shouldShowText = useMemo(() => {
     if (showText !== undefined) {
-      return showText
+      return showText;
     }
-    return type === 'line'
-  }, [showText, type])
-  
+    return type === 'line';
+  }, [showText, type]);
+
   // Get formatted text
   const displayText = useMemo(() => {
     if (!shouldShowText) {
-      return ''
+      return '';
     }
-    return formatProgressText(clampedPercentage, text, format)
-  }, [shouldShowText, clampedPercentage, text, format])
-  
+    return formatProgressText(clampedPercentage, text, format);
+  }, [shouldShowText, clampedPercentage, text, format]);
+
   // Line progress classes
   const lineTrackClasses = useMemo(() => {
-    const heightClass = height 
+    const heightClass = height
       ? `h-[${height}px]`
-      : progressLineSizeClasses[size]
-    
+      : progressLineSizeClasses[size];
+
     return classNames(
       progressLineBaseClasses,
       progressTrackBgClasses,
       heightClass
-    )
-  }, [size, height])
-  
+    );
+  }, [size, height]);
+
   const lineBarClasses = useMemo(() => {
     return classNames(
       progressLineInnerClasses,
       getProgressVariantClasses(effectiveVariant),
       striped && progressStripedClasses,
       striped && stripedAnimation && progressStripedAnimationClasses
-    )
-  }, [effectiveVariant, striped, stripedAnimation])
-  
+    );
+  }, [effectiveVariant, striped, stripedAnimation]);
+
   const textClasses = useMemo(() => {
     return classNames(
       progressTextBaseClasses,
       progressTextSizeClasses[size],
       getProgressTextColorClasses(effectiveVariant)
-    )
-  }, [size, effectiveVariant])
-  
+    );
+  }, [size, effectiveVariant]);
+
   // Render line progress
   const renderLineProgress = () => {
-    const containerStyle = width !== 'auto'
-      ? { width: typeof width === 'number' ? `${width}px` : width }
-      : {}
-    
+    const containerStyle =
+      width !== 'auto'
+        ? { width: typeof width === 'number' ? `${width}px` : width }
+        : {};
+
     return (
-      <div className={classNames('flex items-center', className)} style={containerStyle} {...props}>
+      <div
+        className={classNames('flex items-center', className)}
+        style={containerStyle}
+        {...props}>
         <div className={lineTrackClasses} style={{ flex: 1 }}>
           <div
             className={lineBarClasses}
@@ -119,35 +123,40 @@ export const Progress: React.FC<ProgressProps> = ({
             aria-valuemax={100}
           />
         </div>
-        {shouldShowText && (
-          <span className={textClasses}>{displayText}</span>
-        )}
+        {shouldShowText && <span className={textClasses}>{displayText}</span>}
       </div>
-    )
-  }
-  
+    );
+  };
+
   // Render circle progress
   const renderCircleProgress = () => {
-    const { width: svgWidth, height: svgHeight, radius, cx, cy } = getCircleSize(size, strokeWidth)
+    const {
+      width: svgWidth,
+      height: svgHeight,
+      radius,
+      cx,
+      cy,
+    } = getCircleSize(size, strokeWidth);
     const { strokeDasharray, strokeDashoffset } = calculateCirclePath(
       radius,
       strokeWidth,
       clampedPercentage
-    )
-    
-    const strokeColor = getProgressVariantClasses(effectiveVariant).replace('bg-', 'text-')
-    
+    );
+
+    const strokeColor = getProgressVariantClasses(effectiveVariant).replace(
+      'bg-',
+      'text-'
+    );
+
     return (
-      <div 
+      <div
         className={classNames(progressCircleBaseClasses, className)}
         style={{ width: `${svgWidth}px`, height: `${svgHeight}px` }}
-        {...props}
-      >
+        {...props}>
         <svg
           width={svgWidth}
           height={svgHeight}
-          viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-        >
+          viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
           {/* Background circle */}
           <circle
             cx={cx}
@@ -182,23 +191,22 @@ export const Progress: React.FC<ProgressProps> = ({
           />
         </svg>
         {shouldShowText && (
-          <div 
+          <div
             className={classNames(
               progressCircleTextClasses,
               progressTextSizeClasses[size],
               'font-medium',
               getProgressTextColorClasses(effectiveVariant)
-            )}
-          >
+            )}>
             {displayText}
           </div>
         )}
       </div>
-    )
-  }
-  
+    );
+  };
+
   if (type === 'circle') {
-    return renderCircleProgress()
+    return renderCircleProgress();
   }
-  return renderLineProgress()
-}
+  return renderLineProgress();
+};

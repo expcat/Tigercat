@@ -1,25 +1,45 @@
-import { defineComponent, computed, provide, PropType, h, reactive, watch } from 'vue'
+import {
+  defineComponent,
+  computed,
+  provide,
+  PropType,
+  h,
+  reactive,
+  watch,
+  type VNode,
+  type VNodeArrayChildren,
+  type Component,
+} from 'vue';
 import {
   classNames,
   getStepsContainerClasses,
   type StepsDirection,
   type StepStatus,
   type StepSize,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 // Steps context key
-export const StepsContextKey = Symbol('StepsContext')
+export const StepsContextKey = Symbol('StepsContext');
 
 // Steps context interface
 export interface StepsContext {
-  current: number
-  status: StepStatus
-  direction: StepsDirection
-  size: StepSize
-  simple: boolean
-  clickable: boolean
-  handleStepClick?: (index: number) => void
+  current: number;
+  status: StepStatus;
+  direction: StepsDirection;
+  size: StepSize;
+  simple: boolean;
+  clickable: boolean;
+  handleStepClick?: (index: number) => void;
 }
+
+type RawChildren =
+  | string
+  | number
+  | boolean
+  | VNode
+  | VNodeArrayChildren
+  | (() => unknown);
+type RawSlotsLike = { [name: string]: unknown; $stable?: boolean };
 
 export const Steps = defineComponent({
   name: 'TigerSteps',
@@ -87,18 +107,18 @@ export const Steps = defineComponent({
       return classNames(
         getStepsContainerClasses(props.direction),
         props.className
-      )
-    })
+      );
+    });
 
     // Handle step click
     const handleStepClick = (index: number) => {
       if (!props.clickable) {
-        return
+        return;
       }
 
-      emit('update:current', index)
-      emit('change', index)
-    }
+      emit('update:current', index);
+      emit('change', index);
+    };
 
     // Provide steps context to child components (make it reactive)
     const stepsContextValue = reactive<StepsContext>({
@@ -109,35 +129,61 @@ export const Steps = defineComponent({
       simple: props.simple,
       clickable: props.clickable,
       handleStepClick: props.clickable ? handleStepClick : undefined,
-    })
+    });
 
     // Watch for changes to current and update context
-    watch(() => props.current, (newCurrent) => {
-      stepsContextValue.current = newCurrent
-    })
+    watch(
+      () => props.current,
+      (newCurrent) => {
+        stepsContextValue.current = newCurrent;
+      }
+    );
 
     // Watch for changes to status and update context
-    watch(() => props.status, (newStatus) => {
-      stepsContextValue.status = newStatus
-    })
+    watch(
+      () => props.status,
+      (newStatus) => {
+        stepsContextValue.status = newStatus;
+      }
+    );
 
-    provide<StepsContext>(StepsContextKey, stepsContextValue)
+    provide<StepsContext>(StepsContextKey, stepsContextValue);
 
     return () => {
-      const children = slots.default?.() || []
-      
+      const children = (slots.default?.() || []) as VNode[];
+
       // Add step index and isLast props to each step item
-      const stepsWithProps = children.map((child: any, index: number) => {
-        if (child && child.type && child.type.name === 'TigerStepsItem') {
-          return h(child.type, {
-            ...child.props,
-            stepIndex: index,
-            isLast: index === children.length - 1,
-          }, child.children)
+      const stepsWithProps = children.map((child, index: number) => {
+        const childType = child?.type;
+        const childName =
+          typeof childType === 'object' && childType && 'name' in childType
+            ? (childType as { name?: string }).name
+            : undefined;
+
+        if (childName === 'TigerStepsItem') {
+          const childProps = (child.props ?? {}) as Record<string, unknown>;
+          // `h()` expects `string | Component`, but `VNode.type` is `VNodeTypes`.
+          // Narrow here to keep DTS generation happy.
+          const stepItemType =
+            typeof child.type === 'string' || typeof child.type === 'object'
+              ? (child.type as string | Component)
+              : 'div';
+
+          return h(
+            stepItemType,
+            {
+              ...childProps,
+              stepIndex: index,
+              isLast: index === children.length - 1,
+            },
+            (child.children ?? undefined) as unknown as
+              | RawChildren
+              | RawSlotsLike
+          );
         }
-        return child
-      })
-      
+        return child;
+      });
+
       return h(
         'div',
         {
@@ -145,9 +191,9 @@ export const Steps = defineComponent({
           ...attrs,
         },
         stepsWithProps
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Steps
+export default Steps;

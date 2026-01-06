@@ -4,6 +4,8 @@ import { ref } from 'vue'
 
 const closeMessageRef = ref<(() => void) | null>(null)
 
+const delay = (cb: () => void, ms: number) => setTimeout(cb, ms)
+
 const showInfo = () => {
   message.info('这是一条信息提示')
 }
@@ -297,7 +299,7 @@ const showCustomClass = () => {
             class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             @click="() => {
               const close = message.loading('正在上传文件...')
-              setTimeout(() => {
+              delay(() => {
                 close()
                 message.success('文件上传成功')
               }, 2000)
@@ -313,7 +315,7 @@ const showCustomClass = () => {
             class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
             @click="() => {
               message.loading('正在保存设置...')
-              setTimeout(() => {
+              delay(() => {
                 message.success({
                   content: '设置保存成功',
                   duration: 2000,

@@ -1,13 +1,12 @@
-import { defineComponent, computed, inject, PropType, h } from 'vue'
+import { defineComponent, computed, inject, PropType, h } from 'vue';
 import {
-  classNames,
   getBreadcrumbItemClasses,
   getBreadcrumbLinkClasses,
   getBreadcrumbSeparatorClasses,
   getSeparatorContent,
   type BreadcrumbSeparator,
-} from '@tigercat/core'
-import { BreadcrumbContextKey, type BreadcrumbContext } from './Breadcrumb'
+} from '@tigercat/core';
+import { BreadcrumbContextKey, type BreadcrumbContext } from './Breadcrumb';
 
 export const BreadcrumbItem = defineComponent({
   name: 'TigerBreadcrumbItem',
@@ -66,79 +65,83 @@ export const BreadcrumbItem = defineComponent({
     // Inject breadcrumb context
     const breadcrumbContext = inject<BreadcrumbContext>(BreadcrumbContextKey, {
       separator: '/',
-    })
+    });
 
     // Item classes
     const itemClasses = computed(() => {
-      return getBreadcrumbItemClasses(props.current, props.className)
-    })
+      return getBreadcrumbItemClasses(props.current, props.className);
+    });
 
     // Link classes
     const linkClasses = computed(() => {
-      return getBreadcrumbLinkClasses(props.current)
-    })
+      return getBreadcrumbLinkClasses(props.current);
+    });
 
     // Separator classes
     const separatorClasses = computed(() => {
-      return getBreadcrumbSeparatorClasses()
-    })
+      return getBreadcrumbSeparatorClasses();
+    });
 
     // Get separator content
     const separatorContent = computed(() => {
-      const sep = props.separator !== undefined ? props.separator : breadcrumbContext.separator
-      return getSeparatorContent(sep)
-    })
+      const sep =
+        props.separator !== undefined
+          ? props.separator
+          : breadcrumbContext.separator;
+      return getSeparatorContent(sep);
+    });
 
     // Handle click
     const handleClick = (event: MouseEvent) => {
       if (!props.current) {
-        emit('click', event)
+        emit('click', event);
       }
-    }
+    };
 
     // Compute rel attribute for external links
     const computedRel = computed(() => {
       if (props.target === '_blank') {
-        return 'noopener noreferrer'
+        return 'noopener noreferrer';
       }
-      return undefined
-    })
+      return undefined;
+    });
 
     return () => {
-      const children = slots.default ? slots.default() : []
+      const children = slots.default ? slots.default() : [];
 
       // Icon rendering (if provided)
       const iconElement = props.icon
         ? h('span', { class: 'inline-flex' }, props.icon)
-        : null
+        : null;
 
       // Content wrapper
       const contentElements = iconElement
         ? [iconElement, ...children]
-        : children
+        : children;
 
       // Link or span element
-      const linkElement = props.href && !props.current
-        ? h(
-            'a',
-            {
-              class: linkClasses.value,
-              href: props.href,
-              target: props.target,
-              rel: computedRel.value,
-              'aria-current': props.current ? 'page' : undefined,
-              onClick: handleClick,
-            },
-            contentElements
-          )
-        : h(
-            'span',
-            {
-              class: linkClasses.value,
-              'aria-current': props.current ? 'page' : undefined,
-            },
-            contentElements
-          )
+      const linkElement =
+        props.href && !props.current
+          ? h(
+              'a',
+              {
+                class: linkClasses.value,
+                href: props.href,
+                target: props.target,
+                rel: computedRel.value,
+                'aria-current': props.current ? 'page' : undefined,
+                onClick: handleClick,
+              },
+              contentElements
+            )
+          : h(
+              'span',
+              {
+                class: linkClasses.value,
+                'aria-current': props.current ? 'page' : undefined,
+              },
+              contentElements
+            );
 
       // Separator element (not rendered for current/last item)
       const separatorElement = !props.current
@@ -150,7 +153,7 @@ export const BreadcrumbItem = defineComponent({
             },
             separatorContent.value
           )
-        : null
+        : null;
 
       return h(
         'li',
@@ -159,9 +162,9 @@ export const BreadcrumbItem = defineComponent({
           ...attrs,
         },
         [linkElement, separatorElement]
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default BreadcrumbItem
+export default BreadcrumbItem;

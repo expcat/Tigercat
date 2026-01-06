@@ -2,8 +2,12 @@
  * Loading/Spinner component utilities
  */
 
-import { classNames } from './class-names'
-import type { LoadingSize, LoadingColor, LoadingVariant } from '../types/loading'
+import { classNames } from './class-names';
+import type {
+  LoadingSize,
+  LoadingColor,
+  LoadingVariant,
+} from '../types/loading';
 
 /**
  * Loading size dimension mappings
@@ -13,7 +17,7 @@ export const loadingSizeClasses: Record<LoadingSize, string> = {
   md: 'h-6 w-6',
   lg: 'h-10 w-10',
   xl: 'h-16 w-16',
-}
+};
 
 /**
  * Loading text size classes
@@ -23,7 +27,7 @@ export const loadingTextSizeClasses: Record<LoadingSize, string> = {
   md: 'text-sm',
   lg: 'text-base',
   xl: 'text-lg',
-}
+};
 
 /**
  * Loading color classes using CSS variables
@@ -36,22 +40,24 @@ export const loadingColorClasses: Record<LoadingColor, string> = {
   danger: 'text-red-600',
   info: 'text-blue-500',
   default: 'text-gray-500',
-}
+};
 
 /**
  * Base classes for loading container
  */
-export const loadingContainerBaseClasses = 'inline-flex flex-col items-center justify-center gap-2'
+export const loadingContainerBaseClasses =
+  'inline-flex flex-col items-center justify-center gap-2';
 
 /**
  * Base classes for fullscreen loading
  */
-export const loadingFullscreenBaseClasses = 'fixed inset-0 z-50 flex items-center justify-center'
+export const loadingFullscreenBaseClasses =
+  'fixed inset-0 z-50 flex items-center justify-center';
 
 /**
  * Base classes for spinner animation
  */
-export const loadingSpinnerBaseClasses = 'animate-spin'
+export const loadingSpinnerBaseClasses = 'animate-spin';
 
 /**
  * Get loading spinner classes
@@ -62,27 +68,24 @@ export function getLoadingClasses(
   color: LoadingColor,
   customColor?: string
 ): string {
-  const sizeClass = loadingSizeClasses[size]
-  const colorClass = customColor ? '' : loadingColorClasses[color]
-  
-  const baseClasses = classNames(
-    sizeClass,
-    colorClass
-  )
-  
+  const sizeClass = loadingSizeClasses[size];
+  const colorClass = customColor ? '' : loadingColorClasses[color];
+
+  const baseClasses = classNames(sizeClass, colorClass);
+
   switch (variant) {
     case 'spinner':
-      return classNames(baseClasses, loadingSpinnerBaseClasses)
+      return classNames(baseClasses, loadingSpinnerBaseClasses);
     case 'dots':
-      return baseClasses
+      return baseClasses;
     case 'bars':
-      return baseClasses
+      return baseClasses;
     case 'ring':
-      return classNames(baseClasses, loadingSpinnerBaseClasses)
+      return classNames(baseClasses, loadingSpinnerBaseClasses);
     case 'pulse':
-      return classNames(baseClasses, 'animate-pulse')
+      return classNames(baseClasses, 'animate-pulse');
     default:
-      return classNames(baseClasses, loadingSpinnerBaseClasses)
+      return classNames(baseClasses, loadingSpinnerBaseClasses);
   }
 }
 
@@ -90,8 +93,8 @@ export function getLoadingClasses(
  * Get spinner SVG path for different variants
  */
 export function getSpinnerSVG(variant: LoadingVariant): {
-  viewBox: string
-  elements: Array<{ type: string; attrs: Record<string, any> }>
+  viewBox: string;
+  elements: Array<{ type: string; attrs: Record<string, unknown> }>;
 } {
   switch (variant) {
     case 'spinner':
@@ -119,8 +122,8 @@ export function getSpinnerSVG(variant: LoadingVariant): {
             },
           },
         ],
-      }
-    
+      };
+
     case 'ring':
       return {
         viewBox: '0 0 24 24',
@@ -152,8 +155,8 @@ export function getSpinnerSVG(variant: LoadingVariant): {
             },
           },
         ],
-      }
-    
+      };
+
     case 'pulse':
       return {
         viewBox: '0 0 24 24',
@@ -168,8 +171,8 @@ export function getSpinnerSVG(variant: LoadingVariant): {
             },
           },
         ],
-      }
-    
+      };
+
     default:
       return {
         viewBox: '0 0 24 24',
@@ -187,29 +190,35 @@ export function getSpinnerSVG(variant: LoadingVariant): {
             },
           },
         ],
-      }
+      };
   }
 }
 
 /**
  * Dots variant dimensions based on size
  */
-export const dotsVariantConfig: Record<LoadingSize, { dotSize: string; gap: string }> = {
+export const dotsVariantConfig: Record<
+  LoadingSize,
+  { dotSize: string; gap: string }
+> = {
   sm: { dotSize: 'h-1 w-1', gap: 'gap-0.5' },
   md: { dotSize: 'h-1.5 w-1.5', gap: 'gap-1' },
   lg: { dotSize: 'h-2.5 w-2.5', gap: 'gap-1.5' },
   xl: { dotSize: 'h-4 w-4', gap: 'gap-2' },
-}
+};
 
 /**
  * Bars variant dimensions based on size
  */
-export const barsVariantConfig: Record<LoadingSize, { barWidth: string; barHeight: string; gap: string }> = {
+export const barsVariantConfig: Record<
+  LoadingSize,
+  { barWidth: string; barHeight: string; gap: string }
+> = {
   sm: { barWidth: 'w-0.5', barHeight: 'h-3', gap: 'gap-0.5' },
   md: { barWidth: 'w-1', barHeight: 'h-5', gap: 'gap-1' },
   lg: { barWidth: 'w-1.5', barHeight: 'h-8', gap: 'gap-1.5' },
   xl: { barWidth: 'w-2', barHeight: 'h-12', gap: 'gap-2' },
-}
+};
 
 /**
  * Animation delay classes for dots and bars
@@ -218,7 +227,7 @@ export const animationDelayClasses = [
   'animation-delay-0',
   'animation-delay-150',
   'animation-delay-300',
-]
+];
 
 /**
  * CSS for custom animation delays
@@ -253,7 +262,7 @@ export const animationDelayStyles = `
 .animation-delay-300 {
   animation-delay: 0.3s;
 }
-`
+`;
 
 /**
  * Injects animation styles into the document head
@@ -261,23 +270,23 @@ export const animationDelayStyles = `
  */
 export function injectLoadingAnimationStyles(): void {
   if (typeof document === 'undefined') {
-    return
+    return;
   }
 
   try {
-    const styleId = 'tiger-loading-animations'
+    const styleId = 'tiger-loading-animations';
     if (!document.getElementById(styleId)) {
       if (!document.head) {
-        console.warn('Tigercat Loading: document.head is not available')
-        return
+        console.warn('Tigercat Loading: document.head is not available');
+        return;
       }
-      
-      const style = document.createElement('style')
-      style.id = styleId
-      style.textContent = animationDelayStyles
-      document.head.appendChild(style)
+
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = animationDelayStyles;
+      document.head.appendChild(style);
     }
   } catch (error) {
-    console.error('Tigercat Loading: Failed to inject animation styles', error)
+    console.error('Tigercat Loading: Failed to inject animation styles', error);
   }
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Alert, Space, Divider } from '@tigercat/vue'
+import { Alert, Divider } from '@tigercat/vue'
 
 const showAlert1 = ref(true)
 const showAlert2 = ref(true)

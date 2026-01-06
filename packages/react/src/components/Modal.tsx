@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useCallback, useState } from 'react'
-import { createPortal } from 'react-dom'
+import React, { useEffect, useMemo, useCallback, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   classNames,
   getModalContentClasses,
@@ -12,43 +12,43 @@ import {
   modalBodyClasses,
   modalFooterClasses,
   type ModalProps as CoreModalProps,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 export interface ModalProps extends CoreModalProps {
   /**
    * Modal content
    */
-  children?: React.ReactNode
-  
+  children?: React.ReactNode;
+
   /**
    * Modal title content (alternative to title prop)
    */
-  titleContent?: React.ReactNode
-  
+  titleContent?: React.ReactNode;
+
   /**
    * Modal footer content
    */
-  footer?: React.ReactNode
-  
+  footer?: React.ReactNode;
+
   /**
    * Callback when modal visibility changes
    */
-  onVisibleChange?: (visible: boolean) => void
-  
+  onVisibleChange?: (visible: boolean) => void;
+
   /**
    * Callback when modal is closed
    */
-  onClose?: () => void
-  
+  onClose?: () => void;
+
   /**
    * Callback when cancel button or close action is triggered
    */
-  onCancel?: () => void
-  
+  onCancel?: () => void;
+
   /**
    * Callback when OK button is clicked
    */
-  onOk?: () => void
+  onOk?: () => void;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -68,67 +68,60 @@ export const Modal: React.FC<ModalProps> = ({
   onVisibleChange,
   onClose,
   onCancel,
-  onOk,
 }) => {
-  const [hasRendered, setHasRendered] = useState(false)
-  const [isAnimating, setIsAnimating] = useState(false)
+  const [hasRendered, setHasRendered] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   // Track if modal has ever been rendered
   useEffect(() => {
     if (visible) {
-      setHasRendered(true)
-      setIsAnimating(true)
+      setHasRendered(true);
+      setIsAnimating(true);
     } else {
       // Delay unmounting for exit animation
       const timer = setTimeout(() => {
-        setIsAnimating(false)
-      }, 300)
-      return () => clearTimeout(timer)
+        setIsAnimating(false);
+      }, 300);
+      return () => clearTimeout(timer);
     }
-  }, [visible])
+  }, [visible]);
 
   // Notify parent of visibility changes
   useEffect(() => {
     if (onVisibleChange) {
-      onVisibleChange(visible)
+      onVisibleChange(visible);
     }
     if (!visible && onClose) {
-      onClose()
+      onClose();
     }
-  }, [visible, onVisibleChange, onClose])
+  }, [visible, onVisibleChange, onClose]);
 
-  const shouldRender = destroyOnClose ? visible : hasRendered
+  const shouldRender = destroyOnClose ? visible : hasRendered;
 
   const handleClose = useCallback(() => {
     if (onCancel) {
-      onCancel()
+      onCancel();
     }
-  }, [onCancel])
+  }, [onCancel]);
 
   const handleMaskClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       if (maskClosable && event.target === event.currentTarget) {
-        handleClose()
+        handleClose();
       }
     },
     [maskClosable, handleClose]
-  )
-
-  const handleOk = useCallback(() => {
-    if (onOk) {
-      onOk()
-    }
-  }, [onOk])
+  );
 
   const contentClasses = useMemo(
     () => getModalContentClasses(size, className),
     [size, className]
-  )
+  );
 
   const containerClasses = useMemo(
     () => getModalContainerClasses(centered),
     [centered]
-  )
+  );
 
   // Close icon component
   const CloseIcon = (
@@ -137,8 +130,7 @@ export const Modal: React.FC<ModalProps> = ({
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
+      stroke="currentColor">
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -146,10 +138,10 @@ export const Modal: React.FC<ModalProps> = ({
         d="M6 18L18 6M6 6l12 12"
       />
     </svg>
-  )
+  );
 
   if (!shouldRender && !isAnimating) {
-    return null
+    return null;
   }
 
   const modalContent = (
@@ -159,8 +151,7 @@ export const Modal: React.FC<ModalProps> = ({
         'transition-opacity duration-300',
         visible ? 'opacity-100' : 'opacity-0'
       )}
-      style={{ zIndex }}
-    >
+      style={{ zIndex }}>
       {/* Mask */}
       {mask && (
         <div
@@ -185,8 +176,7 @@ export const Modal: React.FC<ModalProps> = ({
           )}
           role="dialog"
           aria-modal="true"
-          aria-labelledby={title || titleContent ? 'modal-title' : undefined}
-        >
+          aria-labelledby={title || titleContent ? 'modal-title' : undefined}>
           {/* Header */}
           {(title || titleContent || closable) && (
             <div className={modalHeaderClasses}>
@@ -202,8 +192,7 @@ export const Modal: React.FC<ModalProps> = ({
                   type="button"
                   className={modalCloseButtonClasses}
                   onClick={handleClose}
-                  aria-label="Close"
-                >
+                  aria-label="Close">
                   {CloseIcon}
                 </button>
               )}
@@ -218,7 +207,7 @@ export const Modal: React.FC<ModalProps> = ({
         </div>
       </div>
     </div>
-  )
+  );
 
-  return createPortal(modalContent, document.body)
-}
+  return createPortal(modalContent, document.body);
+};
