@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { Link, Space, Divider } from '@tigercat/react';
 
 const LinkDemo: React.FC = () => {
@@ -92,12 +93,9 @@ const LinkDemo: React.FC = () => {
       </section>
 
       <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-        <a
-          href="#"
-          className="text-blue-600 hover:text-blue-800"
-          onClick={(e) => e.preventDefault()}>
+        <RouterLink to="/" className="text-blue-600 hover:text-blue-800">
           ← 返回首页
-        </a>
+        </RouterLink>
       </div>
     </div>
   );
