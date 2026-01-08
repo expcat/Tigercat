@@ -554,11 +554,18 @@ export const Table = defineComponent({
           ? { ...widthStyle, ...fixedStyle }
           : widthStyle;
 
-        const headerContent = [
-          column.renderHeader
-            ? slots[`header-${column.key}`]?.() || column.title
-            : column.title,
-        ];
+        const headerContent: any[] = [];
+
+        if (column.renderHeader) {
+          const slotContent = slots[`header-${column.key}`]?.();
+          if (slotContent && slotContent.length > 0) {
+            headerContent.push(...slotContent);
+          } else {
+            headerContent.push(column.title);
+          }
+        } else {
+          headerContent.push(column.title);
+        }
 
         if (props.columnLockable) {
           headerContent.push(
@@ -586,7 +593,9 @@ export const Table = defineComponent({
           );
         }
 
-        headerContent.push(column.sortable && SortIcon(sortDirection));
+        if (column.sortable) {
+          headerContent.push(SortIcon(sortDirection));
+        }
 
         headerCells.push(
           h(
@@ -610,41 +619,45 @@ export const Table = defineComponent({
             [
               h('div', { class: 'flex items-center gap-2' }, headerContent),
               // Filter input
-              column.filter &&
-                h('div', { class: 'mt-2' }, [
-                  column.filter.type === 'select' && column.filter.options
-                    ? h(
-                        'select',
-                        {
-                          class:
-                            'w-full px-2 py-1 text-sm border border-gray-300 rounded',
-                          onChange: (e: Event) =>
-                            handleFilter(
-                              column.key,
-                              (e.target as HTMLSelectElement).value
-                            ),
-                          onClick: (e: Event) => e.stopPropagation(),
-                        },
-                        [
-                          h('option', { value: '' }, 'All'),
-                          ...column.filter.options.map((opt) =>
-                            h('option', { value: opt.value }, opt.label)
-                          ),
-                        ]
-                      )
-                    : h('input', {
-                        type: 'text',
-                        class:
-                          'w-full px-2 py-1 text-sm border border-gray-300 rounded',
-                        placeholder: column.filter.placeholder || 'Filter...',
-                        onInput: (e: Event) =>
-                          handleFilter(
-                            column.key,
-                            (e.target as HTMLInputElement).value
-                          ),
-                        onClick: (e: Event) => e.stopPropagation(),
-                      }),
-                ]),
+              ...(column.filter
+                ? [
+                    h('div', { class: 'mt-2' }, [
+                      column.filter.type === 'select' && column.filter.options
+                        ? h(
+                            'select',
+                            {
+                              class:
+                                'w-full px-2 py-1 text-sm border border-gray-300 rounded',
+                              onChange: (e: Event) =>
+                                handleFilter(
+                                  column.key,
+                                  (e.target as HTMLSelectElement).value
+                                ),
+                              onClick: (e: Event) => e.stopPropagation(),
+                            },
+                            [
+                              h('option', { value: '' }, 'All'),
+                              ...column.filter.options.map((opt) =>
+                                h('option', { value: opt.value }, opt.label)
+                              ),
+                            ]
+                          )
+                        : h('input', {
+                            type: 'text',
+                            class:
+                              'w-full px-2 py-1 text-sm border border-gray-300 rounded',
+                            placeholder:
+                              column.filter.placeholder || 'Filter...',
+                            onInput: (e: Event) =>
+                              handleFilter(
+                                column.key,
+                                (e.target as HTMLInputElement).value
+                              ),
+                            onClick: (e: Event) => e.stopPropagation(),
+                          }),
+                    ]),
+                  ]
+                : []),
             ]
           )
         );
