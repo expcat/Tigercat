@@ -1,15 +1,15 @@
-import { defineComponent, computed, h, PropType } from 'vue'
-import { 
+import { defineComponent, computed, h, PropType } from 'vue';
+import {
   classNames,
   getSpaceGapSize,
   getSpaceAlignClass,
   getSpaceDirectionClass,
   type SpaceDirection,
   type SpaceSize,
-  type SpaceAlign
-} from '@tigercat/core'
+  type SpaceAlign,
+} from '@tigercat/core';
 
-const baseClasses = 'inline-flex'
+const baseClasses = 'inline-flex';
 
 export const Space = defineComponent({
   name: 'TigerSpace',
@@ -47,9 +47,9 @@ export const Space = defineComponent({
       default: false,
     },
   },
-  setup(props, { slots }) {
-    const gapSize = computed(() => getSpaceGapSize(props.size))
-    
+  setup(props, { slots, attrs }) {
+    const gapSize = computed(() => getSpaceGapSize(props.size));
+
     const spaceClasses = computed(() => {
       return classNames(
         baseClasses,
@@ -57,27 +57,31 @@ export const Space = defineComponent({
         getSpaceAlignClass(props.align),
         gapSize.value.class,
         props.wrap && 'flex-wrap'
-      )
-    })
+      );
+    });
 
     const spaceStyle = computed(() => {
       if (gapSize.value.style) {
-        return { gap: gapSize.value.style }
+        return { gap: gapSize.value.style };
       }
-      return undefined
-    })
+      return undefined;
+    });
+
+    const mergedClass = computed(() => [spaceClasses.value, attrs.class]);
+    const mergedStyle = computed(() => [spaceStyle.value, attrs.style]);
 
     return () => {
       return h(
         'div',
         {
-          class: spaceClasses.value,
-          style: spaceStyle.value,
+          ...attrs,
+          class: mergedClass.value,
+          style: mergedStyle.value,
         },
         slots.default?.()
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Space
+export default Space;
