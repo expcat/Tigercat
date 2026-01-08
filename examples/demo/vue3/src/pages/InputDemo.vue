@@ -2,7 +2,9 @@
 import { ref } from 'vue'
 import { Input, Space, Divider, FormItem } from '@tigercat/vue'
 
-const text = ref('')
+const basicText = ref('')
+const controlledText = ref('')
+const typeText = ref('')
 const password = ref('')
 const disabled = ref('禁用的输入框')
 const readonly = ref('只读的输入框')
@@ -28,9 +30,9 @@ const handleUncontrolledInput = (event: Event) => {
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space direction="vertical"
                class="w-full max-w-md">
-          <Input v-model="text"
+          <Input v-model="basicText"
                  placeholder="请输入内容" />
-          <p class="text-sm text-gray-600">输入的内容：{{ text }}</p>
+          <p class="text-sm text-gray-600">输入的内容：{{ basicText }}</p>
         </Space>
       </div>
       <Divider class="my-6" />
@@ -39,12 +41,12 @@ const handleUncontrolledInput = (event: Event) => {
     <!-- 受控与非受控 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">受控与非受控</h2>
-      <p class="text-gray-600 mb-6">受控模式使用 v-model；非受控模式可直接监听 input 事件。</p>
+      <p class="text-gray-600 mb-6">受控模式绑定值（v-model）；非受控模式不绑定值，仅监听 input 事件。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space direction="vertical"
                class="w-full max-w-md">
           <FormItem label="受控输入">
-            <Input v-model="text"
+            <Input v-model="controlledText"
                    placeholder="受控输入" />
           </FormItem>
           <FormItem label="非受控输入">
@@ -65,7 +67,7 @@ const handleUncontrolledInput = (event: Event) => {
         <Space direction="vertical"
                class="w-full max-w-md">
           <FormItem label="文本输入">
-            <Input v-model="text"
+            <Input v-model="typeText"
                    type="text"
                    placeholder="文本输入" />
           </FormItem>
