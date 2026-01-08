@@ -16,8 +16,6 @@ const SpaceDemo = lazy(() => import('./pages/SpaceDemo'));
 const DividerDemo = lazy(() => import('./pages/DividerDemo'));
 const LayoutDemo = lazy(() => import('./pages/LayoutDemo'));
 const GridDemo = lazy(() => import('./pages/GridDemo'));
-const RowDemo = lazy(() => import('./pages/RowDemo'));
-const ColDemo = lazy(() => import('./pages/ColDemo'));
 const LinkDemo = lazy(() => import('./pages/LinkDemo'));
 const TextDemo = lazy(() => import('./pages/TextDemo'));
 const IconDemo = lazy(() => import('./pages/IconDemo'));
@@ -66,8 +64,6 @@ const router = createBrowserRouter([
   { path: '/divider', element: <DividerDemo /> },
   { path: '/layout', element: <LayoutDemo /> },
   { path: '/grid', element: <GridDemo /> },
-  { path: '/row', element: <RowDemo /> },
-  { path: '/col', element: <ColDemo /> },
   { path: '/link', element: <LinkDemo /> },
   { path: '/text', element: <TextDemo /> },
   { path: '/icon', element: <IconDemo /> },

@@ -1,4 +1,11 @@
-import { defineComponent, computed, h, PropType, provide, InjectionKey } from 'vue'
+import {
+  defineComponent,
+  computed,
+  h,
+  PropType,
+  provide,
+  InjectionKey,
+} from 'vue';
 import {
   classNames,
   getAlignClasses,
@@ -7,13 +14,13 @@ import {
   type Align,
   type Justify,
   type GutterSize,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 interface RowContext {
-  gutter?: GutterSize
+  gutter?: GutterSize;
 }
 
-const RowContextKey: InjectionKey<RowContext> = Symbol('RowContext')
+const RowContextKey: InjectionKey<RowContext> = Symbol('RowContext');
 
 export const Row = defineComponent({
   name: 'TigerRow',
@@ -51,8 +58,8 @@ export const Row = defineComponent({
       default: true,
     },
   },
-  setup(props, { slots }) {
-    const { rowStyle } = getGutterStyles(props.gutter)
+  setup(props, { slots, attrs }) {
+    const { rowStyle } = getGutterStyles(props.gutter);
 
     const rowClasses = computed(() => {
       return classNames(
@@ -60,26 +67,27 @@ export const Row = defineComponent({
         props.wrap && 'flex-wrap',
         getAlignClasses(props.align),
         getJustifyClasses(props.justify)
-      )
-    })
+      );
+    });
 
     // Provide gutter context to Col components
     provide(RowContextKey, {
       gutter: props.gutter,
-    })
+    });
 
     return () => {
       return h(
         'div',
         {
-          class: rowClasses.value,
-          style: rowStyle,
+          ...attrs,
+          class: [rowClasses.value, attrs.class],
+          style: [rowStyle, attrs.style],
         },
         slots.default ? slots.default() : []
-      )
-    }
+      );
+    };
   },
-})
+});
 
 // Export context key for Col component
-export { RowContextKey }
+export { RowContextKey };
