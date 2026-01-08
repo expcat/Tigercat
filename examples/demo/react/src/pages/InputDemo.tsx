@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import { Input, Space, Divider, FormItem } from '@tigercat/react';
 
 const InputDemo: React.FC = () => {
-  const [text, setText] = useState('');
+  const [basicText, setBasicText] = useState('');
+  const [controlledText, setControlledText] = useState('');
+  const [uncontrolledText, setUncontrolledText] = useState('');
+  const [typeText, setTypeText] = useState('');
   const [password, setPassword] = useState('');
   const [limited, setLimited] = useState('');
   const [disabled] = useState('禁用的输入框');
@@ -25,11 +28,11 @@ const InputDemo: React.FC = () => {
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full max-w-md">
             <Input
-              value={text}
-              onChange={(e) => setText(e.target.value)}
+              value={basicText}
+              onChange={(e) => setBasicText(e.target.value)}
               placeholder="请输入内容"
             />
-            <p className="text-sm text-gray-600">输入的内容：{text}</p>
+            <p className="text-sm text-gray-600">输入的内容：{basicText}</p>
           </Space>
         </div>
         <Divider className="my-6" />
@@ -39,19 +42,26 @@ const InputDemo: React.FC = () => {
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">受控与非受控</h2>
         <p className="text-gray-600 mb-6">
-          受控模式由 value/onChange 控制；非受控模式使用 defaultValue。
+          受控模式绑定值（value/onChange）；非受控模式不绑定 value，仅监听 input
+          事件。
         </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full max-w-md">
             <FormItem label="受控输入">
               <Input
-                value={text}
-                onChange={(e) => setText(e.target.value)}
+                value={controlledText}
+                onChange={(e) => setControlledText(e.target.value)}
                 placeholder="受控输入"
               />
             </FormItem>
             <FormItem label="非受控输入">
-              <Input defaultValue="非受控默认值" placeholder="非受控输入" />
+              <Input
+                placeholder="非受控输入"
+                onInput={(e) => setUncontrolledText(e.currentTarget.value)}
+              />
+              <p className="text-sm text-gray-600">
+                输入的内容：{uncontrolledText}
+              </p>
             </FormItem>
           </Space>
         </div>
@@ -68,8 +78,8 @@ const InputDemo: React.FC = () => {
           <Space direction="vertical" className="w-full max-w-md">
             <FormItem label="文本输入">
               <Input
-                value={text}
-                onChange={(e) => setText(e.target.value)}
+                value={typeText}
+                onChange={(e) => setTypeText(e.target.value)}
                 type="text"
                 placeholder="文本输入"
               />
