@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { createRoot, Root } from 'react-dom/client'
-import { 
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { createRoot, Root } from 'react-dom/client';
+import { flushSync } from 'react-dom';
+import {
   classNames,
   getMessageTypeClasses,
   defaultMessageThemeColors,
@@ -17,38 +18,41 @@ import {
   type MessageInstance,
   type MessageOptions,
   type MessageConfig,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 /**
  * Global message container id
  */
-const MESSAGE_CONTAINER_ID = 'tiger-message-container'
+const MESSAGE_CONTAINER_ID = 'tiger-message-container';
 
 /**
  * Message instance storage
  */
-let messageInstances: MessageInstance[] = []
-let instanceIdCounter = 0
-let containerRoot: Root | null = null
-let updateCallback: (() => void) | null = null
+let messageInstances: MessageInstance[] = [];
+let instanceIdCounter = 0;
+let containerRoot: Root | null = null;
+let updateCallback: (() => void) | null = null;
 
 /**
  * Get next instance id
  */
 function getNextInstanceId(): number {
-  return ++instanceIdCounter
+  return ++instanceIdCounter;
 }
 
 /**
  * Icon component
  */
-const Icon: React.FC<{ path: string; className: string; isLoading?: boolean }> = ({ 
-  path, 
-  className, 
-  isLoading = false 
-}) => {
-  const iconClass = classNames(className, isLoading ? messageLoadingSpinnerClasses : '')
-  
+const Icon: React.FC<{
+  path: string;
+  className: string;
+  isLoading?: boolean;
+}> = ({ path, className, isLoading = false }) => {
+  const iconClass = classNames(
+    className,
+    isLoading ? messageLoadingSpinnerClasses : ''
+  );
+
   return (
     <svg
       className={iconClass}
@@ -56,127 +60,128 @@ const Icon: React.FC<{ path: string; className: string; isLoading?: boolean }> =
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
-      strokeWidth="2"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d={path}
-      />
+      strokeWidth="2">
+      <path strokeLinecap="round" strokeLinejoin="round" d={path} />
     </svg>
-  )
-}
+  );
+};
 
 /**
  * Single message item component
  */
 interface MessageItemProps {
-  message: MessageInstance
-  onClose: (id: string | number) => void
+  message: MessageInstance;
+  onClose: (id: string | number) => void;
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
-  const [isVisible, setIsVisible] = useState(false)
-  
+  const [isVisible, setIsVisible] = useState(false);
+
   useEffect(() => {
     // Trigger enter animation
-    setTimeout(() => setIsVisible(true), 10)
-  }, [])
-  
+    setTimeout(() => setIsVisible(true), 10);
+  }, []);
+
   const colorScheme = useMemo(
     () => getMessageTypeClasses(message.type, defaultMessageThemeColors),
     [message.type]
-  )
-  
+  );
+
   const messageClasses = useMemo(
-    () => classNames(
-      messageBaseClasses,
-      colorScheme.bg,
-      colorScheme.border,
-      colorScheme.text,
-      message.className,
-      isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
-    ),
+    () =>
+      classNames(
+        messageBaseClasses,
+        colorScheme.bg,
+        colorScheme.border,
+        colorScheme.text,
+        message.className,
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
+      ),
     [colorScheme, message.className, isVisible]
-  )
-  
-  const iconPath = message.icon || getMessageIconPath(message.type)
-  const iconClass = classNames(messageIconClasses, colorScheme.icon)
-  
+  );
+
+  const iconPath = message.icon || getMessageIconPath(message.type);
+  const iconClass = classNames(messageIconClasses, colorScheme.icon);
+
   const handleClose = useCallback(() => {
-    setIsVisible(false)
-    setTimeout(() => onClose(message.id), 300)
-  }, [message.id, onClose])
-  
+    setIsVisible(false);
+    setTimeout(() => onClose(message.id), 300);
+  }, [message.id, onClose]);
+
   return (
     <div className={messageClasses} role="alert">
-      <Icon path={iconPath} className={iconClass} isLoading={message.type === 'loading'} />
+      <Icon
+        path={iconPath}
+        className={iconClass}
+        isLoading={message.type === 'loading'}
+      />
       <div className={messageContentClasses}>{message.content}</div>
       {message.closable && (
         <button
           className={messageCloseButtonClasses}
           onClick={handleClose}
           aria-label="Close message"
-          type="button"
-        >
+          type="button">
           <Icon path={messageCloseIconPath} className="w-4 h-4" />
         </button>
       )}
     </div>
-  )
-}
+  );
+};
 
 /**
  * Message container props
  */
 export interface MessageContainerProps {
-  position?: MessagePosition
+  position?: MessagePosition;
 }
 
 /**
  * Message container component
  */
-export const MessageContainer: React.FC<MessageContainerProps> = ({ 
-  position = 'top' 
+export const MessageContainer: React.FC<MessageContainerProps> = ({
+  position = 'top',
 }) => {
-  const [messages, setMessages] = useState<MessageInstance[]>([])
-  
+  const [messages, setMessages] = useState<MessageInstance[]>(() => [
+    ...messageInstances,
+  ]);
+
   useEffect(() => {
     // Register update callback
     updateCallback = () => {
-      setMessages([...messageInstances])
-    }
-    
+      flushSync(() => {
+        setMessages([...messageInstances]);
+      });
+    };
+
     // Initial sync
-    updateCallback()
-    
+    updateCallback();
+
     return () => {
-      updateCallback = null
-    }
-  }, [])
-  
+      updateCallback = null;
+    };
+  }, []);
+
   const containerClasses = useMemo(
-    () => classNames(
-      messageContainerBaseClasses,
-      messagePositionClasses[position]
-    ),
+    () =>
+      classNames(messageContainerBaseClasses, messagePositionClasses[position]),
     [position]
-  )
-  
+  );
+
   const handleRemove = useCallback((id: string | number) => {
-    const index = messageInstances.findIndex(msg => msg.id === id)
+    const index = messageInstances.findIndex((msg) => msg.id === id);
     if (index !== -1) {
-      const instance = messageInstances[index]
-      messageInstances.splice(index, 1)
+      const instance = messageInstances[index];
+      messageInstances.splice(index, 1);
       if (instance.onClose) {
-        instance.onClose()
+        instance.onClose();
       }
       if (updateCallback) {
-        updateCallback()
+        updateCallback();
       }
     }
-  }, [])
-  
+  }, []);
+
   return (
     <div className={containerClasses} id={MESSAGE_CONTAINER_ID}>
       {messages.map((message) => (
@@ -187,33 +192,45 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
         />
       ))}
     </div>
-  )
-}
+  );
+};
 
 /**
  * Ensure message container exists
  */
 function ensureContainer() {
-  let container = document.getElementById(MESSAGE_CONTAINER_ID)
-  
-  if (!container) {
-    container = document.createElement('div')
-    container.id = `${MESSAGE_CONTAINER_ID}-root`
-    document.body.appendChild(container)
-    
-    containerRoot = createRoot(container)
-    containerRoot.render(<MessageContainer />)
+  const rootId = `${MESSAGE_CONTAINER_ID}-root`;
+
+  // If we already created a root but the DOM was externally cleared (e.g. tests), reset.
+  const existingRootEl = document.getElementById(rootId);
+  if (containerRoot && !existingRootEl) {
+    containerRoot = null;
+    updateCallback = null;
   }
+
+  if (containerRoot) {
+    return;
+  }
+
+  let rootEl = existingRootEl;
+  if (!rootEl) {
+    rootEl = document.createElement('div');
+    rootEl.id = rootId;
+    document.body.appendChild(rootEl);
+  }
+
+  containerRoot = createRoot(rootEl);
+  flushSync(() => {
+    containerRoot?.render(<MessageContainer />);
+  });
 }
 
 /**
  * Add a message to the queue
  */
 function addMessage(config: MessageConfig): () => void {
-  ensureContainer()
-  
-  const id = getNextInstanceId()
-  
+  const id = getNextInstanceId();
+
   const instance: MessageInstance = {
     id,
     type: config.type || 'info',
@@ -223,39 +240,42 @@ function addMessage(config: MessageConfig): () => void {
     onClose: config.onClose,
     icon: config.icon,
     className: config.className,
-  }
-  
-  messageInstances.push(instance)
-  
+  };
+
+  messageInstances.push(instance);
+
+  // Ensure container exists after state is updated so it can render immediately.
+  ensureContainer();
+
   // Trigger update
   if (updateCallback) {
-    updateCallback()
+    updateCallback();
   }
-  
+
   // Auto close after duration
   if (instance.duration > 0) {
     setTimeout(() => {
-      removeMessage(id)
-    }, instance.duration)
+      removeMessage(id);
+    }, instance.duration);
   }
-  
+
   // Return close function
-  return () => removeMessage(id)
+  return () => removeMessage(id);
 }
 
 /**
  * Remove a message from the queue
  */
 function removeMessage(id: string | number) {
-  const index = messageInstances.findIndex(msg => msg.id === id)
+  const index = messageInstances.findIndex((msg) => msg.id === id);
   if (index !== -1) {
-    const instance = messageInstances[index]
-    messageInstances.splice(index, 1)
+    const instance = messageInstances[index];
+    messageInstances.splice(index, 1);
     if (instance.onClose) {
-      instance.onClose()
+      instance.onClose();
     }
     if (updateCallback) {
-      updateCallback()
+      updateCallback();
     }
   }
 }
@@ -264,14 +284,28 @@ function removeMessage(id: string | number) {
  * Clear all messages
  */
 function clearAll() {
-  messageInstances.forEach(instance => {
+  messageInstances.forEach((instance) => {
     if (instance.onClose) {
-      instance.onClose()
+      instance.onClose();
     }
-  })
-  messageInstances = []
+  });
+  messageInstances = [];
   if (updateCallback) {
-    updateCallback()
+    updateCallback();
+  }
+
+  // For a singleton-style API, clearing should also reset the mounted root.
+  // This prevents tests or consumers that manipulate the DOM from leaving a stale root.
+  if (containerRoot) {
+    containerRoot.unmount();
+    containerRoot = null;
+  }
+  updateCallback = null;
+
+  const rootId = `${MESSAGE_CONTAINER_ID}-root`;
+  const rootEl = document.getElementById(rootId);
+  if (rootEl?.parentNode) {
+    rootEl.parentNode.removeChild(rootEl);
   }
 }
 
@@ -280,9 +314,9 @@ function clearAll() {
  */
 function normalizeOptions(options: MessageOptions): MessageConfig {
   if (typeof options === 'string') {
-    return { content: options }
+    return { content: options };
   }
-  return options
+  return options;
 }
 
 /**
@@ -293,48 +327,48 @@ export const message = {
    * Show an info message
    */
   info(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'info' })
+    const config = normalizeOptions(options);
+    return addMessage({ ...config, type: 'info' });
   },
-  
+
   /**
    * Show a success message
    */
   success(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'success' })
+    const config = normalizeOptions(options);
+    return addMessage({ ...config, type: 'success' });
   },
-  
+
   /**
    * Show a warning message
    */
   warning(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'warning' })
+    const config = normalizeOptions(options);
+    return addMessage({ ...config, type: 'warning' });
   },
-  
+
   /**
    * Show an error message
    */
   error(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'error' })
+    const config = normalizeOptions(options);
+    return addMessage({ ...config, type: 'error' });
   },
-  
+
   /**
    * Show a loading message
    */
   loading(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'loading', duration: 0 })
+    const config = normalizeOptions(options);
+    return addMessage({ ...config, type: 'loading', duration: 0 });
   },
-  
+
   /**
    * Clear all messages
    */
   clear() {
-    clearAll()
+    clearAll();
   },
-}
+};
 
-export default message
+export default message;

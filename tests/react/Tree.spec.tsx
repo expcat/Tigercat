@@ -78,7 +78,7 @@ describe('Tree', () => {
       expect(queryByText('Child 1-1')).not.toBeInTheDocument();
 
       const parent1 = getByText('Parent 1');
-      const expandIcon = parent1.parentElement?.querySelector('svg');
+      const expandIcon = parent1.closest('div')?.querySelector('svg');
 
       if (expandIcon) {
         await user.click(expandIcon);
@@ -98,7 +98,7 @@ describe('Tree', () => {
       expect(getByText('Child 1-1')).toBeInTheDocument();
 
       const parent1 = getByText('Parent 1');
-      const expandIcon = parent1.parentElement?.querySelector('svg');
+      const expandIcon = parent1.closest('div')?.querySelector('svg');
 
       if (expandIcon) {
         await user.click(expandIcon);
@@ -118,7 +118,7 @@ describe('Tree', () => {
       );
 
       const parent1 = getByText('Parent 1');
-      const expandIcon = parent1.parentElement?.querySelector('svg');
+      const expandIcon = parent1.closest('div')?.querySelector('svg');
 
       if (expandIcon) {
         await user.click(expandIcon);
@@ -362,7 +362,7 @@ describe('Tree', () => {
       );
 
       const parent1 = getByText('Parent 1');
-      const expandIcon = parent1.parentElement?.querySelector('svg');
+      const expandIcon = parent1.closest('div')?.querySelector('svg');
 
       if (expandIcon) {
         await user.click(expandIcon);
@@ -386,7 +386,7 @@ describe('Tree', () => {
       );
 
       const parent1 = getByText('Parent 1');
-      const expandIcon = parent1.parentElement?.querySelector('svg');
+      const expandIcon = parent1.closest('div')?.querySelector('svg');
 
       if (expandIcon) {
         await user.click(expandIcon);
@@ -410,7 +410,7 @@ describe('Tree', () => {
       expect(screen.queryByText('Child 1-1')).not.toBeInTheDocument();
 
       const parent1 = getByText('Parent 1');
-      const expandIcon = parent1.parentElement?.querySelector('svg');
+      const expandIcon = parent1.closest('div')?.querySelector('svg');
 
       if (expandIcon) {
         await user.click(expandIcon);
@@ -463,13 +463,16 @@ describe('Tree', () => {
         <Tree
           treeData={sampleTreeData}
           checkable
-          checkedKeys={['1']}
+          checkedKeys={['1-1', '1-2']}
           onCheck={onCheck}
         />
       );
 
       await waitFor(() => {
-        expect(checkbox.checked).toBe(true);
+        const updatedCheckbox = container.querySelector(
+          'input[type="checkbox"]'
+        ) as HTMLInputElement;
+        expect(updatedCheckbox.checked).toBe(true);
       });
     });
   });

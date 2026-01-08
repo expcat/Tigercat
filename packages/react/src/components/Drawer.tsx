@@ -122,7 +122,7 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   // Track transition state for callbacks
   const [, setIsTransitioning] = React.useState(false);
-  const previousVisible = React.useRef(visible);
+  const previousVisible = React.useRef(false);
 
   useEffect(() => {
     if (visible !== previousVisible.current) {
@@ -181,6 +181,12 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   // Don't render if destroyOnClose is true and drawer is not visible
   if (destroyOnClose && !visible) {
+    return null;
+  }
+
+  // Match library expectations: when not visible, do not render anything.
+  // This also prevents portal DOM from lingering in tests.
+  if (!visible) {
     return null;
   }
 
