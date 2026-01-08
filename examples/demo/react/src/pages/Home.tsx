@@ -16,7 +16,6 @@ const components = [
   { name: 'Slider', path: '/slider', category: '表单组件' },
   { name: 'Select', path: '/select', category: '表单组件' },
   { name: 'Form', path: '/form', category: '表单组件' },
-  { name: 'FormItem', path: '/form-item', category: '表单组件' },
   { name: 'DatePicker', path: '/datepicker', category: '表单组件' },
   { name: 'TimePicker', path: '/timepicker', category: '表单组件' },
   { name: 'Upload', path: '/upload', category: '表单组件' },
