@@ -1,11 +1,13 @@
-import { Card, Space, Divider, Button } from '@tigercat/react'
+import { Card, Space, Divider, Button } from '@tigercat/react';
 
 export default function CardDemo() {
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Card 卡片</h1>
-        <p className="text-gray-600">用于内容展示的卡片容器组件，支持多种样式和布局选项。</p>
+        <p className="text-gray-600">
+          用于内容展示的卡片容器组件，支持多种样式和布局选项。
+        </p>
       </div>
 
       {/* 基本用法 */}
@@ -23,7 +25,9 @@ export default function CardDemo() {
       {/* 卡片变体 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">卡片变体</h2>
-        <p className="text-gray-600 mb-6">卡片有四种样式：默认、带边框、带阴影和浮起。</p>
+        <p className="text-gray-600 mb-6">
+          卡片有四种样式：默认、带边框、带阴影和浮起。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card variant="default">
@@ -99,24 +103,21 @@ export default function CardDemo() {
         <p className="text-gray-600 mb-6">卡片可以包含封面图片。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card 
+            <Card
               cover="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=250&fit=crop"
-              coverAlt="代码编辑器"
-            >
+              coverAlt="代码编辑器">
               <h3 className="font-semibold mb-2">开发工具</h3>
               <p className="text-gray-600">现代化的开发环境</p>
             </Card>
-            <Card 
+            <Card
               cover="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=250&fit=crop"
-              coverAlt="笔记本电脑"
-            >
+              coverAlt="笔记本电脑">
               <h3 className="font-semibold mb-2">移动办公</h3>
               <p className="text-gray-600">随时随地高效工作</p>
             </Card>
-            <Card 
+            <Card
               cover="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop"
-              coverAlt="数据分析"
-            >
+              coverAlt="数据分析">
               <h3 className="font-semibold mb-2">数据分析</h3>
               <p className="text-gray-600">洞察数据价值</p>
             </Card>
@@ -128,25 +129,33 @@ export default function CardDemo() {
       {/* 卡片结构 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">卡片结构</h2>
-        <p className="text-gray-600 mb-6">卡片支持头部、主体、底部和操作区域。</p>
+        <p className="text-gray-600 mb-6">
+          卡片支持头部、主体、底部和操作区域。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card
               header={<h3 className="text-lg font-semibold">卡片标题</h3>}
-              footer={<p className="text-sm text-gray-500">创建于 2024-01-01</p>}
-            >
-              <p className="text-gray-600">这是卡片的主体内容区域，可以放置任何内容。</p>
+              footer={
+                <p className="text-sm text-gray-500">创建于 2024-01-01</p>
+              }>
+              <p className="text-gray-600">
+                这是卡片的主体内容区域，可以放置任何内容。
+              </p>
             </Card>
-            
+
             <Card
               header={<h3 className="text-lg font-semibold">操作卡片</h3>}
               actions={
                 <>
-                  <Button variant="ghost" size="sm">取消</Button>
-                  <Button variant="primary" size="sm">确认</Button>
+                  <Button variant="ghost" size="sm">
+                    取消
+                  </Button>
+                  <Button variant="primary" size="sm">
+                    确认
+                  </Button>
                 </>
-              }
-            >
+              }>
               <p className="text-gray-600">这个卡片包含操作按钮。</p>
             </Card>
           </div>
@@ -160,74 +169,95 @@ export default function CardDemo() {
         <p className="text-gray-600 mb-6">结合所有功能的完整卡片示例。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card 
-              variant="shadow" 
+            <Card
+              variant="shadow"
               hoverable
               cover="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=250&fit=crop"
               coverAlt="科技产品"
               header={<h3 className="text-lg font-semibold">智能设备</h3>}
               footer={
                 <div className="flex justify-between items-center">
-                  <span className="text-xl font-bold text-blue-600">¥299</span>
+                  <span className="text-xl font-bold text-[var(--tiger-primary,#2563eb)]">
+                    ¥299
+                  </span>
                   <span className="text-sm text-gray-500">已售 1.2k</span>
                 </div>
               }
               actions={
                 <>
-                  <Button variant="ghost" size="sm">收藏</Button>
-                  <Button variant="primary" size="sm">购买</Button>
+                  <Button variant="ghost" size="sm">
+                    收藏
+                  </Button>
+                  <Button variant="primary" size="sm">
+                    购买
+                  </Button>
                 </>
-              }
-            >
-              <p className="text-gray-600 mb-4">最新的智能科技产品，为您的生活带来便利。</p>
+              }>
+              <p className="text-gray-600 mb-4">
+                最新的智能科技产品，为您的生活带来便利。
+              </p>
             </Card>
 
-            <Card 
-              variant="shadow" 
+            <Card
+              variant="shadow"
               hoverable
               cover="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop"
               coverAlt="科技背景"
               header={<h3 className="text-lg font-semibold">创新方案</h3>}
               footer={
                 <div className="flex justify-between items-center">
-                  <span className="text-xl font-bold text-blue-600">¥999</span>
+                  <span className="text-xl font-bold text-[var(--tiger-primary,#2563eb)]">
+                    ¥999
+                  </span>
                   <span className="text-sm text-gray-500">已售 856</span>
                 </div>
               }
               actions={
                 <>
-                  <Button variant="ghost" size="sm">收藏</Button>
-                  <Button variant="primary" size="sm">购买</Button>
+                  <Button variant="ghost" size="sm">
+                    收藏
+                  </Button>
+                  <Button variant="primary" size="sm">
+                    购买
+                  </Button>
                 </>
-              }
-            >
-              <p className="text-gray-600 mb-4">为企业提供全方位的数字化转型解决方案。</p>
+              }>
+              <p className="text-gray-600 mb-4">
+                为企业提供全方位的数字化转型解决方案。
+              </p>
             </Card>
 
-            <Card 
-              variant="shadow" 
+            <Card
+              variant="shadow"
               hoverable
               cover="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&h=250&fit=crop"
               coverAlt="专业服务"
               header={<h3 className="text-lg font-semibold">专业服务</h3>}
               footer={
                 <div className="flex justify-between items-center">
-                  <span className="text-xl font-bold text-blue-600">¥1999</span>
+                  <span className="text-xl font-bold text-[var(--tiger-primary,#2563eb)]">
+                    ¥1999
+                  </span>
                   <span className="text-sm text-gray-500">已售 562</span>
                 </div>
               }
               actions={
                 <>
-                  <Button variant="ghost" size="sm">收藏</Button>
-                  <Button variant="primary" size="sm">购买</Button>
+                  <Button variant="ghost" size="sm">
+                    收藏
+                  </Button>
+                  <Button variant="primary" size="sm">
+                    购买
+                  </Button>
                 </>
-              }
-            >
-              <p className="text-gray-600 mb-4">专业团队为您提供一对一的咨询和技术支持。</p>
+              }>
+              <p className="text-gray-600 mb-4">
+                专业团队为您提供一对一的咨询和技术支持。
+              </p>
             </Card>
           </div>
         </div>
       </section>
     </div>
-  )
+  );
 }

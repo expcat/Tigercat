@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
 import React from 'react';
 import { Table, type TableColumn } from '@tigercat/react';
-import { expectNoA11yViolations } from '../utils';
+import { expectNoA11yViolations } from '../utils/react';
 
 const columns: TableColumn[] = [
   { key: 'name', title: 'Name' },

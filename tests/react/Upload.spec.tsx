@@ -7,7 +7,7 @@ import { render, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Upload, type UploadFile } from '@tigercat/react';
-import { expectNoA11yViolations } from '../utils';
+import { expectNoA11yViolations } from '../utils/react';
 
 describe('Upload', () => {
   describe('Rendering', () => {

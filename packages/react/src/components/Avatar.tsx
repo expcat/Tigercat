@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react'
-import { 
-  classNames, 
+import React, { useState, useMemo } from 'react';
+import {
+  classNames,
   avatarBaseClasses,
   avatarSizeClasses,
   avatarShapeClasses,
@@ -8,14 +8,14 @@ import {
   avatarDefaultTextColor,
   avatarImageClasses,
   getInitials,
-  type AvatarProps as CoreAvatarProps 
-} from '@tigercat/core'
+  type AvatarProps as CoreAvatarProps,
+} from '@tigercat/core';
 
 export interface AvatarProps extends CoreAvatarProps {
   /**
    * Icon content (children for icon mode)
    */
-  children?: React.ReactNode
+  children?: React.ReactNode;
 }
 
 export const Avatar: React.FC<AvatarProps> = ({
@@ -30,7 +30,9 @@ export const Avatar: React.FC<AvatarProps> = ({
   children,
   ...props
 }) => {
-  const [imageError, setImageError] = useState(false)
+  const [imageError, setImageError] = useState(false);
+
+  const hasImage = Boolean(src && !imageError);
 
   const avatarClasses = useMemo(() => {
     return classNames(
@@ -38,34 +40,33 @@ export const Avatar: React.FC<AvatarProps> = ({
       avatarSizeClasses[size],
       avatarShapeClasses[shape],
       // Apply background and text color only for text/icon avatars
-      !src && bgColor,
-      !src && textColor,
-      className,
-    )
-  }, [size, shape, src, bgColor, textColor, className])
+      !hasImage && bgColor,
+      !hasImage && textColor,
+      className
+    );
+  }, [size, shape, hasImage, bgColor, textColor, className]);
 
   const displayText = useMemo(() => {
     if (text) {
-      return getInitials(text)
+      return getInitials(text);
     }
-    return ''
-  }, [text])
+    return '';
+  }, [text]);
 
   const handleImageError = () => {
-    setImageError(true)
-  }
+    setImageError(true);
+  };
 
   // Priority: image > text > icon (children)
-  
+
   // If src is provided and not errored, show image
-  if (src && !imageError) {
+  if (hasImage) {
     return (
       <span
         className={avatarClasses}
         role="img"
         aria-label={alt || 'avatar'}
-        {...props}
-      >
+        {...props}>
         <img
           src={src}
           alt={alt || 'avatar'}
@@ -73,9 +74,9 @@ export const Avatar: React.FC<AvatarProps> = ({
           onError={handleImageError}
         />
       </span>
-    )
+    );
   }
-  
+
   // If text is provided, show text
   if (displayText) {
     return (
@@ -83,22 +84,20 @@ export const Avatar: React.FC<AvatarProps> = ({
         className={avatarClasses}
         role="img"
         aria-label={alt || text || 'avatar'}
-        {...props}
-      >
+        {...props}>
         {displayText}
       </span>
-    )
+    );
   }
-  
+
   // Otherwise, show icon from children
   return (
     <span
       className={avatarClasses}
       role="img"
       aria-label={alt || 'avatar'}
-      {...props}
-    >
+      {...props}>
       {children}
     </span>
-  )
-}
+  );
+};

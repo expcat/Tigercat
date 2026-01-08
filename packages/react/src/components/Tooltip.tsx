@@ -188,7 +188,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
       </div>
 
       {/* Tooltip content */}
-      <div className={contentWrapperClasses}>
+      <div className={contentWrapperClasses} hidden={!currentVisible}>
         <div className={contentClasses}>{contentContent || content}</div>
       </div>
     </div>
