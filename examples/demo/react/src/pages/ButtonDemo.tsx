@@ -75,7 +75,20 @@ const ButtonDemo: React.FC = () => {
         <Divider className="my-6" />
       </section>
 
-      {/* 块级按钮效果 (使用 className) */}
+      {/* 块级按钮 */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold mb-4">块级按钮</h2>
+        <p className="text-gray-600 mb-6">block 属性将使按钮适合其父宽度。</p>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <Space direction="vertical" className="w-full">
+            <Button variant="primary" block>主要按钮</Button>
+            <Button variant="secondary" block>次要按钮</Button>
+            <Button variant="outline" block>轮廓按钮</Button>
+          </Space>
+        </div>
+      </section>
+
+      {/* 全宽按钮 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">全宽按钮</h2>
         <p className="text-gray-600 mb-6">使用 className 设置按钮宽度。</p>

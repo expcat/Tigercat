@@ -61,15 +61,21 @@ export const Button = defineComponent({
      * Whether the button is in loading state
      */
     loading: Boolean,
+
+    /**
+     * Whether the button should take full width of its parent
+     */
+    block: Boolean,
   },
   emits: ['click'],
-  setup(props, { slots, emit }) {
+  setup(props, { slots, emit, attrs }) {
     const buttonClasses = computed(() => {
       return classNames(
         baseClasses,
         getButtonVariantClasses(props.variant),
         sizeClasses[props.size],
-        (props.disabled || props.loading) && 'cursor-not-allowed opacity-60'
+        (props.disabled || props.loading) && 'cursor-not-allowed opacity-60',
+        props.block && 'w-full'
       )
     })
 
@@ -81,6 +87,10 @@ export const Button = defineComponent({
 
     return () => {
       const children = []
+
+      const attrsWithoutClass: Record<string, unknown> = { ...attrs }
+      const attrsClass = (attrsWithoutClass as { class?: unknown }).class
+      delete (attrsWithoutClass as { class?: unknown }).class
       
       if (props.loading) {
         children.push(h('span', { class: 'mr-2' }, LoadingSpinner))
@@ -93,9 +103,10 @@ export const Button = defineComponent({
       return h(
         'button',
         {
-          class: buttonClasses.value,
+          class: [buttonClasses.value, attrsClass],
           disabled: props.disabled || props.loading,
           onClick: handleClick,
+          ...attrsWithoutClass,
         },
         children
       )

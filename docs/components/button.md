@@ -174,6 +174,7 @@ function App() {
 | size | 按钮尺寸 | `ButtonSize` | `'md'` | `'sm'` \| `'md'` \| `'lg'` |
 | disabled | 是否禁用 | `boolean` | `false` | `true` \| `false` |
 | loading | 是否加载中 | `boolean` | `false` | `true` \| `false` |
+| block | 是否块级（占满父容器宽度） | `boolean` | `false` | `true` \| `false` |
 
 #### React 专属属性
 

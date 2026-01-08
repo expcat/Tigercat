@@ -39,4 +39,10 @@ export interface ButtonProps {
    * @default false
    */
   loading?: boolean
+
+  /**
+   * Whether the button should take full width of its parent
+   * @default false
+   */
+  block?: boolean
 }

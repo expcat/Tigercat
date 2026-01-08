@@ -87,6 +87,19 @@ import { Button, Space, Divider } from '@tigercat/vue'
       </div>
     </section>
 
+    <!-- 全宽按钮 -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-4">全宽按钮</h2>
+      <p class="text-gray-600 mb-6">使用 class 设置按钮宽度。</p>
+      <div class="p-6 bg-gray-50 rounded-lg">
+        <Space direction="vertical" class="w-full">
+          <Button variant="primary" class="w-full">主要按钮</Button>
+          <Button variant="secondary" class="w-full">次要按钮</Button>
+          <Button variant="outline" class="w-full">轮廓按钮</Button>
+        </Space>
+      </div>
+    </section>
+
     <div class="mt-8 p-4 bg-blue-50 rounded-lg">
       <router-link to="/" class="text-blue-600 hover:text-blue-800">← 返回首页</router-link>
     </div>

@@ -37,6 +37,7 @@ export const Button: React.FC<ButtonProps> = ({
   size = 'md',
   disabled = false,
   loading = false,
+  block = false,
   onClick,
   children,
   type = 'button',
@@ -48,8 +49,9 @@ export const Button: React.FC<ButtonProps> = ({
     getButtonVariantClasses(variant),
     sizeClasses[size],
     (disabled || loading) && 'cursor-not-allowed opacity-60',
+    block && 'w-full',
     className,
-  ), [variant, size, disabled, loading, className])
+  ), [variant, size, disabled, loading, block, className])
 
   const handleClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
     if (!disabled && !loading && onClick) {
