@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, inject } from 'vue'
+import { defineComponent, computed, h, PropType, inject } from 'vue';
 import {
   classNames,
   getSpanClasses,
@@ -8,8 +8,8 @@ import {
   getGutterStyles,
   type ColSpan,
   type Breakpoint,
-} from '@tigercat/core'
-import { RowContextKey } from './Row'
+} from '@tigercat/core';
+import { RowContextKey } from './Row';
 
 export const Col = defineComponent({
   name: 'TigerCol',
@@ -27,14 +27,18 @@ export const Col = defineComponent({
      * @default 0
      */
     offset: {
-      type: [Number, Object] as PropType<number | Partial<Record<Breakpoint, number>>>,
+      type: [Number, Object] as PropType<
+        number | Partial<Record<Breakpoint, number>>
+      >,
       default: 0,
     },
     /**
      * Column order or responsive object
      */
     order: {
-      type: [Number, Object] as PropType<number | Partial<Record<Breakpoint, number>>>,
+      type: [Number, Object] as PropType<
+        number | Partial<Record<Breakpoint, number>>
+      >,
     },
     /**
      * Flex layout style
@@ -43,10 +47,10 @@ export const Col = defineComponent({
       type: [String, Number] as PropType<string | number>,
     },
   },
-  setup(props, { slots }) {
+  setup(props, { slots, attrs }) {
     // Inject gutter from Row context
-    const rowContext = inject(RowContextKey, {})
-    const { colStyle } = getGutterStyles(rowContext.gutter || 0)
+    const rowContext = inject(RowContextKey, {});
+    const { colStyle } = getGutterStyles(rowContext.gutter || 0);
 
     const colClasses = computed(() => {
       return classNames(
@@ -54,18 +58,19 @@ export const Col = defineComponent({
         getOffsetClasses(props.offset),
         getOrderClasses(props.order),
         getFlexClasses(props.flex)
-      )
-    })
+      );
+    });
 
     return () => {
       return h(
         'div',
         {
-          class: colClasses.value,
-          style: colStyle,
+          ...attrs,
+          class: [colClasses.value, attrs.class],
+          style: [colStyle, attrs.style],
         },
         slots.default ? slots.default() : []
-      )
-    }
+      );
+    };
   },
-})
+});

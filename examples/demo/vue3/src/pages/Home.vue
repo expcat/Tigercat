@@ -21,8 +21,6 @@ const components = [
 
   { name: 'Layout', path: '/layout', category: '布局组件' },
   { name: 'Grid', path: '/grid', category: '布局组件' },
-  { name: 'Row', path: '/row', category: '布局组件' },
-  { name: 'Col', path: '/col', category: '布局组件' },
   { name: 'Space', path: '/space', category: '布局组件' },
   { name: 'Divider', path: '/divider', category: '布局组件' },
 
