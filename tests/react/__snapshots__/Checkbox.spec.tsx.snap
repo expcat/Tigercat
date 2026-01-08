@@ -6,7 +6,7 @@ exports[`Checkbox > Snapshots > should match snapshot for checked state 1`] = `
 >
   <input
     checked=""
-    class="rounded border-2 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 w-5 h-5 border-[var(--tiger-primary,#2563eb)] text-white checked:bg-[var(--tiger-primary,#2563eb)] checked:border-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
+    class="rounded border-2 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 w-5 h-5 border-[var(--tiger-primary,#2563eb)] accent-[var(--tiger-primary,#2563eb)] text-white checked:bg-[var(--tiger-primary,#2563eb)] checked:border-[var(--tiger-primary,#2563eb)] indeterminate:bg-[var(--tiger-primary,#2563eb)] indeterminate:border-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
     type="checkbox"
   />
   <span
@@ -22,7 +22,7 @@ exports[`Checkbox > Snapshots > should match snapshot for disabled state 1`] = `
   class="inline-flex items-center cursor-pointer select-none text-base cursor-not-allowed opacity-50"
 >
   <input
-    class="rounded border-2 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 w-5 h-5 border-[var(--tiger-primary,#2563eb)] text-white checked:bg-[var(--tiger-primary,#2563eb)] checked:border-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)] cursor-not-allowed opacity-50 disabled:bg-gray-100 disabled:border-gray-300"
+    class="rounded border-2 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 w-5 h-5 border-[var(--tiger-primary,#2563eb)] accent-[var(--tiger-primary,#2563eb)] text-white checked:bg-[var(--tiger-primary,#2563eb)] checked:border-[var(--tiger-primary,#2563eb)] indeterminate:bg-[var(--tiger-primary,#2563eb)] indeterminate:border-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)] cursor-not-allowed opacity-50 disabled:bg-gray-100 disabled:border-gray-300"
     disabled=""
     type="checkbox"
   />
@@ -39,7 +39,7 @@ exports[`Checkbox > Snapshots > should match snapshot for unchecked state 1`] = 
   class="inline-flex items-center cursor-pointer select-none text-base"
 >
   <input
-    class="rounded border-2 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 w-5 h-5 border-[var(--tiger-primary,#2563eb)] text-white checked:bg-[var(--tiger-primary,#2563eb)] checked:border-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
+    class="rounded border-2 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 w-5 h-5 border-[var(--tiger-primary,#2563eb)] accent-[var(--tiger-primary,#2563eb)] text-white checked:bg-[var(--tiger-primary,#2563eb)] checked:border-[var(--tiger-primary,#2563eb)] indeterminate:bg-[var(--tiger-primary,#2563eb)] indeterminate:border-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
     type="checkbox"
   />
   <span
