@@ -8,7 +8,6 @@ const InputDemo = lazy(() => import('./pages/InputDemo'));
 const TextareaDemo = lazy(() => import('./pages/TextareaDemo'));
 const CheckboxDemo = lazy(() => import('./pages/CheckboxDemo'));
 const RadioDemo = lazy(() => import('./pages/RadioDemo'));
-const RadioGroupDemo = lazy(() => import('./pages/RadioGroupDemo'));
 const SwitchDemo = lazy(() => import('./pages/SwitchDemo'));
 const SliderDemo = lazy(() => import('./pages/SliderDemo'));
 const SelectDemo = lazy(() => import('./pages/SelectDemo'));
@@ -65,7 +64,6 @@ const router = createBrowserRouter([
   { path: '/textarea', element: <TextareaDemo /> },
   { path: '/checkbox', element: <CheckboxDemo /> },
   { path: '/radio', element: <RadioDemo /> },
-  { path: '/radio-group', element: <RadioGroupDemo /> },
   { path: '/switch', element: <SwitchDemo /> },
   { path: '/slider', element: <SliderDemo /> },
   { path: '/select', element: <SelectDemo /> },

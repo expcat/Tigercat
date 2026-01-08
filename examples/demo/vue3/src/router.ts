@@ -10,10 +10,6 @@ const router = createRouter({
     { path: '/textarea', component: () => import('./pages/TextareaDemo.vue') },
     { path: '/checkbox', component: () => import('./pages/CheckboxDemo.vue') },
     { path: '/radio', component: () => import('./pages/RadioDemo.vue') },
-    {
-      path: '/radio-group',
-      component: () => import('./pages/RadioGroupDemo.vue'),
-    },
     { path: '/switch', component: () => import('./pages/SwitchDemo.vue') },
     { path: '/slider', component: () => import('./pages/SliderDemo.vue') },
     { path: '/select', component: () => import('./pages/SelectDemo.vue') },
