@@ -83,11 +83,8 @@ const handlePreventNavigate = (event: MouseEvent) => {
     </section>
 
     <div class="mt-8 p-4 bg-blue-50 rounded-lg">
-      <a href="#"
-         class="text-blue-600 hover:text-blue-800"
-         @click.prevent>
-        ← 返回首页
-      </a>
+      <router-link to="/"
+                   class="text-blue-600 hover:text-blue-800">← 返回首页</router-link>
     </div>
   </div>
 </template>
