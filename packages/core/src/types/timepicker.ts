@@ -5,112 +5,125 @@
 /**
  * TimePicker size types
  */
-export type TimePickerSize = 'sm' | 'md' | 'lg'
+export type TimePickerSize = 'sm' | 'md' | 'lg';
 
 /**
  * Time format types
  */
-export type TimeFormat = '12' | '24'
+export type TimeFormat = '12' | '24';
 
 /**
  * Base TimePicker props interface
  */
 export interface TimePickerProps {
   /**
+   * Locale used for UI labels (e.g. AM/PM) and display formatting.
+   * Example: 'zh-CN', 'en-US'
+   */
+  locale?: string;
+
+  /**
    * TimePicker size
    * @default 'md'
    */
-  size?: TimePickerSize
-  
+  size?: TimePickerSize;
+
   /**
    * Selected time value (for controlled mode)
    * Format: 'HH:mm' or 'HH:mm:ss'
    */
-  value?: string | null
-  
+  value?: string | null | [string | null, string | null];
+
   /**
    * Default time value (for uncontrolled mode)
    * Format: 'HH:mm' or 'HH:mm:ss'
    */
-  defaultValue?: string | null
-  
+  defaultValue?: string | null | [string | null, string | null];
+
+  /**
+   * Enable range selection (start/end).
+   * When true, value/defaultValue use a tuple: [start, end].
+   * @default false
+   */
+  range?: boolean;
+
   /**
    * Time format (12-hour or 24-hour)
    * @default '24'
    */
-  format?: TimeFormat
-  
+  format?: TimeFormat;
+
   /**
    * Whether to show seconds
    * @default false
    */
-  showSeconds?: boolean
-  
+  showSeconds?: boolean;
+
   /**
    * Hour step
    * @default 1
    */
-  hourStep?: number
-  
+  hourStep?: number;
+
   /**
    * Minute step
    * @default 1
    */
-  minuteStep?: number
-  
+  minuteStep?: number;
+
   /**
    * Second step
    * @default 1
    */
-  secondStep?: number
-  
+  secondStep?: number;
+
   /**
    * Placeholder text
    * @default 'Select time'
    */
-  placeholder?: string
-  
+  placeholder?: string;
+
   /**
    * Whether the timepicker is disabled
    * @default false
    */
-  disabled?: boolean
-  
+  disabled?: boolean;
+
   /**
    * Whether the timepicker is readonly
    * @default false
    */
-  readonly?: boolean
-  
+  readonly?: boolean;
+
   /**
    * Whether the timepicker is required
    * @default false
    */
-  required?: boolean
-  
+  required?: boolean;
+
   /**
    * Minimum selectable time (HH:mm format)
    */
-  minTime?: string | null
-  
+  minTime?: string | null;
+
   /**
    * Maximum selectable time (HH:mm format)
    */
-  maxTime?: string | null
-  
+  maxTime?: string | null;
+
   /**
    * Whether to show the clear button
    * @default true
    */
-  clearable?: boolean
-  
+  clearable?: boolean;
+
   /**
    * Input name attribute
    */
-  name?: string
-  
+  name?: string;
+
   /**
    * Input id attribute
    */
-  id?: string
+  id?: string;
 }
