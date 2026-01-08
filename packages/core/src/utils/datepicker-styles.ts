@@ -2,23 +2,26 @@
  * DatePicker styling utilities
  */
 
-import type { DatePickerSize } from '../types/datepicker'
-import { classNames } from './class-names'
+import type { DatePickerSize } from '../types/datepicker';
+import { classNames } from './class-names';
 
 /**
  * Base classes for DatePicker container
  */
-export const datePickerBaseClasses = 'relative inline-block w-full'
+export const datePickerBaseClasses = 'relative inline-block w-full';
 
 /**
  * Base classes for DatePicker input wrapper
  */
-export const datePickerInputWrapperClasses = 'relative w-full'
+export const datePickerInputWrapperClasses = 'relative w-full';
 
 /**
  * Get input classes based on size
  */
-export function getDatePickerInputClasses(size: DatePickerSize = 'md', disabled = false): string {
+export function getDatePickerInputClasses(
+  size: DatePickerSize = 'md',
+  disabled = false
+): string {
   const baseClasses = [
     'w-full',
     'rounded-md',
@@ -33,25 +36,27 @@ export function getDatePickerInputClasses(size: DatePickerSize = 'md', disabled 
     'focus:border-transparent',
     'transition-colors',
     'pr-10', // Space for calendar icon
-  ]
+  ];
 
   const sizeClasses = {
     sm: 'px-2 py-1 text-sm',
     md: 'px-3 py-2 text-base',
     lg: 'px-4 py-3 text-lg',
-  }
+  };
 
   const disabledClasses = disabled
     ? ['bg-gray-100', 'cursor-not-allowed', 'text-gray-500']
-    : ['cursor-pointer']
+    : ['cursor-pointer'];
 
-  return classNames(...baseClasses, sizeClasses[size], ...disabledClasses)
+  return classNames(...baseClasses, sizeClasses[size], ...disabledClasses);
 }
 
 /**
  * Icon button classes
  */
-export function getDatePickerIconButtonClasses(size: DatePickerSize = 'md'): string {
+export function getDatePickerIconButtonClasses(
+  size: DatePickerSize = 'md'
+): string {
   const baseClasses = [
     'absolute',
     'right-0',
@@ -63,15 +68,15 @@ export function getDatePickerIconButtonClasses(size: DatePickerSize = 'md'): str
     'text-gray-400',
     'hover:text-gray-600',
     'transition-colors',
-  ]
+  ];
 
   const sizeClasses = {
     sm: 'px-2',
     md: 'px-3',
     lg: 'px-4',
-  }
+  };
 
-  return classNames(...baseClasses, sizeClasses[size])
+  return classNames(...baseClasses, sizeClasses[size]);
 }
 
 /**
@@ -88,7 +93,7 @@ export const datePickerCalendarClasses = classNames(
   'shadow-lg',
   'p-4',
   'w-80'
-)
+);
 
 /**
  * Calendar header classes
@@ -98,7 +103,7 @@ export const datePickerCalendarHeaderClasses = classNames(
   'items-center',
   'justify-between',
   'mb-4'
-)
+);
 
 /**
  * Calendar navigation button classes
@@ -113,7 +118,7 @@ export const datePickerNavButtonClasses = classNames(
   'focus:outline-none',
   'focus:ring-2',
   'focus:ring-[var(--tiger-primary,#2563eb)]'
-)
+);
 
 /**
  * Calendar month/year display classes
@@ -122,7 +127,7 @@ export const datePickerMonthYearClasses = classNames(
   'text-base',
   'font-semibold',
   'text-gray-900'
-)
+);
 
 /**
  * Calendar grid classes
@@ -131,7 +136,7 @@ export const datePickerCalendarGridClasses = classNames(
   'grid',
   'grid-cols-7',
   'gap-1'
-)
+);
 
 /**
  * Day name header classes
@@ -142,7 +147,7 @@ export const datePickerDayNameClasses = classNames(
   'font-medium',
   'text-gray-500',
   'py-2'
-)
+);
 
 /**
  * Get day cell classes
@@ -151,7 +156,10 @@ export function getDatePickerDayCellClasses(
   isCurrentMonth: boolean,
   isSelected: boolean,
   isToday: boolean,
-  isDisabled: boolean
+  isDisabled: boolean,
+  isInRange = false,
+  isRangeStart = false,
+  isRangeEnd = false
 ): string {
   const baseClasses = [
     'w-10',
@@ -162,31 +170,40 @@ export function getDatePickerDayCellClasses(
     'rounded-md',
     'text-sm',
     'transition-colors',
-  ]
+  ];
 
   const interactionClasses = isDisabled
     ? ['cursor-not-allowed', 'text-gray-300']
-    : ['cursor-pointer', 'hover:bg-gray-100']
+    : ['cursor-pointer', 'hover:bg-gray-100'];
 
-  const monthClasses = isCurrentMonth ? ['text-gray-900'] : ['text-gray-400']
+  const monthClasses = isCurrentMonth ? ['text-gray-900'] : ['text-gray-400'];
 
-  const stateClasses = []
-  if (isSelected) {
+  const stateClasses = [];
+  if (isInRange && !isDisabled && !isSelected) {
+    stateClasses.push('bg-[var(--tiger-outline-bg-hover,#eff6ff)]');
+  }
+
+  if (isSelected || isRangeStart || isRangeEnd) {
     stateClasses.push(
       'bg-[var(--tiger-primary,#2563eb)]',
       'text-white',
       'hover:bg-[var(--tiger-primary-hover,#1d4ed8)]',
       'font-semibold'
-    )
+    );
   } else if (isToday) {
     stateClasses.push(
       'border',
       'border-[var(--tiger-primary,#2563eb)]',
       'font-semibold'
-    )
+    );
   }
 
-  return classNames(...baseClasses, ...interactionClasses, ...monthClasses, ...stateClasses)
+  return classNames(
+    ...baseClasses,
+    ...interactionClasses,
+    ...monthClasses,
+    ...stateClasses
+  );
 }
 
 /**
@@ -201,4 +218,4 @@ export const datePickerClearButtonClasses = classNames(
   'hover:text-gray-600',
   'transition-colors',
   'p-1'
-)
+);

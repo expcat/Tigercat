@@ -1,14 +1,18 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { DatePicker } from '@tigercat/react'
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { DatePicker } from '@tigercat/react';
 
 const DatePickerDemo: React.FC = () => {
-  const [date, setDate] = useState<Date | null>(null)
-  const [dateWithDefault, setDateWithDefault] = useState<Date | null>(new Date('2024-01-15'))
-  const [minMaxDate, setMinMaxDate] = useState<Date | null>(null)
-  
-  const minDate = new Date('2024-01-01')
-  const maxDate = new Date('2024-12-31')
+  const [date, setDate] = useState<Date | null>(null);
+  const [dateWithDefault, setDateWithDefault] = useState<Date | null>(
+    new Date('2024-01-15')
+  );
+  const [minMaxDate, setMinMaxDate] = useState<Date | null>(null);
+  const [range, setRange] = useState<[Date | null, Date | null]>([null, null]);
+  const [locale, setLocale] = useState<'zh-CN' | 'en-US'>('zh-CN');
+
+  const minDate = new Date('2024-01-01');
+  const maxDate = new Date('2024-12-31');
 
   return (
     <div className="max-w-5xl mx-auto p-8">
@@ -23,9 +27,51 @@ const DatePickerDemo: React.FC = () => {
         <p className="text-gray-600 mb-6">基础的日期选择器组件。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md space-y-4">
-            <DatePicker value={date} onChange={setDate} placeholder="请选择日期" />
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                语言
+              </label>
+              <select
+                className="border border-gray-300 rounded px-3 py-2"
+                value={locale}
+                onChange={(e) =>
+                  setLocale(e.target.value as 'zh-CN' | 'en-US')
+                }>
+                <option value="zh-CN">中文（简体）</option>
+                <option value="en-US">English (US)</option>
+              </select>
+            </div>
+
+            <DatePicker
+              value={date}
+              onChange={setDate}
+              placeholder="请选择日期"
+              locale={locale}
+            />
             <p className="text-sm text-gray-600">
-              选中的日期：{date ? date.toLocaleDateString() : '未选择'}
+              选中的日期：{date ? date.toLocaleDateString(locale) : '未选择'}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 范围选择 */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold mb-4">范围选择</h2>
+        <p className="text-gray-600 mb-6">选择开始日期与结束日期。</p>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <div className="max-w-md space-y-4">
+            <DatePicker
+              range
+              value={range}
+              onChange={setRange}
+              placeholder="请选择日期范围"
+              locale={locale}
+            />
+            <p className="text-sm text-gray-600">
+              已选范围：
+              {range[0] ? range[0].toLocaleDateString(locale) : '未选择'} -{' '}
+              {range[1] ? range[1].toLocaleDateString(locale) : '未选择'}
             </p>
           </div>
         </div>
@@ -38,15 +84,21 @@ const DatePickerDemo: React.FC = () => {
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">小尺寸</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                小尺寸
+              </label>
               <DatePicker size="sm" placeholder="小尺寸日期选择器" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">中尺寸</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                中尺寸
+              </label>
               <DatePicker size="md" placeholder="中尺寸日期选择器" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">大尺寸</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                大尺寸
+              </label>
               <DatePicker size="lg" placeholder="大尺寸日期选择器" />
             </div>
           </div>
@@ -56,24 +108,30 @@ const DatePickerDemo: React.FC = () => {
       {/* 日期格式 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">日期格式</h2>
-        <p className="text-gray-600 mb-6">支持多种日期显示格式。</p>
+        <p className="text-gray-600 mb-6">仅展示两种常用日期显示格式。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">yyyy-MM-dd</label>
-              <DatePicker value={dateWithDefault} onChange={setDateWithDefault} format="yyyy-MM-dd" />
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                yyyy-MM-dd
+              </label>
+              <DatePicker
+                value={dateWithDefault}
+                onChange={setDateWithDefault}
+                format="yyyy-MM-dd"
+                locale={locale}
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">MM/dd/yyyy</label>
-              <DatePicker value={dateWithDefault} onChange={setDateWithDefault} format="MM/dd/yyyy" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">dd/MM/yyyy</label>
-              <DatePicker value={dateWithDefault} onChange={setDateWithDefault} format="dd/MM/yyyy" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">yyyy/MM/dd</label>
-              <DatePicker value={dateWithDefault} onChange={setDateWithDefault} format="yyyy/MM/dd" />
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                MM/dd/yyyy
+              </label>
+              <DatePicker
+                value={dateWithDefault}
+                onChange={setDateWithDefault}
+                format="MM/dd/yyyy"
+                locale={locale}
+              />
             </div>
           </div>
         </div>
@@ -82,18 +140,22 @@ const DatePickerDemo: React.FC = () => {
       {/* 日期范围限制 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">日期范围限制</h2>
-        <p className="text-gray-600 mb-6">使用 minDate 和 maxDate 限制可选择的日期范围（2024年度）。</p>
+        <p className="text-gray-600 mb-6">
+          使用 minDate 和 maxDate 限制可选择的日期范围（2024年度）。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md space-y-4">
-            <DatePicker 
-              value={minMaxDate} 
+            <DatePicker
+              value={minMaxDate}
               onChange={setMinMaxDate}
               minDate={minDate}
               maxDate={maxDate}
               placeholder="仅可选择2024年的日期"
+              locale={locale}
             />
             <p className="text-sm text-gray-600">
-              选中日期：{minMaxDate ? minMaxDate.toLocaleDateString() : '未选择'}
+              选中日期：
+              {minMaxDate ? minMaxDate.toLocaleDateString(locale) : '未选择'}
             </p>
           </div>
         </div>
@@ -102,15 +164,21 @@ const DatePickerDemo: React.FC = () => {
       {/* 禁用和只读 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">禁用和只读</h2>
-        <p className="text-gray-600 mb-6">日期选择器可以设置为禁用或只读状态。</p>
+        <p className="text-gray-600 mb-6">
+          日期选择器可以设置为禁用或只读状态。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">禁用</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                禁用
+              </label>
               <DatePicker value={new Date('2024-06-15')} disabled />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">只读</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                只读
+              </label>
               <DatePicker value={new Date('2024-06-15')} readonly />
             </div>
           </div>
@@ -120,26 +188,42 @@ const DatePickerDemo: React.FC = () => {
       {/* 可清除 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">可清除</h2>
-        <p className="text-gray-600 mb-6">使用 clearable 属性控制是否显示清除按钮。</p>
+        <p className="text-gray-600 mb-6">
+          使用 clearable 属性控制是否显示清除按钮。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">可清除</label>
-              <DatePicker value={dateWithDefault} onChange={setDateWithDefault} clearable={true} />
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                可清除
+              </label>
+              <DatePicker
+                value={dateWithDefault}
+                onChange={setDateWithDefault}
+                clearable={true}
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">不可清除</label>
-              <DatePicker value={dateWithDefault} onChange={setDateWithDefault} clearable={false} />
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                不可清除
+              </label>
+              <DatePicker
+                value={dateWithDefault}
+                onChange={setDateWithDefault}
+                clearable={false}
+              />
             </div>
           </div>
         </div>
       </section>
 
       <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-        <Link to="/" className="text-blue-600 hover:text-blue-800">← 返回首页</Link>
+        <Link to="/" className="text-blue-600 hover:text-blue-800">
+          ← 返回首页
+        </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default DatePickerDemo
+export default DatePickerDemo;

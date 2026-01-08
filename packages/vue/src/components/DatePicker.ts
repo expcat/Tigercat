@@ -1,7 +1,17 @@
-import { defineComponent, computed, ref, h, PropType, watch, onMounted, onBeforeUnmount } from 'vue'
+import {
+  defineComponent,
+  computed,
+  ref,
+  h,
+  PropType,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+} from 'vue';
 import {
   parseDate,
   formatDate,
+  formatMonthYear,
   isSameDay,
   isDateInRange,
   getCalendarDays,
@@ -27,7 +37,7 @@ import {
   ChevronRightIconPath,
   type DatePickerSize,
   type DateFormat,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 // Helper function to create SVG icon
 const createIcon = (path: string, className: string) => {
@@ -46,23 +56,41 @@ const createIcon = (path: string, className: string) => {
         'clip-rule': 'evenodd',
       }),
     ]
-  )
-}
+  );
+};
 
 // Icons
-const CalendarIcon = createIcon(CalendarIconPath, 'w-5 h-5')
-const CloseIcon = createIcon(CloseIconPath, 'w-4 h-4')
-const ChevronLeftIcon = createIcon(ChevronLeftIconPath, 'w-5 h-5')
-const ChevronRightIcon = createIcon(ChevronRightIconPath, 'w-5 h-5')
+const CalendarIcon = createIcon(CalendarIconPath, 'w-5 h-5');
+const CloseIcon = createIcon(CloseIconPath, 'w-4 h-4');
+const ChevronLeftIcon = createIcon(ChevronLeftIconPath, 'w-5 h-5');
+const ChevronRightIcon = createIcon(ChevronRightIconPath, 'w-5 h-5');
 
 export const DatePicker = defineComponent({
   name: 'TigerDatePicker',
   props: {
     /**
+     * Enable range selection (start/end).
+     * When true, v-model uses a tuple: [start, end].
+     * @default false
+     */
+    range: {
+      type: Boolean,
+      default: false,
+    },
+    /**
+     * Locale used for month/day names in the calendar UI.
+     * Example: 'zh-CN', 'en-US'
+     */
+    locale: {
+      type: String,
+    },
+    /**
      * Selected date value (for v-model)
      */
     modelValue: {
-      type: [Date, String, null] as PropType<Date | string | null>,
+      type: [Date, String, Array, null] as PropType<
+        Date | string | null | [Date | string | null, Date | string | null]
+      >,
       default: null,
     },
     /**
@@ -152,110 +180,196 @@ export const DatePicker = defineComponent({
     /**
      * Emitted when date changes (for v-model)
      */
-    'update:modelValue': (value: Date | null) => value === null || value instanceof Date,
+    'update:modelValue': (value: unknown) => {
+      if (value === null) return true;
+      if (value instanceof Date) return true;
+      if (Array.isArray(value) && value.length === 2) {
+        const [start, end] = value;
+        const validStart = start === null || start instanceof Date;
+        const validEnd = end === null || end instanceof Date;
+        return validStart && validEnd;
+      }
+      return false;
+    },
     /**
      * Emitted when date changes
      */
-    change: (value: Date | null) => value === null || value instanceof Date,
+    change: (value: unknown) => {
+      if (value === null) return true;
+      if (value instanceof Date) return true;
+      if (Array.isArray(value) && value.length === 2) {
+        const [start, end] = value;
+        const validStart = start === null || start instanceof Date;
+        const validEnd = end === null || end instanceof Date;
+        return validStart && validEnd;
+      }
+      return false;
+    },
     /**
      * Emitted when clear button is clicked
      */
     clear: () => true,
   },
   setup(props, { emit }) {
-    const isOpen = ref(false)
-    const calendarRef = ref<HTMLElement | null>(null)
-    const inputWrapperRef = ref<HTMLElement | null>(null)
-    const inputRef = ref<HTMLInputElement | null>(null)
+    const isOpen = ref(false);
+    const calendarRef = ref<HTMLElement | null>(null);
+    const inputWrapperRef = ref<HTMLElement | null>(null);
+    const inputRef = ref<HTMLInputElement | null>(null);
 
-    const selectedDate = computed(() => parseDate(props.modelValue))
-    const minDateParsed = computed(() => parseDate(props.minDate))
-    const maxDateParsed = computed(() => parseDate(props.maxDate))
+    const isRangeMode = computed(() => props.range);
+
+    const selectedDate = computed(() => {
+      if (isRangeMode.value) return null;
+      return parseDate(props.modelValue as Date | string | null);
+    });
+
+    const selectedRange = computed<[Date | null, Date | null]>(() => {
+      if (!isRangeMode.value) return [null, null];
+      const raw = props.modelValue as
+        | [Date | string | null, Date | string | null]
+        | null;
+      if (!raw || !Array.isArray(raw)) return [null, null];
+      return [parseDate(raw[0]), parseDate(raw[1])];
+    });
+    const minDateParsed = computed(() => parseDate(props.minDate));
+    const maxDateParsed = computed(() => parseDate(props.maxDate));
 
     // Current viewing month/year in calendar
-    const viewingMonth = ref(selectedDate.value?.getMonth() ?? new Date().getMonth())
-    const viewingYear = ref(selectedDate.value?.getFullYear() ?? new Date().getFullYear())
+    const viewingMonth = ref(
+      (selectedDate.value ?? selectedRange.value[0])?.getMonth() ??
+        new Date().getMonth()
+    );
+    const viewingYear = ref(
+      (selectedDate.value ?? selectedRange.value[0])?.getFullYear() ??
+        new Date().getFullYear()
+    );
 
     const displayValue = computed(() => {
-      return selectedDate.value ? formatDate(selectedDate.value, props.format) : ''
-    })
+      if (!isRangeMode.value) {
+        return selectedDate.value
+          ? formatDate(selectedDate.value, props.format)
+          : '';
+      }
+
+      const [start, end] = selectedRange.value;
+      const startText = start ? formatDate(start, props.format) : '';
+      const endText = end ? formatDate(end, props.format) : '';
+
+      if (!startText && !endText) return '';
+      if (startText && endText) return `${startText} - ${endText}`;
+      return startText ? `${startText} - ` : ` - ${endText}`;
+    });
 
     const showClearButton = computed(() => {
-      return props.clearable && !props.disabled && !props.readonly && selectedDate.value !== null
-    })
+      if (!props.clearable || props.disabled || props.readonly) return false;
+      if (!isRangeMode.value) return selectedDate.value !== null;
+      const [start, end] = selectedRange.value;
+      return start !== null || end !== null;
+    });
 
     const calendarDays = computed(() => {
-      return getCalendarDays(viewingYear.value, viewingMonth.value)
-    })
+      return getCalendarDays(viewingYear.value, viewingMonth.value);
+    });
 
-    const monthNames = getMonthNames()
-    const dayNames = getShortDayNames()
+    const monthNames = computed(() => getMonthNames(props.locale));
+    const dayNames = computed(() => getShortDayNames(props.locale));
 
     function toggleCalendar() {
       if (!props.disabled && !props.readonly) {
-        isOpen.value = !isOpen.value
+        isOpen.value = !isOpen.value;
         if (isOpen.value) {
           // Reset viewing month to selected date or current month
-          if (selectedDate.value) {
-            viewingMonth.value = selectedDate.value.getMonth()
-            viewingYear.value = selectedDate.value.getFullYear()
+          const baseDate = selectedDate.value ?? selectedRange.value[0];
+          if (baseDate) {
+            viewingMonth.value = baseDate.getMonth();
+            viewingYear.value = baseDate.getFullYear();
           }
         }
       }
     }
 
     function closeCalendar() {
-      isOpen.value = false
+      isOpen.value = false;
     }
 
     function selectDate(date: Date | null) {
-      if (!date) return
+      if (!date) return;
 
-      const normalizedDate = normalizeDate(date)
+      const normalizedDate = normalizeDate(date);
 
       // Check if date is disabled
-      if (!isDateInRange(normalizedDate, minDateParsed.value, maxDateParsed.value)) {
-        return
+      if (
+        !isDateInRange(normalizedDate, minDateParsed.value, maxDateParsed.value)
+      ) {
+        return;
       }
 
-      emit('update:modelValue', normalizedDate)
-      emit('change', normalizedDate)
-      closeCalendar()
+      if (!isRangeMode.value) {
+        emit('update:modelValue', normalizedDate);
+        emit('change', normalizedDate);
+        closeCalendar();
+        return;
+      }
+
+      const [start, end] = selectedRange.value;
+
+      if (!start || (start && end)) {
+        emit('update:modelValue', [normalizedDate, null]);
+        emit('change', [normalizedDate, null]);
+        return;
+      }
+
+      if (normalizedDate < start) {
+        emit('update:modelValue', [normalizedDate, start]);
+        emit('change', [normalizedDate, start]);
+      } else {
+        emit('update:modelValue', [start, normalizedDate]);
+        emit('change', [start, normalizedDate]);
+      }
+
+      closeCalendar();
     }
 
     function clearDate(event: Event) {
-      event.stopPropagation()
-      emit('update:modelValue', null)
-      emit('change', null)
-      emit('clear')
+      event.stopPropagation();
+
+      if (!isRangeMode.value) {
+        emit('update:modelValue', null);
+        emit('change', null);
+      } else {
+        emit('update:modelValue', [null, null]);
+        emit('change', [null, null]);
+      }
+
+      emit('clear');
     }
 
     function previousMonth() {
       if (viewingMonth.value === 0) {
-        viewingMonth.value = 11
-        viewingYear.value--
+        viewingMonth.value = 11;
+        viewingYear.value--;
       } else {
-        viewingMonth.value--
+        viewingMonth.value--;
       }
     }
 
     function nextMonth() {
       if (viewingMonth.value === 11) {
-        viewingMonth.value = 0
-        viewingYear.value++
+        viewingMonth.value = 0;
+        viewingYear.value++;
       } else {
-        viewingMonth.value++
+        viewingMonth.value++;
       }
     }
 
     function isDateDisabled(date: Date | null): boolean {
-      if (!date) return true
-      return !isDateInRange(date, minDateParsed.value, maxDateParsed.value)
+      if (!date) return true;
+      return !isDateInRange(date, minDateParsed.value, maxDateParsed.value);
     }
 
     function isCurrentMonth(date: Date | null): boolean {
-      if (!date) return false
-      return date.getMonth() === viewingMonth.value
+      if (!date) return false;
+      return date.getMonth() === viewingMonth.value;
     }
 
     function handleClickOutside(event: Event) {
@@ -265,35 +379,38 @@ export const DatePicker = defineComponent({
         !calendarRef.value.contains(event.target as Node) &&
         !inputWrapperRef.value.contains(event.target as Node)
       ) {
-        closeCalendar()
+        closeCalendar();
       }
     }
 
     function handleInputClick() {
-      toggleCalendar()
+      toggleCalendar();
     }
 
     watch(isOpen, (newValue) => {
       if (newValue) {
-        document.addEventListener('click', handleClickOutside)
+        document.addEventListener('click', handleClickOutside);
       } else {
-        document.removeEventListener('click', handleClickOutside)
+        document.removeEventListener('click', handleClickOutside);
       }
-    })
+    });
 
     onMounted(() => {
       if (isOpen.value) {
-        document.addEventListener('click', handleClickOutside)
+        document.addEventListener('click', handleClickOutside);
       }
-    })
+    });
 
     onBeforeUnmount(() => {
-      document.removeEventListener('click', handleClickOutside)
-    })
+      document.removeEventListener('click', handleClickOutside);
+    });
 
     return () => {
-      const inputClasses = getDatePickerInputClasses(props.size, props.disabled || props.readonly)
-      const iconButtonClasses = getDatePickerIconButtonClasses(props.size)
+      const inputClasses = getDatePickerInputClasses(
+        props.size,
+        props.disabled || props.readonly
+      );
+      const iconButtonClasses = getDatePickerIconButtonClasses(props.size);
 
       return h('div', { class: datePickerBaseClasses }, [
         // Input wrapper
@@ -371,7 +488,11 @@ export const DatePicker = defineComponent({
                 h(
                   'div',
                   { class: datePickerMonthYearClasses },
-                  `${monthNames[viewingMonth.value]} ${viewingYear.value}`
+                  formatMonthYear(
+                    viewingYear.value,
+                    viewingMonth.value,
+                    props.locale
+                  )
                 ),
                 h(
                   'button',
@@ -386,19 +507,40 @@ export const DatePicker = defineComponent({
               ]),
               // Day names header
               h('div', { class: datePickerCalendarGridClasses }, [
-                ...dayNames.map((day) =>
+                ...dayNames.value.map((day) =>
                   h('div', { class: datePickerDayNameClasses, key: day }, day)
                 ),
               ]),
               // Calendar grid
               h('div', { class: datePickerCalendarGridClasses }, [
                 ...calendarDays.value.map((date, index) => {
-                  if (!date) return null
+                  if (!date) return null;
 
-                  const isSelected = selectedDate.value ? isSameDay(date, selectedDate.value) : false
-                  const isCurrentMonthDay = isCurrentMonth(date)
-                  const isTodayDay = isTodayUtil(date)
-                  const isDisabled = isDateDisabled(date)
+                  const [rangeStart, rangeEnd] = selectedRange.value;
+
+                  const isRangeStart =
+                    isRangeMode.value && rangeStart
+                      ? isSameDay(date, rangeStart)
+                      : false;
+                  const isRangeEnd =
+                    isRangeMode.value && rangeEnd
+                      ? isSameDay(date, rangeEnd)
+                      : false;
+                  const isInRange =
+                    isRangeMode.value &&
+                    rangeStart &&
+                    rangeEnd &&
+                    normalizeDate(date) >= normalizeDate(rangeStart) &&
+                    normalizeDate(date) <= normalizeDate(rangeEnd);
+
+                  const isSelected = !isRangeMode.value
+                    ? selectedDate.value
+                      ? isSameDay(date, selectedDate.value)
+                      : false
+                    : isRangeStart || isRangeEnd;
+                  const isCurrentMonthDay = isCurrentMonth(date);
+                  const isTodayDay = isTodayUtil(date);
+                  const isDisabled = isDateDisabled(date);
 
                   return h(
                     'button',
@@ -409,7 +551,10 @@ export const DatePicker = defineComponent({
                         isCurrentMonthDay,
                         isSelected,
                         isTodayDay,
-                        isDisabled
+                        isDisabled,
+                        Boolean(isInRange),
+                        Boolean(isRangeStart),
+                        Boolean(isRangeEnd)
                       ),
                       disabled: isDisabled,
                       onClick: () => selectDate(date),
@@ -417,14 +562,14 @@ export const DatePicker = defineComponent({
                       'aria-selected': isSelected,
                     },
                     date.getDate()
-                  )
+                  );
                 }),
               ]),
             ]
           ),
-      ])
-    }
+      ]);
+    };
   },
-})
+});
 
-export default DatePicker
+export default DatePicker;
