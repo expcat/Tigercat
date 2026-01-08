@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Tag } from '@tigercat/vue'
+import { Tag } from '@tigercat/vue';
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Tag } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Tag } from '@tigercat/react'
+import { Tag } from '@tigercat/react';
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
       <Tag variant="primary">Primary Tag</Tag>
       <Tag variant="success">Success Tag</Tag>
     </>
-  )
+  );
 }
 ```
 
@@ -99,18 +99,27 @@ Tag 组件支持 3 种不同的尺寸：
 
 通过 `closable` 属性使标签可以关闭。
 
+点击关闭按钮时：
+
+- 默认会触发 close 事件/回调，并从 DOM 中移除该 Tag。
+- 如需阻止默认移除，可在事件回调中调用 `event.preventDefault()`。
+
 ### Vue 3
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Tag } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Tag } from '@tigercat/vue';
 
-const tags = ref(['Tag 1', 'Tag 2', 'Tag 3'])
+const tags = ref(['Tag 1', 'Tag 2', 'Tag 3']);
 
 const handleClose = (index: number) => {
-  tags.value.splice(index, 1)
-}
+  tags.value.splice(index, 1);
+};
+
+const handleCloseKeepVisible = (event: MouseEvent) => {
+  event.preventDefault();
+};
 </script>
 
 <template>
@@ -118,25 +127,26 @@ const handleClose = (index: number) => {
     v-for="(tag, index) in tags"
     :key="tag"
     closable
-    @close="handleClose(index)"
-  >
+    @close="handleClose(index)">
     {{ tag }}
   </Tag>
+
+  <Tag closable @close="handleCloseKeepVisible"> 点击关闭不会移除 </Tag>
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Tag } from '@tigercat/react'
+import { useState } from 'react';
+import { Tag } from '@tigercat/react';
 
 function App() {
-  const [tags, setTags] = useState(['Tag 1', 'Tag 2', 'Tag 3'])
+  const [tags, setTags] = useState(['Tag 1', 'Tag 2', 'Tag 3']);
 
   const handleClose = (index: number) => {
-    setTags(tags.filter((_, i) => i !== index))
-  }
+    setTags(tags.filter((_, i) => i !== index));
+  };
 
   return (
     <>
@@ -145,8 +155,16 @@ function App() {
           {tag}
         </Tag>
       ))}
+
+      <Tag
+        closable
+        onClose={(event) => {
+          event.preventDefault();
+        }}>
+        点击关闭不会移除
+      </Tag>
     </>
-  )
+  );
 }
 ```
 
@@ -192,23 +210,24 @@ function App() {
 
 ### Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| variant | 标签变体 | `'default' \| 'primary' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'default'` |
-| size | 标签尺寸 | `'sm' \| 'md' \| 'lg'` | `'md'` |
-| closable | 是否可关闭 | `boolean` | `false` |
-| className | 自定义 CSS 类名（仅 React） | `string` | - |
+| 属性           | 说明                                                 | 类型                                                                     | 默认值        |
+| -------------- | ---------------------------------------------------- | ------------------------------------------------------------------------ | ------------- |
+| variant        | 标签变体                                             | `'default' \| 'primary' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'default'`   |
+| size           | 标签尺寸                                             | `'sm' \| 'md' \| 'lg'`                                                   | `'md'`        |
+| closable       | 是否可关闭                                           | `boolean`                                                                | `false`       |
+| closeAriaLabel | 关闭按钮无障碍标签（仅在 `closable` 为 true 时生效） | `string`                                                                 | `'Close tag'` |
+| className      | 自定义 CSS 类名（仅 React）                          | `string`                                                                 | -             |
 
 ### Events (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| close | 点击关闭按钮时触发 | `(event: MouseEvent)` |
+| 事件名 | 说明               | 回调参数              |
+| ------ | ------------------ | --------------------- |
+| close  | 点击关闭按钮时触发 | `(event: MouseEvent)` |
 
 ### Event Handlers (React)
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
+| 属性    | 说明                 | 类型                                                   |
+| ------- | -------------------- | ------------------------------------------------------ |
 | onClose | 点击关闭按钮时的回调 | `(event: React.MouseEvent<HTMLButtonElement>) => void` |
 
 ## 样式定制

@@ -5,12 +5,18 @@
 /**
  * Tag variant types
  */
-export type TagVariant = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'
+export type TagVariant =
+  | 'default'
+  | 'primary'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'info';
 
 /**
  * Tag size types
  */
-export type TagSize = 'sm' | 'md' | 'lg'
+export type TagSize = 'sm' | 'md' | 'lg';
 
 /**
  * Base tag props interface
@@ -20,22 +26,23 @@ export interface TagProps {
    * Tag variant style
    * @default 'default'
    */
-  variant?: TagVariant
-  
+  variant?: TagVariant;
+
   /**
    * Tag size
    * @default 'md'
    */
-  size?: TagSize
-  
+  size?: TagSize;
+
   /**
    * Whether the tag can be closed
    * @default false
    */
-  closable?: boolean
-  
+  closable?: boolean;
+
   /**
-   * Additional CSS classes
+   * Accessible label for the close button (when `closable` is true)
+   * @default 'Close tag'
    */
-  className?: string
+  closeAriaLabel?: string;
 }

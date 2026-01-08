@@ -1,34 +1,36 @@
-import { defineComponent, computed, h, PropType } from 'vue'
-import { 
-  classNames, 
-  getTagVariantClasses, 
-  defaultTagThemeColors, 
+import { defineComponent, computed, h, PropType, ref } from 'vue';
+import {
+  classNames,
+  getTagVariantClasses,
+  defaultTagThemeColors,
   tagBaseClasses,
   tagSizeClasses,
   tagCloseButtonBaseClasses,
   tagCloseIconPath,
-  type TagVariant, 
-  type TagSize 
-} from '@tigercat/core'
+  type TagVariant,
+  type TagSize,
+} from '@tigercat/core';
 
-const CloseIcon = h(
-  'svg',
-  {
-    class: 'h-3 w-3',
-    xmlns: 'http://www.w3.org/2000/svg',
-    fill: 'none',
-    viewBox: '0 0 24 24',
-    stroke: 'currentColor',
-    'stroke-width': '2',
-  },
-  [
-    h('path', {
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      d: tagCloseIconPath,
-    }),
-  ]
-)
+const CloseIcon = () =>
+  h(
+    'svg',
+    {
+      class: 'h-3 w-3',
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: '0 0 24 24',
+      stroke: 'currentColor',
+      'stroke-width': '2',
+      'aria-hidden': 'true',
+    },
+    [
+      h('path', {
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+        d: tagCloseIconPath,
+      }),
+    ]
+  );
 
 export const Tag = defineComponent({
   name: 'TigerTag',
@@ -57,37 +59,56 @@ export const Tag = defineComponent({
       type: Boolean,
       default: false,
     },
+
+    /**
+     * Accessible label for the close button (when `closable` is true)
+     * @default 'Close tag'
+     */
+    closeAriaLabel: {
+      type: String,
+      default: 'Close tag',
+    },
   },
   emits: ['close'],
   setup(props, { slots, emit }) {
+    const isVisible = ref(true);
+
     const tagClasses = computed(() => {
       return classNames(
         tagBaseClasses,
         getTagVariantClasses(props.variant),
         tagSizeClasses[props.size]
-      )
-    })
+      );
+    });
 
     const closeButtonClasses = computed(() => {
-      const scheme = defaultTagThemeColors[props.variant]
+      const scheme = defaultTagThemeColors[props.variant];
       return classNames(
         tagCloseButtonBaseClasses,
         scheme.closeBgHover,
         scheme.text
-      )
-    })
+      );
+    });
 
     const handleClose = (event: MouseEvent) => {
-      event.stopPropagation()
-      emit('close', event)
-    }
+      event.stopPropagation();
+      emit('close', event);
+
+      if (!event.defaultPrevented) {
+        isVisible.value = false;
+      }
+    };
 
     return () => {
-      const children = []
-      
+      if (!isVisible.value) {
+        return null;
+      }
+
+      const children = [];
+
       // Add tag content
       if (slots.default) {
-        children.push(h('span', {}, slots.default()))
+        children.push(h('span', {}, slots.default()));
       }
 
       // Add close button if closable
@@ -98,12 +119,12 @@ export const Tag = defineComponent({
             {
               class: closeButtonClasses.value,
               onClick: handleClose,
-              'aria-label': 'Close tag',
+              'aria-label': props.closeAriaLabel,
               type: 'button',
             },
-            CloseIcon
+            CloseIcon()
           )
-        )
+        );
       }
 
       return h(
@@ -113,9 +134,9 @@ export const Tag = defineComponent({
           role: 'status',
         },
         children
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Tag
+export default Tag;
