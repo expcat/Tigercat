@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Layout Sections > Content Component > Snapshots > should match snapshot 1`] = `"<main class="tiger-content flex-1 bg-gray-50 p-6">Content</main>"`;
+
+exports[`Layout Sections > Footer Component > Snapshots > should match snapshot with custom height 1`] = `"<footer class="tiger-footer bg-white border-t border-gray-200 p-4" style="height: 80px;">Footer</footer>"`;
+
+exports[`Layout Sections > Footer Component > Snapshots > should match snapshot with default height 1`] = `"<footer class="tiger-footer bg-white border-t border-gray-200 p-4" style="height: auto;">Footer</footer>"`;
+
+exports[`Layout Sections > Header Component > Snapshots > should match snapshot with custom height 1`] = `"<header class="tiger-header bg-white border-b border-gray-200" style="height: 100px;">Header</header>"`;
+
+exports[`Layout Sections > Header Component > Snapshots > should match snapshot with default height 1`] = `"<header class="tiger-header bg-white border-b border-gray-200" style="height: 64px;">Header</header>"`;
+
+exports[`Layout Sections > Layout Component > Snapshots > should match snapshot 1`] = `"<div class="tiger-layout flex flex-col min-h-screen">Layout content</div>"`;
+
+exports[`Layout Sections > Sidebar Component > Snapshots > should match snapshot when collapsed 1`] = `"<aside class="tiger-sidebar bg-white border-r border-gray-200 transition-all duration-300" style="width: 0px; min-width: 0px; overflow: hidden;"></aside>"`;
+
+exports[`Layout Sections > Sidebar Component > Snapshots > should match snapshot with default width 1`] = `"<aside class="tiger-sidebar bg-white border-r border-gray-200 transition-all duration-300" style="width: 256px; min-width: 256px; overflow: hidden;">Sidebar</aside>"`;

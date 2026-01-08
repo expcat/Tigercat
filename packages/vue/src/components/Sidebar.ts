@@ -1,5 +1,5 @@
-import { defineComponent, h, PropType, computed } from 'vue'
-import { classNames } from '@tigercat/core'
+import { defineComponent, h, PropType, computed } from 'vue';
+import { classNames } from '@tigercat/core';
 
 export const Sidebar = defineComponent({
   name: 'TigerSidebar',
@@ -29,17 +29,19 @@ export const Sidebar = defineComponent({
     },
   },
   setup(props, { slots }) {
-    const sidebarClasses = computed(() => classNames(
-      'tiger-sidebar',
-      'bg-white border-r border-gray-200 transition-all duration-300',
-      props.className
-    ))
+    const sidebarClasses = computed(() =>
+      classNames(
+        'tiger-sidebar',
+        'bg-white border-r border-gray-200 transition-all duration-300',
+        props.className
+      )
+    );
 
     const sidebarStyle = computed(() => ({
-      width: props.collapsed ? '0' : props.width,
-      minWidth: props.collapsed ? '0' : props.width,
+      width: props.collapsed ? '0px' : props.width,
+      minWidth: props.collapsed ? '0px' : props.width,
       overflow: 'hidden',
-    }))
+    }));
 
     return () => {
       return h(
@@ -49,9 +51,9 @@ export const Sidebar = defineComponent({
           style: sidebarStyle.value,
         },
         !props.collapsed && slots.default?.()
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Sidebar
+export default Sidebar;
