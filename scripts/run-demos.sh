@@ -16,10 +16,27 @@ if ! command -v pnpm &> /dev/null; then
     exit 1
 fi
 
-# Check if packages are built
-if [ ! -f "packages/core/dist/index.js" ]; then
-    echo "Warning: Packages are not built. Building now..."
-    pnpm build || {
+# Check if packages are built and up-to-date
+NEED_BUILD=0
+
+if [ ! -f "packages/core/dist/index.js" ] || [ ! -f "packages/react/dist/index.js" ] || [ ! -f "packages/vue/dist/index.js" ]; then
+    NEED_BUILD=1
+else
+    # Rebuild if any source file is newer than its package dist entry
+    if find packages/core/src -type f -newer packages/core/dist/index.js -print -quit | grep -q .; then
+        NEED_BUILD=1
+    fi
+    if find packages/react/src -type f -newer packages/react/dist/index.js -print -quit | grep -q .; then
+        NEED_BUILD=1
+    fi
+    if find packages/vue/src -type f -newer packages/vue/dist/index.js -print -quit | grep -q .; then
+        NEED_BUILD=1
+    fi
+fi
+
+if [ "$NEED_BUILD" -eq 1 ]; then
+    echo "Packages are missing or outdated. Building now..."
+    pnpm --filter @tigercat/core --filter @tigercat/react --filter @tigercat/vue build || {
         echo "Error: Build failed. Please fix build errors and try again."
         exit 1
     }
