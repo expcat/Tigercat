@@ -20,11 +20,6 @@ const components = [
   { name: 'Upload', path: '/upload', category: '表单组件' },
 
   { name: 'Layout', path: '/layout', category: '布局组件' },
-  { name: 'Container', path: '/container', category: '布局组件' },
-  { name: 'Header', path: '/header', category: '布局组件' },
-  { name: 'Sidebar', path: '/sidebar', category: '布局组件' },
-  { name: 'Content', path: '/content', category: '布局组件' },
-  { name: 'Footer', path: '/footer', category: '布局组件' },
   { name: 'Grid', path: '/grid', category: '布局组件' },
   { name: 'Row', path: '/row', category: '布局组件' },
   { name: 'Col', path: '/col', category: '布局组件' },

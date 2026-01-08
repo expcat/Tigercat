@@ -15,11 +15,6 @@ const FormDemo = lazy(() => import('./pages/FormDemo'));
 const SpaceDemo = lazy(() => import('./pages/SpaceDemo'));
 const DividerDemo = lazy(() => import('./pages/DividerDemo'));
 const LayoutDemo = lazy(() => import('./pages/LayoutDemo'));
-const ContainerDemo = lazy(() => import('./pages/ContainerDemo'));
-const HeaderDemo = lazy(() => import('./pages/HeaderDemo'));
-const SidebarDemo = lazy(() => import('./pages/SidebarDemo'));
-const ContentDemo = lazy(() => import('./pages/ContentDemo'));
-const FooterDemo = lazy(() => import('./pages/FooterDemo'));
 const GridDemo = lazy(() => import('./pages/GridDemo'));
 const RowDemo = lazy(() => import('./pages/RowDemo'));
 const ColDemo = lazy(() => import('./pages/ColDemo'));
@@ -70,11 +65,6 @@ const router = createBrowserRouter([
   { path: '/space', element: <SpaceDemo /> },
   { path: '/divider', element: <DividerDemo /> },
   { path: '/layout', element: <LayoutDemo /> },
-  { path: '/container', element: <ContainerDemo /> },
-  { path: '/header', element: <HeaderDemo /> },
-  { path: '/sidebar', element: <SidebarDemo /> },
-  { path: '/content', element: <ContentDemo /> },
-  { path: '/footer', element: <FooterDemo /> },
   { path: '/grid', element: <GridDemo /> },
   { path: '/row', element: <RowDemo /> },
   { path: '/col', element: <ColDemo /> },
