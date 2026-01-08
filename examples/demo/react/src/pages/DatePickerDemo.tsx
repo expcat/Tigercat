@@ -19,6 +19,17 @@ const DatePickerDemo: React.FC = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">DatePicker 日期选择器</h1>
         <p className="text-gray-600">用于选择或输入日期。</p>
+
+        <div className="mt-4 flex items-center gap-3">
+          <label className="text-sm font-medium text-gray-700">语言</label>
+          <select
+            className="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm"
+            value={locale}
+            onChange={(e) => setLocale(e.target.value as 'zh-CN' | 'en-US')}>
+            <option value="zh-CN">中文（简体）</option>
+            <option value="en-US">English (US)</option>
+          </select>
+        </div>
       </div>
 
       {/* 基础用法 */}
@@ -27,21 +38,6 @@ const DatePickerDemo: React.FC = () => {
         <p className="text-gray-600 mb-6">基础的日期选择器组件。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md space-y-4">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                语言
-              </label>
-              <select
-                className="border border-gray-300 rounded px-3 py-2"
-                value={locale}
-                onChange={(e) =>
-                  setLocale(e.target.value as 'zh-CN' | 'en-US')
-                }>
-                <option value="zh-CN">中文（简体）</option>
-                <option value="en-US">English (US)</option>
-              </select>
-            </div>
-
             <DatePicker
               value={date}
               onChange={setDate}
@@ -87,19 +83,31 @@ const DatePickerDemo: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 小尺寸
               </label>
-              <DatePicker size="sm" placeholder="小尺寸日期选择器" />
+              <DatePicker
+                size="sm"
+                placeholder="小尺寸日期选择器"
+                locale={locale}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 中尺寸
               </label>
-              <DatePicker size="md" placeholder="中尺寸日期选择器" />
+              <DatePicker
+                size="md"
+                placeholder="中尺寸日期选择器"
+                locale={locale}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 大尺寸
               </label>
-              <DatePicker size="lg" placeholder="大尺寸日期选择器" />
+              <DatePicker
+                size="lg"
+                placeholder="大尺寸日期选择器"
+                locale={locale}
+              />
             </div>
           </div>
         </div>
@@ -173,13 +181,21 @@ const DatePickerDemo: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 禁用
               </label>
-              <DatePicker value={new Date('2024-06-15')} disabled />
+              <DatePicker
+                value={new Date('2024-06-15')}
+                disabled
+                locale={locale}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 只读
               </label>
-              <DatePicker value={new Date('2024-06-15')} readonly />
+              <DatePicker
+                value={new Date('2024-06-15')}
+                readonly
+                locale={locale}
+              />
             </div>
           </div>
         </div>
@@ -201,6 +217,7 @@ const DatePickerDemo: React.FC = () => {
                 value={dateWithDefault}
                 onChange={setDateWithDefault}
                 clearable={true}
+                locale={locale}
               />
             </div>
             <div>
@@ -211,6 +228,7 @@ const DatePickerDemo: React.FC = () => {
                 value={dateWithDefault}
                 onChange={setDateWithDefault}
                 clearable={false}
+                locale={locale}
               />
             </div>
           </div>

@@ -23,6 +23,8 @@ import {
   datePickerDayNameClasses,
   getDatePickerDayCellClasses,
   datePickerClearButtonClasses,
+  datePickerFooterClasses,
+  datePickerFooterButtonClasses,
   CalendarIconPath,
   CloseIconPath,
   ChevronLeftIconPath,
@@ -207,6 +209,20 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
   const monthNames = getMonthNames(locale);
   const dayNames = getShortDayNames(locale);
 
+  const labels = (() => {
+    const lc = locale?.toLowerCase() ?? '';
+    if (lc.startsWith('zh')) {
+      return {
+        today: '今天',
+        ok: '确定',
+      };
+    }
+    return {
+      today: 'Today',
+      ok: 'OK',
+    };
+  })();
+
   const toggleCalendar = () => {
     if (!disabled && !readonly) {
       setIsOpen(!isOpen);
@@ -262,12 +278,15 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
     }
 
     if (normalizedDate < start) {
-      setRangeValue([normalizedDate, start]);
+      // Range rule (same as TimePicker): end cannot be earlier than start
+      setRangeValue([start, start]);
     } else {
       setRangeValue([start, normalizedDate]);
     }
+  };
 
-    closeCalendar();
+  const setToday = () => {
+    selectDate(new Date());
   };
 
   const clearDate = (event: React.MouseEvent) => {
@@ -446,7 +465,15 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
 
               const isCurrentMonthDay = isCurrentMonth(date);
               const isTodayDay = isTodayUtil(date);
-              const isDisabled = isDateDisabled(date);
+              const isSelectingRangeEnd =
+                isRangeMode && Boolean(rangeStart) && !rangeEnd;
+              const isBeforeRangeStart =
+                isSelectingRangeEnd &&
+                rangeStart &&
+                normalizeDate(date) < normalizeDate(rangeStart);
+
+              const isDisabled =
+                isDateDisabled(date) || Boolean(isBeforeRangeStart);
 
               return (
                 <button
@@ -470,6 +497,24 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
               );
             })}
           </div>
+
+          {/* Footer (range mode only) */}
+          {isRangeMode && (
+            <div className={datePickerFooterClasses}>
+              <button
+                type="button"
+                className={datePickerFooterButtonClasses}
+                onClick={setToday}>
+                {labels.today}
+              </button>
+              <button
+                type="button"
+                className={datePickerFooterButtonClasses}
+                onClick={closeCalendar}>
+                {labels.ok}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

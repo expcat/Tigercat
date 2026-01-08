@@ -31,6 +31,8 @@ import {
   datePickerDayNameClasses,
   getDatePickerDayCellClasses,
   datePickerClearButtonClasses,
+  datePickerFooterClasses,
+  datePickerFooterButtonClasses,
   CalendarIconPath,
   CloseIconPath,
   ChevronLeftIconPath,
@@ -274,6 +276,20 @@ export const DatePicker = defineComponent({
     const monthNames = computed(() => getMonthNames(props.locale));
     const dayNames = computed(() => getShortDayNames(props.locale));
 
+    const labels = computed(() => {
+      const lc = (props.locale ?? '').toLowerCase();
+      if (lc.startsWith('zh')) {
+        return {
+          today: '今天',
+          ok: '确定',
+        };
+      }
+      return {
+        today: 'Today',
+        ok: 'OK',
+      };
+    });
+
     function toggleCalendar() {
       if (!props.disabled && !props.readonly) {
         isOpen.value = !isOpen.value;
@@ -290,6 +306,10 @@ export const DatePicker = defineComponent({
 
     function closeCalendar() {
       isOpen.value = false;
+    }
+
+    function setToday() {
+      selectDate(new Date());
     }
 
     function selectDate(date: Date | null) {
@@ -320,14 +340,13 @@ export const DatePicker = defineComponent({
       }
 
       if (normalizedDate < start) {
-        emit('update:modelValue', [normalizedDate, start]);
-        emit('change', [normalizedDate, start]);
+        // Range rule (same as TimePicker): end cannot be earlier than start
+        emit('update:modelValue', [start, start]);
+        emit('change', [start, start]);
       } else {
         emit('update:modelValue', [start, normalizedDate]);
         emit('change', [start, normalizedDate]);
       }
-
-      closeCalendar();
     }
 
     function clearDate(event: Event) {
@@ -540,7 +559,16 @@ export const DatePicker = defineComponent({
                     : isRangeStart || isRangeEnd;
                   const isCurrentMonthDay = isCurrentMonth(date);
                   const isTodayDay = isTodayUtil(date);
-                  const isDisabled = isDateDisabled(date);
+
+                  const isSelectingRangeEnd =
+                    isRangeMode.value && Boolean(rangeStart) && !rangeEnd;
+                  const isBeforeRangeStart =
+                    isSelectingRangeEnd &&
+                    rangeStart &&
+                    normalizeDate(date) < normalizeDate(rangeStart);
+
+                  const isDisabled =
+                    isDateDisabled(date) || Boolean(isBeforeRangeStart);
 
                   return h(
                     'button',
@@ -565,6 +593,30 @@ export const DatePicker = defineComponent({
                   );
                 }),
               ]),
+
+              // Footer (range mode only)
+              isRangeMode.value
+                ? h('div', { class: datePickerFooterClasses }, [
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        class: datePickerFooterButtonClasses,
+                        onClick: setToday,
+                      },
+                      labels.value.today
+                    ),
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        class: datePickerFooterButtonClasses,
+                        onClick: closeCalendar,
+                      },
+                      labels.value.ok
+                    ),
+                  ])
+                : null,
             ]
           ),
       ]);
