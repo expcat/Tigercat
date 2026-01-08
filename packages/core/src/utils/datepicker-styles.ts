@@ -219,3 +219,40 @@ export const datePickerClearButtonClasses = classNames(
   'transition-colors',
   'p-1'
 );
+
+/**
+ * Footer classes (used in range mode)
+ */
+export const datePickerFooterClasses = classNames(
+  'mt-3',
+  'pt-3',
+  'border-t',
+  'border-gray-200',
+  'flex',
+  'items-center',
+  'justify-between',
+  'gap-2'
+);
+
+/**
+ * Footer button classes
+ */
+export const datePickerFooterButtonClasses = classNames(
+  'px-3',
+  'py-1',
+  'text-xs',
+  'font-medium',
+  'rounded',
+  'border',
+  'border-gray-300',
+  'hover:border-gray-400',
+  'bg-white',
+  'hover:bg-gray-50',
+  'text-gray-700',
+  'focus:outline-none',
+  'focus:ring-2',
+  'focus:ring-[var(--tiger-primary,#2563eb)]',
+  'focus:ring-offset-1',
+  'transition-colors',
+  'duration-150'
+);

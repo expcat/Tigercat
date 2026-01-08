@@ -19,6 +19,15 @@ const maxDate = new Date('2024-12-31')
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">DatePicker 日期选择器</h1>
       <p class="text-gray-600">用于选择或输入日期。</p>
+
+      <div class="mt-4 flex items-center gap-3">
+        <label class="text-sm font-medium text-gray-700">语言</label>
+        <select v-model="locale"
+                class="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm">
+          <option value="zh-CN">中文（简体）</option>
+          <option value="en-US">English (US)</option>
+        </select>
+      </div>
     </div>
 
     <!-- 基础用法 -->
@@ -28,15 +37,6 @@ const maxDate = new Date('2024-12-31')
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space direction="vertical"
                class="w-full max-w-md">
-          <div class="space-y-2">
-            <label class="block text-sm font-medium text-gray-700">语言</label>
-            <select v-model="locale"
-                    class="border border-gray-300 rounded px-3 py-2">
-              <option value="zh-CN">中文（简体）</option>
-              <option value="en-US">English (US)</option>
-            </select>
-          </div>
-
           <DatePicker v-model="date"
                       placeholder="请选择日期"
                       :locale="locale" />
@@ -75,15 +75,18 @@ const maxDate = new Date('2024-12-31')
                class="w-full max-w-md">
           <FormItem label="小尺寸">
             <DatePicker size="sm"
-                        placeholder="小尺寸日期选择器" />
+                        placeholder="小尺寸日期选择器"
+                        :locale="locale" />
           </FormItem>
           <FormItem label="中尺寸">
             <DatePicker size="md"
-                        placeholder="中尺寸日期选择器" />
+                        placeholder="中尺寸日期选择器"
+                        :locale="locale" />
           </FormItem>
           <FormItem label="大尺寸">
             <DatePicker size="lg"
-                        placeholder="大尺寸日期选择器" />
+                        placeholder="大尺寸日期选择器"
+                        :locale="locale" />
           </FormItem>
         </Space>
       </div>
@@ -139,11 +142,13 @@ const maxDate = new Date('2024-12-31')
                class="w-full max-w-md">
           <FormItem label="禁用">
             <DatePicker v-model="disabledDate"
-                        disabled />
+                        disabled
+                        :locale="locale" />
           </FormItem>
           <FormItem label="只读">
             <DatePicker v-model="readonlyDate"
-                        readonly />
+                        readonly
+                        :locale="locale" />
           </FormItem>
         </Space>
       </div>
@@ -159,11 +164,13 @@ const maxDate = new Date('2024-12-31')
                class="w-full max-w-md">
           <FormItem label="可清除">
             <DatePicker v-model="dateWithDefault"
-                        :clearable="true" />
+                        :clearable="true"
+                        :locale="locale" />
           </FormItem>
           <FormItem label="不可清除">
             <DatePicker v-model="dateWithDefault"
-                        :clearable="false" />
+                        :clearable="false"
+                        :locale="locale" />
           </FormItem>
         </Space>
       </div>
