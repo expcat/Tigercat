@@ -8,20 +8,20 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Table } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Table } from '@tigercat/vue';
 
 const dataSource = ref([
   { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
   { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
   { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' },
-])
+]);
 
 const columns = [
   { key: 'name', title: 'Name', width: 200 },
   { key: 'age', title: 'Age', width: 100 },
   { key: 'email', title: 'Email' },
-]
+];
 </script>
 
 <template>
@@ -32,22 +32,22 @@ const columns = [
 ### React
 
 ```tsx
-import { Table } from '@tigercat/react'
+import { Table } from '@tigercat/react';
 
 function App() {
   const dataSource = [
     { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
     { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
     { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' },
-  ]
+  ];
 
   const columns = [
     { key: 'name', title: 'Name', width: 200 },
     { key: 'age', title: 'Age', width: 100 },
     { key: 'email', title: 'Email' },
-  ]
+  ];
 
-  return <Table columns={columns} dataSource={dataSource} />
+  return <Table columns={columns} dataSource={dataSource} />;
 }
 ```
 
@@ -85,10 +85,10 @@ Table 组件支持 3 种不同的尺寸：
 <template>
   <!-- 带边框 -->
   <Table :columns="columns" :dataSource="dataSource" bordered />
-  
+
   <!-- 条纹行 -->
   <Table :columns="columns" :dataSource="dataSource" striped />
-  
+
   <!-- 边框 + 条纹 -->
   <Table :columns="columns" :dataSource="dataSource" bordered striped />
 </template>
@@ -97,14 +97,20 @@ Table 组件支持 3 种不同的尺寸：
 ### React
 
 ```tsx
-{/* 带边框 */}
-<Table columns={columns} dataSource={dataSource} bordered />
+{
+  /* 带边框 */
+}
+<Table columns={columns} dataSource={dataSource} bordered />;
 
-{/* 条纹行 */}
-<Table columns={columns} dataSource={dataSource} striped />
+{
+  /* 条纹行 */
+}
+<Table columns={columns} dataSource={dataSource} striped />;
 
-{/* 边框 + 条纹 */}
-<Table columns={columns} dataSource={dataSource} bordered striped />
+{
+  /* 边框 + 条纹 */
+}
+<Table columns={columns} dataSource={dataSource} bordered striped />;
 ```
 
 ## 排序 (Sorting)
@@ -115,84 +121,83 @@ Table 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Table } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Table } from '@tigercat/vue';
 
 const columns = [
-  { 
-    key: 'name', 
-    title: 'Name', 
-    sortable: true 
+  {
+    key: 'name',
+    title: 'Name',
+    sortable: true,
   },
-  { 
-    key: 'age', 
-    title: 'Age', 
+  {
+    key: 'age',
+    title: 'Age',
     sortable: true,
     // 自定义排序函数
-    sortFn: (a, b) => a - b
+    sortFn: (a, b) => a - b,
   },
   { key: 'email', title: 'Email' },
-]
+];
 
 const dataSource = ref([
   { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
   { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
   { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' },
-])
+]);
 
 function handleSortChange(sortState) {
-  console.log('Sort changed:', sortState)
+  console.log('Sort changed:', sortState);
 }
 </script>
 
 <template>
-  <Table 
-    :columns="columns" 
-    :dataSource="dataSource" 
-    @sort-change="handleSortChange"
-  />
+  <Table
+    :columns="columns"
+    :dataSource="dataSource"
+    @sort-change="handleSortChange" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { Table } from '@tigercat/react'
+import { Table } from '@tigercat/react';
 
 function App() {
   const columns = [
-    { 
-      key: 'name', 
-      title: 'Name', 
-      sortable: true 
+    {
+      key: 'name',
+      title: 'Name',
+      sortable: true,
     },
-    { 
-      key: 'age', 
-      title: 'Age', 
+    {
+      key: 'age',
+      title: 'Age',
       sortable: true,
       // 自定义排序函数
-      sortFn: (a, b) => a - b
+      sortFn: (a, b) => a - b,
     },
     { key: 'email', title: 'Email' },
-  ]
+  ];
 
   const dataSource = [
     { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
     { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
     { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' },
-  ]
+  ];
 
   const handleSortChange = (sortState) => {
-    console.log('Sort changed:', sortState)
-  }
+    console.log('Sort changed:', sortState);
+  };
 
   return (
-    <Table 
-      columns={columns} 
-      dataSource={dataSource} 
+    <Table
+      columns={columns}
+      dataSource={dataSource}
       onSortChange={handleSortChange}
     />
-  )
+  );
 }
 ```
 
@@ -204,98 +209,102 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Table } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Table } from '@tigercat/vue';
 
 const columns = [
-  { 
-    key: 'name', 
+  {
+    key: 'name',
     title: 'Name',
     filter: {
       type: 'text',
-      placeholder: 'Search name...'
-    }
+      placeholder: 'Search name...',
+    },
   },
-  { 
-    key: 'status', 
+  {
+    key: 'status',
     title: 'Status',
     filter: {
       type: 'select',
       options: [
         { value: 'active', label: 'Active' },
         { value: 'inactive', label: 'Inactive' },
-      ]
-    }
+      ],
+    },
   },
   { key: 'email', title: 'Email' },
-]
+];
 
 const dataSource = ref([
   { id: 1, name: 'John Doe', status: 'active', email: 'john@example.com' },
   { id: 2, name: 'Jane Smith', status: 'inactive', email: 'jane@example.com' },
   { id: 3, name: 'Bob Johnson', status: 'active', email: 'bob@example.com' },
-])
+]);
 
 function handleFilterChange(filters) {
-  console.log('Filters changed:', filters)
+  console.log('Filters changed:', filters);
 }
 </script>
 
 <template>
-  <Table 
-    :columns="columns" 
-    :dataSource="dataSource" 
-    @filter-change="handleFilterChange"
-  />
+  <Table
+    :columns="columns"
+    :dataSource="dataSource"
+    @filter-change="handleFilterChange" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { Table } from '@tigercat/react'
+import { Table } from '@tigercat/react';
 
 function App() {
   const columns = [
-    { 
-      key: 'name', 
+    {
+      key: 'name',
       title: 'Name',
       filter: {
         type: 'text',
-        placeholder: 'Search name...'
-      }
+        placeholder: 'Search name...',
+      },
     },
-    { 
-      key: 'status', 
+    {
+      key: 'status',
       title: 'Status',
       filter: {
         type: 'select',
         options: [
           { value: 'active', label: 'Active' },
           { value: 'inactive', label: 'Inactive' },
-        ]
-      }
+        ],
+      },
     },
     { key: 'email', title: 'Email' },
-  ]
+  ];
 
   const dataSource = [
     { id: 1, name: 'John Doe', status: 'active', email: 'john@example.com' },
-    { id: 2, name: 'Jane Smith', status: 'inactive', email: 'jane@example.com' },
+    {
+      id: 2,
+      name: 'Jane Smith',
+      status: 'inactive',
+      email: 'jane@example.com',
+    },
     { id: 3, name: 'Bob Johnson', status: 'active', email: 'bob@example.com' },
-  ]
+  ];
 
   const handleFilterChange = (filters) => {
-    console.log('Filters changed:', filters)
-  }
+    console.log('Filters changed:', filters);
+  };
 
   return (
-    <Table 
-      columns={columns} 
-      dataSource={dataSource} 
+    <Table
+      columns={columns}
+      dataSource={dataSource}
       onFilterChange={handleFilterChange}
     />
-  )
+  );
 }
 ```
 
@@ -307,18 +316,18 @@ Table 组件默认开启分页功能，每页显示 10 条数据。
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Table } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Table } from '@tigercat/vue';
 
 const columns = [
   { key: 'name', title: 'Name' },
   { key: 'age', title: 'Age' },
   { key: 'email', title: 'Email' },
-]
+];
 
 const dataSource = ref([
   // ... 大量数据
-])
+]);
 
 const pagination = ref({
   current: 1,
@@ -327,47 +336,42 @@ const pagination = ref({
   pageSizeOptions: [10, 20, 50, 100],
   showSizeChanger: true,
   showTotal: true,
-})
+});
 
 function handlePageChange({ current, pageSize }) {
-  console.log('Page changed:', current, pageSize)
+  console.log('Page changed:', current, pageSize);
 }
 </script>
 
 <template>
   <!-- 自定义分页配置 -->
-  <Table 
-    :columns="columns" 
+  <Table
+    :columns="columns"
     :dataSource="dataSource"
     :pagination="pagination"
-    @page-change="handlePageChange"
-  />
-  
+    @page-change="handlePageChange" />
+
   <!-- 禁用分页 -->
-  <Table 
-    :columns="columns" 
-    :dataSource="dataSource"
-    :pagination="false"
-  />
+  <Table :columns="columns" :dataSource="dataSource" :pagination="false" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Table } from '@tigercat/react'
+import { useState } from 'react';
+import { Table } from '@tigercat/react';
 
 function App() {
   const columns = [
     { key: 'name', title: 'Name' },
     { key: 'age', title: 'Age' },
     { key: 'email', title: 'Email' },
-  ]
+  ];
 
   const dataSource = [
     // ... 大量数据
-  ]
+  ];
 
   const [pagination, setPagination] = useState({
     current: 1,
@@ -376,30 +380,26 @@ function App() {
     pageSizeOptions: [10, 20, 50, 100],
     showSizeChanger: true,
     showTotal: true,
-  })
+  });
 
   const handlePageChange = ({ current, pageSize }) => {
-    console.log('Page changed:', current, pageSize)
-  }
+    console.log('Page changed:', current, pageSize);
+  };
 
   return (
     <>
       {/* 自定义分页配置 */}
-      <Table 
-        columns={columns} 
+      <Table
+        columns={columns}
         dataSource={dataSource}
         pagination={pagination}
         onPageChange={handlePageChange}
       />
-      
+
       {/* 禁用分页 */}
-      <Table 
-        columns={columns} 
-        dataSource={dataSource}
-        pagination={false}
-      />
+      <Table columns={columns} dataSource={dataSource} pagination={false} />
     </>
-  )
+  );
 }
 ```
 
@@ -411,84 +411,83 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Table } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Table } from '@tigercat/vue';
 
 const columns = [
   { key: 'name', title: 'Name' },
   { key: 'age', title: 'Age' },
   { key: 'email', title: 'Email' },
-]
+];
 
 const dataSource = ref([
   { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
   { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
   { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' },
-])
+]);
 
 const rowSelection = ref({
   selectedRowKeys: [],
   type: 'checkbox', // 'checkbox' | 'radio'
   showCheckbox: true,
   getRowKey: (record) => record.id,
-})
+});
 
 function handleSelectionChange(selectedKeys) {
-  console.log('Selected rows:', selectedKeys)
+  console.log('Selected rows:', selectedKeys);
 }
 </script>
 
 <template>
-  <Table 
-    :columns="columns" 
+  <Table
+    :columns="columns"
     :dataSource="dataSource"
     :rowSelection="rowSelection"
-    @selection-change="handleSelectionChange"
-  />
+    @selection-change="handleSelectionChange" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Table } from '@tigercat/react'
+import { useState } from 'react';
+import { Table } from '@tigercat/react';
 
 function App() {
   const columns = [
     { key: 'name', title: 'Name' },
     { key: 'age', title: 'Age' },
     { key: 'email', title: 'Email' },
-  ]
+  ];
 
   const dataSource = [
     { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
     { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
     { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' },
-  ]
+  ];
 
-  const [selectedRowKeys, setSelectedRowKeys] = useState([])
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const rowSelection = {
     selectedRowKeys,
     type: 'checkbox', // 'checkbox' | 'radio'
     showCheckbox: true,
     getRowKey: (record) => record.id,
-  }
+  };
 
   const handleSelectionChange = (selectedKeys) => {
-    console.log('Selected rows:', selectedKeys)
-    setSelectedRowKeys(selectedKeys)
-  }
+    console.log('Selected rows:', selectedKeys);
+    setSelectedRowKeys(selectedKeys);
+  };
 
   return (
-    <Table 
-      columns={columns} 
+    <Table
+      columns={columns}
       dataSource={dataSource}
       rowSelection={rowSelection}
       onSelectionChange={handleSelectionChange}
     />
-  )
+  );
 }
 ```
 
@@ -500,41 +499,46 @@ function App() {
 
 ```vue
 <script setup>
-import { ref, h } from 'vue'
-import { Table, Button } from '@tigercat/vue'
+import { ref, h } from 'vue';
+import { Table, Button } from '@tigercat/vue';
 
 const columns = [
   { key: 'name', title: 'Name' },
   { key: 'age', title: 'Age' },
-  { 
-    key: 'status', 
+  {
+    key: 'status',
     title: 'Status',
     render: (record) => {
-      const color = record.status === 'active' ? 'text-green-600' : 'text-red-600'
-      return h('span', { class: color }, record.status)
-    }
+      const color =
+        record.status === 'active' ? 'text-green-600' : 'text-red-600';
+      return h('span', { class: color }, record.status);
+    },
   },
-  { 
-    key: 'actions', 
+  {
+    key: 'actions',
     title: 'Actions',
     align: 'center',
     render: (record) => {
-      return h(Button, {
-        size: 'sm',
-        onClick: () => handleEdit(record)
-      }, () => 'Edit')
-    }
+      return h(
+        Button,
+        {
+          size: 'sm',
+          onClick: () => handleEdit(record),
+        },
+        () => 'Edit'
+      );
+    },
   },
-]
+];
 
 const dataSource = ref([
   { id: 1, name: 'John Doe', age: 28, status: 'active' },
   { id: 2, name: 'Jane Smith', age: 32, status: 'inactive' },
   { id: 3, name: 'Bob Johnson', age: 45, status: 'active' },
-])
+]);
 
 function handleEdit(record) {
-  console.log('Edit:', record)
+  console.log('Edit:', record);
 }
 </script>
 
@@ -546,43 +550,44 @@ function handleEdit(record) {
 ### React
 
 ```tsx
-import { Table, Button } from '@tigercat/react'
+import { Table, Button } from '@tigercat/react';
 
 function App() {
   const columns = [
     { key: 'name', title: 'Name' },
     { key: 'age', title: 'Age' },
-    { 
-      key: 'status', 
+    {
+      key: 'status',
       title: 'Status',
       render: (record) => {
-        const color = record.status === 'active' ? 'text-green-600' : 'text-red-600'
-        return <span className={color}>{record.status}</span>
-      }
+        const color =
+          record.status === 'active' ? 'text-green-600' : 'text-red-600';
+        return <span className={color}>{record.status}</span>;
+      },
     },
-    { 
-      key: 'actions', 
+    {
+      key: 'actions',
       title: 'Actions',
       align: 'center',
       render: (record) => (
         <Button size="sm" onClick={() => handleEdit(record)}>
           Edit
         </Button>
-      )
+      ),
     },
-  ]
+  ];
 
   const dataSource = [
     { id: 1, name: 'John Doe', age: 28, status: 'active' },
     { id: 2, name: 'Jane Smith', age: 32, status: 'inactive' },
     { id: 3, name: 'Bob Johnson', age: 45, status: 'active' },
-  ]
+  ];
 
   const handleEdit = (record) => {
-    console.log('Edit:', record)
-  }
+    console.log('Edit:', record);
+  };
 
-  return <Table columns={columns} dataSource={dataSource} />
+  return <Table columns={columns} dataSource={dataSource} />;
 }
 ```
 
@@ -593,25 +598,95 @@ function App() {
 ```vue
 <template>
   <!-- 固定表头 + 最大高度 -->
-  <Table 
-    :columns="columns" 
+  <Table
+    :columns="columns"
     :dataSource="dataSource"
     stickyHeader
-    :maxHeight="400"
-  />
+    :maxHeight="400" />
 </template>
 ```
 
 ### React
 
 ```tsx
-{/* 固定表头 + 最大高度 */}
-<Table 
-  columns={columns} 
+{
+  /* 固定表头 + 最大高度 */
+}
+<Table
+  columns={columns}
   dataSource={dataSource}
   stickyHeader
   maxHeight={400}
-/>
+/>;
+```
+
+## 固定列（锁定列）(Fixed Columns)
+
+通过给列设置 `fixed: 'left' | 'right'` 可实现左右滚动时固定列不动。
+
+注意：为了正确计算固定列的偏移，建议为固定列（以及与其相邻的列）提供明确的 `width`（number 或 px 字符串）。
+
+### 表头锁按钮
+
+当开启 `columnLockable` 时，表头会显示一个小锁按钮。点击后会在“未锁定”与“锁定到左侧”之间切换（等价于切换该列的 `fixed` 状态）。
+
+### Vue 3
+
+```vue
+<script setup>
+import { ref, h } from 'vue';
+import { Table } from '@tigercat/vue';
+
+const dataSource = ref([
+  { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
+  { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
+]);
+
+const columns = [
+  { key: 'name', title: 'Name', width: 160, fixed: 'left' },
+  { key: 'age', title: 'Age', width: 120 },
+  { key: 'email', title: 'Email', width: 240 },
+  {
+    key: 'actions',
+    title: 'Actions',
+    width: 160,
+    fixed: 'right',
+    render: (record) => h('span', {}, 'Edit'),
+  },
+];
+</script>
+
+<template>
+  <Table :columns="columns" :dataSource="dataSource" :pagination="false" />
+</template>
+```
+
+### React
+
+```tsx
+import { Table } from '@tigercat/react';
+
+function App() {
+  const dataSource = [
+    { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
+    { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
+  ];
+
+  const columns = [
+    { key: 'name', title: 'Name', width: 160, fixed: 'left' },
+    { key: 'age', title: 'Age', width: 120 },
+    { key: 'email', title: 'Email', width: 240 },
+    {
+      key: 'actions',
+      title: 'Actions',
+      width: 160,
+      fixed: 'right',
+      render: () => 'Edit',
+    },
+  ];
+
+  return <Table columns={columns} dataSource={dataSource} pagination={false} />;
+}
 ```
 
 ## 加载状态 (Loading)
@@ -620,49 +695,39 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Table } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Table } from '@tigercat/vue';
 
-const loading = ref(true)
+const loading = ref(true);
 
 // 模拟数据加载
 setTimeout(() => {
-  loading.value = false
-}, 2000)
+  loading.value = false;
+}, 2000);
 </script>
 
 <template>
-  <Table 
-    :columns="columns" 
-    :dataSource="dataSource"
-    :loading="loading"
-  />
+  <Table :columns="columns" :dataSource="dataSource" :loading="loading" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState, useEffect } from 'react'
-import { Table } from '@tigercat/react'
+import { useState, useEffect } from 'react';
+import { Table } from '@tigercat/react';
 
 function App() {
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // 模拟数据加载
     setTimeout(() => {
-      setLoading(false)
-    }, 2000)
-  }, [])
+      setLoading(false);
+    }, 2000);
+  }, []);
 
-  return (
-    <Table 
-      columns={columns} 
-      dataSource={dataSource}
-      loading={loading}
-    />
-  )
+  return <Table columns={columns} dataSource={dataSource} loading={loading} />;
 }
 ```
 
@@ -670,83 +735,85 @@ function App() {
 
 ### Table Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| `columns` | 表格列配置 | `TableColumn[]` | - |
-| `dataSource` | 数据源 | `T[]` | `[]` |
-| `size` | 表格尺寸 | `'sm' \| 'md' \| 'lg'` | `'md'` |
-| `bordered` | 是否显示边框 | `boolean` | `false` |
-| `striped` | 是否显示条纹行 | `boolean` | `false` |
-| `hoverable` | 是否高亮悬停行 | `boolean` | `true` |
-| `loading` | 加载状态 | `boolean` | `false` |
-| `emptyText` | 空状态文本 | `string` | `'No data'` |
-| `pagination` | 分页配置，设为 `false` 禁用 | `PaginationConfig \| false` | 默认配置 |
-| `rowSelection` | 行选择配置 | `RowSelectionConfig` | - |
-| `rowKey` | 行键名或函数 | `string \| ((record: T) => string \| number)` | `'id'` |
-| `rowClassName` | 自定义行类名 | `string \| ((record: T, index: number) => string)` | - |
-| `stickyHeader` | 固定表头 | `boolean` | `false` |
-| `maxHeight` | 最大高度（触发滚动） | `string \| number` | - |
+| 属性             | 说明                                                         | 类型                                               | 默认值      |
+| ---------------- | ------------------------------------------------------------ | -------------------------------------------------- | ----------- |
+| `columns`        | 表格列配置                                                   | `TableColumn[]`                                    | -           |
+| `dataSource`     | 数据源                                                       | `T[]`                                              | `[]`        |
+| `size`           | 表格尺寸                                                     | `'sm' \| 'md' \| 'lg'`                             | `'md'`      |
+| `bordered`       | 是否显示边框                                                 | `boolean`                                          | `false`     |
+| `striped`        | 是否显示条纹行                                               | `boolean`                                          | `false`     |
+| `hoverable`      | 是否高亮悬停行                                               | `boolean`                                          | `true`      |
+| `columnLockable` | 是否显示表头锁按钮（点击后切换该列 `fixed`，默认锁定到左侧） | `boolean`                                          | `false`     |
+| `loading`        | 加载状态                                                     | `boolean`                                          | `false`     |
+| `emptyText`      | 空状态文本                                                   | `string`                                           | `'No data'` |
+| `pagination`     | 分页配置，设为 `false` 禁用                                  | `PaginationConfig \| false`                        | 默认配置    |
+| `rowSelection`   | 行选择配置                                                   | `RowSelectionConfig`                               | -           |
+| `rowKey`         | 行键名或函数                                                 | `string \| ((record: T) => string \| number)`      | `'id'`      |
+| `rowClassName`   | 自定义行类名                                                 | `string \| ((record: T, index: number) => string)` | -           |
+| `stickyHeader`   | 固定表头                                                     | `boolean`                                          | `false`     |
+| `maxHeight`      | 最大高度（触发滚动）                                         | `string \| number`                                 | -           |
 
 ### TableColumn
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| `key` | 列键名（唯一） | `string` | - |
-| `title` | 列标题 | `string` | - |
-| `dataKey` | 数据键名（默认使用 `key`） | `string` | - |
-| `width` | 列宽 | `string \| number` | - |
-| `align` | 对齐方式 | `'left' \| 'center' \| 'right'` | `'left'` |
-| `sortable` | 是否可排序 | `boolean` | `false` |
-| `sortFn` | 自定义排序函数 | `(a: unknown, b: unknown) => number` | - |
-| `filter` | 筛选配置 | `ColumnFilter` | - |
-| `render` | 自定义渲染函数 | `(record: T, index: number) => ReactNode` | - |
-| `renderHeader` | 自定义表头渲染函数 | `() => ReactNode` | - |
-| `className` | 单元格类名 | `string` | - |
-| `headerClassName` | 表头单元格类名 | `string` | - |
+| 属性              | 说明                       | 类型                                      | 默认值   |
+| ----------------- | -------------------------- | ----------------------------------------- | -------- |
+| `key`             | 列键名（唯一）             | `string`                                  | -        |
+| `title`           | 列标题                     | `string`                                  | -        |
+| `dataKey`         | 数据键名（默认使用 `key`） | `string`                                  | -        |
+| `width`           | 列宽                       | `string \| number`                        | -        |
+| `align`           | 对齐方式                   | `'left' \| 'center' \| 'right'`           | `'left'` |
+| `sortable`        | 是否可排序                 | `boolean`                                 | `false`  |
+| `sortFn`          | 自定义排序函数             | `(a: unknown, b: unknown) => number`      | -        |
+| `filter`          | 筛选配置                   | `ColumnFilter`                            | -        |
+| `fixed`           | 固定列（锁定列）           | `'left' \| 'right' \| false`              | `false`  |
+| `render`          | 自定义渲染函数             | `(record: T, index: number) => ReactNode` | -        |
+| `renderHeader`    | 自定义表头渲染函数         | `() => ReactNode`                         | -        |
+| `className`       | 单元格类名                 | `string`                                  | -        |
+| `headerClassName` | 表头单元格类名             | `string`                                  | -        |
 
 ### PaginationConfig
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| `current` | 当前页码 | `number` | `1` |
-| `pageSize` | 每页条数 | `number` | `10` |
-| `total` | 总条数 | `number` | - |
-| `pageSizeOptions` | 每页条数选项 | `number[]` | `[10, 20, 50, 100]` |
-| `showSizeChanger` | 是否显示每页条数选择器 | `boolean` | `true` |
-| `showTotal` | 是否显示总条数 | `boolean` | `true` |
-| `totalText` | 自定义总条数文本 | `(total: number, range: [number, number]) => string` | - |
+| 属性              | 说明                   | 类型                                                 | 默认值              |
+| ----------------- | ---------------------- | ---------------------------------------------------- | ------------------- |
+| `current`         | 当前页码               | `number`                                             | `1`                 |
+| `pageSize`        | 每页条数               | `number`                                             | `10`                |
+| `total`           | 总条数                 | `number`                                             | -                   |
+| `pageSizeOptions` | 每页条数选项           | `number[]`                                           | `[10, 20, 50, 100]` |
+| `showSizeChanger` | 是否显示每页条数选择器 | `boolean`                                            | `true`              |
+| `showTotal`       | 是否显示总条数         | `boolean`                                            | `true`              |
+| `totalText`       | 自定义总条数文本       | `(total: number, range: [number, number]) => string` | -                   |
 
 ### RowSelectionConfig
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| `selectedRowKeys` | 已选择的行键 | `(string \| number)[]` | - |
-| `type` | 选择类型 | `'checkbox' \| 'radio'` | `'checkbox'` |
-| `showCheckbox` | 是否显示选择框 | `boolean` | `true` |
-| `getRowKey` | 获取行键函数 | `(record: T) => string \| number` | `(record) => record.id` |
-| `getCheckboxProps` | 获取选择框属性 | `(record: T) => { disabled?: boolean }` | - |
+| 属性               | 说明           | 类型                                    | 默认值                  |
+| ------------------ | -------------- | --------------------------------------- | ----------------------- |
+| `selectedRowKeys`  | 已选择的行键   | `(string \| number)[]`                  | -                       |
+| `type`             | 选择类型       | `'checkbox' \| 'radio'`                 | `'checkbox'`            |
+| `showCheckbox`     | 是否显示选择框 | `boolean`                               | `true`                  |
+| `getRowKey`        | 获取行键函数   | `(record: T) => string \| number`       | `(record) => record.id` |
+| `getCheckboxProps` | 获取选择框属性 | `(record: T) => { disabled?: boolean }` | -                       |
 
 ### Events (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| `change` | 表格变化（排序、筛选、分页） | `{ sort, filters, pagination }` |
-| `row-click` | 行点击事件 | `(record, index)` |
-| `selection-change` | 选择变化 | `selectedKeys` |
-| `sort-change` | 排序变化 | `sortState` |
-| `filter-change` | 筛选变化 | `filters` |
-| `page-change` | 分页变化 | `{ current, pageSize }` |
+| 事件名             | 说明                         | 回调参数                        |
+| ------------------ | ---------------------------- | ------------------------------- |
+| `change`           | 表格变化（排序、筛选、分页） | `{ sort, filters, pagination }` |
+| `row-click`        | 行点击事件                   | `(record, index)`               |
+| `selection-change` | 选择变化                     | `selectedKeys`                  |
+| `sort-change`      | 排序变化                     | `sortState`                     |
+| `filter-change`    | 筛选变化                     | `filters`                       |
+| `page-change`      | 分页变化                     | `{ current, pageSize }`         |
 
 ### Event Handlers (React)
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
-| `onChange` | 表格变化（排序、筛选、分页） | `(params: { sort, filters, pagination }) => void` |
-| `onRowClick` | 行点击事件 | `(record: T, index: number) => void` |
-| `onSelectionChange` | 选择变化 | `(selectedKeys: (string \| number)[]) => void` |
-| `onSortChange` | 排序变化 | `(sort: SortState) => void` |
-| `onFilterChange` | 筛选变化 | `(filters: Record<string, unknown>) => void` |
-| `onPageChange` | 分页变化 | `(page: { current: number; pageSize: number }) => void` |
+| 属性                | 说明                         | 类型                                                    |
+| ------------------- | ---------------------------- | ------------------------------------------------------- |
+| `onChange`          | 表格变化（排序、筛选、分页） | `(params: { sort, filters, pagination }) => void`       |
+| `onRowClick`        | 行点击事件                   | `(record: T, index: number) => void`                    |
+| `onSelectionChange` | 选择变化                     | `(selectedKeys: (string \| number)[]) => void`          |
+| `onSortChange`      | 排序变化                     | `(sort: SortState) => void`                             |
+| `onFilterChange`    | 筛选变化                     | `(filters: Record<string, unknown>) => void`            |
+| `onPageChange`      | 分页变化                     | `(page: { current: number; pageSize: number }) => void` |
 
 ## 主题定制
 

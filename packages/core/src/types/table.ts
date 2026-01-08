@@ -5,12 +5,12 @@
 /**
  * Table size types
  */
-export type TableSize = 'sm' | 'md' | 'lg'
+export type TableSize = 'sm' | 'md' | 'lg';
 
 /**
  * Sort direction
  */
-export type SortDirection = 'asc' | 'desc' | null
+export type SortDirection = 'asc' | 'desc' | null;
 
 /**
  * Sort state
@@ -19,23 +19,23 @@ export interface SortState {
   /**
    * Column key to sort by
    */
-  key: string | null
-  
+  key: string | null;
+
   /**
    * Sort direction
    */
-  direction: SortDirection
+  direction: SortDirection;
 }
 
 /**
  * Column alignment
  */
-export type ColumnAlign = 'left' | 'center' | 'right'
+export type ColumnAlign = 'left' | 'center' | 'right';
 
 /**
  * Filter type
  */
-export type FilterType = 'text' | 'select' | 'custom'
+export type FilterType = 'text' | 'select' | 'custom';
 
 /**
  * Filter option for select filter
@@ -44,12 +44,12 @@ export interface FilterOption {
   /**
    * Option label
    */
-  label: string
-  
+  label: string;
+
   /**
    * Option value
    */
-  value: string | number
+  value: string | number;
 }
 
 /**
@@ -60,25 +60,25 @@ export interface ColumnFilter {
    * Filter type
    * @default 'text'
    */
-  type?: FilterType
-  
+  type?: FilterType;
+
   /**
    * Filter options (for select type)
    */
-  options?: FilterOption[]
-  
+  options?: FilterOption[];
+
   /**
    * Placeholder text
    */
-  placeholder?: string
-  
+  placeholder?: string;
+
   /**
    * Custom filter function
    * @param value - Cell value
    * @param filterValue - Current filter value
    * @returns Whether the row should be shown
    */
-  filterFn?: (value: unknown, filterValue: unknown) => boolean
+  filterFn?: (value: unknown, filterValue: unknown) => boolean;
 }
 
 /**
@@ -88,75 +88,75 @@ export interface TableColumn<T = Record<string, unknown>> {
   /**
    * Column key (must be unique)
    */
-  key: string
-  
+  key: string;
+
   /**
    * Column title/header text
    */
-  title: string
-  
+  title: string;
+
   /**
    * Data key to access in row object
    * If not provided, uses `key`
    */
-  dataKey?: string
-  
+  dataKey?: string;
+
   /**
    * Column width (CSS value)
    */
-  width?: string | number
-  
+  width?: string | number;
+
   /**
    * Column alignment
    * @default 'left'
    */
-  align?: ColumnAlign
-  
+  align?: ColumnAlign;
+
   /**
    * Whether column is sortable
    * @default false
    */
-  sortable?: boolean
-  
+  sortable?: boolean;
+
   /**
    * Custom sort function
    * @param a - First value
    * @param b - Second value
    * @returns Sort comparison result
    */
-  sortFn?: (a: unknown, b: unknown) => number
-  
+  sortFn?: (a: unknown, b: unknown) => number;
+
   /**
    * Column filter configuration
    */
-  filter?: ColumnFilter
-  
+  filter?: ColumnFilter;
+
   /**
    * Whether column is fixed
    * @default false
    */
-  fixed?: 'left' | 'right' | false
-  
+  fixed?: 'left' | 'right' | false;
+
   /**
    * Custom render function for cell content
    * Framework-specific implementations will handle this differently
    */
-  render?: (record: T, index: number) => unknown
-  
+  render?: (record: T, index: number) => unknown;
+
   /**
    * Custom render function for header
    */
-  renderHeader?: () => unknown
-  
+  renderHeader?: () => unknown;
+
   /**
    * CSS class for column cells
    */
-  className?: string
-  
+  className?: string;
+
   /**
    * CSS class for header cell
    */
-  headerClassName?: string
+  headerClassName?: string;
 }
 
 /**
@@ -167,41 +167,41 @@ export interface PaginationConfig {
    * Current page number (1-indexed)
    * @default 1
    */
-  current?: number
-  
+  current?: number;
+
   /**
    * Number of items per page
    * @default 10
    */
-  pageSize?: number
-  
+  pageSize?: number;
+
   /**
    * Total number of items
    */
-  total?: number
-  
+  total?: number;
+
   /**
    * Available page size options
    * @default [10, 20, 50, 100]
    */
-  pageSizeOptions?: number[]
-  
+  pageSizeOptions?: number[];
+
   /**
    * Whether to show page size selector
    * @default true
    */
-  showSizeChanger?: boolean
-  
+  showSizeChanger?: boolean;
+
   /**
    * Whether to show total count
    * @default true
    */
-  showTotal?: boolean
-  
+  showTotal?: boolean;
+
   /**
    * Custom total text render function
    */
-  totalText?: (total: number, range: [number, number]) => string
+  totalText?: (total: number, range: [number, number]) => string;
 }
 
 /**
@@ -211,30 +211,30 @@ export interface RowSelectionConfig<T = Record<string, unknown>> {
   /**
    * Selected row keys
    */
-  selectedRowKeys?: (string | number)[]
-  
+  selectedRowKeys?: (string | number)[];
+
   /**
    * Function to get row key
    * @default (record) => record.id
    */
-  getRowKey?: (record: T) => string | number
-  
+  getRowKey?: (record: T) => string | number;
+
   /**
    * Whether to show checkbox column
    * @default true
    */
-  showCheckbox?: boolean
-  
+  showCheckbox?: boolean;
+
   /**
    * Selection type
    * @default 'checkbox'
    */
-  type?: 'checkbox' | 'radio'
-  
+  type?: 'checkbox' | 'radio';
+
   /**
    * Function to determine if row can be selected
    */
-  getCheckboxProps?: (record: T) => { disabled?: boolean }
+  getCheckboxProps?: (record: T) => { disabled?: boolean };
 }
 
 /**
@@ -244,80 +244,87 @@ export interface TableProps<T = Record<string, unknown>> {
   /**
    * Table columns configuration
    */
-  columns: TableColumn<T>[]
-  
+  columns: TableColumn<T>[];
+
+  /**
+   * Whether to show a lock button in each column header.
+   * Clicking the lock toggles the column fixed state.
+   * @default false
+   */
+  columnLockable?: boolean;
+
   /**
    * Table data source
    * @default []
    */
-  dataSource?: T[]
-  
+  dataSource?: T[];
+
   /**
    * Table size
    * @default 'md'
    */
-  size?: TableSize
-  
+  size?: TableSize;
+
   /**
    * Whether to show border
    * @default false
    */
-  bordered?: boolean
-  
+  bordered?: boolean;
+
   /**
    * Whether to show striped rows
    * @default false
    */
-  striped?: boolean
-  
+  striped?: boolean;
+
   /**
    * Whether to highlight row on hover
    * @default true
    */
-  hoverable?: boolean
-  
+  hoverable?: boolean;
+
   /**
    * Loading state
    * @default false
    */
-  loading?: boolean
-  
+  loading?: boolean;
+
   /**
    * Empty state text
    * @default 'No data'
    */
-  emptyText?: string
-  
+  emptyText?: string;
+
   /**
    * Pagination configuration
    * Set to false to disable pagination
    */
-  pagination?: PaginationConfig | false
-  
+  pagination?: PaginationConfig | false;
+
   /**
    * Row selection configuration
    */
-  rowSelection?: RowSelectionConfig<T>
-  
+  rowSelection?: RowSelectionConfig<T>;
+
   /**
    * Function to get row key
    * @default (record) => record.id
    */
-  rowKey?: string | ((record: T) => string | number)
-  
+  rowKey?: string | ((record: T) => string | number);
+
   /**
    * Custom row class name
    */
-  rowClassName?: string | ((record: T, index: number) => string)
-  
+  rowClassName?: string | ((record: T, index: number) => string);
+
   /**
    * Whether table head is sticky
    * @default false
    */
-  stickyHeader?: boolean
-  
+  stickyHeader?: boolean;
+
   /**
    * Max height for scrollable table
    */
-  maxHeight?: string | number
+  maxHeight?: string | number;
 }
