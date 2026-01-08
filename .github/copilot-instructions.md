@@ -1,11 +1,12 @@
 # GitHub Copilot Instructions for Tigercat
 
-<!-- 
+<!--
 STRUCTURE NAVIGATION TAGS:
 #core-utilities #vue-components #react-components #types #theme #testing #documentation #examples
 -->
 
 When working on issues:
+
 - Start directly with meaningful implementation work
 - Use `report_progress` only when you have actual code changes to commit
 - Skip empty planning commits - integrate planning into your first substantial commit
@@ -37,12 +38,12 @@ tigercat/
 
 **Purpose**: Framework-agnostic utilities, types, and theme configuration shared by both Vue and React implementations.
 
-| Path | Content/Functionality |
-|------|----------------------|
+| Path                       | Content/Functionality                                                                           |
+| -------------------------- | ----------------------------------------------------------------------------------------------- |
 | `packages/core/src/utils/` | Shared utility functions (className merging, form validation, grid calculations, input styling) |
-| `packages/core/src/types/` | TypeScript type definitions for all component prop interfaces |
-| `packages/core/src/theme/` | Theme configuration and CSS variable management |
-| `packages/core/dist/` | Build output (generated) |
+| `packages/core/src/types/` | TypeScript type definitions for all component prop interfaces                                   |
+| `packages/core/src/theme/` | Theme configuration and CSS variable management                                                 |
+| `packages/core/dist/`      | Build output (generated)                                                                        |
 
 **When to modify**: Adding shared utilities, defining component types, modifying theme utilities
 
@@ -50,11 +51,11 @@ tigercat/
 
 **Purpose**: Vue 3 component implementations using Composition API with `<script setup>` syntax.
 
-| Path | Content/Functionality |
-|------|----------------------|
+| Path                           | Content/Functionality                                           |
+| ------------------------------ | --------------------------------------------------------------- |
 | `packages/vue/src/components/` | Vue component files organized by category (Basic, Form, Layout) |
-| `packages/vue/src/index.ts` | Re-exports all Vue components and core utilities |
-| `packages/vue/dist/` | Build output (generated) |
+| `packages/vue/src/index.ts`    | Re-exports all Vue components and core utilities                |
+| `packages/vue/dist/`           | Build output (generated)                                        |
 
 **When to modify**: Implementing Vue 3 components, fixing Vue-specific bugs, adding Vue-specific features (slots, emits, directives)
 
@@ -62,60 +63,63 @@ tigercat/
 
 **Purpose**: React component implementations using functional components with hooks.
 
-| Path | Content/Functionality |
-|------|----------------------|
+| Path                             | Content/Functionality                                             |
+| -------------------------------- | ----------------------------------------------------------------- |
 | `packages/react/src/components/` | React component files organized by category (Basic, Form, Layout) |
-| `packages/react/src/index.tsx` | Re-exports all React components, types, and core utilities |
-| `packages/react/dist/` | Build output (generated) |
+| `packages/react/src/index.tsx`   | Re-exports all React components, types, and core utilities        |
+| `packages/react/dist/`           | Build output (generated)                                          |
 
 **When to modify**: Implementing React components, fixing React-specific bugs, adding React-specific features (hooks, context, refs)
 
 ### Documentation Structure (`docs/`)
 
-| Path | Content/Functionality |
-|------|----------------------|
+| Path               | Content/Functionality                                              |
+| ------------------ | ------------------------------------------------------------------ |
 | `docs/components/` | Component API documentation with props, events, and usage examples |
-| `docs/theme.md` | Theme system documentation and customization guide |
+| `docs/theme.md`    | Theme system documentation and customization guide                 |
 
 ### Examples & Demos (`examples/`)
 
-| Path | Content/Functionality |
-|------|----------------------|
-| `examples/demo/` | Interactive demo applications |
+| Path                 | Content/Functionality           |
+| -------------------- | ------------------------------- |
+| `examples/demo/`     | Interactive demo applications   |
 | `examples/README.md` | How to run and use the examples |
 
 ### Testing Structure (`tests/`)
 
-| Path | Content/Functionality |
-|------|----------------------|
-| `tests/vue/` | Vue component unit and integration tests |
-| `tests/react/` | React component unit and integration tests |
-| `tests/utils/` | Shared test utilities and helpers (Vue and React) |
-| `tests/utils/render-helpers.ts` | Vue-specific render helpers |
-| `tests/utils/render-helpers-react.ts` | React-specific render helpers |
-| `tests/utils/a11y-helpers.ts` | Accessibility testing utilities |
-| `tests/utils/theme-helpers.ts` | Theme testing utilities |
-| `tests/utils/test-fixtures.ts` | Common test data and fixtures |
-| `tests/setup.ts` | Vitest global configuration |
-| `tests/TESTING_GUIDE.md` | Vue testing guide |
-| `tests/REACT_TESTING_GUIDE.md` | React testing guide |
-| `tests/COMPONENT_TEST_CHECKLIST.md` | Vue component test progress |
-| `tests/REACT_COMPONENT_TEST_CHECKLIST.md` | React component test progress |
+| Path                                      | Content/Functionality                             |
+| ----------------------------------------- | ------------------------------------------------- |
+| `tests/vue/`                              | Vue component unit and integration tests          |
+| `tests/react/`                            | React component unit and integration tests        |
+| `tests/utils/`                            | Shared test utilities and helpers (Vue and React) |
+| `tests/utils/render-helpers.ts`           | Vue-specific render helpers                       |
+| `tests/utils/render-helpers-react.ts`     | React-specific render helpers                     |
+| `tests/utils/a11y-helpers.ts`             | Accessibility testing utilities                   |
+| `tests/utils/theme-helpers.ts`            | Theme testing utilities                           |
+| `tests/utils/test-fixtures.ts`            | Common test data and fixtures                     |
+| `tests/setup.ts`                          | Vitest global configuration                       |
+| `tests/TESTING_GUIDE.md`                  | Vue testing guide                                 |
+| `tests/REACT_TESTING_GUIDE.md`            | React testing guide                               |
+| `tests/COMPONENT_TEST_CHECKLIST.md`       | Vue component test progress                       |
+| `tests/REACT_COMPONENT_TEST_CHECKLIST.md` | React component test progress                     |
 
 ## Package Responsibilities Summary
 
 ### `@tigercat/core` - Core Utilities & Types
+
 - Framework-agnostic utilities, TypeScript type definitions, theme configuration
 - No external dependencies (pure TypeScript)
 - Re-exported by both `@tigercat/vue` and `@tigercat/react`
 - Changes affect both Vue and React packages
 
 ### `@tigercat/vue` - Vue 3 Components
+
 - Vue 3 component implementations using Composition API
 - Depends on: `@tigercat/core` (workspace), `vue` (peer dependency)
 - Component style: `<script setup>`, slots for content, kebab-case events
 
 ### `@tigercat/react` - React Components
+
 - React component implementations using functional components and hooks
 - Depends on: `@tigercat/core` (workspace), `react` (peer dependency)
 - Component style: Functional components, children prop, camelCase event handlers
@@ -164,6 +168,10 @@ tigercat/
 - Use explicit return types for public functions
 - Avoid using `any` - use `unknown` or proper types instead (warnings enabled)
 - Use underscore prefix for intentionally unused parameters (e.g., `_context`)
+- Pay attention to syntax punctuation when editing code:
+  - Correctly add `,` between object properties/array items and in import/export lists.
+  - Follow the existing file style for `;` in TS/TSX (this repo generally omits semicolons).
+  - Use `;` where the language requires it (e.g., CSS declarations).
 
 ### Imports & Exports
 
@@ -195,6 +203,7 @@ tigercat/
 For components with advanced interactions (file handling, date/time selection, rich text editing, etc.):
 
 **General Guidelines**:
+
 - Extract validation and formatting logic to `@tigercat/core/utils`
 - Support keyboard navigation and accessibility
 - Implement proper focus management
@@ -203,6 +212,7 @@ For components with advanced interactions (file handling, date/time selection, r
 - Provide clear visual feedback for user interactions
 
 **Best Practices**:
+
 - Break down into smaller sub-components when possible
 - Use shared utilities for validation and formatting
 - Implement comprehensive TypeScript types
@@ -244,6 +254,7 @@ For components with advanced interactions (file handling, date/time selection, r
 ### Testing
 
 #### General Testing Principles
+
 - Write tests for all components (both Vue and React)
 - Test component behavior, not implementation details
 - Include accessibility tests with jest-axe
@@ -251,6 +262,7 @@ For components with advanced interactions (file handling, date/time selection, r
 - Maintain test independence and reproducibility
 
 #### Vue Component Testing
+
 - **Location**: `tests/vue/[ComponentName].spec.ts`
 - **Framework**: @testing-library/vue with Vitest
 - **Style**: Use `renderWithProps`, `renderWithSlots` helpers
@@ -259,6 +271,7 @@ For components with advanced interactions (file handling, date/time selection, r
 - **Example**: `tests/vue/Button.spec.ts`
 
 #### React Component Testing
+
 - **Location**: `tests/react/[ComponentName].spec.tsx`
 - **Framework**: @testing-library/react with Vitest
 - **Style**: Use `renderWithProps`, `renderWithChildren` helpers
@@ -268,39 +281,41 @@ For components with advanced interactions (file handling, date/time selection, r
 - **Example**: `tests/react/Button.spec.tsx`
 
 #### Test Structure (Consistent for Both Frameworks)
+
 ```typescript
 describe('ComponentName', () => {
   describe('Rendering', () => {
     // Basic rendering tests
-  })
-  
+  });
+
   describe('Props', () => {
     // Props validation tests
-  })
-  
+  });
+
   describe('Events', () => {
     // Event/handler tests
-  })
-  
+  });
+
   describe('States', () => {
     // Different states (disabled, loading, etc.)
-  })
-  
+  });
+
   describe('Theme Support', () => {
     // Theme customization tests
-  })
-  
+  });
+
   describe('Accessibility', () => {
     // a11y tests with jest-axe
-  })
-  
+  });
+
   describe('Snapshots', () => {
     // Snapshot tests for regression
-  })
-})
+  });
+});
 ```
 
 #### Shared Test Utilities
+
 - **Accessibility**: `expectNoA11yViolations`, `expectProperAriaLabels`
 - **Theme**: `setThemeVariables`, `clearThemeVariables`
 - **Fixtures**: `buttonVariants`, `componentSizes`, `inputTypes`
@@ -321,6 +336,7 @@ Each component must include:
 #### Documentation for Complex Components
 
 For components with advanced features, documentation should include:
+
 - **Multiple usage examples**: Basic usage and advanced features
 - **Feature-specific guidance**: Special behaviors, constraints, and limitations
 - **Event patterns**: Change handlers with relevant parameters
@@ -369,28 +385,33 @@ pnpm clean
 ### Adding New Components
 
 1. **Core utilities** (`@tigercat/core`): Create shared utilities, types, and helpers
+
    - Add TypeScript types in `packages/core/src/types/[component].ts`
    - Add utilities in `packages/core/src/utils/[component]-utils.ts` (if needed)
    - Export from `packages/core/src/index.ts`
 
 2. **Vue component** (`packages/vue/src/components/`):
+
    - Create component file: `[ComponentName].ts` (using `<script setup>`)
    - Use v-model for two-way binding where appropriate
    - Emit kebab-case events
    - Export from `packages/vue/src/index.ts`
 
 3. **React component** (`packages/react/src/components/`):
+
    - Create component file: `[ComponentName].tsx`
    - Use controlled/uncontrolled patterns
    - Use camelCase event handlers
    - Export from `packages/react/src/index.tsx`
 
 4. **Tests**:
+
    - Vue tests in `tests/vue/[ComponentName].spec.ts`
    - React tests in `tests/react/[ComponentName].spec.tsx`
    - Update test checklists with completion status
 
 5. **Documentation** (`docs/components/`):
+
    - Create `[component].md` with API docs and examples
    - Include both Vue and React usage examples
    - Document all props, events, and special behaviors
@@ -438,13 +459,13 @@ Use Tailwind's arbitrary value syntax with CSS variables:
 
 ```typescript
 // Good: CSS variable with fallback
-bg: 'bg-[var(--tiger-primary,#2563eb)]'
+bg: 'bg-[var(--tiger-primary,#2563eb)]';
 
 // Good: Hover state
-bgHover: 'hover:bg-[var(--tiger-primary-hover,#1d4ed8)]'
+bgHover: 'hover:bg-[var(--tiger-primary-hover,#1d4ed8)]';
 
 // Good: Multiple states
-disabled: 'disabled:bg-[var(--tiger-primary-disabled,#93c5fd)]'
+disabled: 'disabled:bg-[var(--tiger-primary-disabled,#93c5fd)]';
 ```
 
 ### Theme Utilities
@@ -452,17 +473,17 @@ disabled: 'disabled:bg-[var(--tiger-primary-disabled,#93c5fd)]'
 Use the provided theme utilities from `@tigercat/core`:
 
 ```typescript
-import { setThemeColors, getThemeColor, THEME_CSS_VARS } from '@tigercat/core'
+import { setThemeColors, getThemeColor, THEME_CSS_VARS } from '@tigercat/core';
 
 // Set theme colors programmatically
 setThemeColors({
   primary: '#10b981',
   primaryHover: '#059669',
   primaryDisabled: '#6ee7b7',
-})
+});
 
 // Get current theme color
-const currentPrimary = getThemeColor('primary')
+const currentPrimary = getThemeColor('primary');
 ```
 
 ## Best Practices
@@ -487,7 +508,9 @@ const currentPrimary = getThemeColor('primary')
 
 ```typescript
 // Export utilities as named exports
-export function classNames(...classes: (string | undefined | null | false)[]): string {
+export function classNames(
+  ...classes: (string | undefined | null | false)[]
+): string {
   return classes.filter(Boolean).join(' ');
 }
 ```
@@ -551,7 +574,11 @@ export const Button: React.FC<ButtonProps> = ({
   const buttonClasses = ''; // computed classes
 
   return (
-    <button className={buttonClasses} onClick={onClick} disabled={disabled} {...props}>
+    <button
+      className={buttonClasses}
+      onClick={onClick}
+      disabled={disabled}
+      {...props}>
       {children}
     </button>
   );
@@ -595,6 +622,7 @@ This file should be updated when:
 6. **Best practices evolve**: When the team establishes new coding standards or conventions
 
 **What NOT to include**:
+
 - Specific component implementations (use component docs instead)
 - Temporary workarounds
 - Personal preferences that aren't team standards
@@ -605,12 +633,14 @@ This file should be updated when:
 **ROADMAP.md**: Update when components are completed (Vue ✅, React ✅, Docs ✅, Tests ✅)
 
 **README.md**: Update for:
+
 - Major feature additions
 - Changes to setup/installation process
 - New testing documentation
 - Project structure changes
 
 **Test Checklists**: Update when:
+
 - Tests are completed for a component
 - Test count changes
 - Progress percentages need recalculation

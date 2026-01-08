@@ -1,36 +1,41 @@
-import React, { useCallback, useMemo } from 'react'
-import { classNames, getButtonVariantClasses, type ButtonProps as CoreButtonProps } from '@tigercat/core'
+import React, { useCallback, useMemo } from 'react';
+import {
+  classNames,
+  getButtonVariantClasses,
+  type ButtonProps as CoreButtonProps,
+} from '@tigercat/core';
 
 export interface ButtonProps extends CoreButtonProps {
   /**
    * Click event handler
    */
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
-  
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+
   /**
    * Button content
    */
-  children?: React.ReactNode
-  
+  children?: React.ReactNode;
+
   /**
    * HTML button type
    * @default 'button'
    */
-  type?: 'button' | 'submit' | 'reset'
-  
+  type?: 'button' | 'submit' | 'reset';
+
   /**
    * Additional CSS classes
    */
-  className?: string
+  className?: string;
 }
 
-const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2'
+const baseClasses =
+  'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
 
 const sizeClasses = {
   sm: 'px-3 py-1.5 text-sm',
   md: 'px-4 py-2 text-base',
   lg: 'px-6 py-3 text-lg',
-} as const
+} as const;
 
 export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
@@ -44,20 +49,27 @@ export const Button: React.FC<ButtonProps> = ({
   className,
   ...props
 }) => {
-  const buttonClasses = useMemo(() => classNames(
-    baseClasses,
-    getButtonVariantClasses(variant),
-    sizeClasses[size],
-    (disabled || loading) && 'cursor-not-allowed opacity-60',
-    block && 'w-full',
-    className,
-  ), [variant, size, disabled, loading, block, className])
+  const buttonClasses = useMemo(
+    () =>
+      classNames(
+        baseClasses,
+        getButtonVariantClasses(variant),
+        sizeClasses[size],
+        (disabled || loading) && 'cursor-not-allowed opacity-60',
+        block && 'w-full',
+        className
+      ),
+    [variant, size, disabled, loading, block, className]
+  );
 
-  const handleClick = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
-    if (!disabled && !loading && onClick) {
-      onClick(event)
-    }
-  }, [disabled, loading, onClick])
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      if (!disabled && !loading && onClick) {
+        onClick(event);
+      }
+    },
+    [disabled, loading, onClick]
+  );
 
   return (
     <button
@@ -65,16 +77,14 @@ export const Button: React.FC<ButtonProps> = ({
       disabled={disabled || loading}
       onClick={handleClick}
       type={type}
-      {...props}
-    >
+      {...props}>
       {loading && (
         <span className="mr-2">
           <svg
             className="animate-spin h-4 w-4"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
-            viewBox="0 0 24 24"
-          >
+            viewBox="0 0 24 24">
             <circle
               className="opacity-25"
               cx="12"
@@ -93,5 +103,5 @@ export const Button: React.FC<ButtonProps> = ({
       )}
       {children}
     </button>
-  )
-}
+  );
+};
