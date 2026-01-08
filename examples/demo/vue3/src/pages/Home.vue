@@ -11,7 +11,6 @@ const components = [
   { name: 'Textarea', path: '/textarea', category: '表单组件' },
   { name: 'Checkbox', path: '/checkbox', category: '表单组件' },
   { name: 'Radio', path: '/radio', category: '表单组件' },
-  { name: 'RadioGroup', path: '/radio-group', category: '表单组件' },
   { name: 'Switch', path: '/switch', category: '表单组件' },
   { name: 'Slider', path: '/slider', category: '表单组件' },
   { name: 'Select', path: '/select', category: '表单组件' },
