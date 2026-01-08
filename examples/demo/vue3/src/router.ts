@@ -1,5 +1,5 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import Home from './pages/Home.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import Home from './pages/Home.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -9,9 +9,11 @@ const router = createRouter({
     { path: '/input', component: () => import('./pages/InputDemo.vue') },
     { path: '/textarea', component: () => import('./pages/TextareaDemo.vue') },
     { path: '/checkbox', component: () => import('./pages/CheckboxDemo.vue') },
-    { path: '/checkbox-group', component: () => import('./pages/CheckboxGroupDemo.vue') },
     { path: '/radio', component: () => import('./pages/RadioDemo.vue') },
-    { path: '/radio-group', component: () => import('./pages/RadioGroupDemo.vue') },
+    {
+      path: '/radio-group',
+      component: () => import('./pages/RadioGroupDemo.vue'),
+    },
     { path: '/switch', component: () => import('./pages/SwitchDemo.vue') },
     { path: '/slider', component: () => import('./pages/SliderDemo.vue') },
     { path: '/select', component: () => import('./pages/SelectDemo.vue') },
@@ -20,7 +22,10 @@ const router = createRouter({
     { path: '/space', component: () => import('./pages/SpaceDemo.vue') },
     { path: '/divider', component: () => import('./pages/DividerDemo.vue') },
     { path: '/layout', component: () => import('./pages/LayoutDemo.vue') },
-    { path: '/container', component: () => import('./pages/ContainerDemo.vue') },
+    {
+      path: '/container',
+      component: () => import('./pages/ContainerDemo.vue'),
+    },
     { path: '/header', component: () => import('./pages/HeaderDemo.vue') },
     { path: '/sidebar', component: () => import('./pages/SidebarDemo.vue') },
     { path: '/content', component: () => import('./pages/ContentDemo.vue') },
@@ -31,8 +36,14 @@ const router = createRouter({
     { path: '/link', component: () => import('./pages/LinkDemo.vue') },
     { path: '/text', component: () => import('./pages/TextDemo.vue') },
     { path: '/icon', component: () => import('./pages/IconDemo.vue') },
-    { path: '/datepicker', component: () => import('./pages/DatePickerDemo.vue') },
-    { path: '/timepicker', component: () => import('./pages/TimePickerDemo.vue') },
+    {
+      path: '/datepicker',
+      component: () => import('./pages/DatePickerDemo.vue'),
+    },
+    {
+      path: '/timepicker',
+      component: () => import('./pages/TimePickerDemo.vue'),
+    },
     { path: '/upload', component: () => import('./pages/UploadDemo.vue') },
     { path: '/table', component: () => import('./pages/TableDemo.vue') },
     { path: '/tag', component: () => import('./pages/TagDemo.vue') },
@@ -40,11 +51,17 @@ const router = createRouter({
     { path: '/card', component: () => import('./pages/CardDemo.vue') },
     { path: '/avatar', component: () => import('./pages/AvatarDemo.vue') },
     { path: '/list', component: () => import('./pages/ListDemo.vue') },
-    { path: '/descriptions', component: () => import('./pages/DescriptionsDemo.vue') },
+    {
+      path: '/descriptions',
+      component: () => import('./pages/DescriptionsDemo.vue'),
+    },
     { path: '/timeline', component: () => import('./pages/TimelineDemo.vue') },
     { path: '/progress', component: () => import('./pages/ProgressDemo.vue') },
     { path: '/menu', component: () => import('./pages/MenuDemo.vue') },
-    { path: '/breadcrumb', component: () => import('./pages/BreadcrumbDemo.vue') },
+    {
+      path: '/breadcrumb',
+      component: () => import('./pages/BreadcrumbDemo.vue'),
+    },
     { path: '/dropdown', component: () => import('./pages/DropdownDemo.vue') },
     { path: '/tabs', component: () => import('./pages/TabsDemo.vue') },
     { path: '/tree', component: () => import('./pages/TreeDemo.vue') },
@@ -52,15 +69,24 @@ const router = createRouter({
     { path: '/alert', component: () => import('./pages/AlertDemo.vue') },
     { path: '/message', component: () => import('./pages/MessageDemo.vue') },
     { path: '/modal', component: () => import('./pages/ModalDemo.vue') },
-    { path: '/popconfirm', component: () => import('./pages/PopconfirmDemo.vue') },
+    {
+      path: '/popconfirm',
+      component: () => import('./pages/PopconfirmDemo.vue'),
+    },
     { path: '/popover', component: () => import('./pages/PopoverDemo.vue') },
     { path: '/tooltip', component: () => import('./pages/TooltipDemo.vue') },
-    { path: '/notification', component: () => import('./pages/NotificationDemo.vue') },
+    {
+      path: '/notification',
+      component: () => import('./pages/NotificationDemo.vue'),
+    },
     { path: '/steps', component: () => import('./pages/StepsDemo.vue') },
-    { path: '/pagination', component: () => import('./pages/PaginationDemo.vue') },
+    {
+      path: '/pagination',
+      component: () => import('./pages/PaginationDemo.vue'),
+    },
     { path: '/drawer', component: () => import('./pages/DrawerDemo.vue') },
     { path: '/loading', component: () => import('./pages/LoadingDemo.vue') },
   ],
-})
+});
 
-export default router
+export default router;
