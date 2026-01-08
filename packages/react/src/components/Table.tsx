@@ -6,6 +6,7 @@ import {
   getTableHeaderCellClasses,
   getTableRowClasses,
   getTableCellClasses,
+  getFixedColumnOffsets,
   getSortIconClasses,
   getCheckboxCellClasses,
   tableBaseClasses,
@@ -106,6 +107,23 @@ const SortIcon: React.FC<{ direction: 'asc' | 'desc' | null }> = ({
   );
 };
 
+const LockIcon: React.FC<{ locked: boolean }> = ({ locked }) => {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true">
+      {locked ? (
+        <path d="M17 8h-1V6a4 4 0 10-8 0v2H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V10a2 2 0 00-2-2zm-7-2a2 2 0 114 0v2h-4V6z" />
+      ) : (
+        <path d="M17 8h-1V6a4 4 0 00-7.75-1.41 1 1 0 101.9.62A2 2 0 0114 6v2H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V10a2 2 0 00-2-2zm0 12H7V10h10v10z" />
+      )}
+    </svg>
+  );
+};
+
 // Loading spinner
 const LoadingSpinner: React.FC = () => (
   <svg
@@ -133,6 +151,7 @@ export function Table<
   T extends Record<string, unknown> = Record<string, unknown>
 >({
   columns,
+  columnLockable = false,
   dataSource = [],
   size = 'md',
   bordered = false,
@@ -183,6 +202,47 @@ export function Table<
     rowSelection?.selectedRowKeys || []
   );
 
+  const [fixedOverrides, setFixedOverrides] = useState<
+    Record<string, 'left' | 'right' | false>
+  >({});
+
+  const displayColumns = useMemo(() => {
+    return columns.map((column) => {
+      const hasOverride = Object.prototype.hasOwnProperty.call(
+        fixedOverrides,
+        column.key
+      );
+
+      return {
+        ...column,
+        fixed: hasOverride ? fixedOverrides[column.key] : column.fixed,
+      };
+    });
+  }, [columns, fixedOverrides]);
+
+  const fixedColumnsInfo = useMemo(() => {
+    return getFixedColumnOffsets(displayColumns);
+  }, [displayColumns]);
+
+  const toggleColumnLock = useCallback(
+    (columnKey: string) => {
+      setFixedOverrides((prev) => {
+        const original = columns.find((c) => c.key === columnKey)?.fixed;
+        const current = Object.prototype.hasOwnProperty.call(prev, columnKey)
+          ? prev[columnKey]
+          : original;
+
+        const isLocked = current === 'left' || current === 'right';
+
+        return {
+          ...prev,
+          [columnKey]: isLocked ? false : 'left',
+        };
+      });
+    },
+    [columns]
+  );
+
   // Process data with sorting, filtering, and pagination
   const processedData = useMemo(() => {
     let data = [...dataSource];
@@ -192,12 +252,12 @@ export function Table<
 
     // Apply sorting
     if (sortState.key && sortState.direction) {
-      const column = columns.find((col) => col.key === sortState.key);
+      const column = displayColumns.find((col) => col.key === sortState.key);
       data = sortData(data, sortState.key, sortState.direction, column?.sortFn);
     }
 
     return data;
-  }, [dataSource, filterState, sortState, columns]);
+  }, [dataSource, filterState, sortState, displayColumns]);
 
   const paginatedData = useMemo(() => {
     if (pagination === false) {
@@ -218,7 +278,7 @@ export function Table<
 
   const handleSort = useCallback(
     (columnKey: string) => {
-      const column = columns.find((col) => col.key === columnKey);
+      const column = displayColumns.find((col) => col.key === columnKey);
       if (!column || !column.sortable) {
         return;
       }
@@ -253,7 +313,7 @@ export function Table<
       });
     },
     [
-      columns,
+      displayColumns,
       sortState,
       filterState,
       currentPage,
@@ -412,29 +472,52 @@ export function Table<
             )}
 
           {/* Column headers */}
-          {columns.map((column) => {
+          {displayColumns.map((column) => {
             const isSorted = sortState.key === column.key;
             const sortDirection = isSorted ? sortState.direction : null;
+
+            const isFixedLeft = column.fixed === 'left';
+            const isFixedRight = column.fixed === 'right';
+            const fixedStyle = isFixedLeft
+              ? {
+                  position: 'sticky' as const,
+                  left: `${fixedColumnsInfo.leftOffsets[column.key] || 0}px`,
+                  zIndex: 15,
+                }
+              : isFixedRight
+              ? {
+                  position: 'sticky' as const,
+                  right: `${fixedColumnsInfo.rightOffsets[column.key] || 0}px`,
+                  zIndex: 15,
+                }
+              : undefined;
+
+            const widthStyle = column.width
+              ? {
+                  width:
+                    typeof column.width === 'number'
+                      ? `${column.width}px`
+                      : column.width,
+                }
+              : undefined;
+
+            const style = fixedStyle
+              ? { ...widthStyle, ...fixedStyle }
+              : widthStyle;
 
             return (
               <th
                 key={column.key}
-                className={getTableHeaderCellClasses(
-                  size,
-                  column.align || 'left',
-                  !!column.sortable,
-                  column.headerClassName
+                className={classNames(
+                  getTableHeaderCellClasses(
+                    size,
+                    column.align || 'left',
+                    !!column.sortable,
+                    column.headerClassName
+                  ),
+                  (isFixedLeft || isFixedRight) && 'bg-gray-50'
                 )}
-                style={
-                  column.width
-                    ? {
-                        width:
-                          typeof column.width === 'number'
-                            ? `${column.width}px`
-                            : column.width,
-                      }
-                    : undefined
-                }
+                style={style}
                 onClick={
                   column.sortable ? () => handleSort(column.key) : undefined
                 }>
@@ -442,10 +525,36 @@ export function Table<
                   {column.renderHeader
                     ? (column.renderHeader() as React.ReactNode)
                     : column.title}
+
+                  {columnLockable && (
+                    <button
+                      type="button"
+                      aria-label={
+                        column.fixed === 'left' || column.fixed === 'right'
+                          ? `Unlock column ${column.title}`
+                          : `Lock column ${column.title}`
+                      }
+                      className={classNames(
+                        'inline-flex items-center',
+                        column.fixed === 'left' || column.fixed === 'right'
+                          ? 'text-[var(--tiger-primary,#2563eb)]'
+                          : 'text-gray-400 hover:text-gray-700'
+                      )}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleColumnLock(column.key);
+                      }}>
+                      <LockIcon
+                        locked={
+                          column.fixed === 'left' || column.fixed === 'right'
+                        }
+                      />
+                    </button>
+                  )}
+
                   {column.sortable && <SortIcon direction={sortDirection} />}
                 </div>
 
-                {/* Filter input */}
                 {column.filter && (
                   <div className="mt-2">
                     {column.filter.type === 'select' &&
@@ -486,7 +595,7 @@ export function Table<
       </thead>
     );
   }, [
-    columns,
+    displayColumns,
     size,
     stickyHeader,
     sortState,
@@ -496,6 +605,9 @@ export function Table<
     handleSort,
     handleFilter,
     handleSelectAll,
+    columnLockable,
+    toggleColumnLock,
+    fixedColumnsInfo,
   ]);
 
   const renderTableBody = useCallback(() => {
@@ -508,7 +620,7 @@ export function Table<
         <tbody>
           <tr>
             <td
-              colSpan={columns.length + (rowSelection ? 1 : 0)}
+              colSpan={displayColumns.length + (rowSelection ? 1 : 0)}
               className={tableEmptyStateClasses}>
               {emptyText}
             </td>
@@ -530,11 +642,14 @@ export function Table<
           return (
             <tr
               key={key}
-              className={getTableRowClasses(
-                hoverable,
-                striped,
-                index % 2 === 0,
-                rowClass
+              className={classNames(
+                getTableRowClasses(
+                  hoverable,
+                  striped,
+                  index % 2 === 0,
+                  rowClass
+                ),
+                fixedColumnsInfo.hasFixedColumns && 'group'
               )}
               onClick={() => handleRowClick(record, index)}>
               {/* Selection checkbox cell */}
@@ -557,18 +672,66 @@ export function Table<
               )}
 
               {/* Data cells */}
-              {columns.map((column) => {
+              {displayColumns.map((column) => {
                 const dataKey = column.dataKey || column.key;
                 const cellValue = record[dataKey];
+
+                const isFixedLeft = column.fixed === 'left';
+                const isFixedRight = column.fixed === 'right';
+                const fixedStyle = isFixedLeft
+                  ? {
+                      position: 'sticky' as const,
+                      left: `${
+                        fixedColumnsInfo.leftOffsets[column.key] || 0
+                      }px`,
+                      zIndex: 10,
+                    }
+                  : isFixedRight
+                  ? {
+                      position: 'sticky' as const,
+                      right: `${
+                        fixedColumnsInfo.rightOffsets[column.key] || 0
+                      }px`,
+                      zIndex: 10,
+                    }
+                  : undefined;
+
+                const widthStyle = column.width
+                  ? {
+                      width:
+                        typeof column.width === 'number'
+                          ? `${column.width}px`
+                          : column.width,
+                    }
+                  : undefined;
+
+                const style = fixedStyle
+                  ? { ...widthStyle, ...fixedStyle }
+                  : widthStyle;
+
+                const stickyBgClass =
+                  striped && index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white';
+
+                const stickyCellClass =
+                  isFixedLeft || isFixedRight
+                    ? classNames(
+                        stickyBgClass,
+                        hoverable && 'group-hover:bg-gray-50'
+                      )
+                    : undefined;
 
                 return (
                   <td
                     key={column.key}
-                    className={getTableCellClasses(
-                      size,
-                      column.align || 'left',
-                      column.className
-                    )}>
+                    className={classNames(
+                      getTableCellClasses(
+                        size,
+                        column.align || 'left',
+                        column.className
+                      ),
+                      stickyCellClass
+                    )}
+                    style={style}>
                     {column.render
                       ? (column.render(record, index) as React.ReactNode)
                       : (cellValue as React.ReactNode)}
@@ -583,7 +746,7 @@ export function Table<
   }, [
     loading,
     paginatedData,
-    columns,
+    displayColumns,
     rowSelection,
     emptyText,
     rowKey,
@@ -594,6 +757,7 @@ export function Table<
     size,
     handleRowClick,
     handleSelectRow,
+    fixedColumnsInfo,
   ]);
 
   const renderPagination = useCallback(() => {
@@ -693,11 +857,21 @@ export function Table<
   );
 
   return (
-    <div className={classNames('relative', className)} {...props}>
+    <div className={classNames('relative', className)}>
       <div
         className={getTableWrapperClasses(bordered, maxHeight)}
         style={wrapperStyle}>
-        <table className={tableBaseClasses}>
+        <table
+          className={tableBaseClasses}
+          {...props}
+          style={
+            fixedColumnsInfo.hasFixedColumns && fixedColumnsInfo.minTableWidth
+              ? {
+                  ...(props as React.HTMLAttributes<HTMLTableElement>).style,
+                  minWidth: `${fixedColumnsInfo.minTableWidth}px`,
+                }
+              : (props as React.HTMLAttributes<HTMLTableElement>).style
+          }>
           {renderTableHeader()}
           {renderTableBody()}
         </table>

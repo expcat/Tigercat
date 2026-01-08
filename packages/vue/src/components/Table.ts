@@ -1,4 +1,4 @@
-import { defineComponent, computed, ref, h, PropType } from 'vue'
+import { defineComponent, computed, ref, h, PropType } from 'vue';
 import {
   classNames,
   getTableWrapperClasses,
@@ -6,6 +6,7 @@ import {
   getTableHeaderCellClasses,
   getTableRowClasses,
   getTableCellClasses,
+  getFixedColumnOffsets,
   getSortIconClasses,
   getCheckboxCellClasses,
   tableBaseClasses,
@@ -23,74 +24,111 @@ import {
   type SortState,
   type PaginationConfig,
   type RowSelectionConfig,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 // Sort icons
 const SortIcon = (direction: SortDirection) => {
   if (direction === 'asc') {
-    return h('svg', {
-      class: getSortIconClasses(true),
-      width: '16',
-      height: '16',
-      viewBox: '0 0 16 16',
-      fill: 'currentColor',
-    }, [
-      h('path', {
-        d: 'M8 3l4 4H4l4-4z',
-      }),
-    ])
+    return h(
+      'svg',
+      {
+        class: getSortIconClasses(true),
+        width: '16',
+        height: '16',
+        viewBox: '0 0 16 16',
+        fill: 'currentColor',
+      },
+      [
+        h('path', {
+          d: 'M8 3l4 4H4l4-4z',
+        }),
+      ]
+    );
   }
-  
+
   if (direction === 'desc') {
-    return h('svg', {
-      class: getSortIconClasses(true),
+    return h(
+      'svg',
+      {
+        class: getSortIconClasses(true),
+        width: '16',
+        height: '16',
+        viewBox: '0 0 16 16',
+        fill: 'currentColor',
+      },
+      [
+        h('path', {
+          d: 'M8 13l-4-4h8l-4 4z',
+        }),
+      ]
+    );
+  }
+
+  return h(
+    'svg',
+    {
+      class: getSortIconClasses(false),
       width: '16',
       height: '16',
       viewBox: '0 0 16 16',
       fill: 'currentColor',
-    }, [
+    },
+    [
       h('path', {
-        d: 'M8 13l-4-4h8l-4 4z',
+        d: 'M8 3l4 4H4l4-4zM8 13l-4-4h8l-4 4z',
       }),
-    ])
-  }
-  
-  return h('svg', {
-    class: getSortIconClasses(false),
-    width: '16',
-    height: '16',
-    viewBox: '0 0 16 16',
-    fill: 'currentColor',
-  }, [
-    h('path', {
-      d: 'M8 3l4 4H4l4-4zM8 13l-4-4h8l-4 4z',
-    }),
-  ])
-}
+    ]
+  );
+};
+const LockIcon = (locked: boolean) => {
+  return h(
+    'svg',
+    {
+      width: '14',
+      height: '14',
+      viewBox: '0 0 24 24',
+      fill: 'currentColor',
+      'aria-hidden': 'true',
+    },
+    [
+      locked
+        ? h('path', {
+            d: 'M17 8h-1V6a4 4 0 10-8 0v2H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V10a2 2 0 00-2-2zm-7-2a2 2 0 114 0v2h-4V6z',
+          })
+        : h('path', {
+            d: 'M17 8h-1V6a4 4 0 00-7.75-1.41 1 1 0 101.9.62A2 2 0 0114 6v2H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V10a2 2 0 00-2-2zm0 12H7V10h10v10z',
+          }),
+    ]
+  );
+};
 
 // Loading spinner
 const LoadingSpinner = () => {
-  return h('svg', {
-    class: 'animate-spin h-8 w-8 text-[var(--tiger-primary,#2563eb)]',
-    xmlns: 'http://www.w3.org/2000/svg',
-    fill: 'none',
-    viewBox: '0 0 24 24',
-  }, [
-    h('circle', {
-      class: 'opacity-25',
-      cx: '12',
-      cy: '12',
-      r: '10',
-      stroke: 'currentColor',
-      'stroke-width': '4',
-    }),
-    h('path', {
-      class: 'opacity-75',
-      fill: 'currentColor',
-      d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z',
-    }),
-  ])
-}
+  return h(
+    'svg',
+    {
+      class: 'animate-spin h-8 w-8 text-[var(--tiger-primary,#2563eb)]',
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: '0 0 24 24',
+    },
+    [
+      h('circle', {
+        class: 'opacity-25',
+        cx: '12',
+        cy: '12',
+        r: '10',
+        stroke: 'currentColor',
+        'stroke-width': '4',
+      }),
+      h('path', {
+        class: 'opacity-75',
+        fill: 'currentColor',
+        d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z',
+      }),
+    ]
+  );
+};
 
 export const Table = defineComponent({
   name: 'TigerTable',
@@ -101,6 +139,14 @@ export const Table = defineComponent({
     columns: {
       type: Array as PropType<TableColumn[]>,
       required: true,
+    },
+
+    /**
+     * Whether to show a lock button in each column header.
+     */
+    columnLockable: {
+      type: Boolean,
+      default: false,
     },
     /**
      * Table data source
@@ -175,14 +221,18 @@ export const Table = defineComponent({
      * Function to get row key
      */
     rowKey: {
-      type: [String, Function] as PropType<string | ((record: Record<string, unknown>) => string | number)>,
+      type: [String, Function] as PropType<
+        string | ((record: Record<string, unknown>) => string | number)
+      >,
       default: 'id',
     },
     /**
      * Custom row class name
      */
     rowClassName: {
-      type: [String, Function] as PropType<string | ((record: Record<string, unknown>, index: number) => string)>,
+      type: [String, Function] as PropType<
+        string | ((record: Record<string, unknown>, index: number) => string)
+      >,
     },
     /**
      * Whether table head is sticky
@@ -198,116 +248,173 @@ export const Table = defineComponent({
       type: [String, Number] as PropType<string | number>,
     },
   },
-  emits: ['change', 'row-click', 'selection-change', 'sort-change', 'filter-change', 'page-change'],
+  emits: [
+    'change',
+    'row-click',
+    'selection-change',
+    'sort-change',
+    'filter-change',
+    'page-change',
+  ],
   setup(props, { emit, slots }) {
     const sortState = ref<SortState>({
       key: null,
       direction: null,
-    })
-    
-    const filterState = ref<Record<string, unknown>>({})
-    
+    });
+
+    const filterState = ref<Record<string, unknown>>({});
+
     const currentPage = ref(
-      props.pagination && typeof props.pagination === 'object' ? props.pagination.current || 1 : 1
-    )
-    
+      props.pagination && typeof props.pagination === 'object'
+        ? props.pagination.current || 1
+        : 1
+    );
+
     const currentPageSize = ref(
-      props.pagination && typeof props.pagination === 'object' ? props.pagination.pageSize || 10 : 10
-    )
-    
+      props.pagination && typeof props.pagination === 'object'
+        ? props.pagination.pageSize || 10
+        : 10
+    );
+
     const selectedRowKeys = ref<(string | number)[]>(
       props.rowSelection?.selectedRowKeys || []
-    )
+    );
+
+    const fixedOverrides = ref<Record<string, 'left' | 'right' | false>>({});
+
+    const displayColumns = computed(() => {
+      return props.columns.map((column) => {
+        const hasOverride = column.key in fixedOverrides.value;
+
+        return {
+          ...column,
+          fixed: hasOverride ? fixedOverrides.value[column.key] : column.fixed,
+        };
+      });
+    });
+
+    const fixedColumnsInfo = computed(() => {
+      return getFixedColumnOffsets(displayColumns.value);
+    });
+
+    function toggleColumnLock(columnKey: string) {
+      const original = props.columns.find((c) => c.key === columnKey)?.fixed;
+      const hasOverride = columnKey in fixedOverrides.value;
+      const current = hasOverride ? fixedOverrides.value[columnKey] : original;
+      const isLocked = current === 'left' || current === 'right';
+      fixedOverrides.value[columnKey] = isLocked ? false : 'left';
+    }
 
     // Process data with sorting, filtering, and pagination
     const processedData = computed(() => {
-      let data = [...props.dataSource]
-      
+      let data = [...props.dataSource];
+
       // Apply filters
-      data = filterData(data, filterState.value)
-      
+      data = filterData(data, filterState.value);
+
       // Apply sorting
       if (sortState.value.key && sortState.value.direction) {
-        const column = props.columns.find(col => col.key === sortState.value.key)
-        data = sortData(data, sortState.value.key, sortState.value.direction, column?.sortFn)
+        const column = displayColumns.value.find(
+          (col) => col.key === sortState.value.key
+        );
+        data = sortData(
+          data,
+          sortState.value.key,
+          sortState.value.direction,
+          column?.sortFn
+        );
       }
-      
-      return data
-    })
+
+      return data;
+    });
 
     const paginatedData = computed(() => {
       if (props.pagination === false) {
-        return processedData.value
+        return processedData.value;
       }
-      
-      return paginateData(processedData.value, currentPage.value, currentPageSize.value)
-    })
+
+      return paginateData(
+        processedData.value,
+        currentPage.value,
+        currentPageSize.value
+      );
+    });
 
     const paginationInfo = computed(() => {
       if (props.pagination === false) {
-        return null
+        return null;
       }
-      
-      const total = processedData.value.length
-      return calculatePagination(total, currentPage.value, currentPageSize.value)
-    })
+
+      const total = processedData.value.length;
+      return calculatePagination(
+        total,
+        currentPage.value,
+        currentPageSize.value
+      );
+    });
 
     function handleSort(columnKey: string) {
-      const column = props.columns.find(col => col.key === columnKey)
+      const column = displayColumns.value.find((col) => col.key === columnKey);
       if (!column || !column.sortable) {
-        return
+        return;
       }
 
-      let newDirection: SortDirection = 'asc'
-      
+      let newDirection: SortDirection = 'asc';
+
       if (sortState.value.key === columnKey) {
         if (sortState.value.direction === 'asc') {
-          newDirection = 'desc'
+          newDirection = 'desc';
         } else if (sortState.value.direction === 'desc') {
-          newDirection = null
+          newDirection = null;
         }
       }
 
       sortState.value = {
         key: newDirection ? columnKey : null,
         direction: newDirection,
-      }
+      };
 
-      emit('sort-change', sortState.value)
+      emit('sort-change', sortState.value);
       emit('change', {
         sort: sortState.value,
         filters: filterState.value,
-        pagination: props.pagination !== false ? {
-          current: currentPage.value,
-          pageSize: currentPageSize.value,
-        } : null,
-      })
+        pagination:
+          props.pagination !== false
+            ? {
+                current: currentPage.value,
+                pageSize: currentPageSize.value,
+              }
+            : null,
+      });
     }
 
     function handleFilter(columnKey: string, value: unknown) {
       filterState.value = {
         ...filterState.value,
         [columnKey]: value,
-      }
+      };
 
       // Reset to first page when filtering
-      currentPage.value = 1
+      currentPage.value = 1;
 
-      emit('filter-change', filterState.value)
+      emit('filter-change', filterState.value);
       emit('change', {
         sort: sortState.value,
         filters: filterState.value,
-        pagination: props.pagination !== false ? {
-          current: currentPage.value,
-          pageSize: currentPageSize.value,
-        } : null,
-      })
+        pagination:
+          props.pagination !== false
+            ? {
+                current: currentPage.value,
+                pageSize: currentPageSize.value,
+              }
+            : null,
+      });
     }
 
     function handlePageChange(page: number) {
-      currentPage.value = page
-      
-      emit('page-change', { current: page, pageSize: currentPageSize.value })
+      currentPage.value = page;
+
+      emit('page-change', { current: page, pageSize: currentPageSize.value });
       emit('change', {
         sort: sortState.value,
         filters: filterState.value,
@@ -315,14 +422,14 @@ export const Table = defineComponent({
           current: page,
           pageSize: currentPageSize.value,
         },
-      })
+      });
     }
 
     function handlePageSizeChange(pageSize: number) {
-      currentPageSize.value = pageSize
-      currentPage.value = 1
-      
-      emit('page-change', { current: 1, pageSize })
+      currentPageSize.value = pageSize;
+      currentPage.value = 1;
+
+      emit('page-change', { current: 1, pageSize });
       emit('change', {
         sort: sortState.value,
         filters: filterState.value,
@@ -330,294 +437,511 @@ export const Table = defineComponent({
           current: 1,
           pageSize,
         },
-      })
+      });
     }
 
     function handleRowClick(record: Record<string, unknown>, index: number) {
-      emit('row-click', record, index)
+      emit('row-click', record, index);
     }
 
     function handleSelectRow(key: string | number, checked: boolean) {
-      let newKeys: (string | number)[]
-      
+      let newKeys: (string | number)[];
+
       if (props.rowSelection?.type === 'radio') {
-        newKeys = checked ? [key] : []
+        newKeys = checked ? [key] : [];
       } else {
         if (checked) {
-          newKeys = [...selectedRowKeys.value, key]
+          newKeys = [...selectedRowKeys.value, key];
         } else {
-          newKeys = selectedRowKeys.value.filter(k => k !== key)
+          newKeys = selectedRowKeys.value.filter((k) => k !== key);
         }
       }
-      
-      selectedRowKeys.value = newKeys
-      emit('selection-change', newKeys)
+
+      selectedRowKeys.value = newKeys;
+      emit('selection-change', newKeys);
     }
 
     function handleSelectAll(checked: boolean) {
       if (checked) {
-        selectedRowKeys.value = paginatedData.value.map((record, index) => 
+        selectedRowKeys.value = paginatedData.value.map((record, index) =>
           getRowKey(record, props.rowKey, index)
-        )
+        );
       } else {
-        selectedRowKeys.value = []
+        selectedRowKeys.value = [];
       }
-      
-      emit('selection-change', selectedRowKeys.value)
+
+      emit('selection-change', selectedRowKeys.value);
     }
 
     const allSelected = computed(() => {
       if (paginatedData.value.length === 0) {
-        return false
+        return false;
       }
-      
+
       return paginatedData.value.every((record, index) => {
-        const key = getRowKey(record, props.rowKey, index)
-        return selectedRowKeys.value.includes(key)
-      })
-    })
+        const key = getRowKey(record, props.rowKey, index);
+        return selectedRowKeys.value.includes(key);
+      });
+    });
 
     const someSelected = computed(() => {
-      return selectedRowKeys.value.length > 0 && !allSelected.value
-    })
+      return selectedRowKeys.value.length > 0 && !allSelected.value;
+    });
 
     function renderTableHeader() {
-      const headerCells = []
+      const headerCells = [];
 
       // Selection checkbox column
-      if (props.rowSelection && props.rowSelection.showCheckbox !== false && props.rowSelection.type !== 'radio') {
+      if (
+        props.rowSelection &&
+        props.rowSelection.showCheckbox !== false &&
+        props.rowSelection.type !== 'radio'
+      ) {
         headerCells.push(
-          h('th', {
-            class: getCheckboxCellClasses(props.size),
-          }, [
-            h('input', {
-              type: 'checkbox',
-              class: 'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]',
-              checked: allSelected.value,
-              indeterminate: someSelected.value,
-              onChange: (e: Event) => handleSelectAll((e.target as HTMLInputElement).checked),
-            }),
-          ])
-        )
+          h(
+            'th',
+            {
+              class: getCheckboxCellClasses(props.size),
+            },
+            [
+              h('input', {
+                type: 'checkbox',
+                class:
+                  'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]',
+                checked: allSelected.value,
+                indeterminate: someSelected.value,
+                onChange: (e: Event) =>
+                  handleSelectAll((e.target as HTMLInputElement).checked),
+              }),
+            ]
+          )
+        );
       }
 
       // Column headers
-      props.columns.forEach((column) => {
-        const isSorted = sortState.value.key === column.key
-        const sortDirection = isSorted ? sortState.value.direction : null
+      displayColumns.value.forEach((column) => {
+        const isSorted = sortState.value.key === column.key;
+        const sortDirection = isSorted ? sortState.value.direction : null;
+
+        const isFixedLeft = column.fixed === 'left';
+        const isFixedRight = column.fixed === 'right';
+        const fixedStyle = isFixedLeft
+          ? {
+              position: 'sticky',
+              left: `${fixedColumnsInfo.value.leftOffsets[column.key] || 0}px`,
+              zIndex: 15,
+            }
+          : isFixedRight
+          ? {
+              position: 'sticky',
+              right: `${
+                fixedColumnsInfo.value.rightOffsets[column.key] || 0
+              }px`,
+              zIndex: 15,
+            }
+          : undefined;
+
+        const widthStyle = column.width
+          ? {
+              width:
+                typeof column.width === 'number'
+                  ? `${column.width}px`
+                  : column.width,
+            }
+          : undefined;
+
+        const style = fixedStyle
+          ? { ...widthStyle, ...fixedStyle }
+          : widthStyle;
+
+        const headerContent = [
+          column.renderHeader
+            ? slots[`header-${column.key}`]?.() || column.title
+            : column.title,
+        ];
+
+        if (props.columnLockable) {
+          headerContent.push(
+            h(
+              'button',
+              {
+                type: 'button',
+                class: classNames(
+                  'inline-flex items-center',
+                  column.fixed === 'left' || column.fixed === 'right'
+                    ? 'text-[var(--tiger-primary,#2563eb)]'
+                    : 'text-gray-400 hover:text-gray-700'
+                ),
+                'aria-label':
+                  column.fixed === 'left' || column.fixed === 'right'
+                    ? `Unlock column ${column.title}`
+                    : `Lock column ${column.title}`,
+                onClick: (e: Event) => {
+                  e.stopPropagation();
+                  toggleColumnLock(column.key);
+                },
+              },
+              [LockIcon(column.fixed === 'left' || column.fixed === 'right')]
+            )
+          );
+        }
+
+        headerContent.push(column.sortable && SortIcon(sortDirection));
 
         headerCells.push(
-          h('th', {
-            key: column.key,
-            class: getTableHeaderCellClasses(
-              props.size,
-              column.align || 'left',
-              !!column.sortable,
-              column.headerClassName
-            ),
-            style: column.width ? { width: typeof column.width === 'number' ? `${column.width}px` : column.width } : undefined,
-            onClick: column.sortable ? () => handleSort(column.key) : undefined,
-          }, [
-            h('div', { class: 'flex items-center gap-2' }, [
-              column.renderHeader
-                ? slots[`header-${column.key}`]?.() || column.title
-                : column.title,
-              column.sortable && SortIcon(sortDirection),
-            ]),
-            // Filter input
-            column.filter && h('div', { class: 'mt-2' }, [
-              column.filter.type === 'select' && column.filter.options
-                ? h('select', {
-                    class: 'w-full px-2 py-1 text-sm border border-gray-300 rounded',
-                    onChange: (e: Event) => handleFilter(column.key, (e.target as HTMLSelectElement).value),
-                    onClick: (e: Event) => e.stopPropagation(),
-                  }, [
-                    h('option', { value: '' }, 'All'),
-                    ...column.filter.options.map(opt =>
-                      h('option', { value: opt.value }, opt.label)
-                    ),
-                  ])
-                : h('input', {
-                    type: 'text',
-                    class: 'w-full px-2 py-1 text-sm border border-gray-300 rounded',
-                    placeholder: column.filter.placeholder || 'Filter...',
-                    onInput: (e: Event) => handleFilter(column.key, (e.target as HTMLInputElement).value),
-                    onClick: (e: Event) => e.stopPropagation(),
-                  }),
-            ]),
-          ])
-        )
-      })
+          h(
+            'th',
+            {
+              key: column.key,
+              class: classNames(
+                getTableHeaderCellClasses(
+                  props.size,
+                  column.align || 'left',
+                  !!column.sortable,
+                  column.headerClassName
+                ),
+                (isFixedLeft || isFixedRight) && 'bg-gray-50'
+              ),
+              style,
+              onClick: column.sortable
+                ? () => handleSort(column.key)
+                : undefined,
+            },
+            [
+              h('div', { class: 'flex items-center gap-2' }, headerContent),
+              // Filter input
+              column.filter &&
+                h('div', { class: 'mt-2' }, [
+                  column.filter.type === 'select' && column.filter.options
+                    ? h(
+                        'select',
+                        {
+                          class:
+                            'w-full px-2 py-1 text-sm border border-gray-300 rounded',
+                          onChange: (e: Event) =>
+                            handleFilter(
+                              column.key,
+                              (e.target as HTMLSelectElement).value
+                            ),
+                          onClick: (e: Event) => e.stopPropagation(),
+                        },
+                        [
+                          h('option', { value: '' }, 'All'),
+                          ...column.filter.options.map((opt) =>
+                            h('option', { value: opt.value }, opt.label)
+                          ),
+                        ]
+                      )
+                    : h('input', {
+                        type: 'text',
+                        class:
+                          'w-full px-2 py-1 text-sm border border-gray-300 rounded',
+                        placeholder: column.filter.placeholder || 'Filter...',
+                        onInput: (e: Event) =>
+                          handleFilter(
+                            column.key,
+                            (e.target as HTMLInputElement).value
+                          ),
+                        onClick: (e: Event) => e.stopPropagation(),
+                      }),
+                ]),
+            ]
+          )
+        );
+      });
 
       return h('thead', { class: getTableHeaderClasses(props.stickyHeader) }, [
         h('tr', headerCells),
-      ])
+      ]);
     }
 
     function renderTableBody() {
       if (props.loading) {
-        return null
+        return null;
       }
 
       if (paginatedData.value.length === 0) {
         return h('tbody', [
           h('tr', [
-            h('td', {
-              colspan: props.columns.length + (props.rowSelection ? 1 : 0),
-              class: tableEmptyStateClasses,
-            }, props.emptyText),
+            h(
+              'td',
+              {
+                colspan:
+                  displayColumns.value.length + (props.rowSelection ? 1 : 0),
+                class: tableEmptyStateClasses,
+              },
+              props.emptyText
+            ),
           ]),
-        ])
+        ]);
       }
 
       const rows = paginatedData.value.map((record, index) => {
-        const key = getRowKey(record, props.rowKey, index)
-        const isSelected = selectedRowKeys.value.includes(key)
-        const rowClass = typeof props.rowClassName === 'function'
-          ? props.rowClassName(record, index)
-          : props.rowClassName
+        const key = getRowKey(record, props.rowKey, index);
+        const isSelected = selectedRowKeys.value.includes(key);
+        const rowClass =
+          typeof props.rowClassName === 'function'
+            ? props.rowClassName(record, index)
+            : props.rowClassName;
 
-        const cells = []
+        const cells = [];
 
         // Selection checkbox cell
         if (props.rowSelection && props.rowSelection.showCheckbox !== false) {
-          const checkboxProps = props.rowSelection?.getCheckboxProps?.(record) || {}
-          
+          const checkboxProps =
+            props.rowSelection?.getCheckboxProps?.(record) || {};
+
           cells.push(
-            h('td', {
-              class: getCheckboxCellClasses(props.size),
-            }, [
-              h('input', {
-                type: props.rowSelection?.type === 'radio' ? 'radio' : 'checkbox',
-                class: props.rowSelection?.type === 'radio'
-                  ? 'border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
-                  : 'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]',
-                checked: isSelected,
-                disabled: checkboxProps.disabled,
-                onChange: (e: Event) => handleSelectRow(key, (e.target as HTMLInputElement).checked),
-              }),
-            ])
-          )
+            h(
+              'td',
+              {
+                class: getCheckboxCellClasses(props.size),
+              },
+              [
+                h('input', {
+                  type:
+                    props.rowSelection?.type === 'radio' ? 'radio' : 'checkbox',
+                  class:
+                    props.rowSelection?.type === 'radio'
+                      ? 'border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
+                      : 'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]',
+                  checked: isSelected,
+                  disabled: checkboxProps.disabled,
+                  onChange: (e: Event) =>
+                    handleSelectRow(
+                      key,
+                      (e.target as HTMLInputElement).checked
+                    ),
+                }),
+              ]
+            )
+          );
         }
 
         // Data cells
-        props.columns.forEach((column) => {
-          const dataKey = column.dataKey || column.key
-          const cellValue = record[dataKey]
+        displayColumns.value.forEach((column) => {
+          const dataKey = column.dataKey || column.key;
+          const cellValue = record[dataKey];
+
+          const isFixedLeft = column.fixed === 'left';
+          const isFixedRight = column.fixed === 'right';
+          const fixedStyle = isFixedLeft
+            ? {
+                position: 'sticky',
+                left: `${
+                  fixedColumnsInfo.value.leftOffsets[column.key] || 0
+                }px`,
+                zIndex: 10,
+              }
+            : isFixedRight
+            ? {
+                position: 'sticky',
+                right: `${
+                  fixedColumnsInfo.value.rightOffsets[column.key] || 0
+                }px`,
+                zIndex: 10,
+              }
+            : undefined;
+
+          const widthStyle = column.width
+            ? {
+                width:
+                  typeof column.width === 'number'
+                    ? `${column.width}px`
+                    : column.width,
+              }
+            : undefined;
+
+          const style = fixedStyle
+            ? { ...widthStyle, ...fixedStyle }
+            : widthStyle;
+
+          const stickyBgClass =
+            props.striped && index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white';
+          const stickyCellClass =
+            isFixedLeft || isFixedRight
+              ? classNames(
+                  stickyBgClass,
+                  props.hoverable && 'group-hover:bg-gray-50'
+                )
+              : undefined;
 
           cells.push(
-            h('td', {
-              key: column.key,
-              class: getTableCellClasses(props.size, column.align || 'left', column.className),
-            }, [
-              column.render
-                ? slots[`cell-${column.key}`]?.({ record, index }) || (column.render(record, index) as string)
-                : cellValue as string,
-            ])
-          )
-        })
+            h(
+              'td',
+              {
+                key: column.key,
+                class: classNames(
+                  getTableCellClasses(
+                    props.size,
+                    column.align || 'left',
+                    column.className
+                  ),
+                  stickyCellClass
+                ),
+                style,
+              },
+              [
+                column.render
+                  ? slots[`cell-${column.key}`]?.({ record, index }) ||
+                    (column.render(record, index) as string)
+                  : (cellValue as string),
+              ]
+            )
+          );
+        });
 
-        return h('tr', {
-          key,
-          class: getTableRowClasses(props.hoverable, props.striped, index % 2 === 0, rowClass),
-          onClick: () => handleRowClick(record, index),
-        }, cells)
-      })
+        return h(
+          'tr',
+          {
+            key,
+            class: classNames(
+              getTableRowClasses(
+                props.hoverable,
+                props.striped,
+                index % 2 === 0,
+                rowClass
+              ),
+              fixedColumnsInfo.value.hasFixedColumns && 'group'
+            ),
+            onClick: () => handleRowClick(record, index),
+          },
+          cells
+        );
+      });
 
-      return h('tbody', rows)
+      return h('tbody', rows);
     }
 
     function renderPagination() {
       if (props.pagination === false || !paginationInfo.value) {
-        return null
+        return null;
       }
 
-      const { totalPages, startIndex, endIndex, hasNext, hasPrev } = paginationInfo.value
-      const total = processedData.value.length
-      const paginationConfig = props.pagination as PaginationConfig
+      const { totalPages, startIndex, endIndex, hasNext, hasPrev } =
+        paginationInfo.value;
+      const total = processedData.value.length;
+      const paginationConfig = props.pagination as PaginationConfig;
 
       return h('div', { class: tablePaginationContainerClasses }, [
         // Total info
-        paginationConfig.showTotal !== false && h('div', { class: 'text-sm text-gray-700' }, 
-          paginationConfig.totalText
-            ? paginationConfig.totalText(total, [startIndex, endIndex])
-            : `Showing ${startIndex} to ${endIndex} of ${total} results`
-        ),
-        
+        paginationConfig.showTotal !== false &&
+          h(
+            'div',
+            { class: 'text-sm text-gray-700' },
+            paginationConfig.totalText
+              ? paginationConfig.totalText(total, [startIndex, endIndex])
+              : `Showing ${startIndex} to ${endIndex} of ${total} results`
+          ),
+
         // Pagination controls
         h('div', { class: 'flex items-center gap-2' }, [
           // Page size selector
-          paginationConfig.showSizeChanger !== false && h('select', {
-            class: 'px-3 py-1 border border-gray-300 rounded text-sm',
-            value: currentPageSize.value,
-            onChange: (e: Event) => handlePageSizeChange(Number((e.target as HTMLSelectElement).value)),
-          }, 
-            (paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map(size =>
-              h('option', { value: size }, `${size} / page`)
-            )
-          ),
-          
+          paginationConfig.showSizeChanger !== false &&
+            h(
+              'select',
+              {
+                class: 'px-3 py-1 border border-gray-300 rounded text-sm',
+                value: currentPageSize.value,
+                onChange: (e: Event) =>
+                  handlePageSizeChange(
+                    Number((e.target as HTMLSelectElement).value)
+                  ),
+              },
+              (paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map(
+                (size) => h('option', { value: size }, `${size} / page`)
+              )
+            ),
+
           // Page buttons
           h('div', { class: 'flex gap-1' }, [
             // Previous button
-            h('button', {
-              class: classNames(
-                'px-3 py-1 border border-gray-300 rounded text-sm',
-                hasPrev
-                  ? 'hover:bg-gray-50 text-gray-700'
-                  : 'text-gray-400 cursor-not-allowed'
-              ),
-              disabled: !hasPrev,
-              onClick: () => handlePageChange(currentPage.value - 1),
-            }, 'Previous'),
-            
+            h(
+              'button',
+              {
+                class: classNames(
+                  'px-3 py-1 border border-gray-300 rounded text-sm',
+                  hasPrev
+                    ? 'hover:bg-gray-50 text-gray-700'
+                    : 'text-gray-400 cursor-not-allowed'
+                ),
+                disabled: !hasPrev,
+                onClick: () => handlePageChange(currentPage.value - 1),
+              },
+              'Previous'
+            ),
+
             // Current page indicator
-            h('span', { class: 'px-3 py-1 text-sm text-gray-700' },
+            h(
+              'span',
+              { class: 'px-3 py-1 text-sm text-gray-700' },
               `Page ${currentPage.value} of ${totalPages}`
             ),
-            
+
             // Next button
-            h('button', {
-              class: classNames(
-                'px-3 py-1 border border-gray-300 rounded text-sm',
-                hasNext
-                  ? 'hover:bg-gray-50 text-gray-700'
-                  : 'text-gray-400 cursor-not-allowed'
-              ),
-              disabled: !hasNext,
-              onClick: () => handlePageChange(currentPage.value + 1),
-            }, 'Next'),
+            h(
+              'button',
+              {
+                class: classNames(
+                  'px-3 py-1 border border-gray-300 rounded text-sm',
+                  hasNext
+                    ? 'hover:bg-gray-50 text-gray-700'
+                    : 'text-gray-400 cursor-not-allowed'
+                ),
+                disabled: !hasNext,
+                onClick: () => handlePageChange(currentPage.value + 1),
+              },
+              'Next'
+            ),
           ]),
         ]),
-      ])
+      ]);
     }
 
     return () => {
       const wrapperStyle = props.maxHeight
-        ? { maxHeight: typeof props.maxHeight === 'number' ? `${props.maxHeight}px` : props.maxHeight }
-        : undefined
+        ? {
+            maxHeight:
+              typeof props.maxHeight === 'number'
+                ? `${props.maxHeight}px`
+                : props.maxHeight,
+          }
+        : undefined;
 
       return h('div', { class: 'relative' }, [
-        h('div', {
-          class: getTableWrapperClasses(props.bordered, props.maxHeight),
-          style: wrapperStyle,
-        }, [
-          h('table', { class: tableBaseClasses }, [
-            renderTableHeader(),
-            renderTableBody(),
-          ]),
-          
-          // Loading overlay
-          props.loading && h('div', { class: tableLoadingOverlayClasses }, [
-            LoadingSpinner(),
-          ]),
-        ]),
-        
+        h(
+          'div',
+          {
+            class: getTableWrapperClasses(props.bordered, props.maxHeight),
+            style: wrapperStyle,
+          },
+          [
+            h(
+              'table',
+              {
+                class: tableBaseClasses,
+                style:
+                  fixedColumnsInfo.value.hasFixedColumns &&
+                  fixedColumnsInfo.value.minTableWidth
+                    ? { minWidth: `${fixedColumnsInfo.value.minTableWidth}px` }
+                    : undefined,
+              },
+              [renderTableHeader(), renderTableBody()]
+            ),
+
+            // Loading overlay
+            props.loading &&
+              h('div', { class: tableLoadingOverlayClasses }, [
+                LoadingSpinner(),
+              ]),
+          ]
+        ),
+
         // Pagination
         renderPagination(),
-      ])
-    }
+      ]);
+    };
   },
-})
+});
 
-export default Table
+export default Table;
