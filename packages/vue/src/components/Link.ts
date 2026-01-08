@@ -1,15 +1,21 @@
-import { defineComponent, computed, h, PropType } from 'vue'
-import { classNames, getLinkVariantClasses, type LinkVariant, type LinkSize } from '@tigercat/core'
+import { defineComponent, computed, h, PropType } from 'vue';
+import {
+  classNames,
+  getLinkVariantClasses,
+  type LinkVariant,
+  type LinkSize,
+} from '@tigercat/core';
 
-const baseClasses = 'inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer'
+const baseClasses =
+  'inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer no-underline';
 
 const sizeClasses = {
   sm: 'text-sm',
   md: 'text-base',
   lg: 'text-lg',
-}
+};
 
-const disabledClasses = 'cursor-not-allowed opacity-60 pointer-events-none'
+const disabledClasses = 'cursor-not-allowed opacity-60 pointer-events-none';
 
 export const Link = defineComponent({
   name: 'TigerLink',
@@ -79,27 +85,27 @@ export const Link = defineComponent({
         sizeClasses[props.size],
         props.underline && 'hover:underline',
         props.disabled && disabledClasses
-      )
-    })
+      );
+    });
 
     const computedRel = computed(() => {
       // Automatically add security attributes for target="_blank"
       if (props.target === '_blank' && !props.rel) {
-        return 'noopener noreferrer'
+        return 'noopener noreferrer';
       }
-      return props.rel
-    })
+      return props.rel;
+    });
 
     const handleClick = (event: MouseEvent) => {
       if (props.disabled) {
-        event.preventDefault()
-        return
+        event.preventDefault();
+        return;
       }
-      emit('click', event)
-    }
+      emit('click', event);
+    };
 
     return () => {
-      const children = slots.default ? slots.default() : []
+      const children = slots.default ? slots.default() : [];
 
       return h(
         'a',
@@ -112,9 +118,9 @@ export const Link = defineComponent({
           onClick: handleClick,
         },
         children
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Link
+export default Link;
