@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, PropType } from 'vue';
 import {
   classNames,
   getDividerSpacingClasses,
@@ -7,7 +7,7 @@ import {
   type DividerOrientation,
   type DividerLineStyle,
   type DividerSpacing,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 export const Divider = defineComponent({
   name: 'TigerDivider',
@@ -49,42 +49,43 @@ export const Divider = defineComponent({
       type: String,
     },
   },
-  setup(props) {
+  setup(props, { attrs }) {
     const dividerClasses = computed(() => {
       return classNames(
         getDividerOrientationClasses(props.orientation),
         getDividerLineStyleClasses(props.lineStyle),
         getDividerSpacingClasses(props.spacing, props.orientation)
-      )
-    })
+      );
+    });
 
     const dividerStyle = computed(() => {
-      const style: Record<string, string> = {}
-      
+      const style: Record<string, string> = {};
+
       if (props.color) {
-        style.borderColor = props.color
+        style.borderColor = props.color;
       }
-      
+
       if (props.thickness) {
         if (props.orientation === 'horizontal') {
-          style.borderTopWidth = props.thickness
+          style.borderTopWidth = props.thickness;
         } else {
-          style.borderLeftWidth = props.thickness
+          style.borderLeftWidth = props.thickness;
         }
       }
-      
-      return style
-    })
+
+      return style;
+    });
 
     return () => {
       return h('div', {
-        class: dividerClasses.value,
-        style: dividerStyle.value,
+        ...attrs,
+        class: [dividerClasses.value, attrs.class],
+        style: [dividerStyle.value, attrs.style],
         role: 'separator',
         'aria-orientation': props.orientation,
-      })
-    }
+      });
+    };
   },
-})
+});
 
-export default Divider
+export default Divider;
