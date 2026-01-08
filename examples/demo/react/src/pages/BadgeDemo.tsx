@@ -1,24 +1,26 @@
-import { useState } from 'react'
-import { Badge, Space, Divider } from '@tigercat/react'
+import { useState } from 'react';
+import { Badge, Space, Divider, Button } from '@tigercat/react';
 
 export default function BadgeDemo() {
-  const [notificationCount, setNotificationCount] = useState(5)
-  const [messageCount] = useState(99)
-  const [cartItems] = useState(3)
+  const [notificationCount, setNotificationCount] = useState(5);
+  const [messageCount] = useState(99);
+  const [cartItems] = useState(3);
 
   const incrementNotifications = () => {
-    setNotificationCount(prev => prev + 1)
-  }
+    setNotificationCount((prev) => prev + 1);
+  };
 
   const clearNotifications = () => {
-    setNotificationCount(0)
-  }
+    setNotificationCount(0);
+  };
 
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Badge 徽章</h1>
-        <p className="text-gray-600">用于标记和通知的徽章组件，支持点状、数字、文本等多种展示方式。</p>
+        <p className="text-gray-600">
+          用于标记和通知的徽章组件，支持点状、数字、文本等多种展示方式。
+        </p>
       </div>
 
       {/* 基本用法 */}
@@ -39,7 +41,9 @@ export default function BadgeDemo() {
       {/* 徽章类型 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">徽章类型</h2>
-        <p className="text-gray-600 mb-6">徽章有六种颜色类型：默认、主要、成功、警告、危险和信息。</p>
+        <p className="text-gray-600 mb-6">
+          徽章有六种颜色类型：默认、主要、成功、警告、危险和信息。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space wrap>
             <Badge variant="default" content={1} />
@@ -70,7 +74,9 @@ export default function BadgeDemo() {
       {/* 点状徽章 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">点状徽章</h2>
-        <p className="text-gray-600 mb-6">用于简单的通知提示，不显示具体数字。</p>
+        <p className="text-gray-600 mb-6">
+          用于简单的通知提示，不显示具体数字。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space wrap>
             <Badge type="dot" variant="default" />
@@ -102,7 +108,9 @@ export default function BadgeDemo() {
       {/* 最大值 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">最大值</h2>
-        <p className="text-gray-600 mb-6">设置 max 属性，当数字超过最大值时显示 {'{max}+'}。</p>
+        <p className="text-gray-600 mb-6">
+          设置 max 属性，当数字超过最大值时显示 {'{max}+'}。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <Badge content={99} />
@@ -117,25 +125,21 @@ export default function BadgeDemo() {
       {/* 包裹模式 - 按钮 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">包裹元素</h2>
-        <p className="text-gray-600 mb-6">徽章可以附加到其他元素上，通过设置 standalone 为 false 启用包裹模式。</p>
+        <p className="text-gray-600 mb-6">
+          徽章可以附加到其他元素上，通过设置 standalone 为 false 启用包裹模式。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <Badge content={5} standalone={false}>
-              <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                通知
-              </button>
+              <Button>通知</Button>
             </Badge>
-            
+
             <Badge content={99} standalone={false} variant="danger">
-              <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-                消息
-              </button>
+              <Button variant="secondary">消息</Button>
             </Badge>
-            
+
             <Badge type="dot" standalone={false} variant="danger">
-              <button className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
-                邮件
-              </button>
+              <Button variant="outline">邮件</Button>
             </Badge>
           </Space>
         </div>
@@ -149,19 +153,27 @@ export default function BadgeDemo() {
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space wrap>
             <Badge content={5} standalone={false} position="top-right">
-              <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">右上</div>
+              <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
+                右上
+              </div>
             </Badge>
-            
+
             <Badge content={5} standalone={false} position="top-left">
-              <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">左上</div>
+              <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
+                左上
+              </div>
             </Badge>
-            
+
             <Badge content={5} standalone={false} position="bottom-right">
-              <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">右下</div>
+              <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
+                右下
+              </div>
             </Badge>
-            
+
             <Badge content={5} standalone={false} position="bottom-left">
-              <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">左下</div>
+              <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
+                左下
+              </div>
             </Badge>
           </Space>
         </div>
@@ -171,7 +183,9 @@ export default function BadgeDemo() {
       {/* 显示零值 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">显示零值</h2>
-        <p className="text-gray-600 mb-6">默认情况下不显示零值，设置 showZero 可以显示。</p>
+        <p className="text-gray-600 mb-6">
+          默认情况下不显示零值，设置 showZero 可以显示。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <div>
@@ -179,7 +193,7 @@ export default function BadgeDemo() {
               <Badge content={0} />
               <span className="text-gray-500 ml-2">（无徽章）</span>
             </div>
-            
+
             <div>
               <p className="text-sm text-gray-600 mb-2">显示零值</p>
               <Badge content={0} showZero={true} />
@@ -193,27 +207,24 @@ export default function BadgeDemo() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">实际应用示例</h2>
         <p className="text-gray-600 mb-6">模拟真实的使用场景。</p>
-        
+
         {/* 通知示例 */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-3">通知中心</h3>
           <div className="p-6 bg-gray-50 rounded-lg">
             <Space>
-              <Badge content={notificationCount} standalone={false} variant="danger">
-                <button 
-                  className="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                  onClick={incrementNotifications}
-                >
-                  🔔 通知
-                </button>
+              <Badge
+                content={notificationCount}
+                standalone={false}
+                variant="danger">
+                <Button variant="primary" onClick={incrementNotifications}>
+                  通知
+                </Button>
               </Badge>
-              
-              <button 
-                className="px-4 py-3 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
-                onClick={clearNotifications}
-              >
+
+              <Button variant="secondary" onClick={clearNotifications}>
                 清除通知
-              </button>
+              </Button>
             </Space>
           </div>
         </div>
@@ -223,16 +234,16 @@ export default function BadgeDemo() {
           <h3 className="text-lg font-semibold mb-3">消息和购物车</h3>
           <div className="p-6 bg-gray-50 rounded-lg">
             <Space>
-              <Badge content={messageCount} standalone={false} variant="primary" max={99}>
-                <button className="px-6 py-3 bg-green-500 text-white rounded hover:bg-green-600">
-                  💬 消息
-                </button>
+              <Badge
+                content={messageCount}
+                standalone={false}
+                variant="primary"
+                max={99}>
+                <Button variant="primary">消息</Button>
               </Badge>
-              
+
               <Badge content={cartItems} standalone={false} variant="danger">
-                <button className="px-6 py-3 bg-orange-500 text-white rounded hover:bg-orange-600">
-                  🛒 购物车
-                </button>
+                <Button variant="secondary">购物车</Button>
               </Badge>
             </Space>
           </div>
@@ -251,7 +262,7 @@ export default function BadgeDemo() {
                 </Badge>
                 <span className="text-green-600 font-medium">在线</span>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <Badge type="dot" variant="default" standalone={false}>
                   <div className="w-12 h-12 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold">
@@ -260,7 +271,7 @@ export default function BadgeDemo() {
                 </Badge>
                 <span className="text-gray-500">离线</span>
               </div>
-              
+
               <div className="flex items-center gap-3">
                 <Badge type="dot" variant="warning" standalone={false}>
                   <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-white font-bold">
@@ -274,5 +285,5 @@ export default function BadgeDemo() {
         </div>
       </section>
     </div>
-  )
+  );
 }
