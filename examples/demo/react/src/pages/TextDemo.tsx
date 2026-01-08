@@ -1,6 +1,6 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { Text, Space, Divider } from '@tigercat/react'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Text, Space, Divider } from '@tigercat/react';
 
 const TextDemo: React.FC = () => {
   return (
@@ -17,7 +17,9 @@ const TextDemo: React.FC = () => {
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full">
             <Text>这是一段默认段落文本。</Text>
-            <Text tag="span" className="block">这是一段 span 文本（通过 className 设置为 block）。</Text>
+            <Text tag="span" className="block">
+              这是一段 span 文本（通过 className 设置为 block）。
+            </Text>
             <Text tag="div">这是一段 div 文本。</Text>
           </Space>
         </div>
@@ -30,8 +32,12 @@ const TextDemo: React.FC = () => {
         <p className="text-gray-600 mb-6">通过 tag 属性渲染不同语义标签。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full">
-            <Text tag="h3" size="lg" weight="semibold">Heading (h3)</Text>
-            <Text tag="label" size="sm" color="muted">Label text</Text>
+            <Text tag="h3" size="lg" weight="semibold">
+              Heading (h3)
+            </Text>
+            <Text tag="label" size="sm" color="muted">
+              Label text
+            </Text>
             <Text tag="p">Paragraph text</Text>
           </Space>
         </div>
@@ -106,7 +112,9 @@ const TextDemo: React.FC = () => {
       {/* 文本修饰 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">文本修饰</h2>
-        <p className="text-gray-600 mb-6">truncate / italic / underline / lineThrough。</p>
+        <p className="text-gray-600 mb-6">
+          truncate / italic / underline / lineThrough。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full">
             <div className="w-64">
@@ -122,10 +130,12 @@ const TextDemo: React.FC = () => {
       </section>
 
       <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-        <Link to="/" className="text-blue-600 hover:text-blue-800">← 返回首页</Link>
+        <Link to="/" className="text-blue-600 hover:text-blue-800">
+          ← 返回首页
+        </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TextDemo
+export default TextDemo;

@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Textarea, Space, Divider, FormItem } from '@tigercat/react'
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Textarea, Space, Divider, FormItem } from '@tigercat/react';
 
 const TextareaDemo: React.FC = () => {
-  const [text, setText] = useState('')
-  const [disabled] = useState('禁用的文本域')
-  const [readonly] = useState('只读的文本域')
+  const [text, setText] = useState('');
+  const [autoResizeText, setAutoResizeText] = useState('');
+  const [limited, setLimited] = useState('');
+  const [disabled] = useState('禁用的文本域');
+  const [readonly] = useState('只读的文本域');
 
   return (
     <div className="max-w-5xl mx-auto p-8">
@@ -20,8 +22,33 @@ const TextareaDemo: React.FC = () => {
         <p className="text-gray-600 mb-6">基础的文本域组件。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full max-w-md">
-            <Textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="请输入内容" rows={4} />
+            <Textarea
+              value={text}
+              onInput={(e) => setText(e.currentTarget.value)}
+              placeholder="请输入内容"
+              rows={4}
+            />
             <p className="text-sm text-gray-600">输入的内容：{text}</p>
+          </Space>
+        </div>
+        <Divider className="my-6" />
+      </section>
+
+      {/* 尺寸 */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold mb-4">尺寸</h2>
+        <p className="text-gray-600 mb-6">支持 sm / md / lg 三种尺寸。</p>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <Space direction="vertical" className="w-full max-w-md">
+            <FormItem label="Small">
+              <Textarea size="sm" placeholder="Small textarea" />
+            </FormItem>
+            <FormItem label="Medium">
+              <Textarea size="md" placeholder="Medium textarea" />
+            </FormItem>
+            <FormItem label="Large">
+              <Textarea size="lg" placeholder="Large textarea" />
+            </FormItem>
           </Space>
         </div>
         <Divider className="my-6" />
@@ -47,6 +74,60 @@ const TextareaDemo: React.FC = () => {
         <Divider className="my-6" />
       </section>
 
+      {/* 自动高度 */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold mb-4">自动高度</h2>
+        <p className="text-gray-600 mb-6">
+          通过 autoResize 启用自动高度，可配合 minRows / maxRows 限制范围。
+        </p>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <Space direction="vertical" className="w-full max-w-md">
+            <FormItem label="基础自动高度">
+              <Textarea
+                value={autoResizeText}
+                onInput={(e) => setAutoResizeText(e.currentTarget.value)}
+                autoResize
+                placeholder="输入内容后将自动调整高度"
+              />
+            </FormItem>
+            <FormItem label="限制行数 (3-8)">
+              <Textarea
+                autoResize
+                minRows={3}
+                maxRows={8}
+                placeholder="最少 3 行，最多 8 行"
+              />
+            </FormItem>
+          </Space>
+        </div>
+        <Divider className="my-6" />
+      </section>
+
+      {/* 字符计数 */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold mb-4">字符计数</h2>
+        <p className="text-gray-600 mb-6">
+          通过 showCount 显示计数，可配合 maxLength 限制最大字符数。
+        </p>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <Space direction="vertical" className="w-full max-w-md">
+            <FormItem label="仅计数">
+              <Textarea showCount placeholder="显示字符数" />
+            </FormItem>
+            <FormItem label="限制最大长度 (100)">
+              <Textarea
+                value={limited}
+                onInput={(e) => setLimited(e.currentTarget.value)}
+                showCount
+                maxLength={100}
+                placeholder="最多 100 个字符"
+              />
+            </FormItem>
+          </Space>
+        </div>
+        <Divider className="my-6" />
+      </section>
+
       {/* 禁用和只读 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">禁用和只读</h2>
@@ -60,10 +141,12 @@ const TextareaDemo: React.FC = () => {
       </section>
 
       <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-        <Link to="/" className="text-blue-600 hover:text-blue-800">← 返回首页</Link>
+        <Link to="/" className="text-blue-600 hover:text-blue-800">
+          ← 返回首页
+        </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TextareaDemo
+export default TextareaDemo;
