@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -14,11 +14,6 @@ import {
 } from '../utils/react';
 
 describe('Drawer', () => {
-  // Clean up after each test
-  afterEach(() => {
-    document.body.innerHTML = '';
-  });
-
   describe('Rendering', () => {
     it('should not render when visible is false', () => {
       render(<Drawer visible={false} title="Test Drawer" />);

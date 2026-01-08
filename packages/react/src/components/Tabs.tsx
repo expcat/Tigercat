@@ -83,10 +83,6 @@ export const Tabs: React.FC<TabsProps> = ({
     string | number | undefined
   >(defaultActiveKey);
 
-  // Use controlled or uncontrolled state
-  const activeKey =
-    controlledActiveKey !== undefined ? controlledActiveKey : internalActiveKey;
-
   // Handle tab click
   const handleTabClick = useCallback(
     (key: string | number) => {
@@ -133,6 +129,33 @@ export const Tabs: React.FC<TabsProps> = ({
     return tabContentBaseClasses;
   }, []);
 
+  // Extract tab items and tab panes from children
+  const { tabItems, tabPanes, firstTabKey } = useMemo(() => {
+    const items: ReactElement[] = [];
+    const panes: ReactElement[] = [];
+    let firstKey: string | number | undefined;
+
+    React.Children.forEach(children, (child) => {
+      if (React.isValidElement<TabPaneProps>(child) && child.type === TabPane) {
+        if (firstKey === undefined) {
+          firstKey = child.props.tabKey;
+        }
+        items.push(React.cloneElement(child, { renderMode: 'tab' }));
+        panes.push(React.cloneElement(child, { renderMode: 'pane' }));
+      }
+    });
+
+    return { tabItems: items, tabPanes: panes, firstTabKey: firstKey };
+  }, [children]);
+
+  // Use controlled or uncontrolled state, defaulting to the first tab if none is specified
+  const activeKey =
+    controlledActiveKey !== undefined
+      ? controlledActiveKey
+      : internalActiveKey !== undefined
+      ? internalActiveKey
+      : firstTabKey;
+
   // Context value
   const contextValue = useMemo<TabsContextValue>(
     () => ({
@@ -154,21 +177,6 @@ export const Tabs: React.FC<TabsProps> = ({
       handleTabClose,
     ]
   );
-
-  // Extract tab items and tab panes from children
-  const { tabItems, tabPanes } = useMemo(() => {
-    const items: ReactElement[] = [];
-    const panes: ReactElement[] = [];
-
-    React.Children.forEach(children, (child) => {
-      if (React.isValidElement<TabPaneProps>(child) && child.type === TabPane) {
-        items.push(React.cloneElement(child, { renderMode: 'tab' }));
-        panes.push(React.cloneElement(child, { renderMode: 'pane' }));
-      }
-    });
-
-    return { tabItems: items, tabPanes: panes };
-  }, [children]);
 
   // Render tab nav
   const tabNavContent = (
