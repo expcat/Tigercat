@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Button } from '@tigercat/vue'
+import { Button } from '@tigercat/vue';
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Button } from '@tigercat/react'
+import { Button } from '@tigercat/react';
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
       <Button variant="primary">Primary Button</Button>
       <Button variant="secondary">Secondary Button</Button>
     </>
-  )
+  );
 }
 ```
 
@@ -138,11 +138,11 @@ Button 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { Button } from '@tigercat/vue'
+import { Button } from '@tigercat/vue';
 
 const handleClick = (event) => {
-  console.log('Button clicked!', event)
-}
+  console.log('Button clicked!', event);
+};
 </script>
 
 <template>
@@ -153,14 +153,14 @@ const handleClick = (event) => {
 ### React
 
 ```tsx
-import { Button } from '@tigercat/react'
+import { Button } from '@tigercat/react';
 
 function App() {
   const handleClick = (event) => {
-    console.log('Button clicked!', event)
-  }
+    console.log('Button clicked!', event);
+  };
 
-  return <Button onClick={handleClick}>Click Me</Button>
+  return <Button onClick={handleClick}>Click Me</Button>;
 }
 ```
 
@@ -168,33 +168,33 @@ function App() {
 
 ### Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 | 可选值 |
-|------|------|------|--------|--------|
-| variant | 按钮变体 | `ButtonVariant` | `'primary'` | `'primary'` \| `'secondary'` \| `'outline'` \| `'ghost'` \| `'link'` |
-| size | 按钮尺寸 | `ButtonSize` | `'md'` | `'sm'` \| `'md'` \| `'lg'` |
-| disabled | 是否禁用 | `boolean` | `false` | `true` \| `false` |
-| loading | 是否加载中 | `boolean` | `false` | `true` \| `false` |
-| block | 是否块级（占满父容器宽度） | `boolean` | `false` | `true` \| `false` |
+| 属性     | 说明                       | 类型            | 默认值      | 可选值                                                               |
+| -------- | -------------------------- | --------------- | ----------- | -------------------------------------------------------------------- |
+| variant  | 按钮变体                   | `ButtonVariant` | `'primary'` | `'primary'` \| `'secondary'` \| `'outline'` \| `'ghost'` \| `'link'` |
+| size     | 按钮尺寸                   | `ButtonSize`    | `'md'`      | `'sm'` \| `'md'` \| `'lg'`                                           |
+| disabled | 是否禁用                   | `boolean`       | `false`     | `true` \| `false`                                                    |
+| loading  | 是否加载中                 | `boolean`       | `false`     | `true` \| `false`                                                    |
+| block    | 是否块级（占满父容器宽度） | `boolean`       | `false`     | `true` \| `false`                                                    |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| onClick | 点击事件处理器 | `(event: React.MouseEvent<HTMLButtonElement>) => void` | - |
-| type | HTML 按钮类型 | `'button'` \| `'submit'` \| `'reset'` | `'button'` |
-| className | 额外的 CSS 类名 | `string` | - |
-| children | 按钮内容 | `React.ReactNode` | - |
+| 属性      | 说明            | 类型                                                   | 默认值     |
+| --------- | --------------- | ------------------------------------------------------ | ---------- |
+| onClick   | 点击事件处理器  | `(event: React.MouseEvent<HTMLButtonElement>) => void` | -          |
+| type      | HTML 按钮类型   | `'button'` \| `'submit'` \| `'reset'`                  | `'button'` |
+| className | 额外的 CSS 类名 | `string`                                               | -          |
+| children  | 按钮内容        | `React.ReactNode`                                      | -          |
 
 ### Events / 事件 (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| click | 点击按钮时触发（disabled 和 loading 状态不触发） | `(event: MouseEvent)` |
+| 事件名 | 说明                                             | 回调参数              |
+| ------ | ------------------------------------------------ | --------------------- |
+| click  | 点击按钮时触发（disabled 和 loading 状态不触发） | `(event: MouseEvent)` |
 
 ### Slots / 插槽 (Vue)
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明     |
+| ------- | -------- |
 | default | 按钮内容 |
 
 ## 样式定制
@@ -234,15 +234,15 @@ Button 组件支持通过 CSS 变量自定义主题颜色，可以实现实时�
 
 ```vue
 <script setup>
-import { Button, setThemeColors } from '@tigercat/vue'
+import { Button, setThemeColors } from '@tigercat/vue';
 
 const switchTheme = () => {
   setThemeColors({
     primary: '#10b981',
     primaryHover: '#059669',
     primaryDisabled: '#6ee7b7',
-  })
-}
+  });
+};
 </script>
 
 <template>
@@ -253,7 +253,7 @@ const switchTheme = () => {
 **React:**
 
 ```tsx
-import { Button, setThemeColors } from '@tigercat/react'
+import { Button, setThemeColors } from '@tigercat/react';
 
 function App() {
   const switchTheme = () => {
@@ -261,10 +261,10 @@ function App() {
       primary: '#10b981',
       primaryHover: '#059669',
       primaryDisabled: '#6ee7b7',
-    })
-  }
+    });
+  };
 
-  return <Button onClick={switchTheme}>切换主题</Button>
+  return <Button onClick={switchTheme}>切换主题</Button>;
 }
 ```
 
@@ -290,11 +290,11 @@ React 版本的 Button 组件支持 `className` 属性，可以传入额外的 C
 Button 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { ButtonProps, ButtonVariant, ButtonSize } from '@tigercat/core'
+import type { ButtonProps, ButtonVariant, ButtonSize } from '@tigercat/core';
 // Vue
-import type { Button } from '@tigercat/vue'
+import type { Button } from '@tigercat/vue';
 // React
-import type { Button, ButtonProps as ReactButtonProps } from '@tigercat/react'
+import type { Button, ButtonProps as ReactButtonProps } from '@tigercat/react';
 ```
 
 ## 示例
@@ -305,27 +305,25 @@ import type { Button, ButtonProps as ReactButtonProps } from '@tigercat/react'
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Button } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Button } from '@tigercat/vue';
 
-const loading = ref(false)
+const loading = ref(false);
 
 const handleSubmit = async () => {
-  loading.value = true
+  loading.value = true;
   try {
     // 提交表单逻辑
-    await submitForm()
+    await submitForm();
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 </script>
 
 <template>
   <form @submit.prevent="handleSubmit">
-    <Button type="submit" :loading="loading">
-      Submit
-    </Button>
+    <Button type="submit" :loading="loading"> Submit </Button>
   </form>
 </template>
 ```
@@ -333,22 +331,22 @@ const handleSubmit = async () => {
 #### React
 
 ```tsx
-import { useState } from 'react'
-import { Button } from '@tigercat/react'
+import { useState } from 'react';
+import { Button } from '@tigercat/react';
 
 function FormExample() {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
     try {
       // 提交表单逻辑
-      await submitForm()
+      await submitForm();
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit}>
@@ -356,7 +354,7 @@ function FormExample() {
         Submit
       </Button>
     </form>
-  )
+  );
 }
 ```
 
@@ -377,7 +375,11 @@ function FormExample() {
 
 ```tsx
 <div className="flex gap-2">
-  <Button variant="outline" onClick={handleCancel}>Cancel</Button>
-  <Button variant="primary" onClick={handleConfirm}>Confirm</Button>
+  <Button variant="outline" onClick={handleCancel}>
+    Cancel
+  </Button>
+  <Button variant="primary" onClick={handleConfirm}>
+    Confirm
+  </Button>
 </div>
 ```

@@ -1,13 +1,19 @@
-import { defineComponent, computed, h, PropType } from 'vue'
-import { classNames, getButtonVariantClasses, type ButtonVariant, type ButtonSize } from '@tigercat/core'
+import { defineComponent, computed, h, PropType } from 'vue';
+import {
+  classNames,
+  getButtonVariantClasses,
+  type ButtonVariant,
+  type ButtonSize,
+} from '@tigercat/core';
 
-const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2'
+const baseClasses =
+  'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
 
 const sizeClasses = {
   sm: 'px-3 py-1.5 text-sm',
   md: 'px-4 py-2 text-base',
   lg: 'px-6 py-3 text-lg',
-}
+};
 
 const LoadingSpinner = h(
   'svg',
@@ -32,7 +38,7 @@ const LoadingSpinner = h(
       d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z',
     }),
   ]
-)
+);
 
 export const Button = defineComponent({
   name: 'TigerButton',
@@ -76,28 +82,28 @@ export const Button = defineComponent({
         sizeClasses[props.size],
         (props.disabled || props.loading) && 'cursor-not-allowed opacity-60',
         props.block && 'w-full'
-      )
-    })
+      );
+    });
 
     const handleClick = (event: MouseEvent) => {
       if (!props.disabled && !props.loading) {
-        emit('click', event)
+        emit('click', event);
       }
-    }
+    };
 
     return () => {
-      const children = []
+      const children = [];
 
-      const attrsWithoutClass: Record<string, unknown> = { ...attrs }
-      const attrsClass = (attrsWithoutClass as { class?: unknown }).class
-      delete (attrsWithoutClass as { class?: unknown }).class
-      
+      const attrsWithoutClass: Record<string, unknown> = { ...attrs };
+      const attrsClass = (attrsWithoutClass as { class?: unknown }).class;
+      delete (attrsWithoutClass as { class?: unknown }).class;
+
       if (props.loading) {
-        children.push(h('span', { class: 'mr-2' }, LoadingSpinner))
+        children.push(h('span', { class: 'mr-2' }, LoadingSpinner));
       }
-      
+
       if (slots.default) {
-        children.push(slots.default())
+        children.push(slots.default());
       }
 
       return h(
@@ -109,9 +115,9 @@ export const Button = defineComponent({
           ...attrsWithoutClass,
         },
         children
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Button
+export default Button;
