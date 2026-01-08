@@ -1,0 +1,206 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Tree > Snapshots > should match snapshot for basic tree 1`] = `
+<div>
+  <div
+    class="w-full bg-white rounded-lg"
+  >
+    <div
+      class="select-none"
+    >
+      <div
+        class="flex items-center px-2 py-1.5 cursor-pointer rounded transition-colors duration-200 hover:bg-gray-50"
+      >
+        <span
+          class="cursor-pointer"
+        >
+          <svg
+            class="inline-flex items-center justify-center w-6 h-6 transition-transform duration-200"
+            fill="currentColor"
+            height="16"
+            viewBox="0 0 16 16"
+            width="16"
+          >
+            <path
+              d="M6 4l4 4-4 4V4z"
+            />
+          </svg>
+        </span>
+        <span
+          class="flex-1 truncate"
+        >
+          Parent 1
+        </span>
+      </div>
+    </div>
+    <div
+      class="select-none"
+    >
+      <div
+        class="flex items-center px-2 py-1.5 cursor-pointer rounded transition-colors duration-200 hover:bg-gray-50"
+      >
+        <span
+          class="cursor-pointer"
+        >
+          <svg
+            class="inline-flex items-center justify-center w-6 h-6 transition-transform duration-200"
+            fill="currentColor"
+            height="16"
+            viewBox="0 0 16 16"
+            width="16"
+          >
+            <path
+              d="M6 4l4 4-4 4V4z"
+            />
+          </svg>
+        </span>
+        <span
+          class="flex-1 truncate"
+        >
+          Parent 2
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Tree > Snapshots > should match snapshot for checkable tree 1`] = `
+<div>
+  <div
+    class="w-full bg-white rounded-lg"
+  >
+    <div
+      class="select-none"
+    >
+      <div
+        class="flex items-center px-2 py-1.5 cursor-pointer rounded transition-colors duration-200 hover:bg-gray-50"
+      >
+        <span
+          class="cursor-pointer"
+        >
+          <svg
+            class="inline-flex items-center justify-center w-6 h-6 transition-transform duration-200"
+            fill="currentColor"
+            height="16"
+            viewBox="0 0 16 16"
+            width="16"
+          >
+            <path
+              d="M6 4l4 4-4 4V4z"
+            />
+          </svg>
+        </span>
+        <input
+          aria-label="Select Parent 1"
+          class="mr-2 rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
+          type="checkbox"
+        />
+        <span
+          class="flex-1 truncate"
+        >
+          Parent 1
+        </span>
+      </div>
+    </div>
+    <div
+      class="select-none"
+    >
+      <div
+        class="flex items-center px-2 py-1.5 cursor-pointer rounded transition-colors duration-200 hover:bg-gray-50"
+      >
+        <span
+          class="cursor-pointer"
+        >
+          <svg
+            class="inline-flex items-center justify-center w-6 h-6 transition-transform duration-200"
+            fill="currentColor"
+            height="16"
+            viewBox="0 0 16 16"
+            width="16"
+          >
+            <path
+              d="M6 4l4 4-4 4V4z"
+            />
+          </svg>
+        </span>
+        <input
+          aria-label="Select Parent 2"
+          class="mr-2 rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
+          type="checkbox"
+        />
+        <span
+          class="flex-1 truncate"
+        >
+          Parent 2
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Tree > Snapshots > should match snapshot for expanded tree 1`] = `
+<div>
+  <div
+    class="w-full bg-white rounded-lg"
+  >
+    <div
+      class="select-none"
+    >
+      <div
+        class="flex items-center px-2 py-1.5 cursor-pointer rounded transition-colors duration-200 hover:bg-gray-50"
+      >
+        <span
+          class="cursor-pointer"
+        >
+          <svg
+            class="inline-flex items-center justify-center w-6 h-6 transition-transform duration-200"
+            fill="currentColor"
+            height="16"
+            viewBox="0 0 16 16"
+            width="16"
+          >
+            <path
+              d="M6 4l4 4-4 4V4z"
+            />
+          </svg>
+        </span>
+        <span
+          class="flex-1 truncate"
+        >
+          Parent 1
+        </span>
+      </div>
+    </div>
+    <div
+      class="select-none"
+    >
+      <div
+        class="flex items-center px-2 py-1.5 cursor-pointer rounded transition-colors duration-200 hover:bg-gray-50"
+      >
+        <span
+          class="cursor-pointer"
+        >
+          <svg
+            class="inline-flex items-center justify-center w-6 h-6 transition-transform duration-200"
+            fill="currentColor"
+            height="16"
+            viewBox="0 0 16 16"
+            width="16"
+          >
+            <path
+              d="M6 4l4 4-4 4V4z"
+            />
+          </svg>
+        </span>
+        <span
+          class="flex-1 truncate"
+        >
+          Parent 2
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+`;

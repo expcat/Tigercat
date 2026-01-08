@@ -12,7 +12,7 @@ import {
   componentSizes,
   setThemeVariables,
   clearThemeVariables,
-} from '../utils';
+} from '../utils/react';
 
 describe('Checkbox', () => {
   describe('Rendering', () => {

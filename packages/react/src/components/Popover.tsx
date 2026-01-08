@@ -207,7 +207,7 @@ export const Popover: React.FC<PopoverProps> = ({
       </div>
 
       {/* Popover content */}
-      <div className={contentWrapperClasses}>
+      <div className={contentWrapperClasses} hidden={!currentVisible}>
         <div className={contentClasses}>
           {/* Title */}
           {(title || titleContent) && (

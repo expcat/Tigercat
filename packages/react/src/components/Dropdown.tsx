@@ -1,31 +1,38 @@
-import React, { createContext, useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from 'react';
 import {
   classNames,
   getDropdownContainerClasses,
   getDropdownTriggerClasses,
   getDropdownMenuWrapperClasses,
   type DropdownProps as CoreDropdownProps,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 // Dropdown context interface
 export interface DropdownContextValue {
-  closeOnClick: boolean
-  handleItemClick: () => void
+  closeOnClick: boolean;
+  handleItemClick: () => void;
 }
 
 // Create dropdown context
-export const DropdownContext = createContext<DropdownContextValue | null>(null)
+export const DropdownContext = createContext<DropdownContextValue | null>(null);
 
 export interface DropdownProps extends CoreDropdownProps {
   /**
    * Visibility change event handler
    */
-  onVisibleChange?: (visible: boolean) => void
-  
+  onVisibleChange?: (visible: boolean) => void;
+
   /**
    * Dropdown content (trigger and menu)
    */
-  children?: React.ReactNode
+  children?: React.ReactNode;
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({
@@ -41,91 +48,98 @@ export const Dropdown: React.FC<DropdownProps> = ({
   children,
 }) => {
   // Internal state for uncontrolled mode
-  const [internalVisible, setInternalVisible] = useState(defaultVisible)
+  const [internalVisible, setInternalVisible] = useState(defaultVisible);
 
   // Use controlled or uncontrolled state
-  const visible = controlledVisible !== undefined ? controlledVisible : internalVisible
+  const visible =
+    controlledVisible !== undefined ? controlledVisible : internalVisible;
 
   // Refs
-  const containerRef = useRef<HTMLDivElement>(null)
-  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null);
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Handle visibility change
-  const setVisible = useCallback((newVisible: boolean) => {
-    if (disabled) return
+  const setVisible = useCallback(
+    (newVisible: boolean) => {
+      if (disabled) return;
 
-    // Update internal state if uncontrolled
-    if (controlledVisible === undefined) {
-      setInternalVisible(newVisible)
-    }
+      // Update internal state if uncontrolled
+      if (controlledVisible === undefined) {
+        setInternalVisible(newVisible);
+      }
 
-    // Call event handler
-    onVisibleChange?.(newVisible)
-  }, [disabled, controlledVisible, onVisibleChange])
+      // Call event handler
+      onVisibleChange?.(newVisible);
+    },
+    [disabled, controlledVisible, onVisibleChange]
+  );
 
   // Handle item click (close dropdown)
   const handleItemClick = useCallback(() => {
     if (closeOnClick) {
-      setVisible(false)
+      setVisible(false);
     }
-  }, [closeOnClick, setVisible])
+  }, [closeOnClick, setVisible]);
 
   // Handle mouse enter (for hover trigger)
   const handleMouseEnter = useCallback(() => {
-    if (trigger !== 'hover') return
-    
+    if (trigger !== 'hover') return;
+
     if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current)
+      clearTimeout(hoverTimerRef.current);
     }
-    
+
     hoverTimerRef.current = setTimeout(() => {
-      setVisible(true)
-    }, 100)
-  }, [trigger, setVisible])
+      setVisible(true);
+    }, 100);
+  }, [trigger, setVisible]);
 
   // Handle mouse leave (for hover trigger)
   const handleMouseLeave = useCallback(() => {
-    if (trigger !== 'hover') return
-    
+    if (trigger !== 'hover') return;
+
     if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current)
+      clearTimeout(hoverTimerRef.current);
     }
-    
+
     hoverTimerRef.current = setTimeout(() => {
-      setVisible(false)
-    }, 150)
-  }, [trigger, setVisible])
+      setVisible(false);
+    }, 150);
+  }, [trigger, setVisible]);
 
   // Handle click (for click trigger)
   const handleClick = useCallback(() => {
-    if (trigger !== 'click') return
-    setVisible(!visible)
-  }, [trigger, visible, setVisible])
+    if (trigger !== 'click') return;
+    setVisible(!visible);
+  }, [trigger, visible, setVisible]);
 
   // Handle outside click to close dropdown
   useEffect(() => {
-    if (trigger !== 'click') return
+    if (trigger !== 'click') return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setVisible(false)
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setVisible(false);
       }
-    }
+    };
 
-    document.addEventListener('click', handleClickOutside)
+    document.addEventListener('click', handleClickOutside);
     return () => {
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [trigger, setVisible])
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [trigger, setVisible]);
 
   // Cleanup timer on unmount
   useEffect(() => {
     return () => {
       if (hoverTimerRef.current) {
-        clearTimeout(hoverTimerRef.current)
+        clearTimeout(hoverTimerRef.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   // Container classes
   const containerClasses = useMemo(() => {
@@ -133,70 +147,71 @@ export const Dropdown: React.FC<DropdownProps> = ({
       getDropdownContainerClasses(),
       'tiger-dropdown-container',
       className
-    )
-  }, [className])
+    );
+  }, [className]);
 
   // Trigger classes
   const triggerClasses = useMemo(() => {
-    return getDropdownTriggerClasses(disabled)
-  }, [disabled])
+    return getDropdownTriggerClasses(disabled);
+  }, [disabled]);
 
   // Menu wrapper classes
   const menuWrapperClasses = useMemo(() => {
-    return getDropdownMenuWrapperClasses(visible, placement)
-  }, [visible, placement])
+    return getDropdownMenuWrapperClasses(visible, placement);
+  }, [visible, placement]);
 
   // Context value
-  const contextValue = useMemo<DropdownContextValue>(() => ({
-    closeOnClick,
-    handleItemClick,
-  }), [closeOnClick, handleItemClick])
+  const contextValue = useMemo<DropdownContextValue>(
+    () => ({
+      closeOnClick,
+      handleItemClick,
+    }),
+    [closeOnClick, handleItemClick]
+  );
 
   // Parse children to find trigger and menu
-  const childrenArray = React.Children.toArray(children)
-  let triggerElement: React.ReactNode = null
-  let menuElement: React.ReactNode = null
+  const childrenArray = React.Children.toArray(children);
+  let triggerElement: React.ReactNode = null;
+  let menuElement: React.ReactNode = null;
 
   childrenArray.forEach((child) => {
     if (React.isValidElement(child)) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const childType = child.type as any
-      if (childType.name === 'DropdownMenu' || childType.displayName === 'DropdownMenu') {
-        menuElement = child
+      const childType = child.type as any;
+      if (
+        childType.name === 'DropdownMenu' ||
+        childType.displayName === 'DropdownMenu'
+      ) {
+        menuElement = child;
       } else {
-        triggerElement = child
+        triggerElement = child;
       }
     } else {
-      triggerElement = child
+      triggerElement = child;
     }
-  })
+  });
 
   return (
     <DropdownContext.Provider value={contextValue}>
-      <div
-        ref={containerRef}
-        className={containerClasses}
-        style={style}
-      >
+      <div ref={containerRef} className={containerClasses} style={style}>
         {/* Trigger element */}
         <div
           className={triggerClasses}
           onClick={handleClick}
           onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
+          onMouseLeave={handleMouseLeave}>
           {triggerElement}
         </div>
 
         {/* Dropdown menu */}
         <div
           className={menuWrapperClasses}
+          hidden={!visible}
           onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
+          onMouseLeave={handleMouseLeave}>
           {menuElement}
         </div>
       </div>
     </DropdownContext.Provider>
-  )
-}
+  );
+};

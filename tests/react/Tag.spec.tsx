@@ -13,7 +13,7 @@ import {
   componentSizes,
   setThemeVariables,
   clearThemeVariables,
-} from '../utils';
+} from '../utils/react';
 
 const tagVariants = [
   'default',
