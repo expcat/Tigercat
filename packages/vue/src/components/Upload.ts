@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, h, PropType } from 'vue'
+import { defineComponent, ref, computed, h, PropType } from 'vue';
 import {
   type UploadFile,
   type UploadListType,
@@ -11,7 +11,7 @@ import {
   getDragAreaClasses,
   getFileListItemClasses,
   getPictureCardClasses,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 export const Upload = defineComponent({
   name: 'TigerUpload',
@@ -123,7 +123,7 @@ export const Upload = defineComponent({
     /**
      * Emitted on upload progress
      */
-    progress: (progress: number, _file: UploadFile) => 
+    progress: (progress: number, _file: UploadFile) =>
       typeof progress === 'number',
     /**
      * Emitted on upload success
@@ -136,148 +136,156 @@ export const Upload = defineComponent({
     /**
      * Emitted when file limit is exceeded
      */
-    exceed: (files: File[], fileList: UploadFile[]) => 
+    exceed: (files: File[], fileList: UploadFile[]) =>
       Array.isArray(files) && Array.isArray(fileList),
   },
   setup(props, { emit, slots }) {
-    const inputRef = ref<HTMLInputElement | null>(null)
-    const isDragging = ref(false)
-    const internalFileList = ref<UploadFile[]>([...props.fileList])
+    const inputRef = ref<HTMLInputElement | null>(null);
+    const isDragging = ref(false);
+    const internalFileList = ref<UploadFile[]>([...props.fileList]);
 
     // Sync internal file list with prop
     const fileListComputed = computed({
       get: () => props.fileList,
       set: (value) => {
-        internalFileList.value = value
-        emit('update:file-list', value)
+        internalFileList.value = value;
+        emit('update:file-list', value);
       },
-    })
+    });
 
     const handleClick = () => {
-      if (props.disabled) return
-      inputRef.value?.click()
-    }
+      if (props.disabled) return;
+      inputRef.value?.click();
+    };
 
     const handleFileChange = async (event: Event) => {
-      const target = event.target as HTMLInputElement
-      const files = Array.from(target.files || [])
-      await processFiles(files)
+      const target = event.target as HTMLInputElement;
+      const files = Array.from(target.files || []);
+      await processFiles(files);
       // Reset input value to allow selecting the same file again
       if (target) {
-        target.value = ''
+        target.value = '';
       }
-    }
+    };
 
-    const processFiles = async (files: File[]) => {
-      if (files.length === 0) return
+    const processFiles = async (incomingFiles: File[]) => {
+      if (incomingFiles.length === 0) return;
+
+      let files = incomingFiles;
 
       // Check limit
-      const currentCount = fileListComputed.value.length
-      const totalCount = currentCount + files.length
+      const currentCount = fileListComputed.value.length;
+      const totalCount = currentCount + files.length;
 
       if (props.limit && totalCount > props.limit) {
-        const remainingSlots = props.limit - currentCount
-        const acceptedFiles = files.slice(0, remainingSlots)
-        const rejectedFiles = files.slice(remainingSlots)
+        const remainingSlots = props.limit - currentCount;
+        const acceptedFiles = files.slice(0, remainingSlots);
+        const rejectedFiles = files.slice(remainingSlots);
 
         if (rejectedFiles.length > 0) {
-          emit('exceed', rejectedFiles, fileListComputed.value)
+          emit('exceed', rejectedFiles, fileListComputed.value);
         }
 
-        files = acceptedFiles
+        files = acceptedFiles;
       }
+
+      // Important: fileListComputed getter reflects props.fileList (a snapshot).
+      // Use a local accumulator to avoid overwriting previous files when selecting multiple at once.
+      let nextFileList = [...fileListComputed.value];
 
       for (const file of files) {
         // Validate file type
         if (!validateFileType(file, props.accept)) {
-          console.warn(`File ${file.name} type is not accepted`)
-          continue
+          console.warn(`File ${file.name} type is not accepted`);
+          continue;
         }
 
         // Validate file size
         if (!validateFileSize(file, props.maxSize)) {
-          console.warn(`File ${file.name} exceeds maximum size`)
-          continue
+          console.warn(`File ${file.name} exceeds maximum size`);
+          continue;
         }
 
         // Before upload hook
         if (props.beforeUpload) {
           try {
-            const result = await props.beforeUpload(file)
+            const result = await props.beforeUpload(file);
             if (result === false) {
-              continue
+              continue;
             }
           } catch (error) {
-            console.error('beforeUpload error:', error)
-            continue
+            console.error('beforeUpload error:', error);
+            continue;
           }
         }
 
-        const uploadFile = fileToUploadFile(file)
-        
+        const uploadFile = fileToUploadFile(file);
+
         // Add to file list
-        const newFileList = [...fileListComputed.value, uploadFile]
-        fileListComputed.value = newFileList
-        emit('change', uploadFile, newFileList)
+        nextFileList = [...nextFileList, uploadFile];
+        fileListComputed.value = nextFileList;
+        emit('change', uploadFile, nextFileList);
 
         // Auto upload if enabled
         if (props.autoUpload) {
-          uploadFile.status = 'uploading'
+          uploadFile.status = 'uploading';
           if (props.customRequest) {
             props.customRequest({
               file,
               onProgress: (progress: number) => {
-                uploadFile.progress = progress
-                emit('progress', progress, uploadFile)
+                uploadFile.progress = progress;
+                emit('progress', progress, uploadFile);
               },
               onSuccess: (response: unknown) => {
-                uploadFile.status = 'success'
-                emit('success', response, uploadFile)
+                uploadFile.status = 'success';
+                emit('success', response, uploadFile);
               },
               onError: (error: Error) => {
-                uploadFile.status = 'error'
-                uploadFile.error = error.message
-                emit('error', error, uploadFile)
+                uploadFile.status = 'error';
+                uploadFile.error = error.message;
+                emit('error', error, uploadFile);
               },
-            })
+            });
           } else {
             // Simulate upload for demo purposes
-            uploadFile.status = 'success'
+            uploadFile.status = 'success';
           }
         }
       }
-    }
+    };
 
     const handleRemove = (file: UploadFile) => {
-      const newFileList = fileListComputed.value.filter((f) => f.uid !== file.uid)
-      fileListComputed.value = newFileList
-      emit('remove', file, newFileList)
-    }
+      const newFileList = fileListComputed.value.filter(
+        (f) => f.uid !== file.uid
+      );
+      fileListComputed.value = newFileList;
+      emit('remove', file, newFileList);
+    };
 
     const handlePreview = (file: UploadFile) => {
-      emit('preview', file)
-    }
+      emit('preview', file);
+    };
 
     const handleDragOver = (event: DragEvent) => {
-      if (props.disabled) return
-      event.preventDefault()
-      isDragging.value = true
-    }
+      if (props.disabled) return;
+      event.preventDefault();
+      isDragging.value = true;
+    };
 
     const handleDragLeave = (event: DragEvent) => {
-      if (props.disabled) return
-      event.preventDefault()
-      isDragging.value = false
-    }
+      if (props.disabled) return;
+      event.preventDefault();
+      isDragging.value = false;
+    };
 
     const handleDrop = async (event: DragEvent) => {
-      if (props.disabled) return
-      event.preventDefault()
-      isDragging.value = false
+      if (props.disabled) return;
+      event.preventDefault();
+      isDragging.value = false;
 
-      const files = Array.from(event.dataTransfer?.files || [])
-      await processFiles(files)
-    }
+      const files = Array.from(event.dataTransfer?.files || []);
+      await processFiles(files);
+    };
 
     const renderInput = () => {
       return h('input', {
@@ -289,8 +297,8 @@ export const Upload = defineComponent({
         style: { display: 'none' },
         onChange: handleFileChange,
         'aria-hidden': 'true',
-      })
-    }
+      });
+    };
 
     const renderUploadButton = () => {
       if (props.drag) {
@@ -330,10 +338,20 @@ export const Upload = defineComponent({
               h('span', { class: 'font-semibold' }, 'Click to upload'),
               ' or drag and drop',
             ]),
-            props.accept && h('p', { class: 'text-xs text-gray-500' }, `Accepted: ${props.accept}`),
-            props.maxSize && h('p', { class: 'text-xs text-gray-500' }, `Max size: ${formatFileSize(props.maxSize)}`),
+            props.accept &&
+              h(
+                'p',
+                { class: 'text-xs text-gray-500' },
+                `Accepted: ${props.accept}`
+              ),
+            props.maxSize &&
+              h(
+                'p',
+                { class: 'text-xs text-gray-500' },
+                `Max size: ${formatFileSize(props.maxSize)}`
+              ),
           ]
-        )
+        );
       }
 
       return h(
@@ -346,12 +364,12 @@ export const Upload = defineComponent({
           'aria-label': 'Upload file',
         },
         slots.default ? slots.default() : 'Select File'
-      )
-    }
+      );
+    };
 
     const renderFileList = () => {
       if (!props.showFileList || fileListComputed.value.length === 0) {
-        return null
+        return null;
       }
 
       if (props.listType === 'picture-card') {
@@ -359,15 +377,19 @@ export const Upload = defineComponent({
           'div',
           { class: 'flex flex-wrap gap-2 mt-4' },
           fileListComputed.value.map((file) => renderPictureCard(file))
-        )
+        );
       }
 
       return h(
         'ul',
-        { class: 'mt-4 space-y-2', role: 'list', 'aria-label': 'Uploaded files' },
+        {
+          class: 'mt-4 space-y-2',
+          role: 'list',
+          'aria-label': 'Uploaded files',
+        },
         fileListComputed.value.map((file) => renderFileItem(file))
-      )
-    }
+      );
+    };
 
     const renderFileItem = (file: UploadFile) => {
       return h(
@@ -399,77 +421,77 @@ export const Upload = defineComponent({
             ),
             // File name and size
             h('div', { class: 'flex-1 min-w-0' }, [
-              h(
-                'p',
-                { class: 'text-sm font-medium truncate' },
-                file.name
-              ),
-              file.size && h(
-                'p',
-                { class: 'text-xs text-gray-500' },
-                formatFileSize(file.size)
-              ),
+              h('p', { class: 'text-sm font-medium truncate' }, file.name),
+              file.size &&
+                h(
+                  'p',
+                  { class: 'text-xs text-gray-500' },
+                  formatFileSize(file.size)
+                ),
             ]),
           ]),
           // Actions
           h('div', { class: 'flex items-center space-x-2 ml-4' }, [
             // Status icon
-            file.status === 'success' && h(
-              'svg',
-              {
-                class: 'w-5 h-5 text-green-500',
-                fill: 'currentColor',
-                viewBox: '0 0 20 20',
-                'aria-label': 'Success',
-              },
-              [
-                h('path', {
-                  'fill-rule': 'evenodd',
-                  d: 'M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z',
-                  'clip-rule': 'evenodd',
-                }),
-              ]
-            ),
-            file.status === 'error' && h(
-              'svg',
-              {
-                class: 'w-5 h-5 text-red-500',
-                fill: 'currentColor',
-                viewBox: '0 0 20 20',
-                'aria-label': 'Error',
-              },
-              [
-                h('path', {
-                  'fill-rule': 'evenodd',
-                  d: 'M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z',
-                  'clip-rule': 'evenodd',
-                }),
-              ]
-            ),
-            file.status === 'uploading' && h(
-              'svg',
-              {
-                class: 'w-5 h-5 text-blue-500 animate-spin',
-                fill: 'none',
-                viewBox: '0 0 24 24',
-                'aria-label': 'Uploading',
-              },
-              [
-                h('circle', {
-                  class: 'opacity-25',
-                  cx: '12',
-                  cy: '12',
-                  r: '10',
-                  stroke: 'currentColor',
-                  'stroke-width': '4',
-                }),
-                h('path', {
-                  class: 'opacity-75',
+            file.status === 'success' &&
+              h(
+                'svg',
+                {
+                  class: 'w-5 h-5 text-green-500',
                   fill: 'currentColor',
-                  d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z',
-                }),
-              ]
-            ),
+                  viewBox: '0 0 20 20',
+                  'aria-label': 'Success',
+                },
+                [
+                  h('path', {
+                    'fill-rule': 'evenodd',
+                    d: 'M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z',
+                    'clip-rule': 'evenodd',
+                  }),
+                ]
+              ),
+            file.status === 'error' &&
+              h(
+                'svg',
+                {
+                  class: 'w-5 h-5 text-red-500',
+                  fill: 'currentColor',
+                  viewBox: '0 0 20 20',
+                  'aria-label': 'Error',
+                },
+                [
+                  h('path', {
+                    'fill-rule': 'evenodd',
+                    d: 'M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z',
+                    'clip-rule': 'evenodd',
+                  }),
+                ]
+              ),
+            file.status === 'uploading' &&
+              h(
+                'svg',
+                {
+                  class: 'w-5 h-5 text-blue-500 animate-spin',
+                  fill: 'none',
+                  viewBox: '0 0 24 24',
+                  'aria-label': 'Uploading',
+                },
+                [
+                  h('circle', {
+                    class: 'opacity-25',
+                    cx: '12',
+                    cy: '12',
+                    r: '10',
+                    stroke: 'currentColor',
+                    'stroke-width': '4',
+                  }),
+                  h('path', {
+                    class: 'opacity-75',
+                    fill: 'currentColor',
+                    d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z',
+                  }),
+                ]
+              ),
             // Remove button
             h(
               'button',
@@ -500,11 +522,12 @@ export const Upload = defineComponent({
             ),
           ]),
         ]
-      )
-    }
+      );
+    };
 
     const renderPictureCard = (file: UploadFile) => {
-      const imageUrl = file.url || (file.file ? URL.createObjectURL(file.file) : '')
+      const imageUrl =
+        file.url || (file.file ? URL.createObjectURL(file.file) : '');
 
       return h(
         'div',
@@ -514,16 +537,18 @@ export const Upload = defineComponent({
         },
         [
           // Image preview
-          imageUrl && h('img', {
-            src: imageUrl,
-            alt: file.name,
-            class: 'w-full h-full object-cover',
-          }),
+          imageUrl &&
+            h('img', {
+              src: imageUrl,
+              alt: file.name,
+              class: 'w-full h-full object-cover',
+            }),
           // Overlay
           h(
             'div',
             {
-              class: 'absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-all flex items-center justify-center space-x-2 opacity-0 hover:opacity-100',
+              class:
+                'absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-all flex items-center justify-center space-x-2 opacity-0 hover:opacity-100',
             },
             [
               // Preview button
@@ -593,40 +618,42 @@ export const Upload = defineComponent({
             ]
           ),
           // Status indicator
-          file.status === 'uploading' && h(
-            'div',
-            {
-              class: 'absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center',
-            },
-            [
-              h(
-                'svg',
-                {
-                  class: 'w-8 h-8 text-blue-500 animate-spin',
-                  fill: 'none',
-                  viewBox: '0 0 24 24',
-                },
-                [
-                  h('circle', {
-                    class: 'opacity-25',
-                    cx: '12',
-                    cy: '12',
-                    r: '10',
-                    stroke: 'currentColor',
-                    'stroke-width': '4',
-                  }),
-                  h('path', {
-                    class: 'opacity-75',
-                    fill: 'currentColor',
-                    d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z',
-                  }),
-                ]
-              ),
-            ]
-          ),
+          file.status === 'uploading' &&
+            h(
+              'div',
+              {
+                class:
+                  'absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center',
+              },
+              [
+                h(
+                  'svg',
+                  {
+                    class: 'w-8 h-8 text-blue-500 animate-spin',
+                    fill: 'none',
+                    viewBox: '0 0 24 24',
+                  },
+                  [
+                    h('circle', {
+                      class: 'opacity-25',
+                      cx: '12',
+                      cy: '12',
+                      r: '10',
+                      stroke: 'currentColor',
+                      'stroke-width': '4',
+                    }),
+                    h('path', {
+                      class: 'opacity-75',
+                      fill: 'currentColor',
+                      d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z',
+                    }),
+                  ]
+                ),
+              ]
+            ),
         ]
-      )
-    }
+      );
+    };
 
     return () => {
       return h(
@@ -634,14 +661,10 @@ export const Upload = defineComponent({
         {
           class: 'tiger-upload',
         },
-        [
-          renderInput(),
-          renderUploadButton(),
-          renderFileList(),
-        ]
-      )
-    }
+        [renderInput(), renderUploadButton(), renderFileList()]
+      );
+    };
   },
-})
+});
 
-export default Upload
+export default Upload;
