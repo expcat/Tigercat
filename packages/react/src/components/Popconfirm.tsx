@@ -13,6 +13,7 @@ import {
   getPopconfirmTitleClasses,
   getPopconfirmDescriptionClasses,
   getPopconfirmIconClasses,
+  getPopconfirmArrowClasses,
   getPopconfirmButtonsClasses,
   getPopconfirmCancelButtonClasses,
   getPopconfirmOkButtonClasses,
@@ -252,6 +253,11 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     [currentVisible, placement]
   );
 
+  const arrowClasses = useMemo(
+    () => getPopconfirmArrowClasses(placement),
+    [placement]
+  );
+
   // Content classes
   const contentClasses = useMemo(() => getPopconfirmContentClasses(), []);
 
@@ -298,47 +304,50 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
 
       {/* Popconfirm content */}
       <div className={contentWrapperClasses} hidden={!currentVisible}>
-        <div className={contentClasses}>
-          {/* Title section with icon */}
-          <div className="flex items-start">
-            {/* Icon */}
-            {showIcon && (
-              <div className={iconClasses}>
-                <IconComponent />
-              </div>
-            )}
-
-            {/* Title and description */}
-            <div className="flex-1">
-              {/* Title */}
-              <div className={titleClasses}>{titleContent || title}</div>
-
-              {/* Description */}
-              {(description || descriptionContent) && (
-                <div className={descriptionClasses}>
-                  {descriptionContent || description}
+        <div className="relative">
+          <div className={arrowClasses} aria-hidden="true" />
+          <div className={contentClasses}>
+            {/* Title section with icon */}
+            <div className="flex items-start">
+              {/* Icon */}
+              {showIcon && (
+                <div className={iconClasses}>
+                  <IconComponent />
                 </div>
               )}
+
+              {/* Title and description */}
+              <div className="flex-1">
+                {/* Title */}
+                <div className={titleClasses}>{titleContent || title}</div>
+
+                {/* Description */}
+                {(description || descriptionContent) && (
+                  <div className={descriptionClasses}>
+                    {descriptionContent || description}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Buttons */}
-          <div className={buttonsClasses}>
-            {/* Cancel button */}
-            <button
-              type="button"
-              className={cancelButtonClasses}
-              onClick={handleCancel}>
-              {cancelText}
-            </button>
+            {/* Buttons */}
+            <div className={buttonsClasses}>
+              {/* Cancel button */}
+              <button
+                type="button"
+                className={cancelButtonClasses}
+                onClick={handleCancel}>
+                {cancelText}
+              </button>
 
-            {/* OK button */}
-            <button
-              type="button"
-              className={okButtonClasses}
-              onClick={handleConfirm}>
-              {okText}
-            </button>
+              {/* OK button */}
+              <button
+                type="button"
+                className={okButtonClasses}
+                onClick={handleConfirm}>
+                {okText}
+              </button>
+            </div>
           </div>
         </div>
       </div>
