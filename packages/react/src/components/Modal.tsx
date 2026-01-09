@@ -149,7 +149,8 @@ export const Modal: React.FC<ModalProps> = ({
       className={classNames(
         modalWrapperClasses,
         'transition-opacity duration-300',
-        visible ? 'opacity-100' : 'opacity-0'
+        visible ? 'opacity-100' : 'opacity-0',
+        !visible && !isAnimating && 'pointer-events-none'
       )}
       style={{ zIndex }}>
       {/* Mask */}
