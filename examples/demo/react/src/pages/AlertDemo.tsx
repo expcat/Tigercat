@@ -6,11 +6,14 @@ export default function AlertDemo() {
   const [showAlert2, setShowAlert2] = useState(true);
   const [showAlert3, setShowAlert3] = useState(true);
 
+  const demoCardClassName =
+    'p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40';
+
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-8 text-gray-900 dark:text-gray-100">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Alert 警告提示</h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           用于页面中展示重要的提示信息，支持成功、警告、失败、信息等多种状态。
         </p>
       </div>
@@ -18,10 +21,10 @@ export default function AlertDemo() {
       {/* 基本用法 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">基本用法</h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
           最简单的用法，适用于简短的警告提示。
         </p>
-        <div className="p-6 bg-gray-50 rounded-lg space-y-4">
+        <div className={demoCardClassName}>
           <Alert title="这是一条提示信息" />
           <Alert type="success" title="这是一条成功提示" />
           <Alert type="warning" title="这是一条警告提示" />
@@ -33,11 +36,11 @@ export default function AlertDemo() {
       {/* 提示类型 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">提示类型</h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
           Alert 组件支持 4
           种不同的类型：info（信息）、success（成功）、warning（警告）、error（错误）。
         </p>
-        <div className="p-6 bg-gray-50 rounded-lg space-y-4">
+        <div className={demoCardClassName}>
           <Alert
             type="info"
             title="信息提示"
@@ -53,10 +56,10 @@ export default function AlertDemo() {
       {/* 尺寸大小 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">尺寸大小</h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
           Alert 组件支持 3 种不同的尺寸：小、中、大。
         </p>
-        <div className="p-6 bg-gray-50 rounded-lg space-y-4">
+        <div className={demoCardClassName}>
           <Alert
             size="sm"
             type="info"
@@ -82,10 +85,10 @@ export default function AlertDemo() {
       {/* 带图标 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">带图标</h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
           默认情况下会显示图标，可以通过 showIcon 属性控制。
         </p>
-        <div className="p-6 bg-gray-50 rounded-lg space-y-4">
+        <div className={demoCardClassName}>
           <Alert type="success" title="带图标的成功提示" showIcon={true} />
           <Alert type="warning" title="不带图标的警告提示" showIcon={false} />
         </div>
@@ -95,10 +98,10 @@ export default function AlertDemo() {
       {/* 可关闭 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">可关闭</h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
           通过设置 closable 属性可以让 Alert 显示关闭按钮。
         </p>
-        <div className="p-6 bg-gray-50 rounded-lg space-y-4">
+        <div className={demoCardClassName}>
           {showAlert1 && (
             <Alert
               type="info"
@@ -118,10 +121,10 @@ export default function AlertDemo() {
             />
           )}
           {(!showAlert1 || !showAlert2) && (
-            <div className="text-gray-500 text-center py-4">
+            <div className="text-gray-500 dark:text-gray-400 text-center py-4">
               提示已关闭
               <button
-                className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors"
                 onClick={() => {
                   setShowAlert1(true);
                   setShowAlert2(true);
@@ -137,10 +140,10 @@ export default function AlertDemo() {
       {/* 带描述信息 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">带描述信息</h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
           使用 description 属性可以添加详细的描述内容。
         </p>
-        <div className="p-6 bg-gray-50 rounded-lg space-y-4">
+        <div className={demoCardClassName}>
           <Alert
             type="success"
             title="操作成功"
@@ -163,10 +166,10 @@ export default function AlertDemo() {
       {/* 自定义内容 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">自定义内容</h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
           可以使用 titleSlot 和 descriptionSlot 自定义标题和描述内容。
         </p>
-        <div className="p-6 bg-gray-50 rounded-lg space-y-4">
+        <div className={demoCardClassName}>
           <Alert
             type="info"
             titleSlot={<strong>自定义标题内容</strong>}
@@ -190,8 +193,10 @@ export default function AlertDemo() {
       {/* 完整功能示例 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">完整功能示例</h2>
-        <p className="text-gray-600 mb-6">综合展示所有功能。</p>
-        <div className="p-6 bg-gray-50 rounded-lg space-y-4">
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
+          综合展示所有功能。
+        </p>
+        <div className={demoCardClassName}>
           {showAlert3 && (
             <Alert
               type="warning"
@@ -204,10 +209,10 @@ export default function AlertDemo() {
             />
           )}
           {!showAlert3 && (
-            <div className="text-gray-500 text-center py-4">
+            <div className="text-gray-500 dark:text-gray-400 text-center py-4">
               提示已关闭
               <button
-                className="ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors"
                 onClick={() => setShowAlert3(true)}>
                 重置
               </button>
@@ -220,13 +225,15 @@ export default function AlertDemo() {
       {/* 实际应用场景 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">实际应用场景</h2>
-        <p className="text-gray-600 mb-6">模拟真实的使用场景。</p>
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
+          模拟真实的使用场景。
+        </p>
 
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 表单提交成功 */}
           <div>
             <h3 className="text-lg font-semibold mb-3">表单提交成功</h3>
-            <div className="p-6 bg-gray-50 rounded-lg">
+            <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
               <Alert
                 type="success"
                 title="提交成功"
@@ -239,7 +246,7 @@ export default function AlertDemo() {
           {/* 系统维护通知 */}
           <div>
             <h3 className="text-lg font-semibold mb-3">系统维护通知</h3>
-            <div className="p-6 bg-gray-50 rounded-lg">
+            <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
               <Alert
                 type="warning"
                 title="系统维护通知"
@@ -252,7 +259,7 @@ export default function AlertDemo() {
           {/* 错误提示 */}
           <div>
             <h3 className="text-lg font-semibold mb-3">错误提示</h3>
-            <div className="p-6 bg-gray-50 rounded-lg">
+            <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
               <Alert
                 type="error"
                 title="操作失败"
@@ -265,7 +272,7 @@ export default function AlertDemo() {
           {/* 信息提示 */}
           <div>
             <h3 className="text-lg font-semibold mb-3">信息提示</h3>
-            <div className="p-6 bg-gray-50 rounded-lg">
+            <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
               <Alert
                 type="info"
                 title="温馨提示"

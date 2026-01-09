@@ -71,10 +71,10 @@ export function DemoRouteLayout() {
   return (
     <div className="min-h-screen">
       {!isHome && (headerTitle || sections.length > 0) && (
-        <div className="sticky top-0 z-20 border-b border-gray-200 bg-white/90 backdrop-blur">
+        <div className="sticky top-0 z-20 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
           <div className="max-w-5xl mx-auto px-8 py-3">
             <div className="flex items-center justify-between gap-4">
-              <div className="min-w-0 text-sm font-semibold text-gray-900 truncate">
+              <div className="min-w-0 text-sm font-semibold text-gray-900 truncate dark:text-gray-100">
                 {headerTitle}
               </div>
               {sections.length > 0 && (
@@ -83,7 +83,7 @@ export function DemoRouteLayout() {
                     <a
                       key={s.id}
                       href={`#${s.id}`}
-                      className="text-sm px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200">
+                      className="text-sm px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800">
                       {s.label}
                     </a>
                   ))}
