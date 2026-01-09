@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Divider } from '@tigercat/react';
 
 const DividerDemo: React.FC = () => {
@@ -27,13 +26,19 @@ const DividerDemo: React.FC = () => {
         <p className="text-gray-600 mb-6">
           lineStyle 支持 solid / dashed / dotted。
         </p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="text-sm text-gray-600">solid</div>
-          <Divider lineStyle="solid" />
-          <div className="text-sm text-gray-600">dashed</div>
-          <Divider lineStyle="dashed" />
-          <div className="text-sm text-gray-600">dotted</div>
-          <Divider lineStyle="dotted" />
+        <div className="p-6 bg-gray-50 rounded-lg space-y-4">
+          <div>
+            <div className="text-gray-700 mb-2">solid</div>
+            <Divider lineStyle="solid" />
+          </div>
+          <div>
+            <div className="text-gray-700 mb-2">dashed</div>
+            <Divider lineStyle="dashed" />
+          </div>
+          <div>
+            <div className="text-gray-700 mb-2">dotted</div>
+            <Divider lineStyle="dotted" />
+          </div>
         </div>
       </section>
 
@@ -87,12 +92,6 @@ const DividerDemo: React.FC = () => {
           </div>
         </div>
       </section>
-
-      <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-        <Link to="/" className="text-blue-600 hover:text-blue-800">
-          ← 返回首页
-        </Link>
-      </div>
     </div>
   );
 };

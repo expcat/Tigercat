@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 import {
   Container,
   Layout,
@@ -86,12 +85,6 @@ const LayoutDemo: React.FC = () => {
           </Layout>
         </div>
       </section>
-
-      <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-        <RouterLink to="/" className="text-blue-600 hover:text-blue-800">
-          ← 返回首页
-        </RouterLink>
-      </div>
     </div>
   );
 };

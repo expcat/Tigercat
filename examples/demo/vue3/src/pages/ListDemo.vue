@@ -100,34 +100,6 @@ function handlePageChange(page: { current: number; pageSize: number }) {
       <p class="text-gray-600">通用列表组件，用于展示一系列相似的数据项。</p>
     </div>
 
-    <div class="mb-10 p-4 bg-white border border-gray-200 rounded-lg">
-      <div class="text-sm font-semibold text-gray-900 mb-3">功能导航</div>
-      <div class="flex flex-wrap gap-2">
-        <a
-          v-for="item in [
-            { href: '#basic', label: '基本用法' },
-            { href: '#size', label: '尺寸' },
-            { href: '#border', label: '边框' },
-            { href: '#split', label: '分割线' },
-            { href: '#avatar', label: '头像' },
-            { href: '#extra', label: '额外内容' },
-            { href: '#renderItem', label: '自定义渲染' },
-            { href: '#headerFooter', label: '头尾' },
-            { href: '#pagination', label: '分页' },
-            { href: '#grid', label: '网格' },
-            { href: '#loading', label: '加载' },
-            { href: '#empty', label: '空态' },
-            { href: '#clickable', label: '点击' },
-          ]"
-          :key="item.href"
-          :href="item.href"
-          class="px-3 py-1.5 text-sm rounded-full border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:border-gray-300 transition-colors"
-        >
-          {{ item.label }}
-        </a>
-      </div>
-    </div>
-
     <!-- 基本用法 -->
     <section class="mb-12" id="basic">
       <h2 class="text-2xl font-bold mb-4">基本用法</h2>
@@ -351,9 +323,5 @@ function handlePageChange(page: { current: number; pageSize: number }) {
       </div>
       <Divider class="my-6" />
     </section>
-
-    <div class="mt-8 p-4 bg-blue-50 rounded-lg">
-      <router-link to="/" class="text-blue-600 hover:text-blue-800">← 返回首页</router-link>
-    </div>
   </div>
 </template>

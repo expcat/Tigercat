@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Icon } from '@tigercat/react';
 
 const IconDemo: React.FC = () => {
@@ -88,12 +87,6 @@ const IconDemo: React.FC = () => {
           </div>
         </div>
       </section>
-
-      <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-        <Link to="/" className="text-blue-600 hover:text-blue-800">
-          ← 返回首页
-        </Link>
-      </div>
     </div>
   );
 };
