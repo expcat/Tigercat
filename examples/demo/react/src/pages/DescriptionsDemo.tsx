@@ -1,4 +1,5 @@
-import { Descriptions } from '@tigercat/react'
+import { Button, Descriptions, Divider } from '@tigercat/react';
+import { Link } from 'react-router-dom';
 
 export default function DescriptionsDemo() {
   // Basic user information
@@ -9,7 +10,7 @@ export default function DescriptionsDemo() {
     { label: '地址', content: '北京市朝阳区某街道' },
     { label: '公司', content: '某科技有限公司' },
     { label: '职位', content: '高级前端工程师' },
-  ]
+  ];
 
   // Product details with spanning
   const productDetails = [
@@ -17,8 +18,13 @@ export default function DescriptionsDemo() {
     { label: '计费方式', content: '包年包月' },
     { label: '创建时间', content: '2024-01-01 10:00:00' },
     { label: '到期时间', content: '2025-01-01 10:00:00' },
-    { label: '描述', content: '这是一个高性能的云数据库服务，支持多种数据库引擎，提供自动备份、监控和扩展功能。', span: 2 },
-  ]
+    {
+      label: '描述',
+      content:
+        '这是一个高性能的云数据库服务，支持多种数据库引擎，提供自动备份、监控和扩展功能。',
+      span: 2,
+    },
+  ];
 
   // Order information
   const orderInfo = [
@@ -30,7 +36,7 @@ export default function DescriptionsDemo() {
     { label: '订单总额', content: '¥1,299.00' },
     { label: '优惠金额', content: '¥100.00' },
     { label: '实付金额', content: '¥1,199.00' },
-  ]
+  ];
 
   // Server configuration
   const serverConfig = [
@@ -40,38 +46,70 @@ export default function DescriptionsDemo() {
     { label: '带宽', content: '10 Mbps' },
     { label: '操作系统', content: 'Ubuntu 20.04 LTS' },
     { label: 'IP 地址', content: '192.168.1.100' },
-  ]
+  ];
+
+  const featureNav: Array<[string, string]> = [
+    ['#basic', '基本用法'],
+    ['#bordered', '带边框'],
+    ['#size', '尺寸'],
+    ['#vertical', '垂直布局'],
+    ['#column', '列数'],
+    ['#span', '跨列'],
+    ['#extra', '操作区域'],
+    ['#style', '自定义样式'],
+    ['#colon', '无冒号'],
+  ];
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-6xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Descriptions 描述列表</h1>
-        <p className="text-gray-600">用于展示结构化数据、详情信息的描述列表组件。</p>
+        <p className="text-gray-600">
+          用于展示结构化数据、详情信息的描述列表组件。
+        </p>
+      </div>
+
+      <div className="mb-10 p-4 bg-white border border-gray-200 rounded-lg">
+        <div className="text-sm font-semibold text-gray-900 mb-3">功能导航</div>
+        <div className="flex flex-wrap gap-2">
+          {featureNav.map(([href, label]) => (
+            <a
+              key={href}
+              href={href}
+              className="text-sm px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700">
+              {label}
+            </a>
+          ))}
+        </div>
       </div>
 
       {/* 基本用法 */}
-      <section className="mb-12">
+      <section id="basic" className="mb-12">
         <h2 className="text-2xl font-bold mb-4">基本用法</h2>
         <p className="text-gray-600 mb-6">最简单的描述列表展示。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Descriptions title="用户信息" items={userInfo} />
         </div>
+        <Divider className="my-6" />
       </section>
 
       {/* 带边框 */}
-      <section className="mb-12">
+      <section id="bordered" className="mb-12">
         <h2 className="text-2xl font-bold mb-4">带边框</h2>
         <p className="text-gray-600 mb-6">使用 bordered 属性添加边框。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Descriptions title="用户信息" bordered items={userInfo} />
         </div>
+        <Divider className="my-6" />
       </section>
 
       {/* 不同尺寸 */}
-      <section className="mb-12">
+      <section id="size" className="mb-12">
         <h2 className="text-2xl font-bold mb-4">不同尺寸</h2>
-        <p className="text-gray-600 mb-6">支持三种尺寸：small、medium、large。</p>
-        <div className="space-y-6">
+        <p className="text-gray-600 mb-6">
+          支持三种尺寸：small、medium、large。
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="p-6 bg-gray-50 rounded-lg">
             <h3 className="text-lg font-semibold mb-4">小尺寸</h3>
             <Descriptions size="sm" bordered items={userInfo} column={2} />
@@ -85,12 +123,15 @@ export default function DescriptionsDemo() {
             <Descriptions size="lg" bordered items={userInfo} column={2} />
           </div>
         </div>
+        <Divider className="my-6" />
       </section>
 
       {/* 垂直布局 */}
-      <section className="mb-12">
+      <section id="vertical" className="mb-12">
         <h2 className="text-2xl font-bold mb-4">垂直布局</h2>
-        <p className="text-gray-600 mb-6">使用 layout="vertical" 设置垂直布局。</p>
+        <p className="text-gray-600 mb-6">
+          使用 layout="vertical" 设置垂直布局。
+        </p>
         <div className="space-y-6">
           <div className="p-6 bg-gray-50 rounded-lg">
             <h3 className="text-lg font-semibold mb-4">垂直布局（无边框）</h3>
@@ -98,16 +139,24 @@ export default function DescriptionsDemo() {
           </div>
           <div className="p-6 bg-gray-50 rounded-lg">
             <h3 className="text-lg font-semibold mb-4">垂直布局（带边框）</h3>
-            <Descriptions layout="vertical" bordered items={serverConfig} column={2} />
+            <Descriptions
+              layout="vertical"
+              bordered
+              items={serverConfig}
+              column={2}
+            />
           </div>
         </div>
+        <Divider className="my-6" />
       </section>
 
       {/* 自定义列数 */}
-      <section className="mb-12">
+      <section id="column" className="mb-12">
         <h2 className="text-2xl font-bold mb-4">自定义列数</h2>
-        <p className="text-gray-600 mb-6">通过 column 属性设置每行显示的列数。</p>
-        <div className="space-y-6">
+        <p className="text-gray-600 mb-6">
+          通过 column 属性设置每行显示的列数。
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="p-6 bg-gray-50 rounded-lg">
             <h3 className="text-lg font-semibold mb-4">2 列布局</h3>
             <Descriptions bordered column={2} items={userInfo} />
@@ -117,40 +166,82 @@ export default function DescriptionsDemo() {
             <Descriptions bordered column={4} items={userInfo} />
           </div>
         </div>
+        <Divider className="my-6" />
       </section>
 
       {/* 跨列显示 */}
-      <section className="mb-12">
+      <section id="span" className="mb-12">
         <h2 className="text-2xl font-bold mb-4">跨列显示</h2>
-        <p className="text-gray-600 mb-6">描述项可以通过 span 属性实现跨列显示。</p>
+        <p className="text-gray-600 mb-6">
+          描述项可以通过 span 属性实现跨列显示。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <Descriptions title="产品详情" bordered column={3} items={productDetails} />
+          <Descriptions
+            title="产品详情"
+            bordered
+            column={3}
+            items={productDetails}
+          />
         </div>
+        <Divider className="my-6" />
       </section>
 
       {/* 带操作区域 */}
-      <section className="mb-12">
+      <section id="extra" className="mb-12">
         <h2 className="text-2xl font-bold mb-4">带操作区域</h2>
         <p className="text-gray-600 mb-6">可以通过 extra 属性添加操作按钮。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <Descriptions 
-            title="订单详情" 
-            bordered 
-            column={3} 
+          <Descriptions
+            title="订单详情"
+            bordered
+            column={3}
             items={orderInfo}
-            extra={<a href="#" className="text-blue-600 hover:text-blue-800">编辑</a>}
+            extra={<Button size="sm">编辑</Button>}
+          />
+        </div>
+        <Divider className="my-6" />
+      </section>
+
+      {/* 自定义样式 */}
+      <section id="style" className="mb-12">
+        <h2 className="text-2xl font-bold mb-4">自定义样式</h2>
+        <p className="text-gray-600 mb-6">
+          通过 labelStyle 和 contentStyle 自定义标签/内容样式。
+        </p>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <Descriptions
+            title="用户信息（自定义样式）"
+            bordered
+            column={2}
+            items={userInfo}
+            labelStyle={{ fontWeight: 600, color: '#1f2937' }}
+            contentStyle={{ color: '#6b7280' }}
+          />
+        </div>
+        <Divider className="my-6" />
+      </section>
+
+      {/* 无冒号 */}
+      <section id="colon" className="mb-12">
+        <h2 className="text-2xl font-bold mb-4">无冒号</h2>
+        <p className="text-gray-600 mb-6">
+          通过设置 colon 为 false 隐藏标签后的冒号。
+        </p>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <Descriptions
+            title="服务器配置"
+            colon={false}
+            bordered
+            items={serverConfig}
           />
         </div>
       </section>
 
-      {/* 无冒号 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">无冒号</h2>
-        <p className="text-gray-600 mb-6">通过设置 colon 为 false 隐藏标签后的冒号。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Descriptions title="服务器配置" colon={false} bordered items={serverConfig} />
-        </div>
-      </section>
+      <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+        <Link to="/" className="text-blue-600 hover:text-blue-800">
+          ← 返回首页
+        </Link>
+      </div>
     </div>
-  )
+  );
 }
