@@ -63,9 +63,35 @@ export function renderWithSlots(
   slots: Record<string, SlotContent>,
   options?: Omit<RenderOptions, 'slots'>
 ) {
+  const maybeOptions = options ?? {}
+
+  // Many tests historically passed component props as the 3rd argument.
+  // Detect that pattern and map it into { props } so props aren't silently dropped.
+  const renderOptionKeys = new Set([
+    'props',
+    'attrs',
+    'global',
+    'container',
+    'baseElement',
+    'attachTo',
+    'queries',
+    'wrapper',
+  ])
+
+  const hasRenderOptionKey = Object.keys(maybeOptions).some((key) =>
+    renderOptionKeys.has(key)
+  )
+
+  if (hasRenderOptionKey) {
+    return render(component, {
+      slots,
+      ...maybeOptions,
+    })
+  }
+
   return render(component, {
     slots,
-    ...options,
+    props: maybeOptions,
   })
 }
 

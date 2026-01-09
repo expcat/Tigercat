@@ -91,6 +91,24 @@ export const Button = defineComponent({
       }
     };
 
+    const callForwardedOnClick = (event: MouseEvent) => {
+      const forwarded = (attrs as { onClick?: unknown }).onClick;
+      if (!forwarded) return;
+
+      if (Array.isArray(forwarded)) {
+        for (const fn of forwarded) {
+          if (typeof fn === 'function') {
+            fn(event);
+          }
+        }
+        return;
+      }
+
+      if (typeof forwarded === 'function') {
+        forwarded(event);
+      }
+    };
+
     return () => {
       const children = [];
 
@@ -111,7 +129,11 @@ export const Button = defineComponent({
         {
           class: [buttonClasses.value, attrsClass],
           disabled: props.disabled || props.loading,
-          onClick: handleClick,
+          type: 'button',
+          onClick: (event: MouseEvent) => {
+            handleClick(event);
+            callForwardedOnClick(event);
+          },
           ...attrsWithoutClass,
         },
         children

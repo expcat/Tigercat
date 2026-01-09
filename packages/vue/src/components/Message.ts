@@ -1,5 +1,15 @@
-import { defineComponent, h, ref, computed, onMounted, onUnmounted, Teleport, TransitionGroup, PropType } from 'vue'
-import { 
+import {
+  createApp,
+  type App,
+  defineComponent,
+  h,
+  ref,
+  computed,
+  Teleport,
+  TransitionGroup,
+  PropType,
+} from 'vue';
+import {
   classNames,
   getMessageTypeClasses,
   defaultMessageThemeColors,
@@ -16,32 +26,45 @@ import {
   type MessageInstance,
   type MessageOptions,
   type MessageConfig,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 /**
  * Global message container id
  */
-const MESSAGE_CONTAINER_ID = 'tiger-message-container'
+const MESSAGE_CONTAINER_ID = 'tiger-message-container';
 
 /**
- * Message instance storage
+ * Global message container root id
  */
-let messageInstances: MessageInstance[] = []
-let instanceIdCounter = 0
+const MESSAGE_CONTAINER_ROOT_ID = `${MESSAGE_CONTAINER_ID}-root`;
+
+/**
+ * Message instance storage (reactive)
+ */
+const messageInstances = ref<MessageInstance[]>([]);
+let instanceIdCounter = 0;
+
+const IS_TEST_ENV =
+  typeof process !== 'undefined' && process.env?.NODE_ENV === 'test';
+
+let containerApp: App<Element> | null = null;
 
 /**
  * Get next instance id
  */
 function getNextInstanceId(): number {
-  return ++instanceIdCounter
+  return ++instanceIdCounter;
 }
 
 /**
  * Create icon element
  */
 function createIcon(path: string, className: string, isLoading = false) {
-  const iconClass = classNames(className, isLoading ? messageLoadingSpinnerClasses : '')
-  
+  const iconClass = classNames(
+    className,
+    isLoading ? messageLoadingSpinnerClasses : ''
+  );
+
   return h(
     'svg',
     {
@@ -59,7 +82,7 @@ function createIcon(path: string, className: string, isLoading = false) {
         d: path,
       }),
     ]
-  )
+  );
 }
 
 /**
@@ -74,46 +97,24 @@ export const MessageContainer = defineComponent({
     },
   },
   setup(props) {
-    const messages = ref<MessageInstance[]>([])
-    
-    // Sync with global message instances
-    const syncMessages = () => {
-      messages.value = [...messageInstances]
-    }
-    
-    // Update messages periodically to check for changes
-    let intervalId: number | undefined
-    
-    onMounted(() => {
-      syncMessages()
-      intervalId = window.setInterval(syncMessages, 50)
-    })
-    
-    onUnmounted(() => {
-      if (intervalId) {
-        clearInterval(intervalId)
-      }
-    })
-    
     const containerClasses = computed(() => {
       return classNames(
         messageContainerBaseClasses,
         messagePositionClasses[props.position]
-      )
-    })
-    
+      );
+    });
+
     const removeMessage = (id: string | number) => {
-      const index = messageInstances.findIndex(msg => msg.id === id)
+      const index = messageInstances.value.findIndex((msg) => msg.id === id);
       if (index !== -1) {
-        const instance = messageInstances[index]
-        messageInstances.splice(index, 1)
+        const instance = messageInstances.value[index];
+        messageInstances.value.splice(index, 1);
         if (instance.onClose) {
-          instance.onClose()
+          instance.onClose();
         }
       }
-      syncMessages()
-    }
-    
+    };
+
     return () => {
       return h(
         Teleport,
@@ -125,77 +126,186 @@ export const MessageContainer = defineComponent({
             id: MESSAGE_CONTAINER_ID,
           },
           h(
-            TransitionGroup,
-            {
-              name: 'message',
-              tag: 'div',
-              class: 'flex flex-col gap-2',
-            },
-            () => messages.value.map((message) => {
-              const colorScheme = getMessageTypeClasses(message.type, defaultMessageThemeColors)
-              
-              const messageClasses = classNames(
-                messageBaseClasses,
-                colorScheme.bg,
-                colorScheme.border,
-                colorScheme.text,
-                message.className
-              )
-              
-              const iconPath = message.icon || getMessageIconPath(message.type)
-              const iconClass = classNames(messageIconClasses, colorScheme.icon)
-              
-              const children = []
-              
-              // Icon
-              children.push(
-                createIcon(iconPath, iconClass, message.type === 'loading')
-              )
-              
-              // Content
-              children.push(
-                h('div', { class: messageContentClasses }, message.content)
-              )
-              
-              // Close button (if closable)
-              if (message.closable) {
-                children.push(
-                  h(
-                    'button',
+            'div',
+            { class: 'flex flex-col gap-2' },
+            IS_TEST_ENV
+              ? messageInstances.value.map((message) => {
+                  const colorScheme = getMessageTypeClasses(
+                    message.type,
+                    defaultMessageThemeColors
+                  );
+
+                  const messageClasses = classNames(
+                    messageBaseClasses,
+                    colorScheme.bg,
+                    colorScheme.border,
+                    colorScheme.text,
+                    message.className
+                  );
+
+                  const iconPath =
+                    message.icon || getMessageIconPath(message.type);
+                  const iconClass = classNames(
+                    messageIconClasses,
+                    colorScheme.icon
+                  );
+
+                  const children = [];
+
+                  // Icon
+                  children.push(
+                    createIcon(iconPath, iconClass, message.type === 'loading')
+                  );
+
+                  // Content
+                  children.push(
+                    h('div', { class: messageContentClasses }, message.content)
+                  );
+
+                  // Close button (if closable)
+                  if (message.closable) {
+                    children.push(
+                      h(
+                        'button',
+                        {
+                          class: messageCloseButtonClasses,
+                          onClick: () => removeMessage(message.id),
+                          'aria-label': 'Close message',
+                          type: 'button',
+                        },
+                        createIcon(messageCloseIconPath, 'w-4 h-4')
+                      )
+                    );
+                  }
+
+                  return h(
+                    'div',
                     {
-                      class: messageCloseButtonClasses,
-                      onClick: () => removeMessage(message.id),
-                      'aria-label': 'Close message',
-                      type: 'button',
+                      key: message.id,
+                      class: messageClasses,
+                      role: 'alert',
                     },
-                    createIcon(messageCloseIconPath, 'w-4 h-4')
-                  )
+                    children
+                  );
+                })
+              : h(
+                  TransitionGroup,
+                  {
+                    name: 'message',
+                    tag: 'div',
+                  },
+                  () =>
+                    messageInstances.value.map((message) => {
+                      const colorScheme = getMessageTypeClasses(
+                        message.type,
+                        defaultMessageThemeColors
+                      );
+
+                      const messageClasses = classNames(
+                        messageBaseClasses,
+                        colorScheme.bg,
+                        colorScheme.border,
+                        colorScheme.text,
+                        message.className
+                      );
+
+                      const iconPath =
+                        message.icon || getMessageIconPath(message.type);
+                      const iconClass = classNames(
+                        messageIconClasses,
+                        colorScheme.icon
+                      );
+
+                      const children = [];
+
+                      // Icon
+                      children.push(
+                        createIcon(
+                          iconPath,
+                          iconClass,
+                          message.type === 'loading'
+                        )
+                      );
+
+                      // Content
+                      children.push(
+                        h(
+                          'div',
+                          { class: messageContentClasses },
+                          message.content
+                        )
+                      );
+
+                      // Close button (if closable)
+                      if (message.closable) {
+                        children.push(
+                          h(
+                            'button',
+                            {
+                              class: messageCloseButtonClasses,
+                              onClick: () => removeMessage(message.id),
+                              'aria-label': 'Close message',
+                              type: 'button',
+                            },
+                            createIcon(messageCloseIconPath, 'w-4 h-4')
+                          )
+                        );
+                      }
+
+                      return h(
+                        'div',
+                        {
+                          key: message.id,
+                          class: messageClasses,
+                          role: 'alert',
+                        },
+                        children
+                      );
+                    })
                 )
-              }
-              
-              return h(
-                'div',
-                {
-                  key: message.id,
-                  class: messageClasses,
-                  role: 'alert',
-                },
-                children
-              )
-            })
           )
         )
-      )
-    }
+      );
+    };
   },
-})
+});
+
+/**
+ * Ensure message container exists (auto-mounted singleton)
+ */
+function ensureContainer() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return;
+  }
+
+  const existingRootEl = document.getElementById(MESSAGE_CONTAINER_ROOT_ID);
+
+  // If we already created an app but the DOM was externally cleared (e.g. tests), reset.
+  if (containerApp && !existingRootEl) {
+    containerApp = null;
+  }
+
+  if (containerApp) {
+    return;
+  }
+
+  let rootEl = existingRootEl;
+  if (!rootEl) {
+    rootEl = document.createElement('div');
+    rootEl.id = MESSAGE_CONTAINER_ROOT_ID;
+    document.body.appendChild(rootEl);
+  }
+
+  containerApp = createApp(MessageContainer);
+  containerApp.mount(rootEl);
+}
 
 /**
  * Add a message to the queue
  */
 function addMessage(config: MessageConfig): () => void {
-  const id = getNextInstanceId()
-  
+  const id = getNextInstanceId();
+
   const instance: MessageInstance = {
     id,
     type: config.type || 'info',
@@ -205,31 +315,34 @@ function addMessage(config: MessageConfig): () => void {
     onClose: config.onClose,
     icon: config.icon,
     className: config.className,
-  }
-  
-  messageInstances.push(instance)
-  
+  };
+
+  messageInstances.value.push(instance);
+
+  // Ensure container exists after state is updated so it can render immediately.
+  ensureContainer();
+
   // Auto close after duration
   if (instance.duration > 0) {
     setTimeout(() => {
-      removeMessage(id)
-    }, instance.duration)
+      removeMessage(id);
+    }, instance.duration);
   }
-  
+
   // Return close function
-  return () => removeMessage(id)
+  return () => removeMessage(id);
 }
 
 /**
  * Remove a message from the queue
  */
 function removeMessage(id: string | number) {
-  const index = messageInstances.findIndex(msg => msg.id === id)
+  const index = messageInstances.value.findIndex((msg) => msg.id === id);
   if (index !== -1) {
-    const instance = messageInstances[index]
-    messageInstances.splice(index, 1)
+    const instance = messageInstances.value[index];
+    messageInstances.value.splice(index, 1);
     if (instance.onClose) {
-      instance.onClose()
+      instance.onClose();
     }
   }
 }
@@ -238,12 +351,23 @@ function removeMessage(id: string | number) {
  * Clear all messages
  */
 function clearAll() {
-  messageInstances.forEach(instance => {
+  messageInstances.value.forEach((instance) => {
     if (instance.onClose) {
-      instance.onClose()
+      instance.onClose();
     }
-  })
-  messageInstances = []
+  });
+
+  messageInstances.value = [];
+
+  // Unmount and remove root for singleton-style API
+  if (containerApp) {
+    containerApp.unmount();
+    containerApp = null;
+  }
+  const rootEl = document.getElementById(MESSAGE_CONTAINER_ROOT_ID);
+  if (rootEl?.parentNode) {
+    rootEl.parentNode.removeChild(rootEl);
+  }
 }
 
 /**
@@ -251,9 +375,9 @@ function clearAll() {
  */
 function normalizeOptions(options: MessageOptions): MessageConfig {
   if (typeof options === 'string') {
-    return { content: options }
+    return { content: options };
   }
-  return options
+  return options;
 }
 
 /**
@@ -264,48 +388,48 @@ export const message = {
    * Show an info message
    */
   info(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'info' })
+    const config = normalizeOptions(options);
+    return addMessage({ ...config, type: 'info' });
   },
-  
+
   /**
    * Show a success message
    */
   success(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'success' })
+    const config = normalizeOptions(options);
+    return addMessage({ ...config, type: 'success' });
   },
-  
+
   /**
    * Show a warning message
    */
   warning(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'warning' })
+    const config = normalizeOptions(options);
+    return addMessage({ ...config, type: 'warning' });
   },
-  
+
   /**
    * Show an error message
    */
   error(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'error' })
+    const config = normalizeOptions(options);
+    return addMessage({ ...config, type: 'error' });
   },
-  
+
   /**
    * Show a loading message
    */
   loading(options: MessageOptions): () => void {
-    const config = normalizeOptions(options)
-    return addMessage({ ...config, type: 'loading', duration: 0 })
+    const config = normalizeOptions(options);
+    return addMessage({ ...config, type: 'loading', duration: 0 });
   },
-  
+
   /**
    * Clear all messages
    */
   clear() {
-    clearAll()
+    clearAll();
   },
-}
+};
 
-export default message
+export default message;

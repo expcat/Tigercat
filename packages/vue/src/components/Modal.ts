@@ -254,52 +254,53 @@ export const Modal = defineComponent({
         ]
       );
 
+      const wrapper = h(
+        'div',
+        {
+          class: modalWrapperClasses,
+          style: { zIndex: props.zIndex },
+        },
+        [
+          // Mask
+          props.mask &&
+            h(
+              Transition,
+              { name: 'modal-mask', appear: true },
+              {
+                default: () =>
+                  props.visible
+                    ? h('div', {
+                        class: modalMaskClasses,
+                        'aria-hidden': 'true',
+                      })
+                    : null,
+              }
+            ),
+          // Content
+          modalContent,
+        ]
+      );
+
+      const teleportedChildren =
+        props.visible || hasRendered.value
+          ? [
+              h(
+                Transition,
+                {
+                  name: 'modal-fade',
+                  appear: true,
+                },
+                {
+                  default: () => (props.visible ? wrapper : null),
+                }
+              ),
+            ]
+          : [];
+
       return h(
         Teleport,
         { to: 'body', disabled: props.disableTeleport },
-        {
-          default: () =>
-            props.visible || hasRendered.value
-              ? h(
-                  Transition,
-                  {
-                    name: 'modal-fade',
-                    appear: true,
-                  },
-                  {
-                    default: () =>
-                      props.visible
-                        ? h(
-                            'div',
-                            {
-                              class: modalWrapperClasses,
-                              style: { zIndex: props.zIndex },
-                            },
-                            [
-                              // Mask
-                              props.mask &&
-                                h(
-                                  Transition,
-                                  { name: 'modal-mask', appear: true },
-                                  {
-                                    default: () =>
-                                      props.visible
-                                        ? h('div', {
-                                            class: modalMaskClasses,
-                                            'aria-hidden': 'true',
-                                          })
-                                        : null,
-                                  }
-                                ),
-                              // Content
-                              modalContent,
-                            ]
-                          )
-                        : null,
-                  }
-                )
-              : null,
-        }
+        teleportedChildren
       );
     };
   },

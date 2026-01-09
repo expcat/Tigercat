@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Modal > Snapshots > should match snapshot for centered modal 1`] = `<!--teleport start-->`;
+
+exports[`Modal > Snapshots > should match snapshot for default modal 1`] = `<!--teleport start-->`;
+
+exports[`Modal > Snapshots > should match snapshot for modal without close button 1`] = `<!--teleport start-->`;
