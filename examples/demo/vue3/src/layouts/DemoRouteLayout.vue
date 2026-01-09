@@ -84,11 +84,11 @@ watch(
   <div class="min-h-screen">
     <div
       v-if="!isHome && (headerTitle || sections.length > 0)"
-      class="sticky top-0 z-20 border-b border-gray-200 bg-white/90 backdrop-blur"
+      class="sticky top-0 z-20 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80"
     >
       <div class="max-w-5xl mx-auto px-8 py-3">
         <div class="flex items-center justify-between gap-4">
-          <div class="min-w-0 text-sm font-semibold text-gray-900 truncate">
+          <div class="min-w-0 text-sm font-semibold text-gray-900 truncate dark:text-gray-100">
             {{ headerTitle }}
           </div>
           <div v-if="sections.length > 0" class="flex items-center gap-2 flex-wrap justify-end">
@@ -96,7 +96,7 @@ watch(
               v-for="s in sections"
               :key="s.id"
               :href="`#${s.id}`"
-              class="text-sm px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200"
+              class="text-sm px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
             >
               {{ s.label }}
             </a>
