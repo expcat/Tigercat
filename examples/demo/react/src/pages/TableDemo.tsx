@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Table, Button, Space, type TableColumn } from '@tigercat/react';
 
 interface UserData extends Record<string, unknown> {
@@ -414,12 +413,6 @@ const TableDemo: React.FC = () => {
           />
         </div>
       </section>
-
-      <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-        <Link to="/" className="text-blue-600 hover:text-blue-800">
-          ← 返回首页
-        </Link>
-      </div>
     </div>
   );
 };

@@ -42,17 +42,6 @@ const serverConfig = [
   { label: 'IP 地址', content: '192.168.1.100' },
 ]
 
-const featureNav: Array<[string, string]> = [
-  ['#basic', '基本用法'],
-  ['#bordered', '带边框'],
-  ['#size', '尺寸'],
-  ['#vertical', '垂直布局'],
-  ['#column', '列数'],
-  ['#span', '跨列'],
-  ['#extra', '操作区域'],
-  ['#style', '自定义样式'],
-  ['#colon', '无冒号'],
-]
 </script>
 
 <template>
@@ -60,20 +49,6 @@ const featureNav: Array<[string, string]> = [
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Descriptions 描述列表</h1>
       <p class="text-gray-600">用于展示结构化数据、详情信息的描述列表组件。</p>
-    </div>
-
-    <div class="mb-10 p-4 bg-white border border-gray-200 rounded-lg">
-      <div class="text-sm font-semibold text-gray-900 mb-3">功能导航</div>
-      <div class="flex flex-wrap gap-2">
-        <a
-          v-for="[href, label] in featureNav"
-          :key="href"
-          :href="href"
-          class="text-sm px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700"
-        >
-          {{ label }}
-        </a>
-      </div>
     </div>
 
     <!-- 基本用法 -->
@@ -202,9 +177,5 @@ const featureNav: Array<[string, string]> = [
         <Descriptions title="服务器配置" :colon="false" bordered :items="serverConfig" />
       </div>
     </section>
-
-    <div class="mt-8 p-4 bg-blue-50 rounded-lg">
-      <router-link to="/" class="text-blue-600 hover:text-blue-800">← 返回首页</router-link>
-    </div>
   </div>
 </template>

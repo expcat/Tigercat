@@ -1,5 +1,4 @@
 import { Divider, Tag, Timeline } from '@tigercat/react';
-import { Link } from 'react-router-dom';
 
 type ProjectStatus = 'completed' | 'in-progress' | 'pending';
 
@@ -119,18 +118,6 @@ export default function TimelineDemo() {
     { key: 3, label: '2024-01-10', content: '待处理' },
   ];
 
-  const featureNav: Array<[string, string]> = [
-    ['#basic', '基本用法'],
-    ['#mode', '展示模式'],
-    ['#color', '自定义颜色'],
-    ['#dot', '自定义节点'],
-    ['#render-dot', 'renderDot'],
-    ['#render-item', '自定义内容'],
-    ['#pending', '等待状态'],
-    ['#reverse', '反转顺序'],
-    ['#example', '完整示例'],
-  ];
-
   const getStatusVariant = (
     status: ProjectStatus
   ): 'success' | 'primary' | 'info' => {
@@ -151,20 +138,6 @@ export default function TimelineDemo() {
         <p className="text-gray-600">
           垂直展示时间流信息的时间线组件，支持多种模式与自定义渲染。
         </p>
-      </div>
-
-      <div className="mb-10 p-4 bg-white border border-gray-200 rounded-lg">
-        <div className="text-sm font-semibold text-gray-900 mb-3">功能导航</div>
-        <div className="flex flex-wrap gap-2">
-          {featureNav.map(([href, label]) => (
-            <a
-              key={href}
-              href={href}
-              className="text-sm px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700">
-              {label}
-            </a>
-          ))}
-        </div>
       </div>
 
       <section id="basic" className="mb-12">
@@ -374,12 +347,6 @@ export default function TimelineDemo() {
           </div>
         </div>
       </section>
-
-      <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-        <Link to="/" className="text-blue-600 hover:text-blue-800">
-          ← 返回首页
-        </Link>
-      </div>
     </div>
   );
 }

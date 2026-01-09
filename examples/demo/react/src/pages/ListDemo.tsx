@@ -7,7 +7,6 @@ import {
   Button,
   type ListProps,
 } from '@tigercat/react';
-import { Link } from 'react-router-dom';
 
 export default function ListDemo() {
   type DemoItem = NonNullable<ListProps['dataSource']>[number];
@@ -109,34 +108,6 @@ export default function ListDemo() {
         <p className="text-gray-600">
           通用列表组件，用于展示一系列相似的数据项。
         </p>
-      </div>
-
-      <div className="mb-10 p-4 bg-white border border-gray-200 rounded-lg">
-        <div className="text-sm font-semibold text-gray-900 mb-3">功能导航</div>
-        <div className="flex flex-wrap gap-2">
-          {[
-            ['#basic', '基本用法'],
-            ['#size', '尺寸'],
-            ['#border', '边框'],
-            ['#split', '分割线'],
-            ['#avatar', '头像'],
-            ['#extra', '额外内容'],
-            ['#renderItem', '自定义渲染'],
-            ['#headerFooter', '头尾'],
-            ['#pagination', '分页'],
-            ['#grid', '网格'],
-            ['#loading', '加载'],
-            ['#empty', '空态'],
-            ['#clickable', '点击'],
-          ].map(([href, label]) => (
-            <a
-              key={href}
-              href={href}
-              className="px-3 py-1.5 text-sm rounded-full border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:border-gray-300 transition-colors">
-              {label}
-            </a>
-          ))}
-        </div>
       </div>
 
       {/* 基本用法 */}
@@ -393,12 +364,6 @@ export default function ListDemo() {
         </div>
         <Divider className="my-6" />
       </section>
-
-      <div className="mt-8 p-4 bg-blue-50 rounded-lg">
-        <Link to="/" className="text-blue-600 hover:text-blue-800">
-          ← 返回首页
-        </Link>
-      </div>
     </div>
   );
 }

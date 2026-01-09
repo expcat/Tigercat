@@ -177,9 +177,5 @@ const beforeUpload = (file: File) => {
         </div>
       </div>
     </section>
-
-    <div class="mt-8 p-4 bg-blue-50 rounded-lg">
-      <router-link to="/" class="text-blue-600 hover:text-blue-800">← 返回首页</router-link>
-    </div>
   </div>
 </template>
