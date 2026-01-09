@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Card, Space, Divider, Button } from '@tigercat/react';
 
 export default function CardDemo() {
@@ -258,6 +259,12 @@ export default function CardDemo() {
           </div>
         </div>
       </section>
+
+      <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+        <Link to="/" className="text-blue-600 hover:text-blue-800">
+          ← 返回首页
+        </Link>
+      </div>
     </div>
   );
 }

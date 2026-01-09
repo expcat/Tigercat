@@ -75,14 +75,14 @@ const FormDemo: React.FC = () => {
       ],
       email: [
         { required: true, message: '请输入邮箱' },
-        { type: 'email', message: '请输入有效的邮箱地址' },
+        { type: 'email' as const, message: '请输入有效的邮箱地址' },
       ],
       age: [
         { required: true, message: '请输入年龄' },
-        { type: 'number', message: '年龄必须是数字' },
+        { type: 'number' as const, message: '年龄必须是数字' },
         { min: 1, max: 150, message: '年龄必须在 1 到 150 之间' },
       ],
-      website: [{ type: 'url', message: '请输入有效的 URL' }],
+      website: [{ type: 'url' as const, message: '请输入有效的 URL' }],
     }),
     []
   );
