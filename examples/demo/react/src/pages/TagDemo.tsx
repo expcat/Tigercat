@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Tag, Space, Divider } from '@tigercat/react';
 
 const TagDemo: React.FC = () => {
@@ -215,6 +216,12 @@ const TagDemo: React.FC = () => {
           </Space>
         </div>
       </section>
+
+      <div className="mt-8 p-4 bg-blue-50 rounded-lg">
+        <Link to="/" className="text-blue-600 hover:text-blue-800">
+          ← 返回首页
+        </Link>
+      </div>
     </div>
   );
 };

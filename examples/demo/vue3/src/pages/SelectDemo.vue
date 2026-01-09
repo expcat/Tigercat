@@ -198,7 +198,7 @@ const groupedOptions = [
                   :options="countries"
                   searchable
                   placeholder="搜索国家"
-                  @search="(q: string) => { lastSearchQuery.value = q }" />
+              @search="(q: string) => { lastSearchQuery = q }" />
           <p class="text-sm text-gray-600">最近一次搜索：{{ lastSearchQuery || '（无）' }}</p>
         </Space>
       </div>
