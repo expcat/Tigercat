@@ -44,14 +44,16 @@ const categories = ['基础组件', '表单组件', '布局组件', '数据展�
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto p-8">
+  <div class="max-w-7xl mx-auto p-6 sm:p-8">
     <div class="mb-8">
-      <div class="flex items-center justify-between mb-4">
-        <div>
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
+        <div class="min-w-0">
           <h1 class="text-4xl font-bold mb-2">Tigercat Vue3 组件演示</h1>
           <p class="text-gray-600">基于 Tailwind CSS 的 Vue 3 UI 组件库</p>
         </div>
-        <ThemeSwitch />
+        <div class="self-start sm:self-auto">
+          <ThemeSwitch />
+        </div>
       </div>
       <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
         <p class="text-sm text-blue-800">

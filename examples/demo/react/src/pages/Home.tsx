@@ -45,16 +45,18 @@ const categories = ['基础组件', '表单组件', '布局组件', '数据展�
 
 const Home: React.FC = () => {
   return (
-    <div className="max-w-7xl mx-auto p-8">
+    <div className="max-w-7xl mx-auto p-6 sm:p-8">
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
+          <div className="min-w-0">
             <h1 className="text-4xl font-bold mb-2">Tigercat React 组件演示</h1>
             <p className="text-gray-600">
               基于 Tailwind CSS 的 React UI 组件库
             </p>
           </div>
-          <ThemeSwitch />
+          <div className="self-start sm:self-auto">
+            <ThemeSwitch />
+          </div>
         </div>
         <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
           <p className="text-sm text-blue-800">
