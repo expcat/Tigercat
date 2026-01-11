@@ -22,6 +22,7 @@ export { Input } from './components/Input';
 export { Form } from './components/Form';
 export { FormItem } from './components/FormItem';
 export { Space } from './components/Space';
+export type { VueSpaceProps } from './components/Space';
 export { Divider } from './components/Divider';
 export { Layout } from './components/Layout';
 export { Header } from './components/Header';

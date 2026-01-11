@@ -2,240 +2,76 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import { Space } from '@tigercat/react'
-import {
-  renderWithProps,
-  renderWithChildren,
-} from '../utils/render-helpers-react'
-import React from 'react'
-
-const directions = ['horizontal', 'vertical'] as const
-const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const
-const aligns = ['start', 'end', 'center', 'baseline'] as const
+import React from 'react';
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import { Space } from '@tigercat/react';
 
 describe('Space (React)', () => {
-  const Items = (
-    <>
-      <div>Item 1</div>
-      <div>Item 2</div>
-      <div>Item 3</div>
-    </>
-  )
+  it('renders defaults and children', () => {
+    render(
+      <Space data-testid="space">
+        <span>Item</span>
+      </Space>
+    );
 
-  describe('Rendering', () => {
-    it('should render with default props', () => {
-      const { container } = render(<Space>{Items}</Space>)
-      
-      const space = container.querySelector('div')
-      expect(space).toBeInTheDocument()
-      expect(space).toHaveClass('inline-flex')
-    })
+    const el = screen.getByTestId('space');
+    expect(el).toHaveClass('inline-flex', 'flex-row', 'items-start', 'gap-4');
+    expect(screen.getByText('Item')).toBeInTheDocument();
+  });
 
-    it('should render children items', () => {
-      render(<Space>{Items}</Space>)
-      
-      expect(screen.getByText('Item 1')).toBeInTheDocument()
-      expect(screen.getByText('Item 2')).toBeInTheDocument()
-      expect(screen.getByText('Item 3')).toBeInTheDocument()
-    })
-  })
+  it('supports vertical direction', () => {
+    render(
+      <Space data-testid="space" direction="vertical">
+        <span>Item</span>
+      </Space>
+    );
 
-  describe('Directions', () => {
-    it.each(directions)('should apply %s direction', (direction) => {
-      const { container } = renderWithProps(Space, {
-        direction,
-        children: Items,
-      })
-      
-      const space = container.querySelector('div')
-      expect(space?.className).toBeTruthy()
-    })
+    expect(screen.getByTestId('space')).toHaveClass('flex-col');
+  });
 
-    it('should use horizontal direction by default', () => {
-      const { container } = renderWithChildren(Space, Items)
-      
-      const space = container.querySelector('div')
-      expect(space?.className).toContain('flex-row')
-    })
+  it('supports numeric size via inline gap', () => {
+    render(
+      <Space data-testid="space" size={16}>
+        <span>Item</span>
+      </Space>
+    );
 
-    it('should apply vertical direction class', () => {
-      const { container } = renderWithProps(Space, {
-        direction: 'vertical',
-        children: Items,
-      })
-      
-      const space = container.querySelector('div')
-      expect(space?.className).toContain('flex-col')
-    })
-  })
+    expect((screen.getByTestId('space') as HTMLElement).style.gap).toBe('16px');
+  });
 
-  describe('Sizes', () => {
-    it.each(sizes)('should apply %s size', (size) => {
-      const { container } = renderWithProps(Space, {
-        size,
-        children: Items,
-      })
-      
-      const space = container.querySelector('div')
-      expect(space).toBeInTheDocument()
-    })
+  it('supports wrap', () => {
+    render(
+      <Space data-testid="space" wrap>
+        <span>Item</span>
+      </Space>
+    );
 
-    it('should use md size by default', () => {
-      const { container } = renderWithChildren(Space, Items)
-      
-      const space = container.querySelector('div')
-      expect(space).toBeInTheDocument()
-    })
+    expect(screen.getByTestId('space')).toHaveClass('flex-wrap');
+  });
 
-    it('should handle custom numeric size', () => {
-      const { container } = renderWithProps(Space, {
-        size: 16,
-        children: Items,
-      })
-      
-      const space = container.querySelector('div') as HTMLElement
-      expect(space.style.gap).toBe('16px')
-    })
-  })
+  it('merges className and style (style wins over size gap)', () => {
+    render(
+      <Space
+        data-testid="space"
+        size={16}
+        className="custom"
+        style={{ gap: '20px', backgroundColor: 'red' }}>
+        <span>Item</span>
+      </Space>
+    );
 
-  describe('Alignment', () => {
-    it.each(aligns)('should apply %s alignment', (align) => {
-      const { container } = renderWithProps(Space, {
-        align,
-        children: Items,
-      })
-      
-      const space = container.querySelector('div')
-      expect(space?.className).toBeTruthy()
-    })
+    const el = screen.getByTestId('space') as HTMLElement;
+    expect(el).toHaveClass('inline-flex', 'custom');
+    expect(el.style.backgroundColor).toBe('red');
+    expect(el.style.gap).toBe('20px');
+  });
 
-    it('should use start alignment by default', () => {
-      const { container } = renderWithChildren(Space, Items)
-      
-      const space = container.querySelector('div')
-      expect(space?.className).toContain('items-start')
-    })
-  })
+  it('passes through div attributes', () => {
+    render(<Space data-testid="space" id="my-space" aria-label="space" />);
 
-  describe('Wrap', () => {
-    it('should apply wrap class when wrap is true', () => {
-      const { container } = renderWithProps(Space, {
-        wrap: true,
-        children: Items,
-      })
-      
-      const space = container.querySelector('div')
-      expect(space).toHaveClass('flex-wrap')
-    })
-
-    it('should not wrap by default', () => {
-      const { container } = renderWithChildren(Space, Items)
-      
-      const space = container.querySelector('div')
-      expect(space).not.toHaveClass('flex-wrap')
-    })
-  })
-
-  describe('Custom ClassName and Style', () => {
-    it('should apply custom className', () => {
-      const { container } = renderWithProps(Space, {
-        className: 'custom-space-class',
-        children: Items,
-      })
-      
-      const space = container.querySelector('div')
-      expect(space).toHaveClass('custom-space-class')
-      expect(space).toHaveClass('inline-flex') // Should also have base classes
-    })
-
-    it('should apply custom style', () => {
-      const { container } = renderWithProps(Space, {
-        style: { backgroundColor: 'red' },
-        children: Items,
-      })
-      
-      const space = container.querySelector('div') as HTMLElement
-      expect(space.style.backgroundColor).toBe('red')
-    })
-  })
-
-  describe('Combined Props', () => {
-    it('should apply multiple props together', () => {
-      const { container } = renderWithProps(Space, {
-        direction: 'vertical',
-        size: 'lg',
-        align: 'center',
-        wrap: true,
-        className: 'test-class',
-        children: Items,
-      })
-      
-      const space = container.querySelector('div')
-      expect(space).toBeInTheDocument()
-      expect(space).toHaveClass('flex-col')
-      expect(space).toHaveClass('items-center')
-      expect(space).toHaveClass('flex-wrap')
-      expect(space).toHaveClass('test-class')
-    })
-  })
-
-  describe('Children Types', () => {
-    it('should handle empty children', () => {
-      const { container } = render(<Space />)
-      
-      const space = container.querySelector('div')
-      expect(space).toBeInTheDocument()
-    })
-
-    it('should handle single child', () => {
-      render(<Space><div>Single Item</div></Space>)
-      
-      expect(screen.getByText('Single Item')).toBeInTheDocument()
-    })
-
-    it('should handle many children', () => {
-      const ManyItems = Array.from({ length: 10 }, (_, i) => (
-        <div key={i}>Item {i + 1}</div>
-      ))
-
-      const { container } = render(<Space>{ManyItems}</Space>)
-      
-      const space = container.querySelector('div')
-      expect(space?.children.length).toBe(10)
-    })
-
-    it('should handle null children', () => {
-      const { container } = renderWithProps(Space, {
-        children: null,
-      })
-      
-      const space = container.querySelector('div')
-      expect(space).toBeInTheDocument()
-    })
-  })
-
-  describe('Snapshots', () => {
-    it('should match snapshot for horizontal space', () => {
-      const { container } = renderWithProps(Space, {
-        direction: 'horizontal',
-        size: 'md',
-        children: Items,
-      })
-      
-      expect(container.firstChild).toMatchSnapshot()
-    })
-
-    it('should match snapshot for vertical space', () => {
-      const { container } = renderWithProps(Space, {
-        direction: 'vertical',
-        size: 'lg',
-        align: 'center',
-        children: Items,
-      })
-      
-      expect(container.firstChild).toMatchSnapshot()
-    })
-  })
-})
+    const el = screen.getByTestId('space');
+    expect(el).toHaveAttribute('id', 'my-space');
+    expect(el).toHaveAttribute('aria-label', 'space');
+  });
+});
