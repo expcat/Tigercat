@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Slider` Step1 交付验收（补跑 React/Vue tests）（2026-01-12）
+- 上一步：✅ `Divider` Step1 交付验收（主题默认边框色 + 精简测试）（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -161,7 +161,7 @@
 #### Divider（P3，无需优化）
 
 - 例行检查：role="separator"/aria-orientation（如果是语义分隔）。
-- 状态：未开始
+- 状态：✅ Step1 主题/a11y/测试精简对齐（2026-01-12）：core Divider 默认边框色收敛到 `--tiger-border`（含 fallback）；React 调整 props 透传顺序避免覆盖 `role/aria-*`；移除快照并精简 Vue/React Divider 测试。
 
 #### Space（P3，无需优化）
 
