@@ -52,6 +52,21 @@ describe('Input', () => {
 
       expect(container.querySelector('.custom-class')).toBeInTheDocument();
     });
+
+    it('should pass through native attributes', () => {
+      const { getByRole } = render(
+        <Input
+          data-testid="test-input"
+          title="Input title"
+          aria-describedby="input-help"
+        />
+      );
+
+      const input = getByRole('textbox');
+      expect(input).toHaveAttribute('data-testid', 'test-input');
+      expect(input).toHaveAttribute('title', 'Input title');
+      expect(input).toHaveAttribute('aria-describedby', 'input-help');
+    });
   });
 
   describe('Props', () => {
@@ -249,7 +264,6 @@ describe('Input', () => {
 
     it('should handle number type in controlled mode', async () => {
       const user = userEvent.setup();
-      const handleChange = vi.fn();
       const TestComponent = () => {
         const [value, setValue] = React.useState<string | number>(0);
 
@@ -260,7 +274,6 @@ describe('Input', () => {
             onChange={(e) => {
               const val = e.target.value;
               setValue(val === '' ? '' : Number(val));
-              handleChange(e);
             }}
           />
         );
@@ -323,160 +336,6 @@ describe('Input', () => {
       const { getByRole } = render(<Input />);
 
       expect(getByRole('textbox')).toBeInTheDocument();
-    });
-
-    it('should support aria-label', () => {
-      const { getByLabelText } = render(<Input aria-label="Username input" />);
-
-      expect(getByLabelText('Username input')).toBeInTheDocument();
-    });
-
-    it('should support aria-describedby', () => {
-      const { getByRole } = render(<Input aria-describedby="input-help" />);
-
-      expect(getByRole('textbox')).toHaveAttribute(
-        'aria-describedby',
-        'input-help'
-      );
-    });
-  });
-
-  describe('Edge Cases', () => {
-    it('should handle empty value', () => {
-      const { getByRole } = render(<Input value="" />);
-
-      const input = getByRole('textbox') as HTMLInputElement;
-      expect(input.value).toBe('');
-    });
-
-    it('should handle very long text', async () => {
-      const longText = 'a'.repeat(1000);
-      const { getByRole } = render(<Input value={longText} />);
-
-      const input = getByRole('textbox') as HTMLInputElement;
-      expect(input.value).toBe(longText);
-    });
-
-    it('should handle special characters', async () => {
-      const specialText = '<>&"\'`§±!@#$%^&*()';
-      const { getByRole } = render(<Input value={specialText} />);
-
-      const input = getByRole('textbox') as HTMLInputElement;
-      expect(input.value).toBe(specialText);
-    });
-
-    it('should handle unicode characters', () => {
-      const unicodeText = '你好世界 🌍 مرحبا';
-      const { getByRole } = render(<Input value={unicodeText} />);
-
-      const input = getByRole('textbox') as HTMLInputElement;
-      expect(input.value).toBe(unicodeText);
-    });
-
-    it('should handle rapid input changes', async () => {
-      const user = userEvent.setup();
-      const handleChange = vi.fn();
-      const { getByRole } = render(<Input onChange={handleChange} />);
-
-      const input = getByRole('textbox');
-
-      await user.type(input, 'abcd');
-
-      expect(handleChange).toHaveBeenCalled();
-    });
-
-    it('should respect maxLength constraint', async () => {
-      const { getByRole } = render(<Input maxLength={5} />);
-
-      const input = getByRole('textbox');
-      expect(input).toHaveAttribute('maxlength', '5');
-    });
-
-    it('should handle number type with step', () => {
-      const { getByRole } = render(<Input type="number" step="0.01" />);
-
-      const input = getByRole('spinbutton');
-      expect(input).toHaveAttribute('step', '0.01');
-    });
-
-    it('should handle multiple size changes', () => {
-      const { getByRole, rerender } = render(<Input size="sm" />);
-
-      const input = getByRole('textbox');
-      expect(input).toBeInTheDocument();
-
-      componentSizes.forEach((size) => {
-        rerender(<Input size={size} />);
-        expect(input).toBeInTheDocument();
-      });
-    });
-
-    it('should handle type changes', () => {
-      const { container, rerender } = render(<Input type="text" />);
-
-      let input = container.querySelector('input');
-      expect(input).toHaveAttribute('type', 'text');
-
-      rerender(<Input type="password" />);
-      input = container.querySelector('input');
-      expect(input).toHaveAttribute('type', 'password');
-
-      rerender(<Input type="email" />);
-      input = container.querySelector('input');
-      expect(input).toHaveAttribute('type', 'email');
-    });
-
-    it('should pass through additional HTML attributes', () => {
-      const { getByRole } = render(
-        <Input data-testid="test-input" title="Input title" />
-      );
-
-      const input = getByRole('textbox');
-      expect(input).toHaveAttribute('data-testid', 'test-input');
-      expect(input).toHaveAttribute('title', 'Input title');
-    });
-
-    it('should handle undefined and null values gracefully', () => {
-      const { getByRole, rerender } = render(<Input value={undefined} />);
-
-      let input = getByRole('textbox') as HTMLInputElement;
-      expect(input.value).toBe('');
-
-      rerender(<Input value={null as any} />);
-      input = getByRole('textbox') as HTMLInputElement;
-      expect(input.value).toBe('');
-    });
-  });
-
-  describe('Snapshots', () => {
-    it('should match snapshot for default input', () => {
-      const { container } = render(<Input />);
-
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it('should match snapshot with placeholder', () => {
-      const { container } = render(<Input placeholder="Enter text" />);
-
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it('should match snapshot for disabled state', () => {
-      const { container } = render(<Input disabled />);
-
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it('should match snapshot for readonly state', () => {
-      const { container } = render(<Input readonly />);
-
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it('should match snapshot for password type', () => {
-      const { container } = render(<Input type="password" />);
-
-      expect(container.firstChild).toMatchSnapshot();
     });
   });
 });

@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Grid(Row/Col)` Step1 透传/响应性/类型导出/测试精简（2026-01-12）
+- 上一步：✅ `Input` Step1 主题/透传/类型导出/测试精简（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -188,7 +188,7 @@
 
 - 思路：受控/非受控一致；clearable/前后缀 slot/children；aria-invalid/aria-describedby。
 - 可拆分：API → a11y → core input-styles 对齐 → tests。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/类型导出/测试精简（2026-01-12）：core `input-styles` 改为 CSS vars（`--tiger-border/--tiger-surface/--tiger-text/--tiger-text-muted/--tiger-surface-muted` + `--tiger-primary`）；React Input 支持原生 `input` 属性透传并精简内部逻辑（保留受控/非受控与 number 解析）；Vue Input 修复 `attrs.class` 覆盖问题并合并 `class/style`，新增并导出 `VueInputProps`；移除 Input 快照与过度 edge cases，保留关键路径与 a11y 基线；同步修正文档示例与主题变量说明（Demo 无需修改）。
 
 #### Textarea（P1，建议优化）
 
