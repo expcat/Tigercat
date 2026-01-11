@@ -10,6 +10,7 @@ export const version = '0.0.1';
 export * from './utils/class-names';
 export * from './utils/select-utils';
 export * from './utils/input-styles';
+export * from './utils/textarea-auto-resize';
 export * from './utils/form-validation';
 export * from './utils/grid';
 export * from './utils/divider';
