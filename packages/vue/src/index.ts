@@ -65,6 +65,7 @@ export { Tree } from './components/Tree';
 export type { VueTreeProps } from './components/Tree';
 export { Skeleton } from './components/Skeleton';
 export { Progress } from './components/Progress';
+export type { VueProgressProps } from './components/Progress';
 export { Menu } from './components/Menu';
 export { MenuItem } from './components/MenuItem';
 export { SubMenu } from './components/SubMenu';

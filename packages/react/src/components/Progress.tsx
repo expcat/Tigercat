@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import {
   classNames,
   getProgressVariantClasses,
@@ -18,6 +18,7 @@ import {
   progressStripedAnimationClasses,
   progressTrackBgClasses,
   progressCircleTextClasses,
+  progressCircleTrackStrokeClasses,
   type ProgressProps as CoreProgressProps,
   type ProgressVariant,
 } from '@tigercat/core';
@@ -41,64 +42,42 @@ export const Progress: React.FC<ProgressProps> = ({
   width = 'auto',
   height,
   className,
+  style,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledby,
+  'aria-describedby': ariaDescribedby,
   ...props
 }) => {
-  const clampedPercentage = useMemo(
-    () => clampPercentage(percentage),
-    [percentage]
+  const clampedPercentage = clampPercentage(percentage);
+  const effectiveVariant = (getStatusVariant(status) ||
+    variant) as ProgressVariant;
+  const shouldShowText = showText ?? type === 'line';
+  const displayText = shouldShowText
+    ? formatProgressText(clampedPercentage, text, format)
+    : '';
+
+  const resolvedAriaLabel =
+    ariaLabel ??
+    (ariaLabelledby ? undefined : `Progress: ${clampedPercentage}%`);
+
+  const lineTrackClasses = classNames(
+    progressLineBaseClasses,
+    progressTrackBgClasses,
+    !height && progressLineSizeClasses[size]
   );
 
-  // Determine effective variant based on status
-  const effectiveVariant = useMemo(() => {
-    const statusVariant = getStatusVariant(status);
-    return (statusVariant || variant) as ProgressVariant;
-  }, [status, variant]);
+  const lineBarClasses = classNames(
+    progressLineInnerClasses,
+    getProgressVariantClasses(effectiveVariant),
+    striped && progressStripedClasses,
+    striped && stripedAnimation && progressStripedAnimationClasses
+  );
 
-  // Determine if text should be shown
-  const shouldShowText = useMemo(() => {
-    if (showText !== undefined) {
-      return showText;
-    }
-    return type === 'line';
-  }, [showText, type]);
-
-  // Get formatted text
-  const displayText = useMemo(() => {
-    if (!shouldShowText) {
-      return '';
-    }
-    return formatProgressText(clampedPercentage, text, format);
-  }, [shouldShowText, clampedPercentage, text, format]);
-
-  // Line progress classes
-  const lineTrackClasses = useMemo(() => {
-    const heightClass = height
-      ? `h-[${height}px]`
-      : progressLineSizeClasses[size];
-
-    return classNames(
-      progressLineBaseClasses,
-      progressTrackBgClasses,
-      heightClass
-    );
-  }, [size, height]);
-
-  const lineBarClasses = useMemo(() => {
-    return classNames(
-      progressLineInnerClasses,
-      getProgressVariantClasses(effectiveVariant),
-      striped && progressStripedClasses,
-      striped && stripedAnimation && progressStripedAnimationClasses
-    );
-  }, [effectiveVariant, striped, stripedAnimation]);
-
-  const textClasses = useMemo(() => {
-    return classNames(
-      progressTextBaseClasses,
-      progressTextSizeClasses[size],
-      getProgressTextColorClasses(effectiveVariant)
-    );
-  }, [size, effectiveVariant]);
+  const textClasses = classNames(
+    progressTextBaseClasses,
+    progressTextSizeClasses[size],
+    getProgressTextColorClasses(effectiveVariant)
+  );
 
   // Render line progress
   const renderLineProgress = () => {
@@ -107,17 +86,26 @@ export const Progress: React.FC<ProgressProps> = ({
         ? { width: typeof width === 'number' ? `${width}px` : width }
         : {};
 
+    const mergedStyle = {
+      ...(style ?? {}),
+      ...containerStyle,
+    };
+
     return (
       <div
+        {...props}
         className={classNames('flex items-center', className)}
-        style={containerStyle}
-        {...props}>
-        <div className={lineTrackClasses} style={{ flex: 1 }}>
+        style={mergedStyle}>
+        <div
+          className={lineTrackClasses}
+          style={{ flex: 1, ...(height ? { height: `${height}px` } : {}) }}>
           <div
             className={lineBarClasses}
             style={{ width: `${clampedPercentage}%` }}
             role="progressbar"
-            aria-label={`Progress: ${clampedPercentage}%`}
+            aria-label={resolvedAriaLabel}
+            aria-labelledby={ariaLabelledby}
+            aria-describedby={ariaDescribedby}
             aria-valuenow={clampedPercentage}
             aria-valuemin={0}
             aria-valuemax={100}
@@ -150,23 +138,26 @@ export const Progress: React.FC<ProgressProps> = ({
 
     return (
       <div
+        {...props}
         className={classNames(progressCircleBaseClasses, className)}
-        style={{ width: `${svgWidth}px`, height: `${svgHeight}px` }}
-        {...props}>
+        style={{
+          ...(style ?? {}),
+          width: `${svgWidth}px`,
+          height: `${svgHeight}px`,
+        }}>
         <svg
           width={svgWidth}
           height={svgHeight}
           viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
-          {/* Background circle */}
           <circle
             cx={cx}
             cy={cy}
             r={radius}
             fill="none"
-            stroke="#e5e7eb"
+            stroke="currentColor"
+            className={progressCircleTrackStrokeClasses}
             strokeWidth={strokeWidth}
           />
-          {/* Progress circle */}
           <circle
             cx={cx}
             cy={cy}
@@ -184,7 +175,9 @@ export const Progress: React.FC<ProgressProps> = ({
               transformOrigin: 'center',
             }}
             role="progressbar"
-            aria-label={`Progress: ${clampedPercentage}%`}
+            aria-label={resolvedAriaLabel}
+            aria-labelledby={ariaLabelledby}
+            aria-describedby={ariaDescribedby}
             aria-valuenow={clampedPercentage}
             aria-valuemin={0}
             aria-valuemax={100}
@@ -205,8 +198,6 @@ export const Progress: React.FC<ProgressProps> = ({
     );
   };
 
-  if (type === 'circle') {
-    return renderCircleProgress();
-  }
+  if (type === 'circle') return renderCircleProgress();
   return renderLineProgress();
 };

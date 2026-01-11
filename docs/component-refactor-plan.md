@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Alert` Step1 主题/透传/a11y/测试精简（2026-01-12）
+- 上一步：✅ `Progress` Step1 主题/透传/a11y/测试精简（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -310,7 +310,7 @@
 #### Progress（P2，建议优化）
 
 - 思路：role="progressbar" + aria-valuenow/min/max；颜色主题变量。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/测试精简（2026-01-12）：core Progress 变体颜色与 track/text 从固定 Tailwind 色/hex 收敛为 CSS vars（含 fallback：`--tiger-primary/--tiger-success/--tiger-warning/--tiger-error/--tiger-info/--tiger-border/--tiger-text/--tiger-text-muted`）；React Progress 移除多余 `useMemo`，修复 `style`/`width` 合并并将 `aria-label/aria-labelledby/aria-describedby` 作用到实际 `progressbar` 元素；Vue Progress 增加 `inheritAttrs: false`，补齐 `className/style` 并导出 `VueProgressProps`，修复 `height` 动态 class 为 inline style，同时转发 `aria-*`；移除快照并精简 Vue/React Progress 测试；同步更新 Progress 文档主题变量与 API。
 
 #### Skeleton（P3，无需优化）
 

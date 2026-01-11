@@ -645,32 +645,32 @@ export interface ProgressThemeColors {
 }
 
 /**
- * Default progress theme colors using Tailwind CSS classes
+ * Default progress theme colors
  */
 export const defaultProgressThemeColors: ProgressThemeColors = {
   default: {
-    bg: 'bg-gray-500',
-    text: 'text-gray-700',
+    bg: 'bg-[var(--tiger-text-muted,#6b7280)]',
+    text: 'text-[var(--tiger-text,#374151)]',
   },
   primary: {
     bg: 'bg-[var(--tiger-primary,#2563eb)]',
     text: 'text-[var(--tiger-primary,#2563eb)]',
   },
   success: {
-    bg: 'bg-green-500',
-    text: 'text-green-600',
+    bg: 'bg-[var(--tiger-success,#16a34a)]',
+    text: 'text-[var(--tiger-success,#16a34a)]',
   },
   warning: {
-    bg: 'bg-yellow-500',
-    text: 'text-yellow-600',
+    bg: 'bg-[var(--tiger-warning,#f59e0b)]',
+    text: 'text-[var(--tiger-warning,#f59e0b)]',
   },
   danger: {
-    bg: 'bg-red-500',
-    text: 'text-red-600',
+    bg: 'bg-[var(--tiger-error,#dc2626)]',
+    text: 'text-[var(--tiger-error,#dc2626)]',
   },
   info: {
-    bg: 'bg-sky-500',
-    text: 'text-sky-600',
+    bg: 'bg-[var(--tiger-info,#0ea5e9)]',
+    text: 'text-[var(--tiger-info,#0ea5e9)]',
   },
 };
 
@@ -699,7 +699,7 @@ export function getProgressTextColorClasses(
   colors: ProgressThemeColors = defaultProgressThemeColors
 ): string {
   const scheme = colors[variant];
-  return scheme.text || 'text-gray-700';
+  return scheme.text || 'text-[var(--tiger-text,#374151)]';
 }
 
 /**
