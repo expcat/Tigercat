@@ -44,7 +44,7 @@ export function getCheckboxClasses(
   ].join(' ');
 
   const disabledClasses = disabled
-    ? 'cursor-not-allowed opacity-50 disabled:bg-gray-100 disabled:border-gray-300'
+    ? 'cursor-not-allowed opacity-50 disabled:bg-[var(--tiger-surface-muted,#f3f4f6)] disabled:border-[var(--tiger-border,#e5e7eb)]'
     : '';
 
   return [baseClasses, sizeClass, colorClasses, disabledClasses]

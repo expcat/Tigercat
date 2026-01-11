@@ -8,10 +8,10 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Checkbox } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Checkbox } from '@tigercat/vue';
 
-const checked = ref(false)
+const checked = ref(false);
 </script>
 
 <template>
@@ -22,17 +22,17 @@ const checked = ref(false)
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Checkbox } from '@tigercat/react'
+import { useState } from 'react';
+import { Checkbox } from '@tigercat/react';
 
 function App() {
-  const [checked, setChecked] = useState(false)
+  const [checked, setChecked] = useState(false);
 
   return (
     <Checkbox checked={checked} onChange={setChecked}>
       同意条款
     </Checkbox>
-  )
+  );
 }
 ```
 
@@ -72,7 +72,9 @@ function App() {
 ```tsx
 <>
   <Checkbox disabled>禁用状态</Checkbox>
-  <Checkbox checked={true} disabled>已选中且禁用</Checkbox>
+  <Checkbox checked={true} disabled>
+    已选中且禁用
+  </Checkbox>
 </>
 ```
 
@@ -84,34 +86,39 @@ function App() {
 
 ```vue
 <script setup>
-import { ref, computed } from 'vue'
-import { Checkbox } from '@tigercat/vue'
+import { ref, computed } from 'vue';
+import { Checkbox, CheckboxGroup } from '@tigercat/vue';
 
-const options = ref(['Apple', 'Banana', 'Orange'])
-const checkedItems = ref(['Apple'])
+const options = ref(['Apple', 'Banana', 'Orange']);
+const checkedItems = ref(['Apple']);
 
-const allChecked = computed(() => checkedItems.value.length === options.value.length)
-const indeterminate = computed(() => 
-  checkedItems.value.length > 0 && checkedItems.value.length < options.value.length
-)
+const allChecked = computed(
+  () => checkedItems.value.length === options.value.length
+);
+const indeterminate = computed(
+  () =>
+    checkedItems.value.length > 0 &&
+    checkedItems.value.length < options.value.length
+);
 
 const handleCheckAll = (checked) => {
-  checkedItems.value = checked ? [...options.value] : []
-}
+  checkedItems.value = checked ? [...options.value] : [];
+};
 </script>
 
 <template>
   <div>
-    <Checkbox 
+    <Checkbox
       :model-value="allChecked"
       :indeterminate="indeterminate"
-      @change="handleCheckAll"
-    >
+      @change="handleCheckAll">
       全选
     </Checkbox>
-    <div v-for="item in options" :key="item">
-      <Checkbox v-model="checkedItems" :value="item">{{ item }}</Checkbox>
-    </div>
+    <CheckboxGroup v-model="checkedItems">
+      <div v-for="item in options" :key="item">
+        <Checkbox :value="item">{{ item }}</Checkbox>
+      </div>
+    </CheckboxGroup>
   </div>
 </template>
 ```
@@ -119,33 +126,32 @@ const handleCheckAll = (checked) => {
 ### React
 
 ```tsx
-import { useState, useMemo } from 'react'
-import { Checkbox } from '@tigercat/react'
+import { useState, useMemo } from 'react';
+import { Checkbox } from '@tigercat/react';
 
 function App() {
-  const options = ['Apple', 'Banana', 'Orange']
-  const [checkedItems, setCheckedItems] = useState(['Apple'])
+  const options = ['Apple', 'Banana', 'Orange'];
+  const [checkedItems, setCheckedItems] = useState(['Apple']);
 
   const allChecked = useMemo(
     () => checkedItems.length === options.length,
     [checkedItems]
-  )
+  );
   const indeterminate = useMemo(
     () => checkedItems.length > 0 && checkedItems.length < options.length,
     [checkedItems]
-  )
+  );
 
   const handleCheckAll = (checked: boolean) => {
-    setCheckedItems(checked ? [...options] : [])
-  }
+    setCheckedItems(checked ? [...options] : []);
+  };
 
   return (
     <div>
       <Checkbox
         checked={allChecked}
         indeterminate={indeterminate}
-        onChange={handleCheckAll}
-      >
+        onChange={handleCheckAll}>
         全选
       </Checkbox>
       {options.map((item) => (
@@ -158,14 +164,13 @@ function App() {
               checked
                 ? [...checkedItems, item]
                 : checkedItems.filter((i) => i !== item)
-            )
-          }}
-        >
+            );
+          }}>
           {item}
         </Checkbox>
       ))}
     </div>
-  )
+  );
 }
 ```
 
@@ -177,10 +182,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Checkbox, CheckboxGroup } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Checkbox, CheckboxGroup } from '@tigercat/vue';
 
-const selectedFruits = ref(['apple'])
+const selectedFruits = ref(['apple']);
 </script>
 
 <template>
@@ -196,11 +201,11 @@ const selectedFruits = ref(['apple'])
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Checkbox, CheckboxGroup } from '@tigercat/react'
+import { useState } from 'react';
+import { Checkbox, CheckboxGroup } from '@tigercat/react';
 
 function App() {
-  const [selectedFruits, setSelectedFruits] = useState(['apple'])
+  const [selectedFruits, setSelectedFruits] = useState(['apple']);
 
   return (
     <>
@@ -211,7 +216,7 @@ function App() {
       </CheckboxGroup>
       <p>已选择: {selectedFruits.join(', ')}</p>
     </>
-  )
+  );
 }
 ```
 
@@ -295,82 +300,82 @@ function App() {
 
 ### Checkbox Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 | 可选值 |
-|------|------|------|--------|--------|
-| size | 复选框尺寸 | `CheckboxSize` | `'md'` | `'sm'` \| `'md'` \| `'lg'` |
-| disabled | 是否禁用 | `boolean` | `false` | `true` \| `false` |
-| indeterminate | 是否处于不确定状态 | `boolean` | `false` | `true` \| `false` |
-| value | 复选框的值（用于复选框组） | `string \| number \| boolean` | - | - |
+| 属性          | 说明                       | 类型                          | 默认值  | 可选值                     |
+| ------------- | -------------------------- | ----------------------------- | ------- | -------------------------- |
+| size          | 复选框尺寸                 | `CheckboxSize`                | `'md'`  | `'sm'` \| `'md'` \| `'lg'` |
+| disabled      | 是否禁用                   | `boolean`                     | `false` | `true` \| `false`          |
+| indeterminate | 是否处于不确定状态         | `boolean`                     | `false` | `true` \| `false`          |
+| value         | 复选框的值（用于复选框组） | `string \| number \| boolean` | -       | -                          |
 
 #### Vue 专属属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| modelValue | 复选框选中状态（v-model） | `boolean` | - |
+| 属性           | 说明                       | 类型      | 默认值  |
+| -------------- | -------------------------- | --------- | ------- |
+| modelValue     | 复选框选中状态（v-model）  | `boolean` | -       |
 | defaultChecked | 默认选中状态（非受控模式） | `boolean` | `false` |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| checked | 复选框选中状态（受控模式） | `boolean` | - |
-| defaultChecked | 默认选中状态（非受控模式） | `boolean` | `false` |
-| onChange | 选中状态改变时的回调 | `(checked: boolean, event: ChangeEvent) => void` | - |
-| className | 额外的 CSS 类名 | `string` | - |
-| children | 复选框标签内容 | `React.ReactNode` | - |
+| 属性           | 说明                       | 类型                                             | 默认值  |
+| -------------- | -------------------------- | ------------------------------------------------ | ------- |
+| checked        | 复选框选中状态（受控模式） | `boolean`                                        | -       |
+| defaultChecked | 默认选中状态（非受控模式） | `boolean`                                        | `false` |
+| onChange       | 选中状态改变时的回调       | `(checked: boolean, event: ChangeEvent) => void` | -       |
+| className      | 额外的 CSS 类名            | `string`                                         | -       |
+| children       | 复选框标签内容             | `React.ReactNode`                                | -       |
 
 ### CheckboxGroup Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| disabled | 是否禁用所有复选框 | `boolean` | `false` |
-| size | 复选框尺寸 | `CheckboxSize` | `'md'` |
+| 属性     | 说明               | 类型           | 默认值  |
+| -------- | ------------------ | -------------- | ------- |
+| disabled | 是否禁用所有复选框 | `boolean`      | `false` |
+| size     | 复选框尺寸         | `CheckboxSize` | `'md'`  |
 
 #### Vue 专属属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| modelValue | 选中的值数组（v-model） | `(string \| number \| boolean)[]` | - |
-| defaultValue | 默认选中的值数组（非受控模式） | `(string \| number \| boolean)[]` | `[]` |
+| 属性         | 说明                           | 类型                              | 默认值 |
+| ------------ | ------------------------------ | --------------------------------- | ------ |
+| modelValue   | 选中的值数组（v-model）        | `(string \| number \| boolean)[]` | -      |
+| defaultValue | 默认选中的值数组（非受控模式） | `(string \| number \| boolean)[]` | `[]`   |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| value | 选中的值数组（受控模式） | `(string \| number \| boolean)[]` | - |
-| defaultValue | 默认选中的值数组（非受控模式） | `(string \| number \| boolean)[]` | `[]` |
-| onChange | 选中值改变时的回调 | `(value: (string \| number \| boolean)[]) => void` | - |
-| className | 额外的 CSS 类名 | `string` | - |
-| children | 复选框组内容 | `React.ReactNode` | - |
+| 属性         | 说明                           | 类型                                               | 默认值 |
+| ------------ | ------------------------------ | -------------------------------------------------- | ------ |
+| value        | 选中的值数组（受控模式）       | `(string \| number \| boolean)[]`                  | -      |
+| defaultValue | 默认选中的值数组（非受控模式） | `(string \| number \| boolean)[]`                  | `[]`   |
+| onChange     | 选中值改变时的回调             | `(value: (string \| number \| boolean)[]) => void` | -      |
+| className    | 额外的 CSS 类名                | `string`                                           | -      |
+| children     | 复选框组内容                   | `React.ReactNode`                                  | -      |
 
 ### Events / 事件 (Vue)
 
 #### Checkbox
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| update:modelValue | 选中状态改变时触发 | `(value: boolean)` |
-| change | 选中状态改变时触发 | `(value: boolean, event: Event)` |
+| 事件名            | 说明               | 回调参数                         |
+| ----------------- | ------------------ | -------------------------------- |
+| update:modelValue | 选中状态改变时触发 | `(value: boolean)`               |
+| change            | 选中状态改变时触发 | `(value: boolean, event: Event)` |
 
 #### CheckboxGroup
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
+| 事件名            | 说明             | 回调参数                                   |
+| ----------------- | ---------------- | ------------------------------------------ |
 | update:modelValue | 选中值改变时触发 | `(value: (string \| number \| boolean)[])` |
-| change | 选中值改变时触发 | `(value: (string \| number \| boolean)[])` |
+| change            | 选中值改变时触发 | `(value: (string \| number \| boolean)[])` |
 
 ### Slots / 插槽 (Vue)
 
 #### Checkbox
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明           |
+| ------- | -------------- |
 | default | 复选框标签内容 |
 
 #### CheckboxGroup
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明         |
+| ------- | ------------ |
 | default | 复选框组内容 |
 
 ## 样式定制
@@ -414,10 +419,10 @@ Checkbox 组件使用 Tailwind CSS 构建，支持通过 CSS 变量进行主题�
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { CheckboxGroup, Checkbox } from '@tigercat/vue'
+import { ref } from 'vue';
+import { CheckboxGroup, Checkbox } from '@tigercat/vue';
 
-const selectedValues = ref(['apple', 'banana'])
+const selectedValues = ref(['apple', 'banana']);
 </script>
 
 <template>
@@ -437,13 +442,13 @@ Checkbox 可以与 Form 和 FormItem 组件配合使用，实现表单验证。
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Form, FormItem, Checkbox, CheckboxGroup, Button } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Form, FormItem, Checkbox, CheckboxGroup, Button } from '@tigercat/vue';
 
 const formData = ref({
   agree: false,
   interests: [],
-})
+});
 
 const rules = {
   agree: [
@@ -458,16 +463,16 @@ const rules = {
       message: '请至少选择一项兴趣',
     },
   ],
-}
+};
 
-const formRef = ref(null)
+const formRef = ref(null);
 
 const handleSubmit = async () => {
-  const valid = await formRef.value?.validate()
+  const valid = await formRef.value?.validate();
   if (valid) {
-    console.log('表单验证通过:', formData.value)
+    console.log('表单验证通过:', formData.value);
   }
-}
+};
 </script>
 
 <template>
@@ -497,14 +502,20 @@ const handleSubmit = async () => {
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Form, FormItem, Checkbox, CheckboxGroup, Button } from '@tigercat/react'
+import { useState } from 'react';
+import {
+  Form,
+  FormItem,
+  Checkbox,
+  CheckboxGroup,
+  Button,
+} from '@tigercat/react';
 
 function ValidationExample() {
   const [formData, setFormData] = useState({
     agree: false,
     interests: [],
-  })
+  });
 
   const rules = {
     agree: [
@@ -519,20 +530,19 @@ function ValidationExample() {
         message: '请至少选择一项兴趣',
       },
     ],
-  }
+  };
 
   const handleSubmit = async () => {
     // 表单验证逻辑
-    console.log('表单数据:', formData)
-  }
+    console.log('表单数据:', formData);
+  };
 
   return (
     <Form model={formData} rules={rules}>
       <FormItem name="agree" required>
         <Checkbox
           checked={formData.agree}
-          onChange={(checked) => setFormData({ ...formData, agree: checked })}
-        >
+          onChange={(checked) => setFormData({ ...formData, agree: checked })}>
           我已阅读并同意《用户协议》和《隐私政策》
         </Checkbox>
       </FormItem>
@@ -540,8 +550,7 @@ function ValidationExample() {
       <FormItem label="兴趣爱好" name="interests" required>
         <CheckboxGroup
           value={formData.interests}
-          onChange={(interests) => setFormData({ ...formData, interests })}
-        >
+          onChange={(interests) => setFormData({ ...formData, interests })}>
           <Checkbox value="reading">阅读</Checkbox>
           <Checkbox value="sports">运动</Checkbox>
           <Checkbox value="music">音乐</Checkbox>
@@ -553,7 +562,7 @@ function ValidationExample() {
         <Button onClick={handleSubmit}>提交</Button>
       </FormItem>
     </Form>
-  )
+  );
 }
 ```
 
@@ -581,16 +590,16 @@ function ValidationExample() {
 
 ```vue
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch } from 'vue';
 
-const selectedValues = ref([])
-const maxSelection = 3
+const selectedValues = ref([]);
+const maxSelection = 3;
 
 watch(selectedValues, (newValues) => {
   if (newValues.length > maxSelection) {
-    selectedValues.value = newValues.slice(0, maxSelection)
+    selectedValues.value = newValues.slice(0, maxSelection);
   }
-})
+});
 </script>
 
 <template>
@@ -626,28 +635,29 @@ watch(selectedValues, (newValues) => {
 
 ```vue
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed } from 'vue';
 
-const allItems = ['item1', 'item2', 'item3']
-const selectedItems = ref(['item1'])
+const allItems = ['item1', 'item2', 'item3'];
+const selectedItems = ref(['item1']);
 
-const allChecked = computed(() => selectedItems.value.length === allItems.length)
-const indeterminate = computed(() => 
-  selectedItems.value.length > 0 && !allChecked.value
-)
+const allChecked = computed(
+  () => selectedItems.value.length === allItems.length
+);
+const indeterminate = computed(
+  () => selectedItems.value.length > 0 && !allChecked.value
+);
 
 const toggleAll = (checked) => {
-  selectedItems.value = checked ? [...allItems] : []
-}
+  selectedItems.value = checked ? [...allItems] : [];
+};
 </script>
 
 <template>
   <div>
-    <Checkbox 
-      :model-value="allChecked" 
+    <Checkbox
+      :model-value="allChecked"
       :indeterminate="indeterminate"
-      @update:model-value="toggleAll"
-    >
+      @update:model-value="toggleAll">
       全选
     </Checkbox>
     <CheckboxGroup v-model="selectedItems" class="ml-4">
@@ -683,7 +693,7 @@ const toggleAll = (checked) => {
 
 ```vue
 <script setup>
-const isPremiumUser = ref(false)
+const isPremiumUser = ref(false);
 </script>
 
 <template>
@@ -705,22 +715,22 @@ Checkbox 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
 // Core types
-import type { 
-  CheckboxProps, 
-  CheckboxGroupProps, 
-  CheckboxSize 
-} from '@tigercat/core'
+import type {
+  CheckboxProps,
+  CheckboxGroupProps,
+  CheckboxSize,
+} from '@tigercat/core';
 
 // Vue
-import type { Checkbox, CheckboxGroup } from '@tigercat/vue'
+import type { Checkbox, CheckboxGroup } from '@tigercat/vue';
 
 // React
-import type { 
-  Checkbox, 
+import type {
+  Checkbox,
   CheckboxGroup,
   CheckboxProps as ReactCheckboxProps,
-  CheckboxGroupProps as ReactCheckboxGroupProps
-} from '@tigercat/react'
+  CheckboxGroupProps as ReactCheckboxGroupProps,
+} from '@tigercat/react';
 ```
 
 ## 相关组件
@@ -739,17 +749,17 @@ import type {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Checkbox, CheckboxGroup } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Checkbox, CheckboxGroup } from '@tigercat/vue';
 
 const form = ref({
   agree: false,
   interests: [],
-})
+});
 
 const handleSubmit = () => {
-  console.log('Form data:', form.value)
-}
+  console.log('Form data:', form.value);
+};
 </script>
 
 <template>
@@ -757,7 +767,7 @@ const handleSubmit = () => {
     <div>
       <Checkbox v-model="form.agree">我同意服务条款</Checkbox>
     </div>
-    
+
     <div>
       <label>兴趣爱好：</label>
       <CheckboxGroup v-model="form.interests">
@@ -767,7 +777,7 @@ const handleSubmit = () => {
         <Checkbox value="travel">旅行</Checkbox>
       </CheckboxGroup>
     </div>
-    
+
     <button type="submit">提交</button>
   </form>
 </template>
@@ -776,46 +786,44 @@ const handleSubmit = () => {
 #### React
 
 ```tsx
-import { useState } from 'react'
-import { Checkbox, CheckboxGroup } from '@tigercat/react'
+import { useState } from 'react';
+import { Checkbox, CheckboxGroup } from '@tigercat/react';
 
 function FormExample() {
   const [form, setForm] = useState({
     agree: false,
     interests: [],
-  })
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('Form data:', form)
-  }
+    e.preventDefault();
+    console.log('Form data:', form);
+  };
 
   return (
     <form onSubmit={handleSubmit}>
       <div>
         <Checkbox
           checked={form.agree}
-          onChange={(checked) => setForm({ ...form, agree: checked })}
-        >
+          onChange={(checked) => setForm({ ...form, agree: checked })}>
           我同意服务条款
         </Checkbox>
       </div>
-      
+
       <div>
         <label>兴趣爱好：</label>
         <CheckboxGroup
           value={form.interests}
-          onChange={(interests) => setForm({ ...form, interests })}
-        >
+          onChange={(interests) => setForm({ ...form, interests })}>
           <Checkbox value="reading">阅读</Checkbox>
           <Checkbox value="sports">运动</Checkbox>
           <Checkbox value="music">音乐</Checkbox>
           <Checkbox value="travel">旅行</Checkbox>
         </CheckboxGroup>
       </div>
-      
+
       <button type="submit">提交</button>
     </form>
-  )
+  );
 }
 ```

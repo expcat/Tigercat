@@ -8,10 +8,11 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Textarea` Step1 主题/透传/类型导出/测试精简（2026-01-12）
+- 上一步：✅ `Checkbox/CheckboxGroup` Step1 主题/透传/类型导出/测试精简（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
+- 已优化组件数/需优化组件数：13/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -198,7 +199,7 @@
 #### Checkbox / CheckboxGroup（P1，建议优化）
 
 - 思路：组内 name/value、indeterminate、键盘操作；将组选中计算抽 core。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/类型导出/测试精简（2026-01-12）：core 补齐 `CheckboxValue/CheckboxGroupValue` 并将 disabled 视觉收敛为 CSS vars；React Checkbox/CheckboxGroup 精简冗余 memo 并补齐原生属性透传类型；Vue Checkbox/CheckboxGroup 增加 `inheritAttrs: false`、class/style 合并透传并导出 `VueCheckboxProps/VueCheckboxGroupProps`；移除快照并精简 Vue/React Checkbox 测试，补齐 group 关键路径；同步修正文档示例。
 
 #### Radio / RadioGroup（P1，建议优化）
 

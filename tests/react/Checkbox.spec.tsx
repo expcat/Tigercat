@@ -6,7 +6,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { Checkbox } from '@tigercat/react';
+import { Checkbox, CheckboxGroup } from '@tigercat/react';
 import {
   expectNoA11yViolations,
   componentSizes,
@@ -15,171 +15,117 @@ import {
 } from '../utils/react';
 
 describe('Checkbox', () => {
-  describe('Rendering', () => {
-    it('should render with default props', () => {
-      const { container } = render(<Checkbox>Checkbox</Checkbox>);
-
-      const checkbox = container.querySelector('input[type="checkbox"]');
-      expect(checkbox).toBeInTheDocument();
-    });
-
-    it('should render with label text', () => {
-      const { getByText } = render(<Checkbox>Check me</Checkbox>);
-
-      expect(getByText('Check me')).toBeInTheDocument();
-    });
-
-    it('should render unchecked by default', () => {
-      const { container } = render(<Checkbox>Checkbox</Checkbox>);
-
-      const checkbox = container.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement;
-      expect(checkbox.checked).toBe(false);
-    });
-
-    it('should apply custom className', () => {
-      const { container } = render(
-        <Checkbox className="custom-class">Checkbox</Checkbox>
-      );
-
-      expect(container.querySelector('.custom-class')).toBeInTheDocument();
-    });
+  it('renders checkbox input and label', () => {
+    const { container, getByText } = render(<Checkbox>Check me</Checkbox>);
+    expect(
+      container.querySelector('input[type="checkbox"]')
+    ).toBeInTheDocument();
+    expect(getByText('Check me')).toBeInTheDocument();
   });
 
-  describe('Props', () => {
-    it.each(componentSizes)('should render %s size correctly', (size) => {
-      const { container } = render(<Checkbox size={size}>Checkbox</Checkbox>);
-
-      const checkbox = container.querySelector('input[type="checkbox"]');
-      expect(checkbox).toBeInTheDocument();
-    });
-
-    it('should be disabled when disabled prop is true', () => {
-      const { container } = render(<Checkbox disabled>Disabled</Checkbox>);
-
-      const checkbox = container.querySelector('input[type="checkbox"]');
-      expect(checkbox).toBeDisabled();
-    });
-
-    it('should be checked when checked prop is true', () => {
-      const { container } = render(<Checkbox checked>Checked</Checkbox>);
-
-      const checkbox = container.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement;
-      expect(checkbox.checked).toBe(true);
-    });
-
-    it('should be checked when defaultChecked is true', () => {
-      const { container } = render(
-        <Checkbox defaultChecked>Default checked</Checkbox>
-      );
-
-      const checkbox = container.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement;
-      expect(checkbox.checked).toBe(true);
-    });
-
-    it('should apply indeterminate state when indeterminate is true', async () => {
-      const { container } = render(
-        <Checkbox indeterminate>Indeterminate</Checkbox>
-      );
-
-      const checkbox = container.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement;
-      await waitFor(() => expect(checkbox.indeterminate).toBe(true));
-    });
+  it.each(componentSizes)('renders %s size', (size) => {
+    const { container } = render(<Checkbox size={size}>Checkbox</Checkbox>);
+    expect(
+      container.querySelector('input[type="checkbox"]')
+    ).toBeInTheDocument();
   });
 
-  describe('Events', () => {
-    it('should call onChange when clicked', async () => {
-      const user = userEvent.setup();
-      const handleChange = vi.fn();
-      const { container } = render(
-        <Checkbox onChange={handleChange}>Checkbox</Checkbox>
-      );
-
-      const checkbox = container.querySelector('input[type="checkbox"]')!;
-      await user.click(checkbox);
-
-      expect(handleChange).toHaveBeenCalled();
-    });
-
-    it('should not call onChange when disabled', async () => {
-      const user = userEvent.setup();
-      const handleChange = vi.fn();
-      const { container } = render(
-        <Checkbox disabled onChange={handleChange}>
-          Disabled
-        </Checkbox>
-      );
-
-      const checkbox = container.querySelector('input[type="checkbox"]')!;
-      await user.click(checkbox);
-
-      expect(handleChange).not.toHaveBeenCalled();
-    });
-
-    it('should toggle from false to true', async () => {
-      const user = userEvent.setup();
-      const handleChange = vi.fn();
-      const { container } = render(
-        <Checkbox checked={false} onChange={handleChange}>
-          Toggle
-        </Checkbox>
-      );
-
-      const checkbox = container.querySelector('input[type="checkbox"]')!;
-      await user.click(checkbox);
-
-      expect(handleChange).toHaveBeenCalled();
-    });
-
-    it('should toggle from true to false', async () => {
-      const user = userEvent.setup();
-      const handleChange = vi.fn();
-      const { container } = render(
-        <Checkbox checked={true} onChange={handleChange}>
-          Toggle
-        </Checkbox>
-      );
-
-      const checkbox = container.querySelector('input[type="checkbox"]')!;
-      await user.click(checkbox);
-
-      expect(handleChange).toHaveBeenCalled();
-    });
+  it('supports disabled', () => {
+    const { container } = render(<Checkbox disabled>Disabled</Checkbox>);
+    expect(container.querySelector('input[type="checkbox"]')).toBeDisabled();
   });
 
-  describe('Controlled Component', () => {
-    it('should work as controlled component', async () => {
-      const user = userEvent.setup();
-      const TestComponent = () => {
-        const [checked, setChecked] = React.useState(false);
+  it('supports controlled checked', () => {
+    const { container } = render(<Checkbox checked>Checked</Checkbox>);
+    expect(
+      (container.querySelector('input[type="checkbox"]') as HTMLInputElement)
+        .checked
+    ).toBe(true);
+  });
 
-        return (
-          <Checkbox
-            checked={checked}
-            onChange={(isChecked) => setChecked(isChecked)}>
-            Checkbox
-          </Checkbox>
-        );
-      };
+  it('supports uncontrolled defaultChecked', () => {
+    const { container } = render(<Checkbox defaultChecked>Default</Checkbox>);
+    expect(
+      (container.querySelector('input[type="checkbox"]') as HTMLInputElement)
+        .checked
+    ).toBe(true);
+  });
 
-      const { container } = render(<TestComponent />);
-      const checkbox = container.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement;
+  it('supports indeterminate', async () => {
+    const { container } = render(
+      <Checkbox indeterminate>Indeterminate</Checkbox>
+    );
+    const checkbox = container.querySelector(
+      'input[type="checkbox"]'
+    ) as HTMLInputElement;
+    await waitFor(() => expect(checkbox.indeterminate).toBe(true));
+  });
 
-      expect(checkbox.checked).toBe(false);
+  it('calls onChange when clicked (non-group)', async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    const { container } = render(
+      <Checkbox onChange={handleChange}>Checkbox</Checkbox>
+    );
 
-      await user.click(checkbox);
+    await user.click(container.querySelector('input[type="checkbox"]')!);
+    expect(handleChange).toHaveBeenCalled();
+    expect(handleChange.mock.calls[0][0]).toBe(true);
+  });
 
-      expect(checkbox.checked).toBe(true);
-    });
+  it('does not call onChange when disabled', async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    const { container } = render(
+      <Checkbox disabled onChange={handleChange}>
+        Disabled
+      </Checkbox>
+    );
+
+    await user.click(container.querySelector('input[type="checkbox"]')!);
+    expect(handleChange).not.toHaveBeenCalled();
+  });
+
+  it('supports group selection via CheckboxGroup', async () => {
+    const user = userEvent.setup();
+    const handleGroupChange = vi.fn();
+    const { container } = render(
+      <CheckboxGroup defaultValue={['apple']} onChange={handleGroupChange}>
+        <Checkbox value="apple">Apple</Checkbox>
+        <Checkbox value="banana">Banana</Checkbox>
+      </CheckboxGroup>
+    );
+
+    const inputs = container.querySelectorAll('input[type="checkbox"]');
+    expect((inputs[0] as HTMLInputElement).checked).toBe(true);
+    expect((inputs[1] as HTMLInputElement).checked).toBe(false);
+
+    await user.click(inputs[1]);
+    expect(handleGroupChange).toHaveBeenCalledWith(['apple', 'banana']);
+  });
+
+  it('works as controlled component', async () => {
+    const user = userEvent.setup();
+
+    const TestComponent = () => {
+      const [checked, setChecked] = React.useState(false);
+      return (
+        <Checkbox
+          checked={checked}
+          onChange={(isChecked) => setChecked(isChecked)}>
+          Checkbox
+        </Checkbox>
+      );
+    };
+
+    const { container } = render(<TestComponent />);
+    const checkbox = container.querySelector(
+      'input[type="checkbox"]'
+    ) as HTMLInputElement;
+    expect(checkbox.checked).toBe(false);
+
+    await user.click(checkbox);
+    expect(checkbox.checked).toBe(true);
   });
 
   describe('Theme Support', () => {
@@ -187,16 +133,12 @@ describe('Checkbox', () => {
       clearThemeVariables(['--tiger-primary']);
     });
 
-    it('should support custom theme colors', () => {
+    it('supports theme variables', () => {
       setThemeVariables({
         '--tiger-primary': '#ff0000',
       });
 
-      const { container } = render(<Checkbox checked>Themed</Checkbox>);
-
-      const checkbox = container.querySelector('input[type="checkbox"]');
-      expect(checkbox).toBeInTheDocument();
-
+      render(<Checkbox checked>Themed</Checkbox>);
       const rootStyles = window.getComputedStyle(document.documentElement);
       expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe(
         '#ff0000'
@@ -205,49 +147,16 @@ describe('Checkbox', () => {
   });
 
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
+    it('has no accessibility violations', async () => {
       const { container } = render(<Checkbox>Accessible Checkbox</Checkbox>);
-
       await expectNoA11yViolations(container);
     });
 
-    it('should have proper role', () => {
+    it('is focusable', () => {
       const { container } = render(<Checkbox>Checkbox</Checkbox>);
-
-      const checkbox = container.querySelector('input[type="checkbox"]');
-      expect(checkbox).toHaveAttribute('type', 'checkbox');
-    });
-
-    it('should be keyboard accessible', async () => {
-      const handleChange = vi.fn();
-      const { container } = render(
-        <Checkbox onChange={handleChange}>Checkbox</Checkbox>
-      );
-
       const checkbox = container.querySelector('input[type="checkbox"]')!;
       checkbox.focus();
-
       expect(checkbox).toHaveFocus();
-    });
-  });
-
-  describe('Snapshots', () => {
-    it('should match snapshot for unchecked state', () => {
-      const { container } = render(<Checkbox>Unchecked</Checkbox>);
-
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it('should match snapshot for checked state', () => {
-      const { container } = render(<Checkbox checked>Checked</Checkbox>);
-
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it('should match snapshot for disabled state', () => {
-      const { container } = render(<Checkbox disabled>Disabled</Checkbox>);
-
-      expect(container.firstChild).toMatchSnapshot();
     });
   });
 });

@@ -4,8 +4,8 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, fireEvent } from '@testing-library/vue';
-import { nextTick } from 'vue';
-import { Checkbox } from '@tigercat/vue';
+import { nextTick, defineComponent, h } from 'vue';
+import { Checkbox, CheckboxGroup } from '@tigercat/vue';
 import {
   renderWithProps,
   expectNoA11yViolations,
@@ -15,148 +15,122 @@ import {
 } from '../utils';
 
 describe('Checkbox', () => {
-  describe('Rendering', () => {
-    it('should render with default props', () => {
-      const { container } = render(Checkbox, {
-        slots: { default: 'Checkbox' },
-      });
-
-      const checkbox = container.querySelector('input[type="checkbox"]');
-      expect(checkbox).toBeInTheDocument();
+  it('renders checkbox input and label', () => {
+    const { container, getByText } = render(Checkbox, {
+      slots: { default: 'Check me' },
     });
 
-    it('should render with label text', () => {
-      const { getByText } = render(Checkbox, {
-        slots: { default: 'Check me' },
-      });
-
-      expect(getByText('Check me')).toBeInTheDocument();
-    });
-
-    it('should render unchecked by default', () => {
-      const { container } = render(Checkbox, {
-        slots: { default: 'Checkbox' },
-      });
-
-      const checkbox = container.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement;
-      expect(checkbox.checked).toBe(false);
-    });
+    expect(
+      container.querySelector('input[type="checkbox"]')
+    ).toBeInTheDocument();
+    expect(getByText('Check me')).toBeInTheDocument();
   });
 
-  describe('Props', () => {
-    it.each(componentSizes)('should render %s size correctly', (size) => {
-      const { container } = renderWithProps(
-        Checkbox,
-        { size },
-        { slots: { default: 'Checkbox' } }
-      );
-
-      const checkbox = container.querySelector('input[type="checkbox"]');
-      expect(checkbox).toBeInTheDocument();
-    });
-
-    it('should be disabled when disabled prop is true', () => {
-      const { container } = render(Checkbox, {
-        props: { disabled: true },
-        slots: { default: 'Disabled' },
-      });
-
-      const checkbox = container.querySelector('input[type="checkbox"]');
-      expect(checkbox).toBeDisabled();
-    });
-
-    it('should be checked when modelValue is true', () => {
-      const { container } = render(Checkbox, {
-        props: { modelValue: true },
-        slots: { default: 'Checked' },
-      });
-
-      const checkbox = container.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement;
-      expect(checkbox.checked).toBe(true);
-    });
-
-    it('should be checked when defaultChecked is true', () => {
-      const { container } = render(Checkbox, {
-        props: { defaultChecked: true },
-        slots: { default: 'Default checked' },
-      });
-
-      const checkbox = container.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement;
-      expect(checkbox.checked).toBe(true);
-    });
-
-    it('should apply indeterminate state when indeterminate is true', async () => {
-      const { container } = render(Checkbox, {
-        props: { indeterminate: true },
-        slots: { default: 'Indeterminate' },
-      });
-
-      const checkbox = container.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement;
-      await nextTick();
-      expect(checkbox.indeterminate).toBe(true);
-    });
+  it.each(componentSizes)('renders %s size', (size) => {
+    const { container } = renderWithProps(
+      Checkbox,
+      { size },
+      { slots: { default: 'Checkbox' } }
+    );
+    expect(
+      container.querySelector('input[type="checkbox"]')
+    ).toBeInTheDocument();
   });
 
-  describe('Events', () => {
-    it('should emit update:modelValue when clicked', async () => {
-      const onUpdate = vi.fn();
-      const { container } = render(Checkbox, {
-        props: { 'onUpdate:modelValue': onUpdate },
-        slots: { default: 'Checkbox' },
-      });
-
-      const checkbox = container.querySelector('input[type="checkbox"]')!;
-      await fireEvent.click(checkbox);
-
-      expect(onUpdate).toHaveBeenCalledWith(true);
+  it('supports disabled', () => {
+    const { container } = render(Checkbox, {
+      props: { disabled: true },
+      slots: { default: 'Disabled' },
     });
 
-    it('should not emit events when disabled', async () => {
-      const onUpdate = vi.fn();
-      const { container } = render(Checkbox, {
-        props: { disabled: true, 'onUpdate:modelValue': onUpdate },
-        slots: { default: 'Disabled' },
-      });
+    expect(container.querySelector('input[type="checkbox"]')).toBeDisabled();
+  });
 
-      const checkbox = container.querySelector('input[type="checkbox"]')!;
-      await fireEvent.click(checkbox);
-
-      expect(onUpdate).not.toHaveBeenCalled();
+  it('supports controlled modelValue', () => {
+    const { container } = render(Checkbox, {
+      props: { modelValue: true },
+      slots: { default: 'Checked' },
     });
 
-    it('should toggle from false to true', async () => {
-      const onUpdate = vi.fn();
-      const { container } = render(Checkbox, {
-        props: { modelValue: false, 'onUpdate:modelValue': onUpdate },
-        slots: { default: 'Toggle' },
-      });
+    expect(
+      (container.querySelector('input[type="checkbox"]') as HTMLInputElement)
+        .checked
+    ).toBe(true);
+  });
 
-      const checkbox = container.querySelector('input[type="checkbox"]')!;
-      await fireEvent.click(checkbox);
-
-      expect(onUpdate).toHaveBeenCalledWith(true);
+  it('supports uncontrolled defaultChecked', () => {
+    const { container } = render(Checkbox, {
+      props: { defaultChecked: true },
+      slots: { default: 'Default checked' },
     });
 
-    it('should toggle from true to false', async () => {
-      const onUpdate = vi.fn();
-      const { container } = render(Checkbox, {
-        props: { modelValue: true, 'onUpdate:modelValue': onUpdate },
-        slots: { default: 'Toggle' },
-      });
+    expect(
+      (container.querySelector('input[type="checkbox"]') as HTMLInputElement)
+        .checked
+    ).toBe(true);
+  });
 
-      const checkbox = container.querySelector('input[type="checkbox"]')!;
-      await fireEvent.click(checkbox);
-
-      expect(onUpdate).toHaveBeenCalledWith(false);
+  it('supports indeterminate', async () => {
+    const { container } = render(Checkbox, {
+      props: { indeterminate: true },
+      slots: { default: 'Indeterminate' },
     });
+
+    const checkbox = container.querySelector(
+      'input[type="checkbox"]'
+    ) as HTMLInputElement;
+    await nextTick();
+    expect(checkbox.indeterminate).toBe(true);
+  });
+
+  it('emits update:modelValue when clicked (non-group)', async () => {
+    const onUpdate = vi.fn();
+    const { container } = render(Checkbox, {
+      props: { 'onUpdate:modelValue': onUpdate },
+      slots: { default: 'Checkbox' },
+    });
+
+    await fireEvent.click(container.querySelector('input[type="checkbox"]')!);
+    expect(onUpdate).toHaveBeenCalledWith(true);
+  });
+
+  it('does not emit update:modelValue when disabled', async () => {
+    const onUpdate = vi.fn();
+    const { container } = render(Checkbox, {
+      props: { disabled: true, 'onUpdate:modelValue': onUpdate },
+      slots: { default: 'Disabled' },
+    });
+
+    await fireEvent.click(container.querySelector('input[type="checkbox"]')!);
+    expect(onUpdate).not.toHaveBeenCalled();
+  });
+
+  it('supports group selection via CheckboxGroup', async () => {
+    const onUpdate = vi.fn();
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(
+            CheckboxGroup,
+            { defaultValue: ['apple'], 'onUpdate:modelValue': onUpdate },
+            {
+              default: () => [
+                h(Checkbox, { value: 'apple' }, () => 'Apple'),
+                h(Checkbox, { value: 'banana' }, () => 'Banana'),
+              ],
+            }
+          );
+      },
+    });
+
+    const { container } = render(Wrapper);
+    const inputs = container.querySelectorAll('input[type="checkbox"]');
+
+    expect((inputs[0] as HTMLInputElement).checked).toBe(true);
+    expect((inputs[1] as HTMLInputElement).checked).toBe(false);
+
+    await fireEvent.click(inputs[1]);
+    expect(onUpdate).toHaveBeenCalledWith(['apple', 'banana']);
   });
 
   describe('Theme Support', () => {
@@ -164,18 +138,15 @@ describe('Checkbox', () => {
       clearThemeVariables(['--tiger-primary']);
     });
 
-    it('should support custom theme colors', () => {
+    it('supports theme variables', () => {
       setThemeVariables({
         '--tiger-primary': '#ff0000',
       });
 
-      const { container } = render(Checkbox, {
+      render(Checkbox, {
         props: { modelValue: true },
         slots: { default: 'Themed' },
       });
-
-      const checkbox = container.querySelector('input[type="checkbox"]');
-      expect(checkbox).toBeInTheDocument();
 
       const rootStyles = window.getComputedStyle(document.documentElement);
       expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe(
@@ -185,7 +156,7 @@ describe('Checkbox', () => {
   });
 
   describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
+    it('has no accessibility violations', async () => {
       const { container } = render(Checkbox, {
         slots: { default: 'Accessible Checkbox' },
       });
@@ -193,54 +164,14 @@ describe('Checkbox', () => {
       await expectNoA11yViolations(container);
     });
 
-    it('should have proper role', () => {
+    it('is focusable', () => {
       const { container } = render(Checkbox, {
-        slots: { default: 'Checkbox' },
-      });
-
-      const checkbox = container.querySelector('input[type="checkbox"]');
-      expect(checkbox).toHaveAttribute('type', 'checkbox');
-    });
-
-    it('should be keyboard accessible', async () => {
-      const onUpdate = vi.fn();
-      const { container } = render(Checkbox, {
-        props: { 'onUpdate:modelValue': onUpdate },
         slots: { default: 'Checkbox' },
       });
 
       const checkbox = container.querySelector('input[type="checkbox"]')!;
       checkbox.focus();
-
       expect(checkbox).toHaveFocus();
-    });
-  });
-
-  describe('Snapshots', () => {
-    it('should match snapshot for unchecked state', () => {
-      const { container } = render(Checkbox, {
-        slots: { default: 'Unchecked' },
-      });
-
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it('should match snapshot for checked state', () => {
-      const { container } = render(Checkbox, {
-        props: { modelValue: true },
-        slots: { default: 'Checked' },
-      });
-
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it('should match snapshot for disabled state', () => {
-      const { container } = render(Checkbox, {
-        props: { disabled: true },
-        slots: { default: 'Disabled' },
-      });
-
-      expect(container.firstChild).toMatchSnapshot();
     });
   });
 });

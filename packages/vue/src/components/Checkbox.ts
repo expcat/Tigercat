@@ -7,15 +7,29 @@ import {
   inject,
   type PropType,
 } from 'vue';
+import { classNames } from '@tigercat/core';
 import {
   getCheckboxClasses,
   getCheckboxLabelClasses,
   type CheckboxSize,
 } from '@tigercat/core';
+import type { ComputedRef } from 'vue';
 import { CheckboxGroupKey, type CheckboxGroupContext } from './CheckboxGroup';
+
+export interface VueCheckboxProps {
+  modelValue?: boolean | null;
+  value?: string | number | boolean;
+  size?: CheckboxSize;
+  disabled?: boolean;
+  indeterminate?: boolean;
+  defaultChecked?: boolean;
+  className?: string;
+  style?: Record<string, string | number>;
+}
 
 export const Checkbox = defineComponent({
   name: 'TigerCheckbox',
+  inheritAttrs: false,
   props: {
     /**
      * Checkbox value in controlled mode (v-model)
@@ -58,6 +72,20 @@ export const Checkbox = defineComponent({
       type: Boolean,
       default: false,
     },
+
+    /**
+     * Additional CSS classes (applied to root element)
+     */
+    className: {
+      type: String,
+    },
+
+    /**
+     * Inline styles (applied to root element)
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+    },
   },
   emits: {
     /**
@@ -70,27 +98,14 @@ export const Checkbox = defineComponent({
     change: (value: boolean, event: Event) =>
       typeof value === 'boolean' && event instanceof Event,
   },
-  setup(props, { slots, emit }) {
+  setup(props, { slots, emit, attrs }) {
     // Get group context if inside CheckboxGroup
-    const groupContextRef = inject<CheckboxGroupContext | null>(
+    const groupContextRef = inject<ComputedRef<CheckboxGroupContext> | null>(
       CheckboxGroupKey,
       null
     );
 
-    // Unwrap if it's a computed ref
-    const groupContext = computed(() => {
-      if (!groupContextRef) return null;
-      // Check if it's already unwrapped or if it's a ComputedRef
-      // Use type assertion to check for value property
-      const ctx = groupContextRef as
-        | CheckboxGroupContext
-        | { value: CheckboxGroupContext };
-      return 'value' in ctx &&
-        typeof ctx.value === 'object' &&
-        'updateValue' in ctx.value
-        ? ctx.value
-        : (ctx as CheckboxGroupContext);
-    });
+    const groupContext = computed(() => groupContextRef?.value);
 
     // Internal state for uncontrolled mode
     const internalChecked = ref(props.defaultChecked);
@@ -116,25 +131,12 @@ export const Checkbox = defineComponent({
       return isControlled.value ? props.modelValue : internalChecked.value;
     });
 
-    // Watch for indeterminate state changes
     const checkboxRef = ref<HTMLInputElement | null>(null);
 
     watch(
-      checkboxRef,
-      (el) => {
-        if (el) {
-          el.indeterminate = props.indeterminate;
-        }
-      },
-      { immediate: true }
-    );
-
-    watch(
-      () => props.indeterminate,
-      (newVal) => {
-        if (checkboxRef.value) {
-          checkboxRef.value.indeterminate = newVal;
-        }
+      () => [checkboxRef.value, props.indeterminate] as const,
+      ([el]) => {
+        if (el) el.indeterminate = props.indeterminate;
       },
       { immediate: true }
     );
@@ -165,6 +167,11 @@ export const Checkbox = defineComponent({
         effectiveDisabled.value
       );
 
+      const rootStyle = [attrs.style, props.style];
+      const rootClass = classNames(props.className, attrs.class);
+
+      const { class: _class, style: _style, ...restAttrs } = attrs;
+
       const checkboxElement = h('input', {
         ref: checkboxRef,
         type: 'checkbox',
@@ -173,11 +180,22 @@ export const Checkbox = defineComponent({
         disabled: effectiveDisabled.value,
         value: props.value,
         onChange: handleChange,
+        ...restAttrs,
       });
 
       // If there's no label content, return just the checkbox
       if (!slots.default) {
-        return checkboxElement;
+        return h('input', {
+          ref: checkboxRef,
+          type: 'checkbox',
+          class: classNames(checkboxClasses, rootClass),
+          style: rootStyle,
+          checked: checked.value,
+          disabled: effectiveDisabled.value,
+          value: props.value,
+          onChange: handleChange,
+          ...restAttrs,
+        });
       }
 
       // Return label with checkbox and content
@@ -185,10 +203,11 @@ export const Checkbox = defineComponent({
         effectiveSize.value,
         effectiveDisabled.value
       );
-      return h('label', { class: labelClasses }, [
-        checkboxElement,
-        h('span', { class: 'ml-2' }, slots.default()),
-      ]);
+      return h(
+        'label',
+        { class: classNames(labelClasses, rootClass), style: rootStyle },
+        [checkboxElement, h('span', { class: 'ml-2' }, slots.default())]
+      );
     };
   },
 });

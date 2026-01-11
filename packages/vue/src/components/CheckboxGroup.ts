@@ -1,30 +1,44 @@
-import { defineComponent, computed, provide, ref, type PropType } from 'vue'
-import { type CheckboxSize } from '@tigercat/core'
+import { defineComponent, computed, provide, ref, h, type PropType } from 'vue';
+import {
+  classNames,
+  type CheckboxGroupValue,
+  type CheckboxSize,
+} from '@tigercat/core';
 
-export const CheckboxGroupKey = Symbol('CheckboxGroup')
+export const CheckboxGroupKey = Symbol('CheckboxGroup');
 
 export interface CheckboxGroupContext {
-  value: (string | number | boolean)[]
-  disabled: boolean
-  size: CheckboxSize
-  updateValue: (val: string | number | boolean, checked: boolean) => void
+  value: CheckboxGroupValue;
+  disabled: boolean;
+  size: CheckboxSize;
+  updateValue: (val: CheckboxGroupValue[number], checked: boolean) => void;
+}
+
+export interface VueCheckboxGroupProps {
+  modelValue?: CheckboxGroupValue;
+  defaultValue?: CheckboxGroupValue;
+  disabled?: boolean;
+  size?: CheckboxSize;
+  className?: string;
+  style?: Record<string, string | number>;
 }
 
 export const CheckboxGroup = defineComponent({
   name: 'TigerCheckboxGroup',
+  inheritAttrs: false,
   props: {
     /**
      * Selected values (v-model)
      */
     modelValue: {
-      type: Array as PropType<(string | number | boolean)[]>,
+      type: Array as PropType<CheckboxGroupValue>,
     },
     /**
      * Default selected values (uncontrolled mode)
      * @default []
      */
     defaultValue: {
-      type: Array as PropType<(string | number | boolean)[]>,
+      type: Array as PropType<CheckboxGroupValue>,
       default: () => [],
     },
     /**
@@ -43,63 +57,87 @@ export const CheckboxGroup = defineComponent({
       type: String as PropType<CheckboxSize>,
       default: 'md' as CheckboxSize,
     },
+
+    /**
+     * Additional CSS classes
+     */
+    className: {
+      type: String,
+    },
+
+    /**
+     * Inline styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+    },
   },
   emits: {
     /**
      * Emitted when selected values change (for v-model)
      */
-    'update:modelValue': (value: (string | number | boolean)[]) => Array.isArray(value),
+    'update:modelValue': (value: CheckboxGroupValue) => Array.isArray(value),
     /**
      * Emitted when selected values change
      */
-    change: (value: (string | number | boolean)[]) => Array.isArray(value),
+    change: (value: CheckboxGroupValue) => Array.isArray(value),
   },
-  setup(props, { slots, emit }) {
+  setup(props, { slots, emit, attrs }) {
     // Internal state for uncontrolled mode
-    const internalValue = ref<(string | number | boolean)[]>(props.defaultValue)
-    
+    const internalValue = ref<CheckboxGroupValue>(props.defaultValue);
+
     // Determine if controlled or uncontrolled
-    const isControlled = computed(() => props.modelValue !== undefined)
-    
+    const isControlled = computed(() => props.modelValue !== undefined);
+
     // Current selected values
     const value = computed(() => {
-      return isControlled.value ? props.modelValue! : internalValue.value
-    })
-    
-    const updateValue = (val: string | number | boolean, checked: boolean) => {
-      if (props.disabled) return
-      
-      const currentValue = [...value.value]
-      const index = currentValue.indexOf(val)
-      
+      return isControlled.value ? props.modelValue! : internalValue.value;
+    });
+
+    const updateValue = (val: CheckboxGroupValue[number], checked: boolean) => {
+      if (props.disabled) return;
+
+      const currentValue = [...value.value];
+      const index = currentValue.indexOf(val);
+
       if (checked && index === -1) {
-        currentValue.push(val)
+        currentValue.push(val);
       } else if (!checked && index !== -1) {
-        currentValue.splice(index, 1)
+        currentValue.splice(index, 1);
       }
-      
+
       // Update internal state if uncontrolled
       if (!isControlled.value) {
-        internalValue.value = currentValue
+        internalValue.value = currentValue;
       }
-      
-      emit('update:modelValue', currentValue)
-      emit('change', currentValue)
-    }
-    
+
+      emit('update:modelValue', currentValue);
+      emit('change', currentValue);
+    };
+
     // Provide context to child checkboxes
     // Make context reactive by using computed
-    provide(CheckboxGroupKey, computed(() => ({
-      value: value.value,
-      disabled: props.disabled,
-      size: props.size,
-      updateValue,
-    })))
-    
-    return () => {
-      return slots.default?.()
-    }
-  },
-})
+    provide(
+      CheckboxGroupKey,
+      computed(() => ({
+        value: value.value,
+        disabled: props.disabled,
+        size: props.size,
+        updateValue,
+      }))
+    );
 
-export default CheckboxGroup
+    return () =>
+      h(
+        'div',
+        {
+          ...attrs,
+          class: classNames(props.className, attrs.class),
+          style: [attrs.style, props.style],
+        },
+        slots.default?.()
+      );
+  },
+});
+
+export default CheckboxGroup;
