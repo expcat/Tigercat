@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useContext } from 'react';
 import {
   classNames,
   getSpanClasses,
@@ -7,25 +7,10 @@ import {
   getFlexClasses,
   getGutterStyles,
   type ColProps as CoreColProps,
-} from '@tigercat/core'
-import { RowContext } from './Row'
+} from '@tigercat/core';
+import { RowContext } from './Row';
 
-export interface ColProps extends CoreColProps {
-  /**
-   * Column content
-   */
-  children?: React.ReactNode
-
-  /**
-   * Additional CSS classes
-   */
-  className?: string
-
-  /**
-   * Additional inline styles
-   */
-  style?: React.CSSProperties
-}
+export type ColProps = React.HTMLAttributes<HTMLDivElement> & CoreColProps;
 
 export const Col: React.FC<ColProps> = ({
   span = 24,
@@ -35,28 +20,28 @@ export const Col: React.FC<ColProps> = ({
   children,
   className,
   style,
-  ...props
+  ...divProps
 }) => {
-  const { gutter } = useContext(RowContext)
-  
-  const gutterStyles = useMemo(() => getGutterStyles(gutter || 0), [gutter])
+  const { gutter } = useContext(RowContext);
 
-  const colClasses = useMemo(() => classNames(
+  const { colStyle } = getGutterStyles(gutter || 0);
+
+  const colClasses = classNames(
     getSpanClasses(span),
     getOffsetClasses(offset),
     getOrderClasses(order),
     getFlexClasses(flex),
     className
-  ), [span, offset, order, flex, className])
+  );
 
-  const mergedStyle = useMemo((): React.CSSProperties => ({
-    ...gutterStyles.colStyle,
-    ...style
-  }), [gutterStyles.colStyle, style])
+  const mergedStyle: React.CSSProperties = {
+    ...colStyle,
+    ...style,
+  };
 
   return (
-    <div className={colClasses} style={mergedStyle} {...props}>
+    <div className={colClasses} style={mergedStyle} {...divProps}>
       {children}
     </div>
-  )
-}
+  );
+};

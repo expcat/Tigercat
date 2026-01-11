@@ -8,8 +8,11 @@ import {
   getGutterStyles,
   type ColSpan,
   type Breakpoint,
+  type ColProps as CoreColProps,
 } from '@tigercat/core';
 import { RowContextKey } from './Row';
+
+export interface VueColProps extends CoreColProps {}
 
 export const Col = defineComponent({
   name: 'TigerCol',
@@ -49,8 +52,9 @@ export const Col = defineComponent({
   },
   setup(props, { slots, attrs }) {
     // Inject gutter from Row context
-    const rowContext = inject(RowContextKey, {});
-    const { colStyle } = getGutterStyles(rowContext.gutter || 0);
+    const rowContext = inject(RowContextKey, null);
+    const gutter = computed(() => rowContext?.gutter.value ?? 0);
+    const colStyle = computed(() => getGutterStyles(gutter.value).colStyle);
 
     const colClasses = computed(() => {
       return classNames(
@@ -67,7 +71,7 @@ export const Col = defineComponent({
         {
           ...attrs,
           class: [colClasses.value, attrs.class],
-          style: [colStyle, attrs.style],
+          style: [colStyle.value, attrs.style],
         },
         slots.default ? slots.default() : []
       );

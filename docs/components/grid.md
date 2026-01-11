@@ -10,7 +10,7 @@
 
 ```vue
 <script setup>
-import { Row, Col } from '@tigercat/vue'
+import { Row, Col } from '@tigercat/vue';
 </script>
 
 <template>
@@ -58,7 +58,7 @@ import { Row, Col } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Row, Col } from '@tigercat/react'
+import { Row, Col } from '@tigercat/react';
 
 function App() {
   return (
@@ -102,7 +102,7 @@ function App() {
         </Col>
       </Row>
     </>
-  )
+  );
 }
 ```
 
@@ -151,7 +151,9 @@ function App() {
 ### React
 
 ```tsx
-{/* 水平间隔 16px */}
+{
+  /* 水平间隔 16px */
+}
 <Row gutter={16}>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
@@ -165,9 +167,11 @@ function App() {
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
-</Row>
+</Row>;
 
-{/* 水平间隔 16px，垂直间隔 24px */}
+{
+  /* 水平间隔 16px，垂直间隔 24px */
+}
 <Row gutter={[16, 24]}>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
@@ -181,7 +185,7 @@ function App() {
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
-</Row>
+</Row>;
 ```
 
 ## 偏移 (Offset)
@@ -367,7 +371,9 @@ function App() {
 ### React
 
 ```tsx
-{/* 顶部对齐 */}
+{
+  /* 顶部对齐 */
+}
 <Row align="top" gutter={16}>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4 h-24">col-6</div>
@@ -381,9 +387,11 @@ function App() {
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
-</Row>
+</Row>;
 
-{/* 居中对齐 */}
+{
+  /* 居中对齐 */
+}
 <Row align="middle" gutter={16}>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4 h-24">col-6</div>
@@ -397,9 +405,11 @@ function App() {
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
-</Row>
+</Row>;
 
-{/* 底部对齐 */}
+{
+  /* 底部对齐 */
+}
 <Row align="bottom" gutter={16}>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4 h-24">col-6</div>
@@ -413,9 +423,11 @@ function App() {
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
-</Row>
+</Row>;
 
-{/* 水平居中 */}
+{
+  /* 水平居中 */
+}
 <Row justify="center" gutter={16}>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
@@ -423,9 +435,11 @@ function App() {
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
-</Row>
+</Row>;
 
-{/* 两端对齐 */}
+{
+  /* 两端对齐 */
+}
 <Row justify="space-between" gutter={16}>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
@@ -433,7 +447,7 @@ function App() {
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
-</Row>
+</Row>;
 ```
 
 ## 响应式布局
@@ -441,6 +455,7 @@ function App() {
 支持根据不同屏幕尺寸显示不同的列宽。
 
 断点说明：
+
 - `xs`: < 640px
 - `sm`: ≥ 640px
 - `md`: ≥ 768px
@@ -546,50 +561,52 @@ function App() {
 
 ### Row Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 | 可选值 |
-|------|------|------|--------|--------|
-| gutter | 栅格间隔，可以是数字或 [水平间隔, 垂直间隔] | `number \| [number, number]` | `0` | - |
-| align | 垂直对齐方式 | `Align` | `'top'` | `'top'` \| `'middle'` \| `'bottom'` \| `'stretch'` |
-| justify | 水平排列方式 | `Justify` | `'start'` | `'start'` \| `'end'` \| `'center'` \| `'space-around'` \| `'space-between'` \| `'space-evenly'` |
-| wrap | 是否自动换行 | `boolean` | `true` | `true` \| `false` |
+| 属性    | 说明                                        | 类型                         | 默认值    | 可选值                                                                                          |
+| ------- | ------------------------------------------- | ---------------------------- | --------- | ----------------------------------------------------------------------------------------------- |
+| gutter  | 栅格间隔，可以是数字或 [水平间隔, 垂直间隔] | `number \| [number, number]` | `0`       | -                                                                                               |
+| align   | 垂直对齐方式                                | `Align`                      | `'top'`   | `'top'` \| `'middle'` \| `'bottom'` \| `'stretch'`                                              |
+| justify | 水平排列方式                                | `Justify`                    | `'start'` | `'start'` \| `'end'` \| `'center'` \| `'space-around'` \| `'space-between'` \| `'space-evenly'` |
+| wrap    | 是否自动换行                                | `boolean`                    | `true`    | `true` \| `false`                                                                               |
 
-#### React 专属属性
+> 提示：Vue/React 版本都会把未声明的原生属性透传到根 `div`（例如 `id`、`data-*`、`aria-*`）。
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| className | 额外的 CSS 类名 | `string` | - |
-| style | 额外的内联样式 | `React.CSSProperties` | - |
-| children | 行内容 | `React.ReactNode` | - |
+#### React 额外属性
+
+| 属性      | 说明            | 类型                  | 默认值 |
+| --------- | --------------- | --------------------- | ------ |
+| className | 额外的 CSS 类名 | `string`              | -      |
+| style     | 额外的内联样式  | `React.CSSProperties` | -      |
+| children  | 行内容          | `React.ReactNode`     | -      |
 
 ### Col Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 | 可选值 |
-|------|------|------|--------|--------|
-| span | 栅格占位格数，或响应式对象 | `number \| ResponsiveObject` | `24` | `1-24` 或对象 |
-| offset | 栅格左侧的间隔格数，或响应式对象 | `number \| ResponsiveObject` | `0` | `0-24` 或对象 |
-| order | 栅格顺序，或响应式对象 | `number \| ResponsiveObject` | - | - |
-| flex | flex 布局属性 | `string \| number` | - | - |
+| 属性   | 说明                             | 类型                         | 默认值 | 可选值        |
+| ------ | -------------------------------- | ---------------------------- | ------ | ------------- |
+| span   | 栅格占位格数，或响应式对象       | `number \| ResponsiveObject` | `24`   | `1-24` 或对象 |
+| offset | 栅格左侧的间隔格数，或响应式对象 | `number \| ResponsiveObject` | `0`    | `0-24` 或对象 |
+| order  | 栅格顺序，或响应式对象           | `number \| ResponsiveObject` | -      | -             |
+| flex   | flex 布局属性                    | `string \| number`           | -      | -             |
 
-#### React 专属属性
+#### React 额外属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| className | 额外的 CSS 类名 | `string` | - |
-| style | 额外的内联样式 | `React.CSSProperties` | - |
-| children | 列内容 | `React.ReactNode` | - |
+| 属性      | 说明            | 类型                  | 默认值 |
+| --------- | --------------- | --------------------- | ------ |
+| className | 额外的 CSS 类名 | `string`              | -      |
+| style     | 额外的内联样式  | `React.CSSProperties` | -      |
+| children  | 列内容          | `React.ReactNode`     | -      |
 
 ### Slots / 插槽 (Vue)
 
 #### Row Slots
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明   |
+| ------- | ------ |
 | default | 行内容 |
 
 #### Col Slots
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明   |
+| ------- | ------ |
 | default | 列内容 |
 
 ## TypeScript 支持
@@ -606,10 +623,11 @@ import type {
   ColSpan,
   Align,
   Justify,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
 // Vue
-import type { Row, Col } from '@tigercat/vue'
+import { Row, Col } from '@tigercat/vue';
+import type { VueRowProps, VueColProps } from '@tigercat/vue';
 
 // React
 import type {
@@ -617,7 +635,7 @@ import type {
   Col,
   RowProps as ReactRowProps,
   ColProps as ReactColProps,
-} from '@tigercat/react'
+} from '@tigercat/react';
 ```
 
 ## 无障碍 (Accessibility)
@@ -665,7 +683,7 @@ import type {
 #### React
 
 ```tsx
-import { Row, Col } from '@tigercat/react'
+import { Row, Col } from '@tigercat/react';
 
 function Layout() {
   return (
@@ -694,7 +712,7 @@ function Layout() {
         </Col>
       </Row>
     </div>
-  )
+  );
 }
 ```
 
@@ -705,11 +723,7 @@ function Layout() {
 ```vue
 <template>
   <Row :gutter="[16, 16]">
-    <Col
-      v-for="i in 8"
-      :key="i"
-      :span="{ xs: 24, sm: 12, md: 8, lg: 6 }"
-    >
+    <Col v-for="i in 8" :key="i" :span="{ xs: 24, sm: 12, md: 8, lg: 6 }">
       <div class="bg-white border rounded-lg p-4 shadow">
         <h3 class="text-lg font-semibold mb-2">Card {{ i }}</h3>
         <p class="text-gray-600">Card content here</p>
@@ -722,7 +736,7 @@ function Layout() {
 #### React
 
 ```tsx
-import { Row, Col } from '@tigercat/react'
+import { Row, Col } from '@tigercat/react';
 
 function CardGrid() {
   return (
@@ -736,6 +750,6 @@ function CardGrid() {
         </Col>
       ))}
     </Row>
-  )
+  );
 }
 ```

@@ -35,6 +35,31 @@ import {
   type TreeFilterFn,
 } from '@tigercat/core';
 
+export interface VueTreeProps {
+  treeData?: TreeNode[];
+  selectionMode?: TreeSelectionMode;
+  checkable?: boolean;
+  showIcon?: boolean;
+  showLine?: boolean;
+  defaultExpandedKeys?: (string | number)[];
+  defaultSelectedKeys?: (string | number)[];
+  defaultCheckedKeys?: (string | number)[];
+  expandedKeys?: (string | number)[];
+  selectedKeys?: (string | number)[];
+  checkedKeys?: (string | number)[] | TreeCheckedState;
+  defaultExpandAll?: boolean;
+  checkStrictly?: boolean;
+  checkStrategy?: TreeCheckStrategy;
+  selectable?: boolean;
+  multiple?: boolean;
+  loadData?: TreeLoadDataFn;
+  filterValue?: string;
+  filterFn?: TreeFilterFn;
+  autoExpandParent?: boolean;
+  blockNode?: boolean;
+  emptyText?: string;
+}
+
 // Expand icon component
 const ExpandIcon = (expanded: boolean, hasChildren: boolean) => {
   if (!hasChildren) {

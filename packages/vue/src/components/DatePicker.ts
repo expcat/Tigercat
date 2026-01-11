@@ -67,6 +67,29 @@ const CloseIcon = createIcon(CloseIconPath, 'w-4 h-4');
 const ChevronLeftIcon = createIcon(ChevronLeftIconPath, 'w-5 h-5');
 const ChevronRightIcon = createIcon(ChevronRightIconPath, 'w-5 h-5');
 
+export type VueDatePickerModelValue =
+  | Date
+  | string
+  | null
+  | [Date | string | null, Date | string | null];
+
+export interface VueDatePickerProps {
+  range?: boolean;
+  locale?: string;
+  modelValue?: VueDatePickerModelValue;
+  size?: DatePickerSize;
+  format?: DateFormat;
+  placeholder?: string;
+  disabled?: boolean;
+  readonly?: boolean;
+  required?: boolean;
+  minDate?: Date | string | null;
+  maxDate?: Date | string | null;
+  clearable?: boolean;
+  name?: string;
+  id?: string;
+}
+
 export const DatePicker = defineComponent({
   name: 'TigerDatePicker',
   props: {
