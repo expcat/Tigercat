@@ -1,11 +1,14 @@
-import React, { useMemo } from 'react'
-import { classNames, type LayoutProps } from '@tigercat/core'
+import React from 'react';
+import {
+  classNames,
+  layoutRootClasses,
+  type LayoutProps as CoreLayoutProps,
+} from '@tigercat/core';
 
-export interface ReactLayoutProps extends LayoutProps {
-  /**
-   * Layout content
-   */
-  children?: React.ReactNode
+export interface ReactLayoutProps
+  extends CoreLayoutProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+  children?: React.ReactNode;
 }
 
 export const Layout: React.FC<ReactLayoutProps> = ({
@@ -13,15 +16,11 @@ export const Layout: React.FC<ReactLayoutProps> = ({
   children,
   ...props
 }) => {
-  const layoutClasses = useMemo(() => classNames(
-    'tiger-layout',
-    'flex flex-col min-h-screen',
-    className
-  ), [className])
+  const layoutClasses = classNames(layoutRootClasses, className);
 
   return (
     <div className={layoutClasses} {...props}>
       {children}
     </div>
-  )
-}
+  );
+};

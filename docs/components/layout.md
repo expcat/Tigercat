@@ -10,7 +10,7 @@ Layout 组件提供了一套完整的页面布局解决方案，支持多种经�
 
 ```vue
 <script setup>
-import { Layout, Header, Content, Footer } from '@tigercat/vue'
+import { Layout, Header, Content, Footer } from '@tigercat/vue';
 </script>
 
 <template>
@@ -25,7 +25,7 @@ import { Layout, Header, Content, Footer } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Layout, Header, Content, Footer } from '@tigercat/react'
+import { Layout, Header, Content, Footer } from '@tigercat/react';
 
 function App() {
   return (
@@ -34,7 +34,7 @@ function App() {
       <Content>Content</Content>
       <Footer>Footer</Footer>
     </Layout>
-  )
+  );
 }
 ```
 
@@ -46,7 +46,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/vue'
+import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/vue';
 </script>
 
 <template>
@@ -64,7 +64,7 @@ import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/react'
+import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/react';
 
 function App() {
   return (
@@ -76,7 +76,7 @@ function App() {
       </div>
       <Footer>Footer</Footer>
     </Layout>
-  )
+  );
 }
 ```
 
@@ -88,14 +88,21 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Layout, Header, Sidebar, Content, Footer, Button } from '@tigercat/vue'
+import { ref } from 'vue';
+import {
+  Layout,
+  Header,
+  Sidebar,
+  Content,
+  Footer,
+  Button,
+} from '@tigercat/vue';
 
-const collapsed = ref(false)
+const collapsed = ref(false);
 
 const toggleSidebar = () => {
-  collapsed.value = !collapsed.value
-}
+  collapsed.value = !collapsed.value;
+};
 </script>
 
 <template>
@@ -112,9 +119,15 @@ const toggleSidebar = () => {
       <Sidebar :collapsed="collapsed">
         <nav class="p-4">
           <ul class="space-y-2">
-            <li><a href="#" class="block p-2 hover:bg-gray-100 rounded">菜单 1</a></li>
-            <li><a href="#" class="block p-2 hover:bg-gray-100 rounded">菜单 2</a></li>
-            <li><a href="#" class="block p-2 hover:bg-gray-100 rounded">菜单 3</a></li>
+            <li>
+              <a href="#" class="block p-2 hover:bg-gray-100 rounded">菜单 1</a>
+            </li>
+            <li>
+              <a href="#" class="block p-2 hover:bg-gray-100 rounded">菜单 2</a>
+            </li>
+            <li>
+              <a href="#" class="block p-2 hover:bg-gray-100 rounded">菜单 3</a>
+            </li>
           </ul>
         </nav>
       </Sidebar>
@@ -135,33 +148,50 @@ const toggleSidebar = () => {
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Layout, Header, Sidebar, Content, Footer, Button } from '@tigercat/react'
+import { useState } from 'react';
+import {
+  Layout,
+  Header,
+  Sidebar,
+  Content,
+  Footer,
+  Button,
+} from '@tigercat/react';
 
 function App() {
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(false);
 
   const toggleSidebar = () => {
-    setCollapsed(!collapsed)
-  }
+    setCollapsed(!collapsed);
+  };
 
   return (
     <Layout>
       <Header>
         <div className="flex items-center justify-between px-6 h-full">
           <h1 className="text-xl font-bold">My App</h1>
-          <Button onClick={toggleSidebar}>
-            {collapsed ? '展开' : '收起'}
-          </Button>
+          <Button onClick={toggleSidebar}>{collapsed ? '展开' : '收起'}</Button>
         </div>
       </Header>
       <div className="flex flex-1">
         <Sidebar collapsed={collapsed}>
           <nav className="p-4">
             <ul className="space-y-2">
-              <li><a href="#" className="block p-2 hover:bg-gray-100 rounded">菜单 1</a></li>
-              <li><a href="#" className="block p-2 hover:bg-gray-100 rounded">菜单 2</a></li>
-              <li><a href="#" className="block p-2 hover:bg-gray-100 rounded">菜单 3</a></li>
+              <li>
+                <a href="#" className="block p-2 hover:bg-gray-100 rounded">
+                  菜单 1
+                </a>
+              </li>
+              <li>
+                <a href="#" className="block p-2 hover:bg-gray-100 rounded">
+                  菜单 2
+                </a>
+              </li>
+              <li>
+                <a href="#" className="block p-2 hover:bg-gray-100 rounded">
+                  菜单 3
+                </a>
+              </li>
             </ul>
           </nav>
         </Sidebar>
@@ -176,7 +206,7 @@ function App() {
         </div>
       </Footer>
     </Layout>
-  )
+  );
 }
 ```
 
@@ -201,9 +231,7 @@ function App() {
       <Content>主内容</Content>
     </div>
     <Footer height="100px">
-      <div class="flex items-center justify-center h-full">
-        更高的 Footer
-      </div>
+      <div class="flex items-center justify-center h-full">更高的 Footer</div>
     </Footer>
   </Layout>
 </template>
@@ -225,9 +253,7 @@ function App() {
     <Content>主内容</Content>
   </div>
   <Footer height="100px">
-    <div className="flex items-center justify-center h-full">
-      更高的 Footer
-    </div>
+    <div className="flex items-center justify-center h-full">更高的 Footer</div>
   </Footer>
 </Layout>
 ```
@@ -271,9 +297,15 @@ function App() {
           <h2 class="text-lg font-bold mb-4">导航</h2>
           <nav>
             <ul class="space-y-2">
-              <li><a href="#" class="block p-2 hover:bg-gray-100 rounded">首页</a></li>
-              <li><a href="#" class="block p-2 hover:bg-gray-100 rounded">关于</a></li>
-              <li><a href="#" class="block p-2 hover:bg-gray-100 rounded">联系</a></li>
+              <li>
+                <a href="#" class="block p-2 hover:bg-gray-100 rounded">首页</a>
+              </li>
+              <li>
+                <a href="#" class="block p-2 hover:bg-gray-100 rounded">关于</a>
+              </li>
+              <li>
+                <a href="#" class="block p-2 hover:bg-gray-100 rounded">联系</a>
+              </li>
             </ul>
           </nav>
         </div>
@@ -298,9 +330,21 @@ function App() {
         <h2 className="text-lg font-bold mb-4">导航</h2>
         <nav>
           <ul className="space-y-2">
-            <li><a href="#" className="block p-2 hover:bg-gray-100 rounded">首页</a></li>
-            <li><a href="#" className="block p-2 hover:bg-gray-100 rounded">关于</a></li>
-            <li><a href="#" className="block p-2 hover:bg-gray-100 rounded">联系</a></li>
+            <li>
+              <a href="#" className="block p-2 hover:bg-gray-100 rounded">
+                首页
+              </a>
+            </li>
+            <li>
+              <a href="#" className="block p-2 hover:bg-gray-100 rounded">
+                关于
+              </a>
+            </li>
+            <li>
+              <a href="#" className="block p-2 hover:bg-gray-100 rounded">
+                联系
+              </a>
+            </li>
           </ul>
         </nav>
       </div>
@@ -316,27 +360,35 @@ function App() {
 
 ## 自定义样式
 
-所有组件都支持通过 `className` 属性添加自定义样式。
+所有组件都支持通过 `className`（React）/`class-name`（Vue）添加自定义样式，并支持透传原生属性（如 `id`、`data-*`、`aria-*`）。
 
 ### Vue 3
 
 ```vue
 <template>
-  <Layout className="bg-gray-100">
-    <Header className="bg-blue-600 text-white">
+  <Layout class-name="bg-gray-100">
+    <Header class-name="bg-blue-600 text-white">
       <div class="px-6 h-full flex items-center">
         <h1 class="text-xl font-bold">自定义样式</h1>
       </div>
     </Header>
-    <Content className="bg-white">
+    <Content class-name="bg-white">
       <p>自定义背景色的内容区域</p>
     </Content>
-    <Footer className="bg-gray-800 text-white">
+    <Footer class-name="bg-gray-800 text-white">
       <div class="text-center">自定义样式 Footer</div>
     </Footer>
   </Layout>
 </template>
 ```
+
+## 主题定制
+
+Layout 系列组件的默认背景与边框使用 CSS 变量（带 fallback），可在全局主题中覆盖：
+
+- `--tiger-surface`：Header/Sidebar/Footer 默认背景（默认 `#ffffff`）
+- `--tiger-border`：Header/Sidebar/Footer 默认边框色（默认 `#e5e7eb`）
+- `--tiger-layout-content-bg`：Content 默认背景（默认 `#f9fafb`）
 
 ### React
 
@@ -360,79 +412,79 @@ function App() {
 
 ### Layout Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| className | 额外的 CSS 类名 | `string` | - |
+| 属性      | 说明            | 类型     | 默认值 |
+| --------- | --------------- | -------- | ------ |
+| className | 额外的 CSS 类名 | `string` | -      |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
+| 属性     | 说明     | 类型              |
+| -------- | -------- | ----------------- |
 | children | 布局内容 | `React.ReactNode` |
 
 ### Header Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| className | 额外的 CSS 类名 | `string` | - |
-| height | Header 高度 | `string` | `'64px'` |
+| 属性      | 说明            | 类型     | 默认值   |
+| --------- | --------------- | -------- | -------- |
+| className | 额外的 CSS 类名 | `string` | -        |
+| height    | Header 高度     | `string` | `'64px'` |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
+| 属性     | 说明        | 类型              |
+| -------- | ----------- | ----------------- |
 | children | Header 内容 | `React.ReactNode` |
 
 ### Sidebar Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| className | 额外的 CSS 类名 | `string` | - |
-| width | Sidebar 宽度 | `string` | `'256px'` |
-| collapsed | 是否折叠 | `boolean` | `false` |
+| 属性      | 说明            | 类型      | 默认值    |
+| --------- | --------------- | --------- | --------- |
+| className | 额外的 CSS 类名 | `string`  | -         |
+| width     | Sidebar 宽度    | `string`  | `'256px'` |
+| collapsed | 是否折叠        | `boolean` | `false`   |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
+| 属性     | 说明         | 类型              |
+| -------- | ------------ | ----------------- |
 | children | Sidebar 内容 | `React.ReactNode` |
 
 ### Content Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| className | 额外的 CSS 类名 | `string` | - |
+| 属性      | 说明            | 类型     | 默认值 |
+| --------- | --------------- | -------- | ------ |
+| className | 额外的 CSS 类名 | `string` | -      |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
+| 属性     | 说明         | 类型              |
+| -------- | ------------ | ----------------- |
 | children | Content 内容 | `React.ReactNode` |
 
 ### Footer Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| className | 额外的 CSS 类名 | `string` | - |
-| height | Footer 高度 | `string` | `'auto'` |
+| 属性      | 说明            | 类型     | 默认值   |
+| --------- | --------------- | -------- | -------- |
+| className | 额外的 CSS 类名 | `string` | -        |
+| height    | Footer 高度     | `string` | `'auto'` |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
+| 属性     | 说明        | 类型              |
+| -------- | ----------- | ----------------- |
 | children | Footer 内容 | `React.ReactNode` |
 
 ### Slots / 插槽 (Vue)
 
 所有组件都支持默认插槽用于传递内容：
 
-| 组件 | 插槽名 | 说明 |
-|------|--------|------|
-| Layout | default | 布局内容 |
-| Header | default | Header 内容 |
+| 组件    | 插槽名  | 说明         |
+| ------- | ------- | ------------ |
+| Layout  | default | 布局内容     |
+| Header  | default | Header 内容  |
 | Sidebar | default | Sidebar 内容 |
 | Content | default | Content 内容 |
-| Footer | default | Footer 内容 |
+| Footer  | default | Footer 内容  |
 
 ## 样式定制
 
@@ -459,16 +511,10 @@ Layout 组件使用 Tailwind CSS 构建，所有子组件都提供了合理的�
       </div>
     </Header>
     <div class="flex flex-col md:flex-row flex-1">
-      <Sidebar 
-        width="200px" 
-        :collapsed="isMobile"
-        className="md:block"
-      >
+      <Sidebar width="200px" :collapsed="isMobile" className="md:block">
         导航菜单
       </Sidebar>
-      <Content className="p-4 md:p-6">
-        主要内容
-      </Content>
+      <Content className="p-4 md:p-6"> 主要内容 </Content>
     </div>
     <Footer>Footer</Footer>
   </Layout>
@@ -498,11 +544,11 @@ import type {
   HeaderProps,
   SidebarProps,
   ContentProps,
-  FooterProps
-} from '@tigercat/core'
+  FooterProps,
+} from '@tigercat/core';
 
 // Vue
-import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/vue'
+import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/vue';
 
 // React
 import {
@@ -516,7 +562,7 @@ import {
   type SidebarProps as ReactSidebarProps,
   type ContentProps as ReactContentProps,
   type FooterProps as ReactFooterProps,
-} from '@tigercat/react'
+} from '@tigercat/react';
 ```
 
 ## 完整示例
@@ -527,11 +573,18 @@ import {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Layout, Header, Sidebar, Content, Footer, Button } from '@tigercat/vue'
+import { ref } from 'vue';
+import {
+  Layout,
+  Header,
+  Sidebar,
+  Content,
+  Footer,
+  Button,
+} from '@tigercat/vue';
 
-const collapsed = ref(false)
-const currentPage = ref('dashboard')
+const collapsed = ref(false);
+const currentPage = ref('dashboard');
 
 const menuItems = [
   { id: 'dashboard', label: '仪表盘', icon: '📊' },
@@ -539,15 +592,15 @@ const menuItems = [
   { id: 'products', label: '产品管理', icon: '📦' },
   { id: 'orders', label: '订单管理', icon: '🛒' },
   { id: 'settings', label: '设置', icon: '⚙️' },
-]
+];
 
 const toggleSidebar = () => {
-  collapsed.value = !collapsed.value
-}
+  collapsed.value = !collapsed.value;
+};
 
 const navigateTo = (pageId) => {
-  currentPage.value = pageId
-}
+  currentPage.value = pageId;
+};
 </script>
 
 <template>
@@ -564,7 +617,7 @@ const navigateTo = (pageId) => {
         </div>
       </div>
     </Header>
-    
+
     <div class="flex flex-1">
       <Sidebar :collapsed="collapsed">
         <nav class="p-4">
@@ -577,9 +630,8 @@ const navigateTo = (pageId) => {
                   'flex items-center gap-3 px-4 py-2 rounded-lg transition-colors',
                   currentPage === item.id
                     ? 'bg-blue-50 text-blue-600 font-medium'
-                    : 'text-gray-700 hover:bg-gray-100'
-                ]"
-              >
+                    : 'text-gray-700 hover:bg-gray-100',
+                ]">
                 <span class="text-xl">{{ item.icon }}</span>
                 <span>{{ item.label }}</span>
               </a>
@@ -587,17 +639,22 @@ const navigateTo = (pageId) => {
           </ul>
         </nav>
       </Sidebar>
-      
+
       <Content>
         <div class="max-w-7xl mx-auto">
-          <h2 class="text-2xl font-bold mb-6">{{ menuItems.find(i => i.id === currentPage)?.label }}</h2>
+          <h2 class="text-2xl font-bold mb-6">
+            {{ menuItems.find((i) => i.id === currentPage)?.label }}
+          </h2>
           <div class="bg-white rounded-lg shadow p-6">
-            <p class="text-gray-600">这里是 {{ menuItems.find(i => i.id === currentPage)?.label }} 的内容。</p>
+            <p class="text-gray-600">
+              这里是
+              {{ menuItems.find((i) => i.id === currentPage)?.label }} 的内容。
+            </p>
           </div>
         </div>
       </Content>
     </div>
-    
+
     <Footer>
       <div class="text-center text-sm text-gray-600">
         © 2024 管理后台系统. All rights reserved.
@@ -610,18 +667,25 @@ const navigateTo = (pageId) => {
 #### React
 
 ```tsx
-import { useState } from 'react'
-import { Layout, Header, Sidebar, Content, Footer, Button } from '@tigercat/react'
+import { useState } from 'react';
+import {
+  Layout,
+  Header,
+  Sidebar,
+  Content,
+  Footer,
+  Button,
+} from '@tigercat/react';
 
 interface MenuItem {
-  id: string
-  label: string
-  icon: string
+  id: string;
+  label: string;
+  icon: string;
 }
 
 function AdminLayout() {
-  const [collapsed, setCollapsed] = useState(false)
-  const [currentPage, setCurrentPage] = useState('dashboard')
+  const [collapsed, setCollapsed] = useState(false);
+  const [currentPage, setCurrentPage] = useState('dashboard');
 
   const menuItems: MenuItem[] = [
     { id: 'dashboard', label: '仪表盘', icon: '📊' },
@@ -629,31 +693,35 @@ function AdminLayout() {
     { id: 'products', label: '产品管理', icon: '📦' },
     { id: 'orders', label: '订单管理', icon: '🛒' },
     { id: 'settings', label: '设置', icon: '⚙️' },
-  ]
+  ];
 
   const toggleSidebar = () => {
-    setCollapsed(!collapsed)
-  }
+    setCollapsed(!collapsed);
+  };
 
   const navigateTo = (pageId: string) => {
-    setCurrentPage(pageId)
-  }
+    setCurrentPage(pageId);
+  };
 
   return (
     <Layout>
       <Header>
         <div className="flex items-center justify-between px-6 h-full">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={toggleSidebar}>☰</Button>
+            <Button variant="ghost" onClick={toggleSidebar}>
+              ☰
+            </Button>
             <h1 className="text-xl font-bold">管理后台</h1>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">欢迎，管理员</span>
-            <Button variant="outline" size="sm">退出</Button>
+            <Button variant="outline" size="sm">
+              退出
+            </Button>
           </div>
         </div>
       </Header>
-      
+
       <div className="flex flex-1">
         <Sidebar collapsed={collapsed}>
           <nav className="p-4">
@@ -663,17 +731,17 @@ function AdminLayout() {
                   <a
                     href="#"
                     onClick={(e) => {
-                      e.preventDefault()
-                      navigateTo(item.id)
+                      e.preventDefault();
+                      navigateTo(item.id);
                     }}
                     className={`
                       flex items-center gap-3 px-4 py-2 rounded-lg transition-colors
-                      ${currentPage === item.id
-                        ? 'bg-blue-50 text-blue-600 font-medium'
-                        : 'text-gray-700 hover:bg-gray-100'
+                      ${
+                        currentPage === item.id
+                          ? 'bg-blue-50 text-blue-600 font-medium'
+                          : 'text-gray-700 hover:bg-gray-100'
                       }
-                    `}
-                  >
+                    `}>
                     <span className="text-xl">{item.icon}</span>
                     <span>{item.label}</span>
                   </a>
@@ -682,31 +750,32 @@ function AdminLayout() {
             </ul>
           </nav>
         </Sidebar>
-        
+
         <Content>
           <div className="max-w-7xl mx-auto">
             <h2 className="text-2xl font-bold mb-6">
-              {menuItems.find(i => i.id === currentPage)?.label}
+              {menuItems.find((i) => i.id === currentPage)?.label}
             </h2>
             <div className="bg-white rounded-lg shadow p-6">
               <p className="text-gray-600">
-                这里是 {menuItems.find(i => i.id === currentPage)?.label} 的内容。
+                这里是 {menuItems.find((i) => i.id === currentPage)?.label}{' '}
+                的内容。
               </p>
             </div>
           </div>
         </Content>
       </div>
-      
+
       <Footer>
         <div className="text-center text-sm text-gray-600">
           © 2024 管理后台系统. All rights reserved.
         </div>
       </Footer>
     </Layout>
-  )
+  );
 }
 
-export default AdminLayout
+export default AdminLayout;
 ```
 
 ## 最佳实践

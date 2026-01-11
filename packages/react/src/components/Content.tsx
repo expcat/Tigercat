@@ -1,11 +1,14 @@
-import React, { useMemo } from 'react'
-import { classNames, type ContentProps } from '@tigercat/core'
+import React from 'react';
+import {
+  classNames,
+  layoutContentClasses,
+  type ContentProps as CoreContentProps,
+} from '@tigercat/core';
 
-export interface ReactContentProps extends ContentProps {
-  /**
-   * Content body
-   */
-  children?: React.ReactNode
+export interface ReactContentProps
+  extends CoreContentProps,
+    Omit<React.HTMLAttributes<HTMLElement>, 'children'> {
+  children?: React.ReactNode;
 }
 
 export const Content: React.FC<ReactContentProps> = ({
@@ -13,15 +16,11 @@ export const Content: React.FC<ReactContentProps> = ({
   children,
   ...props
 }) => {
-  const contentClasses = useMemo(() => classNames(
-    'tiger-content',
-    'flex-1 bg-gray-50 p-6',
-    className
-  ), [className])
+  const contentClasses = classNames(layoutContentClasses, className);
 
   return (
     <main className={contentClasses} {...props}>
       {children}
     </main>
-  )
-}
+  );
+};

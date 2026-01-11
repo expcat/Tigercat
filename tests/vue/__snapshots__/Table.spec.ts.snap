@@ -42,7 +42,6 @@ exports[`Table > Snapshots > should match snapshot with all features enabled 1`]
                   />
                 </svg>
               </div>
-              <!---->
             </th>
             <th
               class="font-medium text-gray-700 text-sm px-6 py-4 text-left cursor-pointer select-none hover:bg-gray-100 transition-colors"
@@ -63,7 +62,6 @@ exports[`Table > Snapshots > should match snapshot with all features enabled 1`]
                   />
                 </svg>
               </div>
-              <!---->
             </th>
             <th
               class="font-medium text-gray-700 text-sm px-6 py-4 text-left"
@@ -72,9 +70,7 @@ exports[`Table > Snapshots > should match snapshot with all features enabled 1`]
                 class="flex items-center gap-2"
               >
                 Email
-                <!---->
               </div>
-              <!---->
             </th>
           </tr>
         </thead>
@@ -192,9 +188,7 @@ exports[`Table > Snapshots > should match snapshot with default props 1`] = `
                 class="flex items-center gap-2"
               >
                 Name
-                <!---->
               </div>
-              <!---->
             </th>
             <th
               class="font-medium text-gray-700 text-sm px-4 py-3 text-left"
@@ -203,9 +197,7 @@ exports[`Table > Snapshots > should match snapshot with default props 1`] = `
                 class="flex items-center gap-2"
               >
                 Age
-                <!---->
               </div>
-              <!---->
             </th>
             <th
               class="font-medium text-gray-700 text-sm px-4 py-3 text-left"
@@ -214,9 +206,7 @@ exports[`Table > Snapshots > should match snapshot with default props 1`] = `
                 class="flex items-center gap-2"
               >
                 Email
-                <!---->
               </div>
-              <!---->
             </th>
           </tr>
         </thead>

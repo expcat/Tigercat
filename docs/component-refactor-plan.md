@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Skeleton` Step1 例行检查/主题/透传/a11y/测试精简（2026-01-12）
+- 上一步：✅ `Layout` Step1 主题/透传/类型/测试精简（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -174,7 +174,7 @@
 
 - 思路：统一布局类组件的 class 生成与响应式；Sidebar collapsed 状态与 Menu 联动（如有）。
 - 可拆分：API 统一 → 样式抽取到 core → tests（最小渲染）。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/类型/测试精简（2026-01-12）：下沉 core 的 `layout-utils`（默认样式改为 CSS vars：`--tiger-surface/--tiger-border/--tiger-layout-content-bg`）；React 移除多余 `useMemo` 并补齐 `HTMLAttributes` 透传类型（含 style 合并）；Vue 增加 `inheritAttrs: false`，合并 `attrs.class/style` 并导出 `VueLayoutProps/VueHeaderProps/VueSidebarProps/VueContentProps/VueFooterProps`；移除 LayoutSections 快照并精简 Vue/React 测试；同步更新 Layout 文档（新增主题变量说明）。
 
 #### Grid：Row / Col（P2，建议优化）
 

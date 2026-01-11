@@ -17,10 +17,11 @@ exports[`Popover > Snapshots > should match snapshot for basic popover 1`] = `
     <div
       class="tiger-popover-content min-w-[200px] max-w-[400px] p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
     >
-      <!---->
       <div
         class="tiger-popover-text text-sm text-gray-700 dark:text-gray-300"
-      />
+      >
+        Snapshot content
+      </div>
     </div>
   </div>
 </div>
@@ -43,7 +44,6 @@ exports[`Popover > Snapshots > should match snapshot for different placements 1`
     <div
       class="tiger-popover-content min-w-[200px] max-w-[400px] p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
     >
-      <!---->
       <div
         class="tiger-popover-text text-sm text-gray-700 dark:text-gray-300"
       >
@@ -71,7 +71,6 @@ exports[`Popover > Snapshots > should match snapshot for different placements 2`
     <div
       class="tiger-popover-content min-w-[200px] max-w-[400px] p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
     >
-      <!---->
       <div
         class="tiger-popover-text text-sm text-gray-700 dark:text-gray-300"
       >
@@ -99,7 +98,6 @@ exports[`Popover > Snapshots > should match snapshot for different placements 3`
     <div
       class="tiger-popover-content min-w-[200px] max-w-[400px] p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
     >
-      <!---->
       <div
         class="tiger-popover-text text-sm text-gray-700 dark:text-gray-300"
       >
@@ -127,7 +125,6 @@ exports[`Popover > Snapshots > should match snapshot for different placements 4`
     <div
       class="tiger-popover-content min-w-[200px] max-w-[400px] p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
     >
-      <!---->
       <div
         class="tiger-popover-text text-sm text-gray-700 dark:text-gray-300"
       >
@@ -155,7 +152,6 @@ exports[`Popover > Snapshots > should match snapshot for different placements 5`
     <div
       class="tiger-popover-content min-w-[200px] max-w-[400px] p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
     >
-      <!---->
       <div
         class="tiger-popover-text text-sm text-gray-700 dark:text-gray-300"
       >
@@ -183,7 +179,6 @@ exports[`Popover > Snapshots > should match snapshot for different placements 6`
     <div
       class="tiger-popover-content min-w-[200px] max-w-[400px] p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
     >
-      <!---->
       <div
         class="tiger-popover-text text-sm text-gray-700 dark:text-gray-300"
       >
@@ -211,10 +206,16 @@ exports[`Popover > Snapshots > should match snapshot for popover with title 1`] 
     <div
       class="tiger-popover-content min-w-[200px] max-w-[400px] p-3 bg-white rounded-lg shadow-lg border border-gray-200 dark:bg-gray-800 dark:border-gray-700"
     >
-      <!---->
+      <div
+        class="tiger-popover-title text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2 border-b border-gray-200 dark:border-gray-700 pb-2"
+      >
+        Snapshot Title
+      </div>
       <div
         class="tiger-popover-text text-sm text-gray-700 dark:text-gray-300"
-      />
+      >
+        Snapshot content
+      </div>
     </div>
   </div>
 </div>
