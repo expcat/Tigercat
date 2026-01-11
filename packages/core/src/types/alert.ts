@@ -5,12 +5,12 @@
 /**
  * Alert type (determines the icon and color scheme)
  */
-export type AlertType = 'success' | 'warning' | 'error' | 'info'
+export type AlertType = 'success' | 'warning' | 'error' | 'info';
 
 /**
  * Alert size types
  */
-export type AlertSize = 'sm' | 'md' | 'lg'
+export type AlertSize = 'sm' | 'md' | 'lg';
 
 /**
  * Base alert props interface
@@ -20,38 +20,44 @@ export interface AlertProps {
    * Alert type (success, warning, error, info)
    * @default 'info'
    */
-  type?: AlertType
-  
+  type?: AlertType;
+
   /**
    * Alert size
    * @default 'md'
    */
-  size?: AlertSize
-  
+  size?: AlertSize;
+
   /**
    * Alert title (main message)
    */
-  title?: string
-  
+  title?: string;
+
   /**
    * Alert description (detailed content)
    */
-  description?: string
-  
+  description?: string;
+
   /**
    * Whether to show the type icon
    * @default true
    */
-  showIcon?: boolean
-  
+  showIcon?: boolean;
+
   /**
    * Whether the alert can be closed
    * @default false
    */
-  closable?: boolean
-  
+  closable?: boolean;
+
+  /**
+   * Accessible label for the close button (when `closable` is true)
+   * @default 'Close alert'
+   */
+  closeAriaLabel?: string;
+
   /**
    * Additional CSS classes
    */
-  className?: string
+  className?: string;
 }
