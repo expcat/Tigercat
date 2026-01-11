@@ -1,16 +1,29 @@
-import { defineComponent, computed, h, PropType } from 'vue'
-import { 
-  classNames, 
+import { defineComponent, computed, h, PropType } from 'vue';
+import {
+  classNames,
   getSkeletonClasses,
   getSkeletonDimensions,
   getParagraphRowWidth,
-  type SkeletonVariant, 
+  type SkeletonVariant,
   type SkeletonAnimation,
   type SkeletonShape,
-} from '@tigercat/core'
+} from '@tigercat/core';
+
+export interface VueSkeletonProps {
+  variant?: SkeletonVariant;
+  animation?: SkeletonAnimation;
+  width?: string;
+  height?: string;
+  shape?: SkeletonShape;
+  rows?: number;
+  paragraph?: boolean;
+  className?: string;
+  style?: Record<string, string | number>;
+}
 
 export const Skeleton = defineComponent({
   name: 'TigerSkeleton',
+  inheritAttrs: false,
   props: {
     /**
      * Skeleton variant - determines the placeholder shape
@@ -73,51 +86,68 @@ export const Skeleton = defineComponent({
      */
     className: {
       type: String,
-      default: '',
+      default: undefined,
+    },
+
+    /**
+     * Custom styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined,
     },
   },
-  setup(props) {
+  setup(props, { attrs }) {
     const skeletonClasses = computed(() => {
       return classNames(
         getSkeletonClasses(props.variant, props.animation, props.shape),
         props.className
-      )
-    })
+      );
+    });
 
     const dimensions = computed(() => {
-      return getSkeletonDimensions(props.variant, props.width, props.height)
-    })
+      return getSkeletonDimensions(props.variant, props.width, props.height);
+    });
 
     const skeletonStyle = computed(() => {
-      const style: Record<string, string> = {}
-      
+      const style: Record<string, string> = {};
+
       if (dimensions.value.width) {
-        style.width = dimensions.value.width
+        style.width = dimensions.value.width;
       }
       if (dimensions.value.height) {
-        style.height = dimensions.value.height
+        style.height = dimensions.value.height;
       }
-      
-      return style
-    })
+
+      return style;
+    });
 
     return () => {
+      const attrsRecord = attrs as Record<string, unknown>;
+      const attrsClass = attrsRecord.class;
+      const attrsStyle = attrsRecord.style;
+      const ariaLabel = attrsRecord['aria-label'];
+      const ariaLabelledBy = attrsRecord['aria-labelledby'];
+      const computedAriaHidden =
+        attrsRecord['aria-hidden'] ??
+        (ariaLabel || ariaLabelledBy ? undefined : true);
+
       // For text variant with multiple rows
       if (props.variant === 'text' && props.rows > 1) {
-        const rows = []
-        
+        const rows = [];
+
         for (let i = 0; i < props.rows; i++) {
           const rowStyle: Record<string, string> = {
             height: dimensions.value.height,
-          }
-          
+          };
+
           // Apply paragraph widths if paragraph mode is enabled
           if (props.paragraph) {
-            rowStyle.width = getParagraphRowWidth(i, props.rows)
+            rowStyle.width = getParagraphRowWidth(i, props.rows);
           } else if (dimensions.value.width) {
-            rowStyle.width = dimensions.value.width
+            rowStyle.width = dimensions.value.width;
           }
-          
+
           rows.push(
             h('div', {
               key: i,
@@ -126,20 +156,40 @@ export const Skeleton = defineComponent({
                 i < props.rows - 1 && 'mb-2'
               ),
               style: rowStyle,
+              'aria-hidden': computedAriaHidden,
             })
-          )
+          );
         }
-        
-        return h('div', { class: 'flex flex-col' }, rows)
+
+        return h(
+          'div',
+          {
+            ...attrs,
+            class: classNames('flex flex-col', attrsClass as any),
+            style: [attrsStyle as any, props.style as any],
+            'aria-label': ariaLabel as any,
+            'aria-labelledby': ariaLabelledBy as any,
+            'aria-hidden': computedAriaHidden,
+          },
+          rows
+        );
       }
-      
+
       // Single skeleton element
       return h('div', {
-        class: skeletonClasses.value,
-        style: skeletonStyle.value,
-      })
-    }
+        ...attrs,
+        class: classNames(skeletonClasses.value, attrsClass as any),
+        style: [
+          attrsStyle as any,
+          props.style as any,
+          skeletonStyle.value as any,
+        ],
+        'aria-label': ariaLabel as any,
+        'aria-labelledby': ariaLabelledBy as any,
+        'aria-hidden': computedAriaHidden,
+      });
+    };
   },
-})
+});
 
-export default Skeleton
+export default Skeleton;

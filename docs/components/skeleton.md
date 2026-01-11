@@ -8,19 +8,19 @@
 
 ```vue
 <script setup>
-import { Skeleton } from '@tigercat/vue'
+import { Skeleton } from '@tigercat/vue';
 </script>
 
 <template>
   <!-- 基础骨架屏 -->
   <Skeleton />
-  
+
   <!-- 头像骨架屏 -->
   <Skeleton variant="avatar" />
-  
+
   <!-- 图片骨架屏 -->
   <Skeleton variant="image" />
-  
+
   <!-- 按钮骨架屏 -->
   <Skeleton variant="button" />
 </template>
@@ -29,24 +29,24 @@ import { Skeleton } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Skeleton } from '@tigercat/react'
+import { Skeleton } from '@tigercat/react';
 
 function App() {
   return (
     <>
       {/* 基础骨架屏 */}
       <Skeleton />
-      
+
       {/* 头像骨架屏 */}
       <Skeleton variant="avatar" />
-      
+
       {/* 图片骨架屏 */}
       <Skeleton variant="image" />
-      
+
       {/* 按钮骨架屏 */}
       <Skeleton variant="button" />
     </>
-  )
+  );
 }
 ```
 
@@ -118,13 +118,13 @@ Skeleton 组件支持 3 种动画效果：
 <template>
   <!-- 自定义宽度 -->
   <Skeleton width="200px" />
-  
+
   <!-- 自定义高度 -->
   <Skeleton height="50px" />
-  
+
   <!-- 同时自定义宽度和高度 -->
   <Skeleton width="300px" height="100px" />
-  
+
   <!-- 使用百分比 -->
   <Skeleton width="80%" />
 </template>
@@ -133,17 +133,25 @@ Skeleton 组件支持 3 种动画效果：
 ### React
 
 ```tsx
-{/* 自定义宽度 */}
-<Skeleton width="200px" />
+{
+  /* 自定义宽度 */
+}
+<Skeleton width="200px" />;
 
-{/* 自定义高度 */}
-<Skeleton height="50px" />
+{
+  /* 自定义高度 */
+}
+<Skeleton height="50px" />;
 
-{/* 同时自定义宽度和高度 */}
-<Skeleton width="300px" height="100px" />
+{
+  /* 同时自定义宽度和高度 */
+}
+<Skeleton width="300px" height="100px" />;
 
-{/* 使用百分比 */}
-<Skeleton width="80%" />
+{
+  /* 使用百分比 */
+}
+<Skeleton width="80%" />;
 ```
 
 ## 多行文本
@@ -156,7 +164,7 @@ Skeleton 组件支持 3 种动画效果：
 <template>
   <!-- 3 行文本 -->
   <Skeleton variant="text" :rows="3" />
-  
+
   <!-- 5 行文本 -->
   <Skeleton variant="text" :rows="5" />
 </template>
@@ -165,11 +173,15 @@ Skeleton 组件支持 3 种动画效果：
 ### React
 
 ```tsx
-{/* 3 行文本 */}
-<Skeleton variant="text" rows={3} />
+{
+  /* 3 行文本 */
+}
+<Skeleton variant="text" rows={3} />;
 
-{/* 5 行文本 */}
-<Skeleton variant="text" rows={5} />
+{
+  /* 5 行文本 */
+}
+<Skeleton variant="text" rows={5} />;
 ```
 
 ## 段落模式
@@ -182,7 +194,7 @@ Skeleton 组件支持 3 种动画效果：
 <template>
   <!-- 段落模式 -->
   <Skeleton variant="text" :rows="4" paragraph />
-  
+
   <!-- 普通模式 -->
   <Skeleton variant="text" :rows="4" />
 </template>
@@ -191,11 +203,15 @@ Skeleton 组件支持 3 种动画效果：
 ### React
 
 ```tsx
-{/* 段落模式 */}
-<Skeleton variant="text" rows={4} paragraph />
+{
+  /* 段落模式 */
+}
+<Skeleton variant="text" rows={4} paragraph />;
 
-{/* 普通模式 */}
-<Skeleton variant="text" rows={4} />
+{
+  /* 普通模式 */
+}
+<Skeleton variant="text" rows={4} />;
 ```
 
 ## 头像形状
@@ -232,14 +248,14 @@ Skeleton 组件支持 3 种动画效果：
   <div class="flex items-start gap-4">
     <!-- 头像 -->
     <Skeleton variant="avatar" shape="circle" />
-    
+
     <!-- 内容 -->
     <div class="flex-1">
       <Skeleton variant="text" width="200px" class="mb-2" />
       <Skeleton variant="text" :rows="2" paragraph />
     </div>
   </div>
-  
+
   <!-- 图片卡片 -->
   <div class="mt-4">
     <Skeleton variant="image" />
@@ -255,20 +271,22 @@ Skeleton 组件支持 3 种动画效果：
 <div className="flex items-start gap-4">
   {/* 头像 */}
   <Skeleton variant="avatar" shape="circle" />
-  
+
   {/* 内容 */}
   <div className="flex-1">
     <Skeleton variant="text" width="200px" className="mb-2" />
     <Skeleton variant="text" rows={2} paragraph />
   </div>
-</div>
+</div>;
 
-{/* 图片卡片 */}
+{
+  /* 图片卡片 */
+}
 <div className="mt-4">
   <Skeleton variant="image" />
   <Skeleton variant="text" rows={2} paragraph className="mt-2" />
   <Skeleton variant="button" className="mt-2" />
-</div>
+</div>;
 ```
 
 ## 加载状态控制
@@ -279,18 +297,18 @@ Skeleton 组件支持 3 种动画效果：
 
 ```vue
 <script setup>
-import { ref, onMounted } from 'vue'
-import { Skeleton } from '@tigercat/vue'
+import { ref, onMounted } from 'vue';
+import { Skeleton } from '@tigercat/vue';
 
-const loading = ref(true)
-const data = ref(null)
+const loading = ref(true);
+const data = ref(null);
 
 onMounted(async () => {
   // 模拟数据加载
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  data.value = { title: '标题', content: '内容...' }
-  loading.value = false
-})
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  data.value = { title: '标题', content: '内容...' };
+  loading.value = false;
+});
 </script>
 
 <template>
@@ -308,36 +326,36 @@ onMounted(async () => {
 ### React
 
 ```tsx
-import { useState, useEffect } from 'react'
-import { Skeleton } from '@tigercat/react'
+import { useState, useEffect } from 'react';
+import { Skeleton } from '@tigercat/react';
 
 function DataLoader() {
-  const [loading, setLoading] = useState(true)
-  const [data, setData] = useState(null)
-  
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
+
   useEffect(() => {
     // 模拟数据加载
     setTimeout(() => {
-      setData({ title: '标题', content: '内容...' })
-      setLoading(false)
-    }, 2000)
-  }, [])
-  
+      setData({ title: '标题', content: '内容...' });
+      setLoading(false);
+    }, 2000);
+  }, []);
+
   if (loading) {
     return (
       <div>
         <Skeleton variant="text" width="200px" className="mb-2" />
         <Skeleton variant="text" rows={3} paragraph />
       </div>
-    )
+    );
   }
-  
+
   return (
     <div>
       <h2>{data.title}</h2>
       <p>{data.content}</p>
     </div>
-  )
+  );
 }
 ```
 
@@ -345,68 +363,81 @@ function DataLoader() {
 
 ### Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `variant` | `'text' \| 'avatar' \| 'image' \| 'button' \| 'custom'` | `'text'` | 骨架屏变体 |
-| `animation` | `'pulse' \| 'wave' \| 'none'` | `'pulse'` | 动画类型 |
-| `width` | `string` | - | 自定义宽度（CSS 值） |
-| `height` | `string` | - | 自定义高度（CSS 值） |
-| `shape` | `'circle' \| 'square'` | `'circle'` | 形状（仅用于 avatar 变体） |
-| `rows` | `number` | `1` | 行数（仅用于 text 变体） |
-| `paragraph` | `boolean` | `false` | 是否使用段落模式（仅用于 text 变体） |
-| `className` | `string` | `''` | 自定义 CSS 类名 |
+| 属性        | 类型                                                    | 默认值     | 说明                                             |
+| ----------- | ------------------------------------------------------- | ---------- | ------------------------------------------------ |
+| `variant`   | `'text' \| 'avatar' \| 'image' \| 'button' \| 'custom'` | `'text'`   | 骨架屏变体                                       |
+| `animation` | `'pulse' \| 'wave' \| 'none'`                           | `'pulse'`  | 动画类型                                         |
+| `width`     | `string`                                                | -          | 自定义宽度（CSS 值）                             |
+| `height`    | `string`                                                | -          | 自定义高度（CSS 值）                             |
+| `shape`     | `'circle' \| 'square'`                                  | `'circle'` | 形状（仅用于 avatar 变体）                       |
+| `rows`      | `number`                                                | `1`        | 行数（仅用于 text 变体）                         |
+| `paragraph` | `boolean`                                               | `false`    | 是否使用段落模式（仅用于 text 变体）             |
+| `className` | `string`                                                | -          | 自定义 CSS 类名（React）；Vue 请使用原生 `class` |
 
 ### 默认尺寸
 
 不同变体的默认尺寸：
 
-| 变体 | 默认宽度 | 默认高度 |
-|------|----------|----------|
-| `text` | `100%` | `1rem` (~16px) |
-| `avatar` | `2.5rem` (40px) | `2.5rem` (40px) |
-| `image` | `100%` | `12rem` (~192px) |
-| `button` | `6rem` (~96px) | `2.5rem` (~40px) |
-| `custom` | `100%` | `1rem` (~16px) |
+| 变体     | 默认宽度        | 默认高度         |
+| -------- | --------------- | ---------------- |
+| `text`   | `100%`          | `1rem` (~16px)   |
+| `avatar` | `2.5rem` (40px) | `2.5rem` (40px)  |
+| `image`  | `100%`          | `12rem` (~192px) |
+| `button` | `6rem` (~96px)  | `2.5rem` (~40px) |
+| `custom` | `100%`          | `1rem` (~16px)   |
 
 ## 主题定制
 
-Skeleton 组件使用 Tailwind CSS 类，可以通过 `className` 属性进行定制。
+Skeleton 默认背景色来自 CSS 变量，可通过主题覆盖（均带 fallback）：
+
+- `--tiger-skeleton-bg`（默认 `#e5e7eb`）
+- `--tiger-skeleton-bg-alt`（默认 `#d1d5db`，用于 `animation="wave"` 的渐变中间色）
+
+也可以通过类名调整圆角、阴影等（React 用 `className`，Vue 用 `class`）。
 
 ### Vue 3
 
 ```vue
 <template>
-  <!-- 自定义背景色 -->
-  <Skeleton className="bg-blue-100" />
-  
-  <!-- 自定义圆角 -->
-  <Skeleton className="rounded-xl" />
-  
-  <!-- 组合自定义 -->
-  <Skeleton className="bg-gray-100 rounded-lg shadow-sm" />
+  <!-- 通过 class 调整外观 -->
+  <Skeleton class="rounded-xl shadow-sm" />
+
+  <!-- 通过 CSS vars 覆盖颜色（仅示例：建议全局 theme 里配置） -->
+  <Skeleton
+    :style="{
+      '--tiger-skeleton-bg': '#f1f5f9',
+      '--tiger-skeleton-bg-alt': '#e2e8f0',
+    }" />
 </template>
 ```
 
 ### React
 
 ```tsx
-{/* 自定义背景色 */}
-<Skeleton className="bg-blue-100" />
+{
+  /* 自定义圆角 */
+}
+<Skeleton className="rounded-xl" />;
 
-{/* 自定义圆角 */}
-<Skeleton className="rounded-xl" />
+{
+  /* 通过 CSS vars 覆盖颜色 */
+}
+<Skeleton
+  style={{
+    ['--tiger-skeleton-bg' as any]: '#f1f5f9',
+    ['--tiger-skeleton-bg-alt' as any]: '#e2e8f0',
+  }}
+/>;
 
-{/* 组合自定义 */}
-<Skeleton className="bg-gray-100 rounded-lg shadow-sm" />
+{
+  /* 组合自定义 */
+}
+<Skeleton className="bg-gray-100 rounded-lg shadow-sm" />;
 ```
 
 ## 辅助功能
 
-Skeleton 组件使用语义化的 HTML 结构，确保良好的可访问性：
-
-- 使用 `div` 元素作为容器
-- 应用适当的 ARIA 属性（如需要）
-- 支持键盘导航
+Skeleton 默认按“装饰性占位”处理（默认 `aria-hidden="true"`）。如果你希望让屏幕阅读器感知加载状态，可显式传入 `role` 与可访问名称（例如 `role="status"` + `aria-label="Loading"`），或手动设置 `aria-hidden`。
 
 ## 最佳实践
 
@@ -414,7 +445,7 @@ Skeleton 组件使用语义化的 HTML 结构，确保良好的可访问性：
 2. **适当的动画**：使用 `pulse` 动画提供视觉反馈，避免使用 `none` 除非有特殊需求
 3. **组合使用**：结合多个 Skeleton 组件创建完整的加载状态
 4. **响应式设计**：使用百分比宽度或 Tailwind 响应式类确保在不同屏幕尺寸下正常显示
-5. **加载时长**：骨架屏适合中等时长的加载（1-3秒），过长应考虑其他方案
+5. **加载时长**：骨架屏适合中等时长的加载（1-3 秒），过长应考虑其他方案
 
 ## 注意事项
 
