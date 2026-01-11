@@ -1,30 +1,23 @@
-import React, { useMemo } from 'react'
-import { 
+import React from 'react';
+import {
   classNames,
-  getSpaceGapSize,
   getSpaceAlignClass,
   getSpaceDirectionClass,
-  type SpaceProps as CoreSpaceProps
-} from '@tigercat/core'
+  getSpaceGapSize,
+  type SpaceProps as CoreSpaceProps,
+} from '@tigercat/core';
 
-export interface SpaceProps extends CoreSpaceProps {
-  /**
-   * Space content
-   */
-  children?: React.ReactNode
-  
-  /**
-   * Additional CSS classes
-   */
-  className?: string
-  
-  /**
-   * Custom style
-   */
-  style?: React.CSSProperties
-}
+export type SpaceProps = CoreSpaceProps &
+  Omit<
+    React.HTMLAttributes<HTMLDivElement>,
+    'children' | 'className' | 'style'
+  > & {
+    children?: React.ReactNode;
+    className?: string;
+    style?: React.CSSProperties;
+  };
 
-const baseClasses = 'inline-flex'
+const baseClasses = 'inline-flex';
 
 export const Space: React.FC<SpaceProps> = ({
   direction = 'horizontal',
@@ -36,25 +29,24 @@ export const Space: React.FC<SpaceProps> = ({
   style,
   ...props
 }) => {
-  const gapSize = useMemo(() => getSpaceGapSize(size), [size])
-  
-  const spaceClasses = useMemo(() => classNames(
-    baseClasses,
-    getSpaceDirectionClass(direction),
-    getSpaceAlignClass(align),
-    gapSize.class,
-    wrap && 'flex-wrap',
-    className,
-  ), [direction, align, gapSize.class, wrap, className])
-
-  const spaceStyle = useMemo((): React.CSSProperties => ({
-    ...style,
-    ...(gapSize.style ? { gap: gapSize.style } : {}),
-  }), [style, gapSize.style])
+  const gapSize = getSpaceGapSize(size);
+  const mergedStyle: React.CSSProperties | undefined = gapSize.style
+    ? { gap: gapSize.style, ...style }
+    : style;
 
   return (
-    <div className={spaceClasses} style={spaceStyle} {...props}>
+    <div
+      {...props}
+      className={classNames(
+        baseClasses,
+        getSpaceDirectionClass(direction),
+        getSpaceAlignClass(align),
+        gapSize.class,
+        wrap && 'flex-wrap',
+        className
+      )}
+      style={mergedStyle}>
       {children}
     </div>
-  )
-}
+  );
+};

@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Space, Button } from '@tigercat/vue'
+import { Space, Button } from '@tigercat/vue';
 </script>
 
 <template>
@@ -23,7 +23,7 @@ import { Space, Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Space, Button } from '@tigercat/react'
+import { Space, Button } from '@tigercat/react';
 
 function App() {
   return (
@@ -32,7 +32,7 @@ function App() {
       <Button>Button 2</Button>
       <Button>Button 3</Button>
     </Space>
-  )
+  );
 }
 ```
 
@@ -342,25 +342,27 @@ Space 组件支持多种对齐方式：
 
 ### Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 | 可选值 |
-|------|------|------|--------|--------|
-| direction | 间距方向 | `SpaceDirection` | `'horizontal'` | `'horizontal'` \| `'vertical'` |
-| size | 间距大小 | `SpaceSize` | `'md'` | `'sm'` \| `'md'` \| `'lg'` \| `number` |
-| align | 对齐方式 | `SpaceAlign` | `'start'` | `'start'` \| `'end'` \| `'center'` \| `'baseline'` \| `'stretch'` |
-| wrap | 是否自动换行 | `boolean` | `false` | `true` \| `false` |
+| 属性      | 说明         | 类型             | 默认值         | 可选值                                                            |
+| --------- | ------------ | ---------------- | -------------- | ----------------------------------------------------------------- |
+| direction | 间距方向     | `SpaceDirection` | `'horizontal'` | `'horizontal'` \| `'vertical'`                                    |
+| size      | 间距大小     | `SpaceSize`      | `'md'`         | `'sm'` \| `'md'` \| `'lg'` \| `number`                            |
+| align     | 对齐方式     | `SpaceAlign`     | `'start'`      | `'start'` \| `'end'` \| `'center'` \| `'baseline'` \| `'stretch'` |
+| wrap      | 是否自动换行 | `boolean`        | `false`        | `true` \| `false`                                                 |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| className | 额外的 CSS 类名 | `string` | - |
-| style | 自定义样式 | `React.CSSProperties` | - |
-| children | 子元素 | `React.ReactNode` | - |
+| 属性      | 说明            | 类型                  | 默认值 |
+| --------- | --------------- | --------------------- | ------ |
+| className | 额外的 CSS 类名 | `string`              | -      |
+| style     | 自定义样式      | `React.CSSProperties` | -      |
+| children  | 子元素          | `React.ReactNode`     | -      |
+
+> 说明：React 版本会把其余 `div` 原生属性（如 `id`、`data-*`、`aria-*`）透传到根节点。
 
 ### Slots / 插槽 (Vue)
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明     |
+| ------- | -------- |
 | default | 间距内容 |
 
 ## 样式定制
@@ -414,18 +416,18 @@ React 版本的 Space 组件支持 `className` 和 `style` 属性：
 Space 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { 
-  SpaceProps, 
-  SpaceDirection, 
-  SpaceSize, 
-  SpaceAlign 
-} from '@tigercat/core'
+import type {
+  SpaceProps,
+  SpaceDirection,
+  SpaceSize,
+  SpaceAlign,
+} from '@tigercat/core';
 
 // Vue
-import type { Space } from '@tigercat/vue'
+import type { VueSpaceProps } from '@tigercat/vue';
 
 // React
-import type { Space, SpaceProps as ReactSpaceProps } from '@tigercat/react'
+import type { SpaceProps as ReactSpaceProps } from '@tigercat/react';
 ```
 
 ## 示例
@@ -436,15 +438,15 @@ import type { Space, SpaceProps as ReactSpaceProps } from '@tigercat/react'
 
 ```vue
 <script setup>
-import { Space, Button } from '@tigercat/vue'
+import { Space, Button } from '@tigercat/vue';
 
 const handleSubmit = () => {
-  console.log('Submit')
-}
+  console.log('Submit');
+};
 
 const handleCancel = () => {
-  console.log('Cancel')
-}
+  console.log('Cancel');
+};
 </script>
 
 <template>
@@ -458,23 +460,27 @@ const handleCancel = () => {
 #### React
 
 ```tsx
-import { Space, Button } from '@tigercat/react'
+import { Space, Button } from '@tigercat/react';
 
 function FormActions() {
   const handleSubmit = () => {
-    console.log('Submit')
-  }
+    console.log('Submit');
+  };
 
   const handleCancel = () => {
-    console.log('Cancel')
-  }
+    console.log('Cancel');
+  };
 
   return (
     <Space>
-      <Button variant="outline" onClick={handleCancel}>取消</Button>
-      <Button variant="primary" onClick={handleSubmit}>提交</Button>
+      <Button variant="outline" onClick={handleCancel}>
+        取消
+      </Button>
+      <Button variant="primary" onClick={handleSubmit}>
+        提交
+      </Button>
     </Space>
-  )
+  );
 }
 ```
 
@@ -530,14 +536,30 @@ function FormActions() {
 ```tsx
 <div style={{ maxWidth: 500 }}>
   <Space wrap size="sm">
-    <Button size="sm" variant="outline">JavaScript</Button>
-    <Button size="sm" variant="outline">TypeScript</Button>
-    <Button size="sm" variant="outline">Vue</Button>
-    <Button size="sm" variant="outline">React</Button>
-    <Button size="sm" variant="outline">CSS</Button>
-    <Button size="sm" variant="outline">Tailwind</Button>
-    <Button size="sm" variant="outline">Node.js</Button>
-    <Button size="sm" variant="outline">Git</Button>
+    <Button size="sm" variant="outline">
+      JavaScript
+    </Button>
+    <Button size="sm" variant="outline">
+      TypeScript
+    </Button>
+    <Button size="sm" variant="outline">
+      Vue
+    </Button>
+    <Button size="sm" variant="outline">
+      React
+    </Button>
+    <Button size="sm" variant="outline">
+      CSS
+    </Button>
+    <Button size="sm" variant="outline">
+      Tailwind
+    </Button>
+    <Button size="sm" variant="outline">
+      Node.js
+    </Button>
+    <Button size="sm" variant="outline">
+      Git
+    </Button>
   </Space>
 </div>
 ```
