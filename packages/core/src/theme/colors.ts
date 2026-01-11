@@ -11,37 +11,37 @@ export interface ButtonColorScheme {
   /**
    * Background color class
    */
-  bg: string
-  
+  bg: string;
+
   /**
    * Hover background color class
    */
-  bgHover: string
-  
+  bgHover: string;
+
   /**
    * Text color class
    */
-  text: string
-  
+  text: string;
+
   /**
    * Border color class (optional, for outline variants)
    */
-  border?: string
-  
+  border?: string;
+
   /**
    * Border hover color class (optional, for outline variants)
    */
-  borderHover?: string
-  
+  borderHover?: string;
+
   /**
    * Focus ring color class
    */
-  focus: string
-  
+  focus: string;
+
   /**
    * Disabled state color class
    */
-  disabled: string
+  disabled: string;
 }
 
 /**
@@ -51,27 +51,27 @@ export interface ThemeColors {
   /**
    * Primary button theme (solid background with primary color)
    */
-  primary: ButtonColorScheme
-  
+  primary: ButtonColorScheme;
+
   /**
    * Secondary button theme (solid background with secondary color)
    */
-  secondary: ButtonColorScheme
-  
+  secondary: ButtonColorScheme;
+
   /**
    * Outline button theme (transparent background with colored border)
    */
-  outline: ButtonColorScheme
-  
+  outline: ButtonColorScheme;
+
   /**
    * Ghost button theme (transparent background, no border)
    */
-  ghost: ButtonColorScheme
-  
+  ghost: ButtonColorScheme;
+
   /**
    * Link button theme (text-only appearance)
    */
-  link: ButtonColorScheme
+  link: ButtonColorScheme;
 }
 
 /**
@@ -99,7 +99,8 @@ export const defaultThemeColors: ThemeColors = {
     text: 'text-[var(--tiger-primary,#2563eb)]',
     border: 'border-2 border-[var(--tiger-primary,#2563eb)]',
     focus: 'focus:ring-[var(--tiger-primary,#2563eb)]',
-    disabled: 'disabled:border-[var(--tiger-primary-disabled,#93c5fd)] disabled:text-[var(--tiger-primary-disabled,#93c5fd)]',
+    disabled:
+      'disabled:border-[var(--tiger-primary-disabled,#93c5fd)] disabled:text-[var(--tiger-primary-disabled,#93c5fd)]',
   },
   ghost: {
     bg: 'bg-transparent',
@@ -115,7 +116,7 @@ export const defaultThemeColors: ThemeColors = {
     focus: 'focus:ring-[var(--tiger-primary,#2563eb)]',
     disabled: 'disabled:text-[var(--tiger-primary-disabled,#93c5fd)]',
   },
-}
+};
 
 /**
  * Get button variant classes based on theme colors
@@ -127,7 +128,7 @@ export function getButtonVariantClasses(
   variant: keyof ThemeColors,
   colors: ThemeColors = defaultThemeColors
 ): string {
-  const scheme = colors[variant]
+  const scheme = colors[variant];
   const classes = [
     scheme.bg,
     scheme.bgHover,
@@ -136,9 +137,9 @@ export function getButtonVariantClasses(
     scheme.borderHover,
     scheme.focus,
     scheme.disabled,
-  ].filter(Boolean)
-  
-  return classes.join(' ')
+  ].filter(Boolean);
+
+  return classes.join(' ');
 }
 
 /**
@@ -149,42 +150,42 @@ export interface RadioColorScheme {
   /**
    * Border color in unchecked state
    */
-  border: string
-  
+  border: string;
+
   /**
    * Border color in checked state
    */
-  borderChecked: string
-  
+  borderChecked: string;
+
   /**
    * Background color in unchecked state
    */
-  bg: string
-  
+  bg: string;
+
   /**
    * Background color in checked state
    */
-  bgChecked: string
-  
+  bgChecked: string;
+
   /**
    * Inner dot color in checked state
    */
-  innerDot: string
-  
+  innerDot: string;
+
   /**
    * Focus ring color
    */
-  focus: string
-  
+  focus: string;
+
   /**
    * Disabled state styles
    */
-  disabled: string
-  
+  disabled: string;
+
   /**
    * Text color when disabled
    */
-  textDisabled: string
+  textDisabled: string;
 }
 
 /**
@@ -199,7 +200,7 @@ export const defaultRadioColors: RadioColorScheme = {
   focus: 'focus:ring-[var(--tiger-primary,#2563eb)]',
   disabled: 'disabled:bg-gray-100 disabled:border-gray-200',
   textDisabled: 'text-gray-400',
-}
+};
 
 /**
  * Get radio color classes
@@ -209,7 +210,7 @@ export const defaultRadioColors: RadioColorScheme = {
 export function getRadioColorClasses(
   colors: RadioColorScheme = defaultRadioColors
 ): RadioColorScheme {
-  return colors
+  return colors;
 }
 
 /**
@@ -220,22 +221,22 @@ export interface LinkColorScheme {
   /**
    * Text color in normal state
    */
-  text: string
-  
+  text: string;
+
   /**
    * Text color on hover
    */
-  textHover: string
-  
+  textHover: string;
+
   /**
    * Focus ring color
    */
-  focus: string
-  
+  focus: string;
+
   /**
    * Disabled state text color
    */
-  disabled: string
+  disabled: string;
 }
 
 /**
@@ -245,17 +246,17 @@ export interface LinkThemeColors {
   /**
    * Primary link theme (uses primary color)
    */
-  primary: LinkColorScheme
-  
+  primary: LinkColorScheme;
+
   /**
    * Secondary link theme (uses secondary color)
    */
-  secondary: LinkColorScheme
-  
+  secondary: LinkColorScheme;
+
   /**
    * Default link theme (uses gray color)
    */
-  default: LinkColorScheme
+  default: LinkColorScheme;
 }
 
 /**
@@ -280,24 +281,26 @@ export const defaultLinkThemeColors: LinkThemeColors = {
     focus: 'focus:ring-gray-500',
     disabled: 'text-gray-400',
   },
-}
+};
 
 /**
  * Get link variant classes based on theme colors
  */
 export function getLinkVariantClasses(
   variant: keyof LinkThemeColors,
-  colors: LinkThemeColors = defaultLinkThemeColors
+  colors?: LinkThemeColors,
+  options?: { disabled?: boolean }
 ): string {
-  const scheme = colors[variant]
+  const scheme = (colors ?? defaultLinkThemeColors)[variant];
   const classes = [
     scheme.text,
     scheme.textHover,
     scheme.focus,
     `disabled:${scheme.disabled}`,
-  ].filter(Boolean)
-  
-  return classes.join(' ')
+    options?.disabled ? scheme.disabled : undefined,
+  ].filter(Boolean);
+
+  return classes.join(' ');
 }
 
 /**
@@ -314,7 +317,7 @@ export const textSizeClasses = {
   '4xl': 'text-4xl',
   '5xl': 'text-5xl',
   '6xl': 'text-6xl',
-} as const
+} as const;
 
 /**
  * Text weight classes mapping
@@ -328,7 +331,7 @@ export const textWeightClasses = {
   bold: 'font-bold',
   extrabold: 'font-extrabold',
   black: 'font-black',
-} as const
+} as const;
 
 /**
  * Text alignment classes mapping
@@ -338,7 +341,7 @@ export const textAlignClasses = {
   center: 'text-center',
   right: 'text-right',
   justify: 'text-justify',
-} as const
+} as const;
 
 /**
  * Text color classes mapping
@@ -351,7 +354,7 @@ export const textColorClasses = {
   warning: 'text-yellow-600',
   danger: 'text-red-600',
   muted: 'text-gray-500',
-} as const
+} as const;
 
 /**
  * Text decoration classes mapping
@@ -361,7 +364,7 @@ export const textDecorationClasses = {
   italic: 'italic',
   underline: 'underline',
   lineThrough: 'line-through',
-} as const
+} as const;
 
 /**
  * Tag color scheme interface
@@ -371,22 +374,22 @@ export interface TagColorScheme {
   /**
    * Background color class
    */
-  bg: string
-  
+  bg: string;
+
   /**
    * Text color class
    */
-  text: string
-  
+  text: string;
+
   /**
    * Border color class (optional)
    */
-  border?: string
-  
+  border?: string;
+
   /**
    * Close button hover background color class
    */
-  closeBgHover: string
+  closeBgHover: string;
 }
 
 /**
@@ -396,32 +399,32 @@ export interface TagThemeColors {
   /**
    * Default tag theme (gray background)
    */
-  default: TagColorScheme
-  
+  default: TagColorScheme;
+
   /**
    * Primary tag theme (blue background)
    */
-  primary: TagColorScheme
-  
+  primary: TagColorScheme;
+
   /**
    * Success tag theme (green background)
    */
-  success: TagColorScheme
-  
+  success: TagColorScheme;
+
   /**
    * Warning tag theme (yellow background)
    */
-  warning: TagColorScheme
-  
+  warning: TagColorScheme;
+
   /**
    * Danger tag theme (red background)
    */
-  danger: TagColorScheme
-  
+  danger: TagColorScheme;
+
   /**
    * Info tag theme (light blue background)
    */
-  info: TagColorScheme
+  info: TagColorScheme;
 }
 
 /**
@@ -464,7 +467,7 @@ export const defaultTagThemeColors: TagThemeColors = {
     border: 'border-sky-200',
     closeBgHover: 'hover:bg-sky-200',
   },
-}
+};
 
 /**
  * Get tag variant classes based on theme colors
@@ -476,14 +479,10 @@ export function getTagVariantClasses(
   variant: keyof TagThemeColors,
   colors: TagThemeColors = defaultTagThemeColors
 ): string {
-  const scheme = colors[variant]
-  const classes = [
-    scheme.bg,
-    scheme.text,
-    scheme.border,
-  ].filter(Boolean)
-  
-  return classes.join(' ')
+  const scheme = colors[variant];
+  const classes = [scheme.bg, scheme.text, scheme.border].filter(Boolean);
+
+  return classes.join(' ');
 }
 
 /**
@@ -494,17 +493,17 @@ export interface BadgeColorScheme {
   /**
    * Background color class
    */
-  bg: string
-  
+  bg: string;
+
   /**
    * Text color class
    */
-  text: string
-  
+  text: string;
+
   /**
    * Border color class (optional)
    */
-  border?: string
+  border?: string;
 }
 
 /**
@@ -514,32 +513,32 @@ export interface BadgeThemeColors {
   /**
    * Default badge theme (gray background)
    */
-  default: BadgeColorScheme
-  
+  default: BadgeColorScheme;
+
   /**
    * Primary badge theme (blue background)
    */
-  primary: BadgeColorScheme
-  
+  primary: BadgeColorScheme;
+
   /**
    * Success badge theme (green background)
    */
-  success: BadgeColorScheme
-  
+  success: BadgeColorScheme;
+
   /**
    * Warning badge theme (yellow background)
    */
-  warning: BadgeColorScheme
-  
+  warning: BadgeColorScheme;
+
   /**
    * Danger badge theme (red background)
    */
-  danger: BadgeColorScheme
-  
+  danger: BadgeColorScheme;
+
   /**
    * Info badge theme (light blue background)
    */
-  info: BadgeColorScheme
+  info: BadgeColorScheme;
 }
 
 /**
@@ -576,7 +575,7 @@ export const defaultBadgeThemeColors: BadgeThemeColors = {
     text: 'text-white',
     border: 'border-sky-500',
   },
-}
+};
 
 /**
  * Get badge variant classes based on theme colors
@@ -588,14 +587,10 @@ export function getBadgeVariantClasses(
   variant: keyof BadgeThemeColors,
   colors: BadgeThemeColors = defaultBadgeThemeColors
 ): string {
-  const scheme = colors[variant]
-  const classes = [
-    scheme.bg,
-    scheme.text,
-    scheme.border,
-  ].filter(Boolean)
-  
-  return classes.join(' ')
+  const scheme = colors[variant];
+  const classes = [scheme.bg, scheme.text, scheme.border].filter(Boolean);
+
+  return classes.join(' ');
 }
 
 /**
@@ -606,12 +601,12 @@ export interface ProgressColorScheme {
   /**
    * Progress bar fill color
    */
-  bg: string
-  
+  bg: string;
+
   /**
    * Text color for percentage display
    */
-  text?: string
+  text?: string;
 }
 
 /**
@@ -621,32 +616,32 @@ export interface ProgressThemeColors {
   /**
    * Default progress theme (gray)
    */
-  default: ProgressColorScheme
-  
+  default: ProgressColorScheme;
+
   /**
    * Primary progress theme (blue)
    */
-  primary: ProgressColorScheme
-  
+  primary: ProgressColorScheme;
+
   /**
    * Success progress theme (green)
    */
-  success: ProgressColorScheme
-  
+  success: ProgressColorScheme;
+
   /**
    * Warning progress theme (yellow)
    */
-  warning: ProgressColorScheme
-  
+  warning: ProgressColorScheme;
+
   /**
    * Danger progress theme (red)
    */
-  danger: ProgressColorScheme
-  
+  danger: ProgressColorScheme;
+
   /**
    * Info progress theme (light blue)
    */
-  info: ProgressColorScheme
+  info: ProgressColorScheme;
 }
 
 /**
@@ -677,7 +672,7 @@ export const defaultProgressThemeColors: ProgressThemeColors = {
     bg: 'bg-sky-500',
     text: 'text-sky-600',
   },
-}
+};
 
 /**
  * Get progress variant classes based on theme colors
@@ -689,8 +684,8 @@ export function getProgressVariantClasses(
   variant: keyof ProgressThemeColors,
   colors: ProgressThemeColors = defaultProgressThemeColors
 ): string {
-  const scheme = colors[variant]
-  return scheme.bg
+  const scheme = colors[variant];
+  return scheme.bg;
 }
 
 /**
@@ -703,8 +698,8 @@ export function getProgressTextColorClasses(
   variant: keyof ProgressThemeColors,
   colors: ProgressThemeColors = defaultProgressThemeColors
 ): string {
-  const scheme = colors[variant]
-  return scheme.text || 'text-gray-700'
+  const scheme = colors[variant];
+  return scheme.text || 'text-gray-700';
 }
 
 /**
@@ -715,42 +710,42 @@ export interface AlertColorScheme {
   /**
    * Background color class
    */
-  bg: string
-  
+  bg: string;
+
   /**
    * Border color class
    */
-  border: string
-  
+  border: string;
+
   /**
    * Icon color class
    */
-  icon: string
-  
+  icon: string;
+
   /**
    * Title text color class
    */
-  title: string
-  
+  title: string;
+
   /**
    * Description text color class
    */
-  description: string
-  
+  description: string;
+
   /**
    * Close button color class
    */
-  closeButton: string
-  
+  closeButton: string;
+
   /**
    * Close button hover background color class
    */
-  closeButtonHover: string
-  
+  closeButtonHover: string;
+
   /**
    * Focus ring color class
    */
-  focus: string
+  focus: string;
 }
 
 /**
@@ -760,22 +755,22 @@ export interface AlertThemeColors {
   /**
    * Success alert theme (green)
    */
-  success: AlertColorScheme
-  
+  success: AlertColorScheme;
+
   /**
    * Warning alert theme (yellow)
    */
-  warning: AlertColorScheme
-  
+  warning: AlertColorScheme;
+
   /**
    * Error alert theme (red)
    */
-  error: AlertColorScheme
-  
+  error: AlertColorScheme;
+
   /**
    * Info alert theme (blue)
    */
-  info: AlertColorScheme
+  info: AlertColorScheme;
 }
 
 /**
@@ -822,7 +817,7 @@ export const defaultAlertThemeColors: AlertThemeColors = {
     closeButtonHover: 'hover:bg-blue-100',
     focus: 'focus:ring-blue-500',
   },
-}
+};
 
 /**
  * Get alert type classes based on theme colors
@@ -834,5 +829,5 @@ export function getAlertTypeClasses(
   type: 'success' | 'warning' | 'error' | 'info',
   colors: AlertThemeColors = defaultAlertThemeColors
 ): AlertColorScheme {
-  return colors[type]
+  return colors[type];
 }

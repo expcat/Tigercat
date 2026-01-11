@@ -2,36 +2,22 @@ import React, { useCallback, useMemo } from 'react';
 import {
   classNames,
   getLinkVariantClasses,
+  getSecureRel,
+  linkBaseClasses,
+  linkDisabledClasses,
+  linkSizeClasses,
   type LinkProps as CoreLinkProps,
 } from '@tigercat/core';
 
-export interface LinkProps extends CoreLinkProps {
-  /**
-   * Click event handler
-   */
-  onClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
-
-  /**
-   * Link content
-   */
+export interface LinkProps
+  extends CoreLinkProps,
+    Omit<
+      React.AnchorHTMLAttributes<HTMLAnchorElement>,
+      'href' | 'target' | 'rel' | 'onClick' | 'children'
+    > {
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
   children?: React.ReactNode;
-
-  /**
-   * Additional CSS classes
-   */
-  className?: string;
 }
-
-const baseClasses =
-  'inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer no-underline';
-
-const sizeClasses = {
-  sm: 'text-sm',
-  md: 'text-base',
-  lg: 'text-lg',
-} as const;
-
-const disabledClasses = 'cursor-not-allowed opacity-60 pointer-events-none';
 
 export const Link: React.FC<LinkProps> = ({
   variant = 'primary',
@@ -42,6 +28,8 @@ export const Link: React.FC<LinkProps> = ({
   rel,
   underline = true,
   onClick,
+  onKeyDown,
+  tabIndex,
   children,
   className,
   ...props
@@ -49,31 +37,40 @@ export const Link: React.FC<LinkProps> = ({
   const linkClasses = useMemo(
     () =>
       classNames(
-        baseClasses,
-        getLinkVariantClasses(variant),
-        sizeClasses[size],
+        linkBaseClasses,
+        getLinkVariantClasses(variant, undefined, { disabled }),
+        linkSizeClasses[size],
         underline && 'hover:underline',
-        disabled && disabledClasses,
+        disabled && linkDisabledClasses,
         className
       ),
     [variant, size, underline, disabled, className]
   );
 
-  // Automatically add security attributes for target="_blank"
-  const computedRel = useMemo(
-    () => (target === '_blank' && !rel ? 'noopener noreferrer' : rel),
-    [target, rel]
-  );
+  const computedRel = useMemo(() => getSecureRel(target, rel), [target, rel]);
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement>) => {
       if (disabled) {
         event.preventDefault();
+        event.stopPropagation();
         return;
       }
       onClick?.(event);
     },
     [disabled, onClick]
+  );
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLAnchorElement>) => {
+      if (disabled && (event.key === 'Enter' || event.key === ' ')) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+      onKeyDown?.(event);
+    },
+    [disabled, onKeyDown]
   );
 
   return (
@@ -82,8 +79,10 @@ export const Link: React.FC<LinkProps> = ({
       href={disabled ? undefined : href}
       target={target}
       rel={computedRel}
-      aria-disabled={disabled ? 'true' : undefined}
+      aria-disabled={disabled || undefined}
+      tabIndex={disabled ? -1 : tabIndex}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
       {...props}>
       {children}
     </a>
