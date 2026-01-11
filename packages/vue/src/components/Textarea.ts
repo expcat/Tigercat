@@ -1,23 +1,50 @@
-import { defineComponent, computed, ref, watch, nextTick, h, PropType } from 'vue'
-import { classNames, type TextareaSize } from '@tigercat/core'
+import {
+  defineComponent,
+  computed,
+  ref,
+  watch,
+  nextTick,
+  h,
+  PropType,
+} from 'vue';
+import {
+  autoResizeTextarea,
+  classNames,
+  getInputClasses,
+  type TextareaSize,
+} from '@tigercat/core';
 
-const baseClasses = 'block w-full rounded-md border border-gray-300 shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:border-[var(--tiger-primary,#2563eb)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500'
-
-const sizeClasses = {
-  sm: 'px-2 py-1.5 text-sm',
-  md: 'px-3 py-2 text-base',
-  lg: 'px-4 py-3 text-lg',
+export interface VueTextareaProps {
+  modelValue?: string;
+  size?: TextareaSize;
+  placeholder?: string;
+  disabled?: boolean;
+  readonly?: boolean;
+  required?: boolean;
+  rows?: number;
+  autoResize?: boolean;
+  maxRows?: number;
+  minRows?: number;
+  maxLength?: number;
+  minLength?: number;
+  name?: string;
+  id?: string;
+  autoComplete?: string;
+  autoFocus?: boolean;
+  showCount?: boolean;
+  className?: string;
+  style?: Record<string, string | number>;
 }
 
 export const Textarea = defineComponent({
   name: 'TigerTextarea',
+  inheritAttrs: false,
   props: {
     /**
      * Textarea value (for v-model)
      */
     modelValue: {
       type: String,
-      default: '',
     },
     /**
      * Textarea size
@@ -40,6 +67,15 @@ export const Textarea = defineComponent({
      * @default false
      */
     readonly: {
+      type: Boolean,
+      default: false,
+    },
+
+    /**
+     * Whether the textarea is required
+     * @default false
+     */
+    required: {
       type: Boolean,
       default: false,
     },
@@ -84,6 +120,39 @@ export const Textarea = defineComponent({
     maxLength: {
       type: Number,
     },
+
+    /**
+     * Minimum character length
+     */
+    minLength: {
+      type: Number,
+    },
+
+    /**
+     * Textarea name attribute
+     */
+    name: {
+      type: String,
+    },
+
+    /**
+     * Textarea id attribute
+     */
+    id: {
+      type: String,
+    },
+
+    /**
+     * Autocomplete attribute
+     */
+    autoComplete: {
+      type: String,
+    },
+
+    /**
+     * Whether to autofocus on mount
+     */
+    autoFocus: Boolean,
     /**
      * Show character count
      * @default false
@@ -92,144 +161,146 @@ export const Textarea = defineComponent({
       type: Boolean,
       default: false,
     },
+
+    /**
+     * Additional CSS classes
+     */
+    className: {
+      type: String,
+    },
+
+    /**
+     * Inline styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+    },
   },
   emits: {
-    /**
-     * Emitted when value changes (for v-model)
-     */
-    'update:modelValue': (value: string) => typeof value === 'string',
-    /**
-     * Emitted on input event
-     */
-    input: (event: Event) => event instanceof Event,
-    /**
-     * Emitted on change event
-     */
-    change: (event: Event) => event instanceof Event,
-    /**
-     * Emitted on focus event
-     */
-    focus: (event: FocusEvent) => event instanceof FocusEvent,
-    /**
-     * Emitted on blur event
-     */
-    blur: (event: FocusEvent) => event instanceof FocusEvent,
+    'update:modelValue': null,
+    input: null,
+    change: null,
+    focus: null,
+    blur: null,
   },
   setup(props, { emit, attrs }) {
-    const textareaRef = ref<HTMLTextAreaElement | null>(null)
-    
-    const textareaClasses = computed(() => {
-      return classNames(
-        baseClasses,
-        sizeClasses[props.size],
-        props.autoResize && 'resize-none',
-        !props.autoResize && 'resize-y'
-      )
-    })
+    const textareaRef = ref<HTMLTextAreaElement | null>(null);
 
-    const currentLength = computed(() => props.modelValue?.length || 0)
+    const localValue = ref<string>(props.modelValue ?? '');
+
+    watch(
+      () => props.modelValue,
+      (newValue) => {
+        const next = newValue ?? '';
+        if (next !== localValue.value) {
+          localValue.value = next;
+        }
+      }
+    );
+
+    const textareaClasses = computed(() =>
+      classNames(
+        'block',
+        getInputClasses(props.size),
+        props.autoResize ? 'resize-none' : 'resize-y',
+        props.className,
+        attrs.class
+      )
+    );
+
+    const currentLength = computed(() => localValue.value.length);
 
     const adjustHeight = () => {
-      if (!props.autoResize || !textareaRef.value) return
-
-      const textarea = textareaRef.value
-      // Reset height to auto to get the correct scrollHeight
-      textarea.style.height = 'auto'
-      
-      const lineHeight = parseInt(getComputedStyle(textarea).lineHeight, 10)
-      const paddingTop = parseInt(getComputedStyle(textarea).paddingTop, 10)
-      const paddingBottom = parseInt(getComputedStyle(textarea).paddingBottom, 10)
-      
-      let newHeight = textarea.scrollHeight
-      
-      // Apply minRows constraint
-      if (props.minRows) {
-        const minHeight = lineHeight * props.minRows + paddingTop + paddingBottom
-        newHeight = Math.max(newHeight, minHeight)
-      }
-      
-      // Apply maxRows constraint
-      if (props.maxRows) {
-        const maxHeight = lineHeight * props.maxRows + paddingTop + paddingBottom
-        newHeight = Math.min(newHeight, maxHeight)
-      }
-      
-      textarea.style.height = `${newHeight}px`
-    }
+      if (!props.autoResize || !textareaRef.value) return;
+      autoResizeTextarea(textareaRef.value, {
+        minRows: props.minRows,
+        maxRows: props.maxRows,
+      });
+    };
 
     const handleInput = (event: Event) => {
-      const target = event.target as HTMLTextAreaElement
-      const value = target.value
-      
-      emit('update:modelValue', value)
-      emit('input', event)
-      
+      const target = event.target as HTMLTextAreaElement;
+      const value = target.value;
+      localValue.value = value;
+      emit('update:modelValue', value);
+      emit('input', event);
+
       if (props.autoResize) {
-        nextTick(() => adjustHeight())
+        nextTick(adjustHeight);
       }
-    }
+    };
 
     const handleChange = (event: Event) => {
-      emit('change', event)
-    }
+      emit('change', event);
+    };
 
     const handleFocus = (event: FocusEvent) => {
-      emit('focus', event)
-    }
+      emit('focus', event);
+    };
 
     const handleBlur = (event: FocusEvent) => {
-      emit('blur', event)
-    }
+      emit('blur', event);
+    };
 
-    // Watch for external value changes
-    watch(() => props.modelValue, () => {
-      if (props.autoResize) {
-        nextTick(() => adjustHeight())
+    watch(
+      () => [props.modelValue, props.autoResize, props.minRows, props.maxRows],
+      () => {
+        if (!props.autoResize) return;
+        nextTick(adjustHeight);
       }
-    })
+    );
 
-    // Initialize height on mount
     watch(textareaRef, (textarea) => {
-      if (textarea && props.autoResize) {
-        nextTick(() => adjustHeight())
-      }
-    })
+      if (!textarea || !props.autoResize) return;
+      nextTick(adjustHeight);
+    });
 
     return () => {
       const children = [
         h('textarea', {
+          ...attrs,
           ref: textareaRef,
           class: textareaClasses.value,
-          value: props.modelValue,
+          style: [attrs.style, props.style],
+          value: localValue.value,
           disabled: props.disabled,
           readonly: props.readonly,
+          required: props.required,
           placeholder: props.placeholder,
           rows: props.rows,
           maxlength: props.maxLength,
+          minlength: props.minLength,
+          name: props.name,
+          id: props.id,
+          autocomplete: props.autoComplete,
+          autofocus: props.autoFocus,
           onInput: handleInput,
           onChange: handleChange,
           onFocus: handleFocus,
           onBlur: handleBlur,
-          ...attrs,
-        })
-      ]
+        }),
+      ];
 
       // Add character count if enabled
       if (props.showCount) {
         const countText = props.maxLength
           ? `${currentLength.value}/${props.maxLength}`
-          : `${currentLength.value}`
-        
+          : `${currentLength.value}`;
+
         children.push(
-          h('div', {
-            class: 'mt-1 text-sm text-gray-500 text-right',
-          }, countText)
-        )
+          h(
+            'div',
+            {
+              class: 'mt-1 text-sm text-gray-500 text-right',
+            },
+            countText
+          )
+        );
       }
 
-      return h('div', { class: 'w-full' }, children)
-    }
+      return h('div', { class: 'w-full' }, children);
+    };
   },
-})
+});
 
-export default Textarea
+export default Textarea;

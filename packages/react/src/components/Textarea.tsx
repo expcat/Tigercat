@@ -1,192 +1,129 @@
-import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle, useMemo } from 'react'
-import { classNames, type TextareaProps as CoreTextareaProps } from '@tigercat/core'
+import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import {
+  autoResizeTextarea,
+  classNames,
+  getInputClasses,
+  type TextareaProps as CoreTextareaProps,
+} from '@tigercat/core';
 
-export interface TextareaProps extends CoreTextareaProps {
-  /**
-   * Textarea value (controlled)
-   */
-  value?: string
-  
-  /**
-   * Default value (uncontrolled)
-   */
-  defaultValue?: string
-  
-  /**
-   * Input event handler
-   */
-  onInput?: (event: React.FormEvent<HTMLTextAreaElement>) => void
-  
-  /**
-   * Change event handler
-   */
-  onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void
-  
-  /**
-   * Focus event handler
-   */
-  onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => void
-  
-  /**
-   * Blur event handler
-   */
-  onBlur?: (event: React.FocusEvent<HTMLTextAreaElement>) => void
-  
-  /**
-   * Additional CSS classes
-   */
-  className?: string
-  
-  /**
-   * Textarea name attribute
-   */
-  name?: string
-  
-  /**
-   * Textarea id attribute
-   */
-  id?: string
+export interface TextareaProps
+  extends CoreTextareaProps,
+    Omit<
+      React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+      | 'size'
+      | 'value'
+      | 'defaultValue'
+      | 'onInput'
+      | 'onChange'
+      | 'onFocus'
+      | 'onBlur'
+      | 'readOnly'
+    > {
+  onInput?: (event: React.FormEvent<HTMLTextAreaElement>) => void;
+  onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
+  onBlur?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
+  className?: string;
 }
 
-const baseClasses = 'block w-full rounded-md border border-gray-300 shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:border-[var(--tiger-primary,#2563eb)] disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500'
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
+  (
+    {
+      size = 'md',
+      disabled = false,
+      readonly = false,
+      required = false,
+      placeholder = '',
+      rows = 3,
+      autoResize = false,
+      maxRows,
+      minRows,
+      maxLength,
+      minLength,
+      showCount = false,
+      value,
+      defaultValue,
+      onInput,
+      onChange,
+      onFocus,
+      onBlur,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+    const [internalValue, setInternalValue] = useState(defaultValue || '');
 
-const sizeClasses = {
-  sm: 'px-2 py-1.5 text-sm',
-  md: 'px-3 py-2 text-base',
-  lg: 'px-4 py-3 text-lg',
-} as const
+    const isControlled = value !== undefined;
+    const currentValue = isControlled ? value : internalValue;
 
-export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(({
-  size = 'md',
-  disabled = false,
-  readonly = false,
-  placeholder = '',
-  rows = 3,
-  autoResize = false,
-  maxRows,
-  minRows,
-  maxLength,
-  showCount = false,
-  value,
-  defaultValue,
-  onInput,
-  onChange,
-  onFocus,
-  onBlur,
-  className,
-  name,
-  id,
-  ...props
-}, ref) => {
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const [internalValue, setInternalValue] = useState(defaultValue || '')
-  
-  // Expose the textarea element to parent components via ref
-  useImperativeHandle(ref, () => textareaRef.current as HTMLTextAreaElement)
-  
-  // Determine if component is controlled or uncontrolled - simple comparison, no need to memoize
-  const isControlled = value !== undefined
-  const currentValue = isControlled ? value : internalValue
+    const setRefs = (node: HTMLTextAreaElement | null) => {
+      textareaRef.current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref)
+        (ref as React.MutableRefObject<HTMLTextAreaElement | null>).current =
+          node;
+    };
 
-  const textareaClasses = useMemo(() => classNames(
-    baseClasses,
-    sizeClasses[size],
-    autoResize && 'resize-none',
-    !autoResize && 'resize-y',
-    className,
-  ), [size, autoResize, className])
+    useEffect(() => {
+      if (!autoResize || !textareaRef.current) return;
+      autoResizeTextarea(textareaRef.current, { minRows, maxRows });
+    }, [autoResize, currentValue, minRows, maxRows]);
 
-  const adjustHeight = useCallback(() => {
-    if (!autoResize || !textareaRef.current) return
+    const textareaClasses = classNames(
+      'block',
+      getInputClasses(size),
+      autoResize ? 'resize-none' : 'resize-y',
+      className
+    );
 
-    const textarea = textareaRef.current
-    // Reset height to auto to get the correct scrollHeight
-    textarea.style.height = 'auto'
-    
-    const computedStyle = getComputedStyle(textarea)
-    const lineHeight = parseInt(computedStyle.lineHeight, 10)
-    const paddingTop = parseInt(computedStyle.paddingTop, 10)
-    const paddingBottom = parseInt(computedStyle.paddingBottom, 10)
-    
-    let newHeight = textarea.scrollHeight
-    
-    // Apply minRows constraint
-    if (minRows) {
-      const minHeight = lineHeight * minRows + paddingTop + paddingBottom
-      newHeight = Math.max(newHeight, minHeight)
-    }
-    
-    // Apply maxRows constraint
-    if (maxRows) {
-      const maxHeight = lineHeight * maxRows + paddingTop + paddingBottom
-      newHeight = Math.min(newHeight, maxHeight)
-    }
-    
-    textarea.style.height = `${newHeight}px`
-  }, [autoResize, maxRows, minRows])
+    const handleInput = (event: React.FormEvent<HTMLTextAreaElement>) => {
+      if (!isControlled) {
+        setInternalValue(event.currentTarget.value);
+      }
 
-  const handleInput = useCallback((event: React.FormEvent<HTMLTextAreaElement>) => {
-    const target = event.target as HTMLTextAreaElement
-    const newValue = target.value
-    
-    if (!isControlled) {
-      setInternalValue(newValue)
-    }
-    
-    onInput?.(event)
-    
-    if (autoResize) {
-      adjustHeight()
-    }
-  }, [isControlled, onInput, autoResize, adjustHeight])
+      onInput?.(event);
 
-  const handleChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onChange?.(event)
-  }, [onChange])
+      if (autoResize) {
+        autoResizeTextarea(event.currentTarget, { minRows, maxRows });
+      }
+    };
 
-  // Adjust height when value changes or on mount
-  useEffect(() => {
-    if (autoResize) {
-      adjustHeight()
-    }
-  }, [currentValue, autoResize, adjustHeight])
+    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      onChange?.(event);
+    };
 
-  // Initialize height on mount
-  useEffect(() => {
-    if (autoResize && textareaRef.current) {
-      adjustHeight()
-    }
-  }, [autoResize, adjustHeight])
+    const currentLength = currentValue?.length ?? 0;
 
-  const currentLength = useMemo(() => currentValue?.length || 0, [currentValue])
+    return (
+      <div className="w-full">
+        <textarea
+          ref={setRefs}
+          className={textareaClasses}
+          value={currentValue}
+          disabled={disabled}
+          readOnly={readonly}
+          required={required}
+          placeholder={placeholder}
+          rows={rows}
+          maxLength={maxLength}
+          minLength={minLength}
+          onInput={handleInput}
+          onChange={handleChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          {...props}
+        />
 
-  return (
-    <div className="w-full">
-      <textarea
-        ref={textareaRef}
-        className={textareaClasses}
-        value={currentValue}
-        disabled={disabled}
-        readOnly={readonly}
-        placeholder={placeholder}
-        rows={rows}
-        maxLength={maxLength}
-        onInput={handleInput}
-        onChange={handleChange}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        name={name}
-        id={id}
-        {...props}
-      />
-      
-      {showCount && (
-        <div className="mt-1 text-sm text-gray-500 text-right">
-          {maxLength ? `${currentLength}/${maxLength}` : currentLength}
-        </div>
-      )}
-    </div>
-  )
-})
+        {showCount && (
+          <div className="mt-1 text-sm text-gray-500 text-right">
+            {maxLength ? `${currentLength}/${maxLength}` : currentLength}
+          </div>
+        )}
+      </div>
+    );
+  }
+);
 
-Textarea.displayName = 'Textarea'
+Textarea.displayName = 'Textarea';

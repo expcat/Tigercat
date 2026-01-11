@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Input` Step1 主题/透传/类型导出/测试精简（2026-01-12）
+- 上一步：✅ `Textarea` Step1 主题/透传/类型导出/测试精简（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -193,7 +193,7 @@
 #### Textarea（P1，建议优化）
 
 - 思路：autoSize（如支持）边界；maxlength 计数；aria。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/类型导出/测试精简（2026-01-12）：下沉 core 的 `textarea-auto-resize`（统一 autoResize 高度计算），并补齐 core `TextareaProps` 的受控/非受控与常用原生属性（`value/defaultValue/required/minLength/name/id/autoComplete/autoFocus`）；React Textarea 复用 core `getInputClasses` + 去除多余 memo/callback/imperative handle；Vue Textarea 增加 `inheritAttrs: false`，合并 `attrs.class/style` 并导出 `VueTextareaProps`；移除 Textarea 快照并精简 Vue/React 测试；同步更新 Textarea 文档主题变量与 TS 类型示例（Demo 无需修改）。
 
 #### Checkbox / CheckboxGroup（P1，建议优化）
 
