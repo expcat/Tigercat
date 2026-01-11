@@ -546,9 +546,9 @@ export interface BadgeThemeColors {
  */
 export const defaultBadgeThemeColors: BadgeThemeColors = {
   default: {
-    bg: 'bg-gray-500',
+    bg: 'bg-[var(--tiger-text-muted,#6b7280)]',
     text: 'text-white',
-    border: 'border-gray-500',
+    border: 'border-[var(--tiger-text-muted,#6b7280)]',
   },
   primary: {
     bg: 'bg-[var(--tiger-primary,#2563eb)]',
@@ -556,24 +556,24 @@ export const defaultBadgeThemeColors: BadgeThemeColors = {
     border: 'border-[var(--tiger-primary,#2563eb)]',
   },
   success: {
-    bg: 'bg-green-500',
+    bg: 'bg-[var(--tiger-success,#16a34a)]',
     text: 'text-white',
-    border: 'border-green-500',
+    border: 'border-[var(--tiger-success,#16a34a)]',
   },
   warning: {
-    bg: 'bg-yellow-500',
+    bg: 'bg-[var(--tiger-warning,#ca8a04)]',
     text: 'text-white',
-    border: 'border-yellow-500',
+    border: 'border-[var(--tiger-warning,#ca8a04)]',
   },
   danger: {
-    bg: 'bg-red-500',
+    bg: 'bg-[var(--tiger-error,#dc2626)]',
     text: 'text-white',
-    border: 'border-red-500',
+    border: 'border-[var(--tiger-error,#dc2626)]',
   },
   info: {
-    bg: 'bg-sky-500',
+    bg: 'bg-[var(--tiger-info,#3b82f6)]',
     text: 'text-white',
-    border: 'border-sky-500',
+    border: 'border-[var(--tiger-info,#3b82f6)]',
   },
 };
 

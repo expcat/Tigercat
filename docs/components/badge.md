@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Badge } from '@tigercat/vue'
+import { Badge } from '@tigercat/vue';
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Badge } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Badge } from '@tigercat/react'
+import { Badge } from '@tigercat/react';
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
       <Badge content={99} />
       <Badge content="Hot" />
     </>
-  )
+  );
 }
 ```
 
@@ -167,7 +167,7 @@ Badge 组件支持 3 种展示类型：
 <template>
   <Badge :content="100" />
   <!-- 显示 99+ -->
-  
+
   <Badge :content="1000" :max="999" />
   <!-- 显示 999+ -->
 </template>
@@ -176,11 +176,15 @@ Badge 组件支持 3 种展示类型：
 ### React
 
 ```tsx
-<Badge content={100} />
-{/* 显示 99+ */}
+<Badge content={100} />;
+{
+  /* 显示 99+ */
+}
 
-<Badge content={1000} max={999} />
-{/* 显示 999+ */}
+<Badge content={1000} max={999} />;
+{
+  /* 显示 999+ */
+}
 ```
 
 ## 显示零值 (Show Zero)
@@ -193,7 +197,7 @@ Badge 组件支持 3 种展示类型：
 <template>
   <Badge :content="0" />
   <!-- 不显示 -->
-  
+
   <Badge :content="0" :show-zero="true" />
   <!-- 显示 0 -->
 </template>
@@ -202,11 +206,15 @@ Badge 组件支持 3 种展示类型：
 ### React
 
 ```tsx
-<Badge content={0} />
-{/* 不显示 */}
+<Badge content={0} />;
+{
+  /* 不显示 */
+}
 
-<Badge content={0} showZero={true} />
-{/* 显示 0 */}
+<Badge content={0} showZero={true} />;
+{
+  /* 显示 0 */
+}
 ```
 
 ## 包裹模式 (Wrapper Mode)
@@ -219,12 +227,12 @@ Badge 组件支持 3 种展示类型：
 <template>
   <!-- 独立徽章（默认） -->
   <Badge :content="5" />
-  
+
   <!-- 包裹模式 -->
   <Badge :content="5" :standalone="false">
     <button>通知</button>
   </Badge>
-  
+
   <Badge :content="99" :standalone="false">
     <Icon name="bell" />
   </Badge>
@@ -263,15 +271,15 @@ Badge 组件支持 3 种展示类型：
   <Badge :content="5" :standalone="false" position="top-right">
     <button>右上</button>
   </Badge>
-  
+
   <Badge :content="5" :standalone="false" position="top-left">
     <button>左上</button>
   </Badge>
-  
+
   <Badge :content="5" :standalone="false" position="bottom-right">
     <button>右下</button>
   </Badge>
-  
+
   <Badge :content="5" :standalone="false" position="bottom-left">
     <button>左下</button>
   </Badge>
@@ -306,17 +314,15 @@ Badge 组件支持 3 种展示类型：
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Badge } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Badge } from '@tigercat/vue';
 
-const unreadMessages = ref(5)
+const unreadMessages = ref(5);
 </script>
 
 <template>
   <Badge :content="unreadMessages" :standalone="false">
-    <button class="px-4 py-2 bg-blue-500 text-white rounded">
-      消息
-    </button>
+    <button class="px-4 py-2 bg-blue-500 text-white rounded">消息</button>
   </Badge>
 </template>
 ```
@@ -324,19 +330,17 @@ const unreadMessages = ref(5)
 #### React
 
 ```tsx
-import { useState } from 'react'
-import { Badge } from '@tigercat/react'
+import { useState } from 'react';
+import { Badge } from '@tigercat/react';
 
 function MessageButton() {
-  const [unreadMessages, setUnreadMessages] = useState(5)
-  
+  const [unreadMessages, setUnreadMessages] = useState(5);
+
   return (
     <Badge content={unreadMessages} standalone={false}>
-      <button className="px-4 py-2 bg-blue-500 text-white rounded">
-        消息
-      </button>
+      <button className="px-4 py-2 bg-blue-500 text-white rounded">消息</button>
     </Badge>
-  )
+  );
 }
 ```
 
@@ -346,16 +350,20 @@ function MessageButton() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Badge } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Badge } from '@tigercat/vue';
 
-const cartItems = ref(3)
+const cartItems = ref(3);
 </script>
 
 <template>
   <Badge :content="cartItems" :standalone="false" variant="danger">
     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
     </svg>
   </Badge>
 </template>
@@ -364,19 +372,28 @@ const cartItems = ref(3)
 #### React
 
 ```tsx
-import { useState } from 'react'
-import { Badge } from '@tigercat/react'
+import { useState } from 'react';
+import { Badge } from '@tigercat/react';
 
 function ShoppingCart() {
-  const [cartItems, setCartItems] = useState(3)
-  
+  const [cartItems, setCartItems] = useState(3);
+
   return (
     <Badge content={cartItems} standalone={false} variant="danger">
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+        />
       </svg>
     </Badge>
-  )
+  );
 }
 ```
 
@@ -412,10 +429,13 @@ function ShoppingCart() {
 
 ```vue
 <template>
-  <Badge type="text" content="NEW" variant="danger" :standalone="false" position="top-right">
-    <button class="px-6 py-2 bg-gray-100 rounded">
-      新功能
-    </button>
+  <Badge
+    type="text"
+    content="NEW"
+    variant="danger"
+    :standalone="false"
+    position="top-right">
+    <button class="px-6 py-2 bg-gray-100 rounded">新功能</button>
   </Badge>
 </template>
 ```
@@ -423,10 +443,13 @@ function ShoppingCart() {
 #### React
 
 ```tsx
-<Badge type="text" content="NEW" variant="danger" standalone={false} position="top-right">
-  <button className="px-6 py-2 bg-gray-100 rounded">
-    新功能
-  </button>
+<Badge
+  type="text"
+  content="NEW"
+  variant="danger"
+  standalone={false}
+  position="top-right">
+  <button className="px-6 py-2 bg-gray-100 rounded">新功能</button>
 </Badge>
 ```
 
@@ -434,28 +457,29 @@ function ShoppingCart() {
 
 ### Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| variant | 徽章变体 | `'default' \| 'primary' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'danger'` |
-| size | 徽章尺寸 | `'sm' \| 'md' \| 'lg'` | `'md'` |
-| type | 徽章类型 | `'dot' \| 'number' \| 'text'` | `'number'` |
-| content | 徽章内容（数字或文本） | `number \| string` | - |
-| max | 最大显示数值（仅 type='number' 时有效） | `number` | `99` |
-| showZero | 是否显示零值 | `boolean` | `false` |
-| position | 徽章位置（非独立模式） | `'top-right' \| 'top-left' \| 'bottom-right' \| 'bottom-left'` | `'top-right'` |
-| standalone | 是否为独立徽章 | `boolean` | `true` |
-| className | 自定义 CSS 类名（仅 React） | `string` | - |
+| 属性       | 说明                                            | 类型                                                                     | 默认值        |
+| ---------- | ----------------------------------------------- | ------------------------------------------------------------------------ | ------------- |
+| variant    | 徽章变体                                        | `'default' \| 'primary' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'danger'`    |
+| size       | 徽章尺寸                                        | `'sm' \| 'md' \| 'lg'`                                                   | `'md'`        |
+| type       | 徽章类型                                        | `'dot' \| 'number' \| 'text'`                                            | `'number'`    |
+| content    | 徽章内容（数字或文本）                          | `number \| string`                                                       | -             |
+| max        | 最大显示数值（仅 type='number' 时有效）         | `number`                                                                 | `99`          |
+| showZero   | 是否显示零值                                    | `boolean`                                                                | `false`       |
+| position   | 徽章位置（非独立模式）                          | `'top-right' \| 'top-left' \| 'bottom-right' \| 'bottom-left'`           | `'top-right'` |
+| standalone | 是否为独立徽章                                  | `boolean`                                                                | `true`        |
+| className  | 自定义 CSS 类名                                 | `string`                                                                 | -             |
+| style      | 自定义样式（Vue 为 prop；React 为原生 `style`） | `Record<string, string \| number>`                                       | -             |
 
 ### Slots (Vue)
 
-| 名称 | 说明 |
-|------|------|
+| 名称    | 说明                                          |
+| ------- | --------------------------------------------- |
 | default | 被包裹的内容（当 `standalone` 为 `false` 时） |
 
 ### Children (React)
 
-| 名称 | 说明 |
-|------|------|
+| 名称     | 说明                                          |
+| -------- | --------------------------------------------- |
 | children | 被包裹的内容（当 `standalone` 为 `false` 时） |
 
 ## 样式定制
@@ -466,8 +490,15 @@ Badge 组件使用 Tailwind CSS 类，可以通过 Tailwind 配置自定义颜�
 
 ```css
 :root {
+  /* 变体颜色（Badge 默认使用这些变量作为背景/边框色） */
   --tiger-primary: #2563eb;
-  --tiger-primary-hover: #1d4ed8;
+  --tiger-success: #16a34a;
+  --tiger-warning: #ca8a04;
+  --tiger-error: #dc2626;
+  --tiger-info: #3b82f6;
+
+  /* default 变体使用该变量 */
+  --tiger-text-muted: #6b7280;
 }
 ```
 
@@ -476,6 +507,7 @@ Badge 组件使用 Tailwind CSS 类，可以通过 Tailwind 配置自定义颜�
 - Badge 使用 `role="status"` 属性提供语义化信息
 - 数字徽章包含 `aria-label` 属性，描述通知数量
 - 点状徽章包含 `aria-label="notification"` 属性
+- 文本徽章的 `aria-label` 默认为文本内容
 - 支持屏幕阅读器访问
 
 ## 使用场景

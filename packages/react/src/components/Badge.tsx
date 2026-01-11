@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react'
-import { 
-  classNames, 
-  getBadgeVariantClasses, 
+import React from 'react';
+import {
+  classNames,
+  getBadgeVariantClasses,
   badgeBaseClasses,
   badgeSizeClasses,
   dotSizeClasses,
@@ -10,15 +10,16 @@ import {
   badgePositionClasses,
   formatBadgeContent,
   shouldHideBadge,
-  type BadgeProps as CoreBadgeProps 
-} from '@tigercat/core'
+  type BadgeProps as CoreBadgeProps,
+} from '@tigercat/core';
 
-export interface BadgeProps extends CoreBadgeProps {
-  /**
-   * Badge content (children for wrapped mode)
-   */
-  children?: React.ReactNode
-}
+export type BadgeProps = CoreBadgeProps &
+  Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> & {
+    /**
+     * Badge content (children for wrapped mode)
+     */
+    children?: React.ReactNode;
+  };
 
 export const Badge: React.FC<BadgeProps> = ({
   variant = 'danger',
@@ -31,48 +32,53 @@ export const Badge: React.FC<BadgeProps> = ({
   standalone = true,
   className,
   children,
+  ['aria-label']: ariaLabelProp,
   ...props
 }) => {
-  const isDot = type === 'dot'
-  const isHidden = useMemo(() => shouldHideBadge(content, type, showZero), [content, type, showZero])
-  const displayContent = useMemo(() => formatBadgeContent(content, max, showZero), [content, max, showZero])
+  const isDot = type === 'dot';
+  const isHidden = shouldHideBadge(content, type, showZero);
+  const displayContent = formatBadgeContent(content, max, showZero);
 
-  const badgeClasses = useMemo(() => {
-    const sizeClass = isDot ? dotSizeClasses[size] : badgeSizeClasses[size]
-    
-    return classNames(
-      badgeBaseClasses,
-      getBadgeVariantClasses(variant),
-      sizeClass,
-      badgeTypeClasses[type],
-      !standalone && badgePositionClasses[position],
-      className,
-    )
-  }, [variant, size, type, standalone, position, className, isDot])
+  const sizeClass = isDot ? dotSizeClasses[size] : badgeSizeClasses[size];
+  const badgeClasses = classNames(
+    badgeBaseClasses,
+    getBadgeVariantClasses(variant),
+    sizeClass,
+    badgeTypeClasses[type],
+    !standalone && badgePositionClasses[position],
+    className
+  );
+
+  const computedAriaLabel =
+    ariaLabelProp ??
+    (isDot
+      ? 'notification'
+      : type === 'number'
+      ? `${displayContent} notifications`
+      : `${displayContent ?? ''}`);
 
   // If badge should be hidden, render only children (or nothing if standalone)
   if (isHidden) {
     if (standalone) {
-      return null
+      return null;
     }
-    return <>{children}</>
+    return <>{children}</>;
   }
 
   // Create badge element
   const badgeElement = (
     <span
+      {...props}
       className={badgeClasses}
       role="status"
-      aria-label={isDot ? 'notification' : `${displayContent} notifications`}
-      {...props}
-    >
+      aria-label={computedAriaLabel}>
       {!isDot && displayContent}
     </span>
-  )
+  );
 
   // If standalone, return badge only
   if (standalone) {
-    return badgeElement
+    return badgeElement;
   }
 
   // If wrapping content, return wrapper with badge and children
@@ -81,5 +87,5 @@ export const Badge: React.FC<BadgeProps> = ({
       {children}
       {badgeElement}
     </span>
-  )
-}
+  );
+};
