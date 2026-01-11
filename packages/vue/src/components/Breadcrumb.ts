@@ -1,16 +1,22 @@
-import { defineComponent, computed, provide, PropType, h } from 'vue'
+import { defineComponent, computed, provide, PropType, h } from 'vue';
 import {
   classNames,
   breadcrumbContainerClasses,
   type BreadcrumbSeparator,
-} from '@tigercat/core'
+} from '@tigercat/core';
+
+export interface VueBreadcrumbProps {
+  separator?: BreadcrumbSeparator;
+  className?: string;
+  style?: Record<string, unknown>;
+}
 
 // Breadcrumb context key
-export const BreadcrumbContextKey = Symbol('BreadcrumbContext')
+export const BreadcrumbContextKey = Symbol('BreadcrumbContext');
 
 // Breadcrumb context interface
 export interface BreadcrumbContext {
-  separator: BreadcrumbSeparator
+  separator: BreadcrumbSeparator;
 }
 
 export const Breadcrumb = defineComponent({
@@ -31,28 +37,33 @@ export const Breadcrumb = defineComponent({
       type: String,
       default: undefined,
     },
+    /**
+     * Inline styles
+     */
+    style: {
+      type: Object as PropType<Record<string, unknown>>,
+      default: undefined,
+    },
   },
   setup(props, { slots, attrs }) {
     // Container classes
     const containerClasses = computed(() => {
-      return classNames(
-        breadcrumbContainerClasses,
-        props.className
-      )
-    })
+      return classNames(breadcrumbContainerClasses, props.className);
+    });
 
     // Provide breadcrumb context to child components
     provide<BreadcrumbContext>(BreadcrumbContextKey, {
       separator: props.separator,
-    })
+    });
 
     return () => {
       return h(
         'nav',
         {
-          class: containerClasses.value,
           'aria-label': 'Breadcrumb',
           ...attrs,
+          class: [containerClasses.value, attrs.class],
+          style: [props.style, attrs.style],
         },
         h(
           'ol',
@@ -61,9 +72,9 @@ export const Breadcrumb = defineComponent({
           },
           slots.default?.()
         )
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Breadcrumb
+export default Breadcrumb;
