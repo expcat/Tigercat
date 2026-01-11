@@ -8,20 +8,23 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { CheckboxGroup, Checkbox } from '@tigercat/vue'
+import { ref } from 'vue';
+import { CheckboxGroup, Checkbox } from '@tigercat/vue';
 
-const selectedValues = ref(['apple', 'orange'])
+const selectedValues = ref(['apple', 'orange']);
 const options = [
   { value: 'apple', label: '苹果' },
   { value: 'banana', label: '香蕉' },
   { value: 'orange', label: '橙子' },
-]
+];
 </script>
 
 <template>
   <CheckboxGroup v-model="selectedValues">
-    <Checkbox v-for="option in options" :key="option.value" :value="option.value">
+    <Checkbox
+      v-for="option in options"
+      :key="option.value"
+      :value="option.value">
       {{ option.label }}
     </Checkbox>
   </CheckboxGroup>
@@ -31,26 +34,26 @@ const options = [
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { CheckboxGroup, Checkbox } from '@tigercat/react'
+import { useState } from 'react';
+import { CheckboxGroup, Checkbox } from '@tigercat/react';
 
 function App() {
-  const [selectedValues, setSelectedValues] = useState(['apple', 'orange'])
+  const [selectedValues, setSelectedValues] = useState(['apple', 'orange']);
   const options = [
     { value: 'apple', label: '苹果' },
     { value: 'banana', label: '香蕉' },
     { value: 'orange', label: '橙子' },
-  ]
+  ];
 
   return (
     <CheckboxGroup value={selectedValues} onChange={setSelectedValues}>
-      {options.map(option => (
+      {options.map((option) => (
         <Checkbox key={option.value} value={option.value}>
           {option.label}
         </Checkbox>
       ))}
     </CheckboxGroup>
-  )
+  );
 }
 ```
 
@@ -114,18 +117,18 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { CheckboxGroup, Checkbox } from '@tigercat/vue'
+import { ref } from 'vue';
+import { CheckboxGroup, Checkbox } from '@tigercat/vue';
 
-const selectedValues = ref(['vue'])
+const selectedValues = ref(['vue']);
 
 const handleChange = (values) => {
-  console.log('Selected values:', values)
+  console.log('Selected values:', values);
   // 可以在这里添加验证逻辑
   if (values.length <= 2) {
-    selectedValues.value = values
+    selectedValues.value = values;
   }
-}
+};
 </script>
 
 <template>
@@ -141,19 +144,19 @@ const handleChange = (values) => {
 #### React
 
 ```tsx
-import { useState } from 'react'
-import { CheckboxGroup, Checkbox } from '@tigercat/react'
+import { useState } from 'react';
+import { CheckboxGroup, Checkbox } from '@tigercat/react';
 
 function ControlledExample() {
-  const [selectedValues, setSelectedValues] = useState(['vue'])
+  const [selectedValues, setSelectedValues] = useState(['vue']);
 
   const handleChange = (values: (string | number | boolean)[]) => {
-    console.log('Selected values:', values)
+    console.log('Selected values:', values);
     // 可以在这里添加验证逻辑
     if (values.length <= 2) {
-      setSelectedValues(values)
+      setSelectedValues(values);
     }
-  }
+  };
 
   return (
     <>
@@ -164,7 +167,7 @@ function ControlledExample() {
       </CheckboxGroup>
       <p>已选择: {selectedValues.join(', ')}</p>
     </>
-  )
+  );
 }
 ```
 
@@ -176,11 +179,11 @@ function ControlledExample() {
 
 ```vue
 <script setup>
-import { CheckboxGroup, Checkbox } from '@tigercat/vue'
+import { CheckboxGroup, Checkbox } from '@tigercat/vue';
 
 const handleChange = (values) => {
-  console.log('Selected values:', values)
-}
+  console.log('Selected values:', values);
+};
 </script>
 
 <template>
@@ -195,12 +198,12 @@ const handleChange = (values) => {
 #### React
 
 ```tsx
-import { CheckboxGroup, Checkbox } from '@tigercat/react'
+import { CheckboxGroup, Checkbox } from '@tigercat/react';
 
 function UncontrolledExample() {
   const handleChange = (values: (string | number | boolean)[]) => {
-    console.log('Selected values:', values)
-  }
+    console.log('Selected values:', values);
+  };
 
   return (
     <CheckboxGroup defaultValue={['vue']} onChange={handleChange}>
@@ -208,7 +211,7 @@ function UncontrolledExample() {
       <Checkbox value="react">React</Checkbox>
       <Checkbox value="angular">Angular</Checkbox>
     </CheckboxGroup>
-  )
+  );
 }
 ```
 
@@ -216,56 +219,56 @@ function UncontrolledExample() {
 
 ### Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| size | 所有复选框的尺寸 | `'sm' \| 'md' \| 'lg'` | `'md'` |
-| disabled | 是否禁用所有复选框 | `boolean` | `false` |
+| 属性     | 说明               | 类型                   | 默认值  |
+| -------- | ------------------ | ---------------------- | ------- |
+| size     | 所有复选框的尺寸   | `'sm' \| 'md' \| 'lg'` | `'md'`  |
+| disabled | 是否禁用所有复选框 | `boolean`              | `false` |
 
 #### Vue 专属属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| modelValue | 选中值（v-model） | `(string \| number \| boolean)[]` | - |
-| defaultValue | 默认选中值（非受控模式） | `(string \| number \| boolean)[]` | `[]` |
+| 属性         | 说明                     | 类型                              | 默认值 |
+| ------------ | ------------------------ | --------------------------------- | ------ |
+| modelValue   | 选中值（v-model）        | `(string \| number \| boolean)[]` | -      |
+| defaultValue | 默认选中值（非受控模式） | `(string \| number \| boolean)[]` | `[]`   |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| value | 选中值（受控模式） | `(string \| number \| boolean)[]` | - |
-| defaultValue | 默认选中值（非受控模式） | `(string \| number \| boolean)[]` | `[]` |
-| onChange | 值改变时的回调 | `(value: (string \| number \| boolean)[]) => void` | - |
-| className | 额外的 CSS 类名 | `string` | - |
-| children | 子组件 | `React.ReactNode` | - |
+| 属性         | 说明                     | 类型                                               | 默认值 |
+| ------------ | ------------------------ | -------------------------------------------------- | ------ |
+| value        | 选中值（受控模式）       | `(string \| number \| boolean)[]`                  | -      |
+| defaultValue | 默认选中值（非受控模式） | `(string \| number \| boolean)[]`                  | `[]`   |
+| onChange     | 值改变时的回调           | `(value: (string \| number \| boolean)[]) => void` | -      |
+| className    | 额外的 CSS 类名          | `string`                                           | -      |
+| children     | 子组件                   | `React.ReactNode`                                  | -      |
 
 ### Events / 事件 (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
+| 事件名            | 说明                        | 回调参数                                   |
+| ----------------- | --------------------------- | ------------------------------------------ |
 | update:modelValue | 选中值更新时触发（v-model） | `(value: (string \| number \| boolean)[])` |
-| change | 选中值改变时触发 | `(value: (string \| number \| boolean)[])` |
+| change            | 选中值改变时触发            | `(value: (string \| number \| boolean)[])` |
 
 ### Slots / 插槽 (Vue)
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明                                     |
+| ------- | ---------------------------------------- |
 | default | CheckboxGroup 内容，应包含 Checkbox 组件 |
 
 ### Hooks / Context (React)
 
 #### `useCheckboxGroup()`
 
-在 Checkbox 组件内部使用，获取 CheckboxGroup 的上下文。
+在 Checkbox 组件内部使用，获取 CheckboxGroup 的上下文（内部实现细节，不作为公共 API 导出）。
 
 ```typescript
-const context = useCheckboxGroup()
+const context = useCheckboxGroup();
 // context: CheckboxGroupContext | null
 
 interface CheckboxGroupContext {
-  value: (string | number | boolean)[]
-  disabled: boolean
-  size: CheckboxSize
-  updateValue: (val: string | number | boolean, checked: boolean) => void
+  value: (string | number | boolean)[];
+  disabled: boolean;
+  size: CheckboxSize;
+  updateValue: (val: string | number | boolean, checked: boolean) => void;
 }
 ```
 
@@ -275,17 +278,17 @@ interface CheckboxGroupContext {
 
 ```vue
 <script setup>
-import { ref, watch } from 'vue'
-import { CheckboxGroup, Checkbox } from '@tigercat/vue'
+import { ref, watch } from 'vue';
+import { CheckboxGroup, Checkbox } from '@tigercat/vue';
 
-const selectedValues = ref([])
-const maxSelection = 2
+const selectedValues = ref([]);
+const maxSelection = 2;
 
 watch(selectedValues, (newValues) => {
   if (newValues.length > maxSelection) {
-    selectedValues.value = newValues.slice(0, maxSelection)
+    selectedValues.value = newValues.slice(0, maxSelection);
   }
-})
+});
 </script>
 
 <template>
@@ -302,25 +305,25 @@ watch(selectedValues, (newValues) => {
 ### 2. 动态选项
 
 ```tsx
-import { useState } from 'react'
-import { CheckboxGroup, Checkbox } from '@tigercat/react'
+import { useState } from 'react';
+import { CheckboxGroup, Checkbox } from '@tigercat/react';
 
 function DynamicOptions() {
-  const [selectedValues, setSelectedValues] = useState([])
+  const [selectedValues, setSelectedValues] = useState([]);
   const [options, setOptions] = useState([
     { value: '1', label: '选项 1' },
     { value: '2', label: '选项 2' },
-  ])
+  ]);
 
   const addOption = () => {
-    const newValue = String(options.length + 1)
-    setOptions([...options, { value: newValue, label: `选项 ${newValue}` }])
-  }
+    const newValue = String(options.length + 1);
+    setOptions([...options, { value: newValue, label: `选项 ${newValue}` }]);
+  };
 
   return (
     <>
       <CheckboxGroup value={selectedValues} onChange={setSelectedValues}>
-        {options.map(option => (
+        {options.map((option) => (
           <Checkbox key={option.value} value={option.value}>
             {option.label}
           </Checkbox>
@@ -328,7 +331,7 @@ function DynamicOptions() {
       </CheckboxGroup>
       <button onClick={addOption}>添加选项</button>
     </>
-  )
+  );
 }
 ```
 
@@ -347,11 +350,10 @@ function DynamicOptions() {
 ### 4. 网格布局
 
 ```tsx
-<CheckboxGroup 
-  value={selectedValues} 
+<CheckboxGroup
+  value={selectedValues}
   onChange={setSelectedValues}
-  className="grid grid-cols-2 gap-4"
->
+  className="grid grid-cols-2 gap-4">
   <Checkbox value="1">选项 1</Checkbox>
   <Checkbox value="2">选项 2</Checkbox>
   <Checkbox value="3">选项 3</Checkbox>
@@ -417,11 +419,11 @@ function DynamicOptions() {
 CheckboxGroup 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { CheckboxGroupProps, CheckboxGroupContext } from '@tigercat/core'
+import type { CheckboxGroupProps, CheckboxGroupContext } from '@tigercat/core';
 // Vue
-import type { CheckboxGroup } from '@tigercat/vue'
+import type { CheckboxGroup } from '@tigercat/vue';
 // React
-import { CheckboxGroup, useCheckboxGroup } from '@tigercat/react'
+import { CheckboxGroup, useCheckboxGroup } from '@tigercat/react';
 ```
 
 ## 相关组件
@@ -439,14 +441,14 @@ import { CheckboxGroup, useCheckboxGroup } from '@tigercat/react'
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { CheckboxGroup, Checkbox, Button } from '@tigercat/vue'
+import { ref } from 'vue';
+import { CheckboxGroup, Checkbox, Button } from '@tigercat/vue';
 
-const interests = ref(['reading'])
+const interests = ref(['reading']);
 
 const handleSubmit = () => {
-  console.log('兴趣爱好:', interests.value)
-}
+  console.log('兴趣爱好:', interests.value);
+};
 </script>
 
 <template>
@@ -469,22 +471,27 @@ const handleSubmit = () => {
 #### React
 
 ```tsx
-import { useState, FormEvent } from 'react'
-import { CheckboxGroup, Checkbox, Button } from '@tigercat/react'
+import { useState, FormEvent } from 'react';
+import { CheckboxGroup, Checkbox, Button } from '@tigercat/react';
 
 function FormExample() {
-  const [interests, setInterests] = useState(['reading'])
+  const [interests, setInterests] = useState(['reading']);
 
   const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    console.log('兴趣爱好:', interests)
-  }
+    e.preventDefault();
+    console.log('兴趣爱好:', interests);
+  };
 
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-2">选择您的兴趣爱好：</label>
-        <CheckboxGroup value={interests} onChange={setInterests} className="space-y-2">
+        <label className="block text-sm font-medium mb-2">
+          选择您的兴趣爱好：
+        </label>
+        <CheckboxGroup
+          value={interests}
+          onChange={setInterests}
+          className="space-y-2">
           <Checkbox value="reading">阅读</Checkbox>
           <Checkbox value="sports">运动</Checkbox>
           <Checkbox value="music">音乐</Checkbox>
@@ -494,6 +501,6 @@ function FormExample() {
       </div>
       <Button type="submit">提交</Button>
     </form>
-  )
+  );
 }
 ```
