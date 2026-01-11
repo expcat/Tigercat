@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Text` Step1 例行检查/主题变量化/透传与测试精简（2026-01-12）
+- 上一步：✅ `Badge` Step1 主题/透传/测试精简（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -135,7 +135,7 @@
 #### Badge（P3，无需优化）
 
 - 例行检查：颜色使用 CSS vars、尺寸/variant 一致。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/测试精简（2026-01-12）：Badge 变体颜色从硬编码 Tailwind 色收敛为 CSS vars（含 fallback：`--tiger-text-muted/--tiger-primary/--tiger-success/--tiger-warning/--tiger-error/--tiger-info`）；React Badge 去掉不必要的 memo 并补齐 `span` 原生属性透传类型；Vue Badge 增加 `inheritAttrs: false` 并将 attrs 透传到 badge 元素，新增并导出 `VueBadgeProps`（含 `className/style`）；精简 Vue/React Badge 测试并移除快照；同步更新 Badge 文档主题变量与 props/a11y 说明。
 
 #### Tag（P3，无需优化）
 

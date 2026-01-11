@@ -1,7 +1,7 @@
-import { defineComponent, computed, h, PropType } from 'vue'
-import { 
-  classNames, 
-  getBadgeVariantClasses, 
+import { defineComponent, computed, h, PropType } from 'vue';
+import {
+  classNames,
+  getBadgeVariantClasses,
   badgeBaseClasses,
   badgeSizeClasses,
   dotSizeClasses,
@@ -10,14 +10,28 @@ import {
   badgePositionClasses,
   formatBadgeContent,
   shouldHideBadge,
-  type BadgeVariant, 
+  type BadgeVariant,
   type BadgeSize,
   type BadgeType,
   type BadgePosition,
-} from '@tigercat/core'
+} from '@tigercat/core';
+
+export interface VueBadgeProps {
+  variant?: BadgeVariant;
+  size?: BadgeSize;
+  type?: BadgeType;
+  content?: number | string;
+  max?: number;
+  showZero?: boolean;
+  position?: BadgePosition;
+  standalone?: boolean;
+  className?: string;
+  style?: Record<string, string | number>;
+}
 
 export const Badge = defineComponent({
   name: 'TigerBadge',
+  inheritAttrs: false,
   props: {
     /**
      * Badge variant style
@@ -82,55 +96,94 @@ export const Badge = defineComponent({
       type: Boolean,
       default: true,
     },
+
+    /**
+     * Additional CSS classes
+     */
+    className: {
+      type: String,
+      default: undefined,
+    },
+
+    /**
+     * Custom styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined,
+    },
   },
-  setup(props, { slots }) {
-    const isDot = computed(() => props.type === 'dot')
-    const isHidden = computed(() => shouldHideBadge(props.content, props.type, props.showZero))
-    const displayContent = computed(() => formatBadgeContent(props.content, props.max, props.showZero))
+  setup(props, { slots, attrs }) {
+    const isDot = computed(() => props.type === 'dot');
+    const isHidden = computed(() =>
+      shouldHideBadge(props.content, props.type, props.showZero)
+    );
+    const displayContent = computed(() =>
+      formatBadgeContent(props.content, props.max, props.showZero)
+    );
 
     const badgeClasses = computed(() => {
-      const sizeClass = isDot.value ? dotSizeClasses[props.size] : badgeSizeClasses[props.size]
-      
+      const sizeClass = isDot.value
+        ? dotSizeClasses[props.size]
+        : badgeSizeClasses[props.size];
+
       return classNames(
         badgeBaseClasses,
         getBadgeVariantClasses(props.variant),
         sizeClass,
         badgeTypeClasses[props.type],
         !props.standalone && badgePositionClasses[props.position]
-      )
-    })
+      );
+    });
 
     return () => {
       // If badge should be hidden, render only children (or nothing if standalone)
       if (isHidden.value) {
         if (props.standalone) {
-          return null
+          return null;
         }
-        return slots.default ? slots.default() : null
+        return slots.default ? slots.default() : null;
       }
 
       // Create badge element
+      const attrsRecord = attrs as Record<string, unknown>;
+      const attrsClass = attrsRecord.class;
+      const attrsStyle = attrsRecord.style;
+      const ariaLabel =
+        (attrsRecord['aria-label'] as string | undefined) ??
+        (isDot.value
+          ? 'notification'
+          : props.type === 'number'
+          ? `${displayContent.value} notifications`
+          : `${displayContent.value ?? ''}`);
+
       const badgeElement = h(
         'span',
         {
-          class: badgeClasses.value,
+          ...attrs,
+          class: classNames(
+            badgeClasses.value,
+            props.className,
+            attrsClass as any
+          ),
+          style: [attrsStyle as any, props.style as any],
           role: 'status',
-          'aria-label': isDot.value ? 'notification' : `${displayContent.value} notifications`,
+          'aria-label': ariaLabel,
         },
-        isDot.value ? undefined : (displayContent.value || '')
-      )
+        isDot.value ? undefined : displayContent.value || ''
+      );
 
       // If standalone, return badge only
       if (props.standalone) {
-        return badgeElement
+        return badgeElement;
       }
 
       // If wrapping content, return wrapper with badge and children
-      const children = []
+      const children = [];
       if (slots.default) {
-        children.push(...slots.default())
+        children.push(...slots.default());
       }
-      children.push(badgeElement)
+      children.push(badgeElement);
 
       return h(
         'span',
@@ -138,9 +191,9 @@ export const Badge = defineComponent({
           class: badgeWrapperClasses,
         },
         children
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Badge
+export default Badge;
