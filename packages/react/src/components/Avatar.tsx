@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   classNames,
   avatarBaseClasses,
@@ -11,7 +11,9 @@ import {
   type AvatarProps as CoreAvatarProps,
 } from '@tigercat/core';
 
-export interface AvatarProps extends CoreAvatarProps {
+export interface AvatarProps
+  extends CoreAvatarProps,
+    React.HTMLAttributes<HTMLSpanElement> {
   /**
    * Icon content (children for icon mode)
    */
@@ -32,30 +34,29 @@ export const Avatar: React.FC<AvatarProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false);
 
-  const hasImage = Boolean(src && !imageError);
+  const hasImage = Boolean(src) && !imageError;
+  const displayText = text ? getInitials(text) : '';
 
-  const avatarClasses = useMemo(() => {
-    return classNames(
-      avatarBaseClasses,
-      avatarSizeClasses[size],
-      avatarShapeClasses[shape],
-      // Apply background and text color only for text/icon avatars
-      !hasImage && bgColor,
-      !hasImage && textColor,
-      className
-    );
-  }, [size, shape, hasImage, bgColor, textColor, className]);
+  const ariaLabelProp = props['aria-label'];
+  const ariaLabelledbyProp = props['aria-labelledby'];
+  const ariaHiddenProp = props['aria-hidden'];
 
-  const displayText = useMemo(() => {
-    if (text) {
-      return getInitials(text);
-    }
-    return '';
-  }, [text]);
+  const computedLabel =
+    ariaLabelProp ??
+    (alt.trim() ? alt : undefined) ??
+    (text?.trim() || undefined);
 
-  const handleImageError = () => {
-    setImageError(true);
-  };
+  const isDecorative =
+    ariaHiddenProp === true || (!computedLabel && !ariaLabelledbyProp);
+
+  const avatarClasses = classNames(
+    avatarBaseClasses,
+    avatarSizeClasses[size],
+    avatarShapeClasses[shape],
+    !hasImage && bgColor,
+    !hasImage && textColor,
+    className
+  );
 
   // Priority: image > text > icon (children)
 
@@ -63,15 +64,14 @@ export const Avatar: React.FC<AvatarProps> = ({
   if (hasImage) {
     return (
       <span
+        {...props}
         className={avatarClasses}
-        role="img"
-        aria-label={alt || 'avatar'}
-        {...props}>
+        aria-hidden={isDecorative ? true : props['aria-hidden']}>
         <img
           src={src}
-          alt={alt || 'avatar'}
+          alt={alt}
           className={avatarImageClasses}
-          onError={handleImageError}
+          onError={() => setImageError(true)}
         />
       </span>
     );
@@ -81,10 +81,15 @@ export const Avatar: React.FC<AvatarProps> = ({
   if (displayText) {
     return (
       <span
+        {...props}
         className={avatarClasses}
-        role="img"
-        aria-label={alt || text || 'avatar'}
-        {...props}>
+        {...(isDecorative
+          ? { 'aria-hidden': true }
+          : {
+              role: 'img',
+              'aria-label': computedLabel,
+              'aria-labelledby': ariaLabelledbyProp,
+            })}>
         {displayText}
       </span>
     );
@@ -93,10 +98,15 @@ export const Avatar: React.FC<AvatarProps> = ({
   // Otherwise, show icon from children
   return (
     <span
+      {...props}
       className={avatarClasses}
-      role="img"
-      aria-label={alt || 'avatar'}
-      {...props}>
+      {...(isDecorative
+        ? { 'aria-hidden': true }
+        : {
+            role: 'img',
+            'aria-label': computedLabel,
+            'aria-labelledby': ariaLabelledbyProp,
+          })}>
       {children}
     </span>
   );

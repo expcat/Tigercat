@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Icon` Step1 去冗余/透传/a11y 默认对齐（2026-01-12）
+- 上一步：✅ `Avatar` Step1 主题/透传/a11y 默认对齐（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -146,7 +146,7 @@
 
 - 思路：img 的 alt/fallback；加载失败占位；可选 shape/size 统一。
 - 可拆分：a11y/alt → fallback 逻辑抽到 core utils → tests。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y 默认对齐（2026-01-12）：core Avatar 默认背景/文字颜色收敛为 CSS vars（含 fallback：`--tiger-avatar-bg/--tiger-avatar-text`），并将 `generateAvatarColor()` 色盘改为可主题覆盖的 `--tiger-avatar-color-*`；Vue Avatar 增加 `inheritAttrs: false`，合并 `attrs.class/style` 并新增导出 `VueAvatarProps`（含 `style`）；React Avatar 去掉不必要的 memo，补齐 `HTMLAttributes` 透传类型；a11y 默认调整为“无可访问名称时视为装饰性内容（aria-hidden=true）”，有 `text/alt/aria-label/aria-labelledby` 时提供 `role=img`；精简 Vue/React Avatar 测试并移除过度覆盖；同步更新 Avatar 文档（Demo 无需修改）。
 
 #### Card（P3，无需优化）
 

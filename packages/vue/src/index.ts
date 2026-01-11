@@ -57,6 +57,7 @@ export type { VueBadgeProps } from './components/Badge';
 export { Card } from './components/Card';
 export type { VueCardProps } from './components/Card';
 export { Avatar } from './components/Avatar';
+export type { VueAvatarProps } from './components/Avatar';
 export { List } from './components/List';
 export { Descriptions } from './components/Descriptions';
 export { Timeline } from './components/Timeline';

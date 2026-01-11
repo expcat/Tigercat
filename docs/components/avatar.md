@@ -8,20 +8,24 @@
 
 ```vue
 <script setup>
-import { Avatar } from '@tigercat/vue'
+import { Avatar } from '@tigercat/vue';
 </script>
 
 <template>
   <!-- 图片头像 -->
   <Avatar src="/user.jpg" alt="User" />
-  
+
   <!-- 文字头像 -->
   <Avatar text="John Doe" />
-  
+
   <!-- 图标头像 -->
   <Avatar>
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
     </svg>
   </Avatar>
 </template>
@@ -30,25 +34,34 @@ import { Avatar } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Avatar } from '@tigercat/react'
+import { Avatar } from '@tigercat/react';
 
 function App() {
   return (
     <>
       {/* 图片头像 */}
       <Avatar src="/user.jpg" alt="User" />
-      
+
       {/* 文字头像 */}
       <Avatar text="John Doe" />
-      
+
       {/* 图标头像 */}
       <Avatar>
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          />
         </svg>
       </Avatar>
     </>
-  )
+  );
 }
 ```
 
@@ -114,7 +127,7 @@ Avatar 组件支持 2 种不同的形状：
 <template>
   <!-- 正常加载图片 -->
   <Avatar src="/avatar.jpg" alt="User Avatar" />
-  
+
   <!-- 图片加载失败时显示文字 -->
   <Avatar src="/invalid.jpg" text="Fallback" alt="User Avatar" />
 </template>
@@ -123,11 +136,15 @@ Avatar 组件支持 2 种不同的形状：
 ### React
 
 ```tsx
-{/* 正常加载图片 */}
-<Avatar src="/avatar.jpg" alt="User Avatar" />
+{
+  /* 正常加载图片 */
+}
+<Avatar src="/avatar.jpg" alt="User Avatar" />;
 
-{/* 图片加载失败时显示文字 */}
-<Avatar src="/invalid.jpg" text="Fallback" alt="User Avatar" />
+{
+  /* 图片加载失败时显示文字 */
+}
+<Avatar src="/invalid.jpg" text="Fallback" alt="User Avatar" />;
 ```
 
 ## 文字头像 (Text Avatar)
@@ -141,11 +158,11 @@ Avatar 组件支持 2 种不同的形状：
   <!-- 单个词：显示首字母 -->
   <Avatar text="Alice" />
   <!-- 显示 "A" -->
-  
+
   <!-- 多个词：显示首字母缩写 -->
   <Avatar text="John Doe" />
   <!-- 显示 "JD" -->
-  
+
   <!-- 中文名：显示前两个字 -->
   <Avatar text="张三" />
   <!-- 显示 "张三" -->
@@ -155,17 +172,29 @@ Avatar 组件支持 2 种不同的形状：
 ### React
 
 ```tsx
-{/* 单个词：显示首字母 */}
-<Avatar text="Alice" />
-{/* 显示 "A" */}
+{
+  /* 单个词：显示首字母 */
+}
+<Avatar text="Alice" />;
+{
+  /* 显示 "A" */
+}
 
-{/* 多个词：显示首字母缩写 */}
-<Avatar text="John Doe" />
-{/* 显示 "JD" */}
+{
+  /* 多个词：显示首字母缩写 */
+}
+<Avatar text="John Doe" />;
+{
+  /* 显示 "JD" */
+}
 
-{/* 中文名：显示前两个字 */}
-<Avatar text="张三" />
-{/* 显示 "张三" */}
+{
+  /* 中文名：显示前两个字 */
+}
+<Avatar text="张三" />;
+{
+  /* 显示 "张三" */
+}
 ```
 
 ## 图标头像 (Icon Avatar)
@@ -178,7 +207,11 @@ Avatar 组件支持 2 种不同的形状：
 <template>
   <Avatar>
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
     </svg>
   </Avatar>
 </template>
@@ -188,8 +221,17 @@ Avatar 组件支持 2 种不同的形状：
 
 ```tsx
 <Avatar>
-  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+  <svg
+    className="w-5 h-5"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+    />
   </svg>
 </Avatar>
 ```
@@ -206,7 +248,7 @@ Avatar 组件支持 2 种不同的形状：
   <Avatar text="AB" bg-color="bg-blue-500" text-color="text-white" />
   <Avatar text="CD" bg-color="bg-green-500" text-color="text-white" />
   <Avatar text="EF" bg-color="bg-purple-500" text-color="text-white" />
-  
+
   <!-- 使用 CSS 颜色值（需要通过 style 传入） -->
   <Avatar text="GH">
     <template #default>
@@ -233,24 +275,20 @@ Avatar 组件支持 2 种不同的形状：
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Avatar } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Avatar } from '@tigercat/vue';
 
 const users = ref([
   { id: 1, name: 'Alice Johnson', avatar: '/alice.jpg' },
   { id: 2, name: 'Bob Smith', avatar: null },
   { id: 3, name: '张三', avatar: null },
-])
+]);
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
     <div v-for="user in users" :key="user.id" class="flex items-center gap-3">
-      <Avatar 
-        :src="user.avatar" 
-        :text="user.name" 
-        :alt="user.name"
-      />
+      <Avatar :src="user.avatar" :text="user.name" :alt="user.name" />
       <span>{{ user.name }}</span>
     </div>
   </div>
@@ -260,29 +298,29 @@ const users = ref([
 #### React
 
 ```tsx
-import { Avatar } from '@tigercat/react'
+import { Avatar } from '@tigercat/react';
 
 function UserList() {
   const users = [
     { id: 1, name: 'Alice Johnson', avatar: '/alice.jpg' },
     { id: 2, name: 'Bob Smith', avatar: null },
     { id: 3, name: '张三', avatar: null },
-  ]
-  
+  ];
+
   return (
     <div className="flex flex-col gap-4">
-      {users.map(user => (
+      {users.map((user) => (
         <div key={user.id} className="flex items-center gap-3">
-          <Avatar 
-            src={user.avatar || undefined} 
-            text={user.name} 
+          <Avatar
+            src={user.avatar || undefined}
+            text={user.name}
             alt={user.name}
           />
           <span>{user.name}</span>
         </div>
       ))}
     </div>
-  )
+  );
 }
 ```
 
@@ -292,14 +330,14 @@ function UserList() {
 
 ```vue
 <script setup>
-import { Avatar } from '@tigercat/vue'
+import { Avatar } from '@tigercat/vue';
 
 const team = [
   { name: 'Alice', avatar: '/alice.jpg' },
   { name: 'Bob', avatar: '/bob.jpg' },
   { name: 'Charlie', avatar: '/charlie.jpg' },
   { name: 'David', avatar: null },
-]
+];
 </script>
 
 <template>
@@ -311,8 +349,7 @@ const team = [
       :text="member.name"
       :alt="member.name"
       size="md"
-      class="ring-2 ring-white"
-    />
+      class="ring-2 ring-white" />
   </div>
 </template>
 ```
@@ -320,7 +357,7 @@ const team = [
 #### React
 
 ```tsx
-import { Avatar } from '@tigercat/react'
+import { Avatar } from '@tigercat/react';
 
 function TeamAvatars() {
   const team = [
@@ -328,8 +365,8 @@ function TeamAvatars() {
     { name: 'Bob', avatar: '/bob.jpg' },
     { name: 'Charlie', avatar: '/charlie.jpg' },
     { name: 'David', avatar: null },
-  ]
-  
+  ];
+
   return (
     <div className="flex -space-x-2">
       {team.map((member, index) => (
@@ -343,7 +380,7 @@ function TeamAvatars() {
         />
       ))}
     </div>
-  )
+  );
 }
 ```
 
@@ -353,11 +390,15 @@ function TeamAvatars() {
 
 ```vue
 <script setup>
-import { Avatar, Badge } from '@tigercat/vue'
+import { Avatar, Badge } from '@tigercat/vue';
 </script>
 
 <template>
-  <Badge type="dot" variant="success" :standalone="false" position="bottom-right">
+  <Badge
+    type="dot"
+    variant="success"
+    :standalone="false"
+    position="bottom-right">
     <Avatar src="/user.jpg" alt="Online User" size="lg" />
   </Badge>
 </template>
@@ -366,14 +407,18 @@ import { Avatar, Badge } from '@tigercat/vue'
 #### React
 
 ```tsx
-import { Avatar, Badge } from '@tigercat/react'
+import { Avatar, Badge } from '@tigercat/react';
 
 function OnlineAvatar() {
   return (
-    <Badge type="dot" variant="success" standalone={false} position="bottom-right">
+    <Badge
+      type="dot"
+      variant="success"
+      standalone={false}
+      position="bottom-right">
       <Avatar src="/user.jpg" alt="Online User" size="lg" />
     </Badge>
-  )
+  );
 }
 ```
 
@@ -381,27 +426,28 @@ function OnlineAvatar() {
 
 ### Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| size | 头像尺寸 | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'` |
-| shape | 头像形状 | `'circle' \| 'square'` | `'circle'` |
-| src | 图片源地址 | `string` | - |
-| alt | 图片替代文本 | `string` | `''` |
-| text | 文字内容（用于生成缩写） | `string` | - |
-| bgColor | 背景色（仅文字/图标头像） | `string` | `'bg-gray-200'` |
-| textColor | 文字颜色（仅文字/图标头像） | `string` | `'text-gray-600'` |
-| className | 自定义 CSS 类名（仅 React） | `string` | - |
+| 属性      | 说明                                     | 类型                           | 默认值                                                              |
+| --------- | ---------------------------------------- | ------------------------------ | ------------------------------------------------------------------- |
+| size      | 头像尺寸                                 | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`                                                              |
+| shape     | 头像形状                                 | `'circle' \| 'square'`         | `'circle'`                                                          |
+| src       | 图片源地址                               | `string`                       | -                                                                   |
+| alt       | 图片替代文本                             | `string`                       | `''`                                                                |
+| text      | 文字内容（用于生成缩写）                 | `string`                       | -                                                                   |
+| bgColor   | 背景色（仅文字/图标头像）                | `string`                       | `'bg-[var(--tiger-avatar-bg,#e5e7eb)]'`                             |
+| textColor | 文字颜色（仅文字/图标头像）              | `string`                       | `'text-[var(--tiger-avatar-text,var(--tiger-text-muted,#6b7280))]'` |
+| className | 自定义 CSS 类名                          | `string`                       | -                                                                   |
+| style     | 自定义样式（Vue: object / React: style） | `object`                       | -                                                                   |
 
 ### Slots (Vue)
 
-| 名称 | 说明 |
-|------|------|
+| 名称    | 说明                                          |
+| ------- | --------------------------------------------- |
 | default | 图标内容（当 `src` 和 `text` 都未提供时显示） |
 
 ### Children (React)
 
-| 名称 | 说明 |
-|------|------|
+| 名称     | 说明                                          |
+| -------- | --------------------------------------------- |
 | children | 图标内容（当 `src` 和 `text` 都未提供时显示） |
 
 ## 优先级
@@ -416,6 +462,14 @@ Avatar 组件的内容显示遵循以下优先级：
 
 Avatar 组件使用 Tailwind CSS 类，可以通过 Tailwind 配置自定义样式。
 
+### 主题变量（推荐）
+
+默认样式使用 CSS 变量（带 fallback），便于统一主题：
+
+- `--tiger-avatar-bg`：默认背景（文字/图标头像）
+- `--tiger-avatar-text`：默认文字颜色（可配合 `--tiger-text-muted`）
+- `--tiger-avatar-color-1` ~ `--tiger-avatar-color-10`：`generateAvatarColor()` 生成色盘
+
 ### 自定义类名
 
 可以通过 `className` 属性添加额外的样式类：
@@ -426,10 +480,9 @@ Avatar 组件使用 Tailwind CSS 类，可以通过 Tailwind 配置自定义样�
 
 ## 可访问性
 
-- Avatar 使用 `role="img"` 属性提供语义化信息
-- 所有头像都包含 `aria-label` 属性，提供无障碍访问支持
-- 图片头像支持 `alt` 属性用于屏幕阅读器
-- 支持键盘导航和屏幕阅读器访问
+- 当提供 `text` 或显式的 `alt` / `aria-label` / `aria-labelledby` 时，Avatar 会作为可感知内容暴露给屏幕阅读器
+- 当未提供任何可访问名称时，Avatar 会默认视为装饰性内容（`aria-hidden="true"`）
+- 图片头像通过 `<img alt="...">` 提供可访问名称；若 `alt` 为空字符串则视为装饰性图片
 
 ## 使用场景
 
