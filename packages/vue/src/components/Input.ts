@@ -1,8 +1,32 @@
-import { defineComponent, computed, ref, watch, h, PropType } from 'vue'
-import { getInputClasses, type InputSize, type InputType } from '@tigercat/core'
+import { defineComponent, computed, ref, watch, h, PropType } from 'vue';
+import {
+  classNames,
+  getInputClasses,
+  type InputSize,
+  type InputType,
+} from '@tigercat/core';
+
+export interface VueInputProps {
+  modelValue?: string | number;
+  size?: InputSize;
+  type?: InputType;
+  placeholder?: string;
+  disabled?: boolean;
+  readonly?: boolean;
+  required?: boolean;
+  maxLength?: number;
+  minLength?: number;
+  name?: string;
+  id?: string;
+  autoComplete?: string;
+  autoFocus?: boolean;
+  className?: string;
+  style?: Record<string, string | number>;
+}
 
 export const Input = defineComponent({
   name: 'TigerInput',
+  inheritAttrs: false,
   props: {
     /**
      * Input value (for v-model)
@@ -79,6 +103,20 @@ export const Input = defineComponent({
      * Whether to autofocus on mount
      */
     autoFocus: Boolean,
+
+    /**
+     * Additional CSS classes
+     */
+    className: {
+      type: String,
+    },
+
+    /**
+     * Inline styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+    },
   },
   emits: {
     'update:modelValue': null,
@@ -88,42 +126,54 @@ export const Input = defineComponent({
     blur: null,
   },
   setup(props, { emit, attrs }) {
-    const inputRef = ref<HTMLInputElement | null>(null)
-    const localValue = ref<string | number>(props.modelValue ?? '')
+    const inputRef = ref<HTMLInputElement | null>(null);
+    const localValue = ref<string | number>(props.modelValue ?? '');
 
     // Sync localValue with modelValue prop
-    watch(() => props.modelValue, (newValue) => {
-      if (newValue !== undefined && newValue !== localValue.value) {
-        localValue.value = newValue
+    watch(
+      () => props.modelValue,
+      (newValue) => {
+        const next = newValue ?? '';
+        if (next !== localValue.value) {
+          localValue.value = next;
+        }
       }
-    })
+    );
 
-    const inputClasses = computed(() => getInputClasses(props.size))
+    const inputClasses = computed(() =>
+      classNames(getInputClasses(props.size), props.className, attrs.class)
+    );
 
     /**
      * Helper to extract the correct value from input target
      * For number inputs, returns the numeric value if valid, otherwise the string value
      */
     const getInputValue = (target: HTMLInputElement): string | number => {
-      return props.type === 'number' ? (Number.isNaN(target.valueAsNumber) ? target.value : target.valueAsNumber) : target.value
-    }
+      return props.type === 'number'
+        ? Number.isNaN(target.valueAsNumber)
+          ? target.value
+          : target.valueAsNumber
+        : target.value;
+    };
 
     const handleInput = (event: Event) => {
-      const target = event.target as HTMLInputElement
-      const value = getInputValue(target)
-      localValue.value = value
-      emit('update:modelValue', value)
-      emit('input', event)
-    }
+      const target = event.target as HTMLInputElement;
+      const value = getInputValue(target);
+      localValue.value = value;
+      emit('update:modelValue', value);
+      emit('input', event);
+    };
 
-    const handleChange = (event: Event) => emit('change', event)
-    const handleFocus = (event: FocusEvent) => emit('focus', event)
-    const handleBlur = (event: FocusEvent) => emit('blur', event)
+    const handleChange = (event: Event) => emit('change', event);
+    const handleFocus = (event: FocusEvent) => emit('focus', event);
+    const handleBlur = (event: FocusEvent) => emit('blur', event);
 
     return () => {
       return h('input', {
+        ...attrs,
         ref: inputRef,
         class: inputClasses.value,
+        style: [attrs.style, props.style],
         type: props.type,
         value: localValue.value,
         placeholder: props.placeholder,
@@ -140,10 +190,9 @@ export const Input = defineComponent({
         onChange: handleChange,
         onFocus: handleFocus,
         onBlur: handleBlur,
-        ...attrs,
-      })
-    }
+      });
+    };
   },
-})
+});
 
-export default Input
+export default Input;

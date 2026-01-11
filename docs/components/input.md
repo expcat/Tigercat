@@ -8,10 +8,10 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Input } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Input } from '@tigercat/vue';
 
-const inputValue = ref('')
+const inputValue = ref('');
 </script>
 
 <template>
@@ -22,19 +22,19 @@ const inputValue = ref('')
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Input } from '@tigercat/react'
+import { useState } from 'react';
+import { Input } from '@tigercat/react';
 
 function App() {
-  const [value, setValue] = useState('')
-  
+  const [value, setValue] = useState('');
+
   return (
-    <Input 
-      value={value} 
-      onChange={(e) => setValue(e.target.value)} 
-      placeholder="请输入内容" 
+    <Input
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      placeholder="请输入内容"
     />
-  )
+  );
 }
 ```
 
@@ -136,7 +136,7 @@ Input 组件支持多种 HTML5 输入类型：
 
 ```vue
 <template>
-  <Input readonly value="Readonly value" />
+  <Input readonly modelValue="Readonly value" />
 </template>
 ```
 
@@ -178,7 +178,7 @@ Input 组件支持多种 HTML5 输入类型：
 
 ```vue
 <template>
-  <Input maxLength={10} placeholder="最多输入10个字符" />
+  <Input :maxLength="10" placeholder="最多输入10个字符" />
 </template>
 ```
 
@@ -198,14 +198,14 @@ Input 组件支持多种 HTML5 输入类型：
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Input } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Input } from '@tigercat/vue';
 
-const value = ref('')
+const value = ref('');
 
 const handleChange = () => {
-  console.log('Value:', value.value)
-}
+  console.log('Value:', value.value);
+};
 </script>
 
 <template>
@@ -217,23 +217,23 @@ const handleChange = () => {
 #### React
 
 ```tsx
-import { useState } from 'react'
-import { Input } from '@tigercat/react'
+import { useState } from 'react';
+import { Input } from '@tigercat/react';
 
 function ControlledExample() {
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState('');
 
   const handleChange = (e) => {
-    setValue(e.target.value)
-    console.log('Value:', e.target.value)
-  }
+    setValue(e.target.value);
+    console.log('Value:', e.target.value);
+  };
 
   return (
     <>
       <Input value={value} onChange={handleChange} />
       <p>Current value: {value}</p>
     </>
-  )
+  );
 }
 ```
 
@@ -247,11 +247,11 @@ function ControlledExample() {
 
 ```vue
 <script setup>
-import { Input } from '@tigercat/vue'
+import { Input } from '@tigercat/vue';
 
 const handleInput = (event) => {
-  console.log('Input value:', event.target.value)
-}
+  console.log('Input value:', event.target.value);
+};
 </script>
 
 <template>
@@ -264,14 +264,14 @@ const handleInput = (event) => {
 在 React 中，使用 `defaultValue` 而不是 `value` 来创建非受控组件：
 
 ```tsx
-import { Input } from '@tigercat/react'
+import { Input } from '@tigercat/react';
 
 function UncontrolledExample() {
   const handleChange = (e) => {
-    console.log('Value:', e.target.value)
-  }
+    console.log('Value:', e.target.value);
+  };
 
-  return <Input defaultValue="Initial value" onChange={handleChange} />
+  return <Input defaultValue="Initial value" onChange={handleChange} />;
 }
 ```
 
@@ -283,23 +283,23 @@ Vue 组件支持以下事件：
 
 ```vue
 <script setup>
-import { Input } from '@tigercat/vue'
+import { Input } from '@tigercat/vue';
 
 const handleInput = (event) => {
-  console.log('Input event:', event.target.value)
-}
+  console.log('Input event:', event.target.value);
+};
 
 const handleChange = (event) => {
-  console.log('Change event:', event.target.value)
-}
+  console.log('Change event:', event.target.value);
+};
 
 const handleFocus = (event) => {
-  console.log('Input focused')
-}
+  console.log('Input focused');
+};
 
 const handleBlur = (event) => {
-  console.log('Input blurred')
-}
+  console.log('Input blurred');
+};
 </script>
 
 <template>
@@ -307,8 +307,7 @@ const handleBlur = (event) => {
     @input="handleInput"
     @change="handleChange"
     @focus="handleFocus"
-    @blur="handleBlur"
-  />
+    @blur="handleBlur" />
 </template>
 ```
 
@@ -317,24 +316,24 @@ const handleBlur = (event) => {
 React 组件支持标准的事件处理器：
 
 ```tsx
-import { Input } from '@tigercat/react'
+import { Input } from '@tigercat/react';
 
 function EventExample() {
   const handleInput = (e) => {
-    console.log('Input event:', e.currentTarget.value)
-  }
+    console.log('Input event:', e.currentTarget.value);
+  };
 
   const handleChange = (e) => {
-    console.log('Change event:', e.target.value)
-  }
+    console.log('Change event:', e.target.value);
+  };
 
   const handleFocus = (e) => {
-    console.log('Input focused')
-  }
+    console.log('Input focused');
+  };
 
   const handleBlur = (e) => {
-    console.log('Input blurred')
-  }
+    console.log('Input blurred');
+  };
 
   return (
     <Input
@@ -343,7 +342,7 @@ function EventExample() {
       onFocus={handleFocus}
       onBlur={handleBlur}
     />
-  )
+  );
 }
 ```
 
@@ -351,48 +350,50 @@ function EventExample() {
 
 ### Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 | 可选值 |
-|------|------|------|--------|--------|
-| size | 输入框尺寸 | `InputSize` | `'md'` | `'sm'` \| `'md'` \| `'lg'` |
-| type | 输入框类型 | `InputType` | `'text'` | `'text'` \| `'password'` \| `'email'` \| `'number'` \| `'tel'` \| `'url'` \| `'search'` |
-| placeholder | 占位符文本 | `string` | `''` | - |
-| disabled | 是否禁用 | `boolean` | `false` | `true` \| `false` |
-| readonly | 是否只读 | `boolean` | `false` | `true` \| `false` |
-| required | 是否必填 | `boolean` | `false` | `true` \| `false` |
-| maxLength | 最大长度 | `number` | - | - |
-| minLength | 最小长度 | `number` | - | - |
-| name | 输入框 name 属性 | `string` | - | - |
-| id | 输入框 id 属性 | `string` | - | - |
-| autoComplete | 自动完成属性 | `string` | - | - |
-| autoFocus | 是否自动聚焦 | `boolean` | `false` | `true` \| `false` |
+| 属性         | 说明             | 类型        | 默认值   | 可选值                                                                                  |
+| ------------ | ---------------- | ----------- | -------- | --------------------------------------------------------------------------------------- |
+| size         | 输入框尺寸       | `InputSize` | `'md'`   | `'sm'` \| `'md'` \| `'lg'`                                                              |
+| type         | 输入框类型       | `InputType` | `'text'` | `'text'` \| `'password'` \| `'email'` \| `'number'` \| `'tel'` \| `'url'` \| `'search'` |
+| placeholder  | 占位符文本       | `string`    | `''`     | -                                                                                       |
+| disabled     | 是否禁用         | `boolean`   | `false`  | `true` \| `false`                                                                       |
+| readonly     | 是否只读         | `boolean`   | `false`  | `true` \| `false`                                                                       |
+| required     | 是否必填         | `boolean`   | `false`  | `true` \| `false`                                                                       |
+| maxLength    | 最大长度         | `number`    | -        | -                                                                                       |
+| minLength    | 最小长度         | `number`    | -        | -                                                                                       |
+| name         | 输入框 name 属性 | `string`    | -        | -                                                                                       |
+| id           | 输入框 id 属性   | `string`    | -        | -                                                                                       |
+| autoComplete | 自动完成属性     | `string`    | -        | -                                                                                       |
+| autoFocus    | 是否自动聚焦     | `boolean`   | `false`  | `true` \| `false`                                                                       |
 
 #### Vue 专属属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| modelValue | 绑定值（v-model） | `string \| number` | - |
+| 属性       | 说明              | 类型               | 默认值 |
+| ---------- | ----------------- | ------------------ | ------ |
+| modelValue | 绑定值（v-model） | `string \| number` | -      |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| value | 输入框值（受控） | `string \| number` | - |
-| defaultValue | 默认值（非受控） | `string \| number` | - |
-| onInput | Input 事件处理器 | `(event: React.FormEvent<HTMLInputElement>) => void` | - |
-| onChange | Change 事件处理器 | `(event: React.ChangeEvent<HTMLInputElement>) => void` | - |
-| onFocus | Focus 事件处理器 | `(event: React.FocusEvent<HTMLInputElement>) => void` | - |
-| onBlur | Blur 事件处理器 | `(event: React.FocusEvent<HTMLInputElement>) => void` | - |
-| className | 额外的 CSS 类名 | `string` | - |
+| 属性         | 说明              | 类型                                                   | 默认值 |
+| ------------ | ----------------- | ------------------------------------------------------ | ------ |
+| value        | 输入框值（受控）  | `string \| number`                                     | -      |
+| defaultValue | 默认值（非受控）  | `string \| number`                                     | -      |
+| onInput      | Input 事件处理器  | `(event: React.FormEvent<HTMLInputElement>) => void`   | -      |
+| onChange     | Change 事件处理器 | `(event: React.ChangeEvent<HTMLInputElement>) => void` | -      |
+| onFocus      | Focus 事件处理器  | `(event: React.FocusEvent<HTMLInputElement>) => void`  | -      |
+| onBlur       | Blur 事件处理器   | `(event: React.FocusEvent<HTMLInputElement>) => void`  | -      |
+| className    | 额外的 CSS 类名   | `string`                                               | -      |
+
+> React 版本同时支持透传大部分原生 `input` 属性（如 `aria-*`、`data-*`、`title` 等）。
 
 ### Events / 事件 (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
+| 事件名            | 说明                    | 回调参数                    |
+| ----------------- | ----------------------- | --------------------------- |
 | update:modelValue | 值更新时触发（v-model） | `(value: string \| number)` |
-| input | 输入时触发 | `(event: Event)` |
-| change | 值改变时触发 | `(event: Event)` |
-| focus | 获得焦点时触发 | `(event: FocusEvent)` |
-| blur | 失去焦点时触发 | `(event: FocusEvent)` |
+| input             | 输入时触发              | `(event: Event)`            |
+| change            | 值改变时触发            | `(event: Event)`            |
+| focus             | 获得焦点时触发          | `(event: FocusEvent)`       |
+| blur              | 失去焦点时触发          | `(event: FocusEvent)`       |
 
 ## 样式定制
 
@@ -420,11 +421,23 @@ React 版本支持 `className` 属性：
 
 ### 主题颜色配置
 
-Input 组件使用主题系统中的 `--tiger-primary` 颜色变量作为聚焦时的边框颜色。
+Input 组件使用主题系统中的 CSS 变量控制边框、背景、文字、占位符与聚焦态：
+
+- `--tiger-primary`：focus ring 颜色
+- `--tiger-border`：默认边框颜色
+- `--tiger-surface`：默认背景色
+- `--tiger-surface-muted`：disabled 背景色
+- `--tiger-text`：文字颜色
+- `--tiger-text-muted`：placeholder/disabled 文字颜色
 
 ```css
 :root {
   --tiger-primary: #2563eb;
+  --tiger-border: #e5e7eb;
+  --tiger-surface: #ffffff;
+  --tiger-surface-muted: #f3f4f6;
+  --tiger-text: #111827;
+  --tiger-text-muted: #6b7280;
 }
 
 /* 自定义主题 */
@@ -448,11 +461,11 @@ Input 组件使用主题系统中的 `--tiger-primary` 颜色变量作为聚焦�
 Input 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { InputProps, InputSize, InputType } from '@tigercat/core'
+import type { InputProps, InputSize, InputType } from '@tigercat/core';
 // Vue
-import type { Input } from '@tigercat/vue'
+import type { Input, VueInputProps } from '@tigercat/vue';
 // React
-import type { Input, InputProps as ReactInputProps } from '@tigercat/react'
+import type { Input, InputProps as ReactInputProps } from '@tigercat/react';
 ```
 
 ## 示例
@@ -463,22 +476,22 @@ import type { Input, InputProps as ReactInputProps } from '@tigercat/react'
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Input, Button } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Input, Button } from '@tigercat/vue';
 
-const email = ref('')
-const password = ref('')
-const loading = ref(false)
+const email = ref('');
+const password = ref('');
+const loading = ref(false);
 
 const handleSubmit = async () => {
-  loading.value = true
+  loading.value = true;
   try {
     // 登录逻辑
-    console.log('Login:', { email: email.value, password: password.value })
+    console.log('Login:', { email: email.value, password: password.value });
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 </script>
 
 <template>
@@ -490,22 +503,20 @@ const handleSubmit = async () => {
         v-model="email"
         type="email"
         placeholder="your@email.com"
-        required
-      />
+        required />
     </div>
     <div>
-      <label for="password" class="block text-sm font-medium mb-1">Password</label>
+      <label for="password" class="block text-sm font-medium mb-1"
+        >Password</label
+      >
       <Input
         id="password"
         v-model="password"
         type="password"
         placeholder="••••••••"
-        required
-      />
+        required />
     </div>
-    <Button type="submit" :loading="loading" class="w-full">
-      Login
-    </Button>
+    <Button type="submit" :loading="loading" class="w-full"> Login </Button>
   </form>
 </template>
 ```
@@ -513,24 +524,24 @@ const handleSubmit = async () => {
 #### React
 
 ```tsx
-import { useState, FormEvent } from 'react'
-import { Input, Button } from '@tigercat/react'
+import { useState, FormEvent } from 'react';
+import { Input, Button } from '@tigercat/react';
 
 function LoginForm() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
     try {
       // 登录逻辑
-      console.log('Login:', { email, password })
+      console.log('Login:', { email, password });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-sm">
@@ -564,7 +575,7 @@ function LoginForm() {
         Login
       </Button>
     </form>
-  )
+  );
 }
 ```
 
@@ -574,15 +585,15 @@ function LoginForm() {
 
 ```vue
 <script setup>
-import { ref, watch } from 'vue'
-import { Input } from '@tigercat/vue'
+import { ref, watch } from 'vue';
+import { Input } from '@tigercat/vue';
 
-const searchQuery = ref('')
+const searchQuery = ref('');
 
 watch(searchQuery, (newQuery) => {
-  console.log('Searching for:', newQuery)
+  console.log('Searching for:', newQuery);
   // 实现搜索逻辑
-})
+});
 </script>
 
 <template>
@@ -590,24 +601,23 @@ watch(searchQuery, (newQuery) => {
     v-model="searchQuery"
     type="search"
     placeholder="Search..."
-    size="lg"
-  />
+    size="lg" />
 </template>
 ```
 
 #### React
 
 ```tsx
-import { useState, useEffect } from 'react'
-import { Input } from '@tigercat/react'
+import { useState, useEffect } from 'react';
+import { Input } from '@tigercat/react';
 
 function SearchBox() {
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    console.log('Searching for:', searchQuery)
+    console.log('Searching for:', searchQuery);
     // 实现搜索逻辑
-  }, [searchQuery])
+  }, [searchQuery]);
 
   return (
     <Input
@@ -617,6 +627,6 @@ function SearchBox() {
       placeholder="Search..."
       size="lg"
     />
-  )
+  );
 }
 ```

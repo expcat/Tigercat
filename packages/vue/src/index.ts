@@ -19,6 +19,7 @@ export { Radio } from './components/Radio';
 export { RadioGroup } from './components/RadioGroup';
 export { Textarea } from './components/Textarea';
 export { Input } from './components/Input';
+export type { VueInputProps } from './components/Input';
 export { Form } from './components/Form';
 export { FormItem } from './components/FormItem';
 export { Space } from './components/Space';
