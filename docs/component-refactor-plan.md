@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Progress` Step1 主题/透传/a11y/测试精简（2026-01-12）
+- 上一步：✅ `Skeleton` Step1 例行检查/主题/透传/a11y/测试精简（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -315,7 +315,7 @@
 #### Skeleton（P3，无需优化）
 
 - 例行检查：aria-busy/aria-live（如有）；避免影响布局。
-- 状态：未开始
+- 状态：✅ Step1 例行检查/主题/透传/a11y/测试精简（2026-01-12）：core Skeleton 背景色从固定 Tailwind 色收敛为 CSS vars（含 fallback：`--tiger-skeleton-bg/--tiger-skeleton-bg-alt`）；React Skeleton 去掉不必要的 `useMemo`，补齐 `HTMLAttributes` 透传类型并默认 `aria-hidden=true`（提供可通过 `aria-label/aria-labelledby/aria-hidden` 覆盖）；Vue Skeleton 增加 `inheritAttrs: false`，合并 `attrs.class/style` 并新增导出 `VueSkeletonProps`，同时默认 `aria-hidden=true`；移除 Vue/React Skeleton 快照并精简测试；同步更新 Skeleton 文档主题变量与 a11y 说明。
 
 ### F. 反馈（Feedback）
 
