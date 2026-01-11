@@ -5,7 +5,7 @@ exports[`Slider > Snapshots > should match snapshot for default state 1`] = `
   class="relative w-full"
 >
   <div
-    class="bg-gray-200 rounded-full h-1.5"
+    class="bg-[var(--tiger-border,#e5e7eb)] rounded-full h-1.5"
   >
     <div
       class="bg-[var(--tiger-primary,#2563eb)] rounded-full absolute h-full"
@@ -13,10 +13,11 @@ exports[`Slider > Snapshots > should match snapshot for default state 1`] = `
     />
     <div
       aria-disabled="false"
+      aria-orientation="horizontal"
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="0"
-      class="bg-white border-2 border-[var(--tiger-primary,#2563eb)] rounded-full absolute top-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)] h-4 w-4"
+      class="bg-[var(--tiger-surface,#ffffff)] border-2 border-[var(--tiger-primary,#2563eb)] rounded-full absolute top-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)] h-4 w-4"
       role="slider"
       style="left: 0%;"
       tabindex="0"
@@ -30,7 +31,7 @@ exports[`Slider > Snapshots > should match snapshot for disabled state 1`] = `
   class="relative w-full cursor-not-allowed"
 >
   <div
-    class="bg-gray-200 rounded-full h-1.5 opacity-50 cursor-not-allowed"
+    class="bg-[var(--tiger-border,#e5e7eb)] rounded-full h-1.5 opacity-50 cursor-not-allowed"
   >
     <div
       class="bg-[var(--tiger-primary,#2563eb)] rounded-full absolute h-full"
@@ -38,10 +39,11 @@ exports[`Slider > Snapshots > should match snapshot for disabled state 1`] = `
     />
     <div
       aria-disabled="true"
+      aria-orientation="horizontal"
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="0"
-      class="bg-white border-2 border-[var(--tiger-primary,#2563eb)] rounded-full absolute top-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)] h-4 w-4 opacity-50 cursor-not-allowed"
+      class="bg-[var(--tiger-surface,#ffffff)] border-2 border-[var(--tiger-primary,#2563eb)] rounded-full absolute top-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)] h-4 w-4 opacity-50 cursor-not-allowed"
       role="slider"
       style="left: 0%;"
       tabindex="-1"
@@ -55,7 +57,7 @@ exports[`Slider > Snapshots > should match snapshot with value 1`] = `
   class="relative w-full"
 >
   <div
-    class="bg-gray-200 rounded-full h-1.5"
+    class="bg-[var(--tiger-border,#e5e7eb)] rounded-full h-1.5"
   >
     <div
       class="bg-[var(--tiger-primary,#2563eb)] rounded-full absolute h-full"
@@ -63,10 +65,11 @@ exports[`Slider > Snapshots > should match snapshot with value 1`] = `
     />
     <div
       aria-disabled="false"
+      aria-orientation="horizontal"
       aria-valuemax="100"
       aria-valuemin="0"
       aria-valuenow="50"
-      class="bg-white border-2 border-[var(--tiger-primary,#2563eb)] rounded-full absolute top-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)] h-4 w-4"
+      class="bg-[var(--tiger-surface,#ffffff)] border-2 border-[var(--tiger-primary,#2563eb)] rounded-full absolute top-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)] h-4 w-4"
       role="slider"
       style="left: 50%;"
       tabindex="0"
