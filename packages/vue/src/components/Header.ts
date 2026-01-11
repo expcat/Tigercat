@@ -1,15 +1,22 @@
-import { defineComponent, h, PropType, computed } from 'vue'
-import { classNames } from '@tigercat/core'
+import { defineComponent, h, PropType, computed } from 'vue';
+import { classNames, layoutHeaderClasses } from '@tigercat/core';
+
+export interface VueHeaderProps {
+  className?: string;
+  height?: string;
+  style?: Record<string, string | number>;
+}
 
 export const Header = defineComponent({
   name: 'TigerHeader',
+  inheritAttrs: false,
   props: {
     /**
      * Additional CSS classes
      */
     className: {
       type: String as PropType<string>,
-      default: '',
+      default: undefined,
     },
     /**
      * Header height (CSS value)
@@ -19,27 +26,40 @@ export const Header = defineComponent({
       type: String as PropType<string>,
       default: '64px',
     },
+
+    /**
+     * Custom styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined,
+    },
   },
-  setup(props, { slots }) {
-    const headerClasses = computed(() => classNames(
-      'tiger-header',
-      'bg-white border-b border-gray-200',
-      props.className
-    ))
+  setup(props, { slots, attrs }) {
+    const headerClasses = computed(() =>
+      classNames(
+        layoutHeaderClasses,
+        props.className,
+        (attrs as Record<string, unknown>).class as any
+      )
+    );
 
     return () => {
       return h(
         'header',
         {
+          ...attrs,
           class: headerClasses.value,
-          style: {
-            height: props.height,
-          },
+          style: [
+            (attrs as Record<string, unknown>).style as any,
+            props.style as any,
+            { height: props.height },
+          ],
         },
         slots.default?.()
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Header
+export default Header;

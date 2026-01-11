@@ -1,15 +1,23 @@
 import { defineComponent, h, PropType, computed } from 'vue';
-import { classNames } from '@tigercat/core';
+import { classNames, layoutSidebarClasses } from '@tigercat/core';
+
+export interface VueSidebarProps {
+  className?: string;
+  width?: string;
+  collapsed?: boolean;
+  style?: Record<string, string | number>;
+}
 
 export const Sidebar = defineComponent({
   name: 'TigerSidebar',
+  inheritAttrs: false,
   props: {
     /**
      * Additional CSS classes
      */
     className: {
       type: String as PropType<string>,
-      default: '',
+      default: undefined,
     },
     /**
      * Sidebar width (CSS value)
@@ -27,13 +35,21 @@ export const Sidebar = defineComponent({
       type: Boolean as PropType<boolean>,
       default: false,
     },
+
+    /**
+     * Custom styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined,
+    },
   },
-  setup(props, { slots }) {
+  setup(props, { slots, attrs }) {
     const sidebarClasses = computed(() =>
       classNames(
-        'tiger-sidebar',
-        'bg-white border-r border-gray-200 transition-all duration-300',
-        props.className
+        layoutSidebarClasses,
+        props.className,
+        (attrs as Record<string, unknown>).class as any
       )
     );
 
@@ -47,8 +63,13 @@ export const Sidebar = defineComponent({
       return h(
         'aside',
         {
+          ...attrs,
           class: sidebarClasses.value,
-          style: sidebarStyle.value,
+          style: [
+            (attrs as Record<string, unknown>).style as any,
+            props.style as any,
+            sidebarStyle.value,
+          ],
         },
         !props.collapsed && slots.default?.()
       );

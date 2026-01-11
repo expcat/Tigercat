@@ -1,15 +1,22 @@
-import { defineComponent, h, PropType, computed } from 'vue'
-import { classNames } from '@tigercat/core'
+import { defineComponent, h, PropType, computed } from 'vue';
+import { classNames, layoutFooterClasses } from '@tigercat/core';
+
+export interface VueFooterProps {
+  className?: string;
+  height?: string;
+  style?: Record<string, string | number>;
+}
 
 export const Footer = defineComponent({
   name: 'TigerFooter',
+  inheritAttrs: false,
   props: {
     /**
      * Additional CSS classes
      */
     className: {
       type: String as PropType<string>,
-      default: '',
+      default: undefined,
     },
     /**
      * Footer height (CSS value)
@@ -19,27 +26,40 @@ export const Footer = defineComponent({
       type: String as PropType<string>,
       default: 'auto',
     },
+
+    /**
+     * Custom styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined,
+    },
   },
-  setup(props, { slots }) {
-    const footerClasses = computed(() => classNames(
-      'tiger-footer',
-      'bg-white border-t border-gray-200 p-4',
-      props.className
-    ))
+  setup(props, { slots, attrs }) {
+    const footerClasses = computed(() =>
+      classNames(
+        layoutFooterClasses,
+        props.className,
+        (attrs as Record<string, unknown>).class as any
+      )
+    );
 
     return () => {
       return h(
         'footer',
         {
+          ...attrs,
           class: footerClasses.value,
-          style: {
-            height: props.height,
-          },
+          style: [
+            (attrs as Record<string, unknown>).style as any,
+            props.style as any,
+            { height: props.height },
+          ],
         },
         slots.default?.()
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Footer
+export default Footer;

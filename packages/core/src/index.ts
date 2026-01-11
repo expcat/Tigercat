@@ -13,6 +13,7 @@ export * from './utils/input-styles';
 export * from './utils/form-validation';
 export * from './utils/grid';
 export * from './utils/divider';
+export * from './utils/layout-utils';
 export * from './utils/date-utils';
 export * from './utils/datepicker-styles';
 export * from './utils/datepicker-icons';
