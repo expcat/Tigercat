@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Alert } from '@tigercat/vue'
+import { Alert } from '@tigercat/vue';
 </script>
 
 <template>
@@ -22,7 +22,7 @@ import { Alert } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Alert } from '@tigercat/react'
+import { Alert } from '@tigercat/react';
 
 function App() {
   return (
@@ -32,7 +32,7 @@ function App() {
       <Alert title="警告提示" type="warning" />
       <Alert title="错误提示" type="error" />
     </>
-  )
+  );
 }
 ```
 
@@ -51,7 +51,10 @@ Alert 组件支持 4 种不同的类型：
 
 ```vue
 <template>
-  <Alert type="info" title="信息提示" description="这是一条信息提示的详细内容" />
+  <Alert
+    type="info"
+    title="信息提示"
+    description="这是一条信息提示的详细内容" />
   <Alert type="success" title="成功提示" description="操作成功完成" />
   <Alert type="warning" title="警告提示" description="请注意相关事项" />
   <Alert type="error" title="错误提示" description="操作失败，请重试" />
@@ -103,7 +106,7 @@ Alert 组件支持 3 种不同的尺寸：
 <template>
   <!-- 显示图标（默认） -->
   <Alert type="success" title="带图标的提示" :show-icon="true" />
-  
+
   <!-- 隐藏图标 -->
   <Alert type="warning" title="不带图标的提示" :show-icon="false" />
 </template>
@@ -112,11 +115,15 @@ Alert 组件支持 3 种不同的尺寸：
 ### React
 
 ```tsx
-{/* 显示图标（默认） */}
-<Alert type="success" title="带图标的提示" showIcon={true} />
+{
+  /* 显示图标（默认） */
+}
+<Alert type="success" title="带图标的提示" showIcon={true} />;
 
-{/* 隐藏图标 */}
-<Alert type="warning" title="不带图标的提示" showIcon={false} />
+{
+  /* 隐藏图标 */
+}
+<Alert type="warning" title="不带图标的提示" showIcon={false} />;
 ```
 
 ## 可关闭
@@ -127,11 +134,11 @@ Alert 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { Alert } from '@tigercat/vue'
+import { Alert } from '@tigercat/vue';
 
 const handleClose = (event) => {
-  console.log('Alert closed', event)
-}
+  console.log('Alert closed', event);
+};
 </script>
 
 <template>
@@ -139,21 +146,20 @@ const handleClose = (event) => {
     title="可关闭的提示"
     description="点击右侧关闭按钮可以关闭此提示"
     closable
-    @close="handleClose"
-  />
+    @close="handleClose" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { Alert } from '@tigercat/react'
+import { Alert } from '@tigercat/react';
 
 function App() {
   const handleClose = (event) => {
-    console.log('Alert closed', event)
-  }
-  
+    console.log('Alert closed', event);
+  };
+
   return (
     <Alert
       title="可关闭的提示"
@@ -161,7 +167,7 @@ function App() {
       closable
       onClose={handleClose}
     />
-  )
+  );
 }
 ```
 
@@ -176,9 +182,8 @@ function App() {
   <Alert
     type="success"
     title="操作成功"
-    description="您的订单已成功提交，我们将尽快为您处理。订单号：202312310001"
-  />
-  
+    description="您的订单已成功提交，我们将尽快为您处理。订单号：202312310001" />
+
   <!-- 使用插槽自定义描述内容 -->
   <Alert type="warning" title="注意事项">
     <template #description>
@@ -199,9 +204,11 @@ function App() {
   type="success"
   title="操作成功"
   description="您的订单已成功提交，我们将尽快为您处理。订单号：202312310001"
-/>
+/>;
 
-{/* 使用 descriptionSlot 自定义描述内容 */}
+{
+  /* 使用 descriptionSlot 自定义描述内容 */
+}
 <Alert
   type="warning"
   title="注意事项"
@@ -214,7 +221,7 @@ function App() {
       </ul>
     </>
   }
-/>
+/>;
 ```
 
 ## 自定义内容
@@ -226,18 +233,14 @@ function App() {
 ```vue
 <template>
   <!-- 使用默认插槽 -->
-  <Alert type="info">
-    这是通过默认插槽传入的内容
-  </Alert>
-  
+  <Alert type="info"> 这是通过默认插槽传入的内容 </Alert>
+
   <!-- 使用 title 插槽 -->
   <Alert type="success">
     <template #title>
       <strong>自定义标题</strong>
     </template>
-    <template #description>
-      自定义描述内容
-    </template>
+    <template #description> 自定义描述内容 </template>
   </Alert>
 </template>
 ```
@@ -247,17 +250,19 @@ function App() {
 可以使用 children、titleSlot 和 descriptionSlot 属性来自定义内容。
 
 ```tsx
-{/* 使用 children */}
-<Alert type="info">
-  这是通过 children 传入的内容
-</Alert>
+{
+  /* 使用 children */
+}
+<Alert type="info">这是通过 children 传入的内容</Alert>;
 
-{/* 使用自定义插槽 */}
+{
+  /* 使用自定义插槽 */
+}
 <Alert
   type="success"
   titleSlot={<strong>自定义标题</strong>}
   descriptionSlot={<span>自定义描述内容</span>}
-/>
+/>;
 ```
 
 ## 完整示例
@@ -266,42 +271,40 @@ function App() {
 
 ```vue
 <script setup>
-import { Alert } from '@tigercat/vue'
-import { ref } from 'vue'
+import { Alert } from '@tigercat/vue';
+import { ref } from 'vue';
 
-const showAlert = ref(true)
+const showAlert = ref(true);
 
 const handleClose = () => {
-  console.log('Alert will be closed')
-}
+  console.log('Alert will be closed');
+};
 </script>
 
 <template>
   <div class="space-y-4">
     <!-- 基础用法 -->
     <Alert title="基础提示" />
-    
+
     <!-- 不同类型 -->
     <Alert type="success" title="成功提示" />
     <Alert type="warning" title="警告提示" />
     <Alert type="error" title="错误提示" />
-    
+
     <!-- 带描述 -->
     <Alert
       type="info"
       title="详细提示"
-      description="这是一条包含详细描述信息的提示"
-    />
-    
+      description="这是一条包含详细描述信息的提示" />
+
     <!-- 可关闭 -->
     <Alert
       v-if="showAlert"
       type="success"
       title="可关闭的提示"
       closable
-      @close="handleClose"
-    />
-    
+      @close="handleClose" />
+
     <!-- 完整功能 -->
     <Alert
       type="warning"
@@ -309,8 +312,7 @@ const handleClose = () => {
       title="重要提示"
       description="这是一条重要的警告信息，请仔细阅读"
       show-icon
-      closable
-    />
+      closable />
   </div>
 </template>
 ```
@@ -318,33 +320,33 @@ const handleClose = () => {
 ### React
 
 ```tsx
-import { Alert } from '@tigercat/react'
-import { useState } from 'react'
+import { Alert } from '@tigercat/react';
+import { useState } from 'react';
 
 function App() {
-  const [showAlert, setShowAlert] = useState(true)
-  
+  const [showAlert, setShowAlert] = useState(true);
+
   const handleClose = () => {
-    console.log('Alert will be closed')
-  }
-  
+    console.log('Alert will be closed');
+  };
+
   return (
     <div className="space-y-4">
       {/* 基础用法 */}
       <Alert title="基础提示" />
-      
+
       {/* 不同类型 */}
       <Alert type="success" title="成功提示" />
       <Alert type="warning" title="警告提示" />
       <Alert type="error" title="错误提示" />
-      
+
       {/* 带描述 */}
       <Alert
         type="info"
         title="详细提示"
         description="这是一条包含详细描述信息的提示"
       />
-      
+
       {/* 可关闭 */}
       {showAlert && (
         <Alert
@@ -354,7 +356,7 @@ function App() {
           onClose={handleClose}
         />
       )}
-      
+
       {/* 完整功能 */}
       <Alert
         type="warning"
@@ -365,7 +367,7 @@ function App() {
         closable
       />
     </div>
-  )
+  );
 }
 ```
 
@@ -373,56 +375,77 @@ function App() {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 可选值 | 默认值 |
-|------|------|------|--------|--------|
-| type | 提示类型 | `string` | `info` \| `success` \| `warning` \| `error` | `info` |
-| size | 提示尺寸 | `string` | `sm` \| `md` \| `lg` | `md` |
-| title | 提示标题 | `string` | - | - |
-| description | 提示描述 | `string` | - | - |
-| showIcon | 是否显示图标 | `boolean` | - | `true` |
-| closable | 是否可关闭 | `boolean` | - | `false` |
-| className | 自定义 CSS 类名 | `string` | - | - |
+| 参数           | 说明                                       | 类型      | 可选值                                      | 默认值        |
+| -------------- | ------------------------------------------ | --------- | ------------------------------------------- | ------------- |
+| type           | 提示类型                                   | `string`  | `info` \| `success` \| `warning` \| `error` | `info`        |
+| size           | 提示尺寸                                   | `string`  | `sm` \| `md` \| `lg`                        | `md`          |
+| title          | 提示标题                                   | `string`  | -                                           | -             |
+| description    | 提示描述                                   | `string`  | -                                           | -             |
+| showIcon       | 是否显示图标                               | `boolean` | -                                           | `true`        |
+| closable       | 是否可关闭                                 | `boolean` | -                                           | `false`       |
+| closeAriaLabel | 关闭按钮的无障碍标签（仅 closable 时生效） | `string`  | -                                           | `Close alert` |
+| className      | 自定义 CSS 类名                            | `string`  | -                                           | -             |
+| style          | 自定义内联样式                             | `object`  | -                                           | -             |
 
 ### Events (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| close | 关闭提示时触发 | `(event: MouseEvent)` |
+| 事件名 | 说明           | 回调参数              |
+| ------ | -------------- | --------------------- |
+| close  | 关闭提示时触发 | `(event: MouseEvent)` |
 
 ### Events (React)
 
-| 属性名 | 说明 | 类型 |
-|--------|------|------|
+| 属性名  | 说明             | 类型                                                   |
+| ------- | ---------------- | ------------------------------------------------------ |
 | onClose | 关闭提示时的回调 | `(event: React.MouseEvent<HTMLButtonElement>) => void` |
 
 ### Slots (Vue)
 
-| 插槽名 | 说明 |
-|--------|------|
-| default | 默认内容（当没有 title 和 description 时显示） |
-| title | 自定义标题内容 |
-| description | 自定义描述内容 |
+| 插槽名      | 说明                                           |
+| ----------- | ---------------------------------------------- |
+| default     | 默认内容（当没有 title 和 description 时显示） |
+| title       | 自定义标题内容                                 |
+| description | 自定义描述内容                                 |
 
 ### Slots (React)
 
-| 属性名 | 说明 | 类型 |
-|--------|------|------|
-| children | 默认内容（当没有 title 和 description 时显示） | `React.ReactNode` |
-| titleSlot | 自定义标题内容 | `React.ReactNode` |
-| descriptionSlot | 自定义描述内容 | `React.ReactNode` |
+| 属性名          | 说明                                           | 类型              |
+| --------------- | ---------------------------------------------- | ----------------- |
+| children        | 默认内容（当没有 title 和 description 时显示） | `React.ReactNode` |
+| titleSlot       | 自定义标题内容                                 | `React.ReactNode` |
+| descriptionSlot | 自定义描述内容                                 | `React.ReactNode` |
 
 ## 样式定制
 
-Alert 组件使用 Tailwind CSS 类进行样式设计，主要包括以下几个方面：
+Alert 组件支持通过 CSS Variables 覆盖不同类型的颜色（都带 fallback），无需改动组件代码。
 
 ### 类型颜色
 
-不同的提示类型使用不同的颜色方案：
+按类型可覆盖的变量（以 `info` 为例，其他类型把前缀替换为 `success/warning/error`）：
 
-- **Info（信息）**: 蓝色系 (`bg-blue-50`, `border-blue-200`, `text-blue-800`)
-- **Success（成功）**: 绿色系 (`bg-green-50`, `border-green-200`, `text-green-800`)
-- **Warning（警告）**: 黄色系 (`bg-yellow-50`, `border-yellow-200`, `text-yellow-800`)
-- **Error（错误）**: 红色系 (`bg-red-50`, `border-red-200`, `text-red-800`)
+- `--tiger-alert-info-bg`
+- `--tiger-alert-info-border`
+- `--tiger-alert-info-icon`
+- `--tiger-alert-info-title`
+- `--tiger-alert-info-description`
+- `--tiger-alert-info-close`
+- `--tiger-alert-info-close-hover-bg`
+- `--tiger-alert-info-ring`
+
+示例：
+
+```css
+:root {
+  --tiger-alert-info-bg: #eef2ff;
+  --tiger-alert-info-border: #c7d2fe;
+  --tiger-alert-info-icon: #6366f1;
+  --tiger-alert-info-title: #312e81;
+  --tiger-alert-info-description: #3730a3;
+  --tiger-alert-info-close: #6366f1;
+  --tiger-alert-info-close-hover-bg: #e0e7ff;
+  --tiger-alert-info-ring: #6366f1;
+}
+```
 
 ### 尺寸大小
 
@@ -443,7 +466,7 @@ Alert 组件使用 Tailwind CSS 类进行样式设计，主要包括以下几个
 Alert 组件遵循 WAI-ARIA 可访问性标准：
 
 - 使用 `role="alert"` 属性标识为警告提示
-- 关闭按钮包含 `aria-label="Close alert"` 属性
+- 关闭按钮包含 `aria-label`（默认 `Close alert`，可通过 `closeAriaLabel` 覆盖）
 - 图标使用 SVG 格式，具有良好的可缩放性
 - 支持键盘操作（关闭按钮可通过 Tab 键聚焦）
 

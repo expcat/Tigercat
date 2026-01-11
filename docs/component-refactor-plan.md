@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Avatar` Step1 主题/透传/a11y 默认对齐（2026-01-12）
+- 上一步：✅ `Alert` Step1 主题/透传/a11y/测试精简（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -322,7 +322,7 @@
 #### Alert（P2，建议优化）
 
 - 思路：role="alert"/"status"；可关闭按钮 aria-label；主题色。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/测试精简（2026-01-12）：core Alert 颜色从固定 Tailwind 色收敛为 CSS vars（含 fallback，新增 `--tiger-alert-<type>-*` 变量组）；Vue Alert 增加 `inheritAttrs: false` 并合并 `attrs.class/style`，补齐 `className/style/closeAriaLabel` props 且导出 `VueAlertProps`；React Alert 去掉多余 `useMemo` 并补齐 `HTMLAttributes` 透传类型，关闭行为支持 `event.preventDefault()` 阻止自动隐藏；移除快照并精简 Vue/React Alert 测试；同步更新 Alert 文档主题变量与 API。
 
 #### Message（P1，建议优化）
 
