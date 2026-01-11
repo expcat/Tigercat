@@ -1,6 +1,6 @@
-import { defineComponent, computed, h, ref, PropType } from 'vue'
-import { 
-  classNames, 
+import { defineComponent, computed, h, ref, PropType } from 'vue';
+import {
+  classNames,
   avatarBaseClasses,
   avatarSizeClasses,
   avatarShapeClasses,
@@ -8,12 +8,25 @@ import {
   avatarDefaultTextColor,
   avatarImageClasses,
   getInitials,
-  type AvatarSize, 
+  type AvatarSize,
   type AvatarShape,
-} from '@tigercat/core'
+} from '@tigercat/core';
+
+export interface VueAvatarProps {
+  size?: AvatarSize;
+  shape?: AvatarShape;
+  src?: string;
+  alt?: string;
+  text?: string;
+  bgColor?: string;
+  textColor?: string;
+  className?: string;
+  style?: Record<string, string | number>;
+}
 
 export const Avatar = defineComponent({
   name: 'TigerAvatar',
+  inheritAttrs: false,
   props: {
     /**
      * Avatar size
@@ -71,84 +84,124 @@ export const Avatar = defineComponent({
      */
     className: {
       type: String,
-      default: '',
+      default: undefined,
+    },
+
+    /**
+     * Custom styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined,
     },
   },
-  setup(props, { slots }) {
-    const imageError = ref(false)
+  setup(props, { slots, attrs }) {
+    const imageError = ref(false);
 
-    const avatarClasses = computed(() => {
-      const hasImage = props.src && !imageError.value
-      return classNames(
+    const hasImage = computed(() => Boolean(props.src) && !imageError.value);
+
+    const avatarClasses = computed(() =>
+      classNames(
         avatarBaseClasses,
         avatarSizeClasses[props.size],
         avatarShapeClasses[props.shape],
-        // Apply background and text color only for text/icon avatars
-        !hasImage && props.bgColor,
-        !hasImage && props.textColor,
-        props.className
+        !hasImage.value && props.bgColor,
+        !hasImage.value && props.textColor
       )
-    })
+    );
 
-    const displayText = computed(() => {
-      if (props.text) {
-        return getInitials(props.text)
-      }
-      return ''
-    })
-
-    const handleImageError = () => {
-      imageError.value = true
-    }
+    const displayText = computed(() =>
+      props.text ? getInitials(props.text) : ''
+    );
 
     return () => {
       // Priority: image > text > icon (slot)
-      
+
+      const attrsRecord = attrs as Record<string, unknown>;
+      const attrsClass = attrsRecord.class;
+      const attrsStyle = attrsRecord.style;
+      const ariaLabelProp = attrsRecord['aria-label'] as string | undefined;
+      const ariaLabelledbyProp = attrsRecord['aria-labelledby'] as
+        | string
+        | undefined;
+      const ariaHiddenProp = attrsRecord['aria-hidden'] as boolean | undefined;
+
+      const computedLabel =
+        ariaLabelProp ??
+        (props.alt.trim() ? props.alt : undefined) ??
+        (props.text?.trim() || undefined);
+
+      const isDecorative =
+        ariaHiddenProp === true || (!computedLabel && !ariaLabelledbyProp);
+
+      const baseSpanProps = {
+        ...attrs,
+        class: classNames(
+          avatarClasses.value,
+          props.className,
+          attrsClass as any
+        ),
+        style: [attrsStyle as any, props.style as any],
+      };
+
       // If src is provided and not errored, show image
-      if (props.src && !imageError.value) {
+      if (hasImage.value) {
         return h(
           'span',
           {
-            class: avatarClasses.value,
-            role: 'img',
-            'aria-label': props.alt || 'avatar',
+            ...baseSpanProps,
+            'aria-hidden': isDecorative
+              ? true
+              : (attrsRecord['aria-hidden'] as any),
           },
           [
             h('img', {
               src: props.src,
-              alt: props.alt || 'avatar',
+              alt: props.alt,
               class: avatarImageClasses,
-              onError: handleImageError,
+              onError: () => {
+                imageError.value = true;
+              },
             }),
           ]
-        )
+        );
       }
-      
+
       // If text is provided, show text
       if (displayText.value) {
         return h(
           'span',
           {
-            class: avatarClasses.value,
-            role: 'img',
-            'aria-label': props.alt || props.text || 'avatar',
+            ...baseSpanProps,
+            ...(isDecorative
+              ? { 'aria-hidden': true }
+              : {
+                  role: 'img',
+                  'aria-label': computedLabel,
+                  'aria-labelledby': ariaLabelledbyProp,
+                }),
           },
           displayText.value
-        )
+        );
       }
-      
+
       // Otherwise, show icon from slot
       return h(
         'span',
         {
-          class: avatarClasses.value,
-          role: 'img',
-          'aria-label': props.alt || 'avatar',
+          ...baseSpanProps,
+          ...(isDecorative
+            ? { 'aria-hidden': true }
+            : {
+                role: 'img',
+                'aria-label': computedLabel,
+                'aria-labelledby': ariaLabelledbyProp,
+              }),
         },
         slots.default ? slots.default() : undefined
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Avatar
+export default Avatar;
