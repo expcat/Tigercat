@@ -10,7 +10,7 @@ Icon 组件提供了一个通用的图标容器，可以包裹任何 SVG 内容�
 
 ```vue
 <script setup>
-import { Icon } from '@tigercat/vue'
+import { Icon } from '@tigercat/vue';
 </script>
 
 <template>
@@ -25,7 +25,7 @@ import { Icon } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Icon } from '@tigercat/react'
+import { Icon } from '@tigercat/react';
 
 function App() {
   return (
@@ -34,7 +34,7 @@ function App() {
         <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
       </svg>
     </Icon>
-  )
+  );
 }
 ```
 
@@ -56,19 +56,19 @@ Icon 组件支持 4 种不同的尺寸：
       <circle cx="12" cy="12" r="10" />
     </svg>
   </Icon>
-  
+
   <Icon size="md">
     <svg>
       <circle cx="12" cy="12" r="10" />
     </svg>
   </Icon>
-  
+
   <Icon size="lg">
     <svg>
       <circle cx="12" cy="12" r="10" />
     </svg>
   </Icon>
-  
+
   <Icon size="xl">
     <svg>
       <circle cx="12" cy="12" r="10" />
@@ -121,14 +121,14 @@ Icon 组件支持 4 种不同的尺寸：
       </svg>
     </Icon>
   </div>
-  
+
   <!-- 直接设置颜色 -->
   <Icon color="#ff0000">
     <svg>
       <path d="M5 13l4 4L19 7" />
     </svg>
   </Icon>
-  
+
   <!-- 使用 Tailwind 颜色 -->
   <Icon color="rgb(59, 130, 246)">
     <svg>
@@ -141,28 +141,34 @@ Icon 组件支持 4 种不同的尺寸：
 ### React
 
 ```tsx
-{/* 继承父元素颜色 */}
+{
+  /* 继承父元素颜色 */
+}
 <div className="text-blue-500">
   <Icon>
     <svg>
       <path d="M5 13l4 4L19 7" />
     </svg>
   </Icon>
-</div>
+</div>;
 
-{/* 直接设置颜色 */}
+{
+  /* 直接设置颜色 */
+}
 <Icon color="#ff0000">
   <svg>
     <path d="M5 13l4 4L19 7" />
   </svg>
-</Icon>
+</Icon>;
 
-{/* 使用 RGB 颜色 */}
+{
+  /* 使用 RGB 颜色 */
+}
 <Icon color="rgb(59, 130, 246)">
   <svg>
     <path d="M5 13l4 4L19 7" />
   </svg>
-</Icon>
+</Icon>;
 ```
 
 ## 自定义 SVG 图标
@@ -173,7 +179,7 @@ Icon 组件会自动为 SVG 元素添加合适的属性，如 `stroke`、`fill`�
 
 ```vue
 <script setup>
-import { Icon } from '@tigercat/vue'
+import { Icon } from '@tigercat/vue';
 
 // 自定义心形图标
 const HeartIcon = () => (
@@ -182,7 +188,7 @@ const HeartIcon = () => (
       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </svg>
   </Icon>
-)
+);
 
 // 自定义星形图标
 const StarIcon = () => (
@@ -191,7 +197,7 @@ const StarIcon = () => (
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
     </svg>
   </Icon>
-)
+);
 </script>
 
 <template>
@@ -203,7 +209,7 @@ const StarIcon = () => (
 ### React
 
 ```tsx
-import { Icon } from '@tigercat/react'
+import { Icon } from '@tigercat/react';
 
 // 自定义心形图标
 const HeartIcon = () => (
@@ -212,7 +218,7 @@ const HeartIcon = () => (
       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </svg>
   </Icon>
-)
+);
 
 // 自定义星形图标
 const StarIcon = () => (
@@ -221,7 +227,7 @@ const StarIcon = () => (
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
     </svg>
   </Icon>
-)
+);
 
 function App() {
   return (
@@ -229,7 +235,7 @@ function App() {
       <HeartIcon />
       <StarIcon />
     </>
-  )
+  );
 }
 ```
 
@@ -240,8 +246,8 @@ Icon 组件可以与流行的图标库一起使用，如 Heroicons、Lucide、Fo
 ### 使用 Heroicons (React)
 
 ```tsx
-import { Icon } from '@tigercat/react'
-import { HomeIcon, UserIcon } from '@heroicons/react/24/outline'
+import { Icon } from '@tigercat/react';
+import { HomeIcon, UserIcon } from '@heroicons/react/24/outline';
 
 function App() {
   return (
@@ -249,12 +255,12 @@ function App() {
       <Icon size="lg">
         <HomeIcon />
       </Icon>
-      
+
       <Icon size="md" color="#3b82f6">
         <UserIcon />
       </Icon>
     </>
-  )
+  );
 }
 ```
 
@@ -262,19 +268,19 @@ function App() {
 
 ```vue
 <script setup>
-import { Icon } from '@tigercat/vue'
-import { Home, User, Settings } from 'lucide-vue-next'
+import { Icon } from '@tigercat/vue';
+import { Home, User, Settings } from 'lucide-vue-next';
 </script>
 
 <template>
   <Icon size="lg">
     <Home />
   </Icon>
-  
+
   <Icon size="md" color="#3b82f6">
     <User />
   </Icon>
-  
+
   <Icon size="xl" color="#10b981">
     <Settings />
   </Icon>
@@ -289,7 +295,7 @@ import { Home, User, Settings } from 'lucide-vue-next'
 
 ```vue
 <script setup>
-import { Button, Icon } from '@tigercat/vue'
+import { Button, Icon } from '@tigercat/vue';
 </script>
 
 <template>
@@ -301,11 +307,12 @@ import { Button, Icon } from '@tigercat/vue'
     </Icon>
     Add Item
   </Button>
-  
+
   <Button variant="outline">
     <Icon size="sm" class="mr-2">
       <svg>
-        <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+        <path
+          d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
       </svg>
     </Icon>
     Delete
@@ -316,7 +323,7 @@ import { Button, Icon } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Button, Icon } from '@tigercat/react'
+import { Button, Icon } from '@tigercat/react';
 
 function App() {
   return (
@@ -329,7 +336,7 @@ function App() {
         </Icon>
         Add Item
       </Button>
-      
+
       <Button variant="outline">
         <Icon size="sm" className="mr-2">
           <svg>
@@ -339,7 +346,7 @@ function App() {
         Delete
       </Button>
     </>
-  )
+  );
 }
 ```
 
@@ -347,22 +354,22 @@ function App() {
 
 ### Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 | 可选值 |
-|------|------|------|--------|--------|
-| size | 图标尺寸 | `IconSize` | `'md'` | `'sm'` \| `'md'` \| `'lg'` \| `'xl'` |
-| color | 图标颜色 | `string` | `'currentColor'` | 任何有效的 CSS 颜色值 |
-| className | 额外的 CSS 类名 | `string` | - | - |
+| 属性      | 说明            | 类型       | 默认值           | 可选值                               |
+| --------- | --------------- | ---------- | ---------------- | ------------------------------------ |
+| size      | 图标尺寸        | `IconSize` | `'md'`           | `'sm'` \| `'md'` \| `'lg'` \| `'xl'` |
+| color     | 图标颜色        | `string`   | `'currentColor'` | 任何有效的 CSS 颜色值                |
+| className | 额外的 CSS 类名 | `string`   | -                | -                                    |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| children | 图标内容（通常是 SVG 元素） | `React.ReactNode` | - |
+| 属性     | 说明                        | 类型              | 默认值 |
+| -------- | --------------------------- | ----------------- | ------ |
+| children | 图标内容（通常是 SVG 元素） | `React.ReactNode` | -      |
 
 ### Slots / 插槽 (Vue)
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明                        |
+| ------- | --------------------------- |
 | default | 图标内容（通常是 SVG 元素） |
 
 ## 样式定制
@@ -398,12 +405,14 @@ Icon 组件使用 Tailwind CSS 构建，支持通过 `className` 属性添加自
 Icon 组件会自动为 SVG 元素添加以下默认属性（如果未指定）：
 
 - `fill`: `"none"`
-- `stroke`: 从 `color` prop 继承
+- `stroke`: `"currentColor"`（配合 `color` prop / 父元素文本颜色）
 - `strokeWidth`: `"2"`
 - `strokeLinecap`: `"round"`
 - `strokeLinejoin`: `"round"`
 - `viewBox`: `"0 0 24 24"`
 - `xmlns`: `"http://www.w3.org/2000/svg"`
+
+说明：`color` prop 会设置 Icon 外层容器的 CSS `color`，因此默认的 `stroke="currentColor"` 会跟随变化。
 
 你可以在 SVG 元素上显式设置这些属性来覆盖默认值：
 
@@ -431,10 +440,9 @@ Icon 组件会自动为 SVG 元素添加以下默认属性（如果未指定）�
 
 ## 无障碍 (Accessibility)
 
-为了提高可访问性，建议：
+默认情况下，Icon 会作为“装饰性图标”渲染（外层容器会带 `aria-hidden="true"`）。
 
-1. 对于装饰性图标，使用 `aria-hidden="true"`
-2. 对于有语义的图标，添加适当的 `aria-label` 或使用 `<title>` 元素
+当图标具备语义时，给 Icon 添加 `aria-label` / `aria-labelledby`（或 SVG 内含 `<title>`）即可，组件会将外层容器作为可访问的图像节点（默认 `role="img"`）。
 
 ### Vue 3
 
@@ -446,7 +454,7 @@ Icon 组件会自动为 SVG 元素添加以下默认属性（如果未指定）�
       <circle cx="12" cy="12" r="10" />
     </svg>
   </Icon>
-  
+
   <!-- 语义化图标 -->
   <Icon aria-label="设置">
     <svg>
@@ -461,21 +469,25 @@ Icon 组件会自动为 SVG 元素添加以下默认属性（如果未指定）�
 ### React
 
 ```tsx
-{/* 装饰性图标 */}
+{
+  /* 装饰性图标 */
+}
 <Icon aria-hidden="true">
   <svg>
     <circle cx="12" cy="12" r="10" />
   </svg>
-</Icon>
+</Icon>;
 
-{/* 语义化图标 */}
+{
+  /* 语义化图标 */
+}
 <Icon aria-label="设置">
   <svg>
     <title>设置</title>
     <circle cx="12" cy="12" r="3" />
     <path d="M12 1v6m0 6v6M1 12h6m6 0h6" />
   </svg>
-</Icon>
+</Icon>;
 ```
 
 ## TypeScript 支持
@@ -483,11 +495,11 @@ Icon 组件会自动为 SVG 元素添加以下默认属性（如果未指定）�
 Icon 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { IconProps, IconSize } from '@tigercat/core'
+import type { IconProps, IconSize } from '@tigercat/core';
 // Vue
-import type { Icon } from '@tigercat/vue'
+import type { VueIconProps } from '@tigercat/vue';
 // React
-import type { Icon, IconProps as ReactIconProps } from '@tigercat/react'
+import type { Icon, IconProps as ReactIconProps } from '@tigercat/react';
 ```
 
 ## 示例集合
@@ -498,7 +510,7 @@ import type { Icon, IconProps as ReactIconProps } from '@tigercat/react'
 
 ```vue
 <script setup>
-import { Icon } from '@tigercat/vue'
+import { Icon } from '@tigercat/vue';
 </script>
 
 <template>
@@ -509,25 +521,26 @@ import { Icon } from '@tigercat/vue'
       <path d="m21 21-4.35-4.35" />
     </svg>
   </Icon>
-  
+
   <!-- 菜单图标 -->
   <Icon size="md">
     <svg>
       <path d="M3 12h18M3 6h18M3 18h18" />
     </svg>
   </Icon>
-  
+
   <!-- 关闭图标 -->
   <Icon size="md">
     <svg>
       <path d="M18 6L6 18M6 6l12 12" />
     </svg>
   </Icon>
-  
+
   <!-- 下载图标 -->
   <Icon size="md">
     <svg>
-      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+      <path
+        d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
     </svg>
   </Icon>
 </template>
@@ -536,7 +549,7 @@ import { Icon } from '@tigercat/vue'
 #### React
 
 ```tsx
-import { Icon } from '@tigercat/react'
+import { Icon } from '@tigercat/react';
 
 function IconExamples() {
   return (
@@ -548,21 +561,21 @@ function IconExamples() {
           <path d="m21 21-4.35-4.35" />
         </svg>
       </Icon>
-      
+
       {/* 菜单图标 */}
       <Icon size="md">
         <svg>
           <path d="M3 12h18M3 6h18M3 18h18" />
         </svg>
       </Icon>
-      
+
       {/* 关闭图标 */}
       <Icon size="md">
         <svg>
           <path d="M18 6L6 18M6 6l12 12" />
         </svg>
       </Icon>
-      
+
       {/* 下载图标 */}
       <Icon size="md">
         <svg>
@@ -570,7 +583,7 @@ function IconExamples() {
         </svg>
       </Icon>
     </>
-  )
+  );
 }
 ```
 
@@ -588,11 +601,12 @@ function IconExamples() {
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
     </svg>
   </Icon>
-  
+
   <!-- 脉冲图标 -->
   <Icon size="lg" className="animate-pulse" color="#ef4444">
     <svg>
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+      <path
+        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </svg>
   </Icon>
 </template>
@@ -601,19 +615,23 @@ function IconExamples() {
 #### React
 
 ```tsx
-{/* 旋转加载图标 */}
+{
+  /* 旋转加载图标 */
+}
 <Icon size="lg" className="animate-spin">
   <svg>
     <path d="M21 12a9 9 0 1 1-6.219-8.56" />
   </svg>
-</Icon>
+</Icon>;
 
-{/* 脉冲图标 */}
+{
+  /* 脉冲图标 */
+}
 <Icon size="lg" className="animate-pulse" color="#ef4444">
   <svg>
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
   </svg>
-</Icon>
+</Icon>;
 ```
 
 ## 最佳实践

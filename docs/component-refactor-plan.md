@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Tag` Step1 主题/透传/测试精简（2026-01-12）
+- 上一步：✅ `Icon` Step1 去冗余/透传/a11y 默认对齐（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -119,7 +119,7 @@
 
 - 思路：统一 aria-hidden/aria-label 约定；可选 size/color props 与 CSS vars。
 - 可拆分：a11y 约定 → 类型收敛 → docs 示例。
-- 状态：未开始
+- 状态：✅ Step1 去冗余/透传/a11y 默认对齐（2026-01-12）：Vue/React Icon 统一使用外层 `span` 承载透传属性与样式，默认装饰性图标 `aria-hidden=true`，有 `aria-label/aria-labelledby` 时默认 `role=img`；`color` 通过容器 `style.color` 生效，SVG 默认 `stroke=currentColor`（可被显式属性覆盖）；移除 React 不必要的 memo 与 Vue 仅处理首个 SVG 的限制；精简 Vue/React Icon 测试并移除快照；Vue 新增并导出 `VueIconProps`；同步更新 Icon 文档（Demo 无需修改）。
 
 #### Link（P2，建议优化）
 
@@ -151,12 +151,12 @@
 #### Card（P3，无需优化）
 
 - 例行检查：header/footer slot/children 行为与 docs 对齐。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/测试精简（2026-01-12）：core Card 默认背景/边框/分隔线从固定 Tailwind 色收敛为 CSS vars（含 fallback：`--tiger-surface/--tiger-border`）；React Card 去掉不必要的 memo，并补齐 `div` 原生属性透传类型；Vue Card 增加 `inheritAttrs: false`，合并 `attrs.class/style` 并新增导出 `VueCardProps`（含 `className/style`）；移除快照并精简 Vue/React Card 测试；同步更新 Card 文档的主题变量与 API 说明。
 
 #### Container（P3，无需优化）
 
 - 例行检查：响应式 class 与 docs 对齐。
-- 状态：未开始
+- 状态：✅ Step1 去冗余/透传/测试精简（2026-01-12）：Vue Container 增加 `inheritAttrs: false` 并交给 Vue 原生 class 合并（移除 `attrs.class` 手动解析）；React Container 去掉不必要的 `useMemo` 并补齐 `HTMLAttributes` 原生属性透传类型；移除 Vue/React Container 快照与冗余用例，保留关键路径与 a11y 基线。
 
 #### Divider（P3，无需优化）
 

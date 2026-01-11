@@ -1,22 +1,14 @@
-import React, { useMemo } from 'react'
-import { classNames, type IconProps as CoreIconProps, type IconSize } from '@tigercat/core'
+import React from 'react';
+import {
+  classNames,
+  type IconProps as CoreIconProps,
+  type IconSize,
+} from '@tigercat/core';
 
-export interface IconProps extends CoreIconProps {
-  /**
-   * Icon content (typically SVG elements)
-   */
-  children?: React.ReactNode
-}
-
-interface SVGElementProps {
-  className?: string
-  fill?: string
-  stroke?: string
-  strokeWidth?: string | number
-  strokeLinecap?: string
-  strokeLinejoin?: string
-  viewBox?: string
-  xmlns?: string
+export interface IconProps
+  extends CoreIconProps,
+    React.HTMLAttributes<HTMLSpanElement> {
+  children?: React.ReactNode;
 }
 
 const sizeClasses: Record<IconSize, string> = {
@@ -24,7 +16,7 @@ const sizeClasses: Record<IconSize, string> = {
   md: 'w-5 h-5',
   lg: 'w-6 h-6',
   xl: 'w-8 h-8',
-} as const
+} as const;
 
 export const Icon: React.FC<IconProps> = ({
   size = 'md',
@@ -33,60 +25,48 @@ export const Icon: React.FC<IconProps> = ({
   children,
   ...props
 }) => {
-  const iconClasses = useMemo(() => classNames(
-    'inline-block',
-    sizeClasses[size],
-    className
-  ), [size, className])
+  const iconStyle: React.CSSProperties = { ...props.style, color };
+  const iconClasses = classNames('inline-flex align-middle', className);
 
-  // Process children to handle SVG elements
-  const processedChildren = useMemo(() => React.Children.map(children, (child) => {
-    if (React.isValidElement(child) && child.type === 'svg') {
-      // Safely extract props with type checking
-      const childProps = child.props as Record<string, unknown>
-      const existingClassName = typeof childProps.className === 'string' ? childProps.className : ''
-      const fill = typeof childProps.fill === 'string' ? childProps.fill : 'none'
-      const strokeWidth = (typeof childProps.strokeWidth === 'string' || typeof childProps.strokeWidth === 'number') 
-        ? childProps.strokeWidth 
-        : '2'
-      const strokeLinecap = typeof childProps.strokeLinecap === 'string' ? childProps.strokeLinecap : 'round'
-      const strokeLinejoin = typeof childProps.strokeLinejoin === 'string' ? childProps.strokeLinejoin : 'round'
-      const viewBox = typeof childProps.viewBox === 'string' ? childProps.viewBox : '0 0 24 24'
-      const xmlns = typeof childProps.xmlns === 'string' ? childProps.xmlns : 'http://www.w3.org/2000/svg'
-      
-      // Clone SVG element with proper attributes
-      return React.cloneElement(child as React.ReactElement<SVGElementProps>, {
-        className: classNames(iconClasses, existingClassName),
-        fill,
-        stroke: color,
-        strokeWidth,
-        strokeLinecap,
-        strokeLinejoin,
-        viewBox,
-        xmlns,
-      })
-    }
-    return child
-  }), [children, iconClasses, color])
+  const ariaLabel = props['aria-label'];
+  const ariaLabelledBy = props['aria-labelledby'];
+  const isDecorative =
+    ariaLabel == null && ariaLabelledBy == null && props.role == null;
 
-  // If no SVG children, wrap in a span
-  const hasSvg = useMemo(() => React.Children.toArray(children).some(
-    (child) => React.isValidElement(child) && child.type === 'svg'
-  ), [children])
+  const processedChildren = React.Children.map(children, (child) => {
+    if (!React.isValidElement(child) || child.type !== 'svg') return child;
 
-  if (!hasSvg && children) {
-    const iconStyle = useMemo((): React.CSSProperties => ({ color }), [color])
-    
-    return (
-      <span
-        className={iconClasses}
-        style={iconStyle}
-        {...props}
-      >
-        {children}
-      </span>
-    )
-  }
+    const svgProps = child.props as React.SVGProps<SVGSVGElement>;
 
-  return <>{processedChildren}</>
-}
+    return React.cloneElement(
+      child as React.ReactElement<React.SVGProps<SVGSVGElement>>,
+      {
+        ...svgProps,
+        className: classNames(
+          'inline-block',
+          sizeClasses[size],
+          svgProps.className
+        ),
+        xmlns: svgProps.xmlns ?? 'http://www.w3.org/2000/svg',
+        viewBox: svgProps.viewBox ?? '0 0 24 24',
+        fill: svgProps.fill ?? 'none',
+        stroke: svgProps.stroke ?? 'currentColor',
+        strokeWidth: svgProps.strokeWidth ?? 2,
+        strokeLinecap: svgProps.strokeLinecap ?? 'round',
+        strokeLinejoin: svgProps.strokeLinejoin ?? 'round',
+      }
+    );
+  });
+
+  return (
+    <span
+      {...props}
+      className={iconClasses}
+      style={iconStyle}
+      {...(isDecorative
+        ? { 'aria-hidden': true }
+        : { role: props.role ?? 'img' })}>
+      {processedChildren}
+    </span>
+  );
+};
