@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Layout` Step1 主题/透传/类型/测试精简（2026-01-12）
+- 上一步：✅ `Grid(Row/Col)` Step1 透传/响应性/类型导出/测试精简（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -180,7 +180,7 @@
 
 - 思路：gutter/align/justify 的类型与实现一致；将网格计算逻辑集中到 core（如果未集中）。
 - 可拆分：core grid util 对齐 → 组件 props 对齐 → tests。
-- 状态：未开始
+- 状态：✅ Step1 透传/响应性/类型导出/测试精简（2026-01-12）：React Row/Col 移除不必要的 memo 并补齐 `HTMLAttributes` 透传；Vue Row/Col 修复 gutter 响应性（props 变化可更新行/列间距）并导出 `VueRowProps/VueColProps`；移除 Vue/React Grid 快照与过度用例，保留默认行为、gutter 传递、span/offset 与基础 a11y；同步更新 Grid 文档的 TS 类型示例与“原生属性透传”说明。
 
 ### C. 表单与输入（Form）
 

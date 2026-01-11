@@ -26,6 +26,26 @@ import {
   type RowSelectionConfig,
 } from '@tigercat/core';
 
+export interface VueTableProps {
+  columns: TableColumn[];
+  columnLockable?: boolean;
+  dataSource?: Record<string, unknown>[];
+  size?: TableSize;
+  bordered?: boolean;
+  striped?: boolean;
+  hoverable?: boolean;
+  loading?: boolean;
+  emptyText?: string;
+  pagination?: PaginationConfig | false;
+  rowSelection?: RowSelectionConfig;
+  rowKey?: string | ((record: Record<string, unknown>) => string | number);
+  rowClassName?:
+    | string
+    | ((record: Record<string, unknown>, index: number) => string);
+  stickyHeader?: boolean;
+  maxHeight?: string | number;
+}
+
 // Sort icons
 const SortIcon = (direction: SortDirection) => {
   if (direction === 'asc') {

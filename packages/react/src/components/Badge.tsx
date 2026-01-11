@@ -14,7 +14,7 @@ import {
 } from '@tigercat/core';
 
 export type BadgeProps = CoreBadgeProps &
-  Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> & {
+  Omit<React.HTMLAttributes<HTMLSpanElement>, 'children' | 'content'> & {
     /**
      * Badge content (children for wrapped mode)
      */

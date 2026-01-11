@@ -1,34 +1,19 @@
-import React, { createContext, useMemo } from 'react'
+import React, { createContext } from 'react';
 import {
   classNames,
   getAlignClasses,
   getJustifyClasses,
   getGutterStyles,
   type RowProps as CoreRowProps,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
-export interface RowProps extends CoreRowProps {
-  /**
-   * Row content
-   */
-  children?: React.ReactNode
-
-  /**
-   * Additional CSS classes
-   */
-  className?: string
-
-  /**
-   * Additional inline styles
-   */
-  style?: React.CSSProperties
-}
+export type RowProps = React.HTMLAttributes<HTMLDivElement> & CoreRowProps;
 
 interface RowContextType {
-  gutter?: CoreRowProps['gutter']
+  gutter?: CoreRowProps['gutter'];
 }
 
-export const RowContext = createContext<RowContextType>({})
+export const RowContext = createContext<RowContextType>({});
 
 export const Row: React.FC<RowProps> = ({
   gutter = 0,
@@ -38,30 +23,30 @@ export const Row: React.FC<RowProps> = ({
   children,
   className,
   style,
-  ...props
+  ...divProps
 }) => {
-  const gutterStyles = useMemo(() => getGutterStyles(gutter), [gutter])
+  const { rowStyle } = getGutterStyles(gutter);
 
-  const rowClasses = useMemo(() => classNames(
+  const rowClasses = classNames(
     'flex',
     wrap && 'flex-wrap',
     getAlignClasses(align),
     getJustifyClasses(justify),
     className
-  ), [wrap, align, justify, className])
+  );
 
-  const mergedStyle = useMemo((): React.CSSProperties => ({
-    ...gutterStyles.rowStyle,
-    ...style
-  }), [gutterStyles.rowStyle, style])
+  const mergedStyle: React.CSSProperties = {
+    ...rowStyle,
+    ...style,
+  };
 
-  const contextValue = useMemo(() => ({ gutter }), [gutter])
+  const contextValue = { gutter };
 
   return (
     <RowContext.Provider value={contextValue}>
-      <div className={rowClasses} style={mergedStyle} {...props}>
+      <div className={rowClasses} style={mergedStyle} {...divProps}>
         {children}
       </div>
     </RowContext.Provider>
-  )
-}
+  );
+};

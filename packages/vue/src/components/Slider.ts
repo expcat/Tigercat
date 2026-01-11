@@ -442,12 +442,14 @@ export const Slider = defineComponent({
         'div',
         {
           ...attrsWithoutClassStyle,
-          class: classNames(
-            sliderBaseClasses,
-            props.disabled && 'cursor-not-allowed',
-            props.className,
-            attrsClass
-          ),
+          class: [
+            classNames(
+              sliderBaseClasses,
+              props.disabled && 'cursor-not-allowed',
+              props.className
+            ),
+            attrsClass,
+          ],
           style: [props.style, attrsStyle],
         },
         [

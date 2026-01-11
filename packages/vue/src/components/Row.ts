@@ -6,6 +6,7 @@ import {
   provide,
   InjectionKey,
 } from 'vue';
+import type { ComputedRef } from 'vue';
 import {
   classNames,
   getAlignClasses,
@@ -16,8 +17,15 @@ import {
   type GutterSize,
 } from '@tigercat/core';
 
-interface RowContext {
+export interface VueRowProps {
   gutter?: GutterSize;
+  align?: Align;
+  justify?: Justify;
+  wrap?: boolean;
+}
+
+interface RowContext {
+  gutter: ComputedRef<GutterSize>;
 }
 
 const RowContextKey: InjectionKey<RowContext> = Symbol('RowContext');
@@ -59,7 +67,8 @@ export const Row = defineComponent({
     },
   },
   setup(props, { slots, attrs }) {
-    const { rowStyle } = getGutterStyles(props.gutter);
+    const gutter = computed(() => props.gutter);
+    const rowStyle = computed(() => getGutterStyles(gutter.value).rowStyle);
 
     const rowClasses = computed(() => {
       return classNames(
@@ -70,10 +79,7 @@ export const Row = defineComponent({
       );
     });
 
-    // Provide gutter context to Col components
-    provide(RowContextKey, {
-      gutter: props.gutter,
-    });
+    provide(RowContextKey, { gutter });
 
     return () => {
       return h(
@@ -81,7 +87,7 @@ export const Row = defineComponent({
         {
           ...attrs,
           class: [rowClasses.value, attrs.class],
-          style: [rowStyle, attrs.style],
+          style: [rowStyle.value, attrs.style],
         },
         slots.default ? slots.default() : []
       );

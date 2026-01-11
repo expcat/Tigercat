@@ -66,6 +66,32 @@ const createIcon = (path: string, className: string) => {
 const ClockIcon = createIcon(ClockIconPath, 'w-5 h-5');
 const CloseIcon = createIcon(TimePickerCloseIconPath, 'w-4 h-4');
 
+export type VueTimePickerModelValue =
+  | string
+  | null
+  | [string | null, string | null];
+
+export interface VueTimePickerProps {
+  modelValue?: VueTimePickerModelValue;
+  locale?: string;
+  range?: boolean;
+  size?: TimePickerSize;
+  format?: TimeFormat;
+  showSeconds?: boolean;
+  hourStep?: number;
+  minuteStep?: number;
+  secondStep?: number;
+  placeholder?: string;
+  disabled?: boolean;
+  readonly?: boolean;
+  required?: boolean;
+  minTime?: string | null;
+  maxTime?: string | null;
+  clearable?: boolean;
+  name?: string;
+  id?: string;
+}
+
 export const TimePicker = defineComponent({
   name: 'TigerTimePicker',
   props: {
