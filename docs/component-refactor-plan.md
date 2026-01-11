@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Space` Step1 交付验收（去冗余 + 测试精简 + 文档对齐）（2026-01-12）
+- 上一步：✅ `Text` Step1 例行检查/主题变量化/透传与测试精简（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -130,7 +130,7 @@
 #### Text（P3，无需优化）
 
 - 例行检查：语义标签选择、颜色主题变量、docs 一致性。
-- 状态：未开始
+- 状态：✅ Step1 例行检查/主题变量化/透传与测试精简（2026-01-12）：Text 颜色类从固定色收敛为 CSS vars（含 fallback：`--tiger-text/--tiger-primary/--tiger-secondary/--tiger-success/--tiger-warning/--tiger-error/--tiger-text-muted`）；React Text 去掉不必要的 memo 并补齐原生属性透传类型（避开 `color` 冲突）；Vue Text 合并 `attrs.class` 并透传原生属性，导出 `VueTextProps`；移除快照与冗余枚举测试，补跑 `tests/react/Text.spec.tsx` 与 `tests/vue/Text.spec.ts` 全绿；同步更新 Text 文档颜色说明。
 
 #### Badge（P3，无需优化）
 

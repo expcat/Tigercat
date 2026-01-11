@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Text } from '@tigercat/vue'
+import { Text } from '@tigercat/vue';
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Text } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Text } from '@tigercat/react'
+import { Text } from '@tigercat/react';
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
       <Text tag="span">This is an inline span text.</Text>
       <Text tag="div">This is a div text.</Text>
     </>
-  )
+  );
 }
 ```
 
@@ -149,7 +149,10 @@ Text 组件支持 4 种对齐方式。
   <Text align="left">Left aligned text</Text>
   <Text align="center">Center aligned text</Text>
   <Text align="right">Right aligned text</Text>
-  <Text align="justify">Justified text - Lorem ipsum dolor sit amet, consectetur adipiscing elit.</Text>
+  <Text align="justify"
+    >Justified text - Lorem ipsum dolor sit amet, consectetur adipiscing
+    elit.</Text
+  >
 </template>
 ```
 
@@ -164,32 +167,32 @@ Text 组件支持 4 种对齐方式。
 
 ## 文本颜色 (Colors)
 
-Text 组件支持多种预定义颜色。
+Text 组件支持多种预定义颜色，颜色值通过 CSS 变量提供主题化能力（均带 fallback）。
 
 ### Vue 3
 
 ```vue
 <template>
-  <Text color="default">Default color (gray-900)</Text>
-  <Text color="primary">Primary color (blue)</Text>
-  <Text color="secondary">Secondary color (gray)</Text>
-  <Text color="success">Success color (green)</Text>
-  <Text color="warning">Warning color (yellow)</Text>
-  <Text color="danger">Danger color (red)</Text>
-  <Text color="muted">Muted color (gray-500)</Text>
+  <Text color="default">Default color (--tiger-text)</Text>
+  <Text color="primary">Primary color (--tiger-primary)</Text>
+  <Text color="secondary">Secondary color (--tiger-secondary)</Text>
+  <Text color="success">Success color (--tiger-success)</Text>
+  <Text color="warning">Warning color (--tiger-warning)</Text>
+  <Text color="danger">Danger color (--tiger-error)</Text>
+  <Text color="muted">Muted color (--tiger-text-muted)</Text>
 </template>
 ```
 
 ### React
 
 ```tsx
-<Text color="default">Default color (gray-900)</Text>
-<Text color="primary">Primary color (blue)</Text>
-<Text color="secondary">Secondary color (gray)</Text>
-<Text color="success">Success color (green)</Text>
-<Text color="warning">Warning color (yellow)</Text>
-<Text color="danger">Danger color (red)</Text>
-<Text color="muted">Muted color (gray-500)</Text>
+<Text color="default">Default color (--tiger-text)</Text>
+<Text color="primary">Primary color (--tiger-primary)</Text>
+<Text color="secondary">Secondary color (--tiger-secondary)</Text>
+<Text color="success">Success color (--tiger-success)</Text>
+<Text color="warning">Warning color (--tiger-warning)</Text>
+<Text color="danger">Danger color (--tiger-error)</Text>
+<Text color="muted">Muted color (--tiger-text-muted)</Text>
 ```
 
 ## 文本修饰 (Text Decorations)
@@ -204,7 +207,8 @@ Text 组件支持多种预定义颜色。
 <template>
   <div class="w-48">
     <Text truncate>
-      This is a very long text that will be truncated with ellipsis when it overflows the container.
+      This is a very long text that will be truncated with ellipsis when it
+      overflows the container.
     </Text>
   </div>
 </template>
@@ -215,7 +219,8 @@ Text 组件支持多种预定义颜色。
 ```tsx
 <div className="w-48">
   <Text truncate>
-    This is a very long text that will be truncated with ellipsis when it overflows the container.
+    This is a very long text that will be truncated with ellipsis when it
+    overflows the container.
   </Text>
 </div>
 ```
@@ -282,9 +287,7 @@ Text 组件支持多种预定义颜色。
   <Text size="lg" weight="medium" color="secondary">
     A powerful UI component library
   </Text>
-  <Text size="sm" color="muted" italic>
-    Last updated: 2024-12-26
-  </Text>
+  <Text size="sm" color="muted" italic> Last updated: 2024-12-26 </Text>
 </template>
 ```
 
@@ -306,29 +309,29 @@ Text 组件支持多种预定义颜色。
 
 ### Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 | 可选值 |
-|------|------|------|--------|--------|
-| tag | HTML 标签 | `TextTag` | `'p'` | `'p'` \| `'span'` \| `'div'` \| `'h1'` \| `'h2'` \| `'h3'` \| `'h4'` \| `'h5'` \| `'h6'` \| `'label'` \| `'strong'` \| `'em'` \| `'small'` |
-| size | 文本尺寸 | `TextSize` | `'base'` | `'xs'` \| `'sm'` \| `'base'` \| `'lg'` \| `'xl'` \| `'2xl'` \| `'3xl'` \| `'4xl'` \| `'5xl'` \| `'6xl'` |
-| weight | 文本粗细 | `TextWeight` | `'normal'` | `'thin'` \| `'light'` \| `'normal'` \| `'medium'` \| `'semibold'` \| `'bold'` \| `'extrabold'` \| `'black'` |
-| align | 文本对齐 | `TextAlign` | - | `'left'` \| `'center'` \| `'right'` \| `'justify'` |
-| color | 文本颜色 | `TextColor` | `'default'` | `'default'` \| `'primary'` \| `'secondary'` \| `'success'` \| `'warning'` \| `'danger'` \| `'muted'` |
-| truncate | 是否截断文本 | `boolean` | `false` | `true` \| `false` |
-| italic | 是否斜体 | `boolean` | `false` | `true` \| `false` |
-| underline | 是否下划线 | `boolean` | `false` | `true` \| `false` |
-| lineThrough | 是否删除线 | `boolean` | `false` | `true` \| `false` |
+| 属性        | 说明         | 类型         | 默认值      | 可选值                                                                                                                                     |
+| ----------- | ------------ | ------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| tag         | HTML 标签    | `TextTag`    | `'p'`       | `'p'` \| `'span'` \| `'div'` \| `'h1'` \| `'h2'` \| `'h3'` \| `'h4'` \| `'h5'` \| `'h6'` \| `'label'` \| `'strong'` \| `'em'` \| `'small'` |
+| size        | 文本尺寸     | `TextSize`   | `'base'`    | `'xs'` \| `'sm'` \| `'base'` \| `'lg'` \| `'xl'` \| `'2xl'` \| `'3xl'` \| `'4xl'` \| `'5xl'` \| `'6xl'`                                    |
+| weight      | 文本粗细     | `TextWeight` | `'normal'`  | `'thin'` \| `'light'` \| `'normal'` \| `'medium'` \| `'semibold'` \| `'bold'` \| `'extrabold'` \| `'black'`                                |
+| align       | 文本对齐     | `TextAlign`  | -           | `'left'` \| `'center'` \| `'right'` \| `'justify'`                                                                                         |
+| color       | 文本颜色     | `TextColor`  | `'default'` | `'default'` \| `'primary'` \| `'secondary'` \| `'success'` \| `'warning'` \| `'danger'` \| `'muted'`                                       |
+| truncate    | 是否截断文本 | `boolean`    | `false`     | `true` \| `false`                                                                                                                          |
+| italic      | 是否斜体     | `boolean`    | `false`     | `true` \| `false`                                                                                                                          |
+| underline   | 是否下划线   | `boolean`    | `false`     | `true` \| `false`                                                                                                                          |
+| lineThrough | 是否删除线   | `boolean`    | `false`     | `true` \| `false`                                                                                                                          |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| className | 额外的 CSS 类名 | `string` | - |
-| children | 文本内容 | `React.ReactNode` | - |
+| 属性      | 说明            | 类型              | 默认值 |
+| --------- | --------------- | ----------------- | ------ |
+| className | 额外的 CSS 类名 | `string`          | -      |
+| children  | 文本内容        | `React.ReactNode` | -      |
 
 ### Slots / 插槽 (Vue)
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明     |
+| ------- | -------- |
 | default | 文本内容 |
 
 ## 样式定制
@@ -361,14 +364,14 @@ Text 组件的 `primary` 和 `secondary` 颜色支持通过 CSS 变量自定义�
 
 ```vue
 <script setup>
-import { Text, setThemeColors } from '@tigercat/vue'
+import { Text, setThemeColors } from '@tigercat/vue';
 
 const switchTheme = () => {
   setThemeColors({
     primary: '#10b981',
     secondary: '#6b7280',
-  })
-}
+  });
+};
 </script>
 
 <template>
@@ -380,22 +383,22 @@ const switchTheme = () => {
 **React:**
 
 ```tsx
-import { Text, setThemeColors } from '@tigercat/react'
+import { Text, setThemeColors } from '@tigercat/react';
 
 function App() {
   const switchTheme = () => {
     setThemeColors({
       primary: '#10b981',
       secondary: '#6b7280',
-    })
-  }
+    });
+  };
 
   return (
     <>
       <Text color="primary">Primary colored text</Text>
       <button onClick={switchTheme}>切换主题</button>
     </>
-  )
+  );
 }
 ```
 
@@ -428,11 +431,11 @@ import type {
   TextWeight,
   TextAlign,
   TextColor,
-} from '@tigercat/core'
+} from '@tigercat/core';
 // Vue
-import type { Text } from '@tigercat/vue'
+import type { Text } from '@tigercat/vue';
 // React
-import type { Text, TextProps as ReactTextProps } from '@tigercat/react'
+import type { Text, TextProps as ReactTextProps } from '@tigercat/react';
 ```
 
 ## 示例
@@ -447,11 +450,9 @@ import type { Text, TextProps as ReactTextProps } from '@tigercat/react'
     <Text tag="h1" size="4xl" weight="bold" color="default">
       Article Title
     </Text>
-    <Text size="sm" color="muted" italic>
-      Published on December 26, 2024
-    </Text>
+    <Text size="sm" color="muted" italic> Published on December 26, 2024 </Text>
     <Text tag="p" size="base" color="default" class="mt-4">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod 
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
       tempor incididunt ut labore et dolore magna aliqua.
     </Text>
   </article>
@@ -469,7 +470,7 @@ import type { Text, TextProps as ReactTextProps } from '@tigercat/react'
     Published on December 26, 2024
   </Text>
   <Text tag="p" size="base" color="default" className="mt-4">
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod 
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
     tempor incididunt ut labore et dolore magna aliqua.
   </Text>
 </article>
@@ -488,9 +489,7 @@ import type { Text, TextProps as ReactTextProps } from '@tigercat/react'
     <Text color="warning" weight="medium">
       ⚠ Warning: Please review your changes
     </Text>
-    <Text color="danger" weight="medium">
-      ✗ Error: Something went wrong
-    </Text>
+    <Text color="danger" weight="medium"> ✗ Error: Something went wrong </Text>
   </div>
 </template>
 ```
@@ -518,12 +517,8 @@ import type { Text, TextProps as ReactTextProps } from '@tigercat/react'
 ```vue
 <template>
   <div class="flex items-baseline gap-2">
-    <Text tag="span" size="3xl" weight="bold" color="primary">
-      $99.99
-    </Text>
-    <Text tag="span" size="lg" color="muted" lineThrough>
-      $149.99
-    </Text>
+    <Text tag="span" size="3xl" weight="bold" color="primary"> $99.99 </Text>
+    <Text tag="span" size="lg" color="muted" lineThrough> $149.99 </Text>
   </div>
 </template>
 ```
