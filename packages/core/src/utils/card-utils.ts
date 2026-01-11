@@ -1,87 +1,47 @@
-/**
- * Card component utilities
- * Shared styles and helpers for Card components
- */
+import type { CardSize, CardVariant } from '../types/card';
 
-import type { CardSize, CardVariant } from '../types/card'
+export const cardBaseClasses =
+  'rounded-lg bg-[var(--tiger-surface,#ffffff)] overflow-hidden transition-all duration-200';
 
-/**
- * Base classes for all card variants
- */
-export const cardBaseClasses = 'rounded-lg bg-white overflow-hidden transition-all duration-200'
-
-/**
- * Size classes for card padding
- */
 export const cardSizeClasses: Record<CardSize, string> = {
   sm: 'p-3',
   md: 'p-4',
   lg: 'p-6',
-} as const
+} as const;
 
-/**
- * Variant classes for card styles
- */
 export const cardVariantClasses: Record<CardVariant, string> = {
-  default: 'border border-gray-200',
-  bordered: 'border-2 border-gray-300',
-  shadow: 'border border-gray-200 shadow-md',
-  elevated: 'border border-gray-200 shadow-lg',
-} as const
+  default: 'border border-[var(--tiger-border,#e5e7eb)]',
+  bordered: 'border-2 border-[var(--tiger-border,#e5e7eb)]',
+  shadow: 'border border-[var(--tiger-border,#e5e7eb)] shadow-md',
+  elevated: 'border border-[var(--tiger-border,#e5e7eb)] shadow-lg',
+} as const;
 
-/**
- * Hover effect classes
- */
-export const cardHoverClasses = 'cursor-pointer hover:shadow-xl hover:scale-[1.02]'
+export const cardHoverClasses =
+  'cursor-pointer hover:shadow-xl hover:scale-[1.02]';
 
-/**
- * Card header classes
- */
-export const cardHeaderClasses = 'border-b border-gray-200 pb-3 mb-3'
+export const cardHeaderClasses =
+  'border-b border-[var(--tiger-border,#e5e7eb)] pb-3 mb-3';
 
-/**
- * Card body classes (no specific styling, just for structure)
- */
-export const cardBodyClasses = ''
+export const cardBodyClasses = '';
 
-/**
- * Card footer classes
- */
-export const cardFooterClasses = 'border-t border-gray-200 pt-3 mt-3'
+export const cardFooterClasses =
+  'border-t border-[var(--tiger-border,#e5e7eb)] pt-3 mt-3';
 
-/**
- * Card cover image classes
- */
-export const cardCoverClasses = 'w-full h-48 object-cover'
+export const cardCoverClasses = 'w-full h-48 object-cover';
 
-/**
- * Card cover wrapper classes
- */
-export const cardCoverWrapperClasses = 'overflow-hidden'
+export const cardCoverWrapperClasses = 'overflow-hidden';
 
-/**
- * Card actions classes (for action buttons area)
- */
-export const cardActionsClasses = 'flex gap-2 justify-end'
+export const cardActionsClasses = 'flex gap-2 justify-end';
 
-/**
- * Get card variant classes
- * @param variant - Card variant type
- * @param hoverable - Whether the card is hoverable
- * @returns Combined class string for the card variant
- */
 export function getCardClasses(
   variant: CardVariant,
   hoverable: boolean
 ): string {
-  const classes = [
-    cardBaseClasses,
-    cardVariantClasses[variant],
-  ]
-  
+  const classes = [cardBaseClasses, cardVariantClasses[variant]];
+
   if (hoverable) {
-    classes.push(cardHoverClasses)
+    classes.push(cardHoverClasses);
   }
-  
-  return classes.join(' ')
+
+  return classes.join(' ');
 }

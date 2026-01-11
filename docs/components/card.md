@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Card } from '@tigercat/vue'
+import { Card } from '@tigercat/vue';
 </script>
 
 <template>
@@ -21,14 +21,14 @@ import { Card } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Card } from '@tigercat/react'
+import { Card } from '@tigercat/react';
 
 function App() {
   return (
     <Card>
       <p>这是一个基础的卡片组件。</p>
     </Card>
-  )
+  );
 }
 ```
 
@@ -117,10 +117,7 @@ Card 组件支持 3 种不同的尺寸（主要影响内边距）：
 
 ```vue
 <template>
-  <Card 
-    cover="https://example.com/image.jpg"
-    cover-alt="卡片封面图片"
-  >
+  <Card cover="https://example.com/image.jpg" cover-alt="卡片封面图片">
     <template #header>
       <h3>卡片标题</h3>
     </template>
@@ -132,11 +129,10 @@ Card 组件支持 3 种不同的尺寸（主要影响内边距）：
 ### React
 
 ```tsx
-<Card 
+<Card
   cover="https://example.com/image.jpg"
   coverAlt="卡片封面图片"
-  header={<h3>卡片标题</h3>}
->
+  header={<h3>卡片标题</h3>}>
   <p>卡片内容</p>
 </Card>
 ```
@@ -210,12 +206,13 @@ Card 组件支持多个内容区域，可以通过插槽（Vue）或属性（Rea
 #### React
 
 ```tsx
-<Card actions={
-  <>
-    <button>取消</button>
-    <button>确认</button>
-  </>
-}>
+<Card
+  actions={
+    <>
+      <button>取消</button>
+      <button>确认</button>
+    </>
+  }>
   <p>卡片内容</p>
 </Card>
 ```
@@ -226,27 +223,26 @@ Card 组件支持多个内容区域，可以通过插槽（Vue）或属性（Rea
 
 ```vue
 <script setup>
-import { Card } from '@tigercat/vue'
+import { Card } from '@tigercat/vue';
 </script>
 
 <template>
-  <Card 
-    variant="shadow" 
-    size="lg" 
+  <Card
+    variant="shadow"
+    size="lg"
     hoverable
     cover="https://example.com/image.jpg"
-    cover-alt="产品图片"
-  >
+    cover-alt="产品图片">
     <template #header>
       <h3 class="text-xl font-bold">产品名称</h3>
     </template>
-    
+
     <p>这是一个完整的卡片示例，包含封面图片、标题、内容和操作按钮。</p>
-    
+
     <template #footer>
       <p class="text-gray-500">创建于 2024-01-01</p>
     </template>
-    
+
     <template #actions>
       <button class="px-4 py-2 bg-gray-200 rounded">取消</button>
       <button class="px-4 py-2 bg-blue-500 text-white rounded">确认</button>
@@ -258,13 +254,13 @@ import { Card } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Card } from '@tigercat/react'
+import { Card } from '@tigercat/react';
 
 function ProductCard() {
   return (
-    <Card 
-      variant="shadow" 
-      size="lg" 
+    <Card
+      variant="shadow"
+      size="lg"
       hoverable
       cover="https://example.com/image.jpg"
       coverAlt="产品图片"
@@ -273,13 +269,14 @@ function ProductCard() {
       actions={
         <>
           <button className="px-4 py-2 bg-gray-200 rounded">取消</button>
-          <button className="px-4 py-2 bg-blue-500 text-white rounded">确认</button>
+          <button className="px-4 py-2 bg-blue-500 text-white rounded">
+            确认
+          </button>
         </>
-      }
-    >
+      }>
       <p>这是一个完整的卡片示例，包含封面图片、标题、内容和操作按钮。</p>
     </Card>
-  )
+  );
 }
 ```
 
@@ -287,42 +284,50 @@ function ProductCard() {
 
 ### Props
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| variant | `'default' \| 'bordered' \| 'shadow' \| 'elevated'` | `'default'` | 卡片变体样式 |
-| size | `'sm' \| 'md' \| 'lg'` | `'md'` | 卡片尺寸（影响内边距） |
-| hoverable | `boolean` | `false` | 是否可悬停（显示悬停效果） |
-| cover | `string` | `undefined` | 封面图片 URL |
-| coverAlt | `string` | `'Card cover image'` | 封面图片的 alt 文本 |
-| className | `string` | `undefined` | 自定义 CSS 类名 |
+| 属性      | 类型                                                 | 默认值               | 说明                               |
+| --------- | ---------------------------------------------------- | -------------------- | ---------------------------------- |
+| variant   | `'default' \| 'bordered' \| 'shadow' \| 'elevated'`  | `'default'`          | 卡片变体样式                       |
+| size      | `'sm' \| 'md' \| 'lg'`                               | `'md'`               | 卡片尺寸（影响内边距）             |
+| hoverable | `boolean`                                            | `false`              | 是否可悬停（显示悬停效果）         |
+| cover     | `string`                                             | `undefined`          | 封面图片 URL                       |
+| coverAlt  | `string`                                             | `'Card cover image'` | 封面图片的 alt 文本                |
+| className | `string`                                             | `undefined`          | 自定义 CSS 类名                    |
+| style     | `CSSProperties` / `Record<string, string \| number>` | `undefined`          | 自定义内联样式（React/Vue 均支持） |
 
 ### 插槽 (Vue) / 属性 (React)
 
 #### Vue 3 插槽
 
-| 插槽名称 | 说明 |
-|----------|------|
-| default | 卡片主体内容 |
-| header | 卡片头部内容 |
-| footer | 卡片底部内容 |
-| actions | 卡片操作区域（通常放置按钮） |
+| 插槽名称 | 说明                         |
+| -------- | ---------------------------- |
+| default  | 卡片主体内容                 |
+| header   | 卡片头部内容                 |
+| footer   | 卡片底部内容                 |
+| actions  | 卡片操作区域（通常放置按钮） |
 
 #### React 属性
 
-| 属性 | 类型 | 说明 |
-|------|------|------|
-| children | `ReactNode` | 卡片主体内容 |
-| header | `ReactNode` | 卡片头部内容 |
-| footer | `ReactNode` | 卡片底部内容 |
-| actions | `ReactNode` | 卡片操作区域（通常放置按钮） |
+| 属性     | 类型        | 说明                         |
+| -------- | ----------- | ---------------------------- |
+| children | `ReactNode` | 卡片主体内容                 |
+| header   | `ReactNode` | 卡片头部内容                 |
+| footer   | `ReactNode` | 卡片底部内容                 |
+| actions  | `ReactNode` | 卡片操作区域（通常放置按钮） |
 
 ## 样式定制
 
 Card 组件使用 Tailwind CSS 构建，您可以通过以下方式自定义样式：
 
-1. **使用 `className` 属性**：添加额外的 CSS 类
-2. **覆盖默认样式**：通过全局 CSS 覆盖组件样式
-3. **Tailwind 配置**：在 Tailwind 配置文件中自定义颜色和间距
+1. **使用 `className`/`style`**：添加额外类名或内联样式
+2. **主题 CSS 变量**：
+
+- `--tiger-surface`：卡片背景（默认 `#ffffff`）
+- `--tiger-border`：边框/分隔线颜色（默认 `#e5e7eb`）
+
+3. **透传原生属性**：
+
+- React：支持 `div` 的原生属性透传（如 `id`、`data-*`、`aria-*`）
+- Vue：支持 attrs 透传，并会与 `className/style` 合并
 
 ## 可访问性
 

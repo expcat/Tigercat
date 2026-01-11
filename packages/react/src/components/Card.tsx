@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react'
-import { 
-  classNames, 
-  getCardClasses, 
+import React from 'react';
+import {
+  classNames,
+  getCardClasses,
   cardSizeClasses,
   cardHeaderClasses,
   cardBodyClasses,
@@ -9,35 +9,37 @@ import {
   cardCoverWrapperClasses,
   cardCoverClasses,
   cardActionsClasses,
-  type CardProps as CoreCardProps 
-} from '@tigercat/core'
+  type CardProps as CoreCardProps,
+} from '@tigercat/core';
 
-export interface CardProps extends CoreCardProps {
+export interface CardProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    CoreCardProps {
   /**
    * Card content (main body)
    */
-  children?: React.ReactNode
+  children?: React.ReactNode;
   /**
    * Card header content
    */
-  header?: React.ReactNode
+  header?: React.ReactNode;
   /**
    * Card footer content
    */
-  footer?: React.ReactNode
+  footer?: React.ReactNode;
   /**
    * Card actions (buttons, links, etc.)
    */
-  actions?: React.ReactNode
+  actions?: React.ReactNode;
   /**
    * Cover image URL
    */
-  cover?: string
+  cover?: string;
   /**
    * Cover image alt text
    * @default 'Card cover image'
    */
-  coverAlt?: string
+  coverAlt?: string;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -53,25 +55,15 @@ export const Card: React.FC<CardProps> = ({
   children,
   ...props
 }) => {
-  const cardClasses = useMemo(() => {
-    return classNames(
-      getCardClasses(variant, hoverable),
-      !cover && cardSizeClasses[size],
-      className
-    )
-  }, [variant, hoverable, cover, size, className])
-
-  const bodyClasses = useMemo(() => {
-    return classNames(
-      cardBodyClasses,
-      cover && cardSizeClasses[size]
-    )
-  }, [cover, size])
-
-  // Helper to get size classes for content sections when cover is present
-  const getSectionClasses = (baseClasses: string) => {
-    return classNames(baseClasses, cover && cardSizeClasses[size])
-  }
+  const sectionSizeClass = cover ? cardSizeClasses[size] : undefined;
+  const cardClasses = classNames(
+    getCardClasses(variant, hoverable),
+    !cover && cardSizeClasses[size],
+    className
+  );
+  const bodyClasses = classNames(cardBodyClasses, sectionSizeClass);
+  const getSectionClasses = (baseClasses: string) =>
+    classNames(baseClasses, sectionSizeClass);
 
   return (
     <div className={cardClasses} {...props}>
@@ -83,32 +75,27 @@ export const Card: React.FC<CardProps> = ({
       )}
 
       {/* Header */}
-      {header && (
-        <div className={getSectionClasses(cardHeaderClasses)}>
-          {header}
-        </div>
+      {header != null && (
+        <div className={getSectionClasses(cardHeaderClasses)}>{header}</div>
       )}
 
       {/* Body */}
-      {children && (
-        <div className={bodyClasses}>
-          {children}
-        </div>
-      )}
+      {children != null && <div className={bodyClasses}>{children}</div>}
 
       {/* Footer */}
-      {footer && (
-        <div className={getSectionClasses(cardFooterClasses)}>
-          {footer}
-        </div>
+      {footer != null && (
+        <div className={getSectionClasses(cardFooterClasses)}>{footer}</div>
       )}
 
       {/* Actions */}
-      {actions && (
-        <div className={getSectionClasses(classNames(cardActionsClasses, cardFooterClasses))}>
+      {actions != null && (
+        <div
+          className={getSectionClasses(
+            classNames(cardActionsClasses, cardFooterClasses)
+          )}>
           {actions}
         </div>
       )}
     </div>
-  )
-}
+  );
+};

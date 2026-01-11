@@ -1,22 +1,18 @@
-import React, { useMemo } from 'react'
-import { classNames, type ContainerProps as CoreContainerProps, type ContainerMaxWidth } from '@tigercat/core'
+import React from 'react';
+import {
+  classNames,
+  type ContainerProps as CoreContainerProps,
+  type ContainerMaxWidth,
+} from '@tigercat/core';
 
-export interface ContainerProps extends CoreContainerProps {
-  /**
-   * Container content
-   */
-  children?: React.ReactNode
-
-  /**
-   * Additional CSS classes
-   */
-  className?: string
-
+export interface ContainerProps
+  extends CoreContainerProps,
+    React.HTMLAttributes<HTMLElement> {
   /**
    * HTML element to render as
    * @default 'div'
    */
-  as?: React.ElementType
+  as?: React.ElementType;
 }
 
 const maxWidthClasses: Record<Exclude<ContainerMaxWidth, false>, string> = {
@@ -26,7 +22,7 @@ const maxWidthClasses: Record<Exclude<ContainerMaxWidth, false>, string> = {
   xl: 'max-w-screen-xl',
   '2xl': 'max-w-screen-2xl',
   full: 'w-full',
-} as const
+} as const;
 
 export const Container: React.FC<ContainerProps> = ({
   maxWidth = false,
@@ -37,17 +33,17 @@ export const Container: React.FC<ContainerProps> = ({
   as: Component = 'div',
   ...props
 }) => {
-  const containerClasses = useMemo(() => classNames(
+  const containerClasses = classNames(
     'w-full',
     maxWidth !== false && maxWidthClasses[maxWidth],
     center && 'mx-auto',
     padding && 'px-4 sm:px-6 lg:px-8',
     className
-  ), [maxWidth, center, padding, className])
+  );
 
   return (
-    <Component className={containerClasses} {...props}>
+    <Component {...props} className={containerClasses}>
       {children}
     </Component>
-  )
-}
+  );
+};

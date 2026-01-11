@@ -1,7 +1,7 @@
-import { defineComponent, computed, h, PropType } from 'vue'
-import { 
-  classNames, 
-  getCardClasses, 
+import { defineComponent, computed, h, PropType } from 'vue';
+import {
+  classNames,
+  getCardClasses,
   cardSizeClasses,
   cardHeaderClasses,
   cardBodyClasses,
@@ -9,12 +9,23 @@ import {
   cardCoverWrapperClasses,
   cardCoverClasses,
   cardActionsClasses,
-  type CardVariant, 
+  type CardVariant,
   type CardSize,
-} from '@tigercat/core'
+} from '@tigercat/core';
+
+export interface VueCardProps {
+  variant?: CardVariant;
+  size?: CardSize;
+  hoverable?: boolean;
+  cover?: string;
+  coverAlt?: string;
+  className?: string;
+  style?: Record<string, string | number>;
+}
 
 export const Card = defineComponent({
   name: 'TigerCard',
+  inheritAttrs: false,
   props: {
     /**
      * Card variant style
@@ -54,80 +65,102 @@ export const Card = defineComponent({
       type: String,
       default: 'Card cover image',
     },
+
+    /**
+     * Additional CSS classes
+     */
+    className: {
+      type: String,
+      default: undefined,
+    },
+
+    /**
+     * Custom styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined,
+    },
   },
-  setup(props, { slots }) {
+  setup(props, { slots, attrs }) {
     const cardClasses = computed(() => {
       return classNames(
         getCardClasses(props.variant, props.hoverable),
         !props.cover && cardSizeClasses[props.size]
-      )
-    })
+      );
+    });
 
     const bodyClasses = computed(() => {
       return classNames(
         cardBodyClasses,
         props.cover && cardSizeClasses[props.size]
-      )
-    })
+      );
+    });
 
-    // Helper to get size classes for content sections when cover is present
-    const getSectionClasses = (baseClasses: string) => {
-      return classNames(baseClasses, props.cover && cardSizeClasses[props.size])
-    }
+    const sectionSizeClass = computed(() =>
+      props.cover ? cardSizeClasses[props.size] : undefined
+    );
+    const getSectionClasses = (baseClasses: string) =>
+      classNames(baseClasses, sectionSizeClass.value);
 
     return () => {
-      const children = []
-      
-      // Add cover image if provided
-      if (props.cover) {
-        children.push(
-          h('div', { class: cardCoverWrapperClasses }, [
-            h('img', {
-              src: props.cover,
-              alt: props.coverAlt,
-              class: cardCoverClasses,
-            }),
-          ])
-        )
-      }
-
-      // Add header if header slot exists
-      if (slots.header) {
-        children.push(
-          h('div', { class: getSectionClasses(cardHeaderClasses) }, slots.header())
-        )
-      }
-
-      // Add body (default slot)
-      if (slots.default) {
-        children.push(
-          h('div', { class: bodyClasses.value }, slots.default())
-        )
-      }
-
-      // Add footer if footer slot exists
-      if (slots.footer) {
-        children.push(
-          h('div', { class: getSectionClasses(cardFooterClasses) }, slots.footer())
-        )
-      }
-
-      // Add actions if actions slot exists
-      if (slots.actions) {
-        children.push(
-          h('div', { class: getSectionClasses(classNames(cardActionsClasses, cardFooterClasses)) }, slots.actions())
-        )
-      }
+      const attrsRecord = attrs as Record<string, unknown>;
+      const attrsClass = attrsRecord.class;
+      const attrsStyle = attrsRecord.style;
 
       return h(
         'div',
         {
-          class: cardClasses.value,
+          ...attrs,
+          class: classNames(
+            cardClasses.value,
+            props.className,
+            attrsClass as any
+          ),
+          style: [attrsStyle as any, props.style as any],
         },
-        children
-      )
-    }
+        [
+          props.cover
+            ? h('div', { class: cardCoverWrapperClasses }, [
+                h('img', {
+                  src: props.cover,
+                  alt: props.coverAlt,
+                  class: cardCoverClasses,
+                }),
+              ])
+            : null,
+          slots.header
+            ? h(
+                'div',
+                { class: getSectionClasses(cardHeaderClasses) },
+                slots.header()
+              )
+            : null,
+          slots.default
+            ? h('div', { class: bodyClasses.value }, slots.default())
+            : null,
+          slots.footer
+            ? h(
+                'div',
+                { class: getSectionClasses(cardFooterClasses) },
+                slots.footer()
+              )
+            : null,
+          slots.actions
+            ? h(
+                'div',
+                {
+                  class: getSectionClasses(
+                    classNames(cardActionsClasses, cardFooterClasses)
+                  ),
+                },
+                slots.actions()
+              )
+            : null,
+        ]
+      );
+    };
   },
-})
+});
 
-export default Card
+export default Card;

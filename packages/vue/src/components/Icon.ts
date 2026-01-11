@@ -1,15 +1,30 @@
-import { defineComponent, computed, h, PropType, VNode } from 'vue'
-import { classNames, type IconSize } from '@tigercat/core'
+import {
+  defineComponent,
+  computed,
+  h,
+  PropType,
+  type VNode,
+  type CSSProperties,
+} from 'vue';
+import { classNames, type IconSize } from '@tigercat/core';
 
 const sizeClasses: Record<IconSize, string> = {
   sm: 'w-4 h-4',
   md: 'w-5 h-5',
   lg: 'w-6 h-6',
   xl: 'w-8 h-8',
+};
+
+export interface VueIconProps {
+  size?: IconSize;
+  color?: string;
+  className?: string;
+  style?: CSSProperties;
 }
 
 export const Icon = defineComponent({
   name: 'TigerIcon',
+  inheritAttrs: false,
   props: {
     /**
      * Icon size
@@ -32,60 +47,98 @@ export const Icon = defineComponent({
      */
     className: {
       type: String,
-      default: '',
+      default: undefined,
+    },
+
+    /**
+     * Custom styles for the wrapper
+     */
+    style: {
+      type: Object as PropType<CSSProperties>,
+      default: undefined,
     },
   },
-  setup(props, { slots }) {
-    const iconClasses = computed(() => {
+  setup(props, { slots, attrs }) {
+    const wrapperClasses = computed(() => {
       return classNames(
-        'inline-block',
-        sizeClasses[props.size],
+        'inline-flex align-middle',
+        attrs.class as any,
         props.className
-      )
-    })
+      );
+    });
+
+    const svgBaseClasses = computed(() => {
+      return classNames('inline-block', sizeClasses[props.size]);
+    });
+
+    const wrapperStyle = computed((): CSSProperties => {
+      return {
+        ...(attrs.style as CSSProperties | undefined),
+        ...(props.style ?? {}),
+        color: props.color,
+      };
+    });
 
     return () => {
-      const defaultSlot = slots.default?.()
-      
-      // If slot contains SVG, wrap it with proper attributes
-      if (defaultSlot && defaultSlot.length > 0) {
-        const content = defaultSlot[0] as VNode
-        
-        // Check if the content is an SVG element
-        if (typeof content === 'object' && content.type === 'svg') {
-          // Get children safely
-          const children = content.children || undefined
-          
-          // Safely get class from props
-          const contentClass = content.props?.class
-          const existingClass = typeof contentClass === 'string' ? contentClass : ''
-          
-          return h('svg', {
-            class: classNames(iconClasses.value, existingClass),
-            fill: content.props?.fill || 'none',
-            stroke: props.color,
-            'stroke-width': content.props?.['stroke-width'] || '2',
-            'stroke-linecap': content.props?.['stroke-linecap'] || 'round',
-            'stroke-linejoin': content.props?.['stroke-linejoin'] || 'round',
-            viewBox: content.props?.viewBox || '0 0 24 24',
-            xmlns: content.props?.xmlns || 'http://www.w3.org/2000/svg',
-          }, children === null ? undefined : children)
+      const defaultSlot = slots.default?.();
+
+      const ariaLabel = attrs['aria-label'];
+      const ariaLabelledBy = attrs['aria-labelledby'];
+      const hasExplicitRole = attrs.role != null;
+      const isDecorative =
+        ariaLabel == null && ariaLabelledBy == null && !hasExplicitRole;
+
+      const children = (defaultSlot ?? []).map((node) => {
+        if (
+          node &&
+          typeof node === 'object' &&
+          (node as VNode).type === 'svg'
+        ) {
+          const svgNode = node as VNode;
+          const svgProps = (svgNode.props ?? {}) as Record<string, unknown>;
+          const svgChildren =
+            svgNode.children === null ? undefined : svgNode.children;
+
+          return h(
+            'svg',
+            {
+              ...svgProps,
+              class: classNames(svgBaseClasses.value, svgProps.class as any),
+              xmlns:
+                (svgProps.xmlns as string | undefined) ??
+                'http://www.w3.org/2000/svg',
+              viewBox: (svgProps.viewBox as string | undefined) ?? '0 0 24 24',
+              fill: (svgProps.fill as string | undefined) ?? 'none',
+              stroke: (svgProps.stroke as string | undefined) ?? 'currentColor',
+              'stroke-width':
+                (svgProps['stroke-width'] as string | number | undefined) ??
+                '2',
+              'stroke-linecap':
+                (svgProps['stroke-linecap'] as string | undefined) ?? 'round',
+              'stroke-linejoin':
+                (svgProps['stroke-linejoin'] as string | undefined) ?? 'round',
+            },
+            svgChildren as any
+          );
         }
-      }
-      
-      // Fallback: wrap slot content in a span
+
+        return node;
+      });
+
       return h(
         'span',
         {
-          class: iconClasses.value,
-          style: {
-            color: props.color,
-          },
+          ...attrs,
+          class: wrapperClasses.value,
+          style: wrapperStyle.value,
+          ...(isDecorative
+            ? { 'aria-hidden': 'true' }
+            : { role: (attrs.role as string | undefined) ?? 'img' }),
         },
-        defaultSlot
-      )
-    }
+        children
+      );
+    };
   },
-})
+});
 
-export default Icon
+export default Icon;
