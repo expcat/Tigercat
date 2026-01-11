@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Link } from '@tigercat/vue'
+import { Link } from '@tigercat/vue';
 </script>
 
 <template>
@@ -20,7 +20,7 @@ import { Link } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Link } from '@tigercat/react'
+import { Link } from '@tigercat/react';
 
 function App() {
   return (
@@ -28,7 +28,7 @@ function App() {
       <Link href="https://github.com">GitHub</Link>
       <Link href="/about">About Page</Link>
     </>
-  )
+  );
 }
 ```
 
@@ -99,7 +99,9 @@ Link 组件支持 3 种不同的尺寸：
 ### React
 
 ```tsx
-<Link href="#" disabled>Disabled Link</Link>
+<Link href="#" disabled>
+  Disabled Link
+</Link>
 ```
 
 ## 新窗口打开 (Target)
@@ -110,9 +112,7 @@ Link 组件支持 3 种不同的尺寸：
 
 ```vue
 <template>
-  <Link href="https://github.com" target="_blank">
-    Open in New Tab
-  </Link>
+  <Link href="https://github.com" target="_blank"> Open in New Tab </Link>
   <Link href="https://github.com" target="_blank" rel="nofollow">
     Custom Rel Attribute
   </Link>
@@ -156,39 +156,37 @@ Link 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { Link } from '@tigercat/vue'
+import { Link } from '@tigercat/vue';
 
 const handleClick = (event) => {
-  console.log('Link clicked:', event)
+  console.log('Link clicked:', event);
   // You can prevent navigation if needed
   // event.preventDefault()
-}
+};
 </script>
 
 <template>
-  <Link href="#" @click="handleClick">
-    Click Me
-  </Link>
+  <Link href="#" @click="handleClick"> Click Me </Link>
 </template>
 ```
 
 ### React
 
 ```tsx
-import { Link } from '@tigercat/react'
+import { Link } from '@tigercat/react';
 
 function App() {
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    console.log('Link clicked:', event)
+    console.log('Link clicked:', event);
     // You can prevent navigation if needed
     // event.preventDefault()
-  }
+  };
 
   return (
     <Link href="#" onClick={handleClick}>
       Click Me
     </Link>
-  )
+  );
 }
 ```
 
@@ -196,31 +194,37 @@ function App() {
 
 ### Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| variant | 链接变体 | `'primary'` \| `'secondary'` \| `'default'` | `'primary'` |
-| size | 链接尺寸 | `'sm'` \| `'md'` \| `'lg'` | `'md'` |
-| disabled | 是否禁用 | `boolean` | `false` |
-| href | 链接地址 | `string` | `undefined` |
-| target | 链接打开方式 | `'_blank'` \| `'_self'` \| `'_parent'` \| `'_top'` | `undefined` |
-| rel | 链接关系 | `string` | 当 `target="_blank"` 时自动设置为 `'noopener noreferrer'` |
-| underline | 是否显示下划线 | `boolean` | `true` |
+| 属性      | 说明                                                       | 类型                                               | 默认值                                                    |
+| --------- | ---------------------------------------------------------- | -------------------------------------------------- | --------------------------------------------------------- |
+| variant   | 链接变体                                                   | `'primary'` \| `'secondary'` \| `'default'`        | `'primary'`                                               |
+| size      | 链接尺寸                                                   | `'sm'` \| `'md'` \| `'lg'`                         | `'md'`                                                    |
+| disabled  | 是否禁用                                                   | `boolean`                                          | `false`                                                   |
+| href      | 链接地址                                                   | `string`                                           | `undefined`                                               |
+| target    | 链接打开方式                                               | `'_blank'` \| `'_self'` \| `'_parent'` \| `'_top'` | `undefined`                                               |
+| rel       | 链接关系                                                   | `string`                                           | 当 `target="_blank"` 时自动设置为 `'noopener noreferrer'` |
+| underline | 是否显示下划线                                             | `boolean`                                          | `true`                                                    |
+| className | 自定义类名（Vue/React 均支持；Vue 也可直接传 `class`）     | `string`                                           | `undefined`                                               |
+| style     | 自定义内联样式（Vue/React 均支持；Vue 也可直接传 `style`） | `CSSProperties` / `Record<string, unknown>`        | `undefined`                                               |
+
+> 说明：Link 会透传大部分原生属性（如 `id`、`data-*`、`aria-*`）。
 
 ### Events (Vue) / Props (React)
 
 #### Vue 3
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| click | 点击链接时触发 | `(event: MouseEvent)` |
+| 事件名 | 说明           | 回调参数              |
+| ------ | -------------- | --------------------- |
+| click  | 点击链接时触发 | `(event: MouseEvent)` |
 
 #### React
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
-| onClick | 点击链接时的回调 | `(event: React.MouseEvent<HTMLAnchorElement>) => void` |
-| children | 链接内容 | `React.ReactNode` |
-| className | 自定义类名 | `string` |
+| 属性      | 说明                    | 类型                                                   |
+| --------- | ----------------------- | ------------------------------------------------------ |
+| onClick   | 点击链接时的回调        | `(event: React.MouseEvent<HTMLAnchorElement>) => void` |
+| children  | 链接内容                | `React.ReactNode`                                      |
+| className | 自定义类名              | `string`                                               |
+| style     | 自定义内联样式          | `React.CSSProperties`                                  |
+| ...props  | 其他原生 `<a>` 属性透传 | `React.AnchorHTMLAttributes<HTMLAnchorElement>`        |
 
 ## 样式定制
 
@@ -234,7 +238,7 @@ Link 组件使用 Tailwind CSS 类，并支持通过 CSS 变量进行主题定�
   --tiger-primary: #2563eb;
   --tiger-primary-hover: #1d4ed8;
   --tiger-primary-disabled: #93c5fd;
-  
+
   /* Secondary variant */
   --tiger-secondary: #4b5563;
   --tiger-secondary-hover: #374151;
@@ -258,7 +262,7 @@ Link 组件遵循 WAI-ARIA 规范：
 - 禁用状态会添加 `aria-disabled` 属性
 - 新窗口打开时自动添加安全属性 `rel="noopener noreferrer"`
 - 支持键盘导航（Tab 键聚焦，Enter 键激活）
-- 禁用后通过 `pointer-events-none` 防止交互
+- 禁用后会移除 `href`、设置 `tabindex="-1"`，并阻止 Enter/Space 触发交互
 
 ## 最佳实践
 
@@ -282,21 +286,15 @@ Link 组件遵循 WAI-ARIA 规范：
       <Link href="/about" variant="secondary">About</Link>
       <Link href="/contact" variant="default">Contact</Link>
     </div>
-    
+
     <div>
-      <Link 
-        href="https://github.com" 
-        target="_blank"
-        variant="primary"
-      >
+      <Link href="https://github.com" target="_blank" variant="primary">
         Visit GitHub
       </Link>
     </div>
-    
+
     <div>
-      <Link href="#" disabled>
-        Coming Soon
-      </Link>
+      <Link href="#" disabled> Coming Soon </Link>
     </div>
   </div>
 </template>

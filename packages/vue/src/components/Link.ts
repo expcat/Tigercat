@@ -2,20 +2,25 @@ import { defineComponent, computed, h, PropType } from 'vue';
 import {
   classNames,
   getLinkVariantClasses,
+  getSecureRel,
+  linkBaseClasses,
+  linkDisabledClasses,
+  linkSizeClasses,
   type LinkVariant,
   type LinkSize,
 } from '@tigercat/core';
 
-const baseClasses =
-  'inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 cursor-pointer no-underline';
-
-const sizeClasses = {
-  sm: 'text-sm',
-  md: 'text-base',
-  lg: 'text-lg',
-};
-
-const disabledClasses = 'cursor-not-allowed opacity-60 pointer-events-none';
+export interface VueLinkProps {
+  variant?: LinkVariant;
+  size?: LinkSize;
+  disabled?: boolean;
+  href?: string;
+  target?: '_blank' | '_self' | '_parent' | '_top';
+  rel?: string;
+  underline?: boolean;
+  className?: string;
+  style?: Record<string, unknown>;
+}
 
 export const Link = defineComponent({
   name: 'TigerLink',
@@ -70,6 +75,14 @@ export const Link = defineComponent({
       type: Boolean,
       default: true,
     },
+    className: {
+      type: String,
+      default: undefined,
+    },
+    style: {
+      type: Object as PropType<Record<string, unknown>>,
+      default: undefined,
+    },
   },
   emits: {
     /**
@@ -77,31 +90,36 @@ export const Link = defineComponent({
      */
     click: (event: MouseEvent) => event instanceof MouseEvent,
   },
-  setup(props, { slots, emit }) {
+  setup(props, { slots, emit, attrs }) {
     const linkClasses = computed(() => {
       return classNames(
-        baseClasses,
-        getLinkVariantClasses(props.variant),
-        sizeClasses[props.size],
+        linkBaseClasses,
+        getLinkVariantClasses(props.variant, undefined, {
+          disabled: props.disabled,
+        }),
+        linkSizeClasses[props.size],
         props.underline && 'hover:underline',
-        props.disabled && disabledClasses
+        props.disabled && linkDisabledClasses,
+        props.className
       );
     });
 
-    const computedRel = computed(() => {
-      // Automatically add security attributes for target="_blank"
-      if (props.target === '_blank' && !props.rel) {
-        return 'noopener noreferrer';
-      }
-      return props.rel;
-    });
+    const computedRel = computed(() => getSecureRel(props.target, props.rel));
 
     const handleClick = (event: MouseEvent) => {
       if (props.disabled) {
         event.preventDefault();
+        event.stopPropagation();
         return;
       }
       emit('click', event);
+    };
+
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (props.disabled && (event.key === 'Enter' || event.key === ' ')) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
     };
 
     return () => {
@@ -110,12 +128,16 @@ export const Link = defineComponent({
       return h(
         'a',
         {
-          class: linkClasses.value,
+          ...attrs,
+          class: [linkClasses.value, attrs.class],
+          style: [props.style, attrs.style],
           href: props.disabled ? undefined : props.href,
           target: props.target,
           rel: computedRel.value,
           'aria-disabled': props.disabled ? 'true' : undefined,
+          tabindex: props.disabled ? -1 : attrs.tabindex,
           onClick: handleClick,
+          onKeydown: handleKeydown,
         },
         children
       );

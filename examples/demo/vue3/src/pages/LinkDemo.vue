@@ -56,7 +56,7 @@ const handlePreventNavigate = (event: MouseEvent) => {
     <!-- 禁用状态 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">禁用状态</h2>
-      <p class="text-gray-600 mb-6">禁用后不可点击，且不会跳转。</p>
+      <p class="text-gray-600 mb-6">禁用后不可点击，移除 href，并从 Tab 顺序移除。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space>
           <Link href="#"

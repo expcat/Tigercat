@@ -62,7 +62,9 @@ const LinkDemo: React.FC = () => {
       {/* 禁用状态 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">禁用状态</h2>
-        <p className="text-gray-600 mb-6">禁用后不可点击，且不会跳转。</p>
+        <p className="text-gray-600 mb-6">
+          禁用后不可点击，移除 href，并从 Tab 顺序移除。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <Link href="#" disabled>

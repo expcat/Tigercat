@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Breadcrumb` Step1 API/类型/a11y 基线对齐（2026-01-12）
+- 上一步：✅ `Link` Step1 去冗余/透传/disabled a11y 对齐（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -125,7 +125,7 @@
 
 - 思路：disabled 行为（阻止导航/aria-disabled）；外链 rel="noreferrer" 安全默认值。
 - 可拆分：API/默认值 → a11y → tests。
-- 状态：未开始
+- 状态：✅ Step1 去冗余/透传/disabled a11y 对齐（2026-01-12）：下沉 core 的 `link-utils`（classes + `getSecureRel`），Vue/React Link 合并 class/style 并透传原生属性；disabled 强化为移除 href + `tabindex=-1` + 阻止 Enter/Space；精简测试并移除快照；同步更新文档与 Demo 文案。
 
 #### Text（P3，无需优化）
 
