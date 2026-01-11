@@ -592,6 +592,7 @@ export const Tree: React.FC<TreeProps> = ({
           {checkable && (
             <input
               type="checkbox"
+              aria-label={`Select ${node.label}`}
               className={treeNodeCheckboxClasses}
               checked={isChecked}
               ref={(input) => {

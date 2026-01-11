@@ -282,9 +282,11 @@ export const Tree = defineComponent({
       () => {
         if (props.expandedKeys === undefined) {
           const keys =
-            props.expandedKeys ||
-            props.defaultExpandedKeys ||
-            (props.defaultExpandAll ? getAllKeys(props.treeData) : []);
+            props.defaultExpandedKeys.length > 0
+              ? props.defaultExpandedKeys
+              : props.defaultExpandAll
+              ? getAllKeys(props.treeData)
+              : [];
           internalExpandedKeys.value = new Set(keys);
         }
       },

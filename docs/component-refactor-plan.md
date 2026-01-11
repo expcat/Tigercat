@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Link` Step1 去冗余/透传/disabled a11y 对齐（2026-01-12）
+- 上一步：✅ `Slider` Step1 交付验收（补跑 React/Vue tests）（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -227,7 +227,7 @@
 
 - 思路：键盘操作（左右/上下/Home/End）；aria-valuemin/max/now；范围 slider（如支持）。
 
-- 状态：✅ Step1 API/主题/a11y 基线对齐（2026-01-12）：Slider 默认颜色从 Tailwind 固定色收敛到 CSS vars（含 fallback：`--tiger-border/--tiger-surface/--tiger-text/--tiger-text-muted`）；Vue/React 支持 `aria-label/aria-labelledby/aria-describedby` 传给 thumb 并补齐 `aria-orientation`；Vue 增加 `className/style` props 且导出 `VueSliderProps`；React 支持 `div` 原生属性透传并避免覆盖内部 `value/defaultValue/onChange`；同步更新 Slider 文档与快照。
+- 状态：✅ Step1 API/主题/a11y 基线对齐（2026-01-12）：Slider 默认颜色从 Tailwind 固定色收敛到 CSS vars（含 fallback：`--tiger-border/--tiger-surface/--tiger-text/--tiger-text-muted`）；Vue/React 支持 `aria-label/aria-labelledby/aria-describedby` 传给 thumb 并补齐 `aria-orientation`；Vue 增加 `className/style` props 且导出 `VueSliderProps`；React 支持 `div` 原生属性透传并避免覆盖内部 `value/defaultValue/onChange`；同步更新 Slider 文档与快照；补跑 `tests/react/Slider.spec.tsx` 与 `tests/vue/Slider.spec.ts` 全绿。
 
 #### Form / FormItem（P0，建议优化）
 
