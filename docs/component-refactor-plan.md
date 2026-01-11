@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Slider` Step1 API/主题/a11y 基线对齐（2026-01-12）
+- 上一步：✅ `Breadcrumb` Step1 API/类型/a11y 基线对齐（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -250,6 +250,8 @@
 #### Breadcrumb / BreadcrumbItem（P2，建议优化）
 
 - 思路：nav 语义与 aria-current；separator 可定制。
+
+- 状态：✅ Step1 API/类型/a11y 基线对齐（2026-01-12）：Vue 修复 `attrs.class/style` 覆盖（改为合并）并导出 `VueBreadcrumbProps`/`VueBreadcrumbItemProps`；React `Breadcrumb/BreadcrumbItem` 支持原生属性透传，且 `style` 改为 `React.CSSProperties`；补充 Vue 单测覆盖 class 合并与 style。
 
 #### Steps / StepsItem（P2，建议优化）
 

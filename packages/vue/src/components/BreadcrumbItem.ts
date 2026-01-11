@@ -8,6 +8,16 @@ import {
 } from '@tigercat/core';
 import { BreadcrumbContextKey, type BreadcrumbContext } from './Breadcrumb';
 
+export interface VueBreadcrumbItemProps {
+  href?: string;
+  target?: '_blank' | '_self' | '_parent' | '_top';
+  current?: boolean;
+  separator?: BreadcrumbSeparator;
+  className?: string;
+  style?: Record<string, unknown>;
+  icon?: unknown;
+}
+
 export const BreadcrumbItem = defineComponent({
   name: 'TigerBreadcrumbItem',
   props: {
@@ -48,10 +58,17 @@ export const BreadcrumbItem = defineComponent({
       default: undefined,
     },
     /**
+     * Inline styles
+     */
+    style: {
+      type: Object as PropType<Record<string, unknown>>,
+      default: undefined,
+    },
+    /**
      * Icon to display before the item content
      */
     icon: {
-      type: String,
+      type: [String, Object] as PropType<unknown>,
       default: undefined,
     },
   },
@@ -158,8 +175,9 @@ export const BreadcrumbItem = defineComponent({
       return h(
         'li',
         {
-          class: itemClasses.value,
           ...attrs,
+          class: [itemClasses.value, attrs.class],
+          style: [props.style, attrs.style],
         },
         [linkElement, separatorElement]
       );

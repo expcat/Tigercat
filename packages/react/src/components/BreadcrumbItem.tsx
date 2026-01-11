@@ -8,13 +8,17 @@ import {
 } from '@tigercat/core';
 import { useBreadcrumbContext } from './Breadcrumb';
 
-export interface BreadcrumbItemProps extends CoreBreadcrumbItemProps {
+export interface BreadcrumbItemProps
+  extends Omit<CoreBreadcrumbItemProps, 'style'>,
+    Omit<React.LiHTMLAttributes<HTMLLIElement>, 'onClick' | 'children'> {
   /**
    * Click event handler
    */
   onClick?: (
     event: React.MouseEvent<HTMLAnchorElement | HTMLSpanElement>
   ) => void;
+
+  style?: React.CSSProperties;
 
   /**
    * Item content
