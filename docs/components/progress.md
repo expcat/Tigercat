@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Progress } from '@tigercat/vue'
+import { Progress } from '@tigercat/vue';
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Progress } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Progress } from '@tigercat/react'
+import { Progress } from '@tigercat/react';
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
       <Progress percentage={100} status="success" />
       <Progress percentage={70} status="exception" />
     </>
-  )
+  );
 }
 ```
 
@@ -176,7 +176,7 @@ Progress 组件支持多种状态，状态会覆盖变体的颜色：
 <template>
   <Progress :percentage="50" text="进行中" />
   <Progress :percentage="100" text="已完成" />
-  
+
   <!-- 使用格式化函数 -->
   <Progress :percentage="50" :format="(p) => `${p}个/100个`" />
 </template>
@@ -222,7 +222,7 @@ Progress 组件支持多种状态，状态会覆盖变体的颜色：
 <template>
   <!-- 静态条纹 -->
   <Progress :percentage="70" :striped="true" />
-  
+
   <!-- 动画条纹 -->
   <Progress :percentage="70" :striped="true" :striped-animation="true" />
 </template>
@@ -231,11 +231,15 @@ Progress 组件支持多种状态，状态会覆盖变体的颜色：
 ### React
 
 ```tsx
-{/* 静态条纹 */}
-<Progress percentage={70} striped={true} />
+{
+  /* 静态条纹 */
+}
+<Progress percentage={70} striped={true} />;
 
-{/* 动画条纹 */}
-<Progress percentage={70} striped={true} stripedAnimation={true} />
+{
+  /* 动画条纹 */
+}
+<Progress percentage={70} striped={true} stripedAnimation={true} />;
 ```
 
 ## 自定义宽度和高度
@@ -249,7 +253,7 @@ Progress 组件支持多种状态，状态会覆盖变体的颜色：
   <!-- 自定义宽度 -->
   <Progress :percentage="50" width="300px" />
   <Progress :percentage="50" :width="400" />
-  
+
   <!-- 自定义高度 -->
   <Progress :percentage="50" :height="20" />
 </template>
@@ -296,20 +300,20 @@ Progress 组件支持多种状态，状态会覆盖变体的颜色：
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Progress } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Progress } from '@tigercat/vue';
 
-const uploadProgress = ref(0)
+const uploadProgress = ref(0);
 
 const uploadFile = () => {
   // 模拟文件上传
   const interval = setInterval(() => {
-    uploadProgress.value += 10
+    uploadProgress.value += 10;
     if (uploadProgress.value >= 100) {
-      clearInterval(interval)
+      clearInterval(interval);
     }
-  }, 500)
-}
+  }, 500);
+};
 </script>
 
 <template>
@@ -323,31 +327,31 @@ const uploadFile = () => {
 #### React
 
 ```tsx
-import { useState } from 'react'
-import { Progress } from '@tigercat/react'
+import { useState } from 'react';
+import { Progress } from '@tigercat/react';
 
 function FileUpload() {
-  const [uploadProgress, setUploadProgress] = useState(0)
-  
+  const [uploadProgress, setUploadProgress] = useState(0);
+
   const uploadFile = () => {
     // 模拟文件上传
     const interval = setInterval(() => {
-      setUploadProgress(prev => {
-        const next = prev + 10
+      setUploadProgress((prev) => {
+        const next = prev + 10;
         if (next >= 100) {
-          clearInterval(interval)
+          clearInterval(interval);
         }
-        return next
-      })
-    }, 500)
-  }
-  
+        return next;
+      });
+    }, 500);
+  };
+
   return (
     <div>
       <Progress percentage={uploadProgress} />
       <button onClick={uploadFile}>开始上传</button>
     </div>
-  )
+  );
 }
 ```
 
@@ -357,8 +361,8 @@ function FileUpload() {
 
 ```vue
 <script setup>
-import { ref, computed } from 'vue'
-import { Progress } from '@tigercat/vue'
+import { ref, computed } from 'vue';
+import { Progress } from '@tigercat/vue';
 
 const tasks = ref([
   { id: 1, name: '需求分析', completed: true },
@@ -366,29 +370,28 @@ const tasks = ref([
   { id: 3, name: '开发实现', completed: true },
   { id: 4, name: '测试验收', completed: false },
   { id: 5, name: '部署上线', completed: false },
-])
+]);
 
 const completionRate = computed(() => {
-  const completed = tasks.value.filter(t => t.completed).length
-  return (completed / tasks.value.length) * 100
-})
+  const completed = tasks.value.filter((t) => t.completed).length;
+  return (completed / tasks.value.length) * 100;
+});
 
 const getStatus = computed(() => {
-  if (completionRate.value === 100) return 'success'
-  if (completionRate.value >= 75) return 'normal'
-  if (completionRate.value >= 50) return 'paused'
-  return 'exception'
-})
+  if (completionRate.value === 100) return 'success';
+  if (completionRate.value >= 75) return 'normal';
+  if (completionRate.value >= 50) return 'paused';
+  return 'exception';
+});
 </script>
 
 <template>
   <div>
     <h3>项目进度</h3>
-    <Progress 
-      :percentage="completionRate" 
+    <Progress
+      :percentage="completionRate"
       :status="getStatus"
-      :format="(p) => `${Math.round(p)}% 完成`"
-    />
+      :format="(p) => `${Math.round(p)}% 完成`" />
     <ul>
       <li v-for="task in tasks" :key="task.id">
         <input type="checkbox" v-model="task.completed" />
@@ -402,8 +405,8 @@ const getStatus = computed(() => {
 #### React
 
 ```tsx
-import { useState, useMemo } from 'react'
-import { Progress } from '@tigercat/react'
+import { useState, useMemo } from 'react';
+import { Progress } from '@tigercat/react';
 
 function TaskProgress() {
   const [tasks, setTasks] = useState([
@@ -412,39 +415,39 @@ function TaskProgress() {
     { id: 3, name: '开发实现', completed: true },
     { id: 4, name: '测试验收', completed: false },
     { id: 5, name: '部署上线', completed: false },
-  ])
-  
+  ]);
+
   const completionRate = useMemo(() => {
-    const completed = tasks.filter(t => t.completed).length
-    return (completed / tasks.length) * 100
-  }, [tasks])
-  
+    const completed = tasks.filter((t) => t.completed).length;
+    return (completed / tasks.length) * 100;
+  }, [tasks]);
+
   const status = useMemo(() => {
-    if (completionRate === 100) return 'success'
-    if (completionRate >= 75) return 'normal'
-    if (completionRate >= 50) return 'paused'
-    return 'exception'
-  }, [completionRate])
-  
+    if (completionRate === 100) return 'success';
+    if (completionRate >= 75) return 'normal';
+    if (completionRate >= 50) return 'paused';
+    return 'exception';
+  }, [completionRate]);
+
   const toggleTask = (id: number) => {
-    setTasks(tasks.map(t => 
-      t.id === id ? { ...t, completed: !t.completed } : t
-    ))
-  }
-  
+    setTasks(
+      tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+    );
+  };
+
   return (
     <div>
       <h3>项目进度</h3>
-      <Progress 
-        percentage={completionRate} 
+      <Progress
+        percentage={completionRate}
         status={status}
         format={(p) => `${Math.round(p)}% 完成`}
       />
       <ul>
-        {tasks.map(task => (
+        {tasks.map((task) => (
           <li key={task.id}>
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               checked={task.completed}
               onChange={() => toggleTask(task.id)}
             />
@@ -453,7 +456,7 @@ function TaskProgress() {
         ))}
       </ul>
     </div>
-  )
+  );
 }
 ```
 
@@ -463,7 +466,7 @@ function TaskProgress() {
 
 ```vue
 <script setup>
-import { Progress } from '@tigercat/vue'
+import { Progress } from '@tigercat/vue';
 </script>
 
 <template>
@@ -472,17 +475,17 @@ import { Progress } from '@tigercat/vue'
       <h4>CPU 使用率</h4>
       <Progress type="circle" :percentage="75" variant="primary" />
     </div>
-    
+
     <div class="metric">
       <h4>内存使用率</h4>
       <Progress type="circle" :percentage="60" variant="success" />
     </div>
-    
+
     <div class="metric">
       <h4>磁盘使用率</h4>
       <Progress type="circle" :percentage="85" status="paused" />
     </div>
-    
+
     <div class="metric">
       <h4>网络带宽</h4>
       <Progress type="circle" :percentage="95" status="exception" />
@@ -506,7 +509,7 @@ import { Progress } from '@tigercat/vue'
 #### React
 
 ```tsx
-import { Progress } from '@tigercat/react'
+import { Progress } from '@tigercat/react';
 
 function Dashboard() {
   return (
@@ -515,23 +518,23 @@ function Dashboard() {
         <h4 className="mb-4">CPU 使用率</h4>
         <Progress type="circle" percentage={75} variant="primary" />
       </div>
-      
+
       <div className="text-center">
         <h4 className="mb-4">内存使用率</h4>
         <Progress type="circle" percentage={60} variant="success" />
       </div>
-      
+
       <div className="text-center">
         <h4 className="mb-4">磁盘使用率</h4>
         <Progress type="circle" percentage={85} status="paused" />
       </div>
-      
+
       <div className="text-center">
         <h4 className="mb-4">网络带宽</h4>
         <Progress type="circle" percentage={95} status="exception" />
       </div>
     </div>
-  )
+  );
 }
 ```
 
@@ -539,22 +542,23 @@ function Dashboard() {
 
 ### Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| variant | 进度条变体 | `'default' \| 'primary' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'primary'` |
-| size | 进度条尺寸 | `'sm' \| 'md' \| 'lg'` | `'md'` |
-| type | 进度条类型（形状） | `'line' \| 'circle'` | `'line'` |
-| percentage | 当前进度百分比（0-100） | `number` | `0` |
-| status | 进度状态（会覆盖 variant 颜色） | `'normal' \| 'success' \| 'exception' \| 'paused'` | `'normal'` |
-| showText | 是否显示进度文本 | `boolean` | 线形默认 `true`，圆形默认 `false` |
-| text | 自定义显示文本（替代百分比） | `string` | - |
-| format | 自定义文本格式化函数 | `(percentage: number) => string` | - |
-| striped | 是否显示条纹（仅线形） | `boolean` | `false` |
-| stripedAnimation | 条纹是否动画（需要 striped 为 true） | `boolean` | `false` |
-| strokeWidth | 圆形进度条线宽（像素） | `number` | `6` |
-| width | 线形进度条宽度 | `string \| number` | `'auto'` |
-| height | 线形进度条高度（像素） | `number` | 根据 size 自动 |
-| className | 自定义 CSS 类名（仅 React） | `string` | - |
+| 属性             | 说明                                 | 类型                                                                     | 默认值                            |
+| ---------------- | ------------------------------------ | ------------------------------------------------------------------------ | --------------------------------- |
+| variant          | 进度条变体                           | `'default' \| 'primary' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'primary'`                       |
+| size             | 进度条尺寸                           | `'sm' \| 'md' \| 'lg'`                                                   | `'md'`                            |
+| type             | 进度条类型（形状）                   | `'line' \| 'circle'`                                                     | `'line'`                          |
+| percentage       | 当前进度百分比（0-100）              | `number`                                                                 | `0`                               |
+| status           | 进度状态（会覆盖 variant 颜色）      | `'normal' \| 'success' \| 'exception' \| 'paused'`                       | `'normal'`                        |
+| showText         | 是否显示进度文本                     | `boolean`                                                                | 线形默认 `true`，圆形默认 `false` |
+| text             | 自定义显示文本（替代百分比）         | `string`                                                                 | -                                 |
+| format           | 自定义文本格式化函数                 | `(percentage: number) => string`                                         | -                                 |
+| striped          | 是否显示条纹（仅线形）               | `boolean`                                                                | `false`                           |
+| stripedAnimation | 条纹是否动画（需要 striped 为 true） | `boolean`                                                                | `false`                           |
+| strokeWidth      | 圆形进度条线宽（像素）               | `number`                                                                 | `6`                               |
+| width            | 线形进度条宽度                       | `string \| number`                                                       | `'auto'`                          |
+| height           | 线形进度条高度（像素）               | `number`                                                                 | 根据 size 自动                    |
+| className        | 自定义 CSS 类名                      | `string`                                                                 | -                                 |
+| style            | 自定义样式                           | Vue：`Record<string, string \| number>` / React：`React.CSSProperties`   | -                                 |
 
 ## 样式定制
 
@@ -565,7 +569,13 @@ Progress 组件使用 Tailwind CSS 类，可以通过 Tailwind 配置自定义�
 ```css
 :root {
   --tiger-primary: #2563eb;
-  --tiger-primary-hover: #1d4ed8;
+  --tiger-success: #16a34a;
+  --tiger-warning: #f59e0b;
+  --tiger-error: #dc2626;
+  --tiger-info: #0ea5e9;
+  --tiger-border: #e5e7eb;
+  --tiger-text: #374151;
+  --tiger-text-muted: #6b7280;
 }
 ```
 
@@ -573,6 +583,7 @@ Progress 组件使用 Tailwind CSS 类，可以通过 Tailwind 配置自定义�
 
 - Progress 使用 `role="progressbar"` 属性提供语义化信息
 - 包含 `aria-valuenow`、`aria-valuemin`、`aria-valuemax` 属性，描述进度值
+- 支持通过组件上传入 `aria-label` / `aria-labelledby` / `aria-describedby`，并会作用在实际的 `progressbar` 元素上
 - 支持屏幕阅读器访问
 
 ## 使用场景
