@@ -12,6 +12,7 @@ import {
   treeNodeChildrenClasses,
   treeLoadingClasses,
   treeEmptyStateClasses,
+  treeLineClasses,
   getAllKeys,
   findNode,
   calculateCheckedState,
@@ -78,7 +79,7 @@ export interface TreeProps {
   treeData?: TreeNode[];
   /**
    * Selection mode
-   * @default 'none'
+   * When provided, it will override selectable/multiple.
    */
   selectionMode?: TreeSelectionMode;
   /**
@@ -223,10 +224,10 @@ export interface TreeProps {
 
 export const Tree: React.FC<TreeProps> = ({
   treeData = [],
-  selectionMode: _selectionMode = 'none',
+  selectionMode,
   checkable = false,
-  showIcon: _showIcon = true,
-  showLine: _showLine = false,
+  showIcon = true,
+  showLine = false,
   defaultExpandedKeys = [],
   defaultSelectedKeys = [],
   defaultCheckedKeys = [],
@@ -252,6 +253,20 @@ export const Tree: React.FC<TreeProps> = ({
   onNodeCollapse,
   className,
 }) => {
+  const effectiveSelectable = useMemo(() => {
+    if (selectionMode !== undefined) {
+      return selectionMode !== 'none';
+    }
+    return selectable;
+  }, [selectionMode, selectable]);
+
+  const effectiveMultiple = useMemo(() => {
+    if (selectionMode !== undefined) {
+      return selectionMode === 'multiple';
+    }
+    return multiple;
+  }, [selectionMode, multiple]);
+
   // Internal state for expanded keys
   const [internalExpandedKeys, setInternalExpandedKeys] = useState<
     Set<string | number>
@@ -278,12 +293,19 @@ export const Tree: React.FC<TreeProps> = ({
   // Internal state for selected keys
   const [internalSelectedKeys, setInternalSelectedKeys] = useState<
     Set<string | number>
-  >(() => new Set(controlledSelectedKeys || defaultSelectedKeys));
+  >(
+    () =>
+      new Set(
+        controlledSelectedKeys !== undefined
+          ? controlledSelectedKeys
+          : defaultSelectedKeys
+      )
+  );
 
   // Internal state for checked keys
   const [internalCheckedState, setInternalCheckedState] =
     useState<TreeCheckedState>(() => {
-      if (controlledCheckedKeys) {
+      if (controlledCheckedKeys !== undefined) {
         if (Array.isArray(controlledCheckedKeys)) {
           return calculateCheckedState(
             treeData,
@@ -428,11 +450,11 @@ export const Tree: React.FC<TreeProps> = ({
   const handleSelect = useCallback(
     (nodeKey: string | number, event: React.MouseEvent) => {
       const node = findNode(treeData, nodeKey);
-      if (!node || node.disabled || !selectable) return;
+      if (!node || node.disabled || !effectiveSelectable) return;
 
       const newSelectedKeys = new Set(computedSelectedKeys);
 
-      if (multiple) {
+      if (effectiveMultiple) {
         if (newSelectedKeys.has(nodeKey)) {
           newSelectedKeys.delete(nodeKey);
         } else {
@@ -460,8 +482,8 @@ export const Tree: React.FC<TreeProps> = ({
     [
       treeData,
       computedSelectedKeys,
-      selectable,
-      multiple,
+      effectiveSelectable,
+      effectiveMultiple,
       controlledSelectedKeys,
       onSelect,
     ]
@@ -578,16 +600,16 @@ export const Tree: React.FC<TreeProps> = ({
                 }
               }}
               disabled={node.disabled}
-              aria-label={`Select ${node.label}`}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
               onChange={(e) => {
                 handleCheck(node.key, e.target.checked);
               }}
             />
           )}
 
-          {/* Icon (if provided) */}
-          {node.icon && (
+          {showIcon && node.icon && (
             <span className={treeNodeIconClasses}>
               {node.icon as React.ReactNode}
             </span>
@@ -620,7 +642,7 @@ export const Tree: React.FC<TreeProps> = ({
             )}
             onClick={(e) => {
               handleNodeClickInternal(node, e);
-              if (selectable && !node.disabled) {
+              if (effectiveSelectable && !node.disabled) {
                 handleSelect(node.key, e);
               }
             }}>
@@ -629,7 +651,11 @@ export const Tree: React.FC<TreeProps> = ({
 
           {/* Children */}
           {hasChildren && isExpanded && (
-            <div className={treeNodeChildrenClasses}>
+            <div
+              className={classNames(
+                treeNodeChildrenClasses,
+                showLine && treeLineClasses
+              )}>
               {node.children!.map((child) =>
                 renderTreeNode(child, level + 1, node.key)
               )}
@@ -647,7 +673,9 @@ export const Tree: React.FC<TreeProps> = ({
       loadData,
       checkable,
       blockNode,
-      selectable,
+      effectiveSelectable,
+      showIcon,
+      showLine,
       handleExpand,
       handleCheck,
       handleSelect,

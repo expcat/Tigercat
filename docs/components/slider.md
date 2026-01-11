@@ -8,10 +8,10 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Slider } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Slider } from '@tigercat/vue';
 
-const value = ref(50)
+const value = ref(50);
 </script>
 
 <template>
@@ -22,13 +22,13 @@ const value = ref(50)
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Slider } from '@tigercat/react'
+import { useState } from 'react';
+import { Slider } from '@tigercat/react';
 
 function App() {
-  const [value, setValue] = useState(50)
-  
-  return <Slider value={value} onChange={setValue} />
+  const [value, setValue] = useState(50);
+
+  return <Slider value={value} onChange={setValue} />;
 }
 ```
 
@@ -40,10 +40,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Slider } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Slider } from '@tigercat/vue';
 
-const rangeValue = ref([20, 80])
+const rangeValue = ref([20, 80]);
 </script>
 
 <template>
@@ -54,13 +54,13 @@ const rangeValue = ref([20, 80])
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Slider } from '@tigercat/react'
+import { useState } from 'react';
+import { Slider } from '@tigercat/react';
 
 function App() {
-  const [rangeValue, setRangeValue] = useState([20, 80])
-  
-  return <Slider value={rangeValue} onChange={setRangeValue} range />
+  const [rangeValue, setRangeValue] = useState([20, 80]);
+
+  return <Slider value={rangeValue} onChange={setRangeValue} range />;
 }
 ```
 
@@ -136,23 +136,29 @@ Slider 组件支持 3 种不同的尺寸：
 <template>
   <!-- 简单标记 -->
   <Slider :marks="true" />
-  
+
   <!-- 自定义标记 -->
-  <Slider :marks="{ 0: '0°C', 25: '25°C', 50: '50°C', 75: '75°C', 100: '100°C' }" :default-value="25" />
+  <Slider
+    :marks="{ 0: '0°C', 25: '25°C', 50: '50°C', 75: '75°C', 100: '100°C' }"
+    :default-value="25" />
 </template>
 ```
 
 ### React
 
 ```tsx
-{/* 简单标记 */}
-<Slider marks />
+{
+  /* 简单标记 */
+}
+<Slider marks />;
 
-{/* 自定义标记 */}
-<Slider 
+{
+  /* 自定义标记 */
+}
+<Slider
   marks={{ 0: '0°C', 25: '25°C', 50: '50°C', 75: '75°C', 100: '100°C' }}
   defaultValue={25}
-/>
+/>;
 ```
 
 ## 工具提示
@@ -179,11 +185,11 @@ Slider 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Slider } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Slider } from '@tigercat/vue';
 
 // 受控组件
-const value = ref(50)
+const value = ref(50);
 
 // 非受控组件
 </script>
@@ -191,7 +197,7 @@ const value = ref(50)
 <template>
   <!-- 受控 -->
   <Slider v-model:value="value" />
-  
+
   <!-- 非受控 -->
   <Slider :default-value="50" @change="handleChange" />
 </template>
@@ -200,22 +206,22 @@ const value = ref(50)
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Slider } from '@tigercat/react'
+import { useState } from 'react';
+import { Slider } from '@tigercat/react';
 
 function App() {
   // 受控组件
-  const [value, setValue] = useState(50)
-  
+  const [value, setValue] = useState(50);
+
   return (
     <>
       {/* 受控 */}
       <Slider value={value} onChange={setValue} />
-      
+
       {/* 非受控 */}
       <Slider defaultValue={50} onChange={(val) => console.log(val)} />
     </>
-  )
+  );
 }
 ```
 
@@ -223,32 +229,33 @@ function App() {
 
 ### Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 | 可选值 |
-|------|------|------|--------|--------|
-| value | 当前值（受控） | `number \| [number, number]` | - | - |
-| defaultValue | 默认值（非受控） | `number \| [number, number]` | `0` (单值) / `[min, max]` (范围) | - |
-| min | 最小值 | `number` | `0` | - |
-| max | 最大值 | `number` | `100` | - |
-| step | 步进值 | `number` | `1` | - |
-| disabled | 是否禁用 | `boolean` | `false` | `true` \| `false` |
-| marks | 刻度标记 | `boolean \| Record<number, string>` | `false` | - |
-| tooltip | 是否显示提示 | `boolean` | `true` | `true` \| `false` |
-| size | 滑块尺寸 | `SliderSize` | `'md'` | `'sm'` \| `'md'` \| `'lg'` |
-| range | 是否为范围选择 | `boolean` | `false` | `true` \| `false` |
+| 属性         | 说明             | 类型                                                      | 默认值                           | 可选值                     |
+| ------------ | ---------------- | --------------------------------------------------------- | -------------------------------- | -------------------------- |
+| value        | 当前值（受控）   | `number \| [number, number]`                              | -                                | -                          |
+| defaultValue | 默认值（非受控） | `number \| [number, number]`                              | `0` (单值) / `[min, max]` (范围) | -                          |
+| min          | 最小值           | `number`                                                  | `0`                              | -                          |
+| max          | 最大值           | `number`                                                  | `100`                            | -                          |
+| step         | 步进值           | `number`                                                  | `1`                              | -                          |
+| disabled     | 是否禁用         | `boolean`                                                 | `false`                          | `true` \| `false`          |
+| marks        | 刻度标记         | `boolean \| Record<number, string>`                       | `false`                          | -                          |
+| tooltip      | 是否显示提示     | `boolean`                                                 | `true`                           | `true` \| `false`          |
+| size         | 滑块尺寸         | `SliderSize`                                              | `'md'`                           | `'sm'` \| `'md'` \| `'lg'` |
+| range        | 是否为范围选择   | `boolean`                                                 | `false`                          | `true` \| `false`          |
+| className    | 额外 CSS 类名    | `string`                                                  | -                                | -                          |
+| style        | 自定义样式       | `Record<string, string \| number> \| React.CSSProperties` | -                                | -                          |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| onChange | 值变化时的回调 | `(value: number \| [number, number]) => void` | - |
-| className | 额外的 CSS 类名 | `string` | - |
+| 属性     | 说明           | 类型                                          | 默认值 |
+| -------- | -------------- | --------------------------------------------- | ------ |
+| onChange | 值变化时的回调 | `(value: number \| [number, number]) => void` | -      |
 
 ### Events / 事件 (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
+| 事件名       | 说明         | 回调参数                              |
+| ------------ | ------------ | ------------------------------------- |
 | update:value | 值变化时触发 | `(value: number \| [number, number])` |
-| change | 值变化时触发 | `(value: number \| [number, number])` |
+| change       | 值变化时触发 | `(value: number \| [number, number])` |
 
 ## 样式定制
 
@@ -262,23 +269,33 @@ Slider 组件使用与 Button 相同的主题颜色系统：
 :root {
   --tiger-primary: #2563eb;
   --tiger-primary-hover: #1d4ed8;
+
+  /* Slider/通用表面与边框 */
+  --tiger-border: #e5e7eb;
+  --tiger-surface: #ffffff;
+  --tiger-text: #111827;
+  --tiger-text-muted: #6b7280;
 }
 
 /* 自定义主题 */
 .custom-theme {
   --tiger-primary: #10b981;
   --tiger-primary-hover: #059669;
+
+  --tiger-border: #34d399;
 }
 ```
 
 查看完整的主题配置文档：[主题配置指南](../theme.md)
 
-### React 额外样式
+### 额外样式
 
-React 版本的 Slider 组件支持 `className` 属性：
+Vue/React 版本的 Slider 组件都支持 `className` 与 `style`：
 
 ```tsx
 <Slider className="my-4" defaultValue={50} />
+
+<Slider style={{ marginTop: 16 }} defaultValue={50} />
 ```
 
 ## 键盘导航
@@ -294,6 +311,8 @@ Slider 组件支持键盘导航：
 
 - 使用 ARIA 属性 `role="slider"` 标识滑块
 - 提供 `aria-valuenow`、`aria-valuemin`、`aria-valuemax` 属性
+- 可通过 `aria-label` / `aria-labelledby` / `aria-describedby` 提供可访问名称与说明
+- `range` 模式下，若传入 `aria-label` 会自动为两个滑块追加 `(min)` / `(max)` 后缀；未提供标签时会提供默认的 `Minimum value` / `Maximum value`
 - 支持键盘导航
 - 禁用状态下会设置 `aria-disabled` 属性
 - 使用 `focus:ring` 提供清晰的焦点指示器
@@ -303,11 +322,11 @@ Slider 组件支持键盘导航：
 Slider 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { SliderProps, SliderSize } from '@tigercat/core'
+import type { SliderProps, SliderSize } from '@tigercat/core';
 // Vue
-import type { Slider } from '@tigercat/vue'
+import type { Slider, VueSliderProps } from '@tigercat/vue';
 // React
-import type { Slider, SliderProps as ReactSliderProps } from '@tigercat/react'
+import type { Slider, SliderProps as ReactSliderProps } from '@tigercat/react';
 ```
 
 ## 示例
@@ -318,10 +337,10 @@ import type { Slider, SliderProps as ReactSliderProps } from '@tigercat/react'
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Slider } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Slider } from '@tigercat/vue';
 
-const temperature = ref(22)
+const temperature = ref(22);
 </script>
 
 <template>
@@ -337,9 +356,8 @@ const temperature = ref(22)
         20: '20°C',
         24: '24°C',
         28: '28°C',
-        30: '30°C'
-      }"
-    />
+        30: '30°C',
+      }" />
   </div>
 </template>
 ```
@@ -347,12 +365,12 @@ const temperature = ref(22)
 #### React
 
 ```tsx
-import { useState } from 'react'
-import { Slider } from '@tigercat/react'
+import { useState } from 'react';
+import { Slider } from '@tigercat/react';
 
 function TemperatureControl() {
-  const [temperature, setTemperature] = useState(22)
-  
+  const [temperature, setTemperature] = useState(22);
+
   return (
     <div>
       <h3>室内温度：{temperature}°C</h3>
@@ -367,11 +385,11 @@ function TemperatureControl() {
           20: '20°C',
           24: '24°C',
           28: '28°C',
-          30: '30°C'
+          30: '30°C',
         }}
       />
     </div>
-  )
+  );
 }
 ```
 
@@ -381,10 +399,10 @@ function TemperatureControl() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Slider } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Slider } from '@tigercat/vue';
 
-const priceRange = ref([200, 800])
+const priceRange = ref([200, 800]);
 </script>
 
 <template>
@@ -399,9 +417,8 @@ const priceRange = ref([200, 800])
       :marks="{
         0: '¥0',
         500: '¥500',
-        1000: '¥1000'
-      }"
-    />
+        1000: '¥1000',
+      }" />
   </div>
 </template>
 ```
@@ -409,15 +426,17 @@ const priceRange = ref([200, 800])
 #### React
 
 ```tsx
-import { useState } from 'react'
-import { Slider } from '@tigercat/react'
+import { useState } from 'react';
+import { Slider } from '@tigercat/react';
 
 function PriceRangeSelector() {
-  const [priceRange, setPriceRange] = useState<[number, number]>([200, 800])
-  
+  const [priceRange, setPriceRange] = useState<[number, number]>([200, 800]);
+
   return (
     <div>
-      <h3>价格区间：¥{priceRange[0]} - ¥{priceRange[1]}</h3>
+      <h3>
+        价格区间：¥{priceRange[0]} - ¥{priceRange[1]}
+      </h3>
       <Slider
         value={priceRange}
         onChange={setPriceRange}
@@ -428,11 +447,11 @@ function PriceRangeSelector() {
         marks={{
           0: '¥0',
           500: '¥500',
-          1000: '¥1000'
+          1000: '¥1000',
         }}
       />
     </div>
-  )
+  );
 }
 ```
 
@@ -442,10 +461,10 @@ function PriceRangeSelector() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Slider } from '@tigercat/vue'
+import { ref } from 'vue';
+import { Slider } from '@tigercat/vue';
 
-const volume = ref(50)
+const volume = ref(50);
 </script>
 
 <template>
@@ -461,19 +480,25 @@ const volume = ref(50)
 #### React
 
 ```tsx
-import { useState } from 'react'
-import { Slider } from '@tigercat/react'
+import { useState } from 'react';
+import { Slider } from '@tigercat/react';
 
 function VolumeControl() {
-  const [volume, setVolume] = useState(50)
-  
+  const [volume, setVolume] = useState(50);
+
   return (
     <div className="flex items-center gap-4">
       <span>🔇</span>
-      <Slider value={volume} onChange={setVolume} min={0} max={100} className="flex-1" />
+      <Slider
+        value={volume}
+        onChange={setVolume}
+        min={0}
+        max={100}
+        className="flex-1"
+      />
       <span>🔊</span>
       <span className="w-12">{volume}%</span>
     </div>
-  )
+  );
 }
 ```

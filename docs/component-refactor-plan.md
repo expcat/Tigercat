@@ -6,6 +6,20 @@
 
 ---
 
+## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
+
+- 上一步：✅ `Slider` Step1 API/主题/a11y 基线对齐（2026-01-12）
+- 当前组件：`待定`
+- 当前步骤：等待下一条指令
+- 状态：`not-started`
+- 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
+- 完成后要做的事：
+  - 更新本区块为下一步任务
+  - 在对应组件小节追加一条“状态：✅ StepX ...（YYYY-MM-DD）”记录
+  - 然后停下来等待下一条指令
+
+---
+
 ## 1. 总体原则（“强大脑”决策规则）
 
 1. **先对齐模式再动手**：每次重构前先对照同类组件（Button/Input/Form）现有写法，保持一致。
@@ -104,44 +118,54 @@
 
 - 思路：统一 aria-hidden/aria-label 约定；可选 size/color props 与 CSS vars。
 - 可拆分：a11y 约定 → 类型收敛 → docs 示例。
+- 状态：✅ Step1 a11y/类型/实现一致性（2026-01-11）：Vue/React Icon 统一用容器元素承载尺寸与 a11y（默认 decorative `aria-hidden`，提供 `aria-label` 时自动 `role="img"`）；支持 attrs/原生属性透传；SVG/第三方图标子节点统一 `w-full h-full` 随容器缩放；同步更新 Vue/React 单测与文档。
 
 #### Link（P2，建议优化）
 
 - 思路：disabled 行为（阻止导航/aria-disabled）；外链 rel="noreferrer" 安全默认值。
 - 可拆分：API/默认值 → a11y → tests。
+- 状态：✅ Step1 API/默认值对齐（2026-01-11）：Vue 版补齐 attrs 透传与 class 合并；Vue/React 在 `target="_blank"` 时会合并补齐 `rel` 的 `noopener noreferrer`（即使传了自定义 rel）；同步更新 Vue/React Link 单测与文档说明。
 
 #### Text（P3，无需优化）
 
 - 例行检查：语义标签选择、颜色主题变量、docs 一致性。
+- 状态：✅ 已例行检查（2026-01-11）：Vue 版支持 attrs 透传与 class 合并；Text 颜色改为 CSS vars（带 fallback：`--tiger-text`/`--tiger-text-muted`/`--tiger-success`/`--tiger-warning`/`--tiger-danger`）；补充 Vue 单测覆盖 attrs 透传。
 
 #### Badge（P3，无需优化）
 
 - 例行检查：颜色使用 CSS vars、尺寸/variant 一致。
+- 状态：✅ 已例行检查（2026-01-11）：Badge 默认 variant 配色改为 CSS vars（带 fallback：`--tiger-secondary`/`--tiger-primary`/`--tiger-success`/`--tiger-warning`/`--tiger-danger`/`--tiger-info`）；同步更新 Vue/React 快照测试。
 
 #### Tag（P3，无需优化）
 
 - 例行检查：可关闭 tag（若支持）应有按钮语义与 aria-label。
+- 状态：✅ 已例行检查（2026-01-11）：Tag 变体配色改为 CSS vars（含 fallback，支持 `--tiger-tag-*-bg/text/border/close-hover-bg`）；Vue 版补齐 attrs 透传与 class 合并；React 关闭图标补 `aria-hidden`；同步更新 Tag 快照测试。
 
 #### Avatar（P2，建议优化）
 
 - 思路：img 的 alt/fallback；加载失败占位；可选 shape/size 统一。
 - 可拆分：a11y/alt → fallback 逻辑抽到 core utils → tests。
+- 状态：✅ Step1 a11y/alt/fallback 基线对齐（2026-01-11）：默认无可访问名称时视为装饰元素（`aria-hidden`）；提供 `alt`/`text`/`aria-label` 时自动 `role="img"` 并使用其作为读屏名称；图片加载失败后回退到 text/slot；`src` 变更会重置错误状态；同步更新 Vue/React 单测与 Avatar 文档。
 
 #### Card（P3，无需优化）
 
 - 例行检查：header/footer slot/children 行为与 docs 对齐。
+- 状态：✅ 已例行检查（2026-01-11）：Card 边框/背景颜色改为 CSS vars（带 fallback：`--tiger-border`/`--tiger-border-strong`/`--tiger-card-bg`）；Vue 版补齐 attrs 透传与 class 合并；同步更新 Vue/React 快照测试并补充 Vue attrs 单测。
 
 #### Container（P3，无需优化）
 
 - 例行检查：响应式 class 与 docs 对齐。
+- 状态：✅ 已例行检查（2026-01-11）：Vue/React props 与文档一致（`maxWidth`/`center`/`padding`）；Vue 支持 attrs 透传与 `class` 合并（string/array/object）；Vue/React 单测覆盖默认行为与快照。
 
 #### Divider（P3，无需优化）
 
 - 例行检查：role="separator"/aria-orientation（如果是语义分隔）。
+- 状态：✅ 已例行检查（2026-01-10）：默认颜色改为 `--tiger-border`（带 fallback），a11y role/aria 维持不变。
 
 #### Space（P3，无需优化）
 
 - 例行检查：间距/方向 props 与 docs 对齐。
+- 状态：✅ 已例行检查（2026-01-10）：修正测试用例的 size 范围与文档一致（sm/md/lg/number），并在 core 对非法 size 做了运行时回退。
 
 ### B. 布局（Layout）
 
@@ -178,18 +202,27 @@
 
 - 思路：键盘导航（上下/回车/esc）、aria-combobox/listbox；多选展示与清除；点击外部关闭；搜索输入焦点管理。
 - 可拆分：
+
   1. API/类型对齐（value 类型、option group 类型）
   2. 键盘/aria/focus
   3. 视觉与主题（状态色全部 CSS vars）
   4. tests（键盘 + 选中 + 清空 + 搜索）
 
+- 状态：✅ Step1 API/类型对齐（2026-01-11）：修正 `@tigercat/core` 的 `SelectOptions` 为 `(SelectOption | SelectOptionGroup)[]`（支持 option 与 group 混合数组），并同步 Vue 组件 props 与文档类型说明。
+- 状态：✅ Step2 键盘/ARIA/focus（2026-01-11）：补齐 Vue/React 的 `combobox/listbox/option` 语义与 `aria-activedescendant`；支持 `↑/↓/Enter/Escape/Home/End` 键盘导航与选择（跳过 disabled）；Esc 关闭并回焦触发器；增加 active option 高亮与滚动可见。
+- 状态：✅ Step3 视觉与主题（2026-01-11）：Select 样式从 Tailwind 固定色收敛到 CSS vars（带 fallback），覆盖 trigger/dropdown/group/search/empty/disabled 等；Vue 版图标与 placeholder 文案颜色同步改为 CSS vars。
+
 #### Switch（P2，建议优化）
 
 - 思路：role="switch" + aria-checked；禁用/加载（若有）统一。
 
+- 状态：✅ Step1 a11y/主题/API 基线对齐（2026-01-12）：Switch 默认配色收敛到 CSS vars（off 使用 `--tiger-border`，thumb 使用 `--tiger-surface`）；Vue 增加 `className/style` 与 attrs 透传并合并 `class/style`，且不会被外部 `@click/@keydown` 覆盖内部切换逻辑；React 支持 `button` 原生属性透传并避免 `{...props}` 覆盖内部 `onClick/onKeyDown`；同步更新 Vue/React 快照与 Switch 文档。
+
 #### Slider（P1，建议优化）
 
 - 思路：键盘操作（左右/上下/Home/End）；aria-valuemin/max/now；范围 slider（如支持）。
+
+- 状态：✅ Step1 API/主题/a11y 基线对齐（2026-01-12）：Slider 默认颜色从 Tailwind 固定色收敛到 CSS vars（含 fallback：`--tiger-border/--tiger-surface/--tiger-text/--tiger-text-muted`）；Vue/React 支持 `aria-label/aria-labelledby/aria-describedby` 传给 thumb 并补齐 `aria-orientation`；Vue 增加 `className/style` props 且导出 `VueSliderProps`；React 支持 `div` 原生属性透传并避免覆盖内部 `value/defaultValue/onChange`；同步更新 Slider 文档与快照。
 
 #### Form / FormItem（P0，建议优化）
 
@@ -199,6 +232,7 @@
   - 错误展示：aria-describedby 指向 error 文本
   - 状态一致：submit 时 errors 使用最新结果（避免闭包旧值）
 - 可拆分：API/校验路径收敛 → a11y → tests。
+- 状态：✅ Step1 API/校验路径收敛（2026-01-11）：Vue/React Form 移除动态 `import('@tigercat/core')`（`validateField` 改静态依赖）；React 提交时使用最新校验结果（避免 `errors` 闭包旧值）；补齐 Vue/React 提交事件测试覆盖。
 
 ### D. 导航（Navigation）
 
@@ -206,10 +240,12 @@
 
 - 思路：键盘导航（上下/左右/Enter/Esc）；aria-menu/menuitem；openKeys/selectedKeys 受控/非受控一致；collapsed 模式。
 - 可拆分：受控模型与事件语义 → 键盘/a11y → 子组件联动 → tests。
+- 状态：✅ Step1 API/类型对齐（2026-01-11）：Vue 版 Menu 系列补齐 attrs 透传与 class 合并；MenuItem/SubMenu/MenuItemGroup 支持 `className`；修复 Menu provide 的 selected/open keys 响应式问题（点击选中样式可更新）；补充 Vue 回归测试覆盖。
 
 #### Tabs / TabPane（P0，建议优化）
 
 - 思路：roving tabindex、aria-controls/aria-labelledby；键盘左右切换；受控/默认值。
+- 状态：✅ Step1 API/类型对齐（2026-01-11）：Vue 版补齐 `Tabs`/`TabPane` 的 `style` prop 并透传到根容器/面板（与 React 与文档对齐）；补充 Vue 单测覆盖 `style` 透传。
 
 #### Breadcrumb / BreadcrumbItem（P2，建议优化）
 
@@ -222,11 +258,13 @@
 #### Pagination（P1，建议优化）
 
 - 思路：aria-label（上一页/下一页）；pageSize changer；受控/非受控。
+- 状态：✅ Step1 API/类型对齐（2026-01-11）：Vue 版 Pagination 补齐 `style` prop，并修复 attrs 透传时 `class/style` 覆盖问题（改为合并）；同步修正文档中 React `onChange` 示例用法；补充 Vue 回归测试覆盖 `class/style` 透传。
 
 #### Dropdown / DropdownMenu / DropdownItem（P1，建议优化）
 
 - 思路：overlay 行为（click-outside/esc）、focus 管理、aria-menu；定位（如需 portal）。
 - 可拆分：overlay 行为基建 → a11y → tests。
+- 状态：✅ Step1 API/类型对齐（2026-01-11）：Vue 版 Dropdown/DropdownMenu 增加 `style` prop 并与 `attrs.style` 合并；Dropdown/DropdownMenu/DropdownItem 统一 `attrs` 透传与 `class` 合并；React 版 Dropdown/DropdownMenu 修正 `style` 类型为 `React.CSSProperties`（覆盖 core 的跨框架类型）。
 
 ### E. 数据展示（Data Display）
 
@@ -237,6 +275,8 @@
   - a11y：表头排序 aria-sort；空态/加载语义
   - 性能：大数据时可选虚拟滚动/减少重渲染（后置）
 - 可拆分：状态模型/API → a11y → 性能与扩展（可选）→ tests。
+
+- 状态：✅ Step1 API/类型对齐（2026-01-11）：Vue Table 补齐 `className` + `attrs`（`class/style`）透传与合并，并导出 `VueTableProps`；Table 文档补齐 `className` 属性；补充 Vue 回归测试覆盖类名合并。
 
 #### List（P2，建议优化）
 
@@ -254,53 +294,70 @@
 
 - 思路：aria-tree/treeitem；键盘展开/选择；受控状态（expandedKeys/selectedKeys）。
 
+- 状态：✅ Step1 API/类型对齐（2026-01-11）：修复 `selectionMode/showIcon/showLine` 在 Vue/React 中“声明了但未生效”的问题；修正受控空数组的优先级（`selectedKeys/checkedKeys`）与 Vue `defaultExpandAll` 初始化；Vue 版补齐 `className` + attrs（`class/style`）透传与合并并导出 `VueTreeProps`；同步更新 Tree 文档与 Vue/React 单测。
+
 #### Progress（P2，建议优化）
 
 - 思路：role="progressbar" + aria-valuenow/min/max；颜色主题变量。
+- 状态：✅ Step1 a11y/主题对齐（2026-01-11）：Progress 颜色/track 从 Tailwind 固定色收敛到 CSS vars（含 fallback：`--tiger-border/secondary/primary/success/warning/danger/info`）；Vue/React 支持通过 `aria-label/aria-labelledby/aria-describedby/aria-valuetext` 覆盖默认读屏文案；圆形进度条将 progressbar 语义挂到 `svg`；同步更新单测快照。
 
 #### Skeleton（P3，无需优化）
 
 - 例行检查：aria-busy/aria-live（如有）；避免影响布局。
+- 状态：✅ Step1 例行检查（2026-01-11）：默认样式从 Tailwind 固定灰色收敛到 CSS vars（含 fallback，新增 `--tiger-skeleton-bg/--tiger-skeleton-bg-strong`）；Vue/React 统一支持原生属性/attrs 透传与 style 合并；Skeleton 默认 `aria-hidden` 避免读屏噪音；同步更新 Vue/React 单测与快照，并补充文档 a11y/主题说明。
 
 ### F. 反馈（Feedback）
 
 #### Alert（P2，建议优化）
 
 - 思路：role="alert"/"status"；可关闭按钮 aria-label；主题色。
+- 状态：✅ Step1 a11y/主题对齐（2026-01-11）：Alert 默认按类型使用 `status/alert`（并设置 `aria-live` + `aria-atomic`）；默认配色从 Tailwind 固定色收敛到 CSS vars（带 fallback）；Vue 增加 `className/style` + `attrs` 透传并合并 `class/style`；React props 扩展为 `HTMLAttributes` 以支持 `aria-*` 等原生属性；同步更新单测与快照。
 
 #### Message（P1，建议优化）
 
 - 思路：全局容器的 portal/stack；aria-live；自动关闭与可暂停（hover）。
+- 状态：✅ Step1 a11y/主题对齐（2026-01-11）：Message 默认按类型使用 `status/alert`（并设置 `aria-live` + `aria-atomic`）；默认配色与关闭按钮 hover/focus 从 Tailwind 固定色收敛到 CSS vars（带 fallback）；Vue/React 图标补 `aria-hidden`；同步更新 Vue/React 单测覆盖。
 
 #### Notification（P1，建议优化）
 
 - 思路：与 Message 类似，增加位置/堆叠策略一致；a11y。
+- 状态：✅ Step1 a11y/主题对齐（2026-01-11）：Notification 按类型使用 `status/alert`（并设置 `aria-live` + `aria-atomic`）；图标补 `aria-hidden` + `focusable=false`；默认配色/背景/关闭按钮 hover/focus 从 Tailwind 固定色收敛到 CSS vars（带 fallback）；Vue 关闭按钮点击阻止冒泡（避免误触 `onClick`）；同步更新 Vue/React 单测与文档说明。
 
 #### Loading（P2，建议优化）
 
 - 思路：aria-busy；覆盖层的可聚焦性与 scroll lock（如是全屏）。
+- 状态：✅ Step1 a11y/主题对齐（2026-01-11）：Loading 颜色从 Tailwind 固定色收敛到 CSS vars（含 fallback：`--tiger-primary/secondary/success/warning/danger/info/text-muted`）；默认全屏背景改为 `--tiger-surface`（带 fallback）；Vue 增加 `style` prop 并补齐 `attrs` 透传与 `class/style` 合并；React 合并 `style`（避免覆盖全屏背景/自定义色），并补齐 `aria-busy` 与装饰元素 `aria-hidden`；同步更新 Vue/React 单测覆盖。
 
 ### G. 弹层（Overlay）
 
 #### Modal（P0，建议优化）
 
 - 思路：focus trap、ESC 关闭、点击遮罩关闭可配；aria-modal/role="dialog"；scroll lock。
+- 状态：✅ Step1 API/类型对齐（2026-01-11）：修复 React 版 `onClose` 在初始挂载时误触发；补齐 Vue/React 的 footer actions（`ok/cancel/close`）以让 `ok/cancel` API 可用；同步更新 Modal 文档与单测。
+- 状态：✅ Step2 交互/a11y（2026-01-11）：新增 focus trap（Tab 焦点不逃逸）、`Escape` 关闭、打开后初始聚焦与关闭后回焦触发元素；同步补齐 Vue/React 回归测试。
 
 #### Drawer（P0，建议优化）
 
 - 思路：同 Modal，补从侧边进入的焦点与 aria。
+- 状态：✅ Step1 API/类型对齐（2026-01-11）：Vue/React 统一 `aria-labelledby` 行为（title/header 均可作为可访问性标签来源），并修复 Vue `aria-labelledby` 指向缺失 id 的问题；补齐对应回归测试。
+- 状态：✅ Step2 交互/a11y（2026-01-11）：新增 focus trap（Tab 焦点不逃逸）、`Escape` 关闭、打开后初始聚焦与关闭后回焦触发元素；同步补齐 Vue/React 回归测试。
 
 #### Popover（P1，建议优化）
 
 - 思路：触发方式（hover/click/focus）；定位；aria-describedby。
+- 状态：✅ Step1 API/类型对齐（2026-01-11）：Vue/React 补齐 `style` 支持；Vue 增加 `attrs` 透传并合并 `class/style`；同步更新 Popover 文档与回归测试。
 
 #### Tooltip（P1，建议优化）
 
 - 思路：aria-describedby + 延时；hover/focus 一致。
 
+- 状态：✅ Step1 a11y/API 对齐（2026-01-11）：Vue 修复 `visible` 受控检测（避免 Boolean prop 缺省被当作 `false`）、focus trigger 改为 `focusin/focusout`；Vue/React 增加 `role="tooltip"` 与触发器 `aria-describedby` 关联，支持 `Escape` 关闭；补齐 `style` 与 `attrs`/`class` 合并；同步更新 Tooltip 单测与快照。
+
 #### Popconfirm（P1，建议优化）
 
 - 思路：确认/取消按钮语义；键盘可用；与 Popover/Tooltip 复用 overlay 基建。
+
+- 状态：✅ Step1 a11y/API 对齐（2026-01-11）：Vue/React 增加 `style` 支持；Vue 增加 `attrs` 透传并合并 `class/style`；Vue 修复 description slot 无 prop 时不渲染；Vue/React 增加 `role="alertdialog"` 与 `aria-labelledby/aria-describedby`、trigger `aria-controls/aria-expanded` 关联，支持 `Escape` 关闭与基础 focus 管理；Popconfirm 样式从 Tailwind 固定色收敛到 CSS vars（含 fallback：`--tiger-surface/--tiger-border/--tiger-text/--tiger-text-muted/--tiger-muted-bg/--tiger-danger`）。
 
 ### H. 日期/时间/上传（Complex Inputs）
 
@@ -313,9 +370,13 @@
   - i18n：labels/月份/星期统一入口
 - 可拆分：API/类型 → i18n 文案注入 → a11y/键盘 → tests。
 
+- 状态：✅ Step1 API/类型对齐（2026-01-11）：文档补齐 `range` 与正确的 value/defaultValue/onChange 类型；Vue DatePicker 增加 `className` + attrs 透传并导出 `VueDatePickerProps`；React 导出 `ReactDatePickerProps` 供 TS 使用。
+
 #### TimePicker（P0/P1，建议优化）
 
 - 思路：键盘/aria；范围（若支持）；解析/格式化逻辑下沉 core。
+
+- 状态：✅ Step1 API/类型对齐（2026-01-11）：Vue TimePicker 增加 `className/style` 并补齐 `attrs` 透传与 `class/style` 合并，导出 `VueTimePickerProps`/`VueTimePickerModelValue`；React TimePickerProps 支持 `div` 原生属性透传（`aria-*`/`data-*`/`style` 等）且避免与 `onChange/value/defaultValue` 冲突；同步更新 TimePicker 文档与回归测试。
 
 #### Upload（P0/P1，建议优化）
 

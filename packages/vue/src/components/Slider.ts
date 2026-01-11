@@ -9,6 +9,7 @@ import {
   PropType,
 } from 'vue';
 import {
+  classNames,
   type SliderSize,
   sliderBaseClasses,
   sliderRangeClasses,
@@ -16,6 +17,21 @@ import {
   getSliderThumbClasses,
   getSliderTooltipClasses,
 } from '@tigercat/core';
+
+export interface VueSliderProps {
+  value?: number | [number, number];
+  defaultValue?: number | [number, number];
+  min?: number;
+  max?: number;
+  step?: number;
+  disabled?: boolean;
+  marks?: boolean | Record<number, string>;
+  tooltip?: boolean;
+  size?: SliderSize;
+  range?: boolean;
+  className?: string;
+  style?: Record<string, string | number>;
+}
 
 export const Slider = defineComponent({
   name: 'TigerSlider',
@@ -95,6 +111,22 @@ export const Slider = defineComponent({
     range: {
       type: Boolean,
       default: false,
+    },
+
+    /**
+     * Additional CSS classes
+     */
+    className: {
+      type: String,
+      default: undefined,
+    },
+
+    /**
+     * Custom styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined,
     },
   },
   emits: {
@@ -280,6 +312,21 @@ export const Slider = defineComponent({
     });
 
     return () => {
+      const ariaLabel = (attrs as Record<string, unknown>)['aria-label'];
+      const ariaLabelledby = (attrs as Record<string, unknown>)[
+        'aria-labelledby'
+      ];
+      const ariaDescribedby = (attrs as Record<string, unknown>)[
+        'aria-describedby'
+      ];
+
+      const attrsWithoutClassStyle: Record<string, unknown> = { ...attrs };
+      const attrsClass = (attrsWithoutClassStyle as { class?: unknown }).class;
+      const attrsStyle = (attrsWithoutClassStyle as { style?: unknown }).style;
+
+      delete (attrsWithoutClassStyle as { class?: unknown }).class;
+      delete (attrsWithoutClassStyle as { style?: unknown }).style;
+
       // Create thumbs
       const createThumb = (
         value: number,
@@ -289,6 +336,17 @@ export const Slider = defineComponent({
         const showThumbTooltip =
           showTooltip.value &&
           (thumbType === activeThumb.value || thumbType === null);
+
+        let resolvedAriaLabel: unknown = ariaLabel;
+        if (props.range) {
+          if (typeof ariaLabel === 'string') {
+            if (thumbType === 'min') resolvedAriaLabel = `${ariaLabel} (min)`;
+            if (thumbType === 'max') resolvedAriaLabel = `${ariaLabel} (max)`;
+          } else if (!ariaLabel && !ariaLabelledby) {
+            if (thumbType === 'min') resolvedAriaLabel = 'Minimum value';
+            if (thumbType === 'max') resolvedAriaLabel = 'Maximum value';
+          }
+        }
 
         return h(
           'div',
@@ -300,7 +358,11 @@ export const Slider = defineComponent({
             'aria-valuenow': value,
             'aria-valuemin': props.min,
             'aria-valuemax': props.max,
+            'aria-orientation': 'horizontal',
             'aria-disabled': props.disabled,
+            'aria-label': resolvedAriaLabel,
+            'aria-labelledby': ariaLabelledby,
+            'aria-describedby': ariaDescribedby,
             onMousedown: (e: MouseEvent) => handleStart(e, thumbType),
             onTouchstart: (e: TouchEvent) => handleStart(e, thumbType),
             onMouseenter: () => {
@@ -366,7 +428,8 @@ export const Slider = defineComponent({
             return h(
               'div',
               {
-                class: 'absolute text-xs text-gray-600',
+                class:
+                  'absolute text-xs text-[var(--tiger-text-muted,#6b7280)]',
                 style: { left: `${left}%`, transform: 'translateX(-50%)' },
               },
               label
@@ -378,13 +441,14 @@ export const Slider = defineComponent({
       return h(
         'div',
         {
-          ...attrs,
-          class: [
+          ...attrsWithoutClassStyle,
+          class: classNames(
             sliderBaseClasses,
             props.disabled && 'cursor-not-allowed',
-            attrs.class,
-          ],
-          style: attrs.style,
+            props.className,
+            attrsClass
+          ),
+          style: [props.style, attrsStyle],
         },
         [
           // Track
