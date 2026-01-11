@@ -347,13 +347,13 @@ export const textAlignClasses = {
  * Text color classes mapping
  */
 export const textColorClasses = {
-  default: 'text-gray-900',
+  default: 'text-[var(--tiger-text,#111827)]',
   primary: 'text-[var(--tiger-primary,#2563eb)]',
   secondary: 'text-[var(--tiger-secondary,#4b5563)]',
-  success: 'text-green-600',
-  warning: 'text-yellow-600',
-  danger: 'text-red-600',
-  muted: 'text-gray-500',
+  success: 'text-[var(--tiger-success,#16a34a)]',
+  warning: 'text-[var(--tiger-warning,#ca8a04)]',
+  danger: 'text-[var(--tiger-error,#dc2626)]',
+  muted: 'text-[var(--tiger-text-muted,#6b7280)]',
 } as const;
 
 /**

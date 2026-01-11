@@ -34,6 +34,7 @@ export { Col } from './components/Col';
 export { Container } from './components/Container';
 export { Link } from './components/Link';
 export { Text } from './components/Text';
+export type { VueTextProps } from './components/Text';
 export { Icon } from './components/Icon';
 export { DatePicker } from './components/DatePicker';
 export type {

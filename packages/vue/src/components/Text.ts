@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, PropType } from 'vue';
 import {
   classNames,
   textSizeClasses,
@@ -11,7 +11,19 @@ import {
   type TextWeight,
   type TextAlign,
   type TextColor,
-} from '@tigercat/core'
+} from '@tigercat/core';
+
+export interface VueTextProps {
+  tag?: TextTag;
+  size?: TextSize;
+  weight?: TextWeight;
+  align?: TextAlign;
+  color?: TextColor;
+  truncate?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  lineThrough?: boolean;
+}
 
 export const Text = defineComponent({
   name: 'TigerText',
@@ -87,7 +99,7 @@ export const Text = defineComponent({
       default: false,
     },
   },
-  setup(props, { slots }) {
+  setup(props, { slots, attrs }) {
     const textClasses = computed(() => {
       return classNames(
         textSizeClasses[props.size],
@@ -98,19 +110,21 @@ export const Text = defineComponent({
         props.italic && textDecorationClasses.italic,
         props.underline && textDecorationClasses.underline,
         props.lineThrough && textDecorationClasses.lineThrough
-      )
-    })
+      );
+    });
 
     return () => {
       return h(
         props.tag,
         {
-          class: textClasses.value,
+          ...attrs,
+          class: [textClasses.value, attrs.class],
+          style: attrs.style,
         },
         slots.default?.()
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Text
+export default Text;

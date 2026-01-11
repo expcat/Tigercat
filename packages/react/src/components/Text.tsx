@@ -1,25 +1,18 @@
-import React, { useMemo } from 'react'
+import React from 'react';
 import {
   classNames,
-  textSizeClasses,
-  textWeightClasses,
   textAlignClasses,
   textColorClasses,
   textDecorationClasses,
+  textSizeClasses,
+  textWeightClasses,
   type TextProps as CoreTextProps,
-} from '@tigercat/core'
+} from '@tigercat/core';
 
-export interface TextProps extends CoreTextProps {
-  /**
-   * Text content
-   */
-  children?: React.ReactNode
-  
-  /**
-   * Additional CSS classes
-   */
-  className?: string
-}
+export type TextProps = CoreTextProps &
+  Omit<React.HTMLAttributes<HTMLElement>, 'color' | 'children'> & {
+    children?: React.ReactNode;
+  };
 
 export const Text: React.FC<TextProps> = ({
   tag = 'p',
@@ -35,7 +28,7 @@ export const Text: React.FC<TextProps> = ({
   className,
   ...props
 }) => {
-  const textClasses = useMemo(() => classNames(
+  const textClasses = classNames(
     textSizeClasses[size],
     textWeightClasses[weight],
     align && textAlignClasses[align],
@@ -45,11 +38,11 @@ export const Text: React.FC<TextProps> = ({
     underline && textDecorationClasses.underline,
     lineThrough && textDecorationClasses.lineThrough,
     className
-  ), [size, weight, align, color, truncate, italic, underline, lineThrough, className])
+  );
 
   return React.createElement(
     tag,
-    { className: textClasses, ...props },
+    { ...props, className: textClasses },
     children
-  )
-}
+  );
+};
