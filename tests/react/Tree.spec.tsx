@@ -469,7 +469,10 @@ describe('Tree', () => {
       );
 
       await waitFor(() => {
-        expect(checkbox.checked).toBe(true);
+        const updatedCheckbox = container.querySelector(
+          'input[type="checkbox"]'
+        ) as HTMLInputElement;
+        expect(updatedCheckbox.checked).toBe(true);
       });
     });
   });
