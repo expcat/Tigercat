@@ -8,7 +8,7 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Badge` Step1 主题/透传/测试精简（2026-01-12）
+- 上一步：✅ `Tag` Step1 主题/透传/测试精简（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
@@ -140,7 +140,7 @@
 #### Tag（P3，无需优化）
 
 - 例行检查：可关闭 tag（若支持）应有按钮语义与 aria-label。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/测试精简（2026-01-12）：Tag 变体颜色从固定 Tailwind 色收敛为 CSS vars（含 fallback，并新增 `--tiger-tag-*-*` 细粒度变量）；React Tag 去掉不必要的 memo/callback 并补齐 `span` 原生属性透传类型；Vue Tag 增加 `inheritAttrs: false`，将 attrs 透传到根元素并合并 `class/style`，新增并导出 `VueTagProps`（含 `className/style`）；精简 Vue/React Tag 测试并移除快照；同步更新 Tag 文档主题变量说明。
 
 #### Avatar（P2，建议优化）
 

@@ -50,6 +50,7 @@ export { Upload } from './components/Upload';
 export { Table } from './components/Table';
 export type { VueTableProps } from './components/Table';
 export { Tag } from './components/Tag';
+export type { VueTagProps } from './components/Tag';
 export { Badge } from './components/Badge';
 export type { VueBadgeProps } from './components/Badge';
 export { Card } from './components/Card';

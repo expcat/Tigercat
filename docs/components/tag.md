@@ -216,7 +216,22 @@ function App() {
 | size           | 标签尺寸                                             | `'sm' \| 'md' \| 'lg'`                                                   | `'md'`        |
 | closable       | 是否可关闭                                           | `boolean`                                                                | `false`       |
 | closeAriaLabel | 关闭按钮无障碍标签（仅在 `closable` 为 true 时生效） | `string`                                                                 | `'Close tag'` |
-| className      | 自定义 CSS 类名（仅 React）                          | `string`                                                                 | -             |
+| className      | 自定义 CSS 类名                                      | `string`                                                                 | -             |
+| style          | 自定义样式（Vue 为 prop；React 为原生 `style`）      | `Record<string, string \| number>`                                       | -             |
+
+## 主题定制
+
+Tag 的颜色已收敛为 CSS 变量（均带 fallback），你可以通过覆写变量统一定制风格：
+
+- `--tiger-text` / `--tiger-border` / `--tiger-primary` / `--tiger-success` / `--tiger-warning` / `--tiger-error` / `--tiger-info`
+- `--tiger-tag-default-bg` / `--tiger-tag-default-close-hover`
+- `--tiger-tag-primary-bg` / `--tiger-tag-primary-border` / `--tiger-tag-primary-close-hover`
+- `--tiger-tag-success-bg` / `--tiger-tag-success-border` / `--tiger-tag-success-close-hover`
+- `--tiger-tag-warning-bg` / `--tiger-tag-warning-border` / `--tiger-tag-warning-close-hover`
+- `--tiger-tag-danger-bg` / `--tiger-tag-danger-border` / `--tiger-tag-danger-close-hover`
+- `--tiger-tag-info-bg` / `--tiger-tag-info-border` / `--tiger-tag-info-close-hover`
+
+> 说明：Vue 版本支持 `className` / `style` props（并会与原生 `attrs.class/style` 合并），React 版本继续使用 `className`。
 
 ### Events (Vue)
 
