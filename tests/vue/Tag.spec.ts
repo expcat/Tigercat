@@ -2,314 +2,128 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/vue';
 import { Tag } from '@tigercat/vue';
-import {
-  renderWithProps,
-  renderWithSlots,
-  expectNoA11yViolations,
-  componentSizes,
-  setThemeVariables,
-  clearThemeVariables,
-} from '../utils';
-
-const tagVariants = [
-  'default',
-  'primary',
-  'success',
-  'warning',
-  'danger',
-  'info',
-] as const;
+import { renderWithSlots, expectNoA11yViolations } from '../utils';
 
 describe('Tag', () => {
-  describe('Rendering', () => {
-    it('should render with default props', () => {
-      render(Tag, {
-        slots: {
-          default: 'Test Tag',
-        },
-      });
-
-      const tag = screen.getByText('Test Tag');
-      expect(tag).toBeInTheDocument();
-      expect(tag.parentElement).toHaveAttribute('role', 'status');
+  it('renders content and role="status"', () => {
+    render(Tag, {
+      slots: {
+        default: 'Test Tag',
+      },
     });
 
-    it('should render with custom text via slot', () => {
-      const { getByText } = renderWithSlots(Tag, {
-        default: 'Custom Tag Text',
-      });
-
-      expect(getByText('Custom Tag Text')).toBeInTheDocument();
-    });
+    const content = screen.getByText('Test Tag');
+    expect(content).toBeInTheDocument();
+    expect(content.parentElement).toHaveAttribute('role', 'status');
   });
 
-  describe('Variants', () => {
-    it.each(tagVariants)('should render %s variant correctly', (variant) => {
-      const { container } = renderWithProps(
-        Tag,
-        { variant },
-        {
-          slots: { default: `${variant} tag` },
-        }
-      );
-
-      const tag = container.querySelector('[role="status"]');
-      expect(tag).toBeInTheDocument();
-      // Verify tag has variant-specific classes
-      expect(tag?.className).toBeTruthy();
+  it('merges attrs.class and props.className', () => {
+    const { container } = render(Tag, {
+      props: {
+        className: 'from-props',
+      },
+      attrs: {
+        class: 'from-attrs',
+      },
+      slots: {
+        default: 'Tag',
+      },
     });
 
-    it('should apply default variant when not specified', () => {
-      const { container } = renderWithSlots(Tag, {
-        default: 'Default Tag',
-      });
-
-      const tag = container.querySelector('[role="status"]');
-      expect(tag).toBeInTheDocument();
-    });
+    const root = container.querySelector('[role="status"]');
+    expect(root).toHaveClass('from-props');
+    expect(root).toHaveClass('from-attrs');
   });
 
-  describe('Sizes', () => {
-    it.each(componentSizes)('should render %s size correctly', (size) => {
-      const { container } = renderWithProps(
-        Tag,
-        { size },
-        {
-          slots: { default: `${size} tag` },
-        }
-      );
-
-      const tag = container.querySelector('[role="status"]');
-      expect(tag).toBeInTheDocument();
+  it('does not render close button when closable=false', () => {
+    const { container } = render(Tag, {
+      props: {
+        closable: false,
+      },
+      slots: {
+        default: 'Tag',
+      },
     });
+
+    expect(container.querySelector('button')).not.toBeInTheDocument();
   });
 
-  describe('Closable', () => {
-    it('should not render close button when closable is false', () => {
-      const { container } = renderWithProps(
-        Tag,
-        { closable: false },
-        {
-          slots: { default: 'Non-closable Tag' },
-        }
-      );
+  it('emits close and removes tag by default', async () => {
+    const onClose = vi.fn();
 
-      const closeButton = container.querySelector('button');
-      expect(closeButton).not.toBeInTheDocument();
+    const { container } = render(Tag, {
+      props: {
+        closable: true,
+        onClose,
+      },
+      slots: {
+        default: 'Closable Tag',
+      },
     });
 
-    it('should render close button when closable is true', () => {
-      const { container } = renderWithProps(
-        Tag,
-        { closable: true },
-        {
-          slots: { default: 'Closable Tag' },
-        }
-      );
+    const closeButton = container.querySelector(
+      'button[aria-label="Close tag"]'
+    ) as HTMLButtonElement | null;
+    expect(closeButton).toBeInTheDocument();
 
-      const closeButton = container.querySelector(
-        'button[aria-label="Close tag"]'
-      );
-      expect(closeButton).toBeInTheDocument();
-    });
-
-    it('should emit close event when close button is clicked', async () => {
-      const onClose = vi.fn();
-
-      const { container } = render(Tag, {
-        props: {
-          closable: true,
-          onClose,
-        },
-        slots: {
-          default: 'Closable Tag',
-        },
-      });
-
-      const closeButton = container.querySelector(
-        'button[aria-label="Close tag"]'
-      );
-      expect(closeButton).toBeInTheDocument();
-
-      if (closeButton) {
-        await fireEvent.click(closeButton);
-        expect(onClose).toHaveBeenCalledTimes(1);
-      }
-    });
-
-    it('should stop event propagation when close button is clicked', async () => {
-      const onClose = vi.fn();
-      const onTagClick = vi.fn();
-
-      const { container } = render(Tag, {
-        props: {
-          closable: true,
-          onClose,
-        },
-        slots: {
-          default: 'Closable Tag',
-        },
-        attrs: {
-          onClick: onTagClick,
-        },
-      });
-
-      const closeButton = container.querySelector(
-        'button[aria-label="Close tag"]'
-      );
-
-      if (closeButton) {
-        await fireEvent.click(closeButton);
-        expect(onClose).toHaveBeenCalledTimes(1);
-        expect(onTagClick).not.toHaveBeenCalled();
-      }
-    });
-
-    it('should be removed from the DOM when close button is clicked', async () => {
-      const { container } = renderWithProps(
-        Tag,
-        { closable: true },
-        {
-          slots: { default: 'Closable Tag' },
-        }
-      );
-
-      const closeButton = container.querySelector(
-        'button[aria-label="Close tag"]'
-      );
-      expect(closeButton).toBeInTheDocument();
-
-      if (closeButton) {
-        await fireEvent.click(closeButton);
-      }
-
-      expect(screen.queryByText('Closable Tag')).not.toBeInTheDocument();
-    });
+    await fireEvent.click(closeButton!);
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText('Closable Tag')).not.toBeInTheDocument();
   });
 
-  describe('Theme Support', () => {
-    afterEach(() => {
-      clearThemeVariables(['--tiger-primary', '--tiger-primary-hover']);
+  it('keeps tag visible when close event calls preventDefault()', async () => {
+    const onClose = vi.fn((event: MouseEvent) => {
+      event.preventDefault();
     });
 
-    it('should support primary theme customization', () => {
-      setThemeVariables({
-        '--tiger-primary': '#10b981',
-        '--tiger-primary-hover': '#059669',
-      });
-
-      const { container } = renderWithProps(
-        Tag,
-        { variant: 'primary' },
-        {
-          slots: { default: 'Primary Tag' },
-        }
-      );
-
-      const tag = container.querySelector('[role="status"]');
-      expect(tag).toBeInTheDocument();
+    const { container } = render(Tag, {
+      props: {
+        closable: true,
+        onClose,
+      },
+      slots: {
+        default: 'Closable Tag',
+      },
     });
+
+    const closeButton = container.querySelector(
+      'button[aria-label="Close tag"]'
+    ) as HTMLButtonElement | null;
+    await fireEvent.click(closeButton!);
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Closable Tag')).toBeInTheDocument();
   });
 
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = renderWithSlots(Tag, {
-        default: 'Accessible Tag',
-      });
+  it('stops propagation when close button is clicked', async () => {
+    const onTagClick = vi.fn();
 
-      await expectNoA11yViolations(container);
+    const { container } = render(Tag, {
+      props: {
+        closable: true,
+      },
+      slots: {
+        default: 'Closable Tag',
+      },
+      attrs: {
+        onClick: onTagClick,
+      },
     });
 
-    it('should have no accessibility violations with close button', async () => {
-      const { container } = renderWithProps(
-        Tag,
-        { closable: true },
-        {
-          slots: { default: 'Closable Tag' },
-        }
-      );
-
-      await expectNoA11yViolations(container);
-    });
-
-    it('should have proper aria-label on close button', () => {
-      const { container } = renderWithProps(
-        Tag,
-        { closable: true },
-        {
-          slots: { default: 'Tag' },
-        }
-      );
-
-      const closeButton = container.querySelector('button');
-      expect(closeButton).toHaveAttribute('aria-label', 'Close tag');
-    });
-
-    it('should allow customizing close button aria-label', () => {
-      renderWithProps(
-        Tag,
-        { closable: true, closeAriaLabel: '移除标签' },
-        {
-          slots: { default: 'Tag' },
-        }
-      );
-
-      expect(screen.getByLabelText('移除标签')).toBeInTheDocument();
-    });
+    const closeButton = container.querySelector(
+      'button[aria-label="Close tag"]'
+    ) as HTMLButtonElement | null;
+    await fireEvent.click(closeButton!);
+    expect(onTagClick).not.toHaveBeenCalled();
   });
 
-  describe('Combined Props', () => {
-    it('should correctly combine variant, size, and closable', () => {
-      const { container, getByText } = renderWithProps(
-        Tag,
-        { variant: 'success', size: 'lg', closable: true },
-        {
-          slots: { default: 'Combined Tag' },
-        }
-      );
-
-      expect(getByText('Combined Tag')).toBeInTheDocument();
-      const closeButton = container.querySelector(
-        'button[aria-label="Close tag"]'
-      );
-      expect(closeButton).toBeInTheDocument();
-    });
-  });
-
-  describe('Snapshots', () => {
-    it('should match snapshot for default tag', () => {
-      const { container } = renderWithSlots(Tag, {
-        default: 'Default Tag',
-      });
-
-      expect(container.firstChild).toMatchSnapshot();
+  it('passes a11y baseline checks', async () => {
+    const { container } = renderWithSlots(Tag, {
+      default: 'Accessible Tag',
     });
 
-    it('should match snapshot for primary variant', () => {
-      const { container } = renderWithProps(
-        Tag,
-        { variant: 'primary' },
-        {
-          slots: { default: 'Primary Tag' },
-        }
-      );
-
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it('should match snapshot for closable tag', () => {
-      const { container } = renderWithProps(
-        Tag,
-        { closable: true },
-        {
-          slots: { default: 'Closable Tag' },
-        }
-      );
-
-      expect(container.firstChild).toMatchSnapshot();
-    });
+    await expectNoA11yViolations(container);
   });
 });

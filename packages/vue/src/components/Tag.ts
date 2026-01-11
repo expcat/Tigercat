@@ -11,6 +11,15 @@ import {
   type TagSize,
 } from '@tigercat/core';
 
+export interface VueTagProps {
+  variant?: TagVariant;
+  size?: TagSize;
+  closable?: boolean;
+  closeAriaLabel?: string;
+  className?: string;
+  style?: Record<string, string | number>;
+}
+
 const CloseIcon = () =>
   h(
     'svg',
@@ -34,6 +43,7 @@ const CloseIcon = () =>
 
 export const Tag = defineComponent({
   name: 'TigerTag',
+  inheritAttrs: false,
   props: {
     /**
      * Tag variant style
@@ -68,9 +78,25 @@ export const Tag = defineComponent({
       type: String,
       default: 'Close tag',
     },
+
+    /**
+     * Additional CSS classes
+     */
+    className: {
+      type: String,
+      default: undefined,
+    },
+
+    /**
+     * Custom styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined,
+    },
   },
   emits: ['close'],
-  setup(props, { slots, emit }) {
+  setup(props, { slots, emit, attrs }) {
     const isVisible = ref(true);
 
     const tagClasses = computed(() => {
@@ -104,36 +130,37 @@ export const Tag = defineComponent({
         return null;
       }
 
-      const children = [];
-
-      // Add tag content
-      if (slots.default) {
-        children.push(h('span', {}, slots.default()));
-      }
-
-      // Add close button if closable
-      if (props.closable) {
-        children.push(
-          h(
-            'button',
-            {
-              class: closeButtonClasses.value,
-              onClick: handleClose,
-              'aria-label': props.closeAriaLabel,
-              type: 'button',
-            },
-            CloseIcon()
-          )
-        );
-      }
+      const attrsRecord = attrs as Record<string, unknown>;
+      const attrsClass = attrsRecord.class;
+      const attrsStyle = attrsRecord.style;
 
       return h(
         'span',
         {
-          class: tagClasses.value,
+          ...attrs,
+          class: classNames(
+            tagClasses.value,
+            props.className,
+            attrsClass as any
+          ),
+          style: [attrsStyle as any, props.style as any],
           role: 'status',
         },
-        children
+        [
+          slots.default ? h('span', {}, slots.default()) : null,
+          props.closable
+            ? h(
+                'button',
+                {
+                  class: closeButtonClasses.value,
+                  onClick: handleClose,
+                  'aria-label': props.closeAriaLabel,
+                  type: 'button',
+                },
+                CloseIcon()
+              )
+            : null,
+        ]
       );
     };
   },
