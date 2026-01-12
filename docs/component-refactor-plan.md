@@ -8,11 +8,11 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Checkbox/CheckboxGroup` Step1 主题/透传/类型导出/测试精简（2026-01-12）
+- 上一步：✅ `Radio/RadioGroup` Step1 主题/透传/类型导出/测试精简（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：13/38
+- 已优化组件数/需优化组件数：14/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -204,7 +204,7 @@
 #### Radio / RadioGroup（P1，建议优化）
 
 - 思路：roving tabindex、aria-checked；组内受控/默认值一致。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/类型导出/测试精简（2026-01-12）：core Radio 颜色从固定 Tailwind 灰色收敛为 CSS vars（含 fallback：`--tiger-border/--tiger-surface/--tiger-surface-muted/--tiger-text/--tiger-text-muted/--tiger-primary`）；core `RadioProps` 补齐 `defaultChecked`；Vue Radio/RadioGroup 增加 `inheritAttrs: false` 并合并 `class/style`，改为 Symbol + reactive provide/inject（避免 groupName/groupDisabled 不响应），新增并导出 `VueRadioProps/VueRadioGroupProps`；React Radio/RadioGroup 精简冗余 memo/callback，并补齐原生属性透传（focus/aria 等），支持 `Enter` 选中；移除 Vue/React Radio 快照并精简测试，补齐 RadioGroup 非受控切换关键路径；同步更新 Radio/RadioGroup 文档（Demo 无需修改）。
 
 #### Select（P0，建议优化）
 

@@ -1,4 +1,4 @@
-import React, { useContext, useCallback, useMemo } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   classNames,
   getRadioColorClasses,
@@ -6,7 +6,12 @@ import {
 } from '@tigercat/core';
 import { RadioGroupContext } from './RadioGroup';
 
-export interface RadioProps extends Omit<CoreRadioProps, 'checked'> {
+export interface RadioProps
+  extends Omit<
+      React.InputHTMLAttributes<HTMLInputElement>,
+      'type' | 'size' | 'onChange' | 'checked' | 'defaultChecked' | 'value'
+    >,
+    CoreRadioProps {
   /**
    * Change event handler
    */
@@ -18,14 +23,9 @@ export interface RadioProps extends Omit<CoreRadioProps, 'checked'> {
   children?: React.ReactNode;
 
   /**
-   * Additional CSS classes
+   * Additional CSS classes (applied to root element)
    */
   className?: string;
-
-  /**
-   * Whether the radio is checked (controlled mode)
-   */
-  checked?: boolean;
 }
 
 const sizeClasses = {
@@ -49,118 +49,105 @@ const sizeClasses = {
 export const Radio: React.FC<RadioProps> = ({
   value,
   size,
-  disabled = false,
+  disabled,
   name,
   checked,
+  defaultChecked = false,
   onChange,
   children,
   className,
+  style,
   ...props
 }) => {
   const groupContext = useContext(RadioGroupContext);
 
-  // Determine actual values (props override group values) - simple logical operations, no need to memoize
+  const [internalChecked, setInternalChecked] = useState(defaultChecked);
+
+  const isCheckedControlled = checked !== undefined;
+  const isInGroup = !!groupContext;
+
   const actualSize = size || groupContext?.size || 'md';
-  const actualDisabled = disabled || groupContext?.disabled || false;
+  const actualDisabled =
+    disabled !== undefined ? disabled : groupContext?.disabled || false;
   const actualName = name || groupContext?.name || '';
 
-  const isChecked = useMemo(() => {
-    if (checked !== undefined) return checked;
-    if (groupContext?.value !== undefined) return groupContext.value === value;
-    return false;
-  }, [checked, groupContext?.value, value]);
+  const isChecked =
+    checked !== undefined
+      ? checked
+      : groupContext?.value !== undefined
+      ? groupContext.value === value
+      : internalChecked;
 
-  const colors = getRadioColorClasses(); // Static object, no need to memoize
-
-  const radioClasses = useMemo(
-    () =>
-      classNames(
-        'relative inline-flex items-center justify-center rounded-full border-2 cursor-pointer transition-all',
-        sizeClasses[actualSize].radio,
-        isChecked ? colors.borderChecked : colors.border,
-        isChecked ? colors.bgChecked : colors.bg,
-        actualDisabled && colors.disabled,
-        actualDisabled && 'cursor-not-allowed',
-        !actualDisabled && 'hover:border-[var(--tiger-primary,#2563eb)]'
-      ),
-    [actualSize, isChecked, actualDisabled, colors]
+  const colors = getRadioColorClasses();
+  const radioClasses = classNames(
+    'relative inline-flex items-center justify-center rounded-full border-2 cursor-pointer transition-all',
+    'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-primary,#2563eb)] peer-focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]',
+    sizeClasses[actualSize].radio,
+    isChecked ? colors.borderChecked : colors.border,
+    isChecked ? colors.bgChecked : colors.bg,
+    actualDisabled && colors.disabled,
+    actualDisabled && 'cursor-not-allowed',
+    !actualDisabled && 'hover:border-[var(--tiger-primary,#2563eb)]'
   );
 
-  const dotClasses = useMemo(
-    () =>
-      classNames(
-        'rounded-full transition-all',
-        sizeClasses[actualSize].dot,
-        colors.innerDot,
-        isChecked ? 'scale-100' : 'scale-0'
-      ),
-    [actualSize, isChecked, colors.innerDot]
+  const dotClasses = classNames(
+    'rounded-full transition-all',
+    sizeClasses[actualSize].dot,
+    colors.innerDot,
+    isChecked ? 'scale-100' : 'scale-0'
   );
 
-  const labelClasses = useMemo(
-    () =>
-      classNames(
-        'ml-2 cursor-pointer select-none',
-        sizeClasses[actualSize].label,
-        actualDisabled ? colors.textDisabled : 'text-gray-900',
-        actualDisabled && 'cursor-not-allowed'
-      ),
-    [actualSize, actualDisabled, colors.textDisabled]
+  const labelClasses = classNames(
+    'ml-2 cursor-pointer select-none',
+    sizeClasses[actualSize].label,
+    actualDisabled ? colors.textDisabled : 'text-[var(--tiger-text,#111827)]',
+    actualDisabled && 'cursor-not-allowed'
   );
 
-  const handleChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (actualDisabled) {
-        event.preventDefault();
-        return;
-      }
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (actualDisabled) {
+      event.preventDefault();
+      return;
+    }
 
-      const newChecked = event.target.checked;
-      if (newChecked) {
-        onChange?.(value);
-        groupContext?.onChange?.(value);
-      }
-    },
-    [actualDisabled, value, onChange, groupContext]
-  );
+    const newChecked = event.target.checked;
+    if (!newChecked) return;
 
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent<HTMLLabelElement>) => {
-      if (actualDisabled) return;
+    if (!isCheckedControlled && !isInGroup) {
+      setInternalChecked(true);
+    }
 
-      if (event.key === ' ' || event.key === 'Enter') {
-        event.preventDefault();
-        const input = event.currentTarget.querySelector(
-          'input[type="radio"]'
-        ) as HTMLInputElement;
-        if (input && !input.checked) {
-          input.click();
-        }
-      }
-    },
-    [actualDisabled]
-  );
+    onChange?.(value);
+    groupContext?.onChange?.(value);
+  };
 
-  const wrapperClasses = useMemo(
-    () => classNames('inline-flex items-center', className),
-    [className]
-  );
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    props.onKeyDown?.(event);
+    if (event.defaultPrevented) return;
+    if (actualDisabled) return;
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const input = event.currentTarget;
+      if (!input.checked) input.click();
+    }
+  };
 
   return (
     <label
-      className={wrapperClasses}
-      tabIndex={actualDisabled ? -1 : 0}
-      onKeyDown={handleKeyDown}
-      {...props}>
+      className={classNames('inline-flex items-center', className)}
+      style={style}>
       {/* Hidden native radio input */}
       <input
         type="radio"
-        className="sr-only"
+        className="sr-only peer"
+        {...props}
         name={actualName}
         value={value}
         checked={isChecked}
         disabled={actualDisabled}
         onChange={handleChange}
+        onKeyDown={handleKeyDown}
       />
 
       {/* Custom radio visual */}

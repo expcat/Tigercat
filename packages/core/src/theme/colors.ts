@@ -192,14 +192,15 @@ export interface RadioColorScheme {
  * Default radio color scheme using Tailwind CSS classes
  */
 export const defaultRadioColors: RadioColorScheme = {
-  border: 'border-gray-300',
+  border: 'border-[var(--tiger-border,#d1d5db)]',
   borderChecked: 'border-[var(--tiger-primary,#2563eb)]',
-  bg: 'bg-white',
+  bg: 'bg-[var(--tiger-surface,#ffffff)]',
   bgChecked: 'bg-[var(--tiger-primary,#2563eb)]',
-  innerDot: 'bg-white',
-  focus: 'focus:ring-[var(--tiger-primary,#2563eb)]',
-  disabled: 'disabled:bg-gray-100 disabled:border-gray-200',
-  textDisabled: 'text-gray-400',
+  innerDot: 'bg-[var(--tiger-surface,#ffffff)]',
+  focus: 'ring-[var(--tiger-primary,#2563eb)]',
+  disabled:
+    'bg-[var(--tiger-surface-muted,#f3f4f6)] border-[var(--tiger-border,#d1d5db)]',
+  textDisabled: 'text-[var(--tiger-text-muted,#6b7280)]',
 };
 
 /**

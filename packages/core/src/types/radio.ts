@@ -5,7 +5,7 @@
 /**
  * Radio size types
  */
-export type RadioSize = 'sm' | 'md' | 'lg'
+export type RadioSize = 'sm' | 'md' | 'lg';
 
 /**
  * Base radio props interface
@@ -14,29 +14,35 @@ export interface RadioProps {
   /**
    * The value of the radio
    */
-  value: string | number
-  
+  value: string | number;
+
   /**
    * Radio size
    * @default 'md'
    */
-  size?: RadioSize
-  
+  size?: RadioSize;
+
   /**
    * Whether the radio is disabled
    * @default false
    */
-  disabled?: boolean
-  
+  disabled?: boolean;
+
   /**
    * Name attribute for the radio input (for grouping)
    */
-  name?: string
-  
+  name?: string;
+
   /**
    * Whether the radio is checked (controlled mode)
    */
-  checked?: boolean
+  checked?: boolean;
+
+  /**
+   * Default checked state (uncontrolled mode)
+   * @default false
+   */
+  defaultChecked?: boolean;
 }
 
 /**
@@ -46,27 +52,27 @@ export interface RadioGroupProps {
   /**
    * Current selected value (controlled mode)
    */
-  value?: string | number
-  
+  value?: string | number;
+
   /**
    * Default selected value (uncontrolled mode)
    */
-  defaultValue?: string | number
-  
+  defaultValue?: string | number;
+
   /**
    * Name attribute for radio inputs in the group
    */
-  name?: string
-  
+  name?: string;
+
   /**
    * Whether all radios in the group are disabled
    * @default false
    */
-  disabled?: boolean
-  
+  disabled?: boolean;
+
   /**
    * Radio size for all radios in the group
    * @default 'md'
    */
-  size?: RadioSize
+  size?: RadioSize;
 }
