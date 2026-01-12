@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useMemo,
-  useCallback,
-  useState,
-  useRef,
-} from 'react';
+import React, { useEffect, useCallback, useRef, useState } from "react";
 import {
   classNames,
   getTooltipContainerClasses,
@@ -12,184 +6,172 @@ import {
   getTooltipContentClasses,
   getDropdownMenuWrapperClasses,
   type TooltipProps as CoreTooltipProps,
-} from '@tigercat/core';
+} from "@tigercat/core";
 
-export interface TooltipProps extends CoreTooltipProps {
-  /**
-   * The element to trigger the tooltip
-   */
-  children?: React.ReactNode;
+let tooltipIdCounter = 0;
 
-  /**
-   * Custom content (alternative to content prop)
-   */
-  contentContent?: React.ReactNode;
+const createTooltipId = () => `tiger-tooltip-${++tooltipIdCounter}`;
 
-  /**
-   * Callback when visibility changes
-   */
-  onVisibleChange?: (visible: boolean) => void;
-}
+export type TooltipProps = Omit<CoreTooltipProps, "content" | "style"> &
+  Omit<
+    React.HTMLAttributes<HTMLDivElement>,
+    "children" | "className" | "style"
+  > & {
+    children?: React.ReactNode;
+    content?: React.ReactNode;
+    /** @deprecated Use `content` (supports ReactNode). */
+    contentContent?: React.ReactNode;
+    className?: string;
+    style?: React.CSSProperties;
+    onVisibleChange?: (visible: boolean) => void;
+  };
 
 export const Tooltip: React.FC<TooltipProps> = ({
   visible,
   defaultVisible = false,
   content,
-  trigger = 'hover',
-  placement = 'top',
+  trigger = "hover",
+  placement = "top",
   disabled = false,
   className,
+  style,
   children,
   contentContent,
   onVisibleChange,
+  ...divProps
 }) => {
-  // Internal state for uncontrolled mode
+  const isControlled = visible !== undefined;
   const [internalVisible, setInternalVisible] = useState(defaultVisible);
+  const currentVisible = isControlled ? visible : internalVisible;
 
-  // Computed visible state (controlled or uncontrolled)
-  const currentVisible = visible !== undefined ? visible : internalVisible;
-
-  // Ref to the container element
   const containerRef = useRef<HTMLDivElement>(null);
+  const tooltipIdRef = useRef<string | null>(null);
 
-  // Ref to the trigger element
-  const triggerRef = useRef<HTMLDivElement>(null);
+  if (!tooltipIdRef.current) {
+    tooltipIdRef.current = createTooltipId();
+  }
 
-  // Handle visibility change
+  const tooltipId = tooltipIdRef.current;
+  const tooltipContent = contentContent ?? content;
+  const describedBy = tooltipContent != null ? tooltipId : undefined;
+
   const setVisible = useCallback(
     (newVisible: boolean) => {
-      if (disabled) return;
+      if (disabled && newVisible) return;
 
-      // Update internal state if uncontrolled
-      if (visible === undefined) {
+      if (!isControlled) {
         setInternalVisible(newVisible);
       }
 
-      // Notify parent
-      if (onVisibleChange) {
-        onVisibleChange(newVisible);
-      }
+      onVisibleChange?.(newVisible);
     },
-    [disabled, visible, onVisibleChange]
+    [disabled, isControlled, onVisibleChange]
   );
 
-  // Handle trigger click
-  const handleTriggerClick = useCallback(() => {
-    if (disabled || trigger !== 'click') return;
+  const handleTriggerClick = () => {
+    if (disabled || trigger !== "click") return;
     setVisible(!currentVisible);
-  }, [disabled, trigger, currentVisible, setVisible]);
+  };
 
-  // Handle trigger mouse enter
-  const handleTriggerMouseEnter = useCallback(() => {
-    if (disabled || trigger !== 'hover') return;
+  const handleTriggerMouseEnter = () => {
+    if (disabled || trigger !== "hover") return;
     setVisible(true);
-  }, [disabled, trigger, setVisible]);
+  };
 
-  // Handle trigger mouse leave
-  const handleTriggerMouseLeave = useCallback(() => {
-    if (disabled || trigger !== 'hover') return;
+  const handleTriggerMouseLeave = () => {
+    if (disabled || trigger !== "hover") return;
     setVisible(false);
-  }, [disabled, trigger, setVisible]);
+  };
 
-  // Handle trigger focus
-  const handleTriggerFocus = useCallback(() => {
-    if (disabled || trigger !== 'focus') return;
+  const handleTriggerFocus = () => {
+    if (disabled || trigger !== "focus") return;
     setVisible(true);
-  }, [disabled, trigger, setVisible]);
+  };
 
-  // Handle trigger blur
-  const handleTriggerBlur = useCallback(() => {
-    if (disabled || trigger !== 'focus') return;
+  const handleTriggerBlur = () => {
+    if (disabled || trigger !== "focus") return;
     setVisible(false);
-  }, [disabled, trigger, setVisible]);
+  };
 
   // Handle outside click to close tooltip (only for click trigger)
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
+    if (!currentVisible || trigger !== "click") return;
 
-      if (containerRef.current && !containerRef.current.contains(target)) {
-        // Close by calling onVisibleChange if in controlled mode, or update internal state
-        if (visible !== undefined && onVisibleChange) {
-          onVisibleChange(false);
-        } else {
-          setInternalVisible(false);
-        }
-      }
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target;
+      if (!target) return;
+      if (containerRef.current?.contains(target as Node)) return;
+      setVisible(false);
     };
 
-    if (currentVisible && trigger === 'click') {
-      // Use setTimeout to avoid immediate triggering on the same click that opened it
-      const timeoutId = setTimeout(() => {
-        document.addEventListener('click', handleClickOutside);
-      }, 0);
+    const timeoutId = setTimeout(() => {
+      document.addEventListener("click", handleClickOutside);
+    }, 0);
 
-      return () => {
-        clearTimeout(timeoutId);
-        document.removeEventListener('click', handleClickOutside);
-      };
-    }
-  }, [currentVisible, trigger, visible, onVisibleChange]);
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [currentVisible, trigger, setVisible]);
 
-  // Container classes
-  const containerClasses = useMemo(
-    () => classNames(getTooltipContainerClasses(), className),
-    [className]
+  useEffect(() => {
+    if (!currentVisible) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setVisible(false);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [currentVisible, setVisible]);
+
+  const containerClasses = classNames(getTooltipContainerClasses(), className);
+  const triggerClasses = getTooltipTriggerClasses(disabled);
+  const contentWrapperClasses = getDropdownMenuWrapperClasses(
+    currentVisible,
+    placement
   );
+  const contentClasses = getTooltipContentClasses();
 
-  // Trigger classes
-  const triggerClasses = useMemo(
-    () => getTooltipTriggerClasses(disabled),
-    [disabled]
-  );
-
-  // Content wrapper classes
-  const contentWrapperClasses = useMemo(
-    () => getDropdownMenuWrapperClasses(currentVisible, placement),
-    [currentVisible, placement]
-  );
-
-  // Content classes
-  const contentClasses = useMemo(() => getTooltipContentClasses(), []);
-
-  // Build trigger event handlers
-  const triggerHandlers = useMemo(() => {
-    const handlers: React.DOMAttributes<HTMLDivElement> = {};
-
-    if (trigger === 'click') {
-      handlers.onClick = handleTriggerClick;
-    } else if (trigger === 'hover') {
-      handlers.onMouseEnter = handleTriggerMouseEnter;
-      handlers.onMouseLeave = handleTriggerMouseLeave;
-    } else if (trigger === 'focus') {
-      handlers.onFocus = handleTriggerFocus;
-      handlers.onBlur = handleTriggerBlur;
-    }
-
-    return handlers;
-  }, [
-    trigger,
-    handleTriggerClick,
-    handleTriggerMouseEnter,
-    handleTriggerMouseLeave,
-    handleTriggerFocus,
-    handleTriggerBlur,
-  ]);
+  const triggerHandlers: React.DOMAttributes<HTMLDivElement> = {};
+  if (trigger === "click") {
+    triggerHandlers.onClick = handleTriggerClick;
+  } else if (trigger === "hover") {
+    triggerHandlers.onMouseEnter = handleTriggerMouseEnter;
+    triggerHandlers.onMouseLeave = handleTriggerMouseLeave;
+  } else if (trigger === "focus") {
+    triggerHandlers.onFocus = handleTriggerFocus;
+    triggerHandlers.onBlur = handleTriggerBlur;
+  }
 
   if (!children) {
     return null;
   }
 
   return (
-    <div ref={containerRef} className={containerClasses}>
-      {/* Trigger */}
-      <div ref={triggerRef} className={triggerClasses} {...triggerHandlers}>
+    <div
+      ref={containerRef}
+      className={containerClasses}
+      style={style}
+      {...divProps}
+    >
+      <div
+        className={triggerClasses}
+        aria-describedby={describedBy}
+        {...triggerHandlers}
+      >
         {children}
       </div>
 
-      {/* Tooltip content */}
-      <div className={contentWrapperClasses} hidden={!currentVisible}>
-        <div className={contentClasses}>{contentContent || content}</div>
+      <div
+        className={contentWrapperClasses}
+        hidden={!currentVisible}
+        aria-hidden={!currentVisible}
+      >
+        <div id={tooltipId} role="tooltip" className={contentClasses}>
+          {tooltipContent}
+        </div>
       </div>
     </div>
   );

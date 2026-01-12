@@ -116,5 +116,6 @@ export { Loading } from "./components/Loading";
 export { Popconfirm } from "./components/Popconfirm";
 export { Popover } from "./components/Popover";
 export { Tooltip } from "./components/Tooltip";
+export type { VueTooltipProps } from "./components/Tooltip";
 
 export const version = "0.0.1";
