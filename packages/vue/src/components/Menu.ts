@@ -1,28 +1,57 @@
-import { defineComponent, computed, ref, provide, PropType, h } from 'vue'
+import {
+  defineComponent,
+  computed,
+  ref,
+  provide,
+  PropType,
+  h,
+  type ComputedRef,
+} from "vue";
 import {
   classNames,
+  coerceClassValue,
   getMenuClasses,
+  mergeStyleValues,
   type MenuMode,
   type MenuTheme,
-} from '@tigercat/core'
+  type MenuKey,
+  type MenuProps as CoreMenuProps,
+  replaceKeys,
+  toggleKey,
+} from "@tigercat/core";
 
 // Menu context key
-export const MenuContextKey = Symbol('MenuContext')
+export const MenuContextKey = Symbol("MenuContext");
 
 // Menu context interface
 export interface MenuContext {
-  mode: MenuMode
-  theme: MenuTheme
-  collapsed: boolean
-  inlineIndent: number
-  selectedKeys: (string | number)[]
-  openKeys: (string | number)[]
-  handleSelect: (key: string | number) => void
-  handleOpenChange: (key: string | number) => void
+  mode: MenuMode;
+  theme: MenuTheme;
+  collapsed: boolean;
+  inlineIndent: number;
+  selectedKeys: ComputedRef<MenuKey[]>;
+  openKeys: ComputedRef<MenuKey[]>;
+  handleSelect: (key: string | number) => void;
+  handleOpenChange: (key: string | number) => void;
+}
+
+export interface VueMenuProps {
+  mode?: MenuMode;
+  theme?: MenuTheme;
+  selectedKeys?: MenuKey[];
+  defaultSelectedKeys?: MenuKey[];
+  openKeys?: MenuKey[];
+  defaultOpenKeys?: MenuKey[];
+  collapsed?: boolean;
+  multiple?: boolean;
+  inlineIndent?: number;
+  className?: string;
+  style?: CoreMenuProps["style"];
 }
 
 export const Menu = defineComponent({
-  name: 'TigerMenu',
+  name: "TigerMenu",
+  inheritAttrs: false,
   props: {
     /**
      * Menu mode - horizontal, vertical, or inline
@@ -30,7 +59,7 @@ export const Menu = defineComponent({
      */
     mode: {
       type: String as PropType<MenuMode>,
-      default: 'vertical' as MenuMode,
+      default: "vertical" as MenuMode,
     },
     /**
      * Menu theme - light or dark
@@ -38,7 +67,7 @@ export const Menu = defineComponent({
      */
     theme: {
       type: String as PropType<MenuTheme>,
-      default: 'light' as MenuTheme,
+      default: "light" as MenuTheme,
     },
     /**
      * Currently selected menu item keys
@@ -92,71 +121,85 @@ export const Menu = defineComponent({
       type: Number,
       default: 24,
     },
+    className: {
+      type: String,
+      default: undefined,
+    },
+    style: {
+      type: Object as PropType<CoreMenuProps["style"]>,
+      default: undefined,
+    },
   },
-  emits: ['update:selectedKeys', 'update:openKeys', 'select', 'open-change'],
-  setup(props, { slots, emit }) {
+  emits: ["update:selectedKeys", "update:openKeys", "select", "open-change"],
+  setup(props, { slots, emit, attrs }) {
     // Internal state for uncontrolled mode
-    const internalSelectedKeys = ref<(string | number)[]>(props.defaultSelectedKeys)
-    const internalOpenKeys = ref<(string | number)[]>(props.defaultOpenKeys)
+    const internalSelectedKeys = ref<MenuKey[]>(props.defaultSelectedKeys);
+    const internalOpenKeys = ref<MenuKey[]>(props.defaultOpenKeys);
 
     // Computed selected keys (controlled or uncontrolled)
     const currentSelectedKeys = computed(() => {
-      return props.selectedKeys !== undefined ? props.selectedKeys : internalSelectedKeys.value
-    })
+      return props.selectedKeys !== undefined
+        ? props.selectedKeys
+        : internalSelectedKeys.value;
+    });
 
     // Computed open keys (controlled or uncontrolled)
     const currentOpenKeys = computed(() => {
-      return props.openKeys !== undefined ? props.openKeys : internalOpenKeys.value
-    })
+      return props.openKeys !== undefined
+        ? props.openKeys
+        : internalOpenKeys.value;
+    });
 
     // Handle menu item selection
     const handleSelect = (key: string | number) => {
-      const newSelectedKeys = [key]
-      
+      const newSelectedKeys = replaceKeys(key, currentSelectedKeys.value);
+
       // Update internal state if uncontrolled
       if (props.selectedKeys === undefined) {
-        internalSelectedKeys.value = newSelectedKeys
+        internalSelectedKeys.value = newSelectedKeys;
       }
-      
+
       // Emit events
-      emit('update:selectedKeys', newSelectedKeys)
-      emit('select', key, { selectedKeys: newSelectedKeys })
-    }
+      emit("update:selectedKeys", newSelectedKeys);
+      emit("select", key, { selectedKeys: newSelectedKeys });
+    };
 
     // Handle submenu open/close
     const handleOpenChange = (key: string | number) => {
-      let newOpenKeys: (string | number)[]
-      
-      const isOpen = currentOpenKeys.value.includes(key)
-      
-      if (isOpen) {
-        // Close submenu
-        newOpenKeys = currentOpenKeys.value.filter(k => k !== key)
-      } else {
-        // Open submenu
-        if (props.multiple) {
-          newOpenKeys = [...currentOpenKeys.value, key]
-        } else {
-          newOpenKeys = [key]
-        }
-      }
-      
+      const toggled = toggleKey(key, currentOpenKeys.value);
+      const newOpenKeys = props.multiple
+        ? toggled
+        : toggled.includes(key)
+        ? [key]
+        : [];
+
       // Update internal state if uncontrolled
       if (props.openKeys === undefined) {
-        internalOpenKeys.value = newOpenKeys
+        internalOpenKeys.value = newOpenKeys;
       }
-      
+
       // Emit events
-      emit('update:openKeys', newOpenKeys)
-      emit('open-change', key, { openKeys: newOpenKeys })
-    }
+      emit("update:openKeys", newOpenKeys);
+      emit("open-change", key, { openKeys: newOpenKeys });
+    };
 
     // Menu classes
     const menuClasses = computed(() => {
       return classNames(
-        getMenuClasses(props.mode, props.theme, props.collapsed)
-      )
-    })
+        getMenuClasses(props.mode, props.theme, props.collapsed),
+        props.className,
+        coerceClassValue(attrs.class)
+      );
+    });
+
+    const menuStyle = computed(() =>
+      mergeStyleValues(attrs.style, props.style)
+    );
+
+    const passthroughAttrs = computed(() => {
+      const { class: _class, style: _style, ...rest } = attrs;
+      return rest;
+    });
 
     // Provide menu context to child components
     provide<MenuContext>(MenuContextKey, {
@@ -164,23 +207,25 @@ export const Menu = defineComponent({
       theme: props.theme,
       collapsed: props.collapsed,
       inlineIndent: props.inlineIndent,
-      selectedKeys: currentSelectedKeys.value,
-      openKeys: currentOpenKeys.value,
+      selectedKeys: currentSelectedKeys,
+      openKeys: currentOpenKeys,
       handleSelect,
       handleOpenChange,
-    })
+    });
 
     return () => {
       return h(
-        'ul',
+        "ul",
         {
           class: menuClasses.value,
-          role: 'menu',
+          style: menuStyle.value,
+          role: "menu",
+          ...passthroughAttrs.value,
         },
         slots.default?.()
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Menu
+export default Menu;

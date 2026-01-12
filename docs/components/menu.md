@@ -8,10 +8,10 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Menu, MenuItem } from '@tigercat/vue'
+import { ref } from "vue";
+import { Menu, MenuItem } from "@tigercat/vue";
 
-const selectedKeys = ref(['1'])
+const selectedKeys = ref(["1"]);
 </script>
 
 <template>
@@ -26,19 +26,22 @@ const selectedKeys = ref(['1'])
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Menu, MenuItem } from '@tigercat/react'
+import { useState } from "react";
+import { Menu, MenuItem } from "@tigercat/react";
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(['1'])
+  const [selectedKeys, setSelectedKeys] = useState(["1"]);
 
   return (
-    <Menu selectedKeys={selectedKeys} onSelect={(key) => setSelectedKeys([key])}>
-      <MenuItem key="1">菜单项 1</MenuItem>
-      <MenuItem key="2">菜单项 2</MenuItem>
-      <MenuItem key="3">菜单项 3</MenuItem>
+    <Menu
+      selectedKeys={selectedKeys}
+      onSelect={(key) => setSelectedKeys([key])}
+    >
+      <MenuItem itemKey="1">菜单项 1</MenuItem>
+      <MenuItem itemKey="2">菜单项 2</MenuItem>
+      <MenuItem itemKey="3">菜单项 3</MenuItem>
     </Menu>
-  )
+  );
 }
 ```
 
@@ -50,10 +53,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Menu, MenuItem } from '@tigercat/vue'
+import { ref } from "vue";
+import { Menu, MenuItem } from "@tigercat/vue";
 
-const selectedKeys = ref(['home'])
+const selectedKeys = ref(["home"]);
 </script>
 
 <template>
@@ -69,20 +72,24 @@ const selectedKeys = ref(['home'])
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Menu, MenuItem } from '@tigercat/react'
+import { useState } from "react";
+import { Menu, MenuItem } from "@tigercat/react";
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(['home'])
+  const [selectedKeys, setSelectedKeys] = useState(["home"]);
 
   return (
-    <Menu mode="horizontal" selectedKeys={selectedKeys} onSelect={(key) => setSelectedKeys([key])}>
-      <MenuItem key="home">首页</MenuItem>
-      <MenuItem key="products">产品</MenuItem>
-      <MenuItem key="about">关于</MenuItem>
-      <MenuItem key="contact">联系我们</MenuItem>
+    <Menu
+      mode="horizontal"
+      selectedKeys={selectedKeys}
+      onSelect={(key) => setSelectedKeys([key])}
+    >
+      <MenuItem itemKey="home">首页</MenuItem>
+      <MenuItem itemKey="products">产品</MenuItem>
+      <MenuItem itemKey="about">关于</MenuItem>
+      <MenuItem itemKey="contact">联系我们</MenuItem>
     </Menu>
-  )
+  );
 }
 ```
 
@@ -94,18 +101,15 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
+import { ref } from "vue";
+import { Menu, MenuItem, SubMenu } from "@tigercat/vue";
 
-const selectedKeys = ref(['1'])
-const openKeys = ref(['sub1'])
+const selectedKeys = ref(["1"]);
+const openKeys = ref(["sub1"]);
 </script>
 
 <template>
-  <Menu 
-    v-model:selectedKeys="selectedKeys"
-    v-model:openKeys="openKeys"
-  >
+  <Menu v-model:selectedKeys="selectedKeys" v-model:openKeys="openKeys">
     <SubMenu itemKey="sub1" title="导航 1">
       <MenuItem itemKey="1">选项 1</MenuItem>
       <MenuItem itemKey="2">选项 2</MenuItem>
@@ -123,32 +127,32 @@ const openKeys = ref(['sub1'])
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Menu, MenuItem, SubMenu } from '@tigercat/react'
+import { useState } from "react";
+import { Menu, MenuItem, SubMenu } from "@tigercat/react";
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(['1'])
-  const [openKeys, setOpenKeys] = useState(['sub1'])
+  const [selectedKeys, setSelectedKeys] = useState(["1"]);
+  const [openKeys, setOpenKeys] = useState(["sub1"]);
 
   return (
-    <Menu 
+    <Menu
       selectedKeys={selectedKeys}
       openKeys={openKeys}
       onSelect={(key) => setSelectedKeys([key])}
       onOpenChange={(key, { openKeys }) => setOpenKeys(openKeys)}
     >
-      <SubMenu key="sub1" title="导航 1">
-        <MenuItem key="1">选项 1</MenuItem>
-        <MenuItem key="2">选项 2</MenuItem>
-        <MenuItem key="3">选项 3</MenuItem>
+      <SubMenu itemKey="sub1" title="导航 1">
+        <MenuItem itemKey="1">选项 1</MenuItem>
+        <MenuItem itemKey="2">选项 2</MenuItem>
+        <MenuItem itemKey="3">选项 3</MenuItem>
       </SubMenu>
-      <SubMenu key="sub2" title="导航 2">
-        <MenuItem key="4">选项 4</MenuItem>
-        <MenuItem key="5">选项 5</MenuItem>
+      <SubMenu itemKey="sub2" title="导航 2">
+        <MenuItem itemKey="4">选项 4</MenuItem>
+        <MenuItem itemKey="5">选项 5</MenuItem>
       </SubMenu>
-      <MenuItem key="6">导航 3</MenuItem>
+      <MenuItem itemKey="6">导航 3</MenuItem>
     </Menu>
-  )
+  );
 }
 ```
 
@@ -160,15 +164,15 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
+import { ref } from "vue";
+import { Menu, MenuItem, SubMenu } from "@tigercat/vue";
 
-const selectedKeys = ref(['1'])
-const openKeys = ref(['sub1'])
+const selectedKeys = ref(["1"]);
+const openKeys = ref(["sub1"]);
 </script>
 
 <template>
-  <Menu 
+  <Menu
     mode="inline"
     v-model:selectedKeys="selectedKeys"
     v-model:openKeys="openKeys"
@@ -188,31 +192,31 @@ const openKeys = ref(['sub1'])
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Menu, MenuItem, SubMenu } from '@tigercat/react'
+import { useState } from "react";
+import { Menu, MenuItem, SubMenu } from "@tigercat/react";
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(['1'])
-  const [openKeys, setOpenKeys] = useState(['sub1'])
+  const [selectedKeys, setSelectedKeys] = useState(["1"]);
+  const [openKeys, setOpenKeys] = useState(["sub1"]);
 
   return (
-    <Menu 
+    <Menu
       mode="inline"
       selectedKeys={selectedKeys}
       openKeys={openKeys}
       onSelect={(key) => setSelectedKeys([key])}
       onOpenChange={(key, { openKeys }) => setOpenKeys(openKeys)}
     >
-      <SubMenu key="sub1" title="导航 1">
-        <MenuItem key="1">选项 1</MenuItem>
-        <MenuItem key="2">选项 2</MenuItem>
+      <SubMenu itemKey="sub1" title="导航 1">
+        <MenuItem itemKey="1">选项 1</MenuItem>
+        <MenuItem itemKey="2">选项 2</MenuItem>
       </SubMenu>
-      <SubMenu key="sub2" title="导航 2">
-        <MenuItem key="3">选项 3</MenuItem>
-        <MenuItem key="4">选项 4</MenuItem>
+      <SubMenu itemKey="sub2" title="导航 2">
+        <MenuItem itemKey="3">选项 3</MenuItem>
+        <MenuItem itemKey="4">选项 4</MenuItem>
       </SubMenu>
     </Menu>
-  )
+  );
 }
 ```
 
@@ -224,19 +228,19 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
+import { ref } from "vue";
+import { Menu, MenuItem, SubMenu } from "@tigercat/vue";
 
-const collapsed = ref(false)
-const selectedKeys = ref(['1'])
+const collapsed = ref(false);
+const selectedKeys = ref(["1"]);
 </script>
 
 <template>
   <div>
     <button @click="collapsed = !collapsed">
-      {{ collapsed ? '展开' : '收起' }}
+      {{ collapsed ? "展开" : "收起" }}
     </button>
-    <Menu 
+    <Menu
       mode="vertical"
       :collapsed="collapsed"
       v-model:selectedKeys="selectedKeys"
@@ -255,33 +259,33 @@ const selectedKeys = ref(['1'])
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Menu, MenuItem, SubMenu } from '@tigercat/react'
+import { useState } from "react";
+import { Menu, MenuItem, SubMenu } from "@tigercat/react";
 
 function App() {
-  const [collapsed, setCollapsed] = useState(false)
-  const [selectedKeys, setSelectedKeys] = useState(['1'])
+  const [collapsed, setCollapsed] = useState(false);
+  const [selectedKeys, setSelectedKeys] = useState(["1"]);
 
   return (
     <div>
       <button onClick={() => setCollapsed(!collapsed)}>
-        {collapsed ? '展开' : '收起'}
+        {collapsed ? "展开" : "收起"}
       </button>
-      <Menu 
+      <Menu
         mode="vertical"
         collapsed={collapsed}
         selectedKeys={selectedKeys}
         onSelect={(key) => setSelectedKeys([key])}
       >
-        <MenuItem key="1">菜单项 1</MenuItem>
-        <MenuItem key="2">菜单项 2</MenuItem>
-        <SubMenu key="sub1" title="子菜单">
-          <MenuItem key="3">选项 3</MenuItem>
-          <MenuItem key="4">选项 4</MenuItem>
+        <MenuItem itemKey="1">菜单项 1</MenuItem>
+        <MenuItem itemKey="2">菜单项 2</MenuItem>
+        <SubMenu itemKey="sub1" title="子菜单">
+          <MenuItem itemKey="3">选项 3</MenuItem>
+          <MenuItem itemKey="4">选项 4</MenuItem>
         </SubMenu>
       </Menu>
     </div>
-  )
+  );
 }
 ```
 
@@ -293,17 +297,14 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
+import { ref } from "vue";
+import { Menu, MenuItem, SubMenu } from "@tigercat/vue";
 
-const selectedKeys = ref(['1'])
+const selectedKeys = ref(["1"]);
 </script>
 
 <template>
-  <Menu 
-    theme="dark"
-    v-model:selectedKeys="selectedKeys"
-  >
+  <Menu theme="dark" v-model:selectedKeys="selectedKeys">
     <MenuItem itemKey="1">菜单项 1</MenuItem>
     <MenuItem itemKey="2">菜单项 2</MenuItem>
     <SubMenu itemKey="sub1" title="子菜单">
@@ -317,26 +318,26 @@ const selectedKeys = ref(['1'])
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Menu, MenuItem, SubMenu } from '@tigercat/react'
+import { useState } from "react";
+import { Menu, MenuItem, SubMenu } from "@tigercat/react";
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(['1'])
+  const [selectedKeys, setSelectedKeys] = useState(["1"]);
 
   return (
-    <Menu 
+    <Menu
       theme="dark"
       selectedKeys={selectedKeys}
       onSelect={(key) => setSelectedKeys([key])}
     >
-      <MenuItem key="1">菜单项 1</MenuItem>
-      <MenuItem key="2">菜单项 2</MenuItem>
-      <SubMenu key="sub1" title="子菜单">
-        <MenuItem key="3">选项 3</MenuItem>
-        <MenuItem key="4">选项 4</MenuItem>
+      <MenuItem itemKey="1">菜单项 1</MenuItem>
+      <MenuItem itemKey="2">菜单项 2</MenuItem>
+      <SubMenu itemKey="sub1" title="子菜单">
+        <MenuItem itemKey="3">选项 3</MenuItem>
+        <MenuItem itemKey="4">选项 4</MenuItem>
       </SubMenu>
     </Menu>
-  )
+  );
 }
 ```
 
@@ -348,10 +349,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Menu, MenuItem, MenuItemGroup } from '@tigercat/vue'
+import { ref } from "vue";
+import { Menu, MenuItem, MenuItemGroup } from "@tigercat/vue";
 
-const selectedKeys = ref(['1'])
+const selectedKeys = ref(["1"]);
 </script>
 
 <template>
@@ -371,24 +372,27 @@ const selectedKeys = ref(['1'])
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Menu, MenuItem, MenuItemGroup } from '@tigercat/react'
+import { useState } from "react";
+import { Menu, MenuItem, MenuItemGroup } from "@tigercat/react";
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(['1'])
+  const [selectedKeys, setSelectedKeys] = useState(["1"]);
 
   return (
-    <Menu selectedKeys={selectedKeys} onSelect={(key) => setSelectedKeys([key])}>
+    <Menu
+      selectedKeys={selectedKeys}
+      onSelect={(key) => setSelectedKeys([key])}
+    >
       <MenuItemGroup title="分组 1">
-        <MenuItem key="1">选项 1</MenuItem>
-        <MenuItem key="2">选项 2</MenuItem>
+        <MenuItem itemKey="1">选项 1</MenuItem>
+        <MenuItem itemKey="2">选项 2</MenuItem>
       </MenuItemGroup>
       <MenuItemGroup title="分组 2">
-        <MenuItem key="3">选项 3</MenuItem>
-        <MenuItem key="4">选项 4</MenuItem>
+        <MenuItem itemKey="3">选项 3</MenuItem>
+        <MenuItem itemKey="4">选项 4</MenuItem>
       </MenuItemGroup>
     </Menu>
-  )
+  );
 }
 ```
 
@@ -400,13 +404,15 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
+import { ref } from "vue";
+import { Menu, MenuItem, SubMenu } from "@tigercat/vue";
 
-const selectedKeys = ref(['1'])
+const selectedKeys = ref(["1"]);
 
-const homeIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
-const settingsIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.196-15.196l-4.243 4.243m-5.906 5.906l-4.243 4.243M23 12h-6m-6 0H1m15.196 5.196l-4.243-4.243m-5.906-5.906l-4.243-4.243"></path></svg>'
+const homeIcon =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
+const settingsIcon =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.196-15.196l-4.243 4.243m-5.906 5.906l-4.243 4.243M23 12h-6m-6 0H1m15.196 5.196l-4.243-4.243m-5.906-5.906l-4.243-4.243"></path></svg>';
 </script>
 
 <template>
@@ -423,24 +429,31 @@ const settingsIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height=
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Menu, MenuItem, SubMenu } from '@tigercat/react'
+import { useState } from "react";
+import { Menu, MenuItem, SubMenu } from "@tigercat/react";
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(['1'])
+  const [selectedKeys, setSelectedKeys] = useState(["1"]);
 
-  const homeIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
-  const settingsIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.196-15.196l-4.243 4.243m-5.906 5.906l-4.243 4.243M23 12h-6m-6 0H1m15.196 5.196l-4.243-4.243m-5.906-5.906l-4.243-4.243"></path></svg>'
+  const homeIcon =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
+  const settingsIcon =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.196-15.196l-4.243 4.243m-5.906 5.906l-4.243 4.243M23 12h-6m-6 0H1m15.196 5.196l-4.243-4.243m-5.906-5.906l-4.243-4.243"></path></svg>';
 
   return (
-    <Menu selectedKeys={selectedKeys} onSelect={(key) => setSelectedKeys([key])}>
-      <MenuItem key="1" icon={homeIcon}>首页</MenuItem>
-      <SubMenu key="sub1" title="设置" icon={settingsIcon}>
-        <MenuItem key="2">常规设置</MenuItem>
-        <MenuItem key="3">高级设置</MenuItem>
+    <Menu
+      selectedKeys={selectedKeys}
+      onSelect={(key) => setSelectedKeys([key])}
+    >
+      <MenuItem itemKey="1" icon={homeIcon}>
+        首页
+      </MenuItem>
+      <SubMenu itemKey="sub1" title="设置" icon={settingsIcon}>
+        <MenuItem itemKey="2">常规设置</MenuItem>
+        <MenuItem itemKey="3">高级设置</MenuItem>
       </SubMenu>
     </Menu>
-  )
+  );
 }
 ```
 
@@ -448,61 +461,61 @@ function App() {
 
 ### Menu Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| mode | 菜单模式 | `'horizontal' \| 'vertical' \| 'inline'` | `'vertical'` |
-| theme | 主题颜色 | `'light' \| 'dark'` | `'light'` |
-| selectedKeys | 当前选中的菜单项 key 数组（受控） | `(string \| number)[]` | - |
-| defaultSelectedKeys | 初始选中的菜单项 key 数组 | `(string \| number)[]` | `[]` |
-| openKeys | 当前展开的 SubMenu key 数组（受控） | `(string \| number)[]` | - |
-| defaultOpenKeys | 初始展开的 SubMenu key 数组 | `(string \| number)[]` | `[]` |
-| collapsed | 是否收起菜单（仅 vertical 模式） | `boolean` | `false` |
-| multiple | 是否允许多个子菜单展开 | `boolean` | `true` |
-| inlineIndent | inline 模式的菜单缩进宽度（px） | `number` | `24` |
-| className | 自定义类名 | `string` | - |
-| style | 自定义样式 | `object` | - |
+| 参数                | 说明                                | 类型                                     | 默认值       |
+| ------------------- | ----------------------------------- | ---------------------------------------- | ------------ |
+| mode                | 菜单模式                            | `'horizontal' \| 'vertical' \| 'inline'` | `'vertical'` |
+| theme               | 主题颜色                            | `'light' \| 'dark'`                      | `'light'`    |
+| selectedKeys        | 当前选中的菜单项 key 数组（受控）   | `(string \| number)[]`                   | -            |
+| defaultSelectedKeys | 初始选中的菜单项 key 数组           | `(string \| number)[]`                   | `[]`         |
+| openKeys            | 当前展开的 SubMenu key 数组（受控） | `(string \| number)[]`                   | -            |
+| defaultOpenKeys     | 初始展开的 SubMenu key 数组         | `(string \| number)[]`                   | `[]`         |
+| collapsed           | 是否收起菜单（仅 vertical 模式）    | `boolean`                                | `false`      |
+| multiple            | 是否允许多个子菜单展开              | `boolean`                                | `true`       |
+| inlineIndent        | inline 模式的菜单缩进宽度（px）     | `number`                                 | `24`         |
+| className           | 自定义类名                          | `string`                                 | -            |
+| style               | 自定义样式                          | `object`                                 | -            |
 
 ### Menu Events (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| update:selectedKeys | 选中菜单项时触发 | `(keys: (string \| number)[])` |
-| update:openKeys | 子菜单展开/收起时触发 | `(keys: (string \| number)[])` |
-| select | 点击菜单项时触发 | `(key: string \| number, info: { selectedKeys: (string \| number)[] })` |
-| open-change | 子菜单展开/收起时触发 | `(key: string \| number, info: { openKeys: (string \| number)[] })` |
+| 事件名              | 说明                  | 回调参数                                                                |
+| ------------------- | --------------------- | ----------------------------------------------------------------------- |
+| update:selectedKeys | 选中菜单项时触发      | `(keys: (string \| number)[])`                                          |
+| update:openKeys     | 子菜单展开/收起时触发 | `(keys: (string \| number)[])`                                          |
+| select              | 点击菜单项时触发      | `(key: string \| number, info: { selectedKeys: (string \| number)[] })` |
+| open-change         | 子菜单展开/收起时触发 | `(key: string \| number, info: { openKeys: (string \| number)[] })`     |
 
 ### Menu Events (React)
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
-| onSelect | 点击菜单项时触发 | `(key: string \| number, info: { selectedKeys: (string \| number)[] }) => void` |
-| onOpenChange | 子菜单展开/收起时触发 | `(key: string \| number, info: { openKeys: (string \| number)[] }) => void` |
+| 属性         | 说明                  | 类型                                                                            |
+| ------------ | --------------------- | ------------------------------------------------------------------------------- |
+| onSelect     | 点击菜单项时触发      | `(key: string \| number, info: { selectedKeys: (string \| number)[] }) => void` |
+| onOpenChange | 子菜单展开/收起时触发 | `(key: string \| number, info: { openKeys: (string \| number)[] }) => void`     |
 
 ### MenuItem Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| key/itemKey | 唯一标识（Vue 使用 itemKey，React 使用 key） | `string \| number` | - |
-| disabled | 是否禁用 | `boolean` | `false` |
-| icon | 菜单项图标 | `string \| ReactNode \| VNode` | - |
-| className | 自定义类名 | `string` | - |
+| 参数      | 说明       | 类型                           | 默认值  |
+| --------- | ---------- | ------------------------------ | ------- |
+| itemKey   | 唯一标识   | `string \| number`             | -       |
+| disabled  | 是否禁用   | `boolean`                      | `false` |
+| icon      | 菜单项图标 | `string \| ReactNode \| VNode` | -       |
+| className | 自定义类名 | `string`                       | -       |
 
 ### SubMenu Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| key/itemKey | 唯一标识（Vue 使用 itemKey，React 使用 key） | `string \| number` | - |
-| title | 子菜单标题 | `string` | - |
-| icon | 子菜单图标 | `string \| ReactNode \| VNode` | - |
-| disabled | 是否禁用 | `boolean` | `false` |
-| className | 自定义类名 | `string` | - |
+| 参数      | 说明       | 类型                           | 默认值  |
+| --------- | ---------- | ------------------------------ | ------- |
+| itemKey   | 唯一标识   | `string \| number`             | -       |
+| title     | 子菜单标题 | `string`                       | -       |
+| icon      | 子菜单图标 | `string \| ReactNode \| VNode` | -       |
+| disabled  | 是否禁用   | `boolean`                      | `false` |
+| className | 自定义类名 | `string`                       | -       |
 
 ### MenuItemGroup Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| title | 分组标题 | `string` | - |
-| className | 自定义类名 | `string` | - |
+| 参数      | 说明       | 类型     | 默认值 |
+| --------- | ---------- | -------- | ------ |
+| title     | 分组标题   | `string` | -      |
+| className | 自定义类名 | `string` | -      |
 
 ## 主题定制
 

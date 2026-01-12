@@ -8,11 +8,11 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Form/FormItem` Step3 tests（2026-01-13）
+- 上一步：✅ `Menu` Step1 API/受控模型与事件语义（2026-01-13）
 - 当前组件：`Menu`
-- 当前步骤：Step1 API/受控模型与事件语义
+- 当前步骤：Step2 键盘/a11y
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：31/38
+- 已优化组件数/需优化组件数：32/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -275,7 +275,7 @@ return h("div", { class: "..." }, children);
 
 - 思路：键盘导航（上下/左右/Enter/Esc）；aria-menu/menuitem；openKeys/selectedKeys 受控/非受控一致；collapsed 模式。
 - 可拆分：受控模型与事件语义 → 键盘/a11y → 子组件联动 → tests。
-- 状态：未开始
+- 状态：✅ Step1 API/受控模型与事件语义（2026-01-13）：修复 React 使用 `key` 作为业务 key 的根因（React 不会把 `key` 透传为 props），统一改为显式 `itemKey`；core 下沉 `MenuKey` 并收敛 MenuItem/SubMenu 的 props key 类型；Vue Menu context 改为响应式（selectedKeys/openKeys 为 computed ref），同时补齐 Menu/MenuItem/SubMenu 的 `className/style` 与 attrs 合并透传；同步精简并更新 Vue/React Menu 测试与 Menu 文档，更新 React Menu Demo。
 
 #### Tabs / TabPane（P0，建议优化）
 

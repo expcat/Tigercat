@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState, useRef, useEffect } from 'react'
+import React, { useCallback, useState, useRef, useEffect } from "react";
 import {
   classNames,
   getSubMenuTitleClasses,
@@ -9,19 +9,19 @@ import {
   submenuContentHorizontalClasses,
   submenuContentVerticalClasses,
   type SubMenuProps as CoreSubMenuProps,
-} from '@tigercat/core'
-import { useMenuContext } from './Menu'
+} from "@tigercat/core";
+import { useMenuContext } from "./Menu";
 
 export interface SubMenuProps extends CoreSubMenuProps {
   /**
    * Submenu content
    */
-  children?: React.ReactNode
-  
+  children?: React.ReactNode;
+
   /**
    * Nesting level (internal use for indentation)
    */
-  level?: number
+  level?: number;
 }
 
 // Expand/collapse icon
@@ -35,11 +35,11 @@ const ExpandIcon: React.FC<{ expanded: boolean }> = ({ expanded }) => (
   >
     <path d="M6 9L1.5 4.5L2.205 3.795L6 7.59L9.795 3.795L10.5 4.5L6 9Z" />
   </svg>
-)
+);
 
 export const SubMenu: React.FC<SubMenuProps> = ({
-  key: itemKey,
-  title = '',
+  itemKey,
+  title = "",
   icon,
   disabled = false,
   className,
@@ -47,102 +47,86 @@ export const SubMenu: React.FC<SubMenuProps> = ({
   children,
 }) => {
   // Get menu context
-  const menuContext = useMenuContext()
+  const menuContext = useMenuContext();
 
   if (!menuContext) {
-    console.warn('SubMenu must be used within Menu component')
+    console.warn("SubMenu must be used within Menu component");
   }
 
   // For horizontal mode, track hover state
-  const [isHovered, setIsHovered] = useState(false)
-  const contentRef = useRef<HTMLUListElement>(null)
-  const [contentHeight, setContentHeight] = useState<number | undefined>(undefined)
+  const [isHovered, setIsHovered] = useState(false);
+  const contentRef = useRef<HTMLUListElement>(null);
+  const [contentHeight, setContentHeight] = useState<number | undefined>(
+    undefined
+  );
 
   // Check if this submenu is open
-  const isOpen = useMemo(() => {
-    if (!menuContext || itemKey === undefined) return false
-    return isKeyOpen(itemKey, menuContext.openKeys)
-  }, [menuContext, itemKey])
+  const isOpen = !!menuContext && isKeyOpen(itemKey, menuContext.openKeys);
 
   // Determine if submenu should be shown
-  const isExpanded = useMemo(() => {
-    if (menuContext?.mode === 'horizontal') {
-      return isHovered
-    }
-    return isOpen
-  }, [menuContext, isHovered, isOpen])
+  const isExpanded = menuContext?.mode === "horizontal" ? isHovered : isOpen;
 
   // Update content height for smooth animation
   useEffect(() => {
-    if (contentRef.current && menuContext?.mode !== 'horizontal') {
-      setContentHeight(isExpanded ? contentRef.current.scrollHeight : 0)
+    if (contentRef.current && menuContext?.mode !== "horizontal") {
+      setContentHeight(isExpanded ? contentRef.current.scrollHeight : 0);
     }
-  }, [isExpanded, menuContext?.mode])
+  }, [isExpanded, menuContext?.mode]);
 
   // Submenu title classes
-  const titleClasses = useMemo(() => {
-    if (!menuContext) return ''
-    return classNames(
-      getSubMenuTitleClasses(menuContext.theme, disabled)
-    )
-  }, [menuContext, disabled])
+  const titleClasses = menuContext
+    ? classNames(getSubMenuTitleClasses(menuContext.theme, disabled))
+    : "";
 
   // Submenu content classes
-  const contentClasses = useMemo(() => {
-    if (!menuContext) return ''
-    
-    if (menuContext.mode === 'horizontal') {
-      return submenuContentHorizontalClasses
-    }
-    return submenuContentVerticalClasses
-  }, [menuContext])
+  const contentClasses = !menuContext
+    ? ""
+    : menuContext.mode === "horizontal"
+    ? submenuContentHorizontalClasses
+    : submenuContentVerticalClasses;
 
   // Handle title click
   const handleTitleClick = useCallback(() => {
-    if (!disabled && menuContext && menuContext.mode !== 'horizontal' && itemKey !== undefined) {
-      menuContext.handleOpenChange(itemKey)
+    if (!disabled && menuContext && menuContext.mode !== "horizontal") {
+      menuContext.handleOpenChange(itemKey);
     }
-  }, [disabled, menuContext, itemKey])
+  }, [disabled, menuContext, itemKey]);
 
   // Handle mouse enter for horizontal mode
   const handleMouseEnter = useCallback(() => {
-    if (menuContext?.mode === 'horizontal') {
-      setIsHovered(true)
-    }
-  }, [menuContext])
+    if (menuContext?.mode === "horizontal") setIsHovered(true);
+  }, [menuContext]);
 
   // Handle mouse leave for horizontal mode
   const handleMouseLeave = useCallback(() => {
-    if (menuContext?.mode === 'horizontal') {
-      setIsHovered(false)
-    }
-  }, [menuContext])
+    if (menuContext?.mode === "horizontal") setIsHovered(false);
+  }, [menuContext]);
 
   // Get indent style for nested menus in inline mode
-  const indentStyle = useMemo(() => {
-    if (!menuContext || menuContext.mode === 'horizontal' || level === 0) {
-      return {}
-    }
-    return getMenuItemIndent(level, menuContext.inlineIndent)
-  }, [menuContext, level])
+  const indentStyle =
+    !menuContext || menuContext.mode === "horizontal" || level === 0
+      ? {}
+      : getMenuItemIndent(level, menuContext.inlineIndent);
 
-  if (!menuContext) return null
+  if (!menuContext) return null;
 
   // Render icon
   const renderIcon = () => {
-    if (!icon) return null
-    
-    if (typeof icon === 'string') {
+    if (!icon) return null;
+
+    if (typeof icon === "string") {
       return (
         <span
           className={menuItemIconClasses}
           dangerouslySetInnerHTML={{ __html: icon }}
         />
-      )
+      );
     }
-    
-    return <span className={menuItemIconClasses}>{icon as React.ReactNode}</span>
-  }
+
+    return (
+      <span className={menuItemIconClasses}>{icon as React.ReactNode}</span>
+    );
+  };
 
   // Render title
   const renderTitle = () => {
@@ -151,29 +135,35 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         <>
           {renderIcon()}
           <span className="flex-1">{title}</span>
-          {menuContext.mode !== 'horizontal' && <ExpandIcon expanded={isExpanded} />}
+          {menuContext.mode !== "horizontal" && (
+            <ExpandIcon expanded={isExpanded} />
+          )}
         </>
-      )
+      );
     } else if (!icon) {
       // Show first letter when collapsed without icon
-      return <span className="flex-1 text-center">{title.charAt(0).toUpperCase()}</span>
+      return (
+        <span className="flex-1 text-center">
+          {title.charAt(0).toUpperCase()}
+        </span>
+      );
     } else {
-      return renderIcon()
+      return renderIcon();
     }
-  }
+  };
 
   // Render content based on mode
   const renderContent = () => {
-    if (menuContext.mode === 'horizontal') {
+    if (menuContext.mode === "horizontal") {
       return (
         <ul
           className={contentClasses}
-          style={{ display: isExpanded ? 'block' : 'none' }}
+          style={{ display: isExpanded ? "block" : "none" }}
           role="menu"
         >
           {children}
         </ul>
-      )
+      );
     }
 
     return (
@@ -181,19 +171,20 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         ref={contentRef}
         className={contentClasses}
         style={{
-          height: contentHeight !== undefined ? `${contentHeight}px` : undefined,
+          height:
+            contentHeight !== undefined ? `${contentHeight}px` : undefined,
         }}
         role="menu"
       >
         {children}
       </ul>
-    )
-  }
+    );
+  };
 
   return (
     <li
       className={classNames(
-        menuContext.mode === 'horizontal' ? 'relative' : '',
+        menuContext.mode === "horizontal" ? "relative" : "",
         className
       )}
       onMouseEnter={handleMouseEnter}
@@ -204,12 +195,12 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         style={indentStyle}
         onClick={handleTitleClick}
         role="button"
-        aria-expanded={isExpanded ? 'true' : 'false'}
-        aria-disabled={disabled ? 'true' : undefined}
+        aria-expanded={isExpanded ? "true" : "false"}
+        aria-disabled={disabled ? "true" : undefined}
       >
         {renderTitle()}
       </div>
       {renderContent()}
     </li>
-  )
-}
+  );
+};
