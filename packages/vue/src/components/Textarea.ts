@@ -10,7 +10,9 @@ import {
 import {
   autoResizeTextarea,
   classNames,
+  coerceClassValue,
   getInputClasses,
+  mergeStyleValues,
   type TextareaSize,
 } from '@tigercat/core';
 
@@ -204,7 +206,7 @@ export const Textarea = defineComponent({
         getInputClasses(props.size),
         props.autoResize ? 'resize-none' : 'resize-y',
         props.className,
-        attrs.class
+        coerceClassValue(attrs.class)
       )
     );
 
@@ -261,7 +263,7 @@ export const Textarea = defineComponent({
           ...attrs,
           ref: textareaRef,
           class: textareaClasses.value,
-          style: [attrs.style, props.style],
+          style: mergeStyleValues(attrs.style, props.style),
           value: localValue.value,
           disabled: props.disabled,
           readonly: props.readonly,

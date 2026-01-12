@@ -5,6 +5,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/vue';
 import { Input } from '@tigercat/vue';
+import type { InputType } from '@tigercat/core';
 import {
   renderWithProps,
   expectNoA11yViolations,
@@ -65,11 +66,18 @@ describe('Input', () => {
     });
 
     it('should handle different input types', () => {
-      const types = ['text', 'password', 'email', 'number', 'tel', 'url'];
+      const types: InputType[] = [
+        'text',
+        'password',
+        'email',
+        'number',
+        'tel',
+        'url',
+      ];
 
       types.forEach((type) => {
         const { container, unmount } = renderWithProps(Input, {
-          type: type as any,
+          type,
         });
 
         const input = container.querySelector('input');

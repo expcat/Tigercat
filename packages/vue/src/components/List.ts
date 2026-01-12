@@ -10,6 +10,8 @@ import {
 } from 'vue';
 import {
   classNames,
+  coerceClassValue,
+  mergeStyleValues,
   getListClasses,
   getListItemClasses,
   getListHeaderFooterClasses,
@@ -35,13 +37,7 @@ import {
   type ListPaginationConfig,
 } from '@tigercat/core';
 
-type RawChildren =
-  | string
-  | number
-  | boolean
-  | VNode
-  | VNodeArrayChildren
-  | (() => unknown);
+type RawChildren = string | number | boolean | VNode | VNodeArrayChildren;
 
 // Loading spinner component
 const LoadingSpinner = () => {
@@ -352,7 +348,7 @@ export const List = defineComponent({
                   alt: item.title || 'Avatar',
                   class: 'w-10 h-10 rounded-full object-cover',
                 })
-              : item.avatar,
+              : (item.avatar as unknown as RawChildren),
           ])
         );
       }
@@ -544,8 +540,11 @@ export const List = defineComponent({
             'div',
             {
               ...attrs,
-              class: classNames(listClasses.value, attrsClass as any),
-              style: [attrsStyle as any, props.style as any],
+              class: classNames(
+                listClasses.value,
+                coerceClassValue(attrsClass)
+              ),
+              style: mergeStyleValues(attrsStyle, props.style),
               role: 'list',
               'aria-busy': props.loading || undefined,
             },

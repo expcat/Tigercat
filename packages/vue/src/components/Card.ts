@@ -1,6 +1,8 @@
 import { defineComponent, computed, h, PropType } from 'vue';
 import {
   classNames,
+  coerceClassValue,
+  mergeStyleValues,
   getCardClasses,
   cardSizeClasses,
   cardHeaderClasses,
@@ -115,9 +117,9 @@ export const Card = defineComponent({
           class: classNames(
             cardClasses.value,
             props.className,
-            attrsClass as any
+            coerceClassValue(attrsClass)
           ),
-          style: [attrsStyle as any, props.style as any],
+          style: mergeStyleValues(attrsStyle, props.style),
         },
         [
           props.cover

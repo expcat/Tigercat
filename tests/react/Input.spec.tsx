@@ -7,6 +7,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Input } from '@tigercat/react';
+import type { InputType } from '@tigercat/core';
 import {
   renderWithProps,
   expectNoA11yViolations,
@@ -78,10 +79,17 @@ describe('Input', () => {
     });
 
     it('should handle different input types', () => {
-      const types = ['text', 'password', 'email', 'number', 'tel', 'url'];
+      const types: InputType[] = [
+        'text',
+        'password',
+        'email',
+        'number',
+        'tel',
+        'url',
+      ];
 
       types.forEach((type) => {
-        const { container, unmount } = render(<Input type={type as any} />);
+        const { container, unmount } = render(<Input type={type} />);
 
         const input = container.querySelector('input');
         expect(input).toHaveAttribute('type', type);

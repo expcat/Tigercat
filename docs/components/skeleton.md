@@ -424,8 +424,8 @@ Skeleton 默认背景色来自 CSS 变量，可通过主题覆盖（均带 fallb
 }
 <Skeleton
   style={{
-    ['--tiger-skeleton-bg' as any]: '#f1f5f9',
-    ['--tiger-skeleton-bg-alt' as any]: '#e2e8f0',
+    ['--tiger-skeleton-bg' as `--${string}`]: '#f1f5f9',
+    ['--tiger-skeleton-bg-alt' as `--${string}`]: '#e2e8f0',
   }}
 />;
 

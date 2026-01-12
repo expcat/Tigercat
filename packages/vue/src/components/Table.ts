@@ -1,4 +1,11 @@
-import { defineComponent, computed, ref, h, PropType } from 'vue';
+import {
+  defineComponent,
+  computed,
+  ref,
+  h,
+  PropType,
+  type VNodeChild,
+} from 'vue';
 import {
   classNames,
   getTableWrapperClasses,
@@ -574,7 +581,7 @@ export const Table = defineComponent({
           ? { ...widthStyle, ...fixedStyle }
           : widthStyle;
 
-        const headerContent: any[] = [];
+        const headerContent: VNodeChild[] = [];
 
         if (column.renderHeader) {
           const slotContent = slots[`header-${column.key}`]?.();

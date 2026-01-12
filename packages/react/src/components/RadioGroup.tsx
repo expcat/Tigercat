@@ -6,7 +6,10 @@ import {
 } from '@tigercat/core';
 
 export interface RadioGroupProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children'>,
+  extends Omit<
+      React.HTMLAttributes<HTMLDivElement>,
+      'onChange' | 'children' | 'defaultValue'
+    >,
     CoreRadioGroupProps {
   /**
    * Change event handler

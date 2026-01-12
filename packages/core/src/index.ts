@@ -8,6 +8,8 @@ export const version = '0.0.1';
 
 // Utilities
 export * from './utils/class-names';
+export * from './utils/coerce-class-value';
+export * from './utils/style-values';
 export * from './utils/select-utils';
 export * from './utils/input-styles';
 export * from './utils/textarea-auto-resize';

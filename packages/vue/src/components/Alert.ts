@@ -1,6 +1,7 @@
 import { defineComponent, computed, h, ref, PropType } from 'vue';
 import {
   classNames,
+  coerceClassValue,
   getAlertTypeClasses,
   defaultAlertThemeColors,
   alertBaseClasses,
@@ -13,6 +14,7 @@ import {
   alertContentClasses,
   getAlertIconPath,
   alertCloseIconPath,
+  mergeStyleValues,
   type AlertType,
   type AlertSize,
 } from '@tigercat/core';
@@ -267,9 +269,9 @@ export const Alert = defineComponent({
           class: classNames(
             alertClasses.value,
             props.className,
-            attrsClass as any
+            coerceClassValue(attrsClass)
           ),
-          style: [attrsStyle as any, props.style as any],
+          style: mergeStyleValues(attrsStyle, props.style),
           role: 'alert',
         },
         children

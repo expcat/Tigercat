@@ -1,6 +1,8 @@
 import { defineComponent, computed, h, ref, PropType } from 'vue';
 import {
   classNames,
+  coerceClassValue,
+  mergeStyleValues,
   avatarBaseClasses,
   avatarSizeClasses,
   avatarShapeClasses,
@@ -139,9 +141,9 @@ export const Avatar = defineComponent({
         class: classNames(
           avatarClasses.value,
           props.className,
-          attrsClass as any
+          coerceClassValue(attrsClass)
         ),
-        style: [attrsStyle as any, props.style as any],
+        style: mergeStyleValues(attrsStyle, props.style),
       };
 
       // If src is provided and not errored, show image
@@ -150,9 +152,7 @@ export const Avatar = defineComponent({
           'span',
           {
             ...baseSpanProps,
-            'aria-hidden': isDecorative
-              ? true
-              : (attrsRecord['aria-hidden'] as any),
+            'aria-hidden': isDecorative ? true : ariaHiddenProp,
           },
           [
             h('img', {

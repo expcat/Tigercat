@@ -338,15 +338,15 @@ describe('Breadcrumb', () => {
     });
 
     it('should merge attrs.class with className on item', () => {
-      const { container } = render(Breadcrumb, {
+      const { container } = render(BreadcrumbItem, {
+        props: {
+          className: 'from-prop',
+        },
+        attrs: {
+          class: 'from-attrs',
+        },
         slots: {
-          default: () => [
-            h(
-              BreadcrumbItem,
-              { className: 'from-prop', class: 'from-attrs' } as any,
-              () => 'Home'
-            ),
-          ],
+          default: () => 'Home',
         },
       });
 

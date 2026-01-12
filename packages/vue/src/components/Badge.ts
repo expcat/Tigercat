@@ -1,6 +1,8 @@
 import { defineComponent, computed, h, PropType } from 'vue';
 import {
   classNames,
+  coerceClassValue,
+  mergeStyleValues,
   getBadgeVariantClasses,
   badgeBaseClasses,
   badgeSizeClasses,
@@ -164,9 +166,9 @@ export const Badge = defineComponent({
           class: classNames(
             badgeClasses.value,
             props.className,
-            attrsClass as any
+            coerceClassValue(attrsClass)
           ),
-          style: [attrsStyle as any, props.style as any],
+          style: mergeStyleValues(attrsStyle, props.style),
           role: 'status',
           'aria-label': ariaLabel,
         },

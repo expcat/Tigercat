@@ -1,5 +1,10 @@
 import { defineComponent, h, PropType, computed } from 'vue';
-import { classNames, layoutSidebarClasses } from '@tigercat/core';
+import {
+  classNames,
+  coerceClassValue,
+  layoutSidebarClasses,
+  mergeStyleValues,
+} from '@tigercat/core';
 
 export interface VueSidebarProps {
   className?: string;
@@ -45,11 +50,13 @@ export const Sidebar = defineComponent({
     },
   },
   setup(props, { slots, attrs }) {
+    const attrsRecord = attrs as Record<string, unknown>;
+
     const sidebarClasses = computed(() =>
       classNames(
         layoutSidebarClasses,
         props.className,
-        (attrs as Record<string, unknown>).class as any
+        coerceClassValue(attrsRecord.class)
       )
     );
 
@@ -65,11 +72,11 @@ export const Sidebar = defineComponent({
         {
           ...attrs,
           class: sidebarClasses.value,
-          style: [
-            (attrs as Record<string, unknown>).style as any,
-            props.style as any,
-            sidebarStyle.value,
-          ],
+          style: mergeStyleValues(
+            attrsRecord.style,
+            props.style,
+            sidebarStyle.value
+          ),
         },
         !props.collapsed && slots.default?.()
       );

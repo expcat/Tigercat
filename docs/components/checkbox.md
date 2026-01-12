@@ -526,7 +526,7 @@ function ValidationExample() {
     ],
     interests: [
       {
-        validator: (value: any[]) => value.length > 0,
+        validator: (value: unknown[]) => value.length > 0,
         message: '请至少选择一项兴趣',
       },
     ],

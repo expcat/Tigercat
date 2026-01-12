@@ -10,6 +10,7 @@ import {
 } from 'vue';
 import {
   classNames,
+  coerceClassValue,
   getRadioColorClasses,
   type RadioSize,
 } from '@tigercat/core';
@@ -224,7 +225,7 @@ export const Radio = defineComponent({
       const rootClass = classNames(
         'inline-flex items-center',
         props.className,
-        attrs.class
+        coerceClassValue(attrs.class)
       );
 
       const { class: _class, style: _style, ...restAttrs } = attrs;

@@ -14,6 +14,26 @@ import {
   type DropdownProps as CoreDropdownProps,
 } from '@tigercat/core';
 
+const getReactComponentName = (type: unknown): string | undefined => {
+  if (typeof type === 'function') {
+    const fn = type as { displayName?: unknown; name?: unknown };
+    const displayName =
+      typeof fn.displayName === 'string' ? fn.displayName : undefined;
+    const name = typeof fn.name === 'string' ? fn.name : undefined;
+    return displayName ?? name;
+  }
+
+  if (typeof type === 'object' && type != null) {
+    const obj = type as { displayName?: unknown; name?: unknown };
+    const displayName =
+      typeof obj.displayName === 'string' ? obj.displayName : undefined;
+    const name = typeof obj.name === 'string' ? obj.name : undefined;
+    return displayName ?? name;
+  }
+
+  return undefined;
+};
+
 // Dropdown context interface
 export interface DropdownContextValue {
   closeOnClick: boolean;
@@ -176,12 +196,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   childrenArray.forEach((child) => {
     if (React.isValidElement(child)) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const childType = child.type as any;
-      if (
-        childType.name === 'DropdownMenu' ||
-        childType.displayName === 'DropdownMenu'
-      ) {
+      const childTypeName = getReactComponentName(child.type);
+      if (childTypeName === 'DropdownMenu') {
         menuElement = child;
       } else {
         triggerElement = child;

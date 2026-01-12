@@ -1,6 +1,7 @@
 import { defineComponent, computed, provide, ref, h, type PropType } from 'vue';
 import {
   classNames,
+  coerceClassValue,
   type CheckboxGroupValue,
   type CheckboxSize,
 } from '@tigercat/core';
@@ -132,7 +133,7 @@ export const CheckboxGroup = defineComponent({
         'div',
         {
           ...attrs,
-          class: classNames(props.className, attrs.class),
+          class: classNames(props.className, coerceClassValue(attrs.class)),
           style: [attrs.style, props.style],
         },
         slots.default?.()
