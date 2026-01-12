@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useMemo,
-  useCallback,
-  ReactElement,
-} from 'react';
+import React, { createContext, useContext, ReactElement } from "react";
 import {
   classNames,
   getStepsContainerClasses,
@@ -12,8 +6,8 @@ import {
   type StepStatus,
   type StepSize,
   type StepsProps as CoreStepsProps,
-} from '@tigercat/core';
-import { StepsItem, type StepsItemProps } from './StepsItem';
+} from "@tigercat/core";
+import { StepsItem, type StepsItemProps } from "./StepsItem";
 
 // Steps context interface
 export interface StepsContextValue {
@@ -34,7 +28,12 @@ export function useStepsContext(): StepsContextValue | null {
   return useContext(StepsContext);
 }
 
-export interface StepsProps extends CoreStepsProps {
+export interface StepsProps
+  extends CoreStepsProps,
+    Omit<
+      React.OlHTMLAttributes<HTMLOListElement>,
+      keyof CoreStepsProps | "onChange" | "children"
+    > {
   /**
    * Step change event handler
    */
@@ -54,76 +53,63 @@ export interface StepsProps extends CoreStepsProps {
 
 export const Steps: React.FC<StepsProps> = ({
   current = 0,
-  status = 'process',
-  direction = 'horizontal',
-  size = 'default',
+  status = "process",
+  direction = "horizontal",
+  size = "default",
   simple = false,
   clickable = false,
   className,
   style,
   onChange,
   children,
+  ...props
 }) => {
-  // Container classes
-  const containerClasses = useMemo(() => {
-    return classNames(getStepsContainerClasses(direction), className);
-  }, [direction, className]);
-
-  // Handle step click
-  const handleStepClick = useCallback(
-    (index: number) => {
-      if (!clickable) {
-        return;
-      }
-
-      onChange?.(index);
-    },
-    [clickable, onChange]
+  const containerClasses = classNames(
+    getStepsContainerClasses(direction),
+    className
   );
 
-  // Context value
-  const contextValue = useMemo<StepsContextValue>(
-    () => ({
-      current,
-      status,
-      direction,
-      size,
-      simple,
-      clickable,
-      handleStepClick: clickable ? handleStepClick : undefined,
-    }),
-    [current, status, direction, size, simple, clickable, handleStepClick]
-  );
+  const handleStepClick = (index: number) => {
+    if (!clickable) {
+      return;
+    }
 
-  // Add step index and isLast props to each step item
-  const stepsWithProps = useMemo(() => {
-    const items: ReactElement[] = [];
+    onChange?.(index);
+  };
 
-    React.Children.forEach(children, (child, index) => {
-      if (
-        React.isValidElement<StepsItemProps>(child) &&
-        child.type === StepsItem
-      ) {
-        const totalCount = React.Children.count(children);
-        items.push(
-          React.cloneElement(child, {
-            stepIndex: index,
-            isLast: index === totalCount - 1,
-          })
-        );
-      } else {
-        items.push(child as ReactElement);
-      }
-    });
+  const contextValue: StepsContextValue = {
+    current,
+    status,
+    direction,
+    size,
+    simple,
+    clickable,
+    handleStepClick: clickable ? handleStepClick : undefined,
+  };
 
-    return items;
-  }, [children]);
+  const totalCount = React.Children.count(children);
+  const stepsWithProps = React.Children.map(children, (child, index) => {
+    if (
+      React.isValidElement<StepsItemProps>(child) &&
+      child.type === StepsItem
+    ) {
+      return React.cloneElement(child, {
+        stepIndex: index,
+        isLast: index === totalCount - 1,
+      });
+    }
+    return child as ReactElement;
+  });
+
+  const mergedStyle = {
+    ...(style ?? {}),
+  };
 
   return (
     <StepsContext.Provider value={contextValue}>
-      <div className={containerClasses} style={style}>
+      <ol {...props} className={containerClasses} style={mergedStyle}>
         {stepsWithProps}
-      </div>
+      </ol>
     </StepsContext.Provider>
   );
 };
