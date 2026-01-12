@@ -15,7 +15,7 @@ const createTooltipId = () => `tiger-tooltip-${++tooltipIdCounter}`;
 export type TooltipProps = Omit<CoreTooltipProps, "content" | "style"> &
   Omit<
     React.HTMLAttributes<HTMLDivElement>,
-    "children" | "className" | "style"
+    "children" | "className" | "style" | "content"
   > & {
     children?: React.ReactNode;
     content?: React.ReactNode;

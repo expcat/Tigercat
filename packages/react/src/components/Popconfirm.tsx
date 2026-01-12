@@ -302,8 +302,8 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     onClick: (event: React.MouseEvent) => {
       const target = children;
 
-      if (React.isValidElement(target)) {
-        const onChildClick = (target.props as { onClick?: unknown }).onClick;
+      if (React.isValidElement<{ onClick?: unknown }>(target)) {
+        const onChildClick = target.props.onClick;
         if (typeof onChildClick === "function") {
           (onChildClick as (e: React.MouseEvent) => void)(event);
         }
@@ -317,15 +317,16 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     "aria-controls": currentVisible ? popconfirmId : undefined,
   };
 
+  type TriggerChildProps = {
+    className?: string;
+    onClick?: unknown;
+  };
+
   const triggerNode = (() => {
-    if (React.isValidElement(children)) {
+    if (React.isValidElement<TriggerChildProps>(children)) {
       return React.cloneElement(children, {
-        ...(children.props || {}),
         ...triggerProps,
-        className: classNames(
-          (children.props as { className?: string }).className,
-          triggerProps.className
-        ),
+        className: classNames(children.props.className, triggerProps.className),
       });
     }
 
