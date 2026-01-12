@@ -6,9 +6,10 @@ import {
   onBeforeUnmount,
   watch,
   PropType,
-} from 'vue';
+} from "vue";
 import {
   classNames,
+  coerceClassValue,
   getPopoverContainerClasses,
   getPopoverTriggerClasses,
   getPopoverContentClasses,
@@ -17,10 +18,20 @@ import {
   getDropdownMenuWrapperClasses,
   type PopoverTrigger,
   type DropdownPlacement,
-} from '@tigercat/core';
+  type StyleValue,
+} from "@tigercat/core";
+
+export interface VuePopoverProps {
+  className?: string;
+  style?: StyleValue;
+}
+
+let popoverIdCounter = 0;
+const createPopoverId = () => `tiger-popover-${++popoverIdCounter}`;
 
 export const Popover = defineComponent({
-  name: 'TigerPopover',
+  name: "TigerPopover",
+  inheritAttrs: false,
   props: {
     /**
      * Whether the popover is visible (controlled mode)
@@ -57,7 +68,7 @@ export const Popover = defineComponent({
      */
     trigger: {
       type: String as PropType<PopoverTrigger>,
-      default: 'click' as PopoverTrigger,
+      default: "click" as PopoverTrigger,
     },
     /**
      * Popover placement relative to trigger
@@ -65,7 +76,7 @@ export const Popover = defineComponent({
      */
     placement: {
       type: String as PropType<DropdownPlacement>,
-      default: 'top' as DropdownPlacement,
+      default: "top" as DropdownPlacement,
     },
     /**
      * Whether the popover is disabled
@@ -90,97 +101,134 @@ export const Popover = defineComponent({
       type: String,
       default: undefined,
     },
+    style: {
+      type: [String, Object, Array] as PropType<StyleValue>,
+      default: undefined,
+    },
   },
-  emits: ['update:visible', 'visible-change'],
-  setup(props, { slots, emit }) {
-    // Internal state for uncontrolled mode
-    const internalVisible = ref(props.defaultVisible);
+  emits: ["update:visible", "visible-change"],
+  setup(props, { slots, emit, attrs }) {
+    const attrsRecord = attrs as Record<string, unknown>;
 
-    // Computed visible state (controlled or uncontrolled)
-    const currentVisible = computed(() => {
-      return props.visible !== undefined
-        ? props.visible
-        : internalVisible.value;
-    });
+    const coerceBoolean = (val: unknown) => {
+      if (val === "") return true;
+      return Boolean(val);
+    };
 
-    // Ref to the container element
+    const internalVisible = ref(
+      props.visible !== undefined
+        ? coerceBoolean(props.visible)
+        : props.defaultVisible
+    );
+
+    const isControlled = computed(() => props.visible !== undefined);
+
+    watch(
+      () => props.visible,
+      (next) => {
+        if (next === undefined) return;
+        internalVisible.value = coerceBoolean(next);
+      }
+    );
+
+    const currentVisible = computed(() => internalVisible.value);
+
     const containerRef = ref<HTMLElement | null>(null);
 
-    // Ref to the trigger element
-    const triggerRef = ref<HTMLElement | null>(null);
+    const popoverId = createPopoverId();
+    const titleId = `${popoverId}-title`;
+    const contentId = `${popoverId}-content`;
 
-    // Handle visibility change
-    const setVisible = (visible: boolean) => {
-      if (props.disabled) return;
+    const setVisible = (nextVisible: boolean) => {
+      if (props.disabled && nextVisible) return;
 
-      // Update internal state if uncontrolled
-      if (props.visible === undefined) {
-        internalVisible.value = visible;
+      if (!isControlled.value) {
+        internalVisible.value = nextVisible;
       }
 
-      // Emit events
-      emit('update:visible', visible);
-      emit('visible-change', visible);
+      emit("update:visible", nextVisible);
+      emit("visible-change", nextVisible);
     };
 
     // Handle trigger click
     const handleTriggerClick = () => {
-      if (props.disabled || props.trigger !== 'click') return;
+      if (props.disabled || props.trigger !== "click") return;
       setVisible(!currentVisible.value);
     };
 
     // Handle trigger mouse enter
     const handleTriggerMouseEnter = () => {
-      if (props.disabled || props.trigger !== 'hover') return;
+      if (props.disabled || props.trigger !== "hover") return;
       setVisible(true);
     };
 
     // Handle trigger mouse leave
     const handleTriggerMouseLeave = () => {
-      if (props.disabled || props.trigger !== 'hover') return;
+      if (props.disabled || props.trigger !== "hover") return;
       setVisible(false);
     };
 
     // Handle trigger focus
     const handleTriggerFocus = () => {
-      if (props.disabled || props.trigger !== 'focus') return;
+      if (props.disabled || props.trigger !== "focus") return;
       setVisible(true);
     };
 
     // Handle trigger blur
     const handleTriggerBlur = () => {
-      if (props.disabled || props.trigger !== 'focus') return;
+      if (props.disabled || props.trigger !== "focus") return;
       setVisible(false);
     };
 
-    // Handle outside click to close popover (only for click trigger)
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-
-      if (containerRef.value && !containerRef.value.contains(target)) {
-        setVisible(false);
-      }
+      const target = event.target;
+      if (!target) return;
+      if (containerRef.value?.contains(target as Node)) return;
+      setVisible(false);
     };
 
-    // Setup and cleanup event listeners based on visibility and trigger
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setVisible(false);
+    };
+
+    let outsideClickTimeoutId: number | undefined;
+
     watch([currentVisible, () => props.trigger], ([visible, trigger]) => {
-      if (visible && trigger === 'click') {
-        // Use setTimeout to avoid immediate triggering on the same click that opened it
-        setTimeout(() => {
-          document.addEventListener('click', handleClickOutside);
+      if (outsideClickTimeoutId !== undefined) {
+        clearTimeout(outsideClickTimeoutId);
+        outsideClickTimeoutId = undefined;
+      }
+
+      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+
+      if (visible && trigger === "click") {
+        outsideClickTimeoutId = window.setTimeout(() => {
+          document.addEventListener("click", handleClickOutside);
         }, 0);
-      } else {
-        document.removeEventListener('click', handleClickOutside);
+      }
+
+      if (visible && trigger !== "manual") {
+        document.addEventListener("keydown", handleKeyDown);
       }
     });
 
     onBeforeUnmount(() => {
-      document.removeEventListener('click', handleClickOutside);
+      if (outsideClickTimeoutId !== undefined) {
+        clearTimeout(outsideClickTimeoutId);
+      }
+      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
     });
 
     // Container classes
     const containerClasses = computed(() => {
-      return classNames(getPopoverContainerClasses(), props.className);
+      return classNames(
+        getPopoverContainerClasses(),
+        props.className,
+        coerceClassValue(attrsRecord.class)
+      );
     });
 
     // Trigger classes
@@ -217,25 +265,42 @@ export const Popover = defineComponent({
         return null;
       }
 
+      const {
+        class: _class,
+        style: _style,
+        ...restAttrs
+      } = attrsRecord as { class?: unknown; style?: unknown } & Record<
+        string,
+        unknown
+      >;
+
+      const hasTitle = Boolean(props.title || slots.title);
+      const hasContent = Boolean(props.content || slots.content);
+
+      const triggerA11yProps = {
+        "aria-haspopup": "dialog",
+        "aria-disabled": props.disabled ? "true" : undefined,
+      } as const;
+
       // Build trigger event handlers
       const triggerHandlers: Record<string, unknown> = {};
 
-      if (props.trigger === 'click') {
+      if (props.trigger === "click") {
         triggerHandlers.onClick = handleTriggerClick;
-      } else if (props.trigger === 'hover') {
+      } else if (props.trigger === "hover") {
         triggerHandlers.onMouseenter = handleTriggerMouseEnter;
         triggerHandlers.onMouseleave = handleTriggerMouseLeave;
-      } else if (props.trigger === 'focus') {
-        triggerHandlers.onFocus = handleTriggerFocus;
-        triggerHandlers.onBlur = handleTriggerBlur;
+      } else if (props.trigger === "focus") {
+        triggerHandlers.onFocusin = handleTriggerFocus;
+        triggerHandlers.onFocusout = handleTriggerBlur;
       }
 
       // Trigger element
       const trigger = h(
-        'div',
+        "div",
         {
-          ref: triggerRef,
           class: triggerClasses.value,
+          ...triggerA11yProps,
           ...triggerHandlers,
         },
         defaultSlot
@@ -243,22 +308,30 @@ export const Popover = defineComponent({
 
       // Popover content
       const content = h(
-        'div',
+        "div",
         {
           class: contentWrapperClasses.value,
+          hidden: !currentVisible.value,
+          "aria-hidden": !currentVisible.value,
         },
         [
           h(
-            'div',
+            "div",
             {
+              id: popoverId,
+              role: "dialog",
+              "aria-modal": "false",
+              "aria-labelledby": hasTitle ? titleId : undefined,
+              "aria-describedby": hasContent ? contentId : undefined,
               class: contentClasses.value,
             },
             [
               // Title
               (props.title || slots.title) &&
                 h(
-                  'div',
+                  "div",
                   {
+                    id: titleId,
                     class: titleClasses.value,
                   },
                   slots.title ? slots.title() : props.title
@@ -266,8 +339,9 @@ export const Popover = defineComponent({
               // Content
               (props.content || slots.content) &&
                 h(
-                  'div',
+                  "div",
                   {
+                    id: contentId,
                     class: contentTextClasses.value,
                   },
                   slots.content ? slots.content() : props.content
@@ -278,10 +352,12 @@ export const Popover = defineComponent({
       );
 
       return h(
-        'div',
+        "div",
         {
+          ...restAttrs,
           ref: containerRef,
           class: containerClasses.value,
+          style: props.style,
         },
         [trigger, content]
       );

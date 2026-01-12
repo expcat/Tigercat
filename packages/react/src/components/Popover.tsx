@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useMemo,
-  useCallback,
-  useState,
-  useRef,
-} from 'react';
+import React, { useEffect, useCallback, useState, useRef } from "react";
 import {
   classNames,
   getPopoverContainerClasses,
@@ -14,209 +8,192 @@ import {
   getPopoverContentTextClasses,
   getDropdownMenuWrapperClasses,
   type PopoverProps as CorePopoverProps,
-} from '@tigercat/core';
+} from "@tigercat/core";
 
-export interface PopoverProps extends CorePopoverProps {
-  /**
-   * The element to trigger the popover
-   */
-  children?: React.ReactNode;
+let popoverIdCounter = 0;
+const createPopoverId = () => `tiger-popover-${++popoverIdCounter}`;
 
-  /**
-   * Custom title content (alternative to title prop)
-   */
-  titleContent?: React.ReactNode;
-
-  /**
-   * Custom content (alternative to content prop)
-   */
-  contentContent?: React.ReactNode;
-
-  /**
-   * Callback when visibility changes
-   */
-  onVisibleChange?: (visible: boolean) => void;
-}
+export type PopoverProps = Omit<CorePopoverProps, "style"> &
+  Omit<
+    React.HTMLAttributes<HTMLDivElement>,
+    "children" | "className" | "style" | "title"
+  > & {
+    children?: React.ReactNode;
+    titleContent?: React.ReactNode;
+    contentContent?: React.ReactNode;
+    className?: string;
+    style?: React.CSSProperties;
+    onVisibleChange?: (visible: boolean) => void;
+  };
 
 export const Popover: React.FC<PopoverProps> = ({
   visible,
   defaultVisible = false,
   title,
   content,
-  trigger = 'click',
-  placement = 'top',
+  trigger = "click",
+  placement = "top",
   disabled = false,
   width,
   className,
+  style,
   children,
   titleContent,
   contentContent,
   onVisibleChange,
+  ...divProps
 }) => {
-  // Internal state for uncontrolled mode
+  const isControlled = visible !== undefined;
   const [internalVisible, setInternalVisible] = useState(defaultVisible);
 
-  // Computed visible state (controlled or uncontrolled)
-  const currentVisible = visible !== undefined ? visible : internalVisible;
+  const currentVisible = isControlled ? visible : internalVisible;
 
-  // Ref to the container element
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Ref to the trigger element
-  const triggerRef = useRef<HTMLDivElement>(null);
+  const popoverIdRef = useRef<string | null>(null);
+  if (!popoverIdRef.current) {
+    popoverIdRef.current = createPopoverId();
+  }
+  const popoverId = popoverIdRef.current;
+  const titleId = `${popoverId}-title`;
+  const contentId = `${popoverId}-content`;
 
-  // Handle visibility change
   const setVisible = useCallback(
-    (newVisible: boolean) => {
-      if (disabled) return;
+    (nextVisible: boolean) => {
+      if (disabled && nextVisible) return;
 
-      // Update internal state if uncontrolled
-      if (visible === undefined) {
-        setInternalVisible(newVisible);
+      if (!isControlled) {
+        setInternalVisible(nextVisible);
       }
 
-      // Notify parent
-      if (onVisibleChange) {
-        onVisibleChange(newVisible);
-      }
+      onVisibleChange?.(nextVisible);
     },
-    [disabled, visible, onVisibleChange]
+    [disabled, isControlled, onVisibleChange]
   );
 
-  // Handle trigger click
-  const handleTriggerClick = useCallback(() => {
-    if (disabled || trigger !== 'click') return;
+  const handleTriggerClick = () => {
+    if (disabled || trigger !== "click") return;
     setVisible(!currentVisible);
-  }, [disabled, trigger, currentVisible, setVisible]);
+  };
 
-  // Handle trigger mouse enter
-  const handleTriggerMouseEnter = useCallback(() => {
-    if (disabled || trigger !== 'hover') return;
+  const handleTriggerMouseEnter = () => {
+    if (disabled || trigger !== "hover") return;
     setVisible(true);
-  }, [disabled, trigger, setVisible]);
+  };
 
-  // Handle trigger mouse leave
-  const handleTriggerMouseLeave = useCallback(() => {
-    if (disabled || trigger !== 'hover') return;
+  const handleTriggerMouseLeave = () => {
+    if (disabled || trigger !== "hover") return;
     setVisible(false);
-  }, [disabled, trigger, setVisible]);
+  };
 
-  // Handle trigger focus
-  const handleTriggerFocus = useCallback(() => {
-    if (disabled || trigger !== 'focus') return;
+  const handleTriggerFocus = () => {
+    if (disabled || trigger !== "focus") return;
     setVisible(true);
-  }, [disabled, trigger, setVisible]);
+  };
 
-  // Handle trigger blur
-  const handleTriggerBlur = useCallback(() => {
-    if (disabled || trigger !== 'focus') return;
+  const handleTriggerBlur = () => {
+    if (disabled || trigger !== "focus") return;
     setVisible(false);
-  }, [disabled, trigger, setVisible]);
+  };
 
-  // Handle outside click to close popover (only for click trigger)
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
+    if (!currentVisible || trigger !== "click") return;
 
-      if (containerRef.current && !containerRef.current.contains(target)) {
-        // Close by calling onVisibleChange if in controlled mode, or update internal state
-        if (visible !== undefined && onVisibleChange) {
-          onVisibleChange(false);
-        } else {
-          setInternalVisible(false);
-        }
-      }
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target;
+      if (!target) return;
+      if (containerRef.current?.contains(target as Node)) return;
+      setVisible(false);
     };
 
-    if (currentVisible && trigger === 'click') {
-      // Use setTimeout to avoid immediate triggering on the same click that opened it
-      const timeoutId = setTimeout(() => {
-        document.addEventListener('click', handleClickOutside);
-      }, 0);
+    const timeoutId = setTimeout(() => {
+      document.addEventListener("click", handleClickOutside);
+    }, 0);
 
-      return () => {
-        clearTimeout(timeoutId);
-        document.removeEventListener('click', handleClickOutside);
-      };
-    }
-  }, [currentVisible, trigger, visible, onVisibleChange]);
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [currentVisible, trigger, setVisible]);
 
-  // Container classes
-  const containerClasses = useMemo(
-    () => classNames(getPopoverContainerClasses(), className),
-    [className]
+  useEffect(() => {
+    if (!currentVisible || trigger === "manual") return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setVisible(false);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [currentVisible, trigger, setVisible]);
+
+  const containerClasses = classNames(getPopoverContainerClasses(), className);
+  const triggerClasses = getPopoverTriggerClasses(disabled);
+  const contentWrapperClasses = getDropdownMenuWrapperClasses(
+    currentVisible,
+    placement
   );
+  const contentClasses = getPopoverContentClasses(width);
+  const titleClasses = getPopoverTitleClasses();
+  const contentTextClasses = getPopoverContentTextClasses();
 
-  // Trigger classes
-  const triggerClasses = useMemo(
-    () => getPopoverTriggerClasses(disabled),
-    [disabled]
-  );
-
-  // Content wrapper classes
-  const contentWrapperClasses = useMemo(
-    () => getDropdownMenuWrapperClasses(currentVisible, placement),
-    [currentVisible, placement]
-  );
-
-  // Content classes
-  const contentClasses = useMemo(
-    () => getPopoverContentClasses(width),
-    [width]
-  );
-
-  // Title classes
-  const titleClasses = useMemo(() => getPopoverTitleClasses(), []);
-
-  // Content text classes
-  const contentTextClasses = useMemo(() => getPopoverContentTextClasses(), []);
-
-  // Build trigger event handlers
-  const triggerHandlers = useMemo(() => {
-    const handlers: React.DOMAttributes<HTMLDivElement> = {};
-
-    if (trigger === 'click') {
-      handlers.onClick = handleTriggerClick;
-    } else if (trigger === 'hover') {
-      handlers.onMouseEnter = handleTriggerMouseEnter;
-      handlers.onMouseLeave = handleTriggerMouseLeave;
-    } else if (trigger === 'focus') {
-      handlers.onFocus = handleTriggerFocus;
-      handlers.onBlur = handleTriggerBlur;
-    }
-
-    return handlers;
-  }, [
-    trigger,
-    handleTriggerClick,
-    handleTriggerMouseEnter,
-    handleTriggerMouseLeave,
-    handleTriggerFocus,
-    handleTriggerBlur,
-  ]);
+  const triggerHandlers: React.DOMAttributes<HTMLDivElement> = {};
+  if (trigger === "click") {
+    triggerHandlers.onClick = handleTriggerClick;
+  } else if (trigger === "hover") {
+    triggerHandlers.onMouseEnter = handleTriggerMouseEnter;
+    triggerHandlers.onMouseLeave = handleTriggerMouseLeave;
+  } else if (trigger === "focus") {
+    triggerHandlers.onFocus = handleTriggerFocus;
+    triggerHandlers.onBlur = handleTriggerBlur;
+  }
 
   if (!children) {
     return null;
   }
 
+  const hasTitle = Boolean(title || titleContent);
+  const hasContent = Boolean(content || contentContent);
+  const describedBy = hasContent ? contentId : undefined;
+
   return (
-    <div ref={containerRef} className={containerClasses}>
-      {/* Trigger */}
-      <div ref={triggerRef} className={triggerClasses} {...triggerHandlers}>
+    <div
+      ref={containerRef}
+      className={containerClasses}
+      style={style}
+      {...divProps}
+    >
+      <div
+        className={triggerClasses}
+        aria-haspopup="dialog"
+        aria-disabled={disabled ? "true" : undefined}
+        {...triggerHandlers}
+      >
         {children}
       </div>
 
-      {/* Popover content */}
-      <div className={contentWrapperClasses} hidden={!currentVisible}>
-        <div className={contentClasses}>
-          {/* Title */}
-          {(title || titleContent) && (
-            <div className={titleClasses}>{titleContent || title}</div>
+      <div
+        className={contentWrapperClasses}
+        hidden={!currentVisible}
+        aria-hidden={!currentVisible}
+      >
+        <div
+          id={popoverId}
+          role="dialog"
+          aria-modal="false"
+          aria-labelledby={hasTitle ? titleId : undefined}
+          aria-describedby={describedBy}
+          className={contentClasses}
+        >
+          {hasTitle && (
+            <div id={titleId} className={titleClasses}>
+              {titleContent || title}
+            </div>
           )}
 
-          {/* Content */}
-          {(content || contentContent) && (
-            <div className={contentTextClasses}>
+          {hasContent && (
+            <div id={contentId} className={contentTextClasses}>
               {contentContent || content}
             </div>
           )}
