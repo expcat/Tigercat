@@ -77,6 +77,7 @@ export type { VueListProps } from "./components/List";
 export { Descriptions } from "./components/Descriptions";
 export type { VueDescriptionsProps } from "./components/Descriptions";
 export { Timeline } from "./components/Timeline";
+export type { VueTimelineProps } from "./components/Timeline";
 export { Tree } from "./components/Tree";
 export type { VueTreeProps } from "./components/Tree";
 export { Skeleton } from "./components/Skeleton";
