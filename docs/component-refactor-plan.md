@@ -12,7 +12,7 @@
 - 上一步：✅ `Popover` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 上一步：✅ `Message` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 上一步：✅ `Loading` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
-- 旁路修复：✅ 修复 `pnpm build`（React d.ts 类型陷阱：Popconfirm/Tooltip）（2026-01-13）
+- 旁路修复：✅ 修复 `pnpm build`（d.ts 类型陷阱：React Popconfirm/Tooltip + Vue Notification）（2026-01-13）
 - 上一步：✅ `Modal` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 上一步：✅ `Drawer` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 上一步：✅ `Select` Step1 API/类型对齐（value 类型、option group 类型）（2026-01-13）
@@ -47,6 +47,24 @@
 5. **React 类型“同名属性冲突”优先排雷**：当组件 props 使用了与 `React.HTMLAttributes` 同名的字段（常见：`title`/`content` 等），必须在 `Omit<React.HTMLAttributes<...>, ...>` 中显式剔除同名字段；否则会在 d.ts 中形成类似 `string & ReactNode` 的交叉类型，导致 Demo/用户侧在传入 JSX 时出现 `TS2322`。
 
 6. **React cloneElement 必须先收窄 props**：对 `children` 做 `cloneElement` 时，`React.isValidElement()` 默认把 props 视为 `unknown`；需要用 `React.isValidElement<YourChildProps>(children)` 先收窄，再传入 `className/onClick/...`，同时避免无脑展开 `children.props`（可能把 `unknown` 扩散进 d.ts）。
+
+7. **Vue `h()` 的 children 不要写成 `unknown[]`**：`unknown[]` 无法赋值给 Vue 的 `RawChildren`（元素类型会卡在 `unknown`，导致 d.ts 构建出现 `TS2769 No overload matches this call`）。如果需要“收集 children 再传给 h”，用仓库统一写法把类型锚定在 `h()` 的签名上：
+
+```ts
+import { h } from "vue";
+
+type HChildren = Parameters<typeof h>[2];
+type HArrayChildren = Extract<NonNullable<HChildren>, unknown[]>;
+
+const children: HArrayChildren = [
+  h("span", "..."),
+  // ...
+];
+
+return h("div", { class: "..." }, children);
+```
+
+> 补充：当 children 来源是“外部 unknown”（如 `pendingDot`、`item.dot`、slot 返回值等）时，允许使用最小断言 `as unknown as HChildren`，但不要把整个数组直接声明为 `unknown[]`。
 
 > 可用 `pnpm check:react-dts-guards` 做一次快速静态扫描，提前拦住上述两类 d.ts 隐患。
 
