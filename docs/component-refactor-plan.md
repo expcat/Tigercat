@@ -9,11 +9,12 @@
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
 - 上一步：✅ `Popover` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
+- 上一步：✅ `Message` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 旁路修复：✅ 修复 `pnpm build`（React d.ts 类型陷阱：Popconfirm/Tooltip）（2026-01-13）
-- 当前组件：`Message`
+- 当前组件：`Notification`
 - 当前步骤：Step1 主题/透传/a11y/类型导出/测试精简/文档同步
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：24/38
+- 已优化组件数/需优化组件数：25/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -335,7 +336,7 @@
 #### Message（P1，建议优化）
 
 - 思路：全局容器的 portal/stack；aria-live；自动关闭与可暂停（hover）。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）：core Message 默认色值从固定 Tailwind 色收敛为 CSS vars（含 fallback，新增 `--tiger-message-<type>-{bg,border,text,icon}`）；React Message 精简 `useMemo/useCallback` 与冗余断言，补齐按类型的 a11y 语义（error=alert，其它=status，aria-live/aria-busy），并增加稳定的 `data-tiger-message*` 选择器；Vue Message 去除测试环境分支的重复渲染逻辑，统一渲染函数并对齐 a11y 与 `data-*`；精简 Vue/React Message 测试（移除脆弱的颜色 class 断言）；同步更新 Message 文档（Demo 无需修改）。
 
 #### Notification（P1，建议优化）
 

@@ -7,8 +7,8 @@ import {
   computed,
   Teleport,
   TransitionGroup,
-  PropType,
-} from 'vue';
+  type PropType,
+} from "vue";
 import {
   classNames,
   getMessageTypeClasses,
@@ -26,12 +26,13 @@ import {
   type MessageInstance,
   type MessageOptions,
   type MessageConfig,
-} from '@tigercat/core';
+} from "@tigercat/core";
 
 /**
  * Global message container id
  */
-const MESSAGE_CONTAINER_ID = 'tiger-message-container';
+const MESSAGE_CONTAINER_ID = "tiger-message-container";
+const MESSAGE_CLOSE_ARIA_LABEL = "Close message";
 
 /**
  * Global message container root id
@@ -45,7 +46,7 @@ const messageInstances = ref<MessageInstance[]>([]);
 let instanceIdCounter = 0;
 
 const IS_TEST_ENV =
-  typeof process !== 'undefined' && process.env?.NODE_ENV === 'test';
+  typeof process !== "undefined" && process.env?.NODE_ENV === "test";
 
 let containerApp: App<Element> | null = null;
 
@@ -62,23 +63,23 @@ function getNextInstanceId(): number {
 function createIcon(path: string, className: string, isLoading = false) {
   const iconClass = classNames(
     className,
-    isLoading ? messageLoadingSpinnerClasses : ''
+    isLoading ? messageLoadingSpinnerClasses : ""
   );
 
   return h(
-    'svg',
+    "svg",
     {
       class: iconClass,
-      xmlns: 'http://www.w3.org/2000/svg',
-      fill: 'none',
-      viewBox: '0 0 24 24',
-      stroke: 'currentColor',
-      'stroke-width': '2',
+      xmlns: "http://www.w3.org/2000/svg",
+      fill: "none",
+      viewBox: "0 0 24 24",
+      stroke: "currentColor",
+      "stroke-width": "2",
     },
     [
-      h('path', {
-        'stroke-linecap': 'round',
-        'stroke-linejoin': 'round',
+      h("path", {
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
         d: path,
       }),
     ]
@@ -89,11 +90,11 @@ function createIcon(path: string, className: string, isLoading = false) {
  * Message container component
  */
 export const MessageContainer = defineComponent({
-  name: 'TigerMessageContainer',
+  name: "TigerMessageContainer",
   props: {
     position: {
       type: String as PropType<MessagePosition>,
-      default: 'top' as MessagePosition,
+      default: "top" as MessagePosition,
     },
   },
   setup(props) {
@@ -115,158 +116,83 @@ export const MessageContainer = defineComponent({
       }
     };
 
-    return () => {
+    const renderMessageItem = (message: MessageInstance) => {
+      const colorScheme = getMessageTypeClasses(
+        message.type,
+        defaultMessageThemeColors
+      );
+
+      const messageClasses = classNames(
+        messageBaseClasses,
+        colorScheme.bg,
+        colorScheme.border,
+        colorScheme.text,
+        message.className
+      );
+
+      const iconPath = message.icon || getMessageIconPath(message.type);
+      const iconClass = classNames(messageIconClasses, colorScheme.icon);
+
+      const a11yRole = message.type === "error" ? "alert" : "status";
+      const ariaLive = message.type === "error" ? "assertive" : "polite";
+
+      const children = [
+        createIcon(iconPath, iconClass, message.type === "loading"),
+        h("div", { class: messageContentClasses }, message.content),
+      ];
+
+      if (message.closable) {
+        children.push(
+          h(
+            "button",
+            {
+              class: messageCloseButtonClasses,
+              onClick: () => removeMessage(message.id),
+              "aria-label": MESSAGE_CLOSE_ARIA_LABEL,
+              type: "button",
+            },
+            createIcon(messageCloseIconPath, "w-4 h-4")
+          )
+        );
+      }
+
       return h(
+        "div",
+        {
+          key: message.id,
+          class: messageClasses,
+          role: a11yRole,
+          "aria-live": ariaLive,
+          "aria-atomic": "true",
+          "aria-busy": message.type === "loading" ? "true" : undefined,
+          "data-tiger-message": "",
+          "data-tiger-message-type": message.type,
+          "data-tiger-message-id": String(message.id),
+        },
+        children
+      );
+    };
+
+    return () =>
+      h(
         Teleport,
-        { to: 'body' },
+        { to: "body" },
         h(
-          'div',
+          "div",
           {
             class: containerClasses.value,
             id: MESSAGE_CONTAINER_ID,
+            "aria-live": "polite",
+            "aria-relevant": "additions",
+            "data-tiger-message-container": "",
           },
-          h(
-            'div',
-            { class: 'flex flex-col gap-2' },
-            IS_TEST_ENV
-              ? messageInstances.value.map((message) => {
-                  const colorScheme = getMessageTypeClasses(
-                    message.type,
-                    defaultMessageThemeColors
-                  );
-
-                  const messageClasses = classNames(
-                    messageBaseClasses,
-                    colorScheme.bg,
-                    colorScheme.border,
-                    colorScheme.text,
-                    message.className
-                  );
-
-                  const iconPath =
-                    message.icon || getMessageIconPath(message.type);
-                  const iconClass = classNames(
-                    messageIconClasses,
-                    colorScheme.icon
-                  );
-
-                  const children = [];
-
-                  // Icon
-                  children.push(
-                    createIcon(iconPath, iconClass, message.type === 'loading')
-                  );
-
-                  // Content
-                  children.push(
-                    h('div', { class: messageContentClasses }, message.content)
-                  );
-
-                  // Close button (if closable)
-                  if (message.closable) {
-                    children.push(
-                      h(
-                        'button',
-                        {
-                          class: messageCloseButtonClasses,
-                          onClick: () => removeMessage(message.id),
-                          'aria-label': 'Close message',
-                          type: 'button',
-                        },
-                        createIcon(messageCloseIconPath, 'w-4 h-4')
-                      )
-                    );
-                  }
-
-                  return h(
-                    'div',
-                    {
-                      key: message.id,
-                      class: messageClasses,
-                      role: 'alert',
-                    },
-                    children
-                  );
-                })
-              : h(
-                  TransitionGroup,
-                  {
-                    name: 'message',
-                    tag: 'div',
-                  },
-                  () =>
-                    messageInstances.value.map((message) => {
-                      const colorScheme = getMessageTypeClasses(
-                        message.type,
-                        defaultMessageThemeColors
-                      );
-
-                      const messageClasses = classNames(
-                        messageBaseClasses,
-                        colorScheme.bg,
-                        colorScheme.border,
-                        colorScheme.text,
-                        message.className
-                      );
-
-                      const iconPath =
-                        message.icon || getMessageIconPath(message.type);
-                      const iconClass = classNames(
-                        messageIconClasses,
-                        colorScheme.icon
-                      );
-
-                      const children = [];
-
-                      // Icon
-                      children.push(
-                        createIcon(
-                          iconPath,
-                          iconClass,
-                          message.type === 'loading'
-                        )
-                      );
-
-                      // Content
-                      children.push(
-                        h(
-                          'div',
-                          { class: messageContentClasses },
-                          message.content
-                        )
-                      );
-
-                      // Close button (if closable)
-                      if (message.closable) {
-                        children.push(
-                          h(
-                            'button',
-                            {
-                              class: messageCloseButtonClasses,
-                              onClick: () => removeMessage(message.id),
-                              'aria-label': 'Close message',
-                              type: 'button',
-                            },
-                            createIcon(messageCloseIconPath, 'w-4 h-4')
-                          )
-                        );
-                      }
-
-                      return h(
-                        'div',
-                        {
-                          key: message.id,
-                          class: messageClasses,
-                          role: 'alert',
-                        },
-                        children
-                      );
-                    })
-                )
-          )
+          IS_TEST_ENV
+            ? messageInstances.value.map(renderMessageItem)
+            : h(TransitionGroup, { name: "message", tag: "div" }, () =>
+                messageInstances.value.map(renderMessageItem)
+              )
         )
       );
-    };
   },
 });
 
@@ -274,7 +200,7 @@ export const MessageContainer = defineComponent({
  * Ensure message container exists (auto-mounted singleton)
  */
 function ensureContainer() {
-  if (typeof window === 'undefined' || typeof document === 'undefined') {
+  if (typeof window === "undefined" || typeof document === "undefined") {
     return;
   }
 
@@ -291,7 +217,7 @@ function ensureContainer() {
 
   let rootEl = existingRootEl;
   if (!rootEl) {
-    rootEl = document.createElement('div');
+    rootEl = document.createElement("div");
     rootEl.id = MESSAGE_CONTAINER_ROOT_ID;
     document.body.appendChild(rootEl);
   }
@@ -308,7 +234,7 @@ function addMessage(config: MessageConfig): () => void {
 
   const instance: MessageInstance = {
     id,
-    type: config.type || 'info',
+    type: config.type || "info",
     content: config.content,
     duration: config.duration !== undefined ? config.duration : 3000,
     closable: config.closable || false,
@@ -374,7 +300,7 @@ function clearAll() {
  * Normalize message options
  */
 function normalizeOptions(options: MessageOptions): MessageConfig {
-  if (typeof options === 'string') {
+  if (typeof options === "string") {
     return { content: options };
   }
   return options;
@@ -389,7 +315,7 @@ export const message = {
    */
   info(options: MessageOptions): () => void {
     const config = normalizeOptions(options);
-    return addMessage({ ...config, type: 'info' });
+    return addMessage({ ...config, type: "info" });
   },
 
   /**
@@ -397,7 +323,7 @@ export const message = {
    */
   success(options: MessageOptions): () => void {
     const config = normalizeOptions(options);
-    return addMessage({ ...config, type: 'success' });
+    return addMessage({ ...config, type: "success" });
   },
 
   /**
@@ -405,7 +331,7 @@ export const message = {
    */
   warning(options: MessageOptions): () => void {
     const config = normalizeOptions(options);
-    return addMessage({ ...config, type: 'warning' });
+    return addMessage({ ...config, type: "warning" });
   },
 
   /**
@@ -413,7 +339,7 @@ export const message = {
    */
   error(options: MessageOptions): () => void {
     const config = normalizeOptions(options);
-    return addMessage({ ...config, type: 'error' });
+    return addMessage({ ...config, type: "error" });
   },
 
   /**
@@ -421,7 +347,7 @@ export const message = {
    */
   loading(options: MessageOptions): () => void {
     const config = normalizeOptions(options);
-    return addMessage({ ...config, type: 'loading', duration: 0 });
+    return addMessage({ ...config, type: "loading", duration: 0 });
   },
 
   /**
