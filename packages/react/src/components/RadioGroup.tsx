@@ -1,11 +1,13 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useRef, useState } from 'react';
 import { classNames } from '@tigercat/core';
 import {
   type RadioGroupProps as CoreRadioGroupProps,
   type RadioSize,
 } from '@tigercat/core';
 
-export interface RadioGroupProps extends CoreRadioGroupProps {
+export interface RadioGroupProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children'>,
+    CoreRadioGroupProps {
   /**
    * Change event handler
    */
@@ -56,96 +58,74 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
   // Current value - use prop value if controlled, otherwise use internal state
   const currentValue = isControlled ? value : internalValue;
 
-  // Update internal value when defaultValue changes in uncontrolled mode
-  useEffect(() => {
+  const generatedNameRef = useRef(
+    `tiger-radio-group-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+  );
+
+  const groupName = name || generatedNameRef.current;
+
+  const handleChange = (newValue: string | number) => {
+    if (disabled) return;
+
     if (!isControlled) {
-      setInternalValue(defaultValue);
+      setInternalValue(newValue);
     }
-  }, [defaultValue, isControlled]);
 
-  const handleChange = useCallback(
-    (newValue: string | number) => {
-      if (disabled) return;
+    onChange?.(newValue);
+  };
 
-      // Update internal state if uncontrolled
-      if (!isControlled) {
-        setInternalValue(newValue);
-      }
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (disabled) return;
 
-      // Emit change event
-      onChange?.(newValue);
-    },
-    [disabled, isControlled, onChange]
-  );
+    if (
+      event.key !== 'ArrowDown' &&
+      event.key !== 'ArrowRight' &&
+      event.key !== 'ArrowUp' &&
+      event.key !== 'ArrowLeft'
+    ) {
+      return;
+    }
 
-  // Generate unique name if not provided
-  const groupName = useMemo(() => {
-    return (
-      name ||
-      `tiger-radio-group-${Date.now()}-${Math.random()
-        .toString(36)
-        .slice(2, 11)}`
-    );
-  }, [name]);
+    const target = event.target as HTMLElement;
+    const currentInput = target.closest(
+      'input[type="radio"]'
+    ) as HTMLInputElement | null;
+    if (!currentInput) return;
 
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (disabled) return;
+    const container = event.currentTarget;
+    const inputs = Array.from(
+      container.querySelectorAll('input[type="radio"]')
+    ) as HTMLInputElement[];
+    const enabledInputs = inputs.filter((input) => !input.disabled);
+    if (enabledInputs.length === 0) return;
 
-      const target = event.target as HTMLElement;
-      const label = target.closest('label');
-      if (!label) return;
+    const currentIndex = enabledInputs.indexOf(currentInput);
+    if (currentIndex === -1) return;
 
-      const container = event.currentTarget;
-      const labels = Array.from(container.querySelectorAll('label'));
-      const currentIndex = labels.indexOf(label);
+    event.preventDefault();
 
-      let nextIndex: number | null = null;
+    const direction =
+      event.key === 'ArrowDown' || event.key === 'ArrowRight' ? 1 : -1;
+    const nextIndex =
+      (currentIndex + direction + enabledInputs.length) % enabledInputs.length;
 
-      switch (event.key) {
-        case 'ArrowDown':
-        case 'ArrowRight':
-          event.preventDefault();
-          nextIndex = (currentIndex + 1) % labels.length;
-          break;
-        case 'ArrowUp':
-        case 'ArrowLeft':
-          event.preventDefault();
-          nextIndex = (currentIndex - 1 + labels.length) % labels.length;
-          break;
-        default:
-          return;
-      }
+    const nextInput = enabledInputs[nextIndex];
+    nextInput.focus();
+    nextInput.click();
+  };
 
-      if (nextIndex !== null) {
-        const nextLabel = labels[nextIndex] as HTMLElement;
-        const nextInput = nextLabel.querySelector(
-          'input[type="radio"]'
-        ) as HTMLInputElement;
-        if (nextInput && !nextInput.disabled) {
-          nextLabel.focus();
-          nextInput.click();
-        }
-      }
-    },
-    [disabled]
-  );
-
-  const contextValue: RadioGroupContextValue = useMemo(
-    () => ({
-      value: currentValue,
-      name: groupName,
-      disabled,
-      size,
-      onChange: handleChange,
-    }),
-    [currentValue, groupName, disabled, size, handleChange]
-  );
+  const contextValue: RadioGroupContextValue = {
+    value: currentValue,
+    name: groupName,
+    disabled,
+    size,
+    onChange: handleChange,
+  };
 
   return (
     <RadioGroupContext.Provider value={contextValue}>
       <div
-        className={classNames(className || 'space-y-2')}
+        className={classNames(className, !className && 'space-y-2')}
         role="radiogroup"
         onKeyDown={handleKeyDown}
         {...props}>

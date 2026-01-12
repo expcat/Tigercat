@@ -2,15 +2,30 @@ import {
   defineComponent,
   computed,
   h,
-  inject,
   PropType,
+  inject,
+  ref,
   getCurrentInstance,
+  type ComputedRef,
 } from 'vue';
 import {
   classNames,
   getRadioColorClasses,
   type RadioSize,
 } from '@tigercat/core';
+
+import { RadioGroupKey, type RadioGroupContext } from './RadioGroup';
+
+export interface VueRadioProps {
+  value: string | number;
+  size?: RadioSize;
+  disabled?: boolean;
+  name?: string;
+  checked?: boolean;
+  defaultChecked?: boolean;
+  className?: string;
+  style?: Record<string, string | number>;
+}
 
 const sizeClasses = {
   sm: {
@@ -32,6 +47,7 @@ const sizeClasses = {
 
 export const Radio = defineComponent({
   name: 'TigerRadio',
+  inheritAttrs: false,
   props: {
     /**
      * Radio value (required for radio groups)
@@ -53,7 +69,6 @@ export const Radio = defineComponent({
      */
     disabled: {
       type: Boolean,
-      default: false,
     },
     /**
      * Input name attribute
@@ -67,6 +82,29 @@ export const Radio = defineComponent({
     checked: {
       type: Boolean,
     },
+
+    /**
+     * Default checked state (uncontrolled mode)
+     * @default false
+     */
+    defaultChecked: {
+      type: Boolean,
+      default: false,
+    },
+
+    /**
+     * Additional CSS classes (applied to root element)
+     */
+    className: {
+      type: String,
+    },
+
+    /**
+     * Inline styles (applied to root element)
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+    },
   },
   emits: {
     /**
@@ -79,8 +117,18 @@ export const Radio = defineComponent({
      */
     'update:checked': (value: boolean) => typeof value === 'boolean',
   },
-  setup(props, { slots, emit }) {
+  setup(props, { slots, emit, attrs }) {
     const instance = getCurrentInstance();
+
+    const groupContextRef = inject<ComputedRef<RadioGroupContext> | null>(
+      RadioGroupKey,
+      null
+    );
+
+    const groupContext = computed(() => groupContextRef?.value);
+
+    const internalChecked = ref(props.defaultChecked);
+
     const isCheckedControlled = computed(() => {
       const rawProps = instance?.vnode.props as
         | Record<string, unknown>
@@ -90,34 +138,21 @@ export const Radio = defineComponent({
         !!rawProps && Object.prototype.hasOwnProperty.call(rawProps, 'checked')
       );
     });
+    const isInGroup = computed(() => !!groupContext.value);
 
-    // Inject from RadioGroup if available
-    const groupValue = inject<{ value: string | number | undefined }>(
-      'radioGroupValue',
-      { value: undefined }
+    const actualSize = computed<RadioSize>(
+      () => props.size || groupContext.value?.size || 'md'
     );
-    const groupName = inject<string>('radioGroupName', '');
-    const groupDisabled = inject<boolean>('radioGroupDisabled', false);
-    const groupSize = inject<RadioSize>('radioGroupSize', 'md');
-    const groupOnChange = inject<
-      ((value: string | number) => void) | undefined
-    >('radioGroupOnChange', undefined);
-
-    // Determine actual values (props override group values)
-    const actualSize = computed(() => props.size || groupSize || 'md');
-    const actualDisabled = computed(() => props.disabled || groupDisabled);
-    const actualName = computed(() => props.name || groupName);
+    const actualDisabled = computed(() => {
+      if (props.disabled !== undefined) return props.disabled;
+      return groupContext.value?.disabled || false;
+    });
+    const actualName = computed(() => props.name || groupContext.value?.name);
 
     const isChecked = computed(() => {
-      // If controlled via checked prop
-      if (isCheckedControlled.value) {
-        return props.checked;
-      }
-      // If part of a group
-      if (groupValue.value !== undefined) {
-        return groupValue.value === props.value;
-      }
-      return false;
+      if (isCheckedControlled.value) return props.checked;
+      if (isInGroup.value) return groupContext.value?.value === props.value;
+      return internalChecked.value;
     });
 
     const colors = getRadioColorClasses();
@@ -147,7 +182,9 @@ export const Radio = defineComponent({
       return classNames(
         'ml-2 cursor-pointer select-none',
         sizeClasses[actualSize.value].label,
-        actualDisabled.value ? colors.textDisabled : 'text-gray-900',
+        actualDisabled.value
+          ? colors.textDisabled
+          : 'text-[var(--tiger-text,#111827)]',
         actualDisabled.value && 'cursor-not-allowed'
       );
     });
@@ -161,54 +198,64 @@ export const Radio = defineComponent({
       const target = event.target as HTMLInputElement;
       const newChecked = target.checked;
 
+      if (!isCheckedControlled.value && !isInGroup.value && newChecked) {
+        internalChecked.value = true;
+      }
+
       emit('update:checked', newChecked);
       emit('change', props.value);
 
       // Notify group if part of a group
-      if (groupOnChange) {
-        groupOnChange(props.value);
-      }
+      if (newChecked && groupContext.value)
+        groupContext.value.onChange(props.value);
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (actualDisabled.value) return;
+      if (event.key !== 'Enter') return;
+      event.preventDefault();
 
-      if (event.key === ' ' || event.key === 'Enter') {
-        event.preventDefault();
-        const inputElement = event.currentTarget as HTMLElement;
-        const input = inputElement.querySelector(
-          'input[type="radio"]'
-        ) as HTMLInputElement;
-        if (input && !input.checked) {
-          input.click();
-        }
-      }
+      const input = event.currentTarget as HTMLInputElement;
+      if (!input.checked) input.click();
     };
 
     return () => {
+      const rootStyle = [attrs.style, props.style];
+      const rootClass = classNames(
+        'inline-flex items-center',
+        props.className,
+        attrs.class
+      );
+
+      const { class: _class, style: _style, ...restAttrs } = attrs;
+
       return h(
         'label',
         {
-          class: 'inline-flex items-center',
-          tabindex: actualDisabled.value ? -1 : 0,
-          onKeydown: handleKeyDown,
+          class: rootClass,
+          style: rootStyle,
         },
         [
           // Hidden native radio input
           h('input', {
+            ...restAttrs,
             type: 'radio',
-            class: 'sr-only',
+            class: 'sr-only peer',
             name: actualName.value,
             value: props.value,
             checked: isChecked.value,
             disabled: actualDisabled.value,
             onChange: handleChange,
+            onKeydown: handleKeyDown,
           }),
           // Custom radio visual
           h(
             'span',
             {
-              class: radioClasses.value,
+              class: classNames(
+                radioClasses.value,
+                'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-primary,#2563eb)] peer-focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
+              ),
               'aria-hidden': 'true',
             },
             [

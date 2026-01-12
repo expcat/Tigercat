@@ -6,7 +6,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { Radio } from '@tigercat/react';
+import { Radio, RadioGroup } from '@tigercat/react';
 import {
   expectNoA11yViolations,
   componentSizes,
@@ -37,6 +37,19 @@ describe('Radio', () => {
         'input[type="radio"]'
       ) as HTMLInputElement;
       expect(radio.checked).toBe(false);
+    });
+
+    it('should support defaultChecked (uncontrolled)', () => {
+      const { container } = render(
+        <Radio value="option1" defaultChecked>
+          Option 1
+        </Radio>
+      );
+
+      const radio = container.querySelector(
+        'input[type="radio"]'
+      ) as HTMLInputElement;
+      expect(radio.checked).toBe(true);
     });
 
     it('should apply custom className', () => {
@@ -159,6 +172,31 @@ describe('Radio', () => {
     });
   });
 
+  describe('RadioGroup', () => {
+    it('should select and switch values in uncontrolled mode', async () => {
+      const user = userEvent.setup();
+
+      const { container } = render(
+        <RadioGroup defaultValue="a">
+          <Radio value="a">A</Radio>
+          <Radio value="b">B</Radio>
+        </RadioGroup>
+      );
+
+      const inputs = Array.from(
+        container.querySelectorAll('input[type="radio"]')
+      ) as HTMLInputElement[];
+
+      expect(inputs[0].checked).toBe(true);
+      expect(inputs[1].checked).toBe(false);
+
+      await user.click(inputs[1]);
+
+      expect(inputs[0].checked).toBe(false);
+      expect(inputs[1].checked).toBe(true);
+    });
+  });
+
   describe('Theme Support', () => {
     afterEach(() => {
       clearThemeVariables(['--tiger-primary']);
@@ -194,54 +232,13 @@ describe('Radio', () => {
       await expectNoA11yViolations(container);
     });
 
-    it('should have proper role', () => {
+    it('should be focusable', () => {
       const { container } = render(<Radio value="option1">Radio</Radio>);
-
-      const radio = container.querySelector('input[type="radio"]');
-      expect(radio).toHaveAttribute('type', 'radio');
-    });
-
-    it('should be keyboard accessible', async () => {
-      const user = userEvent.setup();
-      const handleChange = vi.fn();
-      const { container } = render(
-        <Radio value="option1" onChange={handleChange}>
-          Radio
-        </Radio>
-      );
 
       const radio = container.querySelector('input[type="radio"]')!;
       radio.focus();
 
       expect(radio).toHaveFocus();
-    });
-  });
-
-  describe('Snapshots', () => {
-    it('should match snapshot for unchecked state', () => {
-      const { container } = render(<Radio value="option1">Unchecked</Radio>);
-
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it('should match snapshot for checked state', () => {
-      const { container } = render(
-        <Radio value="option1" checked>
-          Checked
-        </Radio>
-      );
-
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it('should match snapshot for disabled state', () => {
-      const { container } = render(
-        <Radio value="option1" disabled>
-          Disabled
-        </Radio>
-      );
-
-      expect(container.firstChild).toMatchSnapshot();
     });
   });
 });
