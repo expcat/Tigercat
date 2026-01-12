@@ -1,14 +1,19 @@
 import {
   defineComponent,
-  computed,
   h,
-  Transition,
   Teleport,
-  watch,
   ref,
   PropType,
-} from 'vue';
+  computed,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  nextTick,
+} from "vue";
 import {
+  classNames,
+  coerceClassValue,
+  mergeStyleValues,
   getModalContentClasses,
   modalWrapperClasses,
   modalMaskClasses,
@@ -19,10 +24,33 @@ import {
   modalBodyClasses,
   modalFooterClasses,
   type ModalSize,
-} from '@tigercat/core';
+} from "@tigercat/core";
+
+import { Button } from "./Button";
+
+let modalIdCounter = 0;
+const createModalId = () => `tiger-modal-${++modalIdCounter}`;
+
+export interface VueModalProps {
+  visible?: boolean;
+  size?: ModalSize;
+  title?: string;
+  closable?: boolean;
+  mask?: boolean;
+  maskClosable?: boolean;
+  centered?: boolean;
+  destroyOnClose?: boolean;
+  zIndex?: number;
+  className?: string;
+  style?: Record<string, unknown>;
+  closeAriaLabel?: string;
+  okText?: string;
+  cancelText?: string;
+}
 
 export const Modal = defineComponent({
-  name: 'TigerModal',
+  name: "TigerModal",
+  inheritAttrs: false,
   props: {
     /**
      * Whether the modal is visible
@@ -38,7 +66,7 @@ export const Modal = defineComponent({
      */
     size: {
       type: String as PropType<ModalSize>,
-      default: 'md' as ModalSize,
+      default: "md" as ModalSize,
     },
     /**
      * Modal title
@@ -102,6 +130,50 @@ export const Modal = defineComponent({
       type: String,
       default: undefined,
     },
+
+    /**
+     * Custom inline style
+     */
+    style: {
+      type: Object as PropType<Record<string, unknown>>,
+      default: undefined,
+    },
+
+    /**
+     * Close button aria-label
+     * @default 'Close'
+     */
+    closeAriaLabel: {
+      type: String,
+      default: "Close",
+    },
+
+    /**
+     * Default OK button text (used in default footer)
+     * @default '确定'
+     */
+    okText: {
+      type: String,
+      default: "确定",
+    },
+
+    /**
+     * Default Cancel button text (used in default footer)
+     * @default '取消'
+     */
+    cancelText: {
+      type: String,
+      default: "取消",
+    },
+
+    /**
+     * Whether to render a default footer when no `footer` slot is provided
+     * @default false
+     */
+    showDefaultFooter: {
+      type: Boolean,
+      default: false,
+    },
     /**
      * Disable teleport (useful for testing)
      * @default false
@@ -112,30 +184,44 @@ export const Modal = defineComponent({
       default: false,
     },
   },
-  emits: ['update:visible', 'close', 'cancel', 'ok'],
-  setup(props, { slots, emit }) {
-    const hasRendered = ref(false);
+  emits: ["update:visible", "close", "cancel", "ok"],
+  setup(props, { slots, emit, attrs }) {
+    const instanceId = ref<string>(createModalId());
+    const hasBeenOpened = ref(false);
+
+    const dialogRef = ref<HTMLElement | null>(null);
+    const closeButtonRef = ref<HTMLButtonElement | null>(null);
+    const previousActiveElement = ref<HTMLElement | null>(null);
+
+    const titleId = computed(() => `${instanceId.value}-title`);
+
     const shouldRender = computed(() => {
       if (props.visible) {
-        hasRendered.value = true;
+        hasBeenOpened.value = true;
         return true;
       }
-      return !props.destroyOnClose && hasRendered.value;
+
+      if (props.destroyOnClose) return false;
+      return hasBeenOpened.value;
     });
 
-    // Watch for visible changes to emit events
     watch(
       () => props.visible,
       (newVal) => {
         if (!newVal) {
-          emit('close');
+          emit("close");
         }
       }
     );
 
     const handleClose = () => {
-      emit('update:visible', false);
-      emit('cancel');
+      emit("update:visible", false);
+      emit("cancel");
+    };
+
+    const handleOk = () => {
+      emit("ok");
+      emit("update:visible", false);
     };
 
     const handleMaskClick = (event: MouseEvent) => {
@@ -143,6 +229,38 @@ export const Modal = defineComponent({
         handleClose();
       }
     };
+
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && props.visible) {
+        handleClose();
+      }
+    };
+
+    onMounted(() => {
+      document.addEventListener("keydown", handleEscKey);
+    });
+
+    onBeforeUnmount(() => {
+      document.removeEventListener("keydown", handleEscKey);
+    });
+
+    watch(
+      () => props.visible,
+      async (nextVisible) => {
+        if (nextVisible) {
+          const active = document.activeElement;
+          previousActiveElement.value =
+            active instanceof HTMLElement ? active : null;
+
+          await nextTick();
+          const el = closeButtonRef.value ?? dialogRef.value;
+          el?.focus?.();
+          return;
+        }
+
+        previousActiveElement.value?.focus?.();
+      }
+    );
 
     const contentClasses = computed(() => {
       return getModalContentClasses(props.size, props.className);
@@ -152,22 +270,21 @@ export const Modal = defineComponent({
       return getModalContainerClasses(props.centered);
     });
 
-    // Close button icon (X)
     const CloseIcon = h(
-      'svg',
+      "svg",
       {
-        class: 'h-5 w-5',
-        xmlns: 'http://www.w3.org/2000/svg',
-        fill: 'none',
-        viewBox: '0 0 24 24',
-        stroke: 'currentColor',
+        class: "h-5 w-5",
+        xmlns: "http://www.w3.org/2000/svg",
+        fill: "none",
+        viewBox: "0 0 24 24",
+        stroke: "currentColor",
       },
       [
-        h('path', {
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-          'stroke-width': '2',
-          d: 'M6 18L18 6M6 6l12 12',
+        h("path", {
+          "stroke-linecap": "round",
+          "stroke-linejoin": "round",
+          "stroke-width": "2",
+          d: "M6 18L18 6M6 6l12 12",
         }),
       ]
     );
@@ -177,131 +294,128 @@ export const Modal = defineComponent({
         return null;
       }
 
-      const modalContent = h(
-        'div',
+      const forwardedAttrs = Object.fromEntries(
+        Object.entries(attrs).filter(
+          ([key]) => key !== "class" && key !== "style"
+        )
+      );
+
+      const ariaLabelledbyFromAttrs =
+        typeof attrs["aria-labelledby"] === "string"
+          ? (attrs["aria-labelledby"] as string)
+          : undefined;
+
+      const ariaLabelledby =
+        ariaLabelledbyFromAttrs ??
+        (props.title || slots.title ? titleId.value : undefined);
+
+      const mergedClass = classNames(
+        contentClasses.value,
+        coerceClassValue(attrs.class)
+      );
+
+      const mergedStyle = mergeStyleValues(attrs.style, props.style);
+
+      const header =
+        props.title || slots.title || props.closable
+          ? h("div", { class: modalHeaderClasses }, [
+              props.title || slots.title
+                ? h(
+                    "h3",
+                    {
+                      id: titleId.value,
+                      class: modalTitleClasses,
+                    },
+                    slots.title ? slots.title() : props.title
+                  )
+                : null,
+              props.closable
+                ? h(
+                    "button",
+                    {
+                      type: "button",
+                      class: modalCloseButtonClasses,
+                      onClick: handleClose,
+                      "aria-label": props.closeAriaLabel,
+                      ref: closeButtonRef,
+                    },
+                    CloseIcon
+                  )
+                : null,
+            ])
+          : null;
+
+      const body = slots.default
+        ? h("div", { class: modalBodyClasses }, slots.default())
+        : null;
+
+      const footer = slots.footer
+        ? h(
+            "div",
+            { class: modalFooterClasses, "data-tiger-modal-footer": "" },
+            slots.footer({ ok: handleOk, cancel: handleClose })
+          )
+        : props.showDefaultFooter
+        ? h(
+            "div",
+            { class: modalFooterClasses, "data-tiger-modal-footer": "" },
+            [
+              h(
+                Button,
+                { variant: "secondary", onClick: handleClose },
+                { default: () => props.cancelText }
+              ),
+              h(Button, { onClick: handleOk }, { default: () => props.okText }),
+            ]
+          )
+        : null;
+
+      const renderedWrapper = h(
+        "div",
         {
-          class: containerClasses.value,
-          onClick: handleMaskClick,
+          class: modalWrapperClasses,
+          style: { zIndex: props.zIndex },
+          hidden: !props.visible,
+          "aria-hidden": !props.visible ? "true" : undefined,
+          "data-tiger-modal-root": "",
         },
         [
+          props.mask &&
+            h("div", {
+              class: modalMaskClasses,
+              "aria-hidden": "true",
+              "data-tiger-modal-mask": "",
+            }),
           h(
-            Transition,
+            "div",
             {
-              name: 'modal-content',
-              appear: true,
+              class: containerClasses.value,
+              onClick: handleMaskClick,
             },
-            {
-              default: () =>
-                props.visible
-                  ? h(
-                      'div',
-                      {
-                        class: contentClasses.value,
-                        role: 'dialog',
-                        'aria-modal': 'true',
-                        'aria-labelledby': props.title
-                          ? 'modal-title'
-                          : undefined,
-                      },
-                      [
-                        // Header
-                        (props.title || slots.title || props.closable) &&
-                          h('div', { class: modalHeaderClasses }, [
-                            // Title
-                            (props.title || slots.title) &&
-                              h(
-                                'h3',
-                                {
-                                  id: 'modal-title',
-                                  class: modalTitleClasses,
-                                },
-                                slots.title ? slots.title() : props.title
-                              ),
-                            // Close button
-                            props.closable &&
-                              h(
-                                'button',
-                                {
-                                  type: 'button',
-                                  class: modalCloseButtonClasses,
-                                  onClick: handleClose,
-                                  'aria-label': 'Close',
-                                },
-                                CloseIcon
-                              ),
-                          ]),
-
-                        // Body
-                        slots.default &&
-                          h(
-                            'div',
-                            { class: modalBodyClasses },
-                            slots.default()
-                          ),
-
-                        // Footer
-                        slots.footer &&
-                          h(
-                            'div',
-                            { class: modalFooterClasses },
-                            slots.footer()
-                          ),
-                      ]
-                    )
-                  : null,
-            }
+            [
+              h(
+                "div",
+                {
+                  ...(forwardedAttrs as Record<string, unknown>),
+                  class: mergedClass,
+                  style: mergedStyle,
+                  role: "dialog",
+                  "aria-modal": "true",
+                  "aria-labelledby": ariaLabelledby,
+                  tabindex: -1,
+                  ref: dialogRef,
+                  "data-tiger-modal": "",
+                },
+                [header, body, footer]
+              ),
+            ]
           ),
         ]
       );
 
-      const wrapper = h(
-        'div',
-        {
-          class: modalWrapperClasses,
-          style: { zIndex: props.zIndex },
-        },
-        [
-          // Mask
-          props.mask &&
-            h(
-              Transition,
-              { name: 'modal-mask', appear: true },
-              {
-                default: () =>
-                  props.visible
-                    ? h('div', {
-                        class: modalMaskClasses,
-                        'aria-hidden': 'true',
-                      })
-                    : null,
-              }
-            ),
-          // Content
-          modalContent,
-        ]
-      );
-
-      const teleportedChildren =
-        props.visible || hasRendered.value
-          ? [
-              h(
-                Transition,
-                {
-                  name: 'modal-fade',
-                  appear: true,
-                },
-                {
-                  default: () => (props.visible ? wrapper : null),
-                }
-              ),
-            ]
-          : [];
-
-      return h(
-        Teleport,
-        { to: 'body', disabled: props.disableTeleport },
-        teleportedChildren
-      );
+      return h(Teleport, { to: "body", disabled: props.disableTeleport }, [
+        renderedWrapper,
+      ]);
     };
   },
 });
