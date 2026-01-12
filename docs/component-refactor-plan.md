@@ -9,6 +9,7 @@
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
 - 上一步：✅ `Popover` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
+- 旁路修复：✅ 修复 `pnpm build`（React d.ts 类型陷阱：Popconfirm/Tooltip）（2026-01-13）
 - 当前组件：`Message`
 - 当前步骤：Step1 主题/透传/a11y/类型导出/测试精简/文档同步
 - 状态：`not-started`
@@ -33,6 +34,12 @@
 3. **先稳定 API，再优化实现**：对外 props/events 语义与默认值先统一，避免“实现变好了但 API 漏洞更多”。
 
 4. **以 DoD 驱动收敛**：每个组件的重构必须能交付（导出/类型/测试/文档齐）。
+
+5. **React 类型“同名属性冲突”优先排雷**：当组件 props 使用了与 `React.HTMLAttributes` 同名的字段（常见：`title`/`content` 等），必须在 `Omit<React.HTMLAttributes<...>, ...>` 中显式剔除同名字段；否则会在 d.ts 中形成类似 `string & ReactNode` 的交叉类型，导致 Demo/用户侧在传入 JSX 时出现 `TS2322`。
+
+6. **React cloneElement 必须先收窄 props**：对 `children` 做 `cloneElement` 时，`React.isValidElement()` 默认把 props 视为 `unknown`；需要用 `React.isValidElement<YourChildProps>(children)` 先收窄，再传入 `className/onClick/...`，同时避免无脑展开 `children.props`（可能把 `unknown` 扩散进 d.ts）。
+
+> 可用 `pnpm check:react-dts-guards` 做一次快速静态扫描，提前拦住上述两类 d.ts 隐患。
 
 ---
 
