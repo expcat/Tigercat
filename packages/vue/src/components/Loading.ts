@@ -1,22 +1,47 @@
-import { defineComponent, computed, h, PropType, ref, onMounted, onUnmounted } from 'vue'
-import { 
+import {
+  defineComponent,
+  computed,
+  h,
+  PropType,
+  ref,
+  watch,
+  onUnmounted,
+} from "vue";
+import {
   classNames,
+  coerceClassValue,
   getLoadingClasses,
   getSpinnerSVG,
   dotsVariantConfig,
   barsVariantConfig,
+  animationDelayClasses,
   loadingContainerBaseClasses,
   loadingFullscreenBaseClasses,
   loadingTextSizeClasses,
   loadingColorClasses,
+  mergeStyleValues,
   injectLoadingAnimationStyles,
   type LoadingVariant,
   type LoadingSize,
   type LoadingColor,
-} from '@tigercat/core'
+} from "@tigercat/core";
+
+export interface VueLoadingProps {
+  variant?: LoadingVariant;
+  size?: LoadingSize;
+  color?: LoadingColor;
+  text?: string;
+  fullscreen?: boolean;
+  delay?: number;
+  background?: string;
+  customColor?: string;
+  className?: string;
+  style?: Record<string, string | number>;
+}
 
 export const Loading = defineComponent({
-  name: 'TigerLoading',
+  name: "TigerLoading",
+  inheritAttrs: false,
   props: {
     /**
      * Loading spinner variant - determines animation style
@@ -24,7 +49,7 @@ export const Loading = defineComponent({
      */
     variant: {
       type: String as PropType<LoadingVariant>,
-      default: 'spinner' as LoadingVariant,
+      default: "spinner" as LoadingVariant,
     },
     /**
      * Size of the loading indicator
@@ -32,7 +57,7 @@ export const Loading = defineComponent({
      */
     size: {
       type: String as PropType<LoadingSize>,
-      default: 'md' as LoadingSize,
+      default: "md" as LoadingSize,
     },
     /**
      * Color variant
@@ -40,7 +65,7 @@ export const Loading = defineComponent({
      */
     color: {
       type: String as PropType<LoadingColor>,
-      default: 'primary' as LoadingColor,
+      default: "primary" as LoadingColor,
     },
     /**
      * Custom text to display below the spinner
@@ -71,7 +96,7 @@ export const Loading = defineComponent({
      */
     background: {
       type: String,
-      default: 'rgba(255, 255, 255, 0.9)',
+      default: "rgba(255, 255, 255, 0.9)",
     },
     /**
      * Custom spinner color (overrides color variant)
@@ -85,173 +110,218 @@ export const Loading = defineComponent({
      */
     className: {
       type: String,
-      default: '',
+      default: "",
+    },
+
+    /**
+     * Custom styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined,
     },
   },
-  setup(props) {
+  setup(props, { attrs }) {
     // Inject animation styles when component is first used
-    injectLoadingAnimationStyles()
-    
-    const visible = ref(props.delay === 0)
-    let timer: ReturnType<typeof setTimeout> | null = null
+    injectLoadingAnimationStyles();
 
-    onMounted(() => {
-      if (props.delay > 0) {
-        timer = setTimeout(() => {
-          visible.value = true
-        }, props.delay)
+    const visible = ref(false);
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const clearTimer = () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
       }
-    })
+    };
+
+    watch(
+      () => props.delay,
+      (delay) => {
+        clearTimer();
+
+        if (delay <= 0) {
+          visible.value = true;
+          return;
+        }
+
+        visible.value = false;
+        timer = setTimeout(() => {
+          visible.value = true;
+        }, delay);
+      },
+      { immediate: true }
+    );
 
     onUnmounted(() => {
-      if (timer) {
-        clearTimeout(timer)
-      }
-    })
+      clearTimer();
+    });
 
     const spinnerClasses = computed(() => {
-      return getLoadingClasses(props.variant, props.size, props.color, props.customColor)
-    })
+      return getLoadingClasses(
+        props.variant,
+        props.size,
+        props.color,
+        props.customColor
+      );
+    });
 
     const textClasses = computed(() => {
       return classNames(
         loadingTextSizeClasses[props.size],
-        props.customColor ? '' : loadingColorClasses[props.color],
-        'font-medium'
-      )
-    })
+        props.customColor ? "" : loadingColorClasses[props.color],
+        "font-medium"
+      );
+    });
 
     const containerClasses = computed(() => {
-      if (props.fullscreen) {
-        return classNames(loadingFullscreenBaseClasses, props.className)
-      }
-      return classNames(loadingContainerBaseClasses, props.className)
-    })
+      return classNames(
+        props.fullscreen
+          ? loadingFullscreenBaseClasses
+          : loadingContainerBaseClasses,
+        props.className,
+        coerceClassValue(attrs.class)
+      );
+    });
 
     const customStyle = computed(() => {
-      const style: Record<string, string> = {}
+      const baseStyle: Record<string, string | number> = {};
+
       if (props.customColor) {
-        style.color = props.customColor
+        baseStyle.color = props.customColor;
       }
+
       if (props.fullscreen) {
-        style.backgroundColor = props.background
+        baseStyle.backgroundColor = props.background;
       }
-      return style
-    })
+
+      return mergeStyleValues(attrs.style, props.style, baseStyle);
+    });
+
+    const normalizeSvgAttrs = (svgAttrs: Record<string, unknown>) => {
+      if ("className" in svgAttrs && !("class" in svgAttrs)) {
+        const { className, ...rest } = svgAttrs;
+        return {
+          ...rest,
+          class: className,
+        };
+      }
+
+      return svgAttrs;
+    };
 
     // Render spinner variant
     const renderSpinner = () => {
-      const svg = getSpinnerSVG(props.variant)
-      
+      const svg = getSpinnerSVG(props.variant);
+
       return h(
-        'svg',
+        "svg",
         {
           class: spinnerClasses.value,
-          xmlns: 'http://www.w3.org/2000/svg',
-          fill: 'none',
+          xmlns: "http://www.w3.org/2000/svg",
+          fill: "none",
           viewBox: svg.viewBox,
-          style: props.customColor ? { color: props.customColor } : undefined,
         },
-        svg.elements.map(el => 
-          h(el.type, el.attrs)
-        )
-      )
-    }
+        svg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
+      );
+    };
 
     // Render dots variant
     const renderDots = () => {
-      const config = dotsVariantConfig[props.size]
-      const colorClass = props.customColor ? '' : loadingColorClasses[props.color]
-      
+      const config = dotsVariantConfig[props.size];
+      const colorClass = props.customColor
+        ? ""
+        : loadingColorClasses[props.color];
+
       return h(
-        'div',
+        "div",
         {
-          class: classNames('flex items-center', config.gap),
+          class: classNames("flex items-center", config.gap),
         },
-        [0, 1, 2].map(i => 
-          h('div', {
+        [0, 1, 2].map((i) =>
+          h("div", {
             class: classNames(
               config.dotSize,
-              'rounded-full',
-              'bg-current',
+              "rounded-full",
+              "bg-current",
               colorClass,
-              'animate-bounce-dot',
-              i === 0 ? 'animation-delay-0' : i === 1 ? 'animation-delay-150' : 'animation-delay-300'
+              "animate-bounce-dot",
+              animationDelayClasses[i]
             ),
-            style: props.customColor ? { backgroundColor: props.customColor } : undefined,
           })
         )
-      )
-    }
+      );
+    };
 
     // Render bars variant
     const renderBars = () => {
-      const config = barsVariantConfig[props.size]
-      const colorClass = props.customColor ? '' : loadingColorClasses[props.color]
-      
+      const config = barsVariantConfig[props.size];
+      const colorClass = props.customColor
+        ? ""
+        : loadingColorClasses[props.color];
+
       return h(
-        'div',
+        "div",
         {
-          class: classNames('flex items-end', config.gap),
+          class: classNames("flex items-end", config.gap),
         },
-        [0, 1, 2].map(i => 
-          h('div', {
+        [0, 1, 2].map((i) =>
+          h("div", {
             class: classNames(
               config.barWidth,
               config.barHeight,
-              'rounded-sm',
-              'bg-current',
+              "rounded-sm",
+              "bg-current",
               colorClass,
-              'animate-scale-bar',
-              i === 0 ? 'animation-delay-0' : i === 1 ? 'animation-delay-150' : 'animation-delay-300'
+              "animate-scale-bar",
+              animationDelayClasses[i]
             ),
-            style: props.customColor ? { backgroundColor: props.customColor } : undefined,
           })
         )
-      )
-    }
+      );
+    };
 
     // Render loading indicator based on variant
     const renderIndicator = () => {
       switch (props.variant) {
-        case 'dots':
-          return renderDots()
-        case 'bars':
-          return renderBars()
-        case 'spinner':
-        case 'ring':
-        case 'pulse':
+        case "dots":
+          return renderDots();
+        case "bars":
+          return renderBars();
+        case "spinner":
+        case "ring":
+        case "pulse":
         default:
-          return renderSpinner()
+          return renderSpinner();
       }
-    }
+    };
 
     return () => {
       if (!visible.value) {
-        return null
+        return null;
       }
 
-      const children = [renderIndicator()]
-      
+      const children = [renderIndicator()];
+
       if (props.text) {
-        children.push(
-          h('div', { class: textClasses.value }, props.text)
-        )
+        children.push(h("div", { class: textClasses.value }, props.text));
       }
 
       return h(
-        'div',
+        "div",
         {
+          role: "status",
+          "aria-label": props.text || "Loading",
+          "aria-live": "polite",
+          "aria-busy": true,
+          ...attrs,
           class: containerClasses.value,
           style: customStyle.value,
-          role: 'status',
-          'aria-label': props.text || 'Loading',
-          'aria-live': 'polite',
         },
         children
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Loading
+export default Loading;

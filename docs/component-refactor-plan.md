@@ -11,11 +11,12 @@
 - 上一步：✅ `Notification` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 上一步：✅ `Popover` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 上一步：✅ `Message` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
+- 上一步：✅ `Loading` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 旁路修复：✅ 修复 `pnpm build`（React d.ts 类型陷阱：Popconfirm/Tooltip）（2026-01-13）
-- 当前组件：`Loading`
+- 当前组件：`Modal`
 - 当前步骤：Step1 主题/透传/a11y/类型导出/测试精简/文档同步
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：26/38
+- 已优化组件数/需优化组件数：27/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -347,7 +348,7 @@
 #### Loading（P2，建议优化）
 
 - 思路：aria-busy；覆盖层的可聚焦性与 scroll lock（如是全屏）。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）：core Loading 颜色类全面收敛为 CSS vars（含 fallback，含 info/default）；React Loading 移除多余 memo、统一 customColor 走容器 color 并复用 core `animationDelayClasses`；Vue Loading 增加 `inheritAttrs: false` 与 attrs 透传、合并 class/style 并导出 `VueLoadingProps`，同时修复 SVG 子元素 className 映射；Vue/React Loading 默认补齐 `aria-busy`；精简 Loading 测试并同步更新 Loading 文档 a11y 说明（Demo 无需修改）。
 
 ### G. 弹层（Overlay）
 
