@@ -8,13 +8,14 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
+- 上一步：✅ `Notification` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 上一步：✅ `Popover` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 上一步：✅ `Message` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 旁路修复：✅ 修复 `pnpm build`（React d.ts 类型陷阱：Popconfirm/Tooltip）（2026-01-13）
-- 当前组件：`Notification`
+- 当前组件：`Loading`
 - 当前步骤：Step1 主题/透传/a11y/类型导出/测试精简/文档同步
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：25/38
+- 已优化组件数/需优化组件数：26/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -341,7 +342,7 @@
 #### Notification（P1，建议优化）
 
 - 思路：与 Message 类似，增加位置/堆叠策略一致；a11y。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）：core Notification 色值从固定 Tailwind 色收敛为 CSS vars（含 fallback，新增 `--tiger-notification-<type>-{bg,border,icon,title,description}` 与 close icon 变量）；Vue Notification 去掉 50ms 轮询同步，改为按 position 自动挂载容器并通过回调同步实例队列；React Notification 精简冗余 memo/callback，统一使用 core 的主题类与 close icon classes；两端补齐按类型的 a11y 语义（error=alert/assertive，其它=status/polite）与稳定 `data-tiger-notification*` 选择器；精简 Vue/React Notification 测试并移除重复断言；同步更新 Notification 文档（Demo 无需修改）。
 
 #### Loading（P2，建议优化）
 
