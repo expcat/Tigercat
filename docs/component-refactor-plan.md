@@ -14,10 +14,11 @@
 - 上一步：✅ `Loading` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 旁路修复：✅ 修复 `pnpm build`（React d.ts 类型陷阱：Popconfirm/Tooltip）（2026-01-13）
 - 上一步：✅ `Modal` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
-- 当前组件：`Drawer`
-- 当前步骤：Step1 主题/透传/a11y/类型导出/测试精简/文档同步
+- 上一步：✅ `Drawer` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
+- 当前组件：`Select`
+- 当前步骤：Step1 API/类型对齐（value 类型、option group 类型）
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：28/38
+- 已优化组件数/需优化组件数：29/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -361,7 +362,7 @@
 #### Drawer（P0，建议优化）
 
 - 思路：同 Modal，补从侧边进入的焦点与 aria。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）：core Drawer 样式收敛为 CSS vars（含 fallback，新增 `--tiger-drawer-mask`，并移除无效的动态 z-index class 改为 inline style）；Vue/React Drawer 对齐 Modal 的 a11y 与透传模式（`inheritAttrs: false`/原生属性透传、`class/style` 合并、`aria-labelledby` 实例级唯一 id 且可通过 attrs 覆盖、基础 focus 管理与 ESC 关闭），并补齐稳定 `data-tiger-drawer*` 选择器与 `closeAriaLabel`；修复 `destroyOnClose` 语义（关闭时 hidden 保持挂载/开启时卸载），移除 Vue/React Drawer 快照并精简测试，更新 Drawer 文档（Demo 无需修改）。
 
 #### Popover（P1，建议优化）
 

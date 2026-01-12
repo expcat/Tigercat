@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useCallback, useEffect, useId, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   classNames,
   getDrawerMaskClasses,
@@ -11,38 +11,23 @@ import {
   getDrawerCloseButtonClasses,
   getDrawerTitleClasses,
   type DrawerProps as CoreDrawerProps,
-} from '@tigercat/core';
+} from "@tigercat/core";
 
-export interface DrawerProps extends CoreDrawerProps {
-  /**
-   * Callback when drawer requests to close
-   */
+export interface DrawerProps
+  extends CoreDrawerProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, "title" | "children"> {
   onClose?: () => void;
-
-  /**
-   * Callback after drawer enter transition completes
-   */
   onAfterEnter?: () => void;
-
-  /**
-   * Callback after drawer leave transition completes
-   */
   onAfterLeave?: () => void;
-
-  /**
-   * Header content (alternative to title prop)
-   */
   header?: React.ReactNode;
-
-  /**
-   * Drawer body content
-   */
   children?: React.ReactNode;
+  footer?: React.ReactNode;
 
   /**
-   * Footer content
+   * Close button aria-label
+   * @default 'Close drawer'
    */
-  footer?: React.ReactNode;
+  closeAriaLabel?: string;
 }
 
 const CloseIcon: React.FC = () => (
@@ -51,7 +36,8 @@ const CloseIcon: React.FC = () => (
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg">
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -63,8 +49,8 @@ const CloseIcon: React.FC = () => (
 
 export const Drawer: React.FC<DrawerProps> = ({
   visible = false,
-  placement = 'right',
-  size = 'md',
+  placement = "right",
+  size = "md",
   title,
   header,
   closable = true,
@@ -77,163 +63,182 @@ export const Drawer: React.FC<DrawerProps> = ({
   onClose,
   onAfterEnter,
   onAfterLeave,
+  closeAriaLabel = "Close drawer",
   children,
   footer,
+  style,
+  ...rest
 }) => {
-  // Track if drawer has ever been opened (for destroyOnClose)
   const [hasBeenOpened, setHasBeenOpened] = React.useState(visible);
 
-  React.useEffect(() => {
-    if (visible) {
-      setHasBeenOpened(true);
-    }
+  useEffect(() => {
+    if (visible) setHasBeenOpened(true);
   }, [visible]);
 
-  // Handle close request
+  const shouldRender = destroyOnClose ? visible : hasBeenOpened;
+
   const handleClose = useCallback(() => {
     onClose?.();
   }, [onClose]);
 
-  // Handle mask click
-  const handleMaskClick = useCallback(() => {
-    if (maskClosable) {
-      handleClose();
-    }
-  }, [maskClosable, handleClose]);
+  const handleMaskClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if (!maskClosable) return;
+      if (event.target === event.currentTarget) {
+        handleClose();
+      }
+    },
+    [maskClosable, handleClose]
+  );
 
-  // Handle panel click (stop propagation)
-  const handlePanelClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-  }, []);
-
-  // Handle ESC key
   useEffect(() => {
+    if (!visible) return;
+
     const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && visible) {
+      if (event.key === "Escape") {
         handleClose();
       }
     };
 
-    document.addEventListener('keydown', handleEscKey);
-    return () => {
-      document.removeEventListener('keydown', handleEscKey);
-    };
+    document.addEventListener("keydown", handleEscKey);
+    return () => document.removeEventListener("keydown", handleEscKey);
   }, [visible, handleClose]);
 
-  // Track transition state for callbacks
-  const [, setIsTransitioning] = React.useState(false);
-  const previousVisible = React.useRef(false);
-
+  const previousVisible = useRef(false);
   useEffect(() => {
-    if (visible !== previousVisible.current) {
-      setIsTransitioning(true);
-      previousVisible.current = visible;
+    if (visible === previousVisible.current) return;
+    previousVisible.current = visible;
 
-      // Trigger after transition callbacks
-      const timer = setTimeout(() => {
-        setIsTransitioning(false);
-        if (visible) {
-          onAfterEnter?.();
-        } else {
-          onAfterLeave?.();
-        }
-      }, 300); // Match transition duration
+    const timer = window.setTimeout(() => {
+      if (visible) {
+        onAfterEnter?.();
+      } else {
+        onAfterLeave?.();
+      }
+    }, 300);
 
-      return () => clearTimeout(timer);
-    }
+    return () => window.clearTimeout(timer);
   }, [visible, onAfterEnter, onAfterLeave]);
 
-  // Computed classes
-  const maskClasses = useMemo(() => getDrawerMaskClasses(visible), [visible]);
+  const reactId = useId();
+  const drawerId = useMemo(() => `tiger-drawer-${reactId}`, [reactId]);
+  const titleId = `${drawerId}-title`;
 
-  const containerClasses = useMemo(
-    () => getDrawerContainerClasses(zIndex),
-    [zIndex]
+  const {
+    ["aria-labelledby"]: _ariaLabelledby,
+    role: _role,
+    tabIndex: _tabIndex,
+    ...dialogDivProps
+  } = rest as React.HTMLAttributes<HTMLDivElement> & React.AriaAttributes;
+
+  const ariaLabelledby =
+    (rest as React.AriaAttributes)["aria-labelledby"] ??
+    (title || header ? titleId : undefined);
+
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const previousActiveElementRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!visible) return;
+
+    const active = document.activeElement;
+    previousActiveElementRef.current =
+      active instanceof HTMLElement ? active : null;
+
+    const timer = window.setTimeout(() => {
+      const el = closeButtonRef.current ?? dialogRef.current;
+      el?.focus();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [visible]);
+
+  useEffect(() => {
+    if (visible) return;
+    previousActiveElementRef.current?.focus?.();
+  }, [visible]);
+
+  const containerClasses = classNames(
+    getDrawerContainerClasses(zIndex),
+    !visible && "pointer-events-none"
   );
 
-  const panelClasses = useMemo(
-    () =>
-      classNames(
-        getDrawerPanelClasses(placement, visible, size),
-        'flex flex-col',
-        className
-      ),
-    [placement, visible, size, className]
+  const maskClasses = getDrawerMaskClasses(visible);
+  const panelClasses = classNames(
+    getDrawerPanelClasses(placement, visible, size),
+    "flex flex-col",
+    className
   );
 
-  const headerClasses = useMemo(() => getDrawerHeaderClasses(), []);
+  const headerClasses = getDrawerHeaderClasses();
+  const bodyClasses = getDrawerBodyClasses(bodyClassName);
+  const footerClasses = getDrawerFooterClasses();
+  const closeButtonClasses = getDrawerCloseButtonClasses();
+  const titleClasses = getDrawerTitleClasses();
 
-  const bodyClasses = useMemo(
-    () => getDrawerBodyClasses(bodyClassName),
-    [bodyClassName]
-  );
-
-  const footerClasses = useMemo(() => getDrawerFooterClasses(), []);
-
-  const closeButtonClasses = useMemo(() => getDrawerCloseButtonClasses(), []);
-
-  const titleClasses = useMemo(() => getDrawerTitleClasses(), []);
-
-  // Don't render if destroyOnClose is true and drawer has never been opened
-  if (destroyOnClose && !hasBeenOpened) {
+  if (!shouldRender) {
     return null;
   }
 
-  // Don't render if destroyOnClose is true and drawer is not visible
-  if (destroyOnClose && !visible) {
-    return null;
-  }
-
-  // Match library expectations: when not visible, do not render anything.
-  // This also prevents portal DOM from lingering in tests.
-  if (!visible) {
-    return null;
-  }
-
-  // Render drawer content
   const drawerContent = (
-    <div className={containerClasses}>
+    <div
+      className={containerClasses}
+      style={{ zIndex }}
+      hidden={!visible}
+      aria-hidden={!visible ? "true" : undefined}
+      data-tiger-drawer-root=""
+    >
       {mask && (
         <div
           className={maskClasses}
           onClick={handleMaskClick}
           aria-hidden="true"
+          data-tiger-drawer-mask=""
         />
       )}
+
       <div
         className={panelClasses}
+        style={style}
+        {...dialogDivProps}
         role="dialog"
         aria-modal="true"
-        aria-labelledby={title ? 'drawer-title' : undefined}
-        onClick={handlePanelClick}>
+        aria-labelledby={ariaLabelledby}
+        tabIndex={-1}
+        ref={dialogRef}
+        data-tiger-drawer=""
+      >
         {(title || header || closable) && (
           <div className={headerClasses}>
             {(title || header) && (
-              <div className={titleClasses} id="drawer-title">
+              <h3 className={titleClasses} id={titleId}>
                 {header || title}
-              </div>
+              </h3>
             )}
             {closable && (
               <button
                 type="button"
                 className={closeButtonClasses}
                 onClick={handleClose}
-                aria-label="Close drawer">
+                aria-label={closeAriaLabel}
+                ref={closeButtonRef}
+              >
                 <CloseIcon />
               </button>
             )}
           </div>
         )}
-        <div className={bodyClasses}>{children}</div>
+
+        {children && <div className={bodyClasses}>{children}</div>}
         {footer && <div className={footerClasses}>{footer}</div>}
       </div>
     </div>
   );
 
-  // Use portal to render at document body
-  if (typeof document !== 'undefined') {
-    return createPortal(drawerContent, document.body);
+  if (typeof document === "undefined") {
+    return null;
   }
 
-  return null;
+  return createPortal(drawerContent, document.body);
 };
