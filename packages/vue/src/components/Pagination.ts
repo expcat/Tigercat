@@ -5,9 +5,11 @@ import {
   PropType,
   h,
   type VNodeChild,
-} from 'vue';
+} from "vue";
 import {
   classNames,
+  coerceClassValue,
+  mergeStyleValues,
   getTotalPages,
   getPageRange,
   validateCurrentPage,
@@ -22,10 +24,32 @@ import {
   getTotalTextClasses,
   type PaginationSize,
   type PaginationAlign,
-} from '@tigercat/core';
+} from "@tigercat/core";
+
+export interface VuePaginationProps {
+  current?: number;
+  defaultCurrent?: number;
+  total?: number;
+  pageSize?: number;
+  defaultPageSize?: number;
+  pageSizeOptions?: number[];
+  showQuickJumper?: boolean;
+  showSizeChanger?: boolean;
+  showTotal?: boolean;
+  totalText?: (total: number, range: [number, number]) => string;
+  simple?: boolean;
+  size?: PaginationSize;
+  align?: PaginationAlign;
+  disabled?: boolean;
+  hideOnSinglePage?: boolean;
+  showLessItems?: boolean;
+  className?: string;
+  style?: Record<string, unknown>;
+}
 
 export const Pagination = defineComponent({
-  name: 'TigerPagination',
+  name: "TigerPagination",
+  inheritAttrs: false,
   props: {
     /**
      * Current page number (1-indexed)
@@ -122,7 +146,7 @@ export const Pagination = defineComponent({
      */
     size: {
       type: String as PropType<PaginationSize>,
-      default: 'medium' as PaginationSize,
+      default: "medium" as PaginationSize,
     },
     /**
      * Alignment of pagination
@@ -130,7 +154,7 @@ export const Pagination = defineComponent({
      */
     align: {
       type: String as PropType<PaginationAlign>,
-      default: 'center' as PaginationAlign,
+      default: "center" as PaginationAlign,
     },
     /**
      * Whether pagination is disabled
@@ -163,15 +187,23 @@ export const Pagination = defineComponent({
       type: String,
       default: undefined,
     },
+    style: {
+      type: Object as PropType<Record<string, unknown>>,
+      default: undefined,
+    },
   },
-  emits: ['update:current', 'update:pageSize', 'change', 'page-size-change'],
+  emits: ["update:current", "update:pageSize", "change", "page-size-change"],
   setup(props, { emit, attrs }) {
+    const attrsRecord = attrs as Record<string, unknown>;
+    const attrsClass = (attrsRecord as { class?: unknown }).class;
+    const attrsStyle = (attrsRecord as { style?: unknown }).style;
+
     // Internal state for uncontrolled mode
     const internalCurrent = ref<number>(props.defaultCurrent);
     const internalPageSize = ref<number>(props.defaultPageSize);
 
     // Quick jumper input value
-    const quickJumperValue = ref<string>('');
+    const quickJumperValue = ref<string>("");
 
     // Computed current page (controlled or uncontrolled)
     const currentPage = computed(() => {
@@ -223,8 +255,8 @@ export const Pagination = defineComponent({
       }
 
       // Emit events
-      emit('update:current', page);
-      emit('change', page, currentPageSize.value);
+      emit("update:current", page);
+      emit("change", page, currentPageSize.value);
     };
 
     // Handle page size change
@@ -251,13 +283,13 @@ export const Pagination = defineComponent({
       }
 
       // Emit events
-      emit('update:pageSize', newPageSize);
-      emit('page-size-change', newPage, newPageSize);
+      emit("update:pageSize", newPageSize);
+      emit("page-size-change", newPage, newPageSize);
 
       // Also emit change if page changed
       if (newPage !== validatedCurrentPage.value) {
-        emit('update:current', newPage);
-        emit('change', newPage, newPageSize);
+        emit("update:current", newPage);
+        emit("change", newPage, newPageSize);
       }
     };
 
@@ -267,20 +299,28 @@ export const Pagination = defineComponent({
       if (!isNaN(page)) {
         handlePageChange(page);
       }
-      quickJumperValue.value = '';
+      quickJumperValue.value = "";
     };
 
     // Handle quick jumper keypress
     const handleQuickJumperKeypress = (event: KeyboardEvent) => {
-      if (event.key === 'Enter') {
+      if (event.key === "Enter") {
         handleQuickJumperSubmit();
       }
     };
 
     // Container classes
     const containerClasses = computed(() => {
-      return getPaginationContainerClasses(props.align, props.className);
+      return classNames(
+        getPaginationContainerClasses(props.align),
+        props.className,
+        coerceClassValue(attrsClass)
+      );
     });
+
+    const mergedStyle = computed(() =>
+      mergeStyleValues(attrsStyle, props.style)
+    );
 
     return () => {
       if (shouldHide.value) {
@@ -296,7 +336,7 @@ export const Pagination = defineComponent({
 
         elements.push(
           h(
-            'span',
+            "span",
             {
               class: getTotalTextClasses(props.size),
             },
@@ -314,30 +354,30 @@ export const Pagination = defineComponent({
         // Previous button
         elements.push(
           h(
-            'button',
+            "button",
             {
-              type: 'button',
+              type: "button",
               class: getPaginationButtonBaseClasses(props.size),
               disabled: prevDisabled,
               onClick: () => handlePageChange(validatedCurrentPage.value - 1),
-              'aria-label': '上一页',
+              "aria-label": "上一页",
             },
-            '‹'
+            "‹"
           )
         );
 
         // Current/Total display
         elements.push(
           h(
-            'span',
+            "span",
             {
               class: classNames(
-                'mx-2',
-                props.size === 'small'
-                  ? 'text-sm'
-                  : props.size === 'large'
-                  ? 'text-lg'
-                  : 'text-base'
+                "mx-2",
+                props.size === "small"
+                  ? "text-sm"
+                  : props.size === "large"
+                  ? "text-lg"
+                  : "text-base"
               ),
             },
             `${validatedCurrentPage.value} / ${totalPages.value}`
@@ -347,15 +387,15 @@ export const Pagination = defineComponent({
         // Next button
         elements.push(
           h(
-            'button',
+            "button",
             {
-              type: 'button',
+              type: "button",
               class: getPaginationButtonBaseClasses(props.size),
               disabled: nextDisabled,
               onClick: () => handlePageChange(validatedCurrentPage.value + 1),
-              'aria-label': '下一页',
+              "aria-label": "下一页",
             },
-            '›'
+            "›"
           )
         );
       } else {
@@ -367,15 +407,15 @@ export const Pagination = defineComponent({
         // Previous button
         elements.push(
           h(
-            'button',
+            "button",
             {
-              type: 'button',
+              type: "button",
               class: getPaginationButtonBaseClasses(props.size),
               disabled: prevDisabled,
               onClick: () => handlePageChange(validatedCurrentPage.value - 1),
-              'aria-label': '上一页',
+              "aria-label": "上一页",
             },
-            '‹'
+            "‹"
           )
         );
 
@@ -386,32 +426,32 @@ export const Pagination = defineComponent({
           props.showLessItems
         );
         pageNumbers.forEach((pageNum) => {
-          if (pageNum === '...') {
+          if (pageNum === "...") {
             elements.push(
               h(
-                'span',
+                "span",
                 {
                   class: getPaginationEllipsisClasses(props.size),
-                  'aria-hidden': 'true',
+                  "aria-hidden": "true",
                 },
-                '...'
+                "..."
               )
             );
           } else {
             const isActive = pageNum === validatedCurrentPage.value;
             elements.push(
               h(
-                'button',
+                "button",
                 {
-                  type: 'button',
+                  type: "button",
                   class: classNames(
                     getPaginationButtonBaseClasses(props.size),
                     isActive && getPaginationButtonActiveClasses()
                   ),
                   disabled: props.disabled,
                   onClick: () => handlePageChange(pageNum as number),
-                  'aria-label': `第 ${pageNum} 页`,
-                  'aria-current': isActive ? 'page' : undefined,
+                  "aria-label": `第 ${pageNum} 页`,
+                  "aria-current": isActive ? "page" : undefined,
                 },
                 String(pageNum)
               )
@@ -422,15 +462,15 @@ export const Pagination = defineComponent({
         // Next button
         elements.push(
           h(
-            'button',
+            "button",
             {
-              type: 'button',
+              type: "button",
               class: getPaginationButtonBaseClasses(props.size),
               disabled: nextDisabled,
               onClick: () => handlePageChange(validatedCurrentPage.value + 1),
-              'aria-label': '下一页',
+              "aria-label": "下一页",
             },
-            '›'
+            "›"
           )
         );
       }
@@ -439,7 +479,7 @@ export const Pagination = defineComponent({
       if (props.showSizeChanger) {
         elements.push(
           h(
-            'select',
+            "select",
             {
               class: getPageSizeSelectorClasses(props.size),
               disabled: props.disabled,
@@ -448,11 +488,11 @@ export const Pagination = defineComponent({
                 const target = e.target as HTMLSelectElement;
                 handlePageSizeChange(parseInt(target.value, 10));
               },
-              'aria-label': '每页条数',
+              "aria-label": "每页条数",
             },
             props.pageSizeOptions.map((size) =>
               h(
-                'option',
+                "option",
                 {
                   value: size,
                   key: size,
@@ -468,24 +508,24 @@ export const Pagination = defineComponent({
       if (props.showQuickJumper) {
         elements.push(
           h(
-            'span',
+            "span",
             {
               class: classNames(
-                'ml-2',
-                props.size === 'small'
-                  ? 'text-sm'
-                  : props.size === 'large'
-                  ? 'text-lg'
-                  : 'text-base'
+                "ml-2",
+                props.size === "small"
+                  ? "text-sm"
+                  : props.size === "large"
+                  ? "text-lg"
+                  : "text-base"
               ),
             },
-            '跳至'
+            "跳至"
           )
         );
         elements.push(
-          h('input', {
-            type: 'number',
-            class: classNames(getQuickJumperInputClasses(props.size), 'mx-2'),
+          h("input", {
+            type: "number",
+            class: classNames(getQuickJumperInputClasses(props.size), "mx-2"),
             disabled: props.disabled,
             value: quickJumperValue.value,
             onInput: (e: Event) => {
@@ -495,32 +535,45 @@ export const Pagination = defineComponent({
             onKeydown: handleQuickJumperKeypress,
             min: 1,
             max: totalPages.value,
-            'aria-label': '跳转页码',
+            "aria-label": "跳转页码",
           })
         );
         elements.push(
           h(
-            'span',
+            "span",
             {
               class:
-                props.size === 'small'
-                  ? 'text-sm'
-                  : props.size === 'large'
-                  ? 'text-lg'
-                  : 'text-base',
+                props.size === "small"
+                  ? "text-sm"
+                  : props.size === "large"
+                  ? "text-lg"
+                  : "text-base",
             },
-            '页'
+            "页"
           )
         );
       }
 
+      const {
+        class: _class,
+        style: _style,
+        "aria-label": ariaLabelAttr,
+        ...restAttrs
+      } = attrsRecord as {
+        class?: unknown;
+        style?: unknown;
+        "aria-label"?: unknown;
+      } & Record<string, unknown>;
+
       return h(
-        'nav',
+        "nav",
         {
+          ...restAttrs,
           class: containerClasses.value,
-          role: 'navigation',
-          'aria-label': '分页导航',
-          ...attrs,
+          style: mergedStyle.value,
+          role: "navigation",
+          "aria-label":
+            typeof ariaLabelAttr === "string" ? ariaLabelAttr : "分页导航",
         },
         elements
       );
