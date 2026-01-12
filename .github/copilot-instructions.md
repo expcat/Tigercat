@@ -14,6 +14,24 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 - 变更要可交付：不要只写计划；如果要动代码，就同时补齐导出、类型、测试与文档（见下方 DoD）。
 - 避免无关重构：不做大范围格式化、不改公共 API 命名、不“顺手修一堆”。
 
+## 本次经验（精简版）
+
+### 尽量不使用 any
+
+- 优先用精确类型：能写具体类型就不要用 `unknown`。
+- 仅在“边界输入确实未知”时用 `unknown`（例如 `attrs`、第三方回调、JSON/网络响应），并立刻收窄后再使用（类型守卫 / `typeof` / `in` / `Array.isArray`）。
+- 不要在组件里散落断言：把可复用的收窄/合并逻辑下沉到 `@tigercat/core`。
+- Vue attrs 常是 `unknown`：`class` 用 `coerceClassValue(attrs.class)`；`style` 用 `mergeStyleValues(attrs.style, props.style)`。
+- Vue `h()` children 类型不稳时：优先用 `type HChildren = Parameters<typeof h>[2]` 做最小断言，不要 `as any`。
+- React props 冲突（如 `defaultValue/title/autoComplete`）：用 `Omit<...>` 去掉原生属性再自定义，避免 DTS 冲突。
+
+### 构建与排错
+
+- 先复现再定位：优先看 `tsup --dts` / `vue-tsc` 报错点，修“根因类型”而不是压制报错。
+- 截断日志别吞退出码：用 `set -o pipefail && pnpm build 2>&1 | tail -n 200`。
+- demo 也要类型正确：Vue 模板会自动解包 `ref`，事件参数尽量传 index/值，不要让函数参数强依赖 `Ref<T>`。
+- demo 依赖层级要清晰：优先从 `@tigercat/vue` / `@tigercat/react` 引类型与组件，避免 demo 直接绑死 core 内部实现。
+
 ## 目录速查（改哪里）
 
 - `packages/core/`：框架无关的 types/utils/theme（改这里会影响 Vue + React）
@@ -52,7 +70,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 
 ### TypeScript
 
-- 严格模式；避免 `any`，用 `unknown` 或精确类型。
+- 严格模式；避免 `any`；优先精确类型。仅在边界/未知输入用 `unknown`，并先收窄再用。
 - 导出的公共函数/类型尽量写清晰的返回类型。
 - 本仓库 TS/TSX 大多不写分号；遵循文件现有风格。
 - `import` 顺序：外部依赖 → 内部包（`@tigercat/core`）→ 相对路径。
