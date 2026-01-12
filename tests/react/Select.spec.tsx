@@ -30,6 +30,11 @@ const groupedOptions = [
   },
 ];
 
+const optionsWithDisabledFirst = [
+  { label: "Disabled", value: "d", disabled: true },
+  { label: "Enabled", value: "e" },
+];
+
 describe("Select", () => {
   describe("Rendering", () => {
     it("should render with default props", () => {
@@ -79,12 +84,14 @@ describe("Select", () => {
       expect(trigger).toBeDisabled();
     });
 
-    it("should show clear icon when value is set", () => {
+    it("should show clear control when value is set", () => {
       const { container } = render(
         <Select options={testOptions} value="1" clearable />
       );
 
-      expect(container.querySelector("svg.w-4")).toBeInTheDocument();
+      expect(
+        container.querySelector("[data-tiger-select-clear]")
+      ).toBeInTheDocument();
     });
   });
 
@@ -133,6 +140,43 @@ describe("Select", () => {
       await user.click(getByText("Option 1"));
 
       expect(handleChange).toHaveBeenCalledWith(["1"]);
+    });
+
+    it("should clear selection without opening dropdown (single)", async () => {
+      const user = userEvent.setup();
+      const handleChange = vi.fn();
+      const { container, queryByRole } = render(
+        <Select options={testOptions} value="1" onChange={handleChange} />
+      );
+
+      const clear = container.querySelector(
+        "[data-tiger-select-clear]"
+      ) as HTMLElement;
+      expect(clear).toBeInTheDocument();
+
+      await user.click(clear);
+
+      expect(handleChange).toHaveBeenCalledWith(undefined);
+      expect(queryByRole("listbox")).not.toBeInTheDocument();
+    });
+
+    it("should clear selection (multiple)", async () => {
+      const user = userEvent.setup();
+      const handleChange = vi.fn();
+      const { container } = render(
+        <Select
+          options={testOptions}
+          multiple
+          value={["1"]}
+          onChange={handleChange}
+        />
+      );
+
+      const clear = container.querySelector(
+        "[data-tiger-select-clear]"
+      ) as HTMLElement;
+      await user.click(clear);
+      expect(handleChange).toHaveBeenCalledWith([]);
     });
   });
 
@@ -279,6 +323,29 @@ describe("Select", () => {
       await waitFor(() => {
         expect(firstOption).toHaveFocus();
       });
+    });
+
+    it("should skip disabled options when opening with ArrowDown", async () => {
+      const user = userEvent.setup();
+      const handleChange = vi.fn();
+      const { container, getByRole } = render(
+        <Select options={optionsWithDisabledFirst} onChange={handleChange} />
+      );
+
+      const trigger = container.querySelector("button")!;
+      trigger.focus();
+      await user.keyboard("{ArrowDown}");
+
+      const enabledOption = await waitFor(() =>
+        getByRole("option", { name: "Enabled" })
+      );
+
+      await waitFor(() => {
+        expect(enabledOption).toHaveFocus();
+      });
+
+      await user.keyboard("{Enter}");
+      expect(handleChange).toHaveBeenCalledWith("e");
     });
   });
 

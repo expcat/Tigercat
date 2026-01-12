@@ -610,12 +610,38 @@ Select 组件使用 Tailwind CSS 构建，支持通过 CSS 变量进行主题配
 
 ### 主题颜色配置
 
-Select 组件使用以下 CSS 变量：
+Select 组件会复用以下“全局通用”CSS 变量（多数组件共享）：
 
 ```css
 :root {
   --tiger-primary: #2563eb;
+  --tiger-surface: #ffffff;
+  --tiger-surface-muted: #f3f4f6;
+  --tiger-border: #e5e7eb;
+  --tiger-text: #111827;
+  --tiger-text-muted: #6b7280;
   --tiger-outline-bg-hover: #eff6ff;
+}
+```
+
+同时也支持 Select 组件的“细粒度覆盖变量”（按需覆盖即可）：
+
+```css
+:root {
+  --tiger-select-trigger-bg: var(--tiger-surface);
+  --tiger-select-trigger-border: var(--tiger-border);
+  --tiger-select-trigger-text: var(--tiger-text);
+  --tiger-select-placeholder: var(--tiger-text-muted);
+
+  --tiger-select-dropdown-bg: var(--tiger-surface);
+  --tiger-select-dropdown-border: var(--tiger-border);
+
+  --tiger-select-option-bg-hover: var(--tiger-outline-bg-hover);
+  --tiger-select-option-bg-selected: var(--tiger-outline-bg-hover);
+  --tiger-select-option-text-selected: var(--tiger-primary);
+
+  --tiger-select-icon: var(--tiger-text-muted);
+  --tiger-select-check-icon: var(--tiger-primary);
 }
 ```
 

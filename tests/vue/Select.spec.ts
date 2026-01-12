@@ -29,6 +29,11 @@ const groupedOptions = [
   },
 ];
 
+const optionsWithDisabledFirst = [
+  { label: "Disabled", value: "d", disabled: true },
+  { label: "Enabled", value: "e" },
+];
+
 describe("Select", () => {
   describe("Rendering", () => {
     it("should render with default props", () => {
@@ -95,7 +100,9 @@ describe("Select", () => {
         },
       });
 
-      expect(container.querySelector("svg.w-4")).toBeInTheDocument();
+      expect(
+        container.querySelector("[data-tiger-select-clear]")
+      ).toBeInTheDocument();
     });
 
     it("should support multiple selection", () => {
@@ -184,6 +191,46 @@ describe("Select", () => {
       });
 
       expect(onChange).toHaveBeenCalled();
+    });
+
+    it("should clear selection without opening dropdown (single)", async () => {
+      const onUpdate = vi.fn();
+      const { container, queryByRole } = render(Select, {
+        props: {
+          options: testOptions,
+          modelValue: "1",
+          "onUpdate:modelValue": onUpdate,
+        },
+      });
+
+      const clear = container.querySelector(
+        "[data-tiger-select-clear]"
+      ) as HTMLElement;
+      expect(clear).toBeInTheDocument();
+
+      await fireEvent.click(clear);
+
+      expect(onUpdate).toHaveBeenCalledWith(undefined);
+      expect(queryByRole("listbox")).not.toBeInTheDocument();
+    });
+
+    it("should clear selection (multiple)", async () => {
+      const onUpdate = vi.fn();
+      const { container } = render(Select, {
+        props: {
+          options: testOptions,
+          multiple: true,
+          modelValue: ["1"],
+          "onUpdate:modelValue": onUpdate,
+        },
+      });
+
+      const clear = container.querySelector(
+        "[data-tiger-select-clear]"
+      ) as HTMLElement;
+      await fireEvent.click(clear);
+
+      expect(onUpdate).toHaveBeenCalledWith([]);
     });
   });
 
@@ -327,6 +374,32 @@ describe("Select", () => {
       await waitFor(() => {
         expect(firstOption).toHaveFocus();
       });
+    });
+
+    it("should skip disabled options when opening with ArrowDown", async () => {
+      const onUpdate = vi.fn();
+      const { container, getByRole } = render(Select, {
+        props: {
+          options: optionsWithDisabledFirst,
+          "onUpdate:modelValue": onUpdate,
+        },
+      });
+
+      const trigger = container.querySelector("button")!;
+      trigger.focus();
+
+      await fireEvent.keyDown(trigger, { key: "ArrowDown" });
+
+      const enabledOption = await waitFor(() =>
+        getByRole("option", { name: "Enabled" })
+      );
+
+      await waitFor(() => {
+        expect(enabledOption).toHaveFocus();
+      });
+
+      await fireEvent.keyDown(enabledOption, { key: "Enter" });
+      expect(onUpdate).toHaveBeenCalledWith("e");
     });
   });
 
