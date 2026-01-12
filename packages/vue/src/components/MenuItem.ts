@@ -1,14 +1,24 @@
-import { defineComponent, computed, inject, h, PropType } from 'vue';
+import { defineComponent, computed, inject, h, PropType } from "vue";
 import {
   classNames,
+  coerceClassValue,
   getMenuItemClasses,
   isKeySelected,
   menuItemIconClasses,
-} from '@tigercat/core';
-import { MenuContextKey, type MenuContext } from './Menu';
+  mergeStyleValues,
+} from "@tigercat/core";
+import { MenuContextKey, type MenuContext } from "./Menu";
+
+export interface VueMenuItemProps {
+  itemKey: string | number;
+  disabled?: boolean;
+  icon?: unknown;
+  className?: string;
+  style?: Record<string, string | number>;
+}
 
 export const MenuItem = defineComponent({
-  name: 'TigerMenuItem',
+  name: "TigerMenuItem",
   props: {
     /**
      * Unique key for the menu item
@@ -30,26 +40,35 @@ export const MenuItem = defineComponent({
     icon: {
       type: [String, Object] as PropType<unknown>,
     },
+    className: {
+      type: String,
+      default: undefined,
+    },
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined,
+    },
   },
-  setup(props, { slots }) {
+  inheritAttrs: false,
+  setup(props, { slots, attrs }) {
     // Inject menu context
     const menuContext = inject<MenuContext>(MenuContextKey);
 
     if (!menuContext) {
-      console.warn('MenuItem must be used within Menu component');
+      console.warn("MenuItem must be used within Menu component");
     }
 
     // Check if this item is selected
     const isSelected = computed(() => {
       if (!menuContext) return false;
-      return isKeySelected(props.itemKey, menuContext.selectedKeys);
+      return isKeySelected(props.itemKey, menuContext.selectedKeys.value);
     });
 
     // Menu item classes
     const itemClasses = computed(() => {
       if (!menuContext) {
         return classNames(
-          'flex items-center px-4 py-2 cursor-pointer transition-colors duration-200'
+          "flex items-center px-4 py-2 cursor-pointer transition-colors duration-200"
         );
       }
 
@@ -59,8 +78,19 @@ export const MenuItem = defineComponent({
           props.disabled,
           menuContext.theme,
           menuContext.collapsed
-        )
+        ),
+        props.className,
+        coerceClassValue(attrs.class)
       );
+    });
+
+    const itemStyle = computed(() =>
+      mergeStyleValues(attrs.style, props.style)
+    );
+
+    const passthroughAttrs = computed(() => {
+      const { class: _class, style: _style, ...rest } = attrs;
+      return rest;
     });
 
     // Handle click
@@ -76,32 +106,32 @@ export const MenuItem = defineComponent({
 
       // Render icon if provided
       if (props.icon) {
-        if (typeof props.icon === 'string') {
+        if (typeof props.icon === "string") {
           children.push(
-            h('span', {
+            h("span", {
               class: menuItemIconClasses,
               innerHTML: props.icon,
             })
           );
         } else {
           children.push(
-            h('span', { class: menuItemIconClasses }, props.icon as HChildren)
+            h("span", { class: menuItemIconClasses }, props.icon as HChildren)
           );
         }
       }
 
       // Render label (slot content)
       if (!menuContext?.collapsed && slots.default) {
-        children.push(h('span', { class: 'flex-1' }, slots.default()));
+        children.push(h("span", { class: "flex-1" }, slots.default()));
       } else if (menuContext?.collapsed && !props.icon && slots.default) {
         // Show first letter when collapsed without icon
         const defaultSlot = slots.default();
         if (defaultSlot && defaultSlot.length > 0) {
-          const text = String(defaultSlot[0].children || '');
+          const text = String(defaultSlot[0].children || "");
           children.push(
             h(
-              'span',
-              { class: 'flex-1 text-center' },
+              "span",
+              { class: "flex-1 text-center" },
               text.charAt(0).toUpperCase()
             )
           );
@@ -109,12 +139,14 @@ export const MenuItem = defineComponent({
       }
 
       return h(
-        'li',
+        "li",
         {
           class: itemClasses.value,
-          role: 'menuitem',
-          'aria-disabled': props.disabled ? 'true' : undefined,
+          style: itemStyle.value,
+          role: "menuitem",
+          "aria-disabled": props.disabled ? "true" : undefined,
           onClick: handleClick,
+          ...passthroughAttrs.value,
         },
         children
       );

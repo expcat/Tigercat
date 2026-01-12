@@ -2,98 +2,67 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import { Menu, MenuItem, SubMenu } from '@tigercat/react'
-import React from 'react'
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { Menu, MenuItem, SubMenu } from "@tigercat/react";
+import React from "react";
 
-describe('Menu', () => {
-  describe('Rendering', () => {
-    it('should render with default props', () => {
-      render(
-        <Menu>
-          <MenuItem key="1">Item 1</MenuItem>
-          <MenuItem key="2">Item 2</MenuItem>
-        </Menu>
-      )
+describe("Menu", () => {
+  it("renders items and basic roles", () => {
+    const { container } = render(
+      <Menu>
+        <MenuItem itemKey="1">Item 1</MenuItem>
+        <MenuItem itemKey="2">Item 2</MenuItem>
+      </Menu>
+    );
 
-      expect(screen.getByText('Item 1')).toBeInTheDocument()
-      expect(screen.getByText('Item 2')).toBeInTheDocument()
-    })
+    expect(screen.getByText("Item 1")).toBeInTheDocument();
+    expect(screen.getByText("Item 2")).toBeInTheDocument();
 
-    it('should render with vertical mode by default', () => {
-      const { container } = render(
-        <Menu>
-          <MenuItem key="1">Item 1</MenuItem>
-        </Menu>
-      )
+    const menu = container.querySelector("ul");
+    expect(menu).toHaveAttribute("role", "menu");
+    expect(screen.getByText("Item 1").closest("li")).toHaveAttribute(
+      "role",
+      "menuitem"
+    );
+  });
 
-      const menu = container.querySelector('ul')
-      expect(menu).toHaveClass('flex-col')
-    })
+  it("supports uncontrolled selection and calls onSelect", async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
 
-    it('should render with horizontal mode', () => {
-      const { container } = render(
-        <Menu mode="horizontal">
-          <MenuItem key="1">Item 1</MenuItem>
-        </Menu>
-      )
+    render(
+      <Menu defaultSelectedKeys={[]} onSelect={onSelect}>
+        <MenuItem itemKey="1">Item 1</MenuItem>
+        <MenuItem itemKey="2">Item 2</MenuItem>
+      </Menu>
+    );
 
-      const menu = container.querySelector('ul')
-      expect(menu).toHaveClass('flex-row')
-    })
+    const item2 = screen.getByText("Item 2").closest("li");
+    await user.click(item2 as HTMLElement);
 
-    it('should render with dark theme', () => {
-      const { container } = render(
-        <Menu theme="dark">
-          <MenuItem key="1">Item 1</MenuItem>
-        </Menu>
-      )
+    expect(onSelect).toHaveBeenCalledWith("2", { selectedKeys: ["2"] });
+    expect(item2).toHaveClass("font-medium");
+  });
 
-      const menu = container.querySelector('ul')
-      expect(menu).toHaveClass('bg-gray-800')
-    })
-  })
+  it("supports uncontrolled openKeys and calls onOpenChange", async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
 
-  describe('MenuItem', () => {
-    it('should render menu item with text', () => {
-      render(
-        <Menu>
-          <MenuItem key="1">Test Item</MenuItem>
-        </Menu>
-      )
+    render(
+      <Menu defaultOpenKeys={[]} onOpenChange={onOpenChange}>
+        <SubMenu itemKey="sub1" title="Submenu">
+          <MenuItem itemKey="1">Sub Item 1</MenuItem>
+        </SubMenu>
+      </Menu>
+    );
 
-      expect(screen.getByText('Test Item')).toBeInTheDocument()
-    })
-  })
+    const trigger = screen.getByRole("button", { name: "Submenu" });
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
 
-  describe('SubMenu', () => {
-    it('should render submenu with title', () => {
-      render(
-        <Menu>
-          <SubMenu key="sub1" title="Submenu">
-            <MenuItem key="1">Sub Item 1</MenuItem>
-          </SubMenu>
-        </Menu>
-      )
-
-      expect(screen.getByText('Submenu')).toBeInTheDocument()
-    })
-  })
-
-  describe('Accessibility', () => {
-    it('should have proper ARIA roles', () => {
-      const { container } = render(
-        <Menu>
-          <MenuItem key="1">Item 1</MenuItem>
-        </Menu>
-      )
-
-      const menu = container.querySelector('ul')
-      expect(menu).toHaveAttribute('role', 'menu')
-
-      const menuItem = screen.getByText('Item 1').closest('li')
-      expect(menuItem).toHaveAttribute('role', 'menuitem')
-    })
-  })
-})
+    await user.click(trigger);
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(onOpenChange).toHaveBeenCalledWith("sub1", { openKeys: ["sub1"] });
+  });
+});
