@@ -8,14 +8,14 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { List } from '@tigercat/vue'
+import { ref } from 'vue';
+import { List } from '@tigercat/vue';
 
 const dataSource = ref([
   { key: 1, title: 'Item 1', description: 'Description for item 1' },
   { key: 2, title: 'Item 2', description: 'Description for item 2' },
   { key: 3, title: 'Item 3', description: 'Description for item 3' },
-])
+]);
 </script>
 
 <template>
@@ -26,16 +26,16 @@ const dataSource = ref([
 ### React
 
 ```tsx
-import { List } from '@tigercat/react'
+import { List } from '@tigercat/react';
 
 function App() {
   const dataSource = [
     { key: 1, title: 'Item 1', description: 'Description for item 1' },
     { key: 2, title: 'Item 2', description: 'Description for item 2' },
     { key: 3, title: 'Item 3', description: 'Description for item 3' },
-  ]
+  ];
 
-  return <List dataSource={dataSource} />
+  return <List dataSource={dataSource} />;
 }
 ```
 
@@ -99,8 +99,8 @@ List 组件支持 3 种边框样式：
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { List } from '@tigercat/vue'
+import { ref } from 'vue';
+import { List } from '@tigercat/vue';
 
 const dataSource = ref([
   {
@@ -121,7 +121,7 @@ const dataSource = ref([
     title: 'Bob Johnson',
     description: 'Designer',
   },
-])
+]);
 </script>
 
 <template>
@@ -132,7 +132,7 @@ const dataSource = ref([
 ### React
 
 ```tsx
-import { List } from '@tigercat/react'
+import { List } from '@tigercat/react';
 
 function App() {
   const dataSource = [
@@ -154,9 +154,9 @@ function App() {
       title: 'Bob Johnson',
       description: 'Designer',
     },
-  ]
+  ];
 
-  return <List dataSource={dataSource} />
+  return <List dataSource={dataSource} />;
 }
 ```
 
@@ -168,8 +168,8 @@ function App() {
 
 ```vue
 <script setup>
-import { ref, h } from 'vue'
-import { List, Button } from '@tigercat/vue'
+import { ref, h } from 'vue';
+import { List, Button } from '@tigercat/vue';
 
 const dataSource = ref([
   {
@@ -184,7 +184,7 @@ const dataSource = ref([
     description: 'Review pull requests',
     extra: h(Button, { size: 'sm' }, () => 'View'),
   },
-])
+]);
 </script>
 
 <template>
@@ -195,7 +195,7 @@ const dataSource = ref([
 ### React
 
 ```tsx
-import { List, Button } from '@tigercat/react'
+import { List, Button } from '@tigercat/react';
 
 function App() {
   const dataSource = [
@@ -211,9 +211,9 @@ function App() {
       description: 'Review pull requests',
       extra: <Button size="sm">View</Button>,
     },
-  ]
+  ];
 
-  return <List dataSource={dataSource} />
+  return <List dataSource={dataSource} />;
 }
 ```
 
@@ -225,14 +225,14 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { List, Button } from '@tigercat/vue'
+import { ref } from 'vue';
+import { List, Button } from '@tigercat/vue';
 
 const dataSource = ref([
   { key: 1, name: 'Product A', price: '$99', stock: 15 },
   { key: 2, name: 'Product B', price: '$149', stock: 8 },
   { key: 3, name: 'Product C', price: '$199', stock: 22 },
-])
+]);
 </script>
 
 <template>
@@ -256,14 +256,14 @@ const dataSource = ref([
 ### React
 
 ```tsx
-import { List, Button } from '@tigercat/react'
+import { List, Button } from '@tigercat/react';
 
 function App() {
   const dataSource = [
     { key: 1, name: 'Product A', price: '$99', stock: 15 },
     { key: 2, name: 'Product B', price: '$149', stock: 8 },
     { key: 3, name: 'Product C', price: '$199', stock: 22 },
-  ]
+  ];
 
   return (
     <List
@@ -276,12 +276,14 @@ function App() {
           </div>
           <div className="text-right">
             <p className="text-lg font-bold text-blue-600">{item.price}</p>
-            <Button size="sm" variant="primary">Buy</Button>
+            <Button size="sm" variant="primary">
+              Buy
+            </Button>
           </div>
         </div>
       )}
     />
-  )
+  );
 }
 ```
 
@@ -310,7 +312,9 @@ function App() {
 <List
   dataSource={dataSource}
   header={<h2 className="text-xl font-bold">User List</h2>}
-  footer={<p className="text-sm text-gray-500">Total: {dataSource.length} users</p>}
+  footer={
+    <p className="text-sm text-gray-500">Total: {dataSource.length} users</p>
+  }
 />
 ```
 
@@ -322,12 +326,12 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { List } from '@tigercat/vue'
+import { ref } from 'vue';
+import { List } from '@tigercat/vue';
 
 const dataSource = ref([
   // ... 大量数据项
-])
+]);
 
 const pagination = ref({
   current: 1,
@@ -336,10 +340,10 @@ const pagination = ref({
   pageSizeOptions: [10, 20, 50],
   showSizeChanger: true,
   showTotal: true,
-})
+});
 
 function handlePageChange({ current, pageSize }) {
-  console.log('Page changed:', current, pageSize)
+  console.log('Page changed:', current, pageSize);
 }
 </script>
 
@@ -347,21 +351,20 @@ function handlePageChange({ current, pageSize }) {
   <List
     :dataSource="dataSource"
     :pagination="pagination"
-    @page-change="handlePageChange"
-  />
+    @page-change="handlePageChange" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { List } from '@tigercat/react'
+import { useState } from 'react';
+import { List } from '@tigercat/react';
 
 function App() {
   const dataSource = [
     // ... 大量数据项
-  ]
+  ];
 
   const pagination = {
     current: 1,
@@ -370,11 +373,11 @@ function App() {
     pageSizeOptions: [10, 20, 50],
     showSizeChanger: true,
     showTotal: true,
-  }
+  };
 
   const handlePageChange = ({ current, pageSize }) => {
-    console.log('Page changed:', current, pageSize)
-  }
+    console.log('Page changed:', current, pageSize);
+  };
 
   return (
     <List
@@ -382,7 +385,7 @@ function App() {
       pagination={pagination}
       onPageChange={handlePageChange}
     />
-  )
+  );
 }
 ```
 
@@ -394,8 +397,8 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { List, Card } from '@tigercat/vue'
+import { ref } from 'vue';
+import { List, Card } from '@tigercat/vue';
 
 const dataSource = ref([
   { key: 1, title: 'Card 1', content: 'Content 1' },
@@ -404,7 +407,7 @@ const dataSource = ref([
   { key: 4, title: 'Card 4', content: 'Content 4' },
   { key: 5, title: 'Card 5', content: 'Content 5' },
   { key: 6, title: 'Card 6', content: 'Content 6' },
-])
+]);
 
 const grid = {
   gutter: 16,
@@ -413,7 +416,7 @@ const grid = {
   sm: 2,
   md: 3,
   lg: 4,
-}
+};
 </script>
 
 <template>
@@ -433,7 +436,7 @@ const grid = {
 ### React
 
 ```tsx
-import { List, Card } from '@tigercat/react'
+import { List, Card } from '@tigercat/react';
 
 function App() {
   const dataSource = [
@@ -443,7 +446,7 @@ function App() {
     { key: 4, title: 'Card 4', content: 'Content 4' },
     { key: 5, title: 'Card 5', content: 'Content 5' },
     { key: 6, title: 'Card 6', content: 'Content 6' },
-  ]
+  ];
 
   const grid = {
     gutter: 16,
@@ -452,7 +455,7 @@ function App() {
     sm: 2,
     md: 3,
     lg: 4,
-  }
+  };
 
   return (
     <List
@@ -465,7 +468,7 @@ function App() {
         </Card>
       )}
     />
-  )
+  );
 }
 ```
 
@@ -477,20 +480,20 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { List } from '@tigercat/vue'
+import { ref } from 'vue';
+import { List } from '@tigercat/vue';
 
-const loading = ref(true)
-const dataSource = ref([])
+const loading = ref(true);
+const dataSource = ref([]);
 
 // 模拟数据加载
 setTimeout(() => {
   dataSource.value = [
     { key: 1, title: 'Item 1' },
     { key: 2, title: 'Item 2' },
-  ]
-  loading.value = false
-}, 2000)
+  ];
+  loading.value = false;
+}, 2000);
 </script>
 
 <template>
@@ -501,12 +504,12 @@ setTimeout(() => {
 ### React
 
 ```tsx
-import { useState, useEffect } from 'react'
-import { List } from '@tigercat/react'
+import { useState, useEffect } from 'react';
+import { List } from '@tigercat/react';
 
 function App() {
-  const [loading, setLoading] = useState(true)
-  const [dataSource, setDataSource] = useState([])
+  const [loading, setLoading] = useState(true);
+  const [dataSource, setDataSource] = useState([]);
 
   useEffect(() => {
     // 模拟数据加载
@@ -514,12 +517,12 @@ function App() {
       setDataSource([
         { key: 1, title: 'Item 1' },
         { key: 2, title: 'Item 2' },
-      ])
-      setLoading(false)
-    }, 2000)
-  }, [])
+      ]);
+      setLoading(false);
+    }, 2000);
+  }, []);
 
-  return <List dataSource={dataSource} loading={loading} />
+  return <List dataSource={dataSource} loading={loading} />;
 }
 ```
 
@@ -549,52 +552,44 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { List } from '@tigercat/vue'
+import { ref } from 'vue';
+import { List } from '@tigercat/vue';
 
 const dataSource = ref([
   { key: 1, title: 'Item 1' },
   { key: 2, title: 'Item 2' },
   { key: 3, title: 'Item 3' },
-])
+]);
 
 function handleItemClick(item, index) {
-  console.log('Clicked item:', item, 'at index:', index)
+  console.log('Clicked item:', item, 'at index:', index);
 }
 </script>
 
 <template>
-  <List
-    :dataSource="dataSource"
-    hoverable
-    @item-click="handleItemClick"
-  />
+  <List :dataSource="dataSource" hoverable @item-click="handleItemClick" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { List } from '@tigercat/react'
+import { List } from '@tigercat/react';
 
 function App() {
   const dataSource = [
     { key: 1, title: 'Item 1' },
     { key: 2, title: 'Item 2' },
     { key: 3, title: 'Item 3' },
-  ]
+  ];
 
   const handleItemClick = (item, index) => {
-    console.log('Clicked item:', item, 'at index:', index)
-  }
+    console.log('Clicked item:', item, 'at index:', index);
+  };
 
   return (
-    <List
-      dataSource={dataSource}
-      hoverable
-      onItemClick={handleItemClick}
-    />
-  )
+    <List dataSource={dataSource} hoverable onItemClick={handleItemClick} />
+  );
 }
 ```
 
@@ -620,93 +615,100 @@ function App() {
 
 ### List Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| `dataSource` | 列表数据源 | `ListItem[]` | `[]` |
-| `size` | 列表尺寸 | `'sm' \| 'md' \| 'lg'` | `'md'` |
-| `bordered` | 边框样式 | `'none' \| 'divided' \| 'bordered'` | `'divided'` |
-| `loading` | 加载状态 | `boolean` | `false` |
-| `emptyText` | 空状态文本 | `string` | `'No data'` |
-| `split` | 是否显示分割线 | `boolean` | `true` |
-| `itemLayout` | 列表项布局 | `'horizontal' \| 'vertical'` | `'horizontal'` |
-| `header` | 列表头部内容 | `ReactNode` (React) / Slot (Vue) | - |
-| `footer` | 列表底部内容 | `ReactNode` (React) / Slot (Vue) | - |
-| `pagination` | 分页配置，设为 `false` 禁用 | `ListPaginationConfig \| false` | `false` |
-| `grid` | 网格布局配置 | `GridConfig` | - |
-| `rowKey` | 行键名或函数 | `string \| ((item: ListItem, index: number) => string \| number)` | `'key'` |
-| `hoverable` | 列表项是否可悬停 | `boolean` | `false` |
-| `renderItem` | 自定义列表项渲染 | `(item: ListItem, index: number) => ReactNode` (React) / Slot (Vue) | - |
+| 属性         | 说明                        | 类型                                                                | 默认值         |
+| ------------ | --------------------------- | ------------------------------------------------------------------- | -------------- |
+| `dataSource` | 列表数据源                  | `ListItem[]`                                                        | `[]`           |
+| `size`       | 列表尺寸                    | `'sm' \| 'md' \| 'lg'`                                              | `'md'`         |
+| `bordered`   | 边框样式                    | `'none' \| 'divided' \| 'bordered'`                                 | `'divided'`    |
+| `loading`    | 加载状态                    | `boolean`                                                           | `false`        |
+| `emptyText`  | 空状态文本                  | `string`                                                            | `'No data'`    |
+| `split`      | 是否显示分割线              | `boolean`                                                           | `true`         |
+| `itemLayout` | 列表项布局                  | `'horizontal' \| 'vertical'`                                        | `'horizontal'` |
+| `header`     | 列表头部内容                | `ReactNode` (React) / Slot (Vue)                                    | -              |
+| `footer`     | 列表底部内容                | `ReactNode` (React) / Slot (Vue)                                    | -              |
+| `pagination` | 分页配置，设为 `false` 禁用 | `ListPaginationConfig \| false`                                     | `false`        |
+| `grid`       | 网格布局配置                | `GridConfig`                                                        | -              |
+| `rowKey`     | 行键名或函数                | `string \| ((item: ListItem, index: number) => string \| number)`   | `'key'`        |
+| `hoverable`  | 列表项是否可悬停            | `boolean`                                                           | `false`        |
+| `renderItem` | 自定义列表项渲染            | `(item: ListItem, index: number) => ReactNode` (React) / Slot (Vue) | -              |
+| `className`  | 额外 CSS 类                 | `string`                                                            | -              |
+| `style`      | 自定义样式                  | `CSSProperties` (React) / `Record<string, string \| number>` (Vue)  | -              |
 
 ### ListItem
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| `key` | 列表项唯一键 | `string \| number` | - |
-| `title` | 列表项标题 | `string` | - |
-| `description` | 列表项描述 | `string` | - |
-| `avatar` | 列表项头像/图标 | `string \| ReactNode` | - |
-| `extra` | 额外内容 | `ReactNode` | - |
-| `[key: string]` | 自定义数据 | `unknown` | - |
+| 属性            | 说明            | 类型                  | 默认值 |
+| --------------- | --------------- | --------------------- | ------ |
+| `key`           | 列表项唯一键    | `string \| number`    | -      |
+| `title`         | 列表项标题      | `string`              | -      |
+| `description`   | 列表项描述      | `string`              | -      |
+| `avatar`        | 列表项头像/图标 | `string \| ReactNode` | -      |
+| `extra`         | 额外内容        | `ReactNode`           | -      |
+| `[key: string]` | 自定义数据      | `unknown`             | -      |
 
 ### ListPaginationConfig
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| `current` | 当前页码 | `number` | `1` |
-| `pageSize` | 每页条数 | `number` | `10` |
-| `total` | 总条数 | `number` | - |
-| `pageSizeOptions` | 每页条数选项 | `number[]` | `[10, 20, 50, 100]` |
-| `showSizeChanger` | 是否显示每页条数选择器 | `boolean` | `true` |
-| `showTotal` | 是否显示总条数 | `boolean` | `true` |
-| `totalText` | 自定义总条数文本 | `(total: number, range: [number, number]) => string` | - |
+| 属性              | 说明                   | 类型                                                 | 默认值              |
+| ----------------- | ---------------------- | ---------------------------------------------------- | ------------------- |
+| `current`         | 当前页码               | `number`                                             | `1`                 |
+| `pageSize`        | 每页条数               | `number`                                             | `10`                |
+| `total`           | 总条数                 | `number`                                             | -                   |
+| `pageSizeOptions` | 每页条数选项           | `number[]`                                           | `[10, 20, 50, 100]` |
+| `showSizeChanger` | 是否显示每页条数选择器 | `boolean`                                            | `true`              |
+| `showTotal`       | 是否显示总条数         | `boolean`                                            | `true`              |
+| `totalText`       | 自定义总条数文本       | `(total: number, range: [number, number]) => string` | -                   |
 
 ### GridConfig
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| `gutter` | 栅格间隔 | `number` | - |
-| `column` | 默认列数 | `number` | - |
-| `xs` | `<576px` 响应式栅格 | `number` | - |
-| `sm` | `≥576px` 响应式栅格 | `number` | - |
-| `md` | `≥768px` 响应式栅格 | `number` | - |
-| `lg` | `≥992px` 响应式栅格 | `number` | - |
-| `xl` | `≥1200px` 响应式栅格 | `number` | - |
-| `xxl` | `≥1600px` 响应式栅格 | `number` | - |
+| 属性     | 说明                 | 类型     | 默认值 |
+| -------- | -------------------- | -------- | ------ |
+| `gutter` | 栅格间隔             | `number` | -      |
+| `column` | 默认列数             | `number` | -      |
+| `xs`     | `<576px` 响应式栅格  | `number` | -      |
+| `sm`     | `≥576px` 响应式栅格  | `number` | -      |
+| `md`     | `≥768px` 响应式栅格  | `number` | -      |
+| `lg`     | `≥992px` 响应式栅格  | `number` | -      |
+| `xl`     | `≥1200px` 响应式栅格 | `number` | -      |
+| `xxl`    | `≥1600px` 响应式栅格 | `number` | -      |
 
 ### Events (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| `item-click` | 列表项点击事件 | `(item: ListItem, index: number)` |
-| `page-change` | 分页变化事件 | `{ current: number; pageSize: number }` |
+| 事件名        | 说明           | 回调参数                                |
+| ------------- | -------------- | --------------------------------------- |
+| `item-click`  | 列表项点击事件 | `(item: ListItem, index: number)`       |
+| `page-change` | 分页变化事件   | `{ current: number; pageSize: number }` |
 
 ### Event Handlers (React)
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
-| `onItemClick` | 列表项点击事件 | `(item: ListItem, index: number) => void` |
-| `onPageChange` | 分页变化事件 | `(page: { current: number; pageSize: number }) => void` |
+| 属性           | 说明           | 类型                                                    |
+| -------------- | -------------- | ------------------------------------------------------- |
+| `onItemClick`  | 列表项点击事件 | `(item: ListItem, index: number) => void`               |
+| `onPageChange` | 分页变化事件   | `(page: { current: number; pageSize: number }) => void` |
 
 ### 插槽 (Vue)
 
-| 插槽名称 | 说明 | 参数 |
-|----------|------|------|
-| `header` | 列表头部内容 | - |
-| `footer` | 列表底部内容 | - |
+| 插槽名称     | 说明             | 参数                                |
+| ------------ | ---------------- | ----------------------------------- |
+| `header`     | 列表头部内容     | -                                   |
+| `footer`     | 列表底部内容     | -                                   |
 | `renderItem` | 自定义列表项渲染 | `{ item: ListItem, index: number }` |
 
 ## 主题定制
 
 List 组件使用 Tailwind CSS 类，可以通过覆盖相应的类来自定义样式。主要支持以下 CSS 变量：
 
+- `--tiger-surface` - 背景色（列表容器/加载遮罩）
+- `--tiger-surface-muted` - 悬停背景色
+- `--tiger-border` - 边框/分割线颜色
+- `--tiger-text` - 主要文字颜色
+- `--tiger-text-muted` - 次要文字/空态文字颜色
 - `--tiger-primary` - 主题色（用于加载状态等）
 
 ## 无障碍支持
 
 - 列表使用语义化的 HTML 结构
-- 支持键盘导航
-- 提供适当的 ARIA 属性
-- 加载和空状态有适当的提示
+- 列表容器使用 `role="list"`，加载时设置 `aria-busy`
+- 列表项使用 `role="listitem"`；当提供 `onItemClick`（React）或监听 `@item-click`（Vue）时，列表项可通过 Enter/Space 键触发
+- 加载与空状态使用 `role="status"` + `aria-live="polite"`
 
 ## 使用场景
 

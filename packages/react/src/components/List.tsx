@@ -49,7 +49,7 @@ const LoadingSpinner: React.FC = () => (
   </svg>
 );
 
-export interface ListProps {
+export interface ListProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * List data source
    */
@@ -131,9 +131,6 @@ export interface ListProps {
    * Page change handler
    */
   onPageChange?: (page: { current: number; pageSize: number }) => void;
-  /**
-   * Additional CSS classes
-   */
   className?: string;
 }
 
@@ -155,6 +152,7 @@ export const List: React.FC<ListProps> = ({
   onItemClick,
   onPageChange,
   className,
+  ...divProps
 }) => {
   const [currentPage, setCurrentPage] = useState(
     pagination && typeof pagination === 'object' ? pagination.current || 1 : 1
@@ -325,11 +323,27 @@ export const List: React.FC<ListProps> = ({
       hoverable
     );
 
+    const clickable = typeof onItemClick === 'function';
+    const handleClick = clickable
+      ? () => handleItemClick(item, index)
+      : undefined;
+    const handleKeyDown = clickable
+      ? (e: React.KeyboardEvent<HTMLDivElement>) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleItemClick(item, index);
+          }
+        }
+      : undefined;
+
     return (
       <div
         key={key}
-        className={itemClasses}
-        onClick={() => handleItemClick(item, index)}>
+        className={classNames(itemClasses, clickable && 'cursor-pointer')}
+        role="listitem"
+        tabIndex={clickable ? 0 : undefined}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}>
         {renderItem
           ? renderItem(item, index)
           : renderDefaultListItem(item, index)}
@@ -343,7 +357,11 @@ export const List: React.FC<ListProps> = ({
     }
 
     if (paginatedData.length === 0) {
-      return <div className={listEmptyStateClasses}>{emptyText}</div>;
+      return (
+        <div className={listEmptyStateClasses} role="status" aria-live="polite">
+          {emptyText}
+        </div>
+      );
     }
 
     const items = paginatedData.map((item, index) =>
@@ -351,7 +369,16 @@ export const List: React.FC<ListProps> = ({
     );
 
     if (grid) {
-      return <div className={gridClasses}>{items}</div>;
+      const gutter = grid.gutter;
+      return (
+        <div
+          className={gridClasses}
+          style={
+            gutter ? ({ gap: `${gutter}px` } as React.CSSProperties) : undefined
+          }>
+          {items}
+        </div>
+      );
     }
 
     return items;
@@ -371,7 +398,7 @@ export const List: React.FC<ListProps> = ({
       <div className={listPaginationContainerClasses}>
         {/* Total info */}
         {paginationConfig.showTotal !== false && (
-          <div className="text-sm text-gray-700">
+          <div className="text-sm text-[var(--tiger-text,#111827)]">
             {paginationConfig.totalText
               ? paginationConfig.totalText(total, [startIndex, endIndex])
               : `Showing ${startIndex} to ${endIndex} of ${total} items`}
@@ -383,7 +410,7 @@ export const List: React.FC<ListProps> = ({
           {/* Page size selector */}
           {paginationConfig.showSizeChanger !== false && (
             <select
-              className="px-3 py-1 border border-gray-300 rounded text-sm"
+              className="px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)]"
               value={currentPageSize}
               onChange={(e) => handlePageSizeChange(Number(e.target.value))}>
               {(paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map(
@@ -401,10 +428,10 @@ export const List: React.FC<ListProps> = ({
             {/* Previous button */}
             <button
               className={classNames(
-                'px-3 py-1 border border-gray-300 rounded text-sm',
+                'px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]',
                 hasPrev
-                  ? 'hover:bg-gray-50 text-gray-700'
-                  : 'text-gray-400 cursor-not-allowed'
+                  ? 'hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]'
+                  : 'text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed'
               )}
               disabled={!hasPrev}
               onClick={() => handlePageChange(currentPage - 1)}>
@@ -412,17 +439,17 @@ export const List: React.FC<ListProps> = ({
             </button>
 
             {/* Current page indicator */}
-            <span className="px-3 py-1 text-sm text-gray-700">
+            <span className="px-3 py-1 text-sm text-[var(--tiger-text,#111827)]">
               Page {currentPage} of {totalPages}
             </span>
 
             {/* Next button */}
             <button
               className={classNames(
-                'px-3 py-1 border border-gray-300 rounded text-sm',
+                'px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]',
                 hasNext
-                  ? 'hover:bg-gray-50 text-gray-700'
-                  : 'text-gray-400 cursor-not-allowed'
+                  ? 'hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]'
+                  : 'text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed'
               )}
               disabled={!hasNext}
               onClick={() => handlePageChange(currentPage + 1)}>
@@ -437,7 +464,11 @@ export const List: React.FC<ListProps> = ({
   return (
     <div className={listWrapperClasses}>
       <div className="relative">
-        <div className={listClasses}>
+        <div
+          {...divProps}
+          className={listClasses}
+          role="list"
+          aria-busy={loading || undefined}>
           {renderListHeader()}
           {renderListItems()}
           {renderListFooter()}
@@ -445,7 +476,10 @@ export const List: React.FC<ListProps> = ({
 
         {/* Loading overlay */}
         {loading && (
-          <div className={listLoadingOverlayClasses}>
+          <div
+            className={listLoadingOverlayClasses}
+            role="status"
+            aria-live="polite">
             <LoadingSpinner />
           </div>
         )}

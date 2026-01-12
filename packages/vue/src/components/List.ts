@@ -2,6 +2,7 @@ import {
   defineComponent,
   computed,
   ref,
+  getCurrentInstance,
   h,
   PropType,
   type VNode,
@@ -72,6 +73,7 @@ const LoadingSpinner = () => {
 
 export const List = defineComponent({
   name: 'TigerList',
+  inheritAttrs: false,
   props: {
     /**
      * List data source
@@ -160,9 +162,35 @@ export const List = defineComponent({
       type: Boolean,
       default: false,
     },
+
+    /**
+     * Additional CSS classes
+     */
+    className: {
+      type: String,
+      default: undefined,
+    },
+
+    /**
+     * Custom styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined,
+    },
   },
   emits: ['item-click', 'page-change'],
-  setup(props, { emit, slots }) {
+  setup(props, { emit, slots, attrs }) {
+    const instance = getCurrentInstance();
+    const hasItemClickListener = computed(() => {
+      const vnodeProps = (instance?.vnode.props || {}) as Record<
+        string,
+        unknown
+      >;
+      const handler = vnodeProps.onItemClick;
+      return typeof handler === 'function' || Array.isArray(handler);
+    });
+
     const currentPage = ref(
       props.pagination && typeof props.pagination === 'object'
         ? props.pagination.current || 1
@@ -206,7 +234,8 @@ export const List = defineComponent({
     const listClasses = computed(() => {
       return classNames(
         getListClasses(props.bordered),
-        listSizeClasses[props.size]
+        listSizeClasses[props.size],
+        props.className
       );
     });
 
@@ -283,14 +312,26 @@ export const List = defineComponent({
         props.hoverable
       );
 
+      const clickable = hasItemClickListener.value;
+
       // Custom render from slot
       if (slots.renderItem) {
         return h(
           'div',
           {
             key,
-            class: itemClasses,
+            class: classNames(itemClasses, clickable && 'cursor-pointer'),
+            role: 'listitem',
+            tabindex: clickable ? 0 : undefined,
             onClick: () => handleItemClick(item, index),
+            onKeydown: clickable
+              ? (e: KeyboardEvent) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleItemClick(item, index);
+                  }
+                }
+              : undefined,
           },
           slots.renderItem({ item, index })
         );
@@ -353,8 +394,18 @@ export const List = defineComponent({
         'div',
         {
           key,
-          class: itemClasses,
+          class: classNames(itemClasses, clickable && 'cursor-pointer'),
+          role: 'listitem',
+          tabindex: clickable ? 0 : undefined,
           onClick: () => handleItemClick(item, index),
+          onKeydown: clickable
+            ? (e: KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleItemClick(item, index);
+                }
+              }
+            : undefined,
         },
         itemContent
       );
@@ -366,7 +417,15 @@ export const List = defineComponent({
       }
 
       if (paginatedData.value.length === 0) {
-        return h('div', { class: listEmptyStateClasses }, props.emptyText);
+        return h(
+          'div',
+          {
+            class: listEmptyStateClasses,
+            role: 'status',
+            'aria-live': 'polite',
+          },
+          props.emptyText
+        );
       }
 
       const items = paginatedData.value.map((item, index) =>
@@ -374,7 +433,15 @@ export const List = defineComponent({
       );
 
       if (props.grid) {
-        return h('div', { class: gridClasses.value }, items);
+        const gutter = props.grid.gutter;
+        return h(
+          'div',
+          {
+            class: gridClasses.value,
+            style: gutter ? { gap: `${gutter}px` } : undefined,
+          },
+          items
+        );
       }
 
       return items;
@@ -395,7 +462,7 @@ export const List = defineComponent({
         paginationConfig.showTotal !== false &&
           h(
             'div',
-            { class: 'text-sm text-gray-700' },
+            { class: 'text-sm text-[var(--tiger-text,#111827)]' },
             paginationConfig.totalText
               ? paginationConfig.totalText(total, [startIndex, endIndex])
               : `Showing ${startIndex} to ${endIndex} of ${total} items`
@@ -408,7 +475,8 @@ export const List = defineComponent({
             h(
               'select',
               {
-                class: 'px-3 py-1 border border-gray-300 rounded text-sm',
+                class:
+                  'px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)]',
                 value: currentPageSize.value,
                 onChange: (e: Event) =>
                   handlePageSizeChange(
@@ -427,10 +495,10 @@ export const List = defineComponent({
               'button',
               {
                 class: classNames(
-                  'px-3 py-1 border border-gray-300 rounded text-sm',
+                  'px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]',
                   hasPrev
-                    ? 'hover:bg-gray-50 text-gray-700'
-                    : 'text-gray-400 cursor-not-allowed'
+                    ? 'hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]'
+                    : 'text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed'
                 ),
                 disabled: !hasPrev,
                 onClick: () => handlePageChange(currentPage.value - 1),
@@ -441,7 +509,7 @@ export const List = defineComponent({
             // Current page indicator
             h(
               'span',
-              { class: 'px-3 py-1 text-sm text-gray-700' },
+              { class: 'px-3 py-1 text-sm text-[var(--tiger-text,#111827)]' },
               `Page ${currentPage.value} of ${totalPages}`
             ),
 
@@ -450,10 +518,10 @@ export const List = defineComponent({
               'button',
               {
                 class: classNames(
-                  'px-3 py-1 border border-gray-300 rounded text-sm',
+                  'px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]',
                   hasNext
-                    ? 'hover:bg-gray-50 text-gray-700'
-                    : 'text-gray-400 cursor-not-allowed'
+                    ? 'hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]'
+                    : 'text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed'
                 ),
                 disabled: !hasNext,
                 onClick: () => handlePageChange(currentPage.value + 1),
@@ -466,17 +534,35 @@ export const List = defineComponent({
     }
 
     return () => {
+      const attrsRecord = attrs as Record<string, unknown>;
+      const attrsClass = attrsRecord.class;
+      const attrsStyle = attrsRecord.style;
+
       return h('div', { class: listWrapperClasses }, [
         h('div', { class: 'relative' }, [
-          h('div', { class: listClasses.value }, [
-            renderListHeader(),
-            renderListItems(),
-            renderListFooter(),
-          ]),
+          h(
+            'div',
+            {
+              ...attrs,
+              class: classNames(listClasses.value, attrsClass as any),
+              style: [attrsStyle as any, props.style as any],
+              role: 'list',
+              'aria-busy': props.loading || undefined,
+            },
+            [renderListHeader(), renderListItems(), renderListFooter()]
+          ),
 
           // Loading overlay
           props.loading &&
-            h('div', { class: listLoadingOverlayClasses }, [LoadingSpinner()]),
+            h(
+              'div',
+              {
+                class: listLoadingOverlayClasses,
+                role: 'status',
+                'aria-live': 'polite',
+              },
+              [LoadingSpinner()]
+            ),
         ]),
 
         // Pagination
@@ -485,5 +571,30 @@ export const List = defineComponent({
     };
   },
 });
+
+export interface VueListProps {
+  dataSource?: ListItem[];
+  size?: ListSize;
+  bordered?: ListBorderStyle;
+  loading?: boolean;
+  emptyText?: string;
+  split?: boolean;
+  itemLayout?: ListItemLayout;
+  pagination?: ListPaginationConfig | false;
+  grid?: {
+    gutter?: number;
+    column?: number;
+    xs?: number;
+    sm?: number;
+    md?: number;
+    lg?: number;
+    xl?: number;
+    xxl?: number;
+  };
+  rowKey?: string | ((item: ListItem, index: number) => string | number);
+  hoverable?: boolean;
+  className?: string;
+  style?: Record<string, string | number>;
+}
 
 export default List;

@@ -73,6 +73,7 @@ export type { VueCardProps } from './components/Card';
 export { Avatar } from './components/Avatar';
 export type { VueAvatarProps } from './components/Avatar';
 export { List } from './components/List';
+export type { VueListProps } from './components/List';
 export { Descriptions } from './components/Descriptions';
 export { Timeline } from './components/Timeline';
 export { Tree } from './components/Tree';
