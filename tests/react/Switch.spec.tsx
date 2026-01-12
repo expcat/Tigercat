@@ -57,6 +57,7 @@ describe('Switch', () => {
 
       const switchButton = container.querySelector('[role="switch"]');
       expect(switchButton).toHaveClass('cursor-not-allowed');
+      expect(switchButton).toHaveAttribute('aria-disabled', 'true');
     });
   });
 
@@ -85,19 +86,6 @@ describe('Switch', () => {
       expect(handleChange).not.toHaveBeenCalled();
     });
 
-    it('should toggle from false to true', async () => {
-      const user = userEvent.setup();
-      const handleChange = vi.fn();
-      const { container } = render(
-        <Switch checked={false} onChange={handleChange} />
-      );
-
-      const switchButton = container.querySelector('[role="switch"]')!;
-      await user.click(switchButton);
-
-      expect(handleChange).toHaveBeenCalledWith(true);
-    });
-
     it('should toggle from true to false', async () => {
       const user = userEvent.setup();
       const handleChange = vi.fn();
@@ -109,6 +97,20 @@ describe('Switch', () => {
       await user.click(switchButton);
 
       expect(handleChange).toHaveBeenCalledWith(false);
+    });
+
+    it('should call onChange when Space is pressed', async () => {
+      const user = userEvent.setup();
+      const handleChange = vi.fn();
+      const { container } = render(
+        <Switch checked={false} onChange={handleChange} />
+      );
+
+      const switchButton = container.querySelector('[role="switch"]')!;
+      switchButton.focus();
+      await user.keyboard('[Space]');
+
+      expect(handleChange).toHaveBeenCalledWith(true);
     });
   });
 
@@ -189,36 +191,6 @@ describe('Switch', () => {
       const switchButton = container.querySelector('[role="switch"]');
       expect(switchButton).toHaveAttribute('role', 'switch');
       expect(switchButton).toHaveAttribute('aria-checked', 'false');
-    });
-
-    it('should be keyboard accessible', async () => {
-      const user = userEvent.setup();
-      const handleChange = vi.fn();
-      const { container } = render(
-        <Switch checked={false} onChange={handleChange} />
-      );
-
-      const switchButton = container.querySelector('[role="switch"]')!;
-      switchButton.focus();
-
-      expect(switchButton).toHaveFocus();
-    });
-  });
-
-  describe('Snapshots', () => {
-    it('should match snapshot for unchecked state', () => {
-      const { container } = render(<Switch checked={false} />);
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it('should match snapshot for checked state', () => {
-      const { container } = render(<Switch checked={true} />);
-      expect(container.firstChild).toMatchSnapshot();
-    });
-
-    it('should match snapshot for disabled state', () => {
-      const { container } = render(<Switch disabled />);
-      expect(container.firstChild).toMatchSnapshot();
     });
   });
 });

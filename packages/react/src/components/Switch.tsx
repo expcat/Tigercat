@@ -1,26 +1,21 @@
-import React, { useCallback, useMemo } from 'react'
-import { 
+import React from 'react';
+import {
   classNames,
   type SwitchProps as CoreSwitchProps,
   getSwitchClasses,
-  getSwitchThumbClasses
-} from '@tigercat/core'
+  getSwitchThumbClasses,
+} from '@tigercat/core';
 
-export interface SwitchProps extends CoreSwitchProps {
+export interface SwitchProps
+  extends Omit<
+      React.ButtonHTMLAttributes<HTMLButtonElement>,
+      'onChange' | 'children'
+    >,
+    CoreSwitchProps {
   /**
    * Change event handler
    */
-  onChange?: (checked: boolean) => void
-
-  /**
-   * Additional CSS classes
-   */
-  className?: string
-
-  /**
-   * ARIA label for accessibility
-   */
-  'aria-label'?: string
+  onChange?: (checked: boolean) => void;
 }
 
 export const Switch: React.FC<SwitchProps> = ({
@@ -29,44 +24,53 @@ export const Switch: React.FC<SwitchProps> = ({
   size = 'md',
   onChange,
   className,
-  'aria-label': ariaLabel,
+  onClick,
+  onKeyDown,
+  tabIndex,
   ...props
 }) => {
-  const switchClasses = useMemo(() => classNames(
+  const switchClasses = classNames(
     getSwitchClasses(size, checked, disabled),
     className
-  ), [size, checked, disabled, className])
+  );
 
-  const thumbClasses = useMemo(() => getSwitchThumbClasses(size, checked), [size, checked])
+  const thumbClasses = getSwitchThumbClasses(size, checked);
 
-  const handleClick = useCallback(() => {
-    if (!disabled && onChange) {
-      onChange(!checked)
+  const toggle = () => {
+    if (disabled) return;
+    onChange?.(!checked);
+  };
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onClick?.(event);
+    if (event.defaultPrevented) return;
+    toggle();
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    onKeyDown?.(event);
+    if (event.defaultPrevented) return;
+    if (disabled) return;
+
+    if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault();
+      toggle();
     }
-  }, [disabled, checked, onChange])
-
-  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (!disabled && (event.key === ' ' || event.key === 'Enter')) {
-      event.preventDefault()
-      onChange?.(!checked)
-    }
-  }, [disabled, checked, onChange])
+  };
 
   return (
     <button
+      {...props}
       type="button"
       role="switch"
       aria-checked={checked}
-      aria-disabled={disabled}
-      aria-label={ariaLabel}
       className={switchClasses}
       disabled={disabled}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      tabIndex={disabled ? -1 : 0}
-      {...props}
-    >
+      aria-disabled={disabled || undefined}
+      tabIndex={disabled ? -1 : tabIndex}>
       <span className={thumbClasses} aria-hidden="true" />
     </button>
-  )
-}
+  );
+};

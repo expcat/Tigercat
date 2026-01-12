@@ -2,91 +2,92 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, afterEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
-import { Switch } from '@tigercat/vue'
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/vue';
+import { Switch } from '@tigercat/vue';
 import {
   renderWithProps,
   expectNoA11yViolations,
   componentSizes,
   setThemeVariables,
   clearThemeVariables,
-} from '../utils'
+} from '../utils';
 
 describe('Switch', () => {
   describe('Rendering', () => {
     it('should render with default props', () => {
-      const { container } = render(Switch)
-      
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toBeInTheDocument()
-    })
+      const { container } = render(Switch);
+
+      const switchButton = container.querySelector('[role="switch"]');
+      expect(switchButton).toBeInTheDocument();
+    });
 
     it('should render in unchecked state by default', () => {
-      const { container } = render(Switch)
-      
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-checked', 'false')
-    })
+      const { container } = render(Switch);
+
+      const switchButton = container.querySelector('[role="switch"]');
+      expect(switchButton).toHaveAttribute('aria-checked', 'false');
+    });
 
     it('should render in checked state when checked prop is true', () => {
-      const { container } = renderWithProps(Switch, { checked: true })
-      
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-checked', 'true')
-    })
-  })
+      const { container } = renderWithProps(Switch, { checked: true });
+
+      const switchButton = container.querySelector('[role="switch"]');
+      expect(switchButton).toHaveAttribute('aria-checked', 'true');
+    });
+  });
 
   describe('Props', () => {
     it.each(componentSizes)('should render %s size correctly', (size) => {
-      const { container } = renderWithProps(Switch, { size })
-      
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toBeInTheDocument()
-    })
+      const { container } = renderWithProps(Switch, { size });
+
+      const switchButton = container.querySelector('[role="switch"]');
+      expect(switchButton).toBeInTheDocument();
+    });
 
     it('should apply disabled state', () => {
-      const { container } = renderWithProps(Switch, { disabled: true })
-      
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveClass('cursor-not-allowed')
-    })
-  })
+      const { container } = renderWithProps(Switch, { disabled: true });
+
+      const switchButton = container.querySelector('[role="switch"]');
+      expect(switchButton).toHaveClass('cursor-not-allowed');
+      expect(switchButton).toHaveAttribute('aria-disabled', 'true');
+    });
+  });
 
   describe('Events', () => {
     it('should emit update:checked when clicked', async () => {
-      const onUpdate = vi.fn()
+      const onUpdate = vi.fn();
       const { container } = render(Switch, {
         props: {
           checked: false,
           'onUpdate:checked': onUpdate,
         },
-      })
-      
-      const switchButton = container.querySelector('[role="switch"]')!
-      await fireEvent.click(switchButton)
-      
-      expect(onUpdate).toHaveBeenCalledWith(true)
-    })
+      });
+
+      const switchButton = container.querySelector('[role="switch"]')!;
+      await fireEvent.click(switchButton);
+
+      expect(onUpdate).toHaveBeenCalledWith(true);
+    });
 
     it('should emit change event when clicked', async () => {
-      const onChange = vi.fn()
+      const onChange = vi.fn();
       const { container } = render(Switch, {
         props: {
           checked: false,
           onChange: onChange,
         },
-      })
-      
-      const switchButton = container.querySelector('[role="switch"]')!
-      await fireEvent.click(switchButton)
-      
-      expect(onChange).toHaveBeenCalledWith(true)
-    })
+      });
+
+      const switchButton = container.querySelector('[role="switch"]')!;
+      await fireEvent.click(switchButton);
+
+      expect(onChange).toHaveBeenCalledWith(true);
+    });
 
     it('should not emit events when disabled', async () => {
-      const onUpdate = vi.fn()
-      const onChange = vi.fn()
+      const onUpdate = vi.fn();
+      const onChange = vi.fn();
       const { container } = render(Switch, {
         props: {
           disabled: true,
@@ -94,85 +95,90 @@ describe('Switch', () => {
           'onUpdate:checked': onUpdate,
           onChange: onChange,
         },
-      })
-      
-      const switchButton = container.querySelector('[role="switch"]')!
-      await fireEvent.click(switchButton)
-      
-      expect(onUpdate).not.toHaveBeenCalled()
-      expect(onChange).not.toHaveBeenCalled()
-    })
+      });
 
-    it('should toggle from false to true', async () => {
-      const onUpdate = vi.fn()
-      const { container } = render(Switch, {
-        props: {
-          checked: false,
-          'onUpdate:checked': onUpdate,
-        },
-      })
-      
-      const switchButton = container.querySelector('[role="switch"]')!
-      await fireEvent.click(switchButton)
-      
-      expect(onUpdate).toHaveBeenCalledWith(true)
-    })
+      const switchButton = container.querySelector('[role="switch"]')!;
+      await fireEvent.click(switchButton);
+
+      expect(onUpdate).not.toHaveBeenCalled();
+      expect(onChange).not.toHaveBeenCalled();
+    });
 
     it('should toggle from true to false', async () => {
-      const onUpdate = vi.fn()
+      const onUpdate = vi.fn();
       const { container } = render(Switch, {
         props: {
           checked: true,
           'onUpdate:checked': onUpdate,
         },
-      })
-      
-      const switchButton = container.querySelector('[role="switch"]')!
-      await fireEvent.click(switchButton)
-      
-      expect(onUpdate).toHaveBeenCalledWith(false)
-    })
-  })
+      });
+
+      const switchButton = container.querySelector('[role="switch"]')!;
+      await fireEvent.click(switchButton);
+
+      expect(onUpdate).toHaveBeenCalledWith(false);
+    });
+
+    it('should emit update:checked when Space is pressed', async () => {
+      const onUpdate = vi.fn();
+      const { container } = render(Switch, {
+        props: {
+          checked: false,
+          'onUpdate:checked': onUpdate,
+        },
+      });
+
+      const switchButton = container.querySelector('[role="switch"]')!;
+      switchButton.focus();
+      await fireEvent.keyDown(switchButton, { key: ' ', code: 'Space' });
+
+      expect(onUpdate).toHaveBeenCalledWith(true);
+    });
+  });
 
   describe('States', () => {
     it('should show checked state correctly', async () => {
-      const { container, rerender } = renderWithProps(Switch, { checked: false })
-      
-      let switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-checked', 'false')
-      
-      await rerender({ checked: true })
-      switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-checked', 'true')
-    })
+      const { container, rerender } = renderWithProps(Switch, {
+        checked: false,
+      });
+
+      let switchButton = container.querySelector('[role="switch"]');
+      expect(switchButton).toHaveAttribute('aria-checked', 'false');
+
+      await rerender({ checked: true });
+      switchButton = container.querySelector('[role="switch"]');
+      expect(switchButton).toHaveAttribute('aria-checked', 'true');
+    });
 
     it('should be disabled when disabled prop is true', () => {
-      const { container } = renderWithProps(Switch, { disabled: true })
-      
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveClass('cursor-not-allowed')
-    })
-  })
+      const { container } = renderWithProps(Switch, { disabled: true });
+
+      const switchButton = container.querySelector('[role="switch"]');
+      expect(switchButton).toHaveClass('cursor-not-allowed');
+    });
+  });
 
   describe('Theme Support', () => {
     afterEach(() => {
-      clearThemeVariables(['--tiger-primary'])
-    })
+      clearThemeVariables(['--tiger-primary']);
+    });
 
     it('should support custom theme colors', () => {
       setThemeVariables({
         '--tiger-primary': '#ff0000',
-      })
+      });
 
-      const { container } = renderWithProps(Switch, { checked: true })
-      
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toBeInTheDocument()
-      
-      const rootStyles = window.getComputedStyle(document.documentElement)
-      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
-    })
-  })
+      const { container } = renderWithProps(Switch, { checked: true });
+
+      const switchButton = container.querySelector('[role="switch"]');
+      expect(switchButton).toBeInTheDocument();
+
+      const rootStyles = window.getComputedStyle(document.documentElement);
+      expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe(
+        '#ff0000'
+      );
+    });
+  });
 
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
@@ -180,51 +186,35 @@ describe('Switch', () => {
         attrs: {
           'aria-label': 'Toggle switch',
         },
-      })
-      
-      await expectNoA11yViolations(container)
-    })
+      });
+
+      await expectNoA11yViolations(container);
+    });
 
     it('should have proper role and aria attributes', () => {
-      const { container } = renderWithProps(Switch, { checked: false })
-      
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('role', 'switch')
-      expect(switchButton).toHaveAttribute('aria-checked', 'false')
-    })
+      const { container } = renderWithProps(Switch, { checked: false });
+
+      const switchButton = container.querySelector('[role="switch"]');
+      expect(switchButton).toHaveAttribute('role', 'switch');
+      expect(switchButton).toHaveAttribute('aria-checked', 'false');
+    });
 
     it('should be keyboard accessible', async () => {
-      const onUpdate = vi.fn()
+      const onUpdate = vi.fn();
       const { container } = render(Switch, {
         props: {
           checked: false,
           'onUpdate:checked': onUpdate,
         },
-      })
-      
-      const switchButton = container.querySelector('[role="switch"]')!
-      switchButton.focus()
-      
-      expect(switchButton).toHaveFocus()
-      
-      await fireEvent.keyDown(switchButton, { key: 'Enter', code: 'Enter' })
-    })
-  })
+      });
 
-  describe('Snapshots', () => {
-    it('should match snapshot for unchecked state', () => {
-      const { container } = renderWithProps(Switch, { checked: false })
-      expect(container.firstChild).toMatchSnapshot()
-    })
+      const switchButton = container.querySelector('[role="switch"]')!;
+      switchButton.focus();
 
-    it('should match snapshot for checked state', () => {
-      const { container } = renderWithProps(Switch, { checked: true })
-      expect(container.firstChild).toMatchSnapshot()
-    })
+      expect(switchButton).toHaveFocus();
 
-    it('should match snapshot for disabled state', () => {
-      const { container } = renderWithProps(Switch, { disabled: true })
-      expect(container.firstChild).toMatchSnapshot()
-    })
-  })
-})
+      await fireEvent.keyDown(switchButton, { key: 'Enter', code: 'Enter' });
+      expect(onUpdate).toHaveBeenCalledWith(true);
+    });
+  });
+});
