@@ -8,11 +8,11 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Descriptions` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）
-- 当前组件：`Timeline`
-- 当前步骤：✅ Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）
-- 状态：`completed`
-- 已优化组件数/需优化组件数：18/38
+- 上一步：✅ `Steps` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）
+- 当前组件：`Pagination`
+- 当前步骤：Step1 主题/透传/a11y/类型导出/测试精简/文档同步（未开始）
+- 状态：`not-started`
+- 已优化组件数/需优化组件数：19/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -262,7 +262,7 @@
 #### Steps / StepsItem（P2，建议优化）
 
 - 思路：当前/完成/禁用状态语义；可点击 step 的 a11y。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）：core Steps 样式灰色/错误态收敛到 CSS vars（含 fallback）；Vue/React Steps 改为语义化 `ol/li` 并在 `clickable` 时使用 `button`（支持键盘 Enter/Space），当前项标记 `aria-current="step"`；Vue 合并 `attrs.class/style` 并导出 `VueStepsProps/VueStepsItemProps`；精简 Vue/React Steps 测试并移除快照；同步更新 Steps 文档（Demo 无需修改）。
 
 #### Pagination（P1，建议优化）
 
