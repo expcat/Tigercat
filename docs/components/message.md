@@ -14,11 +14,11 @@
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from "@tigercat/vue";
 
 const showMessage = () => {
-  message.info('这是一条普通消息')
-}
+  message.info("这是一条普通消息");
+};
 </script>
 
 <template>
@@ -29,16 +29,14 @@ const showMessage = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from "@tigercat/react";
 
 function App() {
   const showMessage = () => {
-    message.info('这是一条普通消息')
-  }
-  
-  return (
-    <button onClick={showMessage}>显示消息</button>
-  )
+    message.info("这是一条普通消息");
+  };
+
+  return <button onClick={showMessage}>显示消息</button>;
 }
 ```
 
@@ -56,29 +54,29 @@ Message 组件支持 5 种不同的类型：
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from "@tigercat/vue";
 
 const showInfo = () => {
-  message.info('这是一条信息提示')
-}
+  message.info("这是一条信息提示");
+};
 
 const showSuccess = () => {
-  message.success('操作成功！')
-}
+  message.success("操作成功！");
+};
 
 const showWarning = () => {
-  message.warning('请注意相关事项')
-}
+  message.warning("请注意相关事项");
+};
 
 const showError = () => {
-  message.error('操作失败，请重试')
-}
+  message.error("操作失败，请重试");
+};
 
 const showLoading = () => {
-  const close = message.loading('加载中...')
+  const close = message.loading("加载中...");
   // 3秒后关闭
-  setTimeout(close, 3000)
-}
+  setTimeout(close, 3000);
+};
 </script>
 
 <template>
@@ -95,31 +93,31 @@ const showLoading = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from "@tigercat/react";
 
 function App() {
   const showInfo = () => {
-    message.info('这是一条信息提示')
-  }
-  
+    message.info("这是一条信息提示");
+  };
+
   const showSuccess = () => {
-    message.success('操作成功！')
-  }
-  
+    message.success("操作成功！");
+  };
+
   const showWarning = () => {
-    message.warning('请注意相关事项')
-  }
-  
+    message.warning("请注意相关事项");
+  };
+
   const showError = () => {
-    message.error('操作失败，请重试')
-  }
-  
+    message.error("操作失败，请重试");
+  };
+
   const showLoading = () => {
-    const close = message.loading('加载中...')
+    const close = message.loading("加载中...");
     // 3秒后关闭
-    setTimeout(close, 3000)
-  }
-  
+    setTimeout(close, 3000);
+  };
+
   return (
     <div className="space-x-2">
       <button onClick={showInfo}>信息</button>
@@ -128,7 +126,7 @@ function App() {
       <button onClick={showError}>错误</button>
       <button onClick={showLoading}>加载</button>
     </div>
-  )
+  );
 }
 ```
 
@@ -140,32 +138,32 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from "@tigercat/vue";
 
 const showShortMessage = () => {
   // 1秒后自动关闭
   message.info({
-    content: '这条消息1秒后关闭',
+    content: "这条消息1秒后关闭",
     duration: 1000,
-  })
-}
+  });
+};
 
 const showLongMessage = () => {
   // 5秒后自动关闭
   message.success({
-    content: '这条消息5秒后关闭',
+    content: "这条消息5秒后关闭",
     duration: 5000,
-  })
-}
+  });
+};
 
 const showPersistentMessage = () => {
   // 不会自动关闭
   message.warning({
-    content: '这条消息需要手动关闭',
+    content: "这条消息需要手动关闭",
     duration: 0,
     closable: true,
-  })
-}
+  });
+};
 </script>
 
 <template>
@@ -180,41 +178,41 @@ const showPersistentMessage = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from "@tigercat/react";
 
 function App() {
   const showShortMessage = () => {
     // 1秒后自动关闭
     message.info({
-      content: '这条消息1秒后关闭',
+      content: "这条消息1秒后关闭",
       duration: 1000,
-    })
-  }
-  
+    });
+  };
+
   const showLongMessage = () => {
     // 5秒后自动关闭
     message.success({
-      content: '这条消息5秒后关闭',
+      content: "这条消息5秒后关闭",
       duration: 5000,
-    })
-  }
-  
+    });
+  };
+
   const showPersistentMessage = () => {
     // 不会自动关闭
     message.warning({
-      content: '这条消息需要手动关闭',
+      content: "这条消息需要手动关闭",
       duration: 0,
       closable: true,
-    })
-  }
-  
+    });
+  };
+
   return (
     <div className="space-x-2">
       <button onClick={showShortMessage}>短时间</button>
       <button onClick={showLongMessage}>长时间</button>
       <button onClick={showPersistentMessage}>不自动关闭</button>
     </div>
-  )
+  );
 }
 ```
 
@@ -226,15 +224,15 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from "@tigercat/vue";
 
 const showClosableMessage = () => {
   message.info({
-    content: '这条消息可以手动关闭',
+    content: "这条消息可以手动关闭",
     closable: true,
     duration: 0, // 不自动关闭
-  })
-}
+  });
+};
 </script>
 
 <template>
@@ -245,20 +243,18 @@ const showClosableMessage = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from "@tigercat/react";
 
 function App() {
   const showClosableMessage = () => {
     message.info({
-      content: '这条消息可以手动关闭',
+      content: "这条消息可以手动关闭",
       closable: true,
       duration: 0, // 不自动关闭
-    })
-  }
-  
-  return (
-    <button onClick={showClosableMessage}>显示可关闭消息</button>
-  )
+    });
+  };
+
+  return <button onClick={showClosableMessage}>显示可关闭消息</button>;
 }
 ```
 
@@ -273,7 +269,7 @@ function App() {
 import { message } from '@tigercat/vue'
 import { ref } from 'vue'
 
-const closeMessage = ref(null)
+const closeMessage = ref<(() => void) | null>(null)
 
 const showMessage = () => {
   closeMessage.value = message.loading('正在处理请求...')
@@ -288,7 +284,7 @@ const closeManually = () => {
 
 const simulateRequest = () => {
   const close = message.loading('正在处理请求...')
-  
+
   // 模拟异步请求
   setTimeout(() => {
     close() // 关闭加载消息
@@ -309,40 +305,40 @@ const simulateRequest = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
-import { useRef } from 'react'
+import { message } from "@tigercat/react";
+import { useRef } from "react";
 
 function App() {
-  const closeMessageRef = useRef<(() => void) | null>(null)
-  
+  const closeMessageRef = useRef<(() => void) | null>(null);
+
   const showMessage = () => {
-    closeMessageRef.current = message.loading('正在处理请求...')
-  }
-  
+    closeMessageRef.current = message.loading("正在处理请求...");
+  };
+
   const closeManually = () => {
     if (closeMessageRef.current) {
-      closeMessageRef.current()
-      closeMessageRef.current = null
+      closeMessageRef.current();
+      closeMessageRef.current = null;
     }
-  }
-  
+  };
+
   const simulateRequest = () => {
-    const close = message.loading('正在处理请求...')
-    
+    const close = message.loading("正在处理请求...");
+
     // 模拟异步请求
     setTimeout(() => {
-      close() // 关闭加载消息
-      message.success('请求成功！')
-    }, 2000)
-  }
-  
+      close(); // 关闭加载消息
+      message.success("请求成功！");
+    }, 2000);
+  };
+
   return (
     <div className="space-x-2">
       <button onClick={showMessage}>显示消息</button>
       <button onClick={closeManually}>手动关闭</button>
       <button onClick={simulateRequest}>模拟请求</button>
     </div>
-  )
+  );
 }
 ```
 
@@ -354,17 +350,17 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from "@tigercat/vue";
 
 const showMessageWithCallback = () => {
   message.success({
-    content: '操作成功！',
+    content: "操作成功！",
     onClose: () => {
-      console.log('消息已关闭')
+      console.log("消息已关闭");
       // 执行其他操作
     },
-  })
-}
+  });
+};
 </script>
 
 <template>
@@ -375,22 +371,20 @@ const showMessageWithCallback = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from "@tigercat/react";
 
 function App() {
   const showMessageWithCallback = () => {
     message.success({
-      content: '操作成功！',
+      content: "操作成功！",
       onClose: () => {
-        console.log('消息已关闭')
+        console.log("消息已关闭");
         // 执行其他操作
       },
-    })
-  }
-  
-  return (
-    <button onClick={showMessageWithCallback}>显示消息（带回调）</button>
-  )
+    });
+  };
+
+  return <button onClick={showMessageWithCallback}>显示消息（带回调）</button>;
 }
 ```
 
@@ -402,17 +396,17 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from "@tigercat/vue";
 
 const showMultipleMessages = () => {
-  message.info('消息 1')
-  message.success('消息 2')
-  message.warning('消息 3')
-}
+  message.info("消息 1");
+  message.success("消息 2");
+  message.warning("消息 3");
+};
 
 const clearAll = () => {
-  message.clear()
-}
+  message.clear();
+};
 </script>
 
 <template>
@@ -426,25 +420,25 @@ const clearAll = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from "@tigercat/react";
 
 function App() {
   const showMultipleMessages = () => {
-    message.info('消息 1')
-    message.success('消息 2')
-    message.warning('消息 3')
-  }
-  
+    message.info("消息 1");
+    message.success("消息 2");
+    message.warning("消息 3");
+  };
+
   const clearAll = () => {
-    message.clear()
-  }
-  
+    message.clear();
+  };
+
   return (
     <div className="space-x-2">
       <button onClick={showMultipleMessages}>显示多条消息</button>
       <button onClick={clearAll}>清空所有</button>
     </div>
-  )
+  );
 }
 ```
 
@@ -454,52 +448,52 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from "@tigercat/vue";
 
 const handleFormSubmit = async () => {
   // 显示加载消息
-  const close = message.loading('正在提交表单...')
-  
+  const close = message.loading("正在提交表单...");
+
   try {
     // 模拟异步操作
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
     // 关闭加载消息
-    close()
-    
+    close();
+
     // 显示成功消息
     message.success({
-      content: '表单提交成功！',
+      content: "表单提交成功！",
       duration: 3000,
       onClose: () => {
-        console.log('成功消息已关闭')
+        console.log("成功消息已关闭");
       },
-    })
+    });
   } catch (error) {
     // 关闭加载消息
-    close()
-    
+    close();
+
     // 显示错误消息
     message.error({
-      content: '表单提交失败，请重试',
+      content: "表单提交失败，请重试",
       closable: true,
       duration: 5000,
-    })
+    });
   }
-}
+};
 
 const showDifferentTypes = () => {
-  message.info('这是一条信息')
-  setTimeout(() => message.success('操作成功'), 500)
-  setTimeout(() => message.warning('请注意'), 1000)
-  setTimeout(() => message.error('发生错误'), 1500)
-}
+  message.info("这是一条信息");
+  setTimeout(() => message.success("操作成功"), 500);
+  setTimeout(() => message.warning("请注意"), 1000);
+  setTimeout(() => message.error("发生错误"), 1500);
+};
 </script>
 
 <template>
   <div class="space-y-4">
     <h2 class="text-xl font-bold">Message 组件示例</h2>
-    
+
     <div class="space-x-2">
       <button @click="message.info('信息提示')">信息</button>
       <button @click="message.success('成功提示')">成功</button>
@@ -507,7 +501,7 @@ const showDifferentTypes = () => {
       <button @click="message.error('错误提示')">错误</button>
       <button @click="message.loading('加载中...')">加载</button>
     </div>
-    
+
     <div class="space-x-2">
       <button @click="handleFormSubmit">提交表单（完整流程）</button>
       <button @click="showDifferentTypes">显示多种类型</button>
@@ -520,67 +514,67 @@ const showDifferentTypes = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from "@tigercat/react";
 
 function App() {
   const handleFormSubmit = async () => {
     // 显示加载消息
-    const close = message.loading('正在提交表单...')
-    
+    const close = message.loading("正在提交表单...");
+
     try {
       // 模拟异步操作
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       // 关闭加载消息
-      close()
-      
+      close();
+
       // 显示成功消息
       message.success({
-        content: '表单提交成功！',
+        content: "表单提交成功！",
         duration: 3000,
         onClose: () => {
-          console.log('成功消息已关闭')
+          console.log("成功消息已关闭");
         },
-      })
+      });
     } catch (error) {
       // 关闭加载消息
-      close()
-      
+      close();
+
       // 显示错误消息
       message.error({
-        content: '表单提交失败，请重试',
+        content: "表单提交失败，请重试",
         closable: true,
         duration: 5000,
-      })
+      });
     }
-  }
-  
+  };
+
   const showDifferentTypes = () => {
-    message.info('这是一条信息')
-    setTimeout(() => message.success('操作成功'), 500)
-    setTimeout(() => message.warning('请注意'), 1000)
-    setTimeout(() => message.error('发生错误'), 1500)
-  }
-  
+    message.info("这是一条信息");
+    setTimeout(() => message.success("操作成功"), 500);
+    setTimeout(() => message.warning("请注意"), 1000);
+    setTimeout(() => message.error("发生错误"), 1500);
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-bold">Message 组件示例</h2>
-      
+
       <div className="space-x-2">
-        <button onClick={() => message.info('信息提示')}>信息</button>
-        <button onClick={() => message.success('成功提示')}>成功</button>
-        <button onClick={() => message.warning('警告提示')}>警告</button>
-        <button onClick={() => message.error('错误提示')}>错误</button>
-        <button onClick={() => message.loading('加载中...')}>加载</button>
+        <button onClick={() => message.info("信息提示")}>信息</button>
+        <button onClick={() => message.success("成功提示")}>成功</button>
+        <button onClick={() => message.warning("警告提示")}>警告</button>
+        <button onClick={() => message.error("错误提示")}>错误</button>
+        <button onClick={() => message.loading("加载中...")}>加载</button>
       </div>
-      
+
       <div className="space-x-2">
         <button onClick={handleFormSubmit}>提交表单（完整流程）</button>
         <button onClick={showDifferentTypes}>显示多种类型</button>
         <button onClick={() => message.clear()}>清空所有</button>
       </div>
     </div>
-  )
+  );
 }
 ```
 
@@ -588,40 +582,40 @@ function App() {
 
 ### message 方法
 
-| 方法 | 说明 | 参数类型 | 返回值 |
-|------|------|----------|--------|
-| message.info | 显示信息提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
+| 方法            | 说明         | 参数类型                  | 返回值                  |
+| --------------- | ------------ | ------------------------- | ----------------------- |
+| message.info    | 显示信息提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
 | message.success | 显示成功提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
 | message.warning | 显示警告提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
-| message.error | 显示错误提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
+| message.error   | 显示错误提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
 | message.loading | 显示加载提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
-| message.clear | 清空所有消息 | - | `void` |
+| message.clear   | 清空所有消息 | -                         | `void`                  |
 
 ### MessageConfig
 
-| 参数 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| content | 消息内容 | `string` | - |
-| type | 消息类型 | `'info' \| 'success' \| 'warning' \| 'error' \| 'loading'` | `'info'` |
-| duration | 自动关闭的延时（毫秒），设为 0 时不自动关闭 | `number` | `3000` |
-| closable | 是否显示关闭按钮 | `boolean` | `false` |
-| onClose | 关闭时的回调函数 | `() => void` | - |
-| icon | 自定义图标（SVG path） | `string` | - |
-| className | 自定义 CSS 类名 | `string` | - |
+| 参数      | 说明                                        | 类型                                                       | 默认值   |
+| --------- | ------------------------------------------- | ---------------------------------------------------------- | -------- |
+| content   | 消息内容                                    | `string`                                                   | -        |
+| type      | 消息类型                                    | `'info' \| 'success' \| 'warning' \| 'error' \| 'loading'` | `'info'` |
+| duration  | 自动关闭的延时（毫秒），设为 0 时不自动关闭 | `number`                                                   | `3000`   |
+| closable  | 是否显示关闭按钮                            | `boolean`                                                  | `false`  |
+| onClose   | 关闭时的回调函数                            | `() => void`                                               | -        |
+| icon      | 自定义图标（SVG path）                      | `string`                                                   | -        |
+| className | 自定义 CSS 类名                             | `string`                                                   | -        |
 
 ## 样式定制
 
-Message 组件使用 Tailwind CSS 类进行样式设计，主要包括以下几个方面：
+Message 的颜色方案默认使用 CSS 变量（带 fallback），以便在不同主题下保持一致：
 
-### 类型颜色
+### 主题变量
 
-不同的消息类型使用不同的颜色方案：
+- `--tiger-message-info-bg / --tiger-message-info-border / --tiger-message-info-text / --tiger-message-info-icon`
+- `--tiger-message-success-bg / --tiger-message-success-border / --tiger-message-success-text / --tiger-message-success-icon`
+- `--tiger-message-warning-bg / --tiger-message-warning-border / --tiger-message-warning-text / --tiger-message-warning-icon`
+- `--tiger-message-error-bg / --tiger-message-error-border / --tiger-message-error-text / --tiger-message-error-icon`
+- `--tiger-message-loading-bg / --tiger-message-loading-border / --tiger-message-loading-text / --tiger-message-loading-icon`
 
-- **Info（信息）**: 蓝色系 (`bg-blue-50`, `border-blue-200`, `text-blue-800`)
-- **Success（成功）**: 绿色系 (`bg-green-50`, `border-green-200`, `text-green-800`)
-- **Warning（警告）**: 黄色系 (`bg-yellow-50`, `border-yellow-200`, `text-yellow-800`)
-- **Error（错误）**: 红色系 (`bg-red-50`, `border-red-200`, `text-red-800`)
-- **Loading（加载）**: 灰色系 (`bg-gray-50`, `border-gray-200`, `text-gray-800`)
+其中 loading 默认会回退到基础主题变量（如 `--tiger-surface-muted` / `--tiger-border` / `--tiger-text` / `--tiger-text-muted`）。
 
 ### 自定义样式
 
@@ -629,16 +623,18 @@ Message 组件使用 Tailwind CSS 类进行样式设计，主要包括以下几�
 
 ```javascript
 message.success({
-  content: '自定义样式',
-  className: 'my-custom-message',
-})
+  content: "自定义样式",
+  className: "my-custom-message",
+});
 ```
 
 ## 可访问性
 
 Message 组件遵循 WAI-ARIA 可访问性标准：
 
-- 使用 `role="alert"` 属性标识为警告提示
+- `error` 类型使用 `role="alert"` + `aria-live="assertive"`
+- 其它类型使用 `role="status"` + `aria-live="polite"`
+- 消息项默认 `aria-atomic="true"`，并在 `loading` 时设置 `aria-busy="true"`
 - 关闭按钮包含 `aria-label="Close message"` 属性
 - 图标使用 SVG 格式，具有良好的可缩放性
 - 支持键盘操作（关闭按钮可通过 Tab 键聚焦）
@@ -654,35 +650,35 @@ Message 组件遵循 WAI-ARIA 可访问性标准：
 
 ## 与 Alert 的区别
 
-| 特性 | Message | Alert |
-|------|---------|-------|
+| 特性     | Message            | Alert                |
+| -------- | ------------------ | -------------------- |
 | 使用场景 | 操作反馈、临时提示 | 页面级警告、重要信息 |
-| 显示位置 | 顶部居中（全局） | 页面内嵌 |
-| 自动关闭 | 默认自动关闭 | 默认不自动关闭 |
-| 调用方式 | 命令式（API调用） | 声明式（组件） |
-| 交互方式 | 轻量级，不打断操作 | 需要用户关注 |
+| 显示位置 | 顶部居中（全局）   | 页面内嵌             |
+| 自动关闭 | 默认自动关闭       | 默认不自动关闭       |
+| 调用方式 | 命令式（API 调用） | 声明式（组件）       |
+| 交互方式 | 轻量级，不打断操作 | 需要用户关注         |
 
 ## TypeScript 支持
 
 Message 组件提供完整的 TypeScript 类型定义：
 
 ```typescript
-import { message, MessageConfig, MessageOptions } from '@tigercat/vue' // 或 '@tigercat/react'
+import { message, MessageConfig, MessageOptions } from "@tigercat/vue"; // 或 '@tigercat/react'
 
 // 使用字符串
-message.info('简单消息')
+message.info("简单消息");
 
 // 使用配置对象
 const config: MessageConfig = {
-  content: '详细配置',
+  content: "详细配置",
   duration: 5000,
   closable: true,
   onClose: () => {
-    console.log('已关闭')
+    console.log("已关闭");
   },
-}
-message.success(config)
+};
+message.success(config);
 
 // 获取关闭函数
-const close: () => void = message.loading('加载中...')
+const close: () => void = message.loading("加载中...");
 ```
