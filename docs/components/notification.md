@@ -16,10 +16,10 @@
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue';
+import { notification } from "@tigercat/vue";
 
 const showNotification = () => {
-  notification.info('通知标题');
+  notification.info("通知标题");
 };
 </script>
 
@@ -31,11 +31,11 @@ const showNotification = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react';
+import { notification } from "@tigercat/react";
 
 function App() {
   const showNotification = () => {
-    notification.info('通知标题');
+    notification.info("通知标题");
   };
 
   return <button onClick={showNotification}>显示通知</button>;
@@ -55,33 +55,33 @@ Notification 组件支持 4 种不同的类型：
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue';
+import { notification } from "@tigercat/vue";
 
 const showInfo = () => {
   notification.info({
-    title: '信息通知',
-    description: '这是一条信息通知的详细描述内容',
+    title: "信息通知",
+    description: "这是一条信息通知的详细描述内容",
   });
 };
 
 const showSuccess = () => {
   notification.success({
-    title: '操作成功',
-    description: '您的操作已经成功完成！',
+    title: "操作成功",
+    description: "您的操作已经成功完成！",
   });
 };
 
 const showWarning = () => {
   notification.warning({
-    title: '警告提示',
-    description: '请注意相关事项，以避免潜在问题',
+    title: "警告提示",
+    description: "请注意相关事项，以避免潜在问题",
   });
 };
 
 const showError = () => {
   notification.error({
-    title: '操作失败',
-    description: '操作失败，请检查网络连接后重试',
+    title: "操作失败",
+    description: "操作失败，请检查网络连接后重试",
   });
 };
 </script>
@@ -99,34 +99,34 @@ const showError = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react';
+import { notification } from "@tigercat/react";
 
 function App() {
   const showInfo = () => {
     notification.info({
-      title: '信息通知',
-      description: '这是一条信息通知的详细描述内容',
+      title: "信息通知",
+      description: "这是一条信息通知的详细描述内容",
     });
   };
 
   const showSuccess = () => {
     notification.success({
-      title: '操作成功',
-      description: '您的操作已经成功完成！',
+      title: "操作成功",
+      description: "您的操作已经成功完成！",
     });
   };
 
   const showWarning = () => {
     notification.warning({
-      title: '警告提示',
-      description: '请注意相关事项，以避免潜在问题',
+      title: "警告提示",
+      description: "请注意相关事项，以避免潜在问题",
     });
   };
 
   const showError = () => {
     notification.error({
-      title: '操作失败',
-      description: '操作失败，请检查网络连接后重试',
+      title: "操作失败",
+      description: "操作失败，请检查网络连接后重试",
     });
   };
 
@@ -149,37 +149,37 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue';
+import { notification } from "@tigercat/vue";
 
 const showTopLeft = () => {
   notification.info({
-    title: '左上角通知',
-    description: '这是显示在左上角的通知',
-    position: 'top-left',
+    title: "左上角通知",
+    description: "这是显示在左上角的通知",
+    position: "top-left",
   });
 };
 
 const showTopRight = () => {
   notification.success({
-    title: '右上角通知',
-    description: '这是显示在右上角的通知（默认位置）',
-    position: 'top-right',
+    title: "右上角通知",
+    description: "这是显示在右上角的通知（默认位置）",
+    position: "top-right",
   });
 };
 
 const showBottomLeft = () => {
   notification.warning({
-    title: '左下角通知',
-    description: '这是显示在左下角的通知',
-    position: 'bottom-left',
+    title: "左下角通知",
+    description: "这是显示在左下角的通知",
+    position: "bottom-left",
   });
 };
 
 const showBottomRight = () => {
   notification.error({
-    title: '右下角通知',
-    description: '这是显示在右下角的通知',
-    position: 'bottom-right',
+    title: "右下角通知",
+    description: "这是显示在右下角的通知",
+    position: "bottom-right",
   });
 };
 </script>
@@ -197,38 +197,38 @@ const showBottomRight = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react';
+import { notification } from "@tigercat/react";
 
 function App() {
   const showTopLeft = () => {
     notification.info({
-      title: '左上角通知',
-      description: '这是显示在左上角的通知',
-      position: 'top-left',
+      title: "左上角通知",
+      description: "这是显示在左上角的通知",
+      position: "top-left",
     });
   };
 
   const showTopRight = () => {
     notification.success({
-      title: '右上角通知',
-      description: '这是显示在右上角的通知（默认位置）',
-      position: 'top-right',
+      title: "右上角通知",
+      description: "这是显示在右上角的通知（默认位置）",
+      position: "top-right",
     });
   };
 
   const showBottomLeft = () => {
     notification.warning({
-      title: '左下角通知',
-      description: '这是显示在左下角的通知',
-      position: 'bottom-left',
+      title: "左下角通知",
+      description: "这是显示在左下角的通知",
+      position: "bottom-left",
     });
   };
 
   const showBottomRight = () => {
     notification.error({
-      title: '右下角通知',
-      description: '这是显示在右下角的通知',
-      position: 'bottom-right',
+      title: "右下角通知",
+      description: "这是显示在右下角的通知",
+      position: "bottom-right",
     });
   };
 
@@ -251,13 +251,13 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue';
+import { notification } from "@tigercat/vue";
 
 const showShortNotification = () => {
   // 2秒后自动关闭
   notification.info({
-    title: '短时间通知',
-    description: '这条通知2秒后关闭',
+    title: "短时间通知",
+    description: "这条通知2秒后关闭",
     duration: 2000,
   });
 };
@@ -265,8 +265,8 @@ const showShortNotification = () => {
 const showLongNotification = () => {
   // 10秒后自动关闭
   notification.success({
-    title: '长时间通知',
-    description: '这条通知10秒后关闭',
+    title: "长时间通知",
+    description: "这条通知10秒后关闭",
     duration: 10000,
   });
 };
@@ -274,8 +274,8 @@ const showLongNotification = () => {
 const showPersistentNotification = () => {
   // 不会自动关闭
   notification.warning({
-    title: '持久通知',
-    description: '这条通知需要手动关闭',
+    title: "持久通知",
+    description: "这条通知需要手动关闭",
     duration: 0,
   });
 };
@@ -293,14 +293,14 @@ const showPersistentNotification = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react';
+import { notification } from "@tigercat/react";
 
 function App() {
   const showShortNotification = () => {
     // 2秒后自动关闭
     notification.info({
-      title: '短时间通知',
-      description: '这条通知2秒后关闭',
+      title: "短时间通知",
+      description: "这条通知2秒后关闭",
       duration: 2000,
     });
   };
@@ -308,8 +308,8 @@ function App() {
   const showLongNotification = () => {
     // 10秒后自动关闭
     notification.success({
-      title: '长时间通知',
-      description: '这条通知10秒后关闭',
+      title: "长时间通知",
+      description: "这条通知10秒后关闭",
       duration: 10000,
     });
   };
@@ -317,8 +317,8 @@ function App() {
   const showPersistentNotification = () => {
     // 不会自动关闭
     notification.warning({
-      title: '持久通知',
-      description: '这条通知需要手动关闭',
+      title: "持久通知",
+      description: "这条通知需要手动关闭",
       duration: 0,
     });
   };
@@ -341,12 +341,12 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue';
+import { notification } from "@tigercat/vue";
 
 const showClosableNotification = () => {
   notification.info({
-    title: '可关闭通知',
-    description: '这条通知可以通过点击关闭按钮来关闭',
+    title: "可关闭通知",
+    description: "这条通知可以通过点击关闭按钮来关闭",
     closable: true, // 默认为 true
     duration: 0, // 不自动关闭
   });
@@ -354,8 +354,8 @@ const showClosableNotification = () => {
 
 const showNonClosableNotification = () => {
   notification.success({
-    title: '不可手动关闭',
-    description: '这条通知没有关闭按钮，5秒后自动消失',
+    title: "不可手动关闭",
+    description: "这条通知没有关闭按钮，5秒后自动消失",
     closable: false,
     duration: 5000,
   });
@@ -373,13 +373,13 @@ const showNonClosableNotification = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react';
+import { notification } from "@tigercat/react";
 
 function App() {
   const showClosableNotification = () => {
     notification.info({
-      title: '可关闭通知',
-      description: '这条通知可以通过点击关闭按钮来关闭',
+      title: "可关闭通知",
+      description: "这条通知可以通过点击关闭按钮来关闭",
       closable: true, // 默认为 true
       duration: 0, // 不自动关闭
     });
@@ -387,8 +387,8 @@ function App() {
 
   const showNonClosableNotification = () => {
     notification.success({
-      title: '不可手动关闭',
-      description: '这条通知没有关闭按钮，5秒后自动消失',
+      title: "不可手动关闭",
+      description: "这条通知没有关闭按钮，5秒后自动消失",
       closable: false,
       duration: 5000,
     });
@@ -411,15 +411,15 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue';
-import { ref } from 'vue';
+import { notification } from "@tigercat/vue";
+import { ref } from "vue";
 
 const closeNotification = ref(null);
 
 const showNotification = () => {
   closeNotification.value = notification.info({
-    title: '处理中',
-    description: '正在处理您的请求...',
+    title: "处理中",
+    description: "正在处理您的请求...",
     duration: 0,
   });
 };
@@ -433,8 +433,8 @@ const closeManually = () => {
 
 const simulateRequest = () => {
   const close = notification.info({
-    title: '请求处理',
-    description: '正在处理您的请求...',
+    title: "请求处理",
+    description: "正在处理您的请求...",
     duration: 0,
   });
 
@@ -442,8 +442,8 @@ const simulateRequest = () => {
   setTimeout(() => {
     close(); // 关闭通知
     notification.success({
-      title: '请求成功',
-      description: '您的请求已成功处理！',
+      title: "请求成功",
+      description: "您的请求已成功处理！",
     });
   }, 3000);
 };
@@ -461,16 +461,16 @@ const simulateRequest = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react';
-import { useRef } from 'react';
+import { notification } from "@tigercat/react";
+import { useRef } from "react";
 
 function App() {
   const closeNotificationRef = useRef<(() => void) | null>(null);
 
   const showNotification = () => {
     closeNotificationRef.current = notification.info({
-      title: '处理中',
-      description: '正在处理您的请求...',
+      title: "处理中",
+      description: "正在处理您的请求...",
       duration: 0,
     });
   };
@@ -484,8 +484,8 @@ function App() {
 
   const simulateRequest = () => {
     const close = notification.info({
-      title: '请求处理',
-      description: '正在处理您的请求...',
+      title: "请求处理",
+      description: "正在处理您的请求...",
       duration: 0,
     });
 
@@ -493,8 +493,8 @@ function App() {
     setTimeout(() => {
       close(); // 关闭通知
       notification.success({
-        title: '请求成功',
-        description: '您的请求已成功处理！',
+        title: "请求成功",
+        description: "您的请求已成功处理！",
       });
     }, 3000);
   };
@@ -517,15 +517,15 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue';
+import { notification } from "@tigercat/vue";
 
 const showClickableNotification = () => {
   notification.info({
-    title: '可点击通知',
-    description: '点击这条通知查看详情',
+    title: "可点击通知",
+    description: "点击这条通知查看详情",
     onClick: () => {
-      console.log('通知被点击了');
-      alert('查看详情功能');
+      console.log("通知被点击了");
+      alert("查看详情功能");
     },
   });
 };
@@ -539,16 +539,16 @@ const showClickableNotification = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react';
+import { notification } from "@tigercat/react";
 
 function App() {
   const showClickableNotification = () => {
     notification.info({
-      title: '可点击通知',
-      description: '点击这条通知查看详情',
+      title: "可点击通知",
+      description: "点击这条通知查看详情",
       onClick: () => {
-        console.log('通知被点击了');
-        alert('查看详情功能');
+        console.log("通知被点击了");
+        alert("查看详情功能");
       },
     });
   };
@@ -565,14 +565,14 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue';
+import { notification } from "@tigercat/vue";
 
 const showNotificationWithCallback = () => {
   notification.success({
-    title: '操作成功',
-    description: '您的操作已经成功完成！',
+    title: "操作成功",
+    description: "您的操作已经成功完成！",
     onClose: () => {
-      console.log('通知已关闭');
+      console.log("通知已关闭");
       // 执行其他操作，例如刷新数据
     },
   });
@@ -587,15 +587,15 @@ const showNotificationWithCallback = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react';
+import { notification } from "@tigercat/react";
 
 function App() {
   const showNotificationWithCallback = () => {
     notification.success({
-      title: '操作成功',
-      description: '您的操作已经成功完成！',
+      title: "操作成功",
+      description: "您的操作已经成功完成！",
       onClose: () => {
-        console.log('通知已关闭');
+        console.log("通知已关闭");
         // 执行其他操作，例如刷新数据
       },
     });
@@ -615,25 +615,25 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue';
+import { notification } from "@tigercat/vue";
 
 const showMultipleNotifications = () => {
   notification.info({
-    title: '通知 1',
-    description: '第一条通知',
-    position: 'top-right',
+    title: "通知 1",
+    description: "第一条通知",
+    position: "top-right",
   });
 
   notification.success({
-    title: '通知 2',
-    description: '第二条通知',
-    position: 'top-left',
+    title: "通知 2",
+    description: "第二条通知",
+    position: "top-left",
   });
 
   notification.warning({
-    title: '通知 3',
-    description: '第三条通知',
-    position: 'bottom-right',
+    title: "通知 3",
+    description: "第三条通知",
+    position: "bottom-right",
   });
 };
 
@@ -642,7 +642,7 @@ const clearAll = () => {
 };
 
 const clearTopRight = () => {
-  notification.clear('top-right'); // 仅清空右上角的通知
+  notification.clear("top-right"); // 仅清空右上角的通知
 };
 </script>
 
@@ -658,26 +658,26 @@ const clearTopRight = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react';
+import { notification } from "@tigercat/react";
 
 function App() {
   const showMultipleNotifications = () => {
     notification.info({
-      title: '通知 1',
-      description: '第一条通知',
-      position: 'top-right',
+      title: "通知 1",
+      description: "第一条通知",
+      position: "top-right",
     });
 
     notification.success({
-      title: '通知 2',
-      description: '第二条通知',
-      position: 'top-left',
+      title: "通知 2",
+      description: "第二条通知",
+      position: "top-left",
     });
 
     notification.warning({
-      title: '通知 3',
-      description: '第三条通知',
-      position: 'bottom-right',
+      title: "通知 3",
+      description: "第三条通知",
+      position: "bottom-right",
     });
   };
 
@@ -686,7 +686,7 @@ function App() {
   };
 
   const clearTopRight = () => {
-    notification.clear('top-right'); // 仅清空右上角的通知
+    notification.clear("top-right"); // 仅清空右上角的通知
   };
 
   return (
@@ -705,13 +705,13 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue';
+import { notification } from "@tigercat/vue";
 
 const handleFormSubmit = async () => {
   // 显示处理通知
   const close = notification.info({
-    title: '正在提交',
-    description: '正在提交表单，请稍候...',
+    title: "正在提交",
+    description: "正在提交表单，请稍候...",
     duration: 0,
   });
 
@@ -724,11 +724,11 @@ const handleFormSubmit = async () => {
 
     // 显示成功通知
     notification.success({
-      title: '提交成功',
-      description: '表单已成功提交！',
+      title: "提交成功",
+      description: "表单已成功提交！",
       duration: 4500,
       onClose: () => {
-        console.log('成功通知已关闭');
+        console.log("成功通知已关闭");
       },
     });
   } catch (error) {
@@ -737,8 +737,8 @@ const handleFormSubmit = async () => {
 
     // 显示错误通知
     notification.error({
-      title: '提交失败',
-      description: '表单提交失败，请检查网络连接后重试',
+      title: "提交失败",
+      description: "表单提交失败，请检查网络连接后重试",
       duration: 0,
       closable: true,
     });
@@ -747,17 +747,17 @@ const handleFormSubmit = async () => {
 
 const showDifferentTypes = () => {
   notification.info({
-    title: '信息通知',
-    description: '这是一条信息通知',
-    position: 'top-right',
+    title: "信息通知",
+    description: "这是一条信息通知",
+    position: "top-right",
   });
 
   setTimeout(
     () =>
       notification.success({
-        title: '成功通知',
-        description: '操作成功',
-        position: 'top-left',
+        title: "成功通知",
+        description: "操作成功",
+        position: "top-left",
       }),
     500
   );
@@ -765,9 +765,9 @@ const showDifferentTypes = () => {
   setTimeout(
     () =>
       notification.warning({
-        title: '警告通知',
-        description: '请注意',
-        position: 'bottom-right',
+        title: "警告通知",
+        description: "请注意",
+        position: "bottom-right",
       }),
     1000
   );
@@ -775,9 +775,9 @@ const showDifferentTypes = () => {
   setTimeout(
     () =>
       notification.error({
-        title: '错误通知',
-        description: '发生错误',
-        position: 'bottom-left',
+        title: "错误通知",
+        description: "发生错误",
+        position: "bottom-left",
       }),
     1500
   );
@@ -807,14 +807,14 @@ const showDifferentTypes = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react';
+import { notification } from "@tigercat/react";
 
 function App() {
   const handleFormSubmit = async () => {
     // 显示处理通知
     const close = notification.info({
-      title: '正在提交',
-      description: '正在提交表单，请稍候...',
+      title: "正在提交",
+      description: "正在提交表单，请稍候...",
       duration: 0,
     });
 
@@ -827,11 +827,11 @@ function App() {
 
       // 显示成功通知
       notification.success({
-        title: '提交成功',
-        description: '表单已成功提交！',
+        title: "提交成功",
+        description: "表单已成功提交！",
         duration: 4500,
         onClose: () => {
-          console.log('成功通知已关闭');
+          console.log("成功通知已关闭");
         },
       });
     } catch (error) {
@@ -840,8 +840,8 @@ function App() {
 
       // 显示错误通知
       notification.error({
-        title: '提交失败',
-        description: '表单提交失败，请检查网络连接后重试',
+        title: "提交失败",
+        description: "表单提交失败，请检查网络连接后重试",
         duration: 0,
         closable: true,
       });
@@ -850,17 +850,17 @@ function App() {
 
   const showDifferentTypes = () => {
     notification.info({
-      title: '信息通知',
-      description: '这是一条信息通知',
-      position: 'top-right',
+      title: "信息通知",
+      description: "这是一条信息通知",
+      position: "top-right",
     });
 
     setTimeout(
       () =>
         notification.success({
-          title: '成功通知',
-          description: '操作成功',
-          position: 'top-left',
+          title: "成功通知",
+          description: "操作成功",
+          position: "top-left",
         }),
       500
     );
@@ -868,9 +868,9 @@ function App() {
     setTimeout(
       () =>
         notification.warning({
-          title: '警告通知',
-          description: '请注意',
-          position: 'bottom-right',
+          title: "警告通知",
+          description: "请注意",
+          position: "bottom-right",
         }),
       1000
     );
@@ -878,9 +878,9 @@ function App() {
     setTimeout(
       () =>
         notification.error({
-          title: '错误通知',
-          description: '发生错误',
-          position: 'bottom-left',
+          title: "错误通知",
+          description: "发生错误",
+          position: "bottom-left",
         }),
       1500
     );
@@ -891,14 +891,14 @@ function App() {
       <h2 className="text-xl font-bold">Notification 组件示例</h2>
 
       <div className="space-x-2">
-        <button onClick={() => notification.info('快速信息')}>快速信息</button>
-        <button onClick={() => notification.success('快速成功')}>
+        <button onClick={() => notification.info("快速信息")}>快速信息</button>
+        <button onClick={() => notification.success("快速成功")}>
           快速成功
         </button>
-        <button onClick={() => notification.warning('快速警告')}>
+        <button onClick={() => notification.warning("快速警告")}>
           快速警告
         </button>
-        <button onClick={() => notification.error('快速错误')}>快速错误</button>
+        <button onClick={() => notification.error("快速错误")}>快速错误</button>
       </div>
 
       <div className="space-x-2">
@@ -949,18 +949,28 @@ function App() {
 
 ## 样式定制
 
-Notification 组件使用 Tailwind CSS 类进行样式设计，主要包括以下几个方面：
+Notification 支持通过 CSS 变量进行主题定制（均带 fallback），避免依赖硬编码的 Tailwind 颜色。
 
-### 类型颜色
+### 主题变量
 
-不同的通知类型使用不同的颜色方案：
+按类型可定制：
 
-- **Info（信息）**: 蓝色图标 (`text-blue-500`)
-- **Success（成功）**: 绿色图标 (`text-green-500`)
-- **Warning（警告）**: 黄色图标 (`text-yellow-500`)
-- **Error（错误）**: 红色图标 (`text-red-500`)
+- `--tiger-notification-info-bg / --tiger-notification-info-border / --tiger-notification-info-icon`
+- `--tiger-notification-success-bg / --tiger-notification-success-border / --tiger-notification-success-icon`
+- `--tiger-notification-warning-bg / --tiger-notification-warning-border / --tiger-notification-warning-icon`
+- `--tiger-notification-error-bg / --tiger-notification-error-border / --tiger-notification-error-icon`
 
-通知背景统一为白色 (`bg-white`)，带有边框和阴影效果。
+标题/描述默认继承通用文本变量（也可按类型覆盖）：
+
+- `--tiger-text` / `--tiger-text-muted`
+- `--tiger-notification-<type>-title`
+- `--tiger-notification-<type>-description`
+
+关闭按钮/图标：
+
+- `--tiger-notification-close-icon`
+- `--tiger-notification-close-icon-hover`
+- `--tiger-primary`（focus ring）
 
 ### 自定义样式
 
@@ -968,9 +978,9 @@ Notification 组件使用 Tailwind CSS 类进行样式设计，主要包括以�
 
 ```javascript
 notification.success({
-  title: '自定义样式',
-  description: '这是一条自定义样式的通知',
-  className: 'my-custom-notification',
+  title: "自定义样式",
+  description: "这是一条自定义样式的通知",
+  className: "my-custom-notification",
 });
 ```
 
@@ -978,12 +988,14 @@ notification.success({
 
 Notification 组件遵循 WAI-ARIA 可访问性标准：
 
-- 使用 `role="alert"` 属性标识为警告提示
-- 使用 `aria-live="assertive"` 属性确保屏幕阅读器立即读取
+- `error` 类型使用 `role="alert"` + `aria-live="assertive"`
+- 其它类型使用 `role="status"` + `aria-live="polite"`（避免打断用户）
 - 使用 `aria-atomic="true"` 属性确保整个通知内容被读取
 - 关闭按钮包含 `aria-label="Close notification"` 属性
 - 图标使用 SVG 格式，具有良好的可缩放性
-- 支持键盘操作（关闭按钮可通过 Tab 键聚焦）
+- 支持键盘操作（关闭按钮可通过 Tab 键聚焦；当传入 `onClick` 时通知本体支持 Enter/Space 触发）
+
+为了便于测试与调试，渲染节点包含稳定的 `data-*` 标记（如 `data-tiger-notification`、`data-tiger-notification-container`）。
 
 ## 注意事项
 
@@ -1016,11 +1028,11 @@ Notification 组件可以轻松地与全局状态管理工具（如 Pinia、Redu
 
 ```typescript
 // store/notification.ts
-import { defineStore } from 'pinia';
-import { notification } from '@tigercat/vue';
-import type { NotificationOptions } from '@tigercat/core';
+import { defineStore } from "pinia";
+import { notification } from "@tigercat/vue";
+import type { NotificationOptions } from "@tigercat/core";
 
-export const useNotificationStore = defineStore('notification', {
+export const useNotificationStore = defineStore("notification", {
   actions: {
     notify(config: NotificationOptions) {
       return notification.info(config);
@@ -1039,8 +1051,8 @@ export const useNotificationStore = defineStore('notification', {
 
 ```typescript
 // actions/notification.ts
-import { notification } from '@tigercat/react';
-import type { NotificationOptions } from '@tigercat/core';
+import { notification } from "@tigercat/react";
+import type { NotificationOptions } from "@tigercat/core";
 
 export const showNotification = (config: NotificationOptions) => {
   return () => {
@@ -1066,36 +1078,36 @@ import {
   NotificationOptions,
   NotificationPosition,
   NotificationType,
-} from '@tigercat/vue'; // 或 '@tigercat/react'
+} from "@tigercat/vue"; // 或 '@tigercat/react'
 
 // 使用字符串（仅标题）
-notification.info('简单通知');
+notification.info("简单通知");
 
 // 使用配置对象
 const config: NotificationConfig = {
-  title: '详细配置',
-  description: '这是通知的详细描述',
+  title: "详细配置",
+  description: "这是通知的详细描述",
   duration: 5000,
-  position: 'top-right',
+  position: "top-right",
   closable: true,
   onClick: () => {
-    console.log('通知被点击');
+    console.log("通知被点击");
   },
   onClose: () => {
-    console.log('通知已关闭');
+    console.log("通知已关闭");
   },
 };
 notification.success(config);
 
 // 获取关闭函数
 const close: () => void = notification.info({
-  title: '处理中',
-  description: '正在处理...',
+  title: "处理中",
+  description: "正在处理...",
   duration: 0,
 });
 
 // 清空特定位置的通知
-const position: NotificationPosition = 'top-right';
+const position: NotificationPosition = "top-right";
 notification.clear(position);
 ```
 
