@@ -31,6 +31,9 @@ import {
   type NotificationPosition,
 } from "@tigercat/core";
 
+type HChildren = Parameters<typeof h>[2];
+type HArrayChildren = Extract<NonNullable<HChildren>, unknown[]>;
+
 /**
  * Global notification container id prefix
  */
@@ -183,7 +186,7 @@ export const NotificationContainer = defineComponent({
         );
       }
 
-      const children: unknown[] = [
+      const children: HArrayChildren = [
         createIcon(iconPath, iconClass),
         h("div", { class: notificationContentClasses }, contentChildren),
       ];
