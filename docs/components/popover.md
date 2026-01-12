@@ -16,15 +16,15 @@
 </template>
 
 <script setup>
-import { Popover, Button } from '@tigercat/vue'
+import { Popover, Button } from "@tigercat/vue";
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from 'react'
-import { Popover, Button } from '@tigercat/react'
+import React from "react";
+import { Popover, Button } from "@tigercat/react";
 
 function App() {
   return (
@@ -33,7 +33,7 @@ function App() {
         <Button>触发气泡卡片</Button>
       </Popover>
     </div>
-  )
+  );
 }
 ```
 
@@ -46,37 +46,31 @@ function App() {
 ```vue
 <template>
   <div>
-    <Popover 
-      title="气泡卡片标题" 
-      content="这是一个带标题的气泡卡片内容"
-    >
+    <Popover title="气泡卡片标题" content="这是一个带标题的气泡卡片内容">
       <Button>带标题的气泡卡片</Button>
     </Popover>
   </div>
 </template>
 
 <script setup>
-import { Popover, Button } from '@tigercat/vue'
+import { Popover, Button } from "@tigercat/vue";
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from 'react'
-import { Popover, Button } from '@tigercat/react'
+import React from "react";
+import { Popover, Button } from "@tigercat/react";
 
 function App() {
   return (
     <div>
-      <Popover 
-        title="气泡卡片标题" 
-        content="这是一个带标题的气泡卡片内容"
-      >
+      <Popover title="气泡卡片标题" content="这是一个带标题的气泡卡片内容">
         <Button>带标题的气泡卡片</Button>
       </Popover>
     </div>
-  )
+  );
 }
 ```
 
@@ -109,21 +103,21 @@ function App() {
 </template>
 
 <script setup>
-import { Popover, Button } from '@tigercat/vue'
+import { Popover, Button } from "@tigercat/vue";
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from 'react'
-import { Popover, Button } from '@tigercat/react'
+import React from "react";
+import { Popover, Button } from "@tigercat/react";
 
 function App() {
   return (
     <div>
       <Popover
-        titleContent={<span style={{ color: '#2563eb' }}>自定义标题</span>}
+        titleContent={<span style={{ color: "#2563eb" }}>自定义标题</span>}
         contentContent={
           <div>
             <p>这是自定义的内容</p>
@@ -138,7 +132,7 @@ function App() {
         <Button>自定义内容</Button>
       </Popover>
     </div>
-  )
+  );
 }
 ```
 
@@ -154,15 +148,15 @@ function App() {
     <Popover title="提示" content="上方弹出" placement="top">
       <Button>上方</Button>
     </Popover>
-    
+
     <Popover title="提示" content="下方弹出" placement="bottom">
       <Button>下方</Button>
     </Popover>
-    
+
     <Popover title="提示" content="左侧弹出" placement="left">
       <Button>左侧</Button>
     </Popover>
-    
+
     <Popover title="提示" content="右侧弹出" placement="right">
       <Button>右侧</Button>
     </Popover>
@@ -170,15 +164,15 @@ function App() {
 </template>
 
 <script setup>
-import { Popover, Button } from '@tigercat/vue'
+import { Popover, Button } from "@tigercat/vue";
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from 'react'
-import { Popover, Button } from '@tigercat/react'
+import React from "react";
+import { Popover, Button } from "@tigercat/react";
 
 function App() {
   return (
@@ -186,20 +180,20 @@ function App() {
       <Popover title="提示" content="上方弹出" placement="top">
         <Button>上方</Button>
       </Popover>
-      
+
       <Popover title="提示" content="下方弹出" placement="bottom">
         <Button>下方</Button>
       </Popover>
-      
+
       <Popover title="提示" content="左侧弹出" placement="left">
         <Button>左侧</Button>
       </Popover>
-      
+
       <Popover title="提示" content="右侧弹出" placement="right">
         <Button>右侧</Button>
       </Popover>
     </div>
-  )
+  );
 }
 ```
 
@@ -215,19 +209,19 @@ function App() {
     <Popover title="点击触发" content="点击按钮触发" trigger="click">
       <Button>点击触发</Button>
     </Popover>
-    
+
     <Popover title="悬停触发" content="悬停触发气泡卡片" trigger="hover">
       <Button>悬停触发</Button>
     </Popover>
-    
+
     <Popover title="聚焦触发" content="聚焦触发气泡卡片" trigger="focus">
       <Button>聚焦触发</Button>
     </Popover>
-    
-    <Popover 
+
+    <Popover
       v-model:visible="manualVisible"
-      title="手动触发" 
-      content="手动控制显示隐藏" 
+      title="手动触发"
+      content="手动控制显示隐藏"
       trigger="manual"
     >
       <Button @click="manualVisible = !manualVisible">手动触发</Button>
@@ -236,47 +230,49 @@ function App() {
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { Popover, Button } from '@tigercat/vue'
+import { ref } from "vue";
+import { Popover, Button } from "@tigercat/vue";
 
-const manualVisible = ref(false)
+const manualVisible = ref(false);
 </script>
 ```
 
 ### React
 
 ```tsx
-import React, { useState } from 'react'
-import { Popover, Button } from '@tigercat/react'
+import React, { useState } from "react";
+import { Popover, Button } from "@tigercat/react";
 
 function App() {
-  const [manualVisible, setManualVisible] = useState(false)
-  
+  const [manualVisible, setManualVisible] = useState(false);
+
   return (
     <div className="space-x-2">
       <Popover title="点击触发" content="点击按钮触发" trigger="click">
         <Button>点击触发</Button>
       </Popover>
-      
+
       <Popover title="悬停触发" content="悬停触发气泡卡片" trigger="hover">
         <Button>悬停触发</Button>
       </Popover>
-      
+
       <Popover title="聚焦触发" content="聚焦触发气泡卡片" trigger="focus">
         <Button>聚焦触发</Button>
       </Popover>
-      
-      <Popover 
+
+      <Popover
         visible={manualVisible}
         onVisibleChange={setManualVisible}
-        title="手动触发" 
-        content="手动控制显示隐藏" 
+        title="手动触发"
+        content="手动控制显示隐藏"
         trigger="manual"
       >
-        <Button onClick={() => setManualVisible(!manualVisible)}>手动触发</Button>
+        <Button onClick={() => setManualVisible(!manualVisible)}>
+          手动触发
+        </Button>
       </Popover>
     </div>
-  )
+  );
 }
 ```
 
@@ -289,53 +285,53 @@ function App() {
 ```vue
 <template>
   <div>
-    <Popover 
+    <Popover
       v-model:visible="visible"
-      title="受控气泡卡片" 
+      title="受控气泡卡片"
       content="通过外部状态控制显示"
     >
       <Button>受控气泡卡片</Button>
     </Popover>
-    
+
     <Button @click="visible = !visible" class="ml-2">
-      {{ visible ? '隐藏' : '显示' }}
+      {{ visible ? "隐藏" : "显示" }}
     </Button>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { Popover, Button } from '@tigercat/vue'
+import { ref } from "vue";
+import { Popover, Button } from "@tigercat/vue";
 
-const visible = ref(false)
+const visible = ref(false);
 </script>
 ```
 
 ### React
 
 ```tsx
-import React, { useState } from 'react'
-import { Popover, Button } from '@tigercat/react'
+import React, { useState } from "react";
+import { Popover, Button } from "@tigercat/react";
 
 function App() {
-  const [visible, setVisible] = useState(false)
-  
+  const [visible, setVisible] = useState(false);
+
   return (
     <div>
-      <Popover 
+      <Popover
         visible={visible}
         onVisibleChange={setVisible}
-        title="受控气泡卡片" 
+        title="受控气泡卡片"
         content="通过外部状态控制显示"
       >
         <Button>受控气泡卡片</Button>
       </Popover>
-      
+
       <Button onClick={() => setVisible(!visible)} className="ml-2">
-        {visible ? '隐藏' : '显示'}
+        {visible ? "隐藏" : "显示"}
       </Button>
     </div>
-  )
+  );
 }
 ```
 
@@ -348,16 +344,16 @@ function App() {
 ```vue
 <template>
   <div class="space-x-2">
-    <Popover 
-      title="自定义宽度" 
+    <Popover
+      title="自定义宽度"
       content="这是一个宽度为 300px 的气泡卡片"
       width="300"
     >
       <Button>宽度 300px</Button>
     </Popover>
-    
-    <Popover 
-      title="自定义宽度" 
+
+    <Popover
+      title="自定义宽度"
       content="这是一个宽度为 400px 的气泡卡片"
       width="400"
     >
@@ -367,36 +363,36 @@ function App() {
 </template>
 
 <script setup>
-import { Popover, Button } from '@tigercat/vue'
+import { Popover, Button } from "@tigercat/vue";
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from 'react'
-import { Popover, Button } from '@tigercat/react'
+import React from "react";
+import { Popover, Button } from "@tigercat/react";
 
 function App() {
   return (
     <div className="space-x-2">
-      <Popover 
-        title="自定义宽度" 
+      <Popover
+        title="自定义宽度"
         content="这是一个宽度为 300px 的气泡卡片"
         width="300"
       >
         <Button>宽度 300px</Button>
       </Popover>
-      
-      <Popover 
-        title="自定义宽度" 
+
+      <Popover
+        title="自定义宽度"
         content="这是一个宽度为 400px 的气泡卡片"
         width="400"
       >
         <Button>宽度 400px</Button>
       </Popover>
     </div>
-  )
+  );
 }
 ```
 
@@ -407,39 +403,31 @@ function App() {
 ```vue
 <template>
   <div>
-    <Popover 
-      title="禁用状态" 
-      content="这个气泡卡片已被禁用"
-      disabled
-    >
+    <Popover title="禁用状态" content="这个气泡卡片已被禁用" disabled>
       <Button disabled>禁用的气泡卡片</Button>
     </Popover>
   </div>
 </template>
 
 <script setup>
-import { Popover, Button } from '@tigercat/vue'
+import { Popover, Button } from "@tigercat/vue";
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from 'react'
-import { Popover, Button } from '@tigercat/react'
+import React from "react";
+import { Popover, Button } from "@tigercat/react";
 
 function App() {
   return (
     <div>
-      <Popover 
-        title="禁用状态" 
-        content="这个气泡卡片已被禁用"
-        disabled
-      >
+      <Popover title="禁用状态" content="这个气泡卡片已被禁用" disabled>
         <Button disabled>禁用的气泡卡片</Button>
       </Popover>
     </div>
-  )
+  );
 }
 ```
 
@@ -447,45 +435,46 @@ function App() {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| visible | 气泡卡片是否可见（受控模式） | `boolean` | `undefined` |
-| defaultVisible | 默认是否可见（非受控模式） | `boolean` | `false` |
-| title | 气泡卡片标题 | `string` | `undefined` |
-| content | 气泡卡片内容 | `string` | `undefined` |
-| trigger | 触发方式 | `'click' \| 'hover' \| 'focus' \| 'manual'` | `'click'` |
-| placement | 弹出位置 | `'top' \| 'bottom' \| 'left' \| 'right' \| 'top-start' \| 'top-end' \| 'bottom-start' \| 'bottom-end' \| 'left-start' \| 'left-end' \| 'right-start' \| 'right-end'` | `'top'` |
-| disabled | 是否禁用 | `boolean` | `false` |
-| width | 气泡卡片宽度 | `string \| number` | `'auto'` |
-| className | 自定义类名 | `string` | `undefined` |
+| 参数           | 说明                         | 类型                                                                                                                                                                 | 默认值      |
+| -------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| visible        | 气泡卡片是否可见（受控模式） | `boolean`                                                                                                                                                            | `undefined` |
+| defaultVisible | 默认是否可见（非受控模式）   | `boolean`                                                                                                                                                            | `false`     |
+| title          | 气泡卡片标题                 | `string`                                                                                                                                                             | `undefined` |
+| content        | 气泡卡片内容                 | `string`                                                                                                                                                             | `undefined` |
+| trigger        | 触发方式                     | `'click' \| 'hover' \| 'focus' \| 'manual'`                                                                                                                          | `'click'`   |
+| placement      | 弹出位置                     | `'top' \| 'bottom' \| 'left' \| 'right' \| 'top-start' \| 'top-end' \| 'bottom-start' \| 'bottom-end' \| 'left-start' \| 'left-end' \| 'right-start' \| 'right-end'` | `'top'`     |
+| disabled       | 是否禁用                     | `boolean`                                                                                                                                                            | `false`     |
+| width          | 气泡卡片宽度                 | `string \| number`                                                                                                                                                   | `undefined` |
+| className      | 自定义类名                   | `string`                                                                                                                                                             | `undefined` |
+| style          | 自定义样式                   | `object`                                                                                                                                                             | `undefined` |
 
 ### Events (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
+| 事件名         | 说明               | 回调参数             |
+| -------------- | ------------------ | -------------------- |
 | update:visible | 可见状态改变时触发 | `(visible: boolean)` |
 | visible-change | 可见状态改变时触发 | `(visible: boolean)` |
 
 ### Events (React)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
+| 事件名          | 说明               | 回调参数                     |
+| --------------- | ------------------ | ---------------------------- |
 | onVisibleChange | 可见状态改变时触发 | `(visible: boolean) => void` |
 
 ### Slots (Vue)
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明               |
+| ------- | ------------------ |
 | default | 触发气泡卡片的元素 |
-| title | 自定义标题内容 |
+| title   | 自定义标题内容     |
 | content | 自定义气泡卡片内容 |
 
 ### Props (React Additional)
 
-| 参数 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| children | 触发气泡卡片的元素 | `ReactNode` | `undefined` |
-| titleContent | 自定义标题内容 | `ReactNode` | `undefined` |
+| 参数           | 说明               | 类型        | 默认值      |
+| -------------- | ------------------ | ----------- | ----------- |
+| children       | 触发气泡卡片的元素 | `ReactNode` | `undefined` |
+| titleContent   | 自定义标题内容     | `ReactNode` | `undefined` |
 | contentContent | 自定义气泡卡片内容 | `ReactNode` | `undefined` |
 
 ## 样式定制
@@ -494,11 +483,12 @@ Popover 组件使用 Tailwind CSS 类名，支持通过 `className` 属性自定
 
 ### 主题变量
 
-组件使用以下 CSS 变量，可以通过自定义主题进行覆盖：
+Popover 的默认颜色相关样式使用 CSS 变量（带 fallback），可通过自定义主题覆盖：
 
-- 背景色：白色 / 深色模式下的灰色
-- 边框色：灰色 200 / 深色模式下的灰色 700
-- 文本色：灰色 900 / 深色模式下的灰色 100
+- `--tiger-surface`：内容背景色（默认 `#ffffff`）
+- `--tiger-border`：边框色（默认 `#e5e7eb`）
+- `--tiger-text`：标题文本色（默认 `#111827`）
+- `--tiger-text-muted`：内容文本色（默认 `#374151`）
 
 ## 使用场景
 
@@ -516,9 +506,10 @@ Popover 组件使用 Tailwind CSS 类名，支持通过 `className` 属性自定
 
 ## 无障碍性
 
-- 支持键盘导航（聚焦触发模式）
-- 点击外部区域自动关闭（点击触发模式）
-- 鼠标悬停自动显示/隐藏（悬停触发模式）
+- 弹层内容使用 `role="dialog"`（非模态：`aria-modal="false"`），并在有标题/内容时自动关联 `aria-labelledby/aria-describedby`
+- 触发器提供 `aria-haspopup="dialog"`（并在禁用时标记 `aria-disabled`）
+- 支持键盘导航（`focus` 触发模式）
+- `click` 触发时支持 click-outside 关闭；非 `manual` 模式下支持 `Escape` 关闭
 
 ## 注意事项
 

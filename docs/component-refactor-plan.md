@@ -8,11 +8,11 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Popconfirm` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）
-- 当前组件：`Popover`
+- 上一步：✅ `Popover` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
+- 当前组件：`Message`
 - 当前步骤：Step1 主题/透传/a11y/类型导出/测试精简/文档同步
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：23/38
+- 已优化组件数/需优化组件数：24/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -355,7 +355,7 @@
 #### Popover（P1，建议优化）
 
 - 思路：触发方式（hover/click/focus）；定位；aria-describedby。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）：core Popover 默认色值改为 CSS vars（`--tiger-surface/--tiger-border/--tiger-text/--tiger-text-muted`，含 fallback）；Vue Popover 增加 `inheritAttrs: false` 并合并 `attrs.class/style`，新增导出 `VuePopoverProps`，并修复 `focus` 触发（focusin/focusout）；React Popover 支持 `div` 原生属性透传与 `style`，弹层内容补齐 `role=dialog` + `aria-labelledby/aria-describedby` 关联，非 `manual` 支持 ESC 关闭，click trigger 支持 click-outside；移除 Vue/React Popover 快照与过度用例，仅保留关键路径与 a11y 基线；同步更新 Popover 文档主题变量与无障碍说明（Demo 无需修改）。
 
 #### Tooltip（P1，建议优化）
 
