@@ -8,11 +8,11 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Steps` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）
-- 当前组件：`Pagination`
+- 上一步：✅ `Pagination` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）
+- 当前组件：`Dropdown`
 - 当前步骤：Step1 主题/透传/a11y/类型导出/测试精简/文档同步（未开始）
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：19/38
+- 已优化组件数/需优化组件数：20/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -267,7 +267,7 @@
 #### Pagination（P1，建议优化）
 
 - 思路：aria-label（上一页/下一页）；pageSize changer；受控/非受控。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）：core Pagination 中性样式（border/surface/text/text-muted）收敛为 CSS vars（含 fallback）；Vue Pagination 增加 `inheritAttrs: false` 并合并 `attrs.class/style` 与 `className/style`，新增并导出 `VuePaginationProps`；React Pagination 复用 core `PaginationProps` 类型并避免与原生 `onChange/style` 冲突，同时支持覆盖 `aria-label`；精简 Vue/React Pagination 测试并移除过度用例；同步更新 Pagination 文档主题变量说明（Demo 无需修改）。
 
 #### Dropdown / DropdownMenu / DropdownItem（P1，建议优化）
 

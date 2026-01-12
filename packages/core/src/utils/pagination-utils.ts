@@ -1,9 +1,5 @@
-/**
- * Pagination utility functions
- */
-
-import type { PaginationSize, PaginationAlign } from '../types/pagination';
-import { classNames } from './class-names';
+import type { PaginationSize, PaginationAlign } from "../types/pagination";
+import { classNames } from "./class-names";
 
 /**
  * Calculate total number of pages
@@ -65,7 +61,7 @@ export function getPageNumbers(
 
   // Add ellipsis before range if needed
   if (rangeStart > 2) {
-    pages.push('...');
+    pages.push("...");
   }
 
   // Add pages in range
@@ -75,7 +71,7 @@ export function getPageNumbers(
 
   // Add ellipsis after range if needed
   if (rangeEnd < totalPages - 1) {
-    pages.push('...');
+    pages.push("...");
   }
 
   // Always show last page if there's more than one page
@@ -100,38 +96,38 @@ export function defaultTotalText(
  * Get container classes for pagination
  */
 export function getPaginationContainerClasses(
-  align: PaginationAlign = 'center',
+  align: PaginationAlign = "center",
   className?: string
 ): string {
   const alignClasses = {
-    left: 'justify-start',
-    center: 'justify-center',
-    right: 'justify-end',
+    left: "justify-start",
+    center: "justify-center",
+    right: "justify-end",
   };
 
-  return classNames('flex items-center gap-1', alignClasses[align], className);
+  return classNames("flex items-center gap-1", alignClasses[align], className);
 }
 
 /**
  * Get base button classes for pagination buttons
  */
 export function getPaginationButtonBaseClasses(
-  size: PaginationSize = 'medium'
+  size: PaginationSize = "medium"
 ): string {
   const sizeClasses = {
-    small: 'min-w-7 h-7 text-sm px-2',
-    medium: 'min-w-8 h-8 text-base px-2.5',
-    large: 'min-w-10 h-10 text-lg px-3',
+    small: "min-w-7 h-7 text-sm px-2",
+    medium: "min-w-8 h-8 text-base px-2.5",
+    large: "min-w-10 h-10 text-lg px-3",
   };
 
   return classNames(
-    'inline-flex items-center justify-center',
-    'rounded border border-gray-300',
-    'bg-white text-gray-700',
-    'transition-colors duration-200',
-    'hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)]',
-    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-opacity-50',
-    'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-gray-300 disabled:hover:text-gray-700',
+    "inline-flex items-center justify-center",
+    "rounded border border-[var(--tiger-border,#d1d5db)]",
+    "bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#374151)]",
+    "transition-colors duration-200",
+    "hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)]",
+    "focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-opacity-50",
+    "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-[var(--tiger-border,#d1d5db)] disabled:hover:text-[var(--tiger-text,#374151)]",
     sizeClasses[size]
   );
 }
@@ -141,10 +137,10 @@ export function getPaginationButtonBaseClasses(
  */
 export function getPaginationButtonActiveClasses(): string {
   return classNames(
-    'border-[var(--tiger-primary,#2563eb)]',
-    'bg-[var(--tiger-primary,#2563eb)]',
-    'text-white',
-    'hover:border-[var(--tiger-primary-hover,#1d4ed8)] hover:bg-[var(--tiger-primary-hover,#1d4ed8)] hover:text-white'
+    "border-[var(--tiger-primary,#2563eb)]",
+    "bg-[var(--tiger-primary,#2563eb)]",
+    "text-white",
+    "hover:border-[var(--tiger-primary-hover,#1d4ed8)] hover:bg-[var(--tiger-primary-hover,#1d4ed8)] hover:text-white"
   );
 }
 
@@ -152,17 +148,17 @@ export function getPaginationButtonActiveClasses(): string {
  * Get ellipsis classes
  */
 export function getPaginationEllipsisClasses(
-  size: PaginationSize = 'medium'
+  size: PaginationSize = "medium"
 ): string {
   const sizeClasses = {
-    small: 'min-w-7 h-7 text-sm',
-    medium: 'min-w-8 h-8 text-base',
-    large: 'min-w-10 h-10 text-lg',
+    small: "min-w-7 h-7 text-sm",
+    medium: "min-w-8 h-8 text-base",
+    large: "min-w-10 h-10 text-lg",
   };
 
   return classNames(
-    'inline-flex items-center justify-center',
-    'text-gray-500 cursor-default',
+    "inline-flex items-center justify-center",
+    "text-[var(--tiger-text-muted,#6b7280)] cursor-default",
     sizeClasses[size]
   );
 }
@@ -171,23 +167,23 @@ export function getPaginationEllipsisClasses(
  * Get quick jumper input classes
  */
 export function getQuickJumperInputClasses(
-  size: PaginationSize = 'medium'
+  size: PaginationSize = "medium"
 ): string {
   const sizeClasses = {
-    small: 'w-12 h-7 text-sm',
-    medium: 'w-14 h-8 text-base',
-    large: 'w-16 h-10 text-lg',
+    small: "w-12 h-7 text-sm",
+    medium: "w-14 h-8 text-base",
+    large: "w-16 h-10 text-lg",
   };
 
   return classNames(
-    'inline-block',
-    'px-2 py-1',
-    'rounded border border-gray-300',
-    'text-center',
-    'transition-colors duration-200',
-    'hover:border-[var(--tiger-primary,#2563eb)]',
-    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-opacity-50',
-    'disabled:cursor-not-allowed disabled:opacity-50',
+    "inline-block",
+    "px-2 py-1",
+    "rounded border border-[var(--tiger-border,#d1d5db)]",
+    "text-center",
+    "transition-colors duration-200",
+    "hover:border-[var(--tiger-primary,#2563eb)]",
+    "focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-opacity-50",
+    "disabled:cursor-not-allowed disabled:opacity-50",
     sizeClasses[size]
   );
 }
@@ -196,23 +192,23 @@ export function getQuickJumperInputClasses(
  * Get page size selector classes
  */
 export function getPageSizeSelectorClasses(
-  size: PaginationSize = 'medium'
+  size: PaginationSize = "medium"
 ): string {
   const sizeClasses = {
-    small: 'h-7 text-sm',
-    medium: 'h-8 text-base',
-    large: 'h-10 text-lg',
+    small: "h-7 text-sm",
+    medium: "h-8 text-base",
+    large: "h-10 text-lg",
   };
 
   return classNames(
-    'inline-block',
-    'px-2 py-1',
-    'rounded border border-gray-300',
-    'bg-white',
-    'transition-colors duration-200',
-    'hover:border-[var(--tiger-primary,#2563eb)]',
-    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-opacity-50',
-    'disabled:cursor-not-allowed disabled:opacity-50',
+    "inline-block",
+    "px-2 py-1",
+    "rounded border border-[var(--tiger-border,#d1d5db)]",
+    "bg-[var(--tiger-surface,#ffffff)]",
+    "transition-colors duration-200",
+    "hover:border-[var(--tiger-primary,#2563eb)]",
+    "focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-opacity-50",
+    "disabled:cursor-not-allowed disabled:opacity-50",
     sizeClasses[size]
   );
 }
@@ -220,12 +216,16 @@ export function getPageSizeSelectorClasses(
 /**
  * Get total text classes
  */
-export function getTotalTextClasses(size: PaginationSize = 'medium'): string {
+export function getTotalTextClasses(size: PaginationSize = "medium"): string {
   const sizeClasses = {
-    small: 'text-sm',
-    medium: 'text-base',
-    large: 'text-lg',
+    small: "text-sm",
+    medium: "text-base",
+    large: "text-lg",
   };
 
-  return classNames('text-gray-600', 'mr-2', sizeClasses[size]);
+  return classNames(
+    "text-[var(--tiger-text-muted,#6b7280)]",
+    "mr-2",
+    sizeClasses[size]
+  );
 }

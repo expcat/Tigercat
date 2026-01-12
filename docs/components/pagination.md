@@ -8,40 +8,36 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { ref } from "vue";
+import { Pagination } from "@tigercat/vue";
 
-const current = ref(1)
-const total = ref(100)
+const current = ref(1);
+const total = ref(100);
 </script>
 
 <template>
-  <Pagination 
-    v-model:current="current" 
-    :total="total"
-    :pageSize="10"
-  />
+  <Pagination v-model:current="current" :total="total" :pageSize="10" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { useState } from "react";
+import { Pagination } from "@tigercat/react";
 
 function App() {
-  const [current, setCurrent] = useState(1)
-  const total = 100
+  const [current, setCurrent] = useState(1);
+  const total = 100;
 
   return (
-    <Pagination 
+    <Pagination
       current={current}
       onChange={setCurrent}
       total={total}
       pageSize={10}
     />
-  )
+  );
 }
 ```
 
@@ -53,15 +49,15 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { ref } from "vue";
+import { Pagination } from "@tigercat/vue";
 
-const current = ref(1)
+const current = ref(1);
 </script>
 
 <template>
-  <Pagination 
-    v-model:current="current" 
+  <Pagination
+    v-model:current="current"
     :total="500"
     :pageSize="10"
     showQuickJumper
@@ -72,21 +68,21 @@ const current = ref(1)
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { useState } from "react";
+import { Pagination } from "@tigercat/react";
 
 function App() {
-  const [current, setCurrent] = useState(1)
+  const [current, setCurrent] = useState(1);
 
   return (
-    <Pagination 
+    <Pagination
       current={current}
       onChange={setCurrent}
       total={500}
       pageSize={10}
       showQuickJumper
     />
-  )
+  );
 }
 ```
 
@@ -98,19 +94,19 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { ref } from "vue";
+import { Pagination } from "@tigercat/vue";
 
-const current = ref(1)
-const pageSize = ref(10)
+const current = ref(1);
+const pageSize = ref(10);
 
 const handlePageSizeChange = (newCurrent, newPageSize) => {
-  console.log('页码:', newCurrent, '每页条数:', newPageSize)
-}
+  console.log("页码:", newCurrent, "每页条数:", newPageSize);
+};
 </script>
 
 <template>
-  <Pagination 
+  <Pagination
     v-model:current="current"
     v-model:pageSize="pageSize"
     :total="500"
@@ -124,21 +120,21 @@ const handlePageSizeChange = (newCurrent, newPageSize) => {
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { useState } from "react";
+import { Pagination } from "@tigercat/react";
 
 function App() {
-  const [current, setCurrent] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
+  const [current, setCurrent] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const handlePageSizeChange = (newCurrent: number, newPageSize: number) => {
-    console.log('页码:', newCurrent, '每页条数:', newPageSize)
-    setCurrent(newCurrent)
-    setPageSize(newPageSize)
-  }
+    console.log("页码:", newCurrent, "每页条数:", newPageSize);
+    setCurrent(newCurrent);
+    setPageSize(newPageSize);
+  };
 
   return (
-    <Pagination 
+    <Pagination
       current={current}
       onChange={setCurrent}
       pageSize={pageSize}
@@ -147,7 +143,7 @@ function App() {
       showSizeChanger
       onPageSizeChange={handlePageSizeChange}
     />
-  )
+  );
 }
 ```
 
@@ -159,38 +155,29 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { ref } from "vue";
+import { Pagination } from "@tigercat/vue";
 
-const current = ref(1)
+const current = ref(1);
 </script>
 
 <template>
-  <Pagination 
-    v-model:current="current" 
-    :total="500"
-    simple
-  />
+  <Pagination v-model:current="current" :total="500" simple />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { useState } from "react";
+import { Pagination } from "@tigercat/react";
 
 function App() {
-  const [current, setCurrent] = useState(1)
+  const [current, setCurrent] = useState(1);
 
   return (
-    <Pagination 
-      current={current}
-      onChange={setCurrent}
-      total={500}
-      simple
-    />
-  )
+    <Pagination current={current} onChange={setCurrent} total={500} simple />
+  );
 }
 ```
 
@@ -202,31 +189,19 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { ref } from "vue";
+import { Pagination } from "@tigercat/vue";
 
-const current = ref(1)
+const current = ref(1);
 </script>
 
 <template>
   <div class="space-y-4">
-    <Pagination 
-      v-model:current="current" 
-      :total="100"
-      size="small"
-    />
+    <Pagination v-model:current="current" :total="100" size="small" />
 
-    <Pagination 
-      v-model:current="current" 
-      :total="100"
-      size="medium"
-    />
+    <Pagination v-model:current="current" :total="100" size="medium" />
 
-    <Pagination 
-      v-model:current="current" 
-      :total="100"
-      size="large"
-    />
+    <Pagination v-model:current="current" :total="100" size="large" />
   </div>
 </template>
 ```
@@ -234,36 +209,36 @@ const current = ref(1)
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { useState } from "react";
+import { Pagination } from "@tigercat/react";
 
 function App() {
-  const [current, setCurrent] = useState(1)
+  const [current, setCurrent] = useState(1);
 
   return (
     <div className="space-y-4">
-      <Pagination 
+      <Pagination
         current={current}
         onChange={setCurrent}
         total={100}
         size="small"
       />
 
-      <Pagination 
+      <Pagination
         current={current}
         onChange={setCurrent}
         total={100}
         size="medium"
       />
 
-      <Pagination 
+      <Pagination
         current={current}
         onChange={setCurrent}
         total={100}
         size="large"
       />
     </div>
-  )
+  );
 }
 ```
 
@@ -275,31 +250,19 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { ref } from "vue";
+import { Pagination } from "@tigercat/vue";
 
-const current = ref(1)
+const current = ref(1);
 </script>
 
 <template>
   <div class="space-y-4">
-    <Pagination 
-      v-model:current="current" 
-      :total="100"
-      align="left"
-    />
+    <Pagination v-model:current="current" :total="100" align="left" />
 
-    <Pagination 
-      v-model:current="current" 
-      :total="100"
-      align="center"
-    />
+    <Pagination v-model:current="current" :total="100" align="center" />
 
-    <Pagination 
-      v-model:current="current" 
-      :total="100"
-      align="right"
-    />
+    <Pagination v-model:current="current" :total="100" align="right" />
   </div>
 </template>
 ```
@@ -307,36 +270,36 @@ const current = ref(1)
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { useState } from "react";
+import { Pagination } from "@tigercat/react";
 
 function App() {
-  const [current, setCurrent] = useState(1)
+  const [current, setCurrent] = useState(1);
 
   return (
     <div className="space-y-4">
-      <Pagination 
+      <Pagination
         current={current}
         onChange={setCurrent}
         total={100}
         align="left"
       />
 
-      <Pagination 
+      <Pagination
         current={current}
         onChange={setCurrent}
         total={100}
         align="center"
       />
 
-      <Pagination 
+      <Pagination
         current={current}
         onChange={setCurrent}
         total={100}
         align="right"
       />
     </div>
-  )
+  );
 }
 ```
 
@@ -348,37 +311,30 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { ref } from "vue";
+import { Pagination } from "@tigercat/vue";
 
-const current = ref(1)
+const current = ref(1);
 
 const customTotalText = (total, range) => {
-  return `${range[0]}-${range[1]} 共 ${total} 条`
-}
+  return `${range[0]}-${range[1]} 共 ${total} 条`;
+};
 </script>
 
 <template>
   <div class="space-y-4">
     <!-- 默认显示 -->
-    <Pagination 
-      v-model:current="current" 
-      :total="100"
-    />
+    <Pagination v-model:current="current" :total="100" />
 
     <!-- 自定义总数文本 -->
-    <Pagination 
-      v-model:current="current" 
+    <Pagination
+      v-model:current="current"
       :total="100"
       :totalText="customTotalText"
     />
 
     <!-- 隐藏总数 -->
-    <Pagination 
-      v-model:current="current" 
-      :total="100"
-      :showTotal="false"
-    />
+    <Pagination v-model:current="current" :total="100" :showTotal="false" />
   </div>
 </template>
 ```
@@ -386,27 +342,23 @@ const customTotalText = (total, range) => {
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { useState } from "react";
+import { Pagination } from "@tigercat/react";
 
 function App() {
-  const [current, setCurrent] = useState(1)
+  const [current, setCurrent] = useState(1);
 
   const customTotalText = (total: number, range: [number, number]) => {
-    return `${range[0]}-${range[1]} 共 ${total} 条`
-  }
+    return `${range[0]}-${range[1]} 共 ${total} 条`;
+  };
 
   return (
     <div className="space-y-4">
       {/* 默认显示 */}
-      <Pagination 
-        current={current}
-        onChange={setCurrent}
-        total={100}
-      />
+      <Pagination current={current} onChange={setCurrent} total={100} />
 
       {/* 自定义总数文本 */}
-      <Pagination 
+      <Pagination
         current={current}
         onChange={setCurrent}
         total={100}
@@ -414,14 +366,14 @@ function App() {
       />
 
       {/* 隐藏总数 */}
-      <Pagination 
+      <Pagination
         current={current}
         onChange={setCurrent}
         total={100}
         showTotal={false}
       />
     </div>
-  )
+  );
 }
 ```
 
@@ -433,15 +385,15 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { ref } from "vue";
+import { Pagination } from "@tigercat/vue";
 
-const current = ref(1)
+const current = ref(1);
 </script>
 
 <template>
-  <Pagination 
-    v-model:current="current" 
+  <Pagination
+    v-model:current="current"
     :total="5"
     :pageSize="10"
     hideOnSinglePage
@@ -452,21 +404,21 @@ const current = ref(1)
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { useState } from "react";
+import { Pagination } from "@tigercat/react";
 
 function App() {
-  const [current, setCurrent] = useState(1)
+  const [current, setCurrent] = useState(1);
 
   return (
-    <Pagination 
+    <Pagination
       current={current}
       onChange={setCurrent}
       total={5}
       pageSize={10}
       hideOnSinglePage
     />
-  )
+  );
 }
 ```
 
@@ -478,38 +430,29 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { ref } from "vue";
+import { Pagination } from "@tigercat/vue";
 
-const current = ref(1)
+const current = ref(1);
 </script>
 
 <template>
-  <Pagination 
-    v-model:current="current" 
-    :total="100"
-    disabled
-  />
+  <Pagination v-model:current="current" :total="100" disabled />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { useState } from "react";
+import { Pagination } from "@tigercat/react";
 
 function App() {
-  const [current, setCurrent] = useState(1)
+  const [current, setCurrent] = useState(1);
 
   return (
-    <Pagination 
-      current={current}
-      onChange={setCurrent}
-      total={100}
-      disabled
-    />
-  )
+    <Pagination current={current} onChange={setCurrent} total={100} disabled />
+  );
 }
 ```
 
@@ -521,28 +464,28 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { ref } from "vue";
+import { Pagination } from "@tigercat/vue";
 
-const current = ref(1)
-const pageSize = ref(10)
-const total = ref(500)
+const current = ref(1);
+const pageSize = ref(10);
+const total = ref(500);
 
 const handleChange = (page, size) => {
-  console.log('当前页:', page, '每页条数:', size)
-}
+  console.log("当前页:", page, "每页条数:", size);
+};
 
 const handlePageSizeChange = (page, size) => {
-  console.log('页码大小改变 - 当前页:', page, '每页条数:', size)
-}
+  console.log("页码大小改变 - 当前页:", page, "每页条数:", size);
+};
 
 const customTotalText = (total, range) => {
-  return `显示 ${range[0]}-${range[1]} 条，共 ${total} 条记录`
-}
+  return `显示 ${range[0]}-${range[1]} 条，共 ${total} 条记录`;
+};
 </script>
 
 <template>
-  <Pagination 
+  <Pagination
     v-model:current="current"
     v-model:pageSize="pageSize"
     :total="total"
@@ -561,31 +504,31 @@ const customTotalText = (total, range) => {
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { useState } from "react";
+import { Pagination } from "@tigercat/react";
 
 function App() {
-  const [current, setCurrent] = useState(1)
-  const [pageSize, setPageSize] = useState(10)
-  const total = 500
+  const [current, setCurrent] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const total = 500;
 
   const handleChange = (page: number, size: number) => {
-    console.log('当前页:', page, '每页条数:', size)
-    setCurrent(page)
-  }
+    console.log("当前页:", page, "每页条数:", size);
+    setCurrent(page);
+  };
 
   const handlePageSizeChange = (page: number, size: number) => {
-    console.log('页码大小改变 - 当前页:', page, '每页条数:', size)
-    setCurrent(page)
-    setPageSize(size)
-  }
+    console.log("页码大小改变 - 当前页:", page, "每页条数:", size);
+    setCurrent(page);
+    setPageSize(size);
+  };
 
   const customTotalText = (total: number, range: [number, number]) => {
-    return `显示 ${range[0]}-${range[1]} 条，共 ${total} 条记录`
-  }
+    return `显示 ${range[0]}-${range[1]} 条，共 ${total} 条记录`;
+  };
 
   return (
-    <Pagination 
+    <Pagination
       current={current}
       pageSize={pageSize}
       total={total}
@@ -598,7 +541,7 @@ function App() {
       onChange={handleChange}
       onPageSizeChange={handlePageSizeChange}
     />
-  )
+  );
 }
 ```
 
@@ -606,41 +549,41 @@ function App() {
 
 ### Pagination Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-|-----|------|------|--------|
-| current | 当前页码（Vue: v-model:current） | `number` | `1` |
-| defaultCurrent | 默认当前页码（非受控模式） | `number` | `1` |
-| total | 总条数 | `number` | `0` |
-| pageSize | 每页条数（Vue: v-model:pageSize） | `number` | `10` |
-| defaultPageSize | 默认每页条数（非受控模式） | `number` | `10` |
-| pageSizeOptions | 指定每页可以显示多少条 | `number[]` | `[10, 20, 50, 100]` |
-| showQuickJumper | 是否显示快速跳页输入框 | `boolean` | `false` |
-| showSizeChanger | 是否显示每页条数选择器 | `boolean` | `false` |
-| showTotal | 是否显示总条数 | `boolean` | `true` |
-| totalText | 自定义总条数文本 | `(total: number, range: [number, number]) => string` | - |
-| simple | 简单模式（只显示上一页、下一页和页码） | `boolean` | `false` |
-| size | 分页组件大小 | `'small' \| 'medium' \| 'large'` | `'medium'` |
-| align | 对齐方式 | `'left' \| 'center' \| 'right'` | `'center'` |
-| disabled | 是否禁用 | `boolean` | `false` |
-| hideOnSinglePage | 只有一页时是否隐藏分页 | `boolean` | `false` |
-| showLessItems | 是否显示较少的页码按钮 | `boolean` | `false` |
-| className | 自定义 CSS 类名 | `string` | - |
-| style | 自定义样式 | `CSSProperties` | - |
+| 属性             | 说明                                   | 类型                                                 | 默认值              |
+| ---------------- | -------------------------------------- | ---------------------------------------------------- | ------------------- |
+| current          | 当前页码（Vue: v-model:current）       | `number`                                             | `1`                 |
+| defaultCurrent   | 默认当前页码（非受控模式）             | `number`                                             | `1`                 |
+| total            | 总条数                                 | `number`                                             | `0`                 |
+| pageSize         | 每页条数（Vue: v-model:pageSize）      | `number`                                             | `10`                |
+| defaultPageSize  | 默认每页条数（非受控模式）             | `number`                                             | `10`                |
+| pageSizeOptions  | 指定每页可以显示多少条                 | `number[]`                                           | `[10, 20, 50, 100]` |
+| showQuickJumper  | 是否显示快速跳页输入框                 | `boolean`                                            | `false`             |
+| showSizeChanger  | 是否显示每页条数选择器                 | `boolean`                                            | `false`             |
+| showTotal        | 是否显示总条数                         | `boolean`                                            | `true`              |
+| totalText        | 自定义总条数文本                       | `(total: number, range: [number, number]) => string` | -                   |
+| simple           | 简单模式（只显示上一页、下一页和页码） | `boolean`                                            | `false`             |
+| size             | 分页组件大小                           | `'small' \| 'medium' \| 'large'`                     | `'medium'`          |
+| align            | 对齐方式                               | `'left' \| 'center' \| 'right'`                      | `'center'`          |
+| disabled         | 是否禁用                               | `boolean`                                            | `false`             |
+| hideOnSinglePage | 只有一页时是否隐藏分页                 | `boolean`                                            | `false`             |
+| showLessItems    | 是否显示较少的页码按钮                 | `boolean`                                            | `false`             |
+| className        | 自定义 CSS 类名                        | `string`                                             | -                   |
+| style            | 自定义样式                             | `CSSProperties`                                      | -                   |
 
 ### Pagination Events (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|---------|
-| update:current | 当前页改变时触发 | `(current: number) => void` |
-| update:pageSize | 每页条数改变时触发 | `(pageSize: number) => void` |
-| change | 页码或每页条数改变时触发 | `(current: number, pageSize: number) => void` |
-| page-size-change | 每页条数改变时触发 | `(current: number, pageSize: number) => void` |
+| 事件名           | 说明                     | 回调参数                                      |
+| ---------------- | ------------------------ | --------------------------------------------- |
+| update:current   | 当前页改变时触发         | `(current: number) => void`                   |
+| update:pageSize  | 每页条数改变时触发       | `(pageSize: number) => void`                  |
+| change           | 页码或每页条数改变时触发 | `(current: number, pageSize: number) => void` |
+| page-size-change | 每页条数改变时触发       | `(current: number, pageSize: number) => void` |
 
 ### Pagination Events (React)
 
-| 属性 | 说明 | 类型 |
-|-----|------|------|
-| onChange | 页码改变时的回调 | `(current: number, pageSize: number) => void` |
+| 属性             | 说明                 | 类型                                          |
+| ---------------- | -------------------- | --------------------------------------------- |
+| onChange         | 页码改变时的回调     | `(current: number, pageSize: number) => void` |
 | onPageSizeChange | 每页条数改变时的回调 | `(current: number, pageSize: number) => void` |
 
 ## 主题定制
@@ -651,18 +594,24 @@ Pagination 组件使用 CSS 变量进行主题定制。你可以通过设置以�
 :root {
   --tiger-primary: #2563eb;
   --tiger-primary-hover: #1d4ed8;
+
+  /* 可选：中性色（边框/背景/文字） */
+  --tiger-border: #d1d5db;
+  --tiger-surface: #ffffff;
+  --tiger-text: #374151;
+  --tiger-text-muted: #6b7280;
 }
 ```
 
 或使用 JavaScript:
 
 ```typescript
-import { setThemeColors } from '@tigercat/core'
+import { setThemeColors } from "@tigercat/core";
 
 setThemeColors({
-  primary: '#10b981',
-  primaryHover: '#059669',
-})
+  primary: "#10b981",
+  primaryHover: "#059669",
+});
 ```
 
 ## 可访问性

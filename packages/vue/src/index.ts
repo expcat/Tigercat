@@ -99,6 +99,7 @@ export type { VueStepsProps } from "./components/Steps";
 export { StepsItem } from "./components/StepsItem";
 export type { VueStepsItemProps } from "./components/StepsItem";
 export { Pagination } from "./components/Pagination";
+export type { VuePaginationProps } from "./components/Pagination";
 export { Dropdown } from "./components/Dropdown";
 export { DropdownMenu } from "./components/DropdownMenu";
 export { DropdownItem } from "./components/DropdownItem";
