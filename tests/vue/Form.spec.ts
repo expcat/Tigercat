@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/vue";
+import { render, screen, fireEvent, waitFor } from "@testing-library/vue";
 import { defineComponent, reactive, h } from "vue";
 import { Form, FormItem, type FormRule } from "@tigercat/vue";
 import { expectNoA11yViolations } from "../utils";
@@ -111,6 +111,81 @@ describe("Form", () => {
     expect(form).toBeTruthy();
     await fireEvent.submit(form as HTMLFormElement);
     expect(await screen.findByText("Username is required")).toBeInTheDocument();
+  });
+
+  it("uses registered FormItem rules when calling exposed validateField", async () => {
+    const rules: FormRule[] = [
+      { required: true, message: "Username is required" },
+    ];
+
+    let formApi:
+      | {
+          validateField: (name: string) => Promise<void>;
+          clearValidate: (name?: string | string[]) => void;
+        }
+      | undefined;
+
+    const Demo = defineComponent({
+      setup() {
+        const model = reactive({ username: "" });
+        return () =>
+          h(
+            Form,
+            {
+              model,
+              ref: (el) => {
+                formApi = (el as typeof formApi) ?? undefined;
+              },
+            },
+            {
+              default: () => [
+                h("div", { id: "username-help" }, "Helper text"),
+                h(
+                  FormItem,
+                  { label: "Username", name: "username", rules },
+                  {
+                    default: () =>
+                      h("input", {
+                        "aria-label": "username",
+                        "aria-describedby": "username-help",
+                        value: model.username,
+                        onInput: (e: Event) => {
+                          model.username = (e.target as HTMLInputElement).value;
+                        },
+                      }),
+                  }
+                ),
+              ],
+            }
+          );
+      },
+    });
+
+    render(Demo);
+    expect(formApi).toBeTruthy();
+
+    await formApi?.validateField("username");
+
+    const error = await screen.findByText("Username is required");
+    const errorElement = error.closest("[role=alert]") ?? error;
+    const errorId = errorElement.getAttribute("id");
+    expect(errorId).toBeTruthy();
+
+    const input = screen.getByLabelText("username");
+    const describedBy = input.getAttribute("aria-describedby") ?? "";
+    const parts = describedBy.split(" ").filter(Boolean);
+    expect(parts).toContain("username-help");
+    expect(parts).toContain(errorId as string);
+    expect(input).toHaveAttribute("aria-invalid", "true");
+
+    formApi?.clearValidate("username");
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Username is required")
+      ).not.toBeInTheDocument();
+      expect(input).not.toHaveAttribute("aria-invalid");
+    });
   });
 
   it("has no accessibility violations", async () => {

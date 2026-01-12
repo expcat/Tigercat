@@ -169,8 +169,9 @@ export const Form = defineComponent({
       rulesOverride?: FormRule | FormRule[],
       trigger?: FormRuleTrigger
     ): Promise<void> => {
-      const fieldRules = rulesOverride ?? props.rules?.[fieldName];
-      if (!fieldRules) {
+      const effectiveFieldRules =
+        rulesOverride ?? fieldRules[fieldName] ?? props.rules?.[fieldName];
+      if (!effectiveFieldRules) {
         return;
       }
 
@@ -178,7 +179,7 @@ export const Form = defineComponent({
       const error = await validateFieldUtil(
         fieldName,
         value,
-        fieldRules,
+        effectiveFieldRules,
         props.model,
         trigger
       );
