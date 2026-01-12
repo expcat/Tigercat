@@ -3,36 +3,16 @@ import React, {
   useState,
   useEffect,
   useRef,
-  useMemo,
   useCallback,
-} from 'react';
+} from "react";
 import {
   classNames,
   getDropdownContainerClasses,
   getDropdownTriggerClasses,
   getDropdownMenuWrapperClasses,
   type DropdownProps as CoreDropdownProps,
-} from '@tigercat/core';
-
-const getReactComponentName = (type: unknown): string | undefined => {
-  if (typeof type === 'function') {
-    const fn = type as { displayName?: unknown; name?: unknown };
-    const displayName =
-      typeof fn.displayName === 'string' ? fn.displayName : undefined;
-    const name = typeof fn.name === 'string' ? fn.name : undefined;
-    return displayName ?? name;
-  }
-
-  if (typeof type === 'object' && type != null) {
-    const obj = type as { displayName?: unknown; name?: unknown };
-    const displayName =
-      typeof obj.displayName === 'string' ? obj.displayName : undefined;
-    const name = typeof obj.name === 'string' ? obj.name : undefined;
-    return displayName ?? name;
-  }
-
-  return undefined;
-};
+} from "@tigercat/core";
+import { DropdownMenu } from "./DropdownMenu";
 
 // Dropdown context interface
 export interface DropdownContextValue {
@@ -43,7 +23,11 @@ export interface DropdownContextValue {
 // Create dropdown context
 export const DropdownContext = createContext<DropdownContextValue | null>(null);
 
-export interface DropdownProps extends CoreDropdownProps {
+export interface DropdownProps
+  extends Omit<CoreDropdownProps, "style">,
+    Omit<React.HTMLAttributes<HTMLDivElement>, "style"> {
+  style?: React.CSSProperties;
+
   /**
    * Visibility change event handler
    */
@@ -56,8 +40,8 @@ export interface DropdownProps extends CoreDropdownProps {
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({
-  trigger = 'hover',
-  placement = 'bottom-start',
+  trigger = "hover",
+  placement = "bottom-start",
   disabled = false,
   visible: controlledVisible,
   defaultVisible = false,
@@ -66,6 +50,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
   style,
   onVisibleChange,
   children,
+  onKeyDown,
+  ...divProps
 }) => {
   // Internal state for uncontrolled mode
   const [internalVisible, setInternalVisible] = useState(defaultVisible);
@@ -81,7 +67,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   // Handle visibility change
   const setVisible = useCallback(
     (newVisible: boolean) => {
-      if (disabled) return;
+      if (disabled && newVisible) return;
 
       // Update internal state if uncontrolled
       if (controlledVisible === undefined) {
@@ -103,7 +89,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   // Handle mouse enter (for hover trigger)
   const handleMouseEnter = useCallback(() => {
-    if (trigger !== 'hover') return;
+    if (trigger !== "hover") return;
 
     if (hoverTimerRef.current) {
       clearTimeout(hoverTimerRef.current);
@@ -116,7 +102,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   // Handle mouse leave (for hover trigger)
   const handleMouseLeave = useCallback(() => {
-    if (trigger !== 'hover') return;
+    if (trigger !== "hover") return;
 
     if (hoverTimerRef.current) {
       clearTimeout(hoverTimerRef.current);
@@ -129,13 +115,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   // Handle click (for click trigger)
   const handleClick = useCallback(() => {
-    if (trigger !== 'click') return;
+    if (trigger !== "click") return;
     setVisible(!visible);
   }, [trigger, visible, setVisible]);
 
   // Handle outside click to close dropdown
   useEffect(() => {
-    if (trigger !== 'click') return;
+    if (trigger !== "click") return;
 
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -146,11 +132,26 @@ export const Dropdown: React.FC<DropdownProps> = ({
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
     };
   }, [trigger, setVisible]);
+
+  useEffect(() => {
+    if (!visible) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setVisible(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [visible, setVisible]);
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -161,33 +162,20 @@ export const Dropdown: React.FC<DropdownProps> = ({
     };
   }, []);
 
-  // Container classes
-  const containerClasses = useMemo(() => {
-    return classNames(
-      getDropdownContainerClasses(),
-      'tiger-dropdown-container',
-      className
-    );
-  }, [className]);
-
-  // Trigger classes
-  const triggerClasses = useMemo(() => {
-    return getDropdownTriggerClasses(disabled);
-  }, [disabled]);
-
-  // Menu wrapper classes
-  const menuWrapperClasses = useMemo(() => {
-    return getDropdownMenuWrapperClasses(visible, placement);
-  }, [visible, placement]);
-
-  // Context value
-  const contextValue = useMemo<DropdownContextValue>(
-    () => ({
-      closeOnClick,
-      handleItemClick,
-    }),
-    [closeOnClick, handleItemClick]
+  const containerClasses = classNames(
+    getDropdownContainerClasses(),
+    "tiger-dropdown-container",
+    className
   );
+
+  const triggerClasses = getDropdownTriggerClasses(disabled);
+
+  const menuWrapperClasses = getDropdownMenuWrapperClasses(visible, placement);
+
+  const contextValue: DropdownContextValue = {
+    closeOnClick,
+    handleItemClick,
+  };
 
   // Parse children to find trigger and menu
   const childrenArray = React.Children.toArray(children);
@@ -195,27 +183,49 @@ export const Dropdown: React.FC<DropdownProps> = ({
   let menuElement: React.ReactNode = null;
 
   childrenArray.forEach((child) => {
-    if (React.isValidElement(child)) {
-      const childTypeName = getReactComponentName(child.type);
-      if (childTypeName === 'DropdownMenu') {
-        menuElement = child;
-      } else {
-        triggerElement = child;
-      }
-    } else {
+    if (!React.isValidElement(child)) {
+      if (triggerElement == null) triggerElement = child;
+      return;
+    }
+
+    if (child.type === DropdownMenu) {
+      menuElement = child;
+      return;
+    }
+
+    if (triggerElement == null) {
       triggerElement = child;
     }
   });
 
+  const handleContainerKeyDown = (
+    event: React.KeyboardEvent<HTMLDivElement>
+  ) => {
+    onKeyDown?.(event);
+    if (event.defaultPrevented) return;
+    if (event.key === "Escape") {
+      setVisible(false);
+    }
+  };
+
   return (
     <DropdownContext.Provider value={contextValue}>
-      <div ref={containerRef} className={containerClasses} style={style}>
+      <div
+        ref={containerRef}
+        className={containerClasses}
+        style={style}
+        onKeyDown={handleContainerKeyDown}
+        {...divProps}
+      >
         {/* Trigger element */}
         <div
           className={triggerClasses}
           onClick={handleClick}
           onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}>
+          onMouseLeave={handleMouseLeave}
+          aria-haspopup="menu"
+          aria-expanded={visible}
+        >
           {triggerElement}
         </div>
 
@@ -224,7 +234,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
           className={menuWrapperClasses}
           hidden={!visible}
           onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}>
+          onMouseLeave={handleMouseLeave}
+        >
           {menuElement}
         </div>
       </div>

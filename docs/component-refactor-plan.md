@@ -8,11 +8,11 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Pagination` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）
-- 当前组件：`Dropdown`
+- 上一步：✅ `Dropdown` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）
+- 当前组件：`Tooltip`
 - 当前步骤：Step1 主题/透传/a11y/类型导出/测试精简/文档同步（未开始）
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：20/38
+- 已优化组件数/需优化组件数：21/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -273,7 +273,7 @@
 
 - 思路：overlay 行为（click-outside/esc）、focus 管理、aria-menu；定位（如需 portal）。
 - 可拆分：overlay 行为基建 → a11y → tests。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）：core 下拉菜单样式从固定色收敛为 CSS vars（含 fallback：`--tiger-surface/--tiger-border/--tiger-text/--tiger-surface-muted/--tiger-primary`）；Vue/React Dropdown 支持 attrs/原生属性透传并合并 class/style，补齐 ESC 关闭与 click-outside 行为，且 disabled 仅阻止打开但允许关闭；DropdownItem 改为 button 以获得键盘与焦点能力；Vue 补齐并导出 `VueDropdownProps/VueDropdownMenuProps/VueDropdownItemProps`；移除 Vue/React Dropdown 快照与冗余测试，仅保留关键路径；同步更新 Dropdown 文档主题变量与 a11y 说明（Demo 无需修改）。
 
 ### E. 数据展示（Data Display）
 
