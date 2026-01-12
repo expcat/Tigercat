@@ -20,34 +20,34 @@
 </template>
 
 <script setup>
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from "@tigercat/vue";
 
 const handleConfirm = () => {
-  console.log('确认删除')
+  console.log("确认删除");
   // 执行删除操作
-}
+};
 
 const handleCancel = () => {
-  console.log('取消删除')
-}
+  console.log("取消删除");
+};
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import React from "react";
+import { Popconfirm, Button } from "@tigercat/react";
 
 function App() {
   const handleConfirm = () => {
-    console.log('确认删除')
+    console.log("确认删除");
     // 执行删除操作
-  }
+  };
 
   const handleCancel = () => {
-    console.log('取消删除')
-  }
+    console.log("取消删除");
+  };
 
   return (
     <div>
@@ -59,7 +59,7 @@ function App() {
         <Button variant="danger">删除</Button>
       </Popconfirm>
     </div>
-  )
+  );
 }
 ```
 
@@ -75,15 +75,15 @@ function App() {
     <Popconfirm title="确定要删除吗？" placement="top">
       <Button>上方</Button>
     </Popconfirm>
-    
+
     <Popconfirm title="确定要删除吗？" placement="bottom">
       <Button>下方</Button>
     </Popconfirm>
-    
+
     <Popconfirm title="确定要删除吗？" placement="left">
       <Button>左侧</Button>
     </Popconfirm>
-    
+
     <Popconfirm title="确定要删除吗？" placement="right">
       <Button>右侧</Button>
     </Popconfirm>
@@ -91,15 +91,15 @@ function App() {
 </template>
 
 <script setup>
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from "@tigercat/vue";
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import React from "react";
+import { Popconfirm, Button } from "@tigercat/react";
 
 function App() {
   return (
@@ -107,20 +107,20 @@ function App() {
       <Popconfirm title="确定要删除吗？" placement="top">
         <Button>上方</Button>
       </Popconfirm>
-      
+
       <Popconfirm title="确定要删除吗？" placement="bottom">
         <Button>下方</Button>
       </Popconfirm>
-      
+
       <Popconfirm title="确定要删除吗？" placement="left">
         <Button>左侧</Button>
       </Popconfirm>
-      
+
       <Popconfirm title="确定要删除吗？" placement="right">
         <Button>右侧</Button>
       </Popconfirm>
     </div>
-  )
+  );
 }
 ```
 
@@ -136,19 +136,19 @@ function App() {
     <Popconfirm title="这是警告信息" icon="warning">
       <Button>警告</Button>
     </Popconfirm>
-    
+
     <Popconfirm title="这是提示信息" icon="info">
       <Button>信息</Button>
     </Popconfirm>
-    
+
     <Popconfirm title="这是错误信息" icon="error">
       <Button variant="danger">错误</Button>
     </Popconfirm>
-    
+
     <Popconfirm title="操作成功" icon="success">
       <Button>成功</Button>
     </Popconfirm>
-    
+
     <Popconfirm title="确定继续吗？" icon="question">
       <Button>疑问</Button>
     </Popconfirm>
@@ -156,15 +156,15 @@ function App() {
 </template>
 
 <script setup>
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from "@tigercat/vue";
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import React from "react";
+import { Popconfirm, Button } from "@tigercat/react";
 
 function App() {
   return (
@@ -172,24 +172,24 @@ function App() {
       <Popconfirm title="这是警告信息" icon="warning">
         <Button>警告</Button>
       </Popconfirm>
-      
+
       <Popconfirm title="这是提示信息" icon="info">
         <Button>信息</Button>
       </Popconfirm>
-      
+
       <Popconfirm title="这是错误信息" icon="error">
         <Button variant="danger">错误</Button>
       </Popconfirm>
-      
+
       <Popconfirm title="操作成功" icon="success">
         <Button>成功</Button>
       </Popconfirm>
-      
+
       <Popconfirm title="确定继续吗？" icon="question">
         <Button>疑问</Button>
       </Popconfirm>
     </div>
-  )
+  );
 }
 ```
 
@@ -212,24 +212,24 @@ function App() {
 </template>
 
 <script setup>
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from "@tigercat/vue";
 
 const handleSubmit = () => {
-  console.log('表单已提交')
-}
+  console.log("表单已提交");
+};
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import React from "react";
+import { Popconfirm, Button } from "@tigercat/react";
 
 function App() {
   const handleSubmit = () => {
-    console.log('表单已提交')
-  }
+    console.log("表单已提交");
+  };
 
   return (
     <Popconfirm
@@ -240,7 +240,7 @@ function App() {
     >
       <Button>提交表单</Button>
     </Popconfirm>
-  )
+  );
 }
 ```
 
@@ -265,24 +265,24 @@ function App() {
 </template>
 
 <script setup>
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from "@tigercat/vue";
 
 const handleDelete = () => {
-  console.log('用户已删除')
-}
+  console.log("用户已删除");
+};
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import React from "react";
+import { Popconfirm, Button } from "@tigercat/react";
 
 function App() {
   const handleDelete = () => {
-    console.log('用户已删除')
-  }
+    console.log("用户已删除");
+  };
 
   return (
     <Popconfirm
@@ -295,7 +295,7 @@ function App() {
     >
       <Button variant="danger">删除用户</Button>
     </Popconfirm>
-  )
+  );
 }
 ```
 
@@ -317,24 +317,24 @@ function App() {
 </template>
 
 <script setup>
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from "@tigercat/vue";
 
 const handlePublish = () => {
-  console.log('文章已发布')
-}
+  console.log("文章已发布");
+};
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import React from "react";
+import { Popconfirm, Button } from "@tigercat/react";
 
 function App() {
   const handlePublish = () => {
-    console.log('文章已发布')
-  }
+    console.log("文章已发布");
+  };
 
   return (
     <Popconfirm
@@ -344,7 +344,7 @@ function App() {
     >
       <Button>发布文章</Button>
     </Popconfirm>
-  )
+  );
 }
 ```
 
@@ -365,49 +365,47 @@ function App() {
     >
       <Button>受控弹窗</Button>
     </Popconfirm>
-    
-    <Button @click="visible = true" class="ml-2">
-      外部控制打开
-    </Button>
+
+    <Button @click="visible = true" class="ml-2"> 外部控制打开 </Button>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { Popconfirm, Button } from '@tigercat/vue'
+import { ref } from "vue";
+import { Popconfirm, Button } from "@tigercat/vue";
 
-const visible = ref(false)
+const visible = ref(false);
 
 const handleConfirm = () => {
-  console.log('确认')
-  visible.value = false
-}
+  console.log("确认");
+  visible.value = false;
+};
 
 const handleCancel = () => {
-  console.log('取消')
-  visible.value = false
-}
+  console.log("取消");
+  visible.value = false;
+};
 </script>
 ```
 
 ### React
 
 ```tsx
-import React, { useState } from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import React, { useState } from "react";
+import { Popconfirm, Button } from "@tigercat/react";
 
 function App() {
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(false);
 
   const handleConfirm = () => {
-    console.log('确认')
-    setVisible(false)
-  }
+    console.log("确认");
+    setVisible(false);
+  };
 
   const handleCancel = () => {
-    console.log('取消')
-    setVisible(false)
-  }
+    console.log("取消");
+    setVisible(false);
+  };
 
   return (
     <div>
@@ -420,12 +418,12 @@ function App() {
       >
         <Button>受控弹窗</Button>
       </Popconfirm>
-      
+
       <Button onClick={() => setVisible(true)} className="ml-2">
         外部控制打开
       </Button>
     </div>
-  )
+  );
 }
 ```
 
@@ -447,24 +445,24 @@ function App() {
 </template>
 
 <script setup>
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from "@tigercat/vue";
 
 const handleConfirm = () => {
-  console.log('确认')
-}
+  console.log("确认");
+};
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import React from "react";
+import { Popconfirm, Button } from "@tigercat/react";
 
 function App() {
   const handleConfirm = () => {
-    console.log('确认')
-  }
+    console.log("确认");
+  };
 
   return (
     <Popconfirm
@@ -474,70 +472,79 @@ function App() {
     >
       <Button>无图标</Button>
     </Popconfirm>
-  )
+  );
 }
 ```
 
 ## Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| visible | 是否显示（受控模式） | `boolean` | `undefined` |
-| defaultVisible | 默认是否显示（非受控模式） | `boolean` | `false` |
-| title | 确认框标题 | `string` | `'确定要执行此操作吗？'` |
-| description | 确认框描述信息 | `string` | `undefined` |
-| icon | 图标类型 | `'warning' \| 'info' \| 'error' \| 'success' \| 'question'` | `'warning'` |
-| showIcon | 是否显示图标 | `boolean` | `true` |
-| okText | 确认按钮文字 | `string` | `'确定'` |
-| cancelText | 取消按钮文字 | `string` | `'取消'` |
-| okType | 确认按钮类型 | `'primary' \| 'danger'` | `'primary'` |
-| placement | 弹出位置 | `'top' \| 'bottom' \| 'left' \| 'right' \| 'top-start' \| 'top-end' \| 'bottom-start' \| 'bottom-end' \| 'left-start' \| 'left-end' \| 'right-start' \| 'right-end'` | `'top'` |
-| disabled | 是否禁用 | `boolean` | `false` |
-| className | 自定义类名 | `string` | `undefined` |
+| 属性           | 说明                       | 类型                                                                                                                                                                 | 默认值                   |
+| -------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| visible        | 是否显示（受控模式）       | `boolean`                                                                                                                                                            | `undefined`              |
+| defaultVisible | 默认是否显示（非受控模式） | `boolean`                                                                                                                                                            | `false`                  |
+| title          | 确认框标题                 | `string`                                                                                                                                                             | `'确定要执行此操作吗？'` |
+| description    | 确认框描述信息             | `string`                                                                                                                                                             | `undefined`              |
+| icon           | 图标类型                   | `'warning' \| 'info' \| 'error' \| 'success' \| 'question'`                                                                                                          | `'warning'`              |
+| showIcon       | 是否显示图标               | `boolean`                                                                                                                                                            | `true`                   |
+| okText         | 确认按钮文字               | `string`                                                                                                                                                             | `'确定'`                 |
+| cancelText     | 取消按钮文字               | `string`                                                                                                                                                             | `'取消'`                 |
+| okType         | 确认按钮类型               | `'primary' \| 'danger'`                                                                                                                                              | `'primary'`              |
+| placement      | 弹出位置                   | `'top' \| 'bottom' \| 'left' \| 'right' \| 'top-start' \| 'top-end' \| 'bottom-start' \| 'bottom-end' \| 'left-start' \| 'left-end' \| 'right-start' \| 'right-end'` | `'top'`                  |
+| disabled       | 是否禁用                   | `boolean`                                                                                                                                                            | `false`                  |
+| className      | 自定义类名                 | `string`                                                                                                                                                             | `undefined`              |
 
 ## Events (Vue) / Callbacks (React)
 
 ### Vue 3
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
+| 事件名         | 说明               | 回调参数             |
+| -------------- | ------------------ | -------------------- |
 | update:visible | 显示状态改变时触发 | `(visible: boolean)` |
 | visible-change | 显示状态改变时触发 | `(visible: boolean)` |
-| confirm | 点击确认按钮时触发 | `()` |
-| cancel | 点击取消按钮时触发 | `()` |
+| confirm        | 点击确认按钮时触发 | `()`                 |
+| cancel         | 点击取消按钮时触发 | `()`                 |
 
 ### React
 
-| 回调函数 | 说明 | 参数 |
-|----------|------|------|
+| 回调函数        | 说明               | 参数                 |
+| --------------- | ------------------ | -------------------- |
 | onVisibleChange | 显示状态改变时触发 | `(visible: boolean)` |
-| onConfirm | 点击确认按钮时触发 | `()` |
-| onCancel | 点击取消按钮时触发 | `()` |
+| onConfirm       | 点击确认按钮时触发 | `()`                 |
+| onCancel        | 点击取消按钮时触发 | `()`                 |
 
 ## Slots (Vue) / Props (React)
 
 ### Vue 3
 
-| 插槽名 | 说明 |
-|--------|------|
-| default | 触发 Popconfirm 显示的元素 |
-| title | 自定义标题内容 |
-| description | 自定义描述内容 |
+| 插槽名      | 说明                       |
+| ----------- | -------------------------- |
+| default     | 触发 Popconfirm 显示的元素 |
+| title       | 自定义标题内容             |
+| description | 自定义描述内容             |
 
 ### React
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
-| children | 触发 Popconfirm 显示的元素 | `ReactNode` |
-| titleContent | 自定义标题内容 | `ReactNode` |
-| descriptionContent | 自定义描述内容 | `ReactNode` |
+| 属性               | 说明                       | 类型        |
+| ------------------ | -------------------------- | ----------- |
+| children           | 触发 Popconfirm 显示的元素 | `ReactNode` |
+| titleContent       | 自定义标题内容             | `ReactNode` |
+| descriptionContent | 自定义描述内容             | `ReactNode` |
 
 ## 样式定制
 
 Popconfirm 组件使用 Tailwind CSS 构建，支持通过 CSS 变量进行主题定制：
 
+- `--tiger-surface`: 面板背景色
+- `--tiger-surface-muted`: 次级/悬停背景色（用于取消按钮 hover）
+- `--tiger-border`: 边框色（面板边框/箭头边框）
+- `--tiger-text`: 主文本色（标题/取消按钮文字）
+- `--tiger-text-muted`: 次级文本色（描述/部分 focus ring）
+
 - `--tiger-primary`: 主按钮背景色
 - `--tiger-primary-hover`: 主按钮悬停背景色
+
+- `--tiger-error`: 危险按钮背景色（`okType="danger"`）
+- `--tiger-error-hover`: 危险按钮悬停背景色（`okType="danger"`）
 
 ## 最佳实践
 
@@ -554,6 +561,8 @@ Popconfirm 组件使用 Tailwind CSS 构建，支持通过 CSS 变量进行主�
 ## 注意事项
 
 - Popconfirm 会在点击外部区域时自动关闭
+- Popconfirm 支持按 `Esc` 键关闭
 - 点击确认或取消按钮后会自动关闭 Popconfirm
 - 触发元素应该是一个可交互的元素（如 Button、Link 等）
+- 为了可访问性，触发器会带上 `aria-haspopup="dialog"` / `aria-expanded` / `aria-controls`；弹层使用 `role="dialog"` 并通过 `aria-labelledby` / `aria-describedby` 关联标题与描述
 - 不要在 Popconfirm 中嵌套另一个 Popconfirm 或 Modal

@@ -114,6 +114,7 @@ export { MessageContainer, message } from "./components/Message";
 export { NotificationContainer, notification } from "./components/Notification";
 export { Loading } from "./components/Loading";
 export { Popconfirm } from "./components/Popconfirm";
+export type { VuePopconfirmProps } from "./components/Popconfirm";
 export { Popover } from "./components/Popover";
 export { Tooltip } from "./components/Tooltip";
 export type { VueTooltipProps } from "./components/Tooltip";

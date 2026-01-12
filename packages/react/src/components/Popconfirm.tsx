@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useMemo,
-  useCallback,
-  useState,
-  useRef,
-} from 'react';
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import {
   classNames,
   getPopconfirmContainerClasses,
@@ -18,9 +12,13 @@ import {
   getPopconfirmCancelButtonClasses,
   getPopconfirmOkButtonClasses,
   getDropdownMenuWrapperClasses,
+  mergeStyleValues,
   type PopconfirmProps as CorePopconfirmProps,
   type PopconfirmIconType,
-} from '@tigercat/core';
+} from "@tigercat/core";
+
+let popconfirmIdCounter = 0;
+const createPopconfirmId = () => `tiger-popconfirm-${++popconfirmIdCounter}`;
 
 // Icon components
 const WarningIcon = () => (
@@ -29,7 +27,8 @@ const WarningIcon = () => (
     fill="none"
     viewBox="0 0 24 24"
     strokeWidth={1.5}
-    stroke="currentColor">
+    stroke="currentColor"
+  >
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -44,7 +43,8 @@ const InfoIcon = () => (
     fill="none"
     viewBox="0 0 24 24"
     strokeWidth={1.5}
-    stroke="currentColor">
+    stroke="currentColor"
+  >
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -59,7 +59,8 @@ const ErrorIcon = () => (
     fill="none"
     viewBox="0 0 24 24"
     strokeWidth={1.5}
-    stroke="currentColor">
+    stroke="currentColor"
+  >
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -74,7 +75,8 @@ const SuccessIcon = () => (
     fill="none"
     viewBox="0 0 24 24"
     strokeWidth={1.5}
-    stroke="currentColor">
+    stroke="currentColor"
+  >
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -89,7 +91,8 @@ const QuestionIcon = () => (
     fill="none"
     viewBox="0 0 24 24"
     strokeWidth={1.5}
-    stroke="currentColor">
+    stroke="currentColor"
+  >
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -106,134 +109,145 @@ const iconMap: Record<PopconfirmIconType, React.FC> = {
   question: QuestionIcon,
 };
 
-export interface PopconfirmProps extends CorePopconfirmProps {
-  /**
-   * The element to trigger the popconfirm
-   */
-  children?: React.ReactNode;
+export type PopconfirmProps = Omit<CorePopconfirmProps, "style"> &
+  Omit<
+    React.HTMLAttributes<HTMLDivElement>,
+    "children" | "className" | "style"
+  > & {
+    /**
+     * The element to trigger the popconfirm
+     */
+    children?: React.ReactNode;
 
-  /**
-   * Custom title content (alternative to title prop)
-   */
-  titleContent?: React.ReactNode;
+    /**
+     * Custom title content (alternative to title prop)
+     */
+    titleContent?: React.ReactNode;
 
-  /**
-   * Custom description content (alternative to description prop)
-   */
-  descriptionContent?: React.ReactNode;
+    /**
+     * Custom description content (alternative to description prop)
+     */
+    descriptionContent?: React.ReactNode;
 
-  /**
-   * Callback when visibility changes
-   */
-  onVisibleChange?: (visible: boolean) => void;
+    /**
+     * Callback when visibility changes
+     */
+    onVisibleChange?: (visible: boolean) => void;
 
-  /**
-   * Callback when confirm button is clicked
-   */
-  onConfirm?: () => void;
+    /**
+     * Callback when confirm button is clicked
+     */
+    onConfirm?: () => void;
 
-  /**
-   * Callback when cancel button is clicked
-   */
-  onCancel?: () => void;
-}
+    /**
+     * Callback when cancel button is clicked
+     */
+    onCancel?: () => void;
+    className?: string;
+    style?: React.CSSProperties;
+  };
 
 export const Popconfirm: React.FC<PopconfirmProps> = ({
   visible,
   defaultVisible = false,
-  title = '确定要执行此操作吗？',
+  title = "确定要执行此操作吗？",
   description,
-  icon = 'warning',
+  icon = "warning",
   showIcon = true,
-  okText = '确定',
-  cancelText = '取消',
-  okType = 'primary',
-  placement = 'top',
+  okText = "确定",
+  cancelText = "取消",
+  okType = "primary",
+  placement = "top",
   disabled = false,
   className,
+  style,
   children,
   titleContent,
   descriptionContent,
   onVisibleChange,
   onConfirm,
   onCancel,
+  ...divProps
 }) => {
-  // Internal state for uncontrolled mode
+  const isControlled = visible !== undefined;
   const [internalVisible, setInternalVisible] = useState(defaultVisible);
 
-  // Computed visible state (controlled or uncontrolled)
-  const currentVisible = visible !== undefined ? visible : internalVisible;
+  const currentVisible = isControlled ? visible : internalVisible;
 
   // Ref to the container element
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const popconfirmIdRef = useRef<string | null>(null);
+  if (!popconfirmIdRef.current) {
+    popconfirmIdRef.current = createPopconfirmId();
+  }
+  const popconfirmId = popconfirmIdRef.current;
+  const titleId = `${popconfirmId}-title`;
+  const descriptionId = `${popconfirmId}-description`;
+  const describedBy =
+    description || descriptionContent ? descriptionId : undefined;
+
   // Handle visibility change
-  const setVisible = useCallback(
-    (newVisible: boolean) => {
-      if (disabled) return;
+  const setVisible = (newVisible: boolean) => {
+    if (disabled && newVisible) return;
 
-      // Update internal state if uncontrolled
-      if (visible === undefined) {
-        setInternalVisible(newVisible);
-      }
+    if (!isControlled) {
+      setInternalVisible(newVisible);
+    }
 
-      // Notify parent
-      if (onVisibleChange) {
-        onVisibleChange(newVisible);
-      }
-    },
-    [disabled, visible, onVisibleChange]
-  );
+    onVisibleChange?.(newVisible);
+  };
 
   // Handle confirm
-  const handleConfirm = useCallback(() => {
-    if (onConfirm) {
-      onConfirm();
-    }
+  const handleConfirm = () => {
+    onConfirm?.();
     setVisible(false);
-  }, [onConfirm, setVisible]);
+  };
 
   // Handle cancel
-  const handleCancel = useCallback(() => {
-    if (onCancel) {
-      onCancel();
-    }
+  const handleCancel = () => {
+    onCancel?.();
     setVisible(false);
-  }, [onCancel, setVisible]);
+  };
 
   // Handle trigger click
-  const handleTriggerClick = useCallback(() => {
+  const handleTriggerClick = () => {
     if (disabled) return;
     setVisible(!currentVisible);
-  }, [disabled, currentVisible, setVisible]);
+  };
 
   // Handle outside click to close popconfirm
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
+    if (!currentVisible) return;
 
-      if (containerRef.current && !containerRef.current.contains(target)) {
-        // Close by calling onVisibleChange if in controlled mode, or update internal state
-        if (visible !== undefined && onVisibleChange) {
-          onVisibleChange(false);
-        } else {
-          setInternalVisible(false);
-        }
-      }
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target;
+      if (!target) return;
+      if (containerRef.current?.contains(target as Node)) return;
+      setVisible(false);
     };
 
-    if (currentVisible) {
-      // Use setTimeout to avoid immediate triggering on the same click that opened it
-      const timeoutId = setTimeout(() => {
-        document.addEventListener('click', handleClickOutside);
-      }, 0);
+    const timeoutId = window.setTimeout(() => {
+      document.addEventListener("click", handleClickOutside);
+    }, 0);
 
-      return () => {
-        clearTimeout(timeoutId);
-        document.removeEventListener('click', handleClickOutside);
-      };
-    }
-  }, [currentVisible, visible, onVisibleChange]);
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [currentVisible]);
+
+  useEffect(() => {
+    if (!currentVisible) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setVisible(false);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [currentVisible]);
 
   // Container classes
   const containerClasses = useMemo(
@@ -241,15 +255,13 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     [className]
   );
 
-  // Trigger classes
   const triggerClasses = useMemo(
     () => getPopconfirmTriggerClasses(disabled),
     [disabled]
   );
 
-  // Content wrapper classes
   const contentWrapperClasses = useMemo(
-    () => getDropdownMenuWrapperClasses(currentVisible, placement),
+    () => getDropdownMenuWrapperClasses(Boolean(currentVisible), placement),
     [currentVisible, placement]
   );
 
@@ -257,32 +269,18 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     () => getPopconfirmArrowClasses(placement),
     [placement]
   );
-
-  // Content classes
   const contentClasses = useMemo(() => getPopconfirmContentClasses(), []);
-
-  // Title classes
   const titleClasses = useMemo(() => getPopconfirmTitleClasses(), []);
-
-  // Description classes
   const descriptionClasses = useMemo(
     () => getPopconfirmDescriptionClasses(),
     []
   );
-
-  // Icon classes
   const iconClasses = useMemo(() => getPopconfirmIconClasses(icon), [icon]);
-
-  // Buttons classes
   const buttonsClasses = useMemo(() => getPopconfirmButtonsClasses(), []);
-
-  // Cancel button classes
   const cancelButtonClasses = useMemo(
     () => getPopconfirmCancelButtonClasses(),
     []
   );
-
-  // OK button classes
   const okButtonClasses = useMemo(
     () => getPopconfirmOkButtonClasses(okType),
     [okType]
@@ -295,56 +293,118 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     return null;
   }
 
-  return (
-    <div ref={containerRef} className={containerClasses}>
-      {/* Trigger */}
-      <div className={triggerClasses} onClick={handleTriggerClick}>
+  const mergedStyle = mergeStyleValues(style) as
+    | React.CSSProperties
+    | undefined;
+
+  const triggerProps = {
+    className: triggerClasses,
+    onClick: (event: React.MouseEvent) => {
+      const target = children;
+
+      if (React.isValidElement(target)) {
+        const onChildClick = (target.props as { onClick?: unknown }).onClick;
+        if (typeof onChildClick === "function") {
+          (onChildClick as (e: React.MouseEvent) => void)(event);
+        }
+      }
+
+      if (event.defaultPrevented) return;
+      handleTriggerClick();
+    },
+    "aria-haspopup": "dialog" as const,
+    "aria-expanded": Boolean(currentVisible),
+    "aria-controls": currentVisible ? popconfirmId : undefined,
+  };
+
+  const triggerNode = (() => {
+    if (React.isValidElement(children)) {
+      return React.cloneElement(children, {
+        ...(children.props || {}),
+        ...triggerProps,
+        className: classNames(
+          (children.props as { className?: string }).className,
+          triggerProps.className
+        ),
+      });
+    }
+
+    return (
+      <div
+        {...triggerProps}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        aria-disabled={disabled}
+        onKeyDown={(event) => {
+          if (disabled) return;
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleTriggerClick();
+          }
+        }}
+      >
         {children}
       </div>
+    );
+  })();
 
-      {/* Popconfirm content */}
-      <div className={contentWrapperClasses} hidden={!currentVisible}>
+  return (
+    <div
+      ref={containerRef}
+      className={containerClasses}
+      style={mergedStyle}
+      {...divProps}
+    >
+      {triggerNode}
+
+      <div
+        className={contentWrapperClasses}
+        hidden={!currentVisible}
+        aria-hidden={!currentVisible}
+      >
         <div className="relative">
           <div className={arrowClasses} aria-hidden="true" />
-          <div className={contentClasses}>
-            {/* Title section with icon */}
+          <div
+            id={popconfirmId}
+            role="dialog"
+            aria-modal="false"
+            aria-labelledby={titleId}
+            aria-describedby={describedBy}
+            className={contentClasses}
+          >
             <div className="flex items-start">
-              {/* Icon */}
               {showIcon && (
-                <div className={iconClasses}>
+                <div className={iconClasses} aria-hidden="true">
                   <IconComponent />
                 </div>
               )}
 
-              {/* Title and description */}
               <div className="flex-1">
-                {/* Title */}
-                <div className={titleClasses}>{titleContent || title}</div>
+                <div id={titleId} className={titleClasses}>
+                  {titleContent || title}
+                </div>
 
-                {/* Description */}
                 {(description || descriptionContent) && (
-                  <div className={descriptionClasses}>
+                  <div id={descriptionId} className={descriptionClasses}>
                     {descriptionContent || description}
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Buttons */}
             <div className={buttonsClasses}>
-              {/* Cancel button */}
               <button
                 type="button"
                 className={cancelButtonClasses}
-                onClick={handleCancel}>
+                onClick={handleCancel}
+              >
                 {cancelText}
               </button>
-
-              {/* OK button */}
               <button
                 type="button"
                 className={okButtonClasses}
-                onClick={handleConfirm}>
+                onClick={handleConfirm}
+              >
                 {okText}
               </button>
             </div>
