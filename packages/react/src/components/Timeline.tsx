@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from "react";
 import {
   classNames,
   getTimelineContainerClasses,
@@ -14,9 +14,10 @@ import {
   type TimelineMode,
   type TimelineItem,
   type TimelineItemPosition,
-} from '@tigercat/core';
+} from "@tigercat/core";
 
-export interface TimelineProps {
+export interface TimelineProps
+  extends Omit<React.HTMLAttributes<HTMLUListElement>, "children"> {
   /**
    * Timeline data source
    */
@@ -60,7 +61,7 @@ export interface TimelineProps {
 
 export const Timeline: React.FC<TimelineProps> = ({
   items = [],
-  mode = 'left',
+  mode = "left",
   pending = false,
   pendingDot,
   pendingContent,
@@ -68,70 +69,42 @@ export const Timeline: React.FC<TimelineProps> = ({
   renderItem,
   renderDot: customRenderDot,
   className,
+  ...ulProps
 }) => {
-  // Process items with position for alternate mode
-  const processedItems = useMemo(() => {
-    let processedData = [...items];
+  let processedItems = [...items];
+  if (reverse) processedItems = processedItems.reverse();
+  if (mode === "alternate") {
+    processedItems = processedItems.map((item, index) => ({
+      ...item,
+      position: (item.position ||
+        (index % 2 === 0 ? "left" : "right")) as TimelineItemPosition,
+    }));
+  }
 
-    if (reverse) {
-      processedData = processedData.reverse();
-    }
+  const containerClasses = classNames(
+    getTimelineContainerClasses(mode),
+    timelineListClasses,
+    className
+  );
 
-    // Assign positions for alternate mode
-    if (mode === 'alternate') {
-      return processedData.map((item, index) => ({
-        ...item,
-        position: (item.position ||
-          (index % 2 === 0 ? 'left' : 'right')) as TimelineItemPosition,
-      }));
-    }
+  const getItemKey = (item: TimelineItem, index: number): string | number =>
+    item.key || index;
 
-    return processedData;
-  }, [items, mode, reverse]);
-
-  // Container classes
-  const containerClasses = useMemo(() => {
-    return classNames(
-      getTimelineContainerClasses(mode),
-      timelineListClasses,
-      className
-    );
-  }, [mode, className]);
-
-  const getItemKey = (item: TimelineItem, index: number): string | number => {
-    return item.key || index;
-  };
+  const wrapCustomDot = (node: React.ReactNode) => (
+    <div className={getTimelineDotClasses(undefined, true)}>{node}</div>
+  );
 
   const renderDotElement = (
     item: TimelineItem,
     isPending = false
   ): React.ReactNode => {
-    // Custom dot from prop
-    if (customRenderDot) {
-      return (
-        <div className={getTimelineDotClasses(undefined, true)}>
-          {customRenderDot(item)}
-        </div>
-      );
-    }
-
-    // Custom dot from item
-    if (item.dot) {
-      return (
-        <div className={getTimelineDotClasses(undefined, true)}>
-          {item.dot as React.ReactNode}
-        </div>
-      );
-    }
+    if (customRenderDot) return wrapCustomDot(customRenderDot(item));
+    if (item.dot) return wrapCustomDot(item.dot as React.ReactNode);
 
     // Pending dot
     if (isPending) {
       if (pendingDot) {
-        return (
-          <div className={getTimelineDotClasses(undefined, true)}>
-            {pendingDot}
-          </div>
-        );
+        return wrapCustomDot(pendingDot);
       }
       return <div className={getPendingDotClasses()} />;
     }
@@ -146,22 +119,18 @@ export const Timeline: React.FC<TimelineProps> = ({
   const renderTimelineItem = (item: TimelineItem, index: number) => {
     const key = getItemKey(item, index);
     const isLast = index === processedItems.length - 1 && !pending;
-    const position = (item as { position?: TimelineItemPosition }).position;
+    const position = item.position;
 
     const itemClasses = getTimelineItemClasses(mode, position, isLast);
     const tailClasses = getTimelineTailClasses(mode, position, isLast);
     const headClasses = getTimelineHeadClasses(mode, position);
     const contentClasses = getTimelineContentClasses(mode, position);
 
-    // Custom render from prop
     if (renderItem) {
       return (
         <li key={key} className={itemClasses}>
-          {/* Tail (connector line) */}
           <div className={tailClasses} />
-          {/* Head (dot) */}
           <div className={headClasses}>{renderDotElement(item)}</div>
-          {/* Content */}
           <div className={contentClasses}>{renderItem(item, index)}</div>
         </li>
       );
@@ -170,11 +139,8 @@ export const Timeline: React.FC<TimelineProps> = ({
     // Default item render
     return (
       <li key={key} className={itemClasses}>
-        {/* Tail (connector line) */}
         <div className={tailClasses} />
-        {/* Head (dot) */}
         <div className={headClasses}>{renderDotElement(item)}</div>
-        {/* Content */}
         <div className={contentClasses}>
           {item.label && (
             <div className={timelineLabelClasses}>{item.label}</div>
@@ -194,8 +160,8 @@ export const Timeline: React.FC<TimelineProps> = ({
 
     const index = processedItems.length;
     const position =
-      mode === 'alternate'
-        ? ((index % 2 === 0 ? 'left' : 'right') as TimelineItemPosition)
+      mode === "alternate"
+        ? ((index % 2 === 0 ? "left" : "right") as TimelineItemPosition)
         : undefined;
 
     const itemClasses = getTimelineItemClasses(mode, position, true);
@@ -215,7 +181,11 @@ export const Timeline: React.FC<TimelineProps> = ({
   };
 
   return (
-    <ul className={containerClasses}>
+    <ul
+      {...ulProps}
+      className={containerClasses}
+      aria-busy={ulProps["aria-busy"] ?? (pending ? true : undefined)}
+    >
       {processedItems.map((item, index) => renderTimelineItem(item, index))}
       {renderPendingItem()}
     </ul>

@@ -9,10 +9,10 @@
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
 - 上一步：✅ `Descriptions` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）
-- 当前组件：`待定`
-- 当前步骤：等待下一条指令
-- 状态：`not-started`
-- 已优化组件数/需优化组件数：17/38
+- 当前组件：`Timeline`
+- 当前步骤：✅ Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）
+- 状态：`completed`
+- 已优化组件数/需优化组件数：18/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -300,7 +300,7 @@
 #### Timeline（P2，建议优化）
 
 - 思路：语义结构；可访问性（标记点/内容关联）。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）：core `timeline-utils` 默认灰色样式收敛为 CSS vars（含 fallback：`--tiger-border/--tiger-timeline-dot/--tiger-surface/--tiger-text-muted/--tiger-text/--tiger-primary`）；Vue Timeline 增加 `inheritAttrs: false` 并合并 `className/style` 与 `attrs.class/style`，新增并导出 `VueTimelineProps`，同时在 pending 时设置 `aria-busy`；React Timeline 支持 `ul` 原生属性透传并移除多余 `useMemo`，同样在 pending 时设置 `aria-busy`；精简 Vue/React Timeline 测试并移除过度 edge cases；同步更新 Timeline 文档的主题变量与 a11y 说明（Demo 无需修改）。
 
 #### Tree（P0/P1，建议优化）
 

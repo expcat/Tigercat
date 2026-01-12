@@ -28,5 +28,8 @@
     "**/pnpm-lock.yaml": true
   },
   "vitest.enable": true,
-  "vitest.commandLine": "pnpm test"
+  "vitest.commandLine": "pnpm test",
+  "chat.tools.terminal.autoApprove": {
+    "pnpm": true
+  }
 }

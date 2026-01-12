@@ -1,13 +1,8 @@
-import {
-  defineComponent,
-  computed,
-  h,
-  PropType,
-  type VNode,
-  type VNodeArrayChildren,
-} from 'vue';
+import { defineComponent, computed, h, PropType } from "vue";
 import {
   classNames,
+  coerceClassValue,
+  mergeStyleValues,
   getTimelineContainerClasses,
   getTimelineItemClasses,
   getTimelineTailClasses,
@@ -21,18 +16,23 @@ import {
   type TimelineMode,
   type TimelineItem,
   type TimelineItemPosition,
-} from '@tigercat/core';
+} from "@tigercat/core";
 
-type RawChildren =
-  | string
-  | number
-  | boolean
-  | VNode
-  | VNodeArrayChildren
-  | (() => unknown);
+type HChildren = Parameters<typeof h>[2];
+
+export interface VueTimelineProps {
+  items?: TimelineItem[];
+  mode?: TimelineMode;
+  pending?: boolean;
+  pendingDot?: unknown;
+  reverse?: boolean;
+  className?: string;
+  style?: Record<string, unknown>;
+}
 
 export const Timeline = defineComponent({
-  name: 'TigerTimeline',
+  name: "TigerTimeline",
+  inheritAttrs: false,
   props: {
     /**
      * Timeline data source
@@ -46,7 +46,7 @@ export const Timeline = defineComponent({
      */
     mode: {
       type: String as PropType<TimelineMode>,
-      default: 'left' as TimelineMode,
+      default: "left" as TimelineMode,
     },
     /**
      * Whether to show pending state
@@ -69,9 +69,16 @@ export const Timeline = defineComponent({
       type: Boolean,
       default: false,
     },
+    className: {
+      type: String,
+      default: undefined,
+    },
+    style: {
+      type: Object as PropType<Record<string, unknown>>,
+      default: undefined,
+    },
   },
-  setup(props, { slots }) {
-    // Process items with position for alternate mode
+  setup(props, { slots, attrs }) {
     const processedItems = computed(() => {
       let items = [...props.items];
 
@@ -80,24 +87,29 @@ export const Timeline = defineComponent({
       }
 
       // Assign positions for alternate mode
-      if (props.mode === 'alternate') {
+      if (props.mode === "alternate") {
         return items.map((item, index) => ({
           ...item,
           position: (item.position ||
-            (index % 2 === 0 ? 'left' : 'right')) as TimelineItemPosition,
+            (index % 2 === 0 ? "left" : "right")) as TimelineItemPosition,
         }));
       }
 
       return items;
     });
 
-    // Container classes
     const containerClasses = computed(() => {
       return classNames(
         getTimelineContainerClasses(props.mode),
-        timelineListClasses
+        timelineListClasses,
+        props.className,
+        coerceClassValue(attrs.class)
       );
     });
+
+    const containerStyle = computed(() =>
+      mergeStyleValues(attrs.style, props.style)
+    );
 
     function getItemKey(item: TimelineItem, index: number): string | number {
       return item.key || index;
@@ -107,7 +119,7 @@ export const Timeline = defineComponent({
       // Custom dot from slot
       if (slots.dot) {
         return h(
-          'div',
+          "div",
           { class: getTimelineDotClasses(undefined, true) },
           slots.dot({ item })
         );
@@ -116,9 +128,9 @@ export const Timeline = defineComponent({
       // Custom dot from item
       if (item.dot) {
         return h(
-          'div',
+          "div",
           { class: getTimelineDotClasses(undefined, true) },
-          item.dot as unknown as RawChildren
+          item.dot as unknown as HChildren
         );
       }
 
@@ -126,26 +138,26 @@ export const Timeline = defineComponent({
       if (isPending) {
         if (props.pendingDot) {
           return h(
-            'div',
+            "div",
             { class: getTimelineDotClasses(undefined, true) },
-            props.pendingDot as unknown as RawChildren
+            props.pendingDot as unknown as HChildren
           );
         }
-        return h('div', { class: getPendingDotClasses() });
+        return h("div", { class: getPendingDotClasses() });
       }
 
       // Default dot with optional color
       const dotClasses = getTimelineDotClasses(item.color);
       const dotStyle = item.color ? { backgroundColor: item.color } : {};
 
-      return h('div', { class: dotClasses, style: dotStyle });
+      return h("div", { class: dotClasses, style: dotStyle });
     }
 
     function renderTimelineItem(item: TimelineItem, index: number) {
       const key = getItemKey(item, index);
       const isLast =
         index === processedItems.value.length - 1 && !props.pending;
-      const position = (item as { position?: TimelineItemPosition }).position;
+      const position = item.position;
 
       const itemClasses = getTimelineItemClasses(props.mode, position, isLast);
       const tailClasses = getTimelineTailClasses(props.mode, position, isLast);
@@ -154,13 +166,10 @@ export const Timeline = defineComponent({
 
       // Custom render from slot
       if (slots.item) {
-        return h('li', { key, class: itemClasses }, [
-          // Tail (connector line)
-          h('div', { class: tailClasses }),
-          // Head (dot)
-          h('div', { class: headClasses }, [renderDot(item)]),
-          // Content
-          h('div', { class: contentClasses }, slots.item({ item, index })),
+        return h("li", { key, class: itemClasses }, [
+          h("div", { class: tailClasses }),
+          h("div", { class: headClasses }, [renderDot(item)]),
+          h("div", { class: contentClasses }, slots.item({ item, index })),
         ]);
       }
 
@@ -169,23 +178,20 @@ export const Timeline = defineComponent({
 
       if (item.label) {
         contentChildren.push(
-          h('div', { class: timelineLabelClasses }, item.label)
+          h("div", { class: timelineLabelClasses }, item.label)
         );
       }
 
       if (item.content) {
         contentChildren.push(
-          h('div', { class: timelineDescriptionClasses }, item.content)
+          h("div", { class: timelineDescriptionClasses }, item.content)
         );
       }
 
-      return h('li', { key, class: itemClasses }, [
-        // Tail (connector line)
-        h('div', { class: tailClasses }),
-        // Head (dot)
-        h('div', { class: headClasses }, [renderDot(item)]),
-        // Content
-        h('div', { class: contentClasses }, contentChildren),
+      return h("li", { key, class: itemClasses }, [
+        h("div", { class: tailClasses }),
+        h("div", { class: headClasses }, [renderDot(item)]),
+        h("div", { class: contentClasses }, contentChildren),
       ]);
     }
 
@@ -196,8 +202,8 @@ export const Timeline = defineComponent({
 
       const index = processedItems.value.length;
       const position =
-        props.mode === 'alternate'
-          ? ((index % 2 === 0 ? 'left' : 'right') as TimelineItemPosition)
+        props.mode === "alternate"
+          ? ((index % 2 === 0 ? "left" : "right") as TimelineItemPosition)
           : undefined;
 
       const itemClasses = getTimelineItemClasses(props.mode, position, true);
@@ -206,27 +212,37 @@ export const Timeline = defineComponent({
 
       // Pending content from slot
       if (slots.pending) {
-        return h('li', { key: 'pending', class: itemClasses }, [
-          h('div', { class: headClasses }, [renderDot({}, true)]),
-          h('div', { class: contentClasses }, slots.pending()),
+        return h("li", { key: "pending", class: itemClasses }, [
+          h("div", { class: headClasses }, [renderDot({}, true)]),
+          h("div", { class: contentClasses }, slots.pending()),
         ]);
       }
 
-      return h('li', { key: 'pending', class: itemClasses }, [
-        h('div', { class: headClasses }, [renderDot({}, true)]),
-        h('div', { class: contentClasses }, [
-          h('div', { class: timelineDescriptionClasses }, 'Loading...'),
+      return h("li", { key: "pending", class: itemClasses }, [
+        h("div", { class: headClasses }, [renderDot({}, true)]),
+        h("div", { class: contentClasses }, [
+          h("div", { class: timelineDescriptionClasses }, "Loading..."),
         ]),
       ]);
     }
 
     return () => {
-      return h('ul', { class: containerClasses.value }, [
-        ...processedItems.value.map((item, index) =>
-          renderTimelineItem(item, index)
-        ),
-        renderPendingItem(),
-      ]);
+      return h(
+        "ul",
+        {
+          ...attrs,
+          class: containerClasses.value,
+          style: containerStyle.value,
+          "aria-busy":
+            attrs["aria-busy"] ?? (props.pending ? "true" : undefined),
+        },
+        [
+          ...processedItems.value.map((item, index) =>
+            renderTimelineItem(item, index)
+          ),
+          renderPendingItem(),
+        ]
+      );
     };
   },
 });
