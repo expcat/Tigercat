@@ -8,20 +8,20 @@
 
 ```vue
 <script setup>
-import { reactive } from 'vue';
-import { Form, FormItem } from '@tigercat/vue';
+import { reactive } from "vue";
+import { Form, FormItem } from "@tigercat/vue";
 
 const formData = reactive({
-  username: '',
-  email: '',
-  password: '',
+  username: "",
+  email: "",
+  password: "",
 });
 
 const handleSubmit = ({ valid, values }) => {
   if (valid) {
-    console.log('Form submitted:', values);
+    console.log("Form submitted:", values);
   } else {
-    console.log('Form validation failed');
+    console.log("Form validation failed");
   }
 };
 </script>
@@ -45,22 +45,22 @@ const handleSubmit = ({ valid, values }) => {
 ### React
 
 ```tsx
-import { useState, useRef } from 'react';
-import { Form, FormItem, FormHandle } from '@tigercat/react';
+import { useState, useRef } from "react";
+import { Form, FormItem, FormHandle } from "@tigercat/react";
 
 function App() {
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
+    username: "",
+    email: "",
+    password: "",
   });
   const formRef = useRef<FormHandle>(null);
 
   const handleSubmit = ({ valid, values }) => {
     if (valid) {
-      console.log('Form submitted:', values);
+      console.log("Form submitted:", values);
     } else {
-      console.log('Form validation failed');
+      console.log("Form validation failed");
     }
   };
 
@@ -73,21 +73,21 @@ function App() {
       <FormItem label="用户名" name="username">
         <input
           value={formData.username}
-          onChange={(e) => updateField('username', e.target.value)}
+          onChange={(e) => updateField("username", e.target.value)}
         />
       </FormItem>
       <FormItem label="邮箱" name="email">
         <input
           type="email"
           value={formData.email}
-          onChange={(e) => updateField('email', e.target.value)}
+          onChange={(e) => updateField("email", e.target.value)}
         />
       </FormItem>
       <FormItem label="密码" name="password">
         <input
           type="password"
           value={formData.password}
-          onChange={(e) => updateField('password', e.target.value)}
+          onChange={(e) => updateField("password", e.target.value)}
         />
       </FormItem>
       <button type="submit">提交</button>
@@ -104,46 +104,46 @@ function App() {
 
 ```vue
 <script setup>
-import { reactive, ref } from 'vue';
-import { Form, FormItem } from '@tigercat/vue';
+import { reactive, ref } from "vue";
+import { Form, FormItem } from "@tigercat/vue";
 
 const formRef = ref();
 
 const formData = reactive({
-  username: '',
-  email: '',
-  age: '',
-  website: '',
+  username: "",
+  email: "",
+  age: "",
+  website: "",
 });
 
 const rules = {
   username: [
-    { required: true, message: '请输入用户名' },
-    { min: 3, max: 20, message: '用户名长度应在 3 到 20 个字符之间' },
+    { required: true, message: "请输入用户名" },
+    { min: 3, max: 20, message: "用户名长度应在 3 到 20 个字符之间" },
   ],
   email: [
-    { required: true, message: '请输入邮箱' },
-    { type: 'email', message: '请输入有效的邮箱地址' },
+    { required: true, message: "请输入邮箱" },
+    { type: "email", message: "请输入有效的邮箱地址" },
   ],
   age: [
-    { required: true, message: '请输入年龄' },
-    { type: 'number', message: '年龄必须是数字' },
-    { min: 1, max: 150, message: '年龄必须在 1 到 150 之间' },
+    { required: true, message: "请输入年龄" },
+    { type: "number", message: "年龄必须是数字" },
+    { min: 1, max: 150, message: "年龄必须在 1 到 150 之间" },
   ],
-  website: [{ type: 'url', message: '请输入有效的 URL' }],
+  website: [{ type: "url", message: "请输入有效的 URL" }],
 };
 
 const handleSubmit = async ({ valid, values, errors }) => {
   if (valid) {
-    console.log('提交成功:', values);
+    console.log("提交成功:", values);
   } else {
-    console.log('验证失败:', errors);
+    console.log("验证失败:", errors);
   }
 };
 
 const validateManually = async () => {
   const valid = await formRef.value.validate();
-  console.log('手动验证结果:', valid);
+  console.log("手动验证结果:", valid);
 };
 </script>
 
@@ -170,46 +170,46 @@ const validateManually = async () => {
 ### React
 
 ```tsx
-import { useState, useRef } from 'react';
-import { Form, FormItem, FormHandle, FormRules } from '@tigercat/react';
+import { useState, useRef } from "react";
+import { Form, FormItem, FormHandle, FormRules } from "@tigercat/react";
 
 function App() {
   const formRef = useRef<FormHandle>(null);
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    age: '',
-    website: '',
+    username: "",
+    email: "",
+    age: "",
+    website: "",
   });
 
   const rules: FormRules = {
     username: [
-      { required: true, message: '请输入用户名' },
-      { min: 3, max: 20, message: '用户名长度应在 3 到 20 个字符之间' },
+      { required: true, message: "请输入用户名" },
+      { min: 3, max: 20, message: "用户名长度应在 3 到 20 个字符之间" },
     ],
     email: [
-      { required: true, message: '请输入邮箱' },
-      { type: 'email', message: '请输入有效的邮箱地址' },
+      { required: true, message: "请输入邮箱" },
+      { type: "email", message: "请输入有效的邮箱地址" },
     ],
     age: [
-      { required: true, message: '请输入年龄' },
-      { type: 'number', message: '年龄必须是数字' },
-      { min: 1, max: 150, message: '年龄必须在 1 到 150 之间' },
+      { required: true, message: "请输入年龄" },
+      { type: "number", message: "年龄必须是数字" },
+      { min: 1, max: 150, message: "年龄必须在 1 到 150 之间" },
     ],
-    website: [{ type: 'url', message: '请输入有效的 URL' }],
+    website: [{ type: "url", message: "请输入有效的 URL" }],
   };
 
   const handleSubmit = ({ valid, values, errors }) => {
     if (valid) {
-      console.log('提交成功:', values);
+      console.log("提交成功:", values);
     } else {
-      console.log('验证失败:', errors);
+      console.log("验证失败:", errors);
     }
   };
 
   const validateManually = async () => {
     const valid = await formRef.current?.validate();
-    console.log('手动验证结果:', valid);
+    console.log("手动验证结果:", valid);
   };
 
   const updateField = (field: string, value: unknown) => {
@@ -221,26 +221,26 @@ function App() {
       <FormItem label="用户名" name="username">
         <input
           value={formData.username}
-          onChange={(e) => updateField('username', e.target.value)}
+          onChange={(e) => updateField("username", e.target.value)}
         />
       </FormItem>
       <FormItem label="邮箱" name="email">
         <input
           value={formData.email}
-          onChange={(e) => updateField('email', e.target.value)}
+          onChange={(e) => updateField("email", e.target.value)}
         />
       </FormItem>
       <FormItem label="年龄" name="age">
         <input
           type="number"
           value={formData.age}
-          onChange={(e) => updateField('age', Number(e.target.value))}
+          onChange={(e) => updateField("age", Number(e.target.value))}
         />
       </FormItem>
       <FormItem label="网站" name="website">
         <input
           value={formData.website}
-          onChange={(e) => updateField('website', e.target.value)}
+          onChange={(e) => updateField("website", e.target.value)}
         />
       </FormItem>
       <button type="submit">提交</button>
@@ -260,41 +260,41 @@ function App() {
 
 ```vue
 <script setup>
-import { reactive } from 'vue';
-import { Form, FormItem } from '@tigercat/vue';
+import { reactive } from "vue";
+import { Form, FormItem } from "@tigercat/vue";
 
 const formData = reactive({
-  password: '',
-  confirmPassword: '',
+  password: "",
+  confirmPassword: "",
 });
 
 const validatePassword = (value, values) => {
   if (value.length < 6) {
-    return '密码至少需要 6 个字符';
+    return "密码至少需要 6 个字符";
   }
   if (!/[A-Z]/.test(value)) {
-    return '密码必须包含至少一个大写字母';
+    return "密码必须包含至少一个大写字母";
   }
   if (!/[0-9]/.test(value)) {
-    return '密码必须包含至少一个数字';
+    return "密码必须包含至少一个数字";
   }
   return true;
 };
 
 const validateConfirmPassword = (value, values) => {
   if (value !== values.password) {
-    return '两次输入的密码不一致';
+    return "两次输入的密码不一致";
   }
   return true;
 };
 
 const rules = {
   password: [
-    { required: true, message: '请输入密码' },
+    { required: true, message: "请输入密码" },
     { validator: validatePassword },
   ],
   confirmPassword: [
-    { required: true, message: '请再次输入密码' },
+    { required: true, message: "请再次输入密码" },
     { validator: validateConfirmPassword },
   ],
 };
@@ -316,24 +316,24 @@ const rules = {
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Form, FormItem, FormRules } from '@tigercat/react';
+import { useState } from "react";
+import { Form, FormItem, FormRules } from "@tigercat/react";
 
 function App() {
   const [formData, setFormData] = useState({
-    password: '',
-    confirmPassword: '',
+    password: "",
+    confirmPassword: "",
   });
 
   const validatePassword = (value: string, values?: { password?: string }) => {
     if (value.length < 6) {
-      return '密码至少需要 6 个字符';
+      return "密码至少需要 6 个字符";
     }
     if (!/[A-Z]/.test(value)) {
-      return '密码必须包含至少一个大写字母';
+      return "密码必须包含至少一个大写字母";
     }
     if (!/[0-9]/.test(value)) {
-      return '密码必须包含至少一个数字';
+      return "密码必须包含至少一个数字";
     }
     return true;
   };
@@ -343,18 +343,18 @@ function App() {
     values?: { password?: string }
   ) => {
     if (value !== values?.password) {
-      return '两次输入的密码不一致';
+      return "两次输入的密码不一致";
     }
     return true;
   };
 
   const rules: FormRules = {
     password: [
-      { required: true, message: '请输入密码' },
+      { required: true, message: "请输入密码" },
       { validator: validatePassword },
     ],
     confirmPassword: [
-      { required: true, message: '请再次输入密码' },
+      { required: true, message: "请再次输入密码" },
       { validator: validateConfirmPassword },
     ],
   };
@@ -369,14 +369,14 @@ function App() {
         <input
           type="password"
           value={formData.password}
-          onChange={(e) => updateField('password', e.target.value)}
+          onChange={(e) => updateField("password", e.target.value)}
         />
       </FormItem>
       <FormItem label="确认密码" name="confirmPassword">
         <input
           type="password"
           value={formData.confirmPassword}
-          onChange={(e) => updateField('confirmPassword', e.target.value)}
+          onChange={(e) => updateField("confirmPassword", e.target.value)}
         />
       </FormItem>
       <button type="submit">提交</button>
@@ -599,10 +599,10 @@ import type {
   FormLabelAlign,
   FormLabelPosition,
   FormSize,
-} from '@tigercat/core';
+} from "@tigercat/core";
 
 // Vue
-import type { Form, FormItem } from '@tigercat/vue';
+import type { Form, FormItem } from "@tigercat/vue";
 
 // React
 import type {
@@ -611,7 +611,7 @@ import type {
   FormHandle,
   FormSubmitEvent,
   FormContextValue,
-} from '@tigercat/react';
+} from "@tigercat/react";
 ```
 
 ## 样式定制
@@ -655,11 +655,12 @@ Form 组件使用标准的 CSS 类名，可以通过覆盖这些类名来自定�
 
 ## 无障碍 (Accessibility)
 
-- FormItem 自动为输入字段关联 label
-- 支持键盘导航
-- 提供清晰的错误消息显示
-- 必填字段显示视觉指示（星号）
-- 支持屏幕阅读器
+- `FormItem` 会为字段容器添加 `role="group"`，并通过 `aria-labelledby` 关联到 label
+- 当存在错误消息时：字段会自动添加 `aria-invalid="true"`，并用 `aria-describedby` 指向错误文本
+- 错误消息节点带 `role="alert"`，便于屏幕阅读器及时播报
+- 必填字段会提供视觉提示（星号）并同步 `aria-required`
+
+> 如果你在 `FormItem` 里放的是自定义控件组件，请确保它能把 `id` / `aria-*` 透传到最终可聚焦的表单控件（Tigercat 内置的 `Input/Textarea/Select` 等已支持）。
 
 ## 注意事项
 
@@ -670,9 +671,10 @@ Form 组件使用标准的 CSS 类名，可以通过覆盖这些类名来自定�
 
 2. **验证时机**：
 
-   - 表单提交时会自动触发完整验证
-   - 字段失焦（blur）和值改变（change）时会触发单个字段验证
-   - 可以通过 `trigger` 属性自定义验证触发时机
+- 表单提交时会自动触发完整验证
+- 字段失焦（blur）和值改变（change）时会触发单个字段验证
+- `FormItem` 的 `rules` 会覆盖 `Form` 的同名字段规则
+- `trigger` 仅影响字段级校验（blur/change），提交时仍会进行整表校验
 
 3. **异步验证**：
 
@@ -696,55 +698,55 @@ Form 组件使用标准的 CSS 类名，可以通过覆盖这些类名来自定�
 
 ```vue
 <script setup>
-import { reactive, ref } from 'vue';
-import { Form, FormItem, Button } from '@tigercat/vue';
+import { reactive, ref } from "vue";
+import { Form, FormItem, Button } from "@tigercat/vue";
 
 const formRef = ref();
 const loading = ref(false);
 
 const formData = reactive({
-  username: '',
-  email: '',
-  password: '',
-  confirmPassword: '',
+  username: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
   agree: false,
 });
 
 const checkUsernameExists = async (value) => {
   // 模拟 API 调用
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  if (value === 'admin') {
-    return '用户名已存在';
+  if (value === "admin") {
+    return "用户名已存在";
   }
   return true;
 };
 
 const rules = {
   username: [
-    { required: true, message: '请输入用户名' },
-    { min: 3, max: 20, message: '用户名长度应在 3 到 20 个字符之间' },
+    { required: true, message: "请输入用户名" },
+    { min: 3, max: 20, message: "用户名长度应在 3 到 20 个字符之间" },
     { validator: checkUsernameExists },
   ],
   email: [
-    { required: true, message: '请输入邮箱' },
-    { type: 'email', message: '请输入有效的邮箱地址' },
+    { required: true, message: "请输入邮箱" },
+    { type: "email", message: "请输入有效的邮箱地址" },
   ],
   password: [
-    { required: true, message: '请输入密码' },
-    { min: 6, message: '密码至少需要 6 个字符' },
+    { required: true, message: "请输入密码" },
+    { min: 6, message: "密码至少需要 6 个字符" },
   ],
   confirmPassword: [
-    { required: true, message: '请再次输入密码' },
+    { required: true, message: "请再次输入密码" },
     {
       validator: (value, values) => {
-        return value === values.password || '两次输入的密码不一致';
+        return value === values.password || "两次输入的密码不一致";
       },
     },
   ],
   agree: [
     {
       validator: (value) => {
-        return value === true || '请同意用户协议';
+        return value === true || "请同意用户协议";
       },
     },
   ],
@@ -757,9 +759,9 @@ const handleSubmit = async ({ valid, values }) => {
   try {
     // 提交表单数据
     await submitRegistration(values);
-    alert('注册成功！');
+    alert("注册成功！");
   } catch (error) {
-    alert('注册失败：' + error.message);
+    alert("注册失败：" + error.message);
   } finally {
     loading.value = false;
   }
@@ -768,7 +770,7 @@ const handleSubmit = async ({ valid, values }) => {
 const handleReset = () => {
   formRef.value.resetFields();
   Object.keys(formData).forEach((key) => {
-    formData[key] = '';
+    formData[key] = "";
   });
   formData.agree = false;
 };
@@ -780,7 +782,8 @@ const handleReset = () => {
     :model="formData"
     :rules="rules"
     label-width="100px"
-    @submit="handleSubmit">
+    @submit="handleSubmit"
+  >
     <FormItem label="用户名" name="username">
       <input v-model="formData.username" />
     </FormItem>
@@ -810,55 +813,55 @@ const handleReset = () => {
 #### React
 
 ```tsx
-import { useState, useRef } from 'react';
-import { Form, FormItem, Button, FormHandle, FormRules } from '@tigercat/react';
+import { useState, useRef } from "react";
+import { Form, FormItem, Button, FormHandle, FormRules } from "@tigercat/react";
 
 function RegistrationForm() {
   const formRef = useRef<FormHandle>(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
     agree: false,
   });
 
   const checkUsernameExists = async (value: string) => {
     // 模拟 API 调用
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    if (value === 'admin') {
-      return '用户名已存在';
+    if (value === "admin") {
+      return "用户名已存在";
     }
     return true;
   };
 
   const rules: FormRules = {
     username: [
-      { required: true, message: '请输入用户名' },
-      { min: 3, max: 20, message: '用户名长度应在 3 到 20 个字符之间' },
+      { required: true, message: "请输入用户名" },
+      { min: 3, max: 20, message: "用户名长度应在 3 到 20 个字符之间" },
       { validator: checkUsernameExists },
     ],
     email: [
-      { required: true, message: '请输入邮箱' },
-      { type: 'email', message: '请输入有效的邮箱地址' },
+      { required: true, message: "请输入邮箱" },
+      { type: "email", message: "请输入有效的邮箱地址" },
     ],
     password: [
-      { required: true, message: '请输入密码' },
-      { min: 6, message: '密码至少需要 6 个字符' },
+      { required: true, message: "请输入密码" },
+      { min: 6, message: "密码至少需要 6 个字符" },
     ],
     confirmPassword: [
-      { required: true, message: '请再次输入密码' },
+      { required: true, message: "请再次输入密码" },
       {
         validator: (value, values) => {
-          return value === values?.password || '两次输入的密码不一致';
+          return value === values?.password || "两次输入的密码不一致";
         },
       },
     ],
     agree: [
       {
         validator: (value) => {
-          return value === true || '请同意用户协议';
+          return value === true || "请同意用户协议";
         },
       },
     ],
@@ -871,9 +874,9 @@ function RegistrationForm() {
     try {
       // 提交表单数据
       await submitRegistration(values);
-      alert('注册成功！');
+      alert("注册成功！");
     } catch (error) {
-      alert('注册失败：' + error.message);
+      alert("注册失败：" + error.message);
     } finally {
       setLoading(false);
     }
@@ -882,10 +885,10 @@ function RegistrationForm() {
   const handleReset = () => {
     formRef.current?.resetFields();
     setFormData({
-      username: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
       agree: false,
     });
   };
@@ -900,32 +903,33 @@ function RegistrationForm() {
       model={formData}
       rules={rules}
       labelWidth="100px"
-      onSubmit={handleSubmit}>
+      onSubmit={handleSubmit}
+    >
       <FormItem label="用户名" name="username">
         <input
           value={formData.username}
-          onChange={(e) => updateField('username', e.target.value)}
+          onChange={(e) => updateField("username", e.target.value)}
         />
       </FormItem>
       <FormItem label="邮箱" name="email">
         <input
           type="email"
           value={formData.email}
-          onChange={(e) => updateField('email', e.target.value)}
+          onChange={(e) => updateField("email", e.target.value)}
         />
       </FormItem>
       <FormItem label="密码" name="password">
         <input
           type="password"
           value={formData.password}
-          onChange={(e) => updateField('password', e.target.value)}
+          onChange={(e) => updateField("password", e.target.value)}
         />
       </FormItem>
       <FormItem label="确认密码" name="confirmPassword">
         <input
           type="password"
           value={formData.confirmPassword}
-          onChange={(e) => updateField('confirmPassword', e.target.value)}
+          onChange={(e) => updateField("confirmPassword", e.target.value)}
         />
       </FormItem>
       <FormItem name="agree">
@@ -933,7 +937,7 @@ function RegistrationForm() {
           <input
             type="checkbox"
             checked={formData.agree}
-            onChange={(e) => updateField('agree', e.target.checked)}
+            onChange={(e) => updateField("agree", e.target.checked)}
           />
           我同意用户协议
         </label>

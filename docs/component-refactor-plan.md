@@ -19,10 +19,12 @@
 - 上一步：✅ `Select` Step2 键盘/aria/focus（2026-01-13）
 - 上一步：✅ `Select` Step3 视觉与主题（状态色全部 CSS vars）（2026-01-13）
 - 上一步：✅ `Select` Step4 tests（键盘 + 选中 + 清空 + 搜索）（2026-01-13）
+- 上一步：✅ `Form/FormItem` Step1 API/校验路径收敛（2026-01-13）
+- 上一步：✅ `Form/FormItem` Step2 交互与 a11y（2026-01-13）
 - 当前组件：`Form/FormItem`
-- 当前步骤：Step1 API/校验路径收敛
+- 当前步骤：Step3 tests
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：30/38
+- 已优化组件数/需优化组件数：31/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -275,7 +277,8 @@ return h("div", { class: "..." }, children);
   - 错误展示：aria-describedby 指向 error 文本
   - 状态一致：submit 时 errors 使用最新结果（避免闭包旧值）
 - 可拆分：API/校验路径收敛 → a11y → tests。
-- 状态：未开始
+- 状态：✅ Step1 API/校验路径收敛（2026-01-13）：移除 Vue/React Form 的动态 `import('@tigercat/core')`，统一走 core 静态校验入口；字段值读取支持 dotted path；FormItem.rules 真正覆盖 Form.rules，并支持按 `trigger` 决定 blur/change 的字段级校验；提交时使用最新校验结果回传 errors；精简 Form 测试并移除快照；同步更新 Form/FormItem 文档。
+- 状态：✅ Step2 交互与 a11y（2026-01-13）：FormItem 为字段容器补齐 `role=group` 与 `aria-labelledby/aria-describedby` 关联；有错误时自动标记 `aria-invalid/aria-required` 并为错误文本添加 `role=alert`；在“单子节点”场景对字段控件注入 `id/aria-*` 与校验触发（Vue 同时监听 `focusout` 与 `input`，React 复用 `useId`）；同步更新 Vue/React Form 测试为更稳定的 a11y 断言，并更新 Form 文档无障碍说明。
 
 ### D. 导航（Navigation）
 

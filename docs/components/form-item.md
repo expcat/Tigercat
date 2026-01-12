@@ -8,12 +8,12 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Form, FormItem, Input, Button } from '@tigercat/vue';
+import { ref } from "vue";
+import { Form, FormItem, Input, Button } from "@tigercat/vue";
 
 const formData = ref({
-  username: '',
-  email: '',
+  username: "",
+  email: "",
 });
 </script>
 
@@ -37,13 +37,13 @@ const formData = ref({
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Form, FormItem, Input, Button } from '@tigercat/react';
+import { useState } from "react";
+import { Form, FormItem, Input, Button } from "@tigercat/react";
 
 function App() {
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
+    username: "",
+    email: "",
   });
 
   return (
@@ -90,7 +90,8 @@ function App() {
     <FormItem
       label="邮箱"
       name="email"
-      :rules="{ required: true, message: '请输入邮箱' }">
+      :rules="{ required: true, message: '请输入邮箱' }"
+    >
       <Input v-model="formData.email" />
     </FormItem>
   </Form>
@@ -112,7 +113,8 @@ function App() {
   <FormItem
     label="邮箱"
     name="email"
-    rules={{ required: true, message: '请输入邮箱' }}>
+    rules={{ required: true, message: "请输入邮箱" }}
+  >
     <Input
       value={formData.email}
       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -173,32 +175,32 @@ FormItem 支持多种验证规则。
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Form, FormItem, Input, Button } from '@tigercat/vue';
+import { ref } from "vue";
+import { Form, FormItem, Input, Button } from "@tigercat/vue";
 
 const formData = ref({
-  username: '',
-  password: '',
-  confirmPassword: '',
+  username: "",
+  password: "",
+  confirmPassword: "",
 });
 
 const usernameRules = [
-  { required: true, message: '请输入用户名' },
-  { min: 3, max: 20, message: '用户名长度应在 3-20 个字符之间' },
+  { required: true, message: "请输入用户名" },
+  { min: 3, max: 20, message: "用户名长度应在 3-20 个字符之间" },
 ];
 
 const passwordRules = [
-  { required: true, message: '请输入密码' },
-  { min: 6, message: '密码至少 6 个字符' },
+  { required: true, message: "请输入密码" },
+  { min: 6, message: "密码至少 6 个字符" },
 ];
 
 const confirmPasswordRules = [
-  { required: true, message: '请确认密码' },
+  { required: true, message: "请确认密码" },
   {
     validator: (value) => {
       return value === formData.value.password;
     },
-    message: '两次输入的密码不一致',
+    message: "两次输入的密码不一致",
   },
 ];
 </script>
@@ -216,7 +218,8 @@ const confirmPasswordRules = [
     <FormItem
       label="确认密码"
       name="confirmPassword"
-      :rules="confirmPasswordRules">
+      :rules="confirmPasswordRules"
+    >
       <Input v-model="formData.confirmPassword" type="password" />
     </FormItem>
 
@@ -230,31 +233,31 @@ const confirmPasswordRules = [
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Form, FormItem, Input, Button } from '@tigercat/react';
+import { useState } from "react";
+import { Form, FormItem, Input, Button } from "@tigercat/react";
 
 function RegistrationForm() {
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    confirmPassword: '',
+    username: "",
+    password: "",
+    confirmPassword: "",
   });
 
   const usernameRules = [
-    { required: true, message: '请输入用户名' },
-    { min: 3, max: 20, message: '用户名长度应在 3-20 个字符之间' },
+    { required: true, message: "请输入用户名" },
+    { min: 3, max: 20, message: "用户名长度应在 3-20 个字符之间" },
   ];
 
   const passwordRules = [
-    { required: true, message: '请输入密码' },
-    { min: 6, message: '密码至少 6 个字符' },
+    { required: true, message: "请输入密码" },
+    { min: 6, message: "密码至少 6 个字符" },
   ];
 
   const confirmPasswordRules = [
-    { required: true, message: '请确认密码' },
+    { required: true, message: "请确认密码" },
     {
       validator: (value: string) => value === formData.password,
-      message: '两次输入的密码不一致',
+      message: "两次输入的密码不一致",
     },
   ];
 
@@ -282,7 +285,8 @@ function RegistrationForm() {
       <FormItem
         label="确认密码"
         name="confirmPassword"
-        rules={confirmPasswordRules}>
+        rules={confirmPasswordRules}
+      >
         <Input
           type="password"
           value={formData.confirmPassword}
@@ -308,17 +312,17 @@ function RegistrationForm() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Form, FormItem, Input } from '@tigercat/vue';
+import { ref } from "vue";
+import { Form, FormItem, Input } from "@tigercat/vue";
 
-const formData = ref({ email: '' });
-const emailError = ref('');
+const formData = ref({ email: "" });
+const emailError = ref("");
 
 const validateEmail = () => {
-  if (!formData.value.email.includes('@')) {
-    emailError.value = '邮箱格式不正确';
+  if (!formData.value.email.includes("@")) {
+    emailError.value = "邮箱格式不正确";
   } else {
-    emailError.value = '';
+    emailError.value = "";
   }
 };
 </script>
@@ -335,18 +339,18 @@ const validateEmail = () => {
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Form, FormItem, Input } from '@tigercat/react';
+import { useState } from "react";
+import { Form, FormItem, Input } from "@tigercat/react";
 
 function CustomErrorExample() {
-  const [formData, setFormData] = useState({ email: '' });
-  const [emailError, setEmailError] = useState('');
+  const [formData, setFormData] = useState({ email: "" });
+  const [emailError, setEmailError] = useState("");
 
   const validateEmail = () => {
-    if (!formData.email.includes('@')) {
-      setEmailError('邮箱格式不正确');
+    if (!formData.email.includes("@")) {
+      setEmailError("邮箱格式不正确");
     } else {
-      setEmailError('');
+      setEmailError("");
     }
   };
 
@@ -402,19 +406,12 @@ function CustomErrorExample() {
 | ------- | ------------ |
 | default | 表单控件内容 |
 
-### FormRule 类型定义
+### FormRule 验证规则
 
-```typescript
-interface FormRule {
-  required?: boolean; // 是否必填
-  message?: string; // 错误提示信息
-  min?: number; // 最小长度/值
-  max?: number; // 最大长度/值
-  pattern?: RegExp; // 正则表达式验证
-  validator?: (value: unknown) => boolean; // 自定义验证函数
-  trigger?: 'blur' | 'change'; // 触发时机
-}
-```
+`FormRule` 来自 `@tigercat/core`，支持 `required/min/max/pattern/type/validator/trigger/transform`。
+
+- `trigger`：`'blur' | 'change' | 'submit'`
+- 默认 `trigger`：`['change', 'blur']`
 
 ## 最佳实践
 
@@ -425,10 +422,10 @@ interface FormRule {
 ```vue
 <script setup>
 const formData = ref({
-  username: '',
+  username: "",
   profile: {
-    email: '',
-    phone: '',
+    email: "",
+    phone: "",
   },
 });
 </script>
@@ -532,12 +529,12 @@ FormItem 会继承 Form 的 `labelPosition` 和 `labelAlign` 设置，无需单�
 
 ```vue
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
 const formRef = ref(null);
 
 const validateUsername = () => {
-  formRef.value?.validateField('username');
+  formRef.value?.validateField("username");
 };
 </script>
 
@@ -559,7 +556,7 @@ const validateUsername = () => {
 const formRef = ref(null);
 
 const clearErrors = () => {
-  formRef.value?.clearValidate('username'); // 清除特定字段
+  formRef.value?.clearValidate("username"); // 清除特定字段
   // 或
   formRef.value?.clearValidate(); // 清除所有字段
 };
@@ -642,11 +639,11 @@ FormItem 使用以下 CSS 类名，可以自定义样式：
 FormItem 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { FormItemProps, FormRule } from '@tigercat/core';
+import type { FormItemProps, FormRule } from "@tigercat/core";
 // Vue
-import type { FormItem } from '@tigercat/vue';
+import type { FormItem } from "@tigercat/vue";
 // React
-import { FormItem } from '@tigercat/react';
+import { FormItem } from "@tigercat/react";
 ```
 
 ## 相关组件
@@ -665,58 +662,58 @@ import { FormItem } from '@tigercat/react';
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Form, FormItem, Input, Select, Checkbox, Button } from '@tigercat/vue';
+import { ref } from "vue";
+import { Form, FormItem, Input, Select, Checkbox, Button } from "@tigercat/vue";
 
 const formRef = ref(null);
 const formData = ref({
-  username: '',
-  email: '',
-  password: '',
-  confirmPassword: '',
-  country: '',
+  username: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+  country: "",
   agreeTerms: false,
 });
 
 const rules = {
   username: [
-    { required: true, message: '请输入用户名' },
-    { min: 3, max: 20, message: '用户名长度应在 3-20 个字符之间' },
+    { required: true, message: "请输入用户名" },
+    { min: 3, max: 20, message: "用户名长度应在 3-20 个字符之间" },
   ],
   email: [
-    { required: true, message: '请输入邮箱' },
-    { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: '邮箱格式不正确' },
+    { required: true, message: "请输入邮箱" },
+    { pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "邮箱格式不正确" },
   ],
   password: [
-    { required: true, message: '请输入密码' },
-    { min: 6, message: '密码至少 6 个字符' },
+    { required: true, message: "请输入密码" },
+    { min: 6, message: "密码至少 6 个字符" },
   ],
   confirmPassword: [
-    { required: true, message: '请确认密码' },
+    { required: true, message: "请确认密码" },
     {
       validator: (value) => value === formData.value.password,
-      message: '两次输入的密码不一致',
+      message: "两次输入的密码不一致",
     },
   ],
-  country: [{ required: true, message: '请选择国家' }],
+  country: [{ required: true, message: "请选择国家" }],
   agreeTerms: [
     {
       validator: (value) => value === true,
-      message: '请同意服务条款',
+      message: "请同意服务条款",
     },
   ],
 };
 
 const countries = [
-  { value: 'cn', label: '中国' },
-  { value: 'us', label: '美国' },
-  { value: 'uk', label: '英国' },
+  { value: "cn", label: "中国" },
+  { value: "us", label: "美国" },
+  { value: "uk", label: "英国" },
 ];
 
 const handleSubmit = async () => {
   const valid = await formRef.value?.validate();
   if (valid) {
-    console.log('提交表单:', formData.value);
+    console.log("提交表单:", formData.value);
   }
 };
 </script>
@@ -727,7 +724,8 @@ const handleSubmit = async () => {
     :model="formData"
     :rules="rules"
     label-width="100px"
-    class="max-w-md mx-auto">
+    class="max-w-md mx-auto"
+  >
     <FormItem label="用户名" name="username">
       <Input v-model="formData.username" placeholder="请输入用户名" />
     </FormItem>
@@ -740,21 +738,24 @@ const handleSubmit = async () => {
       <Input
         v-model="formData.password"
         type="password"
-        placeholder="请输入密码" />
+        placeholder="请输入密码"
+      />
     </FormItem>
 
     <FormItem label="确认密码" name="confirmPassword">
       <Input
         v-model="formData.confirmPassword"
         type="password"
-        placeholder="请再次输入密码" />
+        placeholder="请再次输入密码"
+      />
     </FormItem>
 
     <FormItem label="国家" name="country">
       <Select
         v-model="formData.country"
         :options="countries"
-        placeholder="请选择国家" />
+        placeholder="请选择国家"
+      />
     </FormItem>
 
     <FormItem name="agreeTerms">

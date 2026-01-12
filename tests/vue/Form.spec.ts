@@ -2,230 +2,123 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
-import { render } from '@testing-library/vue'
-import { Form } from '@tigercat/vue'
-import {
-  renderWithProps,
-  expectNoA11yViolations,
-} from '../utils'
+import { describe, it, expect } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/vue";
+import { defineComponent, reactive, h } from "vue";
+import { Form, FormItem, type FormRule } from "@tigercat/vue";
+import { expectNoA11yViolations } from "../utils";
 
-describe('Form', () => {
-  describe('Rendering', () => {
-    it('should render with default props', () => {
-      const { container } = render(Form, {
-        props: {
-          model: {},
-        },
-        slots: {
-          default: '<div>Form content</div>',
-        },
-      })
-      
-      const form = container.querySelector('form')
-      expect(form).toBeInTheDocument()
-    })
+describe("Form", () => {
+  it("renders a semantic form element", () => {
+    const { container } = render(Form, {
+      props: { model: {} },
+      slots: { default: "<div>Content</div>" },
+    });
 
-    it('should render with form model', () => {
-      const model = { username: '', email: '' }
-      const { container } = render(Form, {
-        props: { model },
-        slots: {
-          default: '<div>Form content</div>',
-        },
-      })
-      
-      const form = container.querySelector('form')
-      expect(form).toBeInTheDocument()
-    })
+    const form = container.querySelector("form");
+    expect(form).toBeInTheDocument();
+    expect(form?.tagName.toLowerCase()).toBe("form");
+  });
 
-    it('should render form content via slot', () => {
-      const { getByText } = render(Form, {
-        props: {
-          model: {},
-        },
-        slots: {
-          default: '<div>Custom form content</div>',
-        },
-      })
-      
-      expect(getByText('Custom form content')).toBeInTheDocument()
-    })
-  })
+  it("validates with FormItem rules override on blur", async () => {
+    const rules: FormRule[] = [
+      { required: true, message: "Username is required" },
+    ];
+    const Demo = defineComponent({
+      setup() {
+        const model = reactive({ username: "" });
+        return () =>
+          h(
+            Form,
+            { model },
+            {
+              default: () => [
+                h(
+                  FormItem,
+                  { label: "Username", name: "username", rules },
+                  {
+                    default: () =>
+                      h("input", {
+                        "aria-label": "username",
+                        value: model.username,
+                        onInput: (e: Event) => {
+                          model.username = (e.target as HTMLInputElement).value;
+                        },
+                      }),
+                  }
+                ),
+                h("button", { type: "submit" }, "Submit"),
+              ],
+            }
+          );
+      },
+    });
 
-  describe('Props', () => {
-    it('should apply labelPosition prop', () => {
-      const { container } = renderWithProps(Form, {
-        model: {},
-        labelPosition: 'top',
-      }, {
-        slots: { default: '<div>Content</div>' },
-      })
-      
-      const form = container.querySelector('form')
-      expect(form).toBeInTheDocument()
-    })
+    render(Demo);
+    await fireEvent.focusOut(screen.getByLabelText("username"));
 
-    it('should apply labelWidth prop', () => {
-      const { container } = render(Form, {
-        props: {
-          model: {},
-          labelWidth: 100,
-        },
-        slots: {
-          default: '<div>Content</div>',
-        },
-      })
-      
-      const form = container.querySelector('form')
-      expect(form).toBeInTheDocument()
-    })
+    const error = await screen.findByText("Username is required");
+    expect(error).toBeInTheDocument();
 
-    it('should support disabled state', () => {
-      const { container } = render(Form, {
-        props: {
-          model: {},
-          disabled: true,
-        },
-        slots: {
-          default: '<div>Content</div>',
-        },
-      })
-      
-      const form = container.querySelector('form')
-      expect(form).toBeInTheDocument()
-    })
+    const input = screen.getByLabelText("username");
+    expect(input).toHaveAttribute("aria-invalid", "true");
 
-    it('should support inline layout', () => {
-      const { container } = render(Form, {
-        props: {
-          model: {},
-          inline: true,
-        },
-        slots: {
-          default: '<div>Content</div>',
-        },
-      })
-      
-      const form = container.querySelector('form')
-      expect(form).toBeInTheDocument()
-    })
-  })
+    const errorElement = error.closest("[role=alert]") ?? error;
+    const describedBy = input.getAttribute("aria-describedby");
+    expect(describedBy).toBeTruthy();
+    expect(errorElement.getAttribute("id")).toBe(describedBy);
+  });
 
-  describe('Validation', () => {
-    it('should support validation rules', () => {
-      const rules = {
-        username: [{ required: true, message: 'Username is required' }],
-      }
-      const { container } = render(Form, {
-        props: {
-          model: { username: '' },
-          rules,
-        },
-        slots: {
-          default: '<div>Content</div>',
-        },
-      })
-      
-      const form = container.querySelector('form')
-      expect(form).toBeInTheDocument()
-    })
-  })
+  it("respects rule trigger=submit for field validation", async () => {
+    const rules: FormRule[] = [
+      { required: true, message: "Username is required", trigger: "submit" },
+    ];
+    const Demo = defineComponent({
+      setup() {
+        const model = reactive({ username: "" });
+        return () =>
+          h(
+            Form,
+            { model },
+            {
+              default: () => [
+                h(
+                  FormItem,
+                  { label: "Username", name: "username", rules },
+                  {
+                    default: () =>
+                      h("input", {
+                        "aria-label": "username",
+                        value: model.username,
+                        onInput: (e: Event) => {
+                          model.username = (e.target as HTMLInputElement).value;
+                        },
+                      }),
+                  }
+                ),
+                h("button", { type: "submit" }, "Submit"),
+              ],
+            }
+          );
+      },
+    });
 
-  describe('Events', () => {
-    it('should handle submit event', () => {
-      const onSubmit = vi.fn((e) => e.preventDefault())
-      const { container } = render(Form, {
-        props: {
-          model: {},
-        },
-        attrs: {
-          onSubmit,
-        },
-        slots: {
-          default: '<button type="submit">Submit</button>',
-        },
-      })
-      
-      const form = container.querySelector('form')!
-      const submitEvent = new Event('submit', { bubbles: true, cancelable: true })
-      form.dispatchEvent(submitEvent)
-      
-      // Just verify form exists
-      expect(form).toBeInTheDocument()
-    })
-  })
+    render(Demo);
+    await fireEvent.focusOut(screen.getByLabelText("username"));
+    expect(screen.queryByText("Username is required")).not.toBeInTheDocument();
 
-  describe('Accessibility', () => {
-    it('should have no accessibility violations', async () => {
-      const { container } = render(Form, {
-        props: {
-          model: {},
-        },
-        slots: {
-          default: '<div>Accessible form</div>',
-        },
-      })
-      
-      await expectNoA11yViolations(container)
-    })
+    const form = screen.getByRole("button", { name: "Submit" }).closest("form");
+    expect(form).toBeTruthy();
+    await fireEvent.submit(form as HTMLFormElement);
+    expect(await screen.findByText("Username is required")).toBeInTheDocument();
+  });
 
-    it('should render as semantic form element', () => {
-      const { container } = render(Form, {
-        props: {
-          model: {},
-        },
-        slots: {
-          default: '<div>Content</div>',
-        },
-      })
-      
-      const form = container.querySelector('form')
-      expect(form).toBeInTheDocument()
-      expect(form?.tagName.toLowerCase()).toBe('form')
-    })
-  })
+  it("has no accessibility violations", async () => {
+    const { container } = render(Form, {
+      props: { model: {} },
+      slots: { default: "<div>Accessible form</div>" },
+    });
 
-  describe('Snapshots', () => {
-    it('should match snapshot for default state', () => {
-      const { container } = render(Form, {
-        props: {
-          model: {},
-        },
-        slots: {
-          default: '<div>Form content</div>',
-        },
-      })
-      
-      expect(container.firstChild).toMatchSnapshot()
-    })
-
-    it('should match snapshot with inline layout', () => {
-      const { container } = render(Form, {
-        props: {
-          model: {},
-          inline: true,
-        },
-        slots: {
-          default: '<div>Form content</div>',
-        },
-      })
-      
-      expect(container.firstChild).toMatchSnapshot()
-    })
-
-    it('should match snapshot with disabled state', () => {
-      const { container } = render(Form, {
-        props: {
-          model: {},
-          disabled: true,
-        },
-        slots: {
-          default: '<div>Form content</div>',
-        },
-      })
-      
-      expect(container.firstChild).toMatchSnapshot()
-    })
-  })
-})
+    await expectNoA11yViolations(container);
+  });
+});
