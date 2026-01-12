@@ -3,17 +3,18 @@
  * Shared styles and helpers for List components
  */
 
-import type { ListSize, ListBorderStyle, ListItemLayout } from '../types/list'
+import type { ListSize, ListBorderStyle, ListItemLayout } from '../types/list';
 
 /**
  * Base classes for list container
  */
-export const listBaseClasses = 'bg-white rounded-lg overflow-hidden'
+export const listBaseClasses =
+  'bg-[var(--tiger-surface,#ffffff)] rounded-lg overflow-hidden';
 
 /**
  * List wrapper classes
  */
-export const listWrapperClasses = 'w-full'
+export const listWrapperClasses = 'w-full';
 
 /**
  * Size classes for list padding and spacing
@@ -22,7 +23,7 @@ export const listSizeClasses: Record<ListSize, string> = {
   sm: 'text-sm',
   md: 'text-base',
   lg: 'text-lg',
-} as const
+} as const;
 
 /**
  * List item size classes
@@ -31,7 +32,7 @@ export const listItemSizeClasses: Record<ListSize, string> = {
   sm: 'px-3 py-2',
   md: 'px-4 py-3',
   lg: 'px-6 py-4',
-} as const
+} as const;
 
 /**
  * Border style classes
@@ -39,23 +40,25 @@ export const listItemSizeClasses: Record<ListSize, string> = {
 export const listBorderClasses: Record<ListBorderStyle, string> = {
   none: '',
   divided: '',
-  bordered: 'border border-gray-200',
-} as const
+  bordered: 'border border-[var(--tiger-border,#e5e7eb)]',
+} as const;
 
 /**
  * List item base classes
  */
-export const listItemBaseClasses = 'flex w-full transition-colors duration-200'
+export const listItemBaseClasses = 'flex w-full transition-colors duration-200';
 
 /**
  * List item hover classes
  */
-export const listItemHoverClasses = 'hover:bg-gray-50'
+export const listItemHoverClasses =
+  'hover:bg-[var(--tiger-surface-muted,#f9fafb)]';
 
 /**
  * List item divided classes (border between items)
  */
-export const listItemDividedClasses = 'border-b border-gray-200 last:border-b-0'
+export const listItemDividedClasses =
+  'border-b border-[var(--tiger-border,#e5e7eb)] last:border-b-0';
 
 /**
  * List item layout classes
@@ -63,67 +66,73 @@ export const listItemDividedClasses = 'border-b border-gray-200 last:border-b-0'
 export const listItemLayoutClasses: Record<ListItemLayout, string> = {
   horizontal: 'flex-row items-center',
   vertical: 'flex-col items-start',
-} as const
+} as const;
 
 /**
  * List header/footer base classes
  */
-export const listHeaderFooterBaseClasses = 'border-b border-gray-200 font-medium text-gray-700'
+export const listHeaderFooterBaseClasses =
+  'border-b border-[var(--tiger-border,#e5e7eb)] font-medium text-[var(--tiger-text,#111827)]';
 
 /**
  * List footer specific classes
  */
-export const listFooterClasses = 'border-t border-b-0'
+export const listFooterClasses = 'border-t border-b-0';
 
 /**
  * List empty state classes
  */
-export const listEmptyStateClasses = 'py-8 text-center text-gray-500'
+export const listEmptyStateClasses =
+  'py-8 text-center text-[var(--tiger-text-muted,#6b7280)]';
 
 /**
  * List loading overlay classes
  */
-export const listLoadingOverlayClasses = 'absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10'
+export const listLoadingOverlayClasses =
+  'absolute inset-0 bg-[var(--tiger-surface,#ffffff)]/75 flex items-center justify-center z-10';
 
 /**
  * List pagination container classes
  */
-export const listPaginationContainerClasses = 'flex items-center justify-between px-4 py-3 border-t border-gray-200'
+export const listPaginationContainerClasses =
+  'flex items-center justify-between px-4 py-3 border-t border-[var(--tiger-border,#e5e7eb)]';
 
 /**
  * List item meta classes (for avatar + content)
  */
-export const listItemMetaClasses = 'flex items-center gap-3 flex-1'
+export const listItemMetaClasses = 'flex items-center gap-3 flex-1';
 
 /**
  * List item avatar classes
  */
-export const listItemAvatarClasses = 'flex-shrink-0'
+export const listItemAvatarClasses = 'flex-shrink-0';
 
 /**
  * List item content classes
  */
-export const listItemContentClasses = 'flex-1 min-w-0'
+export const listItemContentClasses = 'flex-1 min-w-0';
 
 /**
  * List item title classes
  */
-export const listItemTitleClasses = 'font-medium text-gray-900 truncate'
+export const listItemTitleClasses =
+  'font-medium text-[var(--tiger-text,#111827)] truncate';
 
 /**
  * List item description classes
  */
-export const listItemDescriptionClasses = 'text-sm text-gray-500 mt-1'
+export const listItemDescriptionClasses =
+  'text-sm text-[var(--tiger-text-muted,#6b7280)] mt-1';
 
 /**
  * List item extra classes
  */
-export const listItemExtraClasses = 'flex-shrink-0 ml-4'
+export const listItemExtraClasses = 'flex-shrink-0 ml-4';
 
 /**
  * Grid container classes
  */
-export const listGridContainerClasses = 'grid gap-4'
+export const listGridContainerClasses = 'grid gap-4';
 
 /**
  * Get list container classes
@@ -131,8 +140,8 @@ export const listGridContainerClasses = 'grid gap-4'
  * @returns Combined class string for list container
  */
 export function getListClasses(bordered: ListBorderStyle): string {
-  const classes = [listBaseClasses, listBorderClasses[bordered]]
-  return classes.filter(Boolean).join(' ')
+  const classes = [listBaseClasses, listBorderClasses[bordered]];
+  return classes.filter(Boolean).join(' ');
 }
 
 /**
@@ -153,17 +162,17 @@ export function getListItemClasses(
     listItemBaseClasses,
     listItemSizeClasses[size],
     listItemLayoutClasses[layout],
-  ]
+  ];
 
   if (divided) {
-    classes.push(listItemDividedClasses)
+    classes.push(listItemDividedClasses);
   }
 
   if (hoverable) {
-    classes.push(listItemHoverClasses)
+    classes.push(listItemHoverClasses);
   }
 
-  return classes.join(' ')
+  return classes.join(' ');
 }
 
 /**
@@ -176,16 +185,13 @@ export function getListHeaderFooterClasses(
   size: ListSize,
   isFooter = false
 ): string {
-  const classes = [
-    listHeaderFooterBaseClasses,
-    listItemSizeClasses[size],
-  ]
+  const classes = [listHeaderFooterBaseClasses, listItemSizeClasses[size]];
 
   if (isFooter) {
-    classes.push(listFooterClasses)
+    classes.push(listFooterClasses);
   }
 
-  return classes.join(' ')
+  return classes.join(' ');
 }
 
 /**
@@ -208,29 +214,29 @@ export function getGridColumnClasses(
   xl?: number,
   xxl?: number
 ): string {
-  const classes: string[] = []
+  const classes: string[] = [];
 
   if (column) {
-    classes.push(`grid-cols-${column}`)
+    classes.push(`grid-cols-${column}`);
   }
   if (xs) {
-    classes.push(`grid-cols-${xs}`)
+    classes.push(`grid-cols-${xs}`);
   }
   if (sm) {
-    classes.push(`sm:grid-cols-${sm}`)
+    classes.push(`sm:grid-cols-${sm}`);
   }
   if (md) {
-    classes.push(`md:grid-cols-${md}`)
+    classes.push(`md:grid-cols-${md}`);
   }
   if (lg) {
-    classes.push(`lg:grid-cols-${lg}`)
+    classes.push(`lg:grid-cols-${lg}`);
   }
   if (xl) {
-    classes.push(`xl:grid-cols-${xl}`)
+    classes.push(`xl:grid-cols-${xl}`);
   }
   if (xxl) {
-    classes.push(`2xl:grid-cols-${xxl}`)
+    classes.push(`2xl:grid-cols-${xxl}`);
   }
 
-  return classes.join(' ')
+  return classes.join(' ');
 }

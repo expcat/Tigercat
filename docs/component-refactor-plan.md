@@ -8,11 +8,11 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Switch` Step1 主题/透传/a11y/类型导出/测试精简（2026-01-12）
+- 上一步：✅ `List` Step1 主题/透传/a11y/类型导出/测试精简（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：15/38
+- 已优化组件数/需优化组件数：16/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -290,7 +290,7 @@
 #### List（P2，建议优化）
 
 - 思路：空态/加载 slot；列表项语义；分页（若支持）一致。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/类型导出/测试精简（2026-01-12）：core List 默认色值收敛为 CSS vars（含 fallback：`--tiger-surface/--tiger-surface-muted/--tiger-border/--tiger-text/--tiger-text-muted/--tiger-primary`），并修正 core `ListItem.avatar` 类型以支持跨框架节点；React List 支持 `div` 原生属性透传、补齐 `role=list/listitem` + `aria-busy`，仅在可点击时启用 Enter/Space 键盘触发；Vue List 增加 `inheritAttrs: false`、合并 `attrs.class/style` 并导出 `VueListProps`，同样对齐 a11y 与键盘路径；Vue/React List 测试移除冗余用例，保留关键路径与 a11y 基线；同步更新 List 文档主题变量与无障碍说明（Demo 无需修改）。
 
 #### Descriptions（P2，建议优化）
 
