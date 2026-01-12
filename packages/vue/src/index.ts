@@ -107,6 +107,7 @@ export type { VueDropdownMenuProps } from "./components/DropdownMenu";
 export { DropdownItem } from "./components/DropdownItem";
 export type { VueDropdownItemProps } from "./components/DropdownItem";
 export { Drawer } from "./components/Drawer";
+export type { VueDrawerProps } from "./components/Drawer";
 export { Modal } from "./components/Modal";
 export type { VueModalProps } from "./components/Modal";
 export { Alert } from "./components/Alert";
