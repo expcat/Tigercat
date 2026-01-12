@@ -15,10 +15,12 @@
 - 旁路修复：✅ 修复 `pnpm build`（React d.ts 类型陷阱：Popconfirm/Tooltip）（2026-01-13）
 - 上一步：✅ `Modal` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 上一步：✅ `Drawer` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
+- 上一步：✅ `Select` Step1 API/类型对齐（value 类型、option group 类型）（2026-01-13）
+- 上一步：✅ `Select` Step2 键盘/aria/focus（2026-01-13）
 - 当前组件：`Select`
-- 当前步骤：Step1 API/类型对齐（value 类型、option group 类型）
+- 当前步骤：Step3 视觉与主题（状态色全部 CSS vars）
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：29/38
+- 已优化组件数/需优化组件数：30/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -228,7 +230,8 @@
   3. 视觉与主题（状态色全部 CSS vars）
   4. tests（键盘 + 选中 + 清空 + 搜索）
 
-- 状态：未开始
+- 状态：✅ Step1 API/类型对齐（2026-01-13）：core 补齐并导出 `SelectValue/SelectValues/SelectModelValue/SelectOptions`，options 类型收敛为「option 与 group 的联合数组」；React Select 改为 discriminated union 精确约束单选/多选的 `value/onChange`，同时移除过度 memo/callback；Vue Select 对齐 `SelectOptions/SelectModelValue` 并简化 click-outside 绑定；同步精简 Vue/React Select 测试（移除快照，补齐分组/搜索/多选关键路径），更新 Select 文档与 React Demo。
+- 状态：✅ Step2 键盘/aria/focus（2026-01-13）：React/Vue Select 补齐键盘路径（ArrowUp/Down/Home/End/Enter/Space/Escape/Tab）、打开时高亮/跳过 disabled、单选选择后焦点回到 Trigger；下拉列表增加 `role=listbox`/`role=option` 与 `aria-selected/aria-disabled/aria-multiselectable`；同步补充 Vue/React 键盘交互测试并更新 Select 文档的键盘说明。
 
 #### Switch（P2，建议优化）
 
