@@ -5,7 +5,7 @@ import {
   PropType,
   type VNode,
   type VNodeArrayChildren,
-} from 'vue';
+} from "vue";
 import {
   classNames,
   getDescriptionsClasses,
@@ -22,7 +22,7 @@ import {
   type DescriptionsSize,
   type DescriptionsLayout,
   type DescriptionsItem,
-} from '@tigercat/core';
+} from "@tigercat/core";
 
 type RawChildren =
   | string
@@ -32,14 +32,37 @@ type RawChildren =
   | VNodeArrayChildren
   | (() => unknown);
 
+export interface VueDescriptionsProps {
+  title?: string | number;
+  extra?: unknown;
+  bordered?: boolean;
+  column?: number;
+  size?: DescriptionsSize;
+  layout?: DescriptionsLayout;
+  colon?: boolean;
+  labelStyle?: Record<string, string | number>;
+  contentStyle?: Record<string, string | number>;
+  items?: DescriptionsItem[];
+  className?: string;
+  style?: Record<string, string | number> | string;
+}
+
 export const Descriptions = defineComponent({
-  name: 'TigerDescriptions',
+  name: "TigerDescriptions",
+  inheritAttrs: false,
   props: {
     /**
      * Descriptions title
      */
     title: {
-      type: String,
+      type: [String, Number] as PropType<string | number>,
+      default: undefined,
+    },
+    /**
+     * Extra content (actions, links, etc.)
+     */
+    extra: {
+      type: null as unknown as PropType<unknown>,
       default: undefined,
     },
     /**
@@ -65,7 +88,7 @@ export const Descriptions = defineComponent({
      */
     size: {
       type: String as PropType<DescriptionsSize>,
-      default: 'md' as DescriptionsSize,
+      default: "md" as DescriptionsSize,
     },
     /**
      * Descriptions layout
@@ -73,7 +96,7 @@ export const Descriptions = defineComponent({
      */
     layout: {
       type: String as PropType<DescriptionsLayout>,
-      default: 'horizontal' as DescriptionsLayout,
+      default: "horizontal" as DescriptionsLayout,
     },
     /**
      * Whether to show colon after label
@@ -87,14 +110,14 @@ export const Descriptions = defineComponent({
      * Label style
      */
     labelStyle: {
-      type: Object as PropType<Record<string, string>>,
+      type: Object as PropType<Record<string, string | number>>,
       default: undefined,
     },
     /**
      * Content style
      */
     contentStyle: {
-      type: Object as PropType<Record<string, string>>,
+      type: Object as PropType<Record<string, string | number>>,
       default: undefined,
     },
     /**
@@ -104,8 +127,18 @@ export const Descriptions = defineComponent({
       type: Array as PropType<DescriptionsItem[]>,
       default: () => [],
     },
+    className: {
+      type: String,
+      default: undefined,
+    },
+    style: {
+      type: [Object, String] as PropType<
+        Record<string, string | number> | string
+      >,
+      default: undefined,
+    },
   },
-  setup(props, { slots }) {
+  setup(props, { slots, attrs }) {
     const descriptionsClasses = computed(() => {
       return getDescriptionsClasses(props.bordered, props.size);
     });
@@ -116,18 +149,26 @@ export const Descriptions = defineComponent({
 
     // Render header section
     function renderHeader() {
-      if (!props.title && !slots.title && !slots.extra) {
+      if (!props.title && !slots.title && !props.extra && !slots.extra) {
         return null;
       }
 
-      return h('div', { class: descriptionsHeaderClasses }, [
-        h(
-          'div',
-          { class: descriptionsTitleClasses },
-          slots.title?.() || props.title
-        ),
-        slots.extra &&
-          h('div', { class: descriptionsExtraClasses }, slots.extra()),
+      return h("div", { class: descriptionsHeaderClasses }, [
+        props.title || slots.title
+          ? h(
+              "div",
+              { class: descriptionsTitleClasses },
+              slots.title?.() || props.title
+            )
+          : null,
+        props.extra || slots.extra
+          ? h(
+              "div",
+              { class: descriptionsExtraClasses },
+              slots.extra?.() ||
+                ((props.extra ?? undefined) as unknown as RawChildren)
+            )
+          : null,
       ]);
     }
 
@@ -138,12 +179,11 @@ export const Descriptions = defineComponent({
         return null;
       }
 
-      // Group items into rows
       const rows = groupItemsIntoRows(items, props.column);
 
-      return h('table', { class: tableClasses.value }, [
+      return h("table", { class: tableClasses.value }, [
         h(
-          'tbody',
+          "tbody",
           {},
           rows.map((row) => renderRow(row))
         ),
@@ -172,14 +212,14 @@ export const Descriptions = defineComponent({
         // Label cell
         cells.push(
           h(
-            'th',
+            "th",
             {
               class: labelClass,
               style: props.labelStyle,
             },
             [
               item.label,
-              props.colon && props.layout === 'horizontal' ? ':' : '',
+              props.colon && props.layout === "horizontal" ? ":" : "",
             ]
           )
         );
@@ -187,7 +227,7 @@ export const Descriptions = defineComponent({
         // Content cell
         cells.push(
           h(
-            'td',
+            "td",
             {
               class: contentClass,
               style: props.contentStyle,
@@ -198,7 +238,7 @@ export const Descriptions = defineComponent({
         );
       });
 
-      return h('tr', {}, cells);
+      return h("tr", {}, cells);
     }
 
     // Render vertical layout (stacked)
@@ -210,18 +250,17 @@ export const Descriptions = defineComponent({
 
       if (props.bordered) {
         // Use table for bordered vertical layout
-        return h('table', { class: tableClasses.value }, [
+        return h("table", { class: tableClasses.value }, [
           h(
-            'tbody',
+            "tbody",
             {},
             items.map((item) => renderVerticalItem(item))
           ),
         ]);
       }
 
-      // Use simple div layout for non-bordered vertical
       return h(
-        'div',
+        "dl",
         { class: descriptionsVerticalWrapperClasses },
         items.map((item) => renderVerticalItem(item))
       );
@@ -240,17 +279,17 @@ export const Descriptions = defineComponent({
 
       if (props.bordered) {
         // Table row for bordered layout
-        return h('tr', {}, [
+        return h("tr", {}, [
           h(
-            'th',
+            "th",
             {
               class: labelClass,
               style: props.labelStyle,
             },
-            [item.label, props.colon ? ':' : '']
+            [item.label, props.colon ? ":" : ""]
           ),
           h(
-            'td',
+            "td",
             {
               class: contentClass,
               style: props.contentStyle,
@@ -265,17 +304,17 @@ export const Descriptions = defineComponent({
         props.bordered,
         props.size
       );
-      return h('div', { class: itemClasses }, [
+      return h("div", { class: itemClasses }, [
         h(
-          'div',
+          "dt",
           {
             class: labelClass,
             style: props.labelStyle,
           },
-          [item.label, props.colon ? ':' : '']
+          [item.label, props.colon ? ":" : ""]
         ),
         h(
-          'div',
+          "dd",
           {
             class: contentClass,
             style: props.contentStyle,
@@ -287,16 +326,20 @@ export const Descriptions = defineComponent({
 
     return () => {
       return h(
-        'div',
+        "div",
         {
+          ...attrs,
           class: classNames(
             descriptionsWrapperClasses,
-            descriptionsClasses.value
+            descriptionsClasses.value,
+            props.className,
+            attrs.class as any
           ),
+          style: [props.style as any, attrs.style as any],
         },
         [
           renderHeader(),
-          props.layout === 'horizontal'
+          props.layout === "horizontal"
             ? renderHorizontalLayout()
             : renderVerticalLayout(),
           slots.default?.(),

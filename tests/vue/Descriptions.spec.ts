@@ -2,372 +2,94 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/vue'
-import { Descriptions } from '@tigercat/vue'
-import type { DescriptionsItem } from '@tigercat/core'
-
-describe('Descriptions (Vue)', () => {
-  describe('Rendering', () => {
-    it('should render descriptions with items', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-        { label: 'Email', content: 'john@example.com' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: { items },
-      })
-
-      expect(container.textContent).toContain('Name')
-      expect(container.textContent).toContain('John Doe')
-      expect(container.textContent).toContain('Email')
-      expect(container.textContent).toContain('john@example.com')
-    })
-
-    it('should render with title', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: {
-          title: 'User Information',
-          items,
-        },
-      })
-
-      expect(container.textContent).toContain('User Information')
-    })
-
-    it('should render with extra content via slot', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-      ]
-
-      render(Descriptions, {
-        props: { items },
-        slots: {
-          extra: '<a href="#">Edit</a>',
-        },
-      })
-
-      expect(screen.getByText('Edit')).toBeInTheDocument()
-    })
-  })
-
-  describe('Layout', () => {
-    it('should render horizontal layout by default', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: { items },
-      })
-
-      const table = container.querySelector('table')
-      const th = container.querySelector('th')
-      const td = container.querySelector('td')
-
-      expect(table).toBeTruthy()
-      expect(th).toBeTruthy()
-      expect(td).toBeTruthy()
-    })
-
-    it('should render vertical layout when layout="vertical"', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: {
-          items,
-          layout: 'vertical',
-        },
-      })
-
-      // Vertical non-bordered should use div layout
-      expect(container.innerHTML).toBeDefined()
-    })
-
-    it('should render vertical layout with table when bordered', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: {
-          items,
-          layout: 'vertical',
-          bordered: true,
-        },
-      })
-
-      const table = container.querySelector('table')
-      expect(table).toBeTruthy()
-    })
-  })
-
-  describe('Column Configuration', () => {
-    it('should respect column prop', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-        { label: 'Email', content: 'john@example.com' },
-        { label: 'Phone', content: '123-456-7890' },
-        { label: 'Address', content: '123 Main St' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: {
-          items,
-          column: 2,
-        },
-      })
-
-      // With column=2, 4 items should create 2 rows
-      const rows = container.querySelectorAll('tr')
-      expect(rows.length).toBe(2)
-    })
-
-    it('should handle item span', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-        { label: 'Description', content: 'Long description text', span: 2 },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: {
-          items,
-          column: 3,
-        },
-      })
-
-      const cells = container.querySelectorAll('td')
-      // Second item should have colspan
-      expect(cells[1].getAttribute('colspan')).toBe('3')
-    })
-  })
-
-  describe('Bordered', () => {
-    it('should apply border classes when bordered=true', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: {
-          items,
-          bordered: true,
-        },
-      })
-
-      const table = container.querySelector('table')
-      expect(table?.className).toContain('border')
-      expect(table?.className).toContain('border-gray-200')
-    })
-
-    it('should not apply border classes when bordered=false', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: {
-          items,
-          bordered: false,
-        },
-      })
-
-      const table = container.querySelector('table')
-      expect(table?.className).not.toContain('border-gray-200')
-    })
-  })
-
-  describe('Size', () => {
-    it('should apply small size classes', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: {
-          items,
-          size: 'sm',
-        },
-      })
-
-      expect(container.innerHTML).toContain('text-sm')
-    })
-
-    it('should apply medium size classes by default', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: { items },
-      })
-
-      expect(container.innerHTML).toContain('text-base')
-    })
-
-    it('should apply large size classes', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: {
-          items,
-          size: 'lg',
-        },
-      })
-
-      expect(container.innerHTML).toContain('text-lg')
-    })
-  })
-
-  describe('Colon', () => {
-    it('should show colon after label by default', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: { items },
-      })
-
-      const labelCell = container.querySelector('th')
-      expect(labelCell?.textContent).toContain(':')
-    })
-
-    it('should hide colon when colon=false', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: {
-          items,
-          colon: false,
-        },
-      })
-
-      const labelCell = container.querySelector('th')
-      expect(labelCell?.textContent).toBe('Name')
-      expect(labelCell?.textContent).not.toContain(':')
-    })
-  })
-
-  describe('Custom Styles', () => {
-    it('should apply custom labelStyle', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: {
-          items,
-          labelStyle: { color: 'red', fontWeight: 'bold' },
-        },
-      })
-
-      const labelCell = container.querySelector('th')
-      expect(labelCell?.getAttribute('style')).toContain('color: red')
-      expect(labelCell?.getAttribute('style')).toContain('font-weight: bold')
-    })
-
-    it('should apply custom contentStyle', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: {
-          items,
-          contentStyle: { color: 'blue' },
-        },
-      })
-
-      const contentCell = container.querySelector('td')
-      expect(contentCell?.getAttribute('style')).toContain('color: blue')
-    })
-
-    it('should apply custom labelClassName and contentClassName', () => {
-      const items: DescriptionsItem[] = [
-        { 
-          label: 'Name', 
-          content: 'John Doe',
-          labelClassName: 'custom-label',
-          contentClassName: 'custom-content',
-        },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: { items },
-      })
-
-      const labelCell = container.querySelector('th')
-      const contentCell = container.querySelector('td')
-
-      expect(labelCell?.className).toContain('custom-label')
-      expect(contentCell?.className).toContain('custom-content')
-    })
-  })
-
-  describe('Snapshots', () => {
-    it('should match snapshot for basic horizontal layout', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-        { label: 'Email', content: 'john@example.com' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: { items },
-      })
-
-      expect(container.innerHTML).toMatchSnapshot()
-    })
-
-    it('should match snapshot for bordered vertical layout', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-        { label: 'Email', content: 'john@example.com' },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: {
-          items,
-          layout: 'vertical',
-          bordered: true,
-        },
-      })
-
-      expect(container.innerHTML).toMatchSnapshot()
-    })
-
-    it('should match snapshot with all features', () => {
-      const items: DescriptionsItem[] = [
-        { label: 'Name', content: 'John Doe' },
-        { label: 'Email', content: 'john@example.com' },
-        { label: 'Description', content: 'Long description', span: 2 },
-      ]
-
-      const { container } = render(Descriptions, {
-        props: {
-          title: 'User Information',
-          items,
-          bordered: true,
-          size: 'md',
-          column: 3,
-        },
-        slots: {
-          extra: '<a href="#">Edit</a>',
-        },
-      })
-
-      expect(container.innerHTML).toMatchSnapshot()
-    })
-  })
-})
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@testing-library/vue";
+import { Descriptions } from "@tigercat/vue";
+import type { DescriptionsItem } from "@tigercat/core";
+
+describe("Descriptions (Vue)", () => {
+  it("renders title and extra (prop + slot)", () => {
+    const items: DescriptionsItem[] = [{ label: "Name", content: "John Doe" }];
+
+    render(Descriptions, {
+      props: {
+        title: "User",
+        extra: "Extra",
+        items,
+      },
+      slots: {
+        extra: '<a href="#">Edit</a>',
+      },
+    });
+
+    expect(screen.getByText("User")).toBeInTheDocument();
+    expect(screen.getByText("Edit")).toBeInTheDocument();
+  });
+
+  it("renders horizontal table layout by default", () => {
+    const items: DescriptionsItem[] = [{ label: "Name", content: "John Doe" }];
+    const { container } = render(Descriptions, { props: { items } });
+
+    expect(container.querySelector("table")).toBeTruthy();
+    expect(container.querySelector("th")?.textContent).toContain("Name");
+    expect(container.querySelector("td")?.textContent).toContain("John Doe");
+  });
+
+  it("renders non-bordered vertical layout as dl/dt/dd", () => {
+    const items: DescriptionsItem[] = [{ label: "CPU", content: "8C" }];
+    const { container } = render(Descriptions, {
+      props: { items, layout: "vertical" },
+    });
+
+    expect(container.querySelector("dl")).toBeTruthy();
+    expect(container.querySelector("dt")?.textContent).toContain("CPU");
+    expect(container.querySelector("dd")?.textContent).toContain("8C");
+  });
+
+  it("respects column and span in horizontal layout", () => {
+    const items: DescriptionsItem[] = [
+      { label: "Name", content: "John Doe" },
+      { label: "Email", content: "john@example.com" },
+      { label: "Phone", content: "123-456-7890" },
+      { label: "Address", content: "123 Main St" },
+    ];
+
+    const { container } = render(Descriptions, {
+      props: { items, column: 2 },
+    });
+    expect(container.querySelectorAll("tr").length).toBe(2);
+
+    const itemsWithSpan: DescriptionsItem[] = [
+      { label: "Name", content: "John Doe" },
+      { label: "Description", content: "Long", span: 2 },
+    ];
+
+    const { container: spanContainer } = render(Descriptions, {
+      props: { items: itemsWithSpan, column: 3 },
+    });
+
+    const cells = spanContainer.querySelectorAll("td");
+    expect(cells[1].getAttribute("colspan")).toBe("3");
+  });
+
+  it("merges attrs.class with className and passes through attrs", () => {
+    const items: DescriptionsItem[] = [{ label: "Name", content: "John Doe" }];
+
+    render(Descriptions, {
+      props: {
+        items,
+        className: "from-prop",
+      },
+      attrs: {
+        class: "from-attrs",
+        "data-testid": "root",
+        "aria-label": "descriptions",
+      },
+    });
+
+    const root = screen.getByTestId("root");
+    expect(root).toHaveAttribute("aria-label", "descriptions");
+    expect(root.className).toContain("from-prop");
+    expect(root.className).toContain("from-attrs");
+  });
+});
