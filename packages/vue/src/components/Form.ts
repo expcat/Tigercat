@@ -1,27 +1,56 @@
-import { defineComponent, provide, reactive, computed, h, PropType } from 'vue'
-import { classNames, type FormRules, type FormValues, type FormError, type FormLabelPosition, type FormLabelAlign, type FormSize, validateForm } from '@tigercat/core'
+import {
+  defineComponent,
+  provide,
+  reactive,
+  computed,
+  h,
+  PropType,
+  type ComputedRef,
+} from "vue";
+import {
+  classNames,
+  type FormRules,
+  type FormValues,
+  type FormError,
+  type FormLabelPosition,
+  type FormLabelAlign,
+  type FormSize,
+  type FormRule,
+  type FormRuleTrigger,
+  validateForm,
+  validateField as validateFieldUtil,
+  getValueByPath,
+} from "@tigercat/core";
 
 // Form context key
-export const FormContextKey = Symbol('FormContext')
+export const FormContextKey = Symbol("FormContext");
 
 // Form context type
 export interface FormContext {
-  model: FormValues
-  rules?: FormRules
-  labelWidth?: string | number
-  labelPosition: FormLabelPosition
-  labelAlign: FormLabelAlign
-  size: FormSize
-  inlineMessage: boolean
-  showRequiredAsterisk: boolean
-  disabled: boolean
-  errors: FormError[]
-  validateField: (fieldName: string) => Promise<void>
-  clearValidate: (fieldNames?: string | string[]) => void
+  model: FormValues;
+  rules?: FormRules;
+  labelWidth?: string | number;
+  labelPosition: FormLabelPosition;
+  labelAlign: FormLabelAlign;
+  size: FormSize;
+  inlineMessage: boolean;
+  showRequiredAsterisk: boolean;
+  disabled: boolean;
+  errors: FormError[];
+  registerFieldRules: (
+    fieldName: string,
+    rules?: FormRule | FormRule[]
+  ) => void;
+  validateField: (
+    fieldName: string,
+    rulesOverride?: FormRule | FormRule[],
+    trigger?: FormRuleTrigger
+  ) => Promise<void>;
+  clearValidate: (fieldNames?: string | string[]) => void;
 }
 
 export const Form = defineComponent({
-  name: 'TigerForm',
+  name: "TigerForm",
   props: {
     /**
      * Form data model
@@ -49,7 +78,7 @@ export const Form = defineComponent({
      */
     labelPosition: {
       type: String as PropType<FormLabelPosition>,
-      default: 'right' as FormLabelPosition,
+      default: "right" as FormLabelPosition,
     },
     /**
      * Label alignment
@@ -57,7 +86,7 @@ export const Form = defineComponent({
      */
     labelAlign: {
       type: String as PropType<FormLabelAlign>,
-      default: 'right' as FormLabelAlign,
+      default: "right" as FormLabelAlign,
     },
     /**
      * Form size (applies to all form items)
@@ -65,7 +94,7 @@ export const Form = defineComponent({
      */
     size: {
       type: String as PropType<FormSize>,
-      default: 'md' as FormSize,
+      default: "md" as FormSize,
     },
     /**
      * Show inline validation messages
@@ -96,94 +125,144 @@ export const Form = defineComponent({
     /**
      * Emitted when form is submitted
      */
-    submit: (_data: { valid: boolean; values: FormValues; errors: FormError[] }) => true,
+    submit: (_data: {
+      valid: boolean;
+      values: FormValues;
+      errors: FormError[];
+    }) => true,
     /**
      * Emitted when field is validated
      */
-    validate: (fieldName: string, isValid: boolean, _errorMessage?: string) => 
-      typeof fieldName === 'string' && typeof isValid === 'boolean',
+    validate: (fieldName: string, isValid: boolean, _errorMessage?: string) =>
+      typeof fieldName === "string" && typeof isValid === "boolean",
   },
   setup(props, { slots, emit, expose }) {
-    const errors = reactive<FormError[]>([])
-    
-    const validateField = async (fieldName: string): Promise<void> => {
-      if (!props.rules || !props.rules[fieldName]) {
-        return
+    const errors = reactive<FormError[]>([]);
+    const fieldRules = reactive<Record<string, FormRule | FormRule[]>>({});
+
+    const registerFieldRules = (
+      fieldName: string,
+      rules?: FormRule | FormRule[]
+    ): void => {
+      if (!fieldName) {
+        return;
       }
-      
-      const { validateField: validateFieldUtil } = await import('@tigercat/core')
-      const value = props.model[fieldName]
-      const fieldRules = props.rules[fieldName]
-      
-      const error = await validateFieldUtil(fieldName, value, fieldRules, props.model)
-      
+
+      if (!rules) {
+        delete fieldRules[fieldName];
+        return;
+      }
+
+      fieldRules[fieldName] = rules;
+    };
+
+    const getEffectiveRules = (): FormRules | undefined => {
+      const merged = {
+        ...(props.rules ?? {}),
+        ...fieldRules,
+      };
+      return Object.keys(merged).length > 0 ? merged : undefined;
+    };
+
+    const validateField = async (
+      fieldName: string,
+      rulesOverride?: FormRule | FormRule[],
+      trigger?: FormRuleTrigger
+    ): Promise<void> => {
+      const fieldRules = rulesOverride ?? props.rules?.[fieldName];
+      if (!fieldRules) {
+        return;
+      }
+
+      const value = getValueByPath(props.model, fieldName);
+      const error = await validateFieldUtil(
+        fieldName,
+        value,
+        fieldRules,
+        props.model,
+        trigger
+      );
+
       // Remove existing errors for this field
-      const index = errors.findIndex(e => e.field === fieldName)
+      const index = errors.findIndex((e) => e.field === fieldName);
       if (index !== -1) {
-        errors.splice(index, 1)
+        errors.splice(index, 1);
       }
-      
+
       // Add new error if validation failed
       if (error) {
         errors.push({
           field: fieldName,
           message: error,
-        })
+        });
       }
-      
-      emit('validate', fieldName, !error, error || undefined)
-    }
-    
+
+      emit("validate", fieldName, !error, error || undefined);
+    };
+
     const validate = async (): Promise<boolean> => {
-      if (!props.rules) {
-        return true
+      const effectiveRules = getEffectiveRules();
+      if (!effectiveRules) {
+        return true;
       }
-      
-      const result = await validateForm(props.model, props.rules)
-      
+
+      const result = await validateForm(props.model, effectiveRules);
+
       // Clear all errors
-      errors.splice(0, errors.length)
-      
+      errors.splice(0, errors.length);
+
       // Add new errors
       if (result.errors.length > 0) {
-        errors.push(...result.errors)
+        errors.push(...result.errors);
       }
-      
-      return result.valid
-    }
-    
+
+      return result.valid;
+    };
+
     const clearValidate = (fieldNames?: string | string[]): void => {
       if (!fieldNames) {
-        errors.splice(0, errors.length)
-        return
+        errors.splice(0, errors.length);
+        return;
       }
-      
-      const fields = Array.isArray(fieldNames) ? fieldNames : [fieldNames]
-      
-      fields.forEach(fieldName => {
-        const index = errors.findIndex(e => e.field === fieldName)
+
+      const fields = Array.isArray(fieldNames) ? fieldNames : [fieldNames];
+
+      fields.forEach((fieldName) => {
+        const index = errors.findIndex((e) => e.field === fieldName);
         if (index !== -1) {
-          errors.splice(index, 1)
+          errors.splice(index, 1);
         }
-      })
-    }
-    
+      });
+    };
+
     const resetFields = (): void => {
-      clearValidate()
-    }
-    
+      clearValidate();
+    };
+
     const handleSubmit = async (event: Event): Promise<void> => {
-      event.preventDefault()
-      
-      const valid = await validate()
-      
-      emit('submit', {
-        valid,
+      event.preventDefault();
+
+      const effectiveRules = getEffectiveRules();
+      if (!effectiveRules) {
+        errors.splice(0, errors.length);
+        emit("submit", { valid: true, values: props.model, errors });
+        return;
+      }
+
+      const result = await validateForm(props.model, effectiveRules);
+
+      errors.splice(0, errors.length);
+      if (result.errors.length > 0) {
+        errors.push(...result.errors);
+      }
+
+      emit("submit", {
+        valid: result.valid,
         values: props.model,
-        errors: errors,
-      })
-    }
-    
+        errors,
+      });
+    };
+
     // Provide form context to child FormItems
     const formContextValue = computed<FormContext>(() => ({
       model: props.model,
@@ -196,39 +275,40 @@ export const Form = defineComponent({
       showRequiredAsterisk: props.showRequiredAsterisk,
       disabled: props.disabled,
       errors,
+      registerFieldRules,
       validateField,
       clearValidate,
-    }))
-    
-    provide<FormContext>(FormContextKey, formContextValue.value)
-    
+    }));
+
+    provide<ComputedRef<FormContext>>(FormContextKey, formContextValue);
+
     // Expose methods
     expose({
       validate,
       validateField,
       clearValidate,
       resetFields,
-    })
-    
+    });
+
     const formClasses = computed(() => {
       return classNames(
-        'tiger-form',
+        "tiger-form",
         `tiger-form--label-${props.labelPosition}`,
-        props.disabled && 'tiger-form--disabled'
-      )
-    })
-    
+        props.disabled && "tiger-form--disabled"
+      );
+    });
+
     return () => {
       return h(
-        'form',
+        "form",
         {
           class: formClasses.value,
           onSubmit: handleSubmit,
         },
         slots.default?.()
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default Form
+export default Form;
