@@ -1,6 +1,7 @@
 import { defineComponent, computed, ref, watch, h, PropType } from 'vue';
 import {
   classNames,
+  coerceClassValue,
   getInputClasses,
   type InputSize,
   type InputType,
@@ -141,7 +142,11 @@ export const Input = defineComponent({
     );
 
     const inputClasses = computed(() =>
-      classNames(getInputClasses(props.size), props.className, attrs.class)
+      classNames(
+        getInputClasses(props.size),
+        props.className,
+        coerceClassValue(attrs.class)
+      )
     );
 
     /**

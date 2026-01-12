@@ -13,6 +13,7 @@ export interface InputProps
       | 'type'
       | 'value'
       | 'defaultValue'
+      | 'autoComplete'
       | 'onInput'
       | 'onChange'
       | 'onFocus'

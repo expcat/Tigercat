@@ -9,13 +9,19 @@ const current4 = ref(1)
 const current5 = ref(0)
 const current6 = ref(1)
 
-const next = (currentRef: any) => {
+const currents = [current1, current2, current3, current4, current5, current6] as const
+
+const next = (index: number) => {
+  const currentRef = currents[index]
+  if (!currentRef) return
   if (currentRef.value < 2) {
     currentRef.value++
   }
 }
 
-const prev = (currentRef: any) => {
+const prev = (index: number) => {
+  const currentRef = currents[index]
+  if (!currentRef) return
   if (currentRef.value > 0) {
     currentRef.value--
   }
@@ -40,8 +46,8 @@ const prev = (currentRef: any) => {
           <StepsItem title="待完成" description="这是步骤的描述信息" />
         </Steps>
         <div class="mt-6">
-          <Button @click="prev(current1)" :disabled="current1 === 0" class="mr-2">上一步</Button>
-          <Button @click="next(current1)" :disabled="current1 === 2" variant="primary">下一步</Button>
+          <Button @click="prev(0)" :disabled="current1 === 0" class="mr-2">上一步</Button>
+          <Button @click="next(0)" :disabled="current1 === 2" variant="primary">下一步</Button>
         </div>
       </div>
       <Divider class="my-6" />
@@ -58,8 +64,8 @@ const prev = (currentRef: any) => {
           <StepsItem title="待完成" />
         </Steps>
         <div class="mt-6">
-          <Button @click="prev(current2)" :disabled="current2 === 0" class="mr-2">上一步</Button>
-          <Button @click="next(current2)" :disabled="current2 === 2" variant="primary">下一步</Button>
+          <Button @click="prev(1)" :disabled="current2 === 0" class="mr-2">上一步</Button>
+          <Button @click="next(1)" :disabled="current2 === 2" variant="primary">下一步</Button>
         </div>
       </div>
       <Divider class="my-6" />
@@ -76,8 +82,8 @@ const prev = (currentRef: any) => {
           <StepsItem title="步骤 3" description="这是步骤的描述信息" />
         </Steps>
         <div class="mt-6">
-          <Button @click="prev(current3)" :disabled="current3 === 0" class="mr-2">上一步</Button>
-          <Button @click="next(current3)" :disabled="current3 === 2" variant="primary">下一步</Button>
+          <Button @click="prev(2)" :disabled="current3 === 0" class="mr-2">上一步</Button>
+          <Button @click="next(2)" :disabled="current3 === 2" variant="primary">下一步</Button>
         </div>
       </div>
       <Divider class="my-6" />
@@ -108,8 +114,8 @@ const prev = (currentRef: any) => {
           <StepsItem title="步骤 3" description="这是步骤 3 的详细描述信息" />
         </Steps>
         <div class="mt-6">
-          <Button @click="prev(current5)" :disabled="current5 === 0" class="mr-2">上一步</Button>
-          <Button @click="next(current5)" :disabled="current5 === 2" variant="primary">下一步</Button>
+          <Button @click="prev(4)" :disabled="current5 === 0" class="mr-2">上一步</Button>
+          <Button @click="next(4)" :disabled="current5 === 2" variant="primary">下一步</Button>
         </div>
       </div>
       <Divider class="my-6" />

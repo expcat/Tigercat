@@ -1,5 +1,10 @@
 import { defineComponent, h, PropType, computed } from 'vue';
-import { classNames, layoutFooterClasses } from '@tigercat/core';
+import {
+  classNames,
+  coerceClassValue,
+  layoutFooterClasses,
+  mergeStyleValues,
+} from '@tigercat/core';
 
 export interface VueFooterProps {
   className?: string;
@@ -36,11 +41,13 @@ export const Footer = defineComponent({
     },
   },
   setup(props, { slots, attrs }) {
+    const attrsRecord = attrs as Record<string, unknown>;
+
     const footerClasses = computed(() =>
       classNames(
         layoutFooterClasses,
         props.className,
-        (attrs as Record<string, unknown>).class as any
+        coerceClassValue(attrsRecord.class)
       )
     );
 
@@ -50,11 +57,9 @@ export const Footer = defineComponent({
         {
           ...attrs,
           class: footerClasses.value,
-          style: [
-            (attrs as Record<string, unknown>).style as any,
-            props.style as any,
-            { height: props.height },
-          ],
+          style: mergeStyleValues(attrsRecord.style, props.style, {
+            height: props.height,
+          }),
         },
         slots.default?.()
       );

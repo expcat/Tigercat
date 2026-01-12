@@ -60,16 +60,16 @@ Test basic rendering and visual output.
 describe('Rendering', () => {
   it('should render with default props', () => {
     // Test default state
-  })
+  });
 
   it('should render with custom props', () => {
     // Test customization
-  })
+  });
 
   it('should apply custom className', () => {
     // Test className override
-  })
-})
+  });
+});
 ```
 
 ### 2. Props Tests
@@ -80,16 +80,16 @@ Test all prop combinations and variations.
 describe('Props', () => {
   it.each(variants)('should handle %s variant', (variant) => {
     // Test each variant
-  })
+  });
 
   it.each(sizes)('should handle %s size', (size) => {
     // Test each size
-  })
+  });
 
   it('should handle invalid props gracefully', () => {
     // Test with unexpected values
-  })
-})
+  });
+});
 ```
 
 ### 3. Events Tests
@@ -100,16 +100,16 @@ Test all event handlers and emissions.
 describe('Events', () => {
   it('should call onClick when clicked', async () => {
     // Test event handler
-  })
+  });
 
   it('should not call onClick when disabled', async () => {
     // Test event prevention
-  })
+  });
 
   it('should emit event with correct payload', async () => {
     // Test event data
-  })
-})
+  });
+});
 ```
 
 ### 4. States Tests
@@ -120,16 +120,16 @@ Test different component states.
 describe('States', () => {
   it('should show disabled state', () => {
     // Test disabled
-  })
+  });
 
   it('should show loading state', () => {
     // Test loading
-  })
+  });
 
   it('should show error state', () => {
     // Test error
-  })
-})
+  });
+});
 ```
 
 ### 5. Theme Support Tests
@@ -155,17 +155,17 @@ Test WCAG compliance and a11y features.
 ```typescript
 describe('Accessibility', () => {
   it('should have no accessibility violations', async () => {
-    await expectNoA11yViolations(container)
-  })
+    await expectNoA11yViolations(container);
+  });
 
   it('should have proper ARIA attributes', () => {
     // Test ARIA
-  })
+  });
 
   it('should be keyboard accessible', async () => {
     // Test keyboard navigation
-  })
-})
+  });
+});
 ```
 
 ### 7. Edge Cases Tests
@@ -176,16 +176,16 @@ Test boundary and extreme scenarios.
 describe('Edge Cases', () => {
   it('should handle empty content', () => {
     // Test empty state
-  })
+  });
 
   it('should handle very long text', () => {
     // Test with extreme input
-  })
+  });
 
   it('should handle special characters', () => {
     // Test with special chars
-  })
-})
+  });
+});
 ```
 
 ### 8. Snapshot Tests
@@ -195,9 +195,9 @@ Test for visual regressions.
 ```typescript
 describe('Snapshots', () => {
   it('should match snapshot for default state', () => {
-    expect(container.firstChild).toMatchSnapshot()
-  })
-})
+    expect(container.firstChild).toMatchSnapshot();
+  });
+});
 ```
 
 ## Quality Standards
@@ -205,83 +205,91 @@ describe('Snapshots', () => {
 ### Test Structure
 
 ✅ **Good Test Structure**:
+
 ```typescript
 describe('ComponentName', () => {
   describe('Rendering', () => {
     it('should render with default props', () => {
       // Arrange
-      const props = { /* ... */ }
-      
+      const props = {
+        /* ... */
+      };
+
       // Act
-      const { getByRole } = render(<Component {...props} />)
-      
+      const { getByRole } = render(<Component {...props} />);
+
       // Assert
-      expect(getByRole('button')).toBeInTheDocument()
-    })
-  })
-})
+      expect(getByRole('button')).toBeInTheDocument();
+    });
+  });
+});
 ```
 
 ❌ **Poor Test Structure**:
+
 ```typescript
 describe('tests', () => {
   it('test 1', () => {
     // Everything mixed together
-    const { container } = render(<Component />)
-    expect(container.querySelector('.button')).toBeTruthy()
-    fireEvent.click(container.querySelector('.button'))
-    expect(something).toBe(true)
-  })
-})
+    const { container } = render(<Component />);
+    expect(container.querySelector('.button')).toBeTruthy();
+    fireEvent.click(container.querySelector('.button'));
+    expect(something).toBe(true);
+  });
+});
 ```
 
 ### Test Independence
 
 ✅ **Good - Independent Tests**:
+
 ```typescript
 describe('Component', () => {
   it('test 1', () => {
-    const { getByRole } = render(<Component />)
+    const { getByRole } = render(<Component />);
     // Test is self-contained
-  })
+  });
 
   it('test 2', () => {
-    const { getByRole } = render(<Component />)
+    const { getByRole } = render(<Component />);
     // Independent of test 1
-  })
-})
+  });
+});
 ```
 
 ❌ **Poor - Tests Depend on Each Other**:
+
 ```typescript
 describe('Component', () => {
-  let container
+  let container;
 
   it('test 1', () => {
-    container = render(<Component />).container
-  })
+    container = render(<Component />).container;
+  });
 
   it('test 2', () => {
     // Depends on test 1
-    expect(container).toBeTruthy()
-  })
-})
+    expect(container).toBeTruthy();
+  });
+});
 ```
 
 ### Descriptive Test Names
 
 ✅ **Good Names**:
+
 ```typescript
-it('should disable button when loading prop is true')
-it('should call onChange handler with correct value')
-it('should prevent form submission when validation fails')
+it('should disable button when loading prop is true');
+it('should call onChange handler with correct value');
+it('should prevent form submission when validation fails');
 ```
 
 ❌ **Poor Names**:
+
 ```typescript
-it('works')
-it('test 1')
-it('button test')
+it('works');
+it('test 1');
+it('button test');
 ```
 
 ## Code Quality
@@ -289,67 +297,73 @@ it('button test')
 ### Type Safety
 
 ✅ **Good - Strong Types**:
+
 ```typescript
 interface ButtonProps {
-  variant?: 'primary' | 'secondary'
-  onClick?: (event: MouseEvent) => void
+  variant?: 'primary' | 'secondary';
+  onClick?: (event: MouseEvent) => void;
 }
 
-const mockHandler: ButtonProps['onClick'] = vi.fn()
+const mockHandler: ButtonProps['onClick'] = vi.fn();
 ```
 
 ❌ **Poor - Weak Types**:
+
 ```typescript
-const props: any = { variant: 'primary' }
-const mockHandler: any = vi.fn()
+const props = { variant: 'primary' } as const;
+const mockHandler = vi.fn();
 ```
 
 ### Avoid Magic Values
 
 ✅ **Good - Named Constants**:
+
 ```typescript
-const LONG_TEXT = 'a'.repeat(1000)
-const SPECIAL_CHARS = '<>&"\'\`§±!@#$%^&*()'
-const UNICODE_TEXT = '你好世界 🌍 مرحبا'
+const LONG_TEXT = 'a'.repeat(1000);
+const SPECIAL_CHARS = '<>&"\'`§±!@#$%^&*()';
+const UNICODE_TEXT = '你好世界 🌍 مرحبا';
 
 it('should handle long text', () => {
-  render(<Text>{LONG_TEXT}</Text>)
-})
+  render(<Text>{LONG_TEXT}</Text>);
+});
 ```
 
 ❌ **Poor - Magic Values**:
+
 ```typescript
 it('should handle long text', () => {
-  render(<Text>{'a'.repeat(1000)}</Text>)
-})
+  render(<Text>{'a'.repeat(1000)}</Text>);
+});
 ```
 
 ### DRY Principle
 
 ✅ **Good - Reusable Helpers**:
+
 ```typescript
 const renderButton = (props = {}) => {
-  return render(<Button {...props}>Click me</Button>)
-}
+  return render(<Button {...props}>Click me</Button>);
+};
 
 it('test 1', () => {
-  const { getByRole } = renderButton({ variant: 'primary' })
-})
+  const { getByRole } = renderButton({ variant: 'primary' });
+});
 
 it('test 2', () => {
-  const { getByRole } = renderButton({ disabled: true })
-})
+  const { getByRole } = renderButton({ disabled: true });
+});
 ```
 
 ❌ **Poor - Repeated Code**:
+
 ```typescript
 it('test 1', () => {
-  const { getByRole } = render(<Button variant="primary">Click me</Button>)
-})
+  const { getByRole } = render(<Button variant="primary">Click me</Button>);
+});
 
 it('test 2', () => {
-  const { getByRole } = render(<Button disabled>Click me</Button>)
-})
+  const { getByRole } = render(<Button disabled>Click me</Button>);
+});
 ```
 
 ## Edge Case Testing
@@ -359,51 +373,59 @@ it('test 2', () => {
 Every component must test these edge cases:
 
 1. **Empty/Null Values**
+
    ```typescript
    it('should handle empty children', () => {
-     render(<Button />)
-   })
-   
+     render(<Button />);
+   });
+
    it('should handle null children', () => {
-     render(<Button>{null}</Button>)
-   })
+     render(<Button>{null}</Button>);
+   });
    ```
 
 2. **Extreme Values**
+
    ```typescript
    it('should handle very long text', () => {
-     const longText = 'a'.repeat(10000)
-     render(<Text>{longText}</Text>)
-   })
-   
+     const longText = 'a'.repeat(10000);
+     render(<Text>{longText}</Text>);
+   });
+
    it('should handle maximum file size', () => {
-     const largeFile = createTestFile('large.txt', '', '', Number.MAX_SAFE_INTEGER)
-   })
+     const largeFile = createTestFile(
+       'large.txt',
+       '',
+       '',
+       Number.MAX_SAFE_INTEGER
+     );
+   });
    ```
 
 3. **Special Characters**
+
    ```typescript
    it('should handle HTML special characters', () => {
-     render(<Text>{'<script>alert("XSS")</script>'}</Text>)
-   })
-   
+     render(<Text>{'<script>alert("XSS")</script>'}</Text>);
+   });
+
    it('should handle unicode characters', () => {
-     render(<Text>{'你好世界 🌍'}</Text>)
-   })
+     render(<Text>{'你好世界 🌍'}</Text>);
+   });
    ```
 
 4. **Rapid Interactions**
    ```typescript
    it('should handle rapid clicks', async () => {
-     const onClick = vi.fn()
-     const { getByRole } = render(<Button onClick={onClick}>Click</Button>)
-     
-     await userEvent.click(button)
-     await userEvent.click(button)
-     await userEvent.click(button)
-     
-     expect(onClick).toHaveBeenCalledTimes(3)
-   })
+     const onClick = vi.fn();
+     const { getByRole } = render(<Button onClick={onClick}>Click</Button>);
+
+     await userEvent.click(button);
+     await userEvent.click(button);
+     await userEvent.click(button);
+
+     expect(onClick).toHaveBeenCalledTimes(3);
+   });
    ```
 
 ## Boundary Testing
@@ -415,23 +437,23 @@ Test values at the edges of valid ranges:
 ```typescript
 describe('Boundary Conditions', () => {
   it('should accept minimum valid value', () => {
-    render(<Slider value={0} min={0} max={100} />)
-  })
+    render(<Slider value={0} min={0} max={100} />);
+  });
 
   it('should accept maximum valid value', () => {
-    render(<Slider value={100} min={0} max={100} />)
-  })
+    render(<Slider value={100} min={0} max={100} />);
+  });
 
   it('should handle value below minimum', () => {
     // Test how component handles invalid input
-    render(<Slider value={-1} min={0} max={100} />)
-  })
+    render(<Slider value={-1} min={0} max={100} />);
+  });
 
   it('should handle value above maximum', () => {
     // Test how component handles invalid input
-    render(<Slider value={101} min={0} max={100} />)
-  })
-})
+    render(<Slider value={101} min={0} max={100} />);
+  });
+});
 ```
 
 ### State Combinations
@@ -440,16 +462,18 @@ Test all meaningful combinations:
 
 ```typescript
 it('should handle all size-variant combinations', () => {
-  componentSizes.forEach(size => {
-    buttonVariants.forEach(variant => {
+  componentSizes.forEach((size) => {
+    buttonVariants.forEach((variant) => {
       const { getByRole, unmount } = render(
-        <Button size={size} variant={variant}>Button</Button>
-      )
-      expect(getByRole('button')).toBeInTheDocument()
-      unmount()
-    })
-  })
-})
+        <Button size={size} variant={variant}>
+          Button
+        </Button>
+      );
+      expect(getByRole('button')).toBeInTheDocument();
+      unmount();
+    });
+  });
+});
 ```
 
 ## Negative Testing
@@ -462,22 +486,22 @@ Ensure components handle errors gracefully:
 describe('Negative Scenarios', () => {
   it('should handle missing required props', () => {
     // @ts-expect-error Testing error handling
-    render(<Component />)
+    render(<Component />);
     // Component should not crash
-  })
+  });
 
   it('should handle invalid prop values', () => {
     // @ts-expect-error Testing error handling
-    render(<Button variant="invalid">Button</Button>)
+    render(<Button variant="invalid">Button</Button>);
     // Component should use default
-  })
+  });
 
   it('should handle failed async operations', async () => {
-    const onUpload = vi.fn().mockRejectedValue(new Error('Upload failed'))
-    render(<Upload onUpload={onUpload} />)
+    const onUpload = vi.fn().mockRejectedValue(new Error('Upload failed'));
+    render(<Upload onUpload={onUpload} />);
     // Component should show error state
-  })
-})
+  });
+});
 ```
 
 ## Test Coverage Requirements
@@ -527,14 +551,14 @@ Use "should" statements that describe behavior:
 
 ```typescript
 // ✅ Good
-it('should render with default props')
-it('should call onClick when clicked')
-it('should disable button when loading')
+it('should render with default props');
+it('should call onClick when clicked');
+it('should disable button when loading');
 
 // ❌ Poor
-it('renders')
-it('click test')
-it('disabled')
+it('renders');
+it('click test');
+it('disabled');
 ```
 
 ## Common Anti-Patterns
@@ -542,76 +566,84 @@ it('disabled')
 ### 1. Testing Implementation Details
 
 ❌ **Don't Test Internal State**:
+
 ```typescript
 it('should set isOpen to true', () => {
-  const { container } = render(<Dropdown />)
+  const { container } = render(<Dropdown />);
   // Testing internal state
-  expect(component.state.isOpen).toBe(true)
-})
+  expect(component.state.isOpen).toBe(true);
+});
 ```
 
 ✅ **Test User-Visible Behavior**:
+
 ```typescript
 it('should show dropdown menu when clicked', async () => {
-  const { getByRole, getByText } = render(<Dropdown />)
-  await userEvent.click(getByRole('button'))
-  expect(getByText('Option 1')).toBeVisible()
-})
+  const { getByRole, getByText } = render(<Dropdown />);
+  await userEvent.click(getByRole('button'));
+  expect(getByText('Option 1')).toBeVisible();
+});
 ```
 
 ### 2. Brittle Selectors
 
 ❌ **Don't Use Brittle Selectors**:
+
 ```typescript
 it('test', () => {
-  const button = container.querySelector('.btn-primary.btn-lg')
-  expect(button).toBeTruthy()
-})
+  const button = container.querySelector('.btn-primary.btn-lg');
+  expect(button).toBeTruthy();
+});
 ```
 
 ✅ **Use Semantic Queries**:
+
 ```typescript
 it('test', () => {
-  const button = getByRole('button', { name: 'Submit' })
-  expect(button).toBeInTheDocument()
-})
+  const button = getByRole('button', { name: 'Submit' });
+  expect(button).toBeInTheDocument();
+});
 ```
 
 ### 3. Flaky Tests
 
 ❌ **Don't Use Arbitrary Timeouts**:
+
 ```typescript
 it('test', async () => {
-  fireEvent.click(button)
-  await new Promise(resolve => setTimeout(resolve, 100))
-  expect(element).toBeInTheDocument()
-})
+  fireEvent.click(button);
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  expect(element).toBeInTheDocument();
+});
 ```
 
 ✅ **Use waitFor or findBy**:
+
 ```typescript
 it('test', async () => {
-  fireEvent.click(button)
-  expect(await findByText('Loaded')).toBeInTheDocument()
-})
+  fireEvent.click(button);
+  expect(await findByText('Loaded')).toBeInTheDocument();
+});
 ```
 
 ### 4. Unclear Assertions
 
 ❌ **Don't Use Vague Assertions**:
+
 ```typescript
 it('test', () => {
-  const { container } = render(<Component />)
-  expect(container).toBeTruthy()
-})
+  const { container } = render(<Component />);
+  expect(container).toBeTruthy();
+});
 ```
 
 ✅ **Use Specific Assertions**:
+
 ```typescript
 it('should render button with correct text', () => {
-  const { getByRole } = render(<Button>Click me</Button>)
-  expect(getByRole('button')).toHaveTextContent('Click me')
-})
+  const { getByRole } = render(<Button>Click me</Button>);
+  expect(getByRole('button')).toHaveTextContent('Click me');
+});
 ```
 
 ## Review Checklist
@@ -619,11 +651,13 @@ it('should render button with correct text', () => {
 Use this checklist when reviewing test PRs:
 
 ### Structure
+
 - [ ] Tests are organized into logical describe blocks
 - [ ] All required test categories are present
 - [ ] Test names clearly describe what they test
 
 ### Coverage
+
 - [ ] All props are tested
 - [ ] All events are tested
 - [ ] All states are tested
@@ -632,6 +666,7 @@ Use this checklist when reviewing test PRs:
 - [ ] Coverage meets minimum thresholds
 
 ### Quality
+
 - [ ] Tests are independent (no shared state)
 - [ ] No magic values (use named constants)
 - [ ] No testing implementation details
@@ -639,17 +674,20 @@ Use this checklist when reviewing test PRs:
 - [ ] No flaky tests (proper async handling)
 
 ### Type Safety
+
 - [ ] No use of `any` type
 - [ ] Proper TypeScript types for mocks
 - [ ] Type assertions only when necessary
 
 ### Accessibility
+
 - [ ] No accessibility violations
 - [ ] Keyboard navigation tested
 - [ ] ARIA attributes verified
 - [ ] Screen reader compatibility considered
 
 ### Documentation
+
 - [ ] Complex test logic has comments
 - [ ] Test utilities are documented
 - [ ] Test checklist is updated

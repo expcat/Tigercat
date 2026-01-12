@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, h } from 'vue'
 import { List, Card, Space, Divider, Button } from '@tigercat/vue'
+import type { ListItem } from '@tigercat/vue'
 
 // Basic list data
 const basicData = ref([
@@ -76,7 +77,7 @@ const productData = ref([
 const loading = ref(false)
 const pageInfo = ref({ current: 1, pageSize: 10 })
 
-function handleItemClick(item: any, index: number) {
+function handleItemClick(item: ListItem, index: number) {
   console.log('点击了列表项:', item, '索引:', index)
 }
 

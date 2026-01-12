@@ -1,8 +1,10 @@
 import { defineComponent, computed, h, PropType, ref } from 'vue';
 import {
   classNames,
+  coerceClassValue,
   getTagVariantClasses,
   defaultTagThemeColors,
+  mergeStyleValues,
   tagBaseClasses,
   tagSizeClasses,
   tagCloseButtonBaseClasses,
@@ -141,9 +143,9 @@ export const Tag = defineComponent({
           class: classNames(
             tagClasses.value,
             props.className,
-            attrsClass as any
+            coerceClassValue(attrsClass)
           ),
-          style: [attrsStyle as any, props.style as any],
+          style: mergeStyleValues(attrsStyle, props.style),
           role: 'status',
         },
         [

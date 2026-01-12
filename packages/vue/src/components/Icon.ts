@@ -6,7 +6,7 @@ import {
   type VNode,
   type CSSProperties,
 } from 'vue';
-import { classNames, type IconSize } from '@tigercat/core';
+import { classNames, coerceClassValue, type IconSize } from '@tigercat/core';
 
 const sizeClasses: Record<IconSize, string> = {
   sm: 'w-4 h-4',
@@ -62,7 +62,7 @@ export const Icon = defineComponent({
     const wrapperClasses = computed(() => {
       return classNames(
         'inline-flex align-middle',
-        attrs.class as any,
+        coerceClassValue(attrs.class),
         props.className
       );
     });
@@ -99,11 +99,16 @@ export const Icon = defineComponent({
           const svgChildren =
             svgNode.children === null ? undefined : svgNode.children;
 
+          type HChildren = Parameters<typeof h>[2];
+
           return h(
             'svg',
             {
               ...svgProps,
-              class: classNames(svgBaseClasses.value, svgProps.class as any),
+              class: classNames(
+                svgBaseClasses.value,
+                coerceClassValue(svgProps.class)
+              ),
               xmlns:
                 (svgProps.xmlns as string | undefined) ??
                 'http://www.w3.org/2000/svg',
@@ -118,7 +123,7 @@ export const Icon = defineComponent({
               'stroke-linejoin':
                 (svgProps['stroke-linejoin'] as string | undefined) ?? 'round',
             },
-            svgChildren as any
+            svgChildren as HChildren
           );
         }
 

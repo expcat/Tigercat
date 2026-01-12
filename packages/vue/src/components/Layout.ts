@@ -1,5 +1,10 @@
 import { defineComponent, h, PropType, computed } from 'vue';
-import { classNames, layoutRootClasses } from '@tigercat/core';
+import {
+  classNames,
+  coerceClassValue,
+  layoutRootClasses,
+  mergeStyleValues,
+} from '@tigercat/core';
 
 export interface VueLayoutProps {
   className?: string;
@@ -27,11 +32,13 @@ export const Layout = defineComponent({
     },
   },
   setup(props, { slots, attrs }) {
+    const attrsRecord = attrs as Record<string, unknown>;
+
     const layoutClasses = computed(() =>
       classNames(
         layoutRootClasses,
         props.className,
-        (attrs as Record<string, unknown>).class as any
+        coerceClassValue(attrsRecord.class)
       )
     );
 
@@ -41,10 +48,7 @@ export const Layout = defineComponent({
         {
           ...attrs,
           class: layoutClasses.value,
-          style: [
-            (attrs as Record<string, unknown>).style as any,
-            props.style as any,
-          ],
+          style: mergeStyleValues(attrsRecord.style, props.style),
         },
         slots.default?.()
       );

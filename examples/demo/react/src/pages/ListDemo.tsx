@@ -48,7 +48,7 @@ export default function ListDemo() {
   }));
 
   // Grid data
-  const gridData = useMemo(
+  const gridData: DemoItem[] = useMemo(
     () => [
       { key: 1, title: '卡片 1', content: '这是卡片内容 1' },
       { key: 2, title: '卡片 2', content: '这是卡片内容 2' },
@@ -78,7 +78,7 @@ export default function ListDemo() {
     []
   );
 
-  const productData = useMemo(
+  const productData: DemoItem[] = useMemo(
     () => [
       { key: 1, name: 'Product A', price: '¥99', stock: 15 },
       { key: 2, name: 'Product B', price: '¥149', stock: 8 },
@@ -227,24 +227,35 @@ export default function ListDemo() {
         </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List
-            dataSource={productData as unknown as DemoItem[]}
+            dataSource={productData}
             hoverable
-            renderItem={(item: any) => (
-              <div className="flex items-center justify-between w-full">
-                <div>
-                  <div className="font-medium">{item.name}</div>
-                  <div className="text-sm text-gray-500">
-                    库存：{item.stock}
+            renderItem={(item) => {
+              const name = typeof item.name === 'string' ? item.name : '';
+              const price = typeof item.price === 'string' ? item.price : '';
+              const stock =
+                typeof item.stock === 'number'
+                  ? item.stock
+                  : typeof item.stock === 'string'
+                  ? Number(item.stock)
+                  : undefined;
+
+              return (
+                <div className="flex items-center justify-between w-full">
+                  <div>
+                    <div className="font-medium">{name}</div>
+                    <div className="text-sm text-gray-500">
+                      库存：{stock ?? '-'}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-lg font-bold text-blue-600">
+                      {price}
+                    </div>
+                    <Button size="sm">购买</Button>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-lg font-bold text-blue-600">
-                    {item.price}
-                  </div>
-                  <Button size="sm">购买</Button>
-                </div>
-              </div>
-            )}
+              );
+            }}
           />
         </div>
         <Divider className="my-6" />
@@ -315,12 +326,18 @@ export default function ListDemo() {
               md: 3,
             }}
             bordered="none"
-            renderItem={(item: any) => (
-              <Card variant="shadow">
-                <h3 className="font-semibold mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.content}</p>
-              </Card>
-            )}
+            renderItem={(item) => {
+              const title = typeof item.title === 'string' ? item.title : '';
+              const content =
+                typeof item.content === 'string' ? item.content : '';
+
+              return (
+                <Card variant="shadow">
+                  <h3 className="font-semibold mb-2">{title}</h3>
+                  <p className="text-gray-600">{content}</p>
+                </Card>
+              );
+            }}
           />
         </div>
         <Divider className="my-6" />

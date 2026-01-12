@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   classNames,
   getDescriptionsClasses,
@@ -15,10 +15,10 @@ import {
   type DescriptionsSize,
   type DescriptionsLayout,
   type DescriptionsItem,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
 export interface DescriptionsProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   /**
    * Descriptions title
    */
@@ -80,8 +80,8 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
   extra,
   bordered = false,
   column = 3,
-  size = "md",
-  layout = "horizontal",
+  size = 'md',
+  layout = 'horizontal',
   colon = true,
   labelStyle,
   contentStyle,
@@ -120,7 +120,7 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
       cells.push(
         <th key={`${key}-label`} className={labelClass} style={labelStyle}>
           {item.label}
-          {colon && layout === "horizontal" ? ":" : ""}
+          {colon && layout === 'horizontal' ? ':' : ''}
         </th>
       );
 
@@ -129,8 +129,7 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
           key={`${key}-content`}
           className={contentClass}
           style={contentStyle}
-          colSpan={span > 1 ? span * 2 - 1 : 1}
-        >
+          colSpan={span > 1 ? span * 2 - 1 : 1}>
           {item.content as React.ReactNode}
         </td>
       );
@@ -170,7 +169,7 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
         <tr key={index}>
           <th className={labelClass} style={labelStyle}>
             {item.label}
-            {colon ? ":" : ""}
+            {colon ? ':' : ''}
           </th>
           <td className={contentClass} style={contentStyle}>
             {item.content as React.ReactNode}
@@ -184,7 +183,7 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
       <div key={index} className={itemClasses}>
         <dt className={labelClass} style={labelStyle}>
           {item.label}
-          {colon ? ":" : ""}
+          {colon ? ':' : ''}
         </dt>
         <dd className={contentClass} style={contentStyle}>
           {item.content as React.ReactNode}
@@ -226,7 +225,7 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
   return (
     <div className={descriptionsClasses} {...props}>
       {renderHeader()}
-      {layout === "horizontal"
+      {layout === 'horizontal'
         ? renderHorizontalLayout()
         : renderVerticalLayout()}
       {children}

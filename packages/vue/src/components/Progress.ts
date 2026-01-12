@@ -1,6 +1,7 @@
 import { defineComponent, computed, h, PropType } from 'vue';
 import {
   classNames,
+  coerceClassValue,
   getProgressVariantClasses,
   getProgressTextColorClasses,
   getStatusVariant,
@@ -197,7 +198,7 @@ export const Progress = defineComponent({
 
       const wrapperClasses = classNames(
         'flex items-center',
-        attrs.class as any,
+        coerceClassValue(attrs.class),
         props.className
       );
       const wrapperStyle = {
@@ -289,7 +290,7 @@ export const Progress = defineComponent({
 
       const wrapperClasses = classNames(
         progressCircleBaseClasses,
-        attrs.class as any,
+        coerceClassValue(attrs.class),
         props.className
       );
       const wrapperStyle = {

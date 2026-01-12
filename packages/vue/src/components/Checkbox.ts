@@ -7,7 +7,7 @@ import {
   inject,
   type PropType,
 } from 'vue';
-import { classNames } from '@tigercat/core';
+import { classNames, coerceClassValue } from '@tigercat/core';
 import {
   getCheckboxClasses,
   getCheckboxLabelClasses,
@@ -168,7 +168,10 @@ export const Checkbox = defineComponent({
       );
 
       const rootStyle = [attrs.style, props.style];
-      const rootClass = classNames(props.className, attrs.class);
+      const rootClass = classNames(
+        props.className,
+        coerceClassValue(attrs.class)
+      );
 
       const { class: _class, style: _style, ...restAttrs } = attrs;
 

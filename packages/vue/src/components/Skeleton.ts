@@ -1,9 +1,11 @@
 import { defineComponent, computed, h, PropType } from 'vue';
 import {
   classNames,
+  coerceClassValue,
   getSkeletonClasses,
   getSkeletonDimensions,
   getParagraphRowWidth,
+  mergeStyleValues,
   type SkeletonVariant,
   type SkeletonAnimation,
   type SkeletonShape,
@@ -126,11 +128,19 @@ export const Skeleton = defineComponent({
       const attrsRecord = attrs as Record<string, unknown>;
       const attrsClass = attrsRecord.class;
       const attrsStyle = attrsRecord.style;
-      const ariaLabel = attrsRecord['aria-label'];
-      const ariaLabelledBy = attrsRecord['aria-labelledby'];
+      const ariaLabelRaw = attrsRecord['aria-label'];
+      const ariaLabel =
+        typeof ariaLabelRaw === 'string' ? ariaLabelRaw : undefined;
+
+      const ariaLabelledByRaw = attrsRecord['aria-labelledby'];
+      const ariaLabelledBy =
+        typeof ariaLabelledByRaw === 'string' ? ariaLabelledByRaw : undefined;
+
+      const ariaHiddenRaw = attrsRecord['aria-hidden'];
+      const ariaHidden =
+        typeof ariaHiddenRaw === 'boolean' ? ariaHiddenRaw : undefined;
       const computedAriaHidden =
-        attrsRecord['aria-hidden'] ??
-        (ariaLabel || ariaLabelledBy ? undefined : true);
+        ariaHidden ?? (ariaLabel || ariaLabelledBy ? undefined : true);
 
       // For text variant with multiple rows
       if (props.variant === 'text' && props.rows > 1) {
@@ -165,10 +175,10 @@ export const Skeleton = defineComponent({
           'div',
           {
             ...attrs,
-            class: classNames('flex flex-col', attrsClass as any),
-            style: [attrsStyle as any, props.style as any],
-            'aria-label': ariaLabel as any,
-            'aria-labelledby': ariaLabelledBy as any,
+            class: classNames('flex flex-col', coerceClassValue(attrsClass)),
+            style: mergeStyleValues(attrsStyle, props.style),
+            'aria-label': ariaLabel,
+            'aria-labelledby': ariaLabelledBy,
             'aria-hidden': computedAriaHidden,
           },
           rows
@@ -178,14 +188,10 @@ export const Skeleton = defineComponent({
       // Single skeleton element
       return h('div', {
         ...attrs,
-        class: classNames(skeletonClasses.value, attrsClass as any),
-        style: [
-          attrsStyle as any,
-          props.style as any,
-          skeletonStyle.value as any,
-        ],
-        'aria-label': ariaLabel as any,
-        'aria-labelledby': ariaLabelledBy as any,
+        class: classNames(skeletonClasses.value, coerceClassValue(attrsClass)),
+        style: mergeStyleValues(attrsStyle, props.style, skeletonStyle.value),
+        'aria-label': ariaLabel,
+        'aria-labelledby': ariaLabelledBy,
         'aria-hidden': computedAriaHidden,
       });
     };

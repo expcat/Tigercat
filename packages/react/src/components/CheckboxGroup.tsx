@@ -17,7 +17,10 @@ export const useCheckboxGroup = () => {
 };
 
 export interface CheckboxGroupProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  extends Omit<
+    React.HTMLAttributes<HTMLDivElement>,
+    'onChange' | 'defaultValue'
+  > {
   /**
    * Selected values (controlled mode)
    */

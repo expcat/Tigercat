@@ -264,7 +264,7 @@ export const List: React.FC<ListProps> = ({
               className="w-10 h-10 rounded-full object-cover"
             />
           ) : (
-            item.avatar
+            (item.avatar as React.ReactNode)
           )}
         </div>
       );

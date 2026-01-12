@@ -101,7 +101,7 @@ pnpm clean
 
 ```ts
 import { defineComponent, h, computed, PropType } from 'vue';
-import { classNames } from '@tigercat/core';
+import { classNames, coerceClassValue } from '@tigercat/core';
 
 export const MyComponent = defineComponent({
   name: 'TigerMyComponent',
@@ -113,7 +113,9 @@ export const MyComponent = defineComponent({
   },
   emits: ['change'],
   setup(props, { emit, slots, attrs }) {
-    const classes = computed(() => classNames('...', attrs.class as any));
+    const classes = computed(() =>
+      classNames('...', coerceClassValue(attrs.class))
+    );
     return () => h('div', { class: classes.value }, slots.default?.());
   },
 });
