@@ -13,10 +13,11 @@
 - 上一步：✅ `Message` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 上一步：✅ `Loading` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 旁路修复：✅ 修复 `pnpm build`（React d.ts 类型陷阱：Popconfirm/Tooltip）（2026-01-13）
-- 当前组件：`Modal`
+- 上一步：✅ `Modal` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
+- 当前组件：`Drawer`
 - 当前步骤：Step1 主题/透传/a11y/类型导出/测试精简/文档同步
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：27/38
+- 已优化组件数/需优化组件数：28/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -355,7 +356,7 @@
 #### Modal（P0，建议优化）
 
 - 思路：focus trap、ESC 关闭、点击遮罩关闭可配；aria-modal/role="dialog"；scroll lock。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）：core Modal 样式收敛为 CSS vars（含 fallback，新增 `--tiger-modal-mask`），Vue/React Modal 补齐 ESC 关闭与基础 focus 管理，修复 `aria-labelledby` 硬编码导致的多实例冲突并增加稳定 `data-tiger-modal*` 选择器；Vue 新增并导出 `VueModalProps` 且提供 `showDefaultFooter` 与 `footer` slot props（`{ ok, cancel }`）；移除 Vue/React Modal 快照测试并收敛断言到关键路径；同步更新 Modal 文档。
 
 #### Drawer（P0，建议优化）
 

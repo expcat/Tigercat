@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useCallback, useState } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useEffect, useMemo, useCallback, useRef, useId } from "react";
+import { createPortal } from "react-dom";
 import {
   classNames,
   getModalContentClasses,
@@ -12,9 +12,11 @@ import {
   modalBodyClasses,
   modalFooterClasses,
   type ModalProps as CoreModalProps,
-} from '@tigercat/core';
+} from "@tigercat/core";
 
-export interface ModalProps extends CoreModalProps {
+export interface ModalProps
+  extends CoreModalProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, "title" | "children"> {
   /**
    * Modal content
    */
@@ -49,11 +51,17 @@ export interface ModalProps extends CoreModalProps {
    * Callback when OK button is clicked
    */
   onOk?: () => void;
+
+  /**
+   * Close button aria-label
+   * @default 'Close'
+   */
+  closeAriaLabel?: string;
 }
 
 export const Modal: React.FC<ModalProps> = ({
   visible = false,
-  size = 'md',
+  size = "md",
   title,
   titleContent,
   closable = true,
@@ -68,41 +76,33 @@ export const Modal: React.FC<ModalProps> = ({
   onVisibleChange,
   onClose,
   onCancel,
+  onOk: _onOk,
+  closeAriaLabel = "Close",
+  style,
+  ...rest
 }) => {
-  const [hasRendered, setHasRendered] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [hasBeenOpened, setHasBeenOpened] = React.useState(visible);
 
-  // Track if modal has ever been rendered
   useEffect(() => {
     if (visible) {
-      setHasRendered(true);
-      setIsAnimating(true);
-    } else {
-      // Delay unmounting for exit animation
-      const timer = setTimeout(() => {
-        setIsAnimating(false);
-      }, 300);
-      return () => clearTimeout(timer);
+      setHasBeenOpened(true);
     }
   }, [visible]);
 
   // Notify parent of visibility changes
   useEffect(() => {
-    if (onVisibleChange) {
-      onVisibleChange(visible);
-    }
+    onVisibleChange?.(visible);
     if (!visible && onClose) {
       onClose();
     }
   }, [visible, onVisibleChange, onClose]);
 
-  const shouldRender = destroyOnClose ? visible : hasRendered;
+  const shouldRender = destroyOnClose ? visible : hasBeenOpened;
 
   const handleClose = useCallback(() => {
-    if (onCancel) {
-      onCancel();
-    }
-  }, [onCancel]);
+    onCancel?.();
+    onVisibleChange?.(false);
+  }, [onCancel, onVisibleChange]);
 
   const handleMaskClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -123,6 +123,62 @@ export const Modal: React.FC<ModalProps> = ({
     [centered]
   );
 
+  // Unique ids for a11y
+  const reactId = useId();
+  const modalId = useMemo(() => `tiger-modal-${reactId}`, [reactId]);
+  const titleId = `${modalId}-title`;
+
+  const {
+    ["aria-labelledby"]: _ariaLabelledby,
+    role: _role,
+    tabIndex: _tabIndex,
+    ...dialogDivProps
+  } = rest as React.HTMLAttributes<HTMLDivElement> & React.AriaAttributes;
+
+  const ariaLabelledby =
+    (rest as React.AriaAttributes)["aria-labelledby"] ??
+    (title || titleContent ? titleId : undefined);
+
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const previousActiveElementRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!visible) return;
+
+    const active = document.activeElement;
+    previousActiveElementRef.current =
+      active instanceof HTMLElement ? active : null;
+
+    const timer = setTimeout(() => {
+      const el = closeButtonRef.current ?? dialogRef.current;
+      el?.focus();
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [visible]);
+
+  useEffect(() => {
+    if (visible) return;
+    previousActiveElementRef.current?.focus?.();
+  }, [visible]);
+
+  // Handle ESC key
+  useEffect(() => {
+    if (!visible) return;
+
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        handleClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscKey);
+    return () => {
+      document.removeEventListener("keydown", handleEscKey);
+    };
+  }, [visible, handleClose]);
+
   // Close icon component
   const CloseIcon = (
     <svg
@@ -130,7 +186,8 @@ export const Modal: React.FC<ModalProps> = ({
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
-      stroke="currentColor">
+      stroke="currentColor"
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -140,7 +197,11 @@ export const Modal: React.FC<ModalProps> = ({
     </svg>
   );
 
-  if (!shouldRender && !isAnimating) {
+  if (!shouldRender) {
+    return null;
+  }
+
+  if (destroyOnClose && !visible) {
     return null;
   }
 
@@ -148,42 +209,44 @@ export const Modal: React.FC<ModalProps> = ({
     <div
       className={classNames(
         modalWrapperClasses,
-        'transition-opacity duration-300',
-        visible ? 'opacity-100' : 'opacity-0',
-        !visible && !isAnimating && 'pointer-events-none'
+        !visible && "pointer-events-none"
       )}
-      style={{ zIndex }}>
+      style={{ zIndex }}
+      hidden={!visible}
+      aria-hidden={!visible ? "true" : undefined}
+      data-tiger-modal-root=""
+    >
       {/* Mask */}
       {mask && (
         <div
           className={classNames(
             modalMaskClasses,
-            'transition-opacity duration-300',
-            visible ? 'opacity-100' : 'opacity-0'
+            visible ? "opacity-100" : "opacity-0"
           )}
           aria-hidden="true"
+          data-tiger-modal-mask=""
         />
       )}
 
       {/* Content Container */}
       <div className={containerClasses} onClick={handleMaskClick}>
         <div
-          className={classNames(
-            contentClasses,
-            'transition-all duration-300',
-            visible
-              ? 'opacity-100 scale-100 translate-y-0'
-              : 'opacity-0 scale-95 -translate-y-4'
-          )}
+          className={classNames(contentClasses)}
+          style={style}
+          {...dialogDivProps}
           role="dialog"
           aria-modal="true"
-          aria-labelledby={title || titleContent ? 'modal-title' : undefined}>
+          aria-labelledby={ariaLabelledby}
+          tabIndex={-1}
+          ref={dialogRef}
+          data-tiger-modal=""
+        >
           {/* Header */}
           {(title || titleContent || closable) && (
             <div className={modalHeaderClasses}>
               {/* Title */}
               {(title || titleContent) && (
-                <h3 id="modal-title" className={modalTitleClasses}>
+                <h3 id={titleId} className={modalTitleClasses}>
                   {titleContent || title}
                 </h3>
               )}
@@ -193,7 +256,9 @@ export const Modal: React.FC<ModalProps> = ({
                   type="button"
                   className={modalCloseButtonClasses}
                   onClick={handleClose}
-                  aria-label="Close">
+                  aria-label={closeAriaLabel}
+                  ref={closeButtonRef}
+                >
                   {CloseIcon}
                 </button>
               )}
@@ -204,7 +269,11 @@ export const Modal: React.FC<ModalProps> = ({
           {children && <div className={modalBodyClasses}>{children}</div>}
 
           {/* Footer */}
-          {footer && <div className={modalFooterClasses}>{footer}</div>}
+          {footer && (
+            <div className={modalFooterClasses} data-tiger-modal-footer="">
+              {footer}
+            </div>
+          )}
         </div>
       </div>
     </div>
