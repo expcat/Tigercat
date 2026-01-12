@@ -8,19 +8,6 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Notification` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
-- 上一步：✅ `Popover` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
-- 上一步：✅ `Message` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
-- 上一步：✅ `Loading` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
-- 旁路修复：✅ 修复 `pnpm build`（d.ts 类型陷阱：React Popconfirm/Tooltip + Vue Notification）（2026-01-13）
-- 上一步：✅ `Modal` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
-- 上一步：✅ `Drawer` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
-- 上一步：✅ `Select` Step1 API/类型对齐（value 类型、option group 类型）（2026-01-13）
-- 上一步：✅ `Select` Step2 键盘/aria/focus（2026-01-13）
-- 上一步：✅ `Select` Step3 视觉与主题（状态色全部 CSS vars）（2026-01-13）
-- 上一步：✅ `Select` Step4 tests（键盘 + 选中 + 清空 + 搜索）（2026-01-13）
-- 上一步：✅ `Form/FormItem` Step1 API/校验路径收敛（2026-01-13）
-- 上一步：✅ `Form/FormItem` Step2 交互与 a11y（2026-01-13）
 - 上一步：✅ `Form/FormItem` Step3 tests（2026-01-13）
 - 当前组件：`Menu`
 - 当前步骤：Step1 API/受控模型与事件语义
