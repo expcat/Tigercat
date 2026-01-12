@@ -8,11 +8,11 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Radio/RadioGroup` Step1 主题/透传/类型导出/测试精简（2026-01-12）
+- 上一步：✅ `Switch` Step1 主题/透传/a11y/类型导出/测试精简（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：14/38
+- 已优化组件数/需优化组件数：15/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -222,7 +222,7 @@
 
 - 思路：role="switch" + aria-checked；禁用/加载（若有）统一。
 
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/类型导出/测试精简（2026-01-12）：core Switch 背景从硬编码灰色收敛到 CSS vars（off 走 `--tiger-border`，thumb 走 `--tiger-surface`，均含 fallback）并改用 `classNames` 简化 class 拼接；Vue Switch 增加 `inheritAttrs: false`、合并 `attrs.class/style` 并补齐 `className/style` props，新增并导出 `VueSwitchProps`；React Switch 移除多余 `useMemo/useCallback`，支持 `button` 原生属性透传并保留内部 a11y 语义；移除快照并精简 Vue/React Switch 测试，补齐 Space 键切换断言；同步更新 Switch 文档主题变量与 TS 类型示例（Demo 无需修改）。
 
 #### Slider（P1，建议优化）
 

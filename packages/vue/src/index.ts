@@ -12,6 +12,7 @@ export { Button } from './components/Button';
 export { Slider } from './components/Slider';
 export type { VueSliderProps } from './components/Slider';
 export { Switch } from './components/Switch';
+export type { VueSwitchProps } from './components/Switch';
 export { Select } from './components/Select';
 export { Checkbox } from './components/Checkbox';
 export type { VueCheckboxProps } from './components/Checkbox';

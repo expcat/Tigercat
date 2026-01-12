@@ -2,12 +2,14 @@
  * Theme configuration for Switch component
  */
 
-import type { SwitchSize } from '../types/switch'
+import { classNames } from '../utils/class-names';
+import type { SwitchSize } from '../types/switch';
 
 /**
  * Base classes for Switch component
  */
-export const switchBaseClasses = 'relative inline-flex items-center cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)] rounded-full'
+export const switchBaseClasses =
+  'relative inline-flex items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)]';
 
 /**
  * Switch container size classes
@@ -16,7 +18,7 @@ export const switchSizeClasses: Record<SwitchSize, string> = {
   sm: 'h-5 w-9',
   md: 'h-6 w-11',
   lg: 'h-7 w-14',
-}
+};
 
 /**
  * Switch thumb size classes
@@ -25,7 +27,7 @@ export const switchThumbSizeClasses: Record<SwitchSize, string> = {
   sm: 'h-4 w-4',
   md: 'h-5 w-5',
   lg: 'h-6 w-6',
-}
+};
 
 /**
  * Switch thumb translate classes for checked state
@@ -34,7 +36,7 @@ export const switchThumbTranslateClasses: Record<SwitchSize, string> = {
   sm: 'translate-x-4',
   md: 'translate-x-5',
   lg: 'translate-x-7',
-}
+};
 
 /**
  * Get switch container classes based on size and state
@@ -44,15 +46,18 @@ export function getSwitchClasses(
   checked: boolean = false,
   disabled: boolean = false
 ): string {
-  const sizeClass = switchSizeClasses[size]
+  const sizeClass = switchSizeClasses[size];
+
   const bgColor = checked
     ? 'bg-[var(--tiger-primary,#2563eb)]'
-    : 'bg-gray-200'
-  const disabledClasses = disabled ? 'cursor-not-allowed opacity-50' : ''
-  
-  return [switchBaseClasses, sizeClass, bgColor, disabledClasses]
-    .filter(Boolean)
-    .join(' ')
+    : 'bg-[var(--tiger-border,#e5e7eb)]';
+
+  return classNames(
+    switchBaseClasses,
+    sizeClass,
+    bgColor,
+    disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+  );
 }
 
 /**
@@ -62,9 +67,12 @@ export function getSwitchThumbClasses(
   size: SwitchSize = 'md',
   checked: boolean = false
 ): string {
-  const baseClasses = 'inline-block transform rounded-full bg-white shadow-lg transition-transform'
-  const sizeClass = switchThumbSizeClasses[size]
-  const translateClass = checked ? switchThumbTranslateClasses[size] : 'translate-x-0.5'
-  
-  return [baseClasses, sizeClass, translateClass].join(' ')
+  const baseClasses =
+    'inline-block transform rounded-full bg-[var(--tiger-surface,#ffffff)] shadow-lg transition-transform';
+  const sizeClass = switchThumbSizeClasses[size];
+  const translateClass = checked
+    ? switchThumbTranslateClasses[size]
+    : 'translate-x-0.5';
+
+  return classNames(baseClasses, sizeClass, translateClass);
 }
