@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
 </script>
 
 <template>
@@ -28,7 +28,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
 
 function App() {
   return (
@@ -40,7 +40,7 @@ function App() {
         <DropdownItem>菜单项 3</DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  )
+  );
 }
 ```
 
@@ -52,7 +52,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
 </script>
 
 <template>
@@ -87,7 +87,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
 
 function App() {
   return (
@@ -112,7 +112,7 @@ function App() {
         </DropdownMenu>
       </Dropdown>
     </div>
-  )
+  );
 }
 ```
 
@@ -124,7 +124,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
 </script>
 
 <template>
@@ -199,7 +199,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
 
 function App() {
   return (
@@ -256,7 +256,7 @@ function App() {
         </Dropdown>
       </div>
     </div>
-  )
+  );
 }
 ```
 
@@ -268,7 +268,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
 </script>
 
 <template>
@@ -288,7 +288,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
 
 function App() {
   return (
@@ -300,7 +300,7 @@ function App() {
         <DropdownItem>复制</DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  )
+  );
 }
 ```
 
@@ -312,7 +312,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
 </script>
 
 <template>
@@ -333,7 +333,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
 
 function App() {
   return (
@@ -346,7 +346,7 @@ function App() {
         <DropdownItem>下载</DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  )
+  );
 }
 ```
 
@@ -356,11 +356,11 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
 
 const handleCommand = (command: string) => {
-  console.log('点击了：', command)
-}
+  console.log("点击了：", command);
+};
 </script>
 
 <template>
@@ -370,7 +370,9 @@ const handleCommand = (command: string) => {
       <DropdownMenu>
         <DropdownItem @click="handleCommand('edit')">编辑</DropdownItem>
         <DropdownItem @click="handleCommand('copy')">复制</DropdownItem>
-        <DropdownItem @click="handleCommand('delete')" divided>删除</DropdownItem>
+        <DropdownItem @click="handleCommand('delete')" divided
+          >删除</DropdownItem
+        >
       </DropdownMenu>
     </template>
   </Dropdown>
@@ -380,23 +382,25 @@ const handleCommand = (command: string) => {
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
 
 function App() {
   const handleCommand = (command: string) => {
-    console.log('点击了：', command)
-  }
+    console.log("点击了：", command);
+  };
 
   return (
     <Dropdown>
       <Button>操作菜单</Button>
       <DropdownMenu>
-        <DropdownItem onClick={() => handleCommand('edit')}>编辑</DropdownItem>
-        <DropdownItem onClick={() => handleCommand('copy')}>复制</DropdownItem>
-        <DropdownItem onClick={() => handleCommand('delete')} divided>删除</DropdownItem>
+        <DropdownItem onClick={() => handleCommand("edit")}>编辑</DropdownItem>
+        <DropdownItem onClick={() => handleCommand("copy")}>复制</DropdownItem>
+        <DropdownItem onClick={() => handleCommand("delete")} divided>
+          删除
+        </DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  )
+  );
 }
 ```
 
@@ -406,10 +410,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { ref } from "vue";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
 
-const visible = ref(false)
+const visible = ref(false);
 </script>
 
 <template>
@@ -426,7 +430,7 @@ const visible = ref(false)
     </Dropdown>
     <div class="mt-4">
       <Button @click="visible = !visible">
-        {{ visible ? '关闭' : '打开' }}下拉菜单
+        {{ visible ? "关闭" : "打开" }}下拉菜单
       </Button>
     </div>
   </div>
@@ -436,11 +440,11 @@ const visible = ref(false)
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { useState } from "react";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
 
 function App() {
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(false);
 
   return (
     <div>
@@ -454,11 +458,11 @@ function App() {
       </Dropdown>
       <div className="mt-4">
         <Button onClick={() => setVisible(!visible)}>
-          {visible ? '关闭' : '打开'}下拉菜单
+          {visible ? "关闭" : "打开"}下拉菜单
         </Button>
       </div>
     </div>
-  )
+  );
 }
 ```
 
@@ -470,7 +474,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
 </script>
 
 <template>
@@ -490,7 +494,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
 
 function App() {
   return (
@@ -502,7 +506,7 @@ function App() {
         <DropdownItem>菜单项 3</DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  )
+  );
 }
 ```
 
@@ -510,60 +514,70 @@ function App() {
 
 ### Dropdown Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| trigger | 触发方式 | `'click' \| 'hover'` | `'hover'` |
-| placement | 弹出位置 | `'bottom-start' \| 'bottom' \| 'bottom-end' \| 'top-start' \| 'top' \| 'top-end' \| 'left-start' \| 'left' \| 'left-end' \| 'right-start' \| 'right' \| 'right-end'` | `'bottom-start'` |
-| disabled | 是否禁用 | `boolean` | `false` |
-| visible | 是否显示下拉菜单（受控模式） | `boolean` | - |
-| defaultVisible | 默认是否显示下拉菜单（非受控模式） | `boolean` | `false` |
-| closeOnClick | 点击菜单项后是否关闭下拉菜单 | `boolean` | `true` |
-| className | 自定义 CSS 类名 | `string` | - |
-| style | 自定义样式 | `object` | - |
+| 属性           | 说明                               | 类型                                                                                                                                                                 | 默认值           |
+| -------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| trigger        | 触发方式                           | `'click' \| 'hover'`                                                                                                                                                 | `'hover'`        |
+| placement      | 弹出位置                           | `'bottom-start' \| 'bottom' \| 'bottom-end' \| 'top-start' \| 'top' \| 'top-end' \| 'left-start' \| 'left' \| 'left-end' \| 'right-start' \| 'right' \| 'right-end'` | `'bottom-start'` |
+| disabled       | 是否禁用                           | `boolean`                                                                                                                                                            | `false`          |
+| visible        | 是否显示下拉菜单（受控模式）       | `boolean`                                                                                                                                                            | -                |
+| defaultVisible | 默认是否显示下拉菜单（非受控模式） | `boolean`                                                                                                                                                            | `false`          |
+| closeOnClick   | 点击菜单项后是否关闭下拉菜单       | `boolean`                                                                                                                                                            | `true`           |
+| className      | 自定义 CSS 类名                    | `string`                                                                                                                                                             | -                |
+| style          | 自定义样式                         | `object`                                                                                                                                                             | -                |
 
 ### Dropdown Events (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
+| 事件名         | 说明               | 回调参数             |
+| -------------- | ------------------ | -------------------- |
 | update:visible | 显示状态改变时触发 | `(visible: boolean)` |
 | visible-change | 显示状态改变时触发 | `(visible: boolean)` |
 
 ### Dropdown Events (React)
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
+| 属性            | 说明                 | 类型                         |
+| --------------- | -------------------- | ---------------------------- |
 | onVisibleChange | 显示状态改变时的回调 | `(visible: boolean) => void` |
 
 ### DropdownMenu Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| className | 自定义 CSS 类名 | `string` | - |
-| style | 自定义样式 | `object` | - |
+| 属性      | 说明            | 类型     | 默认值 |
+| --------- | --------------- | -------- | ------ |
+| className | 自定义 CSS 类名 | `string` | -      |
+| style     | 自定义样式      | `object` | -      |
 
 ### DropdownItem Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| disabled | 是否禁用 | `boolean` | `false` |
-| divided | 是否显示分割线 | `boolean` | `false` |
-| className | 自定义 CSS 类名 | `string` | - |
+| 属性      | 说明            | 类型      | 默认值  |
+| --------- | --------------- | --------- | ------- |
+| disabled  | 是否禁用        | `boolean` | `false` |
+| divided   | 是否显示分割线  | `boolean` | `false` |
+| className | 自定义 CSS 类名 | `string`  | -       |
 
 ### DropdownItem Events (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| click | 点击菜单项时触发 | `(event: MouseEvent)` |
+| 事件名 | 说明             | 回调参数              |
+| ------ | ---------------- | --------------------- |
+| click  | 点击菜单项时触发 | `(event: MouseEvent)` |
 
 ### DropdownItem Events (React)
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
+| 属性    | 说明               | 类型                                |
+| ------- | ------------------ | ----------------------------------- |
 | onClick | 点击菜单项时的回调 | `(event: React.MouseEvent) => void` |
 
 ## 样式定制
 
-Dropdown 组件使用 Tailwind CSS 编写，支持通过 `className` 属性添加自定义样式。
+Dropdown 组件使用 Tailwind CSS + CSS 变量编写，支持通过 `className` 属性添加自定义样式。
+
+### 主题变量
+
+组件默认使用以下 CSS 变量（均带 fallback）：
+
+- `--tiger-surface`：菜单背景
+- `--tiger-border`：边框/分割线
+- `--tiger-text`：菜单项文字
+- `--tiger-surface-muted`：hover/active 背景
+- `--tiger-primary`：focus ring 颜色
 
 ### 自定义菜单样式
 
@@ -586,7 +600,8 @@ Dropdown 组件遵循 WAI-ARIA 规范：
 - 下拉菜单具有 `role="menu"` 属性
 - 菜单项具有 `role="menuitem"` 属性
 - 禁用的菜单项具有 `aria-disabled="true"` 属性
-- 支持键盘导航（通过点击触发模式）
+- 菜单项为可聚焦的按钮元素，支持 `Enter/Space` 触发
+- 打开状态下按 `Escape` 可关闭
 
 ## 注意事项
 
