@@ -8,14 +8,14 @@
 
 ```vue
 <script setup>
-import { Descriptions } from '@tigercat/vue'
+import { Descriptions } from "@tigercat/vue";
 
 const items = [
-  { label: 'Name', content: 'John Doe' },
-  { label: 'Email', content: 'john.doe@example.com' },
-  { label: 'Phone', content: '+1 234 567 8900' },
-  { label: 'Address', content: '123 Main Street, City, Country' },
-]
+  { label: "Name", content: "John Doe" },
+  { label: "Email", content: "john.doe@example.com" },
+  { label: "Phone", content: "+1 234 567 8900" },
+  { label: "Address", content: "123 Main Street, City, Country" },
+];
 </script>
 
 <template>
@@ -26,17 +26,17 @@ const items = [
 ### React
 
 ```tsx
-import { Descriptions } from '@tigercat/react'
+import { Descriptions } from "@tigercat/react";
 
 function App() {
   const items = [
-    { label: 'Name', content: 'John Doe' },
-    { label: 'Email', content: 'john.doe@example.com' },
-    { label: 'Phone', content: '+1 234 567 8900' },
-    { label: 'Address', content: '123 Main Street, City, Country' },
-  ]
+    { label: "Name", content: "John Doe" },
+    { label: "Email", content: "john.doe@example.com" },
+    { label: "Phone", content: "+1 234 567 8900" },
+    { label: "Address", content: "123 Main Street, City, Country" },
+  ];
 
-  return <Descriptions title="User Information" items={items} />
+  return <Descriptions title="User Information" items={items} />;
 }
 ```
 
@@ -131,12 +131,16 @@ Descriptions 组件支持 3 种不同的尺寸：
 ```vue
 <script setup>
 const items = [
-  { label: 'Product', content: 'Cloud Database' },
-  { label: 'Billing', content: 'Prepaid' },
-  { label: 'Time', content: '2023-01-01' },
-  { label: 'Amount', content: '$80.00' },
-  { label: 'Description', content: 'High-performance cloud database service', span: 2 },
-]
+  { label: "Product", content: "Cloud Database" },
+  { label: "Billing", content: "Prepaid" },
+  { label: "Time", content: "2023-01-01" },
+  { label: "Amount", content: "$80.00" },
+  {
+    label: "Description",
+    content: "High-performance cloud database service",
+    span: 2,
+  },
+];
 </script>
 
 <template>
@@ -177,8 +181,8 @@ const items = [
 ### React
 
 ```tsx
-<Descriptions 
-  title="User Information" 
+<Descriptions
+  title="User Information"
   items={items}
   extra={<a href="#">Edit</a>}
 />
@@ -192,7 +196,7 @@ const items = [
 
 ```vue
 <template>
-  <Descriptions 
+  <Descriptions
     :items="items"
     :labelStyle="{ fontWeight: 'bold', color: '#1f2937' }"
     :contentStyle="{ color: '#6b7280' }"
@@ -203,10 +207,10 @@ const items = [
 ### React
 
 ```tsx
-<Descriptions 
+<Descriptions
   items={items}
-  labelStyle={{ fontWeight: 'bold', color: '#1f2937' }}
-  contentStyle={{ color: '#6b7280' }}
+  labelStyle={{ fontWeight: "bold", color: "#1f2937" }}
+  contentStyle={{ color: "#6b7280" }}
 />
 ```
 
@@ -235,18 +239,18 @@ const items = [
 ```vue
 <script setup>
 const userInfo = [
-  { label: 'Full Name', content: 'John Doe' },
-  { label: 'Email', content: 'john.doe@example.com' },
-  { label: 'Phone', content: '+1 234 567 8900' },
-  { label: 'Country', content: 'United States' },
-  { label: 'City', content: 'New York' },
-  { label: 'Zip Code', content: '10001' },
-  { label: 'Address', content: '123 Main Street, Apartment 4B', span: 3 },
-]
+  { label: "Full Name", content: "John Doe" },
+  { label: "Email", content: "john.doe@example.com" },
+  { label: "Phone", content: "+1 234 567 8900" },
+  { label: "Country", content: "United States" },
+  { label: "City", content: "New York" },
+  { label: "Zip Code", content: "10001" },
+  { label: "Address", content: "123 Main Street, Apartment 4B", span: 3 },
+];
 </script>
 
 <template>
-  <Descriptions 
+  <Descriptions
     title="User Profile"
     bordered
     size="md"
@@ -273,7 +277,7 @@ const userInfo = [
   { label: 'Address', content: '123 Main Street, Apartment 4B', span: 3 },
 ]
 
-<Descriptions 
+<Descriptions
   title="User Profile"
   bordered
   size="md"
@@ -287,44 +291,51 @@ const userInfo = [
 
 ### Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| title | 描述列表的标题 | `string` | - |
-| extra | 描述列表的操作区域，显示在右上方 | `ReactNode` / `VNode` | - |
-| bordered | 是否展示边框 | `boolean` | `false` |
-| column | 一行显示的列数 | `number` | `3` |
-| size | 设置列表的大小 | `'sm' \| 'md' \| 'lg'` | `'md'` |
-| layout | 布局方式 | `'horizontal' \| 'vertical'` | `'horizontal'` |
-| colon | 是否在标签后显示冒号 | `boolean` | `true` |
-| labelStyle | 自定义标签样式 | `CSSProperties` / `Record<string, string>` | - |
-| contentStyle | 自定义内容样式 | `CSSProperties` / `Record<string, string>` | - |
-| items | 描述列表项数据 | `DescriptionsItem[]` | `[]` |
+| 属性         | 说明                             | 类型                                       | 默认值         |
+| ------------ | -------------------------------- | ------------------------------------------ | -------------- |
+| title        | 描述列表的标题                   | `string`                                   | -              |
+| extra        | 描述列表的操作区域，显示在右上方 | `ReactNode` / `VNode`                      | -              |
+| bordered     | 是否展示边框                     | `boolean`                                  | `false`        |
+| column       | 一行显示的列数                   | `number`                                   | `3`            |
+| size         | 设置列表的大小                   | `'sm' \| 'md' \| 'lg'`                     | `'md'`         |
+| layout       | 布局方式                         | `'horizontal' \| 'vertical'`               | `'horizontal'` |
+| colon        | 是否在标签后显示冒号             | `boolean`                                  | `true`         |
+| labelStyle   | 自定义标签样式                   | `CSSProperties` / `Record<string, string>` | -              |
+| contentStyle | 自定义内容样式                   | `CSSProperties` / `Record<string, string>` | -              |
+| items        | 描述列表项数据                   | `DescriptionsItem[]`                       | `[]`           |
 
 ### DescriptionsItem
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| label | 标签文本 | `string` | - |
-| content | 内容文本或节点 | `ReactNode` / `VNode` / `string` | - |
-| span | 跨列数 | `number` | `1` |
-| labelClassName | 标签自定义类名 | `string` | - |
-| contentClassName | 内容自定义类名 | `string` | - |
+| 属性             | 说明           | 类型                             | 默认值 |
+| ---------------- | -------------- | -------------------------------- | ------ |
+| label            | 标签文本       | `string`                         | -      |
+| content          | 内容文本或节点 | `ReactNode` / `VNode` / `string` | -      |
+| span             | 跨列数         | `number`                         | `1`    |
+| labelClassName   | 标签自定义类名 | `string`                         | -      |
+| contentClassName | 内容自定义类名 | `string`                         | -      |
 
 ### Slots (Vue only)
 
-| 插槽名 | 说明 |
-|--------|------|
-| title | 自定义标题内容 |
-| extra | 自定义额外内容 |
+| 插槽名  | 说明                                    |
+| ------- | --------------------------------------- |
+| title   | 自定义标题内容                          |
+| extra   | 自定义额外内容                          |
 | default | 自定义主体内容（可代替 items 属性使用） |
 
 ## 主题定制
 
-Descriptions 组件使用 Tailwind CSS 类进行样式定制。你可以通过以下方式自定义样式：
+Descriptions 组件的默认颜色全部基于 CSS 变量（含 fallback），便于统一主题：
 
-1. 使用 `labelStyle` 和 `contentStyle` 属性自定义样式
-2. 通过 `labelClassName` 和 `contentClassName` 为每个描述项添加自定义类
-3. 修改 Tailwind 配置文件以自定义全局颜色、间距等
+- `--tiger-surface`：容器背景（默认 `#fff`）
+- `--tiger-surface-muted`：Label 背景（默认 `#f9fafb`）
+- `--tiger-border`：边框色（默认 `#e5e7eb`）
+- `--tiger-text`：正文色（默认 `#111827`）
+- `--tiger-text-muted`：次要文字色（默认 `#6b7280` / `#374151`）
+
+你也可以继续通过以下方式做更细粒度定制：
+
+1. 使用 `labelStyle` / `contentStyle` 自定义样式
+2. 通过 `labelClassName` / `contentClassName` 为每个描述项追加类名
 
 ## 使用场景
 
@@ -337,8 +348,8 @@ Descriptions 组件使用 Tailwind CSS 类进行样式定制。你可以通过�
 
 ## 无障碍性 (Accessibility)
 
-Descriptions 组件使用语义化的 HTML 标签（`<table>`、`<th>`、`<td>`）来确保良好的可访问性：
+Descriptions 组件尽量使用语义化 HTML 来确保良好的可访问性：
 
 - 水平布局使用表格结构，标签使用 `<th>` 标签
-- 垂直布局在边框模式下也使用表格结构
-- 支持键盘导航和屏幕阅读器
+- 垂直布局在边框模式下也使用表格结构（`<table>` / `<th>` / `<td>`）
+- 垂直布局在无边框模式下使用描述列表结构（`<dl>` / `<dt>` / `<dd>`）

@@ -8,11 +8,11 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `List` Step1 主题/透传/a11y/类型导出/测试精简（2026-01-12）
+- 上一步：✅ `Descriptions` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-12）
 - 当前组件：`待定`
 - 当前步骤：等待下一条指令
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：16/38
+- 已优化组件数/需优化组件数：17/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -295,7 +295,7 @@
 #### Descriptions（P2，建议优化）
 
 - 思路：dl/dt/dd 语义；响应式列数；对齐 core utils。
-- 状态：未开始
+- 状态：✅ Step1 主题/透传/a11y/类型导出/测试精简（2026-01-12）：core Descriptions 默认色值从固定 Tailwind 色收敛为 CSS vars（含 fallback：`--tiger-surface/--tiger-surface-muted/--tiger-border/--tiger-text/--tiger-text-muted`）；React Descriptions 补齐 `div` 原生属性透传并简化渲染逻辑；Vue Descriptions 增加 `inheritAttrs: false`、合并 `attrs.class/style`，补齐并导出 `VueDescriptionsProps`（含 `className/style/extra`）；垂直无边框布局改为 `dl/dt/dd` 语义；移除快照并精简 Vue/React Descriptions 测试；同步更新 Descriptions 文档主题变量与 a11y 说明（Demo 无需修改）。
 
 #### Timeline（P2，建议优化）
 
