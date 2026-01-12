@@ -3,13 +3,15 @@ import {
   computed,
   ref,
   h,
+  cloneVNode,
+  isVNode,
   onBeforeUnmount,
   watch,
-  VNode,
   PropType,
-} from 'vue';
+} from "vue";
 import {
   classNames,
+  coerceClassValue,
   getPopconfirmContainerClasses,
   getPopconfirmTriggerClasses,
   getPopconfirmContentClasses,
@@ -21,102 +23,104 @@ import {
   getPopconfirmCancelButtonClasses,
   getPopconfirmOkButtonClasses,
   getDropdownMenuWrapperClasses,
+  mergeStyleValues,
   type PopconfirmIconType,
   type DropdownPlacement,
-} from '@tigercat/core';
+  type StyleValue,
+} from "@tigercat/core";
 
 // Icon components
 const WarningIcon = h(
-  'svg',
+  "svg",
   {
-    xmlns: 'http://www.w3.org/2000/svg',
-    fill: 'none',
-    viewBox: '0 0 24 24',
-    'stroke-width': '1.5',
-    stroke: 'currentColor',
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 24 24",
+    "stroke-width": "1.5",
+    stroke: "currentColor",
   },
   [
-    h('path', {
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      d: 'M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z',
+    h("path", {
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round",
+      d: "M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z",
     }),
   ]
 );
 
 const InfoIcon = h(
-  'svg',
+  "svg",
   {
-    xmlns: 'http://www.w3.org/2000/svg',
-    fill: 'none',
-    viewBox: '0 0 24 24',
-    'stroke-width': '1.5',
-    stroke: 'currentColor',
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 24 24",
+    "stroke-width": "1.5",
+    stroke: "currentColor",
   },
   [
-    h('path', {
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      d: 'M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z',
+    h("path", {
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round",
+      d: "M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z",
     }),
   ]
 );
 
 const ErrorIcon = h(
-  'svg',
+  "svg",
   {
-    xmlns: 'http://www.w3.org/2000/svg',
-    fill: 'none',
-    viewBox: '0 0 24 24',
-    'stroke-width': '1.5',
-    stroke: 'currentColor',
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 24 24",
+    "stroke-width": "1.5",
+    stroke: "currentColor",
   },
   [
-    h('path', {
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      d: 'M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+    h("path", {
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round",
+      d: "M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
     }),
   ]
 );
 
 const SuccessIcon = h(
-  'svg',
+  "svg",
   {
-    xmlns: 'http://www.w3.org/2000/svg',
-    fill: 'none',
-    viewBox: '0 0 24 24',
-    'stroke-width': '1.5',
-    stroke: 'currentColor',
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 24 24",
+    "stroke-width": "1.5",
+    stroke: "currentColor",
   },
   [
-    h('path', {
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      d: 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+    h("path", {
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round",
+      d: "M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
     }),
   ]
 );
 
 const QuestionIcon = h(
-  'svg',
+  "svg",
   {
-    xmlns: 'http://www.w3.org/2000/svg',
-    fill: 'none',
-    viewBox: '0 0 24 24',
-    'stroke-width': '1.5',
-    stroke: 'currentColor',
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 24 24",
+    "stroke-width": "1.5",
+    stroke: "currentColor",
   },
   [
-    h('path', {
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      d: 'M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z',
+    h("path", {
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round",
+      d: "M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z",
     }),
   ]
 );
 
-const iconMap: Record<PopconfirmIconType, VNode> = {
+const iconMap: Record<PopconfirmIconType, ReturnType<typeof h>> = {
   warning: WarningIcon,
   info: InfoIcon,
   error: ErrorIcon,
@@ -124,8 +128,17 @@ const iconMap: Record<PopconfirmIconType, VNode> = {
   question: QuestionIcon,
 };
 
+let popconfirmIdCounter = 0;
+const createPopconfirmId = () => `tiger-popconfirm-${++popconfirmIdCounter}`;
+
+export interface VuePopconfirmProps {
+  className?: string;
+  style?: StyleValue;
+}
+
 export const Popconfirm = defineComponent({
-  name: 'TigerPopconfirm',
+  name: "TigerPopconfirm",
+  inheritAttrs: false,
   props: {
     /**
      * Whether the popconfirm is visible (controlled mode)
@@ -147,7 +160,7 @@ export const Popconfirm = defineComponent({
      */
     title: {
       type: String,
-      default: '确定要执行此操作吗？',
+      default: "确定要执行此操作吗？",
     },
     /**
      * Popconfirm description text
@@ -162,7 +175,7 @@ export const Popconfirm = defineComponent({
      */
     icon: {
       type: String as PropType<PopconfirmIconType>,
-      default: 'warning' as PopconfirmIconType,
+      default: "warning" as PopconfirmIconType,
     },
     /**
      * Whether to show icon
@@ -178,7 +191,7 @@ export const Popconfirm = defineComponent({
      */
     okText: {
       type: String,
-      default: '确定',
+      default: "确定",
     },
     /**
      * Cancel button text
@@ -186,15 +199,15 @@ export const Popconfirm = defineComponent({
      */
     cancelText: {
       type: String,
-      default: '取消',
+      default: "取消",
     },
     /**
      * Confirm button type
      * @default 'primary'
      */
     okType: {
-      type: String as PropType<'primary' | 'danger'>,
-      default: 'primary' as const,
+      type: String as PropType<"primary" | "danger">,
+      default: "primary" as const,
     },
     /**
      * Popconfirm placement relative to trigger
@@ -202,7 +215,7 @@ export const Popconfirm = defineComponent({
      */
     placement: {
       type: String as PropType<DropdownPlacement>,
-      default: 'top' as DropdownPlacement,
+      default: "top" as DropdownPlacement,
     },
     /**
      * Whether the popconfirm is disabled
@@ -219,9 +232,13 @@ export const Popconfirm = defineComponent({
       type: String,
       default: undefined,
     },
+    style: {
+      type: [String, Object, Array] as PropType<StyleValue>,
+      default: undefined,
+    },
   },
-  emits: ['update:visible', 'visible-change', 'confirm', 'cancel'],
-  setup(props, { slots, emit }) {
+  emits: ["update:visible", "visible-change", "confirm", "cancel"],
+  setup(props, { slots, emit, attrs }) {
     // Internal state for uncontrolled mode
     const internalVisible = ref(props.defaultVisible);
 
@@ -235,9 +252,13 @@ export const Popconfirm = defineComponent({
     // Ref to the container element
     const containerRef = ref<HTMLElement | null>(null);
 
+    const popconfirmId = createPopconfirmId();
+    const titleId = `${popconfirmId}-title`;
+    const descriptionId = `${popconfirmId}-description`;
+
     // Handle visibility change
     const setVisible = (visible: boolean) => {
-      if (props.disabled) return;
+      if (props.disabled && visible) return;
 
       // Update internal state if uncontrolled
       if (props.visible === undefined) {
@@ -245,20 +266,20 @@ export const Popconfirm = defineComponent({
       }
 
       // Emit events
-      emit('update:visible', visible);
-      emit('visible-change', visible);
+      emit("update:visible", visible);
+      emit("visible-change", visible);
     };
 
     // Handle confirm
     const handleConfirm = () => {
-      emit('confirm');
       setVisible(false);
+      emit("confirm");
     };
 
     // Handle cancel
     const handleCancel = () => {
-      emit('cancel');
       setVisible(false);
+      emit("cancel");
     };
 
     // Handle trigger click
@@ -276,25 +297,46 @@ export const Popconfirm = defineComponent({
       }
     };
 
-    // Setup and cleanup event listeners based on visibility
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setVisible(false);
+    };
+
+    let outsideClickTimeoutId: number | undefined;
+
     watch(currentVisible, (visible) => {
-      if (visible) {
-        // Use setTimeout to avoid immediate triggering on the same click that opened it
-        setTimeout(() => {
-          document.addEventListener('click', handleClickOutside);
-        }, 0);
-      } else {
-        document.removeEventListener('click', handleClickOutside);
+      if (outsideClickTimeoutId !== undefined) {
+        clearTimeout(outsideClickTimeoutId);
+        outsideClickTimeoutId = undefined;
       }
+
+      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+
+      if (!visible) return;
+
+      outsideClickTimeoutId = window.setTimeout(() => {
+        document.addEventListener("click", handleClickOutside);
+      }, 0);
+
+      document.addEventListener("keydown", handleKeyDown);
     });
 
     onBeforeUnmount(() => {
-      document.removeEventListener('click', handleClickOutside);
+      if (outsideClickTimeoutId !== undefined) {
+        clearTimeout(outsideClickTimeoutId);
+      }
+      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
     });
 
     // Container classes
     const containerClasses = computed(() => {
-      return classNames(getPopconfirmContainerClasses(), props.className);
+      return classNames(
+        getPopconfirmContainerClasses(),
+        props.className,
+        coerceClassValue(attrs.class)
+      );
     });
 
     // Trigger classes
@@ -355,96 +397,169 @@ export const Popconfirm = defineComponent({
         return null;
       }
 
-      // Trigger element
-      const trigger = h(
-        'div',
-        {
-          class: triggerClasses.value,
-          onClick: handleTriggerClick,
-        },
-        defaultSlot
-      );
+      const {
+        class: _class,
+        style: _style,
+        ...restAttrs
+      } = attrs as {
+        class?: unknown;
+        style?: unknown;
+      } & Record<string, unknown>;
 
-      // Popconfirm content
+      const triggerA11yProps = {
+        "aria-haspopup": "dialog",
+        "aria-expanded": Boolean(currentVisible.value),
+        "aria-controls": currentVisible.value ? popconfirmId : undefined,
+        "aria-disabled": props.disabled ? "true" : undefined,
+      } as const;
+
+      const trigger = (() => {
+        if (defaultSlot.length === 1) {
+          const only = defaultSlot[0];
+          if (isVNode(only)) {
+            const existingProps = (only.props ?? {}) as {
+              class?: unknown;
+              onClick?: unknown;
+            };
+
+            const existingOnClick = existingProps.onClick;
+            const onClick = (event: MouseEvent) => {
+              if (typeof existingOnClick === "function") {
+                (existingOnClick as (e: MouseEvent) => void)(event);
+              } else if (Array.isArray(existingOnClick)) {
+                for (const handler of existingOnClick) {
+                  if (typeof handler === "function") {
+                    (handler as (e: MouseEvent) => void)(event);
+                  }
+                }
+              }
+
+              if (event.defaultPrevented) return;
+              handleTriggerClick();
+            };
+
+            return cloneVNode(
+              only,
+              {
+                ...triggerA11yProps,
+                class: classNames(
+                  coerceClassValue(existingProps.class),
+                  triggerClasses.value
+                ),
+                onClick,
+              },
+              true
+            );
+          }
+        }
+
+        return h(
+          "div",
+          {
+            class: triggerClasses.value,
+            onClick: handleTriggerClick,
+            role: "button",
+            tabindex: props.disabled ? -1 : 0,
+            onKeydown: (event: KeyboardEvent) => {
+              if (props.disabled) return;
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                handleTriggerClick();
+              }
+            },
+            ...triggerA11yProps,
+          },
+          defaultSlot
+        );
+      })();
+
+      const hasDescription = Boolean(props.description || slots.description);
+
       const content = h(
-        'div',
+        "div",
         {
           class: contentWrapperClasses.value,
           hidden: !currentVisible.value,
+          "aria-hidden": !currentVisible.value,
         },
         [
-          h('div', { class: 'relative' }, [
-            h('div', { class: arrowClasses.value, 'aria-hidden': 'true' }),
+          h("div", { class: "relative" }, [
+            h("div", { class: arrowClasses.value, "aria-hidden": "true" }),
             h(
-              'div',
+              "div",
               {
+                id: popconfirmId,
+                role: "dialog",
+                "aria-modal": "false",
+                "aria-labelledby": titleId,
+                "aria-describedby": hasDescription ? descriptionId : undefined,
                 class: contentClasses.value,
               },
               [
                 // Title section with icon
                 h(
-                  'div',
+                  "div",
                   {
-                    class: 'flex items-start',
+                    class: "flex items-start",
                   },
                   [
                     // Icon
                     props.showIcon &&
                       h(
-                        'div',
+                        "div",
                         {
                           class: iconClasses.value,
+                          "aria-hidden": "true",
                         },
                         iconMap[props.icon]
                       ),
                     // Title and description
                     h(
-                      'div',
+                      "div",
                       {
-                        class: 'flex-1',
+                        class: "flex-1",
                       },
                       [
                         // Title
                         slots.title
                           ? h(
-                              'div',
-                              { class: titleClasses.value },
+                              "div",
+                              { id: titleId, class: titleClasses.value },
                               slots.title()
                             )
                           : h(
-                              'div',
-                              { class: titleClasses.value },
+                              "div",
+                              { id: titleId, class: titleClasses.value },
                               props.title
                             ),
                         // Description
-                        props.description &&
-                          (slots.description
-                            ? h(
-                                'div',
-                                { class: descriptionClasses.value },
-                                slots.description()
-                              )
-                            : h(
-                                'div',
-                                { class: descriptionClasses.value },
-                                props.description
-                              )),
+                        hasDescription &&
+                          h(
+                            "div",
+                            {
+                              id: descriptionId,
+                              class: descriptionClasses.value,
+                            },
+                            slots.description
+                              ? slots.description()
+                              : props.description
+                          ),
                       ]
                     ),
                   ]
                 ),
                 // Buttons
                 h(
-                  'div',
+                  "div",
                   {
                     class: buttonsClasses.value,
                   },
                   [
                     // Cancel button
                     h(
-                      'button',
+                      "button",
                       {
-                        type: 'button',
+                        type: "button",
                         class: cancelButtonClasses.value,
                         onClick: handleCancel,
                       },
@@ -452,9 +567,9 @@ export const Popconfirm = defineComponent({
                     ),
                     // OK button
                     h(
-                      'button',
+                      "button",
                       {
-                        type: 'button',
+                        type: "button",
                         class: okButtonClasses.value,
                         onClick: handleConfirm,
                       },
@@ -469,10 +584,15 @@ export const Popconfirm = defineComponent({
       );
 
       return h(
-        'div',
+        "div",
         {
+          ...restAttrs,
           ref: containerRef,
           class: containerClasses.value,
+          style: mergeStyleValues(
+            (attrs as Record<string, unknown>).style,
+            props.style
+          ),
         },
         [trigger, content]
       );
