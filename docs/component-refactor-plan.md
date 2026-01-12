@@ -17,8 +17,10 @@
 - 上一步：✅ `Drawer` Step1 主题/透传/a11y/类型导出/测试精简/文档同步（2026-01-13）
 - 上一步：✅ `Select` Step1 API/类型对齐（value 类型、option group 类型）（2026-01-13）
 - 上一步：✅ `Select` Step2 键盘/aria/focus（2026-01-13）
-- 当前组件：`Select`
-- 当前步骤：Step3 视觉与主题（状态色全部 CSS vars）
+- 上一步：✅ `Select` Step3 视觉与主题（状态色全部 CSS vars）（2026-01-13）
+- 上一步：✅ `Select` Step4 tests（键盘 + 选中 + 清空 + 搜索）（2026-01-13）
+- 当前组件：`Form/FormItem`
+- 当前步骤：Step1 API/校验路径收敛
 - 状态：`not-started`
 - 已优化组件数/需优化组件数：30/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
@@ -232,6 +234,8 @@
 
 - 状态：✅ Step1 API/类型对齐（2026-01-13）：core 补齐并导出 `SelectValue/SelectValues/SelectModelValue/SelectOptions`，options 类型收敛为「option 与 group 的联合数组」；React Select 改为 discriminated union 精确约束单选/多选的 `value/onChange`，同时移除过度 memo/callback；Vue Select 对齐 `SelectOptions/SelectModelValue` 并简化 click-outside 绑定；同步精简 Vue/React Select 测试（移除快照，补齐分组/搜索/多选关键路径），更新 Select 文档与 React Demo。
 - 状态：✅ Step2 键盘/aria/focus（2026-01-13）：React/Vue Select 补齐键盘路径（ArrowUp/Down/Home/End/Enter/Space/Escape/Tab）、打开时高亮/跳过 disabled、单选选择后焦点回到 Trigger；下拉列表增加 `role=listbox`/`role=option` 与 `aria-selected/aria-disabled/aria-multiselectable`；同步补充 Vue/React 键盘交互测试并更新 Select 文档的键盘说明。
+- 状态：✅ Step3 视觉与主题（状态色全部 CSS vars）（2026-01-13）：core Select 样式全面收敛为 CSS vars（trigger/dropdown/option/分组/搜索/空态等，含 fallback），React/Vue 内部占位符与图标色也改为 CSS vars；Select 文档同步补充可覆盖变量清单；测试无需变更。
+- 状态：✅ Step4 tests（键盘 + 选中 + 清空 + 搜索）（2026-01-13）：Vue/React Select 测试去掉脆弱的 SVG class 断言，改用稳定 `data-tiger-select-clear` 选择器验证清空行为；补齐键盘打开时跳过 disabled 选项的用例；整体覆盖收敛到关键交互路径。
 
 #### Switch（P2，建议优化）
 

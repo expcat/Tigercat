@@ -31,7 +31,8 @@ let selectInstanceId = 0;
 const ChevronDownIcon = h(
   "svg",
   {
-    class: "w-5 h-5 text-gray-400 transition-transform",
+    class:
+      "w-5 h-5 text-[var(--tiger-select-icon,var(--tiger-text-muted,#9ca3af))] transition-transform",
     xmlns: "http://www.w3.org/2000/svg",
     viewBox: "0 0 20 20",
     fill: "currentColor",
@@ -49,7 +50,8 @@ const ChevronDownIcon = h(
 const CloseIcon = h(
   "svg",
   {
-    class: "w-4 h-4 text-gray-400 hover:text-gray-600",
+    class:
+      "w-4 h-4 text-[var(--tiger-select-icon,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-select-icon-hover,var(--tiger-text-muted,#6b7280))]",
     xmlns: "http://www.w3.org/2000/svg",
     viewBox: "0 0 20 20",
     fill: "currentColor",
@@ -67,7 +69,8 @@ const CloseIcon = h(
 const CheckIcon = h(
   "svg",
   {
-    class: "w-5 h-5 text-[var(--tiger-primary,#2563eb)]",
+    class:
+      "w-5 h-5 text-[var(--tiger-select-check-icon,var(--tiger-primary,#2563eb))]",
     xmlns: "http://www.w3.org/2000/svg",
     viewBox: "0 0 20 20",
     fill: "currentColor",
@@ -589,7 +592,8 @@ export const Select = defineComponent({
               {
                 class: classNames(
                   "flex-1 text-left truncate",
-                  displayText.value === props.placeholder && "text-gray-400"
+                  displayText.value === props.placeholder &&
+                    "text-[var(--tiger-select-placeholder,var(--tiger-text-muted,#9ca3af))]"
                 ),
               },
               displayText.value
@@ -600,6 +604,7 @@ export const Select = defineComponent({
                   "span",
                   {
                     class: "inline-flex",
+                    "data-tiger-select-clear": "",
                     onClick: clearSelection,
                   },
                   CloseIcon

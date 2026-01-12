@@ -503,7 +503,7 @@ export const Select: React.FC<SelectProps> = (props) => {
           <span>{option.label}</span>
           {optionSelected && (
             <svg
-              className="w-5 h-5 text-[var(--tiger-primary,#2563eb)]"
+              className="w-5 h-5 text-[var(--tiger-select-check-icon,var(--tiger-primary,#2563eb))]"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
               fill="currentColor"
@@ -569,16 +569,21 @@ export const Select: React.FC<SelectProps> = (props) => {
         <span
           className={classNames(
             "flex-1 text-left truncate",
-            displayText === placeholder && "text-gray-400"
+            displayText === placeholder &&
+              "text-[var(--tiger-select-placeholder,var(--tiger-text-muted,#9ca3af))]"
           )}
         >
           {displayText}
         </span>
         <span className="flex items-center gap-1">
           {showClearButton && (
-            <span className="inline-flex" onClick={clearSelection}>
+            <span
+              className="inline-flex"
+              data-tiger-select-clear
+              onClick={clearSelection}
+            >
               <svg
-                className="w-4 h-4 text-gray-400 hover:text-gray-600"
+                className="w-4 h-4 text-[var(--tiger-select-icon,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-select-icon-hover,var(--tiger-text-muted,#6b7280))]"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
@@ -593,7 +598,7 @@ export const Select: React.FC<SelectProps> = (props) => {
           )}
           <span className={classNames("inline-flex", isOpen && "rotate-180")}>
             <svg
-              className="w-5 h-5 text-gray-400 transition-transform"
+              className="w-5 h-5 text-[var(--tiger-select-icon,var(--tiger-text-muted,#9ca3af))] transition-transform"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
               fill="currentColor"

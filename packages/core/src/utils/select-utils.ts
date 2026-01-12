@@ -1,7 +1,3 @@
-/**
- * Utility functions for Select component styling
- */
-
 import type {
   SelectOptions,
   SelectSize,
@@ -26,70 +22,71 @@ const SELECT_TRIGGER_BASE_CLASSES = [
   "gap-2",
   "px-3",
   "py-2",
-  "bg-white",
+  "bg-[var(--tiger-select-trigger-bg,var(--tiger-surface,#ffffff))]",
   "border",
-  "border-gray-300",
+  "border-[var(--tiger-select-trigger-border,var(--tiger-border,#d1d5db))]",
+  "text-[var(--tiger-select-trigger-text,var(--tiger-text,#111827))]",
   "rounded-md",
   "shadow-sm",
   "cursor-pointer",
   "transition-colors",
   "focus:outline-none",
   "focus:ring-2",
-  "focus:ring-[var(--tiger-primary,#2563eb)]",
-  "focus:border-[var(--tiger-primary,#2563eb)]",
+  "focus:ring-[var(--tiger-select-ring,var(--tiger-primary,#2563eb))]",
+  "focus:border-[var(--tiger-select-trigger-border-focus,var(--tiger-primary,#2563eb))]",
 ] as const;
 
 /**
  * Select trigger disabled classes (combined string for performance)
  */
 const SELECT_TRIGGER_DISABLED_CLASSES_STRING = [
-  "disabled:bg-gray-50",
-  "disabled:text-gray-500",
+  "disabled:bg-[var(--tiger-select-trigger-bg-disabled,var(--tiger-surface-muted,#f3f4f6))]",
+  "disabled:text-[var(--tiger-select-trigger-text-disabled,var(--tiger-text-muted,#6b7280))]",
   "disabled:cursor-not-allowed",
-  "disabled:border-gray-200",
+  "disabled:border-[var(--tiger-select-trigger-border-disabled,var(--tiger-border,#e5e7eb))]",
 ].join(" ");
 
 /**
  * Select dropdown base classes
  */
 export const selectDropdownBaseClasses =
-  "absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto";
+  "absolute z-50 w-full mt-1 bg-[var(--tiger-select-dropdown-bg,var(--tiger-surface,#ffffff))] border border-[var(--tiger-select-dropdown-border,var(--tiger-border,#e5e7eb))] rounded-md shadow-lg max-h-60 overflow-auto";
 
 /**
  * Select option base classes
  */
 export const selectOptionBaseClasses =
-  "w-full px-3 py-2 text-left cursor-pointer transition-colors hover:bg-[var(--tiger-outline-bg-hover,#eff6ff)]";
+  "w-full px-3 py-2 text-left cursor-pointer transition-colors text-[var(--tiger-select-option-text,var(--tiger-text,#111827))] hover:bg-[var(--tiger-select-option-bg-hover,var(--tiger-outline-bg-hover,#eff6ff))]";
 
 /**
  * Select option selected classes
  */
 export const selectOptionSelectedClasses =
-  "bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)] font-medium";
+  "bg-[var(--tiger-select-option-bg-selected,var(--tiger-outline-bg-hover,#eff6ff))] text-[var(--tiger-select-option-text-selected,var(--tiger-primary,#2563eb))] font-medium";
 
 /**
  * Select option disabled classes
  */
 export const selectOptionDisabledClasses =
-  "opacity-50 cursor-not-allowed hover:bg-white";
+  "opacity-50 cursor-not-allowed hover:bg-[var(--tiger-select-dropdown-bg,var(--tiger-surface,#ffffff))]";
 
 /**
  * Select group label classes
  */
 export const selectGroupLabelClasses =
-  "px-3 py-2 text-xs font-semibold text-gray-500 uppercase bg-gray-50";
+  "px-3 py-2 text-xs font-semibold text-[var(--tiger-select-group-label-text,var(--tiger-text-muted,#6b7280))] uppercase bg-[var(--tiger-select-group-label-bg,var(--tiger-surface-muted,#f9fafb))]";
 
 /**
  * Select search input classes
  */
 export const selectSearchInputClasses =
-  "w-full px-3 py-2 border-b border-gray-200 focus:outline-none focus:ring-0";
+  "w-full px-3 py-2 bg-[var(--tiger-select-dropdown-bg,var(--tiger-surface,#ffffff))] text-[var(--tiger-select-search-text,var(--tiger-text,#111827))] placeholder:text-[var(--tiger-select-search-placeholder,var(--tiger-text-muted,#9ca3af))] border-b border-[var(--tiger-select-dropdown-border,var(--tiger-border,#e5e7eb))] focus:outline-none focus:ring-0";
 
 /**
  * Select empty state classes
  */
 export const selectEmptyStateClasses =
-  "px-3 py-8 text-center text-gray-500 text-sm";
+  "px-3 py-8 text-center text-[var(--tiger-select-empty-text,var(--tiger-text-muted,#6b7280))] text-sm";
 
 /**
  * Select size classes map (constant for performance)
@@ -126,7 +123,7 @@ export function getSelectTriggerClasses(
     getSelectSizeClasses(size),
     disabled && SELECT_TRIGGER_DISABLED_CLASSES_STRING,
     isOpen &&
-      "ring-2 ring-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)]"
+      "ring-2 ring-[var(--tiger-select-ring,var(--tiger-primary,#2563eb))] border-[var(--tiger-select-trigger-border-focus,var(--tiger-primary,#2563eb))]"
   );
 }
 
