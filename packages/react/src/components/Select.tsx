@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   classNames,
   getSelectTriggerClasses,
@@ -11,191 +11,492 @@ import {
   isOptionGroup,
   filterOptions,
   type SelectOption,
-  type SelectOptionGroup,
+  type SelectOptions,
   type SelectProps as CoreSelectProps,
-} from '@tigercat/core'
+  type SelectValue,
+  type SelectValues,
+} from "@tigercat/core";
 
-export interface SelectProps extends CoreSelectProps {
-  /**
-   * Current selected value (single or multiple)
-   */
-  value?: string | number | (string | number)[]
+const flattenSelectOptions = (options: SelectOptions): SelectOption[] => {
+  const all: SelectOption[] = [];
+  for (const item of options) {
+    if (isOptionGroup(item)) {
+      all.push(...item.options);
+    } else {
+      all.push(item);
+    }
+  }
+  return all;
+};
 
-  /**
-   * Change event handler
-   */
-  onChange?: (value: string | number | (string | number)[] | undefined) => void
+type SelectDivProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "defaultValue" | "value" | "onChange"
+>;
 
-  /**
-   * Search event handler
-   */
-  onSearch?: (query: string) => void
+export interface SelectBaseProps
+  extends Omit<CoreSelectProps, "multiple" | "options">,
+    SelectDivProps {
+  options?: SelectOptions;
 
-  /**
-   * Additional CSS classes
-   */
-  className?: string
+  onSearch?: (query: string) => void;
+
+  className?: string;
 }
 
-export const Select: React.FC<SelectProps> = ({
-  value,
-  options = [],
-  size = 'md',
-  disabled = false,
-  placeholder = 'Select an option',
-  searchable = false,
-  multiple = false,
-  clearable = true,
-  noOptionsText = 'No options found',
-  noDataText = 'No options available',
-  onChange,
-  onSearch,
-  className,
-  ...props
-}) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const triggerRef = useRef<HTMLButtonElement>(null)
-  const searchInputRef = useRef<HTMLInputElement>(null)
+export interface SelectSingleProps extends SelectBaseProps {
+  multiple?: false;
+  value?: SelectValue;
+  onChange?: (value: SelectValue | undefined) => void;
+}
 
-  const filteredOptions = useMemo(() => 
-    searchable && searchQuery ? filterOptions(options, searchQuery) : options,
-    [searchable, searchQuery, options]
-  )
+export interface SelectMultipleProps extends SelectBaseProps {
+  multiple: true;
+  value?: SelectValues;
+  onChange?: (value: SelectValues) => void;
+}
 
-  const hasOptions = useMemo(() => filteredOptions.length > 0, [filteredOptions])
+export type SelectProps = SelectSingleProps | SelectMultipleProps;
 
-  const allOptions = useMemo((): SelectOption[] => {
-    const result: SelectOption[] = []
-    options.forEach((item) => {
-      if (isOptionGroup(item)) {
-        result.push(...(item as SelectOptionGroup).options)
-      } else {
-        result.push(item as SelectOption)
-      }
-    })
-    return result
-  }, [options])
+const isMultipleSelect = (props: SelectProps): props is SelectMultipleProps =>
+  props.multiple === true;
 
-  const displayText = useMemo((): string => {
-    if (multiple && Array.isArray(value)) {
+export const Select: React.FC<SelectProps> = (props) => {
+  const {
+    options = [],
+    size = "md",
+    disabled = false,
+    placeholder = "Select an option",
+    searchable = false,
+    clearable = true,
+    noOptionsText = "No options found",
+    noDataText = "No options available",
+    onSearch,
+    className,
+  } = props;
+
+  const divProps = (({
+    value: _value,
+    onChange: _onChange,
+    multiple: _multiple,
+    ...rest
+  }) => rest)(props);
+
+  const instanceId = useId();
+  const listboxId = `tiger-select-listbox-${instanceId}`;
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const filteredOptions = useMemo(
+    () =>
+      searchable && searchQuery ? filterOptions(options, searchQuery) : options,
+    [options, searchable, searchQuery]
+  );
+
+  const flatFilteredOptions = useMemo(
+    () => flattenSelectOptions(filteredOptions),
+    [filteredOptions]
+  );
+
+  const allOptions = useMemo(() => flattenSelectOptions(options), [options]);
+
+  const displayText = (() => {
+    if (isMultipleSelect(props)) {
+      const value = props.value ?? [];
       if (value.length === 0) {
-        return placeholder
+        return placeholder;
       }
-      const selectedOptions = allOptions.filter((opt) => value.includes(opt.value))
-      return selectedOptions.map((opt) => opt.label).join(', ')
-    } else {
-      if (value === undefined || value === null || value === '') {
-        return placeholder
-      }
-      const option = allOptions.find((opt) => opt.value === value)
-      return option ? option.label : placeholder
+      const selectedOptions = allOptions.filter((opt) =>
+        value.includes(opt.value)
+      );
+      return selectedOptions.map((opt) => opt.label).join(", ");
     }
-  }, [multiple, value, placeholder, allOptions])
 
-  const showClearButton = useMemo(() =>
+    const value = props.value;
+    if (value === undefined || value === null || value === "") {
+      return placeholder;
+    }
+
+    return allOptions.find((opt) => opt.value === value)?.label ?? placeholder;
+  })();
+
+  const showClearButton =
     clearable &&
     !disabled &&
-    value !== undefined &&
-    value !== null &&
-    value !== '' &&
-    (!Array.isArray(value) || value.length > 0),
-    [clearable, disabled, value]
-  )
+    props.value !== undefined &&
+    props.value !== null &&
+    props.value !== "" &&
+    (!Array.isArray(props.value) || props.value.length > 0);
 
-  const isSelected = useCallback((option: SelectOption): boolean => {
-    if (multiple && Array.isArray(value)) {
-      return value.includes(option.value)
+  const isSelected = (option: SelectOption): boolean => {
+    if (isMultipleSelect(props)) {
+      return (props.value ?? []).includes(option.value);
     }
-    return value === option.value
-  }, [multiple, value])
+    return props.value === option.value;
+  };
 
-  const toggleDropdown = useCallback(() => {
+  const getOptionId = (index: number) =>
+    `tiger-select-option-${instanceId}-${index}`;
+
+  const findFirstEnabledIndex = (): number =>
+    flatFilteredOptions.findIndex((opt) => !opt.disabled);
+
+  const findLastEnabledIndex = (): number => {
+    for (let i = flatFilteredOptions.length - 1; i >= 0; i--) {
+      if (!flatFilteredOptions[i]?.disabled) {
+        return i;
+      }
+    }
+    return -1;
+  };
+
+  const findNextEnabledIndex = (current: number, direction: 1 | -1): number => {
+    if (flatFilteredOptions.length === 0) {
+      return -1;
+    }
+
+    const start =
+      current < 0
+        ? direction === 1
+          ? 0
+          : flatFilteredOptions.length - 1
+        : current + direction;
+    for (
+      let i = start;
+      i >= 0 && i < flatFilteredOptions.length;
+      i += direction
+    ) {
+      if (!flatFilteredOptions[i]?.disabled) {
+        return i;
+      }
+    }
+    return current;
+  };
+
+  const focusOptionAt = (index: number) => {
+    if (index < 0) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      const el = dropdownRef.current?.querySelector<HTMLElement>(
+        `[data-option-index="${index}"]`
+      );
+      el?.focus();
+      el?.scrollIntoView({ block: "nearest" });
+    });
+  };
+
+  const setActiveAndFocus = (index: number) => {
+    setActiveIndex(index);
+    focusOptionAt(index);
+  };
+
+  const closeDropdown = () => {
+    setIsOpen(false);
+    setSearchQuery("");
+    setActiveIndex(-1);
+  };
+
+  const toggleDropdown = () => {
     if (!disabled) {
-      setIsOpen(!isOpen)
+      setIsOpen((prev) => !prev);
     }
-  }, [disabled, isOpen])
+  };
 
-  const closeDropdown = useCallback(() => {
-    setIsOpen(false)
-    setSearchQuery('')
-  }, [])
+  const getActiveOption = (): SelectOption | undefined => {
+    if (activeIndex < 0) {
+      return undefined;
+    }
+    return flatFilteredOptions[activeIndex];
+  };
 
-  const selectOption = useCallback((option: SelectOption) => {
+  const selectActiveOption = () => {
+    const option = getActiveOption();
+    if (!option || option.disabled) {
+      return;
+    }
+    selectOption(option);
+  };
+
+  const selectOption = (option: SelectOption) => {
     if (option.disabled) {
-      return
+      return;
     }
 
-    if (multiple) {
-      const currentValue = Array.isArray(value) ? value : []
-      let newValue: (string | number)[]
+    if (isMultipleSelect(props)) {
+      const currentValue = props.value ?? [];
+      const nextValue = currentValue.includes(option.value)
+        ? currentValue.filter((v) => v !== option.value)
+        : [...currentValue, option.value];
 
-      if (currentValue.includes(option.value)) {
-        newValue = currentValue.filter((v) => v !== option.value)
-      } else {
-        newValue = [...currentValue, option.value]
+      props.onChange?.(nextValue);
+      return;
+    }
+
+    props.onChange?.(option.value);
+    closeDropdown();
+    requestAnimationFrame(() => {
+      triggerRef.current?.focus();
+    });
+  };
+
+  const clearSelection = (event: React.MouseEvent) => {
+    event.stopPropagation();
+
+    if (isMultipleSelect(props)) {
+      props.onChange?.([]);
+      return;
+    }
+
+    props.onChange?.(undefined);
+  };
+
+  const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    onSearch?.(query);
+  };
+
+  const handleTriggerKeyDown = (
+    event: React.KeyboardEvent<HTMLButtonElement>
+  ) => {
+    if (disabled) {
+      return;
+    }
+
+    switch (event.key) {
+      case "ArrowDown": {
+        event.preventDefault();
+        if (!isOpen) {
+          setIsOpen(true);
+          return;
+        }
+        const next = findNextEnabledIndex(activeIndex, 1);
+        setActiveAndFocus(next);
+        return;
+      }
+      case "ArrowUp": {
+        event.preventDefault();
+        if (!isOpen) {
+          setIsOpen(true);
+          return;
+        }
+        const next = findNextEnabledIndex(activeIndex, -1);
+        setActiveAndFocus(next);
+        return;
+      }
+      case "Enter":
+      case " ": {
+        event.preventDefault();
+        if (!isOpen) {
+          setIsOpen(true);
+          return;
+        }
+        selectActiveOption();
+        return;
+      }
+      case "Escape": {
+        if (isOpen) {
+          event.preventDefault();
+          closeDropdown();
+        }
+        return;
+      }
+      default:
+        return;
+    }
+  };
+
+  const handleDropdownKeyDown = (
+    event: React.KeyboardEvent<HTMLDivElement>
+  ) => {
+    switch (event.key) {
+      case "ArrowDown": {
+        event.preventDefault();
+        const next = findNextEnabledIndex(activeIndex, 1);
+        setActiveAndFocus(next);
+        return;
+      }
+      case "ArrowUp": {
+        event.preventDefault();
+        const next = findNextEnabledIndex(activeIndex, -1);
+        setActiveAndFocus(next);
+        return;
+      }
+      case "Home": {
+        event.preventDefault();
+        const next = findFirstEnabledIndex();
+        setActiveAndFocus(next);
+        return;
+      }
+      case "End": {
+        event.preventDefault();
+        const next = findLastEnabledIndex();
+        setActiveAndFocus(next);
+        return;
+      }
+      case "Enter":
+      case " ": {
+        event.preventDefault();
+        selectActiveOption();
+        return;
+      }
+      case "Escape": {
+        event.preventDefault();
+        closeDropdown();
+        triggerRef.current?.focus();
+        return;
+      }
+      case "Tab": {
+        closeDropdown();
+        return;
+      }
+      default:
+        return;
+    }
+  };
+
+  const handleSearchKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    switch (event.key) {
+      case " ": {
+        event.stopPropagation();
+        return;
+      }
+      case "ArrowDown": {
+        event.preventDefault();
+        event.stopPropagation();
+        const next = activeIndex >= 0 ? activeIndex : findFirstEnabledIndex();
+        setActiveAndFocus(next);
+        return;
+      }
+      case "ArrowUp": {
+        event.preventDefault();
+        event.stopPropagation();
+        const next = activeIndex >= 0 ? activeIndex : findLastEnabledIndex();
+        setActiveAndFocus(next);
+        return;
+      }
+      case "Enter": {
+        if (activeIndex >= 0) {
+          event.preventDefault();
+          event.stopPropagation();
+          selectActiveOption();
+        }
+        return;
+      }
+      case "Escape": {
+        event.preventDefault();
+        event.stopPropagation();
+        closeDropdown();
+        triggerRef.current?.focus();
+        return;
+      }
+      default:
+        return;
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && searchable) {
+      searchInputRef.current?.focus();
+    }
+  }, [isOpen, searchable]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    if (flatFilteredOptions.length === 0) {
+      setActiveIndex(-1);
+      return;
+    }
+
+    const selectedIndex = (() => {
+      if (isMultipleSelect(props)) {
+        const value = props.value ?? [];
+        if (value.length === 0) {
+          return -1;
+        }
+        return flatFilteredOptions.findIndex(
+          (opt) => value.includes(opt.value) && !opt.disabled
+        );
       }
 
-      onChange?.(newValue)
-    } else {
-      onChange?.(option.value)
-      closeDropdown()
+      const value = props.value;
+      if (value === undefined || value === null || value === "") {
+        return -1;
+      }
+      return flatFilteredOptions.findIndex(
+        (opt) => opt.value === value && !opt.disabled
+      );
+    })();
+
+    const nextActive =
+      selectedIndex >= 0 ? selectedIndex : findFirstEnabledIndex();
+    setActiveIndex(nextActive);
+
+    if (!searchable) {
+      focusOptionAt(nextActive);
     }
-  }, [multiple, value, onChange, closeDropdown])
-
-  const clearSelection = useCallback((event: React.MouseEvent) => {
-    event.stopPropagation()
-    const newValue = multiple ? [] : undefined
-    onChange?.(newValue)
-  }, [multiple, onChange])
-
-  const handleSearchInput = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const query = event.target.value
-    setSearchQuery(query)
-    onSearch?.(query)
-  }, [onSearch])
+  }, [isOpen, searchable, flatFilteredOptions, props.multiple, props.value]);
 
   useEffect(() => {
-    if (isOpen && searchable && searchInputRef.current) {
-      searchInputRef.current.focus()
+    if (!isOpen) {
+      return;
     }
-  }, [isOpen, searchable])
 
-  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
       if (
         dropdownRef.current &&
         triggerRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        !triggerRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(target) &&
+        !triggerRef.current.contains(target)
       ) {
-        closeDropdown()
+        closeDropdown();
       }
-    }
+    };
 
-    if (isOpen) {
-      document.addEventListener('click', handleClickOutside)
-      return () => {
-        document.removeEventListener('click', handleClickOutside)
-      }
-    }
-  }, [isOpen]) // closeDropdown is stable (memoized with no deps), no need to include it
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [isOpen]);
 
-  const triggerClasses = useMemo(() => 
-    getSelectTriggerClasses(size, disabled, isOpen),
-    [size, disabled, isOpen]
-  )
+  const triggerClasses = getSelectTriggerClasses(size, disabled, isOpen);
 
-  const renderOption = useCallback((option: SelectOption) => {
-    const optionSelected = isSelected(option)
+  const renderOption = (option: SelectOption, index: number) => {
+    const optionSelected = isSelected(option);
+    const optionActive = index === activeIndex;
 
     return (
-      <button
+      <div
         key={option.value}
-        type="button"
-        className={getSelectOptionClasses(optionSelected, !!option.disabled, size)}
-        disabled={option.disabled}
+        id={getOptionId(index)}
+        data-option-index={index}
+        role="option"
+        aria-selected={optionSelected}
+        aria-disabled={option.disabled ? true : undefined}
+        tabIndex={optionActive ? 0 : -1}
+        className={getSelectOptionClasses(
+          optionSelected,
+          !!option.disabled,
+          size
+        )}
+        onMouseEnter={() => {
+          if (!option.disabled) {
+            setActiveIndex(index);
+          }
+        }}
         onClick={() => selectOption(option)}
       >
         <span className="flex items-center justify-between w-full">
@@ -215,50 +516,60 @@ export const Select: React.FC<SelectProps> = ({
             </svg>
           )}
         </span>
-      </button>
-    )
-  }, [isSelected, size, selectOption])
+      </div>
+    );
+  };
 
-  const renderOptions = useCallback(() => {
+  const hasOptions = filteredOptions.length > 0;
+
+  const renderOptions = () => {
     if (!hasOptions) {
       return (
         <div className={selectEmptyStateClasses}>
           {options.length === 0 ? noDataText : noOptionsText}
         </div>
-      )
+      );
     }
+
+    let optionIndex = -1;
 
     return filteredOptions.map((item) => {
       if (isOptionGroup(item)) {
-        const group = item as SelectOptionGroup
         return (
-          <div key={group.label}>
-            <div className={selectGroupLabelClasses}>{group.label}</div>
-            {group.options.map((option) => renderOption(option))}
+          <div key={item.label}>
+            <div className={selectGroupLabelClasses}>{item.label}</div>
+            {item.options.map((option) => {
+              optionIndex += 1;
+              return renderOption(option, optionIndex);
+            })}
           </div>
-        )
-      } else {
-        return renderOption(item as SelectOption)
+        );
       }
-    })
-  }, [hasOptions, options.length, noDataText, noOptionsText, filteredOptions, renderOption])
 
-  const containerClasses = useMemo(() => classNames(selectBaseClasses, className), [className])
+      optionIndex += 1;
+      return renderOption(item, optionIndex);
+    });
+  };
+
+  const containerClasses = classNames(selectBaseClasses, className);
 
   return (
-    <div className={containerClasses} {...props}>
-      {/* Trigger button */}
+    <div className={containerClasses} {...divProps}>
       <button
         ref={triggerRef}
         type="button"
         className={triggerClasses}
         disabled={disabled}
         onClick={toggleDropdown}
+        onKeyDown={handleTriggerKeyDown}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-controls={listboxId}
       >
         <span
           className={classNames(
-            'flex-1 text-left truncate',
-            displayText === placeholder && 'text-gray-400'
+            "flex-1 text-left truncate",
+            displayText === placeholder && "text-gray-400"
           )}
         >
           {displayText}
@@ -280,7 +591,7 @@ export const Select: React.FC<SelectProps> = ({
               </svg>
             </span>
           )}
-          <span className={classNames('inline-flex', isOpen && 'rotate-180')}>
+          <span className={classNames("inline-flex", isOpen && "rotate-180")}>
             <svg
               className="w-5 h-5 text-gray-400 transition-transform"
               xmlns="http://www.w3.org/2000/svg"
@@ -297,10 +608,15 @@ export const Select: React.FC<SelectProps> = ({
         </span>
       </button>
 
-      {/* Dropdown */}
       {isOpen && (
-        <div ref={dropdownRef} className={selectDropdownBaseClasses}>
-          {/* Search input */}
+        <div
+          ref={dropdownRef}
+          className={selectDropdownBaseClasses}
+          role="listbox"
+          id={listboxId}
+          aria-multiselectable={isMultipleSelect(props) ? true : undefined}
+          onKeyDown={handleDropdownKeyDown}
+        >
           {searchable && (
             <input
               ref={searchInputRef}
@@ -309,12 +625,12 @@ export const Select: React.FC<SelectProps> = ({
               placeholder="Search..."
               value={searchQuery}
               onChange={handleSearchInput}
+              onKeyDown={handleSearchKeyDown}
             />
           )}
-          {/* Options list */}
           {renderOptions()}
         </div>
       )}
     </div>
-  )
-}
+  );
+};
