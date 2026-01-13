@@ -107,13 +107,16 @@ const filterTreeData = ref<TreeNode[]>([
 <template>
   <div class="p-8 max-w-7xl mx-auto">
     <h1 class="text-3xl font-bold mb-6">Tree 树形控件</h1>
-    <p class="text-gray-600 mb-8">用于展示层级结构的树形数据。</p>
+    <p class="text-gray-600 mb-2">用于展示层级结构的树形数据。</p>
+    <p class="text-sm text-gray-600 mb-8">
+      键盘：方向键移动焦点，Enter 选择，Space 勾选，Escape 收拢。
+    </p>
 
     <Space direction="vertical" size="lg" class="w-full">
       <!-- 基本用法 -->
       <Card>
         <template #header><h3 class="text-lg font-semibold">基本用法</h3></template>
-        <Tree :treeData="basicTreeData" />
+        <Tree :treeData="basicTreeData" ariaLabel="Tree 基本用法" />
       </Card>
 
       <!-- 默认展开所有节点 -->
@@ -179,7 +182,11 @@ const filterTreeData = ref<TreeNode[]>([
           placeholder="搜索节点..." 
           class="mb-4"
         />
-        <Tree :treeData="filterTreeData" :filterValue="filterValue" />
+        <Tree
+          :treeData="filterTreeData"
+          :filterValue="filterValue"
+          ariaLabel="Tree 节点过滤"
+        />
       </Card>
 
       <!-- Block 节点 -->

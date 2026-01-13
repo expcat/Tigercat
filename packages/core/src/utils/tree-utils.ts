@@ -8,91 +8,131 @@ import type {
   TreeCheckedState,
   TreeCheckStrategy,
   TreeFilterFn,
-} from '../types/tree';
+} from "../types/tree";
+
+export interface VisibleTreeItem {
+  key: string | number;
+  level: number;
+  parentKey?: string | number;
+  node: TreeNode;
+}
+
+export function getVisibleTreeItems(
+  treeData: TreeNode[],
+  expandedKeys: Set<string | number> = new Set(),
+  matchedKeys?: Set<string | number>
+): VisibleTreeItem[] {
+  const isFiltered = !!matchedKeys && matchedKeys.size > 0;
+  const result: VisibleTreeItem[] = [];
+
+  function traverse(
+    nodes: TreeNode[],
+    level: number,
+    parentKey?: string | number
+  ) {
+    for (const node of nodes) {
+      const isVisible = !isFiltered || matchedKeys!.has(node.key);
+      if (!isVisible) continue;
+
+      result.push({ key: node.key, level, parentKey, node });
+
+      if (
+        node.children &&
+        node.children.length > 0 &&
+        expandedKeys.has(node.key)
+      ) {
+        traverse(node.children, level + 1, node.key);
+      }
+    }
+  }
+
+  traverse(treeData, 1);
+  return result;
+}
 
 /**
  * Base classes for tree container
  */
-export const treeBaseClasses = 'w-full bg-white rounded-lg';
+export const treeBaseClasses = "w-full bg-white rounded-lg";
 
 /**
  * Tree node wrapper classes
  */
-export const treeNodeWrapperClasses = 'select-none';
+export const treeNodeWrapperClasses = "select-none";
 
 /**
  * Tree node content classes
  */
 export const treeNodeContentClasses =
-  'flex items-center px-2 py-1.5 cursor-pointer rounded transition-colors duration-200';
+  "flex items-center px-2 py-1.5 cursor-pointer rounded transition-colors duration-200";
 
 /**
  * Tree node hover classes
  */
-export const treeNodeHoverClasses = 'hover:bg-gray-50';
+export const treeNodeHoverClasses = "hover:bg-gray-50";
 
 /**
  * Tree node selected classes
  */
 export const treeNodeSelectedClasses =
-  'bg-[var(--tiger-primary,#2563eb)] bg-opacity-10 text-[var(--tiger-primary,#2563eb)]';
+  "bg-[var(--tiger-primary,#2563eb)] bg-opacity-10 text-[var(--tiger-primary,#2563eb)]";
 
 /**
  * Tree node disabled classes
  */
-export const treeNodeDisabledClasses = 'opacity-50 cursor-not-allowed';
+export const treeNodeDisabledClasses = "opacity-50 cursor-not-allowed";
 
 /**
  * Tree node indent classes
  */
-export const treeNodeIndentClasses = 'inline-block w-6';
+export const treeNodeIndentClasses = "inline-block w-6";
 
 /**
  * Tree node expand icon classes
  */
 export const treeNodeExpandIconClasses =
-  'inline-flex items-center justify-center w-6 h-6 transition-transform duration-200';
+  "inline-flex items-center justify-center w-6 h-6 transition-transform duration-200";
 
 /**
  * Tree node expand icon expanded classes
  */
-export const treeNodeExpandIconExpandedClasses = 'transform rotate-90';
+export const treeNodeExpandIconExpandedClasses = "transform rotate-90";
 
 /**
  * Tree node checkbox classes
  */
 export const treeNodeCheckboxClasses =
-  'mr-2 rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]';
+  "mr-2 rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]";
 
 /**
  * Tree node icon classes
  */
-export const treeNodeIconClasses = 'mr-2 flex-shrink-0';
+export const treeNodeIconClasses = "mr-2 flex-shrink-0";
 
 /**
  * Tree node label classes
  */
-export const treeNodeLabelClasses = 'flex-1 truncate';
+export const treeNodeLabelClasses = "flex-1 truncate";
 
 /**
  * Tree node children container classes
  */
-export const treeNodeChildrenClasses = 'ml-6';
+export const treeNodeChildrenClasses = "ml-6";
 
 /**
  * Tree loading classes
  */
-export const treeLoadingClasses = 'inline-block ml-2 animate-spin h-4 w-4';
+export const treeLoadingClasses = "inline-block ml-2 animate-spin h-4 w-4";
 
 /**
  * Tree empty state classes
  */
-export const treeEmptyStateClasses = 'py-8 text-center text-gray-500';
+export const treeEmptyStateClasses = "py-8 text-center text-gray-500";
 
 /**
  * Tree line classes
  */
-export const treeLineClasses = 'border-l border-gray-300';
+export const treeLineClasses = "border-l border-gray-300";
 
 /**
  * Get tree node classes
@@ -121,10 +161,10 @@ export function getTreeNodeClasses(
   }
 
   if (blockNode) {
-    classes.push('w-full');
+    classes.push("w-full");
   }
 
-  return classes.join(' ');
+  return classes.join(" ");
 }
 
 /**
@@ -139,7 +179,7 @@ export function getTreeNodeExpandIconClasses(expanded: boolean): string {
     classes.push(treeNodeExpandIconExpandedClasses);
   }
 
-  return classes.join(' ');
+  return classes.join(" ");
 }
 
 /**
@@ -438,9 +478,9 @@ export function handleNodeCheck(
 export function getCheckedKeysByStrategy(
   checkedState: TreeCheckedState,
   treeData: TreeNode[],
-  strategy: TreeCheckStrategy = 'all'
+  strategy: TreeCheckStrategy = "all"
 ): (string | number)[] {
-  if (strategy === 'all') {
+  if (strategy === "all") {
     return checkedState.checked;
   }
 
@@ -455,7 +495,7 @@ export function getCheckedKeysByStrategy(
           hasChildren &&
           node.children!.every((child) => allKeys.has(child.key));
 
-        if (strategy === 'parent') {
+        if (strategy === "parent") {
           // Return parent if all children are checked
           if (hasChildren && allChildrenChecked) {
             result.push(node.key);
@@ -464,7 +504,7 @@ export function getCheckedKeysByStrategy(
           } else if (!hasChildren) {
             result.push(node.key);
           }
-        } else if (strategy === 'child') {
+        } else if (strategy === "child") {
           // Return leaf nodes only
           if (!hasChildren || !allChildrenChecked) {
             result.push(node.key);

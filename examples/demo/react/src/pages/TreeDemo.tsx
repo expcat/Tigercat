@@ -1,64 +1,70 @@
-import { useState } from 'react'
-import { Tree, Card, Space, Input } from '@tigercat/react'
-import type { TreeNode } from '@tigercat/react'
+import { useState } from "react";
+import { Tree, Card, Space, Input } from "@tigercat/react";
+import type { TreeNode } from "@tigercat/react";
 
 export default function TreeDemo() {
   // Basic tree data
   const basicTreeData: TreeNode[] = [
     {
-      key: '1',
-      label: '父节点 1',
+      key: "1",
+      label: "父节点 1",
       children: [
-        { key: '1-1', label: '子节点 1-1' },
-        { key: '1-2', label: '子节点 1-2' },
+        { key: "1-1", label: "子节点 1-1" },
+        { key: "1-2", label: "子节点 1-2" },
       ],
     },
     {
-      key: '2',
-      label: '父节点 2',
+      key: "2",
+      label: "父节点 2",
       children: [
-        { key: '2-1', label: '子节点 2-1' },
-        { key: '2-2', label: '子节点 2-2', children: [
-          { key: '2-2-1', label: '子节点 2-2-1' },
-          { key: '2-2-2', label: '子节点 2-2-2' },
-        ]},
+        { key: "2-1", label: "子节点 2-1" },
+        {
+          key: "2-2",
+          label: "子节点 2-2",
+          children: [
+            { key: "2-2-1", label: "子节点 2-2-1" },
+            { key: "2-2-2", label: "子节点 2-2-2" },
+          ],
+        },
       ],
     },
-  ]
+  ];
 
   // Checkable tree data
-  const [checkedKeys, setCheckedKeys] = useState<(string | number)[]>(['1-1'])
-  const [checkedKeysStrictly, setCheckedKeysStrictly] = useState<(string | number)[]>(['1-1'])
+  const [checkedKeys, setCheckedKeys] = useState<(string | number)[]>(["1-1"]);
+  const [checkedKeysStrictly, setCheckedKeysStrictly] = useState<
+    (string | number)[]
+  >(["1-1"]);
 
   // Selectable tree data
-  const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])
+  const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>([
+    "1-1",
+  ]);
 
   // Tree with disabled nodes
   const disabledTreeData: TreeNode[] = [
     {
-      key: '1',
-      label: '父节点 1',
+      key: "1",
+      label: "父节点 1",
       children: [
-        { key: '1-1', label: '子节点 1-1' },
-        { key: '1-2', label: '子节点 1-2 (禁用)', disabled: true },
+        { key: "1-1", label: "子节点 1-1" },
+        { key: "1-2", label: "子节点 1-2 (禁用)", disabled: true },
       ],
     },
     {
-      key: '2',
-      label: '父节点 2 (禁用)',
+      key: "2",
+      label: "父节点 2 (禁用)",
       disabled: true,
-      children: [
-        { key: '2-1', label: '子节点 2-1' },
-      ],
+      children: [{ key: "2-1", label: "子节点 2-1" }],
     },
-  ]
+  ];
 
   // Lazy loading tree data
   const lazyTreeData: TreeNode[] = [
-    { key: '1', label: '父节点 1' },
-    { key: '2', label: '父节点 2' },
-    { key: '3', label: '父节点 3' },
-  ]
+    { key: "1", label: "父节点 1" },
+    { key: "2", label: "父节点 2" },
+    { key: "3", label: "父节点 3" },
+  ];
 
   const loadChildren = async (node: TreeNode): Promise<TreeNode[]> => {
     // Simulate async loading
@@ -68,66 +74,73 @@ export default function TreeDemo() {
           { key: `${node.key}-1`, label: `${node.label} - 子节点 1` },
           { key: `${node.key}-2`, label: `${node.label} - 子节点 2` },
           { key: `${node.key}-3`, label: `${node.label} - 子节点 3` },
-        ])
-      }, 1000)
-    })
-  }
+        ]);
+      }, 1000);
+    });
+  };
 
   // Filter tree
-  const [filterValue, setFilterValue] = useState('')
+  const [filterValue, setFilterValue] = useState("");
   const filterTreeData: TreeNode[] = [
     {
-      key: '1',
-      label: 'Apple',
+      key: "1",
+      label: "Apple",
       children: [
-        { key: '1-1', label: 'iPhone' },
-        { key: '1-2', label: 'iPad' },
-        { key: '1-3', label: 'MacBook' },
+        { key: "1-1", label: "iPhone" },
+        { key: "1-2", label: "iPad" },
+        { key: "1-3", label: "MacBook" },
       ],
     },
     {
-      key: '2',
-      label: 'Microsoft',
+      key: "2",
+      label: "Microsoft",
       children: [
-        { key: '2-1', label: 'Surface' },
-        { key: '2-2', label: 'Xbox' },
+        { key: "2-1", label: "Surface" },
+        { key: "2-2", label: "Xbox" },
       ],
     },
     {
-      key: '3',
-      label: 'Google',
+      key: "3",
+      label: "Google",
       children: [
-        { key: '3-1', label: 'Pixel' },
-        { key: '3-2', label: 'Chromebook' },
+        { key: "3-1", label: "Pixel" },
+        { key: "3-2", label: "Chromebook" },
       ],
     },
-  ]
+  ];
 
   const handleSelect = (keys: (string | number)[]) => {
-    setSelectedKeys(keys)
-  }
+    setSelectedKeys(keys);
+  };
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Tree 树形控件</h1>
-      <p className="text-gray-600 mb-8">用于展示层级结构的树形数据。</p>
+      <p className="text-gray-600 mb-2">用于展示层级结构的树形数据。</p>
+      <p className="text-sm text-gray-600 mb-8">
+        键盘：方向键移动焦点，Enter 选择，Space 勾选，Escape 收拢。
+      </p>
 
       <Space direction="vertical" size="lg" className="w-full">
         {/* 基本用法 */}
         <Card header={<h3 className="text-lg font-semibold">基本用法</h3>}>
-          <Tree treeData={basicTreeData} />
+          <Tree treeData={basicTreeData} ariaLabel="Tree 基本用法" />
         </Card>
 
         {/* 默认展开所有节点 */}
-        <Card header={<h3 className="text-lg font-semibold">默认展开所有节点</h3>}>
+        <Card
+          header={<h3 className="text-lg font-semibold">默认展开所有节点</h3>}
+        >
           <Tree treeData={basicTreeData} defaultExpandAll />
         </Card>
 
         {/* 可选择的树 */}
         <Card header={<h3 className="text-lg font-semibold">可选择的树</h3>}>
-          <p className="text-sm text-gray-600 mb-4">已选择: {selectedKeys.join(', ')}</p>
-          <Tree 
-            treeData={basicTreeData} 
+          <p className="text-sm text-gray-600 mb-4">
+            已选择: {selectedKeys.join(", ")}
+          </p>
+          <Tree
+            treeData={basicTreeData}
             selectable
             selectedKeys={selectedKeys}
             onSelect={handleSelect}
@@ -135,10 +148,14 @@ export default function TreeDemo() {
         </Card>
 
         {/* 多选树（级联） */}
-        <Card header={<h3 className="text-lg font-semibold">多选树（级联）</h3>}>
-          <p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeys.join(', ')}</p>
-          <Tree 
-            treeData={basicTreeData} 
+        <Card
+          header={<h3 className="text-lg font-semibold">多选树（级联）</h3>}
+        >
+          <p className="text-sm text-gray-600 mb-4">
+            已勾选: {checkedKeys.join(", ")}
+          </p>
+          <Tree
+            treeData={basicTreeData}
             checkable
             defaultExpandAll
             checkedKeys={checkedKeys}
@@ -147,10 +164,14 @@ export default function TreeDemo() {
         </Card>
 
         {/* 多选树（父子独立） */}
-        <Card header={<h3 className="text-lg font-semibold">多选树（父子独立）</h3>}>
-          <p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeysStrictly.join(', ')}</p>
-          <Tree 
-            treeData={basicTreeData} 
+        <Card
+          header={<h3 className="text-lg font-semibold">多选树（父子独立）</h3>}
+        >
+          <p className="text-sm text-gray-600 mb-4">
+            已勾选: {checkedKeysStrictly.join(", ")}
+          </p>
+          <Tree
+            treeData={basicTreeData}
             checkable
             checkStrictly
             defaultExpandAll
@@ -166,19 +187,25 @@ export default function TreeDemo() {
 
         {/* 懒加载 */}
         <Card header={<h3 className="text-lg font-semibold">懒加载</h3>}>
-          <p className="text-sm text-gray-600 mb-4">点击节点展开，动态加载子节点</p>
+          <p className="text-sm text-gray-600 mb-4">
+            点击节点展开，动态加载子节点
+          </p>
           <Tree treeData={lazyTreeData} loadData={loadChildren} />
         </Card>
 
         {/* 节点过滤 */}
         <Card header={<h3 className="text-lg font-semibold">节点过滤</h3>}>
-          <Input 
-            value={filterValue} 
+          <Input
+            value={filterValue}
             onChange={(e) => setFilterValue(e.target.value)}
-            placeholder="搜索节点..." 
+            placeholder="搜索节点..."
             className="mb-4"
           />
-          <Tree treeData={filterTreeData} filterValue={filterValue} />
+          <Tree
+            treeData={filterTreeData}
+            filterValue={filterValue}
+            ariaLabel="Tree 节点过滤"
+          />
         </Card>
 
         {/* Block 节点 */}
@@ -188,5 +215,5 @@ export default function TreeDemo() {
         </Card>
       </Space>
     </div>
-  )
+  );
 }

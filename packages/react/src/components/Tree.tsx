@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, {
+  useState,
+  useMemo,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
 import {
   classNames,
   getTreeNodeClasses,
@@ -13,6 +19,8 @@ import {
   treeLoadingClasses,
   treeEmptyStateClasses,
   treeLineClasses,
+  getVisibleTreeItems,
+  getParentKeys,
   getAllKeys,
   findNode,
   calculateCheckedState,
@@ -26,7 +34,7 @@ import {
   type TreeCheckedState,
   type TreeLoadDataFn,
   type TreeFilterFn,
-} from '@tigercat/core';
+} from "@tigercat/core";
 
 // Expand icon component
 const ExpandIcon: React.FC<{ expanded: boolean; hasChildren: boolean }> = ({
@@ -43,7 +51,8 @@ const ExpandIcon: React.FC<{ expanded: boolean; hasChildren: boolean }> = ({
       width="16"
       height="16"
       viewBox="0 0 16 16"
-      fill="currentColor">
+      fill="currentColor"
+    >
       <path d="M6 4l4 4-4 4V4z" />
     </svg>
   );
@@ -55,7 +64,8 @@ const LoadingSpinner: React.FC = () => (
     className={treeLoadingClasses}
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
-    viewBox="0 0 24 24">
+    viewBox="0 0 24 24"
+  >
     <circle
       className="opacity-25"
       cx="12"
@@ -173,6 +183,12 @@ export interface TreeProps {
    * @default 'No data'
    */
   emptyText?: string;
+
+  /**
+   * Accessible label for the tree container
+   * @default 'Tree'
+   */
+  ariaLabel?: string;
   /**
    * Expand event handler
    */
@@ -189,7 +205,7 @@ export interface TreeProps {
       selected: boolean;
       selectedNodes: TreeNode[];
       node: TreeNode;
-      event: React.MouseEvent;
+      event: React.SyntheticEvent;
     }
   ) => void;
   /**
@@ -236,15 +252,16 @@ export const Tree: React.FC<TreeProps> = ({
   checkedKeys: controlledCheckedKeys,
   defaultExpandAll = false,
   checkStrictly = false,
-  checkStrategy = 'all',
+  checkStrategy = "all",
   selectable = true,
   multiple = false,
   loadData,
-  filterValue = '',
+  filterValue = "",
   filterFn,
   autoExpandParent = true,
   blockNode = false,
-  emptyText = 'No data',
+  emptyText = "No data",
+  ariaLabel = "Tree",
   onExpand,
   onSelect,
   onCheck,
@@ -253,16 +270,18 @@ export const Tree: React.FC<TreeProps> = ({
   onNodeCollapse,
   className,
 }) => {
+  const itemRefs = useRef(new Map<string | number, HTMLDivElement | null>());
+
   const effectiveSelectable = useMemo(() => {
     if (selectionMode !== undefined) {
-      return selectionMode !== 'none';
+      return selectionMode !== "none";
     }
     return selectable;
   }, [selectionMode, selectable]);
 
   const effectiveMultiple = useMemo(() => {
     if (selectionMode !== undefined) {
-      return selectionMode === 'multiple';
+      return selectionMode === "multiple";
     }
     return multiple;
   }, [selectionMode, multiple]);
@@ -328,6 +347,9 @@ export const Tree: React.FC<TreeProps> = ({
     Set<string | number>
   >(new Set());
 
+  // Active (focus) key
+  const [activeKey, setActiveKey] = useState<string | number>();
+
   // Computed expanded keys
   const computedExpandedKeys = useMemo(() => {
     if (controlledExpandedKeys !== undefined) {
@@ -335,6 +357,23 @@ export const Tree: React.FC<TreeProps> = ({
     }
     return internalExpandedKeys;
   }, [controlledExpandedKeys, internalExpandedKeys]);
+
+  const visibleItems = useMemo(
+    () => getVisibleTreeItems(treeData, computedExpandedKeys, filteredNodeKeys),
+    [treeData, computedExpandedKeys, filteredNodeKeys]
+  );
+
+  const focusableKeys = useMemo(
+    () => visibleItems.filter((i) => !i.node.disabled).map((i) => i.key),
+    [visibleItems]
+  );
+
+  const defaultActiveKey = focusableKeys[0];
+
+  useEffect(() => {
+    if (activeKey === undefined) return;
+    itemRefs.current.get(activeKey)?.focus();
+  }, [activeKey]);
 
   // Computed selected keys
   const computedSelectedKeys = useMemo(() => {
@@ -448,7 +487,7 @@ export const Tree: React.FC<TreeProps> = ({
   );
 
   const handleSelect = useCallback(
-    (nodeKey: string | number, event: React.MouseEvent) => {
+    (nodeKey: string | number, event: React.SyntheticEvent) => {
       const node = findNode(treeData, nodeKey);
       if (!node || node.disabled || !effectiveSelectable) return;
 
@@ -532,6 +571,142 @@ export const Tree: React.FC<TreeProps> = ({
     ]
   );
 
+  const handleKeyDown = useCallback(
+    (
+      e: React.KeyboardEvent,
+      node: TreeNode,
+      isExpanded: boolean,
+      isChecked: boolean
+    ) => {
+      if (node.disabled) return;
+
+      const currentKey = activeKey ?? defaultActiveKey ?? node.key;
+      const currentIndex = focusableKeys.findIndex((k) => k === currentKey);
+      const isExpandable =
+        !!(node.children && node.children.length > 0) ||
+        !!(loadData && !node.isLeaf);
+
+      const parents = getParentKeys(treeData, node.key);
+      const parentKey = parents[parents.length - 1];
+
+      const getFirstChildKey = () => {
+        const list = visibleItems;
+        const index = list.findIndex((i) => i.key === node.key);
+        if (index < 0) return undefined;
+
+        const base = list[index];
+        for (let i = index + 1; i < list.length; i++) {
+          const item = list[i];
+          if (item.level <= base.level) break;
+          if (item.parentKey === node.key && !item.node.disabled)
+            return item.key;
+        }
+
+        return undefined;
+      };
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveKey(focusableKeys[currentIndex + 1] ?? currentKey);
+        return;
+      }
+
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveKey(focusableKeys[currentIndex - 1] ?? currentKey);
+        return;
+      }
+
+      if (e.key === "Home") {
+        e.preventDefault();
+        setActiveKey(focusableKeys[0] ?? currentKey);
+        return;
+      }
+
+      if (e.key === "End") {
+        e.preventDefault();
+        setActiveKey(focusableKeys[focusableKeys.length - 1] ?? currentKey);
+        return;
+      }
+
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        if (isExpandable && !isExpanded) {
+          handleExpand(node.key);
+          return;
+        }
+        if (isExpandable && isExpanded) {
+          setActiveKey(getFirstChildKey() ?? currentKey);
+        }
+        return;
+      }
+
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        if (isExpandable && isExpanded) {
+          handleExpand(node.key);
+          return;
+        }
+        if (parentKey !== undefined) {
+          setActiveKey(parentKey);
+        }
+        return;
+      }
+
+      if (e.key === "Escape") {
+        e.preventDefault();
+        if (isExpandable && isExpanded) {
+          handleExpand(node.key);
+          return;
+        }
+        if (parentKey !== undefined) {
+          if (computedExpandedKeys.has(parentKey)) {
+            handleExpand(parentKey);
+          }
+          setActiveKey(parentKey);
+        }
+        return;
+      }
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (effectiveSelectable) {
+          handleSelect(node.key, e);
+          return;
+        }
+        if (isExpandable) {
+          handleExpand(node.key);
+        }
+        return;
+      }
+
+      if (e.key === " ") {
+        e.preventDefault();
+        if (checkable) {
+          handleCheck(node.key, !isChecked);
+          return;
+        }
+        if (isExpandable) {
+          handleExpand(node.key);
+        }
+      }
+    },
+    [
+      activeKey,
+      defaultActiveKey,
+      focusableKeys,
+      visibleItems,
+      treeData,
+      loadData,
+      checkable,
+      computedExpandedKeys,
+      effectiveSelectable,
+      handleExpand,
+      handleSelect,
+      handleCheck,
+    ]
+  );
+
   const handleNodeClickInternal = useCallback(
     (node: TreeNode, event: React.MouseEvent) => {
       if (node.disabled) return;
@@ -556,6 +731,10 @@ export const Tree: React.FC<TreeProps> = ({
       const isMatched = filteredNodeKeys.has(node.key);
       const isVisible = !isFiltered || isMatched;
 
+      const isExpandable = hasChildren || !!(loadData && !node.isLeaf);
+      const isFocusable =
+        !node.disabled && node.key === (activeKey ?? defaultActiveKey);
+
       if (!isVisible) {
         return null;
       }
@@ -573,19 +752,16 @@ export const Tree: React.FC<TreeProps> = ({
 
           {/* Expand icon */}
           <span
-            className={
-              hasChildren || (loadData && !node.isLeaf) ? 'cursor-pointer' : ''
-            }
+            className={isExpandable ? "cursor-pointer" : ""}
             onClick={(e) => {
               e.stopPropagation();
-              if (hasChildren || (loadData && !node.isLeaf)) {
+              if (isExpandable) {
+                setActiveKey(node.key);
                 handleExpand(node.key);
               }
-            }}>
-            <ExpandIcon
-              expanded={isExpanded}
-              hasChildren={hasChildren || !!(loadData && !node.isLeaf)}
-            />
+            }}
+          >
+            <ExpandIcon expanded={isExpanded} hasChildren={isExpandable} />
           </span>
 
           {/* Checkbox */}
@@ -621,9 +797,10 @@ export const Tree: React.FC<TreeProps> = ({
             className={classNames(
               treeNodeLabelClasses,
               isFiltered && isMatched
-                ? 'font-semibold text-[var(--tiger-primary,#2563eb)]'
-                : ''
-            )}>
+                ? "font-semibold text-[var(--tiger-primary,#2563eb)]"
+                : ""
+            )}
+          >
             {node.label}
           </span>
 
@@ -641,12 +818,30 @@ export const Tree: React.FC<TreeProps> = ({
               !!node.disabled,
               blockNode
             )}
+            ref={(el) => {
+              itemRefs.current.set(node.key, el);
+            }}
+            role="treeitem"
+            aria-level={level + 1}
+            aria-disabled={node.disabled || undefined}
+            aria-selected={effectiveSelectable ? isSelected : undefined}
+            aria-expanded={isExpandable ? isExpanded : undefined}
+            aria-checked={
+              checkable ? (isHalfChecked ? "mixed" : isChecked) : undefined
+            }
+            tabIndex={isFocusable ? 0 : -1}
+            onFocus={() => {
+              if (!node.disabled) setActiveKey(node.key);
+            }}
+            onKeyDown={(e) => handleKeyDown(e, node, isExpanded, isChecked)}
             onClick={(e) => {
+              setActiveKey(node.key);
               handleNodeClickInternal(node, e);
               if (effectiveSelectable && !node.disabled) {
                 handleSelect(node.key, e);
               }
-            }}>
+            }}
+          >
             {nodeContent}
           </div>
 
@@ -656,7 +851,8 @@ export const Tree: React.FC<TreeProps> = ({
               className={classNames(
                 treeNodeChildrenClasses,
                 showLine && treeLineClasses
-              )}>
+              )}
+            >
               {node.children!.map((child) =>
                 renderTreeNode(child, level + 1, node.key)
               )}
@@ -671,6 +867,8 @@ export const Tree: React.FC<TreeProps> = ({
       computedCheckedState,
       loadingNodes,
       filteredNodeKeys,
+      activeKey,
+      defaultActiveKey,
       loadData,
       checkable,
       blockNode,
@@ -681,19 +879,29 @@ export const Tree: React.FC<TreeProps> = ({
       handleCheck,
       handleSelect,
       handleNodeClickInternal,
+      handleKeyDown,
     ]
   );
 
   if (!treeData || treeData.length === 0) {
     return (
-      <div className={classNames(treeBaseClasses, 'p-4', className)}>
+      <div
+        className={classNames(treeBaseClasses, "p-4", className)}
+        role="tree"
+        aria-label={ariaLabel}
+      >
         <div className={treeEmptyStateClasses}>{emptyText}</div>
       </div>
     );
   }
 
   return (
-    <div className={classNames(treeBaseClasses, className)}>
+    <div
+      className={classNames(treeBaseClasses, className)}
+      role="tree"
+      aria-label={ariaLabel}
+      aria-multiselectable={effectiveMultiple || undefined}
+    >
       {treeData.map((node) => renderTreeNode(node, 0))}
     </div>
   );

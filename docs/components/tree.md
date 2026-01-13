@@ -8,26 +8,24 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Tree } from '@tigercat/vue'
+import { ref } from "vue";
+import { Tree } from "@tigercat/vue";
 
 const treeData = ref([
   {
-    key: '1',
-    label: 'Parent Node 1',
+    key: "1",
+    label: "Parent Node 1",
     children: [
-      { key: '1-1', label: 'Child Node 1-1' },
-      { key: '1-2', label: 'Child Node 1-2' },
+      { key: "1-1", label: "Child Node 1-1" },
+      { key: "1-2", label: "Child Node 1-2" },
     ],
   },
   {
-    key: '2',
-    label: 'Parent Node 2',
-    children: [
-      { key: '2-1', label: 'Child Node 2-1' },
-    ],
+    key: "2",
+    label: "Parent Node 2",
+    children: [{ key: "2-1", label: "Child Node 2-1" }],
   },
-])
+]);
 </script>
 
 <template>
@@ -38,28 +36,26 @@ const treeData = ref([
 ### React
 
 ```tsx
-import { Tree } from '@tigercat/react'
+import { Tree } from "@tigercat/react";
 
 function App() {
   const treeData = [
     {
-      key: '1',
-      label: 'Parent Node 1',
+      key: "1",
+      label: "Parent Node 1",
       children: [
-        { key: '1-1', label: 'Child Node 1-1' },
-        { key: '1-2', label: 'Child Node 1-2' },
+        { key: "1-1", label: "Child Node 1-1" },
+        { key: "1-2", label: "Child Node 1-2" },
       ],
     },
     {
-      key: '2',
-      label: 'Parent Node 2',
-      children: [
-        { key: '2-1', label: 'Child Node 2-1' },
-      ],
+      key: "2",
+      label: "Parent Node 2",
+      children: [{ key: "2-1", label: "Child Node 2-1" }],
     },
-  ]
+  ];
 
-  return <Tree treeData={treeData} />
+  return <Tree treeData={treeData} />;
 }
 ```
 
@@ -71,31 +67,31 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Tree } from '@tigercat/vue'
+import { ref } from "vue";
+import { Tree } from "@tigercat/vue";
 
 const treeData = ref([
   {
-    key: '1',
-    label: 'Parent Node 1',
+    key: "1",
+    label: "Parent Node 1",
     children: [
-      { key: '1-1', label: 'Child Node 1-1' },
-      { key: '1-2', label: 'Child Node 1-2' },
+      { key: "1-1", label: "Child Node 1-1" },
+      { key: "1-2", label: "Child Node 1-2" },
     ],
   },
-])
+]);
 
-const checkedKeys = ref(['1-1'])
+const checkedKeys = ref(["1-1"]);
 
 function handleCheck(keys, info) {
-  console.log('Checked keys:', keys)
-  console.log('Info:', info)
+  console.log("Checked keys:", keys);
+  console.log("Info:", info);
 }
 </script>
 
 <template>
-  <Tree 
-    :treeData="treeData" 
+  <Tree
+    :treeData="treeData"
     checkable
     v-model:checkedKeys="checkedKeys"
     @check="handleCheck"
@@ -106,37 +102,37 @@ function handleCheck(keys, info) {
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Tree } from '@tigercat/react'
+import { useState } from "react";
+import { Tree } from "@tigercat/react";
 
 function App() {
   const treeData = [
     {
-      key: '1',
-      label: 'Parent Node 1',
+      key: "1",
+      label: "Parent Node 1",
       children: [
-        { key: '1-1', label: 'Child Node 1-1' },
-        { key: '1-2', label: 'Child Node 1-2' },
+        { key: "1-1", label: "Child Node 1-1" },
+        { key: "1-2", label: "Child Node 1-2" },
       ],
     },
-  ]
+  ];
 
-  const [checkedKeys, setCheckedKeys] = useState(['1-1'])
+  const [checkedKeys, setCheckedKeys] = useState(["1-1"]);
 
   const handleCheck = (keys, info) => {
-    console.log('Checked keys:', keys)
-    console.log('Info:', info)
-    setCheckedKeys(keys)
-  }
+    console.log("Checked keys:", keys);
+    console.log("Info:", info);
+    setCheckedKeys(keys);
+  };
 
   return (
-    <Tree 
-      treeData={treeData} 
+    <Tree
+      treeData={treeData}
       checkable
       checkedKeys={checkedKeys}
       onCheck={handleCheck}
     />
-  )
+  );
 }
 ```
 
@@ -148,8 +144,8 @@ function App() {
 
 ```vue
 <template>
-  <Tree 
-    :treeData="treeData" 
+  <Tree
+    :treeData="treeData"
     checkable
     checkStrictly
     v-model:checkedKeys="checkedKeys"
@@ -160,8 +156,8 @@ function App() {
 ### React
 
 ```tsx
-<Tree 
-  treeData={treeData} 
+<Tree
+  treeData={treeData}
   checkable
   checkStrictly
   checkedKeys={checkedKeys}
@@ -177,20 +173,20 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Tree } from '@tigercat/vue'
+import { ref } from "vue";
+import { Tree } from "@tigercat/vue";
 
-const selectedKeys = ref(['1-1'])
+const selectedKeys = ref(["1-1"]);
 
 function handleSelect(keys, info) {
-  console.log('Selected keys:', keys)
-  console.log('Selected nodes:', info.selectedNodes)
+  console.log("Selected keys:", keys);
+  console.log("Selected nodes:", info.selectedNodes);
 }
 </script>
 
 <template>
-  <Tree 
-    :treeData="treeData" 
+  <Tree
+    :treeData="treeData"
     selectable
     v-model:selectedKeys="selectedKeys"
     @select="handleSelect"
@@ -201,26 +197,26 @@ function handleSelect(keys, info) {
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Tree } from '@tigercat/react'
+import { useState } from "react";
+import { Tree } from "@tigercat/react";
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(['1-1'])
+  const [selectedKeys, setSelectedKeys] = useState(["1-1"]);
 
   const handleSelect = (keys, info) => {
-    console.log('Selected keys:', keys)
-    console.log('Selected nodes:', info.selectedNodes)
-    setSelectedKeys(keys)
-  }
+    console.log("Selected keys:", keys);
+    console.log("Selected nodes:", info.selectedNodes);
+    setSelectedKeys(keys);
+  };
 
   return (
-    <Tree 
-      treeData={treeData} 
+    <Tree
+      treeData={treeData}
       selectable
       selectedKeys={selectedKeys}
       onSelect={handleSelect}
     />
-  )
+  );
 }
 ```
 
@@ -250,13 +246,13 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Tree } from '@tigercat/vue'
+import { ref } from "vue";
+import { Tree } from "@tigercat/vue";
 
 const treeData = ref([
-  { key: '1', label: 'Parent Node 1' },
-  { key: '2', label: 'Parent Node 2' },
-])
+  { key: "1", label: "Parent Node 1" },
+  { key: "2", label: "Parent Node 2" },
+]);
 
 async function loadData(node) {
   // 模拟异步加载
@@ -265,9 +261,9 @@ async function loadData(node) {
       resolve([
         { key: `${node.key}-1`, label: `Child of ${node.label}` },
         { key: `${node.key}-2`, label: `Child of ${node.label}` },
-      ])
-    }, 1000)
-  })
+      ]);
+    }, 1000);
+  });
 }
 </script>
 
@@ -279,13 +275,13 @@ async function loadData(node) {
 ### React
 
 ```tsx
-import { Tree } from '@tigercat/react'
+import { Tree } from "@tigercat/react";
 
 function App() {
   const treeData = [
-    { key: '1', label: 'Parent Node 1' },
-    { key: '2', label: 'Parent Node 2' },
-  ]
+    { key: "1", label: "Parent Node 1" },
+    { key: "2", label: "Parent Node 2" },
+  ];
 
   const loadData = async (node) => {
     // 模拟异步加载
@@ -294,12 +290,12 @@ function App() {
         resolve([
           { key: `${node.key}-1`, label: `Child of ${node.label}` },
           { key: `${node.key}-2`, label: `Child of ${node.label}` },
-        ])
-      }, 1000)
-    })
-  }
+        ]);
+      }, 1000);
+    });
+  };
 
-  return <Tree treeData={treeData} loadData={loadData} />
+  return <Tree treeData={treeData} loadData={loadData} />;
 }
 ```
 
@@ -311,21 +307,21 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Tree } from '@tigercat/vue'
+import { ref } from "vue";
+import { Tree } from "@tigercat/vue";
 
 const treeData = ref([
   {
-    key: '1',
-    label: 'Parent Node 1',
+    key: "1",
+    label: "Parent Node 1",
     children: [
-      { key: '1-1', label: 'Child Node 1-1' },
-      { key: '1-2', label: 'Child Node 1-2' },
+      { key: "1-1", label: "Child Node 1-1" },
+      { key: "1-2", label: "Child Node 1-2" },
     ],
   },
-])
+]);
 
-const filterValue = ref('')
+const filterValue = ref("");
 </script>
 
 <template>
@@ -339,33 +335,33 @@ const filterValue = ref('')
 ### React
 
 ```tsx
-import { useState } from 'react'
-import { Tree } from '@tigercat/react'
+import { useState } from "react";
+import { Tree } from "@tigercat/react";
 
 function App() {
   const treeData = [
     {
-      key: '1',
-      label: 'Parent Node 1',
+      key: "1",
+      label: "Parent Node 1",
       children: [
-        { key: '1-1', label: 'Child Node 1-1' },
-        { key: '1-2', label: 'Child Node 1-2' },
+        { key: "1-1", label: "Child Node 1-1" },
+        { key: "1-2", label: "Child Node 1-2" },
       ],
     },
-  ]
+  ];
 
-  const [filterValue, setFilterValue] = useState('')
+  const [filterValue, setFilterValue] = useState("");
 
   return (
     <div>
-      <input 
-        value={filterValue} 
-        onChange={(e) => setFilterValue(e.target.value)} 
-        placeholder="Search..." 
+      <input
+        value={filterValue}
+        onChange={(e) => setFilterValue(e.target.value)}
+        placeholder="Search..."
       />
       <Tree treeData={treeData} filterValue={filterValue} />
     </div>
-  )
+  );
 }
 ```
 
@@ -377,20 +373,20 @@ function App() {
 
 ```vue
 <script setup>
-import { ref, h } from 'vue'
-import { Tree, Icon } from '@tigercat/vue'
+import { ref, h } from "vue";
+import { Tree, Icon } from "@tigercat/vue";
 
 const treeData = ref([
   {
-    key: '1',
-    label: 'Folder',
-    icon: h(Icon, { name: 'folder' }),
+    key: "1",
+    label: "Folder",
+    icon: h(Icon, { name: "folder" }),
     children: [
-      { key: '1-1', label: 'File 1', icon: h(Icon, { name: 'file' }) },
-      { key: '1-2', label: 'File 2', icon: h(Icon, { name: 'file' }) },
+      { key: "1-1", label: "File 1", icon: h(Icon, { name: "file" }) },
+      { key: "1-2", label: "File 2", icon: h(Icon, { name: "file" }) },
     ],
   },
-])
+]);
 </script>
 
 <template>
@@ -401,22 +397,22 @@ const treeData = ref([
 ### React
 
 ```tsx
-import { Tree, Icon } from '@tigercat/react'
+import { Tree, Icon } from "@tigercat/react";
 
 function App() {
   const treeData = [
     {
-      key: '1',
-      label: 'Folder',
+      key: "1",
+      label: "Folder",
       icon: <Icon name="folder" />,
       children: [
-        { key: '1-1', label: 'File 1', icon: <Icon name="file" /> },
-        { key: '1-2', label: 'File 2', icon: <Icon name="file" /> },
+        { key: "1-1", label: "File 1", icon: <Icon name="file" /> },
+        { key: "1-2", label: "File 2", icon: <Icon name="file" /> },
       ],
     },
-  ]
+  ];
 
-  return <Tree treeData={treeData} />
+  return <Tree treeData={treeData} />;
 }
 ```
 
@@ -428,19 +424,19 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Tree } from '@tigercat/vue'
+import { ref } from "vue";
+import { Tree } from "@tigercat/vue";
 
 const treeData = ref([
   {
-    key: '1',
-    label: 'Parent Node 1',
+    key: "1",
+    label: "Parent Node 1",
     children: [
-      { key: '1-1', label: 'Child Node 1-1' },
-      { key: '1-2', label: 'Child Node 1-2 (Disabled)', disabled: true },
+      { key: "1-1", label: "Child Node 1-1" },
+      { key: "1-2", label: "Child Node 1-2 (Disabled)", disabled: true },
     ],
   },
-])
+]);
 </script>
 
 <template>
@@ -451,21 +447,21 @@ const treeData = ref([
 ### React
 
 ```tsx
-import { Tree } from '@tigercat/react'
+import { Tree } from "@tigercat/react";
 
 function App() {
   const treeData = [
     {
-      key: '1',
-      label: 'Parent Node 1',
+      key: "1",
+      label: "Parent Node 1",
       children: [
-        { key: '1-1', label: 'Child Node 1-1' },
-        { key: '1-2', label: 'Child Node 1-2 (Disabled)', disabled: true },
+        { key: "1-1", label: "Child Node 1-1" },
+        { key: "1-2", label: "Child Node 1-2 (Disabled)", disabled: true },
       ],
     },
-  ]
+  ];
 
-  return <Tree treeData={treeData} checkable />
+  return <Tree treeData={treeData} checkable />;
 }
 ```
 
@@ -491,66 +487,67 @@ function App() {
 
 ### Tree Props
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| treeData | 树形数据 | `TreeNode[]` | `[]` |
-| selectionMode | 选择模式 | `'none' \| 'single' \| 'multiple'` | `'none'` |
-| checkable | 是否显示复选框 | `boolean` | `false` |
-| showIcon | 是否显示展开/收拢图标 | `boolean` | `true` |
-| showLine | 是否显示连接线 | `boolean` | `false` |
-| defaultExpandedKeys | 默认展开的节点 | `(string \| number)[]` | `[]` |
-| defaultSelectedKeys | 默认选中的节点 | `(string \| number)[]` | `[]` |
-| defaultCheckedKeys | 默认勾选的节点 | `(string \| number)[]` | `[]` |
-| expandedKeys | 展开的节点（受控） | `(string \| number)[]` | - |
-| selectedKeys | 选中的节点（受控） | `(string \| number)[]` | - |
-| checkedKeys | 勾选的节点（受控） | `(string \| number)[] \| TreeCheckedState` | - |
-| defaultExpandAll | 默认展开所有节点 | `boolean` | `false` |
-| checkStrictly | 父子节点选中状态是否独立 | `boolean` | `false` |
-| checkStrategy | 勾选策略 | `'all' \| 'parent' \| 'child'` | `'all'` |
-| selectable | 是否允许选中节点 | `boolean` | `true` |
-| multiple | 是否允许多选 | `boolean` | `false` |
-| loadData | 异步加载数据函数 | `(node: TreeNode) => Promise<TreeNode[]>` | - |
-| filterValue | 过滤值 | `string` | `''` |
-| filterFn | 自定义过滤函数 | `(value: string, node: TreeNode) => boolean` | - |
-| autoExpandParent | 过滤时是否自动展开父节点 | `boolean` | `true` |
-| blockNode | 节点是否占据整行 | `boolean` | `false` |
-| emptyText | 空状态文本 | `string` | `'No data'` |
+| 属性                | 说明                                           | 类型                                         | 默认值      |
+| ------------------- | ---------------------------------------------- | -------------------------------------------- | ----------- |
+| treeData            | 树形数据                                       | `TreeNode[]`                                 | `[]`        |
+| selectionMode       | 选择模式（提供时会覆盖 `selectable/multiple`） | `'none' \| 'single' \| 'multiple'`           | -           |
+| checkable           | 是否显示复选框                                 | `boolean`                                    | `false`     |
+| showIcon            | 是否显示节点图标（`TreeNode.icon`）            | `boolean`                                    | `true`      |
+| showLine            | 是否显示连接线                                 | `boolean`                                    | `false`     |
+| defaultExpandedKeys | 默认展开的节点                                 | `(string \| number)[]`                       | `[]`        |
+| defaultSelectedKeys | 默认选中的节点                                 | `(string \| number)[]`                       | `[]`        |
+| defaultCheckedKeys  | 默认勾选的节点                                 | `(string \| number)[]`                       | `[]`        |
+| expandedKeys        | 展开的节点（受控）                             | `(string \| number)[]`                       | -           |
+| selectedKeys        | 选中的节点（受控）                             | `(string \| number)[]`                       | -           |
+| checkedKeys         | 勾选的节点（受控）                             | `(string \| number)[] \| TreeCheckedState`   | -           |
+| defaultExpandAll    | 默认展开所有节点                               | `boolean`                                    | `false`     |
+| checkStrictly       | 父子节点选中状态是否独立                       | `boolean`                                    | `false`     |
+| checkStrategy       | 勾选策略                                       | `'all' \| 'parent' \| 'child'`               | `'all'`     |
+| selectable          | 是否允许选中节点                               | `boolean`                                    | `true`      |
+| multiple            | 是否允许多选                                   | `boolean`                                    | `false`     |
+| loadData            | 异步加载数据函数                               | `(node: TreeNode) => Promise<TreeNode[]>`    | -           |
+| filterValue         | 过滤值                                         | `string`                                     | `''`        |
+| filterFn            | 自定义过滤函数                                 | `(value: string, node: TreeNode) => boolean` | -           |
+| autoExpandParent    | 过滤时是否自动展开父节点                       | `boolean`                                    | `true`      |
+| blockNode           | 节点是否占据整行                               | `boolean`                                    | `false`     |
+| emptyText           | 空状态文本                                     | `string`                                     | `'No data'` |
+| ariaLabel           | Tree 容器的无障碍标签                          | `string`                                     | `'Tree'`    |
 
 ### TreeNode
 
-| 属性 | 说明 | 类型 | 必填 |
-|------|------|------|------|
-| key | 唯一标识 | `string \| number` | ✅ |
-| label | 节点标题 | `string` | ✅ |
-| children | 子节点 | `TreeNode[]` | - |
-| disabled | 是否禁用 | `boolean` | - |
-| isLeaf | 是否为叶子节点 | `boolean` | - |
-| icon | 自定义图标 | `VNode \| ReactNode` | - |
+| 属性     | 说明           | 类型                 | 必填 |
+| -------- | -------------- | -------------------- | ---- |
+| key      | 唯一标识       | `string \| number`   | ✅   |
+| label    | 节点标题       | `string`             | ✅   |
+| children | 子节点         | `TreeNode[]`         | -    |
+| disabled | 是否禁用       | `boolean`            | -    |
+| isLeaf   | 是否为叶子节点 | `boolean`            | -    |
+| icon     | 自定义图标     | `VNode \| ReactNode` | -    |
 
 ### Tree Events (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| expand | 节点展开/收拢时触发 | `(expandedKeys: (string \| number)[], info: { expanded: boolean, node: TreeNode })` |
-| select | 节点选中时触发 | `(selectedKeys: (string \| number)[], info: { selected: boolean, selectedNodes: TreeNode[], node: TreeNode, event: MouseEvent })` |
-| check | 节点勾选时触发 | `(checkedKeys: (string \| number)[], info: { checked: boolean, checkedNodes: TreeNode[], node: TreeNode, checkedNodesPositions: TreeCheckedState })` |
-| node-click | 节点点击时触发 | `(node: TreeNode, event: MouseEvent)` |
-| node-expand | 节点展开时触发 | `(node: TreeNode, key: string \| number)` |
-| node-collapse | 节点收拢时触发 | `(node: TreeNode, key: string \| number)` |
-| update:expandedKeys | 更新展开的节点 | `(keys: (string \| number)[])` |
-| update:selectedKeys | 更新选中的节点 | `(keys: (string \| number)[])` |
-| update:checkedKeys | 更新勾选的节点 | `(keys: (string \| number)[])` |
+| 事件名              | 说明                | 回调参数                                                                                                                                             |
+| ------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| expand              | 节点展开/收拢时触发 | `(expandedKeys: (string \| number)[], info: { expanded: boolean, node: TreeNode })`                                                                  |
+| select              | 节点选中时触发      | `(selectedKeys: (string \| number)[], info: { selected: boolean, selectedNodes: TreeNode[], node: TreeNode, event: MouseEvent })`                    |
+| check               | 节点勾选时触发      | `(checkedKeys: (string \| number)[], info: { checked: boolean, checkedNodes: TreeNode[], node: TreeNode, checkedNodesPositions: TreeCheckedState })` |
+| node-click          | 节点点击时触发      | `(node: TreeNode, event: MouseEvent)`                                                                                                                |
+| node-expand         | 节点展开时触发      | `(node: TreeNode, key: string \| number)`                                                                                                            |
+| node-collapse       | 节点收拢时触发      | `(node: TreeNode, key: string \| number)`                                                                                                            |
+| update:expandedKeys | 更新展开的节点      | `(keys: (string \| number)[])`                                                                                                                       |
+| update:selectedKeys | 更新选中的节点      | `(keys: (string \| number)[])`                                                                                                                       |
+| update:checkedKeys  | 更新勾选的节点      | `(keys: (string \| number)[])`                                                                                                                       |
 
 ### Tree Events (React)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| onExpand | 节点展开/收拢时触发 | `(expandedKeys: (string \| number)[], info: { expanded: boolean, node: TreeNode })` |
-| onSelect | 节点选中时触发 | `(selectedKeys: (string \| number)[], info: { selected: boolean, selectedNodes: TreeNode[], node: TreeNode, event: React.MouseEvent })` |
-| onCheck | 节点勾选时触发 | `(checkedKeys: (string \| number)[], info: { checked: boolean, checkedNodes: TreeNode[], node: TreeNode, checkedNodesPositions: TreeCheckedState })` |
-| onNodeClick | 节点点击时触发 | `(node: TreeNode, event: React.MouseEvent)` |
-| onNodeExpand | 节点展开时触发 | `(node: TreeNode, key: string \| number)` |
-| onNodeCollapse | 节点收拢时触发 | `(node: TreeNode, key: string \| number)` |
+| 事件名         | 说明                | 回调参数                                                                                                                                             |
+| -------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| onExpand       | 节点展开/收拢时触发 | `(expandedKeys: (string \| number)[], info: { expanded: boolean, node: TreeNode })`                                                                  |
+| onSelect       | 节点选中时触发      | `(selectedKeys: (string \| number)[], info: { selected: boolean, selectedNodes: TreeNode[], node: TreeNode, event: React.MouseEvent })`              |
+| onCheck        | 节点勾选时触发      | `(checkedKeys: (string \| number)[], info: { checked: boolean, checkedNodes: TreeNode[], node: TreeNode, checkedNodesPositions: TreeCheckedState })` |
+| onNodeClick    | 节点点击时触发      | `(node: TreeNode, event: React.MouseEvent)`                                                                                                          |
+| onNodeExpand   | 节点展开时触发      | `(node: TreeNode, key: string \| number)`                                                                                                            |
+| onNodeCollapse | 节点收拢时触发      | `(node: TreeNode, key: string \| number)`                                                                                                            |
 
 ## 样式定制
 
@@ -572,12 +569,21 @@ Tree 组件使用 Tailwind CSS 构建，支持通过 CSS 变量自定义主题�
 
 ## 无障碍访问
 
-Tree 组件支持键盘导航和屏幕阅读器：
+Tree 组件提供基础 a11y 与键盘交互：
 
-- 使用 `Tab` 键在树节点间导航
-- 使用 `Space` 或 `Enter` 键选中/展开节点
-- 使用方向键在节点间移动
-- 适当的 ARIA 属性以支持屏幕阅读器
+- 语义：容器 `role="tree"`，节点 `role="treeitem"`，并包含 `aria-level`；可展开/可选择/可勾选时分别提供 `aria-expanded / aria-selected / aria-checked`
+- 可访问名称：通过 `ariaLabel` 为 Tree 提供可访问名称（默认 `Tree`）
+
+### 键盘
+
+- `Tab`：进入 Tree，聚焦当前可聚焦节点（roving tabindex）
+- `ArrowUp/ArrowDown`：在可见节点间移动焦点（跳过 disabled）
+- `Home/End`：跳到首/尾可见节点
+- `ArrowRight`：展开当前节点；若已展开则移动到第一个子节点
+- `ArrowLeft`：收拢当前节点；若已收拢则移动到父节点
+- `Enter`：触发选择（可选时）；否则切换展开/收拢
+- `Space`：勾选/取消勾选（checkable 时）；否则切换展开/收拢
+- `Escape`：优先收拢当前节点；若不可收拢则收拢并聚焦父节点
 
 ## 注意事项
 
