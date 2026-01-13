@@ -9,7 +9,12 @@ import {
   getCurrentInstance,
   type ComputedRef,
 } from 'vue';
-import { classNames, coerceClassValue, type RadioSize } from '@tigercat/core';
+import {
+  classNames,
+  coerceClassValue,
+  getRadioGroupClasses,
+  type RadioSize,
+} from '@tigercat/core';
 
 export const RadioGroupKey = Symbol('RadioGroup');
 
@@ -202,12 +207,14 @@ export const RadioGroup = defineComponent({
 
     return () => {
       const rootStyle = [attrs.style, props.style];
-      const hasCustomClass = !!(props.className || attrs.class);
-      const rootClass = classNames(
+      const mergedClass = classNames(
         props.className,
-        coerceClassValue(attrs.class),
-        !hasCustomClass && 'space-y-2'
+        coerceClassValue(attrs.class)
       );
+      const rootClass = getRadioGroupClasses({
+        className: mergedClass,
+        hasCustomClass: !!mergedClass,
+      });
 
       const { class: _class, style: _style, ...restAttrs } = attrs;
 

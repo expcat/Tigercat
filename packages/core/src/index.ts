@@ -62,6 +62,7 @@ export * from './utils/popconfirm-utils';
 export * from './utils/popover-utils';
 export * from './utils/tooltip-utils';
 export * from './utils/radio-utils';
+export * from './utils/radio-group-utils';
 
 // Types
 export * from './types/button';

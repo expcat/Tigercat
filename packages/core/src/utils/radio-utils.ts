@@ -1,30 +1,30 @@
-import { classNames } from './class-names'
-import { type RadioSize } from '../types/radio'
-import { type RadioColorScheme } from '../theme/colors'
+import { classNames } from './class-names';
+import { type RadioSize } from '../types/radio';
+import { type RadioColorScheme } from '../theme/colors';
 
-export const radioRootBaseClasses = 'inline-flex items-center'
+export const radioRootBaseClasses = 'inline-flex items-center';
 
 export const radioVisualBaseClasses =
-  'relative inline-flex items-center justify-center rounded-full border-2 cursor-pointer transition-all'
+  'relative inline-flex items-center justify-center rounded-full border-2 cursor-pointer transition-all';
 
 export const radioFocusVisibleClasses =
-  'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-primary,#2563eb)] peer-focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
+  'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-primary,#2563eb)] peer-focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]';
 
-export const radioDotBaseClasses = 'rounded-full transition-all'
+export const radioDotBaseClasses = 'rounded-full transition-all';
 
-export const radioLabelBaseClasses = 'ml-2 cursor-pointer select-none'
+export const radioLabelBaseClasses = 'ml-2 cursor-pointer select-none';
 
-export const radioDisabledCursorClasses = 'cursor-not-allowed'
+export const radioDisabledCursorClasses = 'cursor-not-allowed';
 
 export const radioHoverBorderClasses =
-  'hover:border-[var(--tiger-primary,#2563eb)]'
+  'hover:border-[var(--tiger-primary,#2563eb)]';
 
 export const radioSizeClasses: Record<
   RadioSize,
   {
-    radio: string
-    dot: string
-    label: string
+    radio: string;
+    dot: string;
+    label: string;
   }
 > = {
   sm: {
@@ -42,13 +42,13 @@ export const radioSizeClasses: Record<
     dot: 'w-2.5 h-2.5',
     label: 'text-lg',
   },
-} as const
+} as const;
 
 export interface GetRadioVisualClassesOptions {
-  size: RadioSize
-  checked: boolean
-  disabled: boolean
-  colors: RadioColorScheme
+  size: RadioSize;
+  checked: boolean;
+  disabled: boolean;
+  colors: RadioColorScheme;
 }
 
 export const getRadioVisualClasses = ({
@@ -66,12 +66,12 @@ export const getRadioVisualClasses = ({
     disabled && colors.disabled,
     disabled && radioDisabledCursorClasses,
     !disabled && radioHoverBorderClasses
-  )
+  );
 
 export interface GetRadioDotClassesOptions {
-  size: RadioSize
-  checked: boolean
-  colors: RadioColorScheme
+  size: RadioSize;
+  checked: boolean;
+  colors: RadioColorScheme;
 }
 
 export const getRadioDotClasses = ({
@@ -84,12 +84,12 @@ export const getRadioDotClasses = ({
     radioSizeClasses[size].dot,
     colors.innerDot,
     checked ? 'scale-100' : 'scale-0'
-  )
+  );
 
 export interface GetRadioLabelClassesOptions {
-  size: RadioSize
-  disabled: boolean
-  colors: RadioColorScheme
+  size: RadioSize;
+  disabled: boolean;
+  colors: RadioColorScheme;
 }
 
 export const getRadioLabelClasses = ({
@@ -102,4 +102,4 @@ export const getRadioLabelClasses = ({
     radioSizeClasses[size].label,
     disabled ? colors.textDisabled : 'text-[var(--tiger-text,#111827)]',
     disabled && radioDisabledCursorClasses
-  )
+  );

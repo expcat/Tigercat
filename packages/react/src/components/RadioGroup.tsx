@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { classNames } from '@tigercat/core';
+import { getRadioGroupClasses } from '@tigercat/core';
 import {
   type RadioGroupProps as CoreRadioGroupProps,
   type RadioSize,
@@ -128,7 +128,10 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
   return (
     <RadioGroupContext.Provider value={contextValue}>
       <div
-        className={classNames(className, !className && 'space-y-2')}
+        className={getRadioGroupClasses({
+          className,
+          hasCustomClass: !!className,
+        })}
         role="radiogroup"
         onKeyDown={handleKeyDown}
         {...props}>
