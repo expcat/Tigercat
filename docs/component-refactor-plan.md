@@ -8,12 +8,11 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Table` Step2 a11y（2026-01-13）
-- 上一步：✅ `Table` Step3 性能与扩展（减少重渲染）（2026-01-13）
-- 当前组件：`TimePicker`
-- 当前步骤：Step1 API/类型
+- 上一步：✅ `TimePicker` Step5 文档/Demo（校对与补充示例）（2026-01-13）
+- 当前组件：`Upload`
+- 当前步骤：Step1 API/类型（对齐 props/events/defaults 与 docs）
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：33/38
+- 已优化组件数/需优化组件数：34/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -424,7 +423,11 @@ return h("div", { class: "..." }, children);
 
 - 思路：键盘/aria；范围（若支持）；解析/格式化逻辑下沉 core。
 
-- 状态：未开始
+- 状态：✅ Step1 API/类型（2026-01-13）：core 补齐并导出 `TimePickerSingleValue/TimePickerRangeValue/TimePickerModelValue`，Vue TimePicker 增加 `inheritAttrs: false` 并合并 `class/style` 透传（新增 `className/style` props）、合并重复 watch；React TimePicker 复用 core range/value 类型并补齐 `div` 原生属性透传类型（避免 onChange 冲突与过度断言）；同步精简 Vue/React TimePicker 测试并移除快照；更新 TimePicker 文档（Demo 无需修改）。
+- 状态：✅ Step2 i18n 文案与 aria-label 抽取（2026-01-13）：core 新增 `TimePickerLabels` + `getTimePickerLabels()` 与 `getTimePickerOptionAriaLabel()`；Vue/React 移除组件内重复的 `isZh/labels` 与 hour/minute/second 的 aria-label 拼接，统一走 core helpers（输入框 fallback 使用 `labels.selectTime`）。
+- 状态：✅ Step3 交互与 a11y（键盘/焦点）（2026-01-13）：面板打开时自动聚焦当前小时选项；支持 Escape 关闭并回焦输入框；在面板内使用 ArrowUp/ArrowDown/Home/End 移动焦点、Enter/Space 选择；同步补齐 Vue/React 键盘交互单测，并更新 TimePicker 文档无障碍说明。
+- 状态：✅ Step4 tests（键盘/边界回归用例）（2026-01-13）：补齐 min/max 限制下的焦点聚焦与键盘导航边界用例（跳过 disabled、到末尾停住），保持测试断言稳定、不过度绑定 DOM 结构。
+- 状态：✅ Step5 文档/Demo（校对与补充示例）（2026-01-13）：校对 TimePicker 文档并补齐 `locale` 与 `range` 的最小可复制示例；确认 React/Vue3 Demo 已覆盖 `locale` 切换、range 时间段选择与常用功能展示。
 
 #### Upload（P0/P1，建议优化）
 
