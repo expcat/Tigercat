@@ -7,33 +7,50 @@ import {
   h,
   reactive,
   watch,
+  getCurrentInstance,
   type VNode,
   type VNodeArrayChildren,
   type Component,
-} from 'vue';
+} from "vue";
 import {
   classNames,
   getTabsContainerClasses,
   getTabNavClasses,
   getTabNavListClasses,
+  tabAddButtonClasses,
   tabContentBaseClasses,
   type TabType,
   type TabPosition,
   type TabSize,
-} from '@tigercat/core';
+} from "@tigercat/core";
 
 // Tabs context key
-export const TabsContextKey = Symbol('TabsContext');
+export const TabsContextKey = Symbol("TabsContext");
 
 // Tabs context interface
 export interface TabsContext {
   activeKey: string | number | undefined;
   type: TabType;
   size: TabSize;
+  tabPosition: TabPosition;
   closable: boolean;
   destroyInactiveTabPane: boolean;
+  idBase: string;
   handleTabClick: (key: string | number) => void;
   handleTabClose: (key: string | number, event: Event) => void;
+}
+
+export interface VueTabsProps {
+  activeKey?: string | number;
+  defaultActiveKey?: string | number;
+  type?: TabType;
+  tabPosition?: TabPosition;
+  size?: TabSize;
+  closable?: boolean;
+  centered?: boolean;
+  destroyInactiveTabPane?: boolean;
+  className?: string;
+  style?: Record<string, string | number>;
 }
 
 type RawChildren =
@@ -46,7 +63,7 @@ type RawChildren =
 type RawSlotsLike = { [name: string]: unknown; $stable?: boolean };
 
 export const Tabs = defineComponent({
-  name: 'TigerTabs',
+  name: "TigerTabs",
   props: {
     /**
      * Currently active tab key
@@ -68,7 +85,7 @@ export const Tabs = defineComponent({
      */
     type: {
       type: String as PropType<TabType>,
-      default: 'line' as TabType,
+      default: "line" as TabType,
     },
     /**
      * Tab position - top, bottom, left, or right
@@ -76,7 +93,7 @@ export const Tabs = defineComponent({
      */
     tabPosition: {
       type: String as PropType<TabPosition>,
-      default: 'top' as TabPosition,
+      default: "top" as TabPosition,
     },
     /**
      * Tab size - small, medium, or large
@@ -84,7 +101,7 @@ export const Tabs = defineComponent({
      */
     size: {
       type: String as PropType<TabSize>,
-      default: 'medium' as TabSize,
+      default: "medium" as TabSize,
     },
     /**
      * Whether tabs can be closed (only works with editable-card type)
@@ -117,9 +134,19 @@ export const Tabs = defineComponent({
       type: String,
       default: undefined,
     },
+    /**
+     * Custom styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined,
+    },
   },
-  emits: ['update:activeKey', 'change', 'edit', 'tab-click'],
+  emits: ["update:activeKey", "change", "edit", "tab-click"],
   setup(props, { slots, emit }) {
+    const instance = getCurrentInstance();
+    const idBase = `tiger-tabs-${instance?.uid ?? "0"}`;
+
     // Internal state for uncontrolled mode
     const internalActiveKey = ref<string | number | undefined>(
       props.defaultActiveKey
@@ -134,15 +161,22 @@ export const Tabs = defineComponent({
 
     // Handle tab click
     const handleTabClick = (key: string | number) => {
+      emit("tab-click", key);
+
+      const prevKey = currentActiveKey.value;
+
+      if (prevKey === key) {
+        return;
+      }
+
       // Update internal state if uncontrolled
       if (props.activeKey === undefined) {
         internalActiveKey.value = key;
       }
 
-      // Emit events
-      emit('update:activeKey', key);
-      emit('change', key);
-      emit('tab-click', key);
+      // Emit events only when switching
+      emit("update:activeKey", key);
+      emit("change", key);
     };
 
     // Handle tab close
@@ -150,7 +184,7 @@ export const Tabs = defineComponent({
       event.stopPropagation();
 
       // Emit edit event
-      emit('edit', { targetKey: key, action: 'remove' });
+      emit("edit", { targetKey: key, action: "remove" });
     };
 
     // Container classes
@@ -181,16 +215,52 @@ export const Tabs = defineComponent({
       activeKey: currentActiveKey.value,
       type: props.type,
       size: props.size,
+      tabPosition: props.tabPosition,
       closable: props.closable,
       destroyInactiveTabPane: props.destroyInactiveTabPane,
+      idBase,
       handleTabClick,
       handleTabClose,
     });
 
-    // Watch for changes to activeKey and update context
     watch(currentActiveKey, (newKey) => {
       tabsContextValue.activeKey = newKey;
     });
+
+    watch(
+      () => props.type,
+      (newType) => {
+        tabsContextValue.type = newType;
+      }
+    );
+
+    watch(
+      () => props.tabPosition,
+      (newPos) => {
+        tabsContextValue.tabPosition = newPos;
+      }
+    );
+
+    watch(
+      () => props.size,
+      (newSize) => {
+        tabsContextValue.size = newSize;
+      }
+    );
+
+    watch(
+      () => props.closable,
+      (newClosable) => {
+        tabsContextValue.closable = newClosable;
+      }
+    );
+
+    watch(
+      () => props.destroyInactiveTabPane,
+      (newDestroy) => {
+        tabsContextValue.destroyInactiveTabPane = newDestroy;
+      }
+    );
 
     provide<TabsContext>(TabsContextKey, tabsContextValue);
 
@@ -200,29 +270,49 @@ export const Tabs = defineComponent({
       // Extract tab items (for nav) and tab panes (for content)
       const tabItems: VNode[] = [];
       const tabPanes: VNode[] = [];
+      let firstTabKey: string | number | undefined;
 
       children.forEach((child) => {
         const childType = child?.type;
         const childName =
-          typeof childType === 'object' && childType && 'name' in childType
+          typeof childType === "object" && childType && "name" in childType
             ? (childType as { name?: string }).name
             : undefined;
 
-        if (childName === 'TigerTabPane') {
+        if (childName === "TigerTabPane") {
           const childProps = (child.props ?? {}) as Record<string, unknown>;
+
+          if (firstTabKey === undefined) {
+            const k = childProps.tabKey;
+            if (typeof k === "string" || typeof k === "number") {
+              firstTabKey = k;
+            }
+          }
           // `VNode.type` is `VNodeTypes` but `h()` expects `string | Component` here.
           // Narrow to keep DTS generation happy.
           const tabPaneType =
-            typeof child.type === 'string' || typeof child.type === 'object'
+            typeof child.type === "string" || typeof child.type === "object"
               ? (child.type as string | Component)
-              : 'div';
+              : "div";
 
           // Store both the tab item and pane components
           // Pass the original child for tab rendering
+          const resolvedActiveKey =
+            props.activeKey ??
+            internalActiveKey.value ??
+            props.defaultActiveKey ??
+            firstTabKey;
+
+          const tabId = `${idBase}-tab-${String(childProps.tabKey ?? "")}`;
+          const panelId = `${idBase}-panel-${String(childProps.tabKey ?? "")}`;
+
           tabItems.push(
             h(tabPaneType, {
               ...childProps,
-              renderMode: 'tab',
+              renderMode: "tab",
+              tabId,
+              panelId,
+              tabIndex: childProps.tabKey === resolvedActiveKey ? 0 : -1,
             })
           );
           // Pass the child with its children/slots for pane rendering
@@ -231,7 +321,9 @@ export const Tabs = defineComponent({
               tabPaneType,
               {
                 ...childProps,
-                renderMode: 'pane',
+                renderMode: "pane",
+                tabId,
+                panelId,
               },
               (child.children ?? undefined) as unknown as
                 | RawChildren
@@ -241,27 +333,55 @@ export const Tabs = defineComponent({
         }
       });
 
+      if (
+        props.activeKey === undefined &&
+        internalActiveKey.value === undefined &&
+        firstTabKey !== undefined
+      ) {
+        internalActiveKey.value = firstTabKey;
+        tabsContextValue.activeKey = firstTabKey;
+      }
+
       // Render tab nav
       const tabNavContent = h(
-        'div',
+        "div",
         {
           class: tabNavClasses.value,
-          role: 'tablist',
+          role: "tablist",
+          "aria-orientation":
+            props.tabPosition === "left" || props.tabPosition === "right"
+              ? "vertical"
+              : "horizontal",
         },
         [
           h(
-            'div',
+            "div",
             {
               class: tabNavListClasses.value,
             },
-            tabItems
+            [
+              ...tabItems,
+              props.type === "editable-card"
+                ? h(
+                    "button",
+                    {
+                      type: "button",
+                      class: tabAddButtonClasses,
+                      onClick: () =>
+                        emit("edit", { targetKey: undefined, action: "add" }),
+                      "aria-label": "Add tab",
+                    },
+                    "+"
+                  )
+                : null,
+            ]
           ),
         ]
       );
 
       // Render tab content
       const tabContent = h(
-        'div',
+        "div",
         {
           class: tabContentClasses.value,
         },
@@ -269,9 +389,9 @@ export const Tabs = defineComponent({
       );
 
       // For left/right position, we need different layout
-      if (props.tabPosition === 'left' || props.tabPosition === 'right') {
+      if (props.tabPosition === "left" || props.tabPosition === "right") {
         return h(
-          'div',
+          "div",
           {
             class: containerClasses.value,
           },
@@ -281,11 +401,12 @@ export const Tabs = defineComponent({
 
       // For top/bottom position
       return h(
-        'div',
+        "div",
         {
           class: containerClasses.value,
+          style: props.style,
         },
-        props.tabPosition === 'bottom'
+        props.tabPosition === "bottom"
           ? [tabContent, tabNavContent]
           : [tabNavContent, tabContent]
       );

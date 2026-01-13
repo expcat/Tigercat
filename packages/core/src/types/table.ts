@@ -5,12 +5,12 @@
 /**
  * Table size types
  */
-export type TableSize = 'sm' | 'md' | 'lg';
+export type TableSize = "sm" | "md" | "lg";
 
 /**
  * Sort direction
  */
-export type SortDirection = 'asc' | 'desc' | null;
+export type SortDirection = "asc" | "desc" | null;
 
 /**
  * Sort state
@@ -30,12 +30,12 @@ export interface SortState {
 /**
  * Column alignment
  */
-export type ColumnAlign = 'left' | 'center' | 'right';
+export type ColumnAlign = "left" | "center" | "right";
 
 /**
  * Filter type
  */
-export type FilterType = 'text' | 'select' | 'custom';
+export type FilterType = "text" | "select" | "custom";
 
 /**
  * Filter option for select filter
@@ -135,7 +135,7 @@ export interface TableColumn<T = Record<string, unknown>> {
    * Whether column is fixed
    * @default false
    */
-  fixed?: 'left' | 'right' | false;
+  fixed?: "left" | "right" | false;
 
   /**
    * Custom render function for cell content
@@ -170,10 +170,24 @@ export interface PaginationConfig {
   current?: number;
 
   /**
+   * Default current page number (1-indexed) for uncontrolled mode.
+   * Used when `current` is not provided.
+   * @default 1
+   */
+  defaultCurrent?: number;
+
+  /**
    * Number of items per page
    * @default 10
    */
   pageSize?: number;
+
+  /**
+   * Default page size for uncontrolled mode.
+   * Used when `pageSize` is not provided.
+   * @default 10
+   */
+  defaultPageSize?: number;
 
   /**
    * Total number of items
@@ -214,6 +228,12 @@ export interface RowSelectionConfig<T = Record<string, unknown>> {
   selectedRowKeys?: (string | number)[];
 
   /**
+   * Default selected row keys for uncontrolled mode.
+   * Used when `selectedRowKeys` is not provided.
+   */
+  defaultSelectedRowKeys?: (string | number)[];
+
+  /**
    * Function to get row key
    * @default (record) => record.id
    */
@@ -229,7 +249,7 @@ export interface RowSelectionConfig<T = Record<string, unknown>> {
    * Selection type
    * @default 'checkbox'
    */
-  type?: 'checkbox' | 'radio';
+  type?: "checkbox" | "radio";
 
   /**
    * Function to determine if row can be selected
@@ -258,6 +278,28 @@ export interface TableProps<T = Record<string, unknown>> {
    * @default []
    */
   dataSource?: T[];
+
+  /**
+   * Controlled sort state.
+   * When provided, internal sort state will not be mutated.
+   */
+  sort?: SortState;
+
+  /**
+   * Default sort state for uncontrolled mode.
+   */
+  defaultSort?: SortState;
+
+  /**
+   * Controlled filters.
+   * When provided, internal filter state will not be mutated.
+   */
+  filters?: Record<string, unknown>;
+
+  /**
+   * Default filters for uncontrolled mode.
+   */
+  defaultFilters?: Record<string, unknown>;
 
   /**
    * Table size

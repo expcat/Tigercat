@@ -8,19 +8,19 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Table } from '@tigercat/vue';
+import { ref } from "vue";
+import { Table } from "@tigercat/vue";
 
 const dataSource = ref([
-  { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
-  { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
-  { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' },
+  { id: 1, name: "John Doe", age: 28, email: "john@example.com" },
+  { id: 2, name: "Jane Smith", age: 32, email: "jane@example.com" },
+  { id: 3, name: "Bob Johnson", age: 45, email: "bob@example.com" },
 ]);
 
 const columns = [
-  { key: 'name', title: 'Name', width: 200 },
-  { key: 'age', title: 'Age', width: 100 },
-  { key: 'email', title: 'Email' },
+  { key: "name", title: "Name", width: 200 },
+  { key: "age", title: "Age", width: 100 },
+  { key: "email", title: "Email" },
 ];
 </script>
 
@@ -32,23 +32,95 @@ const columns = [
 ### React
 
 ```tsx
-import { Table } from '@tigercat/react';
+import { Table } from "@tigercat/react";
 
 function App() {
   const dataSource = [
-    { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
-    { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
-    { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' },
+    { id: 1, name: "John Doe", age: 28, email: "john@example.com" },
+    { id: 2, name: "Jane Smith", age: 32, email: "jane@example.com" },
+    { id: 3, name: "Bob Johnson", age: 45, email: "bob@example.com" },
   ];
 
   const columns = [
-    { key: 'name', title: 'Name', width: 200 },
-    { key: 'age', title: 'Age', width: 100 },
-    { key: 'email', title: 'Email' },
+    { key: "name", title: "Name", width: 200 },
+    { key: "age", title: "Age", width: 100 },
+    { key: "email", title: "Email" },
   ];
 
   return <Table columns={columns} dataSource={dataSource} />;
 }
+```
+
+## 受控与非受控（Controlled / Uncontrolled）
+
+Table 的排序/筛选/分页/行选择都支持“受控/非受控”两种模式：
+
+- 排序：`sort`（受控） / `defaultSort`（非受控初始值）
+- 筛选：`filters`（受控） / `defaultFilters`（非受控初始值）
+- 分页：
+  - `pagination.current` / `pagination.pageSize` 传入即视为受控
+  - 不传 `current/pageSize` 时，可用 `pagination.defaultCurrent/defaultPageSize` 作为非受控初始值
+- 行选择：
+  - `rowSelection.selectedRowKeys` 传入即视为受控
+  - 不传 `selectedRowKeys` 时，可用 `rowSelection.defaultSelectedRowKeys` 作为非受控初始值
+
+### React（受控分页示例）
+
+```tsx
+import React, { useState } from "react";
+import { Table, type SortState } from "@tigercat/react";
+
+export function App() {
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10 });
+  const [sort, setSort] = useState<SortState>({ key: null, direction: null });
+
+  return (
+    <Table
+      columns={[{ key: "name", title: "Name", sortable: true }]}
+      dataSource={[{ id: 1, name: "John" }]}
+      sort={sort}
+      pagination={{ ...pagination, showSizeChanger: true, showTotal: true }}
+      onSortChange={setSort}
+      onPageChange={setPagination}
+    />
+  );
+}
+```
+
+### Vue 3（受控分页示例）
+
+```vue
+<script setup lang="ts">
+import { ref } from "vue";
+import { Table, type SortState } from "@tigercat/vue";
+
+const pagination = ref({
+  current: 1,
+  pageSize: 10,
+  showSizeChanger: true,
+  showTotal: true,
+});
+const sort = ref<SortState>({ key: null, direction: null });
+
+function handlePageChange(next: { current: number; pageSize: number }) {
+  pagination.value = { ...pagination.value, ...next };
+}
+
+function handleSortChange(next: SortState) {
+  sort.value = next;
+}
+</script>
+
+<template>
+  <Table
+    :columns="[{ key: 'name', title: 'Name', sortable: true }]"
+    :dataSource="[{ id: 1, name: 'John' }]"
+    :sort="sort"
+    :pagination="pagination"
+    @sort-change="handleSortChange"
+    @page-change="handlePageChange"
+  />
+</template>
 ```
 
 ## 尺寸 (Sizes)
@@ -121,33 +193,33 @@ Table 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Table } from '@tigercat/vue';
+import { ref } from "vue";
+import { Table } from "@tigercat/vue";
 
 const columns = [
   {
-    key: 'name',
-    title: 'Name',
+    key: "name",
+    title: "Name",
     sortable: true,
   },
   {
-    key: 'age',
-    title: 'Age',
+    key: "age",
+    title: "Age",
     sortable: true,
     // 自定义排序函数
     sortFn: (a, b) => a - b,
   },
-  { key: 'email', title: 'Email' },
+  { key: "email", title: "Email" },
 ];
 
 const dataSource = ref([
-  { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
-  { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
-  { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' },
+  { id: 1, name: "John Doe", age: 28, email: "john@example.com" },
+  { id: 2, name: "Jane Smith", age: 32, email: "jane@example.com" },
+  { id: 3, name: "Bob Johnson", age: 45, email: "bob@example.com" },
 ]);
 
 function handleSortChange(sortState) {
-  console.log('Sort changed:', sortState);
+  console.log("Sort changed:", sortState);
 }
 </script>
 
@@ -155,40 +227,41 @@ function handleSortChange(sortState) {
   <Table
     :columns="columns"
     :dataSource="dataSource"
-    @sort-change="handleSortChange" />
+    @sort-change="handleSortChange"
+  />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { Table } from '@tigercat/react';
+import { Table } from "@tigercat/react";
 
 function App() {
   const columns = [
     {
-      key: 'name',
-      title: 'Name',
+      key: "name",
+      title: "Name",
       sortable: true,
     },
     {
-      key: 'age',
-      title: 'Age',
+      key: "age",
+      title: "Age",
       sortable: true,
       // 自定义排序函数
       sortFn: (a, b) => a - b,
     },
-    { key: 'email', title: 'Email' },
+    { key: "email", title: "Email" },
   ];
 
   const dataSource = [
-    { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
-    { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
-    { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' },
+    { id: 1, name: "John Doe", age: 28, email: "john@example.com" },
+    { id: 2, name: "Jane Smith", age: 32, email: "jane@example.com" },
+    { id: 3, name: "Bob Johnson", age: 45, email: "bob@example.com" },
   ];
 
   const handleSortChange = (sortState) => {
-    console.log('Sort changed:', sortState);
+    console.log("Sort changed:", sortState);
   };
 
   return (
@@ -209,40 +282,40 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Table } from '@tigercat/vue';
+import { ref } from "vue";
+import { Table } from "@tigercat/vue";
 
 const columns = [
   {
-    key: 'name',
-    title: 'Name',
+    key: "name",
+    title: "Name",
     filter: {
-      type: 'text',
-      placeholder: 'Search name...',
+      type: "text",
+      placeholder: "Search name...",
     },
   },
   {
-    key: 'status',
-    title: 'Status',
+    key: "status",
+    title: "Status",
     filter: {
-      type: 'select',
+      type: "select",
       options: [
-        { value: 'active', label: 'Active' },
-        { value: 'inactive', label: 'Inactive' },
+        { value: "active", label: "Active" },
+        { value: "inactive", label: "Inactive" },
       ],
     },
   },
-  { key: 'email', title: 'Email' },
+  { key: "email", title: "Email" },
 ];
 
 const dataSource = ref([
-  { id: 1, name: 'John Doe', status: 'active', email: 'john@example.com' },
-  { id: 2, name: 'Jane Smith', status: 'inactive', email: 'jane@example.com' },
-  { id: 3, name: 'Bob Johnson', status: 'active', email: 'bob@example.com' },
+  { id: 1, name: "John Doe", status: "active", email: "john@example.com" },
+  { id: 2, name: "Jane Smith", status: "inactive", email: "jane@example.com" },
+  { id: 3, name: "Bob Johnson", status: "active", email: "bob@example.com" },
 ]);
 
 function handleFilterChange(filters) {
-  console.log('Filters changed:', filters);
+  console.log("Filters changed:", filters);
 }
 </script>
 
@@ -250,52 +323,53 @@ function handleFilterChange(filters) {
   <Table
     :columns="columns"
     :dataSource="dataSource"
-    @filter-change="handleFilterChange" />
+    @filter-change="handleFilterChange"
+  />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { Table } from '@tigercat/react';
+import { Table } from "@tigercat/react";
 
 function App() {
   const columns = [
     {
-      key: 'name',
-      title: 'Name',
+      key: "name",
+      title: "Name",
       filter: {
-        type: 'text',
-        placeholder: 'Search name...',
+        type: "text",
+        placeholder: "Search name...",
       },
     },
     {
-      key: 'status',
-      title: 'Status',
+      key: "status",
+      title: "Status",
       filter: {
-        type: 'select',
+        type: "select",
         options: [
-          { value: 'active', label: 'Active' },
-          { value: 'inactive', label: 'Inactive' },
+          { value: "active", label: "Active" },
+          { value: "inactive", label: "Inactive" },
         ],
       },
     },
-    { key: 'email', title: 'Email' },
+    { key: "email", title: "Email" },
   ];
 
   const dataSource = [
-    { id: 1, name: 'John Doe', status: 'active', email: 'john@example.com' },
+    { id: 1, name: "John Doe", status: "active", email: "john@example.com" },
     {
       id: 2,
-      name: 'Jane Smith',
-      status: 'inactive',
-      email: 'jane@example.com',
+      name: "Jane Smith",
+      status: "inactive",
+      email: "jane@example.com",
     },
-    { id: 3, name: 'Bob Johnson', status: 'active', email: 'bob@example.com' },
+    { id: 3, name: "Bob Johnson", status: "active", email: "bob@example.com" },
   ];
 
   const handleFilterChange = (filters) => {
-    console.log('Filters changed:', filters);
+    console.log("Filters changed:", filters);
   };
 
   return (
@@ -316,13 +390,13 @@ Table 组件默认开启分页功能，每页显示 10 条数据。
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Table } from '@tigercat/vue';
+import { ref } from "vue";
+import { Table } from "@tigercat/vue";
 
 const columns = [
-  { key: 'name', title: 'Name' },
-  { key: 'age', title: 'Age' },
-  { key: 'email', title: 'Email' },
+  { key: "name", title: "Name" },
+  { key: "age", title: "Age" },
+  { key: "email", title: "Email" },
 ];
 
 const dataSource = ref([
@@ -339,7 +413,7 @@ const pagination = ref({
 });
 
 function handlePageChange({ current, pageSize }) {
-  console.log('Page changed:', current, pageSize);
+  console.log("Page changed:", current, pageSize);
 }
 </script>
 
@@ -349,7 +423,8 @@ function handlePageChange({ current, pageSize }) {
     :columns="columns"
     :dataSource="dataSource"
     :pagination="pagination"
-    @page-change="handlePageChange" />
+    @page-change="handlePageChange"
+  />
 
   <!-- 禁用分页 -->
   <Table :columns="columns" :dataSource="dataSource" :pagination="false" />
@@ -359,14 +434,14 @@ function handlePageChange({ current, pageSize }) {
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Table } from '@tigercat/react';
+import { useState } from "react";
+import { Table } from "@tigercat/react";
 
 function App() {
   const columns = [
-    { key: 'name', title: 'Name' },
-    { key: 'age', title: 'Age' },
-    { key: 'email', title: 'Email' },
+    { key: "name", title: "Name" },
+    { key: "age", title: "Age" },
+    { key: "email", title: "Email" },
   ];
 
   const dataSource = [
@@ -383,7 +458,7 @@ function App() {
   });
 
   const handlePageChange = ({ current, pageSize }) => {
-    console.log('Page changed:', current, pageSize);
+    console.log("Page changed:", current, pageSize);
   };
 
   return (
@@ -411,30 +486,30 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Table } from '@tigercat/vue';
+import { ref } from "vue";
+import { Table } from "@tigercat/vue";
 
 const columns = [
-  { key: 'name', title: 'Name' },
-  { key: 'age', title: 'Age' },
-  { key: 'email', title: 'Email' },
+  { key: "name", title: "Name" },
+  { key: "age", title: "Age" },
+  { key: "email", title: "Email" },
 ];
 
 const dataSource = ref([
-  { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
-  { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
-  { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' },
+  { id: 1, name: "John Doe", age: 28, email: "john@example.com" },
+  { id: 2, name: "Jane Smith", age: 32, email: "jane@example.com" },
+  { id: 3, name: "Bob Johnson", age: 45, email: "bob@example.com" },
 ]);
 
 const rowSelection = ref({
   selectedRowKeys: [],
-  type: 'checkbox', // 'checkbox' | 'radio'
+  type: "checkbox", // 'checkbox' | 'radio'
   showCheckbox: true,
   getRowKey: (record) => record.id,
 });
 
 function handleSelectionChange(selectedKeys) {
-  console.log('Selected rows:', selectedKeys);
+  console.log("Selected rows:", selectedKeys);
 }
 </script>
 
@@ -443,40 +518,41 @@ function handleSelectionChange(selectedKeys) {
     :columns="columns"
     :dataSource="dataSource"
     :rowSelection="rowSelection"
-    @selection-change="handleSelectionChange" />
+    @selection-change="handleSelectionChange"
+  />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Table } from '@tigercat/react';
+import { useState } from "react";
+import { Table } from "@tigercat/react";
 
 function App() {
   const columns = [
-    { key: 'name', title: 'Name' },
-    { key: 'age', title: 'Age' },
-    { key: 'email', title: 'Email' },
+    { key: "name", title: "Name" },
+    { key: "age", title: "Age" },
+    { key: "email", title: "Email" },
   ];
 
   const dataSource = [
-    { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
-    { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
-    { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' },
+    { id: 1, name: "John Doe", age: 28, email: "john@example.com" },
+    { id: 2, name: "Jane Smith", age: 32, email: "jane@example.com" },
+    { id: 3, name: "Bob Johnson", age: 45, email: "bob@example.com" },
   ];
 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const rowSelection = {
     selectedRowKeys,
-    type: 'checkbox', // 'checkbox' | 'radio'
+    type: "checkbox", // 'checkbox' | 'radio'
     showCheckbox: true,
     getRowKey: (record) => record.id,
   };
 
   const handleSelectionChange = (selectedKeys) => {
-    console.log('Selected rows:', selectedKeys);
+    console.log("Selected rows:", selectedKeys);
     setSelectedRowKeys(selectedKeys);
   };
 
@@ -499,46 +575,46 @@ function App() {
 
 ```vue
 <script setup>
-import { ref, h } from 'vue';
-import { Table, Button } from '@tigercat/vue';
+import { ref, h } from "vue";
+import { Table, Button } from "@tigercat/vue";
 
 const columns = [
-  { key: 'name', title: 'Name' },
-  { key: 'age', title: 'Age' },
+  { key: "name", title: "Name" },
+  { key: "age", title: "Age" },
   {
-    key: 'status',
-    title: 'Status',
+    key: "status",
+    title: "Status",
     render: (record) => {
       const color =
-        record.status === 'active' ? 'text-green-600' : 'text-red-600';
-      return h('span', { class: color }, record.status);
+        record.status === "active" ? "text-green-600" : "text-red-600";
+      return h("span", { class: color }, record.status);
     },
   },
   {
-    key: 'actions',
-    title: 'Actions',
-    align: 'center',
+    key: "actions",
+    title: "Actions",
+    align: "center",
     render: (record) => {
       return h(
         Button,
         {
-          size: 'sm',
+          size: "sm",
           onClick: () => handleEdit(record),
         },
-        () => 'Edit'
+        () => "Edit"
       );
     },
   },
 ];
 
 const dataSource = ref([
-  { id: 1, name: 'John Doe', age: 28, status: 'active' },
-  { id: 2, name: 'Jane Smith', age: 32, status: 'inactive' },
-  { id: 3, name: 'Bob Johnson', age: 45, status: 'active' },
+  { id: 1, name: "John Doe", age: 28, status: "active" },
+  { id: 2, name: "Jane Smith", age: 32, status: "inactive" },
+  { id: 3, name: "Bob Johnson", age: 45, status: "active" },
 ]);
 
 function handleEdit(record) {
-  console.log('Edit:', record);
+  console.log("Edit:", record);
 }
 </script>
 
@@ -550,25 +626,25 @@ function handleEdit(record) {
 ### React
 
 ```tsx
-import { Table, Button } from '@tigercat/react';
+import { Table, Button } from "@tigercat/react";
 
 function App() {
   const columns = [
-    { key: 'name', title: 'Name' },
-    { key: 'age', title: 'Age' },
+    { key: "name", title: "Name" },
+    { key: "age", title: "Age" },
     {
-      key: 'status',
-      title: 'Status',
+      key: "status",
+      title: "Status",
       render: (record) => {
         const color =
-          record.status === 'active' ? 'text-green-600' : 'text-red-600';
+          record.status === "active" ? "text-green-600" : "text-red-600";
         return <span className={color}>{record.status}</span>;
       },
     },
     {
-      key: 'actions',
-      title: 'Actions',
-      align: 'center',
+      key: "actions",
+      title: "Actions",
+      align: "center",
       render: (record) => (
         <Button size="sm" onClick={() => handleEdit(record)}>
           Edit
@@ -578,13 +654,13 @@ function App() {
   ];
 
   const dataSource = [
-    { id: 1, name: 'John Doe', age: 28, status: 'active' },
-    { id: 2, name: 'Jane Smith', age: 32, status: 'inactive' },
-    { id: 3, name: 'Bob Johnson', age: 45, status: 'active' },
+    { id: 1, name: "John Doe", age: 28, status: "active" },
+    { id: 2, name: "Jane Smith", age: 32, status: "inactive" },
+    { id: 3, name: "Bob Johnson", age: 45, status: "active" },
   ];
 
   const handleEdit = (record) => {
-    console.log('Edit:', record);
+    console.log("Edit:", record);
   };
 
   return <Table columns={columns} dataSource={dataSource} />;
@@ -602,7 +678,8 @@ function App() {
     :columns="columns"
     :dataSource="dataSource"
     stickyHeader
-    :maxHeight="400" />
+    :maxHeight="400"
+  />
 </template>
 ```
 
@@ -634,24 +711,24 @@ function App() {
 
 ```vue
 <script setup>
-import { ref, h } from 'vue';
-import { Table } from '@tigercat/vue';
+import { ref, h } from "vue";
+import { Table } from "@tigercat/vue";
 
 const dataSource = ref([
-  { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
-  { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
+  { id: 1, name: "John Doe", age: 28, email: "john@example.com" },
+  { id: 2, name: "Jane Smith", age: 32, email: "jane@example.com" },
 ]);
 
 const columns = [
-  { key: 'name', title: 'Name', width: 160, fixed: 'left' },
-  { key: 'age', title: 'Age', width: 120 },
-  { key: 'email', title: 'Email', width: 240 },
+  { key: "name", title: "Name", width: 160, fixed: "left" },
+  { key: "age", title: "Age", width: 120 },
+  { key: "email", title: "Email", width: 240 },
   {
-    key: 'actions',
-    title: 'Actions',
+    key: "actions",
+    title: "Actions",
     width: 160,
-    fixed: 'right',
-    render: (record) => h('span', {}, 'Edit'),
+    fixed: "right",
+    render: (record) => h("span", {}, "Edit"),
   },
 ];
 </script>
@@ -664,24 +741,24 @@ const columns = [
 ### React
 
 ```tsx
-import { Table } from '@tigercat/react';
+import { Table } from "@tigercat/react";
 
 function App() {
   const dataSource = [
-    { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
-    { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
+    { id: 1, name: "John Doe", age: 28, email: "john@example.com" },
+    { id: 2, name: "Jane Smith", age: 32, email: "jane@example.com" },
   ];
 
   const columns = [
-    { key: 'name', title: 'Name', width: 160, fixed: 'left' },
-    { key: 'age', title: 'Age', width: 120 },
-    { key: 'email', title: 'Email', width: 240 },
+    { key: "name", title: "Name", width: 160, fixed: "left" },
+    { key: "age", title: "Age", width: 120 },
+    { key: "email", title: "Email", width: 240 },
     {
-      key: 'actions',
-      title: 'Actions',
+      key: "actions",
+      title: "Actions",
       width: 160,
-      fixed: 'right',
-      render: () => 'Edit',
+      fixed: "right",
+      render: () => "Edit",
     },
   ];
 
@@ -695,8 +772,8 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Table } from '@tigercat/vue';
+import { ref } from "vue";
+import { Table } from "@tigercat/vue";
 
 const loading = ref(true);
 
@@ -714,8 +791,8 @@ setTimeout(() => {
 ### React
 
 ```tsx
-import { useState, useEffect } from 'react';
-import { Table } from '@tigercat/react';
+import { useState, useEffect } from "react";
+import { Table } from "@tigercat/react";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -824,7 +901,9 @@ Table 组件使用 Tailwind CSS 类，可以通过覆盖相应的类来自定义
 ## 无障碍支持
 
 - 表格使用语义化的 `<table>` 标签
-- 支持键盘导航
+- 可排序表头会自动设置 `aria-sort`（`none/ascending/descending`）
+- 加载中会在容器上设置 `aria-busy`，并提供 `role="status"` 的 Loading 语义
+- 空态文案使用 `role="status"` + `aria-live="polite"`，便于辅助技术感知状态变化
 - 选择框具有正确的 ARIA 属性
 - 固定表头时保持合理的滚动体验
 

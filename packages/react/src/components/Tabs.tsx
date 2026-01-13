@@ -4,29 +4,34 @@ import React, {
   useState,
   useMemo,
   useCallback,
+  useId,
   ReactElement,
-} from 'react';
+} from "react";
 import {
   classNames,
   getTabsContainerClasses,
   getTabNavClasses,
   getTabNavListClasses,
+  tabAddButtonClasses,
   tabContentBaseClasses,
   type TabType,
   type TabSize,
+  type TabPosition,
   type TabsProps as CoreTabsProps,
-} from '@tigercat/core';
-import { TabPane, type TabPaneProps } from './TabPane';
+} from "@tigercat/core";
+import { TabPane, type TabPaneProps } from "./TabPane";
 
 // Tabs context interface
 export interface TabsContextValue {
   activeKey: string | number | undefined;
   type: TabType;
   size: TabSize;
+  tabPosition: TabPosition;
   closable: boolean;
   destroyInactiveTabPane: boolean;
+  idBase: string;
   handleTabClick: (key: string | number) => void;
-  handleTabClose: (key: string | number, event: React.MouseEvent) => void;
+  handleTabClose: (key: string | number, event: React.SyntheticEvent) => void;
 }
 
 // Create tabs context
@@ -37,7 +42,7 @@ export function useTabsContext(): TabsContextValue | null {
   return useContext(TabsContext);
 }
 
-export interface TabsProps extends CoreTabsProps {
+export interface TabsProps extends Omit<CoreTabsProps, "style"> {
   /**
    * Tab change event handler
    */
@@ -52,22 +57,27 @@ export interface TabsProps extends CoreTabsProps {
    * Tab edit event handler (for closable tabs)
    */
   onEdit?: (info: {
-    targetKey: string | number;
-    action: 'add' | 'remove';
+    targetKey?: string | number;
+    action: "add" | "remove";
   }) => void;
 
   /**
    * Tab panes
    */
   children?: React.ReactNode;
+
+  /**
+   * Custom styles
+   */
+  style?: React.CSSProperties;
 }
 
 export const Tabs: React.FC<TabsProps> = ({
   activeKey: controlledActiveKey,
   defaultActiveKey,
-  type = 'line',
-  tabPosition = 'top',
-  size = 'medium',
+  type = "line",
+  tabPosition = "top",
+  size = "medium",
   closable = false,
   centered = false,
   destroyInactiveTabPane = false,
@@ -78,36 +88,16 @@ export const Tabs: React.FC<TabsProps> = ({
   onEdit,
   children,
 }) => {
+  const reactId = useId();
+  const idBase = useMemo(
+    () => `tiger-tabs-${reactId.replace(/[^a-zA-Z0-9_-]/g, "")}`,
+    [reactId]
+  );
+
   // Internal state for uncontrolled mode
   const [internalActiveKey, setInternalActiveKey] = useState<
     string | number | undefined
   >(defaultActiveKey);
-
-  // Handle tab click
-  const handleTabClick = useCallback(
-    (key: string | number) => {
-      // Update internal state if uncontrolled
-      if (controlledActiveKey === undefined) {
-        setInternalActiveKey(key);
-      }
-
-      // Call event handlers
-      onChange?.(key);
-      onTabClick?.(key);
-    },
-    [controlledActiveKey, onChange, onTabClick]
-  );
-
-  // Handle tab close
-  const handleTabClose = useCallback(
-    (key: string | number, event: React.MouseEvent) => {
-      event.stopPropagation();
-
-      // Call event handler
-      onEdit?.({ targetKey: key, action: 'remove' });
-    },
-    [onEdit]
-  );
 
   // Container classes
   const containerClasses = useMemo(() => {
@@ -135,18 +125,47 @@ export const Tabs: React.FC<TabsProps> = ({
     const panes: ReactElement[] = [];
     let firstKey: string | number | undefined;
 
+    const childrenArray: ReactElement<TabPaneProps>[] = [];
     React.Children.forEach(children, (child) => {
       if (React.isValidElement<TabPaneProps>(child) && child.type === TabPane) {
-        if (firstKey === undefined) {
-          firstKey = child.props.tabKey;
-        }
-        items.push(React.cloneElement(child, { renderMode: 'tab' }));
-        panes.push(React.cloneElement(child, { renderMode: 'pane' }));
+        childrenArray.push(child);
+      }
+    });
+
+    const resolvedFirstKey = childrenArray[0]?.props.tabKey;
+    if (resolvedFirstKey !== undefined) {
+      firstKey = resolvedFirstKey;
+    }
+
+    const resolvedActiveKey =
+      controlledActiveKey !== undefined
+        ? controlledActiveKey
+        : defaultActiveKey !== undefined
+        ? defaultActiveKey
+        : firstKey;
+
+    childrenArray.forEach((child) => {
+      if (React.isValidElement<TabPaneProps>(child) && child.type === TabPane) {
+        const key = child.props.tabKey;
+        const tabId = `${idBase}-tab-${String(key)}`;
+        const panelId = `${idBase}-panel-${String(key)}`;
+
+        items.push(
+          React.cloneElement(child, {
+            renderMode: "tab",
+            tabId,
+            panelId,
+            tabIndex: key === resolvedActiveKey ? 0 : -1,
+          })
+        );
+        panes.push(
+          React.cloneElement(child, { renderMode: "pane", tabId, panelId })
+        );
       }
     });
 
     return { tabItems: items, tabPanes: panes, firstTabKey: firstKey };
-  }, [children]);
+  }, [children, controlledActiveKey, defaultActiveKey, idBase]);
 
   // Use controlled or uncontrolled state, defaulting to the first tab if none is specified
   const activeKey =
@@ -155,6 +174,39 @@ export const Tabs: React.FC<TabsProps> = ({
       : internalActiveKey !== undefined
       ? internalActiveKey
       : firstTabKey;
+
+  // Handle tab click
+  const handleTabClick = useCallback(
+    (key: string | number) => {
+      onTabClick?.(key);
+
+      if (key === activeKey) {
+        return;
+      }
+
+      // Update internal state if uncontrolled
+      if (controlledActiveKey === undefined) {
+        setInternalActiveKey(key);
+      }
+
+      onChange?.(key);
+    },
+    [activeKey, controlledActiveKey, onChange, onTabClick]
+  );
+
+  // Handle tab close
+  const handleTabClose = useCallback(
+    (key: string | number, event: React.SyntheticEvent) => {
+      event.stopPropagation();
+
+      onEdit?.({ targetKey: key, action: "remove" });
+    },
+    [onEdit]
+  );
+
+  const handleTabAdd = useCallback(() => {
+    onEdit?.({ targetKey: undefined, action: "add" });
+  }, [onEdit]);
 
   // Context value
   const contextValue = useMemo<TabsContextValue>(
@@ -181,7 +233,19 @@ export const Tabs: React.FC<TabsProps> = ({
   // Render tab nav
   const tabNavContent = (
     <div className={tabNavClasses} role="tablist">
-      <div className={tabNavListClasses}>{tabItems}</div>
+      <div className={tabNavListClasses}>
+        {tabItems}
+        {type === "editable-card" && (
+          <button
+            type="button"
+            className={tabAddButtonClasses}
+            onClick={handleTabAdd}
+            aria-label="Add tab"
+          >
+            +
+          </button>
+        )}
+      </div>
     </div>
   );
 
@@ -190,14 +254,14 @@ export const Tabs: React.FC<TabsProps> = ({
 
   // Render container based on position
   let content: React.ReactNode;
-  if (tabPosition === 'left' || tabPosition === 'right') {
+  if (tabPosition === "left" || tabPosition === "right") {
     content = (
       <>
         {tabNavContent}
         {tabContent}
       </>
     );
-  } else if (tabPosition === 'bottom') {
+  } else if (tabPosition === "bottom") {
     content = (
       <>
         {tabContent}

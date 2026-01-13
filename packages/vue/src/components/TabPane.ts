@@ -1,14 +1,25 @@
-import { defineComponent, computed, inject, PropType, h } from 'vue'
+import { defineComponent, computed, inject, PropType, h } from "vue";
 import {
   classNames,
   getTabItemClasses,
   getTabPaneClasses,
   isKeyActive,
-} from '@tigercat/core'
-import { TabsContextKey, type TabsContext } from './Tabs'
+  tabCloseButtonClasses,
+} from "@tigercat/core";
+import { TabsContextKey, type TabsContext } from "./Tabs";
+
+export interface VueTabPaneProps {
+  tabKey: string | number;
+  label: string;
+  disabled?: boolean;
+  closable?: boolean;
+  icon?: unknown;
+  className?: string;
+  style?: Record<string, string | number>;
+}
 
 export const TabPane = defineComponent({
-  name: 'TigerTabPane',
+  name: "TigerTabPane",
   props: {
     /**
      * Unique key for the tab pane (required)
@@ -54,33 +65,54 @@ export const TabPane = defineComponent({
       default: undefined,
     },
     /**
+     * Custom styles
+     */
+    style: {
+      type: Object as PropType<Record<string, string | number>>,
+      default: undefined,
+    },
+    /**
      * Render mode - 'tab' for tab item, 'pane' for content pane
      * @internal
      */
     renderMode: {
-      type: String as PropType<'tab' | 'pane'>,
-      default: 'pane',
+      type: String as PropType<"tab" | "pane">,
+      default: "pane",
+    },
+
+    // Internal props for a11y + roving tabindex
+    tabId: {
+      type: String,
+      default: undefined,
+    },
+    panelId: {
+      type: String,
+      default: undefined,
+    },
+    tabIndex: {
+      type: Number,
+      default: undefined,
     },
   },
   setup(props, { slots }) {
     // Inject tabs context
-    const tabsContext = inject<TabsContext>(TabsContextKey)
+    const tabsContext = inject<TabsContext>(TabsContextKey);
 
     if (!tabsContext) {
-      throw new Error('TabPane must be used within a Tabs component')
+      throw new Error("TabPane must be used within a Tabs component");
     }
 
     // Check if this tab is active
     const isActive = computed(() => {
-      return isKeyActive(props.tabKey, tabsContext.activeKey)
-    })
+      return isKeyActive(props.tabKey, tabsContext.activeKey);
+    });
 
     // Check if tab is closable
     const isClosable = computed(() => {
       return props.closable !== undefined
         ? props.closable
-        : tabsContext.closable && tabsContext.type === 'editable-card'
-    })
+        : tabsContext.closable && tabsContext.type === "editable-card";
+    });
 
     // Tab item classes
     const tabItemClasses = computed(() => {
@@ -91,93 +123,201 @@ export const TabPane = defineComponent({
           tabsContext.type,
           tabsContext.size
         )
-      )
-    })
+      );
+    });
 
     // Tab pane classes
     const tabPaneClasses = computed(() => {
-      return classNames(
-        getTabPaneClasses(isActive.value),
-        props.className
-      )
-    })
+      return classNames(getTabPaneClasses(isActive.value), props.className);
+    });
 
     // Handle tab click
     const handleClick = () => {
       if (!props.disabled) {
-        tabsContext.handleTabClick(props.tabKey)
+        tabsContext.handleTabClick(props.tabKey);
       }
-    }
+    };
 
     // Handle close click
     const handleClose = (event: Event) => {
       if (!props.disabled) {
-        tabsContext.handleTabClose(props.tabKey, event)
+        tabsContext.handleTabClose(props.tabKey, event);
       }
-    }
+    };
+
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (props.disabled) {
+        return;
+      }
+
+      if (
+        isClosable.value &&
+        (event.key === "Backspace" || event.key === "Delete")
+      ) {
+        event.preventDefault();
+        tabsContext.handleTabClose(props.tabKey, event);
+        return;
+      }
+
+      const isVertical =
+        tabsContext.tabPosition === "left" ||
+        tabsContext.tabPosition === "right";
+
+      const nextKeys = isVertical ? ["ArrowDown"] : ["ArrowRight"];
+      const prevKeys = isVertical ? ["ArrowUp"] : ["ArrowLeft"];
+
+      const key = event.key;
+      if (
+        nextKeys.includes(key) ||
+        prevKeys.includes(key) ||
+        key === "Home" ||
+        key === "End" ||
+        key === "Enter" ||
+        key === " "
+      ) {
+        event.preventDefault();
+      }
+
+      if (key === "Enter" || key === " ") {
+        tabsContext.handleTabClick(props.tabKey);
+        return;
+      }
+
+      const tabList = (event.currentTarget as HTMLElement | null)?.closest(
+        '[role="tablist"]'
+      );
+
+      const tabButtons = Array.from(
+        tabList?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ?? []
+      );
+
+      const enabled = tabButtons.filter((b) => !b.disabled);
+      const currentIndex = enabled.findIndex((b) => b.id === props.tabId);
+      if (currentIndex === -1) {
+        return;
+      }
+
+      const focusByIndex = (index: number) => {
+        const next = enabled[index];
+        if (!next) return;
+        next.focus();
+
+        const nextKey = next.getAttribute("data-tiger-tab-key");
+        if (nextKey != null) {
+          const parsed: string | number = nextKey.startsWith("n:")
+            ? Number(nextKey.slice(2))
+            : nextKey.startsWith("s:")
+            ? nextKey.slice(2)
+            : nextKey;
+          tabsContext.handleTabClick(parsed);
+        }
+      };
+
+      if (nextKeys.includes(key)) {
+        focusByIndex((currentIndex + 1) % enabled.length);
+        return;
+      }
+
+      if (prevKeys.includes(key)) {
+        focusByIndex((currentIndex - 1 + enabled.length) % enabled.length);
+        return;
+      }
+
+      if (key === "Home") {
+        focusByIndex(0);
+        return;
+      }
+
+      if (key === "End") {
+        focusByIndex(enabled.length - 1);
+      }
+    };
 
     return () => {
       // Render tab item (in the tab nav)
-      if (props.renderMode === 'tab') {
+      if (props.renderMode === "tab") {
         return h(
-          'div',
+          "button",
           {
+            type: "button",
             class: tabItemClasses.value,
-            role: 'tab',
-            'aria-selected': isActive.value,
-            'aria-disabled': props.disabled,
+            role: "tab",
+            id: props.tabId,
+            "aria-controls": props.panelId,
+            "aria-selected": isActive.value,
+            "aria-disabled": props.disabled,
+            disabled: props.disabled,
+            tabindex:
+              typeof props.tabIndex === "number"
+                ? props.tabIndex
+                : isActive.value
+                ? 0
+                : -1,
+            "data-tiger-tabs-id": tabsContext.idBase,
+            "data-tiger-tab-key":
+              typeof props.tabKey === "number"
+                ? `n:${props.tabKey}`
+                : `s:${props.tabKey}`,
             onClick: handleClick,
+            onKeydown: handleKeydown,
           },
           [
             // Icon
-            props.icon && h('span', { class: 'flex items-center' }, props.icon),
+            props.icon && h("span", { class: "flex items-center" }, props.icon),
             // Label
-            h('span', props.label),
+            h("span", props.label),
             // Close button
             isClosable.value &&
               h(
-                'span',
+                "button",
                 {
-                  class: 'ml-2 p-0.5 rounded hover:bg-gray-200 transition-colors duration-150',
+                  type: "button",
+                  class: tabCloseButtonClasses,
+                  "aria-label": `Close ${String(props.label)}`,
+                  tabindex: -1,
                   onClick: handleClose,
                 },
                 h(
-                  'svg',
+                  "svg",
                   {
-                    class: 'w-4 h-4',
-                    fill: 'none',
-                    stroke: 'currentColor',
-                    viewBox: '0 0 24 24',
+                    class: "w-4 h-4",
+                    fill: "none",
+                    stroke: "currentColor",
+                    viewBox: "0 0 24 24",
                   },
-                  h('path', {
-                    'stroke-linecap': 'round',
-                    'stroke-linejoin': 'round',
-                    'stroke-width': '2',
-                    d: 'M6 18L18 6M6 6l12 12',
+                  h("path", {
+                    "stroke-linecap": "round",
+                    "stroke-linejoin": "round",
+                    "stroke-width": "2",
+                    d: "M6 18L18 6M6 6l12 12",
                   })
                 )
               ),
           ]
-        )
+        );
       }
 
       // Render tab pane content
-      const shouldRender = isActive.value || !tabsContext.destroyInactiveTabPane
+      const shouldRender =
+        isActive.value || !tabsContext.destroyInactiveTabPane;
       if (!shouldRender) {
-        return null
+        return null;
       }
 
       return h(
-        'div',
+        "div",
         {
           class: tabPaneClasses.value,
-          role: 'tabpanel',
-          'aria-hidden': !isActive.value,
+          style: props.style,
+          role: "tabpanel",
+          id: props.panelId,
+          "aria-labelledby": props.tabId,
+          "aria-hidden": !isActive.value,
         },
         slots.default?.()
-      )
-    }
+      );
+    };
   },
-})
+});
 
-export default TabPane
+export default TabPane;
