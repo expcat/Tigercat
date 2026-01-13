@@ -3,6 +3,8 @@
  * Shared styles and helpers for Tag components
  */
 
+import { closeIconPathD } from './common-icons';
+
 /**
  * Base classes for all tag variants
  */
@@ -27,4 +29,4 @@ export const tagCloseButtonBaseClasses =
 /**
  * Close icon SVG path data
  */
-export const tagCloseIconPath = 'M6 18L18 6M6 6l12 12';
+export const tagCloseIconPath = closeIconPathD;

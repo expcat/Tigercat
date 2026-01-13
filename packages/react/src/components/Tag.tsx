@@ -3,6 +3,10 @@ import {
   classNames,
   getTagVariantClasses,
   defaultTagThemeColors,
+  icon24PathStrokeLinecap,
+  icon24PathStrokeLinejoin,
+  icon24StrokeWidth,
+  icon24ViewBox,
   tagBaseClasses,
   tagSizeClasses,
   tagCloseButtonBaseClasses,
@@ -31,12 +35,16 @@ const CloseIcon: React.FC = () => (
     className="h-3 w-3"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
-    viewBox="0 0 24 24"
+    viewBox={icon24ViewBox}
     stroke="currentColor"
-    strokeWidth={2}
+    strokeWidth={icon24StrokeWidth}
     aria-hidden="true"
     focusable="false">
-    <path strokeLinecap="round" strokeLinejoin="round" d={tagCloseIconPath} />
+    <path
+      strokeLinecap={icon24PathStrokeLinecap}
+      strokeLinejoin={icon24PathStrokeLinejoin}
+      d={tagCloseIconPath}
+    />
   </svg>
 );
 

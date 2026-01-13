@@ -9,7 +9,7 @@
 ## 0. 状态板（只维护这里）
 
 - 更新时间：2026-01-14
-- 上一步：✅ `List/Tree` loading spinner 复用 core `getSpinnerSVG('spinner')`（tests + build 通过）
+- 上一步：✅ `Alert/Message/Notification/Tag` 的 24x24 outline SVG attrs + status/close icon 常量统一收敛到 core `common-icons`（Vue/React 复用；tests + build 通过）
 - 当前组件：Phase 0 基建
 - 当前步骤：🚧 consistent classes 推进中（新增覆盖 Upload uploading spinner；持续收敛重复 SVG）
 - Step1-5 完成度：已完成一轮（包含 build 验证；详见「4. 已完成」）
@@ -45,6 +45,8 @@
   - 进度：✅ Upload 的 uploading spinner SVG 已统一复用 core `getSpinnerSVG('spinner')`；同时将 Vue 渲染所需的 SVG attrs 归一化（`normalizeSvgAttrs`）下沉到 `@tigercat/core`（`svg-attrs`）。
   - 进度：✅ Button/Table 的 loading spinner SVG 已统一复用 core `getSpinnerSVG('spinner')`（两端删除重复 circle/path）。
   - 进度：✅ List/Tree 的 loading spinner SVG 已统一复用 core `getSpinnerSVG('spinner')`（两端删除重复 circle/path）。
+  - 进度：✅ Popconfirm 的 5 个状态 icon（warning/info/error/success/question）SVG path 常量已统一下沉到 `@tigercat/core`（`popconfirm-utils`），Vue/React 双端复用同一实现。
+  - 进度：✅ Alert/Message/Notification/Tag 的“24x24 outline SVG 默认 attrs”（viewBox/strokeWidth/linecap/linejoin）+ status icon paths（success/warning/error/info）+ close(X) path 已统一收敛到 `@tigercat/core`（`common-icons`），两端删除重复字面量。
 
 ---
 
@@ -93,6 +95,8 @@ return h('div', { class: '...' }, children);
 - 2026-01-14：`Button` Step2-5（disabled/loading 交互与默认 aria 策略、spinner a11y、测试覆盖、docs 同步、build 通过）。
 - 2026-01-14：`Button`（P1）深化（补齐 keyboard 关键路径测试；注：Space 语义依赖原生 button 行为，happy-dom 不稳定不强测；build 通过）。
 - 2026-01-14：Phase 0 基建（SVG spinner 复用）：`List`/`Tree`（Vue+React）loading spinner 改用 core `getSpinnerSVG('spinner')`；相关单测通过；build 通过。
+- 2026-01-14：Phase 0 基建（重复 SVG 收敛）：`Popconfirm`（Vue+React）内联 5 个状态 icon SVG 改为复用 core `popconfirm-utils`（`getPopconfirmIconPath` + 相关常量）；相关单测通过；build 通过。
+- 2026-01-14：Phase 0 基建（重复 SVG 收敛）：`Alert/Message/Notification/Tag`（Vue+React）统一复用 core `common-icons` 的 status icon paths + close(X) path + 24x24 outline attrs 常量；相关单测通过；build 通过。
 - 2026-01-14：Phase 0 基建（SVG spinner 复用）：`Button`/`Table`（Vue+React）loading spinner 改用 core `getSpinnerSVG('spinner')`；相关单测通过；build 通过。
 - 2026-01-14：Phase 0 基建（SVG spinner 复用）：新增 core `normalizeSvgAttrs`（`svg-attrs`）+ `Upload`（Vue/React）改用 `getSpinnerSVG('spinner')`；Upload 单测通过；build 通过。
 - 2026-01-14：Phase 0 基建（新增 core a11y utils：`createAriaId`/keyboard helpers；新增组件重构任务模板；补齐最小单测；build 通过）。

@@ -1,8 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { createRoot, Root } from "react-dom/client";
-import { flushSync } from "react-dom";
+import React, { useState, useEffect, useCallback } from 'react';
+import { createRoot, Root } from 'react-dom/client';
+import { flushSync } from 'react-dom';
 import {
   classNames,
+  icon24PathStrokeLinecap,
+  icon24PathStrokeLinejoin,
+  icon24StrokeWidth,
+  icon24ViewBox,
   getMessageTypeClasses,
   defaultMessageThemeColors,
   messageContainerBaseClasses,
@@ -18,13 +22,13 @@ import {
   type MessageInstance,
   type MessageOptions,
   type MessageConfig,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
 /**
  * Global message container id
  */
-const MESSAGE_CONTAINER_ID = "tiger-message-container";
-const MESSAGE_CLOSE_ARIA_LABEL = "Close message";
+const MESSAGE_CONTAINER_ID = 'tiger-message-container';
+const MESSAGE_CLOSE_ARIA_LABEL = 'Close message';
 
 /**
  * Message instance storage
@@ -51,7 +55,7 @@ const Icon: React.FC<{
 }> = ({ path, className, isLoading = false }) => {
   const iconClass = classNames(
     className,
-    isLoading ? messageLoadingSpinnerClasses : ""
+    isLoading ? messageLoadingSpinnerClasses : ''
   );
 
   return (
@@ -59,11 +63,14 @@ const Icon: React.FC<{
       className={iconClass}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
-      viewBox="0 0 24 24"
+      viewBox={icon24ViewBox}
       stroke="currentColor"
-      strokeWidth="2"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d={path} />
+      strokeWidth={icon24StrokeWidth}>
+      <path
+        strokeLinecap={icon24PathStrokeLinecap}
+        strokeLinejoin={icon24PathStrokeLinejoin}
+        d={path}
+      />
     </svg>
   );
 };
@@ -95,7 +102,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
     colorScheme.border,
     colorScheme.text,
     message.className,
-    isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
+    isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
   );
 
   const iconPath = message.icon || getMessageIconPath(message.type);
@@ -106,8 +113,8 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
     setTimeout(() => onClose(message.id), 300);
   }, [message.id, onClose]);
 
-  const a11yRole = message.type === "error" ? "alert" : "status";
-  const ariaLive = message.type === "error" ? "assertive" : "polite";
+  const a11yRole = message.type === 'error' ? 'alert' : 'status';
+  const ariaLive = message.type === 'error' ? 'assertive' : 'polite';
 
   return (
     <div
@@ -115,15 +122,14 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
       role={a11yRole}
       aria-live={ariaLive}
       aria-atomic="true"
-      aria-busy={message.type === "loading" || undefined}
+      aria-busy={message.type === 'loading' || undefined}
       data-tiger-message
       data-tiger-message-type={message.type}
-      data-tiger-message-id={String(message.id)}
-    >
+      data-tiger-message-id={String(message.id)}>
       <Icon
         path={iconPath}
         className={iconClass}
-        isLoading={message.type === "loading"}
+        isLoading={message.type === 'loading'}
       />
       <div className={messageContentClasses}>{message.content}</div>
       {message.closable && (
@@ -131,8 +137,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
           className={messageCloseButtonClasses}
           onClick={handleClose}
           aria-label={MESSAGE_CLOSE_ARIA_LABEL}
-          type="button"
-        >
+          type="button">
           <Icon path={messageCloseIconPath} className="w-4 h-4" />
         </button>
       )}
@@ -151,7 +156,7 @@ export interface MessageContainerProps {
  * Message container component
  */
 export const MessageContainer: React.FC<MessageContainerProps> = ({
-  position = "top",
+  position = 'top',
 }) => {
   const [messages, setMessages] = useState<MessageInstance[]>(() => [
     ...messageInstances,
@@ -198,8 +203,7 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
       id={MESSAGE_CONTAINER_ID}
       aria-live="polite"
       aria-relevant="additions"
-      data-tiger-message-container
-    >
+      data-tiger-message-container>
       {messages.map((message) => (
         <MessageItem
           key={message.id}
@@ -230,7 +234,7 @@ function ensureContainer() {
 
   let rootEl = existingRootEl;
   if (!rootEl) {
-    rootEl = document.createElement("div");
+    rootEl = document.createElement('div');
     rootEl.id = rootId;
     document.body.appendChild(rootEl);
   }
@@ -249,7 +253,7 @@ function addMessage(config: MessageConfig): () => void {
 
   const instance: MessageInstance = {
     id,
-    type: config.type || "info",
+    type: config.type || 'info',
     content: config.content,
     duration: config.duration !== undefined ? config.duration : 3000,
     closable: config.closable || false,
@@ -329,7 +333,7 @@ function clearAll() {
  * Normalize message options
  */
 function normalizeOptions(options: MessageOptions): MessageConfig {
-  if (typeof options === "string") {
+  if (typeof options === 'string') {
     return { content: options };
   }
   return options;
@@ -344,7 +348,7 @@ export const message = {
    */
   info(options: MessageOptions): () => void {
     const config = normalizeOptions(options);
-    return addMessage({ ...config, type: "info" });
+    return addMessage({ ...config, type: 'info' });
   },
 
   /**
@@ -352,7 +356,7 @@ export const message = {
    */
   success(options: MessageOptions): () => void {
     const config = normalizeOptions(options);
-    return addMessage({ ...config, type: "success" });
+    return addMessage({ ...config, type: 'success' });
   },
 
   /**
@@ -360,7 +364,7 @@ export const message = {
    */
   warning(options: MessageOptions): () => void {
     const config = normalizeOptions(options);
-    return addMessage({ ...config, type: "warning" });
+    return addMessage({ ...config, type: 'warning' });
   },
 
   /**
@@ -368,7 +372,7 @@ export const message = {
    */
   error(options: MessageOptions): () => void {
     const config = normalizeOptions(options);
-    return addMessage({ ...config, type: "error" });
+    return addMessage({ ...config, type: 'error' });
   },
 
   /**
@@ -376,7 +380,7 @@ export const message = {
    */
   loading(options: MessageOptions): () => void {
     const config = normalizeOptions(options);
-    return addMessage({ ...config, type: "loading", duration: 0 });
+    return addMessage({ ...config, type: 'loading', duration: 0 });
   },
 
   /**
