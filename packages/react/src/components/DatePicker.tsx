@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import {
   classNames,
   parseDate,
@@ -7,7 +7,6 @@ import {
   isSameDay,
   isDateInRange,
   getCalendarDays,
-  getMonthNames,
   getShortDayNames,
   isToday as isTodayUtil,
   normalizeDate,
@@ -29,10 +28,13 @@ import {
   CloseIconPath,
   ChevronLeftIconPath,
   ChevronRightIconPath,
+  getDatePickerLabels,
   type DatePickerProps as CoreDatePickerProps,
-} from '@tigercat/core';
+  type DatePickerSingleModelValue,
+  type DatePickerRangeModelValue,
+  type DatePickerRangeValue,
+} from "@tigercat/core";
 
-// Helper component to render SVG icon
 const Icon: React.FC<{ path: string; className: string }> = ({
   path,
   className,
@@ -41,140 +43,128 @@ const Icon: React.FC<{ path: string; className: string }> = ({
     className={className}
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 20 20"
-    fill="currentColor">
+    fill="currentColor"
+  >
     <path fillRule="evenodd" d={path} clipRule="evenodd" />
   </svg>
 );
 
-export interface DatePickerProps extends CoreDatePickerProps {
-  /**
-   * Change event handler (single-date mode)
-   */
-  onChange?: (date: Date | null) => void;
+type DatePickerDivProps = Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "defaultValue" | "value" | "onChange"
+>;
 
-  /**
-   * Clear event handler
-   */
-  onClear?: () => void;
-
-  /**
-   * Additional CSS classes
-   */
+export interface DatePickerBaseProps
+  extends Omit<CoreDatePickerProps, "value" | "defaultValue" | "range">,
+    DatePickerDivProps {
   className?: string;
+
+  onClear?: () => void;
 }
 
-export type DatePickerRangeValue = [Date | null, Date | null];
-
-export type DatePickerRangeProps = Omit<
-  CoreDatePickerProps,
-  'value' | 'defaultValue' | 'range'
-> & {
-  range: true;
-  value?: [Date | string | null, Date | string | null] | null;
-  defaultValue?: [Date | string | null, Date | string | null] | null;
-  onChange?: (range: DatePickerRangeValue) => void;
-};
-
-export type DatePickerSingleProps = Omit<
-  CoreDatePickerProps,
-  'value' | 'defaultValue' | 'range'
-> & {
+export interface DatePickerSingleProps extends DatePickerBaseProps {
   range?: false;
-  value?: Date | string | null;
-  defaultValue?: Date | string | null;
+  value?: DatePickerSingleModelValue;
+  defaultValue?: DatePickerSingleModelValue;
   onChange?: (date: Date | null) => void;
-};
+}
 
-export type TigerDatePickerProps = (
-  | DatePickerSingleProps
-  | DatePickerRangeProps
-) & {
-  /**
-   * Clear event handler
-   */
-  onClear?: () => void;
+export interface DatePickerRangeProps extends DatePickerBaseProps {
+  range: true;
+  value?: DatePickerRangeModelValue | null;
+  defaultValue?: DatePickerRangeModelValue | null;
+  onChange?: (range: DatePickerRangeValue) => void;
+}
 
-  /**
-   * Additional CSS classes
-   */
-  className?: string;
-};
+export type DatePickerProps = DatePickerSingleProps | DatePickerRangeProps;
 
-export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
+const isRangeDatePicker = (
+  props: DatePickerProps
+): props is DatePickerRangeProps => props.range === true;
+
+export const DatePicker: React.FC<DatePickerProps> = (props) => {
   const {
-    value,
-    defaultValue,
-    range,
-    locale,
-    size = 'md',
-    format = 'yyyy-MM-dd',
-    placeholder = range ? 'Select date range' : 'Select date',
+    size = "md",
     disabled = false,
     readonly = false,
     required = false,
-    minDate,
-    maxDate,
     clearable = true,
-    name,
-    id,
-    onChange,
-    onClear,
-    className,
-    ...props
-  } = allProps as TigerDatePickerProps;
+    format = "yyyy-MM-dd",
+  } = props;
+
+  const isRangeMode = isRangeDatePicker(props);
+  const placeholder =
+    props.placeholder ?? (isRangeMode ? "Select date range" : "Select date");
+
+  const divProps = (({
+    value: _value,
+    defaultValue: _defaultValue,
+    range: _range,
+    locale: _locale,
+    labels: _labels,
+    size: _size,
+    format: _format,
+    placeholder: _placeholder,
+    disabled: _disabled,
+    readonly: _readonly,
+    required: _required,
+    minDate: _minDate,
+    maxDate: _maxDate,
+    clearable: _clearable,
+    name: _name,
+    id: _id,
+    onChange: _onChange,
+    onClear: _onClear,
+    className: _className,
+    ...rest
+  }) => rest)(props);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [internalValue, setInternalValue] = useState<Date | null>(() =>
-    parseDate(
-      !range ? (defaultValue as Date | string | null | undefined) : null
-    )
-  );
+  const [activeDateIso, setActiveDateIso] = useState<string | null>(null);
+  const [internalValue, setInternalValue] = useState<Date | null>(() => {
+    if (isRangeMode) return null;
+    return parseDate((props as DatePickerSingleProps).defaultValue ?? null);
+  });
   const [internalRangeValue, setInternalRangeValue] =
     useState<DatePickerRangeValue>(() => {
-      if (!range) return [null, null];
-      const tuple =
-        (defaultValue as
-          | [Date | string | null, Date | string | null]
-          | null
-          | undefined) ?? null;
-      const start = tuple ? parseDate(tuple[0]) : null;
-      const end = tuple ? parseDate(tuple[1]) : null;
+      if (!isRangeMode) return [null, null];
+      const tuple = (props as DatePickerRangeProps).defaultValue ?? null;
+      if (!tuple) return [null, null];
+      const start = Array.isArray(tuple) ? parseDate(tuple[0]) : null;
+      const end = Array.isArray(tuple) ? parseDate(tuple[1]) : null;
       return [start, end];
     });
 
   const calendarRef = useRef<HTMLDivElement>(null);
   const inputWrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const isRangeMode = range === true;
+  const pendingFocusIsoRef = useRef<string | null>(null);
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
 
   // Determine if the component is controlled
-  const isControlled = value !== undefined;
+  const isControlled = props.value !== undefined;
 
-  const selectedDate = !isRangeMode
-    ? isControlled
-      ? parseDate(value as Date | string | null | undefined)
-      : internalValue
-    : null;
+  const selectedDate = (() => {
+    if (isRangeMode) return null;
+    const current = isControlled
+      ? (props as DatePickerSingleProps).value
+      : internalValue;
+    return parseDate(current ?? null);
+  })();
 
-  const selectedRange: DatePickerRangeValue = isRangeMode
-    ? (() => {
-        const tuple = isControlled
-          ? (value as
-              | [Date | string | null, Date | string | null]
-              | null
-              | undefined)
-          : (internalRangeValue as DatePickerRangeValue);
+  const selectedRange: DatePickerRangeValue = (() => {
+    if (!isRangeMode) return [null, null];
+    const tuple = isControlled
+      ? (props as DatePickerRangeProps).value
+      : internalRangeValue;
+    if (!tuple) return [null, null];
+    const start = Array.isArray(tuple) ? parseDate(tuple[0]) : null;
+    const end = Array.isArray(tuple) ? parseDate(tuple[1]) : null;
+    return [start, end];
+  })();
 
-        if (!tuple) return [null, null];
-        const start = Array.isArray(tuple) ? parseDate(tuple[0]) : null;
-        const end = Array.isArray(tuple) ? parseDate(tuple[1]) : null;
-        return [start, end];
-      })()
-    : [null, null];
-
-  const minDateParsed = parseDate(minDate ?? null);
-  const maxDateParsed = parseDate(maxDate ?? null);
+  const minDateParsed = parseDate(props.minDate ?? null);
+  const maxDateParsed = parseDate(props.maxDate ?? null);
 
   // Current viewing month/year in calendar
   const [viewingMonth, setViewingMonth] = useState(
@@ -187,14 +177,14 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
 
   const displayValue = (() => {
     if (!isRangeMode) {
-      return selectedDate ? formatDate(selectedDate, format) : '';
+      return selectedDate ? formatDate(selectedDate, format) : "";
     }
 
     const [start, end] = selectedRange;
-    const startText = start ? formatDate(start, format) : '';
-    const endText = end ? formatDate(end, format) : '';
+    const startText = start ? formatDate(start, format) : "";
+    const endText = end ? formatDate(end, format) : "";
 
-    if (!startText && !endText) return '';
+    if (!startText && !endText) return "";
     if (startText && endText) return `${startText} - ${endText}`;
     return startText ? `${startText} - ` : ` - ${endText}`;
   })();
@@ -206,27 +196,16 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
   })();
 
   const calendarDays = getCalendarDays(viewingYear, viewingMonth);
-  const monthNames = getMonthNames(locale);
-  const dayNames = getShortDayNames(locale);
+  const dayNames = getShortDayNames(props.locale);
 
-  const labels = (() => {
-    const lc = locale?.toLowerCase() ?? '';
-    if (lc.startsWith('zh')) {
-      return {
-        today: '今天',
-        ok: '确定',
-      };
-    }
-    return {
-      today: 'Today',
-      ok: 'OK',
-    };
-  })();
+  const labels = getDatePickerLabels(props.locale, props.labels);
 
   const toggleCalendar = () => {
     if (!disabled && !readonly) {
       setIsOpen(!isOpen);
       if (!isOpen) {
+        restoreFocusRef.current =
+          (document.activeElement as HTMLElement) ?? null;
         // Reset viewing month to selected date or current month
         const baseDate = selectedDate ?? selectedRange[0];
         if (baseDate) {
@@ -241,11 +220,141 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
     setIsOpen(false);
   };
 
+  const getFirstEnabledIsoInView = (): string | null => {
+    for (const date of calendarDays) {
+      if (!date) continue;
+      const iso = formatDate(date, "yyyy-MM-dd");
+      const isDisabled = isDateDisabled(date);
+      if (!isDisabled) return iso;
+    }
+    return null;
+  };
+
+  const getPreferredFocusIso = (): string | null => {
+    const focusDate = isRangeMode
+      ? selectedRange[0] ?? selectedRange[1]
+      : selectedDate;
+
+    if (focusDate) {
+      return formatDate(focusDate, "yyyy-MM-dd");
+    }
+
+    const today = normalizeDate(new Date());
+    if (isDateInRange(today, minDateParsed, maxDateParsed)) {
+      return formatDate(today, "yyyy-MM-dd");
+    }
+
+    return getFirstEnabledIsoInView();
+  };
+
+  const focusDateButtonByIso = (iso: string): boolean => {
+    const button = calendarRef.current?.querySelector(
+      `button[data-date="${iso}"]`
+    ) as HTMLButtonElement | null;
+
+    if (!button || button.disabled) return false;
+    button.focus();
+    setActiveDateIso(iso);
+    return true;
+  };
+
+  const restoreFocus = () => {
+    const target = restoreFocusRef.current ?? inputRef.current;
+    if (!target) return;
+    if (typeof (target as HTMLElement).focus === "function") {
+      (target as HTMLElement).focus();
+    }
+  };
+
+  const addDays = (date: Date, days: number): Date => {
+    const next = new Date(date);
+    next.setDate(next.getDate() + days);
+    return next;
+  };
+
+  const moveFocus = (deltaDays: number) => {
+    const activeEl = document.activeElement as HTMLElement | null;
+    const currentIso =
+      activeEl?.getAttribute("data-date") ?? activeDateIso ?? null;
+
+    const baseIso = currentIso ?? getPreferredFocusIso();
+    if (!baseIso) return;
+
+    const baseDate = parseDate(baseIso);
+    if (!baseDate) return;
+
+    let candidate = addDays(baseDate, deltaDays);
+    for (let attempts = 0; attempts < 42; attempts++) {
+      const iso = formatDate(candidate, "yyyy-MM-dd");
+
+      const el = calendarRef.current?.querySelector(
+        `button[data-date="${iso}"]`
+      ) as HTMLButtonElement | null;
+
+      if (el && !el.disabled) {
+        el.focus();
+        setActiveDateIso(iso);
+        return;
+      }
+
+      if (!el) {
+        pendingFocusIsoRef.current = iso;
+        setViewingYear(candidate.getFullYear());
+        setViewingMonth(candidate.getMonth());
+        setActiveDateIso(iso);
+        return;
+      }
+
+      candidate = addDays(candidate, deltaDays);
+    }
+  };
+
+  const handleCalendarKeyDown = (event: React.KeyboardEvent) => {
+    if (!isOpen) return;
+
+    switch (event.key) {
+      case "Escape": {
+        event.preventDefault();
+        closeCalendar();
+        return;
+      }
+      case "ArrowRight": {
+        event.preventDefault();
+        moveFocus(1);
+        return;
+      }
+      case "ArrowLeft": {
+        event.preventDefault();
+        moveFocus(-1);
+        return;
+      }
+      case "ArrowDown": {
+        event.preventDefault();
+        moveFocus(7);
+        return;
+      }
+      case "ArrowUp": {
+        event.preventDefault();
+        moveFocus(-7);
+        return;
+      }
+      case "Enter":
+      case " ": {
+        const activeEl = document.activeElement as HTMLButtonElement | null;
+        if (activeEl?.tagName === "BUTTON" && activeEl.dataset.date) {
+          event.preventDefault();
+          if (!activeEl.disabled) activeEl.click();
+        }
+        return;
+      }
+    }
+  };
+
   const setRangeValue = (next: DatePickerRangeValue) => {
     if (!isControlled) {
       setInternalRangeValue(next);
     }
-    (onChange as DatePickerRangeProps['onChange'] | undefined)?.(next);
+    (props as DatePickerRangeProps).onChange?.(next);
   };
 
   const selectDate = (date: Date | null) => {
@@ -263,9 +372,7 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
         setInternalValue(normalizedDate);
       }
 
-      (onChange as DatePickerSingleProps['onChange'] | undefined)?.(
-        normalizedDate
-      );
+      (props as DatePickerSingleProps).onChange?.(normalizedDate);
       closeCalendar();
       return;
     }
@@ -297,12 +404,12 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
         setInternalValue(null);
       }
 
-      (onChange as DatePickerSingleProps['onChange'] | undefined)?.(null);
+      (props as DatePickerSingleProps).onChange?.(null);
     } else {
       setRangeValue([null, null]);
     }
 
-    onClear?.();
+    props.onClear?.();
   };
 
   const previousMonth = () => {
@@ -350,18 +457,54 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
     };
 
     if (isOpen) {
-      document.addEventListener('click', handleClickOutside);
+      document.addEventListener("click", handleClickOutside);
       return () => {
-        document.removeEventListener('click', handleClickOutside);
+        document.removeEventListener("click", handleClickOutside);
       };
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      restoreFocusRef.current = (document.activeElement as HTMLElement) ?? null;
+      const preferred = pendingFocusIsoRef.current ?? getPreferredFocusIso();
+      pendingFocusIsoRef.current = null;
+
+      setTimeout(() => {
+        if (preferred && focusDateButtonByIso(preferred)) return;
+        const fallback = getFirstEnabledIsoInView();
+        if (fallback) focusDateButtonByIso(fallback);
+      }, 0);
+
+      return;
+    }
+
+    setTimeout(() => {
+      restoreFocus();
+    }, 0);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const pending = pendingFocusIsoRef.current;
+    if (!pending) return;
+    pendingFocusIsoRef.current = null;
+
+    setTimeout(() => {
+      if (focusDateButtonByIso(pending)) return;
+      const fallback = getFirstEnabledIsoInView();
+      if (fallback) focusDateButtonByIso(fallback);
+    }, 0);
+  }, [isOpen, viewingMonth, viewingYear]);
 
   const inputClasses = getDatePickerInputClasses(size, disabled || readonly);
   const iconButtonClasses = getDatePickerIconButtonClasses(size);
 
   return (
-    <div className={classNames(datePickerBaseClasses, className)} {...props}>
+    <div
+      className={classNames(datePickerBaseClasses, props.className)}
+      {...divProps}
+    >
       {/* Input wrapper */}
       <div ref={inputWrapperRef} className={datePickerInputWrapperClasses}>
         {/* Input field for date display */}
@@ -374,10 +517,10 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
           disabled={disabled}
           readOnly={true} // Always readonly to prevent manual text input and ensure date selection via calendar only
           required={required}
-          name={name}
-          id={id}
+          name={props.name}
+          id={props.id}
           onClick={handleInputClick}
-          aria-label={placeholder || 'Select date'}
+          aria-label={placeholder || "Select date"}
         />
 
         {/* Clear button */}
@@ -386,7 +529,8 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
             type="button"
             className={datePickerClearButtonClasses}
             onClick={clearDate}
-            aria-label="Clear date">
+            aria-label={labels.clearDate}
+          >
             <Icon path={CloseIconPath} className="w-4 h-4" />
           </button>
         )}
@@ -397,7 +541,8 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
           className={iconButtonClasses}
           disabled={disabled || readonly}
           onClick={toggleCalendar}
-          aria-label="Toggle calendar">
+          aria-label={labels.toggleCalendar}
+        >
           <Icon path={CalendarIconPath} className="w-5 h-5" />
         </button>
       </div>
@@ -408,39 +553,53 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
           ref={calendarRef}
           className={datePickerCalendarClasses}
           role="dialog"
-          aria-label="Calendar">
+          aria-modal="true"
+          aria-label={labels.calendar}
+          onKeyDown={handleCalendarKeyDown}
+        >
           {/* Calendar header */}
           <div className={datePickerCalendarHeaderClasses}>
             <button
               type="button"
               className={datePickerNavButtonClasses}
               onClick={previousMonth}
-              aria-label="Previous month">
+              aria-label={labels.previousMonth}
+            >
               <Icon path={ChevronLeftIconPath} className="w-5 h-5" />
             </button>
             <div className={datePickerMonthYearClasses}>
-              {formatMonthYear(viewingYear, viewingMonth, locale)}
+              {formatMonthYear(viewingYear, viewingMonth, props.locale)}
             </div>
             <button
               type="button"
               className={datePickerNavButtonClasses}
               onClick={nextMonth}
-              aria-label="Next month">
+              aria-label={labels.nextMonth}
+            >
               <Icon path={ChevronRightIconPath} className="w-5 h-5" />
             </button>
           </div>
 
           {/* Day names header */}
-          <div className={datePickerCalendarGridClasses}>
+          <div className={datePickerCalendarGridClasses} role="row">
             {dayNames.map((day) => (
-              <div key={day} className={datePickerDayNameClasses}>
+              <div
+                key={day}
+                className={datePickerDayNameClasses}
+                role="columnheader"
+              >
                 {day}
               </div>
             ))}
           </div>
 
           {/* Calendar grid */}
-          <div className={datePickerCalendarGridClasses}>
+          <div
+            className={datePickerCalendarGridClasses}
+            role="grid"
+            aria-rowcount={6}
+            aria-colcount={7}
+          >
             {calendarDays.map((date, index) => {
               if (!date) return null;
 
@@ -475,6 +634,8 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
               const isDisabled =
                 isDateDisabled(date) || Boolean(isBeforeRangeStart);
 
+              const iso = formatDate(date, "yyyy-MM-dd");
+
               return (
                 <button
                   key={index}
@@ -490,8 +651,14 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
                   )}
                   disabled={isDisabled}
                   onClick={() => selectDate(date)}
-                  aria-label={formatDate(date, 'yyyy-MM-dd')}
-                  aria-selected={isSelected}>
+                  role="gridcell"
+                  data-date={iso}
+                  onFocus={() => setActiveDateIso(iso)}
+                  tabIndex={activeDateIso === iso && !isDisabled ? 0 : -1}
+                  aria-label={iso}
+                  aria-selected={isSelected}
+                  aria-current={isTodayDay ? "date" : undefined}
+                >
                   {date.getDate()}
                 </button>
               );
@@ -504,13 +671,15 @@ export const DatePicker: React.FC<TigerDatePickerProps> = (allProps) => {
               <button
                 type="button"
                 className={datePickerFooterButtonClasses}
-                onClick={setToday}>
+                onClick={setToday}
+              >
                 {labels.today}
               </button>
               <button
                 type="button"
                 className={datePickerFooterButtonClasses}
-                onClick={closeCalendar}>
+                onClick={closeCalendar}
+              >
                 {labels.ok}
               </button>
             </div>

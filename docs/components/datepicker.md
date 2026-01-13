@@ -8,10 +8,10 @@
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { DatePicker } from '@tigercat/vue'
+import { ref } from "vue";
+import { DatePicker } from "@tigercat/vue";
 
-const selectedDate = ref<Date | null>(null)
+const selectedDate = ref<Date | null>(null);
 </script>
 
 <template>
@@ -22,19 +22,19 @@ const selectedDate = ref<Date | null>(null)
 ### React
 
 ```tsx
-import React, { useState } from 'react'
-import { DatePicker } from '@tigercat/react'
+import React, { useState } from "react";
+import { DatePicker } from "@tigercat/react";
 
 function App() {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   return (
-    <DatePicker 
-      value={selectedDate} 
+    <DatePicker
+      value={selectedDate}
       onChange={setSelectedDate}
       placeholder="Select a date"
     />
-  )
+  );
 }
 ```
 
@@ -68,10 +68,10 @@ DatePicker 组件支持三种尺寸：`sm`、`md`、`lg`。
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { DatePicker } from '@tigercat/vue'
+import { ref } from "vue";
+import { DatePicker } from "@tigercat/vue";
 
-const date = ref(new Date('2024-01-15'))
+const date = ref(new Date("2024-01-15"));
 </script>
 
 <template>
@@ -85,11 +85,11 @@ const date = ref(new Date('2024-01-15'))
 ### React
 
 ```tsx
-import React, { useState } from 'react'
-import { DatePicker } from '@tigercat/react'
+import React, { useState } from "react";
+import { DatePicker } from "@tigercat/react";
 
 function App() {
-  const [date, setDate] = useState(new Date('2024-01-15'))
+  const [date, setDate] = useState(new Date("2024-01-15"));
 
   return (
     <>
@@ -98,7 +98,7 @@ function App() {
       <DatePicker value={date} onChange={setDate} format="dd/MM/yyyy" />
       <DatePicker value={date} onChange={setDate} format="yyyy/MM/dd" />
     </>
-  )
+  );
 }
 ```
 
@@ -110,18 +110,18 @@ function App() {
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { DatePicker } from '@tigercat/vue'
+import { ref } from "vue";
+import { DatePicker } from "@tigercat/vue";
 
-const date = ref<Date | null>(null)
-const minDate = new Date('2024-01-01')
-const maxDate = new Date('2024-12-31')
+const date = ref<Date | null>(null);
+const minDate = new Date("2024-01-01");
+const maxDate = new Date("2024-12-31");
 </script>
 
 <template>
-  <DatePicker 
-    v-model="date" 
-    :min-date="minDate" 
+  <DatePicker
+    v-model="date"
+    :min-date="minDate"
     :max-date="maxDate"
     placeholder="Select a date in 2024"
   />
@@ -131,23 +131,23 @@ const maxDate = new Date('2024-12-31')
 ### React
 
 ```tsx
-import React, { useState } from 'react'
-import { DatePicker } from '@tigercat/react'
+import React, { useState } from "react";
+import { DatePicker } from "@tigercat/react";
 
 function App() {
-  const [date, setDate] = useState<Date | null>(null)
-  const minDate = new Date('2024-01-01')
-  const maxDate = new Date('2024-12-31')
+  const [date, setDate] = useState<Date | null>(null);
+  const minDate = new Date("2024-01-01");
+  const maxDate = new Date("2024-12-31");
 
   return (
-    <DatePicker 
-      value={date} 
+    <DatePicker
+      value={date}
       onChange={setDate}
       minDate={minDate}
       maxDate={maxDate}
       placeholder="Select a date in 2024"
     />
-  )
+  );
 }
 ```
 
@@ -177,10 +177,10 @@ function App() {
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { DatePicker } from '@tigercat/vue'
+import { ref } from "vue";
+import { DatePicker } from "@tigercat/vue";
 
-const date = ref(new Date())
+const date = ref(new Date());
 </script>
 
 <template>
@@ -192,18 +192,18 @@ const date = ref(new Date())
 ### React
 
 ```tsx
-import React, { useState } from 'react'
-import { DatePicker } from '@tigercat/react'
+import React, { useState } from "react";
+import { DatePicker } from "@tigercat/react";
 
 function App() {
-  const [date, setDate] = useState(new Date())
+  const [date, setDate] = useState(new Date());
 
   return (
     <>
       <DatePicker value={date} onChange={setDate} clearable={true} />
       <DatePicker value={date} onChange={setDate} clearable={false} />
     </>
-  )
+  );
 }
 ```
 
@@ -218,16 +218,16 @@ Vue 组件使用 `v-model` 进行双向绑定，本质上是受控组件。
 React 支持非受控模式，使用 `defaultValue` 属性。
 
 ```tsx
-import React from 'react'
-import { DatePicker } from '@tigercat/react'
+import React from "react";
+import { DatePicker } from "@tigercat/react";
 
 function App() {
   return (
-    <DatePicker 
-      defaultValue={new Date('2024-01-15')}
+    <DatePicker
+      defaultValue={new Date("2024-01-15")}
       placeholder="Uncontrolled datepicker"
     />
-  )
+  );
 }
 ```
 
@@ -235,37 +235,41 @@ function App() {
 
 ### Props
 
-| 属性 | 说明 | 类型 | 默认值 | Vue | React |
-|------|------|------|--------|-----|-------|
-| value (React) / modelValue (Vue) | 选中的日期（受控模式） | `Date \| string \| null` | `null` | ✓ | ✓ |
-| defaultValue | 默认选中的日期（非受控模式） | `Date \| string \| null` | `null` | - | ✓ |
-| size | 尺寸 | `'sm' \| 'md' \| 'lg'` | `'md'` | ✓ | ✓ |
-| format | 日期格式 | `'yyyy-MM-dd' \| 'MM/dd/yyyy' \| 'dd/MM/yyyy' \| 'yyyy/MM/dd'` | `'yyyy-MM-dd'` | ✓ | ✓ |
-| placeholder | 占位符文本 | `string` | `'Select date'` | ✓ | ✓ |
-| disabled | 是否禁用 | `boolean` | `false` | ✓ | ✓ |
-| readonly | 是否只读 | `boolean` | `false` | ✓ | ✓ |
-| required | 是否必填 | `boolean` | `false` | ✓ | ✓ |
-| minDate | 最小可选日期 | `Date \| string \| null` | `null` | ✓ | ✓ |
-| maxDate | 最大可选日期 | `Date \| string \| null` | `null` | ✓ | ✓ |
-| clearable | 是否显示清除按钮 | `boolean` | `true` | ✓ | ✓ |
-| name | 表单字段名 | `string` | - | ✓ | ✓ |
-| id | 元素 ID | `string` | - | ✓ | ✓ |
-| className | 自定义 CSS 类 | `string` | - | - | ✓ |
+| 属性                             | 说明                                                       | 类型                                                                         | 默认值                                                 | Vue | React |
+| -------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------ | --- | ----- |
+| range                            | 是否启用范围选择（start/end）                              | `boolean`                                                                    | `false`                                                | ✓   | ✓     |
+| locale                           | Intl locale（影响月份/星期显示；也用于默认文案选择）       | `string`                                                                     | -                                                      | ✓   | ✓     |
+| labels                           | i18n 文案覆盖（与 locale 默认值合并）                      | `Partial<DatePickerLabels>`                                                  | -                                                      | ✓   | ✓     |
+| value (React) / modelValue (Vue) | 选中的日期（受控模式）                                     | `Date \| string \| null \| [Date \| string \| null, Date \| string \| null]` | `null`                                                 | ✓   | ✓     |
+| defaultValue (React)             | 默认选中的日期（非受控模式）                               | `Date \| string \| null \| [Date \| string \| null, Date \| string \| null]` | `null`                                                 | -   | ✓     |
+| size                             | 尺寸                                                       | `'sm' \| 'md' \| 'lg'`                                                       | `'md'`                                                 | ✓   | ✓     |
+| format                           | 日期格式                                                   | `'yyyy-MM-dd' \| 'MM/dd/yyyy' \| 'dd/MM/yyyy' \| 'yyyy/MM/dd'`               | `'yyyy-MM-dd'`                                         | ✓   | ✓     |
+| placeholder                      | 占位符文本                                                 | `string`                                                                     | single: `'Select date'` / range: `'Select date range'` | ✓   | ✓     |
+| disabled                         | 是否禁用                                                   | `boolean`                                                                    | `false`                                                | ✓   | ✓     |
+| readonly                         | 是否只读                                                   | `boolean`                                                                    | `false`                                                | ✓   | ✓     |
+| required                         | 是否必填                                                   | `boolean`                                                                    | `false`                                                | ✓   | ✓     |
+| minDate                          | 最小可选日期                                               | `Date \| string \| null`                                                     | `null`                                                 | ✓   | ✓     |
+| maxDate                          | 最大可选日期                                               | `Date \| string \| null`                                                     | `null`                                                 | ✓   | ✓     |
+| clearable                        | 是否显示清除按钮                                           | `boolean`                                                                    | `true`                                                 | ✓   | ✓     |
+| name                             | 表单字段名                                                 | `string`                                                                     | -                                                      | ✓   | ✓     |
+| id                               | 元素 ID                                                    | `string`                                                                     | -                                                      | ✓   | ✓     |
+| className                        | 自定义 CSS 类（与 Vue `class`/React `className` 都可叠加） | `string`                                                                     | -                                                      | ✓   | ✓     |
+| style                            | 自定义样式（与 Vue `style`/React `style` 都可叠加）        | `Record<string, unknown>`                                                    | -                                                      | ✓   | ✓     |
 
 ### Events (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| update:modelValue | 日期改变时触发 | `(value: Date \| null) => void` |
-| change | 日期改变时触发 | `(value: Date \| null) => void` |
-| clear | 清除日期时触发 | `() => void` |
+| 事件名            | 说明           | 回调参数                                                                                      |
+| ----------------- | -------------- | --------------------------------------------------------------------------------------------- |
+| update:modelValue | 日期改变时触发 | `(value: Date \| string \| null \| [Date \| string \| null, Date \| string \| null]) => void` |
+| change            | 日期改变时触发 | `(value: Date \| string \| null \| [Date \| string \| null, Date \| string \| null]) => void` |
+| clear             | 清除日期时触发 | `() => void`                                                                                  |
 
 ### Event Handlers (React)
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
-| onChange | 日期改变时的回调 | `(date: Date \| null) => void` |
-| onClear | 清除日期时的回调 | `() => void` |
+| 属性     | 说明             | 类型                                                                                            |
+| -------- | ---------------- | ----------------------------------------------------------------------------------------------- |
+| onChange | 日期改变时的回调 | single: `(date: Date \| null) => void` / range: `(range: [Date \| null, Date \| null]) => void` |
+| onClear  | 清除日期时的回调 | `() => void`                                                                                    |
 
 ## 主题定制
 
@@ -275,8 +279,8 @@ DatePicker 组件支持通过 CSS 变量进行主题定制。
 
 ```css
 :root {
-  --tiger-primary: #2563eb;          /* 主色 */
-  --tiger-primary-hover: #1d4ed8;    /* 主色悬停 */
+  --tiger-primary: #2563eb; /* 主色 */
+  --tiger-primary-hover: #1d4ed8; /* 主色悬停 */
   --tiger-primary-disabled: #93c5fd; /* 主色禁用 */
 }
 ```
@@ -303,20 +307,24 @@ DatePicker 组件支持通过 CSS 变量进行主题定制。
 ### 使用 setThemeColors 工具函数
 
 ```typescript
-import { setThemeColors } from '@tigercat/core'
+import { setThemeColors } from "@tigercat/core";
 
 setThemeColors({
-  primary: '#10b981',
-  primaryHover: '#059669',
-  primaryDisabled: '#6ee7b7',
-})
+  primary: "#10b981",
+  primaryHover: "#059669",
+  primaryDisabled: "#6ee7b7",
+});
 ```
 
 ## 无障碍支持
 
 DatePicker 组件遵循 WAI-ARIA 规范，支持：
 
-- **键盘导航**：使用 Tab 键在各元素间导航
+- **键盘导航**：
+  - `Tab`：在输入框/按钮与弹层内元素间移动
+  - `Escape`：关闭日历弹层并将焦点返回触发元素
+  - `ArrowUp/Down/Left/Right`：在日期网格中移动焦点
+  - `Enter`/`Space`：选择当前聚焦日期（range 模式下不会自动关闭；需点 `OK`）
 - **ARIA 属性**：正确的 `role`、`aria-label`、`aria-haspopup`、`aria-expanded` 等属性
 - **屏幕阅读器**：所有交互元素都有适当的标签
 - **焦点管理**：打开日历时自动聚焦，关闭时恢复焦点
@@ -341,10 +349,10 @@ DatePicker 组件遵循 WAI-ARIA 规范，支持：
 组件提供完整的 TypeScript 类型定义。
 
 ```typescript
-import type { DatePickerSize, DateFormat } from '@tigercat/core'
-import type { DatePickerProps } from '@tigercat/vue' // or '@tigercat/react'
+import type { DatePickerSize, DateFormat } from "@tigercat/core";
+import type { DatePickerProps } from "@tigercat/vue"; // or '@tigercat/react'
 
 // 使用类型
-const size: DatePickerSize = 'md'
-const format: DateFormat = 'yyyy-MM-dd'
+const size: DatePickerSize = "md";
+const format: DateFormat = "yyyy-MM-dd";
 ```

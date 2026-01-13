@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { DatePicker } from '@tigercat/react';
+import React, { useState } from "react";
+import { DatePicker } from "@tigercat/react";
 
 const DatePickerDemo: React.FC = () => {
   const [date, setDate] = useState<Date | null>(null);
   const [dateWithDefault, setDateWithDefault] = useState<Date | null>(
-    new Date('2024-01-15')
+    new Date("2024-01-15")
   );
   const [minMaxDate, setMinMaxDate] = useState<Date | null>(null);
   const [range, setRange] = useState<[Date | null, Date | null]>([null, null]);
-  const [locale, setLocale] = useState<'zh-CN' | 'en-US'>('zh-CN');
+  const [locale, setLocale] = useState<"zh-CN" | "en-US">("zh-CN");
 
-  const minDate = new Date('2024-01-01');
-  const maxDate = new Date('2024-12-31');
+  const minDate = new Date("2024-01-01");
+  const maxDate = new Date("2024-12-31");
 
   return (
     <div className="max-w-5xl mx-auto p-8">
@@ -24,7 +24,8 @@ const DatePickerDemo: React.FC = () => {
           <select
             className="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm"
             value={locale}
-            onChange={(e) => setLocale(e.target.value as 'zh-CN' | 'en-US')}>
+            onChange={(e) => setLocale(e.target.value as "zh-CN" | "en-US")}
+          >
             <option value="zh-CN">中文（简体）</option>
             <option value="en-US">English (US)</option>
           </select>
@@ -44,7 +45,7 @@ const DatePickerDemo: React.FC = () => {
               locale={locale}
             />
             <p className="text-sm text-gray-600">
-              选中的日期：{date ? date.toLocaleDateString(locale) : '未选择'}
+              选中的日期：{date ? date.toLocaleDateString(locale) : "未选择"}
             </p>
           </div>
         </div>
@@ -65,9 +66,32 @@ const DatePickerDemo: React.FC = () => {
             />
             <p className="text-sm text-gray-600">
               已选范围：
-              {range[0] ? range[0].toLocaleDateString(locale) : '未选择'} -{' '}
-              {range[1] ? range[1].toLocaleDateString(locale) : '未选择'}
+              {range[0] ? range[0].toLocaleDateString(locale) : "未选择"} -{" "}
+              {range[1] ? range[1].toLocaleDateString(locale) : "未选择"}
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 自定义文案 */}
+      <section className="mb-12">
+        <h2 className="text-2xl font-bold mb-4">自定义文案</h2>
+        <p className="text-gray-600 mb-6">
+          通过 <code>labels</code> 覆盖 Today/OK 与 aria-label 文案。
+        </p>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <div className="max-w-md space-y-4">
+            <DatePicker
+              range
+              defaultValue={[new Date("2024-03-10"), null]}
+              locale={locale}
+              labels={{
+                today: locale === "zh-CN" ? "今天（自定义）" : "Today (Custom)",
+                ok: locale === "zh-CN" ? "确定（自定义）" : "OK (Custom)",
+                toggleCalendar:
+                  locale === "zh-CN" ? "打开选择器" : "Open picker",
+              }}
+            />
           </div>
         </div>
       </section>
@@ -162,7 +186,7 @@ const DatePickerDemo: React.FC = () => {
             />
             <p className="text-sm text-gray-600">
               选中日期：
-              {minMaxDate ? minMaxDate.toLocaleDateString(locale) : '未选择'}
+              {minMaxDate ? minMaxDate.toLocaleDateString(locale) : "未选择"}
             </p>
           </div>
         </div>
@@ -181,7 +205,7 @@ const DatePickerDemo: React.FC = () => {
                 禁用
               </label>
               <DatePicker
-                value={new Date('2024-06-15')}
+                value={new Date("2024-06-15")}
                 disabled
                 locale={locale}
               />
@@ -191,7 +215,7 @@ const DatePickerDemo: React.FC = () => {
                 只读
               </label>
               <DatePicker
-                value={new Date('2024-06-15')}
+                value={new Date("2024-06-15")}
                 readonly
                 locale={locale}
               />

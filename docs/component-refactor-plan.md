@@ -10,7 +10,7 @@
 
 - 上一步：✅ `Table` Step2 a11y（2026-01-13）
 - 上一步：✅ `Table` Step3 性能与扩展（减少重渲染）（2026-01-13）
-- 当前组件：`DatePicker`
+- 当前组件：`TimePicker`
 - 当前步骤：Step1 API/类型
 - 状态：`not-started`
 - 已优化组件数/需优化组件数：33/38
@@ -417,7 +417,8 @@ return h("div", { class: "..." }, children);
   - i18n：labels/月份/星期统一入口
 - 可拆分：API/类型 → i18n 文案注入 → a11y/键盘 → tests。
 
-- 状态：未开始
+- 状态：✅ Step1 API/类型（2026-01-13）：core 补齐并导出 DatePicker 的 single/range model/value 类型，React 端改为 discriminated union 精确约束 range/single 的 value/onChange 并支持 div 原生属性透传，Vue 端补齐 className/style + attrs 合并透传并修正 emits 校验允许 string；同步精简 Vue/React DatePicker 测试并移除快照；更新 DatePicker 文档 API 表。✅ Step2 i18n 文案注入（2026-01-13）：core 新增 `DatePickerLabels` + `getDatePickerLabels()`，Vue/React 支持 `labels` 覆盖 Today/OK 与所有 aria-label 文案；补齐 Vue/React 单测与文档 API 表。
+- 状态：✅ Step1 API/类型（2026-01-13）：core 补齐并导出 DatePicker 的 single/range model/value 类型，React 端改为 discriminated union 精确约束 range/single 的 value/onChange 并支持 div 原生属性透传，Vue 端补齐 className/style + attrs 合并透传并修正 emits 校验允许 string；同步精简 Vue/React DatePicker 测试并移除快照；更新 DatePicker 文档 API 表。✅ Step2 i18n 文案注入（2026-01-13）：core 新增 `DatePickerLabels` + `getDatePickerLabels()`，Vue/React 支持 `labels` 覆盖 Today/OK 与所有 aria-label 文案；补齐 Vue/React 单测与文档 API 表。✅ Step3 a11y/键盘（2026-01-13）：日历弹层支持 `Escape` 关闭并回焦，日期网格支持方向键移动焦点与 `Enter/Space` 选择；补齐 Vue/React 键盘交互单测，并更新文档键盘说明。✅ Step4 tests（2026-01-13）：补齐键盘跨月与 Enter 选择的稳定回归用例（Vue/React），确保焦点与关闭行为可回归。
 
 #### TimePicker（P0/P1，建议优化）
 
