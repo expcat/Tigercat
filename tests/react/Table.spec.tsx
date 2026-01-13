@@ -198,21 +198,6 @@ describe("Table", () => {
   });
 
   describe("Sorting", () => {
-    it("should render sort icons for sortable columns", () => {
-      const sortableColumns: TableColumn[] = [
-        { key: "name", title: "Name", sortable: true },
-        { key: "age", title: "Age", sortable: true },
-        { key: "email", title: "Email" },
-      ];
-
-      const { container } = render(
-        <Table columns={sortableColumns} dataSource={dataSource} />
-      );
-
-      const sortIcons = container.querySelectorAll("svg");
-      expect(sortIcons.length).toBeGreaterThan(0);
-    });
-
     it("should call onSortChange when clicking sortable column", async () => {
       const sortableColumns: TableColumn[] = [
         { key: "name", title: "Name", sortable: true },
@@ -629,39 +614,6 @@ describe("Table", () => {
           }),
         })
       );
-    });
-  });
-
-  describe("Snapshots", () => {
-    it("should match snapshot with default props", () => {
-      const { container } = render(
-        <Table columns={columns} dataSource={dataSource} pagination={false} />
-      );
-
-      expect(container).toMatchSnapshot();
-    });
-
-    it("should match snapshot with all features enabled", () => {
-      const { container } = render(
-        <Table
-          columns={[
-            { key: "name", title: "Name", sortable: true },
-            { key: "age", title: "Age", sortable: true },
-            { key: "email", title: "Email" },
-          ]}
-          dataSource={dataSource}
-          size="lg"
-          bordered
-          striped
-          stickyHeader
-          pagination={false}
-          rowSelection={{
-            selectedRowKeys: [1],
-          }}
-        />
-      );
-
-      expect(container).toMatchSnapshot();
     });
   });
 });

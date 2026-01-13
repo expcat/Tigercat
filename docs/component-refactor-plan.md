@@ -9,8 +9,9 @@
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
 - 上一步：✅ `Table` Step2 a11y（2026-01-13）
-- 当前组件：`Table`
-- 当前步骤：Step3 性能与扩展（可选：虚拟滚动/减少重渲染）
+- 上一步：✅ `Table` Step3 性能与扩展（减少重渲染）（2026-01-13）
+- 当前组件：`DatePicker`
+- 当前步骤：Step1 API/类型
 - 状态：`not-started`
 - 已优化组件数/需优化组件数：33/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
@@ -321,6 +322,7 @@ return h("div", { class: "..." }, children);
 
 - 状态：✅ Step1 状态模型与 API（2026-01-13）：core 增补 `sort/defaultSort`、`filters/defaultFilters`，并为 `pagination`/`rowSelection` 增加 `default*` 字段；Vue/React Table 对齐 sort/filter/pagination/selection 的受控/非受控状态源（prop 变更可驱动 UI，受控时不写内部状态）；同步补齐受控模式的 Vue/React 测试与 Table 文档，并在 Demo 中新增受控分页示例。
 - 状态：✅ Step2 a11y（2026-01-13）：为可排序表头补齐 `aria-sort`（none/ascending/descending），加载态补 `aria-busy` 与 `role=status` 的 Loading 语义，空态文案使用 `role=status` + `aria-live=polite`；同步更新 Vue/React Table 测试与 Table 文档。
+- 状态：✅ Step3 性能与扩展（减少重渲染）（2026-01-13）：对排序/行选择路径做低风险性能优化（缓存列查找、缓存当页 rowKey、selection 使用 Set 加速），减少重复计算；同步移除 Table 快照与脆弱断言，保留关键交互与 a11y 基线（Docs/Demo 无需修改）。
 
 #### List（P2，建议优化）
 

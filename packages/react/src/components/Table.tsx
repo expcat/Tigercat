@@ -293,6 +293,14 @@ export function Table<
     });
   }, [columns, fixedOverrides]);
 
+  const columnByKey = useMemo(() => {
+    const map: Record<string, (typeof displayColumns)[number]> = {};
+    for (const column of displayColumns) {
+      map[column.key] = column;
+    }
+    return map;
+  }, [displayColumns]);
+
   const fixedColumnsInfo = useMemo(() => {
     return getFixedColumnOffsets(displayColumns);
   }, [displayColumns]);
@@ -318,19 +326,19 @@ export function Table<
 
   // Process data with sorting, filtering, and pagination
   const processedData = useMemo(() => {
-    let data = [...dataSource];
+    let data = dataSource;
 
     // Apply filters
     data = filterData(data, filterState);
 
     // Apply sorting
     if (sortState.key && sortState.direction) {
-      const column = displayColumns.find((col) => col.key === sortState.key);
+      const column = columnByKey[sortState.key];
       data = sortData(data, sortState.key, sortState.direction, column?.sortFn);
     }
 
     return data;
-  }, [dataSource, filterState, sortState, displayColumns]);
+  }, [dataSource, filterState, sortState, columnByKey]);
 
   const paginatedData = useMemo(() => {
     if (pagination === false) {
@@ -339,6 +347,17 @@ export function Table<
 
     return paginateData(processedData, currentPage, currentPageSize);
   }, [processedData, currentPage, currentPageSize, pagination]);
+
+  const pageRowKeys = useMemo(
+    () =>
+      paginatedData.map((record, index) => getRowKey(record, rowKey, index)),
+    [paginatedData, rowKey]
+  );
+
+  const selectedRowKeySet = useMemo(
+    () => new Set<string | number>(selectedRowKeys),
+    [selectedRowKeys]
+  );
 
   const paginationInfo = useMemo(() => {
     if (pagination === false) {
@@ -351,7 +370,7 @@ export function Table<
 
   const handleSort = useCallback(
     (columnKey: string) => {
-      const column = displayColumns.find((col) => col.key === columnKey);
+      const column = columnByKey[columnKey];
       if (!column || !column.sortable) {
         return;
       }
@@ -388,7 +407,7 @@ export function Table<
       });
     },
     [
-      displayColumns,
+      columnByKey,
       sortState,
       filterState,
       currentPage,
@@ -529,9 +548,7 @@ export function Table<
   const handleSelectAll = useCallback(
     (checked: boolean) => {
       if (checked) {
-        const newKeys = paginatedData.map((record, index) =>
-          getRowKey(record, rowKey, index)
-        );
+        const newKeys = pageRowKeys;
         if (!isSelectionControlled) {
           setUncontrolledSelectedRowKeys(newKeys);
         }
@@ -543,19 +560,16 @@ export function Table<
         onSelectionChange?.([]);
       }
     },
-    [paginatedData, rowKey, isSelectionControlled, onSelectionChange]
+    [pageRowKeys, isSelectionControlled, onSelectionChange]
   );
 
   const allSelected = useMemo(() => {
-    if (paginatedData.length === 0) {
+    if (pageRowKeys.length === 0) {
       return false;
     }
 
-    return paginatedData.every((record, index) => {
-      const key = getRowKey(record, rowKey, index);
-      return selectedRowKeys.includes(key);
-    });
-  }, [paginatedData, rowKey, selectedRowKeys]);
+    return pageRowKeys.every((key) => selectedRowKeySet.has(key));
+  }, [pageRowKeys, selectedRowKeySet]);
 
   const someSelected = useMemo(() => {
     return selectedRowKeys.length > 0 && !allSelected;
@@ -758,8 +772,8 @@ export function Table<
     return (
       <tbody>
         {paginatedData.map((record, index) => {
-          const key = getRowKey(record, rowKey, index);
-          const isSelected = selectedRowKeys.includes(key);
+          const key = pageRowKeys[index];
+          const isSelected = selectedRowKeySet.has(key);
           const rowClass =
             typeof rowClassName === "function"
               ? rowClassName(record, index)
@@ -877,8 +891,8 @@ export function Table<
     displayColumns,
     rowSelection,
     emptyText,
-    rowKey,
-    selectedRowKeys,
+    pageRowKeys,
+    selectedRowKeySet,
     rowClassName,
     hoverable,
     striped,
