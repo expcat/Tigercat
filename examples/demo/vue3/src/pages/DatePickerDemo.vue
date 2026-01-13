@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { DatePicker, Space, Divider, FormItem } from '@tigercat/vue'
 
 const date = ref<Date | null>(null)
@@ -8,10 +8,20 @@ const minMaxDate = ref<Date | null>(null)
 const disabledDate = ref(new Date('2024-06-15'))
 const readonlyDate = ref(new Date('2024-06-15'))
 const range = ref<[Date | null, Date | null]>([null, null])
+const labeledRange = ref<[Date | null, Date | null]>([new Date('2024-03-10'), null])
 const locale = ref<'zh-CN' | 'en-US'>('zh-CN')
 
 const minDate = new Date('2024-01-01')
 const maxDate = new Date('2024-12-31')
+
+const customLabels = computed(() => {
+  const isZh = locale.value === 'zh-CN'
+  return {
+    today: isZh ? '今天（自定义）' : 'Today (Custom)',
+    ok: isZh ? '确定（自定义）' : 'OK (Custom)',
+    toggleCalendar: isZh ? '打开选择器' : 'Open picker',
+  }
+})
 </script>
 
 <template>
@@ -61,6 +71,22 @@ const maxDate = new Date('2024-12-31')
             已选范围：{{ range[0] ? range[0].toLocaleDateString(locale) : '未选择' }} -
             {{ range[1] ? range[1].toLocaleDateString(locale) : '未选择' }}
           </p>
+        </Space>
+      </div>
+      <Divider class="my-6" />
+    </section>
+
+    <!-- 自定义文案 -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold mb-4">自定义文案</h2>
+      <p class="text-gray-600 mb-6">通过 labels 覆盖 Today/OK 与 aria-label 文案。</p>
+      <div class="p-6 bg-gray-50 rounded-lg">
+        <Space direction="vertical"
+               class="w-full max-w-md">
+          <DatePicker v-model="labeledRange"
+                      range
+                      :labels="customLabels"
+                      :locale="locale" />
         </Space>
       </div>
       <Divider class="my-6" />
