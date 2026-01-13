@@ -5,6 +5,7 @@ import {
   classNames,
   focusFirst,
   getModalContentClasses,
+  resolveLocaleText,
   modalWrapperClasses,
   modalMaskClasses,
   getModalContainerClasses,
@@ -14,6 +15,7 @@ import {
   modalBodyClasses,
   modalFooterClasses,
   restoreFocus,
+  type TigerLocale,
   type ModalProps as CoreModalProps,
 } from '@tigercat/core';
 import { useEscapeKey } from '../utils/overlay';
@@ -81,7 +83,8 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   onCancel,
   onOk: _onOk,
-  closeAriaLabel = 'Close',
+  closeAriaLabel,
+  locale,
   style,
   ...rest
 }) => {
@@ -125,6 +128,13 @@ export const Modal: React.FC<ModalProps> = ({
   const containerClasses = useMemo(
     () => getModalContainerClasses(centered),
     [centered]
+  );
+
+  const resolvedCloseAriaLabel = resolveLocaleText(
+    'Close',
+    closeAriaLabel,
+    locale?.modal?.closeAriaLabel,
+    locale?.common?.closeText
   );
 
   // Unique ids for a11y
@@ -240,7 +250,7 @@ export const Modal: React.FC<ModalProps> = ({
                   type="button"
                   className={modalCloseButtonClasses}
                   onClick={handleClose}
-                  aria-label={closeAriaLabel}
+                  aria-label={resolvedCloseAriaLabel}
                   ref={closeButtonRef}>
                   {CloseIcon}
                 </button>

@@ -9,7 +9,7 @@ import {
   onMounted,
   onBeforeUnmount,
   nextTick,
-} from "vue";
+} from 'vue';
 import {
   classNames,
   coerceClassValue,
@@ -23,10 +23,12 @@ import {
   modalCloseButtonClasses,
   modalBodyClasses,
   modalFooterClasses,
+  resolveLocaleText,
+  type TigerLocale,
   type ModalSize,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
-import { Button } from "./Button";
+import { Button } from './Button';
 
 let modalIdCounter = 0;
 const createModalId = () => `tiger-modal-${++modalIdCounter}`;
@@ -46,10 +48,11 @@ export interface VueModalProps {
   closeAriaLabel?: string;
   okText?: string;
   cancelText?: string;
+  locale?: Partial<TigerLocale>;
 }
 
 export const Modal = defineComponent({
-  name: "TigerModal",
+  name: 'TigerModal',
   inheritAttrs: false,
   props: {
     /**
@@ -66,7 +69,7 @@ export const Modal = defineComponent({
      */
     size: {
       type: String as PropType<ModalSize>,
-      default: "md" as ModalSize,
+      default: 'md' as ModalSize,
     },
     /**
      * Modal title
@@ -145,7 +148,7 @@ export const Modal = defineComponent({
      */
     closeAriaLabel: {
       type: String,
-      default: "Close",
+      default: undefined,
     },
 
     /**
@@ -154,7 +157,7 @@ export const Modal = defineComponent({
      */
     okText: {
       type: String,
-      default: "确定",
+      default: undefined,
     },
 
     /**
@@ -163,7 +166,15 @@ export const Modal = defineComponent({
      */
     cancelText: {
       type: String,
-      default: "取消",
+      default: undefined,
+    },
+
+    /**
+     * Locale overrides for common texts
+     */
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined,
     },
 
     /**
@@ -184,7 +195,7 @@ export const Modal = defineComponent({
       default: false,
     },
   },
-  emits: ["update:visible", "close", "cancel", "ok"],
+  emits: ['update:visible', 'close', 'cancel', 'ok'],
   setup(props, { slots, emit, attrs }) {
     const instanceId = ref<string>(createModalId());
     const hasBeenOpened = ref(false);
@@ -209,19 +220,19 @@ export const Modal = defineComponent({
       () => props.visible,
       (newVal) => {
         if (!newVal) {
-          emit("close");
+          emit('close');
         }
       }
     );
 
     const handleClose = () => {
-      emit("update:visible", false);
-      emit("cancel");
+      emit('update:visible', false);
+      emit('cancel');
     };
 
     const handleOk = () => {
-      emit("ok");
-      emit("update:visible", false);
+      emit('ok');
+      emit('update:visible', false);
     };
 
     const handleMaskClick = (event: MouseEvent) => {
@@ -231,17 +242,17 @@ export const Modal = defineComponent({
     };
 
     const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && props.visible) {
+      if (event.key === 'Escape' && props.visible) {
         handleClose();
       }
     };
 
     onMounted(() => {
-      document.addEventListener("keydown", handleEscKey);
+      document.addEventListener('keydown', handleEscKey);
     });
 
     onBeforeUnmount(() => {
-      document.removeEventListener("keydown", handleEscKey);
+      document.removeEventListener('keydown', handleEscKey);
     });
 
     watch(
@@ -271,20 +282,20 @@ export const Modal = defineComponent({
     });
 
     const CloseIcon = h(
-      "svg",
+      'svg',
       {
-        class: "h-5 w-5",
-        xmlns: "http://www.w3.org/2000/svg",
-        fill: "none",
-        viewBox: "0 0 24 24",
-        stroke: "currentColor",
+        class: 'h-5 w-5',
+        xmlns: 'http://www.w3.org/2000/svg',
+        fill: 'none',
+        viewBox: '0 0 24 24',
+        stroke: 'currentColor',
       },
       [
-        h("path", {
-          "stroke-linecap": "round",
-          "stroke-linejoin": "round",
-          "stroke-width": "2",
-          d: "M6 18L18 6M6 6l12 12",
+        h('path', {
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+          'stroke-width': '2',
+          d: 'M6 18L18 6M6 6l12 12',
         }),
       ]
     );
@@ -296,13 +307,13 @@ export const Modal = defineComponent({
 
       const forwardedAttrs = Object.fromEntries(
         Object.entries(attrs).filter(
-          ([key]) => key !== "class" && key !== "style"
+          ([key]) => key !== 'class' && key !== 'style'
         )
       );
 
       const ariaLabelledbyFromAttrs =
-        typeof attrs["aria-labelledby"] === "string"
-          ? (attrs["aria-labelledby"] as string)
+        typeof attrs['aria-labelledby'] === 'string'
+          ? (attrs['aria-labelledby'] as string)
           : undefined;
 
       const ariaLabelledby =
@@ -318,10 +329,10 @@ export const Modal = defineComponent({
 
       const header =
         props.title || slots.title || props.closable
-          ? h("div", { class: modalHeaderClasses }, [
+          ? h('div', { class: modalHeaderClasses }, [
               props.title || slots.title
                 ? h(
-                    "h3",
+                    'h3',
                     {
                       id: titleId.value,
                       class: modalTitleClasses,
@@ -331,12 +342,17 @@ export const Modal = defineComponent({
                 : null,
               props.closable
                 ? h(
-                    "button",
+                    'button',
                     {
-                      type: "button",
+                      type: 'button',
                       class: modalCloseButtonClasses,
                       onClick: handleClose,
-                      "aria-label": props.closeAriaLabel,
+                      'aria-label': resolveLocaleText(
+                        'Close',
+                        props.closeAriaLabel,
+                        props.locale?.modal?.closeAriaLabel,
+                        props.locale?.common?.closeText
+                      ),
                       ref: closeButtonRef,
                     },
                     CloseIcon
@@ -346,65 +362,85 @@ export const Modal = defineComponent({
           : null;
 
       const body = slots.default
-        ? h("div", { class: modalBodyClasses }, slots.default())
+        ? h('div', { class: modalBodyClasses }, slots.default())
         : null;
 
       const footer = slots.footer
         ? h(
-            "div",
-            { class: modalFooterClasses, "data-tiger-modal-footer": "" },
+            'div',
+            { class: modalFooterClasses, 'data-tiger-modal-footer': '' },
             slots.footer({ ok: handleOk, cancel: handleClose })
           )
         : props.showDefaultFooter
         ? h(
-            "div",
-            { class: modalFooterClasses, "data-tiger-modal-footer": "" },
+            'div',
+            { class: modalFooterClasses, 'data-tiger-modal-footer': '' },
             [
               h(
                 Button,
-                { variant: "secondary", onClick: handleClose },
-                { default: () => props.cancelText }
+                { variant: 'secondary', onClick: handleClose },
+                {
+                  default: () =>
+                    resolveLocaleText(
+                      '取消',
+                      props.cancelText,
+                      props.locale?.modal?.cancelText,
+                      props.locale?.common?.cancelText
+                    ),
+                }
               ),
-              h(Button, { onClick: handleOk }, { default: () => props.okText }),
+              h(
+                Button,
+                { onClick: handleOk },
+                {
+                  default: () =>
+                    resolveLocaleText(
+                      '确定',
+                      props.okText,
+                      props.locale?.modal?.okText,
+                      props.locale?.common?.okText
+                    ),
+                }
+              ),
             ]
           )
         : null;
 
       const renderedWrapper = h(
-        "div",
+        'div',
         {
           class: modalWrapperClasses,
           style: { zIndex: props.zIndex },
           hidden: !props.visible,
-          "aria-hidden": !props.visible ? "true" : undefined,
-          "data-tiger-modal-root": "",
+          'aria-hidden': !props.visible ? 'true' : undefined,
+          'data-tiger-modal-root': '',
         },
         [
           props.mask &&
-            h("div", {
+            h('div', {
               class: modalMaskClasses,
-              "aria-hidden": "true",
-              "data-tiger-modal-mask": "",
+              'aria-hidden': 'true',
+              'data-tiger-modal-mask': '',
             }),
           h(
-            "div",
+            'div',
             {
               class: containerClasses.value,
               onClick: handleMaskClick,
             },
             [
               h(
-                "div",
+                'div',
                 {
                   ...(forwardedAttrs as Record<string, unknown>),
                   class: mergedClass,
                   style: mergedStyle,
-                  role: "dialog",
-                  "aria-modal": "true",
-                  "aria-labelledby": ariaLabelledby,
+                  role: 'dialog',
+                  'aria-modal': 'true',
+                  'aria-labelledby': ariaLabelledby,
                   tabindex: -1,
                   ref: dialogRef,
-                  "data-tiger-modal": "",
+                  'data-tiger-modal': '',
                 },
                 [header, body, footer]
               ),
@@ -413,7 +449,7 @@ export const Modal = defineComponent({
         ]
       );
 
-      return h(Teleport, { to: "body", disabled: props.disableTeleport }, [
+      return h(Teleport, { to: 'body', disabled: props.disableTeleport }, [
         renderedWrapper,
       ]);
     };

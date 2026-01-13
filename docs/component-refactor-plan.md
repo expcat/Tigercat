@@ -11,7 +11,7 @@
 - 更新时间：2026-01-14
 - 上一步：✅ `Button` P1 深化（keyboard 关键路径补测 + build 验证）
 - 当前组件：Phase 0 基建
-- 当前步骤：✅ focus management 已落地；准备进入下一项（i18n / consistent classes）
+- 当前步骤：✅ i18n 统一入口已落地；准备进入下一项（consistent classes）
 - Step1-5 完成度：已完成一轮（包含 build 验证；详见「4. 已完成」）
 - 未完成清单：见「1. 未完成/待办」
 
@@ -32,7 +32,7 @@
   - [x] core：`isEventOutside` + focus trap 算法（`getFocusableElements` / `getFocusTrapNavigation`）
   - [x] React：`useClickOutside` / `useEscapeKey` / `useFocusTrap`（内部 utils）
   - [x] Vue：`useVueClickOutside` / `useVueEscapeKey`（内部 utils）
-- [ ] i18n：常用文案（empty/loading/ok/cancel）以 props/locale 方式注入的统一入口
+- [x] i18n：常用文案（empty/loading/ok/cancel/close）以 props/locale 方式注入的统一入口
 - [ ] consistent classes：组件 class 生成尽量走 core 的 `*-utils.ts` / `*-styles.ts`
 
 ---
@@ -84,5 +84,6 @@ return h('div', { class: '...' }, children);
 - 2026-01-14：Phase 0 基建（新增 core a11y utils：`createAriaId`/keyboard helpers；新增组件重构任务模板；补齐最小单测；build 通过）。
 - 2026-01-14：Phase 0 基建（overlay）：新增 core overlay utils（click-outside/ESC/focus trap 算法）+ Vue/React 封装；对齐部分组件使用；补齐最小单测；build 通过。
 - 2026-01-14：Phase 0 基建（focus management）：新增 core focus utils（capture/restore/safe focus）+ React `Modal` / Vue `Drawer` 复用；补齐最小单测；build 通过。
+- 2026-01-14：Phase 0 基建（i18n）：新增 core `TigerLocale` + `resolveLocaleText`；Modal/Drawer（Vue+React）接入 locale 入口；补齐最小单测；build 通过。
 - 2026-01-13：`Button` Step1；`Select` Step1-4；`Form/FormItem` Step1-3；`Menu` Step1-4；`Tabs` Step1-3；`Table` Step1-3；`Tree` Step0 + Step1-4；`DatePicker` Step1-4；`TimePicker` Step1-5；`Upload` Step1-5；`Message/Notification/Loading/Modal/Drawer/Popover` Step1。
 - 2026-01-12：`Icon/Link/Text/Badge/Tag/Avatar/Card/Container/Divider/Space/Layout/Grid/Input/Textarea/Checkbox/Radio/Switch/Slider/Breadcrumb/Steps/Pagination/Dropdown/List/Descriptions/Timeline/Progress/Skeleton/Alert/Tooltip/Popconfirm` Step1。
