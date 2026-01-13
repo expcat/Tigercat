@@ -7,7 +7,7 @@ import {
   watch,
   nextTick,
   type VNodeChild,
-} from "vue";
+} from 'vue';
 import {
   classNames,
   coerceClassValue,
@@ -23,6 +23,8 @@ import {
   treeLoadingClasses,
   treeEmptyStateClasses,
   treeLineClasses,
+  getSpinnerSVG,
+  normalizeSvgAttrs,
   getVisibleTreeItems,
   getParentKeys,
   getAllKeys,
@@ -38,7 +40,9 @@ import {
   type TreeCheckedState,
   type TreeLoadDataFn,
   type TreeFilterFn,
-} from "@tigercat/core";
+} from '@tigercat/core';
+
+const spinnerSvg = getSpinnerSVG('spinner');
 
 export interface VueTreeProps {
   treeData?: TreeNode[];
@@ -69,52 +73,38 @@ export interface VueTreeProps {
 // Expand icon component
 const ExpandIcon = (expanded: boolean, hasChildren: boolean) => {
   if (!hasChildren) {
-    return h("span", { class: treeNodeIndentClasses });
+    return h('span', { class: treeNodeIndentClasses });
   }
 
   return h(
-    "svg",
+    'svg',
     {
       class: getTreeNodeExpandIconClasses(expanded),
-      width: "16",
-      height: "16",
-      viewBox: "0 0 16 16",
-      fill: "currentColor",
+      width: '16',
+      height: '16',
+      viewBox: '0 0 16 16',
+      fill: 'currentColor',
     },
-    [h("path", { d: "M6 4l4 4-4 4V4z" })]
+    [h('path', { d: 'M6 4l4 4-4 4V4z' })]
   );
 };
 
 // Loading spinner
 const LoadingSpinner = () => {
   return h(
-    "svg",
+    'svg',
     {
       class: treeLoadingClasses,
-      xmlns: "http://www.w3.org/2000/svg",
-      fill: "none",
-      viewBox: "0 0 24 24",
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: spinnerSvg.viewBox,
     },
-    [
-      h("circle", {
-        class: "opacity-25",
-        cx: "12",
-        cy: "12",
-        r: "10",
-        stroke: "currentColor",
-        "stroke-width": "4",
-      }),
-      h("path", {
-        class: "opacity-75",
-        fill: "currentColor",
-        d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z",
-      }),
-    ]
+    spinnerSvg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
   );
 };
 
 export const Tree = defineComponent({
-  name: "TigerTree",
+  name: 'TigerTree',
   inheritAttrs: false,
   props: {
     /**
@@ -209,7 +199,7 @@ export const Tree = defineComponent({
      */
     checkStrategy: {
       type: String as PropType<TreeCheckStrategy>,
-      default: "all" as TreeCheckStrategy,
+      default: 'all' as TreeCheckStrategy,
     },
     /**
      * Whether to allow node selection
@@ -236,7 +226,7 @@ export const Tree = defineComponent({
      */
     filterValue: {
       type: String,
-      default: "",
+      default: '',
     },
     /**
      * Custom filter function
@@ -263,7 +253,7 @@ export const Tree = defineComponent({
      */
     emptyText: {
       type: String,
-      default: "No data",
+      default: 'No data',
     },
 
     /**
@@ -271,33 +261,33 @@ export const Tree = defineComponent({
      */
     ariaLabel: {
       type: String,
-      default: "Tree",
+      default: 'Tree',
     },
   },
   emits: [
-    "expand",
-    "select",
-    "check",
-    "node-click",
-    "node-expand",
-    "node-collapse",
-    "update:expandedKeys",
-    "update:selectedKeys",
-    "update:checkedKeys",
+    'expand',
+    'select',
+    'check',
+    'node-click',
+    'node-expand',
+    'node-collapse',
+    'update:expandedKeys',
+    'update:selectedKeys',
+    'update:checkedKeys',
   ],
   setup(props, { emit, attrs }) {
     const rootEl = ref<HTMLElement | null>(null);
 
     const effectiveSelectable = computed(() => {
       if (props.selectionMode !== undefined) {
-        return props.selectionMode !== "none";
+        return props.selectionMode !== 'none';
       }
       return props.selectable;
     });
 
     const effectiveMultiple = computed(() => {
       if (props.selectionMode !== undefined) {
-        return props.selectionMode === "multiple";
+        return props.selectionMode === 'multiple';
       }
       return props.multiple;
     });
@@ -453,10 +443,10 @@ export const Tree = defineComponent({
 
       if (isExpanded) {
         newExpandedKeys.delete(nodeKey);
-        emit("node-collapse", node, nodeKey);
+        emit('node-collapse', node, nodeKey);
       } else {
         newExpandedKeys.add(nodeKey);
-        emit("node-expand", node, nodeKey);
+        emit('node-expand', node, nodeKey);
 
         // Lazy loading
         if (
@@ -484,8 +474,8 @@ export const Tree = defineComponent({
         internalExpandedKeys.value = newExpandedKeys;
       }
 
-      emit("update:expandedKeys", Array.from(newExpandedKeys));
-      emit("expand", Array.from(newExpandedKeys), {
+      emit('update:expandedKeys', Array.from(newExpandedKeys));
+      emit('expand', Array.from(newExpandedKeys), {
         expanded: !isExpanded,
         node,
       });
@@ -516,8 +506,8 @@ export const Tree = defineComponent({
       }
 
       const selectedKeysArray = Array.from(newSelectedKeys);
-      emit("update:selectedKeys", selectedKeysArray);
-      emit("select", selectedKeysArray, {
+      emit('update:selectedKeys', selectedKeysArray);
+      emit('select', selectedKeysArray, {
         selected: newSelectedKeys.has(nodeKey),
         selectedNodes: selectedKeysArray
           .map((k) => findNode(props.treeData, k))
@@ -550,8 +540,8 @@ export const Tree = defineComponent({
         props.checkStrategy
       );
 
-      emit("update:checkedKeys", returnKeys);
-      emit("check", returnKeys, {
+      emit('update:checkedKeys', returnKeys);
+      emit('check', returnKeys, {
         checked,
         checkedNodes: newCheckedState.checked
           .map((k) => findNode(props.treeData, k))
@@ -563,7 +553,7 @@ export const Tree = defineComponent({
 
     function handleNodeClick(node: TreeNode, event: MouseEvent) {
       if (node.disabled) return;
-      emit("node-click", node, event);
+      emit('node-click', node, event);
     }
 
     function focusKey(key: string | number | undefined) {
@@ -622,7 +612,7 @@ export const Tree = defineComponent({
 
       const indent = [];
       for (let i = 0; i < level; i++) {
-        indent.push(h("span", { key: i, class: treeNodeIndentClasses }));
+        indent.push(h('span', { key: i, class: treeNodeIndentClasses }));
       }
 
       // Node content
@@ -632,9 +622,9 @@ export const Tree = defineComponent({
 
         // Expand icon
         h(
-          "span",
+          'span',
           {
-            class: isExpandable ? "cursor-pointer" : "",
+            class: isExpandable ? 'cursor-pointer' : '',
             onClick: (e: MouseEvent) => {
               e.stopPropagation();
               if (isExpandable) {
@@ -648,13 +638,13 @@ export const Tree = defineComponent({
 
         // Checkbox
         props.checkable
-          ? h("input", {
-              type: "checkbox",
+          ? h('input', {
+              type: 'checkbox',
               class: treeNodeCheckboxClasses,
               checked: isChecked,
               indeterminate: isHalfChecked,
               disabled: node.disabled,
-              "aria-label": `Select ${node.label}`,
+              'aria-label': `Select ${node.label}`,
               onClick: (e: MouseEvent) => e.stopPropagation(),
               onChange: (e: Event) => {
                 const target = e.target as HTMLInputElement;
@@ -665,18 +655,18 @@ export const Tree = defineComponent({
 
         // Icon (if provided)
         props.showIcon && node.icon
-          ? h("span", { class: treeNodeIconClasses }, node.icon as never)
+          ? h('span', { class: treeNodeIconClasses }, node.icon as never)
           : null,
 
         // Label
         h(
-          "span",
+          'span',
           {
             class: classNames(
               treeNodeLabelClasses,
               isFiltered && isMatched
-                ? "font-semibold text-[var(--tiger-primary,#2563eb)]"
-                : ""
+                ? 'font-semibold text-[var(--tiger-primary,#2563eb)]'
+                : ''
             ),
           },
           node.label
@@ -688,7 +678,7 @@ export const Tree = defineComponent({
 
       // Tree node wrapper
       const treeNode = h(
-        "div",
+        'div',
         {
           key: node.key,
           class: treeNodeWrapperClasses,
@@ -696,30 +686,30 @@ export const Tree = defineComponent({
         [
           // Node content
           h(
-            "div",
+            'div',
             {
               class: getTreeNodeClasses(
                 isSelected,
                 !!node.disabled,
                 props.blockNode
               ),
-              "data-tiger-treeitem-key": String(node.key),
-              role: "treeitem",
-              "aria-level": level + 1,
-              "aria-disabled": node.disabled ? true : undefined,
-              "aria-selected": effectiveSelectable.value
+              'data-tiger-treeitem-key': String(node.key),
+              role: 'treeitem',
+              'aria-level': level + 1,
+              'aria-disabled': node.disabled ? true : undefined,
+              'aria-selected': effectiveSelectable.value
                 ? isSelected
                   ? true
                   : false
                 : undefined,
-              "aria-expanded": isExpandable
+              'aria-expanded': isExpandable
                 ? isExpanded
                   ? true
                   : false
                 : undefined,
-              "aria-checked": props.checkable
+              'aria-checked': props.checkable
                 ? isHalfChecked
-                  ? "mixed"
+                  ? 'mixed'
                   : isChecked
                 : undefined,
               tabIndex: isFocusable ? 0 : -1,
@@ -734,25 +724,25 @@ export const Tree = defineComponent({
                 const parents = getParentKeys(props.treeData, node.key);
                 const parentKey = parents[parents.length - 1];
 
-                if (e.key === "ArrowDown") {
+                if (e.key === 'ArrowDown') {
                   e.preventDefault();
                   focusKey(focusableKeys.value[currentIndex + 1] ?? currentKey);
                   return;
                 }
 
-                if (e.key === "ArrowUp") {
+                if (e.key === 'ArrowUp') {
                   e.preventDefault();
                   focusKey(focusableKeys.value[currentIndex - 1] ?? currentKey);
                   return;
                 }
 
-                if (e.key === "Home") {
+                if (e.key === 'Home') {
                   e.preventDefault();
                   focusKey(focusableKeys.value[0] ?? currentKey);
                   return;
                 }
 
-                if (e.key === "End") {
+                if (e.key === 'End') {
                   e.preventDefault();
                   focusKey(
                     focusableKeys.value[focusableKeys.value.length - 1] ??
@@ -761,7 +751,7 @@ export const Tree = defineComponent({
                   return;
                 }
 
-                if (e.key === "ArrowRight") {
+                if (e.key === 'ArrowRight') {
                   e.preventDefault();
                   if (isExpandable && !isExpanded) {
                     handleExpand(node.key);
@@ -773,7 +763,7 @@ export const Tree = defineComponent({
                   return;
                 }
 
-                if (e.key === "ArrowLeft") {
+                if (e.key === 'ArrowLeft') {
                   e.preventDefault();
                   if (isExpandable && isExpanded) {
                     handleExpand(node.key);
@@ -783,7 +773,7 @@ export const Tree = defineComponent({
                   return;
                 }
 
-                if (e.key === "Escape") {
+                if (e.key === 'Escape') {
                   e.preventDefault();
                   if (isExpandable && isExpanded) {
                     handleExpand(node.key);
@@ -798,7 +788,7 @@ export const Tree = defineComponent({
                   return;
                 }
 
-                if (e.key === "Enter") {
+                if (e.key === 'Enter') {
                   e.preventDefault();
                   if (effectiveSelectable.value) {
                     handleSelect(node.key, e);
@@ -810,7 +800,7 @@ export const Tree = defineComponent({
                   return;
                 }
 
-                if (e.key === " ") {
+                if (e.key === ' ') {
                   e.preventDefault();
                   if (props.checkable) {
                     handleCheck(node.key, !isChecked);
@@ -836,7 +826,7 @@ export const Tree = defineComponent({
           hasChildren &&
             isExpanded &&
             h(
-              "div",
+              'div',
               {
                 class: classNames(
                   treeNodeChildrenClasses,
@@ -861,25 +851,25 @@ export const Tree = defineComponent({
 
       if (!props.treeData || props.treeData.length === 0) {
         return h(
-          "div",
+          'div',
           {
             ...attrs,
-            class: classNames(rootClass, "p-4"),
-            role: "tree",
-            "aria-label": props.ariaLabel,
+            class: classNames(rootClass, 'p-4'),
+            role: 'tree',
+            'aria-label': props.ariaLabel,
           },
-          [h("div", { class: treeEmptyStateClasses }, props.emptyText)]
+          [h('div', { class: treeEmptyStateClasses }, props.emptyText)]
         );
       }
 
       return h(
-        "div",
+        'div',
         {
           ...attrs,
           class: rootClass,
-          role: "tree",
-          "aria-label": props.ariaLabel,
-          "aria-multiselectable": effectiveMultiple.value ? true : undefined,
+          role: 'tree',
+          'aria-label': props.ariaLabel,
+          'aria-multiselectable': effectiveMultiple.value ? true : undefined,
           ref: rootEl,
         },
         [props.treeData.map((node) => renderTreeNode(node, 0))]
