@@ -24,6 +24,18 @@ export const icon24PathStrokeLinejoin = 'round';
 export const icon24StrokeWidth = 2;
 
 /**
+ * Common solid icon defaults (20x20)
+ */
+export const icon20ViewBox = '0 0 20 20';
+
+/**
+ * Common solid close(X) icon path (20x20)
+ * Used by DatePicker/TimePicker clear button.
+ */
+export const closeSolidIcon20PathD =
+  'M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z';
+
+/**
  * Common status icon paths (shared by Alert/Message/Notification)
  */
 export type StatusIconType = 'success' | 'warning' | 'error' | 'info';
