@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from "vue";
+import { defineComponent, computed, h, PropType } from 'vue';
 import {
   classNames,
   coerceClassValue,
@@ -9,7 +9,7 @@ import {
   getButtonVariantClasses,
   type ButtonVariant,
   type ButtonSize,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
 export interface VueButtonProps {
   variant?: ButtonVariant;
@@ -17,38 +17,40 @@ export interface VueButtonProps {
   disabled?: boolean;
   loading?: boolean;
   block?: boolean;
-  type?: "button" | "submit" | "reset";
+  type?: 'button' | 'submit' | 'reset';
   className?: string;
   style?: Record<string, unknown>;
 }
 
 const LoadingSpinner = h(
-  "svg",
+  'svg',
   {
-    class: "animate-spin h-4 w-4",
-    xmlns: "http://www.w3.org/2000/svg",
-    fill: "none",
-    viewBox: "0 0 24 24",
+    class: 'animate-spin h-4 w-4',
+    xmlns: 'http://www.w3.org/2000/svg',
+    fill: 'none',
+    viewBox: '0 0 24 24',
+    'aria-hidden': 'true',
+    focusable: 'false',
   },
   [
-    h("circle", {
-      class: "opacity-25",
-      cx: "12",
-      cy: "12",
-      r: "10",
-      stroke: "currentColor",
-      "stroke-width": "4",
+    h('circle', {
+      class: 'opacity-25',
+      cx: '12',
+      cy: '12',
+      r: '10',
+      stroke: 'currentColor',
+      'stroke-width': '4',
     }),
-    h("path", {
-      class: "opacity-75",
-      fill: "currentColor",
-      d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z",
+    h('path', {
+      class: 'opacity-75',
+      fill: 'currentColor',
+      d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z',
     }),
   ]
 );
 
 export const Button = defineComponent({
-  name: "TigerButton",
+  name: 'TigerButton',
   inheritAttrs: false,
   props: {
     /**
@@ -57,7 +59,7 @@ export const Button = defineComponent({
      */
     variant: {
       type: String as PropType<ButtonVariant>,
-      default: "primary" as ButtonVariant,
+      default: 'primary' as ButtonVariant,
     },
     /**
      * Button size
@@ -65,7 +67,7 @@ export const Button = defineComponent({
      */
     size: {
       type: String as PropType<ButtonSize>,
-      default: "md" as ButtonSize,
+      default: 'md' as ButtonSize,
     },
     /**
      * Whether the button is disabled
@@ -86,8 +88,8 @@ export const Button = defineComponent({
      * @default 'button'
      */
     type: {
-      type: String as PropType<"button" | "submit" | "reset">,
-      default: "button",
+      type: String as PropType<'button' | 'submit' | 'reset'>,
+      default: 'button',
     },
 
     className: {
@@ -99,7 +101,7 @@ export const Button = defineComponent({
       default: undefined,
     },
   },
-  emits: ["click"],
+  emits: ['click'],
   setup(props, { slots, emit, attrs }) {
     const buttonClasses = computed(() => {
       return classNames(
@@ -107,7 +109,7 @@ export const Button = defineComponent({
         getButtonVariantClasses(props.variant),
         buttonSizeClasses[props.size],
         (props.disabled || props.loading) && buttonDisabledClasses,
-        props.block && "w-full",
+        props.block && 'w-full',
         props.className,
         coerceClassValue(attrs.class)
       );
@@ -123,8 +125,14 @@ export const Button = defineComponent({
 
       const children: HArrayChildren = [];
 
+      const isDisabled = props.disabled || props.loading;
+      const ariaBusy =
+        attrs['aria-busy'] ?? (props.loading ? 'true' : undefined);
+      const ariaDisabled =
+        attrs['aria-disabled'] ?? (isDisabled ? 'true' : undefined);
+
       if (props.loading) {
-        children.push(h("span", { class: "mr-2" }, LoadingSpinner));
+        children.push(h('span', { class: 'mr-2' }, LoadingSpinner));
       }
 
       if (slots.default) {
@@ -132,20 +140,18 @@ export const Button = defineComponent({
       }
 
       return h(
-        "button",
+        'button',
         {
           ...attrs,
           class: buttonClasses.value,
           style: mergedStyle.value,
-          disabled: props.disabled || props.loading,
+          'aria-busy': ariaBusy,
+          'aria-disabled': ariaDisabled,
+          disabled: isDisabled,
           type: props.type,
           onClick: (event: MouseEvent) => {
-            if (props.disabled || props.loading) {
-              event.preventDefault();
-              event.stopPropagation();
-              return;
-            }
-            emit("click", event);
+            if (isDisabled) return;
+            emit('click', event);
           },
         },
         children

@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Button } from "@tigercat/vue";
+import { Button } from '@tigercat/vue';
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Button } from "@tigercat/vue";
 ### React
 
 ```tsx
-import { Button } from "@tigercat/react";
+import { Button } from '@tigercat/react';
 
 function App() {
   return (
@@ -116,6 +116,11 @@ Button 组件支持 3 种不同的尺寸：
 
 通过 `loading` 属性显示加载状态，按钮会显示一个旋转的加载图标。
 
+### a11y 说明
+
+- 当 `loading=true` 时，组件会默认设置 `disabled`，并添加 `aria-busy="true"` 与 `aria-disabled="true"`（除非你显式传入这些 aria 属性进行覆盖）。
+- 加载图标默认带 `aria-hidden="true"`，避免被屏幕阅读器重复朗读。
+
 ### Vue 3
 
 ```vue
@@ -130,6 +135,11 @@ Button 组件支持 3 种不同的尺寸：
 ```tsx
 <Button loading>Loading...</Button>
 <Button variant="primary" loading>Submitting...</Button>
+
+// 覆盖 aria-busy（仅当你有明确需求时）
+<Button loading aria-busy="false">
+  Loading...
+</Button>
 ```
 
 ## 点击事件 (Click Event)
@@ -138,10 +148,10 @@ Button 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { Button } from "@tigercat/vue";
+import { Button } from '@tigercat/vue';
 
 const handleClick = (event) => {
-  console.log("Button clicked!", event);
+  console.log('Button clicked!', event);
 };
 </script>
 
@@ -153,11 +163,11 @@ const handleClick = (event) => {
 ### React
 
 ```tsx
-import { Button } from "@tigercat/react";
+import { Button } from '@tigercat/react';
 
 function App() {
   const handleClick = (event) => {
-    console.log("Button clicked!", event);
+    console.log('Button clicked!', event);
   };
 
   return <Button onClick={handleClick}>Click Me</Button>;
@@ -237,13 +247,13 @@ Button 组件支持通过 CSS 变量自定义主题颜色，可以实现实时�
 
 ```vue
 <script setup>
-import { Button, setThemeColors } from "@tigercat/vue";
+import { Button, setThemeColors } from '@tigercat/vue';
 
 const switchTheme = () => {
   setThemeColors({
-    primary: "#10b981",
-    primaryHover: "#059669",
-    primaryDisabled: "#6ee7b7",
+    primary: '#10b981',
+    primaryHover: '#059669',
+    primaryDisabled: '#6ee7b7',
   });
 };
 </script>
@@ -256,14 +266,14 @@ const switchTheme = () => {
 **React:**
 
 ```tsx
-import { Button, setThemeColors } from "@tigercat/react";
+import { Button, setThemeColors } from '@tigercat/react';
 
 function App() {
   const switchTheme = () => {
     setThemeColors({
-      primary: "#10b981",
-      primaryHover: "#059669",
-      primaryDisabled: "#6ee7b7",
+      primary: '#10b981',
+      primaryHover: '#059669',
+      primaryDisabled: '#6ee7b7',
     });
   };
 
@@ -293,11 +303,11 @@ React 版本的 Button 组件支持 `className` 属性，可以传入额外的 C
 Button 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { ButtonVariant, ButtonSize } from "@tigercat/core";
+import type { ButtonVariant, ButtonSize } from '@tigercat/core';
 // Vue
-import type { VueButtonProps } from "@tigercat/vue";
+import type { VueButtonProps } from '@tigercat/vue';
 // React
-import type { ButtonProps } from "@tigercat/react";
+import type { ButtonProps } from '@tigercat/react';
 ```
 
 ## 示例
@@ -308,8 +318,8 @@ import type { ButtonProps } from "@tigercat/react";
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Button } from "@tigercat/vue";
+import { ref } from 'vue';
+import { Button } from '@tigercat/vue';
 
 const loading = ref(false);
 
@@ -334,8 +344,8 @@ const handleSubmit = async () => {
 #### React
 
 ```tsx
-import { useState } from "react";
-import { Button } from "@tigercat/react";
+import { useState } from 'react';
+import { Button } from '@tigercat/react';
 
 function FormExample() {
   const [loading, setLoading] = useState(false);

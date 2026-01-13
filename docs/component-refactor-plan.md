@@ -8,11 +8,11 @@
 
 ## 0. 状态板（只维护这里）
 
-- 更新时间：2026-01-13
-- 上一步：✅ `Tree` Step4 demo（keyboard/ariaLabel 示例）
+- 更新时间：2026-01-14
+- 上一步：✅ `Button` Step2-5（交互/a11y + 主题样式校对 + tests + docs + build 验证）
 - 当前组件：`Button`
-- 当前步骤：⏳ Step2 交互与 a11y（focus/keyboard/aria-busy/disabled 细节）
-- Step1（API 对齐 + 透传/类型导出/冗余收敛 + tests/docs 同步）完成度：已完成一轮（详见「4. 已完成」）
+- 当前步骤：✅ Step5 已同步；等待进入下一个组件
+- Step1-5 完成度：已完成一轮（包含 build 验证；详见「4. 已完成」）
 - 未完成清单：见「1. 未完成/待办」
 
 ---
@@ -86,5 +86,6 @@ return h('div', { class: '...' }, children);
 
 > 说明：本区只保留“可追溯摘要”，详细变更以 git 历史为准。
 
+- 2026-01-14：`Button` Step2-5（disabled/loading 交互与默认 aria 策略、spinner a11y、测试覆盖、docs 同步、build 通过）。
 - 2026-01-13：`Button` Step1；`Select` Step1-4；`Form/FormItem` Step1-3；`Menu` Step1-4；`Tabs` Step1-3；`Table` Step1-3；`Tree` Step0 + Step1-4；`DatePicker` Step1-4；`TimePicker` Step1-5；`Upload` Step1-5；`Message/Notification/Loading/Modal/Drawer/Popover` Step1。
 - 2026-01-12：`Icon/Link/Text/Badge/Tag/Avatar/Card/Container/Divider/Space/Layout/Grid/Input/Textarea/Checkbox/Radio/Switch/Slider/Breadcrumb/Steps/Pagination/Dropdown/List/Descriptions/Timeline/Progress/Skeleton/Alert/Tooltip/Popconfirm` Step1。
