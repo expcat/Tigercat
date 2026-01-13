@@ -11,7 +11,7 @@ A comprehensive Vue 3 example showcasing Tigercat components with TypeScript and
 - **Port**: 5173
 - **Framework**: Vue 3.5+
 - **Build Tool**: Vite 7.3+
-- **Features**: 
+- **Features**:
   - Component examples with interactive demos
   - Real-time theme switching (5 preset themes)
   - Responsive layouts
@@ -99,12 +99,14 @@ examples/
 所有演示项目都包含以下组件类别：
 
 ### 基础组件
+
 - **Button** - 按钮 (支持多种样式、尺寸和状态)
 - **Link** - 链接
 - **Icon** - 图标
 - **Text** - 文本
 
 ### 表单组件
+
 - **Input** - 输入框 (支持多种类型和验证)
 - **Textarea** - 文本域
 - **Select** - 选择器 (支持单选和多选)
@@ -119,6 +121,7 @@ examples/
 - **Upload** - 文件上传
 
 ### 布局组件
+
 - **Layout** - 布局容器
 - **Header** - 页头
 - **Sidebar** - 侧边栏
@@ -162,23 +165,24 @@ examples/
 
 ```typescript
 // Vue3
-import { setThemeColors } from '@tigercat/core'
+import { setThemeColors } from "@tigercat/core";
 
 setThemeColors({
-  primary: '#10b981',
-  primaryHover: '#059669',
-  primaryDisabled: '#6ee7b7',
-})
+  primary: "#10b981",
+  primaryHover: "#059669",
+  primaryDisabled: "#6ee7b7",
+});
 
 // React
-const root = document.documentElement
-root.style.setProperty('--tiger-primary', '#10b981')
-root.style.setProperty('--tiger-primary-hover', '#059669')
+const root = document.documentElement;
+root.style.setProperty("--tiger-primary", "#10b981");
+root.style.setProperty("--tiger-primary-hover", "#059669");
 ```
 
 ### ThemeSwitch 组件
 
 两个示例项目都包含 `ThemeSwitch` 组件，位于：
+
 - Vue3: `examples/example/vue3/src/components/ThemeSwitch.vue`
 - React: `examples/example/react/src/components/ThemeSwitch.tsx`
 
@@ -197,25 +201,33 @@ root.style.setProperty('--tiger-primary-hover', '#059669')
 1. **创建演示页面**
 
    Vue3:
+
    ```bash
-  # 在 examples/example/vue3/src/pages/ 创建新文件
-   # 例如: NewComponentDemo.vue
+
    ```
 
-   React:
-   ```bash
-  # 在 examples/example/react/src/pages/ 创建新文件
-   # 例如: NewComponentDemo.tsx
-   ```
+# 在 examples/example/vue3/src/pages/ 创建新文件
+
+# 例如: NewComponentDemo.vue
+
+````
+
+React:
+```bash
+# 在 examples/example/react/src/pages/ 创建新文件
+# 例如: NewComponentDemo.tsx
+````
 
 2. **添加路由**
 
    Vue3 (`router.ts`):
+
    ```typescript
    { path: '/new-component', component: () => import('./pages/NewComponentDemo.vue') }
    ```
 
    React (`router.tsx`):
+
    ```typescript
    const NewComponentDemo = lazy(() => import('./pages/NewComponentDemo'))
    { path: '/new-component', element: <NewComponentDemo /> }
@@ -224,6 +236,7 @@ root.style.setProperty('--tiger-primary-hover', '#059669')
 3. **更新首页导航**
 
    在 `Home.vue` 或 `Home.tsx` 的 `components` 数组中添加：
+
    ```typescript
    { name: 'NewComponent', path: '/new-component', category: '你的分类' }
    ```
@@ -256,6 +269,7 @@ root.style.setProperty('--tiger-primary-hover', '#059669')
 **问题**: 运行 `pnpm example:vue` 或 `pnpm example:react`（或兼容别名 `pnpm demo:vue` / `pnpm demo:react`）时出现错误。
 
 **解决方案**:
+
 ```bash
 # 确保已安装依赖
 pnpm install
@@ -272,6 +286,7 @@ pnpm example:vue
 **问题**: Example 页面显示但组件样式缺失。
 
 **解决方案**:
+
 - 确保已构建所有包: `pnpm build`
 - 检查浏览器控制台是否有错误
 - 刷新浏览器缓存 (Ctrl+Shift+R 或 Cmd+Shift+R)
@@ -281,6 +296,7 @@ pnpm example:vue
 **问题**: `Error: Port 5173 is already in use` 或 `Port 5174 is already in use`
 
 **解决方案**:
+
 ```bash
 # 查找占用端口的进程
 lsof -i :5173  # Vue3 example
@@ -299,6 +315,7 @@ kill -9 <PID>
 **问题**: 修改代码后页面不自动刷新。
 
 **解决方案**:
+
 - 确保在开发模式下运行: `pnpm example:vue` 或 `pnpm example:react`（或 `pnpm demo:vue` / `pnpm demo:react`）
 - 如果修改了 `@tigercat` 包，需要在另一个终端运行 `pnpm dev` 来监听包变化
 - 检查 Vite 控制台是否有错误信息
@@ -308,6 +325,7 @@ kill -9 <PID>
 **问题**: IDE 显示类型错误。
 
 **解决方案**:
+
 ```bash
 # 重新构建类型定义
 pnpm build
@@ -321,6 +339,7 @@ pnpm build
 **问题**: 切换主题后组件颜色没有变化。
 
 **解决方案**:
+
 - 检查浏览器控制台是否有错误
 - 确保已正确导入 ThemeSwitch 组件
 - 刷新页面后再次尝试
@@ -329,6 +348,7 @@ pnpm build
 ### 推荐的开发工作流
 
 1. **首次设置**:
+
    ```bash
    pnpm install
    pnpm build
@@ -338,15 +358,19 @@ pnpm build
    ```bash
    # 终端 1: 监听包变化
    pnpm dev
-   
-  # 终端 2: 运行 example
-  pnpm example:vue    # 或 pnpm example:react
+
    ```
 
+# 终端 2: 运行 example
+
+pnpm example:vue # 或 pnpm example:react
+
+```
+
 3. **调试**:
-   - 使用浏览器开发者工具
-   - 检查 Vite 控制台输出
-  - 查看 `/tmp/vue3-example.log` 或 `/tmp/react-example.log` (当使用 `pnpm demo:all` 时)
+- 使用浏览器开发者工具
+- 检查 Vite 控制台输出
+ - 查看 `/tmp/vue3-example.log` 或 `/tmp/react-example.log` (当使用 `pnpm example:all` 或 `pnpm demo:all` 时)
 
 ## 演示截图
 
@@ -373,3 +397,4 @@ pnpm build
 ## 贡献
 
 欢迎贡献新的演示示例！请参考 [CONTRIBUTING.md](../../CONTRIBUTING.md) 了解如何参与。
+```

@@ -9,6 +9,7 @@ This directory contains helpful scripts for common development tasks.
 Checks if your development environment meets all requirements.
 
 **Usage**:
+
 ```bash
 ./scripts/check-env.sh
 # Or via npm script
@@ -16,12 +17,14 @@ pnpm dev:check
 ```
 
 **What it checks**:
+
 - Node.js version (>= 18.0.0)
 - pnpm version (>= 8.0.0)
 - Dependencies installation
 - Package build status
 
 **Example output**:
+
 ```
 🐯 Tigercat Development Environment Check
 ==========================================
@@ -44,47 +47,54 @@ Checking build artifacts...
 
 ---
 
-### 🚀 run-demos.sh
+### 🚀 run-examples.sh
 
-Runs both Vue3 and React demos simultaneously.
+Runs both Vue3 and React example apps simultaneously.
 
 **Usage**:
+
 ```bash
-./scripts/run-demos.sh
+./scripts/run-examples.sh
 # Or via npm script
+pnpm example:all
+
+# Compatibility alias
 pnpm demo:all
 ```
 
 **What it does**:
-- Starts Vue3 demo on http://localhost:5173
-- Starts React demo on http://localhost:5174
+
+- Starts Vue3 example on http://localhost:5173
+- Starts React example on http://localhost:5174
 - Manages both processes
 - Provides cleanup on exit (Ctrl+C)
-- Writes logs to `/tmp/vue3-demo.log` and `/tmp/react-demo.log`
+- Writes logs to `/tmp/vue3-example.log` and `/tmp/react-example.log`
 
 **Example output**:
+
 ```
-🐯 Starting Tigercat Demos
+🐯 Starting Tigercat Examples
 ==========================
 
-Starting Vue3 demo on http://localhost:5173
-Starting React demo on http://localhost:5174
+Starting Vue3 example on http://localhost:5173
+Starting React example on http://localhost:5174
 
-✓ Both demos are starting...
+✓ Both examples are starting...
 
   Vue3:  http://localhost:5173
   React: http://localhost:5174
 
 Logs:
-  Vue3:  /tmp/vue3-demo.log
-  React: /tmp/react-demo.log
+  Vue3:  /tmp/vue3-example.log
+  React: /tmp/react-example.log
 
 Press Ctrl+C to stop both servers
 ```
 
 **Tips**:
+
 - Press Ctrl+C to stop both servers
-- Check log files if demos fail to start
+- Check log files if examples fail to start
 - Ensure ports 5173 and 5174 are available
 
 ---
@@ -94,6 +104,7 @@ Press Ctrl+C to stop both servers
 One-command setup for new developers.
 
 **Usage**:
+
 ```bash
 ./scripts/setup.sh
 # Or via npm script
@@ -101,6 +112,7 @@ pnpm setup
 ```
 
 **What it does**:
+
 1. Checks Node.js installation
 2. Installs pnpm (if not installed)
 3. Installs project dependencies
@@ -109,6 +121,7 @@ pnpm setup
 6. Provides next steps
 
 **Example output**:
+
 ```
 🐯 Tigercat Development Setup
 ==============================
@@ -131,7 +144,7 @@ Building packages...
 Next steps:
   1. Read DEVELOPMENT.md for development guidelines
   2. Run 'pnpm test' to run all tests
-  3. Run 'pnpm demo:vue' or 'pnpm demo:react' to see the demos
+  3. Run 'pnpm example:vue' or 'pnpm example:react' to see the examples
   4. Run 'pnpm dev' for watch mode during development
 ```
 
@@ -141,20 +154,23 @@ Next steps:
 
 All scripts are also available as npm scripts in `package.json`:
 
-| npm script | Script file | Description |
-|------------|-------------|-------------|
-| `pnpm dev:check` | `check-env.sh` | Check environment |
-| `pnpm demo:all` | `run-demos.sh` | Run both demos |
-| `pnpm setup` | `setup.sh` | Initial setup |
+| npm script         | Script file       | Description            |
+| ------------------ | ----------------- | ---------------------- |
+| `pnpm dev:check`   | `check-env.sh`    | Check environment      |
+| `pnpm example:all` | `run-examples.sh` | Run both examples      |
+| `pnpm demo:all`    | `run-examples.sh` | Alias of `example:all` |
+| `pnpm setup`       | `setup.sh`        | Initial setup          |
 
 Additionally, convenience scripts in `package.json`:
 
-| npm script | Description |
-|------------|-------------|
-| `pnpm demo:vue` | Run Vue3 demo only |
-| `pnpm demo:react` | Run React demo only |
-| `pnpm test:vue` | Run Vue tests only |
-| `pnpm test:react` | Run React tests only |
+| npm script           | Description              |
+| -------------------- | ------------------------ |
+| `pnpm example:vue`   | Run Vue3 example only    |
+| `pnpm example:react` | Run React example only   |
+| `pnpm demo:vue`      | Alias of `example:vue`   |
+| `pnpm demo:react`    | Alias of `example:react` |
+| `pnpm test:vue`      | Run Vue tests only       |
+| `pnpm test:react`    | Run React tests only     |
 
 ## Requirements
 
@@ -195,8 +211,10 @@ These scripts are designed for Unix-like systems (Linux, macOS). Windows users s
 3. **PowerShell/CMD** - Use npm scripts instead:
    ```powershell
    pnpm dev:check
-   pnpm demo:all
-   pnpm setup
+    pnpm example:all
+    # Compatibility alias
+    pnpm demo:all
+    pnpm setup
    ```
 
 ## Contributing
@@ -224,6 +242,7 @@ When adding new scripts:
 Validates test files against quality standards defined in `tests/TEST_QUALITY_GUIDELINES.md`.
 
 **Usage**:
+
 ```bash
 ./scripts/validate-tests.sh
 # Or via npm script
@@ -231,6 +250,7 @@ pnpm test:validate
 ```
 
 **What it checks**:
+
 - Test file structure (required describe blocks)
 - Test naming conventions ("should" statements)
 - Edge case coverage
@@ -239,6 +259,7 @@ pnpm test:validate
 - Test count per file
 
 **Quality Checks**:
+
 1. **Test Categories**: Rendering, Props, Events, States, Accessibility, Snapshots
 2. **Test Naming**: "should" statement format
 3. **Edge Cases**: Edge Cases or Boundary describe blocks
@@ -247,6 +268,7 @@ pnpm test:validate
 6. **Test Count**: Minimum based on component complexity
 
 **Example output**:
+
 ```
 🐯 Tigercat Test Quality Validation
 ====================================
@@ -274,8 +296,8 @@ See tests/TEST_QUALITY_GUIDELINES.md for detailed standards.
 ```
 
 **Exit Codes**:
+
 - `0`: All tests pass quality standards
 - `1`: One or more tests failed
 
 **CI Integration**: Can be added to CI/CD pipeline to enforce quality before merge.
-
