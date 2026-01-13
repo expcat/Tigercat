@@ -195,6 +195,19 @@ describe('Radio', () => {
       expect(inputs[0].checked).toBe(false);
       expect(inputs[1].checked).toBe(true);
     });
+
+    it('should apply default spacing when no className provided', () => {
+      const { container } = render(
+        <RadioGroup defaultValue="a">
+          <Radio value="a">A</Radio>
+          <Radio value="b">B</Radio>
+        </RadioGroup>
+      );
+
+      const group = container.querySelector('[role="radiogroup"]');
+      expect(group).toBeInTheDocument();
+      expect(group).toHaveClass('space-y-2');
+    });
   });
 
   describe('Theme Support', () => {
