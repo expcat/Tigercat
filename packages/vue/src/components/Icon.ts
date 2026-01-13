@@ -6,14 +6,14 @@ import {
   type VNode,
   type CSSProperties,
 } from 'vue';
-import { classNames, coerceClassValue, type IconSize } from '@tigercat/core';
-
-const sizeClasses: Record<IconSize, string> = {
-  sm: 'w-4 h-4',
-  md: 'w-5 h-5',
-  lg: 'w-6 h-6',
-  xl: 'w-8 h-8',
-};
+import {
+  classNames,
+  coerceClassValue,
+  iconSizeClasses,
+  iconSvgBaseClasses,
+  iconWrapperClasses,
+  type IconSize,
+} from '@tigercat/core';
 
 export interface VueIconProps {
   size?: IconSize;
@@ -61,14 +61,14 @@ export const Icon = defineComponent({
   setup(props, { slots, attrs }) {
     const wrapperClasses = computed(() => {
       return classNames(
-        'inline-flex align-middle',
+        iconWrapperClasses,
         coerceClassValue(attrs.class),
         props.className
       );
     });
 
     const svgBaseClasses = computed(() => {
-      return classNames('inline-block', sizeClasses[props.size]);
+      return classNames(iconSvgBaseClasses, iconSizeClasses[props.size]);
     });
 
     const wrapperStyle = computed((): CSSProperties => {

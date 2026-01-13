@@ -1,8 +1,10 @@
 import React from "react";
 import {
   classNames,
+  iconSizeClasses,
+  iconSvgBaseClasses,
+  iconWrapperClasses,
   type IconProps as CoreIconProps,
-  type IconSize,
 } from "@tigercat/core";
 
 export interface IconProps
@@ -10,13 +12,6 @@ export interface IconProps
     React.HTMLAttributes<HTMLSpanElement> {
   children?: React.ReactNode;
 }
-
-const sizeClasses: Record<IconSize, string> = {
-  sm: "w-4 h-4",
-  md: "w-5 h-5",
-  lg: "w-6 h-6",
-  xl: "w-8 h-8",
-} as const;
 
 export const Icon: React.FC<IconProps> = ({
   size = "md",
@@ -26,7 +21,7 @@ export const Icon: React.FC<IconProps> = ({
   ...props
 }) => {
   const iconStyle: React.CSSProperties = { ...props.style, color };
-  const iconClasses = classNames("inline-flex align-middle", className);
+  const iconClasses = classNames(iconWrapperClasses, className);
 
   const ariaLabel = props["aria-label"];
   const ariaLabelledBy = props["aria-labelledby"];
@@ -46,8 +41,8 @@ export const Icon: React.FC<IconProps> = ({
     return React.cloneElement(child, {
       ...svgProps,
       className: classNames(
-        "inline-block",
-        sizeClasses[size],
+        iconSvgBaseClasses,
+        iconSizeClasses[size],
         svgProps.className
       ),
       xmlns: svgProps.xmlns ?? "http://www.w3.org/2000/svg",

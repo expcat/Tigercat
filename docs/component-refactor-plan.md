@@ -11,7 +11,7 @@
 - 更新时间：2026-01-14
 - 上一步：✅ `Button` P1 深化（keyboard 关键路径补测 + build 验证）
 - 当前组件：Phase 0 基建
-- 当前步骤：✅ i18n 统一入口已落地；准备进入下一项（consistent classes）
+- 当前步骤：🚧 consistent classes 推进中（Icon/Container 已下沉 core 并双端接入）
 - Step1-5 完成度：已完成一轮（包含 build 验证；详见「4. 已完成」）
 - 未完成清单：见「1. 未完成/待办」
 
@@ -34,6 +34,9 @@
   - [x] Vue：`useVueClickOutside` / `useVueEscapeKey`（内部 utils）
 - [x] i18n：常用文案（empty/loading/ok/cancel/close）以 props/locale 方式注入的统一入口
 - [ ] consistent classes：组件 class 生成尽量走 core 的 `*-utils.ts` / `*-styles.ts`
+
+  - 进度：✅ Icon 的 size/base class 映射已统一下沉到 `@tigercat/core`（`icon-utils`），Vue/React 双端复用同一实现。
+  - 进度：✅ Container 的 maxWidth/center/padding class 生成已统一下沉到 `@tigercat/core`（`container-utils`），Vue/React 双端复用同一实现。
 
 ---
 

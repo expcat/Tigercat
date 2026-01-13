@@ -1,8 +1,7 @@
 import React from 'react';
 import {
-  classNames,
+  getContainerClasses,
   type ContainerProps as CoreContainerProps,
-  type ContainerMaxWidth,
 } from '@tigercat/core';
 
 export interface ContainerProps
@@ -15,15 +14,6 @@ export interface ContainerProps
   as?: React.ElementType;
 }
 
-const maxWidthClasses: Record<Exclude<ContainerMaxWidth, false>, string> = {
-  sm: 'max-w-screen-sm',
-  md: 'max-w-screen-md',
-  lg: 'max-w-screen-lg',
-  xl: 'max-w-screen-xl',
-  '2xl': 'max-w-screen-2xl',
-  full: 'w-full',
-} as const;
-
 export const Container: React.FC<ContainerProps> = ({
   maxWidth = false,
   center = true,
@@ -33,13 +23,12 @@ export const Container: React.FC<ContainerProps> = ({
   as: Component = 'div',
   ...props
 }) => {
-  const containerClasses = classNames(
-    'w-full',
-    maxWidth !== false && maxWidthClasses[maxWidth],
-    center && 'mx-auto',
-    padding && 'px-4 sm:px-6 lg:px-8',
-    className
-  );
+  const containerClasses = getContainerClasses({
+    maxWidth,
+    center,
+    padding,
+    className,
+  });
 
   return (
     <Component {...props} className={containerClasses}>
