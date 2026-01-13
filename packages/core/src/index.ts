@@ -40,6 +40,7 @@ export * from './utils/card-utils';
 export * from './utils/link-utils';
 export * from './utils/avatar-utils';
 export * from './utils/icon-utils';
+export * from './utils/common-icons';
 export * from './utils/list-utils';
 export * from './utils/descriptions-utils';
 export * from './utils/timeline-utils';
