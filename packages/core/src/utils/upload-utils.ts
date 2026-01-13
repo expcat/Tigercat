@@ -7,10 +7,11 @@ import { classNames } from "./class-names";
 
 export type UploadStatusIconSize = "sm" | "lg";
 
-export const uploadStatusIconSizeClasses: Record<UploadStatusIconSize, string> = {
-  sm: "w-5 h-5",
-  lg: "w-8 h-8",
-};
+export const uploadStatusIconSizeClasses: Record<UploadStatusIconSize, string> =
+  {
+    sm: "w-5 h-5",
+    lg: "w-8 h-8",
+  };
 
 export const uploadStatusIconColorClasses: Record<UploadFileStatus, string> = {
   ready: "text-[var(--tiger-text-muted,#6b7280)]",
