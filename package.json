@@ -29,8 +29,10 @@
     "test:vue": "vitest tests/vue",
     "test:react": "vitest tests/react",
     "test:validate": "./scripts/validate-tests.sh",
-    "demo:vue": "pnpm --filter @tigercat-demo/vue3 dev",
-    "demo:react": "pnpm --filter @tigercat-demo/react dev",
+    "example:vue": "pnpm --filter @tigercat-example/vue3 dev",
+    "example:react": "pnpm --filter @tigercat-example/react dev",
+    "demo:vue": "pnpm --filter @tigercat-example/vue3 dev",
+    "demo:react": "pnpm --filter @tigercat-example/react dev",
     "demo:all": "./scripts/run-demos.sh",
     "dev:check": "./scripts/check-env.sh",
     "setup": "./scripts/setup.sh"

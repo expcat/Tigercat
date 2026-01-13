@@ -171,7 +171,7 @@ tigercat/
 - **React components**: `packages/react/src/components/`
 - **Documentation**: `docs/components/`
 - **Tests**: `tests/vue/` or `tests/react/`
-- **Demos**: `examples/demo/vue3/` or `examples/demo/react/`
+- **Examples**: `examples/example/vue3/` or `examples/example/react/`
 
 ## 📝 Coding Standards
 

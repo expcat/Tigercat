@@ -100,25 +100,25 @@ pnpm test:coverage
 pnpm test:ui
 ```
 
-### Demos
+### Examples
 
 ```bash
-# Run Vue3 demo (http://localhost:5173)
-pnpm demo:vue
+# Run Vue3 example (http://localhost:5173)
+pnpm example:vue
 
-# Run React demo (http://localhost:5174)
-pnpm demo:react
+# Run React example (http://localhost:5174)
+pnpm example:react
 
-# Run both demos simultaneously
+# Run both examples simultaneously
 pnpm demo:all
 
-# Build demos for production
-pnpm --filter @tigercat-demo/vue3 build
-pnpm --filter @tigercat-demo/react build
+# Build examples for production
+pnpm --filter @tigercat-example/vue3 build
+pnpm --filter @tigercat-example/react build
 
 # Preview production builds
-pnpm --filter @tigercat-demo/vue3 preview
-pnpm --filter @tigercat-demo/react preview
+pnpm --filter @tigercat-example/vue3 preview
+pnpm --filter @tigercat-example/react preview
 ```
 
 ### Linting and Formatting
@@ -294,14 +294,14 @@ Packages are built in dependency order:
    - Accessibility notes
    - Styling customization
 
-7. **Add to Demos**
+7. **Add to Examples**
    
    ```bash
-   # Vue demo
-   examples/demo/vue3/src/views/YourComponentDemo.vue
+  # Vue example
+  examples/example/vue3/src/pages/YourComponentDemo.vue
    
-   # React demo
-   examples/demo/react/src/views/YourComponentDemo.tsx
+  # React example
+  examples/example/react/src/pages/YourComponentDemo.tsx
    ```
 
 8. **Update Roadmap**

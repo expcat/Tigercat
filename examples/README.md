@@ -2,37 +2,37 @@
 
 This directory contains example projects demonstrating how to use Tigercat UI components.
 
-## Demo Projects
+## Example Projects
 
-### Vue3 Demo (`demo/vue3`)
+### Vue3 Example (`example/vue3`)
 
-A comprehensive Vue 3 demo showcasing all Tigercat components with TypeScript and Tailwind CSS.
+A comprehensive Vue 3 example showcasing Tigercat components with TypeScript and Tailwind CSS.
 
 - **Port**: 5173
 - **Framework**: Vue 3.5+
 - **Build Tool**: Vite 7.3+
 - **Features**: 
-  - All component demos with interactive examples
+  - Component examples with interactive demos
   - Real-time theme switching (5 preset themes)
   - Responsive layouts
   - TypeScript type safety
 
-[查看 Vue3 Demo 文档](./demo/vue3/README.md)
+[查看 Vue3 Example 文档](./example/vue3/README.md)
 
-### React Demo (`demo/react`)
+### React Example (`example/react`)
 
-A comprehensive React demo showcasing all Tigercat components with TypeScript and Tailwind CSS.
+A comprehensive React example showcasing Tigercat components with TypeScript and Tailwind CSS.
 
 - **Port**: 5174
 - **Framework**: React 19.2+
 - **Build Tool**: Vite 7.3+
 - **Features**:
-  - All component demos with interactive examples
+  - Component examples with interactive demos
   - Real-time theme switching (5 preset themes)
   - Responsive layouts
   - TypeScript type safety
 
-[查看 React Demo 文档](./demo/react/README.md)
+[查看 React Example 文档](./example/react/README.md)
 
 ## 快速开始
 
@@ -44,23 +44,23 @@ A comprehensive React demo showcasing all Tigercat components with TypeScript an
 pnpm install
 ```
 
-### 运行 Vue3 Demo
+### 运行 Vue3 Example
 
 ```bash
-pnpm --filter @tigercat-demo/vue3 dev
+pnpm --filter @tigercat-example/vue3 dev
 ```
 
 访问 http://localhost:5173
 
-### 运行 React Demo
+### 运行 React Example
 
 ```bash
-pnpm --filter @tigercat-demo/react dev
+pnpm --filter @tigercat-example/react dev
 ```
 
 访问 http://localhost:5174
 
-### 同时运行两个 Demo
+### 同时运行两个 Example
 
 你可以在两个终端窗口中分别运行上述命令，或者使用并发工具。
 
@@ -68,8 +68,8 @@ pnpm --filter @tigercat-demo/react dev
 
 ```
 examples/
-├── demo/
-│   ├── vue3/           # Vue3 演示项目
+├── example/
+│   ├── vue3/           # Vue3 示例项目
 │   │   ├── src/
 │   │   │   ├── components/    # 共享组件 (如 ThemeSwitch)
 │   │   │   ├── pages/         # 各组件演示页面
@@ -80,7 +80,7 @@ examples/
 │   │   ├── package.json
 │   │   ├── vite.config.ts
 │   │   └── README.md
-│   └── react/          # React 演示项目
+│   └── react/          # React 示例项目
 │       ├── src/
 │       │   ├── components/    # 共享组件 (如 ThemeSwitch)
 │       │   ├── pages/         # 各组件演示页面
@@ -178,33 +178,33 @@ root.style.setProperty('--tiger-primary-hover', '#059669')
 
 ### ThemeSwitch 组件
 
-两个演示项目都包含 `ThemeSwitch` 组件，位于：
-- Vue3: `examples/demo/vue3/src/components/ThemeSwitch.vue`
-- React: `examples/demo/react/src/components/ThemeSwitch.tsx`
+两个示例项目都包含 `ThemeSwitch` 组件，位于：
+- Vue3: `examples/example/vue3/src/components/ThemeSwitch.vue`
+- React: `examples/example/react/src/components/ThemeSwitch.tsx`
 
 你可以在自己的项目中复用这个组件。
 
 ## 技术栈
 
-- **Vue3 Demo**: Vue 3.5, TypeScript, Vite, Tailwind CSS
-- **React Demo**: React 19.2, TypeScript, Vite, Tailwind CSS
+- **Vue3 Example**: Vue 3.5, TypeScript, Vite, Tailwind CSS
+- **React Example**: React 19.2, TypeScript, Vite, Tailwind CSS
 - **UI 组件**: @tigercat/vue 和 @tigercat/react
 
-## 如何扩展演示
+## 如何扩展示例
 
-### 添加新的组件演示
+### 添加新的组件示例
 
 1. **创建演示页面**
 
    Vue3:
    ```bash
-   # 在 examples/demo/vue3/src/pages/ 创建新文件
+  # 在 examples/example/vue3/src/pages/ 创建新文件
    # 例如: NewComponentDemo.vue
    ```
 
    React:
    ```bash
-   # 在 examples/demo/react/src/pages/ 创建新文件
+  # 在 examples/example/react/src/pages/ 创建新文件
    # 例如: NewComponentDemo.tsx
    ```
 
@@ -251,9 +251,9 @@ root.style.setProperty('--tiger-primary-hover', '#059669')
 
 ### 常见问题
 
-#### 1. Demo 无法启动
+#### 1. Example 无法启动
 
-**问题**: 运行 `pnpm demo:vue` 或 `pnpm demo:react` 时出现错误。
+**问题**: 运行 `pnpm example:vue` 或 `pnpm example:react`（或兼容别名 `pnpm demo:vue` / `pnpm demo:react`）时出现错误。
 
 **解决方案**:
 ```bash
@@ -264,12 +264,12 @@ pnpm install
 pnpm build
 
 # 再次尝试运行
-pnpm demo:vue
+pnpm example:vue
 ```
 
 #### 2. 组件样式不显示
 
-**问题**: Demo 页面显示但组件样式缺失。
+**问题**: Example 页面显示但组件样式缺失。
 
 **解决方案**:
 - 确保已构建所有包: `pnpm build`
@@ -283,14 +283,14 @@ pnpm demo:vue
 **解决方案**:
 ```bash
 # 查找占用端口的进程
-lsof -i :5173  # Vue3 demo
-lsof -i :5174  # React demo
+lsof -i :5173  # Vue3 example
+lsof -i :5174  # React example
 
 # 终止进程
 kill -9 <PID>
 
 # 或修改端口号
-# 编辑 demo/vue3/vite.config.ts 或 demo/react/vite.config.ts
+# 编辑 example/vue3/vite.config.ts 或 example/react/vite.config.ts
 # 修改 server.port 配置
 ```
 
@@ -299,7 +299,7 @@ kill -9 <PID>
 **问题**: 修改代码后页面不自动刷新。
 
 **解决方案**:
-- 确保在开发模式下运行: `pnpm demo:vue` 或 `pnpm demo:react`
+- 确保在开发模式下运行: `pnpm example:vue` 或 `pnpm example:react`（或 `pnpm demo:vue` / `pnpm demo:react`）
 - 如果修改了 `@tigercat` 包，需要在另一个终端运行 `pnpm dev` 来监听包变化
 - 检查 Vite 控制台是否有错误信息
 
@@ -339,14 +339,14 @@ pnpm build
    # 终端 1: 监听包变化
    pnpm dev
    
-   # 终端 2: 运行 demo
-   pnpm demo:vue    # 或 pnpm demo:react
+  # 终端 2: 运行 example
+  pnpm example:vue    # 或 pnpm example:react
    ```
 
 3. **调试**:
    - 使用浏览器开发者工具
    - 检查 Vite 控制台输出
-   - 查看 `/tmp/vue3-demo.log` 或 `/tmp/react-demo.log` (当使用 `pnpm demo:all` 时)
+  - 查看 `/tmp/vue3-example.log` 或 `/tmp/react-example.log` (当使用 `pnpm demo:all` 时)
 
 ## 演示截图
 
