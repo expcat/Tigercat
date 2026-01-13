@@ -6,6 +6,9 @@ import {
   PropType,
   h,
   type ComputedRef,
+  watch,
+  nextTick,
+  onMounted,
 } from "vue";
 import {
   classNames,
@@ -132,6 +135,8 @@ export const Menu = defineComponent({
   },
   emits: ["update:selectedKeys", "update:openKeys", "select", "open-change"],
   setup(props, { slots, emit, attrs }) {
+    const menuEl = ref<HTMLElement | null>(null);
+
     // Internal state for uncontrolled mode
     const internalSelectedKeys = ref<MenuKey[]>(props.defaultSelectedKeys);
     const internalOpenKeys = ref<MenuKey[]>(props.defaultOpenKeys);
@@ -213,13 +218,56 @@ export const Menu = defineComponent({
       handleOpenChange,
     });
 
+    const initRovingTabIndex = async () => {
+      await nextTick();
+      const root = menuEl.value;
+      if (!root) return;
+
+      const items = Array.from(
+        root.querySelectorAll<HTMLButtonElement>(
+          'button[data-tiger-menuitem="true"]'
+        )
+      ).filter((el) => !el.disabled);
+
+      if (items.length === 0) return;
+
+      const hasActive = items.some((el) => el.tabIndex === 0);
+      if (hasActive) return;
+
+      const selected = items.find((el) => el.dataset.tigerSelected === "true");
+      const active = selected ?? items[0];
+      items.forEach((el) => {
+        el.tabIndex = el === active ? 0 : -1;
+      });
+    };
+
+    onMounted(() => {
+      void initRovingTabIndex();
+    });
+
+    watch(
+      [
+        () => props.mode,
+        () => props.collapsed,
+        () => currentSelectedKeys.value,
+        () => currentOpenKeys.value,
+      ],
+      () => {
+        void initRovingTabIndex();
+      },
+      { deep: true }
+    );
+
     return () => {
       return h(
         "ul",
         {
+          ref: menuEl,
           class: menuClasses.value,
           style: menuStyle.value,
           role: "menu",
+          "data-tiger-menu-root": "true",
+          "data-tiger-menu-mode": props.mode,
           ...passthroughAttrs.value,
         },
         slots.default?.()

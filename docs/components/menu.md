@@ -533,14 +533,25 @@ Menu 组件使用 CSS 变量进行主题定制。你可以通过覆盖以下 CSS
 Menu 组件遵循 WAI-ARIA 规范：
 
 - 使用 `role="menu"` 标识菜单容器
-- 使用 `role="menuitem"` 标识菜单项
+- 使用 `role="menuitem"` 标识可交互菜单项（MenuItem / SubMenu 标题）
 - 使用 `aria-disabled` 标识禁用状态
 - 使用 `aria-expanded` 标识子菜单展开状态
+
+### 键盘操作
+
+- `ArrowUp` / `ArrowDown`：在当前菜单中移动焦点（vertical / inline，及所有子菜单）
+- `ArrowLeft` / `ArrowRight`：在横向顶层菜单中移动焦点（horizontal 顶层）
+- `Home` / `End`：跳到当前菜单的第一个/最后一个可用项
+- `Enter` / `Space`：激活当前项（MenuItem 选中；SubMenu 在 vertical/inline 下切换展开）
+- `Escape`：关闭当前 SubMenu（若已展开）
+
+Menu 使用 roving tabindex：同一时刻仅一个菜单项可通过 `Tab` 进入焦点，其余通过方向键在菜单内移动。
 
 ## 注意事项
 
 1. **横向模式**：在横向模式下，子菜单会以下拉形式展现，通过鼠标悬停触发展开
 2. **垂直/内联模式**：在垂直和内联模式下，子菜单通过点击标题展开/收起
-3. **收起状态**：收起状态仅在 `mode="vertical"` 时生效，会隐藏菜单文本，只显示图标或首字母
-4. **唯一 key**：每个菜单项和子菜单必须有唯一的 key/itemKey
-5. **多选限制**：设置 `multiple={false}` 后，同时只能展开一个子菜单
+3. **嵌套缩进**：在 `mode="inline"` 下，多级嵌套会按 `inlineIndent` 自动缩进，无需手动传递层级
+4. **收起状态**：收起状态仅在 `mode="vertical"` 时生效，会隐藏菜单文本，只显示图标或首字母
+5. **唯一 key**：每个菜单项和子菜单必须有唯一的 key/itemKey
+6. **多选限制**：设置 `multiple={false}` 后，同时只能展开一个子菜单

@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef, useEffect } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   classNames,
   getSubMenuTitleClasses,
@@ -11,6 +11,8 @@ import {
   type SubMenuProps as CoreSubMenuProps,
 } from "@tigercat/core";
 import { useMenuContext } from "./Menu";
+import { MenuItem } from "./MenuItem";
+import { MenuItemGroup } from "./MenuItemGroup";
 
 export interface SubMenuProps extends CoreSubMenuProps {
   /**
@@ -37,6 +39,60 @@ const ExpandIcon: React.FC<{ expanded: boolean }> = ({ expanded }) => (
   </svg>
 );
 
+function getMenuButtonsWithin(menuEl: HTMLElement): HTMLButtonElement[] {
+  return Array.from(
+    menuEl.querySelectorAll<HTMLButtonElement>(
+      'button[data-tiger-menuitem="true"]'
+    )
+  ).filter((el) => !el.disabled);
+}
+
+function roveFocus(current: HTMLButtonElement, next: HTMLButtonElement) {
+  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null;
+  if (!menuEl) {
+    next.focus();
+    return;
+  }
+
+  const items = getMenuButtonsWithin(menuEl);
+  items.forEach((el) => {
+    el.tabIndex = el === next ? 0 : -1;
+  });
+  next.focus();
+}
+
+function moveFocus(current: HTMLButtonElement, delta: number) {
+  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null;
+  if (!menuEl) return;
+  const items = getMenuButtonsWithin(menuEl);
+  const currentIndex = items.indexOf(current);
+  if (currentIndex < 0) return;
+  const nextIndex = (currentIndex + delta + items.length) % items.length;
+  roveFocus(current, items[nextIndex]);
+}
+
+function focusEdge(current: HTMLButtonElement, edge: "start" | "end") {
+  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null;
+  if (!menuEl) return;
+  const items = getMenuButtonsWithin(menuEl);
+  if (items.length === 0) return;
+  roveFocus(current, edge === "start" ? items[0] : items[items.length - 1]);
+}
+
+function focusFirstChildItemFromTitle(titleEl: HTMLButtonElement) {
+  const li = titleEl.closest("li");
+  const submenu = li?.querySelector('ul[role="menu"]') as HTMLElement | null;
+  if (!submenu) return;
+
+  const items = getMenuButtonsWithin(submenu);
+  if (items.length === 0) return;
+
+  items.forEach((el, idx) => {
+    el.tabIndex = idx === 0 ? 0 : -1;
+  });
+  items[0].focus();
+}
+
 export const SubMenu: React.FC<SubMenuProps> = ({
   itemKey,
   title = "",
@@ -53,30 +109,21 @@ export const SubMenu: React.FC<SubMenuProps> = ({
     console.warn("SubMenu must be used within Menu component");
   }
 
-  // For horizontal mode, track hover state
   const [isHovered, setIsHovered] = useState(false);
-  const contentRef = useRef<HTMLUListElement>(null);
-  const [contentHeight, setContentHeight] = useState<number | undefined>(
-    undefined
-  );
+  const [isOpenByKeyboard, setIsOpenByKeyboard] = useState(false);
 
   // Check if this submenu is open
   const isOpen = !!menuContext && isKeyOpen(itemKey, menuContext.openKeys);
 
   // Determine if submenu should be shown
-  const isExpanded = menuContext?.mode === "horizontal" ? isHovered : isOpen;
-
-  // Update content height for smooth animation
-  useEffect(() => {
-    if (contentRef.current && menuContext?.mode !== "horizontal") {
-      setContentHeight(isExpanded ? contentRef.current.scrollHeight : 0);
-    }
-  }, [isExpanded, menuContext?.mode]);
+  const isExpanded =
+    menuContext?.mode === "horizontal" ? isHovered || isOpenByKeyboard : isOpen;
 
   // Submenu title classes
-  const titleClasses = menuContext
-    ? classNames(getSubMenuTitleClasses(menuContext.theme, disabled))
-    : "";
+  const titleClasses = useMemo(() => {
+    if (!menuContext) return "";
+    return classNames(getSubMenuTitleClasses(menuContext.theme, disabled));
+  }, [menuContext, disabled]);
 
   // Submenu content classes
   const contentClasses = !menuContext
@@ -99,8 +146,90 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
   // Handle mouse leave for horizontal mode
   const handleMouseLeave = useCallback(() => {
-    if (menuContext?.mode === "horizontal") setIsHovered(false);
+    if (menuContext?.mode === "horizontal") {
+      setIsHovered(false);
+      setIsOpenByKeyboard(false);
+    }
   }, [menuContext]);
+
+  const handleTitleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      if (!menuContext || disabled) return;
+
+      const current = event.currentTarget;
+      const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null;
+      const isRoot = rootMenu?.dataset.tigerMenuRoot === "true";
+      const isHorizontalRoot = isRoot && menuContext.mode === "horizontal";
+
+      const nextKey = isHorizontalRoot ? "ArrowRight" : "ArrowDown";
+      const prevKey = isHorizontalRoot ? "ArrowLeft" : "ArrowUp";
+
+      if (event.key === nextKey) {
+        event.preventDefault();
+        moveFocus(current, 1);
+        return;
+      }
+
+      if (event.key === prevKey) {
+        event.preventDefault();
+        moveFocus(current, -1);
+        return;
+      }
+
+      if (event.key === "Home") {
+        event.preventDefault();
+        focusEdge(current, "start");
+        return;
+      }
+
+      if (event.key === "End") {
+        event.preventDefault();
+        focusEdge(current, "end");
+        return;
+      }
+
+      if (event.key === "Escape" || event.key === "ArrowLeft") {
+        if (menuContext.mode === "horizontal") {
+          event.preventDefault();
+          setIsOpenByKeyboard(false);
+          setIsHovered(false);
+          return;
+        }
+
+        if (isOpen) {
+          event.preventDefault();
+          menuContext.handleOpenChange(itemKey);
+        }
+        return;
+      }
+
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        if (menuContext.mode === "horizontal") {
+          setIsOpenByKeyboard(true);
+          return;
+        }
+        menuContext.handleOpenChange(itemKey);
+        setTimeout(() => focusFirstChildItemFromTitle(current), 0);
+        return;
+      }
+
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        if (menuContext.mode === "horizontal") {
+          event.preventDefault();
+          setIsOpenByKeyboard(true);
+          return;
+        }
+
+        if (!isOpen) {
+          event.preventDefault();
+          menuContext.handleOpenChange(itemKey);
+          setTimeout(() => focusFirstChildItemFromTitle(current), 0);
+        }
+      }
+    },
+    [menuContext, disabled, isOpen, itemKey]
+  );
 
   // Get indent style for nested menus in inline mode
   const indentStyle =
@@ -154,29 +283,44 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
   // Render content based on mode
   const renderContent = () => {
+    const nextLevel = level + 1;
+    const enhancedChildren = React.Children.map(children, (child) => {
+      if (!React.isValidElement(child)) return child;
+
+      if (
+        child.type === MenuItem ||
+        child.type === SubMenu ||
+        child.type === MenuItemGroup
+      ) {
+        return React.cloneElement(
+          child as React.ReactElement<{ level?: number }>,
+          {
+            level: nextLevel,
+          }
+        );
+      }
+
+      return child;
+    });
+
     if (menuContext.mode === "horizontal") {
       return (
         <ul
           className={contentClasses}
           style={{ display: isExpanded ? "block" : "none" }}
           role="menu"
+          aria-hidden={isExpanded ? undefined : "true"}
         >
-          {children}
+          {enhancedChildren}
         </ul>
       );
     }
 
+    if (!isExpanded) return null;
+
     return (
-      <ul
-        ref={contentRef}
-        className={contentClasses}
-        style={{
-          height:
-            contentHeight !== undefined ? `${contentHeight}px` : undefined,
-        }}
-        role="menu"
-      >
-        {children}
+      <ul className={contentClasses} role="menu">
+        {enhancedChildren}
       </ul>
     );
   };
@@ -189,17 +333,24 @@ export const SubMenu: React.FC<SubMenuProps> = ({
       )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      role="none"
     >
-      <div
+      <button
+        type="button"
         className={titleClasses}
         style={indentStyle}
         onClick={handleTitleClick}
-        role="button"
+        onKeyDown={handleTitleKeyDown}
+        role="menuitem"
+        data-tiger-menuitem="true"
         aria-expanded={isExpanded ? "true" : "false"}
+        aria-haspopup="true"
         aria-disabled={disabled ? "true" : undefined}
+        disabled={disabled}
+        tabIndex={-1}
       >
         {renderTitle()}
-      </div>
+      </button>
       {renderContent()}
     </li>
   );

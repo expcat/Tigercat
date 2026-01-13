@@ -8,9 +8,9 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Menu` Step1 API/受控模型与事件语义（2026-01-13）
-- 当前组件：`Menu`
-- 当前步骤：Step2 键盘/a11y
+- 上一步：✅ `Menu` Step4 tests（2026-01-13）
+- 当前组件：`Tabs`
+- 当前步骤：Step1 API/受控模型与事件语义
 - 状态：`not-started`
 - 已优化组件数/需优化组件数：32/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
@@ -276,6 +276,9 @@ return h("div", { class: "..." }, children);
 - 思路：键盘导航（上下/左右/Enter/Esc）；aria-menu/menuitem；openKeys/selectedKeys 受控/非受控一致；collapsed 模式。
 - 可拆分：受控模型与事件语义 → 键盘/a11y → 子组件联动 → tests。
 - 状态：✅ Step1 API/受控模型与事件语义（2026-01-13）：修复 React 使用 `key` 作为业务 key 的根因（React 不会把 `key` 透传为 props），统一改为显式 `itemKey`；core 下沉 `MenuKey` 并收敛 MenuItem/SubMenu 的 props key 类型；Vue Menu context 改为响应式（selectedKeys/openKeys 为 computed ref），同时补齐 Menu/MenuItem/SubMenu 的 `className/style` 与 attrs 合并透传；同步精简并更新 Vue/React Menu 测试与 Menu 文档，更新 React Menu Demo。
+- 状态：✅ Step2 键盘/a11y（2026-01-13）：MenuItem/SubMenu 标题统一改为可聚焦的 `button[role=menuitem]`（避免 `li/div` 不可聚焦问题），补齐 roving tabindex 与键盘导航（Arrow/Home/End/Enter/Space/Escape）；关闭子菜单时避免子项残留在 DOM 可被误聚焦；同步更新并精简 Vue/React Menu 测试与 Menu 文档的键盘说明。
+- 状态：✅ Step3 子组件联动（2026-01-13）：SubMenu 自动向子节点注入嵌套层级（level），在 `mode="inline"` 下按 `inlineIndent` 自动缩进多级菜单；MenuItemGroup 同样可在嵌套场景下透传层级；补齐 Vue/React 缩进联动测试。
+- 状态：✅ Step4 tests（2026-01-13）：补齐 roving tabindex 的边界覆盖（disabled 项跳过、默认选中项成为 tab stop），并避免用例依赖脆弱的 DOM 结构。
 
 #### Tabs / TabPane（P0，建议优化）
 
