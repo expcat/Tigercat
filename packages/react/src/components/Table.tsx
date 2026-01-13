@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   classNames,
   getTableWrapperClasses,
@@ -22,9 +22,9 @@ import {
   type TableProps as CoreTableProps,
   type SortState,
   type PaginationConfig,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
-const spinnerSvg = getSpinnerSVG("spinner");
+const spinnerSvg = getSpinnerSVG('spinner');
 
 export interface TableProps<T = Record<string, unknown>>
   extends CoreTableProps<T> {
@@ -69,32 +69,30 @@ export interface TableProps<T = Record<string, unknown>>
 }
 
 // Sort icons
-const SortIcon: React.FC<{ direction: "asc" | "desc" | null }> = ({
+const SortIcon: React.FC<{ direction: 'asc' | 'desc' | null }> = ({
   direction,
 }) => {
-  if (direction === "asc") {
+  if (direction === 'asc') {
     return (
       <svg
         className={getSortIconClasses(true)}
         width="16"
         height="16"
         viewBox="0 0 16 16"
-        fill="currentColor"
-      >
+        fill="currentColor">
         <path d="M8 3l4 4H4l4-4z" />
       </svg>
     );
   }
 
-  if (direction === "desc") {
+  if (direction === 'desc') {
     return (
       <svg
         className={getSortIconClasses(true)}
         width="16"
         height="16"
         viewBox="0 0 16 16"
-        fill="currentColor"
-      >
+        fill="currentColor">
         <path d="M8 13l-4-4h8l-4 4z" />
       </svg>
     );
@@ -106,8 +104,7 @@ const SortIcon: React.FC<{ direction: "asc" | "desc" | null }> = ({
       width="16"
       height="16"
       viewBox="0 0 16 16"
-      fill="currentColor"
-    >
+      fill="currentColor">
       <path d="M8 3l4 4H4l4-4zM8 13l-4-4h8l-4 4z" />
     </svg>
   );
@@ -120,8 +117,7 @@ const LockIcon: React.FC<{ locked: boolean }> = ({ locked }) => {
       height="14"
       viewBox="0 0 24 24"
       fill="currentColor"
-      aria-hidden="true"
-    >
+      aria-hidden="true">
       {locked ? (
         <path d="M17 8h-1V6a4 4 0 10-8 0v2H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V10a2 2 0 00-2-2zm-7-2a2 2 0 114 0v2h-4V6z" />
       ) : (
@@ -137,11 +133,10 @@ const LoadingSpinner: React.FC = () => (
     className="animate-spin h-8 w-8 text-[var(--tiger-primary,#2563eb)]"
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
-    viewBox={spinnerSvg.viewBox}
-  >
+    viewBox={spinnerSvg.viewBox}>
     {spinnerSvg.elements.map((el, index) => {
-      if (el.type === "circle") return <circle key={index} {...el.attrs} />;
-      if (el.type === "path") return <path key={index} {...el.attrs} />;
+      if (el.type === 'circle') return <circle key={index} {...el.attrs} />;
+      if (el.type === 'path') return <path key={index} {...el.attrs} />;
       return null;
     })}
   </svg>
@@ -157,12 +152,12 @@ export function Table<
   defaultSort,
   filters,
   defaultFilters,
-  size = "md",
+  size = 'md',
   bordered = false,
   striped = false,
   hoverable = true,
   loading = false,
-  emptyText = "No data",
+  emptyText = 'No data',
   pagination = {
     current: 1,
     pageSize: 10,
@@ -172,7 +167,7 @@ export function Table<
     showTotal: true,
   },
   rowSelection,
-  rowKey = "id",
+  rowKey = 'id',
   rowClassName,
   stickyHeader = false,
   maxHeight,
@@ -189,7 +184,7 @@ export function Table<
   const isFiltersControlled = filters !== undefined;
 
   const paginationConfig: PaginationConfig | null =
-    pagination !== false && typeof pagination === "object" ? pagination : null;
+    pagination !== false && typeof pagination === 'object' ? pagination : null;
   const isCurrentPageControlled = paginationConfig?.current !== undefined;
   const isPageSizeControlled = paginationConfig?.pageSize !== undefined;
 
@@ -271,7 +266,7 @@ export function Table<
   }, [isSelectionControlled, rowSelection?.selectedRowKeys]);
 
   const [fixedOverrides, setFixedOverrides] = useState<
-    Record<string, "left" | "right" | false>
+    Record<string, 'left' | 'right' | false>
   >({});
 
   const displayColumns = useMemo(() => {
@@ -308,11 +303,11 @@ export function Table<
           ? prev[columnKey]
           : original;
 
-        const isLocked = current === "left" || current === "right";
+        const isLocked = current === 'left' || current === 'right';
 
         return {
           ...prev,
-          [columnKey]: isLocked ? false : "left",
+          [columnKey]: isLocked ? false : 'left',
         };
       });
     },
@@ -370,12 +365,12 @@ export function Table<
         return;
       }
 
-      let newDirection: "asc" | "desc" | null = "asc";
+      let newDirection: 'asc' | 'desc' | null = 'asc';
 
       if (sortState.key === columnKey) {
-        if (sortState.direction === "asc") {
-          newDirection = "desc";
-        } else if (sortState.direction === "desc") {
+        if (sortState.direction === 'asc') {
+          newDirection = 'desc';
+        } else if (sortState.direction === 'desc') {
           newDirection = null;
         }
       }
@@ -522,7 +517,7 @@ export function Table<
     (key: string | number, checked: boolean) => {
       let newKeys: (string | number)[];
 
-      if (rowSelection?.type === "radio") {
+      if (rowSelection?.type === 'radio') {
         newKeys = checked ? [key] : [];
       } else {
         if (checked) {
@@ -577,7 +572,7 @@ export function Table<
           {/* Selection checkbox column */}
           {rowSelection &&
             rowSelection.showCheckbox !== false &&
-            rowSelection.type !== "radio" && (
+            rowSelection.type !== 'radio' && (
               <th className={getCheckboxCellClasses(size)}>
                 <input
                   type="checkbox"
@@ -597,24 +592,24 @@ export function Table<
             const sortDirection = isSorted ? sortState.direction : null;
 
             const ariaSort = column.sortable
-              ? sortDirection === "asc"
-                ? "ascending"
-                : sortDirection === "desc"
-                ? "descending"
-                : "none"
+              ? sortDirection === 'asc'
+                ? 'ascending'
+                : sortDirection === 'desc'
+                ? 'descending'
+                : 'none'
               : undefined;
 
-            const isFixedLeft = column.fixed === "left";
-            const isFixedRight = column.fixed === "right";
+            const isFixedLeft = column.fixed === 'left';
+            const isFixedRight = column.fixed === 'right';
             const fixedStyle = isFixedLeft
               ? {
-                  position: "sticky" as const,
+                  position: 'sticky' as const,
                   left: `${fixedColumnsInfo.leftOffsets[column.key] || 0}px`,
                   zIndex: 15,
                 }
               : isFixedRight
               ? {
-                  position: "sticky" as const,
+                  position: 'sticky' as const,
                   right: `${fixedColumnsInfo.rightOffsets[column.key] || 0}px`,
                   zIndex: 15,
                 }
@@ -623,7 +618,7 @@ export function Table<
             const widthStyle = column.width
               ? {
                   width:
-                    typeof column.width === "number"
+                    typeof column.width === 'number'
                       ? `${column.width}px`
                       : column.width,
                 }
@@ -640,17 +635,16 @@ export function Table<
                 className={classNames(
                   getTableHeaderCellClasses(
                     size,
-                    column.align || "left",
+                    column.align || 'left',
                     !!column.sortable,
                     column.headerClassName
                   ),
-                  (isFixedLeft || isFixedRight) && "bg-gray-50"
+                  (isFixedLeft || isFixedRight) && 'bg-gray-50'
                 )}
                 style={style}
                 onClick={
                   column.sortable ? () => handleSort(column.key) : undefined
-                }
-              >
+                }>
                 <div className="flex items-center gap-2">
                   {column.renderHeader
                     ? (column.renderHeader() as React.ReactNode)
@@ -660,24 +654,23 @@ export function Table<
                     <button
                       type="button"
                       aria-label={
-                        column.fixed === "left" || column.fixed === "right"
+                        column.fixed === 'left' || column.fixed === 'right'
                           ? `Unlock column ${column.title}`
                           : `Lock column ${column.title}`
                       }
                       className={classNames(
-                        "inline-flex items-center",
-                        column.fixed === "left" || column.fixed === "right"
-                          ? "text-[var(--tiger-primary,#2563eb)]"
-                          : "text-gray-400 hover:text-gray-700"
+                        'inline-flex items-center',
+                        column.fixed === 'left' || column.fixed === 'right'
+                          ? 'text-[var(--tiger-primary,#2563eb)]'
+                          : 'text-gray-400 hover:text-gray-700'
                       )}
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleColumnLock(column.key);
-                      }}
-                    >
+                      }}>
                       <LockIcon
                         locked={
-                          column.fixed === "left" || column.fixed === "right"
+                          column.fixed === 'left' || column.fixed === 'right'
                         }
                       />
                     </button>
@@ -688,15 +681,14 @@ export function Table<
 
                 {column.filter && (
                   <div className="mt-2">
-                    {column.filter.type === "select" &&
+                    {column.filter.type === 'select' &&
                     column.filter.options ? (
                       <select
                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
                         onChange={(e) =>
                           handleFilter(column.key, e.target.value)
                         }
-                        onClick={(e) => e.stopPropagation()}
-                      >
+                        onClick={(e) => e.stopPropagation()}>
                         <option value="">All</option>
                         {column.filter.options.map((opt) => (
                           <option key={opt.value} value={opt.value}>
@@ -708,7 +700,7 @@ export function Table<
                       <input
                         type="text"
                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                        placeholder={column.filter.placeholder || "Filter..."}
+                        placeholder={column.filter.placeholder || 'Filter...'}
                         onInput={(e) =>
                           handleFilter(
                             column.key,
@@ -753,8 +745,7 @@ export function Table<
           <tr>
             <td
               colSpan={displayColumns.length + (rowSelection ? 1 : 0)}
-              className={tableEmptyStateClasses}
-            >
+              className={tableEmptyStateClasses}>
               <div role="status" aria-live="polite">
                 {emptyText}
               </div>
@@ -770,7 +761,7 @@ export function Table<
           const key = pageRowKeys[index];
           const isSelected = selectedRowKeySet.has(key);
           const rowClass =
-            typeof rowClassName === "function"
+            typeof rowClassName === 'function'
               ? rowClassName(record, index)
               : rowClassName;
 
@@ -784,19 +775,18 @@ export function Table<
                   index % 2 === 0,
                   rowClass
                 ),
-                fixedColumnsInfo.hasFixedColumns && "group"
+                fixedColumnsInfo.hasFixedColumns && 'group'
               )}
-              onClick={() => handleRowClick(record, index)}
-            >
+              onClick={() => handleRowClick(record, index)}>
               {/* Selection checkbox cell */}
               {rowSelection && rowSelection.showCheckbox !== false && (
                 <td className={getCheckboxCellClasses(size)}>
                   <input
-                    type={rowSelection?.type === "radio" ? "radio" : "checkbox"}
+                    type={rowSelection?.type === 'radio' ? 'radio' : 'checkbox'}
                     className={
-                      rowSelection?.type === "radio"
-                        ? "border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
-                        : "rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
+                      rowSelection?.type === 'radio'
+                        ? 'border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
+                        : 'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
                     }
                     checked={isSelected}
                     disabled={
@@ -812,11 +802,11 @@ export function Table<
                 const dataKey = column.dataKey || column.key;
                 const cellValue = record[dataKey];
 
-                const isFixedLeft = column.fixed === "left";
-                const isFixedRight = column.fixed === "right";
+                const isFixedLeft = column.fixed === 'left';
+                const isFixedRight = column.fixed === 'right';
                 const fixedStyle = isFixedLeft
                   ? {
-                      position: "sticky" as const,
+                      position: 'sticky' as const,
                       left: `${
                         fixedColumnsInfo.leftOffsets[column.key] || 0
                       }px`,
@@ -824,7 +814,7 @@ export function Table<
                     }
                   : isFixedRight
                   ? {
-                      position: "sticky" as const,
+                      position: 'sticky' as const,
                       right: `${
                         fixedColumnsInfo.rightOffsets[column.key] || 0
                       }px`,
@@ -835,7 +825,7 @@ export function Table<
                 const widthStyle = column.width
                   ? {
                       width:
-                        typeof column.width === "number"
+                        typeof column.width === 'number'
                           ? `${column.width}px`
                           : column.width,
                     }
@@ -846,13 +836,13 @@ export function Table<
                   : widthStyle;
 
                 const stickyBgClass =
-                  striped && index % 2 === 0 ? "bg-gray-50/50" : "bg-white";
+                  striped && index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white';
 
                 const stickyCellClass =
                   isFixedLeft || isFixedRight
                     ? classNames(
                         stickyBgClass,
-                        hoverable && "group-hover:bg-gray-50"
+                        hoverable && 'group-hover:bg-gray-50'
                       )
                     : undefined;
 
@@ -862,13 +852,12 @@ export function Table<
                     className={classNames(
                       getTableCellClasses(
                         size,
-                        column.align || "left",
+                        column.align || 'left',
                         column.className
                       ),
                       stickyCellClass
                     )}
-                    style={style}
-                  >
+                    style={style}>
                     {column.render
                       ? (column.render(record, index) as React.ReactNode)
                       : (cellValue as React.ReactNode)}
@@ -925,8 +914,7 @@ export function Table<
             <select
               className="px-3 py-1 border border-gray-300 rounded text-sm"
               value={currentPageSize}
-              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-            >
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}>
               {(paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map(
                 (size) => (
                   <option key={size} value={size}>
@@ -942,14 +930,13 @@ export function Table<
             {/* Previous button */}
             <button
               className={classNames(
-                "px-3 py-1 border border-gray-300 rounded text-sm",
+                'px-3 py-1 border border-gray-300 rounded text-sm',
                 hasPrev
-                  ? "hover:bg-gray-50 text-gray-700"
-                  : "text-gray-400 cursor-not-allowed"
+                  ? 'hover:bg-gray-50 text-gray-700'
+                  : 'text-gray-400 cursor-not-allowed'
               )}
               disabled={!hasPrev}
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
+              onClick={() => handlePageChange(currentPage - 1)}>
               Previous
             </button>
 
@@ -961,14 +948,13 @@ export function Table<
             {/* Next button */}
             <button
               className={classNames(
-                "px-3 py-1 border border-gray-300 rounded text-sm",
+                'px-3 py-1 border border-gray-300 rounded text-sm',
                 hasNext
-                  ? "hover:bg-gray-50 text-gray-700"
-                  : "text-gray-400 cursor-not-allowed"
+                  ? 'hover:bg-gray-50 text-gray-700'
+                  : 'text-gray-400 cursor-not-allowed'
               )}
               disabled={!hasNext}
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
+              onClick={() => handlePageChange(currentPage + 1)}>
               Next
             </button>
           </div>
@@ -990,19 +976,18 @@ export function Table<
       maxHeight
         ? {
             maxHeight:
-              typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight,
+              typeof maxHeight === 'number' ? `${maxHeight}px` : maxHeight,
           }
         : undefined,
     [maxHeight]
   );
 
   return (
-    <div className={classNames("relative", className)}>
+    <div className={classNames('relative', className)}>
       <div
         className={getTableWrapperClasses(bordered, maxHeight)}
         style={wrapperStyle}
-        aria-busy={loading}
-      >
+        aria-busy={loading}>
         <table
           className={tableBaseClasses}
           {...props}
@@ -1013,8 +998,7 @@ export function Table<
                   minWidth: `${fixedColumnsInfo.minTableWidth}px`,
                 }
               : (props as React.HTMLAttributes<HTMLTableElement>).style
-          }
-        >
+          }>
           {renderTableHeader()}
           {renderTableBody()}
         </table>
@@ -1025,8 +1009,7 @@ export function Table<
             className={tableLoadingOverlayClasses}
             role="status"
             aria-live="polite"
-            aria-label="Loading"
-          >
+            aria-label="Loading">
             <LoadingSpinner />
             <span className="sr-only">Loading</span>
           </div>

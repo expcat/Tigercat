@@ -4,7 +4,7 @@ import React, {
   useEffect,
   useCallback,
   useRef,
-} from "react";
+} from 'react';
 import {
   classNames,
   getTreeNodeClasses,
@@ -19,6 +19,7 @@ import {
   treeLoadingClasses,
   treeEmptyStateClasses,
   treeLineClasses,
+  getSpinnerSVG,
   getVisibleTreeItems,
   getParentKeys,
   getAllKeys,
@@ -34,7 +35,9 @@ import {
   type TreeCheckedState,
   type TreeLoadDataFn,
   type TreeFilterFn,
-} from "@tigercat/core";
+} from '@tigercat/core';
+
+const spinnerSvg = getSpinnerSVG('spinner');
 
 // Expand icon component
 const ExpandIcon: React.FC<{ expanded: boolean; hasChildren: boolean }> = ({
@@ -51,8 +54,7 @@ const ExpandIcon: React.FC<{ expanded: boolean; hasChildren: boolean }> = ({
       width="16"
       height="16"
       viewBox="0 0 16 16"
-      fill="currentColor"
-    >
+      fill="currentColor">
       <path d="M6 4l4 4-4 4V4z" />
     </svg>
   );
@@ -64,21 +66,12 @@ const LoadingSpinner: React.FC = () => (
     className={treeLoadingClasses}
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
-    viewBox="0 0 24 24"
-  >
-    <circle
-      className="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="4"
-    />
-    <path
-      className="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-    />
+    viewBox={spinnerSvg.viewBox}>
+    {spinnerSvg.elements.map((el, index) => {
+      if (el.type === 'circle') return <circle key={index} {...el.attrs} />;
+      if (el.type === 'path') return <path key={index} {...el.attrs} />;
+      return null;
+    })}
   </svg>
 );
 
@@ -252,16 +245,16 @@ export const Tree: React.FC<TreeProps> = ({
   checkedKeys: controlledCheckedKeys,
   defaultExpandAll = false,
   checkStrictly = false,
-  checkStrategy = "all",
+  checkStrategy = 'all',
   selectable = true,
   multiple = false,
   loadData,
-  filterValue = "",
+  filterValue = '',
   filterFn,
   autoExpandParent = true,
   blockNode = false,
-  emptyText = "No data",
-  ariaLabel = "Tree",
+  emptyText = 'No data',
+  ariaLabel = 'Tree',
   onExpand,
   onSelect,
   onCheck,
@@ -274,14 +267,14 @@ export const Tree: React.FC<TreeProps> = ({
 
   const effectiveSelectable = useMemo(() => {
     if (selectionMode !== undefined) {
-      return selectionMode !== "none";
+      return selectionMode !== 'none';
     }
     return selectable;
   }, [selectionMode, selectable]);
 
   const effectiveMultiple = useMemo(() => {
     if (selectionMode !== undefined) {
-      return selectionMode === "multiple";
+      return selectionMode === 'multiple';
     }
     return multiple;
   }, [selectionMode, multiple]);
@@ -605,31 +598,31 @@ export const Tree: React.FC<TreeProps> = ({
         return undefined;
       };
 
-      if (e.key === "ArrowDown") {
+      if (e.key === 'ArrowDown') {
         e.preventDefault();
         setActiveKey(focusableKeys[currentIndex + 1] ?? currentKey);
         return;
       }
 
-      if (e.key === "ArrowUp") {
+      if (e.key === 'ArrowUp') {
         e.preventDefault();
         setActiveKey(focusableKeys[currentIndex - 1] ?? currentKey);
         return;
       }
 
-      if (e.key === "Home") {
+      if (e.key === 'Home') {
         e.preventDefault();
         setActiveKey(focusableKeys[0] ?? currentKey);
         return;
       }
 
-      if (e.key === "End") {
+      if (e.key === 'End') {
         e.preventDefault();
         setActiveKey(focusableKeys[focusableKeys.length - 1] ?? currentKey);
         return;
       }
 
-      if (e.key === "ArrowRight") {
+      if (e.key === 'ArrowRight') {
         e.preventDefault();
         if (isExpandable && !isExpanded) {
           handleExpand(node.key);
@@ -641,7 +634,7 @@ export const Tree: React.FC<TreeProps> = ({
         return;
       }
 
-      if (e.key === "ArrowLeft") {
+      if (e.key === 'ArrowLeft') {
         e.preventDefault();
         if (isExpandable && isExpanded) {
           handleExpand(node.key);
@@ -653,7 +646,7 @@ export const Tree: React.FC<TreeProps> = ({
         return;
       }
 
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         e.preventDefault();
         if (isExpandable && isExpanded) {
           handleExpand(node.key);
@@ -668,7 +661,7 @@ export const Tree: React.FC<TreeProps> = ({
         return;
       }
 
-      if (e.key === "Enter") {
+      if (e.key === 'Enter') {
         e.preventDefault();
         if (effectiveSelectable) {
           handleSelect(node.key, e);
@@ -680,7 +673,7 @@ export const Tree: React.FC<TreeProps> = ({
         return;
       }
 
-      if (e.key === " ") {
+      if (e.key === ' ') {
         e.preventDefault();
         if (checkable) {
           handleCheck(node.key, !isChecked);
@@ -752,15 +745,14 @@ export const Tree: React.FC<TreeProps> = ({
 
           {/* Expand icon */}
           <span
-            className={isExpandable ? "cursor-pointer" : ""}
+            className={isExpandable ? 'cursor-pointer' : ''}
             onClick={(e) => {
               e.stopPropagation();
               if (isExpandable) {
                 setActiveKey(node.key);
                 handleExpand(node.key);
               }
-            }}
-          >
+            }}>
             <ExpandIcon expanded={isExpanded} hasChildren={isExpandable} />
           </span>
 
@@ -797,10 +789,9 @@ export const Tree: React.FC<TreeProps> = ({
             className={classNames(
               treeNodeLabelClasses,
               isFiltered && isMatched
-                ? "font-semibold text-[var(--tiger-primary,#2563eb)]"
-                : ""
-            )}
-          >
+                ? 'font-semibold text-[var(--tiger-primary,#2563eb)]'
+                : ''
+            )}>
             {node.label}
           </span>
 
@@ -827,7 +818,7 @@ export const Tree: React.FC<TreeProps> = ({
             aria-selected={effectiveSelectable ? isSelected : undefined}
             aria-expanded={isExpandable ? isExpanded : undefined}
             aria-checked={
-              checkable ? (isHalfChecked ? "mixed" : isChecked) : undefined
+              checkable ? (isHalfChecked ? 'mixed' : isChecked) : undefined
             }
             tabIndex={isFocusable ? 0 : -1}
             onFocus={() => {
@@ -840,8 +831,7 @@ export const Tree: React.FC<TreeProps> = ({
               if (effectiveSelectable && !node.disabled) {
                 handleSelect(node.key, e);
               }
-            }}
-          >
+            }}>
             {nodeContent}
           </div>
 
@@ -851,8 +841,7 @@ export const Tree: React.FC<TreeProps> = ({
               className={classNames(
                 treeNodeChildrenClasses,
                 showLine && treeLineClasses
-              )}
-            >
+              )}>
               {node.children!.map((child) =>
                 renderTreeNode(child, level + 1, node.key)
               )}
@@ -886,10 +875,9 @@ export const Tree: React.FC<TreeProps> = ({
   if (!treeData || treeData.length === 0) {
     return (
       <div
-        className={classNames(treeBaseClasses, "p-4", className)}
+        className={classNames(treeBaseClasses, 'p-4', className)}
         role="tree"
-        aria-label={ariaLabel}
-      >
+        aria-label={ariaLabel}>
         <div className={treeEmptyStateClasses}>{emptyText}</div>
       </div>
     );
@@ -900,8 +888,7 @@ export const Tree: React.FC<TreeProps> = ({
       className={classNames(treeBaseClasses, className)}
       role="tree"
       aria-label={ariaLabel}
-      aria-multiselectable={effectiveMultiple || undefined}
-    >
+      aria-multiselectable={effectiveMultiple || undefined}>
       {treeData.map((node) => renderTreeNode(node, 0))}
     </div>
   );

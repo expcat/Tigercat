@@ -6,7 +6,7 @@ import {
   h,
   PropType,
   type VNodeChild,
-} from "vue";
+} from 'vue';
 import {
   classNames,
   getTableWrapperClasses,
@@ -34,9 +34,9 @@ import {
   type SortState,
   type PaginationConfig,
   type RowSelectionConfig,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
-const spinnerSvg = getSpinnerSVG("spinner");
+const spinnerSvg = getSpinnerSVG('spinner');
 
 export interface VueTableProps {
   columns: TableColumn[];
@@ -64,75 +64,75 @@ export interface VueTableProps {
 
 // Sort icons
 const SortIcon = (direction: SortDirection) => {
-  if (direction === "asc") {
+  if (direction === 'asc') {
     return h(
-      "svg",
+      'svg',
       {
         class: getSortIconClasses(true),
-        width: "16",
-        height: "16",
-        viewBox: "0 0 16 16",
-        fill: "currentColor",
+        width: '16',
+        height: '16',
+        viewBox: '0 0 16 16',
+        fill: 'currentColor',
       },
       [
-        h("path", {
-          d: "M8 3l4 4H4l4-4z",
+        h('path', {
+          d: 'M8 3l4 4H4l4-4z',
         }),
       ]
     );
   }
 
-  if (direction === "desc") {
+  if (direction === 'desc') {
     return h(
-      "svg",
+      'svg',
       {
         class: getSortIconClasses(true),
-        width: "16",
-        height: "16",
-        viewBox: "0 0 16 16",
-        fill: "currentColor",
+        width: '16',
+        height: '16',
+        viewBox: '0 0 16 16',
+        fill: 'currentColor',
       },
       [
-        h("path", {
-          d: "M8 13l-4-4h8l-4 4z",
+        h('path', {
+          d: 'M8 13l-4-4h8l-4 4z',
         }),
       ]
     );
   }
 
   return h(
-    "svg",
+    'svg',
     {
       class: getSortIconClasses(false),
-      width: "16",
-      height: "16",
-      viewBox: "0 0 16 16",
-      fill: "currentColor",
+      width: '16',
+      height: '16',
+      viewBox: '0 0 16 16',
+      fill: 'currentColor',
     },
     [
-      h("path", {
-        d: "M8 3l4 4H4l4-4zM8 13l-4-4h8l-4 4z",
+      h('path', {
+        d: 'M8 3l4 4H4l4-4zM8 13l-4-4h8l-4 4z',
       }),
     ]
   );
 };
 const LockIcon = (locked: boolean) => {
   return h(
-    "svg",
+    'svg',
     {
-      width: "14",
-      height: "14",
-      viewBox: "0 0 24 24",
-      fill: "currentColor",
-      "aria-hidden": "true",
+      width: '14',
+      height: '14',
+      viewBox: '0 0 24 24',
+      fill: 'currentColor',
+      'aria-hidden': 'true',
     },
     [
       locked
-        ? h("path", {
-            d: "M17 8h-1V6a4 4 0 10-8 0v2H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V10a2 2 0 00-2-2zm-7-2a2 2 0 114 0v2h-4V6z",
+        ? h('path', {
+            d: 'M17 8h-1V6a4 4 0 10-8 0v2H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V10a2 2 0 00-2-2zm-7-2a2 2 0 114 0v2h-4V6z',
           })
-        : h("path", {
-            d: "M17 8h-1V6a4 4 0 00-7.75-1.41 1 1 0 101.9.62A2 2 0 0114 6v2H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V10a2 2 0 00-2-2zm0 12H7V10h10v10z",
+        : h('path', {
+            d: 'M17 8h-1V6a4 4 0 00-7.75-1.41 1 1 0 101.9.62A2 2 0 0114 6v2H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V10a2 2 0 00-2-2zm0 12H7V10h10v10z',
           }),
     ]
   );
@@ -141,11 +141,11 @@ const LockIcon = (locked: boolean) => {
 // Loading spinner
 const LoadingSpinner = () => {
   return h(
-    "svg",
+    'svg',
     {
-      class: "animate-spin h-8 w-8 text-[var(--tiger-primary,#2563eb)]",
-      xmlns: "http://www.w3.org/2000/svg",
-      fill: "none",
+      class: 'animate-spin h-8 w-8 text-[var(--tiger-primary,#2563eb)]',
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
       viewBox: spinnerSvg.viewBox,
     },
     spinnerSvg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
@@ -153,7 +153,7 @@ const LoadingSpinner = () => {
 };
 
 export const Table = defineComponent({
-  name: "TigerTable",
+  name: 'TigerTable',
   props: {
     /**
      * Table columns configuration
@@ -215,7 +215,7 @@ export const Table = defineComponent({
      */
     size: {
       type: String as PropType<TableSize>,
-      default: "md" as TableSize,
+      default: 'md' as TableSize,
     },
     /**
      * Whether to show border
@@ -250,7 +250,7 @@ export const Table = defineComponent({
      */
     emptyText: {
       type: String,
-      default: "No data",
+      default: 'No data',
     },
     /**
      * Pagination configuration
@@ -279,7 +279,7 @@ export const Table = defineComponent({
       type: [String, Function] as PropType<
         string | ((record: Record<string, unknown>) => string | number)
       >,
-      default: "id",
+      default: 'id',
     },
     /**
      * Custom row class name
@@ -304,16 +304,16 @@ export const Table = defineComponent({
     },
   },
   emits: [
-    "change",
-    "row-click",
-    "selection-change",
-    "sort-change",
-    "filter-change",
-    "page-change",
+    'change',
+    'row-click',
+    'selection-change',
+    'sort-change',
+    'filter-change',
+    'page-change',
   ],
   setup(props, { emit, slots }) {
     const paginationConfig = computed(() => {
-      return props.pagination !== false && typeof props.pagination === "object"
+      return props.pagination !== false && typeof props.pagination === 'object'
         ? props.pagination
         : null;
     });
@@ -416,7 +416,7 @@ export const Table = defineComponent({
       }
     );
 
-    const fixedOverrides = ref<Record<string, "left" | "right" | false>>({});
+    const fixedOverrides = ref<Record<string, 'left' | 'right' | false>>({});
 
     const displayColumns = computed(() => {
       return props.columns.map((column) => {
@@ -445,8 +445,8 @@ export const Table = defineComponent({
       const original = props.columns.find((c) => c.key === columnKey)?.fixed;
       const hasOverride = columnKey in fixedOverrides.value;
       const current = hasOverride ? fixedOverrides.value[columnKey] : original;
-      const isLocked = current === "left" || current === "right";
-      fixedOverrides.value[columnKey] = isLocked ? false : "left";
+      const isLocked = current === 'left' || current === 'right';
+      fixedOverrides.value[columnKey] = isLocked ? false : 'left';
     }
 
     // Process data with sorting, filtering, and pagination
@@ -511,12 +511,12 @@ export const Table = defineComponent({
         return;
       }
 
-      let newDirection: SortDirection = "asc";
+      let newDirection: SortDirection = 'asc';
 
       if (sortState.value.key === columnKey) {
-        if (sortState.value.direction === "asc") {
-          newDirection = "desc";
-        } else if (sortState.value.direction === "desc") {
+        if (sortState.value.direction === 'asc') {
+          newDirection = 'desc';
+        } else if (sortState.value.direction === 'desc') {
           newDirection = null;
         }
       }
@@ -530,8 +530,8 @@ export const Table = defineComponent({
         uncontrolledSortState.value = nextSortState;
       }
 
-      emit("sort-change", nextSortState);
-      emit("change", {
+      emit('sort-change', nextSortState);
+      emit('change', {
         sort: nextSortState,
         filters: filterState.value,
         pagination:
@@ -557,8 +557,8 @@ export const Table = defineComponent({
       // Reset to first page when filtering
       uncontrolledCurrentPage.value = 1;
 
-      emit("filter-change", nextFilterState);
-      emit("change", {
+      emit('filter-change', nextFilterState);
+      emit('change', {
         sort: sortState.value,
         filters: nextFilterState,
         pagination:
@@ -578,8 +578,8 @@ export const Table = defineComponent({
         uncontrolledCurrentPage.value = page;
       }
 
-      emit("page-change", { current: page, pageSize: currentPageSize.value });
-      emit("change", {
+      emit('page-change', { current: page, pageSize: currentPageSize.value });
+      emit('change', {
         sort: sortState.value,
         filters: filterState.value,
         pagination: {
@@ -602,8 +602,8 @@ export const Table = defineComponent({
         uncontrolledCurrentPage.value = 1;
       }
 
-      emit("page-change", { current: 1, pageSize });
-      emit("change", {
+      emit('page-change', { current: 1, pageSize });
+      emit('change', {
         sort: sortState.value,
         filters: filterState.value,
         pagination: {
@@ -614,13 +614,13 @@ export const Table = defineComponent({
     }
 
     function handleRowClick(record: Record<string, unknown>, index: number) {
-      emit("row-click", record, index);
+      emit('row-click', record, index);
     }
 
     function handleSelectRow(key: string | number, checked: boolean) {
       let newKeys: (string | number)[];
 
-      if (props.rowSelection?.type === "radio") {
+      if (props.rowSelection?.type === 'radio') {
         newKeys = checked ? [key] : [];
       } else {
         if (checked) {
@@ -633,7 +633,7 @@ export const Table = defineComponent({
       if (!isSelectionControlled.value) {
         uncontrolledSelectedRowKeys.value = newKeys;
       }
-      emit("selection-change", newKeys);
+      emit('selection-change', newKeys);
     }
 
     function handleSelectAll(checked: boolean) {
@@ -644,13 +644,13 @@ export const Table = defineComponent({
           uncontrolledSelectedRowKeys.value = nextKeys;
         }
 
-        emit("selection-change", nextKeys);
+        emit('selection-change', nextKeys);
       } else {
         if (!isSelectionControlled.value) {
           uncontrolledSelectedRowKeys.value = [];
         }
 
-        emit("selection-change", []);
+        emit('selection-change', []);
       }
     }
 
@@ -675,19 +675,19 @@ export const Table = defineComponent({
       if (
         props.rowSelection &&
         props.rowSelection.showCheckbox !== false &&
-        props.rowSelection.type !== "radio"
+        props.rowSelection.type !== 'radio'
       ) {
         headerCells.push(
           h(
-            "th",
+            'th',
             {
               class: getCheckboxCellClasses(props.size),
             },
             [
-              h("input", {
-                type: "checkbox",
+              h('input', {
+                type: 'checkbox',
                 class:
-                  "rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]",
+                  'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]',
                 checked: allSelected.value,
                 indeterminate: someSelected.value,
                 onChange: (e: Event) =>
@@ -704,24 +704,24 @@ export const Table = defineComponent({
         const sortDirection = isSorted ? sortState.value.direction : null;
 
         const ariaSort = column.sortable
-          ? sortDirection === "asc"
-            ? "ascending"
-            : sortDirection === "desc"
-            ? "descending"
-            : "none"
+          ? sortDirection === 'asc'
+            ? 'ascending'
+            : sortDirection === 'desc'
+            ? 'descending'
+            : 'none'
           : undefined;
 
-        const isFixedLeft = column.fixed === "left";
-        const isFixedRight = column.fixed === "right";
+        const isFixedLeft = column.fixed === 'left';
+        const isFixedRight = column.fixed === 'right';
         const fixedStyle = isFixedLeft
           ? {
-              position: "sticky",
+              position: 'sticky',
               left: `${fixedColumnsInfo.value.leftOffsets[column.key] || 0}px`,
               zIndex: 15,
             }
           : isFixedRight
           ? {
-              position: "sticky",
+              position: 'sticky',
               right: `${
                 fixedColumnsInfo.value.rightOffsets[column.key] || 0
               }px`,
@@ -732,7 +732,7 @@ export const Table = defineComponent({
         const widthStyle = column.width
           ? {
               width:
-                typeof column.width === "number"
+                typeof column.width === 'number'
                   ? `${column.width}px`
                   : column.width,
             }
@@ -758,17 +758,17 @@ export const Table = defineComponent({
         if (props.columnLockable) {
           headerContent.push(
             h(
-              "button",
+              'button',
               {
-                type: "button",
+                type: 'button',
                 class: classNames(
-                  "inline-flex items-center",
-                  column.fixed === "left" || column.fixed === "right"
-                    ? "text-[var(--tiger-primary,#2563eb)]"
-                    : "text-gray-400 hover:text-gray-700"
+                  'inline-flex items-center',
+                  column.fixed === 'left' || column.fixed === 'right'
+                    ? 'text-[var(--tiger-primary,#2563eb)]'
+                    : 'text-gray-400 hover:text-gray-700'
                 ),
-                "aria-label":
-                  column.fixed === "left" || column.fixed === "right"
+                'aria-label':
+                  column.fixed === 'left' || column.fixed === 'right'
                     ? `Unlock column ${column.title}`
                     : `Lock column ${column.title}`,
                 onClick: (e: Event) => {
@@ -776,7 +776,7 @@ export const Table = defineComponent({
                   toggleColumnLock(column.key);
                 },
               },
-              [LockIcon(column.fixed === "left" || column.fixed === "right")]
+              [LockIcon(column.fixed === 'left' || column.fixed === 'right')]
             )
           );
         }
@@ -787,18 +787,18 @@ export const Table = defineComponent({
 
         headerCells.push(
           h(
-            "th",
+            'th',
             {
               key: column.key,
-              "aria-sort": ariaSort,
+              'aria-sort': ariaSort,
               class: classNames(
                 getTableHeaderCellClasses(
                   props.size,
-                  column.align || "left",
+                  column.align || 'left',
                   !!column.sortable,
                   column.headerClassName
                 ),
-                (isFixedLeft || isFixedRight) && "bg-gray-50"
+                (isFixedLeft || isFixedRight) && 'bg-gray-50'
               ),
               style,
               onClick: column.sortable
@@ -806,17 +806,17 @@ export const Table = defineComponent({
                 : undefined,
             },
             [
-              h("div", { class: "flex items-center gap-2" }, headerContent),
+              h('div', { class: 'flex items-center gap-2' }, headerContent),
               // Filter input
               ...(column.filter
                 ? [
-                    h("div", { class: "mt-2" }, [
-                      column.filter.type === "select" && column.filter.options
+                    h('div', { class: 'mt-2' }, [
+                      column.filter.type === 'select' && column.filter.options
                         ? h(
-                            "select",
+                            'select',
                             {
                               class:
-                                "w-full px-2 py-1 text-sm border border-gray-300 rounded",
+                                'w-full px-2 py-1 text-sm border border-gray-300 rounded',
                               onChange: (e: Event) =>
                                 handleFilter(
                                   column.key,
@@ -825,18 +825,18 @@ export const Table = defineComponent({
                               onClick: (e: Event) => e.stopPropagation(),
                             },
                             [
-                              h("option", { value: "" }, "All"),
+                              h('option', { value: '' }, 'All'),
                               ...column.filter.options.map((opt) =>
-                                h("option", { value: opt.value }, opt.label)
+                                h('option', { value: opt.value }, opt.label)
                               ),
                             ]
                           )
-                        : h("input", {
-                            type: "text",
+                        : h('input', {
+                            type: 'text',
                             class:
-                              "w-full px-2 py-1 text-sm border border-gray-300 rounded",
+                              'w-full px-2 py-1 text-sm border border-gray-300 rounded',
                             placeholder:
-                              column.filter.placeholder || "Filter...",
+                              column.filter.placeholder || 'Filter...',
                             onInput: (e: Event) =>
                               handleFilter(
                                 column.key,
@@ -852,8 +852,8 @@ export const Table = defineComponent({
         );
       });
 
-      return h("thead", { class: getTableHeaderClasses(props.stickyHeader) }, [
-        h("tr", headerCells),
+      return h('thead', { class: getTableHeaderClasses(props.stickyHeader) }, [
+        h('tr', headerCells),
       ]);
     }
 
@@ -863,10 +863,10 @@ export const Table = defineComponent({
       }
 
       if (paginatedData.value.length === 0) {
-        return h("tbody", [
-          h("tr", [
+        return h('tbody', [
+          h('tr', [
             h(
-              "td",
+              'td',
               {
                 colspan:
                   displayColumns.value.length + (props.rowSelection ? 1 : 0),
@@ -874,10 +874,10 @@ export const Table = defineComponent({
               },
               [
                 h(
-                  "div",
+                  'div',
                   {
-                    role: "status",
-                    "aria-live": "polite",
+                    role: 'status',
+                    'aria-live': 'polite',
                   },
                   props.emptyText
                 ),
@@ -891,7 +891,7 @@ export const Table = defineComponent({
         const key = paginatedRowKeys.value[index];
         const isSelected = selectedRowKeySet.value.has(key);
         const rowClass =
-          typeof props.rowClassName === "function"
+          typeof props.rowClassName === 'function'
             ? props.rowClassName(record, index)
             : props.rowClassName;
 
@@ -904,18 +904,18 @@ export const Table = defineComponent({
 
           cells.push(
             h(
-              "td",
+              'td',
               {
                 class: getCheckboxCellClasses(props.size),
               },
               [
-                h("input", {
+                h('input', {
                   type:
-                    props.rowSelection?.type === "radio" ? "radio" : "checkbox",
+                    props.rowSelection?.type === 'radio' ? 'radio' : 'checkbox',
                   class:
-                    props.rowSelection?.type === "radio"
-                      ? "border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
-                      : "rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]",
+                    props.rowSelection?.type === 'radio'
+                      ? 'border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
+                      : 'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]',
                   checked: isSelected,
                   disabled: checkboxProps.disabled,
                   onChange: (e: Event) =>
@@ -934,11 +934,11 @@ export const Table = defineComponent({
           const dataKey = column.dataKey || column.key;
           const cellValue = record[dataKey];
 
-          const isFixedLeft = column.fixed === "left";
-          const isFixedRight = column.fixed === "right";
+          const isFixedLeft = column.fixed === 'left';
+          const isFixedRight = column.fixed === 'right';
           const fixedStyle = isFixedLeft
             ? {
-                position: "sticky",
+                position: 'sticky',
                 left: `${
                   fixedColumnsInfo.value.leftOffsets[column.key] || 0
                 }px`,
@@ -946,7 +946,7 @@ export const Table = defineComponent({
               }
             : isFixedRight
             ? {
-                position: "sticky",
+                position: 'sticky',
                 right: `${
                   fixedColumnsInfo.value.rightOffsets[column.key] || 0
                 }px`,
@@ -957,7 +957,7 @@ export const Table = defineComponent({
           const widthStyle = column.width
             ? {
                 width:
-                  typeof column.width === "number"
+                  typeof column.width === 'number'
                     ? `${column.width}px`
                     : column.width,
               }
@@ -968,24 +968,24 @@ export const Table = defineComponent({
             : widthStyle;
 
           const stickyBgClass =
-            props.striped && index % 2 === 0 ? "bg-gray-50/50" : "bg-white";
+            props.striped && index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white';
           const stickyCellClass =
             isFixedLeft || isFixedRight
               ? classNames(
                   stickyBgClass,
-                  props.hoverable && "group-hover:bg-gray-50"
+                  props.hoverable && 'group-hover:bg-gray-50'
                 )
               : undefined;
 
           cells.push(
             h(
-              "td",
+              'td',
               {
                 key: column.key,
                 class: classNames(
                   getTableCellClasses(
                     props.size,
-                    column.align || "left",
+                    column.align || 'left',
                     column.className
                   ),
                   stickyCellClass
@@ -1003,7 +1003,7 @@ export const Table = defineComponent({
         });
 
         return h(
-          "tr",
+          'tr',
           {
             key,
             class: classNames(
@@ -1013,7 +1013,7 @@ export const Table = defineComponent({
                 index % 2 === 0,
                 rowClass
               ),
-              fixedColumnsInfo.value.hasFixedColumns && "group"
+              fixedColumnsInfo.value.hasFixedColumns && 'group'
             ),
             onClick: () => handleRowClick(record, index),
           },
@@ -1021,7 +1021,7 @@ export const Table = defineComponent({
         );
       });
 
-      return h("tbody", rows);
+      return h('tbody', rows);
     }
 
     function renderPagination() {
@@ -1034,25 +1034,25 @@ export const Table = defineComponent({
       const total = processedData.value.length;
       const paginationConfig = props.pagination as PaginationConfig;
 
-      return h("div", { class: tablePaginationContainerClasses }, [
+      return h('div', { class: tablePaginationContainerClasses }, [
         // Total info
         paginationConfig.showTotal !== false &&
           h(
-            "div",
-            { class: "text-sm text-gray-700" },
+            'div',
+            { class: 'text-sm text-gray-700' },
             paginationConfig.totalText
               ? paginationConfig.totalText(total, [startIndex, endIndex])
               : `Showing ${startIndex} to ${endIndex} of ${total} results`
           ),
 
         // Pagination controls
-        h("div", { class: "flex items-center gap-2" }, [
+        h('div', { class: 'flex items-center gap-2' }, [
           // Page size selector
           paginationConfig.showSizeChanger !== false &&
             h(
-              "select",
+              'select',
               {
-                class: "px-3 py-1 border border-gray-300 rounded text-sm",
+                class: 'px-3 py-1 border border-gray-300 rounded text-sm',
                 value: currentPageSize.value,
                 onChange: (e: Event) =>
                   handlePageSizeChange(
@@ -1060,49 +1060,49 @@ export const Table = defineComponent({
                   ),
               },
               (paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map(
-                (size) => h("option", { value: size }, `${size} / page`)
+                (size) => h('option', { value: size }, `${size} / page`)
               )
             ),
 
           // Page buttons
-          h("div", { class: "flex gap-1" }, [
+          h('div', { class: 'flex gap-1' }, [
             // Previous button
             h(
-              "button",
+              'button',
               {
                 class: classNames(
-                  "px-3 py-1 border border-gray-300 rounded text-sm",
+                  'px-3 py-1 border border-gray-300 rounded text-sm',
                   hasPrev
-                    ? "hover:bg-gray-50 text-gray-700"
-                    : "text-gray-400 cursor-not-allowed"
+                    ? 'hover:bg-gray-50 text-gray-700'
+                    : 'text-gray-400 cursor-not-allowed'
                 ),
                 disabled: !hasPrev,
                 onClick: () => handlePageChange(currentPage.value - 1),
               },
-              "Previous"
+              'Previous'
             ),
 
             // Current page indicator
             h(
-              "span",
-              { class: "px-3 py-1 text-sm text-gray-700" },
+              'span',
+              { class: 'px-3 py-1 text-sm text-gray-700' },
               `Page ${currentPage.value} of ${totalPages}`
             ),
 
             // Next button
             h(
-              "button",
+              'button',
               {
                 class: classNames(
-                  "px-3 py-1 border border-gray-300 rounded text-sm",
+                  'px-3 py-1 border border-gray-300 rounded text-sm',
                   hasNext
-                    ? "hover:bg-gray-50 text-gray-700"
-                    : "text-gray-400 cursor-not-allowed"
+                    ? 'hover:bg-gray-50 text-gray-700'
+                    : 'text-gray-400 cursor-not-allowed'
                 ),
                 disabled: !hasNext,
                 onClick: () => handlePageChange(currentPage.value + 1),
               },
-              "Next"
+              'Next'
             ),
           ]),
         ]),
@@ -1113,23 +1113,23 @@ export const Table = defineComponent({
       const wrapperStyle = props.maxHeight
         ? {
             maxHeight:
-              typeof props.maxHeight === "number"
+              typeof props.maxHeight === 'number'
                 ? `${props.maxHeight}px`
                 : props.maxHeight,
           }
         : undefined;
 
-      return h("div", { class: "relative" }, [
+      return h('div', { class: 'relative' }, [
         h(
-          "div",
+          'div',
           {
             class: getTableWrapperClasses(props.bordered, props.maxHeight),
             style: wrapperStyle,
-            "aria-busy": props.loading,
+            'aria-busy': props.loading,
           },
           [
             h(
-              "table",
+              'table',
               {
                 class: tableBaseClasses,
                 style:
@@ -1144,14 +1144,14 @@ export const Table = defineComponent({
             // Loading overlay
             props.loading &&
               h(
-                "div",
+                'div',
                 {
                   class: tableLoadingOverlayClasses,
-                  role: "status",
-                  "aria-live": "polite",
-                  "aria-label": "Loading",
+                  role: 'status',
+                  'aria-live': 'polite',
+                  'aria-label': 'Loading',
                 },
-                [LoadingSpinner(), h("span", { class: "sr-only" }, "Loading")]
+                [LoadingSpinner(), h('span', { class: 'sr-only' }, 'Loading')]
               ),
           ]
         ),

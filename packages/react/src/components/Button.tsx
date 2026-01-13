@@ -64,7 +64,8 @@ export const Button: React.FC<ButtonProps> = ({
             aria-hidden="true"
             focusable="false">
             {spinnerSvg.elements.map((el, index) => {
-              if (el.type === 'circle') return <circle key={index} {...el.attrs} />;
+              if (el.type === 'circle')
+                return <circle key={index} {...el.attrs} />;
               if (el.type === 'path') return <path key={index} {...el.attrs} />;
               return null;
             })}
