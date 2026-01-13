@@ -8,11 +8,12 @@ import {
   watch,
   onMounted,
   onBeforeUnmount,
-} from "vue";
+} from 'vue';
 import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
+  icon20ViewBox,
   parseTime,
   formatTime,
   formatTimeDisplayWithLocale,
@@ -48,31 +49,31 @@ import {
   type TimePickerRangeValue,
   type TimePickerSize,
   type TimeFormat,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
 // Helper function to create SVG icon
 const createIcon = (path: string, className: string) => {
   return h(
-    "svg",
+    'svg',
     {
       class: className,
-      xmlns: "http://www.w3.org/2000/svg",
-      viewBox: "0 0 20 20",
-      fill: "currentColor",
+      xmlns: 'http://www.w3.org/2000/svg',
+      viewBox: icon20ViewBox,
+      fill: 'currentColor',
     },
     [
-      h("path", {
-        "fill-rule": "evenodd",
+      h('path', {
+        'fill-rule': 'evenodd',
         d: path,
-        "clip-rule": "evenodd",
+        'clip-rule': 'evenodd',
       }),
     ]
   );
 };
 
 // Icons
-const ClockIcon = createIcon(ClockIconPath, "w-5 h-5");
-const CloseIcon = createIcon(TimePickerCloseIconPath, "w-4 h-4");
+const ClockIcon = createIcon(ClockIconPath, 'w-5 h-5');
+const CloseIcon = createIcon(TimePickerCloseIconPath, 'w-4 h-4');
 
 export type VueTimePickerModelValue = TimePickerModelValue;
 
@@ -100,7 +101,7 @@ export interface VueTimePickerProps {
 }
 
 export const TimePicker = defineComponent({
-  name: "TigerTimePicker",
+  name: 'TigerTimePicker',
   inheritAttrs: false,
   props: {
     /**
@@ -134,7 +135,7 @@ export const TimePicker = defineComponent({
      */
     size: {
       type: String as PropType<TimePickerSize>,
-      default: "md" as TimePickerSize,
+      default: 'md' as TimePickerSize,
     },
     /**
      * Time format (12-hour or 24-hour)
@@ -142,7 +143,7 @@ export const TimePicker = defineComponent({
      */
     format: {
       type: String as PropType<TimeFormat>,
-      default: "24" as TimeFormat,
+      default: '24' as TimeFormat,
     },
     /**
      * Show seconds selector
@@ -182,7 +183,7 @@ export const TimePicker = defineComponent({
      */
     placeholder: {
       type: String,
-      default: "Select time",
+      default: 'Select time',
     },
     /**
      * Whether the time picker is disabled
@@ -257,16 +258,16 @@ export const TimePicker = defineComponent({
     /**
      * Emitted when time changes (for v-model)
      */
-    "update:modelValue": (value: TimePickerModelValue) =>
+    'update:modelValue': (value: TimePickerModelValue) =>
       value === null ||
-      typeof value === "string" ||
+      typeof value === 'string' ||
       (Array.isArray(value) && value.length === 2),
     /**
      * Emitted when time changes
      */
     change: (value: TimePickerModelValue) =>
       value === null ||
-      typeof value === "string" ||
+      typeof value === 'string' ||
       (Array.isArray(value) && value.length === 2),
     /**
      * Emitted when clear button is clicked
@@ -280,7 +281,7 @@ export const TimePicker = defineComponent({
     const inputRef = ref<HTMLInputElement | null>(null);
 
     const isRangeMode = computed(() => props.range === true);
-    const activePart = ref<"start" | "end">("start");
+    const activePart = ref<'start' | 'end'>('start');
 
     const normalizeRangeValue = (value: unknown): TimePickerRangeValue => {
       if (Array.isArray(value)) return [value[0] ?? null, value[1] ?? null];
@@ -294,14 +295,14 @@ export const TimePicker = defineComponent({
 
     const currentSingleValue = computed<string | null>(() => {
       if (isRangeMode.value) return null;
-      return typeof props.modelValue === "string" || props.modelValue === null
+      return typeof props.modelValue === 'string' || props.modelValue === null
         ? props.modelValue
         : null;
     });
 
     const activeValue = computed<string | null>(() => {
       if (!isRangeMode.value) return currentSingleValue.value;
-      return currentRangeValue.value[activePart.value === "start" ? 0 : 1];
+      return currentRangeValue.value[activePart.value === 'start' ? 0 : 1];
     });
 
     const parsedTime = computed(() => parseTime(activeValue.value));
@@ -310,7 +311,7 @@ export const TimePicker = defineComponent({
     const selectedHours = ref<number>(parsedTime.value?.hours ?? 0);
     const selectedMinutes = ref<number>(parsedTime.value?.minutes ?? 0);
     const selectedSeconds = ref<number>(parsedTime.value?.seconds ?? 0);
-    const selectedPeriod = ref<"AM" | "PM">("AM");
+    const selectedPeriod = ref<'AM' | 'PM'>('AM');
 
     const syncSelectionFromActiveValue = () => {
       const parsed = parseTime(activeValue.value);
@@ -320,7 +321,7 @@ export const TimePicker = defineComponent({
       selectedMinutes.value = parsed.minutes;
       selectedSeconds.value = parsed.seconds;
 
-      if (props.format === "12") {
+      if (props.format === '12') {
         const { period } = to12HourFormat(parsed.hours);
         selectedPeriod.value = period;
       }
@@ -350,7 +351,7 @@ export const TimePicker = defineComponent({
 
     const displayValue = computed(() => {
       if (!isRangeMode.value) {
-        if (!parsedTime.value) return "";
+        if (!parsedTime.value) return '';
         return formatTimeDisplayWithLocale(
           parsedTime.value.hours,
           parsedTime.value.minutes,
@@ -363,7 +364,7 @@ export const TimePicker = defineComponent({
 
       const toDisplay = (timeStr: string | null): string => {
         const parsed = parseTime(timeStr);
-        if (!parsed) return "";
+        if (!parsed) return '';
         return formatTimeDisplayWithLocale(
           parsed.hours,
           parsed.minutes,
@@ -376,7 +377,7 @@ export const TimePicker = defineComponent({
 
       const start = toDisplay(currentRangeValue.value[0]);
       const end = toDisplay(currentRangeValue.value[1]);
-      if (!start && !end) return "";
+      if (!start && !end) return '';
       return `${start} - ${end}`;
     });
 
@@ -403,7 +404,7 @@ export const TimePicker = defineComponent({
           selectedMinutes.value = parsedTime.value.minutes;
           selectedSeconds.value = parsedTime.value.seconds;
 
-          if (props.format === "12") {
+          if (props.format === '12') {
             const { period } = to12HourFormat(parsedTime.value.hours);
             selectedPeriod.value = period;
           }
@@ -417,8 +418,8 @@ export const TimePicker = defineComponent({
     }
 
     function focusOptionInUnit(
-      unit: "hour" | "minute" | "second" | "period",
-      action: "prev" | "next" | "first" | "last"
+      unit: 'hour' | 'minute' | 'second' | 'period',
+      action: 'prev' | 'next' | 'first' | 'last'
     ) {
       const panel = panelRef.value;
       if (!panel) return;
@@ -433,65 +434,65 @@ export const TimePicker = defineComponent({
       const active = document.activeElement as HTMLButtonElement | null;
       const activeIndex = active ? nodes.indexOf(active) : -1;
       const selectedIndex = nodes.findIndex(
-        (button) => button.getAttribute("aria-selected") === "true"
+        (button) => button.getAttribute('aria-selected') === 'true'
       );
       const baseIndex =
         activeIndex >= 0 ? activeIndex : Math.max(0, selectedIndex);
 
       let nextIndex = baseIndex;
-      if (action === "prev") nextIndex = Math.max(0, baseIndex - 1);
-      if (action === "next")
+      if (action === 'prev') nextIndex = Math.max(0, baseIndex - 1);
+      if (action === 'next')
         nextIndex = Math.min(nodes.length - 1, baseIndex + 1);
-      if (action === "first") nextIndex = 0;
-      if (action === "last") nextIndex = nodes.length - 1;
+      if (action === 'first') nextIndex = 0;
+      if (action === 'last') nextIndex = nodes.length - 1;
 
       nodes[nextIndex]?.focus();
     }
 
     function handlePanelKeydown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         event.preventDefault();
         closePanel();
         return;
       }
 
       const active = document.activeElement as HTMLElement | null;
-      const unit = active?.getAttribute("data-tiger-timepicker-unit") as
-        | "hour"
-        | "minute"
-        | "second"
-        | "period"
+      const unit = active?.getAttribute('data-tiger-timepicker-unit') as
+        | 'hour'
+        | 'minute'
+        | 'second'
+        | 'period'
         | null;
 
       if (!unit) return;
 
-      if (event.key === "ArrowUp") {
+      if (event.key === 'ArrowUp') {
         event.preventDefault();
-        focusOptionInUnit(unit, "prev");
+        focusOptionInUnit(unit, 'prev');
         return;
       }
 
-      if (event.key === "ArrowDown") {
+      if (event.key === 'ArrowDown') {
         event.preventDefault();
-        focusOptionInUnit(unit, "next");
+        focusOptionInUnit(unit, 'next');
         return;
       }
 
-      if (event.key === "Home") {
+      if (event.key === 'Home') {
         event.preventDefault();
-        focusOptionInUnit(unit, "first");
+        focusOptionInUnit(unit, 'first');
         return;
       }
 
-      if (event.key === "End") {
+      if (event.key === 'End') {
         event.preventDefault();
-        focusOptionInUnit(unit, "last");
+        focusOptionInUnit(unit, 'last');
         return;
       }
 
-      if (event.key === "Enter" || event.key === " ") {
+      if (event.key === 'Enter' || event.key === ' ') {
         const el = document.activeElement as HTMLButtonElement | null;
-        if (el && el.tagName === "BUTTON" && !el.disabled) {
+        if (el && el.tagName === 'BUTTON' && !el.disabled) {
           event.preventDefault();
           el.click();
         }
@@ -499,7 +500,7 @@ export const TimePicker = defineComponent({
     }
 
     function selectHour(hour: number) {
-      if (props.format === "12") {
+      if (props.format === '12') {
         selectedHours.value = to24HourFormat(hour, selectedPeriod.value);
       } else {
         selectedHours.value = hour;
@@ -517,7 +518,7 @@ export const TimePicker = defineComponent({
       updateTime();
     }
 
-    function selectPeriod(period: "AM" | "PM") {
+    function selectPeriod(period: 'AM' | 'PM') {
       selectedPeriod.value = period;
       // Convert current hour to 12-hour format, then back to 24-hour with new period
       const { hours: hours12 } = to12HourFormat(selectedHours.value);
@@ -545,15 +546,15 @@ export const TimePicker = defineComponent({
       );
 
       if (!isRangeMode.value) {
-        emit("update:modelValue", timeString);
-        emit("change", timeString);
+        emit('update:modelValue', timeString);
+        emit('change', timeString);
         return;
       }
 
       const nextRange: [string | null, string | null] = [
         ...currentRangeValue.value,
       ];
-      const index = activePart.value === "start" ? 0 : 1;
+      const index = activePart.value === 'start' ? 0 : 1;
 
       const parsedStart = parseTime(currentRangeValue.value[0]);
       const parsedEnd = parseTime(currentRangeValue.value[1]);
@@ -572,7 +573,7 @@ export const TimePicker = defineComponent({
 
       // Keep range ordered: end should never be earlier than start.
       // If user selects an out-of-order time, clamp the opposite side to match.
-      if (activePart.value === "end" && parsedStart && startSeconds !== null) {
+      if (activePart.value === 'end' && parsedStart && startSeconds !== null) {
         if (candidateSeconds < startSeconds) {
           timeString = formatTime(
             parsedStart.hours,
@@ -584,7 +585,7 @@ export const TimePicker = defineComponent({
           selectedMinutes.value = parsedStart.minutes;
           selectedSeconds.value = parsedStart.seconds;
 
-          if (props.format === "12") {
+          if (props.format === '12') {
             const { period } = to12HourFormat(parsedStart.hours);
             selectedPeriod.value = period;
           }
@@ -594,17 +595,17 @@ export const TimePicker = defineComponent({
       nextRange[index] = timeString;
 
       if (
-        activePart.value === "start" &&
+        activePart.value === 'start' &&
         endSeconds !== null &&
         candidateSeconds > endSeconds
       ) {
         nextRange[1] = timeString;
       }
-      emit("update:modelValue", nextRange);
-      emit("change", nextRange);
+      emit('update:modelValue', nextRange);
+      emit('change', nextRange);
 
-      if (activePart.value === "start" && nextRange[1] === null) {
-        activePart.value = "end";
+      if (activePart.value === 'start' && nextRange[1] === null) {
+        activePart.value = 'end';
       }
     }
 
@@ -612,16 +613,16 @@ export const TimePicker = defineComponent({
       event.stopPropagation();
 
       if (!isRangeMode.value) {
-        emit("update:modelValue", null);
-        emit("change", null);
-        emit("clear");
+        emit('update:modelValue', null);
+        emit('change', null);
+        emit('clear');
         return;
       }
 
       const cleared: [string | null, string | null] = [null, null];
-      emit("update:modelValue", cleared);
-      emit("change", cleared);
-      emit("clear");
+      emit('update:modelValue', cleared);
+      emit('change', cleared);
+      emit('clear');
     }
 
     function setNow() {
@@ -632,7 +633,7 @@ export const TimePicker = defineComponent({
         selectedMinutes.value = parsed.minutes;
         selectedSeconds.value = parsed.seconds;
 
-        if (props.format === "12") {
+        if (props.format === '12') {
           const { period } = to12HourFormat(parsed.hours);
           selectedPeriod.value = period;
         }
@@ -643,7 +644,7 @@ export const TimePicker = defineComponent({
 
     function isHourDisabled(hour: number): boolean {
       const hours24 =
-        props.format === "12"
+        props.format === '12'
           ? to24HourFormat(hour, selectedPeriod.value)
           : hour;
       return !isTimeInRange(
@@ -680,7 +681,7 @@ export const TimePicker = defineComponent({
 
     watch(isOpen, async (newValue) => {
       if (newValue) {
-        document.addEventListener("click", handleClickOutside);
+        document.addEventListener('click', handleClickOutside);
 
         await nextTick();
         const panel = panelRef.value;
@@ -701,18 +702,18 @@ export const TimePicker = defineComponent({
 
         firstHour?.focus();
       } else {
-        document.removeEventListener("click", handleClickOutside);
+        document.removeEventListener('click', handleClickOutside);
       }
     });
 
     onMounted(() => {
       if (isOpen.value) {
-        document.addEventListener("click", handleClickOutside);
+        document.addEventListener('click', handleClickOutside);
       }
     });
 
     onBeforeUnmount(() => {
-      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener('click', handleClickOutside);
     });
 
     return () => {
@@ -723,21 +724,21 @@ export const TimePicker = defineComponent({
       const iconButtonClasses = getTimePickerIconButtonClasses(props.size);
 
       return h(
-        "div",
+        'div',
         { ...attrs, class: rootClasses.value, style: rootStyle.value },
         [
           // Input wrapper
           h(
-            "div",
+            'div',
             {
               ref: inputWrapperRef,
               class: timePickerInputWrapperClasses,
             },
             [
               // Input field for time display
-              h("input", {
+              h('input', {
                 ref: inputRef,
-                type: "text",
+                type: 'text',
                 class: inputClasses,
                 value: displayValue.value,
                 placeholder: props.placeholder,
@@ -747,29 +748,29 @@ export const TimePicker = defineComponent({
                 name: props.name,
                 id: props.id,
                 onClick: handleInputClick,
-                "aria-label": props.placeholder || labels.value.selectTime,
+                'aria-label': props.placeholder || labels.value.selectTime,
               }),
               // Clear button
               showClearButton.value &&
                 h(
-                  "button",
+                  'button',
                   {
-                    type: "button",
+                    type: 'button',
                     class: timePickerClearButtonClasses,
                     onClick: clearTime,
-                    "aria-label": labels.value.clear,
+                    'aria-label': labels.value.clear,
                   },
                   CloseIcon
                 ),
               // Clock icon button
               h(
-                "button",
+                'button',
                 {
-                  type: "button",
+                  type: 'button',
                   class: iconButtonClasses,
                   disabled: props.disabled || props.readonly,
                   onClick: togglePanel,
-                  "aria-label": labels.value.toggle,
+                  'aria-label': labels.value.toggle,
                 },
                 ClockIcon
               ),
@@ -778,196 +779,196 @@ export const TimePicker = defineComponent({
           // Time picker panel
           isOpen.value &&
             h(
-              "div",
+              'div',
               {
                 ref: panelRef,
                 class: timePickerPanelClasses,
-                role: "dialog",
-                "aria-label": labels.value.dialog,
+                role: 'dialog',
+                'aria-label': labels.value.dialog,
                 onKeydown: handlePanelKeydown,
               },
               [
                 // Range header
                 isRangeMode.value &&
-                  h("div", { class: timePickerRangeHeaderClasses }, [
+                  h('div', { class: timePickerRangeHeaderClasses }, [
                     h(
-                      "button",
+                      'button',
                       {
-                        type: "button",
+                        type: 'button',
                         class: getTimePickerRangeTabButtonClasses(
-                          activePart.value === "start"
+                          activePart.value === 'start'
                         ),
-                        onClick: () => (activePart.value = "start"),
-                        "aria-label": labels.value.start,
-                        "aria-selected": activePart.value === "start",
+                        onClick: () => (activePart.value = 'start'),
+                        'aria-label': labels.value.start,
+                        'aria-selected': activePart.value === 'start',
                       },
                       labels.value.start
                     ),
                     h(
-                      "button",
+                      'button',
                       {
-                        type: "button",
+                        type: 'button',
                         class: getTimePickerRangeTabButtonClasses(
-                          activePart.value === "end"
+                          activePart.value === 'end'
                         ),
-                        onClick: () => (activePart.value = "end"),
-                        "aria-label": labels.value.end,
-                        "aria-selected": activePart.value === "end",
+                        onClick: () => (activePart.value = 'end'),
+                        'aria-label': labels.value.end,
+                        'aria-selected': activePart.value === 'end',
                       },
                       labels.value.end
                     ),
                   ]),
 
                 // Columns container
-                h("div", { class: timePickerPanelContentClasses }, [
+                h('div', { class: timePickerPanelContentClasses }, [
                   // Hours column
-                  h("div", { class: timePickerColumnClasses }, [
+                  h('div', { class: timePickerColumnClasses }, [
                     h(
-                      "div",
+                      'div',
                       { class: timePickerColumnHeaderClasses },
                       labels.value.hour
                     ),
                     h(
-                      "div",
+                      'div',
                       { class: timePickerColumnListClasses },
                       hoursList.value.map((hour) => {
-                        const displayHour = props.format === "12" ? hour : hour;
+                        const displayHour = props.format === '12' ? hour : hour;
                         const hours24 =
-                          props.format === "12"
+                          props.format === '12'
                             ? to24HourFormat(hour, selectedPeriod.value)
                             : hour;
                         const isSelected = selectedHours.value === hours24;
                         const isDisabled = isHourDisabled(hour);
 
                         return h(
-                          "button",
+                          'button',
                           {
                             key: hour,
-                            type: "button",
+                            type: 'button',
                             class: getTimePickerItemClasses(
                               isSelected,
                               isDisabled
                             ),
                             disabled: isDisabled,
                             onClick: () => selectHour(hour),
-                            "data-tiger-timepicker-unit": "hour",
-                            "aria-label": getTimePickerOptionAriaLabel(
+                            'data-tiger-timepicker-unit': 'hour',
+                            'aria-label': getTimePickerOptionAriaLabel(
                               displayHour,
-                              "hour",
+                              'hour',
                               props.locale
                             ),
-                            "aria-selected": isSelected,
+                            'aria-selected': isSelected,
                           },
-                          displayHour.toString().padStart(2, "0")
+                          displayHour.toString().padStart(2, '0')
                         );
                       })
                     ),
                   ]),
                   // Minutes column
-                  h("div", { class: timePickerColumnClasses }, [
+                  h('div', { class: timePickerColumnClasses }, [
                     h(
-                      "div",
+                      'div',
                       { class: timePickerColumnHeaderClasses },
                       labels.value.minute
                     ),
                     h(
-                      "div",
+                      'div',
                       { class: timePickerColumnListClasses },
                       minutesList.value.map((minute) => {
                         const isSelected = selectedMinutes.value === minute;
                         const isDisabled = isMinuteDisabled(minute);
 
                         return h(
-                          "button",
+                          'button',
                           {
                             key: minute,
-                            type: "button",
+                            type: 'button',
                             class: getTimePickerItemClasses(
                               isSelected,
                               isDisabled
                             ),
                             disabled: isDisabled,
                             onClick: () => selectMinute(minute),
-                            "data-tiger-timepicker-unit": "minute",
-                            "aria-label": getTimePickerOptionAriaLabel(
+                            'data-tiger-timepicker-unit': 'minute',
+                            'aria-label': getTimePickerOptionAriaLabel(
                               minute,
-                              "minute",
+                              'minute',
                               props.locale
                             ),
-                            "aria-selected": isSelected,
+                            'aria-selected': isSelected,
                           },
-                          minute.toString().padStart(2, "0")
+                          minute.toString().padStart(2, '0')
                         );
                       })
                     ),
                   ]),
                   // Seconds column (if enabled)
                   props.showSeconds &&
-                    h("div", { class: timePickerColumnClasses }, [
+                    h('div', { class: timePickerColumnClasses }, [
                       h(
-                        "div",
+                        'div',
                         { class: timePickerColumnHeaderClasses },
                         labels.value.second
                       ),
                       h(
-                        "div",
+                        'div',
                         { class: timePickerColumnListClasses },
                         secondsList.value.map((second) => {
                           const isSelected = selectedSeconds.value === second;
 
                           return h(
-                            "button",
+                            'button',
                             {
                               key: second,
-                              type: "button",
+                              type: 'button',
                               class: getTimePickerItemClasses(
                                 isSelected,
                                 false
                               ),
                               onClick: () => selectSecond(second),
-                              "data-tiger-timepicker-unit": "second",
-                              "aria-label": getTimePickerOptionAriaLabel(
+                              'data-tiger-timepicker-unit': 'second',
+                              'aria-label': getTimePickerOptionAriaLabel(
                                 second,
-                                "second",
+                                'second',
                                 props.locale
                               ),
-                              "aria-selected": isSelected,
+                              'aria-selected': isSelected,
                             },
-                            second.toString().padStart(2, "0")
+                            second.toString().padStart(2, '0')
                           );
                         })
                       ),
                     ]),
                   // AM/PM column (if 12-hour format)
-                  props.format === "12" &&
-                    h("div", { class: timePickerColumnClasses }, [
-                      h("div", { class: timePickerColumnHeaderClasses }, " "),
-                      h("div", { class: "flex flex-col" }, [
+                  props.format === '12' &&
+                    h('div', { class: timePickerColumnClasses }, [
+                      h('div', { class: timePickerColumnHeaderClasses }, ' '),
+                      h('div', { class: 'flex flex-col' }, [
                         h(
-                          "button",
+                          'button',
                           {
-                            type: "button",
+                            type: 'button',
                             class: getTimePickerPeriodButtonClasses(
-                              selectedPeriod.value === "AM"
+                              selectedPeriod.value === 'AM'
                             ),
-                            onClick: () => selectPeriod("AM"),
-                            "data-tiger-timepicker-unit": "period",
-                            "aria-label": periodLabels.value.am,
-                            "aria-selected": selectedPeriod.value === "AM",
+                            onClick: () => selectPeriod('AM'),
+                            'data-tiger-timepicker-unit': 'period',
+                            'aria-label': periodLabels.value.am,
+                            'aria-selected': selectedPeriod.value === 'AM',
                           },
                           periodLabels.value.am
                         ),
                         h(
-                          "button",
+                          'button',
                           {
-                            type: "button",
+                            type: 'button',
                             class: getTimePickerPeriodButtonClasses(
-                              selectedPeriod.value === "PM"
+                              selectedPeriod.value === 'PM'
                             ),
-                            onClick: () => selectPeriod("PM"),
-                            "data-tiger-timepicker-unit": "period",
-                            "aria-label": periodLabels.value.pm,
-                            "aria-selected": selectedPeriod.value === "PM",
+                            onClick: () => selectPeriod('PM'),
+                            'data-tiger-timepicker-unit': 'period',
+                            'aria-label': periodLabels.value.pm,
+                            'aria-selected': selectedPeriod.value === 'PM',
                           },
                           periodLabels.value.pm
                         ),
@@ -975,20 +976,20 @@ export const TimePicker = defineComponent({
                     ]),
                 ]),
                 // Footer
-                h("div", { class: timePickerFooterClasses }, [
+                h('div', { class: timePickerFooterClasses }, [
                   h(
-                    "button",
+                    'button',
                     {
-                      type: "button",
+                      type: 'button',
                       class: timePickerFooterButtonClasses,
                       onClick: setNow,
                     },
                     labels.value.now
                   ),
                   h(
-                    "button",
+                    'button',
                     {
-                      type: "button",
+                      type: 'button',
                       class: timePickerFooterButtonClasses,
                       onClick: closePanel,
                     },

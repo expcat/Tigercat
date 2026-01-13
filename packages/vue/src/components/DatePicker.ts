@@ -7,11 +7,12 @@ import {
   PropType,
   watch,
   onBeforeUnmount,
-} from "vue";
+} from 'vue';
 import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
+  icon20ViewBox,
   parseDate,
   formatDate,
   formatMonthYear,
@@ -44,33 +45,33 @@ import {
   type DateFormat,
   type DatePickerModelValue,
   type DatePickerLabels,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
 // Helper function to create SVG icon
 const createIcon = (path: string, className: string) => {
   return h(
-    "svg",
+    'svg',
     {
       class: className,
-      xmlns: "http://www.w3.org/2000/svg",
-      viewBox: "0 0 20 20",
-      fill: "currentColor",
+      xmlns: 'http://www.w3.org/2000/svg',
+      viewBox: icon20ViewBox,
+      fill: 'currentColor',
     },
     [
-      h("path", {
-        "fill-rule": "evenodd",
+      h('path', {
+        'fill-rule': 'evenodd',
         d: path,
-        "clip-rule": "evenodd",
+        'clip-rule': 'evenodd',
       }),
     ]
   );
 };
 
 // Icons
-const CalendarIcon = createIcon(CalendarIconPath, "w-5 h-5");
-const CloseIcon = createIcon(CloseIconPath, "w-4 h-4");
-const ChevronLeftIcon = createIcon(ChevronLeftIconPath, "w-5 h-5");
-const ChevronRightIcon = createIcon(ChevronRightIconPath, "w-5 h-5");
+const CalendarIcon = createIcon(CalendarIconPath, 'w-5 h-5');
+const CloseIcon = createIcon(CloseIconPath, 'w-4 h-4');
+const ChevronLeftIcon = createIcon(ChevronLeftIconPath, 'w-5 h-5');
+const ChevronRightIcon = createIcon(ChevronRightIconPath, 'w-5 h-5');
 
 export type VueDatePickerModelValue = DatePickerModelValue;
 
@@ -95,7 +96,7 @@ export interface VueDatePickerProps {
 }
 
 const isDateLike = (value: unknown): boolean =>
-  value === null || value instanceof Date || typeof value === "string";
+  value === null || value instanceof Date || typeof value === 'string';
 
 const isModelValue = (value: unknown): boolean => {
   if (isDateLike(value)) return true;
@@ -106,7 +107,7 @@ const isModelValue = (value: unknown): boolean => {
 };
 
 export const DatePicker = defineComponent({
-  name: "TigerDatePicker",
+  name: 'TigerDatePicker',
   inheritAttrs: false,
   props: {
     /**
@@ -147,7 +148,7 @@ export const DatePicker = defineComponent({
      */
     size: {
       type: String as PropType<DatePickerSize>,
-      default: "md" as DatePickerSize,
+      default: 'md' as DatePickerSize,
     },
     /**
      * Date format string
@@ -155,7 +156,7 @@ export const DatePicker = defineComponent({
      */
     format: {
       type: String as PropType<DateFormat>,
-      default: "yyyy-MM-dd" as DateFormat,
+      default: 'yyyy-MM-dd' as DateFormat,
     },
     /**
      * Placeholder text
@@ -228,7 +229,7 @@ export const DatePicker = defineComponent({
      */
     className: {
       type: String,
-      default: "",
+      default: '',
     },
 
     /**
@@ -243,7 +244,7 @@ export const DatePicker = defineComponent({
     /**
      * Emitted when date changes (for v-model)
      */
-    "update:modelValue": (value: unknown) => {
+    'update:modelValue': (value: unknown) => {
       return isModelValue(value);
     },
     /**
@@ -299,21 +300,21 @@ export const DatePicker = defineComponent({
       if (!isRangeMode.value) {
         return selectedDate.value
           ? formatDate(selectedDate.value, props.format)
-          : "";
+          : '';
       }
 
       const [start, end] = selectedRange.value;
-      const startText = start ? formatDate(start, props.format) : "";
-      const endText = end ? formatDate(end, props.format) : "";
+      const startText = start ? formatDate(start, props.format) : '';
+      const endText = end ? formatDate(end, props.format) : '';
 
-      if (!startText && !endText) return "";
+      if (!startText && !endText) return '';
       if (startText && endText) return `${startText} - ${endText}`;
       return startText ? `${startText} - ` : ` - ${endText}`;
     });
 
     const placeholderText = computed(
       () =>
-        props.placeholder ?? (props.range ? "Select date range" : "Select date")
+        props.placeholder ?? (props.range ? 'Select date range' : 'Select date')
     );
 
     const showClearButton = computed(() => {
@@ -353,7 +354,7 @@ export const DatePicker = defineComponent({
     const getFirstEnabledIsoInView = (): string | null => {
       for (const date of calendarDays.value) {
         if (!date) continue;
-        const iso = formatDate(date, "yyyy-MM-dd");
+        const iso = formatDate(date, 'yyyy-MM-dd');
         if (!isDateDisabled(date)) return iso;
       }
       return null;
@@ -364,11 +365,11 @@ export const DatePicker = defineComponent({
         ? selectedRange.value[0] ?? selectedRange.value[1]
         : selectedDate.value;
 
-      if (focusDate) return formatDate(focusDate, "yyyy-MM-dd");
+      if (focusDate) return formatDate(focusDate, 'yyyy-MM-dd');
 
       const today = normalizeDate(new Date());
       if (isDateInRange(today, minDateParsed.value, maxDateParsed.value)) {
-        return formatDate(today, "yyyy-MM-dd");
+        return formatDate(today, 'yyyy-MM-dd');
       }
 
       return getFirstEnabledIsoInView();
@@ -377,7 +378,7 @@ export const DatePicker = defineComponent({
     const restoreFocus = () => {
       const target = restoreFocusEl.value ?? inputRef.value;
       if (!target) return;
-      if (typeof (target as HTMLElement).focus === "function") {
+      if (typeof (target as HTMLElement).focus === 'function') {
         (target as HTMLElement).focus();
       }
     };
@@ -385,7 +386,7 @@ export const DatePicker = defineComponent({
     const moveFocus = async (deltaDays: number) => {
       const activeEl = document.activeElement as HTMLElement | null;
       const currentIso =
-        activeEl?.getAttribute("data-date") ?? activeDateIso.value ?? null;
+        activeEl?.getAttribute('data-date') ?? activeDateIso.value ?? null;
 
       const baseIso = currentIso ?? getPreferredFocusIso();
       if (!baseIso) return;
@@ -395,7 +396,7 @@ export const DatePicker = defineComponent({
 
       let candidate = addDays(baseDate, deltaDays);
       for (let attempts = 0; attempts < 42; attempts++) {
-        const iso = formatDate(candidate, "yyyy-MM-dd");
+        const iso = formatDate(candidate, 'yyyy-MM-dd');
         const el = calendarRef.value?.querySelector(
           `button[data-date="${iso}"]`
         ) as HTMLButtonElement | null;
@@ -430,35 +431,35 @@ export const DatePicker = defineComponent({
       if (!isOpen.value) return;
 
       switch (event.key) {
-        case "Escape": {
+        case 'Escape': {
           event.preventDefault();
           closeCalendar();
           return;
         }
-        case "ArrowRight": {
+        case 'ArrowRight': {
           event.preventDefault();
           await moveFocus(1);
           return;
         }
-        case "ArrowLeft": {
+        case 'ArrowLeft': {
           event.preventDefault();
           await moveFocus(-1);
           return;
         }
-        case "ArrowDown": {
+        case 'ArrowDown': {
           event.preventDefault();
           await moveFocus(7);
           return;
         }
-        case "ArrowUp": {
+        case 'ArrowUp': {
           event.preventDefault();
           await moveFocus(-7);
           return;
         }
-        case "Enter":
-        case " ": {
+        case 'Enter':
+        case ' ': {
           const activeEl = document.activeElement as HTMLButtonElement | null;
-          if (activeEl?.tagName === "BUTTON" && activeEl.dataset.date) {
+          if (activeEl?.tagName === 'BUTTON' && activeEl.dataset.date) {
             event.preventDefault();
             if (!activeEl.disabled) activeEl.click();
           }
@@ -507,8 +508,8 @@ export const DatePicker = defineComponent({
       }
 
       if (!isRangeMode.value) {
-        emit("update:modelValue", normalizedDate);
-        emit("change", normalizedDate);
+        emit('update:modelValue', normalizedDate);
+        emit('change', normalizedDate);
         closeCalendar();
         return;
       }
@@ -516,18 +517,18 @@ export const DatePicker = defineComponent({
       const [start, end] = selectedRange.value;
 
       if (!start || (start && end)) {
-        emit("update:modelValue", [normalizedDate, null]);
-        emit("change", [normalizedDate, null]);
+        emit('update:modelValue', [normalizedDate, null]);
+        emit('change', [normalizedDate, null]);
         return;
       }
 
       if (normalizedDate < start) {
         // Range rule (same as TimePicker): end cannot be earlier than start
-        emit("update:modelValue", [start, start]);
-        emit("change", [start, start]);
+        emit('update:modelValue', [start, start]);
+        emit('change', [start, start]);
       } else {
-        emit("update:modelValue", [start, normalizedDate]);
-        emit("change", [start, normalizedDate]);
+        emit('update:modelValue', [start, normalizedDate]);
+        emit('change', [start, normalizedDate]);
       }
     }
 
@@ -535,14 +536,14 @@ export const DatePicker = defineComponent({
       event.stopPropagation();
 
       if (!isRangeMode.value) {
-        emit("update:modelValue", null);
-        emit("change", null);
+        emit('update:modelValue', null);
+        emit('change', null);
       } else {
-        emit("update:modelValue", [null, null]);
-        emit("change", [null, null]);
+        emit('update:modelValue', [null, null]);
+        emit('change', [null, null]);
       }
 
-      emit("clear");
+      emit('clear');
     }
 
     function previousMonth() {
@@ -591,7 +592,7 @@ export const DatePicker = defineComponent({
 
     watch(isOpen, (newValue) => {
       if (newValue) {
-        document.addEventListener("click", handleClickOutside);
+        document.addEventListener('click', handleClickOutside);
 
         restoreFocusEl.value =
           restoreFocusEl.value ??
@@ -607,7 +608,7 @@ export const DatePicker = defineComponent({
           if (fallback) focusDateButtonByIso(fallback);
         });
       } else {
-        document.removeEventListener("click", handleClickOutside);
+        document.removeEventListener('click', handleClickOutside);
         nextTick().then(() => {
           restoreFocus();
         });
@@ -615,7 +616,7 @@ export const DatePicker = defineComponent({
     });
 
     onBeforeUnmount(() => {
-      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener('click', handleClickOutside);
     });
 
     const rootClass = computed(() =>
@@ -647,7 +648,7 @@ export const DatePicker = defineComponent({
       const iconButtonClasses = getDatePickerIconButtonClasses(props.size);
 
       return h(
-        "div",
+        'div',
         {
           ...forwardedAttrs.value,
           class: rootClass.value,
@@ -656,16 +657,16 @@ export const DatePicker = defineComponent({
         [
           // Input wrapper
           h(
-            "div",
+            'div',
             {
               ref: inputWrapperRef,
               class: datePickerInputWrapperClasses,
             },
             [
               // Input field for date display
-              h("input", {
+              h('input', {
                 ref: inputRef,
-                type: "text",
+                type: 'text',
                 class: inputClasses,
                 value: displayValue.value,
                 placeholder: placeholderText.value,
@@ -675,29 +676,29 @@ export const DatePicker = defineComponent({
                 name: props.name,
                 id: props.id,
                 onClick: handleInputClick,
-                "aria-label": placeholderText.value,
+                'aria-label': placeholderText.value,
               }),
               // Clear button
               showClearButton.value &&
                 h(
-                  "button",
+                  'button',
                   {
-                    type: "button",
+                    type: 'button',
                     class: datePickerClearButtonClasses,
                     onClick: clearDate,
-                    "aria-label": labels.value.clearDate,
+                    'aria-label': labels.value.clearDate,
                   },
                   CloseIcon
                 ),
               // Calendar icon button
               h(
-                "button",
+                'button',
                 {
-                  type: "button",
+                  type: 'button',
                   class: iconButtonClasses,
                   disabled: props.disabled || props.readonly,
                   onClick: toggleCalendar,
-                  "aria-label": labels.value.toggleCalendar,
+                  'aria-label': labels.value.toggleCalendar,
                 },
                 CalendarIcon
               ),
@@ -706,30 +707,30 @@ export const DatePicker = defineComponent({
           // Calendar dropdown
           isOpen.value &&
             h(
-              "div",
+              'div',
               {
                 ref: calendarRef,
                 class: datePickerCalendarClasses,
-                role: "dialog",
-                "aria-modal": "true",
-                "aria-label": labels.value.calendar,
+                role: 'dialog',
+                'aria-modal': 'true',
+                'aria-label': labels.value.calendar,
                 onKeydown: handleCalendarKeyDown,
               },
               [
                 // Calendar header
-                h("div", { class: datePickerCalendarHeaderClasses }, [
+                h('div', { class: datePickerCalendarHeaderClasses }, [
                   h(
-                    "button",
+                    'button',
                     {
-                      type: "button",
+                      type: 'button',
                       class: datePickerNavButtonClasses,
                       onClick: previousMonth,
-                      "aria-label": labels.value.previousMonth,
+                      'aria-label': labels.value.previousMonth,
                     },
                     ChevronLeftIcon
                   ),
                   h(
-                    "div",
+                    'div',
                     { class: datePickerMonthYearClasses },
                     formatMonthYear(
                       viewingYear.value,
@@ -738,28 +739,28 @@ export const DatePicker = defineComponent({
                     )
                   ),
                   h(
-                    "button",
+                    'button',
                     {
-                      type: "button",
+                      type: 'button',
                       class: datePickerNavButtonClasses,
                       onClick: nextMonth,
-                      "aria-label": labels.value.nextMonth,
+                      'aria-label': labels.value.nextMonth,
                     },
                     ChevronRightIcon
                   ),
                 ]),
                 // Day names header
                 h(
-                  "div",
-                  { class: datePickerCalendarGridClasses, role: "row" },
+                  'div',
+                  { class: datePickerCalendarGridClasses, role: 'row' },
                   [
                     ...dayNames.value.map((day) =>
                       h(
-                        "div",
+                        'div',
                         {
                           class: datePickerDayNameClasses,
                           key: day,
-                          role: "columnheader",
+                          role: 'columnheader',
                         },
                         day
                       )
@@ -768,12 +769,12 @@ export const DatePicker = defineComponent({
                 ),
                 // Calendar grid
                 h(
-                  "div",
+                  'div',
                   {
                     class: datePickerCalendarGridClasses,
-                    role: "grid",
-                    "aria-rowcount": 6,
-                    "aria-colcount": 7,
+                    role: 'grid',
+                    'aria-rowcount': 6,
+                    'aria-colcount': 7,
                   },
                   [
                     ...calendarDays.value.map((date, index) => {
@@ -814,13 +815,13 @@ export const DatePicker = defineComponent({
                       const isDisabled =
                         isDateDisabled(date) || Boolean(isBeforeRangeStart);
 
-                      const iso = formatDate(date, "yyyy-MM-dd");
+                      const iso = formatDate(date, 'yyyy-MM-dd');
 
                       return h(
-                        "button",
+                        'button',
                         {
                           key: index,
-                          type: "button",
+                          type: 'button',
                           class: getDatePickerDayCellClasses(
                             isCurrentMonthDay,
                             isSelected,
@@ -832,16 +833,16 @@ export const DatePicker = defineComponent({
                           ),
                           disabled: isDisabled,
                           onClick: () => selectDate(date),
-                          role: "gridcell",
-                          "data-date": iso,
+                          role: 'gridcell',
+                          'data-date': iso,
                           onFocus: () => {
                             activeDateIso.value = iso;
                           },
                           tabindex:
                             activeDateIso.value === iso && !isDisabled ? 0 : -1,
-                          "aria-label": iso,
-                          "aria-selected": isSelected,
-                          "aria-current": isTodayDay ? "date" : undefined,
+                          'aria-label': iso,
+                          'aria-selected': isSelected,
+                          'aria-current': isTodayDay ? 'date' : undefined,
                         },
                         date.getDate()
                       );
@@ -851,20 +852,20 @@ export const DatePicker = defineComponent({
 
                 // Footer (range mode only)
                 isRangeMode.value
-                  ? h("div", { class: datePickerFooterClasses }, [
+                  ? h('div', { class: datePickerFooterClasses }, [
                       h(
-                        "button",
+                        'button',
                         {
-                          type: "button",
+                          type: 'button',
                           class: datePickerFooterButtonClasses,
                           onClick: setToday,
                         },
                         labels.value.today
                       ),
                       h(
-                        "button",
+                        'button',
                         {
-                          type: "button",
+                          type: 'button',
                           class: datePickerFooterButtonClasses,
                           onClick: closeCalendar,
                         },
