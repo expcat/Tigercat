@@ -1,33 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   classNames,
+  getLoadingBarClasses,
+  getLoadingBarsWrapperClasses,
   getLoadingClasses,
+  getLoadingDotClasses,
+  getLoadingDotsWrapperClasses,
+  getLoadingTextClasses,
   getSpinnerSVG,
-  dotsVariantConfig,
-  barsVariantConfig,
-  animationDelayClasses,
   loadingContainerBaseClasses,
   loadingFullscreenBaseClasses,
-  loadingTextSizeClasses,
   loadingColorClasses,
   injectLoadingAnimationStyles,
   type LoadingProps as CoreLoadingProps,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
 export interface LoadingProps
   extends CoreLoadingProps,
     Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreLoadingProps> {}
 
 export const Loading: React.FC<LoadingProps> = ({
-  variant = "spinner",
-  size = "md",
-  color = "primary",
+  variant = 'spinner',
+  size = 'md',
+  color = 'primary',
   text,
   fullscreen = false,
   delay = 0,
-  background = "rgba(255, 255, 255, 0.9)",
+  background = 'rgba(255, 255, 255, 0.9)',
   customColor,
-  className = "",
+  className = '',
   style,
   ...props
 }) => {
@@ -49,11 +50,7 @@ export const Loading: React.FC<LoadingProps> = ({
   }, [delay]);
 
   const spinnerClasses = getLoadingClasses(variant, size, color, customColor);
-  const textClasses = classNames(
-    loadingTextSizeClasses[size],
-    customColor ? "" : loadingColorClasses[color],
-    "font-medium"
-  );
+  const textClasses = getLoadingTextClasses(size, color, customColor);
 
   const containerClasses = classNames(
     fullscreen ? loadingFullscreenBaseClasses : loadingContainerBaseClasses,
@@ -75,12 +72,11 @@ export const Loading: React.FC<LoadingProps> = ({
         className={spinnerClasses}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
-        viewBox={svg.viewBox}
-      >
+        viewBox={svg.viewBox}>
         {svg.elements.map((el, index) => {
-          if (el.type === "circle") {
+          if (el.type === 'circle') {
             return <circle key={index} {...el.attrs} />;
-          } else if (el.type === "path") {
+          } else if (el.type === 'path') {
             return <path key={index} {...el.attrs} />;
           }
           return null;
@@ -91,23 +87,13 @@ export const Loading: React.FC<LoadingProps> = ({
 
   // Render dots variant
   const renderDots = () => {
-    const config = dotsVariantConfig[size];
-    const colorClass = customColor ? "" : loadingColorClasses[color];
+    const colorClass = customColor ? '' : loadingColorClasses[color];
+    const steps = [0, 1, 2] as const;
 
     return (
-      <div className={classNames("flex items-center", config.gap)}>
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className={classNames(
-              config.dotSize,
-              "rounded-full",
-              "bg-current",
-              colorClass,
-              "animate-bounce-dot",
-              animationDelayClasses[i]
-            )}
-          />
+      <div className={getLoadingDotsWrapperClasses(size)}>
+        {steps.map((i) => (
+          <div key={i} className={getLoadingDotClasses(size, i, colorClass)} />
         ))}
       </div>
     );
@@ -115,24 +101,13 @@ export const Loading: React.FC<LoadingProps> = ({
 
   // Render bars variant
   const renderBars = () => {
-    const config = barsVariantConfig[size];
-    const colorClass = customColor ? "" : loadingColorClasses[color];
+    const colorClass = customColor ? '' : loadingColorClasses[color];
+    const steps = [0, 1, 2] as const;
 
     return (
-      <div className={classNames("flex items-end", config.gap)}>
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className={classNames(
-              config.barWidth,
-              config.barHeight,
-              "rounded-sm",
-              "bg-current",
-              colorClass,
-              "animate-scale-bar",
-              animationDelayClasses[i]
-            )}
-          />
+      <div className={getLoadingBarsWrapperClasses(size)}>
+        {steps.map((i) => (
+          <div key={i} className={getLoadingBarClasses(size, i, colorClass)} />
         ))}
       </div>
     );
@@ -141,13 +116,13 @@ export const Loading: React.FC<LoadingProps> = ({
   // Render loading indicator based on variant
   const renderIndicator = () => {
     switch (variant) {
-      case "dots":
+      case 'dots':
         return renderDots();
-      case "bars":
+      case 'bars':
         return renderBars();
-      case "spinner":
-      case "ring":
-      case "pulse":
+      case 'spinner':
+      case 'ring':
+      case 'pulse':
       default:
         return renderSpinner();
     }
@@ -162,11 +137,10 @@ export const Loading: React.FC<LoadingProps> = ({
       className={containerClasses}
       style={mergedStyle}
       role="status"
-      aria-label={text || "Loading"}
+      aria-label={text || 'Loading'}
       aria-live="polite"
       aria-busy={true}
-      {...props}
-    >
+      {...props}>
       {renderIndicator()}
       {text && <div className={textClasses}>{text}</div>}
     </div>

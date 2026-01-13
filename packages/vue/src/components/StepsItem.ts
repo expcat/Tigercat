@@ -6,7 +6,7 @@ import {
   h,
   type VNode,
   type VNodeArrayChildren,
-} from "vue";
+} from 'vue';
 import {
   classNames,
   coerceClassValue,
@@ -18,9 +18,15 @@ import {
   getStepTitleClasses,
   getStepDescriptionClasses,
   calculateStepStatus,
+  stepFinishIconSvgClasses,
+  stepFinishIconViewBox,
+  stepFinishIconPathD,
+  stepFinishIconPathStrokeLinecap,
+  stepFinishIconPathStrokeLinejoin,
+  stepFinishIconPathStrokeWidth,
   type StepStatus,
-} from "@tigercat/core";
-import { StepsContextKey, type StepsContext } from "./Steps";
+} from '@tigercat/core';
+import { StepsContextKey, type StepsContext } from './Steps';
 
 type RawChildren =
   | string
@@ -41,7 +47,7 @@ export interface VueStepsItemProps {
 }
 
 export const StepsItem = defineComponent({
-  name: "TigerStepsItem",
+  name: 'TigerStepsItem',
   inheritAttrs: false,
   props: {
     /**
@@ -106,9 +112,9 @@ export const StepsItem = defineComponent({
     // Get steps context
     const stepsContext = inject<StepsContext>(StepsContextKey, {
       current: 0,
-      status: "process",
-      direction: "horizontal",
-      size: "default",
+      status: 'process',
+      direction: 'horizontal',
+      size: 'default',
       simple: false,
       clickable: false,
     });
@@ -191,38 +197,38 @@ export const StepsItem = defineComponent({
     const renderIcon = () => {
       // Custom icon from slot
       if (slots.icon) {
-        return h("div", { class: iconClasses.value }, slots.icon());
+        return h('div', { class: iconClasses.value }, slots.icon());
       }
 
       // Custom icon from prop
       if (props.icon) {
         return h(
-          "div",
+          'div',
           { class: iconClasses.value },
           props.icon as unknown as RawChildren
         );
       }
 
       // Default: show step number or checkmark for finished steps
-      if (stepStatus.value === "finish") {
+      if (stepStatus.value === 'finish') {
         return h(
-          "div",
+          'div',
           { class: iconClasses.value },
           h(
-            "svg",
+            'svg',
             {
-              class: "w-5 h-5",
-              fill: "none",
-              stroke: "currentColor",
-              viewBox: "0 0 24 24",
-              "aria-hidden": "true",
-              focusable: "false",
+              class: stepFinishIconSvgClasses,
+              fill: 'none',
+              stroke: 'currentColor',
+              viewBox: stepFinishIconViewBox,
+              'aria-hidden': 'true',
+              focusable: 'false',
             },
-            h("path", {
-              "stroke-linecap": "round",
-              "stroke-linejoin": "round",
-              "stroke-width": "2",
-              d: "M5 13l4 4L19 7",
+            h('path', {
+              'stroke-linecap': stepFinishIconPathStrokeLinecap,
+              'stroke-linejoin': stepFinishIconPathStrokeLinejoin,
+              'stroke-width': stepFinishIconPathStrokeWidth,
+              d: stepFinishIconPathD,
             })
           )
         );
@@ -230,7 +236,7 @@ export const StepsItem = defineComponent({
 
       // Default: show step number
       return h(
-        "div",
+        'div',
         { class: iconClasses.value },
         String(props.stepIndex + 1)
       );
@@ -244,33 +250,33 @@ export const StepsItem = defineComponent({
       if (stepsContext.clickable) {
         children.push(
           h(
-            "button",
+            'button',
             {
-              type: "button",
+              type: 'button',
               class: titleClasses.value,
               onClick: handleClick,
               disabled: props.disabled,
-              "aria-disabled": props.disabled || undefined,
+              'aria-disabled': props.disabled || undefined,
             },
             props.title
           )
         );
       } else {
-        children.push(h("div", { class: titleClasses.value }, props.title));
+        children.push(h('div', { class: titleClasses.value }, props.title));
       }
 
       // Description (if not simple mode)
       if (!stepsContext.simple && (props.description || slots.description)) {
         children.push(
           h(
-            "div",
+            'div',
             { class: descriptionClasses.value },
             slots.description ? slots.description() : props.description
           )
         );
       }
 
-      return h("div", { class: contentClasses.value }, children);
+      return h('div', { class: contentClasses.value }, children);
     };
 
     const mergedStyle = computed(() =>
@@ -288,22 +294,22 @@ export const StepsItem = defineComponent({
       >;
 
       // For vertical layout
-      if (stepsContext.direction === "vertical") {
+      if (stepsContext.direction === 'vertical') {
         return h(
-          "li",
+          'li',
           {
             class: itemClasses.value,
             style: mergedStyle.value,
-            "aria-current":
-              props.stepIndex === stepsContext.current ? "step" : undefined,
-            "aria-disabled": props.disabled || undefined,
+            'aria-current':
+              props.stepIndex === stepsContext.current ? 'step' : undefined,
+            'aria-disabled': props.disabled || undefined,
             ...restAttrs,
           },
           [
             // Icon and tail wrapper
-            h("div", { class: "relative" }, [
+            h('div', { class: 'relative' }, [
               renderIcon(),
-              h("div", { class: tailClasses.value }),
+              h('div', { class: tailClasses.value }),
             ]),
             // Content
             renderContent(),
@@ -313,20 +319,20 @@ export const StepsItem = defineComponent({
 
       // For horizontal layout
       return h(
-        "li",
+        'li',
         {
           class: itemClasses.value,
           style: mergedStyle.value,
-          "aria-current":
-            props.stepIndex === stepsContext.current ? "step" : undefined,
-          "aria-disabled": props.disabled || undefined,
+          'aria-current':
+            props.stepIndex === stepsContext.current ? 'step' : undefined,
+          'aria-disabled': props.disabled || undefined,
           ...restAttrs,
         },
         [
           // Icon
           renderIcon(),
           // Tail (connector)
-          h("div", { class: tailClasses.value }),
+          h('div', { class: tailClasses.value }),
           // Content
           renderContent(),
         ]

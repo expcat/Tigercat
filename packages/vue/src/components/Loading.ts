@@ -6,25 +6,26 @@ import {
   ref,
   watch,
   onUnmounted,
-} from "vue";
+} from 'vue';
 import {
   classNames,
   coerceClassValue,
+  getLoadingBarClasses,
+  getLoadingBarsWrapperClasses,
   getLoadingClasses,
+  getLoadingDotClasses,
+  getLoadingDotsWrapperClasses,
+  getLoadingTextClasses,
   getSpinnerSVG,
-  dotsVariantConfig,
-  barsVariantConfig,
-  animationDelayClasses,
   loadingContainerBaseClasses,
   loadingFullscreenBaseClasses,
-  loadingTextSizeClasses,
   loadingColorClasses,
   mergeStyleValues,
   injectLoadingAnimationStyles,
   type LoadingVariant,
   type LoadingSize,
   type LoadingColor,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
 export interface VueLoadingProps {
   variant?: LoadingVariant;
@@ -40,7 +41,7 @@ export interface VueLoadingProps {
 }
 
 export const Loading = defineComponent({
-  name: "TigerLoading",
+  name: 'TigerLoading',
   inheritAttrs: false,
   props: {
     /**
@@ -49,7 +50,7 @@ export const Loading = defineComponent({
      */
     variant: {
       type: String as PropType<LoadingVariant>,
-      default: "spinner" as LoadingVariant,
+      default: 'spinner' as LoadingVariant,
     },
     /**
      * Size of the loading indicator
@@ -57,7 +58,7 @@ export const Loading = defineComponent({
      */
     size: {
       type: String as PropType<LoadingSize>,
-      default: "md" as LoadingSize,
+      default: 'md' as LoadingSize,
     },
     /**
      * Color variant
@@ -65,7 +66,7 @@ export const Loading = defineComponent({
      */
     color: {
       type: String as PropType<LoadingColor>,
-      default: "primary" as LoadingColor,
+      default: 'primary' as LoadingColor,
     },
     /**
      * Custom text to display below the spinner
@@ -96,7 +97,7 @@ export const Loading = defineComponent({
      */
     background: {
       type: String,
-      default: "rgba(255, 255, 255, 0.9)",
+      default: 'rgba(255, 255, 255, 0.9)',
     },
     /**
      * Custom spinner color (overrides color variant)
@@ -110,7 +111,7 @@ export const Loading = defineComponent({
      */
     className: {
       type: String,
-      default: "",
+      default: '',
     },
 
     /**
@@ -167,11 +168,7 @@ export const Loading = defineComponent({
     });
 
     const textClasses = computed(() => {
-      return classNames(
-        loadingTextSizeClasses[props.size],
-        props.customColor ? "" : loadingColorClasses[props.color],
-        "font-medium"
-      );
+      return getLoadingTextClasses(props.size, props.color, props.customColor);
     });
 
     const containerClasses = computed(() => {
@@ -199,7 +196,7 @@ export const Loading = defineComponent({
     });
 
     const normalizeSvgAttrs = (svgAttrs: Record<string, unknown>) => {
-      if ("className" in svgAttrs && !("class" in svgAttrs)) {
+      if ('className' in svgAttrs && !('class' in svgAttrs)) {
         const { className, ...rest } = svgAttrs;
         return {
           ...rest,
@@ -215,11 +212,11 @@ export const Loading = defineComponent({
       const svg = getSpinnerSVG(props.variant);
 
       return h(
-        "svg",
+        'svg',
         {
           class: spinnerClasses.value,
-          xmlns: "http://www.w3.org/2000/svg",
-          fill: "none",
+          xmlns: 'http://www.w3.org/2000/svg',
+          fill: 'none',
           viewBox: svg.viewBox,
         },
         svg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
@@ -228,26 +225,19 @@ export const Loading = defineComponent({
 
     // Render dots variant
     const renderDots = () => {
-      const config = dotsVariantConfig[props.size];
       const colorClass = props.customColor
-        ? ""
+        ? ''
         : loadingColorClasses[props.color];
+      const steps = [0, 1, 2] as const;
 
       return h(
-        "div",
+        'div',
         {
-          class: classNames("flex items-center", config.gap),
+          class: getLoadingDotsWrapperClasses(props.size),
         },
-        [0, 1, 2].map((i) =>
-          h("div", {
-            class: classNames(
-              config.dotSize,
-              "rounded-full",
-              "bg-current",
-              colorClass,
-              "animate-bounce-dot",
-              animationDelayClasses[i]
-            ),
+        steps.map((i) =>
+          h('div', {
+            class: getLoadingDotClasses(props.size, i, colorClass),
           })
         )
       );
@@ -255,27 +245,19 @@ export const Loading = defineComponent({
 
     // Render bars variant
     const renderBars = () => {
-      const config = barsVariantConfig[props.size];
       const colorClass = props.customColor
-        ? ""
+        ? ''
         : loadingColorClasses[props.color];
+      const steps = [0, 1, 2] as const;
 
       return h(
-        "div",
+        'div',
         {
-          class: classNames("flex items-end", config.gap),
+          class: getLoadingBarsWrapperClasses(props.size),
         },
-        [0, 1, 2].map((i) =>
-          h("div", {
-            class: classNames(
-              config.barWidth,
-              config.barHeight,
-              "rounded-sm",
-              "bg-current",
-              colorClass,
-              "animate-scale-bar",
-              animationDelayClasses[i]
-            ),
+        steps.map((i) =>
+          h('div', {
+            class: getLoadingBarClasses(props.size, i, colorClass),
           })
         )
       );
@@ -284,13 +266,13 @@ export const Loading = defineComponent({
     // Render loading indicator based on variant
     const renderIndicator = () => {
       switch (props.variant) {
-        case "dots":
+        case 'dots':
           return renderDots();
-        case "bars":
+        case 'bars':
           return renderBars();
-        case "spinner":
-        case "ring":
-        case "pulse":
+        case 'spinner':
+        case 'ring':
+        case 'pulse':
         default:
           return renderSpinner();
       }
@@ -304,16 +286,16 @@ export const Loading = defineComponent({
       const children = [renderIndicator()];
 
       if (props.text) {
-        children.push(h("div", { class: textClasses.value }, props.text));
+        children.push(h('div', { class: textClasses.value }, props.text));
       }
 
       return h(
-        "div",
+        'div',
         {
-          role: "status",
-          "aria-label": props.text || "Loading",
-          "aria-live": "polite",
-          "aria-busy": true,
+          role: 'status',
+          'aria-label': props.text || 'Loading',
+          'aria-live': 'polite',
+          'aria-busy': true,
           ...attrs,
           class: containerClasses.value,
           style: customStyle.value,
