@@ -3,6 +3,11 @@ import { createPortal } from 'react-dom';
 import {
   captureActiveElement,
   classNames,
+  closeIconViewBox,
+  closeIconPathD,
+  closeIconPathStrokeLinecap,
+  closeIconPathStrokeLinejoin,
+  closeIconPathStrokeWidth,
   focusFirst,
   getDrawerMaskClasses,
   getDrawerContainerClasses,
@@ -40,13 +45,13 @@ const CloseIcon: React.FC = () => (
     className="w-5 h-5"
     fill="none"
     stroke="currentColor"
-    viewBox="0 0 24 24"
+    viewBox={closeIconViewBox}
     xmlns="http://www.w3.org/2000/svg">
     <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M6 18L18 6M6 6l12 12"
+      strokeLinecap={closeIconPathStrokeLinecap}
+      strokeLinejoin={closeIconPathStrokeLinejoin}
+      strokeWidth={closeIconPathStrokeWidth}
+      d={closeIconPathD}
     />
   </svg>
 );

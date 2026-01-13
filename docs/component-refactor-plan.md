@@ -41,6 +41,7 @@
   - 进度：✅ RadioGroup 的默认 spacing class 生成已统一下沉到 `@tigercat/core`（`radio-group-utils`），Vue/React 双端复用同一实现。
   - 进度：✅ Loading 的 dots/bars/text layout class 生成已统一下沉到 `@tigercat/core`（`loading-utils` 扩展），Vue/React 双端复用同一实现。
   - 进度：✅ StepsItem 的 finish 对勾 SVG 常量（`stepFinishIcon*`）已统一下沉到 `@tigercat/core`（`steps-utils`），Vue/React 双端复用同一实现。
+  - 进度：✅ Modal/Drawer/TabPane 的关闭(X) SVG 常量（`closeIcon*`）已统一下沉到 `@tigercat/core`（`common-icons`），Vue/React 双端复用同一实现。
 
 ---
 

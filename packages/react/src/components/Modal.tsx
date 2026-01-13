@@ -4,6 +4,11 @@ import {
   captureActiveElement,
   classNames,
   focusFirst,
+  closeIconViewBox,
+  closeIconPathD,
+  closeIconPathStrokeLinecap,
+  closeIconPathStrokeLinejoin,
+  closeIconPathStrokeWidth,
   getModalContentClasses,
   resolveLocaleText,
   modalWrapperClasses,
@@ -182,13 +187,13 @@ export const Modal: React.FC<ModalProps> = ({
       className="h-5 w-5"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
-      viewBox="0 0 24 24"
+      viewBox={closeIconViewBox}
       stroke="currentColor">
       <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M6 18L18 6M6 6l12 12"
+        strokeLinecap={closeIconPathStrokeLinecap}
+        strokeLinejoin={closeIconPathStrokeLinejoin}
+        strokeWidth={closeIconPathStrokeWidth}
+        d={closeIconPathD}
       />
     </svg>
   );
