@@ -6,14 +6,16 @@
  * Vue's `class` key.
  */
 
-export function normalizeSvgAttrs(svgAttrs: Record<string, unknown>): Record<string, unknown> {
+export function normalizeSvgAttrs(
+  svgAttrs: Record<string, unknown>
+): Record<string, unknown> {
   if ('className' in svgAttrs && !('class' in svgAttrs)) {
-    const { className, ...rest } = svgAttrs
+    const { className, ...rest } = svgAttrs;
     return {
       ...rest,
       class: className,
-    }
+    };
   }
 
-  return svgAttrs
+  return svgAttrs;
 }
