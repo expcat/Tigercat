@@ -1,20 +1,14 @@
-/**
- * TimePicker component types and interfaces
- */
+/** TimePicker shared types */
+export type TimePickerSize = "sm" | "md" | "lg";
 
-/**
- * TimePicker size types
- */
-export type TimePickerSize = 'sm' | 'md' | 'lg';
+export type TimeFormat = "12" | "24";
 
-/**
- * Time format types
- */
-export type TimeFormat = '12' | '24';
+export type TimePickerSingleValue = string | null;
 
-/**
- * Base TimePicker props interface
- */
+export type TimePickerRangeValue = [string | null, string | null];
+
+export type TimePickerModelValue = TimePickerSingleValue | TimePickerRangeValue;
+
 export interface TimePickerProps {
   /**
    * Locale used for UI labels (e.g. AM/PM) and display formatting.
@@ -28,17 +22,11 @@ export interface TimePickerProps {
    */
   size?: TimePickerSize;
 
-  /**
-   * Selected time value (for controlled mode)
-   * Format: 'HH:mm' or 'HH:mm:ss'
-   */
-  value?: string | null | [string | null, string | null];
+  /** Controlled value. Format: 'HH:mm' or 'HH:mm:ss' */
+  value?: TimePickerModelValue;
 
-  /**
-   * Default time value (for uncontrolled mode)
-   * Format: 'HH:mm' or 'HH:mm:ss'
-   */
-  defaultValue?: string | null | [string | null, string | null];
+  /** Uncontrolled default value. Format: 'HH:mm' or 'HH:mm:ss' */
+  defaultValue?: TimePickerModelValue;
 
   /**
    * Enable range selection (start/end).

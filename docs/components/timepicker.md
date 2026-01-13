@@ -8,10 +8,10 @@
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { ref } from "vue";
+import { TimePicker } from "@tigercat/vue";
 
-const selectedTime = ref<string | null>(null)
+const selectedTime = ref<string | null>(null);
 </script>
 
 <template>
@@ -22,19 +22,102 @@ const selectedTime = ref<string | null>(null)
 ### React
 
 ```tsx
-import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import React, { useState } from "react";
+import { TimePicker } from "@tigercat/react";
 
 function App() {
-  const [selectedTime, setSelectedTime] = useState<string | null>(null)
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
   return (
-    <TimePicker 
-      value={selectedTime} 
+    <TimePicker
+      value={selectedTime}
       onChange={setSelectedTime}
       placeholder="Select a time"
     />
-  )
+  );
+}
+```
+
+## 语言/地区
+
+使用 `locale` 属性切换 UI 文案与选项的 aria-label。
+
+### Vue 3
+
+```vue
+<script setup lang="ts">
+import { ref } from "vue";
+import { TimePicker } from "@tigercat/vue";
+
+const time = ref<string | null>(null);
+const locale = ref<"zh-CN" | "en-US">("zh-CN");
+</script>
+
+<template>
+  <TimePicker v-model="time" :locale="locale" />
+</template>
+```
+
+### React
+
+```tsx
+import React, { useState } from "react";
+import { TimePicker } from "@tigercat/react";
+
+function App() {
+  const [time, setTime] = useState<string | null>(null);
+  const [locale, setLocale] = useState<"zh-CN" | "en-US">("zh-CN");
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setLocale(locale === "zh-CN" ? "en-US" : "zh-CN")}
+      >
+        Toggle locale
+      </button>
+      <TimePicker value={time} onChange={setTime} locale={locale} />
+    </>
+  );
+}
+```
+
+## 时间段选择
+
+启用 `range` 后可选择开始/结束时间，value 形如 `[start, end]`。
+
+### Vue 3
+
+```vue
+<script setup lang="ts">
+import { ref } from "vue";
+import { TimePicker } from "@tigercat/vue";
+
+const timeRange = ref<[string | null, string | null]>([null, null]);
+</script>
+
+<template>
+  <TimePicker
+    v-model="timeRange"
+    :range="true"
+    placeholder="Select a time range"
+  />
+</template>
+```
+
+### React
+
+```tsx
+import React, { useState } from "react";
+import { TimePicker } from "@tigercat/react";
+
+function App() {
+  const [timeRange, setTimeRange] = useState<[string | null, string | null]>([
+    null,
+    null,
+  ]);
+
+  return <TimePicker range value={timeRange} onChange={setTimeRange} />;
 }
 ```
 
@@ -68,10 +151,10 @@ TimePicker 组件支持三种尺寸：`sm`、`md`、`lg`。
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { ref } from "vue";
+import { TimePicker } from "@tigercat/vue";
 
-const time = ref('14:30')
+const time = ref("14:30");
 </script>
 
 <template>
@@ -83,18 +166,18 @@ const time = ref('14:30')
 ### React
 
 ```tsx
-import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import React, { useState } from "react";
+import { TimePicker } from "@tigercat/react";
 
 function App() {
-  const [time, setTime] = useState('14:30')
+  const [time, setTime] = useState("14:30");
 
   return (
     <>
       <TimePicker value={time} onChange={setTime} format="24" />
       <TimePicker value={time} onChange={setTime} format="12" />
     </>
-  )
+  );
 }
 ```
 
@@ -106,10 +189,10 @@ function App() {
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { ref } from "vue";
+import { TimePicker } from "@tigercat/vue";
 
-const time = ref<string | null>(null)
+const time = ref<string | null>(null);
 </script>
 
 <template>
@@ -120,15 +203,13 @@ const time = ref<string | null>(null)
 ### React
 
 ```tsx
-import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import React, { useState } from "react";
+import { TimePicker } from "@tigercat/react";
 
 function App() {
-  const [time, setTime] = useState<string | null>(null)
+  const [time, setTime] = useState<string | null>(null);
 
-  return (
-    <TimePicker value={time} onChange={setTime} showSeconds={true} />
-  )
+  return <TimePicker value={time} onChange={setTime} showSeconds={true} />;
 }
 ```
 
@@ -140,38 +221,29 @@ function App() {
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { ref } from "vue";
+import { TimePicker } from "@tigercat/vue";
 
-const time = ref<string | null>(null)
+const time = ref<string | null>(null);
 </script>
 
 <template>
-  <TimePicker 
-    v-model="time" 
-    :hour-step="2" 
-    :minute-step="15" 
-  />
+  <TimePicker v-model="time" :hour-step="2" :minute-step="15" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import React, { useState } from "react";
+import { TimePicker } from "@tigercat/react";
 
 function App() {
-  const [time, setTime] = useState<string | null>(null)
+  const [time, setTime] = useState<string | null>(null);
 
   return (
-    <TimePicker 
-      value={time} 
-      onChange={setTime} 
-      hourStep={2}
-      minuteStep={15}
-    />
-  )
+    <TimePicker value={time} onChange={setTime} hourStep={2} minuteStep={15} />
+  );
 }
 ```
 
@@ -183,16 +255,16 @@ function App() {
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { ref } from "vue";
+import { TimePicker } from "@tigercat/vue";
 
-const time = ref<string | null>(null)
+const time = ref<string | null>(null);
 </script>
 
 <template>
-  <TimePicker 
-    v-model="time" 
-    min-time="09:00" 
+  <TimePicker
+    v-model="time"
+    min-time="09:00"
     max-time="18:00"
     placeholder="Select time between 9:00 - 18:00"
   />
@@ -202,21 +274,21 @@ const time = ref<string | null>(null)
 ### React
 
 ```tsx
-import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import React, { useState } from "react";
+import { TimePicker } from "@tigercat/react";
 
 function App() {
-  const [time, setTime] = useState<string | null>(null)
+  const [time, setTime] = useState<string | null>(null);
 
   return (
-    <TimePicker 
-      value={time} 
+    <TimePicker
+      value={time}
       onChange={setTime}
       minTime="09:00"
       maxTime="18:00"
       placeholder="Select time between 9:00 - 18:00"
     />
-  )
+  );
 }
 ```
 
@@ -246,10 +318,10 @@ function App() {
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { ref } from "vue";
+import { TimePicker } from "@tigercat/vue";
 
-const time = ref('14:30')
+const time = ref("14:30");
 </script>
 
 <template>
@@ -261,18 +333,18 @@ const time = ref('14:30')
 ### React
 
 ```tsx
-import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import React, { useState } from "react";
+import { TimePicker } from "@tigercat/react";
 
 function App() {
-  const [time, setTime] = useState('14:30')
+  const [time, setTime] = useState("14:30");
 
   return (
     <>
       <TimePicker value={time} onChange={setTime} clearable={true} />
       <TimePicker value={time} onChange={setTime} clearable={false} />
     </>
-  )
+  );
 }
 ```
 
@@ -287,16 +359,13 @@ Vue 组件使用 `v-model` 进行双向绑定，本质上是受控组件。
 React 支持非受控模式，使用 `defaultValue` 属性。
 
 ```tsx
-import React from 'react'
-import { TimePicker } from '@tigercat/react'
+import React from "react";
+import { TimePicker } from "@tigercat/react";
 
 function App() {
   return (
-    <TimePicker 
-      defaultValue="14:30"
-      placeholder="Uncontrolled timepicker"
-    />
-  )
+    <TimePicker defaultValue="14:30" placeholder="Uncontrolled timepicker" />
+  );
 }
 ```
 
@@ -304,41 +373,44 @@ function App() {
 
 ### Props
 
-| 属性 | 说明 | 类型 | 默认值 | Vue | React |
-|------|------|------|--------|-----|-------|
-| value (React) / modelValue (Vue) | 选中的时间（受控模式） | `string \| null` | `null` | ✓ | ✓ |
-| defaultValue | 默认选中的时间（非受控模式） | `string \| null` | `null` | - | ✓ |
-| size | 尺寸 | `'sm' \| 'md' \| 'lg'` | `'md'` | ✓ | ✓ |
-| format | 时间格式 | `'12' \| '24'` | `'24'` | ✓ | ✓ |
-| showSeconds | 是否显示秒 | `boolean` | `false` | ✓ | ✓ |
-| hourStep | 小时步长 | `number` | `1` | ✓ | ✓ |
-| minuteStep | 分钟步长 | `number` | `1` | ✓ | ✓ |
-| secondStep | 秒步长 | `number` | `1` | ✓ | ✓ |
-| placeholder | 占位符文本 | `string` | `'Select time'` | ✓ | ✓ |
-| disabled | 是否禁用 | `boolean` | `false` | ✓ | ✓ |
-| readonly | 是否只读 | `boolean` | `false` | ✓ | ✓ |
-| required | 是否必填 | `boolean` | `false` | ✓ | ✓ |
-| minTime | 最小可选时间（HH:mm 格式） | `string \| null` | `null` | ✓ | ✓ |
-| maxTime | 最大可选时间（HH:mm 格式） | `string \| null` | `null` | ✓ | ✓ |
-| clearable | 是否显示清除按钮 | `boolean` | `true` | ✓ | ✓ |
-| name | 表单字段名 | `string` | - | ✓ | ✓ |
-| id | 元素 ID | `string` | - | ✓ | ✓ |
-| className | 自定义 CSS 类 | `string` | - | - | ✓ |
+| 属性                             | 说明                                                           | 类型                                                 | 默认值          | Vue | React |
+| -------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------- | --------------- | --- | ----- |
+| value (React) / modelValue (Vue) | 选中的时间（受控模式）；`range=true` 时为 `[start, end]`       | `string \| null \| [string \| null, string \| null]` | `null`          | ✓   | ✓     |
+| defaultValue                     | 默认选中的时间（非受控模式）；`range=true` 时为 `[start, end]` | `string \| null \| [string \| null, string \| null]` | `null`          | -   | ✓     |
+| range                            | 是否启用时间段选择（开始/结束）                                | `boolean`                                            | `false`         | ✓   | ✓     |
+| locale                           | 语言/地区（用于 UI 文案与展示）                                | `string`                                             | -               | ✓   | ✓     |
+| size                             | 尺寸                                                           | `'sm' \| 'md' \| 'lg'`                               | `'md'`          | ✓   | ✓     |
+| format                           | 时间格式                                                       | `'12' \| '24'`                                       | `'24'`          | ✓   | ✓     |
+| showSeconds                      | 是否显示秒                                                     | `boolean`                                            | `false`         | ✓   | ✓     |
+| hourStep                         | 小时步长                                                       | `number`                                             | `1`             | ✓   | ✓     |
+| minuteStep                       | 分钟步长                                                       | `number`                                             | `1`             | ✓   | ✓     |
+| secondStep                       | 秒步长                                                         | `number`                                             | `1`             | ✓   | ✓     |
+| placeholder                      | 占位符文本                                                     | `string`                                             | `'Select time'` | ✓   | ✓     |
+| disabled                         | 是否禁用                                                       | `boolean`                                            | `false`         | ✓   | ✓     |
+| readonly                         | 是否只读                                                       | `boolean`                                            | `false`         | ✓   | ✓     |
+| required                         | 是否必填                                                       | `boolean`                                            | `false`         | ✓   | ✓     |
+| minTime                          | 最小可选时间（HH:mm 格式）                                     | `string \| null`                                     | `null`          | ✓   | ✓     |
+| maxTime                          | 最大可选时间（HH:mm 格式）                                     | `string \| null`                                     | `null`          | ✓   | ✓     |
+| clearable                        | 是否显示清除按钮                                               | `boolean`                                            | `true`          | ✓   | ✓     |
+| name                             | 表单字段名                                                     | `string`                                             | -               | ✓   | ✓     |
+| id                               | 元素 ID                                                        | `string`                                             | -               | ✓   | ✓     |
+| className                        | 自定义 CSS 类                                                  | `string`                                             | -               | ✓   | ✓     |
+| style                            | 自定义内联样式                                                 | `Record<string, string \| number>`                   | -               | ✓   | ✓     |
 
 ### Events (Vue)
 
-| 事件名 | 说明 | 回调参数 |
-|--------|------|----------|
-| update:modelValue | 时间改变时触发 | `(value: string \| null) => void` |
-| change | 时间改变时触发 | `(value: string \| null) => void` |
-| clear | 清除时间时触发 | `() => void` |
+| 事件名            | 说明           | 回调参数                                                              |
+| ----------------- | -------------- | --------------------------------------------------------------------- |
+| update:modelValue | 时间改变时触发 | `(value: string \| null \| [string \| null, string \| null]) => void` |
+| change            | 时间改变时触发 | `(value: string \| null \| [string \| null, string \| null]) => void` |
+| clear             | 清除时间时触发 | `() => void`                                                          |
 
 ### Event Handlers (React)
 
-| 属性 | 说明 | 类型 |
-|------|------|------|
-| onChange | 时间改变时的回调 | `(time: string \| null) => void` |
-| onClear | 清除时间时的回调 | `() => void` |
+| 属性     | 说明                                                         | 类型                                                                                   |
+| -------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| onChange | 时间改变时的回调（`range=true` 时回调参数为 `[start, end]`） | `(time: string \| null) => void` \| `(time: [string \| null, string \| null]) => void` |
+| onClear  | 清除时间时的回调                                             | `() => void`                                                                           |
 
 ## 主题定制
 
@@ -348,8 +420,8 @@ TimePicker 组件支持通过 CSS 变量进行主题定制。
 
 ```css
 :root {
-  --tiger-primary: #2563eb;          /* 主色 */
-  --tiger-primary-hover: #1d4ed8;    /* 主色悬停 */
+  --tiger-primary: #2563eb; /* 主色 */
+  --tiger-primary-hover: #1d4ed8; /* 主色悬停 */
   --tiger-primary-disabled: #93c5fd; /* 主色禁用 */
 }
 ```
@@ -376,20 +448,23 @@ TimePicker 组件支持通过 CSS 变量进行主题定制。
 ### 使用 setThemeColors 工具函数
 
 ```typescript
-import { setThemeColors } from '@tigercat/core'
+import { setThemeColors } from "@tigercat/core";
 
 setThemeColors({
-  primary: '#10b981',
-  primaryHover: '#059669',
-  primaryDisabled: '#6ee7b7',
-})
+  primary: "#10b981",
+  primaryHover: "#059669",
+  primaryDisabled: "#6ee7b7",
+});
 ```
 
 ## 无障碍支持
 
 TimePicker 组件遵循 WAI-ARIA 规范，支持：
 
-- **键盘导航**：使用 Tab 键在各元素间导航
+- **键盘导航**：
+  - 使用 Tab 键在输入框、清除按钮、打开按钮与面板内各选项间导航
+  - 面板内：ArrowUp/ArrowDown 在同一列选项间移动焦点，Home/End 跳到首/尾
+  - Enter/Space 选择当前聚焦选项，Escape 关闭面板并恢复焦点到输入框
 - **ARIA 属性**：正确的 `role`、`aria-label`、`aria-selected` 等属性
 - **屏幕阅读器**：所有交互元素都有适当的标签
 - **焦点管理**：打开面板时自动聚焦，关闭时恢复焦点
@@ -414,10 +489,10 @@ TimePicker 组件遵循 WAI-ARIA 规范，支持：
 组件提供完整的 TypeScript 类型定义。
 
 ```typescript
-import type { TimePickerSize, TimeFormat } from '@tigercat/core'
-import type { TimePickerProps } from '@tigercat/vue' // or '@tigercat/react'
+import type { TimePickerSize, TimeFormat } from "@tigercat/core";
+import type { TimePickerProps } from "@tigercat/vue"; // or '@tigercat/react'
 
 // 使用类型
-const size: TimePickerSize = 'md'
-const format: TimeFormat = '24'
+const size: TimePickerSize = "md";
+const format: TimeFormat = "24";
 ```

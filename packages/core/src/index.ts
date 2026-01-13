@@ -24,6 +24,7 @@ export * from "./utils/datepicker-i18n";
 export * from "./utils/time-utils";
 export * from "./utils/timepicker-styles";
 export * from "./utils/timepicker-icons";
+export * from "./utils/timepicker-labels";
 export * from "./utils/upload-utils";
 export * from "./utils/space";
 export * from "./utils/table-utils";
