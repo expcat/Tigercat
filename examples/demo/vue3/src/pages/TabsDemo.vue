@@ -19,7 +19,7 @@ const editableTabs = ref([
 const activeEditableKey = ref('1')
 let newTabIndex = 4
 
-const handleEdit = ({ targetKey, action }: { targetKey: string | number; action: 'add' | 'remove' }) => {
+const handleEdit = ({ targetKey, action }: { targetKey?: string | number; action: 'add' | 'remove' }) => {
   if (action === 'add') {
     const newKey = `${newTabIndex++}`
     editableTabs.value.push({
@@ -29,13 +29,19 @@ const handleEdit = ({ targetKey, action }: { targetKey: string | number; action:
     })
     activeEditableKey.value = newKey
   } else if (action === 'remove') {
-    const newTabs = editableTabs.value.filter(tab => tab.key !== targetKey)
+    if (targetKey == null) {
+      return
+    }
+
+    const targetKeyString = String(targetKey)
+    const currentIndex = editableTabs.value.findIndex(tab => tab.key === targetKeyString)
+    const newTabs = editableTabs.value.filter(tab => tab.key !== targetKeyString)
     editableTabs.value = newTabs
     
     // 如果删除的是当前激活的标签，激活下一个标签
-    if (activeEditableKey.value === targetKey && newTabs.length > 0) {
-      const index = editableTabs.value.findIndex(tab => tab.key === targetKey)
-      activeEditableKey.value = newTabs[index] ? newTabs[index].key : newTabs[0].key
+    if (activeEditableKey.value === targetKeyString && newTabs.length > 0) {
+      const next = newTabs[currentIndex] ?? newTabs[currentIndex - 1] ?? newTabs[0]
+      activeEditableKey.value = next.key
     }
   }
 }

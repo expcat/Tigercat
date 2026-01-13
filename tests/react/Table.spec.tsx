@@ -2,70 +2,70 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest';
-import { render, fireEvent } from '@testing-library/react';
-import React from 'react';
-import { Table, type TableColumn } from '@tigercat/react';
-import { expectNoA11yViolations } from '../utils/react';
+import { describe, it, expect, vi } from "vitest";
+import { render, fireEvent } from "@testing-library/react";
+import React from "react";
+import { Table, type TableColumn } from "@tigercat/react";
+import { expectNoA11yViolations } from "../utils/react";
 
 const columns: TableColumn[] = [
-  { key: 'name', title: 'Name' },
-  { key: 'age', title: 'Age' },
-  { key: 'email', title: 'Email' },
+  { key: "name", title: "Name" },
+  { key: "age", title: "Age" },
+  { key: "email", title: "Email" },
 ];
 
 const dataSource = [
-  { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
-  { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com' },
-  { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com' },
+  { id: 1, name: "John Doe", age: 28, email: "john@example.com" },
+  { id: 2, name: "Jane Smith", age: 32, email: "jane@example.com" },
+  { id: 3, name: "Bob Johnson", age: 45, email: "bob@example.com" },
 ];
 
-describe('Table', () => {
-  describe('Rendering', () => {
-    it('should render with default props', () => {
+describe("Table", () => {
+  describe("Rendering", () => {
+    it("should render with default props", () => {
       const { container } = render(
         <Table columns={columns} dataSource={dataSource} />
       );
 
-      const table = container.querySelector('table');
+      const table = container.querySelector("table");
       expect(table).toBeInTheDocument();
     });
 
-    it('should render column headers', () => {
+    it("should render column headers", () => {
       const { getByText } = render(
         <Table columns={columns} dataSource={dataSource} />
       );
 
-      expect(getByText('Name')).toBeInTheDocument();
-      expect(getByText('Age')).toBeInTheDocument();
-      expect(getByText('Email')).toBeInTheDocument();
+      expect(getByText("Name")).toBeInTheDocument();
+      expect(getByText("Age")).toBeInTheDocument();
+      expect(getByText("Email")).toBeInTheDocument();
     });
 
-    it('should render data rows', () => {
+    it("should render data rows", () => {
       const { getByText } = render(
         <Table columns={columns} dataSource={dataSource} />
       );
 
-      expect(getByText('John Doe')).toBeInTheDocument();
-      expect(getByText('Jane Smith')).toBeInTheDocument();
-      expect(getByText('Bob Johnson')).toBeInTheDocument();
+      expect(getByText("John Doe")).toBeInTheDocument();
+      expect(getByText("Jane Smith")).toBeInTheDocument();
+      expect(getByText("Bob Johnson")).toBeInTheDocument();
     });
 
-    it('should render empty state when no data', () => {
+    it("should render empty state when no data", () => {
       const { getByText } = render(<Table columns={columns} dataSource={[]} />);
 
-      expect(getByText('No data')).toBeInTheDocument();
+      expect(getByText("No data")).toBeInTheDocument();
     });
 
-    it('should render custom empty text', () => {
+    it("should render custom empty text", () => {
       const { getByText } = render(
         <Table columns={columns} dataSource={[]} emptyText="No records found" />
       );
 
-      expect(getByText('No records found')).toBeInTheDocument();
+      expect(getByText("No records found")).toBeInTheDocument();
     });
 
-    it('should apply custom className', () => {
+    it("should apply custom className", () => {
       const { container } = render(
         <Table
           columns={columns}
@@ -74,12 +74,12 @@ describe('Table', () => {
         />
       );
 
-      expect(container.querySelector('.custom-table')).toBeInTheDocument();
+      expect(container.querySelector(".custom-table")).toBeInTheDocument();
     });
   });
 
-  describe('Props', () => {
-    it('should apply size classes correctly', () => {
+  describe("Props", () => {
+    it("should apply size classes correctly", () => {
       const { container } = render(
         <Table
           columns={columns}
@@ -89,56 +89,56 @@ describe('Table', () => {
         />
       );
 
-      const ths = container.querySelectorAll('th');
+      const ths = container.querySelectorAll("th");
       const firstDataHeader = ths[0];
-      expect(firstDataHeader).toHaveClass('px-3', 'py-2');
+      expect(firstDataHeader).toHaveClass("px-3", "py-2");
     });
 
-    it('should show border when bordered is true', () => {
+    it("should show border when bordered is true", () => {
       const { container } = render(
         <Table columns={columns} dataSource={dataSource} bordered />
       );
 
-      const wrappers = container.querySelectorAll('div');
+      const wrappers = container.querySelectorAll("div");
       const borderWrapper = Array.from(wrappers).find((div) =>
-        div.classList.contains('border')
+        div.classList.contains("border")
       );
       expect(borderWrapper).toBeTruthy();
     });
 
-    it('should apply striped classes when striped is true', () => {
+    it("should apply striped classes when striped is true", () => {
       const { container } = render(
         <Table columns={columns} dataSource={dataSource} striped />
       );
 
-      const rows = container.querySelectorAll('tbody tr');
-      expect(rows[0]).toHaveClass('bg-gray-50/50');
+      const rows = container.querySelectorAll("tbody tr");
+      expect(rows[0]).toHaveClass("bg-gray-50/50");
     });
 
-    it('should disable pagination when pagination is false', () => {
+    it("should disable pagination when pagination is false", () => {
       const { container } = render(
         <Table columns={columns} dataSource={dataSource} pagination={false} />
       );
 
       const pagination = container.querySelector(
-        '.flex.items-center.justify-between'
+        ".flex.items-center.justify-between"
       );
       expect(pagination).not.toBeInTheDocument();
     });
   });
 
-  describe('Fixed Columns', () => {
-    it('should apply sticky styles for fixed left and right columns', () => {
+  describe("Fixed Columns", () => {
+    it("should apply sticky styles for fixed left and right columns", () => {
       const fixedColumns: TableColumn[] = [
-        { key: 'name', title: 'Name', width: 140, fixed: 'left' },
-        { key: 'age', title: 'Age', width: 120 },
-        { key: 'email', title: 'Email', width: 220 },
+        { key: "name", title: "Name", width: 140, fixed: "left" },
+        { key: "age", title: "Age", width: 120 },
+        { key: "email", title: "Email", width: 220 },
         {
-          key: 'actions',
-          title: 'Actions',
+          key: "actions",
+          title: "Actions",
           width: 140,
-          fixed: 'right',
-          render: () => 'Edit',
+          fixed: "right",
+          render: () => "Edit",
         },
       ];
 
@@ -150,29 +150,29 @@ describe('Table', () => {
         />
       );
 
-      const nameHeader = getByText('Name').closest('th');
+      const nameHeader = getByText("Name").closest("th");
       expect(nameHeader).toBeInTheDocument();
-      expect(nameHeader!).toHaveStyle('position: sticky');
-      expect(nameHeader!).toHaveStyle('left: 0px');
+      expect(nameHeader!).toHaveStyle("position: sticky");
+      expect(nameHeader!).toHaveStyle("left: 0px");
 
-      const actionsHeader = getByText('Actions').closest('th');
+      const actionsHeader = getByText("Actions").closest("th");
       expect(actionsHeader).toBeInTheDocument();
-      expect(actionsHeader!).toHaveStyle('position: sticky');
-      expect(actionsHeader!).toHaveStyle('right: 0px');
+      expect(actionsHeader!).toHaveStyle("position: sticky");
+      expect(actionsHeader!).toHaveStyle("right: 0px");
 
-      const firstNameCell = getByText('John Doe').closest('td');
+      const firstNameCell = getByText("John Doe").closest("td");
       expect(firstNameCell).toBeInTheDocument();
-      expect(firstNameCell!).toHaveStyle('position: sticky');
-      expect(firstNameCell!).toHaveStyle('left: 0px');
+      expect(firstNameCell!).toHaveStyle("position: sticky");
+      expect(firstNameCell!).toHaveStyle("left: 0px");
     });
   });
 
-  describe('Column Lock Button', () => {
-    it('should toggle fixed state when clicking the header lock button', async () => {
+  describe("Column Lock Button", () => {
+    it("should toggle fixed state when clicking the header lock button", async () => {
       const lockableColumns: TableColumn[] = [
-        { key: 'name', title: 'Name', width: 140 },
-        { key: 'age', title: 'Age', width: 120 },
-        { key: 'email', title: 'Email', width: 220 },
+        { key: "name", title: "Name", width: 140 },
+        { key: "age", title: "Age", width: 120 },
+        { key: "email", title: "Email", width: 220 },
       ];
 
       const { getByLabelText, getByText } = render(
@@ -184,39 +184,39 @@ describe('Table', () => {
         />
       );
 
-      await fireEvent.click(getByLabelText('Lock column Email'));
+      await fireEvent.click(getByLabelText("Lock column Email"));
 
-      const emailHeaderLocked = getByText('Email').closest('th')!;
-      expect(emailHeaderLocked).toHaveStyle('position: sticky');
-      expect(emailHeaderLocked).toHaveStyle('left: 260px');
+      const emailHeaderLocked = getByText("Email").closest("th")!;
+      expect(emailHeaderLocked).toHaveStyle("position: sticky");
+      expect(emailHeaderLocked).toHaveStyle("left: 260px");
 
-      await fireEvent.click(getByLabelText('Unlock column Email'));
+      await fireEvent.click(getByLabelText("Unlock column Email"));
 
-      const emailHeaderUnlocked = getByText('Email').closest('th')!;
-      expect(emailHeaderUnlocked).not.toHaveStyle('position: sticky');
+      const emailHeaderUnlocked = getByText("Email").closest("th")!;
+      expect(emailHeaderUnlocked).not.toHaveStyle("position: sticky");
     });
   });
 
-  describe('Sorting', () => {
-    it('should render sort icons for sortable columns', () => {
+  describe("Sorting", () => {
+    it("should render sort icons for sortable columns", () => {
       const sortableColumns: TableColumn[] = [
-        { key: 'name', title: 'Name', sortable: true },
-        { key: 'age', title: 'Age', sortable: true },
-        { key: 'email', title: 'Email' },
+        { key: "name", title: "Name", sortable: true },
+        { key: "age", title: "Age", sortable: true },
+        { key: "email", title: "Email" },
       ];
 
       const { container } = render(
         <Table columns={sortableColumns} dataSource={dataSource} />
       );
 
-      const sortIcons = container.querySelectorAll('svg');
+      const sortIcons = container.querySelectorAll("svg");
       expect(sortIcons.length).toBeGreaterThan(0);
     });
 
-    it('should call onSortChange when clicking sortable column', async () => {
+    it("should call onSortChange when clicking sortable column", async () => {
       const sortableColumns: TableColumn[] = [
-        { key: 'name', title: 'Name', sortable: true },
-        { key: 'age', title: 'Age' },
+        { key: "name", title: "Name", sortable: true },
+        { key: "age", title: "Age" },
       ];
 
       const onSortChange = vi.fn();
@@ -229,18 +229,18 @@ describe('Table', () => {
         />
       );
 
-      const nameHeader = getByText('Name');
-      await fireEvent.click(nameHeader.closest('th')!);
+      const nameHeader = getByText("Name");
+      await fireEvent.click(nameHeader.closest("th")!);
 
       expect(onSortChange).toHaveBeenCalledWith({
-        key: 'name',
-        direction: 'asc',
+        key: "name",
+        direction: "asc",
       });
     });
 
-    it('should toggle sort direction on multiple clicks', async () => {
+    it("should toggle sort direction on multiple clicks", async () => {
       const sortableColumns: TableColumn[] = [
-        { key: 'name', title: 'Name', sortable: true },
+        { key: "name", title: "Name", sortable: true },
       ];
 
       const onSortChange = vi.fn();
@@ -253,21 +253,25 @@ describe('Table', () => {
         />
       );
 
-      const nameHeader = getByText('Name').closest('th')!;
+      const nameHeader = getByText("Name").closest("th")!;
+
+      expect(nameHeader).toHaveAttribute("aria-sort", "none");
 
       // First click - asc
       await fireEvent.click(nameHeader);
       expect(onSortChange).toHaveBeenCalledWith({
-        key: 'name',
-        direction: 'asc',
+        key: "name",
+        direction: "asc",
       });
+      expect(nameHeader).toHaveAttribute("aria-sort", "ascending");
 
       // Second click - desc
       await fireEvent.click(nameHeader);
       expect(onSortChange).toHaveBeenCalledWith({
-        key: 'name',
-        direction: 'desc',
+        key: "name",
+        direction: "desc",
       });
+      expect(nameHeader).toHaveAttribute("aria-sort", "descending");
 
       // Third click - null (clear sort)
       await fireEvent.click(nameHeader);
@@ -275,18 +279,19 @@ describe('Table', () => {
         key: null,
         direction: null,
       });
+      expect(nameHeader).toHaveAttribute("aria-sort", "none");
     });
   });
 
-  describe('Filtering', () => {
-    it('should render filter input for columns with filter config', () => {
+  describe("Filtering", () => {
+    it("should render filter input for columns with filter config", () => {
       const filterColumns: TableColumn[] = [
         {
-          key: 'name',
-          title: 'Name',
-          filter: { type: 'text', placeholder: 'Search...' },
+          key: "name",
+          title: "Name",
+          filter: { type: "text", placeholder: "Search..." },
         },
-        { key: 'age', title: 'Age' },
+        { key: "age", title: "Age" },
       ];
 
       const { container } = render(
@@ -295,19 +300,19 @@ describe('Table', () => {
 
       const filterInput = container.querySelector('input[type="text"]');
       expect(filterInput).toBeInTheDocument();
-      expect(filterInput).toHaveAttribute('placeholder', 'Search...');
+      expect(filterInput).toHaveAttribute("placeholder", "Search...");
     });
 
-    it('should render filter select for select type filter', () => {
+    it("should render filter select for select type filter", () => {
       const filterColumns: TableColumn[] = [
         {
-          key: 'status',
-          title: 'Status',
+          key: "status",
+          title: "Status",
           filter: {
-            type: 'select',
+            type: "select",
             options: [
-              { value: 'active', label: 'Active' },
-              { value: 'inactive', label: 'Inactive' },
+              { value: "active", label: "Active" },
+              { value: "inactive", label: "Inactive" },
             ],
           },
         },
@@ -317,37 +322,37 @@ describe('Table', () => {
         <Table
           columns={filterColumns}
           dataSource={[
-            { id: 1, status: 'active' },
-            { id: 2, status: 'inactive' },
+            { id: 1, status: "active" },
+            { id: 2, status: "inactive" },
           ]}
         />
       );
 
-      const filterSelect = container.querySelector('select');
+      const filterSelect = container.querySelector("select");
       expect(filterSelect).toBeInTheDocument();
     });
   });
 
-  describe('Pagination', () => {
-    it('should render pagination controls by default', () => {
+  describe("Pagination", () => {
+    it("should render pagination controls by default", () => {
       const { getByText } = render(
         <Table columns={columns} dataSource={dataSource} />
       );
 
-      expect(getByText('Previous')).toBeInTheDocument();
-      expect(getByText('Next')).toBeInTheDocument();
+      expect(getByText("Previous")).toBeInTheDocument();
+      expect(getByText("Next")).toBeInTheDocument();
     });
 
-    it('should show page size selector', () => {
+    it("should show page size selector", () => {
       const { container } = render(
         <Table columns={columns} dataSource={dataSource} />
       );
 
-      const select = container.querySelector('select');
+      const select = container.querySelector("select");
       expect(select).toBeInTheDocument();
     });
 
-    it('should call onPageChange when clicking next button', async () => {
+    it("should call onPageChange when clicking next button", async () => {
       const onPageChange = vi.fn();
 
       // Create enough data to have multiple pages
@@ -366,7 +371,7 @@ describe('Table', () => {
         />
       );
 
-      const nextButton = getByText('Next');
+      const nextButton = getByText("Next");
       await fireEvent.click(nextButton);
 
       expect(onPageChange).toHaveBeenCalledWith({
@@ -375,18 +380,41 @@ describe('Table', () => {
       });
     });
 
-    it('should disable previous button on first page', () => {
+    it("should disable previous button on first page", () => {
       const { getByText } = render(
         <Table columns={columns} dataSource={dataSource} />
       );
 
-      const prevButton = getByText('Previous');
+      const prevButton = getByText("Previous");
       expect(prevButton).toBeDisabled();
+    });
+
+    it("should respect controlled pagination on rerender", () => {
+      const { rerender, getByText, queryByText } = render(
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          pagination={{ current: 1, pageSize: 1, showSizeChanger: false }}
+        />
+      );
+
+      expect(getByText("John Doe")).toBeInTheDocument();
+
+      rerender(
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          pagination={{ current: 2, pageSize: 1, showSizeChanger: false }}
+        />
+      );
+
+      expect(queryByText("John Doe")).not.toBeInTheDocument();
+      expect(getByText("Jane Smith")).toBeInTheDocument();
     });
   });
 
-  describe('Row Selection', () => {
-    it('should render checkbox column when rowSelection is provided', () => {
+  describe("Row Selection", () => {
+    it("should render checkbox column when rowSelection is provided", () => {
       const { container } = render(
         <Table
           columns={columns}
@@ -402,7 +430,7 @@ describe('Table', () => {
       expect(checkboxes.length).toBe(dataSource.length + 1);
     });
 
-    it('should call onSelectionChange when selecting row', async () => {
+    it("should call onSelectionChange when selecting row", async () => {
       const onSelectionChange = vi.fn();
 
       const { container } = render(
@@ -424,14 +452,14 @@ describe('Table', () => {
       expect(onSelectionChange).toHaveBeenCalled();
     });
 
-    it('should support radio selection', () => {
+    it("should support radio selection", () => {
       const { container } = render(
         <Table
           columns={columns}
           dataSource={dataSource}
           rowSelection={{
             selectedRowKeys: [],
-            type: 'radio',
+            type: "radio",
           }}
         />
       );
@@ -439,36 +467,70 @@ describe('Table', () => {
       const radios = container.querySelectorAll('input[type="radio"]');
       expect(radios.length).toBe(dataSource.length);
     });
+
+    it("should respect controlled selectedRowKeys on rerender", () => {
+      const { container, rerender } = render(
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          pagination={false}
+          rowSelection={{
+            selectedRowKeys: [],
+          }}
+        />
+      );
+
+      const firstRowCheckbox = container.querySelectorAll(
+        'input[type="checkbox"]'
+      )[1];
+      expect(firstRowCheckbox).not.toBeChecked();
+
+      rerender(
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          pagination={false}
+          rowSelection={{
+            selectedRowKeys: [1],
+          }}
+        />
+      );
+
+      const firstRowCheckboxAfter = container.querySelectorAll(
+        'input[type="checkbox"]'
+      )[1];
+      expect(firstRowCheckboxAfter).toBeChecked();
+    });
   });
 
-  describe('Loading State', () => {
-    it('should show loading overlay when loading is true', () => {
+  describe("Loading State", () => {
+    it("should show loading overlay when loading is true", () => {
       const { container } = render(
         <Table columns={columns} dataSource={dataSource} loading />
       );
 
-      const loadingSpinner = container.querySelector('.animate-spin');
+      const loadingSpinner = container.querySelector(".animate-spin");
       expect(loadingSpinner).toBeInTheDocument();
     });
   });
 
-  describe('Sticky Header', () => {
-    it('should apply sticky class when stickyHeader is true', () => {
+  describe("Sticky Header", () => {
+    it("should apply sticky class when stickyHeader is true", () => {
       const { container } = render(
         <Table columns={columns} dataSource={dataSource} stickyHeader />
       );
 
-      const thead = container.querySelector('thead');
-      expect(thead).toHaveClass('sticky');
+      const thead = container.querySelector("thead");
+      expect(thead).toHaveClass("sticky");
     });
   });
 
-  describe('Custom Rendering', () => {
-    it('should render custom cell content', () => {
+  describe("Custom Rendering", () => {
+    it("should render custom cell content", () => {
       const customColumns: TableColumn[] = [
         {
-          key: 'name',
-          title: 'Name',
+          key: "name",
+          title: "Name",
           render: (record) => <strong>{record.name}</strong>,
         },
       ];
@@ -477,15 +539,15 @@ describe('Table', () => {
         <Table columns={customColumns} dataSource={dataSource} />
       );
 
-      const strongElements = container.querySelectorAll('strong');
+      const strongElements = container.querySelectorAll("strong");
       expect(strongElements.length).toBe(dataSource.length);
     });
 
-    it('should render custom header content', () => {
+    it("should render custom header content", () => {
       const customColumns: TableColumn[] = [
         {
-          key: 'name',
-          title: 'Name',
+          key: "name",
+          title: "Name",
           renderHeader: () => (
             <span className="custom-header">Custom Name</span>
           ),
@@ -496,14 +558,14 @@ describe('Table', () => {
         <Table columns={customColumns} dataSource={dataSource} />
       );
 
-      const customHeader = container.querySelector('.custom-header');
+      const customHeader = container.querySelector(".custom-header");
       expect(customHeader).toBeInTheDocument();
-      expect(customHeader).toHaveTextContent('Custom Name');
+      expect(customHeader).toHaveTextContent("Custom Name");
     });
   });
 
-  describe('Accessibility', () => {
-    it('should have no a11y violations', async () => {
+  describe("Accessibility", () => {
+    it("should have no a11y violations", async () => {
       const { container } = render(
         <Table columns={columns} dataSource={dataSource} pagination={false} />
       );
@@ -511,20 +573,20 @@ describe('Table', () => {
       await expectNoA11yViolations(container);
     });
 
-    it('should have proper table structure', () => {
+    it("should have proper table structure", () => {
       const { container } = render(
         <Table columns={columns} dataSource={dataSource} pagination={false} />
       );
 
-      expect(container.querySelector('table')).toBeInTheDocument();
-      expect(container.querySelector('thead')).toBeInTheDocument();
-      expect(container.querySelector('tbody')).toBeInTheDocument();
-      expect(container.querySelectorAll('th').length).toBe(columns.length);
+      expect(container.querySelector("table")).toBeInTheDocument();
+      expect(container.querySelector("thead")).toBeInTheDocument();
+      expect(container.querySelector("tbody")).toBeInTheDocument();
+      expect(container.querySelectorAll("th").length).toBe(columns.length);
     });
   });
 
-  describe('Events', () => {
-    it('should call onRowClick when clicking a row', async () => {
+  describe("Events", () => {
+    it("should call onRowClick when clicking a row", async () => {
       const onRowClick = vi.fn();
 
       const { container } = render(
@@ -535,17 +597,17 @@ describe('Table', () => {
         />
       );
 
-      const firstRow = container.querySelector('tbody tr')!;
+      const firstRow = container.querySelector("tbody tr")!;
       await fireEvent.click(firstRow);
 
       expect(onRowClick).toHaveBeenCalledWith(dataSource[0], 0);
     });
 
-    it('should call onChange with combined state', async () => {
+    it("should call onChange with combined state", async () => {
       const onChange = vi.fn();
 
       const sortableColumns: TableColumn[] = [
-        { key: 'name', title: 'Name', sortable: true },
+        { key: "name", title: "Name", sortable: true },
       ];
 
       const { getByText } = render(
@@ -556,22 +618,22 @@ describe('Table', () => {
         />
       );
 
-      const nameHeader = getByText('Name');
-      await fireEvent.click(nameHeader.closest('th')!);
+      const nameHeader = getByText("Name");
+      await fireEvent.click(nameHeader.closest("th")!);
 
       expect(onChange).toHaveBeenCalledWith(
         expect.objectContaining({
           sort: expect.objectContaining({
-            key: 'name',
-            direction: 'asc',
+            key: "name",
+            direction: "asc",
           }),
         })
       );
     });
   });
 
-  describe('Snapshots', () => {
-    it('should match snapshot with default props', () => {
+  describe("Snapshots", () => {
+    it("should match snapshot with default props", () => {
       const { container } = render(
         <Table columns={columns} dataSource={dataSource} pagination={false} />
       );
@@ -579,13 +641,13 @@ describe('Table', () => {
       expect(container).toMatchSnapshot();
     });
 
-    it('should match snapshot with all features enabled', () => {
+    it("should match snapshot with all features enabled", () => {
       const { container } = render(
         <Table
           columns={[
-            { key: 'name', title: 'Name', sortable: true },
-            { key: 'age', title: 'Age', sortable: true },
-            { key: 'email', title: 'Email' },
+            { key: "name", title: "Name", sortable: true },
+            { key: "age", title: "Age", sortable: true },
+            { key: "email", title: "Email" },
           ]}
           dataSource={dataSource}
           size="lg"

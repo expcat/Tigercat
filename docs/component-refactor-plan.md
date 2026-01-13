@@ -8,11 +8,11 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Menu` Step4 tests（2026-01-13）
-- 当前组件：`Tabs`
-- 当前步骤：Step1 API/受控模型与事件语义
+- 上一步：✅ `Table` Step2 a11y（2026-01-13）
+- 当前组件：`Table`
+- 当前步骤：Step3 性能与扩展（可选：虚拟滚动/减少重渲染）
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：32/38
+- 已优化组件数/需优化组件数：33/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -283,7 +283,9 @@ return h("div", { class: "..." }, children);
 #### Tabs / TabPane（P0，建议优化）
 
 - 思路：roving tabindex、aria-controls/aria-labelledby；键盘左右切换；受控/默认值。
-- 状态：未开始
+- 状态：✅ Step1 API/受控模型与事件语义（2026-01-13）：Vue/React 对齐“仅在切换时触发 change/onChange、tab-click/onTabClick 始终触发”；editable-card 增加内置新增按钮并通过 edit/onEdit 回调 `action='add'`（此时 `targetKey` 为空）；补齐 `style` 类型与 Vue `VueTabsProps/VueTabPaneProps` 导出；同步更新 Tabs 测试、文档与 Demo。
+- 状态：✅ Step2 键盘交互与 a11y（2026-01-13）：Vue/React Tab 改为可聚焦的 `button[role=tab]` 并实现 roving tabindex；补齐 `aria-controls/aria-labelledby` 与 `aria-orientation`；支持 Arrow/Home/End/Enter/Space 键盘切换并跳过 disabled；同步新增并更新 Vue/React Tabs 键盘与 aria 相关测试，更新 Tabs 文档可访问性说明。
+- 状态：✅ Step3 交互边界与可用性（2026-01-13）：可关闭 tab 的关闭控件改为 `button` 并补齐 `aria-label`；在 `editable-card` + 可关闭场景支持 `Delete/Backspace` 键盘关闭当前 tab；同步更新 Vue/React Tabs 测试与 Tabs 文档键盘说明。
 
 #### Breadcrumb / BreadcrumbItem（P2，建议优化）
 
@@ -317,7 +319,8 @@ return h("div", { class: "..." }, children);
   - 性能：大数据时可选虚拟滚动/减少重渲染（后置）
 - 可拆分：状态模型/API → a11y → 性能与扩展（可选）→ tests。
 
-- 状态：未开始
+- 状态：✅ Step1 状态模型与 API（2026-01-13）：core 增补 `sort/defaultSort`、`filters/defaultFilters`，并为 `pagination`/`rowSelection` 增加 `default*` 字段；Vue/React Table 对齐 sort/filter/pagination/selection 的受控/非受控状态源（prop 变更可驱动 UI，受控时不写内部状态）；同步补齐受控模式的 Vue/React 测试与 Table 文档，并在 Demo 中新增受控分页示例。
+- 状态：✅ Step2 a11y（2026-01-13）：为可排序表头补齐 `aria-sort`（none/ascending/descending），加载态补 `aria-busy` 与 `role=status` 的 Loading 语义，空态文案使用 `role=status` + `aria-live=polite`；同步更新 Vue/React Table 测试与 Table 文档。
 
 #### List（P2，建议优化）
 

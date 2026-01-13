@@ -152,6 +152,15 @@ const lockableColumns: TableColumn[] = [
 // Row selection
 const selectedRowKeys = ref<number[]>([])
 
+// Controlled pagination
+const pagination = ref({
+  current: 1,
+  pageSize: 10,
+  pageSizeOptions: [10, 20, 50],
+  showSizeChanger: true,
+  showTotal: true,
+})
+
 function handleEdit(record: UserData) {
   alert(`Editing: ${record.name}`)
 }
@@ -168,6 +177,10 @@ function handleDelete(record: UserData) {
 
 function handleSelectionChange(keys: (string | number)[]) {
   selectedRowKeys.value = keys as number[]
+}
+
+function handlePageChange(next: { current: number; pageSize: number }) {
+  pagination.value = { ...pagination.value, ...next }
 }
 
 // Large dataset for pagination demo
@@ -250,15 +263,12 @@ const largeData = ref(
     <!-- 分页 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">分页功能</h2>
-      <p class="text-gray-600 mb-6">大数据集的分页展示。</p>
+      <p class="text-gray-600 mb-6">大数据集的分页展示（受控模式）。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Table :columns="basicColumns"
                :dataSource="largeData"
-               :pagination="{
-                pageSize: 10,
-                showSizeChanger: true,
-                showTotal: true,
-              }" />
+               :pagination="pagination"
+               @page-change="handlePageChange" />
       </div>
     </section>
 

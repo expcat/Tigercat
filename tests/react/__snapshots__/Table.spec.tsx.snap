@@ -6,6 +6,7 @@ exports[`Table > Snapshots > should match snapshot with all features enabled 1`]
     class="relative"
   >
     <div
+      aria-busy="false"
       class="relative w-full overflow-auto border border-gray-200 rounded-lg"
     >
       <table
@@ -24,6 +25,7 @@ exports[`Table > Snapshots > should match snapshot with all features enabled 1`]
               />
             </th>
             <th
+              aria-sort="none"
               class="font-medium text-gray-700 text-sm px-6 py-4 text-left cursor-pointer select-none hover:bg-gray-100 transition-colors"
             >
               <div
@@ -44,6 +46,7 @@ exports[`Table > Snapshots > should match snapshot with all features enabled 1`]
               </div>
             </th>
             <th
+              aria-sort="none"
               class="font-medium text-gray-700 text-sm px-6 py-4 text-left cursor-pointer select-none hover:bg-gray-100 transition-colors"
             >
               <div
@@ -170,6 +173,7 @@ exports[`Table > Snapshots > should match snapshot with default props 1`] = `
     class="relative"
   >
     <div
+      aria-busy="false"
       class="relative w-full overflow-auto"
     >
       <table

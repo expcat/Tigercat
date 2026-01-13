@@ -1,34 +1,34 @@
-import { useRef, useState } from 'react';
-import { Tabs, TabPane } from '@tigercat/react';
+import { useRef, useState } from "react";
+import { Tabs, TabPane } from "@tigercat/react";
 
 export default function TabsDemo() {
-  const [activeKey1, setActiveKey1] = useState('1');
-  const [activeKey2, setActiveKey2] = useState('1');
-  const [activeKey3, setActiveKey3] = useState('1');
-  const [activeKey4, setActiveKey4] = useState('1');
-  const [activeKey5, setActiveKey5] = useState('1');
-  const [activeKey6, setActiveKey6] = useState('1');
-  const [position, setPosition] = useState<'top' | 'bottom' | 'left' | 'right'>(
-    'top'
+  const [activeKey1, setActiveKey1] = useState("1");
+  const [activeKey2, setActiveKey2] = useState("1");
+  const [activeKey3, setActiveKey3] = useState("1");
+  const [activeKey4, setActiveKey4] = useState("1");
+  const [activeKey5, setActiveKey5] = useState("1");
+  const [activeKey6, setActiveKey6] = useState("1");
+  const [position, setPosition] = useState<"top" | "bottom" | "left" | "right">(
+    "top"
   );
 
   // Editable tabs
   const [editableTabs, setEditableTabs] = useState([
-    { key: '1', label: '标签 1', content: '标签 1 的内容' },
-    { key: '2', label: '标签 2', content: '标签 2 的内容' },
-    { key: '3', label: '标签 3', content: '标签 3 的内容' },
+    { key: "1", label: "标签 1", content: "标签 1 的内容" },
+    { key: "2", label: "标签 2", content: "标签 2 的内容" },
+    { key: "3", label: "标签 3", content: "标签 3 的内容" },
   ]);
-  const [activeEditableKey, setActiveEditableKey] = useState('1');
+  const [activeEditableKey, setActiveEditableKey] = useState("1");
   const newTabIndexRef = useRef(4);
 
   const handleEdit = ({
     targetKey,
     action,
   }: {
-    targetKey: string | number;
-    action: 'add' | 'remove';
+    targetKey?: string | number;
+    action: "add" | "remove";
   }) => {
-    if (action === 'add') {
+    if (action === "add") {
       const newKey = `${newTabIndexRef.current++}`;
       setEditableTabs([
         ...editableTabs,
@@ -39,7 +39,7 @@ export default function TabsDemo() {
         },
       ]);
       setActiveEditableKey(newKey);
-    } else if (action === 'remove') {
+    } else if (action === "remove") {
       const targetKeyString = String(targetKey);
       const newTabs = editableTabs.filter((tab) => tab.key !== targetKeyString);
       setEditableTabs(newTabs);
@@ -70,7 +70,8 @@ export default function TabsDemo() {
         <div className="p-6 bg-gray-50 rounded-lg">
           <Tabs
             activeKey={activeKey1}
-            onChange={(key) => setActiveKey1(String(key))}>
+            onChange={(key) => setActiveKey1(String(key))}
+          >
             <TabPane tabKey="1" label="标签页 1">
               <div className="p-4">标签页 1 的内容</div>
             </TabPane>
@@ -93,7 +94,8 @@ export default function TabsDemo() {
           <Tabs
             activeKey={activeKey2}
             onChange={(key) => setActiveKey2(String(key))}
-            type="card">
+            type="card"
+          >
             <TabPane tabKey="1" label="选项卡 1">
               <div className="p-4">选项卡 1 的内容</div>
             </TabPane>
@@ -118,7 +120,8 @@ export default function TabsDemo() {
             onChange={(key) => setActiveEditableKey(String(key))}
             type="editable-card"
             closable
-            onEdit={handleEdit}>
+            onEdit={handleEdit}
+          >
             {editableTabs.map((tab) => (
               <TabPane key={tab.key} tabKey={tab.key} label={tab.label}>
                 <div className="p-4">{tab.content}</div>
@@ -142,10 +145,11 @@ export default function TabsDemo() {
               value={position}
               onChange={(e) =>
                 setPosition(
-                  e.target.value as 'top' | 'bottom' | 'left' | 'right'
+                  e.target.value as "top" | "bottom" | "left" | "right"
                 )
               }
-              className="border border-gray-300 rounded px-3 py-2">
+              className="border border-gray-300 rounded px-3 py-2"
+            >
               <option value="top">上</option>
               <option value="bottom">下</option>
               <option value="left">左</option>
@@ -155,7 +159,8 @@ export default function TabsDemo() {
           <Tabs
             activeKey={activeKey3}
             onChange={(key) => setActiveKey3(String(key))}
-            tabPosition={position}>
+            tabPosition={position}
+          >
             <TabPane tabKey="1" label="标签页 1">
               <div className="p-4">标签页 1 的内容</div>
             </TabPane>
@@ -178,7 +183,8 @@ export default function TabsDemo() {
           <Tabs
             activeKey={activeKey4}
             onChange={(key) => setActiveKey4(String(key))}
-            centered>
+            centered
+          >
             <TabPane tabKey="1" label="标签页 1">
               <div className="p-4">标签页 1 的内容</div>
             </TabPane>
@@ -203,7 +209,8 @@ export default function TabsDemo() {
             <Tabs
               activeKey={activeKey5}
               onChange={(key) => setActiveKey5(String(key))}
-              size="small">
+              size="small"
+            >
               <TabPane tabKey="1" label="小尺寸 1">
                 <div className="p-4">内容</div>
               </TabPane>
@@ -221,7 +228,8 @@ export default function TabsDemo() {
             <Tabs
               activeKey={activeKey5}
               onChange={(key) => setActiveKey5(String(key))}
-              size="medium">
+              size="medium"
+            >
               <TabPane tabKey="1" label="中等尺寸 1">
                 <div className="p-4">内容</div>
               </TabPane>
@@ -239,7 +247,8 @@ export default function TabsDemo() {
             <Tabs
               activeKey={activeKey5}
               onChange={(key) => setActiveKey5(String(key))}
-              size="large">
+              size="large"
+            >
               <TabPane tabKey="1" label="大尺寸 1">
                 <div className="p-4">内容</div>
               </TabPane>
@@ -262,7 +271,8 @@ export default function TabsDemo() {
         <div className="p-6 bg-gray-50 rounded-lg">
           <Tabs
             activeKey={activeKey6}
-            onChange={(key) => setActiveKey6(String(key))}>
+            onChange={(key) => setActiveKey6(String(key))}
+          >
             <TabPane tabKey="1" label="标签页 1">
               <div className="p-4">标签页 1 的内容</div>
             </TabPane>

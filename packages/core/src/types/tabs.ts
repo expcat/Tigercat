@@ -5,17 +5,17 @@
 /**
  * Tab type - determines the style of the tabs
  */
-export type TabType = 'line' | 'card' | 'editable-card'
+export type TabType = "line" | "card" | "editable-card";
 
 /**
  * Tab position - determines where the tabs are positioned
  */
-export type TabPosition = 'top' | 'bottom' | 'left' | 'right'
+export type TabPosition = "top" | "bottom" | "left" | "right";
 
 /**
  * Tab size - determines the size of the tabs
  */
-export type TabSize = 'small' | 'medium' | 'large'
+export type TabSize = "small" | "medium" | "large";
 
 /**
  * Base tabs props interface
@@ -24,49 +24,49 @@ export interface TabsProps {
   /**
    * Currently active tab key
    */
-  activeKey?: string | number
+  activeKey?: string | number;
   /**
    * Default active tab key (for uncontrolled mode)
    */
-  defaultActiveKey?: string | number
+  defaultActiveKey?: string | number;
   /**
    * Tab type - line, card, or editable-card
    * @default 'line'
    */
-  type?: TabType
+  type?: TabType;
   /**
    * Tab position - top, bottom, left, or right
    * @default 'top'
    */
-  tabPosition?: TabPosition
+  tabPosition?: TabPosition;
   /**
    * Tab size - small, medium, or large
    * @default 'medium'
    */
-  size?: TabSize
+  size?: TabSize;
   /**
    * Whether tabs can be closed (only works with editable-card type)
    * @default false
    */
-  closable?: boolean
+  closable?: boolean;
   /**
    * Whether tabs are centered
    * @default false
    */
-  centered?: boolean
+  centered?: boolean;
   /**
    * Whether to destroy inactive tab panes
    * @default false
    */
-  destroyInactiveTabPane?: boolean
+  destroyInactiveTabPane?: boolean;
   /**
    * Additional CSS classes
    */
-  className?: string
+  className?: string;
   /**
    * Custom styles
    */
-  style?: Record<string, string | number>
+  style?: Record<string, string | number>;
 }
 
 /**
@@ -76,32 +76,32 @@ export interface TabPaneProps {
   /**
    * Unique key for the tab pane (required)
    */
-  tabKey: string | number
+  tabKey: string | number;
   /**
    * Tab label/title
    */
-  label: string
+  label: string;
   /**
    * Whether the tab is disabled
    * @default false
    */
-  disabled?: boolean
+  disabled?: boolean;
   /**
    * Whether the tab can be closed (overrides parent closable)
    */
-  closable?: boolean
+  closable?: boolean;
   /**
    * Icon for the tab
    */
-  icon?: unknown
+  icon?: unknown;
   /**
    * Additional CSS classes
    */
-  className?: string
+  className?: string;
   /**
    * Custom styles
    */
-  style?: Record<string, string | number>
+  style?: Record<string, string | number>;
 }
 
 /**
@@ -111,7 +111,7 @@ export interface TabChangeInfo {
   /**
    * The key of the newly activated tab
    */
-  activeKey: string | number
+  activeKey: string | number;
 }
 
 /**
@@ -121,9 +121,9 @@ export interface TabEditInfo {
   /**
    * The key of the tab being edited
    */
-  targetKey: string | number
+  targetKey?: string | number;
   /**
    * The action being performed (add or remove)
    */
-  action: 'add' | 'remove'
+  action: "add" | "remove";
 }
