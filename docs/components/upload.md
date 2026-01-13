@@ -8,13 +8,13 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Upload } from '@tigercat/vue';
+import { ref } from "vue";
+import { Upload } from "@tigercat/vue";
 
 const fileList = ref([]);
 
 const handleChange = (file, list) => {
-  console.log('File changed:', file, list);
+  console.log("File changed:", file, list);
 };
 </script>
 
@@ -28,14 +28,14 @@ const handleChange = (file, list) => {
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Upload, type UploadFile } from '@tigercat/react';
+import { useState } from "react";
+import { Upload, type UploadFile } from "@tigercat/react";
 
 function App() {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   const handleChange = (file, list) => {
-    console.log('File changed:', file, list);
+    console.log("File changed:", file, list);
     setFileList(list);
   };
 
@@ -55,8 +55,8 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Upload } from '@tigercat/vue';
+import { ref } from "vue";
+import { Upload } from "@tigercat/vue";
 
 const fileList = ref([]);
 </script>
@@ -69,13 +69,10 @@ const fileList = ref([]);
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Upload, type UploadFile } from '@tigercat/react';
+import { Upload } from "@tigercat/react";
 
 function App() {
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-
-  return <Upload fileList={fileList} drag />;
+  return <Upload drag />;
 }
 ```
 
@@ -159,13 +156,13 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Upload } from '@tigercat/vue';
+import { ref } from "vue";
+import { Upload } from "@tigercat/vue";
 
 const fileList = ref([]);
 
 const handleExceed = (files, list) => {
-  console.log('Files exceeded limit:', files);
+  console.log("Files exceeded limit:", files);
 };
 </script>
 
@@ -174,7 +171,8 @@ const handleExceed = (files, list) => {
     v-model:file-list="fileList"
     multiple
     :limit="3"
-    @exceed="handleExceed">
+    @exceed="handleExceed"
+  >
     Upload (Max 3 files)
   </Upload>
 </template>
@@ -183,14 +181,14 @@ const handleExceed = (files, list) => {
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Upload, type UploadFile } from '@tigercat/react';
+import { useState } from "react";
+import { Upload, type UploadFile } from "@tigercat/react";
 
 function App() {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   const handleExceed = (files, list) => {
-    console.log('Files exceeded limit:', files);
+    console.log("Files exceeded limit:", files);
   };
 
   return (
@@ -249,8 +247,8 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Upload } from '@tigercat/vue';
+import { ref } from "vue";
+import { Upload } from "@tigercat/vue";
 
 const fileList = ref([]);
 
@@ -263,7 +261,7 @@ const customRequest = ({ file, onProgress, onSuccess, onError }) => {
 
     if (progress >= 100) {
       clearInterval(interval);
-      onSuccess({ url: 'https://example.com/file.jpg' });
+      onSuccess({ url: "https://example.com/file.jpg" });
     }
   }, 200);
 };
@@ -279,12 +277,12 @@ const customRequest = ({ file, onProgress, onSuccess, onError }) => {
 ### React
 
 ```tsx
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Upload,
   type UploadFile,
   type UploadRequestOptions,
-} from '@tigercat/react';
+} from "@tigercat/react";
 
 function App() {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
@@ -303,7 +301,7 @@ function App() {
 
       if (progress >= 100) {
         clearInterval(interval);
-        if (onSuccess) onSuccess({ url: 'https://example.com/file.jpg' });
+        if (onSuccess) onSuccess({ url: "https://example.com/file.jpg" });
       }
     }, 200);
   };
@@ -320,22 +318,24 @@ function App() {
 
 通过 `beforeUpload` 在上传前进行校验，返回 `false` 可阻止上传。
 
+如果 `beforeUpload` 抛错或 Promise reject，会被视为校验失败并阻止本次文件进入列表（不会触发 `change/onChange`）。
+
 ### Vue 3
 
 ```vue
 <script setup>
-import { Upload } from '@tigercat/vue';
+import { Upload } from "@tigercat/vue";
 
 const beforeUpload = (file) => {
-  const isJPG = file.type === 'image/jpeg';
+  const isJPG = file.type === "image/jpeg";
   const isLt2M = file.size / 1024 / 1024 < 2;
 
   if (!isJPG) {
-    alert('只能上传 JPG 格式的图片！');
+    alert("只能上传 JPG 格式的图片！");
     return false;
   }
   if (!isLt2M) {
-    alert('图片大小不能超过 2MB！');
+    alert("图片大小不能超过 2MB！");
     return false;
   }
   return true;
@@ -350,19 +350,19 @@ const beforeUpload = (file) => {
 ### React
 
 ```tsx
-import { Upload } from '@tigercat/react';
+import { Upload } from "@tigercat/react";
 
 function App() {
   const beforeUpload = (file: File) => {
-    const isJPG = file.type === 'image/jpeg';
+    const isJPG = file.type === "image/jpeg";
     const isLt2M = file.size / 1024 / 1024 < 2;
 
     if (!isJPG) {
-      alert('只能上传 JPG 格式的图片！');
+      alert("只能上传 JPG 格式的图片！");
       return false;
     }
     if (!isLt2M) {
-      alert('图片大小不能超过 2MB！');
+      alert("图片大小不能超过 2MB！");
       return false;
     }
     return true;
@@ -392,32 +392,34 @@ function App() {
 
 ### Props
 
-| 参数          | 说明                                        | 类型                                          | 默认值   |
-| ------------- | ------------------------------------------- | --------------------------------------------- | -------- |
-| accept        | 接受的文件类型（同 HTML input accept 属性） | `string`                                      | -        |
-| multiple      | 是否允许多选文件                            | `boolean`                                     | `false`  |
-| limit         | 最大允许上传个数                            | `number`                                      | -        |
-| maxSize       | 文件大小限制（字节）                        | `number`                                      | -        |
-| disabled      | 是否禁用                                    | `boolean`                                     | `false`  |
-| drag          | 是否启用拖拽上传                            | `boolean`                                     | `false`  |
-| listType      | 文件列表的类型                              | `'text' \| 'picture' \| 'picture-card'`       | `'text'` |
-| fileList      | 文件列表（Vue 使用 v-model:file-list）      | `UploadFile[]`                                | `[]`     |
-| showFileList  | 是否显示文件列表                            | `boolean`                                     | `true`   |
-| autoUpload    | 选择文件后是否自动上传                      | `boolean`                                     | `true`   |
-| customRequest | 自定义上传实现                              | `(options: UploadRequestOptions) => void`     | -        |
-| beforeUpload  | 上传文件之前的钩子，返回 false 可阻止上传   | `(file: File) => boolean \| Promise<boolean>` | -        |
+| 参数          | 说明                                                   | 类型                                                      | 默认值   |
+| ------------- | ------------------------------------------------------ | --------------------------------------------------------- | -------- |
+| accept        | 接受的文件类型（同 HTML input accept 属性）            | `string`                                                  | -        |
+| multiple      | 是否允许多选文件                                       | `boolean`                                                 | `false`  |
+| limit         | 最大允许上传个数                                       | `number`                                                  | -        |
+| maxSize       | 文件大小限制（字节）                                   | `number`                                                  | -        |
+| disabled      | 是否禁用                                               | `boolean`                                                 | `false`  |
+| drag          | 是否启用拖拽上传                                       | `boolean`                                                 | `false`  |
+| listType      | 文件列表的类型                                         | `'text' \| 'picture' \| 'picture-card'`                   | `'text'` |
+| fileList      | 文件列表（Vue 可用 v-model:file-list；不传则内部维护） | `UploadFile[]`                                            | -        |
+| showFileList  | 是否显示文件列表                                       | `boolean`                                                 | `true`   |
+| autoUpload    | 选择文件后是否自动上传                                 | `boolean`                                                 | `true`   |
+| customRequest | 自定义上传实现                                         | `(options: UploadRequestOptions) => void`                 | -        |
+| beforeUpload  | 上传文件之前的钩子，返回 false 可阻止上传              | `(file: File) => boolean \| Promise<boolean>`             | -        |
+| className     | 自定义 CSS 类名                                        | `string`                                                  | -        |
+| style         | 自定义样式（Vue 为 prop；React 为原生 `style`）        | `Record<string, string \| number> \| React.CSSProperties` | -        |
 
 ### Events (Vue) / Callbacks (React)
 
-| 事件名 / 回调         | 说明                     | 参数                                         |
-| --------------------- | ------------------------ | -------------------------------------------- |
-| change / onChange     | 文件状态改变时的回调     | `(file: UploadFile, fileList: UploadFile[])` |
-| remove / onRemove     | 文件移除时的回调         | `(file: UploadFile, fileList: UploadFile[])` |
-| preview / onPreview   | 点击文件预览时的回调     | `(file: UploadFile)`                         |
-| progress / onProgress | 上传进度回调             | `(progress: number, file: UploadFile)`       |
-| success / onSuccess   | 上传成功回调             | `(response: unknown, file: UploadFile)`      |
-| error / onError       | 上传失败回调             | `(error: Error, file: UploadFile)`           |
-| exceed / onExceed     | 文件超出个数限制时的回调 | `(files: File[], fileList: UploadFile[])`    |
+| 事件名 / 回调         | 说明                                                           | 参数                                         |
+| --------------------- | -------------------------------------------------------------- | -------------------------------------------- |
+| change / onChange     | 文件状态改变时的回调                                           | `(file: UploadFile, fileList: UploadFile[])` |
+| remove / onRemove     | 文件移除时的回调（返回 false 可阻止移除，仅 React `onRemove`） | `(file: UploadFile, fileList: UploadFile[])` |
+| preview / onPreview   | 点击文件预览时的回调                                           | `(file: UploadFile)`                         |
+| progress / onProgress | 上传进度回调                                                   | `(progress: number, file: UploadFile)`       |
+| success / onSuccess   | 上传成功回调                                                   | `(response: unknown, file: UploadFile)`      |
+| error / onError       | 上传失败回调                                                   | `(error: Error, file: UploadFile)`           |
+| exceed / onExceed     | 文件超出个数限制时的回调                                       | `(files: File[], fileList: UploadFile[])`    |
 
 ### UploadFile 接口
 
@@ -425,7 +427,7 @@ function App() {
 interface UploadFile {
   uid: string; // 唯一标识符
   name: string; // 文件名
-  status?: 'ready' | 'uploading' | 'success' | 'error'; // 状态
+  status?: "ready" | "uploading" | "success" | "error"; // 状态
   progress?: number; // 上传进度 (0-100)
   size?: number; // 文件大小（字节）
   type?: string; // 文件类型
@@ -478,5 +480,6 @@ Upload 组件使用 Tailwind CSS 类和 CSS 变量，支持主题定制：
 4. **图片预览**：使用 `picture-card` 模式时，组件会使用 `URL.createObjectURL` 创建临时 URL 进行预览。记得在不需要时清理这些 URL。
 
 5. **文件列表管理**：
-   - Vue：使用 `v-model:file-list` 双向绑定
-   - React：使用 `fileList` 和 `onChange` 进行受控或非受控管理
+
+- Vue：受控用 `v-model:file-list`；非受控可不传 `file-list`（组件内部维护）
+- React：受控传 `fileList` + `onChange`；非受控不传 `fileList`（组件内部维护），可选监听 `onChange`
