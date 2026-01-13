@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed, watch, h, PropType } from 'vue';
+import { defineComponent, ref, computed, watch, h, PropType } from "vue";
 import {
   classNames,
   coerceClassValue,
@@ -20,7 +20,7 @@ import {
   getFileListItemClasses,
   getPictureCardClasses,
   getUploadStatusIconClasses,
-} from '@tigercat/core';
+} from "@tigercat/core";
 
 export interface VueUploadProps {
   accept?: string;
@@ -40,7 +40,7 @@ export interface VueUploadProps {
 }
 
 export const Upload = defineComponent({
-  name: 'TigerUpload',
+  name: "TigerUpload",
   inheritAttrs: false,
   props: {
     /**
@@ -107,7 +107,7 @@ export const Upload = defineComponent({
      */
     listType: {
       type: String as PropType<UploadListType>,
-      default: 'text' as UploadListType,
+      default: "text" as UploadListType,
     },
     /**
      * List of uploaded files (v-model:file-list)
@@ -149,7 +149,7 @@ export const Upload = defineComponent({
     /**
      * Emitted when file list changes (for v-model:file-list)
      */
-    'update:file-list': (files: UploadFile[]) => Array.isArray(files),
+    "update:file-list": (files: UploadFile[]) => Array.isArray(files),
     /**
      * Emitted when file list changes
      */
@@ -166,7 +166,7 @@ export const Upload = defineComponent({
      * Emitted on upload progress
      */
     progress: (progress: number, _file: UploadFile) =>
-      typeof progress === 'number',
+      typeof progress === "number",
     /**
      * Emitted on upload success
      */
@@ -186,7 +186,7 @@ export const Upload = defineComponent({
     const isDragging = ref(false);
     const attrsRecord = attrs as Record<string, unknown>;
 
-    const spinnerSvg = getSpinnerSVG('spinner');
+    const spinnerSvg = getSpinnerSVG("spinner");
 
     const isControlled = computed(() => props.fileList !== undefined);
     const internalFileList = ref<UploadFile[]>(
@@ -214,7 +214,7 @@ export const Upload = defineComponent({
       if (!isControlled.value) {
         internalFileList.value = value;
       }
-      emit('update:file-list', value);
+      emit("update:file-list", value);
     };
 
     const handleClick = () => {
@@ -228,7 +228,7 @@ export const Upload = defineComponent({
       await processFiles(files);
       // Reset input value to allow selecting the same file again
       if (target) {
-        target.value = '';
+        target.value = "";
       }
     };
 
@@ -245,7 +245,7 @@ export const Upload = defineComponent({
       });
 
       if (prepared.rejectedExceedFiles.length > 0) {
-        emit('exceed', prepared.rejectedExceedFiles, fileListValue.value);
+        emit("exceed", prepared.rejectedExceedFiles, fileListValue.value);
       }
 
       // Important: fileListValue is a snapshot (props/state). Use a local accumulator
@@ -258,31 +258,31 @@ export const Upload = defineComponent({
         // Add to file list
         nextFileList = [...nextFileList, uploadFile];
         setFileList(nextFileList);
-        emit('change', uploadFile, nextFileList);
+        emit("change", uploadFile, nextFileList);
 
         // Auto upload if enabled
         if (props.autoUpload) {
-          uploadFile.status = 'uploading';
+          uploadFile.status = "uploading";
           if (props.customRequest) {
             props.customRequest({
               file,
               onProgress: (progress: number) => {
                 uploadFile.progress = progress;
-                emit('progress', progress, uploadFile);
+                emit("progress", progress, uploadFile);
               },
               onSuccess: (response: unknown) => {
-                uploadFile.status = 'success';
-                emit('success', response, uploadFile);
+                uploadFile.status = "success";
+                emit("success", response, uploadFile);
               },
               onError: (error: Error) => {
-                uploadFile.status = 'error';
+                uploadFile.status = "error";
                 uploadFile.error = error.message;
-                emit('error', error, uploadFile);
+                emit("error", error, uploadFile);
               },
             });
           } else {
             // Simulate upload for demo purposes
-            uploadFile.status = 'success';
+            uploadFile.status = "success";
           }
         }
       }
@@ -291,12 +291,12 @@ export const Upload = defineComponent({
     const handleRemove = (file: UploadFile) => {
       const newFileList = fileListValue.value.filter((f) => f.uid !== file.uid);
       setFileList(newFileList);
-      emit('remove', file, newFileList);
-      emit('change', file, newFileList);
+      emit("remove", file, newFileList);
+      emit("change", file, newFileList);
     };
 
     const handlePreview = (file: UploadFile) => {
-      emit('preview', file);
+      emit("preview", file);
     };
 
     const handleDragOver = (event: DragEvent) => {
@@ -323,29 +323,29 @@ export const Upload = defineComponent({
     const handleDragKeydown = (event: KeyboardEvent) => {
       if (props.disabled) return;
 
-      if (event.key === 'Enter' || event.key === ' ') {
+      if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
         handleClick();
       }
     };
 
     const renderInput = () => {
-      return h('input', {
+      return h("input", {
         ref: inputRef,
-        type: 'file',
+        type: "file",
         accept: props.accept,
         multiple: props.multiple,
         disabled: props.disabled,
-        style: { display: 'none' },
+        style: { display: "none" },
         onChange: handleFileChange,
-        'aria-hidden': 'true',
+        "aria-hidden": "true",
       });
     };
 
     const renderUploadButton = () => {
       if (props.drag) {
         return h(
-          'div',
+          "div",
           {
             class: getDragAreaClasses(isDragging.value, props.disabled),
             onClick: handleClick,
@@ -353,44 +353,44 @@ export const Upload = defineComponent({
             onDragover: handleDragOver,
             onDragleave: handleDragLeave,
             onDrop: handleDrop,
-            role: 'button',
+            role: "button",
             tabindex: props.disabled ? -1 : 0,
-            'aria-disabled': props.disabled,
-            'aria-label': 'Upload file by clicking or dragging',
+            "aria-disabled": props.disabled,
+            "aria-label": "Upload file by clicking or dragging",
           },
           [
             h(
-              'svg',
+              "svg",
               {
-                class: 'w-12 h-12 mb-3 text-gray-400',
-                fill: 'none',
-                stroke: 'currentColor',
-                viewBox: '0 0 24 24',
-                'aria-hidden': 'true',
+                class: "w-12 h-12 mb-3 text-gray-400",
+                fill: "none",
+                stroke: "currentColor",
+                viewBox: "0 0 24 24",
+                "aria-hidden": "true",
               },
               [
-                h('path', {
-                  'stroke-linecap': 'round',
-                  'stroke-linejoin': 'round',
-                  'stroke-width': '2',
-                  d: 'M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12',
+                h("path", {
+                  "stroke-linecap": "round",
+                  "stroke-linejoin": "round",
+                  "stroke-width": "2",
+                  d: "M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12",
                 }),
               ]
             ),
-            h('p', { class: 'mb-2 text-sm' }, [
-              h('span', { class: 'font-semibold' }, 'Click to upload'),
-              ' or drag and drop',
+            h("p", { class: "mb-2 text-sm" }, [
+              h("span", { class: "font-semibold" }, "Click to upload"),
+              " or drag and drop",
             ]),
             props.accept &&
               h(
-                'p',
-                { class: 'text-xs text-gray-500' },
+                "p",
+                { class: "text-xs text-gray-500" },
                 `Accepted: ${props.accept}`
               ),
             props.maxSize &&
               h(
-                'p',
-                { class: 'text-xs text-gray-500' },
+                "p",
+                { class: "text-xs text-gray-500" },
                 `Max size: ${formatFileSize(props.maxSize)}`
               ),
           ]
@@ -398,15 +398,15 @@ export const Upload = defineComponent({
       }
 
       return h(
-        'button',
+        "button",
         {
-          type: 'button',
+          type: "button",
           class: getUploadButtonClasses(props.drag, props.disabled),
           onClick: handleClick,
           disabled: props.disabled,
-          'aria-label': 'Upload file',
+          "aria-label": "Upload file",
         },
-        slots.default ? slots.default() : 'Select File'
+        slots.default ? slots.default() : "Select File"
       );
     };
 
@@ -415,20 +415,20 @@ export const Upload = defineComponent({
         return null;
       }
 
-      if (props.listType === 'picture-card') {
+      if (props.listType === "picture-card") {
         return h(
-          'div',
-          { class: 'flex flex-wrap gap-2 mt-4' },
+          "div",
+          { class: "flex flex-wrap gap-2 mt-4" },
           fileListValue.value.map((file) => renderPictureCard(file))
         );
       }
 
       return h(
-        'ul',
+        "ul",
         {
-          class: 'mt-4 space-y-2',
-          role: 'list',
-          'aria-label': 'Uploaded files',
+          class: "mt-4 space-y-2",
+          role: "list",
+          "aria-label": "Uploaded files",
         },
         fileListValue.value.map((file) => renderFileItem(file))
       );
@@ -436,90 +436,90 @@ export const Upload = defineComponent({
 
     const renderFileItem = (file: UploadFile) => {
       return h(
-        'li',
+        "li",
         {
           class: getFileListItemClasses(file.status),
           key: file.uid,
         },
         [
-          h('div', { class: 'flex items-center flex-1 min-w-0' }, [
+          h("div", { class: "flex items-center flex-1 min-w-0" }, [
             // File icon
             h(
-              'svg',
+              "svg",
               {
-                class: 'w-5 h-5 mr-2 flex-shrink-0',
-                fill: 'none',
-                stroke: 'currentColor',
-                viewBox: '0 0 24 24',
-                'aria-hidden': 'true',
+                class: "w-5 h-5 mr-2 flex-shrink-0",
+                fill: "none",
+                stroke: "currentColor",
+                viewBox: "0 0 24 24",
+                "aria-hidden": "true",
               },
               [
-                h('path', {
-                  'stroke-linecap': 'round',
-                  'stroke-linejoin': 'round',
-                  'stroke-width': '2',
-                  d: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+                h("path", {
+                  "stroke-linecap": "round",
+                  "stroke-linejoin": "round",
+                  "stroke-width": "2",
+                  d: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
                 }),
               ]
             ),
             // File name and size
-            h('div', { class: 'flex-1 min-w-0' }, [
-              h('p', { class: 'text-sm font-medium truncate' }, file.name),
+            h("div", { class: "flex-1 min-w-0" }, [
+              h("p", { class: "text-sm font-medium truncate" }, file.name),
               file.size &&
                 h(
-                  'p',
-                  { class: 'text-xs text-gray-500' },
+                  "p",
+                  { class: "text-xs text-gray-500" },
                   formatFileSize(file.size)
                 ),
             ]),
           ]),
           // Actions
-          h('div', { class: 'flex items-center space-x-2 ml-4' }, [
+          h("div", { class: "flex items-center space-x-2 ml-4" }, [
             // Status icon
-            file.status === 'success' &&
+            file.status === "success" &&
               h(
-                'svg',
+                "svg",
                 {
-                  class: getUploadStatusIconClasses('success', 'sm'),
-                  fill: 'currentColor',
+                  class: getUploadStatusIconClasses("success", "sm"),
+                  fill: "currentColor",
                   viewBox: icon20ViewBox,
-                  'aria-label': 'Success',
+                  "aria-label": "Success",
                 },
                 [
-                  h('path', {
-                    'fill-rule': 'evenodd',
+                  h("path", {
+                    "fill-rule": "evenodd",
                     d: successCircleSolidIcon20PathD,
-                    'clip-rule': 'evenodd',
+                    "clip-rule": "evenodd",
                   }),
                 ]
               ),
-            file.status === 'error' &&
+            file.status === "error" &&
               h(
-                'svg',
+                "svg",
                 {
-                  class: getUploadStatusIconClasses('error', 'sm'),
-                  fill: 'currentColor',
+                  class: getUploadStatusIconClasses("error", "sm"),
+                  fill: "currentColor",
                   viewBox: icon20ViewBox,
-                  'aria-label': 'Error',
+                  "aria-label": "Error",
                 },
                 [
-                  h('path', {
-                    'fill-rule': 'evenodd',
+                  h("path", {
+                    "fill-rule": "evenodd",
                     d: errorCircleSolidIcon20PathD,
-                    'clip-rule': 'evenodd',
+                    "clip-rule": "evenodd",
                   }),
                 ]
               ),
-            file.status === 'uploading' &&
+            file.status === "uploading" &&
               h(
-                'svg',
+                "svg",
                 {
-                  class: getUploadStatusIconClasses('uploading', 'sm', {
+                  class: getUploadStatusIconClasses("uploading", "sm", {
                     spinning: true,
                   }),
-                  fill: 'none',
+                  fill: "none",
                   viewBox: spinnerSvg.viewBox,
-                  'aria-label': 'Uploading',
+                  "aria-label": "Uploading",
                 },
                 spinnerSvg.elements.map((el) =>
                   h(el.type, normalizeSvgAttrs(el.attrs))
@@ -527,27 +527,27 @@ export const Upload = defineComponent({
               ),
             // Remove button
             h(
-              'button',
+              "button",
               {
-                type: 'button',
-                class: 'text-gray-400 hover:text-red-500 transition-colors',
+                type: "button",
+                class: "text-gray-400 hover:text-red-500 transition-colors",
                 onClick: () => handleRemove(file),
-                'aria-label': `Remove ${file.name}`,
+                "aria-label": `Remove ${file.name}`,
               },
               [
                 h(
-                  'svg',
+                  "svg",
                   {
-                    class: 'w-5 h-5',
-                    fill: 'currentColor',
+                    class: "w-5 h-5",
+                    fill: "currentColor",
                     viewBox: icon20ViewBox,
-                    'aria-hidden': 'true',
+                    "aria-hidden": "true",
                   },
                   [
-                    h('path', {
-                      'fill-rule': 'evenodd',
+                    h("path", {
+                      "fill-rule": "evenodd",
                       d: closeSolidIcon20PathD,
-                      'clip-rule': 'evenodd',
+                      "clip-rule": "evenodd",
                     }),
                   ]
                 ),
@@ -560,10 +560,10 @@ export const Upload = defineComponent({
 
     const renderPictureCard = (file: UploadFile) => {
       const imageUrl =
-        file.url || (file.file ? URL.createObjectURL(file.file) : '');
+        file.url || (file.file ? URL.createObjectURL(file.file) : "");
 
       return h(
-        'div',
+        "div",
         {
           class: getPictureCardClasses(file.status),
           key: file.uid,
@@ -571,50 +571,50 @@ export const Upload = defineComponent({
         [
           // Image preview
           imageUrl &&
-            h('img', {
+            h("img", {
               src: imageUrl,
               alt: file.name,
-              class: 'w-full h-full object-cover',
+              class: "w-full h-full object-cover",
             }),
           // Overlay
           h(
-            'div',
+            "div",
             {
               class:
-                'absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-all flex items-center justify-center space-x-2 opacity-0 hover:opacity-100',
+                "absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-all flex items-center justify-center space-x-2 opacity-0 hover:opacity-100",
             },
             [
               // Preview button
               h(
-                'button',
+                "button",
                 {
-                  type: 'button',
-                  class: 'text-white hover:text-blue-200 transition-colors',
+                  type: "button",
+                  class: "text-white hover:text-blue-200 transition-colors",
                   onClick: () => handlePreview(file),
-                  'aria-label': `Preview ${file.name}`,
+                  "aria-label": `Preview ${file.name}`,
                 },
                 [
                   h(
-                    'svg',
+                    "svg",
                     {
-                      class: 'w-6 h-6',
-                      fill: 'none',
-                      stroke: 'currentColor',
-                      viewBox: '0 0 24 24',
-                      'aria-hidden': 'true',
+                      class: "w-6 h-6",
+                      fill: "none",
+                      stroke: "currentColor",
+                      viewBox: "0 0 24 24",
+                      "aria-hidden": "true",
                     },
                     [
-                      h('path', {
-                        'stroke-linecap': 'round',
-                        'stroke-linejoin': 'round',
-                        'stroke-width': '2',
-                        d: 'M15 12a3 3 0 11-6 0 3 3 0 016 0z',
+                      h("path", {
+                        "stroke-linecap": "round",
+                        "stroke-linejoin": "round",
+                        "stroke-width": "2",
+                        d: "M15 12a3 3 0 11-6 0 3 3 0 016 0z",
                       }),
-                      h('path', {
-                        'stroke-linecap': 'round',
-                        'stroke-linejoin': 'round',
-                        'stroke-width': '2',
-                        d: 'M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z',
+                      h("path", {
+                        "stroke-linecap": "round",
+                        "stroke-linejoin": "round",
+                        "stroke-width": "2",
+                        d: "M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z",
                       }),
                     ]
                   ),
@@ -622,27 +622,27 @@ export const Upload = defineComponent({
               ),
               // Remove button
               h(
-                'button',
+                "button",
                 {
-                  type: 'button',
-                  class: 'text-white hover:text-red-200 transition-colors',
+                  type: "button",
+                  class: "text-white hover:text-red-200 transition-colors",
                   onClick: () => handleRemove(file),
-                  'aria-label': `Remove ${file.name}`,
+                  "aria-label": `Remove ${file.name}`,
                 },
                 [
                   h(
-                    'svg',
+                    "svg",
                     {
-                      class: 'w-6 h-6',
-                      fill: 'currentColor',
-                      viewBox: '0 0 20 20',
-                      'aria-hidden': 'true',
+                      class: "w-6 h-6",
+                      fill: "currentColor",
+                      viewBox: "0 0 20 20",
+                      "aria-hidden": "true",
                     },
                     [
-                      h('path', {
-                        'fill-rule': 'evenodd',
-                        d: 'M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z',
-                        'clip-rule': 'evenodd',
+                      h("path", {
+                        "fill-rule": "evenodd",
+                        d: "M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z",
+                        "clip-rule": "evenodd",
                       }),
                     ]
                   ),
@@ -651,21 +651,21 @@ export const Upload = defineComponent({
             ]
           ),
           // Status indicator
-          file.status === 'uploading' &&
+          file.status === "uploading" &&
             h(
-              'div',
+              "div",
               {
                 class:
-                  'absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center',
+                  "absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center",
               },
               [
                 h(
-                  'svg',
+                  "svg",
                   {
-                    class: getUploadStatusIconClasses('uploading', 'lg', {
+                    class: getUploadStatusIconClasses("uploading", "lg", {
                       spinning: true,
                     }),
-                    fill: 'none',
+                    fill: "none",
                     viewBox: spinnerSvg.viewBox,
                   },
                   spinnerSvg.elements.map((el) =>
@@ -680,11 +680,11 @@ export const Upload = defineComponent({
 
     return () => {
       return h(
-        'div',
+        "div",
         {
           ...attrs,
           class: classNames(
-            'tiger-upload',
+            "tiger-upload",
             props.className,
             coerceClassValue(attrsRecord.class)
           ),

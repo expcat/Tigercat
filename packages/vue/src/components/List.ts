@@ -7,7 +7,7 @@ import {
   PropType,
   type VNode,
   type VNodeArrayChildren,
-} from 'vue';
+} from "vue";
 import {
   classNames,
   coerceClassValue,
@@ -32,25 +32,26 @@ import {
   listGridContainerClasses,
   getSpinnerSVG,
   normalizeSvgAttrs,
+  getLoadingOverlaySpinnerClasses,
   type ListSize,
   type ListBorderStyle,
   type ListItemLayout,
   type ListItem,
   type ListPaginationConfig,
-} from '@tigercat/core';
+} from "@tigercat/core";
 
-const spinnerSvg = getSpinnerSVG('spinner');
+const spinnerSvg = getSpinnerSVG("spinner");
 
 type RawChildren = string | number | boolean | VNode | VNodeArrayChildren;
 
 // Loading spinner component
 const LoadingSpinner = () => {
   return h(
-    'svg',
+    "svg",
     {
-      class: 'animate-spin h-8 w-8 text-[var(--tiger-primary,#2563eb)]',
-      xmlns: 'http://www.w3.org/2000/svg',
-      fill: 'none',
+      class: getLoadingOverlaySpinnerClasses(),
+      xmlns: "http://www.w3.org/2000/svg",
+      fill: "none",
       viewBox: spinnerSvg.viewBox,
     },
     spinnerSvg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
@@ -58,7 +59,7 @@ const LoadingSpinner = () => {
 };
 
 export const List = defineComponent({
-  name: 'TigerList',
+  name: "TigerList",
   inheritAttrs: false,
   props: {
     /**
@@ -73,14 +74,14 @@ export const List = defineComponent({
      */
     size: {
       type: String as PropType<ListSize>,
-      default: 'md' as ListSize,
+      default: "md" as ListSize,
     },
     /**
      * Border style
      */
     bordered: {
       type: String as PropType<ListBorderStyle>,
-      default: 'divided' as ListBorderStyle,
+      default: "divided" as ListBorderStyle,
     },
     /**
      * Loading state
@@ -94,7 +95,7 @@ export const List = defineComponent({
      */
     emptyText: {
       type: String,
-      default: 'No data',
+      default: "No data",
     },
     /**
      * Whether to show split line between items
@@ -108,7 +109,7 @@ export const List = defineComponent({
      */
     itemLayout: {
       type: String as PropType<ListItemLayout>,
-      default: 'horizontal' as ListItemLayout,
+      default: "horizontal" as ListItemLayout,
     },
     /**
      * Pagination configuration
@@ -139,7 +140,7 @@ export const List = defineComponent({
       type: [String, Function] as PropType<
         string | ((item: ListItem, index: number) => string | number)
       >,
-      default: 'key',
+      default: "key",
     },
     /**
      * Whether items are hoverable
@@ -165,7 +166,7 @@ export const List = defineComponent({
       default: undefined,
     },
   },
-  emits: ['item-click', 'page-change'],
+  emits: ["item-click", "page-change"],
   setup(props, { emit, slots, attrs }) {
     const instance = getCurrentInstance();
     const hasItemClickListener = computed(() => {
@@ -174,17 +175,17 @@ export const List = defineComponent({
         unknown
       >;
       const handler = vnodeProps.onItemClick;
-      return typeof handler === 'function' || Array.isArray(handler);
+      return typeof handler === "function" || Array.isArray(handler);
     });
 
     const currentPage = ref(
-      props.pagination && typeof props.pagination === 'object'
+      props.pagination && typeof props.pagination === "object"
         ? props.pagination.current || 1
         : 1
     );
 
     const currentPageSize = ref(
-      props.pagination && typeof props.pagination === 'object'
+      props.pagination && typeof props.pagination === "object"
         ? props.pagination.pageSize || 10
         : 10
     );
@@ -227,7 +228,7 @@ export const List = defineComponent({
 
     // Grid classes
     const gridClasses = computed(() => {
-      if (!props.grid) return '';
+      if (!props.grid) return "";
 
       return classNames(
         listGridContainerClasses,
@@ -245,21 +246,21 @@ export const List = defineComponent({
 
     function handlePageChange(page: number) {
       currentPage.value = page;
-      emit('page-change', { current: page, pageSize: currentPageSize.value });
+      emit("page-change", { current: page, pageSize: currentPageSize.value });
     }
 
     function handlePageSizeChange(pageSize: number) {
       currentPageSize.value = pageSize;
       currentPage.value = 1;
-      emit('page-change', { current: 1, pageSize });
+      emit("page-change", { current: 1, pageSize });
     }
 
     function handleItemClick(item: ListItem, index: number) {
-      emit('item-click', item, index);
+      emit("item-click", item, index);
     }
 
     function getItemKey(item: ListItem, index: number): string | number {
-      if (typeof props.rowKey === 'function') {
+      if (typeof props.rowKey === "function") {
         return props.rowKey(item, index);
       }
       return (item[props.rowKey] as string | number) || index;
@@ -269,7 +270,7 @@ export const List = defineComponent({
       if (!slots.header) return null;
 
       return h(
-        'div',
+        "div",
         {
           class: getListHeaderFooterClasses(props.size, false),
         },
@@ -281,7 +282,7 @@ export const List = defineComponent({
       if (!slots.footer) return null;
 
       return h(
-        'div',
+        "div",
         {
           class: getListHeaderFooterClasses(props.size, true),
         },
@@ -294,7 +295,7 @@ export const List = defineComponent({
       const itemClasses = getListItemClasses(
         props.size,
         props.itemLayout,
-        props.split && props.bordered === 'divided' && !props.grid,
+        props.split && props.bordered === "divided" && !props.grid,
         props.hoverable
       );
 
@@ -303,16 +304,16 @@ export const List = defineComponent({
       // Custom render from slot
       if (slots.renderItem) {
         return h(
-          'div',
+          "div",
           {
             key,
-            class: classNames(itemClasses, clickable && 'cursor-pointer'),
-            role: 'listitem',
+            class: classNames(itemClasses, clickable && "cursor-pointer"),
+            role: "listitem",
             tabindex: clickable ? 0 : undefined,
             onClick: () => handleItemClick(item, index),
             onKeydown: clickable
               ? (e: KeyboardEvent) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
+                  if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     handleItemClick(item, index);
                   }
@@ -331,12 +332,12 @@ export const List = defineComponent({
 
       if (item.avatar) {
         metaContent.push(
-          h('div', { class: listItemAvatarClasses }, [
-            typeof item.avatar === 'string'
-              ? h('img', {
+          h("div", { class: listItemAvatarClasses }, [
+            typeof item.avatar === "string"
+              ? h("img", {
                   src: item.avatar,
-                  alt: item.title || 'Avatar',
-                  class: 'w-10 h-10 rounded-full object-cover',
+                  alt: item.title || "Avatar",
+                  class: "w-10 h-10 rounded-full object-cover",
                 })
               : (item.avatar as unknown as RawChildren),
           ])
@@ -346,30 +347,30 @@ export const List = defineComponent({
       const contentChildren = [];
       if (item.title) {
         contentChildren.push(
-          h('div', { class: listItemTitleClasses }, item.title)
+          h("div", { class: listItemTitleClasses }, item.title)
         );
       }
       if (item.description) {
         contentChildren.push(
-          h('div', { class: listItemDescriptionClasses }, item.description)
+          h("div", { class: listItemDescriptionClasses }, item.description)
         );
       }
 
       if (contentChildren.length > 0) {
         metaContent.push(
-          h('div', { class: listItemContentClasses }, contentChildren)
+          h("div", { class: listItemContentClasses }, contentChildren)
         );
       }
 
       if (metaContent.length > 0) {
-        itemContent.push(h('div', { class: listItemMetaClasses }, metaContent));
+        itemContent.push(h("div", { class: listItemMetaClasses }, metaContent));
       }
 
       // Extra content
       if (item.extra) {
         itemContent.push(
           h(
-            'div',
+            "div",
             { class: listItemExtraClasses },
             item.extra as unknown as RawChildren
           )
@@ -377,16 +378,16 @@ export const List = defineComponent({
       }
 
       return h(
-        'div',
+        "div",
         {
           key,
-          class: classNames(itemClasses, clickable && 'cursor-pointer'),
-          role: 'listitem',
+          class: classNames(itemClasses, clickable && "cursor-pointer"),
+          role: "listitem",
           tabindex: clickable ? 0 : undefined,
           onClick: () => handleItemClick(item, index),
           onKeydown: clickable
             ? (e: KeyboardEvent) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+                if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
                   handleItemClick(item, index);
                 }
@@ -404,11 +405,11 @@ export const List = defineComponent({
 
       if (paginatedData.value.length === 0) {
         return h(
-          'div',
+          "div",
           {
             class: listEmptyStateClasses,
-            role: 'status',
-            'aria-live': 'polite',
+            role: "status",
+            "aria-live": "polite",
           },
           props.emptyText
         );
@@ -421,7 +422,7 @@ export const List = defineComponent({
       if (props.grid) {
         const gutter = props.grid.gutter;
         return h(
-          'div',
+          "div",
           {
             class: gridClasses.value,
             style: gutter ? { gap: `${gutter}px` } : undefined,
@@ -443,26 +444,26 @@ export const List = defineComponent({
       const total = props.dataSource.length;
       const paginationConfig = props.pagination as ListPaginationConfig;
 
-      return h('div', { class: listPaginationContainerClasses }, [
+      return h("div", { class: listPaginationContainerClasses }, [
         // Total info
         paginationConfig.showTotal !== false &&
           h(
-            'div',
-            { class: 'text-sm text-[var(--tiger-text,#111827)]' },
+            "div",
+            { class: "text-sm text-[var(--tiger-text,#111827)]" },
             paginationConfig.totalText
               ? paginationConfig.totalText(total, [startIndex, endIndex])
               : `Showing ${startIndex} to ${endIndex} of ${total} items`
           ),
 
         // Pagination controls
-        h('div', { class: 'flex items-center gap-2' }, [
+        h("div", { class: "flex items-center gap-2" }, [
           // Page size selector
           paginationConfig.showSizeChanger !== false &&
             h(
-              'select',
+              "select",
               {
                 class:
-                  'px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)]',
+                  "px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)]",
                 value: currentPageSize.value,
                 onChange: (e: Event) =>
                   handlePageSizeChange(
@@ -470,49 +471,49 @@ export const List = defineComponent({
                   ),
               },
               (paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map(
-                (size) => h('option', { value: size }, `${size} / page`)
+                (size) => h("option", { value: size }, `${size} / page`)
               )
             ),
 
           // Page buttons
-          h('div', { class: 'flex gap-1' }, [
+          h("div", { class: "flex gap-1" }, [
             // Previous button
             h(
-              'button',
+              "button",
               {
                 class: classNames(
-                  'px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]',
+                  "px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]",
                   hasPrev
-                    ? 'hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]'
-                    : 'text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed'
+                    ? "hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]"
+                    : "text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed"
                 ),
                 disabled: !hasPrev,
                 onClick: () => handlePageChange(currentPage.value - 1),
               },
-              'Previous'
+              "Previous"
             ),
 
             // Current page indicator
             h(
-              'span',
-              { class: 'px-3 py-1 text-sm text-[var(--tiger-text,#111827)]' },
+              "span",
+              { class: "px-3 py-1 text-sm text-[var(--tiger-text,#111827)]" },
               `Page ${currentPage.value} of ${totalPages}`
             ),
 
             // Next button
             h(
-              'button',
+              "button",
               {
                 class: classNames(
-                  'px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]',
+                  "px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]",
                   hasNext
-                    ? 'hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]'
-                    : 'text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed'
+                    ? "hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]"
+                    : "text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed"
                 ),
                 disabled: !hasNext,
                 onClick: () => handlePageChange(currentPage.value + 1),
               },
-              'Next'
+              "Next"
             ),
           ]),
         ]),
@@ -524,10 +525,10 @@ export const List = defineComponent({
       const attrsClass = attrsRecord.class;
       const attrsStyle = attrsRecord.style;
 
-      return h('div', { class: listWrapperClasses }, [
-        h('div', { class: 'relative' }, [
+      return h("div", { class: listWrapperClasses }, [
+        h("div", { class: "relative" }, [
           h(
-            'div',
+            "div",
             {
               ...attrs,
               class: classNames(
@@ -535,8 +536,8 @@ export const List = defineComponent({
                 coerceClassValue(attrsClass)
               ),
               style: mergeStyleValues(attrsStyle, props.style),
-              role: 'list',
-              'aria-busy': props.loading || undefined,
+              role: "list",
+              "aria-busy": props.loading || undefined,
             },
             [renderListHeader(), renderListItems(), renderListFooter()]
           ),
@@ -544,11 +545,11 @@ export const List = defineComponent({
           // Loading overlay
           props.loading &&
             h(
-              'div',
+              "div",
               {
                 class: listLoadingOverlayClasses,
-                role: 'status',
-                'aria-live': 'polite',
+                role: "status",
+                "aria-live": "polite",
               },
               [LoadingSpinner()]
             ),
