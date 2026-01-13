@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   classNames,
   getStepItemClasses,
@@ -8,12 +8,18 @@ import {
   getStepTitleClasses,
   getStepDescriptionClasses,
   calculateStepStatus,
+  stepFinishIconSvgClasses,
+  stepFinishIconViewBox,
+  stepFinishIconPathD,
+  stepFinishIconPathStrokeLinecap,
+  stepFinishIconPathStrokeLinejoin,
+  stepFinishIconPathStrokeWidth,
   type StepStatus,
-} from "@tigercat/core";
-import { useStepsContext } from "./Steps";
+} from '@tigercat/core';
+import { useStepsContext } from './Steps';
 
 export interface StepsItemProps
-  extends Omit<React.LiHTMLAttributes<HTMLLIElement>, "title" | "children"> {
+  extends Omit<React.LiHTMLAttributes<HTMLLIElement>, 'title' | 'children'> {
   /**
    * Step title
    */
@@ -65,9 +71,9 @@ export const StepsItem: React.FC<StepsItemProps> = ({
   // Get steps context
   const stepsContext = useStepsContext() || {
     current: 0,
-    status: "process" as StepStatus,
-    direction: "horizontal" as const,
-    size: "default" as const,
+    status: 'process' as StepStatus,
+    direction: 'horizontal' as const,
+    size: 'default' as const,
     simple: false,
     clickable: false,
   };
@@ -127,22 +133,21 @@ export const StepsItem: React.FC<StepsItemProps> = ({
     }
 
     // Default: show step number or checkmark for finished steps
-    if (stepStatus === "finish") {
+    if (stepStatus === 'finish') {
       return (
         <div className={iconClasses}>
           <svg
-            className="w-5 h-5"
+            className={stepFinishIconSvgClasses}
             fill="none"
             stroke="currentColor"
-            viewBox="0 0 24 24"
+            viewBox={stepFinishIconViewBox}
             aria-hidden="true"
-            focusable="false"
-          >
+            focusable="false">
             <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
+              strokeLinecap={stepFinishIconPathStrokeLinecap}
+              strokeLinejoin={stepFinishIconPathStrokeLinejoin}
+              strokeWidth={stepFinishIconPathStrokeWidth}
+              d={stepFinishIconPathD}
             />
           </svg>
         </div>
@@ -163,8 +168,7 @@ export const StepsItem: React.FC<StepsItemProps> = ({
             className={titleClasses}
             onClick={handleClick}
             disabled={!isClickable}
-            aria-disabled={disabled || undefined}
-          >
+            aria-disabled={disabled || undefined}>
             {title}
           </button>
         ) : (
@@ -178,15 +182,14 @@ export const StepsItem: React.FC<StepsItemProps> = ({
   };
 
   // For vertical layout
-  if (stepsContext.direction === "vertical") {
+  if (stepsContext.direction === 'vertical') {
     return (
       <li
         {...props}
         className={itemClasses}
         style={style as React.CSSProperties}
-        aria-current={stepIndex === stepsContext.current ? "step" : undefined}
-        aria-disabled={disabled || undefined}
-      >
+        aria-current={stepIndex === stepsContext.current ? 'step' : undefined}
+        aria-disabled={disabled || undefined}>
         {/* Icon and tail wrapper */}
         <div className="relative">
           {renderIcon()}
@@ -204,9 +207,8 @@ export const StepsItem: React.FC<StepsItemProps> = ({
       {...props}
       className={itemClasses}
       style={style as React.CSSProperties}
-      aria-current={stepIndex === stepsContext.current ? "step" : undefined}
-      aria-disabled={disabled || undefined}
-    >
+      aria-current={stepIndex === stepsContext.current ? 'step' : undefined}
+      aria-disabled={disabled || undefined}>
       {/* Icon */}
       {renderIcon()}
       {/* Tail (connector) */}
