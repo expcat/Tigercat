@@ -17,8 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Drawer, Button } from "@tigercat/vue";
+import { ref } from 'vue';
+import { Drawer, Button } from '@tigercat/vue';
 
 const visible = ref(false);
 </script>
@@ -26,7 +26,7 @@ const visible = ref(false);
 
 ### React 示例
 
-```tsx
+````tsx
 import React, { useState } from "react";
 import { Drawer, Button } from "@tigercat/react";
 
@@ -46,7 +46,33 @@ function App() {
     </div>
   );
 }
+
+## i18n / Locale
+
+`Drawer` 支持通过 `locale` 覆盖常用文案（例如关闭按钮的 aria-label）。
+
+### Vue 示例
+
+```vue
+<Drawer
+  v-model:visible="visible"
+  title="抽屉标题"
+  :locale="{ drawer: { closeAriaLabel: 'Close drawer' } }"
+/>
+````
+
+### React 示例
+
+```tsx
+<Drawer
+  visible={visible}
+  title="抽屉标题"
+  locale={{ drawer: { closeAriaLabel: 'Close drawer' } }}
+  onClose={() => setVisible(false)}
+/>
 ```
+
+````
 
 ## 不同位置
 
@@ -87,18 +113,18 @@ const showDrawer = (pos: DrawerPlacement) => {
   visible.value = true;
 };
 </script>
-```
+````
 
 ### React 示例
 
 ```tsx
-import React, { useState } from "react";
-import { Drawer, Button, Space } from "@tigercat/react";
-import type { DrawerPlacement } from "@tigercat/core";
+import React, { useState } from 'react';
+import { Drawer, Button, Space } from '@tigercat/react';
+import type { DrawerPlacement } from '@tigercat/core';
 
 function App() {
   const [visible, setVisible] = useState(false);
-  const [placement, setPlacement] = useState<DrawerPlacement>("right");
+  const [placement, setPlacement] = useState<DrawerPlacement>('right');
 
   const showDrawer = (pos: DrawerPlacement) => {
     setPlacement(pos);
@@ -108,18 +134,17 @@ function App() {
   return (
     <div>
       <Space>
-        <Button onClick={() => showDrawer("left")}>左侧</Button>
-        <Button onClick={() => showDrawer("right")}>右侧</Button>
-        <Button onClick={() => showDrawer("top")}>顶部</Button>
-        <Button onClick={() => showDrawer("bottom")}>底部</Button>
+        <Button onClick={() => showDrawer('left')}>左侧</Button>
+        <Button onClick={() => showDrawer('right')}>右侧</Button>
+        <Button onClick={() => showDrawer('top')}>顶部</Button>
+        <Button onClick={() => showDrawer('bottom')}>底部</Button>
       </Space>
 
       <Drawer
         visible={visible}
         placement={placement}
         title={`${placement} 抽屉`}
-        onClose={() => setVisible(false)}
-      >
+        onClose={() => setVisible(false)}>
         <p>从 {placement} 弹出的抽屉</p>
       </Drawer>
     </div>
@@ -151,12 +176,12 @@ function App() {
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Drawer, Button, Space } from "@tigercat/vue";
-import type { DrawerSize } from "@tigercat/core";
+import { ref } from 'vue';
+import { Drawer, Button, Space } from '@tigercat/vue';
+import type { DrawerSize } from '@tigercat/core';
 
 const visible = ref(false);
-const size = ref<DrawerSize>("md");
+const size = ref<DrawerSize>('md');
 
 const showDrawer = (s: DrawerSize) => {
   size.value = s;
@@ -168,13 +193,13 @@ const showDrawer = (s: DrawerSize) => {
 ### React 示例
 
 ```tsx
-import React, { useState } from "react";
-import { Drawer, Button, Space } from "@tigercat/react";
-import type { DrawerSize } from "@tigercat/core";
+import React, { useState } from 'react';
+import { Drawer, Button, Space } from '@tigercat/react';
+import type { DrawerSize } from '@tigercat/core';
 
 function App() {
   const [visible, setVisible] = useState(false);
-  const [size, setSize] = useState<DrawerSize>("md");
+  const [size, setSize] = useState<DrawerSize>('md');
 
   const showDrawer = (s: DrawerSize) => {
     setSize(s);
@@ -184,19 +209,18 @@ function App() {
   return (
     <div>
       <Space>
-        <Button onClick={() => showDrawer("sm")}>Small</Button>
-        <Button onClick={() => showDrawer("md")}>Medium</Button>
-        <Button onClick={() => showDrawer("lg")}>Large</Button>
-        <Button onClick={() => showDrawer("xl")}>Extra Large</Button>
-        <Button onClick={() => showDrawer("full")}>Full</Button>
+        <Button onClick={() => showDrawer('sm')}>Small</Button>
+        <Button onClick={() => showDrawer('md')}>Medium</Button>
+        <Button onClick={() => showDrawer('lg')}>Large</Button>
+        <Button onClick={() => showDrawer('xl')}>Extra Large</Button>
+        <Button onClick={() => showDrawer('full')}>Full</Button>
       </Space>
 
       <Drawer
         visible={visible}
         size={size}
         title="不同尺寸的抽屉"
-        onClose={() => setVisible(false)}
-      >
+        onClose={() => setVisible(false)}>
         <p>尺寸: {size}</p>
       </Drawer>
     </div>
@@ -233,13 +257,13 @@ function App() {
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Drawer, Button, Space, Icon } from "@tigercat/vue";
+import { ref } from 'vue';
+import { Drawer, Button, Space, Icon } from '@tigercat/vue';
 
 const visible = ref(false);
 
 const handleSubmit = () => {
-  console.log("提交");
+  console.log('提交');
   visible.value = false;
 };
 </script>
@@ -248,14 +272,14 @@ const handleSubmit = () => {
 ### React 示例
 
 ```tsx
-import React, { useState } from "react";
-import { Drawer, Button, Space, Icon } from "@tigercat/react";
+import React, { useState } from 'react';
+import { Drawer, Button, Space, Icon } from '@tigercat/react';
 
 function App() {
   const [visible, setVisible] = useState(false);
 
   const handleSubmit = () => {
-    console.log("提交");
+    console.log('提交');
     setVisible(false);
   };
 
@@ -265,7 +289,7 @@ function App() {
       <Drawer
         visible={visible}
         header={
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Icon name="settings" />
             <span>自定义头部</span>
           </div>
@@ -278,8 +302,7 @@ function App() {
             </Button>
           </Space>
         }
-        onClose={() => setVisible(false)}
-      >
+        onClose={() => setVisible(false)}>
         <p>这是抽屉内容</p>
       </Drawer>
     </div>
@@ -304,8 +327,8 @@ function App() {
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Drawer, Button } from "@tigercat/vue";
+import { ref } from 'vue';
+import { Drawer, Button } from '@tigercat/vue';
 
 const visible = ref(false);
 </script>
@@ -314,8 +337,8 @@ const visible = ref(false);
 ### React 示例
 
 ```tsx
-import React, { useState } from "react";
-import { Drawer, Button } from "@tigercat/react";
+import React, { useState } from 'react';
+import { Drawer, Button } from '@tigercat/react';
 
 function App() {
   const [visible, setVisible] = useState(false);
@@ -327,8 +350,7 @@ function App() {
         visible={visible}
         mask={false}
         title="无蒙层抽屉"
-        onClose={() => setVisible(false)}
-      >
+        onClose={() => setVisible(false)}>
         <p>这个抽屉没有蒙层</p>
       </Drawer>
     </div>
@@ -349,16 +371,15 @@ function App() {
     <Drawer
       v-model:visible="visible"
       :mask-closable="false"
-      title="点击蒙层不关闭"
-    >
+      title="点击蒙层不关闭">
       <p>点击蒙层或按 ESC 键无法关闭，只能点击关闭按钮</p>
     </Drawer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { Drawer, Button } from "@tigercat/vue";
+import { ref } from 'vue';
+import { Drawer, Button } from '@tigercat/vue';
 
 const visible = ref(false);
 </script>
@@ -367,8 +388,8 @@ const visible = ref(false);
 ### React 示例
 
 ```tsx
-import React, { useState } from "react";
-import { Drawer, Button } from "@tigercat/react";
+import React, { useState } from 'react';
+import { Drawer, Button } from '@tigercat/react';
 
 function App() {
   const [visible, setVisible] = useState(false);
@@ -380,8 +401,7 @@ function App() {
         visible={visible}
         maskClosable={false}
         title="点击蒙层不关闭"
-        onClose={() => setVisible(false)}
-      >
+        onClose={() => setVisible(false)}>
         <p>点击蒙层或按 ESC 键无法关闭，只能点击关闭按钮</p>
       </Drawer>
     </div>

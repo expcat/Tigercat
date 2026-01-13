@@ -15,9 +15,11 @@ import {
   classNames,
   coerceClassValue,
   focusFirst,
+  resolveLocaleText,
   mergeStyleValues,
   getDrawerMaskClasses,
   getDrawerContainerClasses,
+  type TigerLocale,
   getDrawerPanelClasses,
   getDrawerHeaderClasses,
   getDrawerBodyClasses,
@@ -47,6 +49,7 @@ export interface VueDrawerProps {
   destroyOnClose?: boolean;
   style?: Record<string, unknown>;
   closeAriaLabel?: string;
+  locale?: Partial<TigerLocale>;
 }
 
 export const Drawer = defineComponent({
@@ -153,7 +156,15 @@ export const Drawer = defineComponent({
      */
     closeAriaLabel: {
       type: String,
-      default: 'Close drawer',
+      default: undefined,
+    },
+
+    /**
+     * Locale overrides for common texts
+     */
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined,
     },
 
     /**
@@ -293,6 +304,13 @@ export const Drawer = defineComponent({
       const closeButtonClasses = getDrawerCloseButtonClasses();
       const titleClasses = getDrawerTitleClasses();
 
+      const resolvedCloseAriaLabel = resolveLocaleText(
+        'Close drawer',
+        props.closeAriaLabel,
+        props.locale?.drawer?.closeAriaLabel,
+        props.locale?.common?.closeText
+      );
+
       const closeIcon = h(
         'svg',
         {
@@ -332,7 +350,7 @@ export const Drawer = defineComponent({
                       type: 'button',
                       class: closeButtonClasses,
                       onClick: handleClose,
-                      'aria-label': props.closeAriaLabel,
+                      'aria-label': resolvedCloseAriaLabel,
                       ref: closeButtonRef,
                     },
                     closeIcon

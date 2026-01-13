@@ -25,8 +25,8 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { Modal, Button, Space } from "@tigercat/vue";
+import { ref } from 'vue';
+import { Modal, Button, Space } from '@tigercat/vue';
 
 const visible = ref(false);
 </script>
@@ -35,19 +35,19 @@ const visible = ref(false);
 ### React
 
 ```tsx
-import React, { useState } from "react";
-import { Modal, Button } from "@tigercat/react";
+import React, { useState } from 'react';
+import { Modal, Button } from '@tigercat/react';
 
 function App() {
   const [visible, setVisible] = useState(false);
 
   const handleOk = () => {
-    console.log("确定");
+    console.log('确定');
     setVisible(false);
   };
 
   const handleCancel = () => {
-    console.log("取消");
+    console.log('取消');
     setVisible(false);
   };
 
@@ -66,8 +66,7 @@ function App() {
             </Button>
             <Button onClick={handleOk}>确定</Button>
           </>
-        }
-      >
+        }>
         <p>这是对话框的内容。</p>
       </Modal>
     </div>
@@ -94,7 +93,7 @@ function App() {
 
 ### React
 
-```tsx
+````tsx
 <Modal
   visible={visible}
   title="自定义页脚"
@@ -109,7 +108,34 @@ function App() {
 >
   <p>这是对话框的内容。</p>
 </Modal>
+
+## i18n / Locale
+
+`Modal` 支持通过 `locale` 传入常用文案覆盖（不改默认行为，仅作为覆盖入口）：
+
+### Vue 3
+
+```vue
+<Modal
+  v-model:visible="visible"
+  title="标题"
+  :showDefaultFooter="true"
+  :locale="{ common: { okText: 'OK', cancelText: 'Cancel' }, modal: { closeAriaLabel: 'Close' } }"
+/>
+````
+
+### React
+
+```tsx
+<Modal
+  visible={visible}
+  title="标题"
+  locale={{ modal: { closeAriaLabel: "Close" } }}
+  footer={...}
+/>
 ```
+
+````
 
 ## 不同尺寸
 
@@ -144,17 +170,17 @@ const showModal = (newSize) => {
   visible.value = true;
 };
 </script>
-```
+````
 
 ### React
 
 ```tsx
-import React, { useState } from "react";
-import { Modal, Button } from "@tigercat/react";
+import React, { useState } from 'react';
+import { Modal, Button } from '@tigercat/react';
 
 function App() {
   const [visible, setVisible] = useState(false);
-  const [size, setSize] = useState("md");
+  const [size, setSize] = useState('md');
 
   const showModal = (newSize) => {
     setSize(newSize);
@@ -163,18 +189,17 @@ function App() {
 
   return (
     <div>
-      <Button onClick={() => showModal("sm")}>小尺寸</Button>
-      <Button onClick={() => showModal("md")}>中等尺寸</Button>
-      <Button onClick={() => showModal("lg")}>大尺寸</Button>
-      <Button onClick={() => showModal("xl")}>超大尺寸</Button>
-      <Button onClick={() => showModal("full")}>全屏</Button>
+      <Button onClick={() => showModal('sm')}>小尺寸</Button>
+      <Button onClick={() => showModal('md')}>中等尺寸</Button>
+      <Button onClick={() => showModal('lg')}>大尺寸</Button>
+      <Button onClick={() => showModal('xl')}>超大尺寸</Button>
+      <Button onClick={() => showModal('full')}>全屏</Button>
 
       <Modal
         visible={visible}
         size={size}
         title="不同尺寸的对话框"
-        onCancel={() => setVisible(false)}
-      >
+        onCancel={() => setVisible(false)}>
         <p>这是一个 {size} 尺寸的对话框。</p>
       </Modal>
     </div>
@@ -203,8 +228,7 @@ function App() {
   visible={visible}
   title="垂直居中对话框"
   centered
-  onCancel={() => setVisible(false)}
->
+  onCancel={() => setVisible(false)}>
   <p>这个对话框垂直居中显示。</p>
 </Modal>
 ```
@@ -230,8 +254,7 @@ function App() {
   visible={visible}
   title="禁用遮罩关闭"
   maskClosable={false}
-  onCancel={() => setVisible(false)}
->
+  onCancel={() => setVisible(false)}>
   <p>点击遮罩层不会关闭此对话框。</p>
 </Modal>
 ```
@@ -257,8 +280,7 @@ function App() {
   visible={visible}
   title="关闭时销毁"
   destroyOnClose
-  onCancel={() => setVisible(false)}
->
+  onCancel={() => setVisible(false)}>
   <p>关闭对话框时，此内容将被销毁。</p>
 </Modal>
 ```
@@ -288,13 +310,12 @@ function App() {
 <Modal
   visible={visible}
   titleContent={
-    <div style={{ display: "flex", alignItems: "center" }}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
       <Icon name="info-circle" />
-      <span style={{ marginLeft: "8px" }}>自定义标题</span>
+      <span style={{ marginLeft: '8px' }}>自定义标题</span>
     </div>
   }
-  onCancel={() => setVisible(false)}
->
+  onCancel={() => setVisible(false)}>
   <p>这是对话框的内容。</p>
 </Modal>
 ```
