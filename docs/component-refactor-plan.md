@@ -9,10 +9,10 @@
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
 - 上一步：✅ `Tree` Step4 demo（keyboard/ariaLabel 示例）（2026-01-13）
-- 当前组件：待定
-- 当前步骤：选择下一个组件（Step1 起）
-- 状态：`not-started`
-- 已优化组件数/需优化组件数：36/38
+- 当前组件：`Button`
+- 当前步骤：✅ Step1 API 对齐（透传/类型导出/冗余收敛 + tests/docs 同步）
+- 状态：`completed`
+- 已优化组件数/需优化组件数：37/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -138,7 +138,7 @@ return h("div", { class: "..." }, children);
 
 - 思路：统一 Vue/React 的 disabled/loading 行为与事件透传；loading 时可选 aria-busy。
 - 可拆分：API 对齐 → a11y/focus → 样式/主题变量检查 → tests/docs。
-- 状态：未开始
+- 状态：✅ Step1 API 对齐（透传/类型导出/冗余收敛 + tests/docs 同步）（2026-01-13）
 
 #### Icon（P2，建议优化）
 
