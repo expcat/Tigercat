@@ -9,10 +9,12 @@ import {
   onMounted,
   onBeforeUnmount,
   nextTick,
-} from "vue";
+} from 'vue';
 import {
+  captureActiveElement,
   classNames,
   coerceClassValue,
+  focusFirst,
   mergeStyleValues,
   getDrawerMaskClasses,
   getDrawerContainerClasses,
@@ -22,9 +24,11 @@ import {
   getDrawerFooterClasses,
   getDrawerCloseButtonClasses,
   getDrawerTitleClasses,
+  restoreFocus,
   type DrawerPlacement,
   type DrawerSize,
-} from "@tigercat/core";
+} from '@tigercat/core';
+import { useVueEscapeKey } from '../utils/overlay';
 
 let drawerIdCounter = 0;
 const createDrawerId = () => `tiger-drawer-${++drawerIdCounter}`;
@@ -46,7 +50,7 @@ export interface VueDrawerProps {
 }
 
 export const Drawer = defineComponent({
-  name: "TigerDrawer",
+  name: 'TigerDrawer',
   inheritAttrs: false,
   props: {
     /**
@@ -63,7 +67,7 @@ export const Drawer = defineComponent({
      */
     placement: {
       type: String as PropType<DrawerPlacement>,
-      default: "right" as DrawerPlacement,
+      default: 'right' as DrawerPlacement,
     },
     /**
      * Drawer size
@@ -71,7 +75,7 @@ export const Drawer = defineComponent({
      */
     size: {
       type: String as PropType<DrawerSize>,
-      default: "md" as DrawerSize,
+      default: 'md' as DrawerSize,
     },
     /**
      * Drawer title
@@ -149,7 +153,7 @@ export const Drawer = defineComponent({
      */
     closeAriaLabel: {
       type: String,
-      default: "Close drawer",
+      default: 'Close drawer',
     },
 
     /**
@@ -162,7 +166,7 @@ export const Drawer = defineComponent({
       default: false,
     },
   },
-  emits: ["update:visible", "close", "after-enter", "after-leave"],
+  emits: ['update:visible', 'close', 'after-enter', 'after-leave'],
   setup(props, { slots, emit, attrs }) {
     const instanceId = ref<string>(createDrawerId());
     const hasBeenOpened = ref(false);
@@ -184,8 +188,8 @@ export const Drawer = defineComponent({
     });
 
     const handleClose = () => {
-      emit("update:visible", false);
-      emit("close");
+      emit('update:visible', false);
+      emit('close');
     };
 
     const handleMaskClick = (event: MouseEvent) => {
@@ -195,46 +199,43 @@ export const Drawer = defineComponent({
       }
     };
 
-    const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && props.visible) {
-        handleClose();
-      }
-    };
+    const escapeEnabled = computed(() => props.visible);
+    let cleanupEscape: (() => void) | undefined;
 
     onMounted(() => {
-      document.addEventListener("keydown", handleEscKey);
+      cleanupEscape = useVueEscapeKey({
+        enabled: escapeEnabled,
+        onEscape: handleClose,
+      });
     });
 
     onBeforeUnmount(() => {
-      document.removeEventListener("keydown", handleEscKey);
+      cleanupEscape?.();
     });
 
     watch(
       () => props.visible,
       async (nextVisible) => {
         if (nextVisible) {
-          const active = document.activeElement;
-          previousActiveElement.value =
-            active instanceof HTMLElement ? active : null;
+          previousActiveElement.value = captureActiveElement();
 
           await nextTick();
-          const el = closeButtonRef.value ?? dialogRef.value;
-          el?.focus?.();
+          focusFirst([closeButtonRef.value, dialogRef.value]);
           return;
         }
 
-        previousActiveElement.value?.focus?.();
+        restoreFocus(previousActiveElement.value);
       }
     );
 
     watch(
       () => props.visible,
       (nextVisible, prevVisible, onCleanup) => {
-        if (typeof prevVisible === "undefined") {
+        if (typeof prevVisible === 'undefined') {
           if (!nextVisible) return;
 
           const timer = window.setTimeout(() => {
-            emit("after-enter");
+            emit('after-enter');
           }, 300);
 
           onCleanup(() => window.clearTimeout(timer));
@@ -244,7 +245,7 @@ export const Drawer = defineComponent({
         if (nextVisible === prevVisible) return;
 
         const timer = window.setTimeout(() => {
-          emit(nextVisible ? "after-enter" : "after-leave");
+          emit(nextVisible ? 'after-enter' : 'after-leave');
         }, 300);
 
         onCleanup(() => window.clearTimeout(timer));
@@ -257,13 +258,13 @@ export const Drawer = defineComponent({
 
       const forwardedAttrs = Object.fromEntries(
         Object.entries(attrs).filter(
-          ([key]) => key !== "class" && key !== "style"
+          ([key]) => key !== 'class' && key !== 'style'
         )
       );
 
       const ariaLabelledbyFromAttrs =
-        typeof attrs["aria-labelledby"] === "string"
-          ? (attrs["aria-labelledby"] as string)
+        typeof attrs['aria-labelledby'] === 'string'
+          ? (attrs['aria-labelledby'] as string)
           : undefined;
 
       const ariaLabelledby =
@@ -272,14 +273,14 @@ export const Drawer = defineComponent({
 
       const containerClasses = classNames(
         getDrawerContainerClasses(props.zIndex),
-        !props.visible && "pointer-events-none"
+        !props.visible && 'pointer-events-none'
       );
 
       const maskClasses = getDrawerMaskClasses(props.visible);
 
       const panelClasses = classNames(
         getDrawerPanelClasses(props.placement, props.visible, props.size),
-        "flex flex-col",
+        'flex flex-col',
         props.className,
         coerceClassValue(attrs.class)
       );
@@ -293,30 +294,30 @@ export const Drawer = defineComponent({
       const titleClasses = getDrawerTitleClasses();
 
       const closeIcon = h(
-        "svg",
+        'svg',
         {
-          class: "w-5 h-5",
-          fill: "none",
-          stroke: "currentColor",
-          viewBox: "0 0 24 24",
-          xmlns: "http://www.w3.org/2000/svg",
+          class: 'w-5 h-5',
+          fill: 'none',
+          stroke: 'currentColor',
+          viewBox: '0 0 24 24',
+          xmlns: 'http://www.w3.org/2000/svg',
         },
         [
-          h("path", {
-            "stroke-linecap": "round",
-            "stroke-linejoin": "round",
-            "stroke-width": "2",
-            d: "M6 18L18 6M6 6l12 12",
+          h('path', {
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+            'stroke-width': '2',
+            d: 'M6 18L18 6M6 6l12 12',
           }),
         ]
       );
 
       const header =
         props.title || slots.header || props.closable
-          ? h("div", { class: headerClasses }, [
+          ? h('div', { class: headerClasses }, [
               props.title || slots.header
                 ? h(
-                    "h3",
+                    'h3',
                     {
                       id: titleId.value,
                       class: titleClasses,
@@ -326,12 +327,12 @@ export const Drawer = defineComponent({
                 : null,
               props.closable
                 ? h(
-                    "button",
+                    'button',
                     {
-                      type: "button",
+                      type: 'button',
                       class: closeButtonClasses,
                       onClick: handleClose,
-                      "aria-label": props.closeAriaLabel,
+                      'aria-label': props.closeAriaLabel,
                       ref: closeButtonRef,
                     },
                     closeIcon
@@ -341,51 +342,51 @@ export const Drawer = defineComponent({
           : null;
 
       const body = slots.default
-        ? h("div", { class: bodyClasses }, slots.default())
+        ? h('div', { class: bodyClasses }, slots.default())
         : null;
 
       const footer = slots.footer
-        ? h("div", { class: footerClasses }, slots.footer())
+        ? h('div', { class: footerClasses }, slots.footer())
         : null;
 
       const mask = props.mask
-        ? h("div", {
+        ? h('div', {
             class: maskClasses,
             onClick: handleMaskClick,
-            "aria-hidden": "true",
-            "data-tiger-drawer-mask": "",
+            'aria-hidden': 'true',
+            'data-tiger-drawer-mask': '',
           })
         : null;
 
       const panel = h(
-        "div",
+        'div',
         {
           ...(forwardedAttrs as Record<string, unknown>),
           class: panelClasses,
           style: mergedStyle,
-          role: "dialog",
-          "aria-modal": "true",
-          "aria-labelledby": ariaLabelledby,
+          role: 'dialog',
+          'aria-modal': 'true',
+          'aria-labelledby': ariaLabelledby,
           tabindex: -1,
           ref: dialogRef,
-          "data-tiger-drawer": "",
+          'data-tiger-drawer': '',
         },
         [header, body, footer]
       );
 
       const root = h(
-        "div",
+        'div',
         {
           class: containerClasses,
           style: { zIndex: props.zIndex },
           hidden: !props.visible,
-          "aria-hidden": !props.visible ? "true" : undefined,
-          "data-tiger-drawer-root": "",
+          'aria-hidden': !props.visible ? 'true' : undefined,
+          'data-tiger-drawer-root': '',
         },
         [mask, panel]
       );
 
-      return h(Teleport, { to: "body", disabled: props.disableTeleport }, [
+      return h(Teleport, { to: 'body', disabled: props.disableTeleport }, [
         root,
       ]);
     };

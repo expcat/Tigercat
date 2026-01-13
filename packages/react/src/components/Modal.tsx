@@ -1,7 +1,9 @@
-import React, { useEffect, useMemo, useCallback, useRef, useId } from "react";
-import { createPortal } from "react-dom";
+import React, { useEffect, useMemo, useCallback, useRef, useId } from 'react';
+import { createPortal } from 'react-dom';
 import {
+  captureActiveElement,
   classNames,
+  focusFirst,
   getModalContentClasses,
   modalWrapperClasses,
   modalMaskClasses,
@@ -11,12 +13,14 @@ import {
   modalCloseButtonClasses,
   modalBodyClasses,
   modalFooterClasses,
+  restoreFocus,
   type ModalProps as CoreModalProps,
-} from "@tigercat/core";
+} from '@tigercat/core';
+import { useEscapeKey } from '../utils/overlay';
 
 export interface ModalProps
   extends CoreModalProps,
-    Omit<React.HTMLAttributes<HTMLDivElement>, "title" | "children"> {
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
   /**
    * Modal content
    */
@@ -61,7 +65,7 @@ export interface ModalProps
 
 export const Modal: React.FC<ModalProps> = ({
   visible = false,
-  size = "md",
+  size = 'md',
   title,
   titleContent,
   closable = true,
@@ -77,7 +81,7 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   onCancel,
   onOk: _onOk,
-  closeAriaLabel = "Close",
+  closeAriaLabel = 'Close',
   style,
   ...rest
 }) => {
@@ -129,14 +133,14 @@ export const Modal: React.FC<ModalProps> = ({
   const titleId = `${modalId}-title`;
 
   const {
-    ["aria-labelledby"]: _ariaLabelledby,
+    ['aria-labelledby']: _ariaLabelledby,
     role: _role,
     tabIndex: _tabIndex,
     ...dialogDivProps
   } = rest as React.HTMLAttributes<HTMLDivElement> & React.AriaAttributes;
 
   const ariaLabelledby =
-    (rest as React.AriaAttributes)["aria-labelledby"] ??
+    (rest as React.AriaAttributes)['aria-labelledby'] ??
     (title || titleContent ? titleId : undefined);
 
   const dialogRef = useRef<HTMLDivElement | null>(null);
@@ -146,13 +150,10 @@ export const Modal: React.FC<ModalProps> = ({
   useEffect(() => {
     if (!visible) return;
 
-    const active = document.activeElement;
-    previousActiveElementRef.current =
-      active instanceof HTMLElement ? active : null;
+    previousActiveElementRef.current = captureActiveElement();
 
     const timer = setTimeout(() => {
-      const el = closeButtonRef.current ?? dialogRef.current;
-      el?.focus();
+      focusFirst([closeButtonRef.current, dialogRef.current]);
     }, 0);
 
     return () => clearTimeout(timer);
@@ -160,24 +161,10 @@ export const Modal: React.FC<ModalProps> = ({
 
   useEffect(() => {
     if (visible) return;
-    previousActiveElementRef.current?.focus?.();
+    restoreFocus(previousActiveElementRef.current);
   }, [visible]);
 
-  // Handle ESC key
-  useEffect(() => {
-    if (!visible) return;
-
-    const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        handleClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscKey);
-    return () => {
-      document.removeEventListener("keydown", handleEscKey);
-    };
-  }, [visible, handleClose]);
+  useEscapeKey({ enabled: visible, onEscape: handleClose });
 
   // Close icon component
   const CloseIcon = (
@@ -186,8 +173,7 @@ export const Modal: React.FC<ModalProps> = ({
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
+      stroke="currentColor">
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -209,19 +195,18 @@ export const Modal: React.FC<ModalProps> = ({
     <div
       className={classNames(
         modalWrapperClasses,
-        !visible && "pointer-events-none"
+        !visible && 'pointer-events-none'
       )}
       style={{ zIndex }}
       hidden={!visible}
-      aria-hidden={!visible ? "true" : undefined}
-      data-tiger-modal-root=""
-    >
+      aria-hidden={!visible ? 'true' : undefined}
+      data-tiger-modal-root="">
       {/* Mask */}
       {mask && (
         <div
           className={classNames(
             modalMaskClasses,
-            visible ? "opacity-100" : "opacity-0"
+            visible ? 'opacity-100' : 'opacity-0'
           )}
           aria-hidden="true"
           data-tiger-modal-mask=""
@@ -239,8 +224,7 @@ export const Modal: React.FC<ModalProps> = ({
           aria-labelledby={ariaLabelledby}
           tabIndex={-1}
           ref={dialogRef}
-          data-tiger-modal=""
-        >
+          data-tiger-modal="">
           {/* Header */}
           {(title || titleContent || closable) && (
             <div className={modalHeaderClasses}>
@@ -257,8 +241,7 @@ export const Modal: React.FC<ModalProps> = ({
                   className={modalCloseButtonClasses}
                   onClick={handleClose}
                   aria-label={closeAriaLabel}
-                  ref={closeButtonRef}
-                >
+                  ref={closeButtonRef}>
                   {CloseIcon}
                 </button>
               )}

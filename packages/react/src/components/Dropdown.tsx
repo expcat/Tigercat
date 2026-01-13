@@ -4,15 +4,16 @@ import React, {
   useEffect,
   useRef,
   useCallback,
-} from "react";
+} from 'react';
 import {
   classNames,
   getDropdownContainerClasses,
   getDropdownTriggerClasses,
   getDropdownMenuWrapperClasses,
   type DropdownProps as CoreDropdownProps,
-} from "@tigercat/core";
-import { DropdownMenu } from "./DropdownMenu";
+} from '@tigercat/core';
+import { DropdownMenu } from './DropdownMenu';
+import { useClickOutside, useEscapeKey } from '../utils/overlay';
 
 // Dropdown context interface
 export interface DropdownContextValue {
@@ -24,8 +25,8 @@ export interface DropdownContextValue {
 export const DropdownContext = createContext<DropdownContextValue | null>(null);
 
 export interface DropdownProps
-  extends Omit<CoreDropdownProps, "style">,
-    Omit<React.HTMLAttributes<HTMLDivElement>, "style"> {
+  extends Omit<CoreDropdownProps, 'style'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
   style?: React.CSSProperties;
 
   /**
@@ -40,8 +41,8 @@ export interface DropdownProps
 }
 
 export const Dropdown: React.FC<DropdownProps> = ({
-  trigger = "hover",
-  placement = "bottom-start",
+  trigger = 'hover',
+  placement = 'bottom-start',
   disabled = false,
   visible: controlledVisible,
   defaultVisible = false,
@@ -89,7 +90,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   // Handle mouse enter (for hover trigger)
   const handleMouseEnter = useCallback(() => {
-    if (trigger !== "hover") return;
+    if (trigger !== 'hover') return;
 
     if (hoverTimerRef.current) {
       clearTimeout(hoverTimerRef.current);
@@ -102,7 +103,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   // Handle mouse leave (for hover trigger)
   const handleMouseLeave = useCallback(() => {
-    if (trigger !== "hover") return;
+    if (trigger !== 'hover') return;
 
     if (hoverTimerRef.current) {
       clearTimeout(hoverTimerRef.current);
@@ -115,43 +116,21 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   // Handle click (for click trigger)
   const handleClick = useCallback(() => {
-    if (trigger !== "click") return;
+    if (trigger !== 'click') return;
     setVisible(!visible);
   }, [trigger, visible, setVisible]);
 
   // Handle outside click to close dropdown
-  useEffect(() => {
-    if (trigger !== "click") return;
+  useClickOutside({
+    enabled: trigger === 'click' && visible,
+    refs: [containerRef],
+    onOutsideClick: () => setVisible(false),
+  });
 
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setVisible(false);
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [trigger, setVisible]);
-
-  useEffect(() => {
-    if (!visible) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setVisible(false);
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [visible, setVisible]);
+  useEscapeKey({
+    enabled: visible,
+    onEscape: () => setVisible(false),
+  });
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -164,7 +143,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   const containerClasses = classNames(
     getDropdownContainerClasses(),
-    "tiger-dropdown-container",
+    'tiger-dropdown-container',
     className
   );
 
@@ -202,10 +181,6 @@ export const Dropdown: React.FC<DropdownProps> = ({
     event: React.KeyboardEvent<HTMLDivElement>
   ) => {
     onKeyDown?.(event);
-    if (event.defaultPrevented) return;
-    if (event.key === "Escape") {
-      setVisible(false);
-    }
   };
 
   return (
@@ -215,8 +190,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         className={containerClasses}
         style={style}
         onKeyDown={handleContainerKeyDown}
-        {...divProps}
-      >
+        {...divProps}>
         {/* Trigger element */}
         <div
           className={triggerClasses}
@@ -224,8 +198,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           aria-haspopup="menu"
-          aria-expanded={visible}
-        >
+          aria-expanded={visible}>
           {triggerElement}
         </div>
 
@@ -234,8 +207,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
           className={menuWrapperClasses}
           hidden={!visible}
           onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
+          onMouseLeave={handleMouseLeave}>
           {menuElement}
         </div>
       </div>
