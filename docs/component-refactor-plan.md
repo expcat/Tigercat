@@ -8,11 +8,11 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `TimePicker` Step5 文档/Demo（校对与补充示例）（2026-01-13）
-- 当前组件：`Upload`
-- 当前步骤：Step1 API/类型（对齐 props/events/defaults 与 docs）
+- 上一步：✅ `Upload` Step5 文档/Demo（校对与补充示例）（2026-01-13）
+- 当前组件：`Tree`
+- 当前步骤：Step1 API/类型对齐（受控模型 + a11y 基线）
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：34/38
+- 已优化组件数/需优化组件数：35/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -343,6 +343,7 @@ return h("div", { class: "..." }, children);
 - 思路：aria-tree/treeitem；键盘展开/选择；受控状态（expandedKeys/selectedKeys）。
 
 - 状态：✅ 调整 selectionMode 内部状态管理（2026-01-12）：改进 Tree 在不同 selection 模式下的内部状态更新一致性。
+- 状态：⏳ Step1 API/类型对齐（受控模型 + a11y 基线）（current）：对齐 `expandedKeys/selectedKeys/checkedKeys` 的受控/非受控与事件语义；补齐 aria-tree/treeitem 的基础角色与可聚焦路径，为后续键盘导航与 tests 做铺垫。
 
 #### Progress（P2，建议优化）
 
@@ -432,7 +433,11 @@ return h("div", { class: "..." }, children);
 #### Upload（P0/P1，建议优化）
 
 - 思路：文件校验/大小/类型逻辑下沉 core；拖拽 a11y；进度/失败重试。
-- 状态：未开始
+- 状态：✅ Step1 API/类型（2026-01-13）：Vue Upload 增加 `inheritAttrs: false` 并合并 `attrs.class/style`，补齐 `className/style` props，同时修复未绑定 `v-model:file-list` 时的非受控 fileList 维护；React Upload 支持 `div` 原生属性透传并用 `classNames` 合并类名（避免类型冲突）；精简 Vue/React Upload 测试并移除快照，补齐 Vue 非受控回归；同步更新 Upload 文档 API 表（Demo 无需修改）。
+- 状态：✅ Step2 核心逻辑抽取（2026-01-13）：core `upload-utils` 新增 `prepareUploadFiles()` 统一处理 limit 截断、accept/maxSize 校验与 async `beforeUpload` 过滤；Vue/React Upload 复用该逻辑并移除组件内重复校验；测试去掉对 `console.warn` 的脆弱断言，改为验证“不触发 change/onChange、不新增 fileList”的对外行为（Docs/Demo 无需修改）。
+- 状态：✅ Step3 交互与 a11y（2026-01-13）：拖拽上传区域补齐键盘触发（Enter/Space 触发选择文件）与 focus ring；Vue/React 增加对应键盘回归用例，确保 disabled 时不响应。
+- 状态：✅ Step4 tests（关键路径 + 边界回归收敛）（2026-01-13）：补齐 `beforeUpload` 抛错时不应触发 change/onChange 的边界回归（Vue/React），并将 dragOver 断言从脆弱的样式片段（如 `border-`）收敛为更稳定的语义类名（如 `cursor-copy`）。
+- 状态：✅ Step5 文档/Demo（校对与补充示例）（2026-01-13）：校对 Upload 文档并补充 `beforeUpload` 抛错语义、`onRemove` 返回 false 可阻止移除（React）以及受控/非受控 fileList 管理说明；确认 Vue/React Demo 用法与当前 API 一致（无需修改）。
 
 ---
 

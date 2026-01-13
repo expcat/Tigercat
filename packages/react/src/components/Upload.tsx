@@ -1,19 +1,23 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback } from "react";
 import {
   type UploadProps as CoreUploadProps,
   type UploadFile,
+  classNames,
+  prepareUploadFiles,
   fileToUploadFile,
-  validateFileType,
-  validateFileSize,
   formatFileSize,
   getUploadButtonClasses,
   getDragAreaClasses,
   getFileListItemClasses,
   getPictureCardClasses,
-} from '@tigercat/core';
+} from "@tigercat/core";
 
 export interface UploadProps
-  extends Omit<CoreUploadProps, 'onChange' | 'onRemove'> {
+  extends Omit<
+      React.HTMLAttributes<HTMLDivElement>,
+      "onChange" | "onError" | "onProgress"
+    >,
+    Omit<CoreUploadProps, "onChange" | "onRemove"> {
   /**
    * File list change callback
    */
@@ -24,15 +28,7 @@ export interface UploadProps
    */
   onRemove?: (file: UploadFile, fileList: UploadFile[]) => void | boolean;
 
-  /**
-   * Children to render as upload button
-   */
-  children?: React.ReactNode;
-
-  /**
-   * Additional CSS classes
-   */
-  className?: string;
+  // children/className/style 等由 React.HTMLAttributes<HTMLDivElement> 提供
 }
 
 export const Upload: React.FC<UploadProps> = ({
@@ -42,7 +38,7 @@ export const Upload: React.FC<UploadProps> = ({
   maxSize,
   disabled = false,
   drag = false,
-  listType = 'text',
+  listType = "text",
   fileList: controlledFileList,
   showFileList = true,
   autoUpload = true,
@@ -57,6 +53,8 @@ export const Upload: React.FC<UploadProps> = ({
   onExceed,
   children,
   className,
+  style,
+  ...divProps
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -87,61 +85,31 @@ export const Upload: React.FC<UploadProps> = ({
     await processFiles(files);
     // Reset input value to allow selecting the same file again
     if (event.target) {
-      event.target.value = '';
+      event.target.value = "";
     }
   };
 
   const processFiles = async (incomingFiles: File[]) => {
     if (incomingFiles.length === 0) return;
 
-    let files = incomingFiles;
+    const prepared = await prepareUploadFiles({
+      currentCount: fileList.length,
+      incomingFiles,
+      limit,
+      accept,
+      maxSize,
+      beforeUpload,
+    });
 
-    // Check limit
-    const currentCount = fileList.length;
-    const totalCount = currentCount + files.length;
-
-    if (limit && totalCount > limit) {
-      const remainingSlots = limit - currentCount;
-      const acceptedFiles = files.slice(0, remainingSlots);
-      const rejectedFiles = files.slice(remainingSlots);
-
-      if (rejectedFiles.length > 0 && onExceed) {
-        onExceed(rejectedFiles, fileList);
-      }
-
-      files = acceptedFiles;
+    if (prepared.rejectedExceedFiles.length > 0) {
+      onExceed?.(prepared.rejectedExceedFiles, fileList);
     }
 
     // Important: fileList is a snapshot (state/props). Use a local accumulator
     // to avoid overwriting previous files when selecting multiple at once.
     let nextFileList = [...fileList];
 
-    for (const file of files) {
-      // Validate file type
-      if (!validateFileType(file, accept)) {
-        console.warn(`File ${file.name} type is not accepted`);
-        continue;
-      }
-
-      // Validate file size
-      if (!validateFileSize(file, maxSize)) {
-        console.warn(`File ${file.name} exceeds maximum size`);
-        continue;
-      }
-
-      // Before upload hook
-      if (beforeUpload) {
-        try {
-          const result = await beforeUpload(file);
-          if (result === false) {
-            continue;
-          }
-        } catch (error) {
-          console.error('beforeUpload error:', error);
-          continue;
-        }
-      }
-
+    for (const file of prepared.acceptedFiles) {
       const uploadFile = fileToUploadFile(file);
 
       // Add to file list
@@ -154,7 +122,7 @@ export const Upload: React.FC<UploadProps> = ({
 
       // Auto upload if enabled
       if (autoUpload) {
-        uploadFile.status = 'uploading';
+        uploadFile.status = "uploading";
         if (customRequest) {
           customRequest({
             file,
@@ -165,13 +133,13 @@ export const Upload: React.FC<UploadProps> = ({
               }
             },
             onSuccess: (response: unknown) => {
-              uploadFile.status = 'success';
+              uploadFile.status = "success";
               if (onSuccess) {
                 onSuccess(response, uploadFile);
               }
             },
             onError: (error: Error) => {
-              uploadFile.status = 'error';
+              uploadFile.status = "error";
               uploadFile.error = error.message;
               if (onError) {
                 onError(error, uploadFile);
@@ -180,7 +148,7 @@ export const Upload: React.FC<UploadProps> = ({
           });
         } else {
           // Simulate upload for demo purposes
-          uploadFile.status = 'success';
+          uploadFile.status = "success";
         }
       }
     }
@@ -209,6 +177,15 @@ export const Upload: React.FC<UploadProps> = ({
     setIsDragging(true);
   };
 
+  const handleDragKeyDown = (event: React.KeyboardEvent) => {
+    if (disabled) return;
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleClick();
+    }
+  };
+
   const handleDragLeave = (event: React.DragEvent) => {
     if (disabled) return;
     event.preventDefault();
@@ -230,19 +207,22 @@ export const Upload: React.FC<UploadProps> = ({
         <div
           className={getDragAreaClasses(isDragging, disabled)}
           onClick={handleClick}
+          onKeyDown={handleDragKeyDown}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           role="button"
           tabIndex={disabled ? -1 : 0}
           aria-disabled={disabled}
-          aria-label="Upload file by clicking or dragging">
+          aria-label="Upload file by clicking or dragging"
+        >
           <svg
             className="w-12 h-12 mb-3 text-gray-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            aria-hidden="true">
+            aria-hidden="true"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -272,8 +252,9 @@ export const Upload: React.FC<UploadProps> = ({
         className={getUploadButtonClasses(drag, disabled)}
         onClick={handleClick}
         disabled={disabled}
-        aria-label="Upload file">
-        {children || 'Select File'}
+        aria-label="Upload file"
+      >
+        {children || "Select File"}
       </button>
     );
   };
@@ -283,7 +264,7 @@ export const Upload: React.FC<UploadProps> = ({
       return null;
     }
 
-    if (listType === 'picture-card') {
+    if (listType === "picture-card") {
       return (
         <div className="flex flex-wrap gap-2 mt-4">
           {fileList.map((file) => renderPictureCard(file))}
@@ -308,7 +289,8 @@ export const Upload: React.FC<UploadProps> = ({
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            aria-hidden="true">
+            aria-hidden="true"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -329,12 +311,13 @@ export const Upload: React.FC<UploadProps> = ({
         {/* Actions */}
         <div className="flex items-center space-x-2 ml-4">
           {/* Status icon */}
-          {file.status === 'success' && (
+          {file.status === "success" && (
             <svg
               className="w-5 h-5 text-green-500"
               fill="currentColor"
               viewBox="0 0 20 20"
-              aria-label="Success">
+              aria-label="Success"
+            >
               <path
                 fillRule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -342,12 +325,13 @@ export const Upload: React.FC<UploadProps> = ({
               />
             </svg>
           )}
-          {file.status === 'error' && (
+          {file.status === "error" && (
             <svg
               className="w-5 h-5 text-red-500"
               fill="currentColor"
               viewBox="0 0 20 20"
-              aria-label="Error">
+              aria-label="Error"
+            >
               <path
                 fillRule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -355,12 +339,13 @@ export const Upload: React.FC<UploadProps> = ({
               />
             </svg>
           )}
-          {file.status === 'uploading' && (
+          {file.status === "uploading" && (
             <svg
               className="w-5 h-5 text-blue-500 animate-spin"
               fill="none"
               viewBox="0 0 24 24"
-              aria-label="Uploading">
+              aria-label="Uploading"
+            >
               <circle
                 className="opacity-25"
                 cx="12"
@@ -381,12 +366,14 @@ export const Upload: React.FC<UploadProps> = ({
             type="button"
             className="text-gray-400 hover:text-red-500 transition-colors"
             onClick={() => handleRemove(file)}
-            aria-label={`Remove ${file.name}`}>
+            aria-label={`Remove ${file.name}`}
+          >
             <svg
               className="w-5 h-5"
               fill="currentColor"
               viewBox="0 0 20 20"
-              aria-hidden="true">
+              aria-hidden="true"
+            >
               <path
                 fillRule="evenodd"
                 d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -401,7 +388,7 @@ export const Upload: React.FC<UploadProps> = ({
 
   const renderPictureCard = (file: UploadFile) => {
     const imageUrl =
-      file.url || (file.file ? URL.createObjectURL(file.file) : '');
+      file.url || (file.file ? URL.createObjectURL(file.file) : "");
 
     return (
       <div key={file.uid} className={getPictureCardClasses(file.status)}>
@@ -420,13 +407,15 @@ export const Upload: React.FC<UploadProps> = ({
             type="button"
             className="text-white hover:text-blue-200 transition-colors"
             onClick={() => handlePreview(file)}
-            aria-label={`Preview ${file.name}`}>
+            aria-label={`Preview ${file.name}`}
+          >
             <svg
               className="w-6 h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              aria-hidden="true">
+              aria-hidden="true"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -446,12 +435,14 @@ export const Upload: React.FC<UploadProps> = ({
             type="button"
             className="text-white hover:text-red-200 transition-colors"
             onClick={() => handleRemove(file)}
-            aria-label={`Remove ${file.name}`}>
+            aria-label={`Remove ${file.name}`}
+          >
             <svg
               className="w-6 h-6"
               fill="currentColor"
               viewBox="0 0 20 20"
-              aria-hidden="true">
+              aria-hidden="true"
+            >
               <path
                 fillRule="evenodd"
                 d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
@@ -461,12 +452,13 @@ export const Upload: React.FC<UploadProps> = ({
           </button>
         </div>
         {/* Status indicator */}
-        {file.status === 'uploading' && (
+        {file.status === "uploading" && (
           <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
             <svg
               className="w-8 h-8 text-blue-500 animate-spin"
               fill="none"
-              viewBox="0 0 24 24">
+              viewBox="0 0 24 24"
+            >
               <circle
                 className="opacity-25"
                 cx="12"
@@ -488,14 +480,18 @@ export const Upload: React.FC<UploadProps> = ({
   };
 
   return (
-    <div className={`tiger-upload${className ? ` ${className}` : ''}`}>
+    <div
+      {...divProps}
+      className={classNames("tiger-upload", className)}
+      style={style}
+    >
       <input
         ref={inputRef}
         type="file"
         accept={accept}
         multiple={multiple}
         disabled={disabled}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
         onChange={handleFileChange}
         aria-hidden="true"
       />
