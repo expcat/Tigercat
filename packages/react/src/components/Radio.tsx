@@ -1,7 +1,10 @@
 import React, { useContext, useState } from 'react';
 import {
   classNames,
+  getRadioDotClasses,
+  getRadioLabelClasses,
   getRadioColorClasses,
+  getRadioVisualClasses,
   type RadioProps as CoreRadioProps,
 } from '@tigercat/core';
 import { RadioGroupContext } from './RadioGroup';
@@ -27,24 +30,6 @@ export interface RadioProps
    */
   className?: string;
 }
-
-const sizeClasses = {
-  sm: {
-    radio: 'w-4 h-4',
-    dot: 'w-1.5 h-1.5',
-    label: 'text-sm',
-  },
-  md: {
-    radio: 'w-5 h-5',
-    dot: 'w-2 h-2',
-    label: 'text-base',
-  },
-  lg: {
-    radio: 'w-6 h-6',
-    dot: 'w-2.5 h-2.5',
-    label: 'text-lg',
-  },
-} as const;
 
 export const Radio: React.FC<RadioProps> = ({
   value,
@@ -79,30 +64,24 @@ export const Radio: React.FC<RadioProps> = ({
       : internalChecked;
 
   const colors = getRadioColorClasses();
-  const radioClasses = classNames(
-    'relative inline-flex items-center justify-center rounded-full border-2 cursor-pointer transition-all',
-    'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-primary,#2563eb)] peer-focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]',
-    sizeClasses[actualSize].radio,
-    isChecked ? colors.borderChecked : colors.border,
-    isChecked ? colors.bgChecked : colors.bg,
-    actualDisabled && colors.disabled,
-    actualDisabled && 'cursor-not-allowed',
-    !actualDisabled && 'hover:border-[var(--tiger-primary,#2563eb)]'
-  );
+  const radioClasses = getRadioVisualClasses({
+    size: actualSize,
+    checked: isChecked,
+    disabled: actualDisabled,
+    colors,
+  });
 
-  const dotClasses = classNames(
-    'rounded-full transition-all',
-    sizeClasses[actualSize].dot,
-    colors.innerDot,
-    isChecked ? 'scale-100' : 'scale-0'
-  );
+  const dotClasses = getRadioDotClasses({
+    size: actualSize,
+    checked: isChecked,
+    colors,
+  });
 
-  const labelClasses = classNames(
-    'ml-2 cursor-pointer select-none',
-    sizeClasses[actualSize].label,
-    actualDisabled ? colors.textDisabled : 'text-[var(--tiger-text,#111827)]',
-    actualDisabled && 'cursor-not-allowed'
-  );
+  const labelClasses = getRadioLabelClasses({
+    size: actualSize,
+    disabled: actualDisabled,
+    colors,
+  });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (actualDisabled) {

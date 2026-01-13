@@ -11,7 +11,10 @@ import {
 import {
   classNames,
   coerceClassValue,
+  getRadioDotClasses,
+  getRadioLabelClasses,
   getRadioColorClasses,
+  getRadioVisualClasses,
   type RadioSize,
 } from '@tigercat/core';
 
@@ -27,24 +30,6 @@ export interface VueRadioProps {
   className?: string;
   style?: Record<string, string | number>;
 }
-
-const sizeClasses = {
-  sm: {
-    radio: 'w-4 h-4',
-    dot: 'w-1.5 h-1.5',
-    label: 'text-sm',
-  },
-  md: {
-    radio: 'w-5 h-5',
-    dot: 'w-2 h-2',
-    label: 'text-base',
-  },
-  lg: {
-    radio: 'w-6 h-6',
-    dot: 'w-2.5 h-2.5',
-    label: 'text-lg',
-  },
-};
 
 export const Radio = defineComponent({
   name: 'TigerRadio',
@@ -159,35 +144,28 @@ export const Radio = defineComponent({
     const colors = getRadioColorClasses();
 
     const radioClasses = computed(() => {
-      return classNames(
-        'relative inline-flex items-center justify-center rounded-full border-2 cursor-pointer transition-all',
-        sizeClasses[actualSize.value].radio,
-        isChecked.value ? colors.borderChecked : colors.border,
-        isChecked.value ? colors.bgChecked : colors.bg,
-        actualDisabled.value && colors.disabled,
-        actualDisabled.value && 'cursor-not-allowed',
-        !actualDisabled.value && 'hover:border-[var(--tiger-primary,#2563eb)]'
-      );
+      return getRadioVisualClasses({
+        size: actualSize.value,
+        checked: !!isChecked.value,
+        disabled: actualDisabled.value,
+        colors,
+      });
     });
 
     const dotClasses = computed(() => {
-      return classNames(
-        'rounded-full transition-all',
-        sizeClasses[actualSize.value].dot,
-        colors.innerDot,
-        isChecked.value ? 'scale-100' : 'scale-0'
-      );
+      return getRadioDotClasses({
+        size: actualSize.value,
+        checked: !!isChecked.value,
+        colors,
+      });
     });
 
     const labelClasses = computed(() => {
-      return classNames(
-        'ml-2 cursor-pointer select-none',
-        sizeClasses[actualSize.value].label,
-        actualDisabled.value
-          ? colors.textDisabled
-          : 'text-[var(--tiger-text,#111827)]',
-        actualDisabled.value && 'cursor-not-allowed'
-      );
+      return getRadioLabelClasses({
+        size: actualSize.value,
+        disabled: actualDisabled.value,
+        colors,
+      });
     });
 
     const handleChange = (event: Event) => {
@@ -253,10 +231,7 @@ export const Radio = defineComponent({
           h(
             'span',
             {
-              class: classNames(
-                radioClasses.value,
-                'peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-[var(--tiger-primary,#2563eb)] peer-focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
-              ),
+              class: radioClasses.value,
               'aria-hidden': 'true',
             },
             [
