@@ -59,6 +59,7 @@ export * from './utils/alert-utils';
 export * from './utils/message-utils';
 export * from './utils/notification-utils';
 export * from './utils/loading-utils';
+export * from './utils/svg-attrs';
 export * from './utils/popconfirm-utils';
 export * from './utils/popover-utils';
 export * from './utils/tooltip-utils';
