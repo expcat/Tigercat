@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   classNames,
   buttonBaseClasses,
@@ -6,48 +6,51 @@ import {
   buttonDisabledClasses,
   getButtonVariantClasses,
   type ButtonProps as CoreButtonProps,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
 export interface ButtonProps
   extends CoreButtonProps,
-    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "disabled"> {}
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled'> {}
 
 export const Button: React.FC<ButtonProps> = ({
-  variant = "primary",
-  size = "md",
+  variant = 'primary',
+  size = 'md',
   disabled = false,
   loading = false,
   block = false,
   onClick,
   children,
-  type = "button",
+  type = 'button',
   className,
   ...props
 }) => {
+  const isDisabled = disabled || loading;
+
+  const ariaBusy = props['aria-busy'] ?? (loading ? true : undefined);
+  const ariaDisabled =
+    props['aria-disabled'] ?? (isDisabled ? true : undefined);
+
   const buttonClasses = classNames(
     buttonBaseClasses,
     getButtonVariantClasses(variant),
     buttonSizeClasses[size],
-    (disabled || loading) && buttonDisabledClasses,
-    block && "w-full",
+    isDisabled && buttonDisabledClasses,
+    block && 'w-full',
     className
   );
 
   return (
     <button
       className={buttonClasses}
-      disabled={disabled || loading}
+      aria-busy={ariaBusy}
+      aria-disabled={ariaDisabled}
+      disabled={isDisabled}
       onClick={(event) => {
-        if (disabled || loading) {
-          event.preventDefault();
-          event.stopPropagation();
-          return;
-        }
+        if (isDisabled) return;
         onClick?.(event);
       }}
       type={type}
-      {...props}
-    >
+      {...props}>
       {loading && (
         <span className="mr-2">
           <svg
@@ -55,7 +58,8 @@ export const Button: React.FC<ButtonProps> = ({
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
-          >
+            aria-hidden="true"
+            focusable="false">
             <circle
               className="opacity-25"
               cx="12"
