@@ -18,31 +18,35 @@ This guide provides detailed information for developers working on the Tigercat 
 ### Environment Setup
 
 1. **Check Prerequisites**:
+
    ```bash
    # Verify your environment meets requirements
    pnpm dev:check
    ```
 
 2. **Install Dependencies**:
+
    ```bash
    # Using the setup script (recommended for first-time setup)
    ./scripts/setup.sh
-   
+
    # Or manually
    pnpm install
    pnpm build
    ```
 
 3. **Start Development**:
+
    ```bash
    # Watch mode for all packages
    pnpm dev
-   
+
    # In another terminal, run tests in watch mode
    pnpm test
-   
-   # In another terminal, run a demo
-   pnpm demo:vue    # or pnpm demo:react
+
+    # In another terminal, run an example
+    pnpm example:vue    # or pnpm example:react
+    # Compatibility aliases: pnpm demo:vue / pnpm demo:react
    ```
 
 ## 🛠 Development Commands
@@ -110,6 +114,9 @@ pnpm example:vue
 pnpm example:react
 
 # Run both examples simultaneously
+pnpm example:all
+
+# Compatibility alias
 pnpm demo:all
 
 # Build examples for production
@@ -158,7 +165,7 @@ packages/
 
 ```
 @tigercat/vue  ──→  @tigercat/core
-                    
+
 @tigercat/react ──→  @tigercat/core
 ```
 
@@ -169,87 +176,90 @@ packages/
 ### Build Order
 
 Packages are built in dependency order:
+
 1. `@tigercat/core` (no dependencies)
 2. `@tigercat/vue` and `@tigercat/react` (in parallel, both depend on core)
-3. Demo applications (depend on component packages)
+3. Example applications (depend on component packages)
 
 ## 🎨 Adding New Components
 
 ### Component Development Workflow
 
 1. **Plan the Component**
+
    - Review [ROADMAP.md](./ROADMAP.md) for component priorities
    - Define component API (props, events, slots)
    - Consider accessibility requirements
 
 2. **Create Core Types and Utilities**
-   
+
    ```bash
    # Create type definitions
    packages/core/src/types/your-component.ts
-   
+
    # Create utilities (if needed)
    packages/core/src/utils/your-component-utils.ts
    ```
-   
+
    ```typescript
    // Example: packages/core/src/types/badge.ts
    export interface BadgeProps {
-     variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
-     size?: 'sm' | 'md' | 'lg';
+     variant?: "primary" | "secondary" | "success" | "warning" | "danger";
+     size?: "sm" | "md" | "lg";
      rounded?: boolean;
    }
    ```
 
 3. **Implement Vue Component**
-   
+
    ```bash
    # Create component file
    packages/vue/src/components/YourComponent.vue
    ```
-   
+
    ```vue
    <script setup lang="ts">
-   import { computed } from 'vue';
-   import type { YourComponentProps } from '@tigercat/core';
-   
+   import { computed } from "vue";
+   import type { YourComponentProps } from "@tigercat/core";
+
    const props = withDefaults(defineProps<YourComponentProps>(), {
-     variant: 'primary',
-     size: 'md',
+     variant: "primary",
+     size: "md",
    });
-   
+
    const emit = defineEmits<{
      click: [event: MouseEvent];
    }>();
    </script>
-   
+
    <template>
      <div @click="emit('click', $event)">
        <slot />
      </div>
    </template>
    ```
-   
+
    Export in `packages/vue/src/index.ts`:
+
    ```typescript
-   export { default as YourComponent } from './components/YourComponent.vue';
-   export type { YourComponentProps } from '@tigercat/core';
+   export { default as YourComponent } from "./components/YourComponent.vue";
+   export type { YourComponentProps } from "@tigercat/core";
    ```
 
 4. **Implement React Component**
-   
+
    ```bash
    # Create component file
    packages/react/src/components/YourComponent.tsx
    ```
-   
+
    ```typescript
-   import React from 'react';
-   import type { YourComponentProps } from '@tigercat/core';
-   
+   import React from "react";
+   import type { YourComponentProps } from "@tigercat/core";
+
    export const YourComponent: React.FC<YourComponentProps> = ({
-     variant = 'primary',
-     size = 'md',
+     variant = "primary",
+     size = "md",
      onClick,
      children,
      ...props
@@ -261,33 +271,35 @@ Packages are built in dependency order:
      );
    };
    ```
-   
+
    Export in `packages/react/src/index.tsx`:
+
    ```typescript
-   export { YourComponent } from './components/YourComponent';
-   export type { YourComponentProps } from '@tigercat/core';
+   export { YourComponent } from "./components/YourComponent";
+   export type { YourComponentProps } from "@tigercat/core";
    ```
 
 5. **Write Tests**
-   
+
    ```bash
    # Vue tests
    tests/vue/YourComponent.spec.ts
-   
+
    # React tests
    tests/react/YourComponent.spec.tsx
    ```
-   
+
    Follow the test structure in existing test files. See [Testing Guide](./tests/TESTING_GUIDE.md).
 
 6. **Add Documentation**
-   
+
    ```bash
    # Component documentation
    docs/components/your-component.md
    ```
-   
+
    Include:
+
    - Component description
    - Props/API reference
    - Usage examples (both Vue and React)
@@ -295,22 +307,28 @@ Packages are built in dependency order:
    - Styling customization
 
 7. **Add to Examples**
-   
+
    ```bash
-  # Vue example
-  examples/example/vue3/src/pages/YourComponentDemo.vue
-   
-  # React example
-  examples/example/react/src/pages/YourComponentDemo.tsx
+
    ```
 
+# Vue example
+
+examples/example/vue3/src/pages/YourComponentDemo.vue
+
+# React example
+
+examples/example/react/src/pages/YourComponentDemo.tsx
+
+```
+
 8. **Update Roadmap**
-   
-   Mark component as complete in [ROADMAP.md](./ROADMAP.md):
-   - Vue: ✅
-   - React: ✅
-   - Docs: ✅
-   - Tests: ✅
+
+Mark component as complete in [ROADMAP.md](./ROADMAP.md):
+- Vue: ✅
+- React: ✅
+- Docs: ✅
+- Tests: ✅
 
 ### Component Best Practices
 
@@ -327,16 +345,18 @@ Packages are built in dependency order:
 ### Test Organization
 
 ```
+
 tests/
-├── vue/                # Vue component tests
-├── react/              # React component tests
-└── utils/              # Shared test utilities
-    ├── render-helpers.ts         # Vue render helpers
-    ├── render-helpers-react.ts   # React render helpers
-    ├── a11y-helpers.ts           # Accessibility testing
-    ├── theme-helpers.ts          # Theme testing
-    └── test-fixtures.ts          # Common test data
-```
+├── vue/ # Vue component tests
+├── react/ # React component tests
+└── utils/ # Shared test utilities
+├── render-helpers.ts # Vue render helpers
+├── render-helpers-react.ts # React render helpers
+├── a11y-helpers.ts # Accessibility testing
+├── theme-helpers.ts # Theme testing
+└── test-fixtures.ts # Common test data
+
+````
 
 ### Test Categories
 
@@ -364,11 +384,12 @@ pnpm test:react          # Only React tests
 # Coverage and UI
 pnpm test:coverage       # Generate coverage report
 pnpm test:ui             # Interactive test UI
-```
+````
 
 ### Writing Tests
 
 See detailed guides:
+
 - [Vue Testing Guide](./tests/TESTING_GUIDE.md)
 - [React Testing Guide](./tests/REACT_TESTING_GUIDE.md)
 
@@ -464,6 +485,7 @@ git push origin feature/new-component
 #### 1. `pnpm: command not found`
 
 **Solution**:
+
 ```bash
 npm install -g pnpm@10.26.2
 ```
@@ -473,6 +495,7 @@ npm install -g pnpm@10.26.2
 **Problem**: Changes to `@tigercat/core` require rebuilding dependent packages.
 
 **Solution**:
+
 ```bash
 # Rebuild all packages
 pnpm build
@@ -483,16 +506,20 @@ pnpm --filter @tigercat/vue build
 pnpm --filter @tigercat/react build
 ```
 
-#### 3. Demo Not Loading Components
+#### 3. Example Not Loading Components
 
-**Problem**: Demos require built packages.
+**Problem**: Examples require built packages.
 
 **Solution**:
+
 ```bash
 # Build packages first
 pnpm build
 
-# Then run demo
+# Then run example (preferred)
+pnpm example:vue
+
+# Compatibility alias
 pnpm demo:vue
 ```
 
@@ -501,6 +528,7 @@ pnpm demo:vue
 **Problem**: Tests may be cached.
 
 **Solution**:
+
 ```bash
 # Clear Vitest cache
 rm -rf node_modules/.vitest
@@ -514,15 +542,17 @@ pnpm test
 **Problem**: VSCode not picking up TypeScript changes.
 
 **Solution**:
+
 1. Reload VSCode window: `Cmd+Shift+P` → "Reload Window"
 2. Restart TypeScript server: `Cmd+Shift+P` → "TypeScript: Restart TS Server"
 3. Rebuild packages: `pnpm build`
 
 #### 6. Port Already in Use
 
-**Problem**: Demo server port (5173 or 5174) is already in use.
+**Problem**: Example server port (5173 or 5174) is already in use.
 
 **Solution**:
+
 ```bash
 # Find process using the port
 lsof -i :5173
@@ -531,7 +561,7 @@ lsof -i :5174
 # Kill the process
 kill -9 <PID>
 
-# Or use different ports (edit vite.config.ts in demo packages)
+# Or use different ports (edit vite.config.ts in example packages)
 ```
 
 ### Getting Help

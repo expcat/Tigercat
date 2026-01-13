@@ -89,10 +89,15 @@ pnpm dev
 # Run tests in watch mode
 pnpm test
 
-# Run demos
-pnpm demo:vue    # Vue3 demo on http://localhost:5173
-pnpm demo:react  # React demo on http://localhost:5174
-pnpm demo:all    # Run both demos simultaneously
+# Run examples (preferred)
+pnpm example:vue    # Vue3 example on http://localhost:5173
+pnpm example:react  # React example on http://localhost:5174
+pnpm example:all    # Run both examples simultaneously
+
+# Compatibility aliases
+pnpm demo:vue
+pnpm demo:react
+pnpm demo:all
 ```
 
 ### 4. Make Changes
@@ -152,9 +157,9 @@ tigercat/
 │   ├── vue/            # Vue 3 components
 │   └── react/          # React components
 ├── examples/
-│   └── demo/
-│       ├── vue3/       # Vue 3 demo app
-│       └── react/      # React demo app
+│   └── example/
+│       ├── vue3/       # Vue 3 example app
+│       └── react/      # React example app
 ├── tests/
 │   ├── vue/            # Vue component tests
 │   ├── react/          # React component tests
@@ -194,15 +199,15 @@ tigercat/
 
 ```vue
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed } from "vue";
 
 interface ButtonProps {
-  variant?: 'primary' | 'secondary';
+  variant?: "primary" | "secondary";
   disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<ButtonProps>(), {
-  variant: 'primary',
+  variant: "primary",
   disabled: false,
 });
 
@@ -226,17 +231,17 @@ const emit = defineEmits<{
 - Use children prop for content composition
 
 ```typescript
-import React from 'react';
+import React from "react";
 
 export interface ButtonProps {
-  variant?: 'primary' | 'secondary';
+  variant?: "primary" | "secondary";
   disabled?: boolean;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   children?: React.ReactNode;
 }
 
 export const Button: React.FC<ButtonProps> = ({
-  variant = 'primary',
+  variant = "primary",
   disabled = false,
   onClick,
   children,
@@ -278,34 +283,35 @@ All components must have comprehensive tests covering:
 ### Test Structure
 
 ```typescript
-describe('ComponentName', () => {
-  describe('Rendering', () => {
-    it('should render with default props', () => {
+describe("ComponentName", () => {
+  describe("Rendering", () => {
+    it("should render with default props", () => {
       // Test implementation
-    })
-  })
-  
-  describe('Props', () => {
-    it('should apply size prop correctly', () => {
+    });
+  });
+
+  describe("Props", () => {
+    it("should apply size prop correctly", () => {
       // Test implementation
-    })
-  })
-  
-  describe('Events', () => {
-    it('should emit click event', async () => {
+    });
+  });
+
+  describe("Events", () => {
+    it("should emit click event", async () => {
       // Test implementation
-    })
-  })
-  
-  describe('Accessibility', () => {
-    it('should have no a11y violations', async () => {
+    });
+  });
+
+  describe("Accessibility", () => {
+    it("should have no a11y violations", async () => {
       // Test implementation
-    })
-  })
-})
+    });
+  });
+});
 ```
 
 For detailed testing guidelines, see:
+
 - [Vue Testing Guide](./tests/TESTING_GUIDE.md)
 - [React Testing Guide](./tests/REACT_TESTING_GUIDE.md)
 
@@ -373,7 +379,7 @@ When creating a PR, include:
 - **Type**: Feature, Bug Fix, Documentation, etc.
 - **Related Issues**: Link to related issues
 - **Breaking Changes**: List any breaking changes
-- **Checklist**: 
+- **Checklist**:
   - [ ] Tests added/updated
   - [ ] Documentation updated
   - [ ] All tests passing

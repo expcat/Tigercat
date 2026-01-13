@@ -31,9 +31,10 @@
     "test:validate": "./scripts/validate-tests.sh",
     "example:vue": "pnpm --filter @tigercat-example/vue3 dev",
     "example:react": "pnpm --filter @tigercat-example/react dev",
+    "example:all": "./scripts/run-examples.sh",
     "demo:vue": "pnpm --filter @tigercat-example/vue3 dev",
     "demo:react": "pnpm --filter @tigercat-example/react dev",
-    "demo:all": "./scripts/run-demos.sh",
+    "demo:all": "./scripts/run-examples.sh",
     "dev:check": "./scripts/check-env.sh",
     "setup": "./scripts/setup.sh"
   },

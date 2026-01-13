@@ -12,11 +12,11 @@ See our [Development Roadmap](./ROADMAP.md) for all planned components and devel
 
 This is a monorepo managed with pnpm workspaces containing:
 
-| Package | Description |
-|---------|-------------|
-| `@tigercat/core` | Core utilities for Tigercat UI library |
-| `@tigercat/vue` | Vue 3 components |
-| `@tigercat/react` | React components |
+| Package           | Description                            |
+| ----------------- | -------------------------------------- |
+| `@tigercat/core`  | Core utilities for Tigercat UI library |
+| `@tigercat/vue`   | Vue 3 components                       |
+| `@tigercat/react` | React components                       |
 
 ## Development
 
@@ -61,10 +61,15 @@ pnpm dev
 # Run all tests
 pnpm test
 
-# Run demos
-pnpm demo:vue    # Vue3 demo on http://localhost:5173
-pnpm demo:react  # React demo on http://localhost:5174
-pnpm demo:all    # Run both demos simultaneously
+# Run examples (preferred)
+pnpm example:vue    # Vue3 example on http://localhost:5173
+pnpm example:react  # React example on http://localhost:5174
+pnpm example:all    # Run both examples simultaneously
+
+# Compatibility aliases
+pnpm demo:vue
+pnpm demo:react
+pnpm demo:all
 ```
 
 ### Testing
@@ -87,32 +92,37 @@ pnpm test:coverage
 For detailed testing guidelines, see:
 
 **Vue Testing**:
+
 - [Testing Guide](./tests/TESTING_GUIDE.md) - Comprehensive testing documentation
 - [Quick Start Guide](./tests/QUICK_START.md) - Get started writing tests
 - [Component Test Checklist](./tests/COMPONENT_TEST_CHECKLIST.md) - Track testing progress
 
 **React Testing**:
+
 - [Testing Guide](./tests/REACT_TESTING_GUIDE.md) - Comprehensive testing documentation
 - [Quick Start Guide](./tests/REACT_QUICK_START.md) - Get started writing tests
 - [Component Test Checklist](./tests/REACT_COMPONENT_TEST_CHECKLIST.md) - Track testing progress
 
 ### Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `pnpm build` | Build all packages |
-| `pnpm dev` | Watch mode for all packages |
-| `pnpm test` | Run all tests |
-| `pnpm test:vue` | Run Vue tests only |
-| `pnpm test:react` | Run React tests only |
-| `pnpm test:ui` | Run tests with interactive UI |
-| `pnpm test:coverage` | Run tests with coverage report |
-| `pnpm demo:vue` | Run Vue3 demo (port 5173) |
-| `pnpm demo:react` | Run React demo (port 5174) |
-| `pnpm demo:all` | Run both demos simultaneously |
-| `pnpm dev:check` | Verify development environment |
-| `pnpm lint` | Lint all packages |
-| `pnpm clean` | Clean build artifacts |
+| Command              | Description                      |
+| -------------------- | -------------------------------- |
+| `pnpm build`         | Build all packages               |
+| `pnpm dev`           | Watch mode for all packages      |
+| `pnpm test`          | Run all tests                    |
+| `pnpm test:vue`      | Run Vue tests only               |
+| `pnpm test:react`    | Run React tests only             |
+| `pnpm test:ui`       | Run tests with interactive UI    |
+| `pnpm test:coverage` | Run tests with coverage report   |
+| `pnpm example:vue`   | Run Vue3 example (port 5173)     |
+| `pnpm example:react` | Run React example (port 5174)    |
+| `pnpm example:all`   | Run both examples simultaneously |
+| `pnpm demo:vue`      | Alias of `example:vue`           |
+| `pnpm demo:react`    | Alias of `example:react`         |
+| `pnpm demo:all`      | Alias of `example:all`           |
+| `pnpm dev:check`     | Verify development environment   |
+| `pnpm lint`          | Lint all packages                |
+| `pnpm clean`         | Clean build artifacts            |
 
 ### Project Structure
 
@@ -129,10 +139,10 @@ tigercat/
 │   ├── vue/            # Vue component tests
 │   ├── react/          # React component tests
 │   └── utils/          # Test helpers and utilities
-├── examples/           # Demo applications
-│   └── demo/
-│       ├── vue3/       # Vue 3 demo app
-│       └── react/      # React demo app
+├── examples/           # Example applications
+│   └── example/
+│       ├── vue3/       # Vue 3 example app
+│       └── react/      # React example app
 ├── package.json
 ├── pnpm-workspace.yaml
 └── tsconfig.json
@@ -141,6 +151,7 @@ tigercat/
 ## Documentation
 
 Component documentation can be found in the `docs/components/` directory. Each component includes:
+
 - API reference (props, events, types)
 - Usage examples for both Vue 3 and React
 - Styling and customization options
@@ -165,19 +176,22 @@ For detailed development documentation, see [DEVELOPMENT.md](./DEVELOPMENT.md).
 ### Common Issues
 
 **pnpm not found?**
+
 ```bash
 npm install -g pnpm@10.26.2
 ```
 
-**Demo not loading components?**
+**Example not loading components?**
+
 ```bash
 # Build packages first
 pnpm build
-# Then run demo
-pnpm demo:vue
+# Then run example
+pnpm example:vue
 ```
 
 **Tests failing after changes?**
+
 ```bash
 # Clear cache and rebuild
 pnpm clean
@@ -187,6 +201,7 @@ pnpm test
 ```
 
 **Port already in use?**
+
 ```bash
 # Check what's using the port
 lsof -i :5173  # or :5174
