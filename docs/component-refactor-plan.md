@@ -10,8 +10,8 @@
 
 - 更新时间：2026-01-14
 - 上一步：✅ `Button` P1 深化（keyboard 关键路径补测 + build 验证）
-- 当前组件：待选择（下一组件 / Phase 0 基建）
-- 当前步骤：准备进入下一个组件（待确认）
+- 当前组件：Phase 0 基建
+- 当前步骤：✅ a11y utils + 模板已落地；准备进入下一项（overlay / i18n / classes）
 - Step1-5 完成度：已完成一轮（包含 build 验证；详见「4. 已完成」）
 - 未完成清单：见「1. 未完成/待办」
 
@@ -23,8 +23,11 @@
 
 > 说明：目前大量能力已在各组件内“就地实现”。若后续要持续扩展组件能力，建议把通用算法/约束补齐到 core，减少重复实现。
 
-- [ ] 建立「组件重构任务模板」并约定优先级标签：P0/P1/P2/P3
-- [ ] a11y：focus management、keyboard helpers、aria id 生成（优先放 `@tigercat/core`）
+- [x] 建立「组件重构任务模板」并约定优先级标签：P0/P1/P2/P3（见 docs/component-refactor-task-template.md）
+- [ ] a11y（优先放 `@tigercat/core`）：
+	- [ ] focus management
+	- [x] keyboard helpers（`isEnterKey` / `isSpaceKey` / `isActivationKey`）
+	- [x] aria id 生成（`createAriaId`）
 - [ ] overlay：click-outside、ESC 关闭、focus trap（core 放无框架算法；React/Vue 各自封装）
 - [ ] i18n：常用文案（empty/loading/ok/cancel）以 props/locale 方式注入的统一入口
 - [ ] consistent classes：组件 class 生成尽量走 core 的 `*-utils.ts` / `*-styles.ts`
@@ -75,5 +78,6 @@ return h('div', { class: '...' }, children);
 
 - 2026-01-14：`Button` Step2-5（disabled/loading 交互与默认 aria 策略、spinner a11y、测试覆盖、docs 同步、build 通过）。
 - 2026-01-14：`Button`（P1）深化（补齐 keyboard 关键路径测试；注：Space 语义依赖原生 button 行为，happy-dom 不稳定不强测；build 通过）。
+- 2026-01-14：Phase 0 基建（新增 core a11y utils：`createAriaId`/keyboard helpers；新增组件重构任务模板；补齐最小单测；build 通过）。
 - 2026-01-13：`Button` Step1；`Select` Step1-4；`Form/FormItem` Step1-3；`Menu` Step1-4；`Tabs` Step1-3；`Table` Step1-3；`Tree` Step0 + Step1-4；`DatePicker` Step1-4；`TimePicker` Step1-5；`Upload` Step1-5；`Message/Notification/Loading/Modal/Drawer/Popover` Step1。
 - 2026-01-12：`Icon/Link/Text/Badge/Tag/Avatar/Card/Container/Divider/Space/Layout/Grid/Input/Textarea/Checkbox/Radio/Switch/Slider/Breadcrumb/Steps/Pagination/Dropdown/List/Descriptions/Timeline/Progress/Skeleton/Alert/Tooltip/Popconfirm` Step1。
