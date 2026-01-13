@@ -9,9 +9,9 @@
 ## 0. 状态板（只维护这里）
 
 - 更新时间：2026-01-14
-- 上一步：✅ `Upload` 的 20x20 success/error 状态 icon paths + viewBox 常量统一收敛到 core `common-icons`（两端复用；tests + build 通过）
+- 上一步：✅ `Upload` 的 uploading/success/error 状态 icon/spinner classes 统一下沉到 core `upload-utils`（两端复用主题 CSS vars；tests + build 通过）
 - 当前组件：Phase 0 基建
-- 当前步骤：🚧 consistent classes 推进中（新增覆盖 Upload uploading spinner；持续收敛重复 SVG）
+- 当前步骤：🚧 consistent classes 推进中（持续收敛重复 SVG / 统一 class 生成入口）
 - Step1-5 完成度：已完成一轮（包含 build 验证；详见「4. 已完成」）
 - 未完成清单：见「1. 未完成/待办」
 
@@ -43,6 +43,7 @@
   - 进度：✅ StepsItem 的 finish 对勾 SVG 常量（`stepFinishIcon*`）已统一下沉到 `@tigercat/core`（`steps-utils`），Vue/React 双端复用同一实现。
   - 进度：✅ Modal/Drawer/TabPane 的关闭(X) SVG 常量（`closeIcon*`）已统一下沉到 `@tigercat/core`（`common-icons`），Vue/React 双端复用同一实现。
   - 进度：✅ Upload 的 uploading spinner SVG 已统一复用 core `getSpinnerSVG('spinner')`；同时将 Vue 渲染所需的 SVG attrs 归一化（`normalizeSvgAttrs`）下沉到 `@tigercat/core`（`svg-attrs`）。
+  - 进度：✅ Upload 的 uploading/success/error 状态 icon/spinner classes（尺寸/颜色/animate-spin）已统一下沉到 `@tigercat/core`（`upload-utils`），Vue/React 双端复用同一实现。
   - 进度：✅ Button/Table 的 loading spinner SVG 已统一复用 core `getSpinnerSVG('spinner')`（两端删除重复 circle/path）。
   - 进度：✅ List/Tree 的 loading spinner SVG 已统一复用 core `getSpinnerSVG('spinner')`（两端删除重复 circle/path）。
   - 进度：✅ Upload 的 20x20 success/error 状态 icon paths（`successCircleSolidIcon20PathD`/`errorCircleSolidIcon20PathD`）与 viewBox（`icon20ViewBox`）已统一收敛到 `@tigercat/core`（`common-icons`），两端删除重复字面量。
@@ -98,6 +99,7 @@ return h('div', { class: '...' }, children);
 - 2026-01-14：`Button`（P1）深化（补齐 keyboard 关键路径测试；注：Space 语义依赖原生 button 行为，happy-dom 不稳定不强测；build 通过）。
 - 2026-01-14：Phase 0 基建（SVG spinner 复用）：`List`/`Tree`（Vue+React）loading spinner 改用 core `getSpinnerSVG('spinner')`；相关单测通过；build 通过。
 - 2026-01-14：Phase 0 基建（重复 SVG 收敛）：`Upload`（Vue+React）file list 的 success/error 状态图标（20x20）改为复用 core `common-icons`（`successCircleSolidIcon20PathD`/`errorCircleSolidIcon20PathD` + `icon20ViewBox`）；相关单测通过；build 通过。
+- 2026-01-14：Phase 0 基建（consistent classes）：`Upload`（Vue+React）uploading/success/error 状态 icon/spinner class 统一收敛到 core `upload-utils`（主题 CSS vars + animate-spin）；相关单测通过；build 通过。
 - 2026-01-14：Phase 0 基建（重复 SVG 收敛）：`Popconfirm`（Vue+React）内联 5 个状态 icon SVG 改为复用 core `popconfirm-utils`（`getPopconfirmIconPath` + 相关常量）；相关单测通过；build 通过。
 - 2026-01-14：Phase 0 基建（重复 SVG 收敛）：`Alert/Message/Notification/Tag`（Vue+React）统一复用 core `common-icons` 的 status icon paths + close(X) path + 24x24 outline attrs 常量；相关单测通过；build 通过。
 - 2026-01-14：Phase 0 基建（重复 SVG 收敛）：`DatePicker/TimePicker`（Vue+React）统一复用 core `common-icons` 的 20x20 icons paths（close/calendar/clock/chevron）+ `icon20ViewBox`；`datepicker-icons`/`timepicker-icons` 内部改为引用该常量；相关单测通过；build 通过。

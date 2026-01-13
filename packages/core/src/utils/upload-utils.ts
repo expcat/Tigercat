@@ -5,6 +5,32 @@
 import type { UploadFile, UploadFileStatus } from "../types/upload";
 import { classNames } from "./class-names";
 
+export type UploadStatusIconSize = "sm" | "lg";
+
+export const uploadStatusIconSizeClasses: Record<UploadStatusIconSize, string> = {
+  sm: "w-5 h-5",
+  lg: "w-8 h-8",
+};
+
+export const uploadStatusIconColorClasses: Record<UploadFileStatus, string> = {
+  ready: "text-[var(--tiger-text-muted,#6b7280)]",
+  uploading: "text-[var(--tiger-primary,#2563eb)]",
+  success: "text-[var(--tiger-success,#16a34a)]",
+  error: "text-[var(--tiger-error,#dc2626)]",
+};
+
+export function getUploadStatusIconClasses(
+  status: UploadFileStatus,
+  size: UploadStatusIconSize,
+  options?: { spinning?: boolean }
+): string {
+  return classNames(
+    uploadStatusIconSizeClasses[size],
+    uploadStatusIconColorClasses[status],
+    options?.spinning ? "animate-spin" : ""
+  );
+}
+
 export type BeforeUploadHandler = (file: File) => boolean | Promise<boolean>;
 
 export type UploadRejectReason =

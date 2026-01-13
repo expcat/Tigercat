@@ -15,6 +15,7 @@ import {
   getDragAreaClasses,
   getFileListItemClasses,
   getPictureCardClasses,
+  getUploadStatusIconClasses,
 } from '@tigercat/core';
 
 export interface UploadProps
@@ -315,7 +316,7 @@ export const Upload: React.FC<UploadProps> = ({
           {/* Status icon */}
           {file.status === 'success' && (
             <svg
-              className="w-5 h-5 text-green-500"
+              className={getUploadStatusIconClasses('success', 'sm')}
               fill="currentColor"
               viewBox={icon20ViewBox}
               aria-label="Success">
@@ -328,7 +329,7 @@ export const Upload: React.FC<UploadProps> = ({
           )}
           {file.status === 'error' && (
             <svg
-              className="w-5 h-5 text-red-500"
+              className={getUploadStatusIconClasses('error', 'sm')}
               fill="currentColor"
               viewBox={icon20ViewBox}
               aria-label="Error">
@@ -341,7 +342,9 @@ export const Upload: React.FC<UploadProps> = ({
           )}
           {file.status === 'uploading' && (
             <svg
-              className="w-5 h-5 text-blue-500 animate-spin"
+              className={getUploadStatusIconClasses('uploading', 'sm', {
+                spinning: true,
+              })}
               fill="none"
               viewBox={spinnerSvg.viewBox}
               aria-label="Uploading">
@@ -442,7 +445,9 @@ export const Upload: React.FC<UploadProps> = ({
         {file.status === 'uploading' && (
           <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
             <svg
-              className="w-8 h-8 text-blue-500 animate-spin"
+              className={getUploadStatusIconClasses('uploading', 'lg', {
+                spinning: true,
+              })}
               fill="none"
               viewBox={spinnerSvg.viewBox}>
               {spinnerSvg.elements.map((el, index) => {

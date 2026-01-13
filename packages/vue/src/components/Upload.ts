@@ -19,6 +19,7 @@ import {
   getDragAreaClasses,
   getFileListItemClasses,
   getPictureCardClasses,
+  getUploadStatusIconClasses,
 } from '@tigercat/core';
 
 export interface VueUploadProps {
@@ -479,7 +480,7 @@ export const Upload = defineComponent({
               h(
                 'svg',
                 {
-                  class: 'w-5 h-5 text-green-500',
+                  class: getUploadStatusIconClasses('success', 'sm'),
                   fill: 'currentColor',
                   viewBox: icon20ViewBox,
                   'aria-label': 'Success',
@@ -496,7 +497,7 @@ export const Upload = defineComponent({
               h(
                 'svg',
                 {
-                  class: 'w-5 h-5 text-red-500',
+                  class: getUploadStatusIconClasses('error', 'sm'),
                   fill: 'currentColor',
                   viewBox: icon20ViewBox,
                   'aria-label': 'Error',
@@ -513,7 +514,9 @@ export const Upload = defineComponent({
               h(
                 'svg',
                 {
-                  class: 'w-5 h-5 text-blue-500 animate-spin',
+                  class: getUploadStatusIconClasses('uploading', 'sm', {
+                    spinning: true,
+                  }),
                   fill: 'none',
                   viewBox: spinnerSvg.viewBox,
                   'aria-label': 'Uploading',
@@ -659,7 +662,9 @@ export const Upload = defineComponent({
                 h(
                   'svg',
                   {
-                    class: 'w-8 h-8 text-blue-500 animate-spin',
+                    class: getUploadStatusIconClasses('uploading', 'lg', {
+                      spinning: true,
+                    }),
                     fill: 'none',
                     viewBox: spinnerSvg.viewBox,
                   },
