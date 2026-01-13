@@ -9,9 +9,9 @@
 ## 0. 状态板（只维护这里）
 
 - 更新时间：2026-01-14
-- 上一步：✅ `Button` P1 深化（keyboard 关键路径补测 + build 验证）
+- 上一步：✅ `Upload` uploading spinner 复用 core `getSpinnerSVG('spinner')` + 下沉 `normalizeSvgAttrs`（tests + build 通过）
 - 当前组件：Phase 0 基建
-- 当前步骤：🚧 consistent classes 推进中（Icon/Container/Radio/RadioGroup/Loading 已下沉 core 并双端接入）
+- 当前步骤：🚧 consistent classes 推进中（新增覆盖 Upload uploading spinner；持续收敛重复 SVG）
 - Step1-5 完成度：已完成一轮（包含 build 验证；详见「4. 已完成」）
 - 未完成清单：见「1. 未完成/待办」
 
@@ -42,6 +42,7 @@
   - 进度：✅ Loading 的 dots/bars/text layout class 生成已统一下沉到 `@tigercat/core`（`loading-utils` 扩展），Vue/React 双端复用同一实现。
   - 进度：✅ StepsItem 的 finish 对勾 SVG 常量（`stepFinishIcon*`）已统一下沉到 `@tigercat/core`（`steps-utils`），Vue/React 双端复用同一实现。
   - 进度：✅ Modal/Drawer/TabPane 的关闭(X) SVG 常量（`closeIcon*`）已统一下沉到 `@tigercat/core`（`common-icons`），Vue/React 双端复用同一实现。
+  - 进度：✅ Upload 的 uploading spinner SVG 已统一复用 core `getSpinnerSVG('spinner')`；同时将 Vue 渲染所需的 SVG attrs 归一化（`normalizeSvgAttrs`）下沉到 `@tigercat/core`（`svg-attrs`）。
 
 ---
 
@@ -89,6 +90,7 @@ return h('div', { class: '...' }, children);
 
 - 2026-01-14：`Button` Step2-5（disabled/loading 交互与默认 aria 策略、spinner a11y、测试覆盖、docs 同步、build 通过）。
 - 2026-01-14：`Button`（P1）深化（补齐 keyboard 关键路径测试；注：Space 语义依赖原生 button 行为，happy-dom 不稳定不强测；build 通过）。
+- 2026-01-14：Phase 0 基建（SVG spinner 复用）：新增 core `normalizeSvgAttrs`（`svg-attrs`）+ `Upload`（Vue/React）改用 `getSpinnerSVG('spinner')`；Upload 单测通过；build 通过。
 - 2026-01-14：Phase 0 基建（新增 core a11y utils：`createAriaId`/keyboard helpers；新增组件重构任务模板；补齐最小单测；build 通过）。
 - 2026-01-14：Phase 0 基建（overlay）：新增 core overlay utils（click-outside/ESC/focus trap 算法）+ Vue/React 封装；对齐部分组件使用；补齐最小单测；build 通过。
 - 2026-01-14：Phase 0 基建（focus management）：新增 core focus utils（capture/restore/safe focus）+ React `Modal` / Vue `Drawer` 复用；补齐最小单测；build 通过。

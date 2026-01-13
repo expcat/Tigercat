@@ -21,6 +21,7 @@ import {
   loadingFullscreenBaseClasses,
   loadingColorClasses,
   mergeStyleValues,
+  normalizeSvgAttrs,
   injectLoadingAnimationStyles,
   type LoadingVariant,
   type LoadingSize,
@@ -194,18 +195,6 @@ export const Loading = defineComponent({
 
       return mergeStyleValues(attrs.style, props.style, baseStyle);
     });
-
-    const normalizeSvgAttrs = (svgAttrs: Record<string, unknown>) => {
-      if ('className' in svgAttrs && !('class' in svgAttrs)) {
-        const { className, ...rest } = svgAttrs;
-        return {
-          ...rest,
-          class: className,
-        };
-      }
-
-      return svgAttrs;
-    };
 
     // Render spinner variant
     const renderSpinner = () => {
