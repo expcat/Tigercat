@@ -8,11 +8,11 @@
 
 ## 当前任务 / 状态板（每次只更新这里 + 对应组件小节状态）
 
-- 上一步：✅ `Upload` Step5 文档/Demo（校对与补充示例）（2026-01-13）
-- 当前组件：`Tree`
-- 当前步骤：Step1 API/类型对齐（受控模型 + a11y 基线）
+- 上一步：✅ `Tree` Step4 demo（keyboard/ariaLabel 示例）（2026-01-13）
+- 当前组件：待定
+- 当前步骤：选择下一个组件（Step1 起）
 - 状态：`not-started`
-- 已优化组件数/需优化组件数：35/38
+- 已优化组件数/需优化组件数：36/38
 - 目标 PR 粒度：一次只做一个 Step（必要时拆更小子步）
 - 完成后要做的事：
   - 更新本区块为下一步任务
@@ -343,7 +343,10 @@ return h("div", { class: "..." }, children);
 - 思路：aria-tree/treeitem；键盘展开/选择；受控状态（expandedKeys/selectedKeys）。
 
 - 状态：✅ 调整 selectionMode 内部状态管理（2026-01-12）：改进 Tree 在不同 selection 模式下的内部状态更新一致性。
-- 状态：⏳ Step1 API/类型对齐（受控模型 + a11y 基线）（current）：对齐 `expandedKeys/selectedKeys/checkedKeys` 的受控/非受控与事件语义；补齐 aria-tree/treeitem 的基础角色与可聚焦路径，为后续键盘导航与 tests 做铺垫。
+- 状态：✅ Step1 API/类型对齐（受控模型 + a11y 基线）（2026-01-13）：修复 Vue 端 `selectedKeys/checkedKeys` 受控空数组判定；对齐 `selectionMode` 为“可选覆盖”语义；Vue/React Tree 补齐 `role=tree/treeitem`、`aria-level/expanded/selected/checked` 与基础可聚焦路径（tabIndex 基线），并补齐 Vue 的 `showLine/showIcon` 行为；同步精简 Vue/React Tree 测试（移除快照与脆弱断言），更新 Tree 文档 a11y/API 说明。
+- 状态：✅ Step2 交互与 a11y（键盘导航：方向键/Enter/Space/Escape）（2026-01-13）：实现 roving tabindex 与 ArrowUp/Down/Home/End 移动焦点（跳过 disabled），ArrowLeft/Right 展开/收拢与父子间聚焦跳转，Enter 触发选择（可选时），Space 触发勾选（checkable 时）；Escape 优先收拢当前节点，否则收拢并回焦父节点；同步补齐 Vue/React 键盘交互回归测试并更新 Tree 文档键盘说明。
+- 状态：✅ Step3 tests（键盘边界回归收敛）（2026-01-13）：补齐过滤模式下的键盘导航、lazy-load 展开后焦点保持、checkStrictly/multiple 的键盘回归，并确保 Vue/React Tree tests 全绿。
+- 状态：✅ Step4 demo（2026-01-13）：在 Vue/React TreeDemo 增加键盘操作提示与 `ariaLabel` 示例，确保示例可访问且可用键盘验证。
 
 #### Progress（P2，建议优化）
 
