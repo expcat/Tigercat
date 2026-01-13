@@ -8,10 +8,14 @@ import {
   Teleport,
   TransitionGroup,
   type PropType,
-} from "vue";
+} from 'vue';
 import {
   classNames,
   coerceClassValue,
+  icon24PathStrokeLinecap,
+  icon24PathStrokeLinejoin,
+  icon24StrokeWidth,
+  icon24ViewBox,
   defaultNotificationThemeColors,
   getNotificationIconPath,
   getNotificationTypeClasses,
@@ -29,7 +33,7 @@ import {
   type NotificationInstance,
   type NotificationOptions,
   type NotificationPosition,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
 type HChildren = Parameters<typeof h>[2];
 type HArrayChildren = Extract<NonNullable<HChildren>, unknown[]>;
@@ -37,11 +41,11 @@ type HArrayChildren = Extract<NonNullable<HChildren>, unknown[]>;
 /**
  * Global notification container id prefix
  */
-const NOTIFICATION_CONTAINER_ID_PREFIX = "tiger-notification-container";
-const NOTIFICATION_CLOSE_ARIA_LABEL = "Close notification";
+const NOTIFICATION_CONTAINER_ID_PREFIX = 'tiger-notification-container';
+const NOTIFICATION_CLOSE_ARIA_LABEL = 'Close notification';
 
 const IS_TEST_ENV =
-  typeof process !== "undefined" && process.env?.NODE_ENV === "test";
+  typeof process !== 'undefined' && process.env?.NODE_ENV === 'test';
 
 /**
  * Notification instance storage per position
@@ -50,26 +54,26 @@ const notificationInstancesByPosition: Record<
   NotificationPosition,
   NotificationInstance[]
 > = {
-  "top-left": [],
-  "top-right": [],
-  "bottom-left": [],
-  "bottom-right": [],
+  'top-left': [],
+  'top-right': [],
+  'bottom-left': [],
+  'bottom-right': [],
 };
 
 let instanceIdCounter = 0;
 
 const containerApps: Record<NotificationPosition, App<Element> | null> = {
-  "top-left": null,
-  "top-right": null,
-  "bottom-left": null,
-  "bottom-right": null,
+  'top-left': null,
+  'top-right': null,
+  'bottom-left': null,
+  'bottom-right': null,
 };
 
 const updateCallbacks: Record<NotificationPosition, (() => void) | null> = {
-  "top-left": null,
-  "top-right": null,
-  "bottom-left": null,
-  "bottom-right": null,
+  'top-left': null,
+  'top-right': null,
+  'bottom-left': null,
+  'bottom-right': null,
 };
 
 /**
@@ -84,21 +88,21 @@ function getNextInstanceId(): number {
  */
 function createIcon(path: string, className: string) {
   return h(
-    "svg",
+    'svg',
     {
       class: className,
-      xmlns: "http://www.w3.org/2000/svg",
-      fill: "none",
-      viewBox: "0 0 24 24",
-      stroke: "currentColor",
-      "stroke-width": "2",
-      "aria-hidden": "true",
-      focusable: "false",
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: icon24ViewBox,
+      stroke: 'currentColor',
+      'stroke-width': String(icon24StrokeWidth),
+      'aria-hidden': 'true',
+      focusable: 'false',
     },
     [
-      h("path", {
-        "stroke-linecap": "round",
-        "stroke-linejoin": "round",
+      h('path', {
+        'stroke-linecap': icon24PathStrokeLinecap,
+        'stroke-linejoin': icon24PathStrokeLinejoin,
         d: path,
       }),
     ]
@@ -113,12 +117,12 @@ function getContainerRootId(position: NotificationPosition) {
  * Notification container component for a specific position
  */
 export const NotificationContainer = defineComponent({
-  name: "TigerNotificationContainer",
+  name: 'TigerNotificationContainer',
   inheritAttrs: false,
   props: {
     position: {
       type: String as PropType<NotificationPosition>,
-      default: "top-right" as NotificationPosition,
+      default: 'top-right' as NotificationPosition,
     },
   },
   setup(props, { attrs }) {
@@ -158,12 +162,12 @@ export const NotificationContainer = defineComponent({
         notification.icon || getNotificationIconPath(notification.type);
       const iconClass = classNames(notificationIconClasses, colorScheme.icon);
 
-      const a11yRole = notification.type === "error" ? "alert" : "status";
-      const ariaLive = notification.type === "error" ? "assertive" : "polite";
+      const a11yRole = notification.type === 'error' ? 'alert' : 'status';
+      const ariaLive = notification.type === 'error' ? 'assertive' : 'polite';
 
       const contentChildren = [
         h(
-          "div",
+          'div',
           {
             class: classNames(notificationTitleClasses, colorScheme.titleText),
           },
@@ -174,7 +178,7 @@ export const NotificationContainer = defineComponent({
       if (notification.description) {
         contentChildren.push(
           h(
-            "div",
+            'div',
             {
               class: classNames(
                 notificationDescriptionClasses,
@@ -188,21 +192,21 @@ export const NotificationContainer = defineComponent({
 
       const children: HArrayChildren = [
         createIcon(iconPath, iconClass),
-        h("div", { class: notificationContentClasses }, contentChildren),
+        h('div', { class: notificationContentClasses }, contentChildren),
       ];
 
       if (notification.closable) {
         children.push(
           h(
-            "button",
+            'button',
             {
               class: notificationCloseButtonClasses,
               onClick: (e: MouseEvent) => {
                 e.stopPropagation();
                 removeNotification(notification.id, props.position);
               },
-              "aria-label": NOTIFICATION_CLOSE_ARIA_LABEL,
-              type: "button",
+              'aria-label': NOTIFICATION_CLOSE_ARIA_LABEL,
+              type: 'button',
             },
             createIcon(notificationCloseIconPath, notificationCloseIconClasses)
           )
@@ -210,27 +214,27 @@ export const NotificationContainer = defineComponent({
       }
 
       return h(
-        "div",
+        'div',
         {
           key: notification.id,
           class: notificationClasses,
           role: a11yRole,
-          "aria-live": ariaLive,
-          "aria-atomic": "true",
+          'aria-live': ariaLive,
+          'aria-atomic': 'true',
           onClick: notification.onClick,
           onKeydown: (e: KeyboardEvent) => {
             if (!notification.onClick) return;
             const key = e.key;
-            if (key === "Enter" || key === " ") {
+            if (key === 'Enter' || key === ' ') {
               e.preventDefault();
               notification.onClick();
             }
           },
           tabindex: notification.onClick ? 0 : undefined,
-          style: notification.onClick ? "cursor: pointer;" : undefined,
-          "data-tiger-notification": "",
-          "data-tiger-notification-type": notification.type,
-          "data-tiger-notification-id": String(notification.id),
+          style: notification.onClick ? 'cursor: pointer;' : undefined,
+          'data-tiger-notification': '',
+          'data-tiger-notification-type': notification.type,
+          'data-tiger-notification-id': String(notification.id),
         },
         children
       );
@@ -239,26 +243,26 @@ export const NotificationContainer = defineComponent({
     return () =>
       h(
         Teleport,
-        { to: "body" },
+        { to: 'body' },
         h(
-          "div",
+          'div',
           {
             ...attrs,
             class: containerClasses.value,
             id: `${NOTIFICATION_CONTAINER_ID_PREFIX}-${props.position}`,
-            "aria-live": "polite",
-            "aria-relevant": "additions",
-            "data-tiger-notification-container": "",
-            "data-tiger-notification-position": props.position,
+            'aria-live': 'polite',
+            'aria-relevant': 'additions',
+            'data-tiger-notification-container': '',
+            'data-tiger-notification-position': props.position,
           },
           IS_TEST_ENV
             ? notifications.value.map(renderNotificationItem)
             : h(
                 TransitionGroup,
                 {
-                  name: "notification",
-                  tag: "div",
-                  class: "flex flex-col gap-3",
+                  name: 'notification',
+                  tag: 'div',
+                  class: 'flex flex-col gap-3',
                 },
                 () => notifications.value.map(renderNotificationItem)
               )
@@ -268,7 +272,7 @@ export const NotificationContainer = defineComponent({
 });
 
 function ensureContainer(position: NotificationPosition) {
-  if (typeof window === "undefined" || typeof document === "undefined") {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
     return;
   }
 
@@ -287,7 +291,7 @@ function ensureContainer(position: NotificationPosition) {
 
   let rootEl = existingRootEl;
   if (!rootEl) {
-    rootEl = document.createElement("div");
+    rootEl = document.createElement('div');
     rootEl.id = rootId;
     document.body.appendChild(rootEl);
   }
@@ -307,7 +311,7 @@ function destroyContainer(position: NotificationPosition) {
   updateCallbacks[position] = null;
 
   const rootEl =
-    typeof document !== "undefined" ? document.getElementById(rootId) : null;
+    typeof document !== 'undefined' ? document.getElementById(rootId) : null;
   if (rootEl?.parentNode) {
     rootEl.parentNode.removeChild(rootEl);
   }
@@ -318,13 +322,13 @@ function destroyContainer(position: NotificationPosition) {
  */
 function addNotification(config: NotificationConfig): () => void {
   const id = getNextInstanceId();
-  const position = config.position || "top-right";
+  const position = config.position || 'top-right';
 
   ensureContainer(position);
 
   const instance: NotificationInstance = {
     id,
-    type: config.type || "info",
+    type: config.type || 'info',
     title: config.title,
     description: config.description,
     duration: config.duration !== undefined ? config.duration : 4500,
@@ -408,7 +412,7 @@ function clearAll(position?: NotificationPosition) {
  * Normalize notification options
  */
 function normalizeOptions(options: NotificationOptions): NotificationConfig {
-  if (typeof options === "string") {
+  if (typeof options === 'string') {
     return { title: options };
   }
   return options;
@@ -423,7 +427,7 @@ export const notification = {
    */
   info(options: NotificationOptions): () => void {
     const config = normalizeOptions(options);
-    return addNotification({ ...config, type: "info" });
+    return addNotification({ ...config, type: 'info' });
   },
 
   /**
@@ -431,7 +435,7 @@ export const notification = {
    */
   success(options: NotificationOptions): () => void {
     const config = normalizeOptions(options);
-    return addNotification({ ...config, type: "success" });
+    return addNotification({ ...config, type: 'success' });
   },
 
   /**
@@ -439,7 +443,7 @@ export const notification = {
    */
   warning(options: NotificationOptions): () => void {
     const config = normalizeOptions(options);
-    return addNotification({ ...config, type: "warning" });
+    return addNotification({ ...config, type: 'warning' });
   },
 
   /**
@@ -447,7 +451,7 @@ export const notification = {
    */
   error(options: NotificationOptions): () => void {
     const config = normalizeOptions(options);
-    return addNotification({ ...config, type: "error" });
+    return addNotification({ ...config, type: 'error' });
   },
 
   /**

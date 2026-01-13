@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import {
   classNames,
+  getPopconfirmIconPath,
   getPopconfirmContainerClasses,
   getPopconfirmTriggerClasses,
   getPopconfirmContentClasses,
@@ -13,106 +14,36 @@ import {
   getPopconfirmOkButtonClasses,
   getDropdownMenuWrapperClasses,
   mergeStyleValues,
+  popconfirmIconPathStrokeLinecap,
+  popconfirmIconPathStrokeLinejoin,
+  popconfirmIconStrokeWidth,
+  popconfirmIconViewBox,
   type PopconfirmProps as CorePopconfirmProps,
   type PopconfirmIconType,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
 let popconfirmIdCounter = 0;
 const createPopconfirmId = () => `tiger-popconfirm-${++popconfirmIdCounter}`;
 
-// Icon components
-const WarningIcon = () => (
+const PopconfirmIcon: React.FC<{ type: PopconfirmIconType }> = ({ type }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-  >
+    viewBox={popconfirmIconViewBox}
+    strokeWidth={popconfirmIconStrokeWidth}
+    stroke="currentColor">
     <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+      strokeLinecap={popconfirmIconPathStrokeLinecap}
+      strokeLinejoin={popconfirmIconPathStrokeLinejoin}
+      d={getPopconfirmIconPath(type)}
     />
   </svg>
 );
 
-const InfoIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-    />
-  </svg>
-);
-
-const ErrorIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-    />
-  </svg>
-);
-
-const SuccessIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-    />
-  </svg>
-);
-
-const QuestionIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={1.5}
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
-    />
-  </svg>
-);
-
-const iconMap: Record<PopconfirmIconType, React.FC> = {
-  warning: WarningIcon,
-  info: InfoIcon,
-  error: ErrorIcon,
-  success: SuccessIcon,
-  question: QuestionIcon,
-};
-
-export type PopconfirmProps = Omit<CorePopconfirmProps, "style"> &
+export type PopconfirmProps = Omit<CorePopconfirmProps, 'style'> &
   Omit<
     React.HTMLAttributes<HTMLDivElement>,
-    "children" | "className" | "style"
+    'children' | 'className' | 'style'
   > & {
     /**
      * The element to trigger the popconfirm
@@ -150,14 +81,14 @@ export type PopconfirmProps = Omit<CorePopconfirmProps, "style"> &
 export const Popconfirm: React.FC<PopconfirmProps> = ({
   visible,
   defaultVisible = false,
-  title = "确定要执行此操作吗？",
+  title = '确定要执行此操作吗？',
   description,
-  icon = "warning",
+  icon = 'warning',
   showIcon = true,
-  okText = "确定",
-  cancelText = "取消",
-  okType = "primary",
-  placement = "top",
+  okText = '确定',
+  cancelText = '取消',
+  okType = 'primary',
+  placement = 'top',
   disabled = false,
   className,
   style,
@@ -228,12 +159,12 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     };
 
     const timeoutId = window.setTimeout(() => {
-      document.addEventListener("click", handleClickOutside);
+      document.addEventListener('click', handleClickOutside);
     }, 0);
 
     return () => {
       clearTimeout(timeoutId);
-      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener('click', handleClickOutside);
     };
   }, [currentVisible]);
 
@@ -241,12 +172,12 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     if (!currentVisible) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
+      if (event.key !== 'Escape') return;
       setVisible(false);
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [currentVisible]);
 
   // Container classes
@@ -286,9 +217,6 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     [okType]
   );
 
-  // Icon component
-  const IconComponent = iconMap[icon];
-
   if (!children) {
     return null;
   }
@@ -304,7 +232,7 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
 
       if (React.isValidElement<{ onClick?: unknown }>(target)) {
         const onChildClick = target.props.onClick;
-        if (typeof onChildClick === "function") {
+        if (typeof onChildClick === 'function') {
           (onChildClick as (e: React.MouseEvent) => void)(event);
         }
       }
@@ -312,9 +240,9 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
       if (event.defaultPrevented) return;
       handleTriggerClick();
     },
-    "aria-haspopup": "dialog" as const,
-    "aria-expanded": Boolean(currentVisible),
-    "aria-controls": currentVisible ? popconfirmId : undefined,
+    'aria-haspopup': 'dialog' as const,
+    'aria-expanded': Boolean(currentVisible),
+    'aria-controls': currentVisible ? popconfirmId : undefined,
   };
 
   type TriggerChildProps = {
@@ -338,12 +266,11 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
         aria-disabled={disabled}
         onKeyDown={(event) => {
           if (disabled) return;
-          if (event.key === "Enter" || event.key === " ") {
+          if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             handleTriggerClick();
           }
-        }}
-      >
+        }}>
         {children}
       </div>
     );
@@ -354,15 +281,13 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
       ref={containerRef}
       className={containerClasses}
       style={mergedStyle}
-      {...divProps}
-    >
+      {...divProps}>
       {triggerNode}
 
       <div
         className={contentWrapperClasses}
         hidden={!currentVisible}
-        aria-hidden={!currentVisible}
-      >
+        aria-hidden={!currentVisible}>
         <div className="relative">
           <div className={arrowClasses} aria-hidden="true" />
           <div
@@ -371,12 +296,11 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
             aria-modal="false"
             aria-labelledby={titleId}
             aria-describedby={describedBy}
-            className={contentClasses}
-          >
+            className={contentClasses}>
             <div className="flex items-start">
               {showIcon && (
                 <div className={iconClasses} aria-hidden="true">
-                  <IconComponent />
+                  <PopconfirmIcon type={icon} />
                 </div>
               )}
 
@@ -397,15 +321,13 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
               <button
                 type="button"
                 className={cancelButtonClasses}
-                onClick={handleCancel}
-              >
+                onClick={handleCancel}>
                 {cancelText}
               </button>
               <button
                 type="button"
                 className={okButtonClasses}
-                onClick={handleConfirm}
-              >
+                onClick={handleConfirm}>
                 {okText}
               </button>
             </div>

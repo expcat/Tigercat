@@ -1,7 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { createRoot, Root } from "react-dom/client";
+import React, { useEffect, useState } from 'react';
+import { createRoot, Root } from 'react-dom/client';
 import {
   classNames,
+  icon24PathStrokeLinecap,
+  icon24PathStrokeLinejoin,
+  icon24StrokeWidth,
+  icon24ViewBox,
   getNotificationTypeClasses,
   defaultNotificationThemeColors,
   notificationContainerBaseClasses,
@@ -19,12 +23,12 @@ import {
   type NotificationInstance,
   type NotificationOptions,
   type NotificationConfig,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
 /**
  * Global notification container id prefix
  */
-const NOTIFICATION_CONTAINER_ID_PREFIX = "tiger-notification-container";
+const NOTIFICATION_CONTAINER_ID_PREFIX = 'tiger-notification-container';
 
 /**
  * Notification instance storage per position
@@ -33,24 +37,24 @@ const notificationInstancesByPosition: Record<
   NotificationPosition,
   NotificationInstance[]
 > = {
-  "top-left": [],
-  "top-right": [],
-  "bottom-left": [],
-  "bottom-right": [],
+  'top-left': [],
+  'top-right': [],
+  'bottom-left': [],
+  'bottom-right': [],
 };
 
 let instanceIdCounter = 0;
 const containerRoots: Record<NotificationPosition, Root | null> = {
-  "top-left": null,
-  "top-right": null,
-  "bottom-left": null,
-  "bottom-right": null,
+  'top-left': null,
+  'top-right': null,
+  'bottom-left': null,
+  'bottom-right': null,
 };
 const updateCallbacks: Record<NotificationPosition, (() => void) | null> = {
-  "top-left": null,
-  "top-right": null,
-  "bottom-left": null,
-  "bottom-right": null,
+  'top-left': null,
+  'top-right': null,
+  'bottom-left': null,
+  'bottom-right': null,
 };
 
 /**
@@ -72,13 +76,16 @@ const Icon: React.FC<{ path: string; className: string }> = ({
       className={className}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
-      viewBox="0 0 24 24"
+      viewBox={icon24ViewBox}
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth={icon24StrokeWidth}
       aria-hidden="true"
-      focusable="false"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d={path} />
+      focusable="false">
+      <path
+        strokeLinecap={icon24PathStrokeLinecap}
+        strokeLinejoin={icon24PathStrokeLinejoin}
+        d={path}
+      />
     </svg>
   );
 };
@@ -112,7 +119,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     colorScheme.bg,
     colorScheme.border,
     notification.className,
-    isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-full"
+    isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
   );
 
   const iconPath =
@@ -124,8 +131,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     setTimeout(() => onClose(notification.id), 300);
   };
 
-  const a11yRole = notification.type === "error" ? "alert" : "status";
-  const ariaLive = notification.type === "error" ? "assertive" : "polite";
+  const a11yRole = notification.type === 'error' ? 'alert' : 'status';
+  const ariaLive = notification.type === 'error' ? 'assertive' : 'polite';
 
   return (
     <div
@@ -136,25 +143,23 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       onClick={notification.onClick}
       onKeyDown={(e) => {
         if (!notification.onClick) return;
-        if (e.key === "Enter" || e.key === " ") {
+        if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           notification.onClick();
         }
       }}
       tabIndex={notification.onClick ? 0 : undefined}
-      style={notification.onClick ? { cursor: "pointer" } : undefined}
+      style={notification.onClick ? { cursor: 'pointer' } : undefined}
       data-tiger-notification=""
       data-tiger-notification-type={notification.type}
-      data-tiger-notification-id={String(notification.id)}
-    >
+      data-tiger-notification-id={String(notification.id)}>
       <Icon path={iconPath} className={iconClass} />
       <div className={notificationContentClasses}>
         <div
           className={classNames(
             notificationTitleClasses,
             colorScheme.titleText
-          )}
-        >
+          )}>
           {notification.title}
         </div>
         {notification.description && (
@@ -162,8 +167,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             className={classNames(
               notificationDescriptionClasses,
               colorScheme.descriptionText
-            )}
-          >
+            )}>
             {notification.description}
           </div>
         )}
@@ -176,8 +180,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             handleClose();
           }}
           aria-label="Close notification"
-          type="button"
-        >
+          type="button">
           <Icon
             path={notificationCloseIconPath}
             className={notificationCloseIconClasses}
@@ -199,7 +202,7 @@ export interface NotificationContainerProps {
  * Notification container component
  */
 export const NotificationContainer: React.FC<NotificationContainerProps> = ({
-  position = "top-right",
+  position = 'top-right',
 }) => {
   const [notifications, setNotifications] = useState<NotificationInstance[]>(
     []
@@ -244,8 +247,7 @@ export const NotificationContainer: React.FC<NotificationContainerProps> = ({
       aria-live="polite"
       aria-relevant="additions"
       data-tiger-notification-container=""
-      data-tiger-notification-position={position}
-    >
+      data-tiger-notification-position={position}>
       {notifications.map((notification) => (
         <NotificationItem
           key={notification.id}
@@ -278,7 +280,7 @@ function ensureContainer(position: NotificationPosition) {
 
   let rootEl = existingRootEl;
   if (!rootEl) {
-    rootEl = document.createElement("div");
+    rootEl = document.createElement('div');
     rootEl.id = rootId;
     document.body.appendChild(rootEl);
   }
@@ -293,14 +295,14 @@ function ensureContainer(position: NotificationPosition) {
  * Add a notification to the queue
  */
 function addNotification(config: NotificationConfig): () => void {
-  const position = config.position || "top-right";
+  const position = config.position || 'top-right';
   ensureContainer(position);
 
   const id = getNextInstanceId();
 
   const instance: NotificationInstance = {
     id,
-    type: config.type || "info",
+    type: config.type || 'info',
     title: config.title,
     description: config.description,
     duration: config.duration !== undefined ? config.duration : 4500,
@@ -386,7 +388,7 @@ function clearAll(position?: NotificationPosition) {
  * Normalize notification options
  */
 function normalizeOptions(options: NotificationOptions): NotificationConfig {
-  if (typeof options === "string") {
+  if (typeof options === 'string') {
     return { title: options };
   }
   return options;
@@ -401,7 +403,7 @@ export const notification = {
    */
   info(options: NotificationOptions): () => void {
     const config = normalizeOptions(options);
-    return addNotification({ ...config, type: "info" });
+    return addNotification({ ...config, type: 'info' });
   },
 
   /**
@@ -409,7 +411,7 @@ export const notification = {
    */
   success(options: NotificationOptions): () => void {
     const config = normalizeOptions(options);
-    return addNotification({ ...config, type: "success" });
+    return addNotification({ ...config, type: 'success' });
   },
 
   /**
@@ -417,7 +419,7 @@ export const notification = {
    */
   warning(options: NotificationOptions): () => void {
     const config = normalizeOptions(options);
-    return addNotification({ ...config, type: "warning" });
+    return addNotification({ ...config, type: 'warning' });
   },
 
   /**
@@ -425,7 +427,7 @@ export const notification = {
    */
   error(options: NotificationOptions): () => void {
     const config = normalizeOptions(options);
-    return addNotification({ ...config, type: "error" });
+    return addNotification({ ...config, type: 'error' });
   },
 
   /**

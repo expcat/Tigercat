@@ -2,6 +2,10 @@ import { defineComponent, computed, h, ref, PropType } from 'vue';
 import {
   classNames,
   coerceClassValue,
+  icon24PathStrokeLinecap,
+  icon24PathStrokeLinejoin,
+  icon24StrokeWidth,
+  icon24ViewBox,
   getAlertTypeClasses,
   defaultAlertThemeColors,
   alertBaseClasses,
@@ -29,14 +33,14 @@ function createIcon(path: string, className: string) {
       class: className,
       xmlns: 'http://www.w3.org/2000/svg',
       fill: 'none',
-      viewBox: '0 0 24 24',
+      viewBox: icon24ViewBox,
       stroke: 'currentColor',
-      'stroke-width': '2',
+      'stroke-width': String(icon24StrokeWidth),
     },
     [
       h('path', {
-        'stroke-linecap': 'round',
-        'stroke-linejoin': 'round',
+        'stroke-linecap': icon24PathStrokeLinecap,
+        'stroke-linejoin': icon24PathStrokeLinejoin,
         d: path,
       }),
     ]
