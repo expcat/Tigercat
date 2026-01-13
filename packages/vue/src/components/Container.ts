@@ -1,14 +1,5 @@
 import { defineComponent, computed, h, PropType } from 'vue';
-import { classNames, type ContainerMaxWidth } from '@tigercat/core';
-
-const maxWidthClasses: Record<Exclude<ContainerMaxWidth, false>, string> = {
-  sm: 'max-w-screen-sm',
-  md: 'max-w-screen-md',
-  lg: 'max-w-screen-lg',
-  xl: 'max-w-screen-xl',
-  '2xl': 'max-w-screen-2xl',
-  full: 'w-full',
-};
+import { getContainerClasses, type ContainerMaxWidth } from '@tigercat/core';
 
 export const Container = defineComponent({
   name: 'TigerContainer',
@@ -41,12 +32,11 @@ export const Container = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const containerClasses = computed(() =>
-      classNames(
-        'w-full',
-        props.maxWidth !== false && maxWidthClasses[props.maxWidth],
-        props.center && 'mx-auto',
-        props.padding && 'px-4 sm:px-6 lg:px-8'
-      )
+      getContainerClasses({
+        maxWidth: props.maxWidth,
+        center: props.center,
+        padding: props.padding,
+      })
     );
 
     return () => {
