@@ -108,6 +108,26 @@ describe('Button', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
+  it('does not activate via keyboard when loading', async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+
+    render(
+      <Button loading onClick={onClick}>
+        Loading
+      </Button>
+    );
+
+    const button = screen.getByRole('button', { name: 'Loading' });
+    expect(button).toBeDisabled();
+
+    await user.tab();
+    expect(button).not.toHaveFocus();
+
+    await user.keyboard('{Enter}');
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
   describe('Theme Support', () => {
     afterEach(() => {
       clearThemeVariables([

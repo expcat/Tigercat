@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/vue';
+import userEvent from '@testing-library/user-event';
 import { Button } from '@tigercat/vue';
 import {
   expectNoA11yViolations,
@@ -85,6 +86,27 @@ describe('Button', () => {
 
     button?.focus();
     expect(button).toHaveFocus();
+  });
+
+  it('supports keyboard activation when enabled (Enter)', async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+
+    const { container } = render(Button, {
+      slots: { default: 'Keyboard' },
+      attrs: { onClick },
+    });
+
+    const button = container.querySelector('button');
+    expect(button).toBeInTheDocument();
+
+    if (!button) return;
+
+    button.focus();
+    expect(button).toHaveFocus();
+
+    await user.keyboard('{Enter}');
+    expect(onClick).toHaveBeenCalledTimes(1);
   });
 
   describe('Theme Support', () => {

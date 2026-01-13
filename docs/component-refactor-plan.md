@@ -9,9 +9,9 @@
 ## 0. 状态板（只维护这里）
 
 - 更新时间：2026-01-14
-- 上一步：✅ `Button` Step2-5（交互/a11y + 主题样式校对 + tests + docs + build 验证）
-- 当前组件：`Button`
-- 当前步骤：✅ Step5 已同步；等待进入下一个组件
+- 上一步：✅ `Button` P1 深化（keyboard 关键路径补测 + build 验证）
+- 当前组件：待选择（下一组件 / Phase 0 基建）
+- 当前步骤：准备进入下一个组件（待确认）
 - Step1-5 完成度：已完成一轮（包含 build 验证；详见「4. 已完成」）
 - 未完成清单：见「1. 未完成/待办」
 
@@ -19,20 +19,7 @@
 
 ## 1. 未完成/待办（给后续 Agent）
 
-### 1.1 `Button`（P1）深化（尚未开始）
-
-- Step2 交互与 a11y：
-  - loading 时可选 `aria-busy`/`aria-disabled` 策略与默认值校对
-  - disabled/loading 时 click 行为一致性（React/Vue；是否阻止触发/是否保留聚焦）
-  - 键盘基线（Enter/Space）与 focus ring 可见性回归
-- Step3 主题/样式：
-  - 颜色相关全部走 CSS vars（含 fallback），检查 hover/active/disabled/loading
-- Step4 tests：
-  - 关键交互路径（disabled/loading/keyboard）+ a11y 基线（role/aria）
-- Step5 docs：
-  - props/events 表与示例补齐（包含 loading a11y 说明）
-
-### 1.2 Phase 0 基建（跨组件通用，仍为待办）
+### 1.1 Phase 0 基建（跨组件通用，仍为待办）
 
 > 说明：目前大量能力已在各组件内“就地实现”。若后续要持续扩展组件能力，建议把通用算法/约束补齐到 core，减少重复实现。
 
@@ -87,5 +74,6 @@ return h('div', { class: '...' }, children);
 > 说明：本区只保留“可追溯摘要”，详细变更以 git 历史为准。
 
 - 2026-01-14：`Button` Step2-5（disabled/loading 交互与默认 aria 策略、spinner a11y、测试覆盖、docs 同步、build 通过）。
+- 2026-01-14：`Button`（P1）深化（补齐 keyboard 关键路径测试；注：Space 语义依赖原生 button 行为，happy-dom 不稳定不强测；build 通过）。
 - 2026-01-13：`Button` Step1；`Select` Step1-4；`Form/FormItem` Step1-3；`Menu` Step1-4；`Tabs` Step1-3；`Table` Step1-3；`Tree` Step0 + Step1-4；`DatePicker` Step1-4；`TimePicker` Step1-5；`Upload` Step1-5；`Message/Notification/Loading/Modal/Drawer/Popover` Step1。
 - 2026-01-12：`Icon/Link/Text/Badge/Tag/Avatar/Card/Container/Divider/Space/Layout/Grid/Input/Textarea/Checkbox/Radio/Switch/Slider/Breadcrumb/Steps/Pagination/Dropdown/List/Descriptions/Timeline/Progress/Skeleton/Alert/Tooltip/Popconfirm` Step1。
