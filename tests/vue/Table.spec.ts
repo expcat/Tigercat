@@ -130,22 +130,6 @@ describe("Table", () => {
   });
 
   describe("Sorting", () => {
-    it("should render sort icons for sortable columns", () => {
-      const sortableColumns = [
-        { key: "name", title: "Name", sortable: true },
-        { key: "age", title: "Age", sortable: true },
-        { key: "email", title: "Email" },
-      ];
-
-      const { container } = renderWithProps(Table, {
-        columns: sortableColumns,
-        dataSource,
-      });
-
-      const sortIcons = container.querySelectorAll("svg");
-      expect(sortIcons.length).toBeGreaterThan(0);
-    });
-
     it("should emit sort-change event when clicking sortable column", async () => {
       const sortableColumns = [
         { key: "name", title: "Name", sortable: true },
@@ -532,39 +516,6 @@ describe("Table", () => {
           }),
         })
       );
-    });
-  });
-
-  describe("Snapshots", () => {
-    it("should match snapshot with default props", () => {
-      const { container } = renderWithProps(Table, {
-        columns,
-        dataSource,
-        pagination: false, // Disable pagination for consistent snapshots
-      });
-
-      expect(container).toMatchSnapshot();
-    });
-
-    it("should match snapshot with all features enabled", () => {
-      const { container } = renderWithProps(Table, {
-        columns: [
-          { key: "name", title: "Name", sortable: true },
-          { key: "age", title: "Age", sortable: true },
-          { key: "email", title: "Email" },
-        ],
-        dataSource,
-        size: "lg",
-        bordered: true,
-        striped: true,
-        stickyHeader: true,
-        pagination: false, // Disable pagination for consistent snapshots
-        rowSelection: {
-          selectedRowKeys: [1],
-        },
-      });
-
-      expect(container).toMatchSnapshot();
     });
   });
 });

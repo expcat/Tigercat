@@ -443,6 +443,14 @@ export const Table = defineComponent({
       return getFixedColumnOffsets(displayColumns.value);
     });
 
+    const columnByKey = computed(() => {
+      const map: Record<string, (typeof displayColumns.value)[number]> = {};
+      for (const column of displayColumns.value) {
+        map[column.key] = column;
+      }
+      return map;
+    });
+
     function toggleColumnLock(columnKey: string) {
       const original = props.columns.find((c) => c.key === columnKey)?.fixed;
       const hasOverride = columnKey in fixedOverrides.value;
@@ -453,16 +461,14 @@ export const Table = defineComponent({
 
     // Process data with sorting, filtering, and pagination
     const processedData = computed(() => {
-      let data = [...props.dataSource];
+      let data = props.dataSource;
 
       // Apply filters
       data = filterData(data, filterState.value);
 
       // Apply sorting
       if (sortState.value.key && sortState.value.direction) {
-        const column = displayColumns.value.find(
-          (col) => col.key === sortState.value.key
-        );
+        const column = columnByKey.value[sortState.value.key];
         data = sortData(
           data,
           sortState.value.key,
@@ -484,6 +490,16 @@ export const Table = defineComponent({
         currentPage.value,
         currentPageSize.value
       );
+    });
+
+    const paginatedRowKeys = computed(() => {
+      return paginatedData.value.map((record, index) =>
+        getRowKey(record, props.rowKey, index)
+      );
+    });
+
+    const selectedRowKeySet = computed(() => {
+      return new Set<string | number>(selectedRowKeys.value);
     });
 
     const paginationInfo = computed(() => {
@@ -632,9 +648,7 @@ export const Table = defineComponent({
 
     function handleSelectAll(checked: boolean) {
       if (checked) {
-        const nextKeys = paginatedData.value.map((record, index) =>
-          getRowKey(record, props.rowKey, index)
-        );
+        const nextKeys = paginatedRowKeys.value;
 
         if (!isSelectionControlled.value) {
           uncontrolledSelectedRowKeys.value = nextKeys;
@@ -651,14 +665,13 @@ export const Table = defineComponent({
     }
 
     const allSelected = computed(() => {
-      if (paginatedData.value.length === 0) {
+      if (paginatedRowKeys.value.length === 0) {
         return false;
       }
 
-      return paginatedData.value.every((record, index) => {
-        const key = getRowKey(record, props.rowKey, index);
-        return selectedRowKeys.value.includes(key);
-      });
+      return paginatedRowKeys.value.every((key) =>
+        selectedRowKeySet.value.has(key)
+      );
     });
 
     const someSelected = computed(() => {
@@ -885,8 +898,8 @@ export const Table = defineComponent({
       }
 
       const rows = paginatedData.value.map((record, index) => {
-        const key = getRowKey(record, props.rowKey, index);
-        const isSelected = selectedRowKeys.value.includes(key);
+        const key = paginatedRowKeys.value[index];
+        const isSelected = selectedRowKeySet.value.has(key);
         const rowClass =
           typeof props.rowClassName === "function"
             ? props.rowClassName(record, index)
