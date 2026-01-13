@@ -9,6 +9,7 @@ export * from "@tigercat/core";
 
 // Components
 export { Button } from "./components/Button";
+export type { VueButtonProps } from "./components/Button";
 export { Slider } from "./components/Slider";
 export type { VueSliderProps } from "./components/Slider";
 export { Switch } from "./components/Switch";

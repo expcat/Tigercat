@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Button } from '@tigercat/vue';
+import { Button } from "@tigercat/vue";
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Button } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Button } from '@tigercat/react';
+import { Button } from "@tigercat/react";
 
 function App() {
   return (
@@ -138,10 +138,10 @@ Button 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { Button } from '@tigercat/vue';
+import { Button } from "@tigercat/vue";
 
 const handleClick = (event) => {
-  console.log('Button clicked!', event);
+  console.log("Button clicked!", event);
 };
 </script>
 
@@ -153,11 +153,11 @@ const handleClick = (event) => {
 ### React
 
 ```tsx
-import { Button } from '@tigercat/react';
+import { Button } from "@tigercat/react";
 
 function App() {
   const handleClick = (event) => {
-    console.log('Button clicked!', event);
+    console.log("Button clicked!", event);
   };
 
   return <Button onClick={handleClick}>Click Me</Button>;
@@ -168,13 +168,16 @@ function App() {
 
 ### Props / 属性
 
-| 属性     | 说明                       | 类型            | 默认值      | 可选值                                                               |
-| -------- | -------------------------- | --------------- | ----------- | -------------------------------------------------------------------- |
-| variant  | 按钮变体                   | `ButtonVariant` | `'primary'` | `'primary'` \| `'secondary'` \| `'outline'` \| `'ghost'` \| `'link'` |
-| size     | 按钮尺寸                   | `ButtonSize`    | `'md'`      | `'sm'` \| `'md'` \| `'lg'`                                           |
-| disabled | 是否禁用                   | `boolean`       | `false`     | `true` \| `false`                                                    |
-| loading  | 是否加载中                 | `boolean`       | `false`     | `true` \| `false`                                                    |
-| block    | 是否块级（占满父容器宽度） | `boolean`       | `false`     | `true` \| `false`                                                    |
+| 属性      | 说明                       | 类型                                  | 默认值      | 可选值                                                               |
+| --------- | -------------------------- | ------------------------------------- | ----------- | -------------------------------------------------------------------- |
+| variant   | 按钮变体                   | `ButtonVariant`                       | `'primary'` | `'primary'` \| `'secondary'` \| `'outline'` \| `'ghost'` \| `'link'` |
+| size      | 按钮尺寸                   | `ButtonSize`                          | `'md'`      | `'sm'` \| `'md'` \| `'lg'`                                           |
+| disabled  | 是否禁用                   | `boolean`                             | `false`     | `true` \| `false`                                                    |
+| loading   | 是否加载中                 | `boolean`                             | `false`     | `true` \| `false`                                                    |
+| block     | 是否块级（占满父容器宽度） | `boolean`                             | `false`     | `true` \| `false`                                                    |
+| type      | HTML 按钮类型              | `'button'` \| `'submit'` \| `'reset'` | `'button'`  | -                                                                    |
+| className | 额外的 CSS 类名            | `string`                              | -           | -                                                                    |
+| style     | 内联样式                   | `Record<string, unknown>`             | -           | -                                                                    |
 
 #### React 专属属性
 
@@ -234,13 +237,13 @@ Button 组件支持通过 CSS 变量自定义主题颜色，可以实现实时�
 
 ```vue
 <script setup>
-import { Button, setThemeColors } from '@tigercat/vue';
+import { Button, setThemeColors } from "@tigercat/vue";
 
 const switchTheme = () => {
   setThemeColors({
-    primary: '#10b981',
-    primaryHover: '#059669',
-    primaryDisabled: '#6ee7b7',
+    primary: "#10b981",
+    primaryHover: "#059669",
+    primaryDisabled: "#6ee7b7",
   });
 };
 </script>
@@ -253,14 +256,14 @@ const switchTheme = () => {
 **React:**
 
 ```tsx
-import { Button, setThemeColors } from '@tigercat/react';
+import { Button, setThemeColors } from "@tigercat/react";
 
 function App() {
   const switchTheme = () => {
     setThemeColors({
-      primary: '#10b981',
-      primaryHover: '#059669',
-      primaryDisabled: '#6ee7b7',
+      primary: "#10b981",
+      primaryHover: "#059669",
+      primaryDisabled: "#6ee7b7",
     });
   };
 
@@ -290,11 +293,11 @@ React 版本的 Button 组件支持 `className` 属性，可以传入额外的 C
 Button 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { ButtonProps, ButtonVariant, ButtonSize } from '@tigercat/core';
+import type { ButtonVariant, ButtonSize } from "@tigercat/core";
 // Vue
-import type { Button } from '@tigercat/vue';
+import type { VueButtonProps } from "@tigercat/vue";
 // React
-import type { Button, ButtonProps as ReactButtonProps } from '@tigercat/react';
+import type { ButtonProps } from "@tigercat/react";
 ```
 
 ## 示例
@@ -305,8 +308,8 @@ import type { Button, ButtonProps as ReactButtonProps } from '@tigercat/react';
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Button } from '@tigercat/vue';
+import { ref } from "vue";
+import { Button } from "@tigercat/vue";
 
 const loading = ref(false);
 
@@ -331,8 +334,8 @@ const handleSubmit = async () => {
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { Button } from '@tigercat/react';
+import { useState } from "react";
+import { Button } from "@tigercat/react";
 
 function FormExample() {
   const [loading, setLoading] = useState(false);
