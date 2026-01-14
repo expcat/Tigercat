@@ -1,10 +1,16 @@
 import { useState } from 'react';
-import { Alert, Divider } from '@tigercat/react';
+import { Alert, Divider, Button, List } from '@tigercat/react';
 
 export default function AlertDemo() {
   const [showAlert1, setShowAlert1] = useState(true);
   const [showAlert2, setShowAlert2] = useState(true);
   const [showAlert3, setShowAlert3] = useState(true);
+
+  const customContentItems = [
+    '支持列表项',
+    '支持多种格式',
+    '支持任意 React 组件',
+  ];
 
   const demoCardClassName =
     'p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40';
@@ -123,14 +129,16 @@ export default function AlertDemo() {
           {(!showAlert1 || !showAlert2) && (
             <div className="text-gray-500 dark:text-gray-400 text-center py-4">
               提示已关闭
-              <button
-                className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors"
+              <Button
+                className="ml-4"
+                size="sm"
+                variant="primary"
                 onClick={() => {
                   setShowAlert1(true);
                   setShowAlert2(true);
                 }}>
                 重置
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -176,11 +184,22 @@ export default function AlertDemo() {
             descriptionSlot={
               <div>
                 <p>这是自定义的描述内容，支持复杂的 HTML 结构：</p>
-                <ul className="list-disc list-inside mt-2">
-                  <li>支持列表项</li>
-                  <li>支持多种格式</li>
-                  <li>支持任意 React 组件</li>
-                </ul>
+                <List
+                  className="mt-2 text-sm"
+                  bordered="none"
+                  split={false}
+                  size="sm"
+                  dataSource={customContentItems.map((title, index) => ({
+                    key: index,
+                    title,
+                  }))}
+                  renderItem={(item) => (
+                    <div className="flex items-start gap-2">
+                      <span aria-hidden>•</span>
+                      <span>{item.title}</span>
+                    </div>
+                  )}
+                />
               </div>
             }
           />
@@ -211,11 +230,13 @@ export default function AlertDemo() {
           {!showAlert3 && (
             <div className="text-gray-500 dark:text-gray-400 text-center py-4">
               提示已关闭
-              <button
-                className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-colors"
+              <Button
+                className="ml-4"
+                size="sm"
+                variant="primary"
                 onClick={() => setShowAlert3(true)}>
                 重置
-              </button>
+              </Button>
             </div>
           )}
         </div>

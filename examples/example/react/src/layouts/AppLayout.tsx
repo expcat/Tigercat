@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import type { DemoLang } from '@demo-shared/app-config';
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale';
-import { ConfigProvider } from '@tigercat/react';
+import { ConfigProvider, Link } from '@tigercat/react';
 import {
   getStoredLang,
   getStoredTheme,
@@ -113,9 +113,12 @@ export const AppLayout: React.FC = () => {
                         {sections.length > 0 && (
                           <div className="flex items-center gap-2 flex-wrap justify-end">
                             {sections.map((s: DemoSection) => (
-                              <a
+                              <Link
                                 key={s.id}
                                 href={`#${s.id}`}
+                                underline={false}
+                                variant="default"
+                                size="sm"
                                 className="text-sm px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -135,7 +138,7 @@ export const AppLayout: React.FC = () => {
                                   }
                                 }}>
                                 {s.label}
-                              </a>
+                              </Link>
                             ))}
                           </div>
                         )}

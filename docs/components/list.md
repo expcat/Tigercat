@@ -255,7 +255,7 @@ const dataSource = ref([
 
 ### React
 
-```tsx
+````tsx
 import { List, Button } from '@tigercat/react';
 
 function App() {
@@ -265,27 +265,61 @@ function App() {
     { key: 3, name: 'Product C', price: '$199', stock: 22 },
   ];
 
-  return (
-    <List
-      dataSource={dataSource}
-      renderItem={(item) => (
-        <div className="flex items-center justify-between w-full">
-          <div>
-            <h3 className="font-medium">{item.name}</h3>
-            <p className="text-sm text-gray-500">Stock: {item.stock}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-lg font-bold text-blue-600">{item.price}</p>
-            <Button size="sm" variant="primary">
-              Buy
-            </Button>
-          </div>
-        </div>
-      )}
-    />
-  );
+
+## React：使用泛型保留自定义字段类型
+
+当你的 `dataSource` item 包含自定义字段（例如 `href`、`id`、`status` 等）时，建议为数据声明明确的类型（或直接给 `List` 指定泛型），这样在 `renderItem` / `onItemClick` 中可以获得完整的类型推断，避免字段被推断为 `unknown`。
+
+```tsx
+import { Link, List } from '@tigercat/react'
+
+type NavItem = {
+  key: string
+  label: string
+  href: string
 }
-```
+
+const items: NavItem[] = [
+  { key: 'button', label: 'Button', href: '#/button' },
+  { key: 'list', label: 'List', href: '#/list' },
+]
+
+export function App() {
+  return (
+    <List<NavItem>
+      dataSource={items}
+      renderItem={(item) => <Link href={item.href}>{item.label}</Link>}
+      onItemClick={(item) => {
+        // item.href 在这里是 string
+        window.location.hash = item.href
+      }}
+    />
+  )
+}
+````
+
+return (
+<List
+dataSource={dataSource}
+renderItem={(item) => (
+<div className="flex items-center justify-between w-full">
+<div>
+<h3 className="font-medium">{item.name}</h3>
+<p className="text-sm text-gray-500">Stock: {item.stock}</p>
+</div>
+<div className="text-right">
+<p className="text-lg font-bold text-blue-600">{item.price}</p>
+<Button size="sm" variant="primary">
+Buy
+</Button>
+</div>
+</div>
+)}
+/>
+);
+}
+
+````
 
 ## 列表头部和底部
 
@@ -304,7 +338,7 @@ function App() {
     </template>
   </List>
 </template>
-```
+````
 
 ### React
 

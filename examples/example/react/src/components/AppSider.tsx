@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Button } from '@tigercat/react';
 import {
   DEMO_NAV_GROUPS,
   type DemoLang,
@@ -73,12 +74,14 @@ export const AppSider: React.FC<AppSiderProps> = ({ lang }) => {
             'mb-3 flex',
             isSiderCollapsed ? 'justify-center' : 'justify-end'
           )}>
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
             onClick={() => setIsSiderCollapsed((v) => !v)}
             className={cn(
-              'inline-flex size-8 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-700',
-              'transition-colors hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900'
+              'size-8 p-0 border-gray-200 bg-white text-gray-700',
+              'hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900'
             )}
             aria-label={
               isSiderCollapsed ? 'Expand sidebar' : 'Collapse sidebar'
@@ -86,7 +89,7 @@ export const AppSider: React.FC<AppSiderProps> = ({ lang }) => {
             <span className="text-sm leading-none">
               {isSiderCollapsed ? '»' : '«'}
             </span>
-          </button>
+          </Button>
         </div>
 
         <Link
@@ -122,8 +125,10 @@ export const AppSider: React.FC<AppSiderProps> = ({ lang }) => {
             const collapsed = !!collapsedGroups[group.key];
             return (
               <div key={group.key}>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="sm"
                   onClick={() => toggleGroup(group)}
                   title={group.label[lang]}
                   className={cn(
@@ -158,7 +163,7 @@ export const AppSider: React.FC<AppSiderProps> = ({ lang }) => {
                       ▾
                     </span>
                   )}
-                </button>
+                </Button>
 
                 <div
                   className={cn(

@@ -1,9 +1,17 @@
 import { useRef, useState } from 'react';
-import { message, Divider } from '@tigercat/react';
+import { message, Divider, Button, List } from '@tigercat/react';
 
 export default function MessageDemo() {
   const manualLoadingCloseFnsRef = useRef<Array<() => void>>([]);
   const [manualLoadingCount, setManualLoadingCount] = useState(0);
+
+  const tips = [
+    '消息默认会在 3 秒后自动关闭',
+    'loading 类型的消息不会自动关闭，需要手动关闭',
+    '多条消息会依次排列显示，形成队列',
+    '可以通过 message.clear() 清空所有正在显示的消息',
+    'Message 与 Alert 的区别：Message 是全局提示，Alert 是页面内嵌提示',
+  ];
 
   const demoCardClassName =
     'p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40';
@@ -152,21 +160,21 @@ export default function MessageDemo() {
         </p>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2">
-            <button className={primaryButtonClassName} onClick={showInfo}>
+            <Button className={primaryButtonClassName} onClick={showInfo}>
               信息
-            </button>
-            <button className={successButtonClassName} onClick={showSuccess}>
+            </Button>
+            <Button className={successButtonClassName} onClick={showSuccess}>
               成功
-            </button>
-            <button className={warningButtonClassName} onClick={showWarning}>
+            </Button>
+            <Button className={warningButtonClassName} onClick={showWarning}>
               警告
-            </button>
-            <button className={dangerButtonClassName} onClick={showError}>
+            </Button>
+            <Button className={dangerButtonClassName} onClick={showError}>
               错误
-            </button>
-            <button className={neutralButtonClassName} onClick={showLoading}>
+            </Button>
+            <Button className={neutralButtonClassName} onClick={showLoading}>
               加载
-            </button>
+            </Button>
           </div>
         </div>
         <Divider className="my-6" />
@@ -180,21 +188,21 @@ export default function MessageDemo() {
         </p>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2">
-            <button
+            <Button
               className={primaryButtonClassName}
               onClick={showShortMessage}>
               短时间（1秒）
-            </button>
-            <button
+            </Button>
+            <Button
               className={successButtonClassName}
               onClick={showLongMessage}>
               长时间（5秒）
-            </button>
-            <button
+            </Button>
+            <Button
               className={warningButtonClassName}
               onClick={showPersistentMessage}>
               不自动关闭
-            </button>
+            </Button>
           </div>
         </div>
         <Divider className="my-6" />
@@ -210,28 +218,28 @@ export default function MessageDemo() {
         </p>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2 mb-4">
-            <button
+            <Button
               className={primaryButtonClassName}
               onClick={showClosableMessage}>
               显示可关闭消息
-            </button>
+            </Button>
           </div>
           <div className="flex flex-wrap gap-2 items-center">
-            <button className={primaryButtonClassName} onClick={showMessage}>
+            <Button className={primaryButtonClassName} onClick={showMessage}>
               显示加载消息
-            </button>
-            <button
+            </Button>
+            <Button
               className={dangerButtonClassName}
               onClick={closeManually}
               disabled={manualLoadingCount === 0}>
               关闭最后一个
-            </button>
-            <button
+            </Button>
+            <Button
               className={dangerButtonClassName}
               onClick={closeAllManual}
               disabled={manualLoadingCount === 0}>
               关闭全部
-            </button>
+            </Button>
             <span className="text-sm text-gray-600 dark:text-gray-300">
               当前可手动关闭：{manualLoadingCount} 条
             </span>
@@ -247,11 +255,11 @@ export default function MessageDemo() {
           模拟表单提交的完整流程。
         </p>
         <div className={demoCardClassName}>
-          <button
+          <Button
             className="px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
             onClick={simulateRequest}>
             提交表单（模拟请求）
-          </button>
+          </Button>
         </div>
         <Divider className="my-6" />
       </section>
@@ -264,14 +272,14 @@ export default function MessageDemo() {
         </p>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2">
-            <button
+            <Button
               className={primaryButtonClassName}
               onClick={showMultipleMessages}>
               显示多条消息
-            </button>
-            <button className={dangerButtonClassName} onClick={clearAll}>
+            </Button>
+            <Button className={dangerButtonClassName} onClick={clearAll}>
               清空所有消息
-            </button>
+            </Button>
           </div>
         </div>
         <Divider className="my-6" />
@@ -284,11 +292,11 @@ export default function MessageDemo() {
           可以通过 onClose 回调函数在消息关闭时执行特定操作（查看控制台）。
         </p>
         <div className={demoCardClassName}>
-          <button
+          <Button
             className={successButtonClassName}
             onClick={showMessageWithCallback}>
             显示消息（带回调）
-          </button>
+          </Button>
         </div>
         <Divider className="my-6" />
       </section>
@@ -300,9 +308,9 @@ export default function MessageDemo() {
           可以通过 className 属性添加自定义样式类。
         </p>
         <div className={demoCardClassName}>
-          <button className={purpleButtonClassName} onClick={showCustomClass}>
+          <Button className={purpleButtonClassName} onClick={showCustomClass}>
             自定义样式
-          </button>
+          </Button>
         </div>
         <Divider className="my-6" />
       </section>
@@ -317,7 +325,7 @@ export default function MessageDemo() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className={demoCardClassName}>
             <h3 className="text-lg font-semibold mb-3">文件上传</h3>
-            <button
+            <Button
               className={primaryButtonClassName}
               onClick={() => {
                 const close = message.loading('正在上传文件...');
@@ -327,12 +335,12 @@ export default function MessageDemo() {
                 }, 2000);
               }}>
               上传文件
-            </button>
+            </Button>
           </div>
 
           <div className={demoCardClassName}>
             <h3 className="text-lg font-semibold mb-3">保存设置</h3>
-            <button
+            <Button
               className={successButtonClassName}
               onClick={() => {
                 const close = message.loading('正在保存设置...');
@@ -345,12 +353,12 @@ export default function MessageDemo() {
                 }, 1000);
               }}>
               保存设置
-            </button>
+            </Button>
           </div>
 
           <div className={demoCardClassName}>
             <h3 className="text-lg font-semibold mb-3">删除确认</h3>
-            <button
+            <Button
               className={dangerButtonClassName}
               onClick={() => {
                 message.warning({
@@ -360,12 +368,12 @@ export default function MessageDemo() {
                 });
               }}>
               删除记录
-            </button>
+            </Button>
           </div>
 
           <div className={demoCardClassName}>
             <h3 className="text-lg font-semibold mb-3">网络错误</h3>
-            <button
+            <Button
               className={warningButtonClassName}
               onClick={() => {
                 message.error({
@@ -375,22 +383,26 @@ export default function MessageDemo() {
                 });
               }}>
               模拟网络错误
-            </button>
+            </Button>
           </div>
         </div>
       </section>
 
       <div className="mt-12 p-6 rounded-xl border bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950/40 dark:border-blue-900 dark:text-blue-200">
         <h3 className="text-lg font-semibold mb-2">提示</h3>
-        <ul className="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-200">
-          <li>消息默认会在 3 秒后自动关闭</li>
-          <li>loading 类型的消息不会自动关闭，需要手动关闭</li>
-          <li>多条消息会依次排列显示，形成队列</li>
-          <li>可以通过 message.clear() 清空所有正在显示的消息</li>
-          <li>
-            Message 与 Alert 的区别：Message 是全局提示，Alert 是页面内嵌提示
-          </li>
-        </ul>
+        <List
+          className="text-blue-700 dark:text-blue-200"
+          bordered="none"
+          split={false}
+          size="sm"
+          dataSource={tips.map((title, index) => ({ key: index, title }))}
+          renderItem={(item) => (
+            <div className="flex items-start gap-2">
+              <span aria-hidden>•</span>
+              <span>{item.title}</span>
+            </div>
+          )}
+        />
       </div>
     </div>
   );

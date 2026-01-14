@@ -1,36 +1,37 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Menu,
   MenuItem,
   SubMenu,
   MenuItemGroup,
   Divider,
-} from "@tigercat/react";
+  Button,
+} from '@tigercat/react';
 
 const MenuDemo: React.FC = () => {
   const [selectedKeys1, setSelectedKeys1] = useState<(string | number)[]>([
-    "1",
+    '1',
   ]);
   const [selectedKeys2, setSelectedKeys2] = useState<(string | number)[]>([
-    "home",
+    'home',
   ]);
   const [selectedKeys3, setSelectedKeys3] = useState<(string | number)[]>([
-    "1",
+    '1',
   ]);
-  const [openKeys3, setOpenKeys3] = useState<(string | number)[]>(["sub1"]);
+  const [openKeys3, setOpenKeys3] = useState<(string | number)[]>(['sub1']);
   const [selectedKeys4, setSelectedKeys4] = useState<(string | number)[]>([
-    "1",
+    '1',
   ]);
-  const [openKeys4, setOpenKeys4] = useState<(string | number)[]>(["sub1"]);
+  const [openKeys4, setOpenKeys4] = useState<(string | number)[]>(['sub1']);
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKeys5, setSelectedKeys5] = useState<(string | number)[]>([
-    "1",
+    '1',
   ]);
   const [selectedKeys6, setSelectedKeys6] = useState<(string | number)[]>([
-    "1",
+    '1',
   ]);
   const [selectedKeys7, setSelectedKeys7] = useState<(string | number)[]>([
-    "1",
+    '1',
   ]);
 
   const homeIcon =
@@ -55,8 +56,7 @@ const MenuDemo: React.FC = () => {
           <div className="bg-white inline-block">
             <Menu
               selectedKeys={selectedKeys1}
-              onSelect={(key) => setSelectedKeys1([key])}
-            >
+              onSelect={(key) => setSelectedKeys1([key])}>
               <MenuItem itemKey="1">菜单项 1</MenuItem>
               <MenuItem itemKey="2">菜单项 2</MenuItem>
               <MenuItem itemKey="3">菜单项 3</MenuItem>
@@ -78,8 +78,7 @@ const MenuDemo: React.FC = () => {
             <Menu
               mode="horizontal"
               selectedKeys={selectedKeys2}
-              onSelect={(key) => setSelectedKeys2([key])}
-            >
+              onSelect={(key) => setSelectedKeys2([key])}>
               <MenuItem itemKey="home">首页</MenuItem>
               <MenuItem itemKey="products">产品</MenuItem>
               <MenuItem itemKey="about">关于</MenuItem>
@@ -100,8 +99,7 @@ const MenuDemo: React.FC = () => {
               selectedKeys={selectedKeys3}
               openKeys={openKeys3}
               onSelect={(key) => setSelectedKeys3([key])}
-              onOpenChange={(_key, { openKeys }) => setOpenKeys3(openKeys)}
-            >
+              onOpenChange={(_key, { openKeys }) => setOpenKeys3(openKeys)}>
               <SubMenu itemKey="sub1" title="导航 1">
                 <MenuItem itemKey="1">选项 1</MenuItem>
                 <MenuItem itemKey="2">选项 2</MenuItem>
@@ -129,8 +127,7 @@ const MenuDemo: React.FC = () => {
               selectedKeys={selectedKeys4}
               openKeys={openKeys4}
               onSelect={(key) => setSelectedKeys4([key])}
-              onOpenChange={(_key, { openKeys }) => setOpenKeys4(openKeys)}
-            >
+              onOpenChange={(_key, { openKeys }) => setOpenKeys4(openKeys)}>
               <SubMenu itemKey="sub1" title="导航 1">
                 <MenuItem itemKey="1">选项 1</MenuItem>
                 <MenuItem itemKey="2">选项 2</MenuItem>
@@ -151,20 +148,18 @@ const MenuDemo: React.FC = () => {
         <p className="text-gray-600 mb-6">可以收起的垂直菜单。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="mb-4">
-            <button
+            <Button
               onClick={() => setCollapsed(!collapsed)}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              {collapsed ? "展开" : "收起"}
-            </button>
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+              {collapsed ? '展开' : '收起'}
+            </Button>
           </div>
           <div className="bg-white inline-block">
             <Menu
               mode="vertical"
               collapsed={collapsed}
               selectedKeys={selectedKeys5}
-              onSelect={(key) => setSelectedKeys5([key])}
-            >
+              onSelect={(key) => setSelectedKeys5([key])}>
               <MenuItem itemKey="1">菜单项 1</MenuItem>
               <MenuItem itemKey="2">菜单项 2</MenuItem>
               <SubMenu itemKey="sub1" title="子菜单">
@@ -186,8 +181,7 @@ const MenuDemo: React.FC = () => {
             <Menu
               theme="dark"
               selectedKeys={selectedKeys6}
-              onSelect={(key) => setSelectedKeys6([key])}
-            >
+              onSelect={(key) => setSelectedKeys6([key])}>
               <MenuItem itemKey="1">菜单项 1</MenuItem>
               <MenuItem itemKey="2">菜单项 2</MenuItem>
               <SubMenu itemKey="sub1" title="子菜单">
@@ -208,8 +202,7 @@ const MenuDemo: React.FC = () => {
           <div className="bg-white inline-block">
             <Menu
               selectedKeys={selectedKeys7}
-              onSelect={(key) => setSelectedKeys7([key])}
-            >
+              onSelect={(key) => setSelectedKeys7([key])}>
               <MenuItem itemKey="1" icon={homeIcon}>
                 首页
               </MenuItem>
