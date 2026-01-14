@@ -33,7 +33,7 @@ For first-time contributors, we provide a setup script:
 # Clone and setup
 git clone https://github.com/expcats/Tigercat.git
 cd Tigercat
-./scripts/setup.sh
+pnpm setup
 ```
 
 Or manually:

@@ -4,15 +4,15 @@ This directory contains helpful scripts for common development tasks.
 
 ## Available Scripts
 
-### 📋 check-env.sh
+### 📋 check-env (cross-platform)
 
 Checks if your development environment meets all requirements.
 
 **Usage**:
 
 ```bash
-./scripts/check-env.sh
-# Or via npm script
+node ./scripts/check-env.mjs
+# Or via pnpm script
 pnpm dev:check
 ```
 
@@ -47,19 +47,23 @@ Checking build artifacts...
 
 ---
 
-### 🚀 run-examples.sh
+### 🚀 run-examples (cross-platform)
 
 Runs both Vue3 and React example apps simultaneously.
 
 **Usage**:
 
 ```bash
-./scripts/run-examples.sh
-# Or via npm script
+node ./scripts/run-examples.mjs
+# Or via pnpm script
 pnpm example:all
 
 # Compatibility alias
 pnpm demo:all
+
+# Smoke test (starts then stops automatically)
+pnpm example:all -- --smoke
+pnpm example:all -- --smoke --smoke-ms=2000
 ```
 
 **What it does**:
@@ -68,7 +72,8 @@ pnpm demo:all
 - Starts React example on http://localhost:5174
 - Manages both processes
 - Provides cleanup on exit (Ctrl+C)
-- Writes logs to `/tmp/vue3-example.log` and `/tmp/react-example.log`
+- Writes logs to a temp directory (printed on start)
+- If example app dependencies are missing, runs `pnpm install` automatically
 
 **Example output**:
 
@@ -85,8 +90,8 @@ Starting React example on http://localhost:5174
   React: http://localhost:5174
 
 Logs:
-  Vue3:  /tmp/vue3-example.log
-  React: /tmp/react-example.log
+  Vue3:  <temp>/tigercat/vue3-example.log
+  React: <temp>/tigercat/react-example.log
 
 Press Ctrl+C to stop both servers
 ```
@@ -99,15 +104,15 @@ Press Ctrl+C to stop both servers
 
 ---
 
-### 🔧 setup.sh
+### 🔧 setup (cross-platform)
 
 One-command setup for new developers.
 
 **Usage**:
 
 ```bash
-./scripts/setup.sh
-# Or via npm script
+node ./scripts/setup.mjs
+# Or via pnpm script
 pnpm setup
 ```
 
@@ -154,12 +159,12 @@ Next steps:
 
 All scripts are also available as npm scripts in `package.json`:
 
-| npm script         | Script file       | Description            |
-| ------------------ | ----------------- | ---------------------- |
-| `pnpm dev:check`   | `check-env.sh`    | Check environment      |
-| `pnpm example:all` | `run-examples.sh` | Run both examples      |
-| `pnpm demo:all`    | `run-examples.sh` | Alias of `example:all` |
-| `pnpm setup`       | `setup.sh`        | Initial setup          |
+| npm script         | Script file        | Description            |
+| ------------------ | ------------------ | ---------------------- |
+| `pnpm dev:check`   | `check-env.mjs`    | Check environment      |
+| `pnpm example:all` | `run-examples.mjs` | Run both examples      |
+| `pnpm demo:all`    | `run-examples.mjs` | Alias of `example:all` |
+| `pnpm setup`       | `setup.mjs`        | Initial setup          |
 
 Additionally, convenience scripts in `package.json`:
 
@@ -174,20 +179,10 @@ Additionally, convenience scripts in `package.json`:
 
 ## Requirements
 
-- **Bash**: All scripts require bash shell
-- **Permissions**: Scripts are executable (`chmod +x`)
+- **Node.js**: Scripts run via Node (recommended on Windows)
 - **Environment**: Scripts assume they're run from project root
 
 ## Troubleshooting
-
-### Script Permission Denied
-
-If you get a permission error:
-
-```bash
-# Make scripts executable
-chmod +x scripts/*.sh
-```
 
 ### Scripts Not Found
 
@@ -199,35 +194,28 @@ pwd
 # Should output: /path/to/tigercat
 
 # Run from root
-./scripts/check-env.sh
+node ./scripts/check-env.mjs
 ```
 
 ### Windows Users
 
-These scripts are designed for Unix-like systems (Linux, macOS). Windows users should use:
+These scripts are now cross-platform. Use the pnpm scripts from PowerShell/CMD:
 
-1. **WSL (Windows Subsystem for Linux)** - Recommended
-2. **Git Bash** - Should work with most scripts
-3. **PowerShell/CMD** - Use npm scripts instead:
-   ```powershell
-   pnpm dev:check
-    pnpm example:all
-    # Compatibility alias
-    pnpm demo:all
-    pnpm setup
-   ```
+```powershell
+pnpm dev:check
+pnpm example:all
+pnpm demo:all
+pnpm setup
+```
 
 ## Contributing
 
 When adding new scripts:
 
 1. Create the script in this directory
-2. Make it executable: `chmod +x scripts/your-script.sh`
-3. Add usage documentation to this README
-4. Add corresponding npm script to `package.json` if appropriate
-5. Include error handling and helpful output messages
-6. Use `set -e` to exit on errors
-7. Provide cleanup on exit (use `trap` for signal handling)
+2. Add usage documentation to this README
+3. Add corresponding pnpm script to `package.json` if appropriate
+4. Include error handling and helpful output messages
 
 ## See Also
 
@@ -237,15 +225,15 @@ When adding new scripts:
 
 ---
 
-### ✅ validate-tests.sh ⭐ NEW
+### ✅ validate-tests (cross-platform)
 
 Validates test files against quality standards defined in `tests/TEST_QUALITY_GUIDELINES.md`.
 
 **Usage**:
 
 ```bash
-./scripts/validate-tests.sh
-# Or via npm script
+node ./scripts/validate-tests.mjs
+# Or via pnpm script
 pnpm test:validate
 ```
 

@@ -19,24 +19,24 @@
     "typescript"
   ],
   "scripts": {
-    "build": "pnpm -r build",
-    "dev": "pnpm -r dev",
-    "clean": "pnpm -r clean && rm -rf node_modules",
+    "build": "pnpm -r --filter ./packages/** build",
+    "dev": "pnpm -r --filter ./packages/** dev",
+    "clean": "pnpm -r --filter ./packages/** clean && node ./scripts/rimraf.mjs node_modules",
     "lint": "eslint packages --ext .ts,.tsx",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:vue": "vitest tests/vue",
     "test:react": "vitest tests/react",
-    "test:validate": "./scripts/validate-tests.sh",
+    "test:validate": "node ./scripts/validate-tests.mjs",
     "example:vue": "pnpm --filter @tigercat-example/vue3 dev",
     "example:react": "pnpm --filter @tigercat-example/react dev",
-    "example:all": "./scripts/run-examples.sh",
+    "example:all": "node ./scripts/run-examples.mjs",
     "demo:vue": "pnpm --filter @tigercat-example/vue3 dev",
     "demo:react": "pnpm --filter @tigercat-example/react dev",
-    "demo:all": "./scripts/run-examples.sh",
-    "dev:check": "./scripts/check-env.sh",
-    "setup": "./scripts/setup.sh"
+    "demo:all": "node ./scripts/run-examples.mjs",
+    "dev:check": "node ./scripts/check-env.mjs",
+    "setup": "node ./scripts/setup.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

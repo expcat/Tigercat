@@ -165,18 +165,18 @@ examples/
 
 ```typescript
 // Vue3
-import { setThemeColors } from "@tigercat/core";
+import { setThemeColors } from '@tigercat/core';
 
 setThemeColors({
-  primary: "#10b981",
-  primaryHover: "#059669",
-  primaryDisabled: "#6ee7b7",
+  primary: '#10b981',
+  primaryHover: '#059669',
+  primaryDisabled: '#6ee7b7',
 });
 
 // React
 const root = document.documentElement;
-root.style.setProperty("--tiger-primary", "#10b981");
-root.style.setProperty("--tiger-primary-hover", "#059669");
+root.style.setProperty('--tiger-primary', '#10b981');
+root.style.setProperty('--tiger-primary-hover', '#059669');
 ```
 
 ### ThemeSwitch 组件
@@ -355,6 +355,7 @@ pnpm build
    ```
 
 2. **日常开发**:
+
    ```bash
    # 终端 1: 监听包变化
    pnpm dev
@@ -370,7 +371,7 @@ pnpm example:vue # 或 pnpm example:react
 3. **调试**:
 - 使用浏览器开发者工具
 - 检查 Vite 控制台输出
- - 查看 `/tmp/vue3-example.log` 或 `/tmp/react-example.log` (当使用 `pnpm example:all` 或 `pnpm demo:all` 时)
+ - 查看示例启动时打印的日志路径（当使用 `pnpm example:all` 或 `pnpm demo:all` 时，会写入系统临时目录）
 
 ## 演示截图
 

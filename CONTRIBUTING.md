@@ -40,7 +40,7 @@ git clone https://github.com/expcats/Tigercat.git
 cd Tigercat
 
 # Run the setup script
-./scripts/setup.sh
+pnpm setup
 ```
 
 Or manually:
@@ -199,15 +199,15 @@ tigercat/
 
 ```vue
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed } from 'vue';
 
 interface ButtonProps {
-  variant?: "primary" | "secondary";
+  variant?: 'primary' | 'secondary';
   disabled?: boolean;
 }
 
 const props = withDefaults(defineProps<ButtonProps>(), {
-  variant: "primary",
+  variant: 'primary',
   disabled: false,
 });
 
@@ -231,17 +231,17 @@ const emit = defineEmits<{
 - Use children prop for content composition
 
 ```typescript
-import React from "react";
+import React from 'react';
 
 export interface ButtonProps {
-  variant?: "primary" | "secondary";
+  variant?: 'primary' | 'secondary';
   disabled?: boolean;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   children?: React.ReactNode;
 }
 
 export const Button: React.FC<ButtonProps> = ({
-  variant = "primary",
+  variant = 'primary',
   disabled = false,
   onClick,
   children,
@@ -283,27 +283,27 @@ All components must have comprehensive tests covering:
 ### Test Structure
 
 ```typescript
-describe("ComponentName", () => {
-  describe("Rendering", () => {
-    it("should render with default props", () => {
+describe('ComponentName', () => {
+  describe('Rendering', () => {
+    it('should render with default props', () => {
       // Test implementation
     });
   });
 
-  describe("Props", () => {
-    it("should apply size prop correctly", () => {
+  describe('Props', () => {
+    it('should apply size prop correctly', () => {
       // Test implementation
     });
   });
 
-  describe("Events", () => {
-    it("should emit click event", async () => {
+  describe('Events', () => {
+    it('should emit click event', async () => {
       // Test implementation
     });
   });
 
-  describe("Accessibility", () => {
-    it("should have no a11y violations", async () => {
+  describe('Accessibility', () => {
+    it('should have no a11y violations', async () => {
       // Test implementation
     });
   });
