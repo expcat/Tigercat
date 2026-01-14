@@ -15,6 +15,26 @@ describe('TimePicker', () => {
     expect(input).toHaveAttribute('placeholder', 'Select time')
   })
 
+  it('uses locale-based default placeholder', () => {
+    const { container } = renderWithProps(TimePicker, { locale: 'zh-CN' })
+    const input = container.querySelector('input')
+    expect(input).toHaveAttribute('placeholder', '请选择时间')
+  })
+
+  it('allows overriding labels for placeholder', () => {
+    const { container } = renderWithProps(TimePicker, {
+      labels: { selectTime: 'Pick a time' },
+    })
+    const input = container.querySelector('input')
+    expect(input).toHaveAttribute('placeholder', 'Pick a time')
+  })
+
+  it('uses range placeholder by default in range mode', () => {
+    const { container } = renderWithProps(TimePicker, { range: true })
+    const input = container.querySelector('input')
+    expect(input).toHaveAttribute('placeholder', 'Select time range')
+  })
+
   it('renders controlled display value', () => {
     const { container } = renderWithProps(TimePicker, { modelValue: '14:30' })
     const input = container.querySelector('input') as HTMLInputElement
