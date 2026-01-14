@@ -120,6 +120,9 @@ pnpm test:ui
 
 # Lint your code
 pnpm lint
+
+# Ensure formatting is consistent
+pnpm format:check
 ```
 
 ### 6. Commit and Push
@@ -194,21 +197,21 @@ tigercat/
 
 ```vue
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed } from 'vue'
 
 interface ButtonProps {
-  variant?: 'primary' | 'secondary';
-  disabled?: boolean;
+  variant?: 'primary' | 'secondary'
+  disabled?: boolean
 }
 
 const props = withDefaults(defineProps<ButtonProps>(), {
   variant: 'primary',
-  disabled: false,
-});
+  disabled: false
+})
 
 const emit = defineEmits<{
-  click: [event: MouseEvent];
-}>();
+  click: [event: MouseEvent]
+}>()
 </script>
 
 <template>
@@ -226,13 +229,13 @@ const emit = defineEmits<{
 - Use children prop for content composition
 
 ```typescript
-import React from 'react';
+import React from 'react'
 
 export interface ButtonProps {
-  variant?: 'primary' | 'secondary';
-  disabled?: boolean;
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  children?: React.ReactNode;
+  variant?: 'primary' | 'secondary'
+  disabled?: boolean
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
+  children?: React.ReactNode
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -246,8 +249,8 @@ export const Button: React.FC<ButtonProps> = ({
     <button onClick={onClick} disabled={disabled} {...props}>
       {children}
     </button>
-  );
-};
+  )
+}
 ```
 
 ### Styling

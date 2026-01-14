@@ -114,6 +114,8 @@ For detailed testing guidelines, see:
 | `pnpm example:all`   | Run both examples simultaneously |
 | `pnpm dev:check`     | Verify development environment   |
 | `pnpm lint`          | Lint all packages                |
+| `pnpm format`        | Format with Prettier             |
+| `pnpm format:check`  | Check formatting (CI-friendly)   |
 | `pnpm clean`         | Clean build artifacts            |
 
 ### Project Structure
