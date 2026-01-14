@@ -17,6 +17,10 @@ describe('Progress', () => {
     expect(progressbar).toHaveAttribute('aria-valuemin', '0')
     expect(progressbar).toHaveAttribute('aria-valuemax', '100')
     expect(progressbar).toHaveAttribute('aria-label', 'Progress: 0%')
+
+    // Should expand by default so it doesn't collapse inside non-stretching flex layouts.
+    const wrapper = progressbar?.parentElement?.parentElement as HTMLElement | null
+    expect(wrapper?.className).toContain('w-full')
   })
 
   it('clamps percentage and updates bar width', () => {

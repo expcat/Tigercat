@@ -85,7 +85,10 @@ export const Progress: React.FC<ProgressProps> = ({
     }
 
     return (
-      <div {...props} className={classNames('flex items-center', className)} style={mergedStyle}>
+      <div
+        {...props}
+        className={classNames('flex items-center w-full', className)}
+        style={mergedStyle}>
         <div
           className={lineTrackClasses}
           style={{ flex: 1, ...(height ? { height: `${height}px` } : {}) }}>

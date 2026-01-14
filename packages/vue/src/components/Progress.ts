@@ -193,7 +193,7 @@ export const Progress = defineComponent({
           : {}
 
       const wrapperClasses = classNames(
-        'flex items-center',
+        'flex items-center w-full',
         coerceClassValue(attrs.class),
         props.className
       )

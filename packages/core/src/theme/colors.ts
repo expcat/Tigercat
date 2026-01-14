@@ -649,28 +649,28 @@ export interface ProgressThemeColors {
  */
 export const defaultProgressThemeColors: ProgressThemeColors = {
   default: {
-    bg: 'bg-[var(--tiger-text-muted,#6b7280)]',
-    text: 'text-[var(--tiger-text,#374151)]'
+    bg: 'bg-[color:var(--tiger-text-muted,#6b7280)]',
+    text: 'text-[color:var(--tiger-text,#374151)]'
   },
   primary: {
-    bg: 'bg-[var(--tiger-primary,#2563eb)]',
-    text: 'text-[var(--tiger-primary,#2563eb)]'
+    bg: 'bg-[color:var(--tiger-primary,#2563eb)]',
+    text: 'text-[color:var(--tiger-primary,#2563eb)]'
   },
   success: {
-    bg: 'bg-[var(--tiger-success,#16a34a)]',
-    text: 'text-[var(--tiger-success,#16a34a)]'
+    bg: 'bg-[color:var(--tiger-success,#16a34a)]',
+    text: 'text-[color:var(--tiger-success,#16a34a)]'
   },
   warning: {
-    bg: 'bg-[var(--tiger-warning,#f59e0b)]',
-    text: 'text-[var(--tiger-warning,#f59e0b)]'
+    bg: 'bg-[color:var(--tiger-warning,#f59e0b)]',
+    text: 'text-[color:var(--tiger-warning,#f59e0b)]'
   },
   danger: {
-    bg: 'bg-[var(--tiger-error,#dc2626)]',
-    text: 'text-[var(--tiger-error,#dc2626)]'
+    bg: 'bg-[color:var(--tiger-error,#dc2626)]',
+    text: 'text-[color:var(--tiger-error,#dc2626)]'
   },
   info: {
-    bg: 'bg-[var(--tiger-info,#0ea5e9)]',
-    text: 'text-[var(--tiger-info,#0ea5e9)]'
+    bg: 'bg-[color:var(--tiger-info,#0ea5e9)]',
+    text: 'text-[color:var(--tiger-info,#0ea5e9)]'
   }
 }
 
