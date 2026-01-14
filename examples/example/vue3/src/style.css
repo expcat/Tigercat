@@ -29,3 +29,15 @@ html {
 h2[data-demo-anchor='true'] {
   scroll-margin-top: 140px;
 }
+
+/* Keep scrolling but hide scrollbars to avoid sider width shifting */
+.demo-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge legacy */
+  scrollbar-gutter: stable;
+}
+
+.demo-scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}

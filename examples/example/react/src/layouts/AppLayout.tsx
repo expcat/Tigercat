@@ -90,40 +90,59 @@ export const AppLayout: React.FC = () => {
 
   return (
     <LangContext.Provider value={{ lang }}>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <div className="h-screen overflow-hidden box-border bg-gray-50 dark:bg-gray-950 pt-14">
         <AppHeader lang={lang} onLangChange={setLang} rightHint="React" />
 
-        <div className="pt-14 flex">
+        <div className="flex h-full">
           <AppSider lang={lang} />
 
-          <main className="flex-1 min-w-0">
-            {!isHome && (headerTitle || sections.length > 0) && (
-              <div className="sticky top-14 z-30 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
-                <div className="px-6 py-3">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="min-w-0 text-sm font-semibold text-gray-900 truncate dark:text-gray-100">
-                      {headerTitle}
-                    </div>
-                    {sections.length > 0 && (
-                      <div className="flex items-center gap-2 flex-wrap justify-end">
-                        {sections.map((s: DemoSection) => (
-                          <a
-                            key={s.id}
-                            href={`#${s.id}`}
-                            className="text-sm px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
-                          >
-                            {s.label}
-                          </a>
-                        ))}
+          <main className="flex-1 min-w-0 h-full overflow-hidden">
+            <div className="h-full overflow-y-auto">
+              {!isHome && (headerTitle || sections.length > 0) && (
+                <div className="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
+                  <div className="px-6 py-3">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="min-w-0 text-sm font-semibold text-gray-900 truncate dark:text-gray-100">
+                        {headerTitle}
                       </div>
-                    )}
+                      {sections.length > 0 && (
+                        <div className="flex items-center gap-2 flex-wrap justify-end">
+                          {sections.map((s: DemoSection) => (
+                            <a
+                              key={s.id}
+                              href={`#${s.id}`}
+                              className="text-sm px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                const el = document.getElementById(s.id);
+                                el?.scrollIntoView({
+                                  behavior: "smooth",
+                                  block: "start",
+                                });
+                                try {
+                                  window.history.replaceState(
+                                    null,
+                                    "",
+                                    `#${s.id}`
+                                  );
+                                } catch {
+                                  // ignore
+                                }
+                              }}
+                            >
+                              {s.label}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            <div ref={pageRootRef} className="px-6 py-6">
-              <Outlet />
+              <div ref={pageRootRef} className="px-6 py-6">
+                <Outlet />
+              </div>
             </div>
           </main>
         </div>
