@@ -10,7 +10,7 @@ import {
   cloneVNode,
   isVNode,
   type VNode,
-} from "vue";
+} from 'vue';
 import {
   classNames,
   coerceClassValue,
@@ -21,9 +21,11 @@ import {
   menuItemIconClasses,
   mergeStyleValues,
   submenuContentHorizontalClasses,
+  submenuContentPopupClasses,
   submenuContentVerticalClasses,
-} from "@tigercat/core";
-import { MenuContextKey, type MenuContext } from "./Menu";
+  submenuContentInlineClasses,
+} from '@tigercat/core';
+import { MenuContextKey, type MenuContext } from './Menu';
 
 export interface VueSubMenuProps {
   itemKey: string | number;
@@ -31,6 +33,7 @@ export interface VueSubMenuProps {
   icon?: unknown;
   disabled?: boolean;
   level?: number;
+  collapsed?: boolean;
   className?: string;
   style?: Record<string, string | number>;
 }
@@ -38,24 +41,24 @@ export interface VueSubMenuProps {
 // Expand/collapse icon
 const ExpandIcon = (expanded: boolean) => {
   return h(
-    "svg",
+    'svg',
     {
       class: getSubMenuExpandIconClasses(expanded),
-      width: "12",
-      height: "12",
-      viewBox: "0 0 12 12",
-      fill: "currentColor",
+      width: '12',
+      height: '12',
+      viewBox: '0 0 12 12',
+      fill: 'currentColor',
     },
     [
-      h("path", {
-        d: "M6 9L1.5 4.5L2.205 3.795L6 7.59L9.795 3.795L10.5 4.5L6 9Z",
+      h('path', {
+        d: 'M6 9L1.5 4.5L2.205 3.795L6 7.59L9.795 3.795L10.5 4.5L6 9Z',
       }),
     ]
   );
 };
 
 export const SubMenu = defineComponent({
-  name: "TigerSubMenu",
+  name: 'TigerSubMenu',
   inheritAttrs: false,
   props: {
     /**
@@ -70,7 +73,7 @@ export const SubMenu = defineComponent({
      */
     title: {
       type: String,
-      default: "",
+      default: '',
     },
     /**
      * Icon for the submenu
@@ -92,6 +95,10 @@ export const SubMenu = defineComponent({
       type: Number,
       default: 0,
     },
+    collapsed: {
+      type: Boolean,
+      default: undefined,
+    },
     className: {
       type: String,
       default: undefined,
@@ -106,7 +113,7 @@ export const SubMenu = defineComponent({
     const menuContext = inject<MenuContext>(MenuContextKey);
 
     if (!menuContext) {
-      console.warn("SubMenu must be used within Menu component");
+      console.warn('SubMenu must be used within Menu component');
     }
 
     // Check if this submenu is open
@@ -120,9 +127,21 @@ export const SubMenu = defineComponent({
 
     const isOpenByKeyboard = ref(false);
 
+    const effectiveCollapsed = computed(() => {
+      return props.collapsed ?? (menuContext ? menuContext.collapsed : false);
+    });
+
+    const isPopup = computed(() => {
+      return (
+        !!menuContext &&
+        menuContext.mode === 'vertical' &&
+        effectiveCollapsed.value
+      );
+    });
+
     // Determine if submenu should be shown
     const isExpanded = computed(() => {
-      if (menuContext?.mode === "horizontal") {
+      if (menuContext?.mode === 'horizontal' || isPopup.value) {
         return isHovered.value || isOpenByKeyboard.value;
       }
       return isOpen.value;
@@ -130,7 +149,7 @@ export const SubMenu = defineComponent({
 
     // Submenu title classes
     const titleClasses = computed(() => {
-      if (!menuContext) return "";
+      if (!menuContext) return '';
       return classNames(
         getSubMenuTitleClasses(menuContext.theme, props.disabled),
         props.className,
@@ -149,19 +168,31 @@ export const SubMenu = defineComponent({
 
     // Submenu content classes
     const contentClasses = computed(() => {
-      if (!menuContext) return "";
+      if (!menuContext) return '';
 
-      if (menuContext.mode === "horizontal") {
+      if (menuContext.mode === 'horizontal') {
         return submenuContentHorizontalClasses;
       }
+
+      if (isPopup.value) return submenuContentPopupClasses;
+
+      if (menuContext.mode === 'inline') return submenuContentInlineClasses;
+
       return submenuContentVerticalClasses;
     });
 
     // Handle title click
     const handleTitleClick = () => {
-      if (!props.disabled && menuContext && menuContext.mode !== "horizontal") {
-        menuContext.handleOpenChange(props.itemKey);
+      if (!menuContext || props.disabled) return;
+      if (menuContext.mode === 'horizontal') return;
+
+      if (isPopup.value) {
+        isOpenByKeyboard.value = !isOpenByKeyboard.value;
+        isHovered.value = true;
+        return;
       }
+
+      menuContext.handleOpenChange(props.itemKey);
     };
 
     const getMenuButtonsWithin = (menuEl: HTMLElement) => {
@@ -196,18 +227,18 @@ export const SubMenu = defineComponent({
       roveFocus(current, items[nextIndex]);
     };
 
-    const focusEdge = (current: HTMLButtonElement, edge: "start" | "end") => {
+    const focusEdge = (current: HTMLButtonElement, edge: 'start' | 'end') => {
       const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null;
       if (!menuEl) return;
       const items = getMenuButtonsWithin(menuEl);
       if (items.length === 0) return;
-      roveFocus(current, edge === "start" ? items[0] : items[items.length - 1]);
+      roveFocus(current, edge === 'start' ? items[0] : items[items.length - 1]);
     };
 
     const focusFirstChildItem = async () => {
       await nextTick();
       const titleEl = document.activeElement as HTMLElement | null;
-      const li = titleEl?.closest("li");
+      const li = titleEl?.closest('li');
       const submenu = li?.querySelector(
         'ul[role="menu"]'
       ) as HTMLElement | null;
@@ -225,11 +256,11 @@ export const SubMenu = defineComponent({
       const current = event.currentTarget as HTMLButtonElement;
 
       const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null;
-      const isRoot = rootMenu?.dataset.tigerMenuRoot === "true";
-      const isHorizontalRoot = isRoot && menuContext.mode === "horizontal";
+      const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true';
+      const isHorizontalRoot = isRoot && menuContext.mode === 'horizontal';
 
-      const nextKey = isHorizontalRoot ? "ArrowRight" : "ArrowDown";
-      const prevKey = isHorizontalRoot ? "ArrowLeft" : "ArrowUp";
+      const nextKey = isHorizontalRoot ? 'ArrowRight' : 'ArrowDown';
+      const prevKey = isHorizontalRoot ? 'ArrowLeft' : 'ArrowUp';
 
       if (event.key === nextKey) {
         event.preventDefault();
@@ -243,20 +274,20 @@ export const SubMenu = defineComponent({
         return;
       }
 
-      if (event.key === "Home") {
+      if (event.key === 'Home') {
         event.preventDefault();
-        focusEdge(current, "start");
+        focusEdge(current, 'start');
         return;
       }
 
-      if (event.key === "End") {
+      if (event.key === 'End') {
         event.preventDefault();
-        focusEdge(current, "end");
+        focusEdge(current, 'end');
         return;
       }
 
-      if (event.key === "Escape" || event.key === "ArrowLeft") {
-        if (menuContext.mode === "horizontal") {
+      if (event.key === 'Escape' || event.key === 'ArrowLeft') {
+        if (menuContext.mode === 'horizontal' || isPopup.value) {
           event.preventDefault();
           isOpenByKeyboard.value = false;
           isHovered.value = false;
@@ -270,9 +301,9 @@ export const SubMenu = defineComponent({
         return;
       }
 
-      if (event.key === "Enter" || event.key === " ") {
+      if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
-        if (menuContext.mode === "horizontal") {
+        if (menuContext.mode === 'horizontal' || isPopup.value) {
           isOpenByKeyboard.value = true;
           return;
         }
@@ -281,8 +312,8 @@ export const SubMenu = defineComponent({
         return;
       }
 
-      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-        if (menuContext.mode === "horizontal") {
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        if (menuContext.mode === 'horizontal' || isPopup.value) {
           event.preventDefault();
           isOpenByKeyboard.value = true;
           return;
@@ -298,14 +329,14 @@ export const SubMenu = defineComponent({
 
     // Handle mouse enter for horizontal mode
     const handleMouseEnter = () => {
-      if (menuContext?.mode === "horizontal") {
+      if (menuContext?.mode === 'horizontal' || isPopup.value) {
         isHovered.value = true;
       }
     };
 
     // Handle mouse leave for horizontal mode
     const handleMouseLeave = () => {
-      if (menuContext?.mode === "horizontal") {
+      if (menuContext?.mode === 'horizontal' || isPopup.value) {
         isHovered.value = false;
         isOpenByKeyboard.value = false;
       }
@@ -313,7 +344,7 @@ export const SubMenu = defineComponent({
 
     // Get indent style for nested menus in inline mode
     const indentStyle = computed(() => {
-      if (!menuContext || menuContext.mode !== "inline" || props.level === 0) {
+      if (!menuContext || menuContext.mode !== 'inline' || props.level === 0) {
         return {};
       }
       return getMenuItemIndent(props.level, menuContext.inlineIndent);
@@ -330,23 +361,30 @@ export const SubMenu = defineComponent({
         const type = node.type as unknown;
 
         const name =
-          typeof type === "object" && type != null && "name" in type
+          typeof type === 'object' && type != null && 'name' in type
             ? (type as { name?: unknown }).name
             : undefined;
 
         const isTarget =
-          name === "TigerMenuItem" ||
-          name === "TigerSubMenu" ||
-          name === "TigerMenuItemGroup";
+          name === 'TigerMenuItem' ||
+          name === 'TigerSubMenu' ||
+          name === 'TigerMenuItemGroup';
 
         if (!isTarget) return node;
 
         const existingProps =
           ((node.props ?? {}) as Record<string, unknown>) ??
           ({} as Record<string, unknown>);
-        if (existingProps.level != null) return node;
 
-        return cloneVNode(node, { level: nextLevel });
+        const nextProps: Record<string, unknown> = {
+          level: existingProps.level ?? nextLevel,
+        };
+
+        if (isPopup.value) {
+          nextProps.collapsed = false;
+        }
+
+        return cloneVNode(node, nextProps);
       });
     };
 
@@ -358,34 +396,34 @@ export const SubMenu = defineComponent({
 
       // Render icon if provided
       if (props.icon) {
-        if (typeof props.icon === "string") {
+        if (typeof props.icon === 'string') {
           titleChildren.push(
-            h("span", {
+            h('span', {
               class: menuItemIconClasses,
               innerHTML: props.icon,
             })
           );
         } else {
           titleChildren.push(
-            h("span", { class: menuItemIconClasses }, props.icon as HChildren)
+            h('span', { class: menuItemIconClasses }, props.icon as HChildren)
           );
         }
       }
 
       // Render title text
-      if (!menuContext.collapsed) {
-        titleChildren.push(h("span", { class: "flex-1" }, props.title));
+      if (!effectiveCollapsed.value) {
+        titleChildren.push(h('span', { class: 'flex-1' }, props.title));
 
         // Add expand icon
-        if (menuContext.mode !== "horizontal") {
+        if (menuContext.mode !== 'horizontal' && !isPopup.value) {
           titleChildren.push(ExpandIcon(isExpanded.value));
         }
       } else if (!props.icon) {
         // Show first letter when collapsed without icon
         titleChildren.push(
           h(
-            "span",
-            { class: "flex-1 text-center" },
+            'span',
+            { class: 'flex-1 text-center' },
             props.title.charAt(0).toUpperCase()
           )
         );
@@ -393,18 +431,18 @@ export const SubMenu = defineComponent({
 
       // Render submenu title
       const titleNode = h(
-        "button",
+        'button',
         {
-          type: "button",
+          type: 'button',
           class: titleClasses.value,
           style: titleStyle.value,
           onClick: handleTitleClick,
           onKeydown: handleTitleKeyDown,
-          role: "menuitem",
-          "data-tiger-menuitem": "true",
-          "aria-expanded": isExpanded.value ? "true" : "false",
-          "aria-haspopup": "true",
-          "aria-disabled": props.disabled ? "true" : undefined,
+          role: 'menuitem',
+          'data-tiger-menuitem': 'true',
+          'aria-expanded': isExpanded.value ? 'true' : 'false',
+          'aria-haspopup': 'true',
+          'aria-disabled': props.disabled ? 'true' : undefined,
           disabled: props.disabled,
           tabindex: -1,
           ...passthroughAttrs.value,
@@ -414,52 +452,52 @@ export const SubMenu = defineComponent({
 
       // Render submenu content
       const contentNode =
-        menuContext.mode === "horizontal"
+        menuContext.mode === 'horizontal' || isPopup.value
           ? h(
-              "ul",
+              'ul',
               {
                 class: contentClasses.value,
                 style: {
-                  display: isExpanded.value ? "block" : "none",
+                  display: isExpanded.value ? 'block' : 'none',
                 },
-                role: "menu",
-                "aria-hidden": isExpanded.value ? undefined : "true",
+                role: 'menu',
+                'aria-hidden': isExpanded.value ? undefined : 'true',
               },
               withChildLevel(slots.default?.() as VNode[] | undefined)
             )
           : h(
               Transition,
               {
-                name: "submenu-collapse",
+                name: 'submenu-collapse',
                 onEnter: (el: Element) => {
                   const element = el as HTMLElement;
-                  element.style.height = "0";
+                  element.style.height = '0';
                   void element.offsetHeight; // Force reflow
-                  element.style.height = element.scrollHeight + "px";
+                  element.style.height = element.scrollHeight + 'px';
                 },
                 onAfterEnter: (el: Element) => {
                   const element = el as HTMLElement;
-                  element.style.height = "";
+                  element.style.height = '';
                 },
                 onLeave: (el: Element) => {
                   const element = el as HTMLElement;
-                  element.style.height = element.scrollHeight + "px";
+                  element.style.height = element.scrollHeight + 'px';
                   void element.offsetHeight; // Force reflow
-                  element.style.height = "0";
+                  element.style.height = '0';
                 },
                 onAfterLeave: (el: Element) => {
                   const element = el as HTMLElement;
-                  element.style.height = "";
+                  element.style.height = '';
                 },
               },
               {
                 default: () =>
                   isExpanded.value
                     ? h(
-                        "ul",
+                        'ul',
                         {
                           class: contentClasses.value,
-                          role: "menu",
+                          role: 'menu',
                         },
                         withChildLevel(slots.default?.() as VNode[] | undefined)
                       )
@@ -468,12 +506,15 @@ export const SubMenu = defineComponent({
             );
 
       return h(
-        "li",
+        'li',
         {
-          class: menuContext.mode === "horizontal" ? "relative" : "",
+          class:
+            menuContext.mode === 'horizontal' || isPopup.value
+              ? 'relative'
+              : '',
           onMouseenter: handleMouseEnter,
           onMouseleave: handleMouseLeave,
-          role: "none",
+          role: 'none',
         },
         [titleNode, contentNode]
       );

@@ -3,115 +3,130 @@
  * Shared styles and helpers for Menu components
  */
 
-import type { MenuMode, MenuTheme } from "../types/menu";
+import type { MenuMode, MenuTheme } from '../types/menu';
 
 /**
  * Base menu container classes
  */
-export const menuBaseClasses = "flex bg-white border-gray-200";
+export const menuBaseClasses =
+  'flex border bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border-[var(--tiger-border,#e5e7eb)]';
 
 /**
  * Menu mode classes
  */
 export const menuModeClasses = {
-  horizontal: "flex-row border-b",
-  vertical: "flex-col border-r min-w-[200px]",
-  inline: "flex-col min-w-[200px]",
+  horizontal: 'flex-row border-b',
+  vertical: 'flex-col border-r min-w-[200px]',
+  inline: 'flex-col min-w-[200px]',
 };
 
 /**
  * Menu theme classes - light theme
  */
-export const menuLightThemeClasses = "bg-white text-gray-800";
+export const menuLightThemeClasses =
+  '[--tiger-surface:#ffffff] [--tiger-text:#111827] [--tiger-text-muted:#6b7280] [--tiger-border:#e5e7eb] [--tiger-surface-muted:#f9fafb]';
 
 /**
  * Menu theme classes - dark theme
  */
-export const menuDarkThemeClasses = "bg-gray-800 text-white";
+export const menuDarkThemeClasses =
+  '[--tiger-surface:#111827] [--tiger-text:#f9fafb] [--tiger-text-muted:#9ca3af] [--tiger-border:#374151] [--tiger-surface-muted:#1f2937] [--tiger-outline-bg-hover:#2563eb1a] [--tiger-ghost-bg-hover:#2563eb1a]';
 
 /**
  * Menu item base classes
  */
 export const menuItemBaseClasses =
-  "flex w-full items-center px-4 py-2 text-left bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none";
+  'flex w-full items-center px-4 py-2 text-left bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none';
 
 /**
  * Menu item hover classes - light theme
  */
-export const menuItemHoverLightClasses = "hover:bg-gray-100";
+export const menuItemHoverLightClasses =
+  'hover:bg-[var(--tiger-surface-muted,#f9fafb)]';
 
 /**
  * Menu item hover classes - dark theme
  */
-export const menuItemHoverDarkClasses = "hover:bg-gray-700";
+export const menuItemHoverDarkClasses =
+  'hover:bg-[var(--tiger-surface-muted,#1f2937)]';
 
 /**
  * Menu item selected classes - light theme
  */
 export const menuItemSelectedLightClasses =
-  "bg-[var(--tiger-primary,#2563eb)] bg-opacity-10 text-[var(--tiger-primary,#2563eb)] font-medium";
+  'bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)] font-medium';
 
 /**
  * Menu item selected classes - dark theme
  */
 export const menuItemSelectedDarkClasses =
-  "bg-[var(--tiger-primary,#2563eb)] text-white font-medium";
+  'bg-[var(--tiger-outline-bg-hover,#2563eb1a)] text-[var(--tiger-primary,#60a5fa)] font-medium';
 
 /**
  * Menu item disabled classes
  */
 export const menuItemDisabledClasses =
-  "opacity-50 cursor-not-allowed pointer-events-none";
+  'opacity-50 cursor-not-allowed pointer-events-none';
 
 /**
  * Menu item icon classes
  */
-export const menuItemIconClasses = "mr-2 flex-shrink-0";
+export const menuItemIconClasses = 'mr-2 flex-shrink-0';
 
 /**
  * Submenu title classes
  */
 export const submenuTitleClasses =
-  "flex w-full items-center justify-between px-4 py-2 text-left bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none";
+  'flex w-full items-center justify-between px-4 py-2 text-left bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none';
 
 /**
  * Submenu expand icon classes
  */
 export const submenuExpandIconClasses =
-  "ml-2 transition-transform duration-200";
+  'ml-2 transition-transform duration-200';
 
 /**
  * Submenu expand icon expanded classes
  */
-export const submenuExpandIconExpandedClasses = "transform rotate-180";
+export const submenuExpandIconExpandedClasses = 'transform rotate-180';
 
 /**
  * Submenu content classes - horizontal mode
  */
 export const submenuContentHorizontalClasses =
-  "absolute left-0 top-full mt-0 min-w-[160px] bg-white border border-gray-200 rounded shadow-lg z-50";
+  'absolute left-0 top-full mt-0 min-w-[160px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg z-50';
 
 /**
- * Submenu content classes - vertical/inline mode
+ * Submenu content classes - collapsed vertical mode (popup)
  */
-export const submenuContentVerticalClasses =
-  "overflow-hidden transition-all duration-200";
+export const submenuContentPopupClasses =
+  'absolute left-full top-0 ml-1 min-w-[180px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg z-50';
+
+/**
+ * Submenu content classes - vertical mode
+ */
+export const submenuContentVerticalClasses = 'overflow-hidden pl-2';
+
+/**
+ * Submenu content classes - inline mode
+ */
+export const submenuContentInlineClasses = 'overflow-hidden';
 
 /**
  * Menu item group title classes
  */
 export const menuItemGroupTitleClasses =
-  "px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider";
+  'px-4 py-2 text-xs font-semibold text-[var(--tiger-text-muted,#6b7280)] uppercase tracking-wider';
 
 /**
  * Menu collapsed classes
  */
-export const menuCollapsedClasses = "min-w-[64px]";
+export const menuCollapsedClasses = 'min-w-[64px]';
 
 /**
  * Menu collapsed item classes
  */
-export const menuCollapsedItemClasses = "justify-center px-2";
+export const menuCollapsedItemClasses = 'justify-center px-2';
 
 /**
  * Get menu classes based on mode and theme
@@ -123,17 +138,17 @@ export function getMenuClasses(
 ): string {
   const classes = [menuBaseClasses, menuModeClasses[mode]];
 
-  if (theme === "dark") {
+  if (theme === 'dark') {
     classes.push(menuDarkThemeClasses);
   } else {
     classes.push(menuLightThemeClasses);
   }
 
-  if (collapsed && mode === "vertical") {
+  if (collapsed && mode === 'vertical') {
     classes.push(menuCollapsedClasses);
   }
 
-  return classes.filter(Boolean).join(" ");
+  return classes.join(' ');
 }
 
 /**
@@ -156,18 +171,18 @@ export function getMenuItemClasses(
   } else {
     if (selected) {
       classes.push(
-        theme === "dark"
+        theme === 'dark'
           ? menuItemSelectedDarkClasses
           : menuItemSelectedLightClasses
       );
     } else {
       classes.push(
-        theme === "dark" ? menuItemHoverDarkClasses : menuItemHoverLightClasses
+        theme === 'dark' ? menuItemHoverDarkClasses : menuItemHoverLightClasses
       );
     }
   }
 
-  return classes.filter(Boolean).join(" ");
+  return classes.join(' ');
 }
 
 /**
@@ -183,11 +198,11 @@ export function getSubMenuTitleClasses(
     classes.push(menuItemDisabledClasses);
   } else {
     classes.push(
-      theme === "dark" ? menuItemHoverDarkClasses : menuItemHoverLightClasses
+      theme === 'dark' ? menuItemHoverDarkClasses : menuItemHoverLightClasses
     );
   }
 
-  return classes.filter(Boolean).join(" ");
+  return classes.join(' ');
 }
 
 /**
@@ -200,7 +215,7 @@ export function getSubMenuExpandIconClasses(expanded: boolean): string {
     classes.push(submenuExpandIconExpandedClasses);
   }
 
-  return classes.filter(Boolean).join(" ");
+  return classes.join(' ');
 }
 
 /**

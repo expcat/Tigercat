@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   classNames,
   getSubMenuTitleClasses,
@@ -7,12 +7,14 @@ import {
   isKeyOpen,
   menuItemIconClasses,
   submenuContentHorizontalClasses,
+  submenuContentPopupClasses,
   submenuContentVerticalClasses,
+  submenuContentInlineClasses,
   type SubMenuProps as CoreSubMenuProps,
-} from "@tigercat/core";
-import { useMenuContext } from "./Menu";
-import { MenuItem } from "./MenuItem";
-import { MenuItemGroup } from "./MenuItemGroup";
+} from '@tigercat/core';
+import { useMenuContext } from './Menu';
+import { MenuItem } from './MenuItem';
+import { MenuItemGroup } from './MenuItemGroup';
 
 export interface SubMenuProps extends CoreSubMenuProps {
   /**
@@ -24,17 +26,20 @@ export interface SubMenuProps extends CoreSubMenuProps {
    * Nesting level (internal use for indentation)
    */
   level?: number;
+
+  /**
+   * Internal override for collapsed rendering (used by SubMenu popup)
+   */
+  collapsed?: boolean;
 }
 
-// Expand/collapse icon
 const ExpandIcon: React.FC<{ expanded: boolean }> = ({ expanded }) => (
   <svg
     className={getSubMenuExpandIconClasses(expanded)}
     width="12"
     height="12"
     viewBox="0 0 12 12"
-    fill="currentColor"
-  >
+    fill="currentColor">
     <path d="M6 9L1.5 4.5L2.205 3.795L6 7.59L9.795 3.795L10.5 4.5L6 9Z" />
   </svg>
 );
@@ -44,7 +49,9 @@ function getMenuButtonsWithin(menuEl: HTMLElement): HTMLButtonElement[] {
     menuEl.querySelectorAll<HTMLButtonElement>(
       'button[data-tiger-menuitem="true"]'
     )
-  ).filter((el) => !el.disabled);
+  ).filter(
+    (el) => !el.disabled && !el.closest('[data-tiger-menu-hidden="true"]')
+  );
 }
 
 function roveFocus(current: HTMLButtonElement, next: HTMLButtonElement) {
@@ -71,16 +78,16 @@ function moveFocus(current: HTMLButtonElement, delta: number) {
   roveFocus(current, items[nextIndex]);
 }
 
-function focusEdge(current: HTMLButtonElement, edge: "start" | "end") {
+function focusEdge(current: HTMLButtonElement, edge: 'start' | 'end') {
   const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null;
   if (!menuEl) return;
   const items = getMenuButtonsWithin(menuEl);
   if (items.length === 0) return;
-  roveFocus(current, edge === "start" ? items[0] : items[items.length - 1]);
+  roveFocus(current, edge === 'start' ? items[0] : items[items.length - 1]);
 }
 
 function focusFirstChildItemFromTitle(titleEl: HTMLButtonElement) {
-  const li = titleEl.closest("li");
+  const li = titleEl.closest('li');
   const submenu = li?.querySelector('ul[role="menu"]') as HTMLElement | null;
   if (!submenu) return;
 
@@ -95,62 +102,97 @@ function focusFirstChildItemFromTitle(titleEl: HTMLButtonElement) {
 
 export const SubMenu: React.FC<SubMenuProps> = ({
   itemKey,
-  title = "",
+  title = '',
   icon,
   disabled = false,
   className,
   level = 0,
   children,
+  collapsed: collapsedOverride,
 }) => {
-  // Get menu context
   const menuContext = useMenuContext();
 
   if (!menuContext) {
-    console.warn("SubMenu must be used within Menu component");
+    console.warn('SubMenu must be used within Menu component');
   }
 
   const [isHovered, setIsHovered] = useState(false);
   const [isOpenByKeyboard, setIsOpenByKeyboard] = useState(false);
 
-  // Check if this submenu is open
+  const effectiveCollapsed =
+    collapsedOverride ?? (menuContext ? menuContext.collapsed : false);
+
+  const isPopup =
+    !!menuContext && menuContext.mode === 'vertical' && effectiveCollapsed;
+
   const isOpen = !!menuContext && isKeyOpen(itemKey, menuContext.openKeys);
 
-  // Determine if submenu should be shown
   const isExpanded =
-    menuContext?.mode === "horizontal" ? isHovered || isOpenByKeyboard : isOpen;
+    menuContext?.mode === 'horizontal' || isPopup
+      ? isHovered || isOpenByKeyboard
+      : isOpen;
 
-  // Submenu title classes
+  const isInlineOrVertical = menuContext?.mode !== 'horizontal' && !isPopup;
+  const [hasRenderedInline, setHasRenderedInline] = useState(() =>
+    isInlineOrVertical ? isExpanded : false
+  );
+
+  useEffect(() => {
+    if (!isInlineOrVertical || !isExpanded || hasRenderedInline) return;
+    setHasRenderedInline(true);
+  }, [hasRenderedInline, isExpanded, isInlineOrVertical]);
+
   const titleClasses = useMemo(() => {
-    if (!menuContext) return "";
-    return classNames(getSubMenuTitleClasses(menuContext.theme, disabled));
+    if (!menuContext) return '';
+    return getSubMenuTitleClasses(menuContext.theme, disabled);
   }, [menuContext, disabled]);
 
-  // Submenu content classes
-  const contentClasses = !menuContext
-    ? ""
-    : menuContext.mode === "horizontal"
-    ? submenuContentHorizontalClasses
-    : submenuContentVerticalClasses;
+  const contentClasses = useMemo(() => {
+    if (!menuContext) return '';
+    if (menuContext.mode === 'horizontal')
+      return submenuContentHorizontalClasses;
+    if (isPopup) return submenuContentPopupClasses;
+    if (menuContext.mode === 'inline') return submenuContentInlineClasses;
+    return submenuContentVerticalClasses;
+  }, [menuContext, isPopup]);
 
-  // Handle title click
   const handleTitleClick = useCallback(() => {
-    if (!disabled && menuContext && menuContext.mode !== "horizontal") {
-      menuContext.handleOpenChange(itemKey);
+    if (!menuContext || disabled) return;
+
+    if (menuContext.mode === 'horizontal') return;
+
+    if (isPopup) {
+      setIsOpenByKeyboard((prev) => !prev);
+      setIsHovered(true);
+      return;
     }
-  }, [disabled, menuContext, itemKey]);
+
+    setHasRenderedInline(true);
+    menuContext.handleOpenChange(itemKey);
+  }, [disabled, menuContext, itemKey, isPopup]);
 
   // Handle mouse enter for horizontal mode
   const handleMouseEnter = useCallback(() => {
-    if (menuContext?.mode === "horizontal") setIsHovered(true);
-  }, [menuContext]);
+    if (menuContext?.mode === 'horizontal' || isPopup) setIsHovered(true);
+  }, [menuContext, isPopup]);
 
   // Handle mouse leave for horizontal mode
   const handleMouseLeave = useCallback(() => {
-    if (menuContext?.mode === "horizontal") {
+    if (menuContext?.mode === 'horizontal' || isPopup) {
       setIsHovered(false);
       setIsOpenByKeyboard(false);
     }
-  }, [menuContext]);
+  }, [menuContext, isPopup]);
+
+  const openInline = useCallback(
+    (titleEl: HTMLButtonElement) => {
+      if (!menuContext) return;
+      setHasRenderedInline(true);
+      menuContext.handleOpenChange(itemKey);
+      setTimeout(() => focusFirstChildItemFromTitle(titleEl), 0);
+    },
+    [menuContext, itemKey]
+  );
 
   const handleTitleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -158,11 +200,11 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
       const current = event.currentTarget;
       const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null;
-      const isRoot = rootMenu?.dataset.tigerMenuRoot === "true";
-      const isHorizontalRoot = isRoot && menuContext.mode === "horizontal";
+      const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true';
+      const isHorizontalRoot = isRoot && menuContext.mode === 'horizontal';
 
-      const nextKey = isHorizontalRoot ? "ArrowRight" : "ArrowDown";
-      const prevKey = isHorizontalRoot ? "ArrowLeft" : "ArrowUp";
+      const nextKey = isHorizontalRoot ? 'ArrowRight' : 'ArrowDown';
+      const prevKey = isHorizontalRoot ? 'ArrowLeft' : 'ArrowUp';
 
       if (event.key === nextKey) {
         event.preventDefault();
@@ -176,20 +218,20 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         return;
       }
 
-      if (event.key === "Home") {
+      if (event.key === 'Home') {
         event.preventDefault();
-        focusEdge(current, "start");
+        focusEdge(current, 'start');
         return;
       }
 
-      if (event.key === "End") {
+      if (event.key === 'End') {
         event.preventDefault();
-        focusEdge(current, "end");
+        focusEdge(current, 'end');
         return;
       }
 
-      if (event.key === "Escape" || event.key === "ArrowLeft") {
-        if (menuContext.mode === "horizontal") {
+      if (event.key === 'Escape' || event.key === 'ArrowLeft') {
+        if (menuContext.mode === 'horizontal' || isPopup) {
           event.preventDefault();
           setIsOpenByKeyboard(false);
           setIsHovered(false);
@@ -203,19 +245,18 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         return;
       }
 
-      if (event.key === "Enter" || event.key === " ") {
+      if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
-        if (menuContext.mode === "horizontal") {
+        if (menuContext.mode === 'horizontal' || isPopup) {
           setIsOpenByKeyboard(true);
           return;
         }
-        menuContext.handleOpenChange(itemKey);
-        setTimeout(() => focusFirstChildItemFromTitle(current), 0);
+        openInline(current);
         return;
       }
 
-      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-        if (menuContext.mode === "horizontal") {
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        if (menuContext.mode === 'horizontal' || isPopup) {
           event.preventDefault();
           setIsOpenByKeyboard(true);
           return;
@@ -223,27 +264,24 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
         if (!isOpen) {
           event.preventDefault();
-          menuContext.handleOpenChange(itemKey);
-          setTimeout(() => focusFirstChildItemFromTitle(current), 0);
+          openInline(current);
         }
       }
     },
-    [menuContext, disabled, isOpen, itemKey]
+    [menuContext, disabled, isOpen, isPopup, openInline]
   );
 
-  // Get indent style for nested menus in inline mode
   const indentStyle =
-    !menuContext || menuContext.mode === "horizontal" || level === 0
+    !menuContext || menuContext.mode === 'horizontal' || level === 0
       ? {}
       : getMenuItemIndent(level, menuContext.inlineIndent);
 
   if (!menuContext) return null;
 
-  // Render icon
   const renderIcon = () => {
     if (!icon) return null;
 
-    if (typeof icon === "string") {
+    if (typeof icon === 'string') {
       return (
         <span
           className={menuItemIconClasses}
@@ -257,14 +295,13 @@ export const SubMenu: React.FC<SubMenuProps> = ({
     );
   };
 
-  // Render title
   const renderTitle = () => {
-    if (!menuContext.collapsed) {
+    if (!effectiveCollapsed) {
       return (
         <>
           {renderIcon()}
           <span className="flex-1">{title}</span>
-          {menuContext.mode !== "horizontal" && (
+          {menuContext.mode !== 'horizontal' && !isPopup && (
             <ExpandIcon expanded={isExpanded} />
           )}
         </>
@@ -281,7 +318,6 @@ export const SubMenu: React.FC<SubMenuProps> = ({
     }
   };
 
-  // Render content based on mode
   const renderContent = () => {
     const nextLevel = level + 1;
     const enhancedChildren = React.Children.map(children, (child) => {
@@ -293,9 +329,10 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         child.type === MenuItemGroup
       ) {
         return React.cloneElement(
-          child as React.ReactElement<{ level?: number }>,
+          child as React.ReactElement<{ level?: number; collapsed?: boolean }>,
           {
             level: nextLevel,
+            collapsed: isPopup ? false : undefined,
           }
         );
       }
@@ -303,38 +340,46 @@ export const SubMenu: React.FC<SubMenuProps> = ({
       return child;
     });
 
-    if (menuContext.mode === "horizontal") {
+    if (menuContext.mode === 'horizontal' || isPopup) {
       return (
         <ul
           className={contentClasses}
-          style={{ display: isExpanded ? "block" : "none" }}
+          style={{ display: isExpanded ? 'block' : 'none' }}
           role="menu"
-          aria-hidden={isExpanded ? undefined : "true"}
-        >
+          aria-hidden={isExpanded ? undefined : 'true'}>
           {enhancedChildren}
         </ul>
       );
     }
 
-    if (!isExpanded) return null;
+    if (!hasRenderedInline) return null;
+
+    const isHidden = !isExpanded;
 
     return (
-      <ul className={contentClasses} role="menu">
-        {enhancedChildren}
-      </ul>
+      <div
+        className={classNames(
+          'grid overflow-hidden transition-[grid-template-rows,opacity] duration-200 ease-in-out',
+          isHidden ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100'
+        )}
+        aria-hidden={isHidden ? 'true' : undefined}
+        data-tiger-menu-hidden={isHidden ? 'true' : undefined}>
+        <ul className={classNames(contentClasses, 'min-h-0')} role="menu">
+          {enhancedChildren}
+        </ul>
+      </div>
     );
   };
 
   return (
     <li
       className={classNames(
-        menuContext.mode === "horizontal" ? "relative" : "",
+        menuContext.mode === 'horizontal' || isPopup ? 'relative' : '',
         className
       )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      role="none"
-    >
+      role="none">
       <button
         type="button"
         className={titleClasses}
@@ -343,12 +388,11 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         onKeyDown={handleTitleKeyDown}
         role="menuitem"
         data-tiger-menuitem="true"
-        aria-expanded={isExpanded ? "true" : "false"}
+        aria-expanded={isExpanded ? 'true' : 'false'}
         aria-haspopup="true"
-        aria-disabled={disabled ? "true" : undefined}
+        aria-disabled={disabled ? 'true' : undefined}
         disabled={disabled}
-        tabIndex={-1}
-      >
+        tabIndex={-1}>
         {renderTitle()}
       </button>
       {renderContent()}

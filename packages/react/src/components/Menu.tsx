@@ -6,14 +6,14 @@ import React, {
   useCallback,
   useEffect,
   useRef,
-} from "react";
+} from 'react';
 import {
   classNames,
   getMenuClasses,
   type MenuMode,
   type MenuTheme,
   type MenuProps as CoreMenuProps,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
 // Menu context interface
 export interface MenuContextValue {
@@ -59,8 +59,8 @@ export interface MenuProps extends CoreMenuProps {
 }
 
 export const Menu: React.FC<MenuProps> = ({
-  mode = "vertical",
-  theme = "light",
+  mode = 'vertical',
+  theme = 'light',
   selectedKeys: controlledSelectedKeys,
   defaultSelectedKeys = [],
   openKeys: controlledOpenKeys,
@@ -172,14 +172,16 @@ export const Menu: React.FC<MenuProps> = ({
       root.querySelectorAll<HTMLButtonElement>(
         'button[data-tiger-menuitem="true"]'
       )
-    ).filter((el) => !el.disabled);
+    ).filter(
+      (el) => !el.disabled && !el.closest('[data-tiger-menu-hidden="true"]')
+    );
 
     if (items.length === 0) return;
 
     const hasActive = items.some((el) => el.tabIndex === 0);
     if (hasActive) return;
 
-    const selected = items.find((el) => el.dataset.tigerSelected === "true");
+    const selected = items.find((el) => el.dataset.tigerSelected === 'true');
     const active = selected ?? items[0];
     items.forEach((el) => {
       el.tabIndex = el === active ? 0 : -1;
@@ -194,8 +196,7 @@ export const Menu: React.FC<MenuProps> = ({
         style={style}
         role="menu"
         data-tiger-menu-root="true"
-        data-tiger-menu-mode={mode}
-      >
+        data-tiger-menu-mode={mode}>
         {children}
       </ul>
     </MenuContext.Provider>

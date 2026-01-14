@@ -24,7 +24,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@demo-shared/*": ["../shared/*"]
+      "@demo-shared/*": ["../shared/*"],
+      "@tigercat/core": ["../../../packages/core/dist/index.d.ts"]
     }
   },
   "include": ["src", "../shared"],
