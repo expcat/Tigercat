@@ -32,7 +32,7 @@
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --external vue",
     "dev": "tsup src/index.ts --format cjs,esm --dts --external vue --watch",
-    "clean": "rm -rf dist"
+    "clean": "node ../../scripts/rimraf.mjs dist"
   },
   "dependencies": {
     "@tigercat/core": "workspace:*"

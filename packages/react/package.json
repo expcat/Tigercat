@@ -31,7 +31,7 @@
   "scripts": {
     "build": "tsup src/index.tsx --format cjs,esm --dts --external react --external react-dom --external react-dom/client",
     "dev": "tsup src/index.tsx --format cjs,esm --dts --external react --external react-dom --external react-dom/client --watch",
-    "clean": "rm -rf dist"
+    "clean": "node ../../scripts/rimraf.mjs dist"
   },
   "dependencies": {
     "@tigercat/core": "workspace:*"
