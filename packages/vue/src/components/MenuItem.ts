@@ -1,4 +1,4 @@
-import { defineComponent, computed, inject, h, PropType } from "vue";
+import { defineComponent, computed, inject, h, PropType } from 'vue';
 import {
   classNames,
   coerceClassValue,
@@ -7,20 +7,21 @@ import {
   isKeySelected,
   menuItemIconClasses,
   mergeStyleValues,
-} from "@tigercat/core";
-import { MenuContextKey, type MenuContext } from "./Menu";
+} from '@tigercat/core';
+import { MenuContextKey, type MenuContext } from './Menu';
 
 export interface VueMenuItemProps {
   itemKey: string | number;
   disabled?: boolean;
   icon?: unknown;
   level?: number;
+  collapsed?: boolean;
   className?: string;
   style?: Record<string, string | number>;
 }
 
 export const MenuItem = defineComponent({
-  name: "TigerMenuItem",
+  name: 'TigerMenuItem',
   props: {
     /**
      * Unique key for the menu item
@@ -46,6 +47,10 @@ export const MenuItem = defineComponent({
       type: Number,
       default: 0,
     },
+    collapsed: {
+      type: Boolean,
+      default: undefined,
+    },
     className: {
       type: String,
       default: undefined,
@@ -61,7 +66,7 @@ export const MenuItem = defineComponent({
     const menuContext = inject<MenuContext>(MenuContextKey);
 
     if (!menuContext) {
-      console.warn("MenuItem must be used within Menu component");
+      console.warn('MenuItem must be used within Menu component');
     }
 
     // Check if this item is selected
@@ -74,16 +79,19 @@ export const MenuItem = defineComponent({
     const itemClasses = computed(() => {
       if (!menuContext) {
         return classNames(
-          "flex items-center px-4 py-2 cursor-pointer transition-colors duration-200"
+          'flex items-center px-4 py-2 cursor-pointer transition-colors duration-200'
         );
       }
+
+      const effectiveCollapsed =
+        props.collapsed ?? (menuContext ? menuContext.collapsed : false);
 
       return classNames(
         getMenuItemClasses(
           isSelected.value,
           props.disabled,
           menuContext.theme,
-          menuContext.collapsed
+          effectiveCollapsed
         ),
         props.className,
         coerceClassValue(attrs.class)
@@ -91,7 +99,7 @@ export const MenuItem = defineComponent({
     });
 
     const indentStyle = computed(() => {
-      if (!menuContext || menuContext.mode !== "inline" || props.level === 0) {
+      if (!menuContext || menuContext.mode !== 'inline' || props.level === 0) {
         return {};
       }
       return getMenuItemIndent(props.level, menuContext.inlineIndent);
@@ -145,23 +153,23 @@ export const MenuItem = defineComponent({
       roveFocus(current, items[nextIndex]);
     };
 
-    const focusEdge = (current: HTMLButtonElement, edge: "start" | "end") => {
+    const focusEdge = (current: HTMLButtonElement, edge: 'start' | 'end') => {
       const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null;
       if (!menuEl) return;
       const items = getMenuButtonsWithin(menuEl);
       if (items.length === 0) return;
-      roveFocus(current, edge === "start" ? items[0] : items[items.length - 1]);
+      roveFocus(current, edge === 'start' ? items[0] : items[items.length - 1]);
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!menuContext) return;
       const current = event.currentTarget as HTMLButtonElement;
       const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null;
-      const isRoot = rootMenu?.dataset.tigerMenuRoot === "true";
-      const isHorizontalRoot = isRoot && menuContext.mode === "horizontal";
+      const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true';
+      const isHorizontalRoot = isRoot && menuContext.mode === 'horizontal';
 
-      const nextKey = isHorizontalRoot ? "ArrowRight" : "ArrowDown";
-      const prevKey = isHorizontalRoot ? "ArrowLeft" : "ArrowUp";
+      const nextKey = isHorizontalRoot ? 'ArrowRight' : 'ArrowDown';
+      const prevKey = isHorizontalRoot ? 'ArrowLeft' : 'ArrowUp';
 
       if (event.key === nextKey) {
         event.preventDefault();
@@ -175,19 +183,19 @@ export const MenuItem = defineComponent({
         return;
       }
 
-      if (event.key === "Home") {
+      if (event.key === 'Home') {
         event.preventDefault();
-        focusEdge(current, "start");
+        focusEdge(current, 'start');
         return;
       }
 
-      if (event.key === "End") {
+      if (event.key === 'End') {
         event.preventDefault();
-        focusEdge(current, "end");
+        focusEdge(current, 'end');
         return;
       }
 
-      if (event.key === "Enter" || event.key === " ") {
+      if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
         handleClick();
       }
@@ -197,34 +205,37 @@ export const MenuItem = defineComponent({
       const children = [];
       type HChildren = Parameters<typeof h>[2];
 
+      const effectiveCollapsed =
+        props.collapsed ?? (menuContext ? menuContext.collapsed : false);
+
       // Render icon if provided
       if (props.icon) {
-        if (typeof props.icon === "string") {
+        if (typeof props.icon === 'string') {
           children.push(
-            h("span", {
+            h('span', {
               class: menuItemIconClasses,
               innerHTML: props.icon,
             })
           );
         } else {
           children.push(
-            h("span", { class: menuItemIconClasses }, props.icon as HChildren)
+            h('span', { class: menuItemIconClasses }, props.icon as HChildren)
           );
         }
       }
 
       // Render label (slot content)
-      if (!menuContext?.collapsed && slots.default) {
-        children.push(h("span", { class: "flex-1" }, slots.default()));
-      } else if (menuContext?.collapsed && !props.icon && slots.default) {
+      if (!effectiveCollapsed && slots.default) {
+        children.push(h('span', { class: 'flex-1' }, slots.default()));
+      } else if (effectiveCollapsed && !props.icon && slots.default) {
         // Show first letter when collapsed without icon
         const defaultSlot = slots.default();
         if (defaultSlot && defaultSlot.length > 0) {
-          const text = String(defaultSlot[0].children || "");
+          const text = String(defaultSlot[0].children || '');
           children.push(
             h(
-              "span",
-              { class: "flex-1 text-center" },
+              'span',
+              { class: 'flex-1 text-center' },
               text.charAt(0).toUpperCase()
             )
           );
@@ -232,22 +243,22 @@ export const MenuItem = defineComponent({
       }
 
       return h(
-        "li",
+        'li',
         {
-          role: "none",
+          role: 'none',
         },
         [
           h(
-            "button",
+            'button',
             {
-              type: "button",
+              type: 'button',
               class: itemClasses.value,
               style: itemStyle.value,
-              role: "menuitem",
-              "data-tiger-menuitem": "true",
-              "data-tiger-selected": isSelected.value ? "true" : "false",
-              "aria-current": isSelected.value ? "page" : undefined,
-              "aria-disabled": props.disabled ? "true" : undefined,
+              role: 'menuitem',
+              'data-tiger-menuitem': 'true',
+              'data-tiger-selected': isSelected.value ? 'true' : 'false',
+              'aria-current': isSelected.value ? 'page' : undefined,
+              'aria-disabled': props.disabled ? 'true' : undefined,
               disabled: props.disabled,
               tabindex: -1,
               onClick: handleClick,

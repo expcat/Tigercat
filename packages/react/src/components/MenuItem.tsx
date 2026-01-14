@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback } from 'react';
 import {
   classNames,
   getMenuItemClasses,
@@ -6,8 +6,8 @@ import {
   isKeySelected,
   menuItemIconClasses,
   type MenuItemProps as CoreMenuItemProps,
-} from "@tigercat/core";
-import { useMenuContext } from "./Menu";
+} from '@tigercat/core';
+import { useMenuContext } from './Menu';
 
 export interface MenuItemProps extends CoreMenuItemProps {
   /**
@@ -19,6 +19,11 @@ export interface MenuItemProps extends CoreMenuItemProps {
    * Nesting level (internal use for indentation)
    */
   level?: number;
+
+  /**
+   * Internal override for collapsed rendering (used by SubMenu popup)
+   */
+  collapsed?: boolean;
 }
 
 function getMenuButtonsWithin(menuEl: HTMLElement): HTMLButtonElement[] {
@@ -54,12 +59,12 @@ function moveFocus(current: HTMLButtonElement, delta: number) {
   roveFocus(current, items[nextIndex]);
 }
 
-function focusEdge(current: HTMLButtonElement, edge: "start" | "end") {
+function focusEdge(current: HTMLButtonElement, edge: 'start' | 'end') {
   const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null;
   if (!menuEl) return;
   const items = getMenuButtonsWithin(menuEl);
   if (items.length === 0) return;
-  roveFocus(current, edge === "start" ? items[0] : items[items.length - 1]);
+  roveFocus(current, edge === 'start' ? items[0] : items[items.length - 1]);
 }
 
 export const MenuItem: React.FC<MenuItemProps> = ({
@@ -69,37 +74,37 @@ export const MenuItem: React.FC<MenuItemProps> = ({
   className,
   children,
   level = 0,
+  collapsed: collapsedOverride,
 }) => {
-  // Get menu context
   const menuContext = useMenuContext();
 
   if (!menuContext) {
-    console.warn("MenuItem must be used within Menu component");
+    console.warn('MenuItem must be used within Menu component');
   }
 
-  // Check if this item is selected
   const isSelected =
     !!menuContext && isKeySelected(itemKey, menuContext.selectedKeys);
 
-  // Menu item classes
+  const effectiveCollapsed =
+    collapsedOverride ?? (menuContext ? menuContext.collapsed : false);
+
   const itemClasses = classNames(
     menuContext
       ? getMenuItemClasses(
           isSelected,
           disabled,
           menuContext.theme,
-          menuContext.collapsed
+          effectiveCollapsed
         )
-      : "flex items-center px-4 py-2 cursor-pointer transition-colors duration-200",
+      : 'flex items-center px-4 py-2 cursor-pointer transition-colors duration-200',
     className
   );
 
   const indentStyle: React.CSSProperties =
-    menuContext && menuContext.mode === "inline" && level > 0
+    menuContext && menuContext.mode === 'inline' && level > 0
       ? getMenuItemIndent(level, menuContext.inlineIndent)
       : {};
 
-  // Handle click
   const handleClick = useCallback(() => {
     if (!disabled && menuContext) {
       menuContext.handleSelect(itemKey);
@@ -111,11 +116,11 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       if (!menuContext) return;
       const current = event.currentTarget;
       const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null;
-      const isRoot = rootMenu?.dataset.tigerMenuRoot === "true";
+      const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true';
 
-      const isHorizontalRoot = isRoot && menuContext.mode === "horizontal";
-      const nextKey = isHorizontalRoot ? "ArrowRight" : "ArrowDown";
-      const prevKey = isHorizontalRoot ? "ArrowLeft" : "ArrowUp";
+      const isHorizontalRoot = isRoot && menuContext.mode === 'horizontal';
+      const nextKey = isHorizontalRoot ? 'ArrowRight' : 'ArrowDown';
+      const prevKey = isHorizontalRoot ? 'ArrowLeft' : 'ArrowUp';
 
       if (event.key === nextKey) {
         event.preventDefault();
@@ -129,19 +134,19 @@ export const MenuItem: React.FC<MenuItemProps> = ({
         return;
       }
 
-      if (event.key === "Home") {
+      if (event.key === 'Home') {
         event.preventDefault();
-        focusEdge(current, "start");
+        focusEdge(current, 'start');
         return;
       }
 
-      if (event.key === "End") {
+      if (event.key === 'End') {
         event.preventDefault();
-        focusEdge(current, "end");
+        focusEdge(current, 'end');
         return;
       }
 
-      if (event.key === "Enter" || event.key === " ") {
+      if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
         handleClick();
       }
@@ -149,11 +154,10 @@ export const MenuItem: React.FC<MenuItemProps> = ({
     [menuContext, handleClick]
   );
 
-  // Render icon
   const renderIcon = () => {
     if (!icon) return null;
 
-    if (typeof icon === "string") {
+    if (typeof icon === 'string') {
       return (
         <span
           className={menuItemIconClasses}
@@ -167,13 +171,10 @@ export const MenuItem: React.FC<MenuItemProps> = ({
     );
   };
 
-  // Render label
   const renderLabel = () => {
-    if (!menuContext?.collapsed) {
-      return <span className="flex-1">{children}</span>;
-    } else if (!icon) {
-      // Show first letter when collapsed without icon
-      const text = String(children || "");
+    if (!effectiveCollapsed) return <span className="flex-1">{children}</span>;
+    if (!icon) {
+      const text = String(children || '');
       return (
         <span className="flex-1 text-center">
           {text.charAt(0).toUpperCase()}
@@ -191,14 +192,13 @@ export const MenuItem: React.FC<MenuItemProps> = ({
         style={indentStyle}
         role="menuitem"
         data-tiger-menuitem="true"
-        data-tiger-selected={isSelected ? "true" : "false"}
-        aria-current={isSelected ? "page" : undefined}
-        aria-disabled={disabled ? "true" : undefined}
+        data-tiger-selected={isSelected ? 'true' : 'false'}
+        aria-current={isSelected ? 'page' : undefined}
+        aria-disabled={disabled ? 'true' : undefined}
         disabled={disabled}
         tabIndex={-1}
         onClick={handleClick}
-        onKeyDown={handleKeyDown}
-      >
+        onKeyDown={handleKeyDown}>
         {renderIcon()}
         {renderLabel()}
       </button>
