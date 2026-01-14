@@ -3,7 +3,7 @@ import { computed, nextTick, onMounted, provide, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { DemoLang } from '@demo-shared/app-config'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
-import { ConfigProvider } from '@tigercat/vue'
+import { ConfigProvider, Link } from '@tigercat/vue'
 import { getStoredLang, setStoredLang } from '@demo-shared/prefs'
 import AppHeader from '../components/AppHeader.vue'
 import AppSider from '../components/AppSider.vue'
@@ -135,13 +135,16 @@ watch(
                                     </div>
                                     <div v-if="sections.length > 0"
                                          class="flex items-center gap-2 flex-wrap justify-end">
-                                        <a v-for="s in sections"
-                                           :key="s.id"
-                                           :href="`#${s.id}`"
-                                           @click.prevent="scrollToSection(s.id)"
-                                           class="text-sm px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800">
+                                        <Link v-for="s in sections"
+                                              :key="s.id"
+                                              :href="`#${s.id}`"
+                                              :underline="false"
+                                              variant="default"
+                                              size="sm"
+                                              @click.prevent="scrollToSection(s.id)"
+                                              class="text-sm px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800">
                                             {{ s.label }}
-                                        </a>
+                                        </Link>
                                     </div>
                                 </div>
                             </div>

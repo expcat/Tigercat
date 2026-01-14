@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { notification, Divider } from '@tigercat/vue'
+import { notification, Divider, Button } from '@tigercat/vue'
 import { ref } from 'vue'
 
 const closeNotificationRef = ref<(() => void) | null>(null)
@@ -132,9 +132,9 @@ const simulateRequest = async () => {
     description: '正在处理您的请求...',
     duration: 0,
   })
-  
+
   await new Promise(resolve => setTimeout(resolve, 3000))
-  
+
   close()
   notification.success({
     title: '请求成功',
@@ -167,19 +167,19 @@ const showNotificationWithCallback = () => {
 
 // 清空通知
 const showMultipleNotifications = () => {
-  notification.info({ 
+  notification.info({
     title: '通知 1',
     description: '第一条通知',
     position: 'top-right',
   })
-  
-  notification.success({ 
+
+  notification.success({
     title: '通知 2',
     description: '第二条通知',
     position: 'top-left',
   })
-  
-  notification.warning({ 
+
+  notification.warning({
     title: '通知 3',
     description: '第三条通知',
     position: 'bottom-right',
@@ -225,30 +225,22 @@ const quickError = () => {
     <div>
       <h2 class="text-lg font-semibold mb-4">基本类型</h2>
       <div class="flex flex-wrap gap-2">
-        <button 
-          @click="showInfo"
-          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
+        <Button @click="showInfo"
+                class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
           信息
-        </button>
-        <button 
-          @click="showSuccess"
-          class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-        >
+        </Button>
+        <Button @click="showSuccess"
+                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
           成功
-        </button>
-        <button 
-          @click="showWarning"
-          class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-        >
+        </Button>
+        <Button @click="showWarning"
+                class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
           警告
-        </button>
-        <button 
-          @click="showError"
-          class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-        >
+        </Button>
+        <Button @click="showError"
+                class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
           错误
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -258,30 +250,22 @@ const quickError = () => {
     <div>
       <h2 class="text-lg font-semibold mb-4">不同位置</h2>
       <div class="flex flex-wrap gap-2">
-        <button 
-          @click="showTopLeft"
-          class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
-        >
+        <Button @click="showTopLeft"
+                class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
           左上角
-        </button>
-        <button 
-          @click="showTopRight"
-          class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
-        >
+        </Button>
+        <Button @click="showTopRight"
+                class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
           右上角
-        </button>
-        <button 
-          @click="showBottomLeft"
-          class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
-        >
+        </Button>
+        <Button @click="showBottomLeft"
+                class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
           左下角
-        </button>
-        <button 
-          @click="showBottomRight"
-          class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
-        >
+        </Button>
+        <Button @click="showBottomRight"
+                class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
           右下角
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -291,24 +275,18 @@ const quickError = () => {
     <div>
       <h2 class="text-lg font-semibold mb-4">自定义持续时间</h2>
       <div class="flex flex-wrap gap-2">
-        <button 
-          @click="showShortNotification"
-          class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
-        >
+        <Button @click="showShortNotification"
+                class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
           短时间（2秒）
-        </button>
-        <button 
-          @click="showLongNotification"
-          class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
-        >
+        </Button>
+        <Button @click="showLongNotification"
+                class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
           长时间（10秒）
-        </button>
-        <button 
-          @click="showPersistentNotification"
-          class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
-        >
+        </Button>
+        <Button @click="showPersistentNotification"
+                class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
           不自动关闭
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -318,18 +296,14 @@ const quickError = () => {
     <div>
       <h2 class="text-lg font-semibold mb-4">可关闭性</h2>
       <div class="flex flex-wrap gap-2">
-        <button 
-          @click="showClosableNotification"
-          class="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600"
-        >
+        <Button @click="showClosableNotification"
+                class="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600">
           可关闭
-        </button>
-        <button 
-          @click="showNonClosableNotification"
-          class="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600"
-        >
+        </Button>
+        <Button @click="showNonClosableNotification"
+                class="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600">
           不可关闭
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -339,24 +313,18 @@ const quickError = () => {
     <div>
       <h2 class="text-lg font-semibold mb-4">手动控制</h2>
       <div class="flex flex-wrap gap-2">
-        <button 
-          @click="showNotification"
-          class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
-        >
+        <Button @click="showNotification"
+                class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
           显示通知
-        </button>
-        <button 
-          @click="closeManually"
-          class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
-        >
+        </Button>
+        <Button @click="closeManually"
+                class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
           手动关闭
-        </button>
-        <button 
-          @click="simulateRequest"
-          class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
-        >
+        </Button>
+        <Button @click="simulateRequest"
+                class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
           模拟请求
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -366,18 +334,14 @@ const quickError = () => {
     <div>
       <h2 class="text-lg font-semibold mb-4">点击和回调</h2>
       <div class="flex flex-wrap gap-2">
-        <button 
-          @click="showClickableNotification"
-          class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600"
-        >
+        <Button @click="showClickableNotification"
+                class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600">
           可点击通知
-        </button>
-        <button 
-          @click="showNotificationWithCallback"
-          class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600"
-        >
+        </Button>
+        <Button @click="showNotificationWithCallback"
+                class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600">
           带回调通知
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -387,24 +351,18 @@ const quickError = () => {
     <div>
       <h2 class="text-lg font-semibold mb-4">清空通知</h2>
       <div class="flex flex-wrap gap-2">
-        <button 
-          @click="showMultipleNotifications"
-          class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-        >
+        <Button @click="showMultipleNotifications"
+                class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
           显示多条通知
-        </button>
-        <button 
-          @click="clearAll"
-          class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-        >
+        </Button>
+        <Button @click="clearAll"
+                class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
           清空所有
-        </button>
-        <button 
-          @click="clearTopRight"
-          class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-        >
+        </Button>
+        <Button @click="clearTopRight"
+                class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
           清空右上角
-        </button>
+        </Button>
       </div>
     </div>
 
@@ -414,30 +372,22 @@ const quickError = () => {
     <div>
       <h2 class="text-lg font-semibold mb-4">快速使用（仅标题）</h2>
       <div class="flex flex-wrap gap-2">
-        <button 
-          @click="quickInfo"
-          class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
-        >
+        <Button @click="quickInfo"
+                class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600">
           快速信息
-        </button>
-        <button 
-          @click="quickSuccess"
-          class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
-        >
+        </Button>
+        <Button @click="quickSuccess"
+                class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600">
           快速成功
-        </button>
-        <button 
-          @click="quickWarning"
-          class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
-        >
+        </Button>
+        <Button @click="quickWarning"
+                class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600">
           快速警告
-        </button>
-        <button 
-          @click="quickError"
-          class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600"
-        >
+        </Button>
+        <Button @click="quickError"
+                class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600">
           快速错误
-        </button>
+        </Button>
       </div>
     </div>
   </div>

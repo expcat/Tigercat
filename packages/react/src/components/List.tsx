@@ -1,4 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState } from 'react';
+import { Button } from './Button';
+import { Select } from './Select';
 import {
   classNames,
   getListClasses,
@@ -26,9 +28,9 @@ import {
   type ListItemLayout,
   type ListItem,
   type ListPaginationConfig,
-} from "@tigercat/core";
+} from '@tigercat/core';
 
-const spinnerSvg = getSpinnerSVG("spinner");
+const spinnerSvg = getSpinnerSVG('spinner');
 
 // Loading spinner component
 const LoadingSpinner: React.FC = () => (
@@ -36,21 +38,21 @@ const LoadingSpinner: React.FC = () => (
     className={getLoadingOverlaySpinnerClasses()}
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
-    viewBox={spinnerSvg.viewBox}
-  >
+    viewBox={spinnerSvg.viewBox}>
     {spinnerSvg.elements.map((el, index) => {
-      if (el.type === "circle") return <circle key={index} {...el.attrs} />;
-      if (el.type === "path") return <path key={index} {...el.attrs} />;
+      if (el.type === 'circle') return <circle key={index} {...el.attrs} />;
+      if (el.type === 'path') return <path key={index} {...el.attrs} />;
       return null;
     })}
   </svg>
 );
 
-export interface ListProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ListProps<T extends ListItem = ListItem>
+  extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * List data source
    */
-  dataSource?: ListItem[];
+  dataSource?: T[];
   /**
    * List size
    * @default 'md'
@@ -110,7 +112,7 @@ export interface ListProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Function to get item key
    */
-  rowKey?: string | ((item: ListItem, index: number) => string | number);
+  rowKey?: string | ((item: T, index: number) => string | number);
   /**
    * Whether items are hoverable
    * @default false
@@ -119,11 +121,11 @@ export interface ListProps extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * Custom render function for list items
    */
-  renderItem?: (item: ListItem, index: number) => React.ReactNode;
+  renderItem?: (item: T, index: number) => React.ReactNode;
   /**
    * Item click handler
    */
-  onItemClick?: (item: ListItem, index: number) => void;
+  onItemClick?: (item: T, index: number) => void;
   /**
    * Page change handler
    */
@@ -131,32 +133,32 @@ export interface ListProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-export const List: React.FC<ListProps> = ({
+export const List = <T extends ListItem = ListItem>({
   dataSource = [],
-  size = "md",
-  bordered = "divided",
+  size = 'md',
+  bordered = 'divided',
   loading = false,
-  emptyText = "No data",
+  emptyText = 'No data',
   split = true,
-  itemLayout = "horizontal",
+  itemLayout = 'horizontal',
   header,
   footer,
   pagination = false,
   grid,
-  rowKey = "key",
+  rowKey = 'key',
   hoverable = false,
   renderItem,
   onItemClick,
   onPageChange,
   className,
   ...divProps
-}) => {
+}: ListProps<T>) => {
   const [currentPage, setCurrentPage] = useState(
-    pagination && typeof pagination === "object" ? pagination.current || 1 : 1
+    pagination && typeof pagination === 'object' ? pagination.current || 1 : 1
   );
 
   const [currentPageSize, setCurrentPageSize] = useState(
-    pagination && typeof pagination === "object"
+    pagination && typeof pagination === 'object'
       ? pagination.pageSize || 10
       : 10
   );
@@ -191,7 +193,7 @@ export const List: React.FC<ListProps> = ({
 
   // Grid classes
   const gridClasses = useMemo(() => {
-    if (!grid) return "";
+    if (!grid) return '';
 
     return classNames(
       listGridContainerClasses,
@@ -218,12 +220,12 @@ export const List: React.FC<ListProps> = ({
     onPageChange?.({ current: 1, pageSize });
   };
 
-  const handleItemClick = (item: ListItem, index: number) => {
+  const handleItemClick = (item: T, index: number) => {
     onItemClick?.(item, index);
   };
 
-  const getItemKey = (item: ListItem, index: number): string | number => {
-    if (typeof rowKey === "function") {
+  const getItemKey = (item: T, index: number): string | number => {
+    if (typeof rowKey === 'function') {
       return rowKey(item, index);
     }
     return (item[rowKey] as string | number) || index;
@@ -245,7 +247,7 @@ export const List: React.FC<ListProps> = ({
     );
   };
 
-  const renderDefaultListItem = (item: ListItem, _index: number) => {
+  const renderDefaultListItem = (item: T, _index: number) => {
     const itemContent: React.ReactNode[] = [];
 
     // Meta section (avatar + content)
@@ -254,10 +256,10 @@ export const List: React.FC<ListProps> = ({
     if (item.avatar) {
       metaContent.push(
         <div key="avatar" className={listItemAvatarClasses}>
-          {typeof item.avatar === "string" ? (
+          {typeof item.avatar === 'string' ? (
             <img
               src={item.avatar}
-              alt={item.title || "Avatar"}
+              alt={item.title || 'Avatar'}
               className="w-10 h-10 rounded-full object-cover"
             />
           ) : (
@@ -311,22 +313,22 @@ export const List: React.FC<ListProps> = ({
     return itemContent;
   };
 
-  const renderListItem = (item: ListItem, index: number) => {
+  const renderListItem = (item: T, index: number) => {
     const key = getItemKey(item, index);
     const itemClasses = getListItemClasses(
       size,
       itemLayout,
-      split && bordered === "divided" && !grid,
+      split && bordered === 'divided' && !grid,
       hoverable
     );
 
-    const clickable = typeof onItemClick === "function";
+    const clickable = typeof onItemClick === 'function';
     const handleClick = clickable
       ? () => handleItemClick(item, index)
       : undefined;
     const handleKeyDown = clickable
       ? (e: React.KeyboardEvent<HTMLDivElement>) => {
-          if (e.key === "Enter" || e.key === " ") {
+          if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             handleItemClick(item, index);
           }
@@ -336,12 +338,11 @@ export const List: React.FC<ListProps> = ({
     return (
       <div
         key={key}
-        className={classNames(itemClasses, clickable && "cursor-pointer")}
+        className={classNames(itemClasses, clickable && 'cursor-pointer')}
         role="listitem"
         tabIndex={clickable ? 0 : undefined}
         onClick={handleClick}
-        onKeyDown={handleKeyDown}
-      >
+        onKeyDown={handleKeyDown}>
         {renderItem
           ? renderItem(item, index)
           : renderDefaultListItem(item, index)}
@@ -373,8 +374,7 @@ export const List: React.FC<ListProps> = ({
           className={gridClasses}
           style={
             gutter ? ({ gap: `${gutter}px` } as React.CSSProperties) : undefined
-          }
-        >
+          }>
           {items}
         </div>
       );
@@ -408,36 +408,39 @@ export const List: React.FC<ListProps> = ({
         <div className="flex items-center gap-2">
           {/* Page size selector */}
           {paginationConfig.showSizeChanger !== false && (
-            <select
-              className="px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)]"
+            <Select
+              size="sm"
               value={currentPageSize}
-              onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-            >
-              {(paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map(
-                (size) => (
-                  <option key={size} value={size}>
-                    {size} / page
-                  </option>
-                )
-              )}
-            </select>
+              onChange={(value) => {
+                if (value == null) return;
+                const nextSize =
+                  typeof value === 'number' ? value : Number(value);
+                if (!Number.isFinite(nextSize)) return;
+                handlePageSizeChange(nextSize);
+              }}
+              options={(
+                paginationConfig.pageSizeOptions || [10, 20, 50, 100]
+              ).map((size) => ({
+                label: `${size} / page`,
+                value: size,
+              }))}
+            />
           )}
 
           {/* Page buttons */}
           <div className="flex gap-1">
             {/* Previous button */}
-            <button
-              className={classNames(
-                "px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]",
-                hasPrev
-                  ? "hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]"
-                  : "text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed"
-              )}
+            <Button
+              size="sm"
+              variant="outline"
               disabled={!hasPrev}
               onClick={() => handlePageChange(currentPage - 1)}
-            >
+              className={classNames(
+                !hasPrev && 'cursor-not-allowed',
+                hasPrev && 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
+              )}>
               Previous
-            </button>
+            </Button>
 
             {/* Current page indicator */}
             <span className="px-3 py-1 text-sm text-[var(--tiger-text,#111827)]">
@@ -445,18 +448,17 @@ export const List: React.FC<ListProps> = ({
             </span>
 
             {/* Next button */}
-            <button
-              className={classNames(
-                "px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]",
-                hasNext
-                  ? "hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]"
-                  : "text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed"
-              )}
+            <Button
+              size="sm"
+              variant="outline"
               disabled={!hasNext}
               onClick={() => handlePageChange(currentPage + 1)}
-            >
+              className={classNames(
+                !hasNext && 'cursor-not-allowed',
+                hasNext && 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
+              )}>
               Next
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -470,8 +472,7 @@ export const List: React.FC<ListProps> = ({
           {...divProps}
           className={listClasses}
           role="list"
-          aria-busy={loading || undefined}
-        >
+          aria-busy={loading || undefined}>
           {renderListHeader()}
           {renderListItems()}
           {renderListFooter()}
@@ -482,8 +483,7 @@ export const List: React.FC<ListProps> = ({
           <div
             className={listLoadingOverlayClasses}
             role="status"
-            aria-live="polite"
-          >
+            aria-live="polite">
             <LoadingSpinner />
           </div>
         )}
