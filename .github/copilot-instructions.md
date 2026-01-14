@@ -129,39 +129,37 @@ pnpm clean
 ### Vue 组件骨架（`.ts`，defineComponent + render）
 
 ```ts
-import { defineComponent, h, computed, PropType } from 'vue';
-import { classNames, coerceClassValue } from '@tigercat/core';
+import { defineComponent, h, computed, PropType } from 'vue'
+import { classNames, coerceClassValue } from '@tigercat/core'
 
 export const MyComponent = defineComponent({
   name: 'TigerMyComponent',
   props: {
     variant: {
       type: String as PropType<'primary' | 'secondary'>,
-      default: 'primary',
-    },
+      default: 'primary'
+    }
   },
   emits: ['change'],
   setup(props, { emit, slots, attrs }) {
-    const classes = computed(() =>
-      classNames('...', coerceClassValue(attrs.class))
-    );
-    return () => h('div', { class: classes.value }, slots.default?.());
-  },
-});
+    const classes = computed(() => classNames('...', coerceClassValue(attrs.class)))
+    return () => h('div', { class: classes.value }, slots.default?.())
+  }
+})
 
-export default MyComponent;
+export default MyComponent
 ```
 
 ### React 组件骨架（`.tsx`，FC）
 
 ```tsx
-import React, { useMemo } from 'react';
-import { classNames } from '@tigercat/core';
+import React, { useMemo } from 'react'
+import { classNames } from '@tigercat/core'
 
 export interface MyComponentProps {
-  variant?: 'primary' | 'secondary';
-  className?: string;
-  children?: React.ReactNode;
+  variant?: 'primary' | 'secondary'
+  className?: string
+  children?: React.ReactNode
 }
 
 export const MyComponent: React.FC<MyComponentProps> = ({
@@ -173,14 +171,14 @@ export const MyComponent: React.FC<MyComponentProps> = ({
   const classes = useMemo(
     () => classNames('...', variant === 'primary' && '...', className),
     [variant, className]
-  );
+  )
 
   return (
     <div className={classes} {...props}>
       {children}
     </div>
-  );
-};
+  )
+}
 ```
 
 ## 维护文档（何时更新）

@@ -130,6 +130,12 @@ pnpm --filter @tigercat-example/react preview
 # Run ESLint
 pnpm lint
 
+# Format code with Prettier (repo source of truth: .prettierrc.json + .editorconfig)
+pnpm format
+
+# Check formatting (CI-friendly)
+pnpm format:check
+
 # Clean up build artifacts and node_modules
 pnpm clean
 ```
@@ -200,9 +206,9 @@ Packages are built in dependency order:
    ```typescript
    // Example: packages/core/src/types/badge.ts
    export interface BadgeProps {
-     variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
-     size?: 'sm' | 'md' | 'lg';
-     rounded?: boolean;
+     variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger'
+     size?: 'sm' | 'md' | 'lg'
+     rounded?: boolean
    }
    ```
 
@@ -215,17 +221,17 @@ Packages are built in dependency order:
 
    ```vue
    <script setup lang="ts">
-   import { computed } from 'vue';
-   import type { YourComponentProps } from '@tigercat/core';
+  import { computed } from 'vue'
+  import type { YourComponentProps } from '@tigercat/core'
 
    const props = withDefaults(defineProps<YourComponentProps>(), {
      variant: 'primary',
-     size: 'md',
-   });
+     size: 'md'
+   })
 
    const emit = defineEmits<{
-     click: [event: MouseEvent];
-   }>();
+     click: [event: MouseEvent]
+   }>()
    </script>
 
    <template>
@@ -238,8 +244,8 @@ Packages are built in dependency order:
    Export in `packages/vue/src/index.ts`:
 
    ```typescript
-   export { default as YourComponent } from './components/YourComponent.vue';
-   export type { YourComponentProps } from '@tigercat/core';
+  export { default as YourComponent } from './components/YourComponent.vue'
+  export type { YourComponentProps } from '@tigercat/core'
    ```
 
 4. **Implement React Component**
@@ -250,8 +256,8 @@ Packages are built in dependency order:
    ```
 
    ```typescript
-   import React from 'react';
-   import type { YourComponentProps } from '@tigercat/core';
+  import React from 'react'
+  import type { YourComponentProps } from '@tigercat/core'
 
    export const YourComponent: React.FC<YourComponentProps> = ({
      variant = 'primary',
@@ -264,15 +270,15 @@ Packages are built in dependency order:
        <div onClick={onClick} {...props}>
          {children}
        </div>
-     );
-   };
+     )
+   }
    ```
 
    Export in `packages/react/src/index.tsx`:
 
    ```typescript
-   export { YourComponent } from './components/YourComponent';
-   export type { YourComponentProps } from '@tigercat/core';
+  export { YourComponent } from './components/YourComponent'
+  export type { YourComponentProps } from '@tigercat/core'
    ```
 
 5. **Write Tests**
