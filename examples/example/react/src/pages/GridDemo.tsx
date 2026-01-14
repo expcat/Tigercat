@@ -120,33 +120,35 @@ const GridDemo: React.FC = () => {
                 <p className="text-sm text-gray-600 mb-2">
                   gutter: [16, 16]（水平+垂直）
                 </p>
-                <Row gutter={[16, 16]}>
-                  <Col span={12}>
-                    <div className="bg-indigo-500 text-white p-4 rounded text-center">
-                      col-12
-                    </div>
-                  </Col>
-                  <Col span={12}>
-                    <div className="bg-indigo-400 text-white p-4 rounded text-center">
-                      col-12
-                    </div>
-                  </Col>
-                  <Col span={8}>
-                    <div className="bg-indigo-500 text-white p-4 rounded text-center">
-                      col-8
-                    </div>
-                  </Col>
-                  <Col span={8}>
-                    <div className="bg-indigo-400 text-white p-4 rounded text-center">
-                      col-8
-                    </div>
-                  </Col>
-                  <Col span={8}>
-                    <div className="bg-indigo-300 text-white p-4 rounded text-center">
-                      col-8
-                    </div>
-                  </Col>
-                </Row>
+                <div className="py-2">
+                  <Row gutter={[16, 16]}>
+                    <Col span={12}>
+                      <div className="bg-indigo-500 text-white p-4 rounded text-center">
+                        col-12
+                      </div>
+                    </Col>
+                    <Col span={12}>
+                      <div className="bg-indigo-400 text-white p-4 rounded text-center">
+                        col-12
+                      </div>
+                    </Col>
+                    <Col span={8}>
+                      <div className="bg-indigo-500 text-white p-4 rounded text-center">
+                        col-8
+                      </div>
+                    </Col>
+                    <Col span={8}>
+                      <div className="bg-indigo-400 text-white p-4 rounded text-center">
+                        col-8
+                      </div>
+                    </Col>
+                    <Col span={8}>
+                      <div className="bg-indigo-300 text-white p-4 rounded text-center">
+                        col-8
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
               </div>
             </Space>
           </Container>
@@ -163,24 +165,24 @@ const GridDemo: React.FC = () => {
           <Container>
             <Space direction="vertical" className="w-full">
               <Row gutter={[16, 16]}>
-                <Col span={{ xs: 24, md: 12, lg: 6 }}>
+                <Col span={{ xs: 24, md: 12, lg: 8 }}>
                   <div className="bg-teal-600 text-white p-4 rounded text-center">
-                    xs-24 md-12 lg-6
+                    xs-24 md-12 lg-8
                   </div>
                 </Col>
-                <Col span={{ xs: 24, md: 12, lg: 6 }}>
+                <Col span={{ xs: 24, md: 6, lg: 6 }}>
                   <div className="bg-teal-500 text-white p-4 rounded text-center">
-                    xs-24 md-12 lg-6
+                    xs-24 md-6 lg-6
                   </div>
                 </Col>
-                <Col span={{ xs: 24, md: 12, lg: 6 }}>
+                <Col span={{ xs: 24, md: 4, lg: 6 }}>
                   <div className="bg-teal-400 text-white p-4 rounded text-center">
-                    xs-24 md-12 lg-6
+                    xs-24 md-4 lg-6
                   </div>
                 </Col>
-                <Col span={{ xs: 24, md: 12, lg: 6 }}>
+                <Col span={{ xs: 24, md: 2, lg: 4 }}>
                   <div className="bg-teal-300 text-white p-4 rounded text-center">
-                    xs-24 md-12 lg-6
+                    xs-24 md-2 lg-4
                   </div>
                 </Col>
               </Row>
@@ -334,7 +336,7 @@ const GridDemo: React.FC = () => {
         </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overflow-y-hidden px-2">
               <Row gutter={16} wrap={false} className="min-w-[720px]">
                 <Col span={6}>
                   <div className="bg-emerald-600 text-white p-4 rounded text-center">

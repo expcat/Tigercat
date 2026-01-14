@@ -15,6 +15,7 @@ describe('Grid (React)', () => {
     const row = screen.getByTestId('row');
     expect(row).toHaveClass(
       'flex',
+      'w-full',
       'flex-wrap',
       'items-start',
       'justify-start'
@@ -46,8 +47,29 @@ describe('Grid (React)', () => {
     render(<Col data-testid="col" span={12} offset={4} />);
 
     const col = screen.getByTestId('col');
-    expect(col.className).toContain('w-[50%]');
-    expect(col.className).toContain('ml-[16.666667%]');
+    expect(col.className).toContain('w-[var(--tiger-col-span)]');
+    expect(col.className).toContain('ml-[var(--tiger-col-offset)]');
+
+    expect(col.style.getPropertyValue('--tiger-col-span')).toBe('50%');
+    expect(col.style.getPropertyValue('--tiger-col-offset')).toBe('16.666667%');
+  });
+
+  it('supports flex layout with span=0', () => {
+    render(<Col data-testid="col" span={0} flex="0_0_160px" />);
+
+    const col = screen.getByTestId('col');
+    expect(col.className).toContain('flex-[var(--tiger-col-flex)]');
+    expect(col.className).not.toContain('w-[var(--tiger-col-span)]');
+    expect(col.style.getPropertyValue('--tiger-col-flex')).toBe('0 0 160px');
+  });
+
+  it('supports order (including responsive)', () => {
+    render(<Col data-testid="col" order={{ xs: 3, md: 1 }} />);
+
+    const col = screen.getByTestId('col');
+    expect(col.className).toContain('order-[var(--tiger-col-order)]');
+    expect(col.style.getPropertyValue('--tiger-col-order')).toBe('3');
+    expect(col.style.getPropertyValue('--tiger-col-order-md')).toBe('1');
   });
 
   it('has no a11y violations for a basic grid', async () => {

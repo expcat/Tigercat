@@ -1,6 +1,8 @@
 import { defineComponent, computed, h, PropType, inject } from 'vue';
 import {
   classNames,
+  getColStyleVars,
+  getColOrderStyleVars,
   getSpanClasses,
   getOffsetClasses,
   getOrderClasses,
@@ -55,10 +57,27 @@ export const Col = defineComponent({
     const rowContext = inject(RowContextKey, null);
     const gutter = computed(() => rowContext?.gutter.value ?? 0);
     const colStyle = computed(() => getGutterStyles(gutter.value).colStyle);
+    const isFlexSpanMode = computed(
+      () => props.flex !== undefined && props.span === 0
+    );
+    const colStyleVars = computed(() =>
+      getColStyleVars(
+        isFlexSpanMode.value ? undefined : props.span,
+        props.offset
+      )
+    );
+    const colOrderVars = computed(() => getColOrderStyleVars(props.order));
+    const colFlexVar = computed(() =>
+      props.flex === undefined
+        ? {}
+        : {
+            '--tiger-col-flex': String(props.flex).replace(/_/g, ' '),
+          }
+    );
 
     const colClasses = computed(() => {
       return classNames(
-        getSpanClasses(props.span),
+        isFlexSpanMode.value ? '' : getSpanClasses(props.span),
         getOffsetClasses(props.offset),
         getOrderClasses(props.order),
         getFlexClasses(props.flex)
@@ -71,7 +90,13 @@ export const Col = defineComponent({
         {
           ...attrs,
           class: [colClasses.value, attrs.class],
-          style: [colStyle.value, attrs.style],
+          style: [
+            colStyle.value,
+            colStyleVars.value,
+            colOrderVars.value,
+            colFlexVar.value,
+            attrs.style,
+          ],
         },
         slots.default ? slots.default() : []
       );

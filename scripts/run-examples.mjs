@@ -1,12 +1,7 @@
 #!/usr/bin/env node
 
 import { spawn, spawnSync } from 'node:child_process';
-import {
-  createWriteStream,
-  existsSync,
-  mkdirSync,
-  readFileSync,
-} from 'node:fs';
+import { existsSync, rmSync } from 'node:fs';
 import { readdir, stat } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -81,13 +76,27 @@ function tailText(text, maxLines = 120) {
   return lines.slice(Math.max(0, lines.length - maxLines)).join(os.EOL);
 }
 
-function readLogTailSafe(logPath) {
-  try {
-    const content = readFileSync(logPath, 'utf8');
-    return tailText(content);
-  } catch {
-    return null;
-  }
+function createTailBuffer(maxLines = 120) {
+  let pending = '';
+  let lines = [];
+
+  const pushText = (chunk) => {
+    pending += String(chunk);
+    const parts = pending.split(/\r?\n/);
+    pending = parts.pop() ?? '';
+
+    if (parts.length > 0) {
+      lines = lines.concat(parts);
+      if (lines.length > maxLines) {
+        lines = lines.slice(lines.length - maxLines);
+      }
+    }
+  };
+
+  const getText = () =>
+    tailText(lines.join(os.EOL) + (pending ? os.EOL + pending : ''), maxLines);
+
+  return { pushText, getText };
 }
 
 function ensureExamplesDependenciesInstalled(exampleDirs) {
@@ -181,53 +190,54 @@ async function main() {
   }
 
   const logDir = path.join(os.tmpdir(), 'tigercat');
-  mkdirSync(logDir, { recursive: true });
+  // 不生成日志文件；同时清理历史遗留的日志目录（包含过往日志）。
+  rmSync(logDir, { recursive: true, force: true });
 
-  const vueLogPath = path.join(logDir, 'vue3-example.log');
-  const reactLogPath = path.join(logDir, 'react-example.log');
-
-  function startWithLogs(name, pnpmArgs, logPath) {
-    const stream = createWriteStream(logPath, { flags: 'a' });
+  function startExample(name, pnpmArgs) {
+    const tail = createTailBuffer(120);
 
     const child = spawn(PNPM_CMD, pnpmArgs, {
       shell: PNPM_SHELL,
       stdio: ['inherit', 'pipe', 'pipe'],
     });
 
-    child.stdout?.pipe(stream);
-    child.stderr?.pipe(stream);
+    child.stdout?.on('data', (d) => {
+      tail.pushText(d);
+      process.stdout.write(d);
+    });
 
-    child.on('close', () => {
-      stream.end();
+    child.stderr?.on('data', (d) => {
+      tail.pushText(d);
+      process.stderr.write(d);
     });
 
     child.on('error', (err) => {
-      stream.write(`\n[runner] ${name} failed to start: ${String(err)}\n`);
-      stream.end();
+      tail.pushText(`\n[runner] ${name} failed to start: ${String(err)}\n`);
     });
 
-    return child;
+    return { child, tail };
   }
 
   console.log('Starting Vue3 example on http://localhost:5173');
-  const vueChild = startWithLogs(
-    'vue3',
-    ['--filter', '@tigercat-example/vue3', 'dev'],
-    vueLogPath
-  );
+  const vue = startExample('vue3', [
+    '--filter',
+    '@tigercat-example/vue3',
+    'dev',
+  ]);
 
   console.log('Starting React example on http://localhost:5174');
-  const reactChild = startWithLogs(
-    'react',
-    ['--filter', '@tigercat-example/react', 'dev'],
-    reactLogPath
-  );
+  const react = startExample('react', [
+    '--filter',
+    '@tigercat-example/react',
+    'dev',
+  ]);
 
   const cleanup = () => {
     console.log('');
     console.log('Stopping example servers...');
-    killTree(vueChild);
-    killTree(reactChild);
+    killTree(vue.child);
+    killTree(react.child);
+    rmSync(logDir, { recursive: true, force: true });
   };
 
   process.on('SIGINT', () => {
@@ -246,18 +256,12 @@ async function main() {
   console.log('  Vue3:  http://localhost:5173');
   console.log('  React: http://localhost:5174');
   console.log('');
-  console.log('Logs:');
-  console.log(`  Vue3:  ${vueLogPath}`);
-  console.log(`  React: ${reactLogPath}`);
-  console.log('');
   console.log('Press Ctrl+C to stop both servers');
   console.log('');
 
-  const waitForExit = (name, child, logPath) =>
+  const waitForExit = (name, child, tail) =>
     new Promise((resolve) => {
-      child.on('exit', (code, signal) =>
-        resolve({ name, code, signal, logPath })
-      );
+      child.on('exit', (code, signal) => resolve({ name, code, signal, tail }));
     });
 
   if (smoke) {
@@ -269,14 +273,14 @@ async function main() {
   }
 
   const firstExit = await Promise.race([
-    waitForExit('vue3', vueChild, vueLogPath),
-    waitForExit('react', reactChild, reactLogPath),
+    waitForExit('vue3', vue.child, vue.tail),
+    waitForExit('react', react.child, react.tail),
   ]);
 
   cleanup();
 
   if ((firstExit.code ?? 0) !== 0 || firstExit.signal) {
-    const tail = readLogTailSafe(firstExit.logPath);
+    const tail = firstExit.tail?.getText?.();
     if (tail) {
       console.error('');
       console.error(`[${firstExit.name}] last log lines:`);

@@ -152,8 +152,8 @@ function main() {
     console.log('');
     console.log('Quick start commands:');
     console.log('  pnpm test              # Run all tests');
-    console.log('  pnpm demo:vue          # Run Vue3 demo');
-    console.log('  pnpm demo:react        # Run React demo');
+    console.log('  pnpm example:vue       # Run Vue3 example');
+    console.log('  pnpm example:react     # Run React example');
     console.log('  pnpm dev               # Watch mode for all packages');
     process.exit(0);
   } else {

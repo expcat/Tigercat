@@ -266,7 +266,7 @@ React:
 
 #### 1. Example 无法启动
 
-**问题**: 运行 `pnpm example:vue` 或 `pnpm example:react`（或兼容别名 `pnpm demo:vue` / `pnpm demo:react`）时出现错误。
+**问题**: 运行 `pnpm example:vue` 或 `pnpm example:react` 时出现错误。
 
 **解决方案**:
 
@@ -316,7 +316,7 @@ kill -9 <PID>
 
 **解决方案**:
 
-- 确保在开发模式下运行: `pnpm example:vue` 或 `pnpm example:react`（或 `pnpm demo:vue` / `pnpm demo:react`）
+- 确保在开发模式下运行: `pnpm example:vue` 或 `pnpm example:react`
 - 如果修改了 `@tigercat` 包，需要在另一个终端运行 `pnpm dev` 来监听包变化
 - 检查 Vite 控制台是否有错误信息
 
@@ -371,7 +371,6 @@ pnpm example:vue # 或 pnpm example:react
 3. **调试**:
 - 使用浏览器开发者工具
 - 检查 Vite 控制台输出
- - 查看示例启动时打印的日志路径（当使用 `pnpm example:all` 或 `pnpm demo:all` 时，会写入系统临时目录）
 
 ## 演示截图
 

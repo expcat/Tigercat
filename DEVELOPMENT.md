@@ -46,7 +46,6 @@ This guide provides detailed information for developers working on the Tigercat 
 
     # In another terminal, run an example
     pnpm example:vue    # or pnpm example:react
-    # Compatibility aliases: pnpm demo:vue / pnpm demo:react
    ```
 
 ## 🛠 Development Commands
@@ -115,9 +114,6 @@ pnpm example:react
 
 # Run both examples simultaneously
 pnpm example:all
-
-# Compatibility alias
-pnpm demo:all
 
 # Build examples for production
 pnpm --filter @tigercat-example/vue3 build
@@ -518,9 +514,6 @@ pnpm build
 
 # Then run example (preferred)
 pnpm example:vue
-
-# Compatibility alias
-pnpm demo:vue
 ```
 
 #### 4. Test Failures After Changes
