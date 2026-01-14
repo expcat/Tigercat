@@ -50,7 +50,7 @@ function App() {
     setThemeColors({
       primary: '#ff6b6b',
       primaryHover: '#ee5a52',
-      primaryDisabled: '#ffc9c9',
+      primaryDisabled: '#ffc9c9'
     })
   }, [])
 
@@ -58,7 +58,7 @@ function App() {
     setThemeColors({
       primary: '#2563eb',
       primaryHover: '#1d4ed8',
-      primaryDisabled: '#93c5fd',
+      primaryDisabled: '#93c5fd'
     })
   }
 
@@ -66,7 +66,7 @@ function App() {
     setThemeColors({
       primary: '#10b981',
       primaryHover: '#059669',
-      primaryDisabled: '#6ee7b7',
+      primaryDisabled: '#6ee7b7'
     })
   }
 
@@ -92,7 +92,7 @@ onMounted(() => {
   setThemeColors({
     primary: '#ff6b6b',
     primaryHover: '#ee5a52',
-    primaryDisabled: '#ffc9c9',
+    primaryDisabled: '#ffc9c9'
   })
 })
 
@@ -100,7 +100,7 @@ const switchToBlueTheme = () => {
   setThemeColors({
     primary: '#2563eb',
     primaryHover: '#1d4ed8',
-    primaryDisabled: '#93c5fd',
+    primaryDisabled: '#93c5fd'
   })
 }
 
@@ -108,7 +108,7 @@ const switchToGreenTheme = () => {
   setThemeColors({
     primary: '#10b981',
     primaryHover: '#059669',
-    primaryDisabled: '#6ee7b7',
+    primaryDisabled: '#6ee7b7'
   })
 }
 </script>
@@ -124,16 +124,16 @@ const switchToGreenTheme = () => {
 
 ## 可用的 CSS 变量
 
-| CSS 变量 | 说明 | 默认值 |
-|---------|------|--------|
-| `--tiger-primary` | 主色 | `#2563eb` |
-| `--tiger-primary-hover` | 主色悬停 | `#1d4ed8` |
-| `--tiger-primary-disabled` | 主色禁用 | `#93c5fd` |
-| `--tiger-secondary` | 次要颜色 | `#4b5563` |
-| `--tiger-secondary-hover` | 次要颜色悬停 | `#374151` |
-| `--tiger-secondary-disabled` | 次要颜色禁用 | `#9ca3af` |
-| `--tiger-outline-bg-hover` | Outline 按钮悬停背景 | `#eff6ff` |
-| `--tiger-ghost-bg-hover` | Ghost 按钮悬停背景 | `#eff6ff` |
+| CSS 变量                     | 说明                 | 默认值    |
+| ---------------------------- | -------------------- | --------- |
+| `--tiger-primary`            | 主色                 | `#2563eb` |
+| `--tiger-primary-hover`      | 主色悬停             | `#1d4ed8` |
+| `--tiger-primary-disabled`   | 主色禁用             | `#93c5fd` |
+| `--tiger-secondary`          | 次要颜色             | `#4b5563` |
+| `--tiger-secondary-hover`    | 次要颜色悬停         | `#374151` |
+| `--tiger-secondary-disabled` | 次要颜色禁用         | `#9ca3af` |
+| `--tiger-outline-bg-hover`   | Outline 按钮悬停背景 | `#eff6ff` |
+| `--tiger-ghost-bg-hover`     | Ghost 按钮悬停背景   | `#eff6ff` |
 
 ## API 参考
 
@@ -142,22 +142,27 @@ const switchToGreenTheme = () => {
 设置主题颜色。
 
 **参数：**
+
 - `colors`: `Partial<Record<keyof typeof THEME_CSS_VARS, string>>` - 要设置的颜色对象
 - `element`: `HTMLElement` (可选) - 要设置颜色的元素，默认为 `document.documentElement`
 
 **示例：**
+
 ```typescript
 // 设置全局主题颜色
 setThemeColors({
   primary: '#ff0000',
-  primaryHover: '#cc0000',
+  primaryHover: '#cc0000'
 })
 
 // 设置特定容器的主题颜色
 const container = document.querySelector('.my-container')
-setThemeColors({
-  primary: '#00ff00',
-}, container)
+setThemeColors(
+  {
+    primary: '#00ff00'
+  },
+  container
+)
 ```
 
 ### `getThemeColor(colorKey, element?)`
@@ -165,12 +170,14 @@ setThemeColors({
 获取当前主题颜色值。
 
 **参数：**
+
 - `colorKey`: `keyof typeof THEME_CSS_VARS` - 颜色键名
 - `element`: `HTMLElement` (可选) - 要获取颜色的元素，默认为 `document.documentElement`
 
 **返回：** `string | undefined` - 当前颜色值
 
 **示例：**
+
 ```typescript
 import { getThemeColor } from '@tigercat/core'
 
@@ -192,10 +199,13 @@ function ThemedContainer() {
   useEffect(() => {
     if (containerRef.current) {
       // 为这个容器设置独立的主题
-      setThemeColors({
-        primary: '#ff6b6b',
-        primaryHover: '#ee5a52',
-      }, containerRef.current)
+      setThemeColors(
+        {
+          primary: '#ff6b6b',
+          primaryHover: '#ee5a52'
+        },
+        containerRef.current
+      )
     }
   }, [])
 
@@ -216,21 +226,21 @@ import { setThemeColors } from '@tigercat/react'
 function useSystemTheme() {
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    
+
     const updateTheme = (e: MediaQueryListEvent | MediaQueryList) => {
       if (e.matches) {
         // 深色主题
         setThemeColors({
           primary: '#60a5fa',
           primaryHover: '#3b82f6',
-          outlineBgHover: '#1e3a8a',
+          outlineBgHover: '#1e3a8a'
         })
       } else {
         // 浅色主题
         setThemeColors({
           primary: '#2563eb',
           primaryHover: '#1d4ed8',
-          outlineBgHover: '#eff6ff',
+          outlineBgHover: '#eff6ff'
         })
       }
     }
@@ -240,7 +250,7 @@ function useSystemTheme() {
 
     // 监听变化
     mediaQuery.addEventListener('change', updateTheme)
-    
+
     return () => {
       mediaQuery.removeEventListener('change', updateTheme)
     }
@@ -354,9 +364,7 @@ function App() {
 
   return (
     <div>
-      <Button onClick={toggleTheme}>
-        {isDark ? '切换到亮色模式' : '切换到暗色模式'}
-      </Button>
+      <Button onClick={toggleTheme}>{isDark ? '切换到亮色模式' : '切换到暗色模式'}</Button>
     </div>
   )
 }
@@ -375,7 +383,7 @@ const lightTheme = {
   secondaryHover: '#374151',
   secondaryDisabled: '#9ca3af',
   outlineBgHover: '#eff6ff',
-  ghostBgHover: '#eff6ff',
+  ghostBgHover: '#eff6ff'
 }
 
 const darkTheme = {
@@ -386,7 +394,7 @@ const darkTheme = {
   secondaryHover: '#6b7280',
   secondaryDisabled: '#374151',
   outlineBgHover: '#1e3a8a',
-  ghostBgHover: '#1e3a8a',
+  ghostBgHover: '#1e3a8a'
 }
 
 function toggleDarkMode(isDark: boolean) {
@@ -405,7 +413,7 @@ import { setThemeColors } from '@tigercat/react'
 function useAutoTheme() {
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    
+
     const updateTheme = (e: MediaQueryListEvent | MediaQueryList) => {
       if (e.matches) {
         // 系统偏好暗色模式
@@ -421,7 +429,7 @@ function useAutoTheme() {
 
     // 监听变化
     mediaQuery.addEventListener('change', updateTheme)
-    
+
     return () => {
       mediaQuery.removeEventListener('change', updateTheme)
     }
@@ -431,12 +439,8 @@ function useAutoTheme() {
 // 在应用中使用
 function App() {
   useAutoTheme()
-  
-  return (
-    <div>
-      {/* 你的应用内容 */}
-    </div>
-  )
+
+  return <div>{/* 你的应用内容 */}</div>
 }
 ```
 
@@ -451,7 +455,7 @@ Tigercat 提供了一些预设的配色方案，可以快速应用。所有主�
 const commonColors = {
   secondary: '#4b5563',
   secondaryHover: '#374151',
-  secondaryDisabled: '#9ca3af',
+  secondaryDisabled: '#9ca3af'
 }
 
 // 蓝色主题（默认）
@@ -461,7 +465,7 @@ const blueTheme = {
   primaryDisabled: '#93c5fd',
   outlineBgHover: '#eff6ff',
   ghostBgHover: '#eff6ff',
-  ...commonColors,
+  ...commonColors
 }
 
 // 绿色主题
@@ -471,7 +475,7 @@ const greenTheme = {
   primaryDisabled: '#6ee7b7',
   outlineBgHover: '#d1fae5',
   ghostBgHover: '#d1fae5',
-  ...commonColors,
+  ...commonColors
 }
 
 // 紫色主题
@@ -481,7 +485,7 @@ const purpleTheme = {
   primaryDisabled: '#c4b5fd',
   outlineBgHover: '#ede9fe',
   ghostBgHover: '#ede9fe',
-  ...commonColors,
+  ...commonColors
 }
 
 // 红色主题
@@ -491,7 +495,7 @@ const redTheme = {
   primaryDisabled: '#fca5a5',
   outlineBgHover: '#fee2e2',
   ghostBgHover: '#fee2e2',
-  ...commonColors,
+  ...commonColors
 }
 
 // 橙色主题
@@ -501,7 +505,7 @@ const orangeTheme = {
   primaryDisabled: '#fdba74',
   outlineBgHover: '#ffedd5',
   ghostBgHover: '#ffedd5',
-  ...commonColors,
+  ...commonColors
 }
 ```
 
@@ -516,7 +520,7 @@ function ThemeSelector() {
     green: greenTheme,
     purple: purpleTheme,
     red: redTheme,
-    orange: orangeTheme,
+    orange: orangeTheme
   }
 
   const applyTheme = (themeName: keyof typeof themes) => {
@@ -567,10 +571,10 @@ watch(currentTheme, (newTheme) => {
 const applyTheme = (themeName) => {
   const themes = {
     blue: { primary: '#2563eb', primaryHover: '#1d4ed8' },
-    green: { primary: '#10b981', primaryHover: '#059669' },
+    green: { primary: '#10b981', primaryHover: '#059669' }
     // ... 其他主题
   }
-  
+
   setThemeColors(themes[themeName])
 }
 </script>
@@ -602,10 +606,10 @@ function usePersistedTheme() {
   const applyTheme = (themeName: string) => {
     const themes = {
       blue: { primary: '#2563eb', primaryHover: '#1d4ed8' },
-      green: { primary: '#10b981', primaryHover: '#059669' },
+      green: { primary: '#10b981', primaryHover: '#059669' }
       // ... 其他主题
     }
-    
+
     setThemeColors(themes[themeName])
   }
 
@@ -640,8 +644,8 @@ function getThemeCookie(): string | null {
 
 ```typescript
 // 使用对比度检查工具验证颜色组合
-const primary = '#2563eb'  // 主色
-const white = '#ffffff'     // 背景色
+const primary = '#2563eb' // 主色
+const white = '#ffffff' // 背景色
 
 // 确保对比度 >= 4.5:1
 ```
@@ -651,10 +655,8 @@ const white = '#ffffff'     // 背景色
 ```vue
 <template>
   <!-- ✅ 好的实践：使用图标 + 颜色 -->
-  <Button variant="primary">
-    <Icon name="check" /> 成功
-  </Button>
-  
+  <Button variant="primary"> <Icon name="check" /> 成功 </Button>
+
   <!-- ❌ 不好的实践：仅依赖颜色 -->
   <Button variant="primary">成功</Button>
 </template>
@@ -699,7 +701,7 @@ const white = '#ffffff'     // 背景色
   --tiger-primary: #8b5cf6;
   --tiger-primary-hover: #7c3aed;
   --tiger-primary-disabled: #c4b5fd;
-  
+
   /* 自定义新的变量 */
   --tiger-success: #10b981;
   --tiger-warning: #f59e0b;
@@ -730,10 +732,11 @@ const white = '#ffffff'     // 背景色
 ### 组件级覆盖
 
 ```tsx
-<div style={{
-  '--tiger-primary': '#8b5cf6',
-  '--tiger-primary-hover': '#7c3aed',
-}}>
+<div
+  style={{
+    '--tiger-primary': '#8b5cf6',
+    '--tiger-primary-hover': '#7c3aed'
+  }}>
   <Button variant="primary">紫色按钮</Button>
 </div>
 ```
@@ -755,7 +758,7 @@ const primaryHoverColor = ref('#1d4ed8')
 const updateTheme = () => {
   setThemeColors({
     primary: primaryColor.value,
-    primaryHover: primaryHoverColor.value,
+    primaryHover: primaryHoverColor.value
   })
 }
 </script>
@@ -764,24 +767,16 @@ const updateTheme = () => {
   <div class="p-4 space-y-4">
     <div>
       <label>主色：</label>
-      <input 
-        type="color" 
-        v-model="primaryColor" 
-        @change="updateTheme"
-      />
+      <input type="color" v-model="primaryColor" @change="updateTheme" />
       <span>{{ primaryColor }}</span>
     </div>
-    
+
     <div>
       <label>主色悬停：</label>
-      <input 
-        type="color" 
-        v-model="primaryHoverColor" 
-        @change="updateTheme"
-      />
+      <input type="color" v-model="primaryHoverColor" @change="updateTheme" />
       <span>{{ primaryHoverColor }}</span>
     </div>
-    
+
     <Button variant="primary">预览按钮</Button>
   </div>
 </template>
@@ -805,6 +800,7 @@ const updateTheme = () => {
 ### 1. 为什么主题颜色没有生效？
 
 确保：
+
 - CSS 变量名称正确（以 `--tiger-` 开头）
 - 在组件挂载后设置主题
 - 检查是否有其他 CSS 规则覆盖了颜色
@@ -817,7 +813,9 @@ const updateTheme = () => {
 // Next.js 示例
 export default function RootLayout({ children }) {
   return (
-    <html className="light"> {/* 或从 cookie 读取 */}
+    <html className="light">
+      {' '}
+      {/* 或从 cookie 读取 */}
       <body>{children}</body>
     </html>
   )
@@ -831,7 +829,7 @@ export default function RootLayout({ children }) {
 ```html
 <script>
   // 在 <head> 中执行，避免闪烁
-  (function() {
+  ;(function () {
     const theme = localStorage.getItem('tigercat-theme') || 'light'
     document.documentElement.classList.add(theme)
   })()

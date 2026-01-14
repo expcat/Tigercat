@@ -28,7 +28,7 @@ import { ComponentName } from '@tigercat/vue'
 import {
   renderWithProps,
   renderWithSlots,
-  expectNoA11yViolations,
+  expectNoA11yViolations
   // Import other utilities as needed
 } from '../utils'
 
@@ -77,7 +77,7 @@ describe('Rendering', () => {
     const { getByRole } = render(Component, {
       slots: { default: 'Content' }
     })
-    
+
     expect(getByRole('button')).toBeInTheDocument()
   })
 
@@ -85,7 +85,7 @@ describe('Rendering', () => {
     const { getByText } = renderWithSlots(Component, {
       default: 'Custom Content'
     })
-    
+
     expect(getByText('Custom Content')).toBeInTheDocument()
   })
 })
@@ -121,7 +121,7 @@ describe('Events', () => {
       props: { onClick: handleClick },
       slots: { default: 'Click me' }
     })
-    
+
     await fireEvent.click(getByRole('button'))
     expect(handleClick).toHaveBeenCalledTimes(1)
   })
@@ -145,16 +145,13 @@ describe('States', () => {
       { disabled: true },
       { slots: { default: 'Disabled' } }
     )
-    
+
     expect(getByRole('button')).toBeDisabled()
   })
 
   it('should show loading state', () => {
-    const { container } = renderWithProps(
-      Component,
-      { loading: true }
-    )
-    
+    const { container } = renderWithProps(Component, { loading: true })
+
     const spinner = container.querySelector('svg')
     expect(spinner).toHaveClass('animate-spin')
   })
@@ -174,11 +171,11 @@ describe('Theme Support', () => {
   it('should support custom theme colors', () => {
     setThemeVariables({
       '--tiger-primary': '#ff0000',
-      '--tiger-primary-hover': '#cc0000',
+      '--tiger-primary-hover': '#cc0000'
     })
 
     const { container } = renderWithProps(Component, { variant: 'primary' })
-    
+
     const rootStyles = window.getComputedStyle(document.documentElement)
     expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
   })
@@ -195,17 +192,17 @@ describe('Accessibility', () => {
     const { container } = render(Component, {
       slots: { default: 'Accessible Component' }
     })
-    
+
     await expectNoA11yViolations(container)
   })
 
   it('should have proper ARIA attributes', () => {
     const { getByRole } = render(Component)
     const element = getByRole('button')
-    
+
     expectProperAriaLabels(element, {
       'aria-label': 'Expected label',
-      'aria-pressed': null, // Should not have this attribute
+      'aria-pressed': null // Should not have this attribute
     })
   })
 
@@ -214,7 +211,7 @@ describe('Accessibility', () => {
     const { getByRole } = render(Component, {
       props: { onClick: handleClick }
     })
-    
+
     const button = getByRole('button')
     button.focus()
     expect(button).toHaveFocus()
@@ -232,14 +229,14 @@ describe('Snapshots', () => {
     const { container } = render(Component, {
       slots: { default: 'Default' }
     })
-    
+
     expect(container.firstChild).toMatchSnapshot()
   })
 
   it('should match snapshot for each variant', () => {
     const variants = ['primary', 'secondary', 'outline']
-    
-    variants.forEach(variant => {
+
+    variants.forEach((variant) => {
       const { container } = renderWithProps(Component, { variant })
       expect(container.firstChild).toMatchSnapshot()
     })
@@ -347,7 +344,7 @@ it('should handle very long text', () => {
 ### Accessibility Helpers
 
 - **axe(container)**: Run axe accessibility tests
-- **expectNoA11yViolations(container)**: Assert no a11y violations  
+- **expectNoA11yViolations(container)**: Assert no a11y violations
 - **expectProperAriaLabels(element, attributes)**: Check ARIA attributes
 - **testKeyboardNavigation(element, keys)**: Test keyboard interactions
 
@@ -404,6 +401,7 @@ pnpm test:ui
 ```
 
 This opens a web interface where you can:
+
 - View test results
 - Debug failed tests
 - Inspect component output
@@ -414,10 +412,10 @@ This opens a web interface where you can:
 ```typescript
 it('should render correctly', () => {
   const { container, debug } = render(Component)
-  
+
   // Print DOM tree to console
   debug()
-  
+
   // Print specific element
   debug(container.querySelector('button'))
 })
@@ -431,9 +429,9 @@ it('should handle click', async () => {
   const { getByRole } = render(Component, {
     props: { onClick: handleClick }
   })
-  
+
   debugger // Pauses execution when running with --inspect
-  
+
   await fireEvent.click(getByRole('button'))
 })
 ```
@@ -452,10 +450,10 @@ describe('Input', () => {
         'onUpdate:modelValue': handleInput
       }
     })
-    
+
     const input = getByRole('textbox')
     await fireEvent.update(input, 'new value')
-    
+
     expect(handleInput).toHaveBeenCalledWith('new value')
   })
 })
@@ -468,9 +466,9 @@ it('should show error message when invalid', () => {
   const { getByText, rerender } = render(Input, {
     props: { error: '' }
   })
-  
+
   expect(() => getByText('Error')).toThrow()
-  
+
   rerender({ error: 'Invalid input' })
   expect(getByText('Invalid input')).toBeInTheDocument()
 })
@@ -481,9 +479,9 @@ it('should show error message when invalid', () => {
 ```typescript
 it('should load data asynchronously', async () => {
   const { getByText } = render(AsyncComponent)
-  
+
   expect(getByText('Loading...')).toBeInTheDocument()
-  
+
   await waitFor(() => {
     expect(getByText('Data loaded')).toBeInTheDocument()
   })
@@ -493,6 +491,7 @@ it('should load data asynchronously', async () => {
 ## Coverage Goals
 
 Aim for:
+
 - **Line Coverage**: >80%
 - **Branch Coverage**: >75%
 - **Function Coverage**: >80%

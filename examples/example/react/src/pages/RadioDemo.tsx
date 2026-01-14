@@ -1,19 +1,15 @@
-import React, { useState } from 'react';
-import { Radio, RadioGroup, Space, Divider } from '@tigercat/react';
+import React, { useState } from 'react'
+import { Radio, RadioGroup, Space, Divider } from '@tigercat/react'
 
 const RadioDemo: React.FC = () => {
-  const [basicValue, setBasicValue] = useState<string | number>('male');
-  const [uncontrolledValue, setUncontrolledValue] = useState<string | number>(
-    'male'
-  );
-  const [disabledValue, setDisabledValue] = useState<string | number>('medium');
-  const [groupDisabledValue, setGroupDisabledValue] = useState<string | number>(
-    'a'
-  );
+  const [basicValue, setBasicValue] = useState<string | number>('male')
+  const [uncontrolledValue, setUncontrolledValue] = useState<string | number>('male')
+  const [disabledValue, setDisabledValue] = useState<string | number>('medium')
+  const [groupDisabledValue, setGroupDisabledValue] = useState<string | number>('a')
 
-  const [sizeSmValue, setSizeSmValue] = useState<string | number>('a');
-  const [sizeMdValue, setSizeMdValue] = useState<string | number>('a');
-  const [sizeLgValue, setSizeLgValue] = useState<string | number>('a');
+  const [sizeSmValue, setSizeSmValue] = useState<string | number>('a')
+  const [sizeMdValue, setSizeMdValue] = useState<string | number>('a')
+  const [sizeLgValue, setSizeLgValue] = useState<string | number>('a')
 
   return (
     <div className="max-w-5xl mx-auto p-8">
@@ -25,9 +21,7 @@ const RadioDemo: React.FC = () => {
       {/* 基础用法 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">基础用法</h2>
-        <p className="text-gray-600 mb-6">
-          单选框组合使用时，需要通过 RadioGroup 组件进行包裹。
-        </p>
+        <p className="text-gray-600 mb-6">单选框组合使用时，需要通过 RadioGroup 组件进行包裹。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical">
             <RadioGroup
@@ -38,9 +32,7 @@ const RadioDemo: React.FC = () => {
               <Radio value="female">女</Radio>
               <Radio value="other">其他</Radio>
             </RadioGroup>
-            <p className="text-sm text-gray-600">
-              当前选中：{String(basicValue)}
-            </p>
+            <p className="text-sm text-gray-600">当前选中：{String(basicValue)}</p>
           </Space>
         </div>
         <Divider className="my-6" />
@@ -62,9 +54,7 @@ const RadioDemo: React.FC = () => {
               <Radio value="female">女</Radio>
               <Radio value="other">其他</Radio>
             </RadioGroup>
-            <p className="text-sm text-gray-600">
-              最近一次变更：{String(uncontrolledValue)}
-            </p>
+            <p className="text-sm text-gray-600">最近一次变更：{String(uncontrolledValue)}</p>
           </Space>
         </div>
         <Divider className="my-6" />
@@ -110,9 +100,7 @@ const RadioDemo: React.FC = () => {
       {/* 尺寸 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">尺寸</h2>
-        <p className="text-gray-600 mb-6">
-          通过 RadioGroup 的 size 控制整组尺寸。
-        </p>
+        <p className="text-gray-600 mb-6">通过 RadioGroup 的 size 控制整组尺寸。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical">
             <div>
@@ -157,7 +145,7 @@ const RadioDemo: React.FC = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default RadioDemo;
+export default RadioDemo

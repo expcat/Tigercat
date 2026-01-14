@@ -1,14 +1,14 @@
-import { defineComponent, h, PropType, computed } from 'vue';
+import { defineComponent, h, PropType, computed } from 'vue'
 import {
   classNames,
   coerceClassValue,
   layoutContentClasses,
-  mergeStyleValues,
-} from '@tigercat/core';
+  mergeStyleValues
+} from '@tigercat/core'
 
 export interface VueContentProps {
-  className?: string;
-  style?: Record<string, string | number>;
+  className?: string
+  style?: Record<string, string | number>
 }
 
 export const Content = defineComponent({
@@ -20,7 +20,7 @@ export const Content = defineComponent({
      */
     className: {
       type: String as PropType<string>,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -28,19 +28,15 @@ export const Content = defineComponent({
      */
     style: {
       type: Object as PropType<Record<string, string | number>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   setup(props, { slots, attrs }) {
-    const attrsRecord = attrs as Record<string, unknown>;
+    const attrsRecord = attrs as Record<string, unknown>
 
     const contentClasses = computed(() =>
-      classNames(
-        layoutContentClasses,
-        props.className,
-        coerceClassValue(attrsRecord.class)
-      )
-    );
+      classNames(layoutContentClasses, props.className, coerceClassValue(attrsRecord.class))
+    )
 
     return () => {
       return h(
@@ -48,12 +44,12 @@ export const Content = defineComponent({
         {
           ...attrs,
           class: contentClasses.value,
-          style: mergeStyleValues(attrsRecord.style, props.style),
+          style: mergeStyleValues(attrsRecord.style, props.style)
         },
         slots.default?.()
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Content;
+export default Content

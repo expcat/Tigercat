@@ -23,7 +23,6 @@ const handleChange = (value: string) => {
       @update:model-value="handleChange"
       :options="options"
       size="sm"
-      class="w-28 max-w-full"
-    />
+      class="w-28 max-w-full" />
   </div>
 </template>

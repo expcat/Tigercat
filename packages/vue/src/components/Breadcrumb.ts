@@ -1,22 +1,18 @@
-import { defineComponent, computed, provide, PropType, h } from 'vue';
-import {
-  classNames,
-  breadcrumbContainerClasses,
-  type BreadcrumbSeparator,
-} from '@tigercat/core';
+import { defineComponent, computed, provide, PropType, h } from 'vue'
+import { classNames, breadcrumbContainerClasses, type BreadcrumbSeparator } from '@tigercat/core'
 
 export interface VueBreadcrumbProps {
-  separator?: BreadcrumbSeparator;
-  className?: string;
-  style?: Record<string, unknown>;
+  separator?: BreadcrumbSeparator
+  className?: string
+  style?: Record<string, unknown>
 }
 
 // Breadcrumb context key
-export const BreadcrumbContextKey = Symbol('BreadcrumbContext');
+export const BreadcrumbContextKey = Symbol('BreadcrumbContext')
 
 // Breadcrumb context interface
 export interface BreadcrumbContext {
-  separator: BreadcrumbSeparator;
+  separator: BreadcrumbSeparator
 }
 
 export const Breadcrumb = defineComponent({
@@ -28,33 +24,33 @@ export const Breadcrumb = defineComponent({
      */
     separator: {
       type: String as PropType<BreadcrumbSeparator>,
-      default: '/' as BreadcrumbSeparator,
+      default: '/' as BreadcrumbSeparator
     },
     /**
      * Additional CSS classes
      */
     className: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Inline styles
      */
     style: {
       type: Object as PropType<Record<string, unknown>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   setup(props, { slots, attrs }) {
     // Container classes
     const containerClasses = computed(() => {
-      return classNames(breadcrumbContainerClasses, props.className);
-    });
+      return classNames(breadcrumbContainerClasses, props.className)
+    })
 
     // Provide breadcrumb context to child components
     provide<BreadcrumbContext>(BreadcrumbContextKey, {
-      separator: props.separator,
-    });
+      separator: props.separator
+    })
 
     return () => {
       return h(
@@ -63,18 +59,18 @@ export const Breadcrumb = defineComponent({
           'aria-label': 'Breadcrumb',
           ...attrs,
           class: [containerClasses.value, attrs.class],
-          style: [props.style, attrs.style],
+          style: [props.style, attrs.style]
         },
         h(
           'ol',
           {
-            class: 'flex items-center flex-wrap gap-2',
+            class: 'flex items-center flex-wrap gap-2'
           },
           slots.default?.()
         )
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Breadcrumb;
+export default Breadcrumb

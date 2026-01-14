@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue';
+import { defineComponent, computed, h, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -12,17 +12,17 @@ import {
   cardCoverClasses,
   cardActionsClasses,
   type CardVariant,
-  type CardSize,
-} from '@tigercat/core';
+  type CardSize
+} from '@tigercat/core'
 
 export interface VueCardProps {
-  variant?: CardVariant;
-  size?: CardSize;
-  hoverable?: boolean;
-  cover?: string;
-  coverAlt?: string;
-  className?: string;
-  style?: Record<string, string | number>;
+  variant?: CardVariant
+  size?: CardSize
+  hoverable?: boolean
+  cover?: string
+  coverAlt?: string
+  className?: string
+  style?: Record<string, string | number>
 }
 
 export const Card = defineComponent({
@@ -35,7 +35,7 @@ export const Card = defineComponent({
      */
     variant: {
       type: String as PropType<CardVariant>,
-      default: 'default' as CardVariant,
+      default: 'default' as CardVariant
     },
     /**
      * Card size (affects padding)
@@ -43,7 +43,7 @@ export const Card = defineComponent({
      */
     size: {
       type: String as PropType<CardSize>,
-      default: 'md' as CardSize,
+      default: 'md' as CardSize
     },
     /**
      * Whether the card is hoverable (shows hover effect)
@@ -51,21 +51,21 @@ export const Card = defineComponent({
      */
     hoverable: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Cover image URL
      */
     cover: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Cover image alt text
      */
     coverAlt: {
       type: String,
-      default: 'Card cover image',
+      default: 'Card cover image'
     },
 
     /**
@@ -73,7 +73,7 @@ export const Card = defineComponent({
      */
     className: {
       type: String,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -81,45 +81,36 @@ export const Card = defineComponent({
      */
     style: {
       type: Object as PropType<Record<string, string | number>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   setup(props, { slots, attrs }) {
     const cardClasses = computed(() => {
       return classNames(
         getCardClasses(props.variant, props.hoverable),
         !props.cover && cardSizeClasses[props.size]
-      );
-    });
+      )
+    })
 
     const bodyClasses = computed(() => {
-      return classNames(
-        cardBodyClasses,
-        props.cover && cardSizeClasses[props.size]
-      );
-    });
+      return classNames(cardBodyClasses, props.cover && cardSizeClasses[props.size])
+    })
 
-    const sectionSizeClass = computed(() =>
-      props.cover ? cardSizeClasses[props.size] : undefined
-    );
+    const sectionSizeClass = computed(() => (props.cover ? cardSizeClasses[props.size] : undefined))
     const getSectionClasses = (baseClasses: string) =>
-      classNames(baseClasses, sectionSizeClass.value);
+      classNames(baseClasses, sectionSizeClass.value)
 
     return () => {
-      const attrsRecord = attrs as Record<string, unknown>;
-      const attrsClass = attrsRecord.class;
-      const attrsStyle = attrsRecord.style;
+      const attrsRecord = attrs as Record<string, unknown>
+      const attrsClass = attrsRecord.class
+      const attrsStyle = attrsRecord.style
 
       return h(
         'div',
         {
           ...attrs,
-          class: classNames(
-            cardClasses.value,
-            props.className,
-            coerceClassValue(attrsClass)
-          ),
-          style: mergeStyleValues(attrsStyle, props.style),
+          class: classNames(cardClasses.value, props.className, coerceClassValue(attrsClass)),
+          style: mergeStyleValues(attrsStyle, props.style)
         },
         [
           props.cover
@@ -127,42 +118,30 @@ export const Card = defineComponent({
                 h('img', {
                   src: props.cover,
                   alt: props.coverAlt,
-                  class: cardCoverClasses,
-                }),
+                  class: cardCoverClasses
+                })
               ])
             : null,
           slots.header
-            ? h(
-                'div',
-                { class: getSectionClasses(cardHeaderClasses) },
-                slots.header()
-              )
+            ? h('div', { class: getSectionClasses(cardHeaderClasses) }, slots.header())
             : null,
-          slots.default
-            ? h('div', { class: bodyClasses.value }, slots.default())
-            : null,
+          slots.default ? h('div', { class: bodyClasses.value }, slots.default()) : null,
           slots.footer
-            ? h(
-                'div',
-                { class: getSectionClasses(cardFooterClasses) },
-                slots.footer()
-              )
+            ? h('div', { class: getSectionClasses(cardFooterClasses) }, slots.footer())
             : null,
           slots.actions
             ? h(
                 'div',
                 {
-                  class: getSectionClasses(
-                    classNames(cardActionsClasses, cardFooterClasses)
-                  ),
+                  class: getSectionClasses(classNames(cardActionsClasses, cardFooterClasses))
                 },
                 slots.actions()
               )
-            : null,
+            : null
         ]
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Card;
+export default Card

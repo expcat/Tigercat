@@ -42,30 +42,22 @@ import { Icon } from '@tigercat/vue'
         <div class="flex items-center gap-6">
           <Icon size="sm">
             <svg>
-              <circle cx="12"
-                      cy="12"
-                      r="10" />
+              <circle cx="12" cy="12" r="10" />
             </svg>
           </Icon>
           <Icon size="md">
             <svg>
-              <circle cx="12"
-                      cy="12"
-                      r="10" />
+              <circle cx="12" cy="12" r="10" />
             </svg>
           </Icon>
           <Icon size="lg">
             <svg>
-              <circle cx="12"
-                      cy="12"
-                      r="10" />
+              <circle cx="12" cy="12" r="10" />
             </svg>
           </Icon>
           <Icon size="xl">
             <svg>
-              <circle cx="12"
-                      cy="12"
-                      r="10" />
+              <circle cx="12" cy="12" r="10" />
             </svg>
           </Icon>
         </div>
@@ -88,7 +80,7 @@ import { Icon } from '@tigercat/vue'
           <Icon color="#ef4444">
             <svg>
               <path
-                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6.01 4.01 4 6.5 4c1.74 0 3.41.81 4.5 2.09C12.09 4.81 13.76 4 15.5 4 17.99 4 20 6.01 20 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6.01 4.01 4 6.5 4c1.74 0 3.41.81 4.5 2.09C12.09 4.81 13.76 4 15.5 4 17.99 4 20 6.01 20 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
             </svg>
           </Icon>
         </div>

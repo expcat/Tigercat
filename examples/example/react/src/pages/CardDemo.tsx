@@ -1,13 +1,11 @@
-import { Card, Space, Divider, Button } from '@tigercat/react';
+import { Card, Space, Divider, Button } from '@tigercat/react'
 
 export default function CardDemo() {
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Card 卡片</h1>
-        <p className="text-gray-600">
-          用于内容展示的卡片容器组件，支持多种样式和布局选项。
-        </p>
+        <p className="text-gray-600">用于内容展示的卡片容器组件，支持多种样式和布局选项。</p>
       </div>
 
       {/* 基本用法 */}
@@ -25,9 +23,7 @@ export default function CardDemo() {
       {/* 卡片变体 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">卡片变体</h2>
-        <p className="text-gray-600 mb-6">
-          卡片有四种样式：默认、带边框、带阴影和浮起。
-        </p>
+        <p className="text-gray-600 mb-6">卡片有四种样式：默认、带边框、带阴影和浮起。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card variant="default">
@@ -129,19 +125,13 @@ export default function CardDemo() {
       {/* 卡片结构 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">卡片结构</h2>
-        <p className="text-gray-600 mb-6">
-          卡片支持头部、主体、底部和操作区域。
-        </p>
+        <p className="text-gray-600 mb-6">卡片支持头部、主体、底部和操作区域。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card
               header={<h3 className="text-lg font-semibold">卡片标题</h3>}
-              footer={
-                <p className="text-sm text-gray-500">创建于 2024-01-01</p>
-              }>
-              <p className="text-gray-600">
-                这是卡片的主体内容区域，可以放置任何内容。
-              </p>
+              footer={<p className="text-sm text-gray-500">创建于 2024-01-01</p>}>
+              <p className="text-gray-600">这是卡片的主体内容区域，可以放置任何内容。</p>
             </Card>
 
             <Card
@@ -193,9 +183,7 @@ export default function CardDemo() {
                   </Button>
                 </>
               }>
-              <p className="text-gray-600 mb-4">
-                最新的智能科技产品，为您的生活带来便利。
-              </p>
+              <p className="text-gray-600 mb-4">最新的智能科技产品，为您的生活带来便利。</p>
             </Card>
 
             <Card
@@ -222,9 +210,7 @@ export default function CardDemo() {
                   </Button>
                 </>
               }>
-              <p className="text-gray-600 mb-4">
-                为企业提供全方位的数字化转型解决方案。
-              </p>
+              <p className="text-gray-600 mb-4">为企业提供全方位的数字化转型解决方案。</p>
             </Card>
 
             <Card
@@ -251,13 +237,11 @@ export default function CardDemo() {
                   </Button>
                 </>
               }>
-              <p className="text-gray-600 mb-4">
-                专业团队为您提供一对一的咨询和技术支持。
-              </p>
+              <p className="text-gray-600 mb-4">专业团队为您提供一对一的咨询和技术支持。</p>
             </Card>
           </div>
         </div>
       </section>
     </div>
-  );
+  )
 }

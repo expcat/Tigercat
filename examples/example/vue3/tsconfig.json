@@ -20,12 +20,6 @@
       "@tigercat/core": ["../../../packages/core/dist/index.d.ts"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "../shared/**/*.ts"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "../shared/**/*.ts"],
   "exclude": ["node_modules"]
 }

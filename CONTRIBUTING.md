@@ -285,27 +285,27 @@ describe('ComponentName', () => {
   describe('Rendering', () => {
     it('should render with default props', () => {
       // Test implementation
-    });
-  });
+    })
+  })
 
   describe('Props', () => {
     it('should apply size prop correctly', () => {
       // Test implementation
-    });
-  });
+    })
+  })
 
   describe('Events', () => {
     it('should emit click event', async () => {
       // Test implementation
-    });
-  });
+    })
+  })
 
   describe('Accessibility', () => {
     it('should have no a11y violations', async () => {
       // Test implementation
-    });
-  });
-});
+    })
+  })
+})
 ```
 
 For detailed testing guidelines, see:

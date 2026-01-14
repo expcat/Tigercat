@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue';
+import { defineComponent, computed, h, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -10,21 +10,21 @@ import {
   getSpinnerSVG,
   normalizeSvgAttrs,
   type ButtonVariant,
-  type ButtonSize,
-} from '@tigercat/core';
+  type ButtonSize
+} from '@tigercat/core'
 
 export interface VueButtonProps {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  disabled?: boolean;
-  loading?: boolean;
-  block?: boolean;
-  type?: 'button' | 'submit' | 'reset';
-  className?: string;
-  style?: Record<string, unknown>;
+  variant?: ButtonVariant
+  size?: ButtonSize
+  disabled?: boolean
+  loading?: boolean
+  block?: boolean
+  type?: 'button' | 'submit' | 'reset'
+  className?: string
+  style?: Record<string, unknown>
 }
 
-const spinnerSvg = getSpinnerSVG('spinner');
+const spinnerSvg = getSpinnerSVG('spinner')
 
 const LoadingSpinner = h(
   'svg',
@@ -34,10 +34,10 @@ const LoadingSpinner = h(
     fill: 'none',
     viewBox: spinnerSvg.viewBox,
     'aria-hidden': 'true',
-    focusable: 'false',
+    focusable: 'false'
   },
   spinnerSvg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
-);
+)
 
 export const Button = defineComponent({
   name: 'TigerButton',
@@ -49,7 +49,7 @@ export const Button = defineComponent({
      */
     variant: {
       type: String as PropType<ButtonVariant>,
-      default: 'primary' as ButtonVariant,
+      default: 'primary' as ButtonVariant
     },
     /**
      * Button size
@@ -57,7 +57,7 @@ export const Button = defineComponent({
      */
     size: {
       type: String as PropType<ButtonSize>,
-      default: 'md' as ButtonSize,
+      default: 'md' as ButtonSize
     },
     /**
      * Whether the button is disabled
@@ -79,17 +79,17 @@ export const Button = defineComponent({
      */
     type: {
       type: String as PropType<'button' | 'submit' | 'reset'>,
-      default: 'button',
+      default: 'button'
     },
 
     className: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     style: {
       type: Object as PropType<Record<string, unknown>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   emits: ['click'],
   setup(props, { slots, emit, attrs }) {
@@ -102,31 +102,27 @@ export const Button = defineComponent({
         props.block && 'w-full',
         props.className,
         coerceClassValue(attrs.class)
-      );
-    });
+      )
+    })
 
-    const mergedStyle = computed(() =>
-      mergeStyleValues(attrs.style, props.style)
-    );
+    const mergedStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
     return () => {
-      type HChildren = Parameters<typeof h>[2];
-      type HArrayChildren = Extract<NonNullable<HChildren>, unknown[]>;
+      type HChildren = Parameters<typeof h>[2]
+      type HArrayChildren = Extract<NonNullable<HChildren>, unknown[]>
 
-      const children: HArrayChildren = [];
+      const children: HArrayChildren = []
 
-      const isDisabled = props.disabled || props.loading;
-      const ariaBusy =
-        attrs['aria-busy'] ?? (props.loading ? 'true' : undefined);
-      const ariaDisabled =
-        attrs['aria-disabled'] ?? (isDisabled ? 'true' : undefined);
+      const isDisabled = props.disabled || props.loading
+      const ariaBusy = attrs['aria-busy'] ?? (props.loading ? 'true' : undefined)
+      const ariaDisabled = attrs['aria-disabled'] ?? (isDisabled ? 'true' : undefined)
 
       if (props.loading) {
-        children.push(h('span', { class: 'mr-2' }, LoadingSpinner));
+        children.push(h('span', { class: 'mr-2' }, LoadingSpinner))
       }
 
       if (slots.default) {
-        children.push(slots.default());
+        children.push(slots.default())
       }
 
       return h(
@@ -140,14 +136,14 @@ export const Button = defineComponent({
           disabled: isDisabled,
           type: props.type,
           onClick: (event: MouseEvent) => {
-            if (isDisabled) return;
-            emit('click', event);
-          },
+            if (isDisabled) return
+            emit('click', event)
+          }
         },
         children
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Button;
+export default Button

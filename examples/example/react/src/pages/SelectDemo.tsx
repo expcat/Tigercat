@@ -1,85 +1,74 @@
-import React, { useState } from "react";
-import { Select, Space, Divider } from "@tigercat/react";
+import React, { useState } from 'react'
+import { Select, Space, Divider } from '@tigercat/react'
 
 const SelectDemo: React.FC = () => {
-  const [basicValue, setBasicValue] = useState<string | number>("");
-  const [defaultValue, setDefaultValue] = useState<string | number>("china");
-  const [disabledValue] = useState<string | number>("china");
+  const [basicValue, setBasicValue] = useState<string | number>('')
+  const [defaultValue, setDefaultValue] = useState<string | number>('china')
+  const [disabledValue] = useState<string | number>('china')
 
-  const [sizeSmValue, setSizeSmValue] = useState<string | number>("option1");
-  const [sizeMdValue, setSizeMdValue] = useState<string | number>("option2");
-  const [sizeLgValue, setSizeLgValue] = useState<string | number>("option3");
+  const [sizeSmValue, setSizeSmValue] = useState<string | number>('option1')
+  const [sizeMdValue, setSizeMdValue] = useState<string | number>('option2')
+  const [sizeLgValue, setSizeLgValue] = useState<string | number>('option3')
 
-  const [disabledOptionValue, setDisabledOptionValue] = useState<
-    string | number
-  >("");
+  const [disabledOptionValue, setDisabledOptionValue] = useState<string | number>('')
 
-  const [clearableValue, setClearableValue] = useState<string | number>(
-    "option2"
-  );
-  const [notClearableValue, setNotClearableValue] = useState<string | number>(
-    "option2"
-  );
+  const [clearableValue, setClearableValue] = useState<string | number>('option2')
+  const [notClearableValue, setNotClearableValue] = useState<string | number>('option2')
 
-  const [searchableValue, setSearchableValue] = useState<string | number>("");
-  const [lastSearchQuery, setLastSearchQuery] = useState("");
+  const [searchableValue, setSearchableValue] = useState<string | number>('')
+  const [lastSearchQuery, setLastSearchQuery] = useState('')
 
-  const [multipleValue, setMultipleValue] = useState<(string | number)[]>([
-    "option1",
-    "option3",
-  ]);
+  const [multipleValue, setMultipleValue] = useState<(string | number)[]>(['option1', 'option3'])
 
-  const [groupedValue, setGroupedValue] = useState<string | number>("apple");
+  const [groupedValue, setGroupedValue] = useState<string | number>('apple')
 
-  const [emptyValue, setEmptyValue] = useState<string | number>("");
+  const [emptyValue, setEmptyValue] = useState<string | number>('')
 
   const options = [
-    { label: "选项 1", value: "option1" },
-    { label: "选项 2", value: "option2" },
-    { label: "选项 3", value: "option3" },
-    { label: "选项 4", value: "option4" },
-  ];
+    { label: '选项 1', value: 'option1' },
+    { label: '选项 2', value: 'option2' },
+    { label: '选项 3', value: 'option3' },
+    { label: '选项 4', value: 'option4' }
+  ]
 
   const optionsWithDisabled = [
-    { label: "可用选项", value: "enabled" },
-    { label: "禁用选项", value: "disabled", disabled: true },
-    { label: "另一个选项", value: "another" },
-  ];
+    { label: '可用选项', value: 'enabled' },
+    { label: '禁用选项', value: 'disabled', disabled: true },
+    { label: '另一个选项', value: 'another' }
+  ]
 
   const countries = [
-    { label: "中国", value: "china" },
-    { label: "美国", value: "usa" },
-    { label: "日本", value: "japan" },
-    { label: "英国", value: "uk" },
-    { label: "法国", value: "france" },
-  ];
+    { label: '中国', value: 'china' },
+    { label: '美国', value: 'usa' },
+    { label: '日本', value: 'japan' },
+    { label: '英国', value: 'uk' },
+    { label: '法国', value: 'france' }
+  ]
 
   const groupedOptions = [
     {
-      label: "水果",
+      label: '水果',
       options: [
-        { label: "苹果", value: "apple" },
-        { label: "香蕉", value: "banana" },
-        { label: "橙子", value: "orange" },
-      ],
+        { label: '苹果', value: 'apple' },
+        { label: '香蕉', value: 'banana' },
+        { label: '橙子', value: 'orange' }
+      ]
     },
     {
-      label: "蔬菜",
+      label: '蔬菜',
       options: [
-        { label: "西红柿", value: "tomato" },
-        { label: "黄瓜", value: "cucumber" },
-        { label: "土豆", value: "potato" },
-      ],
-    },
-  ];
+        { label: '西红柿', value: 'tomato' },
+        { label: '黄瓜', value: 'cucumber' },
+        { label: '土豆', value: 'potato' }
+      ]
+    }
+  ]
 
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Select 选择器</h1>
-        <p className="text-gray-600">
-          当选项过多时，使用下拉菜单展示并选择内容。
-        </p>
+        <p className="text-gray-600">当选项过多时，使用下拉菜单展示并选择内容。</p>
       </div>
 
       {/* 基础用法 */}
@@ -90,13 +79,11 @@ const SelectDemo: React.FC = () => {
           <Space direction="vertical" className="w-full max-w-md">
             <Select
               value={basicValue}
-              onChange={(v) => setBasicValue(v ?? "")}
+              onChange={(v) => setBasicValue(v ?? '')}
               options={options}
               placeholder="请选择"
             />
-            <p className="text-sm text-gray-600">
-              选中的值：{basicValue || "未选择"}
-            </p>
+            <p className="text-sm text-gray-600">选中的值：{basicValue || '未选择'}</p>
           </Space>
         </div>
         <Divider className="my-6" />
@@ -110,7 +97,7 @@ const SelectDemo: React.FC = () => {
           <Space direction="vertical" className="w-full max-w-md">
             <Select
               value={defaultValue}
-              onChange={(v) => setDefaultValue(v ?? "")}
+              onChange={(v) => setDefaultValue(v ?? '')}
               options={countries}
             />
             <p className="text-sm text-gray-600">选中的国家：{defaultValue}</p>
@@ -134,16 +121,14 @@ const SelectDemo: React.FC = () => {
       {/* 不同尺寸 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">不同尺寸</h2>
-        <p className="text-gray-600 mb-6">
-          Select 支持 sm / md / lg 三种尺寸。
-        </p>
+        <p className="text-gray-600 mb-6">Select 支持 sm / md / lg 三种尺寸。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full max-w-md">
             <div className="w-full">
               <p className="text-sm text-gray-600 mb-2">sm</p>
               <Select
                 value={sizeSmValue}
-                onChange={(v) => setSizeSmValue(v ?? "")}
+                onChange={(v) => setSizeSmValue(v ?? '')}
                 options={options}
                 size="sm"
               />
@@ -152,7 +137,7 @@ const SelectDemo: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">md</p>
               <Select
                 value={sizeMdValue}
-                onChange={(v) => setSizeMdValue(v ?? "")}
+                onChange={(v) => setSizeMdValue(v ?? '')}
                 options={options}
                 size="md"
               />
@@ -161,7 +146,7 @@ const SelectDemo: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">lg</p>
               <Select
                 value={sizeLgValue}
-                onChange={(v) => setSizeLgValue(v ?? "")}
+                onChange={(v) => setSizeLgValue(v ?? '')}
                 options={options}
                 size="lg"
               />
@@ -179,13 +164,11 @@ const SelectDemo: React.FC = () => {
           <Space direction="vertical" className="w-full max-w-md">
             <Select
               value={disabledOptionValue}
-              onChange={(v) => setDisabledOptionValue(v ?? "")}
+              onChange={(v) => setDisabledOptionValue(v ?? '')}
               options={optionsWithDisabled}
               placeholder="请选择"
             />
-            <p className="text-sm text-gray-600">
-              选中的值：{disabledOptionValue || "未选择"}
-            </p>
+            <p className="text-sm text-gray-600">选中的值：{disabledOptionValue || '未选择'}</p>
           </Space>
         </div>
         <Divider className="my-6" />
@@ -201,7 +184,7 @@ const SelectDemo: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">clearable: true</p>
               <Select
                 value={clearableValue}
-                onChange={(v) => setClearableValue(v ?? "")}
+                onChange={(v) => setClearableValue(v ?? '')}
                 options={options}
               />
             </div>
@@ -209,7 +192,7 @@ const SelectDemo: React.FC = () => {
               <p className="text-sm text-gray-600 mb-2">clearable: false</p>
               <Select
                 value={notClearableValue}
-                onChange={(v) => setNotClearableValue(v ?? "")}
+                onChange={(v) => setNotClearableValue(v ?? '')}
                 options={options}
                 clearable={false}
               />
@@ -222,22 +205,18 @@ const SelectDemo: React.FC = () => {
       {/* 可搜索 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">可搜索</h2>
-        <p className="text-gray-600 mb-6">
-          启用 searchable 后可在下拉中输入关键字过滤选项。
-        </p>
+        <p className="text-gray-600 mb-6">启用 searchable 后可在下拉中输入关键字过滤选项。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full max-w-md">
             <Select
               value={searchableValue}
-              onChange={(v) => setSearchableValue(v ?? "")}
+              onChange={(v) => setSearchableValue(v ?? '')}
               options={countries}
               searchable
               placeholder="搜索国家"
               onSearch={(q) => setLastSearchQuery(q)}
             />
-            <p className="text-sm text-gray-600">
-              最近一次搜索：{lastSearchQuery || "（无）"}
-            </p>
+            <p className="text-sm text-gray-600">最近一次搜索：{lastSearchQuery || '（无）'}</p>
           </Space>
         </div>
         <Divider className="my-6" />
@@ -257,7 +236,7 @@ const SelectDemo: React.FC = () => {
               placeholder="请选择多个"
             />
             <p className="text-sm text-gray-600">
-              选中：{multipleValue.length ? multipleValue.join(", ") : "未选择"}
+              选中：{multipleValue.length ? multipleValue.join(', ') : '未选择'}
             </p>
           </Space>
         </div>
@@ -267,14 +246,12 @@ const SelectDemo: React.FC = () => {
       {/* 分组选项 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">分组选项</h2>
-        <p className="text-gray-600 mb-6">
-          支持传入分组数据（group label + options）。
-        </p>
+        <p className="text-gray-600 mb-6">支持传入分组数据（group label + options）。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full max-w-md">
             <Select
               value={groupedValue}
-              onChange={(v) => setGroupedValue(v ?? "")}
+              onChange={(v) => setGroupedValue(v ?? '')}
               options={groupedOptions}
             />
             <p className="text-sm text-gray-600">选中的值：{groupedValue}</p>
@@ -286,14 +263,12 @@ const SelectDemo: React.FC = () => {
       {/* 空状态 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">空状态</h2>
-        <p className="text-gray-600 mb-6">
-          当 options 为空时，会显示空提示文案。
-        </p>
+        <p className="text-gray-600 mb-6">当 options 为空时，会显示空提示文案。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full max-w-md">
             <Select
               value={emptyValue}
-              onChange={(v) => setEmptyValue(v ?? "")}
+              onChange={(v) => setEmptyValue(v ?? '')}
               options={[]}
               noDataText="暂无数据"
               placeholder="无可用选项"
@@ -302,7 +277,7 @@ const SelectDemo: React.FC = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default SelectDemo;
+export default SelectDemo

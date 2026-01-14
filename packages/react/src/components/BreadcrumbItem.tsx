@@ -1,34 +1,33 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react'
 import {
   getBreadcrumbItemClasses,
   getBreadcrumbLinkClasses,
   getBreadcrumbSeparatorClasses,
   getSeparatorContent,
-  type BreadcrumbItemProps as CoreBreadcrumbItemProps,
-} from '@tigercat/core';
-import { useBreadcrumbContext } from './Breadcrumb';
+  type BreadcrumbItemProps as CoreBreadcrumbItemProps
+} from '@tigercat/core'
+import { useBreadcrumbContext } from './Breadcrumb'
 
 export interface BreadcrumbItemProps
-  extends Omit<CoreBreadcrumbItemProps, 'style'>,
+  extends
+    Omit<CoreBreadcrumbItemProps, 'style'>,
     Omit<React.LiHTMLAttributes<HTMLLIElement>, 'onClick' | 'children'> {
   /**
    * Click event handler
    */
-  onClick?: (
-    event: React.MouseEvent<HTMLAnchorElement | HTMLSpanElement>
-  ) => void;
+  onClick?: (event: React.MouseEvent<HTMLAnchorElement | HTMLSpanElement>) => void
 
-  style?: React.CSSProperties;
+  style?: React.CSSProperties
 
   /**
    * Item content
    */
-  children?: React.ReactNode;
+  children?: React.ReactNode
 
   /**
    * Icon to display before the item content
    */
-  icon?: React.ReactNode;
+  icon?: React.ReactNode
 }
 
 export const BreadcrumbItem: React.FC<BreadcrumbItemProps> = ({
@@ -44,49 +43,44 @@ export const BreadcrumbItem: React.FC<BreadcrumbItemProps> = ({
   ...props
 }) => {
   // Get breadcrumb context
-  const breadcrumbContext = useBreadcrumbContext();
+  const breadcrumbContext = useBreadcrumbContext()
 
   // Item classes
   const itemClasses = useMemo(
     () => getBreadcrumbItemClasses(current, className),
     [current, className]
-  );
+  )
 
   // Link classes
-  const linkClasses = useMemo(
-    () => getBreadcrumbLinkClasses(current),
-    [current]
-  );
+  const linkClasses = useMemo(() => getBreadcrumbLinkClasses(current), [current])
 
   // Separator classes
-  const separatorClasses = useMemo(() => getBreadcrumbSeparatorClasses(), []);
+  const separatorClasses = useMemo(() => getBreadcrumbSeparatorClasses(), [])
 
   // Get separator content
   const separatorContent = useMemo(() => {
     const sep =
-      customSeparator !== undefined
-        ? customSeparator
-        : breadcrumbContext?.separator || '/';
-    return getSeparatorContent(sep);
-  }, [customSeparator, breadcrumbContext]);
+      customSeparator !== undefined ? customSeparator : breadcrumbContext?.separator || '/'
+    return getSeparatorContent(sep)
+  }, [customSeparator, breadcrumbContext])
 
   // Handle click
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement | HTMLSpanElement>) => {
       if (!current) {
-        onClick?.(event);
+        onClick?.(event)
       }
     },
     [current, onClick]
-  );
+  )
 
   // Compute rel attribute for external links
   const computedRel = useMemo(() => {
     if (target === '_blank') {
-      return 'noopener noreferrer';
+      return 'noopener noreferrer'
     }
-    return undefined;
-  }, [target]);
+    return undefined
+  }, [target])
 
   // Content elements
   const contentElements = icon ? (
@@ -96,7 +90,7 @@ export const BreadcrumbItem: React.FC<BreadcrumbItemProps> = ({
     </>
   ) : (
     children
-  );
+  )
 
   // Link or span element
   const linkElement =
@@ -114,19 +108,19 @@ export const BreadcrumbItem: React.FC<BreadcrumbItemProps> = ({
       <span className={linkClasses} aria-current={current ? 'page' : undefined}>
         {contentElements}
       </span>
-    );
+    )
 
   // Separator element (not rendered for current/last item)
   const separatorElement = !current ? (
     <span className={separatorClasses} aria-hidden="true">
       {separatorContent}
     </span>
-  ) : null;
+  ) : null
 
   return (
     <li className={itemClasses} style={style} {...props}>
       {linkElement}
       {separatorElement}
     </li>
-  );
-};
+  )
+}

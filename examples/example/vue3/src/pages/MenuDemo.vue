@@ -13,9 +13,12 @@ const selectedKeys5 = ref(['1'])
 const selectedKeys6 = ref(['1'])
 const selectedKeys7 = ref(['1'])
 
-const homeIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
-const settingsIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.196-15.196l-4.243 4.243m-5.906 5.906l-4.243 4.243M23 12h-6m-6 0H1m15.196 5.196l-4.243-4.243m-5.906-5.906l-4.243-4.243"></path></svg>'
-const userIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>'
+const homeIcon =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
+const settingsIcon =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.196-15.196l-4.243 4.243m-5.906 5.906l-4.243 4.243M23 12h-6m-6 0H1m15.196 5.196l-4.243-4.243m-5.906-5.906l-4.243-4.243"></path></svg>'
+const userIcon =
+  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>'
 </script>
 
 <template>
@@ -35,8 +38,7 @@ const userIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
             <MenuItem itemKey="1">菜单项 1</MenuItem>
             <MenuItem itemKey="2">菜单项 2</MenuItem>
             <MenuItem itemKey="3">菜单项 3</MenuItem>
-            <MenuItem itemKey="4"
-                      disabled>禁用菜单项</MenuItem>
+            <MenuItem itemKey="4" disabled>禁用菜单项</MenuItem>
           </Menu>
         </div>
       </div>
@@ -49,8 +51,7 @@ const userIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
       <p class="text-gray-600 mb-6">水平导航菜单。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="bg-white">
-          <Menu mode="horizontal"
-                v-model:selectedKeys="selectedKeys2">
+          <Menu mode="horizontal" v-model:selectedKeys="selectedKeys2">
             <MenuItem itemKey="home">首页</MenuItem>
             <MenuItem itemKey="products">产品</MenuItem>
             <MenuItem itemKey="about">关于</MenuItem>
@@ -67,16 +68,13 @@ const userIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
       <p class="text-gray-600 mb-6">多级菜单结构。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="bg-white inline-block">
-          <Menu v-model:selectedKeys="selectedKeys3"
-                v-model:openKeys="openKeys3">
-            <SubMenu itemKey="sub1"
-                     title="导航 1">
+          <Menu v-model:selectedKeys="selectedKeys3" v-model:openKeys="openKeys3">
+            <SubMenu itemKey="sub1" title="导航 1">
               <MenuItem itemKey="1">选项 1</MenuItem>
               <MenuItem itemKey="2">选项 2</MenuItem>
               <MenuItem itemKey="3">选项 3</MenuItem>
             </SubMenu>
-            <SubMenu itemKey="sub2"
-                     title="导航 2">
+            <SubMenu itemKey="sub2" title="导航 2">
               <MenuItem itemKey="4">选项 4</MenuItem>
               <MenuItem itemKey="5">选项 5</MenuItem>
             </SubMenu>
@@ -93,16 +91,12 @@ const userIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
       <p class="text-gray-600 mb-6">垂直菜单，子菜单内嵌在菜单中。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="bg-white inline-block">
-          <Menu mode="inline"
-                v-model:selectedKeys="selectedKeys4"
-                v-model:openKeys="openKeys4">
-            <SubMenu itemKey="sub1"
-                     title="导航 1">
+          <Menu mode="inline" v-model:selectedKeys="selectedKeys4" v-model:openKeys="openKeys4">
+            <SubMenu itemKey="sub1" title="导航 1">
               <MenuItem itemKey="1">选项 1</MenuItem>
               <MenuItem itemKey="2">选项 2</MenuItem>
             </SubMenu>
-            <SubMenu itemKey="sub2"
-                     title="导航 2">
+            <SubMenu itemKey="sub2" title="导航 2">
               <MenuItem itemKey="3">选项 3</MenuItem>
               <MenuItem itemKey="4">选项 4</MenuItem>
             </SubMenu>
@@ -118,19 +112,17 @@ const userIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
       <p class="text-gray-600 mb-6">可以收起的垂直菜单。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="mb-4">
-          <Button @click="collapsed = !collapsed"
-                  class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          <Button
+            @click="collapsed = !collapsed"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
             {{ collapsed ? '展开' : '收起' }}
           </Button>
         </div>
         <div class="bg-white inline-block">
-          <Menu mode="vertical"
-                :collapsed="collapsed"
-                v-model:selectedKeys="selectedKeys5">
+          <Menu mode="vertical" :collapsed="collapsed" v-model:selectedKeys="selectedKeys5">
             <MenuItem itemKey="1">菜单项 1</MenuItem>
             <MenuItem itemKey="2">菜单项 2</MenuItem>
-            <SubMenu itemKey="sub1"
-                     title="子菜单">
+            <SubMenu itemKey="sub1" title="子菜单">
               <MenuItem itemKey="3">选项 3</MenuItem>
               <MenuItem itemKey="4">选项 4</MenuItem>
             </SubMenu>
@@ -146,12 +138,10 @@ const userIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
       <p class="text-gray-600 mb-6">使用暗色主题的菜单。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="inline-block">
-          <Menu theme="dark"
-                v-model:selectedKeys="selectedKeys6">
+          <Menu theme="dark" v-model:selectedKeys="selectedKeys6">
             <MenuItem itemKey="1">菜单项 1</MenuItem>
             <MenuItem itemKey="2">菜单项 2</MenuItem>
-            <SubMenu itemKey="sub1"
-                     title="子菜单">
+            <SubMenu itemKey="sub1" title="子菜单">
               <MenuItem itemKey="3">选项 3</MenuItem>
               <MenuItem itemKey="4">选项 4</MenuItem>
             </SubMenu>
@@ -168,13 +158,9 @@ const userIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="bg-white inline-block">
           <Menu v-model:selectedKeys="selectedKeys7">
-            <MenuItem itemKey="1"
-                      :icon="homeIcon">首页</MenuItem>
-            <MenuItem itemKey="2"
-                      :icon="userIcon">用户</MenuItem>
-            <SubMenu itemKey="sub1"
-                     title="设置"
-                     :icon="settingsIcon">
+            <MenuItem itemKey="1" :icon="homeIcon">首页</MenuItem>
+            <MenuItem itemKey="2" :icon="userIcon">用户</MenuItem>
+            <SubMenu itemKey="sub1" title="设置" :icon="settingsIcon">
               <MenuItem itemKey="3">常规设置</MenuItem>
               <MenuItem itemKey="4">高级设置</MenuItem>
             </SubMenu>

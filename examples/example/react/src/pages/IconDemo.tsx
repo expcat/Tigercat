@@ -1,5 +1,5 @@
-import React from 'react';
-import { Icon } from '@tigercat/react';
+import React from 'react'
+import { Icon } from '@tigercat/react'
 
 const IconDemo: React.FC = () => {
   return (
@@ -67,9 +67,7 @@ const IconDemo: React.FC = () => {
       {/* 颜色定制 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">颜色定制</h2>
-        <p className="text-gray-600 mb-6">
-          默认继承文本颜色，也可以通过 color 属性指定。
-        </p>
+        <p className="text-gray-600 mb-6">默认继承文本颜色，也可以通过 color 属性指定。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="flex items-center gap-8">
             <div className="text-blue-600">
@@ -88,7 +86,7 @@ const IconDemo: React.FC = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default IconDemo;
+export default IconDemo

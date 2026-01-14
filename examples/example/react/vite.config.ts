@@ -1,6 +1,6 @@
-import path from 'node:path';
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import path from 'node:path'
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -15,16 +15,13 @@ export default defineConfig({
       '@tigercat/core': path.resolve(
         path.resolve(__dirname, '../../..'),
         'packages/core/src/index.ts'
-      ),
-    },
+      )
+    }
   },
   server: {
     port: 5174,
     fs: {
-      allow: [
-        path.resolve(__dirname, '..'),
-        path.resolve(__dirname, '../../..'),
-      ],
-    },
-  },
-});
+      allow: [path.resolve(__dirname, '..'), path.resolve(__dirname, '../../..')]
+    }
+  }
+})

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   classNames,
   textAlignClasses,
@@ -6,13 +6,13 @@ import {
   textDecorationClasses,
   textSizeClasses,
   textWeightClasses,
-  type TextProps as CoreTextProps,
-} from '@tigercat/core';
+  type TextProps as CoreTextProps
+} from '@tigercat/core'
 
 export type TextProps = CoreTextProps &
   Omit<React.HTMLAttributes<HTMLElement>, 'color' | 'children'> & {
-    children?: React.ReactNode;
-  };
+    children?: React.ReactNode
+  }
 
 export const Text: React.FC<TextProps> = ({
   tag = 'p',
@@ -38,11 +38,7 @@ export const Text: React.FC<TextProps> = ({
     underline && textDecorationClasses.underline,
     lineThrough && textDecorationClasses.lineThrough,
     className
-  );
+  )
 
-  return React.createElement(
-    tag,
-    { ...props, className: textClasses },
-    children
-  );
-};
+  return React.createElement(tag, { ...props, className: textClasses }, children)
+}

@@ -6,7 +6,7 @@ export interface LangContextValue {
 }
 
 export const LangContext = React.createContext<LangContextValue>({
-  lang: 'zh-CN',
+  lang: 'zh-CN'
 })
 
 export function useLang(): LangContextValue {

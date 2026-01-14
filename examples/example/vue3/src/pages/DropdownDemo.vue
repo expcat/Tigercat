@@ -199,9 +199,7 @@ const handleCommand = (command: string) => {
               <DropdownItem>菜单项 3</DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Button @click="visible1 = !visible1">
-            {{ visible1 ? '关闭' : '打开' }}下拉菜单
-          </Button>
+          <Button @click="visible1 = !visible1"> {{ visible1 ? '关闭' : '打开' }}下拉菜单 </Button>
         </div>
       </div>
       <Divider class="my-6" />

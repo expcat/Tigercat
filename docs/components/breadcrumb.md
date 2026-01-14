@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue';
+import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
 </script>
 
 <template>
@@ -23,7 +23,7 @@ import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react';
+import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
 
 function App() {
   return (
@@ -32,7 +32,7 @@ function App() {
       <BreadcrumbItem href="/products">产品</BreadcrumbItem>
       <BreadcrumbItem current>详情</BreadcrumbItem>
     </Breadcrumb>
-  );
+  )
 }
 ```
 
@@ -44,7 +44,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue';
+import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
 </script>
 
 <template>
@@ -74,7 +74,7 @@ import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react';
+import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
 
 function App() {
   return (
@@ -100,7 +100,7 @@ function App() {
         <BreadcrumbItem current>详情</BreadcrumbItem>
       </Breadcrumb>
     </>
-  );
+  )
 }
 ```
 
@@ -112,7 +112,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue';
+import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
 </script>
 
 <template>
@@ -127,7 +127,7 @@ import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react';
+import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
 
 function App() {
   return (
@@ -140,7 +140,7 @@ function App() {
       </BreadcrumbItem>
       <BreadcrumbItem current>详情</BreadcrumbItem>
     </Breadcrumb>
-  );
+  )
 }
 ```
 
@@ -152,7 +152,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Breadcrumb, BreadcrumbItem, Icon } from '@tigercat/vue';
+import { Breadcrumb, BreadcrumbItem, Icon } from '@tigercat/vue'
 </script>
 
 <template>
@@ -176,7 +176,7 @@ import { Breadcrumb, BreadcrumbItem, Icon } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react';
+import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
 
 function App() {
   return (
@@ -191,7 +191,7 @@ function App() {
         详情
       </BreadcrumbItem>
     </Breadcrumb>
-  );
+  )
 }
 ```
 
@@ -203,15 +203,13 @@ function App() {
 
 ```vue
 <script setup>
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue';
+import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
 </script>
 
 <template>
   <Breadcrumb>
     <BreadcrumbItem href="/">首页</BreadcrumbItem>
-    <BreadcrumbItem href="https://example.com" target="_blank">
-      外部链接
-    </BreadcrumbItem>
+    <BreadcrumbItem href="https://example.com" target="_blank"> 外部链接 </BreadcrumbItem>
     <BreadcrumbItem current>当前页面</BreadcrumbItem>
   </Breadcrumb>
 </template>
@@ -220,7 +218,7 @@ import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react';
+import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
 
 function App() {
   return (
@@ -231,7 +229,7 @@ function App() {
       </BreadcrumbItem>
       <BreadcrumbItem current>当前页面</BreadcrumbItem>
     </Breadcrumb>
-  );
+  )
 }
 ```
 
@@ -243,11 +241,11 @@ function App() {
 
 ```vue
 <script setup>
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue';
+import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
 
 const handleClick = (event) => {
-  console.log('Breadcrumb item clicked', event);
-};
+  console.log('Breadcrumb item clicked', event)
+}
 </script>
 
 <template>
@@ -262,12 +260,12 @@ const handleClick = (event) => {
 ### React
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react';
+import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
 
 function App() {
   const handleClick = (event) => {
-    console.log('Breadcrumb item clicked', event);
-  };
+    console.log('Breadcrumb item clicked', event)
+  }
 
   return (
     <Breadcrumb>
@@ -279,7 +277,7 @@ function App() {
       </BreadcrumbItem>
       <BreadcrumbItem current>详情</BreadcrumbItem>
     </Breadcrumb>
-  );
+  )
 }
 ```
 
@@ -291,19 +289,19 @@ function App() {
 
 ```vue
 <script setup>
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue';
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
 
-const route = useRoute();
+const route = useRoute()
 
 const breadcrumbs = computed(() => {
-  const matched = route.matched.filter((r) => r.meta && r.meta.breadcrumb);
+  const matched = route.matched.filter((r) => r.meta && r.meta.breadcrumb)
   return matched.map((r) => ({
     path: r.path,
-    name: r.meta.breadcrumb,
-  }));
-});
+    name: r.meta.breadcrumb
+  }))
+})
 </script>
 
 <template>
@@ -323,11 +321,11 @@ const breadcrumbs = computed(() => {
 ### React
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react';
-import { useLocation } from 'react-router-dom';
+import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
+import { useLocation } from 'react-router-dom'
 
 function App() {
-  const location = useLocation();
+  const location = useLocation()
 
   // Example: Parse pathname to create breadcrumbs
   const breadcrumbs = location.pathname
@@ -336,8 +334,8 @@ function App() {
     .map((segment, index, array) => ({
       path: '/' + array.slice(0, index + 1).join('/'),
       name: segment.charAt(0).toUpperCase() + segment.slice(1),
-      current: index === array.length - 1,
-    }));
+      current: index === array.length - 1
+    }))
 
   return (
     <Breadcrumb>
@@ -348,7 +346,7 @@ function App() {
         </BreadcrumbItem>
       ))}
     </Breadcrumb>
-  );
+  )
 }
 ```
 
@@ -425,7 +423,6 @@ Breadcrumb 组件使用 Tailwind CSS 类名，可以通过 `className` 属性进
 2. **外部链接安全性**：当使用 `target="_blank"` 时，组件会自动添加 `rel="noopener noreferrer"` 以提高安全性。
 
 3. **分隔符选择**：
-
    - 使用 `/` 或 `slash` 表示层级关系（最常用）
    - 使用 `arrow` (→) 表示流程或导航方向
    - 使用 `chevron` (›) 表示层级深度

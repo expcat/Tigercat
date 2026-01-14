@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, useMemo } from 'react';
+import React, { useRef, useState, useCallback, useMemo } from 'react'
 import {
   type UploadProps as CoreUploadProps,
   type UploadFile,
@@ -19,26 +19,24 @@ import {
   getDragAreaClasses,
   getFileListItemClasses,
   getPictureCardClasses,
-  getUploadStatusIconClasses,
-} from '@tigercat/core';
+  getUploadStatusIconClasses
+} from '@tigercat/core'
 
-import { useTigerConfig } from './ConfigProvider';
+import { useTigerConfig } from './ConfigProvider'
 
 export interface UploadProps
-  extends Omit<
-      React.HTMLAttributes<HTMLDivElement>,
-      'onChange' | 'onError' | 'onProgress'
-    >,
+  extends
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'onError' | 'onProgress'>,
     Omit<CoreUploadProps, 'onChange' | 'onRemove'> {
   /**
    * File list change callback
    */
-  onChange?: (file: UploadFile, fileList: UploadFile[]) => void;
+  onChange?: (file: UploadFile, fileList: UploadFile[]) => void
 
   /**
    * File remove callback
    */
-  onRemove?: (file: UploadFile, fileList: UploadFile[]) => void | boolean;
+  onRemove?: (file: UploadFile, fileList: UploadFile[]) => void | boolean
 
   // children/className/style 等由 React.HTMLAttributes<HTMLDivElement> 提供
 }
@@ -70,51 +68,49 @@ export const Upload: React.FC<UploadProps> = ({
   style,
   ...divProps
 }) => {
-  const spinnerSvg = getSpinnerSVG('spinner');
-  const config = useTigerConfig();
+  const spinnerSvg = getSpinnerSVG('spinner')
+  const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
     [config.locale, locale]
-  );
+  )
   const labels: UploadLabels = useMemo(
     () => getUploadLabels(mergedLocale, labelsOverrides),
     [mergedLocale, labelsOverrides]
-  );
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [internalFileList, setInternalFileList] = useState<UploadFile[]>([]);
+  )
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [internalFileList, setInternalFileList] = useState<UploadFile[]>([])
 
   // Use controlled or uncontrolled mode
-  const isControlled = controlledFileList !== undefined;
-  const fileList = isControlled ? controlledFileList : internalFileList;
+  const isControlled = controlledFileList !== undefined
+  const fileList = isControlled ? controlledFileList : internalFileList
 
   const updateFileList = useCallback(
     (newFileList: UploadFile[]) => {
       if (!isControlled) {
-        setInternalFileList(newFileList);
+        setInternalFileList(newFileList)
       }
     },
     [isControlled]
-  );
+  )
 
   const handleClick = () => {
-    if (disabled) return;
-    inputRef.current?.click();
-  };
+    if (disabled) return
+    inputRef.current?.click()
+  }
 
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const files = Array.from(event.target.files || []);
-    await processFiles(files);
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || [])
+    await processFiles(files)
     // Reset input value to allow selecting the same file again
     if (event.target) {
-      event.target.value = '';
+      event.target.value = ''
     }
-  };
+  }
 
   const processFiles = async (incomingFiles: File[]) => {
-    if (incomingFiles.length === 0) return;
+    if (incomingFiles.length === 0) return
 
     const prepared = await prepareUploadFiles({
       currentCount: fileList.length,
@@ -122,108 +118,108 @@ export const Upload: React.FC<UploadProps> = ({
       limit,
       accept,
       maxSize,
-      beforeUpload,
-    });
+      beforeUpload
+    })
 
     if (prepared.rejectedExceedFiles.length > 0) {
-      onExceed?.(prepared.rejectedExceedFiles, fileList);
+      onExceed?.(prepared.rejectedExceedFiles, fileList)
     }
 
     // Important: fileList is a snapshot (state/props). Use a local accumulator
     // to avoid overwriting previous files when selecting multiple at once.
-    let nextFileList = [...fileList];
+    let nextFileList = [...fileList]
 
     for (const file of prepared.acceptedFiles) {
-      const uploadFile = fileToUploadFile(file);
+      const uploadFile = fileToUploadFile(file)
 
       // Add to file list
-      nextFileList = [...nextFileList, uploadFile];
-      updateFileList(nextFileList);
+      nextFileList = [...nextFileList, uploadFile]
+      updateFileList(nextFileList)
 
       if (onChange) {
-        onChange(uploadFile, nextFileList);
+        onChange(uploadFile, nextFileList)
       }
 
       // Auto upload if enabled
       if (autoUpload) {
-        uploadFile.status = 'uploading';
+        uploadFile.status = 'uploading'
         if (customRequest) {
           customRequest({
             file,
             onProgress: (progress: number) => {
-              uploadFile.progress = progress;
+              uploadFile.progress = progress
               if (onProgress) {
-                onProgress(progress, uploadFile);
+                onProgress(progress, uploadFile)
               }
             },
             onSuccess: (response: unknown) => {
-              uploadFile.status = 'success';
+              uploadFile.status = 'success'
               if (onSuccess) {
-                onSuccess(response, uploadFile);
+                onSuccess(response, uploadFile)
               }
             },
             onError: (error: Error) => {
-              uploadFile.status = 'error';
-              uploadFile.error = error.message;
+              uploadFile.status = 'error'
+              uploadFile.error = error.message
               if (onError) {
-                onError(error, uploadFile);
+                onError(error, uploadFile)
               }
-            },
-          });
+            }
+          })
         } else {
           // Simulate upload for demo purposes
-          uploadFile.status = 'success';
+          uploadFile.status = 'success'
         }
       }
     }
-  };
+  }
 
   const handleRemove = (file: UploadFile) => {
-    const newFileList = fileList.filter((f) => f.uid !== file.uid);
+    const newFileList = fileList.filter((f) => f.uid !== file.uid)
 
-    const removeResult = onRemove?.(file, newFileList);
-    if (removeResult === false) return;
+    const removeResult = onRemove?.(file, newFileList)
+    if (removeResult === false) return
 
-    updateFileList(newFileList);
+    updateFileList(newFileList)
     // Keep controlled mode in sync (demo relies on onChange)
-    onChange?.(file, newFileList);
-  };
+    onChange?.(file, newFileList)
+  }
 
   const handlePreview = (file: UploadFile) => {
     if (onPreview) {
-      onPreview(file);
+      onPreview(file)
     }
-  };
+  }
 
   const handleDragOver = (event: React.DragEvent) => {
-    if (disabled) return;
-    event.preventDefault();
-    setIsDragging(true);
-  };
+    if (disabled) return
+    event.preventDefault()
+    setIsDragging(true)
+  }
 
   const handleDragKeyDown = (event: React.KeyboardEvent) => {
-    if (disabled) return;
+    if (disabled) return
 
     if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleClick();
+      event.preventDefault()
+      handleClick()
     }
-  };
+  }
 
   const handleDragLeave = (event: React.DragEvent) => {
-    if (disabled) return;
-    event.preventDefault();
-    setIsDragging(false);
-  };
+    if (disabled) return
+    event.preventDefault()
+    setIsDragging(false)
+  }
 
   const handleDrop = async (event: React.DragEvent) => {
-    if (disabled) return;
-    event.preventDefault();
-    setIsDragging(false);
+    if (disabled) return
+    event.preventDefault()
+    setIsDragging(false)
 
-    const files = Array.from(event.dataTransfer?.files || []);
-    await processFiles(files);
-  };
+    const files = Array.from(event.dataTransfer?.files || [])
+    await processFiles(files)
+  }
 
   const renderUploadButton = () => {
     if (drag) {
@@ -264,12 +260,12 @@ export const Upload: React.FC<UploadProps> = ({
           {maxSize && (
             <p className="text-xs text-gray-500">
               {interpolateUploadLabel(labels.maxSizeInfoText, {
-                maxSize: formatFileSize(maxSize),
+                maxSize: formatFileSize(maxSize)
               })}
             </p>
           )}
         </div>
-      );
+      )
     }
 
     return (
@@ -281,12 +277,12 @@ export const Upload: React.FC<UploadProps> = ({
         aria-label={labels.buttonAriaLabel}>
         {children || labels.selectFileText}
       </button>
-    );
-  };
+    )
+  }
 
   const renderFileList = () => {
     if (!showFileList || fileList.length === 0) {
-      return null;
+      return null
     }
 
     if (listType === 'picture-card') {
@@ -294,18 +290,15 @@ export const Upload: React.FC<UploadProps> = ({
         <div className="flex flex-wrap gap-2 mt-4">
           {fileList.map((file) => renderPictureCard(file))}
         </div>
-      );
+      )
     }
 
     return (
-      <ul
-        className="mt-4 space-y-2"
-        role="list"
-        aria-label={labels.uploadedFilesAriaLabel}>
+      <ul className="mt-4 space-y-2" role="list" aria-label={labels.uploadedFilesAriaLabel}>
         {fileList.map((file) => renderFileItem(file))}
       </ul>
-    );
-  };
+    )
+  }
 
   const renderFileItem = (file: UploadFile) => {
     return (
@@ -328,11 +321,7 @@ export const Upload: React.FC<UploadProps> = ({
           {/* File name and size */}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">{file.name}</p>
-            {file.size && (
-              <p className="text-xs text-gray-500">
-                {formatFileSize(file.size)}
-              </p>
-            )}
+            {file.size && <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>}
           </div>
         </div>
         {/* Actions */}
@@ -344,11 +333,7 @@ export const Upload: React.FC<UploadProps> = ({
               fill="currentColor"
               viewBox={icon20ViewBox}
               aria-label={labels.successAriaLabel}>
-              <path
-                fillRule="evenodd"
-                d={successCircleSolidIcon20PathD}
-                clipRule="evenodd"
-              />
+              <path fillRule="evenodd" d={successCircleSolidIcon20PathD} clipRule="evenodd" />
             </svg>
           )}
           {file.status === 'error' && (
@@ -357,27 +342,21 @@ export const Upload: React.FC<UploadProps> = ({
               fill="currentColor"
               viewBox={icon20ViewBox}
               aria-label={labels.errorAriaLabel}>
-              <path
-                fillRule="evenodd"
-                d={errorCircleSolidIcon20PathD}
-                clipRule="evenodd"
-              />
+              <path fillRule="evenodd" d={errorCircleSolidIcon20PathD} clipRule="evenodd" />
             </svg>
           )}
           {file.status === 'uploading' && (
             <svg
               className={getUploadStatusIconClasses('uploading', 'sm', {
-                spinning: true,
+                spinning: true
               })}
               fill="none"
               viewBox={spinnerSvg.viewBox}
               aria-label={labels.uploadingAriaLabel}>
               {spinnerSvg.elements.map((el, index) => {
-                if (el.type === 'circle')
-                  return <circle key={index} {...el.attrs} />;
-                if (el.type === 'path')
-                  return <path key={index} {...el.attrs} />;
-                return null;
+                if (el.type === 'circle') return <circle key={index} {...el.attrs} />
+                if (el.type === 'path') return <path key={index} {...el.attrs} />
+                return null
               })}
             </svg>
           )}
@@ -387,39 +366,24 @@ export const Upload: React.FC<UploadProps> = ({
             className="text-gray-400 hover:text-red-500 transition-colors"
             onClick={() => handleRemove(file)}
             aria-label={interpolateUploadLabel(labels.removeFileAriaLabel, {
-              fileName: file.name,
+              fileName: file.name
             })}>
-            <svg
-              className="w-5 h-5"
-              fill="currentColor"
-              viewBox={icon20ViewBox}
-              aria-hidden="true">
-              <path
-                fillRule="evenodd"
-                d={closeSolidIcon20PathD}
-                clipRule="evenodd"
-              />
+            <svg className="w-5 h-5" fill="currentColor" viewBox={icon20ViewBox} aria-hidden="true">
+              <path fillRule="evenodd" d={closeSolidIcon20PathD} clipRule="evenodd" />
             </svg>
           </button>
         </div>
       </li>
-    );
-  };
+    )
+  }
 
   const renderPictureCard = (file: UploadFile) => {
-    const imageUrl =
-      file.url || (file.file ? URL.createObjectURL(file.file) : '');
+    const imageUrl = file.url || (file.file ? URL.createObjectURL(file.file) : '')
 
     return (
       <div key={file.uid} className={getPictureCardClasses(file.status)}>
         {/* Image preview */}
-        {imageUrl && (
-          <img
-            src={imageUrl}
-            alt={file.name}
-            className="w-full h-full object-cover"
-          />
-        )}
+        {imageUrl && <img src={imageUrl} alt={file.name} className="w-full h-full object-cover" />}
         {/* Overlay */}
         <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 transition-all flex items-center justify-center space-x-2 opacity-0 hover:opacity-100">
           {/* Preview button */}
@@ -428,7 +392,7 @@ export const Upload: React.FC<UploadProps> = ({
             className="text-white hover:text-blue-200 transition-colors"
             onClick={() => handlePreview(file)}
             aria-label={interpolateUploadLabel(labels.previewFileAriaLabel, {
-              fileName: file.name,
+              fileName: file.name
             })}>
             <svg
               className="w-6 h-6"
@@ -456,13 +420,9 @@ export const Upload: React.FC<UploadProps> = ({
             className="text-white hover:text-red-200 transition-colors"
             onClick={() => handleRemove(file)}
             aria-label={interpolateUploadLabel(labels.removeFileAriaLabel, {
-              fileName: file.name,
+              fileName: file.name
             })}>
-            <svg
-              className="w-6 h-6"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              aria-hidden="true">
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path
                 fillRule="evenodd"
                 d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
@@ -476,29 +436,24 @@ export const Upload: React.FC<UploadProps> = ({
           <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
             <svg
               className={getUploadStatusIconClasses('uploading', 'lg', {
-                spinning: true,
+                spinning: true
               })}
               fill="none"
               viewBox={spinnerSvg.viewBox}>
               {spinnerSvg.elements.map((el, index) => {
-                if (el.type === 'circle')
-                  return <circle key={index} {...el.attrs} />;
-                if (el.type === 'path')
-                  return <path key={index} {...el.attrs} />;
-                return null;
+                if (el.type === 'circle') return <circle key={index} {...el.attrs} />
+                if (el.type === 'path') return <path key={index} {...el.attrs} />
+                return null
               })}
             </svg>
           </div>
         )}
       </div>
-    );
-  };
+    )
+  }
 
   return (
-    <div
-      {...divProps}
-      className={classNames('tiger-upload', className)}
-      style={style}>
+    <div {...divProps} className={classNames('tiger-upload', className)} style={style}>
       <input
         ref={inputRef}
         type="file"
@@ -512,5 +467,5 @@ export const Upload: React.FC<UploadProps> = ({
       {renderUploadButton()}
       {renderFileList()}
     </div>
-  );
-};
+  )
+}

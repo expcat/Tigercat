@@ -8,14 +8,14 @@
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Timeline } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Timeline } from '@tigercat/vue'
 
 const items = ref([
-  { key: 1, label: "2024-01-01", content: "Create a project" },
-  { key: 2, label: "2024-01-05", content: "Write documentation" },
-  { key: 3, label: "2024-01-10", content: "Release version 1.0" },
-]);
+  { key: 1, label: '2024-01-01', content: 'Create a project' },
+  { key: 2, label: '2024-01-05', content: 'Write documentation' },
+  { key: 3, label: '2024-01-10', content: 'Release version 1.0' }
+])
 </script>
 
 <template>
@@ -26,16 +26,16 @@ const items = ref([
 ### React
 
 ```tsx
-import { Timeline } from "@tigercat/react";
+import { Timeline } from '@tigercat/react'
 
 function App() {
   const items = [
-    { key: 1, label: "2024-01-01", content: "Create a project" },
-    { key: 2, label: "2024-01-05", content: "Write documentation" },
-    { key: 3, label: "2024-01-10", content: "Release version 1.0" },
-  ];
+    { key: 1, label: '2024-01-01', content: 'Create a project' },
+    { key: 2, label: '2024-01-05', content: 'Write documentation' },
+    { key: 3, label: '2024-01-10', content: 'Release version 1.0' }
+  ]
 
-  return <Timeline items={items} />;
+  return <Timeline items={items} />
 }
 ```
 
@@ -103,29 +103,29 @@ Timeline 组件支持 3 种展示模式：
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Timeline } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Timeline } from '@tigercat/vue'
 
 const items = ref([
   {
     key: 1,
-    label: "2024-01-01",
-    content: "Create a project",
-    color: "#10b981",
+    label: '2024-01-01',
+    content: 'Create a project',
+    color: '#10b981'
   },
   {
     key: 2,
-    label: "2024-01-05",
-    content: "Write documentation",
-    color: "#f59e0b",
+    label: '2024-01-05',
+    content: 'Write documentation',
+    color: '#f59e0b'
   },
   {
     key: 3,
-    label: "2024-01-10",
-    content: "Release version 1.0",
-    color: "#ef4444",
-  },
-]);
+    label: '2024-01-10',
+    content: 'Release version 1.0',
+    color: '#ef4444'
+  }
+])
 </script>
 
 <template>
@@ -136,31 +136,31 @@ const items = ref([
 ### React
 
 ```tsx
-import { Timeline } from "@tigercat/react";
+import { Timeline } from '@tigercat/react'
 
 function App() {
   const items = [
     {
       key: 1,
-      label: "2024-01-01",
-      content: "Create a project",
-      color: "#10b981",
+      label: '2024-01-01',
+      content: 'Create a project',
+      color: '#10b981'
     },
     {
       key: 2,
-      label: "2024-01-05",
-      content: "Write documentation",
-      color: "#f59e0b",
+      label: '2024-01-05',
+      content: 'Write documentation',
+      color: '#f59e0b'
     },
     {
       key: 3,
-      label: "2024-01-10",
-      content: "Release version 1.0",
-      color: "#ef4444",
-    },
-  ];
+      label: '2024-01-10',
+      content: 'Release version 1.0',
+      color: '#ef4444'
+    }
+  ]
 
-  return <Timeline items={items} />;
+  return <Timeline items={items} />
 }
 ```
 
@@ -174,23 +174,23 @@ function App() {
 
 ```vue
 <script setup>
-import { ref, h } from "vue";
-import { Timeline, Icon } from "@tigercat/vue";
+import { ref, h } from 'vue'
+import { Timeline, Icon } from '@tigercat/vue'
 
 const items = ref([
   {
     key: 1,
-    label: "2024-01-01",
-    content: "Create a project",
-    dot: h(Icon, { name: "check-circle", class: "text-green-500" }),
+    label: '2024-01-01',
+    content: 'Create a project',
+    dot: h(Icon, { name: 'check-circle', class: 'text-green-500' })
   },
   {
     key: 2,
-    label: "2024-01-05",
-    content: "In progress",
-    dot: h(Icon, { name: "clock", class: "text-blue-500" }),
-  },
-]);
+    label: '2024-01-05',
+    content: 'In progress',
+    dot: h(Icon, { name: 'clock', class: 'text-blue-500' })
+  }
+])
 </script>
 
 <template>
@@ -201,25 +201,25 @@ const items = ref([
 #### React
 
 ```tsx
-import { Timeline, Icon } from "@tigercat/react";
+import { Timeline, Icon } from '@tigercat/react'
 
 function App() {
   const items = [
     {
       key: 1,
-      label: "2024-01-01",
-      content: "Create a project",
-      dot: <Icon name="check-circle" className="text-green-500" />,
+      label: '2024-01-01',
+      content: 'Create a project',
+      dot: <Icon name="check-circle" className="text-green-500" />
     },
     {
       key: 2,
-      label: "2024-01-05",
-      content: "In progress",
-      dot: <Icon name="clock" className="text-blue-500" />,
-    },
-  ];
+      label: '2024-01-05',
+      content: 'In progress',
+      dot: <Icon name="clock" className="text-blue-500" />
+    }
+  ]
 
-  return <Timeline items={items} />;
+  return <Timeline items={items} />
 }
 ```
 
@@ -229,13 +229,13 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Timeline, Icon } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Timeline, Icon } from '@tigercat/vue'
 
 const items = ref([
-  { key: 1, label: "2024-01-01", content: "Create a project" },
-  { key: 2, label: "2024-01-05", content: "In progress" },
-]);
+  { key: 1, label: '2024-01-01', content: 'Create a project' },
+  { key: 2, label: '2024-01-05', content: 'In progress' }
+])
 </script>
 
 <template>
@@ -251,13 +251,13 @@ const items = ref([
 #### React
 
 ```tsx
-import { Timeline, Icon } from "@tigercat/react";
+import { Timeline, Icon } from '@tigercat/react'
 
 function App() {
   const items = [
-    { key: 1, label: "2024-01-01", content: "Create a project" },
-    { key: 2, label: "2024-01-05", content: "In progress" },
-  ];
+    { key: 1, label: '2024-01-01', content: 'Create a project' },
+    { key: 2, label: '2024-01-05', content: 'In progress' }
+  ]
 
   return (
     <Timeline
@@ -270,7 +270,7 @@ function App() {
         )
       }
     />
-  );
+  )
 }
 ```
 
@@ -282,25 +282,25 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Timeline, Tag } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Timeline, Tag } from '@tigercat/vue'
 
 const items = ref([
   {
     key: 1,
-    date: "2024-01-01",
-    title: "Project Started",
-    description: "Initial project setup and planning",
-    status: "completed",
+    date: '2024-01-01',
+    title: 'Project Started',
+    description: 'Initial project setup and planning',
+    status: 'completed'
   },
   {
     key: 2,
-    date: "2024-01-05",
-    title: "Development Phase",
-    description: "Writing code and implementing features",
-    status: "in-progress",
-  },
-]);
+    date: '2024-01-05',
+    title: 'Development Phase',
+    description: 'Writing code and implementing features',
+    status: 'in-progress'
+  }
+])
 </script>
 
 <template>
@@ -311,11 +311,7 @@ const items = ref([
       </div>
       <div class="font-medium text-gray-900 mb-1">
         {{ item.title }}
-        <Tag
-          :variant="item.status === 'completed' ? 'success' : 'primary'"
-          size="sm"
-          class="ml-2"
-        >
+        <Tag :variant="item.status === 'completed' ? 'success' : 'primary'" size="sm" class="ml-2">
           {{ item.status }}
         </Tag>
       </div>
@@ -330,25 +326,25 @@ const items = ref([
 ### React
 
 ```tsx
-import { Timeline, Tag } from "@tigercat/react";
+import { Timeline, Tag } from '@tigercat/react'
 
 function App() {
   const items = [
     {
       key: 1,
-      date: "2024-01-01",
-      title: "Project Started",
-      description: "Initial project setup and planning",
-      status: "completed",
+      date: '2024-01-01',
+      title: 'Project Started',
+      description: 'Initial project setup and planning',
+      status: 'completed'
     },
     {
       key: 2,
-      date: "2024-01-05",
-      title: "Development Phase",
-      description: "Writing code and implementing features",
-      status: "in-progress",
-    },
-  ];
+      date: '2024-01-05',
+      title: 'Development Phase',
+      description: 'Writing code and implementing features',
+      status: 'in-progress'
+    }
+  ]
 
   return (
     <Timeline
@@ -361,10 +357,9 @@ function App() {
           <div className="font-medium text-gray-900 mb-1">
             {item.title}
             <Tag
-              variant={item.status === "completed" ? "success" : "primary"}
+              variant={item.status === 'completed' ? 'success' : 'primary'}
               size="sm"
-              className="ml-2"
-            >
+              className="ml-2">
               {item.status}
             </Tag>
           </div>
@@ -372,7 +367,7 @@ function App() {
         </div>
       )}
     />
-  );
+  )
 }
 ```
 
@@ -384,14 +379,14 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Timeline } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Timeline } from '@tigercat/vue'
 
 const items = ref([
-  { key: 1, label: "2024-01-01", content: "Create a project" },
-  { key: 2, label: "2024-01-05", content: "Write documentation" },
-  { key: 3, label: "2024-01-10", content: "Release version 1.0" },
-]);
+  { key: 1, label: '2024-01-01', content: 'Create a project' },
+  { key: 2, label: '2024-01-05', content: 'Write documentation' },
+  { key: 3, label: '2024-01-10', content: 'Release version 1.0' }
+])
 </script>
 
 <template>
@@ -402,16 +397,16 @@ const items = ref([
 ### React
 
 ```tsx
-import { Timeline } from "@tigercat/react";
+import { Timeline } from '@tigercat/react'
 
 function App() {
   const items = [
-    { key: 1, label: "2024-01-01", content: "Create a project" },
-    { key: 2, label: "2024-01-05", content: "Write documentation" },
-    { key: 3, label: "2024-01-10", content: "Release version 1.0" },
-  ];
+    { key: 1, label: '2024-01-01', content: 'Create a project' },
+    { key: 2, label: '2024-01-05', content: 'Write documentation' },
+    { key: 3, label: '2024-01-10', content: 'Release version 1.0' }
+  ]
 
-  return <Timeline items={items} pending />;
+  return <Timeline items={items} pending />
 }
 ```
 
@@ -463,55 +458,55 @@ function App() {
 
 ```vue
 <script setup>
-import { ref, h } from "vue";
-import { Timeline, Tag, Icon } from "@tigercat/vue";
+import { ref, h } from 'vue'
+import { Timeline, Tag, Icon } from '@tigercat/vue'
 
 const events = ref([
   {
     key: 1,
-    date: "2024-01-01 09:00",
-    title: "Project Kickoff",
-    description: "Team meeting and project planning",
-    status: "completed",
-    color: "#10b981",
+    date: '2024-01-01 09:00',
+    title: 'Project Kickoff',
+    description: 'Team meeting and project planning',
+    status: 'completed',
+    color: '#10b981',
     dot: h(Icon, {
-      name: "check-circle",
-      class: "text-white bg-green-500 rounded-full p-1",
-    }),
+      name: 'check-circle',
+      class: 'text-white bg-green-500 rounded-full p-1'
+    })
   },
   {
     key: 2,
-    date: "2024-01-05 14:30",
-    title: "Design Review",
-    description: "UI/UX design presentation and feedback",
-    status: "completed",
-    color: "#10b981",
+    date: '2024-01-05 14:30',
+    title: 'Design Review',
+    description: 'UI/UX design presentation and feedback',
+    status: 'completed',
+    color: '#10b981',
     dot: h(Icon, {
-      name: "check-circle",
-      class: "text-white bg-green-500 rounded-full p-1",
-    }),
+      name: 'check-circle',
+      class: 'text-white bg-green-500 rounded-full p-1'
+    })
   },
   {
     key: 3,
-    date: "2024-01-10 10:00",
-    title: "Development Sprint 1",
-    description: "Implementing core features",
-    status: "in-progress",
-    color: "#3b82f6",
+    date: '2024-01-10 10:00',
+    title: 'Development Sprint 1',
+    description: 'Implementing core features',
+    status: 'in-progress',
+    color: '#3b82f6',
     dot: h(Icon, {
-      name: "code",
-      class: "text-white bg-blue-500 rounded-full p-1",
-    }),
+      name: 'code',
+      class: 'text-white bg-blue-500 rounded-full p-1'
+    })
   },
   {
     key: 4,
-    date: "2024-01-20",
-    title: "Testing Phase",
-    description: "QA testing and bug fixes",
-    status: "pending",
-    color: "#6b7280",
-  },
-]);
+    date: '2024-01-20',
+    title: 'Testing Phase',
+    description: 'QA testing and bug fixes',
+    status: 'pending',
+    color: '#6b7280'
+  }
+])
 </script>
 
 <template>
@@ -529,12 +524,11 @@ const events = ref([
               item.status === 'completed'
                 ? 'success'
                 : item.status === 'in-progress'
-                ? 'primary'
-                : 'secondary'
+                  ? 'primary'
+                  : 'secondary'
             "
             size="sm"
-            class="ml-2"
-          >
+            class="ml-2">
             {{ item.status }}
           </Tag>
         </div>
@@ -550,58 +544,46 @@ const events = ref([
 ### React
 
 ```tsx
-import { Timeline, Tag, Icon } from "@tigercat/react";
+import { Timeline, Tag, Icon } from '@tigercat/react'
 
 function App() {
   const events = [
     {
       key: 1,
-      date: "2024-01-01 09:00",
-      title: "Project Kickoff",
-      description: "Team meeting and project planning",
-      status: "completed",
-      color: "#10b981",
-      dot: (
-        <Icon
-          name="check-circle"
-          className="text-white bg-green-500 rounded-full p-1"
-        />
-      ),
+      date: '2024-01-01 09:00',
+      title: 'Project Kickoff',
+      description: 'Team meeting and project planning',
+      status: 'completed',
+      color: '#10b981',
+      dot: <Icon name="check-circle" className="text-white bg-green-500 rounded-full p-1" />
     },
     {
       key: 2,
-      date: "2024-01-05 14:30",
-      title: "Design Review",
-      description: "UI/UX design presentation and feedback",
-      status: "completed",
-      color: "#10b981",
-      dot: (
-        <Icon
-          name="check-circle"
-          className="text-white bg-green-500 rounded-full p-1"
-        />
-      ),
+      date: '2024-01-05 14:30',
+      title: 'Design Review',
+      description: 'UI/UX design presentation and feedback',
+      status: 'completed',
+      color: '#10b981',
+      dot: <Icon name="check-circle" className="text-white bg-green-500 rounded-full p-1" />
     },
     {
       key: 3,
-      date: "2024-01-10 10:00",
-      title: "Development Sprint 1",
-      description: "Implementing core features",
-      status: "in-progress",
-      color: "#3b82f6",
-      dot: (
-        <Icon name="code" className="text-white bg-blue-500 rounded-full p-1" />
-      ),
+      date: '2024-01-10 10:00',
+      title: 'Development Sprint 1',
+      description: 'Implementing core features',
+      status: 'in-progress',
+      color: '#3b82f6',
+      dot: <Icon name="code" className="text-white bg-blue-500 rounded-full p-1" />
     },
     {
       key: 4,
-      date: "2024-01-20",
-      title: "Testing Phase",
-      description: "QA testing and bug fixes",
-      status: "pending",
-      color: "#6b7280",
-    },
-  ];
+      date: '2024-01-20',
+      title: 'Testing Phase',
+      description: 'QA testing and bug fixes',
+      status: 'pending',
+      color: '#6b7280'
+    }
+  ]
 
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -618,15 +600,14 @@ function App() {
               {item.title}
               <Tag
                 variant={
-                  item.status === "completed"
-                    ? "success"
-                    : item.status === "in-progress"
-                    ? "primary"
-                    : "secondary"
+                  item.status === 'completed'
+                    ? 'success'
+                    : item.status === 'in-progress'
+                      ? 'primary'
+                      : 'secondary'
                 }
                 size="sm"
-                className="ml-2"
-              >
+                className="ml-2">
                 {item.status}
               </Tag>
             </div>
@@ -635,7 +616,7 @@ function App() {
         )}
       />
     </div>
-  );
+  )
 }
 ```
 

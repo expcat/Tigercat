@@ -1,16 +1,16 @@
-import { defineComponent, h, PropType, computed } from 'vue';
+import { defineComponent, h, PropType, computed } from 'vue'
 import {
   classNames,
   coerceClassValue,
   layoutSidebarClasses,
-  mergeStyleValues,
-} from '@tigercat/core';
+  mergeStyleValues
+} from '@tigercat/core'
 
 export interface VueSidebarProps {
-  className?: string;
-  width?: string;
-  collapsed?: boolean;
-  style?: Record<string, string | number>;
+  className?: string
+  width?: string
+  collapsed?: boolean
+  style?: Record<string, string | number>
 }
 
 export const Sidebar = defineComponent({
@@ -22,7 +22,7 @@ export const Sidebar = defineComponent({
      */
     className: {
       type: String as PropType<string>,
-      default: undefined,
+      default: undefined
     },
     /**
      * Sidebar width (CSS value)
@@ -30,7 +30,7 @@ export const Sidebar = defineComponent({
      */
     width: {
       type: String as PropType<string>,
-      default: '256px',
+      default: '256px'
     },
     /**
      * Whether the sidebar is collapsed
@@ -38,7 +38,7 @@ export const Sidebar = defineComponent({
      */
     collapsed: {
       type: Boolean as PropType<boolean>,
-      default: false,
+      default: false
     },
 
     /**
@@ -46,25 +46,21 @@ export const Sidebar = defineComponent({
      */
     style: {
       type: Object as PropType<Record<string, string | number>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   setup(props, { slots, attrs }) {
-    const attrsRecord = attrs as Record<string, unknown>;
+    const attrsRecord = attrs as Record<string, unknown>
 
     const sidebarClasses = computed(() =>
-      classNames(
-        layoutSidebarClasses,
-        props.className,
-        coerceClassValue(attrsRecord.class)
-      )
-    );
+      classNames(layoutSidebarClasses, props.className, coerceClassValue(attrsRecord.class))
+    )
 
     const sidebarStyle = computed(() => ({
       width: props.collapsed ? '0px' : props.width,
       minWidth: props.collapsed ? '0px' : props.width,
-      overflow: 'hidden',
-    }));
+      overflow: 'hidden'
+    }))
 
     return () => {
       return h(
@@ -72,16 +68,12 @@ export const Sidebar = defineComponent({
         {
           ...attrs,
           class: sidebarClasses.value,
-          style: mergeStyleValues(
-            attrsRecord.style,
-            props.style,
-            sidebarStyle.value
-          ),
+          style: mergeStyleValues(attrsRecord.style, props.style, sidebarStyle.value)
         },
         !props.collapsed && slots.default?.()
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Sidebar;
+export default Sidebar

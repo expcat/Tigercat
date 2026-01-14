@@ -28,10 +28,7 @@ export const breadcrumbLinkClasses = classNames(
 /**
  * Breadcrumb current item classes (last item, not clickable)
  */
-export const breadcrumbCurrentClasses = classNames(
-  'text-gray-900 font-medium',
-  'cursor-default'
-)
+export const breadcrumbCurrentClasses = classNames('text-gray-900 font-medium', 'cursor-default')
 
 /**
  * Breadcrumb separator base classes
@@ -42,10 +39,7 @@ export const breadcrumbSeparatorBaseClasses = 'text-gray-400 select-none'
  * Get breadcrumb item classes
  */
 export function getBreadcrumbItemClasses(current?: boolean, className?: string): string {
-  return classNames(
-    breadcrumbItemBaseClasses,
-    className
-  )
+  return classNames(breadcrumbItemBaseClasses, className)
 }
 
 /**
@@ -62,7 +56,7 @@ export function getSeparatorContent(separator?: BreadcrumbSeparator): string {
   if (!separator || separator === '/') {
     return '/'
   }
-  
+
   switch (separator) {
     case 'slash':
       return '/'
@@ -79,8 +73,5 @@ export function getSeparatorContent(separator?: BreadcrumbSeparator): string {
  * Get breadcrumb separator classes
  */
 export function getBreadcrumbSeparatorClasses(className?: string): string {
-  return classNames(
-    breadcrumbSeparatorBaseClasses,
-    className
-  )
+  return classNames(breadcrumbSeparatorBaseClasses, className)
 }

@@ -1,14 +1,14 @@
-import React from 'react';
+import React from 'react'
 import {
   classNames,
   getParagraphRowWidth,
   getSkeletonClasses,
   getSkeletonDimensions,
-  type SkeletonProps as CoreSkeletonProps,
-} from '@tigercat/core';
+  type SkeletonProps as CoreSkeletonProps
+} from '@tigercat/core'
 
 export type SkeletonProps = CoreSkeletonProps &
-  Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
+  Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>
 
 export const Skeleton: React.FC<SkeletonProps> = (props) => {
   const {
@@ -25,32 +25,29 @@ export const Skeleton: React.FC<SkeletonProps> = (props) => {
     ['aria-labelledby']: ariaLabelledByProp,
     ['aria-hidden']: ariaHiddenProp,
     ...divProps
-  } = props;
+  } = props
 
-  const skeletonClasses = classNames(
-    getSkeletonClasses(variant, animation, shape),
-    className
-  );
+  const skeletonClasses = classNames(getSkeletonClasses(variant, animation, shape), className)
 
-  const dimensions = getSkeletonDimensions(variant, width, height);
+  const dimensions = getSkeletonDimensions(variant, width, height)
 
   const computedAriaHidden =
-    ariaHiddenProp ?? (ariaLabelProp || ariaLabelledByProp ? undefined : true);
+    ariaHiddenProp ?? (ariaLabelProp || ariaLabelledByProp ? undefined : true)
 
   // For text variant with multiple rows
   if (variant === 'text' && rows > 1) {
-    const rowElements: React.ReactNode[] = [];
+    const rowElements: React.ReactNode[] = []
 
     for (let i = 0; i < rows; i++) {
       const rowStyle: React.CSSProperties = {
-        height: dimensions.height,
-      };
+        height: dimensions.height
+      }
 
       // Apply paragraph widths if paragraph mode is enabled
       if (paragraph) {
-        rowStyle.width = getParagraphRowWidth(i, rows);
+        rowStyle.width = getParagraphRowWidth(i, rows)
       } else if (dimensions.width) {
-        rowStyle.width = dimensions.width;
+        rowStyle.width = dimensions.width
       }
 
       rowElements.push(
@@ -60,7 +57,7 @@ export const Skeleton: React.FC<SkeletonProps> = (props) => {
           style={rowStyle}
           aria-hidden={computedAriaHidden}
         />
-      );
+      )
     }
 
     return (
@@ -71,14 +68,14 @@ export const Skeleton: React.FC<SkeletonProps> = (props) => {
         aria-hidden={computedAriaHidden}>
         {rowElements}
       </div>
-    );
+    )
   }
 
   const skeletonStyle: React.CSSProperties = {
     ...style,
     ...(dimensions.width ? { width: dimensions.width } : null),
-    height: dimensions.height,
-  };
+    height: dimensions.height
+  }
 
   return (
     <div
@@ -89,5 +86,5 @@ export const Skeleton: React.FC<SkeletonProps> = (props) => {
       aria-labelledby={ariaLabelledByProp}
       aria-hidden={computedAriaHidden}
     />
-  );
-};
+  )
+}

@@ -2,431 +2,399 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from "vitest";
-import { waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { Popover } from "@tigercat/react";
+import { describe, it, expect, vi } from 'vitest'
+import { waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { Popover } from '@tigercat/react'
 import {
   renderWithProps,
   renderWithChildren,
-  expectNoA11yViolations,
-} from "../utils/render-helpers-react";
-import React from "react";
+  expectNoA11yViolations
+} from '../utils/render-helpers-react'
+import React from 'react'
 
-describe("Popover", () => {
-  describe("Rendering", () => {
-    it("should render trigger element", () => {
-      const { getByText } = renderWithChildren(
-        Popover,
-        <button>Trigger</button>,
-        {
-          content: "Popover content",
-        }
-      );
+describe('Popover', () => {
+  describe('Rendering', () => {
+    it('should render trigger element', () => {
+      const { getByText } = renderWithChildren(Popover, <button>Trigger</button>, {
+        content: 'Popover content'
+      })
 
-      expect(getByText("Trigger")).toBeInTheDocument();
-    });
+      expect(getByText('Trigger')).toBeInTheDocument()
+    })
 
-    it("should not show popover content initially", () => {
-      const { queryByText } = renderWithChildren(
-        Popover,
-        <button>Trigger</button>,
-        {
-          content: "Popover content",
-        }
-      );
+    it('should not show popover content initially', () => {
+      const { queryByText } = renderWithChildren(Popover, <button>Trigger</button>, {
+        content: 'Popover content'
+      })
 
       // Content should be hidden initially
-      expect(queryByText("Popover content")).not.toBeVisible();
-    });
+      expect(queryByText('Popover content')).not.toBeVisible()
+    })
 
-    it("should show popover content when trigger is clicked", async () => {
-      const user = userEvent.setup();
-      const { getByText } = renderWithChildren(
-        Popover,
-        <button>Trigger</button>,
-        {
-          content: "Popover content",
-          trigger: "click",
-        }
-      );
+    it('should show popover content when trigger is clicked', async () => {
+      const user = userEvent.setup()
+      const { getByText } = renderWithChildren(Popover, <button>Trigger</button>, {
+        content: 'Popover content',
+        trigger: 'click'
+      })
 
-      const trigger = getByText("Trigger");
-      await user.click(trigger);
+      const trigger = getByText('Trigger')
+      await user.click(trigger)
 
       await waitFor(() => {
-        expect(getByText("Popover content")).toBeVisible();
-      });
-    });
+        expect(getByText('Popover content')).toBeVisible()
+      })
+    })
 
-    it("should render with title", async () => {
-      const user = userEvent.setup();
-      const { getByText } = renderWithChildren(
-        Popover,
-        <button>Trigger</button>,
-        {
-          title: "Popover Title",
-          content: "Popover content",
-        }
-      );
+    it('should render with title', async () => {
+      const user = userEvent.setup()
+      const { getByText } = renderWithChildren(Popover, <button>Trigger</button>, {
+        title: 'Popover Title',
+        content: 'Popover content'
+      })
 
-      await user.click(getByText("Trigger"));
+      await user.click(getByText('Trigger'))
 
       await waitFor(() => {
-        expect(getByText("Popover Title")).toBeVisible();
-        expect(getByText("Popover content")).toBeVisible();
-      });
-    });
+        expect(getByText('Popover Title')).toBeVisible()
+        expect(getByText('Popover content')).toBeVisible()
+      })
+    })
 
-    it("should render with custom content", async () => {
-      const user = userEvent.setup();
-      const { getByText } = renderWithChildren(
-        Popover,
-        <button>Trigger</button>,
-        {
-          contentContent: <div>Custom content</div>,
-        }
-      );
+    it('should render with custom content', async () => {
+      const user = userEvent.setup()
+      const { getByText } = renderWithChildren(Popover, <button>Trigger</button>, {
+        contentContent: <div>Custom content</div>
+      })
 
-      await user.click(getByText("Trigger"));
+      await user.click(getByText('Trigger'))
 
       await waitFor(() => {
-        expect(getByText("Custom content")).toBeVisible();
-      });
-    });
+        expect(getByText('Custom content')).toBeVisible()
+      })
+    })
 
-    it("should render with custom title", async () => {
-      const user = userEvent.setup();
-      const { getByText } = renderWithChildren(
-        Popover,
-        <button>Trigger</button>,
-        {
-          titleContent: <span>Custom Title</span>,
-          contentContent: <div>Content</div>,
-        }
-      );
+    it('should render with custom title', async () => {
+      const user = userEvent.setup()
+      const { getByText } = renderWithChildren(Popover, <button>Trigger</button>, {
+        titleContent: <span>Custom Title</span>,
+        contentContent: <div>Content</div>
+      })
 
-      await user.click(getByText("Trigger"));
+      await user.click(getByText('Trigger'))
 
       await waitFor(() => {
-        expect(getByText("Custom Title")).toBeVisible();
-        expect(getByText("Content")).toBeVisible();
-      });
-    });
-  });
+        expect(getByText('Custom Title')).toBeVisible()
+        expect(getByText('Content')).toBeVisible()
+      })
+    })
+  })
 
-  describe("Props", () => {
-    it("should accept content prop", async () => {
-      const user = userEvent.setup();
+  describe('Props', () => {
+    it('should accept content prop', async () => {
+      const user = userEvent.setup()
       const { getByText } = renderWithProps(Popover, {
-        content: "Test content",
-        children: <button>Click me</button>,
-      });
+        content: 'Test content',
+        children: <button>Click me</button>
+      })
 
-      await user.click(getByText("Click me"));
+      await user.click(getByText('Click me'))
 
       await waitFor(() => {
-        expect(getByText("Test content")).toBeVisible();
-      });
-    });
+        expect(getByText('Test content')).toBeVisible()
+      })
+    })
 
-    it("should accept title prop", async () => {
-      const user = userEvent.setup();
+    it('should accept title prop', async () => {
+      const user = userEvent.setup()
       const { getByText } = renderWithProps(Popover, {
-        title: "Test title",
-        content: "Test content",
-        children: <button>Click me</button>,
-      });
+        title: 'Test title',
+        content: 'Test content',
+        children: <button>Click me</button>
+      })
 
-      await user.click(getByText("Click me"));
+      await user.click(getByText('Click me'))
 
       await waitFor(() => {
-        expect(getByText("Test title")).toBeVisible();
-      });
-    });
+        expect(getByText('Test title')).toBeVisible()
+      })
+    })
 
-    it("should support placement prop (smoke)", async () => {
-      const user = userEvent.setup();
+    it('should support placement prop (smoke)', async () => {
+      const user = userEvent.setup()
       const { getByText } = renderWithProps(Popover, {
-        placement: "bottom-end",
-        content: "Content",
-        children: <button>Trigger</button>,
-      });
+        placement: 'bottom-end',
+        content: 'Content',
+        children: <button>Trigger</button>
+      })
 
-      await user.click(getByText("Trigger"));
+      await user.click(getByText('Trigger'))
       await waitFor(() => {
-        expect(getByText("Content")).toBeVisible();
-      });
-    });
+        expect(getByText('Content')).toBeVisible()
+      })
+    })
 
-    it("should support custom width", async () => {
-      const user = userEvent.setup();
+    it('should support custom width', async () => {
+      const user = userEvent.setup()
       const { getByText, container } = renderWithProps(Popover, {
-        width: "300",
-        content: "Wide content",
-        children: <button>Trigger</button>,
-      });
+        width: '300',
+        content: 'Wide content',
+        children: <button>Trigger</button>
+      })
 
-      await user.click(getByText("Trigger"));
+      await user.click(getByText('Trigger'))
 
       await waitFor(() => {
-        const contentElement = container.querySelector(
-          ".tiger-popover-content"
-        );
-        expect(contentElement).toHaveClass("w-[300px]");
-      });
-    });
-  });
+        const contentElement = container.querySelector('.tiger-popover-content')
+        expect(contentElement).toHaveClass('w-[300px]')
+      })
+    })
+  })
 
-  describe("Trigger", () => {
+  describe('Trigger', () => {
     it('should show/hide on click when trigger is "click"', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup()
       const { getByText } = renderWithProps(Popover, {
-        trigger: "click",
-        content: "Click content",
-        children: <button>Click trigger</button>,
-      });
+        trigger: 'click',
+        content: 'Click content',
+        children: <button>Click trigger</button>
+      })
 
-      const trigger = getByText("Click trigger");
+      const trigger = getByText('Click trigger')
 
       // Click to show
-      await user.click(trigger);
+      await user.click(trigger)
       await waitFor(() => {
-        expect(getByText("Click content")).toBeVisible();
-      });
+        expect(getByText('Click content')).toBeVisible()
+      })
 
       // Click again to hide
-      await user.click(trigger);
+      await user.click(trigger)
       await waitFor(
         () => {
-          expect(getByText("Click content")).not.toBeVisible();
+          expect(getByText('Click content')).not.toBeVisible()
         },
         { timeout: 2000 }
-      );
-    });
+      )
+    })
 
     it('should show/hide on hover when trigger is "hover"', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup()
       const { getByText } = renderWithProps(Popover, {
-        trigger: "hover",
-        content: "Hover content",
-        children: <button>Hover trigger</button>,
-      });
+        trigger: 'hover',
+        content: 'Hover content',
+        children: <button>Hover trigger</button>
+      })
 
-      const trigger = getByText("Hover trigger");
+      const trigger = getByText('Hover trigger')
 
       // Hover to show
-      await user.hover(trigger);
+      await user.hover(trigger)
       await waitFor(() => {
-        expect(getByText("Hover content")).toBeVisible();
-      });
+        expect(getByText('Hover content')).toBeVisible()
+      })
 
       // Unhover to hide
-      await user.unhover(trigger);
+      await user.unhover(trigger)
       await waitFor(
         () => {
-          expect(getByText("Hover content")).not.toBeVisible();
+          expect(getByText('Hover content')).not.toBeVisible()
         },
         { timeout: 2000 }
-      );
-    });
+      )
+    })
 
     it('should show/hide on focus when trigger is "focus"', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup()
       const { getByText } = renderWithProps(Popover, {
-        trigger: "focus",
-        content: "Focus content",
-        children: <button>Focus trigger</button>,
-      });
+        trigger: 'focus',
+        content: 'Focus content',
+        children: <button>Focus trigger</button>
+      })
 
-      const trigger = getByText("Focus trigger");
+      const trigger = getByText('Focus trigger')
 
       // Focus to show
-      await user.click(trigger);
+      await user.click(trigger)
       await waitFor(() => {
-        expect(getByText("Focus content")).toBeVisible();
-      });
+        expect(getByText('Focus content')).toBeVisible()
+      })
 
       // Blur to hide
-      await user.tab();
+      await user.tab()
       await waitFor(
         () => {
-          expect(getByText("Focus content")).not.toBeVisible();
+          expect(getByText('Focus content')).not.toBeVisible()
         },
         { timeout: 2000 }
-      );
-    });
-  });
+      )
+    })
+  })
 
-  describe("States", () => {
-    it("should support disabled state", async () => {
-      const user = userEvent.setup();
+  describe('States', () => {
+    it('should support disabled state', async () => {
+      const user = userEvent.setup()
       const { getByText } = renderWithProps(Popover, {
         disabled: true,
-        content: "Disabled content",
-        children: <button>Disabled trigger</button>,
-      });
+        content: 'Disabled content',
+        children: <button>Disabled trigger</button>
+      })
 
-      await user.click(getByText("Disabled trigger"));
+      await user.click(getByText('Disabled trigger'))
 
       // Wait a bit to ensure it doesn't show
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100))
 
       // Content should still not be visible
-      expect(getByText("Disabled content")).not.toBeVisible();
-    });
+      expect(getByText('Disabled content')).not.toBeVisible()
+    })
 
-    it("should support defaultVisible", () => {
+    it('should support defaultVisible', () => {
       const { getByText } = renderWithProps(Popover, {
         defaultVisible: true,
-        content: "Default visible content",
-        children: <button>Trigger</button>,
-      });
+        content: 'Default visible content',
+        children: <button>Trigger</button>
+      })
 
-      expect(getByText("Default visible content")).toBeVisible();
-    });
+      expect(getByText('Default visible content')).toBeVisible()
+    })
 
-    it("should support controlled visible state", async () => {
+    it('should support controlled visible state', async () => {
       const { getByText, rerender } = renderWithProps(Popover, {
         visible: false,
-        content: "Controlled content",
-        children: <button>Trigger</button>,
-      });
+        content: 'Controlled content',
+        children: <button>Trigger</button>
+      })
 
       // Initially hidden
-      expect(getByText("Controlled content")).not.toBeVisible();
+      expect(getByText('Controlled content')).not.toBeVisible()
 
       rerender(
         <Popover visible={true} content="Controlled content">
           <button>Trigger</button>
         </Popover>
-      );
+      )
 
       await waitFor(() => {
-        expect(getByText("Controlled content")).toBeVisible();
-      });
+        expect(getByText('Controlled content')).toBeVisible()
+      })
 
       // Hide again
       rerender(
         <Popover visible={false} content="Controlled content">
           <button>Trigger</button>
         </Popover>
-      );
+      )
 
       await waitFor(() => {
-        expect(getByText("Controlled content")).not.toBeVisible();
-      });
-    });
-  });
+        expect(getByText('Controlled content')).not.toBeVisible()
+      })
+    })
+  })
 
-  describe("Events", () => {
-    it("should call onVisibleChange when visibility changes", async () => {
-      const user = userEvent.setup();
-      const onVisibleChange = vi.fn();
+  describe('Events', () => {
+    it('should call onVisibleChange when visibility changes', async () => {
+      const user = userEvent.setup()
+      const onVisibleChange = vi.fn()
 
       const { getByText } = renderWithProps(Popover, {
-        content: "Test content",
+        content: 'Test content',
         onVisibleChange,
-        children: <button>Trigger</button>,
-      });
+        children: <button>Trigger</button>
+      })
 
-      await user.click(getByText("Trigger"));
+      await user.click(getByText('Trigger'))
 
       await waitFor(() => {
-        expect(onVisibleChange).toHaveBeenCalledWith(true);
-      });
-    });
-  });
+        expect(onVisibleChange).toHaveBeenCalledWith(true)
+      })
+    })
+  })
 
-  describe("Theme Support", () => {
-    it("should apply custom className", () => {
+  describe('Theme Support', () => {
+    it('should apply custom className', () => {
       const { container } = renderWithProps(Popover, {
-        className: "custom-popover",
-        content: "Content",
-        children: <button>Trigger</button>,
-      });
+        className: 'custom-popover',
+        content: 'Content',
+        children: <button>Trigger</button>
+      })
 
-      const popover = container.querySelector(".tiger-popover");
-      expect(popover).toHaveClass("custom-popover");
-    });
+      const popover = container.querySelector('.tiger-popover')
+      expect(popover).toHaveClass('custom-popover')
+    })
 
-    it("should use theme CSS variables (surface/border)", async () => {
-      const user = userEvent.setup();
+    it('should use theme CSS variables (surface/border)', async () => {
+      const user = userEvent.setup()
       const { getByText, container } = renderWithProps(Popover, {
-        title: "Title",
-        content: "The content",
-        children: <button>Trigger</button>,
-      });
+        title: 'Title',
+        content: 'The content',
+        children: <button>Trigger</button>
+      })
 
-      await user.click(getByText("Trigger"));
+      await user.click(getByText('Trigger'))
 
       await waitFor(() => {
-        const contentEl = container.querySelector(".tiger-popover-content");
-        expect(contentEl).toHaveClass("bg-[var(--tiger-surface,#ffffff)]");
-        expect(contentEl).toHaveClass("border-[var(--tiger-border,#e5e7eb)]");
-      });
-    });
-  });
+        const contentEl = container.querySelector('.tiger-popover-content')
+        expect(contentEl).toHaveClass('bg-[var(--tiger-surface,#ffffff)]')
+        expect(contentEl).toHaveClass('border-[var(--tiger-border,#e5e7eb)]')
+      })
+    })
+  })
 
-  describe("Accessibility", () => {
-    it("should pass a11y checks", async () => {
-      const { container } = renderWithChildren(
-        Popover,
-        <button>Accessible trigger</button>,
-        {
-          content: "Accessible content",
-        }
-      );
+  describe('Accessibility', () => {
+    it('should pass a11y checks', async () => {
+      const { container } = renderWithChildren(Popover, <button>Accessible trigger</button>, {
+        content: 'Accessible content'
+      })
 
-      await expectNoA11yViolations(container);
-    });
+      await expectNoA11yViolations(container)
+    })
 
-    it("should be keyboard navigable with focus trigger", async () => {
-      const user = userEvent.setup();
+    it('should be keyboard navigable with focus trigger', async () => {
+      const user = userEvent.setup()
       const { getByText, queryByText } = renderWithProps(Popover, {
-        trigger: "focus",
-        content: "Focus content",
-        children: <button>Focus trigger</button>,
-      });
+        trigger: 'focus',
+        content: 'Focus content',
+        children: <button>Focus trigger</button>
+      })
 
       // Tab to focus
-      await user.tab();
+      await user.tab()
 
       await waitFor(() => {
-        expect(getByText("Focus trigger")).toHaveFocus();
-        expect(queryByText("Focus content")).toBeVisible();
-      });
-    });
+        expect(getByText('Focus trigger')).toHaveFocus()
+        expect(queryByText('Focus content')).toBeVisible()
+      })
+    })
 
-    it("should close on Escape (non-manual)", async () => {
-      const user = userEvent.setup();
+    it('should close on Escape (non-manual)', async () => {
+      const user = userEvent.setup()
       const { getByText } = renderWithProps(Popover, {
-        trigger: "click",
-        content: "Esc content",
-        children: <button>Trigger</button>,
-      });
+        trigger: 'click',
+        content: 'Esc content',
+        children: <button>Trigger</button>
+      })
 
-      await user.click(getByText("Trigger"));
+      await user.click(getByText('Trigger'))
       await waitFor(() => {
-        expect(getByText("Esc content")).toBeVisible();
-      });
+        expect(getByText('Esc content')).toBeVisible()
+      })
 
-      await user.keyboard("{Escape}");
+      await user.keyboard('{Escape}')
       await waitFor(() => {
-        expect(getByText("Esc content")).not.toBeVisible();
-      });
-    });
+        expect(getByText('Esc content')).not.toBeVisible()
+      })
+    })
 
-    it("should passthrough div attributes to container", () => {
+    it('should passthrough div attributes to container', () => {
       const { container } = renderWithProps(Popover, {
-        "data-testid": "popover-root",
-        content: "Content",
-        children: <button>Trigger</button>,
-      });
+        'data-testid': 'popover-root',
+        content: 'Content',
+        children: <button>Trigger</button>
+      })
 
-      expect(
-        container.querySelector('[data-testid="popover-root"]')
-      ).toBeTruthy();
-    });
-  });
-});
+      expect(container.querySelector('[data-testid="popover-root"]')).toBeTruthy()
+    })
+  })
+})

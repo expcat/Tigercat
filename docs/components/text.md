@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Text } from '@tigercat/vue';
+import { Text } from '@tigercat/vue'
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Text } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Text } from '@tigercat/react';
+import { Text } from '@tigercat/react'
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
       <Text tag="span">This is an inline span text.</Text>
       <Text tag="div">This is a div text.</Text>
     </>
-  );
+  )
 }
 ```
 
@@ -150,8 +150,7 @@ Text 组件支持 4 种对齐方式。
   <Text align="center">Center aligned text</Text>
   <Text align="right">Right aligned text</Text>
   <Text align="justify"
-    >Justified text - Lorem ipsum dolor sit amet, consectetur adipiscing
-    elit.</Text
+    >Justified text - Lorem ipsum dolor sit amet, consectetur adipiscing elit.</Text
   >
 </template>
 ```
@@ -207,8 +206,7 @@ Text 组件支持多种预定义颜色，颜色值通过 CSS 变量提供主题�
 <template>
   <div class="w-48">
     <Text truncate>
-      This is a very long text that will be truncated with ellipsis when it
-      overflows the container.
+      This is a very long text that will be truncated with ellipsis when it overflows the container.
     </Text>
   </div>
 </template>
@@ -219,8 +217,7 @@ Text 组件支持多种预定义颜色，颜色值通过 CSS 变量提供主题�
 ```tsx
 <div className="w-48">
   <Text truncate>
-    This is a very long text that will be truncated with ellipsis when it
-    overflows the container.
+    This is a very long text that will be truncated with ellipsis when it overflows the container.
   </Text>
 </div>
 ```
@@ -284,9 +281,7 @@ Text 组件支持多种预定义颜色，颜色值通过 CSS 变量提供主题�
   <Text tag="h2" size="2xl" weight="bold" color="primary" align="center">
     Welcome to Tigercat
   </Text>
-  <Text size="lg" weight="medium" color="secondary">
-    A powerful UI component library
-  </Text>
+  <Text size="lg" weight="medium" color="secondary"> A powerful UI component library </Text>
   <Text size="sm" color="muted" italic> Last updated: 2024-12-26 </Text>
 </template>
 ```
@@ -364,14 +359,14 @@ Text 组件的 `primary` 和 `secondary` 颜色支持通过 CSS 变量自定义�
 
 ```vue
 <script setup>
-import { Text, setThemeColors } from '@tigercat/vue';
+import { Text, setThemeColors } from '@tigercat/vue'
 
 const switchTheme = () => {
   setThemeColors({
     primary: '#10b981',
-    secondary: '#6b7280',
-  });
-};
+    secondary: '#6b7280'
+  })
+}
 </script>
 
 <template>
@@ -383,22 +378,22 @@ const switchTheme = () => {
 **React:**
 
 ```tsx
-import { Text, setThemeColors } from '@tigercat/react';
+import { Text, setThemeColors } from '@tigercat/react'
 
 function App() {
   const switchTheme = () => {
     setThemeColors({
       primary: '#10b981',
-      secondary: '#6b7280',
-    });
-  };
+      secondary: '#6b7280'
+    })
+  }
 
   return (
     <>
       <Text color="primary">Primary colored text</Text>
       <button onClick={switchTheme}>切换主题</button>
     </>
-  );
+  )
 }
 ```
 
@@ -424,18 +419,11 @@ React 版本的 Text 组件支持 `className` 属性，可以传入额外的 CSS
 Text 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type {
-  TextProps,
-  TextTag,
-  TextSize,
-  TextWeight,
-  TextAlign,
-  TextColor,
-} from '@tigercat/core';
+import type { TextProps, TextTag, TextSize, TextWeight, TextAlign, TextColor } from '@tigercat/core'
 // Vue
-import type { Text } from '@tigercat/vue';
+import type { Text } from '@tigercat/vue'
 // React
-import type { Text, TextProps as ReactTextProps } from '@tigercat/react';
+import type { Text, TextProps as ReactTextProps } from '@tigercat/react'
 ```
 
 ## 示例
@@ -447,13 +435,11 @@ import type { Text, TextProps as ReactTextProps } from '@tigercat/react';
 ```vue
 <template>
   <article>
-    <Text tag="h1" size="4xl" weight="bold" color="default">
-      Article Title
-    </Text>
+    <Text tag="h1" size="4xl" weight="bold" color="default"> Article Title </Text>
     <Text size="sm" color="muted" italic> Published on December 26, 2024 </Text>
     <Text tag="p" size="base" color="default" class="mt-4">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua.
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+      labore et dolore magna aliqua.
     </Text>
   </article>
 </template>
@@ -470,8 +456,8 @@ import type { Text, TextProps as ReactTextProps } from '@tigercat/react';
     Published on December 26, 2024
   </Text>
   <Text tag="p" size="base" color="default" className="mt-4">
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua.
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+    labore et dolore magna aliqua.
   </Text>
 </article>
 ```
@@ -483,12 +469,8 @@ import type { Text, TextProps as ReactTextProps } from '@tigercat/react';
 ```vue
 <template>
   <div class="space-y-2">
-    <Text color="success" weight="medium">
-      ✓ Operation completed successfully
-    </Text>
-    <Text color="warning" weight="medium">
-      ⚠ Warning: Please review your changes
-    </Text>
+    <Text color="success" weight="medium"> ✓ Operation completed successfully </Text>
+    <Text color="warning" weight="medium"> ⚠ Warning: Please review your changes </Text>
     <Text color="danger" weight="medium"> ✗ Error: Something went wrong </Text>
   </div>
 </template>

@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Skeleton } from '@tigercat/vue';
+import { Skeleton } from '@tigercat/vue'
 </script>
 
 <template>
@@ -29,7 +29,7 @@ import { Skeleton } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Skeleton } from '@tigercat/react';
+import { Skeleton } from '@tigercat/react'
 
 function App() {
   return (
@@ -46,7 +46,7 @@ function App() {
       {/* 按钮骨架屏 */}
       <Skeleton variant="button" />
     </>
-  );
+  )
 }
 ```
 
@@ -136,22 +136,22 @@ Skeleton 组件支持 3 种动画效果：
 {
   /* 自定义宽度 */
 }
-<Skeleton width="200px" />;
+;<Skeleton width="200px" />
 
 {
   /* 自定义高度 */
 }
-<Skeleton height="50px" />;
+;<Skeleton height="50px" />
 
 {
   /* 同时自定义宽度和高度 */
 }
-<Skeleton width="300px" height="100px" />;
+;<Skeleton width="300px" height="100px" />
 
 {
   /* 使用百分比 */
 }
-<Skeleton width="80%" />;
+;<Skeleton width="80%" />
 ```
 
 ## 多行文本
@@ -176,12 +176,12 @@ Skeleton 组件支持 3 种动画效果：
 {
   /* 3 行文本 */
 }
-<Skeleton variant="text" rows={3} />;
+;<Skeleton variant="text" rows={3} />
 
 {
   /* 5 行文本 */
 }
-<Skeleton variant="text" rows={5} />;
+;<Skeleton variant="text" rows={5} />
 ```
 
 ## 段落模式
@@ -206,12 +206,12 @@ Skeleton 组件支持 3 种动画效果：
 {
   /* 段落模式 */
 }
-<Skeleton variant="text" rows={4} paragraph />;
+;<Skeleton variant="text" rows={4} paragraph />
 
 {
   /* 普通模式 */
 }
-<Skeleton variant="text" rows={4} />;
+;<Skeleton variant="text" rows={4} />
 ```
 
 ## 头像形状
@@ -268,7 +268,7 @@ Skeleton 组件支持 3 种动画效果：
 ### React
 
 ```tsx
-<div className="flex items-start gap-4">
+;<div className="flex items-start gap-4">
   {/* 头像 */}
   <Skeleton variant="avatar" shape="circle" />
 
@@ -277,16 +277,16 @@ Skeleton 组件支持 3 种动画效果：
     <Skeleton variant="text" width="200px" className="mb-2" />
     <Skeleton variant="text" rows={2} paragraph />
   </div>
-</div>;
+</div>
 
 {
   /* 图片卡片 */
 }
-<div className="mt-4">
+;<div className="mt-4">
   <Skeleton variant="image" />
   <Skeleton variant="text" rows={2} paragraph className="mt-2" />
   <Skeleton variant="button" className="mt-2" />
-</div>;
+</div>
 ```
 
 ## 加载状态控制
@@ -297,18 +297,18 @@ Skeleton 组件支持 3 种动画效果：
 
 ```vue
 <script setup>
-import { ref, onMounted } from 'vue';
-import { Skeleton } from '@tigercat/vue';
+import { ref, onMounted } from 'vue'
+import { Skeleton } from '@tigercat/vue'
 
-const loading = ref(true);
-const data = ref(null);
+const loading = ref(true)
+const data = ref(null)
 
 onMounted(async () => {
   // 模拟数据加载
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  data.value = { title: '标题', content: '内容...' };
-  loading.value = false;
-});
+  await new Promise((resolve) => setTimeout(resolve, 2000))
+  data.value = { title: '标题', content: '内容...' }
+  loading.value = false
+})
 </script>
 
 <template>
@@ -326,20 +326,20 @@ onMounted(async () => {
 ### React
 
 ```tsx
-import { useState, useEffect } from 'react';
-import { Skeleton } from '@tigercat/react';
+import { useState, useEffect } from 'react'
+import { Skeleton } from '@tigercat/react'
 
 function DataLoader() {
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState(null)
 
   useEffect(() => {
     // 模拟数据加载
     setTimeout(() => {
-      setData({ title: '标题', content: '内容...' });
-      setLoading(false);
-    }, 2000);
-  }, []);
+      setData({ title: '标题', content: '内容...' })
+      setLoading(false)
+    }, 2000)
+  }, [])
 
   if (loading) {
     return (
@@ -347,7 +347,7 @@ function DataLoader() {
         <Skeleton variant="text" width="200px" className="mb-2" />
         <Skeleton variant="text" rows={3} paragraph />
       </div>
-    );
+    )
   }
 
   return (
@@ -355,7 +355,7 @@ function DataLoader() {
       <h2>{data.title}</h2>
       <p>{data.content}</p>
     </div>
-  );
+  )
 }
 ```
 
@@ -406,7 +406,7 @@ Skeleton 默认背景色来自 CSS 变量，可通过主题覆盖（均带 fallb
   <Skeleton
     :style="{
       '--tiger-skeleton-bg': '#f1f5f9',
-      '--tiger-skeleton-bg-alt': '#e2e8f0',
+      '--tiger-skeleton-bg-alt': '#e2e8f0'
     }" />
 </template>
 ```
@@ -417,22 +417,22 @@ Skeleton 默认背景色来自 CSS 变量，可通过主题覆盖（均带 fallb
 {
   /* 自定义圆角 */
 }
-<Skeleton className="rounded-xl" />;
+;<Skeleton className="rounded-xl" />
 
 {
   /* 通过 CSS vars 覆盖颜色 */
 }
-<Skeleton
+;<Skeleton
   style={{
     ['--tiger-skeleton-bg' as `--${string}`]: '#f1f5f9',
-    ['--tiger-skeleton-bg-alt' as `--${string}`]: '#e2e8f0',
+    ['--tiger-skeleton-bg-alt' as `--${string}`]: '#e2e8f0'
   }}
-/>;
+/>
 
 {
   /* 组合自定义 */
 }
-<Skeleton className="bg-gray-100 rounded-lg shadow-sm" />;
+;<Skeleton className="bg-gray-100 rounded-lg shadow-sm" />
 ```
 
 ## 辅助功能

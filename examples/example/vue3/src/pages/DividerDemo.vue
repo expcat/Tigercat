@@ -54,12 +54,9 @@ import { Divider } from '@tigercat/vue'
       <p class="text-gray-600 mb-6">通过 color / thickness 自定义边框颜色与宽度。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="text-gray-700">color="#2563eb" thickness="2px"</div>
-        <Divider color="#2563eb"
-                 thickness="2px" />
+        <Divider color="#2563eb" thickness="2px" />
         <div class="text-gray-700">color="#10b981" thickness="4px"（dashed）</div>
-        <Divider color="#10b981"
-                 thickness="4px"
-                 line-style="dashed" />
+        <Divider color="#10b981" thickness="4px" line-style="dashed" />
       </div>
     </section>
 
@@ -70,12 +67,9 @@ import { Divider } from '@tigercat/vue'
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="flex items-center h-12">
           <span class="text-gray-700">Left</span>
-          <Divider orientation="vertical"
-                   class="h-6" />
+          <Divider orientation="vertical" class="h-6" />
           <span class="text-gray-700">Middle</span>
-          <Divider orientation="vertical"
-                   class="h-6"
-                   line-style="dashed" />
+          <Divider orientation="vertical" class="h-6" line-style="dashed" />
           <span class="text-gray-700">Right</span>
         </div>
       </div>

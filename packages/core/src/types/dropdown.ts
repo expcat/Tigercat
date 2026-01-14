@@ -5,24 +5,24 @@
 /**
  * Dropdown trigger mode - determines how the dropdown is opened
  */
-export type DropdownTrigger = "click" | "hover";
+export type DropdownTrigger = 'click' | 'hover'
 
 /**
  * Dropdown placement - position relative to the trigger element
  */
 export type DropdownPlacement =
-  | "bottom-start"
-  | "bottom"
-  | "bottom-end"
-  | "top-start"
-  | "top"
-  | "top-end"
-  | "left-start"
-  | "left"
-  | "left-end"
-  | "right-start"
-  | "right"
-  | "right-end";
+  | 'bottom-start'
+  | 'bottom'
+  | 'bottom-end'
+  | 'top-start'
+  | 'top'
+  | 'top-end'
+  | 'left-start'
+  | 'left'
+  | 'left-end'
+  | 'right-start'
+  | 'right'
+  | 'right-end'
 
 /**
  * Base dropdown props interface
@@ -32,39 +32,39 @@ export interface DropdownProps {
    * Trigger mode - click or hover
    * @default 'hover'
    */
-  trigger?: DropdownTrigger;
+  trigger?: DropdownTrigger
   /**
    * Dropdown placement relative to trigger
    * @default 'bottom-start'
    */
-  placement?: DropdownPlacement;
+  placement?: DropdownPlacement
   /**
    * Whether the dropdown is disabled
    * @default false
    */
-  disabled?: boolean;
+  disabled?: boolean
   /**
    * Whether the dropdown is visible (controlled mode)
    */
-  visible?: boolean;
+  visible?: boolean
   /**
    * Default visibility (uncontrolled mode)
    * @default false
    */
-  defaultVisible?: boolean;
+  defaultVisible?: boolean
   /**
    * Whether to close dropdown on menu item click
    * @default true
    */
-  closeOnClick?: boolean;
+  closeOnClick?: boolean
   /**
    * Additional CSS classes
    */
-  className?: string;
+  className?: string
   /**
    * Custom styles
    */
-  style?: Record<string, unknown>;
+  style?: Record<string, unknown>
 }
 
 /**
@@ -74,11 +74,11 @@ export interface DropdownMenuProps {
   /**
    * Additional CSS classes
    */
-  className?: string;
+  className?: string
   /**
    * Custom styles
    */
-  style?: Record<string, unknown>;
+  style?: Record<string, unknown>
 }
 
 /**
@@ -88,23 +88,23 @@ export interface DropdownItemProps {
   /**
    * Unique key for the dropdown item
    */
-  key?: string | number;
+  key?: string | number
   /**
    * Whether the item is disabled
    * @default false
    */
-  disabled?: boolean;
+  disabled?: boolean
   /**
    * Whether the item is divided from previous item
    * @default false
    */
-  divided?: boolean;
+  divided?: boolean
   /**
    * Icon for the dropdown item
    */
-  icon?: unknown;
+  icon?: unknown
   /**
    * Additional CSS classes
    */
-  className?: string;
+  className?: string
 }

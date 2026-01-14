@@ -1,35 +1,34 @@
-import React, { useState } from 'react';
-import { Slider, Space, Divider, Text } from '@tigercat/react';
+import React, { useState } from 'react'
+import { Slider, Space, Divider, Text } from '@tigercat/react'
 
 const SliderDemo: React.FC = () => {
-  const [basicValue, setBasicValue] = useState(50);
+  const [basicValue, setBasicValue] = useState(50)
 
-  const [rangeMinMaxDefaultValue, setRangeMinMaxDefaultValue] = useState(50);
-  const [rangeMinMaxWideValue, setRangeMinMaxWideValue] = useState(30);
+  const [rangeMinMaxDefaultValue, setRangeMinMaxDefaultValue] = useState(50)
+  const [rangeMinMaxWideValue, setRangeMinMaxWideValue] = useState(30)
 
-  const [stepValue, setStepValue] = useState(30);
+  const [stepValue, setStepValue] = useState(30)
 
-  const [rangeValue, setRangeValue] = useState<[number, number]>([20, 80]);
+  const [rangeValue, setRangeValue] = useState<[number, number]>([20, 80])
 
-  const [marksValue, setMarksValue] = useState(25);
+  const [marksValue, setMarksValue] = useState(25)
   const marks = {
     0: '0°C',
     25: '25°C',
     50: '50°C',
     75: '75°C',
-    100: '100°C',
-  };
+    100: '100°C'
+  }
 
-  const [tooltipOffValue, setTooltipOffValue] = useState(50);
+  const [tooltipOffValue, setTooltipOffValue] = useState(50)
 
-  const disabledValue = 75;
+  const disabledValue = 75
 
-  const [sizeSm, setSizeSm] = useState(30);
-  const [sizeMd, setSizeMd] = useState(50);
-  const [sizeLg, setSizeLg] = useState(70);
+  const [sizeSm, setSizeSm] = useState(30)
+  const [sizeMd, setSizeMd] = useState(50)
+  const [sizeLg, setSizeLg] = useState(70)
 
-  const toNumber = (val: number | [number, number]) =>
-    Array.isArray(val) ? val[0] : val;
+  const toNumber = (val: number | [number, number]) => (Array.isArray(val) ? val[0] : val)
 
   return (
     <div className="max-w-5xl mx-auto p-8">
@@ -121,9 +120,7 @@ const SliderDemo: React.FC = () => {
       {/* 范围选择 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">范围选择</h2>
-        <p className="text-gray-600 mb-6">
-          通过 range 启用范围选择，此时值为 [min, max]。
-        </p>
+        <p className="text-gray-600 mb-6">通过 range 启用范围选择，此时值为 [min, max]。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full max-w-md">
             <div className="flex items-center gap-4 w-full">
@@ -169,9 +166,7 @@ const SliderDemo: React.FC = () => {
       {/* 工具提示 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">工具提示</h2>
-        <p className="text-gray-600 mb-6">
-          通过 tooltip 控制是否显示提示（默认开启）。
-        </p>
+        <p className="text-gray-600 mb-6">通过 tooltip 控制是否显示提示（默认开启）。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full max-w-md">
             <div className="flex items-center gap-4 w-full">
@@ -197,13 +192,7 @@ const SliderDemo: React.FC = () => {
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full max-w-md">
             <div className="flex items-center gap-4 w-full">
-              <Slider
-                value={disabledValue}
-                min={0}
-                max={100}
-                disabled
-                className="flex-1"
-              />
+              <Slider value={disabledValue} min={0} max={100} disabled className="flex-1" />
               <Text>{disabledValue}</Text>
             </div>
           </Space>
@@ -213,9 +202,7 @@ const SliderDemo: React.FC = () => {
       {/* 不同尺寸 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">不同尺寸</h2>
-        <p className="text-gray-600 mb-6">
-          Slider 支持 sm / md / lg 三种尺寸。
-        </p>
+        <p className="text-gray-600 mb-6">Slider 支持 sm / md / lg 三种尺寸。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full max-w-md">
             <div className="w-full">
@@ -264,7 +251,7 @@ const SliderDemo: React.FC = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default SliderDemo;
+export default SliderDemo

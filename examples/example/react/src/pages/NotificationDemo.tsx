@@ -1,95 +1,95 @@
-import { useRef } from 'react';
-import { notification, Divider, Button } from '@tigercat/react';
+import { useRef } from 'react'
+import { notification, Divider, Button } from '@tigercat/react'
 
 export default function NotificationDemo() {
-  const closeNotificationRef = useRef<(() => void) | null>(null);
+  const closeNotificationRef = useRef<(() => void) | null>(null)
 
   // 基本类型
   const showInfo = () => {
     notification.info({
       title: '信息通知',
-      description: '这是一条信息通知的详细描述内容',
-    });
-  };
+      description: '这是一条信息通知的详细描述内容'
+    })
+  }
 
   const showSuccess = () => {
     notification.success({
       title: '操作成功',
-      description: '您的操作已经成功完成！',
-    });
-  };
+      description: '您的操作已经成功完成！'
+    })
+  }
 
   const showWarning = () => {
     notification.warning({
       title: '警告提示',
-      description: '请注意相关事项，以避免潜在问题',
-    });
-  };
+      description: '请注意相关事项，以避免潜在问题'
+    })
+  }
 
   const showError = () => {
     notification.error({
       title: '操作失败',
-      description: '操作失败，请检查网络连接后重试',
-    });
-  };
+      description: '操作失败，请检查网络连接后重试'
+    })
+  }
 
   // 不同位置
   const showTopLeft = () => {
     notification.info({
       title: '左上角通知',
       description: '这是显示在左上角的通知',
-      position: 'top-left',
-    });
-  };
+      position: 'top-left'
+    })
+  }
 
   const showTopRight = () => {
     notification.success({
       title: '右上角通知',
       description: '这是显示在右上角的通知（默认位置）',
-      position: 'top-right',
-    });
-  };
+      position: 'top-right'
+    })
+  }
 
   const showBottomLeft = () => {
     notification.warning({
       title: '左下角通知',
       description: '这是显示在左下角的通知',
-      position: 'bottom-left',
-    });
-  };
+      position: 'bottom-left'
+    })
+  }
 
   const showBottomRight = () => {
     notification.error({
       title: '右下角通知',
       description: '这是显示在右下角的通知',
-      position: 'bottom-right',
-    });
-  };
+      position: 'bottom-right'
+    })
+  }
 
   // 自定义持续时间
   const showShortNotification = () => {
     notification.info({
       title: '短时间通知',
       description: '这条通知2秒后关闭',
-      duration: 2000,
-    });
-  };
+      duration: 2000
+    })
+  }
 
   const showLongNotification = () => {
     notification.success({
       title: '长时间通知',
       description: '这条通知10秒后关闭',
-      duration: 10000,
-    });
-  };
+      duration: 10000
+    })
+  }
 
   const showPersistentNotification = () => {
     notification.warning({
       title: '持久通知',
       description: '这条通知需要手动关闭',
-      duration: 0,
-    });
-  };
+      duration: 0
+    })
+  }
 
   // 可关闭性
   const showClosableNotification = () => {
@@ -97,50 +97,50 @@ export default function NotificationDemo() {
       title: '可关闭通知',
       description: '这条通知可以通过点击关闭按钮来关闭',
       closable: true,
-      duration: 0,
-    });
-  };
+      duration: 0
+    })
+  }
 
   const showNonClosableNotification = () => {
     notification.success({
       title: '不可手动关闭',
       description: '这条通知没有关闭按钮，5秒后自动消失',
       closable: false,
-      duration: 5000,
-    });
-  };
+      duration: 5000
+    })
+  }
 
   // 手动控制
   const showNotification = () => {
     closeNotificationRef.current = notification.info({
       title: '处理中',
       description: '正在处理您的请求...',
-      duration: 0,
-    });
-  };
+      duration: 0
+    })
+  }
 
   const closeManually = () => {
     if (closeNotificationRef.current) {
-      closeNotificationRef.current();
-      closeNotificationRef.current = null;
+      closeNotificationRef.current()
+      closeNotificationRef.current = null
     }
-  };
+  }
 
   const simulateRequest = async () => {
     const close = notification.info({
       title: '请求处理',
       description: '正在处理您的请求...',
-      duration: 0,
-    });
+      duration: 0
+    })
 
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 3000))
 
-    close();
+    close()
     notification.success({
       title: '请求成功',
-      description: '您的请求已成功处理！',
-    });
-  };
+      description: '您的请求已成功处理！'
+    })
+  }
 
   // 点击事件
   const showClickableNotification = () => {
@@ -148,11 +148,11 @@ export default function NotificationDemo() {
       title: '可点击通知',
       description: '点击这条通知查看详情',
       onClick: () => {
-        console.log('通知被点击了');
-        alert('查看详情功能');
-      },
-    });
-  };
+        console.log('通知被点击了')
+        alert('查看详情功能')
+      }
+    })
+  }
 
   // 回调函数
   const showNotificationWithCallback = () => {
@@ -160,64 +160,62 @@ export default function NotificationDemo() {
       title: '操作成功',
       description: '您的操作已经成功完成！',
       onClose: () => {
-        console.log('通知已关闭');
-      },
-    });
-  };
+        console.log('通知已关闭')
+      }
+    })
+  }
 
   // 清空通知
   const showMultipleNotifications = () => {
     notification.info({
       title: '通知 1',
       description: '第一条通知',
-      position: 'top-right',
-    });
+      position: 'top-right'
+    })
 
     notification.success({
       title: '通知 2',
       description: '第二条通知',
-      position: 'top-left',
-    });
+      position: 'top-left'
+    })
 
     notification.warning({
       title: '通知 3',
       description: '第三条通知',
-      position: 'bottom-right',
-    });
-  };
+      position: 'bottom-right'
+    })
+  }
 
   const clearAll = () => {
-    notification.clear();
-  };
+    notification.clear()
+  }
 
   const clearTopRight = () => {
-    notification.clear('top-right');
-  };
+    notification.clear('top-right')
+  }
 
   // 快速使用
   const quickInfo = () => {
-    notification.info('快速信息通知');
-  };
+    notification.info('快速信息通知')
+  }
 
   const quickSuccess = () => {
-    notification.success('快速成功通知');
-  };
+    notification.success('快速成功通知')
+  }
 
   const quickWarning = () => {
-    notification.warning('快速警告通知');
-  };
+    notification.warning('快速警告通知')
+  }
 
   const quickError = () => {
-    notification.error('快速错误通知');
-  };
+    notification.error('快速错误通知')
+  }
 
   return (
     <div className="p-6 space-y-8">
       <div>
         <h1 className="text-2xl font-bold mb-2">Notification 通知</h1>
-        <p className="text-gray-600">
-          全局显示通知提示信息，支持多种展示位置、关闭与定时消失。
-        </p>
+        <p className="text-gray-600">全局显示通知提示信息，支持多种展示位置、关闭与定时消失。</p>
       </div>
 
       <Divider />
@@ -417,5 +415,5 @@ export default function NotificationDemo() {
         </div>
       </div>
     </div>
-  );
+  )
 }

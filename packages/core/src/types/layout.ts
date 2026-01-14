@@ -20,7 +20,7 @@ export interface HeaderProps {
    * Additional CSS classes
    */
   className?: string
-  
+
   /**
    * Header height
    * @default '64px'
@@ -36,13 +36,13 @@ export interface SidebarProps {
    * Additional CSS classes
    */
   className?: string
-  
+
   /**
    * Sidebar width
    * @default '256px'
    */
   width?: string
-  
+
   /**
    * Whether sidebar is collapsed
    * @default false
@@ -68,7 +68,7 @@ export interface FooterProps {
    * Additional CSS classes
    */
   className?: string
-  
+
   /**
    * Footer height
    * @default 'auto'

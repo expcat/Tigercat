@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue';
+import { defineComponent, computed, h, PropType } from 'vue'
 import {
   classNames,
   getSpaceGapSize,
@@ -6,16 +6,16 @@ import {
   getSpaceDirectionClass,
   type SpaceDirection,
   type SpaceSize,
-  type SpaceAlign,
-} from '@tigercat/core';
+  type SpaceAlign
+} from '@tigercat/core'
 
-const baseClasses = 'inline-flex';
+const baseClasses = 'inline-flex'
 
 export interface VueSpaceProps {
-  direction?: SpaceDirection;
-  size?: SpaceSize;
-  align?: SpaceAlign;
-  wrap?: boolean;
+  direction?: SpaceDirection
+  size?: SpaceSize
+  align?: SpaceAlign
+  wrap?: boolean
 }
 
 export const Space = defineComponent({
@@ -23,23 +23,23 @@ export const Space = defineComponent({
   props: {
     direction: {
       type: String as PropType<SpaceDirection>,
-      default: 'horizontal' as SpaceDirection,
+      default: 'horizontal' as SpaceDirection
     },
     size: {
       type: [String, Number] as PropType<SpaceSize>,
-      default: 'md' as SpaceSize,
+      default: 'md' as SpaceSize
     },
     align: {
       type: String as PropType<SpaceAlign>,
-      default: 'start' as SpaceAlign,
+      default: 'start' as SpaceAlign
     },
     wrap: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   setup(props, { slots, attrs }) {
-    const gapSize = computed(() => getSpaceGapSize(props.size));
+    const gapSize = computed(() => getSpaceGapSize(props.size))
 
     const spaceClasses = computed(() =>
       classNames(
@@ -49,11 +49,11 @@ export const Space = defineComponent({
         gapSize.value.class,
         props.wrap && 'flex-wrap'
       )
-    );
+    )
 
     const spaceStyle = computed(() =>
       gapSize.value.style ? { gap: gapSize.value.style } : undefined
-    );
+    )
 
     return () => {
       return h(
@@ -61,12 +61,12 @@ export const Space = defineComponent({
         {
           ...attrs,
           class: [spaceClasses.value, attrs.class],
-          style: [spaceStyle.value, attrs.style],
+          style: [spaceStyle.value, attrs.style]
         },
         slots.default?.()
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Space;
+export default Space

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   classNames,
   getDescriptionsClasses,
@@ -14,65 +14,64 @@ import {
   descriptionsVerticalWrapperClasses,
   type DescriptionsSize,
   type DescriptionsLayout,
-  type DescriptionsItem,
-} from '@tigercat/core';
+  type DescriptionsItem
+} from '@tigercat/core'
 
-export interface DescriptionsProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
+export interface DescriptionsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   /**
    * Descriptions title
    */
-  title?: React.ReactNode;
+  title?: React.ReactNode
 
   /**
    * Extra content (actions, links, etc.)
    */
-  extra?: React.ReactNode;
+  extra?: React.ReactNode
 
   /**
    * Whether to show border
    * @default false
    */
-  bordered?: boolean;
+  bordered?: boolean
 
   /**
    * Number of columns per row
    * @default 3
    */
-  column?: number;
+  column?: number
 
   /**
    * Descriptions size
    * @default 'md'
    */
-  size?: DescriptionsSize;
+  size?: DescriptionsSize
 
   /**
    * Descriptions layout
    * @default 'horizontal'
    */
-  layout?: DescriptionsLayout;
+  layout?: DescriptionsLayout
 
   /**
    * Whether to show colon after label
    * @default true
    */
-  colon?: boolean;
+  colon?: boolean
 
   /**
    * Label style
    */
-  labelStyle?: React.CSSProperties;
+  labelStyle?: React.CSSProperties
 
   /**
    * Content style
    */
-  contentStyle?: React.CSSProperties;
+  contentStyle?: React.CSSProperties
 
   /**
    * Items data source
    */
-  items?: DescriptionsItem[];
+  items?: DescriptionsItem[]
 }
 
 export const Descriptions: React.FC<DescriptionsProps> = ({
@@ -91,38 +90,38 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
   ...props
 }) => {
   const renderHeader = () => {
-    if (!title && !extra) return null;
+    if (!title && !extra) return null
 
     return (
       <div className={descriptionsHeaderClasses}>
         {title ? <div className={descriptionsTitleClasses}>{title}</div> : null}
         {extra ? <div className={descriptionsExtraClasses}>{extra}</div> : null}
       </div>
-    );
-  };
+    )
+  }
 
   const renderRow = (rowItems: DescriptionsItem[], rowIndex: number) => {
-    const cells: React.ReactNode[] = [];
+    const cells: React.ReactNode[] = []
 
     rowItems.forEach((item, itemIndex) => {
-      const span = Math.min(item.span || 1, column);
+      const span = Math.min(item.span || 1, column)
       const labelClass = classNames(
         getDescriptionsLabelClasses(bordered, size, layout),
         item.labelClassName
-      );
+      )
       const contentClass = classNames(
         getDescriptionsContentClasses(bordered, size, layout),
         item.contentClassName
-      );
+      )
 
-      const key = `${rowIndex}-${itemIndex}`;
+      const key = `${rowIndex}-${itemIndex}`
 
       cells.push(
         <th key={`${key}-label`} className={labelClass} style={labelStyle}>
           {item.label}
           {colon && layout === 'horizontal' ? ':' : ''}
         </th>
-      );
+      )
 
       cells.push(
         <td
@@ -132,37 +131,37 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
           colSpan={span > 1 ? span * 2 - 1 : 1}>
           {item.content as React.ReactNode}
         </td>
-      );
-    });
+      )
+    })
 
-    return <tr key={rowIndex}>{cells}</tr>;
-  };
+    return <tr key={rowIndex}>{cells}</tr>
+  }
 
   // Render horizontal layout (table-based)
   const renderHorizontalLayout = () => {
     if (items.length === 0 && !children) {
-      return null;
+      return null
     }
 
-    const rows = groupItemsIntoRows(items, column);
+    const rows = groupItemsIntoRows(items, column)
 
     return (
       <table className={getDescriptionsTableClasses(bordered)}>
         <tbody>{rows.map((row, index) => renderRow(row, index))}</tbody>
       </table>
-    );
-  };
+    )
+  }
 
   // Render a single item in vertical layout
   const renderVerticalItem = (item: DescriptionsItem, index: number) => {
     const labelClass = classNames(
       getDescriptionsLabelClasses(bordered, size, layout),
       item.labelClassName
-    );
+    )
     const contentClass = classNames(
       getDescriptionsContentClasses(bordered, size, layout),
       item.contentClassName
-    );
+    )
 
     if (bordered) {
       return (
@@ -175,10 +174,10 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
             {item.content as React.ReactNode}
           </td>
         </tr>
-      );
+      )
     }
 
-    const itemClasses = getDescriptionsVerticalItemClasses(bordered, size);
+    const itemClasses = getDescriptionsVerticalItemClasses(bordered, size)
     return (
       <div key={index} className={itemClasses}>
         <dt className={labelClass} style={labelStyle}>
@@ -189,48 +188,44 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
           {item.content as React.ReactNode}
         </dd>
       </div>
-    );
-  };
+    )
+  }
 
   // Render vertical layout (stacked)
   const renderVerticalLayout = () => {
     if (items.length === 0 && !children) {
-      return null;
+      return null
     }
 
     if (bordered) {
       // Use table for bordered vertical layout
       return (
         <table className={getDescriptionsTableClasses(bordered)}>
-          <tbody>
-            {items.map((item, index) => renderVerticalItem(item, index))}
-          </tbody>
+          <tbody>{items.map((item, index) => renderVerticalItem(item, index))}</tbody>
         </table>
-      );
+      )
     }
 
     return (
       <dl className={descriptionsVerticalWrapperClasses}>
         {items.map((item, index) => renderVerticalItem(item, index))}
       </dl>
-    );
-  };
+    )
+  }
 
   const descriptionsClasses = classNames(
     descriptionsWrapperClasses,
     getDescriptionsClasses(bordered, size),
     className
-  );
+  )
 
   return (
     <div className={descriptionsClasses} {...props}>
       {renderHeader()}
-      {layout === 'horizontal'
-        ? renderHorizontalLayout()
-        : renderVerticalLayout()}
+      {layout === 'horizontal' ? renderHorizontalLayout() : renderVerticalLayout()}
       {children}
     </div>
-  );
-};
+  )
+}
 
-export default Descriptions;
+export default Descriptions

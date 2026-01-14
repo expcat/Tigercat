@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Divider } from '@tigercat/vue';
+import { Divider } from '@tigercat/vue'
 </script>
 
 <template>
@@ -23,7 +23,7 @@ import { Divider } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Divider } from '@tigercat/react';
+import { Divider } from '@tigercat/react'
 
 function App() {
   return (
@@ -32,7 +32,7 @@ function App() {
       <Divider />
       <p>Content below</p>
     </div>
-  );
+  )
 }
 ```
 
@@ -65,16 +65,16 @@ Divider 组件支持横向和纵向两种方向：
 {
   /* 横向分割线 */
 }
-<Divider orientation="horizontal" />;
+;<Divider orientation="horizontal" />
 
 {
   /* 纵向分割线 */
 }
-<div className="flex h-20">
+;<div className="flex h-20">
   <span>Left content</span>
   <Divider orientation="vertical" />
   <span>Right content</span>
-</div>;
+</div>
 ```
 
 ## 线条样式 (Line Style)
@@ -168,22 +168,22 @@ Divider 组件支持 6 种不同的间距大小：
 {
   /* 使用颜色名称 */
 }
-<Divider color="red" />;
+;<Divider color="red" />
 
 {
   /* 使用十六进制颜色 */
 }
-<Divider color="#ff6b6b" />;
+;<Divider color="#ff6b6b" />
 
 {
   /* 使用 RGB 颜色 */
 }
-<Divider color="rgb(59, 130, 246)" />;
+;<Divider color="rgb(59, 130, 246)" />
 
 {
   /* 使用 CSS 变量 */
 }
-<Divider color="var(--tiger-primary)" />;
+;<Divider color="var(--tiger-primary)" />
 ```
 
 ## 自定义粗细 (Custom Thickness)
@@ -237,21 +237,21 @@ Divider 组件支持 6 种不同的间距大小：
 {
   /* 红色虚线，大间距 */
 }
-<Divider lineStyle="dashed" color="#ef4444" spacing="lg" />;
+;<Divider lineStyle="dashed" color="#ef4444" spacing="lg" />
 
 {
   /* 蓝色粗实线，小间距 */
 }
-<Divider lineStyle="solid" color="#3b82f6" thickness="3px" spacing="sm" />;
+;<Divider lineStyle="solid" color="#3b82f6" thickness="3px" spacing="sm" />
 
 {
   /* 纵向点线 */
 }
-<div className="flex h-32">
+;<div className="flex h-32">
   <div>Content 1</div>
   <Divider orientation="vertical" lineStyle="dotted" color="#10b981" />
   <div>Content 2</div>
-</div>;
+</div>
 ```
 
 ## API
@@ -318,17 +318,14 @@ import type {
   DividerProps,
   DividerOrientation,
   DividerLineStyle,
-  DividerSpacing,
-} from '@tigercat/core';
+  DividerSpacing
+} from '@tigercat/core'
 
 // Vue
-import type { Divider } from '@tigercat/vue';
+import type { Divider } from '@tigercat/vue'
 
 // React
-import type {
-  Divider,
-  DividerProps as ReactDividerProps,
-} from '@tigercat/react';
+import type { Divider, DividerProps as ReactDividerProps } from '@tigercat/react'
 ```
 
 ## 示例
@@ -339,7 +336,7 @@ import type {
 
 ```vue
 <script setup>
-import { Divider } from '@tigercat/vue';
+import { Divider } from '@tigercat/vue'
 </script>
 
 <template>
@@ -358,7 +355,7 @@ import { Divider } from '@tigercat/vue';
 #### React
 
 ```tsx
-import { Divider } from '@tigercat/react';
+import { Divider } from '@tigercat/react'
 
 function CardExample() {
   return (
@@ -371,7 +368,7 @@ function CardExample() {
       <h3 className="text-lg font-bold">Section 2</h3>
       <p>Content for section 2</p>
     </div>
-  );
+  )
 }
 ```
 
@@ -461,20 +458,20 @@ function CardExample() {
    {
      /* ✅ 正确 - 父容器有高度 */
    }
-   <div className="flex h-20">
+   ;<div className="flex h-20">
      <span>Left</span>
      <Divider orientation="vertical" />
      <span>Right</span>
-   </div>;
+   </div>
 
    {
      /* ❌ 错误 - 父容器没有高度 */
    }
-   <div className="flex">
+   ;<div className="flex">
      <span>Left</span>
      <Divider orientation="vertical" />
      <span>Right</span>
-   </div>;
+   </div>
    ```
 
 2. **间距选择**：根据使用场景选择合适的间距大小，避免分割线占用过多空间。

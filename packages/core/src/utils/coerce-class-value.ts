@@ -10,39 +10,39 @@
  * function normalizes Vue-style inputs into a single space-delimited string.
  */
 
-import type { ClassValue } from './class-names';
+import type { ClassValue } from './class-names'
 
 const isRecord = (val: unknown): val is Record<string, unknown> =>
-  typeof val === 'object' && val !== null;
+  typeof val === 'object' && val !== null
 
 const toClassString = (input: unknown): string => {
-  if (!input) return '';
+  if (!input) return ''
 
   if (typeof input === 'string' || typeof input === 'number') {
-    return String(input);
+    return String(input)
   }
 
   if (Array.isArray(input)) {
     return input
       .map((item) => toClassString(item))
       .filter(Boolean)
-      .join(' ');
+      .join(' ')
   }
 
   if (isRecord(input)) {
     return Object.keys(input)
       .filter((key) => Boolean(input[key]))
-      .join(' ');
+      .join(' ')
   }
 
-  return '';
-};
+  return ''
+}
 
 export function coerceClassValue(input: unknown): ClassValue {
-  if (input === null || input === undefined || input === false) return input;
+  if (input === null || input === undefined || input === false) return input
 
-  if (typeof input === 'string' || typeof input === 'number') return input;
+  if (typeof input === 'string' || typeof input === 'number') return input
 
-  const normalized = toClassString(input);
-  return normalized ? normalized : undefined;
+  const normalized = toClassString(input)
+  return normalized ? normalized : undefined
 }

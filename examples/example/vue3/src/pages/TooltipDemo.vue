@@ -35,43 +35,43 @@ const visible1 = ref(false)
               <Button>Top</Button>
             </Tooltip>
           </div>
-          
+
           <div class="flex justify-center">
             <Tooltip content="顶部开始" placement="top-start">
               <Button>Top Start</Button>
             </Tooltip>
           </div>
-          
+
           <div class="flex justify-center">
             <Tooltip content="顶部结束" placement="top-end">
               <Button>Top End</Button>
             </Tooltip>
           </div>
-          
+
           <div class="flex justify-center">
             <Tooltip content="底部提示" placement="bottom">
               <Button>Bottom</Button>
             </Tooltip>
           </div>
-          
+
           <div class="flex justify-center">
             <Tooltip content="底部开始" placement="bottom-start">
               <Button>Bottom Start</Button>
             </Tooltip>
           </div>
-          
+
           <div class="flex justify-center">
             <Tooltip content="底部结束" placement="bottom-end">
               <Button>Bottom End</Button>
             </Tooltip>
           </div>
-          
+
           <div class="flex justify-center">
             <Tooltip content="左侧提示" placement="left">
               <Button>Left</Button>
             </Tooltip>
           </div>
-          
+
           <div class="flex justify-center">
             <Tooltip content="右侧提示" placement="right">
               <Button>Right</Button>
@@ -91,11 +91,11 @@ const visible1 = ref(false)
           <Tooltip content="悬停触发（默认）" trigger="hover">
             <Button>Hover</Button>
           </Tooltip>
-          
+
           <Tooltip content="点击触发" trigger="click">
             <Button>Click</Button>
           </Tooltip>
-          
+
           <Tooltip content="聚焦触发" trigger="focus">
             <Button>Focus</Button>
           </Tooltip>
@@ -131,7 +131,7 @@ const visible1 = ref(false)
           <Tooltip v-model:visible="visible1" content="受控的气泡提示">
             <Button>受控提示</Button>
           </Tooltip>
-          
+
           <Button @click="visible1 = !visible1">
             {{ visible1 ? '隐藏' : '显示' }}
           </Button>
@@ -149,7 +149,7 @@ const visible1 = ref(false)
           <Tooltip content="正常提示">
             <Button>正常</Button>
           </Tooltip>
-          
+
           <Tooltip content="禁用提示" disabled>
             <Button>禁用</Button>
           </Tooltip>

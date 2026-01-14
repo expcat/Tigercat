@@ -8,7 +8,7 @@ const userInfo = [
   { label: '邮箱', content: 'zhangsan@example.com' },
   { label: '地址', content: '北京市朝阳区某街道' },
   { label: '公司', content: '某科技有限公司' },
-  { label: '职位', content: '高级前端工程师' },
+  { label: '职位', content: '高级前端工程师' }
 ]
 
 // Product details with spanning
@@ -17,7 +17,11 @@ const productDetails = [
   { label: '计费方式', content: '包年包月' },
   { label: '创建时间', content: '2024-01-01 10:00:00' },
   { label: '到期时间', content: '2025-01-01 10:00:00' },
-  { label: '描述', content: '这是一个高性能的云数据库服务，支持多种数据库引擎，提供自动备份、监控和扩展功能。', span: 2 },
+  {
+    label: '描述',
+    content: '这是一个高性能的云数据库服务，支持多种数据库引擎，提供自动备份、监控和扩展功能。',
+    span: 2
+  }
 ]
 
 // Order information
@@ -29,7 +33,7 @@ const orderInfo = [
   { label: '收货地址', content: '上海市浦东新区张江高科技园区', span: 2 },
   { label: '订单总额', content: '¥1,299.00' },
   { label: '优惠金额', content: '¥100.00' },
-  { label: '实付金额', content: '¥1,199.00' },
+  { label: '实付金额', content: '¥1,199.00' }
 ]
 
 // Server configuration
@@ -39,9 +43,8 @@ const serverConfig = [
   { label: '磁盘', content: '500 GB SSD' },
   { label: '带宽', content: '10 Mbps' },
   { label: '操作系统', content: 'Ubuntu 20.04 LTS' },
-  { label: 'IP 地址', content: '192.168.1.100' },
+  { label: 'IP 地址', content: '192.168.1.100' }
 ]
-
 </script>
 
 <template>
@@ -153,9 +156,7 @@ const serverConfig = [
     <!-- 自定义样式 -->
     <section id="style" class="mb-12">
       <h2 class="text-2xl font-bold mb-4">自定义样式</h2>
-      <p class="text-gray-600 mb-6">
-        通过 labelStyle 和 contentStyle 自定义标签/内容样式。
-      </p>
+      <p class="text-gray-600 mb-6">通过 labelStyle 和 contentStyle 自定义标签/内容样式。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Descriptions
           title="用户信息（自定义样式）"
@@ -163,8 +164,7 @@ const serverConfig = [
           :column="2"
           :items="userInfo"
           :labelStyle="{ fontWeight: '600', color: '#1f2937' }"
-          :contentStyle="{ color: '#6b7280' }"
-        />
+          :contentStyle="{ color: '#6b7280' }" />
       </div>
       <Divider class="my-6" />
     </section>

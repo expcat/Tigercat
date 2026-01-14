@@ -10,7 +10,7 @@ Layout 组件提供了一套完整的页面布局解决方案，支持多种经�
 
 ```vue
 <script setup>
-import { Layout, Header, Content, Footer } from '@tigercat/vue';
+import { Layout, Header, Content, Footer } from '@tigercat/vue'
 </script>
 
 <template>
@@ -25,7 +25,7 @@ import { Layout, Header, Content, Footer } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Layout, Header, Content, Footer } from '@tigercat/react';
+import { Layout, Header, Content, Footer } from '@tigercat/react'
 
 function App() {
   return (
@@ -34,7 +34,7 @@ function App() {
       <Content>Content</Content>
       <Footer>Footer</Footer>
     </Layout>
-  );
+  )
 }
 ```
 
@@ -46,7 +46,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/vue';
+import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/vue'
 </script>
 
 <template>
@@ -64,7 +64,7 @@ import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/react';
+import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/react'
 
 function App() {
   return (
@@ -76,7 +76,7 @@ function App() {
       </div>
       <Footer>Footer</Footer>
     </Layout>
-  );
+  )
 }
 ```
 
@@ -88,21 +88,14 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import {
-  Layout,
-  Header,
-  Sidebar,
-  Content,
-  Footer,
-  Button,
-} from '@tigercat/vue';
+import { ref } from 'vue'
+import { Layout, Header, Sidebar, Content, Footer, Button } from '@tigercat/vue'
 
-const collapsed = ref(false);
+const collapsed = ref(false)
 
 const toggleSidebar = () => {
-  collapsed.value = !collapsed.value;
-};
+  collapsed.value = !collapsed.value
+}
 </script>
 
 <template>
@@ -137,9 +130,7 @@ const toggleSidebar = () => {
       </Content>
     </div>
     <Footer>
-      <div class="text-center text-gray-600">
-        © 2024 My App. All rights reserved.
-      </div>
+      <div class="text-center text-gray-600">© 2024 My App. All rights reserved.</div>
     </Footer>
   </Layout>
 </template>
@@ -148,22 +139,15 @@ const toggleSidebar = () => {
 ### React
 
 ```tsx
-import { useState } from 'react';
-import {
-  Layout,
-  Header,
-  Sidebar,
-  Content,
-  Footer,
-  Button,
-} from '@tigercat/react';
+import { useState } from 'react'
+import { Layout, Header, Sidebar, Content, Footer, Button } from '@tigercat/react'
 
 function App() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(false)
 
   const toggleSidebar = () => {
-    setCollapsed(!collapsed);
-  };
+    setCollapsed(!collapsed)
+  }
 
   return (
     <Layout>
@@ -201,12 +185,10 @@ function App() {
         </Content>
       </div>
       <Footer>
-        <div className="text-center text-gray-600">
-          © 2024 My App. All rights reserved.
-        </div>
+        <div className="text-center text-gray-600">© 2024 My App. All rights reserved.</div>
       </Footer>
     </Layout>
-  );
+  )
 }
 ```
 
@@ -511,9 +493,7 @@ Layout 组件使用 Tailwind CSS 构建，所有子组件都提供了合理的�
       </div>
     </Header>
     <div class="flex flex-col md:flex-row flex-1">
-      <Sidebar width="200px" :collapsed="isMobile" className="md:block">
-        导航菜单
-      </Sidebar>
+      <Sidebar width="200px" :collapsed="isMobile" className="md:block"> 导航菜单 </Sidebar>
       <Content className="p-4 md:p-6"> 主要内容 </Content>
     </div>
     <Footer>Footer</Footer>
@@ -544,11 +524,11 @@ import type {
   HeaderProps,
   SidebarProps,
   ContentProps,
-  FooterProps,
-} from '@tigercat/core';
+  FooterProps
+} from '@tigercat/core'
 
 // Vue
-import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/vue';
+import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/vue'
 
 // React
 import {
@@ -561,8 +541,8 @@ import {
   type HeaderProps as ReactHeaderProps,
   type SidebarProps as ReactSidebarProps,
   type ContentProps as ReactContentProps,
-  type FooterProps as ReactFooterProps,
-} from '@tigercat/react';
+  type FooterProps as ReactFooterProps
+} from '@tigercat/react'
 ```
 
 ## 完整示例
@@ -573,34 +553,27 @@ import {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import {
-  Layout,
-  Header,
-  Sidebar,
-  Content,
-  Footer,
-  Button,
-} from '@tigercat/vue';
+import { ref } from 'vue'
+import { Layout, Header, Sidebar, Content, Footer, Button } from '@tigercat/vue'
 
-const collapsed = ref(false);
-const currentPage = ref('dashboard');
+const collapsed = ref(false)
+const currentPage = ref('dashboard')
 
 const menuItems = [
   { id: 'dashboard', label: '仪表盘', icon: '📊' },
   { id: 'users', label: '用户管理', icon: '👥' },
   { id: 'products', label: '产品管理', icon: '📦' },
   { id: 'orders', label: '订单管理', icon: '🛒' },
-  { id: 'settings', label: '设置', icon: '⚙️' },
-];
+  { id: 'settings', label: '设置', icon: '⚙️' }
+]
 
 const toggleSidebar = () => {
-  collapsed.value = !collapsed.value;
-};
+  collapsed.value = !collapsed.value
+}
 
 const navigateTo = (pageId) => {
-  currentPage.value = pageId;
-};
+  currentPage.value = pageId
+}
 </script>
 
 <template>
@@ -630,7 +603,7 @@ const navigateTo = (pageId) => {
                   'flex items-center gap-3 px-4 py-2 rounded-lg transition-colors',
                   currentPage === item.id
                     ? 'bg-blue-50 text-blue-600 font-medium'
-                    : 'text-gray-700 hover:bg-gray-100',
+                    : 'text-gray-700 hover:bg-gray-100'
                 ]">
                 <span class="text-xl">{{ item.icon }}</span>
                 <span>{{ item.label }}</span>
@@ -656,9 +629,7 @@ const navigateTo = (pageId) => {
     </div>
 
     <Footer>
-      <div class="text-center text-sm text-gray-600">
-        © 2024 管理后台系统. All rights reserved.
-      </div>
+      <div class="text-center text-sm text-gray-600">© 2024 管理后台系统. All rights reserved.</div>
     </Footer>
   </Layout>
 </template>
@@ -667,41 +638,34 @@ const navigateTo = (pageId) => {
 #### React
 
 ```tsx
-import { useState } from 'react';
-import {
-  Layout,
-  Header,
-  Sidebar,
-  Content,
-  Footer,
-  Button,
-} from '@tigercat/react';
+import { useState } from 'react'
+import { Layout, Header, Sidebar, Content, Footer, Button } from '@tigercat/react'
 
 interface MenuItem {
-  id: string;
-  label: string;
-  icon: string;
+  id: string
+  label: string
+  icon: string
 }
 
 function AdminLayout() {
-  const [collapsed, setCollapsed] = useState(false);
-  const [currentPage, setCurrentPage] = useState('dashboard');
+  const [collapsed, setCollapsed] = useState(false)
+  const [currentPage, setCurrentPage] = useState('dashboard')
 
   const menuItems: MenuItem[] = [
     { id: 'dashboard', label: '仪表盘', icon: '📊' },
     { id: 'users', label: '用户管理', icon: '👥' },
     { id: 'products', label: '产品管理', icon: '📦' },
     { id: 'orders', label: '订单管理', icon: '🛒' },
-    { id: 'settings', label: '设置', icon: '⚙️' },
-  ];
+    { id: 'settings', label: '设置', icon: '⚙️' }
+  ]
 
   const toggleSidebar = () => {
-    setCollapsed(!collapsed);
-  };
+    setCollapsed(!collapsed)
+  }
 
   const navigateTo = (pageId: string) => {
-    setCurrentPage(pageId);
-  };
+    setCurrentPage(pageId)
+  }
 
   return (
     <Layout>
@@ -731,8 +695,8 @@ function AdminLayout() {
                   <a
                     href="#"
                     onClick={(e) => {
-                      e.preventDefault();
-                      navigateTo(item.id);
+                      e.preventDefault()
+                      navigateTo(item.id)
                     }}
                     className={`
                       flex items-center gap-3 px-4 py-2 rounded-lg transition-colors
@@ -758,8 +722,7 @@ function AdminLayout() {
             </h2>
             <div className="bg-white rounded-lg shadow p-6">
               <p className="text-gray-600">
-                这里是 {menuItems.find((i) => i.id === currentPage)?.label}{' '}
-                的内容。
+                这里是 {menuItems.find((i) => i.id === currentPage)?.label} 的内容。
               </p>
             </div>
           </div>
@@ -772,10 +735,10 @@ function AdminLayout() {
         </div>
       </Footer>
     </Layout>
-  );
+  )
 }
 
-export default AdminLayout;
+export default AdminLayout
 ```
 
 ## 最佳实践

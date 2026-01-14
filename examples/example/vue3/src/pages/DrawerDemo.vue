@@ -104,8 +104,8 @@ const DestroyOnCloseContent = defineComponent({
               value.value = (e.target as HTMLInputElement).value
             },
             class: 'w-full px-3 py-2 border border-gray-300 rounded-md',
-            placeholder: '尝试输入一些内容，然后关闭抽屉',
-          }),
+            placeholder: '尝试输入一些内容，然后关闭抽屉'
+          })
         ]),
         h(
           Space,
@@ -118,7 +118,7 @@ const DestroyOnCloseContent = defineComponent({
                   variant: 'secondary',
                   onClick: () => {
                     count.value += 1
-                  },
+                  }
                 },
                 { default: () => '计数 +1' }
               ),
@@ -128,15 +128,15 @@ const DestroyOnCloseContent = defineComponent({
                   variant: 'secondary',
                   onClick: () => {
                     value.value = ''
-                  },
+                  }
                 },
                 { default: () => '清空输入' }
-              ),
-            ],
+              )
+            ]
           }
-        ),
+        )
       ])
-  },
+  }
 })
 </script>
 
@@ -153,14 +153,12 @@ const DestroyOnCloseContent = defineComponent({
       <p class="text-gray-600 mb-6">最基本的抽屉使用示例。</p>
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="openBasic">打开抽屉</Button>
-        <Drawer v-model:visible="basicVisible"
-                title="基本抽屉">
+        <Drawer v-model:visible="basicVisible" title="基本抽屉">
           <p>这是抽屉的内容</p>
           <p>你可以在这里放置任何内容</p>
           <template #footer>
             <Space>
-              <Button variant="secondary"
-                      @click="basicVisible = false">关闭</Button>
+              <Button variant="secondary" @click="basicVisible = false">关闭</Button>
             </Space>
           </template>
         </Drawer>
@@ -171,26 +169,41 @@ const DestroyOnCloseContent = defineComponent({
     <!-- 不同位置 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">不同位置</h2>
-      <p class="text-gray-600 mb-6">通过 <code class="px-1 py-0.5 bg-gray-200 rounded">placement</code> 属性设置抽屉从不同方向弹出。</p>
+      <p class="text-gray-600 mb-6">
+        通过
+        <code class="px-1 py-0.5 bg-gray-200 rounded">placement</code> 属性设置抽屉从不同方向弹出。
+      </p>
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Space>
-          <Button :variant="placement === 'left' ? 'primary' : 'secondary'"
-                  @click="showPlacementDrawer('left')">左侧</Button>
-          <Button :variant="placement === 'right' ? 'primary' : 'secondary'"
-                  @click="showPlacementDrawer('right')">右侧</Button>
-          <Button :variant="placement === 'top' ? 'primary' : 'secondary'"
-                  @click="showPlacementDrawer('top')">顶部</Button>
-          <Button :variant="placement === 'bottom' ? 'primary' : 'secondary'"
-                  @click="showPlacementDrawer('bottom')">底部</Button>
+          <Button
+            :variant="placement === 'left' ? 'primary' : 'secondary'"
+            @click="showPlacementDrawer('left')"
+            >左侧</Button
+          >
+          <Button
+            :variant="placement === 'right' ? 'primary' : 'secondary'"
+            @click="showPlacementDrawer('right')"
+            >右侧</Button
+          >
+          <Button
+            :variant="placement === 'top' ? 'primary' : 'secondary'"
+            @click="showPlacementDrawer('top')"
+            >顶部</Button
+          >
+          <Button
+            :variant="placement === 'bottom' ? 'primary' : 'secondary'"
+            @click="showPlacementDrawer('bottom')"
+            >底部</Button
+          >
         </Space>
-        <Drawer v-model:visible="placementVisible"
-                :placement="placement"
-                :title="`${placement} 抽屉`">
+        <Drawer
+          v-model:visible="placementVisible"
+          :placement="placement"
+          :title="`${placement} 抽屉`">
           <p>从 {{ placement }} 弹出的抽屉</p>
           <template #footer>
             <Space>
-              <Button variant="secondary"
-                      @click="placementVisible = false">关闭</Button>
+              <Button variant="secondary" @click="placementVisible = false">关闭</Button>
             </Space>
           </template>
         </Drawer>
@@ -201,28 +214,34 @@ const DestroyOnCloseContent = defineComponent({
     <!-- 不同尺寸 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">不同尺寸</h2>
-      <p class="text-gray-600 mb-6">通过 <code class="px-1 py-0.5 bg-gray-200 rounded">size</code> 属性设置抽屉的大小。</p>
+      <p class="text-gray-600 mb-6">
+        通过 <code class="px-1 py-0.5 bg-gray-200 rounded">size</code> 属性设置抽屉的大小。
+      </p>
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Space>
-          <Button :variant="size === 'sm' ? 'primary' : 'secondary'"
-                  @click="showSizeDrawer('sm')">小 (sm)</Button>
-          <Button :variant="size === 'md' ? 'primary' : 'secondary'"
-                  @click="showSizeDrawer('md')">中 (md)</Button>
-          <Button :variant="size === 'lg' ? 'primary' : 'secondary'"
-                  @click="showSizeDrawer('lg')">大 (lg)</Button>
-          <Button :variant="size === 'xl' ? 'primary' : 'secondary'"
-                  @click="showSizeDrawer('xl')">超大 (xl)</Button>
-          <Button :variant="size === 'full' ? 'primary' : 'secondary'"
-                  @click="showSizeDrawer('full')">全屏 (full)</Button>
+          <Button :variant="size === 'sm' ? 'primary' : 'secondary'" @click="showSizeDrawer('sm')"
+            >小 (sm)</Button
+          >
+          <Button :variant="size === 'md' ? 'primary' : 'secondary'" @click="showSizeDrawer('md')"
+            >中 (md)</Button
+          >
+          <Button :variant="size === 'lg' ? 'primary' : 'secondary'" @click="showSizeDrawer('lg')"
+            >大 (lg)</Button
+          >
+          <Button :variant="size === 'xl' ? 'primary' : 'secondary'" @click="showSizeDrawer('xl')"
+            >超大 (xl)</Button
+          >
+          <Button
+            :variant="size === 'full' ? 'primary' : 'secondary'"
+            @click="showSizeDrawer('full')"
+            >全屏 (full)</Button
+          >
         </Space>
-        <Drawer v-model:visible="sizeVisible"
-                :size="size"
-                title="不同尺寸的抽屉">
+        <Drawer v-model:visible="sizeVisible" :size="size" title="不同尺寸的抽屉">
           <p>尺寸: {{ size }}</p>
           <template #footer>
             <Space>
-              <Button variant="secondary"
-                      @click="sizeVisible = false">关闭</Button>
+              <Button variant="secondary" @click="sizeVisible = false">关闭</Button>
             </Space>
           </template>
         </Drawer>
@@ -247,23 +266,24 @@ const DestroyOnCloseContent = defineComponent({
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">选项 1</label>
-              <input type="text"
-                     class="w-full px-3 py-2 border border-gray-300 rounded-md"
-                     placeholder="输入内容" />
+              <input
+                type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                placeholder="输入内容" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">选项 2</label>
-              <input type="text"
-                     class="w-full px-3 py-2 border border-gray-300 rounded-md"
-                     placeholder="输入内容" />
+              <input
+                type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                placeholder="输入内容" />
             </div>
           </div>
 
           <template #footer>
             <Space>
               <Button @click="customVisible = false">取消</Button>
-              <Button variant="primary"
-                      @click="handleSubmit">确定</Button>
+              <Button variant="primary" @click="handleSubmit">确定</Button>
             </Space>
           </template>
         </Drawer>
@@ -274,19 +294,18 @@ const DestroyOnCloseContent = defineComponent({
     <!-- 无蒙层 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">无蒙层</h2>
-      <p class="text-gray-600 mb-6">设置 <code class="px-1 py-0.5 bg-gray-200 rounded">mask=false</code> 可以不显示遮罩层。</p>
+      <p class="text-gray-600 mb-6">
+        设置 <code class="px-1 py-0.5 bg-gray-200 rounded">mask=false</code> 可以不显示遮罩层。
+      </p>
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="openNoMask">打开无蒙层抽屉</Button>
-        <Drawer v-model:visible="noMaskVisible"
-                :mask="false"
-                title="无蒙层抽屉">
+        <Drawer v-model:visible="noMaskVisible" :mask="false" title="无蒙层抽屉">
           <p>这个抽屉没有蒙层</p>
           <p>你可以与页面其他部分交互</p>
           <p class="mt-2 text-sm text-gray-500">建议仍保留明确的关闭入口（关闭按钮/ESC）。</p>
           <template #footer>
             <Space>
-              <Button variant="secondary"
-                      @click="noMaskVisible = false">关闭</Button>
+              <Button variant="secondary" @click="noMaskVisible = false">关闭</Button>
             </Space>
           </template>
         </Drawer>
@@ -297,19 +316,19 @@ const DestroyOnCloseContent = defineComponent({
     <!-- 点击蒙层不关闭 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">点击蒙层不关闭</h2>
-      <p class="text-gray-600 mb-6">设置 <code class="px-1 py-0.5 bg-gray-200 rounded">mask-closable=false</code>
-        可以禁止点击蒙层关闭抽屉。</p>
+      <p class="text-gray-600 mb-6">
+        设置
+        <code class="px-1 py-0.5 bg-gray-200 rounded">mask-closable=false</code>
+        可以禁止点击蒙层关闭抽屉。
+      </p>
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="openNotClosable">打开抽屉</Button>
-        <Drawer v-model:visible="notClosableVisible"
-                :mask-closable="false"
-                title="点击蒙层不关闭">
+        <Drawer v-model:visible="notClosableVisible" :mask-closable="false" title="点击蒙层不关闭">
           <p>点击蒙层不会关闭</p>
           <p class="mt-2">仍可使用关闭按钮或按 ESC 关闭</p>
           <template #footer>
             <Space>
-              <Button variant="secondary"
-                      @click="notClosableVisible = false">关闭</Button>
+              <Button variant="secondary" @click="notClosableVisible = false">关闭</Button>
             </Space>
           </template>
         </Drawer>
@@ -320,18 +339,18 @@ const DestroyOnCloseContent = defineComponent({
     <!-- 关闭时销毁 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">关闭时销毁</h2>
-      <p class="text-gray-600 mb-6">设置 <code class="px-1 py-0.5 bg-gray-200 rounded">destroy-on-close</code>
-        可以在关闭时销毁内容，适用于表单重置等场景。</p>
+      <p class="text-gray-600 mb-6">
+        设置
+        <code class="px-1 py-0.5 bg-gray-200 rounded">destroy-on-close</code>
+        可以在关闭时销毁内容，适用于表单重置等场景。
+      </p>
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="openDestroy">打开抽屉</Button>
-        <Drawer v-model:visible="destroyVisible"
-                :destroy-on-close="true"
-                title="关闭时销毁内容">
+        <Drawer v-model:visible="destroyVisible" :destroy-on-close="true" title="关闭时销毁内容">
           <DestroyOnCloseContent />
           <template #footer>
             <Space>
-              <Button variant="secondary"
-                      @click="destroyVisible = false">关闭</Button>
+              <Button variant="secondary" @click="destroyVisible = false">关闭</Button>
             </Space>
           </template>
         </Drawer>

@@ -1,28 +1,26 @@
-import React, { useContext } from "react";
+import React, { useContext } from 'react'
 import {
   classNames,
   getDropdownItemClasses,
-  type DropdownItemProps as CoreDropdownItemProps,
-} from "@tigercat/core";
-import { DropdownContext } from "./Dropdown";
+  type DropdownItemProps as CoreDropdownItemProps
+} from '@tigercat/core'
+import { DropdownContext } from './Dropdown'
 
 export interface DropdownItemProps
-  extends Omit<CoreDropdownItemProps, "className">,
-    Omit<
-      React.ButtonHTMLAttributes<HTMLButtonElement>,
-      "onClick" | "disabled"
-    > {
-  className?: string;
+  extends
+    Omit<CoreDropdownItemProps, 'className'>,
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick' | 'disabled'> {
+  className?: string
 
   /**
    * Click event handler
    */
-  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
 
   /**
    * Item content
    */
-  children?: React.ReactNode;
+  children?: React.ReactNode
 }
 
 export const DropdownItem: React.FC<DropdownItemProps> = ({
@@ -34,28 +32,25 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
   ...buttonProps
 }) => {
   // Get dropdown context
-  const context = useContext(DropdownContext);
+  const context = useContext(DropdownContext)
 
   // Handle click
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (disabled) {
-      event.preventDefault();
-      return;
+      event.preventDefault()
+      return
     }
 
-    onClick?.(event);
+    onClick?.(event)
 
     // Notify dropdown to close if closeOnClick is true
     if (context?.closeOnClick) {
-      context.handleItemClick();
+      context.handleItemClick()
     }
-  };
+  }
 
   // Item classes
-  const itemClasses = classNames(
-    getDropdownItemClasses(disabled, divided),
-    className
-  );
+  const itemClasses = classNames(getDropdownItemClasses(disabled, divided), className)
 
   return (
     <button
@@ -65,9 +60,8 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
       aria-disabled={disabled}
       disabled={disabled}
       onClick={handleClick}
-      {...buttonProps}
-    >
+      {...buttonProps}>
       {children}
     </button>
-  );
-};
+  )
+}

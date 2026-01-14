@@ -32,7 +32,9 @@ const handleSubmit = () => {
   <div class="max-w-5xl mx-auto p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Loading 加载中</h1>
-      <p class="text-gray-600">用于展示加载状态，支持多种加载动画样式，可用于页面和区块的加载状态。</p>
+      <p class="text-gray-600">
+        用于展示加载状态，支持多种加载动画样式，可用于页面和区块的加载状态。
+      </p>
     </div>
 
     <!-- 基本用法 -->
@@ -167,7 +169,9 @@ const handleSubmit = () => {
       <div class="p-6 bg-gray-50 rounded-lg">
         <Card title="数据统计">
           <div class="relative min-h-[200px]">
-            <div v-if="cardLoading" class="absolute inset-0 flex items-center justify-center bg-white/80">
+            <div
+              v-if="cardLoading"
+              class="absolute inset-0 flex items-center justify-center bg-white/80">
               <Loading text="刷新中..." />
             </div>
             <div v-else>
@@ -188,12 +192,8 @@ const handleSubmit = () => {
       <p class="text-gray-600 mb-6">与按钮组合使用，展示操作进行中的状态。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="flex gap-4">
-          <Button :loading="buttonLoading" @click="handleSubmit">
-            提交
-          </Button>
-          <Button variant="secondary" :loading="buttonLoading" @click="handleSubmit">
-            保存
-          </Button>
+          <Button :loading="buttonLoading" @click="handleSubmit"> 提交 </Button>
+          <Button variant="secondary" :loading="buttonLoading" @click="handleSubmit"> 保存 </Button>
         </div>
       </div>
       <Divider class="my-6" />

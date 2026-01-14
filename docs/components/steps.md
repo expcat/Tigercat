@@ -8,10 +8,10 @@
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Steps, StepsItem } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Steps, StepsItem } from '@tigercat/vue'
 
-const current = ref(1);
+const current = ref(1)
 </script>
 
 <template>
@@ -26,11 +26,11 @@ const current = ref(1);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Steps, StepsItem } from "@tigercat/react";
+import { useState } from 'react'
+import { Steps, StepsItem } from '@tigercat/react'
 
 function App() {
-  const [current, setCurrent] = useState(1);
+  const [current, setCurrent] = useState(1)
 
   return (
     <Steps current={current}>
@@ -38,7 +38,7 @@ function App() {
       <StepsItem title="进行中" description="这是步骤的描述信息" />
       <StepsItem title="待完成" description="这是步骤的描述信息" />
     </Steps>
-  );
+  )
 }
 ```
 
@@ -50,10 +50,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Steps, StepsItem } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Steps, StepsItem } from '@tigercat/vue'
 
-const current = ref(1);
+const current = ref(1)
 </script>
 
 <template>
@@ -68,11 +68,11 @@ const current = ref(1);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Steps, StepsItem } from "@tigercat/react";
+import { useState } from 'react'
+import { Steps, StepsItem } from '@tigercat/react'
 
 function App() {
-  const [current, setCurrent] = useState(1);
+  const [current, setCurrent] = useState(1)
 
   return (
     <Steps current={current} direction="vertical">
@@ -80,7 +80,7 @@ function App() {
       <StepsItem title="进行中" description="这是步骤的描述信息" />
       <StepsItem title="待完成" description="这是步骤的描述信息" />
     </Steps>
-  );
+  )
 }
 ```
 
@@ -92,10 +92,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Steps, StepsItem } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Steps, StepsItem } from '@tigercat/vue'
 
-const current = ref(1);
+const current = ref(1)
 </script>
 
 <template>
@@ -110,11 +110,11 @@ const current = ref(1);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Steps, StepsItem } from "@tigercat/react";
+import { useState } from 'react'
+import { Steps, StepsItem } from '@tigercat/react'
 
 function App() {
-  const [current, setCurrent] = useState(1);
+  const [current, setCurrent] = useState(1)
 
   return (
     <Steps current={current} simple>
@@ -122,7 +122,7 @@ function App() {
       <StepsItem title="进行中" />
       <StepsItem title="待完成" />
     </Steps>
-  );
+  )
 }
 ```
 
@@ -134,10 +134,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Steps, StepsItem } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Steps, StepsItem } from '@tigercat/vue'
 
-const current = ref(1);
+const current = ref(1)
 </script>
 
 <template>
@@ -152,11 +152,11 @@ const current = ref(1);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Steps, StepsItem } from "@tigercat/react";
+import { useState } from 'react'
+import { Steps, StepsItem } from '@tigercat/react'
 
 function App() {
-  const [current, setCurrent] = useState(1);
+  const [current, setCurrent] = useState(1)
 
   return (
     <Steps current={current} size="small">
@@ -164,7 +164,7 @@ function App() {
       <StepsItem title="进行中" description="这是步骤的描述信息" />
       <StepsItem title="待完成" description="这是步骤的描述信息" />
     </Steps>
-  );
+  )
 }
 ```
 
@@ -176,10 +176,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Steps, StepsItem } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Steps, StepsItem } from '@tigercat/vue'
 
-const current = ref(1);
+const current = ref(1)
 </script>
 
 <template>
@@ -194,11 +194,11 @@ const current = ref(1);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Steps, StepsItem } from "@tigercat/react";
+import { useState } from 'react'
+import { Steps, StepsItem } from '@tigercat/react'
 
 function App() {
-  const [current, setCurrent] = useState(1);
+  const [current, setCurrent] = useState(1)
 
   return (
     <Steps current={current} status="error">
@@ -206,7 +206,7 @@ function App() {
       <StepsItem title="出错了" description="这是步骤的描述信息" />
       <StepsItem title="待完成" description="这是步骤的描述信息" />
     </Steps>
-  );
+  )
 }
 ```
 
@@ -218,10 +218,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Steps, StepsItem } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Steps, StepsItem } from '@tigercat/vue'
 
-const current = ref(0);
+const current = ref(0)
 </script>
 
 <template>
@@ -237,11 +237,11 @@ const current = ref(0);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Steps, StepsItem } from "@tigercat/react";
+import { useState } from 'react'
+import { Steps, StepsItem } from '@tigercat/react'
 
 function App() {
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(0)
 
   return (
     <div>
@@ -252,7 +252,7 @@ function App() {
       </Steps>
       <div className="mt-4">当前步骤: {current + 1}</div>
     </div>
-  );
+  )
 }
 ```
 
@@ -264,62 +264,44 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Steps, StepsItem } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Steps, StepsItem } from '@tigercat/vue'
 
-const current = ref(1);
+const current = ref(1)
 </script>
 
 <template>
   <Steps :current="current">
     <StepsItem title="登录">
       <template #icon>
-        <svg
-          class="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-          />
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </svg>
       </template>
     </StepsItem>
     <StepsItem title="验证">
       <template #icon>
-        <svg
-          class="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-          />
+            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
         </svg>
       </template>
     </StepsItem>
     <StepsItem title="完成">
       <template #icon>
-        <svg
-          class="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M5 13l4 4L19 7"
-          />
+            d="M5 13l4 4L19 7" />
         </svg>
       </template>
     </StepsItem>
@@ -330,23 +312,18 @@ const current = ref(1);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Steps, StepsItem } from "@tigercat/react";
+import { useState } from 'react'
+import { Steps, StepsItem } from '@tigercat/react'
 
 function App() {
-  const [current, setCurrent] = useState(1);
+  const [current, setCurrent] = useState(1)
 
   return (
     <Steps current={current}>
       <StepsItem
         title="登录"
         icon={
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -359,12 +336,7 @@ function App() {
       <StepsItem
         title="验证"
         icon={
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -377,23 +349,13 @@ function App() {
       <StepsItem
         title="完成"
         icon={
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         }
       />
     </Steps>
-  );
+  )
 }
 ```
 

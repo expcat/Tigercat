@@ -1,10 +1,10 @@
-import { render, RenderOptions } from '@testing-library/vue';
-import { Component, h, VNode } from 'vue';
+import { render, RenderOptions } from '@testing-library/vue'
+import { Component, h, VNode } from 'vue'
 
 /**
  * Type for slot content that can be string, VNode, or render function
  */
-type SlotContent = string | VNode | (() => VNode);
+type SlotContent = string | VNode | (() => VNode)
 
 /**
  * Custom render function that wraps @testing-library/vue's render
@@ -16,8 +16,8 @@ type SlotContent = string | VNode | (() => VNode);
  */
 export function renderComponent(component: Component, options?: RenderOptions) {
   return render(component, {
-    ...options,
-  });
+    ...options
+  })
 }
 
 /**
@@ -39,8 +39,8 @@ export function renderWithProps<T extends Record<string, unknown>>(
 ) {
   return render(component, {
     props,
-    ...options,
-  });
+    ...options
+  })
 }
 
 /**
@@ -60,7 +60,7 @@ export function renderWithSlots(
   slots: Record<string, SlotContent>,
   options?: Omit<RenderOptions, 'slots'>
 ) {
-  const maybeOptions = options ?? {};
+  const maybeOptions = options ?? {}
 
   // Many tests historically passed component props as the 3rd argument.
   // Detect that pattern and map it into { props } so props aren't silently dropped.
@@ -72,24 +72,22 @@ export function renderWithSlots(
     'baseElement',
     'attachTo',
     'queries',
-    'wrapper',
-  ]);
+    'wrapper'
+  ])
 
-  const hasRenderOptionKey = Object.keys(maybeOptions).some((key) =>
-    renderOptionKeys.has(key)
-  );
+  const hasRenderOptionKey = Object.keys(maybeOptions).some((key) => renderOptionKeys.has(key))
 
   if (hasRenderOptionKey) {
     return render(component, {
       slots,
-      ...maybeOptions,
-    });
+      ...maybeOptions
+    })
   }
 
   return render(component, {
     slots,
-    props: maybeOptions,
-  });
+    props: maybeOptions
+  })
 }
 
 /**
@@ -104,13 +102,10 @@ export function renderWithSlots(
  * const wrapped = createWrapper(MyComponent, ThemeProvider)
  * render(wrapped)
  */
-export function createWrapper(
-  component: Component,
-  wrapperComponent: Component
-) {
+export function createWrapper(component: Component, wrapperComponent: Component) {
   return {
     setup() {
-      return () => h(wrapperComponent, null, () => h(component));
-    },
-  };
+      return () => h(wrapperComponent, null, () => h(component))
+    }
+  }
 }

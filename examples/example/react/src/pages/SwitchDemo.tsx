@@ -1,23 +1,21 @@
-import React, { useState } from 'react';
-import { Switch, Space, Divider } from '@tigercat/react';
+import React, { useState } from 'react'
+import { Switch, Space, Divider } from '@tigercat/react'
 
 const SwitchDemo: React.FC = () => {
-  const [basicEnabled, setBasicEnabled] = useState(true);
+  const [basicEnabled, setBasicEnabled] = useState(true)
 
-  const disabledOn = true;
-  const disabledOff = false;
+  const disabledOn = true
+  const disabledOff = false
 
-  const [sizeSm, setSizeSm] = useState(false);
-  const [sizeMd, setSizeMd] = useState(true);
-  const [sizeLg, setSizeLg] = useState(false);
+  const [sizeSm, setSizeSm] = useState(false)
+  const [sizeMd, setSizeMd] = useState(true)
+  const [sizeLg, setSizeLg] = useState(false)
 
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Switch 开关</h1>
-        <p className="text-gray-600">
-          表示两种相互对立的状态间的切换，多用于触发「开/关」。
-        </p>
+        <p className="text-gray-600">表示两种相互对立的状态间的切换，多用于触发「开/关」。</p>
       </div>
 
       {/* 基础用法 */}
@@ -28,9 +26,7 @@ const SwitchDemo: React.FC = () => {
           <Space direction="vertical">
             <div className="flex items-center gap-3">
               <Switch checked={basicEnabled} onChange={setBasicEnabled} />
-              <span className="text-sm text-gray-600">
-                {basicEnabled ? '开启' : '关闭'}
-              </span>
+              <span className="text-sm text-gray-600">{basicEnabled ? '开启' : '关闭'}</span>
             </div>
           </Space>
         </div>
@@ -63,7 +59,7 @@ const SwitchDemo: React.FC = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default SwitchDemo;
+export default SwitchDemo

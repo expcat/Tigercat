@@ -90,38 +90,52 @@ Container 组件支持多种预设的最大宽度限制，基于 Tailwind CSS �
 ### React
 
 ```tsx
-{/* 小型容器 (640px) */}
-<Container maxWidth="sm">
+{
+  /* 小型容器 (640px) */
+}
+;<Container maxWidth="sm">
   <p>Small container content</p>
 </Container>
 
-{/* 中型容器 (768px) */}
-<Container maxWidth="md">
+{
+  /* 中型容器 (768px) */
+}
+;<Container maxWidth="md">
   <p>Medium container content</p>
 </Container>
 
-{/* 大型容器 (1024px) */}
-<Container maxWidth="lg">
+{
+  /* 大型容器 (1024px) */
+}
+;<Container maxWidth="lg">
   <p>Large container content</p>
 </Container>
 
-{/* 超大容器 (1280px) */}
-<Container maxWidth="xl">
+{
+  /* 超大容器 (1280px) */
+}
+;<Container maxWidth="xl">
   <p>Extra large container content</p>
 </Container>
 
-{/* 2倍大容器 (1536px) */}
-<Container maxWidth="2xl">
+{
+  /* 2倍大容器 (1536px) */
+}
+;<Container maxWidth="2xl">
   <p>2X large container content</p>
 </Container>
 
-{/* 全宽容器 */}
-<Container maxWidth="full">
+{
+  /* 全宽容器 */
+}
+;<Container maxWidth="full">
   <p>Full width container</p>
 </Container>
 
-{/* 无限制容器 */}
-<Container maxWidth={false}>
+{
+  /* 无限制容器 */
+}
+;<Container maxWidth={false}>
   <p>Unlimited width container</p>
 </Container>
 ```
@@ -149,13 +163,17 @@ Container 组件支持多种预设的最大宽度限制，基于 Tailwind CSS �
 ### React
 
 ```tsx
-{/* 居中对齐（默认） */}
-<Container maxWidth="lg">
+{
+  /* 居中对齐（默认） */
+}
+;<Container maxWidth="lg">
   <p>Centered container</p>
 </Container>
 
-{/* 不居中对齐 */}
-<Container maxWidth="lg" center={false}>
+{
+  /* 不居中对齐 */
+}
+;<Container maxWidth="lg" center={false}>
   <p>Left-aligned container</p>
 </Container>
 ```
@@ -165,6 +183,7 @@ Container 组件支持多种预设的最大宽度限制，基于 Tailwind CSS �
 通过 `padding` 属性控制容器是否添加响应式水平内边距。默认为 `true`。
 
 内边距会根据屏幕尺寸自适应：
+
 - 小屏幕: `px-4` (16px)
 - 中等屏幕: `px-6` (24px)
 - 大屏幕: `px-8` (32px)
@@ -188,13 +207,17 @@ Container 组件支持多种预设的最大宽度限制，基于 Tailwind CSS �
 ### React
 
 ```tsx
-{/* 带内边距（默认） */}
-<Container maxWidth="lg">
+{
+  /* 带内边距（默认） */
+}
+;<Container maxWidth="lg">
   <p>Container with padding</p>
 </Container>
 
-{/* 不带内边距 */}
-<Container maxWidth="lg" padding={false}>
+{
+  /* 不带内边距 */
+}
+;<Container maxWidth="lg" padding={false}>
   <p>Container without padding</p>
 </Container>
 ```
@@ -209,11 +232,11 @@ Container 组件支持嵌套使用，可以创建复杂的布局结构。
 <template>
   <Container maxWidth="2xl">
     <h1>Outer Container (2xl)</h1>
-    
+
     <Container maxWidth="lg" class="bg-gray-100 py-8 my-4">
       <h2>Nested Container (lg)</h2>
       <p>This is nested inside the outer container.</p>
-      
+
       <Container maxWidth="md" class="bg-white p-4 mt-4">
         <h3>Deeply Nested Container (md)</h3>
         <p>This is nested even deeper.</p>
@@ -228,11 +251,11 @@ Container 组件支持嵌套使用，可以创建复杂的布局结构。
 ```tsx
 <Container maxWidth="2xl">
   <h1>Outer Container (2xl)</h1>
-  
+
   <Container maxWidth="lg" className="bg-gray-100 py-8 my-4">
     <h2>Nested Container (lg)</h2>
     <p>This is nested inside the outer container.</p>
-    
+
     <Container maxWidth="md" className="bg-white p-4 mt-4">
       <h3>Deeply Nested Container (md)</h3>
       <p>This is nested even deeper.</p>
@@ -246,18 +269,24 @@ Container 组件支持嵌套使用，可以创建复杂的布局结构。
 React 版本的 Container 组件支持通过 `as` 属性自定义渲染的 HTML 元素类型。
 
 ```tsx
-{/* 渲染为 section */}
-<Container as="section" maxWidth="lg">
+{
+  /* 渲染为 section */
+}
+;<Container as="section" maxWidth="lg">
   <h2>Section Container</h2>
 </Container>
 
-{/* 渲染为 main */}
-<Container as="main" maxWidth="xl">
+{
+  /* 渲染为 main */
+}
+;<Container as="main" maxWidth="xl">
   <h1>Main Content</h1>
 </Container>
 
-{/* 渲染为 article */}
-<Container as="article" maxWidth="md">
+{
+  /* 渲染为 article */
+}
+;<Container as="article" maxWidth="md">
   <h2>Article Title</h2>
   <p>Article content...</p>
 </Container>
@@ -267,24 +296,24 @@ React 版本的 Container 组件支持通过 `as` 属性自定义渲染的 HTML 
 
 ### Props / 属性
 
-| 属性 | 说明 | 类型 | 默认值 | 可选值 |
-|------|------|------|--------|--------|
-| maxWidth | 最大宽度限制 | `ContainerMaxWidth` | `false` | `'sm'` \| `'md'` \| `'lg'` \| `'xl'` \| `'2xl'` \| `'full'` \| `false` |
-| center | 是否水平居中 | `boolean` | `true` | `true` \| `false` |
-| padding | 是否添加响应式水平内边距 | `boolean` | `true` | `true` \| `false` |
+| 属性     | 说明                     | 类型                | 默认值  | 可选值                                                                 |
+| -------- | ------------------------ | ------------------- | ------- | ---------------------------------------------------------------------- |
+| maxWidth | 最大宽度限制             | `ContainerMaxWidth` | `false` | `'sm'` \| `'md'` \| `'lg'` \| `'xl'` \| `'2xl'` \| `'full'` \| `false` |
+| center   | 是否水平居中             | `boolean`           | `true`  | `true` \| `false`                                                      |
+| padding  | 是否添加响应式水平内边距 | `boolean`           | `true`  | `true` \| `false`                                                      |
 
 #### React 专属属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-|------|------|------|--------|
-| children | 容器内容 | `React.ReactNode` | - |
-| className | 额外的 CSS 类名 | `string` | - |
-| as | 渲染的 HTML 元素类型 | `React.ElementType` | `'div'` |
+| 属性      | 说明                 | 类型                | 默认值  |
+| --------- | -------------------- | ------------------- | ------- |
+| children  | 容器内容             | `React.ReactNode`   | -       |
+| className | 额外的 CSS 类名      | `string`            | -       |
+| as        | 渲染的 HTML 元素类型 | `React.ElementType` | `'div'` |
 
 ### Slots / 插槽 (Vue)
 
-| 插槽名 | 说明 |
-|--------|------|
+| 插槽名  | 说明     |
+| ------- | -------- |
 | default | 容器内容 |
 
 ## 响应式设计
@@ -310,11 +339,11 @@ Container 组件的内边距会根据屏幕尺寸自动调整：
       <h1>My Website</h1>
       <nav><!-- Navigation --></nav>
     </header>
-    
+
     <main>
       <!-- Main content -->
     </main>
-    
+
     <footer>
       <!-- Footer content -->
     </footer>
@@ -330,14 +359,10 @@ Container 组件的内边距会根据屏幕尺寸自动调整：
     <h1>My Website</h1>
     <nav>{/* Navigation */}</nav>
   </header>
-  
-  <main>
-    {/* Main content */}
-  </main>
-  
-  <footer>
-    {/* Footer content */}
-  </footer>
+
+  <main>{/* Main content */}</main>
+
+  <footer>{/* Footer content */}</footer>
 </Container>
 ```
 
@@ -431,10 +456,7 @@ Container 组件使用 Tailwind CSS 构建，可以通过传入额外的 CSS 类
 
 ```vue
 <template>
-  <Container 
-    maxWidth="lg" 
-    class="bg-gray-50 shadow-lg rounded-lg my-8"
-  >
+  <Container maxWidth="lg" class="bg-gray-50 shadow-lg rounded-lg my-8">
     <p>Custom styled container</p>
   </Container>
 </template>
@@ -443,10 +465,7 @@ Container 组件使用 Tailwind CSS 构建，可以通过传入额外的 CSS 类
 ### React
 
 ```tsx
-<Container 
-  maxWidth="lg" 
-  className="bg-gray-50 shadow-lg rounded-lg my-8"
->
+<Container maxWidth="lg" className="bg-gray-50 shadow-lg rounded-lg my-8">
   <p>Custom styled container</p>
 </Container>
 ```
@@ -564,7 +583,9 @@ function App() {
       <Container maxWidth="xl" className="py-16 text-center">
         <h2 className="text-4xl font-bold mb-4">Welcome to Tigercat</h2>
         <p className="text-xl mb-8">Build beautiful UIs with ease</p>
-        <Button variant="primary" size="lg">Get Started</Button>
+        <Button variant="primary" size="lg">
+          Get Started
+        </Button>
       </Container>
 
       {/* Content Section */}

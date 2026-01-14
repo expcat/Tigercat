@@ -1,147 +1,147 @@
-import { useRef, useState } from 'react';
-import { message, Divider, Button, List } from '@tigercat/react';
+import { useRef, useState } from 'react'
+import { message, Divider, Button, List } from '@tigercat/react'
 
 export default function MessageDemo() {
-  const manualLoadingCloseFnsRef = useRef<Array<() => void>>([]);
-  const [manualLoadingCount, setManualLoadingCount] = useState(0);
+  const manualLoadingCloseFnsRef = useRef<Array<() => void>>([])
+  const [manualLoadingCount, setManualLoadingCount] = useState(0)
 
   const tips = [
     '消息默认会在 3 秒后自动关闭',
     'loading 类型的消息不会自动关闭，需要手动关闭',
     '多条消息会依次排列显示，形成队列',
     '可以通过 message.clear() 清空所有正在显示的消息',
-    'Message 与 Alert 的区别：Message 是全局提示，Alert 是页面内嵌提示',
-  ];
+    'Message 与 Alert 的区别：Message 是全局提示，Alert 是页面内嵌提示'
+  ]
 
   const demoCardClassName =
-    'p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40';
+    'p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40'
 
   const buttonBaseClassName =
-    'px-4 py-2 rounded-lg text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950';
+    'px-4 py-2 rounded-lg text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950'
 
-  const primaryButtonClassName = `${buttonBaseClassName} bg-blue-600 hover:bg-blue-700 focus:ring-blue-400`;
-  const successButtonClassName = `${buttonBaseClassName} bg-green-600 hover:bg-green-700 focus:ring-green-400`;
-  const warningButtonClassName = `${buttonBaseClassName} bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-400`;
-  const dangerButtonClassName = `${buttonBaseClassName} bg-red-600 hover:bg-red-700 focus:ring-red-400`;
-  const neutralButtonClassName = `${buttonBaseClassName} bg-gray-600 hover:bg-gray-700 focus:ring-gray-400`;
-  const purpleButtonClassName = `${buttonBaseClassName} bg-purple-600 hover:bg-purple-700 focus:ring-purple-400`;
+  const primaryButtonClassName = `${buttonBaseClassName} bg-blue-600 hover:bg-blue-700 focus:ring-blue-400`
+  const successButtonClassName = `${buttonBaseClassName} bg-green-600 hover:bg-green-700 focus:ring-green-400`
+  const warningButtonClassName = `${buttonBaseClassName} bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-400`
+  const dangerButtonClassName = `${buttonBaseClassName} bg-red-600 hover:bg-red-700 focus:ring-red-400`
+  const neutralButtonClassName = `${buttonBaseClassName} bg-gray-600 hover:bg-gray-700 focus:ring-gray-400`
+  const purpleButtonClassName = `${buttonBaseClassName} bg-purple-600 hover:bg-purple-700 focus:ring-purple-400`
 
   const showInfo = () => {
-    message.info('这是一条信息提示');
-  };
+    message.info('这是一条信息提示')
+  }
 
   const showSuccess = () => {
-    message.success('操作成功！');
-  };
+    message.success('操作成功！')
+  }
 
   const showWarning = () => {
-    message.warning('请注意相关事项');
-  };
+    message.warning('请注意相关事项')
+  }
 
   const showError = () => {
-    message.error('操作失败，请重试');
-  };
+    message.error('操作失败，请重试')
+  }
 
   const showLoading = () => {
-    const close = message.loading('加载中...');
-    setTimeout(close, 3000);
-  };
+    const close = message.loading('加载中...')
+    setTimeout(close, 3000)
+  }
 
   const showShortMessage = () => {
     message.info({
       content: '这条消息1秒后关闭',
-      duration: 1000,
-    });
-  };
+      duration: 1000
+    })
+  }
 
   const showLongMessage = () => {
     message.success({
       content: '这条消息5秒后关闭',
-      duration: 5000,
-    });
-  };
+      duration: 5000
+    })
+  }
 
   const showPersistentMessage = () => {
     message.warning({
       content: '这条消息需要手动关闭',
       duration: 0,
-      closable: true,
-    });
-  };
+      closable: true
+    })
+  }
 
   const showClosableMessage = () => {
     message.info({
       content: '这条消息可以手动关闭',
       closable: true,
-      duration: 0,
-    });
-  };
+      duration: 0
+    })
+  }
 
   const showMessage = () => {
-    const nextIndex = manualLoadingCloseFnsRef.current.length + 1;
-    const close = message.loading(`正在处理请求...（${nextIndex}）`);
-    manualLoadingCloseFnsRef.current.push(close);
-    setManualLoadingCount(manualLoadingCloseFnsRef.current.length);
-  };
+    const nextIndex = manualLoadingCloseFnsRef.current.length + 1
+    const close = message.loading(`正在处理请求...（${nextIndex}）`)
+    manualLoadingCloseFnsRef.current.push(close)
+    setManualLoadingCount(manualLoadingCloseFnsRef.current.length)
+  }
 
   const closeManually = () => {
-    const close = manualLoadingCloseFnsRef.current.pop();
+    const close = manualLoadingCloseFnsRef.current.pop()
     if (close) {
-      close();
-      setManualLoadingCount(manualLoadingCloseFnsRef.current.length);
+      close()
+      setManualLoadingCount(manualLoadingCloseFnsRef.current.length)
     }
-  };
+  }
 
   const closeAllManual = () => {
-    const closers = manualLoadingCloseFnsRef.current;
-    manualLoadingCloseFnsRef.current = [];
+    const closers = manualLoadingCloseFnsRef.current
+    manualLoadingCloseFnsRef.current = []
     for (const close of closers) {
-      close();
+      close()
     }
-    setManualLoadingCount(0);
-  };
+    setManualLoadingCount(0)
+  }
 
   const simulateRequest = async () => {
-    const close = message.loading('正在提交表单...');
+    const close = message.loading('正在提交表单...')
 
     // 模拟异步请求
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000))
 
-    close();
+    close()
     message.success({
       content: '表单提交成功！',
       duration: 3000,
       onClose: () => {
-        console.log('成功消息已关闭');
-      },
-    });
-  };
+        console.log('成功消息已关闭')
+      }
+    })
+  }
 
   const showMultipleMessages = () => {
-    message.info('消息 1');
-    setTimeout(() => message.success('消息 2'), 300);
-    setTimeout(() => message.warning('消息 3'), 600);
-  };
+    message.info('消息 1')
+    setTimeout(() => message.success('消息 2'), 300)
+    setTimeout(() => message.warning('消息 3'), 600)
+  }
 
   const clearAll = () => {
-    message.clear();
-  };
+    message.clear()
+  }
 
   const showMessageWithCallback = () => {
     message.success({
       content: '操作成功！',
       onClose: () => {
-        console.log('消息已关闭');
-      },
-    });
-  };
+        console.log('消息已关闭')
+      }
+    })
+  }
 
   const showCustomClass = () => {
     message.info({
       content: '自定义样式的消息',
-      className: 'shadow-2xl',
-    });
-  };
+      className: 'shadow-2xl'
+    })
+  }
 
   return (
     <div className="max-w-5xl mx-auto p-8 text-gray-900 dark:text-gray-100">
@@ -188,19 +188,13 @@ export default function MessageDemo() {
         </p>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2">
-            <Button
-              className={primaryButtonClassName}
-              onClick={showShortMessage}>
+            <Button className={primaryButtonClassName} onClick={showShortMessage}>
               短时间（1秒）
             </Button>
-            <Button
-              className={successButtonClassName}
-              onClick={showLongMessage}>
+            <Button className={successButtonClassName} onClick={showLongMessage}>
               长时间（5秒）
             </Button>
-            <Button
-              className={warningButtonClassName}
-              onClick={showPersistentMessage}>
+            <Button className={warningButtonClassName} onClick={showPersistentMessage}>
               不自动关闭
             </Button>
           </div>
@@ -212,15 +206,12 @@ export default function MessageDemo() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">手动关闭</h2>
         <p className="text-gray-600 dark:text-gray-300 mb-6">
-          设置 closable 为 true
-          显示关闭按钮，或使用返回的关闭函数。此示例支持同时打开多条
+          设置 closable 为 true 显示关闭按钮，或使用返回的关闭函数。此示例支持同时打开多条
           loading，并提供逐条/一键关闭。
         </p>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2 mb-4">
-            <Button
-              className={primaryButtonClassName}
-              onClick={showClosableMessage}>
+            <Button className={primaryButtonClassName} onClick={showClosableMessage}>
               显示可关闭消息
             </Button>
           </div>
@@ -251,9 +242,7 @@ export default function MessageDemo() {
       {/* 完整流程示例 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">完整流程示例</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          模拟表单提交的完整流程。
-        </p>
+        <p className="text-gray-600 dark:text-gray-300 mb-6">模拟表单提交的完整流程。</p>
         <div className={demoCardClassName}>
           <Button
             className="px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
@@ -272,9 +261,7 @@ export default function MessageDemo() {
         </p>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2">
-            <Button
-              className={primaryButtonClassName}
-              onClick={showMultipleMessages}>
+            <Button className={primaryButtonClassName} onClick={showMultipleMessages}>
               显示多条消息
             </Button>
             <Button className={dangerButtonClassName} onClick={clearAll}>
@@ -292,9 +279,7 @@ export default function MessageDemo() {
           可以通过 onClose 回调函数在消息关闭时执行特定操作（查看控制台）。
         </p>
         <div className={demoCardClassName}>
-          <Button
-            className={successButtonClassName}
-            onClick={showMessageWithCallback}>
+          <Button className={successButtonClassName} onClick={showMessageWithCallback}>
             显示消息（带回调）
           </Button>
         </div>
@@ -318,9 +303,7 @@ export default function MessageDemo() {
       {/* 实际应用场景 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">实际应用场景</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          常见的使用场景示例。
-        </p>
+        <p className="text-gray-600 dark:text-gray-300 mb-6">常见的使用场景示例。</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className={demoCardClassName}>
@@ -328,11 +311,11 @@ export default function MessageDemo() {
             <Button
               className={primaryButtonClassName}
               onClick={() => {
-                const close = message.loading('正在上传文件...');
+                const close = message.loading('正在上传文件...')
                 setTimeout(() => {
-                  close();
-                  message.success('文件上传成功');
-                }, 2000);
+                  close()
+                  message.success('文件上传成功')
+                }, 2000)
               }}>
               上传文件
             </Button>
@@ -343,14 +326,14 @@ export default function MessageDemo() {
             <Button
               className={successButtonClassName}
               onClick={() => {
-                const close = message.loading('正在保存设置...');
+                const close = message.loading('正在保存设置...')
                 setTimeout(() => {
-                  close();
+                  close()
                   message.success({
                     content: '设置保存成功',
-                    duration: 2000,
-                  });
-                }, 1000);
+                    duration: 2000
+                  })
+                }, 1000)
               }}>
               保存设置
             </Button>
@@ -364,8 +347,8 @@ export default function MessageDemo() {
                 message.warning({
                   content: '确定要删除这条记录吗？',
                   duration: 5000,
-                  closable: true,
-                });
+                  closable: true
+                })
               }}>
               删除记录
             </Button>
@@ -379,8 +362,8 @@ export default function MessageDemo() {
                 message.error({
                   content: '网络连接失败，请检查您的网络设置',
                   duration: 0,
-                  closable: true,
-                });
+                  closable: true
+                })
               }}>
               模拟网络错误
             </Button>
@@ -405,5 +388,5 @@ export default function MessageDemo() {
         />
       </div>
     </div>
-  );
+  )
 }

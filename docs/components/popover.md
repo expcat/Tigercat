@@ -16,15 +16,15 @@
 </template>
 
 <script setup>
-import { Popover, Button } from "@tigercat/vue";
+import { Popover, Button } from '@tigercat/vue'
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Popover, Button } from "@tigercat/react";
+import React from 'react'
+import { Popover, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -33,7 +33,7 @@ function App() {
         <Button>触发气泡卡片</Button>
       </Popover>
     </div>
-  );
+  )
 }
 ```
 
@@ -53,15 +53,15 @@ function App() {
 </template>
 
 <script setup>
-import { Popover, Button } from "@tigercat/vue";
+import { Popover, Button } from '@tigercat/vue'
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Popover, Button } from "@tigercat/react";
+import React from 'react'
+import { Popover, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -70,7 +70,7 @@ function App() {
         <Button>带标题的气泡卡片</Button>
       </Popover>
     </div>
-  );
+  )
 }
 ```
 
@@ -103,21 +103,21 @@ function App() {
 </template>
 
 <script setup>
-import { Popover, Button } from "@tigercat/vue";
+import { Popover, Button } from '@tigercat/vue'
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Popover, Button } from "@tigercat/react";
+import React from 'react'
+import { Popover, Button } from '@tigercat/react'
 
 function App() {
   return (
     <div>
       <Popover
-        titleContent={<span style={{ color: "#2563eb" }}>自定义标题</span>}
+        titleContent={<span style={{ color: '#2563eb' }}>自定义标题</span>}
         contentContent={
           <div>
             <p>这是自定义的内容</p>
@@ -127,12 +127,11 @@ function App() {
               <li>列表项 3</li>
             </ul>
           </div>
-        }
-      >
+        }>
         <Button>自定义内容</Button>
       </Popover>
     </div>
-  );
+  )
 }
 ```
 
@@ -164,15 +163,15 @@ function App() {
 </template>
 
 <script setup>
-import { Popover, Button } from "@tigercat/vue";
+import { Popover, Button } from '@tigercat/vue'
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Popover, Button } from "@tigercat/react";
+import React from 'react'
+import { Popover, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -193,7 +192,7 @@ function App() {
         <Button>右侧</Button>
       </Popover>
     </div>
-  );
+  )
 }
 ```
 
@@ -222,29 +221,28 @@ function App() {
       v-model:visible="manualVisible"
       title="手动触发"
       content="手动控制显示隐藏"
-      trigger="manual"
-    >
+      trigger="manual">
       <Button @click="manualVisible = !manualVisible">手动触发</Button>
     </Popover>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { Popover, Button } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Popover, Button } from '@tigercat/vue'
 
-const manualVisible = ref(false);
+const manualVisible = ref(false)
 </script>
 ```
 
 ### React
 
 ```tsx
-import React, { useState } from "react";
-import { Popover, Button } from "@tigercat/react";
+import React, { useState } from 'react'
+import { Popover, Button } from '@tigercat/react'
 
 function App() {
-  const [manualVisible, setManualVisible] = useState(false);
+  const [manualVisible, setManualVisible] = useState(false)
 
   return (
     <div className="space-x-2">
@@ -265,14 +263,11 @@ function App() {
         onVisibleChange={setManualVisible}
         title="手动触发"
         content="手动控制显示隐藏"
-        trigger="manual"
-      >
-        <Button onClick={() => setManualVisible(!manualVisible)}>
-          手动触发
-        </Button>
+        trigger="manual">
+        <Button onClick={() => setManualVisible(!manualVisible)}>手动触发</Button>
       </Popover>
     </div>
-  );
+  )
 }
 ```
 
@@ -285,36 +280,32 @@ function App() {
 ```vue
 <template>
   <div>
-    <Popover
-      v-model:visible="visible"
-      title="受控气泡卡片"
-      content="通过外部状态控制显示"
-    >
+    <Popover v-model:visible="visible" title="受控气泡卡片" content="通过外部状态控制显示">
       <Button>受控气泡卡片</Button>
     </Popover>
 
     <Button @click="visible = !visible" class="ml-2">
-      {{ visible ? "隐藏" : "显示" }}
+      {{ visible ? '隐藏' : '显示' }}
     </Button>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { Popover, Button } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Popover, Button } from '@tigercat/vue'
 
-const visible = ref(false);
+const visible = ref(false)
 </script>
 ```
 
 ### React
 
 ```tsx
-import React, { useState } from "react";
-import { Popover, Button } from "@tigercat/react";
+import React, { useState } from 'react'
+import { Popover, Button } from '@tigercat/react'
 
 function App() {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
 
   return (
     <div>
@@ -322,16 +313,15 @@ function App() {
         visible={visible}
         onVisibleChange={setVisible}
         title="受控气泡卡片"
-        content="通过外部状态控制显示"
-      >
+        content="通过外部状态控制显示">
         <Button>受控气泡卡片</Button>
       </Popover>
 
       <Button onClick={() => setVisible(!visible)} className="ml-2">
-        {visible ? "隐藏" : "显示"}
+        {visible ? '隐藏' : '显示'}
       </Button>
     </div>
-  );
+  )
 }
 ```
 
@@ -344,55 +334,39 @@ function App() {
 ```vue
 <template>
   <div class="space-x-2">
-    <Popover
-      title="自定义宽度"
-      content="这是一个宽度为 300px 的气泡卡片"
-      width="300"
-    >
+    <Popover title="自定义宽度" content="这是一个宽度为 300px 的气泡卡片" width="300">
       <Button>宽度 300px</Button>
     </Popover>
 
-    <Popover
-      title="自定义宽度"
-      content="这是一个宽度为 400px 的气泡卡片"
-      width="400"
-    >
+    <Popover title="自定义宽度" content="这是一个宽度为 400px 的气泡卡片" width="400">
       <Button>宽度 400px</Button>
     </Popover>
   </div>
 </template>
 
 <script setup>
-import { Popover, Button } from "@tigercat/vue";
+import { Popover, Button } from '@tigercat/vue'
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Popover, Button } from "@tigercat/react";
+import React from 'react'
+import { Popover, Button } from '@tigercat/react'
 
 function App() {
   return (
     <div className="space-x-2">
-      <Popover
-        title="自定义宽度"
-        content="这是一个宽度为 300px 的气泡卡片"
-        width="300"
-      >
+      <Popover title="自定义宽度" content="这是一个宽度为 300px 的气泡卡片" width="300">
         <Button>宽度 300px</Button>
       </Popover>
 
-      <Popover
-        title="自定义宽度"
-        content="这是一个宽度为 400px 的气泡卡片"
-        width="400"
-      >
+      <Popover title="自定义宽度" content="这是一个宽度为 400px 的气泡卡片" width="400">
         <Button>宽度 400px</Button>
       </Popover>
     </div>
-  );
+  )
 }
 ```
 
@@ -410,15 +384,15 @@ function App() {
 </template>
 
 <script setup>
-import { Popover, Button } from "@tigercat/vue";
+import { Popover, Button } from '@tigercat/vue'
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Popover, Button } from "@tigercat/react";
+import React from 'react'
+import { Popover, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -427,7 +401,7 @@ function App() {
         <Button disabled>禁用的气泡卡片</Button>
       </Popover>
     </div>
-  );
+  )
 }
 ```
 

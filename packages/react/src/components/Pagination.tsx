@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback } from 'react'
 import {
   classNames,
   getTotalPages,
@@ -13,16 +13,15 @@ import {
   getQuickJumperInputClasses,
   getPageSizeSelectorClasses,
   getTotalTextClasses,
-  type PaginationProps as CorePaginationProps,
-} from "@tigercat/core";
+  type PaginationProps as CorePaginationProps
+} from '@tigercat/core'
 
 export interface PaginationProps
-  extends Omit<CorePaginationProps, "style">,
-    Omit<React.HTMLAttributes<HTMLElement>, "onChange"> {
-  style?: React.CSSProperties;
+  extends Omit<CorePaginationProps, 'style'>, Omit<React.HTMLAttributes<HTMLElement>, 'onChange'> {
+  style?: React.CSSProperties
 
-  onChange?: (current: number, pageSize: number) => void;
-  onPageSizeChange?: (current: number, pageSize: number) => void;
+  onChange?: (current: number, pageSize: number) => void
+  onPageSizeChange?: (current: number, pageSize: number) => void
 }
 
 export const Pagination: React.FC<PaginationProps> = ({
@@ -37,8 +36,8 @@ export const Pagination: React.FC<PaginationProps> = ({
   showTotal = true,
   totalText,
   simple = false,
-  size = "medium",
-  align = "center",
+  size = 'medium',
+  align = 'center',
   disabled = false,
   hideOnSinglePage = false,
   showLessItems = false,
@@ -48,87 +47,76 @@ export const Pagination: React.FC<PaginationProps> = ({
   onPageSizeChange,
   ...props
 }) => {
-  const { "aria-label": ariaLabelProp, ...navProps } = props;
+  const { 'aria-label': ariaLabelProp, ...navProps } = props
 
   // Internal state for uncontrolled mode
-  const [internalCurrent, setInternalCurrent] =
-    useState<number>(defaultCurrent);
-  const [internalPageSize, setInternalPageSize] =
-    useState<number>(defaultPageSize);
-  const [quickJumperValue, setQuickJumperValue] = useState<string>("");
+  const [internalCurrent, setInternalCurrent] = useState<number>(defaultCurrent)
+  const [internalPageSize, setInternalPageSize] = useState<number>(defaultPageSize)
+  const [quickJumperValue, setQuickJumperValue] = useState<string>('')
 
   // Use controlled or uncontrolled values
-  const currentPage =
-    controlledCurrent !== undefined ? controlledCurrent : internalCurrent;
-  const currentPageSize =
-    controlledPageSize !== undefined ? controlledPageSize : internalPageSize;
+  const currentPage = controlledCurrent !== undefined ? controlledCurrent : internalCurrent
+  const currentPageSize = controlledPageSize !== undefined ? controlledPageSize : internalPageSize
 
   // Calculate total pages
-  const totalPages = getTotalPages(total, currentPageSize);
+  const totalPages = getTotalPages(total, currentPageSize)
 
   // Validate and adjust current page
-  const validatedCurrentPage = validateCurrentPage(currentPage, totalPages);
+  const validatedCurrentPage = validateCurrentPage(currentPage, totalPages)
 
   // Calculate current page range
-  const pageRange = getPageRange(validatedCurrentPage, currentPageSize, total);
+  const pageRange = getPageRange(validatedCurrentPage, currentPageSize, total)
 
   // Check if should hide on single page
   if (hideOnSinglePage && totalPages <= 1) {
-    return null;
+    return null
   }
 
   // Handle page change
   const handlePageChange = useCallback(
     (page: number) => {
-      if (disabled) return;
-      if (page === validatedCurrentPage) return;
-      if (page < 1 || page > totalPages) return;
+      if (disabled) return
+      if (page === validatedCurrentPage) return
+      if (page < 1 || page > totalPages) return
 
       // Update internal state if uncontrolled
       if (controlledCurrent === undefined) {
-        setInternalCurrent(page);
+        setInternalCurrent(page)
       }
 
       // Call onChange callback
-      onChange?.(page, currentPageSize);
+      onChange?.(page, currentPageSize)
     },
-    [
-      disabled,
-      validatedCurrentPage,
-      totalPages,
-      controlledCurrent,
-      onChange,
-      currentPageSize,
-    ]
-  );
+    [disabled, validatedCurrentPage, totalPages, controlledCurrent, onChange, currentPageSize]
+  )
 
   // Handle page size change
   const handlePageSizeChange = useCallback(
     (newPageSize: number) => {
-      if (disabled) return;
+      if (disabled) return
 
-      const newTotalPages = getTotalPages(total, newPageSize);
-      let newPage = validatedCurrentPage;
+      const newTotalPages = getTotalPages(total, newPageSize)
+      let newPage = validatedCurrentPage
 
       // Adjust current page if it exceeds new total pages
       if (newPage > newTotalPages) {
-        newPage = Math.max(1, newTotalPages);
+        newPage = Math.max(1, newTotalPages)
       }
 
       // Update internal state if uncontrolled
       if (controlledPageSize === undefined) {
-        setInternalPageSize(newPageSize);
+        setInternalPageSize(newPageSize)
       }
       if (controlledCurrent === undefined && newPage !== validatedCurrentPage) {
-        setInternalCurrent(newPage);
+        setInternalCurrent(newPage)
       }
 
       // Call callbacks
-      onPageSizeChange?.(newPage, newPageSize);
+      onPageSizeChange?.(newPage, newPageSize)
 
       // Also call onChange if page changed
       if (newPage !== validatedCurrentPage) {
-        onChange?.(newPage, newPageSize);
+        onChange?.(newPage, newPageSize)
       }
     },
     [
@@ -138,50 +126,50 @@ export const Pagination: React.FC<PaginationProps> = ({
       controlledPageSize,
       controlledCurrent,
       onPageSizeChange,
-      onChange,
+      onChange
     ]
-  );
+  )
 
   // Handle quick jumper submit
   const handleQuickJumperSubmit = useCallback(() => {
-    const page = parseInt(quickJumperValue, 10);
+    const page = parseInt(quickJumperValue, 10)
     if (!isNaN(page)) {
-      handlePageChange(page);
+      handlePageChange(page)
     }
-    setQuickJumperValue("");
-  }, [quickJumperValue, handlePageChange]);
+    setQuickJumperValue('')
+  }, [quickJumperValue, handlePageChange])
 
   // Handle quick jumper keypress
   const handleQuickJumperKeyPress = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === "Enter") {
-        handleQuickJumperSubmit();
+      if (event.key === 'Enter') {
+        handleQuickJumperSubmit()
       }
     },
     [handleQuickJumperSubmit]
-  );
+  )
 
   // Container classes
-  const containerClasses = getPaginationContainerClasses(align, className);
+  const containerClasses = getPaginationContainerClasses(align, className)
 
-  const elements: React.ReactNode[] = [];
+  const elements: React.ReactNode[] = []
 
   // Show total text
   if (showTotal) {
-    const totalTextFn = totalText || defaultTotalText;
-    const totalTextContent = totalTextFn(total, pageRange);
+    const totalTextFn = totalText || defaultTotalText
+    const totalTextContent = totalTextFn(total, pageRange)
 
     elements.push(
       <span key="total" className={getTotalTextClasses(size)}>
         {totalTextContent}
       </span>
-    );
+    )
   }
 
   if (simple) {
     // Simple mode: only prev, current/total, next
-    const prevDisabled = validatedCurrentPage <= 1 || disabled;
-    const nextDisabled = validatedCurrentPage >= totalPages || disabled;
+    const prevDisabled = validatedCurrentPage <= 1 || disabled
+    const nextDisabled = validatedCurrentPage >= totalPages || disabled
 
     // Previous button
     elements.push(
@@ -191,28 +179,22 @@ export const Pagination: React.FC<PaginationProps> = ({
         className={getPaginationButtonBaseClasses(size)}
         disabled={prevDisabled}
         onClick={() => handlePageChange(validatedCurrentPage - 1)}
-        aria-label="上一页"
-      >
+        aria-label="上一页">
         ‹
       </button>
-    );
+    )
 
     // Current/Total display
     elements.push(
       <span
         key="current"
         className={classNames(
-          "mx-2",
-          size === "small"
-            ? "text-sm"
-            : size === "large"
-            ? "text-lg"
-            : "text-base"
-        )}
-      >
+          'mx-2',
+          size === 'small' ? 'text-sm' : size === 'large' ? 'text-lg' : 'text-base'
+        )}>
         {validatedCurrentPage} / {totalPages}
       </span>
-    );
+    )
 
     // Next button
     elements.push(
@@ -222,15 +204,14 @@ export const Pagination: React.FC<PaginationProps> = ({
         className={getPaginationButtonBaseClasses(size)}
         disabled={nextDisabled}
         onClick={() => handlePageChange(validatedCurrentPage + 1)}
-        aria-label="下一页"
-      >
+        aria-label="下一页">
         ›
       </button>
-    );
+    )
   } else {
     // Full mode: prev, page numbers, next
-    const prevDisabled = validatedCurrentPage <= 1 || disabled;
-    const nextDisabled = validatedCurrentPage >= totalPages || disabled;
+    const prevDisabled = validatedCurrentPage <= 1 || disabled
+    const nextDisabled = validatedCurrentPage >= totalPages || disabled
 
     // Previous button
     elements.push(
@@ -240,31 +221,25 @@ export const Pagination: React.FC<PaginationProps> = ({
         className={getPaginationButtonBaseClasses(size)}
         disabled={prevDisabled}
         onClick={() => handlePageChange(validatedCurrentPage - 1)}
-        aria-label="上一页"
-      >
+        aria-label="上一页">
         ‹
       </button>
-    );
+    )
 
     // Page numbers
-    const pageNumbers = getPageNumbers(
-      validatedCurrentPage,
-      totalPages,
-      showLessItems
-    );
+    const pageNumbers = getPageNumbers(validatedCurrentPage, totalPages, showLessItems)
     pageNumbers.forEach((pageNum, index) => {
-      if (pageNum === "...") {
+      if (pageNum === '...') {
         elements.push(
           <span
             key={`ellipsis-${index}`}
             className={getPaginationEllipsisClasses(size)}
-            aria-hidden="true"
-          >
+            aria-hidden="true">
             ...
           </span>
-        );
+        )
       } else {
-        const isActive = pageNum === validatedCurrentPage;
+        const isActive = pageNum === validatedCurrentPage
         elements.push(
           <button
             key={`page-${pageNum}`}
@@ -276,13 +251,12 @@ export const Pagination: React.FC<PaginationProps> = ({
             disabled={disabled}
             onClick={() => handlePageChange(pageNum as number)}
             aria-label={`第 ${pageNum} 页`}
-            aria-current={isActive ? "page" : undefined}
-          >
+            aria-current={isActive ? 'page' : undefined}>
             {String(pageNum)}
           </button>
-        );
+        )
       }
-    });
+    })
 
     // Next button
     elements.push(
@@ -292,11 +266,10 @@ export const Pagination: React.FC<PaginationProps> = ({
         className={getPaginationButtonBaseClasses(size)}
         disabled={nextDisabled}
         onClick={() => handlePageChange(validatedCurrentPage + 1)}
-        aria-label="下一页"
-      >
+        aria-label="下一页">
         ›
       </button>
-    );
+    )
   }
 
   // Show page size selector
@@ -308,15 +281,14 @@ export const Pagination: React.FC<PaginationProps> = ({
         disabled={disabled}
         value={currentPageSize}
         onChange={(e) => handlePageSizeChange(parseInt(e.target.value, 10))}
-        aria-label="每页条数"
-      >
+        aria-label="每页条数">
         {pageSizeOptions.map((sizeOption) => (
           <option key={sizeOption} value={sizeOption}>
             {sizeOption} 条/页
           </option>
         ))}
       </select>
-    );
+    )
   }
 
   // Show quick jumper
@@ -325,22 +297,17 @@ export const Pagination: React.FC<PaginationProps> = ({
       <span
         key="jumper-label-start"
         className={classNames(
-          "ml-2",
-          size === "small"
-            ? "text-sm"
-            : size === "large"
-            ? "text-lg"
-            : "text-base"
-        )}
-      >
+          'ml-2',
+          size === 'small' ? 'text-sm' : size === 'large' ? 'text-lg' : 'text-base'
+        )}>
         跳至
       </span>
-    );
+    )
     elements.push(
       <input
         key="jumper-input"
         type="number"
-        className={classNames(getQuickJumperInputClasses(size), "mx-2")}
+        className={classNames(getQuickJumperInputClasses(size), 'mx-2')}
         disabled={disabled}
         value={quickJumperValue}
         onChange={(e) => setQuickJumperValue(e.target.value)}
@@ -349,21 +316,14 @@ export const Pagination: React.FC<PaginationProps> = ({
         max={totalPages}
         aria-label="跳转页码"
       />
-    );
+    )
     elements.push(
       <span
         key="jumper-label-end"
-        className={
-          size === "small"
-            ? "text-sm"
-            : size === "large"
-            ? "text-lg"
-            : "text-base"
-        }
-      >
+        className={size === 'small' ? 'text-sm' : size === 'large' ? 'text-lg' : 'text-base'}>
         页
       </span>
-    );
+    )
   }
 
   return (
@@ -371,12 +331,11 @@ export const Pagination: React.FC<PaginationProps> = ({
       className={containerClasses}
       {...navProps}
       role="navigation"
-      aria-label={ariaLabelProp ?? "分页导航"}
-      style={style}
-    >
+      aria-label={ariaLabelProp ?? '分页导航'}
+      style={style}>
       {elements}
     </nav>
-  );
-};
+  )
+}
 
-export default Pagination;
+export default Pagination

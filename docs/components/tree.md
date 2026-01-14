@@ -8,24 +8,24 @@
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Tree } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Tree } from '@tigercat/vue'
 
 const treeData = ref([
   {
-    key: "1",
-    label: "Parent Node 1",
+    key: '1',
+    label: 'Parent Node 1',
     children: [
-      { key: "1-1", label: "Child Node 1-1" },
-      { key: "1-2", label: "Child Node 1-2" },
-    ],
+      { key: '1-1', label: 'Child Node 1-1' },
+      { key: '1-2', label: 'Child Node 1-2' }
+    ]
   },
   {
-    key: "2",
-    label: "Parent Node 2",
-    children: [{ key: "2-1", label: "Child Node 2-1" }],
-  },
-]);
+    key: '2',
+    label: 'Parent Node 2',
+    children: [{ key: '2-1', label: 'Child Node 2-1' }]
+  }
+])
 </script>
 
 <template>
@@ -36,26 +36,26 @@ const treeData = ref([
 ### React
 
 ```tsx
-import { Tree } from "@tigercat/react";
+import { Tree } from '@tigercat/react'
 
 function App() {
   const treeData = [
     {
-      key: "1",
-      label: "Parent Node 1",
+      key: '1',
+      label: 'Parent Node 1',
       children: [
-        { key: "1-1", label: "Child Node 1-1" },
-        { key: "1-2", label: "Child Node 1-2" },
-      ],
+        { key: '1-1', label: 'Child Node 1-1' },
+        { key: '1-2', label: 'Child Node 1-2' }
+      ]
     },
     {
-      key: "2",
-      label: "Parent Node 2",
-      children: [{ key: "2-1", label: "Child Node 2-1" }],
-    },
-  ];
+      key: '2',
+      label: 'Parent Node 2',
+      children: [{ key: '2-1', label: 'Child Node 2-1' }]
+    }
+  ]
 
-  return <Tree treeData={treeData} />;
+  return <Tree treeData={treeData} />
 }
 ```
 
@@ -67,72 +67,60 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Tree } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Tree } from '@tigercat/vue'
 
 const treeData = ref([
   {
-    key: "1",
-    label: "Parent Node 1",
+    key: '1',
+    label: 'Parent Node 1',
     children: [
-      { key: "1-1", label: "Child Node 1-1" },
-      { key: "1-2", label: "Child Node 1-2" },
-    ],
-  },
-]);
+      { key: '1-1', label: 'Child Node 1-1' },
+      { key: '1-2', label: 'Child Node 1-2' }
+    ]
+  }
+])
 
-const checkedKeys = ref(["1-1"]);
+const checkedKeys = ref(['1-1'])
 
 function handleCheck(keys, info) {
-  console.log("Checked keys:", keys);
-  console.log("Info:", info);
+  console.log('Checked keys:', keys)
+  console.log('Info:', info)
 }
 </script>
 
 <template>
-  <Tree
-    :treeData="treeData"
-    checkable
-    v-model:checkedKeys="checkedKeys"
-    @check="handleCheck"
-  />
+  <Tree :treeData="treeData" checkable v-model:checkedKeys="checkedKeys" @check="handleCheck" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Tree } from "@tigercat/react";
+import { useState } from 'react'
+import { Tree } from '@tigercat/react'
 
 function App() {
   const treeData = [
     {
-      key: "1",
-      label: "Parent Node 1",
+      key: '1',
+      label: 'Parent Node 1',
       children: [
-        { key: "1-1", label: "Child Node 1-1" },
-        { key: "1-2", label: "Child Node 1-2" },
-      ],
-    },
-  ];
+        { key: '1-1', label: 'Child Node 1-1' },
+        { key: '1-2', label: 'Child Node 1-2' }
+      ]
+    }
+  ]
 
-  const [checkedKeys, setCheckedKeys] = useState(["1-1"]);
+  const [checkedKeys, setCheckedKeys] = useState(['1-1'])
 
   const handleCheck = (keys, info) => {
-    console.log("Checked keys:", keys);
-    console.log("Info:", info);
-    setCheckedKeys(keys);
-  };
+    console.log('Checked keys:', keys)
+    console.log('Info:', info)
+    setCheckedKeys(keys)
+  }
 
-  return (
-    <Tree
-      treeData={treeData}
-      checkable
-      checkedKeys={checkedKeys}
-      onCheck={handleCheck}
-    />
-  );
+  return <Tree treeData={treeData} checkable checkedKeys={checkedKeys} onCheck={handleCheck} />
 }
 ```
 
@@ -144,12 +132,7 @@ function App() {
 
 ```vue
 <template>
-  <Tree
-    :treeData="treeData"
-    checkable
-    checkStrictly
-    v-model:checkedKeys="checkedKeys"
-  />
+  <Tree :treeData="treeData" checkable checkStrictly v-model:checkedKeys="checkedKeys" />
 </template>
 ```
 
@@ -173,14 +156,14 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Tree } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Tree } from '@tigercat/vue'
 
-const selectedKeys = ref(["1-1"]);
+const selectedKeys = ref(['1-1'])
 
 function handleSelect(keys, info) {
-  console.log("Selected keys:", keys);
-  console.log("Selected nodes:", info.selectedNodes);
+  console.log('Selected keys:', keys)
+  console.log('Selected nodes:', info.selectedNodes)
 }
 </script>
 
@@ -189,34 +172,26 @@ function handleSelect(keys, info) {
     :treeData="treeData"
     selectable
     v-model:selectedKeys="selectedKeys"
-    @select="handleSelect"
-  />
+    @select="handleSelect" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Tree } from "@tigercat/react";
+import { useState } from 'react'
+import { Tree } from '@tigercat/react'
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(["1-1"]);
+  const [selectedKeys, setSelectedKeys] = useState(['1-1'])
 
   const handleSelect = (keys, info) => {
-    console.log("Selected keys:", keys);
-    console.log("Selected nodes:", info.selectedNodes);
-    setSelectedKeys(keys);
-  };
+    console.log('Selected keys:', keys)
+    console.log('Selected nodes:', info.selectedNodes)
+    setSelectedKeys(keys)
+  }
 
-  return (
-    <Tree
-      treeData={treeData}
-      selectable
-      selectedKeys={selectedKeys}
-      onSelect={handleSelect}
-    />
-  );
+  return <Tree treeData={treeData} selectable selectedKeys={selectedKeys} onSelect={handleSelect} />
 }
 ```
 
@@ -246,13 +221,13 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Tree } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Tree } from '@tigercat/vue'
 
 const treeData = ref([
-  { key: "1", label: "Parent Node 1" },
-  { key: "2", label: "Parent Node 2" },
-]);
+  { key: '1', label: 'Parent Node 1' },
+  { key: '2', label: 'Parent Node 2' }
+])
 
 async function loadData(node) {
   // 模拟异步加载
@@ -260,10 +235,10 @@ async function loadData(node) {
     setTimeout(() => {
       resolve([
         { key: `${node.key}-1`, label: `Child of ${node.label}` },
-        { key: `${node.key}-2`, label: `Child of ${node.label}` },
-      ]);
-    }, 1000);
-  });
+        { key: `${node.key}-2`, label: `Child of ${node.label}` }
+      ])
+    }, 1000)
+  })
 }
 </script>
 
@@ -275,13 +250,13 @@ async function loadData(node) {
 ### React
 
 ```tsx
-import { Tree } from "@tigercat/react";
+import { Tree } from '@tigercat/react'
 
 function App() {
   const treeData = [
-    { key: "1", label: "Parent Node 1" },
-    { key: "2", label: "Parent Node 2" },
-  ];
+    { key: '1', label: 'Parent Node 1' },
+    { key: '2', label: 'Parent Node 2' }
+  ]
 
   const loadData = async (node) => {
     // 模拟异步加载
@@ -289,13 +264,13 @@ function App() {
       setTimeout(() => {
         resolve([
           { key: `${node.key}-1`, label: `Child of ${node.label}` },
-          { key: `${node.key}-2`, label: `Child of ${node.label}` },
-        ]);
-      }, 1000);
-    });
-  };
+          { key: `${node.key}-2`, label: `Child of ${node.label}` }
+        ])
+      }, 1000)
+    })
+  }
 
-  return <Tree treeData={treeData} loadData={loadData} />;
+  return <Tree treeData={treeData} loadData={loadData} />
 }
 ```
 
@@ -307,21 +282,21 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Tree } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Tree } from '@tigercat/vue'
 
 const treeData = ref([
   {
-    key: "1",
-    label: "Parent Node 1",
+    key: '1',
+    label: 'Parent Node 1',
     children: [
-      { key: "1-1", label: "Child Node 1-1" },
-      { key: "1-2", label: "Child Node 1-2" },
-    ],
-  },
-]);
+      { key: '1-1', label: 'Child Node 1-1' },
+      { key: '1-2', label: 'Child Node 1-2' }
+    ]
+  }
+])
 
-const filterValue = ref("");
+const filterValue = ref('')
 </script>
 
 <template>
@@ -335,22 +310,22 @@ const filterValue = ref("");
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Tree } from "@tigercat/react";
+import { useState } from 'react'
+import { Tree } from '@tigercat/react'
 
 function App() {
   const treeData = [
     {
-      key: "1",
-      label: "Parent Node 1",
+      key: '1',
+      label: 'Parent Node 1',
       children: [
-        { key: "1-1", label: "Child Node 1-1" },
-        { key: "1-2", label: "Child Node 1-2" },
-      ],
-    },
-  ];
+        { key: '1-1', label: 'Child Node 1-1' },
+        { key: '1-2', label: 'Child Node 1-2' }
+      ]
+    }
+  ]
 
-  const [filterValue, setFilterValue] = useState("");
+  const [filterValue, setFilterValue] = useState('')
 
   return (
     <div>
@@ -361,7 +336,7 @@ function App() {
       />
       <Tree treeData={treeData} filterValue={filterValue} />
     </div>
-  );
+  )
 }
 ```
 
@@ -373,20 +348,20 @@ function App() {
 
 ```vue
 <script setup>
-import { ref, h } from "vue";
-import { Tree, Icon } from "@tigercat/vue";
+import { ref, h } from 'vue'
+import { Tree, Icon } from '@tigercat/vue'
 
 const treeData = ref([
   {
-    key: "1",
-    label: "Folder",
-    icon: h(Icon, { name: "folder" }),
+    key: '1',
+    label: 'Folder',
+    icon: h(Icon, { name: 'folder' }),
     children: [
-      { key: "1-1", label: "File 1", icon: h(Icon, { name: "file" }) },
-      { key: "1-2", label: "File 2", icon: h(Icon, { name: "file" }) },
-    ],
-  },
-]);
+      { key: '1-1', label: 'File 1', icon: h(Icon, { name: 'file' }) },
+      { key: '1-2', label: 'File 2', icon: h(Icon, { name: 'file' }) }
+    ]
+  }
+])
 </script>
 
 <template>
@@ -397,22 +372,22 @@ const treeData = ref([
 ### React
 
 ```tsx
-import { Tree, Icon } from "@tigercat/react";
+import { Tree, Icon } from '@tigercat/react'
 
 function App() {
   const treeData = [
     {
-      key: "1",
-      label: "Folder",
+      key: '1',
+      label: 'Folder',
       icon: <Icon name="folder" />,
       children: [
-        { key: "1-1", label: "File 1", icon: <Icon name="file" /> },
-        { key: "1-2", label: "File 2", icon: <Icon name="file" /> },
-      ],
-    },
-  ];
+        { key: '1-1', label: 'File 1', icon: <Icon name="file" /> },
+        { key: '1-2', label: 'File 2', icon: <Icon name="file" /> }
+      ]
+    }
+  ]
 
-  return <Tree treeData={treeData} />;
+  return <Tree treeData={treeData} />
 }
 ```
 
@@ -424,19 +399,19 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Tree } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Tree } from '@tigercat/vue'
 
 const treeData = ref([
   {
-    key: "1",
-    label: "Parent Node 1",
+    key: '1',
+    label: 'Parent Node 1',
     children: [
-      { key: "1-1", label: "Child Node 1-1" },
-      { key: "1-2", label: "Child Node 1-2 (Disabled)", disabled: true },
-    ],
-  },
-]);
+      { key: '1-1', label: 'Child Node 1-1' },
+      { key: '1-2', label: 'Child Node 1-2 (Disabled)', disabled: true }
+    ]
+  }
+])
 </script>
 
 <template>
@@ -447,21 +422,21 @@ const treeData = ref([
 ### React
 
 ```tsx
-import { Tree } from "@tigercat/react";
+import { Tree } from '@tigercat/react'
 
 function App() {
   const treeData = [
     {
-      key: "1",
-      label: "Parent Node 1",
+      key: '1',
+      label: 'Parent Node 1',
       children: [
-        { key: "1-1", label: "Child Node 1-1" },
-        { key: "1-2", label: "Child Node 1-2 (Disabled)", disabled: true },
-      ],
-    },
-  ];
+        { key: '1-1', label: 'Child Node 1-1' },
+        { key: '1-2', label: 'Child Node 1-2 (Disabled)', disabled: true }
+      ]
+    }
+  ]
 
-  return <Tree treeData={treeData} checkable />;
+  return <Tree treeData={treeData} checkable />
 }
 ```
 

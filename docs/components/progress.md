@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Progress } from '@tigercat/vue';
+import { Progress } from '@tigercat/vue'
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Progress } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Progress } from '@tigercat/react';
+import { Progress } from '@tigercat/react'
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
       <Progress percentage={100} status="success" />
       <Progress percentage={70} status="exception" />
     </>
-  );
+  )
 }
 ```
 
@@ -234,12 +234,12 @@ Progress 组件支持多种状态，状态会覆盖变体的颜色：
 {
   /* 静态条纹 */
 }
-<Progress percentage={70} striped={true} />;
+;<Progress percentage={70} striped={true} />
 
 {
   /* 动画条纹 */
 }
-<Progress percentage={70} striped={true} stripedAnimation={true} />;
+;<Progress percentage={70} striped={true} stripedAnimation={true} />
 ```
 
 ## 自定义宽度和高度
@@ -300,20 +300,20 @@ Progress 组件支持多种状态，状态会覆盖变体的颜色：
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Progress } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Progress } from '@tigercat/vue'
 
-const uploadProgress = ref(0);
+const uploadProgress = ref(0)
 
 const uploadFile = () => {
   // 模拟文件上传
   const interval = setInterval(() => {
-    uploadProgress.value += 10;
+    uploadProgress.value += 10
     if (uploadProgress.value >= 100) {
-      clearInterval(interval);
+      clearInterval(interval)
     }
-  }, 500);
-};
+  }, 500)
+}
 </script>
 
 <template>
@@ -327,31 +327,31 @@ const uploadFile = () => {
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { Progress } from '@tigercat/react';
+import { useState } from 'react'
+import { Progress } from '@tigercat/react'
 
 function FileUpload() {
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadProgress, setUploadProgress] = useState(0)
 
   const uploadFile = () => {
     // 模拟文件上传
     const interval = setInterval(() => {
       setUploadProgress((prev) => {
-        const next = prev + 10;
+        const next = prev + 10
         if (next >= 100) {
-          clearInterval(interval);
+          clearInterval(interval)
         }
-        return next;
-      });
-    }, 500);
-  };
+        return next
+      })
+    }, 500)
+  }
 
   return (
     <div>
       <Progress percentage={uploadProgress} />
       <button onClick={uploadFile}>开始上传</button>
     </div>
-  );
+  )
 }
 ```
 
@@ -361,28 +361,28 @@ function FileUpload() {
 
 ```vue
 <script setup>
-import { ref, computed } from 'vue';
-import { Progress } from '@tigercat/vue';
+import { ref, computed } from 'vue'
+import { Progress } from '@tigercat/vue'
 
 const tasks = ref([
   { id: 1, name: '需求分析', completed: true },
   { id: 2, name: '设计方案', completed: true },
   { id: 3, name: '开发实现', completed: true },
   { id: 4, name: '测试验收', completed: false },
-  { id: 5, name: '部署上线', completed: false },
-]);
+  { id: 5, name: '部署上线', completed: false }
+])
 
 const completionRate = computed(() => {
-  const completed = tasks.value.filter((t) => t.completed).length;
-  return (completed / tasks.value.length) * 100;
-});
+  const completed = tasks.value.filter((t) => t.completed).length
+  return (completed / tasks.value.length) * 100
+})
 
 const getStatus = computed(() => {
-  if (completionRate.value === 100) return 'success';
-  if (completionRate.value >= 75) return 'normal';
-  if (completionRate.value >= 50) return 'paused';
-  return 'exception';
-});
+  if (completionRate.value === 100) return 'success'
+  if (completionRate.value >= 75) return 'normal'
+  if (completionRate.value >= 50) return 'paused'
+  return 'exception'
+})
 </script>
 
 <template>
@@ -405,8 +405,8 @@ const getStatus = computed(() => {
 #### React
 
 ```tsx
-import { useState, useMemo } from 'react';
-import { Progress } from '@tigercat/react';
+import { useState, useMemo } from 'react'
+import { Progress } from '@tigercat/react'
 
 function TaskProgress() {
   const [tasks, setTasks] = useState([
@@ -414,26 +414,24 @@ function TaskProgress() {
     { id: 2, name: '设计方案', completed: true },
     { id: 3, name: '开发实现', completed: true },
     { id: 4, name: '测试验收', completed: false },
-    { id: 5, name: '部署上线', completed: false },
-  ]);
+    { id: 5, name: '部署上线', completed: false }
+  ])
 
   const completionRate = useMemo(() => {
-    const completed = tasks.filter((t) => t.completed).length;
-    return (completed / tasks.length) * 100;
-  }, [tasks]);
+    const completed = tasks.filter((t) => t.completed).length
+    return (completed / tasks.length) * 100
+  }, [tasks])
 
   const status = useMemo(() => {
-    if (completionRate === 100) return 'success';
-    if (completionRate >= 75) return 'normal';
-    if (completionRate >= 50) return 'paused';
-    return 'exception';
-  }, [completionRate]);
+    if (completionRate === 100) return 'success'
+    if (completionRate >= 75) return 'normal'
+    if (completionRate >= 50) return 'paused'
+    return 'exception'
+  }, [completionRate])
 
   const toggleTask = (id: number) => {
-    setTasks(
-      tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
-    );
-  };
+    setTasks(tasks.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t)))
+  }
 
   return (
     <div>
@@ -446,17 +444,13 @@ function TaskProgress() {
       <ul>
         {tasks.map((task) => (
           <li key={task.id}>
-            <input
-              type="checkbox"
-              checked={task.completed}
-              onChange={() => toggleTask(task.id)}
-            />
+            <input type="checkbox" checked={task.completed} onChange={() => toggleTask(task.id)} />
             {task.name}
           </li>
         ))}
       </ul>
     </div>
-  );
+  )
 }
 ```
 
@@ -466,7 +460,7 @@ function TaskProgress() {
 
 ```vue
 <script setup>
-import { Progress } from '@tigercat/vue';
+import { Progress } from '@tigercat/vue'
 </script>
 
 <template>
@@ -509,7 +503,7 @@ import { Progress } from '@tigercat/vue';
 #### React
 
 ```tsx
-import { Progress } from '@tigercat/react';
+import { Progress } from '@tigercat/react'
 
 function Dashboard() {
   return (
@@ -534,7 +528,7 @@ function Dashboard() {
         <Progress type="circle" percentage={95} status="exception" />
       </div>
     </div>
-  );
+  )
 }
 ```
 

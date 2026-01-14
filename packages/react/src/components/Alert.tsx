@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   classNames,
   icon24PathStrokeLinecap,
@@ -17,40 +17,36 @@ import {
   alertContentClasses,
   getAlertIconPath,
   alertCloseIconPath,
-  type AlertProps as CoreAlertProps,
-} from '@tigercat/core';
+  type AlertProps as CoreAlertProps
+} from '@tigercat/core'
 
 export interface AlertProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>,
-    CoreAlertProps {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, CoreAlertProps {
   /**
    * Alert content (React children)
    */
-  children?: React.ReactNode;
+  children?: React.ReactNode
 
   /**
    * Custom title content (overrides title prop)
    */
-  titleSlot?: React.ReactNode;
+  titleSlot?: React.ReactNode
 
   /**
    * Custom description content (overrides description prop)
    */
-  descriptionSlot?: React.ReactNode;
+  descriptionSlot?: React.ReactNode
 
   /**
    * Callback when alert is closed
    */
-  onClose?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onClose?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 
 /**
  * Icon component
  */
-const Icon: React.FC<{ path: string; className: string }> = ({
-  path,
-  className,
-}) => (
+const Icon: React.FC<{ path: string; className: string }> = ({ path, className }) => (
   <svg
     className={className}
     xmlns="http://www.w3.org/2000/svg"
@@ -64,7 +60,7 @@ const Icon: React.FC<{ path: string; className: string }> = ({
       d={path}
     />
   </svg>
-);
+)
 
 export const Alert: React.FC<AlertProps> = ({
   type = 'info',
@@ -81,9 +77,9 @@ export const Alert: React.FC<AlertProps> = ({
   onClose,
   ...props
 }) => {
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(true)
 
-  const colorScheme = getAlertTypeClasses(type, defaultAlertThemeColors);
+  const colorScheme = getAlertTypeClasses(type, defaultAlertThemeColors)
 
   const alertClasses = classNames(
     alertBaseClasses,
@@ -91,36 +87,30 @@ export const Alert: React.FC<AlertProps> = ({
     colorScheme.bg,
     colorScheme.border,
     className
-  );
+  )
 
-  const iconClasses = classNames(alertIconSizeClasses[size], colorScheme.icon);
-  const titleClasses = classNames(
-    alertTitleSizeClasses[size],
-    colorScheme.title
-  );
-  const descriptionClasses = classNames(
-    alertDescriptionSizeClasses[size],
-    colorScheme.description
-  );
+  const iconClasses = classNames(alertIconSizeClasses[size], colorScheme.icon)
+  const titleClasses = classNames(alertTitleSizeClasses[size], colorScheme.title)
+  const descriptionClasses = classNames(alertDescriptionSizeClasses[size], colorScheme.description)
   const closeButtonClasses = classNames(
     alertCloseButtonBaseClasses,
     colorScheme.closeButton,
     colorScheme.closeButtonHover,
     colorScheme.focus
-  );
+  )
 
   const handleClose = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onClose?.(event);
+    onClose?.(event)
     if (!event.defaultPrevented) {
-      setVisible(false);
+      setVisible(false)
     }
-  };
-
-  if (!visible) {
-    return null;
   }
 
-  const iconPath = getAlertIconPath(type);
+  if (!visible) {
+    return null
+  }
+
+  const iconPath = getAlertIconPath(type)
 
   return (
     <div {...props} className={alertClasses} role="alert">
@@ -134,23 +124,17 @@ export const Alert: React.FC<AlertProps> = ({
       {/* Content */}
       <div className={alertContentClasses}>
         {/* Title */}
-        {(title || titleSlot) && (
-          <div className={titleClasses}>{titleSlot || title}</div>
-        )}
+        {(title || titleSlot) && <div className={titleClasses}>{titleSlot || title}</div>}
 
         {/* Description */}
         {(description || descriptionSlot) && (
-          <div className={descriptionClasses}>
-            {descriptionSlot || description}
-          </div>
+          <div className={descriptionClasses}>{descriptionSlot || description}</div>
         )}
 
         {/* Default content if no title/description */}
-        {!title &&
-          !description &&
-          !titleSlot &&
-          !descriptionSlot &&
-          children && <div className={titleClasses}>{children}</div>}
+        {!title && !description && !titleSlot && !descriptionSlot && children && (
+          <div className={titleClasses}>{children}</div>
+        )}
       </div>
 
       {/* Close button */}
@@ -164,5 +148,5 @@ export const Alert: React.FC<AlertProps> = ({
         </button>
       )}
     </div>
-  );
-};
+  )
+}

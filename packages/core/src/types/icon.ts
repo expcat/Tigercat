@@ -16,14 +16,14 @@ export interface IconProps {
    * @default 'md'
    */
   size?: IconSize
-  
+
   /**
    * Icon color
    * Uses Tailwind's text color classes or custom color value
    * @example 'text-blue-500' | 'currentColor'
    */
   color?: string
-  
+
   /**
    * Additional CSS classes
    */

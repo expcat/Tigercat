@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Radio } from '@tigercat/vue';
+import { Radio } from '@tigercat/vue'
 </script>
 
 <template>
@@ -20,7 +20,7 @@ import { Radio } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Radio } from '@tigercat/react';
+import { Radio } from '@tigercat/react'
 
 function App() {
   return (
@@ -28,7 +28,7 @@ function App() {
       <Radio value="option1">Option 1</Radio>
       <Radio value="option2">Option 2</Radio>
     </>
-  );
+  )
 }
 ```
 
@@ -40,10 +40,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { RadioGroup, Radio } from '@tigercat/vue';
+import { ref } from 'vue'
+import { RadioGroup, Radio } from '@tigercat/vue'
 
-const selected = ref('option1');
+const selected = ref('option1')
 </script>
 
 <template>
@@ -61,11 +61,11 @@ const selected = ref('option1');
 
 ```vue
 <script setup>
-import { RadioGroup, Radio } from '@tigercat/vue';
+import { RadioGroup, Radio } from '@tigercat/vue'
 
 const handleChange = (value) => {
-  console.log('Changed to:', value);
-};
+  console.log('Changed to:', value)
+}
 </script>
 
 <template>
@@ -80,11 +80,11 @@ const handleChange = (value) => {
 ### React - 受控模式
 
 ```tsx
-import { useState } from 'react';
-import { RadioGroup, Radio } from '@tigercat/react';
+import { useState } from 'react'
+import { RadioGroup, Radio } from '@tigercat/react'
 
 function App() {
-  const [selected, setSelected] = useState('option1');
+  const [selected, setSelected] = useState('option1')
 
   return (
     <>
@@ -96,19 +96,19 @@ function App() {
 
       <p>Selected: {selected}</p>
     </>
-  );
+  )
 }
 ```
 
 ### React - 非受控模式
 
 ```tsx
-import { RadioGroup, Radio } from '@tigercat/react';
+import { RadioGroup, Radio } from '@tigercat/react'
 
 function App() {
   const handleChange = (value) => {
-    console.log('Changed to:', value);
-  };
+    console.log('Changed to:', value)
+  }
 
   return (
     <RadioGroup defaultValue="option2" onChange={handleChange}>
@@ -116,7 +116,7 @@ function App() {
       <Radio value="option2">Option 2</Radio>
       <Radio value="option3">Option 3</Radio>
     </RadioGroup>
-  );
+  )
 }
 ```
 
@@ -263,10 +263,10 @@ Radio 组件支持字符串和数字值。
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { RadioGroup, Radio } from '@tigercat/vue';
+import { ref } from 'vue'
+import { RadioGroup, Radio } from '@tigercat/vue'
 
-const quantity = ref(1);
+const quantity = ref(1)
 </script>
 
 <template>
@@ -284,11 +284,11 @@ const quantity = ref(1);
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { RadioGroup, Radio } from '@tigercat/react';
+import { useState } from 'react'
+import { RadioGroup, Radio } from '@tigercat/react'
 
 function App() {
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(1)
 
   return (
     <>
@@ -301,7 +301,7 @@ function App() {
 
       <p>Quantity: {quantity}</p>
     </>
-  );
+  )
 }
 ```
 
@@ -404,15 +404,15 @@ Radio 组件使用与 Button 相同的主题变量来保持一致性。
 
 ```vue
 <script setup>
-import { RadioGroup, Radio, setThemeColors } from '@tigercat/vue';
+import { RadioGroup, Radio, setThemeColors } from '@tigercat/vue'
 
 const switchTheme = () => {
   setThemeColors({
     primary: '#10b981',
     primaryHover: '#059669',
-    primaryDisabled: '#6ee7b7',
-  });
-};
+    primaryDisabled: '#6ee7b7'
+  })
+}
 </script>
 
 <template>
@@ -427,16 +427,16 @@ const switchTheme = () => {
 **React:**
 
 ```tsx
-import { RadioGroup, Radio, setThemeColors } from '@tigercat/react';
+import { RadioGroup, Radio, setThemeColors } from '@tigercat/react'
 
 function App() {
   const switchTheme = () => {
     setThemeColors({
       primary: '#10b981',
       primaryHover: '#059669',
-      primaryDisabled: '#6ee7b7',
-    });
-  };
+      primaryDisabled: '#6ee7b7'
+    })
+  }
 
   return (
     <>
@@ -446,7 +446,7 @@ function App() {
         <Radio value="option2">Option 2</Radio>
       </RadioGroup>
     </>
-  );
+  )
 }
 ```
 
@@ -466,16 +466,16 @@ function App() {
 Radio 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { RadioProps, RadioGroupProps, RadioSize } from '@tigercat/core';
+import type { RadioProps, RadioGroupProps, RadioSize } from '@tigercat/core'
 // Vue
-import type { Radio, RadioGroup } from '@tigercat/vue';
+import type { Radio, RadioGroup } from '@tigercat/vue'
 // React
 import type {
   Radio,
   RadioGroup,
   RadioProps as ReactRadioProps,
-  RadioGroupProps as ReactRadioGroupProps,
-} from '@tigercat/react';
+  RadioGroupProps as ReactRadioGroupProps
+} from '@tigercat/react'
 ```
 
 ## 示例
@@ -486,15 +486,15 @@ import type {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { RadioGroup, Radio, Button } from '@tigercat/vue';
+import { ref } from 'vue'
+import { RadioGroup, Radio, Button } from '@tigercat/vue'
 
-const preference = ref('email');
+const preference = ref('email')
 
 const handleSubmit = () => {
-  console.log('Notification preference:', preference.value);
+  console.log('Notification preference:', preference.value)
   // 提交表单
-};
+}
 </script>
 
 <template>
@@ -516,17 +516,17 @@ const handleSubmit = () => {
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { RadioGroup, Radio, Button } from '@tigercat/react';
+import { useState } from 'react'
+import { RadioGroup, Radio, Button } from '@tigercat/react'
 
 function PreferenceForm() {
-  const [preference, setPreference] = useState('email');
+  const [preference, setPreference] = useState('email')
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Notification preference:', preference);
+    e.preventDefault()
+    console.log('Notification preference:', preference)
     // 提交表单
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -541,7 +541,7 @@ function PreferenceForm() {
       </div>
       <Button type="submit">Save Preferences</Button>
     </form>
-  );
+  )
 }
 ```
 

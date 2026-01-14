@@ -1,54 +1,54 @@
-import { createBrowserRouter } from 'react-router-dom';
-import { lazy } from 'react';
-import Home from './pages/Home';
-import AppLayout from './layouts/AppLayout';
+import { createBrowserRouter } from 'react-router-dom'
+import { lazy } from 'react'
+import Home from './pages/Home'
+import AppLayout from './layouts/AppLayout'
 
 // Lazy load all demo pages for better code splitting
-const ButtonDemo = lazy(() => import('./pages/ButtonDemo'));
-const InputDemo = lazy(() => import('./pages/InputDemo'));
-const TextareaDemo = lazy(() => import('./pages/TextareaDemo'));
-const CheckboxDemo = lazy(() => import('./pages/CheckboxDemo'));
-const RadioDemo = lazy(() => import('./pages/RadioDemo'));
-const SwitchDemo = lazy(() => import('./pages/SwitchDemo'));
-const SliderDemo = lazy(() => import('./pages/SliderDemo'));
-const SelectDemo = lazy(() => import('./pages/SelectDemo'));
-const FormDemo = lazy(() => import('./pages/FormDemo'));
-const SpaceDemo = lazy(() => import('./pages/SpaceDemo'));
-const DividerDemo = lazy(() => import('./pages/DividerDemo'));
-const LayoutDemo = lazy(() => import('./pages/LayoutDemo'));
-const GridDemo = lazy(() => import('./pages/GridDemo'));
-const LinkDemo = lazy(() => import('./pages/LinkDemo'));
-const TextDemo = lazy(() => import('./pages/TextDemo'));
-const IconDemo = lazy(() => import('./pages/IconDemo'));
-const DatePickerDemo = lazy(() => import('./pages/DatePickerDemo'));
-const TimePickerDemo = lazy(() => import('./pages/TimePickerDemo'));
-const UploadDemo = lazy(() => import('./pages/UploadDemo'));
-const TableDemo = lazy(() => import('./pages/TableDemo'));
-const TagDemo = lazy(() => import('./pages/TagDemo'));
-const BadgeDemo = lazy(() => import('./pages/BadgeDemo'));
-const CardDemo = lazy(() => import('./pages/CardDemo'));
-const AvatarDemo = lazy(() => import('./pages/AvatarDemo'));
-const ListDemo = lazy(() => import('./pages/ListDemo'));
-const DescriptionsDemo = lazy(() => import('./pages/DescriptionsDemo'));
-const TimelineDemo = lazy(() => import('./pages/TimelineDemo'));
-const ProgressDemo = lazy(() => import('./pages/ProgressDemo'));
-const MenuDemo = lazy(() => import('./pages/MenuDemo'));
-const BreadcrumbDemo = lazy(() => import('./pages/BreadcrumbDemo'));
-const DropdownDemo = lazy(() => import('./pages/DropdownDemo'));
-const TabsDemo = lazy(() => import('./pages/TabsDemo'));
-const TreeDemo = lazy(() => import('./pages/TreeDemo'));
-const SkeletonDemo = lazy(() => import('./pages/SkeletonDemo'));
-const AlertDemo = lazy(() => import('./pages/AlertDemo'));
-const MessageDemo = lazy(() => import('./pages/MessageDemo'));
-const ModalDemo = lazy(() => import('./pages/ModalDemo'));
-const PopconfirmDemo = lazy(() => import('./pages/PopconfirmDemo'));
-const PopoverDemo = lazy(() => import('./pages/PopoverDemo'));
-const TooltipDemo = lazy(() => import('./pages/TooltipDemo'));
-const NotificationDemo = lazy(() => import('./pages/NotificationDemo'));
-const StepsDemo = lazy(() => import('./pages/StepsDemo'));
-const PaginationDemo = lazy(() => import('./pages/PaginationDemo'));
-const DrawerDemo = lazy(() => import('./pages/DrawerDemo'));
-const LoadingDemo = lazy(() => import('./pages/LoadingDemo'));
+const ButtonDemo = lazy(() => import('./pages/ButtonDemo'))
+const InputDemo = lazy(() => import('./pages/InputDemo'))
+const TextareaDemo = lazy(() => import('./pages/TextareaDemo'))
+const CheckboxDemo = lazy(() => import('./pages/CheckboxDemo'))
+const RadioDemo = lazy(() => import('./pages/RadioDemo'))
+const SwitchDemo = lazy(() => import('./pages/SwitchDemo'))
+const SliderDemo = lazy(() => import('./pages/SliderDemo'))
+const SelectDemo = lazy(() => import('./pages/SelectDemo'))
+const FormDemo = lazy(() => import('./pages/FormDemo'))
+const SpaceDemo = lazy(() => import('./pages/SpaceDemo'))
+const DividerDemo = lazy(() => import('./pages/DividerDemo'))
+const LayoutDemo = lazy(() => import('./pages/LayoutDemo'))
+const GridDemo = lazy(() => import('./pages/GridDemo'))
+const LinkDemo = lazy(() => import('./pages/LinkDemo'))
+const TextDemo = lazy(() => import('./pages/TextDemo'))
+const IconDemo = lazy(() => import('./pages/IconDemo'))
+const DatePickerDemo = lazy(() => import('./pages/DatePickerDemo'))
+const TimePickerDemo = lazy(() => import('./pages/TimePickerDemo'))
+const UploadDemo = lazy(() => import('./pages/UploadDemo'))
+const TableDemo = lazy(() => import('./pages/TableDemo'))
+const TagDemo = lazy(() => import('./pages/TagDemo'))
+const BadgeDemo = lazy(() => import('./pages/BadgeDemo'))
+const CardDemo = lazy(() => import('./pages/CardDemo'))
+const AvatarDemo = lazy(() => import('./pages/AvatarDemo'))
+const ListDemo = lazy(() => import('./pages/ListDemo'))
+const DescriptionsDemo = lazy(() => import('./pages/DescriptionsDemo'))
+const TimelineDemo = lazy(() => import('./pages/TimelineDemo'))
+const ProgressDemo = lazy(() => import('./pages/ProgressDemo'))
+const MenuDemo = lazy(() => import('./pages/MenuDemo'))
+const BreadcrumbDemo = lazy(() => import('./pages/BreadcrumbDemo'))
+const DropdownDemo = lazy(() => import('./pages/DropdownDemo'))
+const TabsDemo = lazy(() => import('./pages/TabsDemo'))
+const TreeDemo = lazy(() => import('./pages/TreeDemo'))
+const SkeletonDemo = lazy(() => import('./pages/SkeletonDemo'))
+const AlertDemo = lazy(() => import('./pages/AlertDemo'))
+const MessageDemo = lazy(() => import('./pages/MessageDemo'))
+const ModalDemo = lazy(() => import('./pages/ModalDemo'))
+const PopconfirmDemo = lazy(() => import('./pages/PopconfirmDemo'))
+const PopoverDemo = lazy(() => import('./pages/PopoverDemo'))
+const TooltipDemo = lazy(() => import('./pages/TooltipDemo'))
+const NotificationDemo = lazy(() => import('./pages/NotificationDemo'))
+const StepsDemo = lazy(() => import('./pages/StepsDemo'))
+const PaginationDemo = lazy(() => import('./pages/PaginationDemo'))
+const DrawerDemo = lazy(() => import('./pages/DrawerDemo'))
+const LoadingDemo = lazy(() => import('./pages/LoadingDemo'))
 
 const router = createBrowserRouter([
   {
@@ -100,9 +100,9 @@ const router = createBrowserRouter([
       { path: 'steps', element: <StepsDemo /> },
       { path: 'pagination', element: <PaginationDemo /> },
       { path: 'drawer', element: <DrawerDemo /> },
-      { path: 'loading', element: <LoadingDemo /> },
-    ],
-  },
-]);
+      { path: 'loading', element: <LoadingDemo /> }
+    ]
+  }
+])
 
-export default router;
+export default router

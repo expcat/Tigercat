@@ -53,9 +53,7 @@ import { Card, Space, Divider, Button } from '@tigercat/vue'
       <h2 class="text-2xl font-bold mb-4">卡片尺寸</h2>
       <p class="text-gray-600 mb-6">卡片有三种尺寸，主要影响内边距。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical"
-               :size="16"
-               class="w-full">
+        <Space direction="vertical" :size="16" class="w-full">
           <Card size="sm">
             <h3 class="font-semibold mb-2">小尺寸卡片</h3>
             <p class="text-gray-600">内边距较小，适合紧凑布局。</p>
@@ -79,18 +77,15 @@ import { Card, Space, Divider, Button } from '@tigercat/vue'
       <p class="text-gray-600 mb-6">鼠标悬停时显示交互效果。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card hoverable
-                variant="shadow">
+          <Card hoverable variant="shadow">
             <h3 class="font-semibold mb-2">功能卡片 1</h3>
             <p class="text-gray-600">悬停查看效果</p>
           </Card>
-          <Card hoverable
-                variant="shadow">
+          <Card hoverable variant="shadow">
             <h3 class="font-semibold mb-2">功能卡片 2</h3>
             <p class="text-gray-600">悬停查看效果</p>
           </Card>
-          <Card hoverable
-                variant="shadow">
+          <Card hoverable variant="shadow">
             <h3 class="font-semibold mb-2">功能卡片 3</h3>
             <p class="text-gray-600">悬停查看效果</p>
           </Card>
@@ -105,18 +100,21 @@ import { Card, Space, Divider, Button } from '@tigercat/vue'
       <p class="text-gray-600 mb-6">卡片可以包含封面图片。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card cover="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=250&fit=crop"
-                cover-alt="代码编辑器">
+          <Card
+            cover="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=250&fit=crop"
+            cover-alt="代码编辑器">
             <h3 class="font-semibold mb-2">开发工具</h3>
             <p class="text-gray-600">现代化的开发环境</p>
           </Card>
-          <Card cover="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=250&fit=crop"
-                cover-alt="笔记本电脑">
+          <Card
+            cover="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=250&fit=crop"
+            cover-alt="笔记本电脑">
             <h3 class="font-semibold mb-2">移动办公</h3>
             <p class="text-gray-600">随时随地高效工作</p>
           </Card>
-          <Card cover="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop"
-                cover-alt="数据分析">
+          <Card
+            cover="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop"
+            cover-alt="数据分析">
             <h3 class="font-semibold mb-2">数据分析</h3>
             <p class="text-gray-600">洞察数据价值</p>
           </Card>
@@ -147,10 +145,8 @@ import { Card, Space, Divider, Button } from '@tigercat/vue'
             </template>
             <p class="text-gray-600">这个卡片包含操作按钮。</p>
             <template #actions>
-              <Button variant="ghost"
-                      size="sm">取消</Button>
-              <Button variant="primary"
-                      size="sm">确认</Button>
+              <Button variant="ghost" size="sm">取消</Button>
+              <Button variant="primary" size="sm">确认</Button>
             </template>
           </Card>
         </div>
@@ -164,10 +160,11 @@ import { Card, Space, Divider, Button } from '@tigercat/vue'
       <p class="text-gray-600 mb-6">结合所有功能的完整卡片示例。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card variant="shadow"
-                hoverable
-                cover="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=250&fit=crop"
-                cover-alt="科技产品">
+          <Card
+            variant="shadow"
+            hoverable
+            cover="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=250&fit=crop"
+            cover-alt="科技产品">
             <template #header>
               <h3 class="text-lg font-semibold">智能设备</h3>
             </template>
@@ -179,17 +176,16 @@ import { Card, Space, Divider, Button } from '@tigercat/vue'
               </div>
             </template>
             <template #actions>
-              <Button variant="ghost"
-                      size="sm">收藏</Button>
-              <Button variant="primary"
-                      size="sm">购买</Button>
+              <Button variant="ghost" size="sm">收藏</Button>
+              <Button variant="primary" size="sm">购买</Button>
             </template>
           </Card>
 
-          <Card variant="shadow"
-                hoverable
-                cover="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop"
-                cover-alt="科技背景">
+          <Card
+            variant="shadow"
+            hoverable
+            cover="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=250&fit=crop"
+            cover-alt="科技背景">
             <template #header>
               <h3 class="text-lg font-semibold">创新方案</h3>
             </template>
@@ -201,17 +197,16 @@ import { Card, Space, Divider, Button } from '@tigercat/vue'
               </div>
             </template>
             <template #actions>
-              <Button variant="ghost"
-                      size="sm">收藏</Button>
-              <Button variant="primary"
-                      size="sm">购买</Button>
+              <Button variant="ghost" size="sm">收藏</Button>
+              <Button variant="primary" size="sm">购买</Button>
             </template>
           </Card>
 
-          <Card variant="shadow"
-                hoverable
-                cover="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&h=250&fit=crop"
-                cover-alt="专业服务">
+          <Card
+            variant="shadow"
+            hoverable
+            cover="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&h=250&fit=crop"
+            cover-alt="专业服务">
             <template #header>
               <h3 class="text-lg font-semibold">专业服务</h3>
             </template>
@@ -223,10 +218,8 @@ import { Card, Space, Divider, Button } from '@tigercat/vue'
               </div>
             </template>
             <template #actions>
-              <Button variant="ghost"
-                      size="sm">收藏</Button>
-              <Button variant="primary"
-                      size="sm">购买</Button>
+              <Button variant="ghost" size="sm">收藏</Button>
+              <Button variant="primary" size="sm">购买</Button>
             </template>
           </Card>
         </div>

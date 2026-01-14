@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { createRoot, Root } from 'react-dom/client';
-import { flushSync } from 'react-dom';
+import React, { useState, useEffect, useCallback } from 'react'
+import { createRoot, Root } from 'react-dom/client'
+import { flushSync } from 'react-dom'
 import {
   classNames,
   icon24PathStrokeLinecap,
@@ -21,42 +21,39 @@ import {
   type MessagePosition,
   type MessageInstance,
   type MessageOptions,
-  type MessageConfig,
-} from '@tigercat/core';
+  type MessageConfig
+} from '@tigercat/core'
 
 /**
  * Global message container id
  */
-const MESSAGE_CONTAINER_ID = 'tiger-message-container';
-const MESSAGE_CLOSE_ARIA_LABEL = 'Close message';
+const MESSAGE_CONTAINER_ID = 'tiger-message-container'
+const MESSAGE_CLOSE_ARIA_LABEL = 'Close message'
 
 /**
  * Message instance storage
  */
-let messageInstances: MessageInstance[] = [];
-let instanceIdCounter = 0;
-let containerRoot: Root | null = null;
-let updateCallback: (() => void) | null = null;
+let messageInstances: MessageInstance[] = []
+let instanceIdCounter = 0
+let containerRoot: Root | null = null
+let updateCallback: (() => void) | null = null
 
 /**
  * Get next instance id
  */
 function getNextInstanceId(): number {
-  return ++instanceIdCounter;
+  return ++instanceIdCounter
 }
 
 /**
  * Icon component
  */
 const Icon: React.FC<{
-  path: string;
-  className: string;
-  isLoading?: boolean;
+  path: string
+  className: string
+  isLoading?: boolean
 }> = ({ path, className, isLoading = false }) => {
-  const iconClass = classNames(
-    className,
-    isLoading ? messageLoadingSpinnerClasses : ''
-  );
+  const iconClass = classNames(className, isLoading ? messageLoadingSpinnerClasses : '')
 
   return (
     <svg
@@ -72,29 +69,26 @@ const Icon: React.FC<{
         d={path}
       />
     </svg>
-  );
-};
+  )
+}
 
 /**
  * Single message item component
  */
 interface MessageItemProps {
-  message: MessageInstance;
-  onClose: (id: string | number) => void;
+  message: MessageInstance
+  onClose: (id: string | number) => void
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     // Trigger enter animation
-    setTimeout(() => setIsVisible(true), 10);
-  }, []);
+    setTimeout(() => setIsVisible(true), 10)
+  }, [])
 
-  const colorScheme = getMessageTypeClasses(
-    message.type,
-    defaultMessageThemeColors
-  );
+  const colorScheme = getMessageTypeClasses(message.type, defaultMessageThemeColors)
 
   const messageClasses = classNames(
     messageBaseClasses,
@@ -103,18 +97,18 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
     colorScheme.text,
     message.className,
     isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
-  );
+  )
 
-  const iconPath = message.icon || getMessageIconPath(message.type);
-  const iconClass = classNames(messageIconClasses, colorScheme.icon);
+  const iconPath = message.icon || getMessageIconPath(message.type)
+  const iconClass = classNames(messageIconClasses, colorScheme.icon)
 
   const handleClose = useCallback(() => {
-    setIsVisible(false);
-    setTimeout(() => onClose(message.id), 300);
-  }, [message.id, onClose]);
+    setIsVisible(false)
+    setTimeout(() => onClose(message.id), 300)
+  }, [message.id, onClose])
 
-  const a11yRole = message.type === 'error' ? 'alert' : 'status';
-  const ariaLive = message.type === 'error' ? 'assertive' : 'polite';
+  const a11yRole = message.type === 'error' ? 'alert' : 'status'
+  const ariaLive = message.type === 'error' ? 'assertive' : 'polite'
 
   return (
     <div
@@ -126,11 +120,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
       data-tiger-message
       data-tiger-message-type={message.type}
       data-tiger-message-id={String(message.id)}>
-      <Icon
-        path={iconPath}
-        className={iconClass}
-        isLoading={message.type === 'loading'}
-      />
+      <Icon path={iconPath} className={iconClass} isLoading={message.type === 'loading'} />
       <div className={messageContentClasses}>{message.content}</div>
       {message.closable && (
         <button
@@ -142,60 +132,53 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
         </button>
       )}
     </div>
-  );
-};
+  )
+}
 
 /**
  * Message container props
  */
 export interface MessageContainerProps {
-  position?: MessagePosition;
+  position?: MessagePosition
 }
 
 /**
  * Message container component
  */
-export const MessageContainer: React.FC<MessageContainerProps> = ({
-  position = 'top',
-}) => {
-  const [messages, setMessages] = useState<MessageInstance[]>(() => [
-    ...messageInstances,
-  ]);
+export const MessageContainer: React.FC<MessageContainerProps> = ({ position = 'top' }) => {
+  const [messages, setMessages] = useState<MessageInstance[]>(() => [...messageInstances])
 
   useEffect(() => {
     // Register update callback
     updateCallback = () => {
       flushSync(() => {
-        setMessages([...messageInstances]);
-      });
-    };
+        setMessages([...messageInstances])
+      })
+    }
 
     // Initial sync
-    updateCallback();
+    updateCallback()
 
     return () => {
-      updateCallback = null;
-    };
-  }, []);
+      updateCallback = null
+    }
+  }, [])
 
-  const containerClasses = classNames(
-    messageContainerBaseClasses,
-    messagePositionClasses[position]
-  );
+  const containerClasses = classNames(messageContainerBaseClasses, messagePositionClasses[position])
 
   const handleRemove = useCallback((id: string | number) => {
-    const index = messageInstances.findIndex((msg) => msg.id === id);
+    const index = messageInstances.findIndex((msg) => msg.id === id)
     if (index !== -1) {
-      const instance = messageInstances[index];
-      messageInstances.splice(index, 1);
+      const instance = messageInstances[index]
+      messageInstances.splice(index, 1)
       if (instance.onClose) {
-        instance.onClose();
+        instance.onClose()
       }
       if (updateCallback) {
-        updateCallback();
+        updateCallback()
       }
     }
-  }, []);
+  }, [])
 
   return (
     <div
@@ -205,51 +188,47 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({
       aria-relevant="additions"
       data-tiger-message-container>
       {messages.map((message) => (
-        <MessageItem
-          key={message.id}
-          message={message}
-          onClose={handleRemove}
-        />
+        <MessageItem key={message.id} message={message} onClose={handleRemove} />
       ))}
     </div>
-  );
-};
+  )
+}
 
 /**
  * Ensure message container exists
  */
 function ensureContainer() {
-  const rootId = `${MESSAGE_CONTAINER_ID}-root`;
+  const rootId = `${MESSAGE_CONTAINER_ID}-root`
 
   // If we already created a root but the DOM was externally cleared (e.g. tests), reset.
-  const existingRootEl = document.getElementById(rootId);
+  const existingRootEl = document.getElementById(rootId)
   if (containerRoot && !existingRootEl) {
-    containerRoot = null;
-    updateCallback = null;
+    containerRoot = null
+    updateCallback = null
   }
 
   if (containerRoot) {
-    return;
+    return
   }
 
-  let rootEl = existingRootEl;
+  let rootEl = existingRootEl
   if (!rootEl) {
-    rootEl = document.createElement('div');
-    rootEl.id = rootId;
-    document.body.appendChild(rootEl);
+    rootEl = document.createElement('div')
+    rootEl.id = rootId
+    document.body.appendChild(rootEl)
   }
 
-  containerRoot = createRoot(rootEl);
+  containerRoot = createRoot(rootEl)
   flushSync(() => {
-    containerRoot?.render(<MessageContainer />);
-  });
+    containerRoot?.render(<MessageContainer />)
+  })
 }
 
 /**
  * Add a message to the queue
  */
 function addMessage(config: MessageConfig): () => void {
-  const id = getNextInstanceId();
+  const id = getNextInstanceId()
 
   const instance: MessageInstance = {
     id,
@@ -259,43 +238,43 @@ function addMessage(config: MessageConfig): () => void {
     closable: config.closable || false,
     onClose: config.onClose,
     icon: config.icon,
-    className: config.className,
-  };
+    className: config.className
+  }
 
-  messageInstances.push(instance);
+  messageInstances.push(instance)
 
   // Ensure container exists after state is updated so it can render immediately.
-  ensureContainer();
+  ensureContainer()
 
   // Trigger update
   if (updateCallback) {
-    updateCallback();
+    updateCallback()
   }
 
   // Auto close after duration
   if (instance.duration > 0) {
     setTimeout(() => {
-      removeMessage(id);
-    }, instance.duration);
+      removeMessage(id)
+    }, instance.duration)
   }
 
   // Return close function
-  return () => removeMessage(id);
+  return () => removeMessage(id)
 }
 
 /**
  * Remove a message from the queue
  */
 function removeMessage(id: string | number) {
-  const index = messageInstances.findIndex((msg) => msg.id === id);
+  const index = messageInstances.findIndex((msg) => msg.id === id)
   if (index !== -1) {
-    const instance = messageInstances[index];
-    messageInstances.splice(index, 1);
+    const instance = messageInstances[index]
+    messageInstances.splice(index, 1)
     if (instance.onClose) {
-      instance.onClose();
+      instance.onClose()
     }
     if (updateCallback) {
-      updateCallback();
+      updateCallback()
     }
   }
 }
@@ -306,26 +285,26 @@ function removeMessage(id: string | number) {
 function clearAll() {
   messageInstances.forEach((instance) => {
     if (instance.onClose) {
-      instance.onClose();
+      instance.onClose()
     }
-  });
-  messageInstances = [];
+  })
+  messageInstances = []
   if (updateCallback) {
-    updateCallback();
+    updateCallback()
   }
 
   // For a singleton-style API, clearing should also reset the mounted root.
   // This prevents tests or consumers that manipulate the DOM from leaving a stale root.
   if (containerRoot) {
-    containerRoot.unmount();
-    containerRoot = null;
+    containerRoot.unmount()
+    containerRoot = null
   }
-  updateCallback = null;
+  updateCallback = null
 
-  const rootId = `${MESSAGE_CONTAINER_ID}-root`;
-  const rootEl = document.getElementById(rootId);
+  const rootId = `${MESSAGE_CONTAINER_ID}-root`
+  const rootEl = document.getElementById(rootId)
   if (rootEl?.parentNode) {
-    rootEl.parentNode.removeChild(rootEl);
+    rootEl.parentNode.removeChild(rootEl)
   }
 }
 
@@ -334,9 +313,9 @@ function clearAll() {
  */
 function normalizeOptions(options: MessageOptions): MessageConfig {
   if (typeof options === 'string') {
-    return { content: options };
+    return { content: options }
   }
-  return options;
+  return options
 }
 
 /**
@@ -347,48 +326,48 @@ export const message = {
    * Show an info message
    */
   info(options: MessageOptions): () => void {
-    const config = normalizeOptions(options);
-    return addMessage({ ...config, type: 'info' });
+    const config = normalizeOptions(options)
+    return addMessage({ ...config, type: 'info' })
   },
 
   /**
    * Show a success message
    */
   success(options: MessageOptions): () => void {
-    const config = normalizeOptions(options);
-    return addMessage({ ...config, type: 'success' });
+    const config = normalizeOptions(options)
+    return addMessage({ ...config, type: 'success' })
   },
 
   /**
    * Show a warning message
    */
   warning(options: MessageOptions): () => void {
-    const config = normalizeOptions(options);
-    return addMessage({ ...config, type: 'warning' });
+    const config = normalizeOptions(options)
+    return addMessage({ ...config, type: 'warning' })
   },
 
   /**
    * Show an error message
    */
   error(options: MessageOptions): () => void {
-    const config = normalizeOptions(options);
-    return addMessage({ ...config, type: 'error' });
+    const config = normalizeOptions(options)
+    return addMessage({ ...config, type: 'error' })
   },
 
   /**
    * Show a loading message
    */
   loading(options: MessageOptions): () => void {
-    const config = normalizeOptions(options);
-    return addMessage({ ...config, type: 'loading', duration: 0 });
+    const config = normalizeOptions(options)
+    return addMessage({ ...config, type: 'loading', duration: 0 })
   },
 
   /**
    * Clear all messages
    */
   clear() {
-    clearAll();
-  },
-};
+    clearAll()
+  }
+}
 
-export default message;
+export default message

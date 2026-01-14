@@ -54,13 +54,8 @@ const beforeUpload = (file: File) => {
       <p class="text-gray-600 mb-6">基础的文件上传组件。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="max-w-md space-y-4">
-          <Upload 
-            v-model:file-list="fileList"
-            @change="handleChange"
-          >
-            <template #default>
-              选择文件
-            </template>
+          <Upload v-model:file-list="fileList" @change="handleChange">
+            <template #default> 选择文件 </template>
           </Upload>
         </div>
       </div>
@@ -72,10 +67,7 @@ const beforeUpload = (file: File) => {
       <p class="text-gray-600 mb-6">将文件拖拽到区域内即可上传。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="max-w-md">
-          <Upload 
-            v-model:file-list="fileList2"
-            drag
-          />
+          <Upload v-model:file-list="fileList2" drag />
         </div>
       </div>
     </section>
@@ -86,12 +78,7 @@ const beforeUpload = (file: File) => {
       <p class="text-gray-600 mb-6">通过设置 multiple 属性允许同时选择多个文件。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="max-w-md">
-          <Upload 
-            v-model:file-list="fileList3"
-            multiple
-          >
-            选择多个文件
-          </Upload>
+          <Upload v-model:file-list="fileList3" multiple> 选择多个文件 </Upload>
         </div>
       </div>
     </section>
@@ -102,12 +89,7 @@ const beforeUpload = (file: File) => {
       <p class="text-gray-600 mb-6">通过 limit 属性限制上传文件的数量。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="max-w-md">
-          <Upload 
-            v-model:file-list="fileList4"
-            multiple
-            :limit="3"
-            @exceed="handleExceed"
-          >
+          <Upload v-model:file-list="fileList4" multiple :limit="3" @exceed="handleExceed">
             最多上传 3 个文件
           </Upload>
         </div>
@@ -122,20 +104,17 @@ const beforeUpload = (file: File) => {
         <div class="max-w-md space-y-6">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">仅允许图片</label>
-            <Upload 
-              v-model:file-list="fileList5"
-              accept="image/*"
-              drag
-            />
+            <Upload v-model:file-list="fileList5" accept="image/*" drag />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">自定义校验（JPG/PNG，小于2MB）</label>
-            <Upload 
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >自定义校验（JPG/PNG，小于2MB）</label
+            >
+            <Upload
               accept="image/jpeg,image/png"
               :max-size="2 * 1024 * 1024"
               :before-upload="beforeUpload"
-              drag
-            />
+              drag />
           </div>
         </div>
       </div>
@@ -147,13 +126,12 @@ const beforeUpload = (file: File) => {
       <p class="text-gray-600 mb-6">使用 listType="picture-card" 显示图片卡片样式。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="max-w-2xl">
-          <Upload 
+          <Upload
             v-model:file-list="fileList6"
             accept="image/*"
             list-type="picture-card"
             multiple
-            @preview="handlePreview"
-          />
+            @preview="handlePreview" />
         </div>
       </div>
     </section>
@@ -166,9 +144,7 @@ const beforeUpload = (file: File) => {
         <div class="max-w-md space-y-6">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">禁用的按钮上传</label>
-            <Upload disabled>
-              选择文件（已禁用）
-            </Upload>
+            <Upload disabled> 选择文件（已禁用） </Upload>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">禁用的拖拽上传</label>

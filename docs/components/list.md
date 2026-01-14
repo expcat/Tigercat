@@ -8,14 +8,14 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { List } from '@tigercat/vue';
+import { ref } from 'vue'
+import { List } from '@tigercat/vue'
 
 const dataSource = ref([
   { key: 1, title: 'Item 1', description: 'Description for item 1' },
   { key: 2, title: 'Item 2', description: 'Description for item 2' },
-  { key: 3, title: 'Item 3', description: 'Description for item 3' },
-]);
+  { key: 3, title: 'Item 3', description: 'Description for item 3' }
+])
 </script>
 
 <template>
@@ -26,16 +26,16 @@ const dataSource = ref([
 ### React
 
 ```tsx
-import { List } from '@tigercat/react';
+import { List } from '@tigercat/react'
 
 function App() {
   const dataSource = [
     { key: 1, title: 'Item 1', description: 'Description for item 1' },
     { key: 2, title: 'Item 2', description: 'Description for item 2' },
-    { key: 3, title: 'Item 3', description: 'Description for item 3' },
-  ];
+    { key: 3, title: 'Item 3', description: 'Description for item 3' }
+  ]
 
-  return <List dataSource={dataSource} />;
+  return <List dataSource={dataSource} />
 }
 ```
 
@@ -99,29 +99,29 @@ List 组件支持 3 种边框样式：
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { List } from '@tigercat/vue';
+import { ref } from 'vue'
+import { List } from '@tigercat/vue'
 
 const dataSource = ref([
   {
     key: 1,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1',
     title: 'John Doe',
-    description: 'Software Engineer',
+    description: 'Software Engineer'
   },
   {
     key: 2,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=2',
     title: 'Jane Smith',
-    description: 'Product Manager',
+    description: 'Product Manager'
   },
   {
     key: 3,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=3',
     title: 'Bob Johnson',
-    description: 'Designer',
-  },
-]);
+    description: 'Designer'
+  }
+])
 </script>
 
 <template>
@@ -132,7 +132,7 @@ const dataSource = ref([
 ### React
 
 ```tsx
-import { List } from '@tigercat/react';
+import { List } from '@tigercat/react'
 
 function App() {
   const dataSource = [
@@ -140,23 +140,23 @@ function App() {
       key: 1,
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1',
       title: 'John Doe',
-      description: 'Software Engineer',
+      description: 'Software Engineer'
     },
     {
       key: 2,
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=2',
       title: 'Jane Smith',
-      description: 'Product Manager',
+      description: 'Product Manager'
     },
     {
       key: 3,
       avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=3',
       title: 'Bob Johnson',
-      description: 'Designer',
-    },
-  ];
+      description: 'Designer'
+    }
+  ]
 
-  return <List dataSource={dataSource} />;
+  return <List dataSource={dataSource} />
 }
 ```
 
@@ -168,23 +168,23 @@ function App() {
 
 ```vue
 <script setup>
-import { ref, h } from 'vue';
-import { List, Button } from '@tigercat/vue';
+import { ref, h } from 'vue'
+import { List, Button } from '@tigercat/vue'
 
 const dataSource = ref([
   {
     key: 1,
     title: 'Task 1',
     description: 'Complete the project documentation',
-    extra: h(Button, { size: 'sm' }, () => 'View'),
+    extra: h(Button, { size: 'sm' }, () => 'View')
   },
   {
     key: 2,
     title: 'Task 2',
     description: 'Review pull requests',
-    extra: h(Button, { size: 'sm' }, () => 'View'),
-  },
-]);
+    extra: h(Button, { size: 'sm' }, () => 'View')
+  }
+])
 </script>
 
 <template>
@@ -195,7 +195,7 @@ const dataSource = ref([
 ### React
 
 ```tsx
-import { List, Button } from '@tigercat/react';
+import { List, Button } from '@tigercat/react'
 
 function App() {
   const dataSource = [
@@ -203,17 +203,17 @@ function App() {
       key: 1,
       title: 'Task 1',
       description: 'Complete the project documentation',
-      extra: <Button size="sm">View</Button>,
+      extra: <Button size="sm">View</Button>
     },
     {
       key: 2,
       title: 'Task 2',
       description: 'Review pull requests',
-      extra: <Button size="sm">View</Button>,
-    },
-  ];
+      extra: <Button size="sm">View</Button>
+    }
+  ]
 
-  return <List dataSource={dataSource} />;
+  return <List dataSource={dataSource} />
 }
 ```
 
@@ -225,14 +225,14 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { List, Button } from '@tigercat/vue';
+import { ref } from 'vue'
+import { List, Button } from '@tigercat/vue'
 
 const dataSource = ref([
   { key: 1, name: 'Product A', price: '$99', stock: 15 },
   { key: 2, name: 'Product B', price: '$149', stock: 8 },
-  { key: 3, name: 'Product C', price: '$199', stock: 22 },
-]);
+  { key: 3, name: 'Product C', price: '$199', stock: 22 }
+])
 </script>
 
 <template>
@@ -302,6 +302,7 @@ return (
 <List
 dataSource={dataSource}
 renderItem={(item) => (
+
 <div className="flex items-center justify-between w-full">
 <div>
 <h3 className="font-medium">{item.name}</h3>
@@ -346,9 +347,7 @@ Buy
 <List
   dataSource={dataSource}
   header={<h2 className="text-xl font-bold">User List</h2>}
-  footer={
-    <p className="text-sm text-gray-500">Total: {dataSource.length} users</p>
-  }
+  footer={<p className="text-sm text-gray-500">Total: {dataSource.length} users</p>}
 />
 ```
 
@@ -360,12 +359,12 @@ Buy
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { List } from '@tigercat/vue';
+import { ref } from 'vue'
+import { List } from '@tigercat/vue'
 
 const dataSource = ref([
   // ... 大量数据项
-]);
+])
 
 const pagination = ref({
   current: 1,
@@ -373,32 +372,29 @@ const pagination = ref({
   total: dataSource.value.length,
   pageSizeOptions: [10, 20, 50],
   showSizeChanger: true,
-  showTotal: true,
-});
+  showTotal: true
+})
 
 function handlePageChange({ current, pageSize }) {
-  console.log('Page changed:', current, pageSize);
+  console.log('Page changed:', current, pageSize)
 }
 </script>
 
 <template>
-  <List
-    :dataSource="dataSource"
-    :pagination="pagination"
-    @page-change="handlePageChange" />
+  <List :dataSource="dataSource" :pagination="pagination" @page-change="handlePageChange" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { List } from '@tigercat/react';
+import { useState } from 'react'
+import { List } from '@tigercat/react'
 
 function App() {
   const dataSource = [
     // ... 大量数据项
-  ];
+  ]
 
   const pagination = {
     current: 1,
@@ -406,20 +402,14 @@ function App() {
     total: dataSource.length,
     pageSizeOptions: [10, 20, 50],
     showSizeChanger: true,
-    showTotal: true,
-  };
+    showTotal: true
+  }
 
   const handlePageChange = ({ current, pageSize }) => {
-    console.log('Page changed:', current, pageSize);
-  };
+    console.log('Page changed:', current, pageSize)
+  }
 
-  return (
-    <List
-      dataSource={dataSource}
-      pagination={pagination}
-      onPageChange={handlePageChange}
-    />
-  );
+  return <List dataSource={dataSource} pagination={pagination} onPageChange={handlePageChange} />
 }
 ```
 
@@ -431,8 +421,8 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { List, Card } from '@tigercat/vue';
+import { ref } from 'vue'
+import { List, Card } from '@tigercat/vue'
 
 const dataSource = ref([
   { key: 1, title: 'Card 1', content: 'Content 1' },
@@ -440,8 +430,8 @@ const dataSource = ref([
   { key: 3, title: 'Card 3', content: 'Content 3' },
   { key: 4, title: 'Card 4', content: 'Content 4' },
   { key: 5, title: 'Card 5', content: 'Content 5' },
-  { key: 6, title: 'Card 6', content: 'Content 6' },
-]);
+  { key: 6, title: 'Card 6', content: 'Content 6' }
+])
 
 const grid = {
   gutter: 16,
@@ -449,8 +439,8 @@ const grid = {
   xs: 1,
   sm: 2,
   md: 3,
-  lg: 4,
-};
+  lg: 4
+}
 </script>
 
 <template>
@@ -470,7 +460,7 @@ const grid = {
 ### React
 
 ```tsx
-import { List, Card } from '@tigercat/react';
+import { List, Card } from '@tigercat/react'
 
 function App() {
   const dataSource = [
@@ -479,8 +469,8 @@ function App() {
     { key: 3, title: 'Card 3', content: 'Content 3' },
     { key: 4, title: 'Card 4', content: 'Content 4' },
     { key: 5, title: 'Card 5', content: 'Content 5' },
-    { key: 6, title: 'Card 6', content: 'Content 6' },
-  ];
+    { key: 6, title: 'Card 6', content: 'Content 6' }
+  ]
 
   const grid = {
     gutter: 16,
@@ -488,8 +478,8 @@ function App() {
     xs: 1,
     sm: 2,
     md: 3,
-    lg: 4,
-  };
+    lg: 4
+  }
 
   return (
     <List
@@ -502,7 +492,7 @@ function App() {
         </Card>
       )}
     />
-  );
+  )
 }
 ```
 
@@ -514,20 +504,20 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { List } from '@tigercat/vue';
+import { ref } from 'vue'
+import { List } from '@tigercat/vue'
 
-const loading = ref(true);
-const dataSource = ref([]);
+const loading = ref(true)
+const dataSource = ref([])
 
 // 模拟数据加载
 setTimeout(() => {
   dataSource.value = [
     { key: 1, title: 'Item 1' },
-    { key: 2, title: 'Item 2' },
-  ];
-  loading.value = false;
-}, 2000);
+    { key: 2, title: 'Item 2' }
+  ]
+  loading.value = false
+}, 2000)
 </script>
 
 <template>
@@ -538,25 +528,25 @@ setTimeout(() => {
 ### React
 
 ```tsx
-import { useState, useEffect } from 'react';
-import { List } from '@tigercat/react';
+import { useState, useEffect } from 'react'
+import { List } from '@tigercat/react'
 
 function App() {
-  const [loading, setLoading] = useState(true);
-  const [dataSource, setDataSource] = useState([]);
+  const [loading, setLoading] = useState(true)
+  const [dataSource, setDataSource] = useState([])
 
   useEffect(() => {
     // 模拟数据加载
     setTimeout(() => {
       setDataSource([
         { key: 1, title: 'Item 1' },
-        { key: 2, title: 'Item 2' },
-      ]);
-      setLoading(false);
-    }, 2000);
-  }, []);
+        { key: 2, title: 'Item 2' }
+      ])
+      setLoading(false)
+    }, 2000)
+  }, [])
 
-  return <List dataSource={dataSource} loading={loading} />;
+  return <List dataSource={dataSource} loading={loading} />
 }
 ```
 
@@ -586,17 +576,17 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { List } from '@tigercat/vue';
+import { ref } from 'vue'
+import { List } from '@tigercat/vue'
 
 const dataSource = ref([
   { key: 1, title: 'Item 1' },
   { key: 2, title: 'Item 2' },
-  { key: 3, title: 'Item 3' },
-]);
+  { key: 3, title: 'Item 3' }
+])
 
 function handleItemClick(item, index) {
-  console.log('Clicked item:', item, 'at index:', index);
+  console.log('Clicked item:', item, 'at index:', index)
 }
 </script>
 
@@ -608,22 +598,20 @@ function handleItemClick(item, index) {
 ### React
 
 ```tsx
-import { List } from '@tigercat/react';
+import { List } from '@tigercat/react'
 
 function App() {
   const dataSource = [
     { key: 1, title: 'Item 1' },
     { key: 2, title: 'Item 2' },
-    { key: 3, title: 'Item 3' },
-  ];
+    { key: 3, title: 'Item 3' }
+  ]
 
   const handleItemClick = (item, index) => {
-    console.log('Clicked item:', item, 'at index:', index);
-  };
+    console.log('Clicked item:', item, 'at index:', index)
+  }
 
-  return (
-    <List dataSource={dataSource} hoverable onItemClick={handleItemClick} />
-  );
+  return <List dataSource={dataSource} hoverable onItemClick={handleItemClick} />
 }
 ```
 

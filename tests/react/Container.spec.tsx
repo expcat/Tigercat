@@ -5,10 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { Container } from '@tigercat/react'
-import {
-  renderWithProps,
-  renderWithChildren,
-} from '../utils/render-helpers-react'
+import { renderWithProps, renderWithChildren } from '../utils/render-helpers-react'
 import { expectNoA11yViolations } from '../utils/react'
 import React from 'react'
 
@@ -35,7 +32,7 @@ describe('Container (React)', () => {
     it('should not apply max width when set to false', () => {
       const { container } = renderWithProps(Container, {
         maxWidth: false,
-        children: Content,
+        children: Content
       })
 
       const containerEl = container.querySelector('div')
@@ -45,23 +42,23 @@ describe('Container (React)', () => {
     it('should apply sm max width class', () => {
       const { container } = renderWithProps(Container, {
         maxWidth: 'sm',
-        children: Content,
+        children: Content
       })
 
       const containerEl = container.querySelector('div')
       expect(containerEl).toHaveClass('max-w-screen-sm')
     })
-  })
+
     it('should apply full width class', () => {
       const { container } = renderWithProps(Container, {
         maxWidth: 'full',
-        children: Content,
-      });
+        children: Content
+      })
 
-      const containerEl = container.querySelector('div');
-      expect(containerEl).toHaveClass('w-full');
-    });
-  });
+      const containerEl = container.querySelector('div')
+      expect(containerEl).toHaveClass('w-full')
+    })
+  })
 
   describe('Center', () => {
     it('should center by default', () => {
@@ -74,7 +71,7 @@ describe('Container (React)', () => {
     it('should not center when set to false', () => {
       const { container } = renderWithProps(Container, {
         center: false,
-        children: Content,
+        children: Content
       })
 
       const containerEl = container.querySelector('div')
@@ -93,7 +90,7 @@ describe('Container (React)', () => {
     it('should not apply padding when set to false', () => {
       const { container } = renderWithProps(Container, {
         padding: false,
-        children: Content,
+        children: Content
       })
 
       const containerEl = container.querySelector('div')
@@ -105,7 +102,7 @@ describe('Container (React)', () => {
     it('should apply custom className', () => {
       const { container } = renderWithProps(Container, {
         className: 'custom-container-class',
-        children: Content,
+        children: Content
       })
 
       const containerEl = container.querySelector('div')
@@ -116,7 +113,7 @@ describe('Container (React)', () => {
     it('should render as custom element', () => {
       const { container } = renderWithProps(Container, {
         as: 'section',
-        children: Content,
+        children: Content
       })
 
       const containerEl = container.querySelector('section')
@@ -131,7 +128,7 @@ describe('Container (React)', () => {
         center: true,
         padding: true,
         className: 'test-class',
-        children: Content,
+        children: Content
       })
 
       const containerEl = container.querySelector('div')
@@ -147,7 +144,7 @@ describe('Container (React)', () => {
         maxWidth: false,
         center: false,
         padding: false,
-        children: Content,
+        children: Content
       })
 
       const containerEl = container.querySelector('div')

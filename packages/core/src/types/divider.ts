@@ -26,26 +26,26 @@ export interface DividerProps {
    * @default 'horizontal'
    */
   orientation?: DividerOrientation
-  
+
   /**
    * Line style of the divider
    * @default 'solid'
    */
   lineStyle?: DividerLineStyle
-  
+
   /**
    * Spacing (margin) around the divider
    * @default 'md'
    */
   spacing?: DividerSpacing
-  
+
   /**
    * Custom color for the divider
    * Can be a CSS color value or CSS variable
    * @default undefined (uses default border color)
    */
   color?: string
-  
+
   /**
    * Custom thickness of the divider line
    * @default undefined (uses default 1px for horizontal, 1px for vertical)

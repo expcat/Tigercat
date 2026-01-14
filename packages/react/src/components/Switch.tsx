@@ -1,21 +1,19 @@
-import React from 'react';
+import React from 'react'
 import {
   classNames,
   type SwitchProps as CoreSwitchProps,
   getSwitchClasses,
-  getSwitchThumbClasses,
-} from '@tigercat/core';
+  getSwitchThumbClasses
+} from '@tigercat/core'
 
 export interface SwitchProps
-  extends Omit<
-      React.ButtonHTMLAttributes<HTMLButtonElement>,
-      'onChange' | 'children'
-    >,
+  extends
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onChange' | 'children'>,
     CoreSwitchProps {
   /**
    * Change event handler
    */
-  onChange?: (checked: boolean) => void;
+  onChange?: (checked: boolean) => void
 }
 
 export const Switch: React.FC<SwitchProps> = ({
@@ -29,34 +27,31 @@ export const Switch: React.FC<SwitchProps> = ({
   tabIndex,
   ...props
 }) => {
-  const switchClasses = classNames(
-    getSwitchClasses(size, checked, disabled),
-    className
-  );
+  const switchClasses = classNames(getSwitchClasses(size, checked, disabled), className)
 
-  const thumbClasses = getSwitchThumbClasses(size, checked);
+  const thumbClasses = getSwitchThumbClasses(size, checked)
 
   const toggle = () => {
-    if (disabled) return;
-    onChange?.(!checked);
-  };
+    if (disabled) return
+    onChange?.(!checked)
+  }
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onClick?.(event);
-    if (event.defaultPrevented) return;
-    toggle();
-  };
+    onClick?.(event)
+    if (event.defaultPrevented) return
+    toggle()
+  }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
-    onKeyDown?.(event);
-    if (event.defaultPrevented) return;
-    if (disabled) return;
+    onKeyDown?.(event)
+    if (event.defaultPrevented) return
+    if (disabled) return
 
     if (event.key === ' ' || event.key === 'Enter') {
-      event.preventDefault();
-      toggle();
+      event.preventDefault()
+      toggle()
     }
-  };
+  }
 
   return (
     <button
@@ -72,5 +67,5 @@ export const Switch: React.FC<SwitchProps> = ({
       tabIndex={disabled ? -1 : tabIndex}>
       <span className={thumbClasses} aria-hidden="true" />
     </button>
-  );
-};
+  )
+}

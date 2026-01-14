@@ -1,27 +1,27 @@
-import { defineComponent, computed, provide, ref, h, type PropType } from 'vue';
+import { defineComponent, computed, provide, ref, h, type PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
   type CheckboxGroupValue,
-  type CheckboxSize,
-} from '@tigercat/core';
+  type CheckboxSize
+} from '@tigercat/core'
 
-export const CheckboxGroupKey = Symbol('CheckboxGroup');
+export const CheckboxGroupKey = Symbol('CheckboxGroup')
 
 export interface CheckboxGroupContext {
-  value: CheckboxGroupValue;
-  disabled: boolean;
-  size: CheckboxSize;
-  updateValue: (val: CheckboxGroupValue[number], checked: boolean) => void;
+  value: CheckboxGroupValue
+  disabled: boolean
+  size: CheckboxSize
+  updateValue: (val: CheckboxGroupValue[number], checked: boolean) => void
 }
 
 export interface VueCheckboxGroupProps {
-  modelValue?: CheckboxGroupValue;
-  defaultValue?: CheckboxGroupValue;
-  disabled?: boolean;
-  size?: CheckboxSize;
-  className?: string;
-  style?: Record<string, string | number>;
+  modelValue?: CheckboxGroupValue
+  defaultValue?: CheckboxGroupValue
+  disabled?: boolean
+  size?: CheckboxSize
+  className?: string
+  style?: Record<string, string | number>
 }
 
 export const CheckboxGroup = defineComponent({
@@ -32,7 +32,7 @@ export const CheckboxGroup = defineComponent({
      * Selected values (v-model)
      */
     modelValue: {
-      type: Array as PropType<CheckboxGroupValue>,
+      type: Array as PropType<CheckboxGroupValue>
     },
     /**
      * Default selected values (uncontrolled mode)
@@ -40,7 +40,7 @@ export const CheckboxGroup = defineComponent({
      */
     defaultValue: {
       type: Array as PropType<CheckboxGroupValue>,
-      default: () => [],
+      default: () => []
     },
     /**
      * Whether all checkboxes are disabled
@@ -48,7 +48,7 @@ export const CheckboxGroup = defineComponent({
      */
     disabled: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Checkbox size for all checkboxes
@@ -56,22 +56,22 @@ export const CheckboxGroup = defineComponent({
      */
     size: {
       type: String as PropType<CheckboxSize>,
-      default: 'md' as CheckboxSize,
+      default: 'md' as CheckboxSize
     },
 
     /**
      * Additional CSS classes
      */
     className: {
-      type: String,
+      type: String
     },
 
     /**
      * Inline styles
      */
     style: {
-      type: Object as PropType<Record<string, string | number>>,
-    },
+      type: Object as PropType<Record<string, string | number>>
+    }
   },
   emits: {
     /**
@@ -81,40 +81,40 @@ export const CheckboxGroup = defineComponent({
     /**
      * Emitted when selected values change
      */
-    change: (value: CheckboxGroupValue) => Array.isArray(value),
+    change: (value: CheckboxGroupValue) => Array.isArray(value)
   },
   setup(props, { slots, emit, attrs }) {
     // Internal state for uncontrolled mode
-    const internalValue = ref<CheckboxGroupValue>(props.defaultValue);
+    const internalValue = ref<CheckboxGroupValue>(props.defaultValue)
 
     // Determine if controlled or uncontrolled
-    const isControlled = computed(() => props.modelValue !== undefined);
+    const isControlled = computed(() => props.modelValue !== undefined)
 
     // Current selected values
     const value = computed(() => {
-      return isControlled.value ? props.modelValue! : internalValue.value;
-    });
+      return isControlled.value ? props.modelValue! : internalValue.value
+    })
 
     const updateValue = (val: CheckboxGroupValue[number], checked: boolean) => {
-      if (props.disabled) return;
+      if (props.disabled) return
 
-      const currentValue = [...value.value];
-      const index = currentValue.indexOf(val);
+      const currentValue = [...value.value]
+      const index = currentValue.indexOf(val)
 
       if (checked && index === -1) {
-        currentValue.push(val);
+        currentValue.push(val)
       } else if (!checked && index !== -1) {
-        currentValue.splice(index, 1);
+        currentValue.splice(index, 1)
       }
 
       // Update internal state if uncontrolled
       if (!isControlled.value) {
-        internalValue.value = currentValue;
+        internalValue.value = currentValue
       }
 
-      emit('update:modelValue', currentValue);
-      emit('change', currentValue);
-    };
+      emit('update:modelValue', currentValue)
+      emit('change', currentValue)
+    }
 
     // Provide context to child checkboxes
     // Make context reactive by using computed
@@ -124,9 +124,9 @@ export const CheckboxGroup = defineComponent({
         value: value.value,
         disabled: props.disabled,
         size: props.size,
-        updateValue,
+        updateValue
       }))
-    );
+    )
 
     return () =>
       h(
@@ -134,11 +134,11 @@ export const CheckboxGroup = defineComponent({
         {
           ...attrs,
           class: classNames(props.className, coerceClassValue(attrs.class)),
-          style: [attrs.style, props.style],
+          style: [attrs.style, props.style]
         },
         slots.default?.()
-      );
-  },
-});
+      )
+  }
+})
 
-export default CheckboxGroup;
+export default CheckboxGroup

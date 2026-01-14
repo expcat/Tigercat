@@ -1,12 +1,5 @@
-import React from 'react';
-import {
-  Container,
-  Layout,
-  Header,
-  Sidebar,
-  Content,
-  Footer,
-} from '@tigercat/react';
+import React from 'react'
+import { Container, Layout, Header, Sidebar, Content, Footer } from '@tigercat/react'
 
 const LayoutDemo: React.FC = () => {
   return (
@@ -19,9 +12,7 @@ const LayoutDemo: React.FC = () => {
       {/* Container 容器 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">Container 容器</h2>
-        <p className="text-gray-600 mb-6">
-          用于约束内容宽度并提供响应式内边距。
-        </p>
+        <p className="text-gray-600 mb-6">用于约束内容宽度并提供响应式内边距。</p>
         <div className="bg-gray-50 rounded-lg py-6">
           <Container maxWidth="lg">
             <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -86,7 +77,7 @@ const LayoutDemo: React.FC = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default LayoutDemo;
+export default LayoutDemo

@@ -1,22 +1,22 @@
-import React, { useMemo, useEffect, useState, useCallback, useId } from "react";
+import React, { useMemo, useEffect, useState, useCallback, useId } from 'react'
 import {
   classNames,
   type FormSize,
   type FormItemProps as CoreFormItemProps,
-  getFieldError,
-} from "@tigercat/core";
-import { useFormContext } from "./Form";
+  getFieldError
+} from '@tigercat/core'
+import { useFormContext } from './Form'
 
 export interface FormItemProps extends CoreFormItemProps {
   /**
    * Form item content
    */
-  children?: React.ReactNode;
+  children?: React.ReactNode
 
   /**
    * Additional CSS classes
    */
-  className?: string;
+  className?: string
 }
 
 export const FormItem: React.FC<FormItemProps> = ({
@@ -29,173 +29,167 @@ export const FormItem: React.FC<FormItemProps> = ({
   showMessage = true,
   size,
   children,
-  className,
+  className
 }) => {
-  const formContext = useFormContext();
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const formContext = useFormContext()
+  const [errorMessage, setErrorMessage] = useState<string>('')
 
-  const reactId = useId();
-  const baseId = useMemo(() => `tiger-form-item-${reactId}`, [reactId]);
-  const labelId = `${baseId}-label`;
-  const fieldId = `${baseId}-field`;
-  const errorId = `${baseId}-error`;
+  const reactId = useId()
+  const baseId = useMemo(() => `tiger-form-item-${reactId}`, [reactId])
+  const labelId = `${baseId}-label`
+  const fieldId = `${baseId}-field`
+  const errorId = `${baseId}-error`
 
   const mergeAriaDescribedBy = useCallback(
-    (
-      existing: string | undefined,
-      next: string | undefined
-    ): string | undefined => {
+    (existing: string | undefined, next: string | undefined): string | undefined => {
       if (!existing) {
-        return next;
+        return next
       }
       if (!next) {
-        return existing;
+        return existing
       }
       const parts = new Set(
         `${existing} ${next}`
-          .split(" ")
+          .split(' ')
           .map((s) => s.trim())
           .filter(Boolean)
-      );
-      return Array.from(parts).join(" ");
+      )
+      return Array.from(parts).join(' ')
     },
     []
-  );
+  )
 
   // Simple logical operations - no need to memoize
-  const actualSize: FormSize = size || formContext?.size || "md";
-  const labelPosition = formContext?.labelPosition || "right";
-  const labelAlign = formContext?.labelAlign || "right";
+  const actualSize: FormSize = size || formContext?.size || 'md'
+  const labelPosition = formContext?.labelPosition || 'right'
+  const labelAlign = formContext?.labelAlign || 'right'
 
   const actualLabelWidth = useMemo(() => {
-    const width = labelWidth || formContext?.labelWidth;
-    if (typeof width === "number") {
-      return `${width}px`;
+    const width = labelWidth || formContext?.labelWidth
+    if (typeof width === 'number') {
+      return `${width}px`
     }
-    return width;
-  }, [labelWidth, formContext?.labelWidth]);
+    return width
+  }, [labelWidth, formContext?.labelWidth])
 
   const showRequiredAsterisk = useMemo(() => {
     if (required !== undefined) {
-      return required;
+      return required
     }
 
     // Check if any rule has required: true
     if (rules) {
-      const ruleArray = Array.isArray(rules) ? rules : [rules];
-      return ruleArray.some((rule) => rule.required);
+      const ruleArray = Array.isArray(rules) ? rules : [rules]
+      return ruleArray.some((rule) => rule.required)
     }
 
     // Check form-level rules
     if (name && formContext?.rules) {
-      const fieldRules = formContext.rules[name];
+      const fieldRules = formContext.rules[name]
       if (fieldRules) {
-        const ruleArray = Array.isArray(fieldRules) ? fieldRules : [fieldRules];
-        return ruleArray.some((rule) => rule.required);
+        const ruleArray = Array.isArray(fieldRules) ? fieldRules : [fieldRules]
+        return ruleArray.some((rule) => rule.required)
       }
     }
 
-    return false;
-  }, [required, rules, name, formContext?.rules]);
+    return false
+  }, [required, rules, name, formContext?.rules])
 
   const isRequired = useMemo(
     () => showRequiredAsterisk && (formContext?.showRequiredAsterisk ?? true),
     [showRequiredAsterisk, formContext?.showRequiredAsterisk]
-  );
+  )
 
   // Watch for errors in form context
   useEffect(() => {
     if (name && formContext?.errors) {
-      const error = getFieldError(name, formContext.errors);
-      setErrorMessage(error || "");
+      const error = getFieldError(name, formContext.errors)
+      setErrorMessage(error || '')
     }
-  }, [name, formContext?.errors]);
+  }, [name, formContext?.errors])
 
   // Watch for controlled error prop
   useEffect(() => {
     if (controlledError !== undefined) {
-      setErrorMessage(controlledError);
+      setErrorMessage(controlledError)
     }
-  }, [controlledError]);
+  }, [controlledError])
 
   useEffect(() => {
     if (!name || !formContext) {
-      return;
+      return
     }
 
     if (rules) {
-      formContext.registerFieldRules(name, rules);
+      formContext.registerFieldRules(name, rules)
     }
 
     return () => {
-      formContext.registerFieldRules(name, undefined);
-    };
-  }, [name, rules, formContext]);
+      formContext.registerFieldRules(name, undefined)
+    }
+  }, [name, rules, formContext])
 
   const handleBlur = useCallback(() => {
     if (name && formContext) {
-      formContext.validateField(name, rules, "blur");
+      formContext.validateField(name, rules, 'blur')
     }
-  }, [name, formContext, rules]);
+  }, [name, formContext, rules])
 
   const handleChange = useCallback(() => {
     if (name && formContext) {
-      formContext.validateField(name, rules, "change");
+      formContext.validateField(name, rules, 'change')
     }
-  }, [name, formContext, rules]);
+  }, [name, formContext, rules])
 
-  const hasError = useMemo(() => !!errorMessage, [errorMessage]);
+  const hasError = useMemo(() => !!errorMessage, [errorMessage])
 
   const describedById = useMemo(
     () => (showMessage && hasError ? errorId : undefined),
     [showMessage, hasError, errorId]
-  );
+  )
 
   type FieldLikeProps = {
-    id?: string;
-    onBlur?: React.FocusEventHandler<unknown>;
-    onChange?: React.ChangeEventHandler<unknown>;
-    "aria-invalid"?: boolean | "true" | "false";
-    "aria-describedby"?: string;
-    "aria-required"?: boolean | "true" | "false";
-  };
+    id?: string
+    onBlur?: React.FocusEventHandler<unknown>
+    onChange?: React.ChangeEventHandler<unknown>
+    'aria-invalid'?: boolean | 'true' | 'false'
+    'aria-describedby'?: string
+    'aria-required'?: boolean | 'true' | 'false'
+  }
 
   const onlyChild = useMemo(() => {
-    const count = React.Children.count(children);
+    const count = React.Children.count(children)
     if (count !== 1) {
-      return null;
+      return null
     }
-    return React.Children.toArray(children)[0] ?? null;
-  }, [children]);
+    return React.Children.toArray(children)[0] ?? null
+  }, [children])
 
-  const isClonableChild = React.isValidElement<FieldLikeProps>(onlyChild);
-  const childId = isClonableChild ? onlyChild.props.id : undefined;
-  const effectiveFieldId = childId ?? fieldId;
+  const isClonableChild = React.isValidElement<FieldLikeProps>(onlyChild)
+  const childId = isClonableChild ? onlyChild.props.id : undefined
+  const effectiveFieldId = childId ?? fieldId
 
   const enhancedChild = useMemo(() => {
     if (!isClonableChild) {
-      return children;
+      return children
     }
 
     const nextProps: Partial<FieldLikeProps> = {
       id: effectiveFieldId,
-      "aria-invalid": hasError ? true : onlyChild.props["aria-invalid"],
-      "aria-required": isRequired ? true : onlyChild.props["aria-required"],
-      "aria-describedby": mergeAriaDescribedBy(
-        onlyChild.props["aria-describedby"],
-        describedById
-      ),
+      'aria-invalid': hasError ? true : onlyChild.props['aria-invalid'],
+      'aria-required': isRequired ? true : onlyChild.props['aria-required'],
+      'aria-describedby': mergeAriaDescribedBy(onlyChild.props['aria-describedby'], describedById),
       onBlur: (event) => {
-        onlyChild.props.onBlur?.(event);
-        handleBlur();
+        onlyChild.props.onBlur?.(event)
+        handleBlur()
       },
       onChange: (event) => {
-        onlyChild.props.onChange?.(event);
-        handleChange();
-      },
-    };
+        onlyChild.props.onChange?.(event)
+        handleChange()
+      }
+    }
 
-    return React.cloneElement(onlyChild, nextProps);
+    return React.cloneElement(onlyChild, nextProps)
   }, [
     isClonableChild,
     children,
@@ -206,47 +200,43 @@ export const FormItem: React.FC<FormItemProps> = ({
     mergeAriaDescribedBy,
     describedById,
     handleBlur,
-    handleChange,
-  ]);
+    handleChange
+  ])
 
   const formItemClasses = useMemo(
     () =>
       classNames(
-        "tiger-form-item",
+        'tiger-form-item',
         `tiger-form-item--${actualSize}`,
         `tiger-form-item--label-${labelPosition}`,
-        hasError && "tiger-form-item--error",
-        formContext?.disabled && "tiger-form-item--disabled",
+        hasError && 'tiger-form-item--error',
+        formContext?.disabled && 'tiger-form-item--disabled',
         className
       ),
     [actualSize, labelPosition, hasError, formContext?.disabled, className]
-  );
+  )
 
   const labelClasses = useMemo(
     () =>
       classNames(
-        "tiger-form-item__label",
+        'tiger-form-item__label',
         `tiger-form-item__label--${labelAlign}`,
-        isRequired && "tiger-form-item__label--required"
+        isRequired && 'tiger-form-item__label--required'
       ),
     [labelAlign, isRequired]
-  );
+  )
 
   const labelStyles = useMemo((): React.CSSProperties => {
-    if (labelPosition === "top") {
-      return {};
+    if (labelPosition === 'top') {
+      return {}
     }
-    return actualLabelWidth ? { width: actualLabelWidth } : {};
-  }, [labelPosition, actualLabelWidth]);
+    return actualLabelWidth ? { width: actualLabelWidth } : {}
+  }, [labelPosition, actualLabelWidth])
 
   const errorClasses = useMemo(
-    () =>
-      classNames(
-        "tiger-form-item__error",
-        hasError && "tiger-form-item__error--show"
-      ),
+    () => classNames('tiger-form-item__error', hasError && 'tiger-form-item__error--show'),
     [hasError]
-  );
+  )
 
   return (
     <div className={formItemClasses}>
@@ -255,8 +245,7 @@ export const FormItem: React.FC<FormItemProps> = ({
           id={labelId}
           className={labelClasses}
           style={labelStyles}
-          htmlFor={isClonableChild ? effectiveFieldId : undefined}
-        >
+          htmlFor={isClonableChild ? effectiveFieldId : undefined}>
           {isRequired && <span className="tiger-form-item__asterisk">*</span>}
           {label}
         </label>
@@ -270,8 +259,7 @@ export const FormItem: React.FC<FormItemProps> = ({
           aria-invalid={hasError ? true : undefined}
           aria-required={isRequired ? true : undefined}
           onBlur={isClonableChild ? undefined : handleBlur}
-          onChange={isClonableChild ? undefined : handleChange}
-        >
+          onChange={isClonableChild ? undefined : handleChange}>
           {enhancedChild}
         </div>
         {showMessage && hasError && (
@@ -281,7 +269,7 @@ export const FormItem: React.FC<FormItemProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-FormItem.displayName = "TigerFormItem";
+FormItem.displayName = 'TigerFormItem'

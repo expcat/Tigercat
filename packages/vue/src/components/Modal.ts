@@ -8,8 +8,8 @@ import {
   watch,
   onMounted,
   onBeforeUnmount,
-  nextTick,
-} from 'vue';
+  nextTick
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -30,30 +30,30 @@ import {
   modalFooterClasses,
   resolveLocaleText,
   type TigerLocale,
-  type ModalSize,
-} from '@tigercat/core';
+  type ModalSize
+} from '@tigercat/core'
 
-import { Button } from './Button';
+import { Button } from './Button'
 
-let modalIdCounter = 0;
-const createModalId = () => `tiger-modal-${++modalIdCounter}`;
+let modalIdCounter = 0
+const createModalId = () => `tiger-modal-${++modalIdCounter}`
 
 export interface VueModalProps {
-  visible?: boolean;
-  size?: ModalSize;
-  title?: string;
-  closable?: boolean;
-  mask?: boolean;
-  maskClosable?: boolean;
-  centered?: boolean;
-  destroyOnClose?: boolean;
-  zIndex?: number;
-  className?: string;
-  style?: Record<string, unknown>;
-  closeAriaLabel?: string;
-  okText?: string;
-  cancelText?: string;
-  locale?: Partial<TigerLocale>;
+  visible?: boolean
+  size?: ModalSize
+  title?: string
+  closable?: boolean
+  mask?: boolean
+  maskClosable?: boolean
+  centered?: boolean
+  destroyOnClose?: boolean
+  zIndex?: number
+  className?: string
+  style?: Record<string, unknown>
+  closeAriaLabel?: string
+  okText?: string
+  cancelText?: string
+  locale?: Partial<TigerLocale>
 }
 
 export const Modal = defineComponent({
@@ -66,7 +66,7 @@ export const Modal = defineComponent({
      */
     visible: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Modal size
@@ -74,14 +74,14 @@ export const Modal = defineComponent({
      */
     size: {
       type: String as PropType<ModalSize>,
-      default: 'md' as ModalSize,
+      default: 'md' as ModalSize
     },
     /**
      * Modal title
      */
     title: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Whether to show the close button
@@ -89,7 +89,7 @@ export const Modal = defineComponent({
      */
     closable: {
       type: Boolean,
-      default: true,
+      default: true
     },
     /**
      * Whether to show the mask (overlay)
@@ -97,7 +97,7 @@ export const Modal = defineComponent({
      */
     mask: {
       type: Boolean,
-      default: true,
+      default: true
     },
     /**
      * Whether clicking the mask should close the modal
@@ -105,7 +105,7 @@ export const Modal = defineComponent({
      */
     maskClosable: {
       type: Boolean,
-      default: true,
+      default: true
     },
     /**
      * Whether the modal should be centered vertically
@@ -113,7 +113,7 @@ export const Modal = defineComponent({
      */
     centered: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Whether to destroy the modal content when closed
@@ -121,7 +121,7 @@ export const Modal = defineComponent({
      */
     destroyOnClose: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * z-index of the modal
@@ -129,14 +129,14 @@ export const Modal = defineComponent({
      */
     zIndex: {
       type: Number,
-      default: 1000,
+      default: 1000
     },
     /**
      * Custom class name
      */
     className: {
       type: String,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -144,7 +144,7 @@ export const Modal = defineComponent({
      */
     style: {
       type: Object as PropType<Record<string, unknown>>,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -153,7 +153,7 @@ export const Modal = defineComponent({
      */
     closeAriaLabel: {
       type: String,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -162,7 +162,7 @@ export const Modal = defineComponent({
      */
     okText: {
       type: String,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -171,7 +171,7 @@ export const Modal = defineComponent({
      */
     cancelText: {
       type: String,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -179,7 +179,7 @@ export const Modal = defineComponent({
      */
     locale: {
       type: Object as PropType<Partial<TigerLocale>>,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -188,7 +188,7 @@ export const Modal = defineComponent({
      */
     showDefaultFooter: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Disable teleport (useful for testing)
@@ -197,94 +197,93 @@ export const Modal = defineComponent({
      */
     disableTeleport: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   emits: ['update:visible', 'close', 'cancel', 'ok'],
   setup(props, { slots, emit, attrs }) {
-    const instanceId = ref<string>(createModalId());
-    const hasBeenOpened = ref(false);
+    const instanceId = ref<string>(createModalId())
+    const hasBeenOpened = ref(false)
 
-    const dialogRef = ref<HTMLElement | null>(null);
-    const closeButtonRef = ref<HTMLButtonElement | null>(null);
-    const previousActiveElement = ref<HTMLElement | null>(null);
+    const dialogRef = ref<HTMLElement | null>(null)
+    const closeButtonRef = ref<HTMLButtonElement | null>(null)
+    const previousActiveElement = ref<HTMLElement | null>(null)
 
-    const titleId = computed(() => `${instanceId.value}-title`);
+    const titleId = computed(() => `${instanceId.value}-title`)
 
     const shouldRender = computed(() => {
       if (props.visible) {
-        hasBeenOpened.value = true;
-        return true;
+        hasBeenOpened.value = true
+        return true
       }
 
-      if (props.destroyOnClose) return false;
-      return hasBeenOpened.value;
-    });
+      if (props.destroyOnClose) return false
+      return hasBeenOpened.value
+    })
 
     watch(
       () => props.visible,
       (newVal) => {
         if (!newVal) {
-          emit('close');
+          emit('close')
         }
       }
-    );
+    )
 
     const handleClose = () => {
-      emit('update:visible', false);
-      emit('cancel');
-    };
+      emit('update:visible', false)
+      emit('cancel')
+    }
 
     const handleOk = () => {
-      emit('ok');
-      emit('update:visible', false);
-    };
+      emit('ok')
+      emit('update:visible', false)
+    }
 
     const handleMaskClick = (event: MouseEvent) => {
       if (props.maskClosable && event.target === event.currentTarget) {
-        handleClose();
+        handleClose()
       }
-    };
+    }
 
     const handleEscKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && props.visible) {
-        handleClose();
+        handleClose()
       }
-    };
+    }
 
     onMounted(() => {
-      document.addEventListener('keydown', handleEscKey);
-    });
+      document.addEventListener('keydown', handleEscKey)
+    })
 
     onBeforeUnmount(() => {
-      document.removeEventListener('keydown', handleEscKey);
-    });
+      document.removeEventListener('keydown', handleEscKey)
+    })
 
     watch(
       () => props.visible,
       async (nextVisible) => {
         if (nextVisible) {
-          const active = document.activeElement;
-          previousActiveElement.value =
-            active instanceof HTMLElement ? active : null;
+          const active = document.activeElement
+          previousActiveElement.value = active instanceof HTMLElement ? active : null
 
-          await nextTick();
-          const el = closeButtonRef.value ?? dialogRef.value;
-          el?.focus?.();
-          return;
+          await nextTick()
+          const el = closeButtonRef.value ?? dialogRef.value
+          el?.focus?.()
+          return
         }
 
-        previousActiveElement.value?.focus?.();
+        previousActiveElement.value?.focus?.()
       }
-    );
+    )
 
     const contentClasses = computed(() => {
-      return getModalContentClasses(props.size, props.className);
-    });
+      return getModalContentClasses(props.size, props.className)
+    })
 
     const containerClasses = computed(() => {
-      return getModalContainerClasses(props.centered);
-    });
+      return getModalContainerClasses(props.centered)
+    })
 
     const CloseIcon = h(
       'svg',
@@ -293,44 +292,38 @@ export const Modal = defineComponent({
         xmlns: 'http://www.w3.org/2000/svg',
         fill: 'none',
         viewBox: closeIconViewBox,
-        stroke: 'currentColor',
+        stroke: 'currentColor'
       },
       [
         h('path', {
           'stroke-linecap': closeIconPathStrokeLinecap,
           'stroke-linejoin': closeIconPathStrokeLinejoin,
           'stroke-width': closeIconPathStrokeWidth,
-          d: closeIconPathD,
-        }),
+          d: closeIconPathD
+        })
       ]
-    );
+    )
 
     return () => {
       if (!shouldRender.value) {
-        return null;
+        return null
       }
 
       const forwardedAttrs = Object.fromEntries(
-        Object.entries(attrs).filter(
-          ([key]) => key !== 'class' && key !== 'style'
-        )
-      );
+        Object.entries(attrs).filter(([key]) => key !== 'class' && key !== 'style')
+      )
 
       const ariaLabelledbyFromAttrs =
         typeof attrs['aria-labelledby'] === 'string'
           ? (attrs['aria-labelledby'] as string)
-          : undefined;
+          : undefined
 
       const ariaLabelledby =
-        ariaLabelledbyFromAttrs ??
-        (props.title || slots.title ? titleId.value : undefined);
+        ariaLabelledbyFromAttrs ?? (props.title || slots.title ? titleId.value : undefined)
 
-      const mergedClass = classNames(
-        contentClasses.value,
-        coerceClassValue(attrs.class)
-      );
+      const mergedClass = classNames(contentClasses.value, coerceClassValue(attrs.class))
 
-      const mergedStyle = mergeStyleValues(attrs.style, props.style);
+      const mergedStyle = mergeStyleValues(attrs.style, props.style)
 
       const header =
         props.title || slots.title || props.closable
@@ -340,7 +333,7 @@ export const Modal = defineComponent({
                     'h3',
                     {
                       id: titleId.value,
-                      class: modalTitleClasses,
+                      class: modalTitleClasses
                     },
                     slots.title ? slots.title() : props.title
                   )
@@ -358,17 +351,15 @@ export const Modal = defineComponent({
                         props.locale?.modal?.closeAriaLabel,
                         props.locale?.common?.closeText
                       ),
-                      ref: closeButtonRef,
+                      ref: closeButtonRef
                     },
                     CloseIcon
                   )
-                : null,
+                : null
             ])
-          : null;
+          : null
 
-      const body = slots.default
-        ? h('div', { class: modalBodyClasses }, slots.default())
-        : null;
+      const body = slots.default ? h('div', { class: modalBodyClasses }, slots.default()) : null
 
       const footer = slots.footer
         ? h(
@@ -377,10 +368,7 @@ export const Modal = defineComponent({
             slots.footer({ ok: handleOk, cancel: handleClose })
           )
         : props.showDefaultFooter
-        ? h(
-            'div',
-            { class: modalFooterClasses, 'data-tiger-modal-footer': '' },
-            [
+          ? h('div', { class: modalFooterClasses, 'data-tiger-modal-footer': '' }, [
               h(
                 Button,
                 { variant: 'secondary', onClick: handleClose },
@@ -391,7 +379,7 @@ export const Modal = defineComponent({
                       props.cancelText,
                       props.locale?.modal?.cancelText,
                       props.locale?.common?.cancelText
-                    ),
+                    )
                 }
               ),
               h(
@@ -404,12 +392,11 @@ export const Modal = defineComponent({
                       props.okText,
                       props.locale?.modal?.okText,
                       props.locale?.common?.okText
-                    ),
+                    )
                 }
-              ),
-            ]
-          )
-        : null;
+              )
+            ])
+          : null
 
       const renderedWrapper = h(
         'div',
@@ -418,20 +405,20 @@ export const Modal = defineComponent({
           style: { zIndex: props.zIndex },
           hidden: !props.visible,
           'aria-hidden': !props.visible ? 'true' : undefined,
-          'data-tiger-modal-root': '',
+          'data-tiger-modal-root': ''
         },
         [
           props.mask &&
             h('div', {
               class: modalMaskClasses,
               'aria-hidden': 'true',
-              'data-tiger-modal-mask': '',
+              'data-tiger-modal-mask': ''
             }),
           h(
             'div',
             {
               class: containerClasses.value,
-              onClick: handleMaskClick,
+              onClick: handleMaskClick
             },
             [
               h(
@@ -445,20 +432,18 @@ export const Modal = defineComponent({
                   'aria-labelledby': ariaLabelledby,
                   tabindex: -1,
                   ref: dialogRef,
-                  'data-tiger-modal': '',
+                  'data-tiger-modal': ''
                 },
                 [header, body, footer]
-              ),
+              )
             ]
-          ),
+          )
         ]
-      );
+      )
 
-      return h(Teleport, { to: 'body', disabled: props.disableTeleport }, [
-        renderedWrapper,
-      ]);
-    };
-  },
-});
+      return h(Teleport, { to: 'body', disabled: props.disableTeleport }, [renderedWrapper])
+    }
+  }
+})
 
-export default Modal;
+export default Modal

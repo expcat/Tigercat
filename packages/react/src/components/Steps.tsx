@@ -1,61 +1,59 @@
-import React, { createContext, useContext, ReactElement } from "react";
+import React, { createContext, useContext, ReactElement } from 'react'
 import {
   classNames,
   getStepsContainerClasses,
   type StepsDirection,
   type StepStatus,
   type StepSize,
-  type StepsProps as CoreStepsProps,
-} from "@tigercat/core";
-import { StepsItem, type StepsItemProps } from "./StepsItem";
+  type StepsProps as CoreStepsProps
+} from '@tigercat/core'
+import { StepsItem, type StepsItemProps } from './StepsItem'
 
 // Steps context interface
 export interface StepsContextValue {
-  current: number;
-  status: StepStatus;
-  direction: StepsDirection;
-  size: StepSize;
-  simple: boolean;
-  clickable: boolean;
-  handleStepClick?: (index: number) => void;
+  current: number
+  status: StepStatus
+  direction: StepsDirection
+  size: StepSize
+  simple: boolean
+  clickable: boolean
+  handleStepClick?: (index: number) => void
 }
 
 // Create steps context
-const StepsContext = createContext<StepsContextValue | null>(null);
+const StepsContext = createContext<StepsContextValue | null>(null)
 
 // Hook to use steps context
 export function useStepsContext(): StepsContextValue | null {
-  return useContext(StepsContext);
+  return useContext(StepsContext)
 }
 
 export interface StepsProps
-  extends CoreStepsProps,
-    Omit<
-      React.OlHTMLAttributes<HTMLOListElement>,
-      keyof CoreStepsProps | "onChange" | "children"
-    > {
+  extends
+    CoreStepsProps,
+    Omit<React.OlHTMLAttributes<HTMLOListElement>, keyof CoreStepsProps | 'onChange' | 'children'> {
   /**
    * Step change event handler
    */
-  onChange?: (current: number) => void;
+  onChange?: (current: number) => void
 
   /**
    * Whether steps are clickable
    * @default false
    */
-  clickable?: boolean;
+  clickable?: boolean
 
   /**
    * Step items
    */
-  children?: React.ReactNode;
+  children?: React.ReactNode
 }
 
 export const Steps: React.FC<StepsProps> = ({
   current = 0,
-  status = "process",
-  direction = "horizontal",
-  size = "default",
+  status = 'process',
+  direction = 'horizontal',
+  size = 'default',
   simple = false,
   clickable = false,
   className,
@@ -64,18 +62,15 @@ export const Steps: React.FC<StepsProps> = ({
   children,
   ...props
 }) => {
-  const containerClasses = classNames(
-    getStepsContainerClasses(direction),
-    className
-  );
+  const containerClasses = classNames(getStepsContainerClasses(direction), className)
 
   const handleStepClick = (index: number) => {
     if (!clickable) {
-      return;
+      return
     }
 
-    onChange?.(index);
-  };
+    onChange?.(index)
+  }
 
   const contextValue: StepsContextValue = {
     current,
@@ -84,26 +79,23 @@ export const Steps: React.FC<StepsProps> = ({
     size,
     simple,
     clickable,
-    handleStepClick: clickable ? handleStepClick : undefined,
-  };
+    handleStepClick: clickable ? handleStepClick : undefined
+  }
 
-  const totalCount = React.Children.count(children);
+  const totalCount = React.Children.count(children)
   const stepsWithProps = React.Children.map(children, (child, index) => {
-    if (
-      React.isValidElement<StepsItemProps>(child) &&
-      child.type === StepsItem
-    ) {
+    if (React.isValidElement<StepsItemProps>(child) && child.type === StepsItem) {
       return React.cloneElement(child, {
         stepIndex: index,
-        isLast: index === totalCount - 1,
-      });
+        isLast: index === totalCount - 1
+      })
     }
-    return child as ReactElement;
-  });
+    return child as ReactElement
+  })
 
   const mergedStyle = {
-    ...(style ?? {}),
-  };
+    ...(style ?? {})
+  }
 
   return (
     <StepsContext.Provider value={contextValue}>
@@ -111,5 +103,5 @@ export const Steps: React.FC<StepsProps> = ({
         {stepsWithProps}
       </ol>
     </StepsContext.Provider>
-  );
-};
+  )
+}

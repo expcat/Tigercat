@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   Button,
   Input,
@@ -25,48 +25,48 @@ import {
   Container,
   Link,
   Text,
-  Icon,
-} from '@tigercat/react';
+  Icon
+} from '@tigercat/react'
 
 const App: React.FC = () => {
   // Form state
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [bio, setBio] = useState('');
-  const [agree, setAgree] = useState(false);
-  const [fruits, setFruits] = useState<string[]>([]);
-  const [gender, setGender] = useState('');
-  const [notifications, setNotifications] = useState(true);
-  const [volume, setVolume] = useState(50);
-  const [country, setCountry] = useState('');
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [bio, setBio] = useState('')
+  const [agree, setAgree] = useState(false)
+  const [fruits, setFruits] = useState<string[]>([])
+  const [gender, setGender] = useState('')
+  const [notifications, setNotifications] = useState(true)
+  const [volume, setVolume] = useState(50)
+  const [country, setCountry] = useState('')
 
   // Select options
   const countries = [
     { label: '中国', value: 'china' },
     { label: '美国', value: 'usa' },
-    { label: '日本', value: 'japan' },
-  ];
+    { label: '日本', value: 'japan' }
+  ]
 
   const handleSubmit = (event: {
-    valid: boolean;
-    values: Record<string, unknown>;
-    errors: unknown[];
+    valid: boolean
+    values: Record<string, unknown>
+    errors: unknown[]
   }) => {
-    console.log('Form submitted:', event);
-    alert('表单提交成功！查看控制台获取数据。');
-  };
+    console.log('Form submitted:', event)
+    alert('表单提交成功！查看控制台获取数据。')
+  }
 
   const handleReset = () => {
-    setUsername('');
-    setPassword('');
-    setBio('');
-    setAgree(false);
-    setFruits([]);
-    setGender('');
-    setNotifications(true);
-    setVolume(50);
-    setCountry('');
-  };
+    setUsername('')
+    setPassword('')
+    setBio('')
+    setAgree(false)
+    setFruits([])
+    setGender('')
+    setNotifications(true)
+    setVolume(50)
+    setCountry('')
+  }
 
   return (
     <Layout className="min-h-screen">
@@ -88,7 +88,7 @@ const App: React.FC = () => {
                 { key: 'buttons', title: '按钮', href: '#buttons' },
                 { key: 'forms', title: '表单', href: '#forms' },
                 { key: 'layout', title: '布局', href: '#layout' },
-                { key: 'typography', title: '文本', href: '#typography' },
+                { key: 'typography', title: '文本', href: '#typography' }
               ]}
               renderItem={(item) => <Link href={item.href}>{item.title}</Link>}
             />
@@ -164,9 +164,7 @@ const App: React.FC = () => {
               </FormItem>
 
               <FormItem label="性别">
-                <RadioGroup
-                  value={gender}
-                  onChange={(val) => setGender(String(val))}>
+                <RadioGroup value={gender} onChange={(val) => setGender(String(val))}>
                   <Radio value="male">男</Radio>
                   <Radio value="female">女</Radio>
                   <Radio value="other">其他</Radio>
@@ -174,9 +172,7 @@ const App: React.FC = () => {
               </FormItem>
 
               <FormItem label="喜欢的水果">
-                <CheckboxGroup
-                  value={fruits}
-                  onChange={(val) => setFruits(val.map(String))}>
+                <CheckboxGroup value={fruits} onChange={(val) => setFruits(val.map(String))}>
                   <Checkbox value="apple">苹果</Checkbox>
                   <Checkbox value="banana">香蕉</Checkbox>
                   <Checkbox value="orange">橙子</Checkbox>
@@ -200,9 +196,7 @@ const App: React.FC = () => {
                 <div className="flex items-center">
                   <Slider
                     value={volume}
-                    onChange={(val) =>
-                      setVolume(Array.isArray(val) ? val[0] : val)
-                    }
+                    onChange={(val) => setVolume(Array.isArray(val) ? val[0] : val)}
                     min={0}
                     max={100}
                   />
@@ -221,10 +215,7 @@ const App: React.FC = () => {
                   <Button type="submit" variant="primary">
                     提交
                   </Button>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={handleReset}>
+                  <Button type="button" variant="secondary" onClick={handleReset}>
                     重置
                   </Button>
                 </Space>
@@ -243,55 +234,37 @@ const App: React.FC = () => {
               <Container>
                 <Row gutter={16} className="mb-4">
                   <Col span={12}>
-                    <div className="bg-blue-500 text-white p-4 rounded">
-                      Col-12
-                    </div>
+                    <div className="bg-blue-500 text-white p-4 rounded">Col-12</div>
                   </Col>
                   <Col span={12}>
-                    <div className="bg-blue-500 text-white p-4 rounded">
-                      Col-12
-                    </div>
+                    <div className="bg-blue-500 text-white p-4 rounded">Col-12</div>
                   </Col>
                 </Row>
 
                 <Row gutter={16} className="mb-4">
                   <Col span={8}>
-                    <div className="bg-green-500 text-white p-4 rounded">
-                      Col-8
-                    </div>
+                    <div className="bg-green-500 text-white p-4 rounded">Col-8</div>
                   </Col>
                   <Col span={8}>
-                    <div className="bg-green-500 text-white p-4 rounded">
-                      Col-8
-                    </div>
+                    <div className="bg-green-500 text-white p-4 rounded">Col-8</div>
                   </Col>
                   <Col span={8}>
-                    <div className="bg-green-500 text-white p-4 rounded">
-                      Col-8
-                    </div>
+                    <div className="bg-green-500 text-white p-4 rounded">Col-8</div>
                   </Col>
                 </Row>
 
                 <Row gutter={16}>
                   <Col span={6}>
-                    <div className="bg-purple-500 text-white p-4 rounded">
-                      Col-6
-                    </div>
+                    <div className="bg-purple-500 text-white p-4 rounded">Col-6</div>
                   </Col>
                   <Col span={6}>
-                    <div className="bg-purple-500 text-white p-4 rounded">
-                      Col-6
-                    </div>
+                    <div className="bg-purple-500 text-white p-4 rounded">Col-6</div>
                   </Col>
                   <Col span={6}>
-                    <div className="bg-purple-500 text-white p-4 rounded">
-                      Col-6
-                    </div>
+                    <div className="bg-purple-500 text-white p-4 rounded">Col-6</div>
                   </Col>
                   <Col span={6}>
-                    <div className="bg-purple-500 text-white p-4 rounded">
-                      Col-6
-                    </div>
+                    <div className="bg-purple-500 text-white p-4 rounded">Col-6</div>
                   </Col>
                 </Row>
               </Container>
@@ -327,9 +300,7 @@ const App: React.FC = () => {
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-3">链接</h3>
               <Space>
-                <Link
-                  href="https://github.com/expcats/Tigercat"
-                  target="_blank">
+                <Link href="https://github.com/expcats/Tigercat" target="_blank">
                   GitHub 仓库
                 </Link>
                 <Link href="#" disabled>
@@ -342,39 +313,23 @@ const App: React.FC = () => {
               <h3 className="text-lg font-semibold mb-3">图标</h3>
               <Space>
                 <Icon>
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
                     <path d="M20 6L9 17l-5-5" />
                   </svg>
                 </Icon>
                 <Icon>
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
                     <path d="M18 6L6 18M6 6l12 12" />
                   </svg>
                 </Icon>
                 <Icon>
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
                     <circle cx="12" cy="12" r="10" />
                     <path d="M12 16v-4M12 8h.01" />
                   </svg>
                 </Icon>
                 <Icon>
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
                     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
                     <path d="M12 9v4M12 17h.01" />
                   </svg>
@@ -393,7 +348,7 @@ const App: React.FC = () => {
         </div>
       </Footer>
     </Layout>
-  );
-};
+  )
+}
 
-export default App;
+export default App

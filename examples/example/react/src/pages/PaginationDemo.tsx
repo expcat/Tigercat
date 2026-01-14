@@ -1,26 +1,26 @@
-import React, { useState } from 'react';
-import { Pagination, Divider } from '@tigercat/react';
+import React, { useState } from 'react'
+import { Pagination, Divider } from '@tigercat/react'
 
 const PaginationDemo: React.FC = () => {
-  const [current1, setCurrent1] = useState(1);
-  const [current2, setCurrent2] = useState(1);
-  const [current3, setCurrent3] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [current4, setCurrent4] = useState(1);
-  const [current5, setCurrent5] = useState(1);
-  const [current6, setCurrent6] = useState(1);
-  const [current7, setCurrent7] = useState(1);
-  const [current8, setCurrent8] = useState(1);
+  const [current1, setCurrent1] = useState(1)
+  const [current2, setCurrent2] = useState(1)
+  const [current3, setCurrent3] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [current4, setCurrent4] = useState(1)
+  const [current5, setCurrent5] = useState(1)
+  const [current6, setCurrent6] = useState(1)
+  const [current7, setCurrent7] = useState(1)
+  const [current8, setCurrent8] = useState(1)
 
   const handlePageSizeChange = (page: number, size: number) => {
-    console.log('页码大小改变 - 当前页:', page, '每页条数:', size);
-    setCurrent3(page);
-    setPageSize(size);
-  };
+    console.log('页码大小改变 - 当前页:', page, '每页条数:', size)
+    setCurrent3(page)
+    setPageSize(size)
+  }
 
   const customTotalText = (total: number, range: [number, number]) => {
-    return `显示 ${range[0]}-${range[1]} 条，共 ${total} 条记录`;
-  };
+    return `显示 ${range[0]}-${range[1]} 条，共 ${total} 条记录`
+  }
 
   return (
     <div className="max-w-5xl mx-auto p-8">
@@ -36,12 +36,7 @@ const PaginationDemo: React.FC = () => {
         <h2 className="text-2xl font-bold mb-4">基本用法</h2>
         <p className="text-gray-600 mb-6">最简单的分页组件。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <Pagination
-            current={current1}
-            onChange={setCurrent1}
-            total={100}
-            pageSize={10}
-          />
+          <Pagination current={current1} onChange={setCurrent1} total={100} pageSize={10} />
         </div>
         <Divider className="my-6" />
       </section>
@@ -49,9 +44,7 @@ const PaginationDemo: React.FC = () => {
       {/* 快速跳页 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">快速跳页</h2>
-        <p className="text-gray-600 mb-6">
-          显示快速跳页输入框，方便快速跳转到指定页。
-        </p>
+        <p className="text-gray-600 mb-6">显示快速跳页输入框，方便快速跳转到指定页。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Pagination
             current={current2}
@@ -85,16 +78,9 @@ const PaginationDemo: React.FC = () => {
       {/* 简单模式 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">简单模式</h2>
-        <p className="text-gray-600 mb-6">
-          只显示上一页、下一页和当前页/总页数。
-        </p>
+        <p className="text-gray-600 mb-6">只显示上一页、下一页和当前页/总页数。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <Pagination
-            current={current4}
-            onChange={setCurrent4}
-            total={500}
-            simple
-          />
+          <Pagination current={current4} onChange={setCurrent4} total={500} simple />
         </div>
         <Divider className="my-6" />
       </section>
@@ -106,30 +92,15 @@ const PaginationDemo: React.FC = () => {
         <div className="p-6 bg-gray-50 rounded-lg space-y-4">
           <div>
             <p className="text-sm text-gray-500 mb-2">小尺寸</p>
-            <Pagination
-              current={current5}
-              onChange={setCurrent5}
-              total={100}
-              size="small"
-            />
+            <Pagination current={current5} onChange={setCurrent5} total={100} size="small" />
           </div>
           <div>
             <p className="text-sm text-gray-500 mb-2">中等尺寸（默认）</p>
-            <Pagination
-              current={current5}
-              onChange={setCurrent5}
-              total={100}
-              size="medium"
-            />
+            <Pagination current={current5} onChange={setCurrent5} total={100} size="medium" />
           </div>
           <div>
             <p className="text-sm text-gray-500 mb-2">大尺寸</p>
-            <Pagination
-              current={current5}
-              onChange={setCurrent5}
-              total={100}
-              size="large"
-            />
+            <Pagination current={current5} onChange={setCurrent5} total={100} size="large" />
           </div>
         </div>
         <Divider className="my-6" />
@@ -142,30 +113,15 @@ const PaginationDemo: React.FC = () => {
         <div className="p-6 bg-gray-50 rounded-lg space-y-4">
           <div>
             <p className="text-sm text-gray-500 mb-2">左对齐</p>
-            <Pagination
-              current={current6}
-              onChange={setCurrent6}
-              total={100}
-              align="left"
-            />
+            <Pagination current={current6} onChange={setCurrent6} total={100} align="left" />
           </div>
           <div>
             <p className="text-sm text-gray-500 mb-2">居中对齐（默认）</p>
-            <Pagination
-              current={current6}
-              onChange={setCurrent6}
-              total={100}
-              align="center"
-            />
+            <Pagination current={current6} onChange={setCurrent6} total={100} align="center" />
           </div>
           <div>
             <p className="text-sm text-gray-500 mb-2">右对齐</p>
-            <Pagination
-              current={current6}
-              onChange={setCurrent6}
-              total={100}
-              align="right"
-            />
+            <Pagination current={current6} onChange={setCurrent6} total={100} align="right" />
           </div>
         </div>
         <Divider className="my-6" />
@@ -191,12 +147,7 @@ const PaginationDemo: React.FC = () => {
         <h2 className="text-2xl font-bold mb-4">禁用状态</h2>
         <p className="text-gray-600 mb-6">禁用分页组件的所有交互。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <Pagination
-            current={current8}
-            onChange={setCurrent8}
-            total={100}
-            disabled
-          />
+          <Pagination current={current8} onChange={setCurrent8} total={100} disabled />
         </div>
         <Divider className="my-6" />
       </section>
@@ -204,9 +155,7 @@ const PaginationDemo: React.FC = () => {
       {/* 完整示例 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">完整示例</h2>
-        <p className="text-gray-600 mb-6">
-          包含所有功能的完整示例（查看控制台）。
-        </p>
+        <p className="text-gray-600 mb-6">包含所有功能的完整示例（查看控制台）。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Pagination
             current={current3}
@@ -224,7 +173,7 @@ const PaginationDemo: React.FC = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default PaginationDemo;
+export default PaginationDemo

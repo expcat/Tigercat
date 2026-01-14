@@ -8,10 +8,10 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Input } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Input } from '@tigercat/vue'
 
-const inputValue = ref('');
+const inputValue = ref('')
 </script>
 
 <template>
@@ -22,19 +22,13 @@ const inputValue = ref('');
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Input } from '@tigercat/react';
+import { useState } from 'react'
+import { Input } from '@tigercat/react'
 
 function App() {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState('')
 
-  return (
-    <Input
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      placeholder="请输入内容"
-    />
-  );
+  return <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder="请输入内容" />
 }
 ```
 
@@ -198,14 +192,14 @@ Input 组件支持多种 HTML5 输入类型：
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Input } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Input } from '@tigercat/vue'
 
-const value = ref('');
+const value = ref('')
 
 const handleChange = () => {
-  console.log('Value:', value.value);
-};
+  console.log('Value:', value.value)
+}
 </script>
 
 <template>
@@ -217,23 +211,23 @@ const handleChange = () => {
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { Input } from '@tigercat/react';
+import { useState } from 'react'
+import { Input } from '@tigercat/react'
 
 function ControlledExample() {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState('')
 
   const handleChange = (e) => {
-    setValue(e.target.value);
-    console.log('Value:', e.target.value);
-  };
+    setValue(e.target.value)
+    console.log('Value:', e.target.value)
+  }
 
   return (
     <>
       <Input value={value} onChange={handleChange} />
       <p>Current value: {value}</p>
     </>
-  );
+  )
 }
 ```
 
@@ -247,11 +241,11 @@ function ControlledExample() {
 
 ```vue
 <script setup>
-import { Input } from '@tigercat/vue';
+import { Input } from '@tigercat/vue'
 
 const handleInput = (event) => {
-  console.log('Input value:', event.target.value);
-};
+  console.log('Input value:', event.target.value)
+}
 </script>
 
 <template>
@@ -264,14 +258,14 @@ const handleInput = (event) => {
 在 React 中，使用 `defaultValue` 而不是 `value` 来创建非受控组件：
 
 ```tsx
-import { Input } from '@tigercat/react';
+import { Input } from '@tigercat/react'
 
 function UncontrolledExample() {
   const handleChange = (e) => {
-    console.log('Value:', e.target.value);
-  };
+    console.log('Value:', e.target.value)
+  }
 
-  return <Input defaultValue="Initial value" onChange={handleChange} />;
+  return <Input defaultValue="Initial value" onChange={handleChange} />
 }
 ```
 
@@ -283,31 +277,27 @@ Vue 组件支持以下事件：
 
 ```vue
 <script setup>
-import { Input } from '@tigercat/vue';
+import { Input } from '@tigercat/vue'
 
 const handleInput = (event) => {
-  console.log('Input event:', event.target.value);
-};
+  console.log('Input event:', event.target.value)
+}
 
 const handleChange = (event) => {
-  console.log('Change event:', event.target.value);
-};
+  console.log('Change event:', event.target.value)
+}
 
 const handleFocus = (event) => {
-  console.log('Input focused');
-};
+  console.log('Input focused')
+}
 
 const handleBlur = (event) => {
-  console.log('Input blurred');
-};
+  console.log('Input blurred')
+}
 </script>
 
 <template>
-  <Input
-    @input="handleInput"
-    @change="handleChange"
-    @focus="handleFocus"
-    @blur="handleBlur" />
+  <Input @input="handleInput" @change="handleChange" @focus="handleFocus" @blur="handleBlur" />
 </template>
 ```
 
@@ -316,24 +306,24 @@ const handleBlur = (event) => {
 React 组件支持标准的事件处理器：
 
 ```tsx
-import { Input } from '@tigercat/react';
+import { Input } from '@tigercat/react'
 
 function EventExample() {
   const handleInput = (e) => {
-    console.log('Input event:', e.currentTarget.value);
-  };
+    console.log('Input event:', e.currentTarget.value)
+  }
 
   const handleChange = (e) => {
-    console.log('Change event:', e.target.value);
-  };
+    console.log('Change event:', e.target.value)
+  }
 
   const handleFocus = (e) => {
-    console.log('Input focused');
-  };
+    console.log('Input focused')
+  }
 
   const handleBlur = (e) => {
-    console.log('Input blurred');
-  };
+    console.log('Input blurred')
+  }
 
   return (
     <Input
@@ -342,7 +332,7 @@ function EventExample() {
       onFocus={handleFocus}
       onBlur={handleBlur}
     />
-  );
+  )
 }
 ```
 
@@ -461,11 +451,11 @@ Input 组件使用主题系统中的 CSS 变量控制边框、背景、文字、
 Input 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { InputProps, InputSize, InputType } from '@tigercat/core';
+import type { InputProps, InputSize, InputType } from '@tigercat/core'
 // Vue
-import type { Input, VueInputProps } from '@tigercat/vue';
+import type { Input, VueInputProps } from '@tigercat/vue'
 // React
-import type { Input, InputProps as ReactInputProps } from '@tigercat/react';
+import type { Input, InputProps as ReactInputProps } from '@tigercat/react'
 ```
 
 ## 示例
@@ -476,45 +466,33 @@ import type { Input, InputProps as ReactInputProps } from '@tigercat/react';
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Input, Button } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Input, Button } from '@tigercat/vue'
 
-const email = ref('');
-const password = ref('');
-const loading = ref(false);
+const email = ref('')
+const password = ref('')
+const loading = ref(false)
 
 const handleSubmit = async () => {
-  loading.value = true;
+  loading.value = true
   try {
     // 登录逻辑
-    console.log('Login:', { email: email.value, password: password.value });
+    console.log('Login:', { email: email.value, password: password.value })
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 </script>
 
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-4 max-w-sm">
     <div>
       <label for="email" class="block text-sm font-medium mb-1">Email</label>
-      <Input
-        id="email"
-        v-model="email"
-        type="email"
-        placeholder="your@email.com"
-        required />
+      <Input id="email" v-model="email" type="email" placeholder="your@email.com" required />
     </div>
     <div>
-      <label for="password" class="block text-sm font-medium mb-1"
-        >Password</label
-      >
-      <Input
-        id="password"
-        v-model="password"
-        type="password"
-        placeholder="••••••••"
-        required />
+      <label for="password" class="block text-sm font-medium mb-1">Password</label>
+      <Input id="password" v-model="password" type="password" placeholder="••••••••" required />
     </div>
     <Button type="submit" :loading="loading" class="w-full"> Login </Button>
   </form>
@@ -524,24 +502,24 @@ const handleSubmit = async () => {
 #### React
 
 ```tsx
-import { useState, FormEvent } from 'react';
-import { Input, Button } from '@tigercat/react';
+import { useState, FormEvent } from 'react'
+import { Input, Button } from '@tigercat/react'
 
 function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
     try {
       // 登录逻辑
-      console.log('Login:', { email, password });
+      console.log('Login:', { email, password })
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-sm">
@@ -575,7 +553,7 @@ function LoginForm() {
         Login
       </Button>
     </form>
-  );
+  )
 }
 ```
 
@@ -585,39 +563,35 @@ function LoginForm() {
 
 ```vue
 <script setup>
-import { ref, watch } from 'vue';
-import { Input } from '@tigercat/vue';
+import { ref, watch } from 'vue'
+import { Input } from '@tigercat/vue'
 
-const searchQuery = ref('');
+const searchQuery = ref('')
 
 watch(searchQuery, (newQuery) => {
-  console.log('Searching for:', newQuery);
+  console.log('Searching for:', newQuery)
   // 实现搜索逻辑
-});
+})
 </script>
 
 <template>
-  <Input
-    v-model="searchQuery"
-    type="search"
-    placeholder="Search..."
-    size="lg" />
+  <Input v-model="searchQuery" type="search" placeholder="Search..." size="lg" />
 </template>
 ```
 
 #### React
 
 ```tsx
-import { useState, useEffect } from 'react';
-import { Input } from '@tigercat/react';
+import { useState, useEffect } from 'react'
+import { Input } from '@tigercat/react'
 
 function SearchBox() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
-    console.log('Searching for:', searchQuery);
+    console.log('Searching for:', searchQuery)
     // 实现搜索逻辑
-  }, [searchQuery]);
+  }, [searchQuery])
 
   return (
     <Input
@@ -627,6 +601,6 @@ function SearchBox() {
       placeholder="Search..."
       size="lg"
     />
-  );
+  )
 }
 ```

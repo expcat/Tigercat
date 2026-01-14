@@ -2,133 +2,129 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/vue';
-import { Alert } from '@tigercat/vue';
-import {
-  renderWithProps,
-  renderWithSlots,
-  expectNoA11yViolations,
-} from '../utils';
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/vue'
+import { Alert } from '@tigercat/vue'
+import { renderWithProps, renderWithSlots, expectNoA11yViolations } from '../utils'
 
-const closeButtonSelector = 'button[aria-label="Close alert"]';
+const closeButtonSelector = 'button[aria-label="Close alert"]'
 
 describe('Alert', () => {
   it('renders title and description', () => {
     renderWithProps(Alert, {
       title: 'Alert Title',
-      description: 'Alert description',
-    });
+      description: 'Alert description'
+    })
 
-    expect(screen.getByRole('alert')).toBeInTheDocument();
-    expect(screen.getByText('Alert Title')).toBeInTheDocument();
-    expect(screen.getByText('Alert description')).toBeInTheDocument();
-  });
+    expect(screen.getByRole('alert')).toBeInTheDocument()
+    expect(screen.getByText('Alert Title')).toBeInTheDocument()
+    expect(screen.getByText('Alert description')).toBeInTheDocument()
+  })
 
   it('renders slots for title/description', () => {
     renderWithSlots(
       Alert,
       {
         title: 'Custom Title',
-        description: 'Custom Description',
+        description: 'Custom Description'
       },
       {
-        type: 'info',
+        type: 'info'
       }
-    );
+    )
 
-    expect(screen.getByText('Custom Title')).toBeInTheDocument();
-    expect(screen.getByText('Custom Description')).toBeInTheDocument();
-  });
+    expect(screen.getByText('Custom Title')).toBeInTheDocument()
+    expect(screen.getByText('Custom Description')).toBeInTheDocument()
+  })
 
   it('renders default slot content when no title/description', () => {
     renderWithSlots(Alert, {
-      default: 'Default content',
-    });
+      default: 'Default content'
+    })
 
-    expect(screen.getByText('Default content')).toBeInTheDocument();
-  });
+    expect(screen.getByText('Default content')).toBeInTheDocument()
+  })
 
   it('hides icon when showIcon is false', () => {
     const { container } = renderWithProps(Alert, {
       title: 'Alert',
-      showIcon: false,
-    });
+      showIcon: false
+    })
 
-    expect(container.querySelector('svg')).not.toBeInTheDocument();
-  });
+    expect(container.querySelector('svg')).not.toBeInTheDocument()
+  })
 
   it('merges className and attrs.class', () => {
     const { container } = renderWithProps(
       Alert,
       {
         title: 'Alert',
-        className: 'custom-class',
+        className: 'custom-class'
       },
       {
         attrs: {
-          class: 'attrs-class',
-        },
+          class: 'attrs-class'
+        }
       }
-    );
+    )
 
-    const alert = container.querySelector('[role="alert"]');
-    expect(alert).toBeInTheDocument();
-    expect(alert).toHaveClass('custom-class');
-    expect(alert).toHaveClass('attrs-class');
-  });
+    const alert = container.querySelector('[role="alert"]')
+    expect(alert).toBeInTheDocument()
+    expect(alert).toHaveClass('custom-class')
+    expect(alert).toHaveClass('attrs-class')
+  })
 
   it('emits close and hides by default when clicked', async () => {
-    const onClose = vi.fn();
+    const onClose = vi.fn()
 
     const { container } = render(Alert, {
       props: {
         title: 'Closable Alert',
         closable: true,
-        onClose,
-      },
-    });
+        onClose
+      }
+    })
 
-    const closeButton = container.querySelector(closeButtonSelector);
-    expect(closeButton).toBeInTheDocument();
+    const closeButton = container.querySelector(closeButtonSelector)
+    expect(closeButton).toBeInTheDocument()
 
     if (closeButton) {
-      await fireEvent.click(closeButton);
+      await fireEvent.click(closeButton)
     }
 
-    expect(onClose).toHaveBeenCalledTimes(1);
-    expect(container.querySelector('[role="alert"]')).not.toBeInTheDocument();
-  });
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(container.querySelector('[role="alert"]')).not.toBeInTheDocument()
+  })
 
   it('does not hide if close handler prevents default', async () => {
-    const onClose = vi.fn((event: MouseEvent) => event.preventDefault());
+    const onClose = vi.fn((event: MouseEvent) => event.preventDefault())
 
     const { container } = render(Alert, {
       props: {
         title: 'Closable Alert',
         closable: true,
-        onClose,
-      },
-    });
+        onClose
+      }
+    })
 
-    const closeButton = container.querySelector(closeButtonSelector);
-    expect(closeButton).toBeInTheDocument();
+    const closeButton = container.querySelector(closeButtonSelector)
+    expect(closeButton).toBeInTheDocument()
 
     if (closeButton) {
-      await fireEvent.click(closeButton);
+      await fireEvent.click(closeButton)
     }
 
-    expect(onClose).toHaveBeenCalledTimes(1);
-    expect(container.querySelector('[role="alert"]')).toBeInTheDocument();
-  });
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(container.querySelector('[role="alert"]')).toBeInTheDocument()
+  })
 
   it('has no a11y violations', async () => {
     const { container } = renderWithProps(Alert, {
       title: 'Accessible Alert',
       description: 'This is an accessible alert',
-      closable: true,
-    });
+      closable: true
+    })
 
-    await expectNoA11yViolations(container);
-  });
-});
+    await expectNoA11yViolations(container)
+  })
+})

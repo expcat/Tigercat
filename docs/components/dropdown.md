@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 </script>
 
 <template>
@@ -28,7 +28,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -40,7 +40,7 @@ function App() {
         <DropdownItem>菜单项 3</DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  );
+  )
 }
 ```
 
@@ -52,7 +52,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 </script>
 
 <template>
@@ -87,7 +87,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -112,7 +112,7 @@ function App() {
         </DropdownMenu>
       </Dropdown>
     </div>
-  );
+  )
 }
 ```
 
@@ -124,7 +124,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 </script>
 
 <template>
@@ -199,7 +199,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -256,7 +256,7 @@ function App() {
         </Dropdown>
       </div>
     </div>
-  );
+  )
 }
 ```
 
@@ -268,7 +268,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 </script>
 
 <template>
@@ -288,7 +288,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -300,7 +300,7 @@ function App() {
         <DropdownItem>复制</DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  );
+  )
 }
 ```
 
@@ -312,7 +312,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 </script>
 
 <template>
@@ -333,7 +333,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -346,7 +346,7 @@ function App() {
         <DropdownItem>下载</DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  );
+  )
 }
 ```
 
@@ -370,9 +370,7 @@ const handleCommand = (command: string) => {
       <DropdownMenu>
         <DropdownItem @click="handleCommand('edit')">编辑</DropdownItem>
         <DropdownItem @click="handleCommand('copy')">复制</DropdownItem>
-        <DropdownItem @click="handleCommand('delete')" divided
-          >删除</DropdownItem
-        >
+        <DropdownItem @click="handleCommand('delete')" divided>删除</DropdownItem>
       </DropdownMenu>
     </template>
   </Dropdown>
@@ -382,25 +380,25 @@ const handleCommand = (command: string) => {
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
 
 function App() {
   const handleCommand = (command: string) => {
-    console.log("点击了：", command);
-  };
+    console.log('点击了：', command)
+  }
 
   return (
     <Dropdown>
       <Button>操作菜单</Button>
       <DropdownMenu>
-        <DropdownItem onClick={() => handleCommand("edit")}>编辑</DropdownItem>
-        <DropdownItem onClick={() => handleCommand("copy")}>复制</DropdownItem>
-        <DropdownItem onClick={() => handleCommand("delete")} divided>
+        <DropdownItem onClick={() => handleCommand('edit')}>编辑</DropdownItem>
+        <DropdownItem onClick={() => handleCommand('copy')}>复制</DropdownItem>
+        <DropdownItem onClick={() => handleCommand('delete')} divided>
           删除
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  );
+  )
 }
 ```
 
@@ -410,10 +408,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 
-const visible = ref(false);
+const visible = ref(false)
 </script>
 
 <template>
@@ -429,9 +427,7 @@ const visible = ref(false);
       </template>
     </Dropdown>
     <div class="mt-4">
-      <Button @click="visible = !visible">
-        {{ visible ? "关闭" : "打开" }}下拉菜单
-      </Button>
+      <Button @click="visible = !visible"> {{ visible ? '关闭' : '打开' }}下拉菜单 </Button>
     </div>
   </div>
 </template>
@@ -440,11 +436,11 @@ const visible = ref(false);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
+import { useState } from 'react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
 
 function App() {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
 
   return (
     <div>
@@ -457,12 +453,10 @@ function App() {
         </DropdownMenu>
       </Dropdown>
       <div className="mt-4">
-        <Button onClick={() => setVisible(!visible)}>
-          {visible ? "关闭" : "打开"}下拉菜单
-        </Button>
+        <Button onClick={() => setVisible(!visible)}>{visible ? '关闭' : '打开'}下拉菜单</Button>
       </div>
     </div>
-  );
+  )
 }
 ```
 
@@ -474,7 +468,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 </script>
 
 <template>
@@ -494,7 +488,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/react";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -506,7 +500,7 @@ function App() {
         <DropdownItem>菜单项 3</DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  );
+  )
 }
 ```
 

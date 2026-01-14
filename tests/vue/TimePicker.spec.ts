@@ -23,7 +23,7 @@ describe('TimePicker', () => {
 
   it('allows overriding labels for placeholder', () => {
     const { container } = renderWithProps(TimePicker, {
-      labels: { selectTime: 'Pick a time' },
+      labels: { selectTime: 'Pick a time' }
     })
     const input = container.querySelector('input')
     expect(input).toHaveAttribute('placeholder', 'Pick a time')
@@ -44,7 +44,7 @@ describe('TimePicker', () => {
   it('supports 12-hour display', () => {
     const { container } = renderWithProps(TimePicker, {
       modelValue: '14:30',
-      format: '12',
+      format: '12'
     })
     const input = container.querySelector('input') as HTMLInputElement
     expect(input.value).toBe('02:30 PM')
@@ -53,9 +53,7 @@ describe('TimePicker', () => {
   it('opens panel when input clicked', async () => {
     const { container } = render(TimePicker)
     await fireEvent.click(container.querySelector('input') as HTMLInputElement)
-    await waitFor(() =>
-      expect(container.querySelector('[role="dialog"]')).toBeInTheDocument()
-    )
+    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
   })
 
   it('closes on Escape and restores focus to input', async () => {
@@ -63,29 +61,23 @@ describe('TimePicker', () => {
     const input = container.querySelector('input') as HTMLInputElement
 
     await fireEvent.click(input)
-    await waitFor(() =>
-      expect(container.querySelector('[role="dialog"]')).toBeInTheDocument()
-    )
+    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
 
     const dialog = container.querySelector('[role="dialog"]') as HTMLElement
     await fireEvent.keyDown(dialog, { key: 'Escape' })
 
-    await waitFor(() =>
-      expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument()
-    )
+    await waitFor(() => expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument())
     expect(document.activeElement).toBe(input)
   })
 
   it('supports keyboard navigation to change hour', async () => {
     const { container, emitted } = renderWithProps(TimePicker, {
-      modelValue: null,
+      modelValue: null
     })
     const input = container.querySelector('input') as HTMLInputElement
 
     await fireEvent.click(input)
-    await waitFor(() =>
-      expect(container.querySelector('[role="dialog"]')).toBeInTheDocument()
-    )
+    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
 
     const dialog = container.querySelector('[role="dialog"]') as HTMLElement
     await fireEvent.keyDown(dialog, { key: 'ArrowDown' })
@@ -98,14 +90,12 @@ describe('TimePicker', () => {
     const { container } = renderWithProps(TimePicker, {
       modelValue: null,
       minTime: '10:00',
-      maxTime: '11:00',
+      maxTime: '11:00'
     })
     const input = container.querySelector('input') as HTMLInputElement
 
     await fireEvent.click(input)
-    await waitFor(() =>
-      expect(container.querySelector('[role="dialog"]')).toBeInTheDocument()
-    )
+    await waitFor(() => expect(container.querySelector('[role="dialog"]')).toBeInTheDocument())
 
     const dialog = container.querySelector('[role="dialog"]') as HTMLElement
     const hourButtons = Array.from(
@@ -127,7 +117,7 @@ describe('TimePicker', () => {
   it('emits clear + update:modelValue when cleared', async () => {
     const { container, emitted } = renderWithProps(TimePicker, {
       modelValue: '14:30',
-      clearable: true,
+      clearable: true
     })
 
     const clearButton = container.querySelector(
@@ -142,7 +132,7 @@ describe('TimePicker', () => {
   it('supports range display and clears to tuple', async () => {
     const { container, emitted } = renderWithProps(TimePicker, {
       range: true,
-      modelValue: ['14:30', '15:00'],
+      modelValue: ['14:30', '15:00']
     })
 
     const input = container.querySelector('input') as HTMLInputElement
@@ -160,3 +150,4 @@ describe('TimePicker', () => {
     const { container } = renderWithProps(TimePicker, { modelValue: '14:30' })
     await expectNoA11yViolations(container)
   })
+})

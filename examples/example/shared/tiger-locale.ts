@@ -1,5 +1,5 @@
-import type { TigerLocale } from '@tigercat/core';
-import type { DemoLang } from './app-config';
+import type { TigerLocale } from '@tigercat/core'
+import type { DemoLang } from './app-config'
 
 export function getDemoTigerLocale(lang: DemoLang): Partial<TigerLocale> {
   if (lang === 'zh-CN') {
@@ -17,9 +17,9 @@ export function getDemoTigerLocale(lang: DemoLang): Partial<TigerLocale> {
         errorAriaLabel: '失败',
         uploadingAriaLabel: '上传中',
         removeFileAriaLabel: '移除 {fileName}',
-        previewFileAriaLabel: '预览 {fileName}',
-      },
-    };
+        previewFileAriaLabel: '预览 {fileName}'
+      }
+    }
   }
 
   return {
@@ -36,7 +36,7 @@ export function getDemoTigerLocale(lang: DemoLang): Partial<TigerLocale> {
       errorAriaLabel: 'Error',
       uploadingAriaLabel: 'Uploading',
       removeFileAriaLabel: 'Remove {fileName}',
-      previewFileAriaLabel: 'Preview {fileName}',
-    },
-  };
+      previewFileAriaLabel: 'Preview {fileName}'
+    }
+  }
 }

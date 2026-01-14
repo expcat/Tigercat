@@ -16,15 +16,15 @@
 </template>
 
 <script setup>
-import { Tooltip, Button } from "@tigercat/vue";
+import { Tooltip, Button } from '@tigercat/vue'
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Tooltip, Button } from "@tigercat/react";
+import React from 'react'
+import { Tooltip, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -33,7 +33,7 @@ function App() {
         <Button>悬停显示提示</Button>
       </Tooltip>
     </div>
-  );
+  )
 }
 ```
 
@@ -73,15 +73,15 @@ function App() {
 </template>
 
 <script setup>
-import { Tooltip, Button } from "@tigercat/vue";
+import { Tooltip, Button } from '@tigercat/vue'
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Tooltip, Button } from "@tigercat/react";
+import React from 'react'
+import { Tooltip, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -110,7 +110,7 @@ function App() {
         </Tooltip>
       </div>
     </div>
-  );
+  )
 }
 ```
 
@@ -138,15 +138,15 @@ function App() {
 </template>
 
 <script setup>
-import { Tooltip, Button } from "@tigercat/vue";
+import { Tooltip, Button } from '@tigercat/vue'
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Tooltip, Button } from "@tigercat/react";
+import React from 'react'
+import { Tooltip, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -163,7 +163,7 @@ function App() {
         <Button>Focus</Button>
       </Tooltip>
     </div>
-  );
+  )
 }
 ```
 
@@ -189,15 +189,15 @@ function App() {
 </template>
 
 <script setup>
-import { Tooltip, Button } from "@tigercat/vue";
+import { Tooltip, Button } from '@tigercat/vue'
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Tooltip, Button } from "@tigercat/react";
+import React from 'react'
+import { Tooltip, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -208,12 +208,11 @@ function App() {
             <strong>自定义内容</strong>
             <p>这里可以包含任何内容</p>
           </div>
-        }
-      >
+        }>
         <Button>自定义提示</Button>
       </Tooltip>
     </div>
-  );
+  )
 }
 ```
 
@@ -231,43 +230,37 @@ function App() {
     </Tooltip>
 
     <Button @click="visible = !visible">
-      {{ visible ? "隐藏" : "显示" }}
+      {{ visible ? '隐藏' : '显示' }}
     </Button>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { Tooltip, Button } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Tooltip, Button } from '@tigercat/vue'
 
-const visible = ref(false);
+const visible = ref(false)
 </script>
 ```
 
 ### React
 
 ```tsx
-import React, { useState } from "react";
-import { Tooltip, Button } from "@tigercat/react";
+import React, { useState } from 'react'
+import { Tooltip, Button } from '@tigercat/react'
 
 function App() {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
 
   return (
     <div className="flex gap-4 items-center">
-      <Tooltip
-        visible={visible}
-        content="受控的气泡提示"
-        onVisibleChange={setVisible}
-      >
+      <Tooltip visible={visible} content="受控的气泡提示" onVisibleChange={setVisible}>
         <Button>受控提示</Button>
       </Tooltip>
 
-      <Button onClick={() => setVisible(!visible)}>
-        {visible ? "隐藏" : "显示"}
-      </Button>
+      <Button onClick={() => setVisible(!visible)}>{visible ? '隐藏' : '显示'}</Button>
     </div>
-  );
+  )
 }
 ```
 
@@ -291,15 +284,15 @@ function App() {
 </template>
 
 <script setup>
-import { Tooltip, Button } from "@tigercat/vue";
+import { Tooltip, Button } from '@tigercat/vue'
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Tooltip, Button } from "@tigercat/react";
+import React from 'react'
+import { Tooltip, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -312,7 +305,7 @@ function App() {
         <Button>禁用</Button>
       </Tooltip>
     </div>
-  );
+  )
 }
 ```
 

@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Button } from '@tigercat/vue';
+import { Button } from '@tigercat/vue'
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Button } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Button } from '@tigercat/react';
+import { Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
       <Button variant="primary">Primary Button</Button>
       <Button variant="secondary">Secondary Button</Button>
     </>
-  );
+  )
 }
 ```
 
@@ -148,11 +148,11 @@ Button 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { Button } from '@tigercat/vue';
+import { Button } from '@tigercat/vue'
 
 const handleClick = (event) => {
-  console.log('Button clicked!', event);
-};
+  console.log('Button clicked!', event)
+}
 </script>
 
 <template>
@@ -163,14 +163,14 @@ const handleClick = (event) => {
 ### React
 
 ```tsx
-import { Button } from '@tigercat/react';
+import { Button } from '@tigercat/react'
 
 function App() {
   const handleClick = (event) => {
-    console.log('Button clicked!', event);
-  };
+    console.log('Button clicked!', event)
+  }
 
-  return <Button onClick={handleClick}>Click Me</Button>;
+  return <Button onClick={handleClick}>Click Me</Button>
 }
 ```
 
@@ -247,15 +247,15 @@ Button 组件支持通过 CSS 变量自定义主题颜色，可以实现实时�
 
 ```vue
 <script setup>
-import { Button, setThemeColors } from '@tigercat/vue';
+import { Button, setThemeColors } from '@tigercat/vue'
 
 const switchTheme = () => {
   setThemeColors({
     primary: '#10b981',
     primaryHover: '#059669',
-    primaryDisabled: '#6ee7b7',
-  });
-};
+    primaryDisabled: '#6ee7b7'
+  })
+}
 </script>
 
 <template>
@@ -266,18 +266,18 @@ const switchTheme = () => {
 **React:**
 
 ```tsx
-import { Button, setThemeColors } from '@tigercat/react';
+import { Button, setThemeColors } from '@tigercat/react'
 
 function App() {
   const switchTheme = () => {
     setThemeColors({
       primary: '#10b981',
       primaryHover: '#059669',
-      primaryDisabled: '#6ee7b7',
-    });
-  };
+      primaryDisabled: '#6ee7b7'
+    })
+  }
 
-  return <Button onClick={switchTheme}>切换主题</Button>;
+  return <Button onClick={switchTheme}>切换主题</Button>
 }
 ```
 
@@ -303,11 +303,11 @@ React 版本的 Button 组件支持 `className` 属性，可以传入额外的 C
 Button 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { ButtonVariant, ButtonSize } from '@tigercat/core';
+import type { ButtonVariant, ButtonSize } from '@tigercat/core'
 // Vue
-import type { VueButtonProps } from '@tigercat/vue';
+import type { VueButtonProps } from '@tigercat/vue'
 // React
-import type { ButtonProps } from '@tigercat/react';
+import type { ButtonProps } from '@tigercat/react'
 ```
 
 ## 示例
@@ -318,20 +318,20 @@ import type { ButtonProps } from '@tigercat/react';
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Button } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Button } from '@tigercat/vue'
 
-const loading = ref(false);
+const loading = ref(false)
 
 const handleSubmit = async () => {
-  loading.value = true;
+  loading.value = true
   try {
     // 提交表单逻辑
-    await submitForm();
+    await submitForm()
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 </script>
 
 <template>
@@ -344,22 +344,22 @@ const handleSubmit = async () => {
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { Button } from '@tigercat/react';
+import { useState } from 'react'
+import { Button } from '@tigercat/react'
 
 function FormExample() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
     try {
       // 提交表单逻辑
-      await submitForm();
+      await submitForm()
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -367,7 +367,7 @@ function FormExample() {
         Submit
       </Button>
     </form>
-  );
+  )
 }
 ```
 

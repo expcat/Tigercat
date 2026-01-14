@@ -8,10 +8,10 @@
 
 ```vue
 <script setup lang="ts">
-import { ref } from "vue";
-import { DatePicker } from "@tigercat/vue";
+import { ref } from 'vue'
+import { DatePicker } from '@tigercat/vue'
 
-const selectedDate = ref<Date | null>(null);
+const selectedDate = ref<Date | null>(null)
 </script>
 
 <template>
@@ -22,19 +22,13 @@ const selectedDate = ref<Date | null>(null);
 ### React
 
 ```tsx
-import React, { useState } from "react";
-import { DatePicker } from "@tigercat/react";
+import React, { useState } from 'react'
+import { DatePicker } from '@tigercat/react'
 
 function App() {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
-  return (
-    <DatePicker
-      value={selectedDate}
-      onChange={setSelectedDate}
-      placeholder="Select a date"
-    />
-  );
+  return <DatePicker value={selectedDate} onChange={setSelectedDate} placeholder="Select a date" />
 }
 ```
 
@@ -68,10 +62,10 @@ DatePicker 组件支持三种尺寸：`sm`、`md`、`lg`。
 
 ```vue
 <script setup lang="ts">
-import { ref } from "vue";
-import { DatePicker } from "@tigercat/vue";
+import { ref } from 'vue'
+import { DatePicker } from '@tigercat/vue'
 
-const date = ref(new Date("2024-01-15"));
+const date = ref(new Date('2024-01-15'))
 </script>
 
 <template>
@@ -85,11 +79,11 @@ const date = ref(new Date("2024-01-15"));
 ### React
 
 ```tsx
-import React, { useState } from "react";
-import { DatePicker } from "@tigercat/react";
+import React, { useState } from 'react'
+import { DatePicker } from '@tigercat/react'
 
 function App() {
-  const [date, setDate] = useState(new Date("2024-01-15"));
+  const [date, setDate] = useState(new Date('2024-01-15'))
 
   return (
     <>
@@ -98,7 +92,7 @@ function App() {
       <DatePicker value={date} onChange={setDate} format="dd/MM/yyyy" />
       <DatePicker value={date} onChange={setDate} format="yyyy/MM/dd" />
     </>
-  );
+  )
 }
 ```
 
@@ -110,12 +104,12 @@ function App() {
 
 ```vue
 <script setup lang="ts">
-import { ref } from "vue";
-import { DatePicker } from "@tigercat/vue";
+import { ref } from 'vue'
+import { DatePicker } from '@tigercat/vue'
 
-const date = ref<Date | null>(null);
-const minDate = new Date("2024-01-01");
-const maxDate = new Date("2024-12-31");
+const date = ref<Date | null>(null)
+const minDate = new Date('2024-01-01')
+const maxDate = new Date('2024-12-31')
 </script>
 
 <template>
@@ -123,21 +117,20 @@ const maxDate = new Date("2024-12-31");
     v-model="date"
     :min-date="minDate"
     :max-date="maxDate"
-    placeholder="Select a date in 2024"
-  />
+    placeholder="Select a date in 2024" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import React, { useState } from "react";
-import { DatePicker } from "@tigercat/react";
+import React, { useState } from 'react'
+import { DatePicker } from '@tigercat/react'
 
 function App() {
-  const [date, setDate] = useState<Date | null>(null);
-  const minDate = new Date("2024-01-01");
-  const maxDate = new Date("2024-12-31");
+  const [date, setDate] = useState<Date | null>(null)
+  const minDate = new Date('2024-01-01')
+  const maxDate = new Date('2024-12-31')
 
   return (
     <DatePicker
@@ -147,7 +140,7 @@ function App() {
       maxDate={maxDate}
       placeholder="Select a date in 2024"
     />
-  );
+  )
 }
 ```
 
@@ -177,10 +170,10 @@ function App() {
 
 ```vue
 <script setup lang="ts">
-import { ref } from "vue";
-import { DatePicker } from "@tigercat/vue";
+import { ref } from 'vue'
+import { DatePicker } from '@tigercat/vue'
 
-const date = ref(new Date());
+const date = ref(new Date())
 </script>
 
 <template>
@@ -192,18 +185,18 @@ const date = ref(new Date());
 ### React
 
 ```tsx
-import React, { useState } from "react";
-import { DatePicker } from "@tigercat/react";
+import React, { useState } from 'react'
+import { DatePicker } from '@tigercat/react'
 
 function App() {
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(new Date())
 
   return (
     <>
       <DatePicker value={date} onChange={setDate} clearable={true} />
       <DatePicker value={date} onChange={setDate} clearable={false} />
     </>
-  );
+  )
 }
 ```
 
@@ -218,16 +211,11 @@ Vue 组件使用 `v-model` 进行双向绑定，本质上是受控组件。
 React 支持非受控模式，使用 `defaultValue` 属性。
 
 ```tsx
-import React from "react";
-import { DatePicker } from "@tigercat/react";
+import React from 'react'
+import { DatePicker } from '@tigercat/react'
 
 function App() {
-  return (
-    <DatePicker
-      defaultValue={new Date("2024-01-15")}
-      placeholder="Uncontrolled datepicker"
-    />
-  );
+  return <DatePicker defaultValue={new Date('2024-01-15')} placeholder="Uncontrolled datepicker" />
 }
 ```
 
@@ -307,13 +295,13 @@ DatePicker 组件支持通过 CSS 变量进行主题定制。
 ### 使用 setThemeColors 工具函数
 
 ```typescript
-import { setThemeColors } from "@tigercat/core";
+import { setThemeColors } from '@tigercat/core'
 
 setThemeColors({
-  primary: "#10b981",
-  primaryHover: "#059669",
-  primaryDisabled: "#6ee7b7",
-});
+  primary: '#10b981',
+  primaryHover: '#059669',
+  primaryDisabled: '#6ee7b7'
+})
 ```
 
 ## 无障碍支持
@@ -349,10 +337,10 @@ DatePicker 组件遵循 WAI-ARIA 规范，支持：
 组件提供完整的 TypeScript 类型定义。
 
 ```typescript
-import type { DatePickerSize, DateFormat } from "@tigercat/core";
-import type { DatePickerProps } from "@tigercat/vue"; // or '@tigercat/react'
+import type { DatePickerSize, DateFormat } from '@tigercat/core'
+import type { DatePickerProps } from '@tigercat/vue' // or '@tigercat/react'
 
 // 使用类型
-const size: DatePickerSize = "md";
-const format: DateFormat = "yyyy-MM-dd";
+const size: DatePickerSize = 'md'
+const format: DateFormat = 'yyyy-MM-dd'
 ```

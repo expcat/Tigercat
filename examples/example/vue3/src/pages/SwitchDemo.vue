@@ -40,10 +40,8 @@ const sizeLg = ref(false)
       <p class="text-gray-600 mb-6">通过设置 disabled 属性来禁用开关。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space>
-          <Switch v-model:checked="disabledOn"
-                  disabled />
-          <Switch v-model:checked="disabledOff"
-                  disabled />
+          <Switch v-model:checked="disabledOn" disabled />
+          <Switch v-model:checked="disabledOff" disabled />
         </Space>
       </div>
       <Divider class="my-6" />
@@ -55,12 +53,9 @@ const sizeLg = ref(false)
       <p class="text-gray-600 mb-6">开关有三种尺寸。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space align="center">
-          <Switch v-model:checked="sizeSm"
-                  size="sm" />
-          <Switch v-model:checked="sizeMd"
-                  size="md" />
-          <Switch v-model:checked="sizeLg"
-                  size="lg" />
+          <Switch v-model:checked="sizeSm" size="sm" />
+          <Switch v-model:checked="sizeMd" size="md" />
+          <Switch v-model:checked="sizeLg" size="lg" />
         </Space>
       </div>
     </section>

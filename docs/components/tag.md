@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Tag } from '@tigercat/vue';
+import { Tag } from '@tigercat/vue'
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Tag } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Tag } from '@tigercat/react';
+import { Tag } from '@tigercat/react'
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
       <Tag variant="primary">Primary Tag</Tag>
       <Tag variant="success">Success Tag</Tag>
     </>
-  );
+  )
 }
 ```
 
@@ -123,11 +123,7 @@ const handleCloseKeepVisible = (event: MouseEvent) => {
 </script>
 
 <template>
-  <Tag
-    v-for="(tag, index) in tags"
-    :key="tag"
-    closable
-    @close="handleClose(index)">
+  <Tag v-for="(tag, index) in tags" :key="tag" closable @close="handleClose(index)">
     {{ tag }}
   </Tag>
 
@@ -138,15 +134,15 @@ const handleCloseKeepVisible = (event: MouseEvent) => {
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Tag } from '@tigercat/react';
+import { useState } from 'react'
+import { Tag } from '@tigercat/react'
 
 function App() {
-  const [tags, setTags] = useState(['Tag 1', 'Tag 2', 'Tag 3']);
+  const [tags, setTags] = useState(['Tag 1', 'Tag 2', 'Tag 3'])
 
   const handleClose = (index: number) => {
-    setTags(tags.filter((_, i) => i !== index));
-  };
+    setTags(tags.filter((_, i) => i !== index))
+  }
 
   return (
     <>
@@ -159,12 +155,12 @@ function App() {
       <Tag
         closable
         onClose={(event) => {
-          event.preventDefault();
+          event.preventDefault()
         }}>
         点击关闭不会移除
       </Tag>
     </>
-  );
+  )
 }
 ```
 
@@ -177,15 +173,9 @@ function App() {
 ```vue
 <template>
   <div class="flex flex-wrap gap-2">
-    <Tag variant="primary" size="sm" closable @close="handleClose">
-      Primary Small
-    </Tag>
-    <Tag variant="success" size="md" closable @close="handleClose">
-      Success Medium
-    </Tag>
-    <Tag variant="warning" size="lg" closable @close="handleClose">
-      Warning Large
-    </Tag>
+    <Tag variant="primary" size="sm" closable @close="handleClose"> Primary Small </Tag>
+    <Tag variant="success" size="md" closable @close="handleClose"> Success Medium </Tag>
+    <Tag variant="warning" size="lg" closable @close="handleClose"> Warning Large </Tag>
   </div>
 </template>
 ```

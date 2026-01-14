@@ -1,29 +1,23 @@
-import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useRef, useState } from 'react'
 import {
   autoResizeTextarea,
   classNames,
   getInputClasses,
-  type TextareaProps as CoreTextareaProps,
-} from '@tigercat/core';
+  type TextareaProps as CoreTextareaProps
+} from '@tigercat/core'
 
 export interface TextareaProps
-  extends CoreTextareaProps,
+  extends
+    CoreTextareaProps,
     Omit<
       React.TextareaHTMLAttributes<HTMLTextAreaElement>,
-      | 'size'
-      | 'value'
-      | 'defaultValue'
-      | 'onInput'
-      | 'onChange'
-      | 'onFocus'
-      | 'onBlur'
-      | 'readOnly'
+      'size' | 'value' | 'defaultValue' | 'onInput' | 'onChange' | 'onFocus' | 'onBlur' | 'readOnly'
     > {
-  onInput?: (event: React.FormEvent<HTMLTextAreaElement>) => void;
-  onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
-  onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
-  onBlur?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
-  className?: string;
+  onInput?: (event: React.FormEvent<HTMLTextAreaElement>) => void
+  onChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void
+  onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => void
+  onBlur?: (event: React.FocusEvent<HTMLTextAreaElement>) => void
+  className?: string
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -52,49 +46,47 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     },
     ref
   ) => {
-    const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-    const [internalValue, setInternalValue] = useState(defaultValue || '');
+    const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+    const [internalValue, setInternalValue] = useState(defaultValue || '')
 
-    const isControlled = value !== undefined;
-    const currentValue = isControlled ? value : internalValue;
+    const isControlled = value !== undefined
+    const currentValue = isControlled ? value : internalValue
 
     const setRefs = (node: HTMLTextAreaElement | null) => {
-      textareaRef.current = node;
-      if (typeof ref === 'function') ref(node);
-      else if (ref)
-        (ref as React.MutableRefObject<HTMLTextAreaElement | null>).current =
-          node;
-    };
+      textareaRef.current = node
+      if (typeof ref === 'function') ref(node)
+      else if (ref) (ref as React.MutableRefObject<HTMLTextAreaElement | null>).current = node
+    }
 
     useEffect(() => {
-      if (!autoResize || !textareaRef.current) return;
-      autoResizeTextarea(textareaRef.current, { minRows, maxRows });
-    }, [autoResize, currentValue, minRows, maxRows]);
+      if (!autoResize || !textareaRef.current) return
+      autoResizeTextarea(textareaRef.current, { minRows, maxRows })
+    }, [autoResize, currentValue, minRows, maxRows])
 
     const textareaClasses = classNames(
       'block',
       getInputClasses(size),
       autoResize ? 'resize-none' : 'resize-y',
       className
-    );
+    )
 
     const handleInput = (event: React.FormEvent<HTMLTextAreaElement>) => {
       if (!isControlled) {
-        setInternalValue(event.currentTarget.value);
+        setInternalValue(event.currentTarget.value)
       }
 
-      onInput?.(event);
+      onInput?.(event)
 
       if (autoResize) {
-        autoResizeTextarea(event.currentTarget, { minRows, maxRows });
+        autoResizeTextarea(event.currentTarget, { minRows, maxRows })
       }
-    };
+    }
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      onChange?.(event);
-    };
+      onChange?.(event)
+    }
 
-    const currentLength = currentValue?.length ?? 0;
+    const currentLength = currentValue?.length ?? 0
 
     return (
       <div className="w-full">
@@ -122,8 +114,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           </div>
         )}
       </div>
-    );
+    )
   }
-);
+)
 
-Textarea.displayName = 'Textarea';
+Textarea.displayName = 'Textarea'

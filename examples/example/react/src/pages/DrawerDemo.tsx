@@ -1,22 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   Drawer,
   Button,
   Space,
   Divider,
   type DrawerPlacement,
-  type DrawerSize,
-} from '@tigercat/react';
+  type DrawerSize
+} from '@tigercat/react'
 
 const DestroyOnCloseContent: React.FC = () => {
-  const [value, setValue] = useState('');
-  const [count, setCount] = useState(0);
+  const [value, setValue] = useState('')
+  const [count, setCount] = useState(0)
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-600">
-        这个区域的内部状态会在关闭后重置（示例计数：{count}）
-      </p>
+      <p className="text-sm text-gray-600">这个区域的内部状态会在关闭后重置（示例计数：{count}）</p>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           输入框（关闭后会重置）
@@ -38,13 +36,10 @@ const DestroyOnCloseContent: React.FC = () => {
         </Button>
       </Space>
     </div>
-  );
-};
+  )
+}
 
-const getCloseFooter = (
-  onClose: () => void,
-  primaryAction?: React.ReactNode
-) => {
+const getCloseFooter = (onClose: () => void, primaryAction?: React.ReactNode) => {
   return (
     <Space>
       <Button variant="secondary" onClick={onClose}>
@@ -52,92 +47,90 @@ const getCloseFooter = (
       </Button>
       {primaryAction}
     </Space>
-  );
-};
+  )
+}
 
 const DrawerDemo: React.FC = () => {
   // Basic drawer
-  const [basicVisible, setBasicVisible] = useState(false);
+  const [basicVisible, setBasicVisible] = useState(false)
 
   // Placement drawers
-  const [placementVisible, setPlacementVisible] = useState(false);
-  const [placement, setPlacement] = useState<DrawerPlacement>('right');
+  const [placementVisible, setPlacementVisible] = useState(false)
+  const [placement, setPlacement] = useState<DrawerPlacement>('right')
 
   // Size drawers
-  const [sizeVisible, setSizeVisible] = useState(false);
-  const [size, setSize] = useState<DrawerSize>('md');
+  const [sizeVisible, setSizeVisible] = useState(false)
+  const [size, setSize] = useState<DrawerSize>('md')
 
   // Custom content drawer
-  const [customVisible, setCustomVisible] = useState(false);
+  const [customVisible, setCustomVisible] = useState(false)
 
   const handleSubmit = () => {
-    console.log('提交');
-    setCustomVisible(false);
-  };
+    console.log('提交')
+    setCustomVisible(false)
+  }
 
   // No mask drawer
-  const [noMaskVisible, setNoMaskVisible] = useState(false);
+  const [noMaskVisible, setNoMaskVisible] = useState(false)
 
   // Not closable by mask
-  const [notClosableVisible, setNotClosableVisible] = useState(false);
+  const [notClosableVisible, setNotClosableVisible] = useState(false)
 
   // Destroy on close
-  const [destroyVisible, setDestroyVisible] = useState(false);
+  const [destroyVisible, setDestroyVisible] = useState(false)
 
   const closeAll = () => {
-    setBasicVisible(false);
-    setPlacementVisible(false);
-    setSizeVisible(false);
-    setCustomVisible(false);
-    setNoMaskVisible(false);
-    setNotClosableVisible(false);
-    setDestroyVisible(false);
-  };
+    setBasicVisible(false)
+    setPlacementVisible(false)
+    setSizeVisible(false)
+    setCustomVisible(false)
+    setNoMaskVisible(false)
+    setNotClosableVisible(false)
+    setDestroyVisible(false)
+  }
 
   const openBasic = () => {
-    closeAll();
-    setBasicVisible(true);
-  };
+    closeAll()
+    setBasicVisible(true)
+  }
 
   const showPlacementDrawer = (pos: DrawerPlacement) => {
-    closeAll();
-    setPlacement(pos);
-    setPlacementVisible(true);
-  };
+    closeAll()
+    setPlacement(pos)
+    setPlacementVisible(true)
+  }
 
   const showSizeDrawer = (s: DrawerSize) => {
-    closeAll();
-    setSize(s);
-    setSizeVisible(true);
-  };
+    closeAll()
+    setSize(s)
+    setSizeVisible(true)
+  }
 
   const openCustom = () => {
-    closeAll();
-    setCustomVisible(true);
-  };
+    closeAll()
+    setCustomVisible(true)
+  }
 
   const openNoMask = () => {
-    closeAll();
-    setNoMaskVisible(true);
-  };
+    closeAll()
+    setNoMaskVisible(true)
+  }
 
   const openNotClosable = () => {
-    closeAll();
-    setNotClosableVisible(true);
-  };
+    closeAll()
+    setNotClosableVisible(true)
+  }
 
   const openDestroy = () => {
-    closeAll();
-    setDestroyVisible(true);
-  };
+    closeAll()
+    setDestroyVisible(true)
+  }
 
   return (
     <div className="max-w-5xl mx-auto p-6 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Drawer 抽屉</h1>
-        <p className="text-gray-600">
-          从页面边缘滑出的面板，用于展示详细信息或进行操作。
-        </p>
+        <p className="text-gray-600">从页面边缘滑出的面板，用于展示详细信息或进行操作。</p>
       </div>
 
       {/* 基本使用 */}
@@ -162,8 +155,7 @@ const DrawerDemo: React.FC = () => {
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">不同位置</h2>
         <p className="text-gray-600 mb-6">
-          通过{' '}
-          <code className="px-1 py-0.5 bg-gray-200 rounded">placement</code>{' '}
+          通过 <code className="px-1 py-0.5 bg-gray-200 rounded">placement</code>{' '}
           属性设置抽屉从不同方向弹出。
         </p>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -205,8 +197,7 @@ const DrawerDemo: React.FC = () => {
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">不同尺寸</h2>
         <p className="text-gray-600 mb-6">
-          通过 <code className="px-1 py-0.5 bg-gray-200 rounded">size</code>{' '}
-          属性设置抽屉的大小。
+          通过 <code className="px-1 py-0.5 bg-gray-200 rounded">size</code> 属性设置抽屉的大小。
         </p>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Space>
@@ -251,9 +242,7 @@ const DrawerDemo: React.FC = () => {
       {/* 自定义头部和底部 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">自定义头部和底部</h2>
-        <p className="text-gray-600 mb-6">
-          使用 header 和 footer 属性自定义头部和底部内容。
-        </p>
+        <p className="text-gray-600 mb-6">使用 header 和 footer 属性自定义头部和底部内容。</p>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={openCustom}>打开自定义抽屉</Button>
           <Drawer
@@ -275,9 +264,7 @@ const DrawerDemo: React.FC = () => {
             onClose={() => setCustomVisible(false)}>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  选项 1
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">选项 1</label>
                 <input
                   type="text"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -285,9 +272,7 @@ const DrawerDemo: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  选项 2
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">选项 2</label>
                 <input
                   type="text"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -304,8 +289,7 @@ const DrawerDemo: React.FC = () => {
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">无蒙层</h2>
         <p className="text-gray-600 mb-6">
-          设置{' '}
-          <code className="px-1 py-0.5 bg-gray-200 rounded">mask=false</code>{' '}
+          设置 <code className="px-1 py-0.5 bg-gray-200 rounded">mask=false</code>{' '}
           可以不显示遮罩层。
         </p>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -318,9 +302,7 @@ const DrawerDemo: React.FC = () => {
             onClose={() => setNoMaskVisible(false)}>
             <p>这个抽屉没有蒙层</p>
             <p>你可以与页面其他部分交互</p>
-            <p className="mt-2 text-sm text-gray-500">
-              建议仍保留明确的关闭入口（关闭按钮/ESC）。
-            </p>
+            <p className="mt-2 text-sm text-gray-500">建议仍保留明确的关闭入口（关闭按钮/ESC）。</p>
           </Drawer>
         </div>
         <Divider className="my-6" />
@@ -330,10 +312,7 @@ const DrawerDemo: React.FC = () => {
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">点击蒙层不关闭</h2>
         <p className="text-gray-600 mb-6">
-          设置{' '}
-          <code className="px-1 py-0.5 bg-gray-200 rounded">
-            maskClosable=false
-          </code>{' '}
+          设置 <code className="px-1 py-0.5 bg-gray-200 rounded">maskClosable=false</code>{' '}
           可以禁止点击蒙层关闭抽屉。
         </p>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -355,10 +334,7 @@ const DrawerDemo: React.FC = () => {
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">关闭时销毁</h2>
         <p className="text-gray-600 mb-6">
-          设置{' '}
-          <code className="px-1 py-0.5 bg-gray-200 rounded">
-            destroyOnClose
-          </code>{' '}
+          设置 <code className="px-1 py-0.5 bg-gray-200 rounded">destroyOnClose</code>{' '}
           可以在关闭时销毁内容，适用于表单重置等场景。
         </p>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -374,7 +350,7 @@ const DrawerDemo: React.FC = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default DrawerDemo;
+export default DrawerDemo

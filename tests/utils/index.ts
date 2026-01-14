@@ -6,7 +6,7 @@
  */
 
 // Vue-specific helpers
-export * from './render-helpers';
-export * from './a11y-helpers';
-export * from './theme-helpers';
-export * from './test-fixtures';
+export * from './render-helpers'
+export * from './a11y-helpers'
+export * from './theme-helpers'
+export * from './test-fixtures'

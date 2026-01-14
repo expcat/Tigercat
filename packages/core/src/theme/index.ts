@@ -10,7 +10,7 @@ export * from './slider'
 /**
  * CSS variables for theme colors
  * These can be set on :root or any parent element to override theme colors
- * 
+ *
  * @example
  * ```css
  * :root {
@@ -24,7 +24,7 @@ export * from './slider'
  *   --tiger-ghost-bg-hover: #eff6ff;
  * }
  * ```
- * 
+ *
  * @example
  * For dark mode:
  * ```css
@@ -44,25 +44,25 @@ export const THEME_CSS_VARS = {
   secondaryHover: '--tiger-secondary-hover',
   secondaryDisabled: '--tiger-secondary-disabled',
   outlineBgHover: '--tiger-outline-bg-hover',
-  ghostBgHover: '--tiger-ghost-bg-hover',
+  ghostBgHover: '--tiger-ghost-bg-hover'
 } as const
 
 /**
  * Helper function to set theme colors programmatically
- * 
+ *
  * @param colors - Object with color values to set
  * @param element - Element to set colors on (defaults to document.documentElement)
- * 
+ *
  * @example
  * ```typescript
  * import { setThemeColors } from '@tigercat/core'
- * 
+ *
  * // Set colors on root
  * setThemeColors({
  *   primary: '#ff0000',
  *   primaryHover: '#cc0000',
  * })
- * 
+ *
  * // Set colors on specific element
  * const container = document.querySelector('.my-container')
  * setThemeColors({
@@ -75,9 +75,11 @@ export function setThemeColors(
   element?: HTMLElement
 ): void {
   const target = element || (typeof document !== 'undefined' ? document.documentElement : null)
-  
+
   if (!target) {
-    console.warn('Cannot set theme colors: document is not available (SSR environment or non-browser context)')
+    console.warn(
+      'Cannot set theme colors: document is not available (SSR environment or non-browser context)'
+    )
     return
   }
 
@@ -91,15 +93,15 @@ export function setThemeColors(
 
 /**
  * Helper function to get current theme color value
- * 
+ *
  * @param colorKey - Key of the color to get
  * @param element - Element to get color from (defaults to document.documentElement)
  * @returns The current color value or undefined
- * 
+ *
  * @example
  * ```typescript
  * import { getThemeColor } from '@tigercat/core'
- * 
+ *
  * const primaryColor = getThemeColor('primary')
  * console.log(primaryColor) // '#2563eb'
  * ```
@@ -109,13 +111,13 @@ export function getThemeColor(
   element?: HTMLElement
 ): string | undefined {
   const target = element || (typeof document !== 'undefined' ? document.documentElement : null)
-  
+
   if (!target) {
     return undefined
   }
 
   const varName = THEME_CSS_VARS[colorKey]
   const value = getComputedStyle(target).getPropertyValue(varName).trim()
-  
+
   return value || undefined
 }

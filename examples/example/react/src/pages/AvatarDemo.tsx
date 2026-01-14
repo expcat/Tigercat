@@ -1,4 +1,4 @@
-import { Avatar, Space, Divider, Badge } from '@tigercat/react';
+import { Avatar, Space, Divider, Badge } from '@tigercat/react'
 
 export default function AvatarDemo() {
   return (
@@ -49,11 +49,7 @@ export default function AvatarDemo() {
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <Avatar>
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -63,11 +59,7 @@ export default function AvatarDemo() {
               </svg>
             </Avatar>
             <Avatar>
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -77,11 +69,7 @@ export default function AvatarDemo() {
               </svg>
             </Avatar>
             <Avatar>
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -133,17 +121,12 @@ export default function AvatarDemo() {
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">自定义颜色</h2>
         <p className="text-gray-600 mb-6">
-          可以通过 bgColor 和 textColor 自定义文字/图标头像颜色，推荐使用主题
-          CSS 变量以便跟随主题。
+          可以通过 bgColor 和 textColor 自定义文字/图标头像颜色，推荐使用主题 CSS 变量以便跟随主题。
         </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <Avatar text="默认" />
-            <Avatar
-              text="主"
-              bgColor="bg-[var(--tiger-primary,#2563eb)]"
-              textColor="text-white"
-            />
+            <Avatar text="主" bgColor="bg-[var(--tiger-primary,#2563eb)]" textColor="text-white" />
             <Avatar
               text="次"
               bgColor="bg-[var(--tiger-secondary,#4b5563)]"
@@ -165,10 +148,7 @@ export default function AvatarDemo() {
           <div className="p-6 bg-gray-50 rounded-lg">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <Avatar
-                  src="https://i.pravatar.cc/150?img=11"
-                  alt="Alice Johnson"
-                />
+                <Avatar src="https://i.pravatar.cc/150?img=11" alt="Alice Johnson" />
                 <div>
                   <div className="font-medium">Alice Johnson</div>
                   <div className="text-sm text-gray-500">alice@example.com</div>
@@ -187,9 +167,7 @@ export default function AvatarDemo() {
                 <Avatar text="张三" />
                 <div>
                   <div className="font-medium">张三</div>
-                  <div className="text-sm text-gray-500">
-                    zhangsan@example.com
-                  </div>
+                  <div className="text-sm text-gray-500">zhangsan@example.com</div>
                 </div>
               </div>
             </div>
@@ -244,37 +222,21 @@ export default function AvatarDemo() {
           <div className="p-6 bg-gray-50 rounded-lg">
             <Space wrap>
               <div className="flex items-center gap-3">
-                <Badge
-                  type="dot"
-                  variant="success"
-                  standalone={false}
-                  position="bottom-right">
-                  <Avatar
-                    src="https://i.pravatar.cc/150?img=31"
-                    alt="Online User"
-                    size="lg"
-                  />
+                <Badge type="dot" variant="success" standalone={false} position="bottom-right">
+                  <Avatar src="https://i.pravatar.cc/150?img=31" alt="Online User" size="lg" />
                 </Badge>
                 <span className="text-green-600 font-medium">在线</span>
               </div>
 
               <div className="flex items-center gap-3">
-                <Badge
-                  type="dot"
-                  variant="warning"
-                  standalone={false}
-                  position="bottom-right">
+                <Badge type="dot" variant="warning" standalone={false} position="bottom-right">
                   <Avatar text="忙碌" size="lg" />
                 </Badge>
                 <span className="text-yellow-600 font-medium">忙碌</span>
               </div>
 
               <div className="flex items-center gap-3">
-                <Badge
-                  type="dot"
-                  variant="default"
-                  standalone={false}
-                  position="bottom-right">
+                <Badge type="dot" variant="default" standalone={false} position="bottom-right">
                   <Avatar text="离线" size="lg" />
                 </Badge>
                 <span className="text-gray-500">离线</span>
@@ -289,11 +251,7 @@ export default function AvatarDemo() {
           <div className="p-6 bg-gray-50 rounded-lg">
             <div className="space-y-4">
               <div className="flex gap-3">
-                <Avatar
-                  src="https://i.pravatar.cc/150?img=41"
-                  alt="User"
-                  size="md"
-                />
+                <Avatar src="https://i.pravatar.cc/150?img=41" alt="User" size="md" />
                 <div className="flex-1">
                   <div className="font-medium mb-1">Alice Johnson</div>
                   <div className="text-gray-600 text-sm">
@@ -318,5 +276,5 @@ export default function AvatarDemo() {
         </div>
       </section>
     </div>
-  );
+  )
 }

@@ -1,17 +1,12 @@
-import React from 'react';
-import {
-  getContainerClasses,
-  type ContainerProps as CoreContainerProps,
-} from '@tigercat/core';
+import React from 'react'
+import { getContainerClasses, type ContainerProps as CoreContainerProps } from '@tigercat/core'
 
-export interface ContainerProps
-  extends CoreContainerProps,
-    React.HTMLAttributes<HTMLElement> {
+export interface ContainerProps extends CoreContainerProps, React.HTMLAttributes<HTMLElement> {
   /**
    * HTML element to render as
    * @default 'div'
    */
-  as?: React.ElementType;
+  as?: React.ElementType
 }
 
 export const Container: React.FC<ContainerProps> = ({
@@ -27,12 +22,12 @@ export const Container: React.FC<ContainerProps> = ({
     maxWidth,
     center,
     padding,
-    className,
-  });
+    className
+  })
 
   return (
     <Component {...props} className={containerClasses}>
       {children}
     </Component>
-  );
-};
+  )
+}

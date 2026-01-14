@@ -2,14 +2,14 @@
  * Checkbox component types and interfaces
  */
 
-export type CheckboxValue = string | number | boolean;
+export type CheckboxValue = string | number | boolean
 
-export type CheckboxGroupValue = CheckboxValue[];
+export type CheckboxGroupValue = CheckboxValue[]
 
 /**
  * Checkbox size types
  */
-export type CheckboxSize = 'sm' | 'md' | 'lg';
+export type CheckboxSize = 'sm' | 'md' | 'lg'
 
 /**
  * Base checkbox props interface
@@ -19,24 +19,24 @@ export interface CheckboxProps {
    * Checkbox size
    * @default 'md'
    */
-  size?: CheckboxSize;
+  size?: CheckboxSize
 
   /**
    * Whether the checkbox is disabled
    * @default false
    */
-  disabled?: boolean;
+  disabled?: boolean
 
   /**
    * Checkbox value (for use in checkbox groups)
    */
-  value?: CheckboxValue;
+  value?: CheckboxValue
 
   /**
    * Whether the checkbox is in indeterminate state
    * @default false
    */
-  indeterminate?: boolean;
+  indeterminate?: boolean
 }
 
 /**
@@ -47,11 +47,11 @@ export interface CheckboxGroupProps {
    * Whether the checkbox group is disabled
    * @default false
    */
-  disabled?: boolean;
+  disabled?: boolean
 
   /**
    * Checkbox size for all checkboxes in the group
    * @default 'md'
    */
-  size?: CheckboxSize;
+  size?: CheckboxSize
 }

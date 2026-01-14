@@ -1,19 +1,20 @@
-import React from "react";
+import React from 'react'
 import {
   classNames,
   getDropdownMenuClasses,
-  type DropdownMenuProps as CoreDropdownMenuProps,
-} from "@tigercat/core";
+  type DropdownMenuProps as CoreDropdownMenuProps
+} from '@tigercat/core'
 
 export interface DropdownMenuProps
-  extends Omit<CoreDropdownMenuProps, "style">,
-    Omit<React.HTMLAttributes<HTMLDivElement>, "style"> {
-  style?: React.CSSProperties;
+  extends
+    Omit<CoreDropdownMenuProps, 'style'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
+  style?: React.CSSProperties
 
   /**
    * Menu content
    */
-  children?: React.ReactNode;
+  children?: React.ReactNode
 }
 
 export const DropdownMenu: React.FC<DropdownMenuProps> = ({
@@ -23,16 +24,11 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   role,
   ...divProps
 }) => {
-  const menuClasses = classNames(getDropdownMenuClasses(), className);
+  const menuClasses = classNames(getDropdownMenuClasses(), className)
 
   return (
-    <div
-      className={menuClasses}
-      style={style}
-      role={role ?? "menu"}
-      {...divProps}
-    >
+    <div className={menuClasses} style={style} role={role ?? 'menu'} {...divProps}>
       {children}
     </div>
-  );
-};
+  )
+}

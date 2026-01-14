@@ -177,7 +177,9 @@ export default function DropdownDemo() {
             <DropdownMenu>
               <DropdownItem onClick={() => handleCommand('edit')}>编辑</DropdownItem>
               <DropdownItem onClick={() => handleCommand('copy')}>复制</DropdownItem>
-              <DropdownItem onClick={() => handleCommand('delete')} divided>删除</DropdownItem>
+              <DropdownItem onClick={() => handleCommand('delete')} divided>
+                删除
+              </DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </div>
@@ -187,7 +189,9 @@ export default function DropdownDemo() {
       {/* 受控模式 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">受控模式</h2>
-        <p className="text-gray-600 mb-6">通过 visible 和 onVisibleChange 控制下拉菜单的显示隐藏。</p>
+        <p className="text-gray-600 mb-6">
+          通过 visible 和 onVisibleChange 控制下拉菜单的显示隐藏。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="flex gap-4 items-center">
             <Dropdown visible={visible1} onVisibleChange={setVisible1}>

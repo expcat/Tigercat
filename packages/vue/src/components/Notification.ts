@@ -7,8 +7,8 @@ import {
   ref,
   Teleport,
   TransitionGroup,
-  type PropType,
-} from 'vue';
+  type PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -32,55 +32,51 @@ import {
   type NotificationConfig,
   type NotificationInstance,
   type NotificationOptions,
-  type NotificationPosition,
-} from '@tigercat/core';
+  type NotificationPosition
+} from '@tigercat/core'
 
-type HChildren = Parameters<typeof h>[2];
-type HArrayChildren = Extract<NonNullable<HChildren>, unknown[]>;
+type HChildren = Parameters<typeof h>[2]
+type HArrayChildren = Extract<NonNullable<HChildren>, unknown[]>
 
 /**
  * Global notification container id prefix
  */
-const NOTIFICATION_CONTAINER_ID_PREFIX = 'tiger-notification-container';
-const NOTIFICATION_CLOSE_ARIA_LABEL = 'Close notification';
+const NOTIFICATION_CONTAINER_ID_PREFIX = 'tiger-notification-container'
+const NOTIFICATION_CLOSE_ARIA_LABEL = 'Close notification'
 
-const IS_TEST_ENV =
-  typeof process !== 'undefined' && process.env?.NODE_ENV === 'test';
+const IS_TEST_ENV = typeof process !== 'undefined' && process.env?.NODE_ENV === 'test'
 
 /**
  * Notification instance storage per position
  */
-const notificationInstancesByPosition: Record<
-  NotificationPosition,
-  NotificationInstance[]
-> = {
+const notificationInstancesByPosition: Record<NotificationPosition, NotificationInstance[]> = {
   'top-left': [],
   'top-right': [],
   'bottom-left': [],
-  'bottom-right': [],
-};
+  'bottom-right': []
+}
 
-let instanceIdCounter = 0;
+let instanceIdCounter = 0
 
 const containerApps: Record<NotificationPosition, App<Element> | null> = {
   'top-left': null,
   'top-right': null,
   'bottom-left': null,
-  'bottom-right': null,
-};
+  'bottom-right': null
+}
 
 const updateCallbacks: Record<NotificationPosition, (() => void) | null> = {
   'top-left': null,
   'top-right': null,
   'bottom-left': null,
-  'bottom-right': null,
-};
+  'bottom-right': null
+}
 
 /**
  * Get next instance id
  */
 function getNextInstanceId(): number {
-  return ++instanceIdCounter;
+  return ++instanceIdCounter
 }
 
 /**
@@ -97,20 +93,20 @@ function createIcon(path: string, className: string) {
       stroke: 'currentColor',
       'stroke-width': String(icon24StrokeWidth),
       'aria-hidden': 'true',
-      focusable: 'false',
+      focusable: 'false'
     },
     [
       h('path', {
         'stroke-linecap': icon24PathStrokeLinecap,
         'stroke-linejoin': icon24PathStrokeLinejoin,
-        d: path,
-      }),
+        d: path
+      })
     ]
-  );
+  )
 }
 
 function getContainerRootId(position: NotificationPosition) {
-  return `${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}-root`;
+  return `${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}-root`
 }
 
 /**
@@ -122,20 +118,18 @@ export const NotificationContainer = defineComponent({
   props: {
     position: {
       type: String as PropType<NotificationPosition>,
-      default: 'top-right' as NotificationPosition,
-    },
+      default: 'top-right' as NotificationPosition
+    }
   },
   setup(props, { attrs }) {
-    const notifications = ref<NotificationInstance[]>([]);
+    const notifications = ref<NotificationInstance[]>([])
 
     const syncNotifications = () => {
-      notifications.value = [
-        ...notificationInstancesByPosition[props.position],
-      ];
-    };
+      notifications.value = [...notificationInstancesByPosition[props.position]]
+    }
 
-    updateCallbacks[props.position] = syncNotifications;
-    syncNotifications();
+    updateCallbacks[props.position] = syncNotifications
+    syncNotifications()
 
     const containerClasses = computed(() =>
       classNames(
@@ -143,57 +137,53 @@ export const NotificationContainer = defineComponent({
         notificationPositionClasses[props.position],
         coerceClassValue(attrs.class)
       )
-    );
+    )
 
     const renderNotificationItem = (notification: NotificationInstance) => {
       const colorScheme = getNotificationTypeClasses(
         notification.type,
         defaultNotificationThemeColors
-      );
+      )
 
       const notificationClasses = classNames(
         notificationBaseClasses,
         colorScheme.bg,
         colorScheme.border,
         notification.className
-      );
+      )
 
-      const iconPath =
-        notification.icon || getNotificationIconPath(notification.type);
-      const iconClass = classNames(notificationIconClasses, colorScheme.icon);
+      const iconPath = notification.icon || getNotificationIconPath(notification.type)
+      const iconClass = classNames(notificationIconClasses, colorScheme.icon)
 
-      const a11yRole = notification.type === 'error' ? 'alert' : 'status';
-      const ariaLive = notification.type === 'error' ? 'assertive' : 'polite';
+      const a11yRole = notification.type === 'error' ? 'alert' : 'status'
+      const ariaLive = notification.type === 'error' ? 'assertive' : 'polite'
 
       const contentChildren = [
         h(
           'div',
           {
-            class: classNames(notificationTitleClasses, colorScheme.titleText),
+            class: classNames(notificationTitleClasses, colorScheme.titleText)
           },
           notification.title
-        ),
-      ];
+        )
+      ]
 
       if (notification.description) {
         contentChildren.push(
           h(
             'div',
             {
-              class: classNames(
-                notificationDescriptionClasses,
-                colorScheme.descriptionText
-              ),
+              class: classNames(notificationDescriptionClasses, colorScheme.descriptionText)
             },
             notification.description
           )
-        );
+        )
       }
 
       const children: HArrayChildren = [
         createIcon(iconPath, iconClass),
-        h('div', { class: notificationContentClasses }, contentChildren),
-      ];
+        h('div', { class: notificationContentClasses }, contentChildren)
+      ]
 
       if (notification.closable) {
         children.push(
@@ -202,15 +192,15 @@ export const NotificationContainer = defineComponent({
             {
               class: notificationCloseButtonClasses,
               onClick: (e: MouseEvent) => {
-                e.stopPropagation();
-                removeNotification(notification.id, props.position);
+                e.stopPropagation()
+                removeNotification(notification.id, props.position)
               },
               'aria-label': NOTIFICATION_CLOSE_ARIA_LABEL,
-              type: 'button',
+              type: 'button'
             },
             createIcon(notificationCloseIconPath, notificationCloseIconClasses)
           )
-        );
+        )
       }
 
       return h(
@@ -223,22 +213,22 @@ export const NotificationContainer = defineComponent({
           'aria-atomic': 'true',
           onClick: notification.onClick,
           onKeydown: (e: KeyboardEvent) => {
-            if (!notification.onClick) return;
-            const key = e.key;
+            if (!notification.onClick) return
+            const key = e.key
             if (key === 'Enter' || key === ' ') {
-              e.preventDefault();
-              notification.onClick();
+              e.preventDefault()
+              notification.onClick()
             }
           },
           tabindex: notification.onClick ? 0 : undefined,
           style: notification.onClick ? 'cursor: pointer;' : undefined,
           'data-tiger-notification': '',
           'data-tiger-notification-type': notification.type,
-          'data-tiger-notification-id': String(notification.id),
+          'data-tiger-notification-id': String(notification.id)
         },
         children
-      );
-    };
+      )
+    }
 
     return () =>
       h(
@@ -253,7 +243,7 @@ export const NotificationContainer = defineComponent({
             'aria-live': 'polite',
             'aria-relevant': 'additions',
             'data-tiger-notification-container': '',
-            'data-tiger-notification-position': props.position,
+            'data-tiger-notification-position': props.position
           },
           IS_TEST_ENV
             ? notifications.value.map(renderNotificationItem)
@@ -262,58 +252,57 @@ export const NotificationContainer = defineComponent({
                 {
                   name: 'notification',
                   tag: 'div',
-                  class: 'flex flex-col gap-3',
+                  class: 'flex flex-col gap-3'
                 },
                 () => notifications.value.map(renderNotificationItem)
               )
         )
-      );
-  },
-});
+      )
+  }
+})
 
 function ensureContainer(position: NotificationPosition) {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
-    return;
+    return
   }
 
-  const rootId = getContainerRootId(position);
-  const existingRootEl = document.getElementById(rootId);
+  const rootId = getContainerRootId(position)
+  const existingRootEl = document.getElementById(rootId)
 
   // If we already created an app but the DOM was externally cleared (e.g. tests), reset.
   if (containerApps[position] && !existingRootEl) {
-    containerApps[position] = null;
-    updateCallbacks[position] = null;
+    containerApps[position] = null
+    updateCallbacks[position] = null
   }
 
   if (containerApps[position]) {
-    return;
+    return
   }
 
-  let rootEl = existingRootEl;
+  let rootEl = existingRootEl
   if (!rootEl) {
-    rootEl = document.createElement('div');
-    rootEl.id = rootId;
-    document.body.appendChild(rootEl);
+    rootEl = document.createElement('div')
+    rootEl.id = rootId
+    document.body.appendChild(rootEl)
   }
 
-  containerApps[position] = createApp(NotificationContainer, { position });
-  containerApps[position]!.mount(rootEl);
+  containerApps[position] = createApp(NotificationContainer, { position })
+  containerApps[position]!.mount(rootEl)
 }
 
 function destroyContainer(position: NotificationPosition) {
-  const rootId = getContainerRootId(position);
+  const rootId = getContainerRootId(position)
 
   if (containerApps[position]) {
-    containerApps[position]!.unmount();
-    containerApps[position] = null;
+    containerApps[position]!.unmount()
+    containerApps[position] = null
   }
 
-  updateCallbacks[position] = null;
+  updateCallbacks[position] = null
 
-  const rootEl =
-    typeof document !== 'undefined' ? document.getElementById(rootId) : null;
+  const rootEl = typeof document !== 'undefined' ? document.getElementById(rootId) : null
   if (rootEl?.parentNode) {
-    rootEl.parentNode.removeChild(rootEl);
+    rootEl.parentNode.removeChild(rootEl)
   }
 }
 
@@ -321,10 +310,10 @@ function destroyContainer(position: NotificationPosition) {
  * Add a notification to the queue
  */
 function addNotification(config: NotificationConfig): () => void {
-  const id = getNextInstanceId();
-  const position = config.position || 'top-right';
+  const id = getNextInstanceId()
+  const position = config.position || 'top-right'
 
-  ensureContainer(position);
+  ensureContainer(position)
 
   const instance: NotificationInstance = {
     id,
@@ -337,45 +326,42 @@ function addNotification(config: NotificationConfig): () => void {
     onClick: config.onClick,
     icon: config.icon,
     className: config.className,
-    position,
-  };
+    position
+  }
 
-  notificationInstancesByPosition[position].push(instance);
+  notificationInstancesByPosition[position].push(instance)
 
-  updateCallbacks[position]?.();
+  updateCallbacks[position]?.()
 
   // Auto close after duration
   if (instance.duration > 0) {
     setTimeout(() => {
-      removeNotification(id, position);
-    }, instance.duration);
+      removeNotification(id, position)
+    }, instance.duration)
   }
 
   // Return close function
-  return () => removeNotification(id, position);
+  return () => removeNotification(id, position)
 }
 
 /**
  * Remove a notification from the queue
  */
-function removeNotification(
-  id: string | number,
-  position: NotificationPosition
-) {
-  const instances = notificationInstancesByPosition[position];
-  const index = instances.findIndex((notif) => notif.id === id);
+function removeNotification(id: string | number, position: NotificationPosition) {
+  const instances = notificationInstancesByPosition[position]
+  const index = instances.findIndex((notif) => notif.id === id)
   if (index !== -1) {
-    const instance = instances[index];
-    instances.splice(index, 1);
+    const instance = instances[index]
+    instances.splice(index, 1)
     if (instance.onClose) {
-      instance.onClose();
+      instance.onClose()
     }
   }
 
-  updateCallbacks[position]?.();
+  updateCallbacks[position]?.()
 
   if (notificationInstancesByPosition[position].length === 0) {
-    destroyContainer(position);
+    destroyContainer(position)
   }
 }
 
@@ -386,25 +372,25 @@ function clearAll(position?: NotificationPosition) {
   if (position) {
     notificationInstancesByPosition[position].forEach((instance) => {
       if (instance.onClose) {
-        instance.onClose();
+        instance.onClose()
       }
-    });
-    notificationInstancesByPosition[position] = [];
-    updateCallbacks[position]?.();
-    destroyContainer(position);
+    })
+    notificationInstancesByPosition[position] = []
+    updateCallbacks[position]?.()
+    destroyContainer(position)
   } else {
     // Clear all positions
     Object.keys(notificationInstancesByPosition).forEach((pos) => {
-      const p = pos as NotificationPosition;
+      const p = pos as NotificationPosition
       notificationInstancesByPosition[p].forEach((instance) => {
         if (instance.onClose) {
-          instance.onClose();
+          instance.onClose()
         }
-      });
-      notificationInstancesByPosition[p] = [];
-      updateCallbacks[p]?.();
-      destroyContainer(p);
-    });
+      })
+      notificationInstancesByPosition[p] = []
+      updateCallbacks[p]?.()
+      destroyContainer(p)
+    })
   }
 }
 
@@ -413,9 +399,9 @@ function clearAll(position?: NotificationPosition) {
  */
 function normalizeOptions(options: NotificationOptions): NotificationConfig {
   if (typeof options === 'string') {
-    return { title: options };
+    return { title: options }
   }
-  return options;
+  return options
 }
 
 /**
@@ -426,40 +412,40 @@ export const notification = {
    * Show an info notification
    */
   info(options: NotificationOptions): () => void {
-    const config = normalizeOptions(options);
-    return addNotification({ ...config, type: 'info' });
+    const config = normalizeOptions(options)
+    return addNotification({ ...config, type: 'info' })
   },
 
   /**
    * Show a success notification
    */
   success(options: NotificationOptions): () => void {
-    const config = normalizeOptions(options);
-    return addNotification({ ...config, type: 'success' });
+    const config = normalizeOptions(options)
+    return addNotification({ ...config, type: 'success' })
   },
 
   /**
    * Show a warning notification
    */
   warning(options: NotificationOptions): () => void {
-    const config = normalizeOptions(options);
-    return addNotification({ ...config, type: 'warning' });
+    const config = normalizeOptions(options)
+    return addNotification({ ...config, type: 'warning' })
   },
 
   /**
    * Show an error notification
    */
   error(options: NotificationOptions): () => void {
-    const config = normalizeOptions(options);
-    return addNotification({ ...config, type: 'error' });
+    const config = normalizeOptions(options)
+    return addNotification({ ...config, type: 'error' })
   },
 
   /**
    * Clear all notifications
    */
   clear(position?: NotificationPosition) {
-    clearAll(position);
-  },
-};
+    clearAll(position)
+  }
+}
 
-export default notification;
+export default notification

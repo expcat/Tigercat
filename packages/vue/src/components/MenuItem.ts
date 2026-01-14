@@ -1,4 +1,4 @@
-import { defineComponent, computed, inject, h, PropType } from 'vue';
+import { defineComponent, computed, inject, h, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -6,18 +6,18 @@ import {
   getMenuItemIndent,
   isKeySelected,
   menuItemIconClasses,
-  mergeStyleValues,
-} from '@tigercat/core';
-import { MenuContextKey, type MenuContext } from './Menu';
+  mergeStyleValues
+} from '@tigercat/core'
+import { MenuContextKey, type MenuContext } from './Menu'
 
 export interface VueMenuItemProps {
-  itemKey: string | number;
-  disabled?: boolean;
-  icon?: unknown;
-  level?: number;
-  collapsed?: boolean;
-  className?: string;
-  style?: Record<string, string | number>;
+  itemKey: string | number
+  disabled?: boolean
+  icon?: unknown
+  level?: number
+  collapsed?: boolean
+  className?: string
+  style?: Record<string, string | number>
 }
 
 export const MenuItem = defineComponent({
@@ -28,185 +28,174 @@ export const MenuItem = defineComponent({
      */
     itemKey: {
       type: [String, Number] as PropType<string | number>,
-      required: true,
+      required: true
     },
     /**
      * Whether the menu item is disabled
      */
     disabled: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Icon for the menu item
      */
     icon: {
-      type: [String, Object] as PropType<unknown>,
+      type: [String, Object] as PropType<unknown>
     },
     level: {
       type: Number,
-      default: 0,
+      default: 0
     },
     collapsed: {
       type: Boolean,
-      default: undefined,
+      default: undefined
     },
     className: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     style: {
       type: Object as PropType<Record<string, string | number>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   inheritAttrs: false,
   setup(props, { slots, attrs }) {
     // Inject menu context
-    const menuContext = inject<MenuContext>(MenuContextKey);
+    const menuContext = inject<MenuContext>(MenuContextKey)
 
     if (!menuContext) {
-      console.warn('MenuItem must be used within Menu component');
+      console.warn('MenuItem must be used within Menu component')
     }
 
     // Check if this item is selected
     const isSelected = computed(() => {
-      if (!menuContext) return false;
-      return isKeySelected(props.itemKey, menuContext.selectedKeys.value);
-    });
+      if (!menuContext) return false
+      return isKeySelected(props.itemKey, menuContext.selectedKeys.value)
+    })
 
     // Menu item classes
     const itemClasses = computed(() => {
       if (!menuContext) {
         return classNames(
           'flex items-center px-4 py-2 cursor-pointer transition-colors duration-200'
-        );
+        )
       }
 
-      const effectiveCollapsed =
-        props.collapsed ?? (menuContext ? menuContext.collapsed : false);
+      const effectiveCollapsed = props.collapsed ?? (menuContext ? menuContext.collapsed : false)
 
       return classNames(
-        getMenuItemClasses(
-          isSelected.value,
-          props.disabled,
-          menuContext.theme,
-          effectiveCollapsed
-        ),
+        getMenuItemClasses(isSelected.value, props.disabled, menuContext.theme, effectiveCollapsed),
         props.className,
         coerceClassValue(attrs.class)
-      );
-    });
+      )
+    })
 
     const indentStyle = computed(() => {
       if (!menuContext || menuContext.mode !== 'inline' || props.level === 0) {
-        return {};
+        return {}
       }
-      return getMenuItemIndent(props.level, menuContext.inlineIndent);
-    });
+      return getMenuItemIndent(props.level, menuContext.inlineIndent)
+    })
 
-    const itemStyle = computed(() =>
-      mergeStyleValues(attrs.style, props.style, indentStyle.value)
-    );
+    const itemStyle = computed(() => mergeStyleValues(attrs.style, props.style, indentStyle.value))
 
     const passthroughAttrs = computed(() => {
-      const { class: _class, style: _style, ...rest } = attrs;
-      return rest;
-    });
+      const { class: _class, style: _style, ...rest } = attrs
+      return rest
+    })
 
     // Handle click
     const handleClick = () => {
       if (!props.disabled && menuContext) {
-        menuContext.handleSelect(props.itemKey);
+        menuContext.handleSelect(props.itemKey)
       }
-    };
+    }
 
     const getMenuButtonsWithin = (menuEl: HTMLElement) => {
       return Array.from(
-        menuEl.querySelectorAll<HTMLButtonElement>(
-          'button[data-tiger-menuitem="true"]'
-        )
-      ).filter((el) => !el.disabled);
-    };
+        menuEl.querySelectorAll<HTMLButtonElement>('button[data-tiger-menuitem="true"]')
+      ).filter((el) => !el.disabled)
+    }
 
     const roveFocus = (current: HTMLButtonElement, next: HTMLButtonElement) => {
-      const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null;
+      const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
       if (!menuEl) {
-        next.focus();
-        return;
+        next.focus()
+        return
       }
 
-      const items = getMenuButtonsWithin(menuEl);
+      const items = getMenuButtonsWithin(menuEl)
       items.forEach((el) => {
-        el.tabIndex = el === next ? 0 : -1;
-      });
-      next.focus();
-    };
+        el.tabIndex = el === next ? 0 : -1
+      })
+      next.focus()
+    }
 
     const moveFocus = (current: HTMLButtonElement, delta: number) => {
-      const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null;
-      if (!menuEl) return;
-      const items = getMenuButtonsWithin(menuEl);
-      const currentIndex = items.indexOf(current);
-      if (currentIndex < 0) return;
-      const nextIndex = (currentIndex + delta + items.length) % items.length;
-      roveFocus(current, items[nextIndex]);
-    };
+      const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
+      if (!menuEl) return
+      const items = getMenuButtonsWithin(menuEl)
+      const currentIndex = items.indexOf(current)
+      if (currentIndex < 0) return
+      const nextIndex = (currentIndex + delta + items.length) % items.length
+      roveFocus(current, items[nextIndex])
+    }
 
     const focusEdge = (current: HTMLButtonElement, edge: 'start' | 'end') => {
-      const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null;
-      if (!menuEl) return;
-      const items = getMenuButtonsWithin(menuEl);
-      if (items.length === 0) return;
-      roveFocus(current, edge === 'start' ? items[0] : items[items.length - 1]);
-    };
+      const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
+      if (!menuEl) return
+      const items = getMenuButtonsWithin(menuEl)
+      if (items.length === 0) return
+      roveFocus(current, edge === 'start' ? items[0] : items[items.length - 1])
+    }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (!menuContext) return;
-      const current = event.currentTarget as HTMLButtonElement;
-      const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null;
-      const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true';
-      const isHorizontalRoot = isRoot && menuContext.mode === 'horizontal';
+      if (!menuContext) return
+      const current = event.currentTarget as HTMLButtonElement
+      const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null
+      const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true'
+      const isHorizontalRoot = isRoot && menuContext.mode === 'horizontal'
 
-      const nextKey = isHorizontalRoot ? 'ArrowRight' : 'ArrowDown';
-      const prevKey = isHorizontalRoot ? 'ArrowLeft' : 'ArrowUp';
+      const nextKey = isHorizontalRoot ? 'ArrowRight' : 'ArrowDown'
+      const prevKey = isHorizontalRoot ? 'ArrowLeft' : 'ArrowUp'
 
       if (event.key === nextKey) {
-        event.preventDefault();
-        moveFocus(current, 1);
-        return;
+        event.preventDefault()
+        moveFocus(current, 1)
+        return
       }
 
       if (event.key === prevKey) {
-        event.preventDefault();
-        moveFocus(current, -1);
-        return;
+        event.preventDefault()
+        moveFocus(current, -1)
+        return
       }
 
       if (event.key === 'Home') {
-        event.preventDefault();
-        focusEdge(current, 'start');
-        return;
+        event.preventDefault()
+        focusEdge(current, 'start')
+        return
       }
 
       if (event.key === 'End') {
-        event.preventDefault();
-        focusEdge(current, 'end');
-        return;
+        event.preventDefault()
+        focusEdge(current, 'end')
+        return
       }
 
       if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        handleClick();
+        event.preventDefault()
+        handleClick()
       }
-    };
+    }
 
     return () => {
-      const children = [];
-      type HChildren = Parameters<typeof h>[2];
+      const children = []
+      type HChildren = Parameters<typeof h>[2]
 
-      const effectiveCollapsed =
-        props.collapsed ?? (menuContext ? menuContext.collapsed : false);
+      const effectiveCollapsed = props.collapsed ?? (menuContext ? menuContext.collapsed : false)
 
       // Render icon if provided
       if (props.icon) {
@@ -214,38 +203,30 @@ export const MenuItem = defineComponent({
           children.push(
             h('span', {
               class: menuItemIconClasses,
-              innerHTML: props.icon,
+              innerHTML: props.icon
             })
-          );
+          )
         } else {
-          children.push(
-            h('span', { class: menuItemIconClasses }, props.icon as HChildren)
-          );
+          children.push(h('span', { class: menuItemIconClasses }, props.icon as HChildren))
         }
       }
 
       // Render label (slot content)
       if (!effectiveCollapsed && slots.default) {
-        children.push(h('span', { class: 'flex-1' }, slots.default()));
+        children.push(h('span', { class: 'flex-1' }, slots.default()))
       } else if (effectiveCollapsed && !props.icon && slots.default) {
         // Show first letter when collapsed without icon
-        const defaultSlot = slots.default();
+        const defaultSlot = slots.default()
         if (defaultSlot && defaultSlot.length > 0) {
-          const text = String(defaultSlot[0].children || '');
-          children.push(
-            h(
-              'span',
-              { class: 'flex-1 text-center' },
-              text.charAt(0).toUpperCase()
-            )
-          );
+          const text = String(defaultSlot[0].children || '')
+          children.push(h('span', { class: 'flex-1 text-center' }, text.charAt(0).toUpperCase()))
         }
       }
 
       return h(
         'li',
         {
-          role: 'none',
+          role: 'none'
         },
         [
           h(
@@ -263,14 +244,14 @@ export const MenuItem = defineComponent({
               tabindex: -1,
               onClick: handleClick,
               onKeydown: handleKeyDown,
-              ...passthroughAttrs.value,
+              ...passthroughAttrs.value
             },
             children
-          ),
+          )
         ]
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default MenuItem;
+export default MenuItem

@@ -2,248 +2,226 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { Tree } from "@tigercat/react";
-import { expectNoA11yViolations } from "../utils/react";
-import React from "react";
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { Tree } from '@tigercat/react'
+import { expectNoA11yViolations } from '../utils/react'
+import React from 'react'
 
 const sampleTreeData = [
   {
-    key: "1",
-    label: "Parent 1",
+    key: '1',
+    label: 'Parent 1',
     children: [
-      { key: "1-1", label: "Child 1-1" },
-      { key: "1-2", label: "Child 1-2" },
-    ],
+      { key: '1-1', label: 'Child 1-1' },
+      { key: '1-2', label: 'Child 1-2' }
+    ]
   },
   {
-    key: "2",
-    label: "Parent 2",
-    children: [{ key: "2-1", label: "Child 2-1" }],
-  },
-];
+    key: '2',
+    label: 'Parent 2',
+    children: [{ key: '2-1', label: 'Child 2-1' }]
+  }
+]
 
-describe("Tree", () => {
-  describe("Rendering", () => {
-    it("should render with default props", () => {
-      render(<Tree treeData={sampleTreeData} />);
+describe('Tree', () => {
+  describe('Rendering', () => {
+    it('should render with default props', () => {
+      render(<Tree treeData={sampleTreeData} />)
 
-      expect(screen.getByText("Parent 1")).toBeInTheDocument();
-      expect(screen.getByText("Parent 2")).toBeInTheDocument();
-    });
+      expect(screen.getByText('Parent 1')).toBeInTheDocument()
+      expect(screen.getByText('Parent 2')).toBeInTheDocument()
+    })
 
-    it("should render tree roles", () => {
-      render(<Tree treeData={sampleTreeData} />);
+    it('should render tree roles', () => {
+      render(<Tree treeData={sampleTreeData} />)
 
-      expect(screen.getByRole("tree")).toBeInTheDocument();
-      expect(screen.getAllByRole("treeitem").length).toBeGreaterThan(0);
-    });
+      expect(screen.getByRole('tree')).toBeInTheDocument()
+      expect(screen.getAllByRole('treeitem').length).toBeGreaterThan(0)
+    })
 
-    it("should render empty state when no data", () => {
-      const { getByText } = render(<Tree treeData={[]} />);
+    it('should render empty state when no data', () => {
+      const { getByText } = render(<Tree treeData={[]} />)
 
-      expect(getByText("No data")).toBeInTheDocument();
-    });
+      expect(getByText('No data')).toBeInTheDocument()
+    })
 
-    it("should render custom empty text", () => {
-      const { getByText } = render(
-        <Tree treeData={[]} emptyText="No tree data available" />
-      );
+    it('should render custom empty text', () => {
+      const { getByText } = render(<Tree treeData={[]} emptyText="No tree data available" />)
 
-      expect(getByText("No tree data available")).toBeInTheDocument();
-    });
+      expect(getByText('No tree data available')).toBeInTheDocument()
+    })
 
-    it("should not show children by default", () => {
-      render(<Tree treeData={sampleTreeData} />);
+    it('should not show children by default', () => {
+      render(<Tree treeData={sampleTreeData} />)
 
-      expect(screen.getByText("Parent 1")).toBeInTheDocument();
-      expect(screen.queryByText("Child 1-1")).not.toBeInTheDocument();
-    });
+      expect(screen.getByText('Parent 1')).toBeInTheDocument()
+      expect(screen.queryByText('Child 1-1')).not.toBeInTheDocument()
+    })
 
-    it("should show all children when defaultExpandAll is true", () => {
-      render(<Tree treeData={sampleTreeData} defaultExpandAll />);
+    it('should show all children when defaultExpandAll is true', () => {
+      render(<Tree treeData={sampleTreeData} defaultExpandAll />)
 
-      expect(screen.getByText("Parent 1")).toBeInTheDocument();
-      expect(screen.getByText("Child 1-1")).toBeInTheDocument();
-      expect(screen.getByText("Child 1-2")).toBeInTheDocument();
-      expect(screen.getByText("Child 2-1")).toBeInTheDocument();
-    });
-  });
+      expect(screen.getByText('Parent 1')).toBeInTheDocument()
+      expect(screen.getByText('Child 1-1')).toBeInTheDocument()
+      expect(screen.getByText('Child 1-2')).toBeInTheDocument()
+      expect(screen.getByText('Child 2-1')).toBeInTheDocument()
+    })
+  })
 
-  describe("Expand/Collapse", () => {
-    it("should expand node when clicking expand icon", async () => {
-      const user = userEvent.setup();
-      const { getByText, queryByText } = render(
-        <Tree treeData={sampleTreeData} />
-      );
+  describe('Expand/Collapse', () => {
+    it('should expand node when clicking expand icon', async () => {
+      const user = userEvent.setup()
+      const { getByText, queryByText } = render(<Tree treeData={sampleTreeData} />)
 
-      expect(queryByText("Child 1-1")).not.toBeInTheDocument();
+      expect(queryByText('Child 1-1')).not.toBeInTheDocument()
 
-      const parent1 = getByText("Parent 1");
-      const expandIcon = parent1.parentElement?.querySelector("svg");
+      const parent1 = getByText('Parent 1')
+      const expandIcon = parent1.parentElement?.querySelector('svg')
 
       if (expandIcon) {
-        await user.click(expandIcon);
+        await user.click(expandIcon)
       }
 
       await waitFor(() => {
-        expect(getByText("Child 1-1")).toBeInTheDocument();
-      });
-    });
+        expect(getByText('Child 1-1')).toBeInTheDocument()
+      })
+    })
 
-    it("should collapse expanded node when clicking expand icon again", async () => {
-      const user = userEvent.setup();
-      const { getByText, queryByText } = render(
-        <Tree treeData={sampleTreeData} defaultExpandAll />
-      );
+    it('should collapse expanded node when clicking expand icon again', async () => {
+      const user = userEvent.setup()
+      const { getByText, queryByText } = render(<Tree treeData={sampleTreeData} defaultExpandAll />)
 
-      expect(getByText("Child 1-1")).toBeInTheDocument();
+      expect(getByText('Child 1-1')).toBeInTheDocument()
 
-      const parent1 = getByText("Parent 1");
-      const expandIcon = parent1.parentElement?.querySelector("svg");
+      const parent1 = getByText('Parent 1')
+      const expandIcon = parent1.parentElement?.querySelector('svg')
 
       if (expandIcon) {
-        await user.click(expandIcon);
+        await user.click(expandIcon)
       }
 
       await waitFor(() => {
-        expect(queryByText("Child 1-1")).not.toBeInTheDocument();
-      });
-    });
+        expect(queryByText('Child 1-1')).not.toBeInTheDocument()
+      })
+    })
 
-    it("should emit onExpand event when node expands", async () => {
-      const user = userEvent.setup();
-      const onExpand = vi.fn();
+    it('should emit onExpand event when node expands', async () => {
+      const user = userEvent.setup()
+      const onExpand = vi.fn()
 
-      const { getByText } = render(
-        <Tree treeData={sampleTreeData} onExpand={onExpand} />
-      );
+      const { getByText } = render(<Tree treeData={sampleTreeData} onExpand={onExpand} />)
 
-      const parent1 = getByText("Parent 1");
-      const expandIcon = parent1.parentElement?.querySelector("svg");
+      const parent1 = getByText('Parent 1')
+      const expandIcon = parent1.parentElement?.querySelector('svg')
 
       if (expandIcon) {
-        await user.click(expandIcon);
+        await user.click(expandIcon)
       }
 
       await waitFor(() => {
-        expect(onExpand).toHaveBeenCalled();
-      });
-    });
-  });
+        expect(onExpand).toHaveBeenCalled()
+      })
+    })
+  })
 
-  describe("Keyboard", () => {
-    it("should move focus with ArrowDown", async () => {
-      const user = userEvent.setup();
+  describe('Keyboard', () => {
+    it('should move focus with ArrowDown', async () => {
+      const user = userEvent.setup()
 
-      render(<Tree treeData={sampleTreeData} defaultExpandAll />);
+      render(<Tree treeData={sampleTreeData} defaultExpandAll />)
 
-      const items = screen.getAllByRole("treeitem");
-      items[0].focus();
-      expect(document.activeElement).toBe(items[0]);
+      const items = screen.getAllByRole('treeitem')
+      items[0].focus()
+      expect(document.activeElement).toBe(items[0])
 
-      await user.keyboard("{ArrowDown}");
-
-      await waitFor(() => {
-        expect(document.activeElement).toBe(items[1]);
-      });
-    });
-
-    it("should expand node with ArrowRight", async () => {
-      const user = userEvent.setup();
-
-      render(<Tree treeData={sampleTreeData} />);
-      expect(screen.queryByText("Child 1-1")).not.toBeInTheDocument();
-
-      const items = screen.getAllByRole("treeitem");
-      items[0].focus();
-      expect(document.activeElement).toBe(items[0]);
-
-      await user.keyboard("{ArrowRight}");
+      await user.keyboard('{ArrowDown}')
 
       await waitFor(() => {
-        expect(screen.getByText("Child 1-1")).toBeInTheDocument();
-      });
-    });
+        expect(document.activeElement).toBe(items[1])
+      })
+    })
 
-    it("should navigate only visible items when filtering", async () => {
-      const user = userEvent.setup();
+    it('should expand node with ArrowRight', async () => {
+      const user = userEvent.setup()
 
-      render(
-        <Tree
-          treeData={sampleTreeData}
-          filterValue="Child 1"
-          autoExpandParent
-        />
-      );
+      render(<Tree treeData={sampleTreeData} />)
+      expect(screen.queryByText('Child 1-1')).not.toBeInTheDocument()
 
-      expect(screen.queryByText("Parent 2")).not.toBeInTheDocument();
+      const items = screen.getAllByRole('treeitem')
+      items[0].focus()
+      expect(document.activeElement).toBe(items[0])
 
-      const items = screen.getAllByRole("treeitem");
-      expect(items.length).toBeGreaterThanOrEqual(2);
-
-      items[0].focus();
-      expect(document.activeElement).toBe(items[0]);
-
-      await user.keyboard("{ArrowDown}");
+      await user.keyboard('{ArrowRight}')
 
       await waitFor(() => {
-        expect(document.activeElement).toBe(items[1]);
-      });
-    });
+        expect(screen.getByText('Child 1-1')).toBeInTheDocument()
+      })
+    })
 
-    it("should keep focus after lazy-load expand", async () => {
-      const user = userEvent.setup();
-      const onLoadData = vi.fn(async () => [
-        { key: "1-1", label: "Child 1-1" },
-      ]);
+    it('should navigate only visible items when filtering', async () => {
+      const user = userEvent.setup()
 
-      const lazyTreeData = [{ key: "1", label: "Parent 1" }];
+      render(<Tree treeData={sampleTreeData} filterValue="Child 1" autoExpandParent />)
 
-      render(
-        <Tree
-          treeData={lazyTreeData}
-          loadData={onLoadData}
-          defaultExpandedKeys={[]}
-        />
-      );
+      expect(screen.queryByText('Parent 2')).not.toBeInTheDocument()
 
-      const parentItem = screen.getAllByRole("treeitem")[0];
-      parentItem.focus();
-      expect(document.activeElement).toBe(parentItem);
+      const items = screen.getAllByRole('treeitem')
+      expect(items.length).toBeGreaterThanOrEqual(2)
 
-      await user.keyboard("{ArrowRight}");
+      items[0].focus()
+      expect(document.activeElement).toBe(items[0])
+
+      await user.keyboard('{ArrowDown}')
 
       await waitFor(() => {
-        expect(onLoadData).toHaveBeenCalled();
-        expect(screen.getByText("Child 1-1")).toBeInTheDocument();
-      });
+        expect(document.activeElement).toBe(items[1])
+      })
+    })
 
-      expect(document.activeElement).toBe(parentItem);
-    });
+    it('should keep focus after lazy-load expand', async () => {
+      const user = userEvent.setup()
+      const onLoadData = vi.fn(async () => [{ key: '1-1', label: 'Child 1-1' }])
 
-    it("should support multiple selection with Enter", async () => {
-      const user = userEvent.setup();
+      const lazyTreeData = [{ key: '1', label: 'Parent 1' }]
 
-      render(<Tree treeData={sampleTreeData} defaultExpandAll multiple />);
+      render(<Tree treeData={lazyTreeData} loadData={onLoadData} defaultExpandedKeys={[]} />)
 
-      const items = screen.getAllByRole("treeitem");
-      items[0].focus();
-      await user.keyboard("{Enter}");
+      const parentItem = screen.getAllByRole('treeitem')[0]
+      parentItem.focus()
+      expect(document.activeElement).toBe(parentItem)
 
-      await user.keyboard("{ArrowDown}{Enter}");
+      await user.keyboard('{ArrowRight}')
 
       await waitFor(() => {
-        expect(items[0]).toHaveAttribute("aria-selected", "true");
-        expect(items[1]).toHaveAttribute("aria-selected", "true");
-      });
-    });
+        expect(onLoadData).toHaveBeenCalled()
+        expect(screen.getByText('Child 1-1')).toBeInTheDocument()
+      })
 
-    it("should not cascade check when checkStrictly is true (Space)", async () => {
-      const user = userEvent.setup();
-      const onCheck = vi.fn();
+      expect(document.activeElement).toBe(parentItem)
+    })
+
+    it('should support multiple selection with Enter', async () => {
+      const user = userEvent.setup()
+
+      render(<Tree treeData={sampleTreeData} defaultExpandAll multiple />)
+
+      const items = screen.getAllByRole('treeitem')
+      items[0].focus()
+      await user.keyboard('{Enter}')
+
+      await user.keyboard('{ArrowDown}{Enter}')
+
+      await waitFor(() => {
+        expect(items[0]).toHaveAttribute('aria-selected', 'true')
+        expect(items[1]).toHaveAttribute('aria-selected', 'true')
+      })
+    })
+
+    it('should not cascade check when checkStrictly is true (Space)', async () => {
+      const user = userEvent.setup()
+      const onCheck = vi.fn()
 
       render(
         <Tree
@@ -253,106 +231,98 @@ describe("Tree", () => {
           checkStrictly
           onCheck={onCheck}
         />
-      );
+      )
 
-      const items = screen.getAllByRole("treeitem");
-      items[0].focus();
-      await user.keyboard(" ");
+      const items = screen.getAllByRole('treeitem')
+      items[0].focus()
+      await user.keyboard(' ')
 
       await waitFor(() => {
-        expect(items[0]).toHaveAttribute("aria-checked", "true");
-        expect(items[1]).toHaveAttribute("aria-checked", "false");
-        expect(onCheck).toHaveBeenCalled();
-      });
+        expect(items[0]).toHaveAttribute('aria-checked', 'true')
+        expect(items[1]).toHaveAttribute('aria-checked', 'false')
+        expect(onCheck).toHaveBeenCalled()
+      })
 
-      const last = onCheck.mock.calls.at(-1);
-      const checkedKeys = last?.[0] as Array<string | number>;
-      expect(checkedKeys).toContain("1");
-      expect(checkedKeys).not.toContain("1-1");
-    });
-  });
+      const last = onCheck.mock.calls.at(-1)
+      const checkedKeys = last?.[0] as Array<string | number>
+      expect(checkedKeys).toContain('1')
+      expect(checkedKeys).not.toContain('1-1')
+    })
+  })
 
-  describe("Selection", () => {
-    it("should select node when selectable is true", async () => {
-      const user = userEvent.setup();
-      const onSelect = vi.fn();
+  describe('Selection', () => {
+    it('should select node when selectable is true', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
 
       const { getByText } = render(
         <Tree treeData={sampleTreeData} selectable onSelect={onSelect} />
-      );
+      )
 
-      await user.click(getByText("Parent 1"));
+      await user.click(getByText('Parent 1'))
 
       await waitFor(() => {
-        expect(onSelect).toHaveBeenCalled();
-      });
-    });
+        expect(onSelect).toHaveBeenCalled()
+      })
+    })
 
-    it("should not select node when selectable is false", async () => {
-      const user = userEvent.setup();
-      const onSelect = vi.fn();
+    it('should not select node when selectable is false', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
 
       const { getByText } = render(
-        <Tree
-          treeData={sampleTreeData}
-          selectable={false}
-          onSelect={onSelect}
-        />
-      );
+        <Tree treeData={sampleTreeData} selectable={false} onSelect={onSelect} />
+      )
 
-      await user.click(getByText("Parent 1"));
-      expect(onSelect).not.toHaveBeenCalled();
-    });
+      await user.click(getByText('Parent 1'))
+      expect(onSelect).not.toHaveBeenCalled()
+    })
 
-    it("should not select disabled node", async () => {
-      const user = userEvent.setup();
-      const onSelect = vi.fn();
+    it('should not select disabled node', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
       const dataWithDisabled = [
-        { key: "1", label: "Node 1", disabled: true },
-        { key: "2", label: "Node 2" },
-      ];
+        { key: '1', label: 'Node 1', disabled: true },
+        { key: '2', label: 'Node 2' }
+      ]
 
       const { getByText } = render(
         <Tree treeData={dataWithDisabled} selectable onSelect={onSelect} />
-      );
+      )
 
-      await user.click(getByText("Node 1"));
-      expect(onSelect).not.toHaveBeenCalled();
-    });
-  });
+      await user.click(getByText('Node 1'))
+      expect(onSelect).not.toHaveBeenCalled()
+    })
+  })
 
-  describe("Checkable", () => {
-    it("should render checkboxes when checkable is true", () => {
-      const { container } = render(
-        <Tree treeData={sampleTreeData} checkable />
-      );
+  describe('Checkable', () => {
+    it('should render checkboxes when checkable is true', () => {
+      const { container } = render(<Tree treeData={sampleTreeData} checkable />)
 
-      const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-      expect(checkboxes.length).toBeGreaterThan(0);
-    });
+      const checkboxes = container.querySelectorAll('input[type="checkbox"]')
+      expect(checkboxes.length).toBeGreaterThan(0)
+    })
 
-    it("should check node when clicking checkbox", async () => {
-      const user = userEvent.setup();
-      const onCheck = vi.fn();
+    it('should check node when clicking checkbox', async () => {
+      const user = userEvent.setup()
+      const onCheck = vi.fn()
 
-      const { container } = render(
-        <Tree treeData={sampleTreeData} checkable onCheck={onCheck} />
-      );
+      const { container } = render(<Tree treeData={sampleTreeData} checkable onCheck={onCheck} />)
 
-      const checkbox = container.querySelector('input[type="checkbox"]');
+      const checkbox = container.querySelector('input[type="checkbox"]')
 
       if (checkbox) {
-        await user.click(checkbox);
+        await user.click(checkbox)
       }
 
       await waitFor(() => {
-        expect(onCheck).toHaveBeenCalled();
-      });
-    });
+        expect(onCheck).toHaveBeenCalled()
+      })
+    })
 
-    it("should check all children when checking parent (cascade mode)", async () => {
-      const user = userEvent.setup();
-      const onCheck = vi.fn();
+    it('should check all children when checking parent (cascade mode)', async () => {
+      const user = userEvent.setup()
+      const onCheck = vi.fn()
 
       const { container } = render(
         <Tree
@@ -362,269 +332,220 @@ describe("Tree", () => {
           defaultExpandAll
           onCheck={onCheck}
         />
-      );
+      )
 
-      const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-      const parentCheckbox = checkboxes[0] as HTMLInputElement;
+      const checkboxes = container.querySelectorAll('input[type="checkbox"]')
+      const parentCheckbox = checkboxes[0] as HTMLInputElement
 
-      await user.click(parentCheckbox);
+      await user.click(parentCheckbox)
 
       await waitFor(() => {
-        expect(onCheck).toHaveBeenCalled();
+        expect(onCheck).toHaveBeenCalled()
         // In cascade mode, checking parent should include children
-        const checkedKeys = onCheck.mock.calls[0][0];
-        expect(checkedKeys.length).toBeGreaterThan(1);
-      });
-    });
+        const checkedKeys = onCheck.mock.calls[0][0]
+        expect(checkedKeys.length).toBeGreaterThan(1)
+      })
+    })
 
-    it("should only check parent when checkStrictly is true", async () => {
-      const user = userEvent.setup();
-      const onCheck = vi.fn();
+    it('should only check parent when checkStrictly is true', async () => {
+      const user = userEvent.setup()
+      const onCheck = vi.fn()
 
       const { container } = render(
-        <Tree
-          treeData={sampleTreeData}
-          checkable
-          checkStrictly
-          onCheck={onCheck}
-        />
-      );
+        <Tree treeData={sampleTreeData} checkable checkStrictly onCheck={onCheck} />
+      )
 
-      const checkbox = container.querySelector('input[type="checkbox"]');
+      const checkbox = container.querySelector('input[type="checkbox"]')
 
       if (checkbox) {
-        await user.click(checkbox);
+        await user.click(checkbox)
       }
 
       await waitFor(() => {
-        expect(onCheck).toHaveBeenCalled();
-        const checkedKeys = onCheck.mock.calls[0][0];
-        expect(checkedKeys).toHaveLength(1);
-      });
-    });
+        expect(onCheck).toHaveBeenCalled()
+        const checkedKeys = onCheck.mock.calls[0][0]
+        expect(checkedKeys).toHaveLength(1)
+      })
+    })
 
-    it("should not check disabled node", async () => {
-      const user = userEvent.setup();
-      const onCheck = vi.fn();
+    it('should not check disabled node', async () => {
+      const user = userEvent.setup()
+      const onCheck = vi.fn()
       const dataWithDisabled = [
-        { key: "1", label: "Node 1", disabled: true },
-        { key: "2", label: "Node 2" },
-      ];
+        { key: '1', label: 'Node 1', disabled: true },
+        { key: '2', label: 'Node 2' }
+      ]
 
-      const { container } = render(
-        <Tree treeData={dataWithDisabled} checkable onCheck={onCheck} />
-      );
+      const { container } = render(<Tree treeData={dataWithDisabled} checkable onCheck={onCheck} />)
 
-      const checkbox = container.querySelector(
-        'input[type="checkbox"][disabled]'
-      );
+      const checkbox = container.querySelector('input[type="checkbox"][disabled]')
 
       if (checkbox) {
-        await user.click(checkbox);
+        await user.click(checkbox)
       }
-      expect(onCheck).not.toHaveBeenCalled();
-    });
-  });
+      expect(onCheck).not.toHaveBeenCalled()
+    })
+  })
 
-  describe("Filter", () => {
-    it("should filter nodes based on filter value", async () => {
+  describe('Filter', () => {
+    it('should filter nodes based on filter value', async () => {
       const { getByText, queryByText, rerender } = render(
         <Tree treeData={sampleTreeData} defaultExpandAll filterValue="" />
-      );
+      )
 
-      expect(getByText("Parent 1")).toBeInTheDocument();
-      expect(getByText("Parent 2")).toBeInTheDocument();
+      expect(getByText('Parent 1')).toBeInTheDocument()
+      expect(getByText('Parent 2')).toBeInTheDocument()
 
-      rerender(
-        <Tree
-          treeData={sampleTreeData}
-          defaultExpandAll
-          filterValue="Parent 1"
-        />
-      );
+      rerender(<Tree treeData={sampleTreeData} defaultExpandAll filterValue="Parent 1" />)
 
       await waitFor(() => {
-        expect(getByText("Parent 1")).toBeInTheDocument();
-        expect(queryByText("Parent 2")).not.toBeInTheDocument();
-      });
-    });
+        expect(getByText('Parent 1')).toBeInTheDocument()
+        expect(queryByText('Parent 2')).not.toBeInTheDocument()
+      })
+    })
 
-    it("should highlight matched nodes", async () => {
-      const { getByText } = render(
-        <Tree treeData={sampleTreeData} filterValue="Parent 1" />
-      );
+    it('should highlight matched nodes', async () => {
+      const { getByText } = render(<Tree treeData={sampleTreeData} filterValue="Parent 1" />)
 
       await waitFor(() => {
-        const matchedNode = getByText("Parent 1");
-        expect(matchedNode.className).toContain("font-semibold");
-      });
-    });
-  });
+        const matchedNode = getByText('Parent 1')
+        expect(matchedNode.className).toContain('font-semibold')
+      })
+    })
+  })
 
-  describe("Block Node", () => {
-    it("should apply block node styles when blockNode is true", () => {
-      const { getByText } = render(
-        <Tree treeData={sampleTreeData} blockNode />
-      );
+  describe('Block Node', () => {
+    it('should apply block node styles when blockNode is true', () => {
+      const { getByText } = render(<Tree treeData={sampleTreeData} blockNode />)
 
-      const node = getByText("Parent 1").parentElement;
-      expect(node?.className).toContain("w-full");
-    });
-  });
+      const node = getByText('Parent 1').parentElement
+      expect(node?.className).toContain('w-full')
+    })
+  })
 
-  describe("Events", () => {
-    it("should emit onNodeClick event when node is clicked", async () => {
-      const user = userEvent.setup();
-      const onNodeClick = vi.fn();
+  describe('Events', () => {
+    it('should emit onNodeClick event when node is clicked', async () => {
+      const user = userEvent.setup()
+      const onNodeClick = vi.fn()
 
-      const { getByText } = render(
-        <Tree treeData={sampleTreeData} onNodeClick={onNodeClick} />
-      );
+      const { getByText } = render(<Tree treeData={sampleTreeData} onNodeClick={onNodeClick} />)
 
-      await user.click(getByText("Parent 1"));
+      await user.click(getByText('Parent 1'))
 
       await waitFor(() => {
-        expect(onNodeClick).toHaveBeenCalled();
-      });
-    });
+        expect(onNodeClick).toHaveBeenCalled()
+      })
+    })
 
-    it("should emit onNodeExpand event when node expands", async () => {
-      const user = userEvent.setup();
-      const onNodeExpand = vi.fn();
+    it('should emit onNodeExpand event when node expands', async () => {
+      const user = userEvent.setup()
+      const onNodeExpand = vi.fn()
 
-      const { getByText } = render(
-        <Tree treeData={sampleTreeData} onNodeExpand={onNodeExpand} />
-      );
+      const { getByText } = render(<Tree treeData={sampleTreeData} onNodeExpand={onNodeExpand} />)
 
-      const parent1 = getByText("Parent 1");
-      const expandIcon = parent1.parentElement?.querySelector("svg");
+      const parent1 = getByText('Parent 1')
+      const expandIcon = parent1.parentElement?.querySelector('svg')
 
       if (expandIcon) {
-        await user.click(expandIcon);
+        await user.click(expandIcon)
       }
 
       await waitFor(() => {
-        expect(onNodeExpand).toHaveBeenCalled();
-      });
-    });
+        expect(onNodeExpand).toHaveBeenCalled()
+      })
+    })
 
-    it("should emit onNodeCollapse event when node collapses", async () => {
-      const user = userEvent.setup();
-      const onNodeCollapse = vi.fn();
+    it('should emit onNodeCollapse event when node collapses', async () => {
+      const user = userEvent.setup()
+      const onNodeCollapse = vi.fn()
 
       const { getByText } = render(
-        <Tree
-          treeData={sampleTreeData}
-          defaultExpandAll
-          onNodeCollapse={onNodeCollapse}
-        />
-      );
+        <Tree treeData={sampleTreeData} defaultExpandAll onNodeCollapse={onNodeCollapse} />
+      )
 
-      const parent1 = getByText("Parent 1");
-      const expandIcon = parent1.parentElement?.querySelector("svg");
+      const parent1 = getByText('Parent 1')
+      const expandIcon = parent1.parentElement?.querySelector('svg')
 
       if (expandIcon) {
-        await user.click(expandIcon);
+        await user.click(expandIcon)
       }
 
       await waitFor(() => {
-        expect(onNodeCollapse).toHaveBeenCalled();
-      });
-    });
-  });
+        expect(onNodeCollapse).toHaveBeenCalled()
+      })
+    })
+  })
 
-  describe("Controlled Mode", () => {
-    it("should work in controlled mode for expanded keys", async () => {
-      const user = userEvent.setup();
-      const onExpand = vi.fn();
+  describe('Controlled Mode', () => {
+    it('should work in controlled mode for expanded keys', async () => {
+      const user = userEvent.setup()
+      const onExpand = vi.fn()
 
       const { getByText, rerender } = render(
         <Tree treeData={sampleTreeData} expandedKeys={[]} onExpand={onExpand} />
-      );
+      )
 
-      expect(screen.queryByText("Child 1-1")).not.toBeInTheDocument();
+      expect(screen.queryByText('Child 1-1')).not.toBeInTheDocument()
 
-      const parent1 = getByText("Parent 1");
-      const expandIcon = parent1.parentElement?.querySelector("svg");
+      const parent1 = getByText('Parent 1')
+      const expandIcon = parent1.parentElement?.querySelector('svg')
 
       if (expandIcon) {
-        await user.click(expandIcon);
+        await user.click(expandIcon)
       }
 
       await waitFor(() => {
-        expect(onExpand).toHaveBeenCalled();
-      });
+        expect(onExpand).toHaveBeenCalled()
+      })
 
       // Manually update expandedKeys
-      rerender(
-        <Tree
-          treeData={sampleTreeData}
-          expandedKeys={["1"]}
-          onExpand={onExpand}
-        />
-      );
+      rerender(<Tree treeData={sampleTreeData} expandedKeys={['1']} onExpand={onExpand} />)
 
       await waitFor(() => {
-        expect(getByText("Child 1-1")).toBeInTheDocument();
-      });
-    });
+        expect(getByText('Child 1-1')).toBeInTheDocument()
+      })
+    })
 
-    it("should work in controlled mode for checked keys", async () => {
-      const user = userEvent.setup();
-      const onCheck = vi.fn();
+    it('should work in controlled mode for checked keys', async () => {
+      const user = userEvent.setup()
+      const onCheck = vi.fn()
 
       const { container, rerender } = render(
-        <Tree
-          treeData={sampleTreeData}
-          checkable
-          checkedKeys={[]}
-          onCheck={onCheck}
-        />
-      );
+        <Tree treeData={sampleTreeData} checkable checkedKeys={[]} onCheck={onCheck} />
+      )
 
-      const checkbox = container.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement;
-      expect(checkbox.checked).toBe(false);
+      const checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
+      expect(checkbox.checked).toBe(false)
 
-      await user.click(checkbox);
+      await user.click(checkbox)
 
       await waitFor(() => {
-        expect(onCheck).toHaveBeenCalled();
-      });
+        expect(onCheck).toHaveBeenCalled()
+      })
 
       // Manually update checkedKeys
-      rerender(
-        <Tree
-          treeData={sampleTreeData}
-          checkable
-          checkedKeys={["1"]}
-          onCheck={onCheck}
-        />
-      );
+      rerender(<Tree treeData={sampleTreeData} checkable checkedKeys={['1']} onCheck={onCheck} />)
 
       await waitFor(() => {
         const updatedCheckbox = container.querySelector(
           'input[type="checkbox"]'
-        ) as HTMLInputElement;
-        expect(updatedCheckbox.checked).toBe(true);
-      });
-    });
-  });
+        ) as HTMLInputElement
+        expect(updatedCheckbox.checked).toBe(true)
+      })
+    })
+  })
 
-  describe("Accessibility", () => {
-    it("should have no accessibility violations", async () => {
-      const { container } = render(<Tree treeData={sampleTreeData} />);
+  describe('Accessibility', () => {
+    it('should have no accessibility violations', async () => {
+      const { container } = render(<Tree treeData={sampleTreeData} />)
 
-      await expectNoA11yViolations(container);
-    });
+      await expectNoA11yViolations(container)
+    })
 
-    it("should have no accessibility violations with checkboxes", async () => {
-      const { container } = render(
-        <Tree treeData={sampleTreeData} checkable />
-      );
+    it('should have no accessibility violations with checkboxes', async () => {
+      const { container } = render(<Tree treeData={sampleTreeData} checkable />)
 
-      await expectNoA11yViolations(container);
-    });
-  });
-});
+      await expectNoA11yViolations(container)
+    })
+  })
+})

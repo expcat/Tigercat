@@ -6,8 +6,8 @@ import {
   h,
   PropType,
   type VNode,
-  type VNodeArrayChildren,
-} from "vue";
+  type VNodeArrayChildren
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -37,29 +37,29 @@ import {
   type ListBorderStyle,
   type ListItemLayout,
   type ListItem,
-  type ListPaginationConfig,
-} from "@tigercat/core";
+  type ListPaginationConfig
+} from '@tigercat/core'
 
-const spinnerSvg = getSpinnerSVG("spinner");
+const spinnerSvg = getSpinnerSVG('spinner')
 
-type RawChildren = string | number | boolean | VNode | VNodeArrayChildren;
+type RawChildren = string | number | boolean | VNode | VNodeArrayChildren
 
 // Loading spinner component
 const LoadingSpinner = () => {
   return h(
-    "svg",
+    'svg',
     {
       class: getLoadingOverlaySpinnerClasses(),
-      xmlns: "http://www.w3.org/2000/svg",
-      fill: "none",
-      viewBox: spinnerSvg.viewBox,
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: spinnerSvg.viewBox
     },
     spinnerSvg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
-  );
-};
+  )
+}
 
 export const List = defineComponent({
-  name: "TigerList",
+  name: 'TigerList',
   inheritAttrs: false,
   props: {
     /**
@@ -67,71 +67,71 @@ export const List = defineComponent({
      */
     dataSource: {
       type: Array as PropType<ListItem[]>,
-      default: () => [],
+      default: () => []
     },
     /**
      * List size
      */
     size: {
       type: String as PropType<ListSize>,
-      default: "md" as ListSize,
+      default: 'md' as ListSize
     },
     /**
      * Border style
      */
     bordered: {
       type: String as PropType<ListBorderStyle>,
-      default: "divided" as ListBorderStyle,
+      default: 'divided' as ListBorderStyle
     },
     /**
      * Loading state
      */
     loading: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Empty state text
      */
     emptyText: {
       type: String,
-      default: "No data",
+      default: 'No data'
     },
     /**
      * Whether to show split line between items
      */
     split: {
       type: Boolean,
-      default: true,
+      default: true
     },
     /**
      * Item layout
      */
     itemLayout: {
       type: String as PropType<ListItemLayout>,
-      default: "horizontal" as ListItemLayout,
+      default: 'horizontal' as ListItemLayout
     },
     /**
      * Pagination configuration
      */
     pagination: {
       type: [Object, Boolean] as PropType<ListPaginationConfig | false>,
-      default: false,
+      default: false
     },
     /**
      * Grid configuration
      */
     grid: {
       type: Object as PropType<{
-        gutter?: number;
-        column?: number;
-        xs?: number;
-        sm?: number;
-        md?: number;
-        lg?: number;
-        xl?: number;
-        xxl?: number;
-      }>,
+        gutter?: number
+        column?: number
+        xs?: number
+        sm?: number
+        md?: number
+        lg?: number
+        xl?: number
+        xxl?: number
+      }>
     },
     /**
      * Function to get item key
@@ -140,14 +140,14 @@ export const List = defineComponent({
       type: [String, Function] as PropType<
         string | ((item: ListItem, index: number) => string | number)
       >,
-      default: "key",
+      default: 'key'
     },
     /**
      * Whether items are hoverable
      */
     hoverable: {
       type: Boolean,
-      default: false,
+      default: false
     },
 
     /**
@@ -155,7 +155,7 @@ export const List = defineComponent({
      */
     className: {
       type: String,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -163,59 +163,46 @@ export const List = defineComponent({
      */
     style: {
       type: Object as PropType<Record<string, string | number>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
-  emits: ["item-click", "page-change"],
+  emits: ['item-click', 'page-change'],
   setup(props, { emit, slots, attrs }) {
-    const instance = getCurrentInstance();
+    const instance = getCurrentInstance()
     const hasItemClickListener = computed(() => {
-      const vnodeProps = (instance?.vnode.props || {}) as Record<
-        string,
-        unknown
-      >;
-      const handler = vnodeProps.onItemClick;
-      return typeof handler === "function" || Array.isArray(handler);
-    });
+      const vnodeProps = (instance?.vnode.props || {}) as Record<string, unknown>
+      const handler = vnodeProps.onItemClick
+      return typeof handler === 'function' || Array.isArray(handler)
+    })
 
     const currentPage = ref(
-      props.pagination && typeof props.pagination === "object"
-        ? props.pagination.current || 1
-        : 1
-    );
+      props.pagination && typeof props.pagination === 'object' ? props.pagination.current || 1 : 1
+    )
 
     const currentPageSize = ref(
-      props.pagination && typeof props.pagination === "object"
+      props.pagination && typeof props.pagination === 'object'
         ? props.pagination.pageSize || 10
         : 10
-    );
+    )
 
     // Paginated data
     const paginatedData = computed(() => {
       if (props.pagination === false) {
-        return props.dataSource;
+        return props.dataSource
       }
 
-      return paginateData(
-        props.dataSource,
-        currentPage.value,
-        currentPageSize.value
-      );
-    });
+      return paginateData(props.dataSource, currentPage.value, currentPageSize.value)
+    })
 
     // Pagination info
     const paginationInfo = computed(() => {
       if (props.pagination === false) {
-        return null;
+        return null
       }
 
-      const total = props.dataSource.length;
-      return calculatePagination(
-        total,
-        currentPage.value,
-        currentPageSize.value
-      );
-    });
+      const total = props.dataSource.length
+      return calculatePagination(total, currentPage.value, currentPageSize.value)
+    })
 
     // List classes
     const listClasses = computed(() => {
@@ -223,12 +210,12 @@ export const List = defineComponent({
         getListClasses(props.bordered),
         listSizeClasses[props.size],
         props.className
-      );
-    });
+      )
+    })
 
     // Grid classes
     const gridClasses = computed(() => {
-      if (!props.grid) return "";
+      if (!props.grid) return ''
 
       return classNames(
         listGridContainerClasses,
@@ -241,303 +228,285 @@ export const List = defineComponent({
           props.grid.xl,
           props.grid.xxl
         )
-      );
-    });
+      )
+    })
 
     function handlePageChange(page: number) {
-      currentPage.value = page;
-      emit("page-change", { current: page, pageSize: currentPageSize.value });
+      currentPage.value = page
+      emit('page-change', { current: page, pageSize: currentPageSize.value })
     }
 
     function handlePageSizeChange(pageSize: number) {
-      currentPageSize.value = pageSize;
-      currentPage.value = 1;
-      emit("page-change", { current: 1, pageSize });
+      currentPageSize.value = pageSize
+      currentPage.value = 1
+      emit('page-change', { current: 1, pageSize })
     }
 
     function handleItemClick(item: ListItem, index: number) {
-      emit("item-click", item, index);
+      emit('item-click', item, index)
     }
 
     function getItemKey(item: ListItem, index: number): string | number {
-      if (typeof props.rowKey === "function") {
-        return props.rowKey(item, index);
+      if (typeof props.rowKey === 'function') {
+        return props.rowKey(item, index)
       }
-      return (item[props.rowKey] as string | number) || index;
+      return (item[props.rowKey] as string | number) || index
     }
 
     function renderListHeader() {
-      if (!slots.header) return null;
+      if (!slots.header) return null
 
       return h(
-        "div",
+        'div',
         {
-          class: getListHeaderFooterClasses(props.size, false),
+          class: getListHeaderFooterClasses(props.size, false)
         },
         slots.header()
-      );
+      )
     }
 
     function renderListFooter() {
-      if (!slots.footer) return null;
+      if (!slots.footer) return null
 
       return h(
-        "div",
+        'div',
         {
-          class: getListHeaderFooterClasses(props.size, true),
+          class: getListHeaderFooterClasses(props.size, true)
         },
         slots.footer()
-      );
+      )
     }
 
     function renderListItem(item: ListItem, index: number) {
-      const key = getItemKey(item, index);
+      const key = getItemKey(item, index)
       const itemClasses = getListItemClasses(
         props.size,
         props.itemLayout,
-        props.split && props.bordered === "divided" && !props.grid,
+        props.split && props.bordered === 'divided' && !props.grid,
         props.hoverable
-      );
+      )
 
-      const clickable = hasItemClickListener.value;
+      const clickable = hasItemClickListener.value
 
       // Custom render from slot
       if (slots.renderItem) {
         return h(
-          "div",
+          'div',
           {
             key,
-            class: classNames(itemClasses, clickable && "cursor-pointer"),
-            role: "listitem",
+            class: classNames(itemClasses, clickable && 'cursor-pointer'),
+            role: 'listitem',
             tabindex: clickable ? 0 : undefined,
             onClick: () => handleItemClick(item, index),
             onKeydown: clickable
               ? (e: KeyboardEvent) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleItemClick(item, index);
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    handleItemClick(item, index)
                   }
                 }
-              : undefined,
+              : undefined
           },
           slots.renderItem({ item, index })
-        );
+        )
       }
 
       // Default item render
-      const itemContent = [];
+      const itemContent = []
 
       // Meta section (avatar + content)
-      const metaContent = [];
+      const metaContent = []
 
       if (item.avatar) {
         metaContent.push(
-          h("div", { class: listItemAvatarClasses }, [
-            typeof item.avatar === "string"
-              ? h("img", {
+          h('div', { class: listItemAvatarClasses }, [
+            typeof item.avatar === 'string'
+              ? h('img', {
                   src: item.avatar,
-                  alt: item.title || "Avatar",
-                  class: "w-10 h-10 rounded-full object-cover",
+                  alt: item.title || 'Avatar',
+                  class: 'w-10 h-10 rounded-full object-cover'
                 })
-              : (item.avatar as unknown as RawChildren),
+              : (item.avatar as unknown as RawChildren)
           ])
-        );
+        )
       }
 
-      const contentChildren = [];
+      const contentChildren = []
       if (item.title) {
-        contentChildren.push(
-          h("div", { class: listItemTitleClasses }, item.title)
-        );
+        contentChildren.push(h('div', { class: listItemTitleClasses }, item.title))
       }
       if (item.description) {
-        contentChildren.push(
-          h("div", { class: listItemDescriptionClasses }, item.description)
-        );
+        contentChildren.push(h('div', { class: listItemDescriptionClasses }, item.description))
       }
 
       if (contentChildren.length > 0) {
-        metaContent.push(
-          h("div", { class: listItemContentClasses }, contentChildren)
-        );
+        metaContent.push(h('div', { class: listItemContentClasses }, contentChildren))
       }
 
       if (metaContent.length > 0) {
-        itemContent.push(h("div", { class: listItemMetaClasses }, metaContent));
+        itemContent.push(h('div', { class: listItemMetaClasses }, metaContent))
       }
 
       // Extra content
       if (item.extra) {
         itemContent.push(
-          h(
-            "div",
-            { class: listItemExtraClasses },
-            item.extra as unknown as RawChildren
-          )
-        );
+          h('div', { class: listItemExtraClasses }, item.extra as unknown as RawChildren)
+        )
       }
 
       return h(
-        "div",
+        'div',
         {
           key,
-          class: classNames(itemClasses, clickable && "cursor-pointer"),
-          role: "listitem",
+          class: classNames(itemClasses, clickable && 'cursor-pointer'),
+          role: 'listitem',
           tabindex: clickable ? 0 : undefined,
           onClick: () => handleItemClick(item, index),
           onKeydown: clickable
             ? (e: KeyboardEvent) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  handleItemClick(item, index);
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  handleItemClick(item, index)
                 }
               }
-            : undefined,
+            : undefined
         },
         itemContent
-      );
+      )
     }
 
     function renderListItems() {
       if (props.loading) {
-        return null;
+        return null
       }
 
       if (paginatedData.value.length === 0) {
         return h(
-          "div",
+          'div',
           {
             class: listEmptyStateClasses,
-            role: "status",
-            "aria-live": "polite",
+            role: 'status',
+            'aria-live': 'polite'
           },
           props.emptyText
-        );
+        )
       }
 
-      const items = paginatedData.value.map((item, index) =>
-        renderListItem(item, index)
-      );
+      const items = paginatedData.value.map((item, index) => renderListItem(item, index))
 
       if (props.grid) {
-        const gutter = props.grid.gutter;
+        const gutter = props.grid.gutter
         return h(
-          "div",
+          'div',
           {
             class: gridClasses.value,
-            style: gutter ? { gap: `${gutter}px` } : undefined,
+            style: gutter ? { gap: `${gutter}px` } : undefined
           },
           items
-        );
+        )
       }
 
-      return items;
+      return items
     }
 
     function renderPagination() {
       if (props.pagination === false || !paginationInfo.value) {
-        return null;
+        return null
       }
 
-      const { totalPages, startIndex, endIndex, hasNext, hasPrev } =
-        paginationInfo.value;
-      const total = props.dataSource.length;
-      const paginationConfig = props.pagination as ListPaginationConfig;
+      const { totalPages, startIndex, endIndex, hasNext, hasPrev } = paginationInfo.value
+      const total = props.dataSource.length
+      const paginationConfig = props.pagination as ListPaginationConfig
 
-      return h("div", { class: listPaginationContainerClasses }, [
+      return h('div', { class: listPaginationContainerClasses }, [
         // Total info
         paginationConfig.showTotal !== false &&
           h(
-            "div",
-            { class: "text-sm text-[var(--tiger-text,#111827)]" },
+            'div',
+            { class: 'text-sm text-[var(--tiger-text,#111827)]' },
             paginationConfig.totalText
               ? paginationConfig.totalText(total, [startIndex, endIndex])
               : `Showing ${startIndex} to ${endIndex} of ${total} items`
           ),
 
         // Pagination controls
-        h("div", { class: "flex items-center gap-2" }, [
+        h('div', { class: 'flex items-center gap-2' }, [
           // Page size selector
           paginationConfig.showSizeChanger !== false &&
             h(
-              "select",
+              'select',
               {
                 class:
-                  "px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)]",
+                  'px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)]',
                 value: currentPageSize.value,
                 onChange: (e: Event) =>
-                  handlePageSizeChange(
-                    Number((e.target as HTMLSelectElement).value)
-                  ),
+                  handlePageSizeChange(Number((e.target as HTMLSelectElement).value))
               },
-              (paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map(
-                (size) => h("option", { value: size }, `${size} / page`)
+              (paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map((size) =>
+                h('option', { value: size }, `${size} / page`)
               )
             ),
 
           // Page buttons
-          h("div", { class: "flex gap-1" }, [
+          h('div', { class: 'flex gap-1' }, [
             // Previous button
             h(
-              "button",
+              'button',
               {
                 class: classNames(
-                  "px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]",
+                  'px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]',
                   hasPrev
-                    ? "hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]"
-                    : "text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed"
+                    ? 'hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]'
+                    : 'text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed'
                 ),
                 disabled: !hasPrev,
-                onClick: () => handlePageChange(currentPage.value - 1),
+                onClick: () => handlePageChange(currentPage.value - 1)
               },
-              "Previous"
+              'Previous'
             ),
 
             // Current page indicator
             h(
-              "span",
-              { class: "px-3 py-1 text-sm text-[var(--tiger-text,#111827)]" },
+              'span',
+              { class: 'px-3 py-1 text-sm text-[var(--tiger-text,#111827)]' },
               `Page ${currentPage.value} of ${totalPages}`
             ),
 
             // Next button
             h(
-              "button",
+              'button',
               {
                 class: classNames(
-                  "px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]",
+                  'px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]',
                   hasNext
-                    ? "hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]"
-                    : "text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed"
+                    ? 'hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]'
+                    : 'text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed'
                 ),
                 disabled: !hasNext,
-                onClick: () => handlePageChange(currentPage.value + 1),
+                onClick: () => handlePageChange(currentPage.value + 1)
               },
-              "Next"
-            ),
-          ]),
-        ]),
-      ]);
+              'Next'
+            )
+          ])
+        ])
+      ])
     }
 
     return () => {
-      const attrsRecord = attrs as Record<string, unknown>;
-      const attrsClass = attrsRecord.class;
-      const attrsStyle = attrsRecord.style;
+      const attrsRecord = attrs as Record<string, unknown>
+      const attrsClass = attrsRecord.class
+      const attrsStyle = attrsRecord.style
 
-      return h("div", { class: listWrapperClasses }, [
-        h("div", { class: "relative" }, [
+      return h('div', { class: listWrapperClasses }, [
+        h('div', { class: 'relative' }, [
           h(
-            "div",
+            'div',
             {
               ...attrs,
-              class: classNames(
-                listClasses.value,
-                coerceClassValue(attrsClass)
-              ),
+              class: classNames(listClasses.value, coerceClassValue(attrsClass)),
               style: mergeStyleValues(attrsStyle, props.style),
-              role: "list",
-              "aria-busy": props.loading || undefined,
+              role: 'list',
+              'aria-busy': props.loading || undefined
             },
             [renderListHeader(), renderListItems(), renderListFooter()]
           ),
@@ -545,46 +514,46 @@ export const List = defineComponent({
           // Loading overlay
           props.loading &&
             h(
-              "div",
+              'div',
               {
                 class: listLoadingOverlayClasses,
-                role: "status",
-                "aria-live": "polite",
+                role: 'status',
+                'aria-live': 'polite'
               },
               [LoadingSpinner()]
-            ),
+            )
         ]),
 
         // Pagination
-        renderPagination(),
-      ]);
-    };
-  },
-});
+        renderPagination()
+      ])
+    }
+  }
+})
 
 export interface VueListProps {
-  dataSource?: ListItem[];
-  size?: ListSize;
-  bordered?: ListBorderStyle;
-  loading?: boolean;
-  emptyText?: string;
-  split?: boolean;
-  itemLayout?: ListItemLayout;
-  pagination?: ListPaginationConfig | false;
+  dataSource?: ListItem[]
+  size?: ListSize
+  bordered?: ListBorderStyle
+  loading?: boolean
+  emptyText?: string
+  split?: boolean
+  itemLayout?: ListItemLayout
+  pagination?: ListPaginationConfig | false
   grid?: {
-    gutter?: number;
-    column?: number;
-    xs?: number;
-    sm?: number;
-    md?: number;
-    lg?: number;
-    xl?: number;
-    xxl?: number;
-  };
-  rowKey?: string | ((item: ListItem, index: number) => string | number);
-  hoverable?: boolean;
-  className?: string;
-  style?: Record<string, string | number>;
+    gutter?: number
+    column?: number
+    xs?: number
+    sm?: number
+    md?: number
+    lg?: number
+    xl?: number
+    xxl?: number
+  }
+  rowKey?: string | ((item: ListItem, index: number) => string | number)
+  hoverable?: boolean
+  className?: string
+  style?: Record<string, string | number>
 }
 
-export default List;
+export default List

@@ -1,15 +1,10 @@
-import { defineComponent, h, PropType, computed } from 'vue';
-import {
-  classNames,
-  coerceClassValue,
-  layoutHeaderClasses,
-  mergeStyleValues,
-} from '@tigercat/core';
+import { defineComponent, h, PropType, computed } from 'vue'
+import { classNames, coerceClassValue, layoutHeaderClasses, mergeStyleValues } from '@tigercat/core'
 
 export interface VueHeaderProps {
-  className?: string;
-  height?: string;
-  style?: Record<string, string | number>;
+  className?: string
+  height?: string
+  style?: Record<string, string | number>
 }
 
 export const Header = defineComponent({
@@ -21,7 +16,7 @@ export const Header = defineComponent({
      */
     className: {
       type: String as PropType<string>,
-      default: undefined,
+      default: undefined
     },
     /**
      * Header height (CSS value)
@@ -29,7 +24,7 @@ export const Header = defineComponent({
      */
     height: {
       type: String as PropType<string>,
-      default: '64px',
+      default: '64px'
     },
 
     /**
@@ -37,19 +32,15 @@ export const Header = defineComponent({
      */
     style: {
       type: Object as PropType<Record<string, string | number>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   setup(props, { slots, attrs }) {
-    const attrsRecord = attrs as Record<string, unknown>;
+    const attrsRecord = attrs as Record<string, unknown>
 
     const headerClasses = computed(() =>
-      classNames(
-        layoutHeaderClasses,
-        props.className,
-        coerceClassValue(attrsRecord.class)
-      )
-    );
+      classNames(layoutHeaderClasses, props.className, coerceClassValue(attrsRecord.class))
+    )
 
     return () => {
       return h(
@@ -58,13 +49,13 @@ export const Header = defineComponent({
           ...attrs,
           class: headerClasses.value,
           style: mergeStyleValues(attrsRecord.style, props.style, {
-            height: props.height,
-          }),
+            height: props.height
+          })
         },
         slots.default?.()
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Header;
+export default Header

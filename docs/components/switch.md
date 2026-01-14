@@ -8,10 +8,10 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Switch } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Switch } from '@tigercat/vue'
 
-const checked = ref(false);
+const checked = ref(false)
 </script>
 
 <template>
@@ -22,13 +22,13 @@ const checked = ref(false);
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Switch } from '@tigercat/react';
+import { useState } from 'react'
+import { Switch } from '@tigercat/react'
 
 function App() {
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(false)
 
-  return <Switch checked={checked} onChange={setChecked} />;
+  return <Switch checked={checked} onChange={setChecked} />
 }
 ```
 
@@ -44,12 +44,12 @@ Switch 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Switch } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Switch } from '@tigercat/vue'
 
-const checked1 = ref(false);
-const checked2 = ref(false);
-const checked3 = ref(false);
+const checked1 = ref(false)
+const checked2 = ref(false)
+const checked3 = ref(false)
 </script>
 
 <template>
@@ -64,13 +64,13 @@ const checked3 = ref(false);
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Switch } from '@tigercat/react';
+import { useState } from 'react'
+import { Switch } from '@tigercat/react'
 
 function App() {
-  const [checked1, setChecked1] = useState(false);
-  const [checked2, setChecked2] = useState(false);
-  const [checked3, setChecked3] = useState(false);
+  const [checked1, setChecked1] = useState(false)
+  const [checked2, setChecked2] = useState(false)
+  const [checked3, setChecked3] = useState(false)
 
   return (
     <div className="flex items-center gap-4">
@@ -78,7 +78,7 @@ function App() {
       <Switch checked={checked2} onChange={setChecked2} size="md" />
       <Switch checked={checked3} onChange={setChecked3} size="lg" />
     </div>
-  );
+  )
 }
 ```
 
@@ -112,10 +112,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Switch } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Switch } from '@tigercat/vue'
 
-const notifications = ref(true);
+const notifications = ref(true)
 </script>
 
 <template>
@@ -129,18 +129,18 @@ const notifications = ref(true);
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Switch } from '@tigercat/react';
+import { useState } from 'react'
+import { Switch } from '@tigercat/react'
 
 function App() {
-  const [notifications, setNotifications] = useState(true);
+  const [notifications, setNotifications] = useState(true)
 
   return (
     <div className="flex items-center gap-3">
       <Switch checked={notifications} onChange={setNotifications} />
       <span className="text-gray-700">启用通知</span>
     </div>
-  );
+  )
 }
 ```
 
@@ -222,18 +222,18 @@ const handleChange = (newValue: boolean) => {
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Switch } from '@tigercat/react';
+import { useState } from 'react'
+import { Switch } from '@tigercat/react'
 
 function App() {
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(false)
 
   const handleChange = (newValue: boolean) => {
-    console.log('Switch changed:', newValue);
-    setChecked(newValue);
-  };
+    console.log('Switch changed:', newValue)
+    setChecked(newValue)
+  }
 
-  return <Switch checked={checked} onChange={handleChange} />;
+  return <Switch checked={checked} onChange={handleChange} />
 }
 ```
 
@@ -290,13 +290,13 @@ Switch 组件的选中状态颜色使用与 Button 组件相同的主题变量�
 
 ```vue
 <script setup>
-import { Switch, setThemeColors } from '@tigercat/vue';
+import { Switch, setThemeColors } from '@tigercat/vue'
 
 const switchTheme = () => {
   setThemeColors({
-    primary: '#10b981',
-  });
-};
+    primary: '#10b981'
+  })
+}
 </script>
 
 <template>
@@ -310,21 +310,21 @@ const switchTheme = () => {
 **React:**
 
 ```tsx
-import { Switch, setThemeColors } from '@tigercat/react';
+import { Switch, setThemeColors } from '@tigercat/react'
 
 function App() {
   const switchTheme = () => {
     setThemeColors({
-      primary: '#10b981',
-    });
-  };
+      primary: '#10b981'
+    })
+  }
 
   return (
     <div>
       <button onClick={switchTheme}>切换为绿色主题</button>
       <Switch checked={checked} onChange={setChecked} />
     </div>
-  );
+  )
 }
 ```
 
@@ -355,9 +355,9 @@ Switch 组件遵循 ARIA 最佳实践：
 Switch 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```ts
-import type { SwitchProps, SwitchSize } from '@tigercat/core';
-import type { VueSwitchProps } from '@tigercat/vue';
-import type { SwitchProps as ReactSwitchProps } from '@tigercat/react';
+import type { SwitchProps, SwitchSize } from '@tigercat/core'
+import type { VueSwitchProps } from '@tigercat/vue'
+import type { SwitchProps as ReactSwitchProps } from '@tigercat/react'
 ```
 
 ## 示例
@@ -368,14 +368,14 @@ import type { SwitchProps as ReactSwitchProps } from '@tigercat/react';
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Switch } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Switch } from '@tigercat/vue'
 
 const settings = ref({
   notifications: true,
   emailAlerts: false,
-  darkMode: false,
-});
+  darkMode: false
+})
 </script>
 
 <template>
@@ -412,19 +412,19 @@ const settings = ref({
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { Switch } from '@tigercat/react';
+import { useState } from 'react'
+import { Switch } from '@tigercat/react'
 
 function SettingsPanel() {
   const [settings, setSettings] = useState({
     notifications: true,
     emailAlerts: false,
-    darkMode: false,
-  });
+    darkMode: false
+  })
 
   const updateSetting = (key: string) => (value: boolean) => {
-    setSettings((prev) => ({ ...prev, [key]: value }));
-  };
+    setSettings((prev) => ({ ...prev, [key]: value }))
+  }
 
   return (
     <div className="space-y-4 p-6 bg-white rounded-lg shadow">
@@ -435,10 +435,7 @@ function SettingsPanel() {
           <div className="font-medium">通知</div>
           <div className="text-sm text-gray-500">接收应用通知</div>
         </div>
-        <Switch
-          checked={settings.notifications}
-          onChange={updateSetting('notifications')}
-        />
+        <Switch checked={settings.notifications} onChange={updateSetting('notifications')} />
       </div>
 
       <div className="flex items-center justify-between">
@@ -446,10 +443,7 @@ function SettingsPanel() {
           <div className="font-medium">邮件提醒</div>
           <div className="text-sm text-gray-500">接收邮件通知</div>
         </div>
-        <Switch
-          checked={settings.emailAlerts}
-          onChange={updateSetting('emailAlerts')}
-        />
+        <Switch checked={settings.emailAlerts} onChange={updateSetting('emailAlerts')} />
       </div>
 
       <div className="flex items-center justify-between">
@@ -457,13 +451,10 @@ function SettingsPanel() {
           <div className="font-medium">深色模式</div>
           <div className="text-sm text-gray-500">使用深色主题</div>
         </div>
-        <Switch
-          checked={settings.darkMode}
-          onChange={updateSetting('darkMode')}
-        />
+        <Switch checked={settings.darkMode} onChange={updateSetting('darkMode')} />
       </div>
     </div>
-  );
+  )
 }
 ```
 
@@ -473,32 +464,29 @@ function SettingsPanel() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Switch, Button } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Switch, Button } from '@tigercat/vue'
 
 const formData = ref({
   username: '',
   agreeTerms: false,
-  newsletter: false,
-});
+  newsletter: false
+})
 
 const handleSubmit = () => {
   if (!formData.value.agreeTerms) {
-    alert('请同意服务条款');
-    return;
+    alert('请同意服务条款')
+    return
   }
-  console.log('提交表单:', formData.value);
-};
+  console.log('提交表单:', formData.value)
+}
 </script>
 
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-4">
     <div>
       <label class="block mb-2">用户名</label>
-      <input
-        v-model="formData.username"
-        type="text"
-        class="border rounded px-3 py-2 w-full" />
+      <input v-model="formData.username" type="text" class="border rounded px-3 py-2 w-full" />
     </div>
 
     <div class="flex items-center gap-3">
@@ -519,24 +507,24 @@ const handleSubmit = () => {
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { Switch, Button } from '@tigercat/react';
+import { useState } from 'react'
+import { Switch, Button } from '@tigercat/react'
 
 function FormExample() {
   const [formData, setFormData] = useState({
     username: '',
     agreeTerms: false,
-    newsletter: false,
-  });
+    newsletter: false
+  })
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!formData.agreeTerms) {
-      alert('请同意服务条款');
-      return;
+      alert('请同意服务条款')
+      return
     }
-    console.log('提交表单:', formData);
-  };
+    console.log('提交表单:', formData)
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -544,9 +532,7 @@ function FormExample() {
         <label className="block mb-2">用户名</label>
         <input
           value={formData.username}
-          onChange={(e) =>
-            setFormData((prev) => ({ ...prev, username: e.target.value }))
-          }
+          onChange={(e) => setFormData((prev) => ({ ...prev, username: e.target.value }))}
           type="text"
           className="border rounded px-3 py-2 w-full"
         />
@@ -555,9 +541,7 @@ function FormExample() {
       <div className="flex items-center gap-3">
         <Switch
           checked={formData.agreeTerms}
-          onChange={(checked) =>
-            setFormData((prev) => ({ ...prev, agreeTerms: checked }))
-          }
+          onChange={(checked) => setFormData((prev) => ({ ...prev, agreeTerms: checked }))}
         />
         <span>我同意服务条款</span>
       </div>
@@ -565,9 +549,7 @@ function FormExample() {
       <div className="flex items-center gap-3">
         <Switch
           checked={formData.newsletter}
-          onChange={(checked) =>
-            setFormData((prev) => ({ ...prev, newsletter: checked }))
-          }
+          onChange={(checked) => setFormData((prev) => ({ ...prev, newsletter: checked }))}
         />
         <span>订阅新闻通讯</span>
       </div>
@@ -576,6 +558,6 @@ function FormExample() {
         提交
       </Button>
     </form>
-  );
+  )
 }
 ```

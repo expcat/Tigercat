@@ -1,15 +1,10 @@
-import { defineComponent, h, PropType, computed } from 'vue';
-import {
-  classNames,
-  coerceClassValue,
-  layoutFooterClasses,
-  mergeStyleValues,
-} from '@tigercat/core';
+import { defineComponent, h, PropType, computed } from 'vue'
+import { classNames, coerceClassValue, layoutFooterClasses, mergeStyleValues } from '@tigercat/core'
 
 export interface VueFooterProps {
-  className?: string;
-  height?: string;
-  style?: Record<string, string | number>;
+  className?: string
+  height?: string
+  style?: Record<string, string | number>
 }
 
 export const Footer = defineComponent({
@@ -21,7 +16,7 @@ export const Footer = defineComponent({
      */
     className: {
       type: String as PropType<string>,
-      default: undefined,
+      default: undefined
     },
     /**
      * Footer height (CSS value)
@@ -29,7 +24,7 @@ export const Footer = defineComponent({
      */
     height: {
       type: String as PropType<string>,
-      default: 'auto',
+      default: 'auto'
     },
 
     /**
@@ -37,19 +32,15 @@ export const Footer = defineComponent({
      */
     style: {
       type: Object as PropType<Record<string, string | number>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   setup(props, { slots, attrs }) {
-    const attrsRecord = attrs as Record<string, unknown>;
+    const attrsRecord = attrs as Record<string, unknown>
 
     const footerClasses = computed(() =>
-      classNames(
-        layoutFooterClasses,
-        props.className,
-        coerceClassValue(attrsRecord.class)
-      )
-    );
+      classNames(layoutFooterClasses, props.className, coerceClassValue(attrsRecord.class))
+    )
 
     return () => {
       return h(
@@ -58,13 +49,13 @@ export const Footer = defineComponent({
           ...attrs,
           class: footerClasses.value,
           style: mergeStyleValues(attrsRecord.style, props.style, {
-            height: props.height,
-          }),
+            height: props.height
+          })
         },
         slots.default?.()
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Footer;
+export default Footer

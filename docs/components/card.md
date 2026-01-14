@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Card } from '@tigercat/vue';
+import { Card } from '@tigercat/vue'
 </script>
 
 <template>
@@ -21,14 +21,14 @@ import { Card } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Card } from '@tigercat/react';
+import { Card } from '@tigercat/react'
 
 function App() {
   return (
     <Card>
       <p>这是一个基础的卡片组件。</p>
     </Card>
-  );
+  )
 }
 ```
 
@@ -129,10 +129,7 @@ Card 组件支持 3 种不同的尺寸（主要影响内边距）：
 ### React
 
 ```tsx
-<Card
-  cover="https://example.com/image.jpg"
-  coverAlt="卡片封面图片"
-  header={<h3>卡片标题</h3>}>
+<Card cover="https://example.com/image.jpg" coverAlt="卡片封面图片" header={<h3>卡片标题</h3>}>
   <p>卡片内容</p>
 </Card>
 ```
@@ -223,7 +220,7 @@ Card 组件支持多个内容区域，可以通过插槽（Vue）或属性（Rea
 
 ```vue
 <script setup>
-import { Card } from '@tigercat/vue';
+import { Card } from '@tigercat/vue'
 </script>
 
 <template>
@@ -254,7 +251,7 @@ import { Card } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Card } from '@tigercat/react';
+import { Card } from '@tigercat/react'
 
 function ProductCard() {
   return (
@@ -269,14 +266,12 @@ function ProductCard() {
       actions={
         <>
           <button className="px-4 py-2 bg-gray-200 rounded">取消</button>
-          <button className="px-4 py-2 bg-blue-500 text-white rounded">
-            确认
-          </button>
+          <button className="px-4 py-2 bg-blue-500 text-white rounded">确认</button>
         </>
       }>
       <p>这是一个完整的卡片示例，包含封面图片、标题、内容和操作按钮。</p>
     </Card>
-  );
+  )
 }
 ```
 

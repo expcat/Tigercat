@@ -8,46 +8,43 @@ import type {
   FormValues,
   FormError,
   FormValidationResult,
-  FormRuleTrigger,
-} from "../types/form";
+  FormRuleTrigger
+} from '../types/form'
 
-export function getValueByPath(
-  values: FormValues | undefined,
-  path: string
-): unknown {
+export function getValueByPath(values: FormValues | undefined, path: string): unknown {
   if (!values || !path) {
-    return undefined;
+    return undefined
   }
 
-  if (!path.includes(".")) {
-    return values[path];
+  if (!path.includes('.')) {
+    return values[path]
   }
 
-  const segments = path.split(".").filter(Boolean);
-  let current: unknown = values;
+  const segments = path.split('.').filter(Boolean)
+  let current: unknown = values
 
   for (const segment of segments) {
-    if (!current || typeof current !== "object" || Array.isArray(current)) {
-      return undefined;
+    if (!current || typeof current !== 'object' || Array.isArray(current)) {
+      return undefined
     }
 
-    const record = current as Record<string, unknown>;
-    current = record[segment];
+    const record = current as Record<string, unknown>
+    current = record[segment]
   }
 
-  return current;
+  return current
 }
 
 /**
  * Email validation pattern (RFC 5322 compliant)
  */
-const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
 /**
  * URL validation pattern (supports http and https)
  */
 const URL_PATTERN =
-  /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
+  /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/
 
 /**
  * Check if a value is considered empty for form validation
@@ -63,13 +60,13 @@ const URL_PATTERN =
  * as they may contain properties that need to be validated separately.
  */
 function isEmpty(value: unknown): boolean {
-  if (value === null || value === undefined || value === "") {
-    return true;
+  if (value === null || value === undefined || value === '') {
+    return true
   }
   if (Array.isArray(value) && value.length === 0) {
-    return true;
+    return true
   }
-  return false;
+  return false
 }
 
 /**
@@ -81,52 +78,52 @@ function isEmpty(value: unknown): boolean {
  */
 function validateType(
   value: unknown,
-  type: FormRule["type"],
+  type: FormRule['type'],
   customMessage?: string
 ): string | null {
   switch (type) {
-    case "string":
-      if (typeof value !== "string") {
-        return customMessage || "Value must be a string";
+    case 'string':
+      if (typeof value !== 'string') {
+        return customMessage || 'Value must be a string'
       }
-      break;
-    case "number":
-      if (typeof value !== "number" && isNaN(Number(value))) {
-        return customMessage || "Value must be a number";
+      break
+    case 'number':
+      if (typeof value !== 'number' && isNaN(Number(value))) {
+        return customMessage || 'Value must be a number'
       }
-      break;
-    case "boolean":
-      if (typeof value !== "boolean") {
-        return customMessage || "Value must be a boolean";
+      break
+    case 'boolean':
+      if (typeof value !== 'boolean') {
+        return customMessage || 'Value must be a boolean'
       }
-      break;
-    case "array":
+      break
+    case 'array':
       if (!Array.isArray(value)) {
-        return customMessage || "Value must be an array";
+        return customMessage || 'Value must be an array'
       }
-      break;
-    case "object":
-      if (typeof value !== "object" || Array.isArray(value)) {
-        return customMessage || "Value must be an object";
+      break
+    case 'object':
+      if (typeof value !== 'object' || Array.isArray(value)) {
+        return customMessage || 'Value must be an object'
       }
-      break;
-    case "email":
-      if (typeof value === "string" && !EMAIL_PATTERN.test(value)) {
-        return customMessage || "Please enter a valid email address";
+      break
+    case 'email':
+      if (typeof value === 'string' && !EMAIL_PATTERN.test(value)) {
+        return customMessage || 'Please enter a valid email address'
       }
-      break;
-    case "url":
-      if (typeof value === "string" && !URL_PATTERN.test(value)) {
-        return customMessage || "Please enter a valid URL";
+      break
+    case 'url':
+      if (typeof value === 'string' && !URL_PATTERN.test(value)) {
+        return customMessage || 'Please enter a valid URL'
       }
-      break;
-    case "date":
+      break
+    case 'date':
       if (!(value instanceof Date) && isNaN(Date.parse(String(value)))) {
-        return customMessage || "Please enter a valid date";
+        return customMessage || 'Please enter a valid date'
       }
-      break;
+      break
   }
-  return null;
+  return null
 }
 
 /**
@@ -144,36 +141,36 @@ function validateRange(
   customMessage?: string
 ): string | null {
   // String length validation
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     if (min !== undefined && value.length < min) {
-      return customMessage || `Minimum length is ${min} characters`;
+      return customMessage || `Minimum length is ${min} characters`
     }
     if (max !== undefined && value.length > max) {
-      return customMessage || `Maximum length is ${max} characters`;
+      return customMessage || `Maximum length is ${max} characters`
     }
   }
 
   // Number range validation
-  if (typeof value === "number") {
+  if (typeof value === 'number') {
     if (min !== undefined && value < min) {
-      return customMessage || `Minimum value is ${min}`;
+      return customMessage || `Minimum value is ${min}`
     }
     if (max !== undefined && value > max) {
-      return customMessage || `Maximum value is ${max}`;
+      return customMessage || `Maximum value is ${max}`
     }
   }
 
   // Array length validation
   if (Array.isArray(value)) {
     if (min !== undefined && value.length < min) {
-      return customMessage || `Minimum ${min} items required`;
+      return customMessage || `Minimum ${min} items required`
     }
     if (max !== undefined && value.length > max) {
-      return customMessage || `Maximum ${max} items allowed`;
+      return customMessage || `Maximum ${max} items allowed`
     }
   }
 
-  return null;
+  return null
 }
 
 /**
@@ -190,57 +187,52 @@ export async function validateRule(
 ): Promise<string | null> {
   // Skip validation if value is empty and not required
   if (!rule.required && isEmpty(value)) {
-    return null;
+    return null
   }
 
   // Transform value if needed
-  const transformedValue = rule.transform ? rule.transform(value) : value;
+  const transformedValue = rule.transform ? rule.transform(value) : value
 
   // Required validation
   if (rule.required && isEmpty(transformedValue)) {
-    return rule.message || "This field is required";
+    return rule.message || 'This field is required'
   }
 
   // Type validation
   if (rule.type && !isEmpty(transformedValue)) {
-    const typeError = validateType(transformedValue, rule.type, rule.message);
-    if (typeError) return typeError;
+    const typeError = validateType(transformedValue, rule.type, rule.message)
+    if (typeError) return typeError
   }
 
   // Min/Max validation based on value type
   if (!isEmpty(transformedValue)) {
-    const rangeError = validateRange(
-      transformedValue,
-      rule.min,
-      rule.max,
-      rule.message
-    );
-    if (rangeError) return rangeError;
+    const rangeError = validateRange(transformedValue, rule.min, rule.max, rule.message)
+    if (rangeError) return rangeError
   }
 
   // Pattern validation
-  if (rule.pattern && typeof transformedValue === "string") {
+  if (rule.pattern && typeof transformedValue === 'string') {
     if (!rule.pattern.test(transformedValue)) {
-      return rule.message || "Value does not match the required pattern";
+      return rule.message || 'Value does not match the required pattern'
     }
   }
 
   // Custom validator
   if (rule.validator) {
     try {
-      const result = await rule.validator(transformedValue, allValues);
+      const result = await rule.validator(transformedValue, allValues)
       if (result === false) {
-        return rule.message || "Validation failed";
+        return rule.message || 'Validation failed'
       }
-      if (typeof result === "string") {
-        return result;
+      if (typeof result === 'string') {
+        return result
       }
     } catch {
-      return rule.message || "Validation error occurred";
+      return rule.message || 'Validation error occurred'
     }
   }
 
-  return null;
+  return null
 }
 
 /**
@@ -254,11 +246,11 @@ export async function validateField(
   trigger?: FormRuleTrigger
 ): Promise<string | null> {
   if (!rules) {
-    return null;
+    return null
   }
 
-  const ruleArray = Array.isArray(rules) ? rules : [rules];
-  const defaultTriggers: FormRuleTrigger[] = ["change", "blur"];
+  const ruleArray = Array.isArray(rules) ? rules : [rules]
+  const defaultTriggers: FormRuleTrigger[] = ['change', 'blur']
 
   for (const rule of ruleArray) {
     if (trigger) {
@@ -266,20 +258,20 @@ export async function validateField(
         ? Array.isArray(rule.trigger)
           ? rule.trigger
           : [rule.trigger]
-        : defaultTriggers;
+        : defaultTriggers
 
       if (!ruleTriggers.includes(trigger)) {
-        continue;
+        continue
       }
     }
 
-    const error = await validateRule(value, rule, allValues);
+    const error = await validateRule(value, rule, allValues)
     if (error) {
-      return error;
+      return error
     }
   }
 
-  return null;
+  return null
 }
 
 /**
@@ -289,59 +281,53 @@ export async function validateForm(
   values: FormValues,
   rules: FormRules
 ): Promise<FormValidationResult> {
-  const errors: FormError[] = [];
+  const errors: FormError[] = []
 
   // Validate all fields with rules
   for (const [fieldName, fieldRules] of Object.entries(rules)) {
-    const value = getValueByPath(values, fieldName);
-    const error = await validateField(fieldName, value, fieldRules, values);
+    const value = getValueByPath(values, fieldName)
+    const error = await validateField(fieldName, value, fieldRules, values)
 
     if (error) {
       errors.push({
         field: fieldName,
-        message: error,
-      });
+        message: error
+      })
     }
   }
 
   return {
     valid: errors.length === 0,
-    errors,
-  };
+    errors
+  }
 }
 
 /**
  * Get error message for a specific field
  */
-export function getFieldError(
-  fieldName: string,
-  errors: FormError[]
-): string | undefined {
-  const error = errors.find((e) => e.field === fieldName);
-  return error?.message;
+export function getFieldError(fieldName: string, errors: FormError[]): string | undefined {
+  const error = errors.find((e) => e.field === fieldName)
+  return error?.message
 }
 
 /**
  * Clear errors for specific fields
  */
-export function clearFieldErrors(
-  fieldNames: string | string[],
-  errors: FormError[]
-): FormError[] {
-  const fields = Array.isArray(fieldNames) ? fieldNames : [fieldNames];
-  return errors.filter((error) => !fields.includes(error.field));
+export function clearFieldErrors(fieldNames: string | string[], errors: FormError[]): FormError[] {
+  const fields = Array.isArray(fieldNames) ? fieldNames : [fieldNames]
+  return errors.filter((error) => !fields.includes(error.field))
 }
 
 /**
  * Check if form has errors
  */
 export function hasErrors(errors: FormError[]): boolean {
-  return errors.length > 0;
+  return errors.length > 0
 }
 
 /**
  * Get all field names with errors
  */
 export function getErrorFields(errors: FormError[]): string[] {
-  return errors.map((error) => error.field);
+  return errors.map((error) => error.field)
 }

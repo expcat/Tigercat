@@ -22,7 +22,7 @@ export const tabNavPositionClasses = {
   top: 'flex-row border-b border-gray-200',
   bottom: 'flex-row border-t border-gray-200',
   left: 'flex-col border-r border-gray-200',
-  right: 'flex-col border-l border-gray-200',
+  right: 'flex-col border-l border-gray-200'
 }
 
 /**
@@ -37,7 +37,7 @@ export const tabNavListPositionClasses = {
   top: 'flex-row',
   bottom: 'flex-row',
   left: 'flex-col',
-  right: 'flex-col',
+  right: 'flex-col'
 }
 
 /**
@@ -48,7 +48,8 @@ export const tabNavListCenteredClasses = 'justify-center'
 /**
  * Tab item base classes
  */
-export const tabItemBaseClasses = 'relative px-4 py-2 cursor-pointer transition-all duration-200 select-none flex items-center gap-2'
+export const tabItemBaseClasses =
+  'relative px-4 py-2 cursor-pointer transition-all duration-200 select-none flex items-center gap-2'
 
 /**
  * Tab item size classes
@@ -56,38 +57,44 @@ export const tabItemBaseClasses = 'relative px-4 py-2 cursor-pointer transition-
 export const tabItemSizeClasses = {
   small: 'text-sm px-3 py-1.5',
   medium: 'text-base px-4 py-2',
-  large: 'text-lg px-5 py-2.5',
+  large: 'text-lg px-5 py-2.5'
 }
 
 /**
  * Tab item type classes - line
  */
-export const tabItemLineClasses = 'border-b-2 border-transparent hover:text-[var(--tiger-primary,#2563eb)] text-gray-600'
+export const tabItemLineClasses =
+  'border-b-2 border-transparent hover:text-[var(--tiger-primary,#2563eb)] text-gray-600'
 
 /**
  * Tab item type classes - line active
  */
-export const tabItemLineActiveClasses = 'border-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary,#2563eb)] font-medium'
+export const tabItemLineActiveClasses =
+  'border-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary,#2563eb)] font-medium'
 
 /**
  * Tab item type classes - card
  */
-export const tabItemCardClasses = 'border border-gray-200 rounded-t bg-white hover:text-[var(--tiger-primary,#2563eb)] text-gray-600 -mb-px'
+export const tabItemCardClasses =
+  'border border-gray-200 rounded-t bg-white hover:text-[var(--tiger-primary,#2563eb)] text-gray-600 -mb-px'
 
 /**
  * Tab item type classes - card active
  */
-export const tabItemCardActiveClasses = 'bg-white border-[var(--tiger-primary,#2563eb)] border-b-white text-[var(--tiger-primary,#2563eb)] font-medium z-10'
+export const tabItemCardActiveClasses =
+  'bg-white border-[var(--tiger-primary,#2563eb)] border-b-white text-[var(--tiger-primary,#2563eb)] font-medium z-10'
 
 /**
  * Tab item type classes - editable-card
  */
-export const tabItemEditableCardClasses = 'border border-gray-200 rounded-t bg-gray-50 hover:bg-white hover:text-[var(--tiger-primary,#2563eb)] text-gray-600 -mb-px'
+export const tabItemEditableCardClasses =
+  'border border-gray-200 rounded-t bg-gray-50 hover:bg-white hover:text-[var(--tiger-primary,#2563eb)] text-gray-600 -mb-px'
 
 /**
  * Tab item type classes - editable-card active
  */
-export const tabItemEditableCardActiveClasses = 'bg-white border-[var(--tiger-primary,#2563eb)] border-b-white text-[var(--tiger-primary,#2563eb)] font-medium z-10'
+export const tabItemEditableCardActiveClasses =
+  'bg-white border-[var(--tiger-primary,#2563eb)] border-b-white text-[var(--tiger-primary,#2563eb)] font-medium z-10'
 
 /**
  * Tab item disabled classes
@@ -97,7 +104,8 @@ export const tabItemDisabledClasses = 'opacity-50 cursor-not-allowed pointer-eve
 /**
  * Tab close button classes
  */
-export const tabCloseButtonClasses = 'ml-2 p-0.5 rounded hover:bg-gray-200 transition-colors duration-150'
+export const tabCloseButtonClasses =
+  'ml-2 p-0.5 rounded hover:bg-gray-200 transition-colors duration-150'
 
 /**
  * Tab content container classes
@@ -117,21 +125,22 @@ export const tabPaneHiddenClasses = 'hidden'
 /**
  * Tab add button classes (for editable-card)
  */
-export const tabAddButtonClasses = 'px-3 py-2 border border-gray-200 rounded-t bg-gray-50 hover:bg-white hover:text-[var(--tiger-primary,#2563eb)] text-gray-600 cursor-pointer transition-colors duration-200'
+export const tabAddButtonClasses =
+  'px-3 py-2 border border-gray-200 rounded-t bg-gray-50 hover:bg-white hover:text-[var(--tiger-primary,#2563eb)] text-gray-600 cursor-pointer transition-colors duration-200'
 
 /**
  * Get tabs container classes
  */
 export function getTabsContainerClasses(position: TabPosition): string {
   const classes = [tabsBaseClasses]
-  
+
   if (position === 'left' || position === 'right') {
     classes.push('flex')
     if (position === 'right') {
       classes.push('flex-row-reverse')
     }
   }
-  
+
   return classes.filter(Boolean).join(' ')
 }
 
@@ -140,12 +149,12 @@ export function getTabsContainerClasses(position: TabPosition): string {
  */
 export function getTabNavClasses(position: TabPosition, type: TabType): string {
   const classes = [tabNavBaseClasses, tabNavPositionClasses[position]]
-  
+
   // No border for card types since they have their own borders
   if (type === 'card' || type === 'editable-card') {
     classes.push('border-0')
   }
-  
+
   return classes.filter(Boolean).join(' ')
 }
 
@@ -154,11 +163,11 @@ export function getTabNavClasses(position: TabPosition, type: TabType): string {
  */
 export function getTabNavListClasses(position: TabPosition, centered: boolean): string {
   const classes = [tabNavListBaseClasses, tabNavListPositionClasses[position]]
-  
+
   if (centered && (position === 'top' || position === 'bottom')) {
     classes.push(tabNavListCenteredClasses)
   }
-  
+
   return classes.filter(Boolean).join(' ')
 }
 
@@ -172,7 +181,7 @@ export function getTabItemClasses(
   size: TabSize
 ): string {
   const classes = [tabItemBaseClasses, tabItemSizeClasses[size]]
-  
+
   if (disabled) {
     classes.push(tabItemDisabledClasses)
   } else {
@@ -197,7 +206,7 @@ export function getTabItemClasses(
         break
     }
   }
-  
+
   return classes.filter(Boolean).join(' ')
 }
 
@@ -206,11 +215,11 @@ export function getTabItemClasses(
  */
 export function getTabPaneClasses(active: boolean): string {
   const classes = [tabPaneBaseClasses]
-  
+
   if (!active) {
     classes.push(tabPaneHiddenClasses)
   }
-  
+
   return classes.filter(Boolean).join(' ')
 }
 
@@ -233,20 +242,20 @@ export function getNextActiveKey(
   if (removedKey !== currentActiveKey) {
     return currentActiveKey
   }
-  
+
   // Find the index of the removed key
   const removedIndex = allKeys.indexOf(removedKey)
-  
+
   // If removed key is not found or is the only tab, return undefined
   if (removedIndex === -1 || allKeys.length <= 1) {
     return undefined
   }
-  
+
   // Try to activate the next tab
   if (removedIndex < allKeys.length - 1) {
     return allKeys[removedIndex + 1]
   }
-  
+
   // If removing the last tab, activate the previous one
   return allKeys[removedIndex - 1]
 }

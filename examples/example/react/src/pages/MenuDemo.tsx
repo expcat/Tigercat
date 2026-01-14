@@ -1,45 +1,24 @@
-import React, { useState } from 'react';
-import {
-  Menu,
-  MenuItem,
-  SubMenu,
-  MenuItemGroup,
-  Divider,
-  Button,
-} from '@tigercat/react';
+import React, { useState } from 'react'
+import { Menu, MenuItem, SubMenu, MenuItemGroup, Divider, Button } from '@tigercat/react'
 
 const MenuDemo: React.FC = () => {
-  const [selectedKeys1, setSelectedKeys1] = useState<(string | number)[]>([
-    '1',
-  ]);
-  const [selectedKeys2, setSelectedKeys2] = useState<(string | number)[]>([
-    'home',
-  ]);
-  const [selectedKeys3, setSelectedKeys3] = useState<(string | number)[]>([
-    '1',
-  ]);
-  const [openKeys3, setOpenKeys3] = useState<(string | number)[]>(['sub1']);
-  const [selectedKeys4, setSelectedKeys4] = useState<(string | number)[]>([
-    '1',
-  ]);
-  const [openKeys4, setOpenKeys4] = useState<(string | number)[]>(['sub1']);
-  const [collapsed, setCollapsed] = useState(false);
-  const [selectedKeys5, setSelectedKeys5] = useState<(string | number)[]>([
-    '1',
-  ]);
-  const [selectedKeys6, setSelectedKeys6] = useState<(string | number)[]>([
-    '1',
-  ]);
-  const [selectedKeys7, setSelectedKeys7] = useState<(string | number)[]>([
-    '1',
-  ]);
+  const [selectedKeys1, setSelectedKeys1] = useState<(string | number)[]>(['1'])
+  const [selectedKeys2, setSelectedKeys2] = useState<(string | number)[]>(['home'])
+  const [selectedKeys3, setSelectedKeys3] = useState<(string | number)[]>(['1'])
+  const [openKeys3, setOpenKeys3] = useState<(string | number)[]>(['sub1'])
+  const [selectedKeys4, setSelectedKeys4] = useState<(string | number)[]>(['1'])
+  const [openKeys4, setOpenKeys4] = useState<(string | number)[]>(['sub1'])
+  const [collapsed, setCollapsed] = useState(false)
+  const [selectedKeys5, setSelectedKeys5] = useState<(string | number)[]>(['1'])
+  const [selectedKeys6, setSelectedKeys6] = useState<(string | number)[]>(['1'])
+  const [selectedKeys7, setSelectedKeys7] = useState<(string | number)[]>(['1'])
 
   const homeIcon =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
   const settingsIcon =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.196-15.196l-4.243 4.243m-5.906 5.906l-4.243 4.243M23 12h-6m-6 0H1m15.196 5.196l-4.243-4.243m-5.906-5.906l-4.243-4.243"></path></svg>';
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.196-15.196l-4.243 4.243m-5.906 5.906l-4.243 4.243M23 12h-6m-6 0H1m15.196 5.196l-4.243-4.243m-5.906-5.906l-4.243-4.243"></path></svg>'
   const userIcon =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>'
 
   return (
     <div className="max-w-5xl mx-auto p-8">
@@ -54,9 +33,7 @@ const MenuDemo: React.FC = () => {
         <p className="text-gray-600 mb-6">垂直菜单，默认模式。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="bg-white inline-block">
-            <Menu
-              selectedKeys={selectedKeys1}
-              onSelect={(key) => setSelectedKeys1([key])}>
+            <Menu selectedKeys={selectedKeys1} onSelect={(key) => setSelectedKeys1([key])}>
               <MenuItem itemKey="1">菜单项 1</MenuItem>
               <MenuItem itemKey="2">菜单项 2</MenuItem>
               <MenuItem itemKey="3">菜单项 3</MenuItem>
@@ -200,9 +177,7 @@ const MenuDemo: React.FC = () => {
         <p className="text-gray-600 mb-6">菜单项可以添加图标。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="bg-white inline-block">
-            <Menu
-              selectedKeys={selectedKeys7}
-              onSelect={(key) => setSelectedKeys7([key])}>
+            <Menu selectedKeys={selectedKeys7} onSelect={(key) => setSelectedKeys7([key])}>
               <MenuItem itemKey="1" icon={homeIcon}>
                 首页
               </MenuItem>
@@ -222,9 +197,7 @@ const MenuDemo: React.FC = () => {
       {/* 菜单项分组 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">菜单项分组</h2>
-        <p className="text-gray-600 mb-6">
-          使用 MenuItemGroup 对菜单项进行分组。
-        </p>
+        <p className="text-gray-600 mb-6">使用 MenuItemGroup 对菜单项进行分组。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="bg-white inline-block">
             <Menu>
@@ -241,7 +214,7 @@ const MenuDemo: React.FC = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default MenuDemo;
+export default MenuDemo

@@ -25,11 +25,7 @@ const handleCancel = () => {
       <h2 class="text-2xl font-bold mb-4">基本用法</h2>
       <p class="text-gray-600 mb-6">最简单的用法，点击按钮打开确认框。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Popconfirm
-          title="确定要删除这条记录吗？"
-          @confirm="handleConfirm"
-          @cancel="handleCancel"
-        >
+        <Popconfirm title="确定要删除这条记录吗？" @confirm="handleConfirm" @cancel="handleCancel">
           <Button variant="secondary">删除</Button>
         </Popconfirm>
       </div>
@@ -45,15 +41,15 @@ const handleCancel = () => {
           <Popconfirm title="确定要删除吗？" placement="top">
             <Button>上方</Button>
           </Popconfirm>
-          
+
           <Popconfirm title="确定要删除吗？" placement="bottom">
             <Button>下方</Button>
           </Popconfirm>
-          
+
           <Popconfirm title="确定要删除吗？" placement="left">
             <Button>左侧</Button>
           </Popconfirm>
-          
+
           <Popconfirm title="确定要删除吗？" placement="right">
             <Button>右侧</Button>
           </Popconfirm>
@@ -71,19 +67,19 @@ const handleCancel = () => {
           <Popconfirm title="这是警告信息" icon="warning">
             <Button>警告</Button>
           </Popconfirm>
-          
+
           <Popconfirm title="这是提示信息" icon="info">
             <Button>信息</Button>
           </Popconfirm>
-          
+
           <Popconfirm title="这是错误信息" icon="error">
             <Button variant="secondary">错误</Button>
           </Popconfirm>
-          
+
           <Popconfirm title="操作成功" icon="success">
             <Button>成功</Button>
           </Popconfirm>
-          
+
           <Popconfirm title="确定继续吗？" icon="question">
             <Button>疑问</Button>
           </Popconfirm>
@@ -101,8 +97,7 @@ const handleCancel = () => {
           title="确定要提交这个表单吗？"
           ok-text="提交"
           cancel-text="取消"
-          @confirm="() => console.log('Form submitted')"
-        >
+          @confirm="() => console.log('Form submitted')">
           <Button>提交表单</Button>
         </Popconfirm>
       </div>
@@ -120,8 +115,7 @@ const handleCancel = () => {
           icon="error"
           ok-type="danger"
           ok-text="删除"
-          @confirm="() => console.log('User deleted')"
-        >
+          @confirm="() => console.log('User deleted')">
           <Button variant="secondary">删除用户</Button>
         </Popconfirm>
       </div>
@@ -136,8 +130,7 @@ const handleCancel = () => {
         <Popconfirm
           title="确定要发布这篇文章吗？"
           description="发布后，文章将对所有用户可见。"
-          @confirm="() => console.log('Article published')"
-        >
+          @confirm="() => console.log('Article published')">
           <Button>发布文章</Button>
         </Popconfirm>
       </div>
@@ -153,15 +146,22 @@ const handleCancel = () => {
           <Popconfirm
             v-model:visible="visible1"
             title="确定要执行此操作吗？"
-            @confirm="() => { handleConfirm(); visible1 = false }"
-            @cancel="() => { handleCancel(); visible1 = false }"
-          >
+            @confirm="
+              () => {
+                handleConfirm()
+                visible1 = false
+              }
+            "
+            @cancel="
+              () => {
+                handleCancel()
+                visible1 = false
+              }
+            ">
             <Button>受控弹窗</Button>
           </Popconfirm>
-          
-          <Button @click="visible1 = true">
-            外部控制打开
-          </Button>
+
+          <Button @click="visible1 = true"> 外部控制打开 </Button>
         </Space>
       </div>
       <Divider class="my-6" />
@@ -175,8 +175,7 @@ const handleCancel = () => {
         <Popconfirm
           title="确定要继续吗？"
           :show-icon="false"
-          @confirm="() => console.log('Confirmed')"
-        >
+          @confirm="() => console.log('Confirmed')">
           <Button>无图标</Button>
         </Popconfirm>
       </div>
