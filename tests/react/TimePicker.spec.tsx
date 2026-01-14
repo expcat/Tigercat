@@ -15,6 +15,23 @@ describe("TimePicker", () => {
     expect(screen.getByPlaceholderText("Select time")).toBeInTheDocument();
   });
 
+  it("uses locale-based default placeholder", () => {
+    render(<TimePicker locale="zh-CN" />);
+    expect(screen.getByPlaceholderText("请选择时间")).toBeInTheDocument();
+  });
+
+  it("allows overriding labels for placeholder", () => {
+    render(<TimePicker labels={{ selectTime: "Pick a time" }} />);
+    expect(screen.getByPlaceholderText("Pick a time")).toBeInTheDocument();
+  });
+
+  it("uses range placeholder by default in range mode", () => {
+    render(<TimePicker range />);
+    expect(
+      screen.getByPlaceholderText("Select time range")
+    ).toBeInTheDocument();
+  });
+
   it("renders controlled display value", () => {
     render(<TimePicker value="14:30" />);
     const input = screen.getByRole("textbox") as HTMLInputElement;

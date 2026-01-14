@@ -42,6 +42,11 @@ function App() {
 
 使用 `locale` 属性切换 UI 文案与选项的 aria-label。
 
+也可以用 `labels` 覆盖默认文案（会与 locale 的默认文案合并）。当未显式传入 `placeholder` 时：
+
+- 单选模式默认使用 `labels.selectTime`
+- `range` 模式默认使用 `labels.selectTimeRange`
+
 ### Vue 3
 
 ```vue
@@ -54,7 +59,16 @@ const locale = ref<"zh-CN" | "en-US">("zh-CN");
 </script>
 
 <template>
-  <TimePicker v-model="time" :locale="locale" />
+  <TimePicker
+    v-model="time"
+    :locale="locale"
+    :labels="{
+      clear: '清除',
+      toggle: '打开',
+      selectTime: '请选择时间',
+      selectTimeRange: '请选择时间范围',
+    }"
+  />
 </template>
 ```
 
@@ -76,7 +90,17 @@ function App() {
       >
         Toggle locale
       </button>
-      <TimePicker value={time} onChange={setTime} locale={locale} />
+      <TimePicker
+        value={time}
+        onChange={setTime}
+        locale={locale}
+        labels={{
+          clear: "清除",
+          toggle: "打开",
+          selectTime: "请选择时间",
+          selectTimeRange: "请选择时间范围",
+        }}
+      />
     </>
   );
 }

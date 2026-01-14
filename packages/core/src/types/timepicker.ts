@@ -9,12 +9,33 @@ export type TimePickerRangeValue = [string | null, string | null];
 
 export type TimePickerModelValue = TimePickerSingleValue | TimePickerRangeValue;
 
+export interface TimePickerLabels {
+  hour: string;
+  minute: string;
+  second: string;
+  now: string;
+  ok: string;
+  start: string;
+  end: string;
+  clear: string;
+  toggle: string;
+  dialog: string;
+  selectTime: string;
+  selectTimeRange: string;
+}
+
 export interface TimePickerProps {
   /**
    * Locale used for UI labels (e.g. AM/PM) and display formatting.
    * Example: 'zh-CN', 'en-US'
    */
   locale?: string;
+
+  /**
+   * UI labels for i18n.
+   * When provided, merges with locale-based defaults.
+   */
+  labels?: Partial<TimePickerLabels>;
 
   /**
    * TimePicker size
