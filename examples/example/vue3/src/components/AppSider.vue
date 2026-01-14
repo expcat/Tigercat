@@ -73,8 +73,10 @@ watch(
                     : 'text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-900',
             ]" :title="props.lang === 'zh-CN' ? '首页' : 'Home'">
                 <span :class="[
-                    'inline-flex size-7 items-center justify-center rounded-md text-xs font-semibold',
-                    'bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200',
+                    'inline-flex items-center justify-center rounded-md text-xs font-semibold',
+                    isSiderCollapsed
+                        ? 'size-9 bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200'
+                        : 'size-7 bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200',
                     isActive('/') ? 'bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)]' : '',
                 ]">
                     {{ getAbbr(props.lang === 'zh-CN' ? '首页' : 'Home') }}
@@ -92,7 +94,7 @@ watch(
                         <span :class="[
                             'inline-flex items-center justify-center text-[10px] font-bold',
                             isSiderCollapsed
-                                ? 'size-9 rounded-full border border-gray-200 bg-white text-gray-700 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200'
+                                ? 'size-9 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200'
                                 : 'size-6 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200'
                         ]">
                             {{ getAbbr(group.label[props.lang]) }}
@@ -119,10 +121,9 @@ watch(
                                     ]">
                                     <span :class="[
                                         'inline-flex items-center justify-center text-[10px] font-semibold',
-                                        isSiderCollapsed
-                                            ? 'size-7 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200'
-                                            : 'size-6 rounded-md bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200',
-                                        isActive(item.path) ? 'bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)]' : '',
+                                        'rounded-md border border-gray-200 bg-transparent text-gray-700 dark:border-gray-800 dark:text-gray-200',
+                                        isSiderCollapsed ? 'size-7' : 'size-6',
+                                        isActive(item.path) ? 'text-[var(--tiger-primary,#2563eb)]' : '',
                                     ]">
                                         {{ getAbbr(item.label[props.lang]) }}
                                     </span>
