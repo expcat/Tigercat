@@ -5,7 +5,7 @@ export const progressLineBaseClasses = 'relative overflow-hidden rounded-full'
 export const progressLineInnerClasses =
   'h-full rounded-full transition-all duration-300 ease-in-out flex items-center justify-end'
 
-export const progressTextBaseClasses = 'font-medium ml-2 text-[var(--tiger-text,#374151)]'
+export const progressTextBaseClasses = 'font-medium ml-2 text-[color:var(--tiger-text,#374151)]'
 
 export const progressCircleBaseClasses = 'relative inline-flex items-center justify-center'
 
@@ -100,8 +100,8 @@ export function getCircleSize(
   return { width, height, radius, cx, cy }
 }
 
-export const progressTrackBgClasses = 'bg-[var(--tiger-border,#e5e7eb)]'
+export const progressTrackBgClasses = 'bg-[color:var(--tiger-border,#e5e7eb)]'
 
 export const progressCircleTextClasses = 'absolute inset-0 flex items-center justify-center'
 
-export const progressCircleTrackStrokeClasses = 'text-[var(--tiger-border,#e5e7eb)]'
+export const progressCircleTrackStrokeClasses = 'text-[color:var(--tiger-border,#e5e7eb)]'
