@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, inject, ref, type Ref } from 'vue'
 import { TimePicker } from '@tigercat/vue'
+import type { DemoLang } from '@demo-shared/app-config'
 
-const locale = ref<'zh-CN' | 'en-US'>('zh-CN')
+const demoLang = inject<Ref<DemoLang>>('demo-lang', ref<DemoLang>('zh-CN'))
+const locale = computed(() => demoLang.value)
 const time = ref<string | null>(null)
 const time24 = ref<string | null>('14:30')
 const time12 = ref<string | null>('14:30')
@@ -17,15 +19,6 @@ const timeRange = ref<[string | null, string | null]>([null, null])
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">TimePicker 时间选择器</h1>
       <p class="text-gray-600">用于选择或输入时间。</p>
-
-      <div class="mt-4 flex items-center gap-3">
-        <label class="text-sm font-medium text-gray-700">语言</label>
-        <select class="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm"
-                v-model="locale">
-          <option value="zh-CN">中文</option>
-          <option value="en-US">English</option>
-        </select>
-      </div>
     </div>
 
     <!-- 基础用法 -->
@@ -35,6 +28,7 @@ const timeRange = ref<[string | null, string | null]>([null, null])
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="max-w-md space-y-4">
           <TimePicker v-model="time"
+                      class="w-full max-w-[260px]"
                       :locale="locale"
                       placeholder="请选择时间" />
           <p class="text-sm text-gray-600">
@@ -51,6 +45,7 @@ const timeRange = ref<[string | null, string | null]>([null, null])
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="max-w-md space-y-4">
           <TimePicker v-model="timeRange"
+                      class="w-full max-w-[340px]"
                       :locale="locale"
                       :range="true"
                       :placeholder="locale === 'zh-CN' ? '请选择时间段' : 'Select time range'" />
@@ -70,18 +65,21 @@ const timeRange = ref<[string | null, string | null]>([null, null])
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">小尺寸</label>
             <TimePicker size="sm"
+                        class="w-full max-w-[260px]"
                         :locale="locale"
                         placeholder="小尺寸时间选择器" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">中尺寸</label>
             <TimePicker size="md"
+                        class="w-full max-w-[260px]"
                         :locale="locale"
                         placeholder="中尺寸时间选择器" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">大尺寸</label>
             <TimePicker size="lg"
+                        class="w-full max-w-[260px]"
                         :locale="locale"
                         placeholder="大尺寸时间选择器" />
           </div>
@@ -98,6 +96,7 @@ const timeRange = ref<[string | null, string | null]>([null, null])
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">24 小时制</label>
             <TimePicker v-model="time24"
+                        class="w-full max-w-[260px]"
                         :locale="locale"
                         format="24" />
             <p class="text-sm text-gray-500 mt-1">显示：{{ time24 }}</p>
@@ -105,6 +104,7 @@ const timeRange = ref<[string | null, string | null]>([null, null])
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">12 小时制</label>
             <TimePicker v-model="time12"
+                        class="w-full max-w-[260px]"
                         :locale="locale"
                         format="12" />
             <p class="text-sm text-gray-500 mt-1">显示：{{ time12 }}</p>
@@ -120,6 +120,7 @@ const timeRange = ref<[string | null, string | null]>([null, null])
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="max-w-md space-y-4">
           <TimePicker v-model="timeWithSeconds"
+                      class="w-full max-w-[260px]"
                       :locale="locale"
                       :show-seconds="true"
                       placeholder="选择时间（包含秒）" />
@@ -137,6 +138,7 @@ const timeRange = ref<[string | null, string | null]>([null, null])
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="max-w-md space-y-4">
           <TimePicker v-model="timeWithSteps"
+                      class="w-full max-w-[260px]"
                       :hour-step="2"
                       :minute-step="15"
                       :locale="locale"
@@ -155,6 +157,7 @@ const timeRange = ref<[string | null, string | null]>([null, null])
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="max-w-md space-y-4">
           <TimePicker v-model="timeWithRange"
+                      class="w-full max-w-[260px]"
                       min-time="09:00"
                       max-time="18:00"
                       :locale="locale"
@@ -175,12 +178,14 @@ const timeRange = ref<[string | null, string | null]>([null, null])
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">禁用</label>
             <TimePicker model-value="14:30"
+                        class="w-full max-w-[260px]"
                         :locale="locale"
                         disabled />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">只读</label>
             <TimePicker model-value="14:30"
+                        class="w-full max-w-[260px]"
                         :locale="locale"
                         readonly />
           </div>
@@ -197,12 +202,14 @@ const timeRange = ref<[string | null, string | null]>([null, null])
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">可清除</label>
             <TimePicker v-model="time24"
+                        class="w-full max-w-[260px]"
                         :locale="locale"
                         :clearable="true" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">不可清除</label>
             <TimePicker v-model="time24"
+                        class="w-full max-w-[260px]"
                         :locale="locale"
                         :clearable="false" />
           </div>
