@@ -3,18 +3,13 @@
  * Shared styles and helpers for Tree components
  */
 
-import type {
-  TreeNode,
-  TreeCheckedState,
-  TreeCheckStrategy,
-  TreeFilterFn,
-} from "../types/tree";
+import type { TreeNode, TreeCheckedState, TreeCheckStrategy, TreeFilterFn } from '../types/tree'
 
 export interface VisibleTreeItem {
-  key: string | number;
-  level: number;
-  parentKey?: string | number;
-  node: TreeNode;
+  key: string | number
+  level: number
+  parentKey?: string | number
+  node: TreeNode
 }
 
 export function getVisibleTreeItems(
@@ -22,117 +17,109 @@ export function getVisibleTreeItems(
   expandedKeys: Set<string | number> = new Set(),
   matchedKeys?: Set<string | number>
 ): VisibleTreeItem[] {
-  const isFiltered = !!matchedKeys && matchedKeys.size > 0;
-  const result: VisibleTreeItem[] = [];
+  const isFiltered = !!matchedKeys && matchedKeys.size > 0
+  const result: VisibleTreeItem[] = []
 
-  function traverse(
-    nodes: TreeNode[],
-    level: number,
-    parentKey?: string | number
-  ) {
+  function traverse(nodes: TreeNode[], level: number, parentKey?: string | number) {
     for (const node of nodes) {
-      const isVisible = !isFiltered || matchedKeys!.has(node.key);
-      if (!isVisible) continue;
+      const isVisible = !isFiltered || matchedKeys!.has(node.key)
+      if (!isVisible) continue
 
-      result.push({ key: node.key, level, parentKey, node });
+      result.push({ key: node.key, level, parentKey, node })
 
-      if (
-        node.children &&
-        node.children.length > 0 &&
-        expandedKeys.has(node.key)
-      ) {
-        traverse(node.children, level + 1, node.key);
+      if (node.children && node.children.length > 0 && expandedKeys.has(node.key)) {
+        traverse(node.children, level + 1, node.key)
       }
     }
   }
 
-  traverse(treeData, 1);
-  return result;
+  traverse(treeData, 1)
+  return result
 }
 
 /**
  * Base classes for tree container
  */
-export const treeBaseClasses = "w-full bg-white rounded-lg";
+export const treeBaseClasses = 'w-full bg-white rounded-lg'
 
 /**
  * Tree node wrapper classes
  */
-export const treeNodeWrapperClasses = "select-none";
+export const treeNodeWrapperClasses = 'select-none'
 
 /**
  * Tree node content classes
  */
 export const treeNodeContentClasses =
-  "flex items-center px-2 py-1.5 cursor-pointer rounded transition-colors duration-200";
+  'flex items-center px-2 py-1.5 cursor-pointer rounded transition-colors duration-200'
 
 /**
  * Tree node hover classes
  */
-export const treeNodeHoverClasses = "hover:bg-gray-50";
+export const treeNodeHoverClasses = 'hover:bg-gray-50'
 
 /**
  * Tree node selected classes
  */
 export const treeNodeSelectedClasses =
-  "bg-[var(--tiger-primary,#2563eb)] bg-opacity-10 text-[var(--tiger-primary,#2563eb)]";
+  'bg-[var(--tiger-primary,#2563eb)] bg-opacity-10 text-[var(--tiger-primary,#2563eb)]'
 
 /**
  * Tree node disabled classes
  */
-export const treeNodeDisabledClasses = "opacity-50 cursor-not-allowed";
+export const treeNodeDisabledClasses = 'opacity-50 cursor-not-allowed'
 
 /**
  * Tree node indent classes
  */
-export const treeNodeIndentClasses = "inline-block w-6";
+export const treeNodeIndentClasses = 'inline-block w-6'
 
 /**
  * Tree node expand icon classes
  */
 export const treeNodeExpandIconClasses =
-  "inline-flex items-center justify-center w-6 h-6 transition-transform duration-200";
+  'inline-flex items-center justify-center w-6 h-6 transition-transform duration-200'
 
 /**
  * Tree node expand icon expanded classes
  */
-export const treeNodeExpandIconExpandedClasses = "transform rotate-90";
+export const treeNodeExpandIconExpandedClasses = 'transform rotate-90'
 
 /**
  * Tree node checkbox classes
  */
 export const treeNodeCheckboxClasses =
-  "mr-2 rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]";
+  'mr-2 rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
 
 /**
  * Tree node icon classes
  */
-export const treeNodeIconClasses = "mr-2 flex-shrink-0";
+export const treeNodeIconClasses = 'mr-2 flex-shrink-0'
 
 /**
  * Tree node label classes
  */
-export const treeNodeLabelClasses = "flex-1 truncate";
+export const treeNodeLabelClasses = 'flex-1 truncate'
 
 /**
  * Tree node children container classes
  */
-export const treeNodeChildrenClasses = "ml-6";
+export const treeNodeChildrenClasses = 'ml-6'
 
 /**
  * Tree loading classes
  */
-export const treeLoadingClasses = "inline-block ml-2 animate-spin h-4 w-4";
+export const treeLoadingClasses = 'inline-block ml-2 animate-spin h-4 w-4'
 
 /**
  * Tree empty state classes
  */
-export const treeEmptyStateClasses = "py-8 text-center text-gray-500";
+export const treeEmptyStateClasses = 'py-8 text-center text-gray-500'
 
 /**
  * Tree line classes
  */
-export const treeLineClasses = "border-l border-gray-300";
+export const treeLineClasses = 'border-l border-gray-300'
 
 /**
  * Get tree node classes
@@ -146,25 +133,25 @@ export function getTreeNodeClasses(
   disabled: boolean,
   blockNode = false
 ): string {
-  const classes = [treeNodeContentClasses];
+  const classes = [treeNodeContentClasses]
 
   if (!disabled) {
-    classes.push(treeNodeHoverClasses);
+    classes.push(treeNodeHoverClasses)
   }
 
   if (selected) {
-    classes.push(treeNodeSelectedClasses);
+    classes.push(treeNodeSelectedClasses)
   }
 
   if (disabled) {
-    classes.push(treeNodeDisabledClasses);
+    classes.push(treeNodeDisabledClasses)
   }
 
   if (blockNode) {
-    classes.push("w-full");
+    classes.push('w-full')
   }
 
-  return classes.join(" ");
+  return classes.join(' ')
 }
 
 /**
@@ -173,13 +160,13 @@ export function getTreeNodeClasses(
  * @returns Combined class string for expand icon
  */
 export function getTreeNodeExpandIconClasses(expanded: boolean): string {
-  const classes = [treeNodeExpandIconClasses];
+  const classes = [treeNodeExpandIconClasses]
 
   if (expanded) {
-    classes.push(treeNodeExpandIconExpandedClasses);
+    classes.push(treeNodeExpandIconExpandedClasses)
   }
 
-  return classes.join(" ");
+  return classes.join(' ')
 }
 
 /**
@@ -192,26 +179,20 @@ export function flattenTree(
   treeData: TreeNode[],
   expandedKeys: Set<string | number> = new Set()
 ): Array<TreeNode & { level: number; parentKey?: string | number }> {
-  const result: Array<
-    TreeNode & { level: number; parentKey?: string | number }
-  > = [];
+  const result: Array<TreeNode & { level: number; parentKey?: string | number }> = []
 
   function traverse(nodes: TreeNode[], level = 0, parentKey?: string | number) {
     nodes.forEach((node) => {
-      result.push({ ...node, level, parentKey });
+      result.push({ ...node, level, parentKey })
 
-      if (
-        node.children &&
-        node.children.length > 0 &&
-        expandedKeys.has(node.key)
-      ) {
-        traverse(node.children, level + 1, node.key);
+      if (node.children && node.children.length > 0 && expandedKeys.has(node.key)) {
+        traverse(node.children, level + 1, node.key)
       }
-    });
+    })
   }
 
-  traverse(treeData);
-  return result;
+  traverse(treeData)
+  return result
 }
 
 /**
@@ -220,19 +201,19 @@ export function flattenTree(
  * @returns Array of all node keys
  */
 export function getAllKeys(treeData: TreeNode[]): (string | number)[] {
-  const keys: (string | number)[] = [];
+  const keys: (string | number)[] = []
 
   function traverse(nodes: TreeNode[]) {
     nodes.forEach((node) => {
-      keys.push(node.key);
+      keys.push(node.key)
       if (node.children && node.children.length > 0) {
-        traverse(node.children);
+        traverse(node.children)
       }
-    });
+    })
   }
 
-  traverse(treeData);
-  return keys;
+  traverse(treeData)
+  return keys
 }
 
 /**
@@ -241,20 +222,20 @@ export function getAllKeys(treeData: TreeNode[]): (string | number)[] {
  * @returns Array of leaf node keys
  */
 export function getLeafKeys(treeData: TreeNode[]): (string | number)[] {
-  const keys: (string | number)[] = [];
+  const keys: (string | number)[] = []
 
   function traverse(nodes: TreeNode[]) {
     nodes.forEach((node) => {
       if (!node.children || node.children.length === 0 || node.isLeaf) {
-        keys.push(node.key);
+        keys.push(node.key)
       } else {
-        traverse(node.children);
+        traverse(node.children)
       }
-    });
+    })
   }
 
-  traverse(treeData);
-  return keys;
+  traverse(treeData)
+  return keys
 }
 
 /**
@@ -263,22 +244,19 @@ export function getLeafKeys(treeData: TreeNode[]): (string | number)[] {
  * @param key - Node key
  * @returns Found node or null
  */
-export function findNode(
-  treeData: TreeNode[],
-  key: string | number
-): TreeNode | null {
+export function findNode(treeData: TreeNode[], key: string | number): TreeNode | null {
   for (const node of treeData) {
     if (node.key === key) {
-      return node;
+      return node
     }
     if (node.children && node.children.length > 0) {
-      const found = findNode(node.children, key);
+      const found = findNode(node.children, key)
       if (found) {
-        return found;
+        return found
       }
     }
   }
-  return null;
+  return null
 }
 
 /**
@@ -287,32 +265,26 @@ export function findNode(
  * @param key - Node key
  * @returns Array of parent keys from root to direct parent
  */
-export function getParentKeys(
-  treeData: TreeNode[],
-  key: string | number
-): (string | number)[] {
-  const parents: (string | number)[] = [];
+export function getParentKeys(treeData: TreeNode[], key: string | number): (string | number)[] {
+  const parents: (string | number)[] = []
 
-  function traverse(
-    nodes: TreeNode[],
-    path: (string | number)[] = []
-  ): boolean {
+  function traverse(nodes: TreeNode[], path: (string | number)[] = []): boolean {
     for (const node of nodes) {
       if (node.key === key) {
-        parents.push(...path);
-        return true;
+        parents.push(...path)
+        return true
       }
       if (node.children && node.children.length > 0) {
         if (traverse(node.children, [...path, node.key])) {
-          return true;
+          return true
         }
       }
     }
-    return false;
+    return false
   }
 
-  traverse(treeData);
-  return parents;
+  traverse(treeData)
+  return parents
 }
 
 /**
@@ -321,19 +293,19 @@ export function getParentKeys(
  * @returns Array of all descendant keys
  */
 export function getDescendantKeys(node: TreeNode): (string | number)[] {
-  const keys: (string | number)[] = [];
+  const keys: (string | number)[] = []
 
   function traverse(n: TreeNode) {
     if (n.children && n.children.length > 0) {
       n.children.forEach((child) => {
-        keys.push(child.key);
-        traverse(child);
-      });
+        keys.push(child.key)
+        traverse(child)
+      })
     }
   }
 
-  traverse(node);
-  return keys;
+  traverse(node)
+  return keys
 }
 
 /**
@@ -349,67 +321,67 @@ export function calculateCheckedState(
   checkStrictly = false
 ): TreeCheckedState {
   if (checkStrictly) {
-    return { checked: checkedKeys, halfChecked: [] };
+    return { checked: checkedKeys, halfChecked: [] }
   }
 
-  const checkedSet = new Set(checkedKeys);
-  const halfCheckedSet = new Set<string | number>();
+  const checkedSet = new Set(checkedKeys)
+  const halfCheckedSet = new Set<string | number>()
 
   function markSubtreeChecked(node: TreeNode) {
-    checkedSet.add(node.key);
-    halfCheckedSet.delete(node.key);
-    node.children?.forEach(markSubtreeChecked);
+    checkedSet.add(node.key)
+    halfCheckedSet.delete(node.key)
+    node.children?.forEach(markSubtreeChecked)
   }
 
   function checkNode(node: TreeNode): {
-    checked: boolean;
-    halfChecked: boolean;
+    checked: boolean
+    halfChecked: boolean
   } {
     // Treat explicitly-checked parent keys as selecting the whole subtree.
     if (checkedSet.has(node.key)) {
-      markSubtreeChecked(node);
-      return { checked: true, halfChecked: false };
+      markSubtreeChecked(node)
+      return { checked: true, halfChecked: false }
     }
 
     if (!node.children || node.children.length === 0) {
-      return { checked: checkedSet.has(node.key), halfChecked: false };
+      return { checked: checkedSet.has(node.key), halfChecked: false }
     }
 
-    let checkedCount = 0;
-    let totalCount = 0;
+    let checkedCount = 0
+    let totalCount = 0
 
     node.children.forEach((child) => {
-      const childState = checkNode(child);
-      totalCount++;
+      const childState = checkNode(child)
+      totalCount++
 
       if (childState.checked) {
-        checkedCount++;
+        checkedCount++
       } else if (childState.halfChecked) {
-        halfCheckedSet.add(node.key);
+        halfCheckedSet.add(node.key)
       }
-    });
+    })
 
     if (checkedCount === totalCount) {
-      checkedSet.add(node.key);
-      halfCheckedSet.delete(node.key);
-      return { checked: true, halfChecked: false };
+      checkedSet.add(node.key)
+      halfCheckedSet.delete(node.key)
+      return { checked: true, halfChecked: false }
     } else if (checkedCount > 0 || halfCheckedSet.has(node.key)) {
-      halfCheckedSet.add(node.key);
-      checkedSet.delete(node.key);
-      return { checked: false, halfChecked: true };
+      halfCheckedSet.add(node.key)
+      checkedSet.delete(node.key)
+      return { checked: false, halfChecked: true }
     }
 
-    checkedSet.delete(node.key);
-    halfCheckedSet.delete(node.key);
-    return { checked: false, halfChecked: false };
+    checkedSet.delete(node.key)
+    halfCheckedSet.delete(node.key)
+    return { checked: false, halfChecked: false }
   }
 
-  treeData.forEach((node) => checkNode(node));
+  treeData.forEach((node) => checkNode(node))
 
   return {
     checked: Array.from(checkedSet),
-    halfChecked: Array.from(halfCheckedSet),
-  };
+    halfChecked: Array.from(halfCheckedSet)
+  }
 }
 
 /**
@@ -428,44 +400,42 @@ export function handleNodeCheck(
   currentChecked: (string | number)[],
   checkStrictly = false
 ): TreeCheckedState {
-  const node = findNode(treeData, nodeKey);
+  const node = findNode(treeData, nodeKey)
   if (!node) {
-    return calculateCheckedState(treeData, currentChecked, checkStrictly);
+    return calculateCheckedState(treeData, currentChecked, checkStrictly)
   }
 
-  let newCheckedKeys = [...currentChecked];
+  let newCheckedKeys = [...currentChecked]
 
   if (checkStrictly) {
     if (checked) {
       if (!newCheckedKeys.includes(nodeKey)) {
-        newCheckedKeys.push(nodeKey);
+        newCheckedKeys.push(nodeKey)
       }
     } else {
-      newCheckedKeys = newCheckedKeys.filter((k) => k !== nodeKey);
+      newCheckedKeys = newCheckedKeys.filter((k) => k !== nodeKey)
     }
   } else {
     // Get all descendant keys
-    const descendantKeys = getDescendantKeys(node);
+    const descendantKeys = getDescendantKeys(node)
 
     if (checked) {
       // Add node and all descendants
       if (!newCheckedKeys.includes(nodeKey)) {
-        newCheckedKeys.push(nodeKey);
+        newCheckedKeys.push(nodeKey)
       }
       descendantKeys.forEach((key) => {
         if (!newCheckedKeys.includes(key)) {
-          newCheckedKeys.push(key);
+          newCheckedKeys.push(key)
         }
-      });
+      })
     } else {
       // Remove node and all descendants
-      newCheckedKeys = newCheckedKeys.filter(
-        (k) => k !== nodeKey && !descendantKeys.includes(k)
-      );
+      newCheckedKeys = newCheckedKeys.filter((k) => k !== nodeKey && !descendantKeys.includes(k))
     }
   }
 
-  return calculateCheckedState(treeData, newCheckedKeys, checkStrictly);
+  return calculateCheckedState(treeData, newCheckedKeys, checkStrictly)
 }
 
 /**
@@ -478,48 +448,47 @@ export function handleNodeCheck(
 export function getCheckedKeysByStrategy(
   checkedState: TreeCheckedState,
   treeData: TreeNode[],
-  strategy: TreeCheckStrategy = "all"
+  strategy: TreeCheckStrategy = 'all'
 ): (string | number)[] {
-  if (strategy === "all") {
-    return checkedState.checked;
+  if (strategy === 'all') {
+    return checkedState.checked
   }
 
-  const allKeys = new Set(checkedState.checked);
-  const result: (string | number)[] = [];
+  const allKeys = new Set(checkedState.checked)
+  const result: (string | number)[] = []
 
   function traverse(nodes: TreeNode[]) {
     nodes.forEach((node) => {
       if (allKeys.has(node.key)) {
-        const hasChildren = node.children && node.children.length > 0;
+        const hasChildren = node.children && node.children.length > 0
         const allChildrenChecked =
-          hasChildren &&
-          node.children!.every((child) => allKeys.has(child.key));
+          hasChildren && node.children!.every((child) => allKeys.has(child.key))
 
-        if (strategy === "parent") {
+        if (strategy === 'parent') {
           // Return parent if all children are checked
           if (hasChildren && allChildrenChecked) {
-            result.push(node.key);
+            result.push(node.key)
             // Don't traverse children
-            return;
+            return
           } else if (!hasChildren) {
-            result.push(node.key);
+            result.push(node.key)
           }
-        } else if (strategy === "child") {
+        } else if (strategy === 'child') {
           // Return leaf nodes only
           if (!hasChildren || !allChildrenChecked) {
-            result.push(node.key);
+            result.push(node.key)
           }
         }
 
         if (hasChildren) {
-          traverse(node.children!);
+          traverse(node.children!)
         }
       }
-    });
+    })
   }
 
-  traverse(treeData);
-  return result;
+  traverse(treeData)
+  return result
 }
 
 /**
@@ -534,40 +503,40 @@ export function filterTreeNodes(
   filterValue: string,
   filterFn?: TreeFilterFn
 ): Set<string | number> {
-  const matchedKeys = new Set<string | number>();
+  const matchedKeys = new Set<string | number>()
 
   if (!filterValue) {
-    return matchedKeys;
+    return matchedKeys
   }
 
   const defaultFilterFn: TreeFilterFn = (value, node) => {
-    return node.label.toLowerCase().includes(value.toLowerCase());
-  };
+    return node.label.toLowerCase().includes(value.toLowerCase())
+  }
 
-  const fn = filterFn || defaultFilterFn;
+  const fn = filterFn || defaultFilterFn
 
   function traverse(nodes: TreeNode[]): boolean {
-    let hasMatchedChild = false;
+    let hasMatchedChild = false
 
     nodes.forEach((node) => {
-      const isMatched = fn(filterValue, node);
-      let childMatched = false;
+      const isMatched = fn(filterValue, node)
+      let childMatched = false
 
       if (node.children && node.children.length > 0) {
-        childMatched = traverse(node.children);
+        childMatched = traverse(node.children)
       }
 
       if (isMatched || childMatched) {
-        matchedKeys.add(node.key);
-        hasMatchedChild = true;
+        matchedKeys.add(node.key)
+        hasMatchedChild = true
       }
-    });
+    })
 
-    return hasMatchedChild;
+    return hasMatchedChild
   }
 
-  traverse(treeData);
-  return matchedKeys;
+  traverse(treeData)
+  return matchedKeys
 }
 
 /**
@@ -580,14 +549,14 @@ export function getAutoExpandKeys(
   treeData: TreeNode[],
   matchedKeys: Set<string | number>
 ): Set<string | number> {
-  const expandKeys = new Set<string | number>();
+  const expandKeys = new Set<string | number>()
 
   matchedKeys.forEach((key) => {
-    const parentKeys = getParentKeys(treeData, key);
-    parentKeys.forEach((pk) => expandKeys.add(pk));
-  });
+    const parentKeys = getParentKeys(treeData, key)
+    parentKeys.forEach((pk) => expandKeys.add(pk))
+  })
 
-  return expandKeys;
+  return expandKeys
 }
 
 /**
@@ -599,7 +568,7 @@ export const defaultExpandIcon = (expanded: boolean) => `
   )}" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
     <path d="M6 4l4 4-4 4V4z"/>
   </svg>
-`;
+`
 
 /**
  * Default checkbox icon SVG (indeterminate state)
@@ -608,4 +577,4 @@ export const defaultIndeterminateIcon = `
   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
     <rect x="4" y="7" width="8" height="2" rx="1"/>
   </svg>
-`;
+`

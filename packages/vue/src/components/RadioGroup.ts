@@ -7,33 +7,28 @@ import {
   PropType,
   watch,
   getCurrentInstance,
-  type ComputedRef,
-} from 'vue';
-import {
-  classNames,
-  coerceClassValue,
-  getRadioGroupClasses,
-  type RadioSize,
-} from '@tigercat/core';
+  type ComputedRef
+} from 'vue'
+import { classNames, coerceClassValue, getRadioGroupClasses, type RadioSize } from '@tigercat/core'
 
-export const RadioGroupKey = Symbol('RadioGroup');
+export const RadioGroupKey = Symbol('RadioGroup')
 
 export interface RadioGroupContext {
-  value: string | number | undefined;
-  name: string;
-  disabled: boolean;
-  size: RadioSize;
-  onChange: (value: string | number) => void;
+  value: string | number | undefined
+  name: string
+  disabled: boolean
+  size: RadioSize
+  onChange: (value: string | number) => void
 }
 
 export interface VueRadioGroupProps {
-  value?: string | number;
-  defaultValue?: string | number;
-  name?: string;
-  disabled?: boolean;
-  size?: RadioSize;
-  className?: string;
-  style?: Record<string, string | number>;
+  value?: string | number
+  defaultValue?: string | number
+  name?: string
+  disabled?: boolean
+  size?: RadioSize
+  className?: string
+  style?: Record<string, string | number>
 }
 
 export const RadioGroup = defineComponent({
@@ -44,19 +39,19 @@ export const RadioGroup = defineComponent({
      * Selected value (for v-model:value)
      */
     value: {
-      type: [String, Number] as PropType<string | number | undefined>,
+      type: [String, Number] as PropType<string | number | undefined>
     },
     /**
      * Default selected value (uncontrolled mode)
      */
     defaultValue: {
-      type: [String, Number] as PropType<string | number | undefined>,
+      type: [String, Number] as PropType<string | number | undefined>
     },
     /**
      * Input name attribute for all radios
      */
     name: {
-      type: String,
+      type: String
     },
     /**
      * Whether all radios are disabled
@@ -64,7 +59,7 @@ export const RadioGroup = defineComponent({
      */
     disabled: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Radio size for all radios
@@ -72,22 +67,22 @@ export const RadioGroup = defineComponent({
      */
     size: {
       type: String as PropType<RadioSize>,
-      default: 'md' as RadioSize,
+      default: 'md' as RadioSize
     },
 
     /**
      * Additional CSS classes
      */
     className: {
-      type: String,
+      type: String
     },
 
     /**
      * Inline styles
      */
     style: {
-      type: Object as PropType<Record<string, string | number>>,
-    },
+      type: Object as PropType<Record<string, string | number>>
+    }
   },
   emits: {
     /**
@@ -98,59 +93,53 @@ export const RadioGroup = defineComponent({
     /**
      * Emitted when value changes
      */
-    change: (value: string | number) =>
-      typeof value === 'string' || typeof value === 'number',
+    change: (value: string | number) => typeof value === 'string' || typeof value === 'number'
   },
   setup(props, { slots, emit, attrs }) {
-    const instance = getCurrentInstance();
+    const instance = getCurrentInstance()
 
     // Internal state for uncontrolled mode
-    const internalValue = ref<string | number | undefined>(props.defaultValue);
+    const internalValue = ref<string | number | undefined>(props.defaultValue)
 
     // Determine if controlled or uncontrolled
     const isControlled = computed(() => {
-      const rawProps = instance?.vnode.props as
-        | Record<string, unknown>
-        | null
-        | undefined;
-      return (
-        !!rawProps && Object.prototype.hasOwnProperty.call(rawProps, 'value')
-      );
-    });
+      const rawProps = instance?.vnode.props as Record<string, unknown> | null | undefined
+      return !!rawProps && Object.prototype.hasOwnProperty.call(rawProps, 'value')
+    })
 
     // Current value - use prop value if controlled, otherwise use internal state
     const currentValue = computed(() => {
-      return isControlled.value ? props.value : internalValue.value;
-    });
+      return isControlled.value ? props.value : internalValue.value
+    })
 
     // Watch for changes to defaultValue in uncontrolled mode
     watch(
       () => props.defaultValue,
       (newVal) => {
         if (!isControlled.value) {
-          internalValue.value = newVal;
+          internalValue.value = newVal
         }
       }
-    );
+    )
 
     const handleChange = (value: string | number) => {
-      if (props.disabled) return;
+      if (props.disabled) return
 
       // Update internal state if uncontrolled
       if (!isControlled.value) {
-        internalValue.value = value;
+        internalValue.value = value
       }
 
       // Emit events
-      emit('update:value', value);
-      emit('change', value);
-    };
+      emit('update:value', value)
+      emit('change', value)
+    }
 
     // Generate unique name if not provided
     const generatedName = `tiger-radio-group-${Date.now()}-${Math.random()
       .toString(36)
-      .slice(2, 11)}`;
-    const groupName = computed(() => props.name || generatedName);
+      .slice(2, 11)}`
+    const groupName = computed(() => props.name || generatedName)
 
     // Provide context to child Radio components (reactive)
     provide<ComputedRef<RadioGroupContext>>(
@@ -160,63 +149,55 @@ export const RadioGroup = defineComponent({
         name: groupName.value,
         disabled: props.disabled,
         size: props.size,
-        onChange: handleChange,
+        onChange: handleChange
       }))
-    );
+    )
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (props.disabled) return;
+      if (props.disabled) return
       if (
         event.key !== 'ArrowDown' &&
         event.key !== 'ArrowRight' &&
         event.key !== 'ArrowUp' &&
         event.key !== 'ArrowLeft'
       ) {
-        return;
+        return
       }
 
-      const target = event.target as HTMLElement;
-      const currentInput = target.closest(
-        'input[type="radio"]'
-      ) as HTMLInputElement | null;
-      if (!currentInput) return;
+      const target = event.target as HTMLElement
+      const currentInput = target.closest('input[type="radio"]') as HTMLInputElement | null
+      if (!currentInput) return
 
-      const container = event.currentTarget as HTMLElement;
+      const container = event.currentTarget as HTMLElement
       const inputs = Array.from(
         container.querySelectorAll('input[type="radio"]')
-      ) as HTMLInputElement[];
+      ) as HTMLInputElement[]
 
-      const enabledInputs = inputs.filter((input) => !input.disabled);
-      if (enabledInputs.length === 0) return;
+      const enabledInputs = inputs.filter((input) => !input.disabled)
+      if (enabledInputs.length === 0) return
 
-      const currentIndex = enabledInputs.indexOf(currentInput);
-      if (currentIndex === -1) return;
+      const currentIndex = enabledInputs.indexOf(currentInput)
+      if (currentIndex === -1) return
 
-      event.preventDefault();
+      event.preventDefault()
 
-      const direction =
-        event.key === 'ArrowDown' || event.key === 'ArrowRight' ? 1 : -1;
-      const nextIndex =
-        (currentIndex + direction + enabledInputs.length) %
-        enabledInputs.length;
-      const nextInput = enabledInputs[nextIndex];
+      const direction = event.key === 'ArrowDown' || event.key === 'ArrowRight' ? 1 : -1
+      const nextIndex = (currentIndex + direction + enabledInputs.length) % enabledInputs.length
+      const nextInput = enabledInputs[nextIndex]
 
-      nextInput.focus();
-      nextInput.click();
-    };
+      nextInput.focus()
+      nextInput.click()
+    }
 
     return () => {
-      const rootStyle = [attrs.style, props.style];
-      const mergedClass = classNames(
-        props.className,
-        coerceClassValue(attrs.class)
-      );
+      const rootStyle = [attrs.style, props.style]
+      const mergedClass = classNames(props.className, coerceClassValue(attrs.class))
       const rootClass = getRadioGroupClasses({
         className: mergedClass,
-        hasCustomClass: !!mergedClass,
-      });
+        hasCustomClass: !!mergedClass
+      })
 
-      const { class: _class, style: _style, ...restAttrs } = attrs;
+      const { class: _class, style: _style, ...restAttrs } = attrs
 
       return h(
         'div',
@@ -225,12 +206,12 @@ export const RadioGroup = defineComponent({
           class: rootClass,
           style: rootStyle,
           role: 'radiogroup',
-          onKeydown: handleKeyDown,
+          onKeydown: handleKeyDown
         },
         slots.default?.()
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default RadioGroup;
+export default RadioGroup

@@ -29,7 +29,9 @@ const customTotalText = (total: number, range: [number, number]) => {
   <div class="max-w-5xl mx-auto p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Pagination 分页</h1>
-      <p class="text-gray-600">用于在数据量较大时进行分页展示，支持多种模式、快速跳页、页码选择等特性。</p>
+      <p class="text-gray-600">
+        用于在数据量较大时进行分页展示，支持多种模式、快速跳页、页码选择等特性。
+      </p>
     </div>
 
     <!-- 基本用法 -->
@@ -37,11 +39,7 @@ const customTotalText = (total: number, range: [number, number]) => {
       <h2 class="text-2xl font-bold mb-4">基本用法</h2>
       <p class="text-gray-600 mb-6">最简单的分页组件。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Pagination 
-          v-model:current="current1" 
-          :total="100"
-          :pageSize="10"
-        />
+        <Pagination v-model:current="current1" :total="100" :pageSize="10" />
       </div>
       <Divider class="my-6" />
     </section>
@@ -51,12 +49,7 @@ const customTotalText = (total: number, range: [number, number]) => {
       <h2 class="text-2xl font-bold mb-4">快速跳页</h2>
       <p class="text-gray-600 mb-6">显示快速跳页输入框，方便快速跳转到指定页。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Pagination 
-          v-model:current="current2" 
-          :total="500"
-          :pageSize="10"
-          showQuickJumper
-        />
+        <Pagination v-model:current="current2" :total="500" :pageSize="10" showQuickJumper />
       </div>
       <Divider class="my-6" />
     </section>
@@ -66,14 +59,13 @@ const customTotalText = (total: number, range: [number, number]) => {
       <h2 class="text-2xl font-bold mb-4">改变每页条数</h2>
       <p class="text-gray-600 mb-6">可以改变每页显示的条数。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Pagination 
+        <Pagination
           v-model:current="current3"
           v-model:pageSize="pageSize"
           :total="500"
           :pageSizeOptions="[10, 20, 50, 100]"
           showSizeChanger
-          @page-size-change="handlePageSizeChange"
-        />
+          @page-size-change="handlePageSizeChange" />
       </div>
       <Divider class="my-6" />
     </section>
@@ -83,11 +75,7 @@ const customTotalText = (total: number, range: [number, number]) => {
       <h2 class="text-2xl font-bold mb-4">简单模式</h2>
       <p class="text-gray-600 mb-6">只显示上一页、下一页和当前页/总页数。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Pagination 
-          v-model:current="current4" 
-          :total="500"
-          simple
-        />
+        <Pagination v-model:current="current4" :total="500" simple />
       </div>
       <Divider class="my-6" />
     </section>
@@ -99,27 +87,15 @@ const customTotalText = (total: number, range: [number, number]) => {
       <div class="p-6 bg-gray-50 rounded-lg space-y-4">
         <div>
           <p class="text-sm text-gray-500 mb-2">小尺寸</p>
-          <Pagination 
-            v-model:current="current5" 
-            :total="100"
-            size="small"
-          />
+          <Pagination v-model:current="current5" :total="100" size="small" />
         </div>
         <div>
           <p class="text-sm text-gray-500 mb-2">中等尺寸（默认）</p>
-          <Pagination 
-            v-model:current="current5" 
-            :total="100"
-            size="medium"
-          />
+          <Pagination v-model:current="current5" :total="100" size="medium" />
         </div>
         <div>
           <p class="text-sm text-gray-500 mb-2">大尺寸</p>
-          <Pagination 
-            v-model:current="current5" 
-            :total="100"
-            size="large"
-          />
+          <Pagination v-model:current="current5" :total="100" size="large" />
         </div>
       </div>
       <Divider class="my-6" />
@@ -132,27 +108,15 @@ const customTotalText = (total: number, range: [number, number]) => {
       <div class="p-6 bg-gray-50 rounded-lg space-y-4">
         <div>
           <p class="text-sm text-gray-500 mb-2">左对齐</p>
-          <Pagination 
-            v-model:current="current6" 
-            :total="100"
-            align="left"
-          />
+          <Pagination v-model:current="current6" :total="100" align="left" />
         </div>
         <div>
           <p class="text-sm text-gray-500 mb-2">居中对齐（默认）</p>
-          <Pagination 
-            v-model:current="current6" 
-            :total="100"
-            align="center"
-          />
+          <Pagination v-model:current="current6" :total="100" align="center" />
         </div>
         <div>
           <p class="text-sm text-gray-500 mb-2">右对齐</p>
-          <Pagination 
-            v-model:current="current6" 
-            :total="100"
-            align="right"
-          />
+          <Pagination v-model:current="current6" :total="100" align="right" />
         </div>
       </div>
       <Divider class="my-6" />
@@ -163,11 +127,7 @@ const customTotalText = (total: number, range: [number, number]) => {
       <h2 class="text-2xl font-bold mb-4">自定义总数文本</h2>
       <p class="text-gray-600 mb-6">可以自定义显示总条数的文本。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Pagination 
-          v-model:current="current7" 
-          :total="100"
-          :totalText="customTotalText"
-        />
+        <Pagination v-model:current="current7" :total="100" :totalText="customTotalText" />
       </div>
       <Divider class="my-6" />
     </section>
@@ -177,11 +137,7 @@ const customTotalText = (total: number, range: [number, number]) => {
       <h2 class="text-2xl font-bold mb-4">禁用状态</h2>
       <p class="text-gray-600 mb-6">禁用分页组件的所有交互。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Pagination 
-          v-model:current="current8" 
-          :total="100"
-          disabled
-        />
+        <Pagination v-model:current="current8" :total="100" disabled />
       </div>
       <Divider class="my-6" />
     </section>
@@ -191,7 +147,7 @@ const customTotalText = (total: number, range: [number, number]) => {
       <h2 class="text-2xl font-bold mb-4">完整示例</h2>
       <p class="text-gray-600 mb-6">包含所有功能的完整示例（查看控制台）。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Pagination 
+        <Pagination
           v-model:current="current3"
           v-model:pageSize="pageSize"
           :total="500"
@@ -202,8 +158,7 @@ const customTotalText = (total: number, range: [number, number]) => {
           size="medium"
           align="center"
           @change="handleChange"
-          @page-size-change="handlePageSizeChange"
-        />
+          @page-size-change="handlePageSizeChange" />
       </div>
     </section>
   </div>

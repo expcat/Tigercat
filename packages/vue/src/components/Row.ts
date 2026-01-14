@@ -1,12 +1,5 @@
-import {
-  defineComponent,
-  computed,
-  h,
-  PropType,
-  provide,
-  InjectionKey,
-} from 'vue';
-import type { ComputedRef } from 'vue';
+import { defineComponent, computed, h, PropType, provide, InjectionKey } from 'vue'
+import type { ComputedRef } from 'vue'
 import {
   classNames,
   getAlignClasses,
@@ -14,21 +7,21 @@ import {
   getGutterStyles,
   type Align,
   type Justify,
-  type GutterSize,
-} from '@tigercat/core';
+  type GutterSize
+} from '@tigercat/core'
 
 export interface VueRowProps {
-  gutter?: GutterSize;
-  align?: Align;
-  justify?: Justify;
-  wrap?: boolean;
+  gutter?: GutterSize
+  align?: Align
+  justify?: Justify
+  wrap?: boolean
 }
 
 interface RowContext {
-  gutter: ComputedRef<GutterSize>;
+  gutter: ComputedRef<GutterSize>
 }
 
-const RowContextKey: InjectionKey<RowContext> = Symbol('RowContext');
+const RowContextKey: InjectionKey<RowContext> = Symbol('RowContext')
 
 export const Row = defineComponent({
   name: 'TigerRow',
@@ -39,7 +32,7 @@ export const Row = defineComponent({
      */
     gutter: {
       type: [Number, Array] as PropType<GutterSize>,
-      default: 0,
+      default: 0
     },
     /**
      * Vertical alignment of columns
@@ -47,7 +40,7 @@ export const Row = defineComponent({
      */
     align: {
       type: String as PropType<Align>,
-      default: 'top' as Align,
+      default: 'top' as Align
     },
     /**
      * Horizontal alignment of columns
@@ -55,7 +48,7 @@ export const Row = defineComponent({
      */
     justify: {
       type: String as PropType<Justify>,
-      default: 'start' as Justify,
+      default: 'start' as Justify
     },
     /**
      * Whether to wrap columns
@@ -63,12 +56,12 @@ export const Row = defineComponent({
      */
     wrap: {
       type: Boolean,
-      default: true,
-    },
+      default: true
+    }
   },
   setup(props, { slots, attrs }) {
-    const gutter = computed(() => props.gutter);
-    const rowStyle = computed(() => getGutterStyles(gutter.value).rowStyle);
+    const gutter = computed(() => props.gutter)
+    const rowStyle = computed(() => getGutterStyles(gutter.value).rowStyle)
 
     const rowClasses = computed(() => {
       return classNames(
@@ -77,10 +70,10 @@ export const Row = defineComponent({
         props.wrap && 'flex-wrap',
         getAlignClasses(props.align),
         getJustifyClasses(props.justify)
-      );
-    });
+      )
+    })
 
-    provide(RowContextKey, { gutter });
+    provide(RowContextKey, { gutter })
 
     return () => {
       return h(
@@ -88,13 +81,13 @@ export const Row = defineComponent({
         {
           ...attrs,
           class: [rowClasses.value, attrs.class],
-          style: [rowStyle.value, attrs.style],
+          style: [rowStyle.value, attrs.style]
         },
         slots.default ? slots.default() : []
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
 // Export context key for Col component
-export { RowContextKey };
+export { RowContextKey }

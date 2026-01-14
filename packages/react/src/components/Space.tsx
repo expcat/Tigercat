@@ -1,23 +1,20 @@
-import React from 'react';
+import React from 'react'
 import {
   classNames,
   getSpaceAlignClass,
   getSpaceDirectionClass,
   getSpaceGapSize,
-  type SpaceProps as CoreSpaceProps,
-} from '@tigercat/core';
+  type SpaceProps as CoreSpaceProps
+} from '@tigercat/core'
 
 export type SpaceProps = CoreSpaceProps &
-  Omit<
-    React.HTMLAttributes<HTMLDivElement>,
-    'children' | 'className' | 'style'
-  > & {
-    children?: React.ReactNode;
-    className?: string;
-    style?: React.CSSProperties;
-  };
+  Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style'> & {
+    children?: React.ReactNode
+    className?: string
+    style?: React.CSSProperties
+  }
 
-const baseClasses = 'inline-flex';
+const baseClasses = 'inline-flex'
 
 export const Space: React.FC<SpaceProps> = ({
   direction = 'horizontal',
@@ -29,10 +26,10 @@ export const Space: React.FC<SpaceProps> = ({
   style,
   ...props
 }) => {
-  const gapSize = getSpaceGapSize(size);
+  const gapSize = getSpaceGapSize(size)
   const mergedStyle: React.CSSProperties | undefined = gapSize.style
     ? { gap: gapSize.style, ...style }
-    : style;
+    : style
 
   return (
     <div
@@ -48,5 +45,5 @@ export const Space: React.FC<SpaceProps> = ({
       style={mergedStyle}>
       {children}
     </div>
-  );
-};
+  )
+}

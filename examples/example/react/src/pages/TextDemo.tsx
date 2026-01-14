@@ -1,5 +1,5 @@
-import React from 'react';
-import { Text, Space, Divider } from '@tigercat/react';
+import React from 'react'
+import { Text, Space, Divider } from '@tigercat/react'
 
 const TextDemo: React.FC = () => {
   return (
@@ -111,15 +111,11 @@ const TextDemo: React.FC = () => {
       {/* 文本修饰 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">文本修饰</h2>
-        <p className="text-gray-600 mb-6">
-          truncate / italic / underline / lineThrough。
-        </p>
+        <p className="text-gray-600 mb-6">truncate / italic / underline / lineThrough。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full">
             <div className="w-64">
-              <Text truncate>
-                这是一段很长很长的文本，会在容器宽度不足时显示省略号。
-              </Text>
+              <Text truncate>这是一段很长很长的文本，会在容器宽度不足时显示省略号。</Text>
             </div>
             <Text italic>这是一段斜体文本。</Text>
             <Text underline>这是一段带下划线的文本。</Text>
@@ -128,7 +124,7 @@ const TextDemo: React.FC = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default TextDemo;
+export default TextDemo

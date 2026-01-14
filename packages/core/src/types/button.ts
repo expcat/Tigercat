@@ -5,17 +5,12 @@
 /**
  * Button variant types
  */
-export type ButtonVariant =
-  | 'primary'
-  | 'secondary'
-  | 'outline'
-  | 'ghost'
-  | 'link';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'link'
 
 /**
  * Button size types
  */
-export type ButtonSize = 'sm' | 'md' | 'lg';
+export type ButtonSize = 'sm' | 'md' | 'lg'
 
 /**
  * Base button props interface
@@ -25,29 +20,29 @@ export interface ButtonProps {
    * Button variant style
    * @default 'primary'
    */
-  variant?: ButtonVariant;
+  variant?: ButtonVariant
 
   /**
    * Button size
    * @default 'md'
    */
-  size?: ButtonSize;
+  size?: ButtonSize
 
   /**
    * Whether the button is disabled
    * @default false
    */
-  disabled?: boolean;
+  disabled?: boolean
 
   /**
    * Whether the button is in loading state
    * @default false
    */
-  loading?: boolean;
+  loading?: boolean
 
   /**
    * Whether the button should take full width of its parent
    * @default false
    */
-  block?: boolean;
+  block?: boolean
 }

@@ -8,10 +8,10 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Textarea } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Textarea } from '@tigercat/vue'
 
-const text = ref('');
+const text = ref('')
 </script>
 
 <template>
@@ -22,11 +22,11 @@ const text = ref('');
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Textarea } from '@tigercat/react';
+import { useState } from 'react'
+import { Textarea } from '@tigercat/react'
 
 function App() {
-  const [text, setText] = useState('');
+  const [text, setText] = useState('')
 
   return (
     <Textarea
@@ -34,7 +34,7 @@ function App() {
       onInput={(e) => setText(e.currentTarget.value)}
       placeholder="请输入内容..."
     />
-  );
+  )
 }
 ```
 
@@ -96,11 +96,7 @@ Textarea 组件支持 3 种不同的尺寸：
   <Textarea autoResize placeholder="自动调整高度..." />
 
   <!-- 限制最小和最大行数 -->
-  <Textarea
-    autoResize
-    :minRows="3"
-    :maxRows="10"
-    placeholder="最少 3 行，最多 10 行" />
+  <Textarea autoResize :minRows="3" :maxRows="10" placeholder="最少 3 行，最多 10 行" />
 </template>
 ```
 
@@ -110,17 +106,12 @@ Textarea 组件支持 3 种不同的尺寸：
 {
   /* 基础自动高度 */
 }
-<Textarea autoResize placeholder="自动调整高度..." />;
+;<Textarea autoResize placeholder="自动调整高度..." />
 
 {
   /* 限制最小和最大行数 */
 }
-<Textarea
-  autoResize
-  minRows={3}
-  maxRows={10}
-  placeholder="最少 3 行，最多 10 行"
-/>;
+;<Textarea autoResize minRows={3} maxRows={10} placeholder="最少 3 行，最多 10 行" />
 ```
 
 ## 字符计数
@@ -145,12 +136,12 @@ Textarea 组件支持 3 种不同的尺寸：
 {
   /* 仅显示字符数 */
 }
-<Textarea showCount placeholder="显示字符数..." />;
+;<Textarea showCount placeholder="显示字符数..." />
 
 {
   /* 限制最大字符数 */
 }
-<Textarea showCount maxLength={100} placeholder="最多 100 个字符" />;
+;<Textarea showCount maxLength={100} placeholder="最多 100 个字符" />
 ```
 
 ## 禁用和只读状态
@@ -173,12 +164,12 @@ Textarea 组件支持 3 种不同的尺寸：
 {
   /* 禁用状态 */
 }
-<Textarea disabled placeholder="禁用状态" />;
+;<Textarea disabled placeholder="禁用状态" />
 
 {
   /* 只读状态 */
 }
-<Textarea readonly value="只读内容，无法编辑" />;
+;<Textarea readonly value="只读内容，无法编辑" />
 ```
 
 ## 受控与非受控模式
@@ -189,14 +180,14 @@ Vue 3 版本使用 `v-model` 进行双向绑定，始终是受控模式。
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Textarea } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Textarea } from '@tigercat/vue'
 
-const text = ref('初始内容');
+const text = ref('初始内容')
 
 const handleInput = (event) => {
-  console.log('当前值:', event.target.value);
-};
+  console.log('当前值:', event.target.value)
+}
 </script>
 
 <template>
@@ -211,37 +202,35 @@ React 版本支持受控和非受控两种模式。
 #### 受控模式
 
 ```tsx
-import { useState } from 'react';
-import { Textarea } from '@tigercat/react';
+import { useState } from 'react'
+import { Textarea } from '@tigercat/react'
 
 function ControlledExample() {
-  const [text, setText] = useState('初始内容');
+  const [text, setText] = useState('初始内容')
 
-  return (
-    <Textarea value={text} onInput={(e) => setText(e.currentTarget.value)} />
-  );
+  return <Textarea value={text} onInput={(e) => setText(e.currentTarget.value)} />
 }
 ```
 
 #### 非受控模式
 
 ```tsx
-import { useRef } from 'react';
-import { Textarea } from '@tigercat/react';
+import { useRef } from 'react'
+import { Textarea } from '@tigercat/react'
 
 function UncontrolledExample() {
-  const textareaRef = useRef(null);
+  const textareaRef = useRef(null)
 
   const handleSubmit = () => {
-    console.log('值:', textareaRef.current?.value);
-  };
+    console.log('值:', textareaRef.current?.value)
+  }
 
   return (
     <>
       <Textarea ref={textareaRef} defaultValue="初始内容" />
       <button onClick={handleSubmit}>提交</button>
     </>
-  );
+  )
 }
 ```
 
@@ -251,55 +240,51 @@ function UncontrolledExample() {
 
 ```vue
 <script setup>
-import { Textarea } from '@tigercat/vue';
+import { Textarea } from '@tigercat/vue'
 
 const handleInput = (event) => {
-  console.log('Input:', event.target.value);
-};
+  console.log('Input:', event.target.value)
+}
 
 const handleChange = (event) => {
-  console.log('Change:', event.target.value);
-};
+  console.log('Change:', event.target.value)
+}
 
 const handleFocus = (event) => {
-  console.log('Focus');
-};
+  console.log('Focus')
+}
 
 const handleBlur = (event) => {
-  console.log('Blur');
-};
+  console.log('Blur')
+}
 </script>
 
 <template>
-  <Textarea
-    @input="handleInput"
-    @change="handleChange"
-    @focus="handleFocus"
-    @blur="handleBlur" />
+  <Textarea @input="handleInput" @change="handleChange" @focus="handleFocus" @blur="handleBlur" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { Textarea } from '@tigercat/react';
+import { Textarea } from '@tigercat/react'
 
 function EventExample() {
   const handleInput = (event) => {
-    console.log('Input:', event.currentTarget.value);
-  };
+    console.log('Input:', event.currentTarget.value)
+  }
 
   const handleChange = (event) => {
-    console.log('Change:', event.currentTarget.value);
-  };
+    console.log('Change:', event.currentTarget.value)
+  }
 
   const handleFocus = (event) => {
-    console.log('Focus');
-  };
+    console.log('Focus')
+  }
 
   const handleBlur = (event) => {
-    console.log('Blur');
-  };
+    console.log('Blur')
+  }
 
   return (
     <Textarea
@@ -308,7 +293,7 @@ function EventExample() {
       onFocus={handleFocus}
       onBlur={handleBlur}
     />
-  );
+  )
 }
 ```
 
@@ -440,27 +425,27 @@ import type { Textarea, TextareaProps as ReactTextareaProps } from '@tigercat/re
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Textarea, Button } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Textarea, Button } from '@tigercat/vue'
 
-const comment = ref('');
-const loading = ref(false);
+const comment = ref('')
+const loading = ref(false)
 
 const handleSubmit = async () => {
   if (!comment.value.trim()) {
-    alert('请输入评论内容');
-    return;
+    alert('请输入评论内容')
+    return
   }
 
-  loading.value = true;
+  loading.value = true
   try {
     // 提交评论逻辑
-    await submitComment(comment.value);
-    comment.value = '';
+    await submitComment(comment.value)
+    comment.value = ''
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-};
+}
 </script>
 
 <template>
@@ -471,9 +456,7 @@ const handleSubmit = async () => {
       :rows="5"
       :maxLength="500"
       showCount />
-    <Button @click="handleSubmit" :loading="loading" class="mt-2">
-      提交评论
-    </Button>
+    <Button @click="handleSubmit" :loading="loading" class="mt-2"> 提交评论 </Button>
   </div>
 </template>
 ```
@@ -481,28 +464,28 @@ const handleSubmit = async () => {
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { Textarea, Button } from '@tigercat/react';
+import { useState } from 'react'
+import { Textarea, Button } from '@tigercat/react'
 
 function CommentForm() {
-  const [comment, setComment] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [comment, setComment] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async () => {
     if (!comment.trim()) {
-      alert('请输入评论内容');
-      return;
+      alert('请输入评论内容')
+      return
     }
 
-    setLoading(true);
+    setLoading(true)
     try {
       // 提交评论逻辑
-      await submitComment(comment);
-      setComment('');
+      await submitComment(comment)
+      setComment('')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div>
@@ -518,7 +501,7 @@ function CommentForm() {
         提交评论
       </Button>
     </div>
-  );
+  )
 }
 ```
 
@@ -528,10 +511,10 @@ function CommentForm() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Textarea } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Textarea } from '@tigercat/vue'
 
-const note = ref('');
+const note = ref('')
 </script>
 
 <template>
@@ -547,11 +530,11 @@ const note = ref('');
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { Textarea } from '@tigercat/react';
+import { useState } from 'react'
+import { Textarea } from '@tigercat/react'
 
 function AutoResizeExample() {
-  const [note, setNote] = useState('');
+  const [note, setNote] = useState('')
 
   return (
     <Textarea
@@ -562,7 +545,7 @@ function AutoResizeExample() {
       minRows={3}
       maxRows={15}
     />
-  );
+  )
 }
 ```
 
@@ -572,17 +555,15 @@ function AutoResizeExample() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Textarea } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Textarea } from '@tigercat/vue'
 
-const bio = ref('');
+const bio = ref('')
 </script>
 
 <template>
   <div>
-    <label class="block text-sm font-medium text-gray-700 mb-1">
-      个人简介
-    </label>
+    <label class="block text-sm font-medium text-gray-700 mb-1"> 个人简介 </label>
     <Textarea
       v-model="bio"
       placeholder="请输入个人简介（最多 200 字）"
@@ -596,17 +577,15 @@ const bio = ref('');
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { Textarea } from '@tigercat/react';
+import { useState } from 'react'
+import { Textarea } from '@tigercat/react'
 
 function BioForm() {
-  const [bio, setBio] = useState('');
+  const [bio, setBio] = useState('')
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        个人简介
-      </label>
+      <label className="block text-sm font-medium text-gray-700 mb-1">个人简介</label>
       <Textarea
         value={bio}
         onInput={(e) => setBio(e.currentTarget.value)}
@@ -616,6 +595,6 @@ function BioForm() {
         showCount
       />
     </div>
-  );
+  )
 }
 ```

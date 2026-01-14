@@ -16,13 +16,13 @@ export interface SwitchProps {
    * @default false
    */
   checked?: boolean
-  
+
   /**
    * Whether the switch is disabled
    * @default false
    */
   disabled?: boolean
-  
+
   /**
    * Switch size
    * @default 'md'

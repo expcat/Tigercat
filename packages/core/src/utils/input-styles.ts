@@ -2,8 +2,8 @@
  * Input component styling utilities
  */
 
-import type { InputSize } from '../types/input';
-import { classNames } from './class-names';
+import type { InputSize } from '../types/input'
+import { classNames } from './class-names'
 
 /**
  * Base input classes that apply to all inputs
@@ -24,8 +24,8 @@ const BASE_INPUT_CLASSES = [
   'disabled:bg-[var(--tiger-surface-muted,#f3f4f6)]',
   'disabled:text-[var(--tiger-text-muted,#6b7280)]',
   'disabled:cursor-not-allowed',
-  'placeholder:text-[var(--tiger-text-muted,#6b7280)]',
-] as const;
+  'placeholder:text-[var(--tiger-text-muted,#6b7280)]'
+] as const
 
 /**
  * Size-specific classes for inputs
@@ -33,8 +33,8 @@ const BASE_INPUT_CLASSES = [
 const INPUT_SIZE_CLASSES: Record<InputSize, string> = {
   sm: 'px-2 py-1 text-sm',
   md: 'px-3 py-2 text-base',
-  lg: 'px-4 py-3 text-lg',
-} as const;
+  lg: 'px-4 py-3 text-lg'
+} as const
 
 /**
  * Get complete input class string based on size
@@ -47,5 +47,5 @@ const INPUT_SIZE_CLASSES: Record<InputSize, string> = {
  * // Returns: 'w-full border border-gray-300 ... px-3 py-2 text-base'
  */
 export function getInputClasses(size: InputSize = 'md'): string {
-  return classNames(...BASE_INPUT_CLASSES, INPUT_SIZE_CLASSES[size]);
+  return classNames(...BASE_INPUT_CLASSES, INPUT_SIZE_CLASSES[size])
 }

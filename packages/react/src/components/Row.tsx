@@ -1,19 +1,19 @@
-import React, { createContext } from 'react';
+import React, { createContext } from 'react'
 import {
   classNames,
   getAlignClasses,
   getJustifyClasses,
   getGutterStyles,
-  type RowProps as CoreRowProps,
-} from '@tigercat/core';
+  type RowProps as CoreRowProps
+} from '@tigercat/core'
 
-export type RowProps = React.HTMLAttributes<HTMLDivElement> & CoreRowProps;
+export type RowProps = React.HTMLAttributes<HTMLDivElement> & CoreRowProps
 
 interface RowContextType {
-  gutter?: CoreRowProps['gutter'];
+  gutter?: CoreRowProps['gutter']
 }
 
-export const RowContext = createContext<RowContextType>({});
+export const RowContext = createContext<RowContextType>({})
 
 export const Row: React.FC<RowProps> = ({
   gutter = 0,
@@ -25,7 +25,7 @@ export const Row: React.FC<RowProps> = ({
   style,
   ...divProps
 }) => {
-  const { rowStyle } = getGutterStyles(gutter);
+  const { rowStyle } = getGutterStyles(gutter)
 
   const rowClasses = classNames(
     'flex',
@@ -34,14 +34,14 @@ export const Row: React.FC<RowProps> = ({
     getAlignClasses(align),
     getJustifyClasses(justify),
     className
-  );
+  )
 
   const mergedStyle: React.CSSProperties = {
     ...rowStyle,
-    ...style,
-  };
+    ...style
+  }
 
-  const contextValue = { gutter };
+  const contextValue = { gutter }
 
   return (
     <RowContext.Provider value={contextValue}>
@@ -49,5 +49,5 @@ export const Row: React.FC<RowProps> = ({
         {children}
       </div>
     </RowContext.Provider>
-  );
-};
+  )
+}

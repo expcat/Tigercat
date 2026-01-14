@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react'
 import {
   classNames,
   getLinkVariantClasses,
@@ -6,17 +6,18 @@ import {
   linkBaseClasses,
   linkDisabledClasses,
   linkSizeClasses,
-  type LinkProps as CoreLinkProps,
-} from '@tigercat/core';
+  type LinkProps as CoreLinkProps
+} from '@tigercat/core'
 
 export interface LinkProps
-  extends CoreLinkProps,
+  extends
+    CoreLinkProps,
     Omit<
       React.AnchorHTMLAttributes<HTMLAnchorElement>,
       'href' | 'target' | 'rel' | 'onClick' | 'children'
     > {
-  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
-  children?: React.ReactNode;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>
+  children?: React.ReactNode
 }
 
 export const Link: React.FC<LinkProps> = ({
@@ -45,33 +46,33 @@ export const Link: React.FC<LinkProps> = ({
         className
       ),
     [variant, size, underline, disabled, className]
-  );
+  )
 
-  const computedRel = useMemo(() => getSecureRel(target, rel), [target, rel]);
+  const computedRel = useMemo(() => getSecureRel(target, rel), [target, rel])
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement>) => {
       if (disabled) {
-        event.preventDefault();
-        event.stopPropagation();
-        return;
+        event.preventDefault()
+        event.stopPropagation()
+        return
       }
-      onClick?.(event);
+      onClick?.(event)
     },
     [disabled, onClick]
-  );
+  )
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLAnchorElement>) => {
       if (disabled && (event.key === 'Enter' || event.key === ' ')) {
-        event.preventDefault();
-        event.stopPropagation();
-        return;
+        event.preventDefault()
+        event.stopPropagation()
+        return
       }
-      onKeyDown?.(event);
+      onKeyDown?.(event)
     },
     [disabled, onKeyDown]
-  );
+  )
 
   return (
     <a
@@ -86,5 +87,5 @@ export const Link: React.FC<LinkProps> = ({
       {...props}>
       {children}
     </a>
-  );
-};
+  )
+}

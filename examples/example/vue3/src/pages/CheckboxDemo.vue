@@ -9,7 +9,9 @@ const fruits = ref<string[]>(['apple'])
 const options = ['apple', 'banana', 'orange']
 
 const allChecked = computed(() => fruitsIndeterminate.value.length === options.length)
-const indeterminate = computed(() => fruitsIndeterminate.value.length > 0 && fruitsIndeterminate.value.length < options.length)
+const indeterminate = computed(
+  () => fruitsIndeterminate.value.length > 0 && fruitsIndeterminate.value.length < options.length
+)
 
 const handleCheckAllChange = (value: boolean) => {
   fruitsIndeterminate.value = value ? [...options] : []
@@ -56,8 +58,7 @@ const handleCheckAllChange = (value: boolean) => {
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space>
           <Checkbox disabled>未选中禁用</Checkbox>
-          <Checkbox :model-value="true"
-                    disabled>选中禁用</Checkbox>
+          <Checkbox :model-value="true" disabled>选中禁用</Checkbox>
         </Space>
       </div>
       <Divider class="my-6" />
@@ -69,9 +70,10 @@ const handleCheckAllChange = (value: boolean) => {
       <p class="text-gray-600 mb-6">通过 indeterminate 实现“全选/半选”效果。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space direction="vertical">
-          <Checkbox :model-value="allChecked"
-                    :indeterminate="indeterminate"
-                    @change="handleCheckAllChange">
+          <Checkbox
+            :model-value="allChecked"
+            :indeterminate="indeterminate"
+            @change="handleCheckAllChange">
             全选
           </Checkbox>
           <CheckboxGroup v-model="fruitsIndeterminate">

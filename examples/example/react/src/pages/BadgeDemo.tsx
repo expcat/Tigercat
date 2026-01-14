@@ -1,18 +1,18 @@
-import { useState } from 'react';
-import { Badge, Space, Divider, Button } from '@tigercat/react';
+import { useState } from 'react'
+import { Badge, Space, Divider, Button } from '@tigercat/react'
 
 export default function BadgeDemo() {
-  const [notificationCount, setNotificationCount] = useState(5);
-  const [messageCount] = useState(99);
-  const [cartItems] = useState(3);
+  const [notificationCount, setNotificationCount] = useState(5)
+  const [messageCount] = useState(99)
+  const [cartItems] = useState(3)
 
   const incrementNotifications = () => {
-    setNotificationCount((prev) => prev + 1);
-  };
+    setNotificationCount((prev) => prev + 1)
+  }
 
   const clearNotifications = () => {
-    setNotificationCount(0);
-  };
+    setNotificationCount(0)
+  }
 
   return (
     <div className="max-w-5xl mx-auto p-8">
@@ -74,9 +74,7 @@ export default function BadgeDemo() {
       {/* 点状徽章 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">点状徽章</h2>
-        <p className="text-gray-600 mb-6">
-          用于简单的通知提示，不显示具体数字。
-        </p>
+        <p className="text-gray-600 mb-6">用于简单的通知提示，不显示具体数字。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space wrap>
             <Badge type="dot" variant="default" />
@@ -108,9 +106,7 @@ export default function BadgeDemo() {
       {/* 最大值 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">最大值</h2>
-        <p className="text-gray-600 mb-6">
-          设置 max 属性，当数字超过最大值时显示 {'{max}+'}。
-        </p>
+        <p className="text-gray-600 mb-6">设置 max 属性，当数字超过最大值时显示 {'{max}+'}。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <Badge content={99} />
@@ -183,9 +179,7 @@ export default function BadgeDemo() {
       {/* 显示零值 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">显示零值</h2>
-        <p className="text-gray-600 mb-6">
-          默认情况下不显示零值，设置 showZero 可以显示。
-        </p>
+        <p className="text-gray-600 mb-6">默认情况下不显示零值，设置 showZero 可以显示。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <div>
@@ -213,10 +207,7 @@ export default function BadgeDemo() {
           <h3 className="text-lg font-semibold mb-3">通知中心</h3>
           <div className="p-6 bg-gray-50 rounded-lg">
             <Space>
-              <Badge
-                content={notificationCount}
-                standalone={false}
-                variant="danger">
+              <Badge content={notificationCount} standalone={false} variant="danger">
                 <Button variant="primary" onClick={incrementNotifications}>
                   通知
                 </Button>
@@ -234,11 +225,7 @@ export default function BadgeDemo() {
           <h3 className="text-lg font-semibold mb-3">消息和购物车</h3>
           <div className="p-6 bg-gray-50 rounded-lg">
             <Space>
-              <Badge
-                content={messageCount}
-                standalone={false}
-                variant="primary"
-                max={99}>
+              <Badge content={messageCount} standalone={false} variant="primary" max={99}>
                 <Button variant="primary">消息</Button>
               </Badge>
 
@@ -285,5 +272,5 @@ export default function BadgeDemo() {
         </div>
       </section>
     </div>
-  );
+  )
 }

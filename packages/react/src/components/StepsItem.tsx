@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   classNames,
   getStepItemClasses,
@@ -14,46 +14,48 @@ import {
   stepFinishIconPathStrokeLinecap,
   stepFinishIconPathStrokeLinejoin,
   stepFinishIconPathStrokeWidth,
-  type StepStatus,
-} from '@tigercat/core';
-import { useStepsContext } from './Steps';
+  type StepStatus
+} from '@tigercat/core'
+import { useStepsContext } from './Steps'
 
-export interface StepsItemProps
-  extends Omit<React.LiHTMLAttributes<HTMLLIElement>, 'title' | 'children'> {
+export interface StepsItemProps extends Omit<
+  React.LiHTMLAttributes<HTMLLIElement>,
+  'title' | 'children'
+> {
   /**
    * Step title
    */
-  title: string;
+  title: string
 
   /**
    * Step description
    */
-  description?: string;
+  description?: string
 
   /**
    * Step icon (custom icon element)
    */
-  icon?: React.ReactNode;
+  icon?: React.ReactNode
 
   /**
    * Step status (overrides automatic status)
    */
-  status?: StepStatus;
+  status?: StepStatus
 
   /**
    * Whether the step is disabled
    */
-  disabled?: boolean;
+  disabled?: boolean
 
   /**
    * Internal prop: step index (automatically set by parent)
    */
-  stepIndex?: number;
+  stepIndex?: number
 
   /**
    * Internal prop: is last step (automatically set by parent)
    */
-  isLast?: boolean;
+  isLast?: boolean
 }
 
 export const StepsItem: React.FC<StepsItemProps> = ({
@@ -75,61 +77,42 @@ export const StepsItem: React.FC<StepsItemProps> = ({
     direction: 'horizontal' as const,
     size: 'default' as const,
     simple: false,
-    clickable: false,
-  };
+    clickable: false
+  }
 
   const stepStatus = calculateStepStatus(
     stepIndex,
     stepsContext.current,
     stepsContext.status,
     customStatus
-  );
+  )
 
-  const isClickable = !!stepsContext.handleStepClick && !disabled;
+  const isClickable = !!stepsContext.handleStepClick && !disabled
 
   const itemClasses = classNames(
     getStepItemClasses(stepsContext.direction, isLast, stepsContext.simple),
     className
-  );
+  )
 
-  const iconClasses = getStepIconClasses(
-    stepStatus,
-    stepsContext.size,
-    stepsContext.simple,
-    !!icon
-  );
+  const iconClasses = getStepIconClasses(stepStatus, stepsContext.size, stepsContext.simple, !!icon)
 
-  const tailClasses = getStepTailClasses(
-    stepsContext.direction,
-    stepStatus,
-    isLast
-  );
-  const contentClasses = getStepContentClasses(
-    stepsContext.direction,
-    stepsContext.simple
-  );
-  const titleClasses = getStepTitleClasses(
-    stepStatus,
-    stepsContext.size,
-    isClickable
-  );
-  const descriptionClasses = getStepDescriptionClasses(
-    stepStatus,
-    stepsContext.size
-  );
+  const tailClasses = getStepTailClasses(stepsContext.direction, stepStatus, isLast)
+  const contentClasses = getStepContentClasses(stepsContext.direction, stepsContext.simple)
+  const titleClasses = getStepTitleClasses(stepStatus, stepsContext.size, isClickable)
+  const descriptionClasses = getStepDescriptionClasses(stepStatus, stepsContext.size)
 
   const handleClick = (event: React.MouseEvent) => {
     if (!isClickable) {
-      return;
+      return
     }
-    stepsContext.handleStepClick?.(stepIndex);
-  };
+    stepsContext.handleStepClick?.(stepIndex)
+  }
 
   // Render icon
   const renderIcon = () => {
     // Custom icon from prop
     if (icon) {
-      return <div className={iconClasses}>{icon}</div>;
+      return <div className={iconClasses}>{icon}</div>
     }
 
     // Default: show step number or checkmark for finished steps
@@ -151,12 +134,12 @@ export const StepsItem: React.FC<StepsItemProps> = ({
             />
           </svg>
         </div>
-      );
+      )
     }
 
     // Default: show step number
-    return <div className={iconClasses}>{stepIndex + 1}</div>;
-  };
+    return <div className={iconClasses}>{stepIndex + 1}</div>
+  }
 
   // Render content
   const renderContent = () => {
@@ -178,8 +161,8 @@ export const StepsItem: React.FC<StepsItemProps> = ({
           <div className={descriptionClasses}>{description}</div>
         )}
       </div>
-    );
-  };
+    )
+  }
 
   // For vertical layout
   if (stepsContext.direction === 'vertical') {
@@ -198,7 +181,7 @@ export const StepsItem: React.FC<StepsItemProps> = ({
         {/* Content */}
         {renderContent()}
       </li>
-    );
+    )
   }
 
   // For horizontal layout
@@ -216,5 +199,5 @@ export const StepsItem: React.FC<StepsItemProps> = ({
       {/* Content */}
       {renderContent()}
     </li>
-  );
-};
+  )
+}

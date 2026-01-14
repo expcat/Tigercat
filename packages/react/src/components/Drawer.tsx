@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useId, useMemo, useRef } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useCallback, useEffect, useId, useMemo, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import {
   captureActiveElement,
   classNames,
@@ -19,25 +19,24 @@ import {
   getDrawerTitleClasses,
   resolveLocaleText,
   restoreFocus,
-  type DrawerProps as CoreDrawerProps,
-} from '@tigercat/core';
-import { useEscapeKey } from '../utils/overlay';
+  type DrawerProps as CoreDrawerProps
+} from '@tigercat/core'
+import { useEscapeKey } from '../utils/overlay'
 
 export interface DrawerProps
-  extends CoreDrawerProps,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
-  onClose?: () => void;
-  onAfterEnter?: () => void;
-  onAfterLeave?: () => void;
-  header?: React.ReactNode;
-  children?: React.ReactNode;
-  footer?: React.ReactNode;
+  extends CoreDrawerProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
+  onClose?: () => void
+  onAfterEnter?: () => void
+  onAfterLeave?: () => void
+  header?: React.ReactNode
+  children?: React.ReactNode
+  footer?: React.ReactNode
 
   /**
    * Close button aria-label
    * @default 'Close drawer'
    */
-  closeAriaLabel?: string;
+  closeAriaLabel?: string
 }
 
 const CloseIcon: React.FC = () => (
@@ -54,7 +53,7 @@ const CloseIcon: React.FC = () => (
       d={closeIconPathD}
     />
   </svg>
-);
+)
 
 export const Drawer: React.FC<DrawerProps> = ({
   visible = false,
@@ -79,109 +78,108 @@ export const Drawer: React.FC<DrawerProps> = ({
   style,
   ...rest
 }) => {
-  const [hasBeenOpened, setHasBeenOpened] = React.useState(visible);
+  const [hasBeenOpened, setHasBeenOpened] = React.useState(visible)
 
   useEffect(() => {
-    if (visible) setHasBeenOpened(true);
-  }, [visible]);
+    if (visible) setHasBeenOpened(true)
+  }, [visible])
 
-  const shouldRender = destroyOnClose ? visible : hasBeenOpened;
+  const shouldRender = destroyOnClose ? visible : hasBeenOpened
 
   const handleClose = useCallback(() => {
-    onClose?.();
-  }, [onClose]);
+    onClose?.()
+  }, [onClose])
 
   const handleMaskClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      if (!maskClosable) return;
+      if (!maskClosable) return
       if (event.target === event.currentTarget) {
-        handleClose();
+        handleClose()
       }
     },
     [maskClosable, handleClose]
-  );
+  )
 
-  useEscapeKey({ enabled: visible, onEscape: handleClose });
+  useEscapeKey({ enabled: visible, onEscape: handleClose })
 
-  const previousVisible = useRef(false);
+  const previousVisible = useRef(false)
   useEffect(() => {
-    if (visible === previousVisible.current) return;
-    previousVisible.current = visible;
+    if (visible === previousVisible.current) return
+    previousVisible.current = visible
 
     const timer = window.setTimeout(() => {
       if (visible) {
-        onAfterEnter?.();
+        onAfterEnter?.()
       } else {
-        onAfterLeave?.();
+        onAfterLeave?.()
       }
-    }, 300);
+    }, 300)
 
-    return () => window.clearTimeout(timer);
-  }, [visible, onAfterEnter, onAfterLeave]);
+    return () => window.clearTimeout(timer)
+  }, [visible, onAfterEnter, onAfterLeave])
 
-  const reactId = useId();
-  const drawerId = useMemo(() => `tiger-drawer-${reactId}`, [reactId]);
-  const titleId = `${drawerId}-title`;
+  const reactId = useId()
+  const drawerId = useMemo(() => `tiger-drawer-${reactId}`, [reactId])
+  const titleId = `${drawerId}-title`
 
   const {
     ['aria-labelledby']: _ariaLabelledby,
     role: _role,
     tabIndex: _tabIndex,
     ...dialogDivProps
-  } = rest as React.HTMLAttributes<HTMLDivElement> & React.AriaAttributes;
+  } = rest as React.HTMLAttributes<HTMLDivElement> & React.AriaAttributes
 
   const ariaLabelledby =
-    (rest as React.AriaAttributes)['aria-labelledby'] ??
-    (title || header ? titleId : undefined);
+    (rest as React.AriaAttributes)['aria-labelledby'] ?? (title || header ? titleId : undefined)
 
-  const dialogRef = useRef<HTMLDivElement | null>(null);
-  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
-  const previousActiveElementRef = useRef<HTMLElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement | null>(null)
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null)
+  const previousActiveElementRef = useRef<HTMLElement | null>(null)
 
   const resolvedCloseAriaLabel = resolveLocaleText(
     'Close drawer',
     closeAriaLabel,
     locale?.drawer?.closeAriaLabel,
     locale?.common?.closeText
-  );
+  )
 
   useEffect(() => {
-    if (!visible) return;
+    if (!visible) return
 
-    previousActiveElementRef.current = captureActiveElement();
+    previousActiveElementRef.current = captureActiveElement()
 
     const timer = window.setTimeout(() => {
-      focusFirst([closeButtonRef.current, dialogRef.current]);
-    }, 0);
+      focusFirst([closeButtonRef.current, dialogRef.current])
+    }, 0)
 
-    return () => window.clearTimeout(timer);
-  }, [visible]);
+    return () => window.clearTimeout(timer)
+  }, [visible])
 
   useEffect(() => {
-    if (visible) return;
-    restoreFocus(previousActiveElementRef.current);
-  }, [visible]);
+    if (visible) return
+    restoreFocus(previousActiveElementRef.current)
+  }, [visible])
 
   const containerClasses = classNames(
     getDrawerContainerClasses(zIndex),
     !visible && 'pointer-events-none'
-  );
+  )
 
-  const maskClasses = getDrawerMaskClasses(visible);
+  const maskClasses = getDrawerMaskClasses(visible)
   const panelClasses = classNames(
     getDrawerPanelClasses(placement, visible, size),
     'flex flex-col',
     className
-  );
+  )
 
-  const headerClasses = getDrawerHeaderClasses();
-  const bodyClasses = getDrawerBodyClasses(bodyClassName);
-  const footerClasses = getDrawerFooterClasses();
-  const closeButtonClasses = getDrawerCloseButtonClasses();
-  const titleClasses = getDrawerTitleClasses();
+  const headerClasses = getDrawerHeaderClasses()
+  const bodyClasses = getDrawerBodyClasses(bodyClassName)
+  const footerClasses = getDrawerFooterClasses()
+  const closeButtonClasses = getDrawerCloseButtonClasses()
+  const titleClasses = getDrawerTitleClasses()
 
   if (!shouldRender) {
-    return null;
+    return null
   }
 
   const drawerContent = (
@@ -234,11 +232,11 @@ export const Drawer: React.FC<DrawerProps> = ({
         {footer && <div className={footerClasses}>{footer}</div>}
       </div>
     </div>
-  );
+  )
 
   if (typeof document === 'undefined') {
-    return null;
+    return null
   }
 
-  return createPortal(drawerContent, document.body);
-};
+  return createPortal(drawerContent, document.body)
+}

@@ -2,7 +2,7 @@
  * Date utility functions for DatePicker
  */
 
-import type { DateFormat } from '../types/datepicker';
+import type { DateFormat } from '../types/datepicker'
 
 /**
  * Validate if a value is a valid date
@@ -10,9 +10,9 @@ import type { DateFormat } from '../types/datepicker';
  * @returns True if value is a valid date
  */
 function isValidDate(value: Date | string | null | undefined): boolean {
-  if (!value) return false;
-  const date = value instanceof Date ? value : new Date(value);
-  return !isNaN(date.getTime());
+  if (!value) return false
+  const date = value instanceof Date ? value : new Date(value)
+  return !isNaN(date.getTime())
 }
 
 /**
@@ -20,15 +20,13 @@ function isValidDate(value: Date | string | null | undefined): boolean {
  * @param value - Date string, Date object, or null/undefined
  * @returns Date instance or null if invalid
  */
-export function parseDate(
-  value: Date | string | null | undefined
-): Date | null {
-  if (!value) return null;
+export function parseDate(value: Date | string | null | undefined): Date | null {
+  if (!value) return null
   if (value instanceof Date) {
-    return isNaN(value.getTime()) ? null : value;
+    return isNaN(value.getTime()) ? null : value
   }
-  const parsed = new Date(value);
-  return isNaN(parsed.getTime()) ? null : parsed;
+  const parsed = new Date(value)
+  return isNaN(parsed.getTime()) ? null : parsed
 }
 
 /**
@@ -37,28 +35,25 @@ export function parseDate(
  * @param format - Date format string
  * @returns Formatted date string, empty string if date is null
  */
-export function formatDate(
-  date: Date | null,
-  format: DateFormat = 'yyyy-MM-dd'
-): string {
-  if (!date || !isValidDate(date)) return '';
+export function formatDate(date: Date | null, format: DateFormat = 'yyyy-MM-dd'): string {
+  if (!date || !isValidDate(date)) return ''
 
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
 
   // Use switch for better performance (no object allocation per call)
   switch (format) {
     case 'yyyy-MM-dd':
-      return `${year}-${month}-${day}`;
+      return `${year}-${month}-${day}`
     case 'MM/dd/yyyy':
-      return `${month}/${day}/${year}`;
+      return `${month}/${day}/${year}`
     case 'dd/MM/yyyy':
-      return `${day}/${month}/${year}`;
+      return `${day}/${month}/${year}`
     case 'yyyy/MM/dd':
-      return `${year}/${month}/${day}`;
+      return `${year}/${month}/${day}`
     default:
-      return `${year}-${month}-${day}`;
+      return `${year}-${month}-${day}`
   }
 }
 
@@ -66,12 +61,12 @@ export function formatDate(
  * Check if two dates are the same day
  */
 export function isSameDay(date1: Date | null, date2: Date | null): boolean {
-  if (!date1 || !date2) return false;
+  if (!date1 || !date2) return false
   return (
     date1.getFullYear() === date2.getFullYear() &&
     date1.getMonth() === date2.getMonth() &&
     date1.getDate() === date2.getDate()
-  );
+  )
 }
 
 /**
@@ -80,9 +75,9 @@ export function isSameDay(date1: Date | null, date2: Date | null): boolean {
  * @returns Normalized date
  */
 export function normalizeDate(date: Date): Date {
-  const normalized = new Date(date);
-  normalized.setHours(0, 0, 0, 0);
-  return normalized;
+  const normalized = new Date(date)
+  normalized.setHours(0, 0, 0, 0)
+  return normalized
 }
 
 /**
@@ -97,22 +92,22 @@ export function isDateInRange(
   minDate: Date | null | undefined,
   maxDate: Date | null | undefined
 ): boolean {
-  if (!isValidDate(date)) return false;
+  if (!isValidDate(date)) return false
 
   // Normalize dates to midnight for accurate comparison
-  const normalizedDate = normalizeDate(date);
+  const normalizedDate = normalizeDate(date)
 
   if (minDate && isValidDate(minDate)) {
-    const normalizedMin = normalizeDate(minDate);
-    if (normalizedDate < normalizedMin) return false;
+    const normalizedMin = normalizeDate(minDate)
+    if (normalizedDate < normalizedMin) return false
   }
 
   if (maxDate && isValidDate(maxDate)) {
-    const normalizedMax = normalizeDate(maxDate);
-    if (normalizedDate > normalizedMax) return false;
+    const normalizedMax = normalizeDate(maxDate)
+    if (normalizedDate > normalizedMax) return false
   }
 
-  return true;
+  return true
 }
 
 /**
@@ -123,7 +118,7 @@ export function isDateInRange(
  */
 export function getDaysInMonth(year: number, month: number): number {
   // month + 1, day 0 gives the last day of the previous month
-  return new Date(year, month + 1, 0).getDate();
+  return new Date(year, month + 1, 0).getDate()
 }
 
 /**
@@ -133,7 +128,7 @@ export function getDaysInMonth(year: number, month: number): number {
  * @returns Day of week (0-6)
  */
 export function getFirstDayOfMonth(year: number, month: number): number {
-  return new Date(year, month, 1).getDay();
+  return new Date(year, month, 1).getDay()
 }
 
 /**
@@ -141,29 +136,29 @@ export function getFirstDayOfMonth(year: number, month: number): number {
  * Returns array of dates including padding days from previous/next months
  */
 export function getCalendarDays(year: number, month: number): (Date | null)[] {
-  const firstDay = getFirstDayOfMonth(year, month);
-  const daysInMonth = getDaysInMonth(year, month);
-  const daysInPrevMonth = getDaysInMonth(year, month - 1);
+  const firstDay = getFirstDayOfMonth(year, month)
+  const daysInMonth = getDaysInMonth(year, month)
+  const daysInPrevMonth = getDaysInMonth(year, month - 1)
 
-  const days: (Date | null)[] = [];
+  const days: (Date | null)[] = []
 
   // Previous month's days
   for (let i = firstDay - 1; i >= 0; i--) {
-    days.push(new Date(year, month - 1, daysInPrevMonth - i));
+    days.push(new Date(year, month - 1, daysInPrevMonth - i))
   }
 
   // Current month's days
   for (let i = 1; i <= daysInMonth; i++) {
-    days.push(new Date(year, month, i));
+    days.push(new Date(year, month, i))
   }
 
   // Next month's days (to fill the grid)
-  const remainingDays = 42 - days.length; // 6 rows × 7 days
+  const remainingDays = 42 - days.length // 6 rows × 7 days
   for (let i = 1; i <= remainingDays; i++) {
-    days.push(new Date(year, month + 1, i));
+    days.push(new Date(year, month + 1, i))
   }
 
-  return days;
+  return days
 }
 
 function safeIntlFormat(
@@ -172,9 +167,9 @@ function safeIntlFormat(
   date: Date
 ): string {
   try {
-    return new Intl.DateTimeFormat(locale, options).format(date);
+    return new Intl.DateTimeFormat(locale, options).format(date)
   } catch {
-    return '';
+    return ''
   }
 }
 
@@ -182,22 +177,18 @@ function safeIntlFormat(
  * Format the calendar header (month + year) using Intl for a given locale.
  * Falls back to English month names when Intl is unavailable.
  */
-export function formatMonthYear(
-  year: number,
-  month: number,
-  locale?: string
-): string {
+export function formatMonthYear(year: number, month: number, locale?: string): string {
   if (locale) {
     const text = safeIntlFormat(
       locale,
       { year: 'numeric', month: 'long' },
       new Date(year, month, 1)
-    );
-    if (text) return text;
+    )
+    if (text) return text
   }
 
-  const monthNames = getMonthNames();
-  return `${monthNames[month]} ${year}`;
+  const monthNames = getMonthNames()
+  return `${monthNames[month]} ${year}`
 }
 
 /**
@@ -216,16 +207,16 @@ export function getMonthNames(locale?: string): string[] {
     'September',
     'October',
     'November',
-    'December',
-  ];
+    'December'
+  ]
 
-  if (!locale) return fallback;
+  if (!locale) return fallback
 
   const names = Array.from({ length: 12 }, (_, i) =>
     safeIntlFormat(locale, { month: 'long' }, new Date(2020, i, 1))
-  );
+  )
 
-  return names.every(Boolean) ? names : fallback;
+  return names.every(Boolean) ? names : fallback
 }
 
 /**
@@ -244,72 +235,64 @@ export function getShortMonthNames(locale?: string): string[] {
     'Sep',
     'Oct',
     'Nov',
-    'Dec',
-  ];
+    'Dec'
+  ]
 
-  if (!locale) return fallback;
+  if (!locale) return fallback
 
   const names = Array.from({ length: 12 }, (_, i) =>
     safeIntlFormat(locale, { month: 'short' }, new Date(2020, i, 1))
-  );
+  )
 
-  return names.every(Boolean) ? names : fallback;
+  return names.every(Boolean) ? names : fallback
 }
 
 /**
  * Get day names
  */
 export function getDayNames(locale?: string): string[] {
-  const fallback = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday',
-  ];
+  const fallback = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
-  if (!locale) return fallback;
+  if (!locale) return fallback
 
   // 2021-08-01 is a Sunday
-  const base = new Date(2021, 7, 1);
+  const base = new Date(2021, 7, 1)
   const names = Array.from({ length: 7 }, (_, i) =>
     safeIntlFormat(
       locale,
       { weekday: 'long' },
       new Date(base.getFullYear(), base.getMonth(), base.getDate() + i)
     )
-  );
+  )
 
-  return names.every(Boolean) ? names : fallback;
+  return names.every(Boolean) ? names : fallback
 }
 
 /**
  * Get short day names
  */
 export function getShortDayNames(locale?: string): string[] {
-  const fallback = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const fallback = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-  if (!locale) return fallback;
+  if (!locale) return fallback
 
   // 2021-08-01 is a Sunday
-  const base = new Date(2021, 7, 1);
+  const base = new Date(2021, 7, 1)
   const names = Array.from({ length: 7 }, (_, i) =>
     safeIntlFormat(
       locale,
       { weekday: 'short' },
       new Date(base.getFullYear(), base.getMonth(), base.getDate() + i)
     )
-  );
+  )
 
-  return names.every(Boolean) ? names : fallback;
+  return names.every(Boolean) ? names : fallback
 }
 
 /**
  * Check if a date is today
  */
 export function isToday(date: Date): boolean {
-  const today = new Date();
-  return isSameDay(date, today);
+  const today = new Date()
+  return isSameDay(date, today)
 }

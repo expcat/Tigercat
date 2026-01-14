@@ -1,17 +1,14 @@
-import type { TigerLocale } from '../types/locale';
-import type { UploadLabels } from '../types/upload';
-import { resolveLocaleText } from './locale-utils';
+import type { TigerLocale } from '../types/locale'
+import type { UploadLabels } from '../types/upload'
+import { resolveLocaleText } from './locale-utils'
 
-export type UploadLabelOverrides = Partial<UploadLabels>;
+export type UploadLabelOverrides = Partial<UploadLabels>
 
-export function interpolateUploadLabel(
-  template: string,
-  params: Record<string, string>
-): string {
+export function interpolateUploadLabel(template: string, params: Record<string, string>): string {
   return template.replace(/\{(\w+)\}/g, (_match, key: string) => {
-    const value = params[key];
-    return typeof value === 'string' ? value : '';
-  });
+    const value = params[key]
+    return typeof value === 'string' ? value : ''
+  })
 }
 
 export function getUploadLabels(
@@ -83,6 +80,6 @@ export function getUploadLabels(
       'Preview {fileName}',
       overrides?.previewFileAriaLabel,
       locale?.upload?.previewFileAriaLabel
-    ),
-  };
+    )
+  }
 }

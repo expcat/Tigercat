@@ -1,7 +1,7 @@
-import { render, RenderOptions, RenderResult } from '@testing-library/react';
-import React from 'react';
+import { render, RenderOptions, RenderResult } from '@testing-library/react'
+import React from 'react'
 
-export * from './a11y-helpers';
+export * from './a11y-helpers'
 
 /**
  * Helper to render a React component with props
@@ -20,7 +20,7 @@ export function renderWithProps<T extends Record<string, unknown>>(
   props: T,
   options?: Omit<RenderOptions, 'props'>
 ): RenderResult {
-  return render(React.createElement(Component, props), options);
+  return render(React.createElement(Component, props), options)
 }
 
 /**
@@ -43,36 +43,32 @@ export function renderWithChildren<T extends Record<string, unknown>>(
   c?: RenderOptions
 ): RenderResult {
   const isPropsObject = (value: unknown): value is Record<string, unknown> => {
-    if (!value || typeof value !== 'object') return false;
-    if (React.isValidElement(value)) return false;
-    return true;
-  };
+    if (!value || typeof value !== 'object') return false
+    if (React.isValidElement(value)) return false
+    return true
+  }
 
-  let children: React.ReactNode;
-  let props: Omit<T, 'children'> | undefined;
-  let options: RenderOptions | undefined;
+  let children: React.ReactNode
+  let props: Omit<T, 'children'> | undefined
+  let options: RenderOptions | undefined
 
   // Support both call signatures:
   // - renderWithChildren(Component, children, props?, options?)
   // - renderWithChildren(Component, props, children, options?)
   if (isPropsObject(a) && b !== undefined && !isPropsObject(b)) {
-    props = a as Omit<T, 'children'>;
-    children = b as React.ReactNode;
-    options = c;
+    props = a as Omit<T, 'children'>
+    children = b as React.ReactNode
+    options = c
   } else {
-    children = a as React.ReactNode;
-    props = isPropsObject(b) ? (b as Omit<T, 'children'>) : undefined;
-    options = isPropsObject(b) ? c : (b as RenderOptions | undefined);
+    children = a as React.ReactNode
+    props = isPropsObject(b) ? (b as Omit<T, 'children'>) : undefined
+    options = isPropsObject(b) ? c : (b as RenderOptions | undefined)
   }
 
   return render(
-    React.createElement(
-      Component,
-      props as T & { children?: React.ReactNode },
-      children
-    ),
+    React.createElement(Component, props as T & { children?: React.ReactNode }, children),
     options
-  );
+  )
 }
 
 /**
@@ -88,14 +84,12 @@ export function renderWithChildren<T extends Record<string, unknown>>(
  * const wrapper = createReactWrapper(ThemeProvider, { theme: 'dark' })
  * render(<MyComponent />, { wrapper })
  */
-export function createReactWrapper<
-  P extends Record<string, unknown> = Record<string, never>
->(
+export function createReactWrapper<P extends Record<string, unknown> = Record<string, never>>(
   WrapperComponent: React.ComponentType<P & { children?: React.ReactNode }>,
   wrapperProps?: P
 ) {
   return ({ children }: { children: React.ReactNode }) =>
     React.createElement(WrapperComponent, { ...wrapperProps, children } as P & {
-      children: React.ReactNode;
-    });
+      children: React.ReactNode
+    })
 }

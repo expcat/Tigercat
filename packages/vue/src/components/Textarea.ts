@@ -1,41 +1,33 @@
-import {
-  defineComponent,
-  computed,
-  ref,
-  watch,
-  nextTick,
-  h,
-  PropType,
-} from 'vue';
+import { defineComponent, computed, ref, watch, nextTick, h, PropType } from 'vue'
 import {
   autoResizeTextarea,
   classNames,
   coerceClassValue,
   getInputClasses,
   mergeStyleValues,
-  type TextareaSize,
-} from '@tigercat/core';
+  type TextareaSize
+} from '@tigercat/core'
 
 export interface VueTextareaProps {
-  modelValue?: string;
-  size?: TextareaSize;
-  placeholder?: string;
-  disabled?: boolean;
-  readonly?: boolean;
-  required?: boolean;
-  rows?: number;
-  autoResize?: boolean;
-  maxRows?: number;
-  minRows?: number;
-  maxLength?: number;
-  minLength?: number;
-  name?: string;
-  id?: string;
-  autoComplete?: string;
-  autoFocus?: boolean;
-  showCount?: boolean;
-  className?: string;
-  style?: Record<string, string | number>;
+  modelValue?: string
+  size?: TextareaSize
+  placeholder?: string
+  disabled?: boolean
+  readonly?: boolean
+  required?: boolean
+  rows?: number
+  autoResize?: boolean
+  maxRows?: number
+  minRows?: number
+  maxLength?: number
+  minLength?: number
+  name?: string
+  id?: string
+  autoComplete?: string
+  autoFocus?: boolean
+  showCount?: boolean
+  className?: string
+  style?: Record<string, string | number>
 }
 
 export const Textarea = defineComponent({
@@ -46,7 +38,7 @@ export const Textarea = defineComponent({
      * Textarea value (for v-model)
      */
     modelValue: {
-      type: String,
+      type: String
     },
     /**
      * Textarea size
@@ -54,7 +46,7 @@ export const Textarea = defineComponent({
      */
     size: {
       type: String as PropType<TextareaSize>,
-      default: 'md' as TextareaSize,
+      default: 'md' as TextareaSize
     },
     /**
      * Whether the textarea is disabled
@@ -62,7 +54,7 @@ export const Textarea = defineComponent({
      */
     disabled: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Whether the textarea is readonly
@@ -70,7 +62,7 @@ export const Textarea = defineComponent({
      */
     readonly: {
       type: Boolean,
-      default: false,
+      default: false
     },
 
     /**
@@ -79,14 +71,14 @@ export const Textarea = defineComponent({
      */
     required: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Placeholder text
      */
     placeholder: {
       type: String,
-      default: '',
+      default: ''
     },
     /**
      * Number of visible text rows
@@ -94,7 +86,7 @@ export const Textarea = defineComponent({
      */
     rows: {
       type: Number,
-      default: 3,
+      default: 3
     },
     /**
      * Auto-resize height based on content
@@ -102,53 +94,53 @@ export const Textarea = defineComponent({
      */
     autoResize: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Maximum number of rows (only with autoResize)
      */
     maxRows: {
-      type: Number,
+      type: Number
     },
     /**
      * Minimum number of rows (only with autoResize)
      */
     minRows: {
-      type: Number,
+      type: Number
     },
     /**
      * Maximum character length
      */
     maxLength: {
-      type: Number,
+      type: Number
     },
 
     /**
      * Minimum character length
      */
     minLength: {
-      type: Number,
+      type: Number
     },
 
     /**
      * Textarea name attribute
      */
     name: {
-      type: String,
+      type: String
     },
 
     /**
      * Textarea id attribute
      */
     id: {
-      type: String,
+      type: String
     },
 
     /**
      * Autocomplete attribute
      */
     autoComplete: {
-      type: String,
+      type: String
     },
 
     /**
@@ -161,44 +153,44 @@ export const Textarea = defineComponent({
      */
     showCount: {
       type: Boolean,
-      default: false,
+      default: false
     },
 
     /**
      * Additional CSS classes
      */
     className: {
-      type: String,
+      type: String
     },
 
     /**
      * Inline styles
      */
     style: {
-      type: Object as PropType<Record<string, string | number>>,
-    },
+      type: Object as PropType<Record<string, string | number>>
+    }
   },
   emits: {
     'update:modelValue': null,
     input: null,
     change: null,
     focus: null,
-    blur: null,
+    blur: null
   },
   setup(props, { emit, attrs }) {
-    const textareaRef = ref<HTMLTextAreaElement | null>(null);
+    const textareaRef = ref<HTMLTextAreaElement | null>(null)
 
-    const localValue = ref<string>(props.modelValue ?? '');
+    const localValue = ref<string>(props.modelValue ?? '')
 
     watch(
       () => props.modelValue,
       (newValue) => {
-        const next = newValue ?? '';
+        const next = newValue ?? ''
         if (next !== localValue.value) {
-          localValue.value = next;
+          localValue.value = next
         }
       }
-    );
+    )
 
     const textareaClasses = computed(() =>
       classNames(
@@ -208,54 +200,54 @@ export const Textarea = defineComponent({
         props.className,
         coerceClassValue(attrs.class)
       )
-    );
+    )
 
-    const currentLength = computed(() => localValue.value.length);
+    const currentLength = computed(() => localValue.value.length)
 
     const adjustHeight = () => {
-      if (!props.autoResize || !textareaRef.value) return;
+      if (!props.autoResize || !textareaRef.value) return
       autoResizeTextarea(textareaRef.value, {
         minRows: props.minRows,
-        maxRows: props.maxRows,
-      });
-    };
+        maxRows: props.maxRows
+      })
+    }
 
     const handleInput = (event: Event) => {
-      const target = event.target as HTMLTextAreaElement;
-      const value = target.value;
-      localValue.value = value;
-      emit('update:modelValue', value);
-      emit('input', event);
+      const target = event.target as HTMLTextAreaElement
+      const value = target.value
+      localValue.value = value
+      emit('update:modelValue', value)
+      emit('input', event)
 
       if (props.autoResize) {
-        nextTick(adjustHeight);
+        nextTick(adjustHeight)
       }
-    };
+    }
 
     const handleChange = (event: Event) => {
-      emit('change', event);
-    };
+      emit('change', event)
+    }
 
     const handleFocus = (event: FocusEvent) => {
-      emit('focus', event);
-    };
+      emit('focus', event)
+    }
 
     const handleBlur = (event: FocusEvent) => {
-      emit('blur', event);
-    };
+      emit('blur', event)
+    }
 
     watch(
       () => [props.modelValue, props.autoResize, props.minRows, props.maxRows],
       () => {
-        if (!props.autoResize) return;
-        nextTick(adjustHeight);
+        if (!props.autoResize) return
+        nextTick(adjustHeight)
       }
-    );
+    )
 
     watch(textareaRef, (textarea) => {
-      if (!textarea || !props.autoResize) return;
-      nextTick(adjustHeight);
-    });
+      if (!textarea || !props.autoResize) return
+      nextTick(adjustHeight)
+    })
 
     return () => {
       const children = [
@@ -279,30 +271,30 @@ export const Textarea = defineComponent({
           onInput: handleInput,
           onChange: handleChange,
           onFocus: handleFocus,
-          onBlur: handleBlur,
-        }),
-      ];
+          onBlur: handleBlur
+        })
+      ]
 
       // Add character count if enabled
       if (props.showCount) {
         const countText = props.maxLength
           ? `${currentLength.value}/${props.maxLength}`
-          : `${currentLength.value}`;
+          : `${currentLength.value}`
 
         children.push(
           h(
             'div',
             {
-              class: 'mt-1 text-sm text-gray-500 text-right',
+              class: 'mt-1 text-sm text-gray-500 text-right'
             },
             countText
           )
-        );
+        )
       }
 
-      return h('div', { class: 'w-full' }, children);
-    };
-  },
-});
+      return h('div', { class: 'w-full' }, children)
+    }
+  }
+})
 
-export default Textarea;
+export default Textarea

@@ -10,7 +10,7 @@ Icon 组件提供了一个通用的图标容器，可以包裹任何 SVG 内容�
 
 ```vue
 <script setup>
-import { Icon } from '@tigercat/vue';
+import { Icon } from '@tigercat/vue'
 </script>
 
 <template>
@@ -25,7 +25,7 @@ import { Icon } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Icon } from '@tigercat/react';
+import { Icon } from '@tigercat/react'
 
 function App() {
   return (
@@ -34,7 +34,7 @@ function App() {
         <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
       </svg>
     </Icon>
-  );
+  )
 }
 ```
 
@@ -144,31 +144,31 @@ Icon 组件支持 4 种不同的尺寸：
 {
   /* 继承父元素颜色 */
 }
-<div className="text-blue-500">
+;<div className="text-blue-500">
   <Icon>
     <svg>
       <path d="M5 13l4 4L19 7" />
     </svg>
   </Icon>
-</div>;
+</div>
 
 {
   /* 直接设置颜色 */
 }
-<Icon color="#ff0000">
+;<Icon color="#ff0000">
   <svg>
     <path d="M5 13l4 4L19 7" />
   </svg>
-</Icon>;
+</Icon>
 
 {
   /* 使用 RGB 颜色 */
 }
-<Icon color="rgb(59, 130, 246)">
+;<Icon color="rgb(59, 130, 246)">
   <svg>
     <path d="M5 13l4 4L19 7" />
   </svg>
-</Icon>;
+</Icon>
 ```
 
 ## 自定义 SVG 图标
@@ -179,7 +179,7 @@ Icon 组件会自动为 SVG 元素添加合适的属性，如 `stroke`、`fill`�
 
 ```vue
 <script setup>
-import { Icon } from '@tigercat/vue';
+import { Icon } from '@tigercat/vue'
 
 // 自定义心形图标
 const HeartIcon = () => (
@@ -188,7 +188,7 @@ const HeartIcon = () => (
       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </svg>
   </Icon>
-);
+)
 
 // 自定义星形图标
 const StarIcon = () => (
@@ -197,7 +197,7 @@ const StarIcon = () => (
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
     </svg>
   </Icon>
-);
+)
 </script>
 
 <template>
@@ -209,7 +209,7 @@ const StarIcon = () => (
 ### React
 
 ```tsx
-import { Icon } from '@tigercat/react';
+import { Icon } from '@tigercat/react'
 
 // 自定义心形图标
 const HeartIcon = () => (
@@ -218,7 +218,7 @@ const HeartIcon = () => (
       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </svg>
   </Icon>
-);
+)
 
 // 自定义星形图标
 const StarIcon = () => (
@@ -227,7 +227,7 @@ const StarIcon = () => (
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
     </svg>
   </Icon>
-);
+)
 
 function App() {
   return (
@@ -235,7 +235,7 @@ function App() {
       <HeartIcon />
       <StarIcon />
     </>
-  );
+  )
 }
 ```
 
@@ -246,8 +246,8 @@ Icon 组件可以与流行的图标库一起使用，如 Heroicons、Lucide、Fo
 ### 使用 Heroicons (React)
 
 ```tsx
-import { Icon } from '@tigercat/react';
-import { HomeIcon, UserIcon } from '@heroicons/react/24/outline';
+import { Icon } from '@tigercat/react'
+import { HomeIcon, UserIcon } from '@heroicons/react/24/outline'
 
 function App() {
   return (
@@ -260,7 +260,7 @@ function App() {
         <UserIcon />
       </Icon>
     </>
-  );
+  )
 }
 ```
 
@@ -268,8 +268,8 @@ function App() {
 
 ```vue
 <script setup>
-import { Icon } from '@tigercat/vue';
-import { Home, User, Settings } from 'lucide-vue-next';
+import { Icon } from '@tigercat/vue'
+import { Home, User, Settings } from 'lucide-vue-next'
 </script>
 
 <template>
@@ -295,7 +295,7 @@ import { Home, User, Settings } from 'lucide-vue-next';
 
 ```vue
 <script setup>
-import { Button, Icon } from '@tigercat/vue';
+import { Button, Icon } from '@tigercat/vue'
 </script>
 
 <template>
@@ -323,7 +323,7 @@ import { Button, Icon } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Button, Icon } from '@tigercat/react';
+import { Button, Icon } from '@tigercat/react'
 
 function App() {
   return (
@@ -346,7 +346,7 @@ function App() {
         Delete
       </Button>
     </>
-  );
+  )
 }
 ```
 
@@ -472,22 +472,22 @@ Icon 组件会自动为 SVG 元素添加以下默认属性（如果未指定）�
 {
   /* 装饰性图标 */
 }
-<Icon aria-hidden="true">
+;<Icon aria-hidden="true">
   <svg>
     <circle cx="12" cy="12" r="10" />
   </svg>
-</Icon>;
+</Icon>
 
 {
   /* 语义化图标 */
 }
-<Icon aria-label="设置">
+;<Icon aria-label="设置">
   <svg>
     <title>设置</title>
     <circle cx="12" cy="12" r="3" />
     <path d="M12 1v6m0 6v6M1 12h6m6 0h6" />
   </svg>
-</Icon>;
+</Icon>
 ```
 
 ## TypeScript 支持
@@ -495,11 +495,11 @@ Icon 组件会自动为 SVG 元素添加以下默认属性（如果未指定）�
 Icon 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { IconProps, IconSize } from '@tigercat/core';
+import type { IconProps, IconSize } from '@tigercat/core'
 // Vue
-import type { VueIconProps } from '@tigercat/vue';
+import type { VueIconProps } from '@tigercat/vue'
 // React
-import type { Icon, IconProps as ReactIconProps } from '@tigercat/react';
+import type { Icon, IconProps as ReactIconProps } from '@tigercat/react'
 ```
 
 ## 示例集合
@@ -510,7 +510,7 @@ import type { Icon, IconProps as ReactIconProps } from '@tigercat/react';
 
 ```vue
 <script setup>
-import { Icon } from '@tigercat/vue';
+import { Icon } from '@tigercat/vue'
 </script>
 
 <template>
@@ -539,8 +539,7 @@ import { Icon } from '@tigercat/vue';
   <!-- 下载图标 -->
   <Icon size="md">
     <svg>
-      <path
-        d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
     </svg>
   </Icon>
 </template>
@@ -549,7 +548,7 @@ import { Icon } from '@tigercat/vue';
 #### React
 
 ```tsx
-import { Icon } from '@tigercat/react';
+import { Icon } from '@tigercat/react'
 
 function IconExamples() {
   return (
@@ -583,7 +582,7 @@ function IconExamples() {
         </svg>
       </Icon>
     </>
-  );
+  )
 }
 ```
 
@@ -618,20 +617,20 @@ function IconExamples() {
 {
   /* 旋转加载图标 */
 }
-<Icon size="lg" className="animate-spin">
+;<Icon size="lg" className="animate-spin">
   <svg>
     <path d="M21 12a9 9 0 1 1-6.219-8.56" />
   </svg>
-</Icon>;
+</Icon>
 
 {
   /* 脉冲图标 */
 }
-<Icon size="lg" className="animate-pulse" color="#ef4444">
+;<Icon size="lg" className="animate-pulse" color="#ef4444">
   <svg>
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
   </svg>
-</Icon>;
+</Icon>
 ```
 
 ## 最佳实践

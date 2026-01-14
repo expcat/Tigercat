@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue';
+import { defineComponent, computed, h, PropType } from 'vue'
 import {
   classNames,
   textSizeClasses,
@@ -10,19 +10,19 @@ import {
   type TextSize,
   type TextWeight,
   type TextAlign,
-  type TextColor,
-} from '@tigercat/core';
+  type TextColor
+} from '@tigercat/core'
 
 export interface VueTextProps {
-  tag?: TextTag;
-  size?: TextSize;
-  weight?: TextWeight;
-  align?: TextAlign;
-  color?: TextColor;
-  truncate?: boolean;
-  italic?: boolean;
-  underline?: boolean;
-  lineThrough?: boolean;
+  tag?: TextTag
+  size?: TextSize
+  weight?: TextWeight
+  align?: TextAlign
+  color?: TextColor
+  truncate?: boolean
+  italic?: boolean
+  underline?: boolean
+  lineThrough?: boolean
 }
 
 export const Text = defineComponent({
@@ -34,7 +34,7 @@ export const Text = defineComponent({
      */
     tag: {
       type: String as PropType<TextTag>,
-      default: 'p' as TextTag,
+      default: 'p' as TextTag
     },
     /**
      * Text size
@@ -42,7 +42,7 @@ export const Text = defineComponent({
      */
     size: {
       type: String as PropType<TextSize>,
-      default: 'base' as TextSize,
+      default: 'base' as TextSize
     },
     /**
      * Font weight
@@ -50,13 +50,13 @@ export const Text = defineComponent({
      */
     weight: {
       type: String as PropType<TextWeight>,
-      default: 'normal' as TextWeight,
+      default: 'normal' as TextWeight
     },
     /**
      * Text alignment
      */
     align: {
-      type: String as PropType<TextAlign>,
+      type: String as PropType<TextAlign>
     },
     /**
      * Text color
@@ -64,7 +64,7 @@ export const Text = defineComponent({
      */
     color: {
       type: String as PropType<TextColor>,
-      default: 'default' as TextColor,
+      default: 'default' as TextColor
     },
     /**
      * Truncate text with ellipsis
@@ -72,7 +72,7 @@ export const Text = defineComponent({
      */
     truncate: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Italic text style
@@ -80,7 +80,7 @@ export const Text = defineComponent({
      */
     italic: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Underline text decoration
@@ -88,7 +88,7 @@ export const Text = defineComponent({
      */
     underline: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Line-through text decoration
@@ -96,8 +96,8 @@ export const Text = defineComponent({
      */
     lineThrough: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   setup(props, { slots, attrs }) {
     const textClasses = computed(() => {
@@ -110,8 +110,8 @@ export const Text = defineComponent({
         props.italic && textDecorationClasses.italic,
         props.underline && textDecorationClasses.underline,
         props.lineThrough && textDecorationClasses.lineThrough
-      );
-    });
+      )
+    })
 
     return () => {
       return h(
@@ -119,12 +119,12 @@ export const Text = defineComponent({
         {
           ...attrs,
           class: [textClasses.value, attrs.class],
-          style: attrs.style,
+          style: attrs.style
         },
         slots.default?.()
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Text;
+export default Text

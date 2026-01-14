@@ -31,7 +31,7 @@ import { ComponentName } from '@tigercat/react'
 import {
   renderWithProps,
   renderWithChildren,
-  expectNoA11yViolations,
+  expectNoA11yViolations
   // Import other utilities as needed
 } from '../utils'
 
@@ -78,19 +78,19 @@ Verify that the component renders correctly with default and custom configuratio
 describe('Rendering', () => {
   it('should render with default props', () => {
     const { getByRole } = render(<Button>Click me</Button>)
-    
+
     expect(getByRole('button')).toBeInTheDocument()
   })
 
   it('should render with custom content', () => {
     const { getByText } = render(<Button>Custom Content</Button>)
-    
+
     expect(getByText('Custom Content')).toBeInTheDocument()
   })
 
   it('should apply custom className', () => {
     const { container } = render(<Button className="custom-class">Button</Button>)
-    
+
     expect(container.querySelector('.custom-class')).toBeInTheDocument()
   })
 })
@@ -131,7 +131,7 @@ describe('Events', () => {
     const { getByRole } = render(
       <Button onClick={handleClick}>Click me</Button>
     )
-    
+
     await userEvent.click(getByRole('button'))
     expect(handleClick).toHaveBeenCalledTimes(1)
   })
@@ -141,7 +141,7 @@ describe('Events', () => {
     const { getByRole } = render(
       <Input onChange={handleChange} />
     )
-    
+
     const input = getByRole('textbox')
     await userEvent.type(input, 'test')
     expect(handleChange).toHaveBeenCalled()
@@ -152,7 +152,7 @@ describe('Events', () => {
     const { getByRole } = render(
       <Button onClick={handleClick} disabled>Disabled</Button>
     )
-    
+
     await userEvent.click(getByRole('button'))
     expect(handleClick).not.toHaveBeenCalled()
   })
@@ -167,13 +167,13 @@ Test different component states like disabled, loading, error, etc.
 describe('States', () => {
   it('should be disabled when disabled prop is true', () => {
     const { getByRole } = render(<Button disabled>Disabled</Button>)
-    
+
     expect(getByRole('button')).toBeDisabled()
   })
 
   it('should show loading state', () => {
     const { container, getByRole } = render(<Button loading>Loading</Button>)
-    
+
     const button = getByRole('button')
     expect(button).toBeDisabled()
     expect(container.querySelector('.animate-spin')).toBeInTheDocument()
@@ -182,7 +182,7 @@ describe('States', () => {
   it('should handle focus state', async () => {
     const { getByRole } = render(<Button>Focus me</Button>)
     const button = getByRole('button')
-    
+
     button.focus()
     expect(button).toHaveFocus()
   })
@@ -206,7 +206,7 @@ describe('Theme Support', () => {
     })
 
     const { container } = render(<Button variant="primary">Button</Button>)
-    
+
     const rootStyles = window.getComputedStyle(document.documentElement)
     expect(rootStyles.getPropertyValue('--tiger-primary').trim()).toBe('#ff0000')
   })
@@ -221,25 +221,25 @@ Ensure components meet WCAG accessibility guidelines.
 describe('Accessibility', () => {
   it('should have no accessibility violations', async () => {
     const { container } = render(<Button>Accessible Button</Button>)
-    
+
     await expectNoA11yViolations(container)
   })
 
   it('should have proper ARIA attributes', () => {
     const { getByRole } = render(<Button aria-label="Close">×</Button>)
     const button = getByRole('button', { name: 'Close' })
-    
+
     expect(button).toHaveAttribute('aria-label', 'Close')
   })
 
   it('should be keyboard accessible', async () => {
     const handleClick = vi.fn()
     const { getByRole } = render(<Button onClick={handleClick}>Button</Button>)
-    
+
     const button = getByRole('button')
     button.focus()
     expect(button).toHaveFocus()
-    
+
     await userEvent.keyboard('{Enter}')
     expect(handleClick).toHaveBeenCalledTimes(1)
   })
@@ -254,13 +254,13 @@ Capture snapshots of major component variants for regression testing.
 describe('Snapshots', () => {
   it('should match snapshot for default state', () => {
     const { container } = render(<Button>Default</Button>)
-    
+
     expect(container.firstChild).toMatchSnapshot()
   })
 
   it('should match snapshot for each variant', () => {
     const variants = ['primary', 'secondary', 'outline', 'ghost'] as const
-    
+
     variants.forEach(variant => {
       const { container } = render(<Button variant={variant}>Button</Button>)
       expect(container.firstChild).toMatchSnapshot()
@@ -381,7 +381,7 @@ For basic rendering, use `render()` directly from @testing-library/react.
 ### Accessibility Helpers
 
 - **axe(container)**: Run axe accessibility tests
-- **expectNoA11yViolations(container)**: Assert no a11y violations  
+- **expectNoA11yViolations(container)**: Assert no a11y violations
 - **expectProperAriaLabels(element, attributes)**: Check ARIA attributes
 - **testKeyboardNavigation(element, keys)**: Test keyboard interactions
 
@@ -439,6 +439,7 @@ pnpm test:ui
 ```
 
 This opens a web interface where you can:
+
 - View test results
 - Debug failed tests
 - Inspect component output
@@ -449,10 +450,10 @@ This opens a web interface where you can:
 ```typescript
 it('should render correctly', () => {
   const { container, debug } = render(<Component />)
-  
+
   // Print DOM tree to console
   debug()
-  
+
   // Print specific element
   debug(container.querySelector('button'))
 })
@@ -463,7 +464,7 @@ it('should render correctly', () => {
 ```typescript
 it('should render correctly', () => {
   render(<Component />)
-  
+
   // Get a URL to test your queries
   screen.logTestingPlaygroundURL()
 })
@@ -478,10 +479,10 @@ describe('Input', () => {
   it('should update value on user input', async () => {
     const handleChange = vi.fn()
     const { getByRole } = render(<Input onChange={handleChange} />)
-    
+
     const input = getByRole('textbox')
     await userEvent.type(input, 'new value')
-    
+
     expect(handleChange).toHaveBeenCalled()
   })
 })
@@ -494,16 +495,16 @@ it('should work as controlled component', async () => {
   const TestComponent = () => {
     const [value, setValue] = React.useState('')
     return (
-      <Input 
-        value={value} 
-        onChange={(e) => setValue(e.target.value)} 
+      <Input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
       />
     )
   }
-  
+
   const { getByRole } = render(<TestComponent />)
   const input = getByRole('textbox') as HTMLInputElement
-  
+
   await userEvent.type(input, 'test')
   expect(input.value).toBe('test')
 })
@@ -514,9 +515,9 @@ it('should work as controlled component', async () => {
 ```typescript
 it('should show error message when invalid', () => {
   const { getByText, rerender } = render(<Input error="" />)
-  
+
   expect(() => getByText('Error')).toThrow()
-  
+
   rerender(<Input error="Invalid input" />)
   expect(getByText('Invalid input')).toBeInTheDocument()
 })
@@ -527,9 +528,9 @@ it('should show error message when invalid', () => {
 ```typescript
 it('should load data asynchronously', async () => {
   const { getByText, findByText } = render(<AsyncComponent />)
-  
+
   expect(getByText('Loading...')).toBeInTheDocument()
-  
+
   // Use findBy for async elements
   expect(await findByText('Data loaded')).toBeInTheDocument()
 })
@@ -540,13 +541,13 @@ it('should load data asynchronously', async () => {
 ```typescript
 it('should consume context values', () => {
   const wrapper = createReactWrapper(ThemeProvider)
-  
+
   const { getByRole } = render(
     <ThemeProvider theme="dark">
       <Button>Button</Button>
     </ThemeProvider>
   )
-  
+
   // Test component behavior with context
 })
 ```
@@ -554,6 +555,7 @@ it('should consume context values', () => {
 ## Coverage Goals
 
 Aim for:
+
 - **Line Coverage**: >80%
 - **Branch Coverage**: >75%
 - **Function Coverage**: >80%

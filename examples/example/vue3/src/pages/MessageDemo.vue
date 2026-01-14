@@ -31,14 +31,14 @@ const showLoading = () => {
 const showShortMessage = () => {
   message.info({
     content: '这条消息1秒后关闭',
-    duration: 1000,
+    duration: 1000
   })
 }
 
 const showLongMessage = () => {
   message.success({
     content: '这条消息5秒后关闭',
-    duration: 5000,
+    duration: 5000
   })
 }
 
@@ -46,7 +46,7 @@ const showPersistentMessage = () => {
   message.warning({
     content: '这条消息需要手动关闭',
     duration: 0,
-    closable: true,
+    closable: true
   })
 }
 
@@ -54,7 +54,7 @@ const showClosableMessage = () => {
   message.info({
     content: '这条消息可以手动关闭',
     closable: true,
-    duration: 0,
+    duration: 0
   })
 }
 
@@ -83,7 +83,7 @@ const simulateRequest = async () => {
   const close = message.loading('正在提交表单...')
 
   // 模拟异步请求
-  await new Promise(resolve => setTimeout(resolve, 2000))
+  await new Promise((resolve) => setTimeout(resolve, 2000))
 
   close()
   message.success({
@@ -91,7 +91,7 @@ const simulateRequest = async () => {
     duration: 3000,
     onClose: () => {
       console.log('成功消息已关闭')
-    },
+    }
   })
 }
 
@@ -110,14 +110,14 @@ const showMessageWithCallback = () => {
     content: '操作成功！',
     onClose: () => {
       console.log('消息已关闭')
-    },
+    }
   })
 }
 
 const showCustomClass = () => {
   message.info({
     content: '自定义样式的消息',
-    className: 'shadow-2xl',
+    className: 'shadow-2xl'
   })
 }
 
@@ -126,7 +126,7 @@ const tips = [
   { key: 2, title: 'loading 类型的消息不会自动关闭，需要手动关闭' },
   { key: 3, title: '多条消息会依次排列显示，形成队列' },
   { key: 4, title: '可以通过 message.clear() 清空所有正在显示的消息' },
-  { key: 5, title: 'Message 与 Alert 的区别：Message 是全局提示，Alert 是页面内嵌提示' },
+  { key: 5, title: 'Message 与 Alert 的区别：Message 是全局提示，Alert 是页面内嵌提示' }
 ]
 </script>
 
@@ -134,33 +134,43 @@ const tips = [
   <div class="max-w-5xl mx-auto p-8 text-gray-900 dark:text-gray-100">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Message 消息提示</h1>
-      <p class="text-gray-600 dark:text-gray-300">全局展示操作反馈信息，支持多种状态、自动关闭、队列管理等功能。</p>
+      <p class="text-gray-600 dark:text-gray-300">
+        全局展示操作反馈信息，支持多种状态、自动关闭、队列管理等功能。
+      </p>
     </div>
 
     <!-- 基本用法 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">基本用法</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">最简单的用法，调用 message 方法即可显示消息提示。</p>
-      <div class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
+      <p class="text-gray-600 dark:text-gray-300 mb-6">
+        最简单的用法，调用 message 方法即可显示消息提示。
+      </p>
+      <div
+        class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
         <div class="flex flex-wrap gap-2">
-          <Button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="showInfo">
+          <Button
+            class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="showInfo">
             信息
           </Button>
-          <Button class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="showSuccess">
+          <Button
+            class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="showSuccess">
             成功
           </Button>
-          <Button class="px-4 py-2 rounded-lg bg-yellow-600 text-white hover:bg-yellow-700 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="showWarning">
+          <Button
+            class="px-4 py-2 rounded-lg bg-yellow-600 text-white hover:bg-yellow-700 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="showWarning">
             警告
           </Button>
-          <Button class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="showError">
+          <Button
+            class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="showError">
             错误
           </Button>
-          <Button class="px-4 py-2 rounded-lg bg-gray-600 text-white hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="showLoading">
+          <Button
+            class="px-4 py-2 rounded-lg bg-gray-600 text-white hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="showLoading">
             加载
           </Button>
         </div>
@@ -171,19 +181,25 @@ const tips = [
     <!-- 自定义持续时间 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">自定义持续时间</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">通过 duration 属性自定义消息显示时间，设置为 0 时不会自动关闭。</p>
-      <div class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
+      <p class="text-gray-600 dark:text-gray-300 mb-6">
+        通过 duration 属性自定义消息显示时间，设置为 0 时不会自动关闭。
+      </p>
+      <div
+        class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
         <div class="flex flex-wrap gap-2">
-          <Button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="showShortMessage">
+          <Button
+            class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="showShortMessage">
             短时间（1秒）
           </Button>
-          <Button class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="showLongMessage">
+          <Button
+            class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="showLongMessage">
             长时间（5秒）
           </Button>
-          <Button class="px-4 py-2 rounded-lg bg-yellow-600 text-white hover:bg-yellow-700 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="showPersistentMessage">
+          <Button
+            class="px-4 py-2 rounded-lg bg-yellow-600 text-white hover:bg-yellow-700 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="showPersistentMessage">
             不自动关闭
           </Button>
         </div>
@@ -194,28 +210,35 @@ const tips = [
     <!-- 手动关闭 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">手动关闭</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">设置 closable 为 true 显示关闭按钮，或使用返回的关闭函数。此示例支持同时打开多条
-        loading，并提供逐条/一键关闭。</p>
-      <div class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
+      <p class="text-gray-600 dark:text-gray-300 mb-6">
+        设置 closable 为 true 显示关闭按钮，或使用返回的关闭函数。此示例支持同时打开多条
+        loading，并提供逐条/一键关闭。
+      </p>
+      <div
+        class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
         <div class="flex flex-wrap gap-2 mb-4">
-          <Button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="showClosableMessage">
+          <Button
+            class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="showClosableMessage">
             显示可关闭消息
           </Button>
         </div>
         <div class="flex flex-wrap gap-2 items-center">
-          <Button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="showMessage">
+          <Button
+            class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="showMessage">
             显示加载消息
           </Button>
-          <Button class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="closeManually"
-                  :disabled="manualLoadingCount === 0">
+          <Button
+            class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="closeManually"
+            :disabled="manualLoadingCount === 0">
             关闭最后一个
           </Button>
-          <Button class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="closeAllManual"
-                  :disabled="manualLoadingCount === 0">
+          <Button
+            class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="closeAllManual"
+            :disabled="manualLoadingCount === 0">
             关闭全部
           </Button>
           <span class="text-sm text-gray-600 dark:text-gray-300">
@@ -230,9 +253,11 @@ const tips = [
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">完整流程示例</h2>
       <p class="text-gray-600 dark:text-gray-300 mb-6">模拟表单提交的完整流程。</p>
-      <div class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
-        <Button class="px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                @click="simulateRequest">
+      <div
+        class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
+        <Button
+          class="px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+          @click="simulateRequest">
           提交表单（模拟请求）
         </Button>
       </div>
@@ -242,15 +267,20 @@ const tips = [
     <!-- 队列管理 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">队列管理</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">支持多条消息同时显示，可以一次清空所有消息。</p>
-      <div class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
+      <p class="text-gray-600 dark:text-gray-300 mb-6">
+        支持多条消息同时显示，可以一次清空所有消息。
+      </p>
+      <div
+        class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
         <div class="flex flex-wrap gap-2">
-          <Button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="showMultipleMessages">
+          <Button
+            class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="showMultipleMessages">
             显示多条消息
           </Button>
-          <Button class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="clearAll">
+          <Button
+            class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="clearAll">
             清空所有消息
           </Button>
         </div>
@@ -261,10 +291,14 @@ const tips = [
     <!-- 回调函数 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">回调函数</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">可以通过 onClose 回调函数在消息关闭时执行特定操作（查看控制台）。</p>
-      <div class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
-        <Button class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                @click="showMessageWithCallback">
+      <p class="text-gray-600 dark:text-gray-300 mb-6">
+        可以通过 onClose 回调函数在消息关闭时执行特定操作（查看控制台）。
+      </p>
+      <div
+        class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
+        <Button
+          class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+          @click="showMessageWithCallback">
           显示消息（带回调）
         </Button>
       </div>
@@ -275,9 +309,11 @@ const tips = [
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">自定义样式</h2>
       <p class="text-gray-600 dark:text-gray-300 mb-6">可以通过 className 属性添加自定义样式类。</p>
-      <div class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
-        <Button class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                @click="showCustomClass">
+      <div
+        class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
+        <Button
+          class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+          @click="showCustomClass">
           自定义样式
         </Button>
       </div>
@@ -290,61 +326,77 @@ const tips = [
       <p class="text-gray-600 dark:text-gray-300 mb-6">常见的使用场景示例。</p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
+        <div
+          class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
           <h3 class="text-lg font-semibold mb-3">文件上传</h3>
-          <Button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="() => {
-                    const close = message.loading('正在上传文件...')
-                    delay(() => {
-                      close()
-                      message.success('文件上传成功')
-                    }, 2000)
-                  }">
+          <Button
+            class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="
+              () => {
+                const close = message.loading('正在上传文件...')
+                delay(() => {
+                  close()
+                  message.success('文件上传成功')
+                }, 2000)
+              }
+            ">
             上传文件
           </Button>
         </div>
 
-        <div class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
+        <div
+          class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
           <h3 class="text-lg font-semibold mb-3">保存设置</h3>
-          <Button class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="() => {
-                    const close = message.loading('正在保存设置...')
-                    delay(() => {
-                      close()
-                      message.success({
-                        content: '设置保存成功',
-                        duration: 2000,
-                      })
-                    }, 1000)
-                  }">
+          <Button
+            class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="
+              () => {
+                const close = message.loading('正在保存设置...')
+                delay(() => {
+                  close()
+                  message.success({
+                    content: '设置保存成功',
+                    duration: 2000
+                  })
+                }, 1000)
+              }
+            ">
             保存设置
           </Button>
         </div>
 
-        <div class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
+        <div
+          class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
           <h3 class="text-lg font-semibold mb-3">删除确认</h3>
-          <Button class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="() => {
-                    message.warning({
-                      content: '确定要删除这条记录吗？',
-                      duration: 5000,
-                      closable: true,
-                    })
-                  }">
+          <Button
+            class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="
+              () => {
+                message.warning({
+                  content: '确定要删除这条记录吗？',
+                  duration: 5000,
+                  closable: true
+                })
+              }
+            ">
             删除记录
           </Button>
         </div>
 
-        <div class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
+        <div
+          class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
           <h3 class="text-lg font-semibold mb-3">网络错误</h3>
-          <Button class="px-4 py-2 rounded-lg bg-yellow-600 text-white hover:bg-yellow-700 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
-                  @click="() => {
-                    message.error({
-                      content: '网络连接失败，请检查您的网络设置',
-                      duration: 0,
-                      closable: true,
-                    })
-                  }">
+          <Button
+            class="px-4 py-2 rounded-lg bg-yellow-600 text-white hover:bg-yellow-700 transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+            @click="
+              () => {
+                message.error({
+                  content: '网络连接失败，请检查您的网络设置',
+                  duration: 0,
+                  closable: true
+                })
+              }
+            ">
             模拟网络错误
           </Button>
         </div>
@@ -352,13 +404,9 @@ const tips = [
     </section>
 
     <div
-         class="mt-12 p-6 rounded-xl border bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950/40 dark:border-blue-900 dark:text-blue-200">
+      class="mt-12 p-6 rounded-xl border bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950/40 dark:border-blue-900 dark:text-blue-200">
       <h3 class="text-lg font-semibold mb-2">提示</h3>
-      <List class="text-sm"
-            bordered="none"
-            :split="false"
-            size="sm"
-            :dataSource="tips">
+      <List class="text-sm" bordered="none" :split="false" size="sm" :dataSource="tips">
         <template #renderItem="{ item }">
           <div class="flex items-start gap-2 text-blue-700 dark:text-blue-200">
             <span aria-hidden="true">•</span>

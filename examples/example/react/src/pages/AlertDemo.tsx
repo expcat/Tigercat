@@ -1,19 +1,15 @@
-import { useState } from 'react';
-import { Alert, Divider, Button, List } from '@tigercat/react';
+import { useState } from 'react'
+import { Alert, Divider, Button, List } from '@tigercat/react'
 
 export default function AlertDemo() {
-  const [showAlert1, setShowAlert1] = useState(true);
-  const [showAlert2, setShowAlert2] = useState(true);
-  const [showAlert3, setShowAlert3] = useState(true);
+  const [showAlert1, setShowAlert1] = useState(true)
+  const [showAlert2, setShowAlert2] = useState(true)
+  const [showAlert3, setShowAlert3] = useState(true)
 
-  const customContentItems = [
-    '支持列表项',
-    '支持多种格式',
-    '支持任意 React 组件',
-  ];
+  const customContentItems = ['支持列表项', '支持多种格式', '支持任意 React 组件']
 
   const demoCardClassName =
-    'p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40';
+    'p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40'
 
   return (
     <div className="max-w-5xl mx-auto p-8 text-gray-900 dark:text-gray-100">
@@ -47,11 +43,7 @@ export default function AlertDemo() {
           种不同的类型：info（信息）、success（成功）、warning（警告）、error（错误）。
         </p>
         <div className={demoCardClassName}>
-          <Alert
-            type="info"
-            title="信息提示"
-            description="这是一条信息提示的详细内容"
-          />
+          <Alert type="info" title="信息提示" description="这是一条信息提示的详细内容" />
           <Alert type="success" title="成功提示" description="操作成功完成" />
           <Alert type="warning" title="警告提示" description="请注意相关事项" />
           <Alert type="error" title="错误提示" description="操作失败，请重试" />
@@ -66,24 +58,14 @@ export default function AlertDemo() {
           Alert 组件支持 3 种不同的尺寸：小、中、大。
         </p>
         <div className={demoCardClassName}>
-          <Alert
-            size="sm"
-            type="info"
-            title="小尺寸提示"
-            description="这是小尺寸的提示内容"
-          />
+          <Alert size="sm" type="info" title="小尺寸提示" description="这是小尺寸的提示内容" />
           <Alert
             size="md"
             type="success"
             title="中等尺寸提示"
             description="这是中等尺寸的提示内容"
           />
-          <Alert
-            size="lg"
-            type="warning"
-            title="大尺寸提示"
-            description="这是大尺寸的提示内容"
-          />
+          <Alert size="lg" type="warning" title="大尺寸提示" description="这是大尺寸的提示内容" />
         </div>
         <Divider className="my-6" />
       </section>
@@ -134,8 +116,8 @@ export default function AlertDemo() {
                 size="sm"
                 variant="primary"
                 onClick={() => {
-                  setShowAlert1(true);
-                  setShowAlert2(true);
+                  setShowAlert1(true)
+                  setShowAlert2(true)
                 }}>
                 重置
               </Button>
@@ -191,7 +173,7 @@ export default function AlertDemo() {
                   size="sm"
                   dataSource={customContentItems.map((title, index) => ({
                     key: index,
-                    title,
+                    title
                   }))}
                   renderItem={(item) => (
                     <div className="flex items-start gap-2">
@@ -212,9 +194,7 @@ export default function AlertDemo() {
       {/* 完整功能示例 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">完整功能示例</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          综合展示所有功能。
-        </p>
+        <p className="text-gray-600 dark:text-gray-300 mb-6">综合展示所有功能。</p>
         <div className={demoCardClassName}>
           {showAlert3 && (
             <Alert
@@ -246,9 +226,7 @@ export default function AlertDemo() {
       {/* 实际应用场景 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">实际应用场景</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          模拟真实的使用场景。
-        </p>
+        <p className="text-gray-600 dark:text-gray-300 mb-6">模拟真实的使用场景。</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 表单提交成功 */}
@@ -305,5 +283,5 @@ export default function AlertDemo() {
         </div>
       </section>
     </div>
-  );
+  )
 }

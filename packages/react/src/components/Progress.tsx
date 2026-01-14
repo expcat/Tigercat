@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   classNames,
   getProgressVariantClasses,
@@ -20,12 +20,11 @@ import {
   progressCircleTextClasses,
   progressCircleTrackStrokeClasses,
   type ProgressProps as CoreProgressProps,
-  type ProgressVariant,
-} from '@tigercat/core';
+  type ProgressVariant
+} from '@tigercat/core'
 
 export interface ProgressProps
-  extends CoreProgressProps,
-    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreProgressProps> {}
+  extends CoreProgressProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreProgressProps> {}
 
 export const Progress: React.FC<ProgressProps> = ({
   variant = 'primary',
@@ -48,54 +47,45 @@ export const Progress: React.FC<ProgressProps> = ({
   'aria-describedby': ariaDescribedby,
   ...props
 }) => {
-  const clampedPercentage = clampPercentage(percentage);
-  const effectiveVariant = (getStatusVariant(status) ||
-    variant) as ProgressVariant;
-  const shouldShowText = showText ?? type === 'line';
-  const displayText = shouldShowText
-    ? formatProgressText(clampedPercentage, text, format)
-    : '';
+  const clampedPercentage = clampPercentage(percentage)
+  const effectiveVariant = (getStatusVariant(status) || variant) as ProgressVariant
+  const shouldShowText = showText ?? type === 'line'
+  const displayText = shouldShowText ? formatProgressText(clampedPercentage, text, format) : ''
 
   const resolvedAriaLabel =
-    ariaLabel ??
-    (ariaLabelledby ? undefined : `Progress: ${clampedPercentage}%`);
+    ariaLabel ?? (ariaLabelledby ? undefined : `Progress: ${clampedPercentage}%`)
 
   const lineTrackClasses = classNames(
     progressLineBaseClasses,
     progressTrackBgClasses,
     !height && progressLineSizeClasses[size]
-  );
+  )
 
   const lineBarClasses = classNames(
     progressLineInnerClasses,
     getProgressVariantClasses(effectiveVariant),
     striped && progressStripedClasses,
     striped && stripedAnimation && progressStripedAnimationClasses
-  );
+  )
 
   const textClasses = classNames(
     progressTextBaseClasses,
     progressTextSizeClasses[size],
     getProgressTextColorClasses(effectiveVariant)
-  );
+  )
 
   // Render line progress
   const renderLineProgress = () => {
     const containerStyle =
-      width !== 'auto'
-        ? { width: typeof width === 'number' ? `${width}px` : width }
-        : {};
+      width !== 'auto' ? { width: typeof width === 'number' ? `${width}px` : width } : {}
 
     const mergedStyle = {
       ...(style ?? {}),
-      ...containerStyle,
-    };
+      ...containerStyle
+    }
 
     return (
-      <div
-        {...props}
-        className={classNames('flex items-center', className)}
-        style={mergedStyle}>
+      <div {...props} className={classNames('flex items-center', className)} style={mergedStyle}>
         <div
           className={lineTrackClasses}
           style={{ flex: 1, ...(height ? { height: `${height}px` } : {}) }}>
@@ -113,28 +103,19 @@ export const Progress: React.FC<ProgressProps> = ({
         </div>
         {shouldShowText && <span className={textClasses}>{displayText}</span>}
       </div>
-    );
-  };
+    )
+  }
 
   // Render circle progress
   const renderCircleProgress = () => {
-    const {
-      width: svgWidth,
-      height: svgHeight,
-      radius,
-      cx,
-      cy,
-    } = getCircleSize(size, strokeWidth);
+    const { width: svgWidth, height: svgHeight, radius, cx, cy } = getCircleSize(size, strokeWidth)
     const { strokeDasharray, strokeDashoffset } = calculateCirclePath(
       radius,
       strokeWidth,
       clampedPercentage
-    );
+    )
 
-    const strokeColor = getProgressVariantClasses(effectiveVariant).replace(
-      'bg-',
-      'text-'
-    );
+    const strokeColor = getProgressVariantClasses(effectiveVariant).replace('bg-', 'text-')
 
     return (
       <div
@@ -143,12 +124,9 @@ export const Progress: React.FC<ProgressProps> = ({
         style={{
           ...(style ?? {}),
           width: `${svgWidth}px`,
-          height: `${svgHeight}px`,
+          height: `${svgHeight}px`
         }}>
-        <svg
-          width={svgWidth}
-          height={svgHeight}
-          viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
+        <svg width={svgWidth} height={svgHeight} viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
           <circle
             cx={cx}
             cy={cy}
@@ -172,7 +150,7 @@ export const Progress: React.FC<ProgressProps> = ({
             style={{
               transition: 'stroke-dashoffset 0.3s ease',
               transform: 'rotate(-90deg)',
-              transformOrigin: 'center',
+              transformOrigin: 'center'
             }}
             role="progressbar"
             aria-label={resolvedAriaLabel}
@@ -195,9 +173,9 @@ export const Progress: React.FC<ProgressProps> = ({
           </div>
         )}
       </div>
-    );
-  };
+    )
+  }
 
-  if (type === 'circle') return renderCircleProgress();
-  return renderLineProgress();
-};
+  if (type === 'circle') return renderCircleProgress()
+  return renderLineProgress()
+}

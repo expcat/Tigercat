@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { createRoot, Root } from 'react-dom/client';
+import React, { useEffect, useState } from 'react'
+import { createRoot, Root } from 'react-dom/client'
 import {
   classNames,
   icon24PathStrokeLinecap,
@@ -22,55 +22,49 @@ import {
   type NotificationPosition,
   type NotificationInstance,
   type NotificationOptions,
-  type NotificationConfig,
-} from '@tigercat/core';
+  type NotificationConfig
+} from '@tigercat/core'
 
 /**
  * Global notification container id prefix
  */
-const NOTIFICATION_CONTAINER_ID_PREFIX = 'tiger-notification-container';
+const NOTIFICATION_CONTAINER_ID_PREFIX = 'tiger-notification-container'
 
 /**
  * Notification instance storage per position
  */
-const notificationInstancesByPosition: Record<
-  NotificationPosition,
-  NotificationInstance[]
-> = {
+const notificationInstancesByPosition: Record<NotificationPosition, NotificationInstance[]> = {
   'top-left': [],
   'top-right': [],
   'bottom-left': [],
-  'bottom-right': [],
-};
+  'bottom-right': []
+}
 
-let instanceIdCounter = 0;
+let instanceIdCounter = 0
 const containerRoots: Record<NotificationPosition, Root | null> = {
   'top-left': null,
   'top-right': null,
   'bottom-left': null,
-  'bottom-right': null,
-};
+  'bottom-right': null
+}
 const updateCallbacks: Record<NotificationPosition, (() => void) | null> = {
   'top-left': null,
   'top-right': null,
   'bottom-left': null,
-  'bottom-right': null,
-};
+  'bottom-right': null
+}
 
 /**
  * Get next instance id
  */
 function getNextInstanceId(): number {
-  return ++instanceIdCounter;
+  return ++instanceIdCounter
 }
 
 /**
  * Icon component
  */
-const Icon: React.FC<{ path: string; className: string }> = ({
-  path,
-  className,
-}) => {
+const Icon: React.FC<{ path: string; className: string }> = ({ path, className }) => {
   return (
     <svg
       className={className}
@@ -87,32 +81,26 @@ const Icon: React.FC<{ path: string; className: string }> = ({
         d={path}
       />
     </svg>
-  );
-};
+  )
+}
 
 /**
  * Single notification item component
  */
 interface NotificationItemProps {
-  notification: NotificationInstance;
-  onClose: (id: string | number) => void;
+  notification: NotificationInstance
+  onClose: (id: string | number) => void
 }
 
-const NotificationItem: React.FC<NotificationItemProps> = ({
-  notification,
-  onClose,
-}) => {
-  const [isVisible, setIsVisible] = useState(false);
+const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClose }) => {
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     // Trigger enter animation
-    setTimeout(() => setIsVisible(true), 10);
-  }, []);
+    setTimeout(() => setIsVisible(true), 10)
+  }, [])
 
-  const colorScheme = getNotificationTypeClasses(
-    notification.type,
-    defaultNotificationThemeColors
-  );
+  const colorScheme = getNotificationTypeClasses(notification.type, defaultNotificationThemeColors)
 
   const notificationClasses = classNames(
     notificationBaseClasses,
@@ -120,19 +108,18 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
     colorScheme.border,
     notification.className,
     isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
-  );
+  )
 
-  const iconPath =
-    notification.icon || getNotificationIconPath(notification.type);
-  const iconClass = classNames(notificationIconClasses, colorScheme.icon);
+  const iconPath = notification.icon || getNotificationIconPath(notification.type)
+  const iconClass = classNames(notificationIconClasses, colorScheme.icon)
 
   const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(() => onClose(notification.id), 300);
-  };
+    setIsVisible(false)
+    setTimeout(() => onClose(notification.id), 300)
+  }
 
-  const a11yRole = notification.type === 'error' ? 'alert' : 'status';
-  const ariaLive = notification.type === 'error' ? 'assertive' : 'polite';
+  const a11yRole = notification.type === 'error' ? 'alert' : 'status'
+  const ariaLive = notification.type === 'error' ? 'assertive' : 'polite'
 
   return (
     <div
@@ -142,10 +129,10 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       aria-atomic="true"
       onClick={notification.onClick}
       onKeyDown={(e) => {
-        if (!notification.onClick) return;
+        if (!notification.onClick) return
         if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          notification.onClick();
+          e.preventDefault()
+          notification.onClick()
         }
       }}
       tabIndex={notification.onClick ? 0 : undefined}
@@ -155,19 +142,11 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
       data-tiger-notification-id={String(notification.id)}>
       <Icon path={iconPath} className={iconClass} />
       <div className={notificationContentClasses}>
-        <div
-          className={classNames(
-            notificationTitleClasses,
-            colorScheme.titleText
-          )}>
+        <div className={classNames(notificationTitleClasses, colorScheme.titleText)}>
           {notification.title}
         </div>
         {notification.description && (
-          <div
-            className={classNames(
-              notificationDescriptionClasses,
-              colorScheme.descriptionText
-            )}>
+          <div className={classNames(notificationDescriptionClasses, colorScheme.descriptionText)}>
             {notification.description}
           </div>
         )}
@@ -176,69 +155,64 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
         <button
           className={notificationCloseButtonClasses}
           onClick={(e) => {
-            e.stopPropagation();
-            handleClose();
+            e.stopPropagation()
+            handleClose()
           }}
           aria-label="Close notification"
           type="button">
-          <Icon
-            path={notificationCloseIconPath}
-            className={notificationCloseIconClasses}
-          />
+          <Icon path={notificationCloseIconPath} className={notificationCloseIconClasses} />
         </button>
       )}
     </div>
-  );
-};
+  )
+}
 
 /**
  * Notification container props
  */
 export interface NotificationContainerProps {
-  position?: NotificationPosition;
+  position?: NotificationPosition
 }
 
 /**
  * Notification container component
  */
 export const NotificationContainer: React.FC<NotificationContainerProps> = ({
-  position = 'top-right',
+  position = 'top-right'
 }) => {
-  const [notifications, setNotifications] = useState<NotificationInstance[]>(
-    []
-  );
+  const [notifications, setNotifications] = useState<NotificationInstance[]>([])
 
   useEffect(() => {
     // Register update callback
     updateCallbacks[position] = () => {
-      setNotifications([...notificationInstancesByPosition[position]]);
-    };
+      setNotifications([...notificationInstancesByPosition[position]])
+    }
 
     // Initial sync
-    updateCallbacks[position]!();
+    updateCallbacks[position]!()
 
     return () => {
-      updateCallbacks[position] = null;
-    };
-  }, [position]);
+      updateCallbacks[position] = null
+    }
+  }, [position])
 
   const containerClasses = classNames(
     notificationContainerBaseClasses,
     notificationPositionClasses[position]
-  );
+  )
 
   const handleRemove = (id: string | number) => {
-    const instances = notificationInstancesByPosition[position];
-    const index = instances.findIndex((notif) => notif.id === id);
+    const instances = notificationInstancesByPosition[position]
+    const index = instances.findIndex((notif) => notif.id === id)
     if (index !== -1) {
-      const instance = instances[index];
-      instances.splice(index, 1);
+      const instance = instances[index]
+      instances.splice(index, 1)
       if (instance.onClose) {
-        instance.onClose();
+        instance.onClose()
       }
-      updateCallbacks[position]?.();
+      updateCallbacks[position]?.()
     }
-  };
+  }
 
   return (
     <div
@@ -256,49 +230,47 @@ export const NotificationContainer: React.FC<NotificationContainerProps> = ({
         />
       ))}
     </div>
-  );
-};
+  )
+}
 
 /**
  * Ensure notification container exists for a position
  */
 function ensureContainer(position: NotificationPosition) {
-  const containerId = `${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}`;
-  const rootId = `${containerId}-root`;
+  const containerId = `${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}`
+  const rootId = `${containerId}-root`
 
   // If we already created a root but the DOM was externally cleared (e.g. tests), reset.
-  const existingRootEl = document.getElementById(rootId);
+  const existingRootEl = document.getElementById(rootId)
   if (containerRoots[position] && !existingRootEl) {
-    containerRoots[position] = null;
-    updateCallbacks[position] = null;
+    containerRoots[position] = null
+    updateCallbacks[position] = null
   }
 
   // If a root already exists for this position, don't recreate it.
   if (containerRoots[position]) {
-    return;
+    return
   }
 
-  let rootEl = existingRootEl;
+  let rootEl = existingRootEl
   if (!rootEl) {
-    rootEl = document.createElement('div');
-    rootEl.id = rootId;
-    document.body.appendChild(rootEl);
+    rootEl = document.createElement('div')
+    rootEl.id = rootId
+    document.body.appendChild(rootEl)
   }
 
-  containerRoots[position] = createRoot(rootEl);
-  containerRoots[position]!.render(
-    <NotificationContainer position={position} />
-  );
+  containerRoots[position] = createRoot(rootEl)
+  containerRoots[position]!.render(<NotificationContainer position={position} />)
 }
 
 /**
  * Add a notification to the queue
  */
 function addNotification(config: NotificationConfig): () => void {
-  const position = config.position || 'top-right';
-  ensureContainer(position);
+  const position = config.position || 'top-right'
+  ensureContainer(position)
 
-  const id = getNextInstanceId();
+  const id = getNextInstanceId()
 
   const instance: NotificationInstance = {
     id,
@@ -311,44 +283,41 @@ function addNotification(config: NotificationConfig): () => void {
     onClick: config.onClick,
     icon: config.icon,
     className: config.className,
-    position,
-  };
+    position
+  }
 
-  notificationInstancesByPosition[position].push(instance);
+  notificationInstancesByPosition[position].push(instance)
 
   // Trigger update
   if (updateCallbacks[position]) {
-    updateCallbacks[position]!();
+    updateCallbacks[position]!()
   }
 
   // Auto close after duration
   if (instance.duration > 0) {
     setTimeout(() => {
-      removeNotification(id, position);
-    }, instance.duration);
+      removeNotification(id, position)
+    }, instance.duration)
   }
 
   // Return close function
-  return () => removeNotification(id, position);
+  return () => removeNotification(id, position)
 }
 
 /**
  * Remove a notification from the queue
  */
-function removeNotification(
-  id: string | number,
-  position: NotificationPosition
-) {
-  const instances = notificationInstancesByPosition[position];
-  const index = instances.findIndex((notif) => notif.id === id);
+function removeNotification(id: string | number, position: NotificationPosition) {
+  const instances = notificationInstancesByPosition[position]
+  const index = instances.findIndex((notif) => notif.id === id)
   if (index !== -1) {
-    const instance = instances[index];
-    instances.splice(index, 1);
+    const instance = instances[index]
+    instances.splice(index, 1)
     if (instance.onClose) {
-      instance.onClose();
+      instance.onClose()
     }
     if (updateCallbacks[position]) {
-      updateCallbacks[position]!();
+      updateCallbacks[position]!()
     }
   }
 }
@@ -360,27 +329,27 @@ function clearAll(position?: NotificationPosition) {
   if (position) {
     notificationInstancesByPosition[position].forEach((instance) => {
       if (instance.onClose) {
-        instance.onClose();
+        instance.onClose()
       }
-    });
-    notificationInstancesByPosition[position] = [];
+    })
+    notificationInstancesByPosition[position] = []
     if (updateCallbacks[position]) {
-      updateCallbacks[position]!();
+      updateCallbacks[position]!()
     }
   } else {
     // Clear all positions
     Object.keys(notificationInstancesByPosition).forEach((pos) => {
-      const p = pos as NotificationPosition;
+      const p = pos as NotificationPosition
       notificationInstancesByPosition[p].forEach((instance) => {
         if (instance.onClose) {
-          instance.onClose();
+          instance.onClose()
         }
-      });
-      notificationInstancesByPosition[p] = [];
+      })
+      notificationInstancesByPosition[p] = []
       if (updateCallbacks[p]) {
-        updateCallbacks[p]!();
+        updateCallbacks[p]!()
       }
-    });
+    })
   }
 }
 
@@ -389,9 +358,9 @@ function clearAll(position?: NotificationPosition) {
  */
 function normalizeOptions(options: NotificationOptions): NotificationConfig {
   if (typeof options === 'string') {
-    return { title: options };
+    return { title: options }
   }
-  return options;
+  return options
 }
 
 /**
@@ -402,40 +371,40 @@ export const notification = {
    * Show an info notification
    */
   info(options: NotificationOptions): () => void {
-    const config = normalizeOptions(options);
-    return addNotification({ ...config, type: 'info' });
+    const config = normalizeOptions(options)
+    return addNotification({ ...config, type: 'info' })
   },
 
   /**
    * Show a success notification
    */
   success(options: NotificationOptions): () => void {
-    const config = normalizeOptions(options);
-    return addNotification({ ...config, type: 'success' });
+    const config = normalizeOptions(options)
+    return addNotification({ ...config, type: 'success' })
   },
 
   /**
    * Show a warning notification
    */
   warning(options: NotificationOptions): () => void {
-    const config = normalizeOptions(options);
-    return addNotification({ ...config, type: 'warning' });
+    const config = normalizeOptions(options)
+    return addNotification({ ...config, type: 'warning' })
   },
 
   /**
    * Show an error notification
    */
   error(options: NotificationOptions): () => void {
-    const config = normalizeOptions(options);
-    return addNotification({ ...config, type: 'error' });
+    const config = normalizeOptions(options)
+    return addNotification({ ...config, type: 'error' })
   },
 
   /**
    * Clear all notifications
    */
   clear(position?: NotificationPosition) {
-    clearAll(position);
-  },
-};
+    clearAll(position)
+  }
+}
 
-export default notification;
+export default notification

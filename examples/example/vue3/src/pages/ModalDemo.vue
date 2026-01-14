@@ -97,16 +97,12 @@ const handleFormSubmit = async () => {
       <p class="text-gray-600 mb-6">最简单的用法，点击按钮打开对话框。</p>
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visible1 = true">打开对话框</Button>
-        <Modal v-model:visible="visible1"
-               title="基本对话框"
-               @ok="handleOk"
-               @cancel="handleCancel">
+        <Modal v-model:visible="visible1" title="基本对话框" @ok="handleOk" @cancel="handleCancel">
           <p>这是对话框的内容。</p>
           <p class="mt-2">您可以在这里添加任何内容。</p>
           <template #footer>
             <Space>
-              <Button variant="secondary"
-                      @click="handleCancel">取消</Button>
+              <Button variant="secondary" @click="handleCancel">取消</Button>
               <Button @click="handleOk">确定</Button>
             </Space>
           </template>
@@ -128,29 +124,19 @@ const handleFormSubmit = async () => {
           <Button @click="visibleFull = true">全屏</Button>
         </Space>
 
-        <Modal v-model:visible="visibleSm"
-               title="小尺寸对话框"
-               size="sm">
+        <Modal v-model:visible="visibleSm" title="小尺寸对话框" size="sm">
           <p>这是一个小尺寸的对话框。</p>
         </Modal>
-        <Modal v-model:visible="visibleMd"
-               title="中等尺寸对话框"
-               size="md">
+        <Modal v-model:visible="visibleMd" title="中等尺寸对话框" size="md">
           <p>这是一个中等尺寸的对话框（默认）。</p>
         </Modal>
-        <Modal v-model:visible="visibleLg"
-               title="大尺寸对话框"
-               size="lg">
+        <Modal v-model:visible="visibleLg" title="大尺寸对话框" size="lg">
           <p>这是一个大尺寸的对话框，可以容纳更多内容。</p>
         </Modal>
-        <Modal v-model:visible="visibleXl"
-               title="超大尺寸对话框"
-               size="xl">
+        <Modal v-model:visible="visibleXl" title="超大尺寸对话框" size="xl">
           <p>这是一个超大尺寸的对话框，适合复杂的内容展示。</p>
         </Modal>
-        <Modal v-model:visible="visibleFull"
-               title="全屏对话框"
-               size="full">
+        <Modal v-model:visible="visibleFull" title="全屏对话框" size="full">
           <p>这是一个全屏对话框，占据整个屏幕宽度。</p>
         </Modal>
       </div>
@@ -163,9 +149,7 @@ const handleFormSubmit = async () => {
       <p class="text-gray-600 mb-6">设置 centered 属性可以让对话框垂直居中显示。</p>
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleCentered = true">垂直居中对话框</Button>
-        <Modal v-model:visible="visibleCentered"
-               title="垂直居中对话框"
-               centered>
+        <Modal v-model:visible="visibleCentered" title="垂直居中对话框" centered>
           <p>这个对话框垂直居中显示。</p>
           <p class="mt-2">适合展示重要信息。</p>
         </Modal>
@@ -179,15 +163,12 @@ const handleFormSubmit = async () => {
       <p class="text-gray-600 mb-6">使用 footer 插槽可以自定义页脚内容。</p>
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleCustomFooter = true">自定义页脚</Button>
-        <Modal v-model:visible="visibleCustomFooter"
-               title="自定义页脚对话框">
+        <Modal v-model:visible="visibleCustomFooter" title="自定义页脚对话框">
           <p>这是对话框的内容。</p>
           <template #footer>
             <Space>
-              <Button variant="secondary"
-                      @click="visibleCustomFooter = false">取消</Button>
-              <Button variant="outline"
-                      @click="console.log('保存草稿')">保存草稿</Button>
+              <Button variant="secondary" @click="visibleCustomFooter = false">取消</Button>
+              <Button variant="outline" @click="console.log('保存草稿')">保存草稿</Button>
               <Button @click="visibleCustomFooter = false">提交</Button>
             </Space>
           </template>
@@ -202,15 +183,11 @@ const handleFormSubmit = async () => {
       <p class="text-gray-600 mb-6">对话框可以嵌套使用，通过 z-index 控制层级。</p>
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleNested = true">打开嵌套对话框</Button>
-        <Modal v-model:visible="visibleNested"
-               title="第一层对话框">
+        <Modal v-model:visible="visibleNested" title="第一层对话框">
           <p>这是第一层对话框的内容。</p>
-          <Button @click="visibleNested2 = true"
-                  class="mt-4">打开第二层对话框</Button>
+          <Button @click="visibleNested2 = true" class="mt-4">打开第二层对话框</Button>
 
-          <Modal v-model:visible="visibleNested2"
-                 title="第二层对话框"
-                 :z-index="1100">
+          <Modal v-model:visible="visibleNested2" title="第二层对话框" :z-index="1100">
             <p>这是第二层嵌套的对话框。</p>
           </Modal>
         </Modal>
@@ -224,9 +201,7 @@ const handleFormSubmit = async () => {
       <p class="text-gray-600 mb-6">设置 mask-closable 为 false 可以禁止点击遮罩层关闭对话框。</p>
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visible2 = true">禁用遮罩关闭</Button>
-        <Modal v-model:visible="visible2"
-               title="禁用遮罩关闭"
-               :mask-closable="false">
+        <Modal v-model:visible="visible2" title="禁用遮罩关闭" :mask-closable="false">
           <p>点击遮罩层不会关闭此对话框。</p>
           <p class="mt-2">只能通过关闭按钮或页脚按钮关闭。</p>
         </Modal>
@@ -240,9 +215,7 @@ const handleFormSubmit = async () => {
       <p class="text-gray-600 mb-6">设置 mask 为 false 可以不显示遮罩层。</p>
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleNoMask = true">无遮罩对话框</Button>
-        <Modal v-model:visible="visibleNoMask"
-               title="无遮罩对话框"
-               :mask="false">
+        <Modal v-model:visible="visibleNoMask" title="无遮罩对话框" :mask="false">
           <p>这个对话框没有遮罩层。</p>
         </Modal>
       </div>
@@ -255,9 +228,7 @@ const handleFormSubmit = async () => {
       <p class="text-gray-600 mb-6">设置 destroy-on-close 可以在关闭对话框时销毁其内容。</p>
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleDestroyOnClose = true">关闭时销毁</Button>
-        <Modal v-model:visible="visibleDestroyOnClose"
-               title="关闭时销毁"
-               destroy-on-close>
+        <Modal v-model:visible="visibleDestroyOnClose" title="关闭时销毁" destroy-on-close>
           <p>关闭对话框时，此内容将被销毁。</p>
           <p class="mt-2">组件状态：{{ new Date().toLocaleTimeString() }}</p>
         </Modal>
@@ -271,9 +242,7 @@ const handleFormSubmit = async () => {
       <p class="text-gray-600 mb-6">设置 closable 为 false 可以隐藏关闭按钮。</p>
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visible3 = true">无关闭按钮</Button>
-        <Modal v-model:visible="visible3"
-               title="无关闭按钮"
-               :closable="false">
+        <Modal v-model:visible="visible3" title="无关闭按钮" :closable="false">
           <p>这个对话框没有关闭按钮。</p>
           <template #footer>
             <Button @click="visible3 = false">确定</Button>
@@ -295,26 +264,25 @@ const handleFormSubmit = async () => {
           <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p class="text-gray-700">用于需要用户确认的操作（示例：删除）。</p>
-              <Button variant="outline"
-                      @click="visibleConfirm = true">删除确认</Button>
+              <Button variant="outline" @click="visibleConfirm = true">删除确认</Button>
             </div>
-            <p v-if="confirmResult"
-               class="mt-3 text-sm text-green-700">{{ confirmResult }}</p>
+            <p v-if="confirmResult" class="mt-3 text-sm text-green-700">{{ confirmResult }}</p>
 
-            <Modal v-model:visible="visibleConfirm"
-                   title="删除确认"
-                   :mask-closable="false">
+            <Modal v-model:visible="visibleConfirm" title="删除确认" :mask-closable="false">
               <p class="text-gray-800">此操作不可撤销，是否继续？</p>
               <p class="mt-2 text-gray-600 text-sm">提示：这里用按钮 loading 模拟异步提交。</p>
               <template #footer>
                 <Space>
-                  <Button variant="secondary"
-                          :disabled="confirmLoading"
-                          @click="visibleConfirm = false; confirmResult = '已取消：未执行删除（示例）'">
+                  <Button
+                    variant="secondary"
+                    :disabled="confirmLoading"
+                    @click="
+                      visibleConfirm = false
+                      confirmResult = '已取消：未执行删除（示例）'
+                    ">
                     取消
                   </Button>
-                  <Button :disabled="confirmLoading"
-                          @click="handleConfirmDelete">
+                  <Button :disabled="confirmLoading" @click="handleConfirmDelete">
                     {{ confirmLoading ? '删除中…' : '确认删除' }}
                   </Button>
                 </Space>
@@ -332,13 +300,12 @@ const handleFormSubmit = async () => {
               <Button @click="visibleInfo = true">查看详情</Button>
             </div>
 
-            <Modal v-model:visible="visibleInfo"
-                   title="服务协议（示例）"
-                   size="lg">
+            <Modal v-model:visible="visibleInfo" title="服务协议（示例）" size="lg">
               <div class="max-h-[50vh] overflow-auto pr-2">
-                <p v-for="(text, idx) in infoParagraphs"
-                   :key="idx"
-                   :class="idx === 0 ? '' : 'mt-2'">
+                <p
+                  v-for="(text, idx) in infoParagraphs"
+                  :key="idx"
+                  :class="idx === 0 ? '' : 'mt-2'">
                   {{ text }}
                 </p>
               </div>
@@ -358,33 +325,31 @@ const handleFormSubmit = async () => {
               <Button @click="visibleForm = true">编辑资料</Button>
             </div>
 
-            <Modal v-model:visible="visibleForm"
-                   title="编辑资料"
-                   :mask-closable="false">
+            <Modal v-model:visible="visibleForm" title="编辑资料" :mask-closable="false">
               <div class="space-y-4">
                 <div>
                   <div class="text-sm font-medium text-gray-700 mb-1">姓名</div>
-                  <Input v-model="formName"
-                         placeholder="请输入姓名" />
+                  <Input v-model="formName" placeholder="请输入姓名" />
                 </div>
                 <div>
                   <div class="text-sm font-medium text-gray-700 mb-1">邮箱</div>
-                  <Input v-model="formEmail"
-                         placeholder="name@example.com" />
+                  <Input v-model="formEmail" placeholder="name@example.com" />
                 </div>
-                <p v-if="formError"
-                   class="text-sm text-red-600">{{ formError }}</p>
+                <p v-if="formError" class="text-sm text-red-600">{{ formError }}</p>
                 <p class="text-xs text-gray-500">提示：这里仅做简单校验与异步保存模拟。</p>
               </div>
               <template #footer>
                 <Space>
-                  <Button variant="secondary"
-                          :disabled="formLoading"
-                          @click="visibleForm = false; formError = null">
+                  <Button
+                    variant="secondary"
+                    :disabled="formLoading"
+                    @click="
+                      visibleForm = false
+                      formError = null
+                    ">
                     取消
                   </Button>
-                  <Button :disabled="formLoading"
-                          @click="handleFormSubmit">
+                  <Button :disabled="formLoading" @click="handleFormSubmit">
                     {{ formLoading ? '保存中…' : '保存' }}
                   </Button>
                 </Space>

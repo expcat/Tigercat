@@ -9,57 +9,49 @@
 ```vue
 <template>
   <div>
-    <Popconfirm
-      title="确定要删除这条记录吗？"
-      @confirm="handleConfirm"
-      @cancel="handleCancel"
-    >
+    <Popconfirm title="确定要删除这条记录吗？" @confirm="handleConfirm" @cancel="handleCancel">
       <Button variant="danger">删除</Button>
     </Popconfirm>
   </div>
 </template>
 
 <script setup>
-import { Popconfirm, Button } from "@tigercat/vue";
+import { Popconfirm, Button } from '@tigercat/vue'
 
 const handleConfirm = () => {
-  console.log("确认删除");
+  console.log('确认删除')
   // 执行删除操作
-};
+}
 
 const handleCancel = () => {
-  console.log("取消删除");
-};
+  console.log('取消删除')
+}
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Popconfirm, Button } from "@tigercat/react";
+import React from 'react'
+import { Popconfirm, Button } from '@tigercat/react'
 
 function App() {
   const handleConfirm = () => {
-    console.log("确认删除");
+    console.log('确认删除')
     // 执行删除操作
-  };
+  }
 
   const handleCancel = () => {
-    console.log("取消删除");
-  };
+    console.log('取消删除')
+  }
 
   return (
     <div>
-      <Popconfirm
-        title="确定要删除这条记录吗？"
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-      >
+      <Popconfirm title="确定要删除这条记录吗？" onConfirm={handleConfirm} onCancel={handleCancel}>
         <Button variant="danger">删除</Button>
       </Popconfirm>
     </div>
-  );
+  )
 }
 ```
 
@@ -91,15 +83,15 @@ function App() {
 </template>
 
 <script setup>
-import { Popconfirm, Button } from "@tigercat/vue";
+import { Popconfirm, Button } from '@tigercat/vue'
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Popconfirm, Button } from "@tigercat/react";
+import React from 'react'
+import { Popconfirm, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -120,7 +112,7 @@ function App() {
         <Button>右侧</Button>
       </Popconfirm>
     </div>
-  );
+  )
 }
 ```
 
@@ -156,15 +148,15 @@ function App() {
 </template>
 
 <script setup>
-import { Popconfirm, Button } from "@tigercat/vue";
+import { Popconfirm, Button } from '@tigercat/vue'
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Popconfirm, Button } from "@tigercat/react";
+import React from 'react'
+import { Popconfirm, Button } from '@tigercat/react'
 
 function App() {
   return (
@@ -189,7 +181,7 @@ function App() {
         <Button>疑问</Button>
       </Popconfirm>
     </div>
-  );
+  )
 }
 ```
 
@@ -205,42 +197,40 @@ function App() {
     title="确定要提交这个表单吗？"
     ok-text="提交"
     cancel-text="取消"
-    @confirm="handleSubmit"
-  >
+    @confirm="handleSubmit">
     <Button>提交表单</Button>
   </Popconfirm>
 </template>
 
 <script setup>
-import { Popconfirm, Button } from "@tigercat/vue";
+import { Popconfirm, Button } from '@tigercat/vue'
 
 const handleSubmit = () => {
-  console.log("表单已提交");
-};
+  console.log('表单已提交')
+}
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Popconfirm, Button } from "@tigercat/react";
+import React from 'react'
+import { Popconfirm, Button } from '@tigercat/react'
 
 function App() {
   const handleSubmit = () => {
-    console.log("表单已提交");
-  };
+    console.log('表单已提交')
+  }
 
   return (
     <Popconfirm
       title="确定要提交这个表单吗？"
       okText="提交"
       cancelText="取消"
-      onConfirm={handleSubmit}
-    >
+      onConfirm={handleSubmit}>
       <Button>提交表单</Button>
     </Popconfirm>
-  );
+  )
 }
 ```
 
@@ -258,31 +248,30 @@ function App() {
     icon="error"
     ok-type="danger"
     ok-text="删除"
-    @confirm="handleDelete"
-  >
+    @confirm="handleDelete">
     <Button variant="danger">删除用户</Button>
   </Popconfirm>
 </template>
 
 <script setup>
-import { Popconfirm, Button } from "@tigercat/vue";
+import { Popconfirm, Button } from '@tigercat/vue'
 
 const handleDelete = () => {
-  console.log("用户已删除");
-};
+  console.log('用户已删除')
+}
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Popconfirm, Button } from "@tigercat/react";
+import React from 'react'
+import { Popconfirm, Button } from '@tigercat/react'
 
 function App() {
   const handleDelete = () => {
-    console.log("用户已删除");
-  };
+    console.log('用户已删除')
+  }
 
   return (
     <Popconfirm
@@ -291,11 +280,10 @@ function App() {
       icon="error"
       okType="danger"
       okText="删除"
-      onConfirm={handleDelete}
-    >
+      onConfirm={handleDelete}>
       <Button variant="danger">删除用户</Button>
     </Popconfirm>
-  );
+  )
 }
 ```
 
@@ -310,41 +298,39 @@ function App() {
   <Popconfirm
     title="确定要发布这篇文章吗？"
     description="发布后，文章将对所有用户可见。"
-    @confirm="handlePublish"
-  >
+    @confirm="handlePublish">
     <Button>发布文章</Button>
   </Popconfirm>
 </template>
 
 <script setup>
-import { Popconfirm, Button } from "@tigercat/vue";
+import { Popconfirm, Button } from '@tigercat/vue'
 
 const handlePublish = () => {
-  console.log("文章已发布");
-};
+  console.log('文章已发布')
+}
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Popconfirm, Button } from "@tigercat/react";
+import React from 'react'
+import { Popconfirm, Button } from '@tigercat/react'
 
 function App() {
   const handlePublish = () => {
-    console.log("文章已发布");
-  };
+    console.log('文章已发布')
+  }
 
   return (
     <Popconfirm
       title="确定要发布这篇文章吗？"
       description="发布后，文章将对所有用户可见。"
-      onConfirm={handlePublish}
-    >
+      onConfirm={handlePublish}>
       <Button>发布文章</Button>
     </Popconfirm>
-  );
+  )
 }
 ```
 
@@ -361,8 +347,7 @@ function App() {
       v-model:visible="visible"
       title="确定要执行此操作吗？"
       @confirm="handleConfirm"
-      @cancel="handleCancel"
-    >
+      @cancel="handleCancel">
       <Button>受控弹窗</Button>
     </Popconfirm>
 
@@ -371,41 +356,41 @@ function App() {
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { Popconfirm, Button } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Popconfirm, Button } from '@tigercat/vue'
 
-const visible = ref(false);
+const visible = ref(false)
 
 const handleConfirm = () => {
-  console.log("确认");
-  visible.value = false;
-};
+  console.log('确认')
+  visible.value = false
+}
 
 const handleCancel = () => {
-  console.log("取消");
-  visible.value = false;
-};
+  console.log('取消')
+  visible.value = false
+}
 </script>
 ```
 
 ### React
 
 ```tsx
-import React, { useState } from "react";
-import { Popconfirm, Button } from "@tigercat/react";
+import React, { useState } from 'react'
+import { Popconfirm, Button } from '@tigercat/react'
 
 function App() {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
 
   const handleConfirm = () => {
-    console.log("确认");
-    setVisible(false);
-  };
+    console.log('确认')
+    setVisible(false)
+  }
 
   const handleCancel = () => {
-    console.log("取消");
-    setVisible(false);
-  };
+    console.log('取消')
+    setVisible(false)
+  }
 
   return (
     <div>
@@ -414,8 +399,7 @@ function App() {
         onVisibleChange={setVisible}
         title="确定要执行此操作吗？"
         onConfirm={handleConfirm}
-        onCancel={handleCancel}
-      >
+        onCancel={handleCancel}>
         <Button>受控弹窗</Button>
       </Popconfirm>
 
@@ -423,7 +407,7 @@ function App() {
         外部控制打开
       </Button>
     </div>
-  );
+  )
 }
 ```
 
@@ -435,44 +419,36 @@ function App() {
 
 ```vue
 <template>
-  <Popconfirm
-    title="确定要继续吗？"
-    :show-icon="false"
-    @confirm="handleConfirm"
-  >
+  <Popconfirm title="确定要继续吗？" :show-icon="false" @confirm="handleConfirm">
     <Button>无图标</Button>
   </Popconfirm>
 </template>
 
 <script setup>
-import { Popconfirm, Button } from "@tigercat/vue";
+import { Popconfirm, Button } from '@tigercat/vue'
 
 const handleConfirm = () => {
-  console.log("确认");
-};
+  console.log('确认')
+}
 </script>
 ```
 
 ### React
 
 ```tsx
-import React from "react";
-import { Popconfirm, Button } from "@tigercat/react";
+import React from 'react'
+import { Popconfirm, Button } from '@tigercat/react'
 
 function App() {
   const handleConfirm = () => {
-    console.log("确认");
-  };
+    console.log('确认')
+  }
 
   return (
-    <Popconfirm
-      title="确定要继续吗？"
-      showIcon={false}
-      onConfirm={handleConfirm}
-    >
+    <Popconfirm title="确定要继续吗？" showIcon={false} onConfirm={handleConfirm}>
       <Button>无图标</Button>
     </Popconfirm>
-  );
+  )
 }
 ```
 

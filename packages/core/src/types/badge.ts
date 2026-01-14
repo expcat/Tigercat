@@ -31,19 +31,19 @@ export interface BadgeProps {
    * @default 'danger'
    */
   variant?: BadgeVariant
-  
+
   /**
    * Badge size
    * @default 'md'
    */
   size?: BadgeSize
-  
+
   /**
    * Badge display type
    * @default 'number'
    */
   type?: BadgeType
-  
+
   /**
    * Badge content (number or text)
    * For type='number', this should be a number or string
@@ -51,26 +51,26 @@ export interface BadgeProps {
    * For type='dot', this prop is ignored
    */
   content?: number | string
-  
+
   /**
    * Maximum count to display (only for type='number')
    * When content exceeds max, displays 'max+' (e.g., '99+')
    * @default 99
    */
   max?: number
-  
+
   /**
    * Whether to show zero count
    * @default false
    */
   showZero?: boolean
-  
+
   /**
    * Badge position when used as wrapper (standalone mode)
    * @default 'top-right'
    */
   position?: BadgePosition
-  
+
   /**
    * Whether badge is standalone or wrapping content
    * When true, badge is displayed inline
@@ -78,7 +78,7 @@ export interface BadgeProps {
    * @default true
    */
   standalone?: boolean
-  
+
   /**
    * Additional CSS classes
    */

@@ -1,16 +1,17 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react'
 import {
   classNames,
   getRadioDotClasses,
   getRadioLabelClasses,
   getRadioColorClasses,
   getRadioVisualClasses,
-  type RadioProps as CoreRadioProps,
-} from '@tigercat/core';
-import { RadioGroupContext } from './RadioGroup';
+  type RadioProps as CoreRadioProps
+} from '@tigercat/core'
+import { RadioGroupContext } from './RadioGroup'
 
 export interface RadioProps
-  extends Omit<
+  extends
+    Omit<
       React.InputHTMLAttributes<HTMLInputElement>,
       'type' | 'size' | 'onChange' | 'checked' | 'defaultChecked' | 'value'
     >,
@@ -18,17 +19,17 @@ export interface RadioProps
   /**
    * Change event handler
    */
-  onChange?: (value: string | number) => void;
+  onChange?: (value: string | number) => void
 
   /**
    * Radio label content
    */
-  children?: React.ReactNode;
+  children?: React.ReactNode
 
   /**
    * Additional CSS classes (applied to root element)
    */
-  className?: string;
+  className?: string
 }
 
 export const Radio: React.FC<RadioProps> = ({
@@ -44,78 +45,75 @@ export const Radio: React.FC<RadioProps> = ({
   style,
   ...props
 }) => {
-  const groupContext = useContext(RadioGroupContext);
+  const groupContext = useContext(RadioGroupContext)
 
-  const [internalChecked, setInternalChecked] = useState(defaultChecked);
+  const [internalChecked, setInternalChecked] = useState(defaultChecked)
 
-  const isCheckedControlled = checked !== undefined;
-  const isInGroup = !!groupContext;
+  const isCheckedControlled = checked !== undefined
+  const isInGroup = !!groupContext
 
-  const actualSize = size || groupContext?.size || 'md';
-  const actualDisabled =
-    disabled !== undefined ? disabled : groupContext?.disabled || false;
-  const actualName = name || groupContext?.name || '';
+  const actualSize = size || groupContext?.size || 'md'
+  const actualDisabled = disabled !== undefined ? disabled : groupContext?.disabled || false
+  const actualName = name || groupContext?.name || ''
 
   const isChecked =
     checked !== undefined
       ? checked
       : groupContext?.value !== undefined
-      ? groupContext.value === value
-      : internalChecked;
+        ? groupContext.value === value
+        : internalChecked
 
-  const colors = getRadioColorClasses();
+  const colors = getRadioColorClasses()
   const radioClasses = getRadioVisualClasses({
     size: actualSize,
     checked: isChecked,
     disabled: actualDisabled,
-    colors,
-  });
+    colors
+  })
 
   const dotClasses = getRadioDotClasses({
     size: actualSize,
     checked: isChecked,
-    colors,
-  });
+    colors
+  })
 
   const labelClasses = getRadioLabelClasses({
     size: actualSize,
     disabled: actualDisabled,
-    colors,
-  });
+    colors
+  })
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (actualDisabled) {
-      event.preventDefault();
-      return;
+      event.preventDefault()
+      return
     }
 
-    const newChecked = event.target.checked;
-    if (!newChecked) return;
+    const newChecked = event.target.checked
+    if (!newChecked) return
 
     if (!isCheckedControlled && !isInGroup) {
-      setInternalChecked(true);
+      setInternalChecked(true)
     }
 
-    onChange?.(value);
-    groupContext?.onChange?.(value);
-  };
+    onChange?.(value)
+    groupContext?.onChange?.(value)
+  }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    props.onKeyDown?.(event);
-    if (event.defaultPrevented) return;
-    if (actualDisabled) return;
+    props.onKeyDown?.(event)
+    if (event.defaultPrevented) return
+    if (actualDisabled) return
 
     if (event.key === 'Enter') {
-      event.preventDefault();
-      const input = event.currentTarget;
-      if (!input.checked) input.click();
+      event.preventDefault()
+      const input = event.currentTarget
+      if (!input.checked) input.click()
     }
-  };
+  }
 
   return (
-    <label
-      className={classNames('inline-flex items-center', className)}
-      style={style}>
+    <label className={classNames('inline-flex items-center', className)} style={style}>
       {/* Hidden native radio input */}
       <input
         type="radio"
@@ -137,5 +135,5 @@ export const Radio: React.FC<RadioProps> = ({
       {/* Label content */}
       {children && <span className={labelClasses}>{children}</span>}
     </label>
-  );
-};
+  )
+}

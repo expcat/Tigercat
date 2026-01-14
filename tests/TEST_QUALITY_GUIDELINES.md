@@ -60,16 +60,16 @@ Test basic rendering and visual output.
 describe('Rendering', () => {
   it('should render with default props', () => {
     // Test default state
-  });
+  })
 
   it('should render with custom props', () => {
     // Test customization
-  });
+  })
 
   it('should apply custom className', () => {
     // Test className override
-  });
-});
+  })
+})
 ```
 
 ### 2. Props Tests
@@ -80,16 +80,16 @@ Test all prop combinations and variations.
 describe('Props', () => {
   it.each(variants)('should handle %s variant', (variant) => {
     // Test each variant
-  });
+  })
 
   it.each(sizes)('should handle %s size', (size) => {
     // Test each size
-  });
+  })
 
   it('should handle invalid props gracefully', () => {
     // Test with unexpected values
-  });
-});
+  })
+})
 ```
 
 ### 3. Events Tests
@@ -100,16 +100,16 @@ Test all event handlers and emissions.
 describe('Events', () => {
   it('should call onClick when clicked', async () => {
     // Test event handler
-  });
+  })
 
   it('should not call onClick when disabled', async () => {
     // Test event prevention
-  });
+  })
 
   it('should emit event with correct payload', async () => {
     // Test event data
-  });
-});
+  })
+})
 ```
 
 ### 4. States Tests
@@ -120,16 +120,16 @@ Test different component states.
 describe('States', () => {
   it('should show disabled state', () => {
     // Test disabled
-  });
+  })
 
   it('should show loading state', () => {
     // Test loading
-  });
+  })
 
   it('should show error state', () => {
     // Test error
-  });
-});
+  })
+})
 ```
 
 ### 5. Theme Support Tests
@@ -155,17 +155,17 @@ Test WCAG compliance and a11y features.
 ```typescript
 describe('Accessibility', () => {
   it('should have no accessibility violations', async () => {
-    await expectNoA11yViolations(container);
-  });
+    await expectNoA11yViolations(container)
+  })
 
   it('should have proper ARIA attributes', () => {
     // Test ARIA
-  });
+  })
 
   it('should be keyboard accessible', async () => {
     // Test keyboard navigation
-  });
-});
+  })
+})
 ```
 
 ### 7. Edge Cases Tests
@@ -176,16 +176,16 @@ Test boundary and extreme scenarios.
 describe('Edge Cases', () => {
   it('should handle empty content', () => {
     // Test empty state
-  });
+  })
 
   it('should handle very long text', () => {
     // Test with extreme input
-  });
+  })
 
   it('should handle special characters', () => {
     // Test with special chars
-  });
-});
+  })
+})
 ```
 
 ### 8. Snapshot Tests
@@ -195,9 +195,9 @@ Test for visual regressions.
 ```typescript
 describe('Snapshots', () => {
   it('should match snapshot for default state', () => {
-    expect(container.firstChild).toMatchSnapshot();
-  });
-});
+    expect(container.firstChild).toMatchSnapshot()
+  })
+})
 ```
 
 ## Quality Standards
@@ -279,17 +279,17 @@ describe('Component', () => {
 ✅ **Good Names**:
 
 ```typescript
-it('should disable button when loading prop is true');
-it('should call onChange handler with correct value');
-it('should prevent form submission when validation fails');
+it('should disable button when loading prop is true')
+it('should call onChange handler with correct value')
+it('should prevent form submission when validation fails')
 ```
 
 ❌ **Poor Names**:
 
 ```typescript
-it('works');
-it('test 1');
-it('button test');
+it('works')
+it('test 1')
+it('button test')
 ```
 
 ## Code Quality
@@ -300,18 +300,18 @@ it('button test');
 
 ```typescript
 interface ButtonProps {
-  variant?: 'primary' | 'secondary';
-  onClick?: (event: MouseEvent) => void;
+  variant?: 'primary' | 'secondary'
+  onClick?: (event: MouseEvent) => void
 }
 
-const mockHandler: ButtonProps['onClick'] = vi.fn();
+const mockHandler: ButtonProps['onClick'] = vi.fn()
 ```
 
 ❌ **Poor - Weak Types**:
 
 ```typescript
-const props = { variant: 'primary' } as const;
-const mockHandler = vi.fn();
+const props = { variant: 'primary' } as const
+const mockHandler = vi.fn()
 ```
 
 ### Avoid Magic Values
@@ -415,6 +415,7 @@ Every component must test these edge cases:
    ```
 
 4. **Rapid Interactions**
+
    ```typescript
    it('should handle rapid clicks', async () => {
      const onClick = vi.fn();
@@ -551,14 +552,14 @@ Use "should" statements that describe behavior:
 
 ```typescript
 // ✅ Good
-it('should render with default props');
-it('should call onClick when clicked');
-it('should disable button when loading');
+it('should render with default props')
+it('should call onClick when clicked')
+it('should disable button when loading')
 
 // ❌ Poor
-it('renders');
-it('click test');
-it('disabled');
+it('renders')
+it('click test')
+it('disabled')
 ```
 
 ## Common Anti-Patterns
@@ -591,18 +592,18 @@ it('should show dropdown menu when clicked', async () => {
 
 ```typescript
 it('test', () => {
-  const button = container.querySelector('.btn-primary.btn-lg');
-  expect(button).toBeTruthy();
-});
+  const button = container.querySelector('.btn-primary.btn-lg')
+  expect(button).toBeTruthy()
+})
 ```
 
 ✅ **Use Semantic Queries**:
 
 ```typescript
 it('test', () => {
-  const button = getByRole('button', { name: 'Submit' });
-  expect(button).toBeInTheDocument();
-});
+  const button = getByRole('button', { name: 'Submit' })
+  expect(button).toBeInTheDocument()
+})
 ```
 
 ### 3. Flaky Tests
@@ -611,19 +612,19 @@ it('test', () => {
 
 ```typescript
 it('test', async () => {
-  fireEvent.click(button);
-  await new Promise((resolve) => setTimeout(resolve, 100));
-  expect(element).toBeInTheDocument();
-});
+  fireEvent.click(button)
+  await new Promise((resolve) => setTimeout(resolve, 100))
+  expect(element).toBeInTheDocument()
+})
 ```
 
 ✅ **Use waitFor or findBy**:
 
 ```typescript
 it('test', async () => {
-  fireEvent.click(button);
-  expect(await findByText('Loaded')).toBeInTheDocument();
-});
+  fireEvent.click(button)
+  expect(await findByText('Loaded')).toBeInTheDocument()
+})
 ```
 
 ### 4. Unclear Assertions

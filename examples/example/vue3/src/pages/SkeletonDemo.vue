@@ -11,7 +11,7 @@ onMounted(() => {
   setTimeout(() => {
     loading.value = false
   }, 3000)
-  
+
   // Simulate data loading for card demo
   setTimeout(() => {
     cardLoading.value = false

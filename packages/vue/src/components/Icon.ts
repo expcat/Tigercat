@@ -1,25 +1,18 @@
-import {
-  defineComponent,
-  computed,
-  h,
-  PropType,
-  type VNode,
-  type CSSProperties,
-} from 'vue';
+import { defineComponent, computed, h, PropType, type VNode, type CSSProperties } from 'vue'
 import {
   classNames,
   coerceClassValue,
   iconSizeClasses,
   iconSvgBaseClasses,
   iconWrapperClasses,
-  type IconSize,
-} from '@tigercat/core';
+  type IconSize
+} from '@tigercat/core'
 
 export interface VueIconProps {
-  size?: IconSize;
-  color?: string;
-  className?: string;
-  style?: CSSProperties;
+  size?: IconSize
+  color?: string
+  className?: string
+  style?: CSSProperties
 }
 
 export const Icon = defineComponent({
@@ -32,7 +25,7 @@ export const Icon = defineComponent({
      */
     size: {
       type: String as PropType<IconSize>,
-      default: 'md' as IconSize,
+      default: 'md' as IconSize
     },
     /**
      * Icon color (CSS color value)
@@ -40,14 +33,14 @@ export const Icon = defineComponent({
      */
     color: {
       type: String,
-      default: 'currentColor',
+      default: 'currentColor'
     },
     /**
      * Additional CSS classes
      */
     className: {
       type: String,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -55,80 +48,61 @@ export const Icon = defineComponent({
      */
     style: {
       type: Object as PropType<CSSProperties>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   setup(props, { slots, attrs }) {
     const wrapperClasses = computed(() => {
-      return classNames(
-        iconWrapperClasses,
-        coerceClassValue(attrs.class),
-        props.className
-      );
-    });
+      return classNames(iconWrapperClasses, coerceClassValue(attrs.class), props.className)
+    })
 
     const svgBaseClasses = computed(() => {
-      return classNames(iconSvgBaseClasses, iconSizeClasses[props.size]);
-    });
+      return classNames(iconSvgBaseClasses, iconSizeClasses[props.size])
+    })
 
     const wrapperStyle = computed((): CSSProperties => {
       return {
         ...(attrs.style as CSSProperties | undefined),
         ...(props.style ?? {}),
-        color: props.color,
-      };
-    });
+        color: props.color
+      }
+    })
 
     return () => {
-      const defaultSlot = slots.default?.();
+      const defaultSlot = slots.default?.()
 
-      const ariaLabel = attrs['aria-label'];
-      const ariaLabelledBy = attrs['aria-labelledby'];
-      const hasExplicitRole = attrs.role != null;
-      const isDecorative =
-        ariaLabel == null && ariaLabelledBy == null && !hasExplicitRole;
+      const ariaLabel = attrs['aria-label']
+      const ariaLabelledBy = attrs['aria-labelledby']
+      const hasExplicitRole = attrs.role != null
+      const isDecorative = ariaLabel == null && ariaLabelledBy == null && !hasExplicitRole
 
       const children = (defaultSlot ?? []).map((node) => {
-        if (
-          node &&
-          typeof node === 'object' &&
-          (node as VNode).type === 'svg'
-        ) {
-          const svgNode = node as VNode;
-          const svgProps = (svgNode.props ?? {}) as Record<string, unknown>;
-          const svgChildren =
-            svgNode.children === null ? undefined : svgNode.children;
+        if (node && typeof node === 'object' && (node as VNode).type === 'svg') {
+          const svgNode = node as VNode
+          const svgProps = (svgNode.props ?? {}) as Record<string, unknown>
+          const svgChildren = svgNode.children === null ? undefined : svgNode.children
 
-          type HChildren = Parameters<typeof h>[2];
+          type HChildren = Parameters<typeof h>[2]
 
           return h(
             'svg',
             {
               ...svgProps,
-              class: classNames(
-                svgBaseClasses.value,
-                coerceClassValue(svgProps.class)
-              ),
-              xmlns:
-                (svgProps.xmlns as string | undefined) ??
-                'http://www.w3.org/2000/svg',
+              class: classNames(svgBaseClasses.value, coerceClassValue(svgProps.class)),
+              xmlns: (svgProps.xmlns as string | undefined) ?? 'http://www.w3.org/2000/svg',
               viewBox: (svgProps.viewBox as string | undefined) ?? '0 0 24 24',
               fill: (svgProps.fill as string | undefined) ?? 'none',
               stroke: (svgProps.stroke as string | undefined) ?? 'currentColor',
-              'stroke-width':
-                (svgProps['stroke-width'] as string | number | undefined) ??
-                '2',
-              'stroke-linecap':
-                (svgProps['stroke-linecap'] as string | undefined) ?? 'round',
-              'stroke-linejoin':
-                (svgProps['stroke-linejoin'] as string | undefined) ?? 'round',
+              'stroke-width': (svgProps['stroke-width'] as string | number | undefined) ?? '2',
+              'stroke-linecap': (svgProps['stroke-linecap'] as string | undefined) ?? 'round',
+              'stroke-linejoin': (svgProps['stroke-linejoin'] as string | undefined) ?? 'round'
             },
             svgChildren as HChildren
-          );
+          )
         }
 
-        return node;
-      });
+        return node
+      })
 
       return h(
         'span',
@@ -138,12 +112,12 @@ export const Icon = defineComponent({
           style: wrapperStyle.value,
           ...(isDecorative
             ? { 'aria-hidden': 'true' }
-            : { role: (attrs.role as string | undefined) ?? 'img' }),
+            : { role: (attrs.role as string | undefined) ?? 'img' })
         },
         children
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Icon;
+export default Icon

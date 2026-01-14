@@ -6,8 +6,8 @@
  * accidentally use the Vue renderer.
  */
 
-export * from './a11y-helpers';
-export * from './theme-helpers';
-export * from './test-fixtures';
+export * from './a11y-helpers'
+export * from './theme-helpers'
+export * from './test-fixtures'
 
-export * from './render-helpers-react';
+export * from './render-helpers-react'

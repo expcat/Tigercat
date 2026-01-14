@@ -5,8 +5,8 @@ import {
   PropType,
   h,
   type VNode,
-  type VNodeArrayChildren,
-} from 'vue';
+  type VNodeArrayChildren
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -24,26 +24,20 @@ import {
   stepFinishIconPathStrokeLinecap,
   stepFinishIconPathStrokeLinejoin,
   stepFinishIconPathStrokeWidth,
-  type StepStatus,
-} from '@tigercat/core';
-import { StepsContextKey, type StepsContext } from './Steps';
+  type StepStatus
+} from '@tigercat/core'
+import { StepsContextKey, type StepsContext } from './Steps'
 
-type RawChildren =
-  | string
-  | number
-  | boolean
-  | VNode
-  | VNodeArrayChildren
-  | (() => unknown);
+type RawChildren = string | number | boolean | VNode | VNodeArrayChildren | (() => unknown)
 
 export interface VueStepsItemProps {
-  title: string;
-  description?: string;
-  icon?: unknown;
-  status?: StepStatus;
-  disabled?: boolean;
-  className?: string;
-  style?: Record<string, unknown>;
+  title: string
+  description?: string
+  icon?: unknown
+  status?: StepStatus
+  disabled?: boolean
+  className?: string
+  style?: Record<string, unknown>
 }
 
 export const StepsItem = defineComponent({
@@ -55,58 +49,58 @@ export const StepsItem = defineComponent({
      */
     title: {
       type: String,
-      required: true,
+      required: true
     },
     /**
      * Step description
      */
     description: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Step icon (slot content or custom icon)
      */
     icon: {
       type: [String, Object] as PropType<unknown>,
-      default: undefined,
+      default: undefined
     },
     /**
      * Step status (overrides automatic status)
      */
     status: {
       type: String as PropType<StepStatus>,
-      default: undefined,
+      default: undefined
     },
     /**
      * Whether the step is disabled
      */
     disabled: {
       type: Boolean,
-      default: false,
+      default: false
     },
     className: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     style: {
       type: Object as PropType<Record<string, unknown>>,
-      default: undefined,
+      default: undefined
     },
     /**
      * Internal prop: step index (automatically set by parent)
      */
     stepIndex: {
       type: Number,
-      default: 0,
+      default: 0
     },
     /**
      * Internal prop: is last step (automatically set by parent)
      */
     isLast: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   setup(props, { slots, attrs }) {
     // Get steps context
@@ -116,12 +110,12 @@ export const StepsItem = defineComponent({
       direction: 'horizontal',
       size: 'default',
       simple: false,
-      clickable: false,
-    });
+      clickable: false
+    })
 
-    const attrsRecord = attrs as Record<string, unknown>;
-    const attrsClass = (attrsRecord as { class?: unknown }).class;
-    const attrsStyle = (attrsRecord as { style?: unknown }).style;
+    const attrsRecord = attrs as Record<string, unknown>
+    const attrsClass = (attrsRecord as { class?: unknown }).class
+    const attrsStyle = (attrsRecord as { style?: unknown }).style
 
     // Calculate step status
     const stepStatus = computed(() => {
@@ -130,46 +124,38 @@ export const StepsItem = defineComponent({
         stepsContext.current,
         stepsContext.status,
         props.status
-      );
-    });
+      )
+    })
 
     // Item classes
     const itemClasses = computed(() => {
       return classNames(
-        getStepItemClasses(
-          stepsContext.direction,
-          props.isLast,
-          stepsContext.simple
-        ),
+        getStepItemClasses(stepsContext.direction, props.isLast, stepsContext.simple),
         props.className,
         coerceClassValue(attrsClass)
-      );
-    });
+      )
+    })
 
     // Icon classes
     const iconClasses = computed(() => {
-      const hasCustomIcon = !!(props.icon || slots.icon);
+      const hasCustomIcon = !!(props.icon || slots.icon)
       return getStepIconClasses(
         stepStatus.value,
         stepsContext.size,
         stepsContext.simple,
         hasCustomIcon
-      );
-    });
+      )
+    })
 
     // Tail classes
     const tailClasses = computed(() => {
-      return getStepTailClasses(
-        stepsContext.direction,
-        stepStatus.value,
-        props.isLast
-      );
-    });
+      return getStepTailClasses(stepsContext.direction, stepStatus.value, props.isLast)
+    })
 
     // Content classes
     const contentClasses = computed(() => {
-      return getStepContentClasses(stepsContext.direction, stepsContext.simple);
-    });
+      return getStepContentClasses(stepsContext.direction, stepsContext.simple)
+    })
 
     // Title classes
     const titleClasses = computed(() => {
@@ -177,36 +163,32 @@ export const StepsItem = defineComponent({
         stepStatus.value,
         stepsContext.size,
         stepsContext.clickable && !props.disabled
-      );
-    });
+      )
+    })
 
     // Description classes
     const descriptionClasses = computed(() => {
-      return getStepDescriptionClasses(stepStatus.value, stepsContext.size);
-    });
+      return getStepDescriptionClasses(stepStatus.value, stepsContext.size)
+    })
 
     // Handle click
     const handleClick = () => {
       if (props.disabled || !stepsContext.handleStepClick) {
-        return;
+        return
       }
-      stepsContext.handleStepClick(props.stepIndex);
-    };
+      stepsContext.handleStepClick(props.stepIndex)
+    }
 
     // Render icon
     const renderIcon = () => {
       // Custom icon from slot
       if (slots.icon) {
-        return h('div', { class: iconClasses.value }, slots.icon());
+        return h('div', { class: iconClasses.value }, slots.icon())
       }
 
       // Custom icon from prop
       if (props.icon) {
-        return h(
-          'div',
-          { class: iconClasses.value },
-          props.icon as unknown as RawChildren
-        );
+        return h('div', { class: iconClasses.value }, props.icon as unknown as RawChildren)
       }
 
       // Default: show step number or checkmark for finished steps
@@ -222,29 +204,25 @@ export const StepsItem = defineComponent({
               stroke: 'currentColor',
               viewBox: stepFinishIconViewBox,
               'aria-hidden': 'true',
-              focusable: 'false',
+              focusable: 'false'
             },
             h('path', {
               'stroke-linecap': stepFinishIconPathStrokeLinecap,
               'stroke-linejoin': stepFinishIconPathStrokeLinejoin,
               'stroke-width': stepFinishIconPathStrokeWidth,
-              d: stepFinishIconPathD,
+              d: stepFinishIconPathD
             })
           )
-        );
+        )
       }
 
       // Default: show step number
-      return h(
-        'div',
-        { class: iconClasses.value },
-        String(props.stepIndex + 1)
-      );
-    };
+      return h('div', { class: iconClasses.value }, String(props.stepIndex + 1))
+    }
 
     // Render content
     const renderContent = () => {
-      const children = [];
+      const children = []
 
       // Title
       if (stepsContext.clickable) {
@@ -256,13 +234,13 @@ export const StepsItem = defineComponent({
               class: titleClasses.value,
               onClick: handleClick,
               disabled: props.disabled,
-              'aria-disabled': props.disabled || undefined,
+              'aria-disabled': props.disabled || undefined
             },
             props.title
           )
-        );
+        )
       } else {
-        children.push(h('div', { class: titleClasses.value }, props.title));
+        children.push(h('div', { class: titleClasses.value }, props.title))
       }
 
       // Description (if not simple mode)
@@ -273,25 +251,20 @@ export const StepsItem = defineComponent({
             { class: descriptionClasses.value },
             slots.description ? slots.description() : props.description
           )
-        );
+        )
       }
 
-      return h('div', { class: contentClasses.value }, children);
-    };
+      return h('div', { class: contentClasses.value }, children)
+    }
 
-    const mergedStyle = computed(() =>
-      mergeStyleValues(attrsStyle, props.style)
-    );
+    const mergedStyle = computed(() => mergeStyleValues(attrsStyle, props.style))
 
     return () => {
       const {
         class: _class,
         style: _style,
         ...restAttrs
-      } = attrsRecord as { class?: unknown; style?: unknown } & Record<
-        string,
-        unknown
-      >;
+      } = attrsRecord as { class?: unknown; style?: unknown } & Record<string, unknown>
 
       // For vertical layout
       if (stepsContext.direction === 'vertical') {
@@ -300,21 +273,17 @@ export const StepsItem = defineComponent({
           {
             class: itemClasses.value,
             style: mergedStyle.value,
-            'aria-current':
-              props.stepIndex === stepsContext.current ? 'step' : undefined,
+            'aria-current': props.stepIndex === stepsContext.current ? 'step' : undefined,
             'aria-disabled': props.disabled || undefined,
-            ...restAttrs,
+            ...restAttrs
           },
           [
             // Icon and tail wrapper
-            h('div', { class: 'relative' }, [
-              renderIcon(),
-              h('div', { class: tailClasses.value }),
-            ]),
+            h('div', { class: 'relative' }, [renderIcon(), h('div', { class: tailClasses.value })]),
             // Content
-            renderContent(),
+            renderContent()
           ]
-        );
+        )
       }
 
       // For horizontal layout
@@ -323,10 +292,9 @@ export const StepsItem = defineComponent({
         {
           class: itemClasses.value,
           style: mergedStyle.value,
-          'aria-current':
-            props.stepIndex === stepsContext.current ? 'step' : undefined,
+          'aria-current': props.stepIndex === stepsContext.current ? 'step' : undefined,
           'aria-disabled': props.disabled || undefined,
-          ...restAttrs,
+          ...restAttrs
         },
         [
           // Icon
@@ -334,11 +302,11 @@ export const StepsItem = defineComponent({
           // Tail (connector)
           h('div', { class: tailClasses.value }),
           // Content
-          renderContent(),
+          renderContent()
         ]
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default StepsItem;
+export default StepsItem

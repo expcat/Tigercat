@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   classNames,
   getLoadingBarClasses,
@@ -12,12 +12,11 @@ import {
   loadingFullscreenBaseClasses,
   loadingColorClasses,
   injectLoadingAnimationStyles,
-  type LoadingProps as CoreLoadingProps,
-} from '@tigercat/core';
+  type LoadingProps as CoreLoadingProps
+} from '@tigercat/core'
 
 export interface LoadingProps
-  extends CoreLoadingProps,
-    Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreLoadingProps> {}
+  extends CoreLoadingProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreLoadingProps> {}
 
 export const Loading: React.FC<LoadingProps> = ({
   variant = 'spinner',
@@ -34,38 +33,38 @@ export const Loading: React.FC<LoadingProps> = ({
 }) => {
   // Inject animation styles when component is first used
   useEffect(() => {
-    injectLoadingAnimationStyles();
-  }, []);
+    injectLoadingAnimationStyles()
+  }, [])
 
-  const [visible, setVisible] = useState(delay === 0);
+  const [visible, setVisible] = useState(delay === 0)
 
   useEffect(() => {
     if (delay > 0) {
       const timer = setTimeout(() => {
-        setVisible(true);
-      }, delay);
+        setVisible(true)
+      }, delay)
 
-      return () => clearTimeout(timer);
+      return () => clearTimeout(timer)
     }
-  }, [delay]);
+  }, [delay])
 
-  const spinnerClasses = getLoadingClasses(variant, size, color, customColor);
-  const textClasses = getLoadingTextClasses(size, color, customColor);
+  const spinnerClasses = getLoadingClasses(variant, size, color, customColor)
+  const textClasses = getLoadingTextClasses(size, color, customColor)
 
   const containerClasses = classNames(
     fullscreen ? loadingFullscreenBaseClasses : loadingContainerBaseClasses,
     className
-  );
+  )
 
   const mergedStyle: React.CSSProperties = {
     ...(customColor ? { color: customColor } : null),
     ...(fullscreen ? { backgroundColor: background } : null),
-    ...style,
-  };
+    ...style
+  }
 
   // Render spinner variant
   const renderSpinner = () => {
-    const svg = getSpinnerSVG(variant);
+    const svg = getSpinnerSVG(variant)
 
     return (
       <svg
@@ -75,20 +74,20 @@ export const Loading: React.FC<LoadingProps> = ({
         viewBox={svg.viewBox}>
         {svg.elements.map((el, index) => {
           if (el.type === 'circle') {
-            return <circle key={index} {...el.attrs} />;
+            return <circle key={index} {...el.attrs} />
           } else if (el.type === 'path') {
-            return <path key={index} {...el.attrs} />;
+            return <path key={index} {...el.attrs} />
           }
-          return null;
+          return null
         })}
       </svg>
-    );
-  };
+    )
+  }
 
   // Render dots variant
   const renderDots = () => {
-    const colorClass = customColor ? '' : loadingColorClasses[color];
-    const steps = [0, 1, 2] as const;
+    const colorClass = customColor ? '' : loadingColorClasses[color]
+    const steps = [0, 1, 2] as const
 
     return (
       <div className={getLoadingDotsWrapperClasses(size)}>
@@ -96,13 +95,13 @@ export const Loading: React.FC<LoadingProps> = ({
           <div key={i} className={getLoadingDotClasses(size, i, colorClass)} />
         ))}
       </div>
-    );
-  };
+    )
+  }
 
   // Render bars variant
   const renderBars = () => {
-    const colorClass = customColor ? '' : loadingColorClasses[color];
-    const steps = [0, 1, 2] as const;
+    const colorClass = customColor ? '' : loadingColorClasses[color]
+    const steps = [0, 1, 2] as const
 
     return (
       <div className={getLoadingBarsWrapperClasses(size)}>
@@ -110,26 +109,26 @@ export const Loading: React.FC<LoadingProps> = ({
           <div key={i} className={getLoadingBarClasses(size, i, colorClass)} />
         ))}
       </div>
-    );
-  };
+    )
+  }
 
   // Render loading indicator based on variant
   const renderIndicator = () => {
     switch (variant) {
       case 'dots':
-        return renderDots();
+        return renderDots()
       case 'bars':
-        return renderBars();
+        return renderBars()
       case 'spinner':
       case 'ring':
       case 'pulse':
       default:
-        return renderSpinner();
+        return renderSpinner()
     }
-  };
+  }
 
   if (!visible) {
-    return null;
+    return null
   }
 
   return (
@@ -144,5 +143,5 @@ export const Loading: React.FC<LoadingProps> = ({
       {renderIndicator()}
       {text && <div className={textClasses}>{text}</div>}
     </div>
-  );
-};
+  )
+}

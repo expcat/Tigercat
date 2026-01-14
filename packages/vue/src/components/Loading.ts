@@ -1,12 +1,4 @@
-import {
-  defineComponent,
-  computed,
-  h,
-  PropType,
-  ref,
-  watch,
-  onUnmounted,
-} from 'vue';
+import { defineComponent, computed, h, PropType, ref, watch, onUnmounted } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -25,20 +17,20 @@ import {
   injectLoadingAnimationStyles,
   type LoadingVariant,
   type LoadingSize,
-  type LoadingColor,
-} from '@tigercat/core';
+  type LoadingColor
+} from '@tigercat/core'
 
 export interface VueLoadingProps {
-  variant?: LoadingVariant;
-  size?: LoadingSize;
-  color?: LoadingColor;
-  text?: string;
-  fullscreen?: boolean;
-  delay?: number;
-  background?: string;
-  customColor?: string;
-  className?: string;
-  style?: Record<string, string | number>;
+  variant?: LoadingVariant
+  size?: LoadingSize
+  color?: LoadingColor
+  text?: string
+  fullscreen?: boolean
+  delay?: number
+  background?: string
+  customColor?: string
+  className?: string
+  style?: Record<string, string | number>
 }
 
 export const Loading = defineComponent({
@@ -51,7 +43,7 @@ export const Loading = defineComponent({
      */
     variant: {
       type: String as PropType<LoadingVariant>,
-      default: 'spinner' as LoadingVariant,
+      default: 'spinner' as LoadingVariant
     },
     /**
      * Size of the loading indicator
@@ -59,7 +51,7 @@ export const Loading = defineComponent({
      */
     size: {
       type: String as PropType<LoadingSize>,
-      default: 'md' as LoadingSize,
+      default: 'md' as LoadingSize
     },
     /**
      * Color variant
@@ -67,14 +59,14 @@ export const Loading = defineComponent({
      */
     color: {
       type: String as PropType<LoadingColor>,
-      default: 'primary' as LoadingColor,
+      default: 'primary' as LoadingColor
     },
     /**
      * Custom text to display below the spinner
      */
     text: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Whether to show loading as fullscreen overlay
@@ -82,7 +74,7 @@ export const Loading = defineComponent({
      */
     fullscreen: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Delay before showing the loading indicator (ms)
@@ -90,7 +82,7 @@ export const Loading = defineComponent({
      */
     delay: {
       type: Number,
-      default: 0,
+      default: 0
     },
     /**
      * Custom background color (for fullscreen mode)
@@ -98,21 +90,21 @@ export const Loading = defineComponent({
      */
     background: {
       type: String,
-      default: 'rgba(255, 255, 255, 0.9)',
+      default: 'rgba(255, 255, 255, 0.9)'
     },
     /**
      * Custom spinner color (overrides color variant)
      */
     customColor: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Additional CSS classes
      */
     className: {
       type: String,
-      default: '',
+      default: ''
     },
 
     /**
@@ -120,85 +112,78 @@ export const Loading = defineComponent({
      */
     style: {
       type: Object as PropType<Record<string, string | number>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   setup(props, { attrs }) {
     // Inject animation styles when component is first used
-    injectLoadingAnimationStyles();
+    injectLoadingAnimationStyles()
 
-    const visible = ref(false);
-    let timer: ReturnType<typeof setTimeout> | null = null;
+    const visible = ref(false)
+    let timer: ReturnType<typeof setTimeout> | null = null
 
     const clearTimer = () => {
       if (timer) {
-        clearTimeout(timer);
-        timer = null;
+        clearTimeout(timer)
+        timer = null
       }
-    };
+    }
 
     watch(
       () => props.delay,
       (delay) => {
-        clearTimer();
+        clearTimer()
 
         if (delay <= 0) {
-          visible.value = true;
-          return;
+          visible.value = true
+          return
         }
 
-        visible.value = false;
+        visible.value = false
         timer = setTimeout(() => {
-          visible.value = true;
-        }, delay);
+          visible.value = true
+        }, delay)
       },
       { immediate: true }
-    );
+    )
 
     onUnmounted(() => {
-      clearTimer();
-    });
+      clearTimer()
+    })
 
     const spinnerClasses = computed(() => {
-      return getLoadingClasses(
-        props.variant,
-        props.size,
-        props.color,
-        props.customColor
-      );
-    });
+      return getLoadingClasses(props.variant, props.size, props.color, props.customColor)
+    })
 
     const textClasses = computed(() => {
-      return getLoadingTextClasses(props.size, props.color, props.customColor);
-    });
+      return getLoadingTextClasses(props.size, props.color, props.customColor)
+    })
 
     const containerClasses = computed(() => {
       return classNames(
-        props.fullscreen
-          ? loadingFullscreenBaseClasses
-          : loadingContainerBaseClasses,
+        props.fullscreen ? loadingFullscreenBaseClasses : loadingContainerBaseClasses,
         props.className,
         coerceClassValue(attrs.class)
-      );
-    });
+      )
+    })
 
     const customStyle = computed(() => {
-      const baseStyle: Record<string, string | number> = {};
+      const baseStyle: Record<string, string | number> = {}
 
       if (props.customColor) {
-        baseStyle.color = props.customColor;
+        baseStyle.color = props.customColor
       }
 
       if (props.fullscreen) {
-        baseStyle.backgroundColor = props.background;
+        baseStyle.backgroundColor = props.background
       }
 
-      return mergeStyleValues(attrs.style, props.style, baseStyle);
-    });
+      return mergeStyleValues(attrs.style, props.style, baseStyle)
+    })
 
     // Render spinner variant
     const renderSpinner = () => {
-      const svg = getSpinnerSVG(props.variant);
+      const svg = getSpinnerSVG(props.variant)
 
       return h(
         'svg',
@@ -206,76 +191,72 @@ export const Loading = defineComponent({
           class: spinnerClasses.value,
           xmlns: 'http://www.w3.org/2000/svg',
           fill: 'none',
-          viewBox: svg.viewBox,
+          viewBox: svg.viewBox
         },
         svg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
-      );
-    };
+      )
+    }
 
     // Render dots variant
     const renderDots = () => {
-      const colorClass = props.customColor
-        ? ''
-        : loadingColorClasses[props.color];
-      const steps = [0, 1, 2] as const;
+      const colorClass = props.customColor ? '' : loadingColorClasses[props.color]
+      const steps = [0, 1, 2] as const
 
       return h(
         'div',
         {
-          class: getLoadingDotsWrapperClasses(props.size),
+          class: getLoadingDotsWrapperClasses(props.size)
         },
         steps.map((i) =>
           h('div', {
-            class: getLoadingDotClasses(props.size, i, colorClass),
+            class: getLoadingDotClasses(props.size, i, colorClass)
           })
         )
-      );
-    };
+      )
+    }
 
     // Render bars variant
     const renderBars = () => {
-      const colorClass = props.customColor
-        ? ''
-        : loadingColorClasses[props.color];
-      const steps = [0, 1, 2] as const;
+      const colorClass = props.customColor ? '' : loadingColorClasses[props.color]
+      const steps = [0, 1, 2] as const
 
       return h(
         'div',
         {
-          class: getLoadingBarsWrapperClasses(props.size),
+          class: getLoadingBarsWrapperClasses(props.size)
         },
         steps.map((i) =>
           h('div', {
-            class: getLoadingBarClasses(props.size, i, colorClass),
+            class: getLoadingBarClasses(props.size, i, colorClass)
           })
         )
-      );
-    };
+      )
+    }
 
     // Render loading indicator based on variant
     const renderIndicator = () => {
       switch (props.variant) {
         case 'dots':
-          return renderDots();
+          return renderDots()
         case 'bars':
-          return renderBars();
+          return renderBars()
         case 'spinner':
         case 'ring':
         case 'pulse':
         default:
-          return renderSpinner();
+          return renderSpinner()
       }
-    };
+    }
 
     return () => {
       if (!visible.value) {
-        return null;
+        return null
       }
 
-      const children = [renderIndicator()];
+      const children = [renderIndicator()]
 
       if (props.text) {
-        children.push(h('div', { class: textClasses.value }, props.text));
+        children.push(h('div', { class: textClasses.value }, props.text))
       }
 
       return h(
@@ -287,12 +268,12 @@ export const Loading = defineComponent({
           'aria-busy': true,
           ...attrs,
           class: containerClasses.value,
-          style: customStyle.value,
+          style: customStyle.value
         },
         children
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Loading;
+export default Loading

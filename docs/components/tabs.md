@@ -8,10 +8,10 @@
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Tabs, TabPane } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Tabs, TabPane } from '@tigercat/vue'
 
-const activeKey = ref("1");
+const activeKey = ref('1')
 </script>
 
 <template>
@@ -26,11 +26,11 @@ const activeKey = ref("1");
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Tabs, TabPane } from "@tigercat/react";
+import { useState } from 'react'
+import { Tabs, TabPane } from '@tigercat/react'
 
 function App() {
-  const [activeKey, setActiveKey] = useState("1");
+  const [activeKey, setActiveKey] = useState('1')
 
   return (
     <Tabs activeKey={activeKey} onChange={setActiveKey}>
@@ -44,7 +44,7 @@ function App() {
         标签页 3 的内容
       </TabPane>
     </Tabs>
-  );
+  )
 }
 ```
 
@@ -56,10 +56,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Tabs, TabPane } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Tabs, TabPane } from '@tigercat/vue'
 
-const activeKey = ref("1");
+const activeKey = ref('1')
 </script>
 
 <template>
@@ -74,11 +74,11 @@ const activeKey = ref("1");
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Tabs, TabPane } from "@tigercat/react";
+import { useState } from 'react'
+import { Tabs, TabPane } from '@tigercat/react'
 
 function App() {
-  const [activeKey, setActiveKey] = useState("1");
+  const [activeKey, setActiveKey] = useState('1')
 
   return (
     <Tabs activeKey={activeKey} onChange={setActiveKey} type="card">
@@ -92,7 +92,7 @@ function App() {
         选项卡 3 的内容
       </TabPane>
     </Tabs>
-  );
+  )
 }
 ```
 
@@ -151,18 +151,8 @@ const handleEdit = ({
 </script>
 
 <template>
-  <Tabs
-    v-model:activeKey="activeKey"
-    type="editable-card"
-    closable
-    @edit="handleEdit"
-  >
-    <TabPane
-      v-for="tab in tabs"
-      :key="tab.key"
-      :tabKey="tab.key"
-      :label="tab.label"
-    >
+  <Tabs v-model:activeKey="activeKey" type="editable-card" closable @edit="handleEdit">
+    <TabPane v-for="tab in tabs" :key="tab.key" :tabKey="tab.key" :label="tab.label">
       {{ tab.content }}
     </TabPane>
   </Tabs>
@@ -172,52 +162,51 @@ const handleEdit = ({
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Tabs, TabPane } from "@tigercat/react";
+import { useState } from 'react'
+import { Tabs, TabPane } from '@tigercat/react'
 
 function App() {
-  const [activeKey, setActiveKey] = useState("1");
+  const [activeKey, setActiveKey] = useState('1')
   const [tabs, setTabs] = useState([
-    { key: "1", label: "标签 1", content: "标签 1 的内容" },
-    { key: "2", label: "标签 2", content: "标签 2 的内容" },
-    { key: "3", label: "标签 3", content: "标签 3 的内容" },
-  ]);
+    { key: '1', label: '标签 1', content: '标签 1 的内容' },
+    { key: '2', label: '标签 2', content: '标签 2 的内容' },
+    { key: '3', label: '标签 3', content: '标签 3 的内容' }
+  ])
 
   const handleEdit = ({
     targetKey,
-    action,
+    action
   }: {
-    targetKey?: string | number;
-    action: "add" | "remove";
+    targetKey?: string | number
+    action: 'add' | 'remove'
   }) => {
-    if (action === "add") {
-      const newKey = `${tabs.length + 1}`;
+    if (action === 'add') {
+      const newKey = `${tabs.length + 1}`
       setTabs([
         ...tabs,
         {
           key: newKey,
           label: `新标签 ${newKey}`,
-          content: `新标签 ${newKey} 的内容`,
-        },
-      ]);
-      setActiveKey(newKey);
-      return;
+          content: `新标签 ${newKey} 的内容`
+        }
+      ])
+      setActiveKey(newKey)
+      return
     }
 
-    if (action === "remove" && targetKey != null) {
-      const targetKeyString = String(targetKey);
-      const currentIndex = tabs.findIndex((tab) => tab.key === targetKeyString);
-      const newTabs = tabs.filter((tab) => tab.key !== targetKeyString);
-      setTabs(newTabs);
+    if (action === 'remove' && targetKey != null) {
+      const targetKeyString = String(targetKey)
+      const currentIndex = tabs.findIndex((tab) => tab.key === targetKeyString)
+      const newTabs = tabs.filter((tab) => tab.key !== targetKeyString)
+      setTabs(newTabs)
 
       // 如果删除的是当前激活的标签，激活下一个标签
       if (activeKey === targetKeyString && newTabs.length > 0) {
-        const next =
-          newTabs[currentIndex] ?? newTabs[currentIndex - 1] ?? newTabs[0];
-        setActiveKey(next.key);
+        const next = newTabs[currentIndex] ?? newTabs[currentIndex - 1] ?? newTabs[0]
+        setActiveKey(next.key)
       }
     }
-  };
+  }
 
   return (
     <Tabs
@@ -225,15 +214,14 @@ function App() {
       onChange={setActiveKey}
       type="editable-card"
       closable
-      onEdit={handleEdit}
-    >
+      onEdit={handleEdit}>
       {tabs.map((tab) => (
         <TabPane key={tab.key} tabKey={tab.key} label={tab.label}>
           {tab.content}
         </TabPane>
       ))}
     </Tabs>
-  );
+  )
 }
 ```
 
@@ -245,11 +233,11 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Tabs, TabPane } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Tabs, TabPane } from '@tigercat/vue'
 
-const activeKey = ref("1");
-const position = ref("top");
+const activeKey = ref('1')
+const position = ref('top')
 </script>
 
 <template>
@@ -264,14 +252,12 @@ const position = ref("top");
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Tabs, TabPane } from "@tigercat/react";
+import { useState } from 'react'
+import { Tabs, TabPane } from '@tigercat/react'
 
 function App() {
-  const [activeKey, setActiveKey] = useState("1");
-  const [position, setPosition] = useState<"top" | "bottom" | "left" | "right">(
-    "top"
-  );
+  const [activeKey, setActiveKey] = useState('1')
+  const [position, setPosition] = useState<'top' | 'bottom' | 'left' | 'right'>('top')
 
   return (
     <Tabs activeKey={activeKey} onChange={setActiveKey} tabPosition={position}>
@@ -285,7 +271,7 @@ function App() {
         标签页 3 的内容
       </TabPane>
     </Tabs>
-  );
+  )
 }
 ```
 
@@ -297,10 +283,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Tabs, TabPane } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Tabs, TabPane } from '@tigercat/vue'
 
-const activeKey = ref("1");
+const activeKey = ref('1')
 </script>
 
 <template>
@@ -315,11 +301,11 @@ const activeKey = ref("1");
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Tabs, TabPane } from "@tigercat/react";
+import { useState } from 'react'
+import { Tabs, TabPane } from '@tigercat/react'
 
 function App() {
-  const [activeKey, setActiveKey] = useState("1");
+  const [activeKey, setActiveKey] = useState('1')
 
   return (
     <Tabs activeKey={activeKey} onChange={setActiveKey} centered>
@@ -333,7 +319,7 @@ function App() {
         标签页 3 的内容
       </TabPane>
     </Tabs>
-  );
+  )
 }
 ```
 
@@ -345,10 +331,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Tabs, TabPane } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Tabs, TabPane } from '@tigercat/vue'
 
-const activeKey = ref("1");
+const activeKey = ref('1')
 </script>
 
 <template>
@@ -377,11 +363,11 @@ const activeKey = ref("1");
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Tabs, TabPane } from "@tigercat/react";
+import { useState } from 'react'
+import { Tabs, TabPane } from '@tigercat/react'
 
 function App() {
-  const [activeKey, setActiveKey] = useState("1");
+  const [activeKey, setActiveKey] = useState('1')
 
   return (
     <div className="space-y-4">
@@ -421,7 +407,7 @@ function App() {
         </TabPane>
       </Tabs>
     </div>
-  );
+  )
 }
 ```
 
@@ -433,18 +419,16 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Tabs, TabPane } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Tabs, TabPane } from '@tigercat/vue'
 
-const activeKey = ref("1");
+const activeKey = ref('1')
 </script>
 
 <template>
   <Tabs v-model:activeKey="activeKey">
     <TabPane tabKey="1" label="标签页 1"> 标签页 1 的内容 </TabPane>
-    <TabPane tabKey="2" label="禁用标签" disabled>
-      标签页 2 的内容（不可访问）
-    </TabPane>
+    <TabPane tabKey="2" label="禁用标签" disabled> 标签页 2 的内容（不可访问） </TabPane>
     <TabPane tabKey="3" label="标签页 3"> 标签页 3 的内容 </TabPane>
   </Tabs>
 </template>
@@ -453,11 +437,11 @@ const activeKey = ref("1");
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Tabs, TabPane } from "@tigercat/react";
+import { useState } from 'react'
+import { Tabs, TabPane } from '@tigercat/react'
 
 function App() {
-  const [activeKey, setActiveKey] = useState("1");
+  const [activeKey, setActiveKey] = useState('1')
 
   return (
     <Tabs activeKey={activeKey} onChange={setActiveKey}>
@@ -471,7 +455,7 @@ function App() {
         标签页 3 的内容
       </TabPane>
     </Tabs>
-  );
+  )
 }
 ```
 
@@ -535,12 +519,12 @@ Tabs 组件使用 CSS 变量进行主题定制。你可以通过设置以下 CSS
 或使用 JavaScript:
 
 ```typescript
-import { setThemeColors } from "@tigercat/core";
+import { setThemeColors } from '@tigercat/core'
 
 setThemeColors({
-  primary: "#10b981",
-  primaryHover: "#059669",
-});
+  primary: '#10b981',
+  primaryHover: '#059669'
+})
 ```
 
 ## 可访问性

@@ -8,10 +8,10 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Slider } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Slider } from '@tigercat/vue'
 
-const value = ref(50);
+const value = ref(50)
 </script>
 
 <template>
@@ -22,13 +22,13 @@ const value = ref(50);
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Slider } from '@tigercat/react';
+import { useState } from 'react'
+import { Slider } from '@tigercat/react'
 
 function App() {
-  const [value, setValue] = useState(50);
+  const [value, setValue] = useState(50)
 
-  return <Slider value={value} onChange={setValue} />;
+  return <Slider value={value} onChange={setValue} />
 }
 ```
 
@@ -40,10 +40,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Slider } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Slider } from '@tigercat/vue'
 
-const rangeValue = ref([20, 80]);
+const rangeValue = ref([20, 80])
 </script>
 
 <template>
@@ -54,13 +54,13 @@ const rangeValue = ref([20, 80]);
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Slider } from '@tigercat/react';
+import { useState } from 'react'
+import { Slider } from '@tigercat/react'
 
 function App() {
-  const [rangeValue, setRangeValue] = useState([20, 80]);
+  const [rangeValue, setRangeValue] = useState([20, 80])
 
-  return <Slider value={rangeValue} onChange={setRangeValue} range />;
+  return <Slider value={rangeValue} onChange={setRangeValue} range />
 }
 ```
 
@@ -150,15 +150,12 @@ Slider 组件支持 3 种不同的尺寸：
 {
   /* 简单标记 */
 }
-<Slider marks />;
+;<Slider marks />
 
 {
   /* 自定义标记 */
 }
-<Slider
-  marks={{ 0: '0°C', 25: '25°C', 50: '50°C', 75: '75°C', 100: '100°C' }}
-  defaultValue={25}
-/>;
+;<Slider marks={{ 0: '0°C', 25: '25°C', 50: '50°C', 75: '75°C', 100: '100°C' }} defaultValue={25} />
 ```
 
 ## 工具提示
@@ -185,11 +182,11 @@ Slider 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Slider } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Slider } from '@tigercat/vue'
 
 // 受控组件
-const value = ref(50);
+const value = ref(50)
 
 // 非受控组件
 </script>
@@ -206,12 +203,12 @@ const value = ref(50);
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Slider } from '@tigercat/react';
+import { useState } from 'react'
+import { Slider } from '@tigercat/react'
 
 function App() {
   // 受控组件
-  const [value, setValue] = useState(50);
+  const [value, setValue] = useState(50)
 
   return (
     <>
@@ -221,7 +218,7 @@ function App() {
       {/* 非受控 */}
       <Slider defaultValue={50} onChange={(val) => console.log(val)} />
     </>
-  );
+  )
 }
 ```
 
@@ -322,11 +319,11 @@ Slider 组件支持键盘导航：
 Slider 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { SliderProps, SliderSize } from '@tigercat/core';
+import type { SliderProps, SliderSize } from '@tigercat/core'
 // Vue
-import type { Slider, VueSliderProps } from '@tigercat/vue';
+import type { Slider, VueSliderProps } from '@tigercat/vue'
 // React
-import type { Slider, SliderProps as ReactSliderProps } from '@tigercat/react';
+import type { Slider, SliderProps as ReactSliderProps } from '@tigercat/react'
 ```
 
 ## 示例
@@ -337,10 +334,10 @@ import type { Slider, SliderProps as ReactSliderProps } from '@tigercat/react';
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Slider } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Slider } from '@tigercat/vue'
 
-const temperature = ref(22);
+const temperature = ref(22)
 </script>
 
 <template>
@@ -356,7 +353,7 @@ const temperature = ref(22);
         20: '20°C',
         24: '24°C',
         28: '28°C',
-        30: '30°C',
+        30: '30°C'
       }" />
   </div>
 </template>
@@ -365,11 +362,11 @@ const temperature = ref(22);
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { Slider } from '@tigercat/react';
+import { useState } from 'react'
+import { Slider } from '@tigercat/react'
 
 function TemperatureControl() {
-  const [temperature, setTemperature] = useState(22);
+  const [temperature, setTemperature] = useState(22)
 
   return (
     <div>
@@ -385,11 +382,11 @@ function TemperatureControl() {
           20: '20°C',
           24: '24°C',
           28: '28°C',
-          30: '30°C',
+          30: '30°C'
         }}
       />
     </div>
-  );
+  )
 }
 ```
 
@@ -399,10 +396,10 @@ function TemperatureControl() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Slider } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Slider } from '@tigercat/vue'
 
-const priceRange = ref([200, 800]);
+const priceRange = ref([200, 800])
 </script>
 
 <template>
@@ -417,7 +414,7 @@ const priceRange = ref([200, 800]);
       :marks="{
         0: '¥0',
         500: '¥500',
-        1000: '¥1000',
+        1000: '¥1000'
       }" />
   </div>
 </template>
@@ -426,11 +423,11 @@ const priceRange = ref([200, 800]);
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { Slider } from '@tigercat/react';
+import { useState } from 'react'
+import { Slider } from '@tigercat/react'
 
 function PriceRangeSelector() {
-  const [priceRange, setPriceRange] = useState<[number, number]>([200, 800]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([200, 800])
 
   return (
     <div>
@@ -447,11 +444,11 @@ function PriceRangeSelector() {
         marks={{
           0: '¥0',
           500: '¥500',
-          1000: '¥1000',
+          1000: '¥1000'
         }}
       />
     </div>
-  );
+  )
 }
 ```
 
@@ -461,10 +458,10 @@ function PriceRangeSelector() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Slider } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Slider } from '@tigercat/vue'
 
-const volume = ref(50);
+const volume = ref(50)
 </script>
 
 <template>
@@ -480,25 +477,19 @@ const volume = ref(50);
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { Slider } from '@tigercat/react';
+import { useState } from 'react'
+import { Slider } from '@tigercat/react'
 
 function VolumeControl() {
-  const [volume, setVolume] = useState(50);
+  const [volume, setVolume] = useState(50)
 
   return (
     <div className="flex items-center gap-4">
       <span>🔇</span>
-      <Slider
-        value={volume}
-        onChange={setVolume}
-        min={0}
-        max={100}
-        className="flex-1"
-      />
+      <Slider value={volume} onChange={setVolume} min={0} max={100} className="flex-1" />
       <span>🔊</span>
       <span className="w-12">{volume}%</span>
     </div>
-  );
+  )
 }
 ```

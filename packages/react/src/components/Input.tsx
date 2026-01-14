@@ -1,12 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  classNames,
-  getInputClasses,
-  type InputProps as CoreInputProps,
-} from '@tigercat/core';
+import React, { useState, useEffect, useRef } from 'react'
+import { classNames, getInputClasses, type InputProps as CoreInputProps } from '@tigercat/core'
 
 export interface InputProps
-  extends CoreInputProps,
+  extends
+    CoreInputProps,
     Omit<
       React.InputHTMLAttributes<HTMLInputElement>,
       | 'size'
@@ -23,27 +20,27 @@ export interface InputProps
   /**
    * Input event handler
    */
-  onInput?: (event: React.FormEvent<HTMLInputElement>) => void;
+  onInput?: (event: React.FormEvent<HTMLInputElement>) => void
 
   /**
    * Change event handler
    */
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void
 
   /**
    * Focus event handler
    */
-  onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
+  onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void
 
   /**
    * Blur event handler
    */
-  onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
+  onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void
 
   /**
    * Additional CSS classes
    */
-  className?: string;
+  className?: string
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -68,45 +65,41 @@ export const Input: React.FC<InputProps> = ({
   className,
   ...props
 }) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [internalValue, setInternalValue] = useState<string | number>(
-    defaultValue ?? ''
-  );
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [internalValue, setInternalValue] = useState<string | number>(defaultValue ?? '')
 
   // Determine if the component is controlled - simple comparison, no need to memoize
-  const isControlled = value !== undefined;
-  const inputValue = isControlled ? value : internalValue;
+  const isControlled = value !== undefined
+  const inputValue = isControlled ? value : internalValue
 
   useEffect(() => {
     if (autoFocus && inputRef.current) {
-      inputRef.current.focus();
+      inputRef.current.focus()
     }
-  }, [autoFocus]);
+  }, [autoFocus])
 
   const getNextValue = (target: HTMLInputElement): string | number => {
     if (type === 'number') {
-      return Number.isNaN(target.valueAsNumber)
-        ? target.value
-        : target.valueAsNumber;
+      return Number.isNaN(target.valueAsNumber) ? target.value : target.valueAsNumber
     }
-    return target.value;
-  };
+    return target.value
+  }
 
   const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
     if (!isControlled) {
-      setInternalValue(getNextValue(event.currentTarget));
+      setInternalValue(getNextValue(event.currentTarget))
     }
-    onInput?.(event);
-  };
+    onInput?.(event)
+  }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!isControlled) {
-      setInternalValue(getNextValue(event.currentTarget));
+      setInternalValue(getNextValue(event.currentTarget))
     }
-    onChange?.(event);
-  };
+    onChange?.(event)
+  }
 
-  const inputClasses = classNames(getInputClasses(size), className);
+  const inputClasses = classNames(getInputClasses(size), className)
 
   return (
     <input
@@ -130,5 +123,5 @@ export const Input: React.FC<InputProps> = ({
       onFocus={onFocus}
       onBlur={onBlur}
     />
-  );
-};
+  )
+}

@@ -16,8 +16,7 @@ const handleLangChange = (v: DemoLang) => {
 
 <template>
   <header
-    class="fixed top-0 left-0 right-0 z-40 h-14 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80"
-  >
+    class="fixed top-0 left-0 right-0 z-40 h-14 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
     <div class="h-full px-4 sm:px-6 flex items-center justify-between gap-4">
       <div class="min-w-0 flex items-baseline gap-3">
         <div class="text-base sm:text-lg font-semibold text-gray-900 truncate dark:text-gray-100">

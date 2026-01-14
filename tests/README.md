@@ -56,17 +56,21 @@ pnpm test Button.spec
 ## Framework-Specific Guides
 
 ### Vue Testing
+
 See [TESTING_GUIDE.md](./TESTING_GUIDE.md) for comprehensive Vue testing guidelines.
 
 **Quick Start:**
+
 - Test template: `vue/ComponentTemplate.spec.ts.template`
 - Example test: `vue/Button.spec.ts`
 - Progress tracker: `COMPONENT_TEST_CHECKLIST.md`
 
 ### React Testing
+
 See [REACT_TESTING_GUIDE.md](./REACT_TESTING_GUIDE.md) for comprehensive React testing guidelines.
 
 **Quick Start:**
+
 - Test template: `react/ComponentTemplate.spec.tsx.template`
 - Example test: `react/Button.spec.tsx`
 - Progress tracker: `REACT_COMPONENT_TEST_CHECKLIST.md`
@@ -117,7 +121,7 @@ All component tests should cover:
 4. **Slots**: Default and named slots if applicable
 5. **States**: Different states (disabled, loading, error, etc.)
 6. **Theme**: Theme customization via CSS variables
-7. **Accessibility**: 
+7. **Accessibility**:
    - ARIA attributes
    - Keyboard navigation
    - Screen reader support
@@ -133,7 +137,7 @@ it('should render with default props', () => {
   const { getByRole } = render(Component, {
     slots: { default: 'Content' }
   })
-  
+
   expect(getByRole('button')).toBeInTheDocument()
 })
 ```
@@ -155,7 +159,7 @@ it('should emit click event', async () => {
   const { getByRole } = render(Component, {
     props: { onClick: handleClick }
   })
-  
+
   await fireEvent.click(getByRole('button'))
   expect(handleClick).toHaveBeenCalledTimes(1)
 })
@@ -176,7 +180,7 @@ it('should have no a11y violations', async () => {
 it('should support custom theme', () => {
   setThemeVariables({ '--tiger-primary': '#ff0000' })
   const { container } = render(Component)
-  
+
   // Verify theme is applied
   const styles = getComputedStyles(document.documentElement)
   expect(styles.getPropertyValue('--tiger-primary')).toBe('#ff0000')
@@ -252,6 +256,7 @@ it('should match snapshot', () => {
    - React: `react/Button.spec.tsx`
 
 3. **Run Tests in Watch Mode**:
+
    ```bash
    pnpm test
    ```
@@ -268,15 +273,30 @@ it('should match snapshot', () => {
    - React: `tests/react/YourComponent.spec.tsx`
 
 2. Follow the standard test structure:
+
    ```typescript
    describe('YourComponent', () => {
-     describe('Rendering', () => { /* ... */ })
-     describe('Props', () => { /* ... */ })
-     describe('Events', () => { /* ... */ })
-     describe('States', () => { /* ... */ })
-     describe('Theme Support', () => { /* ... */ })
-     describe('Accessibility', () => { /* ... */ })
-     describe('Snapshots', () => { /* ... */ })
+     describe('Rendering', () => {
+       /* ... */
+     })
+     describe('Props', () => {
+       /* ... */
+     })
+     describe('Events', () => {
+       /* ... */
+     })
+     describe('States', () => {
+       /* ... */
+     })
+     describe('Theme Support', () => {
+       /* ... */
+     })
+     describe('Accessibility', () => {
+       /* ... */
+     })
+     describe('Snapshots', () => {
+       /* ... */
+     })
    })
    ```
 
@@ -286,6 +306,7 @@ it('should match snapshot', () => {
    - `setThemeVariables(variables)`
 
 4. Run your tests:
+
    ```bash
    pnpm test YourComponent
    ```
@@ -303,6 +324,7 @@ it('should match snapshot', () => {
 **Problem**: Tests fail after updating dependencies or making changes.
 
 **Solution**:
+
 ```bash
 # Clear Vitest cache
 rm -rf node_modules/.vitest
@@ -319,6 +341,7 @@ pnpm test
 **Problem**: `jest-axe` reports violations you can't see.
 
 **Solution**:
+
 - Run tests with UI: `pnpm test:ui`
 - Check the detailed violation messages
 - Use browser dev tools to inspect the rendered component
@@ -329,6 +352,7 @@ pnpm test
 **Problem**: Snapshot tests fail after intentional changes.
 
 **Solution**:
+
 ```bash
 # Review the snapshot diff carefully
 pnpm test -- -u  # Update snapshots (only if changes are intentional)
@@ -339,6 +363,7 @@ pnpm test -- -u  # Update snapshots (only if changes are intentional)
 **Problem**: Tests pass/fail inconsistently.
 
 **Solution**:
+
 - Use `waitFor` for async operations
 - Avoid relying on timing (use proper async utilities)
 - Ensure tests are independent (no shared state)
@@ -349,6 +374,7 @@ pnpm test -- -u  # Update snapshots (only if changes are intentional)
 **Problem**: Test can't find rendered component.
 
 **Solution**:
+
 ```typescript
 // Debug by logging the rendered output
 const { container } = render(Component)

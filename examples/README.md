@@ -165,18 +165,18 @@ examples/
 
 ```typescript
 // Vue3
-import { setThemeColors } from '@tigercat/core';
+import { setThemeColors } from '@tigercat/core'
 
 setThemeColors({
   primary: '#10b981',
   primaryHover: '#059669',
-  primaryDisabled: '#6ee7b7',
-});
+  primaryDisabled: '#6ee7b7'
+})
 
 // React
-const root = document.documentElement;
-root.style.setProperty('--tiger-primary', '#10b981');
-root.style.setProperty('--tiger-primary-hover', '#059669');
+const root = document.documentElement
+root.style.setProperty('--tiger-primary', '#10b981')
+root.style.setProperty('--tiger-primary-hover', '#059669')
 ```
 
 ### ThemeSwitch 组件

@@ -1,56 +1,56 @@
 export interface TigerLocaleCommon {
-  okText?: string;
-  cancelText?: string;
-  closeText?: string;
-  loadingText?: string;
-  emptyText?: string;
+  okText?: string
+  cancelText?: string
+  closeText?: string
+  loadingText?: string
+  emptyText?: string
 }
 
 export interface TigerLocaleModal {
-  closeAriaLabel?: string;
-  okText?: string;
-  cancelText?: string;
+  closeAriaLabel?: string
+  okText?: string
+  cancelText?: string
 }
 
 export interface TigerLocaleDrawer {
-  closeAriaLabel?: string;
+  closeAriaLabel?: string
 }
 
 export interface TigerLocaleUpload {
   /** Drag area aria-label */
-  dragAreaAriaLabel?: string;
+  dragAreaAriaLabel?: string
   /** Upload button aria-label (non-drag mode) */
-  buttonAriaLabel?: string;
+  buttonAriaLabel?: string
 
   /** Main drag-area instruction (emphasized part) */
-  clickToUploadText?: string;
+  clickToUploadText?: string
   /** Secondary drag-area instruction */
-  dragAndDropText?: string;
+  dragAndDropText?: string
 
   /** Template: supports {accept} */
-  acceptInfoText?: string;
+  acceptInfoText?: string
   /** Template: supports {maxSize} */
-  maxSizeInfoText?: string;
+  maxSizeInfoText?: string
 
   /** Default non-drag button text */
-  selectFileText?: string;
+  selectFileText?: string
 
   /** File list aria-label */
-  uploadedFilesAriaLabel?: string;
+  uploadedFilesAriaLabel?: string
 
   /** Status aria-labels */
-  successAriaLabel?: string;
-  errorAriaLabel?: string;
-  uploadingAriaLabel?: string;
+  successAriaLabel?: string
+  errorAriaLabel?: string
+  uploadingAriaLabel?: string
 
   /** Templates: support {fileName} */
-  removeFileAriaLabel?: string;
-  previewFileAriaLabel?: string;
+  removeFileAriaLabel?: string
+  previewFileAriaLabel?: string
 }
 
 export interface TigerLocale {
-  common?: TigerLocaleCommon;
-  modal?: TigerLocaleModal;
-  drawer?: TigerLocaleDrawer;
-  upload?: TigerLocaleUpload;
+  common?: TigerLocaleCommon
+  modal?: TigerLocaleModal
+  drawer?: TigerLocaleDrawer
+  upload?: TigerLocaleUpload
 }

@@ -114,7 +114,9 @@ describe('Breadcrumb', () => {
     it('should allow item-level separator override', () => {
       const { container } = render(
         <Breadcrumb separator="/">
-          <BreadcrumbItem href="/" separator="arrow">Home</BreadcrumbItem>
+          <BreadcrumbItem href="/" separator="arrow">
+            Home
+          </BreadcrumbItem>
           <BreadcrumbItem current>Current</BreadcrumbItem>
         </Breadcrumb>
       )
@@ -139,7 +141,9 @@ describe('Breadcrumb', () => {
     it('should render as span when current is true', () => {
       const { container } = render(
         <Breadcrumb>
-          <BreadcrumbItem href="/current" current>Current</BreadcrumbItem>
+          <BreadcrumbItem href="/current" current>
+            Current
+          </BreadcrumbItem>
         </Breadcrumb>
       )
 
@@ -163,7 +167,9 @@ describe('Breadcrumb', () => {
     it('should support target attribute', () => {
       const { container } = render(
         <Breadcrumb>
-          <BreadcrumbItem href="https://example.com" target="_blank">External</BreadcrumbItem>
+          <BreadcrumbItem href="https://example.com" target="_blank">
+            External
+          </BreadcrumbItem>
         </Breadcrumb>
       )
 
@@ -175,7 +181,9 @@ describe('Breadcrumb', () => {
     it('should render icon when provided', () => {
       render(
         <Breadcrumb>
-          <BreadcrumbItem href="/" icon="🏠">Home</BreadcrumbItem>
+          <BreadcrumbItem href="/" icon="🏠">
+            Home
+          </BreadcrumbItem>
         </Breadcrumb>
       )
 
@@ -191,7 +199,9 @@ describe('Breadcrumb', () => {
 
       render(
         <Breadcrumb>
-          <BreadcrumbItem href="/home" onClick={handleClick}>Home</BreadcrumbItem>
+          <BreadcrumbItem href="/home" onClick={handleClick}>
+            Home
+          </BreadcrumbItem>
         </Breadcrumb>
       )
 
@@ -207,7 +217,9 @@ describe('Breadcrumb', () => {
 
       render(
         <Breadcrumb>
-          <BreadcrumbItem current onClick={handleClick}>Current</BreadcrumbItem>
+          <BreadcrumbItem current onClick={handleClick}>
+            Current
+          </BreadcrumbItem>
         </Breadcrumb>
       )
 

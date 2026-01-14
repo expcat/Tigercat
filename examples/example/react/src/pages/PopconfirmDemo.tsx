@@ -27,8 +27,7 @@ export default function PopconfirmDemo() {
           <Popconfirm
             title="确定要删除这条记录吗？"
             onConfirm={handleConfirm}
-            onCancel={handleCancel}
-          >
+            onCancel={handleCancel}>
             <Button variant="secondary">删除</Button>
           </Popconfirm>
         </div>
@@ -44,15 +43,15 @@ export default function PopconfirmDemo() {
             <Popconfirm title="确定要删除吗？" placement="top">
               <Button>上方</Button>
             </Popconfirm>
-            
+
             <Popconfirm title="确定要删除吗？" placement="bottom">
               <Button>下方</Button>
             </Popconfirm>
-            
+
             <Popconfirm title="确定要删除吗？" placement="left">
               <Button>左侧</Button>
             </Popconfirm>
-            
+
             <Popconfirm title="确定要删除吗？" placement="right">
               <Button>右侧</Button>
             </Popconfirm>
@@ -64,25 +63,27 @@ export default function PopconfirmDemo() {
       {/* 不同图标类型 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">不同图标类型</h2>
-        <p className="text-gray-600 mb-6">支持 warning、info、error、success、question 五种图标类型。</p>
+        <p className="text-gray-600 mb-6">
+          支持 warning、info、error、success、question 五种图标类型。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <Popconfirm title="这是警告信息" icon="warning">
               <Button>警告</Button>
             </Popconfirm>
-            
+
             <Popconfirm title="这是提示信息" icon="info">
               <Button>信息</Button>
             </Popconfirm>
-            
+
             <Popconfirm title="这是错误信息" icon="error">
               <Button variant="secondary">错误</Button>
             </Popconfirm>
-            
+
             <Popconfirm title="操作成功" icon="success">
               <Button>成功</Button>
             </Popconfirm>
-            
+
             <Popconfirm title="确定继续吗？" icon="question">
               <Button>疑问</Button>
             </Popconfirm>
@@ -100,8 +101,7 @@ export default function PopconfirmDemo() {
             title="确定要提交这个表单吗？"
             okText="提交"
             cancelText="取消"
-            onConfirm={() => console.log('Form submitted')}
-          >
+            onConfirm={() => console.log('Form submitted')}>
             <Button>提交表单</Button>
           </Popconfirm>
         </div>
@@ -119,8 +119,7 @@ export default function PopconfirmDemo() {
             icon="error"
             okType="danger"
             okText="删除"
-            onConfirm={() => console.log('User deleted')}
-          >
+            onConfirm={() => console.log('User deleted')}>
             <Button variant="secondary">删除用户</Button>
           </Popconfirm>
         </div>
@@ -135,8 +134,7 @@ export default function PopconfirmDemo() {
           <Popconfirm
             title="确定要发布这篇文章吗？"
             description="发布后，文章将对所有用户可见。"
-            onConfirm={() => console.log('Article published')}
-          >
+            onConfirm={() => console.log('Article published')}>
             <Button>发布文章</Button>
           </Popconfirm>
         </div>
@@ -146,22 +144,27 @@ export default function PopconfirmDemo() {
       {/* 受控模式 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">受控模式</h2>
-        <p className="text-gray-600 mb-6">通过 visible 和 onVisibleChange 控制 Popconfirm 的显示状态。</p>
+        <p className="text-gray-600 mb-6">
+          通过 visible 和 onVisibleChange 控制 Popconfirm 的显示状态。
+        </p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <Popconfirm
               visible={visible1}
               onVisibleChange={setVisible1}
               title="确定要执行此操作吗？"
-              onConfirm={() => { handleConfirm(); setVisible1(false) }}
-              onCancel={() => { handleCancel(); setVisible1(false) }}
-            >
+              onConfirm={() => {
+                handleConfirm()
+                setVisible1(false)
+              }}
+              onCancel={() => {
+                handleCancel()
+                setVisible1(false)
+              }}>
               <Button>受控弹窗</Button>
             </Popconfirm>
-            
-            <Button onClick={() => setVisible1(true)}>
-              外部控制打开
-            </Button>
+
+            <Button onClick={() => setVisible1(true)}>外部控制打开</Button>
           </Space>
         </div>
         <Divider className="my-6" />
@@ -175,8 +178,7 @@ export default function PopconfirmDemo() {
           <Popconfirm
             title="确定要继续吗？"
             showIcon={false}
-            onConfirm={() => console.log('Confirmed')}
-          >
+            onConfirm={() => console.log('Confirmed')}>
             <Button>无图标</Button>
           </Popconfirm>
         </div>

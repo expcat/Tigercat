@@ -4,10 +4,10 @@ export default {
     './index.html',
     './src/**/*.{js,ts,jsx,tsx}',
     '../../../packages/react/src/**/*.{js,ts,jsx,tsx}',
-    '../../../packages/core/src/**/*.{js,ts,jsx,tsx}',
+    '../../../packages/core/src/**/*.{js,ts,jsx,tsx}'
   ],
   theme: {
-    extend: {},
+    extend: {}
   },
-  plugins: [],
-};
+  plugins: []
+}

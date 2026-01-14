@@ -8,10 +8,10 @@
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Menu, MenuItem } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Menu, MenuItem } from '@tigercat/vue'
 
-const selectedKeys = ref(["1"]);
+const selectedKeys = ref(['1'])
 </script>
 
 <template>
@@ -26,22 +26,19 @@ const selectedKeys = ref(["1"]);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Menu, MenuItem } from "@tigercat/react";
+import { useState } from 'react'
+import { Menu, MenuItem } from '@tigercat/react'
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(["1"]);
+  const [selectedKeys, setSelectedKeys] = useState(['1'])
 
   return (
-    <Menu
-      selectedKeys={selectedKeys}
-      onSelect={(key) => setSelectedKeys([key])}
-    >
+    <Menu selectedKeys={selectedKeys} onSelect={(key) => setSelectedKeys([key])}>
       <MenuItem itemKey="1">菜单项 1</MenuItem>
       <MenuItem itemKey="2">菜单项 2</MenuItem>
       <MenuItem itemKey="3">菜单项 3</MenuItem>
     </Menu>
-  );
+  )
 }
 ```
 
@@ -53,10 +50,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Menu, MenuItem } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Menu, MenuItem } from '@tigercat/vue'
 
-const selectedKeys = ref(["home"]);
+const selectedKeys = ref(['home'])
 </script>
 
 <template>
@@ -72,24 +69,20 @@ const selectedKeys = ref(["home"]);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Menu, MenuItem } from "@tigercat/react";
+import { useState } from 'react'
+import { Menu, MenuItem } from '@tigercat/react'
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(["home"]);
+  const [selectedKeys, setSelectedKeys] = useState(['home'])
 
   return (
-    <Menu
-      mode="horizontal"
-      selectedKeys={selectedKeys}
-      onSelect={(key) => setSelectedKeys([key])}
-    >
+    <Menu mode="horizontal" selectedKeys={selectedKeys} onSelect={(key) => setSelectedKeys([key])}>
       <MenuItem itemKey="home">首页</MenuItem>
       <MenuItem itemKey="products">产品</MenuItem>
       <MenuItem itemKey="about">关于</MenuItem>
       <MenuItem itemKey="contact">联系我们</MenuItem>
     </Menu>
-  );
+  )
 }
 ```
 
@@ -101,11 +94,11 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Menu, MenuItem, SubMenu } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
 
-const selectedKeys = ref(["1"]);
-const openKeys = ref(["sub1"]);
+const selectedKeys = ref(['1'])
+const openKeys = ref(['sub1'])
 </script>
 
 <template>
@@ -127,20 +120,19 @@ const openKeys = ref(["sub1"]);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Menu, MenuItem, SubMenu } from "@tigercat/react";
+import { useState } from 'react'
+import { Menu, MenuItem, SubMenu } from '@tigercat/react'
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(["1"]);
-  const [openKeys, setOpenKeys] = useState(["sub1"]);
+  const [selectedKeys, setSelectedKeys] = useState(['1'])
+  const [openKeys, setOpenKeys] = useState(['sub1'])
 
   return (
     <Menu
       selectedKeys={selectedKeys}
       openKeys={openKeys}
       onSelect={(key) => setSelectedKeys([key])}
-      onOpenChange={(key, { openKeys }) => setOpenKeys(openKeys)}
-    >
+      onOpenChange={(key, { openKeys }) => setOpenKeys(openKeys)}>
       <SubMenu itemKey="sub1" title="导航 1">
         <MenuItem itemKey="1">选项 1</MenuItem>
         <MenuItem itemKey="2">选项 2</MenuItem>
@@ -152,7 +144,7 @@ function App() {
       </SubMenu>
       <MenuItem itemKey="6">导航 3</MenuItem>
     </Menu>
-  );
+  )
 }
 ```
 
@@ -164,19 +156,15 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Menu, MenuItem, SubMenu } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
 
-const selectedKeys = ref(["1"]);
-const openKeys = ref(["sub1"]);
+const selectedKeys = ref(['1'])
+const openKeys = ref(['sub1'])
 </script>
 
 <template>
-  <Menu
-    mode="inline"
-    v-model:selectedKeys="selectedKeys"
-    v-model:openKeys="openKeys"
-  >
+  <Menu mode="inline" v-model:selectedKeys="selectedKeys" v-model:openKeys="openKeys">
     <SubMenu itemKey="sub1" title="导航 1">
       <MenuItem itemKey="1">选项 1</MenuItem>
       <MenuItem itemKey="2">选项 2</MenuItem>
@@ -192,12 +180,12 @@ const openKeys = ref(["sub1"]);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Menu, MenuItem, SubMenu } from "@tigercat/react";
+import { useState } from 'react'
+import { Menu, MenuItem, SubMenu } from '@tigercat/react'
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(["1"]);
-  const [openKeys, setOpenKeys] = useState(["sub1"]);
+  const [selectedKeys, setSelectedKeys] = useState(['1'])
+  const [openKeys, setOpenKeys] = useState(['sub1'])
 
   return (
     <Menu
@@ -205,8 +193,7 @@ function App() {
       selectedKeys={selectedKeys}
       openKeys={openKeys}
       onSelect={(key) => setSelectedKeys([key])}
-      onOpenChange={(key, { openKeys }) => setOpenKeys(openKeys)}
-    >
+      onOpenChange={(key, { openKeys }) => setOpenKeys(openKeys)}>
       <SubMenu itemKey="sub1" title="导航 1">
         <MenuItem itemKey="1">选项 1</MenuItem>
         <MenuItem itemKey="2">选项 2</MenuItem>
@@ -216,7 +203,7 @@ function App() {
         <MenuItem itemKey="4">选项 4</MenuItem>
       </SubMenu>
     </Menu>
-  );
+  )
 }
 ```
 
@@ -228,23 +215,19 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Menu, MenuItem, SubMenu } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
 
-const collapsed = ref(false);
-const selectedKeys = ref(["1"]);
+const collapsed = ref(false)
+const selectedKeys = ref(['1'])
 </script>
 
 <template>
   <div>
     <button @click="collapsed = !collapsed">
-      {{ collapsed ? "展开" : "收起" }}
+      {{ collapsed ? '展开' : '收起' }}
     </button>
-    <Menu
-      mode="vertical"
-      :collapsed="collapsed"
-      v-model:selectedKeys="selectedKeys"
-    >
+    <Menu mode="vertical" :collapsed="collapsed" v-model:selectedKeys="selectedKeys">
       <MenuItem itemKey="1">菜单项 1</MenuItem>
       <MenuItem itemKey="2">菜单项 2</MenuItem>
       <SubMenu itemKey="sub1" title="子菜单">
@@ -259,24 +242,21 @@ const selectedKeys = ref(["1"]);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Menu, MenuItem, SubMenu } from "@tigercat/react";
+import { useState } from 'react'
+import { Menu, MenuItem, SubMenu } from '@tigercat/react'
 
 function App() {
-  const [collapsed, setCollapsed] = useState(false);
-  const [selectedKeys, setSelectedKeys] = useState(["1"]);
+  const [collapsed, setCollapsed] = useState(false)
+  const [selectedKeys, setSelectedKeys] = useState(['1'])
 
   return (
     <div>
-      <button onClick={() => setCollapsed(!collapsed)}>
-        {collapsed ? "展开" : "收起"}
-      </button>
+      <button onClick={() => setCollapsed(!collapsed)}>{collapsed ? '展开' : '收起'}</button>
       <Menu
         mode="vertical"
         collapsed={collapsed}
         selectedKeys={selectedKeys}
-        onSelect={(key) => setSelectedKeys([key])}
-      >
+        onSelect={(key) => setSelectedKeys([key])}>
         <MenuItem itemKey="1">菜单项 1</MenuItem>
         <MenuItem itemKey="2">菜单项 2</MenuItem>
         <SubMenu itemKey="sub1" title="子菜单">
@@ -285,7 +265,7 @@ function App() {
         </SubMenu>
       </Menu>
     </div>
-  );
+  )
 }
 ```
 
@@ -297,10 +277,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Menu, MenuItem, SubMenu } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
 
-const selectedKeys = ref(["1"]);
+const selectedKeys = ref(['1'])
 </script>
 
 <template>
@@ -318,18 +298,14 @@ const selectedKeys = ref(["1"]);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Menu, MenuItem, SubMenu } from "@tigercat/react";
+import { useState } from 'react'
+import { Menu, MenuItem, SubMenu } from '@tigercat/react'
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(["1"]);
+  const [selectedKeys, setSelectedKeys] = useState(['1'])
 
   return (
-    <Menu
-      theme="dark"
-      selectedKeys={selectedKeys}
-      onSelect={(key) => setSelectedKeys([key])}
-    >
+    <Menu theme="dark" selectedKeys={selectedKeys} onSelect={(key) => setSelectedKeys([key])}>
       <MenuItem itemKey="1">菜单项 1</MenuItem>
       <MenuItem itemKey="2">菜单项 2</MenuItem>
       <SubMenu itemKey="sub1" title="子菜单">
@@ -337,7 +313,7 @@ function App() {
         <MenuItem itemKey="4">选项 4</MenuItem>
       </SubMenu>
     </Menu>
-  );
+  )
 }
 ```
 
@@ -349,10 +325,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Menu, MenuItem, MenuItemGroup } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Menu, MenuItem, MenuItemGroup } from '@tigercat/vue'
 
-const selectedKeys = ref(["1"]);
+const selectedKeys = ref(['1'])
 </script>
 
 <template>
@@ -372,17 +348,14 @@ const selectedKeys = ref(["1"]);
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Menu, MenuItem, MenuItemGroup } from "@tigercat/react";
+import { useState } from 'react'
+import { Menu, MenuItem, MenuItemGroup } from '@tigercat/react'
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(["1"]);
+  const [selectedKeys, setSelectedKeys] = useState(['1'])
 
   return (
-    <Menu
-      selectedKeys={selectedKeys}
-      onSelect={(key) => setSelectedKeys([key])}
-    >
+    <Menu selectedKeys={selectedKeys} onSelect={(key) => setSelectedKeys([key])}>
       <MenuItemGroup title="分组 1">
         <MenuItem itemKey="1">选项 1</MenuItem>
         <MenuItem itemKey="2">选项 2</MenuItem>
@@ -392,7 +365,7 @@ function App() {
         <MenuItem itemKey="4">选项 4</MenuItem>
       </MenuItemGroup>
     </Menu>
-  );
+  )
 }
 ```
 
@@ -404,15 +377,15 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Menu, MenuItem, SubMenu } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
 
-const selectedKeys = ref(["1"]);
+const selectedKeys = ref(['1'])
 
 const homeIcon =
-  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
+  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
 const settingsIcon =
-  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.196-15.196l-4.243 4.243m-5.906 5.906l-4.243 4.243M23 12h-6m-6 0H1m15.196 5.196l-4.243-4.243m-5.906-5.906l-4.243-4.243"></path></svg>';
+  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.196-15.196l-4.243 4.243m-5.906 5.906l-4.243 4.243M23 12h-6m-6 0H1m15.196 5.196l-4.243-4.243m-5.906-5.906l-4.243-4.243"></path></svg>'
 </script>
 
 <template>
@@ -429,22 +402,19 @@ const settingsIcon =
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Menu, MenuItem, SubMenu } from "@tigercat/react";
+import { useState } from 'react'
+import { Menu, MenuItem, SubMenu } from '@tigercat/react'
 
 function App() {
-  const [selectedKeys, setSelectedKeys] = useState(["1"]);
+  const [selectedKeys, setSelectedKeys] = useState(['1'])
 
   const homeIcon =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
   const settingsIcon =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.196-15.196l-4.243 4.243m-5.906 5.906l-4.243 4.243M23 12h-6m-6 0H1m15.196 5.196l-4.243-4.243m-5.906-5.906l-4.243-4.243"></path></svg>';
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6m5.196-15.196l-4.243 4.243m-5.906 5.906l-4.243 4.243M23 12h-6m-6 0H1m15.196 5.196l-4.243-4.243m-5.906-5.906l-4.243-4.243"></path></svg>'
 
   return (
-    <Menu
-      selectedKeys={selectedKeys}
-      onSelect={(key) => setSelectedKeys([key])}
-    >
+    <Menu selectedKeys={selectedKeys} onSelect={(key) => setSelectedKeys([key])}>
       <MenuItem itemKey="1" icon={homeIcon}>
         首页
       </MenuItem>
@@ -453,7 +423,7 @@ function App() {
         <MenuItem itemKey="3">高级设置</MenuItem>
       </SubMenu>
     </Menu>
-  );
+  )
 }
 ```
 

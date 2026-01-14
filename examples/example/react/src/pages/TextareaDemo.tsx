@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Textarea, Space, Divider, FormItem } from '@tigercat/react';
+import React, { useState } from 'react'
+import { Textarea, Space, Divider, FormItem } from '@tigercat/react'
 
 const TextareaDemo: React.FC = () => {
-  const [text, setText] = useState('');
-  const [autoResizeText, setAutoResizeText] = useState('');
-  const [limited, setLimited] = useState('');
-  const [disabled] = useState('禁用的文本域');
-  const [readonly] = useState('只读的文本域');
+  const [text, setText] = useState('')
+  const [autoResizeText, setAutoResizeText] = useState('')
+  const [limited, setLimited] = useState('')
+  const [disabled] = useState('禁用的文本域')
+  const [readonly] = useState('只读的文本域')
 
   return (
     <div className="max-w-5xl mx-auto p-8">
@@ -90,12 +90,7 @@ const TextareaDemo: React.FC = () => {
               />
             </FormItem>
             <FormItem label="限制行数 (3-8)">
-              <Textarea
-                autoResize
-                minRows={3}
-                maxRows={8}
-                placeholder="最少 3 行，最多 8 行"
-              />
+              <Textarea autoResize minRows={3} maxRows={8} placeholder="最少 3 行，最多 8 行" />
             </FormItem>
           </Space>
         </div>
@@ -139,7 +134,7 @@ const TextareaDemo: React.FC = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default TextareaDemo;
+export default TextareaDemo

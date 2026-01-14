@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react'
 import {
   classNames,
   icon20ViewBox,
@@ -33,13 +33,10 @@ import {
   type DatePickerProps as CoreDatePickerProps,
   type DatePickerSingleModelValue,
   type DatePickerRangeModelValue,
-  type DatePickerRangeValue,
-} from '@tigercat/core';
+  type DatePickerRangeValue
+} from '@tigercat/core'
 
-const Icon: React.FC<{ path: string; className: string }> = ({
-  path,
-  className,
-}) => (
+const Icon: React.FC<{ path: string; className: string }> = ({ path, className }) => (
   <svg
     className={className}
     xmlns="http://www.w3.org/2000/svg"
@@ -47,40 +44,38 @@ const Icon: React.FC<{ path: string; className: string }> = ({
     fill="currentColor">
     <path fillRule="evenodd" d={path} clipRule="evenodd" />
   </svg>
-);
+)
 
 type DatePickerDivProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   'defaultValue' | 'value' | 'onChange'
->;
+>
 
 export interface DatePickerBaseProps
-  extends Omit<CoreDatePickerProps, 'value' | 'defaultValue' | 'range'>,
-    DatePickerDivProps {
-  className?: string;
+  extends Omit<CoreDatePickerProps, 'value' | 'defaultValue' | 'range'>, DatePickerDivProps {
+  className?: string
 
-  onClear?: () => void;
+  onClear?: () => void
 }
 
 export interface DatePickerSingleProps extends DatePickerBaseProps {
-  range?: false;
-  value?: DatePickerSingleModelValue;
-  defaultValue?: DatePickerSingleModelValue;
-  onChange?: (date: Date | null) => void;
+  range?: false
+  value?: DatePickerSingleModelValue
+  defaultValue?: DatePickerSingleModelValue
+  onChange?: (date: Date | null) => void
 }
 
 export interface DatePickerRangeProps extends DatePickerBaseProps {
-  range: true;
-  value?: DatePickerRangeModelValue | null;
-  defaultValue?: DatePickerRangeModelValue | null;
-  onChange?: (range: DatePickerRangeValue) => void;
+  range: true
+  value?: DatePickerRangeModelValue | null
+  defaultValue?: DatePickerRangeModelValue | null
+  onChange?: (range: DatePickerRangeValue) => void
 }
 
-export type DatePickerProps = DatePickerSingleProps | DatePickerRangeProps;
+export type DatePickerProps = DatePickerSingleProps | DatePickerRangeProps
 
-const isRangeDatePicker = (
-  props: DatePickerProps
-): props is DatePickerRangeProps => props.range === true;
+const isRangeDatePicker = (props: DatePickerProps): props is DatePickerRangeProps =>
+  props.range === true
 
 export const DatePicker: React.FC<DatePickerProps> = (props) => {
   const {
@@ -89,12 +84,11 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     readonly = false,
     required = false,
     clearable = true,
-    format = 'yyyy-MM-dd',
-  } = props;
+    format = 'yyyy-MM-dd'
+  } = props
 
-  const isRangeMode = isRangeDatePicker(props);
-  const placeholder =
-    props.placeholder ?? (isRangeMode ? 'Select date range' : 'Select date');
+  const isRangeMode = isRangeDatePicker(props)
+  const placeholder = props.placeholder ?? (isRangeMode ? 'Select date range' : 'Select date')
 
   const divProps = (({
     value: _value,
@@ -117,332 +111,322 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     onClear: _onClear,
     className: _className,
     ...rest
-  }) => rest)(props);
+  }) => rest)(props)
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeDateIso, setActiveDateIso] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(false)
+  const [activeDateIso, setActiveDateIso] = useState<string | null>(null)
   const [internalValue, setInternalValue] = useState<Date | null>(() => {
-    if (isRangeMode) return null;
-    return parseDate((props as DatePickerSingleProps).defaultValue ?? null);
-  });
-  const [internalRangeValue, setInternalRangeValue] =
-    useState<DatePickerRangeValue>(() => {
-      if (!isRangeMode) return [null, null];
-      const tuple = (props as DatePickerRangeProps).defaultValue ?? null;
-      if (!tuple) return [null, null];
-      const start = Array.isArray(tuple) ? parseDate(tuple[0]) : null;
-      const end = Array.isArray(tuple) ? parseDate(tuple[1]) : null;
-      return [start, end];
-    });
+    if (isRangeMode) return null
+    return parseDate((props as DatePickerSingleProps).defaultValue ?? null)
+  })
+  const [internalRangeValue, setInternalRangeValue] = useState<DatePickerRangeValue>(() => {
+    if (!isRangeMode) return [null, null]
+    const tuple = (props as DatePickerRangeProps).defaultValue ?? null
+    if (!tuple) return [null, null]
+    const start = Array.isArray(tuple) ? parseDate(tuple[0]) : null
+    const end = Array.isArray(tuple) ? parseDate(tuple[1]) : null
+    return [start, end]
+  })
 
-  const calendarRef = useRef<HTMLDivElement>(null);
-  const inputWrapperRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const pendingFocusIsoRef = useRef<string | null>(null);
-  const restoreFocusRef = useRef<HTMLElement | null>(null);
+  const calendarRef = useRef<HTMLDivElement>(null)
+  const inputWrapperRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const pendingFocusIsoRef = useRef<string | null>(null)
+  const restoreFocusRef = useRef<HTMLElement | null>(null)
 
   // Determine if the component is controlled
-  const isControlled = props.value !== undefined;
+  const isControlled = props.value !== undefined
 
   const selectedDate = (() => {
-    if (isRangeMode) return null;
-    const current = isControlled
-      ? (props as DatePickerSingleProps).value
-      : internalValue;
-    return parseDate(current ?? null);
-  })();
+    if (isRangeMode) return null
+    const current = isControlled ? (props as DatePickerSingleProps).value : internalValue
+    return parseDate(current ?? null)
+  })()
 
   const selectedRange: DatePickerRangeValue = (() => {
-    if (!isRangeMode) return [null, null];
-    const tuple = isControlled
-      ? (props as DatePickerRangeProps).value
-      : internalRangeValue;
-    if (!tuple) return [null, null];
-    const start = Array.isArray(tuple) ? parseDate(tuple[0]) : null;
-    const end = Array.isArray(tuple) ? parseDate(tuple[1]) : null;
-    return [start, end];
-  })();
+    if (!isRangeMode) return [null, null]
+    const tuple = isControlled ? (props as DatePickerRangeProps).value : internalRangeValue
+    if (!tuple) return [null, null]
+    const start = Array.isArray(tuple) ? parseDate(tuple[0]) : null
+    const end = Array.isArray(tuple) ? parseDate(tuple[1]) : null
+    return [start, end]
+  })()
 
-  const minDateParsed = parseDate(props.minDate ?? null);
-  const maxDateParsed = parseDate(props.maxDate ?? null);
+  const minDateParsed = parseDate(props.minDate ?? null)
+  const maxDateParsed = parseDate(props.maxDate ?? null)
 
   // Current viewing month/year in calendar
   const [viewingMonth, setViewingMonth] = useState(
     (selectedDate ?? selectedRange[0])?.getMonth() ?? new Date().getMonth()
-  );
+  )
   const [viewingYear, setViewingYear] = useState(
-    (selectedDate ?? selectedRange[0])?.getFullYear() ??
-      new Date().getFullYear()
-  );
+    (selectedDate ?? selectedRange[0])?.getFullYear() ?? new Date().getFullYear()
+  )
 
   const displayValue = (() => {
     if (!isRangeMode) {
-      return selectedDate ? formatDate(selectedDate, format) : '';
+      return selectedDate ? formatDate(selectedDate, format) : ''
     }
 
-    const [start, end] = selectedRange;
-    const startText = start ? formatDate(start, format) : '';
-    const endText = end ? formatDate(end, format) : '';
+    const [start, end] = selectedRange
+    const startText = start ? formatDate(start, format) : ''
+    const endText = end ? formatDate(end, format) : ''
 
-    if (!startText && !endText) return '';
-    if (startText && endText) return `${startText} - ${endText}`;
-    return startText ? `${startText} - ` : ` - ${endText}`;
-  })();
+    if (!startText && !endText) return ''
+    if (startText && endText) return `${startText} - ${endText}`
+    return startText ? `${startText} - ` : ` - ${endText}`
+  })()
 
   const showClearButton = (() => {
-    if (!clearable || disabled || readonly) return false;
-    if (!isRangeMode) return selectedDate !== null;
-    return selectedRange[0] !== null || selectedRange[1] !== null;
-  })();
+    if (!clearable || disabled || readonly) return false
+    if (!isRangeMode) return selectedDate !== null
+    return selectedRange[0] !== null || selectedRange[1] !== null
+  })()
 
-  const calendarDays = getCalendarDays(viewingYear, viewingMonth);
-  const dayNames = getShortDayNames(props.locale);
+  const calendarDays = getCalendarDays(viewingYear, viewingMonth)
+  const dayNames = getShortDayNames(props.locale)
 
-  const labels = getDatePickerLabels(props.locale, props.labels);
+  const labels = getDatePickerLabels(props.locale, props.labels)
 
   const toggleCalendar = () => {
     if (!disabled && !readonly) {
-      setIsOpen(!isOpen);
+      setIsOpen(!isOpen)
       if (!isOpen) {
-        restoreFocusRef.current =
-          (document.activeElement as HTMLElement) ?? null;
+        restoreFocusRef.current = (document.activeElement as HTMLElement) ?? null
         // Reset viewing month to selected date or current month
-        const baseDate = selectedDate ?? selectedRange[0];
+        const baseDate = selectedDate ?? selectedRange[0]
         if (baseDate) {
-          setViewingMonth(baseDate.getMonth());
-          setViewingYear(baseDate.getFullYear());
+          setViewingMonth(baseDate.getMonth())
+          setViewingYear(baseDate.getFullYear())
         }
       }
     }
-  };
+  }
 
   const closeCalendar = () => {
-    setIsOpen(false);
-  };
+    setIsOpen(false)
+  }
 
   const getFirstEnabledIsoInView = (): string | null => {
     for (const date of calendarDays) {
-      if (!date) continue;
-      const iso = formatDate(date, 'yyyy-MM-dd');
-      const isDisabled = isDateDisabled(date);
-      if (!isDisabled) return iso;
+      if (!date) continue
+      const iso = formatDate(date, 'yyyy-MM-dd')
+      const isDisabled = isDateDisabled(date)
+      if (!isDisabled) return iso
     }
-    return null;
-  };
+    return null
+  }
 
   const getPreferredFocusIso = (): string | null => {
-    const focusDate = isRangeMode
-      ? selectedRange[0] ?? selectedRange[1]
-      : selectedDate;
+    const focusDate = isRangeMode ? (selectedRange[0] ?? selectedRange[1]) : selectedDate
 
     if (focusDate) {
-      return formatDate(focusDate, 'yyyy-MM-dd');
+      return formatDate(focusDate, 'yyyy-MM-dd')
     }
 
-    const today = normalizeDate(new Date());
+    const today = normalizeDate(new Date())
     if (isDateInRange(today, minDateParsed, maxDateParsed)) {
-      return formatDate(today, 'yyyy-MM-dd');
+      return formatDate(today, 'yyyy-MM-dd')
     }
 
-    return getFirstEnabledIsoInView();
-  };
+    return getFirstEnabledIsoInView()
+  }
 
   const focusDateButtonByIso = (iso: string): boolean => {
     const button = calendarRef.current?.querySelector(
       `button[data-date="${iso}"]`
-    ) as HTMLButtonElement | null;
+    ) as HTMLButtonElement | null
 
-    if (!button || button.disabled) return false;
-    button.focus();
-    setActiveDateIso(iso);
-    return true;
-  };
+    if (!button || button.disabled) return false
+    button.focus()
+    setActiveDateIso(iso)
+    return true
+  }
 
   const restoreFocus = () => {
-    const target = restoreFocusRef.current ?? inputRef.current;
-    if (!target) return;
+    const target = restoreFocusRef.current ?? inputRef.current
+    if (!target) return
     if (typeof (target as HTMLElement).focus === 'function') {
-      (target as HTMLElement).focus();
+      ;(target as HTMLElement).focus()
     }
-  };
+  }
 
   const addDays = (date: Date, days: number): Date => {
-    const next = new Date(date);
-    next.setDate(next.getDate() + days);
-    return next;
-  };
+    const next = new Date(date)
+    next.setDate(next.getDate() + days)
+    return next
+  }
 
   const moveFocus = (deltaDays: number) => {
-    const activeEl = document.activeElement as HTMLElement | null;
-    const currentIso =
-      activeEl?.getAttribute('data-date') ?? activeDateIso ?? null;
+    const activeEl = document.activeElement as HTMLElement | null
+    const currentIso = activeEl?.getAttribute('data-date') ?? activeDateIso ?? null
 
-    const baseIso = currentIso ?? getPreferredFocusIso();
-    if (!baseIso) return;
+    const baseIso = currentIso ?? getPreferredFocusIso()
+    if (!baseIso) return
 
-    const baseDate = parseDate(baseIso);
-    if (!baseDate) return;
+    const baseDate = parseDate(baseIso)
+    if (!baseDate) return
 
-    let candidate = addDays(baseDate, deltaDays);
+    let candidate = addDays(baseDate, deltaDays)
     for (let attempts = 0; attempts < 42; attempts++) {
-      const iso = formatDate(candidate, 'yyyy-MM-dd');
+      const iso = formatDate(candidate, 'yyyy-MM-dd')
 
       const el = calendarRef.current?.querySelector(
         `button[data-date="${iso}"]`
-      ) as HTMLButtonElement | null;
+      ) as HTMLButtonElement | null
 
       if (el && !el.disabled) {
-        el.focus();
-        setActiveDateIso(iso);
-        return;
+        el.focus()
+        setActiveDateIso(iso)
+        return
       }
 
       if (!el) {
-        pendingFocusIsoRef.current = iso;
-        setViewingYear(candidate.getFullYear());
-        setViewingMonth(candidate.getMonth());
-        setActiveDateIso(iso);
-        return;
+        pendingFocusIsoRef.current = iso
+        setViewingYear(candidate.getFullYear())
+        setViewingMonth(candidate.getMonth())
+        setActiveDateIso(iso)
+        return
       }
 
-      candidate = addDays(candidate, deltaDays);
+      candidate = addDays(candidate, deltaDays)
     }
-  };
+  }
 
   const handleCalendarKeyDown = (event: React.KeyboardEvent) => {
-    if (!isOpen) return;
+    if (!isOpen) return
 
     switch (event.key) {
       case 'Escape': {
-        event.preventDefault();
-        closeCalendar();
-        return;
+        event.preventDefault()
+        closeCalendar()
+        return
       }
       case 'ArrowRight': {
-        event.preventDefault();
-        moveFocus(1);
-        return;
+        event.preventDefault()
+        moveFocus(1)
+        return
       }
       case 'ArrowLeft': {
-        event.preventDefault();
-        moveFocus(-1);
-        return;
+        event.preventDefault()
+        moveFocus(-1)
+        return
       }
       case 'ArrowDown': {
-        event.preventDefault();
-        moveFocus(7);
-        return;
+        event.preventDefault()
+        moveFocus(7)
+        return
       }
       case 'ArrowUp': {
-        event.preventDefault();
-        moveFocus(-7);
-        return;
+        event.preventDefault()
+        moveFocus(-7)
+        return
       }
       case 'Enter':
       case ' ': {
-        const activeEl = document.activeElement as HTMLButtonElement | null;
+        const activeEl = document.activeElement as HTMLButtonElement | null
         if (activeEl?.tagName === 'BUTTON' && activeEl.dataset.date) {
-          event.preventDefault();
-          if (!activeEl.disabled) activeEl.click();
+          event.preventDefault()
+          if (!activeEl.disabled) activeEl.click()
         }
-        return;
+        return
       }
     }
-  };
+  }
 
   const setRangeValue = (next: DatePickerRangeValue) => {
     if (!isControlled) {
-      setInternalRangeValue(next);
+      setInternalRangeValue(next)
     }
-    (props as DatePickerRangeProps).onChange?.(next);
-  };
+    ;(props as DatePickerRangeProps).onChange?.(next)
+  }
 
   const selectDate = (date: Date | null) => {
-    if (!date) return;
+    if (!date) return
 
-    const normalizedDate = normalizeDate(date);
+    const normalizedDate = normalizeDate(date)
 
     // Check if date is disabled
     if (!isDateInRange(normalizedDate, minDateParsed, maxDateParsed)) {
-      return;
+      return
     }
 
     if (!isRangeMode) {
       if (!isControlled) {
-        setInternalValue(normalizedDate);
+        setInternalValue(normalizedDate)
       }
 
-      (props as DatePickerSingleProps).onChange?.(normalizedDate);
-      closeCalendar();
-      return;
+      ;(props as DatePickerSingleProps).onChange?.(normalizedDate)
+      closeCalendar()
+      return
     }
 
-    const [start, end] = selectedRange;
+    const [start, end] = selectedRange
 
     if (!start || (start && end)) {
-      setRangeValue([normalizedDate, null]);
-      return;
+      setRangeValue([normalizedDate, null])
+      return
     }
 
     if (normalizedDate < start) {
       // Range rule (same as TimePicker): end cannot be earlier than start
-      setRangeValue([start, start]);
+      setRangeValue([start, start])
     } else {
-      setRangeValue([start, normalizedDate]);
+      setRangeValue([start, normalizedDate])
     }
-  };
+  }
 
   const setToday = () => {
-    selectDate(new Date());
-  };
+    selectDate(new Date())
+  }
 
   const clearDate = (event: React.MouseEvent) => {
-    event.stopPropagation();
+    event.stopPropagation()
 
     if (!isRangeMode) {
       if (!isControlled) {
-        setInternalValue(null);
+        setInternalValue(null)
       }
 
-      (props as DatePickerSingleProps).onChange?.(null);
+      ;(props as DatePickerSingleProps).onChange?.(null)
     } else {
-      setRangeValue([null, null]);
+      setRangeValue([null, null])
     }
 
-    props.onClear?.();
-  };
+    props.onClear?.()
+  }
 
   const previousMonth = () => {
     if (viewingMonth === 0) {
-      setViewingMonth(11);
-      setViewingYear(viewingYear - 1);
+      setViewingMonth(11)
+      setViewingYear(viewingYear - 1)
     } else {
-      setViewingMonth(viewingMonth - 1);
+      setViewingMonth(viewingMonth - 1)
     }
-  };
+  }
 
   const nextMonth = () => {
     if (viewingMonth === 11) {
-      setViewingMonth(0);
-      setViewingYear(viewingYear + 1);
+      setViewingMonth(0)
+      setViewingYear(viewingYear + 1)
     } else {
-      setViewingMonth(viewingMonth + 1);
+      setViewingMonth(viewingMonth + 1)
     }
-  };
+  }
 
   const isDateDisabled = (date: Date | null): boolean => {
-    if (!date) return true;
-    return !isDateInRange(date, minDateParsed, maxDateParsed);
-  };
+    if (!date) return true
+    return !isDateInRange(date, minDateParsed, maxDateParsed)
+  }
 
   const isCurrentMonth = (date: Date | null): boolean => {
-    if (!date) return false;
-    return date.getMonth() === viewingMonth;
-  };
+    if (!date) return false
+    return date.getMonth() === viewingMonth
+  }
 
   const handleInputClick = () => {
-    toggleCalendar();
-  };
+    toggleCalendar()
+  }
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -452,58 +436,56 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
         !calendarRef.current.contains(event.target as Node) &&
         !inputWrapperRef.current.contains(event.target as Node)
       ) {
-        closeCalendar();
+        closeCalendar()
       }
-    };
+    }
 
     if (isOpen) {
-      document.addEventListener('click', handleClickOutside);
+      document.addEventListener('click', handleClickOutside)
       return () => {
-        document.removeEventListener('click', handleClickOutside);
-      };
+        document.removeEventListener('click', handleClickOutside)
+      }
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   useEffect(() => {
     if (isOpen) {
-      restoreFocusRef.current = (document.activeElement as HTMLElement) ?? null;
-      const preferred = pendingFocusIsoRef.current ?? getPreferredFocusIso();
-      pendingFocusIsoRef.current = null;
+      restoreFocusRef.current = (document.activeElement as HTMLElement) ?? null
+      const preferred = pendingFocusIsoRef.current ?? getPreferredFocusIso()
+      pendingFocusIsoRef.current = null
 
       setTimeout(() => {
-        if (preferred && focusDateButtonByIso(preferred)) return;
-        const fallback = getFirstEnabledIsoInView();
-        if (fallback) focusDateButtonByIso(fallback);
-      }, 0);
+        if (preferred && focusDateButtonByIso(preferred)) return
+        const fallback = getFirstEnabledIsoInView()
+        if (fallback) focusDateButtonByIso(fallback)
+      }, 0)
 
-      return;
+      return
     }
 
     setTimeout(() => {
-      restoreFocus();
-    }, 0);
-  }, [isOpen]);
+      restoreFocus()
+    }, 0)
+  }, [isOpen])
 
   useEffect(() => {
-    if (!isOpen) return;
-    const pending = pendingFocusIsoRef.current;
-    if (!pending) return;
-    pendingFocusIsoRef.current = null;
+    if (!isOpen) return
+    const pending = pendingFocusIsoRef.current
+    if (!pending) return
+    pendingFocusIsoRef.current = null
 
     setTimeout(() => {
-      if (focusDateButtonByIso(pending)) return;
-      const fallback = getFirstEnabledIsoInView();
-      if (fallback) focusDateButtonByIso(fallback);
-    }, 0);
-  }, [isOpen, viewingMonth, viewingYear]);
+      if (focusDateButtonByIso(pending)) return
+      const fallback = getFirstEnabledIsoInView()
+      if (fallback) focusDateButtonByIso(fallback)
+    }, 0)
+  }, [isOpen, viewingMonth, viewingYear])
 
-  const inputClasses = getDatePickerInputClasses(size, disabled || readonly);
-  const iconButtonClasses = getDatePickerIconButtonClasses(size);
+  const inputClasses = getDatePickerInputClasses(size, disabled || readonly)
+  const iconButtonClasses = getDatePickerIconButtonClasses(size)
 
   return (
-    <div
-      className={classNames(datePickerBaseClasses, props.className)}
-      {...divProps}>
+    <div className={classNames(datePickerBaseClasses, props.className)} {...divProps}>
       {/* Input wrapper */}
       <div ref={inputWrapperRef} className={datePickerInputWrapperClasses}>
         {/* Input field for date display */}
@@ -577,10 +559,7 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
           {/* Day names header */}
           <div className={datePickerCalendarGridClasses} role="row">
             {dayNames.map((day) => (
-              <div
-                key={day}
-                className={datePickerDayNameClasses}
-                role="columnheader">
+              <div key={day} className={datePickerDayNameClasses} role="columnheader">
                 {day}
               </div>
             ))}
@@ -593,40 +572,34 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
             aria-rowcount={6}
             aria-colcount={7}>
             {calendarDays.map((date, index) => {
-              if (!date) return null;
+              if (!date) return null
 
-              const [rangeStart, rangeEnd] = selectedRange;
+              const [rangeStart, rangeEnd] = selectedRange
 
-              const isRangeStart =
-                isRangeMode && rangeStart ? isSameDay(date, rangeStart) : false;
-              const isRangeEnd =
-                isRangeMode && rangeEnd ? isSameDay(date, rangeEnd) : false;
+              const isRangeStart = isRangeMode && rangeStart ? isSameDay(date, rangeStart) : false
+              const isRangeEnd = isRangeMode && rangeEnd ? isSameDay(date, rangeEnd) : false
               const isInRange =
                 isRangeMode &&
                 rangeStart &&
                 rangeEnd &&
                 normalizeDate(date) >= normalizeDate(rangeStart) &&
-                normalizeDate(date) <= normalizeDate(rangeEnd);
+                normalizeDate(date) <= normalizeDate(rangeEnd)
 
               const isSelected = !isRangeMode
                 ? selectedDate
                   ? isSameDay(date, selectedDate)
                   : false
-                : isRangeStart || isRangeEnd;
+                : isRangeStart || isRangeEnd
 
-              const isCurrentMonthDay = isCurrentMonth(date);
-              const isTodayDay = isTodayUtil(date);
-              const isSelectingRangeEnd =
-                isRangeMode && Boolean(rangeStart) && !rangeEnd;
+              const isCurrentMonthDay = isCurrentMonth(date)
+              const isTodayDay = isTodayUtil(date)
+              const isSelectingRangeEnd = isRangeMode && Boolean(rangeStart) && !rangeEnd
               const isBeforeRangeStart =
-                isSelectingRangeEnd &&
-                rangeStart &&
-                normalizeDate(date) < normalizeDate(rangeStart);
+                isSelectingRangeEnd && rangeStart && normalizeDate(date) < normalizeDate(rangeStart)
 
-              const isDisabled =
-                isDateDisabled(date) || Boolean(isBeforeRangeStart);
+              const isDisabled = isDateDisabled(date) || Boolean(isBeforeRangeStart)
 
-              const iso = formatDate(date, 'yyyy-MM-dd');
+              const iso = formatDate(date, 'yyyy-MM-dd')
 
               return (
                 <button
@@ -652,17 +625,14 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
                   aria-current={isTodayDay ? 'date' : undefined}>
                   {date.getDate()}
                 </button>
-              );
+              )
             })}
           </div>
 
           {/* Footer (range mode only) */}
           {isRangeMode && (
             <div className={datePickerFooterClasses}>
-              <button
-                type="button"
-                className={datePickerFooterButtonClasses}
-                onClick={setToday}>
+              <button type="button" className={datePickerFooterButtonClasses} onClick={setToday}>
                 {labels.today}
               </button>
               <button
@@ -676,5 +646,5 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   classNames,
   getSubMenuTitleClasses,
@@ -10,27 +10,27 @@ import {
   submenuContentPopupClasses,
   submenuContentVerticalClasses,
   submenuContentInlineClasses,
-  type SubMenuProps as CoreSubMenuProps,
-} from '@tigercat/core';
-import { useMenuContext } from './Menu';
-import { MenuItem } from './MenuItem';
-import { MenuItemGroup } from './MenuItemGroup';
+  type SubMenuProps as CoreSubMenuProps
+} from '@tigercat/core'
+import { useMenuContext } from './Menu'
+import { MenuItem } from './MenuItem'
+import { MenuItemGroup } from './MenuItemGroup'
 
 export interface SubMenuProps extends CoreSubMenuProps {
   /**
    * Submenu content
    */
-  children?: React.ReactNode;
+  children?: React.ReactNode
 
   /**
    * Nesting level (internal use for indentation)
    */
-  level?: number;
+  level?: number
 
   /**
    * Internal override for collapsed rendering (used by SubMenu popup)
    */
-  collapsed?: boolean;
+  collapsed?: boolean
 }
 
 const ExpandIcon: React.FC<{ expanded: boolean }> = ({ expanded }) => (
@@ -42,62 +42,58 @@ const ExpandIcon: React.FC<{ expanded: boolean }> = ({ expanded }) => (
     fill="currentColor">
     <path d="M6 9L1.5 4.5L2.205 3.795L6 7.59L9.795 3.795L10.5 4.5L6 9Z" />
   </svg>
-);
+)
 
 function getMenuButtonsWithin(menuEl: HTMLElement): HTMLButtonElement[] {
   return Array.from(
-    menuEl.querySelectorAll<HTMLButtonElement>(
-      'button[data-tiger-menuitem="true"]'
-    )
-  ).filter(
-    (el) => !el.disabled && !el.closest('[data-tiger-menu-hidden="true"]')
-  );
+    menuEl.querySelectorAll<HTMLButtonElement>('button[data-tiger-menuitem="true"]')
+  ).filter((el) => !el.disabled && !el.closest('[data-tiger-menu-hidden="true"]'))
 }
 
 function roveFocus(current: HTMLButtonElement, next: HTMLButtonElement) {
-  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null;
+  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
   if (!menuEl) {
-    next.focus();
-    return;
+    next.focus()
+    return
   }
 
-  const items = getMenuButtonsWithin(menuEl);
+  const items = getMenuButtonsWithin(menuEl)
   items.forEach((el) => {
-    el.tabIndex = el === next ? 0 : -1;
-  });
-  next.focus();
+    el.tabIndex = el === next ? 0 : -1
+  })
+  next.focus()
 }
 
 function moveFocus(current: HTMLButtonElement, delta: number) {
-  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null;
-  if (!menuEl) return;
-  const items = getMenuButtonsWithin(menuEl);
-  const currentIndex = items.indexOf(current);
-  if (currentIndex < 0) return;
-  const nextIndex = (currentIndex + delta + items.length) % items.length;
-  roveFocus(current, items[nextIndex]);
+  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
+  if (!menuEl) return
+  const items = getMenuButtonsWithin(menuEl)
+  const currentIndex = items.indexOf(current)
+  if (currentIndex < 0) return
+  const nextIndex = (currentIndex + delta + items.length) % items.length
+  roveFocus(current, items[nextIndex])
 }
 
 function focusEdge(current: HTMLButtonElement, edge: 'start' | 'end') {
-  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null;
-  if (!menuEl) return;
-  const items = getMenuButtonsWithin(menuEl);
-  if (items.length === 0) return;
-  roveFocus(current, edge === 'start' ? items[0] : items[items.length - 1]);
+  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
+  if (!menuEl) return
+  const items = getMenuButtonsWithin(menuEl)
+  if (items.length === 0) return
+  roveFocus(current, edge === 'start' ? items[0] : items[items.length - 1])
 }
 
 function focusFirstChildItemFromTitle(titleEl: HTMLButtonElement) {
-  const li = titleEl.closest('li');
-  const submenu = li?.querySelector('ul[role="menu"]') as HTMLElement | null;
-  if (!submenu) return;
+  const li = titleEl.closest('li')
+  const submenu = li?.querySelector('ul[role="menu"]') as HTMLElement | null
+  if (!submenu) return
 
-  const items = getMenuButtonsWithin(submenu);
-  if (items.length === 0) return;
+  const items = getMenuButtonsWithin(submenu)
+  if (items.length === 0) return
 
   items.forEach((el, idx) => {
-    el.tabIndex = idx === 0 ? 0 : -1;
-  });
-  items[0].focus();
+    el.tabIndex = idx === 0 ? 0 : -1
+  })
+  items[0].focus()
 }
 
 export const SubMenu: React.FC<SubMenuProps> = ({
@@ -108,192 +104,180 @@ export const SubMenu: React.FC<SubMenuProps> = ({
   className,
   level = 0,
   children,
-  collapsed: collapsedOverride,
+  collapsed: collapsedOverride
 }) => {
-  const menuContext = useMenuContext();
+  const menuContext = useMenuContext()
 
   if (!menuContext) {
-    console.warn('SubMenu must be used within Menu component');
+    console.warn('SubMenu must be used within Menu component')
   }
 
-  const [isHovered, setIsHovered] = useState(false);
-  const [isOpenByKeyboard, setIsOpenByKeyboard] = useState(false);
+  const [isHovered, setIsHovered] = useState(false)
+  const [isOpenByKeyboard, setIsOpenByKeyboard] = useState(false)
 
-  const effectiveCollapsed =
-    collapsedOverride ?? (menuContext ? menuContext.collapsed : false);
+  const effectiveCollapsed = collapsedOverride ?? (menuContext ? menuContext.collapsed : false)
 
-  const isPopup =
-    !!menuContext && menuContext.mode === 'vertical' && effectiveCollapsed;
+  const isPopup = !!menuContext && menuContext.mode === 'vertical' && effectiveCollapsed
 
-  const isOpen = !!menuContext && isKeyOpen(itemKey, menuContext.openKeys);
+  const isOpen = !!menuContext && isKeyOpen(itemKey, menuContext.openKeys)
 
   const isExpanded =
-    menuContext?.mode === 'horizontal' || isPopup
-      ? isHovered || isOpenByKeyboard
-      : isOpen;
+    menuContext?.mode === 'horizontal' || isPopup ? isHovered || isOpenByKeyboard : isOpen
 
-  const isInlineOrVertical = menuContext?.mode !== 'horizontal' && !isPopup;
+  const isInlineOrVertical = menuContext?.mode !== 'horizontal' && !isPopup
   const [hasRenderedInline, setHasRenderedInline] = useState(() =>
     isInlineOrVertical ? isExpanded : false
-  );
+  )
 
   useEffect(() => {
-    if (!isInlineOrVertical || !isExpanded || hasRenderedInline) return;
-    setHasRenderedInline(true);
-  }, [hasRenderedInline, isExpanded, isInlineOrVertical]);
+    if (!isInlineOrVertical || !isExpanded || hasRenderedInline) return
+    setHasRenderedInline(true)
+  }, [hasRenderedInline, isExpanded, isInlineOrVertical])
 
   const titleClasses = useMemo(() => {
-    if (!menuContext) return '';
-    return getSubMenuTitleClasses(menuContext.theme, disabled);
-  }, [menuContext, disabled]);
+    if (!menuContext) return ''
+    return getSubMenuTitleClasses(menuContext.theme, disabled)
+  }, [menuContext, disabled])
 
   const contentClasses = useMemo(() => {
-    if (!menuContext) return '';
-    if (menuContext.mode === 'horizontal')
-      return submenuContentHorizontalClasses;
-    if (isPopup) return submenuContentPopupClasses;
-    if (menuContext.mode === 'inline') return submenuContentInlineClasses;
-    return submenuContentVerticalClasses;
-  }, [menuContext, isPopup]);
+    if (!menuContext) return ''
+    if (menuContext.mode === 'horizontal') return submenuContentHorizontalClasses
+    if (isPopup) return submenuContentPopupClasses
+    if (menuContext.mode === 'inline') return submenuContentInlineClasses
+    return submenuContentVerticalClasses
+  }, [menuContext, isPopup])
 
   const handleTitleClick = useCallback(() => {
-    if (!menuContext || disabled) return;
+    if (!menuContext || disabled) return
 
-    if (menuContext.mode === 'horizontal') return;
+    if (menuContext.mode === 'horizontal') return
 
     if (isPopup) {
-      setIsOpenByKeyboard((prev) => !prev);
-      setIsHovered(true);
-      return;
+      setIsOpenByKeyboard((prev) => !prev)
+      setIsHovered(true)
+      return
     }
 
-    setHasRenderedInline(true);
-    menuContext.handleOpenChange(itemKey);
-  }, [disabled, menuContext, itemKey, isPopup]);
+    setHasRenderedInline(true)
+    menuContext.handleOpenChange(itemKey)
+  }, [disabled, menuContext, itemKey, isPopup])
 
   // Handle mouse enter for horizontal mode
   const handleMouseEnter = useCallback(() => {
-    if (menuContext?.mode === 'horizontal' || isPopup) setIsHovered(true);
-  }, [menuContext, isPopup]);
+    if (menuContext?.mode === 'horizontal' || isPopup) setIsHovered(true)
+  }, [menuContext, isPopup])
 
   // Handle mouse leave for horizontal mode
   const handleMouseLeave = useCallback(() => {
     if (menuContext?.mode === 'horizontal' || isPopup) {
-      setIsHovered(false);
-      setIsOpenByKeyboard(false);
+      setIsHovered(false)
+      setIsOpenByKeyboard(false)
     }
-  }, [menuContext, isPopup]);
+  }, [menuContext, isPopup])
 
   const openInline = useCallback(
     (titleEl: HTMLButtonElement) => {
-      if (!menuContext) return;
-      setHasRenderedInline(true);
-      menuContext.handleOpenChange(itemKey);
-      setTimeout(() => focusFirstChildItemFromTitle(titleEl), 0);
+      if (!menuContext) return
+      setHasRenderedInline(true)
+      menuContext.handleOpenChange(itemKey)
+      setTimeout(() => focusFirstChildItemFromTitle(titleEl), 0)
     },
     [menuContext, itemKey]
-  );
+  )
 
   const handleTitleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
-      if (!menuContext || disabled) return;
+      if (!menuContext || disabled) return
 
-      const current = event.currentTarget;
-      const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null;
-      const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true';
-      const isHorizontalRoot = isRoot && menuContext.mode === 'horizontal';
+      const current = event.currentTarget
+      const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null
+      const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true'
+      const isHorizontalRoot = isRoot && menuContext.mode === 'horizontal'
 
-      const nextKey = isHorizontalRoot ? 'ArrowRight' : 'ArrowDown';
-      const prevKey = isHorizontalRoot ? 'ArrowLeft' : 'ArrowUp';
+      const nextKey = isHorizontalRoot ? 'ArrowRight' : 'ArrowDown'
+      const prevKey = isHorizontalRoot ? 'ArrowLeft' : 'ArrowUp'
 
       if (event.key === nextKey) {
-        event.preventDefault();
-        moveFocus(current, 1);
-        return;
+        event.preventDefault()
+        moveFocus(current, 1)
+        return
       }
 
       if (event.key === prevKey) {
-        event.preventDefault();
-        moveFocus(current, -1);
-        return;
+        event.preventDefault()
+        moveFocus(current, -1)
+        return
       }
 
       if (event.key === 'Home') {
-        event.preventDefault();
-        focusEdge(current, 'start');
-        return;
+        event.preventDefault()
+        focusEdge(current, 'start')
+        return
       }
 
       if (event.key === 'End') {
-        event.preventDefault();
-        focusEdge(current, 'end');
-        return;
+        event.preventDefault()
+        focusEdge(current, 'end')
+        return
       }
 
       if (event.key === 'Escape' || event.key === 'ArrowLeft') {
         if (menuContext.mode === 'horizontal' || isPopup) {
-          event.preventDefault();
-          setIsOpenByKeyboard(false);
-          setIsHovered(false);
-          return;
+          event.preventDefault()
+          setIsOpenByKeyboard(false)
+          setIsHovered(false)
+          return
         }
 
         if (isOpen) {
-          event.preventDefault();
-          menuContext.handleOpenChange(itemKey);
+          event.preventDefault()
+          menuContext.handleOpenChange(itemKey)
         }
-        return;
+        return
       }
 
       if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
+        event.preventDefault()
         if (menuContext.mode === 'horizontal' || isPopup) {
-          setIsOpenByKeyboard(true);
-          return;
+          setIsOpenByKeyboard(true)
+          return
         }
-        openInline(current);
-        return;
+        openInline(current)
+        return
       }
 
       if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
         if (menuContext.mode === 'horizontal' || isPopup) {
-          event.preventDefault();
-          setIsOpenByKeyboard(true);
-          return;
+          event.preventDefault()
+          setIsOpenByKeyboard(true)
+          return
         }
 
         if (!isOpen) {
-          event.preventDefault();
-          openInline(current);
+          event.preventDefault()
+          openInline(current)
         }
       }
     },
     [menuContext, disabled, isOpen, isPopup, openInline]
-  );
+  )
 
   const indentStyle =
     !menuContext || menuContext.mode === 'horizontal' || level === 0
       ? {}
-      : getMenuItemIndent(level, menuContext.inlineIndent);
+      : getMenuItemIndent(level, menuContext.inlineIndent)
 
-  if (!menuContext) return null;
+  if (!menuContext) return null
 
   const renderIcon = () => {
-    if (!icon) return null;
+    if (!icon) return null
 
     if (typeof icon === 'string') {
-      return (
-        <span
-          className={menuItemIconClasses}
-          dangerouslySetInnerHTML={{ __html: icon }}
-        />
-      );
+      return <span className={menuItemIconClasses} dangerouslySetInnerHTML={{ __html: icon }} />
     }
 
-    return (
-      <span className={menuItemIconClasses}>{icon as React.ReactNode}</span>
-    );
-  };
+    return <span className={menuItemIconClasses}>{icon as React.ReactNode}</span>
+  }
 
   const renderTitle = () => {
     if (!effectiveCollapsed) {
@@ -301,44 +285,34 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         <>
           {renderIcon()}
           <span className="flex-1">{title}</span>
-          {menuContext.mode !== 'horizontal' && !isPopup && (
-            <ExpandIcon expanded={isExpanded} />
-          )}
+          {menuContext.mode !== 'horizontal' && !isPopup && <ExpandIcon expanded={isExpanded} />}
         </>
-      );
+      )
     } else if (!icon) {
       // Show first letter when collapsed without icon
-      return (
-        <span className="flex-1 text-center">
-          {title.charAt(0).toUpperCase()}
-        </span>
-      );
+      return <span className="flex-1 text-center">{title.charAt(0).toUpperCase()}</span>
     } else {
-      return renderIcon();
+      return renderIcon()
     }
-  };
+  }
 
   const renderContent = () => {
-    const nextLevel = level + 1;
+    const nextLevel = level + 1
     const enhancedChildren = React.Children.map(children, (child) => {
-      if (!React.isValidElement(child)) return child;
+      if (!React.isValidElement(child)) return child
 
-      if (
-        child.type === MenuItem ||
-        child.type === SubMenu ||
-        child.type === MenuItemGroup
-      ) {
+      if (child.type === MenuItem || child.type === SubMenu || child.type === MenuItemGroup) {
         return React.cloneElement(
           child as React.ReactElement<{ level?: number; collapsed?: boolean }>,
           {
             level: nextLevel,
-            collapsed: isPopup ? false : undefined,
+            collapsed: isPopup ? false : undefined
           }
-        );
+        )
       }
 
-      return child;
-    });
+      return child
+    })
 
     if (menuContext.mode === 'horizontal' || isPopup) {
       return (
@@ -349,12 +323,12 @@ export const SubMenu: React.FC<SubMenuProps> = ({
           aria-hidden={isExpanded ? undefined : 'true'}>
           {enhancedChildren}
         </ul>
-      );
+      )
     }
 
-    if (!hasRenderedInline) return null;
+    if (!hasRenderedInline) return null
 
-    const isHidden = !isExpanded;
+    const isHidden = !isExpanded
 
     return (
       <div
@@ -368,8 +342,8 @@ export const SubMenu: React.FC<SubMenuProps> = ({
           {enhancedChildren}
         </ul>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <li
@@ -397,5 +371,5 @@ export const SubMenu: React.FC<SubMenuProps> = ({
       </button>
       {renderContent()}
     </li>
-  );
-};
+  )
+}

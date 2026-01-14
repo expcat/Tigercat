@@ -8,15 +8,15 @@
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Select } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Select } from '@tigercat/vue'
 
-const selectedValue = ref("");
+const selectedValue = ref('')
 const options = [
-  { value: "1", label: "Option 1" },
-  { value: "2", label: "Option 2" },
-  { value: "3", label: "Option 3" },
-];
+  { value: '1', label: 'Option 1' },
+  { value: '2', label: 'Option 2' },
+  { value: '3', label: 'Option 3' }
+]
 </script>
 
 <template>
@@ -27,24 +27,18 @@ const options = [
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Select } from "@tigercat/react";
+import { useState } from 'react'
+import { Select } from '@tigercat/react'
 
 function App() {
-  const [selectedValue, setSelectedValue] = useState("");
+  const [selectedValue, setSelectedValue] = useState('')
   const options = [
-    { value: "1", label: "Option 1" },
-    { value: "2", label: "Option 2" },
-    { value: "3", label: "Option 3" },
-  ];
+    { value: '1', label: 'Option 1' },
+    { value: '2', label: 'Option 2' },
+    { value: '3', label: 'Option 3' }
+  ]
 
-  return (
-    <Select
-      value={selectedValue}
-      onChange={setSelectedValue}
-      options={options}
-    />
-  );
+  return <Select value={selectedValue} onChange={setSelectedValue} options={options} />
 }
 ```
 
@@ -100,15 +94,15 @@ Select 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Select } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Select } from '@tigercat/vue'
 
-const value = ref("");
+const value = ref('')
 const options = [
-  { value: "1", label: "Option 1" },
-  { value: "2", label: "Option 2", disabled: true },
-  { value: "3", label: "Option 3" },
-];
+  { value: '1', label: 'Option 1' },
+  { value: '2', label: 'Option 2', disabled: true },
+  { value: '3', label: 'Option 3' }
+]
 </script>
 
 <template>
@@ -119,18 +113,18 @@ const options = [
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Select } from "@tigercat/react";
+import { useState } from 'react'
+import { Select } from '@tigercat/react'
 
 function App() {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('')
   const options = [
-    { value: "1", label: "Option 1" },
-    { value: "2", label: "Option 2", disabled: true },
-    { value: "3", label: "Option 3" },
-  ];
+    { value: '1', label: 'Option 1' },
+    { value: '2', label: 'Option 2', disabled: true },
+    { value: '3', label: 'Option 3' }
+  ]
 
-  return <Select value={value} onChange={setValue} options={options} />;
+  return <Select value={value} onChange={setValue} options={options} />
 }
 ```
 
@@ -151,16 +145,11 @@ function App() {
 ### React
 
 ```tsx
-<Select value={value} onChange={setValue} options={options} clearable />;
+;<Select value={value} onChange={setValue} options={options} clearable />
 {
   /* 或禁用清空功能 */
 }
-<Select
-  value={value}
-  onChange={setValue}
-  options={options}
-  clearable={false}
-/>;
+;<Select value={value} onChange={setValue} options={options} clearable={false} />
 ```
 
 ## 可搜索 (Searchable)
@@ -171,52 +160,47 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Select } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Select } from '@tigercat/vue'
 
-const value = ref("");
+const value = ref('')
 const options = [
-  { value: "1", label: "Apple" },
-  { value: "2", label: "Banana" },
-  { value: "3", label: "Cherry" },
-  { value: "4", label: "Date" },
-  { value: "5", label: "Elderberry" },
-];
+  { value: '1', label: 'Apple' },
+  { value: '2', label: 'Banana' },
+  { value: '3', label: 'Cherry' },
+  { value: '4', label: 'Date' },
+  { value: '5', label: 'Elderberry' }
+]
 
 const handleSearch = (query) => {
-  console.log("Searching:", query);
-};
+  console.log('Searching:', query)
+}
 </script>
 
 <template>
-  <Select
-    v-model="value"
-    :options="options"
-    searchable
-    @search="handleSearch"
-  />
+  <Select v-model="value" :options="options" searchable @search="handleSearch" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Select } from "@tigercat/react";
+import { useState } from 'react'
+import { Select } from '@tigercat/react'
 
 function App() {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('')
   const options = [
-    { value: "1", label: "Apple" },
-    { value: "2", label: "Banana" },
-    { value: "3", label: "Cherry" },
-    { value: "4", label: "Date" },
-    { value: "5", label: "Elderberry" },
-  ];
+    { value: '1', label: 'Apple' },
+    { value: '2', label: 'Banana' },
+    { value: '3', label: 'Cherry' },
+    { value: '4', label: 'Date' },
+    { value: '5', label: 'Elderberry' }
+  ]
 
   const handleSearch = (query) => {
-    console.log("Searching:", query);
-  };
+    console.log('Searching:', query)
+  }
 
   return (
     <Select
@@ -226,7 +210,7 @@ function App() {
       searchable
       onSearch={handleSearch}
     />
-  );
+  )
 }
 ```
 
@@ -238,16 +222,16 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Select } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Select } from '@tigercat/vue'
 
-const selectedValues = ref([]);
+const selectedValues = ref([])
 const options = [
-  { value: "1", label: "Option 1" },
-  { value: "2", label: "Option 2" },
-  { value: "3", label: "Option 3" },
-  { value: "4", label: "Option 4" },
-];
+  { value: '1', label: 'Option 1' },
+  { value: '2', label: 'Option 2' },
+  { value: '3', label: 'Option 3' },
+  { value: '4', label: 'Option 4' }
+]
 </script>
 
 <template>
@@ -259,29 +243,24 @@ const options = [
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Select } from "@tigercat/react";
+import { useState } from 'react'
+import { Select } from '@tigercat/react'
 
 function App() {
-  const [selectedValues, setSelectedValues] = useState<(string | number)[]>([]);
+  const [selectedValues, setSelectedValues] = useState<(string | number)[]>([])
   const options = [
-    { value: "1", label: "Option 1" },
-    { value: "2", label: "Option 2" },
-    { value: "3", label: "Option 3" },
-    { value: "4", label: "Option 4" },
-  ];
+    { value: '1', label: 'Option 1' },
+    { value: '2', label: 'Option 2' },
+    { value: '3', label: 'Option 3' },
+    { value: '4', label: 'Option 4' }
+  ]
 
   return (
     <>
-      <Select
-        value={selectedValues}
-        onChange={setSelectedValues}
-        options={options}
-        multiple
-      />
-      <p>Selected: {selectedValues.join(", ")}</p>
+      <Select value={selectedValues} onChange={setSelectedValues} options={options} multiple />
+      <p>Selected: {selectedValues.join(', ')}</p>
     </>
-  );
+  )
 }
 ```
 
@@ -293,28 +272,28 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Select } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Select } from '@tigercat/vue'
 
-const value = ref("");
+const value = ref('')
 const groupedOptions = [
   {
-    label: "Fruits",
+    label: 'Fruits',
     options: [
-      { value: "apple", label: "Apple" },
-      { value: "banana", label: "Banana" },
-      { value: "cherry", label: "Cherry" },
-    ],
+      { value: 'apple', label: 'Apple' },
+      { value: 'banana', label: 'Banana' },
+      { value: 'cherry', label: 'Cherry' }
+    ]
   },
   {
-    label: "Vegetables",
+    label: 'Vegetables',
     options: [
-      { value: "carrot", label: "Carrot" },
-      { value: "potato", label: "Potato" },
-      { value: "tomato", label: "Tomato" },
-    ],
-  },
-];
+      { value: 'carrot', label: 'Carrot' },
+      { value: 'potato', label: 'Potato' },
+      { value: 'tomato', label: 'Tomato' }
+    ]
+  }
+]
 </script>
 
 <template>
@@ -325,31 +304,31 @@ const groupedOptions = [
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Select } from "@tigercat/react";
+import { useState } from 'react'
+import { Select } from '@tigercat/react'
 
 function App() {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('')
   const groupedOptions = [
     {
-      label: "Fruits",
+      label: 'Fruits',
       options: [
-        { value: "apple", label: "Apple" },
-        { value: "banana", label: "Banana" },
-        { value: "cherry", label: "Cherry" },
-      ],
+        { value: 'apple', label: 'Apple' },
+        { value: 'banana', label: 'Banana' },
+        { value: 'cherry', label: 'Cherry' }
+      ]
     },
     {
-      label: "Vegetables",
+      label: 'Vegetables',
       options: [
-        { value: "carrot", label: "Carrot" },
-        { value: "potato", label: "Potato" },
-        { value: "tomato", label: "Tomato" },
-      ],
-    },
-  ];
+        { value: 'carrot', label: 'Carrot' },
+        { value: 'potato', label: 'Potato' },
+        { value: 'tomato', label: 'Tomato' }
+      ]
+    }
+  ]
 
-  return <Select value={value} onChange={setValue} options={groupedOptions} />;
+  return <Select value={value} onChange={setValue} options={groupedOptions} />
 }
 ```
 
@@ -368,12 +347,7 @@ Select 组件提供两种空状态处理：
   <Select v-model="value" :options="[]" no-data-text="暂无数据" />
 
   <!-- 搜索无结果 -->
-  <Select
-    v-model="value"
-    :options="options"
-    searchable
-    no-options-text="未找到匹配项"
-  />
+  <Select v-model="value" :options="options" searchable no-options-text="未找到匹配项" />
 </template>
 ```
 
@@ -383,18 +357,18 @@ Select 组件提供两种空状态处理：
 {
   /* 无数据 */
 }
-<Select value={value} onChange={setValue} options={[]} noDataText="暂无数据" />;
+;<Select value={value} onChange={setValue} options={[]} noDataText="暂无数据" />
 
 {
   /* 搜索无结果 */
 }
-<Select
+;<Select
   value={value}
   onChange={setValue}
   options={options}
   searchable
   noOptionsText="未找到匹配项"
-/>;
+/>
 ```
 
 ## 自定义占位符 (Custom Placeholder)
@@ -410,12 +384,7 @@ Select 组件提供两种空状态处理：
 ### React
 
 ```tsx
-<Select
-  value={value}
-  onChange={setValue}
-  options={options}
-  placeholder="请选择一个选项"
-/>
+<Select value={value} onChange={setValue} options={options} placeholder="请选择一个选项" />
 ```
 
 ## 综合示例 (Complete Example)
@@ -424,35 +393,35 @@ Select 组件提供两种空状态处理：
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Select } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Select } from '@tigercat/vue'
 
-const value = ref("");
+const value = ref('')
 const groupedOptions = [
   {
-    label: "水果",
+    label: '水果',
     options: [
-      { value: "apple", label: "苹果" },
-      { value: "banana", label: "香蕉" },
-      { value: "cherry", label: "樱桃", disabled: true },
-    ],
+      { value: 'apple', label: '苹果' },
+      { value: 'banana', label: '香蕉' },
+      { value: 'cherry', label: '樱桃', disabled: true }
+    ]
   },
   {
-    label: "蔬菜",
+    label: '蔬菜',
     options: [
-      { value: "carrot", label: "胡萝卜" },
-      { value: "potato", label: "土豆" },
-    ],
-  },
-];
+      { value: 'carrot', label: '胡萝卜' },
+      { value: 'potato', label: '土豆' }
+    ]
+  }
+]
 
 const handleChange = (newValue) => {
-  console.log("Selected:", newValue);
-};
+  console.log('Selected:', newValue)
+}
 
 const handleSearch = (query) => {
-  console.log("Search query:", query);
-};
+  console.log('Search query:', query)
+}
 </script>
 
 <template>
@@ -466,45 +435,44 @@ const handleSearch = (query) => {
     no-options-text="未找到匹配的食物"
     no-data-text="暂无食物选项"
     @change="handleChange"
-    @search="handleSearch"
-  />
+    @search="handleSearch" />
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Select } from "@tigercat/react";
+import { useState } from 'react'
+import { Select } from '@tigercat/react'
 
 function App() {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('')
   const groupedOptions = [
     {
-      label: "水果",
+      label: '水果',
       options: [
-        { value: "apple", label: "苹果" },
-        { value: "banana", label: "香蕉" },
-        { value: "cherry", label: "樱桃", disabled: true },
-      ],
+        { value: 'apple', label: '苹果' },
+        { value: 'banana', label: '香蕉' },
+        { value: 'cherry', label: '樱桃', disabled: true }
+      ]
     },
     {
-      label: "蔬菜",
+      label: '蔬菜',
       options: [
-        { value: "carrot", label: "胡萝卜" },
-        { value: "potato", label: "土豆" },
-      ],
-    },
-  ];
+        { value: 'carrot', label: '胡萝卜' },
+        { value: 'potato', label: '土豆' }
+      ]
+    }
+  ]
 
   const handleChange = (newValue) => {
-    console.log("Selected:", newValue);
-    setValue(newValue);
-  };
+    console.log('Selected:', newValue)
+    setValue(newValue)
+  }
 
   const handleSearch = (query) => {
-    console.log("Search query:", query);
-  };
+    console.log('Search query:', query)
+  }
 
   return (
     <Select
@@ -519,7 +487,7 @@ function App() {
       noDataText="暂无食物选项"
       onSearch={handleSearch}
     />
-  );
+  )
 }
 ```
 
@@ -569,9 +537,9 @@ function App() {
 
 ```typescript
 interface SelectOption {
-  value: SelectValue;
-  label: string;
-  disabled?: boolean;
+  value: SelectValue
+  label: string
+  disabled?: boolean
 }
 ```
 
@@ -592,8 +560,8 @@ type SelectOptions = Array<SelectOption | SelectOptionGroup>
 #### SelectValue / SelectValues
 
 ```typescript
-type SelectValue = string | number;
-type SelectValues = SelectValue[];
+type SelectValue = string | number
+type SelectValues = SelectValue[]
 ```
 
 ````
@@ -651,28 +619,28 @@ Select 组件会复用以下“全局通用”CSS 变量（多数组件共享）
 
 ```vue
 <script setup>
-import { Select, setThemeColors } from "@tigercat/vue";
+import { Select, setThemeColors } from '@tigercat/vue'
 
 const switchTheme = () => {
   setThemeColors({
-    primary: "#10b981",
-    outlineBgHover: "#d1fae5",
-  });
-};
+    primary: '#10b981',
+    outlineBgHover: '#d1fae5'
+  })
+}
 </script>
 ```
 
 **React:**
 
 ```tsx
-import { Select, setThemeColors } from "@tigercat/react";
+import { Select, setThemeColors } from '@tigercat/react'
 
 const switchTheme = () => {
   setThemeColors({
-    primary: "#10b981",
-    outlineBgHover: "#d1fae5",
-  });
-};
+    primary: '#10b981',
+    outlineBgHover: '#d1fae5'
+  })
+}
 ```
 
 ### React 额外样式
@@ -721,14 +689,14 @@ import type {
   SelectValues,
   SelectOption,
   SelectOptionGroup,
-  SelectSize,
-} from "@tigercat/core";
+  SelectSize
+} from '@tigercat/core'
 
 // Vue
-import type { Select } from "@tigercat/vue";
+import type { Select } from '@tigercat/vue'
 
 // React
-import type { Select, SelectProps as ReactSelectProps } from "@tigercat/react";
+import type { Select, SelectProps as ReactSelectProps } from '@tigercat/react'
 ```
 
 ## 最佳实践

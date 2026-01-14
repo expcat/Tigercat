@@ -1,5 +1,5 @@
-import React from 'react';
-import { Space } from '@tigercat/react';
+import React from 'react'
+import { Space } from '@tigercat/react'
 
 const SpaceDemo: React.FC = () => {
   return (
@@ -15,15 +15,9 @@ const SpaceDemo: React.FC = () => {
         <p className="text-gray-600 mb-6">默认水平方向（horizontal）。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
-            <div className="bg-blue-500 text-white px-4 py-2 rounded">
-              Item 1
-            </div>
-            <div className="bg-blue-500 text-white px-4 py-2 rounded">
-              Item 2
-            </div>
-            <div className="bg-blue-500 text-white px-4 py-2 rounded">
-              Item 3
-            </div>
+            <div className="bg-blue-500 text-white px-4 py-2 rounded">Item 1</div>
+            <div className="bg-blue-500 text-white px-4 py-2 rounded">Item 2</div>
+            <div className="bg-blue-500 text-white px-4 py-2 rounded">Item 3</div>
           </Space>
         </div>
       </section>
@@ -31,20 +25,12 @@ const SpaceDemo: React.FC = () => {
       {/* 垂直间距 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">垂直间距</h2>
-        <p className="text-gray-600 mb-6">
-          direction="vertical" 让子项纵向排列并产生间距。
-        </p>
+        <p className="text-gray-600 mb-6">direction="vertical" 让子项纵向排列并产生间距。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical">
-            <div className="bg-green-500 text-white px-4 py-2 rounded">
-              Item 1
-            </div>
-            <div className="bg-green-500 text-white px-4 py-2 rounded">
-              Item 2
-            </div>
-            <div className="bg-green-500 text-white px-4 py-2 rounded">
-              Item 3
-            </div>
+            <div className="bg-green-500 text-white px-4 py-2 rounded">Item 1</div>
+            <div className="bg-green-500 text-white px-4 py-2 rounded">Item 2</div>
+            <div className="bg-green-500 text-white px-4 py-2 rounded">Item 3</div>
           </Space>
         </div>
       </section>
@@ -52,70 +38,42 @@ const SpaceDemo: React.FC = () => {
       {/* 不同尺寸 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">不同尺寸</h2>
-        <p className="text-gray-600 mb-6">
-          size 支持内置尺寸（sm/md/lg）与自定义数值（px）。
-        </p>
+        <p className="text-gray-600 mb-6">size 支持内置尺寸（sm/md/lg）与自定义数值（px）。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full">
             <div>
               <p className="text-sm text-gray-600 mb-2">size="sm"</p>
               <Space size="sm">
-                <div className="bg-purple-500 text-white px-4 py-2 rounded">
-                  Item
-                </div>
-                <div className="bg-purple-500 text-white px-4 py-2 rounded">
-                  Item
-                </div>
-                <div className="bg-purple-500 text-white px-4 py-2 rounded">
-                  Item
-                </div>
+                <div className="bg-purple-500 text-white px-4 py-2 rounded">Item</div>
+                <div className="bg-purple-500 text-white px-4 py-2 rounded">Item</div>
+                <div className="bg-purple-500 text-white px-4 py-2 rounded">Item</div>
               </Space>
             </div>
 
             <div>
               <p className="text-sm text-gray-600 mb-2">size="md"（默认）</p>
               <Space size="md">
-                <div className="bg-purple-500 text-white px-4 py-2 rounded">
-                  Item
-                </div>
-                <div className="bg-purple-500 text-white px-4 py-2 rounded">
-                  Item
-                </div>
-                <div className="bg-purple-500 text-white px-4 py-2 rounded">
-                  Item
-                </div>
+                <div className="bg-purple-500 text-white px-4 py-2 rounded">Item</div>
+                <div className="bg-purple-500 text-white px-4 py-2 rounded">Item</div>
+                <div className="bg-purple-500 text-white px-4 py-2 rounded">Item</div>
               </Space>
             </div>
 
             <div>
               <p className="text-sm text-gray-600 mb-2">size="lg"</p>
               <Space size="lg">
-                <div className="bg-purple-500 text-white px-4 py-2 rounded">
-                  Item
-                </div>
-                <div className="bg-purple-500 text-white px-4 py-2 rounded">
-                  Item
-                </div>
-                <div className="bg-purple-500 text-white px-4 py-2 rounded">
-                  Item
-                </div>
+                <div className="bg-purple-500 text-white px-4 py-2 rounded">Item</div>
+                <div className="bg-purple-500 text-white px-4 py-2 rounded">Item</div>
+                <div className="bg-purple-500 text-white px-4 py-2 rounded">Item</div>
               </Space>
             </div>
 
             <div>
-              <p className="text-sm text-gray-600 mb-2">
-                size={24}（自定义 px）
-              </p>
+              <p className="text-sm text-gray-600 mb-2">size={24}（自定义 px）</p>
               <Space size={24}>
-                <div className="bg-purple-600 text-white px-4 py-2 rounded">
-                  24px
-                </div>
-                <div className="bg-purple-600 text-white px-4 py-2 rounded">
-                  24px
-                </div>
-                <div className="bg-purple-600 text-white px-4 py-2 rounded">
-                  24px
-                </div>
+                <div className="bg-purple-600 text-white px-4 py-2 rounded">24px</div>
+                <div className="bg-purple-600 text-white px-4 py-2 rounded">24px</div>
+                <div className="bg-purple-600 text-white px-4 py-2 rounded">24px</div>
               </Space>
             </div>
           </Space>
@@ -152,15 +110,9 @@ const SpaceDemo: React.FC = () => {
               <Space
                 align="baseline"
                 className="w-full border border-dashed border-gray-300 p-3 rounded">
-                <div className="bg-rose-500 text-white px-4 py-2 rounded text-sm">
-                  Text-sm
-                </div>
-                <div className="bg-rose-500 text-white px-4 py-2 rounded text-lg">
-                  Text-lg
-                </div>
-                <div className="bg-rose-500 text-white px-4 py-2 rounded text-2xl">
-                  Text-2xl
-                </div>
+                <div className="bg-rose-500 text-white px-4 py-2 rounded text-sm">Text-sm</div>
+                <div className="bg-rose-500 text-white px-4 py-2 rounded text-lg">Text-lg</div>
+                <div className="bg-rose-500 text-white px-4 py-2 rounded text-2xl">Text-2xl</div>
               </Space>
             </div>
           </Space>
@@ -170,16 +122,12 @@ const SpaceDemo: React.FC = () => {
       {/* 自动换行 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">自动换行</h2>
-        <p className="text-gray-600 mb-6">
-          wrap=true 时，子项在空间不足时自动换行。
-        </p>
+        <p className="text-gray-600 mb-6">wrap=true 时，子项在空间不足时自动换行。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md">
             <Space wrap size="sm" className="w-full">
               {Array.from({ length: 14 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="bg-slate-700 text-white px-3 py-2 rounded">
+                <div key={index} className="bg-slate-700 text-white px-3 py-2 rounded">
                   Tag {index + 1}
                 </div>
               ))}
@@ -188,7 +136,7 @@ const SpaceDemo: React.FC = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default SpaceDemo;
+export default SpaceDemo

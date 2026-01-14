@@ -188,7 +188,6 @@ Packages are built in dependency order:
 ### Component Development Workflow
 
 1. **Plan the Component**
-
    - Review [ROADMAP.md](./ROADMAP.md) for component priorities
    - Define component API (props, events, slots)
    - Consider accessibility requirements
@@ -221,8 +220,8 @@ Packages are built in dependency order:
 
    ```vue
    <script setup lang="ts">
-  import { computed } from 'vue'
-  import type { YourComponentProps } from '@tigercat/core'
+   import { computed } from 'vue'
+   import type { YourComponentProps } from '@tigercat/core'
 
    const props = withDefaults(defineProps<YourComponentProps>(), {
      variant: 'primary',
@@ -244,8 +243,8 @@ Packages are built in dependency order:
    Export in `packages/vue/src/index.ts`:
 
    ```typescript
-  export { default as YourComponent } from './components/YourComponent.vue'
-  export type { YourComponentProps } from '@tigercat/core'
+   export { default as YourComponent } from './components/YourComponent.vue'
+   export type { YourComponentProps } from '@tigercat/core'
    ```
 
 4. **Implement React Component**
@@ -256,8 +255,8 @@ Packages are built in dependency order:
    ```
 
    ```typescript
-  import React from 'react'
-  import type { YourComponentProps } from '@tigercat/core'
+   import React from 'react'
+   import type { YourComponentProps } from '@tigercat/core'
 
    export const YourComponent: React.FC<YourComponentProps> = ({
      variant = 'primary',
@@ -277,8 +276,8 @@ Packages are built in dependency order:
    Export in `packages/react/src/index.tsx`:
 
    ```typescript
-  export { YourComponent } from './components/YourComponent'
-  export type { YourComponentProps } from '@tigercat/core'
+   export { YourComponent } from './components/YourComponent'
+   export type { YourComponentProps } from '@tigercat/core'
    ```
 
 5. **Write Tests**
@@ -301,7 +300,6 @@ Packages are built in dependency order:
    ```
 
    Include:
-
    - Component description
    - Props/API reference
    - Usage examples (both Vue and React)

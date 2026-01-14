@@ -8,42 +8,40 @@
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Upload } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Upload } from '@tigercat/vue'
 
-const fileList = ref([]);
+const fileList = ref([])
 
 const handleChange = (file, list) => {
-  console.log('File changed:', file, list);
-};
+  console.log('File changed:', file, list)
+}
 </script>
 
 <template>
-  <Upload v-model:file-list="fileList" @change="handleChange">
-    Select File
-  </Upload>
+  <Upload v-model:file-list="fileList" @change="handleChange"> Select File </Upload>
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Upload, type UploadFile } from '@tigercat/react';
+import { useState } from 'react'
+import { Upload, type UploadFile } from '@tigercat/react'
 
 function App() {
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[]>([])
 
   const handleChange = (file, list) => {
-    console.log('File changed:', file, list);
-    setFileList(list);
-  };
+    console.log('File changed:', file, list)
+    setFileList(list)
+  }
 
   return (
     <Upload fileList={fileList} onChange={handleChange}>
       Select File
     </Upload>
-  );
+  )
 }
 ```
 
@@ -55,10 +53,10 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Upload } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Upload } from '@tigercat/vue'
 
-const fileList = ref([]);
+const fileList = ref([])
 </script>
 
 <template>
@@ -69,10 +67,10 @@ const fileList = ref([]);
 ### React
 
 ```tsx
-import { Upload } from '@tigercat/react';
+import { Upload } from '@tigercat/react'
 
 function App() {
-  return <Upload drag />;
+  return <Upload drag />
 }
 ```
 
@@ -95,10 +93,10 @@ Upload 内部提示文案（如拖拽区“Click to upload / or drag and drop”
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Upload, ConfigProvider } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Upload, ConfigProvider } from '@tigercat/vue'
 
-const fileList = ref([]);
+const fileList = ref([])
 
 const zhCN = {
   upload: {
@@ -106,9 +104,9 @@ const zhCN = {
     dragAndDropText: '或拖拽到此处',
     acceptInfoText: '支持：{accept}',
     maxSizeInfoText: '大小限制：{maxSize}',
-    selectFileText: '选择文件',
-  },
-};
+    selectFileText: '选择文件'
+  }
+}
 </script>
 
 <template>
@@ -126,8 +124,8 @@ const zhCN = {
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Upload, ConfigProvider, type UploadFile } from '@tigercat/react';
+import { useState } from 'react'
+import { Upload, ConfigProvider, type UploadFile } from '@tigercat/react'
 
 const zhCN = {
   upload: {
@@ -135,12 +133,12 @@ const zhCN = {
     dragAndDropText: '或拖拽到此处',
     acceptInfoText: '支持：{accept}',
     maxSizeInfoText: '大小限制：{maxSize}',
-    selectFileText: '选择文件',
-  },
-};
+    selectFileText: '选择文件'
+  }
+}
 
 export function App() {
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[]>([])
 
   return (
     <ConfigProvider locale={zhCN}>
@@ -153,7 +151,7 @@ export function App() {
         labels={{ acceptInfoText: '仅允许：{accept}' }}
       />
     </ConfigProvider>
-  );
+  )
 }
 ```
 
@@ -226,7 +224,7 @@ export function App() {
 {
   /* 限制为 5MB */
 }
-<Upload maxSize={5 * 1024 * 1024}>Upload (Max 5MB)</Upload>;
+;<Upload maxSize={5 * 1024 * 1024}>Upload (Max 5MB)</Upload>
 ```
 
 ## 文件数量限制 (File Limit)
@@ -237,22 +235,18 @@ export function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Upload } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Upload } from '@tigercat/vue'
 
-const fileList = ref([]);
+const fileList = ref([])
 
 const handleExceed = (files, list) => {
-  console.log('Files exceeded limit:', files);
-};
+  console.log('Files exceeded limit:', files)
+}
 </script>
 
 <template>
-  <Upload
-    v-model:file-list="fileList"
-    multiple
-    :limit="3"
-    @exceed="handleExceed">
+  <Upload v-model:file-list="fileList" multiple :limit="3" @exceed="handleExceed">
     Upload (Max 3 files)
   </Upload>
 </template>
@@ -261,21 +255,21 @@ const handleExceed = (files, list) => {
 ### React
 
 ```tsx
-import { useState } from 'react';
-import { Upload, type UploadFile } from '@tigercat/react';
+import { useState } from 'react'
+import { Upload, type UploadFile } from '@tigercat/react'
 
 function App() {
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[]>([])
 
   const handleExceed = (files, list) => {
-    console.log('Files exceeded limit:', files);
-  };
+    console.log('Files exceeded limit:', files)
+  }
 
   return (
     <Upload fileList={fileList} multiple limit={3} onExceed={handleExceed}>
       Upload (Max 3 files)
     </Upload>
-  );
+  )
 }
 ```
 
@@ -327,70 +321,59 @@ function App() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Upload } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Upload } from '@tigercat/vue'
 
-const fileList = ref([]);
+const fileList = ref([])
 
 const customRequest = ({ file, onProgress, onSuccess, onError }) => {
   // 模拟上传进度
-  let progress = 0;
+  let progress = 0
   const interval = setInterval(() => {
-    progress += 10;
-    onProgress(progress);
+    progress += 10
+    onProgress(progress)
 
     if (progress >= 100) {
-      clearInterval(interval);
-      onSuccess({ url: 'https://example.com/file.jpg' });
+      clearInterval(interval)
+      onSuccess({ url: 'https://example.com/file.jpg' })
     }
-  }, 200);
-};
+  }, 200)
+}
 </script>
 
 <template>
-  <Upload v-model:file-list="fileList" :custom-request="customRequest">
-    Custom Upload
-  </Upload>
+  <Upload v-model:file-list="fileList" :custom-request="customRequest"> Custom Upload </Upload>
 </template>
 ```
 
 ### React
 
 ```tsx
-import { useState } from 'react';
-import {
-  Upload,
-  type UploadFile,
-  type UploadRequestOptions,
-} from '@tigercat/react';
+import { useState } from 'react'
+import { Upload, type UploadFile, type UploadRequestOptions } from '@tigercat/react'
 
 function App() {
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[]>([])
 
-  const customRequest = ({
-    file,
-    onProgress,
-    onSuccess,
-    onError,
-  }: UploadRequestOptions) => {
+  const customRequest = ({ file, onProgress, onSuccess, onError }: UploadRequestOptions) => {
     // 模拟上传进度
-    let progress = 0;
+    let progress = 0
     const interval = setInterval(() => {
-      progress += 10;
-      if (onProgress) onProgress(progress);
+      progress += 10
+      if (onProgress) onProgress(progress)
 
       if (progress >= 100) {
-        clearInterval(interval);
-        if (onSuccess) onSuccess({ url: 'https://example.com/file.jpg' });
+        clearInterval(interval)
+        if (onSuccess) onSuccess({ url: 'https://example.com/file.jpg' })
       }
-    }, 200);
-  };
+    }, 200)
+  }
 
   return (
     <Upload fileList={fileList} customRequest={customRequest}>
       Custom Upload
     </Upload>
-  );
+  )
 }
 ```
 
@@ -404,22 +387,22 @@ function App() {
 
 ```vue
 <script setup>
-import { Upload } from '@tigercat/vue';
+import { Upload } from '@tigercat/vue'
 
 const beforeUpload = (file) => {
-  const isJPG = file.type === 'image/jpeg';
-  const isLt2M = file.size / 1024 / 1024 < 2;
+  const isJPG = file.type === 'image/jpeg'
+  const isLt2M = file.size / 1024 / 1024 < 2
 
   if (!isJPG) {
-    alert('只能上传 JPG 格式的图片！');
-    return false;
+    alert('只能上传 JPG 格式的图片！')
+    return false
   }
   if (!isLt2M) {
-    alert('图片大小不能超过 2MB！');
-    return false;
+    alert('图片大小不能超过 2MB！')
+    return false
   }
-  return true;
-};
+  return true
+}
 </script>
 
 <template>
@@ -430,25 +413,25 @@ const beforeUpload = (file) => {
 ### React
 
 ```tsx
-import { Upload } from '@tigercat/react';
+import { Upload } from '@tigercat/react'
 
 function App() {
   const beforeUpload = (file: File) => {
-    const isJPG = file.type === 'image/jpeg';
-    const isLt2M = file.size / 1024 / 1024 < 2;
+    const isJPG = file.type === 'image/jpeg'
+    const isLt2M = file.size / 1024 / 1024 < 2
 
     if (!isJPG) {
-      alert('只能上传 JPG 格式的图片！');
-      return false;
+      alert('只能上传 JPG 格式的图片！')
+      return false
     }
     if (!isLt2M) {
-      alert('图片大小不能超过 2MB！');
-      return false;
+      alert('图片大小不能超过 2MB！')
+      return false
     }
-    return true;
-  };
+    return true
+  }
 
-  return <Upload beforeUpload={beforeUpload}>Upload JPG (&lt; 2MB)</Upload>;
+  return <Upload beforeUpload={beforeUpload}>Upload JPG (&lt; 2MB)</Upload>
 }
 ```
 
@@ -505,15 +488,15 @@ function App() {
 
 ```typescript
 interface UploadFile {
-  uid: string; // 唯一标识符
-  name: string; // 文件名
-  status?: 'ready' | 'uploading' | 'success' | 'error'; // 状态
-  progress?: number; // 上传进度 (0-100)
-  size?: number; // 文件大小（字节）
-  type?: string; // 文件类型
-  url?: string; // 文件 URL
-  file?: File; // 原始 File 对象
-  error?: string; // 错误信息
+  uid: string // 唯一标识符
+  name: string // 文件名
+  status?: 'ready' | 'uploading' | 'success' | 'error' // 状态
+  progress?: number // 上传进度 (0-100)
+  size?: number // 文件大小（字节）
+  type?: string // 文件类型
+  url?: string // 文件 URL
+  file?: File // 原始 File 对象
+  error?: string // 错误信息
 }
 ```
 
@@ -521,10 +504,10 @@ interface UploadFile {
 
 ```typescript
 interface UploadRequestOptions {
-  file: File; // 要上传的文件
-  onProgress?: (progress: number) => void; // 进度回调
-  onSuccess?: (response: unknown) => void; // 成功回调
-  onError?: (error: Error) => void; // 错误回调
+  file: File // 要上传的文件
+  onProgress?: (progress: number) => void // 进度回调
+  onSuccess?: (response: unknown) => void // 成功回调
+  onError?: (error: Error) => void // 错误回调
 }
 ```
 

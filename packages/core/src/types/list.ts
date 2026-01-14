@@ -5,17 +5,17 @@
 /**
  * List size types
  */
-export type ListSize = 'sm' | 'md' | 'lg';
+export type ListSize = 'sm' | 'md' | 'lg'
 
 /**
  * List item layout types
  */
-export type ListItemLayout = 'horizontal' | 'vertical';
+export type ListItemLayout = 'horizontal' | 'vertical'
 
 /**
  * List border style types
  */
-export type ListBorderStyle = 'none' | 'divided' | 'bordered';
+export type ListBorderStyle = 'none' | 'divided' | 'bordered'
 
 /**
  * List data item interface
@@ -24,27 +24,27 @@ export interface ListItem {
   /**
    * Unique key for the list item
    */
-  key?: string | number;
+  key?: string | number
   /**
    * Item title
    */
-  title?: string;
+  title?: string
   /**
    * Item description
    */
-  description?: string;
+  description?: string
   /**
    * Item avatar/icon
    */
-  avatar?: unknown;
+  avatar?: unknown
   /**
    * Extra content
    */
-  extra?: unknown;
+  extra?: unknown
   /**
    * Custom data
    */
-  [key: string]: unknown;
+  [key: string]: unknown
 }
 
 /**
@@ -54,31 +54,31 @@ export interface ListPaginationConfig {
   /**
    * Current page number
    */
-  current?: number;
+  current?: number
   /**
    * Number of items per page
    */
-  pageSize?: number;
+  pageSize?: number
   /**
    * Total number of items
    */
-  total?: number;
+  total?: number
   /**
    * Page size options
    */
-  pageSizeOptions?: number[];
+  pageSizeOptions?: number[]
   /**
    * Show size changer
    */
-  showSizeChanger?: boolean;
+  showSizeChanger?: boolean
   /**
    * Show total items
    */
-  showTotal?: boolean;
+  showTotal?: boolean
   /**
    * Custom total text
    */
-  totalText?: (total: number, range: [number, number]) => string;
+  totalText?: (total: number, range: [number, number]) => string
 }
 
 /**
@@ -89,59 +89,59 @@ export interface ListProps {
    * List size
    * @default 'md'
    */
-  size?: ListSize;
+  size?: ListSize
   /**
    * List border style
    * @default 'divided'
    */
-  bordered?: ListBorderStyle;
+  bordered?: ListBorderStyle
   /**
    * Loading state
    * @default false
    */
-  loading?: boolean;
+  loading?: boolean
   /**
    * Empty state text
    * @default 'No data'
    */
-  emptyText?: string;
+  emptyText?: string
   /**
    * Whether to show split line between items
    * @default true
    */
-  split?: boolean;
+  split?: boolean
   /**
    * Item layout
    * @default 'horizontal'
    */
-  itemLayout?: ListItemLayout;
+  itemLayout?: ListItemLayout
   /**
    * List header content
    */
-  header?: unknown;
+  header?: unknown
   /**
    * List footer content
    */
-  footer?: unknown;
+  footer?: unknown
   /**
    * Pagination configuration, set to false to disable
    */
-  pagination?: ListPaginationConfig | false;
+  pagination?: ListPaginationConfig | false
   /**
    * Grid configuration for grid layout
    */
   grid?: {
-    gutter?: number;
-    column?: number;
-    xs?: number;
-    sm?: number;
-    md?: number;
-    lg?: number;
-    xl?: number;
-    xxl?: number;
-  };
+    gutter?: number
+    column?: number
+    xs?: number
+    sm?: number
+    md?: number
+    lg?: number
+    xl?: number
+    xxl?: number
+  }
   /**
    * Additional CSS classes
    */
-  className?: string;
+  className?: string
 }

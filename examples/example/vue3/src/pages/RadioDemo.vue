@@ -29,8 +29,7 @@ const handleUncontrolledChange = (value: string | number) => {
       <p class="text-gray-600 mb-6">单选框组合使用时，需要通过 RadioGroup 组件进行包裹。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space direction="vertical">
-          <RadioGroup v-model:value="basicValue"
-                      class="flex flex-wrap items-center gap-4">
+          <RadioGroup v-model:value="basicValue" class="flex flex-wrap items-center gap-4">
             <Radio value="male">男</Radio>
             <Radio value="female">女</Radio>
             <Radio value="other">其他</Radio>
@@ -47,9 +46,10 @@ const handleUncontrolledChange = (value: string | number) => {
       <p class="text-gray-600 mb-6">不使用 v-model，通过 defaultValue 初始化，并监听 change。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space direction="vertical">
-          <RadioGroup default-value="male"
-                      class="flex flex-wrap items-center gap-4"
-                      @change="handleUncontrolledChange">
+          <RadioGroup
+            default-value="male"
+            class="flex flex-wrap items-center gap-4"
+            @change="handleUncontrolledChange">
             <Radio value="male">男</Radio>
             <Radio value="female">女</Radio>
             <Radio value="other">其他</Radio>
@@ -68,20 +68,19 @@ const handleUncontrolledChange = (value: string | number) => {
         <Space direction="vertical">
           <div>
             <div class="text-sm text-gray-700 mb-2">部分禁用</div>
-            <RadioGroup v-model:value="disabledValue"
-                        class="flex flex-wrap items-center gap-4">
+            <RadioGroup v-model:value="disabledValue" class="flex flex-wrap items-center gap-4">
               <Radio value="small">小</Radio>
               <Radio value="medium">中</Radio>
-              <Radio value="large"
-                     disabled>大（禁用）</Radio>
+              <Radio value="large" disabled>大（禁用）</Radio>
             </RadioGroup>
           </div>
 
           <div>
             <div class="text-sm text-gray-700 mb-2">整组禁用</div>
-            <RadioGroup v-model:value="groupDisabledValue"
-                        disabled
-                        class="flex flex-wrap items-center gap-4">
+            <RadioGroup
+              v-model:value="groupDisabledValue"
+              disabled
+              class="flex flex-wrap items-center gap-4">
               <Radio value="a">选项 A</Radio>
               <Radio value="b">选项 B</Radio>
               <Radio value="c">选项 C</Radio>
@@ -100,9 +99,10 @@ const handleUncontrolledChange = (value: string | number) => {
         <Space direction="vertical">
           <div>
             <div class="text-sm text-gray-700 mb-2">小号（sm）</div>
-            <RadioGroup v-model:value="sizeSmValue"
-                        size="sm"
-                        class="flex flex-wrap items-center gap-4">
+            <RadioGroup
+              v-model:value="sizeSmValue"
+              size="sm"
+              class="flex flex-wrap items-center gap-4">
               <Radio value="a">选项 A</Radio>
               <Radio value="b">选项 B</Radio>
               <Radio value="c">选项 C</Radio>
@@ -111,9 +111,10 @@ const handleUncontrolledChange = (value: string | number) => {
 
           <div>
             <div class="text-sm text-gray-700 mb-2">默认（md）</div>
-            <RadioGroup v-model:value="sizeMdValue"
-                        size="md"
-                        class="flex flex-wrap items-center gap-4">
+            <RadioGroup
+              v-model:value="sizeMdValue"
+              size="md"
+              class="flex flex-wrap items-center gap-4">
               <Radio value="a">选项 A</Radio>
               <Radio value="b">选项 B</Radio>
               <Radio value="c">选项 C</Radio>
@@ -122,9 +123,10 @@ const handleUncontrolledChange = (value: string | number) => {
 
           <div>
             <div class="text-sm text-gray-700 mb-2">大号（lg）</div>
-            <RadioGroup v-model:value="sizeLgValue"
-                        size="lg"
-                        class="flex flex-wrap items-center gap-4">
+            <RadioGroup
+              v-model:value="sizeLgValue"
+              size="lg"
+              class="flex flex-wrap items-center gap-4">
               <Radio value="a">选项 A</Radio>
               <Radio value="b">选项 B</Radio>
               <Radio value="c">选项 C</Radio>

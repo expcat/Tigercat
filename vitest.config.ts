@@ -12,21 +12,14 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'tests/',
-        'dist/',
-        '**/*.d.ts',
-        '**/*.config.*',
-        '**/__mocks__',
-      ],
-    },
+      exclude: ['node_modules/', 'tests/', 'dist/', '**/*.d.ts', '**/*.config.*', '**/__mocks__']
+    }
   },
   resolve: {
     alias: {
       '@tigercat/core': resolve(__dirname, './packages/core/src'),
       '@tigercat/vue': resolve(__dirname, './packages/vue/src'),
-      '@tigercat/react': resolve(__dirname, './packages/react/src'),
-    },
-  },
+      '@tigercat/react': resolve(__dirname, './packages/react/src')
+    }
+  }
 })

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   classNames,
   buttonBaseClasses,
@@ -6,14 +6,13 @@ import {
   buttonDisabledClasses,
   getButtonVariantClasses,
   getSpinnerSVG,
-  type ButtonProps as CoreButtonProps,
-} from '@tigercat/core';
+  type ButtonProps as CoreButtonProps
+} from '@tigercat/core'
 
 export interface ButtonProps
-  extends CoreButtonProps,
-    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled'> {}
+  extends CoreButtonProps, Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled'> {}
 
-const spinnerSvg = getSpinnerSVG('spinner');
+const spinnerSvg = getSpinnerSVG('spinner')
 
 export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
@@ -27,11 +26,10 @@ export const Button: React.FC<ButtonProps> = ({
   className,
   ...props
 }) => {
-  const isDisabled = disabled || loading;
+  const isDisabled = disabled || loading
 
-  const ariaBusy = props['aria-busy'] ?? (loading ? true : undefined);
-  const ariaDisabled =
-    props['aria-disabled'] ?? (isDisabled ? true : undefined);
+  const ariaBusy = props['aria-busy'] ?? (loading ? true : undefined)
+  const ariaDisabled = props['aria-disabled'] ?? (isDisabled ? true : undefined)
 
   const buttonClasses = classNames(
     buttonBaseClasses,
@@ -40,7 +38,7 @@ export const Button: React.FC<ButtonProps> = ({
     isDisabled && buttonDisabledClasses,
     block && 'w-full',
     className
-  );
+  )
 
   return (
     <button
@@ -49,8 +47,8 @@ export const Button: React.FC<ButtonProps> = ({
       aria-disabled={ariaDisabled}
       disabled={isDisabled}
       onClick={(event) => {
-        if (isDisabled) return;
-        onClick?.(event);
+        if (isDisabled) return
+        onClick?.(event)
       }}
       type={type}
       {...props}>
@@ -64,15 +62,14 @@ export const Button: React.FC<ButtonProps> = ({
             aria-hidden="true"
             focusable="false">
             {spinnerSvg.elements.map((el, index) => {
-              if (el.type === 'circle')
-                return <circle key={index} {...el.attrs} />;
-              if (el.type === 'path') return <path key={index} {...el.attrs} />;
-              return null;
+              if (el.type === 'circle') return <circle key={index} {...el.attrs} />
+              if (el.type === 'path') return <path key={index} {...el.attrs} />
+              return null
             })}
           </svg>
         </span>
       )}
       {children}
     </button>
-  );
-};
+  )
+}

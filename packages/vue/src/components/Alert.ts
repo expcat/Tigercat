@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, ref, PropType } from 'vue';
+import { defineComponent, computed, h, ref, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -20,8 +20,8 @@ import {
   alertCloseIconPath,
   mergeStyleValues,
   type AlertType,
-  type AlertSize,
-} from '@tigercat/core';
+  type AlertSize
+} from '@tigercat/core'
 
 /**
  * Create icon element
@@ -35,28 +35,28 @@ function createIcon(path: string, className: string) {
       fill: 'none',
       viewBox: icon24ViewBox,
       stroke: 'currentColor',
-      'stroke-width': String(icon24StrokeWidth),
+      'stroke-width': String(icon24StrokeWidth)
     },
     [
       h('path', {
         'stroke-linecap': icon24PathStrokeLinecap,
         'stroke-linejoin': icon24PathStrokeLinejoin,
-        d: path,
-      }),
+        d: path
+      })
     ]
-  );
+  )
 }
 
 export interface VueAlertProps {
-  type?: AlertType;
-  size?: AlertSize;
-  title?: string;
-  description?: string;
-  showIcon?: boolean;
-  closable?: boolean;
-  closeAriaLabel?: string;
-  className?: string;
-  style?: Record<string, string | number>;
+  type?: AlertType
+  size?: AlertSize
+  title?: string
+  description?: string
+  showIcon?: boolean
+  closable?: boolean
+  closeAriaLabel?: string
+  className?: string
+  style?: Record<string, string | number>
 }
 
 export const Alert = defineComponent({
@@ -69,7 +69,7 @@ export const Alert = defineComponent({
      */
     type: {
       type: String as PropType<AlertType>,
-      default: 'info' as AlertType,
+      default: 'info' as AlertType
     },
     /**
      * Alert size
@@ -77,21 +77,21 @@ export const Alert = defineComponent({
      */
     size: {
       type: String as PropType<AlertSize>,
-      default: 'md' as AlertSize,
+      default: 'md' as AlertSize
     },
     /**
      * Alert title (main message)
      */
     title: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Alert description (detailed content)
      */
     description: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Whether to show the type icon
@@ -99,7 +99,7 @@ export const Alert = defineComponent({
      */
     showIcon: {
       type: Boolean,
-      default: true,
+      default: true
     },
     /**
      * Whether the alert can be closed
@@ -107,7 +107,7 @@ export const Alert = defineComponent({
      */
     closable: {
       type: Boolean,
-      default: false,
+      default: false
     },
 
     /**
@@ -116,7 +116,7 @@ export const Alert = defineComponent({
      */
     closeAriaLabel: {
       type: String,
-      default: 'Close alert',
+      default: 'Close alert'
     },
 
     /**
@@ -124,7 +124,7 @@ export const Alert = defineComponent({
      */
     className: {
       type: String,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -132,15 +132,13 @@ export const Alert = defineComponent({
      */
     style: {
       type: Object as PropType<Record<string, string | number>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   emits: ['close'],
   setup(props, { slots, emit, attrs }) {
-    const visible = ref(true);
-    const colorScheme = computed(() =>
-      getAlertTypeClasses(props.type, defaultAlertThemeColors)
-    );
+    const visible = ref(true)
+    const colorScheme = computed(() => getAlertTypeClasses(props.type, defaultAlertThemeColors))
 
     const alertClasses = computed(() =>
       classNames(
@@ -149,22 +147,19 @@ export const Alert = defineComponent({
         colorScheme.value.bg,
         colorScheme.value.border
       )
-    );
+    )
 
     const iconClasses = computed(() =>
       classNames(alertIconSizeClasses[props.size], colorScheme.value.icon)
-    );
+    )
 
     const titleClasses = computed(() =>
       classNames(alertTitleSizeClasses[props.size], colorScheme.value.title)
-    );
+    )
 
     const descriptionClasses = computed(() =>
-      classNames(
-        alertDescriptionSizeClasses[props.size],
-        colorScheme.value.description
-      )
-    );
+      classNames(alertDescriptionSizeClasses[props.size], colorScheme.value.description)
+    )
 
     const closeButtonClasses = computed(() =>
       classNames(
@@ -173,51 +168,43 @@ export const Alert = defineComponent({
         colorScheme.value.closeButtonHover,
         colorScheme.value.focus
       )
-    );
+    )
 
     const handleClose = (event: MouseEvent) => {
-      emit('close', event);
+      emit('close', event)
 
       if (!event.defaultPrevented) {
-        visible.value = false;
+        visible.value = false
       }
-    };
+    }
 
     return () => {
       if (!visible.value) {
-        return null;
+        return null
       }
 
-      const attrsRecord = attrs as Record<string, unknown>;
-      const attrsClass = attrsRecord.class;
-      const attrsStyle = attrsRecord.style;
+      const attrsRecord = attrs as Record<string, unknown>
+      const attrsClass = attrsRecord.class
+      const attrsStyle = attrsRecord.style
 
-      const children = [];
+      const children = []
 
       // Add icon if showIcon is true
       if (props.showIcon) {
-        const iconPath = getAlertIconPath(props.type);
+        const iconPath = getAlertIconPath(props.type)
         children.push(
-          h(
-            'div',
-            { class: alertIconContainerClasses },
-            createIcon(iconPath, iconClasses.value)
-          )
-        );
+          h('div', { class: alertIconContainerClasses }, createIcon(iconPath, iconClasses.value))
+        )
       }
 
       // Add content (title and/or description)
-      const contentChildren = [];
+      const contentChildren = []
 
       // Add title
       if (props.title || slots.title) {
         contentChildren.push(
-          h(
-            'div',
-            { class: titleClasses.value },
-            slots.title ? slots.title() : props.title
-          )
-        );
+          h('div', { class: titleClasses.value }, slots.title ? slots.title() : props.title)
+        )
       }
 
       // Add description
@@ -228,7 +215,7 @@ export const Alert = defineComponent({
             { class: descriptionClasses.value },
             slots.description ? slots.description() : props.description
           )
-        );
+        )
       }
 
       // Add default slot content if no title/description
@@ -239,15 +226,11 @@ export const Alert = defineComponent({
         !slots.description &&
         slots.default
       ) {
-        contentChildren.push(
-          h('div', { class: titleClasses.value }, slots.default())
-        );
+        contentChildren.push(h('div', { class: titleClasses.value }, slots.default()))
       }
 
       if (contentChildren.length > 0) {
-        children.push(
-          h('div', { class: alertContentClasses }, contentChildren)
-        );
+        children.push(h('div', { class: alertContentClasses }, contentChildren))
       }
 
       // Add close button if closable
@@ -259,29 +242,25 @@ export const Alert = defineComponent({
               class: closeButtonClasses.value,
               onClick: handleClose,
               'aria-label': props.closeAriaLabel,
-              type: 'button',
+              type: 'button'
             },
             createIcon(alertCloseIconPath, 'h-4 w-4')
           )
-        );
+        )
       }
 
       return h(
         'div',
         {
           ...attrs,
-          class: classNames(
-            alertClasses.value,
-            props.className,
-            coerceClassValue(attrsClass)
-          ),
+          class: classNames(alertClasses.value, props.className, coerceClassValue(attrsClass)),
           style: mergeStyleValues(attrsStyle, props.style),
-          role: 'alert',
+          role: 'alert'
         },
         children
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Alert;
+export default Alert

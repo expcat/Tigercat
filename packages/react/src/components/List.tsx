@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
-import { Button } from './Button';
-import { Select } from './Select';
+import React, { useMemo, useState } from 'react'
+import { Button } from './Button'
+import { Select } from './Select'
 import {
   classNames,
   getListClasses,
@@ -27,10 +27,10 @@ import {
   type ListBorderStyle,
   type ListItemLayout,
   type ListItem,
-  type ListPaginationConfig,
-} from '@tigercat/core';
+  type ListPaginationConfig
+} from '@tigercat/core'
 
-const spinnerSvg = getSpinnerSVG('spinner');
+const spinnerSvg = getSpinnerSVG('spinner')
 
 // Loading spinner component
 const LoadingSpinner: React.FC = () => (
@@ -40,97 +40,98 @@ const LoadingSpinner: React.FC = () => (
     fill="none"
     viewBox={spinnerSvg.viewBox}>
     {spinnerSvg.elements.map((el, index) => {
-      if (el.type === 'circle') return <circle key={index} {...el.attrs} />;
-      if (el.type === 'path') return <path key={index} {...el.attrs} />;
-      return null;
+      if (el.type === 'circle') return <circle key={index} {...el.attrs} />
+      if (el.type === 'path') return <path key={index} {...el.attrs} />
+      return null
     })}
   </svg>
-);
+)
 
-export interface ListProps<T extends ListItem = ListItem>
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface ListProps<
+  T extends ListItem = ListItem
+> extends React.HTMLAttributes<HTMLDivElement> {
   /**
    * List data source
    */
-  dataSource?: T[];
+  dataSource?: T[]
   /**
    * List size
    * @default 'md'
    */
-  size?: ListSize;
+  size?: ListSize
   /**
    * Border style
    * @default 'divided'
    */
-  bordered?: ListBorderStyle;
+  bordered?: ListBorderStyle
   /**
    * Loading state
    * @default false
    */
-  loading?: boolean;
+  loading?: boolean
   /**
    * Empty state text
    * @default 'No data'
    */
-  emptyText?: string;
+  emptyText?: string
   /**
    * Whether to show split line between items
    * @default true
    */
-  split?: boolean;
+  split?: boolean
   /**
    * Item layout
    * @default 'horizontal'
    */
-  itemLayout?: ListItemLayout;
+  itemLayout?: ListItemLayout
   /**
    * List header content
    */
-  header?: React.ReactNode;
+  header?: React.ReactNode
   /**
    * List footer content
    */
-  footer?: React.ReactNode;
+  footer?: React.ReactNode
   /**
    * Pagination configuration, set to false to disable
    * @default false
    */
-  pagination?: ListPaginationConfig | false;
+  pagination?: ListPaginationConfig | false
   /**
    * Grid configuration
    */
   grid?: {
-    gutter?: number;
-    column?: number;
-    xs?: number;
-    sm?: number;
-    md?: number;
-    lg?: number;
-    xl?: number;
-    xxl?: number;
-  };
+    gutter?: number
+    column?: number
+    xs?: number
+    sm?: number
+    md?: number
+    lg?: number
+    xl?: number
+    xxl?: number
+  }
   /**
    * Function to get item key
    */
-  rowKey?: string | ((item: T, index: number) => string | number);
+  rowKey?: string | ((item: T, index: number) => string | number)
   /**
    * Whether items are hoverable
    * @default false
    */
-  hoverable?: boolean;
+  hoverable?: boolean
   /**
    * Custom render function for list items
    */
-  renderItem?: (item: T, index: number) => React.ReactNode;
+  renderItem?: (item: T, index: number) => React.ReactNode
   /**
    * Item click handler
    */
-  onItemClick?: (item: T, index: number) => void;
+  onItemClick?: (item: T, index: number) => void
   /**
    * Page change handler
    */
-  onPageChange?: (page: { current: number; pageSize: number }) => void;
-  className?: string;
+  onPageChange?: (page: { current: number; pageSize: number }) => void
+  className?: string
 }
 
 export const List = <T extends ListItem = ListItem>({
@@ -155,103 +156,85 @@ export const List = <T extends ListItem = ListItem>({
 }: ListProps<T>) => {
   const [currentPage, setCurrentPage] = useState(
     pagination && typeof pagination === 'object' ? pagination.current || 1 : 1
-  );
+  )
 
   const [currentPageSize, setCurrentPageSize] = useState(
-    pagination && typeof pagination === 'object'
-      ? pagination.pageSize || 10
-      : 10
-  );
+    pagination && typeof pagination === 'object' ? pagination.pageSize || 10 : 10
+  )
 
   // Paginated data
   const paginatedData = useMemo(() => {
     if (pagination === false) {
-      return dataSource;
+      return dataSource
     }
 
-    return paginateData(dataSource, currentPage, currentPageSize);
-  }, [dataSource, currentPage, currentPageSize, pagination]);
+    return paginateData(dataSource, currentPage, currentPageSize)
+  }, [dataSource, currentPage, currentPageSize, pagination])
 
   // Pagination info
   const paginationInfo = useMemo(() => {
     if (pagination === false) {
-      return null;
+      return null
     }
 
-    const total = dataSource.length;
-    return calculatePagination(total, currentPage, currentPageSize);
-  }, [dataSource.length, currentPage, currentPageSize, pagination]);
+    const total = dataSource.length
+    return calculatePagination(total, currentPage, currentPageSize)
+  }, [dataSource.length, currentPage, currentPageSize, pagination])
 
   // List classes
   const listClasses = useMemo(() => {
-    return classNames(
-      getListClasses(bordered),
-      listSizeClasses[size],
-      className
-    );
-  }, [bordered, size, className]);
+    return classNames(getListClasses(bordered), listSizeClasses[size], className)
+  }, [bordered, size, className])
 
   // Grid classes
   const gridClasses = useMemo(() => {
-    if (!grid) return '';
+    if (!grid) return ''
 
     return classNames(
       listGridContainerClasses,
-      getGridColumnClasses(
-        grid.column,
-        grid.xs,
-        grid.sm,
-        grid.md,
-        grid.lg,
-        grid.xl,
-        grid.xxl
-      )
-    );
-  }, [grid]);
+      getGridColumnClasses(grid.column, grid.xs, grid.sm, grid.md, grid.lg, grid.xl, grid.xxl)
+    )
+  }, [grid])
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    onPageChange?.({ current: page, pageSize: currentPageSize });
-  };
+    setCurrentPage(page)
+    onPageChange?.({ current: page, pageSize: currentPageSize })
+  }
 
   const handlePageSizeChange = (pageSize: number) => {
-    setCurrentPageSize(pageSize);
-    setCurrentPage(1);
-    onPageChange?.({ current: 1, pageSize });
-  };
+    setCurrentPageSize(pageSize)
+    setCurrentPage(1)
+    onPageChange?.({ current: 1, pageSize })
+  }
 
   const handleItemClick = (item: T, index: number) => {
-    onItemClick?.(item, index);
-  };
+    onItemClick?.(item, index)
+  }
 
   const getItemKey = (item: T, index: number): string | number => {
     if (typeof rowKey === 'function') {
-      return rowKey(item, index);
+      return rowKey(item, index)
     }
-    return (item[rowKey] as string | number) || index;
-  };
+    return (item[rowKey] as string | number) || index
+  }
 
   const renderListHeader = () => {
-    if (!header) return null;
+    if (!header) return null
 
-    return (
-      <div className={getListHeaderFooterClasses(size, false)}>{header}</div>
-    );
-  };
+    return <div className={getListHeaderFooterClasses(size, false)}>{header}</div>
+  }
 
   const renderListFooter = () => {
-    if (!footer) return null;
+    if (!footer) return null
 
-    return (
-      <div className={getListHeaderFooterClasses(size, true)}>{footer}</div>
-    );
-  };
+    return <div className={getListHeaderFooterClasses(size, true)}>{footer}</div>
+  }
 
   const renderDefaultListItem = (item: T, _index: number) => {
-    const itemContent: React.ReactNode[] = [];
+    const itemContent: React.ReactNode[] = []
 
     // Meta section (avatar + content)
-    const metaContent: React.ReactNode[] = [];
+    const metaContent: React.ReactNode[] = []
 
     if (item.avatar) {
       metaContent.push(
@@ -266,23 +249,23 @@ export const List = <T extends ListItem = ListItem>({
             (item.avatar as React.ReactNode)
           )}
         </div>
-      );
+      )
     }
 
-    const contentChildren: React.ReactNode[] = [];
+    const contentChildren: React.ReactNode[] = []
     if (item.title) {
       contentChildren.push(
         <div key="title" className={listItemTitleClasses}>
           {item.title}
         </div>
-      );
+      )
     }
     if (item.description) {
       contentChildren.push(
         <div key="description" className={listItemDescriptionClasses}>
           {item.description}
         </div>
-      );
+      )
     }
 
     if (contentChildren.length > 0) {
@@ -290,7 +273,7 @@ export const List = <T extends ListItem = ListItem>({
         <div key="content" className={listItemContentClasses}>
           {contentChildren}
         </div>
-      );
+      )
     }
 
     if (metaContent.length > 0) {
@@ -298,7 +281,7 @@ export const List = <T extends ListItem = ListItem>({
         <div key="meta" className={listItemMetaClasses}>
           {metaContent}
         </div>
-      );
+      )
     }
 
     // Extra content
@@ -307,33 +290,31 @@ export const List = <T extends ListItem = ListItem>({
         <div key="extra" className={listItemExtraClasses}>
           {item.extra as React.ReactNode}
         </div>
-      );
+      )
     }
 
-    return itemContent;
-  };
+    return itemContent
+  }
 
   const renderListItem = (item: T, index: number) => {
-    const key = getItemKey(item, index);
+    const key = getItemKey(item, index)
     const itemClasses = getListItemClasses(
       size,
       itemLayout,
       split && bordered === 'divided' && !grid,
       hoverable
-    );
+    )
 
-    const clickable = typeof onItemClick === 'function';
-    const handleClick = clickable
-      ? () => handleItemClick(item, index)
-      : undefined;
+    const clickable = typeof onItemClick === 'function'
+    const handleClick = clickable ? () => handleItemClick(item, index) : undefined
     const handleKeyDown = clickable
       ? (e: React.KeyboardEvent<HTMLDivElement>) => {
           if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleItemClick(item, index);
+            e.preventDefault()
+            handleItemClick(item, index)
           }
         }
-      : undefined;
+      : undefined
 
     return (
       <div
@@ -343,16 +324,14 @@ export const List = <T extends ListItem = ListItem>({
         tabIndex={clickable ? 0 : undefined}
         onClick={handleClick}
         onKeyDown={handleKeyDown}>
-        {renderItem
-          ? renderItem(item, index)
-          : renderDefaultListItem(item, index)}
+        {renderItem ? renderItem(item, index) : renderDefaultListItem(item, index)}
       </div>
-    );
-  };
+    )
+  }
 
   const renderListItems = () => {
     if (loading) {
-      return null;
+      return null
     }
 
     if (paginatedData.length === 0) {
@@ -360,38 +339,33 @@ export const List = <T extends ListItem = ListItem>({
         <div className={listEmptyStateClasses} role="status" aria-live="polite">
           {emptyText}
         </div>
-      );
+      )
     }
 
-    const items = paginatedData.map((item, index) =>
-      renderListItem(item, index)
-    );
+    const items = paginatedData.map((item, index) => renderListItem(item, index))
 
     if (grid) {
-      const gutter = grid.gutter;
+      const gutter = grid.gutter
       return (
         <div
           className={gridClasses}
-          style={
-            gutter ? ({ gap: `${gutter}px` } as React.CSSProperties) : undefined
-          }>
+          style={gutter ? ({ gap: `${gutter}px` } as React.CSSProperties) : undefined}>
           {items}
         </div>
-      );
+      )
     }
 
-    return items;
-  };
+    return items
+  }
 
   const renderPagination = () => {
     if (pagination === false || !paginationInfo) {
-      return null;
+      return null
     }
 
-    const { totalPages, startIndex, endIndex, hasNext, hasPrev } =
-      paginationInfo;
-    const total = dataSource.length;
-    const paginationConfig = pagination as ListPaginationConfig;
+    const { totalPages, startIndex, endIndex, hasNext, hasPrev } = paginationInfo
+    const total = dataSource.length
+    const paginationConfig = pagination as ListPaginationConfig
 
     return (
       <div className={listPaginationContainerClasses}>
@@ -412,17 +386,14 @@ export const List = <T extends ListItem = ListItem>({
               size="sm"
               value={currentPageSize}
               onChange={(value) => {
-                if (value == null) return;
-                const nextSize =
-                  typeof value === 'number' ? value : Number(value);
-                if (!Number.isFinite(nextSize)) return;
-                handlePageSizeChange(nextSize);
+                if (value == null) return
+                const nextSize = typeof value === 'number' ? value : Number(value)
+                if (!Number.isFinite(nextSize)) return
+                handlePageSizeChange(nextSize)
               }}
-              options={(
-                paginationConfig.pageSizeOptions || [10, 20, 50, 100]
-              ).map((size) => ({
+              options={(paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map((size) => ({
                 label: `${size} / page`,
-                value: size,
+                value: size
               }))}
             />
           )}
@@ -462,17 +433,13 @@ export const List = <T extends ListItem = ListItem>({
           </div>
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <div className={listWrapperClasses}>
       <div className="relative">
-        <div
-          {...divProps}
-          className={listClasses}
-          role="list"
-          aria-busy={loading || undefined}>
+        <div {...divProps} className={listClasses} role="list" aria-busy={loading || undefined}>
           {renderListHeader()}
           {renderListItems()}
           {renderListFooter()}
@@ -480,10 +447,7 @@ export const List = <T extends ListItem = ListItem>({
 
         {/* Loading overlay */}
         {loading && (
-          <div
-            className={listLoadingOverlayClasses}
-            role="status"
-            aria-live="polite">
+          <div className={listLoadingOverlayClasses} role="status" aria-live="polite">
             <LoadingSpinner />
           </div>
         )}
@@ -492,5 +456,5 @@ export const List = <T extends ListItem = ListItem>({
       {/* Pagination */}
       {renderPagination()}
     </div>
-  );
-};
+  )
+}

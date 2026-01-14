@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Link } from '@tigercat/vue';
+import { Link } from '@tigercat/vue'
 </script>
 
 <template>
@@ -20,7 +20,7 @@ import { Link } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Link } from '@tigercat/react';
+import { Link } from '@tigercat/react'
 
 function App() {
   return (
@@ -28,7 +28,7 @@ function App() {
       <Link href="https://github.com">GitHub</Link>
       <Link href="/about">About Page</Link>
     </>
-  );
+  )
 }
 ```
 
@@ -113,9 +113,7 @@ Link 组件支持 3 种不同的尺寸：
 ```vue
 <template>
   <Link href="https://github.com" target="_blank"> Open in New Tab </Link>
-  <Link href="https://github.com" target="_blank" rel="nofollow">
-    Custom Rel Attribute
-  </Link>
+  <Link href="https://github.com" target="_blank" rel="nofollow"> Custom Rel Attribute </Link>
 </template>
 ```
 
@@ -156,13 +154,13 @@ Link 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { Link } from '@tigercat/vue';
+import { Link } from '@tigercat/vue'
 
 const handleClick = (event) => {
-  console.log('Link clicked:', event);
+  console.log('Link clicked:', event)
   // You can prevent navigation if needed
   // event.preventDefault()
-};
+}
 </script>
 
 <template>
@@ -173,20 +171,20 @@ const handleClick = (event) => {
 ### React
 
 ```tsx
-import { Link } from '@tigercat/react';
+import { Link } from '@tigercat/react'
 
 function App() {
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    console.log('Link clicked:', event);
+    console.log('Link clicked:', event)
     // You can prevent navigation if needed
     // event.preventDefault()
-  };
+  }
 
   return (
     <Link href="#" onClick={handleClick}>
       Click Me
     </Link>
-  );
+  )
 }
 ```
 
@@ -288,9 +286,7 @@ Link 组件遵循 WAI-ARIA 规范：
     </div>
 
     <div>
-      <Link href="https://github.com" target="_blank" variant="primary">
-        Visit GitHub
-      </Link>
+      <Link href="https://github.com" target="_blank" variant="primary"> Visit GitHub </Link>
     </div>
 
     <div>

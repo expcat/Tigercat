@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button, Space, Divider } from '@tigercat/react';
+import React from 'react'
+import { Button, Space, Divider } from '@tigercat/react'
 
 const ButtonDemo: React.FC = () => {
   return (
@@ -48,9 +48,7 @@ const ButtonDemo: React.FC = () => {
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full">
             <div>
-              <h3 className="text-sm font-semibold mb-2 text-gray-700">
-                正常状态
-              </h3>
+              <h3 className="text-sm font-semibold mb-2 text-gray-700">正常状态</h3>
               <Space>
                 <Button variant="primary">主要按钮</Button>
                 <Button variant="secondary">次要按钮</Button>
@@ -58,9 +56,7 @@ const ButtonDemo: React.FC = () => {
               </Space>
             </div>
             <div>
-              <h3 className="text-sm font-semibold mb-2 text-gray-700">
-                禁用状态
-              </h3>
+              <h3 className="text-sm font-semibold mb-2 text-gray-700">禁用状态</h3>
               <Space>
                 <Button variant="primary" disabled>
                   主要按钮
@@ -74,9 +70,7 @@ const ButtonDemo: React.FC = () => {
               </Space>
             </div>
             <div>
-              <h3 className="text-sm font-semibold mb-2 text-gray-700">
-                加载状态
-              </h3>
+              <h3 className="text-sm font-semibold mb-2 text-gray-700">加载状态</h3>
               <Space>
                 <Button variant="primary" loading>
                   主要按钮
@@ -132,7 +126,7 @@ const ButtonDemo: React.FC = () => {
         </div>
       </section>
     </div>
-  );
-};
+  )
+}
 
-export default ButtonDemo;
+export default ButtonDemo

@@ -17,7 +17,9 @@ import { Container, Layout, Header, Sidebar, Content, Footer } from '@tigercat/v
         <Container maxWidth="lg">
           <div class="bg-white border border-gray-200 rounded-lg p-4">
             <div class="font-medium mb-1">这里是 Container 内容区域</div>
-            <div class="text-sm text-gray-600">maxWidth=&quot;lg&quot;，默认居中并带有响应式 padding</div>
+            <div class="text-sm text-gray-600">
+              maxWidth=&quot;lg&quot;，默认居中并带有响应式 padding
+            </div>
           </div>
         </Container>
       </div>
@@ -44,8 +46,7 @@ import { Container, Layout, Header, Sidebar, Content, Footer } from '@tigercat/v
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[260px]">
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
           <div class="flex flex-1">
-            <Sidebar width="192px"
-                     class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
+            <Sidebar width="192px" class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
             <Content class-name="!bg-white !p-4 min-h-[200px]">Content</Content>
           </div>
           <Footer class-name="!bg-gray-800 !text-white !p-4">Footer</Footer>
@@ -61,8 +62,7 @@ import { Container, Layout, Header, Sidebar, Content, Footer } from '@tigercat/v
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[400px]">
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
           <div class="flex flex-1">
-            <Sidebar width="192px"
-                     class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
+            <Sidebar width="192px" class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
             <Layout class-name="min-h-0 flex-1">
               <Content class-name="!bg-white !p-4 min-h-[200px]">Content</Content>
               <Footer class-name="!bg-gray-100 !p-4">Inner Footer</Footer>

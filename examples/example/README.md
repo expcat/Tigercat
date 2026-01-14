@@ -53,6 +53,7 @@ pnpm preview
 Both examples include:
 
 -- **Home Page**: Overview and quick entry for component examples
+
 - **Individual Component Pages**: Each component has its own dedicated demo page with:
   - Component description
   - Multiple usage examples
@@ -63,12 +64,14 @@ Both examples include:
 ## Component Categories
 
 ### 基础组件 (Basic Components)
+
 - Button
 - Icon
 - Link
 - Text
 
 ### 表单组件 (Form Components)
+
 - Input
 - Textarea
 - Checkbox
@@ -82,6 +85,7 @@ Both examples include:
 - FormItem
 
 ### 布局组件 (Layout Components)
+
 - Layout
 - Container
 - Header

@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Alert } from '@tigercat/vue';
+import { Alert } from '@tigercat/vue'
 </script>
 
 <template>
@@ -22,7 +22,7 @@ import { Alert } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Alert } from '@tigercat/react';
+import { Alert } from '@tigercat/react'
 
 function App() {
   return (
@@ -32,7 +32,7 @@ function App() {
       <Alert title="警告提示" type="warning" />
       <Alert title="错误提示" type="error" />
     </>
-  );
+  )
 }
 ```
 
@@ -51,10 +51,7 @@ Alert 组件支持 4 种不同的类型：
 
 ```vue
 <template>
-  <Alert
-    type="info"
-    title="信息提示"
-    description="这是一条信息提示的详细内容" />
+  <Alert type="info" title="信息提示" description="这是一条信息提示的详细内容" />
   <Alert type="success" title="成功提示" description="操作成功完成" />
   <Alert type="warning" title="警告提示" description="请注意相关事项" />
   <Alert type="error" title="错误提示" description="操作失败，请重试" />
@@ -118,12 +115,12 @@ Alert 组件支持 3 种不同的尺寸：
 {
   /* 显示图标（默认） */
 }
-<Alert type="success" title="带图标的提示" showIcon={true} />;
+;<Alert type="success" title="带图标的提示" showIcon={true} />
 
 {
   /* 隐藏图标 */
 }
-<Alert type="warning" title="不带图标的提示" showIcon={false} />;
+;<Alert type="warning" title="不带图标的提示" showIcon={false} />
 ```
 
 ## 可关闭
@@ -134,11 +131,11 @@ Alert 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { Alert } from '@tigercat/vue';
+import { Alert } from '@tigercat/vue'
 
 const handleClose = (event) => {
-  console.log('Alert closed', event);
-};
+  console.log('Alert closed', event)
+}
 </script>
 
 <template>
@@ -153,12 +150,12 @@ const handleClose = (event) => {
 ### React
 
 ```tsx
-import { Alert } from '@tigercat/react';
+import { Alert } from '@tigercat/react'
 
 function App() {
   const handleClose = (event) => {
-    console.log('Alert closed', event);
-  };
+    console.log('Alert closed', event)
+  }
 
   return (
     <Alert
@@ -167,7 +164,7 @@ function App() {
       closable
       onClose={handleClose}
     />
-  );
+  )
 }
 ```
 
@@ -200,16 +197,16 @@ function App() {
 ### React
 
 ```tsx
-<Alert
+;<Alert
   type="success"
   title="操作成功"
   description="您的订单已成功提交，我们将尽快为您处理。订单号：202312310001"
-/>;
+/>
 
 {
   /* 使用 descriptionSlot 自定义描述内容 */
 }
-<Alert
+;<Alert
   type="warning"
   title="注意事项"
   descriptionSlot={
@@ -221,7 +218,7 @@ function App() {
       </ul>
     </>
   }
-/>;
+/>
 ```
 
 ## 自定义内容
@@ -253,16 +250,16 @@ function App() {
 {
   /* 使用 children */
 }
-<Alert type="info">这是通过 children 传入的内容</Alert>;
+;<Alert type="info">这是通过 children 传入的内容</Alert>
 
 {
   /* 使用自定义插槽 */
 }
-<Alert
+;<Alert
   type="success"
   titleSlot={<strong>自定义标题</strong>}
   descriptionSlot={<span>自定义描述内容</span>}
-/>;
+/>
 ```
 
 ## 完整示例
@@ -271,14 +268,14 @@ function App() {
 
 ```vue
 <script setup>
-import { Alert } from '@tigercat/vue';
-import { ref } from 'vue';
+import { Alert } from '@tigercat/vue'
+import { ref } from 'vue'
 
-const showAlert = ref(true);
+const showAlert = ref(true)
 
 const handleClose = () => {
-  console.log('Alert will be closed');
-};
+  console.log('Alert will be closed')
+}
 </script>
 
 <template>
@@ -292,18 +289,10 @@ const handleClose = () => {
     <Alert type="error" title="错误提示" />
 
     <!-- 带描述 -->
-    <Alert
-      type="info"
-      title="详细提示"
-      description="这是一条包含详细描述信息的提示" />
+    <Alert type="info" title="详细提示" description="这是一条包含详细描述信息的提示" />
 
     <!-- 可关闭 -->
-    <Alert
-      v-if="showAlert"
-      type="success"
-      title="可关闭的提示"
-      closable
-      @close="handleClose" />
+    <Alert v-if="showAlert" type="success" title="可关闭的提示" closable @close="handleClose" />
 
     <!-- 完整功能 -->
     <Alert
@@ -320,15 +309,15 @@ const handleClose = () => {
 ### React
 
 ```tsx
-import { Alert } from '@tigercat/react';
-import { useState } from 'react';
+import { Alert } from '@tigercat/react'
+import { useState } from 'react'
 
 function App() {
-  const [showAlert, setShowAlert] = useState(true);
+  const [showAlert, setShowAlert] = useState(true)
 
   const handleClose = () => {
-    console.log('Alert will be closed');
-  };
+    console.log('Alert will be closed')
+  }
 
   return (
     <div className="space-y-4">
@@ -341,21 +330,10 @@ function App() {
       <Alert type="error" title="错误提示" />
 
       {/* 带描述 */}
-      <Alert
-        type="info"
-        title="详细提示"
-        description="这是一条包含详细描述信息的提示"
-      />
+      <Alert type="info" title="详细提示" description="这是一条包含详细描述信息的提示" />
 
       {/* 可关闭 */}
-      {showAlert && (
-        <Alert
-          type="success"
-          title="可关闭的提示"
-          closable
-          onClose={handleClose}
-        />
-      )}
+      {showAlert && <Alert type="success" title="可关闭的提示" closable onClose={handleClose} />}
 
       {/* 完整功能 */}
       <Alert
@@ -367,7 +345,7 @@ function App() {
         closable
       />
     </div>
-  );
+  )
 }
 ```
 

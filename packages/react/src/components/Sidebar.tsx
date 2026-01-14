@@ -1,14 +1,13 @@
-import React from 'react';
+import React from 'react'
 import {
   classNames,
   layoutSidebarClasses,
-  type SidebarProps as CoreSidebarProps,
-} from '@tigercat/core';
+  type SidebarProps as CoreSidebarProps
+} from '@tigercat/core'
 
 export interface ReactSidebarProps
-  extends CoreSidebarProps,
-    Omit<React.HTMLAttributes<HTMLElement>, 'children' | 'width'> {
-  children?: React.ReactNode;
+  extends CoreSidebarProps, Omit<React.HTMLAttributes<HTMLElement>, 'children' | 'width'> {
+  children?: React.ReactNode
 }
 
 export const Sidebar: React.FC<ReactSidebarProps> = ({
@@ -19,17 +18,17 @@ export const Sidebar: React.FC<ReactSidebarProps> = ({
   children,
   ...props
 }) => {
-  const sidebarClasses = classNames(layoutSidebarClasses, className);
+  const sidebarClasses = classNames(layoutSidebarClasses, className)
   const sidebarStyle: React.CSSProperties = {
     ...style,
     width: collapsed ? '0px' : width,
     minWidth: collapsed ? '0px' : width,
-    overflow: 'hidden',
-  };
+    overflow: 'hidden'
+  }
 
   return (
     <aside className={sidebarClasses} style={sidebarStyle} {...props}>
       {!collapsed && children}
     </aside>
-  );
-};
+  )
+}

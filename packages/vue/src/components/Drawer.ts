@@ -8,8 +8,8 @@ import {
   h,
   onMounted,
   onBeforeUnmount,
-  nextTick,
-} from 'vue';
+  nextTick
+} from 'vue'
 import {
   captureActiveElement,
   classNames,
@@ -33,28 +33,28 @@ import {
   getDrawerTitleClasses,
   restoreFocus,
   type DrawerPlacement,
-  type DrawerSize,
-} from '@tigercat/core';
-import { useVueEscapeKey } from '../utils/overlay';
+  type DrawerSize
+} from '@tigercat/core'
+import { useVueEscapeKey } from '../utils/overlay'
 
-let drawerIdCounter = 0;
-const createDrawerId = () => `tiger-drawer-${++drawerIdCounter}`;
+let drawerIdCounter = 0
+const createDrawerId = () => `tiger-drawer-${++drawerIdCounter}`
 
 export interface VueDrawerProps {
-  visible?: boolean;
-  placement?: DrawerPlacement;
-  size?: DrawerSize;
-  title?: string;
-  closable?: boolean;
-  mask?: boolean;
-  maskClosable?: boolean;
-  zIndex?: number;
-  className?: string;
-  bodyClassName?: string;
-  destroyOnClose?: boolean;
-  style?: Record<string, unknown>;
-  closeAriaLabel?: string;
-  locale?: Partial<TigerLocale>;
+  visible?: boolean
+  placement?: DrawerPlacement
+  size?: DrawerSize
+  title?: string
+  closable?: boolean
+  mask?: boolean
+  maskClosable?: boolean
+  zIndex?: number
+  className?: string
+  bodyClassName?: string
+  destroyOnClose?: boolean
+  style?: Record<string, unknown>
+  closeAriaLabel?: string
+  locale?: Partial<TigerLocale>
 }
 
 export const Drawer = defineComponent({
@@ -67,7 +67,7 @@ export const Drawer = defineComponent({
      */
     visible: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Drawer placement
@@ -75,7 +75,7 @@ export const Drawer = defineComponent({
      */
     placement: {
       type: String as PropType<DrawerPlacement>,
-      default: 'right' as DrawerPlacement,
+      default: 'right' as DrawerPlacement
     },
     /**
      * Drawer size
@@ -83,14 +83,14 @@ export const Drawer = defineComponent({
      */
     size: {
       type: String as PropType<DrawerSize>,
-      default: 'md' as DrawerSize,
+      default: 'md' as DrawerSize
     },
     /**
      * Drawer title
      */
     title: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Whether to show close button
@@ -98,7 +98,7 @@ export const Drawer = defineComponent({
      */
     closable: {
       type: Boolean,
-      default: true,
+      default: true
     },
     /**
      * Whether to show mask/backdrop
@@ -106,7 +106,7 @@ export const Drawer = defineComponent({
      */
     mask: {
       type: Boolean,
-      default: true,
+      default: true
     },
     /**
      * Whether clicking mask closes the drawer
@@ -114,7 +114,7 @@ export const Drawer = defineComponent({
      */
     maskClosable: {
       type: Boolean,
-      default: true,
+      default: true
     },
     /**
      * z-index of the drawer
@@ -122,21 +122,21 @@ export const Drawer = defineComponent({
      */
     zIndex: {
       type: Number,
-      default: 1000,
+      default: 1000
     },
     /**
      * Additional CSS class for the drawer container
      */
     className: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Additional CSS class for the drawer body
      */
     bodyClassName: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Whether to destroy content on close
@@ -144,7 +144,7 @@ export const Drawer = defineComponent({
      */
     destroyOnClose: {
       type: Boolean,
-      default: false,
+      default: false
     },
 
     /**
@@ -152,7 +152,7 @@ export const Drawer = defineComponent({
      */
     style: {
       type: Object as PropType<Record<string, unknown>>,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -161,7 +161,7 @@ export const Drawer = defineComponent({
      */
     closeAriaLabel: {
       type: String,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -169,7 +169,7 @@ export const Drawer = defineComponent({
      */
     locale: {
       type: Object as PropType<Partial<TigerLocale>>,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -179,142 +179,139 @@ export const Drawer = defineComponent({
      */
     disableTeleport: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   emits: ['update:visible', 'close', 'after-enter', 'after-leave'],
   setup(props, { slots, emit, attrs }) {
-    const instanceId = ref<string>(createDrawerId());
-    const hasBeenOpened = ref(false);
+    const instanceId = ref<string>(createDrawerId())
+    const hasBeenOpened = ref(false)
 
-    const dialogRef = ref<HTMLElement | null>(null);
-    const closeButtonRef = ref<HTMLButtonElement | null>(null);
-    const previousActiveElement = ref<HTMLElement | null>(null);
+    const dialogRef = ref<HTMLElement | null>(null)
+    const closeButtonRef = ref<HTMLButtonElement | null>(null)
+    const previousActiveElement = ref<HTMLElement | null>(null)
 
-    const titleId = computed(() => `${instanceId.value}-title`);
+    const titleId = computed(() => `${instanceId.value}-title`)
 
     const shouldRender = computed(() => {
       if (props.visible) {
-        hasBeenOpened.value = true;
-        return true;
+        hasBeenOpened.value = true
+        return true
       }
 
-      if (props.destroyOnClose) return false;
-      return hasBeenOpened.value;
-    });
+      if (props.destroyOnClose) return false
+      return hasBeenOpened.value
+    })
 
     const handleClose = () => {
-      emit('update:visible', false);
-      emit('close');
-    };
+      emit('update:visible', false)
+      emit('close')
+    }
 
     const handleMaskClick = (event: MouseEvent) => {
-      if (!props.maskClosable) return;
+      if (!props.maskClosable) return
       if (event.target === event.currentTarget) {
-        handleClose();
+        handleClose()
       }
-    };
+    }
 
-    const escapeEnabled = computed(() => props.visible);
-    let cleanupEscape: (() => void) | undefined;
+    const escapeEnabled = computed(() => props.visible)
+    let cleanupEscape: (() => void) | undefined
 
     onMounted(() => {
       cleanupEscape = useVueEscapeKey({
         enabled: escapeEnabled,
-        onEscape: handleClose,
-      });
-    });
+        onEscape: handleClose
+      })
+    })
 
     onBeforeUnmount(() => {
-      cleanupEscape?.();
-    });
+      cleanupEscape?.()
+    })
 
     watch(
       () => props.visible,
       async (nextVisible) => {
         if (nextVisible) {
-          previousActiveElement.value = captureActiveElement();
+          previousActiveElement.value = captureActiveElement()
 
-          await nextTick();
-          focusFirst([closeButtonRef.value, dialogRef.value]);
-          return;
+          await nextTick()
+          focusFirst([closeButtonRef.value, dialogRef.value])
+          return
         }
 
-        restoreFocus(previousActiveElement.value);
+        restoreFocus(previousActiveElement.value)
       }
-    );
+    )
 
     watch(
       () => props.visible,
       (nextVisible, prevVisible, onCleanup) => {
         if (typeof prevVisible === 'undefined') {
-          if (!nextVisible) return;
+          if (!nextVisible) return
 
           const timer = window.setTimeout(() => {
-            emit('after-enter');
-          }, 300);
+            emit('after-enter')
+          }, 300)
 
-          onCleanup(() => window.clearTimeout(timer));
-          return;
+          onCleanup(() => window.clearTimeout(timer))
+          return
         }
 
-        if (nextVisible === prevVisible) return;
+        if (nextVisible === prevVisible) return
 
         const timer = window.setTimeout(() => {
-          emit(nextVisible ? 'after-enter' : 'after-leave');
-        }, 300);
+          emit(nextVisible ? 'after-enter' : 'after-leave')
+        }, 300)
 
-        onCleanup(() => window.clearTimeout(timer));
+        onCleanup(() => window.clearTimeout(timer))
       },
       { immediate: true }
-    );
+    )
 
     return () => {
-      if (!shouldRender.value) return null;
+      if (!shouldRender.value) return null
 
       const forwardedAttrs = Object.fromEntries(
-        Object.entries(attrs).filter(
-          ([key]) => key !== 'class' && key !== 'style'
-        )
-      );
+        Object.entries(attrs).filter(([key]) => key !== 'class' && key !== 'style')
+      )
 
       const ariaLabelledbyFromAttrs =
         typeof attrs['aria-labelledby'] === 'string'
           ? (attrs['aria-labelledby'] as string)
-          : undefined;
+          : undefined
 
       const ariaLabelledby =
-        ariaLabelledbyFromAttrs ??
-        (props.title || slots.header ? titleId.value : undefined);
+        ariaLabelledbyFromAttrs ?? (props.title || slots.header ? titleId.value : undefined)
 
       const containerClasses = classNames(
         getDrawerContainerClasses(props.zIndex),
         !props.visible && 'pointer-events-none'
-      );
+      )
 
-      const maskClasses = getDrawerMaskClasses(props.visible);
+      const maskClasses = getDrawerMaskClasses(props.visible)
 
       const panelClasses = classNames(
         getDrawerPanelClasses(props.placement, props.visible, props.size),
         'flex flex-col',
         props.className,
         coerceClassValue(attrs.class)
-      );
+      )
 
-      const mergedStyle = mergeStyleValues(attrs.style, props.style);
+      const mergedStyle = mergeStyleValues(attrs.style, props.style)
 
-      const headerClasses = getDrawerHeaderClasses();
-      const bodyClasses = getDrawerBodyClasses(props.bodyClassName);
-      const footerClasses = getDrawerFooterClasses();
-      const closeButtonClasses = getDrawerCloseButtonClasses();
-      const titleClasses = getDrawerTitleClasses();
+      const headerClasses = getDrawerHeaderClasses()
+      const bodyClasses = getDrawerBodyClasses(props.bodyClassName)
+      const footerClasses = getDrawerFooterClasses()
+      const closeButtonClasses = getDrawerCloseButtonClasses()
+      const titleClasses = getDrawerTitleClasses()
 
       const resolvedCloseAriaLabel = resolveLocaleText(
         'Close drawer',
         props.closeAriaLabel,
         props.locale?.drawer?.closeAriaLabel,
         props.locale?.common?.closeText
-      );
+      )
 
       const closeIcon = h(
         'svg',
@@ -323,17 +320,17 @@ export const Drawer = defineComponent({
           fill: 'none',
           stroke: 'currentColor',
           viewBox: closeIconViewBox,
-          xmlns: 'http://www.w3.org/2000/svg',
+          xmlns: 'http://www.w3.org/2000/svg'
         },
         [
           h('path', {
             'stroke-linecap': closeIconPathStrokeLinecap,
             'stroke-linejoin': closeIconPathStrokeLinejoin,
             'stroke-width': closeIconPathStrokeWidth,
-            d: closeIconPathD,
-          }),
+            d: closeIconPathD
+          })
         ]
-      );
+      )
 
       const header =
         props.title || slots.header || props.closable
@@ -343,7 +340,7 @@ export const Drawer = defineComponent({
                     'h3',
                     {
                       id: titleId.value,
-                      class: titleClasses,
+                      class: titleClasses
                     },
                     slots.header ? slots.header() : props.title
                   )
@@ -356,30 +353,26 @@ export const Drawer = defineComponent({
                       class: closeButtonClasses,
                       onClick: handleClose,
                       'aria-label': resolvedCloseAriaLabel,
-                      ref: closeButtonRef,
+                      ref: closeButtonRef
                     },
                     closeIcon
                   )
-                : null,
+                : null
             ])
-          : null;
+          : null
 
-      const body = slots.default
-        ? h('div', { class: bodyClasses }, slots.default())
-        : null;
+      const body = slots.default ? h('div', { class: bodyClasses }, slots.default()) : null
 
-      const footer = slots.footer
-        ? h('div', { class: footerClasses }, slots.footer())
-        : null;
+      const footer = slots.footer ? h('div', { class: footerClasses }, slots.footer()) : null
 
       const mask = props.mask
         ? h('div', {
             class: maskClasses,
             onClick: handleMaskClick,
             'aria-hidden': 'true',
-            'data-tiger-drawer-mask': '',
+            'data-tiger-drawer-mask': ''
           })
-        : null;
+        : null
 
       const panel = h(
         'div',
@@ -392,10 +385,10 @@ export const Drawer = defineComponent({
           'aria-labelledby': ariaLabelledby,
           tabindex: -1,
           ref: dialogRef,
-          'data-tiger-drawer': '',
+          'data-tiger-drawer': ''
         },
         [header, body, footer]
-      );
+      )
 
       const root = h(
         'div',
@@ -404,16 +397,14 @@ export const Drawer = defineComponent({
           style: { zIndex: props.zIndex },
           hidden: !props.visible,
           'aria-hidden': !props.visible ? 'true' : undefined,
-          'data-tiger-drawer-root': '',
+          'data-tiger-drawer-root': ''
         },
         [mask, panel]
-      );
+      )
 
-      return h(Teleport, { to: 'body', disabled: props.disableTeleport }, [
-        root,
-      ]);
-    };
-  },
-});
+      return h(Teleport, { to: 'body', disabled: props.disableTeleport }, [root])
+    }
+  }
+})
 
-export default Drawer;
+export default Drawer

@@ -43,18 +43,12 @@ const clearNotifications = () => {
       <p class="text-gray-600 mb-6">徽章有六种颜色类型：默认、主要、成功、警告、危险和信息。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space wrap>
-          <Badge variant="default"
-                 :content="1" />
-          <Badge variant="primary"
-                 :content="2" />
-          <Badge variant="success"
-                 :content="3" />
-          <Badge variant="warning"
-                 :content="4" />
-          <Badge variant="danger"
-                 :content="5" />
-          <Badge variant="info"
-                 :content="6" />
+          <Badge variant="default" :content="1" />
+          <Badge variant="primary" :content="2" />
+          <Badge variant="success" :content="3" />
+          <Badge variant="warning" :content="4" />
+          <Badge variant="danger" :content="5" />
+          <Badge variant="info" :content="6" />
         </Space>
       </div>
       <Divider class="my-6" />
@@ -66,12 +60,9 @@ const clearNotifications = () => {
       <p class="text-gray-600 mb-6">徽章有三种尺寸：小、中、大。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space align="center">
-          <Badge size="sm"
-                 :content="5" />
-          <Badge size="md"
-                 :content="10" />
-          <Badge size="lg"
-                 :content="99" />
+          <Badge size="sm" :content="5" />
+          <Badge size="md" :content="10" />
+          <Badge size="lg" :content="99" />
         </Space>
       </div>
       <Divider class="my-6" />
@@ -83,18 +74,12 @@ const clearNotifications = () => {
       <p class="text-gray-600 mb-6">用于简单的通知提示，不显示具体数字。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space wrap>
-          <Badge type="dot"
-                 variant="default" />
-          <Badge type="dot"
-                 variant="primary" />
-          <Badge type="dot"
-                 variant="success" />
-          <Badge type="dot"
-                 variant="warning" />
-          <Badge type="dot"
-                 variant="danger" />
-          <Badge type="dot"
-                 variant="info" />
+          <Badge type="dot" variant="default" />
+          <Badge type="dot" variant="primary" />
+          <Badge type="dot" variant="success" />
+          <Badge type="dot" variant="warning" />
+          <Badge type="dot" variant="danger" />
+          <Badge type="dot" variant="info" />
         </Space>
       </div>
       <Divider class="my-6" />
@@ -106,18 +91,10 @@ const clearNotifications = () => {
       <p class="text-gray-600 mb-6">显示文本内容的徽章。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space wrap>
-          <Badge type="text"
-                 content="NEW"
-                 variant="danger" />
-          <Badge type="text"
-                 content="HOT"
-                 variant="warning" />
-          <Badge type="text"
-                 content="VIP"
-                 variant="primary" />
-          <Badge type="text"
-                 content="推荐"
-                 variant="success" />
+          <Badge type="text" content="NEW" variant="danger" />
+          <Badge type="text" content="HOT" variant="warning" />
+          <Badge type="text" content="VIP" variant="primary" />
+          <Badge type="text" content="推荐" variant="success" />
         </Space>
       </div>
       <Divider class="my-6" />
@@ -131,10 +108,8 @@ const clearNotifications = () => {
         <Space>
           <Badge :content="99" />
           <Badge :content="100" />
-          <Badge :content="150"
-                 :max="99" />
-          <Badge :content="1000"
-                 :max="999" />
+          <Badge :content="150" :max="99" />
+          <Badge :content="1000" :max="999" />
         </Space>
       </div>
       <Divider class="my-6" />
@@ -143,23 +118,20 @@ const clearNotifications = () => {
     <!-- 包裹模式 - 按钮 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">包裹元素</h2>
-      <p class="text-gray-600 mb-6">徽章可以附加到其他元素上，通过设置 standalone 为 false 启用包裹模式。</p>
+      <p class="text-gray-600 mb-6">
+        徽章可以附加到其他元素上，通过设置 standalone 为 false 启用包裹模式。
+      </p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space>
-          <Badge :content="5"
-                 :standalone="false">
+          <Badge :content="5" :standalone="false">
             <Button>通知</Button>
           </Badge>
 
-          <Badge :content="99"
-                 :standalone="false"
-                 variant="danger">
+          <Badge :content="99" :standalone="false" variant="danger">
             <Button variant="secondary">消息</Button>
           </Badge>
 
-          <Badge type="dot"
-                 :standalone="false"
-                 variant="danger">
+          <Badge type="dot" :standalone="false" variant="danger">
             <Button variant="outline">邮件</Button>
           </Badge>
         </Space>
@@ -173,27 +145,19 @@ const clearNotifications = () => {
       <p class="text-gray-600 mb-6">在包裹模式下，可以设置徽章的位置。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space wrap>
-          <Badge :content="5"
-                 :standalone="false"
-                 position="top-right">
+          <Badge :content="5" :standalone="false" position="top-right">
             <div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">右上</div>
           </Badge>
 
-          <Badge :content="5"
-                 :standalone="false"
-                 position="top-left">
+          <Badge :content="5" :standalone="false" position="top-left">
             <div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">左上</div>
           </Badge>
 
-          <Badge :content="5"
-                 :standalone="false"
-                 position="bottom-right">
+          <Badge :content="5" :standalone="false" position="bottom-right">
             <div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">右下</div>
           </Badge>
 
-          <Badge :content="5"
-                 :standalone="false"
-                 position="bottom-left">
+          <Badge :content="5" :standalone="false" position="bottom-left">
             <div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">左下</div>
           </Badge>
         </Space>
@@ -215,8 +179,7 @@ const clearNotifications = () => {
 
           <div>
             <p class="text-sm text-gray-600 mb-2">显示零值</p>
-            <Badge :content="0"
-                   :show-zero="true" />
+            <Badge :content="0" :show-zero="true" />
           </div>
         </Space>
       </div>
@@ -233,19 +196,11 @@ const clearNotifications = () => {
         <h3 class="text-lg font-semibold mb-3">通知中心</h3>
         <div class="p-6 bg-gray-50 rounded-lg">
           <Space>
-            <Badge :content="notificationCount"
-                   :standalone="false"
-                   variant="danger">
-              <Button variant="primary"
-                      @click="incrementNotifications">
-                通知
-              </Button>
+            <Badge :content="notificationCount" :standalone="false" variant="danger">
+              <Button variant="primary" @click="incrementNotifications"> 通知 </Button>
             </Badge>
 
-            <Button variant="secondary"
-                    @click="clearNotifications">
-              清除通知
-            </Button>
+            <Button variant="secondary" @click="clearNotifications"> 清除通知 </Button>
           </Space>
         </div>
       </div>
@@ -255,16 +210,11 @@ const clearNotifications = () => {
         <h3 class="text-lg font-semibold mb-3">消息和购物车</h3>
         <div class="p-6 bg-gray-50 rounded-lg">
           <Space>
-            <Badge :content="messageCount"
-                   :standalone="false"
-                   variant="primary"
-                   :max="99">
+            <Badge :content="messageCount" :standalone="false" variant="primary" :max="99">
               <Button variant="primary">消息</Button>
             </Badge>
 
-            <Badge :content="cartItems"
-                   :standalone="false"
-                   variant="danger">
+            <Badge :content="cartItems" :standalone="false" variant="danger">
               <Button variant="secondary">购物车</Button>
             </Badge>
           </Space>
@@ -277,10 +227,9 @@ const clearNotifications = () => {
         <div class="p-6 bg-gray-50 rounded-lg">
           <Space wrap>
             <div class="flex items-center gap-3">
-              <Badge type="dot"
-                     variant="success"
-                     :standalone="false">
-                <div class="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center text-white font-bold">
+              <Badge type="dot" variant="success" :standalone="false">
+                <div
+                  class="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center text-white font-bold">
                   张三
                 </div>
               </Badge>
@@ -288,10 +237,9 @@ const clearNotifications = () => {
             </div>
 
             <div class="flex items-center gap-3">
-              <Badge type="dot"
-                     variant="default"
-                     :standalone="false">
-                <div class="w-12 h-12 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold">
+              <Badge type="dot" variant="default" :standalone="false">
+                <div
+                  class="w-12 h-12 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold">
                   李四
                 </div>
               </Badge>
@@ -299,10 +247,9 @@ const clearNotifications = () => {
             </div>
 
             <div class="flex items-center gap-3">
-              <Badge type="dot"
-                     variant="warning"
-                     :standalone="false">
-                <div class="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-white font-bold">
+              <Badge type="dot" variant="warning" :standalone="false">
+                <div
+                  class="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-white font-bold">
                   王五
                 </div>
               </Badge>

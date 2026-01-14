@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   classNames,
   getTagVariantClasses,
@@ -11,24 +11,21 @@ import {
   tagSizeClasses,
   tagCloseButtonBaseClasses,
   tagCloseIconPath,
-  type TagProps as CoreTagProps,
-} from '@tigercat/core';
+  type TagProps as CoreTagProps
+} from '@tigercat/core'
 
 export type TagProps = CoreTagProps &
-  Omit<
-    React.HTMLAttributes<HTMLSpanElement>,
-    keyof CoreTagProps | 'onClose'
-  > & {
+  Omit<React.HTMLAttributes<HTMLSpanElement>, keyof CoreTagProps | 'onClose'> & {
     /**
      * Close event handler
      */
-    onClose?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+    onClose?: (event: React.MouseEvent<HTMLButtonElement>) => void
 
     /**
      * Tag content
      */
-    children?: React.ReactNode;
-  };
+    children?: React.ReactNode
+  }
 
 const CloseIcon: React.FC = () => (
   <svg
@@ -46,7 +43,7 @@ const CloseIcon: React.FC = () => (
       d={tagCloseIconPath}
     />
   </svg>
-);
+)
 
 export const Tag: React.FC<TagProps> = ({
   variant = 'default',
@@ -58,33 +55,29 @@ export const Tag: React.FC<TagProps> = ({
   className,
   ...props
 }) => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(true)
 
   const tagClasses = classNames(
     tagBaseClasses,
     getTagVariantClasses(variant),
     tagSizeClasses[size],
     className
-  );
+  )
 
-  const scheme = defaultTagThemeColors[variant];
-  const closeButtonClasses = classNames(
-    tagCloseButtonBaseClasses,
-    scheme.closeBgHover,
-    scheme.text
-  );
+  const scheme = defaultTagThemeColors[variant]
+  const closeButtonClasses = classNames(tagCloseButtonBaseClasses, scheme.closeBgHover, scheme.text)
 
   const handleClose = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    onClose?.(event);
+    event.stopPropagation()
+    onClose?.(event)
 
     if (!event.defaultPrevented) {
-      setIsVisible(false);
+      setIsVisible(false)
     }
-  };
+  }
 
   if (!isVisible) {
-    return null;
+    return null
   }
 
   return (
@@ -100,5 +93,5 @@ export const Tag: React.FC<TagProps> = ({
         </button>
       )}
     </span>
-  );
-};
+  )
+}

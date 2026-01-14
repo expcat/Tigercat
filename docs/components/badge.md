@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Badge } from '@tigercat/vue';
+import { Badge } from '@tigercat/vue'
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Badge } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Badge } from '@tigercat/react';
+import { Badge } from '@tigercat/react'
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
       <Badge content={99} />
       <Badge content="Hot" />
     </>
-  );
+  )
 }
 ```
 
@@ -176,12 +176,12 @@ Badge 组件支持 3 种展示类型：
 ### React
 
 ```tsx
-<Badge content={100} />;
+;<Badge content={100} />
 {
   /* 显示 99+ */
 }
 
-<Badge content={1000} max={999} />;
+;<Badge content={1000} max={999} />
 {
   /* 显示 999+ */
 }
@@ -206,12 +206,12 @@ Badge 组件支持 3 种展示类型：
 ### React
 
 ```tsx
-<Badge content={0} />;
+;<Badge content={0} />
 {
   /* 不显示 */
 }
 
-<Badge content={0} showZero={true} />;
+;<Badge content={0} showZero={true} />
 {
   /* 显示 0 */
 }
@@ -314,10 +314,10 @@ Badge 组件支持 3 种展示类型：
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Badge } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Badge } from '@tigercat/vue'
 
-const unreadMessages = ref(5);
+const unreadMessages = ref(5)
 </script>
 
 <template>
@@ -330,17 +330,17 @@ const unreadMessages = ref(5);
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { Badge } from '@tigercat/react';
+import { useState } from 'react'
+import { Badge } from '@tigercat/react'
 
 function MessageButton() {
-  const [unreadMessages, setUnreadMessages] = useState(5);
+  const [unreadMessages, setUnreadMessages] = useState(5)
 
   return (
     <Badge content={unreadMessages} standalone={false}>
       <button className="px-4 py-2 bg-blue-500 text-white rounded">消息</button>
     </Badge>
-  );
+  )
 }
 ```
 
@@ -350,10 +350,10 @@ function MessageButton() {
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Badge } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Badge } from '@tigercat/vue'
 
-const cartItems = ref(3);
+const cartItems = ref(3)
 </script>
 
 <template>
@@ -372,19 +372,15 @@ const cartItems = ref(3);
 #### React
 
 ```tsx
-import { useState } from 'react';
-import { Badge } from '@tigercat/react';
+import { useState } from 'react'
+import { Badge } from '@tigercat/react'
 
 function ShoppingCart() {
-  const [cartItems, setCartItems] = useState(3);
+  const [cartItems, setCartItems] = useState(3)
 
   return (
     <Badge content={cartItems} standalone={false} variant="danger">
-      <svg
-        className="w-6 h-6"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24">
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -393,7 +389,7 @@ function ShoppingCart() {
         />
       </svg>
     </Badge>
-  );
+  )
 }
 ```
 
@@ -429,12 +425,7 @@ function ShoppingCart() {
 
 ```vue
 <template>
-  <Badge
-    type="text"
-    content="NEW"
-    variant="danger"
-    :standalone="false"
-    position="top-right">
+  <Badge type="text" content="NEW" variant="danger" :standalone="false" position="top-right">
     <button class="px-6 py-2 bg-gray-100 rounded">新功能</button>
   </Badge>
 </template>
@@ -443,12 +434,7 @@ function ShoppingCart() {
 #### React
 
 ```tsx
-<Badge
-  type="text"
-  content="NEW"
-  variant="danger"
-  standalone={false}
-  position="top-right">
+<Badge type="text" content="NEW" variant="danger" standalone={false} position="top-right">
   <button className="px-6 py-2 bg-gray-100 rounded">新功能</button>
 </Badge>
 ```

@@ -21,19 +21,19 @@ export interface CardProps {
    * @default 'default'
    */
   variant?: CardVariant
-  
+
   /**
    * Card size (affects padding)
    * @default 'md'
    */
   size?: CardSize
-  
+
   /**
    * Whether the card is hoverable (shows hover effect)
    * @default false
    */
   hoverable?: boolean
-  
+
   /**
    * Additional CSS classes
    */

@@ -9,67 +9,67 @@ export interface TreeNode {
   /**
    * Unique key for the tree node
    */
-  key: string | number;
+  key: string | number
   /**
    * Node label/title
    */
-  label: string;
+  label: string
   /**
    * Child nodes
    */
-  children?: TreeNode[];
+  children?: TreeNode[]
   /**
    * Whether the node is disabled
    */
-  disabled?: boolean;
+  disabled?: boolean
   /**
    * Whether the node is a leaf node (no children)
    */
-  isLeaf?: boolean;
+  isLeaf?: boolean
   /**
    * Custom icon for the node
    */
-  icon?: unknown;
+  icon?: unknown
   /**
    * Custom data
    */
-  [key: string]: unknown;
+  [key: string]: unknown
 }
 
 /**
  * Tree selection mode
  */
-export type TreeSelectionMode = "none" | "single" | "multiple";
+export type TreeSelectionMode = 'none' | 'single' | 'multiple'
 
 /**
  * Tree check strategy - determines which nodes to return when checked
  */
-export type TreeCheckStrategy = "all" | "parent" | "child";
+export type TreeCheckStrategy = 'all' | 'parent' | 'child'
 
 /**
  * Tree node expanded state
  */
 export interface TreeExpandedState {
-  [key: string | number]: boolean;
+  [key: string | number]: boolean
 }
 
 /**
  * Tree node selected/checked state
  */
 export interface TreeCheckedState {
-  checked: (string | number)[];
-  halfChecked: (string | number)[];
+  checked: (string | number)[]
+  halfChecked: (string | number)[]
 }
 
 /**
  * Lazy load function type
  */
-export type TreeLoadDataFn = (node: TreeNode) => Promise<TreeNode[]>;
+export type TreeLoadDataFn = (node: TreeNode) => Promise<TreeNode[]>
 
 /**
  * Tree filter function type
  */
-export type TreeFilterFn = (value: string, node: TreeNode) => boolean;
+export type TreeFilterFn = (value: string, node: TreeNode) => boolean
 
 /**
  * Base tree props interface
@@ -78,119 +78,119 @@ export interface TreeProps {
   /**
    * Tree data source
    */
-  treeData?: TreeNode[];
+  treeData?: TreeNode[]
   /**
    * Selection mode
    * @default 'none'
    */
-  selectionMode?: TreeSelectionMode;
+  selectionMode?: TreeSelectionMode
   /**
    * Whether to show checkboxes
    * @default false
    */
-  checkable?: boolean;
+  checkable?: boolean
   /**
    * Whether to show expand/collapse icon
    * @default true
    */
-  showIcon?: boolean;
+  showIcon?: boolean
   /**
    * Whether to show connecting lines
    * @default false
    */
-  showLine?: boolean;
+  showLine?: boolean
   /**
    * Default expanded node keys
    */
-  defaultExpandedKeys?: (string | number)[];
+  defaultExpandedKeys?: (string | number)[]
   /**
    * Default selected node keys
    */
-  defaultSelectedKeys?: (string | number)[];
+  defaultSelectedKeys?: (string | number)[]
   /**
    * Default checked node keys
    */
-  defaultCheckedKeys?: (string | number)[];
+  defaultCheckedKeys?: (string | number)[]
   /**
    * Expanded node keys (controlled)
    */
-  expandedKeys?: (string | number)[];
+  expandedKeys?: (string | number)[]
   /**
    * Selected node keys (controlled)
    */
-  selectedKeys?: (string | number)[];
+  selectedKeys?: (string | number)[]
   /**
    * Checked node keys (controlled)
    */
-  checkedKeys?: (string | number)[] | TreeCheckedState;
+  checkedKeys?: (string | number)[] | TreeCheckedState
   /**
    * Whether to expand all nodes by default
    * @default false
    */
-  defaultExpandAll?: boolean;
+  defaultExpandAll?: boolean
   /**
    * Whether parent and children are associated when checked
    * @default false
    */
-  checkStrictly?: boolean;
+  checkStrictly?: boolean
   /**
    * Check strategy for return values
    * @default 'all'
    */
-  checkStrategy?: TreeCheckStrategy;
+  checkStrategy?: TreeCheckStrategy
   /**
    * Whether to allow node selection
    * @default true
    */
-  selectable?: boolean;
+  selectable?: boolean
   /**
    * Whether multiple nodes can be selected
    * @default false
    */
-  multiple?: boolean;
+  multiple?: boolean
   /**
    * Whether to load data asynchronously
    */
-  loadData?: TreeLoadDataFn;
+  loadData?: TreeLoadDataFn
   /**
    * Filter value for highlighting matched nodes
    */
-  filterValue?: string;
+  filterValue?: string
   /**
    * Custom filter function
    */
-  filterFn?: TreeFilterFn;
+  filterFn?: TreeFilterFn
   /**
    * Whether to auto expand parent nodes when filtering
    * @default true
    */
-  autoExpandParent?: boolean;
+  autoExpandParent?: boolean
   /**
    * Virtual scroll configuration
    */
-  virtual?: boolean;
+  virtual?: boolean
   /**
    * Height for virtual scroll
    */
-  height?: number | string;
+  height?: number | string
   /**
    * Whether nodes are draggable
    * @default false
    */
-  draggable?: boolean;
+  draggable?: boolean
   /**
    * Block node style (full width)
    * @default false
    */
-  blockNode?: boolean;
+  blockNode?: boolean
   /**
    * Additional CSS classes
    */
-  className?: string;
+  className?: string
 
   /**
    * Accessible label for the tree container
    * @default 'Tree'
    */
-  ariaLabel?: string;
+  ariaLabel?: string
 }

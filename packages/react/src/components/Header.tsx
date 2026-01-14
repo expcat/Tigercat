@@ -1,14 +1,13 @@
-import React from 'react';
+import React from 'react'
 import {
   classNames,
   layoutHeaderClasses,
-  type HeaderProps as CoreHeaderProps,
-} from '@tigercat/core';
+  type HeaderProps as CoreHeaderProps
+} from '@tigercat/core'
 
 export interface ReactHeaderProps
-  extends CoreHeaderProps,
-    Omit<React.HTMLAttributes<HTMLElement>, 'children' | 'height'> {
-  children?: React.ReactNode;
+  extends CoreHeaderProps, Omit<React.HTMLAttributes<HTMLElement>, 'children' | 'height'> {
+  children?: React.ReactNode
 }
 
 export const Header: React.FC<ReactHeaderProps> = ({
@@ -18,12 +17,12 @@ export const Header: React.FC<ReactHeaderProps> = ({
   children,
   ...props
 }) => {
-  const headerClasses = classNames(layoutHeaderClasses, className);
-  const headerStyle: React.CSSProperties = { ...style, height };
+  const headerClasses = classNames(layoutHeaderClasses, className)
+  const headerStyle: React.CSSProperties = { ...style, height }
 
   return (
     <header className={headerClasses} style={headerStyle} {...props}>
       {children}
     </header>
-  );
-};
+  )
+}

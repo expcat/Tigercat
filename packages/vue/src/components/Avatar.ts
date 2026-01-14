@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, ref, PropType } from 'vue';
+import { defineComponent, computed, h, ref, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -11,19 +11,19 @@ import {
   avatarImageClasses,
   getInitials,
   type AvatarSize,
-  type AvatarShape,
-} from '@tigercat/core';
+  type AvatarShape
+} from '@tigercat/core'
 
 export interface VueAvatarProps {
-  size?: AvatarSize;
-  shape?: AvatarShape;
-  src?: string;
-  alt?: string;
-  text?: string;
-  bgColor?: string;
-  textColor?: string;
-  className?: string;
-  style?: Record<string, string | number>;
+  size?: AvatarSize
+  shape?: AvatarShape
+  src?: string
+  alt?: string
+  text?: string
+  bgColor?: string
+  textColor?: string
+  className?: string
+  style?: Record<string, string | number>
 }
 
 export const Avatar = defineComponent({
@@ -36,7 +36,7 @@ export const Avatar = defineComponent({
      */
     size: {
       type: String as PropType<AvatarSize>,
-      default: 'md' as AvatarSize,
+      default: 'md' as AvatarSize
     },
     /**
      * Avatar shape
@@ -44,49 +44,49 @@ export const Avatar = defineComponent({
      */
     shape: {
       type: String as PropType<AvatarShape>,
-      default: 'circle' as AvatarShape,
+      default: 'circle' as AvatarShape
     },
     /**
      * Image source URL
      */
     src: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Alternative text for image
      */
     alt: {
       type: String,
-      default: '',
+      default: ''
     },
     /**
      * Text content to display (e.g., initials)
      */
     text: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Background color for text/icon avatars
      */
     bgColor: {
       type: String,
-      default: avatarDefaultBgColor,
+      default: avatarDefaultBgColor
     },
     /**
      * Text color for text/icon avatars
      */
     textColor: {
       type: String,
-      default: avatarDefaultTextColor,
+      default: avatarDefaultTextColor
     },
     /**
      * Additional CSS classes
      */
     className: {
       type: String,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -94,13 +94,13 @@ export const Avatar = defineComponent({
      */
     style: {
       type: Object as PropType<Record<string, string | number>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   setup(props, { slots, attrs }) {
-    const imageError = ref(false);
+    const imageError = ref(false)
 
-    const hasImage = computed(() => Boolean(props.src) && !imageError.value);
+    const hasImage = computed(() => Boolean(props.src) && !imageError.value)
 
     const avatarClasses = computed(() =>
       classNames(
@@ -110,41 +110,32 @@ export const Avatar = defineComponent({
         !hasImage.value && props.bgColor,
         !hasImage.value && props.textColor
       )
-    );
+    )
 
-    const displayText = computed(() =>
-      props.text ? getInitials(props.text) : ''
-    );
+    const displayText = computed(() => (props.text ? getInitials(props.text) : ''))
 
     return () => {
       // Priority: image > text > icon (slot)
 
-      const attrsRecord = attrs as Record<string, unknown>;
-      const attrsClass = attrsRecord.class;
-      const attrsStyle = attrsRecord.style;
-      const ariaLabelProp = attrsRecord['aria-label'] as string | undefined;
-      const ariaLabelledbyProp = attrsRecord['aria-labelledby'] as
-        | string
-        | undefined;
-      const ariaHiddenProp = attrsRecord['aria-hidden'] as boolean | undefined;
+      const attrsRecord = attrs as Record<string, unknown>
+      const attrsClass = attrsRecord.class
+      const attrsStyle = attrsRecord.style
+      const ariaLabelProp = attrsRecord['aria-label'] as string | undefined
+      const ariaLabelledbyProp = attrsRecord['aria-labelledby'] as string | undefined
+      const ariaHiddenProp = attrsRecord['aria-hidden'] as boolean | undefined
 
       const computedLabel =
         ariaLabelProp ??
         (props.alt.trim() ? props.alt : undefined) ??
-        (props.text?.trim() || undefined);
+        (props.text?.trim() || undefined)
 
-      const isDecorative =
-        ariaHiddenProp === true || (!computedLabel && !ariaLabelledbyProp);
+      const isDecorative = ariaHiddenProp === true || (!computedLabel && !ariaLabelledbyProp)
 
       const baseSpanProps = {
         ...attrs,
-        class: classNames(
-          avatarClasses.value,
-          props.className,
-          coerceClassValue(attrsClass)
-        ),
-        style: mergeStyleValues(attrsStyle, props.style),
-      };
+        class: classNames(avatarClasses.value, props.className, coerceClassValue(attrsClass)),
+        style: mergeStyleValues(attrsStyle, props.style)
+      }
 
       // If src is provided and not errored, show image
       if (hasImage.value) {
@@ -152,7 +143,7 @@ export const Avatar = defineComponent({
           'span',
           {
             ...baseSpanProps,
-            'aria-hidden': isDecorative ? true : ariaHiddenProp,
+            'aria-hidden': isDecorative ? true : ariaHiddenProp
           },
           [
             h('img', {
@@ -160,11 +151,11 @@ export const Avatar = defineComponent({
               alt: props.alt,
               class: avatarImageClasses,
               onError: () => {
-                imageError.value = true;
-              },
-            }),
+                imageError.value = true
+              }
+            })
           ]
-        );
+        )
       }
 
       // If text is provided, show text
@@ -178,11 +169,11 @@ export const Avatar = defineComponent({
               : {
                   role: 'img',
                   'aria-label': computedLabel,
-                  'aria-labelledby': ariaLabelledbyProp,
-                }),
+                  'aria-labelledby': ariaLabelledbyProp
+                })
           },
           displayText.value
-        );
+        )
       }
 
       // Otherwise, show icon from slot
@@ -195,13 +186,13 @@ export const Avatar = defineComponent({
             : {
                 role: 'img',
                 'aria-label': computedLabel,
-                'aria-labelledby': ariaLabelledbyProp,
-              }),
+                'aria-labelledby': ariaLabelledbyProp
+              })
         },
         slots.default ? slots.default() : undefined
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Avatar;
+export default Avatar

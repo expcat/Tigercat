@@ -8,14 +8,14 @@
 
 ```vue
 <script setup>
-import { Descriptions } from "@tigercat/vue";
+import { Descriptions } from '@tigercat/vue'
 
 const items = [
-  { label: "Name", content: "John Doe" },
-  { label: "Email", content: "john.doe@example.com" },
-  { label: "Phone", content: "+1 234 567 8900" },
-  { label: "Address", content: "123 Main Street, City, Country" },
-];
+  { label: 'Name', content: 'John Doe' },
+  { label: 'Email', content: 'john.doe@example.com' },
+  { label: 'Phone', content: '+1 234 567 8900' },
+  { label: 'Address', content: '123 Main Street, City, Country' }
+]
 </script>
 
 <template>
@@ -26,17 +26,17 @@ const items = [
 ### React
 
 ```tsx
-import { Descriptions } from "@tigercat/react";
+import { Descriptions } from '@tigercat/react'
 
 function App() {
   const items = [
-    { label: "Name", content: "John Doe" },
-    { label: "Email", content: "john.doe@example.com" },
-    { label: "Phone", content: "+1 234 567 8900" },
-    { label: "Address", content: "123 Main Street, City, Country" },
-  ];
+    { label: 'Name', content: 'John Doe' },
+    { label: 'Email', content: 'john.doe@example.com' },
+    { label: 'Phone', content: '+1 234 567 8900' },
+    { label: 'Address', content: '123 Main Street, City, Country' }
+  ]
 
-  return <Descriptions title="User Information" items={items} />;
+  return <Descriptions title="User Information" items={items} />
 }
 ```
 
@@ -131,16 +131,16 @@ Descriptions 组件支持 3 种不同的尺寸：
 ```vue
 <script setup>
 const items = [
-  { label: "Product", content: "Cloud Database" },
-  { label: "Billing", content: "Prepaid" },
-  { label: "Time", content: "2023-01-01" },
-  { label: "Amount", content: "$80.00" },
+  { label: 'Product', content: 'Cloud Database' },
+  { label: 'Billing', content: 'Prepaid' },
+  { label: 'Time', content: '2023-01-01' },
+  { label: 'Amount', content: '$80.00' },
   {
-    label: "Description",
-    content: "High-performance cloud database service",
-    span: 2,
-  },
-];
+    label: 'Description',
+    content: 'High-performance cloud database service',
+    span: 2
+  }
+]
 </script>
 
 <template>
@@ -181,11 +181,7 @@ const items = [
 ### React
 
 ```tsx
-<Descriptions
-  title="User Information"
-  items={items}
-  extra={<a href="#">Edit</a>}
-/>
+<Descriptions title="User Information" items={items} extra={<a href="#">Edit</a>} />
 ```
 
 ## 自定义样式
@@ -199,8 +195,7 @@ const items = [
   <Descriptions
     :items="items"
     :labelStyle="{ fontWeight: 'bold', color: '#1f2937' }"
-    :contentStyle="{ color: '#6b7280' }"
-  />
+    :contentStyle="{ color: '#6b7280' }" />
 </template>
 ```
 
@@ -209,8 +204,8 @@ const items = [
 ```tsx
 <Descriptions
   items={items}
-  labelStyle={{ fontWeight: "bold", color: "#1f2937" }}
-  contentStyle={{ color: "#6b7280" }}
+  labelStyle={{ fontWeight: 'bold', color: '#1f2937' }}
+  contentStyle={{ color: '#6b7280' }}
 />
 ```
 
@@ -239,24 +234,18 @@ const items = [
 ```vue
 <script setup>
 const userInfo = [
-  { label: "Full Name", content: "John Doe" },
-  { label: "Email", content: "john.doe@example.com" },
-  { label: "Phone", content: "+1 234 567 8900" },
-  { label: "Country", content: "United States" },
-  { label: "City", content: "New York" },
-  { label: "Zip Code", content: "10001" },
-  { label: "Address", content: "123 Main Street, Apartment 4B", span: 3 },
-];
+  { label: 'Full Name', content: 'John Doe' },
+  { label: 'Email', content: 'john.doe@example.com' },
+  { label: 'Phone', content: '+1 234 567 8900' },
+  { label: 'Country', content: 'United States' },
+  { label: 'City', content: 'New York' },
+  { label: 'Zip Code', content: '10001' },
+  { label: 'Address', content: '123 Main Street, Apartment 4B', span: 3 }
+]
 </script>
 
 <template>
-  <Descriptions
-    title="User Profile"
-    bordered
-    size="md"
-    :column="3"
-    :items="userInfo"
-  >
+  <Descriptions title="User Profile" bordered size="md" :column="3" :items="userInfo">
     <template #extra>
       <a href="#" class="text-blue-600 hover:text-blue-800">Edit Profile</a>
     </template>

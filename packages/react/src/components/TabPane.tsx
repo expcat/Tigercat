@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo } from 'react'
 import {
   classNames,
   closeIconViewBox,
@@ -10,53 +10,52 @@ import {
   getTabPaneClasses,
   isKeyActive,
   tabCloseButtonClasses,
-  type TabPaneProps as CoreTabPaneProps,
-} from '@tigercat/core';
-import { useTabsContext } from './Tabs';
+  type TabPaneProps as CoreTabPaneProps
+} from '@tigercat/core'
+import { useTabsContext } from './Tabs'
 
-export interface TabPaneProps
-  extends Omit<CoreTabPaneProps, 'tabKey' | 'icon' | 'style'> {
+export interface TabPaneProps extends Omit<CoreTabPaneProps, 'tabKey' | 'icon' | 'style'> {
   /**
    * Unique key for the tab pane (required)
    * Note: In React we use 'key' prop, but internally we use 'tabKey' to avoid conflicts
    */
-  tabKey: string | number;
+  tabKey: string | number
 
   /**
    * Icon for the tab
    */
-  icon?: React.ReactNode;
+  icon?: React.ReactNode
 
   /**
    * Tab pane content
    */
-  children?: React.ReactNode;
+  children?: React.ReactNode
 
   /**
    * Custom styles
    */
-  style?: React.CSSProperties;
+  style?: React.CSSProperties
 
   /**
    * Render mode - 'tab' for tab item, 'pane' for content pane
    * @internal
    */
-  renderMode?: 'tab' | 'pane';
+  renderMode?: 'tab' | 'pane'
 
   /**
    * @internal
    */
-  tabId?: string;
+  tabId?: string
 
   /**
    * @internal
    */
-  panelId?: string;
+  panelId?: string
 
   /**
    * @internal
    */
-  tabIndex?: number;
+  tabIndex?: number
 }
 
 export const TabPane: React.FC<TabPaneProps> = ({
@@ -71,64 +70,61 @@ export const TabPane: React.FC<TabPaneProps> = ({
   renderMode = 'pane',
   tabId,
   panelId,
-  tabIndex,
+  tabIndex
 }) => {
   // Get tabs context
-  const tabsContext = useTabsContext();
+  const tabsContext = useTabsContext()
 
   if (!tabsContext) {
-    throw new Error('TabPane must be used within a Tabs component');
+    throw new Error('TabPane must be used within a Tabs component')
   }
 
   // Check if this tab is active
   const isActive = useMemo(() => {
-    return isKeyActive(tabKey, tabsContext.activeKey);
-  }, [tabKey, tabsContext.activeKey]);
+    return isKeyActive(tabKey, tabsContext.activeKey)
+  }, [tabKey, tabsContext.activeKey])
 
   // Check if tab is closable
   const isClosable = useMemo(() => {
     return closable !== undefined
       ? closable
-      : tabsContext.closable && tabsContext.type === 'editable-card';
-  }, [closable, tabsContext.closable, tabsContext.type]);
+      : tabsContext.closable && tabsContext.type === 'editable-card'
+  }, [closable, tabsContext.closable, tabsContext.type])
 
   // Tab item classes
   const tabItemClasses = useMemo(() => {
-    return classNames(
-      getTabItemClasses(isActive, disabled, tabsContext.type, tabsContext.size)
-    );
-  }, [isActive, disabled, tabsContext.type, tabsContext.size]);
+    return classNames(getTabItemClasses(isActive, disabled, tabsContext.type, tabsContext.size))
+  }, [isActive, disabled, tabsContext.type, tabsContext.size])
 
   // Tab pane classes
   const tabPaneClasses = useMemo(() => {
-    return classNames(getTabPaneClasses(isActive), className);
-  }, [isActive, className]);
+    return classNames(getTabPaneClasses(isActive), className)
+  }, [isActive, className])
 
   // Handle tab click
   const handleClick = () => {
     if (!disabled) {
-      tabsContext.handleTabClick(tabKey);
+      tabsContext.handleTabClick(tabKey)
     }
-  };
+  }
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (disabled) {
-      return;
+      return
     }
 
     if (isClosable && (event.key === 'Backspace' || event.key === 'Delete')) {
-      event.preventDefault();
-      tabsContext.handleTabClose(tabKey, event);
-      return;
+      event.preventDefault()
+      tabsContext.handleTabClose(tabKey, event)
+      return
     }
 
-    const isVertical =
-      tabsContext.tabPosition === 'left' || tabsContext.tabPosition === 'right';
+    const isVertical = tabsContext.tabPosition === 'left' || tabsContext.tabPosition === 'right'
 
-    const nextKeys = isVertical ? ['ArrowDown'] : ['ArrowRight'];
-    const prevKeys = isVertical ? ['ArrowUp'] : ['ArrowLeft'];
+    const nextKeys = isVertical ? ['ArrowDown'] : ['ArrowRight']
+    const prevKeys = isVertical ? ['ArrowUp'] : ['ArrowLeft']
 
-    const key = event.key;
+    const key = event.key
     if (
       nextKeys.includes(key) ||
       prevKeys.includes(key) ||
@@ -137,69 +133,67 @@ export const TabPane: React.FC<TabPaneProps> = ({
       key === 'Enter' ||
       key === ' '
     ) {
-      event.preventDefault();
+      event.preventDefault()
     }
 
     if (key === 'Enter' || key === ' ') {
-      tabsContext.handleTabClick(tabKey);
-      return;
+      tabsContext.handleTabClick(tabKey)
+      return
     }
 
-    const tabList = (event.currentTarget as HTMLElement | null)?.closest(
-      '[role="tablist"]'
-    );
+    const tabList = (event.currentTarget as HTMLElement | null)?.closest('[role="tablist"]')
 
     const tabButtons = Array.from(
       tabList?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ?? []
-    );
+    )
 
-    const enabled = tabButtons.filter((b) => !b.disabled);
-    const currentIndex = enabled.findIndex((b) => b.id === tabId);
+    const enabled = tabButtons.filter((b) => !b.disabled)
+    const currentIndex = enabled.findIndex((b) => b.id === tabId)
     if (currentIndex === -1) {
-      return;
+      return
     }
 
     const focusByIndex = (index: number) => {
-      const next = enabled[index];
-      if (!next) return;
-      next.focus();
-      const nextKey = next.getAttribute('data-tiger-tab-key');
+      const next = enabled[index]
+      if (!next) return
+      next.focus()
+      const nextKey = next.getAttribute('data-tiger-tab-key')
       if (nextKey != null) {
         const parsed: string | number = nextKey.startsWith('n:')
           ? Number(nextKey.slice(2))
           : nextKey.startsWith('s:')
-          ? nextKey.slice(2)
-          : nextKey;
-        tabsContext.handleTabClick(parsed);
+            ? nextKey.slice(2)
+            : nextKey
+        tabsContext.handleTabClick(parsed)
       }
-    };
+    }
 
     if (nextKeys.includes(key)) {
-      focusByIndex((currentIndex + 1) % enabled.length);
-      return;
+      focusByIndex((currentIndex + 1) % enabled.length)
+      return
     }
 
     if (prevKeys.includes(key)) {
-      focusByIndex((currentIndex - 1 + enabled.length) % enabled.length);
-      return;
+      focusByIndex((currentIndex - 1 + enabled.length) % enabled.length)
+      return
     }
 
     if (key === 'Home') {
-      focusByIndex(0);
-      return;
+      focusByIndex(0)
+      return
     }
 
     if (key === 'End') {
-      focusByIndex(enabled.length - 1);
+      focusByIndex(enabled.length - 1)
     }
-  };
+  }
 
   // Handle close click
   const handleClose = (event: React.MouseEvent) => {
     if (!disabled) {
-      tabsContext.handleTabClose(tabKey, event);
+      tabsContext.handleTabClose(tabKey, event)
     }
-  };
+  }
 
   // Render tab item (in the tab nav)
   if (renderMode === 'tab') {
@@ -215,9 +209,7 @@ export const TabPane: React.FC<TabPaneProps> = ({
         disabled={disabled}
         tabIndex={typeof tabIndex === 'number' ? tabIndex : isActive ? 0 : -1}
         data-tiger-tabs-id={tabsContext.idBase}
-        data-tiger-tab-key={
-          typeof tabKey === 'number' ? `n:${tabKey}` : `s:${tabKey}`
-        }
+        data-tiger-tab-key={typeof tabKey === 'number' ? `n:${tabKey}` : `s:${tabKey}`}
         onClick={handleClick}
         onKeyDown={handleKeyDown}>
         {/* Icon */}
@@ -232,11 +224,7 @@ export const TabPane: React.FC<TabPaneProps> = ({
             aria-label={`Close ${String(label)}`}
             tabIndex={-1}
             onClick={handleClose}>
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox={closeIconViewBox}>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox={closeIconViewBox}>
               <path
                 strokeLinecap={closeIconPathStrokeLinecap}
                 strokeLinejoin={closeIconPathStrokeLinejoin}
@@ -247,13 +235,13 @@ export const TabPane: React.FC<TabPaneProps> = ({
           </button>
         )}
       </button>
-    );
+    )
   }
 
   // Render tab pane content
-  const shouldRender = isActive || !tabsContext.destroyInactiveTabPane;
+  const shouldRender = isActive || !tabsContext.destroyInactiveTabPane
   if (!shouldRender) {
-    return null;
+    return null
   }
 
   return (
@@ -266,5 +254,5 @@ export const TabPane: React.FC<TabPaneProps> = ({
       aria-hidden={!isActive}>
       {children}
     </div>
-  );
-};
+  )
+}

@@ -7,8 +7,8 @@ import {
   isVNode,
   onBeforeUnmount,
   watch,
-  PropType,
-} from 'vue';
+  PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -31,8 +31,8 @@ import {
   popconfirmIconViewBox,
   type PopconfirmIconType,
   type DropdownPlacement,
-  type StyleValue,
-} from '@tigercat/core';
+  type StyleValue
+} from '@tigercat/core'
 
 const renderPopconfirmIcon = (iconType: PopconfirmIconType) => {
   return h(
@@ -42,24 +42,24 @@ const renderPopconfirmIcon = (iconType: PopconfirmIconType) => {
       fill: 'none',
       viewBox: popconfirmIconViewBox,
       'stroke-width': String(popconfirmIconStrokeWidth),
-      stroke: 'currentColor',
+      stroke: 'currentColor'
     },
     [
       h('path', {
         'stroke-linecap': popconfirmIconPathStrokeLinecap,
         'stroke-linejoin': popconfirmIconPathStrokeLinejoin,
-        d: getPopconfirmIconPath(iconType),
-      }),
+        d: getPopconfirmIconPath(iconType)
+      })
     ]
-  );
-};
+  )
+}
 
-let popconfirmIdCounter = 0;
-const createPopconfirmId = () => `tiger-popconfirm-${++popconfirmIdCounter}`;
+let popconfirmIdCounter = 0
+const createPopconfirmId = () => `tiger-popconfirm-${++popconfirmIdCounter}`
 
 export interface VuePopconfirmProps {
-  className?: string;
-  style?: StyleValue;
+  className?: string
+  style?: StyleValue
 }
 
 export const Popconfirm = defineComponent({
@@ -71,7 +71,7 @@ export const Popconfirm = defineComponent({
      */
     visible: {
       type: Boolean,
-      default: undefined,
+      default: undefined
     },
     /**
      * Default visibility (uncontrolled mode)
@@ -79,21 +79,21 @@ export const Popconfirm = defineComponent({
      */
     defaultVisible: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Popconfirm title/question text
      */
     title: {
       type: String,
-      default: '确定要执行此操作吗？',
+      default: '确定要执行此操作吗？'
     },
     /**
      * Popconfirm description text
      */
     description: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Icon type to display
@@ -101,7 +101,7 @@ export const Popconfirm = defineComponent({
      */
     icon: {
       type: String as PropType<PopconfirmIconType>,
-      default: 'warning' as PopconfirmIconType,
+      default: 'warning' as PopconfirmIconType
     },
     /**
      * Whether to show icon
@@ -109,7 +109,7 @@ export const Popconfirm = defineComponent({
      */
     showIcon: {
       type: Boolean,
-      default: true,
+      default: true
     },
     /**
      * Confirm button text
@@ -117,7 +117,7 @@ export const Popconfirm = defineComponent({
      */
     okText: {
       type: String,
-      default: '确定',
+      default: '确定'
     },
     /**
      * Cancel button text
@@ -125,7 +125,7 @@ export const Popconfirm = defineComponent({
      */
     cancelText: {
       type: String,
-      default: '取消',
+      default: '取消'
     },
     /**
      * Confirm button type
@@ -133,7 +133,7 @@ export const Popconfirm = defineComponent({
      */
     okType: {
       type: String as PropType<'primary' | 'danger'>,
-      default: 'primary' as const,
+      default: 'primary' as const
     },
     /**
      * Popconfirm placement relative to trigger
@@ -141,7 +141,7 @@ export const Popconfirm = defineComponent({
      */
     placement: {
       type: String as PropType<DropdownPlacement>,
-      default: 'top' as DropdownPlacement,
+      default: 'top' as DropdownPlacement
     },
     /**
      * Whether the popconfirm is disabled
@@ -149,112 +149,110 @@ export const Popconfirm = defineComponent({
      */
     disabled: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Additional CSS classes
      */
     className: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     style: {
       type: [String, Object, Array] as PropType<StyleValue>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   emits: ['update:visible', 'visible-change', 'confirm', 'cancel'],
   setup(props, { slots, emit, attrs }) {
     // Internal state for uncontrolled mode
-    const internalVisible = ref(props.defaultVisible);
+    const internalVisible = ref(props.defaultVisible)
 
     // Computed visible state (controlled or uncontrolled)
     const currentVisible = computed(() => {
-      return props.visible !== undefined
-        ? props.visible
-        : internalVisible.value;
-    });
+      return props.visible !== undefined ? props.visible : internalVisible.value
+    })
 
     // Ref to the container element
-    const containerRef = ref<HTMLElement | null>(null);
+    const containerRef = ref<HTMLElement | null>(null)
 
-    const popconfirmId = createPopconfirmId();
-    const titleId = `${popconfirmId}-title`;
-    const descriptionId = `${popconfirmId}-description`;
+    const popconfirmId = createPopconfirmId()
+    const titleId = `${popconfirmId}-title`
+    const descriptionId = `${popconfirmId}-description`
 
     // Handle visibility change
     const setVisible = (visible: boolean) => {
-      if (props.disabled && visible) return;
+      if (props.disabled && visible) return
 
       // Update internal state if uncontrolled
       if (props.visible === undefined) {
-        internalVisible.value = visible;
+        internalVisible.value = visible
       }
 
       // Emit events
-      emit('update:visible', visible);
-      emit('visible-change', visible);
-    };
+      emit('update:visible', visible)
+      emit('visible-change', visible)
+    }
 
     // Handle confirm
     const handleConfirm = () => {
-      setVisible(false);
-      emit('confirm');
-    };
+      setVisible(false)
+      emit('confirm')
+    }
 
     // Handle cancel
     const handleCancel = () => {
-      setVisible(false);
-      emit('cancel');
-    };
+      setVisible(false)
+      emit('cancel')
+    }
 
     // Handle trigger click
     const handleTriggerClick = () => {
-      if (props.disabled) return;
-      setVisible(!currentVisible.value);
-    };
+      if (props.disabled) return
+      setVisible(!currentVisible.value)
+    }
 
     // Handle outside click to close popconfirm
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
+      const target = event.target as HTMLElement
 
       if (containerRef.value && !containerRef.value.contains(target)) {
-        setVisible(false);
+        setVisible(false)
       }
-    };
+    }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
-      setVisible(false);
-    };
+      if (event.key !== 'Escape') return
+      setVisible(false)
+    }
 
-    let outsideClickTimeoutId: number | undefined;
+    let outsideClickTimeoutId: number | undefined
 
     watch(currentVisible, (visible) => {
       if (outsideClickTimeoutId !== undefined) {
-        clearTimeout(outsideClickTimeoutId);
-        outsideClickTimeoutId = undefined;
+        clearTimeout(outsideClickTimeoutId)
+        outsideClickTimeoutId = undefined
       }
 
-      document.removeEventListener('click', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('click', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
 
-      if (!visible) return;
+      if (!visible) return
 
       outsideClickTimeoutId = window.setTimeout(() => {
-        document.addEventListener('click', handleClickOutside);
-      }, 0);
+        document.addEventListener('click', handleClickOutside)
+      }, 0)
 
-      document.addEventListener('keydown', handleKeyDown);
-    });
+      document.addEventListener('keydown', handleKeyDown)
+    })
 
     onBeforeUnmount(() => {
       if (outsideClickTimeoutId !== undefined) {
-        clearTimeout(outsideClickTimeoutId);
+        clearTimeout(outsideClickTimeoutId)
       }
-      document.removeEventListener('click', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
-    });
+      document.removeEventListener('click', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
+    })
 
     // Container classes
     const containerClasses = computed(() => {
@@ -262,65 +260,62 @@ export const Popconfirm = defineComponent({
         getPopconfirmContainerClasses(),
         props.className,
         coerceClassValue(attrs.class)
-      );
-    });
+      )
+    })
 
     // Trigger classes
     const triggerClasses = computed(() => {
-      return getPopconfirmTriggerClasses(props.disabled);
-    });
+      return getPopconfirmTriggerClasses(props.disabled)
+    })
 
     // Content wrapper classes
     const contentWrapperClasses = computed(() => {
-      return getDropdownMenuWrapperClasses(
-        currentVisible.value,
-        props.placement
-      );
-    });
+      return getDropdownMenuWrapperClasses(currentVisible.value, props.placement)
+    })
 
     const arrowClasses = computed(() => {
-      return getPopconfirmArrowClasses(props.placement);
-    });
+      return getPopconfirmArrowClasses(props.placement)
+    })
 
     // Content classes
     const contentClasses = computed(() => {
-      return getPopconfirmContentClasses();
-    });
+      return getPopconfirmContentClasses()
+    })
 
     // Title classes
     const titleClasses = computed(() => {
-      return getPopconfirmTitleClasses();
-    });
+      return getPopconfirmTitleClasses()
+    })
 
     // Description classes
     const descriptionClasses = computed(() => {
-      return getPopconfirmDescriptionClasses();
-    });
+      return getPopconfirmDescriptionClasses()
+    })
 
     // Icon classes
     const iconClasses = computed(() => {
-      return getPopconfirmIconClasses(props.icon);
-    });
+      return getPopconfirmIconClasses(props.icon)
+    })
 
     // Buttons classes
     const buttonsClasses = computed(() => {
-      return getPopconfirmButtonsClasses();
-    });
+      return getPopconfirmButtonsClasses()
+    })
 
     // Cancel button classes
     const cancelButtonClasses = computed(() => {
-      return getPopconfirmCancelButtonClasses();
-    });
+      return getPopconfirmCancelButtonClasses()
+    })
 
     // OK button classes
     const okButtonClasses = computed(() => {
-      return getPopconfirmOkButtonClasses(props.okType);
-    });
+      return getPopconfirmOkButtonClasses(props.okType)
+    })
 
     return () => {
-      const defaultSlot = slots.default?.();
+      const defaultSlot = slots.default?.()
       if (!defaultSlot || defaultSlot.length === 0) {
-        return null;
+        return null
       }
 
       const {
@@ -328,54 +323,51 @@ export const Popconfirm = defineComponent({
         style: _style,
         ...restAttrs
       } = attrs as {
-        class?: unknown;
-        style?: unknown;
-      } & Record<string, unknown>;
+        class?: unknown
+        style?: unknown
+      } & Record<string, unknown>
 
       const triggerA11yProps = {
         'aria-haspopup': 'dialog',
         'aria-expanded': Boolean(currentVisible.value),
         'aria-controls': currentVisible.value ? popconfirmId : undefined,
-        'aria-disabled': props.disabled ? 'true' : undefined,
-      } as const;
+        'aria-disabled': props.disabled ? 'true' : undefined
+      } as const
 
       const trigger = (() => {
         if (defaultSlot.length === 1) {
-          const only = defaultSlot[0];
+          const only = defaultSlot[0]
           if (isVNode(only)) {
             const existingProps = (only.props ?? {}) as {
-              class?: unknown;
-              onClick?: unknown;
-            };
+              class?: unknown
+              onClick?: unknown
+            }
 
-            const existingOnClick = existingProps.onClick;
+            const existingOnClick = existingProps.onClick
             const onClick = (event: MouseEvent) => {
               if (typeof existingOnClick === 'function') {
-                (existingOnClick as (e: MouseEvent) => void)(event);
+                ;(existingOnClick as (e: MouseEvent) => void)(event)
               } else if (Array.isArray(existingOnClick)) {
                 for (const handler of existingOnClick) {
                   if (typeof handler === 'function') {
-                    (handler as (e: MouseEvent) => void)(event);
+                    ;(handler as (e: MouseEvent) => void)(event)
                   }
                 }
               }
 
-              if (event.defaultPrevented) return;
-              handleTriggerClick();
-            };
+              if (event.defaultPrevented) return
+              handleTriggerClick()
+            }
 
             return cloneVNode(
               only,
               {
                 ...triggerA11yProps,
-                class: classNames(
-                  coerceClassValue(existingProps.class),
-                  triggerClasses.value
-                ),
-                onClick,
+                class: classNames(coerceClassValue(existingProps.class), triggerClasses.value),
+                onClick
               },
               true
-            );
+            )
           }
         }
 
@@ -387,26 +379,26 @@ export const Popconfirm = defineComponent({
             role: 'button',
             tabindex: props.disabled ? -1 : 0,
             onKeydown: (event: KeyboardEvent) => {
-              if (props.disabled) return;
+              if (props.disabled) return
               if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                handleTriggerClick();
+                event.preventDefault()
+                handleTriggerClick()
               }
             },
-            ...triggerA11yProps,
+            ...triggerA11yProps
           },
           defaultSlot
-        );
-      })();
+        )
+      })()
 
-      const hasDescription = Boolean(props.description || slots.description);
+      const hasDescription = Boolean(props.description || slots.description)
 
       const content = h(
         'div',
         {
           class: contentWrapperClasses.value,
           hidden: !currentVisible.value,
-          'aria-hidden': !currentVisible.value,
+          'aria-hidden': !currentVisible.value
         },
         [
           h('div', { class: 'relative' }, [
@@ -419,14 +411,14 @@ export const Popconfirm = defineComponent({
                 'aria-modal': 'false',
                 'aria-labelledby': titleId,
                 'aria-describedby': hasDescription ? descriptionId : undefined,
-                class: contentClasses.value,
+                class: contentClasses.value
               },
               [
                 // Title section with icon
                 h(
                   'div',
                   {
-                    class: 'flex items-start',
+                    class: 'flex items-start'
                   },
                   [
                     // Icon
@@ -435,7 +427,7 @@ export const Popconfirm = defineComponent({
                         'div',
                         {
                           class: iconClasses.value,
-                          'aria-hidden': 'true',
+                          'aria-hidden': 'true'
                         },
                         renderPopconfirmIcon(props.icon)
                       ),
@@ -443,42 +435,32 @@ export const Popconfirm = defineComponent({
                     h(
                       'div',
                       {
-                        class: 'flex-1',
+                        class: 'flex-1'
                       },
                       [
                         // Title
                         slots.title
-                          ? h(
-                              'div',
-                              { id: titleId, class: titleClasses.value },
-                              slots.title()
-                            )
-                          : h(
-                              'div',
-                              { id: titleId, class: titleClasses.value },
-                              props.title
-                            ),
+                          ? h('div', { id: titleId, class: titleClasses.value }, slots.title())
+                          : h('div', { id: titleId, class: titleClasses.value }, props.title),
                         // Description
                         hasDescription &&
                           h(
                             'div',
                             {
                               id: descriptionId,
-                              class: descriptionClasses.value,
+                              class: descriptionClasses.value
                             },
-                            slots.description
-                              ? slots.description()
-                              : props.description
-                          ),
+                            slots.description ? slots.description() : props.description
+                          )
                       ]
-                    ),
+                    )
                   ]
                 ),
                 // Buttons
                 h(
                   'div',
                   {
-                    class: buttonsClasses.value,
+                    class: buttonsClasses.value
                   },
                   [
                     // Cancel button
@@ -487,7 +469,7 @@ export const Popconfirm = defineComponent({
                       {
                         type: 'button',
                         class: cancelButtonClasses.value,
-                        onClick: handleCancel,
+                        onClick: handleCancel
                       },
                       props.cancelText
                     ),
@@ -497,17 +479,17 @@ export const Popconfirm = defineComponent({
                       {
                         type: 'button',
                         class: okButtonClasses.value,
-                        onClick: handleConfirm,
+                        onClick: handleConfirm
                       },
                       props.okText
-                    ),
+                    )
                   ]
-                ),
+                )
               ]
-            ),
-          ]),
+            )
+          ])
         ]
-      );
+      )
 
       return h(
         'div',
@@ -515,15 +497,12 @@ export const Popconfirm = defineComponent({
           ...restAttrs,
           ref: containerRef,
           class: containerClasses.value,
-          style: mergeStyleValues(
-            (attrs as Record<string, unknown>).style,
-            props.style
-          ),
+          style: mergeStyleValues((attrs as Record<string, unknown>).style, props.style)
         },
         [trigger, content]
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Popconfirm;
+export default Popconfirm

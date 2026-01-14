@@ -2,7 +2,7 @@
  * Time utility functions for TimePicker component
  */
 
-import type { TimeFormat } from '../types/timepicker';
+import type { TimeFormat } from '../types/timepicker'
 
 /**
  * Validate time component value
@@ -12,7 +12,7 @@ import type { TimeFormat } from '../types/timepicker';
  * @returns True if value is within range
  */
 function isValidTimeValue(value: number, min: number, max: number): boolean {
-  return !isNaN(value) && value >= min && value <= max;
+  return !isNaN(value) && value >= min && value <= max
 }
 
 /**
@@ -22,7 +22,7 @@ function isValidTimeValue(value: number, min: number, max: number): boolean {
  * @returns Valid step value (minimum 1)
  */
 function validateStep(step: number): number {
-  return Math.max(1, Math.floor(step));
+  return Math.max(1, Math.floor(step))
 }
 
 /**
@@ -33,7 +33,7 @@ function validateStep(step: number): number {
  * @returns Clamped value
  */
 function clampValue(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value));
+  return Math.max(min, Math.min(max, value))
 }
 
 /**
@@ -42,18 +42,18 @@ function clampValue(value: number, min: number, max: number): number {
  * @returns Object with hours, minutes, and seconds, or null if invalid
  */
 export function parseTime(timeString: string | null | undefined): {
-  hours: number;
-  minutes: number;
-  seconds: number;
+  hours: number
+  minutes: number
+  seconds: number
 } | null {
-  if (!timeString) return null;
+  if (!timeString) return null
 
-  const timeParts = timeString.split(':');
-  if (timeParts.length < 2 || timeParts.length > 3) return null;
+  const timeParts = timeString.split(':')
+  if (timeParts.length < 2 || timeParts.length > 3) return null
 
-  const hours = parseInt(timeParts[0], 10);
-  const minutes = parseInt(timeParts[1], 10);
-  const seconds = timeParts.length === 3 ? parseInt(timeParts[2], 10) : 0;
+  const hours = parseInt(timeParts[0], 10)
+  const minutes = parseInt(timeParts[1], 10)
+  const seconds = timeParts.length === 3 ? parseInt(timeParts[2], 10) : 0
 
   // Validate all components
   if (
@@ -61,10 +61,10 @@ export function parseTime(timeString: string | null | undefined): {
     !isValidTimeValue(minutes, 0, 59) ||
     !isValidTimeValue(seconds, 0, 59)
   ) {
-    return null;
+    return null
   }
 
-  return { hours, minutes, seconds };
+  return { hours, minutes, seconds }
 }
 
 /**
@@ -82,11 +82,11 @@ export function formatTime(
   showSeconds: boolean = false
 ): string {
   // Clamp values to valid ranges
-  const h = clampValue(hours, 0, 23).toString().padStart(2, '0');
-  const m = clampValue(minutes, 0, 59).toString().padStart(2, '0');
-  const s = clampValue(seconds, 0, 59).toString().padStart(2, '0');
+  const h = clampValue(hours, 0, 23).toString().padStart(2, '0')
+  const m = clampValue(minutes, 0, 59).toString().padStart(2, '0')
+  const s = clampValue(seconds, 0, 59).toString().padStart(2, '0')
 
-  return showSeconds ? `${h}:${m}:${s}` : `${h}:${m}`;
+  return showSeconds ? `${h}:${m}:${s}` : `${h}:${m}`
 }
 
 /**
@@ -95,13 +95,13 @@ export function formatTime(
  * @returns Object with 12-hour hours and period
  */
 export function to12HourFormat(hours: number): {
-  hours: number;
-  period: 'AM' | 'PM';
+  hours: number
+  period: 'AM' | 'PM'
 } {
-  const period = hours >= 12 ? 'PM' : 'AM';
-  const hours12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+  const period = hours >= 12 ? 'PM' : 'AM'
+  const hours12 = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours
 
-  return { hours: hours12, period };
+  return { hours: hours12, period }
 }
 
 /**
@@ -112,9 +112,9 @@ export function to12HourFormat(hours: number): {
  */
 export function to24HourFormat(hours: number, period: 'AM' | 'PM'): number {
   if (period === 'AM') {
-    return hours === 12 ? 0 : hours;
+    return hours === 12 ? 0 : hours
   } else {
-    return hours === 12 ? 12 : hours + 12;
+    return hours === 12 ? 12 : hours + 12
   }
 }
 
@@ -135,43 +135,43 @@ export function formatTimeDisplay(
   showSeconds: boolean = false
 ): string {
   if (format === '12') {
-    const { hours: hours12, period } = to12HourFormat(hours);
-    const h = hours12.toString().padStart(2, '0');
-    const m = clampValue(minutes, 0, 59).toString().padStart(2, '0');
-    const s = clampValue(seconds, 0, 59).toString().padStart(2, '0');
-    const timeStr = showSeconds ? `${h}:${m}:${s}` : `${h}:${m}`;
-    return `${timeStr} ${period}`;
+    const { hours: hours12, period } = to12HourFormat(hours)
+    const h = hours12.toString().padStart(2, '0')
+    const m = clampValue(minutes, 0, 59).toString().padStart(2, '0')
+    const s = clampValue(seconds, 0, 59).toString().padStart(2, '0')
+    const timeStr = showSeconds ? `${h}:${m}:${s}` : `${h}:${m}`
+    return `${timeStr} ${period}`
   }
-  return formatTime(hours, minutes, seconds, showSeconds);
+  return formatTime(hours, minutes, seconds, showSeconds)
 }
 
 export function getTimePeriodLabels(locale?: string): {
-  am: string;
-  pm: string;
+  am: string
+  pm: string
 } {
-  if (!locale) return { am: 'AM', pm: 'PM' };
+  if (!locale) return { am: 'AM', pm: 'PM' }
 
   const extract = (date: Date): string | null => {
     try {
       const parts = new Intl.DateTimeFormat(locale, {
         hour: 'numeric',
-        hour12: true,
-      }).formatToParts(date);
-      const dayPeriod = parts.find((p) => p.type === 'dayPeriod');
-      return dayPeriod?.value ?? null;
+        hour12: true
+      }).formatToParts(date)
+      const dayPeriod = parts.find((p) => p.type === 'dayPeriod')
+      return dayPeriod?.value ?? null
     } catch {
-      return null;
+      return null
     }
-  };
+  }
 
   // Use stable dates with morning/evening hours
-  const am = extract(new Date(2020, 0, 1, 9, 0, 0));
-  const pm = extract(new Date(2020, 0, 1, 21, 0, 0));
+  const am = extract(new Date(2020, 0, 1, 9, 0, 0))
+  const pm = extract(new Date(2020, 0, 1, 21, 0, 0))
 
   return {
     am: am || 'AM',
-    pm: pm || 'PM',
-  };
+    pm: pm || 'PM'
+  }
 }
 
 export function formatTimeDisplayWithLocale(
@@ -183,18 +183,18 @@ export function formatTimeDisplayWithLocale(
   locale?: string
 ): string {
   if (format !== '12') {
-    return formatTime(hours, minutes, seconds, showSeconds);
+    return formatTime(hours, minutes, seconds, showSeconds)
   }
 
-  const { hours: hours12, period } = to12HourFormat(hours);
-  const h = hours12.toString().padStart(2, '0');
-  const m = clampValue(minutes, 0, 59).toString().padStart(2, '0');
-  const s = clampValue(seconds, 0, 59).toString().padStart(2, '0');
-  const timeStr = showSeconds ? `${h}:${m}:${s}` : `${h}:${m}`;
+  const { hours: hours12, period } = to12HourFormat(hours)
+  const h = hours12.toString().padStart(2, '0')
+  const m = clampValue(minutes, 0, 59).toString().padStart(2, '0')
+  const s = clampValue(seconds, 0, 59).toString().padStart(2, '0')
+  const timeStr = showSeconds ? `${h}:${m}:${s}` : `${h}:${m}`
 
-  const labels = getTimePeriodLabels(locale);
-  const suffix = period === 'AM' ? labels.am : labels.pm;
-  return `${timeStr} ${suffix}`;
+  const labels = getTimePeriodLabels(locale)
+  const suffix = period === 'AM' ? labels.am : labels.pm
+  return `${timeStr} ${suffix}`
 }
 
 /**
@@ -211,25 +211,25 @@ export function isTimeInRange(
   minTime: string | null | undefined,
   maxTime: string | null | undefined
 ): boolean {
-  const currentMinutes = hours * 60 + minutes;
+  const currentMinutes = hours * 60 + minutes
 
   if (minTime) {
-    const min = parseTime(minTime);
+    const min = parseTime(minTime)
     if (min) {
-      const minMinutes = min.hours * 60 + min.minutes;
-      if (currentMinutes < minMinutes) return false;
+      const minMinutes = min.hours * 60 + min.minutes
+      if (currentMinutes < minMinutes) return false
     }
   }
 
   if (maxTime) {
-    const max = parseTime(maxTime);
+    const max = parseTime(maxTime)
     if (max) {
-      const maxMinutes = max.hours * 60 + max.minutes;
-      if (currentMinutes > maxMinutes) return false;
+      const maxMinutes = max.hours * 60 + max.minutes
+      if (currentMinutes > maxMinutes) return false
     }
   }
 
-  return true;
+  return true
 }
 
 /**
@@ -238,20 +238,17 @@ export function isTimeInRange(
  * @param format - '12' or '24' hour format
  * @returns Array of hour values
  */
-export function generateHours(
-  step: number = 1,
-  format: TimeFormat = '24'
-): number[] {
-  const max = format === '12' ? 12 : 23;
-  const start = format === '12' ? 1 : 0;
-  const hours: number[] = [];
-  const validStep = validateStep(step);
+export function generateHours(step: number = 1, format: TimeFormat = '24'): number[] {
+  const max = format === '12' ? 12 : 23
+  const start = format === '12' ? 1 : 0
+  const hours: number[] = []
+  const validStep = validateStep(step)
 
   for (let i = start; i <= max; i += validStep) {
-    hours.push(i);
+    hours.push(i)
   }
 
-  return hours;
+  return hours
 }
 
 /**
@@ -260,14 +257,14 @@ export function generateHours(
  * @returns Array of minute values
  */
 export function generateMinutes(step: number = 1): number[] {
-  const minutes: number[] = [];
-  const validStep = validateStep(step);
+  const minutes: number[] = []
+  const validStep = validateStep(step)
 
   for (let i = 0; i < 60; i += validStep) {
-    minutes.push(i);
+    minutes.push(i)
   }
 
-  return minutes;
+  return minutes
 }
 
 /**
@@ -276,14 +273,14 @@ export function generateMinutes(step: number = 1): number[] {
  * @returns Array of second values
  */
 export function generateSeconds(step: number = 1): number[] {
-  const seconds: number[] = [];
-  const validStep = validateStep(step);
+  const seconds: number[] = []
+  const validStep = validateStep(step)
 
   for (let i = 0; i < 60; i += validStep) {
-    seconds.push(i);
+    seconds.push(i)
   }
 
-  return seconds;
+  return seconds
 }
 
 /**
@@ -292,11 +289,6 @@ export function generateSeconds(step: number = 1): number[] {
  * @returns Current time string
  */
 export function getCurrentTime(showSeconds: boolean = false): string {
-  const now = new Date();
-  return formatTime(
-    now.getHours(),
-    now.getMinutes(),
-    now.getSeconds(),
-    showSeconds
-  );
+  const now = new Date()
+  return formatTime(now.getHours(), now.getMinutes(), now.getSeconds(), showSeconds)
 }

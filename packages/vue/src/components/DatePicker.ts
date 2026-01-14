@@ -1,13 +1,4 @@
-import {
-  defineComponent,
-  computed,
-  ref,
-  nextTick,
-  h,
-  PropType,
-  watch,
-  onBeforeUnmount,
-} from 'vue';
+import { defineComponent, computed, ref, nextTick, h, PropType, watch, onBeforeUnmount } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -44,8 +35,8 @@ import {
   type DatePickerSize,
   type DateFormat,
   type DatePickerModelValue,
-  type DatePickerLabels,
-} from '@tigercat/core';
+  type DatePickerLabels
+} from '@tigercat/core'
 
 // Helper function to create SVG icon
 const createIcon = (path: string, className: string) => {
@@ -55,56 +46,56 @@ const createIcon = (path: string, className: string) => {
       class: className,
       xmlns: 'http://www.w3.org/2000/svg',
       viewBox: icon20ViewBox,
-      fill: 'currentColor',
+      fill: 'currentColor'
     },
     [
       h('path', {
         'fill-rule': 'evenodd',
         d: path,
-        'clip-rule': 'evenodd',
-      }),
+        'clip-rule': 'evenodd'
+      })
     ]
-  );
-};
+  )
+}
 
 // Icons
-const CalendarIcon = createIcon(CalendarIconPath, 'w-5 h-5');
-const CloseIcon = createIcon(CloseIconPath, 'w-4 h-4');
-const ChevronLeftIcon = createIcon(ChevronLeftIconPath, 'w-5 h-5');
-const ChevronRightIcon = createIcon(ChevronRightIconPath, 'w-5 h-5');
+const CalendarIcon = createIcon(CalendarIconPath, 'w-5 h-5')
+const CloseIcon = createIcon(CloseIconPath, 'w-4 h-4')
+const ChevronLeftIcon = createIcon(ChevronLeftIconPath, 'w-5 h-5')
+const ChevronRightIcon = createIcon(ChevronRightIconPath, 'w-5 h-5')
 
-export type VueDatePickerModelValue = DatePickerModelValue;
+export type VueDatePickerModelValue = DatePickerModelValue
 
 export interface VueDatePickerProps {
-  range?: boolean;
-  locale?: string;
-  labels?: Partial<DatePickerLabels>;
-  modelValue?: VueDatePickerModelValue;
-  size?: DatePickerSize;
-  format?: DateFormat;
-  placeholder?: string;
-  disabled?: boolean;
-  readonly?: boolean;
-  required?: boolean;
-  minDate?: Date | string | null;
-  maxDate?: Date | string | null;
-  clearable?: boolean;
-  name?: string;
-  id?: string;
-  className?: string;
-  style?: Record<string, unknown>;
+  range?: boolean
+  locale?: string
+  labels?: Partial<DatePickerLabels>
+  modelValue?: VueDatePickerModelValue
+  size?: DatePickerSize
+  format?: DateFormat
+  placeholder?: string
+  disabled?: boolean
+  readonly?: boolean
+  required?: boolean
+  minDate?: Date | string | null
+  maxDate?: Date | string | null
+  clearable?: boolean
+  name?: string
+  id?: string
+  className?: string
+  style?: Record<string, unknown>
 }
 
 const isDateLike = (value: unknown): boolean =>
-  value === null || value instanceof Date || typeof value === 'string';
+  value === null || value instanceof Date || typeof value === 'string'
 
 const isModelValue = (value: unknown): boolean => {
-  if (isDateLike(value)) return true;
+  if (isDateLike(value)) return true
   if (Array.isArray(value) && value.length === 2) {
-    return isDateLike(value[0]) && isDateLike(value[1]);
+    return isDateLike(value[0]) && isDateLike(value[1])
   }
-  return false;
-};
+  return false
+}
 
 export const DatePicker = defineComponent({
   name: 'TigerDatePicker',
@@ -117,21 +108,21 @@ export const DatePicker = defineComponent({
      */
     range: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Locale used for month/day names in the calendar UI.
      * Example: 'zh-CN', 'en-US'
      */
     locale: {
-      type: String,
+      type: String
     },
     /**
      * UI labels for i18n.
      */
     labels: {
       type: Object as PropType<Partial<DatePickerLabels>>,
-      default: undefined,
+      default: undefined
     },
     /**
      * Selected date value (for v-model)
@@ -140,7 +131,7 @@ export const DatePicker = defineComponent({
       type: [Date, String, Array, null] as PropType<
         Date | string | null | [Date | string | null, Date | string | null]
       >,
-      default: null,
+      default: null
     },
     /**
      * Date picker size
@@ -148,7 +139,7 @@ export const DatePicker = defineComponent({
      */
     size: {
       type: String as PropType<DatePickerSize>,
-      default: 'md' as DatePickerSize,
+      default: 'md' as DatePickerSize
     },
     /**
      * Date format string
@@ -156,14 +147,14 @@ export const DatePicker = defineComponent({
      */
     format: {
       type: String as PropType<DateFormat>,
-      default: 'yyyy-MM-dd' as DateFormat,
+      default: 'yyyy-MM-dd' as DateFormat
     },
     /**
      * Placeholder text
      */
     placeholder: {
       type: String,
-      default: undefined,
+      default: undefined
     },
     /**
      * Whether the date picker is disabled
@@ -171,7 +162,7 @@ export const DatePicker = defineComponent({
      */
     disabled: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Whether the date picker is readonly
@@ -179,7 +170,7 @@ export const DatePicker = defineComponent({
      */
     readonly: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Whether the date picker is required
@@ -187,21 +178,21 @@ export const DatePicker = defineComponent({
      */
     required: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Minimum selectable date
      */
     minDate: {
       type: [Date, String, null] as PropType<Date | string | null>,
-      default: null,
+      default: null
     },
     /**
      * Maximum selectable date
      */
     maxDate: {
       type: [Date, String, null] as PropType<Date | string | null>,
-      default: null,
+      default: null
     },
     /**
      * Show clear button
@@ -209,19 +200,19 @@ export const DatePicker = defineComponent({
      */
     clearable: {
       type: Boolean,
-      default: true,
+      default: true
     },
     /**
      * Input name attribute
      */
     name: {
-      type: String,
+      type: String
     },
     /**
      * Input id attribute
      */
     id: {
-      type: String,
+      type: String
     },
 
     /**
@@ -229,7 +220,7 @@ export const DatePicker = defineComponent({
      */
     className: {
       type: String,
-      default: '',
+      default: ''
     },
 
     /**
@@ -237,341 +228,329 @@ export const DatePicker = defineComponent({
      */
     style: {
       type: Object as PropType<Record<string, unknown>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   emits: {
     /**
      * Emitted when date changes (for v-model)
      */
     'update:modelValue': (value: unknown) => {
-      return isModelValue(value);
+      return isModelValue(value)
     },
     /**
      * Emitted when date changes
      */
     change: (value: unknown) => {
-      return isModelValue(value);
+      return isModelValue(value)
     },
     /**
      * Emitted when clear button is clicked
      */
-    clear: () => true,
+    clear: () => true
   },
   setup(props, { emit, attrs }) {
-    const isOpen = ref(false);
-    const calendarRef = ref<HTMLElement | null>(null);
-    const inputWrapperRef = ref<HTMLElement | null>(null);
-    const inputRef = ref<HTMLInputElement | null>(null);
+    const isOpen = ref(false)
+    const calendarRef = ref<HTMLElement | null>(null)
+    const inputWrapperRef = ref<HTMLElement | null>(null)
+    const inputRef = ref<HTMLInputElement | null>(null)
 
-    const activeDateIso = ref<string | null>(null);
-    const pendingFocusIso = ref<string | null>(null);
-    const restoreFocusEl = ref<HTMLElement | null>(null);
+    const activeDateIso = ref<string | null>(null)
+    const pendingFocusIso = ref<string | null>(null)
+    const restoreFocusEl = ref<HTMLElement | null>(null)
 
-    const isRangeMode = computed(() => props.range);
+    const isRangeMode = computed(() => props.range)
 
     const selectedDate = computed(() => {
-      if (isRangeMode.value) return null;
-      return parseDate(props.modelValue as Date | string | null);
-    });
+      if (isRangeMode.value) return null
+      return parseDate(props.modelValue as Date | string | null)
+    })
 
     const selectedRange = computed<[Date | null, Date | null]>(() => {
-      if (!isRangeMode.value) return [null, null];
-      const raw = props.modelValue as
-        | [Date | string | null, Date | string | null]
-        | null;
-      if (!raw || !Array.isArray(raw)) return [null, null];
-      return [parseDate(raw[0]), parseDate(raw[1])];
-    });
-    const minDateParsed = computed(() => parseDate(props.minDate));
-    const maxDateParsed = computed(() => parseDate(props.maxDate));
+      if (!isRangeMode.value) return [null, null]
+      const raw = props.modelValue as [Date | string | null, Date | string | null] | null
+      if (!raw || !Array.isArray(raw)) return [null, null]
+      return [parseDate(raw[0]), parseDate(raw[1])]
+    })
+    const minDateParsed = computed(() => parseDate(props.minDate))
+    const maxDateParsed = computed(() => parseDate(props.maxDate))
 
     // Current viewing month/year in calendar
     const viewingMonth = ref(
-      (selectedDate.value ?? selectedRange.value[0])?.getMonth() ??
-        new Date().getMonth()
-    );
+      (selectedDate.value ?? selectedRange.value[0])?.getMonth() ?? new Date().getMonth()
+    )
     const viewingYear = ref(
-      (selectedDate.value ?? selectedRange.value[0])?.getFullYear() ??
-        new Date().getFullYear()
-    );
+      (selectedDate.value ?? selectedRange.value[0])?.getFullYear() ?? new Date().getFullYear()
+    )
 
     const displayValue = computed(() => {
       if (!isRangeMode.value) {
-        return selectedDate.value
-          ? formatDate(selectedDate.value, props.format)
-          : '';
+        return selectedDate.value ? formatDate(selectedDate.value, props.format) : ''
       }
 
-      const [start, end] = selectedRange.value;
-      const startText = start ? formatDate(start, props.format) : '';
-      const endText = end ? formatDate(end, props.format) : '';
+      const [start, end] = selectedRange.value
+      const startText = start ? formatDate(start, props.format) : ''
+      const endText = end ? formatDate(end, props.format) : ''
 
-      if (!startText && !endText) return '';
-      if (startText && endText) return `${startText} - ${endText}`;
-      return startText ? `${startText} - ` : ` - ${endText}`;
-    });
+      if (!startText && !endText) return ''
+      if (startText && endText) return `${startText} - ${endText}`
+      return startText ? `${startText} - ` : ` - ${endText}`
+    })
 
     const placeholderText = computed(
-      () =>
-        props.placeholder ?? (props.range ? 'Select date range' : 'Select date')
-    );
+      () => props.placeholder ?? (props.range ? 'Select date range' : 'Select date')
+    )
 
     const showClearButton = computed(() => {
-      if (!props.clearable || props.disabled || props.readonly) return false;
-      if (!isRangeMode.value) return selectedDate.value !== null;
-      const [start, end] = selectedRange.value;
-      return start !== null || end !== null;
-    });
+      if (!props.clearable || props.disabled || props.readonly) return false
+      if (!isRangeMode.value) return selectedDate.value !== null
+      const [start, end] = selectedRange.value
+      return start !== null || end !== null
+    })
 
     const calendarDays = computed(() => {
-      return getCalendarDays(viewingYear.value, viewingMonth.value);
-    });
+      return getCalendarDays(viewingYear.value, viewingMonth.value)
+    })
 
-    const dayNames = computed(() => getShortDayNames(props.locale));
+    const dayNames = computed(() => getShortDayNames(props.locale))
 
-    const labels = computed(() =>
-      getDatePickerLabels(props.locale, props.labels)
-    );
+    const labels = computed(() => getDatePickerLabels(props.locale, props.labels))
 
     const addDays = (date: Date, days: number): Date => {
-      const next = new Date(date);
-      next.setDate(next.getDate() + days);
-      return next;
-    };
+      const next = new Date(date)
+      next.setDate(next.getDate() + days)
+      return next
+    }
 
     const focusDateButtonByIso = (iso: string): boolean => {
       const button = calendarRef.value?.querySelector(
         `button[data-date="${iso}"]`
-      ) as HTMLButtonElement | null;
+      ) as HTMLButtonElement | null
 
-      if (!button || button.disabled) return false;
-      button.focus();
-      activeDateIso.value = iso;
-      return true;
-    };
+      if (!button || button.disabled) return false
+      button.focus()
+      activeDateIso.value = iso
+      return true
+    }
 
     const getFirstEnabledIsoInView = (): string | null => {
       for (const date of calendarDays.value) {
-        if (!date) continue;
-        const iso = formatDate(date, 'yyyy-MM-dd');
-        if (!isDateDisabled(date)) return iso;
+        if (!date) continue
+        const iso = formatDate(date, 'yyyy-MM-dd')
+        if (!isDateDisabled(date)) return iso
       }
-      return null;
-    };
+      return null
+    }
 
     const getPreferredFocusIso = (): string | null => {
       const focusDate = isRangeMode.value
-        ? selectedRange.value[0] ?? selectedRange.value[1]
-        : selectedDate.value;
+        ? (selectedRange.value[0] ?? selectedRange.value[1])
+        : selectedDate.value
 
-      if (focusDate) return formatDate(focusDate, 'yyyy-MM-dd');
+      if (focusDate) return formatDate(focusDate, 'yyyy-MM-dd')
 
-      const today = normalizeDate(new Date());
+      const today = normalizeDate(new Date())
       if (isDateInRange(today, minDateParsed.value, maxDateParsed.value)) {
-        return formatDate(today, 'yyyy-MM-dd');
+        return formatDate(today, 'yyyy-MM-dd')
       }
 
-      return getFirstEnabledIsoInView();
-    };
+      return getFirstEnabledIsoInView()
+    }
 
     const restoreFocus = () => {
-      const target = restoreFocusEl.value ?? inputRef.value;
-      if (!target) return;
+      const target = restoreFocusEl.value ?? inputRef.value
+      if (!target) return
       if (typeof (target as HTMLElement).focus === 'function') {
-        (target as HTMLElement).focus();
+        ;(target as HTMLElement).focus()
       }
-    };
+    }
 
     const moveFocus = async (deltaDays: number) => {
-      const activeEl = document.activeElement as HTMLElement | null;
-      const currentIso =
-        activeEl?.getAttribute('data-date') ?? activeDateIso.value ?? null;
+      const activeEl = document.activeElement as HTMLElement | null
+      const currentIso = activeEl?.getAttribute('data-date') ?? activeDateIso.value ?? null
 
-      const baseIso = currentIso ?? getPreferredFocusIso();
-      if (!baseIso) return;
+      const baseIso = currentIso ?? getPreferredFocusIso()
+      if (!baseIso) return
 
-      const baseDate = parseDate(baseIso);
-      if (!baseDate) return;
+      const baseDate = parseDate(baseIso)
+      if (!baseDate) return
 
-      let candidate = addDays(baseDate, deltaDays);
+      let candidate = addDays(baseDate, deltaDays)
       for (let attempts = 0; attempts < 42; attempts++) {
-        const iso = formatDate(candidate, 'yyyy-MM-dd');
+        const iso = formatDate(candidate, 'yyyy-MM-dd')
         const el = calendarRef.value?.querySelector(
           `button[data-date="${iso}"]`
-        ) as HTMLButtonElement | null;
+        ) as HTMLButtonElement | null
 
         if (el && !el.disabled) {
-          el.focus();
-          activeDateIso.value = iso;
-          return;
+          el.focus()
+          activeDateIso.value = iso
+          return
         }
 
         if (!el) {
-          pendingFocusIso.value = iso;
-          viewingYear.value = candidate.getFullYear();
-          viewingMonth.value = candidate.getMonth();
-          activeDateIso.value = iso;
-          await nextTick();
+          pendingFocusIso.value = iso
+          viewingYear.value = candidate.getFullYear()
+          viewingMonth.value = candidate.getMonth()
+          activeDateIso.value = iso
+          await nextTick()
           if (pendingFocusIso.value) {
-            const nextIso = pendingFocusIso.value;
-            pendingFocusIso.value = null;
-            if (focusDateButtonByIso(nextIso)) return;
+            const nextIso = pendingFocusIso.value
+            pendingFocusIso.value = null
+            if (focusDateButtonByIso(nextIso)) return
           }
-          const fallback = getFirstEnabledIsoInView();
-          if (fallback) focusDateButtonByIso(fallback);
-          return;
+          const fallback = getFirstEnabledIsoInView()
+          if (fallback) focusDateButtonByIso(fallback)
+          return
         }
 
-        candidate = addDays(candidate, deltaDays);
+        candidate = addDays(candidate, deltaDays)
       }
-    };
+    }
 
     const handleCalendarKeyDown = async (event: KeyboardEvent) => {
-      if (!isOpen.value) return;
+      if (!isOpen.value) return
 
       switch (event.key) {
         case 'Escape': {
-          event.preventDefault();
-          closeCalendar();
-          return;
+          event.preventDefault()
+          closeCalendar()
+          return
         }
         case 'ArrowRight': {
-          event.preventDefault();
-          await moveFocus(1);
-          return;
+          event.preventDefault()
+          await moveFocus(1)
+          return
         }
         case 'ArrowLeft': {
-          event.preventDefault();
-          await moveFocus(-1);
-          return;
+          event.preventDefault()
+          await moveFocus(-1)
+          return
         }
         case 'ArrowDown': {
-          event.preventDefault();
-          await moveFocus(7);
-          return;
+          event.preventDefault()
+          await moveFocus(7)
+          return
         }
         case 'ArrowUp': {
-          event.preventDefault();
-          await moveFocus(-7);
-          return;
+          event.preventDefault()
+          await moveFocus(-7)
+          return
         }
         case 'Enter':
         case ' ': {
-          const activeEl = document.activeElement as HTMLButtonElement | null;
+          const activeEl = document.activeElement as HTMLButtonElement | null
           if (activeEl?.tagName === 'BUTTON' && activeEl.dataset.date) {
-            event.preventDefault();
-            if (!activeEl.disabled) activeEl.click();
+            event.preventDefault()
+            if (!activeEl.disabled) activeEl.click()
           }
-          return;
+          return
         }
       }
-    };
+    }
 
     function toggleCalendar() {
       if (!props.disabled && !props.readonly) {
-        isOpen.value = !isOpen.value;
+        isOpen.value = !isOpen.value
         if (isOpen.value) {
           restoreFocusEl.value =
             restoreFocusEl.value ??
             (document.activeElement as HTMLElement) ??
             inputRef.value ??
-            null;
+            null
           // Reset viewing month to selected date or current month
-          const baseDate = selectedDate.value ?? selectedRange.value[0];
+          const baseDate = selectedDate.value ?? selectedRange.value[0]
           if (baseDate) {
-            viewingMonth.value = baseDate.getMonth();
-            viewingYear.value = baseDate.getFullYear();
+            viewingMonth.value = baseDate.getMonth()
+            viewingYear.value = baseDate.getFullYear()
           }
         }
       }
     }
 
     function closeCalendar() {
-      isOpen.value = false;
+      isOpen.value = false
     }
 
     function setToday() {
-      selectDate(new Date());
+      selectDate(new Date())
     }
 
     function selectDate(date: Date | null) {
-      if (!date) return;
+      if (!date) return
 
-      const normalizedDate = normalizeDate(date);
+      const normalizedDate = normalizeDate(date)
 
       // Check if date is disabled
-      if (
-        !isDateInRange(normalizedDate, minDateParsed.value, maxDateParsed.value)
-      ) {
-        return;
+      if (!isDateInRange(normalizedDate, minDateParsed.value, maxDateParsed.value)) {
+        return
       }
 
       if (!isRangeMode.value) {
-        emit('update:modelValue', normalizedDate);
-        emit('change', normalizedDate);
-        closeCalendar();
-        return;
+        emit('update:modelValue', normalizedDate)
+        emit('change', normalizedDate)
+        closeCalendar()
+        return
       }
 
-      const [start, end] = selectedRange.value;
+      const [start, end] = selectedRange.value
 
       if (!start || (start && end)) {
-        emit('update:modelValue', [normalizedDate, null]);
-        emit('change', [normalizedDate, null]);
-        return;
+        emit('update:modelValue', [normalizedDate, null])
+        emit('change', [normalizedDate, null])
+        return
       }
 
       if (normalizedDate < start) {
         // Range rule (same as TimePicker): end cannot be earlier than start
-        emit('update:modelValue', [start, start]);
-        emit('change', [start, start]);
+        emit('update:modelValue', [start, start])
+        emit('change', [start, start])
       } else {
-        emit('update:modelValue', [start, normalizedDate]);
-        emit('change', [start, normalizedDate]);
+        emit('update:modelValue', [start, normalizedDate])
+        emit('change', [start, normalizedDate])
       }
     }
 
     function clearDate(event: Event) {
-      event.stopPropagation();
+      event.stopPropagation()
 
       if (!isRangeMode.value) {
-        emit('update:modelValue', null);
-        emit('change', null);
+        emit('update:modelValue', null)
+        emit('change', null)
       } else {
-        emit('update:modelValue', [null, null]);
-        emit('change', [null, null]);
+        emit('update:modelValue', [null, null])
+        emit('change', [null, null])
       }
 
-      emit('clear');
+      emit('clear')
     }
 
     function previousMonth() {
       if (viewingMonth.value === 0) {
-        viewingMonth.value = 11;
-        viewingYear.value--;
+        viewingMonth.value = 11
+        viewingYear.value--
       } else {
-        viewingMonth.value--;
+        viewingMonth.value--
       }
     }
 
     function nextMonth() {
       if (viewingMonth.value === 11) {
-        viewingMonth.value = 0;
-        viewingYear.value++;
+        viewingMonth.value = 0
+        viewingYear.value++
       } else {
-        viewingMonth.value++;
+        viewingMonth.value++
       }
     }
 
     function isDateDisabled(date: Date | null): boolean {
-      if (!date) return true;
-      return !isDateInRange(date, minDateParsed.value, maxDateParsed.value);
+      if (!date) return true
+      return !isDateInRange(date, minDateParsed.value, maxDateParsed.value)
     }
 
     function isCurrentMonth(date: Date | null): boolean {
-      if (!date) return false;
-      return date.getMonth() === viewingMonth.value;
+      if (!date) return false
+      return date.getMonth() === viewingMonth.value
     }
 
     function handleClickOutside(event: Event) {
@@ -581,78 +560,62 @@ export const DatePicker = defineComponent({
         !calendarRef.value.contains(event.target as Node) &&
         !inputWrapperRef.value.contains(event.target as Node)
       ) {
-        closeCalendar();
+        closeCalendar()
       }
     }
 
     function handleInputClick() {
-      inputRef.value?.focus();
-      toggleCalendar();
+      inputRef.value?.focus()
+      toggleCalendar()
     }
 
     watch(isOpen, (newValue) => {
       if (newValue) {
-        document.addEventListener('click', handleClickOutside);
+        document.addEventListener('click', handleClickOutside)
 
         restoreFocusEl.value =
-          restoreFocusEl.value ??
-          (document.activeElement as HTMLElement) ??
-          inputRef.value ??
-          null;
-        const preferred = pendingFocusIso.value ?? getPreferredFocusIso();
-        pendingFocusIso.value = null;
+          restoreFocusEl.value ?? (document.activeElement as HTMLElement) ?? inputRef.value ?? null
+        const preferred = pendingFocusIso.value ?? getPreferredFocusIso()
+        pendingFocusIso.value = null
 
         nextTick().then(() => {
-          if (preferred && focusDateButtonByIso(preferred)) return;
-          const fallback = getFirstEnabledIsoInView();
-          if (fallback) focusDateButtonByIso(fallback);
-        });
+          if (preferred && focusDateButtonByIso(preferred)) return
+          const fallback = getFirstEnabledIsoInView()
+          if (fallback) focusDateButtonByIso(fallback)
+        })
       } else {
-        document.removeEventListener('click', handleClickOutside);
+        document.removeEventListener('click', handleClickOutside)
         nextTick().then(() => {
-          restoreFocus();
-        });
+          restoreFocus()
+        })
       }
-    });
+    })
 
     onBeforeUnmount(() => {
-      document.removeEventListener('click', handleClickOutside);
-    });
+      document.removeEventListener('click', handleClickOutside)
+    })
 
     const rootClass = computed(() =>
-      classNames(
-        datePickerBaseClasses,
-        props.className,
-        coerceClassValue(attrs.class)
-      )
-    );
+      classNames(datePickerBaseClasses, props.className, coerceClassValue(attrs.class))
+    )
 
-    const rootStyle = computed(() =>
-      mergeStyleValues(attrs.style, props.style)
-    );
+    const rootStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
     const forwardedAttrs = computed(() => {
-      const {
-        class: _class,
-        style: _style,
-        ...rest
-      } = (attrs as Record<string, unknown>) ?? {};
-      return rest;
-    });
+      const { class: _class, style: _style, ...rest } = (attrs as Record<string, unknown>) ?? {}
+      return rest
+    })
 
     return () => {
-      const inputClasses = getDatePickerInputClasses(
-        props.size,
-        props.disabled || props.readonly
-      );
-      const iconButtonClasses = getDatePickerIconButtonClasses(props.size);
+      const inputClasses = getDatePickerInputClasses(props.size, props.disabled || props.readonly)
+      const iconButtonClasses = getDatePickerIconButtonClasses(props.size)
 
       return h(
         'div',
         {
           ...forwardedAttrs.value,
           class: rootClass.value,
-          style: rootStyle.value,
+          style: rootStyle.value
         },
         [
           // Input wrapper
@@ -660,7 +623,7 @@ export const DatePicker = defineComponent({
             'div',
             {
               ref: inputWrapperRef,
-              class: datePickerInputWrapperClasses,
+              class: datePickerInputWrapperClasses
             },
             [
               // Input field for date display
@@ -676,7 +639,7 @@ export const DatePicker = defineComponent({
                 name: props.name,
                 id: props.id,
                 onClick: handleInputClick,
-                'aria-label': placeholderText.value,
+                'aria-label': placeholderText.value
               }),
               // Clear button
               showClearButton.value &&
@@ -686,7 +649,7 @@ export const DatePicker = defineComponent({
                     type: 'button',
                     class: datePickerClearButtonClasses,
                     onClick: clearDate,
-                    'aria-label': labels.value.clearDate,
+                    'aria-label': labels.value.clearDate
                   },
                   CloseIcon
                 ),
@@ -698,10 +661,10 @@ export const DatePicker = defineComponent({
                   class: iconButtonClasses,
                   disabled: props.disabled || props.readonly,
                   onClick: toggleCalendar,
-                  'aria-label': labels.value.toggleCalendar,
+                  'aria-label': labels.value.toggleCalendar
                 },
                 CalendarIcon
-              ),
+              )
             ]
           ),
           // Calendar dropdown
@@ -714,7 +677,7 @@ export const DatePicker = defineComponent({
                 role: 'dialog',
                 'aria-modal': 'true',
                 'aria-label': labels.value.calendar,
-                onKeydown: handleCalendarKeyDown,
+                onKeydown: handleCalendarKeyDown
               },
               [
                 // Calendar header
@@ -725,18 +688,14 @@ export const DatePicker = defineComponent({
                       type: 'button',
                       class: datePickerNavButtonClasses,
                       onClick: previousMonth,
-                      'aria-label': labels.value.previousMonth,
+                      'aria-label': labels.value.previousMonth
                     },
                     ChevronLeftIcon
                   ),
                   h(
                     'div',
                     { class: datePickerMonthYearClasses },
-                    formatMonthYear(
-                      viewingYear.value,
-                      viewingMonth.value,
-                      props.locale
-                    )
+                    formatMonthYear(viewingYear.value, viewingMonth.value, props.locale)
                   ),
                   h(
                     'button',
@@ -744,29 +703,25 @@ export const DatePicker = defineComponent({
                       type: 'button',
                       class: datePickerNavButtonClasses,
                       onClick: nextMonth,
-                      'aria-label': labels.value.nextMonth,
+                      'aria-label': labels.value.nextMonth
                     },
                     ChevronRightIcon
-                  ),
+                  )
                 ]),
                 // Day names header
-                h(
-                  'div',
-                  { class: datePickerCalendarGridClasses, role: 'row' },
-                  [
-                    ...dayNames.value.map((day) =>
-                      h(
-                        'div',
-                        {
-                          class: datePickerDayNameClasses,
-                          key: day,
-                          role: 'columnheader',
-                        },
-                        day
-                      )
-                    ),
-                  ]
-                ),
+                h('div', { class: datePickerCalendarGridClasses, role: 'row' }, [
+                  ...dayNames.value.map((day) =>
+                    h(
+                      'div',
+                      {
+                        class: datePickerDayNameClasses,
+                        key: day,
+                        role: 'columnheader'
+                      },
+                      day
+                    )
+                  )
+                ]),
                 // Calendar grid
                 h(
                   'div',
@@ -774,48 +729,43 @@ export const DatePicker = defineComponent({
                     class: datePickerCalendarGridClasses,
                     role: 'grid',
                     'aria-rowcount': 6,
-                    'aria-colcount': 7,
+                    'aria-colcount': 7
                   },
                   [
                     ...calendarDays.value.map((date, index) => {
-                      if (!date) return null;
+                      if (!date) return null
 
-                      const [rangeStart, rangeEnd] = selectedRange.value;
+                      const [rangeStart, rangeEnd] = selectedRange.value
 
                       const isRangeStart =
-                        isRangeMode.value && rangeStart
-                          ? isSameDay(date, rangeStart)
-                          : false;
+                        isRangeMode.value && rangeStart ? isSameDay(date, rangeStart) : false
                       const isRangeEnd =
-                        isRangeMode.value && rangeEnd
-                          ? isSameDay(date, rangeEnd)
-                          : false;
+                        isRangeMode.value && rangeEnd ? isSameDay(date, rangeEnd) : false
                       const isInRange =
                         isRangeMode.value &&
                         rangeStart &&
                         rangeEnd &&
                         normalizeDate(date) >= normalizeDate(rangeStart) &&
-                        normalizeDate(date) <= normalizeDate(rangeEnd);
+                        normalizeDate(date) <= normalizeDate(rangeEnd)
 
                       const isSelected = !isRangeMode.value
                         ? selectedDate.value
                           ? isSameDay(date, selectedDate.value)
                           : false
-                        : isRangeStart || isRangeEnd;
-                      const isCurrentMonthDay = isCurrentMonth(date);
-                      const isTodayDay = isTodayUtil(date);
+                        : isRangeStart || isRangeEnd
+                      const isCurrentMonthDay = isCurrentMonth(date)
+                      const isTodayDay = isTodayUtil(date)
 
                       const isSelectingRangeEnd =
-                        isRangeMode.value && Boolean(rangeStart) && !rangeEnd;
+                        isRangeMode.value && Boolean(rangeStart) && !rangeEnd
                       const isBeforeRangeStart =
                         isSelectingRangeEnd &&
                         rangeStart &&
-                        normalizeDate(date) < normalizeDate(rangeStart);
+                        normalizeDate(date) < normalizeDate(rangeStart)
 
-                      const isDisabled =
-                        isDateDisabled(date) || Boolean(isBeforeRangeStart);
+                      const isDisabled = isDateDisabled(date) || Boolean(isBeforeRangeStart)
 
-                      const iso = formatDate(date, 'yyyy-MM-dd');
+                      const iso = formatDate(date, 'yyyy-MM-dd')
 
                       return h(
                         'button',
@@ -836,17 +786,16 @@ export const DatePicker = defineComponent({
                           role: 'gridcell',
                           'data-date': iso,
                           onFocus: () => {
-                            activeDateIso.value = iso;
+                            activeDateIso.value = iso
                           },
-                          tabindex:
-                            activeDateIso.value === iso && !isDisabled ? 0 : -1,
+                          tabindex: activeDateIso.value === iso && !isDisabled ? 0 : -1,
                           'aria-label': iso,
                           'aria-selected': isSelected,
-                          'aria-current': isTodayDay ? 'date' : undefined,
+                          'aria-current': isTodayDay ? 'date' : undefined
                         },
                         date.getDate()
-                      );
-                    }),
+                      )
+                    })
                   ]
                 ),
 
@@ -858,7 +807,7 @@ export const DatePicker = defineComponent({
                         {
                           type: 'button',
                           class: datePickerFooterButtonClasses,
-                          onClick: setToday,
+                          onClick: setToday
                         },
                         labels.value.today
                       ),
@@ -867,18 +816,18 @@ export const DatePicker = defineComponent({
                         {
                           type: 'button',
                           class: datePickerFooterButtonClasses,
-                          onClick: closeCalendar,
+                          onClick: closeCalendar
                         },
                         labels.value.ok
-                      ),
+                      )
                     ])
-                  : null,
+                  : null
               ]
-            ),
+            )
         ]
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default DatePicker;
+export default DatePicker

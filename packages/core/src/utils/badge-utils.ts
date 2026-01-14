@@ -8,7 +8,8 @@ import type { BadgePosition, BadgeSize, BadgeType } from '../types/badge'
 /**
  * Base classes for all badge variants
  */
-export const badgeBaseClasses = 'inline-flex items-center justify-center font-medium transition-colors'
+export const badgeBaseClasses =
+  'inline-flex items-center justify-center font-medium transition-colors'
 
 /**
  * Size classes for badge variants
@@ -16,7 +17,7 @@ export const badgeBaseClasses = 'inline-flex items-center justify-center font-me
 export const badgeSizeClasses: Record<BadgeSize, string> = {
   sm: 'min-w-4 h-4 text-xs px-1',
   md: 'min-w-5 h-5 text-xs px-1.5',
-  lg: 'min-w-6 h-6 text-sm px-2',
+  lg: 'min-w-6 h-6 text-sm px-2'
 } as const
 
 /**
@@ -25,7 +26,7 @@ export const badgeSizeClasses: Record<BadgeSize, string> = {
 export const dotSizeClasses: Record<BadgeSize, string> = {
   sm: 'w-2 h-2',
   md: 'w-2.5 h-2.5',
-  lg: 'w-3 h-3',
+  lg: 'w-3 h-3'
 } as const
 
 /**
@@ -34,7 +35,7 @@ export const dotSizeClasses: Record<BadgeSize, string> = {
 export const badgeTypeClasses: Record<BadgeType, string> = {
   dot: 'rounded-full',
   number: 'rounded-full',
-  text: 'rounded-md',
+  text: 'rounded-md'
 } as const
 
 /**
@@ -49,7 +50,7 @@ export const badgePositionClasses: Record<BadgePosition, string> = {
   'top-right': 'absolute -top-1 -right-1',
   'top-left': 'absolute -top-1 -left-1',
   'bottom-right': 'absolute -bottom-1 -right-1',
-  'bottom-left': 'absolute -bottom-1 -left-1',
+  'bottom-left': 'absolute -bottom-1 -left-1'
 } as const
 
 /**
@@ -68,25 +69,25 @@ export function formatBadgeContent(
   if (content === undefined || content === null) {
     return null
   }
-  
+
   // If content is a string, return as-is
   if (typeof content === 'string') {
     return content
   }
-  
+
   // If content is a number
   const num = Number(content)
-  
+
   // Don't show zero unless showZero is true
   if (num === 0 && !showZero) {
     return null
   }
-  
+
   // If exceeds max, show 'max+'
   if (num > max) {
     return `${max}+`
   }
-  
+
   return String(num)
 }
 
@@ -106,7 +107,7 @@ export function shouldHideBadge(
   if (type === 'dot') {
     return false
   }
-  
+
   // For number and text types, check content
   const formattedContent = formatBadgeContent(content, 99, showZero)
   return formattedContent === null || formattedContent === ''

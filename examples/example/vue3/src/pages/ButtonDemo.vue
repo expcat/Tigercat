@@ -12,7 +12,9 @@ import { Button, Space, Divider } from '@tigercat/vue'
     <!-- 按钮类型 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">按钮类型</h2>
-      <p class="text-gray-600 mb-6">按钮有五种类型：主要按钮、次要按钮、轮廓按钮、幽灵按钮和链接按钮。</p>
+      <p class="text-gray-600 mb-6">
+        按钮有五种类型：主要按钮、次要按钮、轮廓按钮、幽灵按钮和链接按钮。
+      </p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space>
           <Button variant="primary">主要按钮</Button>

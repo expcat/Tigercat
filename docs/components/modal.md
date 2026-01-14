@@ -25,31 +25,31 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { Modal, Button, Space } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Modal, Button, Space } from '@tigercat/vue'
 
-const visible = ref(false);
+const visible = ref(false)
 </script>
 ```
 
 ### React
 
 ```tsx
-import React, { useState } from 'react';
-import { Modal, Button } from '@tigercat/react';
+import React, { useState } from 'react'
+import { Modal, Button } from '@tigercat/react'
 
 function App() {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(false)
 
   const handleOk = () => {
-    console.log('确定');
-    setVisible(false);
-  };
+    console.log('确定')
+    setVisible(false)
+  }
 
   const handleCancel = () => {
-    console.log('取消');
-    setVisible(false);
-  };
+    console.log('取消')
+    setVisible(false)
+  }
 
   return (
     <div>
@@ -70,7 +70,7 @@ function App() {
         <p>这是对话框的内容。</p>
       </Modal>
     </div>
-  );
+  )
 }
 ```
 
@@ -175,17 +175,17 @@ const showModal = (newSize) => {
 ### React
 
 ```tsx
-import React, { useState } from 'react';
-import { Modal, Button } from '@tigercat/react';
+import React, { useState } from 'react'
+import { Modal, Button } from '@tigercat/react'
 
 function App() {
-  const [visible, setVisible] = useState(false);
-  const [size, setSize] = useState('md');
+  const [visible, setVisible] = useState(false)
+  const [size, setSize] = useState('md')
 
   const showModal = (newSize) => {
-    setSize(newSize);
-    setVisible(true);
-  };
+    setSize(newSize)
+    setVisible(true)
+  }
 
   return (
     <div>
@@ -203,7 +203,7 @@ function App() {
         <p>这是一个 {size} 尺寸的对话框。</p>
       </Modal>
     </div>
-  );
+  )
 }
 ```
 
@@ -224,11 +224,7 @@ function App() {
 ### React
 
 ```tsx
-<Modal
-  visible={visible}
-  title="垂直居中对话框"
-  centered
-  onCancel={() => setVisible(false)}>
+<Modal visible={visible} title="垂直居中对话框" centered onCancel={() => setVisible(false)}>
   <p>这个对话框垂直居中显示。</p>
 </Modal>
 ```
@@ -276,11 +272,7 @@ function App() {
 ### React
 
 ```tsx
-<Modal
-  visible={visible}
-  title="关闭时销毁"
-  destroyOnClose
-  onCancel={() => setVisible(false)}>
+<Modal visible={visible} title="关闭时销毁" destroyOnClose onCancel={() => setVisible(false)}>
   <p>关闭对话框时，此内容将被销毁。</p>
 </Modal>
 ```

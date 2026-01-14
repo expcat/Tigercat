@@ -14,7 +14,7 @@ const themeNameByValue: Record<string, Record<DemoLang, string>> = {
   green: { 'zh-CN': '绿色主题', 'en-US': 'Green' },
   purple: { 'zh-CN': '紫色主题', 'en-US': 'Purple' },
   orange: { 'zh-CN': '橙色主题', 'en-US': 'Orange' },
-  pink: { 'zh-CN': '粉色主题', 'en-US': 'Pink' },
+  pink: { 'zh-CN': '粉色主题', 'en-US': 'Pink' }
 }
 
 const currentTheme = ref(getStoredTheme())
@@ -28,7 +28,7 @@ const handleThemeChange = (value: string) => {
 const themeOptions = computed(() =>
   themes.map((t) => ({
     label: themeNameByValue[t.value]?.[lang.value] ?? t.name,
-    value: t.value,
+    value: t.value
   }))
 )
 
@@ -42,7 +42,11 @@ onMounted(() => {
     <span class="text-sm font-medium text-gray-700 whitespace-nowrap shrink-0 dark:text-gray-200">
       {{ lang === 'zh-CN' ? '主题：' : 'Theme:' }}
     </span>
-    <Select :model-value="currentTheme" @update:model-value="handleThemeChange" :options="themeOptions" size="sm"
+    <Select
+      :model-value="currentTheme"
+      @update:model-value="handleThemeChange"
+      :options="themeOptions"
+      size="sm"
       class="w-40 max-w-full" />
   </div>
 </template>

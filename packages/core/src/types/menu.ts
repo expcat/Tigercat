@@ -5,14 +5,14 @@
 /**
  * Menu mode - determines the layout direction
  */
-export type MenuMode = "horizontal" | "vertical" | "inline";
+export type MenuMode = 'horizontal' | 'vertical' | 'inline'
 
 /**
  * Menu theme - color scheme for the menu
  */
-export type MenuTheme = "light" | "dark";
+export type MenuTheme = 'light' | 'dark'
 
-export type MenuKey = string | number;
+export type MenuKey = string | number
 
 /**
  * Menu item data structure
@@ -21,27 +21,27 @@ export interface MenuItem {
   /**
    * Unique key for the menu item
    */
-  key: MenuKey;
+  key: MenuKey
   /**
    * Menu item label/title
    */
-  label: string;
+  label: string
   /**
    * Icon for the menu item
    */
-  icon?: unknown;
+  icon?: unknown
   /**
    * Whether the menu item is disabled
    */
-  disabled?: boolean;
+  disabled?: boolean
   /**
    * Child menu items (for submenu)
    */
-  children?: MenuItem[];
+  children?: MenuItem[]
   /**
    * Custom data
    */
-  [key: string]: unknown;
+  [key: string]: unknown
 }
 
 /**
@@ -52,51 +52,51 @@ export interface MenuProps {
    * Menu mode - horizontal, vertical, or inline
    * @default 'vertical'
    */
-  mode?: MenuMode;
+  mode?: MenuMode
   /**
    * Menu theme - light or dark
    * @default 'light'
    */
-  theme?: MenuTheme;
+  theme?: MenuTheme
   /**
    * Currently selected menu item keys
    */
-  selectedKeys?: MenuKey[];
+  selectedKeys?: MenuKey[]
   /**
    * Default selected menu item keys
    */
-  defaultSelectedKeys?: MenuKey[];
+  defaultSelectedKeys?: MenuKey[]
   /**
    * Currently opened submenu keys (for vertical/inline mode)
    */
-  openKeys?: MenuKey[];
+  openKeys?: MenuKey[]
   /**
    * Default opened submenu keys
    */
-  defaultOpenKeys?: MenuKey[];
+  defaultOpenKeys?: MenuKey[]
   /**
    * Whether the menu is collapsed (for vertical mode)
    * @default false
    */
-  collapsed?: boolean;
+  collapsed?: boolean
   /**
    * Whether multiple submenus can be opened at once
    * @default true
    */
-  multiple?: boolean;
+  multiple?: boolean
   /**
    * Whether to allow inline indentation of submenus
    * @default true
    */
-  inlineIndent?: number;
+  inlineIndent?: number
   /**
    * Additional CSS classes
    */
-  className?: string;
+  className?: string
   /**
    * Custom styles
    */
-  style?: Record<string, string | number>;
+  style?: Record<string, string | number>
 }
 
 /**
@@ -106,19 +106,19 @@ export interface MenuItemProps {
   /**
    * Unique key for the menu item
    */
-  itemKey: MenuKey;
+  itemKey: MenuKey
   /**
    * Whether the menu item is disabled
    */
-  disabled?: boolean;
+  disabled?: boolean
   /**
    * Icon for the menu item
    */
-  icon?: unknown;
+  icon?: unknown
   /**
    * Additional CSS classes
    */
-  className?: string;
+  className?: string
 }
 
 /**
@@ -128,23 +128,23 @@ export interface SubMenuProps {
   /**
    * Unique key for the submenu
    */
-  itemKey: MenuKey;
+  itemKey: MenuKey
   /**
    * Submenu title
    */
-  title?: string;
+  title?: string
   /**
    * Icon for the submenu
    */
-  icon?: unknown;
+  icon?: unknown
   /**
    * Whether the submenu is disabled
    */
-  disabled?: boolean;
+  disabled?: boolean
   /**
    * Additional CSS classes
    */
-  className?: string;
+  className?: string
 }
 
 /**
@@ -154,9 +154,9 @@ export interface MenuItemGroupProps {
   /**
    * Group title
    */
-  title?: string;
+  title?: string
   /**
    * Additional CSS classes
    */
-  className?: string;
+  className?: string
 }

@@ -13,13 +13,13 @@ export function getSpaceGapSize(size: SpaceSize = 'md'): { class?: string; style
   if (typeof size === 'number') {
     return { style: `${size}px` }
   }
-  
+
   const sizeMap: Record<Exclude<SpaceSize, number>, string> = {
-    sm: 'gap-2',  // 8px
-    md: 'gap-4',  // 16px
-    lg: 'gap-6',  // 24px
+    sm: 'gap-2', // 8px
+    md: 'gap-4', // 16px
+    lg: 'gap-6' // 24px
   }
-  
+
   return { class: sizeMap[size] }
 }
 
@@ -34,9 +34,9 @@ export function getSpaceAlignClass(align: SpaceAlign = 'start'): string {
     end: 'items-end',
     center: 'items-center',
     baseline: 'items-baseline',
-    stretch: 'items-stretch',
+    stretch: 'items-stretch'
   }
-  
+
   return alignMap[align]
 }
 

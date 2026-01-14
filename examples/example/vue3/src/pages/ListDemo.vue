@@ -7,7 +7,7 @@ import type { ListItem } from '@tigercat/vue'
 const basicData = ref([
   { key: 1, title: '列表项 1', description: '这是第一个列表项的描述' },
   { key: 2, title: '列表项 2', description: '这是第二个列表项的描述' },
-  { key: 3, title: '列表项 3', description: '这是第三个列表项的描述' },
+  { key: 3, title: '列表项 3', description: '这是第三个列表项的描述' }
 ])
 
 // List with avatars
@@ -16,20 +16,20 @@ const userData = ref([
     key: 1,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=1',
     title: '张三',
-    description: '软件工程师 · 北京',
+    description: '软件工程师 · 北京'
   },
   {
     key: 2,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=2',
     title: '李四',
-    description: '产品经理 · 上海',
+    description: '产品经理 · 上海'
   },
   {
     key: 3,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=3',
     title: '王五',
-    description: 'UI 设计师 · 深圳',
-  },
+    description: 'UI 设计师 · 深圳'
+  }
 ])
 
 // Large dataset for pagination
@@ -37,7 +37,7 @@ const largeData = ref(
   Array.from({ length: 25 }, (_, i) => ({
     key: i + 1,
     title: `列表项 ${i + 1}`,
-    description: `这是第 ${i + 1} 个列表项的描述信息`,
+    description: `这是第 ${i + 1} 个列表项的描述信息`
   }))
 )
 
@@ -48,7 +48,7 @@ const gridData = ref([
   { key: 3, title: '卡片 3', content: '这是卡片内容 3' },
   { key: 4, title: '卡片 4', content: '这是卡片内容 4' },
   { key: 5, title: '卡片 5', content: '这是卡片内容 5' },
-  { key: 6, title: '卡片 6', content: '这是卡片内容 6' },
+  { key: 6, title: '卡片 6', content: '这是卡片内容 6' }
 ])
 
 // List with extra content
@@ -57,21 +57,21 @@ const extraData = ref([
     key: 1,
     title: '任务 1',
     description: '完成项目文档',
-    extra: h(Button, { size: 'sm' }, () => '查看'),
+    extra: h(Button, { size: 'sm' }, () => '查看')
   },
   {
     key: 2,
     title: '任务 2',
     description: 'Review Pull Requests',
-    extra: h(Button, { size: 'sm' }, () => '查看'),
-  },
+    extra: h(Button, { size: 'sm' }, () => '查看')
+  }
 ])
 
 // Custom render data
 const productData = ref([
   { key: 1, name: 'Product A', price: '¥99', stock: 15 },
   { key: 2, name: 'Product B', price: '¥149', stock: 8 },
-  { key: 3, name: 'Product C', price: '¥199', stock: 22 },
+  { key: 3, name: 'Product C', price: '¥199', stock: 22 }
 ])
 
 const loading = ref(false)
@@ -250,10 +250,9 @@ function handlePageChange(page: { current: number; pageSize: number }) {
             current: 1,
             pageSize: 10,
             showSizeChanger: true,
-            showTotal: true,
+            showTotal: true
           }"
-          @page-change="handlePageChange"
-        />
+          @page-change="handlePageChange" />
         <div class="mt-3 text-sm text-gray-600">
           当前：第 {{ pageInfo.current }} 页，{{ pageInfo.pageSize }} / 页
         </div>
@@ -273,10 +272,9 @@ function handlePageChange(page: { current: number; pageSize: number }) {
             column: 3,
             xs: 1,
             sm: 2,
-            md: 3,
+            md: 3
           }"
-          bordered="none"
-        >
+          bordered="none">
           <template #renderItem="{ item }">
             <Card variant="shadow">
               <h3 class="font-semibold mb-2">{{ item.title }}</h3>
@@ -316,11 +314,7 @@ function handlePageChange(page: { current: number; pageSize: number }) {
       <h2 class="text-2xl font-bold mb-4">可点击列表</h2>
       <p class="text-gray-600 mb-6">列表项可以添加点击事件和悬停效果。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
-        <List
-          :dataSource="basicData"
-          hoverable
-          @item-click="handleItemClick"
-        />
+        <List :dataSource="basicData" hoverable @item-click="handleItemClick" />
       </div>
       <Divider class="my-6" />
     </section>

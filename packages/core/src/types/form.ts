@@ -5,7 +5,15 @@
 /**
  * Supported form validation rule types
  */
-export type FormRuleType = 'string' | 'number' | 'boolean' | 'array' | 'object' | 'email' | 'url' | 'date'
+export type FormRuleType =
+  | 'string'
+  | 'number'
+  | 'boolean'
+  | 'array'
+  | 'object'
+  | 'email'
+  | 'url'
+  | 'date'
 
 /**
  * When to trigger form validation
@@ -21,28 +29,28 @@ export interface FormRule {
    * Rule type - determines the validation logic to apply
    */
   type?: FormRuleType
-  
+
   /**
    * Whether the field is required
    * @default false
    */
   required?: boolean
-  
+
   /**
    * Minimum length for strings, minimum value for numbers, or minimum items for arrays
    */
   min?: number
-  
+
   /**
    * Maximum length for strings, maximum value for numbers, or maximum items for arrays
    */
   max?: number
-  
+
   /**
    * Regular expression pattern to match against string values
    */
   pattern?: RegExp
-  
+
   /**
    * Custom validator function
    * Should return:
@@ -51,20 +59,23 @@ export interface FormRule {
    * - string with custom error message if validation fails
    * Can be async for server-side validation
    */
-  validator?: (value: unknown, values?: Record<string, unknown>) => boolean | string | Promise<boolean | string>
-  
+  validator?: (
+    value: unknown,
+    values?: Record<string, unknown>
+  ) => boolean | string | Promise<boolean | string>
+
   /**
    * Error message to display when validation fails
    * If not provided, a default message will be used
    */
   message?: string
-  
+
   /**
    * When to trigger validation
    * @default ['change', 'blur']
    */
   trigger?: FormRuleTrigger | FormRuleTrigger[]
-  
+
   /**
    * Transform value before validation
    * Useful for trimming strings, converting types, etc.
@@ -86,7 +97,7 @@ export interface FormError {
    * Field name that failed validation
    */
   field: string
-  
+
   /**
    * Error message describing the validation failure
    */
@@ -107,7 +118,7 @@ export interface FormValidationResult {
    * Whether the entire form is valid (no errors)
    */
   valid: boolean
-  
+
   /**
    * Array of validation errors (empty if form is valid)
    */
@@ -137,47 +148,47 @@ export interface FormProps {
    * Form values
    */
   model?: FormValues
-  
+
   /**
    * Form validation rules
    */
   rules?: FormRules
-  
+
   /**
    * Label width (applies when labelPosition is 'left' or 'right')
    */
   labelWidth?: string | number
-  
+
   /**
    * Label position
    * @default 'right'
    */
   labelPosition?: FormLabelPosition
-  
+
   /**
    * Label alignment
    * @default 'right'
    */
   labelAlign?: FormLabelAlign
-  
+
   /**
    * Form size
    * @default 'md'
    */
   size?: FormSize
-  
+
   /**
    * Whether to show validation messages inline
    * @default true
    */
   inlineMessage?: boolean
-  
+
   /**
    * Whether to show asterisk for required fields
    * @default true
    */
   showRequiredAsterisk?: boolean
-  
+
   /**
    * Whether to disable the entire form
    * @default false
@@ -193,38 +204,38 @@ export interface FormItemProps {
    * Field name (must match key in form model)
    */
   name?: string
-  
+
   /**
    * Label text
    */
   label?: string
-  
+
   /**
    * Label width (overrides form's labelWidth)
    */
   labelWidth?: string | number
-  
+
   /**
    * Whether the field is required
    */
   required?: boolean
-  
+
   /**
    * Validation rules for this field
    */
   rules?: FormRule | FormRule[]
-  
+
   /**
    * Error message (controlled mode)
    */
   error?: string
-  
+
   /**
    * Whether to show validation message
    * @default true
    */
   showMessage?: boolean
-  
+
   /**
    * Size (overrides form's size)
    */

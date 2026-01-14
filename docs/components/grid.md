@@ -10,7 +10,7 @@
 
 ```vue
 <script setup>
-import { Row, Col } from '@tigercat/vue';
+import { Row, Col } from '@tigercat/vue'
 </script>
 
 <template>
@@ -58,7 +58,7 @@ import { Row, Col } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Row, Col } from '@tigercat/react';
+import { Row, Col } from '@tigercat/react'
 
 function App() {
   return (
@@ -102,7 +102,7 @@ function App() {
         </Col>
       </Row>
     </>
-  );
+  )
 }
 ```
 
@@ -154,7 +154,7 @@ function App() {
 {
   /* 水平间隔 16px */
 }
-<Row gutter={16}>
+;<Row gutter={16}>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
@@ -167,12 +167,12 @@ function App() {
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
-</Row>;
+</Row>
 
 {
   /* 水平间隔 16px，垂直间隔 24px */
 }
-<Row gutter={[16, 24]}>
+;<Row gutter={[16, 24]}>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
@@ -185,7 +185,7 @@ function App() {
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
-</Row>;
+</Row>
 ```
 
 ## 偏移 (Offset)
@@ -374,7 +374,7 @@ function App() {
 {
   /* 顶部对齐 */
 }
-<Row align="top" gutter={16}>
+;<Row align="top" gutter={16}>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4 h-24">col-6</div>
   </Col>
@@ -387,12 +387,12 @@ function App() {
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
-</Row>;
+</Row>
 
 {
   /* 居中对齐 */
 }
-<Row align="middle" gutter={16}>
+;<Row align="middle" gutter={16}>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4 h-24">col-6</div>
   </Col>
@@ -405,12 +405,12 @@ function App() {
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
-</Row>;
+</Row>
 
 {
   /* 底部对齐 */
 }
-<Row align="bottom" gutter={16}>
+;<Row align="bottom" gutter={16}>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4 h-24">col-6</div>
   </Col>
@@ -423,31 +423,31 @@ function App() {
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
-</Row>;
+</Row>
 
 {
   /* 水平居中 */
 }
-<Row justify="center" gutter={16}>
+;<Row justify="center" gutter={16}>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
-</Row>;
+</Row>
 
 {
   /* 两端对齐 */
 }
-<Row justify="space-between" gutter={16}>
+;<Row justify="space-between" gutter={16}>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
   <Col span={6}>
     <div className="bg-blue-500 text-white p-4">col-6</div>
   </Col>
-</Row>;
+</Row>
 ```
 
 ## 响应式布局
@@ -622,20 +622,20 @@ import type {
   GutterSize,
   ColSpan,
   Align,
-  Justify,
-} from '@tigercat/core';
+  Justify
+} from '@tigercat/core'
 
 // Vue
-import { Row, Col } from '@tigercat/vue';
-import type { VueRowProps, VueColProps } from '@tigercat/vue';
+import { Row, Col } from '@tigercat/vue'
+import type { VueRowProps, VueColProps } from '@tigercat/vue'
 
 // React
 import type {
   Row,
   Col,
   RowProps as ReactRowProps,
-  ColProps as ReactColProps,
-} from '@tigercat/react';
+  ColProps as ReactColProps
+} from '@tigercat/react'
 ```
 
 ## 无障碍 (Accessibility)
@@ -683,7 +683,7 @@ import type {
 #### React
 
 ```tsx
-import { Row, Col } from '@tigercat/react';
+import { Row, Col } from '@tigercat/react'
 
 function Layout() {
   return (
@@ -712,7 +712,7 @@ function Layout() {
         </Col>
       </Row>
     </div>
-  );
+  )
 }
 ```
 
@@ -736,7 +736,7 @@ function Layout() {
 #### React
 
 ```tsx
-import { Row, Col } from '@tigercat/react';
+import { Row, Col } from '@tigercat/react'
 
 function CardGrid() {
   return (
@@ -750,6 +750,6 @@ function CardGrid() {
         </Col>
       ))}
     </Row>
-  );
+  )
 }
 ```

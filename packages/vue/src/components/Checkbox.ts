@@ -1,30 +1,18 @@
-import {
-  defineComponent,
-  computed,
-  h,
-  ref,
-  watch,
-  inject,
-  type PropType,
-} from 'vue';
-import { classNames, coerceClassValue } from '@tigercat/core';
-import {
-  getCheckboxClasses,
-  getCheckboxLabelClasses,
-  type CheckboxSize,
-} from '@tigercat/core';
-import type { ComputedRef } from 'vue';
-import { CheckboxGroupKey, type CheckboxGroupContext } from './CheckboxGroup';
+import { defineComponent, computed, h, ref, watch, inject, type PropType } from 'vue'
+import { classNames, coerceClassValue } from '@tigercat/core'
+import { getCheckboxClasses, getCheckboxLabelClasses, type CheckboxSize } from '@tigercat/core'
+import type { ComputedRef } from 'vue'
+import { CheckboxGroupKey, type CheckboxGroupContext } from './CheckboxGroup'
 
 export interface VueCheckboxProps {
-  modelValue?: boolean | null;
-  value?: string | number | boolean;
-  size?: CheckboxSize;
-  disabled?: boolean;
-  indeterminate?: boolean;
-  defaultChecked?: boolean;
-  className?: string;
-  style?: Record<string, string | number>;
+  modelValue?: boolean | null
+  value?: string | number | boolean
+  size?: CheckboxSize
+  disabled?: boolean
+  indeterminate?: boolean
+  defaultChecked?: boolean
+  className?: string
+  style?: Record<string, string | number>
 }
 
 export const Checkbox = defineComponent({
@@ -36,25 +24,25 @@ export const Checkbox = defineComponent({
      */
     modelValue: {
       type: [Boolean, null] as PropType<boolean | null>,
-      default: null,
+      default: null
     },
     /**
      * Checkbox value (for use in checkbox groups)
      */
     value: {
-      type: [String, Number, Boolean] as PropType<string | number | boolean>,
+      type: [String, Number, Boolean] as PropType<string | number | boolean>
     },
     /**
      * Checkbox size
      */
     size: {
-      type: String as PropType<CheckboxSize>,
+      type: String as PropType<CheckboxSize>
     },
     /**
      * Whether the checkbox is disabled
      */
     disabled: {
-      type: Boolean,
+      type: Boolean
     },
     /**
      * Whether the checkbox is in indeterminate state
@@ -62,7 +50,7 @@ export const Checkbox = defineComponent({
      */
     indeterminate: {
       type: Boolean,
-      default: false,
+      default: false
     },
     /**
      * Default checked state (uncontrolled mode)
@@ -70,22 +58,22 @@ export const Checkbox = defineComponent({
      */
     defaultChecked: {
       type: Boolean,
-      default: false,
+      default: false
     },
 
     /**
      * Additional CSS classes (applied to root element)
      */
     className: {
-      type: String,
+      type: String
     },
 
     /**
      * Inline styles (applied to root element)
      */
     style: {
-      type: Object as PropType<Record<string, string | number>>,
-    },
+      type: Object as PropType<Record<string, string | number>>
+    }
   },
   emits: {
     /**
@@ -95,85 +83,73 @@ export const Checkbox = defineComponent({
     /**
      * Emitted when checked state changes
      */
-    change: (value: boolean, event: Event) =>
-      typeof value === 'boolean' && event instanceof Event,
+    change: (value: boolean, event: Event) => typeof value === 'boolean' && event instanceof Event
   },
   setup(props, { slots, emit, attrs }) {
     // Get group context if inside CheckboxGroup
-    const groupContextRef = inject<ComputedRef<CheckboxGroupContext> | null>(
-      CheckboxGroupKey,
-      null
-    );
+    const groupContextRef = inject<ComputedRef<CheckboxGroupContext> | null>(CheckboxGroupKey, null)
 
-    const groupContext = computed(() => groupContextRef?.value);
+    const groupContext = computed(() => groupContextRef?.value)
 
     // Internal state for uncontrolled mode
-    const internalChecked = ref(props.defaultChecked);
+    const internalChecked = ref(props.defaultChecked)
 
     // Determine if controlled or uncontrolled
-    const isControlled = computed(() => props.modelValue !== null);
+    const isControlled = computed(() => props.modelValue !== null)
 
     // Determine effective size and disabled state
-    const effectiveSize = computed(
-      () => props.size || groupContext.value?.size || 'md'
-    );
+    const effectiveSize = computed(() => props.size || groupContext.value?.size || 'md')
     const effectiveDisabled = computed(() => {
-      if (props.disabled !== undefined) return props.disabled;
-      return groupContext.value?.disabled || false;
-    });
+      if (props.disabled !== undefined) return props.disabled
+      return groupContext.value?.disabled || false
+    })
 
     // Current checked state
     const checked = computed(() => {
       // If in a group and has a value, check if value is in group's selected values
       if (groupContext.value && props.value !== undefined) {
-        return groupContext.value.value.includes(props.value);
+        return groupContext.value.value.includes(props.value)
       }
-      return isControlled.value ? props.modelValue : internalChecked.value;
-    });
+      return isControlled.value ? props.modelValue : internalChecked.value
+    })
 
-    const checkboxRef = ref<HTMLInputElement | null>(null);
+    const checkboxRef = ref<HTMLInputElement | null>(null)
 
     watch(
       () => [checkboxRef.value, props.indeterminate] as const,
       ([el]) => {
-        if (el) el.indeterminate = props.indeterminate;
+        if (el) el.indeterminate = props.indeterminate
       },
       { immediate: true }
-    );
+    )
 
     const handleChange = (event: Event) => {
-      if (effectiveDisabled.value) return;
+      if (effectiveDisabled.value) return
 
-      const target = event.target as HTMLInputElement;
-      const newValue = target.checked;
+      const target = event.target as HTMLInputElement
+      const newValue = target.checked
 
       // If in a group, update group value
       if (groupContext.value && props.value !== undefined) {
-        groupContext.value.updateValue(props.value, newValue);
+        groupContext.value.updateValue(props.value, newValue)
       } else {
         // Update internal state if uncontrolled
         if (!isControlled.value) {
-          internalChecked.value = newValue;
+          internalChecked.value = newValue
         }
 
-        emit('update:modelValue', newValue);
-        emit('change', newValue, event);
+        emit('update:modelValue', newValue)
+        emit('change', newValue, event)
       }
-    };
+    }
 
     return () => {
-      const checkboxClasses = getCheckboxClasses(
-        effectiveSize.value,
-        effectiveDisabled.value
-      );
+      const checkboxClasses = getCheckboxClasses(effectiveSize.value, effectiveDisabled.value)
 
-      const rootStyle = [attrs.style, props.style];
-      const rootClass = classNames(
-        props.className,
-        coerceClassValue(attrs.class)
-      );
+      const rootStyle = [attrs.style, props.style]
+      const rootClass = classNames(props.className, coerceClassValue(attrs.class))
 
-      const { class: _class, style: _style, ...restAttrs } = attrs;
+      const { class: _class, style: _style, ...restAttrs } = attrs
 
       const checkboxElement = h('input', {
         ref: checkboxRef,
@@ -183,8 +159,8 @@ export const Checkbox = defineComponent({
         disabled: effectiveDisabled.value,
         value: props.value,
         onChange: handleChange,
-        ...restAttrs,
-      });
+        ...restAttrs
+      })
 
       // If there's no label content, return just the checkbox
       if (!slots.default) {
@@ -197,22 +173,18 @@ export const Checkbox = defineComponent({
           disabled: effectiveDisabled.value,
           value: props.value,
           onChange: handleChange,
-          ...restAttrs,
-        });
+          ...restAttrs
+        })
       }
 
       // Return label with checkbox and content
-      const labelClasses = getCheckboxLabelClasses(
-        effectiveSize.value,
-        effectiveDisabled.value
-      );
-      return h(
-        'label',
-        { class: classNames(labelClasses, rootClass), style: rootStyle },
-        [checkboxElement, h('span', { class: 'ml-2' }, slots.default())]
-      );
-    };
-  },
-});
+      const labelClasses = getCheckboxLabelClasses(effectiveSize.value, effectiveDisabled.value)
+      return h('label', { class: classNames(labelClasses, rootClass), style: rootStyle }, [
+        checkboxElement,
+        h('span', { class: 'ml-2' }, slots.default())
+      ])
+    }
+  }
+})
 
-export default Checkbox;
+export default Checkbox

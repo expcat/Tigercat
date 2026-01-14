@@ -10,20 +10,24 @@ const basicTreeData = ref<TreeNode[]>([
     label: '父节点 1',
     children: [
       { key: '1-1', label: '子节点 1-1' },
-      { key: '1-2', label: '子节点 1-2' },
-    ],
+      { key: '1-2', label: '子节点 1-2' }
+    ]
   },
   {
     key: '2',
     label: '父节点 2',
     children: [
       { key: '2-1', label: '子节点 2-1' },
-      { key: '2-2', label: '子节点 2-2', children: [
-        { key: '2-2-1', label: '子节点 2-2-1' },
-        { key: '2-2-2', label: '子节点 2-2-2' },
-      ]},
-    ],
-  },
+      {
+        key: '2-2',
+        label: '子节点 2-2',
+        children: [
+          { key: '2-2-1', label: '子节点 2-2-1' },
+          { key: '2-2-2', label: '子节点 2-2-2' }
+        ]
+      }
+    ]
+  }
 ])
 
 // Checkable tree data
@@ -40,24 +44,22 @@ const disabledTreeData = ref<TreeNode[]>([
     label: '父节点 1',
     children: [
       { key: '1-1', label: '子节点 1-1' },
-      { key: '1-2', label: '子节点 1-2 (禁用)', disabled: true },
-    ],
+      { key: '1-2', label: '子节点 1-2 (禁用)', disabled: true }
+    ]
   },
   {
     key: '2',
     label: '父节点 2 (禁用)',
     disabled: true,
-    children: [
-      { key: '2-1', label: '子节点 2-1' },
-    ],
-  },
+    children: [{ key: '2-1', label: '子节点 2-1' }]
+  }
 ])
 
 // Lazy loading tree data
 const lazyTreeData = ref<TreeNode[]>([
   { key: '1', label: '父节点 1' },
   { key: '2', label: '父节点 2' },
-  { key: '3', label: '父节点 3' },
+  { key: '3', label: '父节点 3' }
 ])
 
 async function loadChildren(node: TreeNode): Promise<TreeNode[]> {
@@ -67,7 +69,7 @@ async function loadChildren(node: TreeNode): Promise<TreeNode[]> {
       resolve([
         { key: `${node.key}-1`, label: `${node.label} - 子节点 1` },
         { key: `${node.key}-2`, label: `${node.label} - 子节点 2` },
-        { key: `${node.key}-3`, label: `${node.label} - 子节点 3` },
+        { key: `${node.key}-3`, label: `${node.label} - 子节点 3` }
       ])
     }, 1000)
   })
@@ -82,25 +84,25 @@ const filterTreeData = ref<TreeNode[]>([
     children: [
       { key: '1-1', label: 'iPhone' },
       { key: '1-2', label: 'iPad' },
-      { key: '1-3', label: 'MacBook' },
-    ],
+      { key: '1-3', label: 'MacBook' }
+    ]
   },
   {
     key: '2',
     label: 'Microsoft',
     children: [
       { key: '2-1', label: 'Surface' },
-      { key: '2-2', label: 'Xbox' },
-    ],
+      { key: '2-2', label: 'Xbox' }
+    ]
   },
   {
     key: '3',
     label: 'Google',
     children: [
       { key: '3-1', label: 'Pixel' },
-      { key: '3-2', label: 'Chromebook' },
-    ],
-  },
+      { key: '3-2', label: 'Chromebook' }
+    ]
+  }
 ])
 </script>
 
@@ -129,36 +131,30 @@ const filterTreeData = ref<TreeNode[]>([
       <Card>
         <template #header><h3 class="text-lg font-semibold">可选择的树</h3></template>
         <p class="text-sm text-gray-600 mb-4">已选择: {{ selectedKeys.join(', ') }}</p>
-        <Tree 
-          :treeData="basicTreeData" 
-          selectable
-          v-model:selectedKeys="selectedKeys"
-        />
+        <Tree :treeData="basicTreeData" selectable v-model:selectedKeys="selectedKeys" />
       </Card>
 
       <!-- 多选树（级联） -->
       <Card>
         <template #header><h3 class="text-lg font-semibold">多选树（级联）</h3></template>
         <p class="text-sm text-gray-600 mb-4">已勾选: {{ checkedKeys.join(', ') }}</p>
-        <Tree 
-          :treeData="basicTreeData" 
+        <Tree
+          :treeData="basicTreeData"
           checkable
           defaultExpandAll
-          v-model:checkedKeys="checkedKeys"
-        />
+          v-model:checkedKeys="checkedKeys" />
       </Card>
 
       <!-- 多选树（父子独立） -->
       <Card>
         <template #header><h3 class="text-lg font-semibold">多选树（父子独立）</h3></template>
         <p class="text-sm text-gray-600 mb-4">已勾选: {{ checkedKeysStrictly.join(', ') }}</p>
-        <Tree 
-          :treeData="basicTreeData" 
+        <Tree
+          :treeData="basicTreeData"
           checkable
           checkStrictly
           defaultExpandAll
-          v-model:checkedKeys="checkedKeysStrictly"
-        />
+          v-model:checkedKeys="checkedKeysStrictly" />
       </Card>
 
       <!-- 禁用节点 -->
@@ -177,16 +173,8 @@ const filterTreeData = ref<TreeNode[]>([
       <!-- 节点过滤 -->
       <Card>
         <template #header><h3 class="text-lg font-semibold">节点过滤</h3></template>
-        <Input 
-          v-model="filterValue" 
-          placeholder="搜索节点..." 
-          class="mb-4"
-        />
-        <Tree
-          :treeData="filterTreeData"
-          :filterValue="filterValue"
-          ariaLabel="Tree 节点过滤"
-        />
+        <Input v-model="filterValue" placeholder="搜索节点..." class="mb-4" />
+        <Tree :treeData="filterTreeData" :filterValue="filterValue" ariaLabel="Tree 节点过滤" />
       </Card>
 
       <!-- Block 节点 -->

@@ -1,21 +1,15 @@
 /**
  * Popconfirm utility functions
  */
-import { classNames } from './class-names';
-import type { PopconfirmIconType } from '../types/popconfirm';
-import type { DropdownPlacement } from '../types/dropdown';
+import { classNames } from './class-names'
+import type { PopconfirmIconType } from '../types/popconfirm'
+import type { DropdownPlacement } from '../types/dropdown'
 
 /**
  * Get base popconfirm container classes
  */
 export function getPopconfirmContainerClasses(): string {
-  return classNames(
-    'tiger-popconfirm',
-    'relative',
-    'inline-block',
-    'w-fit',
-    'justify-self-start'
-  );
+  return classNames('tiger-popconfirm', 'relative', 'inline-block', 'w-fit', 'justify-self-start')
 }
 
 /**
@@ -26,7 +20,7 @@ export function getPopconfirmTriggerClasses(disabled: boolean): string {
     'tiger-popconfirm-trigger',
     'inline-block',
     disabled && 'cursor-not-allowed opacity-50'
-  );
+  )
 }
 
 /**
@@ -45,15 +39,13 @@ export function getPopconfirmContentClasses(): string {
     'shadow-lg',
     'border',
     'border-[var(--tiger-border,#e5e7eb)]'
-  );
+  )
 }
 
 /**
  * Get popconfirm arrow classes (small pointer to the trigger)
  */
-export function getPopconfirmArrowClasses(
-  placement: DropdownPlacement
-): string {
+export function getPopconfirmArrowClasses(placement: DropdownPlacement): string {
   const base = classNames(
     'tiger-popconfirm-arrow',
     'absolute',
@@ -69,7 +61,7 @@ export function getPopconfirmArrowClasses(
     'after:rounded-[2px]',
     'pointer-events-none',
     'z-0'
-  );
+  )
 
   const placementMap: Record<DropdownPlacement, string> = {
     'top-start': 'bottom-0 left-6 translate-y-1/2',
@@ -86,10 +78,10 @@ export function getPopconfirmArrowClasses(
 
     'right-start': 'left-0 top-6 -translate-x-1/2',
     right: 'left-0 top-1/2 -translate-y-1/2 -translate-x-1/2',
-    'right-end': 'left-0 bottom-6 -translate-x-1/2',
-  };
+    'right-end': 'left-0 bottom-6 -translate-x-1/2'
+  }
 
-  return classNames(base, placementMap[placement] || placementMap.bottom);
+  return classNames(base, placementMap[placement] || placementMap.bottom)
 }
 
 /**
@@ -102,7 +94,7 @@ export function getPopconfirmTitleClasses(): string {
     'font-medium',
     'text-[var(--tiger-text,#111827)]',
     'mb-2'
-  );
+  )
 }
 
 /**
@@ -114,7 +106,7 @@ export function getPopconfirmDescriptionClasses(): string {
     'text-xs',
     'text-[var(--tiger-text-muted,#6b7280)]',
     'mb-3'
-  );
+  )
 }
 
 /**
@@ -126,8 +118,8 @@ export function getPopconfirmIconClasses(iconType: PopconfirmIconType): string {
     info: 'text-[var(--tiger-info,#3b82f6)]',
     error: 'text-[var(--tiger-error,#ef4444)]',
     success: 'text-[var(--tiger-success,#22c55e)]',
-    question: 'text-[var(--tiger-text-muted,#6b7280)]',
-  };
+    question: 'text-[var(--tiger-text-muted,#6b7280)]'
+  }
 
   return classNames(
     'tiger-popconfirm-icon',
@@ -136,7 +128,7 @@ export function getPopconfirmIconClasses(iconType: PopconfirmIconType): string {
     'h-5',
     'mr-2',
     iconColorMap[iconType] || iconColorMap.warning
-  );
+  )
 }
 
 /**
@@ -150,7 +142,7 @@ export function getPopconfirmButtonsClasses(): string {
     'justify-end',
     'gap-2',
     'mt-3'
-  );
+  )
 }
 
 /**
@@ -167,7 +159,7 @@ export function getPopconfirmButtonBaseClasses(): string {
     'focus:outline-none',
     'focus:ring-2',
     'focus:ring-offset-2'
-  );
+  )
 }
 
 /**
@@ -182,15 +174,13 @@ export function getPopconfirmCancelButtonClasses(): string {
     'border-[var(--tiger-border,#d1d5db)]',
     'hover:bg-[var(--tiger-surface-muted,#f3f4f6)]',
     'focus:ring-[var(--tiger-text-muted,#6b7280)]'
-  );
+  )
 }
 
 /**
  * Get popconfirm confirm button classes
  */
-export function getPopconfirmOkButtonClasses(
-  okType: 'primary' | 'danger'
-): string {
+export function getPopconfirmOkButtonClasses(okType: 'primary' | 'danger'): string {
   const typeClasses =
     okType === 'danger'
       ? classNames(
@@ -204,33 +194,33 @@ export function getPopconfirmOkButtonClasses(
           'text-white',
           'hover:bg-[var(--tiger-primary-hover,#1d4ed8)]',
           'focus:ring-[var(--tiger-primary,#2563eb)]'
-        );
+        )
 
-  return classNames(getPopconfirmButtonBaseClasses(), typeClasses);
+  return classNames(getPopconfirmButtonBaseClasses(), typeClasses)
 }
 
 /**
  * Popconfirm icon SVG constants
  */
-export const popconfirmIconViewBox = '0 0 24 24';
-export const popconfirmIconStrokeWidth = 1.5;
-export const popconfirmIconPathStrokeLinecap = 'round';
-export const popconfirmIconPathStrokeLinejoin = 'round';
+export const popconfirmIconViewBox = '0 0 24 24'
+export const popconfirmIconStrokeWidth = 1.5
+export const popconfirmIconPathStrokeLinecap = 'round'
+export const popconfirmIconPathStrokeLinejoin = 'round'
 
 export const popconfirmWarningIconPath =
-  'M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z';
+  'M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z'
 
 export const popconfirmInfoIconPath =
-  'M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z';
+  'M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z'
 
 export const popconfirmErrorIconPath =
-  'M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+  'M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
 
 export const popconfirmSuccessIconPath =
-  'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
+  'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
 
 export const popconfirmQuestionIconPath =
-  'M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z';
+  'M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z'
 
 /**
  * Get popconfirm icon path based on icon type
@@ -241,8 +231,8 @@ export function getPopconfirmIconPath(iconType: PopconfirmIconType): string {
     info: popconfirmInfoIconPath,
     error: popconfirmErrorIconPath,
     success: popconfirmSuccessIconPath,
-    question: popconfirmQuestionIconPath,
-  };
+    question: popconfirmQuestionIconPath
+  }
 
-  return iconPathMap[iconType] || iconPathMap.warning;
+  return iconPathMap[iconType] || iconPathMap.warning
 }

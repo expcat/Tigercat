@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Loading } from "@tigercat/vue";
+import { Loading } from '@tigercat/vue'
 </script>
 
 <template>
@@ -20,7 +20,7 @@ import { Loading } from "@tigercat/vue";
 ### React
 
 ```tsx
-import { Loading } from "@tigercat/react";
+import { Loading } from '@tigercat/react'
 
 function App() {
   return (
@@ -28,7 +28,7 @@ function App() {
       <Loading />
       <Loading text="加载中..." />
     </>
-  );
+  )
 }
 ```
 
@@ -161,17 +161,17 @@ Loading 组件支持 7 种颜色变体：
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Loading } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Loading } from '@tigercat/vue'
 
-const loading = ref(true);
+const loading = ref(true)
 
 const loadData = () => {
-  loading.value = true;
+  loading.value = true
   setTimeout(() => {
-    loading.value = false;
-  }, 2000);
-};
+    loading.value = false
+  }, 2000)
+}
 </script>
 
 <template>
@@ -185,25 +185,25 @@ const loadData = () => {
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Loading } from "@tigercat/react";
+import { useState } from 'react'
+import { Loading } from '@tigercat/react'
 
 function App() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   const loadData = () => {
-    setLoading(true);
+    setLoading(true)
     setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  };
+      setLoading(false)
+    }, 2000)
+  }
 
   return (
     <div>
       <button onClick={loadData}>加载数据</button>
       {loading && <Loading fullscreen text="加载中..." />}
     </div>
-  );
+  )
 }
 ```
 
@@ -244,7 +244,7 @@ function App() {
 {
   /* 延迟 300ms 后显示 */
 }
-<Loading delay={300} text="加载中..." />;
+;<Loading delay={300} text="加载中..." />
 ```
 
 ## 与 Button 组合使用
@@ -255,17 +255,17 @@ Loading 组件可以很好地与 Button 组件的 loading 状态配合使用。
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Button } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Button } from '@tigercat/vue'
 
-const loading = ref(false);
+const loading = ref(false)
 
 const handleSubmit = () => {
-  loading.value = true;
+  loading.value = true
   setTimeout(() => {
-    loading.value = false;
-  }, 2000);
-};
+    loading.value = false
+  }, 2000)
+}
 </script>
 
 <template>
@@ -276,24 +276,24 @@ const handleSubmit = () => {
 ### React
 
 ```tsx
-import { useState } from "react";
-import { Button } from "@tigercat/react";
+import { useState } from 'react'
+import { Button } from '@tigercat/react'
 
 function SubmitButton() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = () => {
-    setLoading(true);
+    setLoading(true)
     setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  };
+      setLoading(false)
+    }, 2000)
+  }
 
   return (
     <Button loading={loading} onClick={handleSubmit}>
       提交
     </Button>
-  );
+  )
 }
 ```
 
@@ -305,25 +305,25 @@ function SubmitButton() {
 
 ```vue
 <script setup>
-import { ref, onMounted } from "vue";
-import { Loading } from "@tigercat/vue";
+import { ref, onMounted } from 'vue'
+import { Loading } from '@tigercat/vue'
 
-const pageLoading = ref(true);
-const data = ref([]);
+const pageLoading = ref(true)
+const data = ref([])
 
 onMounted(async () => {
   try {
     // 模拟数据加载
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1500))
     data.value = [
-      { id: 1, name: "项目一" },
-      { id: 2, name: "项目二" },
-      { id: 3, name: "项目三" },
-    ];
+      { id: 1, name: '项目一' },
+      { id: 2, name: '项目二' },
+      { id: 3, name: '项目三' }
+    ]
   } finally {
-    pageLoading.value = false;
+    pageLoading.value = false
   }
-});
+})
 </script>
 
 <template>
@@ -342,27 +342,27 @@ onMounted(async () => {
 #### React
 
 ```tsx
-import { useState, useEffect } from "react";
-import { Loading } from "@tigercat/react";
+import { useState, useEffect } from 'react'
+import { Loading } from '@tigercat/react'
 
 function PageContent() {
-  const [pageLoading, setPageLoading] = useState(true);
-  const [data, setData] = useState([]);
+  const [pageLoading, setPageLoading] = useState(true)
+  const [data, setData] = useState([])
 
   useEffect(() => {
     // 模拟数据加载
     setTimeout(() => {
       setData([
-        { id: 1, name: "项目一" },
-        { id: 2, name: "项目二" },
-        { id: 3, name: "项目三" },
-      ]);
-      setPageLoading(false);
-    }, 1500);
-  }, []);
+        { id: 1, name: '项目一' },
+        { id: 2, name: '项目二' },
+        { id: 3, name: '项目三' }
+      ])
+      setPageLoading(false)
+    }, 1500)
+  }, [])
 
   if (pageLoading) {
-    return <Loading fullscreen text="页面加载中..." />;
+    return <Loading fullscreen text="页面加载中..." />
   }
 
   return (
@@ -374,7 +374,7 @@ function PageContent() {
         ))}
       </ul>
     </div>
-  );
+  )
 }
 ```
 
@@ -384,26 +384,23 @@ function PageContent() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Card, Loading, Button } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Card, Loading, Button } from '@tigercat/vue'
 
-const cardLoading = ref(false);
+const cardLoading = ref(false)
 
 const refreshCard = () => {
-  cardLoading.value = true;
+  cardLoading.value = true
   setTimeout(() => {
-    cardLoading.value = false;
-  }, 1500);
-};
+    cardLoading.value = false
+  }, 1500)
+}
 </script>
 
 <template>
   <Card title="数据统计">
     <div class="relative min-h-[200px]">
-      <div
-        v-if="cardLoading"
-        class="absolute inset-0 flex items-center justify-center bg-white/80"
-      >
+      <div v-if="cardLoading" class="absolute inset-0 flex items-center justify-center bg-white/80">
         <Loading text="刷新中..." />
       </div>
       <div v-else>
@@ -420,18 +417,18 @@ const refreshCard = () => {
 #### React
 
 ```tsx
-import { useState } from "react";
-import { Card, Loading, Button } from "@tigercat/react";
+import { useState } from 'react'
+import { Card, Loading, Button } from '@tigercat/react'
 
 function DataCard() {
-  const [cardLoading, setCardLoading] = useState(false);
+  const [cardLoading, setCardLoading] = useState(false)
 
   const refreshCard = () => {
-    setCardLoading(true);
+    setCardLoading(true)
     setTimeout(() => {
-      setCardLoading(false);
-    }, 1500);
-  };
+      setCardLoading(false)
+    }, 1500)
+  }
 
   return (
     <Card title="数据统计">
@@ -452,7 +449,7 @@ function DataCard() {
         )}
       </div>
     </Card>
-  );
+  )
 }
 ```
 
@@ -462,22 +459,22 @@ function DataCard() {
 
 ```vue
 <script setup>
-import { ref } from "vue";
-import { Form, FormItem, Input, Button, Loading } from "@tigercat/vue";
+import { ref } from 'vue'
+import { Form, FormItem, Input, Button, Loading } from '@tigercat/vue'
 
-const formLoading = ref(false);
+const formLoading = ref(false)
 const formData = ref({
-  username: "",
-  email: "",
-});
+  username: '',
+  email: ''
+})
 
 const handleSubmit = () => {
-  formLoading.value = true;
+  formLoading.value = true
   setTimeout(() => {
-    alert("提交成功！");
-    formLoading.value = false;
-  }, 2000);
-};
+    alert('提交成功！')
+    formLoading.value = false
+  }, 2000)
+}
 </script>
 
 <template>
@@ -501,33 +498,31 @@ const handleSubmit = () => {
 #### React
 
 ```tsx
-import { useState } from "react";
-import { Form, FormItem, Input, Button, Loading } from "@tigercat/react";
+import { useState } from 'react'
+import { Form, FormItem, Input, Button, Loading } from '@tigercat/react'
 
 function SubmitForm() {
-  const [formLoading, setFormLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false)
   const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-  });
+    username: '',
+    email: ''
+  })
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormLoading(true);
+    e.preventDefault()
+    setFormLoading(true)
     setTimeout(() => {
-      alert("提交成功！");
-      setFormLoading(false);
-    }, 2000);
-  };
+      alert('提交成功！')
+      setFormLoading(false)
+    }, 2000)
+  }
 
   return (
     <Form onSubmit={handleSubmit}>
       <FormItem label="用户名">
         <Input
           value={formData.username}
-          onChange={(e) =>
-            setFormData({ ...formData, username: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
           disabled={formLoading}
         />
       </FormItem>
@@ -540,11 +535,11 @@ function SubmitForm() {
       </FormItem>
       <FormItem>
         <Button type="submit" disabled={formLoading}>
-          {formLoading ? <Loading size="sm" color="default" /> : "提交"}
+          {formLoading ? <Loading size="sm" color="default" /> : '提交'}
         </Button>
       </FormItem>
     </Form>
-  );
+  )
 }
 ```
 

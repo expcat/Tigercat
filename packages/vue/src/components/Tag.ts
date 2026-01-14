@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, ref } from 'vue';
+import { defineComponent, computed, h, PropType, ref } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -14,16 +14,16 @@ import {
   tagCloseButtonBaseClasses,
   tagCloseIconPath,
   type TagVariant,
-  type TagSize,
-} from '@tigercat/core';
+  type TagSize
+} from '@tigercat/core'
 
 export interface VueTagProps {
-  variant?: TagVariant;
-  size?: TagSize;
-  closable?: boolean;
-  closeAriaLabel?: string;
-  className?: string;
-  style?: Record<string, string | number>;
+  variant?: TagVariant
+  size?: TagSize
+  closable?: boolean
+  closeAriaLabel?: string
+  className?: string
+  style?: Record<string, string | number>
 }
 
 const CloseIcon = () =>
@@ -36,16 +36,16 @@ const CloseIcon = () =>
       viewBox: icon24ViewBox,
       stroke: 'currentColor',
       'stroke-width': String(icon24StrokeWidth),
-      'aria-hidden': 'true',
+      'aria-hidden': 'true'
     },
     [
       h('path', {
         'stroke-linecap': icon24PathStrokeLinecap,
         'stroke-linejoin': icon24PathStrokeLinejoin,
-        d: tagCloseIconPath,
-      }),
+        d: tagCloseIconPath
+      })
     ]
-  );
+  )
 
 export const Tag = defineComponent({
   name: 'TigerTag',
@@ -57,7 +57,7 @@ export const Tag = defineComponent({
      */
     variant: {
       type: String as PropType<TagVariant>,
-      default: 'default' as TagVariant,
+      default: 'default' as TagVariant
     },
     /**
      * Tag size
@@ -65,7 +65,7 @@ export const Tag = defineComponent({
      */
     size: {
       type: String as PropType<TagSize>,
-      default: 'md' as TagSize,
+      default: 'md' as TagSize
     },
     /**
      * Whether the tag can be closed
@@ -73,7 +73,7 @@ export const Tag = defineComponent({
      */
     closable: {
       type: Boolean,
-      default: false,
+      default: false
     },
 
     /**
@@ -82,7 +82,7 @@ export const Tag = defineComponent({
      */
     closeAriaLabel: {
       type: String,
-      default: 'Close tag',
+      default: 'Close tag'
     },
 
     /**
@@ -90,7 +90,7 @@ export const Tag = defineComponent({
      */
     className: {
       type: String,
-      default: undefined,
+      default: undefined
     },
 
     /**
@@ -98,59 +98,51 @@ export const Tag = defineComponent({
      */
     style: {
       type: Object as PropType<Record<string, string | number>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   emits: ['close'],
   setup(props, { slots, emit, attrs }) {
-    const isVisible = ref(true);
+    const isVisible = ref(true)
 
     const tagClasses = computed(() => {
       return classNames(
         tagBaseClasses,
         getTagVariantClasses(props.variant),
         tagSizeClasses[props.size]
-      );
-    });
+      )
+    })
 
     const closeButtonClasses = computed(() => {
-      const scheme = defaultTagThemeColors[props.variant];
-      return classNames(
-        tagCloseButtonBaseClasses,
-        scheme.closeBgHover,
-        scheme.text
-      );
-    });
+      const scheme = defaultTagThemeColors[props.variant]
+      return classNames(tagCloseButtonBaseClasses, scheme.closeBgHover, scheme.text)
+    })
 
     const handleClose = (event: MouseEvent) => {
-      event.stopPropagation();
-      emit('close', event);
+      event.stopPropagation()
+      emit('close', event)
 
       if (!event.defaultPrevented) {
-        isVisible.value = false;
+        isVisible.value = false
       }
-    };
+    }
 
     return () => {
       if (!isVisible.value) {
-        return null;
+        return null
       }
 
-      const attrsRecord = attrs as Record<string, unknown>;
-      const attrsClass = attrsRecord.class;
-      const attrsStyle = attrsRecord.style;
+      const attrsRecord = attrs as Record<string, unknown>
+      const attrsClass = attrsRecord.class
+      const attrsStyle = attrsRecord.style
 
       return h(
         'span',
         {
           ...attrs,
-          class: classNames(
-            tagClasses.value,
-            props.className,
-            coerceClassValue(attrsClass)
-          ),
+          class: classNames(tagClasses.value, props.className, coerceClassValue(attrsClass)),
           style: mergeStyleValues(attrsStyle, props.style),
-          role: 'status',
+          role: 'status'
         },
         [
           slots.default ? h('span', {}, slots.default()) : null,
@@ -161,15 +153,15 @@ export const Tag = defineComponent({
                   class: closeButtonClasses.value,
                   onClick: handleClose,
                   'aria-label': props.closeAriaLabel,
-                  type: 'button',
+                  type: 'button'
                 },
                 CloseIcon()
               )
-            : null,
+            : null
         ]
-      );
-    };
-  },
-});
+      )
+    }
+  }
+})
 
-export default Tag;
+export default Tag

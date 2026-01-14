@@ -3,13 +3,13 @@
  * Shared styles and helpers for Menu components
  */
 
-import type { MenuMode, MenuTheme } from '../types/menu';
+import type { MenuMode, MenuTheme } from '../types/menu'
 
 /**
  * Base menu container classes
  */
 export const menuBaseClasses =
-  'flex border bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border-[var(--tiger-border,#e5e7eb)]';
+  'flex border bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border-[var(--tiger-border,#e5e7eb)]'
 
 /**
  * Menu mode classes
@@ -17,138 +17,130 @@ export const menuBaseClasses =
 export const menuModeClasses = {
   horizontal: 'flex-row border-b',
   vertical: 'flex-col border-r min-w-[200px]',
-  inline: 'flex-col min-w-[200px]',
-};
+  inline: 'flex-col min-w-[200px]'
+}
 
 /**
  * Menu theme classes - light theme
  */
 export const menuLightThemeClasses =
-  '[--tiger-surface:#ffffff] [--tiger-text:#111827] [--tiger-text-muted:#6b7280] [--tiger-border:#e5e7eb] [--tiger-surface-muted:#f9fafb]';
+  '[--tiger-surface:#ffffff] [--tiger-text:#111827] [--tiger-text-muted:#6b7280] [--tiger-border:#e5e7eb] [--tiger-surface-muted:#f9fafb]'
 
 /**
  * Menu theme classes - dark theme
  */
 export const menuDarkThemeClasses =
-  '[--tiger-surface:#111827] [--tiger-text:#f9fafb] [--tiger-text-muted:#9ca3af] [--tiger-border:#374151] [--tiger-surface-muted:#1f2937] [--tiger-outline-bg-hover:#2563eb1a] [--tiger-ghost-bg-hover:#2563eb1a]';
+  '[--tiger-surface:#111827] [--tiger-text:#f9fafb] [--tiger-text-muted:#9ca3af] [--tiger-border:#374151] [--tiger-surface-muted:#1f2937] [--tiger-outline-bg-hover:#2563eb1a] [--tiger-ghost-bg-hover:#2563eb1a]'
 
 /**
  * Menu item base classes
  */
 export const menuItemBaseClasses =
-  'flex w-full items-center px-4 py-2 text-left bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none';
+  'flex w-full items-center px-4 py-2 text-left bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none'
 
 /**
  * Menu item hover classes - light theme
  */
-export const menuItemHoverLightClasses =
-  'hover:bg-[var(--tiger-surface-muted,#f9fafb)]';
+export const menuItemHoverLightClasses = 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
 
 /**
  * Menu item hover classes - dark theme
  */
-export const menuItemHoverDarkClasses =
-  'hover:bg-[var(--tiger-surface-muted,#1f2937)]';
+export const menuItemHoverDarkClasses = 'hover:bg-[var(--tiger-surface-muted,#1f2937)]'
 
 /**
  * Menu item selected classes - light theme
  */
 export const menuItemSelectedLightClasses =
-  'bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)] font-medium';
+  'bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)] font-medium'
 
 /**
  * Menu item selected classes - dark theme
  */
 export const menuItemSelectedDarkClasses =
-  'bg-[var(--tiger-outline-bg-hover,#2563eb1a)] text-[var(--tiger-primary,#60a5fa)] font-medium';
+  'bg-[var(--tiger-outline-bg-hover,#2563eb1a)] text-[var(--tiger-primary,#60a5fa)] font-medium'
 
 /**
  * Menu item disabled classes
  */
-export const menuItemDisabledClasses =
-  'opacity-50 cursor-not-allowed pointer-events-none';
+export const menuItemDisabledClasses = 'opacity-50 cursor-not-allowed pointer-events-none'
 
 /**
  * Menu item icon classes
  */
-export const menuItemIconClasses = 'mr-2 flex-shrink-0';
+export const menuItemIconClasses = 'mr-2 flex-shrink-0'
 
 /**
  * Submenu title classes
  */
 export const submenuTitleClasses =
-  'flex w-full items-center justify-between px-4 py-2 text-left bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none';
+  'flex w-full items-center justify-between px-4 py-2 text-left bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none'
 
 /**
  * Submenu expand icon classes
  */
-export const submenuExpandIconClasses =
-  'ml-2 transition-transform duration-200';
+export const submenuExpandIconClasses = 'ml-2 transition-transform duration-200'
 
 /**
  * Submenu expand icon expanded classes
  */
-export const submenuExpandIconExpandedClasses = 'transform rotate-180';
+export const submenuExpandIconExpandedClasses = 'transform rotate-180'
 
 /**
  * Submenu content classes - horizontal mode
  */
 export const submenuContentHorizontalClasses =
-  'absolute left-0 top-full mt-0 min-w-[160px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg z-50';
+  'absolute left-0 top-full mt-0 min-w-[160px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg z-50'
 
 /**
  * Submenu content classes - collapsed vertical mode (popup)
  */
 export const submenuContentPopupClasses =
-  'absolute left-full top-0 ml-1 min-w-[180px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg z-50';
+  'absolute left-full top-0 ml-1 min-w-[180px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg z-50'
 
 /**
  * Submenu content classes - vertical mode
  */
-export const submenuContentVerticalClasses = 'overflow-hidden pl-2';
+export const submenuContentVerticalClasses = 'overflow-hidden pl-2'
 
 /**
  * Submenu content classes - inline mode
  */
-export const submenuContentInlineClasses = 'overflow-hidden';
+export const submenuContentInlineClasses = 'overflow-hidden'
 
 /**
  * Menu item group title classes
  */
 export const menuItemGroupTitleClasses =
-  'px-4 py-2 text-xs font-semibold text-[var(--tiger-text-muted,#6b7280)] uppercase tracking-wider';
+  'px-4 py-2 text-xs font-semibold text-[var(--tiger-text-muted,#6b7280)] uppercase tracking-wider'
 
 /**
  * Menu collapsed classes
  */
-export const menuCollapsedClasses = 'min-w-[64px]';
+export const menuCollapsedClasses = 'min-w-[64px]'
 
 /**
  * Menu collapsed item classes
  */
-export const menuCollapsedItemClasses = 'justify-center px-2';
+export const menuCollapsedItemClasses = 'justify-center px-2'
 
 /**
  * Get menu classes based on mode and theme
  */
-export function getMenuClasses(
-  mode: MenuMode,
-  theme: MenuTheme,
-  collapsed?: boolean
-): string {
-  const classes = [menuBaseClasses, menuModeClasses[mode]];
+export function getMenuClasses(mode: MenuMode, theme: MenuTheme, collapsed?: boolean): string {
+  const classes = [menuBaseClasses, menuModeClasses[mode]]
 
   if (theme === 'dark') {
-    classes.push(menuDarkThemeClasses);
+    classes.push(menuDarkThemeClasses)
   } else {
-    classes.push(menuLightThemeClasses);
+    classes.push(menuLightThemeClasses)
   }
 
   if (collapsed && mode === 'vertical') {
-    classes.push(menuCollapsedClasses);
+    classes.push(menuCollapsedClasses)
   }
 
-  return classes.join(' ');
+  return classes.join(' ')
 }
 
 /**
@@ -160,62 +152,51 @@ export function getMenuItemClasses(
   theme: MenuTheme,
   collapsed?: boolean
 ): string {
-  const classes = [menuItemBaseClasses];
+  const classes = [menuItemBaseClasses]
 
   if (collapsed) {
-    classes.push(menuCollapsedItemClasses);
+    classes.push(menuCollapsedItemClasses)
   }
 
   if (disabled) {
-    classes.push(menuItemDisabledClasses);
+    classes.push(menuItemDisabledClasses)
   } else {
     if (selected) {
-      classes.push(
-        theme === 'dark'
-          ? menuItemSelectedDarkClasses
-          : menuItemSelectedLightClasses
-      );
+      classes.push(theme === 'dark' ? menuItemSelectedDarkClasses : menuItemSelectedLightClasses)
     } else {
-      classes.push(
-        theme === 'dark' ? menuItemHoverDarkClasses : menuItemHoverLightClasses
-      );
+      classes.push(theme === 'dark' ? menuItemHoverDarkClasses : menuItemHoverLightClasses)
     }
   }
 
-  return classes.join(' ');
+  return classes.join(' ')
 }
 
 /**
  * Get submenu title classes based on theme
  */
-export function getSubMenuTitleClasses(
-  theme: MenuTheme,
-  disabled?: boolean
-): string {
-  const classes = [submenuTitleClasses];
+export function getSubMenuTitleClasses(theme: MenuTheme, disabled?: boolean): string {
+  const classes = [submenuTitleClasses]
 
   if (disabled) {
-    classes.push(menuItemDisabledClasses);
+    classes.push(menuItemDisabledClasses)
   } else {
-    classes.push(
-      theme === 'dark' ? menuItemHoverDarkClasses : menuItemHoverLightClasses
-    );
+    classes.push(theme === 'dark' ? menuItemHoverDarkClasses : menuItemHoverLightClasses)
   }
 
-  return classes.join(' ');
+  return classes.join(' ')
 }
 
 /**
  * Get submenu expand icon classes
  */
 export function getSubMenuExpandIconClasses(expanded: boolean): string {
-  const classes = [submenuExpandIconClasses];
+  const classes = [submenuExpandIconClasses]
 
   if (expanded) {
-    classes.push(submenuExpandIconExpandedClasses);
+    classes.push(submenuExpandIconExpandedClasses)
   }
 
-  return classes.join(' ');
+  return classes.join(' ')
 }
 
 /**
@@ -226,53 +207,41 @@ export function getMenuItemIndent(
   inlineIndent: number = 24
 ): Record<string, string> {
   return {
-    paddingLeft: `${level * inlineIndent}px`,
-  };
+    paddingLeft: `${level * inlineIndent}px`
+  }
 }
 
 /**
  * Check if a key is in the selected keys array
  */
-export function isKeySelected(
-  key: string | number,
-  selectedKeys: (string | number)[]
-): boolean {
-  return selectedKeys.includes(key);
+export function isKeySelected(key: string | number, selectedKeys: (string | number)[]): boolean {
+  return selectedKeys.includes(key)
 }
 
 /**
  * Check if a key is in the open keys array
  */
-export function isKeyOpen(
-  key: string | number,
-  openKeys: (string | number)[]
-): boolean {
-  return openKeys.includes(key);
+export function isKeyOpen(key: string | number, openKeys: (string | number)[]): boolean {
+  return openKeys.includes(key)
 }
 
 /**
  * Toggle a key in an array
  */
-export function toggleKey(
-  key: string | number,
-  keys: (string | number)[]
-): (string | number)[] {
-  const index = keys.indexOf(key);
+export function toggleKey(key: string | number, keys: (string | number)[]): (string | number)[] {
+  const index = keys.indexOf(key)
   if (index > -1) {
-    return keys.filter((k) => k !== key);
+    return keys.filter((k) => k !== key)
   }
-  return [...keys, key];
+  return [...keys, key]
 }
 
 /**
  * Replace keys array with single key (for single selection mode)
  */
-export function replaceKeys(
-  key: string | number,
-  keys: (string | number)[]
-): (string | number)[] {
+export function replaceKeys(key: string | number, keys: (string | number)[]): (string | number)[] {
   if (keys.includes(key)) {
-    return keys;
+    return keys
   }
-  return [key];
+  return [key]
 }

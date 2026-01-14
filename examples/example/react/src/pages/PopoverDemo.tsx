@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { Popover, Button, Space, Divider, List } from '@tigercat/react';
+import { useState } from 'react'
+import { Popover, Button, Space, Divider, List } from '@tigercat/react'
 
 export default function PopoverDemo() {
-  const [visible1, setVisible1] = useState(false);
-  const [manualVisible, setManualVisible] = useState(false);
+  const [visible1, setVisible1] = useState(false)
+  const [manualVisible, setManualVisible] = useState(false)
 
-  const customContentItems = ['列表项 1', '列表项 2', '列表项 3'];
+  const customContentItems = ['列表项 1', '列表项 2', '列表项 3']
 
   return (
     <div className="max-w-5xl mx-auto p-8">
@@ -17,9 +17,7 @@ export default function PopoverDemo() {
       {/* 基本用法 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">基本用法</h2>
-        <p className="text-gray-600 mb-6">
-          最简单的用法，点击按钮显示气泡卡片。
-        </p>
+        <p className="text-gray-600 mb-6">最简单的用法，点击按钮显示气泡卡片。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Popover content="这是一个气泡卡片的内容">
             <Button>触发气泡卡片</Button>
@@ -57,7 +55,7 @@ export default function PopoverDemo() {
                   size="sm"
                   dataSource={customContentItems.map((title, index) => ({
                     key: index,
-                    title,
+                    title
                   }))}
                   renderItem={(item) => (
                     <div className="flex items-start gap-2">
@@ -103,26 +101,18 @@ export default function PopoverDemo() {
       {/* 触发方式 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">触发方式</h2>
-        <p className="text-gray-600 mb-6">
-          支持 click、hover、focus、manual 四种触发方式。
-        </p>
+        <p className="text-gray-600 mb-6">支持 click、hover、focus、manual 四种触发方式。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <Popover title="点击触发" content="点击按钮触发" trigger="click">
               <Button>点击触发</Button>
             </Popover>
 
-            <Popover
-              title="悬停触发"
-              content="悬停触发气泡卡片"
-              trigger="hover">
+            <Popover title="悬停触发" content="悬停触发气泡卡片" trigger="hover">
               <Button>悬停触发</Button>
             </Popover>
 
-            <Popover
-              title="聚焦触发"
-              content="聚焦触发气泡卡片"
-              trigger="focus">
+            <Popover title="聚焦触发" content="聚焦触发气泡卡片" trigger="focus">
               <Button>聚焦触发</Button>
             </Popover>
 
@@ -132,9 +122,7 @@ export default function PopoverDemo() {
               title="手动触发"
               content="手动控制显示隐藏"
               trigger="manual">
-              <Button onClick={() => setManualVisible(!manualVisible)}>
-                手动触发
-              </Button>
+              <Button onClick={() => setManualVisible(!manualVisible)}>手动触发</Button>
             </Popover>
           </Space>
         </div>
@@ -157,9 +145,7 @@ export default function PopoverDemo() {
               <Button>受控气泡卡片</Button>
             </Popover>
 
-            <Button onClick={() => setVisible1(!visible1)}>
-              {visible1 ? '隐藏' : '显示'}
-            </Button>
+            <Button onClick={() => setVisible1(!visible1)}>{visible1 ? '隐藏' : '显示'}</Button>
           </Space>
         </div>
         <Divider className="my-6" />
@@ -168,22 +154,14 @@ export default function PopoverDemo() {
       {/* 自定义宽度 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">自定义宽度</h2>
-        <p className="text-gray-600 mb-6">
-          通过 width 属性自定义气泡卡片的宽度。
-        </p>
+        <p className="text-gray-600 mb-6">通过 width 属性自定义气泡卡片的宽度。</p>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
-            <Popover
-              title="自定义宽度"
-              content="这是一个宽度为 300px 的气泡卡片"
-              width="300">
+            <Popover title="自定义宽度" content="这是一个宽度为 300px 的气泡卡片" width="300">
               <Button>宽度 300px</Button>
             </Popover>
 
-            <Popover
-              title="自定义宽度"
-              content="这是一个宽度为 400px 的气泡卡片"
-              width="400">
+            <Popover title="自定义宽度" content="这是一个宽度为 400px 的气泡卡片" width="400">
               <Button>宽度 400px</Button>
             </Popover>
           </Space>
@@ -202,5 +180,5 @@ export default function PopoverDemo() {
         </div>
       </section>
     </div>
-  );
+  )
 }

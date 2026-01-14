@@ -1,99 +1,97 @@
-import { useMemo, useState } from 'react';
-import { Modal, Button, Space, Divider, Input } from '@tigercat/react';
+import { useMemo, useState } from 'react'
+import { Modal, Button, Space, Divider, Input } from '@tigercat/react'
 
 export default function ModalDemo() {
-  const [visible1, setVisible1] = useState(false);
-  const [visible2, setVisible2] = useState(false);
-  const [visible3, setVisible3] = useState(false);
-  const [visibleSm, setVisibleSm] = useState(false);
-  const [visibleMd, setVisibleMd] = useState(false);
-  const [visibleLg, setVisibleLg] = useState(false);
-  const [visibleXl, setVisibleXl] = useState(false);
-  const [visibleFull, setVisibleFull] = useState(false);
-  const [visibleCentered, setVisibleCentered] = useState(false);
-  const [visibleNested, setVisibleNested] = useState(false);
-  const [visibleNested2, setVisibleNested2] = useState(false);
-  const [visibleNoMask, setVisibleNoMask] = useState(false);
-  const [visibleDestroyOnClose, setVisibleDestroyOnClose] = useState(false);
-  const [visibleCustomFooter, setVisibleCustomFooter] = useState(false);
+  const [visible1, setVisible1] = useState(false)
+  const [visible2, setVisible2] = useState(false)
+  const [visible3, setVisible3] = useState(false)
+  const [visibleSm, setVisibleSm] = useState(false)
+  const [visibleMd, setVisibleMd] = useState(false)
+  const [visibleLg, setVisibleLg] = useState(false)
+  const [visibleXl, setVisibleXl] = useState(false)
+  const [visibleFull, setVisibleFull] = useState(false)
+  const [visibleCentered, setVisibleCentered] = useState(false)
+  const [visibleNested, setVisibleNested] = useState(false)
+  const [visibleNested2, setVisibleNested2] = useState(false)
+  const [visibleNoMask, setVisibleNoMask] = useState(false)
+  const [visibleDestroyOnClose, setVisibleDestroyOnClose] = useState(false)
+  const [visibleCustomFooter, setVisibleCustomFooter] = useState(false)
 
-  const [visibleConfirm, setVisibleConfirm] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [confirmResult, setConfirmResult] = useState<string | null>(null);
+  const [visibleConfirm, setVisibleConfirm] = useState(false)
+  const [confirmLoading, setConfirmLoading] = useState(false)
+  const [confirmResult, setConfirmResult] = useState<string | null>(null)
 
-  const [visibleInfo, setVisibleInfo] = useState(false);
+  const [visibleInfo, setVisibleInfo] = useState(false)
 
-  const [visibleForm, setVisibleForm] = useState(false);
-  const [formLoading, setFormLoading] = useState(false);
-  const [formName, setFormName] = useState('');
-  const [formEmail, setFormEmail] = useState('');
-  const [formError, setFormError] = useState<string | null>(null);
+  const [visibleForm, setVisibleForm] = useState(false)
+  const [formLoading, setFormLoading] = useState(false)
+  const [formName, setFormName] = useState('')
+  const [formEmail, setFormEmail] = useState('')
+  const [formError, setFormError] = useState<string | null>(null)
 
   const handleOk = () => {
-    console.log('OK clicked');
-    setVisible1(false);
-  };
+    console.log('OK clicked')
+    setVisible1(false)
+  }
 
   const handleCancel = () => {
-    console.log('Cancel clicked');
-    setVisible1(false);
-  };
+    console.log('Cancel clicked')
+    setVisible1(false)
+  }
 
   const infoParagraphs = useMemo(
     () =>
       Array.from({ length: 14 }).map((_, index) => (
         <p key={index} className={index === 0 ? '' : 'mt-2'}>
-          这是一段用于演示滚动内容的示例文本（第 {index + 1}{' '}
-          段）。当内容较长时，Modal 仍应保持良好的可读性与滚动体验。
+          这是一段用于演示滚动内容的示例文本（第 {index + 1} 段）。当内容较长时，Modal
+          仍应保持良好的可读性与滚动体验。
         </p>
       )),
     []
-  );
+  )
 
   const handleConfirmDelete = async () => {
-    if (confirmLoading) return;
-    setConfirmLoading(true);
-    setConfirmResult(null);
+    if (confirmLoading) return
+    setConfirmLoading(true)
+    setConfirmResult(null)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 900));
-      setVisibleConfirm(false);
-      setConfirmResult('已确认：删除操作已提交（示例）');
+      await new Promise((resolve) => setTimeout(resolve, 900))
+      setVisibleConfirm(false)
+      setConfirmResult('已确认：删除操作已提交（示例）')
     } finally {
-      setConfirmLoading(false);
+      setConfirmLoading(false)
     }
-  };
+  }
 
   const handleFormSubmit = async () => {
-    if (formLoading) return;
-    setFormError(null);
+    if (formLoading) return
+    setFormError(null)
 
-    const name = formName.trim();
-    const email = formEmail.trim();
+    const name = formName.trim()
+    const email = formEmail.trim()
     if (!name) {
-      setFormError('请填写姓名');
-      return;
+      setFormError('请填写姓名')
+      return
     }
     if (!email || !email.includes('@')) {
-      setFormError('请填写正确的邮箱');
-      return;
+      setFormError('请填写正确的邮箱')
+      return
     }
 
-    setFormLoading(true);
+    setFormLoading(true)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setVisibleForm(false);
+      await new Promise((resolve) => setTimeout(resolve, 800))
+      setVisibleForm(false)
     } finally {
-      setFormLoading(false);
+      setFormLoading(false)
     }
-  };
+  }
 
   return (
     <div className="max-w-5xl mx-auto p-6 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Modal 对话框</h1>
-        <p className="text-gray-600">
-          用于显示重要信息或需要用户交互的浮层对话框。
-        </p>
+        <p className="text-gray-600">用于显示重要信息或需要用户交互的浮层对话框。</p>
       </div>
 
       {/* 基本用法 */}
@@ -179,13 +177,9 @@ export default function ModalDemo() {
       {/* 垂直居中 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">垂直居中</h2>
-        <p className="text-gray-600 mb-6">
-          设置 centered 属性可以让对话框垂直居中显示。
-        </p>
+        <p className="text-gray-600 mb-6">设置 centered 属性可以让对话框垂直居中显示。</p>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
-          <Button onClick={() => setVisibleCentered(true)}>
-            垂直居中对话框
-          </Button>
+          <Button onClick={() => setVisibleCentered(true)}>垂直居中对话框</Button>
           <Modal
             visible={visibleCentered}
             title="垂直居中对话框"
@@ -201,31 +195,21 @@ export default function ModalDemo() {
       {/* 自定义页脚 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">自定义页脚</h2>
-        <p className="text-gray-600 mb-6">
-          使用 footer 属性可以自定义页脚内容。
-        </p>
+        <p className="text-gray-600 mb-6">使用 footer 属性可以自定义页脚内容。</p>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
-          <Button onClick={() => setVisibleCustomFooter(true)}>
-            自定义页脚
-          </Button>
+          <Button onClick={() => setVisibleCustomFooter(true)}>自定义页脚</Button>
           <Modal
             visible={visibleCustomFooter}
             title="自定义页脚对话框"
             footer={
               <Space>
-                <Button
-                  variant="secondary"
-                  onClick={() => setVisibleCustomFooter(false)}>
+                <Button variant="secondary" onClick={() => setVisibleCustomFooter(false)}>
                   取消
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => console.log('保存草稿')}>
+                <Button variant="outline" onClick={() => console.log('保存草稿')}>
                   保存草稿
                 </Button>
-                <Button onClick={() => setVisibleCustomFooter(false)}>
-                  提交
-                </Button>
+                <Button onClick={() => setVisibleCustomFooter(false)}>提交</Button>
               </Space>
             }
             onCancel={() => setVisibleCustomFooter(false)}>
@@ -238,9 +222,7 @@ export default function ModalDemo() {
       {/* 嵌套对话框 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">嵌套对话框</h2>
-        <p className="text-gray-600 mb-6">
-          对话框可以嵌套使用，通过 z-index 控制层级。
-        </p>
+        <p className="text-gray-600 mb-6">对话框可以嵌套使用，通过 z-index 控制层级。</p>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleNested(true)}>打开嵌套对话框</Button>
           <Modal
@@ -287,9 +269,7 @@ export default function ModalDemo() {
       {/* 无遮罩 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">无遮罩</h2>
-        <p className="text-gray-600 mb-6">
-          设置 mask 为 false 可以不显示遮罩层。
-        </p>
+        <p className="text-gray-600 mb-6">设置 mask 为 false 可以不显示遮罩层。</p>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleNoMask(true)}>无遮罩对话框</Button>
           <Modal
@@ -306,13 +286,9 @@ export default function ModalDemo() {
       {/* 关闭时销毁 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">关闭时销毁</h2>
-        <p className="text-gray-600 mb-6">
-          设置 destroyOnClose 可以在关闭对话框时销毁其内容。
-        </p>
+        <p className="text-gray-600 mb-6">设置 destroyOnClose 可以在关闭对话框时销毁其内容。</p>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
-          <Button onClick={() => setVisibleDestroyOnClose(true)}>
-            关闭时销毁
-          </Button>
+          <Button onClick={() => setVisibleDestroyOnClose(true)}>关闭时销毁</Button>
           <Modal
             visible={visibleDestroyOnClose}
             title="关闭时销毁"
@@ -328,9 +304,7 @@ export default function ModalDemo() {
       {/* 无关闭按钮 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">无关闭按钮</h2>
-        <p className="text-gray-600 mb-6">
-          设置 closable 为 false 可以隐藏关闭按钮。
-        </p>
+        <p className="text-gray-600 mb-6">设置 closable 为 false 可以隐藏关闭按钮。</p>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisible3(true)}>无关闭按钮</Button>
           <Modal
@@ -348,9 +322,7 @@ export default function ModalDemo() {
       {/* 实际应用场景 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">实际应用场景</h2>
-        <p className="text-gray-600 mb-6">
-          用更贴近业务的例子展示交互、滚动与表单。
-        </p>
+        <p className="text-gray-600 mb-6">用更贴近业务的例子展示交互、滚动与表单。</p>
 
         <div className="space-y-6">
           {/* 确认对话框 */}
@@ -358,26 +330,20 @@ export default function ModalDemo() {
             <h3 className="text-lg font-semibold mb-3">确认对话框</h3>
             <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-gray-700">
-                  用于需要用户确认的操作（示例：删除）。
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => setVisibleConfirm(true)}>
+                <p className="text-gray-700">用于需要用户确认的操作（示例：删除）。</p>
+                <Button variant="outline" onClick={() => setVisibleConfirm(true)}>
                   删除确认
                 </Button>
               </div>
-              {confirmResult && (
-                <p className="mt-3 text-sm text-green-700">{confirmResult}</p>
-              )}
+              {confirmResult && <p className="mt-3 text-sm text-green-700">{confirmResult}</p>}
 
               <Modal
                 visible={visibleConfirm}
                 title="删除确认"
                 onCancel={() => {
-                  if (confirmLoading) return;
-                  setVisibleConfirm(false);
-                  setConfirmResult('已取消：未执行删除（示例）');
+                  if (confirmLoading) return
+                  setVisibleConfirm(false)
+                  setConfirmResult('已取消：未执行删除（示例）')
                 }}
                 footer={
                   <Space>
@@ -385,14 +351,12 @@ export default function ModalDemo() {
                       variant="secondary"
                       disabled={confirmLoading}
                       onClick={() => {
-                        setVisibleConfirm(false);
-                        setConfirmResult('已取消：未执行删除（示例）');
+                        setVisibleConfirm(false)
+                        setConfirmResult('已取消：未执行删除（示例）')
                       }}>
                       取消
                     </Button>
-                    <Button
-                      disabled={confirmLoading}
-                      onClick={handleConfirmDelete}>
+                    <Button disabled={confirmLoading} onClick={handleConfirmDelete}>
                       {confirmLoading ? '删除中…' : '确认删除'}
                     </Button>
                   </Space>
@@ -410,9 +374,7 @@ export default function ModalDemo() {
             <h3 className="text-lg font-semibold mb-3">信息展示</h3>
             <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-gray-700">
-                  用于展示较长内容（用户协议/隐私政策等）。
-                </p>
+                <p className="text-gray-700">用于展示较长内容（用户协议/隐私政策等）。</p>
                 <Button onClick={() => setVisibleInfo(true)}>查看详情</Button>
               </div>
 
@@ -421,14 +383,8 @@ export default function ModalDemo() {
                 title="服务协议（示例）"
                 size="lg"
                 onCancel={() => setVisibleInfo(false)}
-                footer={
-                  <Button onClick={() => setVisibleInfo(false)}>
-                    我已阅读
-                  </Button>
-                }>
-                <div className="max-h-[50vh] overflow-auto pr-2">
-                  {infoParagraphs}
-                </div>
+                footer={<Button onClick={() => setVisibleInfo(false)}>我已阅读</Button>}>
+                <div className="max-h-[50vh] overflow-auto pr-2">{infoParagraphs}</div>
               </Modal>
             </div>
           </div>
@@ -438,9 +394,7 @@ export default function ModalDemo() {
             <h3 className="text-lg font-semibold mb-3">表单输入</h3>
             <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-gray-700">
-                  在对话框中嵌入表单，用于数据收集和编辑。
-                </p>
+                <p className="text-gray-700">在对话框中嵌入表单，用于数据收集和编辑。</p>
                 <Button onClick={() => setVisibleForm(true)}>编辑资料</Button>
               </div>
 
@@ -448,9 +402,9 @@ export default function ModalDemo() {
                 visible={visibleForm}
                 title="编辑资料"
                 onCancel={() => {
-                  if (formLoading) return;
-                  setVisibleForm(false);
-                  setFormError(null);
+                  if (formLoading) return
+                  setVisibleForm(false)
+                  setFormError(null)
                 }}
                 footer={
                   <Space>
@@ -458,8 +412,8 @@ export default function ModalDemo() {
                       variant="secondary"
                       disabled={formLoading}
                       onClick={() => {
-                        setVisibleForm(false);
-                        setFormError(null);
+                        setVisibleForm(false)
+                        setFormError(null)
                       }}>
                       取消
                     </Button>
@@ -470,9 +424,7 @@ export default function ModalDemo() {
                 }>
                 <div className="space-y-4">
                   <div>
-                    <div className="text-sm font-medium text-gray-700 mb-1">
-                      姓名
-                    </div>
+                    <div className="text-sm font-medium text-gray-700 mb-1">姓名</div>
                     <Input
                       value={formName}
                       onChange={(e) => setFormName(e.target.value)}
@@ -480,21 +432,15 @@ export default function ModalDemo() {
                     />
                   </div>
                   <div>
-                    <div className="text-sm font-medium text-gray-700 mb-1">
-                      邮箱
-                    </div>
+                    <div className="text-sm font-medium text-gray-700 mb-1">邮箱</div>
                     <Input
                       value={formEmail}
                       onChange={(e) => setFormEmail(e.target.value)}
                       placeholder="name@example.com"
                     />
                   </div>
-                  {formError && (
-                    <p className="text-sm text-red-600">{formError}</p>
-                  )}
-                  <p className="text-xs text-gray-500">
-                    提示：这里仅做简单校验与异步保存模拟。
-                  </p>
+                  {formError && <p className="text-sm text-red-600">{formError}</p>}
+                  <p className="text-xs text-gray-500">提示：这里仅做简单校验与异步保存模拟。</p>
                 </div>
               </Modal>
             </div>
@@ -502,5 +448,5 @@ export default function ModalDemo() {
         </div>
       </section>
     </div>
-  );
+  )
 }

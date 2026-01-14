@@ -5,22 +5,21 @@ import {
   provide,
   type ComputedRef,
   type InjectionKey,
-  type PropType,
-} from 'vue';
-import { mergeTigerLocale, type TigerLocale } from '@tigercat/core';
+  type PropType
+} from 'vue'
+import { mergeTigerLocale, type TigerLocale } from '@tigercat/core'
 
 export interface TigerConfig {
-  locale?: Partial<TigerLocale>;
+  locale?: Partial<TigerLocale>
 }
 
-export const TigerConfigKey: InjectionKey<ComputedRef<TigerConfig>> =
-  Symbol('TigerConfig');
+export const TigerConfigKey: InjectionKey<ComputedRef<TigerConfig>> = Symbol('TigerConfig')
 
 export function useTigerConfig(): ComputedRef<TigerConfig> {
   return inject(
     TigerConfigKey,
     computed(() => ({}))
-  );
+  )
 }
 
 export const ConfigProvider = defineComponent({
@@ -28,22 +27,22 @@ export const ConfigProvider = defineComponent({
   props: {
     locale: {
       type: Object as PropType<Partial<TigerLocale>>,
-      default: undefined,
-    },
+      default: undefined
+    }
   },
   setup(props, { slots }) {
-    const parent = useTigerConfig();
+    const parent = useTigerConfig()
 
     const merged = computed<TigerConfig>(() => {
       return {
-        locale: mergeTigerLocale(parent.value.locale, props.locale),
-      };
-    });
+        locale: mergeTigerLocale(parent.value.locale, props.locale)
+      }
+    })
 
-    provide(TigerConfigKey, merged);
+    provide(TigerConfigKey, merged)
 
-    return () => slots.default?.();
-  },
-});
+    return () => slots.default?.()
+  }
+})
 
-export default ConfigProvider;
+export default ConfigProvider

@@ -53,12 +53,9 @@ const handleClose = (index: number) => {
       <p class="text-gray-600 mb-6">标签有三种尺寸：小、中、大。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space align="center">
-          <Tag size="sm"
-               variant="primary">小标签</Tag>
-          <Tag size="md"
-               variant="primary">中标签</Tag>
-          <Tag size="lg"
-               variant="primary">大标签</Tag>
+          <Tag size="sm" variant="primary">小标签</Tag>
+          <Tag size="md" variant="primary">中标签</Tag>
+          <Tag size="lg" variant="primary">大标签</Tag>
         </Space>
       </div>
       <Divider class="my-6" />
@@ -70,15 +67,15 @@ const handleClose = (index: number) => {
       <p class="text-gray-600 mb-6">设置 closable 属性可以定义一个标签是否可移除。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space wrap>
-          <Tag v-for="(tag, index) in tags"
-               :key="tag"
-               variant="primary"
-               closable
-               @close="handleClose(index)">
+          <Tag
+            v-for="(tag, index) in tags"
+            :key="tag"
+            variant="primary"
+            closable
+            @close="handleClose(index)">
             {{ tag }}
           </Tag>
-          <p v-if="tags.length === 0"
-             class="text-gray-500">所有标签已被移除</p>
+          <p v-if="tags.length === 0" class="text-gray-500">所有标签已被移除</p>
         </Space>
       </div>
       <Divider class="my-6" />
@@ -87,15 +84,13 @@ const handleClose = (index: number) => {
     <!-- 关闭按钮无障碍标签 -->
     <section class="mb-12">
       <h2 class="text-2xl font-bold mb-4">关闭按钮无障碍标签</h2>
-      <p class="text-gray-600 mb-6">使用 closeAriaLabel 自定义关闭按钮的 aria-label（便于无障碍与多语言）。</p>
+      <p class="text-gray-600 mb-6">
+        使用 closeAriaLabel 自定义关闭按钮的 aria-label（便于无障碍与多语言）。
+      </p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space wrap>
-          <Tag variant="info"
-               closable
-               closeAriaLabel="移除标签：JavaScript">JavaScript</Tag>
-          <Tag variant="success"
-               closable
-               closeAriaLabel="移除标签：已完成">已完成</Tag>
+          <Tag variant="info" closable closeAriaLabel="移除标签：JavaScript">JavaScript</Tag>
+          <Tag variant="success" closable closeAriaLabel="移除标签：已完成">已完成</Tag>
         </Space>
       </div>
       <Divider class="my-6" />
@@ -107,18 +102,12 @@ const handleClose = (index: number) => {
       <p class="text-gray-600 mb-6">展示不同变体的可关闭标签。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space wrap>
-          <Tag variant="default"
-               closable>默认标签</Tag>
-          <Tag variant="primary"
-               closable>主要标签</Tag>
-          <Tag variant="success"
-               closable>成功标签</Tag>
-          <Tag variant="warning"
-               closable>警告标签</Tag>
-          <Tag variant="danger"
-               closable>危险标签</Tag>
-          <Tag variant="info"
-               closable>信息标签</Tag>
+          <Tag variant="default" closable>默认标签</Tag>
+          <Tag variant="primary" closable>主要标签</Tag>
+          <Tag variant="success" closable>成功标签</Tag>
+          <Tag variant="warning" closable>警告标签</Tag>
+          <Tag variant="danger" closable>危险标签</Tag>
+          <Tag variant="info" closable>信息标签</Tag>
         </Space>
       </div>
       <Divider class="my-6" />
@@ -129,17 +118,10 @@ const handleClose = (index: number) => {
       <h2 class="text-2xl font-bold mb-4">不同大小的可关闭标签</h2>
       <p class="text-gray-600 mb-6">不同尺寸的可关闭标签组合。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Space align="center"
-               wrap>
-          <Tag size="sm"
-               variant="success"
-               closable>小标签</Tag>
-          <Tag size="md"
-               variant="success"
-               closable>中标签</Tag>
-          <Tag size="lg"
-               variant="success"
-               closable>大标签</Tag>
+        <Space align="center" wrap>
+          <Tag size="sm" variant="success" closable>小标签</Tag>
+          <Tag size="md" variant="success" closable>中标签</Tag>
+          <Tag size="lg" variant="success" closable>大标签</Tag>
         </Space>
       </div>
       <Divider class="my-6" />
@@ -150,8 +132,7 @@ const handleClose = (index: number) => {
       <h2 class="text-2xl font-bold mb-4">应用场景</h2>
       <p class="text-gray-600 mb-6">标签在实际应用中的常见使用场景。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical"
-               class="w-full">
+        <Space direction="vertical" class="w-full">
           <div>
             <h3 class="text-sm font-semibold mb-2 text-gray-700">状态标签</h3>
             <Space>
@@ -173,16 +154,11 @@ const handleClose = (index: number) => {
           <div>
             <h3 class="text-sm font-semibold mb-2 text-gray-700">可移除的兴趣标签</h3>
             <Space wrap>
-              <Tag variant="info"
-                   closable>JavaScript</Tag>
-              <Tag variant="info"
-                   closable>TypeScript</Tag>
-              <Tag variant="info"
-                   closable>React</Tag>
-              <Tag variant="info"
-                   closable>Vue</Tag>
-              <Tag variant="info"
-                   closable>Node.js</Tag>
+              <Tag variant="info" closable>JavaScript</Tag>
+              <Tag variant="info" closable>TypeScript</Tag>
+              <Tag variant="info" closable>React</Tag>
+              <Tag variant="info" closable>Vue</Tag>
+              <Tag variant="info" closable>Node.js</Tag>
             </Space>
           </div>
         </Space>

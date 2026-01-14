@@ -1,20 +1,17 @@
-import { classNames, type ClassValue } from './class-names';
+import { classNames, type ClassValue } from './class-names'
 
-export const radioGroupDefaultClasses = 'space-y-2';
+export const radioGroupDefaultClasses = 'space-y-2'
 
 export interface GetRadioGroupClassesOptions {
-  className?: ClassValue;
-  hasCustomClass?: boolean;
+  className?: ClassValue
+  hasCustomClass?: boolean
 }
 
 export const getRadioGroupClasses = ({
   className,
-  hasCustomClass,
+  hasCustomClass
 }: GetRadioGroupClassesOptions = {}) => {
-  const effectiveHasCustomClass = hasCustomClass ?? !!className;
+  const effectiveHasCustomClass = hasCustomClass ?? !!className
 
-  return classNames(
-    className,
-    !effectiveHasCustomClass && radioGroupDefaultClasses
-  );
-};
+  return classNames(className, !effectiveHasCustomClass && radioGroupDefaultClasses)
+}

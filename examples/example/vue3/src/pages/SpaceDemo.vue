@@ -42,8 +42,7 @@ import { Space, Divider } from '@tigercat/vue'
       <h2 class="text-2xl font-bold mb-4">不同尺寸</h2>
       <p class="text-gray-600 mb-6">size 支持内置尺寸（sm/md/lg）与自定义数值（px）。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical"
-               class="w-full">
+        <Space direction="vertical" class="w-full">
           <div>
             <p class="text-sm text-gray-600 mb-2">Small</p>
             <Space size="sm">
@@ -85,12 +84,10 @@ import { Space, Divider } from '@tigercat/vue'
       <h2 class="text-2xl font-bold mb-4">对齐方式</h2>
       <p class="text-gray-600 mb-6">align 控制交叉轴对齐（start/center/end/baseline/stretch）。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical"
-               class="w-full">
+        <Space direction="vertical" class="w-full">
           <div>
             <p class="text-sm text-gray-600 mb-2">align="center"</p>
-            <Space align="center"
-                   class="w-full border border-dashed border-gray-300 p-3 rounded">
+            <Space align="center" class="w-full border border-dashed border-gray-300 p-3 rounded">
               <div class="bg-amber-500 text-white p-4 rounded h-10 flex items-center">h-10</div>
               <div class="bg-amber-500 text-white p-4 rounded h-16 flex items-center">h-16</div>
               <div class="bg-amber-500 text-white p-4 rounded h-12 flex items-center">h-12</div>
@@ -98,8 +95,7 @@ import { Space, Divider } from '@tigercat/vue'
           </div>
           <div>
             <p class="text-sm text-gray-600 mb-2">align="baseline"</p>
-            <Space align="baseline"
-                   class="w-full border border-dashed border-gray-300 p-3 rounded">
+            <Space align="baseline" class="w-full border border-dashed border-gray-300 p-3 rounded">
               <div class="bg-rose-500 text-white p-4 rounded text-sm">Text-sm</div>
               <div class="bg-rose-500 text-white p-4 rounded text-lg">Text-lg</div>
               <div class="bg-rose-500 text-white p-4 rounded text-2xl">Text-2xl</div>
@@ -115,12 +111,8 @@ import { Space, Divider } from '@tigercat/vue'
       <p class="text-gray-600 mb-6">wrap=true 时，子项在空间不足时自动换行。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="max-w-md">
-          <Space wrap
-                 size="sm"
-                 class="w-full">
-            <div v-for="i in 14"
-                 :key="i"
-                 class="bg-slate-700 text-white px-3 py-2 rounded">
+          <Space wrap size="sm" class="w-full">
+            <div v-for="i in 14" :key="i" class="bg-slate-700 text-white px-3 py-2 rounded">
               Tag {{ i }}
             </div>
           </Space>

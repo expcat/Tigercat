@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue';
+import { defineComponent, computed, h, PropType } from 'vue'
 import {
   classNames,
   getDividerSpacingClasses,
@@ -6,30 +6,30 @@ import {
   getDividerOrientationClasses,
   type DividerOrientation,
   type DividerLineStyle,
-  type DividerSpacing,
-} from '@tigercat/core';
+  type DividerSpacing
+} from '@tigercat/core'
 
 export const Divider = defineComponent({
   name: 'TigerDivider',
   props: {
     orientation: {
       type: String as PropType<DividerOrientation>,
-      default: 'horizontal' as DividerOrientation,
+      default: 'horizontal' as DividerOrientation
     },
     lineStyle: {
       type: String as PropType<DividerLineStyle>,
-      default: 'solid' as DividerLineStyle,
+      default: 'solid' as DividerLineStyle
     },
     spacing: {
       type: String as PropType<DividerSpacing>,
-      default: 'md' as DividerSpacing,
+      default: 'md' as DividerSpacing
     },
     color: {
-      type: String,
+      type: String
     },
     thickness: {
-      type: String,
-    },
+      type: String
+    }
   },
   setup(props, { attrs }) {
     const dividerClasses = computed(() =>
@@ -38,22 +38,19 @@ export const Divider = defineComponent({
         getDividerLineStyleClasses(props.lineStyle),
         getDividerSpacingClasses(props.spacing, props.orientation)
       )
-    );
+    )
 
     const dividerStyle = computed(() => {
-      const style: Record<string, string> = {};
+      const style: Record<string, string> = {}
 
-      if (props.color) style.borderColor = props.color;
+      if (props.color) style.borderColor = props.color
       if (props.thickness) {
-        style[
-          props.orientation === 'horizontal'
-            ? 'borderTopWidth'
-            : 'borderLeftWidth'
-        ] = props.thickness;
+        style[props.orientation === 'horizontal' ? 'borderTopWidth' : 'borderLeftWidth'] =
+          props.thickness
       }
 
-      return style;
-    });
+      return style
+    })
 
     return () => {
       return h('div', {
@@ -61,10 +58,10 @@ export const Divider = defineComponent({
         class: [dividerClasses.value, attrs.class],
         style: [dividerStyle.value, attrs.style],
         role: 'separator',
-        'aria-orientation': props.orientation,
-      });
-    };
-  },
-});
+        'aria-orientation': props.orientation
+      })
+    }
+  }
+})
 
-export default Divider;
+export default Divider

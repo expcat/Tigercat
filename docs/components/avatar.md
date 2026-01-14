@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Avatar } from '@tigercat/vue';
+import { Avatar } from '@tigercat/vue'
 </script>
 
 <template>
@@ -34,7 +34,7 @@ import { Avatar } from '@tigercat/vue';
 ### React
 
 ```tsx
-import { Avatar } from '@tigercat/react';
+import { Avatar } from '@tigercat/react'
 
 function App() {
   return (
@@ -47,11 +47,7 @@ function App() {
 
       {/* 图标头像 */}
       <Avatar>
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -61,7 +57,7 @@ function App() {
         </svg>
       </Avatar>
     </>
-  );
+  )
 }
 ```
 
@@ -139,12 +135,12 @@ Avatar 组件支持 2 种不同的形状：
 {
   /* 正常加载图片 */
 }
-<Avatar src="/avatar.jpg" alt="User Avatar" />;
+;<Avatar src="/avatar.jpg" alt="User Avatar" />
 
 {
   /* 图片加载失败时显示文字 */
 }
-<Avatar src="/invalid.jpg" text="Fallback" alt="User Avatar" />;
+;<Avatar src="/invalid.jpg" text="Fallback" alt="User Avatar" />
 ```
 
 ## 文字头像 (Text Avatar)
@@ -175,7 +171,7 @@ Avatar 组件支持 2 种不同的形状：
 {
   /* 单个词：显示首字母 */
 }
-<Avatar text="Alice" />;
+;<Avatar text="Alice" />
 {
   /* 显示 "A" */
 }
@@ -183,7 +179,7 @@ Avatar 组件支持 2 种不同的形状：
 {
   /* 多个词：显示首字母缩写 */
 }
-<Avatar text="John Doe" />;
+;<Avatar text="John Doe" />
 {
   /* 显示 "JD" */
 }
@@ -191,7 +187,7 @@ Avatar 组件支持 2 种不同的形状：
 {
   /* 中文名：显示前两个字 */
 }
-<Avatar text="张三" />;
+;<Avatar text="张三" />
 {
   /* 显示 "张三" */
 }
@@ -221,11 +217,7 @@ Avatar 组件支持 2 种不同的形状：
 
 ```tsx
 <Avatar>
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24">
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -275,14 +267,14 @@ Avatar 组件支持 2 种不同的形状：
 
 ```vue
 <script setup>
-import { ref } from 'vue';
-import { Avatar } from '@tigercat/vue';
+import { ref } from 'vue'
+import { Avatar } from '@tigercat/vue'
 
 const users = ref([
   { id: 1, name: 'Alice Johnson', avatar: '/alice.jpg' },
   { id: 2, name: 'Bob Smith', avatar: null },
-  { id: 3, name: '张三', avatar: null },
-]);
+  { id: 3, name: '张三', avatar: null }
+])
 </script>
 
 <template>
@@ -298,29 +290,25 @@ const users = ref([
 #### React
 
 ```tsx
-import { Avatar } from '@tigercat/react';
+import { Avatar } from '@tigercat/react'
 
 function UserList() {
   const users = [
     { id: 1, name: 'Alice Johnson', avatar: '/alice.jpg' },
     { id: 2, name: 'Bob Smith', avatar: null },
-    { id: 3, name: '张三', avatar: null },
-  ];
+    { id: 3, name: '张三', avatar: null }
+  ]
 
   return (
     <div className="flex flex-col gap-4">
       {users.map((user) => (
         <div key={user.id} className="flex items-center gap-3">
-          <Avatar
-            src={user.avatar || undefined}
-            text={user.name}
-            alt={user.name}
-          />
+          <Avatar src={user.avatar || undefined} text={user.name} alt={user.name} />
           <span>{user.name}</span>
         </div>
       ))}
     </div>
-  );
+  )
 }
 ```
 
@@ -330,14 +318,14 @@ function UserList() {
 
 ```vue
 <script setup>
-import { Avatar } from '@tigercat/vue';
+import { Avatar } from '@tigercat/vue'
 
 const team = [
   { name: 'Alice', avatar: '/alice.jpg' },
   { name: 'Bob', avatar: '/bob.jpg' },
   { name: 'Charlie', avatar: '/charlie.jpg' },
-  { name: 'David', avatar: null },
-];
+  { name: 'David', avatar: null }
+]
 </script>
 
 <template>
@@ -357,15 +345,15 @@ const team = [
 #### React
 
 ```tsx
-import { Avatar } from '@tigercat/react';
+import { Avatar } from '@tigercat/react'
 
 function TeamAvatars() {
   const team = [
     { name: 'Alice', avatar: '/alice.jpg' },
     { name: 'Bob', avatar: '/bob.jpg' },
     { name: 'Charlie', avatar: '/charlie.jpg' },
-    { name: 'David', avatar: null },
-  ];
+    { name: 'David', avatar: null }
+  ]
 
   return (
     <div className="flex -space-x-2">
@@ -380,7 +368,7 @@ function TeamAvatars() {
         />
       ))}
     </div>
-  );
+  )
 }
 ```
 
@@ -390,15 +378,11 @@ function TeamAvatars() {
 
 ```vue
 <script setup>
-import { Avatar, Badge } from '@tigercat/vue';
+import { Avatar, Badge } from '@tigercat/vue'
 </script>
 
 <template>
-  <Badge
-    type="dot"
-    variant="success"
-    :standalone="false"
-    position="bottom-right">
+  <Badge type="dot" variant="success" :standalone="false" position="bottom-right">
     <Avatar src="/user.jpg" alt="Online User" size="lg" />
   </Badge>
 </template>
@@ -407,18 +391,14 @@ import { Avatar, Badge } from '@tigercat/vue';
 #### React
 
 ```tsx
-import { Avatar, Badge } from '@tigercat/react';
+import { Avatar, Badge } from '@tigercat/react'
 
 function OnlineAvatar() {
   return (
-    <Badge
-      type="dot"
-      variant="success"
-      standalone={false}
-      position="bottom-right">
+    <Badge type="dot" variant="success" standalone={false} position="bottom-right">
       <Avatar src="/user.jpg" alt="Online User" size="lg" />
     </Badge>
-  );
+  )
 }
 ```
 
