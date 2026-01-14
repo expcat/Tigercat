@@ -58,9 +58,6 @@ node ./scripts/run-examples.mjs
 # Or via pnpm script
 pnpm example:all
 
-# Compatibility alias
-pnpm demo:all
-
 # Smoke test (starts then stops automatically)
 pnpm example:all -- --smoke
 pnpm example:all -- --smoke --smoke-ms=2000
@@ -72,7 +69,6 @@ pnpm example:all -- --smoke --smoke-ms=2000
 - Starts React example on http://localhost:5174
 - Manages both processes
 - Provides cleanup on exit (Ctrl+C)
-- Writes logs to a temp directory (printed on start)
 - If example app dependencies are missing, runs `pnpm install` automatically
 
 **Example output**:
@@ -89,17 +85,13 @@ Starting React example on http://localhost:5174
   Vue3:  http://localhost:5173
   React: http://localhost:5174
 
-Logs:
-  Vue3:  <temp>/tigercat/vue3-example.log
-  React: <temp>/tigercat/react-example.log
-
 Press Ctrl+C to stop both servers
 ```
 
 **Tips**:
 
 - Press Ctrl+C to stop both servers
-- Check log files if examples fail to start
+- Check the terminal output if examples fail to start
 - Ensure ports 5173 and 5174 are available
 
 ---
@@ -159,23 +151,20 @@ Next steps:
 
 All scripts are also available as npm scripts in `package.json`:
 
-| npm script         | Script file        | Description            |
-| ------------------ | ------------------ | ---------------------- |
-| `pnpm dev:check`   | `check-env.mjs`    | Check environment      |
-| `pnpm example:all` | `run-examples.mjs` | Run both examples      |
-| `pnpm demo:all`    | `run-examples.mjs` | Alias of `example:all` |
-| `pnpm setup`       | `setup.mjs`        | Initial setup          |
+| npm script         | Script file        | Description       |
+| ------------------ | ------------------ | ----------------- |
+| `pnpm dev:check`   | `check-env.mjs`    | Check environment |
+| `pnpm example:all` | `run-examples.mjs` | Run both examples |
+| `pnpm setup`       | `setup.mjs`        | Initial setup     |
 
 Additionally, convenience scripts in `package.json`:
 
-| npm script           | Description              |
-| -------------------- | ------------------------ |
-| `pnpm example:vue`   | Run Vue3 example only    |
-| `pnpm example:react` | Run React example only   |
-| `pnpm demo:vue`      | Alias of `example:vue`   |
-| `pnpm demo:react`    | Alias of `example:react` |
-| `pnpm test:vue`      | Run Vue tests only       |
-| `pnpm test:react`    | Run React tests only     |
+| npm script           | Description            |
+| -------------------- | ---------------------- |
+| `pnpm example:vue`   | Run Vue3 example only  |
+| `pnpm example:react` | Run React example only |
+| `pnpm test:vue`      | Run Vue tests only     |
+| `pnpm test:react`    | Run React tests only   |
 
 ## Requirements
 
@@ -204,7 +193,6 @@ These scripts are now cross-platform. Use the pnpm scripts from PowerShell/CMD:
 ```powershell
 pnpm dev:check
 pnpm example:all
-pnpm demo:all
 pnpm setup
 ```
 

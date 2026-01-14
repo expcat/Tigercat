@@ -73,6 +73,7 @@ export const Row = defineComponent({
     const rowClasses = computed(() => {
       return classNames(
         'flex',
+        'w-full',
         props.wrap && 'flex-wrap',
         getAlignClasses(props.align),
         getJustifyClasses(props.justify)

@@ -54,7 +54,9 @@ function main() {
   console.log('Next steps:');
   console.log('  1. Read DEVELOPMENT.md for development guidelines');
   console.log("  2. Run 'pnpm test' to run all tests");
-  console.log("  3. Run 'pnpm demo:vue' or 'pnpm demo:react' to see the demos");
+  console.log(
+    "  3. Run 'pnpm example:vue' or 'pnpm example:react' to see the examples"
+  );
   console.log("  4. Run 'pnpm dev' for watch mode during development");
   console.log('');
 }

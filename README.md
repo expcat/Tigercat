@@ -65,11 +65,6 @@ pnpm test
 pnpm example:vue    # Vue3 example on http://localhost:5173
 pnpm example:react  # React example on http://localhost:5174
 pnpm example:all    # Run both examples simultaneously
-
-# Compatibility aliases
-pnpm demo:vue
-pnpm demo:react
-pnpm demo:all
 ```
 
 ### Testing
@@ -117,9 +112,6 @@ For detailed testing guidelines, see:
 | `pnpm example:vue`   | Run Vue3 example (port 5173)     |
 | `pnpm example:react` | Run React example (port 5174)    |
 | `pnpm example:all`   | Run both examples simultaneously |
-| `pnpm demo:vue`      | Alias of `example:vue`           |
-| `pnpm demo:react`    | Alias of `example:react`         |
-| `pnpm demo:all`      | Alias of `example:all`           |
 | `pnpm dev:check`     | Verify development environment   |
 | `pnpm lint`          | Lint all packages                |
 | `pnpm clean`         | Clean build artifacts            |

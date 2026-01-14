@@ -93,11 +93,6 @@ pnpm test
 pnpm example:vue    # Vue3 example on http://localhost:5173
 pnpm example:react  # React example on http://localhost:5174
 pnpm example:all    # Run both examples simultaneously
-
-# Compatibility aliases
-pnpm demo:vue
-pnpm demo:react
-pnpm demo:all
 ```
 
 ### 4. Make Changes

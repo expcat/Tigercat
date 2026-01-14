@@ -29,6 +29,7 @@ export const Row: React.FC<RowProps> = ({
 
   const rowClasses = classNames(
     'flex',
+    'w-full',
     wrap && 'flex-wrap',
     getAlignClasses(align),
     getJustifyClasses(justify),

@@ -88,23 +88,25 @@ import { Row, Col, Container, Space } from '@tigercat/vue'
 
             <div>
               <p class="text-sm text-gray-600 mb-2">gutter: [16, 16]（水平+垂直）</p>
-              <Row :gutter="[16, 16]">
-                <Col :span="12">
-                  <div class="bg-indigo-500 text-white p-4 rounded text-center">col-12</div>
-                </Col>
-                <Col :span="12">
-                  <div class="bg-indigo-400 text-white p-4 rounded text-center">col-12</div>
-                </Col>
-                <Col :span="8">
-                  <div class="bg-indigo-500 text-white p-4 rounded text-center">col-8</div>
-                </Col>
-                <Col :span="8">
-                  <div class="bg-indigo-400 text-white p-4 rounded text-center">col-8</div>
-                </Col>
-                <Col :span="8">
-                  <div class="bg-indigo-300 text-white p-4 rounded text-center">col-8</div>
-                </Col>
-              </Row>
+              <div class="py-2">
+                <Row :gutter="[16, 16]">
+                  <Col :span="12">
+                    <div class="bg-indigo-500 text-white p-4 rounded text-center">col-12</div>
+                  </Col>
+                  <Col :span="12">
+                    <div class="bg-indigo-400 text-white p-4 rounded text-center">col-12</div>
+                  </Col>
+                  <Col :span="8">
+                    <div class="bg-indigo-500 text-white p-4 rounded text-center">col-8</div>
+                  </Col>
+                  <Col :span="8">
+                    <div class="bg-indigo-400 text-white p-4 rounded text-center">col-8</div>
+                  </Col>
+                  <Col :span="8">
+                    <div class="bg-indigo-300 text-white p-4 rounded text-center">col-8</div>
+                  </Col>
+                </Row>
+              </div>
             </div>
           </Space>
         </Container>
@@ -120,17 +122,17 @@ import { Row, Col, Container, Space } from '@tigercat/vue'
           <Space direction="vertical"
                  class="w-full">
             <Row :gutter="[16, 16]">
-              <Col :span="{ xs: 24, md: 12, lg: 6 }">
-                <div class="bg-teal-600 text-white p-4 rounded text-center">xs-24 md-12 lg-6</div>
+              <Col :span="{ xs: 24, md: 12, lg: 8 }">
+                <div class="bg-teal-600 text-white p-4 rounded text-center">xs-24 md-12 lg-8</div>
               </Col>
-              <Col :span="{ xs: 24, md: 12, lg: 6 }">
-                <div class="bg-teal-500 text-white p-4 rounded text-center">xs-24 md-12 lg-6</div>
+              <Col :span="{ xs: 24, md: 6, lg: 6 }">
+                <div class="bg-teal-500 text-white p-4 rounded text-center">xs-24 md-6 lg-6</div>
               </Col>
-              <Col :span="{ xs: 24, md: 12, lg: 6 }">
-                <div class="bg-teal-400 text-white p-4 rounded text-center">xs-24 md-12 lg-6</div>
+              <Col :span="{ xs: 24, md: 4, lg: 6 }">
+                <div class="bg-teal-400 text-white p-4 rounded text-center">xs-24 md-4 lg-6</div>
               </Col>
-              <Col :span="{ xs: 24, md: 12, lg: 6 }">
-                <div class="bg-teal-300 text-white p-4 rounded text-center">xs-24 md-12 lg-6</div>
+              <Col :span="{ xs: 24, md: 2, lg: 4 }">
+                <div class="bg-teal-300 text-white p-4 rounded text-center">xs-24 md-2 lg-4</div>
               </Col>
             </Row>
 
@@ -257,7 +259,7 @@ import { Row, Col, Container, Space } from '@tigercat/vue'
       <p class="text-gray-600 mb-6">当总宽度超过 24 栅格时，不换行会导致横向溢出。</p>
       <div class="p-6 bg-gray-50 rounded-lg">
         <Container>
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto overflow-y-hidden px-2">
             <Row :gutter="16"
                  :wrap="false"
                  class="min-w-[720px]">

@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
 import {
   classNames,
+  getColStyleVars,
+  getColOrderStyleVars,
   getSpanClasses,
   getOffsetClasses,
   getOrderClasses,
@@ -25,9 +27,22 @@ export const Col: React.FC<ColProps> = ({
   const { gutter } = useContext(RowContext);
 
   const { colStyle } = getGutterStyles(gutter || 0);
+  const isFlexSpanMode = flex !== undefined && span === 0;
+  const colStyleVars = getColStyleVars(
+    isFlexSpanMode ? undefined : span,
+    offset
+  );
+  const colOrderVars = getColOrderStyleVars(order);
+
+  const colFlexVar: Record<string, string> =
+    flex === undefined
+      ? {}
+      : {
+          '--tiger-col-flex': String(flex).replace(/_/g, ' '),
+        };
 
   const colClasses = classNames(
-    getSpanClasses(span),
+    isFlexSpanMode ? '' : getSpanClasses(span),
     getOffsetClasses(offset),
     getOrderClasses(order),
     getFlexClasses(flex),
@@ -36,6 +51,9 @@ export const Col: React.FC<ColProps> = ({
 
   const mergedStyle: React.CSSProperties = {
     ...colStyle,
+    ...colStyleVars,
+    ...colOrderVars,
+    ...colFlexVar,
     ...style,
   };
 
