@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { TimePicker } from '@tigercat/react';
+import { useLang } from '../context/lang';
+
+const PICKER_WIDTH = 'w-full max-w-[260px]';
+const RANGE_PICKER_WIDTH = 'w-full max-w-[340px]';
 
 const TimePickerDemo: React.FC = () => {
-  const [locale, setLocale] = useState<'zh-CN' | 'en-US'>('zh-CN');
+  const { lang: locale } = useLang();
   const [time, setTime] = useState<string | null>(null);
   const [time24, setTime24] = useState<string | null>('14:30');
   const [time12, setTime12] = useState<string | null>('14:30');
@@ -21,17 +25,6 @@ const TimePickerDemo: React.FC = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">TimePicker 时间选择器</h1>
         <p className="text-gray-600">用于选择或输入时间。</p>
-
-        <div className="mt-4 flex items-center gap-3">
-          <label className="text-sm font-medium text-gray-700">语言</label>
-          <select
-            className="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm"
-            value={locale}
-            onChange={(e) => setLocale(e.target.value as 'zh-CN' | 'en-US')}>
-            <option value="zh-CN">中文</option>
-            <option value="en-US">English</option>
-          </select>
-        </div>
       </div>
 
       {/* 基础用法 */}
@@ -41,6 +34,7 @@ const TimePickerDemo: React.FC = () => {
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md space-y-4">
             <TimePicker
+              className={PICKER_WIDTH}
               value={time}
               onChange={setTime}
               locale={locale}
@@ -61,6 +55,7 @@ const TimePickerDemo: React.FC = () => {
           <div className="max-w-md space-y-4">
             <TimePicker
               range
+              className={RANGE_PICKER_WIDTH}
               locale={locale}
               value={timeRange}
               onChange={setTimeRange}
@@ -88,6 +83,7 @@ const TimePickerDemo: React.FC = () => {
               </label>
               <TimePicker
                 size="sm"
+                className={PICKER_WIDTH}
                 locale={locale}
                 placeholder="小尺寸时间选择器"
               />
@@ -98,6 +94,7 @@ const TimePickerDemo: React.FC = () => {
               </label>
               <TimePicker
                 size="md"
+                className={PICKER_WIDTH}
                 locale={locale}
                 placeholder="中尺寸时间选择器"
               />
@@ -108,6 +105,7 @@ const TimePickerDemo: React.FC = () => {
               </label>
               <TimePicker
                 size="lg"
+                className={PICKER_WIDTH}
                 locale={locale}
                 placeholder="大尺寸时间选择器"
               />
@@ -127,6 +125,7 @@ const TimePickerDemo: React.FC = () => {
                 24 小时制
               </label>
               <TimePicker
+                className={PICKER_WIDTH}
                 value={time24}
                 onChange={setTime24}
                 format="24"
@@ -139,6 +138,7 @@ const TimePickerDemo: React.FC = () => {
                 12 小时制
               </label>
               <TimePicker
+                className={PICKER_WIDTH}
                 value={time12}
                 onChange={setTime12}
                 format="12"
@@ -159,6 +159,7 @@ const TimePickerDemo: React.FC = () => {
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md space-y-4">
             <TimePicker
+              className={PICKER_WIDTH}
               value={timeWithSeconds}
               onChange={setTimeWithSeconds}
               showSeconds={true}
@@ -181,6 +182,7 @@ const TimePickerDemo: React.FC = () => {
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md space-y-4">
             <TimePicker
+              className={PICKER_WIDTH}
               value={timeWithSteps}
               onChange={setTimeWithSteps}
               hourStep={2}
@@ -204,6 +206,7 @@ const TimePickerDemo: React.FC = () => {
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md space-y-4">
             <TimePicker
+              className={PICKER_WIDTH}
               value={timeWithRange}
               onChange={setTimeWithRange}
               minTime="09:00"
@@ -230,13 +233,23 @@ const TimePickerDemo: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 禁用
               </label>
-              <TimePicker value="14:30" disabled locale={locale} />
+              <TimePicker
+                className={PICKER_WIDTH}
+                value="14:30"
+                disabled
+                locale={locale}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 只读
               </label>
-              <TimePicker value="14:30" readonly locale={locale} />
+              <TimePicker
+                className={PICKER_WIDTH}
+                value="14:30"
+                readonly
+                locale={locale}
+              />
             </div>
           </div>
         </div>
@@ -255,6 +268,7 @@ const TimePickerDemo: React.FC = () => {
                 可清除
               </label>
               <TimePicker
+                className={PICKER_WIDTH}
                 value={time24}
                 onChange={setTime24}
                 clearable={true}
@@ -266,6 +280,7 @@ const TimePickerDemo: React.FC = () => {
                 不可清除
               </label>
               <TimePicker
+                className={PICKER_WIDTH}
                 value={time24}
                 onChange={setTime24}
                 clearable={false}

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, inject, type Ref } from 'vue'
 import { DatePicker, Space, Divider, FormItem } from '@tigercat/vue'
+import type { DemoLang } from '@demo-shared/app-config'
 
 const date = ref<Date | null>(null)
 const dateWithDefault = ref(new Date('2024-01-15'))
@@ -9,7 +10,9 @@ const disabledDate = ref(new Date('2024-06-15'))
 const readonlyDate = ref(new Date('2024-06-15'))
 const range = ref<[Date | null, Date | null]>([null, null])
 const labeledRange = ref<[Date | null, Date | null]>([new Date('2024-03-10'), null])
-const locale = ref<'zh-CN' | 'en-US'>('zh-CN')
+
+const demoLang = inject<Ref<DemoLang>>('demo-lang', ref<DemoLang>('zh-CN'))
+const locale = computed(() => demoLang.value)
 
 const minDate = new Date('2024-01-01')
 const maxDate = new Date('2024-12-31')
@@ -29,15 +32,6 @@ const customLabels = computed(() => {
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">DatePicker 日期选择器</h1>
       <p class="text-gray-600">用于选择或输入日期。</p>
-
-      <div class="mt-4 flex items-center gap-3">
-        <label class="text-sm font-medium text-gray-700">语言</label>
-        <select v-model="locale"
-                class="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm">
-          <option value="zh-CN">中文（简体）</option>
-          <option value="en-US">English (US)</option>
-        </select>
-      </div>
     </div>
 
     <!-- 基础用法 -->
@@ -48,6 +42,7 @@ const customLabels = computed(() => {
         <Space direction="vertical"
                class="w-full max-w-md">
           <DatePicker v-model="date"
+                      class="w-full max-w-[260px]"
                       placeholder="请选择日期"
                       :locale="locale" />
           <p class="text-sm text-gray-600">选中的日期：{{ date ? date.toLocaleDateString(locale) : '未选择' }}</p>
@@ -65,6 +60,7 @@ const customLabels = computed(() => {
                class="w-full max-w-md">
           <DatePicker v-model="range"
                       range
+                      class="w-full max-w-[340px]"
                       placeholder="请选择日期范围"
                       :locale="locale" />
           <p class="text-sm text-gray-600">
@@ -85,6 +81,7 @@ const customLabels = computed(() => {
                class="w-full max-w-md">
           <DatePicker v-model="labeledRange"
                       range
+                      class="w-full max-w-[340px]"
                       :labels="customLabels"
                       :locale="locale" />
         </Space>
@@ -101,16 +98,19 @@ const customLabels = computed(() => {
                class="w-full max-w-md">
           <FormItem label="小尺寸">
             <DatePicker size="sm"
+                        class="w-full max-w-[260px]"
                         placeholder="小尺寸日期选择器"
                         :locale="locale" />
           </FormItem>
           <FormItem label="中尺寸">
             <DatePicker size="md"
+                        class="w-full max-w-[260px]"
                         placeholder="中尺寸日期选择器"
                         :locale="locale" />
           </FormItem>
           <FormItem label="大尺寸">
             <DatePicker size="lg"
+                        class="w-full max-w-[260px]"
                         placeholder="大尺寸日期选择器"
                         :locale="locale" />
           </FormItem>
@@ -128,11 +128,13 @@ const customLabels = computed(() => {
                class="w-full max-w-md">
           <FormItem label="yyyy-MM-dd">
             <DatePicker v-model="dateWithDefault"
+                        class="w-full max-w-[260px]"
                         format="yyyy-MM-dd"
                         :locale="locale" />
           </FormItem>
           <FormItem label="MM/dd/yyyy">
             <DatePicker v-model="dateWithDefault"
+                        class="w-full max-w-[260px]"
                         format="MM/dd/yyyy"
                         :locale="locale" />
           </FormItem>
@@ -149,6 +151,7 @@ const customLabels = computed(() => {
         <Space direction="vertical"
                class="w-full max-w-md">
           <DatePicker v-model="minMaxDate"
+                      class="w-full max-w-[260px]"
                       :min-date="minDate"
                       :max-date="maxDate"
                       placeholder="仅可选择2024年的日期"
@@ -168,11 +171,13 @@ const customLabels = computed(() => {
                class="w-full max-w-md">
           <FormItem label="禁用">
             <DatePicker v-model="disabledDate"
+                        class="w-full max-w-[260px]"
                         disabled
                         :locale="locale" />
           </FormItem>
           <FormItem label="只读">
             <DatePicker v-model="readonlyDate"
+                        class="w-full max-w-[260px]"
                         readonly
                         :locale="locale" />
           </FormItem>
@@ -190,11 +195,13 @@ const customLabels = computed(() => {
                class="w-full max-w-md">
           <FormItem label="可清除">
             <DatePicker v-model="dateWithDefault"
+                        class="w-full max-w-[260px]"
                         :clearable="true"
                         :locale="locale" />
           </FormItem>
           <FormItem label="不可清除">
             <DatePicker v-model="dateWithDefault"
+                        class="w-full max-w-[260px]"
                         :clearable="false"
                         :locale="locale" />
           </FormItem>

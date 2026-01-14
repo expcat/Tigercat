@@ -1,35 +1,27 @@
-import React, { useState } from "react";
-import { DatePicker } from "@tigercat/react";
+import React, { useState } from 'react';
+import { DatePicker } from '@tigercat/react';
+import { useLang } from '../context/lang';
+
+const PICKER_WIDTH = 'w-full max-w-[260px]';
+const RANGE_PICKER_WIDTH = 'w-full max-w-[340px]';
 
 const DatePickerDemo: React.FC = () => {
+  const { lang: locale } = useLang();
   const [date, setDate] = useState<Date | null>(null);
   const [dateWithDefault, setDateWithDefault] = useState<Date | null>(
-    new Date("2024-01-15")
+    new Date('2024-01-15')
   );
   const [minMaxDate, setMinMaxDate] = useState<Date | null>(null);
   const [range, setRange] = useState<[Date | null, Date | null]>([null, null]);
-  const [locale, setLocale] = useState<"zh-CN" | "en-US">("zh-CN");
 
-  const minDate = new Date("2024-01-01");
-  const maxDate = new Date("2024-12-31");
+  const minDate = new Date('2024-01-01');
+  const maxDate = new Date('2024-12-31');
 
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">DatePicker 日期选择器</h1>
         <p className="text-gray-600">用于选择或输入日期。</p>
-
-        <div className="mt-4 flex items-center gap-3">
-          <label className="text-sm font-medium text-gray-700">语言</label>
-          <select
-            className="h-9 rounded-md border border-gray-300 bg-white px-3 text-sm"
-            value={locale}
-            onChange={(e) => setLocale(e.target.value as "zh-CN" | "en-US")}
-          >
-            <option value="zh-CN">中文（简体）</option>
-            <option value="en-US">English (US)</option>
-          </select>
-        </div>
       </div>
 
       {/* 基础用法 */}
@@ -39,13 +31,14 @@ const DatePickerDemo: React.FC = () => {
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md space-y-4">
             <DatePicker
+              className={PICKER_WIDTH}
               value={date}
               onChange={setDate}
               placeholder="请选择日期"
               locale={locale}
             />
             <p className="text-sm text-gray-600">
-              选中的日期：{date ? date.toLocaleDateString(locale) : "未选择"}
+              选中的日期：{date ? date.toLocaleDateString(locale) : '未选择'}
             </p>
           </div>
         </div>
@@ -59,6 +52,7 @@ const DatePickerDemo: React.FC = () => {
           <div className="max-w-md space-y-4">
             <DatePicker
               range
+              className={RANGE_PICKER_WIDTH}
               value={range}
               onChange={setRange}
               placeholder="请选择日期范围"
@@ -66,8 +60,8 @@ const DatePickerDemo: React.FC = () => {
             />
             <p className="text-sm text-gray-600">
               已选范围：
-              {range[0] ? range[0].toLocaleDateString(locale) : "未选择"} -{" "}
-              {range[1] ? range[1].toLocaleDateString(locale) : "未选择"}
+              {range[0] ? range[0].toLocaleDateString(locale) : '未选择'} -{' '}
+              {range[1] ? range[1].toLocaleDateString(locale) : '未选择'}
             </p>
           </div>
         </div>
@@ -83,13 +77,14 @@ const DatePickerDemo: React.FC = () => {
           <div className="max-w-md space-y-4">
             <DatePicker
               range
-              defaultValue={[new Date("2024-03-10"), null]}
+              className={RANGE_PICKER_WIDTH}
+              defaultValue={[new Date('2024-03-10'), null]}
               locale={locale}
               labels={{
-                today: locale === "zh-CN" ? "今天（自定义）" : "Today (Custom)",
-                ok: locale === "zh-CN" ? "确定（自定义）" : "OK (Custom)",
+                today: locale === 'zh-CN' ? '今天（自定义）' : 'Today (Custom)',
+                ok: locale === 'zh-CN' ? '确定（自定义）' : 'OK (Custom)',
                 toggleCalendar:
-                  locale === "zh-CN" ? "打开选择器" : "Open picker",
+                  locale === 'zh-CN' ? '打开选择器' : 'Open picker',
               }}
             />
           </div>
@@ -108,6 +103,7 @@ const DatePickerDemo: React.FC = () => {
               </label>
               <DatePicker
                 size="sm"
+                className={PICKER_WIDTH}
                 placeholder="小尺寸日期选择器"
                 locale={locale}
               />
@@ -118,6 +114,7 @@ const DatePickerDemo: React.FC = () => {
               </label>
               <DatePicker
                 size="md"
+                className={PICKER_WIDTH}
                 placeholder="中尺寸日期选择器"
                 locale={locale}
               />
@@ -128,6 +125,7 @@ const DatePickerDemo: React.FC = () => {
               </label>
               <DatePicker
                 size="lg"
+                className={PICKER_WIDTH}
                 placeholder="大尺寸日期选择器"
                 locale={locale}
               />
@@ -147,6 +145,7 @@ const DatePickerDemo: React.FC = () => {
                 yyyy-MM-dd
               </label>
               <DatePicker
+                className={PICKER_WIDTH}
                 value={dateWithDefault}
                 onChange={setDateWithDefault}
                 format="yyyy-MM-dd"
@@ -158,6 +157,7 @@ const DatePickerDemo: React.FC = () => {
                 MM/dd/yyyy
               </label>
               <DatePicker
+                className={PICKER_WIDTH}
                 value={dateWithDefault}
                 onChange={setDateWithDefault}
                 format="MM/dd/yyyy"
@@ -177,6 +177,7 @@ const DatePickerDemo: React.FC = () => {
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md space-y-4">
             <DatePicker
+              className={PICKER_WIDTH}
               value={minMaxDate}
               onChange={setMinMaxDate}
               minDate={minDate}
@@ -186,7 +187,7 @@ const DatePickerDemo: React.FC = () => {
             />
             <p className="text-sm text-gray-600">
               选中日期：
-              {minMaxDate ? minMaxDate.toLocaleDateString(locale) : "未选择"}
+              {minMaxDate ? minMaxDate.toLocaleDateString(locale) : '未选择'}
             </p>
           </div>
         </div>
@@ -205,7 +206,8 @@ const DatePickerDemo: React.FC = () => {
                 禁用
               </label>
               <DatePicker
-                value={new Date("2024-06-15")}
+                className={PICKER_WIDTH}
+                value={new Date('2024-06-15')}
                 disabled
                 locale={locale}
               />
@@ -215,7 +217,8 @@ const DatePickerDemo: React.FC = () => {
                 只读
               </label>
               <DatePicker
-                value={new Date("2024-06-15")}
+                className={PICKER_WIDTH}
+                value={new Date('2024-06-15')}
                 readonly
                 locale={locale}
               />
@@ -237,6 +240,7 @@ const DatePickerDemo: React.FC = () => {
                 可清除
               </label>
               <DatePicker
+                className={PICKER_WIDTH}
                 value={dateWithDefault}
                 onChange={setDateWithDefault}
                 clearable={true}
@@ -248,6 +252,7 @@ const DatePickerDemo: React.FC = () => {
                 不可清除
               </label>
               <DatePicker
+                className={PICKER_WIDTH}
                 value={dateWithDefault}
                 onChange={setDateWithDefault}
                 clearable={false}

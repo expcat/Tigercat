@@ -23,7 +23,7 @@ export function getTimePickerInputClasses(
     'w-full rounded-md border border-gray-300',
     'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:border-transparent',
     'transition-colors duration-200',
-    'pr-20', // Space for icons
+    'pr-16', // Space for clear + clock buttons
   ];
 
   const sizeClasses = {
@@ -77,7 +77,7 @@ export const timePickerClearButtonClasses = [
  */
 export const timePickerPanelClasses = [
   'absolute z-10 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg',
-  'w-auto min-w-[200px]',
+  'w-max',
 ].join(' ');
 
 /**
@@ -117,7 +117,8 @@ export function getTimePickerRangeTabButtonClasses(isActive: boolean): string {
 /**
  * Column container classes
  */
-export const timePickerColumnClasses = 'flex flex-col overflow-hidden';
+export const timePickerColumnClasses =
+  'flex flex-col overflow-hidden shrink-0 w-16';
 
 /**
  * Column header classes

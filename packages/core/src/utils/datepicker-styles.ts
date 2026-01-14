@@ -35,7 +35,7 @@ export function getDatePickerInputClasses(
     'focus:ring-[var(--tiger-primary,#2563eb)]',
     'focus:border-transparent',
     'transition-colors',
-    'pr-10', // Space for calendar icon
+    'pr-16', // Space for clear + calendar buttons
   ];
 
   const sizeClasses = {
