@@ -32,6 +32,7 @@ export * from './utils/timepicker-styles';
 export * from './utils/timepicker-icons';
 export * from './utils/timepicker-labels';
 export * from './utils/upload-utils';
+export * from './utils/upload-labels';
 export * from './utils/space';
 export * from './utils/table-utils';
 export * from './utils/tag-utils';

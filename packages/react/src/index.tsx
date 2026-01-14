@@ -8,6 +8,7 @@
 export * from '@tigercat/core';
 
 // Components
+export { ConfigProvider, useTigerConfig } from './components/ConfigProvider';
 export { Button } from './components/Button';
 export type { ButtonProps } from './components/Button';
 export { Slider } from './components/Slider';
