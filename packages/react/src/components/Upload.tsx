@@ -1,13 +1,17 @@
-import React, { useRef, useState, useCallback } from "react";
+import React, { useRef, useState, useCallback, useMemo } from 'react';
 import {
   type UploadProps as CoreUploadProps,
   type UploadFile,
+  type UploadLabels,
   classNames,
   icon20ViewBox,
   closeSolidIcon20PathD,
   successCircleSolidIcon20PathD,
   errorCircleSolidIcon20PathD,
   getSpinnerSVG,
+  getUploadLabels,
+  interpolateUploadLabel,
+  mergeTigerLocale,
   prepareUploadFiles,
   fileToUploadFile,
   formatFileSize,
@@ -16,14 +20,16 @@ import {
   getFileListItemClasses,
   getPictureCardClasses,
   getUploadStatusIconClasses,
-} from "@tigercat/core";
+} from '@tigercat/core';
+
+import { useTigerConfig } from './ConfigProvider';
 
 export interface UploadProps
   extends Omit<
       React.HTMLAttributes<HTMLDivElement>,
-      "onChange" | "onError" | "onProgress"
+      'onChange' | 'onError' | 'onProgress'
     >,
-    Omit<CoreUploadProps, "onChange" | "onRemove"> {
+    Omit<CoreUploadProps, 'onChange' | 'onRemove'> {
   /**
    * File list change callback
    */
@@ -44,7 +50,7 @@ export const Upload: React.FC<UploadProps> = ({
   maxSize,
   disabled = false,
   drag = false,
-  listType = "text",
+  listType = 'text',
   fileList: controlledFileList,
   showFileList = true,
   autoUpload = true,
@@ -57,12 +63,23 @@ export const Upload: React.FC<UploadProps> = ({
   onSuccess,
   onError,
   onExceed,
+  locale,
+  labels: labelsOverrides,
   children,
   className,
   style,
   ...divProps
 }) => {
-  const spinnerSvg = getSpinnerSVG("spinner");
+  const spinnerSvg = getSpinnerSVG('spinner');
+  const config = useTigerConfig();
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  );
+  const labels: UploadLabels = useMemo(
+    () => getUploadLabels(mergedLocale, labelsOverrides),
+    [mergedLocale, labelsOverrides]
+  );
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [internalFileList, setInternalFileList] = useState<UploadFile[]>([]);
@@ -92,7 +109,7 @@ export const Upload: React.FC<UploadProps> = ({
     await processFiles(files);
     // Reset input value to allow selecting the same file again
     if (event.target) {
-      event.target.value = "";
+      event.target.value = '';
     }
   };
 
@@ -129,7 +146,7 @@ export const Upload: React.FC<UploadProps> = ({
 
       // Auto upload if enabled
       if (autoUpload) {
-        uploadFile.status = "uploading";
+        uploadFile.status = 'uploading';
         if (customRequest) {
           customRequest({
             file,
@@ -140,13 +157,13 @@ export const Upload: React.FC<UploadProps> = ({
               }
             },
             onSuccess: (response: unknown) => {
-              uploadFile.status = "success";
+              uploadFile.status = 'success';
               if (onSuccess) {
                 onSuccess(response, uploadFile);
               }
             },
             onError: (error: Error) => {
-              uploadFile.status = "error";
+              uploadFile.status = 'error';
               uploadFile.error = error.message;
               if (onError) {
                 onError(error, uploadFile);
@@ -155,7 +172,7 @@ export const Upload: React.FC<UploadProps> = ({
           });
         } else {
           // Simulate upload for demo purposes
-          uploadFile.status = "success";
+          uploadFile.status = 'success';
         }
       }
     }
@@ -187,7 +204,7 @@ export const Upload: React.FC<UploadProps> = ({
   const handleDragKeyDown = (event: React.KeyboardEvent) => {
     if (disabled) return;
 
-    if (event.key === "Enter" || event.key === " ") {
+    if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       handleClick();
     }
@@ -221,15 +238,13 @@ export const Upload: React.FC<UploadProps> = ({
           role="button"
           tabIndex={disabled ? -1 : 0}
           aria-disabled={disabled}
-          aria-label="Upload file by clicking or dragging"
-        >
+          aria-label={labels.dragAreaAriaLabel}>
           <svg
             className="w-12 h-12 mb-3 text-gray-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
+            aria-hidden="true">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -238,15 +253,19 @@ export const Upload: React.FC<UploadProps> = ({
             />
           </svg>
           <p className="mb-2 text-sm">
-            <span className="font-semibold">Click to upload</span> or drag and
-            drop
+            <span className="font-semibold">{labels.clickToUploadText}</span>{' '}
+            {labels.dragAndDropText}
           </p>
           {accept && (
-            <p className="text-xs text-gray-500">Accepted: {accept}</p>
+            <p className="text-xs text-gray-500">
+              {interpolateUploadLabel(labels.acceptInfoText, { accept })}
+            </p>
           )}
           {maxSize && (
             <p className="text-xs text-gray-500">
-              Max size: {formatFileSize(maxSize)}
+              {interpolateUploadLabel(labels.maxSizeInfoText, {
+                maxSize: formatFileSize(maxSize),
+              })}
             </p>
           )}
         </div>
@@ -259,9 +278,8 @@ export const Upload: React.FC<UploadProps> = ({
         className={getUploadButtonClasses(drag, disabled)}
         onClick={handleClick}
         disabled={disabled}
-        aria-label="Upload file"
-      >
-        {children || "Select File"}
+        aria-label={labels.buttonAriaLabel}>
+        {children || labels.selectFileText}
       </button>
     );
   };
@@ -271,7 +289,7 @@ export const Upload: React.FC<UploadProps> = ({
       return null;
     }
 
-    if (listType === "picture-card") {
+    if (listType === 'picture-card') {
       return (
         <div className="flex flex-wrap gap-2 mt-4">
           {fileList.map((file) => renderPictureCard(file))}
@@ -280,7 +298,10 @@ export const Upload: React.FC<UploadProps> = ({
     }
 
     return (
-      <ul className="mt-4 space-y-2" role="list" aria-label="Uploaded files">
+      <ul
+        className="mt-4 space-y-2"
+        role="list"
+        aria-label={labels.uploadedFilesAriaLabel}>
         {fileList.map((file) => renderFileItem(file))}
       </ul>
     );
@@ -296,8 +317,7 @@ export const Upload: React.FC<UploadProps> = ({
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
+            aria-hidden="true">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -318,13 +338,12 @@ export const Upload: React.FC<UploadProps> = ({
         {/* Actions */}
         <div className="flex items-center space-x-2 ml-4">
           {/* Status icon */}
-          {file.status === "success" && (
+          {file.status === 'success' && (
             <svg
-              className={getUploadStatusIconClasses("success", "sm")}
+              className={getUploadStatusIconClasses('success', 'sm')}
               fill="currentColor"
               viewBox={icon20ViewBox}
-              aria-label="Success"
-            >
+              aria-label={labels.successAriaLabel}>
               <path
                 fillRule="evenodd"
                 d={successCircleSolidIcon20PathD}
@@ -332,13 +351,12 @@ export const Upload: React.FC<UploadProps> = ({
               />
             </svg>
           )}
-          {file.status === "error" && (
+          {file.status === 'error' && (
             <svg
-              className={getUploadStatusIconClasses("error", "sm")}
+              className={getUploadStatusIconClasses('error', 'sm')}
               fill="currentColor"
               viewBox={icon20ViewBox}
-              aria-label="Error"
-            >
+              aria-label={labels.errorAriaLabel}>
               <path
                 fillRule="evenodd"
                 d={errorCircleSolidIcon20PathD}
@@ -346,19 +364,18 @@ export const Upload: React.FC<UploadProps> = ({
               />
             </svg>
           )}
-          {file.status === "uploading" && (
+          {file.status === 'uploading' && (
             <svg
-              className={getUploadStatusIconClasses("uploading", "sm", {
+              className={getUploadStatusIconClasses('uploading', 'sm', {
                 spinning: true,
               })}
               fill="none"
               viewBox={spinnerSvg.viewBox}
-              aria-label="Uploading"
-            >
+              aria-label={labels.uploadingAriaLabel}>
               {spinnerSvg.elements.map((el, index) => {
-                if (el.type === "circle")
+                if (el.type === 'circle')
                   return <circle key={index} {...el.attrs} />;
-                if (el.type === "path")
+                if (el.type === 'path')
                   return <path key={index} {...el.attrs} />;
                 return null;
               })}
@@ -369,14 +386,14 @@ export const Upload: React.FC<UploadProps> = ({
             type="button"
             className="text-gray-400 hover:text-red-500 transition-colors"
             onClick={() => handleRemove(file)}
-            aria-label={`Remove ${file.name}`}
-          >
+            aria-label={interpolateUploadLabel(labels.removeFileAriaLabel, {
+              fileName: file.name,
+            })}>
             <svg
               className="w-5 h-5"
               fill="currentColor"
               viewBox={icon20ViewBox}
-              aria-hidden="true"
-            >
+              aria-hidden="true">
               <path
                 fillRule="evenodd"
                 d={closeSolidIcon20PathD}
@@ -391,7 +408,7 @@ export const Upload: React.FC<UploadProps> = ({
 
   const renderPictureCard = (file: UploadFile) => {
     const imageUrl =
-      file.url || (file.file ? URL.createObjectURL(file.file) : "");
+      file.url || (file.file ? URL.createObjectURL(file.file) : '');
 
     return (
       <div key={file.uid} className={getPictureCardClasses(file.status)}>
@@ -410,15 +427,15 @@ export const Upload: React.FC<UploadProps> = ({
             type="button"
             className="text-white hover:text-blue-200 transition-colors"
             onClick={() => handlePreview(file)}
-            aria-label={`Preview ${file.name}`}
-          >
+            aria-label={interpolateUploadLabel(labels.previewFileAriaLabel, {
+              fileName: file.name,
+            })}>
             <svg
               className="w-6 h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
+              aria-hidden="true">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -438,14 +455,14 @@ export const Upload: React.FC<UploadProps> = ({
             type="button"
             className="text-white hover:text-red-200 transition-colors"
             onClick={() => handleRemove(file)}
-            aria-label={`Remove ${file.name}`}
-          >
+            aria-label={interpolateUploadLabel(labels.removeFileAriaLabel, {
+              fileName: file.name,
+            })}>
             <svg
               className="w-6 h-6"
               fill="currentColor"
               viewBox="0 0 20 20"
-              aria-hidden="true"
-            >
+              aria-hidden="true">
               <path
                 fillRule="evenodd"
                 d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
@@ -455,19 +472,18 @@ export const Upload: React.FC<UploadProps> = ({
           </button>
         </div>
         {/* Status indicator */}
-        {file.status === "uploading" && (
+        {file.status === 'uploading' && (
           <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
             <svg
-              className={getUploadStatusIconClasses("uploading", "lg", {
+              className={getUploadStatusIconClasses('uploading', 'lg', {
                 spinning: true,
               })}
               fill="none"
-              viewBox={spinnerSvg.viewBox}
-            >
+              viewBox={spinnerSvg.viewBox}>
               {spinnerSvg.elements.map((el, index) => {
-                if (el.type === "circle")
+                if (el.type === 'circle')
                   return <circle key={index} {...el.attrs} />;
-                if (el.type === "path")
+                if (el.type === 'path')
                   return <path key={index} {...el.attrs} />;
                 return null;
               })}
@@ -481,16 +497,15 @@ export const Upload: React.FC<UploadProps> = ({
   return (
     <div
       {...divProps}
-      className={classNames("tiger-upload", className)}
-      style={style}
-    >
+      className={classNames('tiger-upload', className)}
+      style={style}>
       <input
         ref={inputRef}
         type="file"
         accept={accept}
         multiple={multiple}
         disabled={disabled}
-        style={{ display: "none" }}
+        style={{ display: 'none' }}
         onChange={handleFileChange}
         aria-hidden="true"
       />

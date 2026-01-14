@@ -2,88 +2,147 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from "vitest";
-import { render, fireEvent, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import React from "react";
-import { Upload, type UploadFile } from "@tigercat/react";
-import { expectNoA11yViolations } from "../utils/react";
+import { describe, it, expect, vi } from 'vitest';
+import { render, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { Upload, ConfigProvider, type UploadFile } from '@tigercat/react';
+import { expectNoA11yViolations } from '../utils/react';
 
-describe("Upload", () => {
-  describe("Rendering", () => {
-    it("should render with default props", () => {
+describe('Upload', () => {
+  describe('Rendering', () => {
+    it('should render with default props', () => {
       const { container } = render(<Upload />);
 
       const input = container.querySelector('input[type="file"]');
       expect(input).toBeInTheDocument();
 
-      const button = container.querySelector("button");
+      const button = container.querySelector('button');
       expect(button).toBeInTheDocument();
-      expect(button).toHaveTextContent("Select File");
+      expect(button).toHaveTextContent('Select File');
     });
 
-    it("should render with custom children", () => {
+    it('should render with custom children', () => {
       const { getByText } = render(<Upload>Custom Upload Button</Upload>);
 
-      expect(getByText("Custom Upload Button")).toBeInTheDocument();
+      expect(getByText('Custom Upload Button')).toBeInTheDocument();
     });
 
-    it("should render drag area when drag prop is true", () => {
+    it('should render drag area when drag prop is true', () => {
       const { container } = render(<Upload drag />);
 
       const dragArea = container.querySelector('[role="button"]');
       expect(dragArea).toBeInTheDocument();
-      expect(dragArea).toHaveTextContent("Click to upload");
-      expect(dragArea).toHaveTextContent("or drag and drop");
+      expect(dragArea).toHaveTextContent('Click to upload');
+      expect(dragArea).toHaveTextContent('or drag and drop');
     });
 
-    it("should show accept info in drag area", () => {
+    it('should show accept info in drag area', () => {
       const { container } = render(<Upload drag accept="image/*" />);
 
-      expect(container).toHaveTextContent("Accepted: image/*");
+      expect(container).toHaveTextContent('Accepted: image/*');
     });
 
-    it("should show max size info in drag area", () => {
+    it('should show max size info in drag area', () => {
       const { container } = render(<Upload drag maxSize={5 * 1024 * 1024} />);
 
-      expect(container).toHaveTextContent("Max size: 5.00 MB");
+      expect(container).toHaveTextContent('Max size: 5.00 MB');
     });
 
-    it("should apply custom className", () => {
+    it('should apply custom className', () => {
       const { container } = render(<Upload className="custom-class" />);
 
-      expect(container.querySelector(".custom-class")).toBeInTheDocument();
+      expect(container.querySelector('.custom-class')).toBeInTheDocument();
+    });
+
+    it('should use locale upload texts when provided', () => {
+      const { container } = render(
+        <Upload
+          drag
+          accept="image/*"
+          locale={{
+            upload: {
+              clickToUploadText: '点击上传',
+              dragAndDropText: '或拖拽到此处',
+              acceptInfoText: '支持：{accept}',
+            },
+          }}
+        />
+      );
+
+      const dragArea = container.querySelector('[role="button"]');
+      expect(dragArea).toBeInTheDocument();
+      expect(container).toHaveTextContent('点击上传');
+      expect(container).toHaveTextContent('或拖拽到此处');
+      expect(container).toHaveTextContent('支持：image/*');
+    });
+
+    it('should prefer labels overrides over locale', () => {
+      const { container } = render(
+        <Upload
+          drag
+          accept="image/*"
+          locale={{
+            upload: {
+              acceptInfoText: '支持：{accept}',
+            },
+          }}
+          labels={{
+            acceptInfoText: '仅允许：{accept}',
+          }}
+        />
+      );
+
+      expect(container).toHaveTextContent('仅允许：image/*');
+      expect(container).not.toHaveTextContent('支持：image/*');
+    });
+
+    it('should use ConfigProvider locale when locale prop is not provided', () => {
+      const { container } = render(
+        <ConfigProvider
+          locale={{
+            upload: {
+              clickToUploadText: '点击上传',
+              dragAndDropText: '或拖拽到此处',
+            },
+          }}>
+          <Upload drag />
+        </ConfigProvider>
+      );
+
+      expect(container).toHaveTextContent('点击上传');
+      expect(container).toHaveTextContent('或拖拽到此处');
     });
   });
 
-  describe("Props", () => {
-    it("should set accept attribute on input", () => {
+  describe('Props', () => {
+    it('should set accept attribute on input', () => {
       const { container } = render(<Upload accept="image/*" />);
 
       const input = container.querySelector('input[type="file"]');
-      expect(input).toHaveAttribute("accept", "image/*");
+      expect(input).toHaveAttribute('accept', 'image/*');
     });
 
-    it("should set multiple attribute when multiple is true", () => {
+    it('should set multiple attribute when multiple is true', () => {
       const { container } = render(<Upload multiple />);
 
       const input = container.querySelector('input[type="file"]');
-      expect(input).toHaveAttribute("multiple");
+      expect(input).toHaveAttribute('multiple');
     });
 
-    it("should disable input when disabled is true", () => {
+    it('should disable input when disabled is true', () => {
       const { container } = render(<Upload disabled />);
 
       const input = container.querySelector('input[type="file"]');
       expect(input).toBeDisabled();
     });
 
-    it("should hide file list when showFileList is false", () => {
+    it('should hide file list when showFileList is false', () => {
       const fileList: UploadFile[] = [
         {
-          uid: "file-1",
-          name: "test.jpg",
-          status: "success",
+          uid: 'file-1',
+          name: 'test.jpg',
+          status: 'success',
         },
       ];
       const { container } = render(
@@ -95,17 +154,17 @@ describe("Upload", () => {
     });
   });
 
-  describe("Events", () => {
-    it("should call onChange when file is selected", async () => {
+  describe('Events', () => {
+    it('should call onChange when file is selected', async () => {
       const onChange = vi.fn();
       const { container } = render(<Upload onChange={onChange} />);
 
       const input = container.querySelector(
         'input[type="file"]'
       ) as HTMLInputElement;
-      const file = new File(["content"], "test.txt", { type: "text/plain" });
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
-      Object.defineProperty(input, "files", {
+      Object.defineProperty(input, 'files', {
         value: [file],
         writable: false,
       });
@@ -117,14 +176,14 @@ describe("Upload", () => {
       });
     });
 
-    it("should call onRemove when file is removed", async () => {
+    it('should call onRemove when file is removed', async () => {
       const onRemove = vi.fn();
       const onChange = vi.fn();
       const fileList: UploadFile[] = [
         {
-          uid: "file-1",
-          name: "test.jpg",
-          status: "success",
+          uid: 'file-1',
+          name: 'test.jpg',
+          status: 'success',
         },
       ];
       const { container } = render(
@@ -140,14 +199,14 @@ describe("Upload", () => {
       expect(onChange).toHaveBeenCalled();
     });
 
-    it("should not remove when onRemove returns false", async () => {
+    it('should not remove when onRemove returns false', async () => {
       const onRemove = vi.fn(() => false);
       const onChange = vi.fn();
       const fileList: UploadFile[] = [
         {
-          uid: "file-1",
-          name: "test.jpg",
-          status: "success",
+          uid: 'file-1',
+          name: 'test.jpg',
+          status: 'success',
         },
       ];
       const { container } = render(
@@ -163,7 +222,7 @@ describe("Upload", () => {
       expect(onChange).not.toHaveBeenCalled();
     });
 
-    it("should accumulate multiple selected files into fileList", async () => {
+    it('should accumulate multiple selected files into fileList', async () => {
       const onChange = vi.fn();
       const { container } = render(
         <Upload multiple fileList={[]} onChange={onChange} />
@@ -172,10 +231,10 @@ describe("Upload", () => {
       const input = container.querySelector(
         'input[type="file"]'
       ) as HTMLInputElement;
-      const file1 = new File(["a"], "a.txt", { type: "text/plain" });
-      const file2 = new File(["b"], "b.txt", { type: "text/plain" });
+      const file1 = new File(['a'], 'a.txt', { type: 'text/plain' });
+      const file2 = new File(['b'], 'b.txt', { type: 'text/plain' });
 
-      Object.defineProperty(input, "files", {
+      Object.defineProperty(input, 'files', {
         value: [file1, file2],
         writable: false,
       });
@@ -189,16 +248,16 @@ describe("Upload", () => {
       const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
       const lastFileList = lastCall?.[1] as UploadFile[];
       expect(lastFileList).toHaveLength(2);
-      expect(lastFileList.map((f) => f.name)).toEqual(["a.txt", "b.txt"]);
+      expect(lastFileList.map((f) => f.name)).toEqual(['a.txt', 'b.txt']);
     });
 
-    it("should call onExceed when file limit is exceeded", async () => {
+    it('should call onExceed when file limit is exceeded', async () => {
       const onExceed = vi.fn();
       const fileList: UploadFile[] = [
         {
-          uid: "file-1",
-          name: "test1.jpg",
-          status: "success",
+          uid: 'file-1',
+          name: 'test1.jpg',
+          status: 'success',
         },
       ];
       const { container } = render(
@@ -208,9 +267,9 @@ describe("Upload", () => {
       const input = container.querySelector(
         'input[type="file"]'
       ) as HTMLInputElement;
-      const file = new File(["content"], "test2.txt", { type: "text/plain" });
+      const file = new File(['content'], 'test2.txt', { type: 'text/plain' });
 
-      Object.defineProperty(input, "files", {
+      Object.defineProperty(input, 'files', {
         value: [file],
         writable: false,
       });
@@ -222,14 +281,14 @@ describe("Upload", () => {
       });
     });
 
-    it("should call onPreview when preview button is clicked in picture-card mode", async () => {
+    it('should call onPreview when preview button is clicked in picture-card mode', async () => {
       const onPreview = vi.fn();
       const fileList: UploadFile[] = [
         {
-          uid: "file-1",
-          name: "test.jpg",
-          status: "success",
-          url: "https://example.com/test.jpg",
+          uid: 'file-1',
+          name: 'test.jpg',
+          status: 'success',
+          url: 'https://example.com/test.jpg',
         },
       ];
       const { container } = render(
@@ -249,8 +308,8 @@ describe("Upload", () => {
     });
   });
 
-  describe("File Validation", () => {
-    it("should validate file type", async () => {
+  describe('File Validation', () => {
+    it('should validate file type', async () => {
       const onChange = vi.fn();
       const { container } = render(
         <Upload accept="image/*" onChange={onChange} />
@@ -259,9 +318,9 @@ describe("Upload", () => {
       const input = container.querySelector(
         'input[type="file"]'
       ) as HTMLInputElement;
-      const file = new File(["content"], "test.txt", { type: "text/plain" });
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
-      Object.defineProperty(input, "files", {
+      Object.defineProperty(input, 'files', {
         value: [file],
         writable: false,
       });
@@ -275,7 +334,7 @@ describe("Upload", () => {
       expect(container.querySelector('[role="list"]')).not.toBeInTheDocument();
     });
 
-    it("should validate file size", async () => {
+    it('should validate file size', async () => {
       const onChange = vi.fn();
       const { container } = render(<Upload maxSize={50} onChange={onChange} />);
 
@@ -283,10 +342,10 @@ describe("Upload", () => {
         'input[type="file"]'
       ) as HTMLInputElement;
       // Create content that's definitely larger than 50 bytes
-      const largeContent = "x".repeat(100);
-      const file = new File([largeContent], "test.txt", { type: "text/plain" });
+      const largeContent = 'x'.repeat(100);
+      const file = new File([largeContent], 'test.txt', { type: 'text/plain' });
 
-      Object.defineProperty(input, "files", {
+      Object.defineProperty(input, 'files', {
         value: [file],
         writable: false,
       });
@@ -300,7 +359,7 @@ describe("Upload", () => {
       expect(container.querySelector('[role="list"]')).not.toBeInTheDocument();
     });
 
-    it("should prevent upload when beforeUpload returns false", async () => {
+    it('should prevent upload when beforeUpload returns false', async () => {
       const beforeUpload = vi.fn(() => false);
       const onChange = vi.fn();
       const { container } = render(
@@ -310,9 +369,9 @@ describe("Upload", () => {
       const input = container.querySelector(
         'input[type="file"]'
       ) as HTMLInputElement;
-      const file = new File(["content"], "test.txt", { type: "text/plain" });
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
-      Object.defineProperty(input, "files", {
+      Object.defineProperty(input, 'files', {
         value: [file],
         writable: false,
       });
@@ -325,9 +384,9 @@ describe("Upload", () => {
       });
     });
 
-    it("should prevent upload when beforeUpload throws", async () => {
+    it('should prevent upload when beforeUpload throws', async () => {
       const beforeUpload = vi.fn(() => {
-        throw new Error("boom");
+        throw new Error('boom');
       });
       const onChange = vi.fn();
       const { container } = render(
@@ -337,9 +396,9 @@ describe("Upload", () => {
       const input = container.querySelector(
         'input[type="file"]'
       ) as HTMLInputElement;
-      const file = new File(["content"], "test.txt", { type: "text/plain" });
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
-      Object.defineProperty(input, "files", {
+      Object.defineProperty(input, 'files', {
         value: [file],
         writable: false,
       });
@@ -353,13 +412,13 @@ describe("Upload", () => {
     });
   });
 
-  describe("List Types", () => {
-    it("should render text list by default", () => {
+  describe('List Types', () => {
+    it('should render text list by default', () => {
       const fileList: UploadFile[] = [
         {
-          uid: "file-1",
-          name: "test.jpg",
-          status: "success",
+          uid: 'file-1',
+          name: 'test.jpg',
+          status: 'success',
         },
       ];
       const { container } = render(<Upload fileList={fileList} />);
@@ -368,47 +427,47 @@ describe("Upload", () => {
       expect(list).toBeInTheDocument();
     });
 
-    it("should render picture card list when listType is picture-card", () => {
+    it('should render picture card list when listType is picture-card', () => {
       const fileList: UploadFile[] = [
         {
-          uid: "file-1",
-          name: "test.jpg",
-          status: "success",
-          url: "https://example.com/test.jpg",
+          uid: 'file-1',
+          name: 'test.jpg',
+          status: 'success',
+          url: 'https://example.com/test.jpg',
         },
       ];
       const { container } = render(
         <Upload fileList={fileList} listType="picture-card" />
       );
 
-      const img = container.querySelector("img");
+      const img = container.querySelector('img');
       expect(img).toBeInTheDocument();
-      expect(img).toHaveAttribute("src", "https://example.com/test.jpg");
+      expect(img).toHaveAttribute('src', 'https://example.com/test.jpg');
     });
   });
 
-  describe("States", () => {
-    it("should show disabled state on button", () => {
+  describe('States', () => {
+    it('should show disabled state on button', () => {
       const { container } = render(<Upload disabled />);
 
-      const button = container.querySelector("button");
+      const button = container.querySelector('button');
       expect(button).toBeDisabled();
     });
 
-    it("should show disabled state on drag area", () => {
+    it('should show disabled state on drag area', () => {
       const { container } = render(<Upload drag disabled />);
 
       const dragArea = container.querySelector('[role="button"]');
-      expect(dragArea).toHaveAttribute("aria-disabled", "true");
-      expect(dragArea).toHaveAttribute("tabindex", "-1");
+      expect(dragArea).toHaveAttribute('aria-disabled', 'true');
+      expect(dragArea).toHaveAttribute('tabindex', '-1');
     });
 
-    it("should display success status icon", () => {
+    it('should display success status icon', () => {
       const fileList: UploadFile[] = [
         {
-          uid: "file-1",
-          name: "test.jpg",
-          status: "success",
+          uid: 'file-1',
+          name: 'test.jpg',
+          status: 'success',
         },
       ];
       const { container } = render(<Upload fileList={fileList} />);
@@ -417,12 +476,12 @@ describe("Upload", () => {
       expect(successIcon).toBeInTheDocument();
     });
 
-    it("should display error status icon", () => {
+    it('should display error status icon', () => {
       const fileList: UploadFile[] = [
         {
-          uid: "file-1",
-          name: "test.jpg",
-          status: "error",
+          uid: 'file-1',
+          name: 'test.jpg',
+          status: 'error',
         },
       ];
       const { container } = render(<Upload fileList={fileList} />);
@@ -431,12 +490,12 @@ describe("Upload", () => {
       expect(errorIcon).toBeInTheDocument();
     });
 
-    it("should display uploading status icon", () => {
+    it('should display uploading status icon', () => {
       const fileList: UploadFile[] = [
         {
-          uid: "file-1",
-          name: "test.jpg",
-          status: "uploading",
+          uid: 'file-1',
+          name: 'test.jpg',
+          status: 'uploading',
         },
       ];
       const { container } = render(<Upload fileList={fileList} />);
@@ -446,8 +505,8 @@ describe("Upload", () => {
     });
   });
 
-  describe("Drag and Drop", () => {
-    it("should handle drag over event", async () => {
+  describe('Drag and Drop', () => {
+    it('should handle drag over event', async () => {
       const { container } = render(<Upload drag />);
 
       const dragArea = container.querySelector(
@@ -457,17 +516,17 @@ describe("Upload", () => {
       await fireEvent.dragOver(dragArea);
 
       // Should add dragging state classes
-      expect(dragArea.className).toContain("cursor-copy");
+      expect(dragArea.className).toContain('cursor-copy');
     });
 
-    it("should handle drop event", async () => {
+    it('should handle drop event', async () => {
       const onChange = vi.fn();
       const { container } = render(<Upload drag onChange={onChange} />);
 
       const dragArea = container.querySelector(
         '[role="button"]'
       ) as HTMLElement;
-      const file = new File(["content"], "test.txt", { type: "text/plain" });
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
       const dataTransfer = {
         files: [file],
@@ -480,7 +539,7 @@ describe("Upload", () => {
       });
     });
 
-    it("should not handle drag events when disabled", async () => {
+    it('should not handle drag events when disabled', async () => {
       const { container } = render(<Upload drag disabled />);
 
       const dragArea = container.querySelector(
@@ -495,8 +554,8 @@ describe("Upload", () => {
     });
   });
 
-  describe("Keyboard Interaction", () => {
-    it("should open file dialog on Enter/Space in drag mode", async () => {
+  describe('Keyboard Interaction', () => {
+    it('should open file dialog on Enter/Space in drag mode', async () => {
       const { container } = render(<Upload drag />);
 
       const dragArea = container.querySelector(
@@ -505,15 +564,15 @@ describe("Upload", () => {
       const input = container.querySelector(
         'input[type="file"]'
       ) as HTMLInputElement;
-      const clickSpy = vi.spyOn(input, "click");
+      const clickSpy = vi.spyOn(input, 'click');
 
-      await fireEvent.keyDown(dragArea, { key: "Enter" });
-      await fireEvent.keyDown(dragArea, { key: " " });
+      await fireEvent.keyDown(dragArea, { key: 'Enter' });
+      await fireEvent.keyDown(dragArea, { key: ' ' });
 
       expect(clickSpy).toHaveBeenCalled();
     });
 
-    it("should not open file dialog on keydown when disabled", async () => {
+    it('should not open file dialog on keydown when disabled', async () => {
       const { container } = render(<Upload drag disabled />);
 
       const dragArea = container.querySelector(
@@ -522,25 +581,25 @@ describe("Upload", () => {
       const input = container.querySelector(
         'input[type="file"]'
       ) as HTMLInputElement;
-      const clickSpy = vi.spyOn(input, "click");
+      const clickSpy = vi.spyOn(input, 'click');
 
-      await fireEvent.keyDown(dragArea, { key: "Enter" });
-      await fireEvent.keyDown(dragArea, { key: " " });
+      await fireEvent.keyDown(dragArea, { key: 'Enter' });
+      await fireEvent.keyDown(dragArea, { key: ' ' });
 
       expect(clickSpy).not.toHaveBeenCalled();
     });
   });
 
-  describe("Controlled and Uncontrolled", () => {
-    it("should work in uncontrolled mode", async () => {
+  describe('Controlled and Uncontrolled', () => {
+    it('should work in uncontrolled mode', async () => {
       const { container } = render(<Upload />);
 
       const input = container.querySelector(
         'input[type="file"]'
       ) as HTMLInputElement;
-      const file = new File(["content"], "test.txt", { type: "text/plain" });
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
-      Object.defineProperty(input, "files", {
+      Object.defineProperty(input, 'files', {
         value: [file],
         writable: false,
       });
@@ -553,7 +612,7 @@ describe("Upload", () => {
       });
     });
 
-    it("should work in controlled mode", async () => {
+    it('should work in controlled mode', async () => {
       const TestComponent = () => {
         const [fileList, setFileList] = React.useState<UploadFile[]>([]);
 
@@ -569,9 +628,9 @@ describe("Upload", () => {
       const input = container.querySelector(
         'input[type="file"]'
       ) as HTMLInputElement;
-      const file = new File(["content"], "test.txt", { type: "text/plain" });
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' });
 
-      Object.defineProperty(input, "files", {
+      Object.defineProperty(input, 'files', {
         value: [file],
         writable: false,
       });
@@ -585,60 +644,60 @@ describe("Upload", () => {
     });
   });
 
-  describe("Accessibility", () => {
-    it("should have proper ARIA attributes on upload button", () => {
+  describe('Accessibility', () => {
+    it('should have proper ARIA attributes on upload button', () => {
       const { container } = render(<Upload />);
 
-      const button = container.querySelector("button");
-      expect(button).toHaveAttribute("aria-label", "Upload file");
+      const button = container.querySelector('button');
+      expect(button).toHaveAttribute('aria-label', 'Upload file');
     });
 
-    it("should have proper ARIA attributes on drag area", () => {
+    it('should have proper ARIA attributes on drag area', () => {
       const { container } = render(<Upload drag />);
 
       const dragArea = container.querySelector('[role="button"]');
-      expect(dragArea).toHaveAttribute("role", "button");
+      expect(dragArea).toHaveAttribute('role', 'button');
       expect(dragArea).toHaveAttribute(
-        "aria-label",
-        "Upload file by clicking or dragging"
+        'aria-label',
+        'Upload file by clicking or dragging'
       );
-      expect(dragArea).toHaveAttribute("tabindex", "0");
+      expect(dragArea).toHaveAttribute('tabindex', '0');
     });
 
-    it("should have proper ARIA attributes on file list", () => {
+    it('should have proper ARIA attributes on file list', () => {
       const fileList: UploadFile[] = [
         {
-          uid: "file-1",
-          name: "test.jpg",
-          status: "success",
+          uid: 'file-1',
+          name: 'test.jpg',
+          status: 'success',
         },
       ];
       const { container } = render(<Upload fileList={fileList} />);
 
       const list = container.querySelector('[role="list"]');
-      expect(list).toHaveAttribute("aria-label", "Uploaded files");
+      expect(list).toHaveAttribute('aria-label', 'Uploaded files');
     });
 
-    it("should have descriptive aria-label on remove button", () => {
+    it('should have descriptive aria-label on remove button', () => {
       const fileList: UploadFile[] = [
         {
-          uid: "file-1",
-          name: "test.jpg",
-          status: "success",
+          uid: 'file-1',
+          name: 'test.jpg',
+          status: 'success',
         },
       ];
       const { container } = render(<Upload fileList={fileList} />);
 
       const removeButton = container.querySelector('[aria-label*="Remove"]');
-      expect(removeButton).toHaveAttribute("aria-label", "Remove test.jpg");
+      expect(removeButton).toHaveAttribute('aria-label', 'Remove test.jpg');
     });
 
-    it("should pass accessibility checks", async () => {
+    it('should pass accessibility checks', async () => {
       const fileList: UploadFile[] = [
         {
-          uid: "file-1",
-          name: "test.jpg",
-          status: "success",
+          uid: 'file-1',
+          name: 'test.jpg',
+          status: 'success',
         },
       ];
       const { container } = render(<Upload fileList={fileList} />);
