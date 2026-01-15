@@ -192,7 +192,10 @@ export default function TooltipDemo() {
       </DemoBlock>
 
       {/* 自定义内容 */}
-      <DemoBlock title="自定义内容" description="可以通过 props 自定义提示内容。" code={contentSnippet}>
+      <DemoBlock
+        title="自定义内容"
+        description="可以通过 props 自定义提示内容。"
+        code={contentSnippet}>
         <Tooltip
           content={
             <div>
@@ -219,7 +222,10 @@ export default function TooltipDemo() {
       </DemoBlock>
 
       {/* 禁用状态 */}
-      <DemoBlock title="禁用状态" description="通过 disabled 属性禁用气泡提示。" code={disabledSnippet}>
+      <DemoBlock
+        title="禁用状态"
+        description="通过 disabled 属性禁用气泡提示。"
+        code={disabledSnippet}>
         <Space size={16}>
           <Tooltip content="正常提示">
             <Button>正常</Button>
