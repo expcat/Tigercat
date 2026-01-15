@@ -1,0 +1,79 @@
+import React, { useMemo, useState } from 'react'
+import { Tabs, TabPane, Code } from '@expcat/tigercat-react'
+
+interface DemoBlockProps {
+  title: string
+  description?: string
+  code: string
+  children: React.ReactNode
+}
+
+const panelBaseClasses =
+  'rounded-b-lg border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950/40'
+const previewPanelClasses = `p-6 ${panelBaseClasses}`
+const codePanelClasses = `p-4 ${panelBaseClasses}`
+const exampleBoxClasses =
+  'rounded-md border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900'
+
+const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, children }) => {
+  const [activeKey, setActiveKey] = useState('preview')
+
+  const tabs = useMemo(
+    () => [
+      {
+        key: 'preview',
+        label: '示例',
+        content: <div className={previewPanelClasses}>{children}</div>
+      },
+      {
+        key: 'code',
+        label: '代码',
+        content: (
+          <div className={codePanelClasses}>
+            <Code code={code} />
+          </div>
+        )
+      },
+      {
+        key: 'mixed',
+        label: '混合',
+        content: (
+          <div className={previewPanelClasses}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="w-full">
+                <div className="text-xs text-gray-500 mb-2">示例</div>
+                <div className={exampleBoxClasses}>{children}</div>
+              </div>
+              <div className="w-full">
+                <div className="text-xs text-gray-500 mb-2">代码</div>
+                <Code code={code} />
+              </div>
+            </div>
+          </div>
+        )
+      }
+    ],
+    [children, code]
+  )
+
+  return (
+    <section className="mb-12">
+      <div className="mb-4">
+        <h2 className="text-2xl font-bold mb-2">{title}</h2>
+        {description ? <p className="text-gray-600">{description}</p> : null}
+      </div>
+
+      <div className="rounded-lg">
+        <Tabs activeKey={activeKey} onChange={(key) => setActiveKey(String(key))} type="card">
+          {tabs.map((tab) => (
+            <TabPane key={tab.key} tabKey={tab.key} label={tab.label}>
+              {tab.content}
+            </TabPane>
+          ))}
+        </Tabs>
+      </div>
+    </section>
+  )
+}
+
+export default DemoBlock
