@@ -32,7 +32,8 @@ import {
   type NotificationConfig,
   type NotificationInstance,
   type NotificationOptions,
-  type NotificationPosition
+  type NotificationPosition,
+  isBrowser
 } from '@tigercat/core'
 
 type HChildren = Parameters<typeof h>[2]
@@ -262,7 +263,7 @@ export const NotificationContainer = defineComponent({
 })
 
 function ensureContainer(position: NotificationPosition) {
-  if (typeof window === 'undefined' || typeof document === 'undefined') {
+  if (!isBrowser()) {
     return
   }
 
@@ -300,9 +301,11 @@ function destroyContainer(position: NotificationPosition) {
 
   updateCallbacks[position] = null
 
-  const rootEl = typeof document !== 'undefined' ? document.getElementById(rootId) : null
-  if (rootEl?.parentNode) {
-    rootEl.parentNode.removeChild(rootEl)
+  if (isBrowser()) {
+    const rootEl = document.getElementById(rootId)
+    if (rootEl?.parentNode) {
+      rootEl.parentNode.removeChild(rootEl)
+    }
   }
 }
 

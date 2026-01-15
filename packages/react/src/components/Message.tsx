@@ -18,6 +18,7 @@ import {
   messageLoadingSpinnerClasses,
   getMessageIconPath,
   messageCloseIconPath,
+  isBrowser,
   type MessagePosition,
   type MessageInstance,
   type MessageOptions,
@@ -198,7 +199,7 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({ position = '
  * Ensure message container exists
  */
 function ensureContainer() {
-  if (typeof window === 'undefined' || typeof document === 'undefined') {
+  if (!isBrowser()) {
     return
   }
 
@@ -306,7 +307,7 @@ function clearAll() {
   updateCallback = null
 
   const rootId = `${MESSAGE_CONTAINER_ID}-root`
-  if (typeof document !== 'undefined') {
+  if (isBrowser()) {
     const rootEl = document.getElementById(rootId)
     if (rootEl?.parentNode) {
       rootEl.parentNode.removeChild(rootEl)

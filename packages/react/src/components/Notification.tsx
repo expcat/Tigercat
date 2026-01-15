@@ -19,6 +19,7 @@ import {
   notificationCloseIconClasses,
   getNotificationIconPath,
   notificationCloseIconPath,
+  isBrowser,
   type NotificationPosition,
   type NotificationInstance,
   type NotificationOptions,
@@ -237,7 +238,7 @@ export const NotificationContainer: React.FC<NotificationContainerProps> = ({
  * Ensure notification container exists for a position
  */
 function ensureContainer(position: NotificationPosition) {
-  if (typeof window === 'undefined' || typeof document === 'undefined') {
+  if (!isBrowser()) {
     return
   }
 

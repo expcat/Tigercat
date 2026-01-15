@@ -17,7 +17,9 @@
     "paths": {
       "@/*": ["./src/*"],
       "@demo-shared/*": ["../shared/*"],
-      "@tigercat/core": ["../../../packages/core/dist/index.d.ts"]
+      "@tigercat/core": ["../../../packages/core/dist/index.d.ts"],
+      "@tigercat/vue": ["../../../packages/vue/src/index.ts"],
+      "@tigercat/vue/*": ["../../../packages/vue/src/components/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "../shared/**/*.ts"],
