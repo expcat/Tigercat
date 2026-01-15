@@ -173,9 +173,7 @@ const disabledSnippet = `<div class="max-w-md space-y-6">
 
     <!-- 图片卡片列表 -->
     <DemoBlock title="图片卡片列表"
-               description="使用 listType=\"
-               picture-card\"
-               显示图片卡片样式。"
+               description='使用 listType="picture-card" 显示图片卡片样式。'
                :code="pictureCardSnippet">
       <div class="max-w-2xl">
         <Upload v-model:file-list="fileList6"
