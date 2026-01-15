@@ -1,51 +1,51 @@
 name: Create Release Tags
 
 on:
-  push:
-    branches:
-      - main
+    push:
+        branches:
+            - main
 
 permissions:
-  contents: write
+    contents: write
 
 jobs:
-  version-and-tag:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    version-and-tag:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: pnpm
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 18
+                  cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
 
-      - name: Configure git
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+            - name: Configure git
+              run: |
+                  git config user.name "github-actions"
+                  git config user.email "github-actions@github.com"
 
-      - name: Version packages and create tags
-        run: |
-          pnpm changeset version
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git add -A
-            git commit -m "chore(release): version packages"
-            VERSION=$(node -p "require('./packages/core/package.json').version")
-            TAG="v${VERSION}"
-            git tag "${TAG}"
-            git push --follow-tags
-          else
-            echo "No changesets to release"
-          fi
+            - name: Version packages and create tags
+              run: |
+                  pnpm changeset version
+                  if [[ -n "$(git status --porcelain)" ]]; then
+                    git add -A
+                    git commit -m "chore(release): version packages"
+                    VERSION=$(node -p "require('./packages/core/package.json').version")
+                    TAG="v${VERSION}"
+                    git tag "${TAG}"
+                    git push --follow-tags
+                  else
+                    echo "No changesets to release"
+                  fi
