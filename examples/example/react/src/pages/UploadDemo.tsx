@@ -1,5 +1,47 @@
 import React, { useState } from 'react'
 import { Upload, type UploadFile } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
+
+const basicSnippet = `<Upload fileList={fileList} onChange={handleChange}>选择文件</Upload>`
+
+const dragSnippet = `<Upload fileList={fileList2} onChange={handleChange2} drag />`
+
+const multipleSnippet = `<Upload fileList={fileList3} onChange={handleChange3} multiple>选择多个文件</Upload>`
+
+const limitSnippet = `<Upload fileList={fileList4} onChange={handleChange4} multiple limit={3} onExceed={handleExceed}>
+  最多上传 3 个文件
+</Upload>`
+
+const validateSnippet = `<div className="max-w-md space-y-6">
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">仅允许图片</label>
+    <Upload fileList={fileList5} onChange={handleChange5} accept="image/*" drag />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">自定义校验（JPG/PNG，小于2MB）</label>
+    <Upload accept="image/jpeg,image/png" maxSize={2 * 1024 * 1024} beforeUpload={beforeUpload} drag />
+  </div>
+</div>`
+
+const pictureCardSnippet = `<Upload
+  fileList={fileList6}
+  onChange={handleChange6}
+  accept="image/*"
+  listType="picture-card"
+  multiple
+  onPreview={handlePreview}
+/>`
+
+const disabledSnippet = `<div className="max-w-md space-y-6">
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">禁用的按钮上传</label>
+    <Upload disabled>选择文件（已禁用）</Upload>
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">禁用的拖拽上传</label>
+    <Upload disabled drag />
+  </div>
+</div>`
 
 const UploadDemo: React.FC = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([])
@@ -69,120 +111,92 @@ const UploadDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">基础用法</h2>
-        <p className="text-gray-600 mb-6">基础的文件上传组件。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="max-w-md space-y-4">
-            <Upload fileList={fileList} onChange={handleChange}>
-              选择文件
-            </Upload>
-          </div>
+      <DemoBlock title="基础用法" description="基础的文件上传组件。" code={basicSnippet}>
+        <div className="max-w-md space-y-4">
+          <Upload fileList={fileList} onChange={handleChange}>
+            选择文件
+          </Upload>
         </div>
-      </section>
+      </DemoBlock>
 
       {/* 拖拽上传 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">拖拽上传</h2>
-        <p className="text-gray-600 mb-6">将文件拖拽到区域内即可上传。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="max-w-md">
-            <Upload fileList={fileList2} onChange={handleChange2} drag />
-          </div>
+      <DemoBlock title="拖拽上传" description="将文件拖拽到区域内即可上传。" code={dragSnippet}>
+        <div className="max-w-md">
+          <Upload fileList={fileList2} onChange={handleChange2} drag />
         </div>
-      </section>
+      </DemoBlock>
 
       {/* 多文件上传 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">多文件上传</h2>
-        <p className="text-gray-600 mb-6">通过设置 multiple 属性允许同时选择多个文件。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="max-w-md">
-            <Upload fileList={fileList3} onChange={handleChange3} multiple>
-              选择多个文件
-            </Upload>
-          </div>
+      <DemoBlock title="多文件上传" description="通过设置 multiple 属性允许同时选择多个文件。" code={multipleSnippet}>
+        <div className="max-w-md">
+          <Upload fileList={fileList3} onChange={handleChange3} multiple>
+            选择多个文件
+          </Upload>
         </div>
-      </section>
+      </DemoBlock>
 
       {/* 文件数量限制 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">文件数量限制</h2>
-        <p className="text-gray-600 mb-6">通过 limit 属性限制上传文件的数量。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="max-w-md">
-            <Upload
-              fileList={fileList4}
-              onChange={handleChange4}
-              multiple
-              limit={3}
-              onExceed={handleExceed}>
-              最多上传 3 个文件
-            </Upload>
-          </div>
+      <DemoBlock title="文件数量限制" description="通过 limit 属性限制上传文件的数量。" code={limitSnippet}>
+        <div className="max-w-md">
+          <Upload
+            fileList={fileList4}
+            onChange={handleChange4}
+            multiple
+            limit={3}
+            onExceed={handleExceed}>
+            最多上传 3 个文件
+          </Upload>
         </div>
-      </section>
+      </DemoBlock>
 
       {/* 文件类型和大小限制 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">文件类型和大小限制</h2>
-        <p className="text-gray-600 mb-6">通过 accept 和 maxSize 限制文件类型和大小。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="max-w-md space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">仅允许图片</label>
-              <Upload fileList={fileList5} onChange={handleChange5} accept="image/*" drag />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                自定义校验（JPG/PNG，小于2MB）
-              </label>
-              <Upload
-                accept="image/jpeg,image/png"
-                maxSize={2 * 1024 * 1024}
-                beforeUpload={beforeUpload}
-                drag
-              />
-            </div>
+      <DemoBlock title="文件类型和大小限制" description="通过 accept 和 maxSize 限制文件类型和大小。" code={validateSnippet}>
+        <div className="max-w-md space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">仅允许图片</label>
+            <Upload fileList={fileList5} onChange={handleChange5} accept="image/*" drag />
           </div>
-        </div>
-      </section>
-
-      {/* 图片卡片列表 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">图片卡片列表</h2>
-        <p className="text-gray-600 mb-6">使用 listType="picture-card" 显示图片卡片样式。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="max-w-2xl">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              自定义校验（JPG/PNG，小于2MB）
+            </label>
             <Upload
-              fileList={fileList6}
-              onChange={handleChange6}
-              accept="image/*"
-              listType="picture-card"
-              multiple
-              onPreview={handlePreview}
+              accept="image/jpeg,image/png"
+              maxSize={2 * 1024 * 1024}
+              beforeUpload={beforeUpload}
+              drag
             />
           </div>
         </div>
-      </section>
+      </DemoBlock>
+
+      {/* 图片卡片列表 */}
+      <DemoBlock title="图片卡片列表" description="使用 listType=\"picture-card\" 显示图片卡片样式。" code={pictureCardSnippet}>
+        <div className="max-w-2xl">
+          <Upload
+            fileList={fileList6}
+            onChange={handleChange6}
+            accept="image/*"
+            listType="picture-card"
+            multiple
+            onPreview={handlePreview}
+          />
+        </div>
+      </DemoBlock>
 
       {/* 禁用状态 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">禁用状态</h2>
-        <p className="text-gray-600 mb-6">设置 disabled 属性禁用上传功能。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="max-w-md space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">禁用的按钮上传</label>
-              <Upload disabled>选择文件（已禁用）</Upload>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">禁用的拖拽上传</label>
-              <Upload disabled drag />
-            </div>
+      <DemoBlock title="禁用状态" description="设置 disabled 属性禁用上传功能。" code={disabledSnippet}>
+        <div className="max-w-md space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">禁用的按钮上传</label>
+            <Upload disabled>选择文件（已禁用）</Upload>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">禁用的拖拽上传</label>
+            <Upload disabled drag />
           </div>
         </div>
-      </section>
+      </DemoBlock>
     </div>
   )
 }

@@ -1,5 +1,77 @@
 import React, { useState } from 'react'
-import { Select, Space, Divider } from '@expcat/tigercat-react'
+import { Select, Space } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
+
+const basicSnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <Select value={basicValue} onChange={(v) => setBasicValue(v ?? '')} options={options} placeholder="请选择" />
+  <p className="text-sm text-gray-600">选中的值：{basicValue || '未选择'}</p>
+</Space>`
+
+const defaultSnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <Select value={defaultValue} onChange={(v) => setDefaultValue(v ?? '')} options={countries} />
+  <p className="text-sm text-gray-600">选中的国家：{defaultValue}</p>
+</Space>`
+
+const disabledSnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <Select value={disabledValue} options={countries} disabled />
+</Space>`
+
+const sizeSnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <div className="w-full">
+    <p className="text-sm text-gray-600 mb-2">sm</p>
+    <Select value={sizeSmValue} onChange={(v) => setSizeSmValue(v ?? '')} options={options} size="sm" />
+  </div>
+  <div className="w-full">
+    <p className="text-sm text-gray-600 mb-2">md</p>
+    <Select value={sizeMdValue} onChange={(v) => setSizeMdValue(v ?? '')} options={options} size="md" />
+  </div>
+  <div className="w-full">
+    <p className="text-sm text-gray-600 mb-2">lg</p>
+    <Select value={sizeLgValue} onChange={(v) => setSizeLgValue(v ?? '')} options={options} size="lg" />
+  </div>
+</Space>`
+
+const disabledOptionSnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <Select value={disabledOptionValue} onChange={(v) => setDisabledOptionValue(v ?? '')} options={optionsWithDisabled} placeholder="请选择" />
+  <p className="text-sm text-gray-600">选中的值：{disabledOptionValue || '未选择'}</p>
+</Space>`
+
+const clearableSnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <div className="w-full">
+    <p className="text-sm text-gray-600 mb-2">clearable: true</p>
+    <Select value={clearableValue} onChange={(v) => setClearableValue(v ?? '')} options={options} />
+  </div>
+  <div className="w-full">
+    <p className="text-sm text-gray-600 mb-2">clearable: false</p>
+    <Select value={notClearableValue} onChange={(v) => setNotClearableValue(v ?? '')} options={options} clearable={false} />
+  </div>
+</Space>`
+
+const searchableSnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <Select
+    value={searchableValue}
+    onChange={(v) => setSearchableValue(v ?? '')}
+    options={countries}
+    searchable
+    placeholder="搜索国家"
+    onSearch={(q) => setLastSearchQuery(q)}
+  />
+  <p className="text-sm text-gray-600">最近一次搜索：{lastSearchQuery || '（无）'}</p>
+</Space>`
+
+const multipleSnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <Select value={multipleValue} onChange={(v) => setMultipleValue(v)} options={options} multiple placeholder="请选择多个" />
+  <p className="text-sm text-gray-600">选中：{multipleValue.length ? multipleValue.join(', ') : '未选择'}</p>
+</Space>`
+
+const groupedSnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <Select value={groupedValue} onChange={(v) => setGroupedValue(v ?? '')} options={groupedOptions} />
+  <p className="text-sm text-gray-600">选中的值：{groupedValue}</p>
+</Space>`
+
+const emptySnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <Select value={emptyValue} onChange={(v) => setEmptyValue(v ?? '')} options={[]} noDataText="暂无数据" placeholder="无可用选项" />
+</Space>`
 
 const SelectDemo: React.FC = () => {
   const [basicValue, setBasicValue] = useState<string | number>('')
@@ -72,210 +144,176 @@ const SelectDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">基础用法</h2>
-        <p className="text-gray-600 mb-6">适用广泛的基础选择器。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space direction="vertical" className="w-full max-w-md">
-            <Select
-              value={basicValue}
-              onChange={(v) => setBasicValue(v ?? '')}
-              options={options}
-              placeholder="请选择"
-            />
-            <p className="text-sm text-gray-600">选中的值：{basicValue || '未选择'}</p>
-          </Space>
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock title="基础用法" description="适用广泛的基础选择器。" code={basicSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <Select
+            value={basicValue}
+            onChange={(v) => setBasicValue(v ?? '')}
+            options={options}
+            placeholder="请选择"
+          />
+          <p className="text-sm text-gray-600">选中的值：{basicValue || '未选择'}</p>
+        </Space>
+      </DemoBlock>
 
       {/* 有默认值 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">有默认值</h2>
-        <p className="text-gray-600 mb-6">可以设置默认选中的值。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space direction="vertical" className="w-full max-w-md">
-            <Select
-              value={defaultValue}
-              onChange={(v) => setDefaultValue(v ?? '')}
-              options={countries}
-            />
-            <p className="text-sm text-gray-600">选中的国家：{defaultValue}</p>
-          </Space>
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock title="有默认值" description="可以设置默认选中的值。" code={defaultSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <Select
+            value={defaultValue}
+            onChange={(v) => setDefaultValue(v ?? '')}
+            options={countries}
+          />
+          <p className="text-sm text-gray-600">选中的国家：{defaultValue}</p>
+        </Space>
+      </DemoBlock>
 
       {/* 禁用状态 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">禁用状态</h2>
-        <p className="text-gray-600 mb-6">禁用整个选择器组件。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space direction="vertical" className="w-full max-w-md">
-            <Select value={disabledValue} options={countries} disabled />
-          </Space>
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock title="禁用状态" description="禁用整个选择器组件。" code={disabledSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <Select value={disabledValue} options={countries} disabled />
+        </Space>
+      </DemoBlock>
 
       {/* 不同尺寸 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">不同尺寸</h2>
-        <p className="text-gray-600 mb-6">Select 支持 sm / md / lg 三种尺寸。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space direction="vertical" className="w-full max-w-md">
-            <div className="w-full">
-              <p className="text-sm text-gray-600 mb-2">sm</p>
-              <Select
-                value={sizeSmValue}
-                onChange={(v) => setSizeSmValue(v ?? '')}
-                options={options}
-                size="sm"
-              />
-            </div>
-            <div className="w-full">
-              <p className="text-sm text-gray-600 mb-2">md</p>
-              <Select
-                value={sizeMdValue}
-                onChange={(v) => setSizeMdValue(v ?? '')}
-                options={options}
-                size="md"
-              />
-            </div>
-            <div className="w-full">
-              <p className="text-sm text-gray-600 mb-2">lg</p>
-              <Select
-                value={sizeLgValue}
-                onChange={(v) => setSizeLgValue(v ?? '')}
-                options={options}
-                size="lg"
-              />
-            </div>
-          </Space>
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock
+        title="不同尺寸"
+        description="Select 支持 sm / md / lg 三种尺寸。"
+        code={sizeSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <div className="w-full">
+            <p className="text-sm text-gray-600 mb-2">sm</p>
+            <Select
+              value={sizeSmValue}
+              onChange={(v) => setSizeSmValue(v ?? '')}
+              options={options}
+              size="sm"
+            />
+          </div>
+          <div className="w-full">
+            <p className="text-sm text-gray-600 mb-2">md</p>
+            <Select
+              value={sizeMdValue}
+              onChange={(v) => setSizeMdValue(v ?? '')}
+              options={options}
+              size="md"
+            />
+          </div>
+          <div className="w-full">
+            <p className="text-sm text-gray-600 mb-2">lg</p>
+            <Select
+              value={sizeLgValue}
+              onChange={(v) => setSizeLgValue(v ?? '')}
+              options={options}
+              size="lg"
+            />
+          </div>
+        </Space>
+      </DemoBlock>
 
       {/* 禁用选项 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">禁用选项</h2>
-        <p className="text-gray-600 mb-6">可以禁用单个选项。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space direction="vertical" className="w-full max-w-md">
-            <Select
-              value={disabledOptionValue}
-              onChange={(v) => setDisabledOptionValue(v ?? '')}
-              options={optionsWithDisabled}
-              placeholder="请选择"
-            />
-            <p className="text-sm text-gray-600">选中的值：{disabledOptionValue || '未选择'}</p>
-          </Space>
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock title="禁用选项" description="可以禁用单个选项。" code={disabledOptionSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <Select
+            value={disabledOptionValue}
+            onChange={(v) => setDisabledOptionValue(v ?? '')}
+            options={optionsWithDisabled}
+            placeholder="请选择"
+          />
+          <p className="text-sm text-gray-600">选中的值：{disabledOptionValue || '未选择'}</p>
+        </Space>
+      </DemoBlock>
 
       {/* 可清空 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">可清空</h2>
-        <p className="text-gray-600 mb-6">默认支持清空，也可以关闭清空功能。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space direction="vertical" className="w-full max-w-md">
-            <div className="w-full">
-              <p className="text-sm text-gray-600 mb-2">clearable: true</p>
-              <Select
-                value={clearableValue}
-                onChange={(v) => setClearableValue(v ?? '')}
-                options={options}
-              />
-            </div>
-            <div className="w-full">
-              <p className="text-sm text-gray-600 mb-2">clearable: false</p>
-              <Select
-                value={notClearableValue}
-                onChange={(v) => setNotClearableValue(v ?? '')}
-                options={options}
-                clearable={false}
-              />
-            </div>
-          </Space>
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock
+        title="可清空"
+        description="默认支持清空，也可以关闭清空功能。"
+        code={clearableSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <div className="w-full">
+            <p className="text-sm text-gray-600 mb-2">clearable: true</p>
+            <Select
+              value={clearableValue}
+              onChange={(v) => setClearableValue(v ?? '')}
+              options={options}
+            />
+          </div>
+          <div className="w-full">
+            <p className="text-sm text-gray-600 mb-2">clearable: false</p>
+            <Select
+              value={notClearableValue}
+              onChange={(v) => setNotClearableValue(v ?? '')}
+              options={options}
+              clearable={false}
+            />
+          </div>
+        </Space>
+      </DemoBlock>
 
       {/* 可搜索 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">可搜索</h2>
-        <p className="text-gray-600 mb-6">启用 searchable 后可在下拉中输入关键字过滤选项。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space direction="vertical" className="w-full max-w-md">
-            <Select
-              value={searchableValue}
-              onChange={(v) => setSearchableValue(v ?? '')}
-              options={countries}
-              searchable
-              placeholder="搜索国家"
-              onSearch={(q) => setLastSearchQuery(q)}
-            />
-            <p className="text-sm text-gray-600">最近一次搜索：{lastSearchQuery || '（无）'}</p>
-          </Space>
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock
+        title="可搜索"
+        description="启用 searchable 后可在下拉中输入关键字过滤选项。"
+        code={searchableSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <Select
+            value={searchableValue}
+            onChange={(v) => setSearchableValue(v ?? '')}
+            options={countries}
+            searchable
+            placeholder="搜索国家"
+            onSearch={(q) => setLastSearchQuery(q)}
+          />
+          <p className="text-sm text-gray-600">最近一次搜索：{lastSearchQuery || '（无）'}</p>
+        </Space>
+      </DemoBlock>
 
       {/* 多选 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">多选</h2>
-        <p className="text-gray-600 mb-6">启用 multiple 后可选择多个选项。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space direction="vertical" className="w-full max-w-md">
-            <Select
-              value={multipleValue}
-              onChange={(v) => setMultipleValue(v)}
-              options={options}
-              multiple
-              placeholder="请选择多个"
-            />
-            <p className="text-sm text-gray-600">
-              选中：{multipleValue.length ? multipleValue.join(', ') : '未选择'}
-            </p>
-          </Space>
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock title="多选" description="启用 multiple 后可选择多个选项。" code={multipleSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <Select
+            value={multipleValue}
+            onChange={(v) => setMultipleValue(v)}
+            options={options}
+            multiple
+            placeholder="请选择多个"
+          />
+          <p className="text-sm text-gray-600">
+            选中：{multipleValue.length ? multipleValue.join(', ') : '未选择'}
+          </p>
+        </Space>
+      </DemoBlock>
 
       {/* 分组选项 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">分组选项</h2>
-        <p className="text-gray-600 mb-6">支持传入分组数据（group label + options）。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space direction="vertical" className="w-full max-w-md">
-            <Select
-              value={groupedValue}
-              onChange={(v) => setGroupedValue(v ?? '')}
-              options={groupedOptions}
-            />
-            <p className="text-sm text-gray-600">选中的值：{groupedValue}</p>
-          </Space>
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock
+        title="分组选项"
+        description="支持传入分组数据（group label + options）。"
+        code={groupedSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <Select
+            value={groupedValue}
+            onChange={(v) => setGroupedValue(v ?? '')}
+            options={groupedOptions}
+          />
+          <p className="text-sm text-gray-600">选中的值：{groupedValue}</p>
+        </Space>
+      </DemoBlock>
 
       {/* 空状态 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">空状态</h2>
-        <p className="text-gray-600 mb-6">当 options 为空时，会显示空提示文案。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space direction="vertical" className="w-full max-w-md">
-            <Select
-              value={emptyValue}
-              onChange={(v) => setEmptyValue(v ?? '')}
-              options={[]}
-              noDataText="暂无数据"
-              placeholder="无可用选项"
-            />
-          </Space>
-        </div>
-      </section>
+      <DemoBlock
+        title="空状态"
+        description="当 options 为空时，会显示空提示文案。"
+        code={emptySnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <Select
+            value={emptyValue}
+            onChange={(v) => setEmptyValue(v ?? '')}
+            options={[]}
+            noDataText="暂无数据"
+            placeholder="无可用选项"
+          />
+        </Space>
+      </DemoBlock>
     </div>
   )
 }
