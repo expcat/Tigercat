@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Loading, Button, Card, Divider } from '@tigercat/react'
+import { Loading, Button, Card, Divider } from '@expcat/tigercat-react'
 
 export default function LoadingDemo() {
   const [pageLoading, setPageLoading] = useState(false)

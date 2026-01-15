@@ -10,7 +10,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 ## 工作方式（高信噪比规则）
 
 - 先找现有模式再动手：优先对照同类组件（例如 `Button`/`Input`）的写法，保持风格一致。
-- 解决根因：避免“表面补丁”；尽量把框架无关逻辑沉到 `@tigercat/core`。
+- 解决根因：避免“表面补丁”；尽量把框架无关逻辑沉到 `@expcat/tigercat-core`。
 - 变更要可交付：不要只写计划；如果要动代码，就同时补齐导出、类型、测试与文档（见下方 DoD）。
 - 避免无关重构：不做大范围格式化、不改公共 API 命名、不“顺手修一堆”。
 
@@ -20,7 +20,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 
 - 优先用精确类型：能写具体类型就不要用 `unknown`。
 - 仅在“边界输入确实未知”时用 `unknown`（例如 `attrs`、第三方回调、JSON/网络响应），并立刻收窄后再使用（类型守卫 / `typeof` / `in` / `Array.isArray`）。
-- 不要在组件里散落断言：把可复用的收窄/合并逻辑下沉到 `@tigercat/core`。
+- 不要在组件里散落断言：把可复用的收窄/合并逻辑下沉到 `@expcat/tigercat-core`。
 - Vue attrs 常是 `unknown`：`class` 用 `coerceClassValue(attrs.class)`；`style` 用 `mergeStyleValues(attrs.style, props.style)`。
 - Vue `h()` children 类型不稳时：优先用 `type HChildren = Parameters<typeof h>[2]` 做最小断言，不要 `as any`。
 - React props 冲突（如 `defaultValue/title/autoComplete`）：用 `Omit<...>` 去掉原生属性再自定义，避免 DTS 冲突。
@@ -30,7 +30,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 - 先复现再定位：优先看 `tsup --dts` / `vue-tsc` 报错点，修“根因类型”而不是压制报错。
 - 截断日志别吞退出码：用 `set -o pipefail && pnpm build 2>&1 | tail -n 200`。
 - demo 也要类型正确：Vue 模板会自动解包 `ref`，事件参数尽量传 index/值，不要让函数参数强依赖 `Ref<T>`。
-- demo 依赖层级要清晰：优先从 `@tigercat/vue` / `@tigercat/react` 引类型与组件，避免 demo 直接绑死 core 内部实现。
+- demo 依赖层级要清晰：优先从 `@expcat/tigercat-vue` / `@expcat/tigercat-react` 引类型与组件，避免 demo 直接绑死 core 内部实现。
 
 ## 目录速查（改哪里）
 
@@ -59,7 +59,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 
 对“新增组件”或“显著功能”默认满足：
 
-1. `@tigercat/core`：必要的类型/工具被抽出并导出（如果 Vue/React 都会用到）
+1. `@expcat/tigercat-core`：必要的类型/工具被抽出并导出（如果 Vue/React 都会用到）
 2. Vue：新增/修改组件文件，并在 `packages/vue/src/index.ts` 导出
 3. React：新增/修改组件文件，并在 `packages/react/src/index.tsx` 导出（需要时同时导出 `type Props`）
 4. Tests：至少补齐对应框架的单测；复杂组件补充 a11y/边界场景
@@ -84,7 +84,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 - 严格模式；避免 `any`；优先精确类型。仅在边界/未知输入用 `unknown`，并先收窄再用。
 - 导出的公共函数/类型尽量写清晰的返回类型。
 - TS/TSX 不写分号；遵循 `.prettierrc.json`。
-- `import` 顺序：外部依赖 → 内部包（`@tigercat/core`）→ 相对路径。
+- `import` 顺序：外部依赖 → 内部包（`@expcat/tigercat-core`）→ 相对路径。
 
 ### 组件 API 约定
 
@@ -105,7 +105,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 
 - Tailwind 优先；颜色相关必须用 CSS 变量并带 fallback。
 - 推荐写法：`bg-[var(--tiger-primary,#2563eb)]`、`hover:bg-[var(--tiger-primary-hover,#1d4ed8)]`。
-- Theme helpers（来自 `@tigercat/core`）：`THEME_CSS_VARS`、`setThemeColors`、`getThemeColor`。
+- Theme helpers（来自 `@expcat/tigercat-core`）：`THEME_CSS_VARS`、`setThemeColors`、`getThemeColor`。
 
 ## Testing（默认要求）
 
@@ -130,7 +130,7 @@ pnpm clean
 
 ```ts
 import { defineComponent, h, computed, PropType } from 'vue'
-import { classNames, coerceClassValue } from '@tigercat/core'
+import { classNames, coerceClassValue } from '@expcat/tigercat-core'
 
 export const MyComponent = defineComponent({
   name: 'TigerMyComponent',
@@ -154,7 +154,7 @@ export default MyComponent
 
 ```tsx
 import React, { useMemo } from 'react'
-import { classNames } from '@tigercat/core'
+import { classNames } from '@expcat/tigercat-core'
 
 export interface MyComponentProps {
   variant?: 'primary' | 'secondary'

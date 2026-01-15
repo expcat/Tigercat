@@ -24,7 +24,7 @@ import {
   type ProgressSize,
   type ProgressType,
   type ProgressStatus
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueProgressProps {
   variant?: ProgressVariant

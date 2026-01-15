@@ -3,7 +3,7 @@ import {
   classNames,
   layoutContentClasses,
   type ContentProps as CoreContentProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface ReactContentProps
   extends CoreContentProps, Omit<React.HTMLAttributes<HTMLElement>, 'children'> {

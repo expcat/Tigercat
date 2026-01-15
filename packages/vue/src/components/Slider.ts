@@ -16,7 +16,7 @@ import {
   getSliderTrackClasses,
   getSliderThumbClasses,
   getSliderTooltipClasses
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueSliderProps {
   value?: number | [number, number]

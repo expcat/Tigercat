@@ -47,7 +47,7 @@ pnpm install
 ### 运行 Vue3 Example
 
 ```bash
-pnpm --filter @tigercat-example/vue3 dev
+pnpm --filter @expcat/tigercat-example-vue3 dev
 ```
 
 访问 http://localhost:5173
@@ -55,7 +55,7 @@ pnpm --filter @tigercat-example/vue3 dev
 ### 运行 React Example
 
 ```bash
-pnpm --filter @tigercat-example/react dev
+pnpm --filter @expcat/tigercat-example-react dev
 ```
 
 访问 http://localhost:5174
@@ -165,7 +165,7 @@ examples/
 
 ```typescript
 // Vue3
-import { setThemeColors } from '@tigercat/core'
+import { setThemeColors } from '@expcat/tigercat-core'
 
 setThemeColors({
   primary: '#10b981',
@@ -192,7 +192,7 @@ root.style.setProperty('--tiger-primary-hover', '#059669')
 
 - **Vue3 Example**: Vue 3.5, TypeScript, Vite, Tailwind CSS
 - **React Example**: React 19.2, TypeScript, Vite, Tailwind CSS
-- **UI 组件**: @tigercat/vue 和 @tigercat/react
+- **UI 组件**: @expcat/tigercat-vue 和 @expcat/tigercat-react
 
 ## 如何扩展示例
 
@@ -317,7 +317,7 @@ kill -9 <PID>
 **解决方案**:
 
 - 确保在开发模式下运行: `pnpm example:vue` 或 `pnpm example:react`
-- 如果修改了 `@tigercat` 包，需要在另一个终端运行 `pnpm dev` 来监听包变化
+- 如果修改了 `@expcat` 包，需要在另一个终端运行 `pnpm dev` 来监听包变化
 - 检查 Vite 控制台是否有错误信息
 
 #### 5. TypeScript 类型错误

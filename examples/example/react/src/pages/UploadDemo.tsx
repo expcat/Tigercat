@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Upload, type UploadFile } from '@tigercat/react'
+import { Upload, type UploadFile } from '@expcat/tigercat-react'
 
 const UploadDemo: React.FC = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([])

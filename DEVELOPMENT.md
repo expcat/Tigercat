@@ -57,8 +57,8 @@ This guide provides detailed information for developers working on the Tigercat 
 pnpm install
 
 # Add a dependency to a specific package
-pnpm --filter @tigercat/vue add vue-router
-pnpm --filter @tigercat/react add react-router-dom
+pnpm --filter @expcat/tigercat-vue add vue-router
+pnpm --filter @expcat/tigercat-react add react-router-dom
 
 # Update dependencies
 pnpm update
@@ -71,13 +71,13 @@ pnpm update
 pnpm build
 
 # Build a specific package
-pnpm --filter @tigercat/core build
-pnpm --filter @tigercat/vue build
-pnpm --filter @tigercat/react build
+pnpm --filter @expcat/tigercat-core build
+pnpm --filter @expcat/tigercat-vue build
+pnpm --filter @expcat/tigercat-react build
 
 # Watch mode (auto-rebuild on changes)
 pnpm dev
-pnpm --filter @tigercat/vue dev
+pnpm --filter @expcat/tigercat-vue dev
 ```
 
 ### Testing
@@ -116,12 +116,12 @@ pnpm example:react
 pnpm example:all
 
 # Build examples for production
-pnpm --filter @tigercat-example/vue3 build
-pnpm --filter @tigercat-example/react build
+pnpm --filter @expcat/tigercat-example-vue3 build
+pnpm --filter @expcat/tigercat-example-react build
 
 # Preview production builds
-pnpm --filter @tigercat-example/vue3 preview
-pnpm --filter @tigercat-example/react preview
+pnpm --filter @expcat/tigercat-example-vue3 preview
+pnpm --filter @expcat/tigercat-example-react preview
 ```
 
 ### Linting and Formatting
@@ -166,21 +166,21 @@ packages/
 ### Dependency Graph
 
 ```
-@tigercat/vue  ──→  @tigercat/core
+@expcat/tigercat-vue  ──→  @expcat/tigercat-core
 
-@tigercat/react ──→  @tigercat/core
+@expcat/tigercat-react ──→  @expcat/tigercat-core
 ```
 
-- `@tigercat/core` has no framework dependencies
-- Both `@tigercat/vue` and `@tigercat/react` depend on `@tigercat/core`
-- Changes to `@tigercat/core` require rebuilding dependent packages
+- `@expcat/tigercat-core` has no framework dependencies
+- Both `@expcat/tigercat-vue` and `@expcat/tigercat-react` depend on `@expcat/tigercat-core`
+- Changes to `@expcat/tigercat-core` require rebuilding dependent packages
 
 ### Build Order
 
 Packages are built in dependency order:
 
-1. `@tigercat/core` (no dependencies)
-2. `@tigercat/vue` and `@tigercat/react` (in parallel, both depend on core)
+1. `@expcat/tigercat-core` (no dependencies)
+2. `@expcat/tigercat-vue` and `@expcat/tigercat-react` (in parallel, both depend on core)
 3. Example applications (depend on component packages)
 
 ## 🎨 Adding New Components
@@ -221,7 +221,7 @@ Packages are built in dependency order:
    ```vue
    <script setup lang="ts">
    import { computed } from 'vue'
-   import type { YourComponentProps } from '@tigercat/core'
+   import type { YourComponentProps } from '@expcat/tigercat-core'
 
    const props = withDefaults(defineProps<YourComponentProps>(), {
      variant: 'primary',
@@ -244,7 +244,7 @@ Packages are built in dependency order:
 
    ```typescript
    export { default as YourComponent } from './components/YourComponent.vue'
-   export type { YourComponentProps } from '@tigercat/core'
+   export type { YourComponentProps } from '@expcat/tigercat-core'
    ```
 
 4. **Implement React Component**
@@ -256,7 +256,7 @@ Packages are built in dependency order:
 
    ```typescript
    import React from 'react'
-   import type { YourComponentProps } from '@tigercat/core'
+   import type { YourComponentProps } from '@expcat/tigercat-core'
 
    export const YourComponent: React.FC<YourComponentProps> = ({
      variant = 'primary',
@@ -277,7 +277,7 @@ Packages are built in dependency order:
 
    ```typescript
    export { YourComponent } from './components/YourComponent'
-   export type { YourComponentProps } from '@tigercat/core'
+   export type { YourComponentProps } from '@expcat/tigercat-core'
    ```
 
 5. **Write Tests**
@@ -332,7 +332,7 @@ Mark component as complete in [ROADMAP.md](./ROADMAP.md):
 
 ### Component Best Practices
 
-- **Framework Agnostic Core**: Put shared logic in `@tigercat/core`
+- **Framework Agnostic Core**: Put shared logic in `@expcat/tigercat-core`
 - **Consistent API**: Keep Vue and React APIs as similar as possible
 - **Accessibility First**: Follow ARIA best practices
 - **Theme Support**: Use CSS variables for colors
@@ -437,8 +437,8 @@ packages/*/dist/
 pnpm add -D vitest -w
 
 # Package-specific dependency
-pnpm --filter @tigercat/vue add some-package
-pnpm --filter @tigercat/react add some-package
+pnpm --filter @expcat/tigercat-vue add some-package
+pnpm --filter @expcat/tigercat-react add some-package
 ```
 
 ### Updating Version
@@ -457,7 +457,7 @@ pnpm version major
 pnpm clean
 
 # Remove build artifacts from specific package
-pnpm --filter @tigercat/vue clean
+pnpm --filter @expcat/tigercat-vue clean
 
 # Remove node_modules (then reinstall)
 rm -rf node_modules packages/*/node_modules examples/*/node_modules
@@ -492,7 +492,7 @@ npm install -g pnpm@10.26.2
 
 #### 2. Build Errors After Updating Core
 
-**Problem**: Changes to `@tigercat/core` require rebuilding dependent packages.
+**Problem**: Changes to `@expcat/tigercat-core` require rebuilding dependent packages.
 
 **Solution**:
 
@@ -501,9 +501,9 @@ npm install -g pnpm@10.26.2
 pnpm build
 
 # Or rebuild in dependency order
-pnpm --filter @tigercat/core build
-pnpm --filter @tigercat/vue build
-pnpm --filter @tigercat/react build
+pnpm --filter @expcat/tigercat-core build
+pnpm --filter @expcat/tigercat-vue build
+pnpm --filter @expcat/tigercat-react build
 ```
 
 #### 3. Example Not Loading Components

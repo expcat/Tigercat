@@ -24,7 +24,7 @@ Every component test file should follow this structure:
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { ComponentName } from '@tigercat/vue'
+import { ComponentName } from '@expcat/tigercat-vue'
 import {
   renderWithProps,
   renderWithSlots,

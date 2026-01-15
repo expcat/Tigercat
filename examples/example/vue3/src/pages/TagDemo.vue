@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Tag, Space, Divider } from '@tigercat/vue'
+import { Tag, Space, Divider } from '@expcat/tigercat-vue'
 
 const tags = ref(['标签一', '标签二', '标签三'])
 

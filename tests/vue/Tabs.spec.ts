@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, cleanup } from '@testing-library/vue'
 import { h } from 'vue'
-import { Tabs, TabPane } from '@tigercat/vue'
+import { Tabs, TabPane } from '@expcat/tigercat-vue'
 
 describe('Tabs', () => {
   describe('Rendering', () => {

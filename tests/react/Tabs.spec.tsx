@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { Tabs, TabPane } from '@tigercat/react'
+import { Tabs, TabPane } from '@expcat/tigercat-react'
 
 describe('Tabs', () => {
   describe('Rendering', () => {

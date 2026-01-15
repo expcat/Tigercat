@@ -17,7 +17,7 @@ import {
   type DescriptionsSize,
   type DescriptionsLayout,
   type DescriptionsItem
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 type RawChildren = string | number | boolean | VNode | VNodeArrayChildren | (() => unknown)
 

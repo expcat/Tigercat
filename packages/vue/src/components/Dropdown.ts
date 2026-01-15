@@ -19,9 +19,9 @@ import {
   getDropdownMenuWrapperClasses,
   type DropdownTrigger,
   type DropdownPlacement
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
-import type { DropdownProps as CoreDropdownProps } from '@tigercat/core'
+import type { DropdownProps as CoreDropdownProps } from '@expcat/tigercat-core'
 import { DropdownMenu } from './DropdownMenu'
 
 // Dropdown context key

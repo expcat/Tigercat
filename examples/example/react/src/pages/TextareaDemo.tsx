@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Textarea, Space, Divider, FormItem } from '@tigercat/react'
+import { Textarea, Space, Divider, FormItem } from '@expcat/tigercat-react'
 
 const TextareaDemo: React.FC = () => {
   const [text, setText] = useState('')

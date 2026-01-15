@@ -9,7 +9,7 @@ import {
   getCurrentInstance,
   type ComputedRef
 } from 'vue'
-import { classNames, coerceClassValue, getRadioGroupClasses, type RadioSize } from '@tigercat/core'
+import { classNames, coerceClassValue, getRadioGroupClasses, type RadioSize } from '@expcat/tigercat-core'
 
 export const RadioGroupKey = Symbol('RadioGroup')
 

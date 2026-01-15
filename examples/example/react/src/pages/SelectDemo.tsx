@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Select, Space, Divider } from '@tigercat/react'
+import { Select, Space, Divider } from '@expcat/tigercat-react'
 
 const SelectDemo: React.FC = () => {
   const [basicValue, setBasicValue] = useState<string | number>('')

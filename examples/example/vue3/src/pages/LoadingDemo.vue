@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Loading, Button, Card, Divider } from '@tigercat/vue'
+import { Loading, Button, Card, Divider } from '@expcat/tigercat-vue'
 
 const pageLoading = ref(false)
 const cardLoading = ref(false)

@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import React from 'react'
 import { render } from '@testing-library/react'
-import { Skeleton } from '@tigercat/react'
+import { Skeleton } from '@expcat/tigercat-react'
 import { expectNoA11yViolations } from '../utils/a11y-helpers'
 import { renderWithProps } from '../utils/render-helpers-react'
 

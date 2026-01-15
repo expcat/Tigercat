@@ -1,5 +1,5 @@
 import React from 'react'
-import { Row, Col, Container, Space } from '@tigercat/react'
+import { Row, Col, Container, Space } from '@expcat/tigercat-react'
 
 const GridDemo: React.FC = () => {
   return (

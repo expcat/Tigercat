@@ -2,7 +2,7 @@ import React from 'react'
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { expectNoA11yViolations } from '../utils/a11y-helpers'
-import { Layout, Header, Footer, Sidebar, Content } from '@tigercat/react'
+import { Layout, Header, Footer, Sidebar, Content } from '@expcat/tigercat-react'
 
 describe('Layout Sections', () => {
   it('Layout merges className and forwards attrs', () => {

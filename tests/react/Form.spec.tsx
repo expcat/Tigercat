@@ -6,7 +6,7 @@ import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, { useState } from 'react'
-import { Form, FormItem, type FormHandle, type FormRule } from '@tigercat/react'
+import { Form, FormItem, type FormHandle, type FormRule } from '@expcat/tigercat-react'
 import { expectNoA11yViolations } from '../utils/react'
 
 describe('Form', () => {

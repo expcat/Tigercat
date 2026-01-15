@@ -55,7 +55,7 @@ export const THEME_CSS_VARS = {
  *
  * @example
  * ```typescript
- * import { setThemeColors } from '@tigercat/core'
+ * import { setThemeColors } from '@expcat/tigercat-core'
  *
  * // Set colors on root
  * setThemeColors({
@@ -100,7 +100,7 @@ export function setThemeColors(
  *
  * @example
  * ```typescript
- * import { getThemeColor } from '@tigercat/core'
+ * import { getThemeColor } from '@expcat/tigercat-core'
  *
  * const primaryColor = getThemeColor('primary')
  * console.log(primaryColor) // '#2563eb'

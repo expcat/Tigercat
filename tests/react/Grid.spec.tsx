@@ -5,7 +5,7 @@
 import React from 'react'
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { Row, Col } from '@tigercat/react'
+import { Row, Col } from '@expcat/tigercat-react'
 import { expectNoA11yViolations } from '../utils/react'
 
 describe('Grid (React)', () => {

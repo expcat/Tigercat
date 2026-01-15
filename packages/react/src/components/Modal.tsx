@@ -22,7 +22,7 @@ import {
   restoreFocus,
   type TigerLocale,
   type ModalProps as CoreModalProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { useEscapeKey } from '../utils/overlay'
 
 export interface ModalProps

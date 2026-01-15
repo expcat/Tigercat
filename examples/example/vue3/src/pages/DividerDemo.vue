@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Divider } from '@tigercat/vue'
+import { Divider } from '@expcat/tigercat-vue'
 </script>
 
 <template>

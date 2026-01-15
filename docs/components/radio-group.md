@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { RadioGroup, Radio } from '@tigercat/vue'
+import { RadioGroup, Radio } from '@expcat/tigercat-vue'
 
 const selectedValue = ref('apple')
 const options = [
@@ -32,7 +32,7 @@ const options = [
 
 ```tsx
 import { useState } from 'react'
-import { RadioGroup, Radio } from '@tigercat/react'
+import { RadioGroup, Radio } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedValue, setSelectedValue] = useState('apple')
@@ -141,7 +141,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { RadioGroup, Radio } from '@tigercat/vue'
+import { RadioGroup, Radio } from '@expcat/tigercat-vue'
 
 const selectedValue = ref('vue')
 
@@ -165,7 +165,7 @@ const handleChange = (value) => {
 
 ```tsx
 import { useState } from 'react'
-import { RadioGroup, Radio } from '@tigercat/react'
+import { RadioGroup, Radio } from '@expcat/tigercat-react'
 
 function ControlledExample() {
   const [selectedValue, setSelectedValue] = useState('vue')
@@ -196,7 +196,7 @@ function ControlledExample() {
 
 ```vue
 <script setup>
-import { RadioGroup, Radio } from '@tigercat/vue'
+import { RadioGroup, Radio } from '@expcat/tigercat-vue'
 
 const handleChange = (value) => {
   console.log('Selected value:', value)
@@ -215,7 +215,7 @@ const handleChange = (value) => {
 #### React
 
 ```tsx
-import { RadioGroup, Radio } from '@tigercat/react'
+import { RadioGroup, Radio } from '@expcat/tigercat-react'
 
 function UncontrolledExample() {
   const handleChange = (value: string | number) => {
@@ -315,7 +315,7 @@ interface RadioGroupContextValue {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { RadioGroup, Radio } from '@tigercat/vue'
+import { RadioGroup, Radio } from '@expcat/tigercat-vue'
 
 const paymentMethod = ref('credit-card')
 </script>
@@ -458,7 +458,7 @@ const plans = [
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { RadioGroup, Radio } from '@tigercat/vue'
+import { RadioGroup, Radio } from '@expcat/tigercat-vue'
 
 const selectedValue = ref('basic')
 const showAdvanced = ref(false)
@@ -497,11 +497,11 @@ const showAdvanced = ref(false)
 RadioGroup 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { RadioGroupProps, RadioGroupContext } from '@tigercat/core'
+import type { RadioGroupProps, RadioGroupContext } from '@expcat/tigercat-core'
 // Vue
-import type { RadioGroup } from '@tigercat/vue'
+import type { RadioGroup } from '@expcat/tigercat-vue'
 // React
-import { RadioGroup, RadioGroupContext } from '@tigercat/react'
+import { RadioGroup, RadioGroupContext } from '@expcat/tigercat-react'
 ```
 
 ## 相关组件
@@ -520,7 +520,7 @@ import { RadioGroup, RadioGroupContext } from '@tigercat/react'
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { RadioGroup, Radio, Button } from '@tigercat/vue'
+import { RadioGroup, Radio, Button } from '@expcat/tigercat-vue'
 
 const gender = ref('male')
 const ageRange = ref('18-25')
@@ -561,7 +561,7 @@ const handleSubmit = () => {
 
 ```tsx
 import { useState, FormEvent } from 'react'
-import { RadioGroup, Radio, Button } from '@tigercat/react'
+import { RadioGroup, Radio, Button } from '@expcat/tigercat-react'
 
 function FormExample() {
   const [gender, setGender] = useState('male')
@@ -605,7 +605,7 @@ function FormExample() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { RadioGroup, Radio } from '@tigercat/vue'
+import { RadioGroup, Radio } from '@expcat/tigercat-vue'
 
 const selectedPlan = ref('pro')
 const plans = [

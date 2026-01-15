@@ -7,7 +7,7 @@ import {
   isKeySelected,
   menuItemIconClasses,
   mergeStyleValues
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { MenuContextKey, type MenuContext } from './Menu'
 
 export interface VueMenuItemProps {

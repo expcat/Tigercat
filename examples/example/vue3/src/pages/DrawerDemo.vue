@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { defineComponent, h, ref } from 'vue'
-import { Drawer, Button, Space, Divider } from '@tigercat/vue'
-import type { DrawerPlacement, DrawerSize } from '@tigercat/vue'
+import { Drawer, Button, Space, Divider } from '@expcat/tigercat-vue'
+import type { DrawerPlacement, DrawerSize } from '@expcat/tigercat-vue'
 
 // Basic drawer
 const basicVisible = ref(false)

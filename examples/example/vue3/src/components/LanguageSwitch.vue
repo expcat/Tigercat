@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Select } from '@tigercat/vue'
+import { Select } from '@expcat/tigercat-vue'
 import { DEMO_LANG_OPTIONS, type DemoLang } from '@demo-shared/app-config'
 
 const props = defineProps<{ modelValue: DemoLang }>()

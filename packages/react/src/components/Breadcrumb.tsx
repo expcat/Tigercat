@@ -4,7 +4,7 @@ import {
   breadcrumbContainerClasses,
   type BreadcrumbProps as CoreBreadcrumbProps,
   type BreadcrumbSeparator
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Breadcrumb context interface
 export interface BreadcrumbContextValue {

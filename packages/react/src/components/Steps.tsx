@@ -6,7 +6,7 @@ import {
   type StepStatus,
   type StepSize,
   type StepsProps as CoreStepsProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { StepsItem, type StepsItemProps } from './StepsItem'
 
 // Steps context interface

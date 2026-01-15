@@ -9,7 +9,7 @@ import {
   avatarImageClasses,
   getInitials,
   type AvatarProps as CoreAvatarProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface AvatarProps extends CoreAvatarProps, React.HTMLAttributes<HTMLSpanElement> {
   /**

@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { notification, Divider, Button } from '@tigercat/react'
+import { notification, Divider, Button } from '@expcat/tigercat-react'
 
 export default function NotificationDemo() {
   const closeNotificationRef = useRef<(() => void) | null>(null)

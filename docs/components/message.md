@@ -14,7 +14,7 @@
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from '@expcat/tigercat-vue'
 
 const showMessage = () => {
   message.info('这是一条普通消息')
@@ -29,7 +29,7 @@ const showMessage = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from '@expcat/tigercat-react'
 
 function App() {
   const showMessage = () => {
@@ -54,7 +54,7 @@ Message 组件支持 5 种不同的类型：
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from '@expcat/tigercat-vue'
 
 const showInfo = () => {
   message.info('这是一条信息提示')
@@ -93,7 +93,7 @@ const showLoading = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from '@expcat/tigercat-react'
 
 function App() {
   const showInfo = () => {
@@ -138,7 +138,7 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from '@expcat/tigercat-vue'
 
 const showShortMessage = () => {
   // 1秒后自动关闭
@@ -178,7 +178,7 @@ const showPersistentMessage = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from '@expcat/tigercat-react'
 
 function App() {
   const showShortMessage = () => {
@@ -224,7 +224,7 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from '@expcat/tigercat-vue'
 
 const showClosableMessage = () => {
   message.info({
@@ -243,7 +243,7 @@ const showClosableMessage = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from '@expcat/tigercat-react'
 
 function App() {
   const showClosableMessage = () => {
@@ -266,7 +266,7 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from '@expcat/tigercat-vue'
 import { ref } from 'vue'
 
 const closeMessage = ref<(() => void) | null>(null)
@@ -305,7 +305,7 @@ const simulateRequest = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from '@expcat/tigercat-react'
 import { useRef } from 'react'
 
 function App() {
@@ -350,7 +350,7 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from '@expcat/tigercat-vue'
 
 const showMessageWithCallback = () => {
   message.success({
@@ -371,7 +371,7 @@ const showMessageWithCallback = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from '@expcat/tigercat-react'
 
 function App() {
   const showMessageWithCallback = () => {
@@ -396,7 +396,7 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from '@expcat/tigercat-vue'
 
 const showMultipleMessages = () => {
   message.info('消息 1')
@@ -420,7 +420,7 @@ const clearAll = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from '@expcat/tigercat-react'
 
 function App() {
   const showMultipleMessages = () => {
@@ -448,7 +448,7 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@tigercat/vue'
+import { message } from '@expcat/tigercat-vue'
 
 const handleFormSubmit = async () => {
   // 显示加载消息
@@ -514,7 +514,7 @@ const showDifferentTypes = () => {
 ### React
 
 ```tsx
-import { message } from '@tigercat/react'
+import { message } from '@expcat/tigercat-react'
 
 function App() {
   const handleFormSubmit = async () => {
@@ -663,7 +663,7 @@ Message 组件遵循 WAI-ARIA 可访问性标准：
 Message 组件提供完整的 TypeScript 类型定义：
 
 ```typescript
-import { message, MessageConfig, MessageOptions } from '@tigercat/vue' // 或 '@tigercat/react'
+import { message, MessageConfig, MessageOptions } from '@expcat/tigercat-vue' // 或 '@expcat/tigercat-react'
 
 // 使用字符串
 message.info('简单消息')

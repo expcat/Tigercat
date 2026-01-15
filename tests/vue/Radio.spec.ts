@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { Radio, RadioGroup } from '@tigercat/vue'
+import { Radio, RadioGroup } from '@expcat/tigercat-vue'
 import {
   renderWithProps,
   expectNoA11yViolations,

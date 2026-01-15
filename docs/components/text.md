@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Text } from '@tigercat/vue'
+import { Text } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Text } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Text } from '@tigercat/react'
+import { Text } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -359,7 +359,7 @@ Text 组件的 `primary` 和 `secondary` 颜色支持通过 CSS 变量自定义�
 
 ```vue
 <script setup>
-import { Text, setThemeColors } from '@tigercat/vue'
+import { Text, setThemeColors } from '@expcat/tigercat-vue'
 
 const switchTheme = () => {
   setThemeColors({
@@ -378,7 +378,7 @@ const switchTheme = () => {
 **React:**
 
 ```tsx
-import { Text, setThemeColors } from '@tigercat/react'
+import { Text, setThemeColors } from '@expcat/tigercat-react'
 
 function App() {
   const switchTheme = () => {
@@ -419,11 +419,11 @@ React 版本的 Text 组件支持 `className` 属性，可以传入额外的 CSS
 Text 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { TextProps, TextTag, TextSize, TextWeight, TextAlign, TextColor } from '@tigercat/core'
+import type { TextProps, TextTag, TextSize, TextWeight, TextAlign, TextColor } from '@expcat/tigercat-core'
 // Vue
-import type { Text } from '@tigercat/vue'
+import type { Text } from '@expcat/tigercat-vue'
 // React
-import type { Text, TextProps as ReactTextProps } from '@tigercat/react'
+import type { Text, TextProps as ReactTextProps } from '@expcat/tigercat-react'
 ```
 
 ## 示例

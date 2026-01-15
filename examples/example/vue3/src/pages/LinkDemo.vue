@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link, Space, Divider } from '@tigercat/vue'
+import { Link, Space, Divider } from '@expcat/tigercat-vue'
 
 const handlePreventNavigate = (event: MouseEvent) => {
   event.preventDefault()

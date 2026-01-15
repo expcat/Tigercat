@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from '@expcat/tigercat-vue'
 
 const handleConfirm = () => {
   console.log('确认删除')
@@ -33,7 +33,7 @@ const handleCancel = () => {
 
 ```tsx
 import React from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import { Popconfirm, Button } from '@expcat/tigercat-react'
 
 function App() {
   const handleConfirm = () => {
@@ -83,7 +83,7 @@ function App() {
 </template>
 
 <script setup>
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from '@expcat/tigercat-vue'
 </script>
 ```
 
@@ -91,7 +91,7 @@ import { Popconfirm, Button } from '@tigercat/vue'
 
 ```tsx
 import React from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import { Popconfirm, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -148,7 +148,7 @@ function App() {
 </template>
 
 <script setup>
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from '@expcat/tigercat-vue'
 </script>
 ```
 
@@ -156,7 +156,7 @@ import { Popconfirm, Button } from '@tigercat/vue'
 
 ```tsx
 import React from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import { Popconfirm, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -203,7 +203,7 @@ function App() {
 </template>
 
 <script setup>
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from '@expcat/tigercat-vue'
 
 const handleSubmit = () => {
   console.log('表单已提交')
@@ -215,7 +215,7 @@ const handleSubmit = () => {
 
 ```tsx
 import React from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import { Popconfirm, Button } from '@expcat/tigercat-react'
 
 function App() {
   const handleSubmit = () => {
@@ -254,7 +254,7 @@ function App() {
 </template>
 
 <script setup>
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from '@expcat/tigercat-vue'
 
 const handleDelete = () => {
   console.log('用户已删除')
@@ -266,7 +266,7 @@ const handleDelete = () => {
 
 ```tsx
 import React from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import { Popconfirm, Button } from '@expcat/tigercat-react'
 
 function App() {
   const handleDelete = () => {
@@ -304,7 +304,7 @@ function App() {
 </template>
 
 <script setup>
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from '@expcat/tigercat-vue'
 
 const handlePublish = () => {
   console.log('文章已发布')
@@ -316,7 +316,7 @@ const handlePublish = () => {
 
 ```tsx
 import React from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import { Popconfirm, Button } from '@expcat/tigercat-react'
 
 function App() {
   const handlePublish = () => {
@@ -357,7 +357,7 @@ function App() {
 
 <script setup>
 import { ref } from 'vue'
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from '@expcat/tigercat-vue'
 
 const visible = ref(false)
 
@@ -377,7 +377,7 @@ const handleCancel = () => {
 
 ```tsx
 import React, { useState } from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import { Popconfirm, Button } from '@expcat/tigercat-react'
 
 function App() {
   const [visible, setVisible] = useState(false)
@@ -425,7 +425,7 @@ function App() {
 </template>
 
 <script setup>
-import { Popconfirm, Button } from '@tigercat/vue'
+import { Popconfirm, Button } from '@expcat/tigercat-vue'
 
 const handleConfirm = () => {
   console.log('确认')
@@ -437,7 +437,7 @@ const handleConfirm = () => {
 
 ```tsx
 import React from 'react'
-import { Popconfirm, Button } from '@tigercat/react'
+import { Popconfirm, Button } from '@expcat/tigercat-react'
 
 function App() {
   const handleConfirm = () => {

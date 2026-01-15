@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Descriptions } from '@tigercat/vue'
+import { Descriptions } from '@expcat/tigercat-vue'
 
 const items = [
   { label: 'Name', content: 'John Doe' },
@@ -26,7 +26,7 @@ const items = [
 ### React
 
 ```tsx
-import { Descriptions } from '@tigercat/react'
+import { Descriptions } from '@expcat/tigercat-react'
 
 function App() {
   const items = [

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Input, Space, Divider, FormItem } from '@tigercat/react'
+import { Input, Space, Divider, FormItem } from '@expcat/tigercat-react'
 
 const InputDemo: React.FC = () => {
   const [basicText, setBasicText] = useState('')

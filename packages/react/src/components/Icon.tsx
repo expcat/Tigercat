@@ -5,7 +5,7 @@ import {
   iconSvgBaseClasses,
   iconWrapperClasses,
   type IconProps as CoreIconProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface IconProps extends CoreIconProps, React.HTMLAttributes<HTMLSpanElement> {
   children?: React.ReactNode

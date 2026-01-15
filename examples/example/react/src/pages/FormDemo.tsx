@@ -13,7 +13,7 @@ import {
   Divider,
   type FormHandle,
   type FormSubmitEvent
-} from '@tigercat/react'
+} from '@expcat/tigercat-react'
 import { countries } from '@demo-shared/constants'
 
 const FormDemo: React.FC = () => {

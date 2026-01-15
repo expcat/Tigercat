@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Pagination, Divider } from '@tigercat/react'
+import { Pagination, Divider } from '@expcat/tigercat-react'
 
 const PaginationDemo: React.FC = () => {
   const [current1, setCurrent1] = useState(1)

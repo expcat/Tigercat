@@ -1,4 +1,4 @@
-import { Button, Descriptions, Divider } from '@tigercat/react'
+import { Button, Descriptions, Divider } from '@expcat/tigercat-react'
 
 export default function DescriptionsDemo() {
   // Basic user information

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Radio, RadioGroup, Space, Divider } from '@tigercat/vue'
+import { Radio, RadioGroup, Space, Divider } from '@expcat/tigercat-vue'
 
 const basicValue = ref<string | number>('male')
 const uncontrolledValue = ref<string | number>('male')

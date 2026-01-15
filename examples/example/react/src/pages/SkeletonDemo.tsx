@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Skeleton, Space, Divider, Card, Avatar } from '@tigercat/react'
+import { Skeleton, Space, Divider, Card, Avatar } from '@expcat/tigercat-react'
 
 export default function SkeletonDemo() {
   // Loading state simulation

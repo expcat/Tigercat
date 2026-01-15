@@ -31,7 +31,7 @@ import {
   resolveLocaleText,
   type TigerLocale,
   type ModalSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 import { Button } from './Button'
 

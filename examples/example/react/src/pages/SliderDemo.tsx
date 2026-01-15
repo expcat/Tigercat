@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Slider, Space, Divider, Text } from '@tigercat/react'
+import { Slider, Space, Divider, Text } from '@expcat/tigercat-react'
 
 const SliderDemo: React.FC = () => {
   const [basicValue, setBasicValue] = useState(50)

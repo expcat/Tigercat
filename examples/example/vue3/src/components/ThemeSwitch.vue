@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { Select } from '@tigercat/vue'
+import { Select } from '@expcat/tigercat-vue'
 import { themes, applyTheme } from '@demo-shared/themes'
 import { getStoredTheme, setStoredTheme } from '@demo-shared/prefs'
 import type { DemoLang } from '@demo-shared/app-config'

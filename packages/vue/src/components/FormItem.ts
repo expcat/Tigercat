@@ -12,7 +12,7 @@ import {
   isVNode,
   type VNode
 } from 'vue'
-import { classNames, type FormRule, type FormSize, getFieldError } from '@tigercat/core'
+import { classNames, type FormRule, type FormSize, getFieldError } from '@expcat/tigercat-core'
 import { FormContextKey, type FormContext } from './Form'
 
 let formItemIdCounter = 0

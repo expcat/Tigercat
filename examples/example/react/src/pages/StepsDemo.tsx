@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Steps, StepsItem, Button, Divider } from '@tigercat/react'
+import { Steps, StepsItem, Button, Divider } from '@expcat/tigercat-react'
 
 const StepsDemo: React.FC = () => {
   const [current1, setCurrent1] = useState(1)

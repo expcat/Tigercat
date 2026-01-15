@@ -17,7 +17,7 @@ import {
   getTotalTextClasses,
   type PaginationSize,
   type PaginationAlign
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VuePaginationProps {
   current?: number

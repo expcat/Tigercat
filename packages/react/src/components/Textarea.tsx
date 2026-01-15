@@ -4,7 +4,7 @@ import {
   classNames,
   getInputClasses,
   type TextareaProps as CoreTextareaProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface TextareaProps
   extends

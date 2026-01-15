@@ -8,7 +8,7 @@ import {
   type Align,
   type Justify,
   type GutterSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueRowProps {
   gutter?: GutterSize

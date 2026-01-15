@@ -21,7 +21,7 @@ import {
   progressCircleTrackStrokeClasses,
   type ProgressProps as CoreProgressProps,
   type ProgressVariant
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface ProgressProps
   extends CoreProgressProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreProgressProps> {}

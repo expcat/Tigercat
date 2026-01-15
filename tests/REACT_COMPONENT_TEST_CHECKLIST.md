@@ -428,7 +428,7 @@ See **[TEST_QUALITY_GUIDELINES.md](./TEST_QUALITY_GUIDELINES.md)** for comprehen
 
 1. **Create test file**: `tests/react/[ComponentName].spec.tsx`
 2. **Copy template**: Use `ComponentTemplate.spec.tsx.template` as starting point
-3. **Import component**: From `@tigercat/react`
+3. **Import component**: From `@expcat/tigercat-react`
 4. **Implement tests**: Follow the test categories in the template
 5. **Run tests**: `pnpm test [ComponentName].spec.tsx`
 6. **Check coverage**: Ensure >80% line coverage

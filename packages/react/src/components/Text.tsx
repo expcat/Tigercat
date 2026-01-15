@@ -7,7 +7,7 @@ import {
   textSizeClasses,
   textWeightClasses,
   type TextProps as CoreTextProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export type TextProps = CoreTextProps &
   Omit<React.HTMLAttributes<HTMLElement>, 'color' | 'children'> & {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Tag, Space, Divider } from '@tigercat/react'
+import { Tag, Space, Divider } from '@expcat/tigercat-react'
 
 const TagDemo: React.FC = () => {
   const [tags, setTags] = useState(['标签一', '标签二', '标签三'])

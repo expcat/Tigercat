@@ -1,4 +1,4 @@
-import { isEscapeKey, isEventOutside } from '@tigercat/core'
+import { isEscapeKey, isEventOutside } from '@expcat/tigercat-core'
 import type { Ref } from 'vue'
 
 export interface UseVueClickOutsideOptions {

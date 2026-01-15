@@ -22,7 +22,7 @@ import {
   type TabType,
   type TabPosition,
   type TabSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Tabs context key
 export const TabsContextKey = Symbol('TabsContext')

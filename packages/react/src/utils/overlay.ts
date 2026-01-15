@@ -4,7 +4,7 @@ import {
   getFocusableElements,
   isEscapeKey,
   isEventOutside
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface UseClickOutsideOptions {
   enabled: boolean

@@ -8,7 +8,7 @@ import {
   getPopoverContentTextClasses,
   getDropdownMenuWrapperClasses,
   type PopoverProps as CorePopoverProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 let popoverIdCounter = 0
 const createPopoverId = () => `tiger-popover-${++popoverIdCounter}`

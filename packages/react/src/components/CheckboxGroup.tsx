@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react'
-import { type CheckboxGroupValue, type CheckboxSize } from '@tigercat/core'
+import { type CheckboxGroupValue, type CheckboxSize } from '@expcat/tigercat-core'
 
 export interface CheckboxGroupContext {
   value: CheckboxGroupValue

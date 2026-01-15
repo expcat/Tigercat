@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Breadcrumb, BreadcrumbItem, Divider } from '@tigercat/vue'
+import { Breadcrumb, BreadcrumbItem, Divider } from '@expcat/tigercat-vue'
 
 const handleClick = (event: MouseEvent) => {
   console.log('Breadcrumb item clicked:', event)

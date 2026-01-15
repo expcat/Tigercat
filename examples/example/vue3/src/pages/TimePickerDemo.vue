@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, ref, type Ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { TimePicker } from '@expcat/tigercat-vue'
 import type { DemoLang } from '@demo-shared/app-config'
 
 const demoLang = inject<Ref<DemoLang>>('demo-lang', ref<DemoLang>('zh-CN'))

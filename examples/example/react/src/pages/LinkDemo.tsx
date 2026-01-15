@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link, Space, Divider } from '@tigercat/react'
+import { Link, Space, Divider } from '@expcat/tigercat-react'
 
 const LinkDemo: React.FC = () => {
   const handlePreventNavigate = (event: React.MouseEvent<HTMLAnchorElement>) => {

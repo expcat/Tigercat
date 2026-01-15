@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Popover, Button, Space, Divider, List } from '@tigercat/vue'
+import { Popover, Button, Space, Divider, List } from '@expcat/tigercat-vue'
 
 const visible1 = ref(false)
 const manualVisible = ref(false)

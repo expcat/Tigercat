@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { Pagination } from '@tigercat/vue'
+import { Pagination } from '@expcat/tigercat-vue'
 
 describe('Pagination', () => {
   it('renders navigation with default aria-label', () => {

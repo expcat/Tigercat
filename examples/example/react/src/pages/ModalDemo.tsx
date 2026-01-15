@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Modal, Button, Space, Divider, Input } from '@tigercat/react'
+import { Modal, Button, Space, Divider, Input } from '@expcat/tigercat-react'
 
 export default function ModalDemo() {
   const [visible1, setVisible1] = useState(false)

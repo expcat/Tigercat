@@ -10,7 +10,7 @@
 
 ```vue
 <script setup>
-import { Row, Col } from '@tigercat/vue'
+import { Row, Col } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -58,7 +58,7 @@ import { Row, Col } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Row, Col } from '@tigercat/react'
+import { Row, Col } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -623,11 +623,11 @@ import type {
   ColSpan,
   Align,
   Justify
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Vue
-import { Row, Col } from '@tigercat/vue'
-import type { VueRowProps, VueColProps } from '@tigercat/vue'
+import { Row, Col } from '@expcat/tigercat-vue'
+import type { VueRowProps, VueColProps } from '@expcat/tigercat-vue'
 
 // React
 import type {
@@ -635,7 +635,7 @@ import type {
   Col,
   RowProps as ReactRowProps,
   ColProps as ReactColProps
-} from '@tigercat/react'
+} from '@expcat/tigercat-react'
 ```
 
 ## 无障碍 (Accessibility)
@@ -683,7 +683,7 @@ import type {
 #### React
 
 ```tsx
-import { Row, Col } from '@tigercat/react'
+import { Row, Col } from '@expcat/tigercat-react'
 
 function Layout() {
   return (
@@ -736,7 +736,7 @@ function Layout() {
 #### React
 
 ```tsx
-import { Row, Col } from '@tigercat/react'
+import { Row, Col } from '@expcat/tigercat-react'
 
 function CardGrid() {
   return (

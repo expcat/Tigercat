@@ -31,7 +31,7 @@ import {
   type MessageOptions,
   type MessageConfig,
   isBrowser
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 /**
  * Global message container id

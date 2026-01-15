@@ -20,7 +20,7 @@ import {
   resolveLocaleText,
   restoreFocus,
   type DrawerProps as CoreDrawerProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { useEscapeKey } from '../utils/overlay'
 
 export interface DrawerProps

@@ -4,7 +4,7 @@ import {
   type SwitchProps as CoreSwitchProps,
   getSwitchClasses,
   getSwitchThumbClasses
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface SwitchProps
   extends

@@ -3,7 +3,7 @@ import {
   classNames,
   getDropdownMenuClasses,
   type DropdownMenuProps as CoreDropdownMenuProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface DropdownMenuProps
   extends

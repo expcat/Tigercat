@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Layout, Header, Sidebar, Content, Footer } from '@tigercat/react'
+import { Container, Layout, Header, Sidebar, Content, Footer } from '@expcat/tigercat-react'
 
 const LayoutDemo: React.FC = () => {
   return (

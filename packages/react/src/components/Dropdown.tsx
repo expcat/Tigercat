@@ -5,7 +5,7 @@ import {
   getDropdownTriggerClasses,
   getDropdownMenuWrapperClasses,
   type DropdownProps as CoreDropdownProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { DropdownMenu } from './DropdownMenu'
 import { useClickOutside, useEscapeKey } from '../utils/overlay'
 

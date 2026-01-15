@@ -25,7 +25,7 @@ import {
   getFileListItemClasses,
   getPictureCardClasses,
   getUploadStatusIconClasses
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 import { useTigerConfig } from './ConfigProvider'
 

@@ -7,7 +7,7 @@ import {
   linkDisabledClasses,
   linkSizeClasses,
   type LinkProps as CoreLinkProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface LinkProps
   extends

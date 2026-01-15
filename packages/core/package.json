@@ -1,5 +1,5 @@
 {
-  "name": "@tigercat/core",
+  "name": "@expcat/tigercat-core",
   "version": "0.0.1",
   "description": "Core utilities for Tigercat UI library",
   "license": "MIT",

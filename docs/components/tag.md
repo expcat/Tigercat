@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Tag } from '@tigercat/vue'
+import { Tag } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Tag } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Tag } from '@tigercat/react'
+import { Tag } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -109,7 +109,7 @@ Tag 组件支持 3 种不同的尺寸：
 ```vue
 <script setup>
 import { ref } from 'vue';
-import { Tag } from '@tigercat/vue';
+import { Tag } from '@expcat/tigercat-vue';
 
 const tags = ref(['Tag 1', 'Tag 2', 'Tag 3']);
 
@@ -135,7 +135,7 @@ const handleCloseKeepVisible = (event: MouseEvent) => {
 
 ```tsx
 import { useState } from 'react'
-import { Tag } from '@tigercat/react'
+import { Tag } from '@expcat/tigercat-react'
 
 function App() {
   const [tags, setTags] = useState(['Tag 1', 'Tag 2', 'Tag 3'])

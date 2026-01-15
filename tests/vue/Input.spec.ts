@@ -4,8 +4,8 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { Input } from '@tigercat/vue'
-import type { InputType } from '@tigercat/core'
+import { Input } from '@expcat/tigercat-vue'
+import type { InputType } from '@expcat/tigercat-core'
 import {
   renderWithProps,
   expectNoA11yViolations,

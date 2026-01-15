@@ -29,7 +29,7 @@ import {
   type TreeCheckedState,
   type TreeLoadDataFn,
   type TreeFilterFn
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 const spinnerSvg = getSpinnerSVG('spinner')
 

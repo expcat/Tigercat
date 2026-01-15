@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, inject, type Ref } from 'vue'
-import { DatePicker, Space, Divider, FormItem } from '@tigercat/vue'
+import { DatePicker, Space, Divider, FormItem } from '@expcat/tigercat-vue'
 import type { DemoLang } from '@demo-shared/app-config'
 
 const date = ref<Date | null>(null)

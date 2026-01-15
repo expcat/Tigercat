@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Upload, type UploadFile } from '@tigercat/vue'
+import { Upload, type UploadFile } from '@expcat/tigercat-vue'
 
 const fileList = ref<UploadFile[]>([])
 const fileList2 = ref<UploadFile[]>([])

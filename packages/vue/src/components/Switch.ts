@@ -4,7 +4,7 @@ import {
   type SwitchSize,
   getSwitchClasses,
   getSwitchThumbClasses
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueSwitchProps {
   checked?: boolean

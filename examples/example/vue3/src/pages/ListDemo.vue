@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, h } from 'vue'
-import { List, Card, Space, Divider, Button } from '@tigercat/vue'
-import type { ListItem } from '@tigercat/vue'
+import { List, Card, Space, Divider, Button } from '@expcat/tigercat-vue'
+import type { ListItem } from '@expcat/tigercat-vue'
 
 // Basic list data
 const basicData = ref([

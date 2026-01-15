@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Timeline } from '@tigercat/vue'
+import { Timeline } from '@expcat/tigercat-vue'
 
 const items = ref([
   { key: 1, label: '2024-01-01', content: 'Create a project' },
@@ -26,7 +26,7 @@ const items = ref([
 ### React
 
 ```tsx
-import { Timeline } from '@tigercat/react'
+import { Timeline } from '@expcat/tigercat-react'
 
 function App() {
   const items = [
@@ -104,7 +104,7 @@ Timeline 组件支持 3 种展示模式：
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Timeline } from '@tigercat/vue'
+import { Timeline } from '@expcat/tigercat-vue'
 
 const items = ref([
   {
@@ -136,7 +136,7 @@ const items = ref([
 ### React
 
 ```tsx
-import { Timeline } from '@tigercat/react'
+import { Timeline } from '@expcat/tigercat-react'
 
 function App() {
   const items = [
@@ -175,7 +175,7 @@ function App() {
 ```vue
 <script setup>
 import { ref, h } from 'vue'
-import { Timeline, Icon } from '@tigercat/vue'
+import { Timeline, Icon } from '@expcat/tigercat-vue'
 
 const items = ref([
   {
@@ -201,7 +201,7 @@ const items = ref([
 #### React
 
 ```tsx
-import { Timeline, Icon } from '@tigercat/react'
+import { Timeline, Icon } from '@expcat/tigercat-react'
 
 function App() {
   const items = [
@@ -230,7 +230,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Timeline, Icon } from '@tigercat/vue'
+import { Timeline, Icon } from '@expcat/tigercat-vue'
 
 const items = ref([
   { key: 1, label: '2024-01-01', content: 'Create a project' },
@@ -251,7 +251,7 @@ const items = ref([
 #### React
 
 ```tsx
-import { Timeline, Icon } from '@tigercat/react'
+import { Timeline, Icon } from '@expcat/tigercat-react'
 
 function App() {
   const items = [
@@ -283,7 +283,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Timeline, Tag } from '@tigercat/vue'
+import { Timeline, Tag } from '@expcat/tigercat-vue'
 
 const items = ref([
   {
@@ -326,7 +326,7 @@ const items = ref([
 ### React
 
 ```tsx
-import { Timeline, Tag } from '@tigercat/react'
+import { Timeline, Tag } from '@expcat/tigercat-react'
 
 function App() {
   const items = [
@@ -380,7 +380,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Timeline } from '@tigercat/vue'
+import { Timeline } from '@expcat/tigercat-vue'
 
 const items = ref([
   { key: 1, label: '2024-01-01', content: 'Create a project' },
@@ -397,7 +397,7 @@ const items = ref([
 ### React
 
 ```tsx
-import { Timeline } from '@tigercat/react'
+import { Timeline } from '@expcat/tigercat-react'
 
 function App() {
   const items = [
@@ -459,7 +459,7 @@ function App() {
 ```vue
 <script setup>
 import { ref, h } from 'vue'
-import { Timeline, Tag, Icon } from '@tigercat/vue'
+import { Timeline, Tag, Icon } from '@expcat/tigercat-vue'
 
 const events = ref([
   {
@@ -544,7 +544,7 @@ const events = ref([
 ### React
 
 ```tsx
-import { Timeline, Tag, Icon } from '@tigercat/react'
+import { Timeline, Tag, Icon } from '@expcat/tigercat-react'
 
 function App() {
   const events = [

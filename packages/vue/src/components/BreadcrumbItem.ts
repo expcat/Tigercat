@@ -5,7 +5,7 @@ import {
   getBreadcrumbSeparatorClasses,
   getSeparatorContent,
   type BreadcrumbSeparator
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { BreadcrumbContextKey, type BreadcrumbContext } from './Breadcrumb'
 
 export interface VueBreadcrumbItemProps {

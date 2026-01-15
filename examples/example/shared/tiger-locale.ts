@@ -1,4 +1,4 @@
-import type { TigerLocale } from '@tigercat/core'
+import type { TigerLocale } from '@expcat/tigercat-core'
 import type { DemoLang } from './app-config'
 
 export function getDemoTigerLocale(lang: DemoLang): Partial<TigerLocale> {

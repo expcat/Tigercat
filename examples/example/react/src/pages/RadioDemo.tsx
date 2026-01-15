@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Radio, RadioGroup, Space, Divider } from '@tigercat/react'
+import { Radio, RadioGroup, Space, Divider } from '@expcat/tigercat-react'
 
 const RadioDemo: React.FC = () => {
   const [basicValue, setBasicValue] = useState<string | number>('male')

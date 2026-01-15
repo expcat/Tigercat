@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { reactive } from 'vue'
-import { Form, FormItem } from '@tigercat/vue'
+import { Form, FormItem } from '@expcat/tigercat-vue'
 
 const formData = reactive({
   username: '',
@@ -46,7 +46,7 @@ const handleSubmit = ({ valid, values }) => {
 
 ```tsx
 import { useState, useRef } from 'react'
-import { Form, FormItem, FormHandle } from '@tigercat/react'
+import { Form, FormItem, FormHandle } from '@expcat/tigercat-react'
 
 function App() {
   const [formData, setFormData] = useState({
@@ -105,7 +105,7 @@ function App() {
 ```vue
 <script setup>
 import { reactive, ref } from 'vue'
-import { Form, FormItem } from '@tigercat/vue'
+import { Form, FormItem } from '@expcat/tigercat-vue'
 
 const formRef = ref()
 
@@ -171,7 +171,7 @@ const validateManually = async () => {
 
 ```tsx
 import { useState, useRef } from 'react'
-import { Form, FormItem, FormHandle, FormRules } from '@tigercat/react'
+import { Form, FormItem, FormHandle, FormRules } from '@expcat/tigercat-react'
 
 function App() {
   const formRef = useRef<FormHandle>(null)
@@ -255,7 +255,7 @@ function App() {
 ```vue
 <script setup>
 import { reactive } from 'vue'
-import { Form, FormItem } from '@tigercat/vue'
+import { Form, FormItem } from '@expcat/tigercat-vue'
 
 const formData = reactive({
   password: '',
@@ -308,7 +308,7 @@ const rules = {
 
 ```tsx
 import { useState } from 'react'
-import { Form, FormItem, FormRules } from '@tigercat/react'
+import { Form, FormItem, FormRules } from '@expcat/tigercat-react'
 
 function App() {
   const [formData, setFormData] = useState({
@@ -584,13 +584,13 @@ import type {
   FormLabelAlign,
   FormLabelPosition,
   FormSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Vue
-import type { Form, FormItem } from '@tigercat/vue'
+import type { Form, FormItem } from '@expcat/tigercat-vue'
 
 // React
-import type { Form, FormItem, FormHandle, FormSubmitEvent, FormContextValue } from '@tigercat/react'
+import type { Form, FormItem, FormHandle, FormSubmitEvent, FormContextValue } from '@expcat/tigercat-react'
 ```
 
 ## 样式定制
@@ -675,7 +675,7 @@ Form 组件使用标准的 CSS 类名，可以通过覆盖这些类名来自定�
 ```vue
 <script setup>
 import { reactive, ref } from 'vue'
-import { Form, FormItem, Button } from '@tigercat/vue'
+import { Form, FormItem, Button } from '@expcat/tigercat-vue'
 
 const formRef = ref()
 const loading = ref(false)
@@ -784,7 +784,7 @@ const handleReset = () => {
 
 ```tsx
 import { useState, useRef } from 'react'
-import { Form, FormItem, Button, FormHandle, FormRules } from '@tigercat/react'
+import { Form, FormItem, Button, FormHandle, FormRules } from '@expcat/tigercat-react'
 
 function RegistrationForm() {
   const formRef = useRef<FormHandle>(null)

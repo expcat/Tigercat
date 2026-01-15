@@ -8,15 +8,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@demo-shared': path.resolve(__dirname, '../shared'),
-      '@tigercat/vue': path.resolve(
+      '@expcat/tigercat-vue': path.resolve(
         path.resolve(__dirname, '../../..'),
         'packages/vue/src/index.ts'
       ),
-      '@tigercat/vue/': `${path.resolve(
+      '@expcat/tigercat-vue/': `${path.resolve(
         path.resolve(__dirname, '../../..'),
         'packages/vue/src/components'
       )}/`,
-      '@tigercat/core': path.resolve(
+      '@expcat/tigercat-core': path.resolve(
         path.resolve(__dirname, '../../..'),
         'packages/core/src/index.ts'
       )

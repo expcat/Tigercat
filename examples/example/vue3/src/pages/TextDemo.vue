@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Text, Space, Divider } from '@tigercat/vue'
+import { Text, Space, Divider } from '@expcat/tigercat-vue'
 </script>
 
 <template>

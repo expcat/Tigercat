@@ -5,7 +5,7 @@ import {
   getInputClasses,
   type InputSize,
   type InputType
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueInputProps {
   modelValue?: string | number

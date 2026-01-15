@@ -24,7 +24,7 @@ import {
   type NotificationInstance,
   type NotificationOptions,
   type NotificationConfig
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 /**
  * Global notification container id prefix

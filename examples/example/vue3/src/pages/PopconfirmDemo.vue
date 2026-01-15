@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Popconfirm, Button, Space, Divider } from '@tigercat/vue'
+import { Popconfirm, Button, Space, Divider } from '@expcat/tigercat-vue'
 
 const visible1 = ref(false)
 

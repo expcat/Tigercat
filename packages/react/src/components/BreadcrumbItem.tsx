@@ -5,7 +5,7 @@ import {
   getBreadcrumbSeparatorClasses,
   getSeparatorContent,
   type BreadcrumbItemProps as CoreBreadcrumbItemProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { useBreadcrumbContext } from './Breadcrumb'
 
 export interface BreadcrumbItemProps

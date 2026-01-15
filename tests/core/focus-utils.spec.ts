@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { captureActiveElement, focusElement, focusFirst, restoreFocus } from '@tigercat/core'
+import { captureActiveElement, focusElement, focusFirst, restoreFocus } from '@expcat/tigercat-core'
 
 describe('focus-utils', () => {
   it('captures and restores the active element', () => {

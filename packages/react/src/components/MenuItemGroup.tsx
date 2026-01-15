@@ -2,7 +2,7 @@ import React from 'react'
 import {
   menuItemGroupTitleClasses,
   type MenuItemGroupProps as CoreMenuItemGroupProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { MenuItem } from './MenuItem'
 
 function isComponentNamed(elementType: unknown, name: string): boolean {

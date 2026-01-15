@@ -15,7 +15,7 @@ import {
   type DescriptionsSize,
   type DescriptionsLayout,
   type DescriptionsItem
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface DescriptionsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   /**

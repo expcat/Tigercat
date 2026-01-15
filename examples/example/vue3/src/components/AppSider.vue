@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { DEMO_NAV_GROUPS, type DemoLang, type DemoNavGroup } from '@demo-shared/app-config'
-import { Button } from '@tigercat/vue'
+import { Button } from '@expcat/tigercat-vue'
 import {
   getStoredCollapsedNavGroups,
   getStoredSiderCollapsed,

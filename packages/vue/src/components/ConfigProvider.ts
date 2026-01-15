@@ -7,7 +7,7 @@ import {
   type InjectionKey,
   type PropType
 } from 'vue'
-import { mergeTigerLocale, type TigerLocale } from '@tigercat/core'
+import { mergeTigerLocale, type TigerLocale } from '@expcat/tigercat-core'
 
 export interface TigerConfig {
   locale?: Partial<TigerLocale>

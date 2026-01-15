@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Textarea, Space, Divider, FormItem } from '@tigercat/vue'
+import { Textarea, Space, Divider, FormItem } from '@expcat/tigercat-vue'
 
 const text = ref('')
 const autoResizeText = ref('')

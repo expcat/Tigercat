@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Badge, Space, Divider, Button } from '@tigercat/react'
+import { Badge, Space, Divider, Button } from '@expcat/tigercat-react'
 
 export default function BadgeDemo() {
   const [notificationCount, setNotificationCount] = useState(5)

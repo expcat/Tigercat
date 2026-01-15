@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
-import { Upload, ConfigProvider } from '@tigercat/vue'
+import { Upload, ConfigProvider } from '@expcat/tigercat-vue'
 import { defineComponent, h } from 'vue'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
 

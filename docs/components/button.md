@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Button } from '@tigercat/vue'
+import { Button } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Button } from '@tigercat/react'
+import { Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -148,7 +148,7 @@ Button 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { Button } from '@tigercat/vue'
+import { Button } from '@expcat/tigercat-vue'
 
 const handleClick = (event) => {
   console.log('Button clicked!', event)
@@ -163,7 +163,7 @@ const handleClick = (event) => {
 ### React
 
 ```tsx
-import { Button } from '@tigercat/react'
+import { Button } from '@expcat/tigercat-react'
 
 function App() {
   const handleClick = (event) => {
@@ -247,7 +247,7 @@ Button 组件支持通过 CSS 变量自定义主题颜色，可以实现实时�
 
 ```vue
 <script setup>
-import { Button, setThemeColors } from '@tigercat/vue'
+import { Button, setThemeColors } from '@expcat/tigercat-vue'
 
 const switchTheme = () => {
   setThemeColors({
@@ -266,7 +266,7 @@ const switchTheme = () => {
 **React:**
 
 ```tsx
-import { Button, setThemeColors } from '@tigercat/react'
+import { Button, setThemeColors } from '@expcat/tigercat-react'
 
 function App() {
   const switchTheme = () => {
@@ -303,11 +303,11 @@ React 版本的 Button 组件支持 `className` 属性，可以传入额外的 C
 Button 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { ButtonVariant, ButtonSize } from '@tigercat/core'
+import type { ButtonVariant, ButtonSize } from '@expcat/tigercat-core'
 // Vue
-import type { VueButtonProps } from '@tigercat/vue'
+import type { VueButtonProps } from '@expcat/tigercat-vue'
 // React
-import type { ButtonProps } from '@tigercat/react'
+import type { ButtonProps } from '@expcat/tigercat-react'
 ```
 
 ## 示例
@@ -319,7 +319,7 @@ import type { ButtonProps } from '@tigercat/react'
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Button } from '@tigercat/vue'
+import { Button } from '@expcat/tigercat-vue'
 
 const loading = ref(false)
 
@@ -345,7 +345,7 @@ const handleSubmit = async () => {
 
 ```tsx
 import { useState } from 'react'
-import { Button } from '@tigercat/react'
+import { Button } from '@expcat/tigercat-react'
 
 function FormExample() {
   const [loading, setLoading] = useState(false)

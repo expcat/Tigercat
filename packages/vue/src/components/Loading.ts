@@ -18,7 +18,7 @@ import {
   type LoadingVariant,
   type LoadingSize,
   type LoadingColor
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueLoadingProps {
   variant?: LoadingVariant

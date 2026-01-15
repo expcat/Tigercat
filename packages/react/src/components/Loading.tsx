@@ -13,7 +13,7 @@ import {
   loadingColorClasses,
   injectLoadingAnimationStyles,
   type LoadingProps as CoreLoadingProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface LoadingProps
   extends CoreLoadingProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreLoadingProps> {}

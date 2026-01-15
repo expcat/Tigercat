@@ -4,7 +4,7 @@ import {
   type FormSize,
   type FormItemProps as CoreFormItemProps,
   getFieldError
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { useFormContext } from './Form'
 
 export interface FormItemProps extends CoreFormItemProps {

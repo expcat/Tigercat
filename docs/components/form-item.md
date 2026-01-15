@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Form, FormItem, Input, Button } from '@tigercat/vue'
+import { Form, FormItem, Input, Button } from '@expcat/tigercat-vue'
 
 const formData = ref({
   username: '',
@@ -38,7 +38,7 @@ const formData = ref({
 
 ```tsx
 import { useState } from 'react'
-import { Form, FormItem, Input, Button } from '@tigercat/react'
+import { Form, FormItem, Input, Button } from '@expcat/tigercat-react'
 
 function App() {
   const [formData, setFormData] = useState({
@@ -166,7 +166,7 @@ FormItem 支持多种验证规则。
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Form, FormItem, Input, Button } from '@tigercat/vue'
+import { Form, FormItem, Input, Button } from '@expcat/tigercat-vue'
 
 const formData = ref({
   username: '',
@@ -220,7 +220,7 @@ const confirmPasswordRules = [
 
 ```tsx
 import { useState } from 'react'
-import { Form, FormItem, Input, Button } from '@tigercat/react'
+import { Form, FormItem, Input, Button } from '@expcat/tigercat-react'
 
 function RegistrationForm() {
   const [formData, setFormData] = useState({
@@ -289,7 +289,7 @@ function RegistrationForm() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Form, FormItem, Input } from '@tigercat/vue'
+import { Form, FormItem, Input } from '@expcat/tigercat-vue'
 
 const formData = ref({ email: '' })
 const emailError = ref('')
@@ -316,7 +316,7 @@ const validateEmail = () => {
 
 ```tsx
 import { useState } from 'react'
-import { Form, FormItem, Input } from '@tigercat/react'
+import { Form, FormItem, Input } from '@expcat/tigercat-react'
 
 function CustomErrorExample() {
   const [formData, setFormData] = useState({ email: '' })
@@ -384,7 +384,7 @@ function CustomErrorExample() {
 
 ### FormRule 验证规则
 
-`FormRule` 来自 `@tigercat/core`，支持 `required/min/max/pattern/type/validator/trigger/transform`。
+`FormRule` 来自 `@expcat/tigercat-core`，支持 `required/min/max/pattern/type/validator/trigger/transform`。
 
 - `trigger`：`'blur' | 'change' | 'submit'`
 - 默认 `trigger`：`['change', 'blur']`
@@ -615,11 +615,11 @@ FormItem 使用以下 CSS 类名，可以自定义样式：
 FormItem 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { FormItemProps, FormRule } from '@tigercat/core'
+import type { FormItemProps, FormRule } from '@expcat/tigercat-core'
 // Vue
-import type { FormItem } from '@tigercat/vue'
+import type { FormItem } from '@expcat/tigercat-vue'
 // React
-import { FormItem } from '@tigercat/react'
+import { FormItem } from '@expcat/tigercat-react'
 ```
 
 ## 相关组件
@@ -639,7 +639,7 @@ import { FormItem } from '@tigercat/react'
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Form, FormItem, Input, Select, Checkbox, Button } from '@tigercat/vue'
+import { Form, FormItem, Input, Select, Checkbox, Button } from '@expcat/tigercat-vue'
 
 const formRef = ref(null)
 const formData = ref({

@@ -9,7 +9,7 @@ import {
   type SkeletonVariant,
   type SkeletonAnimation,
   type SkeletonShape
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueSkeletonProps {
   variant?: SkeletonVariant

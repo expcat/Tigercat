@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Alert, Divider, Button, List } from '@tigercat/react'
+import { Alert, Divider, Button, List } from '@expcat/tigercat-react'
 
 export default function AlertDemo() {
   const [showAlert1, setShowAlert1] = useState(true)

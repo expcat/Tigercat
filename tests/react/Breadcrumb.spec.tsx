@@ -6,7 +6,7 @@ import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react'
 
 describe('Breadcrumb', () => {
   describe('Rendering', () => {

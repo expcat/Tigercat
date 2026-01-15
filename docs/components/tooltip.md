@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { Tooltip, Button } from '@tigercat/vue'
+import { Tooltip, Button } from '@expcat/tigercat-vue'
 </script>
 ```
 
@@ -24,7 +24,7 @@ import { Tooltip, Button } from '@tigercat/vue'
 
 ```tsx
 import React from 'react'
-import { Tooltip, Button } from '@tigercat/react'
+import { Tooltip, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -73,7 +73,7 @@ function App() {
 </template>
 
 <script setup>
-import { Tooltip, Button } from '@tigercat/vue'
+import { Tooltip, Button } from '@expcat/tigercat-vue'
 </script>
 ```
 
@@ -81,7 +81,7 @@ import { Tooltip, Button } from '@tigercat/vue'
 
 ```tsx
 import React from 'react'
-import { Tooltip, Button } from '@tigercat/react'
+import { Tooltip, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -138,7 +138,7 @@ function App() {
 </template>
 
 <script setup>
-import { Tooltip, Button } from '@tigercat/vue'
+import { Tooltip, Button } from '@expcat/tigercat-vue'
 </script>
 ```
 
@@ -146,7 +146,7 @@ import { Tooltip, Button } from '@tigercat/vue'
 
 ```tsx
 import React from 'react'
-import { Tooltip, Button } from '@tigercat/react'
+import { Tooltip, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -189,7 +189,7 @@ function App() {
 </template>
 
 <script setup>
-import { Tooltip, Button } from '@tigercat/vue'
+import { Tooltip, Button } from '@expcat/tigercat-vue'
 </script>
 ```
 
@@ -197,7 +197,7 @@ import { Tooltip, Button } from '@tigercat/vue'
 
 ```tsx
 import React from 'react'
-import { Tooltip, Button } from '@tigercat/react'
+import { Tooltip, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -237,7 +237,7 @@ function App() {
 
 <script setup>
 import { ref } from 'vue'
-import { Tooltip, Button } from '@tigercat/vue'
+import { Tooltip, Button } from '@expcat/tigercat-vue'
 
 const visible = ref(false)
 </script>
@@ -247,7 +247,7 @@ const visible = ref(false)
 
 ```tsx
 import React, { useState } from 'react'
-import { Tooltip, Button } from '@tigercat/react'
+import { Tooltip, Button } from '@expcat/tigercat-react'
 
 function App() {
   const [visible, setVisible] = useState(false)
@@ -284,7 +284,7 @@ function App() {
 </template>
 
 <script setup>
-import { Tooltip, Button } from '@tigercat/vue'
+import { Tooltip, Button } from '@expcat/tigercat-vue'
 </script>
 ```
 
@@ -292,7 +292,7 @@ import { Tooltip, Button } from '@tigercat/vue'
 
 ```tsx
 import React from 'react'
-import { Tooltip, Button } from '@tigercat/react'
+import { Tooltip, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (

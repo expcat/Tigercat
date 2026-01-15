@@ -1,5 +1,5 @@
 import React from 'react'
-import { getContainerClasses, type ContainerProps as CoreContainerProps } from '@tigercat/core'
+import { getContainerClasses, type ContainerProps as CoreContainerProps } from '@expcat/tigercat-core'
 
 export interface ContainerProps extends CoreContainerProps, React.HTMLAttributes<HTMLElement> {
   /**

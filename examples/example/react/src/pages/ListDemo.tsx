@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { List, Card, Space, Divider, Button, type ListProps } from '@tigercat/react'
+import { List, Card, Space, Divider, Button, type ListProps } from '@expcat/tigercat-react'
 
 export default function ListDemo() {
   type DemoItem = NonNullable<ListProps['dataSource']>[number]

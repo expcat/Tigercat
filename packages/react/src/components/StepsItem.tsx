@@ -15,7 +15,7 @@ import {
   stepFinishIconPathStrokeLinejoin,
   stepFinishIconPathStrokeWidth,
   type StepStatus
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { useStepsContext } from './Steps'
 
 export interface StepsItemProps extends Omit<

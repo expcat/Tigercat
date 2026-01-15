@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, fireEvent, waitFor } from '@testing-library/vue'
-import { TimePicker } from '@tigercat/vue'
+import { TimePicker } from '@expcat/tigercat-vue'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
 
 describe('TimePicker', () => {

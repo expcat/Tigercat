@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Checkbox, CheckboxGroup, Space, Divider } from '@tigercat/react'
+import { Checkbox, CheckboxGroup, Space, Divider } from '@expcat/tigercat-react'
 
 const CheckboxDemo: React.FC = () => {
   const [checked, setChecked] = useState(false)

@@ -14,7 +14,7 @@ import {
   getPageSizeSelectorClasses,
   getTotalTextClasses,
   type PaginationProps as CorePaginationProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface PaginationProps
   extends Omit<CorePaginationProps, 'style'>, Omit<React.HTMLAttributes<HTMLElement>, 'onChange'> {

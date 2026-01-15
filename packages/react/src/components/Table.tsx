@@ -23,7 +23,7 @@ import {
   type TableProps as CoreTableProps,
   type SortState,
   type PaginationConfig
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 const spinnerSvg = getSpinnerSVG('spinner')
 

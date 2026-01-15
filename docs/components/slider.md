@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Slider } from '@tigercat/vue'
+import { Slider } from '@expcat/tigercat-vue'
 
 const value = ref(50)
 </script>
@@ -23,7 +23,7 @@ const value = ref(50)
 
 ```tsx
 import { useState } from 'react'
-import { Slider } from '@tigercat/react'
+import { Slider } from '@expcat/tigercat-react'
 
 function App() {
   const [value, setValue] = useState(50)
@@ -41,7 +41,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Slider } from '@tigercat/vue'
+import { Slider } from '@expcat/tigercat-vue'
 
 const rangeValue = ref([20, 80])
 </script>
@@ -55,7 +55,7 @@ const rangeValue = ref([20, 80])
 
 ```tsx
 import { useState } from 'react'
-import { Slider } from '@tigercat/react'
+import { Slider } from '@expcat/tigercat-react'
 
 function App() {
   const [rangeValue, setRangeValue] = useState([20, 80])
@@ -183,7 +183,7 @@ Slider 组件支持 3 种不同的尺寸：
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Slider } from '@tigercat/vue'
+import { Slider } from '@expcat/tigercat-vue'
 
 // 受控组件
 const value = ref(50)
@@ -204,7 +204,7 @@ const value = ref(50)
 
 ```tsx
 import { useState } from 'react'
-import { Slider } from '@tigercat/react'
+import { Slider } from '@expcat/tigercat-react'
 
 function App() {
   // 受控组件
@@ -319,11 +319,11 @@ Slider 组件支持键盘导航：
 Slider 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { SliderProps, SliderSize } from '@tigercat/core'
+import type { SliderProps, SliderSize } from '@expcat/tigercat-core'
 // Vue
-import type { Slider, VueSliderProps } from '@tigercat/vue'
+import type { Slider, VueSliderProps } from '@expcat/tigercat-vue'
 // React
-import type { Slider, SliderProps as ReactSliderProps } from '@tigercat/react'
+import type { Slider, SliderProps as ReactSliderProps } from '@expcat/tigercat-react'
 ```
 
 ## 示例
@@ -335,7 +335,7 @@ import type { Slider, SliderProps as ReactSliderProps } from '@tigercat/react'
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Slider } from '@tigercat/vue'
+import { Slider } from '@expcat/tigercat-vue'
 
 const temperature = ref(22)
 </script>
@@ -363,7 +363,7 @@ const temperature = ref(22)
 
 ```tsx
 import { useState } from 'react'
-import { Slider } from '@tigercat/react'
+import { Slider } from '@expcat/tigercat-react'
 
 function TemperatureControl() {
   const [temperature, setTemperature] = useState(22)
@@ -397,7 +397,7 @@ function TemperatureControl() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Slider } from '@tigercat/vue'
+import { Slider } from '@expcat/tigercat-vue'
 
 const priceRange = ref([200, 800])
 </script>
@@ -424,7 +424,7 @@ const priceRange = ref([200, 800])
 
 ```tsx
 import { useState } from 'react'
-import { Slider } from '@tigercat/react'
+import { Slider } from '@expcat/tigercat-react'
 
 function PriceRangeSelector() {
   const [priceRange, setPriceRange] = useState<[number, number]>([200, 800])
@@ -459,7 +459,7 @@ function PriceRangeSelector() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Slider } from '@tigercat/vue'
+import { Slider } from '@expcat/tigercat-vue'
 
 const volume = ref(50)
 </script>
@@ -478,7 +478,7 @@ const volume = ref(50)
 
 ```tsx
 import { useState } from 'react'
-import { Slider } from '@tigercat/react'
+import { Slider } from '@expcat/tigercat-react'
 
 function VolumeControl() {
   const [volume, setVolume] = useState(50)

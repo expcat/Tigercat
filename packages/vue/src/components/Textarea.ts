@@ -6,7 +6,7 @@ import {
   getInputClasses,
   mergeStyleValues,
   type TextareaSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueTextareaProps {
   modelValue?: string

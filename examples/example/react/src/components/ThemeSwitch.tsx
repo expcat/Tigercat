@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Select } from '@tigercat/react'
+import { Select } from '@expcat/tigercat-react'
 import { themes, applyTheme } from '@demo-shared/themes'
 import { getStoredTheme, setStoredTheme } from '@demo-shared/prefs'
 import type { DemoLang } from '@demo-shared/app-config'

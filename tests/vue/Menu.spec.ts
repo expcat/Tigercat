@@ -6,7 +6,7 @@ import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { waitFor } from '@testing-library/vue'
 import { h } from 'vue'
-import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
+import { Menu, MenuItem, SubMenu } from '@expcat/tigercat-vue'
 
 describe('Menu', () => {
   it('renders items and basic roles', () => {

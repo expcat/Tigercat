@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -23,7 +23,7 @@ import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -44,7 +44,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -74,7 +74,7 @@ import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -112,7 +112,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -127,7 +127,7 @@ import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -152,7 +152,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Breadcrumb, BreadcrumbItem, Icon } from '@tigercat/vue'
+import { Breadcrumb, BreadcrumbItem, Icon } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -176,7 +176,7 @@ import { Breadcrumb, BreadcrumbItem, Icon } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -203,7 +203,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -218,7 +218,7 @@ import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -241,7 +241,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-vue'
 
 const handleClick = (event) => {
   console.log('Breadcrumb item clicked', event)
@@ -260,7 +260,7 @@ const handleClick = (event) => {
 ### React
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react'
 
 function App() {
   const handleClick = (event) => {
@@ -291,7 +291,7 @@ function App() {
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-vue'
 
 const route = useRoute()
 
@@ -321,7 +321,7 @@ const breadcrumbs = computed(() => {
 ### React
 
 ```tsx
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/react'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react'
 import { useLocation } from 'react-router-dom'
 
 function App() {

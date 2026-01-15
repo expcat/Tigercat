@@ -8,15 +8,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@demo-shared': path.resolve(__dirname, '../shared'),
-      '@tigercat/react': path.resolve(
+      '@expcat/tigercat-react': path.resolve(
         path.resolve(__dirname, '../../..'),
         'packages/react/src/index.tsx'
       ),
-      '@tigercat/react/': `${path.resolve(
+      '@expcat/tigercat-react/': `${path.resolve(
         path.resolve(__dirname, '../../..'),
         'packages/react/src/components'
       )}/`,
-      '@tigercat/core': path.resolve(
+      '@expcat/tigercat-core': path.resolve(
         path.resolve(__dirname, '../../..'),
         'packages/core/src/index.ts'
       )

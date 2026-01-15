@@ -15,7 +15,7 @@ import {
   type SelectProps as CoreSelectProps,
   type SelectValue,
   type SelectValues
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 const flattenSelectOptions = (options: SelectOptions): SelectOption[] => {
   const all: SelectOption[] = []

@@ -8,7 +8,7 @@ import {
   getSliderTrackClasses,
   getSliderThumbClasses,
   getSliderTooltipClasses
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface SliderProps
   extends

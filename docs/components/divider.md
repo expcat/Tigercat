@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Divider } from '@tigercat/vue'
+import { Divider } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -23,7 +23,7 @@ import { Divider } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Divider } from '@tigercat/react'
+import { Divider } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -319,13 +319,13 @@ import type {
   DividerOrientation,
   DividerLineStyle,
   DividerSpacing
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Vue
-import type { Divider } from '@tigercat/vue'
+import type { Divider } from '@expcat/tigercat-vue'
 
 // React
-import type { Divider, DividerProps as ReactDividerProps } from '@tigercat/react'
+import type { Divider, DividerProps as ReactDividerProps } from '@expcat/tigercat-react'
 ```
 
 ## 示例
@@ -336,7 +336,7 @@ import type { Divider, DividerProps as ReactDividerProps } from '@tigercat/react
 
 ```vue
 <script setup>
-import { Divider } from '@tigercat/vue'
+import { Divider } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -355,7 +355,7 @@ import { Divider } from '@tigercat/vue'
 #### React
 
 ```tsx
-import { Divider } from '@tigercat/react'
+import { Divider } from '@expcat/tigercat-react'
 
 function CardExample() {
   return (

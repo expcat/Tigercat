@@ -16,7 +16,7 @@ import {
   type TimelineMode,
   type TimelineItem,
   type TimelineItemPosition
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 type HChildren = Parameters<typeof h>[2]
 

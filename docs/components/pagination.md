@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { Pagination } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 const total = ref(100)
@@ -24,7 +24,7 @@ const total = ref(100)
 
 ```tsx
 import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { Pagination } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -43,7 +43,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { Pagination } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 </script>
@@ -57,7 +57,7 @@ const current = ref(1)
 
 ```tsx
 import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { Pagination } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -77,7 +77,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { Pagination } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 const pageSize = ref(10)
@@ -102,7 +102,7 @@ const handlePageSizeChange = (newCurrent, newPageSize) => {
 
 ```tsx
 import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { Pagination } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -137,7 +137,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { Pagination } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 </script>
@@ -151,7 +151,7 @@ const current = ref(1)
 
 ```tsx
 import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { Pagination } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -169,7 +169,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { Pagination } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 </script>
@@ -189,7 +189,7 @@ const current = ref(1)
 
 ```tsx
 import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { Pagination } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -215,7 +215,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { Pagination } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 </script>
@@ -235,7 +235,7 @@ const current = ref(1)
 
 ```tsx
 import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { Pagination } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -261,7 +261,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { Pagination } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 
@@ -288,7 +288,7 @@ const customTotalText = (total, range) => {
 
 ```tsx
 import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { Pagination } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -321,7 +321,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { Pagination } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 </script>
@@ -335,7 +335,7 @@ const current = ref(1)
 
 ```tsx
 import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { Pagination } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -355,7 +355,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { Pagination } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 </script>
@@ -369,7 +369,7 @@ const current = ref(1)
 
 ```tsx
 import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { Pagination } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -387,7 +387,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Pagination } from '@tigercat/vue'
+import { Pagination } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 const pageSize = ref(10)
@@ -426,7 +426,7 @@ const customTotalText = (total, range) => {
 
 ```tsx
 import { useState } from 'react'
-import { Pagination } from '@tigercat/react'
+import { Pagination } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -527,7 +527,7 @@ Pagination 组件使用 CSS 变量进行主题定制。你可以通过设置以�
 或使用 JavaScript:
 
 ```typescript
-import { setThemeColors } from '@tigercat/core'
+import { setThemeColors } from '@expcat/tigercat-core'
 
 setThemeColors({
   primary: '#10b981',

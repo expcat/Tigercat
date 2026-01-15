@@ -11,7 +11,7 @@ import {
   submenuContentVerticalClasses,
   submenuContentInlineClasses,
   type SubMenuProps as CoreSubMenuProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { useMenuContext } from './Menu'
 import { MenuItem } from './MenuItem'
 import { MenuItemGroup } from './MenuItemGroup'

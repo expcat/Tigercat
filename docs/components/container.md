@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Container } from '@tigercat/vue'
+import { Container } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -22,7 +22,7 @@ import { Container } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Container } from '@tigercat/react'
+import { Container } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -482,11 +482,11 @@ Container 组件使用 Tailwind CSS 构建，可以通过传入额外的 CSS 类
 Container 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { ContainerProps, ContainerMaxWidth } from '@tigercat/core'
+import type { ContainerProps, ContainerMaxWidth } from '@expcat/tigercat-core'
 // Vue
-import type { Container } from '@tigercat/vue'
+import type { Container } from '@expcat/tigercat-vue'
 // React
-import type { Container, ContainerProps as ReactContainerProps } from '@tigercat/react'
+import type { Container, ContainerProps as ReactContainerProps } from '@expcat/tigercat-react'
 ```
 
 ## 最佳实践
@@ -511,7 +511,7 @@ import type { Container, ContainerProps as ReactContainerProps } from '@tigercat
 
 ```vue
 <script setup>
-import { Container, Button } from '@tigercat/vue'
+import { Container, Button } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -562,7 +562,7 @@ import { Container, Button } from '@tigercat/vue'
 #### React
 
 ```tsx
-import { Container, Button } from '@tigercat/react'
+import { Container, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (

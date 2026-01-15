@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, waitFor } from '@testing-library/react'
-import { message } from '@tigercat/react'
+import { message } from '@expcat/tigercat-react'
 
 const messageTypes = ['success', 'warning', 'error', 'info', 'loading'] as const
 

@@ -26,7 +26,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Modal, Button, Space } from '@tigercat/vue'
+import { Modal, Button, Space } from '@expcat/tigercat-vue'
 
 const visible = ref(false)
 </script>
@@ -36,7 +36,7 @@ const visible = ref(false)
 
 ```tsx
 import React, { useState } from 'react'
-import { Modal, Button } from '@tigercat/react'
+import { Modal, Button } from '@expcat/tigercat-react'
 
 function App() {
   const [visible, setVisible] = useState(false)
@@ -160,7 +160,7 @@ Modal 提供了多种尺寸选项：`sm`、`md`（默认）、`lg`、`xl`、`ful
 
 <script setup>
 import { ref } from "vue";
-import { Modal, Button } from "@tigercat/vue";
+import { Modal, Button } from "@expcat/tigercat-vue";
 
 const visible = ref(false);
 const size = ref("md");
@@ -176,7 +176,7 @@ const showModal = (newSize) => {
 
 ```tsx
 import React, { useState } from 'react'
-import { Modal, Button } from '@tigercat/react'
+import { Modal, Button } from '@expcat/tigercat-react'
 
 function App() {
   const [visible, setVisible] = useState(false)

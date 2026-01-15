@@ -21,7 +21,7 @@ import {
   validateForm,
   validateField as validateFieldUtil,
   getValueByPath
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Form context type
 export interface FormContextValue {

@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from 'react'
-import { mergeTigerLocale, type TigerLocale } from '@tigercat/core'
+import { mergeTigerLocale, type TigerLocale } from '@expcat/tigercat-core'
 
 export interface TigerConfig {
   locale?: Partial<TigerLocale>

@@ -6,7 +6,7 @@ import {
   isKeySelected,
   menuItemIconClasses,
   type MenuItemProps as CoreMenuItemProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { useMenuContext } from './Menu'
 
 export interface MenuItemProps extends CoreMenuItemProps {

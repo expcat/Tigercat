@@ -7,7 +7,7 @@ import {
   type SpaceDirection,
   type SpaceSize,
   type SpaceAlign
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 const baseClasses = 'inline-flex'
 

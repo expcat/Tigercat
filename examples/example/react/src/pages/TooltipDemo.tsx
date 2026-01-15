@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Tooltip, Button, Space, Divider } from '@tigercat/react'
+import { Tooltip, Button, Space, Divider } from '@expcat/tigercat-react'
 
 export default function TooltipDemo() {
   const [visible1, setVisible1] = useState(false)

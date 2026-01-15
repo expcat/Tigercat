@@ -27,7 +27,7 @@ import {
   type SortState,
   type PaginationConfig,
   type RowSelectionConfig
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 const spinnerSvg = getSpinnerSVG('spinner')
 

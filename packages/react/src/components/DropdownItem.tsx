@@ -3,7 +3,7 @@ import {
   classNames,
   getDropdownItemClasses,
   type DropdownItemProps as CoreDropdownItemProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { DropdownContext } from './Dropdown'
 
 export interface DropdownItemProps

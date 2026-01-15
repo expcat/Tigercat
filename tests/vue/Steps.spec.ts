@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
-import { Steps, StepsItem } from '@tigercat/vue'
+import { Steps, StepsItem } from '@expcat/tigercat-vue'
 
 describe('Steps', () => {
   describe('Rendering', () => {

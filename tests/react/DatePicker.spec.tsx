@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { DatePicker } from '@tigercat/react'
+import { DatePicker } from '@expcat/tigercat-react'
 import { expectNoA11yViolations, componentSizes } from '../utils/react'
 
 describe('DatePicker', () => {

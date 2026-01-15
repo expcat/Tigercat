@@ -24,7 +24,7 @@ import {
   submenuContentPopupClasses,
   submenuContentVerticalClasses,
   submenuContentInlineClasses
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { MenuContextKey, type MenuContext } from './Menu'
 
 export interface VueSubMenuProps {

@@ -36,7 +36,7 @@ import {
   type TimePickerRangeValue as CoreTimePickerRangeValue,
   type TimePickerSingleValue,
   type TimePickerProps as CoreTimePickerProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Helper component to render SVG icon
 const Icon: React.FC<{ path: string; className: string }> = ({ path, className }) => (

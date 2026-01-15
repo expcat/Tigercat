@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Menu, MenuItem, SubMenu } from '@tigercat/react'
+import { Menu, MenuItem, SubMenu } from '@expcat/tigercat-react'
 import React from 'react'
 
 describe('Menu', () => {

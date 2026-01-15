@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { List } from '@tigercat/vue'
+import { List } from '@expcat/tigercat-vue'
 
 const dataSource = ref([
   { key: 1, title: 'Item 1', description: 'Description for item 1' },
@@ -26,7 +26,7 @@ const dataSource = ref([
 ### React
 
 ```tsx
-import { List } from '@tigercat/react'
+import { List } from '@expcat/tigercat-react'
 
 function App() {
   const dataSource = [
@@ -100,7 +100,7 @@ List 组件支持 3 种边框样式：
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { List } from '@tigercat/vue'
+import { List } from '@expcat/tigercat-vue'
 
 const dataSource = ref([
   {
@@ -132,7 +132,7 @@ const dataSource = ref([
 ### React
 
 ```tsx
-import { List } from '@tigercat/react'
+import { List } from '@expcat/tigercat-react'
 
 function App() {
   const dataSource = [
@@ -169,7 +169,7 @@ function App() {
 ```vue
 <script setup>
 import { ref, h } from 'vue'
-import { List, Button } from '@tigercat/vue'
+import { List, Button } from '@expcat/tigercat-vue'
 
 const dataSource = ref([
   {
@@ -195,7 +195,7 @@ const dataSource = ref([
 ### React
 
 ```tsx
-import { List, Button } from '@tigercat/react'
+import { List, Button } from '@expcat/tigercat-react'
 
 function App() {
   const dataSource = [
@@ -226,7 +226,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { List, Button } from '@tigercat/vue'
+import { List, Button } from '@expcat/tigercat-vue'
 
 const dataSource = ref([
   { key: 1, name: 'Product A', price: '$99', stock: 15 },
@@ -256,7 +256,7 @@ const dataSource = ref([
 ### React
 
 ````tsx
-import { List, Button } from '@tigercat/react';
+import { List, Button } from '@expcat/tigercat-react';
 
 function App() {
   const dataSource = [
@@ -271,7 +271,7 @@ function App() {
 当你的 `dataSource` item 包含自定义字段（例如 `href`、`id`、`status` 等）时，建议为数据声明明确的类型（或直接给 `List` 指定泛型），这样在 `renderItem` / `onItemClick` 中可以获得完整的类型推断，避免字段被推断为 `unknown`。
 
 ```tsx
-import { Link, List } from '@tigercat/react'
+import { Link, List } from '@expcat/tigercat-react'
 
 type NavItem = {
   key: string
@@ -360,7 +360,7 @@ Buy
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { List } from '@tigercat/vue'
+import { List } from '@expcat/tigercat-vue'
 
 const dataSource = ref([
   // ... 大量数据项
@@ -389,7 +389,7 @@ function handlePageChange({ current, pageSize }) {
 
 ```tsx
 import { useState } from 'react'
-import { List } from '@tigercat/react'
+import { List } from '@expcat/tigercat-react'
 
 function App() {
   const dataSource = [
@@ -422,7 +422,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { List, Card } from '@tigercat/vue'
+import { List, Card } from '@expcat/tigercat-vue'
 
 const dataSource = ref([
   { key: 1, title: 'Card 1', content: 'Content 1' },
@@ -460,7 +460,7 @@ const grid = {
 ### React
 
 ```tsx
-import { List, Card } from '@tigercat/react'
+import { List, Card } from '@expcat/tigercat-react'
 
 function App() {
   const dataSource = [
@@ -505,7 +505,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { List } from '@tigercat/vue'
+import { List } from '@expcat/tigercat-vue'
 
 const loading = ref(true)
 const dataSource = ref([])
@@ -529,7 +529,7 @@ setTimeout(() => {
 
 ```tsx
 import { useState, useEffect } from 'react'
-import { List } from '@tigercat/react'
+import { List } from '@expcat/tigercat-react'
 
 function App() {
   const [loading, setLoading] = useState(true)
@@ -577,7 +577,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { List } from '@tigercat/vue'
+import { List } from '@expcat/tigercat-vue'
 
 const dataSource = ref([
   { key: 1, title: 'Item 1' },
@@ -598,7 +598,7 @@ function handleItemClick(item, index) {
 ### React
 
 ```tsx
-import { List } from '@tigercat/react'
+import { List } from '@expcat/tigercat-react'
 
 function App() {
   const dataSource = [

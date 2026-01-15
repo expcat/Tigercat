@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
-import { getRadioGroupClasses } from '@tigercat/core'
-import { type RadioGroupProps as CoreRadioGroupProps, type RadioSize } from '@tigercat/core'
+import { getRadioGroupClasses } from '@expcat/tigercat-core'
+import { type RadioGroupProps as CoreRadioGroupProps, type RadioSize } from '@expcat/tigercat-core'
 
 export interface RadioGroupProps
   extends

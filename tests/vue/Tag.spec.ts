@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { Tag } from '@tigercat/vue'
+import { Tag } from '@expcat/tigercat-vue'
 import { renderWithSlots, expectNoA11yViolations } from '../utils'
 
 describe('Tag', () => {

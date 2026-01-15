@@ -11,7 +11,7 @@ import {
   type TextWeight,
   type TextAlign,
   type TextColor
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueTextProps {
   tag?: TextTag

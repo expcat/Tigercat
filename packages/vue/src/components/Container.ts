@@ -1,5 +1,5 @@
 import { defineComponent, computed, h, PropType } from 'vue'
-import { getContainerClasses, type ContainerMaxWidth } from '@tigercat/core'
+import { getContainerClasses, type ContainerMaxWidth } from '@expcat/tigercat-core'
 
 export const Container = defineComponent({
   name: 'TigerContainer',

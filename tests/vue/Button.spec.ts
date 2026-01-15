@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { Button } from '@tigercat/vue'
+import { Button } from '@expcat/tigercat-vue'
 import { expectNoA11yViolations, setThemeVariables, clearThemeVariables } from '../utils'
 
 describe('Button', () => {

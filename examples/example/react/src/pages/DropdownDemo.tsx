@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Dropdown, DropdownMenu, DropdownItem, Button, Divider } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button, Divider } from '@expcat/tigercat-react'
 
 export default function DropdownDemo() {
   const [visible1, setVisible1] = useState(false)

@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { Switch } from '@tigercat/vue'
+import { Switch } from '@expcat/tigercat-vue'
 import {
   renderWithProps,
   expectNoA11yViolations,

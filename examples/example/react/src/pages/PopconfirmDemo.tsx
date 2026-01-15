@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Popconfirm, Button, Space, Divider } from '@tigercat/react'
+import { Popconfirm, Button, Space, Divider } from '@expcat/tigercat-react'
 
 export default function PopconfirmDemo() {
   const [visible1, setVisible1] = useState(false)

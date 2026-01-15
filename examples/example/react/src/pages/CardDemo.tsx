@@ -1,4 +1,4 @@
-import { Card, Space, Divider, Button } from '@tigercat/react'
+import { Card, Space, Divider, Button } from '@expcat/tigercat-react'
 
 export default function CardDemo() {
   return (

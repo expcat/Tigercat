@@ -10,7 +10,7 @@ import {
   cardCoverClasses,
   cardActionsClasses,
   type CardProps as CoreCardProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement>, CoreCardProps {
   /**

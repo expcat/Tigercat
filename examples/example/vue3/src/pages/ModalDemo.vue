@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Modal, Button, Space, Divider, Input } from '@tigercat/vue'
+import { Modal, Button, Space, Divider, Input } from '@expcat/tigercat-vue'
 
 const visible1 = ref(false)
 const visible2 = ref(false)

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Alert, Divider, Button, List } from '@tigercat/vue'
+import { Alert, Divider, Button, List } from '@expcat/tigercat-vue'
 
 const showAlert1 = ref(true)
 const showAlert2 = ref(true)

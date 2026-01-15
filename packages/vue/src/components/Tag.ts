@@ -15,7 +15,7 @@ import {
   tagCloseIconPath,
   type TagVariant,
   type TagSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueTagProps {
   variant?: TagVariant

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Popover, Button, Space, Divider, List } from '@tigercat/react'
+import { Popover, Button, Space, Divider, List } from '@expcat/tigercat-react'
 
 export default function PopoverDemo() {
   const [visible1, setVisible1] = useState(false)

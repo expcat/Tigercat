@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { Slider } from '@tigercat/vue'
+import { Slider } from '@expcat/tigercat-vue'
 import {
   renderWithProps,
   expectNoA11yViolations,

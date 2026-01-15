@@ -4,10 +4,10 @@ import {
   coerceClassValue,
   mergeStyleValues,
   getDropdownItemClasses
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { DropdownContextKey, type DropdownContext } from './Dropdown'
 
-import type { DropdownItemProps as CoreDropdownItemProps } from '@tigercat/core'
+import type { DropdownItemProps as CoreDropdownItemProps } from '@expcat/tigercat-core'
 
 export interface VueDropdownItemProps extends CoreDropdownItemProps {
   itemKey?: string | number

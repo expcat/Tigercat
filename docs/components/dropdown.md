@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -28,7 +28,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -52,7 +52,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -87,7 +87,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -124,7 +124,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -199,7 +199,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -268,7 +268,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -288,7 +288,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -312,7 +312,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -333,7 +333,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -356,7 +356,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from "@tigercat/vue";
+import { Dropdown, DropdownMenu, DropdownItem, Button } from "@expcat/tigercat-vue";
 
 const handleCommand = (command: string) => {
   console.log("点击了：", command);
@@ -380,7 +380,7 @@ const handleCommand = (command: string) => {
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-react'
 
 function App() {
   const handleCommand = (command: string) => {
@@ -409,7 +409,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-vue'
 
 const visible = ref(false)
 </script>
@@ -437,7 +437,7 @@ const visible = ref(false)
 
 ```tsx
 import { useState } from 'react'
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-react'
 
 function App() {
   const [visible, setVisible] = useState(false)
@@ -468,7 +468,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -488,7 +488,7 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Dropdown, DropdownMenu, DropdownItem, Button } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (

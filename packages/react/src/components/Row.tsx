@@ -5,7 +5,7 @@ import {
   getJustifyClasses,
   getGutterStyles,
   type RowProps as CoreRowProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export type RowProps = React.HTMLAttributes<HTMLDivElement> & CoreRowProps
 

@@ -6,7 +6,7 @@ import {
   Divider,
   type DrawerPlacement,
   type DrawerSize
-} from '@tigercat/react'
+} from '@expcat/tigercat-react'
 
 const DestroyOnCloseContent: React.FC = () => {
   const [value, setValue] = useState('')

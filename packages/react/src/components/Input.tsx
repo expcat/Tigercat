@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { classNames, getInputClasses, type InputProps as CoreInputProps } from '@tigercat/core'
+import { classNames, getInputClasses, type InputProps as CoreInputProps } from '@expcat/tigercat-core'
 
 export interface InputProps
   extends

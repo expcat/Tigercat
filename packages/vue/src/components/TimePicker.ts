@@ -50,7 +50,7 @@ import {
   type TimePickerRangeValue,
   type TimePickerSize,
   type TimeFormat
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Helper function to create SVG icon
 const createIcon = (path: string, className: string) => {

@@ -5,7 +5,7 @@ import {
   getSkeletonClasses,
   getSkeletonDimensions,
   type SkeletonProps as CoreSkeletonProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export type SkeletonProps = CoreSkeletonProps &
   Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>

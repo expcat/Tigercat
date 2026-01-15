@@ -10,7 +10,7 @@ import {
   closeIconPathStrokeLinecap,
   closeIconPathStrokeLinejoin,
   closeIconPathStrokeWidth
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { TabsContextKey, type TabsContext } from './Tabs'
 
 export interface VueTabPaneProps {

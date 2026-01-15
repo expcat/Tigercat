@@ -12,7 +12,7 @@ import {
   getInitials,
   type AvatarSize,
   type AvatarShape
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueAvatarProps {
   size?: AvatarSize

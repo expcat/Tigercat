@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Menu, MenuItem, SubMenu, MenuItemGroup, Divider, Button } from '@tigercat/vue'
+import { Menu, MenuItem, SubMenu, MenuItemGroup, Divider, Button } from '@expcat/tigercat-vue'
 
 const selectedKeys1 = ref(['1'])
 const selectedKeys2 = ref(['home'])

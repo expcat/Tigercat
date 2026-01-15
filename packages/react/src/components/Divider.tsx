@@ -5,7 +5,7 @@ import {
   getDividerLineStyleClasses,
   getDividerOrientationClasses,
   type DividerProps as CoreDividerProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface DividerProps extends CoreDividerProps {
   /**

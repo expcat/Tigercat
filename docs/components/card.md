@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Card } from '@tigercat/vue'
+import { Card } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Card } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Card } from '@tigercat/react'
+import { Card } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -220,7 +220,7 @@ Card 组件支持多个内容区域，可以通过插槽（Vue）或属性（Rea
 
 ```vue
 <script setup>
-import { Card } from '@tigercat/vue'
+import { Card } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -251,7 +251,7 @@ import { Card } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Card } from '@tigercat/react'
+import { Card } from '@expcat/tigercat-react'
 
 function ProductCard() {
   return (
