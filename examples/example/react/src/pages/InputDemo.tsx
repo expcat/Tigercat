@@ -106,7 +106,10 @@ const InputDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 不同类型 */}
-      <DemoBlock title="不同类型" description="Input 支持多种类型，如文本、密码、数字等。" code={typeSnippet}>
+      <DemoBlock
+        title="不同类型"
+        description="Input 支持多种类型，如文本、密码、数字等。"
+        code={typeSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <FormItem label="文本输入">
             <Input
@@ -143,7 +146,10 @@ const InputDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 禁用和只读 */}
-      <DemoBlock title="禁用和只读" description="输入框可以设置为禁用或只读状态。" code={disabledSnippet}>
+      <DemoBlock
+        title="禁用和只读"
+        description="输入框可以设置为禁用或只读状态。"
+        code={disabledSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Input value={disabled} disabled />
           <Input value={readonly} readonly />
