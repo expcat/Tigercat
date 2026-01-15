@@ -25,6 +25,10 @@
     "lint": "eslint packages --ext .ts,.tsx",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:tag": "changeset tag",
+    "release": "pnpm -r --filter \"./packages/**\" publish --access public --no-git-checks",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
@@ -39,6 +43,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@changesets/cli": "^2.27.7",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
