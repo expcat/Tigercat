@@ -20,7 +20,7 @@ Thank you for your interest in contributing to Tigercat! This document provides 
 Before you begin, ensure you have the following installed:
 
 - **Node.js**: >= 18.0.0 (recommended: 20.19.6)
-- **pnpm**: >= 8.0.0 (recommended: 10.26.2)
+- **pnpm**: >= 8.0.0 (recommended: 10)
 
 We recommend using [nvm](https://github.com/nvm-sh/nvm) to manage Node.js versions:
 
@@ -47,7 +47,7 @@ Or manually:
 
 ```bash
 # Install pnpm if not already installed
-npm install -g pnpm@10.26.2
+npm install -g pnpm@10
 
 # Install dependencies
 pnpm install

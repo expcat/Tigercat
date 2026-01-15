@@ -47,7 +47,7 @@ function main() {
   const pnpmVersion = getPnpmVersion()
   if (!pnpmVersion) {
     console.log(`${c('red', '✗')} pnpm is not installed`)
-    console.log(`${c('yellow', 'ℹ')} Install pnpm: npm install -g pnpm@10.26.2`)
+    console.log(`${c('yellow', 'ℹ')} Install pnpm: npm install -g pnpm@10`)
     hasErrors = true
   } else if (!checkMajorVersion('pnpm', pnpmVersion, 8)) {
     hasErrors = true

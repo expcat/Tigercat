@@ -23,7 +23,7 @@ function main() {
 
   if (!isPnpmAvailable()) {
     console.log('Installing pnpm...')
-    const status = run('npm', ['install', '-g', 'pnpm@10.26.2'], {
+    const status = run('npm', ['install', '-g', 'pnpm@10'], {
       shell: true
     })
     if (status !== 0) process.exit(status)
