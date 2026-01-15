@@ -23,7 +23,7 @@ This is a monorepo managed with pnpm workspaces containing:
 ### Prerequisites
 
 - Node.js >= 18 (recommended: 20.19.6)
-- pnpm >= 8 (recommended: 10.26.2)
+- pnpm >= 8 (recommended: 10)
 
 ### Quick Setup
 
@@ -40,7 +40,7 @@ Or manually:
 
 ```bash
 # Install pnpm if not already installed
-npm install -g pnpm@10.26.2
+npm install -g pnpm@10
 
 # Install dependencies
 pnpm install
@@ -172,7 +172,7 @@ For detailed development documentation, see [DEVELOPMENT.md](./DEVELOPMENT.md).
 **pnpm not found?**
 
 ```bash
-npm install -g pnpm@10.26.2
+npm install -g pnpm@10
 ```
 
 **Example not loading components?**

@@ -487,7 +487,7 @@ git push origin feature/new-component
 **Solution**:
 
 ```bash
-npm install -g pnpm@10.26.2
+npm install -g pnpm@10
 ```
 
 #### 2. Build Errors After Updating Core

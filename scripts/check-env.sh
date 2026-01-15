@@ -70,7 +70,7 @@ if command -v pnpm &> /dev/null; then
     fi
 else
     echo -e "${RED}✗${NC} pnpm is not installed"
-    echo -e "${YELLOW}ℹ${NC} Install pnpm: npm install -g pnpm@10.26.2"
+    echo -e "${YELLOW}ℹ${NC} Install pnpm: npm install -g pnpm@10"
     has_errors=1
 fi
 echo ""
