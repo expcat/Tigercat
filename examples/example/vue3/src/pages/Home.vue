@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Code } from '@expcat/tigercat-vue'
+
 const installSnippet = 'pnpm add @expcat/tigercat-vue'
 const scriptClose = '</scr' + 'ipt>'
 
@@ -32,20 +34,20 @@ const themeSnippet = `:root {
     <div class="mt-6 space-y-6">
       <section>
         <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">1. 安装</h2>
-        <pre
-             class="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-100"><code v-text="installSnippet"></code></pre>
+        <Code class="mt-3"
+              :code="installSnippet" />
       </section>
 
       <section>
         <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">2. 组件使用</h2>
-        <pre
-             class="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-100"><code v-text="usageSnippet"></code></pre>
+        <Code class="mt-3"
+              :code="usageSnippet" />
       </section>
 
       <section>
         <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">3. 主题色（可选）</h2>
-        <pre
-             class="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-100"><code v-text="themeSnippet"></code></pre>
+        <Code class="mt-3"
+              :code="themeSnippet" />
       </section>
     </div>
   </div>

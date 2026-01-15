@@ -45,6 +45,8 @@ export { Link } from './components/Link'
 export type { LinkProps } from './components/Link'
 export { Text } from './components/Text'
 export type { TextProps } from './components/Text'
+export { Code } from './components/Code'
+export type { CodeProps } from './components/Code'
 export { Icon } from './components/Icon'
 export type { IconProps } from './components/Icon'
 

@@ -19,6 +19,7 @@ const LayoutDemo = lazy(() => import('./pages/LayoutDemo'))
 const GridDemo = lazy(() => import('./pages/GridDemo'))
 const LinkDemo = lazy(() => import('./pages/LinkDemo'))
 const TextDemo = lazy(() => import('./pages/TextDemo'))
+const CodeDemo = lazy(() => import('./pages/CodeDemo'))
 const IconDemo = lazy(() => import('./pages/IconDemo'))
 const DatePickerDemo = lazy(() => import('./pages/DatePickerDemo'))
 const TimePickerDemo = lazy(() => import('./pages/TimePickerDemo'))
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
       { path: 'grid', element: <GridDemo /> },
       { path: 'link', element: <LinkDemo /> },
       { path: 'text', element: <TextDemo /> },
+      { path: 'code', element: <CodeDemo /> },
       { path: 'icon', element: <IconDemo /> },
       { path: 'datepicker', element: <DatePickerDemo /> },
       { path: 'timepicker', element: <TimePickerDemo /> },
