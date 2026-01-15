@@ -67,6 +67,8 @@ export * from './utils/popover-utils'
 export * from './utils/tooltip-utils'
 export * from './utils/radio-utils'
 export * from './utils/radio-group-utils'
+export * from './utils/code-utils'
+export * from './utils/copy-text'
 
 // Types
 export * from './types/button'
@@ -116,6 +118,7 @@ export * from './types/loading'
 export * from './types/popconfirm'
 export * from './types/popover'
 export * from './types/tooltip'
+export * from './types/code'
 
 // Theme
 export * from './theme'

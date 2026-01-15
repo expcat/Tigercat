@@ -31,6 +31,7 @@ const router = createRouter({
         { path: 'grid', component: () => import('./pages/GridDemo.vue') },
         { path: 'link', component: () => import('./pages/LinkDemo.vue') },
         { path: 'text', component: () => import('./pages/TextDemo.vue') },
+        { path: 'code', component: () => import('./pages/CodeDemo.vue') },
         { path: 'icon', component: () => import('./pages/IconDemo.vue') },
         {
           path: 'datepicker',

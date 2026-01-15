@@ -46,6 +46,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'text',
         path: '/text',
         label: { 'zh-CN': 'Text', 'en-US': 'Text' }
+      },
+      {
+        key: 'code',
+        path: '/code',
+        label: { 'zh-CN': 'Code', 'en-US': 'Code' }
       }
     ]
   },

@@ -1,4 +1,5 @@
 import React from 'react'
+import { Code } from '@expcat/tigercat-react'
 
 const Home: React.FC = () => {
   return (
@@ -13,15 +14,14 @@ const Home: React.FC = () => {
       <div className="mt-6 space-y-6">
         <section>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">1. 安装</h2>
-          <pre className="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-100">
-            <code>{`pnpm add @expcat/tigercat-react`}</code>
-          </pre>
+          <Code className="mt-3" code="pnpm add @expcat/tigercat-react" />
         </section>
 
         <section>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">2. 组件使用</h2>
-          <pre className="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-100">
-            <code>{`import { Button, ConfigProvider } from '@expcat/tigercat-react'
+          <Code
+            className="mt-3"
+            code={`import { Button, ConfigProvider } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -30,20 +30,21 @@ function App() {
     </ConfigProvider>
   )
 }
-`}</code>
-          </pre>
+`}
+          />
         </section>
 
         <section>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             3. 主题色（可选）
           </h2>
-          <pre className="mt-3 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-800 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-100">
-            <code>{`:root {
+          <Code
+            className="mt-3"
+            code={`:root {
   --tiger-primary: #2563eb;
   --tiger-primary-hover: #1d4ed8;
-}`}</code>
-          </pre>
+}`}
+          />
         </section>
       </div>
     </div>
