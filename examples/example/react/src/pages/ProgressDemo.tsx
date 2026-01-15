@@ -145,7 +145,7 @@ export default function ProgressDemo() {
       </DemoBlock>
 
       {/* 圆形进度条 */}
-      <DemoBlock title="圆形进度条" description="通过设置 type=\"circle\" 展示圆形进度条。" code={circleSnippet}>
+      <DemoBlock title="圆形进度条" description='通过设置 type="circle" 展示圆形进度条。' code={circleSnippet}>
         <Space align="center">
           <Progress type="circle" percentage={0} showText={true} />
           <Progress type="circle" percentage={25} showText={true} />
