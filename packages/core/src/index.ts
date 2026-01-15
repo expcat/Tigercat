@@ -9,6 +9,7 @@ export const version = '0.0.1'
 // Utilities
 export * from './utils/class-names'
 export * from './utils/coerce-class-value'
+export * from './utils/env'
 export * from './utils/a11y-utils'
 export * from './utils/overlay-utils'
 export * from './utils/focus-utils'

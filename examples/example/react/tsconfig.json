@@ -25,7 +25,9 @@
     "paths": {
       "@/*": ["./src/*"],
       "@demo-shared/*": ["../shared/*"],
-      "@tigercat/core": ["../../../packages/core/dist/index.d.ts"]
+      "@tigercat/core": ["../../../packages/core/dist/index.d.ts"],
+      "@tigercat/react": ["../../../packages/react/src/index.tsx"],
+      "@tigercat/react/*": ["../../../packages/react/src/components/*"]
     }
   },
   "include": ["src", "../shared"],

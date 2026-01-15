@@ -29,7 +29,8 @@ import {
   type MessagePosition,
   type MessageInstance,
   type MessageOptions,
-  type MessageConfig
+  type MessageConfig,
+  isBrowser
 } from '@tigercat/core'
 
 /**
@@ -194,7 +195,7 @@ export const MessageContainer = defineComponent({
  * Ensure message container exists (auto-mounted singleton)
  */
 function ensureContainer() {
-  if (typeof window === 'undefined' || typeof document === 'undefined') {
+  if (!isBrowser()) {
     return
   }
 
@@ -284,9 +285,11 @@ function clearAll() {
     containerApp.unmount()
     containerApp = null
   }
-  const rootEl = document.getElementById(MESSAGE_CONTAINER_ROOT_ID)
-  if (rootEl?.parentNode) {
-    rootEl.parentNode.removeChild(rootEl)
+  if (isBrowser()) {
+    const rootEl = document.getElementById(MESSAGE_CONTAINER_ROOT_ID)
+    if (rootEl?.parentNode) {
+      rootEl.parentNode.removeChild(rootEl)
+    }
   }
 }
 

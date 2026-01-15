@@ -12,6 +12,10 @@ export default defineConfig({
         path.resolve(__dirname, '../../..'),
         'packages/react/src/index.tsx'
       ),
+      '@tigercat/react/': `${path.resolve(
+        path.resolve(__dirname, '../../..'),
+        'packages/react/src/components'
+      )}/`,
       '@tigercat/core': path.resolve(
         path.resolve(__dirname, '../../..'),
         'packages/core/src/index.ts'
