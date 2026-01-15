@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Radio, RadioGroup, Space, Divider } from '@expcat/tigercat-vue'
+import { Radio, RadioGroup, Space } from '@expcat/tigercat-vue'
+import DemoBlock from '../components/DemoBlock.vue'
 
 const basicValue = ref<string | number>('male')
 const uncontrolledValue = ref<string | number>('male')
@@ -14,6 +15,70 @@ const sizeLgValue = ref<string | number>('a')
 const handleUncontrolledChange = (value: string | number) => {
   uncontrolledValue.value = value
 }
+
+const basicSnippet = `<Space direction="vertical">
+  <RadioGroup v-model:value="basicValue" class="flex flex-wrap items-center gap-4">
+    <Radio value="male">男</Radio>
+    <Radio value="female">女</Radio>
+    <Radio value="other">其他</Radio>
+  </RadioGroup>
+  <p class="text-sm text-gray-600">当前选中：{{ String(basicValue) }}</p>
+</Space>`
+
+const uncontrolledSnippet = `<Space direction="vertical">
+  <RadioGroup default-value="male" class="flex flex-wrap items-center gap-4" @change="handleUncontrolledChange">
+    <Radio value="male">男</Radio>
+    <Radio value="female">女</Radio>
+    <Radio value="other">其他</Radio>
+  </RadioGroup>
+  <p class="text-sm text-gray-600">最近一次变更：{{ String(uncontrolledValue) }}</p>
+</Space>`
+
+const disabledSnippet = `<Space direction="vertical">
+  <div>
+    <div class="text-sm text-gray-700 mb-2">部分禁用</div>
+    <RadioGroup v-model:value="disabledValue" class="flex flex-wrap items-center gap-4">
+      <Radio value="small">小</Radio>
+      <Radio value="medium">中</Radio>
+      <Radio value="large" disabled>大（禁用）</Radio>
+    </RadioGroup>
+  </div>
+  <div>
+    <div class="text-sm text-gray-700 mb-2">整组禁用</div>
+    <RadioGroup v-model:value="groupDisabledValue" disabled class="flex flex-wrap items-center gap-4">
+      <Radio value="a">选项 A</Radio>
+      <Radio value="b">选项 B</Radio>
+      <Radio value="c">选项 C</Radio>
+    </RadioGroup>
+  </div>
+</Space>`
+
+const sizeSnippet = `<Space direction="vertical">
+  <div>
+    <div class="text-sm text-gray-700 mb-2">小号（sm）</div>
+    <RadioGroup v-model:value="sizeSmValue" size="sm" class="flex flex-wrap items-center gap-4">
+      <Radio value="a">选项 A</Radio>
+      <Radio value="b">选项 B</Radio>
+      <Radio value="c">选项 C</Radio>
+    </RadioGroup>
+  </div>
+  <div>
+    <div class="text-sm text-gray-700 mb-2">默认（md）</div>
+    <RadioGroup v-model:value="sizeMdValue" size="md" class="flex flex-wrap items-center gap-4">
+      <Radio value="a">选项 A</Radio>
+      <Radio value="b">选项 B</Radio>
+      <Radio value="c">选项 C</Radio>
+    </RadioGroup>
+  </div>
+  <div>
+    <div class="text-sm text-gray-700 mb-2">大号（lg）</div>
+    <RadioGroup v-model:value="sizeLgValue" size="lg" class="flex flex-wrap items-center gap-4">
+      <Radio value="a">选项 A</Radio>
+      <Radio value="b">选项 B</Radio>
+      <Radio value="c">选项 C</Radio>
+    </RadioGroup>
+  </div>
+</Space>`
 </script>
 
 <template>
@@ -24,116 +89,103 @@ const handleUncontrolledChange = (value: string | number) => {
     </div>
 
     <!-- 基础用法 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">基础用法</h2>
-      <p class="text-gray-600 mb-6">单选框组合使用时，需要通过 RadioGroup 组件进行包裹。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical">
-          <RadioGroup v-model:value="basicValue" class="flex flex-wrap items-center gap-4">
-            <Radio value="male">男</Radio>
-            <Radio value="female">女</Radio>
-            <Radio value="other">其他</Radio>
-          </RadioGroup>
-          <p class="text-sm text-gray-600">当前选中：{{ String(basicValue) }}</p>
-        </Space>
-      </div>
-      <Divider class="my-6" />
-    </section>
+    <DemoBlock title="基础用法"
+               description="单选框组合使用时，需要通过 RadioGroup 组件进行包裹。"
+               :code="basicSnippet">
+      <Space direction="vertical">
+        <RadioGroup v-model:value="basicValue"
+                    class="flex flex-wrap items-center gap-4">
+          <Radio value="male">男</Radio>
+          <Radio value="female">女</Radio>
+          <Radio value="other">其他</Radio>
+        </RadioGroup>
+        <p class="text-sm text-gray-600">当前选中：{{ String(basicValue) }}</p>
+      </Space>
+    </DemoBlock>
 
     <!-- 非受控 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">非受控</h2>
-      <p class="text-gray-600 mb-6">不使用 v-model，通过 defaultValue 初始化，并监听 change。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical">
-          <RadioGroup
-            default-value="male"
-            class="flex flex-wrap items-center gap-4"
-            @change="handleUncontrolledChange">
-            <Radio value="male">男</Radio>
-            <Radio value="female">女</Radio>
-            <Radio value="other">其他</Radio>
-          </RadioGroup>
-          <p class="text-sm text-gray-600">最近一次变更：{{ String(uncontrolledValue) }}</p>
-        </Space>
-      </div>
-      <Divider class="my-6" />
-    </section>
+    <DemoBlock title="非受控"
+               description="不使用 v-model，通过 defaultValue 初始化，并监听 change。"
+               :code="uncontrolledSnippet">
+      <Space direction="vertical">
+        <RadioGroup default-value="male"
+                    class="flex flex-wrap items-center gap-4"
+                    @change="handleUncontrolledChange">
+          <Radio value="male">男</Radio>
+          <Radio value="female">女</Radio>
+          <Radio value="other">其他</Radio>
+        </RadioGroup>
+        <p class="text-sm text-gray-600">最近一次变更：{{ String(uncontrolledValue) }}</p>
+      </Space>
+    </DemoBlock>
 
     <!-- 禁用状态 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">禁用状态</h2>
-      <p class="text-gray-600 mb-6">单选框不可用的状态。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical">
-          <div>
-            <div class="text-sm text-gray-700 mb-2">部分禁用</div>
-            <RadioGroup v-model:value="disabledValue" class="flex flex-wrap items-center gap-4">
-              <Radio value="small">小</Radio>
-              <Radio value="medium">中</Radio>
-              <Radio value="large" disabled>大（禁用）</Radio>
-            </RadioGroup>
-          </div>
+    <DemoBlock title="禁用状态"
+               description="单选框不可用的状态。"
+               :code="disabledSnippet">
+      <Space direction="vertical">
+        <div>
+          <div class="text-sm text-gray-700 mb-2">部分禁用</div>
+          <RadioGroup v-model:value="disabledValue"
+                      class="flex flex-wrap items-center gap-4">
+            <Radio value="small">小</Radio>
+            <Radio value="medium">中</Radio>
+            <Radio value="large"
+                   disabled>大（禁用）</Radio>
+          </RadioGroup>
+        </div>
 
-          <div>
-            <div class="text-sm text-gray-700 mb-2">整组禁用</div>
-            <RadioGroup
-              v-model:value="groupDisabledValue"
-              disabled
-              class="flex flex-wrap items-center gap-4">
-              <Radio value="a">选项 A</Radio>
-              <Radio value="b">选项 B</Radio>
-              <Radio value="c">选项 C</Radio>
-            </RadioGroup>
-          </div>
-        </Space>
-      </div>
-      <Divider class="my-6" />
-    </section>
+        <div>
+          <div class="text-sm text-gray-700 mb-2">整组禁用</div>
+          <RadioGroup v-model:value="groupDisabledValue"
+                      disabled
+                      class="flex flex-wrap items-center gap-4">
+            <Radio value="a">选项 A</Radio>
+            <Radio value="b">选项 B</Radio>
+            <Radio value="c">选项 C</Radio>
+          </RadioGroup>
+        </div>
+      </Space>
+    </DemoBlock>
 
     <!-- 尺寸 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">尺寸</h2>
-      <p class="text-gray-600 mb-6">通过 RadioGroup 的 size 控制整组尺寸。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical">
-          <div>
-            <div class="text-sm text-gray-700 mb-2">小号（sm）</div>
-            <RadioGroup
-              v-model:value="sizeSmValue"
-              size="sm"
-              class="flex flex-wrap items-center gap-4">
-              <Radio value="a">选项 A</Radio>
-              <Radio value="b">选项 B</Radio>
-              <Radio value="c">选项 C</Radio>
-            </RadioGroup>
-          </div>
+    <DemoBlock title="尺寸"
+               description="通过 RadioGroup 的 size 控制整组尺寸。"
+               :code="sizeSnippet">
+      <Space direction="vertical">
+        <div>
+          <div class="text-sm text-gray-700 mb-2">小号（sm）</div>
+          <RadioGroup v-model:value="sizeSmValue"
+                      size="sm"
+                      class="flex flex-wrap items-center gap-4">
+            <Radio value="a">选项 A</Radio>
+            <Radio value="b">选项 B</Radio>
+            <Radio value="c">选项 C</Radio>
+          </RadioGroup>
+        </div>
 
-          <div>
-            <div class="text-sm text-gray-700 mb-2">默认（md）</div>
-            <RadioGroup
-              v-model:value="sizeMdValue"
-              size="md"
-              class="flex flex-wrap items-center gap-4">
-              <Radio value="a">选项 A</Radio>
-              <Radio value="b">选项 B</Radio>
-              <Radio value="c">选项 C</Radio>
-            </RadioGroup>
-          </div>
+        <div>
+          <div class="text-sm text-gray-700 mb-2">默认（md）</div>
+          <RadioGroup v-model:value="sizeMdValue"
+                      size="md"
+                      class="flex flex-wrap items-center gap-4">
+            <Radio value="a">选项 A</Radio>
+            <Radio value="b">选项 B</Radio>
+            <Radio value="c">选项 C</Radio>
+          </RadioGroup>
+        </div>
 
-          <div>
-            <div class="text-sm text-gray-700 mb-2">大号（lg）</div>
-            <RadioGroup
-              v-model:value="sizeLgValue"
-              size="lg"
-              class="flex flex-wrap items-center gap-4">
-              <Radio value="a">选项 A</Radio>
-              <Radio value="b">选项 B</Radio>
-              <Radio value="c">选项 C</Radio>
-            </RadioGroup>
-          </div>
-        </Space>
-      </div>
-    </section>
+        <div>
+          <div class="text-sm text-gray-700 mb-2">大号（lg）</div>
+          <RadioGroup v-model:value="sizeLgValue"
+                      size="lg"
+                      class="flex flex-wrap items-center gap-4">
+            <Radio value="a">选项 A</Radio>
+            <Radio value="b">选项 B</Radio>
+            <Radio value="c">选项 C</Radio>
+          </RadioGroup>
+        </div>
+      </Space>
+    </DemoBlock>
   </div>
 </template>
