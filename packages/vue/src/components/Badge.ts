@@ -16,7 +16,7 @@ import {
   type BadgeSize,
   type BadgeType,
   type BadgePosition
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueBadgeProps {
   variant?: BadgeVariant

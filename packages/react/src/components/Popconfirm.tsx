@@ -20,7 +20,7 @@ import {
   popconfirmIconViewBox,
   type PopconfirmProps as CorePopconfirmProps,
   type PopconfirmIconType
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 let popconfirmIdCounter = 0
 const createPopconfirmId = () => `tiger-popconfirm-${++popconfirmIdCounter}`

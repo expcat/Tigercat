@@ -1,5 +1,5 @@
 {
-  "name": "@tigercat-example/vue3",
+  "name": "@expcat/tigercat-example-vue3",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tigercat/vue": "workspace:*",
+    "@expcat/tigercat-vue": "workspace:*",
     "vue": "^3.5.26",
     "vue-router": "^4.6.4"
   },

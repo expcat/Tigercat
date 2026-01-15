@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Select, Space, Divider } from '@tigercat/vue'
+import { Select, Space, Divider } from '@expcat/tigercat-vue'
 
 const basicValue = ref<string | number>('')
 const defaultValue = ref<string | number>('china')

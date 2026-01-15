@@ -4,7 +4,7 @@ import {
   getCheckboxClasses,
   getCheckboxLabelClasses,
   type CheckboxSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { useCheckboxGroup } from './CheckboxGroup'
 
 export interface CheckboxProps extends Omit<

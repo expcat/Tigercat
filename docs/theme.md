@@ -42,7 +42,7 @@ Tigercat 支持通过 CSS 变量进行主题颜色配置，可以实时更改主
 
 ```tsx
 import { useEffect } from 'react'
-import { Button, setThemeColors } from '@tigercat/react'
+import { Button, setThemeColors } from '@expcat/tigercat-react'
 
 function App() {
   useEffect(() => {
@@ -85,7 +85,7 @@ function App() {
 ```vue
 <script setup>
 import { onMounted } from 'vue'
-import { Button, setThemeColors } from '@tigercat/vue'
+import { Button, setThemeColors } from '@expcat/tigercat-vue'
 
 onMounted(() => {
   // 设置主题颜色
@@ -179,7 +179,7 @@ setThemeColors(
 **示例：**
 
 ```typescript
-import { getThemeColor } from '@tigercat/core'
+import { getThemeColor } from '@expcat/tigercat-core'
 
 const primaryColor = getThemeColor('primary')
 console.log(primaryColor) // '#2563eb'
@@ -191,7 +191,7 @@ console.log(primaryColor) // '#2563eb'
 
 ```tsx
 import { useEffect, useRef } from 'react'
-import { Button, setThemeColors } from '@tigercat/react'
+import { Button, setThemeColors } from '@expcat/tigercat-react'
 
 function ThemedContainer() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -221,7 +221,7 @@ function ThemedContainer() {
 
 ```tsx
 import { useEffect } from 'react'
-import { setThemeColors } from '@tigercat/react'
+import { setThemeColors } from '@expcat/tigercat-react'
 
 function useSystemTheme() {
   useEffect(() => {
@@ -295,7 +295,7 @@ Tigercat 完全支持暗色模式。您可以通过多种方式实现暗色主�
 ```vue
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Button } from '@tigercat/vue'
+import { Button } from '@expcat/tigercat-vue'
 
 const isDark = ref(false)
 
@@ -334,7 +334,7 @@ const toggleTheme = () => {
 
 ```tsx
 import { useState, useEffect } from 'react'
-import { Button } from '@tigercat/react'
+import { Button } from '@expcat/tigercat-react'
 
 function App() {
   const [isDark, setIsDark] = useState(false)
@@ -373,7 +373,7 @@ function App() {
 ### 方法二：使用 JavaScript 动态切换
 
 ```tsx
-import { setThemeColors } from '@tigercat/react'
+import { setThemeColors } from '@expcat/tigercat-react'
 
 const lightTheme = {
   primary: '#2563eb',
@@ -408,7 +408,7 @@ function toggleDarkMode(isDark: boolean) {
 
 ```tsx
 import { useEffect } from 'react'
-import { setThemeColors } from '@tigercat/react'
+import { setThemeColors } from '@expcat/tigercat-react'
 
 function useAutoTheme() {
   useEffect(() => {
@@ -512,7 +512,7 @@ const orangeTheme = {
 ### 使用预设主题
 
 ```tsx
-import { setThemeColors } from '@tigercat/react'
+import { setThemeColors } from '@expcat/tigercat-react'
 
 function ThemeSelector() {
   const themes = {
@@ -550,7 +550,7 @@ function ThemeSelector() {
 ```vue
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { setThemeColors } from '@tigercat/vue'
+import { setThemeColors } from '@expcat/tigercat-vue'
 
 const currentTheme = ref('blue')
 
@@ -584,7 +584,7 @@ const applyTheme = (themeName) => {
 
 ```tsx
 import { useState, useEffect } from 'react'
-import { setThemeColors } from '@tigercat/react'
+import { setThemeColors } from '@expcat/tigercat-react'
 
 function usePersistedTheme() {
   const [currentTheme, setCurrentTheme] = useState('blue')
@@ -750,7 +750,7 @@ const white = '#ffffff' // 背景色
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { setThemeColors, getThemeColor } from '@tigercat/vue'
+import { setThemeColors, getThemeColor } from '@expcat/tigercat-vue'
 
 const primaryColor = ref('#2563eb')
 const primaryHoverColor = ref('#1d4ed8')

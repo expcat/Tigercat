@@ -16,7 +16,7 @@
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue'
+import { notification } from '@expcat/tigercat-vue'
 
 const showNotification = () => {
   notification.info('通知标题')
@@ -31,7 +31,7 @@ const showNotification = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react'
+import { notification } from '@expcat/tigercat-react'
 
 function App() {
   const showNotification = () => {
@@ -55,7 +55,7 @@ Notification 组件支持 4 种不同的类型：
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue'
+import { notification } from '@expcat/tigercat-vue'
 
 const showInfo = () => {
   notification.info({
@@ -99,7 +99,7 @@ const showError = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react'
+import { notification } from '@expcat/tigercat-react'
 
 function App() {
   const showInfo = () => {
@@ -149,7 +149,7 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue'
+import { notification } from '@expcat/tigercat-vue'
 
 const showTopLeft = () => {
   notification.info({
@@ -197,7 +197,7 @@ const showBottomRight = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react'
+import { notification } from '@expcat/tigercat-react'
 
 function App() {
   const showTopLeft = () => {
@@ -251,7 +251,7 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue'
+import { notification } from '@expcat/tigercat-vue'
 
 const showShortNotification = () => {
   // 2秒后自动关闭
@@ -293,7 +293,7 @@ const showPersistentNotification = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react'
+import { notification } from '@expcat/tigercat-react'
 
 function App() {
   const showShortNotification = () => {
@@ -341,7 +341,7 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue'
+import { notification } from '@expcat/tigercat-vue'
 
 const showClosableNotification = () => {
   notification.info({
@@ -373,7 +373,7 @@ const showNonClosableNotification = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react'
+import { notification } from '@expcat/tigercat-react'
 
 function App() {
   const showClosableNotification = () => {
@@ -411,7 +411,7 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue'
+import { notification } from '@expcat/tigercat-vue'
 import { ref } from 'vue'
 
 const closeNotification = ref(null)
@@ -461,7 +461,7 @@ const simulateRequest = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react'
+import { notification } from '@expcat/tigercat-react'
 import { useRef } from 'react'
 
 function App() {
@@ -517,7 +517,7 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue'
+import { notification } from '@expcat/tigercat-vue'
 
 const showClickableNotification = () => {
   notification.info({
@@ -539,7 +539,7 @@ const showClickableNotification = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react'
+import { notification } from '@expcat/tigercat-react'
 
 function App() {
   const showClickableNotification = () => {
@@ -565,7 +565,7 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue'
+import { notification } from '@expcat/tigercat-vue'
 
 const showNotificationWithCallback = () => {
   notification.success({
@@ -587,7 +587,7 @@ const showNotificationWithCallback = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react'
+import { notification } from '@expcat/tigercat-react'
 
 function App() {
   const showNotificationWithCallback = () => {
@@ -613,7 +613,7 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue'
+import { notification } from '@expcat/tigercat-vue'
 
 const showMultipleNotifications = () => {
   notification.info({
@@ -656,7 +656,7 @@ const clearTopRight = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react'
+import { notification } from '@expcat/tigercat-react'
 
 function App() {
   const showMultipleNotifications = () => {
@@ -703,7 +703,7 @@ function App() {
 
 ```vue
 <script setup>
-import { notification } from '@tigercat/vue'
+import { notification } from '@expcat/tigercat-vue'
 
 const handleFormSubmit = async () => {
   // 显示处理通知
@@ -805,7 +805,7 @@ const showDifferentTypes = () => {
 ### React
 
 ```tsx
-import { notification } from '@tigercat/react'
+import { notification } from '@expcat/tigercat-react'
 
 function App() {
   const handleFormSubmit = async () => {
@@ -1023,8 +1023,8 @@ Notification 组件可以轻松地与全局状态管理工具（如 Pinia、Redu
 ```typescript
 // store/notification.ts
 import { defineStore } from 'pinia'
-import { notification } from '@tigercat/vue'
-import type { NotificationOptions } from '@tigercat/core'
+import { notification } from '@expcat/tigercat-vue'
+import type { NotificationOptions } from '@expcat/tigercat-core'
 
 export const useNotificationStore = defineStore('notification', {
   actions: {
@@ -1045,8 +1045,8 @@ export const useNotificationStore = defineStore('notification', {
 
 ```typescript
 // actions/notification.ts
-import { notification } from '@tigercat/react'
-import type { NotificationOptions } from '@tigercat/core'
+import { notification } from '@expcat/tigercat-react'
+import type { NotificationOptions } from '@expcat/tigercat-core'
 
 export const showNotification = (config: NotificationOptions) => {
   return () => {
@@ -1072,7 +1072,7 @@ import {
   NotificationOptions,
   NotificationPosition,
   NotificationType
-} from '@tigercat/vue' // 或 '@tigercat/react'
+} from '@expcat/tigercat-vue' // 或 '@expcat/tigercat-react'
 
 // 使用字符串（仅标题）
 notification.info('简单通知')

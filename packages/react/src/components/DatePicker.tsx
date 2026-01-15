@@ -34,7 +34,7 @@ import {
   type DatePickerSingleModelValue,
   type DatePickerRangeModelValue,
   type DatePickerRangeValue
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 const Icon: React.FC<{ path: string; className: string }> = ({ path, className }) => (
   <svg

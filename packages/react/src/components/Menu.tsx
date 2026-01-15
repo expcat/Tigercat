@@ -13,7 +13,7 @@ import {
   type MenuMode,
   type MenuTheme,
   type MenuProps as CoreMenuProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Menu context interface
 export interface MenuContextValue {

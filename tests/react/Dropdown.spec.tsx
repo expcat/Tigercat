@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { Dropdown, DropdownMenu, DropdownItem } from '@tigercat/react'
+import { Dropdown, DropdownMenu, DropdownItem } from '@expcat/tigercat-react'
 import React from 'react'
 
 describe('Dropdown', () => {

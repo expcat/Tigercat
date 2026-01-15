@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Tree, Card, Space, Input } from '@tigercat/vue'
-import type { TreeNode } from '@tigercat/vue'
+import { Tree, Card, Space, Input } from '@expcat/tigercat-vue'
+import type { TreeNode } from '@expcat/tigercat-vue'
 
 // Basic tree data
 const basicTreeData = ref<TreeNode[]>([

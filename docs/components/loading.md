@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Loading } from '@tigercat/vue'
+import { Loading } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -20,7 +20,7 @@ import { Loading } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Loading } from '@tigercat/react'
+import { Loading } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -162,7 +162,7 @@ Loading 组件支持 7 种颜色变体：
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Loading } from '@tigercat/vue'
+import { Loading } from '@expcat/tigercat-vue'
 
 const loading = ref(true)
 
@@ -186,7 +186,7 @@ const loadData = () => {
 
 ```tsx
 import { useState } from 'react'
-import { Loading } from '@tigercat/react'
+import { Loading } from '@expcat/tigercat-react'
 
 function App() {
   const [loading, setLoading] = useState(false)
@@ -256,7 +256,7 @@ Loading 组件可以很好地与 Button 组件的 loading 状态配合使用。
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Button } from '@tigercat/vue'
+import { Button } from '@expcat/tigercat-vue'
 
 const loading = ref(false)
 
@@ -277,7 +277,7 @@ const handleSubmit = () => {
 
 ```tsx
 import { useState } from 'react'
-import { Button } from '@tigercat/react'
+import { Button } from '@expcat/tigercat-react'
 
 function SubmitButton() {
   const [loading, setLoading] = useState(false)
@@ -306,7 +306,7 @@ function SubmitButton() {
 ```vue
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Loading } from '@tigercat/vue'
+import { Loading } from '@expcat/tigercat-vue'
 
 const pageLoading = ref(true)
 const data = ref([])
@@ -343,7 +343,7 @@ onMounted(async () => {
 
 ```tsx
 import { useState, useEffect } from 'react'
-import { Loading } from '@tigercat/react'
+import { Loading } from '@expcat/tigercat-react'
 
 function PageContent() {
   const [pageLoading, setPageLoading] = useState(true)
@@ -385,7 +385,7 @@ function PageContent() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Card, Loading, Button } from '@tigercat/vue'
+import { Card, Loading, Button } from '@expcat/tigercat-vue'
 
 const cardLoading = ref(false)
 
@@ -418,7 +418,7 @@ const refreshCard = () => {
 
 ```tsx
 import { useState } from 'react'
-import { Card, Loading, Button } from '@tigercat/react'
+import { Card, Loading, Button } from '@expcat/tigercat-react'
 
 function DataCard() {
   const [cardLoading, setCardLoading] = useState(false)
@@ -460,7 +460,7 @@ function DataCard() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Form, FormItem, Input, Button, Loading } from '@tigercat/vue'
+import { Form, FormItem, Input, Button, Loading } from '@expcat/tigercat-vue'
 
 const formLoading = ref(false)
 const formData = ref({
@@ -499,7 +499,7 @@ const handleSubmit = () => {
 
 ```tsx
 import { useState } from 'react'
-import { Form, FormItem, Input, Button, Loading } from '@tigercat/react'
+import { Form, FormItem, Input, Button, Loading } from '@expcat/tigercat-react'
 
 function SubmitForm() {
   const [formLoading, setFormLoading] = useState(false)

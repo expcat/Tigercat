@@ -21,7 +21,7 @@ import {
   type MenuProps as CoreMenuProps,
   replaceKeys,
   toggleKey
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Menu context key
 export const MenuContextKey = Symbol('MenuContext')

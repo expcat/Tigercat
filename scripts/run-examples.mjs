@@ -111,17 +111,17 @@ async function main() {
 
   const packagesToCheck = [
     {
-      name: '@tigercat/core',
+      name: '@expcat/tigercat-core',
       srcDir: path.join('packages', 'core', 'src'),
       distEntry: path.join('packages', 'core', 'dist', 'index.js')
     },
     {
-      name: '@tigercat/react',
+      name: '@expcat/tigercat-react',
       srcDir: path.join('packages', 'react', 'src'),
       distEntry: path.join('packages', 'react', 'dist', 'index.js')
     },
     {
-      name: '@tigercat/vue',
+      name: '@expcat/tigercat-vue',
       srcDir: path.join('packages', 'vue', 'src'),
       distEntry: path.join('packages', 'vue', 'dist', 'index.js')
     }
@@ -139,11 +139,11 @@ async function main() {
     console.log('Packages are missing or outdated. Building now...')
     const status = runPnpm([
       '--filter',
-      '@tigercat/core',
+      '@expcat/tigercat-core',
       '--filter',
-      '@tigercat/react',
+      '@expcat/tigercat-react',
       '--filter',
-      '@tigercat/vue',
+      '@expcat/tigercat-vue',
       'build'
     ])
 
@@ -200,10 +200,10 @@ async function main() {
   }
 
   console.log('Starting Vue3 example on http://localhost:5173')
-  const vue = startExample('vue3', ['--filter', '@tigercat-example/vue3', 'dev'])
+  const vue = startExample('vue3', ['--filter', '@expcat/tigercat-example-vue3', 'dev'])
 
   console.log('Starting React example on http://localhost:5174')
-  const react = startExample('react', ['--filter', '@tigercat-example/react', 'dev'])
+  const react = startExample('react', ['--filter', '@expcat/tigercat-example-react', 'dev'])
 
   const cleanup = () => {
     console.log('')

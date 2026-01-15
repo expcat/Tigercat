@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Switch } from '@tigercat/vue'
+import { Switch } from '@expcat/tigercat-vue'
 
 const checked = ref(false)
 </script>
@@ -23,7 +23,7 @@ const checked = ref(false)
 
 ```tsx
 import { useState } from 'react'
-import { Switch } from '@tigercat/react'
+import { Switch } from '@expcat/tigercat-react'
 
 function App() {
   const [checked, setChecked] = useState(false)
@@ -45,7 +45,7 @@ Switch 组件支持 3 种不同的尺寸：
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Switch } from '@tigercat/vue'
+import { Switch } from '@expcat/tigercat-vue'
 
 const checked1 = ref(false)
 const checked2 = ref(false)
@@ -65,7 +65,7 @@ const checked3 = ref(false)
 
 ```tsx
 import { useState } from 'react'
-import { Switch } from '@tigercat/react'
+import { Switch } from '@expcat/tigercat-react'
 
 function App() {
   const [checked1, setChecked1] = useState(false)
@@ -113,7 +113,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Switch } from '@tigercat/vue'
+import { Switch } from '@expcat/tigercat-vue'
 
 const notifications = ref(true)
 </script>
@@ -130,7 +130,7 @@ const notifications = ref(true)
 
 ```tsx
 import { useState } from 'react'
-import { Switch } from '@tigercat/react'
+import { Switch } from '@expcat/tigercat-react'
 
 function App() {
   const [notifications, setNotifications] = useState(true)
@@ -205,7 +205,7 @@ Switch 组件提供两个事件：
 ```vue
 <script setup>
 import { ref } from 'vue';
-import { Switch } from '@tigercat/vue';
+import { Switch } from '@expcat/tigercat-vue';
 
 const checked = ref(false);
 
@@ -223,7 +223,7 @@ const handleChange = (newValue: boolean) => {
 
 ```tsx
 import { useState } from 'react'
-import { Switch } from '@tigercat/react'
+import { Switch } from '@expcat/tigercat-react'
 
 function App() {
   const [checked, setChecked] = useState(false)
@@ -290,7 +290,7 @@ Switch 组件的选中状态颜色使用与 Button 组件相同的主题变量�
 
 ```vue
 <script setup>
-import { Switch, setThemeColors } from '@tigercat/vue'
+import { Switch, setThemeColors } from '@expcat/tigercat-vue'
 
 const switchTheme = () => {
   setThemeColors({
@@ -310,7 +310,7 @@ const switchTheme = () => {
 **React:**
 
 ```tsx
-import { Switch, setThemeColors } from '@tigercat/react'
+import { Switch, setThemeColors } from '@expcat/tigercat-react'
 
 function App() {
   const switchTheme = () => {
@@ -355,9 +355,9 @@ Switch 组件遵循 ARIA 最佳实践：
 Switch 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```ts
-import type { SwitchProps, SwitchSize } from '@tigercat/core'
-import type { VueSwitchProps } from '@tigercat/vue'
-import type { SwitchProps as ReactSwitchProps } from '@tigercat/react'
+import type { SwitchProps, SwitchSize } from '@expcat/tigercat-core'
+import type { VueSwitchProps } from '@expcat/tigercat-vue'
+import type { SwitchProps as ReactSwitchProps } from '@expcat/tigercat-react'
 ```
 
 ## 示例
@@ -369,7 +369,7 @@ import type { SwitchProps as ReactSwitchProps } from '@tigercat/react'
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Switch } from '@tigercat/vue'
+import { Switch } from '@expcat/tigercat-vue'
 
 const settings = ref({
   notifications: true,
@@ -413,7 +413,7 @@ const settings = ref({
 
 ```tsx
 import { useState } from 'react'
-import { Switch } from '@tigercat/react'
+import { Switch } from '@expcat/tigercat-react'
 
 function SettingsPanel() {
   const [settings, setSettings] = useState({
@@ -465,7 +465,7 @@ function SettingsPanel() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Switch, Button } from '@tigercat/vue'
+import { Switch, Button } from '@expcat/tigercat-vue'
 
 const formData = ref({
   username: '',
@@ -508,7 +508,7 @@ const handleSubmit = () => {
 
 ```tsx
 import { useState } from 'react'
-import { Switch, Button } from '@tigercat/react'
+import { Switch, Button } from '@expcat/tigercat-react'
 
 function FormExample() {
   const [formData, setFormData] = useState({

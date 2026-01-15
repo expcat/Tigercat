@@ -4,7 +4,7 @@ import {
   coerceClassValue,
   layoutContentClasses,
   mergeStyleValues
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueContentProps {
   className?: string

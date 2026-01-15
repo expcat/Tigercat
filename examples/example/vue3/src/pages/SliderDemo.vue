@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Slider, Space, Divider, Text } from '@tigercat/vue'
+import { Slider, Space, Divider, Text } from '@expcat/tigercat-vue'
 
 const basicValue = ref(50)
 

@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
-import { Row, Col } from '@tigercat/vue'
+import { Row, Col } from '@expcat/tigercat-vue'
 import { expectNoA11yViolations } from '../utils'
 
 describe('Grid (Vue)', () => {

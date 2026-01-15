@@ -8,7 +8,7 @@ import {
   linkSizeClasses,
   type LinkVariant,
   type LinkSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueLinkProps {
   variant?: LinkVariant

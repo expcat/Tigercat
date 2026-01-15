@@ -9,7 +9,7 @@
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { DatePicker } from '@tigercat/vue'
+import { DatePicker } from '@expcat/tigercat-vue'
 
 const selectedDate = ref<Date | null>(null)
 </script>
@@ -23,7 +23,7 @@ const selectedDate = ref<Date | null>(null)
 
 ```tsx
 import React, { useState } from 'react'
-import { DatePicker } from '@tigercat/react'
+import { DatePicker } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
@@ -63,7 +63,7 @@ DatePicker 组件支持三种尺寸：`sm`、`md`、`lg`。
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { DatePicker } from '@tigercat/vue'
+import { DatePicker } from '@expcat/tigercat-vue'
 
 const date = ref(new Date('2024-01-15'))
 </script>
@@ -80,7 +80,7 @@ const date = ref(new Date('2024-01-15'))
 
 ```tsx
 import React, { useState } from 'react'
-import { DatePicker } from '@tigercat/react'
+import { DatePicker } from '@expcat/tigercat-react'
 
 function App() {
   const [date, setDate] = useState(new Date('2024-01-15'))
@@ -105,7 +105,7 @@ function App() {
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { DatePicker } from '@tigercat/vue'
+import { DatePicker } from '@expcat/tigercat-vue'
 
 const date = ref<Date | null>(null)
 const minDate = new Date('2024-01-01')
@@ -125,7 +125,7 @@ const maxDate = new Date('2024-12-31')
 
 ```tsx
 import React, { useState } from 'react'
-import { DatePicker } from '@tigercat/react'
+import { DatePicker } from '@expcat/tigercat-react'
 
 function App() {
   const [date, setDate] = useState<Date | null>(null)
@@ -171,7 +171,7 @@ function App() {
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { DatePicker } from '@tigercat/vue'
+import { DatePicker } from '@expcat/tigercat-vue'
 
 const date = ref(new Date())
 </script>
@@ -186,7 +186,7 @@ const date = ref(new Date())
 
 ```tsx
 import React, { useState } from 'react'
-import { DatePicker } from '@tigercat/react'
+import { DatePicker } from '@expcat/tigercat-react'
 
 function App() {
   const [date, setDate] = useState(new Date())
@@ -212,7 +212,7 @@ React 支持非受控模式，使用 `defaultValue` 属性。
 
 ```tsx
 import React from 'react'
-import { DatePicker } from '@tigercat/react'
+import { DatePicker } from '@expcat/tigercat-react'
 
 function App() {
   return <DatePicker defaultValue={new Date('2024-01-15')} placeholder="Uncontrolled datepicker" />
@@ -295,7 +295,7 @@ DatePicker 组件支持通过 CSS 变量进行主题定制。
 ### 使用 setThemeColors 工具函数
 
 ```typescript
-import { setThemeColors } from '@tigercat/core'
+import { setThemeColors } from '@expcat/tigercat-core'
 
 setThemeColors({
   primary: '#10b981',
@@ -337,8 +337,8 @@ DatePicker 组件遵循 WAI-ARIA 规范，支持：
 组件提供完整的 TypeScript 类型定义。
 
 ```typescript
-import type { DatePickerSize, DateFormat } from '@tigercat/core'
-import type { DatePickerProps } from '@tigercat/vue' // or '@tigercat/react'
+import type { DatePickerSize, DateFormat } from '@expcat/tigercat-core'
+import type { DatePickerProps } from '@expcat/tigercat-vue' // or '@expcat/tigercat-react'
 
 // 使用类型
 const size: DatePickerSize = 'md'

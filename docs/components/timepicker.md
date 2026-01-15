@@ -9,7 +9,7 @@
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { TimePicker } from '@expcat/tigercat-vue'
 
 const selectedTime = ref<string | null>(null)
 </script>
@@ -23,7 +23,7 @@ const selectedTime = ref<string | null>(null)
 
 ```tsx
 import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import { TimePicker } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
@@ -46,7 +46,7 @@ function App() {
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { TimePicker } from '@expcat/tigercat-vue'
 
 const time = ref<string | null>(null)
 const locale = ref<'zh-CN' | 'en-US'>('zh-CN')
@@ -69,7 +69,7 @@ const locale = ref<'zh-CN' | 'en-US'>('zh-CN')
 
 ```tsx
 import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import { TimePicker } from '@expcat/tigercat-react'
 
 function App() {
   const [time, setTime] = useState<string | null>(null)
@@ -105,7 +105,7 @@ function App() {
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { TimePicker } from '@expcat/tigercat-vue'
 
 const timeRange = ref<[string | null, string | null]>([null, null])
 </script>
@@ -119,7 +119,7 @@ const timeRange = ref<[string | null, string | null]>([null, null])
 
 ```tsx
 import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import { TimePicker } from '@expcat/tigercat-react'
 
 function App() {
   const [timeRange, setTimeRange] = useState<[string | null, string | null]>([null, null])
@@ -159,7 +159,7 @@ TimePicker 组件支持三种尺寸：`sm`、`md`、`lg`。
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { TimePicker } from '@expcat/tigercat-vue'
 
 const time = ref('14:30')
 </script>
@@ -174,7 +174,7 @@ const time = ref('14:30')
 
 ```tsx
 import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import { TimePicker } from '@expcat/tigercat-react'
 
 function App() {
   const [time, setTime] = useState('14:30')
@@ -197,7 +197,7 @@ function App() {
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { TimePicker } from '@expcat/tigercat-vue'
 
 const time = ref<string | null>(null)
 </script>
@@ -211,7 +211,7 @@ const time = ref<string | null>(null)
 
 ```tsx
 import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import { TimePicker } from '@expcat/tigercat-react'
 
 function App() {
   const [time, setTime] = useState<string | null>(null)
@@ -229,7 +229,7 @@ function App() {
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { TimePicker } from '@expcat/tigercat-vue'
 
 const time = ref<string | null>(null)
 </script>
@@ -243,7 +243,7 @@ const time = ref<string | null>(null)
 
 ```tsx
 import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import { TimePicker } from '@expcat/tigercat-react'
 
 function App() {
   const [time, setTime] = useState<string | null>(null)
@@ -261,7 +261,7 @@ function App() {
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { TimePicker } from '@expcat/tigercat-vue'
 
 const time = ref<string | null>(null)
 </script>
@@ -279,7 +279,7 @@ const time = ref<string | null>(null)
 
 ```tsx
 import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import { TimePicker } from '@expcat/tigercat-react'
 
 function App() {
   const [time, setTime] = useState<string | null>(null)
@@ -323,7 +323,7 @@ function App() {
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { TimePicker } from '@tigercat/vue'
+import { TimePicker } from '@expcat/tigercat-vue'
 
 const time = ref('14:30')
 </script>
@@ -338,7 +338,7 @@ const time = ref('14:30')
 
 ```tsx
 import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import { TimePicker } from '@expcat/tigercat-react'
 
 function App() {
   const [time, setTime] = useState('14:30')
@@ -364,7 +364,7 @@ React 支持非受控模式，使用 `defaultValue` 属性。
 
 ```tsx
 import React from 'react'
-import { TimePicker } from '@tigercat/react'
+import { TimePicker } from '@expcat/tigercat-react'
 
 function App() {
   return <TimePicker defaultValue="14:30" placeholder="Uncontrolled timepicker" />
@@ -450,7 +450,7 @@ TimePicker 组件支持通过 CSS 变量进行主题定制。
 ### 使用 setThemeColors 工具函数
 
 ```typescript
-import { setThemeColors } from '@tigercat/core'
+import { setThemeColors } from '@expcat/tigercat-core'
 
 setThemeColors({
   primary: '#10b981',
@@ -491,8 +491,8 @@ TimePicker 组件遵循 WAI-ARIA 规范，支持：
 组件提供完整的 TypeScript 类型定义。
 
 ```typescript
-import type { TimePickerSize, TimeFormat } from '@tigercat/core'
-import type { TimePickerProps } from '@tigercat/vue' // or '@tigercat/react'
+import type { TimePickerSize, TimeFormat } from '@expcat/tigercat-core'
+import type { TimePickerProps } from '@expcat/tigercat-vue' // or '@expcat/tigercat-react'
 
 // 使用类型
 const size: TimePickerSize = 'md'

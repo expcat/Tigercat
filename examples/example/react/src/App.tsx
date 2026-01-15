@@ -26,7 +26,7 @@ import {
   Link,
   Text,
   Icon
-} from '@tigercat/react'
+} from '@expcat/tigercat-react'
 
 const App: React.FC = () => {
   // Form state

@@ -12,7 +12,7 @@ import {
   tagCloseButtonBaseClasses,
   tagCloseIconPath,
   type TagProps as CoreTagProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export type TagProps = CoreTagProps &
   Omit<React.HTMLAttributes<HTMLSpanElement>, keyof CoreTagProps | 'onClose'> & {

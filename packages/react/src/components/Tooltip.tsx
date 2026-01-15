@@ -6,7 +6,7 @@ import {
   getTooltipContentClasses,
   getDropdownMenuWrapperClasses,
   type TooltipProps as CoreTooltipProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 let tooltipIdCounter = 0
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Badge, Space, Divider, Button } from '@tigercat/vue'
+import { Badge, Space, Divider, Button } from '@expcat/tigercat-vue'
 
 const notificationCount = ref(5)
 const messageCount = ref(99)

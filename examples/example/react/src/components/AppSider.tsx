@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Button } from '@tigercat/react'
+import { Button } from '@expcat/tigercat-react'
 import { DEMO_NAV_GROUPS, type DemoLang, type DemoNavGroup } from '@demo-shared/app-config'
 import {
   getStoredCollapsedNavGroups,

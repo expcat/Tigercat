@@ -11,7 +11,7 @@ import {
   normalizeSvgAttrs,
   type ButtonVariant,
   type ButtonSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueButtonProps {
   variant?: ButtonVariant

@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Link } from '@tigercat/vue'
+import { Link } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -20,7 +20,7 @@ import { Link } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Link } from '@tigercat/react'
+import { Link } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -154,7 +154,7 @@ Link 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { Link } from '@tigercat/vue'
+import { Link } from '@expcat/tigercat-vue'
 
 const handleClick = (event) => {
   console.log('Link clicked:', event)
@@ -171,7 +171,7 @@ const handleClick = (event) => {
 ### React
 
 ```tsx
-import { Link } from '@tigercat/react'
+import { Link } from '@expcat/tigercat-react'
 
 function App() {
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {

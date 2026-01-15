@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { notification, Divider, Button } from '@tigercat/vue'
+import { notification, Divider, Button } from '@expcat/tigercat-vue'
 import { ref } from 'vue'
 
 const closeNotificationRef = ref<(() => void) | null>(null)

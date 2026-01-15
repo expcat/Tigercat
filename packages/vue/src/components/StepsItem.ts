@@ -25,7 +25,7 @@ import {
   stepFinishIconPathStrokeLinejoin,
   stepFinishIconPathStrokeWidth,
   type StepStatus
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { StepsContextKey, type StepsContext } from './Steps'
 
 type RawChildren = string | number | boolean | VNode | VNodeArrayChildren | (() => unknown)

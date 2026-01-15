@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Table, Button, Space, type TableColumn } from '@tigercat/react'
+import { Table, Button, Space, type TableColumn } from '@expcat/tigercat-react'
 
 interface UserData extends Record<string, unknown> {
   id: number

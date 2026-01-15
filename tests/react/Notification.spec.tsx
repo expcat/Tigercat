@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act } from '@testing-library/react'
-import { notification } from '@tigercat/react'
+import { notification } from '@expcat/tigercat-react'
 
 const notificationPositions = ['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const
 

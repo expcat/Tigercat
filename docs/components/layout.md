@@ -10,7 +10,7 @@ Layout 组件提供了一套完整的页面布局解决方案，支持多种经�
 
 ```vue
 <script setup>
-import { Layout, Header, Content, Footer } from '@tigercat/vue'
+import { Layout, Header, Content, Footer } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -25,7 +25,7 @@ import { Layout, Header, Content, Footer } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Layout, Header, Content, Footer } from '@tigercat/react'
+import { Layout, Header, Content, Footer } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -46,7 +46,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/vue'
+import { Layout, Header, Sidebar, Content, Footer } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -64,7 +64,7 @@ import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/react'
+import { Layout, Header, Sidebar, Content, Footer } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -89,7 +89,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Layout, Header, Sidebar, Content, Footer, Button } from '@tigercat/vue'
+import { Layout, Header, Sidebar, Content, Footer, Button } from '@expcat/tigercat-vue'
 
 const collapsed = ref(false)
 
@@ -140,7 +140,7 @@ const toggleSidebar = () => {
 
 ```tsx
 import { useState } from 'react'
-import { Layout, Header, Sidebar, Content, Footer, Button } from '@tigercat/react'
+import { Layout, Header, Sidebar, Content, Footer, Button } from '@expcat/tigercat-react'
 
 function App() {
   const [collapsed, setCollapsed] = useState(false)
@@ -525,10 +525,10 @@ import type {
   SidebarProps,
   ContentProps,
   FooterProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Vue
-import { Layout, Header, Sidebar, Content, Footer } from '@tigercat/vue'
+import { Layout, Header, Sidebar, Content, Footer } from '@expcat/tigercat-vue'
 
 // React
 import {
@@ -542,7 +542,7 @@ import {
   type SidebarProps as ReactSidebarProps,
   type ContentProps as ReactContentProps,
   type FooterProps as ReactFooterProps
-} from '@tigercat/react'
+} from '@expcat/tigercat-react'
 ```
 
 ## 完整示例
@@ -554,7 +554,7 @@ import {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Layout, Header, Sidebar, Content, Footer, Button } from '@tigercat/vue'
+import { Layout, Header, Sidebar, Content, Footer, Button } from '@expcat/tigercat-vue'
 
 const collapsed = ref(false)
 const currentPage = ref('dashboard')
@@ -639,7 +639,7 @@ const navigateTo = (pageId) => {
 
 ```tsx
 import { useState } from 'react'
-import { Layout, Header, Sidebar, Content, Footer, Button } from '@tigercat/react'
+import { Layout, Header, Sidebar, Content, Footer, Button } from '@expcat/tigercat-react'
 
 interface MenuItem {
   id: string

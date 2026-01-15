@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Tabs, TabPane, Divider } from '@tigercat/vue'
+import { Tabs, TabPane, Divider } from '@expcat/tigercat-vue'
 
 const activeKey1 = ref('1')
 const activeKey2 = ref('1')

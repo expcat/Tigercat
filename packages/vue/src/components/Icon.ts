@@ -6,7 +6,7 @@ import {
   iconSvgBaseClasses,
   iconWrapperClasses,
   type IconSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueIconProps {
   size?: IconSize

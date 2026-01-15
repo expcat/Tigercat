@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { defineComponent, reactive, h } from 'vue'
-import { Form, FormItem, type FormRule } from '@tigercat/vue'
+import { Form, FormItem, type FormRule } from '@expcat/tigercat-vue'
 import { expectNoA11yViolations } from '../utils'
 
 describe('Form', () => {

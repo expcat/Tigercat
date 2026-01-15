@@ -22,7 +22,7 @@ pnpm install
 启动开发服务器：
 
 ```bash
-pnpm --filter @tigercat-example/react dev
+pnpm --filter @expcat/tigercat-example-react dev
 ```
 
 或者在当前目录下运行：

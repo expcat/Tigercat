@@ -4,8 +4,8 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { Descriptions } from '@tigercat/vue'
-import type { DescriptionsItem } from '@tigercat/core'
+import { Descriptions } from '@expcat/tigercat-vue'
+import type { DescriptionsItem } from '@expcat/tigercat-core'
 
 describe('Descriptions (Vue)', () => {
   it('renders title and extra (prop + slot)', () => {

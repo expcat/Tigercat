@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Tooltip, Button, Space, Divider } from '@tigercat/vue'
+import { Tooltip, Button, Space, Divider } from '@expcat/tigercat-vue'
 
 const visible1 = ref(false)
 </script>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Steps, StepsItem, Button, Divider } from '@tigercat/vue'
+import { Steps, StepsItem, Button, Divider } from '@expcat/tigercat-vue'
 
 const current1 = ref(1)
 const current2 = ref(1)

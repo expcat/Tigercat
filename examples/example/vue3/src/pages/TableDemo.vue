@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, h } from 'vue'
-import { Table, Button, Space, type TableColumn } from '@tigercat/vue'
+import { Table, Button, Space, type TableColumn } from '@expcat/tigercat-vue'
 
 // Basic data
 interface UserData extends Record<string, unknown> {

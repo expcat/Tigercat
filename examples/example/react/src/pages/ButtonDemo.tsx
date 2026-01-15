@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Space, Divider } from '@tigercat/react'
+import { Button, Space, Divider } from '@expcat/tigercat-react'
 
 const ButtonDemo: React.FC = () => {
   return (

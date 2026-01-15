@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Checkbox, CheckboxGroup, Space, Divider } from '@tigercat/vue'
+import { Checkbox, CheckboxGroup, Space, Divider } from '@expcat/tigercat-vue'
 
 const checked = ref(false)
 const fruitsIndeterminate = ref<string[]>(['apple'])

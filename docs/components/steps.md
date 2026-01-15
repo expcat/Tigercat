@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Steps, StepsItem } from '@tigercat/vue'
+import { Steps, StepsItem } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 </script>
@@ -27,7 +27,7 @@ const current = ref(1)
 
 ```tsx
 import { useState } from 'react'
-import { Steps, StepsItem } from '@tigercat/react'
+import { Steps, StepsItem } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -51,7 +51,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Steps, StepsItem } from '@tigercat/vue'
+import { Steps, StepsItem } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 </script>
@@ -69,7 +69,7 @@ const current = ref(1)
 
 ```tsx
 import { useState } from 'react'
-import { Steps, StepsItem } from '@tigercat/react'
+import { Steps, StepsItem } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -93,7 +93,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Steps, StepsItem } from '@tigercat/vue'
+import { Steps, StepsItem } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 </script>
@@ -111,7 +111,7 @@ const current = ref(1)
 
 ```tsx
 import { useState } from 'react'
-import { Steps, StepsItem } from '@tigercat/react'
+import { Steps, StepsItem } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -135,7 +135,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Steps, StepsItem } from '@tigercat/vue'
+import { Steps, StepsItem } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 </script>
@@ -153,7 +153,7 @@ const current = ref(1)
 
 ```tsx
 import { useState } from 'react'
-import { Steps, StepsItem } from '@tigercat/react'
+import { Steps, StepsItem } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -177,7 +177,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Steps, StepsItem } from '@tigercat/vue'
+import { Steps, StepsItem } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 </script>
@@ -195,7 +195,7 @@ const current = ref(1)
 
 ```tsx
 import { useState } from 'react'
-import { Steps, StepsItem } from '@tigercat/react'
+import { Steps, StepsItem } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)
@@ -219,7 +219,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Steps, StepsItem } from '@tigercat/vue'
+import { Steps, StepsItem } from '@expcat/tigercat-vue'
 
 const current = ref(0)
 </script>
@@ -238,7 +238,7 @@ const current = ref(0)
 
 ```tsx
 import { useState } from 'react'
-import { Steps, StepsItem } from '@tigercat/react'
+import { Steps, StepsItem } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(0)
@@ -265,7 +265,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Steps, StepsItem } from '@tigercat/vue'
+import { Steps, StepsItem } from '@expcat/tigercat-vue'
 
 const current = ref(1)
 </script>
@@ -313,7 +313,7 @@ const current = ref(1)
 
 ```tsx
 import { useState } from 'react'
-import { Steps, StepsItem } from '@tigercat/react'
+import { Steps, StepsItem } from '@expcat/tigercat-react'
 
 function App() {
   const [current, setCurrent] = useState(1)

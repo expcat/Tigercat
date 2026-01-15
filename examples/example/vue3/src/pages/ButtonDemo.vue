@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, Space, Divider } from '@tigercat/vue'
+import { Button, Space, Divider } from '@expcat/tigercat-vue'
 </script>
 
 <template>

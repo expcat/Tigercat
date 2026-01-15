@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { List } from '@tigercat/vue'
+import { List } from '@expcat/tigercat-vue'
 import { expectNoA11yViolations } from '../utils'
 
 const sampleData = [

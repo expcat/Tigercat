@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Alert } from '@tigercat/react'
+import { Alert } from '@expcat/tigercat-react'
 import { expectNoA11yViolations } from '../utils/react'
 
 describe('Alert', () => {

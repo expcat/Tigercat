@@ -1,5 +1,5 @@
 import React from 'react'
-import { Icon } from '@tigercat/react'
+import { Icon } from '@expcat/tigercat-react'
 
 const IconDemo: React.FC = () => {
   return (

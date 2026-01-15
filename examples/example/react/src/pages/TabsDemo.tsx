@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Tabs, TabPane } from '@tigercat/react'
+import { Tabs, TabPane } from '@expcat/tigercat-react'
 
 export default function TabsDemo() {
   const [activeKey1, setActiveKey1] = useState('1')

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Divider } from '@tigercat/react'
+import { Divider } from '@expcat/tigercat-react'
 
 const DividerDemo: React.FC = () => {
   return (

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Progress, Space, Divider, Button } from '@tigercat/react'
+import { Progress, Space, Divider, Button } from '@expcat/tigercat-react'
 
 export default function ProgressDemo() {
   const [uploadProgress, setUploadProgress] = useState(0)

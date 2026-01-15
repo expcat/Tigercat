@@ -11,7 +11,7 @@ import {
   isKeyActive,
   tabCloseButtonClasses,
   type TabPaneProps as CoreTabPaneProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { useTabsContext } from './Tabs'
 
 export interface TabPaneProps extends Omit<CoreTabPaneProps, 'tabKey' | 'icon' | 'style'> {

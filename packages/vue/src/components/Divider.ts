@@ -7,7 +7,7 @@ import {
   type DividerOrientation,
   type DividerLineStyle,
   type DividerSpacing
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export const Divider = defineComponent({
   name: 'TigerDivider',

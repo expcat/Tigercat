@@ -16,7 +16,7 @@ import {
   getRadioColorClasses,
   getRadioVisualClasses,
   type RadioSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 import { RadioGroupKey, type RadioGroupContext } from './RadioGroup'
 

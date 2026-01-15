@@ -14,7 +14,7 @@ import {
   type TimelineMode,
   type TimelineItem,
   type TimelineItemPosition
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface TimelineProps extends Omit<React.HTMLAttributes<HTMLUListElement>, 'children'> {
   /**

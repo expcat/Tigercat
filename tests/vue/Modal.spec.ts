@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { Modal } from '@tigercat/vue'
+import { Modal } from '@expcat/tigercat-vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolations } from '../utils'
 
 const modalSizes = ['sm', 'md', 'lg', 'xl', 'full'] as const

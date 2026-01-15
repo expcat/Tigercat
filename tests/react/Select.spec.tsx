@@ -6,7 +6,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { Select } from '@tigercat/react'
+import { Select } from '@expcat/tigercat-react'
 import {
   expectNoA11yViolations,
   componentSizes,

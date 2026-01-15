@@ -18,7 +18,7 @@ import {
   type StepsDirection,
   type StepStatus,
   type StepSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Steps context key
 export const StepsContextKey = Symbol('StepsContext')

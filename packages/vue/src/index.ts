@@ -5,7 +5,7 @@
  */
 
 // Re-export from core
-export * from '@tigercat/core'
+export * from '@expcat/tigercat-core'
 
 // Global config
 export { ConfigProvider, useTigerConfig } from './components/ConfigProvider'

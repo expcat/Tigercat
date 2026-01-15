@@ -1,5 +1,5 @@
 import React from 'react'
-import { Breadcrumb, BreadcrumbItem, Divider } from '@tigercat/react'
+import { Breadcrumb, BreadcrumbItem, Divider } from '@expcat/tigercat-react'
 
 const BreadcrumbDemo: React.FC = () => {
   const handleClick = (event: React.MouseEvent) => {

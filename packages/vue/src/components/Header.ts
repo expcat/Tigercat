@@ -1,5 +1,5 @@
 import { defineComponent, h, PropType, computed } from 'vue'
-import { classNames, coerceClassValue, layoutHeaderClasses, mergeStyleValues } from '@tigercat/core'
+import { classNames, coerceClassValue, layoutHeaderClasses, mergeStyleValues } from '@expcat/tigercat-core'
 
 export interface VueHeaderProps {
   className?: string

@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Input } from '@tigercat/vue'
+import { Input } from '@expcat/tigercat-vue'
 
 const inputValue = ref('')
 </script>
@@ -23,7 +23,7 @@ const inputValue = ref('')
 
 ```tsx
 import { useState } from 'react'
-import { Input } from '@tigercat/react'
+import { Input } from '@expcat/tigercat-react'
 
 function App() {
   const [value, setValue] = useState('')
@@ -193,7 +193,7 @@ Input 组件支持多种 HTML5 输入类型：
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Input } from '@tigercat/vue'
+import { Input } from '@expcat/tigercat-vue'
 
 const value = ref('')
 
@@ -212,7 +212,7 @@ const handleChange = () => {
 
 ```tsx
 import { useState } from 'react'
-import { Input } from '@tigercat/react'
+import { Input } from '@expcat/tigercat-react'
 
 function ControlledExample() {
   const [value, setValue] = useState('')
@@ -241,7 +241,7 @@ function ControlledExample() {
 
 ```vue
 <script setup>
-import { Input } from '@tigercat/vue'
+import { Input } from '@expcat/tigercat-vue'
 
 const handleInput = (event) => {
   console.log('Input value:', event.target.value)
@@ -258,7 +258,7 @@ const handleInput = (event) => {
 在 React 中，使用 `defaultValue` 而不是 `value` 来创建非受控组件：
 
 ```tsx
-import { Input } from '@tigercat/react'
+import { Input } from '@expcat/tigercat-react'
 
 function UncontrolledExample() {
   const handleChange = (e) => {
@@ -277,7 +277,7 @@ Vue 组件支持以下事件：
 
 ```vue
 <script setup>
-import { Input } from '@tigercat/vue'
+import { Input } from '@expcat/tigercat-vue'
 
 const handleInput = (event) => {
   console.log('Input event:', event.target.value)
@@ -306,7 +306,7 @@ const handleBlur = (event) => {
 React 组件支持标准的事件处理器：
 
 ```tsx
-import { Input } from '@tigercat/react'
+import { Input } from '@expcat/tigercat-react'
 
 function EventExample() {
   const handleInput = (e) => {
@@ -451,11 +451,11 @@ Input 组件使用主题系统中的 CSS 变量控制边框、背景、文字、
 Input 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { InputProps, InputSize, InputType } from '@tigercat/core'
+import type { InputProps, InputSize, InputType } from '@expcat/tigercat-core'
 // Vue
-import type { Input, VueInputProps } from '@tigercat/vue'
+import type { Input, VueInputProps } from '@expcat/tigercat-vue'
 // React
-import type { Input, InputProps as ReactInputProps } from '@tigercat/react'
+import type { Input, InputProps as ReactInputProps } from '@expcat/tigercat-react'
 ```
 
 ## 示例
@@ -467,7 +467,7 @@ import type { Input, InputProps as ReactInputProps } from '@tigercat/react'
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Input, Button } from '@tigercat/vue'
+import { Input, Button } from '@expcat/tigercat-vue'
 
 const email = ref('')
 const password = ref('')
@@ -503,7 +503,7 @@ const handleSubmit = async () => {
 
 ```tsx
 import { useState, FormEvent } from 'react'
-import { Input, Button } from '@tigercat/react'
+import { Input, Button } from '@expcat/tigercat-react'
 
 function LoginForm() {
   const [email, setEmail] = useState('')
@@ -564,7 +564,7 @@ function LoginForm() {
 ```vue
 <script setup>
 import { ref, watch } from 'vue'
-import { Input } from '@tigercat/vue'
+import { Input } from '@expcat/tigercat-vue'
 
 const searchQuery = ref('')
 
@@ -583,7 +583,7 @@ watch(searchQuery, (newQuery) => {
 
 ```tsx
 import { useState, useEffect } from 'react'
-import { Input } from '@tigercat/react'
+import { Input } from '@expcat/tigercat-react'
 
 function SearchBox() {
   const [searchQuery, setSearchQuery] = useState('')

@@ -10,7 +10,7 @@ import {
   isEscapeKey,
   isSpaceKey,
   isTabKey
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 describe('a11y-utils (core)', () => {
   it('createAriaId should generate unique ids with default prefix', () => {

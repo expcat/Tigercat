@@ -3,7 +3,7 @@ import {
   classNames,
   layoutSidebarClasses,
   type SidebarProps as CoreSidebarProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface ReactSidebarProps
   extends CoreSidebarProps, Omit<React.HTMLAttributes<HTMLElement>, 'children' | 'width'> {

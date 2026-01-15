@@ -3,7 +3,7 @@ import {
   classNames,
   layoutHeaderClasses,
   type HeaderProps as CoreHeaderProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface ReactHeaderProps
   extends CoreHeaderProps, Omit<React.HTMLAttributes<HTMLElement>, 'children' | 'height'> {

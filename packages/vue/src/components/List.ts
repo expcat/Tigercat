@@ -38,7 +38,7 @@ import {
   type ListItemLayout,
   type ListItem,
   type ListPaginationConfig
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 const spinnerSvg = getSpinnerSVG('spinner')
 

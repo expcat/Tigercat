@@ -11,7 +11,7 @@ import {
   formatBadgeContent,
   shouldHideBadge,
   type BadgeProps as CoreBadgeProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export type BadgeProps = CoreBadgeProps &
   Omit<React.HTMLAttributes<HTMLSpanElement>, 'children' | 'content'> & {

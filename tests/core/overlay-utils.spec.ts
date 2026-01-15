@@ -3,7 +3,7 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { getFocusableElements, getFocusTrapNavigation, isEventOutside } from '@tigercat/core'
+import { getFocusableElements, getFocusTrapNavigation, isEventOutside } from '@expcat/tigercat-core'
 
 describe('overlay-utils (core)', () => {
   it('isEventOutside should return false when target is inside container', () => {

@@ -1,6 +1,6 @@
 import { defineComponent, computed, h, ref, watch, inject, type PropType } from 'vue'
-import { classNames, coerceClassValue } from '@tigercat/core'
-import { getCheckboxClasses, getCheckboxLabelClasses, type CheckboxSize } from '@tigercat/core'
+import { classNames, coerceClassValue } from '@expcat/tigercat-core'
+import { getCheckboxClasses, getCheckboxLabelClasses, type CheckboxSize } from '@expcat/tigercat-core'
 import type { ComputedRef } from 'vue'
 import { CheckboxGroupKey, type CheckboxGroupContext } from './CheckboxGroup'
 

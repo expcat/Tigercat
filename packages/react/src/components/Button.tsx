@@ -7,7 +7,7 @@ import {
   getButtonVariantClasses,
   getSpinnerSVG,
   type ButtonProps as CoreButtonProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface ButtonProps
   extends CoreButtonProps, Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled'> {}

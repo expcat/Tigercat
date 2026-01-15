@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Switch, Space, Divider } from '@tigercat/vue'
+import { Switch, Space, Divider } from '@expcat/tigercat-vue'
 
 const basicEnabled = ref(true)
 

@@ -6,8 +6,8 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { Input } from '@tigercat/react'
-import type { InputType } from '@tigercat/core'
+import { Input } from '@expcat/tigercat-react'
+import type { InputType } from '@expcat/tigercat-core'
 import {
   renderWithProps,
   expectNoA11yViolations,

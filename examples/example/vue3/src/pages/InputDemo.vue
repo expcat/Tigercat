@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Input, Space, Divider, FormItem } from '@tigercat/vue'
+import { Input, Space, Divider, FormItem } from '@expcat/tigercat-vue'
 
 const basicText = ref('')
 const controlledText = ref('')

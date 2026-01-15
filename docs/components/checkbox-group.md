@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { CheckboxGroup, Checkbox } from '@tigercat/vue'
+import { CheckboxGroup, Checkbox } from '@expcat/tigercat-vue'
 
 const selectedValues = ref(['apple', 'orange'])
 const options = [
@@ -32,7 +32,7 @@ const options = [
 
 ```tsx
 import { useState } from 'react'
-import { CheckboxGroup, Checkbox } from '@tigercat/react'
+import { CheckboxGroup, Checkbox } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedValues, setSelectedValues] = useState(['apple', 'orange'])
@@ -115,7 +115,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { CheckboxGroup, Checkbox } from '@tigercat/vue'
+import { CheckboxGroup, Checkbox } from '@expcat/tigercat-vue'
 
 const selectedValues = ref(['vue'])
 
@@ -142,7 +142,7 @@ const handleChange = (values) => {
 
 ```tsx
 import { useState } from 'react'
-import { CheckboxGroup, Checkbox } from '@tigercat/react'
+import { CheckboxGroup, Checkbox } from '@expcat/tigercat-react'
 
 function ControlledExample() {
   const [selectedValues, setSelectedValues] = useState(['vue'])
@@ -176,7 +176,7 @@ function ControlledExample() {
 
 ```vue
 <script setup>
-import { CheckboxGroup, Checkbox } from '@tigercat/vue'
+import { CheckboxGroup, Checkbox } from '@expcat/tigercat-vue'
 
 const handleChange = (values) => {
   console.log('Selected values:', values)
@@ -195,7 +195,7 @@ const handleChange = (values) => {
 #### React
 
 ```tsx
-import { CheckboxGroup, Checkbox } from '@tigercat/react'
+import { CheckboxGroup, Checkbox } from '@expcat/tigercat-react'
 
 function UncontrolledExample() {
   const handleChange = (values: (string | number | boolean)[]) => {
@@ -276,7 +276,7 @@ interface CheckboxGroupContext {
 ```vue
 <script setup>
 import { ref, watch } from 'vue'
-import { CheckboxGroup, Checkbox } from '@tigercat/vue'
+import { CheckboxGroup, Checkbox } from '@expcat/tigercat-vue'
 
 const selectedValues = ref([])
 const maxSelection = 2
@@ -303,7 +303,7 @@ watch(selectedValues, (newValues) => {
 
 ```tsx
 import { useState } from 'react'
-import { CheckboxGroup, Checkbox } from '@tigercat/react'
+import { CheckboxGroup, Checkbox } from '@expcat/tigercat-react'
 
 function DynamicOptions() {
   const [selectedValues, setSelectedValues] = useState([])
@@ -416,11 +416,11 @@ function DynamicOptions() {
 CheckboxGroup 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { CheckboxGroupProps, CheckboxGroupContext } from '@tigercat/core'
+import type { CheckboxGroupProps, CheckboxGroupContext } from '@expcat/tigercat-core'
 // Vue
-import type { CheckboxGroup } from '@tigercat/vue'
+import type { CheckboxGroup } from '@expcat/tigercat-vue'
 // React
-import { CheckboxGroup, useCheckboxGroup } from '@tigercat/react'
+import { CheckboxGroup, useCheckboxGroup } from '@expcat/tigercat-react'
 ```
 
 ## 相关组件
@@ -439,7 +439,7 @@ import { CheckboxGroup, useCheckboxGroup } from '@tigercat/react'
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { CheckboxGroup, Checkbox, Button } from '@tigercat/vue'
+import { CheckboxGroup, Checkbox, Button } from '@expcat/tigercat-vue'
 
 const interests = ref(['reading'])
 
@@ -469,7 +469,7 @@ const handleSubmit = () => {
 
 ```tsx
 import { useState, FormEvent } from 'react'
-import { CheckboxGroup, Checkbox, Button } from '@tigercat/react'
+import { CheckboxGroup, Checkbox, Button } from '@expcat/tigercat-react'
 
 function FormExample() {
   const [interests, setInterests] = useState(['reading'])

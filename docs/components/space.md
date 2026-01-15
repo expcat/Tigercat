@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Space, Button } from '@tigercat/vue'
+import { Space, Button } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -23,7 +23,7 @@ import { Space, Button } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Space, Button } from '@tigercat/react'
+import { Space, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -416,13 +416,13 @@ React 版本的 Space 组件支持 `className` 和 `style` 属性：
 Space 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { SpaceProps, SpaceDirection, SpaceSize, SpaceAlign } from '@tigercat/core'
+import type { SpaceProps, SpaceDirection, SpaceSize, SpaceAlign } from '@expcat/tigercat-core'
 
 // Vue
-import type { VueSpaceProps } from '@tigercat/vue'
+import type { VueSpaceProps } from '@expcat/tigercat-vue'
 
 // React
-import type { SpaceProps as ReactSpaceProps } from '@tigercat/react'
+import type { SpaceProps as ReactSpaceProps } from '@expcat/tigercat-react'
 ```
 
 ## 示例
@@ -433,7 +433,7 @@ import type { SpaceProps as ReactSpaceProps } from '@tigercat/react'
 
 ```vue
 <script setup>
-import { Space, Button } from '@tigercat/vue'
+import { Space, Button } from '@expcat/tigercat-vue'
 
 const handleSubmit = () => {
   console.log('Submit')
@@ -455,7 +455,7 @@ const handleCancel = () => {
 #### React
 
 ```tsx
-import { Space, Button } from '@tigercat/react'
+import { Space, Button } from '@expcat/tigercat-react'
 
 function FormActions() {
   const handleSubmit = () => {

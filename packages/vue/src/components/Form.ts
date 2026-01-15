@@ -12,7 +12,7 @@ import {
   validateForm,
   validateField as validateFieldUtil,
   getValueByPath
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Form context key
 export const FormContextKey = Symbol('FormContext')

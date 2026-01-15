@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { Space } from '@tigercat/vue'
+import { Space } from '@expcat/tigercat-vue'
 import { h } from 'vue'
 import { renderWithProps, renderWithSlots } from '../utils'
 

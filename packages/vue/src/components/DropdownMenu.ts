@@ -4,9 +4,9 @@ import {
   coerceClassValue,
   mergeStyleValues,
   getDropdownMenuClasses
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
-import type { DropdownMenuProps as CoreDropdownMenuProps } from '@tigercat/core'
+import type { DropdownMenuProps as CoreDropdownMenuProps } from '@expcat/tigercat-core'
 
 export interface VueDropdownMenuProps extends CoreDropdownMenuProps {}
 

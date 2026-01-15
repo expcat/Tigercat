@@ -14,9 +14,9 @@ This is a monorepo managed with pnpm workspaces containing:
 
 | Package           | Description                            |
 | ----------------- | -------------------------------------- |
-| `@tigercat/core`  | Core utilities for Tigercat UI library |
-| `@tigercat/vue`   | Vue 3 components                       |
-| `@tigercat/react` | React components                       |
+| `@expcat/tigercat-core`  | Core utilities for Tigercat UI library |
+| `@expcat/tigercat-vue`   | Vue 3 components                       |
+| `@expcat/tigercat-react` | React components                       |
 
 ## Development
 

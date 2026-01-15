@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Progress } from '@tigercat/vue'
+import { Progress } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Progress } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Progress } from '@tigercat/react'
+import { Progress } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -301,7 +301,7 @@ Progress 组件支持多种状态，状态会覆盖变体的颜色：
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Progress } from '@tigercat/vue'
+import { Progress } from '@expcat/tigercat-vue'
 
 const uploadProgress = ref(0)
 
@@ -328,7 +328,7 @@ const uploadFile = () => {
 
 ```tsx
 import { useState } from 'react'
-import { Progress } from '@tigercat/react'
+import { Progress } from '@expcat/tigercat-react'
 
 function FileUpload() {
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -362,7 +362,7 @@ function FileUpload() {
 ```vue
 <script setup>
 import { ref, computed } from 'vue'
-import { Progress } from '@tigercat/vue'
+import { Progress } from '@expcat/tigercat-vue'
 
 const tasks = ref([
   { id: 1, name: '需求分析', completed: true },
@@ -406,7 +406,7 @@ const getStatus = computed(() => {
 
 ```tsx
 import { useState, useMemo } from 'react'
-import { Progress } from '@tigercat/react'
+import { Progress } from '@expcat/tigercat-react'
 
 function TaskProgress() {
   const [tasks, setTasks] = useState([
@@ -460,7 +460,7 @@ function TaskProgress() {
 
 ```vue
 <script setup>
-import { Progress } from '@tigercat/vue'
+import { Progress } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -503,7 +503,7 @@ import { Progress } from '@tigercat/vue'
 #### React
 
 ```tsx
-import { Progress } from '@tigercat/react'
+import { Progress } from '@expcat/tigercat-react'
 
 function Dashboard() {
   return (

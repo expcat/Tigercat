@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { Tooltip } from '@tigercat/vue'
+import { Tooltip } from '@expcat/tigercat-vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolations } from '../utils'
 
 describe('Tooltip', () => {

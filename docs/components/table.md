@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Table } from '@tigercat/vue'
+import { Table } from '@expcat/tigercat-vue'
 
 const dataSource = ref([
   { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
@@ -32,7 +32,7 @@ const columns = [
 ### React
 
 ```tsx
-import { Table } from '@tigercat/react'
+import { Table } from '@expcat/tigercat-react'
 
 function App() {
   const dataSource = [
@@ -68,7 +68,7 @@ Table 的排序/筛选/分页/行选择都支持“受控/非受控”两种模�
 
 ```tsx
 import React, { useState } from 'react'
-import { Table, type SortState } from '@tigercat/react'
+import { Table, type SortState } from '@expcat/tigercat-react'
 
 export function App() {
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 })
@@ -92,7 +92,7 @@ export function App() {
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Table, type SortState } from '@tigercat/vue'
+import { Table, type SortState } from '@expcat/tigercat-vue'
 
 const pagination = ref({
   current: 1,
@@ -193,7 +193,7 @@ Table 组件支持 3 种不同的尺寸：
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Table } from '@tigercat/vue'
+import { Table } from '@expcat/tigercat-vue'
 
 const columns = [
   {
@@ -230,7 +230,7 @@ function handleSortChange(sortState) {
 ### React
 
 ```tsx
-import { Table } from '@tigercat/react'
+import { Table } from '@expcat/tigercat-react'
 
 function App() {
   const columns = [
@@ -272,7 +272,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Table } from '@tigercat/vue'
+import { Table } from '@expcat/tigercat-vue'
 
 const columns = [
   {
@@ -316,7 +316,7 @@ function handleFilterChange(filters) {
 ### React
 
 ```tsx
-import { Table } from '@tigercat/react'
+import { Table } from '@expcat/tigercat-react'
 
 function App() {
   const columns = [
@@ -370,7 +370,7 @@ Table 组件默认开启分页功能，每页显示 10 条数据。
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Table } from '@tigercat/vue'
+import { Table } from '@expcat/tigercat-vue'
 
 const columns = [
   { key: 'name', title: 'Name' },
@@ -413,7 +413,7 @@ function handlePageChange({ current, pageSize }) {
 
 ```tsx
 import { useState } from 'react'
-import { Table } from '@tigercat/react'
+import { Table } from '@expcat/tigercat-react'
 
 function App() {
   const columns = [
@@ -465,7 +465,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Table } from '@tigercat/vue'
+import { Table } from '@expcat/tigercat-vue'
 
 const columns = [
   { key: 'name', title: 'Name' },
@@ -504,7 +504,7 @@ function handleSelectionChange(selectedKeys) {
 
 ```tsx
 import { useState } from 'react'
-import { Table } from '@tigercat/react'
+import { Table } from '@expcat/tigercat-react'
 
 function App() {
   const columns = [
@@ -553,7 +553,7 @@ function App() {
 ```vue
 <script setup>
 import { ref, h } from 'vue'
-import { Table, Button } from '@tigercat/vue'
+import { Table, Button } from '@expcat/tigercat-vue'
 
 const columns = [
   { key: 'name', title: 'Name' },
@@ -602,7 +602,7 @@ function handleEdit(record) {
 ### React
 
 ```tsx
-import { Table, Button } from '@tigercat/react'
+import { Table, Button } from '@expcat/tigercat-react'
 
 function App() {
   const columns = [
@@ -677,7 +677,7 @@ function App() {
 ```vue
 <script setup>
 import { ref, h } from 'vue'
-import { Table } from '@tigercat/vue'
+import { Table } from '@expcat/tigercat-vue'
 
 const dataSource = ref([
   { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
@@ -706,7 +706,7 @@ const columns = [
 ### React
 
 ```tsx
-import { Table } from '@tigercat/react'
+import { Table } from '@expcat/tigercat-react'
 
 function App() {
   const dataSource = [
@@ -738,7 +738,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Table } from '@tigercat/vue'
+import { Table } from '@expcat/tigercat-vue'
 
 const loading = ref(true)
 
@@ -757,7 +757,7 @@ setTimeout(() => {
 
 ```tsx
 import { useState, useEffect } from 'react'
-import { Table } from '@tigercat/react'
+import { Table } from '@expcat/tigercat-react'
 
 function App() {
   const [loading, setLoading] = useState(true)

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Switch, Space, Divider } from '@tigercat/react'
+import { Switch, Space, Divider } from '@expcat/tigercat-react'
 
 const SwitchDemo: React.FC = () => {
   const [basicEnabled, setBasicEnabled] = useState(true)

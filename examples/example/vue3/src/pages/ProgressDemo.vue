@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Progress, Space, Divider, Button } from '@tigercat/vue'
+import { Progress, Space, Divider, Button } from '@expcat/tigercat-vue'
 
 const uploadProgress = ref(0)
 

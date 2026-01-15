@@ -9,7 +9,7 @@ import {
   getFlexClasses,
   getGutterStyles,
   type ColProps as CoreColProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { RowContext } from './Row'
 
 export type ColProps = React.HTMLAttributes<HTMLDivElement> & CoreColProps

@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Textarea } from '@tigercat/vue'
+import { Textarea } from '@expcat/tigercat-vue'
 
 const text = ref('')
 </script>
@@ -23,7 +23,7 @@ const text = ref('')
 
 ```tsx
 import { useState } from 'react'
-import { Textarea } from '@tigercat/react'
+import { Textarea } from '@expcat/tigercat-react'
 
 function App() {
   const [text, setText] = useState('')
@@ -181,7 +181,7 @@ Vue 3 版本使用 `v-model` 进行双向绑定，始终是受控模式。
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Textarea } from '@tigercat/vue'
+import { Textarea } from '@expcat/tigercat-vue'
 
 const text = ref('初始内容')
 
@@ -203,7 +203,7 @@ React 版本支持受控和非受控两种模式。
 
 ```tsx
 import { useState } from 'react'
-import { Textarea } from '@tigercat/react'
+import { Textarea } from '@expcat/tigercat-react'
 
 function ControlledExample() {
   const [text, setText] = useState('初始内容')
@@ -216,7 +216,7 @@ function ControlledExample() {
 
 ```tsx
 import { useRef } from 'react'
-import { Textarea } from '@tigercat/react'
+import { Textarea } from '@expcat/tigercat-react'
 
 function UncontrolledExample() {
   const textareaRef = useRef(null)
@@ -240,7 +240,7 @@ function UncontrolledExample() {
 
 ```vue
 <script setup>
-import { Textarea } from '@tigercat/vue'
+import { Textarea } from '@expcat/tigercat-vue'
 
 const handleInput = (event) => {
   console.log('Input:', event.target.value)
@@ -267,7 +267,7 @@ const handleBlur = (event) => {
 ### React
 
 ```tsx
-import { Textarea } from '@tigercat/react'
+import { Textarea } from '@expcat/tigercat-react'
 
 function EventExample() {
   const handleInput = (event) => {
@@ -408,13 +408,13 @@ Textarea 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
 // Core types
-import type { TextareaProps, TextareaSize } from '@tigercat/core'
+import type { TextareaProps, TextareaSize } from '@expcat/tigercat-core'
 
 // Vue
-import type { Textarea, VueTextareaProps } from '@tigercat/vue'
+import type { Textarea, VueTextareaProps } from '@expcat/tigercat-vue'
 
 // React
-import type { Textarea, TextareaProps as ReactTextareaProps } from '@tigercat/react'
+import type { Textarea, TextareaProps as ReactTextareaProps } from '@expcat/tigercat-react'
 ````
 
 ## 示例
@@ -426,7 +426,7 @@ import type { Textarea, TextareaProps as ReactTextareaProps } from '@tigercat/re
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Textarea, Button } from '@tigercat/vue'
+import { Textarea, Button } from '@expcat/tigercat-vue'
 
 const comment = ref('')
 const loading = ref(false)
@@ -465,7 +465,7 @@ const handleSubmit = async () => {
 
 ```tsx
 import { useState } from 'react'
-import { Textarea, Button } from '@tigercat/react'
+import { Textarea, Button } from '@expcat/tigercat-react'
 
 function CommentForm() {
   const [comment, setComment] = useState('')
@@ -512,7 +512,7 @@ function CommentForm() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Textarea } from '@tigercat/vue'
+import { Textarea } from '@expcat/tigercat-vue'
 
 const note = ref('')
 </script>
@@ -531,7 +531,7 @@ const note = ref('')
 
 ```tsx
 import { useState } from 'react'
-import { Textarea } from '@tigercat/react'
+import { Textarea } from '@expcat/tigercat-react'
 
 function AutoResizeExample() {
   const [note, setNote] = useState('')
@@ -556,7 +556,7 @@ function AutoResizeExample() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Textarea } from '@tigercat/vue'
+import { Textarea } from '@expcat/tigercat-vue'
 
 const bio = ref('')
 </script>
@@ -578,7 +578,7 @@ const bio = ref('')
 
 ```tsx
 import { useState } from 'react'
-import { Textarea } from '@tigercat/react'
+import { Textarea } from '@expcat/tigercat-react'
 
 function BioForm() {
   const [bio, setBio] = useState('')

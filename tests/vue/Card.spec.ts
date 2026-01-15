@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/vue'
-import { Card } from '@tigercat/vue'
+import { Card } from '@expcat/tigercat-vue'
 import { expectNoA11yViolations } from '../utils'
 
 describe('Card', () => {

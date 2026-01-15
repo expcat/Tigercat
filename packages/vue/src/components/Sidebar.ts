@@ -4,7 +4,7 @@ import {
   coerceClassValue,
   layoutSidebarClasses,
   mergeStyleValues
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueSidebarProps {
   className?: string

@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { h } from 'vue'
 import userEvent from '@testing-library/user-event'
-import { Breadcrumb, BreadcrumbItem } from '@tigercat/vue'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-vue'
 
 describe('Breadcrumb', () => {
   describe('Rendering', () => {

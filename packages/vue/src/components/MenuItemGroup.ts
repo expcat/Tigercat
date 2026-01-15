@@ -4,7 +4,7 @@ import {
   coerceClassValue,
   menuItemGroupTitleClasses,
   mergeStyleValues
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueMenuItemGroupProps {
   title?: string

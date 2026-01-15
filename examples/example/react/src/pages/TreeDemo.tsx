@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Tree, Card, Space, Input } from '@tigercat/react'
-import type { TreeNode } from '@tigercat/react'
+import { Tree, Card, Space, Input } from '@expcat/tigercat-react'
+import type { TreeNode } from '@expcat/tigercat-react'
 
 export default function TreeDemo() {
   // Basic tree data

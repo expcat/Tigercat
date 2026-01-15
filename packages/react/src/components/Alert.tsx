@@ -18,7 +18,7 @@ import {
   getAlertIconPath,
   alertCloseIconPath,
   type AlertProps as CoreAlertProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface AlertProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, CoreAlertProps {

@@ -5,7 +5,7 @@
 import React from 'react'
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { Space } from '@tigercat/react'
+import { Space } from '@expcat/tigercat-react'
 
 describe('Space (React)', () => {
   it('renders defaults and children', () => {

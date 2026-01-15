@@ -6,7 +6,7 @@ import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Pagination } from '@tigercat/react'
+import { Pagination } from '@expcat/tigercat-react'
 
 describe('Pagination', () => {
   it('renders navigation with default aria-label', () => {

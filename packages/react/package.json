@@ -1,5 +1,5 @@
 {
-  "name": "@tigercat/react",
+  "name": "@expcat/tigercat-react",
   "version": "0.0.1",
   "description": "React components for Tigercat UI library",
   "license": "MIT",
@@ -43,7 +43,7 @@
     "clean": "node ../../scripts/rimraf.mjs dist"
   },
   "dependencies": {
-    "@tigercat/core": "workspace:*"
+    "@expcat/tigercat-core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^25.0.3",

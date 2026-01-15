@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { Textarea } from '@tigercat/vue'
+import { Textarea } from '@expcat/tigercat-vue'
 import { renderWithProps, expectNoA11yViolations, componentSizes } from '../utils'
 
 describe('Textarea', () => {

@@ -34,7 +34,7 @@ import {
   type NotificationOptions,
   type NotificationPosition,
   isBrowser
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 type HChildren = Parameters<typeof h>[2]
 type HArrayChildren = Extract<NonNullable<HChildren>, unknown[]>

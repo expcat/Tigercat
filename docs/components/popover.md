@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { Popover, Button } from '@tigercat/vue'
+import { Popover, Button } from '@expcat/tigercat-vue'
 </script>
 ```
 
@@ -24,7 +24,7 @@ import { Popover, Button } from '@tigercat/vue'
 
 ```tsx
 import React from 'react'
-import { Popover, Button } from '@tigercat/react'
+import { Popover, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -53,7 +53,7 @@ function App() {
 </template>
 
 <script setup>
-import { Popover, Button } from '@tigercat/vue'
+import { Popover, Button } from '@expcat/tigercat-vue'
 </script>
 ```
 
@@ -61,7 +61,7 @@ import { Popover, Button } from '@tigercat/vue'
 
 ```tsx
 import React from 'react'
-import { Popover, Button } from '@tigercat/react'
+import { Popover, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -103,7 +103,7 @@ function App() {
 </template>
 
 <script setup>
-import { Popover, Button } from '@tigercat/vue'
+import { Popover, Button } from '@expcat/tigercat-vue'
 </script>
 ```
 
@@ -111,7 +111,7 @@ import { Popover, Button } from '@tigercat/vue'
 
 ```tsx
 import React from 'react'
-import { Popover, Button } from '@tigercat/react'
+import { Popover, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -163,7 +163,7 @@ function App() {
 </template>
 
 <script setup>
-import { Popover, Button } from '@tigercat/vue'
+import { Popover, Button } from '@expcat/tigercat-vue'
 </script>
 ```
 
@@ -171,7 +171,7 @@ import { Popover, Button } from '@tigercat/vue'
 
 ```tsx
 import React from 'react'
-import { Popover, Button } from '@tigercat/react'
+import { Popover, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -229,7 +229,7 @@ function App() {
 
 <script setup>
 import { ref } from 'vue'
-import { Popover, Button } from '@tigercat/vue'
+import { Popover, Button } from '@expcat/tigercat-vue'
 
 const manualVisible = ref(false)
 </script>
@@ -239,7 +239,7 @@ const manualVisible = ref(false)
 
 ```tsx
 import React, { useState } from 'react'
-import { Popover, Button } from '@tigercat/react'
+import { Popover, Button } from '@expcat/tigercat-react'
 
 function App() {
   const [manualVisible, setManualVisible] = useState(false)
@@ -292,7 +292,7 @@ function App() {
 
 <script setup>
 import { ref } from 'vue'
-import { Popover, Button } from '@tigercat/vue'
+import { Popover, Button } from '@expcat/tigercat-vue'
 
 const visible = ref(false)
 </script>
@@ -302,7 +302,7 @@ const visible = ref(false)
 
 ```tsx
 import React, { useState } from 'react'
-import { Popover, Button } from '@tigercat/react'
+import { Popover, Button } from '@expcat/tigercat-react'
 
 function App() {
   const [visible, setVisible] = useState(false)
@@ -345,7 +345,7 @@ function App() {
 </template>
 
 <script setup>
-import { Popover, Button } from '@tigercat/vue'
+import { Popover, Button } from '@expcat/tigercat-vue'
 </script>
 ```
 
@@ -353,7 +353,7 @@ import { Popover, Button } from '@tigercat/vue'
 
 ```tsx
 import React from 'react'
-import { Popover, Button } from '@tigercat/react'
+import { Popover, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -384,7 +384,7 @@ function App() {
 </template>
 
 <script setup>
-import { Popover, Button } from '@tigercat/vue'
+import { Popover, Button } from '@expcat/tigercat-vue'
 </script>
 ```
 
@@ -392,7 +392,7 @@ import { Popover, Button } from '@tigercat/vue'
 
 ```tsx
 import React from 'react'
-import { Popover, Button } from '@tigercat/react'
+import { Popover, Button } from '@expcat/tigercat-react'
 
 function App() {
   return (

@@ -10,7 +10,7 @@ Icon 组件提供了一个通用的图标容器，可以包裹任何 SVG 内容�
 
 ```vue
 <script setup>
-import { Icon } from '@tigercat/vue'
+import { Icon } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -25,7 +25,7 @@ import { Icon } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Icon } from '@tigercat/react'
+import { Icon } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -179,7 +179,7 @@ Icon 组件会自动为 SVG 元素添加合适的属性，如 `stroke`、`fill`�
 
 ```vue
 <script setup>
-import { Icon } from '@tigercat/vue'
+import { Icon } from '@expcat/tigercat-vue'
 
 // 自定义心形图标
 const HeartIcon = () => (
@@ -209,7 +209,7 @@ const StarIcon = () => (
 ### React
 
 ```tsx
-import { Icon } from '@tigercat/react'
+import { Icon } from '@expcat/tigercat-react'
 
 // 自定义心形图标
 const HeartIcon = () => (
@@ -246,7 +246,7 @@ Icon 组件可以与流行的图标库一起使用，如 Heroicons、Lucide、Fo
 ### 使用 Heroicons (React)
 
 ```tsx
-import { Icon } from '@tigercat/react'
+import { Icon } from '@expcat/tigercat-react'
 import { HomeIcon, UserIcon } from '@heroicons/react/24/outline'
 
 function App() {
@@ -268,7 +268,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Icon } from '@tigercat/vue'
+import { Icon } from '@expcat/tigercat-vue'
 import { Home, User, Settings } from 'lucide-vue-next'
 </script>
 
@@ -295,7 +295,7 @@ import { Home, User, Settings } from 'lucide-vue-next'
 
 ```vue
 <script setup>
-import { Button, Icon } from '@tigercat/vue'
+import { Button, Icon } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -323,7 +323,7 @@ import { Button, Icon } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Button, Icon } from '@tigercat/react'
+import { Button, Icon } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -495,11 +495,11 @@ Icon 组件会自动为 SVG 元素添加以下默认属性（如果未指定）�
 Icon 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { IconProps, IconSize } from '@tigercat/core'
+import type { IconProps, IconSize } from '@expcat/tigercat-core'
 // Vue
-import type { VueIconProps } from '@tigercat/vue'
+import type { VueIconProps } from '@expcat/tigercat-vue'
 // React
-import type { Icon, IconProps as ReactIconProps } from '@tigercat/react'
+import type { Icon, IconProps as ReactIconProps } from '@expcat/tigercat-react'
 ```
 
 ## 示例集合
@@ -510,7 +510,7 @@ import type { Icon, IconProps as ReactIconProps } from '@tigercat/react'
 
 ```vue
 <script setup>
-import { Icon } from '@tigercat/vue'
+import { Icon } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -548,7 +548,7 @@ import { Icon } from '@tigercat/vue'
 #### React
 
 ```tsx
-import { Icon } from '@tigercat/react'
+import { Icon } from '@expcat/tigercat-react'
 
 function IconExamples() {
   return (

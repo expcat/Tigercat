@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Container, Layout, Header, Sidebar, Content, Footer } from '@tigercat/vue'
+import { Container, Layout, Header, Sidebar, Content, Footer } from '@expcat/tigercat-vue'
 </script>
 
 <template>

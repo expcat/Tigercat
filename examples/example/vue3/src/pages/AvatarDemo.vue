@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Avatar, Space, Divider, Badge } from '@tigercat/vue'
+import { Avatar, Space, Divider, Badge } from '@expcat/tigercat-vue'
 </script>
 
 <template>

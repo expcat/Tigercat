@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Radio } from '@tigercat/vue'
+import { Radio } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -20,7 +20,7 @@ import { Radio } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Radio } from '@tigercat/react'
+import { Radio } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -41,7 +41,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { RadioGroup, Radio } from '@tigercat/vue'
+import { RadioGroup, Radio } from '@expcat/tigercat-vue'
 
 const selected = ref('option1')
 </script>
@@ -61,7 +61,7 @@ const selected = ref('option1')
 
 ```vue
 <script setup>
-import { RadioGroup, Radio } from '@tigercat/vue'
+import { RadioGroup, Radio } from '@expcat/tigercat-vue'
 
 const handleChange = (value) => {
   console.log('Changed to:', value)
@@ -81,7 +81,7 @@ const handleChange = (value) => {
 
 ```tsx
 import { useState } from 'react'
-import { RadioGroup, Radio } from '@tigercat/react'
+import { RadioGroup, Radio } from '@expcat/tigercat-react'
 
 function App() {
   const [selected, setSelected] = useState('option1')
@@ -103,7 +103,7 @@ function App() {
 ### React - 非受控模式
 
 ```tsx
-import { RadioGroup, Radio } from '@tigercat/react'
+import { RadioGroup, Radio } from '@expcat/tigercat-react'
 
 function App() {
   const handleChange = (value) => {
@@ -264,7 +264,7 @@ Radio 组件支持字符串和数字值。
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { RadioGroup, Radio } from '@tigercat/vue'
+import { RadioGroup, Radio } from '@expcat/tigercat-vue'
 
 const quantity = ref(1)
 </script>
@@ -285,7 +285,7 @@ const quantity = ref(1)
 
 ```tsx
 import { useState } from 'react'
-import { RadioGroup, Radio } from '@tigercat/react'
+import { RadioGroup, Radio } from '@expcat/tigercat-react'
 
 function App() {
   const [quantity, setQuantity] = useState(1)
@@ -404,7 +404,7 @@ Radio 组件使用与 Button 相同的主题变量来保持一致性。
 
 ```vue
 <script setup>
-import { RadioGroup, Radio, setThemeColors } from '@tigercat/vue'
+import { RadioGroup, Radio, setThemeColors } from '@expcat/tigercat-vue'
 
 const switchTheme = () => {
   setThemeColors({
@@ -427,7 +427,7 @@ const switchTheme = () => {
 **React:**
 
 ```tsx
-import { RadioGroup, Radio, setThemeColors } from '@tigercat/react'
+import { RadioGroup, Radio, setThemeColors } from '@expcat/tigercat-react'
 
 function App() {
   const switchTheme = () => {
@@ -466,16 +466,16 @@ function App() {
 Radio 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
-import type { RadioProps, RadioGroupProps, RadioSize } from '@tigercat/core'
+import type { RadioProps, RadioGroupProps, RadioSize } from '@expcat/tigercat-core'
 // Vue
-import type { Radio, RadioGroup } from '@tigercat/vue'
+import type { Radio, RadioGroup } from '@expcat/tigercat-vue'
 // React
 import type {
   Radio,
   RadioGroup,
   RadioProps as ReactRadioProps,
   RadioGroupProps as ReactRadioGroupProps
-} from '@tigercat/react'
+} from '@expcat/tigercat-react'
 ```
 
 ## 示例
@@ -487,7 +487,7 @@ import type {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { RadioGroup, Radio, Button } from '@tigercat/vue'
+import { RadioGroup, Radio, Button } from '@expcat/tigercat-vue'
 
 const preference = ref('email')
 
@@ -517,7 +517,7 @@ const handleSubmit = () => {
 
 ```tsx
 import { useState } from 'react'
-import { RadioGroup, Radio, Button } from '@tigercat/react'
+import { RadioGroup, Radio, Button } from '@expcat/tigercat-react'
 
 function PreferenceForm() {
   const [preference, setPreference] = useState('email')

@@ -1,4 +1,4 @@
-import { Avatar, Space, Divider, Badge } from '@tigercat/react'
+import { Avatar, Space, Divider, Badge } from '@expcat/tigercat-react'
 
 export default function AvatarDemo() {
   return (

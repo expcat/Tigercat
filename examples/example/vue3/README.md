@@ -22,7 +22,7 @@ pnpm install
 启动开发服务器：
 
 ```bash
-pnpm --filter @tigercat-example/vue3 dev
+pnpm --filter @expcat/tigercat-example-vue3 dev
 ```
 
 或者在当前目录下运行：

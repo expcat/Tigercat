@@ -18,7 +18,7 @@ import {
   type TabSize,
   type TabPosition,
   type TabsProps as CoreTabsProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { TabPane, type TabPaneProps } from './TabPane'
 
 // Tabs context interface

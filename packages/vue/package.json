@@ -1,5 +1,5 @@
 {
-  "name": "@tigercat/vue",
+  "name": "@expcat/tigercat-vue",
   "version": "0.0.1",
   "description": "Vue 3 components for Tigercat UI library",
   "license": "MIT",
@@ -44,7 +44,7 @@
     "clean": "node ../../scripts/rimraf.mjs dist"
   },
   "dependencies": {
-    "@tigercat/core": "workspace:*"
+    "@expcat/tigercat-core": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^25.0.3",

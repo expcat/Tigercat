@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from '@tigercat/vue'
+import { Icon } from '@expcat/tigercat-vue'
 </script>
 
 <template>

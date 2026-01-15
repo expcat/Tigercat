@@ -6,7 +6,7 @@ import {
   getRadioColorClasses,
   getRadioVisualClasses,
   type RadioProps as CoreRadioProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { RadioGroupContext } from './RadioGroup'
 
 export interface RadioProps

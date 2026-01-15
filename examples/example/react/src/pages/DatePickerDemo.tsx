@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { DatePicker } from '@tigercat/react'
+import { DatePicker } from '@expcat/tigercat-react'
 import { useLang } from '../context/lang'
 
 const PICKER_WIDTH = 'w-full max-w-[260px]'

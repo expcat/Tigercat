@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Menu, MenuItem } from '@tigercat/vue'
+import { Menu, MenuItem } from '@expcat/tigercat-vue'
 
 const selectedKeys = ref(['1'])
 </script>
@@ -27,7 +27,7 @@ const selectedKeys = ref(['1'])
 
 ```tsx
 import { useState } from 'react'
-import { Menu, MenuItem } from '@tigercat/react'
+import { Menu, MenuItem } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedKeys, setSelectedKeys] = useState(['1'])
@@ -51,7 +51,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Menu, MenuItem } from '@tigercat/vue'
+import { Menu, MenuItem } from '@expcat/tigercat-vue'
 
 const selectedKeys = ref(['home'])
 </script>
@@ -70,7 +70,7 @@ const selectedKeys = ref(['home'])
 
 ```tsx
 import { useState } from 'react'
-import { Menu, MenuItem } from '@tigercat/react'
+import { Menu, MenuItem } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedKeys, setSelectedKeys] = useState(['home'])
@@ -95,7 +95,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
+import { Menu, MenuItem, SubMenu } from '@expcat/tigercat-vue'
 
 const selectedKeys = ref(['1'])
 const openKeys = ref(['sub1'])
@@ -121,7 +121,7 @@ const openKeys = ref(['sub1'])
 
 ```tsx
 import { useState } from 'react'
-import { Menu, MenuItem, SubMenu } from '@tigercat/react'
+import { Menu, MenuItem, SubMenu } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedKeys, setSelectedKeys] = useState(['1'])
@@ -157,7 +157,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
+import { Menu, MenuItem, SubMenu } from '@expcat/tigercat-vue'
 
 const selectedKeys = ref(['1'])
 const openKeys = ref(['sub1'])
@@ -181,7 +181,7 @@ const openKeys = ref(['sub1'])
 
 ```tsx
 import { useState } from 'react'
-import { Menu, MenuItem, SubMenu } from '@tigercat/react'
+import { Menu, MenuItem, SubMenu } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedKeys, setSelectedKeys] = useState(['1'])
@@ -216,7 +216,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
+import { Menu, MenuItem, SubMenu } from '@expcat/tigercat-vue'
 
 const collapsed = ref(false)
 const selectedKeys = ref(['1'])
@@ -243,7 +243,7 @@ const selectedKeys = ref(['1'])
 
 ```tsx
 import { useState } from 'react'
-import { Menu, MenuItem, SubMenu } from '@tigercat/react'
+import { Menu, MenuItem, SubMenu } from '@expcat/tigercat-react'
 
 function App() {
   const [collapsed, setCollapsed] = useState(false)
@@ -278,7 +278,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
+import { Menu, MenuItem, SubMenu } from '@expcat/tigercat-vue'
 
 const selectedKeys = ref(['1'])
 </script>
@@ -299,7 +299,7 @@ const selectedKeys = ref(['1'])
 
 ```tsx
 import { useState } from 'react'
-import { Menu, MenuItem, SubMenu } from '@tigercat/react'
+import { Menu, MenuItem, SubMenu } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedKeys, setSelectedKeys] = useState(['1'])
@@ -326,7 +326,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Menu, MenuItem, MenuItemGroup } from '@tigercat/vue'
+import { Menu, MenuItem, MenuItemGroup } from '@expcat/tigercat-vue'
 
 const selectedKeys = ref(['1'])
 </script>
@@ -349,7 +349,7 @@ const selectedKeys = ref(['1'])
 
 ```tsx
 import { useState } from 'react'
-import { Menu, MenuItem, MenuItemGroup } from '@tigercat/react'
+import { Menu, MenuItem, MenuItemGroup } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedKeys, setSelectedKeys] = useState(['1'])
@@ -378,7 +378,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Menu, MenuItem, SubMenu } from '@tigercat/vue'
+import { Menu, MenuItem, SubMenu } from '@expcat/tigercat-vue'
 
 const selectedKeys = ref(['1'])
 
@@ -403,7 +403,7 @@ const settingsIcon =
 
 ```tsx
 import { useState } from 'react'
-import { Menu, MenuItem, SubMenu } from '@tigercat/react'
+import { Menu, MenuItem, SubMenu } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedKeys, setSelectedKeys] = useState(['1'])

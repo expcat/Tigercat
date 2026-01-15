@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { h } from 'vue'
-import { Timeline, Divider, Tag } from '@tigercat/vue'
+import { Timeline, Divider, Tag } from '@expcat/tigercat-vue'
 
 // Basic timeline data
 const basicEvents = [

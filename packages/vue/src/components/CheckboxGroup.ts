@@ -4,7 +4,7 @@ import {
   coerceClassValue,
   type CheckboxGroupValue,
   type CheckboxSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export const CheckboxGroupKey = Symbol('CheckboxGroup')
 

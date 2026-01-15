@@ -6,7 +6,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { Textarea } from '@tigercat/react'
+import { Textarea } from '@expcat/tigercat-react'
 import { expectNoA11yViolations, componentSizes } from '../utils/react'
 
 describe('Textarea', () => {

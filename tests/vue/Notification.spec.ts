@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { nextTick } from 'vue'
-import { notification } from '@tigercat/vue'
+import { notification } from '@expcat/tigercat-vue'
 
 const notificationPositions = ['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const
 

@@ -12,7 +12,7 @@ import {
   type PopoverTrigger,
   type DropdownPlacement,
   type StyleValue
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VuePopoverProps {
   className?: string

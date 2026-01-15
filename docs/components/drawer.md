@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Drawer, Button } from '@tigercat/vue'
+import { Drawer, Button } from '@expcat/tigercat-vue'
 
 const visible = ref(false)
 </script>
@@ -28,7 +28,7 @@ const visible = ref(false)
 
 ````tsx
 import React, { useState } from "react";
-import { Drawer, Button } from "@tigercat/react";
+import { Drawer, Button } from "@expcat/tigercat-react";
 
 function App() {
   const [visible, setVisible] = useState(false);
@@ -102,8 +102,8 @@ function App() {
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { Drawer, Button, Space } from "@tigercat/vue";
-import type { DrawerPlacement } from "@tigercat/core";
+import { Drawer, Button, Space } from "@expcat/tigercat-vue";
+import type { DrawerPlacement } from "@expcat/tigercat-core";
 
 const visible = ref(false);
 const placement = ref<DrawerPlacement>("right");
@@ -119,8 +119,8 @@ const showDrawer = (pos: DrawerPlacement) => {
 
 ```tsx
 import React, { useState } from 'react'
-import { Drawer, Button, Space } from '@tigercat/react'
-import type { DrawerPlacement } from '@tigercat/core'
+import { Drawer, Button, Space } from '@expcat/tigercat-react'
+import type { DrawerPlacement } from '@expcat/tigercat-core'
 
 function App() {
   const [visible, setVisible] = useState(false)
@@ -177,8 +177,8 @@ function App() {
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Drawer, Button, Space } from '@tigercat/vue'
-import type { DrawerSize } from '@tigercat/core'
+import { Drawer, Button, Space } from '@expcat/tigercat-vue'
+import type { DrawerSize } from '@expcat/tigercat-core'
 
 const visible = ref(false)
 const size = ref<DrawerSize>('md')
@@ -194,8 +194,8 @@ const showDrawer = (s: DrawerSize) => {
 
 ```tsx
 import React, { useState } from 'react'
-import { Drawer, Button, Space } from '@tigercat/react'
-import type { DrawerSize } from '@tigercat/core'
+import { Drawer, Button, Space } from '@expcat/tigercat-react'
+import type { DrawerSize } from '@expcat/tigercat-core'
 
 function App() {
   const [visible, setVisible] = useState(false)
@@ -258,7 +258,7 @@ function App() {
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Drawer, Button, Space, Icon } from '@tigercat/vue'
+import { Drawer, Button, Space, Icon } from '@expcat/tigercat-vue'
 
 const visible = ref(false)
 
@@ -273,7 +273,7 @@ const handleSubmit = () => {
 
 ```tsx
 import React, { useState } from 'react'
-import { Drawer, Button, Space, Icon } from '@tigercat/react'
+import { Drawer, Button, Space, Icon } from '@expcat/tigercat-react'
 
 function App() {
   const [visible, setVisible] = useState(false)
@@ -328,7 +328,7 @@ function App() {
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Drawer, Button } from '@tigercat/vue'
+import { Drawer, Button } from '@expcat/tigercat-vue'
 
 const visible = ref(false)
 </script>
@@ -338,7 +338,7 @@ const visible = ref(false)
 
 ```tsx
 import React, { useState } from 'react'
-import { Drawer, Button } from '@tigercat/react'
+import { Drawer, Button } from '@expcat/tigercat-react'
 
 function App() {
   const [visible, setVisible] = useState(false)
@@ -372,7 +372,7 @@ function App() {
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Drawer, Button } from '@tigercat/vue'
+import { Drawer, Button } from '@expcat/tigercat-vue'
 
 const visible = ref(false)
 </script>
@@ -382,7 +382,7 @@ const visible = ref(false)
 
 ```tsx
 import React, { useState } from 'react'
-import { Drawer, Button } from '@tigercat/react'
+import { Drawer, Button } from '@expcat/tigercat-react'
 
 function App() {
   const [visible, setVisible] = useState(false)

@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
-import { Dropdown, DropdownMenu, DropdownItem } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem } from '@expcat/tigercat-vue'
 
 describe('Dropdown', () => {
   it('renders trigger and menu content', () => {

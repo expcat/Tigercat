@@ -12,7 +12,7 @@ import {
   Button,
   Space,
   Divider
-} from '@tigercat/vue'
+} from '@expcat/tigercat-vue'
 import { countries } from '@demo-shared/constants'
 
 const basicForm = reactive({

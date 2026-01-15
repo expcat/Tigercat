@@ -5,7 +5,7 @@
 import React from 'react'
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { Text } from '@tigercat/react'
+import { Text } from '@expcat/tigercat-react'
 import { renderWithProps } from '../utils/render-helpers-react'
 import { expectNoA11yViolations } from '../utils/react'
 

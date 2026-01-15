@@ -36,7 +36,7 @@ import {
   type DateFormat,
   type DatePickerModelValue,
   type DatePickerLabels
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Helper function to create SVG icon
 const createIcon = (path: string, className: string) => {

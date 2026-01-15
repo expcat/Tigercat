@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, Descriptions, Divider } from '@tigercat/vue'
+import { Button, Descriptions, Divider } from '@expcat/tigercat-vue'
 
 // Basic user information
 const userInfo = [

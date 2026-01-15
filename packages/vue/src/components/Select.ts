@@ -14,7 +14,7 @@ import {
   type SelectOptions,
   type SelectSize,
   type SelectModelValue
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 let selectInstanceId = 0
 

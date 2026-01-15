@@ -1,5 +1,5 @@
 import React from 'react'
-import { Space } from '@tigercat/react'
+import { Space } from '@expcat/tigercat-react'
 
 const SpaceDemo: React.FC = () => {
   return (

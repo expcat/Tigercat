@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Tree } from '@tigercat/vue'
+import { Tree } from '@expcat/tigercat-vue'
 
 const treeData = ref([
   {
@@ -36,7 +36,7 @@ const treeData = ref([
 ### React
 
 ```tsx
-import { Tree } from '@tigercat/react'
+import { Tree } from '@expcat/tigercat-react'
 
 function App() {
   const treeData = [
@@ -68,7 +68,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Tree } from '@tigercat/vue'
+import { Tree } from '@expcat/tigercat-vue'
 
 const treeData = ref([
   {
@@ -98,7 +98,7 @@ function handleCheck(keys, info) {
 
 ```tsx
 import { useState } from 'react'
-import { Tree } from '@tigercat/react'
+import { Tree } from '@expcat/tigercat-react'
 
 function App() {
   const treeData = [
@@ -157,7 +157,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Tree } from '@tigercat/vue'
+import { Tree } from '@expcat/tigercat-vue'
 
 const selectedKeys = ref(['1-1'])
 
@@ -180,7 +180,7 @@ function handleSelect(keys, info) {
 
 ```tsx
 import { useState } from 'react'
-import { Tree } from '@tigercat/react'
+import { Tree } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedKeys, setSelectedKeys] = useState(['1-1'])
@@ -222,7 +222,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Tree } from '@tigercat/vue'
+import { Tree } from '@expcat/tigercat-vue'
 
 const treeData = ref([
   { key: '1', label: 'Parent Node 1' },
@@ -250,7 +250,7 @@ async function loadData(node) {
 ### React
 
 ```tsx
-import { Tree } from '@tigercat/react'
+import { Tree } from '@expcat/tigercat-react'
 
 function App() {
   const treeData = [
@@ -283,7 +283,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Tree } from '@tigercat/vue'
+import { Tree } from '@expcat/tigercat-vue'
 
 const treeData = ref([
   {
@@ -311,7 +311,7 @@ const filterValue = ref('')
 
 ```tsx
 import { useState } from 'react'
-import { Tree } from '@tigercat/react'
+import { Tree } from '@expcat/tigercat-react'
 
 function App() {
   const treeData = [
@@ -349,7 +349,7 @@ function App() {
 ```vue
 <script setup>
 import { ref, h } from 'vue'
-import { Tree, Icon } from '@tigercat/vue'
+import { Tree, Icon } from '@expcat/tigercat-vue'
 
 const treeData = ref([
   {
@@ -372,7 +372,7 @@ const treeData = ref([
 ### React
 
 ```tsx
-import { Tree, Icon } from '@tigercat/react'
+import { Tree, Icon } from '@expcat/tigercat-react'
 
 function App() {
   const treeData = [
@@ -400,7 +400,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Tree } from '@tigercat/vue'
+import { Tree } from '@expcat/tigercat-vue'
 
 const treeData = ref([
   {
@@ -422,7 +422,7 @@ const treeData = ref([
 ### React
 
 ```tsx
-import { Tree } from '@tigercat/react'
+import { Tree } from '@expcat/tigercat-react'
 
 function App() {
   const treeData = [

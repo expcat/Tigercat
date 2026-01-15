@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { Popover } from '@tigercat/vue'
+import { Popover } from '@expcat/tigercat-vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolations } from '../utils'
 import { h } from 'vue'
 

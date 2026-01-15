@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { message, Divider, Button, List } from '@tigercat/vue'
+import { message, Divider, Button, List } from '@expcat/tigercat-vue'
 import { computed, ref } from 'vue'
 
 const manualLoadingCloseFns = ref<Array<() => void>>([])

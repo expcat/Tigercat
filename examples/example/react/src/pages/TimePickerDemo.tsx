@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { TimePicker } from '@tigercat/react'
+import { TimePicker } from '@expcat/tigercat-react'
 import { useLang } from '../context/lang'
 
 const PICKER_WIDTH = 'w-full max-w-[260px]'

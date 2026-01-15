@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { message, Divider, Button, List } from '@tigercat/react'
+import { message, Divider, Button, List } from '@expcat/tigercat-react'
 
 export default function MessageDemo() {
   const manualLoadingCloseFnsRef = useRef<Array<() => void>>([])

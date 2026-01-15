@@ -89,7 +89,7 @@ importers:
 
   examples/example/react:
     dependencies:
-      '@tigercat/react':
+      '@expcat/tigercat-react':
         specifier: workspace:*
         version: link:../../../packages/react
       react:
@@ -129,7 +129,7 @@ importers:
 
   examples/example/vue3:
     dependencies:
-      '@tigercat/vue':
+      '@expcat/tigercat-vue':
         specifier: workspace:*
         version: link:../../../packages/vue
       vue:
@@ -175,7 +175,7 @@ importers:
 
   packages/react:
     dependencies:
-      '@tigercat/core':
+      '@expcat/tigercat-core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -200,7 +200,7 @@ importers:
 
   packages/vue:
     dependencies:
-      '@tigercat/core':
+      '@expcat/tigercat-core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

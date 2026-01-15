@@ -32,7 +32,7 @@ import {
   type PopconfirmIconType,
   type DropdownPlacement,
   type StyleValue
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 const renderPopconfirmIcon = (iconType: PopconfirmIconType) => {
   return h(

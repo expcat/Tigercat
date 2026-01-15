@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { Drawer } from '@tigercat/vue'
+import { Drawer } from '@expcat/tigercat-vue'
 import { h } from 'vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolations } from '../utils'
 

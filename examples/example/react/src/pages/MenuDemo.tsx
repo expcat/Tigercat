@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Menu, MenuItem, SubMenu, MenuItemGroup, Divider, Button } from '@tigercat/react'
+import { Menu, MenuItem, SubMenu, MenuItemGroup, Divider, Button } from '@expcat/tigercat-react'
 
 const MenuDemo: React.FC = () => {
   const [selectedKeys1, setSelectedKeys1] = useState<(string | number)[]>(['1'])

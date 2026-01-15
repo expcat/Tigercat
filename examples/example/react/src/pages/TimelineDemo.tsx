@@ -1,4 +1,4 @@
-import { Divider, Tag, Timeline } from '@tigercat/react'
+import { Divider, Tag, Timeline } from '@expcat/tigercat-react'
 
 type ProjectStatus = 'completed' | 'in-progress' | 'pending'
 

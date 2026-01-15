@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, Space, Divider } from '@tigercat/react'
+import { Text, Space, Divider } from '@expcat/tigercat-react'
 
 const TextDemo: React.FC = () => {
   return (

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Dropdown, DropdownMenu, DropdownItem, Button, Divider } from '@tigercat/vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button, Divider } from '@expcat/tigercat-vue'
 
 const visible1 = ref(false)
 

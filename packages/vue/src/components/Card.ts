@@ -13,7 +13,7 @@ import {
   cardActionsClasses,
   type CardVariant,
   type CardSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface VueCardProps {
   variant?: CardVariant

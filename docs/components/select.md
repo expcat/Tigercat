@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Select } from '@tigercat/vue'
+import { Select } from '@expcat/tigercat-vue'
 
 const selectedValue = ref('')
 const options = [
@@ -28,7 +28,7 @@ const options = [
 
 ```tsx
 import { useState } from 'react'
-import { Select } from '@tigercat/react'
+import { Select } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedValue, setSelectedValue] = useState('')
@@ -95,7 +95,7 @@ Select 组件支持 3 种不同的尺寸：
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Select } from '@tigercat/vue'
+import { Select } from '@expcat/tigercat-vue'
 
 const value = ref('')
 const options = [
@@ -114,7 +114,7 @@ const options = [
 
 ```tsx
 import { useState } from 'react'
-import { Select } from '@tigercat/react'
+import { Select } from '@expcat/tigercat-react'
 
 function App() {
   const [value, setValue] = useState('')
@@ -161,7 +161,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Select } from '@tigercat/vue'
+import { Select } from '@expcat/tigercat-vue'
 
 const value = ref('')
 const options = [
@@ -186,7 +186,7 @@ const handleSearch = (query) => {
 
 ```tsx
 import { useState } from 'react'
-import { Select } from '@tigercat/react'
+import { Select } from '@expcat/tigercat-react'
 
 function App() {
   const [value, setValue] = useState('')
@@ -223,7 +223,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Select } from '@tigercat/vue'
+import { Select } from '@expcat/tigercat-vue'
 
 const selectedValues = ref([])
 const options = [
@@ -244,7 +244,7 @@ const options = [
 
 ```tsx
 import { useState } from 'react'
-import { Select } from '@tigercat/react'
+import { Select } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedValues, setSelectedValues] = useState<(string | number)[]>([])
@@ -273,7 +273,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Select } from '@tigercat/vue'
+import { Select } from '@expcat/tigercat-vue'
 
 const value = ref('')
 const groupedOptions = [
@@ -305,7 +305,7 @@ const groupedOptions = [
 
 ```tsx
 import { useState } from 'react'
-import { Select } from '@tigercat/react'
+import { Select } from '@expcat/tigercat-react'
 
 function App() {
   const [value, setValue] = useState('')
@@ -394,7 +394,7 @@ Select 组件提供两种空状态处理：
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Select } from '@tigercat/vue'
+import { Select } from '@expcat/tigercat-vue'
 
 const value = ref('')
 const groupedOptions = [
@@ -443,7 +443,7 @@ const handleSearch = (query) => {
 
 ```tsx
 import { useState } from 'react'
-import { Select } from '@tigercat/react'
+import { Select } from '@expcat/tigercat-react'
 
 function App() {
   const [value, setValue] = useState('')
@@ -619,7 +619,7 @@ Select 组件会复用以下“全局通用”CSS 变量（多数组件共享）
 
 ```vue
 <script setup>
-import { Select, setThemeColors } from '@tigercat/vue'
+import { Select, setThemeColors } from '@expcat/tigercat-vue'
 
 const switchTheme = () => {
   setThemeColors({
@@ -633,7 +633,7 @@ const switchTheme = () => {
 **React:**
 
 ```tsx
-import { Select, setThemeColors } from '@tigercat/react'
+import { Select, setThemeColors } from '@expcat/tigercat-react'
 
 const switchTheme = () => {
   setThemeColors({
@@ -690,13 +690,13 @@ import type {
   SelectOption,
   SelectOptionGroup,
   SelectSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 // Vue
-import type { Select } from '@tigercat/vue'
+import type { Select } from '@expcat/tigercat-vue'
 
 // React
-import type { Select, SelectProps as ReactSelectProps } from '@tigercat/react'
+import type { Select, SelectProps as ReactSelectProps } from '@expcat/tigercat-react'
 ```
 
 ## 最佳实践

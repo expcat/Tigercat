@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Skeleton } from '@tigercat/vue'
+import { Skeleton } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -29,7 +29,7 @@ import { Skeleton } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Skeleton } from '@tigercat/react'
+import { Skeleton } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -298,7 +298,7 @@ Skeleton 组件支持 3 种动画效果：
 ```vue
 <script setup>
 import { ref, onMounted } from 'vue'
-import { Skeleton } from '@tigercat/vue'
+import { Skeleton } from '@expcat/tigercat-vue'
 
 const loading = ref(true)
 const data = ref(null)
@@ -327,7 +327,7 @@ onMounted(async () => {
 
 ```tsx
 import { useState, useEffect } from 'react'
-import { Skeleton } from '@tigercat/react'
+import { Skeleton } from '@expcat/tigercat-react'
 
 function DataLoader() {
   const [loading, setLoading] = useState(true)

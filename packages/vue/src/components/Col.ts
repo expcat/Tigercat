@@ -11,7 +11,7 @@ import {
   type ColSpan,
   type Breakpoint,
   type ColProps as CoreColProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { RowContextKey } from './Row'
 
 export interface VueColProps extends CoreColProps {}

@@ -5,7 +5,7 @@ import {
   getSpaceDirectionClass,
   getSpaceGapSize,
   type SpaceProps as CoreSpaceProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export type SpaceProps = CoreSpaceProps &
   Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style'> & {

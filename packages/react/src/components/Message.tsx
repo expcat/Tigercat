@@ -23,7 +23,7 @@ import {
   type MessageInstance,
   type MessageOptions,
   type MessageConfig
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 /**
  * Global message container id

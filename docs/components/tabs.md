@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Tabs, TabPane } from '@tigercat/vue'
+import { Tabs, TabPane } from '@expcat/tigercat-vue'
 
 const activeKey = ref('1')
 </script>
@@ -27,7 +27,7 @@ const activeKey = ref('1')
 
 ```tsx
 import { useState } from 'react'
-import { Tabs, TabPane } from '@tigercat/react'
+import { Tabs, TabPane } from '@expcat/tigercat-react'
 
 function App() {
   const [activeKey, setActiveKey] = useState('1')
@@ -57,7 +57,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Tabs, TabPane } from '@tigercat/vue'
+import { Tabs, TabPane } from '@expcat/tigercat-vue'
 
 const activeKey = ref('1')
 </script>
@@ -75,7 +75,7 @@ const activeKey = ref('1')
 
 ```tsx
 import { useState } from 'react'
-import { Tabs, TabPane } from '@tigercat/react'
+import { Tabs, TabPane } from '@expcat/tigercat-react'
 
 function App() {
   const [activeKey, setActiveKey] = useState('1')
@@ -105,7 +105,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from "vue";
-import { Tabs, TabPane } from "@tigercat/vue";
+import { Tabs, TabPane } from "@expcat/tigercat-vue";
 
 const activeKey = ref("1");
 const tabs = ref([
@@ -163,7 +163,7 @@ const handleEdit = ({
 
 ```tsx
 import { useState } from 'react'
-import { Tabs, TabPane } from '@tigercat/react'
+import { Tabs, TabPane } from '@expcat/tigercat-react'
 
 function App() {
   const [activeKey, setActiveKey] = useState('1')
@@ -234,7 +234,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Tabs, TabPane } from '@tigercat/vue'
+import { Tabs, TabPane } from '@expcat/tigercat-vue'
 
 const activeKey = ref('1')
 const position = ref('top')
@@ -253,7 +253,7 @@ const position = ref('top')
 
 ```tsx
 import { useState } from 'react'
-import { Tabs, TabPane } from '@tigercat/react'
+import { Tabs, TabPane } from '@expcat/tigercat-react'
 
 function App() {
   const [activeKey, setActiveKey] = useState('1')
@@ -284,7 +284,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Tabs, TabPane } from '@tigercat/vue'
+import { Tabs, TabPane } from '@expcat/tigercat-vue'
 
 const activeKey = ref('1')
 </script>
@@ -302,7 +302,7 @@ const activeKey = ref('1')
 
 ```tsx
 import { useState } from 'react'
-import { Tabs, TabPane } from '@tigercat/react'
+import { Tabs, TabPane } from '@expcat/tigercat-react'
 
 function App() {
   const [activeKey, setActiveKey] = useState('1')
@@ -332,7 +332,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Tabs, TabPane } from '@tigercat/vue'
+import { Tabs, TabPane } from '@expcat/tigercat-vue'
 
 const activeKey = ref('1')
 </script>
@@ -364,7 +364,7 @@ const activeKey = ref('1')
 
 ```tsx
 import { useState } from 'react'
-import { Tabs, TabPane } from '@tigercat/react'
+import { Tabs, TabPane } from '@expcat/tigercat-react'
 
 function App() {
   const [activeKey, setActiveKey] = useState('1')
@@ -420,7 +420,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Tabs, TabPane } from '@tigercat/vue'
+import { Tabs, TabPane } from '@expcat/tigercat-vue'
 
 const activeKey = ref('1')
 </script>
@@ -438,7 +438,7 @@ const activeKey = ref('1')
 
 ```tsx
 import { useState } from 'react'
-import { Tabs, TabPane } from '@tigercat/react'
+import { Tabs, TabPane } from '@expcat/tigercat-react'
 
 function App() {
   const [activeKey, setActiveKey] = useState('1')
@@ -519,7 +519,7 @@ Tabs 组件使用 CSS 变量进行主题定制。你可以通过设置以下 CSS
 或使用 JavaScript:
 
 ```typescript
-import { setThemeColors } from '@tigercat/core'
+import { setThemeColors } from '@expcat/tigercat-core'
 
 setThemeColors({
   primary: '#10b981',

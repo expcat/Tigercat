@@ -3,7 +3,7 @@ import {
   classNames,
   layoutFooterClasses,
   type FooterProps as CoreFooterProps
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 export interface ReactFooterProps
   extends CoreFooterProps, Omit<React.HTMLAttributes<HTMLElement>, 'children' | 'height'> {

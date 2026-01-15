@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Skeleton, Space, Divider, Card, Avatar } from '@tigercat/vue'
+import { Skeleton, Space, Divider, Card, Avatar } from '@expcat/tigercat-vue'
 
 // Loading state simulation
 const loading = ref(true)

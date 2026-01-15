@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Badge } from '@tigercat/vue'
+import { Badge } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -21,7 +21,7 @@ import { Badge } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Badge } from '@tigercat/react'
+import { Badge } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -315,7 +315,7 @@ Badge 组件支持 3 种展示类型：
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Badge } from '@tigercat/vue'
+import { Badge } from '@expcat/tigercat-vue'
 
 const unreadMessages = ref(5)
 </script>
@@ -331,7 +331,7 @@ const unreadMessages = ref(5)
 
 ```tsx
 import { useState } from 'react'
-import { Badge } from '@tigercat/react'
+import { Badge } from '@expcat/tigercat-react'
 
 function MessageButton() {
   const [unreadMessages, setUnreadMessages] = useState(5)
@@ -351,7 +351,7 @@ function MessageButton() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Badge } from '@tigercat/vue'
+import { Badge } from '@expcat/tigercat-vue'
 
 const cartItems = ref(3)
 </script>
@@ -373,7 +373,7 @@ const cartItems = ref(3)
 
 ```tsx
 import { useState } from 'react'
-import { Badge } from '@tigercat/react'
+import { Badge } from '@expcat/tigercat-react'
 
 function ShoppingCart() {
   const [cartItems, setCartItems] = useState(3)

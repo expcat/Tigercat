@@ -21,7 +21,7 @@ import {
   mergeStyleValues,
   type AlertType,
   type AlertSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 
 /**
  * Create icon element

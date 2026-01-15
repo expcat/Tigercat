@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
-import { DatePicker } from '@tigercat/vue'
+import { DatePicker } from '@expcat/tigercat-vue'
 import { renderWithProps, expectNoA11yViolations, componentSizes } from '../utils'
 
 describe('DatePicker', () => {

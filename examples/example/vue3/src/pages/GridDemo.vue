@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Row, Col, Container, Space } from '@tigercat/vue'
+import { Row, Col, Container, Space } from '@expcat/tigercat-vue'
 </script>
 
 <template>

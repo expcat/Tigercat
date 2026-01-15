@@ -1,5 +1,5 @@
 import { defineComponent, computed, provide, PropType, h } from 'vue'
-import { classNames, breadcrumbContainerClasses, type BreadcrumbSeparator } from '@tigercat/core'
+import { classNames, breadcrumbContainerClasses, type BreadcrumbSeparator } from '@expcat/tigercat-core'
 
 export interface VueBreadcrumbProps {
   separator?: BreadcrumbSeparator

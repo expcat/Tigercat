@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Alert } from '@tigercat/vue'
+import { Alert } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -22,7 +22,7 @@ import { Alert } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Alert } from '@tigercat/react'
+import { Alert } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -131,7 +131,7 @@ Alert 组件支持 3 种不同的尺寸：
 
 ```vue
 <script setup>
-import { Alert } from '@tigercat/vue'
+import { Alert } from '@expcat/tigercat-vue'
 
 const handleClose = (event) => {
   console.log('Alert closed', event)
@@ -150,7 +150,7 @@ const handleClose = (event) => {
 ### React
 
 ```tsx
-import { Alert } from '@tigercat/react'
+import { Alert } from '@expcat/tigercat-react'
 
 function App() {
   const handleClose = (event) => {
@@ -268,7 +268,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Alert } from '@tigercat/vue'
+import { Alert } from '@expcat/tigercat-vue'
 import { ref } from 'vue'
 
 const showAlert = ref(true)
@@ -309,7 +309,7 @@ const handleClose = () => {
 ### React
 
 ```tsx
-import { Alert } from '@tigercat/react'
+import { Alert } from '@expcat/tigercat-react'
 import { useState } from 'react'
 
 function App() {

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Select } from '@tigercat/react'
+import { Select } from '@expcat/tigercat-react'
 import { DEMO_LANG_OPTIONS, type DemoLang } from '@demo-shared/app-config'
 
 export interface LanguageSwitchProps {

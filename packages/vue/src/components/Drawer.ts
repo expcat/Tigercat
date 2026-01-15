@@ -34,7 +34,7 @@ import {
   restoreFocus,
   type DrawerPlacement,
   type DrawerSize
-} from '@tigercat/core'
+} from '@expcat/tigercat-core'
 import { useVueEscapeKey } from '../utils/overlay'
 
 let drawerIdCounter = 0

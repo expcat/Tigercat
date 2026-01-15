@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Checkbox } from '@tigercat/vue'
+import { Checkbox } from '@expcat/tigercat-vue'
 
 const checked = ref(false)
 </script>
@@ -23,7 +23,7 @@ const checked = ref(false)
 
 ```tsx
 import { useState } from 'react'
-import { Checkbox } from '@tigercat/react'
+import { Checkbox } from '@expcat/tigercat-react'
 
 function App() {
   const [checked, setChecked] = useState(false)
@@ -87,7 +87,7 @@ function App() {
 ```vue
 <script setup>
 import { ref, computed } from 'vue'
-import { Checkbox, CheckboxGroup } from '@tigercat/vue'
+import { Checkbox, CheckboxGroup } from '@expcat/tigercat-vue'
 
 const options = ref(['Apple', 'Banana', 'Orange'])
 const checkedItems = ref(['Apple'])
@@ -120,7 +120,7 @@ const handleCheckAll = (checked) => {
 
 ```tsx
 import { useState, useMemo } from 'react'
-import { Checkbox } from '@tigercat/react'
+import { Checkbox } from '@expcat/tigercat-react'
 
 function App() {
   const options = ['Apple', 'Banana', 'Orange']
@@ -168,7 +168,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Checkbox, CheckboxGroup } from '@tigercat/vue'
+import { Checkbox, CheckboxGroup } from '@expcat/tigercat-vue'
 
 const selectedFruits = ref(['apple'])
 </script>
@@ -187,7 +187,7 @@ const selectedFruits = ref(['apple'])
 
 ```tsx
 import { useState } from 'react'
-import { Checkbox, CheckboxGroup } from '@tigercat/react'
+import { Checkbox, CheckboxGroup } from '@expcat/tigercat-react'
 
 function App() {
   const [selectedFruits, setSelectedFruits] = useState(['apple'])
@@ -405,7 +405,7 @@ Checkbox 组件使用 Tailwind CSS 构建，支持通过 CSS 变量进行主题�
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { CheckboxGroup, Checkbox } from '@tigercat/vue'
+import { CheckboxGroup, Checkbox } from '@expcat/tigercat-vue'
 
 const selectedValues = ref(['apple', 'banana'])
 </script>
@@ -428,7 +428,7 @@ Checkbox 可以与 Form 和 FormItem 组件配合使用，实现表单验证。
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Form, FormItem, Checkbox, CheckboxGroup, Button } from '@tigercat/vue'
+import { Form, FormItem, Checkbox, CheckboxGroup, Button } from '@expcat/tigercat-vue'
 
 const formData = ref({
   agree: false,
@@ -486,7 +486,7 @@ const handleSubmit = async () => {
 
 ```tsx
 import { useState } from 'react'
-import { Form, FormItem, Checkbox, CheckboxGroup, Button } from '@tigercat/react'
+import { Form, FormItem, Checkbox, CheckboxGroup, Button } from '@expcat/tigercat-react'
 
 function ValidationExample() {
   const [formData, setFormData] = useState({
@@ -684,10 +684,10 @@ Checkbox 组件完全使用 TypeScript 编写，提供完整的类型定义：
 
 ```typescript
 // Core types
-import type { CheckboxProps, CheckboxGroupProps, CheckboxSize } from '@tigercat/core'
+import type { CheckboxProps, CheckboxGroupProps, CheckboxSize } from '@expcat/tigercat-core'
 
 // Vue
-import type { Checkbox, CheckboxGroup } from '@tigercat/vue'
+import type { Checkbox, CheckboxGroup } from '@expcat/tigercat-vue'
 
 // React
 import type {
@@ -695,7 +695,7 @@ import type {
   CheckboxGroup,
   CheckboxProps as ReactCheckboxProps,
   CheckboxGroupProps as ReactCheckboxGroupProps
-} from '@tigercat/react'
+} from '@expcat/tigercat-react'
 ```
 
 ## 相关组件
@@ -715,7 +715,7 @@ import type {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Checkbox, CheckboxGroup } from '@tigercat/vue'
+import { Checkbox, CheckboxGroup } from '@expcat/tigercat-vue'
 
 const form = ref({
   agree: false,
@@ -752,7 +752,7 @@ const handleSubmit = () => {
 
 ```tsx
 import { useState } from 'react'
-import { Checkbox, CheckboxGroup } from '@tigercat/react'
+import { Checkbox, CheckboxGroup } from '@expcat/tigercat-react'
 
 function FormExample() {
   const [form, setForm] = useState({

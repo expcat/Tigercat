@@ -5,7 +5,7 @@
 import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { List } from '@tigercat/react'
+import { List } from '@expcat/tigercat-react'
 import { expectNoA11yViolations } from '../utils/react'
 
 const sampleData = [

@@ -9,7 +9,7 @@
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Upload } from '@tigercat/vue'
+import { Upload } from '@expcat/tigercat-vue'
 
 const fileList = ref([])
 
@@ -27,7 +27,7 @@ const handleChange = (file, list) => {
 
 ```tsx
 import { useState } from 'react'
-import { Upload, type UploadFile } from '@tigercat/react'
+import { Upload, type UploadFile } from '@expcat/tigercat-react'
 
 function App() {
   const [fileList, setFileList] = useState<UploadFile[]>([])
@@ -54,7 +54,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Upload } from '@tigercat/vue'
+import { Upload } from '@expcat/tigercat-vue'
 
 const fileList = ref([])
 </script>
@@ -67,7 +67,7 @@ const fileList = ref([])
 ### React
 
 ```tsx
-import { Upload } from '@tigercat/react'
+import { Upload } from '@expcat/tigercat-react'
 
 function App() {
   return <Upload drag />
@@ -94,7 +94,7 @@ Upload 内部提示文案（如拖拽区“Click to upload / or drag and drop”
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Upload, ConfigProvider } from '@tigercat/vue'
+import { Upload, ConfigProvider } from '@expcat/tigercat-vue'
 
 const fileList = ref([])
 
@@ -125,7 +125,7 @@ const zhCN = {
 
 ```tsx
 import { useState } from 'react'
-import { Upload, ConfigProvider, type UploadFile } from '@tigercat/react'
+import { Upload, ConfigProvider, type UploadFile } from '@expcat/tigercat-react'
 
 const zhCN = {
   upload: {
@@ -236,7 +236,7 @@ export function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Upload } from '@tigercat/vue'
+import { Upload } from '@expcat/tigercat-vue'
 
 const fileList = ref([])
 
@@ -256,7 +256,7 @@ const handleExceed = (files, list) => {
 
 ```tsx
 import { useState } from 'react'
-import { Upload, type UploadFile } from '@tigercat/react'
+import { Upload, type UploadFile } from '@expcat/tigercat-react'
 
 function App() {
   const [fileList, setFileList] = useState<UploadFile[]>([])
@@ -322,7 +322,7 @@ function App() {
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Upload } from '@tigercat/vue'
+import { Upload } from '@expcat/tigercat-vue'
 
 const fileList = ref([])
 
@@ -350,7 +350,7 @@ const customRequest = ({ file, onProgress, onSuccess, onError }) => {
 
 ```tsx
 import { useState } from 'react'
-import { Upload, type UploadFile, type UploadRequestOptions } from '@tigercat/react'
+import { Upload, type UploadFile, type UploadRequestOptions } from '@expcat/tigercat-react'
 
 function App() {
   const [fileList, setFileList] = useState<UploadFile[]>([])
@@ -387,7 +387,7 @@ function App() {
 
 ```vue
 <script setup>
-import { Upload } from '@tigercat/vue'
+import { Upload } from '@expcat/tigercat-vue'
 
 const beforeUpload = (file) => {
   const isJPG = file.type === 'image/jpeg'
@@ -413,7 +413,7 @@ const beforeUpload = (file) => {
 ### React
 
 ```tsx
-import { Upload } from '@tigercat/react'
+import { Upload } from '@expcat/tigercat-react'
 
 function App() {
   const beforeUpload = (file: File) => {

@@ -8,7 +8,7 @@
 
 ```vue
 <script setup>
-import { Avatar } from '@tigercat/vue'
+import { Avatar } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -34,7 +34,7 @@ import { Avatar } from '@tigercat/vue'
 ### React
 
 ```tsx
-import { Avatar } from '@tigercat/react'
+import { Avatar } from '@expcat/tigercat-react'
 
 function App() {
   return (
@@ -268,7 +268,7 @@ Avatar 组件支持 2 种不同的形状：
 ```vue
 <script setup>
 import { ref } from 'vue'
-import { Avatar } from '@tigercat/vue'
+import { Avatar } from '@expcat/tigercat-vue'
 
 const users = ref([
   { id: 1, name: 'Alice Johnson', avatar: '/alice.jpg' },
@@ -290,7 +290,7 @@ const users = ref([
 #### React
 
 ```tsx
-import { Avatar } from '@tigercat/react'
+import { Avatar } from '@expcat/tigercat-react'
 
 function UserList() {
   const users = [
@@ -318,7 +318,7 @@ function UserList() {
 
 ```vue
 <script setup>
-import { Avatar } from '@tigercat/vue'
+import { Avatar } from '@expcat/tigercat-vue'
 
 const team = [
   { name: 'Alice', avatar: '/alice.jpg' },
@@ -345,7 +345,7 @@ const team = [
 #### React
 
 ```tsx
-import { Avatar } from '@tigercat/react'
+import { Avatar } from '@expcat/tigercat-react'
 
 function TeamAvatars() {
   const team = [
@@ -378,7 +378,7 @@ function TeamAvatars() {
 
 ```vue
 <script setup>
-import { Avatar, Badge } from '@tigercat/vue'
+import { Avatar, Badge } from '@expcat/tigercat-vue'
 </script>
 
 <template>
@@ -391,7 +391,7 @@ import { Avatar, Badge } from '@tigercat/vue'
 #### React
 
 ```tsx
-import { Avatar, Badge } from '@tigercat/react'
+import { Avatar, Badge } from '@expcat/tigercat-react'
 
 function OnlineAvatar() {
   return (

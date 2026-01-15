@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/vue'
-import { Icon } from '@tigercat/vue'
+import { Icon } from '@expcat/tigercat-vue'
 import { h } from 'vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolations } from '../utils'
 
