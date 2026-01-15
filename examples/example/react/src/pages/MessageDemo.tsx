@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
-import { message, Divider, Button, List } from '@expcat/tigercat-react'
+import { message, Button, List } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
 
 export default function MessageDemo() {
   const manualLoadingCloseFnsRef = useRef<Array<() => void>>([])
@@ -25,6 +26,131 @@ export default function MessageDemo() {
   const dangerButtonClassName = `${buttonBaseClassName} bg-red-600 hover:bg-red-700 focus:ring-red-400`
   const neutralButtonClassName = `${buttonBaseClassName} bg-gray-600 hover:bg-gray-700 focus:ring-gray-400`
   const purpleButtonClassName = `${buttonBaseClassName} bg-purple-600 hover:bg-purple-700 focus:ring-purple-400`
+
+  const basicSnippet = `<div className="flex flex-wrap gap-2">
+  <Button className={primaryButtonClassName} onClick={showInfo}>
+    信息
+  </Button>
+  <Button className={successButtonClassName} onClick={showSuccess}>
+    成功
+  </Button>
+  <Button className={warningButtonClassName} onClick={showWarning}>
+    警告
+  </Button>
+  <Button className={dangerButtonClassName} onClick={showError}>
+    错误
+  </Button>
+  <Button className={neutralButtonClassName} onClick={showLoading}>
+    加载
+  </Button>
+</div>`
+
+  const durationSnippet = `<div className="flex flex-wrap gap-2">
+  <Button className={primaryButtonClassName} onClick={showShortMessage}>
+    短时间（1秒）
+  </Button>
+  <Button className={successButtonClassName} onClick={showLongMessage}>
+    长时间（5秒）
+  </Button>
+  <Button className={warningButtonClassName} onClick={showPersistentMessage}>
+    不自动关闭
+  </Button>
+</div>`
+
+  const manualSnippet = `<div className="flex flex-wrap gap-2 mb-4">
+  <Button className={primaryButtonClassName} onClick={showClosableMessage}>
+    显示可关闭消息
+  </Button>
+</div>
+<div className="flex flex-wrap gap-2 items-center">
+  <Button className={primaryButtonClassName} onClick={showMessage}>
+    显示加载消息
+  </Button>
+  <Button className={dangerButtonClassName} onClick={closeManually} disabled={manualLoadingCount === 0}>
+    关闭最后一个
+  </Button>
+  <Button className={dangerButtonClassName} onClick={closeAllManual} disabled={manualLoadingCount === 0}>
+    关闭全部
+  </Button>
+  <span className="text-sm text-gray-600 dark:text-gray-300">当前可手动关闭：\${manualLoadingCount} 条</span>
+</div>`
+
+  const flowSnippet = `<Button
+  className="px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
+  onClick={simulateRequest}>
+  提交表单（模拟请求）
+</Button>`
+
+  const queueSnippet = `<div className="flex flex-wrap gap-2">
+  <Button className={primaryButtonClassName} onClick={showMultipleMessages}>
+    显示多条消息
+  </Button>
+  <Button className={dangerButtonClassName} onClick={clearAll}>
+    清空所有消息
+  </Button>
+</div>`
+
+  const callbackSnippet = `<Button className={successButtonClassName} onClick={showMessageWithCallback}>
+  显示消息（带回调）
+</Button>`
+
+  const customSnippet = `<Button className={purpleButtonClassName} onClick={showCustomClass}>
+  自定义样式
+</Button>`
+
+  const sceneSnippet = `<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div className={demoCardClassName}>
+    <h3 className="text-lg font-semibold mb-3">文件上传</h3>
+    <Button
+      className={primaryButtonClassName}
+      onClick={() => {
+        const close = message.loading('正在上传文件...')
+        setTimeout(() => {
+          close()
+          message.success('文件上传成功')
+        }, 2000)
+      }}>
+      上传文件
+    </Button>
+  </div>
+
+  <div className={demoCardClassName}>
+    <h3 className="text-lg font-semibold mb-3">保存设置</h3>
+    <Button
+      className={successButtonClassName}
+      onClick={() => {
+        const close = message.loading('正在保存设置...')
+        setTimeout(() => {
+          close()
+          message.success({ content: '设置保存成功', duration: 2000 })
+        }, 1000)
+      }}>
+      保存设置
+    </Button>
+  </div>
+
+  <div className={demoCardClassName}>
+    <h3 className="text-lg font-semibold mb-3">删除确认</h3>
+    <Button
+      className={dangerButtonClassName}
+      onClick={() => {
+        message.warning({ content: '确定要删除这条记录吗？', duration: 5000, closable: true })
+      }}>
+      删除记录
+    </Button>
+  </div>
+
+  <div className={demoCardClassName}>
+    <h3 className="text-lg font-semibold mb-3">网络错误</h3>
+    <Button
+      className={warningButtonClassName}
+      onClick={() => {
+        message.error({ content: '网络连接失败，请检查您的网络设置', duration: 0, closable: true })
+      }}>
+      模拟网络错误
+    </Button>
+  </div>
+</div>`
 
   const showInfo = () => {
     message.info('这是一条信息提示')
@@ -153,11 +279,10 @@ export default function MessageDemo() {
       </div>
 
       {/* 基本用法 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">基本用法</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          最简单的用法，调用 message 方法即可显示消息提示。
-        </p>
+      <DemoBlock
+        title="基本用法"
+        description="最简单的用法，调用 message 方法即可显示消息提示。"
+        code={basicSnippet}>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2">
             <Button className={primaryButtonClassName} onClick={showInfo}>
@@ -177,15 +302,13 @@ export default function MessageDemo() {
             </Button>
           </div>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
       {/* 自定义持续时间 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">自定义持续时间</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          通过 duration 属性自定义消息显示时间，设置为 0 时不会自动关闭。
-        </p>
+      <DemoBlock
+        title="自定义持续时间"
+        description="通过 duration 属性自定义消息显示时间，设置为 0 时不会自动关闭。"
+        code={durationSnippet}>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2">
             <Button className={primaryButtonClassName} onClick={showShortMessage}>
@@ -199,16 +322,13 @@ export default function MessageDemo() {
             </Button>
           </div>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
       {/* 手动关闭 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">手动关闭</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          设置 closable 为 true 显示关闭按钮，或使用返回的关闭函数。此示例支持同时打开多条
-          loading，并提供逐条/一键关闭。
-        </p>
+      <DemoBlock
+        title="手动关闭"
+        description="设置 closable 为 true 显示关闭按钮，或使用返回的关闭函数。此示例支持同时打开多条 loading，并提供逐条/一键关闭。"
+        code={manualSnippet}>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2 mb-4">
             <Button className={primaryButtonClassName} onClick={showClosableMessage}>
@@ -236,13 +356,10 @@ export default function MessageDemo() {
             </span>
           </div>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
       {/* 完整流程示例 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">完整流程示例</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">模拟表单提交的完整流程。</p>
+      <DemoBlock title="完整流程示例" description="模拟表单提交的完整流程。" code={flowSnippet}>
         <div className={demoCardClassName}>
           <Button
             className="px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
@@ -250,15 +367,13 @@ export default function MessageDemo() {
             提交表单（模拟请求）
           </Button>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
       {/* 队列管理 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">队列管理</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          支持多条消息同时显示，可以一次清空所有消息。
-        </p>
+      <DemoBlock
+        title="队列管理"
+        description="支持多条消息同时显示，可以一次清空所有消息。"
+        code={queueSnippet}>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2">
             <Button className={primaryButtonClassName} onClick={showMultipleMessages}>
@@ -269,42 +384,34 @@ export default function MessageDemo() {
             </Button>
           </div>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
       {/* 回调函数 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">回调函数</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          可以通过 onClose 回调函数在消息关闭时执行特定操作（查看控制台）。
-        </p>
+      <DemoBlock
+        title="回调函数"
+        description="可以通过 onClose 回调函数在消息关闭时执行特定操作（查看控制台）。"
+        code={callbackSnippet}>
         <div className={demoCardClassName}>
           <Button className={successButtonClassName} onClick={showMessageWithCallback}>
             显示消息（带回调）
           </Button>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
       {/* 自定义样式 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">自定义样式</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          可以通过 className 属性添加自定义样式类。
-        </p>
+      <DemoBlock
+        title="自定义样式"
+        description="可以通过 className 属性添加自定义样式类。"
+        code={customSnippet}>
         <div className={demoCardClassName}>
           <Button className={purpleButtonClassName} onClick={showCustomClass}>
             自定义样式
           </Button>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
       {/* 实际应用场景 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">实际应用场景</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">常见的使用场景示例。</p>
-
+      <DemoBlock title="实际应用场景" description="常见的使用场景示例。" code={sceneSnippet}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className={demoCardClassName}>
             <h3 className="text-lg font-semibold mb-3">文件上传</h3>
@@ -369,7 +476,7 @@ export default function MessageDemo() {
             </Button>
           </div>
         </div>
-      </section>
+      </DemoBlock>
 
       <div className="mt-12 p-6 rounded-xl border bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950/40 dark:border-blue-900 dark:text-blue-200">
         <h3 className="text-lg font-semibold mb-2">提示</h3>
