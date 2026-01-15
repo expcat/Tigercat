@@ -1,5 +1,24 @@
 import React, { useState } from 'react'
-import { Switch, Space, Divider } from '@expcat/tigercat-react'
+import { Switch, Space } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
+
+const basicSnippet = `<Space direction="vertical">
+  <div className="flex items-center gap-3">
+    <Switch checked={basicEnabled} onChange={setBasicEnabled} />
+    <span className="text-sm text-gray-600">{basicEnabled ? '开启' : '关闭'}</span>
+  </div>
+</Space>`
+
+const disabledSnippet = `<Space>
+  <Switch checked={disabledOn} disabled />
+  <Switch checked={disabledOff} disabled />
+</Space>`
+
+const sizeSnippet = `<Space align="center">
+  <Switch checked={sizeSm} size="sm" onChange={setSizeSm} />
+  <Switch checked={sizeMd} size="md" onChange={setSizeMd} />
+  <Switch checked={sizeLg} size="lg" onChange={setSizeLg} />
+</Space>`
 
 const SwitchDemo: React.FC = () => {
   const [basicEnabled, setBasicEnabled] = useState(true)
@@ -19,45 +38,34 @@ const SwitchDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">基础用法</h2>
-        <p className="text-gray-600 mb-6">绑定到一个 Boolean 类型的变量。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space direction="vertical">
-            <div className="flex items-center gap-3">
-              <Switch checked={basicEnabled} onChange={setBasicEnabled} />
-              <span className="text-sm text-gray-600">{basicEnabled ? '开启' : '关闭'}</span>
-            </div>
-          </Space>
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock title="基础用法" description="绑定到一个 Boolean 类型的变量。" code={basicSnippet}>
+        <Space direction="vertical">
+          <div className="flex items-center gap-3">
+            <Switch checked={basicEnabled} onChange={setBasicEnabled} />
+            <span className="text-sm text-gray-600">{basicEnabled ? '开启' : '关闭'}</span>
+          </div>
+        </Space>
+      </DemoBlock>
 
       {/* 禁用状态 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">禁用状态</h2>
-        <p className="text-gray-600 mb-6">通过设置 disabled 属性来禁用开关。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space>
-            <Switch checked={disabledOn} disabled />
-            <Switch checked={disabledOff} disabled />
-          </Space>
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock
+        title="禁用状态"
+        description="通过设置 disabled 属性来禁用开关。"
+        code={disabledSnippet}>
+        <Space>
+          <Switch checked={disabledOn} disabled />
+          <Switch checked={disabledOff} disabled />
+        </Space>
+      </DemoBlock>
 
       {/* 不同尺寸 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">不同尺寸</h2>
-        <p className="text-gray-600 mb-6">开关有三种尺寸。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Space align="center">
-            <Switch checked={sizeSm} size="sm" onChange={setSizeSm} />
-            <Switch checked={sizeMd} size="md" onChange={setSizeMd} />
-            <Switch checked={sizeLg} size="lg" onChange={setSizeLg} />
-          </Space>
-        </div>
-      </section>
+      <DemoBlock title="不同尺寸" description="开关有三种尺寸。" code={sizeSnippet}>
+        <Space align="center">
+          <Switch checked={sizeSm} size="sm" onChange={setSizeSm} />
+          <Switch checked={sizeMd} size="md" onChange={setSizeMd} />
+          <Switch checked={sizeLg} size="lg" onChange={setSizeLg} />
+        </Space>
+      </DemoBlock>
     </div>
   )
 }
