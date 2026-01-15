@@ -127,7 +127,10 @@ const UploadDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 多文件上传 */}
-      <DemoBlock title="多文件上传" description="通过设置 multiple 属性允许同时选择多个文件。" code={multipleSnippet}>
+      <DemoBlock
+        title="多文件上传"
+        description="通过设置 multiple 属性允许同时选择多个文件。"
+        code={multipleSnippet}>
         <div className="max-w-md">
           <Upload fileList={fileList3} onChange={handleChange3} multiple>
             选择多个文件
@@ -136,7 +139,10 @@ const UploadDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 文件数量限制 */}
-      <DemoBlock title="文件数量限制" description="通过 limit 属性限制上传文件的数量。" code={limitSnippet}>
+      <DemoBlock
+        title="文件数量限制"
+        description="通过 limit 属性限制上传文件的数量。"
+        code={limitSnippet}>
         <div className="max-w-md">
           <Upload
             fileList={fileList4}
@@ -150,7 +156,10 @@ const UploadDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 文件类型和大小限制 */}
-      <DemoBlock title="文件类型和大小限制" description="通过 accept 和 maxSize 限制文件类型和大小。" code={validateSnippet}>
+      <DemoBlock
+        title="文件类型和大小限制"
+        description="通过 accept 和 maxSize 限制文件类型和大小。"
+        code={validateSnippet}>
         <div className="max-w-md space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">仅允许图片</label>
@@ -171,7 +180,10 @@ const UploadDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 图片卡片列表 */}
-      <DemoBlock title="图片卡片列表" description="使用 listType=\"picture-card\" 显示图片卡片样式。" code={pictureCardSnippet}>
+      <DemoBlock
+        title="图片卡片列表"
+        description='使用 listType="picture-card" 显示图片卡片样式。'
+        code={pictureCardSnippet}>
         <div className="max-w-2xl">
           <Upload
             fileList={fileList6}
@@ -185,7 +197,10 @@ const UploadDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 禁用状态 */}
-      <DemoBlock title="禁用状态" description="设置 disabled 属性禁用上传功能。" code={disabledSnippet}>
+      <DemoBlock
+        title="禁用状态"
+        description="设置 disabled 属性禁用上传功能。"
+        code={disabledSnippet}>
         <div className="max-w-md space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">禁用的按钮上传</label>
