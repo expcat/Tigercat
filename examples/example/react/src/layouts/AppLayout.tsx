@@ -3,7 +3,13 @@ import { Outlet, useLocation } from 'react-router-dom'
 import type { DemoLang } from '@demo-shared/app-config'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
 import { ConfigProvider, Link } from '@expcat/tigercat-react'
-import { getStoredLang, getStoredTheme, setStoredLang } from '@demo-shared/prefs'
+import {
+  getStoredLang,
+  getStoredSiderCollapsed,
+  getStoredTheme,
+  setStoredLang,
+  setStoredSiderCollapsed
+} from '@demo-shared/prefs'
 import { applyTheme } from '@demo-shared/themes'
 import { LangContext } from '../context/lang'
 import AppHeader from '../components/AppHeader'
@@ -30,12 +36,17 @@ export const AppLayout: React.FC = () => {
   const [sections, setSections] = useState<DemoSection[]>([])
   const [pageTitle, setPageTitle] = useState('')
   const [lang, setLang] = useState<DemoLang>(() => getStoredLang())
+  const [isSiderCollapsed, setIsSiderCollapsed] = useState<boolean>(() => getStoredSiderCollapsed())
 
   const isHome = useMemo(() => location.pathname === '/', [location.pathname])
 
   useEffect(() => {
     setStoredLang(lang)
   }, [lang])
+
+  useEffect(() => {
+    setStoredSiderCollapsed(isSiderCollapsed)
+  }, [isSiderCollapsed])
 
   useEffect(() => {
     const storedTheme = getStoredTheme()
@@ -92,10 +103,16 @@ export const AppLayout: React.FC = () => {
     <LangContext.Provider value={{ lang }}>
       <ConfigProvider locale={tigerLocale}>
         <div className="h-screen overflow-hidden box-border bg-gray-50 dark:bg-gray-950 pt-14">
-          <AppHeader lang={lang} onLangChange={setLang} rightHint="React" />
+          <AppHeader
+            lang={lang}
+            onLangChange={setLang}
+            rightHint="React"
+            isSiderCollapsed={isSiderCollapsed}
+            onToggleSider={() => setIsSiderCollapsed((prev) => !prev)}
+          />
 
           <div className="flex h-full">
-            <AppSider lang={lang} />
+            <AppSider lang={lang} isSiderCollapsed={isSiderCollapsed} />
 
             <main className="flex-1 min-w-0 h-full overflow-hidden">
               <div className="h-full overflow-y-auto">
