@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Pagination, Divider } from '@expcat/tigercat-react'
+import { Pagination } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
 
 const PaginationDemo: React.FC = () => {
   const [current1, setCurrent1] = useState(1)
@@ -22,6 +23,81 @@ const PaginationDemo: React.FC = () => {
     return `显示 ${range[0]}-${range[1]} 条，共 ${total} 条记录`
   }
 
+  const basicSnippet = `<Pagination current={current1} onChange={setCurrent1} total={100} pageSize={10} />`
+
+  const quickSnippet = `<Pagination
+    current={current2}
+    onChange={setCurrent2}
+    total={500}
+    pageSize={10}
+    showQuickJumper
+  />`
+
+  const sizeChangeSnippet = `<Pagination
+    current={current3}
+    onChange={setCurrent3}
+    pageSize={pageSize}
+    total={500}
+    pageSizeOptions={[10, 20, 50, 100]}
+    showSizeChanger
+    onPageSizeChange={handlePageSizeChange}
+  />`
+
+  const simpleSnippet = `<Pagination current={current4} onChange={setCurrent4} total={500} simple />`
+
+  const sizeSnippet = `<div className="space-y-4">
+    <div>
+      <p className="text-sm text-gray-500 mb-2">小尺寸</p>
+      <Pagination current={current5} onChange={setCurrent5} total={100} size="small" />
+    </div>
+    <div>
+      <p className="text-sm text-gray-500 mb-2">中等尺寸（默认）</p>
+      <Pagination current={current5} onChange={setCurrent5} total={100} size="medium" />
+    </div>
+    <div>
+      <p className="text-sm text-gray-500 mb-2">大尺寸</p>
+      <Pagination current={current5} onChange={setCurrent5} total={100} size="large" />
+    </div>
+  </div>`
+
+  const alignSnippet = `<div className="space-y-4">
+    <div>
+      <p className="text-sm text-gray-500 mb-2">左对齐</p>
+      <Pagination current={current6} onChange={setCurrent6} total={100} align="left" />
+    </div>
+    <div>
+      <p className="text-sm text-gray-500 mb-2">居中对齐（默认）</p>
+      <Pagination current={current6} onChange={setCurrent6} total={100} align="center" />
+    </div>
+    <div>
+      <p className="text-sm text-gray-500 mb-2">右对齐</p>
+      <Pagination current={current6} onChange={setCurrent6} total={100} align="right" />
+    </div>
+  </div>`
+
+  const totalTextSnippet = `<Pagination
+    current={current7}
+    onChange={setCurrent7}
+    total={100}
+    totalText={customTotalText}
+  />`
+
+  const disabledSnippet = `<Pagination current={current8} onChange={setCurrent8} total={100} disabled />`
+
+  const fullSnippet = `<Pagination
+    current={current3}
+    onChange={setCurrent3}
+    pageSize={pageSize}
+    total={500}
+    pageSizeOptions={[10, 20, 50, 100]}
+    showQuickJumper
+    showSizeChanger
+    totalText={customTotalText}
+    size="medium"
+    align="center"
+    onPageSizeChange={handlePageSizeChange}
+  />`
+
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
@@ -32,64 +108,51 @@ const PaginationDemo: React.FC = () => {
       </div>
 
       {/* 基本用法 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">基本用法</h2>
-        <p className="text-gray-600 mb-6">最简单的分页组件。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Pagination current={current1} onChange={setCurrent1} total={100} pageSize={10} />
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock title="基本用法" description="最简单的分页组件。" code={basicSnippet}>
+        <Pagination current={current1} onChange={setCurrent1} total={100} pageSize={10} />
+      </DemoBlock>
 
       {/* 快速跳页 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">快速跳页</h2>
-        <p className="text-gray-600 mb-6">显示快速跳页输入框，方便快速跳转到指定页。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Pagination
-            current={current2}
-            onChange={setCurrent2}
-            total={500}
-            pageSize={10}
-            showQuickJumper
-          />
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock
+        title="快速跳页"
+        description="显示快速跳页输入框，方便快速跳转到指定页。"
+        code={quickSnippet}>
+        <Pagination
+          current={current2}
+          onChange={setCurrent2}
+          total={500}
+          pageSize={10}
+          showQuickJumper
+        />
+      </DemoBlock>
 
       {/* 改变每页条数 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">改变每页条数</h2>
-        <p className="text-gray-600 mb-6">可以改变每页显示的条数。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Pagination
-            current={current3}
-            onChange={setCurrent3}
-            pageSize={pageSize}
-            total={500}
-            pageSizeOptions={[10, 20, 50, 100]}
-            showSizeChanger
-            onPageSizeChange={handlePageSizeChange}
-          />
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock
+        title="改变每页条数"
+        description="可以改变每页显示的条数。"
+        code={sizeChangeSnippet}>
+        <Pagination
+          current={current3}
+          onChange={setCurrent3}
+          pageSize={pageSize}
+          total={500}
+          pageSizeOptions={[10, 20, 50, 100]}
+          showSizeChanger
+          onPageSizeChange={handlePageSizeChange}
+        />
+      </DemoBlock>
 
       {/* 简单模式 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">简单模式</h2>
-        <p className="text-gray-600 mb-6">只显示上一页、下一页和当前页/总页数。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Pagination current={current4} onChange={setCurrent4} total={500} simple />
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock
+        title="简单模式"
+        description="只显示上一页、下一页和当前页/总页数。"
+        code={simpleSnippet}>
+        <Pagination current={current4} onChange={setCurrent4} total={500} simple />
+      </DemoBlock>
 
       {/* 不同尺寸 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">不同尺寸</h2>
-        <p className="text-gray-600 mb-6">提供三种尺寸：小、中、大。</p>
-        <div className="p-6 bg-gray-50 rounded-lg space-y-4">
+      <DemoBlock title="不同尺寸" description="提供三种尺寸：小、中、大。" code={sizeSnippet}>
+        <div className="space-y-4">
           <div>
             <p className="text-sm text-gray-500 mb-2">小尺寸</p>
             <Pagination current={current5} onChange={setCurrent5} total={100} size="small" />
@@ -103,14 +166,14 @@ const PaginationDemo: React.FC = () => {
             <Pagination current={current5} onChange={setCurrent5} total={100} size="large" />
           </div>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
       {/* 自定义对齐方式 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">自定义对齐方式</h2>
-        <p className="text-gray-600 mb-6">可以设置分页组件的对齐方式。</p>
-        <div className="p-6 bg-gray-50 rounded-lg space-y-4">
+      <DemoBlock
+        title="自定义对齐方式"
+        description="可以设置分页组件的对齐方式。"
+        code={alignSnippet}>
+        <div className="space-y-4">
           <div>
             <p className="text-sm text-gray-500 mb-2">左对齐</p>
             <Pagination current={current6} onChange={setCurrent6} total={100} align="left" />
@@ -124,54 +187,45 @@ const PaginationDemo: React.FC = () => {
             <Pagination current={current6} onChange={setCurrent6} total={100} align="right" />
           </div>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
       {/* 自定义总数文本 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">自定义总数文本</h2>
-        <p className="text-gray-600 mb-6">可以自定义显示总条数的文本。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Pagination
-            current={current7}
-            onChange={setCurrent7}
-            total={100}
-            totalText={customTotalText}
-          />
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock
+        title="自定义总数文本"
+        description="可以自定义显示总条数的文本。"
+        code={totalTextSnippet}>
+        <Pagination
+          current={current7}
+          onChange={setCurrent7}
+          total={100}
+          totalText={customTotalText}
+        />
+      </DemoBlock>
 
       {/* 禁用状态 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">禁用状态</h2>
-        <p className="text-gray-600 mb-6">禁用分页组件的所有交互。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Pagination current={current8} onChange={setCurrent8} total={100} disabled />
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock title="禁用状态" description="禁用分页组件的所有交互。" code={disabledSnippet}>
+        <Pagination current={current8} onChange={setCurrent8} total={100} disabled />
+      </DemoBlock>
 
       {/* 完整示例 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">完整示例</h2>
-        <p className="text-gray-600 mb-6">包含所有功能的完整示例（查看控制台）。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Pagination
-            current={current3}
-            onChange={setCurrent3}
-            pageSize={pageSize}
-            total={500}
-            pageSizeOptions={[10, 20, 50, 100]}
-            showQuickJumper
-            showSizeChanger
-            totalText={customTotalText}
-            size="medium"
-            align="center"
-            onPageSizeChange={handlePageSizeChange}
-          />
-        </div>
-      </section>
+      <DemoBlock
+        title="完整示例"
+        description="包含所有功能的完整示例（查看控制台）。"
+        code={fullSnippet}>
+        <Pagination
+          current={current3}
+          onChange={setCurrent3}
+          pageSize={pageSize}
+          total={500}
+          pageSizeOptions={[10, 20, 50, 100]}
+          showQuickJumper
+          showSizeChanger
+          totalText={customTotalText}
+          size="medium"
+          align="center"
+          onPageSizeChange={handlePageSizeChange}
+        />
+      </DemoBlock>
     </div>
   )
 }
