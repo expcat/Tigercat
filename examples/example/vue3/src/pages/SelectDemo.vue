@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Select, Space, Divider } from '@expcat/tigercat-vue'
+import { Select, Space } from '@expcat/tigercat-vue'
+import DemoBlock from '../components/DemoBlock.vue'
 
 const basicValue = ref<string | number>('')
 const defaultValue = ref<string | number>('china')
@@ -63,6 +64,77 @@ const groupedOptions = [
     ]
   }
 ]
+
+const basicSnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <Select v-model="basicValue" :options="options" placeholder="请选择" />
+  <p class="text-sm text-gray-600">选中的值：{{ basicValue || '未选择' }}</p>
+</Space>`
+
+const defaultSnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <Select v-model="defaultValue" :options="countries" />
+  <p class="text-sm text-gray-600">选中的国家：{{ defaultValue }}</p>
+</Space>`
+
+const disabledSnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <Select v-model="disabledValue" :options="countries" disabled />
+</Space>`
+
+const sizeSnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <div class="w-full">
+    <p class="text-sm text-gray-600 mb-2">sm</p>
+    <Select v-model="sizeSmValue" :options="options" size="sm" />
+  </div>
+  <div class="w-full">
+    <p class="text-sm text-gray-600 mb-2">md</p>
+    <Select v-model="sizeMdValue" :options="options" size="md" />
+  </div>
+  <div class="w-full">
+    <p class="text-sm text-gray-600 mb-2">lg</p>
+    <Select v-model="sizeLgValue" :options="options" size="lg" />
+  </div>
+</Space>`
+
+const disabledOptionSnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <Select v-model="disabledOptionValue" :options="optionsWithDisabled" placeholder="请选择" />
+  <p class="text-sm text-gray-600">选中的值：{{ disabledOptionValue || '未选择' }}</p>
+</Space>`
+
+const clearableSnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <div class="w-full">
+    <p class="text-sm text-gray-600 mb-2">clearable: true</p>
+    <Select v-model="clearableValue" :options="options" />
+  </div>
+  <div class="w-full">
+    <p class="text-sm text-gray-600 mb-2">clearable: false</p>
+    <Select v-model="notClearableValue" :options="options" :clearable="false" />
+  </div>
+</Space>`
+
+const searchableSnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <Select
+    v-model="searchableValue"
+    :options="countries"
+    searchable
+    placeholder="搜索国家"
+    @search="(q) => (lastSearchQuery = q)" />
+  <p class="text-sm text-gray-600">最近一次搜索：{{ lastSearchQuery || '（无）' }}</p>
+</Space>`
+
+const multipleSnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <Select v-model="multipleValue" :options="options" multiple placeholder="请选择多个" />
+  <p class="text-sm text-gray-600">
+    选中：{{ multipleValue.length ? multipleValue.join(', ') : '未选择' }}
+  </p>
+</Space>`
+
+const groupedSnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <Select v-model="groupedValue" :options="groupedOptions" />
+  <p class="text-sm text-gray-600">选中的值：{{ groupedValue }}</p>
+</Space>`
+
+const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <Select v-model="emptyValue" :options="[]" no-data-text="暂无数据" placeholder="无可用选项" />
+</Space>`
 </script>
 
 <template>
@@ -73,185 +145,156 @@ const groupedOptions = [
     </div>
 
     <!-- 基础用法 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">基础用法</h2>
-      <p class="text-gray-600 mb-6">适用广泛的基础选择器。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical"
-               class="w-full max-w-md">
-          <Select v-model="basicValue"
-                  :options="options"
-                  placeholder="请选择" />
-          <p class="text-sm text-gray-600">选中的值：{{ basicValue || '未选择' }}</p>
-        </Space>
-      </div>
-      <Divider class="my-6" />
-    </section>
+    <DemoBlock title="基础用法"
+               description="适用广泛的基础选择器。"
+               :code="basicSnippet">
+      <Space direction="vertical"
+             class="w-full max-w-md">
+        <Select v-model="basicValue"
+                :options="options"
+                placeholder="请选择" />
+        <p class="text-sm text-gray-600">选中的值：{{ basicValue || '未选择' }}</p>
+      </Space>
+    </DemoBlock>
 
     <!-- 有默认值 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">有默认值</h2>
-      <p class="text-gray-600 mb-6">可以设置默认选中的值。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical"
-               class="w-full max-w-md">
-          <Select v-model="defaultValue"
-                  :options="countries" />
-          <p class="text-sm text-gray-600">选中的国家：{{ defaultValue }}</p>
-        </Space>
-      </div>
-      <Divider class="my-6" />
-    </section>
+    <DemoBlock title="有默认值"
+               description="可以设置默认选中的值。"
+               :code="defaultSnippet">
+      <Space direction="vertical"
+             class="w-full max-w-md">
+        <Select v-model="defaultValue"
+                :options="countries" />
+        <p class="text-sm text-gray-600">选中的国家：{{ defaultValue }}</p>
+      </Space>
+    </DemoBlock>
 
     <!-- 禁用状态 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">禁用状态</h2>
-      <p class="text-gray-600 mb-6">禁用整个选择器组件。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical"
-               class="w-full max-w-md">
-          <Select v-model="disabledValue"
-                  :options="countries"
-                  disabled />
-        </Space>
-      </div>
-      <Divider class="my-6" />
-    </section>
+    <DemoBlock title="禁用状态"
+               description="禁用整个选择器组件。"
+               :code="disabledSnippet">
+      <Space direction="vertical"
+             class="w-full max-w-md">
+        <Select v-model="disabledValue"
+                :options="countries"
+                disabled />
+      </Space>
+    </DemoBlock>
 
     <!-- 不同尺寸 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">不同尺寸</h2>
-      <p class="text-gray-600 mb-6">Select 支持 sm / md / lg 三种尺寸。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical"
-               class="w-full max-w-md">
-          <div class="w-full">
-            <p class="text-sm text-gray-600 mb-2">sm</p>
-            <Select v-model="sizeSmValue"
-                    :options="options"
-                    size="sm" />
-          </div>
-          <div class="w-full">
-            <p class="text-sm text-gray-600 mb-2">md</p>
-            <Select v-model="sizeMdValue"
-                    :options="options"
-                    size="md" />
-          </div>
-          <div class="w-full">
-            <p class="text-sm text-gray-600 mb-2">lg</p>
-            <Select v-model="sizeLgValue"
-                    :options="options"
-                    size="lg" />
-          </div>
-        </Space>
-      </div>
-      <Divider class="my-6" />
-    </section>
+    <DemoBlock title="不同尺寸"
+               description="Select 支持 sm / md / lg 三种尺寸。"
+               :code="sizeSnippet">
+      <Space direction="vertical"
+             class="w-full max-w-md">
+        <div class="w-full">
+          <p class="text-sm text-gray-600 mb-2">sm</p>
+          <Select v-model="sizeSmValue"
+                  :options="options"
+                  size="sm" />
+        </div>
+        <div class="w-full">
+          <p class="text-sm text-gray-600 mb-2">md</p>
+          <Select v-model="sizeMdValue"
+                  :options="options"
+                  size="md" />
+        </div>
+        <div class="w-full">
+          <p class="text-sm text-gray-600 mb-2">lg</p>
+          <Select v-model="sizeLgValue"
+                  :options="options"
+                  size="lg" />
+        </div>
+      </Space>
+    </DemoBlock>
 
     <!-- 禁用选项 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">禁用选项</h2>
-      <p class="text-gray-600 mb-6">可以禁用单个选项。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical"
-               class="w-full max-w-md">
-          <Select v-model="disabledOptionValue"
-                  :options="optionsWithDisabled"
-                  placeholder="请选择" />
-          <p class="text-sm text-gray-600">选中的值：{{ disabledOptionValue || '未选择' }}</p>
-        </Space>
-      </div>
-      <Divider class="my-6" />
-    </section>
+    <DemoBlock title="禁用选项"
+               description="可以禁用单个选项。"
+               :code="disabledOptionSnippet">
+      <Space direction="vertical"
+             class="w-full max-w-md">
+        <Select v-model="disabledOptionValue"
+                :options="optionsWithDisabled"
+                placeholder="请选择" />
+        <p class="text-sm text-gray-600">选中的值：{{ disabledOptionValue || '未选择' }}</p>
+      </Space>
+    </DemoBlock>
 
     <!-- 可清空 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">可清空</h2>
-      <p class="text-gray-600 mb-6">默认支持清空，也可以关闭清空功能。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical"
-               class="w-full max-w-md">
-          <div class="w-full">
-            <p class="text-sm text-gray-600 mb-2">clearable: true</p>
-            <Select v-model="clearableValue"
-                    :options="options" />
-          </div>
-          <div class="w-full">
-            <p class="text-sm text-gray-600 mb-2">clearable: false</p>
-            <Select v-model="notClearableValue"
-                    :options="options"
-                    :clearable="false" />
-          </div>
-        </Space>
-      </div>
-      <Divider class="my-6" />
-    </section>
+    <DemoBlock title="可清空"
+               description="默认支持清空，也可以关闭清空功能。"
+               :code="clearableSnippet">
+      <Space direction="vertical"
+             class="w-full max-w-md">
+        <div class="w-full">
+          <p class="text-sm text-gray-600 mb-2">clearable: true</p>
+          <Select v-model="clearableValue"
+                  :options="options" />
+        </div>
+        <div class="w-full">
+          <p class="text-sm text-gray-600 mb-2">clearable: false</p>
+          <Select v-model="notClearableValue"
+                  :options="options"
+                  :clearable="false" />
+        </div>
+      </Space>
+    </DemoBlock>
 
     <!-- 可搜索 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">可搜索</h2>
-      <p class="text-gray-600 mb-6">启用 searchable 后可在下拉中输入关键字过滤选项。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical"
-               class="w-full max-w-md">
-          <Select v-model="searchableValue"
-                  :options="countries"
-                  searchable
-                  placeholder="搜索国家"
-                  @search="(q) => (lastSearchQuery = q)" />
-          <p class="text-sm text-gray-600">最近一次搜索：{{ lastSearchQuery || '（无）' }}</p>
-        </Space>
-      </div>
-      <Divider class="my-6" />
-    </section>
+    <DemoBlock title="可搜索"
+               description="启用 searchable 后可在下拉中输入关键字过滤选项。"
+               :code="searchableSnippet">
+      <Space direction="vertical"
+             class="w-full max-w-md">
+        <Select v-model="searchableValue"
+                :options="countries"
+                searchable
+                placeholder="搜索国家"
+                @search="(q) => (lastSearchQuery = q)" />
+        <p class="text-sm text-gray-600">最近一次搜索：{{ lastSearchQuery || '（无）' }}</p>
+      </Space>
+    </DemoBlock>
 
     <!-- 多选 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">多选</h2>
-      <p class="text-gray-600 mb-6">启用 multiple 后可选择多个选项。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical"
-               class="w-full max-w-md">
-          <Select v-model="multipleValue"
-                  :options="options"
-                  multiple
-                  placeholder="请选择多个" />
-          <p class="text-sm text-gray-600">
-            选中：{{ multipleValue.length ? multipleValue.join(', ') : '未选择' }}
-          </p>
-        </Space>
-      </div>
-      <Divider class="my-6" />
-    </section>
+    <DemoBlock title="多选"
+               description="启用 multiple 后可选择多个选项。"
+               :code="multipleSnippet">
+      <Space direction="vertical"
+             class="w-full max-w-md">
+        <Select v-model="multipleValue"
+                :options="options"
+                multiple
+                placeholder="请选择多个" />
+        <p class="text-sm text-gray-600">
+          选中：{{ multipleValue.length ? multipleValue.join(', ') : '未选择' }}
+        </p>
+      </Space>
+    </DemoBlock>
 
     <!-- 分组选项 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">分组选项</h2>
-      <p class="text-gray-600 mb-6">支持传入分组数据（group label + options）。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical"
-               class="w-full max-w-md">
-          <Select v-model="groupedValue"
-                  :options="groupedOptions" />
-          <p class="text-sm text-gray-600">选中的值：{{ groupedValue }}</p>
-        </Space>
-      </div>
-      <Divider class="my-6" />
-    </section>
+    <DemoBlock title="分组选项"
+               description="支持传入分组数据（group label + options）。"
+               :code="groupedSnippet">
+      <Space direction="vertical"
+             class="w-full max-w-md">
+        <Select v-model="groupedValue"
+                :options="groupedOptions" />
+        <p class="text-sm text-gray-600">选中的值：{{ groupedValue }}</p>
+      </Space>
+    </DemoBlock>
 
     <!-- 空状态 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">空状态</h2>
-      <p class="text-gray-600 mb-6">当 options 为空时，会显示空提示文案。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical"
-               class="w-full max-w-md">
-          <Select v-model="emptyValue"
-                  :options="[]"
-                  no-data-text="暂无数据"
-                  placeholder="无可用选项" />
-        </Space>
-      </div>
-    </section>
+    <DemoBlock title="空状态"
+               description="当 options 为空时，会显示空提示文案。"
+               :code="emptySnippet">
+      <Space direction="vertical"
+             class="w-full max-w-md">
+        <Select v-model="emptyValue"
+                :options="[]"
+                no-data-text="暂无数据"
+                placeholder="无可用选项" />
+      </Space>
+    </DemoBlock>
   </div>
 </template>

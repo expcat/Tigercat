@@ -10,10 +10,10 @@ import {
   Radio,
   RadioGroup,
   Button,
-  Space,
-  Divider
+  Space
 } from '@expcat/tigercat-vue'
 import { countries } from '@demo-shared/constants'
+import DemoBlock from '../components/DemoBlock.vue'
 
 const basicForm = reactive({
   username: '',
@@ -98,6 +98,77 @@ const resetValidateForm = () => {
   validateFormRef.value?.clearValidate()
   lastValidateResult.value = ''
 }
+
+const basicSnippet = `<Form :model="basicForm" @submit="handleBasicSubmit" class="max-w-md">
+  <FormItem label="用户名" name="username" required>
+    <Input v-model="basicForm.username" placeholder="请输入用户名" />
+  </FormItem>
+  <FormItem label="邮箱" name="email" required>
+    <Input v-model="basicForm.email" type="email" placeholder="请输入邮箱" />
+  </FormItem>
+  <FormItem label="性别">
+    <RadioGroup v-model="basicForm.gender">
+      <Radio value="male">男</Radio>
+      <Radio value="female">女</Radio>
+      <Radio value="other">其他</Radio>
+    </RadioGroup>
+  </FormItem>
+  <FormItem label="国家">
+    <Select v-model="basicForm.country" :options="countries" />
+  </FormItem>
+  <FormItem label="个人简介">
+    <Textarea v-model="basicForm.bio" placeholder="请输入个人简介" :rows="4" />
+  </FormItem>
+  <FormItem>
+    <Checkbox v-model="basicForm.agreement"> 我已阅读并同意用户协议 </Checkbox>
+  </FormItem>
+  <FormItem>
+    <Space>
+      <Button type="submit" variant="primary">提交</Button>
+      <Button type="button" variant="secondary" @click="resetBasic">重置</Button>
+    </Space>
+  </FormItem>
+</Form>`
+
+const validateSnippet = `<Space direction="vertical" class="w-full">
+  <Form
+    ref="validateFormRef"
+    :model="validateForm"
+    :rules="validateRules"
+    @submit="handleValidateSubmit"
+    class="max-w-md">
+    <FormItem label="用户名" name="username">
+      <Input v-model="validateForm.username" placeholder="至少 3 个字符" />
+    </FormItem>
+    <FormItem label="邮箱" name="email">
+      <Input v-model="validateForm.email" placeholder="example@domain.com" />
+    </FormItem>
+    <FormItem label="年龄" name="age">
+      <Input v-model="validateForm.age" type="number" placeholder="1-150" />
+    </FormItem>
+    <FormItem label="网站" name="website">
+      <Input v-model="validateForm.website" placeholder="https://example.com" />
+    </FormItem>
+    <FormItem>
+      <Space>
+        <Button type="submit" variant="primary">提交并校验</Button>
+        <Button type="button" variant="secondary" @click="validateManually">手动校验</Button>
+        <Button type="button" variant="secondary" @click="clearValidateManually">清除校验</Button>
+        <Button type="button" variant="secondary" @click="resetValidateForm">重置</Button>
+      </Space>
+    </FormItem>
+  </Form>
+  <div class="max-w-md w-full">
+    <p class="text-sm text-gray-600 mb-2">最近一次校验结果：</p>
+    <pre class="text-sm text-gray-700 bg-white p-4 rounded border whitespace-pre-wrap">{{
+      lastValidateResult || '（无）'
+    }}</pre>
+  </div>
+</Space>`
+
+const previewSnippet = `<pre class="text-sm text-gray-700 bg-white p-4 rounded border">
+  {{ JSON.stringify({ basicForm, validateForm }, null, 2) }}
+</pre>`
 </script>
 
 <template>
@@ -110,111 +181,131 @@ const resetValidateForm = () => {
     </div>
 
     <!-- 基础用法 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">基础用法</h2>
-      <p class="text-gray-600 mb-6">完整的表单示例，包含多种表单控件。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Form :model="basicForm" @submit="handleBasicSubmit" class="max-w-md">
-          <FormItem label="用户名" name="username" required>
-            <Input v-model="basicForm.username" placeholder="请输入用户名" />
+    <DemoBlock title="基础用法"
+               description="完整的表单示例，包含多种表单控件。"
+               :code="basicSnippet">
+      <Form :model="basicForm"
+            @submit="handleBasicSubmit"
+            class="max-w-md">
+        <FormItem label="用户名"
+                  name="username"
+                  required>
+          <Input v-model="basicForm.username"
+                 placeholder="请输入用户名" />
+        </FormItem>
+
+        <FormItem label="邮箱"
+                  name="email"
+                  required>
+          <Input v-model="basicForm.email"
+                 type="email"
+                 placeholder="请输入邮箱" />
+        </FormItem>
+
+        <FormItem label="性别">
+          <RadioGroup v-model="basicForm.gender">
+            <Radio value="male">男</Radio>
+            <Radio value="female">女</Radio>
+            <Radio value="other">其他</Radio>
+          </RadioGroup>
+        </FormItem>
+
+        <FormItem label="国家">
+          <Select v-model="basicForm.country"
+                  :options="countries" />
+        </FormItem>
+
+        <FormItem label="个人简介">
+          <Textarea v-model="basicForm.bio"
+                    placeholder="请输入个人简介"
+                    :rows="4" />
+        </FormItem>
+
+        <FormItem>
+          <Checkbox v-model="basicForm.agreement"> 我已阅读并同意用户协议 </Checkbox>
+        </FormItem>
+
+        <FormItem>
+          <Space>
+            <Button type="submit"
+                    variant="primary">提交</Button>
+            <Button type="button"
+                    variant="secondary"
+                    @click="resetBasic">重置</Button>
+          </Space>
+        </FormItem>
+      </Form>
+    </DemoBlock>
+
+    <!-- 表单验证 -->
+    <DemoBlock title="表单验证"
+               description="通过 rules + name 实现校验，支持提交校验与手动校验。"
+               :code="validateSnippet">
+      <Space direction="vertical"
+             class="w-full">
+        <Form ref="validateFormRef"
+              :model="validateForm"
+              :rules="validateRules"
+              @submit="handleValidateSubmit"
+              class="max-w-md">
+          <FormItem label="用户名"
+                    name="username">
+            <Input v-model="validateForm.username"
+                   placeholder="至少 3 个字符" />
           </FormItem>
 
-          <FormItem label="邮箱" name="email" required>
-            <Input v-model="basicForm.email" type="email" placeholder="请输入邮箱" />
+          <FormItem label="邮箱"
+                    name="email">
+            <Input v-model="validateForm.email"
+                   placeholder="example@domain.com" />
           </FormItem>
 
-          <FormItem label="性别">
-            <RadioGroup v-model="basicForm.gender">
-              <Radio value="male">男</Radio>
-              <Radio value="female">女</Radio>
-              <Radio value="other">其他</Radio>
-            </RadioGroup>
+          <FormItem label="年龄"
+                    name="age">
+            <Input v-model="validateForm.age"
+                   type="number"
+                   placeholder="1-150" />
           </FormItem>
 
-          <FormItem label="国家">
-            <Select v-model="basicForm.country" :options="countries" />
-          </FormItem>
-
-          <FormItem label="个人简介">
-            <Textarea v-model="basicForm.bio" placeholder="请输入个人简介" :rows="4" />
-          </FormItem>
-
-          <FormItem>
-            <Checkbox v-model="basicForm.agreement"> 我已阅读并同意用户协议 </Checkbox>
+          <FormItem label="网站"
+                    name="website">
+            <Input v-model="validateForm.website"
+                   placeholder="https://example.com" />
           </FormItem>
 
           <FormItem>
             <Space>
-              <Button type="submit" variant="primary">提交</Button>
-              <Button type="button" variant="secondary" @click="resetBasic">重置</Button>
+              <Button type="submit"
+                      variant="primary">提交并校验</Button>
+              <Button type="button"
+                      variant="secondary"
+                      @click="validateManually">手动校验</Button>
+              <Button type="button"
+                      variant="secondary"
+                      @click="clearValidateManually">清除校验</Button>
+              <Button type="button"
+                      variant="secondary"
+                      @click="resetValidateForm">重置</Button>
             </Space>
           </FormItem>
         </Form>
-      </div>
-      <Divider class="my-6" />
-    </section>
 
-    <!-- 表单验证 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">表单验证</h2>
-      <p class="text-gray-600 mb-6">通过 rules + name 实现校验，支持提交校验与手动校验。</p>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <Space direction="vertical" class="w-full">
-          <Form
-            ref="validateFormRef"
-            :model="validateForm"
-            :rules="validateRules"
-            @submit="handleValidateSubmit"
-            class="max-w-md">
-            <FormItem label="用户名" name="username">
-              <Input v-model="validateForm.username" placeholder="至少 3 个字符" />
-            </FormItem>
-
-            <FormItem label="邮箱" name="email">
-              <Input v-model="validateForm.email" placeholder="example@domain.com" />
-            </FormItem>
-
-            <FormItem label="年龄" name="age">
-              <Input v-model="validateForm.age" type="number" placeholder="1-150" />
-            </FormItem>
-
-            <FormItem label="网站" name="website">
-              <Input v-model="validateForm.website" placeholder="https://example.com" />
-            </FormItem>
-
-            <FormItem>
-              <Space>
-                <Button type="submit" variant="primary">提交并校验</Button>
-                <Button type="button" variant="secondary" @click="validateManually"
-                  >手动校验</Button
-                >
-                <Button type="button" variant="secondary" @click="clearValidateManually"
-                  >清除校验</Button
-                >
-                <Button type="button" variant="secondary" @click="resetValidateForm">重置</Button>
-              </Space>
-            </FormItem>
-          </Form>
-
-          <div class="max-w-md w-full">
-            <p class="text-sm text-gray-600 mb-2">最近一次校验结果：</p>
-            <pre class="text-sm text-gray-700 bg-white p-4 rounded border whitespace-pre-wrap">{{
-              lastValidateResult || '（无）'
-            }}</pre>
-          </div>
-        </Space>
-      </div>
-      <Divider class="my-6" />
-    </section>
+        <div class="max-w-md w-full">
+          <p class="text-sm text-gray-600 mb-2">最近一次校验结果：</p>
+          <pre class="text-sm text-gray-700 bg-white p-4 rounded border whitespace-pre-wrap">{{
+            lastValidateResult || '（无）'
+          }}</pre>
+        </div>
+      </Space>
+    </DemoBlock>
 
     <!-- 表单数据预览 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">表单数据预览</h2>
-      <div class="p-6 bg-gray-50 rounded-lg">
-        <pre class="text-sm text-gray-700 bg-white p-4 rounded border">{{
-          JSON.stringify({ basicForm, validateForm }, null, 2)
-        }}</pre>
-      </div>
-    </section>
+    <DemoBlock title="表单数据预览"
+               description="实时查看表单数据。"
+               :code="previewSnippet">
+      <pre class="text-sm text-gray-700 bg-white p-4 rounded border">{{
+        JSON.stringify({ basicForm, validateForm }, null, 2)
+      }}</pre>
+    </DemoBlock>
   </div>
 </template>
