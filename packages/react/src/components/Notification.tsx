@@ -237,6 +237,10 @@ export const NotificationContainer: React.FC<NotificationContainerProps> = ({
  * Ensure notification container exists for a position
  */
 function ensureContainer(position: NotificationPosition) {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return
+  }
+
   const containerId = `${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}`
   const rootId = `${containerId}-root`
 

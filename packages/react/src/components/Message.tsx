@@ -198,6 +198,10 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({ position = '
  * Ensure message container exists
  */
 function ensureContainer() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    return
+  }
+
   const rootId = `${MESSAGE_CONTAINER_ID}-root`
 
   // If we already created a root but the DOM was externally cleared (e.g. tests), reset.
@@ -302,9 +306,11 @@ function clearAll() {
   updateCallback = null
 
   const rootId = `${MESSAGE_CONTAINER_ID}-root`
-  const rootEl = document.getElementById(rootId)
-  if (rootEl?.parentNode) {
-    rootEl.parentNode.removeChild(rootEl)
+  if (typeof document !== 'undefined') {
+    const rootEl = document.getElementById(rootId)
+    if (rootEl?.parentNode) {
+      rootEl.parentNode.removeChild(rootEl)
+    }
   }
 }
 
