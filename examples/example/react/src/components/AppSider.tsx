@@ -1,16 +1,12 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Button } from '@expcat/tigercat-react'
 import { DEMO_NAV_GROUPS, type DemoLang, type DemoNavGroup } from '@demo-shared/app-config'
-import {
-  getStoredCollapsedNavGroups,
-  getStoredSiderCollapsed,
-  setStoredCollapsedNavGroups,
-  setStoredSiderCollapsed
-} from '@demo-shared/prefs'
+import { getStoredCollapsedNavGroups, setStoredCollapsedNavGroups } from '@demo-shared/prefs'
 
 export interface AppSiderProps {
   lang: DemoLang
+  isSiderCollapsed: boolean
 }
 
 function cn(...parts: Array<string | false | null | undefined>) {
@@ -29,22 +25,15 @@ function isActivePath(currentPath: string, targetPath: string) {
   return currentPath === targetPath
 }
 
-export const AppSider: React.FC<AppSiderProps> = ({ lang }) => {
+export const AppSider: React.FC<AppSiderProps> = ({ lang, isSiderCollapsed }) => {
   const location = useLocation()
-  const [isSiderCollapsed, setIsSiderCollapsed] = useState<boolean>(() => getStoredSiderCollapsed())
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>(() =>
     getStoredCollapsedNavGroups()
   )
 
-  const groups = useMemo(() => DEMO_NAV_GROUPS, [])
-
   const toggleGroup = (group: DemoNavGroup) => {
     setCollapsedGroups((prev) => ({ ...prev, [group.key]: !prev[group.key] }))
   }
-
-  useEffect(() => {
-    setStoredSiderCollapsed(isSiderCollapsed)
-  }, [isSiderCollapsed])
 
   useEffect(() => {
     setStoredCollapsedNavGroups(collapsedGroups)
@@ -63,49 +52,8 @@ export const AppSider: React.FC<AppSiderProps> = ({ lang }) => {
           'transition-[padding] duration-300 ease-in-out',
           isSiderCollapsed ? 'px-2' : 'px-3'
         )}>
-        <div className={cn('mb-3 flex', isSiderCollapsed ? 'justify-center' : 'justify-end')}>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setIsSiderCollapsed((v) => !v)}
-            className={cn(
-              'size-8 p-0 border-gray-200 bg-white text-gray-700',
-              'hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900'
-            )}
-            aria-label={isSiderCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
-            <span className="text-sm leading-none">{isSiderCollapsed ? '»' : '«'}</span>
-          </Button>
-        </div>
-
-        <Link
-          to="/"
-          title={lang === 'zh-CN' ? '首页' : 'Home'}
-          className={cn(
-            'flex items-center rounded-md py-2 text-sm font-medium transition-colors overflow-hidden',
-            isSiderCollapsed ? 'justify-center px-2' : 'gap-2 px-3',
-            isActivePath(location.pathname, '/')
-              ? 'bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)]'
-              : 'text-gray-700 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-900'
-          )}>
-          <span
-            className={cn(
-              'inline-flex items-center justify-center rounded-md text-xs font-semibold',
-              isSiderCollapsed
-                ? 'size-9 bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200'
-                : 'size-7 bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200',
-              isActivePath(location.pathname, '/') &&
-                'bg-[var(--tiger-outline-bg-hover,#eff6ff)] text-[var(--tiger-primary,#2563eb)]'
-            )}>
-            {getAbbr(lang === 'zh-CN' ? '首页' : 'Home')}
-          </span>
-          {!isSiderCollapsed && (
-            <span className="truncate">{lang === 'zh-CN' ? '首页' : 'Home'}</span>
-          )}
-        </Link>
-
         <div className="mt-4 space-y-3">
-          {groups.map((group) => {
+          {DEMO_NAV_GROUPS.map((group) => {
             const collapsed = !!collapsedGroups[group.key]
             return (
               <div key={group.key}>
