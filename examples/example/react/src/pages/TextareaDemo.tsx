@@ -153,7 +153,10 @@ const TextareaDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 禁用和只读 */}
-      <DemoBlock title="禁用和只读" description="文本域可以设置为禁用或只读状态。" code={disabledSnippet}>
+      <DemoBlock
+        title="禁用和只读"
+        description="文本域可以设置为禁用或只读状态。"
+        code={disabledSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Textarea value={disabled} disabled rows={3} />
           <Textarea value={readonly} readonly rows={3} />
