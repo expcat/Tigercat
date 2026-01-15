@@ -47,7 +47,7 @@ Or manually:
 
 ```bash
 # Install pnpm if not already installed
-npm install -g pnpm@10
+npm install -g pnpm@10.26.2
 
 # Install dependencies
 pnpm install

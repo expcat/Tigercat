@@ -40,7 +40,7 @@ Or manually:
 
 ```bash
 # Install pnpm if not already installed
-npm install -g pnpm@10
+npm install -g pnpm@10.26.2
 
 # Install dependencies
 pnpm install
@@ -172,7 +172,7 @@ For detailed development documentation, see [DEVELOPMENT.md](./DEVELOPMENT.md).
 **pnpm not found?**
 
 ```bash
-npm install -g pnpm@10
+npm install -g pnpm@10.26.2
 ```
 
 **Example not loading components?**

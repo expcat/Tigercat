@@ -22,7 +22,7 @@ echo "✓ Node.js $NODE_VERSION detected"
 # Check/Install pnpm
 if ! command -v pnpm &> /dev/null; then
     echo "Installing pnpm..."
-    npm install -g pnpm@10
+    npm install -g pnpm@10.26.2
     echo "✓ pnpm installed"
 else
     PNPM_VERSION=$(pnpm --version)
