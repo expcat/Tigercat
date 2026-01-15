@@ -168,9 +168,7 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
 
     <!-- 圆形进度条 -->
     <DemoBlock title="圆形进度条"
-               description="通过设置 type=\"
-               circle\"
-               展示圆形进度条。"
+               description='通过设置 type="circle" 展示圆形进度条。'
                :code="circleSnippet">
       <Space align="center">
         <Progress type="circle"
