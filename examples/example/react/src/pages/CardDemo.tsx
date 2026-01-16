@@ -1,4 +1,24 @@
-import { Card, Space, Divider, Button } from '@expcat/tigercat-react'
+import { Card, Space, Button } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
+
+const basicSnippet = `<Card>...</Card>`
+
+const variantSnippet = `<Card variant="default">...</Card>
+<Card variant="bordered">...</Card>
+<Card variant="shadow">...</Card>
+<Card variant="elevated">...</Card>`
+
+const sizeSnippet = `<Card size="sm">...</Card>
+<Card size="md">...</Card>
+<Card size="lg">...</Card>`
+
+const hoverSnippet = `<Card hoverable variant="shadow">...</Card>`
+
+const coverSnippet = `<Card cover="..." coverAlt="...">...</Card>`
+
+const structureSnippet = `<Card header={...} footer={...} actions={...}>...</Card>`
+
+const fullSnippet = `<Card variant="shadow" hoverable cover="..." header={...} footer={...} actions={...}>...</Card>`
 
 export default function CardDemo() {
   return (
@@ -8,22 +28,18 @@ export default function CardDemo() {
         <p className="text-gray-600">用于内容展示的卡片容器组件，支持多种样式和布局选项。</p>
       </div>
 
-      {/* 基本用法 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">基本用法</h2>
-        <p className="text-gray-600 mb-6">最简单的卡片，包含基本内容。</p>
+      <DemoBlock title="基本用法" description="最简单的卡片，包含基本内容。" code={basicSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Card>
             <p>这是一个基础的卡片组件，可以展示任何内容。</p>
           </Card>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 卡片变体 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">卡片变体</h2>
-        <p className="text-gray-600 mb-6">卡片有四种样式：默认、带边框、带阴影和浮起。</p>
+      <DemoBlock
+        title="卡片变体"
+        description="卡片有四种样式：默认、带边框、带阴影和浮起。"
+        code={variantSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card variant="default">
@@ -44,13 +60,9 @@ export default function CardDemo() {
             </Card>
           </div>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 卡片尺寸 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">卡片尺寸</h2>
-        <p className="text-gray-600 mb-6">卡片有三种尺寸，主要影响内边距。</p>
+      <DemoBlock title="卡片尺寸" description="卡片有三种尺寸，主要影响内边距。" code={sizeSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" size={16} className="w-full">
             <Card size="sm">
@@ -67,13 +79,9 @@ export default function CardDemo() {
             </Card>
           </Space>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 可悬停卡片 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">可悬停卡片</h2>
-        <p className="text-gray-600 mb-6">鼠标悬停时显示交互效果。</p>
+      <DemoBlock title="可悬停卡片" description="鼠标悬停时显示交互效果。" code={hoverSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card hoverable variant="shadow">
@@ -90,13 +98,9 @@ export default function CardDemo() {
             </Card>
           </div>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 带封面图片 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">带封面图片</h2>
-        <p className="text-gray-600 mb-6">卡片可以包含封面图片。</p>
+      <DemoBlock title="带封面图片" description="卡片可以包含封面图片。" code={coverSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card
@@ -119,13 +123,12 @@ export default function CardDemo() {
             </Card>
           </div>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 卡片结构 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">卡片结构</h2>
-        <p className="text-gray-600 mb-6">卡片支持头部、主体、底部和操作区域。</p>
+      <DemoBlock
+        title="卡片结构"
+        description="卡片支持头部、主体、底部和操作区域。"
+        code={structureSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card
@@ -150,13 +153,9 @@ export default function CardDemo() {
             </Card>
           </div>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 完整示例 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">完整示例</h2>
-        <p className="text-gray-600 mb-6">结合所有功能的完整卡片示例。</p>
+      <DemoBlock title="完整示例" description="结合所有功能的完整卡片示例。" code={fullSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card
@@ -241,7 +240,7 @@ export default function CardDemo() {
             </Card>
           </div>
         </div>
-      </section>
+      </DemoBlock>
     </div>
   )
 }
