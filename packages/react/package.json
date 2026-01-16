@@ -18,13 +18,16 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
+    "./style": "./dist/styles/index.css",
     "./*": {
       "types": "./dist/components/*.d.ts",
       "import": "./dist/components/*.mjs",
