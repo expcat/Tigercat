@@ -3,10 +3,13 @@
 import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, rmSync } from 'node:fs'
 import { readdir, stat } from 'node:fs/promises'
+import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
 
 import { isWindows, isPnpmAvailable, runPnpm, PNPM_CMD, PNPM_SHELL } from './utils/pnpm.mjs'
+
+const require = createRequire(import.meta.url)
 
 const argv = process.argv.slice(2)
 const checkOnly = argv.includes('--check') || argv.includes('-c')
@@ -88,6 +91,25 @@ function createTailBuffer(maxLines = 120) {
   return { pushText, getText }
 }
 
+function canResolvePackage(packageName) {
+  try {
+    require.resolve(`${packageName}/package.json`, { paths: [process.cwd()] })
+    return true
+  } catch {
+    return false
+  }
+}
+
+function ensureWorkspaceDependenciesInstalled(packageNames) {
+  const missing = packageNames.filter((name) => !canResolvePackage(name))
+  if (missing.length === 0) return 0
+
+  console.log('')
+  console.log('Workspace dependencies are missing. Installing workspace dependencies...')
+  console.log('')
+  return runPnpm(['install'])
+}
+
 function ensureExamplesDependenciesInstalled(exampleDirs) {
   const missing = exampleDirs.filter((dir) => !existsSync(path.join(dir, 'node_modules')))
   if (missing.length === 0) return 0
@@ -107,6 +129,18 @@ async function main() {
     console.error('Error: pnpm is not installed or not in PATH')
     console.error('Install it with: npm install -g pnpm')
     process.exit(1)
+  }
+
+  const workspacePackages = [
+    '@expcat/tigercat-core',
+    '@expcat/tigercat-react',
+    '@expcat/tigercat-vue'
+  ]
+
+  const workspaceInstallStatus = ensureWorkspaceDependenciesInstalled(workspacePackages)
+  if (workspaceInstallStatus !== 0) {
+    console.error('Error: Failed to install workspace dependencies required by examples.')
+    process.exit(workspaceInstallStatus)
   }
 
   const packagesToCheck = [
