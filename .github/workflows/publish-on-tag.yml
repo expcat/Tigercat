@@ -37,6 +37,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Resolve release version
+        id: release_version
+        run: |
+          TAG=$(git describe --tags --abbrev=0)
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Sync package versions
+        run: pnpm -r --filter "./packages/**" version ${{ steps.release_version.outputs.version }} --no-git-tag-version
+
       - name: Build packages
         run: pnpm build
 
@@ -46,6 +56,6 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish package
-        run: pnpm release
+        run: pnpm -r --filter "./packages/**" publish --access public --no-git-checks --tag ${{ steps.release_version.outputs.tag }}
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
