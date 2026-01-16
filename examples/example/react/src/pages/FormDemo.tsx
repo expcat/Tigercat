@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import {
   Form,
   FormItem,
@@ -82,6 +82,23 @@ const previewSnippet = `<pre className="text-sm text-gray-700 bg-white p-4 round
   {JSON.stringify({ basicForm, validateForm }, null, 2)}
 </pre>`
 
+const validateRules = {
+  username: [
+    { required: true, message: '请输入用户名' },
+    { min: 3, max: 20, message: '用户名长度应在 3 到 20 个字符之间' }
+  ],
+  email: [
+    { required: true, message: '请输入邮箱' },
+    { type: 'email' as const, message: '请输入有效的邮箱地址' }
+  ],
+  age: [
+    { required: true, message: '请输入年龄' },
+    { type: 'number' as const, message: '年龄必须是数字' },
+    { min: 1, max: 150, message: '年龄必须在 1 到 150 之间' }
+  ],
+  website: [{ type: 'url' as const, message: '请输入有效的 URL' }]
+}
+
 const FormDemo: React.FC = () => {
   const [basicForm, setBasicForm] = useState({
     username: '',
@@ -127,26 +144,6 @@ const FormDemo: React.FC = () => {
     website: ''
   })
   const [lastValidateResult, setLastValidateResult] = useState<string>('')
-
-  const validateRules = useMemo(
-    () => ({
-      username: [
-        { required: true, message: '请输入用户名' },
-        { min: 3, max: 20, message: '用户名长度应在 3 到 20 个字符之间' }
-      ],
-      email: [
-        { required: true, message: '请输入邮箱' },
-        { type: 'email' as const, message: '请输入有效的邮箱地址' }
-      ],
-      age: [
-        { required: true, message: '请输入年龄' },
-        { type: 'number' as const, message: '年龄必须是数字' },
-        { min: 1, max: 150, message: '年龄必须在 1 到 150 之间' }
-      ],
-      website: [{ type: 'url' as const, message: '请输入有效的 URL' }]
-    }),
-    []
-  )
 
   const handleValidateSubmit = ({ valid, values, errors }: FormSubmitEvent) => {
     setLastValidateResult(JSON.stringify({ valid, values, errors }, null, 2))

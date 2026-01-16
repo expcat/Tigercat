@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Select } from '@expcat/tigercat-react'
 import { themes, applyTheme } from '@demo-shared/themes'
 import { getStoredTheme, setStoredTheme } from '@demo-shared/prefs'
@@ -30,12 +30,10 @@ const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ lang = 'zh-CN' }) => {
     applyTheme(themeValue)
   }
 
-  const themeOptions = useMemo(() => {
-    return themes.map((t) => ({
-      label: themeNameByValue[t.value]?.[lang] ?? t.name,
-      value: t.value
-    }))
-  }, [lang])
+  const themeOptions = themes.map((t) => ({
+    label: themeNameByValue[t.value]?.[lang] ?? t.name,
+    value: t.value
+  }))
 
   return (
     <div className="flex items-center gap-2 shrink-0">

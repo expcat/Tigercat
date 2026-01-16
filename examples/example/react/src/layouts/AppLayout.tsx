@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import type { DemoLang } from '@demo-shared/app-config'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
@@ -38,7 +38,7 @@ export const AppLayout: React.FC = () => {
   const [lang, setLang] = useState<DemoLang>(() => getStoredLang())
   const [isSiderCollapsed, setIsSiderCollapsed] = useState<boolean>(() => getStoredSiderCollapsed())
 
-  const isHome = useMemo(() => location.pathname === '/', [location.pathname])
+  const isHome = location.pathname === '/'
 
   useEffect(() => {
     setStoredLang(lang)
@@ -91,13 +91,11 @@ export const AppLayout: React.FC = () => {
     setSections(nextSections)
   }, [location.pathname])
 
-  const headerTitle = useMemo(() => {
-    if (pageTitle) return pageTitle
-    const lastSegment = location.pathname.split('/').filter(Boolean).pop()
-    return lastSegment ? lastSegment : ''
-  }, [location.pathname, pageTitle])
+  const headerTitle = pageTitle
+    ? pageTitle
+    : location.pathname.split('/').filter(Boolean).pop() || ''
 
-  const tigerLocale = useMemo(() => getDemoTigerLocale(lang), [lang])
+  const tigerLocale = getDemoTigerLocale(lang)
 
   return (
     <LangContext.Provider value={{ lang }}>

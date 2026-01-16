@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { Tabs, TabPane, Code } from '@expcat/tigercat-react'
 
 interface DemoBlockProps {
@@ -18,43 +18,40 @@ const exampleBoxClasses =
 const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, children }) => {
   const [activeKey, setActiveKey] = useState('preview')
 
-  const tabs = useMemo(
-    () => [
-      {
-        key: 'preview',
-        label: '示例',
-        content: <div className={previewPanelClasses}>{children}</div>
-      },
-      {
-        key: 'code',
-        label: '代码',
-        content: (
-          <div className={codePanelClasses}>
-            <Code code={code} />
-          </div>
-        )
-      },
-      {
-        key: 'mixed',
-        label: '混合',
-        content: (
-          <div className={previewPanelClasses}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="w-full">
-                <div className="text-xs text-gray-500 mb-2">示例</div>
-                <div className={exampleBoxClasses}>{children}</div>
-              </div>
-              <div className="w-full">
-                <div className="text-xs text-gray-500 mb-2">代码</div>
-                <Code code={code} />
-              </div>
+  const tabs = [
+    {
+      key: 'preview',
+      label: '示例',
+      content: <div className={previewPanelClasses}>{children}</div>
+    },
+    {
+      key: 'code',
+      label: '代码',
+      content: (
+        <div className={codePanelClasses}>
+          <Code code={code} />
+        </div>
+      )
+    },
+    {
+      key: 'mixed',
+      label: '混合',
+      content: (
+        <div className={previewPanelClasses}>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="w-full">
+              <div className="text-xs text-gray-500 mb-2">示例</div>
+              <div className={exampleBoxClasses}>{children}</div>
+            </div>
+            <div className="w-full">
+              <div className="text-xs text-gray-500 mb-2">代码</div>
+              <Code code={code} />
             </div>
           </div>
-        )
-      }
-    ],
-    [children, code]
-  )
+        </div>
+      )
+    }
+  ]
 
   return (
     <section className="mb-12">
