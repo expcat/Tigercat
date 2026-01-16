@@ -1,5 +1,37 @@
 <script setup lang="ts">
 import { Container, Layout, Header, Sidebar, Content, Footer } from '@expcat/tigercat-vue'
+import DemoBlock from '../components/DemoBlock.vue'
+
+const containerSnippet = `<Container maxWidth="lg">
+  <div>这里是 Container 内容区域</div>
+</Container>`
+
+const basicSnippet = `<Layout>
+  <Header>Header</Header>
+  <Content>Content</Content>
+  <Footer>Footer</Footer>
+</Layout>`
+
+const sidebarSnippet = `<Layout>
+  <Header>Header</Header>
+  <div class="flex flex-1">
+    <Sidebar width="192px">Sidebar</Sidebar>
+    <Content>Content</Content>
+  </div>
+  <Footer>Footer</Footer>
+</Layout>`
+
+const complexSnippet = `<Layout>
+  <Header>Header</Header>
+  <div class="flex flex-1">
+    <Sidebar width="192px">Sidebar</Sidebar>
+    <Layout>
+      <Content>Content</Content>
+      <Footer>Inner Footer</Footer>
+    </Layout>
+  </div>
+  <Footer>Footer</Footer>
+</Layout>`
 </script>
 
 <template>
@@ -9,10 +41,10 @@ import { Container, Layout, Header, Sidebar, Content, Footer } from '@expcat/tig
       <p class="text-gray-600">协助进行页面级整体布局。</p>
     </div>
 
-    <!-- Container 容器 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">Container 容器</h2>
-      <p class="text-gray-600 mb-6">用于约束内容宽度并提供响应式内边距。</p>
+    <DemoBlock
+      title="Container 容器"
+      description="用于约束内容宽度并提供响应式内边距。"
+      :code="containerSnippet">
       <div class="bg-gray-50 rounded-lg py-6">
         <Container maxWidth="lg">
           <div class="bg-white border border-gray-200 rounded-lg p-4">
@@ -23,12 +55,9 @@ import { Container, Layout, Header, Sidebar, Content, Footer } from '@expcat/tig
           </div>
         </Container>
       </div>
-    </section>
+    </DemoBlock>
 
-    <!-- 基础布局 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">基础布局</h2>
-      <p class="text-gray-600 mb-6">典型的页面布局。</p>
+    <DemoBlock title="基础布局" description="典型的页面布局。" :code="basicSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[260px]">
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
@@ -36,12 +65,9 @@ import { Container, Layout, Header, Sidebar, Content, Footer } from '@expcat/tig
           <Footer class-name="!bg-gray-800 !text-white !p-4">Footer</Footer>
         </Layout>
       </div>
-    </section>
+    </DemoBlock>
 
-    <!-- 侧边栏布局 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">侧边栏布局</h2>
-      <p class="text-gray-600 mb-6">带有侧边栏的布局。</p>
+    <DemoBlock title="侧边栏布局" description="带有侧边栏的布局。" :code="sidebarSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[260px]">
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
@@ -52,12 +78,9 @@ import { Container, Layout, Header, Sidebar, Content, Footer } from '@expcat/tig
           <Footer class-name="!bg-gray-800 !text-white !p-4">Footer</Footer>
         </Layout>
       </div>
-    </section>
+    </DemoBlock>
 
-    <!-- 复杂布局 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">复杂布局</h2>
-      <p class="text-gray-600 mb-6">更复杂的页面布局。</p>
+    <DemoBlock title="复杂布局" description="更复杂的页面布局。" :code="complexSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[400px]">
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
@@ -71,6 +94,6 @@ import { Container, Layout, Header, Sidebar, Content, Footer } from '@expcat/tig
           <Footer class-name="!bg-gray-800 !text-white !p-4">Footer</Footer>
         </Layout>
       </div>
-    </section>
+    </DemoBlock>
   </div>
 </template>

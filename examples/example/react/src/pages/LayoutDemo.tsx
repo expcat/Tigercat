@@ -1,5 +1,37 @@
 import React from 'react'
 import { Container, Layout, Header, Sidebar, Content, Footer } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
+
+const containerSnippet = `<Container maxWidth="lg">
+  <div>这里是 Container 内容区域</div>
+</Container>`
+
+const basicSnippet = `<Layout>
+  <Header>Header</Header>
+  <Content>Content</Content>
+  <Footer>Footer</Footer>
+</Layout>`
+
+const sidebarSnippet = `<Layout>
+  <Header>Header</Header>
+  <div className="flex flex-1">
+    <Sidebar width="192px">Sidebar</Sidebar>
+    <Content>Content</Content>
+  </div>
+  <Footer>Footer</Footer>
+</Layout>`
+
+const complexSnippet = `<Layout>
+  <Header>Header</Header>
+  <div className="flex flex-1">
+    <Sidebar width="192px">Sidebar</Sidebar>
+    <Layout>
+      <Content>Content</Content>
+      <Footer>Inner Footer</Footer>
+    </Layout>
+  </div>
+  <Footer>Footer</Footer>
+</Layout>`
 
 const LayoutDemo: React.FC = () => {
   return (
@@ -9,10 +41,10 @@ const LayoutDemo: React.FC = () => {
         <p className="text-gray-600">协助进行页面级整体布局。</p>
       </div>
 
-      {/* Container 容器 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">Container 容器</h2>
-        <p className="text-gray-600 mb-6">用于约束内容宽度并提供响应式内边距。</p>
+      <DemoBlock
+        title="Container 容器"
+        description="用于约束内容宽度并提供响应式内边距。"
+        code={containerSnippet}>
         <div className="bg-gray-50 rounded-lg py-6">
           <Container maxWidth="lg">
             <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -23,12 +55,9 @@ const LayoutDemo: React.FC = () => {
             </div>
           </Container>
         </div>
-      </section>
+      </DemoBlock>
 
-      {/* 基础布局 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">基础布局</h2>
-        <p className="text-gray-600 mb-6">典型的页面布局。</p>
+      <DemoBlock title="基础布局" description="典型的页面布局。" code={basicSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Layout className="border border-gray-300 overflow-hidden min-h-[260px]">
             <Header className="!bg-blue-600 !text-white !p-4">Header</Header>
@@ -36,12 +65,9 @@ const LayoutDemo: React.FC = () => {
             <Footer className="!bg-gray-800 !text-white !p-4">Footer</Footer>
           </Layout>
         </div>
-      </section>
+      </DemoBlock>
 
-      {/* 侧边栏布局 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">侧边栏布局</h2>
-        <p className="text-gray-600 mb-6">带有侧边栏的布局。</p>
+      <DemoBlock title="侧边栏布局" description="带有侧边栏的布局。" code={sidebarSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Layout className="border border-gray-300 overflow-hidden min-h-[260px]">
             <Header className="!bg-blue-600 !text-white !p-4">Header</Header>
@@ -54,12 +80,9 @@ const LayoutDemo: React.FC = () => {
             <Footer className="!bg-gray-800 !text-white !p-4">Footer</Footer>
           </Layout>
         </div>
-      </section>
+      </DemoBlock>
 
-      {/* 复杂布局 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">复杂布局</h2>
-        <p className="text-gray-600 mb-6">更复杂的页面布局。</p>
+      <DemoBlock title="复杂布局" description="更复杂的页面布局。" code={complexSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Layout className="border border-gray-300 overflow-hidden min-h-[400px]">
             <Header className="!bg-blue-600 !text-white !p-4">Header</Header>
@@ -75,7 +98,7 @@ const LayoutDemo: React.FC = () => {
             <Footer className="!bg-gray-800 !text-white !p-4">Footer</Footer>
           </Layout>
         </div>
-      </section>
+      </DemoBlock>
     </div>
   )
 }

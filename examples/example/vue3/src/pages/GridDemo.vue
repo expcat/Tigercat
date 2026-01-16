@@ -1,5 +1,70 @@
 <script setup lang="ts">
 import { Row, Col, Container, Space } from '@expcat/tigercat-vue'
+import DemoBlock from '../components/DemoBlock.vue'
+
+const basicSnippet = `<Row>
+  <Col :span="24">col-24</Col>
+  <Col :span="12">col-12</Col>
+  <Col :span="12">col-12</Col>
+  <Col :span="8">col-8</Col>
+  <Col :span="8">col-8</Col>
+  <Col :span="8">col-8</Col>
+  <Col :span="6">col-6</Col>
+  <Col :span="6">col-6</Col>
+  <Col :span="6">col-6</Col>
+  <Col :span="6">col-6</Col>
+</Row>`
+
+const gutterSnippet = `<Row :gutter="16">...</Row>
+<Row :gutter="[16, 16]">...</Row>`
+
+const responsiveSnippet = `<Row :gutter="[16, 16]">
+  <Col :span="{ xs: 24, md: 12, lg: 8 }">...</Col>
+  <Col :span="{ xs: 24, md: 6, lg: 6 }">...</Col>
+  <Col :span="{ xs: 24, md: 4, lg: 6 }">...</Col>
+  <Col :span="{ xs: 24, md: 2, lg: 4 }">...</Col>
+</Row>
+<Row :gutter="16">
+  <Col :span="8">...</Col>
+  <Col :span="8" :offset="{ xs: 0, md: 8 }">...</Col>
+</Row>`
+
+const alignSnippet = `<Row justify="space-between">...</Row>
+<Row align="middle">...</Row>`
+
+const offsetSnippet = `<Row :gutter="16">
+  <Col :span="8">...</Col>
+  <Col :span="8" :offset="8">...</Col>
+</Row>
+<Row :gutter="16">
+  <Col :span="6" :offset="6">...</Col>
+  <Col :span="6" :offset="6">...</Col>
+</Row>`
+
+const orderSnippet = `<Row :gutter="16">
+  <Col :span="8" :order="3">...</Col>
+  <Col :span="8" :order="1">...</Col>
+  <Col :span="8" :order="2">...</Col>
+</Row>`
+
+const nowrapSnippet = `<Row :gutter="16" :wrap="false" class="min-w-[720px]">...</Row>`
+
+const flexSnippet = `<Row :gutter="16">
+  <Col :span="0" :flex="1">...</Col>
+  <Col :span="0" :flex="2">...</Col>
+  <Col :span="0" flex="0_0_160px">...</Col>
+</Row>`
+
+const mixedSnippet = `<Row :gutter="16">
+  <Col :span="16">...</Col>
+  <Col :span="8">...</Col>
+</Row>
+<Row :gutter="16">
+  <Col :span="8">...</Col>
+  <Col :span="8">...</Col>
+  <Col :span="4">...</Col>
+  <Col :span="4">...</Col>
+</Row>`
 </script>
 
 <template>
@@ -9,10 +74,7 @@ import { Row, Col, Container, Space } from '@expcat/tigercat-vue'
       <p class="text-gray-600">通过基础的 24 分栏，迅速简便地创建布局。</p>
     </div>
 
-    <!-- 基础栅格 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">基础栅格</h2>
-      <p class="text-gray-600 mb-6">使用单一分栏创建基础的栅格布局。</p>
+    <DemoBlock title="基础栅格" description="使用单一分栏创建基础的栅格布局。" :code="basicSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Container>
           <Space direction="vertical" class="w-full">
@@ -57,12 +119,12 @@ import { Row, Col, Container, Space } from '@expcat/tigercat-vue'
           </Space>
         </Container>
       </div>
-    </section>
+    </DemoBlock>
 
-    <!-- 分栏间隔 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">分栏间隔</h2>
-      <p class="text-gray-600 mb-6">支持水平间距或 [水平, 垂直] 的间距数组。</p>
+    <DemoBlock
+      title="分栏间隔"
+      description="支持水平间距或 [水平, 垂直] 的间距数组。"
+      :code="gutterSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Container>
           <Space direction="vertical" class="w-full">
@@ -109,12 +171,12 @@ import { Row, Col, Container, Space } from '@expcat/tigercat-vue'
           </Space>
         </Container>
       </div>
-    </section>
+    </DemoBlock>
 
-    <!-- 响应式栅格 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">响应式栅格</h2>
-      <p class="text-gray-600 mb-6">span / offset 支持按断点设置（xs, sm, md, lg, xl, 2xl）。</p>
+    <DemoBlock
+      title="响应式栅格"
+      description="span / offset 支持按断点设置（xs, sm, md, lg, xl, 2xl）。"
+      :code="responsiveSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Container>
           <Space direction="vertical" class="w-full">
@@ -144,12 +206,12 @@ import { Row, Col, Container, Space } from '@expcat/tigercat-vue'
           </Space>
         </Container>
       </div>
-    </section>
+    </DemoBlock>
 
-    <!-- Row 对齐与分布 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">Row 对齐与分布</h2>
-      <p class="text-gray-600 mb-6">justify 控制水平分布，align 控制垂直对齐。</p>
+    <DemoBlock
+      title="Row 对齐与分布"
+      description="justify 控制水平分布，align 控制垂直对齐。"
+      :code="alignSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Container>
           <Space direction="vertical" class="w-full">
@@ -194,12 +256,9 @@ import { Row, Col, Container, Space } from '@expcat/tigercat-vue'
           </Space>
         </Container>
       </div>
-    </section>
+    </DemoBlock>
 
-    <!-- 列偏移 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">列偏移</h2>
-      <p class="text-gray-600 mb-6">使用 offset 在 24 栅格内做留白与对齐。</p>
+    <DemoBlock title="列偏移" description="使用 offset 在 24 栅格内做留白与对齐。" :code="offsetSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Container>
           <Space direction="vertical" class="w-full">
@@ -222,12 +281,12 @@ import { Row, Col, Container, Space } from '@expcat/tigercat-vue'
           </Space>
         </Container>
       </div>
-    </section>
+    </DemoBlock>
 
-    <!-- 排序 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">列排序</h2>
-      <p class="text-gray-600 mb-6">使用 order 改变列的显示顺序（不改变 DOM 顺序）。</p>
+    <DemoBlock
+      title="列排序"
+      description="使用 order 改变列的显示顺序（不改变 DOM 顺序）。"
+      :code="orderSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Container>
           <Row :gutter="16">
@@ -249,12 +308,12 @@ import { Row, Col, Container, Space } from '@expcat/tigercat-vue'
           </Row>
         </Container>
       </div>
-    </section>
+    </DemoBlock>
 
-    <!-- 不换行 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">不换行（wrap=false）</h2>
-      <p class="text-gray-600 mb-6">当总宽度超过 24 栅格时，不换行会导致横向溢出。</p>
+    <DemoBlock
+      title="不换行（wrap=false）"
+      description="当总宽度超过 24 栅格时，不换行会导致横向溢出。"
+      :code="nowrapSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Container>
           <div class="overflow-x-auto overflow-y-hidden px-2">
@@ -278,12 +337,12 @@ import { Row, Col, Container, Space } from '@expcat/tigercat-vue'
           </div>
         </Container>
       </div>
-    </section>
+    </DemoBlock>
 
-    <!-- Flex -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">Flex 自适应</h2>
-      <p class="text-gray-600 mb-6">使用 flex 进行比例分配（建议与 span=0 搭配）。</p>
+    <DemoBlock
+      title="Flex 自适应"
+      description="使用 flex 进行比例分配（建议与 span=0 搭配）。"
+      :code="flexSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Container>
           <Row :gutter="16">
@@ -299,12 +358,12 @@ import { Row, Col, Container, Space } from '@expcat/tigercat-vue'
           </Row>
         </Container>
       </div>
-    </section>
+    </DemoBlock>
 
-    <!-- 混合布局 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">混合布局</h2>
-      <p class="text-gray-600 mb-6">通过基础的 1/24 分栏任意扩展组合形成较为复杂的混合布局。</p>
+    <DemoBlock
+      title="混合布局"
+      description="通过基础的 1/24 分栏任意扩展组合形成较为复杂的混合布局。"
+      :code="mixedSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Container>
           <Space direction="vertical" class="w-full">
@@ -333,6 +392,6 @@ import { Row, Col, Container, Space } from '@expcat/tigercat-vue'
           </Space>
         </Container>
       </div>
-    </section>
+    </DemoBlock>
   </div>
 </template>
