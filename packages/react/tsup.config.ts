@@ -14,11 +14,5 @@ export default defineConfig({
   clean: true,
   treeshake: true,
   splitting: true,
-  external: [
-    'react',
-    'react-dom',
-    'react-dom/client',
-    'react/jsx-runtime',
-    'react/jsx-dev-runtime'
-  ]
+  external: ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime', 'react/jsx-dev-runtime']
 })
