@@ -9,7 +9,7 @@ const componentEntries = readdirSync(componentsDir, { withFileTypes: true })
 
 export default defineConfig({
   entry: ['src/index.tsx', ...componentEntries],
-  format: ['esm'],
+  format: ['cjs', 'esm'],
   dts: true,
   clean: true,
   treeshake: true,
@@ -19,7 +19,6 @@ export default defineConfig({
     'react-dom',
     'react-dom/client',
     'react/jsx-runtime',
-    'react/jsx-dev-runtime',
-    'tailwindcss'
+    'react/jsx-dev-runtime'
   ]
 })
