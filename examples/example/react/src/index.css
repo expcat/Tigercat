@@ -1,17 +1,9 @@
 @import "tailwindcss";
-@source "../../../packages/react/src";
-@source "../../../packages/core/src";
+@plugin "../../../../packages/core/src/tailwind-plugin.ts";
+@source "../../../../packages/react/src";
+@source "../../../../packages/core/src";
 
 :root {
-  --tiger-primary: #2563eb;
-  --tiger-primary-hover: #1d4ed8;
-  --tiger-primary-disabled: #93c5fd;
-  --tiger-secondary: #4b5563;
-  --tiger-secondary-hover: #374151;
-  --tiger-secondary-disabled: #9ca3af;
-  --tiger-outline-bg-hover: #eff6ff;
-  --tiger-ghost-bg-hover: #eff6ff;
-
   /* Neutral tokens (used by components via CSS variables) */
   --tiger-surface: #ffffff;
   --tiger-surface-muted: #f9fafb;

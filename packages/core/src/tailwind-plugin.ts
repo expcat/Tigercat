@@ -26,3 +26,5 @@ export const tigercatPlugin = plugin(function ({ addBase }) {
     ':root': tigercatTheme
   })
 })
+
+export default tigercatPlugin
