@@ -15,23 +15,23 @@
     "react",
     "components"
   ],
-  "main": "./dist/index.js",
+  "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.mts",
   "sideEffects": [
     "**/*.css"
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "default": "./dist/index.mjs"
     },
     "./style": "./dist/styles/index.css",
     "./*": {
-      "types": "./dist/components/*.d.ts",
+      "types": "./dist/components/*.d.mts",
       "import": "./dist/components/*.mjs",
-      "require": "./dist/components/*.js"
+      "default": "./dist/components/*.mjs"
     }
   },
   "files": [
