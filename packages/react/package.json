@@ -1,6 +1,6 @@
 {
   "name": "@expcat/tigercat-react",
-  "version": "0.0.1",
+  "version": "0.0.42",
   "description": "React components for Tigercat UI library",
   "license": "MIT",
   "author": "Yizhe Wang",
