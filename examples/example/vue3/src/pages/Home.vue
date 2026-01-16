@@ -1,8 +1,21 @@
 <script setup lang="ts">
 import { Code } from '@expcat/tigercat-vue'
 
-const installSnippet = 'pnpm add @expcat/tigercat-vue'
+const installSnippet = 'pnpm add @expcat/tigercat-vue @expcat/tigercat-core'
 const scriptClose = '</scr' + 'ipt>'
+
+const configSnippet = `// tailwind.config.js
+import { tigercatPlugin } from '@expcat/tigercat-core'
+
+export default {
+  content: [
+    // ...
+    './node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}'
+  ],
+  plugins: [
+    tigercatPlugin
+  ]
+}`
 
 const usageSnippet = [
   '<script setup lang="ts">',
@@ -39,7 +52,17 @@ const themeSnippet = `:root {
       </section>
 
       <section>
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">2. 组件使用</h2>
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">2. 配置 Tailwind</h2>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          在 <code>tailwind.config.js</code> 中添加插件与扫描路径：
+        </p>
+        <Code class="mt-3"
+              :code="configSnippet" />
+      </section>4
+
+      <section>
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">3. 组件使用</h2>
+
         <Code class="mt-3"
               :code="usageSnippet" />
       </section>

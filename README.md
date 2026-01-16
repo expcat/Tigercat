@@ -28,10 +28,12 @@ GitHub Pages： https://expcat.github.io/Tigercat/
 
 ### NPM 使用（按需样式 / 需要最少配置）
 
-Tigercat 使用 Tailwind utility class。若你希望按需生成样式，请在业务项目的 Tailwind 配置中加入对 Tigercat 产物的扫描路径：
+Tigercat 使用 Tailwind utility class。若你希望按需生成样式，请在业务项目的 Tailwind 配置中加入对 Tigercat 产物的扫描路径，并引入 Core 包提供的插件以注入主题变量：
 
 ```js
 // tailwind.config.js
+import { tigercatPlugin } from '@expcat/tigercat-core'
+
 export default {
   content: [
     './index.html',
@@ -42,11 +44,14 @@ export default {
   theme: {
     extend: {}
   },
-  plugins: []
+  plugins: [
+    // 注入 Tigercat 默认 CSS 变量
+    tigercatPlugin
+  ]
 }
 ```
 
-这条配置是按需样式的关键，否则最终 CSS 中不会生成 Tigercat 的类名。
+这条配置是按需样式的关键，否则最终 CSS 中不会生成 Tigercat 的类名与主题变量。
 
 ### 环境要求
 

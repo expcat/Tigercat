@@ -2,7 +2,23 @@
 
 Tigercat 使用 CSS 变量控制主题颜色。
 
-## CSS 变量（默认）
+## 自动注入（推荐）
+
+使用 `@expcat/tigercat-core` 提供的 Tailwind 插件，自动在项目中注入默认主题变量：
+
+```js
+// tailwind.config.js
+import { tigercatPlugin } from '@expcat/tigercat-core'
+
+export default {
+  // ...
+  plugins: [tigercatPlugin]
+}
+```
+
+## CSS 变量（手动控制）
+
+如果不使用插件，你也可以手动定义 CSS 变量：
 
 ```css
 :root {

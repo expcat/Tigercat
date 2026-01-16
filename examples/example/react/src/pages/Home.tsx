@@ -14,11 +14,36 @@ const Home: React.FC = () => {
       <div className="mt-6 space-y-6">
         <section>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">1. 安装</h2>
-          <Code className="mt-3" code="pnpm add @expcat/tigercat-react" />
+          <Code className="mt-3" code="pnpm add @expcat/tigercat-react @expcat/tigercat-core" />
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">2. 组件使用</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            2. 配置 Tailwind
+          </h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            在 <code>tailwind.config.js</code> 中添加插件与扫描路径：
+          </p>
+          <Code
+            className="mt-3"
+            code={`// tailwind.config.js
+import { tigercatPlugin } from '@expcat/tigercat-core'
+
+export default {
+  content: [
+    // ...
+    './node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}'
+  ],
+  plugins: [
+    tigercatPlugin
+  ]
+}`}
+          />
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">3. 组件使用</h2>
+
           <Code
             className="mt-3"
             code={`import { Button, ConfigProvider } from '@expcat/tigercat-react'
@@ -36,8 +61,9 @@ function App() {
 
         <section>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            3. 主题色（可选）
+            4. 主题色（可选）
           </h2>
+
           <Code
             className="mt-3"
             code={`:root {
