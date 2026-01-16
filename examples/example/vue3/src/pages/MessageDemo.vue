@@ -378,10 +378,9 @@ const sceneSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     </DemoBlock>
 
     <!-- 实际应用场景 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">实际应用场景</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">常见的使用场景示例。</p>
-
+    <DemoBlock title="实际应用场景"
+               description="常见的使用场景示例。"
+               :code="sceneSnippet">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
           <h3 class="text-lg font-semibold mb-3">文件上传</h3>
@@ -450,6 +449,23 @@ const sceneSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           </Button>
         </div>
       </div>
-    </section>
+    </DemoBlock>
+
+    <div
+         class="mt-12 p-6 rounded-xl border bg-[color:color-mix(in_srgb,var(--tiger-primary,#2563eb)_12%,transparent)] border-[color:color-mix(in_srgb,var(--tiger-primary,#2563eb)_30%,transparent)] text-[var(--tiger-primary,#2563eb)]">
+      <h3 class="text-lg font-semibold mb-2">提示</h3>
+      <List class="text-[var(--tiger-primary,#2563eb)]"
+            bordered="none"
+            :split="false"
+            size="sm"
+            :dataSource="tips">
+        <template #renderItem="{ item }">
+          <div class="flex items-start gap-2">
+            <span aria-hidden="true">•</span>
+            <span>{{ item.title }}</span>
+          </div>
+        </template>
+      </List>
+    </div>
   </div>
 </template>
