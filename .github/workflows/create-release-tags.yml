@@ -85,7 +85,7 @@ jobs:
                     exit 1
                   fi
 
-                  pnpm -r --filter "./packages/**" version "${VERSION}" --no-git-tag-version
+                  pnpm -r --filter "./packages/**" exec pnpm version "${VERSION}" --no-git-tag-version
 
                   if [[ -n "$(git status --porcelain)" ]]; then
                     git add packages/*/package.json
