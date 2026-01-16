@@ -1,5 +1,24 @@
 import { useRef, useState } from 'react'
 import { Tabs, TabPane } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
+
+const basicSnippet = `<Tabs activeKey={activeKey1} onChange={...}>
+  <TabPane tabKey="1" label="标签页 1">...</TabPane>
+</Tabs>`
+
+const cardSnippet = `<Tabs type="card">...</Tabs>`
+
+const editableSnippet = `<Tabs type="editable-card" closable onEdit={handleEdit}>...</Tabs>`
+
+const positionSnippet = `<Tabs tabPosition={position}>...</Tabs>`
+
+const centeredSnippet = `<Tabs centered>...</Tabs>`
+
+const sizeSnippet = `<Tabs size="small">...</Tabs>
+<Tabs size="medium">...</Tabs>
+<Tabs size="large">...</Tabs>`
+
+const disabledSnippet = `<TabPane tabKey="2" label="禁用标签" disabled>...</TabPane>`
 
 export default function TabsDemo() {
   const [activeKey1, setActiveKey1] = useState('1')
@@ -57,10 +76,7 @@ export default function TabsDemo() {
         <p className="text-gray-600">用于内容的分类与切换。</p>
       </div>
 
-      {/* 基本用法 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">基本用法</h2>
-        <p className="text-gray-600 mb-6">基础的、简洁的标签页。</p>
+      <DemoBlock title="基本用法" description="基础的、简洁的标签页。" code={basicSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Tabs activeKey={activeKey1} onChange={(key) => setActiveKey1(String(key))}>
             <TabPane tabKey="1" label="标签页 1">
@@ -74,13 +90,12 @@ export default function TabsDemo() {
             </TabPane>
           </Tabs>
         </div>
-        <hr className="my-6 border-gray-200" />
-      </section>
+      </DemoBlock>
 
-      {/* 卡片式标签页 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">卡片式标签页</h2>
-        <p className="text-gray-600 mb-6">卡片式的标签页，适合在容器内使用。</p>
+      <DemoBlock
+        title="卡片式标签页"
+        description="卡片式的标签页，适合在容器内使用。"
+        code={cardSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Tabs activeKey={activeKey2} onChange={(key) => setActiveKey2(String(key))} type="card">
             <TabPane tabKey="1" label="选项卡 1">
@@ -94,13 +109,9 @@ export default function TabsDemo() {
             </TabPane>
           </Tabs>
         </div>
-        <hr className="my-6 border-gray-200" />
-      </section>
+      </DemoBlock>
 
-      {/* 可编辑卡片 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">可编辑卡片</h2>
-        <p className="text-gray-600 mb-6">可以新增和关闭标签页。</p>
+      <DemoBlock title="可编辑卡片" description="可以新增和关闭标签页。" code={editableSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Tabs
             activeKey={activeEditableKey}
@@ -115,13 +126,12 @@ export default function TabsDemo() {
             ))}
           </Tabs>
         </div>
-        <hr className="my-6 border-gray-200" />
-      </section>
+      </DemoBlock>
 
-      {/* 不同位置 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">不同位置</h2>
-        <p className="text-gray-600 mb-6">可以设置标签页的位置：上、下、左、右。</p>
+      <DemoBlock
+        title="不同位置"
+        description="可以设置标签页的位置：上、下、左、右。"
+        code={positionSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="mb-4">
             <label className="mr-4">位置：</label>
@@ -150,13 +160,9 @@ export default function TabsDemo() {
             </TabPane>
           </Tabs>
         </div>
-        <hr className="my-6 border-gray-200" />
-      </section>
+      </DemoBlock>
 
-      {/* 居中标签 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">居中标签</h2>
-        <p className="text-gray-600 mb-6">标签居中显示。</p>
+      <DemoBlock title="居中标签" description="标签居中显示。" code={centeredSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Tabs activeKey={activeKey4} onChange={(key) => setActiveKey4(String(key))} centered>
             <TabPane tabKey="1" label="标签页 1">
@@ -170,13 +176,12 @@ export default function TabsDemo() {
             </TabPane>
           </Tabs>
         </div>
-        <hr className="my-6 border-gray-200" />
-      </section>
+      </DemoBlock>
 
-      {/* 不同尺寸 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">不同尺寸</h2>
-        <p className="text-gray-600 mb-6">提供三种尺寸：小、中（默认）、大。</p>
+      <DemoBlock
+        title="不同尺寸"
+        description="提供三种尺寸：小、中（默认）、大。"
+        code={sizeSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg space-y-6">
           <div>
             <h3 className="text-lg font-semibold mb-2">小尺寸</h3>
@@ -232,13 +237,9 @@ export default function TabsDemo() {
             </Tabs>
           </div>
         </div>
-        <hr className="my-6 border-gray-200" />
-      </section>
+      </DemoBlock>
 
-      {/* 禁用标签 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">禁用标签</h2>
-        <p className="text-gray-600 mb-6">可以禁用某个标签页。</p>
+      <DemoBlock title="禁用标签" description="可以禁用某个标签页。" code={disabledSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Tabs activeKey={activeKey6} onChange={(key) => setActiveKey6(String(key))}>
             <TabPane tabKey="1" label="标签页 1">
@@ -252,7 +253,7 @@ export default function TabsDemo() {
             </TabPane>
           </Tabs>
         </div>
-      </section>
+      </DemoBlock>
     </div>
   )
 }
