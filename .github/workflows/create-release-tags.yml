@@ -36,6 +36,11 @@ jobs:
                     RANGE="${LAST_TAG}..HEAD"
                   fi
 
+                  echo "LAST_TAG=${LAST_TAG}"
+                  echo "RANGE=${RANGE}"
+                  echo "CHANGED_FILES:"
+                  git diff --name-only "$RANGE" || true
+
                   if git diff --name-only "$RANGE" | grep -q '^packages/'; then
                     echo "changed=true" >> "$GITHUB_OUTPUT"
                   else
@@ -54,6 +59,9 @@ jobs:
                     COMMIT_COUNT=$(git rev-list --count "${LAST_TAG}..HEAD")
                   fi
 
+                  echo "BASE_VERSION=${BASE_VERSION}"
+                  echo "COMMIT_COUNT=${COMMIT_COUNT}"
+
                   if [[ "$COMMIT_COUNT" -eq 0 ]]; then
                     echo "No new commits since last tag"
                     exit 0
@@ -63,10 +71,12 @@ jobs:
                   NEW_PATCH=$((PATCH + COMMIT_COUNT))
                   TAG="v${MAJOR}.${MINOR}.${NEW_PATCH}"
 
+                  echo "NEXT_TAG=${TAG}"
+
                   if git rev-parse "${TAG}" >/dev/null 2>&1; then
                     echo "Tag already exists: ${TAG}"
                     exit 1
                   fi
 
-                  git tag "${TAG}"
-                  git push --follow-tags
+                  git tag -a "${TAG}" -m "chore(release): ${TAG}"
+                  git push origin "${TAG}"
