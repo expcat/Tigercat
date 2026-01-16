@@ -1,4 +1,0 @@
-@import "@expcat/tigercat-core/style";
-@source "../../core/dist/**/*.js";
-@source "../dist/components/**/*.js";
-@source "../dist/index.js";
