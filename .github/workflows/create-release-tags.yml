@@ -55,6 +55,7 @@ jobs:
             - name: Version packages and create tags
               if: steps.packages_changed.outputs.changed == 'true'
               run: |
+                  set -euo pipefail
                   LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
                   if [[ -z "$LAST_TAG" ]]; then
                     BASE_VERSION=$(node -p "require('./packages/core/package.json').version")
@@ -92,5 +93,5 @@ jobs:
                   fi
 
                   git tag -a "${TAG}" -m "chore(release): ${TAG}"
-                  git push origin HEAD
+                  git push origin "HEAD:${GITHUB_REF_NAME}"
                   git push origin "${TAG}"
