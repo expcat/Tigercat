@@ -3,7 +3,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  base: command === 'serve' ? '/' : '/Tigercat/vue/',
   plugins: [vue()],
   resolve: {
     alias: {
@@ -28,4 +29,4 @@ export default defineConfig({
       allow: [path.resolve(__dirname, '..'), path.resolve(__dirname, '../../..')]
     }
   }
-})
+}))

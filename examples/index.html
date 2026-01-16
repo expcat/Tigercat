@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tigercat Examples</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #f8fafc;
+        color: #0f172a;
+      }
+
+      main {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 16px;
+      }
+
+      .container {
+        max-width: 960px;
+        width: 100%;
+      }
+
+      .title {
+        margin: 0 0 32px;
+        text-align: center;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .cards {
+        display: grid;
+        gap: 24px;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+
+      .card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
+      }
+
+      .card-title {
+        margin: 0 0 8px;
+        font-size: 20px;
+        font-weight: 600;
+      }
+
+      .card-desc {
+        margin: 0;
+        font-size: 14px;
+        color: #475569;
+      }
+
+      .card-link {
+        margin-top: 16px;
+        display: inline-block;
+        font-weight: 600;
+        color: #2563eb;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <h1 class="title">Tigercat 示例站点</h1>
+        <div class="cards">
+          <a class="card" href="./vue/">
+            <h2 class="card-title">Vue 3 示例</h2>
+            <p class="card-desc">浏览 Tigercat Vue 组件示例与主题效果。</p>
+            <span class="card-link">进入站点 →</span>
+          </a>
+          <a class="card" href="./react/">
+            <h2 class="card-title">React 示例</h2>
+            <p class="card-desc">查看 Tigercat React 组件示例与交互体验。</p>
+            <span class="card-link">进入站点 →</span>
+          </a>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
