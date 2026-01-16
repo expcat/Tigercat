@@ -6,11 +6,13 @@
 
 ```vue
 <script setup>
-import { Button } from '@expcat/tigercat-vue'
+import { Button, ConfigProvider } from '@expcat/tigercat-vue'
 </script>
 
 <template>
-  <Button>Button</Button>
+  <ConfigProvider>
+    <Button variant="solid">开始使用</Button>
+  </ConfigProvider>
 </template>
 ```
 
@@ -23,6 +25,8 @@ import { Button } from '@expcat/tigercat-vue'
 
 ```js
 // tailwind.config.js
+import { tigercatPlugin } from '@expcat/tigercat-core'
+
 export default {
   content: [
     './index.html',
@@ -32,7 +36,7 @@ export default {
   theme: {
     extend: {}
   },
-  plugins: []
+  plugins: [tigercatPlugin]
 }
 ```
 

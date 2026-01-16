@@ -5,10 +5,14 @@
 ## 快速使用
 
 ```tsx
-import { Button } from '@expcat/tigercat-react'
+import { Button, ConfigProvider } from '@expcat/tigercat-react'
 
 export function App() {
-  return <Button>Button</Button>
+  return (
+    <ConfigProvider>
+      <Button variant="solid">开始使用</Button>
+    </ConfigProvider>
+  )
 }
 ```
 
@@ -21,6 +25,8 @@ export function App() {
 
 ```js
 // tailwind.config.js
+import { tigercatPlugin } from '@expcat/tigercat-core'
+
 export default {
   content: [
     './index.html',
@@ -30,7 +36,7 @@ export default {
   theme: {
     extend: {}
   },
-  plugins: []
+  plugins: [tigercatPlugin]
 }
 ```
 
