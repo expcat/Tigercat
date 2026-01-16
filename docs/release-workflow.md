@@ -22,10 +22,9 @@
 
 ### 执行逻辑
 
-1. 安装依赖并执行 `pnpm changeset version`
-2. 仅当最近一个 tag 之后存在 `packages/` 目录变更时才继续
-3. 若 `changeset version` 产生版本变更，提交并创建 tag：`v{version}`
-4. 推送 commit 与 tag
+1. 仅当最近一个 tag 之后存在 `packages/` 目录变更时才继续
+2. 计算最近 tag 后的提交数并生成新 tag：`v{major}.{minor}.{patch+commitCount}`
+3. 推送 tag
 
 ### packages 变更判断规则
 
@@ -45,7 +44,7 @@
 ### 执行逻辑
 
 1. 安装依赖并构建：`pnpm build`
-2. `pnpm changeset publish` 发布
+2. `pnpm release` 发布
 
 ## 常见配置项
 
@@ -54,11 +53,6 @@
 在仓库 Settings → Secrets and variables → Actions 中配置：
 
 - `NPM_TOKEN`：npm 发布令牌
-
-### changeset 配置
-
-- 需在仓库中维护 changeset 文件，否则不会产出版本变更
-- 版本号来源于 `packages/core/package.json`
 
 ## 使用建议
 
