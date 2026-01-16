@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Tree, Card, Space, Input } from '@expcat/tigercat-react'
+import { Tree, Input } from '@expcat/tigercat-react'
 import type { TreeNode } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
 
 export default function TreeDemo() {
   // Basic tree data
@@ -109,6 +110,53 @@ export default function TreeDemo() {
     setSelectedKeys(keys)
   }
 
+  const basicSnippet = `<Tree treeData={basicTreeData} ariaLabel="Tree 基本用法" />`
+
+  const expandAllSnippet = `<Tree treeData={basicTreeData} defaultExpandAll />`
+
+  const selectableSnippet = `<p className="text-sm text-gray-600 mb-4">已选择: {selectedKeys.join(', ')}</p>
+<Tree
+  treeData={basicTreeData}
+  selectable
+  selectedKeys={selectedKeys}
+  onSelect={handleSelect}
+/>`
+
+  const checkableSnippet = `<p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeys.join(', ')}</p>
+<Tree
+  treeData={basicTreeData}
+  checkable
+  defaultExpandAll
+  checkedKeys={checkedKeys}
+  onCheck={(keys) => setCheckedKeys(keys)}
+/>`
+
+  const checkStrictlySnippet = `<p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeysStrictly.join(', ')}</p>
+<Tree
+  treeData={basicTreeData}
+  checkable
+  checkStrictly
+  defaultExpandAll
+  checkedKeys={checkedKeysStrictly}
+  onCheck={(keys) => setCheckedKeysStrictly(keys)}
+/>`
+
+  const disabledSnippet = `<Tree treeData={disabledTreeData} checkable defaultExpandAll />`
+
+  const lazySnippet = `<p className="text-sm text-gray-600 mb-4">点击节点展开，动态加载子节点</p>
+<Tree treeData={lazyTreeData} loadData={loadChildren} />`
+
+  const filterSnippet = `<Input
+  value={filterValue}
+  onChange={(e) => setFilterValue(e.target.value)}
+  placeholder="搜索节点..."
+  className="mb-4"
+/>
+<Tree treeData={filterTreeData} filterValue={filterValue} ariaLabel="Tree 节点过滤" />`
+
+  const blockSnippet = `<p className="text-sm text-gray-600 mb-4">节点占据整行宽度</p>
+<Tree treeData={basicTreeData} blockNode defaultExpandAll />`
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Tree 树形控件</h1>
@@ -117,81 +165,70 @@ export default function TreeDemo() {
         键盘：方向键移动焦点，Enter 选择，Space 勾选，Escape 收拢。
       </p>
 
-      <Space direction="vertical" size="lg" className="w-full">
-        {/* 基本用法 */}
-        <Card header={<h3 className="text-lg font-semibold">基本用法</h3>}>
-          <Tree treeData={basicTreeData} ariaLabel="Tree 基本用法" />
-        </Card>
+      <DemoBlock title="基本用法" description="基础树形结构展示。" code={basicSnippet}>
+        <Tree treeData={basicTreeData} ariaLabel="Tree 基本用法" />
+      </DemoBlock>
 
-        {/* 默认展开所有节点 */}
-        <Card header={<h3 className="text-lg font-semibold">默认展开所有节点</h3>}>
-          <Tree treeData={basicTreeData} defaultExpandAll />
-        </Card>
+      <DemoBlock title="默认展开所有节点" description="初始展开全部节点。" code={expandAllSnippet}>
+        <Tree treeData={basicTreeData} defaultExpandAll />
+      </DemoBlock>
 
-        {/* 可选择的树 */}
-        <Card header={<h3 className="text-lg font-semibold">可选择的树</h3>}>
-          <p className="text-sm text-gray-600 mb-4">已选择: {selectedKeys.join(', ')}</p>
-          <Tree
-            treeData={basicTreeData}
-            selectable
-            selectedKeys={selectedKeys}
-            onSelect={handleSelect}
-          />
-        </Card>
+      <DemoBlock title="可选择的树" description="支持选择节点并回显选中结果。" code={selectableSnippet}>
+        <p className="text-sm text-gray-600 mb-4">已选择: {selectedKeys.join(', ')}</p>
+        <Tree
+          treeData={basicTreeData}
+          selectable
+          selectedKeys={selectedKeys}
+          onSelect={handleSelect}
+        />
+      </DemoBlock>
 
-        {/* 多选树（级联） */}
-        <Card header={<h3 className="text-lg font-semibold">多选树（级联）</h3>}>
-          <p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeys.join(', ')}</p>
-          <Tree
-            treeData={basicTreeData}
-            checkable
-            defaultExpandAll
-            checkedKeys={checkedKeys}
-            onCheck={(keys) => setCheckedKeys(keys)}
-          />
-        </Card>
+      <DemoBlock title="多选树（级联）" description="勾选节点时父子联动。" code={checkableSnippet}>
+        <p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeys.join(', ')}</p>
+        <Tree
+          treeData={basicTreeData}
+          checkable
+          defaultExpandAll
+          checkedKeys={checkedKeys}
+          onCheck={(keys) => setCheckedKeys(keys)}
+        />
+      </DemoBlock>
 
-        {/* 多选树（父子独立） */}
-        <Card header={<h3 className="text-lg font-semibold">多选树（父子独立）</h3>}>
-          <p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeysStrictly.join(', ')}</p>
-          <Tree
-            treeData={basicTreeData}
-            checkable
-            checkStrictly
-            defaultExpandAll
-            checkedKeys={checkedKeysStrictly}
-            onCheck={(keys) => setCheckedKeysStrictly(keys)}
-          />
-        </Card>
+      <DemoBlock title="多选树（父子独立）" description="父子节点勾选状态相互独立。" code={checkStrictlySnippet}>
+        <p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeysStrictly.join(', ')}</p>
+        <Tree
+          treeData={basicTreeData}
+          checkable
+          checkStrictly
+          defaultExpandAll
+          checkedKeys={checkedKeysStrictly}
+          onCheck={(keys) => setCheckedKeysStrictly(keys)}
+        />
+      </DemoBlock>
 
-        {/* 禁用节点 */}
-        <Card header={<h3 className="text-lg font-semibold">禁用节点</h3>}>
-          <Tree treeData={disabledTreeData} checkable defaultExpandAll />
-        </Card>
+      <DemoBlock title="禁用节点" description="为特定节点设置禁用状态。" code={disabledSnippet}>
+        <Tree treeData={disabledTreeData} checkable defaultExpandAll />
+      </DemoBlock>
 
-        {/* 懒加载 */}
-        <Card header={<h3 className="text-lg font-semibold">懒加载</h3>}>
-          <p className="text-sm text-gray-600 mb-4">点击节点展开，动态加载子节点</p>
-          <Tree treeData={lazyTreeData} loadData={loadChildren} />
-        </Card>
+      <DemoBlock title="懒加载" description="展开节点时动态加载子节点。" code={lazySnippet}>
+        <p className="text-sm text-gray-600 mb-4">点击节点展开，动态加载子节点</p>
+        <Tree treeData={lazyTreeData} loadData={loadChildren} />
+      </DemoBlock>
 
-        {/* 节点过滤 */}
-        <Card header={<h3 className="text-lg font-semibold">节点过滤</h3>}>
-          <Input
-            value={filterValue}
-            onChange={(e) => setFilterValue(e.target.value)}
-            placeholder="搜索节点..."
-            className="mb-4"
-          />
-          <Tree treeData={filterTreeData} filterValue={filterValue} ariaLabel="Tree 节点过滤" />
-        </Card>
+      <DemoBlock title="节点过滤" description="根据关键字过滤节点。" code={filterSnippet}>
+        <Input
+          value={filterValue}
+          onChange={(e) => setFilterValue(e.target.value)}
+          placeholder="搜索节点..."
+          className="mb-4"
+        />
+        <Tree treeData={filterTreeData} filterValue={filterValue} ariaLabel="Tree 节点过滤" />
+      </DemoBlock>
 
-        {/* Block 节点 */}
-        <Card header={<h3 className="text-lg font-semibold">Block 节点</h3>}>
-          <p className="text-sm text-gray-600 mb-4">节点占据整行宽度</p>
-          <Tree treeData={basicTreeData} blockNode defaultExpandAll />
-        </Card>
-      </Space>
+      <DemoBlock title="Block 节点" description="节点占据整行宽度。" code={blockSnippet}>
+        <p className="text-sm text-gray-600 mb-4">节点占据整行宽度</p>
+        <Tree treeData={basicTreeData} blockNode defaultExpandAll />
+      </DemoBlock>
     </div>
   )
 }

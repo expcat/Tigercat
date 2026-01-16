@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Table, Button, Space, type TableColumn } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
 
 interface UserData extends Record<string, unknown> {
   id: number
@@ -9,6 +10,100 @@ interface UserData extends Record<string, unknown> {
   status: 'active' | 'inactive'
   address: string
 }
+
+const basicSnippet = `<Table<UserData>
+  columns={basicColumns}
+  dataSource={basicData}
+  pagination={false}
+/>`
+
+const borderedSnippet = `<Table<UserData>
+  columns={basicColumns}
+  dataSource={basicData}
+  bordered
+  striped
+  pagination={false}
+/>`
+
+const sortingSnippet = `<Table<UserData>
+  columns={sortableColumns}
+  dataSource={basicData}
+  pagination={false}
+/>`
+
+const filterSnippet = `<Table<UserData>
+  columns={filterableColumns}
+  dataSource={basicData}
+  pagination={false}
+/>`
+
+const customSnippet = `<Table<UserData>
+  columns={customColumns}
+  dataSource={basicData}
+  pagination={false}
+/>`
+
+const paginationSnippet = `<Table<UserData>
+  columns={basicColumns}
+  dataSource={largeData}
+  pagination={{
+    ...pagination,
+    total: largeData.length,
+    pageSizeOptions: [10, 20, 50],
+    showSizeChanger: true,
+    showTotal: true
+  }}
+  onPageChange={setPagination}
+/>`
+
+const selectionSnippet = `<div className="mb-4">
+  <p className="text-sm text-gray-600">已选择: {selectedRowKeys.join(', ') || '无'}</p>
+</div>
+<Table<UserData>
+  columns={basicColumns}
+  dataSource={basicData}
+  rowSelection={{
+    selectedRowKeys: selectedRowKeys,
+    type: 'checkbox'
+  }}
+  pagination={false}
+  onSelectionChange={handleSelectionChange}
+/>`
+
+const stickySnippet = `<Table<UserData>
+  columns={basicColumns}
+  dataSource={largeData}
+  stickyHeader
+  maxHeight={400}
+  pagination={false}
+/>`
+
+const fixedSnippet = `<Table<UserData>
+  columns={fixedColumns}
+  dataSource={basicData}
+  pagination={false}
+/>`
+
+const lockableSnippet = `<Table<UserData>
+  columns={lockableColumns}
+  dataSource={basicData}
+  pagination={false}
+  columnLockable
+/>`
+
+const loadingSnippet = `<Table<UserData>
+  columns={basicColumns}
+  dataSource={basicData}
+  loading
+  pagination={false}
+/>`
+
+const emptySnippet = `<Table<UserData>
+  columns={basicColumns}
+  dataSource={[]}
+  emptyText="暂无数据"
+  pagination={false}
+/>`
 
 const TableDemo: React.FC = () => {
   // Basic data
@@ -217,162 +312,124 @@ const TableDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">基础用法</h2>
-        <p className="text-gray-600 mb-6">基础的表格展示用法。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Table<UserData> columns={basicColumns} dataSource={basicData} pagination={false} />
-        </div>
-      </section>
+      <DemoBlock title="基础用法" description="基础的表格展示用法。" code={basicSnippet}>
+        <Table<UserData> columns={basicColumns} dataSource={basicData} pagination={false} />
+      </DemoBlock>
 
       {/* 带边框和条纹 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">带边框和条纹</h2>
-        <p className="text-gray-600 mb-6">显示边框和条纹行。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Table<UserData>
-            columns={basicColumns}
-            dataSource={basicData}
-            bordered
-            striped
-            pagination={false}
-          />
-        </div>
-      </section>
+      <DemoBlock title="带边框和条纹" description="显示边框和条纹行。" code={borderedSnippet}>
+        <Table<UserData>
+          columns={basicColumns}
+          dataSource={basicData}
+          bordered
+          striped
+          pagination={false}
+        />
+      </DemoBlock>
 
       {/* 排序 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">排序功能</h2>
-        <p className="text-gray-600 mb-6">点击列头进行排序，支持升序、降序和取消排序。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Table<UserData> columns={sortableColumns} dataSource={basicData} pagination={false} />
-        </div>
-      </section>
+      <DemoBlock
+        title="排序功能"
+        description="点击列头进行排序，支持升序、降序和取消排序。"
+        code={sortingSnippet}>
+        <Table<UserData> columns={sortableColumns} dataSource={basicData} pagination={false} />
+      </DemoBlock>
 
       {/* 筛选 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">筛选功能</h2>
-        <p className="text-gray-600 mb-6">支持文本筛选和下拉选择筛选。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Table<UserData> columns={filterableColumns} dataSource={basicData} pagination={false} />
-        </div>
-      </section>
+      <DemoBlock title="筛选功能" description="支持文本筛选和下拉选择筛选。" code={filterSnippet}>
+        <Table<UserData> columns={filterableColumns} dataSource={basicData} pagination={false} />
+      </DemoBlock>
 
       {/* 自定义渲染 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">自定义列渲染</h2>
-        <p className="text-gray-600 mb-6">通过 render 函数自定义单元格内容。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Table<UserData> columns={customColumns} dataSource={basicData} pagination={false} />
-        </div>
-      </section>
+      <DemoBlock
+        title="自定义列渲染"
+        description="通过 render 函数自定义单元格内容。"
+        code={customSnippet}>
+        <Table<UserData> columns={customColumns} dataSource={basicData} pagination={false} />
+      </DemoBlock>
 
       {/* 分页 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">分页功能</h2>
-        <p className="text-gray-600 mb-6">大数据集的分页展示（受控模式）。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Table<UserData>
-            columns={basicColumns}
-            dataSource={largeData}
-            pagination={{
-              ...pagination,
-              total: largeData.length,
-              pageSizeOptions: [10, 20, 50],
-              showSizeChanger: true,
-              showTotal: true
-            }}
-            onPageChange={setPagination}
-          />
-        </div>
-      </section>
+      <DemoBlock
+        title="分页功能"
+        description="大数据集的分页展示（受控模式）。"
+        code={paginationSnippet}>
+        <Table<UserData>
+          columns={basicColumns}
+          dataSource={largeData}
+          pagination={{
+            ...pagination,
+            total: largeData.length,
+            pageSizeOptions: [10, 20, 50],
+            showSizeChanger: true,
+            showTotal: true
+          }}
+          onPageChange={setPagination}
+        />
+      </DemoBlock>
 
       {/* 行选择 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">行选择</h2>
-        <p className="text-gray-600 mb-6">选择单行或多行数据。</p>
+      <DemoBlock title="行选择" description="选择单行或多行数据。" code={selectionSnippet}>
         <div className="mb-4">
           <p className="text-sm text-gray-600">已选择: {selectedRowKeys.join(', ') || '无'}</p>
         </div>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Table<UserData>
-            columns={basicColumns}
-            dataSource={basicData}
-            rowSelection={{
-              selectedRowKeys: selectedRowKeys,
-              type: 'checkbox'
-            }}
-            pagination={false}
-            onSelectionChange={handleSelectionChange}
-          />
-        </div>
-      </section>
+        <Table<UserData>
+          columns={basicColumns}
+          dataSource={basicData}
+          rowSelection={{
+            selectedRowKeys: selectedRowKeys,
+            type: 'checkbox'
+          }}
+          pagination={false}
+          onSelectionChange={handleSelectionChange}
+        />
+      </DemoBlock>
 
       {/* 固定表头 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">固定表头</h2>
-        <p className="text-gray-600 mb-6">表头固定，内容可滚动。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Table<UserData>
-            columns={basicColumns}
-            dataSource={largeData}
-            stickyHeader
-            maxHeight={400}
-            pagination={false}
-          />
-        </div>
-      </section>
+      <DemoBlock title="固定表头" description="表头固定，内容可滚动。" code={stickySnippet}>
+        <Table<UserData>
+          columns={basicColumns}
+          dataSource={largeData}
+          stickyHeader
+          maxHeight={400}
+          pagination={false}
+        />
+      </DemoBlock>
 
       {/* 锁定列（固定列） */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">锁定列（固定列）</h2>
-        <p className="text-gray-600 mb-6">左右滚动时固定列保持可见（需为固定列设置 width）。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Table<UserData> columns={fixedColumns} dataSource={basicData} pagination={false} />
-        </div>
-      </section>
+      <DemoBlock
+        title="锁定列（固定列）"
+        description="左右滚动时固定列保持可见（需为固定列设置 width）。"
+        code={fixedSnippet}>
+        <Table<UserData> columns={fixedColumns} dataSource={basicData} pagination={false} />
+      </DemoBlock>
 
       {/* 表头锁按钮 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">表头锁按钮</h2>
-        <p className="text-gray-600 mb-6">点击表头的小锁按钮锁定/解锁该列（默认锁定到左侧）。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Table<UserData>
-            columns={lockableColumns}
-            dataSource={basicData}
-            pagination={false}
-            columnLockable
-          />
-        </div>
-      </section>
+      <DemoBlock
+        title="表头锁按钮"
+        description="点击表头的小锁按钮锁定/解锁该列（默认锁定到左侧）。"
+        code={lockableSnippet}>
+        <Table<UserData>
+          columns={lockableColumns}
+          dataSource={basicData}
+          pagination={false}
+          columnLockable
+        />
+      </DemoBlock>
 
       {/* 加载状态 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">加载状态</h2>
-        <p className="text-gray-600 mb-6">显示加载中的状态。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Table<UserData>
-            columns={basicColumns}
-            dataSource={basicData}
-            loading
-            pagination={false}
-          />
-        </div>
-      </section>
+      <DemoBlock title="加载状态" description="显示加载中的状态。" code={loadingSnippet}>
+        <Table<UserData> columns={basicColumns} dataSource={basicData} loading pagination={false} />
+      </DemoBlock>
 
       {/* 空状态 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">空状态</h2>
-        <p className="text-gray-600 mb-6">没有数据时的显示。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Table<UserData>
-            columns={basicColumns}
-            dataSource={[]}
-            emptyText="暂无数据"
-            pagination={false}
-          />
-        </div>
-      </section>
+      <DemoBlock title="空状态" description="没有数据时的显示。" code={emptySnippet}>
+        <Table<UserData>
+          columns={basicColumns}
+          dataSource={[]}
+          emptyText="暂无数据"
+          pagination={false}
+        />
+      </DemoBlock>
     </div>
   )
 }

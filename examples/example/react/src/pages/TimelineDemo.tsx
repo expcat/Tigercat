@@ -1,4 +1,5 @@
-import { Divider, Tag, Timeline } from '@expcat/tigercat-react'
+import { Tag, Timeline } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
 
 type ProjectStatus = 'completed' | 'in-progress' | 'pending'
 
@@ -10,6 +11,128 @@ interface ProjectTimelineItem extends Record<string, unknown> {
   status: ProjectStatus
   color: string
 }
+
+const basicSnippet = `<Timeline items={basicEvents} />`
+
+const modeSnippet = `<div className="space-y-6">
+  <div className="p-6 bg-gray-50 rounded-lg">
+    <div className="text-lg font-semibold mb-4">左侧时间线（默认）</div>
+    <Timeline items={basicEvents} mode="left" />
+  </div>
+  <div className="p-6 bg-gray-50 rounded-lg">
+    <div className="text-lg font-semibold mb-4">右侧时间线</div>
+    <Timeline items={basicEvents} mode="right" />
+  </div>
+  <div className="p-6 bg-gray-50 rounded-lg">
+    <div className="text-lg font-semibold mb-4">交替展示</div>
+    <Timeline items={basicEvents} mode="alternate" />
+  </div>
+</div>`
+
+const colorSnippet = `<Timeline items={coloredEvents} />`
+
+const dotSnippet = `<Timeline items={customDotEvents} />`
+
+const renderDotSnippet = `<Timeline
+  items={renderDotEvents}
+  renderDot={(item) => {
+    if (item.key === 1) {
+      return <div className="w-4 h-4 bg-green-500 rounded-full" />
+    }
+    if (item.key === 2) {
+      return <div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse" />
+    }
+    return <div className="w-4 h-4 bg-gray-300 rounded-full" />
+  }}
+/>`
+
+const renderItemSnippet = `<Timeline
+  items={projectTimeline}
+  renderItem={(item) => {
+    const t = item as ProjectTimelineItem
+    return (
+      <div>
+        <div className="mb-2">
+          <span className="text-sm text-gray-500">{t.date}</span>
+        </div>
+        <div className="font-medium text-gray-900 mb-1">
+          {t.title}
+          <Tag variant={getStatusVariant(t.status)} size="sm" className="ml-2">
+            {t.status}
+          </Tag>
+        </div>
+        <div className="text-gray-600">{t.description}</div>
+      </div>
+    )
+  }}
+/>`
+
+const pendingSnippet = `<div className="space-y-6">
+  <div className="p-6 bg-gray-50 rounded-lg">
+    <div className="text-lg font-semibold mb-4">默认等待内容</div>
+    <Timeline items={basicEvents} pending />
+  </div>
+  <div className="p-6 bg-gray-50 rounded-lg">
+    <div className="text-lg font-semibold mb-4">自定义等待节点与内容</div>
+    <Timeline
+      items={basicEvents}
+      pending
+      pendingDot={
+        <div className="w-4 h-4 bg-[var(--tiger-primary,#2563eb)] rounded-full animate-pulse" />
+      }
+      pendingContent={
+        <div className="flex items-center gap-2 text-blue-600">
+          <svg
+            className="animate-spin h-4 w-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24">
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+          <span>正在处理...</span>
+        </div>
+      }
+    />
+  </div>
+</div>`
+
+const reverseSnippet = `<Timeline items={basicEvents} reverse />`
+
+const exampleSnippet = `<div className="max-w-2xl">
+  <Timeline
+    items={projectTimeline}
+    mode="alternate"
+    renderItem={(item) => {
+      const t = item as ProjectTimelineItem
+      return (
+        <div>
+          <div className="mb-2">
+            <span className="text-sm text-gray-500">{t.date}</span>
+          </div>
+          <div className="font-medium text-gray-900 mb-1">
+            {t.title}
+            <Tag variant={getStatusVariant(t.status)} size="sm" className="ml-2">
+              {t.status}
+            </Tag>
+          </div>
+          <div className="text-gray-600">{t.description}</div>
+        </div>
+      )
+    }}
+  />
+</div>`
 
 export default function TimelineDemo() {
   // Basic timeline data
@@ -133,18 +256,11 @@ export default function TimelineDemo() {
         <p className="text-gray-600">垂直展示时间流信息的时间线组件，支持多种模式与自定义渲染。</p>
       </div>
 
-      <section id="basic" className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">基本用法</h2>
-        <p className="text-gray-600 mb-6">通过 items 提供数据源即可渲染时间线。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Timeline items={basicEvents} />
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock title="基本用法" description="通过 items 提供数据源即可渲染时间线。" code={basicSnippet}>
+        <Timeline items={basicEvents} />
+      </DemoBlock>
 
-      <section id="mode" className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">展示模式</h2>
-        <p className="text-gray-600 mb-6">支持 left/right/alternate 三种展示模式。</p>
+      <DemoBlock title="展示模式" description="支持 left/right/alternate 三种展示模式。" code={modeSnippet}>
         <div className="space-y-6">
           <div className="p-6 bg-gray-50 rounded-lg">
             <div className="text-lg font-semibold mb-4">左侧时间线（默认）</div>
@@ -159,84 +275,64 @@ export default function TimelineDemo() {
             <Timeline items={basicEvents} mode="alternate" />
           </div>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      <section id="color" className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">自定义颜色</h2>
-        <p className="text-gray-600 mb-6">通过 item.color 设置时间点颜色。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Timeline items={coloredEvents} />
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock title="自定义颜色" description="通过 item.color 设置时间点颜色。" code={colorSnippet}>
+        <Timeline items={coloredEvents} />
+      </DemoBlock>
 
-      <section id="dot" className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">自定义节点（dot）</h2>
-        <p className="text-gray-600 mb-6">通过 item.dot 为单个节点提供自定义内容。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Timeline items={customDotEvents} />
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock title="自定义节点（dot）" description="通过 item.dot 为单个节点提供自定义内容。" code={dotSnippet}>
+        <Timeline items={customDotEvents} />
+      </DemoBlock>
 
-      <section id="render-dot" className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">自定义节点（renderDot）</h2>
-        <p className="text-gray-600 mb-6">
-          通过 renderDot 统一控制节点渲染（适合按状态/数据决定样式）。
-        </p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Timeline
-            items={renderDotEvents}
-            renderDot={(item) => {
-              if (item.key === 1) {
-                return <div className="w-4 h-4 bg-green-500 rounded-full" />
-              }
-              if (item.key === 2) {
-                return <div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse" />
-              }
-              return <div className="w-4 h-4 bg-gray-300 rounded-full" />
-            }}
-          />
-        </div>
-        <Divider className="my-6" />
-      </section>
-
-      <section id="render-item" className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">自定义内容（renderItem）</h2>
-        <p className="text-gray-600 mb-6">通过 renderItem 自定义每个时间线项的内容区域。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Timeline
-            items={projectTimeline}
-            renderItem={(item) =>
-              (() => {
-                const t = item as ProjectTimelineItem
-                return (
-                  <div>
-                    <div className="mb-2">
-                      <span className="text-sm text-gray-500">{t.date}</span>
-                    </div>
-                    <div className="font-medium text-gray-900 mb-1">
-                      {t.title}
-                      <Tag variant={getStatusVariant(t.status)} size="sm" className="ml-2">
-                        {t.status}
-                      </Tag>
-                    </div>
-                    <div className="text-gray-600">{t.description}</div>
-                  </div>
-                )
-              })()
+      <DemoBlock
+        title="自定义节点（renderDot）"
+        description="通过 renderDot 统一控制节点渲染（适合按状态/数据决定样式）。"
+        code={renderDotSnippet}>
+        <Timeline
+          items={renderDotEvents}
+          renderDot={(item) => {
+            if (item.key === 1) {
+              return <div className="w-4 h-4 bg-green-500 rounded-full" />
             }
-          />
-        </div>
-        <Divider className="my-6" />
-      </section>
+            if (item.key === 2) {
+              return <div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse" />
+            }
+            return <div className="w-4 h-4 bg-gray-300 rounded-full" />
+          }}
+        />
+      </DemoBlock>
 
-      <section id="pending" className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">等待中状态</h2>
-        <p className="text-gray-600 mb-6">
-          通过 pending/pendingDot/pendingContent 展示“处理中”状态。
-        </p>
+      <DemoBlock
+        title="自定义内容（renderItem）"
+        description="通过 renderItem 自定义每个时间线项的内容区域。"
+        code={renderItemSnippet}>
+        <Timeline
+          items={projectTimeline}
+          renderItem={(item) => {
+            const t = item as ProjectTimelineItem
+            return (
+              <div>
+                <div className="mb-2">
+                  <span className="text-sm text-gray-500">{t.date}</span>
+                </div>
+                <div className="font-medium text-gray-900 mb-1">
+                  {t.title}
+                  <Tag variant={getStatusVariant(t.status)} size="sm" className="ml-2">
+                    {t.status}
+                  </Tag>
+                </div>
+                <div className="text-gray-600">{t.description}</div>
+              </div>
+            )
+          }}
+        />
+      </DemoBlock>
+
+      <DemoBlock
+        title="等待中状态"
+        description='通过 pending/pendingDot/pendingContent 展示“处理中”状态。'
+        code={pendingSnippet}>
         <div className="space-y-6">
           <div className="p-6 bg-gray-50 rounded-lg">
             <div className="text-lg font-semibold mb-4">默认等待内容</div>
@@ -277,49 +373,40 @@ export default function TimelineDemo() {
             />
           </div>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      <section id="reverse" className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">反转顺序</h2>
-        <p className="text-gray-600 mb-6">通过 reverse 反转时间线顺序。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <Timeline items={basicEvents} reverse />
-        </div>
-        <Divider className="my-6" />
-      </section>
+      <DemoBlock title="反转顺序" description="通过 reverse 反转时间线顺序。" code={reverseSnippet}>
+        <Timeline items={basicEvents} reverse />
+      </DemoBlock>
 
-      <section id="example" className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">完整示例</h2>
-        <p className="text-gray-600 mb-6">组合 mode + renderItem + color 展示一个“项目时间线”。</p>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="max-w-2xl">
-            <Timeline
-              items={projectTimeline}
-              mode="alternate"
-              renderItem={(item) =>
-                (() => {
-                  const t = item as ProjectTimelineItem
-                  return (
-                    <div>
-                      <div className="mb-2">
-                        <span className="text-sm text-gray-500">{t.date}</span>
-                      </div>
-                      <div className="font-medium text-gray-900 mb-1">
-                        {t.title}
-                        <Tag variant={getStatusVariant(t.status)} size="sm" className="ml-2">
-                          {t.status}
-                        </Tag>
-                      </div>
-                      <div className="text-gray-600">{t.description}</div>
-                    </div>
-                  )
-                })()
-              }
-            />
-          </div>
+      <DemoBlock
+        title="完整示例"
+        description="组合 mode + renderItem + color 展示一个“项目时间线”。"
+        code={exampleSnippet}>
+        <div className="max-w-2xl">
+          <Timeline
+            items={projectTimeline}
+            mode="alternate"
+            renderItem={(item) => {
+              const t = item as ProjectTimelineItem
+              return (
+                <div>
+                  <div className="mb-2">
+                    <span className="text-sm text-gray-500">{t.date}</span>
+                  </div>
+                  <div className="font-medium text-gray-900 mb-1">
+                    {t.title}
+                    <Tag variant={getStatusVariant(t.status)} size="sm" className="ml-2">
+                      {t.status}
+                    </Tag>
+                  </div>
+                  <div className="text-gray-600">{t.description}</div>
+                </div>
+              )
+            }}
+          />
         </div>
-      </section>
+      </DemoBlock>
     </div>
   )
 }

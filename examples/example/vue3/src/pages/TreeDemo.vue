@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Tree, Card, Space, Input } from '@expcat/tigercat-vue'
+import { Tree, Input } from '@expcat/tigercat-vue'
 import type { TreeNode } from '@expcat/tigercat-vue'
+import DemoBlock from '../components/DemoBlock.vue'
 
 // Basic tree data
 const basicTreeData = ref<TreeNode[]>([
@@ -104,6 +105,39 @@ const filterTreeData = ref<TreeNode[]>([
     ]
   }
 ])
+
+const basicSnippet = `<Tree :treeData="basicTreeData" ariaLabel="Tree 基本用法" />`
+
+const expandAllSnippet = `<Tree :treeData="basicTreeData" defaultExpandAll />`
+
+const selectableSnippet = `<p class="text-sm text-gray-600 mb-4">已选择: {{ selectedKeys.join(', ') }}</p>
+<Tree :treeData="basicTreeData" selectable v-model:selectedKeys="selectedKeys" />`
+
+const checkableSnippet = `<p class="text-sm text-gray-600 mb-4">已勾选: {{ checkedKeys.join(', ') }}</p>
+<Tree
+  :treeData="basicTreeData"
+  checkable
+  defaultExpandAll
+  v-model:checkedKeys="checkedKeys" />`
+
+const checkStrictlySnippet = `<p class="text-sm text-gray-600 mb-4">已勾选: {{ checkedKeysStrictly.join(', ') }}</p>
+<Tree
+  :treeData="basicTreeData"
+  checkable
+  checkStrictly
+  defaultExpandAll
+  v-model:checkedKeys="checkedKeysStrictly" />`
+
+const disabledSnippet = `<Tree :treeData="disabledTreeData" checkable defaultExpandAll />`
+
+const lazySnippet = `<p class="text-sm text-gray-600 mb-4">点击节点展开，动态加载子节点</p>
+<Tree :treeData="lazyTreeData" :loadData="loadChildren" />`
+
+const filterSnippet = `<Input v-model="filterValue" placeholder="搜索节点..." class="mb-4" />
+<Tree :treeData="filterTreeData" :filterValue="filterValue" ariaLabel="Tree 节点过滤" />`
+
+const blockSnippet = `<p class="text-sm text-gray-600 mb-4">节点占据整行宽度</p>
+<Tree :treeData="basicTreeData" blockNode defaultExpandAll />`
 </script>
 
 <template>
@@ -114,75 +148,55 @@ const filterTreeData = ref<TreeNode[]>([
       键盘：方向键移动焦点，Enter 选择，Space 勾选，Escape 收拢。
     </p>
 
-    <Space direction="vertical" size="lg" class="w-full">
-      <!-- 基本用法 -->
-      <Card>
-        <template #header><h3 class="text-lg font-semibold">基本用法</h3></template>
-        <Tree :treeData="basicTreeData" ariaLabel="Tree 基本用法" />
-      </Card>
+    <DemoBlock title="基本用法" description="基础树形结构展示。" :code="basicSnippet">
+      <Tree :treeData="basicTreeData" ariaLabel="Tree 基本用法" />
+    </DemoBlock>
 
-      <!-- 默认展开所有节点 -->
-      <Card>
-        <template #header><h3 class="text-lg font-semibold">默认展开所有节点</h3></template>
-        <Tree :treeData="basicTreeData" defaultExpandAll />
-      </Card>
+    <DemoBlock title="默认展开所有节点" description="初始展开全部节点。" :code="expandAllSnippet">
+      <Tree :treeData="basicTreeData" defaultExpandAll />
+    </DemoBlock>
 
-      <!-- 可选择的树 -->
-      <Card>
-        <template #header><h3 class="text-lg font-semibold">可选择的树</h3></template>
-        <p class="text-sm text-gray-600 mb-4">已选择: {{ selectedKeys.join(', ') }}</p>
-        <Tree :treeData="basicTreeData" selectable v-model:selectedKeys="selectedKeys" />
-      </Card>
+    <DemoBlock title="可选择的树" description="支持选择节点并回显选中结果。" :code="selectableSnippet">
+      <p class="text-sm text-gray-600 mb-4">已选择: {{ selectedKeys.join(', ') }}</p>
+      <Tree :treeData="basicTreeData" selectable v-model:selectedKeys="selectedKeys" />
+    </DemoBlock>
 
-      <!-- 多选树（级联） -->
-      <Card>
-        <template #header><h3 class="text-lg font-semibold">多选树（级联）</h3></template>
-        <p class="text-sm text-gray-600 mb-4">已勾选: {{ checkedKeys.join(', ') }}</p>
-        <Tree
-          :treeData="basicTreeData"
-          checkable
-          defaultExpandAll
-          v-model:checkedKeys="checkedKeys" />
-      </Card>
+    <DemoBlock title="多选树（级联）" description="勾选节点时父子联动。" :code="checkableSnippet">
+      <p class="text-sm text-gray-600 mb-4">已勾选: {{ checkedKeys.join(', ') }}</p>
+      <Tree
+        :treeData="basicTreeData"
+        checkable
+        defaultExpandAll
+        v-model:checkedKeys="checkedKeys" />
+    </DemoBlock>
 
-      <!-- 多选树（父子独立） -->
-      <Card>
-        <template #header><h3 class="text-lg font-semibold">多选树（父子独立）</h3></template>
-        <p class="text-sm text-gray-600 mb-4">已勾选: {{ checkedKeysStrictly.join(', ') }}</p>
-        <Tree
-          :treeData="basicTreeData"
-          checkable
-          checkStrictly
-          defaultExpandAll
-          v-model:checkedKeys="checkedKeysStrictly" />
-      </Card>
+    <DemoBlock title="多选树（父子独立）" description="父子节点勾选状态相互独立。" :code="checkStrictlySnippet">
+      <p class="text-sm text-gray-600 mb-4">已勾选: {{ checkedKeysStrictly.join(', ') }}</p>
+      <Tree
+        :treeData="basicTreeData"
+        checkable
+        checkStrictly
+        defaultExpandAll
+        v-model:checkedKeys="checkedKeysStrictly" />
+    </DemoBlock>
 
-      <!-- 禁用节点 -->
-      <Card>
-        <template #header><h3 class="text-lg font-semibold">禁用节点</h3></template>
-        <Tree :treeData="disabledTreeData" checkable defaultExpandAll />
-      </Card>
+    <DemoBlock title="禁用节点" description="为特定节点设置禁用状态。" :code="disabledSnippet">
+      <Tree :treeData="disabledTreeData" checkable defaultExpandAll />
+    </DemoBlock>
 
-      <!-- 懒加载 -->
-      <Card>
-        <template #header><h3 class="text-lg font-semibold">懒加载</h3></template>
-        <p class="text-sm text-gray-600 mb-4">点击节点展开，动态加载子节点</p>
-        <Tree :treeData="lazyTreeData" :loadData="loadChildren" />
-      </Card>
+    <DemoBlock title="懒加载" description="展开节点时动态加载子节点。" :code="lazySnippet">
+      <p class="text-sm text-gray-600 mb-4">点击节点展开，动态加载子节点</p>
+      <Tree :treeData="lazyTreeData" :loadData="loadChildren" />
+    </DemoBlock>
 
-      <!-- 节点过滤 -->
-      <Card>
-        <template #header><h3 class="text-lg font-semibold">节点过滤</h3></template>
-        <Input v-model="filterValue" placeholder="搜索节点..." class="mb-4" />
-        <Tree :treeData="filterTreeData" :filterValue="filterValue" ariaLabel="Tree 节点过滤" />
-      </Card>
+    <DemoBlock title="节点过滤" description="根据关键字过滤节点。" :code="filterSnippet">
+      <Input v-model="filterValue" placeholder="搜索节点..." class="mb-4" />
+      <Tree :treeData="filterTreeData" :filterValue="filterValue" ariaLabel="Tree 节点过滤" />
+    </DemoBlock>
 
-      <!-- Block 节点 -->
-      <Card>
-        <template #header><h3 class="text-lg font-semibold">Block 节点</h3></template>
-        <p class="text-sm text-gray-600 mb-4">节点占据整行宽度</p>
-        <Tree :treeData="basicTreeData" blockNode defaultExpandAll />
-      </Card>
-    </Space>
+    <DemoBlock title="Block 节点" description="节点占据整行宽度。" :code="blockSnippet">
+      <p class="text-sm text-gray-600 mb-4">节点占据整行宽度</p>
+      <Tree :treeData="basicTreeData" blockNode defaultExpandAll />
+    </DemoBlock>
   </div>
 </template>
