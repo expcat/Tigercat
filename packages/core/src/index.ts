@@ -122,3 +122,4 @@ export * from './types/code'
 
 // Theme
 export * from './theme'
+export * from './tailwind-plugin'
