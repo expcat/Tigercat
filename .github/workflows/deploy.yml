@@ -46,6 +46,8 @@ jobs:
         run: |
           mkdir -p public_html
           cp examples/index.html public_html/index.html
+          cp examples/example/vue3/dist/index.html examples/example/vue3/dist/404.html
+          cp examples/example/react/dist/index.html examples/example/react/dist/404.html
           mv examples/example/vue3/dist public_html/vue
           mv examples/example/react/dist public_html/react
 
