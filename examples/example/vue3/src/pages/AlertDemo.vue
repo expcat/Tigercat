@@ -1,6 +1,37 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Alert, Divider, Button, List } from '@expcat/tigercat-vue'
+import { Alert, Button, List } from '@expcat/tigercat-vue'
+import DemoBlock from '../components/DemoBlock.vue'
+
+const basicSnippet = `<Alert title="这是一条提示信息" />
+<Alert type="success" title="这是一条成功提示" />
+<Alert type="warning" title="这是一条警告提示" />
+<Alert type="error" title="这是一条错误提示" />`
+
+const typeSnippet = `<Alert type="info" title="信息提示" description="这是一条信息提示的详细内容" />
+<Alert type="success" title="成功提示" description="操作成功完成" />
+<Alert type="warning" title="警告提示" description="请注意相关事项" />
+<Alert type="error" title="错误提示" description="操作失败，请重试" />`
+
+const sizeSnippet = `<Alert size="sm" type="info" title="小尺寸提示" />
+<Alert size="md" type="success" title="中等尺寸提示" />
+<Alert size="lg" type="warning" title="大尺寸提示" />`
+
+const iconSnippet = `<Alert type="success" title="带图标的成功提示" show-icon />
+<Alert type="warning" title="不带图标的警告提示" :show-icon="false" />`
+
+const closableSnippet = `<Alert closable title="可关闭的提示" />`
+
+const descriptionSnippet = `<Alert type="success" title="操作成功" description="您的订单已成功提交..." />`
+
+const customSnippet = `<Alert>
+  <template #title>...</template>
+  <template #description>...</template>
+</Alert>`
+
+const fullSnippet = `<Alert type="warning" size="lg" title="重要提示" show-icon closable />`
+
+const scenarioSnippet = `<Alert type="success" title="提交成功" description="您的申请已成功提交..." />`
 
 const showAlert1 = ref(true)
 const showAlert2 = ref(true)
@@ -22,10 +53,9 @@ const customContentItems = [
       </p>
     </div>
 
-    <!-- 基本用法 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">基本用法</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">最简单的用法，适用于简短的警告提示。</p>
+    <DemoBlock title="基本用法"
+               description="最简单的用法，适用于简短的警告提示。"
+               :code="basicSnippet">
       <div
            class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert title="这是一条提示信息" />
@@ -36,16 +66,11 @@ const customContentItems = [
         <Alert type="error"
                title="这是一条错误提示" />
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 提示类型 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">提示类型</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">
-        Alert 组件支持 4
-        种不同的类型：info（信息）、success（成功）、warning（警告）、error（错误）。
-      </p>
+    <DemoBlock title="提示类型"
+               description="Alert 组件支持 4 种不同的类型：info（信息）、success（成功）、warning（警告）、error（错误）。"
+               :code="typeSnippet">
       <div
            class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert type="info"
@@ -61,15 +86,11 @@ const customContentItems = [
                title="错误提示"
                description="操作失败，请重试" />
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 尺寸大小 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">尺寸大小</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">
-        Alert 组件支持 3 种不同的尺寸：小、中、大。
-      </p>
+    <DemoBlock title="尺寸大小"
+               description="Alert 组件支持 3 种不同的尺寸：小、中、大。"
+               :code="sizeSnippet">
       <div
            class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert size="sm"
@@ -85,15 +106,11 @@ const customContentItems = [
                title="大尺寸提示"
                description="这是大尺寸的提示内容" />
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 带图标 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">带图标</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">
-        默认情况下会显示图标，可以通过 showIcon 属性控制。
-      </p>
+    <DemoBlock title="带图标"
+               description="默认情况下会显示图标，可以通过 showIcon 属性控制。"
+               :code="iconSnippet">
       <div
            class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert type="success"
@@ -103,15 +120,11 @@ const customContentItems = [
                title="不带图标的警告提示"
                :show-icon="false" />
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 可关闭 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">可关闭</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">
-        通过设置 closable 属性可以让 Alert 显示关闭按钮。
-      </p>
+    <DemoBlock title="可关闭"
+               description="通过设置 closable 属性可以让 Alert 显示关闭按钮。"
+               :code="closableSnippet">
       <div
            class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert v-if="showAlert1"
@@ -137,15 +150,11 @@ const customContentItems = [
           </Button>
         </div>
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 带描述信息 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">带描述信息</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">
-        使用 description 属性可以添加详细的描述内容。
-      </p>
+    <DemoBlock title="带描述信息"
+               description="使用 description 属性可以添加详细的描述内容。"
+               :code="descriptionSnippet">
       <div
            class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert type="success"
@@ -158,13 +167,11 @@ const customContentItems = [
                title="操作失败"
                description="网络连接失败，请检查您的网络设置后重试。错误代码：E001" />
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 自定义内容 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">自定义内容</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">可以使用插槽自定义标题和描述内容。</p>
+    <DemoBlock title="自定义内容"
+               description="可以使用插槽自定义标题和描述内容。"
+               :code="customSnippet">
       <div
            class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert type="info">
@@ -192,13 +199,11 @@ const customContentItems = [
 
         <Alert type="warning"> 这是通过默认插槽传入的内容 </Alert>
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 完整功能示例 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">完整功能示例</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">综合展示所有功能。</p>
+    <DemoBlock title="完整功能示例"
+               description="综合展示所有功能。"
+               :code="fullSnippet">
       <div
            class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert v-if="showAlert3"
@@ -220,16 +225,12 @@ const customContentItems = [
           </Button>
         </div>
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 实际应用场景 -->
-    <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">实际应用场景</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-6">模拟真实的使用场景。</p>
-
+    <DemoBlock title="实际应用场景"
+               description="模拟真实的使用场景。"
+               :code="scenarioSnippet">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- 表单提交成功 -->
         <div>
           <h3 class="text-lg font-semibold mb-3">表单提交成功</h3>
           <div
@@ -241,7 +242,6 @@ const customContentItems = [
           </div>
         </div>
 
-        <!-- 系统维护通知 -->
         <div>
           <h3 class="text-lg font-semibold mb-3">系统维护通知</h3>
           <div
@@ -253,7 +253,6 @@ const customContentItems = [
           </div>
         </div>
 
-        <!-- 错误提示 -->
         <div>
           <h3 class="text-lg font-semibold mb-3">错误提示</h3>
           <div
@@ -265,7 +264,6 @@ const customContentItems = [
           </div>
         </div>
 
-        <!-- 信息提示 -->
         <div>
           <h3 class="text-lg font-semibold mb-3">信息提示</h3>
           <div
@@ -277,6 +275,6 @@ const customContentItems = [
           </div>
         </div>
       </div>
-    </section>
+    </DemoBlock>
   </div>
 </template>

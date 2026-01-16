@@ -1,5 +1,33 @@
 import { useState } from 'react'
-import { Alert, Divider, Button, List } from '@expcat/tigercat-react'
+import { Alert, Button, List } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
+
+const basicSnippet = `<Alert title="这是一条提示信息" />
+<Alert type="success" title="这是一条成功提示" />
+<Alert type="warning" title="这是一条警告提示" />
+<Alert type="error" title="这是一条错误提示" />`
+
+const typeSnippet = `<Alert type="info" title="信息提示" description="这是一条信息提示的详细内容" />
+<Alert type="success" title="成功提示" description="操作成功完成" />
+<Alert type="warning" title="警告提示" description="请注意相关事项" />
+<Alert type="error" title="错误提示" description="操作失败，请重试" />`
+
+const sizeSnippet = `<Alert size="sm" type="info" title="小尺寸提示" />
+<Alert size="md" type="success" title="中等尺寸提示" />
+<Alert size="lg" type="warning" title="大尺寸提示" />`
+
+const iconSnippet = `<Alert type="success" title="带图标的成功提示" showIcon />
+<Alert type="warning" title="不带图标的警告提示" showIcon={false} />`
+
+const closableSnippet = `<Alert closable title="可关闭的提示" />`
+
+const descriptionSnippet = `<Alert type="success" title="操作成功" description="您的订单已成功提交..." />`
+
+const customSnippet = `<Alert titleSlot={<strong>自定义标题内容</strong>} descriptionSlot={<div>...</div>} />`
+
+const fullSnippet = `<Alert type="warning" size="lg" title="重要提示" showIcon closable />`
+
+const scenarioSnippet = `<Alert type="success" title="提交成功" description="您的申请已成功提交..." />`
 
 export default function AlertDemo() {
   const [showAlert1, setShowAlert1] = useState(true)
@@ -20,43 +48,34 @@ export default function AlertDemo() {
         </p>
       </div>
 
-      {/* 基本用法 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">基本用法</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          最简单的用法，适用于简短的警告提示。
-        </p>
+      <DemoBlock
+        title="基本用法"
+        description="最简单的用法，适用于简短的警告提示。"
+        code={basicSnippet}>
         <div className={demoCardClassName}>
           <Alert title="这是一条提示信息" />
           <Alert type="success" title="这是一条成功提示" />
           <Alert type="warning" title="这是一条警告提示" />
           <Alert type="error" title="这是一条错误提示" />
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 提示类型 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">提示类型</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          Alert 组件支持 4
-          种不同的类型：info（信息）、success（成功）、warning（警告）、error（错误）。
-        </p>
+      <DemoBlock
+        title="提示类型"
+        description="Alert 组件支持 4 种不同的类型：info（信息）、success（成功）、warning（警告）、error（错误）。"
+        code={typeSnippet}>
         <div className={demoCardClassName}>
           <Alert type="info" title="信息提示" description="这是一条信息提示的详细内容" />
           <Alert type="success" title="成功提示" description="操作成功完成" />
           <Alert type="warning" title="警告提示" description="请注意相关事项" />
           <Alert type="error" title="错误提示" description="操作失败，请重试" />
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 尺寸大小 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">尺寸大小</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          Alert 组件支持 3 种不同的尺寸：小、中、大。
-        </p>
+      <DemoBlock
+        title="尺寸大小"
+        description="Alert 组件支持 3 种不同的尺寸：小、中、大。"
+        code={sizeSnippet}>
         <div className={demoCardClassName}>
           <Alert size="sm" type="info" title="小尺寸提示" description="这是小尺寸的提示内容" />
           <Alert
@@ -67,28 +86,22 @@ export default function AlertDemo() {
           />
           <Alert size="lg" type="warning" title="大尺寸提示" description="这是大尺寸的提示内容" />
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 带图标 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">带图标</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          默认情况下会显示图标，可以通过 showIcon 属性控制。
-        </p>
+      <DemoBlock
+        title="带图标"
+        description="默认情况下会显示图标，可以通过 showIcon 属性控制。"
+        code={iconSnippet}>
         <div className={demoCardClassName}>
           <Alert type="success" title="带图标的成功提示" showIcon={true} />
           <Alert type="warning" title="不带图标的警告提示" showIcon={false} />
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 可关闭 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">可关闭</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          通过设置 closable 属性可以让 Alert 显示关闭按钮。
-        </p>
+      <DemoBlock
+        title="可关闭"
+        description="通过设置 closable 属性可以让 Alert 显示关闭按钮。"
+        code={closableSnippet}>
         <div className={demoCardClassName}>
           {showAlert1 && (
             <Alert
@@ -124,15 +137,12 @@ export default function AlertDemo() {
             </div>
           )}
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 带描述信息 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">带描述信息</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          使用 description 属性可以添加详细的描述内容。
-        </p>
+      <DemoBlock
+        title="带描述信息"
+        description="使用 description 属性可以添加详细的描述内容。"
+        code={descriptionSnippet}>
         <div className={demoCardClassName}>
           <Alert
             type="success"
@@ -150,15 +160,12 @@ export default function AlertDemo() {
             description="网络连接失败，请检查您的网络设置后重试。错误代码：E001"
           />
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 自定义内容 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">自定义内容</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          可以使用 titleSlot 和 descriptionSlot 自定义标题和描述内容。
-        </p>
+      <DemoBlock
+        title="自定义内容"
+        description="可以使用 titleSlot 和 descriptionSlot 自定义标题和描述内容。"
+        code={customSnippet}>
         <div className={demoCardClassName}>
           <Alert
             type="info"
@@ -188,13 +195,9 @@ export default function AlertDemo() {
 
           <Alert type="warning">这是通过 children 传入的内容</Alert>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 完整功能示例 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">完整功能示例</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">综合展示所有功能。</p>
+      <DemoBlock title="完整功能示例" description="综合展示所有功能。" code={fullSnippet}>
         <div className={demoCardClassName}>
           {showAlert3 && (
             <Alert
@@ -220,16 +223,10 @@ export default function AlertDemo() {
             </div>
           )}
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 实际应用场景 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">实际应用场景</h2>
-        <p className="text-gray-600 dark:text-gray-300 mb-6">模拟真实的使用场景。</p>
-
+      <DemoBlock title="实际应用场景" description="模拟真实的使用场景。" code={scenarioSnippet}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* 表单提交成功 */}
           <div>
             <h3 className="text-lg font-semibold mb-3">表单提交成功</h3>
             <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
@@ -242,7 +239,6 @@ export default function AlertDemo() {
             </div>
           </div>
 
-          {/* 系统维护通知 */}
           <div>
             <h3 className="text-lg font-semibold mb-3">系统维护通知</h3>
             <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
@@ -255,7 +251,6 @@ export default function AlertDemo() {
             </div>
           </div>
 
-          {/* 错误提示 */}
           <div>
             <h3 className="text-lg font-semibold mb-3">错误提示</h3>
             <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
@@ -268,7 +263,6 @@ export default function AlertDemo() {
             </div>
           </div>
 
-          {/* 信息提示 */}
           <div>
             <h3 className="text-lg font-semibold mb-3">信息提示</h3>
             <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
@@ -281,7 +275,7 @@ export default function AlertDemo() {
             </div>
           </div>
         </div>
-      </section>
+      </DemoBlock>
     </div>
   )
 }
