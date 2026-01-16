@@ -26,8 +26,8 @@
       "@/*": ["./src/*"],
       "@demo-shared/*": ["../shared/*"],
       "@expcat/tigercat-core": ["../../../packages/core/dist/index.d.ts"],
-      "@expcat/tigercat-react": ["../../../packages/react/src/index.tsx"],
-      "@expcat/tigercat-react/*": ["../../../packages/react/src/components/*"]
+      "@expcat/tigercat-react": ["../../../packages/react/dist/index.d.ts"],
+      "@expcat/tigercat-react/*": ["../../../packages/react/dist/components/*.d.ts"]
     }
   },
   "include": ["src", "../shared"],
