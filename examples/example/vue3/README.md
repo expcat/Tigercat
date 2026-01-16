@@ -9,6 +9,43 @@
 - 使用 TypeScript 进行类型检查
 - 集成 Tailwind CSS 样式系统
 
+## 在业务项目中使用（NPM + 按需样式）
+
+安装依赖：
+
+```bash
+pnpm add @expcat/tigercat-vue
+```
+
+在 Tailwind 配置中加入 Tigercat 构建产物路径，确保按需生成样式：
+
+```js
+// tailwind.config.js
+export default {
+  content: [
+    './index.html',
+    './src/**/*.{vue,js,ts,jsx,tsx}',
+    './node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}'
+  ],
+  theme: {
+    extend: {}
+  },
+  plugins: []
+}
+```
+
+使用组件：
+
+```vue
+<script setup>
+import { Button } from '@expcat/tigercat-vue'
+</script>
+
+<template>
+  <Button>Button</Button>
+</template>
+```
+
 ## 安装依赖
 
 在项目根目录运行：
