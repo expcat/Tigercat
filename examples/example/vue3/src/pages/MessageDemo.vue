@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { message, Button, List } from '@expcat/tigercat-vue'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const manualLoadingCloseFns = ref<Array<() => void>>([])
-const manualLoadingCount = computed(() => manualLoadingCloseFns.value.length)
 
 const delay = (cb: () => void, ms: number) => setTimeout(cb, ms)
 
@@ -169,13 +168,13 @@ const manualSnippet = `<div class="flex flex-wrap gap-2 mb-4">
   <Button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950" @click="showMessage">
     显示加载消息
   </Button>
-  <Button class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950" @click="closeManually" :disabled="manualLoadingCount === 0">
+  <Button class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950" @click="closeManually" :disabled="manualLoadingCloseFns.length === 0">
     关闭最后一个
   </Button>
-  <Button class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950" @click="closeAllManual" :disabled="manualLoadingCount === 0">
+  <Button class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950" @click="closeAllManual" :disabled="manualLoadingCloseFns.length === 0">
     关闭全部
   </Button>
-  <span class="text-sm text-gray-600 dark:text-gray-300">当前可手动关闭：{{ manualLoadingCount }} 条</span>
+  <span class="text-sm text-gray-600 dark:text-gray-300">当前可手动关闭：{{ manualLoadingCloseFns.length }} 条</span>
 </div>`
 
 const flowSnippet = `<Button class="px-6 py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950" @click="simulateRequest">
@@ -309,16 +308,16 @@ const sceneSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           </Button>
           <Button class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
                   @click="closeManually"
-                  :disabled="manualLoadingCount === 0">
+                  :disabled="manualLoadingCloseFns.length === 0">
             关闭最后一个
           </Button>
           <Button class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"
                   @click="closeAllManual"
-                  :disabled="manualLoadingCount === 0">
+                  :disabled="manualLoadingCloseFns.length === 0">
             关闭全部
           </Button>
           <span class="text-sm text-gray-600 dark:text-gray-300">
-            当前可手动关闭：{{ manualLoadingCount }} 条
+            当前可手动关闭：{{ manualLoadingCloseFns.length }} 条
           </span>
         </div>
       </div>

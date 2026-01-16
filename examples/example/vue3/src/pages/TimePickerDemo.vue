@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, inject, ref, type Ref } from 'vue'
+import { inject, ref, type Ref } from 'vue'
 import { TimePicker } from '@expcat/tigercat-vue'
 import type { DemoLang } from '@demo-shared/app-config'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const demoLang = inject<Ref<DemoLang>>('demo-lang', ref<DemoLang>('zh-CN'))
-const locale = computed(() => demoLang.value)
+const locale = demoLang
 const time = ref<string | null>(null)
 const time24 = ref<string | null>('14:30')
 const time12 = ref<string | null>('14:30')

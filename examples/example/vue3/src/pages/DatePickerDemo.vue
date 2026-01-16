@@ -13,7 +13,7 @@ const range = ref<[Date | null, Date | null]>([null, null])
 const labeledRange = ref<[Date | null, Date | null]>([new Date('2024-03-10'), null])
 
 const demoLang = inject<Ref<DemoLang>>('demo-lang', ref<DemoLang>('zh-CN'))
-const locale = computed(() => demoLang.value)
+const locale = demoLang
 
 const minDate = new Date('2024-01-01')
 const maxDate = new Date('2024-12-31')
