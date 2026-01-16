@@ -1,5 +1,46 @@
 import { useMemo, useState } from 'react'
-import { List, Card, Space, Divider, Button, type ListProps } from '@expcat/tigercat-react'
+import { List, Card, Space, Button, type ListProps } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
+
+const basicSnippet = `<List dataSource={basicData} />`
+
+const sizeSnippet = `<List dataSource={basicData.slice(0, 2)} size="sm" />
+<List dataSource={basicData.slice(0, 2)} size="md" />
+<List dataSource={basicData.slice(0, 2)} size="lg" />`
+
+const borderSnippet = `<List dataSource={basicData.slice(0, 2)} bordered="none" />
+<List dataSource={basicData.slice(0, 2)} bordered="divided" />
+<List dataSource={basicData.slice(0, 2)} bordered="bordered" />`
+
+const splitSnippet = `<List dataSource={basicData.slice(0, 3)} bordered="divided" split />
+<List dataSource={basicData.slice(0, 3)} bordered="divided" split={false} />`
+
+const avatarSnippet = `<List dataSource={userData} />`
+
+const extraSnippet = `<List dataSource={extraData} />`
+
+const renderSnippet = `<List dataSource={productData} hoverable renderItem={(item) => (...)} />`
+
+const headerFooterSnippet = `<List dataSource={basicData} header={...} footer={...} />`
+
+const paginationSnippet = `<List
+  dataSource={largeData}
+  pagination={{ current: 1, pageSize: 10, showSizeChanger: true, showTotal: true }}
+  onPageChange={(page) => setPageInfo(page)}
+/>`
+
+const gridSnippet = `<List
+  dataSource={gridData}
+  grid={{ gutter: 16, column: 3, xs: 1, sm: 2, md: 3 }}
+  bordered="none"
+  renderItem={(item) => (...)}
+/>`
+
+const loadingSnippet = `<List dataSource={basicData} loading={loading} />`
+
+const emptySnippet = `<List dataSource={[]} emptyText="暂无数据" />`
+
+const clickableSnippet = `<List dataSource={basicData} hoverable onItemClick={handleItemClick} />`
 
 export default function ListDemo() {
   type DemoItem = NonNullable<ListProps['dataSource']>[number]
@@ -101,20 +142,13 @@ export default function ListDemo() {
         <p className="text-gray-600">通用列表组件，用于展示一系列相似的数据项。</p>
       </div>
 
-      {/* 基本用法 */}
-      <section className="mb-12" id="basic">
-        <h2 className="text-2xl font-bold mb-4">基本用法</h2>
-        <p className="text-gray-600 mb-6">最简单的列表展示。</p>
+      <DemoBlock title="基本用法" description="最简单的列表展示。" code={basicSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List dataSource={basicData} />
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 尺寸 */}
-      <section className="mb-12" id="size">
-        <h2 className="text-2xl font-bold mb-4">列表尺寸</h2>
-        <p className="text-gray-600 mb-6">列表支持三种尺寸：小、中、大。</p>
+      <DemoBlock title="列表尺寸" description="列表支持三种尺寸：小、中、大。" code={sizeSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" size={16} className="w-full">
             <div>
@@ -131,13 +165,9 @@ export default function ListDemo() {
             </div>
           </Space>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 边框样式 */}
-      <section className="mb-12" id="border">
-        <h2 className="text-2xl font-bold mb-4">边框样式</h2>
-        <p className="text-gray-600 mb-6">列表支持多种边框样式。</p>
+      <DemoBlock title="边框样式" description="列表支持多种边框样式。" code={borderSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" size={16} className="w-full">
             <div>
@@ -154,15 +184,12 @@ export default function ListDemo() {
             </div>
           </Space>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 分割线 */}
-      <section className="mb-12" id="split">
-        <h2 className="text-2xl font-bold mb-4">分割线（split）</h2>
-        <p className="text-gray-600 mb-6">
-          当 bordered="divided" 时，可通过 split 控制是否显示分割线。
-        </p>
+      <DemoBlock
+        title="分割线（split）"
+        description='当 bordered="divided" 时，可通过 split 控制是否显示分割线。'
+        code={splitSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -175,33 +202,27 @@ export default function ListDemo() {
             </div>
           </div>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 带头像的列表 */}
-      <section className="mb-12" id="avatar">
-        <h2 className="text-2xl font-bold mb-4">带头像的列表</h2>
-        <p className="text-gray-600 mb-6">列表项可以包含头像。</p>
+      <DemoBlock title="带头像的列表" description="列表项可以包含头像。" code={avatarSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List dataSource={userData} />
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 带额外内容 */}
-      <section className="mb-12" id="extra">
-        <h2 className="text-2xl font-bold mb-4">带额外内容</h2>
-        <p className="text-gray-600 mb-6">通过数据项的 extra 在右侧添加操作区。</p>
+      <DemoBlock
+        title="带额外内容"
+        description="通过数据项的 extra 在右侧添加操作区。"
+        code={extraSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List dataSource={extraData} />
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 自定义渲染 */}
-      <section className="mb-12" id="renderItem">
-        <h2 className="text-2xl font-bold mb-4">自定义列表项渲染</h2>
-        <p className="text-gray-600 mb-6">通过 renderItem 自定义每一项的布局。</p>
+      <DemoBlock
+        title="自定义列表项渲染"
+        description="通过 renderItem 自定义每一项的布局。"
+        code={renderSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List
             dataSource={productData}
@@ -231,13 +252,12 @@ export default function ListDemo() {
             }}
           />
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 头部和底部 */}
-      <section className="mb-12" id="headerFooter">
-        <h2 className="text-2xl font-bold mb-4">头部和底部</h2>
-        <p className="text-gray-600 mb-6">列表可以添加头部和底部内容。</p>
+      <DemoBlock
+        title="头部和底部"
+        description="列表可以添加头部和底部内容。"
+        code={headerFooterSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List
             dataSource={basicData}
@@ -250,13 +270,12 @@ export default function ListDemo() {
             footer={<p className="text-sm text-gray-500">共 {basicData.length} 条记录</p>}
           />
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 分页列表 */}
-      <section className="mb-12" id="pagination">
-        <h2 className="text-2xl font-bold mb-4">分页列表</h2>
-        <p className="text-gray-600 mb-6">当数据较多时，可以使用分页功能。</p>
+      <DemoBlock
+        title="分页列表"
+        description="当数据较多时，可以使用分页功能。"
+        code={paginationSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List
             dataSource={largeData}
@@ -275,13 +294,12 @@ export default function ListDemo() {
             当前：第 {pageInfo.current} 页，{pageInfo.pageSize} / 页
           </div>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 网格布局 */}
-      <section className="mb-12" id="grid">
-        <h2 className="text-2xl font-bold mb-4">网格布局</h2>
-        <p className="text-gray-600 mb-6">列表项可以以网格形式展示，支持响应式布局。</p>
+      <DemoBlock
+        title="网格布局"
+        description="列表项可以以网格形式展示，支持响应式布局。"
+        code={gridSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List
             dataSource={gridData}
@@ -306,41 +324,31 @@ export default function ListDemo() {
             }}
           />
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 加载状态 */}
-      <section className="mb-12" id="loading">
-        <h2 className="text-2xl font-bold mb-4">加载状态</h2>
-        <p className="text-gray-600 mb-6">列表支持加载状态。</p>
+      <DemoBlock title="加载状态" description="列表支持加载状态。" code={loadingSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" size={16} className="w-full">
             <Button onClick={simulateLoading}>{loading ? '加载中...' : '模拟加载'}</Button>
             <List dataSource={basicData} loading={loading} />
           </Space>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 空状态 */}
-      <section className="mb-12" id="empty">
-        <h2 className="text-2xl font-bold mb-4">空状态</h2>
-        <p className="text-gray-600 mb-6">当列表没有数据时显示空状态。</p>
+      <DemoBlock title="空状态" description="当列表没有数据时显示空状态。" code={emptySnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List dataSource={[]} emptyText="暂无数据" />
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 可点击列表 */}
-      <section className="mb-12" id="clickable">
-        <h2 className="text-2xl font-bold mb-4">可点击列表</h2>
-        <p className="text-gray-600 mb-6">列表项可以添加点击事件和悬停效果。</p>
+      <DemoBlock
+        title="可点击列表"
+        description="列表项可以添加点击事件和悬停效果。"
+        code={clickableSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List dataSource={basicData} hoverable onItemClick={handleItemClick} />
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
     </div>
   )
 }
