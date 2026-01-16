@@ -256,11 +256,17 @@ export default function TimelineDemo() {
         <p className="text-gray-600">垂直展示时间流信息的时间线组件，支持多种模式与自定义渲染。</p>
       </div>
 
-      <DemoBlock title="基本用法" description="通过 items 提供数据源即可渲染时间线。" code={basicSnippet}>
+      <DemoBlock
+        title="基本用法"
+        description="通过 items 提供数据源即可渲染时间线。"
+        code={basicSnippet}>
         <Timeline items={basicEvents} />
       </DemoBlock>
 
-      <DemoBlock title="展示模式" description="支持 left/right/alternate 三种展示模式。" code={modeSnippet}>
+      <DemoBlock
+        title="展示模式"
+        description="支持 left/right/alternate 三种展示模式。"
+        code={modeSnippet}>
         <div className="space-y-6">
           <div className="p-6 bg-gray-50 rounded-lg">
             <div className="text-lg font-semibold mb-4">左侧时间线（默认）</div>
@@ -277,11 +283,17 @@ export default function TimelineDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="自定义颜色" description="通过 item.color 设置时间点颜色。" code={colorSnippet}>
+      <DemoBlock
+        title="自定义颜色"
+        description="通过 item.color 设置时间点颜色。"
+        code={colorSnippet}>
         <Timeline items={coloredEvents} />
       </DemoBlock>
 
-      <DemoBlock title="自定义节点（dot）" description="通过 item.dot 为单个节点提供自定义内容。" code={dotSnippet}>
+      <DemoBlock
+        title="自定义节点（dot）"
+        description="通过 item.dot 为单个节点提供自定义内容。"
+        code={dotSnippet}>
         <Timeline items={customDotEvents} />
       </DemoBlock>
 
@@ -331,7 +343,7 @@ export default function TimelineDemo() {
 
       <DemoBlock
         title="等待中状态"
-        description='通过 pending/pendingDot/pendingContent 展示“处理中”状态。'
+        description="通过 pending/pendingDot/pendingContent 展示“处理中”状态。"
         code={pendingSnippet}>
         <div className="space-y-6">
           <div className="p-6 bg-gray-50 rounded-lg">
