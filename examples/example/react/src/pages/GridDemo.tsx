@@ -74,7 +74,10 @@ const GridDemo: React.FC = () => {
         <p className="text-gray-600">通过基础的 24 分栏，迅速简便地创建布局。</p>
       </div>
 
-      <DemoBlock title="基础栅格" description="使用单一分栏创建基础的栅格布局。" code={basicSnippet}>
+      <DemoBlock
+        title="基础栅格"
+        description="使用单一分栏创建基础的栅格布局。"
+        code={basicSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
             <Space direction="vertical" className="w-full">
@@ -263,7 +266,10 @@ const GridDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="列偏移" description="使用 offset 在 24 栅格内做留白与对齐。" code={offsetSnippet}>
+      <DemoBlock
+        title="列偏移"
+        description="使用 offset 在 24 栅格内做留白与对齐。"
+        code={offsetSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
             <Space direction="vertical" className="w-full">

@@ -41,10 +41,9 @@ const complexSnippet = `<Layout>
       <p class="text-gray-600">协助进行页面级整体布局。</p>
     </div>
 
-    <DemoBlock
-      title="Container 容器"
-      description="用于约束内容宽度并提供响应式内边距。"
-      :code="containerSnippet">
+    <DemoBlock title="Container 容器"
+               description="用于约束内容宽度并提供响应式内边距。"
+               :code="containerSnippet">
       <div class="bg-gray-50 rounded-lg py-6">
         <Container maxWidth="lg">
           <div class="bg-white border border-gray-200 rounded-lg p-4">
@@ -57,7 +56,9 @@ const complexSnippet = `<Layout>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="基础布局" description="典型的页面布局。" :code="basicSnippet">
+    <DemoBlock title="基础布局"
+               description="典型的页面布局。"
+               :code="basicSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[260px]">
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
@@ -67,12 +68,15 @@ const complexSnippet = `<Layout>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="侧边栏布局" description="带有侧边栏的布局。" :code="sidebarSnippet">
+    <DemoBlock title="侧边栏布局"
+               description="带有侧边栏的布局。"
+               :code="sidebarSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[260px]">
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
           <div class="flex flex-1">
-            <Sidebar width="192px" class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
+            <Sidebar width="192px"
+                     class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
             <Content class-name="!bg-white !p-4 min-h-[200px]">Content</Content>
           </div>
           <Footer class-name="!bg-gray-800 !text-white !p-4">Footer</Footer>
@@ -80,12 +84,15 @@ const complexSnippet = `<Layout>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="复杂布局" description="更复杂的页面布局。" :code="complexSnippet">
+    <DemoBlock title="复杂布局"
+               description="更复杂的页面布局。"
+               :code="complexSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Layout class-name="border border-gray-300 overflow-hidden min-h-[400px]">
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
           <div class="flex flex-1">
-            <Sidebar width="192px" class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
+            <Sidebar width="192px"
+                     class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
             <Layout class-name="min-h-0 flex-1">
               <Content class-name="!bg-white !p-4 min-h-[200px]">Content</Content>
               <Footer class-name="!bg-gray-100 !p-4">Inner Footer</Footer>
