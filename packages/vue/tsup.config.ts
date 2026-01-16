@@ -8,11 +8,11 @@ const componentEntries = readdirSync(componentsDir, { withFileTypes: true })
   .map((entry) => `src/components/${entry.name}`)
 
 export default defineConfig({
-  entry: ['src/index.ts', ...componentEntries],
-  format: ['cjs', 'esm'],
+  entry: ['src/index.ts', 'src/styles/index.css', ...componentEntries],
+  format: ['esm'],
   dts: true,
   clean: true,
   treeshake: true,
   splitting: true,
-  external: ['vue']
+  external: ['vue', 'tailwindcss']
 })
