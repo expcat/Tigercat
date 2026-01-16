@@ -48,7 +48,8 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 - `packages/react/`：React 组件实现
   - `packages/react/src/components/`：组件（PascalCase 文件名，例如 `Button.tsx`）
   - `packages/react/src/index.tsx`：对外导出（组件 + `type` 导出）
-- `docs/components/`：组件文档（kebab-case，例如 `button.md`）
+- `docs/components-vue.md`：Vue 组件总览（简要）
+- `docs/components-react.md`：React 组件总览（简要）
 - `tests/`：Vitest + Testing Library 测试（Vue/React 分目录）
 
 ## 决策指南（快速判断放哪）
@@ -67,7 +68,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 2. Vue：新增/修改组件文件，并在 `packages/vue/src/index.ts` 导出
 3. React：新增/修改组件文件，并在 `packages/react/src/index.tsx` 导出（需要时同时导出 `type Props`）
 4. Tests：至少补齐对应框架的单测；复杂组件补充 a11y/边界场景
-5. Docs：在 `docs/components/*.md` 补齐 API、示例、a11y 说明与主题定制说明
+5. Docs：在 `docs/components-vue.md` 与 `docs/components-react.md` 补齐简要描述与分组
 6. 进度文件：必要时更新 `ROADMAP.md`、测试清单（见 `tests/*CHECKLIST*.md`）
 
 ## 代码约定
@@ -103,7 +104,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 - Core utils：kebab-case（例如 `class-names.ts`、`button-utils.ts`）
 - Vue components：PascalCase + `.ts`（例如 `Button.ts`）
 - React components：PascalCase + `.tsx`（例如 `Button.tsx`）
-- Docs：kebab-case（例如 `button.md`）
+- Docs：kebab-case（例如 `components-vue.md`）
 
 ## Styling / Theme（必须支持主题）
 
@@ -188,4 +189,4 @@ export const MyComponent: React.FC<MyComponentProps> = ({
 ## 维护文档（何时更新）
 
 - 只有当出现“新的通用模式/约束/目录结构/测试约定”时才更新本文件。
-- 组件的具体 API 与示例应写在 `docs/components/*.md`，不要把实现细节塞进本文件。
+- 组件的简要说明与分组应写在 `docs/components-vue.md` 与 `docs/components-react.md`，不要把实现细节塞进本文件。

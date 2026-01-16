@@ -1,13 +1,10 @@
-# 主题配置 (Theme Configuration)
+# 主题配置
 
-Tigercat 支持通过 CSS 变量进行主题颜色配置，可以实时更改主题颜色而无需重新编译。
+Tigercat 使用 CSS 变量控制主题颜色。
 
-## 使用 CSS 变量
-
-### 在 CSS 文件中配置
+## CSS 变量（默认）
 
 ```css
-/* 默认主题 */
 :root {
   --tiger-primary: #2563eb;
   --tiger-primary-hover: #1d4ed8;
@@ -18,244 +15,26 @@ Tigercat 支持通过 CSS 变量进行主题颜色配置，可以实时更改主
   --tiger-outline-bg-hover: #eff6ff;
   --tiger-ghost-bg-hover: #eff6ff;
 }
-
-/* 深色主题 */
-.dark {
-  --tiger-primary: #60a5fa;
-  --tiger-primary-hover: #3b82f6;
-  --tiger-primary-disabled: #1e3a8a;
-  --tiger-outline-bg-hover: #1e3a8a;
-  --tiger-ghost-bg-hover: #1e3a8a;
-}
-
-/* 自定义主题 */
-.custom-theme {
-  --tiger-primary: #ff6b6b;
-  --tiger-primary-hover: #ee5a52;
-  --tiger-primary-disabled: #ffc9c9;
-}
 ```
 
-### 在 JavaScript/TypeScript 中配置
-
-#### React 示例
-
-```tsx
-import { useEffect } from 'react'
-import { Button, setThemeColors } from '@expcat/tigercat-react'
-
-function App() {
-  useEffect(() => {
-    // 设置主题颜色
-    setThemeColors({
-      primary: '#ff6b6b',
-      primaryHover: '#ee5a52',
-      primaryDisabled: '#ffc9c9'
-    })
-  }, [])
-
-  const switchToBlueTheme = () => {
-    setThemeColors({
-      primary: '#2563eb',
-      primaryHover: '#1d4ed8',
-      primaryDisabled: '#93c5fd'
-    })
-  }
-
-  const switchToGreenTheme = () => {
-    setThemeColors({
-      primary: '#10b981',
-      primaryHover: '#059669',
-      primaryDisabled: '#6ee7b7'
-    })
-  }
-
-  return (
-    <div>
-      <Button onClick={switchToBlueTheme}>蓝色主题</Button>
-      <Button onClick={switchToGreenTheme}>绿色主题</Button>
-      <Button variant="primary">Primary Button</Button>
-    </div>
-  )
-}
-```
-
-#### Vue 3 示例
-
-```vue
-<script setup>
-import { onMounted } from 'vue'
-import { Button, setThemeColors } from '@expcat/tigercat-vue'
-
-onMounted(() => {
-  // 设置主题颜色
-  setThemeColors({
-    primary: '#ff6b6b',
-    primaryHover: '#ee5a52',
-    primaryDisabled: '#ffc9c9'
-  })
-})
-
-const switchToBlueTheme = () => {
-  setThemeColors({
-    primary: '#2563eb',
-    primaryHover: '#1d4ed8',
-    primaryDisabled: '#93c5fd'
-  })
-}
-
-const switchToGreenTheme = () => {
-  setThemeColors({
-    primary: '#10b981',
-    primaryHover: '#059669',
-    primaryDisabled: '#6ee7b7'
-  })
-}
-</script>
-
-<template>
-  <div>
-    <Button @click="switchToBlueTheme">蓝色主题</Button>
-    <Button @click="switchToGreenTheme">绿色主题</Button>
-    <Button variant="primary">Primary Button</Button>
-  </div>
-</template>
-```
-
-## 可用的 CSS 变量
-
-| CSS 变量                     | 说明                 | 默认值    |
-| ---------------------------- | -------------------- | --------- |
-| `--tiger-primary`            | 主色                 | `#2563eb` |
-| `--tiger-primary-hover`      | 主色悬停             | `#1d4ed8` |
-| `--tiger-primary-disabled`   | 主色禁用             | `#93c5fd` |
-| `--tiger-secondary`          | 次要颜色             | `#4b5563` |
-| `--tiger-secondary-hover`    | 次要颜色悬停         | `#374151` |
-| `--tiger-secondary-disabled` | 次要颜色禁用         | `#9ca3af` |
-| `--tiger-outline-bg-hover`   | Outline 按钮悬停背景 | `#eff6ff` |
-| `--tiger-ghost-bg-hover`     | Ghost 按钮悬停背景   | `#eff6ff` |
-
-## API 参考
+## JS/TS API
 
 ### `setThemeColors(colors, element?)`
 
-设置主题颜色。
+- 作用：设置主题色
+- `colors`：颜色键值
+- `element`：目标元素（默认 `document.documentElement`）
 
-**参数：**
-
-- `colors`: `Partial<Record<keyof typeof THEME_CSS_VARS, string>>` - 要设置的颜色对象
-- `element`: `HTMLElement` (可选) - 要设置颜色的元素，默认为 `document.documentElement`
-
-**示例：**
-
-```typescript
-// 设置全局主题颜色
-setThemeColors({
-  primary: '#ff0000',
-  primaryHover: '#cc0000'
-})
-
-// 设置特定容器的主题颜色
-const container = document.querySelector('.my-container')
-setThemeColors(
-  {
-    primary: '#00ff00'
-  },
-  container
-)
+```ts
+setThemeColors({ primary: '#ff0000', primaryHover: '#cc0000' })
 ```
 
 ### `getThemeColor(colorKey, element?)`
 
-获取当前主题颜色值。
+- 作用：读取主题色
 
-**参数：**
-
-- `colorKey`: `keyof typeof THEME_CSS_VARS` - 颜色键名
-- `element`: `HTMLElement` (可选) - 要获取颜色的元素，默认为 `document.documentElement`
-
-**返回：** `string | undefined` - 当前颜色值
-
-**示例：**
-
-```typescript
-import { getThemeColor } from '@expcat/tigercat-core'
-
-const primaryColor = getThemeColor('primary')
-console.log(primaryColor) // '#2563eb'
-```
-
-## 高级用法
-
-### 针对特定容器的主题
-
-```tsx
-import { useEffect, useRef } from 'react'
-import { Button, setThemeColors } from '@expcat/tigercat-react'
-
-function ThemedContainer() {
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (containerRef.current) {
-      // 为这个容器设置独立的主题
-      setThemeColors(
-        {
-          primary: '#ff6b6b',
-          primaryHover: '#ee5a52'
-        },
-        containerRef.current
-      )
-    }
-  }, [])
-
-  return (
-    <div ref={containerRef}>
-      <Button variant="primary">这个按钮使用自定义主题</Button>
-    </div>
-  )
-}
-```
-
-### 响应系统主题切换
-
-```tsx
-import { useEffect } from 'react'
-import { setThemeColors } from '@expcat/tigercat-react'
-
-function useSystemTheme() {
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-
-    const updateTheme = (e: MediaQueryListEvent | MediaQueryList) => {
-      if (e.matches) {
-        // 深色主题
-        setThemeColors({
-          primary: '#60a5fa',
-          primaryHover: '#3b82f6',
-          outlineBgHover: '#1e3a8a'
-        })
-      } else {
-        // 浅色主题
-        setThemeColors({
-          primary: '#2563eb',
-          primaryHover: '#1d4ed8',
-          outlineBgHover: '#eff6ff'
-        })
-      }
-    }
-
-    // 初始设置
-    updateTheme(mediaQuery)
-
-    // 监听变化
-    mediaQuery.addEventListener('change', updateTheme)
-
-    return () => {
-      mediaQuery.removeEventListener('change', updateTheme)
-    }
-  }, [])
-}
+```ts
+const primary = getThemeColor('primary')
 ```
 
 ## 暗色模式 (Dark Mode)
