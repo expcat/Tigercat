@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Modal, Button, Space, Input } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
@@ -34,6 +34,13 @@ const noCloseSnippet = `<Modal closable={false} title="无关闭按钮">...</Mod
 const scenarioSnippet = `<Button variant="outline">删除确认</Button>
 <Button>查看详情</Button>
 <Button>编辑资料</Button>`
+
+const infoParagraphs = Array.from({ length: 14 }).map((_, index) => (
+  <p key={index} className={index === 0 ? '' : 'mt-2'}>
+    这是一段用于演示滚动内容的示例文本（第 {index + 1} 段）。当内容较长时，Modal
+    仍应保持良好的可读性与滚动体验。
+  </p>
+))
 
 export default function ModalDemo() {
   const [visible1, setVisible1] = useState(false)
@@ -72,17 +79,6 @@ export default function ModalDemo() {
     console.log('Cancel clicked')
     setVisible1(false)
   }
-
-  const infoParagraphs = useMemo(
-    () =>
-      Array.from({ length: 14 }).map((_, index) => (
-        <p key={index} className={index === 0 ? '' : 'mt-2'}>
-          这是一段用于演示滚动内容的示例文本（第 {index + 1} 段）。当内容较长时，Modal
-          仍应保持良好的可读性与滚动体验。
-        </p>
-      )),
-    []
-  )
 
   const handleConfirmDelete = async () => {
     if (confirmLoading) return

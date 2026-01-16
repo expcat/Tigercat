@@ -1,6 +1,8 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { Select } from '@expcat/tigercat-react'
 import { DEMO_LANG_OPTIONS, type DemoLang } from '@demo-shared/app-config'
+
+const languageOptions = DEMO_LANG_OPTIONS.map((o) => ({ label: o.label, value: o.value }))
 
 export interface LanguageSwitchProps {
   value: DemoLang
@@ -8,11 +10,6 @@ export interface LanguageSwitchProps {
 }
 
 export const LanguageSwitch: React.FC<LanguageSwitchProps> = ({ value, onChange }) => {
-  const options = useMemo(
-    () => DEMO_LANG_OPTIONS.map((o) => ({ label: o.label, value: o.value })),
-    []
-  )
-
   const handleChange = (next: string | number | (string | number)[] | undefined) => {
     const v = Array.isArray(next) ? next[0] : next
     if (v === 'zh-CN' || v === 'en-US') onChange(v)
@@ -26,7 +23,7 @@ export const LanguageSwitch: React.FC<LanguageSwitchProps> = ({ value, onChange 
       <Select
         value={value}
         onChange={handleChange}
-        options={options}
+        options={languageOptions}
         size="sm"
         className="w-28 max-w-full"
       />

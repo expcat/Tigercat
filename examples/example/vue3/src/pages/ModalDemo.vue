@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { Modal, Button, Space, Input } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
@@ -74,10 +74,8 @@ const handleCancel = () => {
   visible1.value = false
 }
 
-const infoParagraphs = computed(() => {
-  return Array.from({ length: 14 }).map((_, index) => {
-    return `这是一段用于演示滚动内容的示例文本（第 ${index + 1} 段）。当内容较长时，Modal 仍应保持良好的可读性与滚动体验。`
-  })
+const infoParagraphs = Array.from({ length: 14 }).map((_, index) => {
+  return `这是一段用于演示滚动内容的示例文本（第 ${index + 1} 段）。当内容较长时，Modal 仍应保持良好的可读性与滚动体验。`
 })
 
 const handleConfirmDelete = async () => {
