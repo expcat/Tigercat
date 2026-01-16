@@ -148,55 +148,84 @@ const blockSnippet = `<p class="text-sm text-gray-600 mb-4">节点占据整行�
       键盘：方向键移动焦点，Enter 选择，Space 勾选，Escape 收拢。
     </p>
 
-    <DemoBlock title="基本用法" description="基础树形结构展示。" :code="basicSnippet">
-      <Tree :treeData="basicTreeData" ariaLabel="Tree 基本用法" />
+    <DemoBlock title="基本用法"
+               description="基础树形结构展示。"
+               :code="basicSnippet">
+      <Tree :treeData="basicTreeData"
+            ariaLabel="Tree 基本用法" />
     </DemoBlock>
 
-    <DemoBlock title="默认展开所有节点" description="初始展开全部节点。" :code="expandAllSnippet">
-      <Tree :treeData="basicTreeData" defaultExpandAll />
+    <DemoBlock title="默认展开所有节点"
+               description="初始展开全部节点。"
+               :code="expandAllSnippet">
+      <Tree :treeData="basicTreeData"
+            defaultExpandAll />
     </DemoBlock>
 
-    <DemoBlock title="可选择的树" description="支持选择节点并回显选中结果。" :code="selectableSnippet">
+    <DemoBlock title="可选择的树"
+               description="支持选择节点并回显选中结果。"
+               :code="selectableSnippet">
       <p class="text-sm text-gray-600 mb-4">已选择: {{ selectedKeys.join(', ') }}</p>
-      <Tree :treeData="basicTreeData" selectable v-model:selectedKeys="selectedKeys" />
+      <Tree :treeData="basicTreeData"
+            selectable
+            v-model:selectedKeys="selectedKeys" />
     </DemoBlock>
 
-    <DemoBlock title="多选树（级联）" description="勾选节点时父子联动。" :code="checkableSnippet">
+    <DemoBlock title="多选树（级联）"
+               description="勾选节点时父子联动。"
+               :code="checkableSnippet">
       <p class="text-sm text-gray-600 mb-4">已勾选: {{ checkedKeys.join(', ') }}</p>
-      <Tree
-        :treeData="basicTreeData"
-        checkable
-        defaultExpandAll
-        v-model:checkedKeys="checkedKeys" />
+      <Tree :treeData="basicTreeData"
+            checkable
+            defaultExpandAll
+            v-model:checkedKeys="checkedKeys" />
     </DemoBlock>
 
-    <DemoBlock title="多选树（父子独立）" description="父子节点勾选状态相互独立。" :code="checkStrictlySnippet">
+    <DemoBlock title="多选树（父子独立）"
+               description="父子节点勾选状态相互独立。"
+               :code="checkStrictlySnippet">
       <p class="text-sm text-gray-600 mb-4">已勾选: {{ checkedKeysStrictly.join(', ') }}</p>
-      <Tree
-        :treeData="basicTreeData"
-        checkable
-        checkStrictly
-        defaultExpandAll
-        v-model:checkedKeys="checkedKeysStrictly" />
+      <Tree :treeData="basicTreeData"
+            checkable
+            checkStrictly
+            defaultExpandAll
+            v-model:checkedKeys="checkedKeysStrictly" />
     </DemoBlock>
 
-    <DemoBlock title="禁用节点" description="为特定节点设置禁用状态。" :code="disabledSnippet">
-      <Tree :treeData="disabledTreeData" checkable defaultExpandAll />
+    <DemoBlock title="禁用节点"
+               description="为特定节点设置禁用状态。"
+               :code="disabledSnippet">
+      <Tree :treeData="disabledTreeData"
+            checkable
+            defaultExpandAll />
     </DemoBlock>
 
-    <DemoBlock title="懒加载" description="展开节点时动态加载子节点。" :code="lazySnippet">
+    <DemoBlock title="懒加载"
+               description="展开节点时动态加载子节点。"
+               :code="lazySnippet">
       <p class="text-sm text-gray-600 mb-4">点击节点展开，动态加载子节点</p>
-      <Tree :treeData="lazyTreeData" :loadData="loadChildren" />
+      <Tree :treeData="lazyTreeData"
+            :loadData="loadChildren" />
     </DemoBlock>
 
-    <DemoBlock title="节点过滤" description="根据关键字过滤节点。" :code="filterSnippet">
-      <Input v-model="filterValue" placeholder="搜索节点..." class="mb-4" />
-      <Tree :treeData="filterTreeData" :filterValue="filterValue" ariaLabel="Tree 节点过滤" />
+    <DemoBlock title="节点过滤"
+               description="根据关键字过滤节点。"
+               :code="filterSnippet">
+      <Input v-model="filterValue"
+             placeholder="搜索节点..."
+             class="mb-4" />
+      <Tree :treeData="filterTreeData"
+            :filterValue="filterValue"
+            ariaLabel="Tree 节点过滤" />
     </DemoBlock>
 
-    <DemoBlock title="Block 节点" description="节点占据整行宽度。" :code="blockSnippet">
+    <DemoBlock title="Block 节点"
+               description="节点占据整行宽度。"
+               :code="blockSnippet">
       <p class="text-sm text-gray-600 mb-4">节点占据整行宽度</p>
-      <Tree :treeData="basicTreeData" blockNode defaultExpandAll />
+      <Tree :treeData="basicTreeData"
+            blockNode
+            defaultExpandAll />
     </DemoBlock>
   </div>
 </template>

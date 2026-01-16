@@ -173,7 +173,10 @@ export default function TreeDemo() {
         <Tree treeData={basicTreeData} defaultExpandAll />
       </DemoBlock>
 
-      <DemoBlock title="可选择的树" description="支持选择节点并回显选中结果。" code={selectableSnippet}>
+      <DemoBlock
+        title="可选择的树"
+        description="支持选择节点并回显选中结果。"
+        code={selectableSnippet}>
         <p className="text-sm text-gray-600 mb-4">已选择: {selectedKeys.join(', ')}</p>
         <Tree
           treeData={basicTreeData}
@@ -194,7 +197,10 @@ export default function TreeDemo() {
         />
       </DemoBlock>
 
-      <DemoBlock title="多选树（父子独立）" description="父子节点勾选状态相互独立。" code={checkStrictlySnippet}>
+      <DemoBlock
+        title="多选树（父子独立）"
+        description="父子节点勾选状态相互独立。"
+        code={checkStrictlySnippet}>
         <p className="text-sm text-gray-600 mb-4">已勾选: {checkedKeysStrictly.join(', ')}</p>
         <Tree
           treeData={basicTreeData}
