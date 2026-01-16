@@ -44,7 +44,7 @@
 ### 执行逻辑
 
 1. 安装依赖并构建：`pnpm build`
-2. `pnpm release` 发布
+2. 发布到 npm：`pnpm -r --filter "./packages/**" publish --access public --no-git-checks --tag latest`
 
 ## 常见配置项
 
