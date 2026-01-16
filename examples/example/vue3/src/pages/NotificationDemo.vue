@@ -1,6 +1,40 @@
 <script setup lang="ts">
-import { notification, Divider, Button } from '@expcat/tigercat-vue'
+import { notification, Button } from '@expcat/tigercat-vue'
 import { ref } from 'vue'
+import DemoBlock from '../components/DemoBlock.vue'
+
+const basicSnippet = `<Button @click="showInfo">信息</Button>
+<Button @click="showSuccess">成功</Button>
+<Button @click="showWarning">警告</Button>
+<Button @click="showError">错误</Button>`
+
+const positionSnippet = `<Button @click="showTopLeft">左上角</Button>
+<Button @click="showTopRight">右上角</Button>
+<Button @click="showBottomLeft">左下角</Button>
+<Button @click="showBottomRight">右下角</Button>`
+
+const durationSnippet = `<Button @click="showShortNotification">短时间</Button>
+<Button @click="showLongNotification">长时间</Button>
+<Button @click="showPersistentNotification">不自动关闭</Button>`
+
+const closableSnippet = `<Button @click="showClosableNotification">可关闭</Button>
+<Button @click="showNonClosableNotification">不可关闭</Button>`
+
+const manualSnippet = `<Button @click="showNotification">显示通知</Button>
+<Button @click="closeManually">手动关闭</Button>
+<Button @click="simulateRequest">模拟请求</Button>`
+
+const callbackSnippet = `<Button @click="showClickableNotification">可点击通知</Button>
+<Button @click="showNotificationWithCallback">带回调通知</Button>`
+
+const clearSnippet = `<Button @click="showMultipleNotifications">显示多条通知</Button>
+<Button @click="clearAll">清空所有</Button>
+<Button @click="clearTopRight">清空右上角</Button>`
+
+const quickSnippet = `<Button @click="quickInfo">快速信息</Button>
+<Button @click="quickSuccess">快速成功</Button>
+<Button @click="quickWarning">快速警告</Button>
+<Button @click="quickError">快速错误</Button>`
 
 const closeNotificationRef = ref<(() => void) | null>(null)
 
@@ -219,199 +253,160 @@ const quickError = () => {
       <p class="text-gray-600">全局显示通知提示信息，支持多种展示位置、关闭与定时消失。</p>
     </div>
 
-    <Divider />
-
-    <!-- 基本类型 -->
-    <div>
-      <h2 class="text-lg font-semibold mb-4">基本类型</h2>
+    <DemoBlock title="基本类型"
+               description="展示四种基础通知类型。"
+               :code="basicSnippet">
       <div class="flex flex-wrap gap-2">
-        <Button
-          @click="showInfo"
-          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        <Button @click="showInfo"
+                class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
           信息
         </Button>
-        <Button
-          @click="showSuccess"
-          class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+        <Button @click="showSuccess"
+                class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
           成功
         </Button>
-        <Button
-          @click="showWarning"
-          class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+        <Button @click="showWarning"
+                class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
           警告
         </Button>
-        <Button @click="showError" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+        <Button @click="showError"
+                class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
           错误
         </Button>
       </div>
-    </div>
+    </DemoBlock>
 
-    <Divider />
-
-    <!-- 不同位置 -->
-    <div>
-      <h2 class="text-lg font-semibold mb-4">不同位置</h2>
+    <DemoBlock title="不同位置"
+               description="支持在四个角落显示通知。"
+               :code="positionSnippet">
       <div class="flex flex-wrap gap-2">
-        <Button
-          @click="showTopLeft"
-          class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
+        <Button @click="showTopLeft"
+                class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
           左上角
         </Button>
-        <Button
-          @click="showTopRight"
-          class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
+        <Button @click="showTopRight"
+                class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
           右上角
         </Button>
-        <Button
-          @click="showBottomLeft"
-          class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
+        <Button @click="showBottomLeft"
+                class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
           左下角
         </Button>
-        <Button
-          @click="showBottomRight"
-          class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
+        <Button @click="showBottomRight"
+                class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">
           右下角
         </Button>
       </div>
-    </div>
+    </DemoBlock>
 
-    <Divider />
-
-    <!-- 自定义持续时间 -->
-    <div>
-      <h2 class="text-lg font-semibold mb-4">自定义持续时间</h2>
+    <DemoBlock title="自定义持续时间"
+               description="通过 duration 设置自动关闭时间。"
+               :code="durationSnippet">
       <div class="flex flex-wrap gap-2">
-        <Button
-          @click="showShortNotification"
-          class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
+        <Button @click="showShortNotification"
+                class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
           短时间（2秒）
         </Button>
-        <Button
-          @click="showLongNotification"
-          class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
+        <Button @click="showLongNotification"
+                class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
           长时间（10秒）
         </Button>
-        <Button
-          @click="showPersistentNotification"
-          class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
+        <Button @click="showPersistentNotification"
+                class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
           不自动关闭
         </Button>
       </div>
-    </div>
+    </DemoBlock>
 
-    <Divider />
-
-    <!-- 可关闭性 -->
-    <div>
-      <h2 class="text-lg font-semibold mb-4">可关闭性</h2>
+    <DemoBlock title="可关闭性"
+               description="控制通知是否显示关闭按钮。"
+               :code="closableSnippet">
       <div class="flex flex-wrap gap-2">
-        <Button
-          @click="showClosableNotification"
-          class="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600">
+        <Button @click="showClosableNotification"
+                class="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600">
           可关闭
         </Button>
-        <Button
-          @click="showNonClosableNotification"
-          class="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600">
+        <Button @click="showNonClosableNotification"
+                class="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600">
           不可关闭
         </Button>
       </div>
-    </div>
+    </DemoBlock>
 
-    <Divider />
-
-    <!-- 手动控制 -->
-    <div>
-      <h2 class="text-lg font-semibold mb-4">手动控制</h2>
+    <DemoBlock title="手动控制"
+               description="保存关闭函数实现手动关闭或模拟流程。"
+               :code="manualSnippet">
       <div class="flex flex-wrap gap-2">
-        <Button
-          @click="showNotification"
-          class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
+        <Button @click="showNotification"
+                class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
           显示通知
         </Button>
-        <Button
-          @click="closeManually"
-          class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
+        <Button @click="closeManually"
+                class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
           手动关闭
         </Button>
-        <Button
-          @click="simulateRequest"
-          class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
+        <Button @click="simulateRequest"
+                class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
           模拟请求
         </Button>
       </div>
-    </div>
+    </DemoBlock>
 
-    <Divider />
-
-    <!-- 点击和回调 -->
-    <div>
-      <h2 class="text-lg font-semibold mb-4">点击和回调</h2>
+    <DemoBlock title="点击和回调"
+               description="支持点击与关闭回调。"
+               :code="callbackSnippet">
       <div class="flex flex-wrap gap-2">
-        <Button
-          @click="showClickableNotification"
-          class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600">
+        <Button @click="showClickableNotification"
+                class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600">
           可点击通知
         </Button>
-        <Button
-          @click="showNotificationWithCallback"
-          class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600">
+        <Button @click="showNotificationWithCallback"
+                class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600">
           带回调通知
         </Button>
       </div>
-    </div>
+    </DemoBlock>
 
-    <Divider />
-
-    <!-- 清空通知 -->
-    <div>
-      <h2 class="text-lg font-semibold mb-4">清空通知</h2>
+    <DemoBlock title="清空通知"
+               description="按位置或全部清空通知。"
+               :code="clearSnippet">
       <div class="flex flex-wrap gap-2">
-        <Button
-          @click="showMultipleNotifications"
-          class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+        <Button @click="showMultipleNotifications"
+                class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
           显示多条通知
         </Button>
-        <Button
-          @click="clearAll"
-          class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+        <Button @click="clearAll"
+                class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
           清空所有
         </Button>
-        <Button
-          @click="clearTopRight"
-          class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+        <Button @click="clearTopRight"
+                class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
           清空右上角
         </Button>
       </div>
-    </div>
+    </DemoBlock>
 
-    <Divider />
-
-    <!-- 快速使用 -->
-    <div>
-      <h2 class="text-lg font-semibold mb-4">快速使用（仅标题）</h2>
+    <DemoBlock title="快速使用（仅标题）"
+               description="仅传入标题的快捷写法。"
+               :code="quickSnippet">
       <div class="flex flex-wrap gap-2">
-        <Button
-          @click="quickInfo"
-          class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600">
+        <Button @click="quickInfo"
+                class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600">
           快速信息
         </Button>
-        <Button
-          @click="quickSuccess"
-          class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600">
+        <Button @click="quickSuccess"
+                class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600">
           快速成功
         </Button>
-        <Button
-          @click="quickWarning"
-          class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600">
+        <Button @click="quickWarning"
+                class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600">
           快速警告
         </Button>
-        <Button
-          @click="quickError"
-          class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600">
+        <Button @click="quickError"
+                class="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600">
           快速错误
         </Button>
       </div>
-    </div>
+    </DemoBlock>
   </div>
 </template>

@@ -1,5 +1,39 @@
 import { useRef } from 'react'
-import { notification, Divider, Button } from '@expcat/tigercat-react'
+import { notification, Button } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
+
+const basicSnippet = `<Button onClick={showInfo}>信息</Button>
+<Button onClick={showSuccess}>成功</Button>
+<Button onClick={showWarning}>警告</Button>
+<Button onClick={showError}>错误</Button>`
+
+const positionSnippet = `<Button onClick={showTopLeft}>左上角</Button>
+<Button onClick={showTopRight}>右上角</Button>
+<Button onClick={showBottomLeft}>左下角</Button>
+<Button onClick={showBottomRight}>右下角</Button>`
+
+const durationSnippet = `<Button onClick={showShortNotification}>短时间</Button>
+<Button onClick={showLongNotification}>长时间</Button>
+<Button onClick={showPersistentNotification}>不自动关闭</Button>`
+
+const closableSnippet = `<Button onClick={showClosableNotification}>可关闭</Button>
+<Button onClick={showNonClosableNotification}>不可关闭</Button>`
+
+const manualSnippet = `<Button onClick={showNotification}>显示通知</Button>
+<Button onClick={closeManually}>手动关闭</Button>
+<Button onClick={simulateRequest}>模拟请求</Button>`
+
+const callbackSnippet = `<Button onClick={showClickableNotification}>可点击通知</Button>
+<Button onClick={showNotificationWithCallback}>带回调通知</Button>`
+
+const clearSnippet = `<Button onClick={showMultipleNotifications}>显示多条通知</Button>
+<Button onClick={clearAll}>清空所有</Button>
+<Button onClick={clearTopRight}>清空右上角</Button>`
+
+const quickSnippet = `<Button onClick={quickInfo}>快速信息</Button>
+<Button onClick={quickSuccess}>快速成功</Button>
+<Button onClick={quickWarning}>快速警告</Button>
+<Button onClick={quickError}>快速错误</Button>`
 
 export default function NotificationDemo() {
   const closeNotificationRef = useRef<(() => void) | null>(null)
@@ -218,11 +252,7 @@ export default function NotificationDemo() {
         <p className="text-gray-600">全局显示通知提示信息，支持多种展示位置、关闭与定时消失。</p>
       </div>
 
-      <Divider />
-
-      {/* 基本类型 */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">基本类型</h2>
+      <DemoBlock title="基本类型" description="展示四种基础通知类型。" code={basicSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showInfo}
@@ -245,13 +275,9 @@ export default function NotificationDemo() {
             错误
           </Button>
         </div>
-      </div>
+      </DemoBlock>
 
-      <Divider />
-
-      {/* 不同位置 */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">不同位置</h2>
+      <DemoBlock title="不同位置" description="支持在四个角落显示通知。" code={positionSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showTopLeft}
@@ -274,13 +300,12 @@ export default function NotificationDemo() {
             右下角
           </Button>
         </div>
-      </div>
+      </DemoBlock>
 
-      <Divider />
-
-      {/* 自定义持续时间 */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">自定义持续时间</h2>
+      <DemoBlock
+        title="自定义持续时间"
+        description="通过 duration 设置自动关闭时间。"
+        code={durationSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showShortNotification}
@@ -298,13 +323,9 @@ export default function NotificationDemo() {
             不自动关闭
           </Button>
         </div>
-      </div>
+      </DemoBlock>
 
-      <Divider />
-
-      {/* 可关闭性 */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">可关闭性</h2>
+      <DemoBlock title="可关闭性" description="控制通知是否显示关闭按钮。" code={closableSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showClosableNotification}
@@ -317,13 +338,12 @@ export default function NotificationDemo() {
             不可关闭
           </Button>
         </div>
-      </div>
+      </DemoBlock>
 
-      <Divider />
-
-      {/* 手动控制 */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">手动控制</h2>
+      <DemoBlock
+        title="手动控制"
+        description="保存关闭函数实现手动关闭或模拟流程。"
+        code={manualSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showNotification}
@@ -341,13 +361,9 @@ export default function NotificationDemo() {
             模拟请求
           </Button>
         </div>
-      </div>
+      </DemoBlock>
 
-      <Divider />
-
-      {/* 点击和回调 */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">点击和回调</h2>
+      <DemoBlock title="点击和回调" description="支持点击与关闭回调。" code={callbackSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showClickableNotification}
@@ -360,13 +376,9 @@ export default function NotificationDemo() {
             带回调通知
           </Button>
         </div>
-      </div>
+      </DemoBlock>
 
-      <Divider />
-
-      {/* 清空通知 */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">清空通知</h2>
+      <DemoBlock title="清空通知" description="按位置或全部清空通知。" code={clearSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={showMultipleNotifications}
@@ -384,13 +396,12 @@ export default function NotificationDemo() {
             清空右上角
           </Button>
         </div>
-      </div>
+      </DemoBlock>
 
-      <Divider />
-
-      {/* 快速使用 */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">快速使用（仅标题）</h2>
+      <DemoBlock
+        title="快速使用（仅标题）"
+        description="仅传入标题的快捷写法。"
+        code={quickSnippet}>
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={quickInfo}
@@ -413,7 +424,7 @@ export default function NotificationDemo() {
             快速错误
           </Button>
         </div>
-      </div>
+      </DemoBlock>
     </div>
   )
 }
