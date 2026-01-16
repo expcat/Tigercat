@@ -1,0 +1,59 @@
+name: Publish to NPM
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.26.2
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update version from tag and commit
+        run: |
+          set -e
+          TAG_NAME=$(git describe --tags --abbrev=0)
+          VERSION=${TAG_NAME#v}
+          
+          pnpm -r --filter "./packages/**" exec pnpm version $VERSION --no-git-tag-version
+          
+          git add packages/*/package.json
+          git commit -m "chore(release): update version to $VERSION" || echo "No changes to commit"
+
+
+      - name: Publish to NPM
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+        run: |
+          pnpm -r --filter "./packages/**" publish --no-git-checks --access public
+
