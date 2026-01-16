@@ -44,6 +44,14 @@ export function App() {
 }
 ```
 
+在项目的 CSS 文件中加入以下内容（放在业务样式之前）：
+
+```css
+@import 'tailwindcss';
+@source '../node_modules/@expcat/tigercat-react/dist/**/*.{js,mjs}';
+@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
+```
+
 ## 安装依赖
 
 在项目根目录运行：

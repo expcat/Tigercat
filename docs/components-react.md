@@ -16,7 +16,18 @@ export function App() {
 }
 ```
 
+**样式入口（必需）**
+
+在项目的 CSS 文件中加入以下内容（放在业务样式之前）：
+
+```css
+@import 'tailwindcss';
+@source '../node_modules/@expcat/tigercat-react/dist/**/*.{js,mjs}';
+@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
+```
+
 - 组件名使用 PascalCase（如 `Button`、`DatePicker`）。
+- 事件使用 camelCase（如 `onClick`、`onChange`）。
 - 事件使用 camelCase（如 `onClick`、`onChange`）。
 
 ### 按需样式（Tailwind content 配置）
