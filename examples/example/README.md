@@ -22,6 +22,16 @@ pnpm dev
 
 The example will be available at `http://localhost:5173`
 
+### Required CSS (after importing Tigercat)
+
+Add the following to your project CSS (before your app styles):
+
+```css
+@import 'tailwindcss';
+@source '../node_modules/@expcat/tigercat-vue/dist/**/*.{js,mjs}';
+@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
+```
+
 ### Building for Production
 
 ```bash
@@ -40,6 +50,16 @@ pnpm dev
 ```
 
 The example will be available at `http://localhost:5174`
+
+### Required CSS (after importing Tigercat)
+
+Add the following to your project CSS (before your app styles):
+
+```css
+@import 'tailwindcss';
+@source '../node_modules/@expcat/tigercat-react/dist/**/*.{js,mjs}';
+@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
+```
 
 ### Building for Production
 

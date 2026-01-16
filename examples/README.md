@@ -36,6 +36,26 @@ A comprehensive React example showcasing Tigercat components with TypeScript and
 
 ## 快速开始
 
+### 样式入口（必需）
+
+在引用 `@expcat/tigercat-vue` 或 `@expcat/tigercat-react` 后，需要在项目的 CSS 文件中加入以下内容（放在业务样式之前）：
+
+**Vue 3**
+
+```css
+@import 'tailwindcss';
+@source '../node_modules/@expcat/tigercat-vue/dist/**/*.{js,mjs}';
+@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
+```
+
+**React**
+
+```css
+@import 'tailwindcss';
+@source '../node_modules/@expcat/tigercat-react/dist/**/*.{js,mjs}';
+@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
+```
+
 ### 安装依赖
 
 在项目根目录运行：

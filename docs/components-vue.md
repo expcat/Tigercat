@@ -16,7 +16,18 @@ import { Button, ConfigProvider } from '@expcat/tigercat-vue'
 </template>
 ```
 
+**样式入口（必需）**
+
+在项目的 CSS 文件中加入以下内容（放在业务样式之前）：
+
+```css
+@import 'tailwindcss';
+@source '../node_modules/@expcat/tigercat-vue/dist/**/*.{js,mjs}';
+@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
+```
+
 - 组件名使用 PascalCase（如 `Button`、`DatePicker`）。
+- 事件采用 kebab-case（如 `@click`、`@change`）。
 - 事件采用 kebab-case（如 `@click`、`@change`）。
 
 ### 按需样式（Tailwind content 配置）
