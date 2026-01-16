@@ -39,6 +39,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build packages
+        run: pnpm build
+
       - name: Build Vue example
         run: pnpm --filter @expcat/tigercat-example-vue3 build
 
