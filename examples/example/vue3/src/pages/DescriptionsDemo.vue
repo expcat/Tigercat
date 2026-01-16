@@ -1,5 +1,29 @@
 <script setup lang="ts">
-import { Button, Descriptions, Divider } from '@expcat/tigercat-vue'
+import { Button, Descriptions } from '@expcat/tigercat-vue'
+import DemoBlock from '../components/DemoBlock.vue'
+
+const basicSnippet = `<Descriptions title="用户信息" :items="userInfo" />`
+
+const borderedSnippet = `<Descriptions title="用户信息" bordered :items="userInfo" />`
+
+const sizeSnippet = `<Descriptions size="sm" bordered :items="userInfo" :column="2" />
+<Descriptions size="md" bordered :items="userInfo" :column="2" />
+<Descriptions size="lg" bordered :items="userInfo" :column="2" />`
+
+const verticalSnippet = `<Descriptions layout="vertical" :items="serverConfig" :column="2" />`
+
+const columnSnippet = `<Descriptions bordered :column="2" :items="userInfo" />
+<Descriptions bordered :column="4" :items="userInfo" />`
+
+const spanSnippet = `<Descriptions title="产品详情" bordered :column="3" :items="productDetails" />`
+
+const extraSnippet = `<Descriptions title="订单详情" bordered :column="3" :items="orderInfo">
+  <template #extra><Button size="sm">编辑</Button></template>
+</Descriptions>`
+
+const styleSnippet = `<Descriptions bordered :column="2" :items="userInfo" :labelStyle="{ fontWeight: '600' }" />`
+
+const colonSnippet = `<Descriptions title="服务器配置" :colon="false" bordered :items="serverConfig" />`
 
 // Basic user information
 const userInfo = [
@@ -54,128 +78,140 @@ const serverConfig = [
       <p class="text-gray-600">用于展示结构化数据、详情信息的描述列表组件。</p>
     </div>
 
-    <!-- 基本用法 -->
-    <section id="basic" class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">基本用法</h2>
-      <p class="text-gray-600 mb-6">最简单的描述列表展示。</p>
+    <DemoBlock title="基本用法"
+               description="最简单的描述列表展示。"
+               :code="basicSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions title="用户信息" :items="userInfo" />
+        <Descriptions title="用户信息"
+                      :items="userInfo" />
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 带边框 -->
-    <section id="bordered" class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">带边框</h2>
-      <p class="text-gray-600 mb-6">使用 bordered 属性添加边框。</p>
+    <DemoBlock title="带边框"
+               description="使用 bordered 属性添加边框。"
+               :code="borderedSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions title="用户信息" bordered :items="userInfo" />
+        <Descriptions title="用户信息"
+                      bordered
+                      :items="userInfo" />
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 不同尺寸 -->
-    <section id="size" class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">不同尺寸</h2>
-      <p class="text-gray-600 mb-6">支持三种尺寸：small、medium、large。</p>
+    <DemoBlock title="不同尺寸"
+               description="支持三种尺寸：small、medium、large。"
+               :code="sizeSnippet">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">小尺寸</h3>
-          <Descriptions size="sm" bordered :items="userInfo" :column="2" />
+          <Descriptions size="sm"
+                        bordered
+                        :items="userInfo"
+                        :column="2" />
         </div>
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">中等尺寸（默认）</h3>
-          <Descriptions size="md" bordered :items="userInfo" :column="2" />
+          <Descriptions size="md"
+                        bordered
+                        :items="userInfo"
+                        :column="2" />
         </div>
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">大尺寸</h3>
-          <Descriptions size="lg" bordered :items="userInfo" :column="2" />
+          <Descriptions size="lg"
+                        bordered
+                        :items="userInfo"
+                        :column="2" />
         </div>
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 垂直布局 -->
-    <section id="vertical" class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">垂直布局</h2>
-      <p class="text-gray-600 mb-6">使用 layout="vertical" 设置垂直布局。</p>
+    <DemoBlock title="垂直布局"
+               description='使用 layout="vertical" 设置垂直布局。'
+               :code="verticalSnippet">
       <div class="space-y-6">
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">垂直布局（无边框）</h3>
-          <Descriptions layout="vertical" :items="serverConfig" :column="2" />
+          <Descriptions layout="vertical"
+                        :items="serverConfig"
+                        :column="2" />
         </div>
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">垂直布局（带边框）</h3>
-          <Descriptions layout="vertical" bordered :items="serverConfig" :column="2" />
+          <Descriptions layout="vertical"
+                        bordered
+                        :items="serverConfig"
+                        :column="2" />
         </div>
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 自定义列数 -->
-    <section id="column" class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">自定义列数</h2>
-      <p class="text-gray-600 mb-6">通过 column 属性设置每行显示的列数。</p>
+    <DemoBlock title="自定义列数"
+               description="通过 column 属性设置每行显示的列数。"
+               :code="columnSnippet">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">2 列布局</h3>
-          <Descriptions bordered :column="2" :items="userInfo" />
+          <Descriptions bordered
+                        :column="2"
+                        :items="userInfo" />
         </div>
         <div class="p-6 bg-gray-50 rounded-lg">
           <h3 class="text-lg font-semibold mb-4">4 列布局</h3>
-          <Descriptions bordered :column="4" :items="userInfo" />
+          <Descriptions bordered
+                        :column="4"
+                        :items="userInfo" />
         </div>
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 跨列显示 -->
-    <section id="span" class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">跨列显示</h2>
-      <p class="text-gray-600 mb-6">描述项可以通过 span 属性实现跨列显示。</p>
+    <DemoBlock title="跨列显示"
+               description="描述项可以通过 span 属性实现跨列显示。"
+               :code="spanSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions title="产品详情" bordered :column="3" :items="productDetails" />
+        <Descriptions title="产品详情"
+                      bordered
+                      :column="3"
+                      :items="productDetails" />
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 带操作区域 -->
-    <section id="extra" class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">带操作区域</h2>
-      <p class="text-gray-600 mb-6">可以通过 extra 插槽添加操作按钮。</p>
+    <DemoBlock title="带操作区域"
+               description="可以通过 extra 插槽添加操作按钮。"
+               :code="extraSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions title="订单详情" bordered :column="3" :items="orderInfo">
+        <Descriptions title="订单详情"
+                      bordered
+                      :column="3"
+                      :items="orderInfo">
           <template #extra>
             <Button size="sm">编辑</Button>
           </template>
         </Descriptions>
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 自定义样式 -->
-    <section id="style" class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">自定义样式</h2>
-      <p class="text-gray-600 mb-6">通过 labelStyle 和 contentStyle 自定义标签/内容样式。</p>
+    <DemoBlock title="自定义样式"
+               description="通过 labelStyle 和 contentStyle 自定义标签/内容样式。"
+               :code="styleSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions
-          title="用户信息（自定义样式）"
-          bordered
-          :column="2"
-          :items="userInfo"
-          :labelStyle="{ fontWeight: '600', color: '#1f2937' }"
-          :contentStyle="{ color: '#6b7280' }" />
+        <Descriptions title="用户信息（自定义样式）"
+                      bordered
+                      :column="2"
+                      :items="userInfo"
+                      :labelStyle="{ fontWeight: '600', color: '#1f2937' }"
+                      :contentStyle="{ color: '#6b7280' }" />
       </div>
-      <Divider class="my-6" />
-    </section>
+    </DemoBlock>
 
-    <!-- 无冒号 -->
-    <section id="colon" class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">无冒号</h2>
-      <p class="text-gray-600 mb-6">通过设置 colon 为 false 隐藏标签后的冒号。</p>
+    <DemoBlock title="无冒号"
+               description="通过设置 colon 为 false 隐藏标签后的冒号。"
+               :code="colonSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <Descriptions title="服务器配置" :colon="false" bordered :items="serverConfig" />
+        <Descriptions title="服务器配置"
+                      :colon="false"
+                      bordered
+                      :items="serverConfig" />
       </div>
-    </section>
+    </DemoBlock>
   </div>
 </template>
