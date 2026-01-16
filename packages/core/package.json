@@ -1,6 +1,6 @@
 {
   "name": "@expcat/tigercat-core",
-  "version": "0.0.1",
+  "version": "0.0.42",
   "description": "Core utilities for Tigercat UI library",
   "license": "MIT",
   "author": "Yizhe Wang",
