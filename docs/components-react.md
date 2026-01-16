@@ -15,6 +15,25 @@ export function App() {
 - 组件名使用 PascalCase（如 `Button`、`DatePicker`）。
 - 事件使用 camelCase（如 `onClick`、`onChange`）。
 
+### 按需样式（Tailwind content 配置）
+
+在业务项目的 Tailwind 配置中加入 Tigercat 构建产物路径，确保按需生成样式：
+
+```js
+// tailwind.config.js
+export default {
+  content: [
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
+    './node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}'
+  ],
+  theme: {
+    extend: {}
+  },
+  plugins: []
+}
+```
+
 ## 组件清单（Props / Events 速览）
 
 ### 基础

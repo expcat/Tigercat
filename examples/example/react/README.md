@@ -9,6 +9,41 @@
 - 使用 TypeScript 进行类型检查
 - 集成 Tailwind CSS 样式系统
 
+## 在业务项目中使用（NPM + 按需样式）
+
+安装依赖：
+
+```bash
+pnpm add @expcat/tigercat-react
+```
+
+在 Tailwind 配置中加入 Tigercat 构建产物路径，确保按需生成样式：
+
+```js
+// tailwind.config.js
+export default {
+  content: [
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
+    './node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}'
+  ],
+  theme: {
+    extend: {}
+  },
+  plugins: []
+}
+```
+
+使用组件：
+
+```tsx
+import { Button } from '@expcat/tigercat-react'
+
+export function App() {
+  return <Button>Button</Button>
+}
+```
+
 ## 安装依赖
 
 在项目根目录运行：

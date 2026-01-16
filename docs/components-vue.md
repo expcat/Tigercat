@@ -17,6 +17,25 @@ import { Button } from '@expcat/tigercat-vue'
 - 组件名使用 PascalCase（如 `Button`、`DatePicker`）。
 - 事件采用 kebab-case（如 `@click`、`@change`）。
 
+### 按需样式（Tailwind content 配置）
+
+在业务项目的 Tailwind 配置中加入 Tigercat 构建产物路径，确保按需生成样式：
+
+```js
+// tailwind.config.js
+export default {
+  content: [
+    './index.html',
+    './src/**/*.{vue,js,ts,jsx,tsx}',
+    './node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}'
+  ],
+  theme: {
+    extend: {}
+  },
+  plugins: []
+}
+```
+
 ## 组件清单（Props / Events 速览）
 
 ### 基础

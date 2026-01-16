@@ -26,6 +26,28 @@ GitHub Pages： https://expcat.github.io/Tigercat/
 
 ## 快速开始
 
+### NPM 使用（按需样式 / 需要最少配置）
+
+Tigercat 使用 Tailwind utility class。若你希望按需生成样式，请在业务项目的 Tailwind 配置中加入对 Tigercat 产物的扫描路径：
+
+```js
+// tailwind.config.js
+export default {
+  content: [
+    './index.html',
+    './src/**/*.{vue,js,ts,jsx,tsx}',
+    // 扫描 Tigercat 包的构建产物以生成按需样式
+    './node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}'
+  ],
+  theme: {
+    extend: {}
+  },
+  plugins: []
+}
+```
+
+这条配置是按需样式的关键，否则最终 CSS 中不会生成 Tigercat 的类名。
+
 ### 环境要求
 
 - Node.js >= 18 (推荐 20.19.6)
