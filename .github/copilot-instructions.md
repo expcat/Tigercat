@@ -25,6 +25,10 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 - Vue `h()` children 类型不稳时：优先用 `type HChildren = Parameters<typeof h>[2]` 做最小断言，不要 `as any`。
 - React props 冲突（如 `defaultValue/title/autoComplete`）：用 `Omit<...>` 去掉原生属性再自定义，避免 DTS 冲突。
 
+### 文案引号使用标准
+
+- 在 Vue 模板 / React JSX 中使用转义双引号可能导致示例语法错误或阅读混乱，优先用单引号包裹字符串。
+
 ### 构建与排错
 
 - 先复现再定位：优先看 `tsup --dts` / `vue-tsc` 报错点，修“根因类型”而不是压制报错。

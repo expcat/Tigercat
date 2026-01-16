@@ -1,5 +1,64 @@
 import React from 'react'
-import { Breadcrumb, BreadcrumbItem, Divider } from '@expcat/tigercat-react'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
+
+const basicSnippet = `<Breadcrumb>
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem href="/products">Products</BreadcrumbItem>
+  <BreadcrumbItem current>Details</BreadcrumbItem>
+</Breadcrumb>`
+
+const arrowSnippet = `<Breadcrumb separator="arrow">
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem href="/products">Products</BreadcrumbItem>
+  <BreadcrumbItem current>Details</BreadcrumbItem>
+</Breadcrumb>`
+
+const chevronSnippet = `<Breadcrumb separator="chevron">
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem href="/products">Products</BreadcrumbItem>
+  <BreadcrumbItem href="/category">Category</BreadcrumbItem>
+  <BreadcrumbItem current>Details</BreadcrumbItem>
+</Breadcrumb>`
+
+const customSnippet = `<Breadcrumb separator=">">
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem href="/docs">Documentation</BreadcrumbItem>
+  <BreadcrumbItem current>Breadcrumb</BreadcrumbItem>
+</Breadcrumb>`
+
+const iconSnippet = `<Breadcrumb>
+  <BreadcrumbItem href="/" icon={<HomeIcon />}>Home</BreadcrumbItem>
+  <BreadcrumbItem href="/products" icon={<BagIcon />}>Products</BreadcrumbItem>
+  <BreadcrumbItem current>Details</BreadcrumbItem>
+</Breadcrumb>`
+
+const externalSnippet = `<Breadcrumb>
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem href="https://github.com" target="_blank">GitHub</BreadcrumbItem>
+  <BreadcrumbItem current>Current Page</BreadcrumbItem>
+</Breadcrumb>`
+
+const clickSnippet = `<Breadcrumb>
+  <BreadcrumbItem href="/" onClick={handleClick}>Home</BreadcrumbItem>
+  <BreadcrumbItem href="/products" onClick={handleClick}>Products</BreadcrumbItem>
+  <BreadcrumbItem current>Details</BreadcrumbItem>
+</Breadcrumb>`
+
+const multiSnippet = `<Breadcrumb separator="chevron">
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem href="/category">Category</BreadcrumbItem>
+  <BreadcrumbItem href="/category/electronics">Electronics</BreadcrumbItem>
+  <BreadcrumbItem href="/category/electronics/phones">Phones</BreadcrumbItem>
+  <BreadcrumbItem href="/category/electronics/phones/smartphones">Smartphones</BreadcrumbItem>
+  <BreadcrumbItem current>iPhone 15 Pro</BreadcrumbItem>
+</Breadcrumb>`
+
+const itemSeparatorSnippet = `<Breadcrumb>
+  <BreadcrumbItem href="/" separator="arrow">Home</BreadcrumbItem>
+  <BreadcrumbItem href="/products" separator="chevron">Products</BreadcrumbItem>
+  <BreadcrumbItem current>Details</BreadcrumbItem>
+</Breadcrumb>`
 
 const BreadcrumbDemo: React.FC = () => {
   const handleClick = (event: React.MouseEvent) => {
@@ -13,10 +72,7 @@ const BreadcrumbDemo: React.FC = () => {
         <p className="text-gray-600">显示当前页面在系统层级结构中的位置，并能向上返回。</p>
       </div>
 
-      {/* 基本用法 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">基本用法</h2>
-        <p className="text-gray-600 mb-6">最简单的面包屑导航。</p>
+      <DemoBlock title="基本用法" description="最简单的面包屑导航。" code={basicSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb>
             <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -24,13 +80,9 @@ const BreadcrumbDemo: React.FC = () => {
             <BreadcrumbItem current>Details</BreadcrumbItem>
           </Breadcrumb>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 箭头分隔符 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">箭头分隔符</h2>
-        <p className="text-gray-600 mb-6">使用箭头作为分隔符。</p>
+      <DemoBlock title="箭头分隔符" description="使用箭头作为分隔符。" code={arrowSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb separator="arrow">
             <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -38,13 +90,9 @@ const BreadcrumbDemo: React.FC = () => {
             <BreadcrumbItem current>Details</BreadcrumbItem>
           </Breadcrumb>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 尖括号分隔符 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">尖括号分隔符</h2>
-        <p className="text-gray-600 mb-6">使用尖括号作为分隔符。</p>
+      <DemoBlock title="尖括号分隔符" description="使用尖括号作为分隔符。" code={chevronSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb separator="chevron">
             <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -53,13 +101,12 @@ const BreadcrumbDemo: React.FC = () => {
             <BreadcrumbItem current>Details</BreadcrumbItem>
           </Breadcrumb>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 自定义分隔符 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">自定义分隔符</h2>
-        <p className="text-gray-600 mb-6">可以使用任意字符串作为分隔符。</p>
+      <DemoBlock
+        title="自定义分隔符"
+        description="可以使用任意字符串作为分隔符。"
+        code={customSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb separator=">">
             <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -67,13 +114,9 @@ const BreadcrumbDemo: React.FC = () => {
             <BreadcrumbItem current>Breadcrumb</BreadcrumbItem>
           </Breadcrumb>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 带图标 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">带图标</h2>
-        <p className="text-gray-600 mb-6">可以在面包屑项中添加图标。</p>
+      <DemoBlock title="带图标" description="可以在面包屑项中添加图标。" code={iconSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb>
             <BreadcrumbItem
@@ -101,13 +144,9 @@ const BreadcrumbDemo: React.FC = () => {
             <BreadcrumbItem current>Details</BreadcrumbItem>
           </Breadcrumb>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 外部链接 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">外部链接</h2>
-        <p className="text-gray-600 mb-6">支持在新窗口打开链接。</p>
+      <DemoBlock title="外部链接" description="支持在新窗口打开链接。" code={externalSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb>
             <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -117,13 +156,12 @@ const BreadcrumbDemo: React.FC = () => {
             <BreadcrumbItem current>Current Page</BreadcrumbItem>
           </Breadcrumb>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 点击事件 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">点击事件</h2>
-        <p className="text-gray-600 mb-6">面包屑项可以监听点击事件（查看控制台）。</p>
+      <DemoBlock
+        title="点击事件"
+        description="面包屑项可以监听点击事件（查看控制台）。"
+        code={clickSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb>
             <BreadcrumbItem href="/" onClick={handleClick}>
@@ -135,13 +173,9 @@ const BreadcrumbDemo: React.FC = () => {
             <BreadcrumbItem current>Details</BreadcrumbItem>
           </Breadcrumb>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 多级层次 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">多级层次</h2>
-        <p className="text-gray-600 mb-6">支持任意层级的面包屑导航。</p>
+      <DemoBlock title="多级层次" description="支持任意层级的面包屑导航。" code={multiSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb separator="chevron">
             <BreadcrumbItem href="/">Home</BreadcrumbItem>
@@ -154,13 +188,12 @@ const BreadcrumbDemo: React.FC = () => {
             <BreadcrumbItem current>iPhone 15 Pro</BreadcrumbItem>
           </Breadcrumb>
         </div>
-        <Divider className="my-6" />
-      </section>
+      </DemoBlock>
 
-      {/* 单独设置分隔符 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">单独设置分隔符</h2>
-        <p className="text-gray-600 mb-6">每个面包屑项可以单独设置分隔符。</p>
+      <DemoBlock
+        title="单独设置分隔符"
+        description="每个面包屑项可以单独设置分隔符。"
+        code={itemSeparatorSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Breadcrumb>
             <BreadcrumbItem href="/" separator="arrow">
@@ -172,7 +205,7 @@ const BreadcrumbDemo: React.FC = () => {
             <BreadcrumbItem current>Details</BreadcrumbItem>
           </Breadcrumb>
         </div>
-      </section>
+      </DemoBlock>
     </div>
   )
 }
