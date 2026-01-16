@@ -478,10 +478,10 @@ export default function MessageDemo() {
         </div>
       </DemoBlock>
 
-      <div className="mt-12 p-6 rounded-xl border bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950/40 dark:border-blue-900 dark:text-blue-200">
+      <div className="mt-12 p-6 rounded-xl border bg-[color:color-mix(in_srgb,var(--tiger-primary,#2563eb)_12%,transparent)] border-[color:color-mix(in_srgb,var(--tiger-primary,#2563eb)_30%,transparent)] text-[var(--tiger-primary,#2563eb)]">
         <h3 className="text-lg font-semibold mb-2">提示</h3>
         <List
-          className="text-blue-700 dark:text-blue-200"
+          className="text-[var(--tiger-primary,#2563eb)]"
           bordered="none"
           split={false}
           size="sm"
