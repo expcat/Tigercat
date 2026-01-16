@@ -1,5 +1,34 @@
 import React from 'react'
 import { Space } from '@expcat/tigercat-react'
+import DemoBlock from '../components/DemoBlock'
+
+const horizontalSnippet = `<Space>
+  <div className="bg-blue-500 text-white px-4 py-2 rounded">Item 1</div>
+  <div className="bg-blue-500 text-white px-4 py-2 rounded">Item 2</div>
+  <div className="bg-blue-500 text-white px-4 py-2 rounded">Item 3</div>
+</Space>`
+
+const verticalSnippet = `<Space direction="vertical">
+  <div className="bg-green-500 text-white px-4 py-2 rounded">Item 1</div>
+  <div className="bg-green-500 text-white px-4 py-2 rounded">Item 2</div>
+  <div className="bg-green-500 text-white px-4 py-2 rounded">Item 3</div>
+</Space>`
+
+const sizeSnippet = `<Space direction="vertical" className="w-full">
+  <Space size="sm">...</Space>
+  <Space size="md">...</Space>
+  <Space size="lg">...</Space>
+  <Space size={24}>...</Space>
+</Space>`
+
+const alignSnippet = `<Space direction="vertical" className="w-full">
+  <Space align="center" className="w-full ...">...</Space>
+  <Space align="baseline" className="w-full ...">...</Space>
+</Space>`
+
+const wrapSnippet = `<Space wrap size="sm" className="w-full">
+  {Array.from({ length: 14 }).map(...)}
+</Space>`
 
 const SpaceDemo: React.FC = () => {
   return (
@@ -9,10 +38,10 @@ const SpaceDemo: React.FC = () => {
         <p className="text-gray-600">设置组件之间的间距。</p>
       </div>
 
-      {/* 水平间距 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">水平间距</h2>
-        <p className="text-gray-600 mb-6">默认水平方向（horizontal）。</p>
+      <DemoBlock
+        title="水平间距"
+        description="默认水平方向（horizontal）。"
+        code={horizontalSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <div className="bg-blue-500 text-white px-4 py-2 rounded">Item 1</div>
@@ -20,12 +49,12 @@ const SpaceDemo: React.FC = () => {
             <div className="bg-blue-500 text-white px-4 py-2 rounded">Item 3</div>
           </Space>
         </div>
-      </section>
+      </DemoBlock>
 
-      {/* 垂直间距 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">垂直间距</h2>
-        <p className="text-gray-600 mb-6">direction="vertical" 让子项纵向排列并产生间距。</p>
+      <DemoBlock
+        title="垂直间距"
+        description='direction="vertical" 让子项纵向排列并产生间距。'
+        code={verticalSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical">
             <div className="bg-green-500 text-white px-4 py-2 rounded">Item 1</div>
@@ -33,12 +62,12 @@ const SpaceDemo: React.FC = () => {
             <div className="bg-green-500 text-white px-4 py-2 rounded">Item 3</div>
           </Space>
         </div>
-      </section>
+      </DemoBlock>
 
-      {/* 不同尺寸 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">不同尺寸</h2>
-        <p className="text-gray-600 mb-6">size 支持内置尺寸（sm/md/lg）与自定义数值（px）。</p>
+      <DemoBlock
+        title="不同尺寸"
+        description="size 支持内置尺寸（sm/md/lg）与自定义数值（px）。"
+        code={sizeSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full">
             <div>
@@ -78,14 +107,12 @@ const SpaceDemo: React.FC = () => {
             </div>
           </Space>
         </div>
-      </section>
+      </DemoBlock>
 
-      {/* 对齐方式 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">对齐方式</h2>
-        <p className="text-gray-600 mb-6">
-          align 控制交叉轴对齐（start/center/end/baseline/stretch）。
-        </p>
+      <DemoBlock
+        title="对齐方式"
+        description="align 控制交叉轴对齐（start/center/end/baseline/stretch）。"
+        code={alignSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space direction="vertical" className="w-full">
             <div>
@@ -117,12 +144,12 @@ const SpaceDemo: React.FC = () => {
             </div>
           </Space>
         </div>
-      </section>
+      </DemoBlock>
 
-      {/* 自动换行 */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">自动换行</h2>
-        <p className="text-gray-600 mb-6">wrap=true 时，子项在空间不足时自动换行。</p>
+      <DemoBlock
+        title="自动换行"
+        description="wrap=true 时，子项在空间不足时自动换行。"
+        code={wrapSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="max-w-md">
             <Space wrap size="sm" className="w-full">
@@ -134,7 +161,7 @@ const SpaceDemo: React.FC = () => {
             </Space>
           </div>
         </div>
-      </section>
+      </DemoBlock>
     </div>
   )
 }
