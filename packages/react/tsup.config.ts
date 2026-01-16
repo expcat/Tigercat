@@ -8,7 +8,7 @@ const componentEntries = readdirSync(componentsDir, { withFileTypes: true })
   .map((entry) => `src/components/${entry.name}`)
 
 export default defineConfig({
-  entry: ['src/index.tsx', 'src/styles/index.css', ...componentEntries],
+  entry: ['src/index.tsx', ...componentEntries],
   format: ['esm'],
   dts: true,
   clean: true,

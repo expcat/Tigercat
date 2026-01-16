@@ -19,16 +19,13 @@
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "sideEffects": [
-    "**/*.css"
-  ],
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
     },
-    "./style": "./dist/styles/index.css",
     "./*": {
       "types": "./dist/components/*.d.mts",
       "import": "./dist/components/*.mjs",
