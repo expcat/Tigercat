@@ -20,6 +20,11 @@ jobs:
               with:
                   node-version: 18
 
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10.26.2
+
             - name: Configure git
               run: |
                   git config user.name "github-actions"
@@ -69,13 +74,21 @@ jobs:
 
                   IFS='.' read -r MAJOR MINOR PATCH <<< "$BASE_VERSION"
                   NEW_PATCH=$((PATCH + COMMIT_COUNT))
-                  TAG="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+                  VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
+                  TAG="v${VERSION}"
 
                   echo "NEXT_TAG=${TAG}"
 
                   if git rev-parse "${TAG}" >/dev/null 2>&1; then
                     echo "Tag already exists: ${TAG}"
                     exit 1
+                  fi
+
+                  pnpm -r --filter "./packages/**" version "${VERSION}" --no-git-tag-version
+
+                  if [[ -n "$(git status --porcelain)" ]]; then
+                    git add packages/*/package.json
+                    git commit -m "chore(release): ${TAG}"
                   fi
 
                   git tag -a "${TAG}" -m "chore(release): ${TAG}"
