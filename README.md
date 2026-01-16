@@ -1,104 +1,76 @@
 # Tigercat
 
-A Tailwind CSS-based UI component library supporting both Vue 3 and React.
+基于 Tailwind CSS 的 UI 组件库，支持 Vue 3 与 React。
 
-## 📋 Roadmap
+## 演示
 
-See our [Development Roadmap](./ROADMAP.md) for all planned components and development progress.
+GitHub Pages： https://expcat.github.io/Tigercat/
 
-查看我们的 [开发路线图](./ROADMAP.md) 了解所有计划中的组件和开发进度。
+## 文档
 
-## Project Structure
+- Vue 组件总览： [docs/components-vue.md](./docs/components-vue.md)
+- React 组件总览： [docs/components-react.md](./docs/components-react.md)
+- 主题定制： [docs/theme.md](./docs/theme.md)
 
-This is a monorepo managed with pnpm workspaces containing:
+## 路线图
 
-| Package           | Description                            |
-| ----------------- | -------------------------------------- |
-| `@expcat/tigercat-core`  | Core utilities for Tigercat UI library |
-| `@expcat/tigercat-vue`   | Vue 3 components                       |
-| `@expcat/tigercat-react` | React components                       |
+[开发路线图](./ROADMAP.md)
 
-## Development
+## 包与模块
 
-### Prerequisites
+| Package                  | Description    |
+| ------------------------ | -------------- |
+| `@expcat/tigercat-core`  | 通用工具与类型 |
+| `@expcat/tigercat-vue`   | Vue 3 组件     |
+| `@expcat/tigercat-react` | React 组件     |
 
-- Node.js >= 18 (recommended: 20.19.6)
-- pnpm >= 8 (recommended: 10)
+## 快速开始
 
-### Quick Setup
+### 环境要求
 
-For first-time contributors, we provide a setup script:
+- Node.js >= 18 (推荐 20.19.6)
+- pnpm >= 8 (推荐 10)
+
+### 安装与构建
 
 ```bash
-# Clone and setup
 git clone https://github.com/expcats/Tigercat.git
 cd Tigercat
 pnpm setup
 ```
 
-Or manually:
+或手动：
 
 ```bash
-# Install pnpm if not already installed
 npm install -g pnpm@10.26.2
-
-# Install dependencies
 pnpm install
-
-# Build all packages
 pnpm build
-
-# Verify your environment
 pnpm dev:check
 ```
 
-### Development Workflow
+### 开发与示例
 
 ```bash
-# Development mode (watch all packages)
 pnpm dev
-
-# Run all tests
-pnpm test
-
-# Run examples (preferred)
-pnpm example:vue    # Vue3 example on http://localhost:5173
-pnpm example:react  # React example on http://localhost:5174
-pnpm example:all    # Run both examples simultaneously
+pnpm example:vue    # http://localhost:5173
+pnpm example:react  # http://localhost:5174
+pnpm example:all
 ```
 
-### Testing
+### 测试
 
 ```bash
-# Run all tests
 pnpm test
-
-# Run specific framework tests
-pnpm test:vue     # Vue tests only
-pnpm test:react   # React tests only
-
-# Run tests with UI (great for debugging)
-pnpm test:ui
-
-# Run tests with coverage
-pnpm test:coverage
+pnpm test:vue
+pnpm test:react
 ```
 
-For detailed testing guidelines, see:
+测试文档：
 
-**Vue Testing**:
+- Vue： [tests/TESTING_GUIDE.md](./tests/TESTING_GUIDE.md)
+- React： [tests/REACT_TESTING_GUIDE.md](./tests/REACT_TESTING_GUIDE.md)
 
-- [Testing Guide](./tests/TESTING_GUIDE.md) - Comprehensive testing documentation
-- [Quick Start Guide](./tests/QUICK_START.md) - Get started writing tests
-- [Component Test Checklist](./tests/COMPONENT_TEST_CHECKLIST.md) - Track testing progress
-
-**React Testing**:
-
-- [Testing Guide](./tests/REACT_TESTING_GUIDE.md) - Comprehensive testing documentation
-- [Quick Start Guide](./tests/REACT_QUICK_START.md) - Get started writing tests
-- [Component Test Checklist](./tests/REACT_COMPONENT_TEST_CHECKLIST.md) - Track testing progress
-
-### Available Scripts
+## 可用脚本
 
 | Command              | Description                      |
 | -------------------- | -------------------------------- |
@@ -118,7 +90,7 @@ For detailed testing guidelines, see:
 | `pnpm format:check`  | Check formatting (CI-friendly)   |
 | `pnpm clean`         | Clean build artifacts            |
 
-### Project Structure
+## 项目结构
 
 ```
 tigercat/
@@ -126,9 +98,10 @@ tigercat/
 │   ├── core/           # Core utilities and types
 │   ├── vue/            # Vue 3 components
 │   └── react/          # React components
-├── docs/               # Component documentation
-│   ├── components/     # Individual component docs
-│   └── theme.md        # Theme customization guide
+├── docs/               # Documentation
+│   ├── components-vue.md   # Vue component overview
+│   ├── components-react.md # React component overview
+│   └── theme.md            # Theme customization guide
 ├── tests/              # Test infrastructure and utilities
 │   ├── vue/            # Vue component tests
 │   ├── react/          # React component tests
@@ -142,67 +115,15 @@ tigercat/
 └── tsconfig.json
 ```
 
-## Documentation
+## 参与贡献
 
-Component documentation can be found in the `docs/components/` directory. Each component includes:
+请先阅读 [CONTRIBUTING.md](./CONTRIBUTING.md)，开发细节见 [DEVELOPMENT.md](./DEVELOPMENT.md)。
 
-- API reference (props, events, types)
-- Usage examples for both Vue 3 and React
-- Styling and customization options
-- Accessibility guidelines
+### 快捷链接
 
-See [docs/components/](./docs/components/) for the complete list of available components.
-
-## Contributing
-
-We welcome contributions! Please read our [Contributing Guide](./CONTRIBUTING.md) to get started.
-
-For detailed development documentation, see [DEVELOPMENT.md](./DEVELOPMENT.md).
-
-### Quick Links
-
-- [Contributing Guide](./CONTRIBUTING.md) - How to contribute
-- [Development Guide](./DEVELOPMENT.md) - Development documentation
-- [Roadmap](./ROADMAP.md) - Project roadmap and progress
-
-## Troubleshooting
-
-### Common Issues
-
-**pnpm not found?**
-
-```bash
-npm install -g pnpm@10.26.2
-```
-
-**Example not loading components?**
-
-```bash
-# Build packages first
-pnpm build
-# Then run example
-pnpm example:vue
-```
-
-**Tests failing after changes?**
-
-```bash
-# Clear cache and rebuild
-pnpm clean
-pnpm install
-pnpm build
-pnpm test
-```
-
-**Port already in use?**
-
-```bash
-# Check what's using the port
-lsof -i :5173  # or :5174
-# Kill the process or use a different port
-```
-
-For more troubleshooting tips, see [DEVELOPMENT.md](./DEVELOPMENT.md#troubleshooting).
+- [Contributing Guide](./CONTRIBUTING.md)
+- [Development Guide](./DEVELOPMENT.md)
+- [Roadmap](./ROADMAP.md)
 
 ## License
 

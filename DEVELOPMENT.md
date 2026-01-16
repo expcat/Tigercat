@@ -1,284 +1,70 @@
-# Tigercat Development Guide
+# Tigercat 开发说明
 
-This guide provides detailed information for developers working on the Tigercat UI component library.
-
-## 📋 Table of Contents
-
-- [Quick Start](#quick-start)
-- [Development Commands](#development-commands)
-- [Project Architecture](#project-architecture)
-- [Adding New Components](#adding-new-components)
-- [Testing Strategy](#testing-strategy)
-- [Build System](#build-system)
-- [Common Tasks](#common-tasks)
-- [Troubleshooting](#troubleshooting)
-
-## 🚀 Quick Start
-
-### Environment Setup
-
-1. **Check Prerequisites**:
-
-   ```bash
-   # Verify your environment meets requirements
-   pnpm dev:check
-   ```
-
-2. **Install Dependencies**:
-
-   ```bash
-   # Using the setup script (recommended for first-time setup)
-   pnpm setup
-
-   # Or manually
-   pnpm install
-   pnpm build
-   ```
-
-3. **Start Development**:
-
-   ```bash
-   # Watch mode for all packages
-   pnpm dev
-
-   # In another terminal, run tests in watch mode
-   pnpm test
-
-    # In another terminal, run an example
-    pnpm example:vue    # or pnpm example:react
-   ```
-
-## 🛠 Development Commands
-
-### Package Management
+## 快速开始
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Add a dependency to a specific package
-pnpm --filter @expcat/tigercat-vue add vue-router
-pnpm --filter @expcat/tigercat-react add react-router-dom
-
-# Update dependencies
-pnpm update
-```
-
-### Building
-
-```bash
-# Build all packages
-pnpm build
-
-# Build a specific package
-pnpm --filter @expcat/tigercat-core build
-pnpm --filter @expcat/tigercat-vue build
-pnpm --filter @expcat/tigercat-react build
-
-# Watch mode (auto-rebuild on changes)
+pnpm dev:check
+pnpm setup
 pnpm dev
-pnpm --filter @expcat/tigercat-vue dev
+pnpm test
+pnpm example:vue
 ```
 
-### Testing
+## 常用命令
 
 ```bash
-# Run all tests
+pnpm build
+pnpm dev
 pnpm test
-
-# Run tests in watch mode
-pnpm test
-
-# Run specific framework tests
 pnpm test:vue
 pnpm test:react
-
-# Run a specific test file
-pnpm test Button.spec
-
-# Run tests with coverage
-pnpm test:coverage
-
-# Run tests with UI (great for debugging)
-pnpm test:ui
-```
-
-### Examples
-
-```bash
-# Run Vue3 example (http://localhost:5173)
 pnpm example:vue
-
-# Run React example (http://localhost:5174)
 pnpm example:react
-
-# Run both examples simultaneously
-pnpm example:all
-
-# Build examples for production
-pnpm --filter @expcat/tigercat-example-vue3 build
-pnpm --filter @expcat/tigercat-example-react build
-
-# Preview production builds
-pnpm --filter @expcat/tigercat-example-vue3 preview
-pnpm --filter @expcat/tigercat-example-react preview
-```
-
-### Linting and Formatting
-
-```bash
-# Run ESLint
 pnpm lint
-
-# Format code with Prettier (repo source of truth: .prettierrc.json + .editorconfig)
-pnpm format
-
-# Check formatting (CI-friendly)
 pnpm format:check
-
-# Clean up build artifacts and node_modules
 pnpm clean
 ```
 
-### Environment Check
+## 新增组件（最小步骤）
+
+1. Core 类型/工具：`packages/core/src/types|utils`
+2. Vue 组件：`packages/vue/src/components` 并导出
+3. React 组件：`packages/react/src/components` 并导出
+4. 文档：更新 [docs/components-vue.md](./docs/components-vue.md) 与 [docs/components-react.md](./docs/components-react.md)
+5. 测试：`tests/vue` / `tests/react`
+6. 里程碑：必要时更新 [ROADMAP.md](./ROADMAP.md)
+
+## 排错（简）
 
 ```bash
-# Verify development environment
-pnpm dev:check
-
-# Or run the script directly
-node ./scripts/check-env.mjs
+pnpm clean
+pnpm install
+pnpm build
+pnpm test
 ```
 
-## 🏗 Project Architecture
+export const YourComponent: React.FC<YourComponentProps> = ({
+variant = 'primary',
+size = 'md',
+onClick,
+children,
+...props
+}) => {
+return (
+<div onClick={onClick} {...props}>
+{children}
+</div>
+)
+}
 
-### Monorepo Structure
+````
 
-Tigercat uses pnpm workspaces to manage a monorepo with three main packages:
+Export in `packages/react/src/index.tsx`:
 
-```
-packages/
-├── core/       # Framework-agnostic utilities and types
-├── vue/        # Vue 3 components
-└── react/      # React components
-```
-
-### Dependency Graph
-
-```
-@expcat/tigercat-vue  ──→  @expcat/tigercat-core
-
-@expcat/tigercat-react ──→  @expcat/tigercat-core
-```
-
-- `@expcat/tigercat-core` has no framework dependencies
-- Both `@expcat/tigercat-vue` and `@expcat/tigercat-react` depend on `@expcat/tigercat-core`
-- Changes to `@expcat/tigercat-core` require rebuilding dependent packages
-
-### Build Order
-
-Packages are built in dependency order:
-
-1. `@expcat/tigercat-core` (no dependencies)
-2. `@expcat/tigercat-vue` and `@expcat/tigercat-react` (in parallel, both depend on core)
-3. Example applications (depend on component packages)
-
-## 🎨 Adding New Components
-
-### Component Development Workflow
-
-1. **Plan the Component**
-   - Review [ROADMAP.md](./ROADMAP.md) for component priorities
-   - Define component API (props, events, slots)
-   - Consider accessibility requirements
-
-2. **Create Core Types and Utilities**
-
-   ```bash
-   # Create type definitions
-   packages/core/src/types/your-component.ts
-
-   # Create utilities (if needed)
-   packages/core/src/utils/your-component-utils.ts
-   ```
-
-   ```typescript
-   // Example: packages/core/src/types/badge.ts
-   export interface BadgeProps {
-     variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger'
-     size?: 'sm' | 'md' | 'lg'
-     rounded?: boolean
-   }
-   ```
-
-3. **Implement Vue Component**
-
-   ```bash
-   # Create component file
-   packages/vue/src/components/YourComponent.vue
-   ```
-
-   ```vue
-   <script setup lang="ts">
-   import { computed } from 'vue'
-   import type { YourComponentProps } from '@expcat/tigercat-core'
-
-   const props = withDefaults(defineProps<YourComponentProps>(), {
-     variant: 'primary',
-     size: 'md'
-   })
-
-   const emit = defineEmits<{
-     click: [event: MouseEvent]
-   }>()
-   </script>
-
-   <template>
-     <div @click="emit('click', $event)">
-       <slot />
-     </div>
-   </template>
-   ```
-
-   Export in `packages/vue/src/index.ts`:
-
-   ```typescript
-   export { default as YourComponent } from './components/YourComponent.vue'
-   export type { YourComponentProps } from '@expcat/tigercat-core'
-   ```
-
-4. **Implement React Component**
-
-   ```bash
-   # Create component file
-   packages/react/src/components/YourComponent.tsx
-   ```
-
-   ```typescript
-   import React from 'react'
-   import type { YourComponentProps } from '@expcat/tigercat-core'
-
-   export const YourComponent: React.FC<YourComponentProps> = ({
-     variant = 'primary',
-     size = 'md',
-     onClick,
-     children,
-     ...props
-   }) => {
-     return (
-       <div onClick={onClick} {...props}>
-         {children}
-       </div>
-     )
-   }
-   ```
-
-   Export in `packages/react/src/index.tsx`:
-
-   ```typescript
-   export { YourComponent } from './components/YourComponent'
-   export type { YourComponentProps } from '@expcat/tigercat-core'
-   ```
+```typescript
+export { YourComponent } from './components/YourComponent'
+export type { YourComponentProps } from '@expcat/tigercat-core'
+````
 
 5. **Write Tests**
 
@@ -294,17 +80,20 @@ Packages are built in dependency order:
 
 6. **Add Documentation**
 
-   ```bash
-   # Component documentation
-   docs/components/your-component.md
-   ```
+Update the concise overviews:
 
-   Include:
-   - Component description
-   - Props/API reference
-   - Usage examples (both Vue and React)
-   - Accessibility notes
-   - Styling customization
+```bash
+# Vue overview
+docs/components-vue.md
+
+# React overview
+docs/components-react.md
+```
+
+Keep it brief:
+
+- One-line component description
+- Category placement only (no deep API details)
 
 7. **Add to Examples**
 
