@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@source "../../../packages/vue/src";
+@source "../../../packages/core/src";
 
 :root {
   --tiger-primary: #2563eb;
