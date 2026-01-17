@@ -1,20 +1,101 @@
 # Tigercat
 
+<!-- LLM-INDEX: packages=@expcat/tigercat-vue|@expcat/tigercat-react|@expcat/tigercat-core; frameworks=Vue3|React; requires=Tailwind-CSS; docs=docs/components-vue.md|docs/components-react.md|docs/theme.md -->
+
 基于 Tailwind CSS 的 UI 组件库，支持 Vue 3 与 React。
+
+## LLM Quick Start
+
+### 安装
+
+```bash
+pnpm add @expcat/tigercat-vue @expcat/tigercat-core  # Vue 3
+pnpm add @expcat/tigercat-react @expcat/tigercat-core # React
+```
+
+### Vue 3 最小示例
+
+```vue
+<script setup>
+import { Button, ConfigProvider } from '@expcat/tigercat-vue'
+</script>
+<template>
+  <ConfigProvider>
+    <Button variant="solid" @click="handleClick">点击</Button>
+  </ConfigProvider>
+</template>
+```
+
+```css
+/* 在项目 CSS 文件中引入 */
+@import 'tailwindcss';
+@source '../node_modules/@expcat/tigercat-vue/dist/**/*.{js,mjs}';
+@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
+```
+
+### React 最小示例
+
+```tsx
+import { Button, ConfigProvider } from '@expcat/tigercat-react'
+export function App() {
+  return (
+    <ConfigProvider>
+      <Button variant="solid" onClick={handleClick}>
+        点击
+      </Button>
+    </ConfigProvider>
+  )
+}
+```
+
+```css
+/* 在项目 CSS 文件中引入 */
+@import 'tailwindcss';
+@source '../node_modules/@expcat/tigercat-react/dist/**/*.{js,mjs}';
+@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
+```
+
+### Tailwind 配置（必需）
+
+```js
+// tailwind.config.js
+import { tigercatPlugin } from '@expcat/tigercat-core'
+export default {
+  content: [
+    './src/**/*.{vue,js,ts,jsx,tsx}',
+    './node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}' // 扫描 Tigercat 包
+  ],
+  plugins: [tigercatPlugin] // 注入主题变量
+}
+```
 
 ## 演示
 
 GitHub Pages： https://expcat.github.io/Tigercat/
 
-## 文档
+## Documentation Index
 
-- Vue 组件总览： [docs/components-vue.md](./docs/components-vue.md)
-- React 组件总览： [docs/components-react.md](./docs/components-react.md)
-- 主题定制： [docs/theme.md](./docs/theme.md)
+**核心文档（LLM 优先）：**
 
-## 路线图
+- [Vue 组件总览](./docs/components-vue.md) - 所有 Vue 3 组件的 API 速览与使用示例
+- [React 组件总览](./docs/components-react.md) - 所有 React 组件的 API 速览与使用示例
+- [主题定制](./docs/theme.md) - CSS 变量与主题配置
 
-[开发路线图](./ROADMAP.md)
+**开发文档：**
+
+- [开发路线图](./ROADMAP.md) - 功能规划与进度
+- [贡献指南](./CONTRIBUTING.md) - 如何参与贡献
+- [开发细节](./DEVELOPMENT.md) - 本地开发与构建
+- [测试指南](./tests/TESTING_GUIDE.md) - Vue 测试规范
+- [React 测试指南](./tests/REACT_TESTING_GUIDE.md) - React 测试规范
+
+## 版本兼容性
+
+- **Vue:** >= 3.3.0
+- **React:** >= 18.0.0
+- **Node.js:** >= 18 (推荐 20.19.6)
+- **pnpm:** >= 8 (推荐 10)
+- **Tailwind CSS:** >= 3.4.0
 
 ## 包与模块
 
@@ -24,34 +105,7 @@ GitHub Pages： https://expcat.github.io/Tigercat/
 | `@expcat/tigercat-vue`   | Vue 3 组件     |
 | `@expcat/tigercat-react` | React 组件     |
 
-## 快速开始
-
-### NPM 使用（按需样式 / 需要最少配置）
-
-Tigercat 使用 Tailwind utility class。若你希望按需生成样式，请在业务项目的 Tailwind 配置中加入对 Tigercat 产物的扫描路径，并引入 Core 包提供的插件以注入主题变量：
-
-```js
-// tailwind.config.js
-import { tigercatPlugin } from '@expcat/tigercat-core'
-
-export default {
-  content: [
-    './index.html',
-    './src/**/*.{vue,js,ts,jsx,tsx}',
-    // 扫描 Tigercat 包的构建产物以生成按需样式
-    './node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}'
-  ],
-  theme: {
-    extend: {}
-  },
-  plugins: [
-    // 注入 Tigercat 默认 CSS 变量
-    tigercatPlugin
-  ]
-}
-```
-
-这条配置是按需样式的关键，否则最终 CSS 中不会生成 Tigercat 的类名与主题变量。
+## 本地开发
 
 ### 环境要求
 
