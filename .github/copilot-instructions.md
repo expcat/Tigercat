@@ -1,11 +1,33 @@
 # GitHub Copilot Instructions for Tigercat
 
-<!--
-STRUCTURE NAVIGATION TAGS:
-#core-utilities #vue-components #react-components #types #theme #testing #documentation #examples
+<!-- LLM-INDEX
+project: Tigercat UI Library
+type: monorepo (pnpm workspace)
+frameworks: Vue3, React
+styling: Tailwind CSS + CSS Variables
+language: TypeScript (strict mode)
+packages:
+  - @expcat/tigercat-core → packages/core/ (shared utils/types/theme)
+  - @expcat/tigercat-vue → packages/vue/ (Vue 3 components, .ts files)
+  - @expcat/tigercat-react → packages/react/ (React components, .tsx files)
+key-files:
+  - packages/*/src/index.ts(x) → public exports
+  - docs/components-vue.md → Vue API reference
+  - docs/components-react.md → React API reference
+  - docs/theme.md → theming guide
 -->
 
 Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 React 实现。仓库是 TypeScript 严格模式 + pnpm workspace 的 monorepo。
+
+## 任务快查（按任务类型）
+
+| 任务类型         | 关键步骤                                                                                                    |
+| ---------------- | ----------------------------------------------------------------------------------------------------------- |
+| **新增组件**     | 1) 参照 `Button` 写法 2) core 抽共享类型/utils 3) vue + react 各实现 4) 导出到 index 5) 补测试 6) 更新 docs |
+| **修改现有组件** | 1) 先读源码理解 2) 改 core 或 vue/react 3) 同步另一框架(如适用) 4) 更新测试                                 |
+| **修复类型错误** | 1) 定位根因(tsup/vue-tsc 报错) 2) 优先改类型定义 3) 不用 `any`                                              |
+| **添加测试**     | 1) 参照同类组件测试 2) Vue: `tests/vue/` React: `tests/react/` 3) 用 Testing Library                        |
+| **更新文档**     | 1) API 变更 → `docs/components-*.md` 2) 新模式/约定 → 本文件                                                |
 
 ## 工作方式（高信噪比规则）
 
@@ -14,27 +36,32 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 - 变更要可交付：不要只写计划；如果要动代码，就同时补齐导出、类型、测试与文档（见下方 DoD）。
 - 避免无关重构：不做大范围格式化、不改公共 API 命名、不“顺手修一堆”。
 
-## 本次经验（精简版）
+## 本次经验（类型与构建）
 
-### 尽量不使用 any
+### 类型规范
 
-- 优先用精确类型：能写具体类型就不要用 `unknown`。
-- 仅在“边界输入确实未知”时用 `unknown`（例如 `attrs`、第三方回调、JSON/网络响应），并立刻收窄后再使用（类型守卫 / `typeof` / `in` / `Array.isArray`）。
-- 不要在组件里散落断言：把可复用的收窄/合并逻辑下沉到 `@expcat/tigercat-core`。
-- Vue attrs 常是 `unknown`：`class` 用 `coerceClassValue(attrs.class)`；`style` 用 `mergeStyleValues(attrs.style, props.style)`。
-- Vue `h()` children 类型不稳时：优先用 `type HChildren = Parameters<typeof h>[2]` 做最小断言，不要 `as any`。
-- React props 冲突（如 `defaultValue/title/autoComplete`）：用 `Omit<...>` 去掉原生属性再自定义，避免 DTS 冲突。
+| 场景             | 做法                | 示例                                         |
+| ---------------- | ------------------- | -------------------------------------------- |
+| 已知类型         | 用精确类型          | `variant: 'primary' \| 'secondary'`          |
+| 边界输入         | 用 `unknown` + 收窄 | `if (typeof x === 'string')`                 |
+| Vue attrs.class  | 用 helper           | `coerceClassValue(attrs.class)`              |
+| Vue attrs.style  | 用 helper           | `mergeStyleValues(attrs.style, props.style)` |
+| Vue h() children | 最小断言            | `type HChildren = Parameters<typeof h>[2]`   |
+| React props 冲突 | Omit 原生属性       | `Omit<InputHTMLAttributes, 'defaultValue'>`  |
 
-### 文案引号使用标准
+### 构建排错
 
-- 在 Vue 模板 / React JSX 中使用转义双引号可能导致示例语法错误或阅读混乱，优先用单引号包裹字符串。
+- 先复现再定位：优先看 `tsup --dts` / `vue-tsc` 报错点，修"根因类型"而不是压制报错
+- 截断日志别吞退出码：`set -o pipefail && pnpm build 2>&1 | tail -n 200`
+- demo 类型要正确：Vue 模板自动解包 `ref`，事件参数传 index/值，不强依赖 `Ref<T>`
+- demo 引入层级清晰：优先从 `@expcat/tigercat-vue` / `@expcat/tigercat-react` 引类型与组件
 
-### 构建与排错
+### 代码风格速记
 
-- 先复现再定位：优先看 `tsup --dts` / `vue-tsc` 报错点，修“根因类型”而不是压制报错。
-- 截断日志别吞退出码：用 `set -o pipefail && pnpm build 2>&1 | tail -n 200`。
-- demo 也要类型正确：Vue 模板会自动解包 `ref`，事件参数尽量传 index/值，不要让函数参数强依赖 `Ref<T>`。
-- demo 依赖层级要清晰：优先从 `@expcat/tigercat-vue` / `@expcat/tigercat-react` 引类型与组件，避免 demo 直接绑死 core 内部实现。
+- 字符串用单引号 `'`，不写分号，缩进 2 空格
+- 多行对象/数组不加尾随逗号
+- JSX 多行属性 `>` 与最后属性同行 (`bracketSameLine: true`)
+- import 顺序：外部依赖 → `@expcat/tigercat-core` → 相对路径
 
 ## 目录速查（改哪里）
 
@@ -73,23 +100,15 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 
 ## 代码约定
 
-### 格式化（避免来回改格式）
+### 格式化
 
-- 以 Prettier 为唯一格式化来源：遵循仓库根目录 `.prettierrc.json` 与 `.editorconfig`。
-- 统一规则（生成/修改代码时默认按此输出）：
-  - 单引号：`'`（字符串、import 等）
-  - 不写分号
-  - 多行对象/数组/参数列表：不加尾随逗号
-  - 缩进 2 空格；保持必要空格（例如 `{ a: 1 }`）
-  - JSX/TSX 多行属性：`>` 与最后一个属性同一行（`bracketSameLine: true`）
-- 不要为了“看起来更整齐”手动做大范围格式化；只改与任务相关的代码。
+- 遵循 `.prettierrc.json` 与 `.editorconfig`（见上方"代码风格速记"）
+- 只改与任务相关的代码，不做大范围格式化
 
 ### TypeScript
 
-- 严格模式；避免 `any`；优先精确类型。仅在边界/未知输入用 `unknown`，并先收窄再用。
-- 导出的公共函数/类型尽量写清晰的返回类型。
-- TS/TSX 不写分号；遵循 `.prettierrc.json`。
-- `import` 顺序：外部依赖 → 内部包（`@expcat/tigercat-core`）→ 相对路径。
+- 严格模式；避免 `any`；优先精确类型（见上方"类型规范"表）
+- 导出的公共函数/类型尽量写清晰的返回类型
 
 ### 组件 API 约定
 
