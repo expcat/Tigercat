@@ -1,6 +1,19 @@
 # Tigercat 组件总览（Vue 3）
 
+<!-- LLM-INDEX: framework=Vue3; package=@expcat/tigercat-vue; import-from=@expcat/tigercat-vue; event-style=kebab-case; v-model=supported -->
+
 面向快速理解与使用的简版组件清单，适合 AI/搜索场景。
+
+## LLM 组件索引
+
+**基础组件 (Layout/Basic):** Button | Icon | Text | Code | Link | Tag | Badge | Avatar | Divider  
+**布局 (Layout):** Container | Grid | Layout | Space | Card | List | Descriptions | Skeleton  
+**表单 (Form):** Form | FormItem | Input | Textarea | Select | Checkbox | CheckboxGroup | Radio | RadioGroup | Switch | Slider | DatePicker | TimePicker | Upload  
+**导航 (Navigation):** Breadcrumb | Menu | Tabs | Pagination | Steps | Tree  
+**反馈/浮层 (Feedback/Overlay):** Alert | Message | Notification | Modal | Drawer | Popover | Popconfirm | Tooltip | Dropdown | Loading | Progress  
+**数据展示 (Data):** Table | Timeline
+
+**快速查找：** 所有组件从 `@expcat/tigercat-vue` 导入，事件使用 kebab-case (@click, @change)，支持 v-model。
 
 ## 快速使用
 
@@ -16,40 +29,11 @@ import { Button, ConfigProvider } from '@expcat/tigercat-vue'
 </template>
 ```
 
-**样式入口（必需）**
+- 组件名使用 PascalCase（如 `Button`、`DatePicker`）
+- 事件采用 kebab-case（如 `@click`、`@change`）
+- 支持 v-model 双向绑定
 
-在项目的 CSS 文件中加入以下内容（放在业务样式之前）：
-
-```css
-@import 'tailwindcss';
-@source '../node_modules/@expcat/tigercat-vue/dist/**/*.{js,mjs}';
-@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
-```
-
-- 组件名使用 PascalCase（如 `Button`、`DatePicker`）。
-- 事件采用 kebab-case（如 `@click`、`@change`）。
-- 事件采用 kebab-case（如 `@click`、`@change`）。
-
-### 按需样式（Tailwind content 配置）
-
-在业务项目的 Tailwind 配置中加入 Tigercat 构建产物路径，确保按需生成样式：
-
-```js
-// tailwind.config.js
-import { tigercatPlugin } from '@expcat/tigercat-core'
-
-export default {
-  content: [
-    './index.html',
-    './src/**/*.{vue,js,ts,jsx,tsx}',
-    './node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}'
-  ],
-  theme: {
-    extend: {}
-  },
-  plugins: [tigercatPlugin]
-}
-```
+> 样式配置请参考 [README.md](../README.md#llm-quick-start)
 
 ## 组件清单（Props / Events 速览）
 
@@ -120,3 +104,13 @@ export default {
 
 - Table：Props: columns(列)/data(数据)/rowKey(行键)；Events: @rowClick(行点击)
 - Timeline：Props: items(节点)/placement(位置)
+
+## 常见陷阱 / FAQ
+
+1. **样式未生效：** 确保 Tailwind 配置的 `content` 包含 `./node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}`
+2. **主题变量无效：** 必须在 `plugins` 中添加 `tigercatPlugin`
+3. **v-model 不响应：** 检查是否同时使用了 `:value` 和 `@update:modelValue`（应只用 `v-model`）
+4. **事件名称错误：** Vue 事件使用 kebab-case（`@click` 而非 `@onClick`）
+5. **组件未注册：** 确认已从 `@expcat/tigercat-vue` 导入并在 template 中使用 PascalCase
+
+更多详情见各组件文档：`docs/components/[component-name].md`（TODO: 待补全） 或源码：`packages/vue/src/components/`

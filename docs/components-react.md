@@ -1,6 +1,19 @@
 # Tigercat 组件总览（React）
 
+<!-- LLM-INDEX: framework=React; package=@expcat/tigercat-react; import-from=@expcat/tigercat-react; event-style=camelCase; controlled=supported -->
+
 面向快速理解与使用的简版组件清单，适合 AI/搜索场景。
+
+## LLM 组件索引
+
+**基础组件 (Layout/Basic):** Button | Icon | Text | Code | Link | Tag | Badge | Avatar | Divider  
+**布局 (Layout):** Container | Grid | Layout | Space | Card | List | Descriptions | Skeleton  
+**表单 (Form):** Form | FormItem | Input | Textarea | Select | Checkbox | CheckboxGroup | Radio | RadioGroup | Switch | Slider | DatePicker | TimePicker | Upload  
+**导航 (Navigation):** Breadcrumb | Menu | Tabs | Pagination | Steps | Tree  
+**反馈/浮层 (Feedback/Overlay):** Alert | Message | Notification | Modal | Drawer | Popover | Popconfirm | Tooltip | Dropdown | Loading | Progress  
+**数据展示 (Data):** Table | Timeline
+
+**快速查找：** 所有组件从 `@expcat/tigercat-react` 导入，事件使用 camelCase (onClick, onChange)，支持受控/非受控模式。
 
 ## 快速使用
 
@@ -16,40 +29,11 @@ export function App() {
 }
 ```
 
-**样式入口（必需）**
+- 组件名使用 PascalCase（如 `Button`、`DatePicker`）
+- 事件使用 camelCase（如 `onClick`、`onChange`）
+- 支持受控/非受控模式
 
-在项目的 CSS 文件中加入以下内容（放在业务样式之前）：
-
-```css
-@import 'tailwindcss';
-@source '../node_modules/@expcat/tigercat-react/dist/**/*.{js,mjs}';
-@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
-```
-
-- 组件名使用 PascalCase（如 `Button`、`DatePicker`）。
-- 事件使用 camelCase（如 `onClick`、`onChange`）。
-- 事件使用 camelCase（如 `onClick`、`onChange`）。
-
-### 按需样式（Tailwind content 配置）
-
-在业务项目的 Tailwind 配置中加入 Tigercat 构建产物路径，确保按需生成样式：
-
-```js
-// tailwind.config.js
-import { tigercatPlugin } from '@expcat/tigercat-core'
-
-export default {
-  content: [
-    './index.html',
-    './src/**/*.{js,ts,jsx,tsx}',
-    './node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}'
-  ],
-  theme: {
-    extend: {}
-  },
-  plugins: [tigercatPlugin]
-}
-```
+> 样式配置请参考 [README.md](../README.md#llm-quick-start)
 
 ## 组件清单（Props / Events 速览）
 
@@ -120,3 +104,13 @@ export default {
 
 - Table：Props: columns(列)/data(数据)/rowKey(行键)；Events: onRowClick(行点击)
 - Timeline：Props: items(节点)/placement(位置)
+
+## 常见陷阱 / FAQ
+
+1. **样式未生效：** 确保 Tailwind 配置的 `content` 包含 `./node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}`
+2. **主题变量无效：** 必须在 `plugins` 中添加 `tigercatPlugin`
+3. **受控组件报错：** 不要在同一组件混用 `value` (受控) 和 `defaultValue` (非受控)
+4. **事件名称错误：** React 事件使用 camelCase（`onClick` 而非 `@click`）
+5. **类型导入：** 组件 props 类型也从 `@expcat/tigercat-react` 导出（如 `ButtonProps`）
+
+更多详情见各组件文档：`docs/components/[component-name].md`（TODO: 待补全） 或源码：`packages/react/src/components/`
