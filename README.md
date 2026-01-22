@@ -1,5 +1,9 @@
 # Tigercat
 
+[![@expcat/tigercat-vue](https://img.shields.io/npm/v/@expcat/tigercat-vue?style=flat-square&logo=vue.js&label=@expcat/tigercat-vue)](https://www.npmjs.com/package/@expcat/tigercat-vue)
+[![@expcat/tigercat-react](https://img.shields.io/npm/v/@expcat/tigercat-react?style=flat-square&logo=react&label=@expcat/tigercat-react)](https://www.npmjs.com/package/@expcat/tigercat-react)
+[![@expcat/tigercat-core](https://img.shields.io/npm/v/@expcat/tigercat-core?style=flat-square&logo=npm&label=@expcat/tigercat-core)](https://www.npmjs.com/package/@expcat/tigercat-core)
+
 <!-- LLM-INDEX: packages=@expcat/tigercat-vue|@expcat/tigercat-react|@expcat/tigercat-core; frameworks=Vue3|React; requires=Tailwind-CSS; docs=docs/components-vue.md|docs/components-react.md|docs/theme.md -->
 
 基于 Tailwind CSS 的 UI 组件库，支持 Vue 3 与 React。
