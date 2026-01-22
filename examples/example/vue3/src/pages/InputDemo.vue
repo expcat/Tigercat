@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Input, Space, FormItem } from '@expcat/tigercat-vue'
+import { Input, Space, FormItem, Button } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
+import type { InputStatus } from '@expcat/tigercat-core'
 
 const basicText = ref('')
 const controlledText = ref('')
@@ -11,6 +12,25 @@ const disabled = ref('禁用的输入框')
 const readonly = ref('只读的输入框')
 const limited = ref('')
 const uncontrolled = ref('')
+
+// Shake Demo Logic
+const shakeStatus = ref<InputStatus>('default')
+const shakeError = ref('')
+
+const triggerShake = () => {
+  shakeStatus.value = 'default'
+  shakeError.value = ''
+  
+  // 使用 nextTick 或 setTimeout 来确保状态变更被捕捉，从而由 default -> error 触发动画
+  setTimeout(() => {
+    shakeStatus.value = 'error'
+    shakeError.value = '验证失败，请重试！'
+  }, 50)
+}
+const resetShake = () => {
+    shakeStatus.value = 'default'
+    shakeError.value = ''
+}
 
 const handleUncontrolledInput = (event: Event) => {
   uncontrolled.value = (event.target as HTMLInputElement).value
@@ -82,6 +102,14 @@ const statusSnippet = `<Space direction="vertical" class="w-full max-w-md">
   <Input status="warning" placeholder="警告状态" />
   <Input status="success" placeholder="成功状态" />
   <Input status="error" errorMessage="用户名已存在" placeholder="带错误信息" />
+</Space>`
+
+const shakeSnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <Input :status="shakeStatus" :errorMessage="shakeError" placeholder="点击按钮触发错误抖动" />
+  <Space>
+    <Button @click="triggerShake" variant="primary">触发错误</Button>
+    <Button @click="resetShake">重置</Button>
+  </Space>
 </Space>`
 </script>
 
@@ -221,6 +249,23 @@ const statusSnippet = `<Space direction="vertical" class="w-full max-w-md">
         <Input status="warning" placeholder="警告状态" />
         <Input status="success" placeholder="成功状态" />
         <Input status="error" errorMessage="用户名已存在" placeholder="带错误信息" />
+      </Space>
+    </DemoBlock>
+
+    <!-- 错误抖动 -->
+    <DemoBlock title="错误抖动"
+               description="当状态变为 error 时会自动触发抖动动画。"
+               :code="shakeSnippet">
+      <Space direction="vertical"
+             class="w-full max-w-md">
+        <Input :status="shakeStatus"
+               :errorMessage="shakeError"
+               placeholder="点击按钮触发错误抖动" />
+        <Space>
+          <Button @click="triggerShake"
+                  variant="primary">触发错误</Button>
+          <Button @click="resetShake">重置</Button>
+        </Space>
       </Space>
     </DemoBlock>
   </div>

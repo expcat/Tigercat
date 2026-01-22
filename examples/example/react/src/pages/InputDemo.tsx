@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Input, Space, FormItem } from '@expcat/tigercat-react'
+import { Input, Space, FormItem, Button } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
+import type { InputStatus } from '@expcat/tigercat-core'
 
 const basicSnippet = `<Space direction="vertical" className="w-full max-w-md">
   <Input value={basicText} onChange={(e) => setBasicText(e.target.value)} placeholder="请输入内容" />
@@ -66,6 +67,14 @@ const statusSnippet = `<Space direction="vertical" className="w-full max-w-md">
   <Input status="error" errorMessage="用户名已存在" placeholder="带错误信息" />
 </Space>`
 
+const shakeSnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <Input status={shakeStatus} errorMessage={shakeError} placeholder="点击按钮触发错误抖动" />
+  <Space>
+    <Button onClick={triggerShake} variant="primary">触发错误</Button>
+    <Button onClick={resetShake}>重置</Button>
+  </Space>
+</Space>`
+
 const InputDemo: React.FC = () => {
   const [basicText, setBasicText] = useState('')
   const [controlledText, setControlledText] = useState('')
@@ -75,6 +84,24 @@ const InputDemo: React.FC = () => {
   const [limited, setLimited] = useState('')
   const [disabled] = useState('禁用的输入框')
   const [readonly] = useState('只读的输入框')
+
+  // Shake demo state
+  const [shakeStatus, setShakeStatus] = useState<InputStatus>('default')
+  const [shakeError, setShakeError] = useState('')
+
+  const triggerShake = () => {
+    setShakeStatus('default')
+    setShakeError('')
+    setTimeout(() => {
+      setShakeStatus('error')
+      setShakeError('验证失败，请重试！')
+    }, 50)
+  }
+
+  const resetShake = () => {
+    setShakeStatus('default')
+    setShakeError('')
+  }
 
   return (
     <div className="max-w-5xl mx-auto p-8">
@@ -213,6 +240,26 @@ const InputDemo: React.FC = () => {
           <Input status="warning" placeholder="警告状态" />
           <Input status="success" placeholder="成功状态" />
           <Input status="error" errorMessage="用户名已存在" placeholder="带错误信息" />
+        </Space>
+      </DemoBlock>
+
+      {/* 错误抖动 */}
+      <DemoBlock
+        title="错误抖动"
+        description="当状态变为 error 时会自动触发抖动动画。"
+        code={shakeSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <Input
+            status={shakeStatus}
+            errorMessage={shakeError}
+            placeholder="点击按钮触发错误抖动"
+          />
+          <Space>
+            <Button onClick={triggerShake} variant="primary">
+              触发错误
+            </Button>
+            <Button onClick={resetShake}>重置</Button>
+          </Space>
         </Space>
       </DemoBlock>
     </div>

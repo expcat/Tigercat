@@ -64,7 +64,7 @@ import { Button, ConfigProvider } from '@expcat/tigercat-vue'
 
 - Form：Props: model(数据)/rules(校验)/labelWidth(标签宽度)
 - FormItem：Props: prop(字段)/label(标签)/error(错误)
-- Input：Props: modelValue(值)/placeholder(占位)/disabled(禁用)/clearable(可清除)/prefix(前缀)/suffix(后缀)/status(状态)/errorMessage(错误信息)；Events: @update:modelValue(改值) @change(变更) @blur(失焦)；Slots: prefix(前缀)/suffix(后缀)
+- Input：Props: modelValue(值)/placeholder(占位)/disabled(禁用)/clearable(可清除)/prefix(前缀)/suffix(后缀)/status(状态)/errorMessage(错误信息)；Events: @update:modelValue(改值) @change(变更) @blur(失焦)；Slots: prefix(前缀)/suffix(后缀)；Other: Error status triggers shake animation
 - Textarea：Props: modelValue(值)/rows(行数)/autosize(自适应)；Events: @update:modelValue(改值)
 - Select：Props: modelValue(值)/options(选项)/multiple(多选)/clearable(可清除)；Events: @update:modelValue(改值)
 - Checkbox：Props: modelValue(选中)/disabled(禁用)/indeterminate(半选)；Events: @update:modelValue(改值)

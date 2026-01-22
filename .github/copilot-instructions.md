@@ -27,7 +27,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 | **修改现有组件** | 1) 先读源码理解 2) 改 core 或 vue/react 3) 同步另一框架(如适用) 4) 更新测试                                 |
 | **修复类型错误** | 1) 定位根因(tsup/vue-tsc 报错) 2) 优先改类型定义 3) 不用 `any`                                              |
 | **添加测试**     | 1) 参照同类组件测试 2) Vue: `tests/vue/` React: `tests/react/` 3) 用 Testing Library                        |
-| **更新文档**     | 1) API 变更 → `docs/components-*.md` 2) 新模式/约定 → 本文件                                                |
+| **更新文档**     | 1) API 变更 → `docs/components-*.md` 及 `docs/components/*.md` 2) 新模式/约定 → 本文件                      |
 
 ## 工作方式（高信噪比规则）
 
@@ -77,6 +77,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
   - `packages/react/src/index.tsx`：对外导出（组件 + `type` 导出）
 - `docs/components-vue.md`：Vue 组件总览（简要）
 - `docs/components-react.md`：React 组件总览（简要）
+- `docs/components/*.md`：各组件详细文档（包含 API 表格与示例代码）
 - `tests/`：Vitest + Testing Library 测试（Vue/React 分目录）
 
 ## 决策指南（快速判断放哪）
@@ -95,7 +96,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 2. Vue：新增/修改组件文件，并在 `packages/vue/src/index.ts` 导出
 3. React：新增/修改组件文件，并在 `packages/react/src/index.tsx` 导出（需要时同时导出 `type Props`）
 4. Tests：至少补齐对应框架的单测；复杂组件补充 a11y/边界场景
-5. Docs：在 `docs/components-vue.md` 与 `docs/components-react.md` 补齐简要描述与分组
+5. Docs：在 `docs/components-vue.md` 与 `docs/components-react.md` 补齐简要描述与分组；同时更新 `docs/components/[name].md` 详细文档
 6. 进度文件：必要时更新 `ROADMAP.md`、测试清单（见 `tests/*CHECKLIST*.md`）
 
 ## 代码约定

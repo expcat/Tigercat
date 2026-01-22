@@ -64,7 +64,7 @@ export function App() {
 
 - Form：Props: model(数据)/rules(校验)/labelWidth(标签宽度)
 - FormItem：Props: name(字段)/label(标签)/error(错误)
-- Input：Props: value(值)/placeholder(占位)/disabled(禁用)/clearable(可清除)/prefix(前缀)/suffix(后缀)/status(状态)/errorMessage(错误信息)；Events: onChange(变更)/onBlur(失焦)
+- Input：Props: value(值)/placeholder(占位)/disabled(禁用)/clearable(可清除)/prefix(前缀)/suffix(后缀)/status(状态)/errorMessage(错误信息)；Events: onChange(变更)/onBlur(失焦)；Other: Error status triggers shake animation
 - Textarea：Props: value(值)/rows(行数)/autosize(自适应)；Events: onChange(变更)
 - Select：Props: value(值)/options(选项)/multiple(多选)/clearable(可清除)；Events: onChange(变更)
 - Checkbox：Props: checked(选中)/disabled(禁用)/indeterminate(半选)；Events: onChange(变更)
