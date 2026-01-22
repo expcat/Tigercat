@@ -169,6 +169,59 @@ Input 组件支持多种 HTML5 输入类型：
 </div>
 ```
 
+### 错误抖动 (Shake Animation)
+
+当 input 的 `status` 变更为 `error` 时，组件会自动触发一次抖动动画，用于提示用户输入错误。
+
+#### Vue 3
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import { Input, Button } from '@expcat/tigercat-vue'
+
+const status = ref('default')
+
+const triggerError = () => {
+  status.value = 'default'
+  // 确保状态变更被捕捉
+  setTimeout(() => {
+    status.value = 'error'
+  }, 50)
+}
+</script>
+
+<template>
+  <Input :status="status" placeholder="Click button to shake" />
+  <Button @click="triggerError">Trigger Error</Button>
+</template>
+```
+
+#### React
+
+```tsx
+import { useState } from 'react'
+import { Input, Button } from '@expcat/tigercat-react'
+
+function ShakeExample() {
+  const [status, setStatus] = useState('default')
+
+  const triggerError = () => {
+    setStatus('default')
+    setTimeout(() => {
+      setStatus('error')
+    }, 50)
+  }
+
+  return (
+    <>
+      <Input status={status} placeholder="Click button to shake" />
+      <Button onClick={triggerError}>Trigger Error</Button>
+    </>
+  )
+}
+```
+
 ## 禁用状态 (Disabled)
 
 通过 `disabled` 属性禁用输入框。

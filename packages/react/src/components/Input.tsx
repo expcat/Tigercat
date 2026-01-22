@@ -5,6 +5,8 @@ import {
   getInputWrapperClasses,
   getInputAffixClasses,
   getInputErrorClasses,
+  injectShakeStyle,
+  SHAKE_CLASS,
   type InputProps as CoreInputProps,
   type InputStatus
 } from '@expcat/tigercat-core'
@@ -99,8 +101,21 @@ export const Input: React.FC<InputProps> = ({
   style,
   ...props
 }) => {
+  injectShakeStyle()
+  const [isShaking, setIsShaking] = useState(false)
+
   const inputRef = useRef<HTMLInputElement>(null)
   const [internalValue, setInternalValue] = useState<string | number>(defaultValue ?? '')
+
+  useEffect(() => {
+    if (status === 'error') {
+      setIsShaking(true)
+    }
+  }, [status])
+
+  const handleAnimationEnd = () => {
+    setIsShaking(false)
+  }
 
   // Determine if the component is controlled - simple comparison, no need to memoize
   const isControlled = value !== undefined
@@ -145,7 +160,10 @@ export const Input: React.FC<InputProps> = ({
   })
 
   return (
-    <div className={classNames(getInputWrapperClasses(), className)} style={style}>
+    <div
+      className={classNames(getInputWrapperClasses(), className, isShaking && SHAKE_CLASS)}
+      style={style}
+      onAnimationEnd={handleAnimationEnd}>
       {hasPrefix && <div className={getInputAffixClasses('prefix', size)}>{prefix}</div>}
       <input
         {...props}

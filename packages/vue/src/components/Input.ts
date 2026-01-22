@@ -6,6 +6,8 @@ import {
   getInputWrapperClasses,
   getInputAffixClasses,
   getInputErrorClasses,
+  injectShakeStyle,
+  SHAKE_CLASS,
   type InputSize,
   type InputType,
   type InputStatus
@@ -151,8 +153,10 @@ export const Input = defineComponent({
     blur: null
   },
   setup(props, { emit, attrs, slots }) {
+    injectShakeStyle()
     const inputRef = ref<HTMLInputElement | null>(null)
     const localValue = ref<string | number>(props.modelValue ?? '')
+    const isShaking = ref(false)
 
     // Sync localValue with modelValue prop
     watch(
@@ -164,6 +168,20 @@ export const Input = defineComponent({
         }
       }
     )
+
+    // Trigger shake animation when status changes to error
+    watch(
+      () => props.status,
+      (newStatus) => {
+        if (newStatus === 'error') {
+          isShaking.value = true
+        }
+      }
+    )
+
+    const handleAnimationEnd = () => {
+      isShaking.value = false
+    }
 
     const hasPrefix = computed(() => !!slots.prefix || !!props.prefix)
     const hasSuffix = computed(() => !!slots.suffix || !!props.suffix)
@@ -208,8 +226,14 @@ export const Input = defineComponent({
       return h(
         'div',
         {
-          class: classNames(getInputWrapperClasses(), props.className, coerceClassValue(attrClass)),
-          style: [attrStyle, props.style]
+          class: classNames(
+            getInputWrapperClasses(),
+            props.className,
+            coerceClassValue(attrClass),
+            isShaking.value && SHAKE_CLASS
+          ),
+          style: [attrStyle, props.style],
+          onAnimationend: handleAnimationEnd
         },
         [
           hasPrefix.value &&
