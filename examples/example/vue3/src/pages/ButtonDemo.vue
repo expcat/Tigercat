@@ -54,6 +54,13 @@ const fullWidthSnippet = `<Space direction="vertical" class="w-full">
   <Button variant="secondary" class="w-full">次要按钮</Button>
   <Button variant="outline" class="w-full">轮廓按钮</Button>
 </Space>`
+
+const customLoadingSnippet = `<Button loading>
+  <template #loading-icon>
+    <span class="animate-spin inline-block">🔄</span>
+  </template>
+  自定义图标
+</Button>`
 </script>
 
 <template>
@@ -124,6 +131,18 @@ const fullWidthSnippet = `<Space direction="vertical" class="w-full">
           </Space>
         </div>
       </Space>
+    </DemoBlock>
+
+    <!-- 自定义加载图标 -->
+    <DemoBlock title="自定义加载图标"
+               description="可以通过 slot 自定义加载状态下的图标。"
+               :code="customLoadingSnippet">
+      <Button loading>
+        <template #loading-icon>
+          <span class="animate-spin inline-block">🔄</span>
+        </template>
+        自定义图标
+      </Button>
     </DemoBlock>
 
     <!-- 块级按钮 -->

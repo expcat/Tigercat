@@ -10,7 +10,9 @@ import {
 } from '@expcat/tigercat-core'
 
 export interface ButtonProps
-  extends CoreButtonProps, Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled'> {}
+  extends CoreButtonProps, Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled'> {
+  loadingIcon?: React.ReactNode
+}
 
 const spinnerSvg = getSpinnerSVG('spinner')
 
@@ -19,6 +21,7 @@ export const Button: React.FC<ButtonProps> = ({
   size = 'md',
   disabled = false,
   loading = false,
+  loadingIcon,
   block = false,
   onClick,
   children,
@@ -54,19 +57,23 @@ export const Button: React.FC<ButtonProps> = ({
       {...props}>
       {loading && (
         <span className="mr-2">
-          <svg
-            className="animate-spin h-4 w-4"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox={spinnerSvg.viewBox}
-            aria-hidden="true"
-            focusable="false">
-            {spinnerSvg.elements.map((el, index) => {
-              if (el.type === 'circle') return <circle key={index} {...el.attrs} />
-              if (el.type === 'path') return <path key={index} {...el.attrs} />
-              return null
-            })}
-          </svg>
+          {loadingIcon ? (
+            loadingIcon
+          ) : (
+            <svg
+              className="animate-spin h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox={spinnerSvg.viewBox}
+              aria-hidden="true"
+              focusable="false">
+              {spinnerSvg.elements.map((el, index) => {
+                if (el.type === 'circle') return <circle key={index} {...el.attrs} />
+                if (el.type === 'path') return <path key={index} {...el.attrs} />
+                return null
+              })}
+            </svg>
+          )}
         </span>
       )}
       {children}

@@ -39,7 +39,7 @@ import { Button, ConfigProvider } from '@expcat/tigercat-vue'
 
 ### 基础
 
-- Button：Props: variant(外观)/size(尺寸)/disabled(禁用)/loading(加载)/block(块级)/type(原生类型)/class(样式类)/style(内联样式)；Events: @click(点击)
+- Button：Props: variant(外观)/size(尺寸)/disabled(禁用)/loading(加载)/block(块级)/type(原生类型)/class(样式类)/style(内联样式)；Events: @click(点击)；Slots: default(内容)/loading-icon(加载图标)
 - Icon：Props: name(图标名)/size(尺寸)/color(颜色)/rotate(旋转)
 - Text：Props: size(字号)/weight(字重)/color(颜色)/ellipsis(省略)
 - Code：Props: value(内容)/lang(语言)/copyable(可复制)
@@ -64,7 +64,7 @@ import { Button, ConfigProvider } from '@expcat/tigercat-vue'
 
 - Form：Props: model(数据)/rules(校验)/labelWidth(标签宽度)
 - FormItem：Props: prop(字段)/label(标签)/error(错误)
-- Input：Props: modelValue(值)/placeholder(占位)/disabled(禁用)/clearable(可清除)；Events: @update:modelValue(改值) @change(变更) @blur(失焦)
+- Input：Props: modelValue(值)/placeholder(占位)/disabled(禁用)/clearable(可清除)/prefix(前缀)/suffix(后缀)/status(状态)/errorMessage(错误信息)；Events: @update:modelValue(改值) @change(变更) @blur(失焦)；Slots: prefix(前缀)/suffix(后缀)
 - Textarea：Props: modelValue(值)/rows(行数)/autosize(自适应)；Events: @update:modelValue(改值)
 - Select：Props: modelValue(值)/options(选项)/multiple(多选)/clearable(可清除)；Events: @update:modelValue(改值)
 - Checkbox：Props: modelValue(选中)/disabled(禁用)/indeterminate(半选)；Events: @update:modelValue(改值)

@@ -104,6 +104,71 @@ Input 组件支持多种 HTML5 输入类型：
 </div>
 ```
 
+## 前缀与后缀 (Prefix & Suffix)
+
+可以在输入框的前后添加图标或文本。
+
+### Vue 3
+
+支持通过 props 传入字符串，或通过 slots 传入复杂内容。
+
+```vue
+<template>
+  <div class="space-y-4">
+    <!-- 使用 props -->
+    <Input prefix="￥" suffix="RMB" />
+
+    <!-- 使用 slots -->
+    <Input>
+      <template #prefix>
+        <span class="text-gray-500">https://</span>
+      </template>
+      <template #suffix>
+        <span>.com</span>
+      </template>
+    </Input>
+  </div>
+</template>
+```
+
+### React
+
+通过 `prefix` 和 `suffix` 属性传入。
+
+```tsx
+<div className="space-y-4">
+  <Input prefix="￥" suffix="RMB" />
+
+  <Input prefix={<span className="text-gray-500">https://</span>} suffix={<span>.com</span>} />
+</div>
+```
+
+## 状态与校验 (Status & Validation)
+
+通过 `status` 属性设置校验状态，支持显示错误信息。
+
+### Vue 3
+
+```vue
+<template>
+  <div class="space-y-4">
+    <Input status="error" errorMessage="邮箱格式不正确" />
+    <Input status="warning" placeholder="Warning status" />
+    <Input status="success" placeholder="Success status" />
+  </div>
+</template>
+```
+
+### React
+
+```tsx
+<div className="space-y-4">
+  <Input status="error" errorMessage="邮箱格式不正确" />
+  <Input status="warning" placeholder="Warning status" />
+  <Input status="success" placeholder="Success status" />
+</div>
+```
+
 ## 禁用状态 (Disabled)
 
 通过 `disabled` 属性禁用输入框。
@@ -340,50 +405,64 @@ function EventExample() {
 
 ### Props / 属性
 
-| 属性         | 说明             | 类型        | 默认值   | 可选值                                                                                  |
-| ------------ | ---------------- | ----------- | -------- | --------------------------------------------------------------------------------------- |
-| size         | 输入框尺寸       | `InputSize` | `'md'`   | `'sm'` \| `'md'` \| `'lg'`                                                              |
-| type         | 输入框类型       | `InputType` | `'text'` | `'text'` \| `'password'` \| `'email'` \| `'number'` \| `'tel'` \| `'url'` \| `'search'` |
-| placeholder  | 占位符文本       | `string`    | `''`     | -                                                                                       |
-| disabled     | 是否禁用         | `boolean`   | `false`  | `true` \| `false`                                                                       |
-| readonly     | 是否只读         | `boolean`   | `false`  | `true` \| `false`                                                                       |
-| required     | 是否必填         | `boolean`   | `false`  | `true` \| `false`                                                                       |
-| maxLength    | 最大长度         | `number`    | -        | -                                                                                       |
-| minLength    | 最小长度         | `number`    | -        | -                                                                                       |
-| name         | 输入框 name 属性 | `string`    | -        | -                                                                                       |
-| id           | 输入框 id 属性   | `string`    | -        | -                                                                                       |
-| autoComplete | 自动完成属性     | `string`    | -        | -                                                                                       |
-| autoFocus    | 是否自动聚焦     | `boolean`   | `false`  | `true` \| `false`                                                                       |
+| 属性         | 说明             | 类型          | 默认值      | 可选值                                                                                  |
+| ------------ | ---------------- | ------------- | ----------- | --------------------------------------------------------------------------------------- |
+| size         | 输入框尺寸       | `InputSize`   | `'md'`      | `'sm'` \| `'md'` \| `'lg'`                                                              |
+| type         | 输入框类型       | `InputType`   | `'text'`    | `'text'` \| `'password'` \| `'email'` \| `'number'` \| `'tel'` \| `'url'` \| `'search'` |
+| status       | 校验状态         | `InputStatus` | `'default'` | `'default'` \| `'error'` \| `'warning'` \| `'success'`                                  |
+| errorMessage | 错误提示信息     | `string`      | -           | -                                                                                       |
+| placeholder  | 占位符文本       | `string`      | `''`        | -                                                                                       |
+| disabled     | 是否禁用         | `boolean`     | `false`     | `true` \| `false`                                                                       |
+| readonly     | 是否只读         | `boolean`     | `false`     | `true` \| `false`                                                                       |
+| required     | 是否必填         | `boolean`     | `false`     | `true` \| `false`                                                                       |
+| maxLength    | 最大长度         | `number`      | -           | -                                                                                       |
+| minLength    | 最小长度         | `number`      | -           | -                                                                                       |
+| name         | 输入框 name 属性 | `string`      | -           | -                                                                                       |
+| id           | 输入框 id 属性   | `string`      | -           | -                                                                                       |
+| autoComplete | 自动完成属性     | `string`      | -           | -                                                                                       |
+| autoFocus    | 是否自动聚焦     | `boolean`     | `false`     | `true` \| `false`                                                                       |
 
 #### Vue 专属属性
 
-| 属性       | 说明              | 类型               | 默认值 |
-| ---------- | ----------------- | ------------------ | ------ |
-| modelValue | 绑定值（v-model） | `string \| number` | -      |
+| 属性 | 说明 | 类型 | 默认值 |
+| prefix | 前缀内容 | `string` | - |
+| suffix | 后缀内容 | `string` | - |
 
 #### React 专属属性
 
-| 属性         | 说明              | 类型                                                   | 默认值 |
-| ------------ | ----------------- | ------------------------------------------------------ | ------ |
-| value        | 输入框值（受控）  | `string \| number`                                     | -      |
-| defaultValue | 默认值（非受控）  | `string \| number`                                     | -      |
-| onInput      | Input 事件处理器  | `(event: React.FormEvent<HTMLInputElement>) => void`   | -      |
-| onChange     | Change 事件处理器 | `(event: React.ChangeEvent<HTMLInputElement>) => void` | -      |
-| onFocus      | Focus 事件处理器  | `(event: React.FocusEvent<HTMLInputElement>) => void`  | -      |
-| onBlur       | Blur 事件处理器   | `(event: React.FocusEvent<HTMLInputElement>) => void`  | -      |
-| className    | 额外的 CSS 类名   | `string`                                               | -      |
+| 属性         | 说明              | 类型                                                           | 默认值 |
+| ------------ | ----------------- | -------------------------------------------------------------- | ------ |
+| value        | 输入框值（受控）  | `string \| number`                                             | -      |
+| defaultValue | 默认值（非受控）  | `string \| number`                                             | -      |
+| prefix       | 前缀内容          | `React.ReactNode`                                              | -      |
+| suffix       | 后缀内容          | `React.ReactNode` -------------------------------------------- | ------ |
+| value        | 输入框值（受控）  | `string \| number`                                             | -      |
+| defaultValue | 默认值（非受控）  | `string \| number`                                             | -      |
+| onInput      | Input 事件处理器  | `(event: React.FormEvent<HTMLInputElement>) => void`           | -      |
+| onChange     | Change 事件处理器 | `(event: React.ChangeEvent<HTMLInputElement>) => void`         | -      |
+| onFocus      | Focus 事件处理器  | `(event: React.FocusEvent<HTMLInputElement>) => void`          | -      |
+| onBlur       | Blur 事件处理器   | `(event: React.FocusEvent<HTMLInputElement>) => void`          | -      |
+| className    | 额外的 CSS 类名   | `string`                                                       | -      |
 
 > React 版本同时支持透传大部分原生 `input` 属性（如 `aria-*`、`data-*`、`title` 等）。
 
 ### Events / 事件 (Vue)
 
-| 事件名            | 说明                    | 回调参数                    |
-| ----------------- | ----------------------- | --------------------------- |
-| update:modelValue | 值更新时触发（v-model） | `(value: string \| number)` |
-| input             | 输入时触发              | `(event: Event)`            |
-| change            | 值改变时触发            | `(event: Event)`            |
-| focus             | 获得焦点时触发          | `(event: FocusEvent)`       |
-| blur              | 失去焦点时触发          | `(event: FocusEvent)`       |
+| 事件名 | 说明 | 回调参数 |
+| ------ | ---- | -------- |
+
+| # Slots / 插槽 (Vue)
+
+| 插槽名 | 说明     |
+| ------ | -------- |
+| prefix | 前缀内容 |
+| suffix | 后缀内容 |
+
+##update:modelValue | 值更新时触发（v-model） | `(value: string \| number)` |
+| input | 输入时触发 | `(event: Event)` |
+| change | 值改变时触发 | `(event: Event)` |
+| focus | 获得焦点时触发 | `(event: FocusEvent)` |
+| blur | 失去焦点时触发 | `(event: FocusEvent)` |
 
 ## 样式定制
 

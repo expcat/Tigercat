@@ -13,6 +13,11 @@ export type InputSize = 'sm' | 'md' | 'lg'
 export type InputType = 'text' | 'password' | 'email' | 'number' | 'tel' | 'url' | 'search'
 
 /**
+ * Input status types
+ */
+export type InputStatus = 'default' | 'error' | 'success' | 'warning'
+
+/**
  * Base input props interface
  */
 export interface InputProps {
@@ -21,6 +26,17 @@ export interface InputProps {
    * @default 'md'
    */
   size?: InputSize
+
+  /**
+   * Validation status
+   * @default 'default'
+   */
+  status?: InputStatus
+
+  /**
+   * Error message to display
+   */
+  errorMessage?: string
 
   /**
    * Input type
