@@ -66,6 +66,23 @@ const limitSnippet = `<Space direction="vertical" class="w-full max-w-md">
     <p class="text-sm text-gray-600">当前长度：{{ limited.length }}</p>
   </FormItem>
 </Space>`
+
+const affixSnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <Input placeholder="前缀图标">
+    <template #prefix>👤</template>
+  </Input>
+  <Input placeholder="后缀图标">
+    <template #suffix>🔍</template>
+  </Input>
+  <Input prefix="￥" suffix="RMB" placeholder="前缀后缀文本" />
+</Space>`
+
+const statusSnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <Input status="error" placeholder="错误状态" />
+  <Input status="warning" placeholder="警告状态" />
+  <Input status="success" placeholder="成功状态" />
+  <Input status="error" errorMessage="用户名已存在" placeholder="带错误信息" />
+</Space>`
 </script>
 
 <template>
@@ -177,6 +194,33 @@ const limitSnippet = `<Space direction="vertical" class="w-full max-w-md">
                  placeholder="请输入 3~10 个字符" />
           <p class="text-sm text-gray-600">当前长度：{{ limited.length }}</p>
         </FormItem>
+      </Space>
+    </DemoBlock>
+
+    <!-- 前缀与后缀 -->
+    <DemoBlock title="前缀与后缀"
+               description="可以在输入框前后添加图标或文本。"
+               :code="affixSnippet">
+      <Space direction="vertical" class="w-full max-w-md">
+        <Input placeholder="前缀图标">
+          <template #prefix>👤</template>
+        </Input>
+        <Input placeholder="后缀图标">
+          <template #suffix>🔍</template>
+        </Input>
+        <Input prefix="￥" suffix="RMB" placeholder="前缀后缀文本" />
+      </Space>
+    </DemoBlock>
+
+    <!-- 状态与错误提示 -->
+    <DemoBlock title="状态与错误提示"
+               description="支持 error、warning、success 状态，error 状态下可显示内部错误信息。"
+               :code="statusSnippet">
+      <Space direction="vertical" class="w-full max-w-md">
+        <Input status="error" placeholder="错误状态" />
+        <Input status="warning" placeholder="警告状态" />
+        <Input status="success" placeholder="成功状态" />
+        <Input status="error" errorMessage="用户名已存在" placeholder="带错误信息" />
       </Space>
     </DemoBlock>
   </div>

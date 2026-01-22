@@ -64,6 +64,34 @@ describe('Input', () => {
     })
   })
 
+  describe('Affix', () => {
+    it('should render prefix', () => {
+      const { getByText } = render(<Input prefix="Pre" />)
+      expect(getByText('Pre')).toBeInTheDocument()
+    })
+
+    it('should render suffix', () => {
+      const { getByText } = render(<Input suffix="Suf" />)
+      expect(getByText('Suf')).toBeInTheDocument()
+    })
+  })
+
+  describe('Validation', () => {
+    it('should render error status style', () => {
+      const { container } = render(<Input status="error" />)
+      const input = container.querySelector('input')
+      expect(input?.className).toContain('border-red-500')
+    })
+
+    it('should render error message', () => {
+      const { getByText, queryByText } = render(
+        <Input status="error" errorMessage="Bad input" suffix="HiddenSuffix" />
+      )
+      expect(getByText('Bad input')).toBeInTheDocument()
+      expect(queryByText('HiddenSuffix')).not.toBeInTheDocument()
+    })
+  })
+
   describe('Props', () => {
     it.each(componentSizes)('should render %s size correctly', (size) => {
       const { getByRole } = render(<Input size={size} />)

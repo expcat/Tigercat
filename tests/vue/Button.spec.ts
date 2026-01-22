@@ -69,6 +69,18 @@ describe('Button', () => {
     expect(onClick).not.toHaveBeenCalled()
   })
 
+  it('renders custom loading icon via slot', () => {
+    const { container } = render(Button, {
+      props: { loading: true },
+      slots: { 'loading-icon': '<span class="custom-loader">Loading...</span>' }
+    })
+
+    const loader = container.querySelector('.custom-loader')
+    expect(loader).toBeInTheDocument()
+    expect(loader).toHaveTextContent('Loading...')
+    expect(container.querySelector('svg.animate-spin')).not.toBeInTheDocument()
+  })
+
   it('can receive focus (keyboard baseline)', async () => {
     const { container } = render(Button, {
       slots: { default: 'Focusable' }

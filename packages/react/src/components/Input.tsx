@@ -1,5 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { classNames, getInputClasses, type InputProps as CoreInputProps } from '@expcat/tigercat-core'
+import {
+  classNames,
+  getInputClasses,
+  getInputWrapperClasses,
+  getInputAffixClasses,
+  getInputErrorClasses,
+  type InputProps as CoreInputProps,
+  type InputStatus
+} from '@expcat/tigercat-core'
 
 export interface InputProps
   extends
@@ -16,6 +24,7 @@ export interface InputProps
       | 'onFocus'
       | 'onBlur'
       | 'readOnly'
+      | 'prefix'
     > {
   /**
    * Input event handler
@@ -41,11 +50,35 @@ export interface InputProps
    * Additional CSS classes
    */
   className?: string
+
+  /**
+   * Validation status
+   */
+  status?: InputStatus
+
+  /**
+   * Error message to display
+   */
+  errorMessage?: string
+
+  /**
+   * Prefix content
+   */
+  prefix?: React.ReactNode
+
+  /**
+   * Suffix content
+   */
+  suffix?: React.ReactNode
 }
 
 export const Input: React.FC<InputProps> = ({
   size = 'md',
   type = 'text',
+  status = 'default',
+  errorMessage,
+  prefix,
+  suffix,
   value,
   defaultValue,
   placeholder = '',
@@ -63,6 +96,7 @@ export const Input: React.FC<InputProps> = ({
   onFocus,
   onBlur,
   className,
+  style,
   ...props
 }) => {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -99,29 +133,46 @@ export const Input: React.FC<InputProps> = ({
     onChange?.(event)
   }
 
-  const inputClasses = classNames(getInputClasses(size), className)
+  const hasPrefix = !!prefix
+  const hasSuffix = !!suffix
+  const activeError = status === 'error' && !!errorMessage
+
+  const inputClasses = getInputClasses({
+    size,
+    status,
+    hasPrefix,
+    hasSuffix
+  })
 
   return (
-    <input
-      {...props}
-      ref={inputRef}
-      className={inputClasses}
-      type={type}
-      value={inputValue}
-      placeholder={placeholder}
-      disabled={disabled}
-      readOnly={readonly}
-      required={required}
-      maxLength={maxLength}
-      minLength={minLength}
-      name={name}
-      id={id}
-      autoComplete={autoComplete}
-      autoFocus={autoFocus}
-      onInput={handleInput}
-      onChange={handleChange}
-      onFocus={onFocus}
-      onBlur={onBlur}
-    />
+    <div className={classNames(getInputWrapperClasses(), className)} style={style}>
+      {hasPrefix && <div className={getInputAffixClasses('prefix', size)}>{prefix}</div>}
+      <input
+        {...props}
+        ref={inputRef}
+        className={inputClasses}
+        type={type}
+        value={inputValue}
+        placeholder={placeholder}
+        disabled={disabled}
+        readOnly={readonly}
+        required={required}
+        maxLength={maxLength}
+        minLength={minLength}
+        name={name}
+        id={id}
+        autoComplete={autoComplete}
+        autoFocus={autoFocus}
+        onInput={handleInput}
+        onChange={handleChange}
+        onFocus={onFocus}
+        onBlur={onBlur}
+      />
+      {activeError ? (
+        <div className={getInputErrorClasses(size)}>{errorMessage}</div>
+      ) : (
+        hasSuffix && <div className={getInputAffixClasses('suffix', size)}>{suffix}</div>
+      )}
+    </div>
   )
 }

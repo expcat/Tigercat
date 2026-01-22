@@ -39,7 +39,7 @@ export function App() {
 
 ### 基础
 
-- Button：Props: variant(外观)/size(尺寸)/disabled(禁用)/loading(加载)/block(块级)/type(原生类型)/className(样式类)/style(内联样式)；Events: onClick(点击)
+- Button：Props: variant(外观)/size(尺寸)/disabled(禁用)/loading(加载)/loadingIcon(加载图标)/block(块级)/type(原生类型)/className(样式类)/style(内联样式)；Events: onClick(点击)
 - Icon：Props: name(图标名)/size(尺寸)/color(颜色)/rotate(旋转)
 - Text：Props: size(字号)/weight(字重)/color(颜色)/ellipsis(省略)
 - Code：Props: value(内容)/lang(语言)/copyable(可复制)
@@ -64,7 +64,7 @@ export function App() {
 
 - Form：Props: model(数据)/rules(校验)/labelWidth(标签宽度)
 - FormItem：Props: name(字段)/label(标签)/error(错误)
-- Input：Props: value(值)/placeholder(占位)/disabled(禁用)/clearable(可清除)；Events: onChange(变更)/onBlur(失焦)
+- Input：Props: value(值)/placeholder(占位)/disabled(禁用)/clearable(可清除)/prefix(前缀)/suffix(后缀)/status(状态)/errorMessage(错误信息)；Events: onChange(变更)/onBlur(失焦)
 - Textarea：Props: value(值)/rows(行数)/autosize(自适应)；Events: onChange(变更)
 - Select：Props: value(值)/options(选项)/multiple(多选)/clearable(可清除)；Events: onChange(变更)
 - Checkbox：Props: checked(选中)/disabled(禁用)/indeterminate(半选)；Events: onChange(变更)

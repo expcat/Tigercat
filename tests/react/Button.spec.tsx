@@ -87,6 +87,30 @@ describe('Button', () => {
     expect(onClick).not.toHaveBeenCalled()
   })
 
+  it('renders custom loading icon when loading and loadingIcon prop is provided', () => {
+    render(
+      <Button
+        loading
+        loadingIcon={
+          <span data-testid="custom-spinner" aria-hidden="true">
+            Custom
+          </span>
+        }>
+        Submit
+      </Button>
+    )
+
+    // aria-hidden content inside button might still be part of text content depending on implementation,
+    // but let's check if we can find it by generic role first.
+    // Ideally we want to ensure the custom icon is there.
+    const button = screen.getByRole('button')
+    expect(button).toBeDisabled()
+    expect(button).toHaveAttribute('aria-busy', 'true')
+    expect(screen.getByTestId('custom-spinner')).toBeInTheDocument()
+    // Default spinner should not be present
+    expect(button.querySelector('svg.animate-spin')).not.toBeInTheDocument()
+  })
+
   it('supports keyboard activation when enabled', async () => {
     const user = userEvent.setup()
     const onClick = vi.fn()

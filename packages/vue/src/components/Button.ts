@@ -118,7 +118,8 @@ export const Button = defineComponent({
       const ariaDisabled = attrs['aria-disabled'] ?? (isDisabled ? 'true' : undefined)
 
       if (props.loading) {
-        children.push(h('span', { class: 'mr-2' }, LoadingSpinner))
+        const loadingIcon = slots['loading-icon'] ? slots['loading-icon']() : LoadingSpinner
+        children.push(h('span', { class: 'mr-2' }, loadingIcon))
       }
 
       if (slots.default) {

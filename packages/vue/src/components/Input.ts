@@ -3,8 +3,12 @@ import {
   classNames,
   coerceClassValue,
   getInputClasses,
+  getInputWrapperClasses,
+  getInputAffixClasses,
+  getInputErrorClasses,
   type InputSize,
-  type InputType
+  type InputType,
+  type InputStatus
 } from '@expcat/tigercat-core'
 
 export interface VueInputProps {
@@ -51,6 +55,26 @@ export const Input = defineComponent({
       type: String as PropType<InputType>,
       default: 'text' as InputType
     },
+    /**
+     * Input status
+     * @default 'default'
+     */
+    status: {
+      type: String as PropType<InputStatus>,
+      default: 'default'
+    },
+    /**
+     * Error message to default display
+     */
+    errorMessage: String,
+    /**
+     * Prefix text/icon
+     */
+    prefix: String,
+    /**
+     * Suffix text/icon
+     */
+    suffix: String,
     /**
      * Placeholder text
      */
@@ -126,7 +150,7 @@ export const Input = defineComponent({
     focus: null,
     blur: null
   },
-  setup(props, { emit, attrs }) {
+  setup(props, { emit, attrs, slots }) {
     const inputRef = ref<HTMLInputElement | null>(null)
     const localValue = ref<string | number>(props.modelValue ?? '')
 
@@ -141,8 +165,17 @@ export const Input = defineComponent({
       }
     )
 
+    const hasPrefix = computed(() => !!slots.prefix || !!props.prefix)
+    const hasSuffix = computed(() => !!slots.suffix || !!props.suffix)
+    const activeError = computed(() => props.status === 'error' && !!props.errorMessage)
+
     const inputClasses = computed(() =>
-      classNames(getInputClasses(props.size), props.className, coerceClassValue(attrs.class))
+      getInputClasses({
+        size: props.size,
+        status: props.status,
+        hasPrefix: hasPrefix.value,
+        hasSuffix: hasSuffix.value
+      })
     )
 
     /**
@@ -170,28 +203,52 @@ export const Input = defineComponent({
     const handleBlur = (event: FocusEvent) => emit('blur', event)
 
     return () => {
-      return h('input', {
-        ...attrs,
-        ref: inputRef,
-        class: inputClasses.value,
-        style: [attrs.style, props.style],
-        type: props.type,
-        value: localValue.value,
-        placeholder: props.placeholder,
-        disabled: props.disabled,
-        readonly: props.readonly,
-        required: props.required,
-        maxlength: props.maxLength,
-        minlength: props.minLength,
-        name: props.name,
-        id: props.id,
-        autocomplete: props.autoComplete,
-        autofocus: props.autoFocus,
-        onInput: handleInput,
-        onChange: handleChange,
-        onFocus: handleFocus,
-        onBlur: handleBlur
-      })
+      const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
+
+      return h(
+        'div',
+        {
+          class: classNames(getInputWrapperClasses(), props.className, coerceClassValue(attrClass)),
+          style: [attrStyle, props.style]
+        },
+        [
+          hasPrefix.value &&
+            h(
+              'div',
+              { class: getInputAffixClasses('prefix', props.size) },
+              slots.prefix ? slots.prefix() : props.prefix
+            ),
+          h('input', {
+            ...restAttrs,
+            ref: inputRef,
+            class: inputClasses.value,
+            type: props.type,
+            value: localValue.value,
+            placeholder: props.placeholder,
+            disabled: props.disabled,
+            readonly: props.readonly,
+            required: props.required,
+            maxlength: props.maxLength,
+            minlength: props.minLength,
+            name: props.name,
+            id: props.id,
+            autocomplete: props.autoComplete,
+            autofocus: props.autoFocus,
+            onInput: handleInput,
+            onChange: handleChange,
+            onFocus: handleFocus,
+            onBlur: handleBlur
+          }),
+          activeError.value
+            ? h('div', { class: getInputErrorClasses(props.size) }, props.errorMessage)
+            : hasSuffix.value &&
+              h(
+                'div',
+                { class: getInputAffixClasses('suffix', props.size) },
+                slots.suffix ? slots.suffix() : props.suffix
+              )
+        ]
+      )
     }
   }
 })

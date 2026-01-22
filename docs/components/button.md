@@ -142,6 +142,39 @@ Button 组件支持 3 种不同的尺寸：
 </Button>
 ```
 
+### 自定义加载图标
+
+你可以自定义加载状态时显示的图标。
+
+#### Vue 3
+
+使用 `loading-icon` 插槽：
+
+```vue
+<template>
+  <Button loading>
+    <template #loading-icon>
+      <!-- 自定义 SVG 或组件 -->
+      <svg class="animate-spin h-4 w-4" ...>...</svg>
+    </template>
+    Loading...
+  </Button>
+</template>
+```
+
+#### React
+
+使用 `loadingIcon` 属性：
+
+```tsx
+<Button
+  loading
+  loadingIcon={<svg className="animate-spin h-4 w-4" ...>...</svg>}
+>
+  Loading...
+</Button>
+```
+
 ## 点击事件 (Click Event)
 
 ### Vue 3
@@ -191,12 +224,13 @@ function App() {
 
 #### React 专属属性
 
-| 属性      | 说明            | 类型                                                   | 默认值     |
-| --------- | --------------- | ------------------------------------------------------ | ---------- |
-| onClick   | 点击事件处理器  | `(event: React.MouseEvent<HTMLButtonElement>) => void` | -          |
-| type      | HTML 按钮类型   | `'button'` \| `'submit'` \| `'reset'`                  | `'button'` |
-| className | 额外的 CSS 类名 | `string`                                               | -          |
-| children  | 按钮内容        | `React.ReactNode`                                      | -          |
+| 属性        | 说明            | 类型                                                   | 默认值     |
+| ----------- | --------------- | ------------------------------------------------------ | ---------- |
+| onClick     | 点击事件处理器  | `(event: React.MouseEvent<HTMLButtonElement>) => void` | -          |
+| type        | HTML 按钮类型   | `'button'` \| `'submit'` \| `'reset'`                  | `'button'` |
+| className   | 额外的 CSS 类名 | `string`                                               | -          |
+| children    | 按钮内容        | `React.ReactNode`                                      | -          |
+| loadingIcon | 自定义加载图标  | `React.ReactNode`                                      | -          |
 
 ### Events / 事件 (Vue)
 
@@ -206,8 +240,11 @@ function App() {
 
 ### Slots / 插槽 (Vue)
 
-| 插槽名  | 说明     |
-| ------- | -------- |
+     | 说明           |
+
+| ------------ | -------------- |
+| default | 按钮内容 |
+| loading-icon | 自定义加载图标---- |
 | default | 按钮内容 |
 
 ## 样式定制

@@ -57,6 +57,58 @@ describe('Input', () => {
     })
   })
 
+  describe('Affix', () => {
+    it('should render prefix prop', () => {
+      const { container } = render(Input, {
+        props: { prefix: 'Pre' }
+      })
+      expect(container).toHaveTextContent('Pre')
+    })
+
+    it('should render prefix slot', () => {
+      const { container } = render(Input, {
+        slots: { prefix: '<span class="prefix-slot">Slot</span>' }
+      })
+      expect(container.querySelector('.prefix-slot')).toBeInTheDocument()
+    })
+
+    it('should render suffix prop', () => {
+      const { container } = render(Input, {
+        props: { suffix: 'Suf' }
+      })
+      expect(container).toHaveTextContent('Suf')
+    })
+
+    it('should render suffix slot', () => {
+      const { container } = render(Input, {
+        slots: { suffix: '<span class="suffix-slot">Slot</span>' }
+      })
+      expect(container.querySelector('.suffix-slot')).toBeInTheDocument()
+    })
+  })
+
+  describe('Validation', () => {
+    it('should render error status style', () => {
+      const { container } = render(Input, {
+        props: { status: 'error' }
+      })
+      const input = container.querySelector('input')
+      expect(input).toHaveClass('border-red-500')
+    })
+
+    it('should render error message inside input wrapper', () => {
+      const { container } = render(Input, {
+        props: { status: 'error', errorMessage: 'Bad input' }
+      })
+      expect(container).toHaveTextContent('Bad input')
+      // Should not render suffix if error is present (impl detail)
+      const { container: containerWithSuffix } = render(Input, {
+        props: { status: 'error', errorMessage: 'Bad input', suffix: 'Should hide' }
+      })
+      expect(containerWithSuffix).not.toHaveTextContent('Should hide')
+    })
+  })
+
   describe('Props', () => {
     it.each(componentSizes)('should render %s size correctly', (size) => {
       const { getByRole } = renderWithProps(Input, { size })
