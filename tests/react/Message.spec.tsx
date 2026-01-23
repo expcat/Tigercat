@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, waitFor } from '@testing-library/react'
-import { message } from '@expcat/tigercat-react'
+import { Message } from '@expcat/tigercat-react'
 
 const messageTypes = ['success', 'warning', 'error', 'info', 'loading'] as const
 
@@ -19,20 +19,20 @@ function getMessageByType(type: (typeof messageTypes)[number]) {
 describe('Message (React)', () => {
   beforeEach(() => {
     // Clear all messages before each test
-    message.clear()
+    Message.clear()
     // Clear any existing message containers
     document.body.innerHTML = ''
   })
 
   afterEach(() => {
     // Clean up after each test
-    message.clear()
+    Message.clear()
     document.body.innerHTML = ''
   })
 
   describe('Basic Functionality', () => {
     it('should show a message when called', async () => {
-      message.info('Test message')
+      Message.info('Test message')
 
       await waitFor(() => {
         const messageElement = getMessageByType('info')
@@ -42,7 +42,7 @@ describe('Message (React)', () => {
     })
 
     it('should accept config object as parameter', async () => {
-      message.warning({
+      Message.warning({
         content: 'Warning message',
         duration: 5000
       })
@@ -56,7 +56,7 @@ describe('Message (React)', () => {
 
   describe('Types', () => {
     it.each(messageTypes)('should show %s type message', async (type) => {
-      message[type](`${type} message`)
+      Message[type](`${type} message`)
 
       await waitFor(() => {
         const messageElement = getMessageByType(type)
@@ -71,7 +71,7 @@ describe('Message (React)', () => {
       vi.useFakeTimers()
 
       act(() => {
-        message.info('Auto close message')
+        Message.info('Auto close message')
       })
 
       expect(getMessages().length).toBe(1)
@@ -90,7 +90,7 @@ describe('Message (React)', () => {
       vi.useFakeTimers()
 
       act(() => {
-        message.success({
+        Message.success({
           content: 'Custom duration',
           duration: 1000
         })
@@ -112,7 +112,7 @@ describe('Message (React)', () => {
       vi.useFakeTimers()
 
       act(() => {
-        message.warning({
+        Message.warning({
           content: 'No auto close',
           duration: 0
         })
@@ -135,7 +135,7 @@ describe('Message (React)', () => {
       vi.useFakeTimers()
 
       act(() => {
-        message.loading('Loading...')
+        Message.loading('Loading...')
       })
 
       expect(getMessages().length).toBe(1)
@@ -154,7 +154,7 @@ describe('Message (React)', () => {
 
   describe('Manual Close', () => {
     it('should return a close function', async () => {
-      const close = message.info('Closable message')
+      const close = Message.info('Closable message')
 
       expect(typeof close).toBe('function')
 
@@ -171,7 +171,7 @@ describe('Message (React)', () => {
     })
 
     it('should show close button when closable is true', async () => {
-      message.info({
+      Message.info({
         content: 'Closable',
         closable: true,
         duration: 0
@@ -186,7 +186,7 @@ describe('Message (React)', () => {
     it('should close when close button is clicked', async () => {
       vi.useFakeTimers()
 
-      message.info({
+      Message.info({
         content: 'Closable',
         closable: true,
         duration: 0
@@ -212,7 +212,7 @@ describe('Message (React)', () => {
     it('should call onClose callback when message closes', async () => {
       const onClose = vi.fn()
 
-      const close = message.success({
+      const close = Message.success({
         content: 'Test',
         onClose
       })
@@ -235,7 +235,7 @@ describe('Message (React)', () => {
       const onClose = vi.fn()
 
       act(() => {
-        message.info({
+        Message.info({
           content: 'Test',
           duration: 1000,
           onClose
@@ -257,9 +257,9 @@ describe('Message (React)', () => {
 
   describe('Queue Management', () => {
     it('should show multiple messages', async () => {
-      message.info('Message 1')
-      message.success('Message 2')
-      message.warning('Message 3')
+      Message.info('Message 1')
+      Message.success('Message 2')
+      Message.warning('Message 3')
 
       await waitFor(() => {
         expect(getMessages().length).toBe(3)
@@ -267,16 +267,16 @@ describe('Message (React)', () => {
     })
 
     it('should clear all messages with clear()', async () => {
-      message.info('Message 1')
-      message.success('Message 2')
-      message.warning('Message 3')
+      Message.info('Message 1')
+      Message.success('Message 2')
+      Message.warning('Message 3')
 
       await waitFor(() => {
         expect(getMessages().length).toBe(3)
       })
 
       // Clear all
-      message.clear()
+      Message.clear()
 
       await waitFor(() => {
         expect(getMessages().length).toBe(0)
@@ -288,15 +288,15 @@ describe('Message (React)', () => {
       const onClose2 = vi.fn()
       const onClose3 = vi.fn()
 
-      message.info({ content: 'Message 1', onClose: onClose1 })
-      message.success({ content: 'Message 2', onClose: onClose2 })
-      message.warning({ content: 'Message 3', onClose: onClose3 })
+      Message.info({ content: 'Message 1', onClose: onClose1 })
+      Message.success({ content: 'Message 2', onClose: onClose2 })
+      Message.warning({ content: 'Message 3', onClose: onClose3 })
 
       await waitFor(() => {
         expect(getMessages().length).toBe(3)
       })
 
-      message.clear()
+      Message.clear()
 
       await waitFor(() => {
         expect(onClose1).toHaveBeenCalled()
@@ -308,7 +308,7 @@ describe('Message (React)', () => {
 
   describe('Custom Options', () => {
     it('should support custom className', async () => {
-      message.info({
+      Message.info({
         content: 'Custom class',
         className: 'custom-message-class'
       })
@@ -320,7 +320,7 @@ describe('Message (React)', () => {
     })
 
     it('should support custom icon', async () => {
-      message.success({
+      Message.success({
         content: 'Custom icon',
         icon: 'M5 13l4 4L19 7'
       })
@@ -335,7 +335,7 @@ describe('Message (React)', () => {
 
   describe('Accessibility', () => {
     it('should use role=status for non-error messages', async () => {
-      message.info('Accessible message')
+      Message.info('Accessible message')
       await waitFor(() => {
         const el = getMessageByType('info')
         expect(el?.getAttribute('role')).toBe('status')
@@ -343,7 +343,7 @@ describe('Message (React)', () => {
     })
 
     it('should use role=alert for error messages', async () => {
-      message.error('Error message')
+      Message.error('Error message')
       await waitFor(() => {
         const el = getMessageByType('error')
         expect(el?.getAttribute('role')).toBe('alert')
@@ -351,7 +351,7 @@ describe('Message (React)', () => {
     })
 
     it('close button should have aria-label', async () => {
-      message.info({
+      Message.info({
         content: 'Closable',
         closable: true
       })
