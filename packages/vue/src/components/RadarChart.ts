@@ -4,6 +4,7 @@ import {
   chartGridLineClasses,
   classNames,
   createPolygonPath,
+  DEFAULT_CHART_COLORS,
   getChartGridLineDasharray,
   getChartInnerRect,
   getRadarAngles,
@@ -16,15 +17,6 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartSeries } from './ChartSeries'
-
-const defaultRadarColors = [
-  'var(--tiger-chart-1,#2563eb)',
-  'var(--tiger-chart-2,#22c55e)',
-  'var(--tiger-chart-3,#f97316)',
-  'var(--tiger-chart-4,#a855f7)',
-  'var(--tiger-chart-5,#0ea5e9)',
-  'var(--tiger-chart-6,#ef4444)'
-]
 
 export interface VueRadarChartProps extends CoreRadarChartProps {
   data?: RadarChartDatum[]
@@ -162,7 +154,7 @@ export const RadarChart = defineComponent({
     },
     strokeColor: {
       type: String,
-      default: defaultRadarColors[0]
+      default: DEFAULT_CHART_COLORS[0]
     },
     strokeWidth: {
       type: Number,
@@ -170,7 +162,7 @@ export const RadarChart = defineComponent({
     },
     fillColor: {
       type: String,
-      default: defaultRadarColors[0]
+      default: DEFAULT_CHART_COLORS[0]
     },
     fillOpacity: {
       type: Number,
@@ -315,7 +307,7 @@ export const RadarChart = defineComponent({
 
     const dasharray = computed(() => getChartGridLineDasharray(props.gridLineStyle))
     const palette = computed(() =>
-      props.colors && props.colors.length > 0 ? props.colors : defaultRadarColors
+      props.colors && props.colors.length > 0 ? props.colors : [...DEFAULT_CHART_COLORS]
     )
     const formatTooltip = computed(
       () =>
@@ -576,14 +568,14 @@ export const RadarChart = defineComponent({
               },
               [
                 h('span', {
-                  class: classNames(
-                    'inline-block rounded-full',
-                    `w-[${props.legendMarkerSize}px]`,
-                    `h-[${props.legendMarkerSize}px]`,
-                    `bg-[${item.color}]`
-                  )
+                  class: 'inline-block rounded-full',
+                  style: {
+                    width: `${props.legendMarkerSize}px`,
+                    height: `${props.legendMarkerSize}px`,
+                    backgroundColor: item.color
+                  }
                 }),
-                h('span', { class: classNames(`mr-[${props.legendGap}px]`) }, item.label)
+                h('span', { style: { marginRight: `${props.legendGap}px` } }, item.label)
               ]
             )
           )

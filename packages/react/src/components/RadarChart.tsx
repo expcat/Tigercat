@@ -4,6 +4,7 @@ import {
   chartGridLineClasses,
   classNames,
   createPolygonPath,
+  DEFAULT_CHART_COLORS,
   getChartGridLineDasharray,
   getChartInnerRect,
   getRadarAngles,
@@ -16,15 +17,6 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartSeries } from './ChartSeries'
-
-const defaultRadarColors = [
-  'var(--tiger-chart-1,#2563eb)',
-  'var(--tiger-chart-2,#22c55e)',
-  'var(--tiger-chart-3,#f97316)',
-  'var(--tiger-chart-4,#a855f7)',
-  'var(--tiger-chart-5,#0ea5e9)',
-  'var(--tiger-chart-6,#ef4444)'
-]
 
 export interface RadarChartProps extends CoreRadarChartProps {
   data?: RadarChartDatum[]
@@ -90,9 +82,9 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   legendFormatter,
   legendMarkerSize = 10,
   legendGap = 8,
-  strokeColor = defaultRadarColors[0],
+  strokeColor = DEFAULT_CHART_COLORS[0],
   strokeWidth = 2,
-  fillColor = defaultRadarColors[0],
+  fillColor = DEFAULT_CHART_COLORS[0],
   fillOpacity = 0.2,
   showPoints = true,
   pointSize = 3,
@@ -225,7 +217,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
 
   const dasharray = getChartGridLineDasharray(gridLineStyle)
   const palette = useMemo(
-    () => (colors && colors.length > 0 ? colors : defaultRadarColors),
+    () => (colors && colors.length > 0 ? colors : [...DEFAULT_CHART_COLORS]),
     [colors]
   )
   const formatTooltip = useMemo(
@@ -433,14 +425,14 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             onMouseEnter={shouldHandleHover ? () => handleHover(item.index) : undefined}
             onMouseLeave={shouldHandleHover ? () => handleHover(null) : undefined}>
             <span
-              className={classNames(
-                'inline-block rounded-full',
-                `w-[${legendMarkerSize}px]`,
-                `h-[${legendMarkerSize}px]`,
-                `bg-[${item.color}]`
-              )}
+              className="inline-block rounded-full"
+              style={{
+                width: `${legendMarkerSize}px`,
+                height: `${legendMarkerSize}px`,
+                backgroundColor: item.color
+              }}
             />
-            <span className={classNames(`mr-[${legendGap}px]`)}>{item.label}</span>
+            <span style={{ marginRight: `${legendGap}px` }}>{item.label}</span>
           </button>
         ))}
       </div>

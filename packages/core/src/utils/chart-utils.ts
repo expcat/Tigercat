@@ -17,6 +17,19 @@ export const chartAxisLabelClasses = 'fill-[color:var(--tiger-text,#374151)] tex
 
 export const chartGridLineClasses = 'stroke-[color:var(--tiger-border,#e5e7eb)]'
 
+/**
+ * Default color palette for chart components.
+ * Uses CSS variables with fallback colors.
+ */
+export const DEFAULT_CHART_COLORS = [
+  'var(--tiger-chart-1,#2563eb)',
+  'var(--tiger-chart-2,#22c55e)',
+  'var(--tiger-chart-3,#f97316)',
+  'var(--tiger-chart-4,#a855f7)',
+  'var(--tiger-chart-5,#0ea5e9)',
+  'var(--tiger-chart-6,#ef4444)'
+] as const
+
 const clampNumber = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
 export function normalizeChartPadding(padding?: ChartPadding): {
