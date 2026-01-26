@@ -71,6 +71,7 @@ export * from './utils/radio-group-utils'
 export * from './utils/code-utils'
 export * from './utils/copy-text'
 export * from './utils/chart-utils'
+export * from './utils/chart-interaction'
 
 // Types
 export * from './types/button'
