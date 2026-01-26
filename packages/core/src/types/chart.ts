@@ -240,15 +240,15 @@ export interface ChartGridProps {
 export type ChartSeriesType = 'bar' | 'scatter' | 'line' | 'area' | 'pie' | 'radar' | 'custom'
 
 export interface ChartSeriesPoint {
-  x: ChartScaleValue
-  y: ChartScaleValue
+  x?: ChartScaleValue
+  y?: ChartScaleValue
   value?: number
   label?: string
   color?: string
   size?: number
 }
 
-export interface ChartSeriesProps<T extends ChartSeriesPoint = ChartSeriesPoint> {
+export interface ChartSeriesProps<T = ChartSeriesPoint> {
   /**
    * Series data
    */
@@ -569,6 +569,87 @@ export interface ScatterChartProps {
    * @default 1
    */
   gridStrokeWidth?: number
+
+  /**
+   * Additional CSS classes
+   */
+  className?: string
+}
+
+export interface PieChartDatum extends ChartSeriesPoint {
+  value: number
+  label?: string
+  color?: string
+}
+
+export interface PieChartProps {
+  /**
+   * Chart width
+   * @default 320
+   */
+  width?: number
+
+  /**
+   * Chart height
+   * @default 200
+   */
+  height?: number
+
+  /**
+   * Chart padding
+   * @default 24
+   */
+  padding?: ChartPadding
+
+  /**
+   * Chart data
+   */
+  data: PieChartDatum[]
+
+  /**
+   * Inner radius for donut
+   * @default 0
+   */
+  innerRadius?: number
+
+  /**
+   * Outer radius
+   */
+  outerRadius?: number
+
+  /**
+   * Start angle in radians
+   * @default 0
+   */
+  startAngle?: number
+
+  /**
+   * End angle in radians
+   * @default Math.PI * 2
+   */
+  endAngle?: number
+
+  /**
+   * Padding angle in radians
+   * @default 0
+   */
+  padAngle?: number
+
+  /**
+   * Custom colors
+   */
+  colors?: string[]
+
+  /**
+   * Whether to show labels
+   * @default false
+   */
+  showLabels?: boolean
+
+  /**
+   * Label formatter
+   */
+  labelFormatter?: (value: number, datum: PieChartDatum, index: number) => string
 
   /**
    * Additional CSS classes

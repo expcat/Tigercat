@@ -197,6 +197,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'ScatterChart', 'en-US': 'ScatterChart' }
       },
       {
+        key: 'pie-chart',
+        path: '/pie-chart',
+        label: { 'zh-CN': 'PieChart', 'en-US': 'PieChart' }
+      },
+      {
         key: 'skeleton',
         path: '/skeleton',
         label: { 'zh-CN': 'Skeleton', 'en-US': 'Skeleton' }

@@ -68,6 +68,10 @@ const router = createRouter({
           path: 'scatter-chart',
           component: () => import('./pages/ScatterChartDemo.vue')
         },
+        {
+          path: 'pie-chart',
+          component: () => import('./pages/PieChartDemo.vue')
+        },
         { path: 'menu', component: () => import('./pages/MenuDemo.vue') },
         {
           path: 'breadcrumb',

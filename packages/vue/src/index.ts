@@ -149,5 +149,7 @@ export { BarChart } from './components/BarChart'
 export type { VueBarChartProps } from './components/BarChart'
 export { ScatterChart } from './components/ScatterChart'
 export type { VueScatterChartProps } from './components/ScatterChart'
+export { PieChart } from './components/PieChart'
+export type { VuePieChartProps } from './components/PieChart'
 
 export const version = '0.0.1'

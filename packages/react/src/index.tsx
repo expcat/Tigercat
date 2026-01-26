@@ -180,5 +180,7 @@ export { BarChart } from './components/BarChart'
 export type { BarChartProps } from './components/BarChart'
 export { ScatterChart } from './components/ScatterChart'
 export type { ScatterChartProps } from './components/ScatterChart'
+export { PieChart } from './components/PieChart'
+export type { PieChartProps } from './components/PieChart'
 
 export const version = '0.0.1'

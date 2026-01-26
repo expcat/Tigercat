@@ -243,3 +243,107 @@ export function getNumberExtent(
 
   return [min, max]
 }
+
+export interface PieArcDatum<T> {
+  data: T
+  value: number
+  startAngle: number
+  endAngle: number
+  padAngle: number
+  index: number
+}
+
+export function getPieArcs<T extends { value: number }>(
+  data: T[],
+  options: {
+    startAngle?: number
+    endAngle?: number
+    padAngle?: number
+  } = {}
+): PieArcDatum<T>[] {
+  const startAngle = options.startAngle ?? 0
+  const endAngle = options.endAngle ?? Math.PI * 2
+  const padAngle = Math.max(0, options.padAngle ?? 0)
+  const values = data.map((item) => Math.max(0, item.value))
+  const total = values.reduce((sum, value) => sum + value, 0)
+  if (total <= 0) return []
+
+  const totalAngle = endAngle - startAngle
+  const totalPadding = padAngle * data.length
+  const availableAngle = Math.max(0, totalAngle - totalPadding)
+
+  let current = startAngle
+  return data.map((item, index) => {
+    const value = values[index]
+    const sliceAngle = availableAngle * (value / total)
+    const sliceStart = current
+    const sliceEnd = sliceStart + sliceAngle
+    current = sliceEnd + padAngle
+
+    return {
+      data: item,
+      value,
+      startAngle: sliceStart,
+      endAngle: sliceEnd,
+      padAngle,
+      index
+    }
+  })
+}
+
+export function polarToCartesian(
+  cx: number,
+  cy: number,
+  radius: number,
+  angle: number
+): { x: number; y: number } {
+  return {
+    x: cx + radius * Math.cos(angle),
+    y: cy + radius * Math.sin(angle)
+  }
+}
+
+export function createPieArcPath(options: {
+  cx: number
+  cy: number
+  innerRadius?: number
+  outerRadius: number
+  startAngle: number
+  endAngle: number
+}): string {
+  const { cx, cy, outerRadius } = options
+  const innerRadius = Math.max(0, options.innerRadius ?? 0)
+
+  let startAngle = options.startAngle
+  let endAngle = options.endAngle
+  const fullCircle = Math.PI * 2
+  if (endAngle - startAngle >= fullCircle) {
+    endAngle = startAngle + fullCircle - 0.0001
+  }
+
+  if (endAngle <= startAngle) return ''
+
+  const startOuter = polarToCartesian(cx, cy, outerRadius, startAngle)
+  const endOuter = polarToCartesian(cx, cy, outerRadius, endAngle)
+  const largeArcFlag = endAngle - startAngle > Math.PI ? 1 : 0
+
+  if (innerRadius <= 0) {
+    return [
+      `M ${cx} ${cy}`,
+      `L ${startOuter.x} ${startOuter.y}`,
+      `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${endOuter.x} ${endOuter.y}`,
+      'Z'
+    ].join(' ')
+  }
+
+  const startInner = polarToCartesian(cx, cy, innerRadius, startAngle)
+  const endInner = polarToCartesian(cx, cy, innerRadius, endAngle)
+
+  return [
+    `M ${startOuter.x} ${startOuter.y}`,
+    `A ${outerRadius} ${outerRadius} 0 ${largeArcFlag} 1 ${endOuter.x} ${endOuter.y}`,
+    `L ${endInner.x} ${endInner.y}`,
+    `A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${startInner.x} ${startInner.y}`,
+    'Z'
+  ].join(' ')
+}
