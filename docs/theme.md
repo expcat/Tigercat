@@ -41,6 +41,12 @@ export default {
 - `--tiger-text`：坐标轴标题颜色
 - `--tiger-text-secondary`：刻度文字颜色
 - `--tiger-primary`：柱状图/散点图默认主色
+- `--tiger-chart-1`：饼图色板 1
+- `--tiger-chart-2`：饼图色板 2
+- `--tiger-chart-3`：饼图色板 3
+- `--tiger-chart-4`：饼图色板 4
+- `--tiger-chart-5`：饼图色板 5
+- `--tiger-chart-6`：饼图色板 6
 
 ## JS/TS API
 

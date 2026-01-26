@@ -5,7 +5,7 @@ import {
   type ChartSeriesProps as CoreChartSeriesProps
 } from '@expcat/tigercat-core'
 
-export interface ChartSeriesRenderProps<T extends ChartSeriesPoint = ChartSeriesPoint> {
+export interface ChartSeriesRenderProps<T = ChartSeriesPoint> {
   data: T[]
   name?: string
   color?: string
@@ -13,7 +13,7 @@ export interface ChartSeriesRenderProps<T extends ChartSeriesPoint = ChartSeries
   type?: string
 }
 
-export interface ChartSeriesProps<T extends ChartSeriesPoint = ChartSeriesPoint>
+export interface ChartSeriesProps<T = ChartSeriesPoint>
   extends
     CoreChartSeriesProps<T>,
     Omit<React.SVGAttributes<SVGGElement>, keyof CoreChartSeriesProps<T> | 'children'> {
