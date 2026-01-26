@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { RadarChart } from '@expcat/tigercat-react'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
@@ -121,5 +122,50 @@ describe('RadarChart', () => {
     })
 
     expect(container.querySelectorAll('circle[data-radar-point] title')).toHaveLength(0)
+  })
+
+  it('selects series on click when selectable', async () => {
+    const user = userEvent.setup()
+    const { container } = renderWithProps(RadarChart, {
+      series: [
+        {
+          name: 'Series A',
+          data: [
+            { label: 'A', value: 80 },
+            { label: 'B', value: 65 },
+            { label: 'C', value: 90 }
+          ]
+        },
+        {
+          name: 'Series B',
+          data: [
+            { label: 'A', value: 70 },
+            { label: 'B', value: 75 },
+            { label: 'C', value: 60 }
+          ]
+        }
+      ],
+      selectable: true,
+      mutedOpacity: 0.2
+    })
+
+    const seriesA = container.querySelector('g[data-series-name="Series A"]') as SVGGElement
+    const seriesB = container.querySelector('g[data-series-name="Series B"]') as SVGGElement
+
+    await user.click(seriesA)
+    expect(seriesA).toHaveAttribute('opacity', '1')
+    expect(seriesB).toHaveAttribute('opacity', '0.2')
+  })
+
+  it('renders legend when enabled', () => {
+    const { container } = renderWithProps(RadarChart, {
+      series: [
+        { name: 'Series A', data: [{ label: 'A', value: 80 }] },
+        { name: 'Series B', data: [{ label: 'A', value: 70 }] }
+      ],
+      showLegend: true
+    })
+
+    expect(container.querySelectorAll('button')).toHaveLength(2)
   })
 })

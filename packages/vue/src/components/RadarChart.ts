@@ -109,6 +109,32 @@ export const RadarChart = defineComponent({
       type: Number,
       default: 0.25
     },
+    selectable: {
+      type: Boolean,
+      default: false
+    },
+    selectedSeriesIndex: {
+      type: Number
+    },
+    showLegend: {
+      type: Boolean,
+      default: false
+    },
+    legendPosition: {
+      type: String as PropType<'bottom' | 'right'>,
+      default: 'bottom'
+    },
+    legendFormatter: {
+      type: Function as PropType<(series: RadarChartSeries, index: number) => string>
+    },
+    legendMarkerSize: {
+      type: Number,
+      default: 10
+    },
+    legendGap: {
+      type: Number,
+      default: 8
+    },
     showTooltip: {
       type: Boolean,
       default: true
@@ -171,8 +197,11 @@ export const RadarChart = defineComponent({
       type: String
     }
   },
-  setup(props) {
+  emits: ['update:selectedSeriesIndex', 'series-click'],
+  setup(props, { emit }) {
     const hoveredIndex = ref<number | null>(null)
+    const localSelectedIndex = ref<number | null>(null)
+
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 
     const radius = computed(() =>
@@ -303,19 +332,71 @@ export const RadarChart = defineComponent({
           return `${name} · ${label}: ${value}`
         })
     )
+    const resolvedSelectedIndex = computed(() =>
+      typeof props.selectedSeriesIndex === 'number'
+        ? props.selectedSeriesIndex
+        : localSelectedIndex.value
+    )
     const resolvedActiveIndex = computed(() =>
       typeof props.activeSeriesIndex === 'number'
         ? props.activeSeriesIndex
-        : props.hoverable
-          ? hoveredIndex.value
-          : null
+        : resolvedSelectedIndex.value !== null
+          ? resolvedSelectedIndex.value
+          : props.hoverable
+            ? hoveredIndex.value
+            : null
     )
     const shouldHandleHover = computed(
-      () => props.hoverable && typeof props.activeSeriesIndex !== 'number'
+      () =>
+        props.hoverable &&
+        typeof props.activeSeriesIndex !== 'number' &&
+        resolvedSelectedIndex.value === null
+    )
+    const shouldHandleSelect = computed(
+      () => props.selectable && typeof props.selectedSeriesIndex !== 'number'
+    )
+    const handleHover = (index: number | null) => {
+      if (!shouldHandleHover.value) return
+      hoveredIndex.value = index
+    }
+    const handleSelectIndex = (index: number) => {
+      if (!props.selectable) return
+      const nextIndex = resolvedSelectedIndex.value === index ? null : index
+      if (typeof props.selectedSeriesIndex !== 'number') {
+        localSelectedIndex.value = nextIndex
+      }
+      emit('update:selectedSeriesIndex', nextIndex)
+      emit('series-click', index, resolvedSeries.value[index])
+    }
+    const resolvedLegendItems = computed(() =>
+      resolvedSeries.value.map((item, index) => {
+        const color = item.color ?? palette.value[index % palette.value.length]
+        const label = props.legendFormatter
+          ? props.legendFormatter(item, index)
+          : (item.name ?? `Series ${index + 1}`)
+
+        return {
+          index,
+          label,
+          color
+        }
+      })
+    )
+    const legendContainerClasses = computed(() =>
+      classNames(
+        'flex flex-wrap',
+        props.legendPosition === 'right' ? 'flex-col gap-2' : 'flex-row gap-3'
+      )
+    )
+    const wrapperClasses = computed(() =>
+      classNames(
+        'inline-flex',
+        props.legendPosition === 'right' ? 'flex-row items-start gap-4' : 'flex-col gap-2'
+      )
     )
 
-    return () =>
-      h(
+    return () => {
+      const chart = h(
         ChartCanvas,
         {
           width: props.width,
@@ -378,19 +459,23 @@ export const RadarChart = defineComponent({
                     data: item.series.data,
                     name: item.series.name,
                     type: 'radar',
-                    className: item.series.className,
+                    class: classNames(
+                      item.series.className,
+                      props.hoverable || props.selectable ? 'cursor-pointer' : null
+                    ),
                     opacity: resolvedOpacity,
-                    style: props.hoverable ? { cursor: 'pointer' } : undefined,
                     onMouseenter: shouldHandleHover.value
-                      ? () => {
-                          hoveredIndex.value = seriesIndex
-                        }
+                      ? () => handleHover(seriesIndex)
                       : undefined,
-                    onMouseleave: shouldHandleHover.value
-                      ? () => {
-                          hoveredIndex.value = null
-                        }
-                      : undefined
+                    onMouseleave: shouldHandleHover.value ? () => handleHover(null) : undefined,
+                    onClick: props.selectable ? () => handleSelectIndex(seriesIndex) : undefined,
+                    tabindex: props.selectable ? 0 : undefined,
+                    onKeydown: (event: KeyboardEvent) => {
+                      if (!shouldHandleSelect.value) return
+                      if (event.key !== 'Enter' && event.key !== ' ') return
+                      event.preventDefault()
+                      handleSelectIndex(seriesIndex)
+                    }
                   },
                   {
                     default: () => [
@@ -467,6 +552,44 @@ export const RadarChart = defineComponent({
             ].filter(Boolean)
         }
       )
+
+      if (!props.showLegend) return chart
+
+      return h('div', { class: wrapperClasses.value }, [
+        chart,
+        h(
+          'div',
+          { class: legendContainerClasses.value },
+          resolvedLegendItems.value.map((item) =>
+            h(
+              'button',
+              {
+                key: `legend-${item.index}`,
+                type: 'button',
+                class: classNames(
+                  'flex items-center gap-2 text-sm text-gray-600',
+                  props.selectable ? 'cursor-pointer' : 'cursor-default'
+                ),
+                onClick: props.selectable ? () => handleSelectIndex(item.index) : undefined,
+                onMouseenter: shouldHandleHover.value ? () => handleHover(item.index) : undefined,
+                onMouseleave: shouldHandleHover.value ? () => handleHover(null) : undefined
+              },
+              [
+                h('span', {
+                  class: classNames(
+                    'inline-block rounded-full',
+                    `w-[${props.legendMarkerSize}px]`,
+                    `h-[${props.legendMarkerSize}px]`,
+                    `bg-[${item.color}]`
+                  )
+                }),
+                h('span', { class: classNames(`mr-[${props.legendGap}px]`) }, item.label)
+              ]
+            )
+          )
+        )
+      ])
+    }
   }
 })
 

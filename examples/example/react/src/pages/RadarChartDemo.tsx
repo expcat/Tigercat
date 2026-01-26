@@ -72,6 +72,9 @@ const multiSnippet = `<RadarChart
   maxValue={100}
   colors={['#2563eb', '#f97316']}
   hoverable
+  selectable
+  showLegend
+  legendPosition="right"
   mutedOpacity={0.2}
   tooltipFormatter={tooltipFormatter}
 />`
@@ -109,6 +112,9 @@ const RadarChartDemo: React.FC = () => {
           maxValue={100}
           colors={['#2563eb', '#f97316']}
           hoverable
+          selectable
+          showLegend
+          legendPosition="right"
           mutedOpacity={0.2}
           tooltipFormatter={tooltipFormatter}
         />

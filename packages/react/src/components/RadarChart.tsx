@@ -46,6 +46,14 @@ export interface RadarChartProps extends CoreRadarChartProps {
     index: number,
     series?: RadarChartSeries
   ) => string
+  selectable?: boolean
+  selectedSeriesIndex?: number
+  onSelectedSeriesChange?: (index: number | null) => void
+  showLegend?: boolean
+  legendPosition?: 'bottom' | 'right'
+  legendFormatter?: (series: RadarChartSeries, index: number) => string
+  legendMarkerSize?: number
+  legendGap?: number
 }
 
 export const RadarChart: React.FC<RadarChartProps> = ({
@@ -74,6 +82,14 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   mutedOpacity = 0.25,
   showTooltip = true,
   tooltipFormatter,
+  selectable = false,
+  selectedSeriesIndex,
+  onSelectedSeriesChange,
+  showLegend = false,
+  legendPosition = 'bottom',
+  legendFormatter,
+  legendMarkerSize = 10,
+  legendGap = 8,
   strokeColor = defaultRadarColors[0],
   strokeWidth = 2,
   fillColor = defaultRadarColors[0],
@@ -86,6 +102,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   className
 }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const [localSelectedIndex, setLocalSelectedIndex] = useState<number | null>(null)
   const innerRect = useMemo(
     () => getChartInnerRect(width, height, padding),
     [width, height, padding]
@@ -222,11 +239,57 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       }),
     [tooltipFormatter]
   )
+  const resolvedSelectedIndex =
+    typeof selectedSeriesIndex === 'number' ? selectedSeriesIndex : localSelectedIndex
   const resolvedActiveIndex =
-    typeof activeSeriesIndex === 'number' ? activeSeriesIndex : hoverable ? hoveredIndex : null
-  const shouldHandleHover = hoverable && typeof activeSeriesIndex !== 'number'
+    typeof activeSeriesIndex === 'number'
+      ? activeSeriesIndex
+      : resolvedSelectedIndex !== null
+        ? resolvedSelectedIndex
+        : hoverable
+          ? hoveredIndex
+          : null
+  const shouldHandleHover =
+    hoverable && typeof activeSeriesIndex !== 'number' && resolvedSelectedIndex === null
+  const shouldHandleSelect = selectable && typeof selectedSeriesIndex !== 'number'
+  const handleHover = (index: number | null) => {
+    if (!shouldHandleHover) return
+    setHoveredIndex(index)
+  }
+  const handleSelectIndex = (index: number) => {
+    if (!selectable) return
+    const nextIndex = resolvedSelectedIndex === index ? null : index
+    if (typeof selectedSeriesIndex !== 'number') {
+      setLocalSelectedIndex(nextIndex)
+    }
+    onSelectedSeriesChange?.(nextIndex)
+  }
+  const resolvedLegendItems = useMemo(
+    () =>
+      resolvedSeries.map((item, index) => {
+        const color = item.color ?? palette[index % palette.length]
+        const label = legendFormatter
+          ? legendFormatter(item, index)
+          : (item.name ?? `Series ${index + 1}`)
 
-  return (
+        return {
+          index,
+          label,
+          color
+        }
+      }),
+    [resolvedSeries, palette, legendFormatter]
+  )
+  const legendContainerClasses = classNames(
+    'flex flex-wrap',
+    legendPosition === 'right' ? 'flex-col gap-2' : 'flex-row gap-3'
+  )
+  const wrapperClasses = classNames(
+    'inline-flex',
+    legendPosition === 'right' ? 'flex-row items-start gap-4' : 'flex-col gap-2'
+  )
+
+  const chart = (
     <ChartCanvas
       width={width}
       height={height}
@@ -281,9 +344,17 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             type="radar"
             className={item.series.className}
             opacity={resolvedOpacity}
-            style={hoverable ? { cursor: 'pointer' } : undefined}
-            onMouseEnter={shouldHandleHover ? () => setHoveredIndex(seriesIndex) : undefined}
-            onMouseLeave={shouldHandleHover ? () => setHoveredIndex(null) : undefined}>
+            style={hoverable || selectable ? { cursor: 'pointer' } : undefined}
+            onMouseEnter={shouldHandleHover ? () => handleHover(seriesIndex) : undefined}
+            onMouseLeave={shouldHandleHover ? () => handleHover(null) : undefined}
+            onClick={selectable ? () => handleSelectIndex(seriesIndex) : undefined}
+            tabIndex={selectable ? 0 : undefined}
+            onKeyDown={(event) => {
+              if (!shouldHandleSelect) return
+              if (event.key !== 'Enter' && event.key !== ' ') return
+              event.preventDefault()
+              handleSelectIndex(seriesIndex)
+            }}>
             {areaPath ? (
               <path
                 d={areaPath}
@@ -342,6 +413,38 @@ export const RadarChart: React.FC<RadarChartProps> = ({
         </text>
       ))}
     </ChartCanvas>
+  )
+
+  if (!showLegend) return chart
+
+  return (
+    <div className={wrapperClasses}>
+      {chart}
+      <div className={legendContainerClasses}>
+        {resolvedLegendItems.map((item) => (
+          <button
+            key={`legend-${item.index}`}
+            type="button"
+            className={classNames(
+              'flex items-center gap-2 text-sm text-gray-600',
+              selectable ? 'cursor-pointer' : 'cursor-default'
+            )}
+            onClick={selectable ? () => handleSelectIndex(item.index) : undefined}
+            onMouseEnter={shouldHandleHover ? () => handleHover(item.index) : undefined}
+            onMouseLeave={shouldHandleHover ? () => handleHover(null) : undefined}>
+            <span
+              className={classNames(
+                'inline-block rounded-full',
+                `w-[${legendMarkerSize}px]`,
+                `h-[${legendMarkerSize}px]`,
+                `bg-[${item.color}]`
+              )}
+            />
+            <span className={classNames(`mr-[${legendGap}px]`)}>{item.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
   )
 }
 
