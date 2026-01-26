@@ -70,4 +70,59 @@ describe('RadarChart', () => {
 
     expect(container.querySelectorAll('text[data-radar-level-label]')).toHaveLength(3)
   })
+
+  it('applies hover highlight opacity', () => {
+    const { container } = renderWithProps(RadarChart, {
+      series: [
+        {
+          name: 'Series A',
+          data: [
+            { label: 'A', value: 80 },
+            { label: 'B', value: 65 },
+            { label: 'C', value: 90 }
+          ]
+        },
+        {
+          name: 'Series B',
+          data: [
+            { label: 'A', value: 70 },
+            { label: 'B', value: 75 },
+            { label: 'C', value: 60 }
+          ]
+        }
+      ],
+      activeSeriesIndex: 1,
+      hoverOpacity: 1,
+      mutedOpacity: 0.2
+    })
+
+    const seriesA = container.querySelector('g[data-series-name="Series A"]')
+    const seriesB = container.querySelector('g[data-series-name="Series B"]')
+    expect(seriesA).toHaveAttribute('opacity', '0.2')
+    expect(seriesB).toHaveAttribute('opacity', '1')
+  })
+
+  it('renders tooltip titles on points', () => {
+    const { container } = renderWithProps(RadarChart, {
+      data: [
+        { label: 'A', value: 80 },
+        { label: 'B', value: 65 },
+        { label: 'C', value: 90 }
+      ]
+    })
+
+    expect(container.querySelectorAll('circle[data-radar-point] title')).toHaveLength(3)
+  })
+
+  it('can disable tooltip titles', () => {
+    const { container } = renderWithProps(RadarChart, {
+      data: [
+        { label: 'A', value: 80 },
+        { label: 'B', value: 65 }
+      ],
+      showTooltip: false
+    })
+
+    expect(container.querySelectorAll('circle[data-radar-point] title')).toHaveLength(0)
+  })
 })

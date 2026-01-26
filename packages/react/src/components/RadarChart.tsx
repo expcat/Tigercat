@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
@@ -33,6 +33,19 @@ export interface RadarChartProps extends CoreRadarChartProps {
   showLevelLabels?: boolean
   levelLabelFormatter?: (value: number, level: number) => string
   levelLabelOffset?: number
+  title?: string
+  desc?: string
+  hoverable?: boolean
+  activeSeriesIndex?: number
+  hoverOpacity?: number
+  mutedOpacity?: number
+  showTooltip?: boolean
+  tooltipFormatter?: (
+    datum: RadarChartDatum,
+    seriesIndex: number,
+    index: number,
+    series?: RadarChartSeries
+  ) => string
 }
 
 export const RadarChart: React.FC<RadarChartProps> = ({
@@ -55,6 +68,12 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   colors,
   gridLineStyle = 'solid',
   gridStrokeWidth = 1,
+  hoverable = false,
+  activeSeriesIndex,
+  hoverOpacity = 1,
+  mutedOpacity = 0.25,
+  showTooltip = true,
+  tooltipFormatter,
   strokeColor = defaultRadarColors[0],
   strokeWidth = 2,
   fillColor = defaultRadarColors[0],
@@ -62,8 +81,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   showPoints = true,
   pointSize = 3,
   pointColor,
+  title,
+  desc,
   className
 }) => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const innerRect = useMemo(
     () => getChartInnerRect(width, height, padding),
     [width, height, padding]
@@ -189,9 +211,29 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     () => (colors && colors.length > 0 ? colors : defaultRadarColors),
     [colors]
   )
+  const formatTooltip = useMemo(
+    () =>
+      tooltipFormatter ??
+      ((datum: RadarChartDatum, seriesIndex: number, index: number, series?: RadarChartSeries) => {
+        const label = datum.label ?? `#${index + 1}`
+        const value = datum.value
+        const name = series?.name ?? `Series ${seriesIndex + 1}`
+        return `${name} · ${label}: ${value}`
+      }),
+    [tooltipFormatter]
+  )
+  const resolvedActiveIndex =
+    typeof activeSeriesIndex === 'number' ? activeSeriesIndex : hoverable ? hoveredIndex : null
+  const shouldHandleHover = hoverable && typeof activeSeriesIndex !== 'number'
 
   return (
-    <ChartCanvas width={width} height={height} padding={padding} className={classNames(className)}>
+    <ChartCanvas
+      width={width}
+      height={height}
+      padding={padding}
+      title={title}
+      desc={desc}
+      className={classNames(className)}>
       {gridPaths.map((path, index) => (
         <path
           key={`grid-${index}`}
@@ -224,6 +266,12 @@ export const RadarChart: React.FC<RadarChartProps> = ({
         const resolvedPointSize = item.series.pointSize ?? pointSize
         const resolvedPointColor = item.series.pointColor ?? seriesColor ?? pointColor
         const areaPath = createPolygonPath(item.points.map((point) => ({ x: point.x, y: point.y })))
+        const resolvedOpacity =
+          resolvedActiveIndex === null
+            ? undefined
+            : seriesIndex === resolvedActiveIndex
+              ? hoverOpacity
+              : mutedOpacity
 
         return (
           <ChartSeries
@@ -231,7 +279,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             data={item.series.data}
             name={item.series.name}
             type="radar"
-            className={item.series.className}>
+            className={item.series.className}
+            opacity={resolvedOpacity}
+            style={hoverable ? { cursor: 'pointer' } : undefined}
+            onMouseEnter={shouldHandleHover ? () => setHoveredIndex(seriesIndex) : undefined}
+            onMouseLeave={shouldHandleHover ? () => setHoveredIndex(null) : undefined}>
             {areaPath ? (
               <path
                 d={areaPath}
@@ -244,17 +296,24 @@ export const RadarChart: React.FC<RadarChartProps> = ({
               />
             ) : null}
             {resolvedShowPoints
-              ? item.points.map((point) => (
-                  <circle
-                    key={`point-${seriesIndex}-${point.index}`}
-                    cx={point.x}
-                    cy={point.y}
-                    r={point.data.size ?? resolvedPointSize}
-                    fill={point.data.color ?? resolvedPointColor ?? resolvedStrokeColor}
-                    data-radar-point="true"
-                    data-series-index={seriesIndex}
-                  />
-                ))
+              ? item.points.map((point) => {
+                  const tooltipText = showTooltip
+                    ? formatTooltip(point.data, seriesIndex, point.index, item.series)
+                    : null
+
+                  return (
+                    <circle
+                      key={`point-${seriesIndex}-${point.index}`}
+                      cx={point.x}
+                      cy={point.y}
+                      r={point.data.size ?? resolvedPointSize}
+                      fill={point.data.color ?? resolvedPointColor ?? resolvedStrokeColor}
+                      data-radar-point="true"
+                      data-series-index={seriesIndex}>
+                      {tooltipText ? <title>{tooltipText}</title> : null}
+                    </circle>
+                  )
+                })
               : null}
           </ChartSeries>
         )
