@@ -11,7 +11,7 @@
 **表单 (Form):** Form | FormItem | Input | Textarea | Select | Checkbox | CheckboxGroup | Radio | RadioGroup | Switch | Slider | DatePicker | TimePicker | Upload  
 **导航 (Navigation):** Breadcrumb | Menu | Tabs | Pagination | Steps | Tree  
 **反馈/浮层 (Feedback/Overlay):** Alert | Message | Notification | Modal | Drawer | Popover | Popconfirm | Tooltip | Dropdown | Loading | Progress  
-**数据展示 (Data):** Table | Timeline | ChartCanvas | ChartAxis | ChartGrid | ChartSeries | BarChart | ScatterChart | PieChart
+**数据展示 (Data):** Table | Timeline | ChartCanvas | ChartAxis | ChartGrid | ChartSeries | BarChart | ScatterChart | PieChart | DonutChart
 
 **快速查找：** 所有组件从 `@expcat/tigercat-react` 导入，事件使用 camelCase (onClick, onChange)，支持受控/非受控模式。
 
@@ -111,6 +111,7 @@ export function App() {
 - BarChart：Props: data(数据)/width(宽度)/height(高度)/barColor(颜色)/showGrid(网格)
 - ScatterChart：Props: data(数据)/width(宽度)/height(高度)/pointSize(点大小)/showGrid(网格)
 - PieChart：Props: data(数据)/width(宽度)/height(高度)/innerRadius(内半径)/showLabels(标签)
+- DonutChart：Props: data(数据)/width(宽度)/height(高度)/innerRadiusRatio(内半径比例)/showLabels(标签)
 
 ## 常见陷阱 / FAQ
 

@@ -151,5 +151,7 @@ export { ScatterChart } from './components/ScatterChart'
 export type { VueScatterChartProps } from './components/ScatterChart'
 export { PieChart } from './components/PieChart'
 export type { VuePieChartProps } from './components/PieChart'
+export { DonutChart } from './components/DonutChart'
+export type { VueDonutChartProps } from './components/DonutChart'
 
 export const version = '0.0.1'

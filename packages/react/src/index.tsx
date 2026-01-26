@@ -182,5 +182,7 @@ export { ScatterChart } from './components/ScatterChart'
 export type { ScatterChartProps } from './components/ScatterChart'
 export { PieChart } from './components/PieChart'
 export type { PieChartProps } from './components/PieChart'
+export { DonutChart } from './components/DonutChart'
+export type { DonutChartProps } from './components/DonutChart'
 
 export const version = '0.0.1'
