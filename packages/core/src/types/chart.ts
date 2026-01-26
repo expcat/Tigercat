@@ -877,6 +877,46 @@ export interface RadarChartProps {
   ) => string
 
   /**
+   * Enable click selection
+   * @default false
+   */
+  selectable?: boolean
+
+  /**
+   * Selected series index (controlled)
+   */
+  selectedSeriesIndex?: number
+
+  /**
+   * Whether to show legend
+   * @default false
+   */
+  showLegend?: boolean
+
+  /**
+   * Legend position
+   * @default 'bottom'
+   */
+  legendPosition?: 'bottom' | 'right'
+
+  /**
+   * Legend formatter
+   */
+  legendFormatter?: (series: RadarChartSeries, index: number) => string
+
+  /**
+   * Legend marker size
+   * @default 10
+   */
+  legendMarkerSize?: number
+
+  /**
+   * Legend item gap
+   * @default 8
+   */
+  legendGap?: number
+
+  /**
    * Colors for series
    */
   colors?: string[]

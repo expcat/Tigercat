@@ -104,6 +104,53 @@ export default function Demo() {
 />
 ```
 
+### 选择高亮
+
+#### Vue 3
+
+```vue
+<RadarChart
+  :series="series"
+  :width="360"
+  :height="260"
+  :max-value="100"
+  selectable
+  :muted-opacity="0.2" />
+```
+
+#### React
+
+```tsx
+<RadarChart series={series} width={360} height={260} maxValue={100} selectable mutedOpacity={0.2} />
+```
+
+### 图例
+
+#### Vue 3
+
+```vue
+<RadarChart
+  :series="series"
+  :width="360"
+  :height="260"
+  :max-value="100"
+  show-legend
+  legend-position="right" />
+```
+
+#### React
+
+```tsx
+<RadarChart
+  series={series}
+  width={360}
+  height={260}
+  maxValue={100}
+  showLegend
+  legendPosition="right"
+/>
+```
+
 ### Tooltip
 
 默认会在数据点上显示浏览器原生提示，可通过 `tooltipFormatter` 自定义内容。
@@ -189,6 +236,13 @@ export default function Demo() {
 | activeSeriesIndex   | 高亮系列索引       | `number`                                                                     | -              |
 | hoverOpacity        | 高亮系列透明度     | `number`                                                                     | `1`            |
 | mutedOpacity        | 其他系列透明度     | `number`                                                                     | `0.25`         |
+| selectable          | 启用点击选择       | `boolean`                                                                    | `false`        |
+| selectedSeriesIndex | 选中系列索引       | `number`                                                                     | -              |
+| showLegend          | 显示图例           | `boolean`                                                                    | `false`        |
+| legendPosition      | 图例位置           | `'bottom' \| 'right'`                                                        | `'bottom'`     |
+| legendFormatter     | 图例格式化函数     | `(series, index) => string`                                                  | -              |
+| legendMarkerSize    | 图例标记大小       | `number`                                                                     | `10`           |
+| legendGap           | 图例项间距         | `number`                                                                     | `8`            |
 | showTooltip         | 显示 Tooltip       | `boolean`                                                                    | `true`         |
 | tooltipFormatter    | Tooltip 格式化函数 | `(datum, seriesIndex, index, series) => string`                              | -              |
 | colors              | 系列颜色列表       | `string[]`                                                                   | 主题默认调色板 |

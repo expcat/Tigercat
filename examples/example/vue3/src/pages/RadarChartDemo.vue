@@ -72,6 +72,9 @@ const multiSnippet = `<RadarChart
     :max-value="100"
     :colors="['#2563eb', '#f97316']"
     hoverable
+    selectable
+    show-legend
+    legend-position="right"
     :muted-opacity="0.2"
     :tooltip-formatter="tooltipFormatter"
 />`
@@ -114,6 +117,9 @@ const multiSnippet = `<RadarChart
                         :max-value="100"
                         :colors="['#2563eb', '#f97316']"
                         hoverable
+                        selectable
+                        show-legend
+                        legend-position="right"
                         :muted-opacity="0.2"
                         :tooltip-formatter="tooltipFormatter" />
         </DemoBlock>
