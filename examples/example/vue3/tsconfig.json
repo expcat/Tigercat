@@ -17,9 +17,9 @@
     "paths": {
       "@/*": ["./src/*"],
       "@demo-shared/*": ["../shared/*"],
-      "@expcat/tigercat-core": ["../../../packages/core/dist/index.d.ts"],
-      "@expcat/tigercat-vue": ["../../../packages/vue/dist/index.d.ts"],
-      "@expcat/tigercat-vue/*": ["../../../packages/vue/dist/components/*.d.ts"]
+      "@expcat/tigercat-core": ["../../../packages/core/src/index.ts"],
+      "@expcat/tigercat-vue": ["../../../packages/vue/src/index.ts"],
+      "@expcat/tigercat-vue/*": ["../../../packages/vue/src/components/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "../shared/**/*.ts"],

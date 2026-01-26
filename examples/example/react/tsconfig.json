@@ -19,15 +19,16 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
 
     /* Path mapping */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@demo-shared/*": ["../shared/*"],
-      "@expcat/tigercat-core": ["../../../packages/core/dist/index.d.ts"],
-      "@expcat/tigercat-react": ["../../../packages/react/dist/index.d.ts"],
-      "@expcat/tigercat-react/*": ["../../../packages/react/dist/components/*.d.ts"]
+      "@expcat/tigercat-core": ["../../../packages/core/src/index.ts"],
+      "@expcat/tigercat-react": ["../../../packages/react/src/index.tsx"],
+      "@expcat/tigercat-react/*": ["../../../packages/react/src/components/*"]
     }
   },
   "include": ["src", "../shared"],
