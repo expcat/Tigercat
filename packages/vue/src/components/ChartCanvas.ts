@@ -30,6 +30,12 @@ export const ChartCanvas = defineComponent({
     },
     className: {
       type: String
+    },
+    title: {
+      type: String
+    },
+    desc: {
+      type: String
     }
   },
   setup(props, { slots, attrs }) {
@@ -55,6 +61,8 @@ export const ChartCanvas = defineComponent({
           style: svgStyle.value
         },
         [
+          props.title ? h('title', props.title) : null,
+          props.desc ? h('desc', props.desc) : null,
           h(
             'g',
             {
@@ -62,7 +70,7 @@ export const ChartCanvas = defineComponent({
             },
             slots.default?.({ innerRect: rect })
           )
-        ]
+        ].filter(Boolean)
       )
     }
   }

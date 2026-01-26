@@ -33,6 +33,15 @@ export default {
 }
 ```
 
+## 图表相关变量
+
+图表组件会复用以下主题变量，用于轴线、网格、文字与默认数据色：
+
+- `--tiger-border`：坐标轴与网格线颜色
+- `--tiger-text`：坐标轴标题颜色
+- `--tiger-text-secondary`：刻度文字颜色
+- `--tiger-primary`：柱状图/散点图默认主色
+
 ## JS/TS API
 
 ### `setThemeColors(colors, element?)`

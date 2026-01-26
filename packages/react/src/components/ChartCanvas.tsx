@@ -19,6 +19,8 @@ export const ChartCanvas: React.FC<ChartCanvasProps> = ({
   height = 200,
   padding = 24,
   className,
+  title,
+  desc,
   children,
   ...props
 }) => {
@@ -35,6 +37,8 @@ export const ChartCanvas: React.FC<ChartCanvasProps> = ({
       height={height}
       viewBox={`0 0 ${width} ${height}`}
       className={svgClasses}>
+      {title ? <title>{title}</title> : null}
+      {desc ? <desc>{desc}</desc> : null}
       <g transform={`translate(${innerRect.x}, ${innerRect.y})`}>{children}</g>
     </svg>
   )

@@ -73,6 +73,14 @@ export const BarChart = defineComponent({
       type: Boolean,
       default: true
     },
+    showXAxis: {
+      type: Boolean,
+      default: true
+    },
+    showYAxis: {
+      type: Boolean,
+      default: true
+    },
     xAxisLabel: {
       type: String
     },
@@ -131,6 +139,9 @@ export const BarChart = defineComponent({
       return createLinearScale(extent, [innerRect.value.height, 0])
     })
 
+    const showXAxis = computed(() => props.showAxis && props.showXAxis)
+    const showYAxis = computed(() => props.showAxis && props.showYAxis)
+
     const bars = computed(() => {
       const scale = resolvedXScale.value
       const bandWidth =
@@ -183,7 +194,7 @@ export const BarChart = defineComponent({
                     strokeWidth: props.gridStrokeWidth
                   })
                 : null,
-              props.showAxis
+              showXAxis.value
                 ? h(ChartAxis, {
                     scale: resolvedXScale.value,
                     orientation: 'bottom',
@@ -194,7 +205,7 @@ export const BarChart = defineComponent({
                     label: props.xAxisLabel
                   })
                 : null,
-              props.showAxis
+              showYAxis.value
                 ? h(ChartAxis, {
                     scale: resolvedYScale.value,
                     orientation: 'left',

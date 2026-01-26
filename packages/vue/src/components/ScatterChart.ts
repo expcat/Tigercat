@@ -67,6 +67,14 @@ export const ScatterChart = defineComponent({
       type: Boolean,
       default: true
     },
+    showXAxis: {
+      type: Boolean,
+      default: true
+    },
+    showYAxis: {
+      type: Boolean,
+      default: true
+    },
     includeZero: {
       type: Boolean,
       default: false
@@ -127,6 +135,9 @@ export const ScatterChart = defineComponent({
       return createLinearScale(extent, [innerRect.value.height, 0])
     })
 
+    const showXAxis = computed(() => props.showAxis && props.showXAxis)
+    const showYAxis = computed(() => props.showAxis && props.showYAxis)
+
     return () =>
       h(
         ChartCanvas,
@@ -152,7 +163,7 @@ export const ScatterChart = defineComponent({
                     strokeWidth: props.gridStrokeWidth
                   })
                 : null,
-              props.showAxis
+              showXAxis.value
                 ? h(ChartAxis, {
                     scale: resolvedXScale.value,
                     orientation: 'bottom',
@@ -163,7 +174,7 @@ export const ScatterChart = defineComponent({
                     label: props.xAxisLabel
                   })
                 : null,
-              props.showAxis
+              showYAxis.value
                 ? h(ChartAxis, {
                     scale: resolvedYScale.value,
                     orientation: 'left',
