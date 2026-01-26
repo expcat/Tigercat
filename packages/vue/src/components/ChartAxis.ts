@@ -14,10 +14,8 @@ import {
   type ChartScaleValue
 } from '@expcat/tigercat-core'
 
-export interface VueChartAxisProps<
-  T extends ChartScaleValue = ChartScaleValue
-> extends ChartAxisProps<T> {
-  scale: ChartScale<T>
+export interface VueChartAxisProps extends ChartAxisProps {
+  scale: ChartScale
 }
 
 export const ChartAxis = defineComponent({
@@ -70,7 +68,7 @@ export const ChartAxis = defineComponent({
     }
   },
   setup(props, { attrs }) {
-    const ticks = computed<ChartAxisTick<ChartScaleValue>[]>(() =>
+    const ticks = computed<ChartAxisTick[]>(() =>
       getChartAxisTicks(props.scale, {
         tickCount: props.ticks,
         tickValues: props.tickValues,

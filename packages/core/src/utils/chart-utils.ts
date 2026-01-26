@@ -64,10 +64,7 @@ export function getChartInnerRect(
   }
 }
 
-export function createLinearScale(
-  domain: [number, number],
-  range: [number, number]
-): ChartScale<number> {
+export function createLinearScale(domain: [number, number], range: [number, number]): ChartScale {
   const [d0, d1] = domain
   const [r0, r1] = range
   const span = d1 - d0
@@ -76,9 +73,10 @@ export function createLinearScale(
     type: 'linear',
     domain: [d0, d1],
     range: [r0, r1],
-    map: (value: number) => {
+    map: (value: ChartScaleValue) => {
+      const numeric = typeof value === 'number' ? value : Number(value)
       if (span === 0) return (r0 + r1) / 2
-      return r0 + ((value - d0) / span) * (r1 - r0)
+      return r0 + ((numeric - d0) / span) * (r1 - r0)
     }
   }
 }
@@ -87,7 +85,7 @@ export function createPointScale(
   domain: string[],
   range: [number, number],
   options: PointScaleOptions = {}
-): ChartScale<string> {
+): ChartScale {
   const padding = clampNumber(options.padding ?? 0.5, 0, 1)
   const [rangeStart, rangeEnd] = range
   const span = rangeEnd - rangeStart
@@ -103,8 +101,9 @@ export function createPointScale(
     domain,
     range: [rangeStart, rangeEnd],
     step,
-    map: (value: string) => {
-      const index = indexMap.get(value) ?? 0
+    map: (value: ChartScaleValue) => {
+      const key = String(value)
+      const index = indexMap.get(key) ?? 0
       return rangeStart + direction * (offset + step * index)
     }
   }
@@ -114,7 +113,7 @@ export function createBandScale(
   domain: string[],
   range: [number, number],
   options: BandScaleOptions = {}
-): ChartScale<string> {
+): ChartScale {
   const paddingInner = clampNumber(options.paddingInner ?? 0.1, 0, 1)
   const paddingOuter = clampNumber(options.paddingOuter ?? 0.1, 0, 1)
   const align = clampNumber(options.align ?? 0.5, 0, 1)
@@ -134,29 +133,28 @@ export function createBandScale(
     range: [rangeStart, rangeEnd],
     step,
     bandwidth,
-    map: (value: string) => {
-      const index = indexMap.get(value) ?? 0
+    map: (value: ChartScaleValue) => {
+      const key = String(value)
+      const index = indexMap.get(key) ?? 0
       return rangeStart + direction * (offset + step * index)
     }
   }
 }
 
-export function getChartAxisTicks<T extends ChartScaleValue>(
-  scale: ChartScale<T>,
+export function getChartAxisTicks(
+  scale: ChartScale,
   options: {
     tickCount?: number
-    tickValues?: T[]
-    tickFormat?: (value: T) => string
+    tickValues?: ChartScaleValue[]
+    tickFormat?: (value: ChartScaleValue) => string
   } = {}
-): ChartAxisTick<T>[] {
+): ChartAxisTick[] {
   const { tickCount = 5, tickValues, tickFormat } = options
-  const format = tickFormat ?? ((value: T) => `${value}`)
+  const format = tickFormat ?? ((value: ChartScaleValue) => `${value}`)
 
   const resolvedTickValues =
     tickValues ??
-    (scale.type === 'linear'
-      ? (getLinearTicks(scale.domain as number[], tickCount) as T[])
-      : scale.domain)
+    (scale.type === 'linear' ? getLinearTicks(scale.domain as number[], tickCount) : scale.domain)
 
   return resolvedTickValues.map((value) => {
     const basePosition = scale.map(value)
@@ -210,4 +208,38 @@ export function getChartGridLineDasharray(lineStyle: ChartGridLineStyle): string
   if (lineStyle === 'dashed') return '4 4'
   if (lineStyle === 'dotted') return '1 4'
   return undefined
+}
+
+export function getNumberExtent(
+  values: number[],
+  options: {
+    includeZero?: boolean
+    fallback?: [number, number]
+    padding?: number
+  } = {}
+): [number, number] {
+  const fallback: [number, number] = options.fallback ?? [0, 1]
+  if (values.length === 0) return fallback
+
+  let min = Math.min(...values)
+  let max = Math.max(...values)
+
+  if (options.includeZero) {
+    min = Math.min(min, 0)
+    max = Math.max(max, 0)
+  }
+
+  if (min === max) {
+    const pad = Math.abs(min) * 0.1 || 1
+    return [min - pad, max + pad]
+  }
+
+  const padding = options.padding ?? 0
+  if (padding > 0) {
+    const span = max - min
+    min -= span * padding
+    max += span * padding
+  }
+
+  return [min, max]
 }
