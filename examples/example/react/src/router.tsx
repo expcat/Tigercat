@@ -37,6 +37,7 @@ const BarChartDemo = lazy(() => import('./pages/BarChartDemo'))
 const ScatterChartDemo = lazy(() => import('./pages/ScatterChartDemo'))
 const PieChartDemo = lazy(() => import('./pages/PieChartDemo'))
 const DonutChartDemo = lazy(() => import('./pages/DonutChartDemo'))
+const RadarChartDemo = lazy(() => import('./pages/RadarChartDemo'))
 const MenuDemo = lazy(() => import('./pages/MenuDemo'))
 const BreadcrumbDemo = lazy(() => import('./pages/BreadcrumbDemo'))
 const DropdownDemo = lazy(() => import('./pages/DropdownDemo'))
@@ -95,6 +96,7 @@ const router = createBrowserRouter(
         { path: 'scatter-chart', element: <ScatterChartDemo /> },
         { path: 'pie-chart', element: <PieChartDemo /> },
         { path: 'donut-chart', element: <DonutChartDemo /> },
+        { path: 'radar-chart', element: <RadarChartDemo /> },
         { path: 'menu', element: <MenuDemo /> },
         { path: 'breadcrumb', element: <BreadcrumbDemo /> },
         { path: 'dropdown', element: <DropdownDemo /> },

@@ -153,5 +153,7 @@ export { PieChart } from './components/PieChart'
 export type { VuePieChartProps } from './components/PieChart'
 export { DonutChart } from './components/DonutChart'
 export type { VueDonutChartProps } from './components/DonutChart'
+export { RadarChart } from './components/RadarChart'
+export type { VueRadarChartProps } from './components/RadarChart'
 
 export const version = '0.0.1'

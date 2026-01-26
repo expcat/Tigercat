@@ -207,6 +207,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'DonutChart', 'en-US': 'DonutChart' }
       },
       {
+        key: 'radar-chart',
+        path: '/radar-chart',
+        label: { 'zh-CN': 'RadarChart', 'en-US': 'RadarChart' }
+      },
+      {
         key: 'skeleton',
         path: '/skeleton',
         label: { 'zh-CN': 'Skeleton', 'en-US': 'Skeleton' }

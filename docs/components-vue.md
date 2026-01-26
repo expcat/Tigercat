@@ -112,6 +112,7 @@ import { Button, ConfigProvider } from '@expcat/tigercat-vue'
 - ScatterChart：Props: data(数据)/width(宽度)/height(高度)/pointSize(点大小)/showGrid(网格)
 - PieChart：Props: data(数据)/width(宽度)/height(高度)/innerRadius(内半径)/showLabels(标签)
 - DonutChart：Props: data(数据)/width(宽度)/height(高度)/innerRadiusRatio(内半径比例)/showLabels(标签)
+- RadarChart：Props: data(数据)/width(宽度)/height(高度)/levels(网格层数)/showLabels(标签)
 
 ## 常见陷阱 / FAQ
 
