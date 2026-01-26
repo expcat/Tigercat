@@ -28,7 +28,7 @@ describe('Code (Vue)', () => {
 
     expect(writeText).toHaveBeenCalledWith("console.log('copy')")
     expect(emitted().copy?.[0]).toEqual(["console.log('copy')"])
-    expect(screen.getByRole('button', { name: '已复制' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: '已复制' })).toBeInTheDocument()
   })
 
   it('hides copy button when copyable is false', () => {
