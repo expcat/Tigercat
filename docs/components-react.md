@@ -104,15 +104,27 @@ export function App() {
 
 - Table：Props: columns(列)/data(数据)/rowKey(行键)；Events: onRowClick(行点击)
 - Timeline：Props: items(节点)/placement(位置)
-- ChartCanvas：Props: width(宽度)/height(高度)/padding(内边距)
+
+### 图表组件
+
+#### 基础组件
+
+- ChartCanvas：Props: width(宽度)/height(高度)/padding(内边距)/title(标题)/desc(描述)
 - ChartAxis：Props: orientation(方向)/scale(比例尺)/ticks(刻度数)/tickValues(刻度值)/label(标题)
 - ChartGrid：Props: xScale/yScale(比例尺)/show(网格)/xTicks/yTicks(刻度数)/lineStyle(样式)
 - ChartSeries：Props: data(数据)/name(名称)/color(颜色)/type(类型)
-- BarChart：Props: data(数据)/width(宽度)/height(高度)/barColor(颜色)/showGrid(网格)
-- ScatterChart：Props: data(数据)/width(宽度)/height(高度)/pointSize(点大小)/showGrid(网格)
-- PieChart：Props: data(数据)/width(宽度)/height(高度)/innerRadius(内半径)/showLabels(标签)
-- DonutChart：Props: data(数据)/width(宽度)/height(高度)/innerRadiusRatio(内半径比例)/showLabels(标签)
-- RadarChart：Props: data(数据)/width(宽度)/height(高度)/levels(网格层数)/showLabels(标签)
+- ChartLegend：Props: items(图例项)/position(位置)/interactive(可交互)；Callbacks: onItemClick/onItemHover/onItemLeave
+- ChartTooltip：Props: content(内容)/visible(可见)/x/y(位置)
+
+#### 高级图表
+
+- BarChart：Props: data(数据)/hoverable(悬停)/selectable(选择)/showLegend(图例)/showTooltip(提示)；Callbacks: onBarClick/onBarHover
+- ScatterChart：Props: data(数据)/pointSize(点大小)/showGrid(网格)
+- PieChart：Props: data(数据)/innerRadius(内半径)/hoverable/selectable/showLegend；Callbacks: onSliceClick/onSliceHover
+- DonutChart：Props: data(数据)/innerRadiusRatio(内半径比例)/hoverable/selectable/showLegend
+- RadarChart：Props: data(数据)/levels(网格层数)/hoverable/selectable/showLegend
+- LineChart：Props: data/series(数据)/curve(曲线类型)/showPoints(数据点)/hoverable/showLegend；Callbacks: onSeriesClick/onPointHover
+- AreaChart：Props: data/series(数据)/stacked(堆叠)/fillOpacity(填充透明度)/hoverable/showLegend；Callbacks: onSeriesClick/onPointHover
 
 ## 常见陷阱 / FAQ
 

@@ -420,3 +420,248 @@ export function createPolygonPath(points: Array<{ x: number; y: number }>): stri
     ' '
   )
 }
+
+// ============================================================================
+// Line/Area Chart Utilities
+// ============================================================================
+
+import type { ChartCurveType } from '../types/chart'
+
+/**
+ * Create a line path from points
+ */
+export function createLinePath(
+  points: Array<{ x: number; y: number }>,
+  curve: ChartCurveType = 'linear'
+): string {
+  if (points.length === 0) return ''
+  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`
+
+  switch (curve) {
+    case 'step':
+      return createStepPath(points, 0.5)
+    case 'stepBefore':
+      return createStepPath(points, 0)
+    case 'stepAfter':
+      return createStepPath(points, 1)
+    case 'monotone':
+      return createMonotonePath(points)
+    case 'natural':
+      return createNaturalPath(points)
+    case 'linear':
+    default:
+      return createLinearPath(points)
+  }
+}
+
+/**
+ * Create an area path from points (closed polygon with baseline)
+ */
+export function createAreaPath(
+  points: Array<{ x: number; y: number }>,
+  baseline: number,
+  curve: ChartCurveType = 'linear'
+): string {
+  if (points.length === 0) return ''
+
+  const linePath = createLinePath(points, curve)
+  if (!linePath) return ''
+
+  // Close the area by going to baseline and back
+  const lastPoint = points[points.length - 1]
+  const firstPoint = points[0]
+
+  return `${linePath} L ${lastPoint.x} ${baseline} L ${firstPoint.x} ${baseline} Z`
+}
+
+/**
+ * Create a linear path (straight lines between points)
+ */
+function createLinearPath(points: Array<{ x: number; y: number }>): string {
+  const [first, ...rest] = points
+  return [`M ${first.x} ${first.y}`, ...rest.map((p) => `L ${p.x} ${p.y}`)].join(' ')
+}
+
+/**
+ * Create a step path
+ * @param t - Step position (0 = before, 0.5 = middle, 1 = after)
+ */
+function createStepPath(points: Array<{ x: number; y: number }>, t: number): string {
+  const [first, ...rest] = points
+  const commands: string[] = [`M ${first.x} ${first.y}`]
+
+  let prev = first
+  for (const point of rest) {
+    if (t === 0) {
+      // Step before: vertical first, then horizontal
+      commands.push(`V ${point.y}`, `H ${point.x}`)
+    } else if (t === 1) {
+      // Step after: horizontal first, then vertical
+      commands.push(`H ${point.x}`, `V ${point.y}`)
+    } else {
+      // Step middle
+      const midX = prev.x + (point.x - prev.x) * t
+      commands.push(`H ${midX}`, `V ${point.y}`, `H ${point.x}`)
+    }
+    prev = point
+  }
+
+  return commands.join(' ')
+}
+
+/**
+ * Create a monotone cubic spline path (preserves monotonicity)
+ */
+function createMonotonePath(points: Array<{ x: number; y: number }>): string {
+  if (points.length < 2) return createLinearPath(points)
+
+  const n = points.length
+  const tangents: number[] = []
+
+  // Calculate tangents using finite differences
+  for (let i = 0; i < n; i++) {
+    if (i === 0) {
+      tangents.push((points[1].y - points[0].y) / (points[1].x - points[0].x))
+    } else if (i === n - 1) {
+      tangents.push((points[n - 1].y - points[n - 2].y) / (points[n - 1].x - points[n - 2].x))
+    } else {
+      const d0 = (points[i].y - points[i - 1].y) / (points[i].x - points[i - 1].x)
+      const d1 = (points[i + 1].y - points[i].y) / (points[i + 1].x - points[i].x)
+
+      // Use harmonic mean for monotonicity
+      if (d0 * d1 <= 0) {
+        tangents.push(0)
+      } else {
+        tangents.push((3 * (d0 + d1)) / (2 / d0 + 2 / d1 + 2 / ((d0 + d1) / 2)))
+      }
+    }
+  }
+
+  // Adjust tangents to ensure monotonicity
+  for (let i = 0; i < n - 1; i++) {
+    const d = (points[i + 1].y - points[i].y) / (points[i + 1].x - points[i].x)
+    if (Math.abs(d) < 1e-10) {
+      tangents[i] = 0
+      tangents[i + 1] = 0
+    } else {
+      const alpha = tangents[i] / d
+      const beta = tangents[i + 1] / d
+      const s = alpha * alpha + beta * beta
+
+      if (s > 9) {
+        const t = 3 / Math.sqrt(s)
+        tangents[i] = t * alpha * d
+        tangents[i + 1] = t * beta * d
+      }
+    }
+  }
+
+  // Build path
+  const commands: string[] = [`M ${points[0].x} ${points[0].y}`]
+
+  for (let i = 0; i < n - 1; i++) {
+    const p0 = points[i]
+    const p1 = points[i + 1]
+    const dx = p1.x - p0.x
+    const cp1x = p0.x + dx / 3
+    const cp1y = p0.y + (tangents[i] * dx) / 3
+    const cp2x = p1.x - dx / 3
+    const cp2y = p1.y - (tangents[i + 1] * dx) / 3
+
+    commands.push(`C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p1.x} ${p1.y}`)
+  }
+
+  return commands.join(' ')
+}
+
+/**
+ * Create a natural cubic spline path
+ */
+function createNaturalPath(points: Array<{ x: number; y: number }>): string {
+  if (points.length < 2) return createLinearPath(points)
+  if (points.length === 2) return createLinearPath(points)
+
+  const n = points.length - 1
+
+  // Solve tridiagonal system for second derivatives
+  const a: number[] = new Array(n + 1).fill(0)
+  const b: number[] = new Array(n + 1).fill(0)
+  const c: number[] = new Array(n + 1).fill(0)
+  const d: number[] = new Array(n + 1).fill(0)
+
+  // Natural spline boundary conditions
+  b[0] = 1
+  b[n] = 1
+
+  for (let i = 1; i < n; i++) {
+    const h0 = points[i].x - points[i - 1].x
+    const h1 = points[i + 1].x - points[i].x
+    a[i] = h0
+    b[i] = 2 * (h0 + h1)
+    c[i] = h1
+    d[i] = (3 * (points[i + 1].y - points[i].y)) / h1 - (3 * (points[i].y - points[i - 1].y)) / h0
+  }
+
+  // Solve with Thomas algorithm
+  const m: number[] = new Array(n + 1).fill(0)
+  const z: number[] = new Array(n + 1).fill(0)
+
+  for (let i = 1; i <= n; i++) {
+    const l = b[i] - a[i] * m[i - 1]
+    m[i] = c[i] / l
+    z[i] = (d[i] - a[i] * z[i - 1]) / l
+  }
+
+  const M: number[] = new Array(n + 1).fill(0)
+  for (let i = n - 1; i >= 0; i--) {
+    M[i] = z[i] - m[i] * M[i + 1]
+  }
+
+  // Build path using cubic segments
+  const commands: string[] = [`M ${points[0].x} ${points[0].y}`]
+
+  for (let i = 0; i < n; i++) {
+    const h = points[i + 1].x - points[i].x
+    const p0 = points[i]
+    const p1 = points[i + 1]
+
+    // Control points for cubic Bezier
+    const cp1x = p0.x + h / 3
+    const cp1y = p0.y + (h / 3) * ((p1.y - p0.y) / h - (h * (M[i + 1] + 2 * M[i])) / 6)
+    const cp2x = p1.x - h / 3
+    const cp2y = p1.y - (h / 3) * ((p1.y - p0.y) / h + (h * (2 * M[i + 1] + M[i])) / 6)
+
+    commands.push(`C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p1.x} ${p1.y}`)
+  }
+
+  return commands.join(' ')
+}
+
+/**
+ * Calculate stacked Y values for area charts
+ */
+export function stackSeriesData<T extends { x: unknown; y: number }>(
+  seriesData: T[][]
+): { original: T; y0: number; y1: number }[][] {
+  if (seriesData.length === 0) return []
+
+  const result: { original: T; y0: number; y1: number }[][] = []
+  const stackedValues: Map<unknown, number> = new Map()
+
+  for (const series of seriesData) {
+    const stackedSeries: { original: T; y0: number; y1: number }[] = []
+
+    for (const datum of series) {
+      const prevY = stackedValues.get(datum.x) ?? 0
+      const y0 = prevY
+      const y1 = prevY + datum.y
+
+      stackedSeries.push({ original: datum, y0, y1 })
+      stackedValues.set(datum.x, y1)
+    }
+
+    result.push(stackedSeries)
+  }
+
+  return result
+}

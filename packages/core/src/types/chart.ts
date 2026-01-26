@@ -17,6 +17,158 @@ export type ChartPadding =
       left?: number
     }
 
+/**
+ * Curve interpolation type for line/area charts
+ */
+export type ChartCurveType = 'linear' | 'monotone' | 'step' | 'stepBefore' | 'stepAfter' | 'natural'
+
+/**
+ * Legend position
+ */
+export type ChartLegendPosition = 'top' | 'bottom' | 'left' | 'right'
+
+/**
+ * Common base props for all high-level chart components
+ */
+export interface BaseChartProps {
+  /**
+   * Chart width
+   * @default 320
+   */
+  width?: number
+
+  /**
+   * Chart height
+   * @default 200
+   */
+  height?: number
+
+  /**
+   * Chart padding
+   * @default 24
+   */
+  padding?: ChartPadding
+
+  /**
+   * Accessible title for the SVG
+   */
+  title?: string
+
+  /**
+   * Accessible description for the SVG
+   */
+  desc?: string
+
+  /**
+   * Additional CSS classes
+   */
+  className?: string
+}
+
+/**
+ * Common interaction props for charts
+ */
+export interface ChartInteractionProps {
+  /**
+   * Enable hover highlight
+   * @default false
+   */
+  hoverable?: boolean
+
+  /**
+   * Hovered index (controlled)
+   */
+  hoveredIndex?: number | null
+
+  /**
+   * Opacity for active/hovered element
+   * @default 1
+   */
+  activeOpacity?: number
+
+  /**
+   * Opacity for inactive elements when one is active
+   * @default 0.25
+   */
+  inactiveOpacity?: number
+
+  /**
+   * Enable click selection
+   * @default false
+   */
+  selectable?: boolean
+
+  /**
+   * Selected index (controlled)
+   */
+  selectedIndex?: number | null
+}
+
+/**
+ * Common legend props for charts
+ */
+export interface ChartLegendProps {
+  /**
+   * Whether to show legend
+   * @default false
+   */
+  showLegend?: boolean
+
+  /**
+   * Legend position
+   * @default 'bottom'
+   */
+  legendPosition?: ChartLegendPosition
+
+  /**
+   * Legend marker size in px
+   * @default 10
+   */
+  legendMarkerSize?: number
+
+  /**
+   * Legend item gap in px
+   * @default 8
+   */
+  legendGap?: number
+}
+
+/**
+ * Common tooltip props for charts
+ */
+export interface ChartTooltipProps {
+  /**
+   * Whether to show tooltip
+   * @default true
+   */
+  showTooltip?: boolean
+}
+
+/**
+ * Legend item data
+ */
+export interface ChartLegendItem {
+  /**
+   * Item index
+   */
+  index: number
+
+  /**
+   * Display label
+   */
+  label: string
+
+  /**
+   * Color
+   */
+  color: string
+
+  /**
+   * Whether this item is active/selected
+   */
+  active?: boolean
+}
+
 export interface ChartCanvasProps {
   /**
    * SVG width
@@ -287,25 +439,8 @@ export interface BarChartDatum {
   label?: string
 }
 
-export interface BarChartProps {
-  /**
-   * Chart width
-   * @default 320
-   */
-  width?: number
-
-  /**
-   * Chart height
-   * @default 200
-   */
-  height?: number
-
-  /**
-   * Chart padding
-   * @default 24
-   */
-  padding?: ChartPadding
-
+export interface BarChartProps
+  extends BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartTooltipProps {
   /**
    * Chart data
    */
@@ -325,6 +460,11 @@ export interface BarChartProps {
    * Bar color
    */
   barColor?: string
+
+  /**
+   * Custom colors for bars
+   */
+  colors?: string[]
 
   /**
    * Bar corner radius
@@ -423,9 +563,14 @@ export interface BarChartProps {
   gridStrokeWidth?: number
 
   /**
-   * Additional CSS classes
+   * Tooltip formatter
    */
-  className?: string
+  tooltipFormatter?: (datum: BarChartDatum, index: number) => string
+
+  /**
+   * Legend formatter
+   */
+  legendFormatter?: (datum: BarChartDatum, index: number) => string
 }
 
 export interface ScatterChartDatum {
@@ -592,25 +737,8 @@ export interface PieChartDatum extends ChartSeriesPoint {
   color?: string
 }
 
-export interface PieChartProps {
-  /**
-   * Chart width
-   * @default 320
-   */
-  width?: number
-
-  /**
-   * Chart height
-   * @default 200
-   */
-  height?: number
-
-  /**
-   * Chart padding
-   * @default 24
-   */
-  padding?: ChartPadding
-
+export interface PieChartProps
+  extends BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartTooltipProps {
   /**
    * Chart data
    */
@@ -662,9 +790,14 @@ export interface PieChartProps {
   labelFormatter?: (value: number, datum: PieChartDatum, index: number) => string
 
   /**
-   * Additional CSS classes
+   * Tooltip formatter
    */
-  className?: string
+  tooltipFormatter?: (datum: PieChartDatum, index: number) => string
+
+  /**
+   * Legend formatter
+   */
+  legendFormatter?: (datum: PieChartDatum, index: number) => string
 }
 
 export interface DonutChartDatum extends PieChartDatum {}
@@ -745,6 +878,418 @@ export interface RadarChartSeries {
   className?: string
 }
 
+// ============================================================================
+// LineChart Types
+// ============================================================================
+
+export interface LineChartDatum {
+  x: ChartScaleValue
+  y: number
+  label?: string
+}
+
+export interface LineChartSeries {
+  /**
+   * Series name
+   */
+  name?: string
+
+  /**
+   * Series data
+   */
+  data: LineChartDatum[]
+
+  /**
+   * Line color
+   */
+  color?: string
+
+  /**
+   * Line stroke width
+   * @default 2
+   */
+  strokeWidth?: number
+
+  /**
+   * Line dash array (e.g., '5 5' for dashed)
+   */
+  strokeDasharray?: string
+
+  /**
+   * Whether to show data points
+   * @default true
+   */
+  showPoints?: boolean
+
+  /**
+   * Point size
+   * @default 4
+   */
+  pointSize?: number
+
+  /**
+   * Point color (defaults to line color)
+   */
+  pointColor?: string
+
+  /**
+   * Additional CSS classes for this series
+   */
+  className?: string
+}
+
+export interface LineChartProps
+  extends BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartTooltipProps {
+  /**
+   * Chart data (single series)
+   */
+  data?: LineChartDatum[]
+
+  /**
+   * Multiple series
+   */
+  series?: LineChartSeries[]
+
+  /**
+   * Custom x scale
+   */
+  xScale?: ChartScale
+
+  /**
+   * Custom y scale
+   */
+  yScale?: ChartScale
+
+  /**
+   * Line color (for single series)
+   */
+  lineColor?: string
+
+  /**
+   * Line stroke width
+   * @default 2
+   */
+  strokeWidth?: number
+
+  /**
+   * Curve interpolation type
+   * @default 'linear'
+   */
+  curve?: ChartCurveType
+
+  /**
+   * Whether to show data points
+   * @default true
+   */
+  showPoints?: boolean
+
+  /**
+   * Point size
+   * @default 4
+   */
+  pointSize?: number
+
+  /**
+   * Point color
+   */
+  pointColor?: string
+
+  /**
+   * Whether to show grid
+   * @default true
+   */
+  showGrid?: boolean
+
+  /**
+   * Whether to show axes
+   * @default true
+   */
+  showAxis?: boolean
+
+  /**
+   * Whether to show X axis
+   * @default true
+   */
+  showXAxis?: boolean
+
+  /**
+   * Whether to show Y axis
+   * @default true
+   */
+  showYAxis?: boolean
+
+  /**
+   * Include zero in Y domain
+   * @default false
+   */
+  includeZero?: boolean
+
+  /**
+   * X axis label
+   */
+  xAxisLabel?: string
+
+  /**
+   * Y axis label
+   */
+  yAxisLabel?: string
+
+  /**
+   * X ticks
+   * @default 5
+   */
+  xTicks?: number
+
+  /**
+   * Y ticks
+   * @default 5
+   */
+  yTicks?: number
+
+  /**
+   * X tick values
+   */
+  xTickValues?: ChartScaleValue[]
+
+  /**
+   * Y tick values
+   */
+  yTickValues?: number[]
+
+  /**
+   * X tick format
+   */
+  xTickFormat?: (value: ChartScaleValue) => string
+
+  /**
+   * Y tick format
+   */
+  yTickFormat?: (value: ChartScaleValue) => string
+
+  /**
+   * Grid line style
+   * @default 'solid'
+   */
+  gridLineStyle?: ChartGridLineStyle
+
+  /**
+   * Grid stroke width
+   * @default 1
+   */
+  gridStrokeWidth?: number
+
+  /**
+   * Custom colors for multi-series
+   */
+  colors?: string[]
+
+  /**
+   * Tooltip formatter
+   */
+  tooltipFormatter?: (
+    datum: LineChartDatum,
+    seriesIndex: number,
+    index: number,
+    series?: LineChartSeries
+  ) => string
+
+  /**
+   * Legend formatter
+   */
+  legendFormatter?: (series: LineChartSeries, index: number) => string
+}
+
+// ============================================================================
+// AreaChart Types
+// ============================================================================
+
+export interface AreaChartDatum extends LineChartDatum {}
+
+export interface AreaChartSeries extends LineChartSeries {
+  /**
+   * Fill color (defaults to line color)
+   */
+  fillColor?: string
+
+  /**
+   * Fill opacity
+   * @default 0.2
+   */
+  fillOpacity?: number
+}
+
+export interface AreaChartProps
+  extends BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartTooltipProps {
+  /**
+   * Chart data (single series)
+   */
+  data?: AreaChartDatum[]
+
+  /**
+   * Multiple series
+   */
+  series?: AreaChartSeries[]
+
+  /**
+   * Custom x scale
+   */
+  xScale?: ChartScale
+
+  /**
+   * Custom y scale
+   */
+  yScale?: ChartScale
+
+  /**
+   * Line/area color (for single series)
+   */
+  areaColor?: string
+
+  /**
+   * Line stroke width
+   * @default 2
+   */
+  strokeWidth?: number
+
+  /**
+   * Fill opacity
+   * @default 0.2
+   */
+  fillOpacity?: number
+
+  /**
+   * Curve interpolation type
+   * @default 'linear'
+   */
+  curve?: ChartCurveType
+
+  /**
+   * Whether to show data points
+   * @default false
+   */
+  showPoints?: boolean
+
+  /**
+   * Point size
+   * @default 4
+   */
+  pointSize?: number
+
+  /**
+   * Point color
+   */
+  pointColor?: string
+
+  /**
+   * Whether to stack areas
+   * @default false
+   */
+  stacked?: boolean
+
+  /**
+   * Whether to show grid
+   * @default true
+   */
+  showGrid?: boolean
+
+  /**
+   * Whether to show axes
+   * @default true
+   */
+  showAxis?: boolean
+
+  /**
+   * Whether to show X axis
+   * @default true
+   */
+  showXAxis?: boolean
+
+  /**
+   * Whether to show Y axis
+   * @default true
+   */
+  showYAxis?: boolean
+
+  /**
+   * Include zero in Y domain
+   * @default true (different from LineChart)
+   */
+  includeZero?: boolean
+
+  /**
+   * X axis label
+   */
+  xAxisLabel?: string
+
+  /**
+   * Y axis label
+   */
+  yAxisLabel?: string
+
+  /**
+   * X ticks
+   * @default 5
+   */
+  xTicks?: number
+
+  /**
+   * Y ticks
+   * @default 5
+   */
+  yTicks?: number
+
+  /**
+   * X tick values
+   */
+  xTickValues?: ChartScaleValue[]
+
+  /**
+   * Y tick values
+   */
+  yTickValues?: number[]
+
+  /**
+   * X tick format
+   */
+  xTickFormat?: (value: ChartScaleValue) => string
+
+  /**
+   * Y tick format
+   */
+  yTickFormat?: (value: ChartScaleValue) => string
+
+  /**
+   * Grid line style
+   * @default 'solid'
+   */
+  gridLineStyle?: ChartGridLineStyle
+
+  /**
+   * Grid stroke width
+   * @default 1
+   */
+  gridStrokeWidth?: number
+
+  /**
+   * Custom colors for multi-series
+   */
+  colors?: string[]
+
+  /**
+   * Tooltip formatter
+   */
+  tooltipFormatter?: (
+    datum: AreaChartDatum,
+    seriesIndex: number,
+    index: number,
+    series?: AreaChartSeries
+  ) => string
+
+  /**
+   * Legend formatter
+   */
+  legendFormatter?: (series: AreaChartSeries, index: number) => string
+}
 export interface RadarChartProps {
   /**
    * Chart width
