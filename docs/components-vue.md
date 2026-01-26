@@ -11,7 +11,7 @@
 **表单 (Form):** Form | FormItem | Input | Textarea | Select | Checkbox | CheckboxGroup | Radio | RadioGroup | Switch | Slider | DatePicker | TimePicker | Upload  
 **导航 (Navigation):** Breadcrumb | Menu | Tabs | Pagination | Steps | Tree  
 **反馈/浮层 (Feedback/Overlay):** Alert | Message | Notification | Modal | Drawer | Popover | Popconfirm | Tooltip | Dropdown | Loading | Progress  
-**数据展示 (Data):** Table | Timeline
+**数据展示 (Data):** Table | Timeline | ChartCanvas | ChartAxis
 
 **快速查找：** 所有组件从 `@expcat/tigercat-vue` 导入，事件使用 kebab-case (@click, @change)，支持 v-model。
 
@@ -104,6 +104,8 @@ import { Button, ConfigProvider } from '@expcat/tigercat-vue'
 
 - Table：Props: columns(列)/data(数据)/rowKey(行键)；Events: @rowClick(行点击)
 - Timeline：Props: items(节点)/placement(位置)
+- ChartCanvas：Props: width(宽度)/height(高度)/padding(内边距)
+- ChartAxis：Props: orientation(方向)/scale(比例尺)/ticks(刻度数)/tickValues(刻度值)/label(标题)
 
 ## 常见陷阱 / FAQ
 
