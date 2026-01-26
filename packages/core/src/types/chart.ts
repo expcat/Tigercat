@@ -656,3 +656,13 @@ export interface PieChartProps {
    */
   className?: string
 }
+
+export interface DonutChartDatum extends PieChartDatum {}
+
+export interface DonutChartProps extends PieChartProps {
+  /**
+   * Inner radius ratio based on outer radius
+   * @default 0.6
+   */
+  innerRadiusRatio?: number
+}
