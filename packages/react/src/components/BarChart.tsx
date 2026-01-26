@@ -35,6 +35,8 @@ export const BarChart: React.FC<BarChartProps> = ({
   barPaddingOuter = 0.1,
   showGrid = true,
   showAxis = true,
+  showXAxis = true,
+  showYAxis = true,
   xAxisLabel,
   yAxisLabel,
   xTicks = 5,
@@ -93,6 +95,9 @@ export const BarChart: React.FC<BarChartProps> = ({
     })
   }, [resolvedXScale, resolvedYScale, data, innerRect.width, barColor])
 
+  const shouldShowXAxis = showAxis && showXAxis
+  const shouldShowYAxis = showAxis && showYAxis
+
   return (
     <ChartCanvas width={width} height={height} padding={padding} className={classNames(className)}>
       {showGrid ? (
@@ -108,7 +113,7 @@ export const BarChart: React.FC<BarChartProps> = ({
           strokeWidth={gridStrokeWidth}
         />
       ) : null}
-      {showAxis ? (
+      {shouldShowXAxis ? (
         <ChartAxis
           scale={resolvedXScale}
           orientation="bottom"
@@ -119,7 +124,7 @@ export const BarChart: React.FC<BarChartProps> = ({
           label={xAxisLabel}
         />
       ) : null}
-      {showAxis ? (
+      {shouldShowYAxis ? (
         <ChartAxis
           scale={resolvedYScale}
           orientation="left"

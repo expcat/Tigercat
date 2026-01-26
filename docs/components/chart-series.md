@@ -50,6 +50,38 @@ export default function Demo() {
 }
 ```
 
+## 渲染插槽 / Children
+
+### Vue 3
+
+`ChartSeries` 默认插槽会传入当前系列信息：
+
+- `data`：系列数据
+- `name`：系列名称
+- `color`：系列颜色
+- `opacity`：透明度
+- `type`：系列类型提示
+
+```vue
+<ChartSeries :data="points" name="Series A" color="#2563eb">
+  <template #default="{ data, color }">
+    <circle v-for="(pt, index) in data" :key="index" :cx="pt.x" :cy="pt.y" r="3" :fill="color" />
+  </template>
+</ChartSeries>
+```
+
+### React
+
+`children` 支持直接传入节点或渲染函数：
+
+```tsx
+<ChartSeries data={points} name="Series A" color="#2563eb">
+  {({ data, color }) =>
+    data.map((pt, index) => <circle key={index} cx={pt.x} cy={pt.y} r={3} fill={color} />)
+  }
+</ChartSeries>
+```
+
 ## API
 
 ### Props

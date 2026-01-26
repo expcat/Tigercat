@@ -33,6 +33,8 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
   pointOpacity,
   showGrid = true,
   showAxis = true,
+  showXAxis = true,
+  showYAxis = true,
   includeZero = false,
   xAxisLabel,
   yAxisLabel,
@@ -65,6 +67,9 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
     return createLinearScale(extent, [innerRect.height, 0])
   }, [yScale, yValues, includeZero, innerRect.height])
 
+  const shouldShowXAxis = showAxis && showXAxis
+  const shouldShowYAxis = showAxis && showYAxis
+
   return (
     <ChartCanvas width={width} height={height} padding={padding} className={classNames(className)}>
       {showGrid ? (
@@ -80,7 +85,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
           strokeWidth={gridStrokeWidth}
         />
       ) : null}
-      {showAxis ? (
+      {shouldShowXAxis ? (
         <ChartAxis
           scale={resolvedXScale}
           orientation="bottom"
@@ -91,7 +96,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
           label={xAxisLabel}
         />
       ) : null}
-      {showAxis ? (
+      {shouldShowYAxis ? (
         <ChartAxis
           scale={resolvedYScale}
           orientation="left"

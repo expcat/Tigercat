@@ -38,12 +38,14 @@ export default function Demo() {
 
 ### Props
 
-| 属性      | 说明       | 类型     | 默认值                                                            |
-| --------- | ---------- | -------- | ----------------------------------------------------------------- | ---- |
-| width     | SVG 宽度   | `number` | `320`                                                             |
-| height    | SVG 高度   | `number` | `200`                                                             |
-| padding   | 内边距     | `number  | { top?: number; right?: number; bottom?: number; left?: number }` | `24` |
-| className | 自定义类名 | `string` | -                                                                 |
+| 属性      | 说明         | 类型                                                                         | 默认值 |
+| --------- | ------------ | ---------------------------------------------------------------------------- | ------ |
+| width     | SVG 宽度     | `number`                                                                     | `320`  |
+| height    | SVG 高度     | `number`                                                                     | `200`  |
+| padding   | 内边距       | `number \| { top?: number; right?: number; bottom?: number; left?: number }` | `24`   |
+| className | 自定义类名   | `string`                                                                     | -      |
+| title     | SVG 标题     | `string`                                                                     | -      |
+| desc      | SVG 描述文本 | `string`                                                                     | -      |
 
 ## 设计说明
 

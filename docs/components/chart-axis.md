@@ -56,20 +56,20 @@ export default function Demo() {
 
 ### Props
 
-| 属性        | 说明           | 类型                | 默认值     |
-| ----------- | -------------- | ------------------- | ---------- | ----- | --------- | ---------- |
-| orientation | 坐标轴方向     | `'left'             | 'right'    | 'top' | 'bottom'` | `'bottom'` |
-| scale       | 轴比例尺       | `ChartScale`        | -          |
-| ticks       | 线性刻度数量   | `number`            | `5`        |
-| tickValues  | 自定义刻度值   | `(string            | number)[]` | -     |
-| tickFormat  | 刻度格式化函数 | `(value) => string` | -          |
-| tickSize    | 刻度线长度     | `number`            | `6`        |
-| tickPadding | 刻度文字间距   | `number`            | `4`        |
-| label       | 轴标题         | `string`            | -          |
-| labelOffset | 标题偏移量     | `number`            | `28`       |
-| x           | 轴平移 X       | `number`            | `0`        |
-| y           | 轴平移 Y       | `number`            | `0`        |
-| className   | 自定义类名     | `string`            | -          |
+| 属性        | 说明           | 类型                                     | 默认值     |
+| ----------- | -------------- | ---------------------------------------- | ---------- |
+| orientation | 坐标轴方向     | `'left' \| 'right' \| 'top' \| 'bottom'` | `'bottom'` |
+| scale       | 轴比例尺       | `ChartScale`                             | -          |
+| ticks       | 线性刻度数量   | `number`                                 | `5`        |
+| tickValues  | 自定义刻度值   | `(string \| number)[]`                   | -          |
+| tickFormat  | 刻度格式化函数 | `(value) => string`                      | -          |
+| tickSize    | 刻度线长度     | `number`                                 | `6`        |
+| tickPadding | 刻度文字间距   | `number`                                 | `4`        |
+| label       | 轴标题         | `string`                                 | -          |
+| labelOffset | 标题偏移量     | `number`                                 | `28`       |
+| x           | 轴平移 X       | `number`                                 | `0`        |
+| y           | 轴平移 Y       | `number`                                 | `0`        |
+| className   | 自定义类名     | `string`                                 | -          |
 
 ## 设计说明
 

@@ -60,6 +60,8 @@ export default function Demo() {
 | barPaddingOuter | 外间距比例      | `number`                                                                     | `0.1`                          |
 | showGrid        | 显示网格        | `boolean`                                                                    | `true`                         |
 | showAxis        | 显示坐标轴      | `boolean`                                                                    | `true`                         |
+| showXAxis       | 显示 X 轴       | `boolean`                                                                    | `true`                         |
+| showYAxis       | 显示 Y 轴       | `boolean`                                                                    | `true`                         |
 | xAxisLabel      | X 轴标题        | `string`                                                                     | -                              |
 | yAxisLabel      | Y 轴标题        | `string`                                                                     | -                              |
 | xTicks          | X 轴刻度数      | `number`                                                                     | `5`                            |

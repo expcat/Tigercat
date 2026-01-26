@@ -40,6 +40,16 @@ export interface ChartCanvasProps {
    * Additional CSS classes
    */
   className?: string
+
+  /**
+   * Accessible title for the SVG
+   */
+  title?: string
+
+  /**
+   * Accessible description for the SVG
+   */
+  desc?: string
 }
 
 export interface ChartScale {
@@ -347,6 +357,18 @@ export interface BarChartProps {
   showAxis?: boolean
 
   /**
+   * Whether to show X axis
+   * @default true
+   */
+  showXAxis?: boolean
+
+  /**
+   * Whether to show Y axis
+   * @default true
+   */
+  showYAxis?: boolean
+
+  /**
    * X axis label
    */
   xAxisLabel?: string
@@ -475,6 +497,18 @@ export interface ScatterChartProps {
    * @default true
    */
   showAxis?: boolean
+
+  /**
+   * Whether to show X axis
+   * @default true
+   */
+  showXAxis?: boolean
+
+  /**
+   * Whether to show Y axis
+   * @default true
+   */
+  showYAxis?: boolean
 
   /**
    * Include zero in domain

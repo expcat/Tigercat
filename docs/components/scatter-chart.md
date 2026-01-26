@@ -57,6 +57,8 @@ export default function Demo() {
 | pointOpacity    | 点透明度        | `number`                                                                     | -                              |
 | showGrid        | 显示网格        | `boolean`                                                                    | `true`                         |
 | showAxis        | 显示坐标轴      | `boolean`                                                                    | `true`                         |
+| showXAxis       | 显示 X 轴       | `boolean`                                                                    | `true`                         |
+| showYAxis       | 显示 Y 轴       | `boolean`                                                                    | `true`                         |
 | includeZero     | 包含零刻度      | `boolean`                                                                    | `false`                        |
 | xAxisLabel      | X 轴标题        | `string`                                                                     | -                              |
 | yAxisLabel      | Y 轴标题        | `string`                                                                     | -                              |
