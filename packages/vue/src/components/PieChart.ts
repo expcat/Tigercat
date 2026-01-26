@@ -3,6 +3,7 @@ import {
   chartAxisTickTextClasses,
   classNames,
   createPieArcPath,
+  DEFAULT_CHART_COLORS,
   getChartInnerRect,
   getPieArcs,
   polarToCartesian,
@@ -12,15 +13,6 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartSeries } from './ChartSeries'
-
-const defaultPieColors = [
-  'var(--tiger-chart-1,#2563eb)',
-  'var(--tiger-chart-2,#22c55e)',
-  'var(--tiger-chart-3,#f97316)',
-  'var(--tiger-chart-4,#a855f7)',
-  'var(--tiger-chart-5,#0ea5e9)',
-  'var(--tiger-chart-6,#ef4444)'
-]
 
 export interface VuePieChartProps extends CorePieChartProps {
   data: PieChartDatum[]
@@ -100,7 +92,7 @@ export const PieChart = defineComponent({
     )
 
     const palette = computed(() =>
-      props.colors && props.colors.length > 0 ? props.colors : defaultPieColors
+      props.colors && props.colors.length > 0 ? props.colors : [...DEFAULT_CHART_COLORS]
     )
 
     return () => {

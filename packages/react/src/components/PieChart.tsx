@@ -3,6 +3,7 @@ import {
   chartAxisTickTextClasses,
   classNames,
   createPieArcPath,
+  DEFAULT_CHART_COLORS,
   getChartInnerRect,
   getPieArcs,
   polarToCartesian,
@@ -11,15 +12,6 @@ import {
   type PieChartProps as CorePieChartProps
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
-
-const defaultPieColors = [
-  'var(--tiger-chart-1,#2563eb)',
-  'var(--tiger-chart-2,#22c55e)',
-  'var(--tiger-chart-3,#f97316)',
-  'var(--tiger-chart-4,#a855f7)',
-  'var(--tiger-chart-5,#0ea5e9)',
-  'var(--tiger-chart-6,#ef4444)'
-]
 
 export interface PieChartProps extends CorePieChartProps {
   data: PieChartDatum[]
@@ -66,7 +58,10 @@ export const PieChart: React.FC<PieChartProps> = ({
     [data, startAngle, endAngle, padAngle]
   )
 
-  const palette = useMemo(() => (colors && colors.length > 0 ? colors : defaultPieColors), [colors])
+  const palette = useMemo(
+    () => (colors && colors.length > 0 ? colors : [...DEFAULT_CHART_COLORS]),
+    [colors]
+  )
 
   const cx = innerRect.width / 2
   const cy = innerRect.height / 2
