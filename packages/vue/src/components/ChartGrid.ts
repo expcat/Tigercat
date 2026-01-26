@@ -12,12 +12,9 @@ import {
   type ChartScaleValue
 } from '@expcat/tigercat-core'
 
-export interface VueChartGridProps<
-  TX extends ChartScaleValue = ChartScaleValue,
-  TY extends ChartScaleValue = ChartScaleValue
-> extends ChartGridProps<TX, TY> {
-  xScale?: ChartScale<TX>
-  yScale?: ChartScale<TY>
+export interface VueChartGridProps extends ChartGridProps {
+  xScale?: ChartScale
+  yScale?: ChartScale
 }
 
 export const ChartGrid = defineComponent({

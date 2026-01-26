@@ -11,7 +11,7 @@
 **表单 (Form):** Form | FormItem | Input | Textarea | Select | Checkbox | CheckboxGroup | Radio | RadioGroup | Switch | Slider | DatePicker | TimePicker | Upload  
 **导航 (Navigation):** Breadcrumb | Menu | Tabs | Pagination | Steps | Tree  
 **反馈/浮层 (Feedback/Overlay):** Alert | Message | Notification | Modal | Drawer | Popover | Popconfirm | Tooltip | Dropdown | Loading | Progress  
-**数据展示 (Data):** Table | Timeline | ChartCanvas | ChartAxis | ChartGrid | ChartSeries
+**数据展示 (Data):** Table | Timeline | ChartCanvas | ChartAxis | ChartGrid | ChartSeries | BarChart | ScatterChart
 
 **快速查找：** 所有组件从 `@expcat/tigercat-vue` 导入，事件使用 kebab-case (@click, @change)，支持 v-model。
 
@@ -108,6 +108,8 @@ import { Button, ConfigProvider } from '@expcat/tigercat-vue'
 - ChartAxis：Props: orientation(方向)/scale(比例尺)/ticks(刻度数)/tickValues(刻度值)/label(标题)
 - ChartGrid：Props: xScale/yScale(比例尺)/show(网格)/xTicks/yTicks(刻度数)/lineStyle(样式)
 - ChartSeries：Props: data(数据)/name(名称)/color(颜色)/type(类型)
+- BarChart：Props: data(数据)/width(宽度)/height(高度)/barColor(颜色)/showGrid(网格)
+- ScatterChart：Props: data(数据)/width(宽度)/height(高度)/pointSize(点大小)/showGrid(网格)
 
 ## 常见陷阱 / FAQ
 

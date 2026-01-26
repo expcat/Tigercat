@@ -5,25 +5,16 @@ import {
   getChartAxisTicks,
   getChartGridLineDasharray,
   type ChartGridProps as CoreChartGridProps,
-  type ChartScale,
-  type ChartScaleValue
+  type ChartScale
 } from '@expcat/tigercat-core'
 
-export interface ChartGridProps<
-  TX extends ChartScaleValue = ChartScaleValue,
-  TY extends ChartScaleValue = ChartScaleValue
->
-  extends
-    CoreChartGridProps<TX, TY>,
-    Omit<React.SVGAttributes<SVGGElement>, keyof CoreChartGridProps<TX, TY>> {
-  xScale?: ChartScale<TX>
-  yScale?: ChartScale<TY>
+export interface ChartGridProps
+  extends CoreChartGridProps, Omit<React.SVGAttributes<SVGGElement>, keyof CoreChartGridProps> {
+  xScale?: ChartScale
+  yScale?: ChartScale
 }
 
-export const ChartGrid = <
-  TX extends ChartScaleValue = ChartScaleValue,
-  TY extends ChartScaleValue = ChartScaleValue
->({
+export const ChartGrid = ({
   xScale,
   yScale,
   show = 'both',
@@ -37,17 +28,17 @@ export const ChartGrid = <
   y = 0,
   className,
   ...props
-}: ChartGridProps<TX, TY>) => {
+}: ChartGridProps) => {
   const dasharray = useMemo(() => getChartGridLineDasharray(lineStyle), [lineStyle])
 
   const resolvedXTicks = useMemo(() => {
     if (!xScale) return []
-    return getChartAxisTicks(xScale, { tickCount: xTicks, tickValues: xTickValues as TX[] })
+    return getChartAxisTicks(xScale, { tickCount: xTicks, tickValues: xTickValues })
   }, [xScale, xTicks, xTickValues])
 
   const resolvedYTicks = useMemo(() => {
     if (!yScale) return []
-    return getChartAxisTicks(yScale, { tickCount: yTicks, tickValues: yTickValues as TY[] })
+    return getChartAxisTicks(yScale, { tickCount: yTicks, tickValues: yTickValues })
   }, [yScale, yTicks, yTickValues])
 
   const shouldRenderX = show === 'both' || show === 'x'

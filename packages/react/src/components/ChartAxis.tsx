@@ -8,18 +8,15 @@ import {
   getChartAxisTicks,
   type ChartAxisOrientation,
   type ChartAxisProps as CoreChartAxisProps,
-  type ChartScale,
-  type ChartScaleValue
+  type ChartScale
 } from '@expcat/tigercat-core'
 
-export interface ChartAxisProps<T extends ChartScaleValue = ChartScaleValue>
-  extends
-    CoreChartAxisProps<T>,
-    Omit<React.SVGAttributes<SVGGElement>, keyof CoreChartAxisProps<T>> {
-  scale: ChartScale<T>
+export interface ChartAxisProps
+  extends CoreChartAxisProps, Omit<React.SVGAttributes<SVGGElement>, keyof CoreChartAxisProps> {
+  scale: ChartScale
 }
 
-export const ChartAxis = <T extends ChartScaleValue = ChartScaleValue>({
+export const ChartAxis = ({
   orientation = 'bottom',
   scale,
   ticks = 5,
@@ -33,12 +30,12 @@ export const ChartAxis = <T extends ChartScaleValue = ChartScaleValue>({
   y = 0,
   className,
   ...props
-}: ChartAxisProps<T>) => {
+}: ChartAxisProps) => {
   const axisTicks = useMemo(
     () =>
       getChartAxisTicks(scale, {
         tickCount: ticks,
-        tickValues: tickValues as T[] | undefined,
+        tickValues,
         tickFormat
       }),
     [scale, ticks, tickValues, tickFormat]

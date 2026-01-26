@@ -42,11 +42,11 @@ export interface ChartCanvasProps {
   className?: string
 }
 
-export interface ChartScale<T extends ChartScaleValue = ChartScaleValue> {
+export interface ChartScale {
   type: ChartScaleType
-  domain: T[]
+  domain: ChartScaleValue[]
   range: [number, number]
-  map: (value: T) => number
+  map: (value: ChartScaleValue) => number
   bandwidth?: number
   step?: number
 }
@@ -79,7 +79,7 @@ export interface PointScaleOptions {
   padding?: number
 }
 
-export interface ChartAxisProps<T extends ChartScaleValue = ChartScaleValue> {
+export interface ChartAxisProps {
   /**
    * Axis orientation
    * @default 'bottom'
@@ -89,7 +89,7 @@ export interface ChartAxisProps<T extends ChartScaleValue = ChartScaleValue> {
   /**
    * Axis scale
    */
-  scale: ChartScale<T>
+  scale: ChartScale
 
   /**
    * Number of ticks (only for linear scale)
@@ -100,12 +100,12 @@ export interface ChartAxisProps<T extends ChartScaleValue = ChartScaleValue> {
   /**
    * Explicit tick values
    */
-  tickValues?: T[]
+  tickValues?: ChartScaleValue[]
 
   /**
    * Tick label formatter
    */
-  tickFormat?: (value: T) => string
+  tickFormat?: (value: ChartScaleValue) => string
 
   /**
    * Tick size in px
@@ -148,8 +148,8 @@ export interface ChartAxisProps<T extends ChartScaleValue = ChartScaleValue> {
   className?: string
 }
 
-export interface ChartAxisTick<T extends ChartScaleValue = ChartScaleValue> {
-  value: T
+export interface ChartAxisTick {
+  value: ChartScaleValue
   position: number
   label: string
 }
@@ -158,19 +158,16 @@ export type ChartGridLine = 'x' | 'y' | 'both'
 
 export type ChartGridLineStyle = 'solid' | 'dashed' | 'dotted'
 
-export interface ChartGridProps<
-  TX extends ChartScaleValue = ChartScaleValue,
-  TY extends ChartScaleValue = ChartScaleValue
-> {
+export interface ChartGridProps {
   /**
    * X axis scale
    */
-  xScale?: ChartScale<TX>
+  xScale?: ChartScale
 
   /**
    * Y axis scale
    */
-  yScale?: ChartScale<TY>
+  yScale?: ChartScale
 
   /**
    * Show grid lines
@@ -193,12 +190,12 @@ export interface ChartGridProps<
   /**
    * Explicit X tick values
    */
-  xTickValues?: TX[]
+  xTickValues?: ChartScaleValue[]
 
   /**
    * Explicit Y tick values
    */
-  yTickValues?: TY[]
+  yTickValues?: ChartScaleValue[]
 
   /**
    * Grid line style
@@ -266,6 +263,278 @@ export interface ChartSeriesProps<T extends ChartSeriesPoint = ChartSeriesPoint>
    * Series type hint
    */
   type?: ChartSeriesType
+
+  /**
+   * Additional CSS classes
+   */
+  className?: string
+}
+
+export interface BarChartDatum {
+  x: ChartScaleValue
+  y: number
+  color?: string
+  label?: string
+}
+
+export interface BarChartProps {
+  /**
+   * Chart width
+   * @default 320
+   */
+  width?: number
+
+  /**
+   * Chart height
+   * @default 200
+   */
+  height?: number
+
+  /**
+   * Chart padding
+   * @default 24
+   */
+  padding?: ChartPadding
+
+  /**
+   * Chart data
+   */
+  data: BarChartDatum[]
+
+  /**
+   * Custom x scale
+   */
+  xScale?: ChartScale
+
+  /**
+   * Custom y scale
+   */
+  yScale?: ChartScale
+
+  /**
+   * Bar color
+   */
+  barColor?: string
+
+  /**
+   * Bar corner radius
+   * @default 4
+   */
+  barRadius?: number
+
+  /**
+   * Inner padding ratio for bars
+   * @default 0.2
+   */
+  barPaddingInner?: number
+
+  /**
+   * Outer padding ratio for bars
+   * @default 0.1
+   */
+  barPaddingOuter?: number
+
+  /**
+   * Whether to show grid
+   * @default true
+   */
+  showGrid?: boolean
+
+  /**
+   * Whether to show axes
+   * @default true
+   */
+  showAxis?: boolean
+
+  /**
+   * X axis label
+   */
+  xAxisLabel?: string
+
+  /**
+   * Y axis label
+   */
+  yAxisLabel?: string
+
+  /**
+   * X ticks
+   * @default 5
+   */
+  xTicks?: number
+
+  /**
+   * Y ticks
+   * @default 5
+   */
+  yTicks?: number
+
+  /**
+   * X tick values
+   */
+  xTickValues?: ChartScaleValue[]
+
+  /**
+   * Y tick values
+   */
+  yTickValues?: ChartScaleValue[]
+
+  /**
+   * X tick format
+   */
+  xTickFormat?: (value: ChartScaleValue) => string
+
+  /**
+   * Y tick format
+   */
+  yTickFormat?: (value: ChartScaleValue) => string
+
+  /**
+   * Grid line style
+   * @default 'solid'
+   */
+  gridLineStyle?: ChartGridLineStyle
+
+  /**
+   * Grid stroke width
+   * @default 1
+   */
+  gridStrokeWidth?: number
+
+  /**
+   * Additional CSS classes
+   */
+  className?: string
+}
+
+export interface ScatterChartDatum {
+  x: number
+  y: number
+  size?: number
+  color?: string
+  label?: string
+}
+
+export interface ScatterChartProps {
+  /**
+   * Chart width
+   * @default 320
+   */
+  width?: number
+
+  /**
+   * Chart height
+   * @default 200
+   */
+  height?: number
+
+  /**
+   * Chart padding
+   * @default 24
+   */
+  padding?: ChartPadding
+
+  /**
+   * Chart data
+   */
+  data: ScatterChartDatum[]
+
+  /**
+   * Custom x scale
+   */
+  xScale?: ChartScale
+
+  /**
+   * Custom y scale
+   */
+  yScale?: ChartScale
+
+  /**
+   * Point size
+   * @default 4
+   */
+  pointSize?: number
+
+  /**
+   * Point color
+   */
+  pointColor?: string
+
+  /**
+   * Point opacity
+   */
+  pointOpacity?: number
+
+  /**
+   * Whether to show grid
+   * @default true
+   */
+  showGrid?: boolean
+
+  /**
+   * Whether to show axes
+   * @default true
+   */
+  showAxis?: boolean
+
+  /**
+   * Include zero in domain
+   * @default false
+   */
+  includeZero?: boolean
+
+  /**
+   * X axis label
+   */
+  xAxisLabel?: string
+
+  /**
+   * Y axis label
+   */
+  yAxisLabel?: string
+
+  /**
+   * X ticks
+   * @default 5
+   */
+  xTicks?: number
+
+  /**
+   * Y ticks
+   * @default 5
+   */
+  yTicks?: number
+
+  /**
+   * X tick values
+   */
+  xTickValues?: ChartScaleValue[]
+
+  /**
+   * Y tick values
+   */
+  yTickValues?: ChartScaleValue[]
+
+  /**
+   * X tick format
+   */
+  xTickFormat?: (value: ChartScaleValue) => string
+
+  /**
+   * Y tick format
+   */
+  yTickFormat?: (value: ChartScaleValue) => string
+
+  /**
+   * Grid line style
+   * @default 'solid'
+   */
+  gridLineStyle?: ChartGridLineStyle
+
+  /**
+   * Grid stroke width
+   * @default 1
+   */
+  gridStrokeWidth?: number
 
   /**
    * Additional CSS classes
