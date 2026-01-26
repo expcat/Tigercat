@@ -347,3 +347,63 @@ export function createPieArcPath(options: {
     'Z'
   ].join(' ')
 }
+
+export function getRadarAngles(count: number, startAngle = -Math.PI / 2): number[] {
+  if (count <= 0) return []
+  const step = (Math.PI * 2) / count
+  return Array.from({ length: count }, (_, index) => startAngle + step * index)
+}
+
+export interface RadarPoint<T> {
+  data: T
+  value: number
+  angle: number
+  radius: number
+  x: number
+  y: number
+  index: number
+}
+
+export function getRadarPoints<T extends { value: number }>(
+  data: T[],
+  options: {
+    cx: number
+    cy: number
+    radius: number
+    startAngle?: number
+    maxValue?: number
+  }
+): RadarPoint<T>[] {
+  if (data.length === 0) return []
+
+  const startAngle = options.startAngle ?? -Math.PI / 2
+  const maxValue = Math.max(0, options.maxValue ?? Math.max(...data.map((datum) => datum.value)))
+  const resolvedMax = maxValue > 0 ? maxValue : 1
+  const step = (Math.PI * 2) / data.length
+
+  return data.map((datum, index) => {
+    const value = Math.max(0, datum.value)
+    const ratio = value / resolvedMax
+    const radius = options.radius * ratio
+    const angle = startAngle + step * index
+    const point = polarToCartesian(options.cx, options.cy, radius, angle)
+
+    return {
+      data: datum,
+      value,
+      angle,
+      radius,
+      x: point.x,
+      y: point.y,
+      index
+    }
+  })
+}
+
+export function createPolygonPath(points: Array<{ x: number; y: number }>): string {
+  if (points.length === 0) return ''
+  const [first, ...rest] = points
+  return [`M ${first.x} ${first.y}`, ...rest.map((point) => `L ${point.x} ${point.y}`), 'Z'].join(
+    ' '
+  )
+}

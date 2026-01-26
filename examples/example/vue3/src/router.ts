@@ -76,6 +76,10 @@ const router = createRouter({
           path: 'donut-chart',
           component: () => import('./pages/DonutChartDemo.vue')
         },
+        {
+          path: 'radar-chart',
+          component: () => import('./pages/RadarChartDemo.vue')
+        },
         { path: 'menu', component: () => import('./pages/MenuDemo.vue') },
         {
           path: 'breadcrumb',

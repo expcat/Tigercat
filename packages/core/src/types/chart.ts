@@ -666,3 +666,220 @@ export interface DonutChartProps extends PieChartProps {
    */
   innerRadiusRatio?: number
 }
+
+export interface RadarChartDatum extends ChartSeriesPoint {
+  value: number
+  label?: string
+  color?: string
+}
+
+export interface RadarChartSeries {
+  /**
+   * Series name
+   */
+  name?: string
+
+  /**
+   * Series data
+   */
+  data: RadarChartDatum[]
+
+  /**
+   * Base color
+   */
+  color?: string
+
+  /**
+   * Polygon stroke color
+   */
+  strokeColor?: string
+
+  /**
+   * Polygon stroke width
+   */
+  strokeWidth?: number
+
+  /**
+   * Polygon fill color
+   */
+  fillColor?: string
+
+  /**
+   * Polygon fill opacity
+   */
+  fillOpacity?: number
+
+  /**
+   * Whether to show points
+   */
+  showPoints?: boolean
+
+  /**
+   * Point size
+   */
+  pointSize?: number
+
+  /**
+   * Point color
+   */
+  pointColor?: string
+
+  /**
+   * Additional CSS classes
+   */
+  className?: string
+}
+
+export interface RadarChartProps {
+  /**
+   * Chart width
+   * @default 320
+   */
+  width?: number
+
+  /**
+   * Chart height
+   * @default 200
+   */
+  height?: number
+
+  /**
+   * Chart padding
+   * @default 24
+   */
+  padding?: ChartPadding
+
+  /**
+   * Chart data
+   */
+  data?: RadarChartDatum[]
+
+  /**
+   * Series list
+   */
+  series?: RadarChartSeries[]
+
+  /**
+   * Max value for radius scaling
+   */
+  maxValue?: number
+
+  /**
+   * Start angle in radians
+   * @default -Math.PI / 2
+   */
+  startAngle?: number
+
+  /**
+   * Grid levels
+   * @default 5
+   */
+  levels?: number
+
+  /**
+   * Whether to show level labels
+   * @default false
+   */
+  showLevelLabels?: boolean
+
+  /**
+   * Whether to show grid
+   * @default true
+   */
+  showGrid?: boolean
+
+  /**
+   * Whether to show axis lines
+   * @default true
+   */
+  showAxis?: boolean
+
+  /**
+   * Whether to show labels
+   * @default true
+   */
+  showLabels?: boolean
+
+  /**
+   * Label offset from outer radius
+   * @default 12
+   */
+  labelOffset?: number
+
+  /**
+   * Label formatter
+   */
+  labelFormatter?: (datum: RadarChartDatum, index: number) => string
+
+  /**
+   * Level label formatter
+   */
+  levelLabelFormatter?: (value: number, level: number) => string
+
+  /**
+   * Level label offset
+   * @default 8
+   */
+  levelLabelOffset?: number
+
+  /**
+   * Colors for series
+   */
+  colors?: string[]
+
+  /**
+   * Grid line style
+   * @default 'solid'
+   */
+  gridLineStyle?: ChartGridLineStyle
+
+  /**
+   * Grid stroke width
+   * @default 1
+   */
+  gridStrokeWidth?: number
+
+  /**
+   * Polygon stroke color
+   */
+  strokeColor?: string
+
+  /**
+   * Polygon stroke width
+   * @default 2
+   */
+  strokeWidth?: number
+
+  /**
+   * Polygon fill color
+   */
+  fillColor?: string
+
+  /**
+   * Polygon fill opacity
+   * @default 0.2
+   */
+  fillOpacity?: number
+
+  /**
+   * Whether to show data points
+   * @default true
+   */
+  showPoints?: boolean
+
+  /**
+   * Point size
+   * @default 3
+   */
+  pointSize?: number
+
+  /**
+   * Point color
+   */
+  pointColor?: string
+
+  /**
+   * Additional CSS classes
+   */
+  className?: string
+}
