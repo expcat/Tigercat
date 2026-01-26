@@ -153,3 +153,122 @@ export interface ChartAxisTick<T extends ChartScaleValue = ChartScaleValue> {
   position: number
   label: string
 }
+
+export type ChartGridLine = 'x' | 'y' | 'both'
+
+export type ChartGridLineStyle = 'solid' | 'dashed' | 'dotted'
+
+export interface ChartGridProps<
+  TX extends ChartScaleValue = ChartScaleValue,
+  TY extends ChartScaleValue = ChartScaleValue
+> {
+  /**
+   * X axis scale
+   */
+  xScale?: ChartScale<TX>
+
+  /**
+   * Y axis scale
+   */
+  yScale?: ChartScale<TY>
+
+  /**
+   * Show grid lines
+   * @default 'both'
+   */
+  show?: ChartGridLine
+
+  /**
+   * X axis tick count
+   * @default 5
+   */
+  xTicks?: number
+
+  /**
+   * Y axis tick count
+   * @default 5
+   */
+  yTicks?: number
+
+  /**
+   * Explicit X tick values
+   */
+  xTickValues?: TX[]
+
+  /**
+   * Explicit Y tick values
+   */
+  yTickValues?: TY[]
+
+  /**
+   * Grid line style
+   * @default 'solid'
+   */
+  lineStyle?: ChartGridLineStyle
+
+  /**
+   * Line stroke width
+   * @default 1
+   */
+  strokeWidth?: number
+
+  /**
+   * X offset
+   * @default 0
+   */
+  x?: number
+
+  /**
+   * Y offset
+   * @default 0
+   */
+  y?: number
+
+  /**
+   * Additional CSS classes
+   */
+  className?: string
+}
+
+export type ChartSeriesType = 'bar' | 'scatter' | 'line' | 'area' | 'pie' | 'radar' | 'custom'
+
+export interface ChartSeriesPoint {
+  x: ChartScaleValue
+  y: ChartScaleValue
+  value?: number
+  label?: string
+  color?: string
+  size?: number
+}
+
+export interface ChartSeriesProps<T extends ChartSeriesPoint = ChartSeriesPoint> {
+  /**
+   * Series data
+   */
+  data: T[]
+
+  /**
+   * Series name
+   */
+  name?: string
+
+  /**
+   * Series color
+   */
+  color?: string
+
+  /**
+   * Series opacity
+   */
+  opacity?: number
+
+  /**
+   * Series type hint
+   */
+  type?: ChartSeriesType
+
+  /**
+   * Additional CSS classes
+   */
+  className?: string
+}

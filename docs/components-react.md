@@ -11,7 +11,7 @@
 **表单 (Form):** Form | FormItem | Input | Textarea | Select | Checkbox | CheckboxGroup | Radio | RadioGroup | Switch | Slider | DatePicker | TimePicker | Upload  
 **导航 (Navigation):** Breadcrumb | Menu | Tabs | Pagination | Steps | Tree  
 **反馈/浮层 (Feedback/Overlay):** Alert | Message | Notification | Modal | Drawer | Popover | Popconfirm | Tooltip | Dropdown | Loading | Progress  
-**数据展示 (Data):** Table | Timeline | ChartCanvas | ChartAxis
+**数据展示 (Data):** Table | Timeline | ChartCanvas | ChartAxis | ChartGrid | ChartSeries
 
 **快速查找：** 所有组件从 `@expcat/tigercat-react` 导入，事件使用 camelCase (onClick, onChange)，支持受控/非受控模式。
 
@@ -106,6 +106,8 @@ export function App() {
 - Timeline：Props: items(节点)/placement(位置)
 - ChartCanvas：Props: width(宽度)/height(高度)/padding(内边距)
 - ChartAxis：Props: orientation(方向)/scale(比例尺)/ticks(刻度数)/tickValues(刻度值)/label(标题)
+- ChartGrid：Props: xScale/yScale(比例尺)/show(网格)/xTicks/yTicks(刻度数)/lineStyle(样式)
+- ChartSeries：Props: data(数据)/name(名称)/color(颜色)/type(类型)
 
 ## 常见陷阱 / FAQ
 
