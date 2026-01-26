@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { message, Button, List } from '@expcat/tigercat-react'
+import { Message, Button, List } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 export default function MessageDemo() {
@@ -10,7 +10,7 @@ export default function MessageDemo() {
     '消息默认会在 3 秒后自动关闭',
     'loading 类型的消息不会自动关闭，需要手动关闭',
     '多条消息会依次排列显示，形成队列',
-    '可以通过 message.clear() 清空所有正在显示的消息',
+    '可以通过 Message.clear() 清空所有正在显示的消息',
     'Message 与 Alert 的区别：Message 是全局提示，Alert 是页面内嵌提示'
   ]
 
@@ -104,10 +104,10 @@ export default function MessageDemo() {
     <Button
       className={primaryButtonClassName}
       onClick={() => {
-        const close = message.loading('正在上传文件...')
+        const close = Message.loading('正在上传文件...')
         setTimeout(() => {
           close()
-          message.success('文件上传成功')
+          Message.success('文件上传成功')
         }, 2000)
       }}>
       上传文件
@@ -119,10 +119,10 @@ export default function MessageDemo() {
     <Button
       className={successButtonClassName}
       onClick={() => {
-        const close = message.loading('正在保存设置...')
+        const close = Message.loading('正在保存设置...')
         setTimeout(() => {
           close()
-          message.success({ content: '设置保存成功', duration: 2000 })
+          Message.success({ content: '设置保存成功', duration: 2000 })
         }, 1000)
       }}>
       保存设置
@@ -134,7 +134,7 @@ export default function MessageDemo() {
     <Button
       className={dangerButtonClassName}
       onClick={() => {
-        message.warning({ content: '确定要删除这条记录吗？', duration: 5000, closable: true })
+        Message.warning({ content: '确定要删除这条记录吗？', duration: 5000, closable: true })
       }}>
       删除记录
     </Button>
@@ -145,7 +145,7 @@ export default function MessageDemo() {
     <Button
       className={warningButtonClassName}
       onClick={() => {
-        message.error({ content: '网络连接失败，请检查您的网络设置', duration: 0, closable: true })
+        Message.error({ content: '网络连接失败，请检查您的网络设置', duration: 0, closable: true })
       }}>
       模拟网络错误
     </Button>
@@ -153,42 +153,42 @@ export default function MessageDemo() {
 </div>`
 
   const showInfo = () => {
-    message.info('这是一条信息提示')
+    Message.info('这是一条信息提示')
   }
 
   const showSuccess = () => {
-    message.success('操作成功！')
+    Message.success('操作成功！')
   }
 
   const showWarning = () => {
-    message.warning('请注意相关事项')
+    Message.warning('请注意相关事项')
   }
 
   const showError = () => {
-    message.error('操作失败，请重试')
+    Message.error('操作失败，请重试')
   }
 
   const showLoading = () => {
-    const close = message.loading('加载中...')
+    const close = Message.loading('加载中...')
     setTimeout(close, 3000)
   }
 
   const showShortMessage = () => {
-    message.info({
+    Message.info({
       content: '这条消息1秒后关闭',
       duration: 1000
     })
   }
 
   const showLongMessage = () => {
-    message.success({
+    Message.success({
       content: '这条消息5秒后关闭',
       duration: 5000
     })
   }
 
   const showPersistentMessage = () => {
-    message.warning({
+    Message.warning({
       content: '这条消息需要手动关闭',
       duration: 0,
       closable: true
@@ -196,7 +196,7 @@ export default function MessageDemo() {
   }
 
   const showClosableMessage = () => {
-    message.info({
+    Message.info({
       content: '这条消息可以手动关闭',
       closable: true,
       duration: 0
@@ -205,7 +205,7 @@ export default function MessageDemo() {
 
   const showMessage = () => {
     const nextIndex = manualLoadingCloseFnsRef.current.length + 1
-    const close = message.loading(`正在处理请求...（${nextIndex}）`)
+    const close = Message.loading(`正在处理请求...（${nextIndex}）`)
     manualLoadingCloseFnsRef.current.push(close)
     setManualLoadingCount(manualLoadingCloseFnsRef.current.length)
   }
@@ -228,13 +228,13 @@ export default function MessageDemo() {
   }
 
   const simulateRequest = async () => {
-    const close = message.loading('正在提交表单...')
+    const close = Message.loading('正在提交表单...')
 
     // 模拟异步请求
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
     close()
-    message.success({
+    Message.success({
       content: '表单提交成功！',
       duration: 3000,
       onClose: () => {
@@ -244,17 +244,17 @@ export default function MessageDemo() {
   }
 
   const showMultipleMessages = () => {
-    message.info('消息 1')
-    setTimeout(() => message.success('消息 2'), 300)
-    setTimeout(() => message.warning('消息 3'), 600)
+    Message.info('消息 1')
+    setTimeout(() => Message.success('消息 2'), 300)
+    setTimeout(() => Message.warning('消息 3'), 600)
   }
 
   const clearAll = () => {
-    message.clear()
+    Message.clear()
   }
 
   const showMessageWithCallback = () => {
-    message.success({
+    Message.success({
       content: '操作成功！',
       onClose: () => {
         console.log('消息已关闭')
@@ -263,7 +263,7 @@ export default function MessageDemo() {
   }
 
   const showCustomClass = () => {
-    message.info({
+    Message.info({
       content: '自定义样式的消息',
       className: 'shadow-2xl'
     })
@@ -281,7 +281,7 @@ export default function MessageDemo() {
       {/* 基本用法 */}
       <DemoBlock
         title="基本用法"
-        description="最简单的用法，调用 message 方法即可显示消息提示。"
+        description="最简单的用法，调用 Message 方法即可显示消息提示。"
         code={basicSnippet}>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2">
@@ -418,10 +418,10 @@ export default function MessageDemo() {
             <Button
               className={primaryButtonClassName}
               onClick={() => {
-                const close = message.loading('正在上传文件...')
+                const close = Message.loading('正在上传文件...')
                 setTimeout(() => {
                   close()
-                  message.success('文件上传成功')
+                  Message.success('文件上传成功')
                 }, 2000)
               }}>
               上传文件
@@ -433,10 +433,10 @@ export default function MessageDemo() {
             <Button
               className={successButtonClassName}
               onClick={() => {
-                const close = message.loading('正在保存设置...')
+                const close = Message.loading('正在保存设置...')
                 setTimeout(() => {
                   close()
-                  message.success({
+                  Message.success({
                     content: '设置保存成功',
                     duration: 2000
                   })
@@ -451,7 +451,7 @@ export default function MessageDemo() {
             <Button
               className={dangerButtonClassName}
               onClick={() => {
-                message.warning({
+                Message.warning({
                   content: '确定要删除这条记录吗？',
                   duration: 5000,
                   closable: true
@@ -466,7 +466,7 @@ export default function MessageDemo() {
             <Button
               className={warningButtonClassName}
               onClick={() => {
-                message.error({
+                Message.error({
                   content: '网络连接失败，请检查您的网络设置',
                   duration: 0,
                   closable: true

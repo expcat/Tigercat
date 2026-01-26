@@ -306,7 +306,7 @@ function normalizeOptions(options: MessageOptions): MessageConfig {
 /**
  * Message API
  */
-export const message = {
+export const Message = {
   /**
    * Show an info message
    */
@@ -355,4 +355,4 @@ export const message = {
   }
 }
 
-export default message
+export default Message

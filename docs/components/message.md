@@ -14,10 +14,10 @@
 
 ```vue
 <script setup>
-import { message } from '@expcat/tigercat-vue'
+import { Message } from '@expcat/tigercat-vue'
 
 const showMessage = () => {
-  message.info('这是一条普通消息')
+  Message.info('这是一条普通消息')
 }
 </script>
 
@@ -29,11 +29,11 @@ const showMessage = () => {
 ### React
 
 ```tsx
-import { message } from '@expcat/tigercat-react'
+import { Message } from '@expcat/tigercat-react'
 
 function App() {
   const showMessage = () => {
-    message.info('这是一条普通消息')
+    Message.info('这是一条普通消息')
   }
 
   return <button onClick={showMessage}>显示消息</button>
@@ -54,26 +54,26 @@ Message 组件支持 5 种不同的类型：
 
 ```vue
 <script setup>
-import { message } from '@expcat/tigercat-vue'
+import { Message } from '@expcat/tigercat-vue'
 
 const showInfo = () => {
-  message.info('这是一条信息提示')
+  Message.info('这是一条信息提示')
 }
 
 const showSuccess = () => {
-  message.success('操作成功！')
+  Message.success('操作成功！')
 }
 
 const showWarning = () => {
-  message.warning('请注意相关事项')
+  Message.warning('请注意相关事项')
 }
 
 const showError = () => {
-  message.error('操作失败，请重试')
+  Message.error('操作失败，请重试')
 }
 
 const showLoading = () => {
-  const close = message.loading('加载中...')
+  const close = Message.loading('加载中...')
   // 3秒后关闭
   setTimeout(close, 3000)
 }
@@ -93,27 +93,27 @@ const showLoading = () => {
 ### React
 
 ```tsx
-import { message } from '@expcat/tigercat-react'
+import { Message } from '@expcat/tigercat-react'
 
 function App() {
   const showInfo = () => {
-    message.info('这是一条信息提示')
+    Message.info('这是一条信息提示')
   }
 
   const showSuccess = () => {
-    message.success('操作成功！')
+    Message.success('操作成功！')
   }
 
   const showWarning = () => {
-    message.warning('请注意相关事项')
+    Message.warning('请注意相关事项')
   }
 
   const showError = () => {
-    message.error('操作失败，请重试')
+    Message.error('操作失败，请重试')
   }
 
   const showLoading = () => {
-    const close = message.loading('加载中...')
+    const close = Message.loading('加载中...')
     // 3秒后关闭
     setTimeout(close, 3000)
   }
@@ -138,11 +138,11 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@expcat/tigercat-vue'
+import { Message } from '@expcat/tigercat-vue'
 
 const showShortMessage = () => {
   // 1秒后自动关闭
-  message.info({
+  Message.info({
     content: '这条消息1秒后关闭',
     duration: 1000
   })
@@ -150,7 +150,7 @@ const showShortMessage = () => {
 
 const showLongMessage = () => {
   // 5秒后自动关闭
-  message.success({
+  Message.success({
     content: '这条消息5秒后关闭',
     duration: 5000
   })
@@ -158,7 +158,7 @@ const showLongMessage = () => {
 
 const showPersistentMessage = () => {
   // 不会自动关闭
-  message.warning({
+  Message.warning({
     content: '这条消息需要手动关闭',
     duration: 0,
     closable: true
@@ -178,12 +178,12 @@ const showPersistentMessage = () => {
 ### React
 
 ```tsx
-import { message } from '@expcat/tigercat-react'
+import { Message } from '@expcat/tigercat-react'
 
 function App() {
   const showShortMessage = () => {
     // 1秒后自动关闭
-    message.info({
+    Message.info({
       content: '这条消息1秒后关闭',
       duration: 1000
     })
@@ -191,7 +191,7 @@ function App() {
 
   const showLongMessage = () => {
     // 5秒后自动关闭
-    message.success({
+    Message.success({
       content: '这条消息5秒后关闭',
       duration: 5000
     })
@@ -199,7 +199,7 @@ function App() {
 
   const showPersistentMessage = () => {
     // 不会自动关闭
-    message.warning({
+    Message.warning({
       content: '这条消息需要手动关闭',
       duration: 0,
       closable: true
@@ -224,10 +224,10 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@expcat/tigercat-vue'
+import { Message } from '@expcat/tigercat-vue'
 
 const showClosableMessage = () => {
-  message.info({
+  Message.info({
     content: '这条消息可以手动关闭',
     closable: true,
     duration: 0 // 不自动关闭
@@ -243,11 +243,11 @@ const showClosableMessage = () => {
 ### React
 
 ```tsx
-import { message } from '@expcat/tigercat-react'
+import { Message } from '@expcat/tigercat-react'
 
 function App() {
   const showClosableMessage = () => {
-    message.info({
+    Message.info({
       content: '这条消息可以手动关闭',
       closable: true,
       duration: 0 // 不自动关闭
@@ -266,13 +266,13 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@expcat/tigercat-vue'
+import { Message } from '@expcat/tigercat-vue'
 import { ref } from 'vue'
 
 const closeMessage = ref<(() => void) | null>(null)
 
 const showMessage = () => {
-  closeMessage.value = message.loading('正在处理请求...')
+  closeMessage.value = Message.loading('正在处理请求...')
 }
 
 const closeManually = () => {
@@ -283,12 +283,12 @@ const closeManually = () => {
 }
 
 const simulateRequest = () => {
-  const close = message.loading('正在处理请求...')
+  const close = Message.loading('正在处理请求...')
 
   // 模拟异步请求
   setTimeout(() => {
     close() // 关闭加载消息
-    message.success('请求成功！')
+    Message.success('请求成功！')
   }, 2000)
 }
 </script>
@@ -305,14 +305,14 @@ const simulateRequest = () => {
 ### React
 
 ```tsx
-import { message } from '@expcat/tigercat-react'
+import { Message } from '@expcat/tigercat-react'
 import { useRef } from 'react'
 
 function App() {
   const closeMessageRef = useRef<(() => void) | null>(null)
 
   const showMessage = () => {
-    closeMessageRef.current = message.loading('正在处理请求...')
+    closeMessageRef.current = Message.loading('正在处理请求...')
   }
 
   const closeManually = () => {
@@ -323,12 +323,12 @@ function App() {
   }
 
   const simulateRequest = () => {
-    const close = message.loading('正在处理请求...')
+    const close = Message.loading('正在处理请求...')
 
     // 模拟异步请求
     setTimeout(() => {
       close() // 关闭加载消息
-      message.success('请求成功！')
+      Message.success('请求成功！')
     }, 2000)
   }
 
@@ -350,10 +350,10 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@expcat/tigercat-vue'
+import { Message } from '@expcat/tigercat-vue'
 
 const showMessageWithCallback = () => {
-  message.success({
+  Message.success({
     content: '操作成功！',
     onClose: () => {
       console.log('消息已关闭')
@@ -371,11 +371,11 @@ const showMessageWithCallback = () => {
 ### React
 
 ```tsx
-import { message } from '@expcat/tigercat-react'
+import { Message } from '@expcat/tigercat-react'
 
 function App() {
   const showMessageWithCallback = () => {
-    message.success({
+    Message.success({
       content: '操作成功！',
       onClose: () => {
         console.log('消息已关闭')
@@ -396,12 +396,12 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@expcat/tigercat-vue'
+import { Message } from '@expcat/tigercat-vue'
 
 const showMultipleMessages = () => {
-  message.info('消息 1')
-  message.success('消息 2')
-  message.warning('消息 3')
+  Message.info('消息 1')
+  Message.success('消息 2')
+  Message.warning('消息 3')
 }
 
 const clearAll = () => {
@@ -420,13 +420,13 @@ const clearAll = () => {
 ### React
 
 ```tsx
-import { message } from '@expcat/tigercat-react'
+import { Message } from '@expcat/tigercat-react'
 
 function App() {
   const showMultipleMessages = () => {
-    message.info('消息 1')
-    message.success('消息 2')
-    message.warning('消息 3')
+    Message.info('消息 1')
+    Message.success('消息 2')
+    Message.warning('消息 3')
   }
 
   const clearAll = () => {
@@ -448,11 +448,11 @@ function App() {
 
 ```vue
 <script setup>
-import { message } from '@expcat/tigercat-vue'
+import { Message } from '@expcat/tigercat-vue'
 
 const handleFormSubmit = async () => {
   // 显示加载消息
-  const close = message.loading('正在提交表单...')
+  const close = Message.loading('正在提交表单...')
 
   try {
     // 模拟异步操作
@@ -462,7 +462,7 @@ const handleFormSubmit = async () => {
     close()
 
     // 显示成功消息
-    message.success({
+    Message.success({
       content: '表单提交成功！',
       duration: 3000,
       onClose: () => {
@@ -474,7 +474,7 @@ const handleFormSubmit = async () => {
     close()
 
     // 显示错误消息
-    message.error({
+    Message.error({
       content: '表单提交失败，请重试',
       closable: true,
       duration: 5000
@@ -483,10 +483,10 @@ const handleFormSubmit = async () => {
 }
 
 const showDifferentTypes = () => {
-  message.info('这是一条信息')
-  setTimeout(() => message.success('操作成功'), 500)
-  setTimeout(() => message.warning('请注意'), 1000)
-  setTimeout(() => message.error('发生错误'), 1500)
+  Message.info('这是一条信息')
+  setTimeout(() => Message.success('操作成功'), 500)
+  setTimeout(() => Message.warning('请注意'), 1000)
+  setTimeout(() => Message.error('发生错误'), 1500)
 }
 </script>
 
@@ -495,11 +495,11 @@ const showDifferentTypes = () => {
     <h2 class="text-xl font-bold">Message 组件示例</h2>
 
     <div class="space-x-2">
-      <button @click="message.info('信息提示')">信息</button>
-      <button @click="message.success('成功提示')">成功</button>
-      <button @click="message.warning('警告提示')">警告</button>
-      <button @click="message.error('错误提示')">错误</button>
-      <button @click="message.loading('加载中...')">加载</button>
+      <button @click="Message.info('信息提示')">信息</button>
+      <button @click="Message.success('成功提示')">成功</button>
+      <button @click="Message.warning('警告提示')">警告</button>
+      <button @click="Message.error('错误提示')">错误</button>
+      <button @click="Message.loading('加载中...')">加载</button>
     </div>
 
     <div class="space-x-2">
@@ -514,12 +514,12 @@ const showDifferentTypes = () => {
 ### React
 
 ```tsx
-import { message } from '@expcat/tigercat-react'
+import { Message } from '@expcat/tigercat-react'
 
 function App() {
   const handleFormSubmit = async () => {
     // 显示加载消息
-    const close = message.loading('正在提交表单...')
+    const close = Message.loading('正在提交表单...')
 
     try {
       // 模拟异步操作
@@ -529,7 +529,7 @@ function App() {
       close()
 
       // 显示成功消息
-      message.success({
+      Message.success({
         content: '表单提交成功！',
         duration: 3000,
         onClose: () => {
@@ -541,7 +541,7 @@ function App() {
       close()
 
       // 显示错误消息
-      message.error({
+      Message.error({
         content: '表单提交失败，请重试',
         closable: true,
         duration: 5000
@@ -550,10 +550,10 @@ function App() {
   }
 
   const showDifferentTypes = () => {
-    message.info('这是一条信息')
-    setTimeout(() => message.success('操作成功'), 500)
-    setTimeout(() => message.warning('请注意'), 1000)
-    setTimeout(() => message.error('发生错误'), 1500)
+    Message.info('这是一条信息')
+    setTimeout(() => Message.success('操作成功'), 500)
+    setTimeout(() => Message.warning('请注意'), 1000)
+    setTimeout(() => Message.error('发生错误'), 1500)
   }
 
   return (
@@ -561,11 +561,11 @@ function App() {
       <h2 className="text-xl font-bold">Message 组件示例</h2>
 
       <div className="space-x-2">
-        <button onClick={() => message.info('信息提示')}>信息</button>
-        <button onClick={() => message.success('成功提示')}>成功</button>
-        <button onClick={() => message.warning('警告提示')}>警告</button>
-        <button onClick={() => message.error('错误提示')}>错误</button>
-        <button onClick={() => message.loading('加载中...')}>加载</button>
+        <button onClick={() => Message.info('信息提示')}>信息</button>
+        <button onClick={() => Message.success('成功提示')}>成功</button>
+        <button onClick={() => Message.warning('警告提示')}>警告</button>
+        <button onClick={() => Message.error('错误提示')}>错误</button>
+        <button onClick={() => Message.loading('加载中...')}>加载</button>
       </div>
 
       <div className="space-x-2">
@@ -584,11 +584,11 @@ function App() {
 
 | 方法            | 说明         | 参数类型                  | 返回值                  |
 | --------------- | ------------ | ------------------------- | ----------------------- |
-| message.info    | 显示信息提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
-| message.success | 显示成功提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
-| message.warning | 显示警告提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
-| message.error   | 显示错误提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
-| message.loading | 显示加载提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
+| Message.info    | 显示信息提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
+| Message.success | 显示成功提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
+| Message.warning | 显示警告提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
+| Message.error   | 显示错误提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
+| Message.loading | 显示加载提示 | `string \| MessageConfig` | `() => void` (关闭函数) |
 | message.clear   | 清空所有消息 | -                         | `void`                  |
 
 ### MessageConfig
@@ -622,7 +622,7 @@ Message 的颜色方案默认使用 CSS 变量（带 fallback），以便在不�
 可以通过 `className` 属性添加自定义样式：
 
 ```javascript
-message.success({
+Message.success({
   content: '自定义样式',
   className: 'my-custom-message'
 })
@@ -666,7 +666,7 @@ Message 组件提供完整的 TypeScript 类型定义：
 import { message, MessageConfig, MessageOptions } from '@expcat/tigercat-vue' // 或 '@expcat/tigercat-react'
 
 // 使用字符串
-message.info('简单消息')
+Message.info('简单消息')
 
 // 使用配置对象
 const config: MessageConfig = {
@@ -677,8 +677,8 @@ const config: MessageConfig = {
     console.log('已关闭')
   }
 }
-message.success(config)
+Message.success(config)
 
 // 获取关闭函数
-const close: () => void = message.loading('加载中...')
+const close: () => void = Message.loading('加载中...')
 ```
