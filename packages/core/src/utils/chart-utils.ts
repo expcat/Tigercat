@@ -1,6 +1,7 @@
 import type {
   BandScaleOptions,
   ChartAxisTick,
+  ChartGridLineStyle,
   ChartPadding,
   ChartScale,
   ChartScaleValue,
@@ -13,6 +14,8 @@ export const chartAxisLineClasses = 'stroke-[color:var(--tiger-border,#e5e7eb)]'
 export const chartAxisTickLineClasses = 'stroke-[color:var(--tiger-border,#e5e7eb)]'
 export const chartAxisTickTextClasses = 'fill-[color:var(--tiger-text-secondary,#6b7280)] text-xs'
 export const chartAxisLabelClasses = 'fill-[color:var(--tiger-text,#374151)] text-xs font-medium'
+
+export const chartGridLineClasses = 'stroke-[color:var(--tiger-border,#e5e7eb)]'
 
 const clampNumber = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
@@ -201,4 +204,10 @@ function getNiceStep(step: number): number {
 function roundTick(value: number, step: number): number {
   const precision = Math.max(0, -Math.floor(Math.log10(step)) + 1)
   return Number(value.toFixed(precision))
+}
+
+export function getChartGridLineDasharray(lineStyle: ChartGridLineStyle): string | undefined {
+  if (lineStyle === 'dashed') return '4 4'
+  if (lineStyle === 'dotted') return '1 4'
+  return undefined
 }
