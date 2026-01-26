@@ -60,6 +60,14 @@ const router = createRouter({
           path: 'progress',
           component: () => import('./pages/ProgressDemo.vue')
         },
+        {
+          path: 'bar-chart',
+          component: () => import('./pages/BarChartDemo.vue')
+        },
+        {
+          path: 'scatter-chart',
+          component: () => import('./pages/ScatterChartDemo.vue')
+        },
         { path: 'menu', component: () => import('./pages/MenuDemo.vue') },
         {
           path: 'breadcrumb',

@@ -187,6 +187,16 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'Progress', 'en-US': 'Progress' }
       },
       {
+        key: 'bar-chart',
+        path: '/bar-chart',
+        label: { 'zh-CN': 'BarChart', 'en-US': 'BarChart' }
+      },
+      {
+        key: 'scatter-chart',
+        path: '/scatter-chart',
+        label: { 'zh-CN': 'ScatterChart', 'en-US': 'ScatterChart' }
+      },
+      {
         key: 'skeleton',
         path: '/skeleton',
         label: { 'zh-CN': 'Skeleton', 'en-US': 'Skeleton' }
