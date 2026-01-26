@@ -41,6 +41,13 @@ const multiSeries: RadarChartSeries[] = [
   }
 ]
 
+const tooltipFormatter = (
+  datum: RadarChartDatum,
+  _seriesIndex: number,
+  _index: number,
+  series?: RadarChartSeries
+) => `${series?.name ?? 'Series'} · ${datum.label ?? ''}: ${datum.value}`
+
 const basicSnippet = `<RadarChart
   data={data}
   width={360}
@@ -64,6 +71,9 @@ const multiSnippet = `<RadarChart
   height={260}
   maxValue={100}
   colors={['#2563eb', '#f97316']}
+  hoverable
+  mutedOpacity={0.2}
+  tooltipFormatter={tooltipFormatter}
 />`
 
 const RadarChartDemo: React.FC = () => {
@@ -98,6 +108,9 @@ const RadarChartDemo: React.FC = () => {
           height={260}
           maxValue={100}
           colors={['#2563eb', '#f97316']}
+          hoverable
+          mutedOpacity={0.2}
+          tooltipFormatter={tooltipFormatter}
         />
       </DemoBlock>
     </div>

@@ -482,6 +482,16 @@ export interface ScatterChartProps {
   pointColor?: string
 
   /**
+   * Accessible title for the SVG
+   */
+  title?: string
+
+  /**
+   * Accessible description for the SVG
+   */
+  desc?: string
+
+  /**
    * Point opacity
    */
   pointOpacity?: number
@@ -690,6 +700,11 @@ export interface RadarChartSeries {
   color?: string
 
   /**
+   * Series opacity
+   */
+  opacity?: number
+
+  /**
    * Polygon stroke color
    */
   strokeColor?: string
@@ -821,6 +836,45 @@ export interface RadarChartProps {
    * @default 8
    */
   levelLabelOffset?: number
+
+  /**
+   * Enable hover highlight
+   * @default false
+   */
+  hoverable?: boolean
+
+  /**
+   * Active series index (controlled)
+   */
+  activeSeriesIndex?: number
+
+  /**
+   * Opacity for active series
+   * @default 1
+   */
+  hoverOpacity?: number
+
+  /**
+   * Opacity for inactive series
+   * @default 0.25
+   */
+  mutedOpacity?: number
+
+  /**
+   * Whether to show tooltip on points
+   * @default true
+   */
+  showTooltip?: boolean
+
+  /**
+   * Tooltip formatter
+   */
+  tooltipFormatter?: (
+    datum: RadarChartDatum,
+    seriesIndex: number,
+    index: number,
+    series?: RadarChartSeries
+  ) => string
 
   /**
    * Colors for series

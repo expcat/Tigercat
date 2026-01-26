@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, PropType, ref } from 'vue'
 import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
@@ -94,6 +94,35 @@ export const RadarChart = defineComponent({
       type: Number,
       default: 8
     },
+    hoverable: {
+      type: Boolean,
+      default: false
+    },
+    activeSeriesIndex: {
+      type: Number
+    },
+    hoverOpacity: {
+      type: Number,
+      default: 1
+    },
+    mutedOpacity: {
+      type: Number,
+      default: 0.25
+    },
+    showTooltip: {
+      type: Boolean,
+      default: true
+    },
+    tooltipFormatter: {
+      type: Function as PropType<
+        (
+          datum: RadarChartDatum,
+          seriesIndex: number,
+          index: number,
+          series?: RadarChartSeries
+        ) => string
+      >
+    },
     colors: {
       type: Array as PropType<string[]>
     },
@@ -132,11 +161,18 @@ export const RadarChart = defineComponent({
     pointColor: {
       type: String
     },
+    title: {
+      type: String
+    },
+    desc: {
+      type: String
+    },
     className: {
       type: String
     }
   },
   setup(props) {
+    const hoveredIndex = ref<number | null>(null)
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 
     const radius = computed(() =>
@@ -252,6 +288,31 @@ export const RadarChart = defineComponent({
     const palette = computed(() =>
       props.colors && props.colors.length > 0 ? props.colors : defaultRadarColors
     )
+    const formatTooltip = computed(
+      () =>
+        props.tooltipFormatter ??
+        ((
+          datum: RadarChartDatum,
+          seriesIndex: number,
+          index: number,
+          series?: RadarChartSeries
+        ) => {
+          const label = datum.label ?? `#${index + 1}`
+          const value = datum.value
+          const name = series?.name ?? `Series ${seriesIndex + 1}`
+          return `${name} · ${label}: ${value}`
+        })
+    )
+    const resolvedActiveIndex = computed(() =>
+      typeof props.activeSeriesIndex === 'number'
+        ? props.activeSeriesIndex
+        : props.hoverable
+          ? hoveredIndex.value
+          : null
+    )
+    const shouldHandleHover = computed(
+      () => props.hoverable && typeof props.activeSeriesIndex !== 'number'
+    )
 
     return () =>
       h(
@@ -260,6 +321,8 @@ export const RadarChart = defineComponent({
           width: props.width,
           height: props.height,
           padding: props.padding,
+          title: props.title,
+          desc: props.desc,
           className: classNames(props.className)
         },
         {
@@ -301,6 +364,12 @@ export const RadarChart = defineComponent({
                 const areaPath = createPolygonPath(
                   item.points.map((point) => ({ x: point.x, y: point.y }))
                 )
+                const resolvedOpacity =
+                  resolvedActiveIndex.value === null
+                    ? undefined
+                    : seriesIndex === resolvedActiveIndex.value
+                      ? props.hoverOpacity
+                      : props.mutedOpacity
 
                 return h(
                   ChartSeries,
@@ -309,7 +378,19 @@ export const RadarChart = defineComponent({
                     data: item.series.data,
                     name: item.series.name,
                     type: 'radar',
-                    className: item.series.className
+                    className: item.series.className,
+                    opacity: resolvedOpacity,
+                    style: props.hoverable ? { cursor: 'pointer' } : undefined,
+                    onMouseenter: shouldHandleHover.value
+                      ? () => {
+                          hoveredIndex.value = seriesIndex
+                        }
+                      : undefined,
+                    onMouseleave: shouldHandleHover.value
+                      ? () => {
+                          hoveredIndex.value = null
+                        }
+                      : undefined
                   },
                   {
                     default: () => [
@@ -325,17 +406,30 @@ export const RadarChart = defineComponent({
                           })
                         : null,
                       resolvedShowPoints
-                        ? item.points.map((point) =>
-                            h('circle', {
-                              key: `point-${seriesIndex}-${point.index}`,
-                              cx: point.x,
-                              cy: point.y,
-                              r: point.data.size ?? resolvedPointSize,
-                              fill: point.data.color ?? resolvedPointColor ?? resolvedStrokeColor,
-                              'data-radar-point': 'true',
-                              'data-series-index': seriesIndex
-                            })
-                          )
+                        ? item.points.map((point) => {
+                            const tooltipText = props.showTooltip
+                              ? formatTooltip.value(
+                                  point.data,
+                                  seriesIndex,
+                                  point.index,
+                                  item.series
+                                )
+                              : null
+
+                            return h(
+                              'circle',
+                              {
+                                key: `point-${seriesIndex}-${point.index}`,
+                                cx: point.x,
+                                cy: point.y,
+                                r: point.data.size ?? resolvedPointSize,
+                                fill: point.data.color ?? resolvedPointColor ?? resolvedStrokeColor,
+                                'data-radar-point': 'true',
+                                'data-series-index': seriesIndex
+                              },
+                              tooltipText ? [h('title', tooltipText)] : undefined
+                            )
+                          })
                         : null
                     ]
                   }

@@ -41,6 +41,13 @@ const multiSeries: RadarChartSeries[] = [
     }
 ]
 
+const tooltipFormatter = (
+    datum: RadarChartDatum,
+    _seriesIndex: number,
+    _index: number,
+    series?: RadarChartSeries
+) => `${series?.name ?? 'Series'} · ${datum.label ?? ''}: ${datum.value}`
+
 const basicSnippet = `<RadarChart
   :data="data"
   :width="360"
@@ -64,6 +71,9 @@ const multiSnippet = `<RadarChart
     :height="260"
     :max-value="100"
     :colors="['#2563eb', '#f97316']"
+    hoverable
+    :muted-opacity="0.2"
+    :tooltip-formatter="tooltipFormatter"
 />`
 </script>
 
@@ -102,7 +112,10 @@ const multiSnippet = `<RadarChart
                         :width="360"
                         :height="260"
                         :max-value="100"
-                        :colors="['#2563eb', '#f97316']" />
+                        :colors="['#2563eb', '#f97316']"
+                        hoverable
+                        :muted-opacity="0.2"
+                        :tooltip-formatter="tooltipFormatter" />
         </DemoBlock>
     </div>
 </template>

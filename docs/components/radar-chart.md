@@ -75,6 +75,94 @@ export default function Demo() {
 }
 ```
 
+### 交互高亮
+
+#### Vue 3
+
+```vue
+<RadarChart
+  :series="series"
+  :width="360"
+  :height="260"
+  :max-value="100"
+  hoverable
+  :hover-opacity="1"
+  :muted-opacity="0.2" />
+```
+
+#### React
+
+```tsx
+<RadarChart
+  series={series}
+  width={360}
+  height={260}
+  maxValue={100}
+  hoverable
+  hoverOpacity={1}
+  mutedOpacity={0.2}
+/>
+```
+
+### Tooltip
+
+默认会在数据点上显示浏览器原生提示，可通过 `tooltipFormatter` 自定义内容。
+
+#### Vue 3
+
+```vue
+<RadarChart
+  :series="series"
+  :width="360"
+  :height="260"
+  :max-value="100"
+  :tooltip-formatter="
+    (datum, seriesIndex, index, series) =>
+      `${series?.name ?? 'Series'} · ${datum.label}: ${datum.value}`
+  " />
+```
+
+#### React
+
+```tsx
+<RadarChart
+  series={series}
+  width={360}
+  height={260}
+  maxValue={100}
+  tooltipFormatter={(datum, seriesIndex, index, series) =>
+    `${series?.name ?? 'Series'} · ${datum.label}: ${datum.value}`
+  }
+/>
+```
+
+### 可访问性
+
+可以通过 `title` 与 `desc` 为 SVG 添加可访问性描述。
+
+#### Vue 3
+
+```vue
+<RadarChart
+  :data="data"
+  :width="360"
+  :height="260"
+  title="性能雷达图"
+  desc="包含速度、稳定、设计、续航、价格 5 个维度" />
+```
+
+#### React
+
+```tsx
+<RadarChart
+  data={data}
+  width={360}
+  height={260}
+  title="性能雷达图"
+  desc="包含速度、稳定、设计、续航、价格 5 个维度"
+/>
+```
+
 ## API
 
 ### Props
@@ -97,6 +185,12 @@ export default function Demo() {
 | labelFormatter      | 标签格式化函数     | `(datum, index) => string`                                                   | -              |
 | levelLabelFormatter | 层级标签格式化函数 | `(value, level) => string`                                                   | -              |
 | levelLabelOffset    | 层级标签偏移       | `number`                                                                     | `8`            |
+| hoverable           | 启用悬浮高亮       | `boolean`                                                                    | `false`        |
+| activeSeriesIndex   | 高亮系列索引       | `number`                                                                     | -              |
+| hoverOpacity        | 高亮系列透明度     | `number`                                                                     | `1`            |
+| mutedOpacity        | 其他系列透明度     | `number`                                                                     | `0.25`         |
+| showTooltip         | 显示 Tooltip       | `boolean`                                                                    | `true`         |
+| tooltipFormatter    | Tooltip 格式化函数 | `(datum, seriesIndex, index, series) => string`                              | -              |
 | colors              | 系列颜色列表       | `string[]`                                                                   | 主题默认调色板 |
 | gridLineStyle       | 网格线样式         | `'solid' \| 'dashed' \| 'dotted'`                                            | `'solid'`      |
 | gridStrokeWidth     | 网格线宽           | `number`                                                                     | `1`            |
@@ -107,6 +201,8 @@ export default function Demo() {
 | showPoints          | 显示数据点         | `boolean`                                                                    | `true`         |
 | pointSize           | 数据点大小         | `number`                                                                     | `3`            |
 | pointColor          | 数据点颜色         | `string`                                                                     | -              |
+| title               | 无障碍标题         | `string`                                                                     | -              |
+| desc                | 无障碍描述         | `string`                                                                     | -              |
 | className           | 自定义类名         | `string`                                                                     | -              |
 
 ## 设计说明
