@@ -876,32 +876,33 @@ export const Button: React.FC<ButtonProps> = ({
 - [x] 拆分大型 setup 函数（useDateNavigation/useDateSelection/useTimeSelection/useTimePanelKeyboard/useSelectOptions/useSelectKeyboard）
 - [x] 简化 Vue Props 定义（props-factory.ts 工具函数）
 - [x] 添加 SVG 路径动画（injectSvgAnimationStyles/getPathDrawAnimationStyle/getBarGrowAnimationStyle/getPieDrawAnimationStyle）
-- [ ] 更新 Demo 示例
+- [x] 更新 Demo 示例（TooltipDemo/PopoverDemo 添加 offset+flip，PaginationDemo 添加 i18n）
 
-### 12.5 下一步行动
+### 12.5 0.2.0 发布就绪
 
-**剩余 1 项任务需在 0.2.0 完成**：
+**✅ 全部任务已完成！**
 
-| 序号 | 任务           | 状态      | 说明                   |
-| ---- | -------------- | --------- | ---------------------- |
-| 1    | 更新 Demo 示例 | ⬜ 待完成 | 以最少示例展示全部功能 |
+| 分类     | 完成项                                                                            |
+| -------- | --------------------------------------------------------------------------------- |
+| 定位系统 | Floating UI 集成（Tooltip/Popover/Popconfirm/Dropdown），支持自动翻转和偏移设置   |
+| 动画系统 | 统一动画常量（ANIMATION_DURATION_MS），SVG 路径动画工具                           |
+| 组件优化 | RadarChart 复用 ChartTooltip，Pagination 国际化，Focus Trap 完善                  |
+| 代码精简 | usePopup composable/hook，6 个 setup 拆分 composables，props-factory 工具         |
+| 测试     | 1698 个测试全部通过，Lint 0 错误                                                  |
+| 文档     | i18n.md 国际化文档，Demo 示例更新（Tooltip/Popover offset+flip，Pagination i18n） |
 
 **已完成进度**：
 
 - ✅ 合并 Tooltip/Popover 抽象 - 创建 usePopup composable/hook
 - ✅ 抽取点级别交互 hook - LineChart/AreaChart 已复用 useChartInteraction
-- ✅ 拆分大型 setup 函数 - 创建 6 个新 composables（useDateNavigation/useDateSelection/useTimeSelection/useTimePanelKeyboard/useSelectOptions/useSelectKeyboard）
+- ✅ 拆分大型 setup 函数 - 创建 6 个新 composables
 - ✅ 简化 Vue Props - 创建 props-factory.ts 工具函数
-- ✅ SVG 路径动画 - 创建动画工具（injectSvgAnimationStyles + 多个 animation style helpers）
+- ✅ SVG 路径动画 - 创建动画工具
+- ✅ Demo 示例更新 - TooltipDemo/PopoverDemo/PaginationDemo 展示新功能
 - ✅ 全部 1698 个测试通过
 - ✅ Lint 0 错误，构建成功
 
-**执行顺序**：
-
-1. ✅ **已完成**：Tooltip/Popover 抽象 + 点级别交互 hook
-2. ✅ **已完成**：拆分 DatePicker/TimePicker/Select setup composables
-3. ✅ **已完成**：Vue Props 工具 + SVG 动画
-4. ⬜ **待完成**：Demo 示例更新
+**可发布版本：0.2.0**
 
 ---
 

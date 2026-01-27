@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Pagination } from '@expcat/tigercat-vue'
+import { ref, inject, computed, type Ref } from 'vue'
+import { Pagination, type TigerLocalePagination } from '@expcat/tigercat-vue'
+import type { DemoLang } from '@demo-shared/app-config'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const current1 = ref(1)
@@ -11,7 +12,10 @@ const current5 = ref(1)
 const current6 = ref(1)
 const current7 = ref(1)
 const current8 = ref(1)
+const current9 = ref(1)
 const pageSize = ref(10)
+
+const demoLang = inject<Ref<DemoLang>>('demo-lang', ref<DemoLang>('zh-CN'))
 
 const handleChange = (page: number, size: number) => {
   console.log('页码改变:', page, '每页条数:', size)
@@ -24,6 +28,19 @@ const handlePageSizeChange = (page: number, size: number) => {
 const customTotalText = (total: number, range: [number, number]) => {
   return `显示 ${range[0]}-${range[1]} 条，共 ${total} 条记录`
 }
+
+// 自定义国际化标签
+const customLabels = computed<Partial<TigerLocalePagination>>(() => {
+  const isZh = demoLang.value === 'zh-CN'
+  return {
+    prev: isZh ? '上一页' : 'Previous',
+    next: isZh ? '下一页' : 'Next',
+    page: isZh ? '页' : 'Page',
+    itemsPerPage: isZh ? '条/页' : 'items/page',
+    jumpTo: isZh ? '跳至' : 'Go to',
+    total: isZh ? (t: number) => `共 ${t} 条` : (t: number) => `Total ${t} items`
+  }
+})
 
 const basicSnippet = `<Pagination v-model:current="current1" :total="100" :pageSize="10" />`
 
@@ -72,6 +89,14 @@ const alignSnippet = `<div class="space-y-4">
 const totalTextSnippet = `<Pagination v-model:current="current7" :total="100" :totalText="customTotalText" />`
 
 const disabledSnippet = `<Pagination v-model:current="current8" :total="100" disabled />`
+
+const i18nSnippet = `<Pagination
+  v-model:current="current9"
+  :total="500"
+  :locale="locale"
+  :labels="customLabels"
+  showQuickJumper
+  showSizeChanger />`
 
 const fullSnippet = `<Pagination
   v-model:current="current3"
@@ -204,6 +229,23 @@ const fullSnippet = `<Pagination
       <Pagination v-model:current="current8"
                   :total="100"
                   disabled />
+    </DemoBlock>
+
+    <!-- 国际化 -->
+    <DemoBlock title="国际化 (i18n)"
+               description="通过 locale 和 labels 属性自定义国际化文本。切换顶部的语言开关可查看效果。"
+               :code="i18nSnippet">
+      <div class="space-y-2">
+        <p class="text-sm text-gray-500">
+          当前语言：{{ demoLang === 'zh-CN' ? '中文' : 'English' }}
+        </p>
+        <Pagination v-model:current="current9"
+                    :total="500"
+                    :locale="demoLang"
+                    :labels="customLabels"
+                    showQuickJumper
+                    showSizeChanger />
+      </div>
     </DemoBlock>
 
     <!-- 完整示例 -->

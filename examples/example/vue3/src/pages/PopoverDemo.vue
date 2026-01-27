@@ -31,6 +31,21 @@ const widthSnippet = `<Popover title="自定义宽度" content="这是一个宽�
 
 const disabledSnippet = `<Popover title="禁用状态" content="这个气泡卡片已被禁用" disabled>...</Popover>`
 
+const offsetSnippet = `<Space :size="16">
+  <Popover title="默认偏移" content="默认 8px 偏移">
+    <Button>默认</Button>
+  </Popover>
+
+  <Popover title="自定义偏移" content="16px 偏移距离" :offset="16">
+    <Button>offset=16</Button>
+  </Popover>
+</Space>`
+
+const flipSnippet = `<!-- Floating UI 自动翻转定位 -->
+<Popover placement="top" title="自动翻转" content="空间不足时自动翻转到下方">
+  <Button>试试滚动</Button>
+</Popover>`
+
 const visible1 = ref(false)
 const manualVisible = ref(false)
 
@@ -211,6 +226,39 @@ const customContentItems = [
                  disabled>
           <Button disabled>禁用的气泡卡片</Button>
         </Popover>
+      </div>
+    </DemoBlock>
+
+    <DemoBlock title="偏移距离"
+               description="通过 offset 属性设置气泡卡片与触发元素的距离。"
+               :code="offsetSnippet">
+      <div class="p-6 bg-gray-50 rounded-lg">
+        <Space :size="16">
+          <Popover title="默认偏移"
+                   content="默认 8px 偏移">
+            <Button>默认</Button>
+          </Popover>
+
+          <Popover title="自定义偏移"
+                   content="16px 偏移距离"
+                   :offset="16">
+            <Button>offset=16</Button>
+          </Popover>
+        </Space>
+      </div>
+    </DemoBlock>
+
+    <DemoBlock title="自动翻转 (Floating UI)"
+               description="当弹出位置空间不足时，Popover 会自动翻转到对侧显示。"
+               :code="flipSnippet">
+      <div class="p-6 bg-gray-100 rounded overflow-auto h-32">
+        <div class="pt-16">
+          <Popover placement="top"
+                   title="自动翻转"
+                   content="空间不足时自动翻转到下方">
+            <Button>试试滚动容器</Button>
+          </Popover>
+        </div>
       </div>
     </DemoBlock>
   </div>

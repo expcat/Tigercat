@@ -100,6 +100,27 @@ const disabledSnippet = `<Space :size="16">
     <Button>禁用</Button>
   </Tooltip>
 </Space>`
+
+const offsetSnippet = `<Space :size="16">
+  <Tooltip content="默认偏移 (8px)">
+    <Button>默认</Button>
+  </Tooltip>
+
+  <Tooltip content="偏移 16px" :offset="16">
+    <Button>offset=16</Button>
+  </Tooltip>
+
+  <Tooltip content="偏移 24px" :offset="24">
+    <Button>offset=24</Button>
+  </Tooltip>
+</Space>`
+
+const flipSnippet = `<!-- 当空间不足时，Tooltip 会自动翻转到对侧 -->
+<Tooltip content="向上弹出，空间不足时自动翻转到下方" placement="top">
+  <Button>自动翻转</Button>
+</Tooltip>`
+  </Tooltip>
+</Space>`
 </script>
 
 <template>
@@ -248,6 +269,41 @@ const disabledSnippet = `<Space :size="16">
           <Button>禁用</Button>
         </Tooltip>
       </Space>
+    </DemoBlock>
+
+    <!-- 偏移距离 -->
+    <DemoBlock title="偏移距离"
+               description="通过 offset 属性设置提示与触发元素的距离（单位 px）。"
+               :code="offsetSnippet">
+      <Space :size="16">
+        <Tooltip content="默认偏移 (8px)">
+          <Button>默认</Button>
+        </Tooltip>
+
+        <Tooltip content="偏移 16px"
+                 :offset="16">
+          <Button>offset=16</Button>
+        </Tooltip>
+
+        <Tooltip content="偏移 24px"
+                 :offset="24">
+          <Button>offset=24</Button>
+        </Tooltip>
+      </Space>
+    </DemoBlock>
+
+    <!-- 自动翻转 -->
+    <DemoBlock title="自动翻转 (Floating UI)"
+               description="当弹出位置空间不足时，Tooltip 会自动翻转到对侧显示。这是通过 Floating UI 的 flip 中间件实现的。"
+               :code="flipSnippet">
+      <div class="p-4 bg-gray-100 rounded overflow-auto h-32">
+        <div class="pt-16">
+          <Tooltip content="空间不足时自动翻转"
+                   placement="top">
+            <Button>试试滚动容器</Button>
+          </Tooltip>
+        </div>
+      </div>
     </DemoBlock>
   </div>
 </template>
