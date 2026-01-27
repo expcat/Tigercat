@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useCallback } from 'react'
 import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
@@ -17,6 +17,7 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartSeries } from './ChartSeries'
+import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
 
 export interface RadarChartProps extends CoreRadarChartProps {
@@ -93,7 +94,9 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     resolvedHoveredIndex,
     resolvedSelectedIndex,
     activeIndex: resolvedActiveIndex,
+    tooltipPosition,
     handleMouseEnter: handleHoverEnter,
+    handleMouseMove,
     handleMouseLeave: handleHoverLeave,
     handleClick: handleSelectIndex
   } = useChartInteraction<RadarChartSeries>({
@@ -116,6 +119,33 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       }
     }
   })
+
+  // Point-level hover state for tooltip
+  const [hoveredPoint, setHoveredPoint] = useState<{
+    seriesIndex: number
+    pointIndex: number
+  } | null>(null)
+
+  const handlePointEnter = useCallback(
+    (seriesIndex: number, pointIndex: number, event: React.MouseEvent) => {
+      if (!hoverable) return
+      setHoveredPoint({ seriesIndex, pointIndex })
+      handleHoverEnter(seriesIndex, event)
+    },
+    [hoverable, handleHoverEnter]
+  )
+
+  const handlePointMove = useCallback(
+    (event: React.MouseEvent) => {
+      handleMouseMove(event)
+    },
+    [handleMouseMove]
+  )
+
+  const handlePointLeave = useCallback(() => {
+    setHoveredPoint(null)
+    handleHoverLeave()
+  }, [handleHoverLeave])
 
   const innerRect = useMemo(
     () => getChartInnerRect(width, height, padding),
@@ -248,6 +278,16 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       }),
     [tooltipFormatter]
   )
+
+  const tooltipContent = useMemo(() => {
+    if (!hoveredPoint) return ''
+    const { seriesIndex, pointIndex } = hoveredPoint
+    const series = resolvedSeries[seriesIndex]
+    if (!series) return ''
+    const datum = series.data[pointIndex]
+    if (!datum) return ''
+    return formatTooltip(datum, seriesIndex, pointIndex, series)
+  }, [hoveredPoint, resolvedSeries, formatTooltip])
   const resolvedLegendItems = useMemo(
     () =>
       resolvedSeries.map((item, index) => {
@@ -354,10 +394,6 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             ) : null}
             {resolvedShowPoints
               ? item.points.map((point) => {
-                  const tooltipText = showTooltip
-                    ? formatTooltip(point.data, seriesIndex, point.index, item.series)
-                    : null
-
                   return (
                     <circle
                       key={`point-${seriesIndex}-${point.index}`}
@@ -365,10 +401,18 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                       cy={point.y}
                       r={point.data.size ?? resolvedPointSize}
                       fill={point.data.color ?? resolvedPointColor ?? resolvedStrokeColor}
+                      className={showTooltip && hoverable ? 'cursor-pointer' : undefined}
                       data-radar-point="true"
-                      data-series-index={seriesIndex}>
-                      {tooltipText ? <title>{tooltipText}</title> : null}
-                    </circle>
+                      data-series-index={seriesIndex}
+                      data-point-index={point.index}
+                      onMouseEnter={
+                        showTooltip && hoverable
+                          ? (e: React.MouseEvent) => handlePointEnter(seriesIndex, point.index, e)
+                          : undefined
+                      }
+                      onMouseMove={showTooltip && hoverable ? handlePointMove : undefined}
+                      onMouseLeave={showTooltip && hoverable ? handlePointLeave : undefined}
+                    />
                   )
                 })
               : null}
@@ -401,7 +445,24 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     </ChartCanvas>
   )
 
-  if (!showLegend) return chart
+  const tooltip =
+    showTooltip && hoverable ? (
+      <ChartTooltip
+        content={tooltipContent}
+        visible={hoveredPoint !== null && tooltipContent !== ''}
+        x={tooltipPosition.x}
+        y={tooltipPosition.y}
+      />
+    ) : null
+
+  if (!showLegend) {
+    return (
+      <div className="inline-block relative">
+        {chart}
+        {tooltip}
+      </div>
+    )
+  }
 
   return (
     <div className={wrapperClasses}>
@@ -419,7 +480,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             onMouseEnter={
               hoverable ? (e: React.MouseEvent) => handleHoverEnter(item.index, e) : undefined
             }
-            onMouseLeave={hoverable ? handleHoverLeave : undefined}>
+            onMouseLeave={hoverable ? handlePointLeave : undefined}>
             <span
               className="inline-block rounded-full"
               style={{
@@ -432,6 +493,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
           </button>
         ))}
       </div>
+      {tooltip}
     </div>
   )
 }

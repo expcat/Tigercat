@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, ref, PropType } from 'vue'
 import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
@@ -17,6 +17,7 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartSeries } from './ChartSeries'
+import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
 
 export interface VueRadarChartProps extends CoreRadarChartProps {
@@ -213,7 +214,9 @@ export const RadarChart = defineComponent({
       resolvedHoveredIndex,
       resolvedSelectedIndex,
       activeIndex: resolvedActiveIndex,
+      tooltipPosition,
       handleMouseEnter: handleHoverEnter,
+      handleMouseMove,
       handleMouseLeave: handleHoverLeave,
       handleClick: handleSelectIndex,
       wrapperClasses
@@ -232,6 +235,24 @@ export const RadarChart = defineComponent({
         click: 'series-click'
       }
     })
+
+    // Point-level hover state for tooltip
+    const hoveredPoint = ref<{ seriesIndex: number; pointIndex: number } | null>(null)
+
+    const handlePointEnter = (seriesIndex: number, pointIndex: number, event: MouseEvent) => {
+      if (!props.hoverable) return
+      hoveredPoint.value = { seriesIndex, pointIndex }
+      handleHoverEnter(seriesIndex, event)
+    }
+
+    const handlePointMove = (event: MouseEvent) => {
+      handleMouseMove(event)
+    }
+
+    const handlePointLeave = () => {
+      hoveredPoint.value = null
+      handleHoverLeave()
+    }
 
     const axisData = computed(() => {
       if (props.series && props.series.length > 0) return props.series[0]?.data ?? []
@@ -349,6 +370,17 @@ export const RadarChart = defineComponent({
           return `${name} · ${label}: ${value}`
         })
     )
+
+    const tooltipContent = computed(() => {
+      if (!hoveredPoint.value) return ''
+      const { seriesIndex, pointIndex } = hoveredPoint.value
+      const series = resolvedSeries.value[seriesIndex]
+      if (!series) return ''
+      const datum = series.data[pointIndex]
+      if (!datum) return ''
+      return formatTooltip.value(datum, seriesIndex, pointIndex, series)
+    })
+
     const resolvedLegendItems = computed(() =>
       resolvedSeries.value.map((item, index) => {
         const color = item.color ?? palette.value[index % palette.value.length]
@@ -467,28 +499,25 @@ export const RadarChart = defineComponent({
                         : null,
                       resolvedShowPoints
                         ? item.points.map((point) => {
-                            const tooltipText = props.showTooltip
-                              ? formatTooltip.value(
-                                  point.data,
-                                  seriesIndex,
-                                  point.index,
-                                  item.series
-                                )
-                              : null
-
-                            return h(
-                              'circle',
-                              {
-                                key: `point-${seriesIndex}-${point.index}`,
-                                cx: point.x,
-                                cy: point.y,
-                                r: point.data.size ?? resolvedPointSize,
-                                fill: point.data.color ?? resolvedPointColor ?? resolvedStrokeColor,
-                                'data-radar-point': 'true',
-                                'data-series-index': seriesIndex
-                              },
-                              tooltipText ? [h('title', tooltipText)] : undefined
-                            )
+                            return h('circle', {
+                              key: `point-${seriesIndex}-${point.index}`,
+                              cx: point.x,
+                              cy: point.y,
+                              r: point.data.size ?? resolvedPointSize,
+                              fill: point.data.color ?? resolvedPointColor ?? resolvedStrokeColor,
+                              class: props.showTooltip && props.hoverable ? 'cursor-pointer' : null,
+                              'data-radar-point': 'true',
+                              'data-series-index': seriesIndex,
+                              'data-point-index': point.index,
+                              onMouseenter:
+                                props.showTooltip && props.hoverable
+                                  ? (e: MouseEvent) => handlePointEnter(seriesIndex, point.index, e)
+                                  : undefined,
+                              onMousemove:
+                                props.showTooltip && props.hoverable ? handlePointMove : undefined,
+                              onMouseleave:
+                                props.showTooltip && props.hoverable ? handlePointLeave : undefined
+                            })
                           })
                         : null
                     ]
@@ -528,7 +557,19 @@ export const RadarChart = defineComponent({
         }
       )
 
-      if (!props.showLegend) return chart
+      const tooltip =
+        props.showTooltip && props.hoverable
+          ? h(ChartTooltip, {
+              content: tooltipContent.value,
+              visible: hoveredPoint.value !== null && tooltipContent.value !== '',
+              x: tooltipPosition.value.x,
+              y: tooltipPosition.value.y
+            })
+          : null
+
+      if (!props.showLegend) {
+        return h('div', { class: 'inline-block relative' }, [chart, tooltip])
+      }
 
       return h('div', { class: wrapperClasses.value }, [
         chart,
@@ -549,7 +590,7 @@ export const RadarChart = defineComponent({
                 onMouseenter: props.hoverable
                   ? (e: MouseEvent) => handleHoverEnter(item.index, e)
                   : undefined,
-                onMouseleave: props.hoverable ? handleHoverLeave : undefined
+                onMouseleave: props.hoverable ? handlePointLeave : undefined
               },
               [
                 h('span', {
@@ -564,7 +605,8 @@ export const RadarChart = defineComponent({
               ]
             )
           )
-        )
+        ),
+        tooltip
       ])
     }
   }

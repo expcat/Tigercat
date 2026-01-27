@@ -768,13 +768,16 @@ export const Button: React.FC<ButtonProps> = ({
 - 新增 floating.ts (~250 行) 统一定位逻辑
 - 所有 72 个 Tooltip/Popover 测试通过
 
-#### 阶段 3B：组件拆分与抽象 ⬜ 待开始
+#### 阶段 3B：组件拆分与抽象 🔄 进行中
 
 > 目标：提高组件复用性，减少 Table/List 分页代码重复
 
 1. ⬜ 抽取 Pagination 子组件（`PaginationButton`, `PaginationEllipsis`, `PaginationSizeChanger`, `PaginationQuickJumper`）
 2. ⬜ Table/List 复用 Pagination 子组件（预计减少 100+ 行重复）
-3. ⬜ RadarChart 复用 ChartTooltip 组件（需重写交互逻辑，统一图表 tooltip 体验）
+3. ✅ RadarChart 复用 ChartTooltip 组件（统一图表 tooltip 体验）
+   - 移除原生 `<title>` 元素，改用 ChartTooltip 组件
+   - 添加 point 级别 hover 状态（`hoveredPoint`）
+   - Vue + React 均已更新，测试通过
 
 #### 阶段 3C：代码精简 ⬜ 待开始
 
@@ -806,7 +809,11 @@ export const Button: React.FC<ButtonProps> = ({
    - 支持 locale prop 传入自定义文本
    - 默认英文标签，提供中文简体预设 `ZH_CN_PAGINATION_LABELS`
    - Vue + React 组件均已更新
-2. ⬜ 添加 i18n 文档（说明 DatePicker/TimePicker/Pagination 的国际化用法）
+2. ✅ 添加 i18n 文档（`docs/i18n.md`，说明 Pagination/DatePicker/TimePicker 的国际化用法）
+   - 完整的类型定义说明
+   - Vue 和 React 使用示例
+   - 全局配置方案（provide/inject 和 Context）
+   - 工具函数文档
 3. ⬜ 更新 Demo 示例（以最少示例展示全部功能）
 
 #### 已完成的中优先级优化

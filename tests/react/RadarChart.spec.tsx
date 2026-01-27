@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import { RadarChart } from '@expcat/tigercat-react'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
@@ -72,15 +72,43 @@ describe('RadarChart', () => {
     )
   })
 
-  it('handles tooltip display', () => {
-    const { container } = renderWithProps(RadarChart, { data: singleSeriesData })
-    expect(container.querySelectorAll('circle[data-radar-point] title')).toHaveLength(3)
+  it('handles tooltip display', async () => {
+    const user = userEvent.setup()
+    const { container } = renderWithProps(RadarChart, {
+      data: singleSeriesData,
+      hoverable: true,
+      showTooltip: true
+    })
 
+    // Points should be hoverable when showTooltip and hoverable are true
+    const points = container.querySelectorAll('circle[data-radar-point]')
+    expect(points).toHaveLength(3)
+
+    // Each point should have cursor-pointer class
+    points.forEach((point) => {
+      expect(point.getAttribute('class')).toContain('cursor-pointer')
+    })
+
+    // Hover over a point to show tooltip
+    await user.hover(points[0])
+
+    // ChartTooltip should be visible in body
+    await vi.waitFor(() => {
+      const tooltip = document.querySelector('[data-chart-tooltip]')
+      expect(tooltip).toBeTruthy()
+    })
+
+    // When showTooltip is false, points should not be hoverable
     const { container: noTooltip } = renderWithProps(RadarChart, {
       data: singleSeriesData.slice(0, 2),
-      showTooltip: false
+      showTooltip: false,
+      hoverable: true
     })
-    expect(noTooltip.querySelectorAll('circle[data-radar-point] title')).toHaveLength(0)
+    const noTooltipPoints = noTooltip.querySelectorAll('circle[data-radar-point]')
+    noTooltipPoints.forEach((point) => {
+      const className = point.getAttribute('class') || ''
+      expect(className).not.toContain('cursor-pointer')
+    })
   })
 
   it('selects series on click when selectable', async () => {
