@@ -12,7 +12,6 @@ import {
   tableBaseClasses,
   tableEmptyStateClasses,
   tableLoadingOverlayClasses,
-  tablePaginationContainerClasses,
   getSpinnerSVG,
   getLoadingOverlaySpinnerClasses,
   sortData,
@@ -20,6 +19,14 @@ import {
   paginateData,
   calculatePagination,
   getRowKey,
+  // Simple pagination style utilities
+  getSimplePaginationContainerClasses,
+  getSimplePaginationTotalClasses,
+  getSimplePaginationControlsClasses,
+  getSimplePaginationSelectClasses,
+  getSimplePaginationButtonClasses,
+  getSimplePaginationPageIndicatorClasses,
+  getSimplePaginationButtonsWrapperClasses,
   type TableProps as CoreTableProps,
   type SortState,
   type PaginationConfig
@@ -811,10 +818,10 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     const paginationConfig = pagination as PaginationConfig
 
     return (
-      <div className={tablePaginationContainerClasses}>
+      <div className={getSimplePaginationContainerClasses()}>
         {/* Total info */}
         {paginationConfig.showTotal !== false && (
-          <div className="text-sm text-gray-700">
+          <div className={getSimplePaginationTotalClasses()}>
             {paginationConfig.totalText
               ? paginationConfig.totalText(total, [startIndex, endIndex])
               : `Showing ${startIndex} to ${endIndex} of ${total} results`}
@@ -822,11 +829,11 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         )}
 
         {/* Pagination controls */}
-        <div className="flex items-center gap-2">
+        <div className={getSimplePaginationControlsClasses()}>
           {/* Page size selector */}
           {paginationConfig.showSizeChanger !== false && (
             <select
-              className="px-3 py-1 border border-gray-300 rounded text-sm"
+              className={getSimplePaginationSelectClasses()}
               value={currentPageSize}
               onChange={(e) => handlePageSizeChange(Number(e.target.value))}>
               {(paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map((size) => (
@@ -838,29 +845,23 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
           )}
 
           {/* Page buttons */}
-          <div className="flex gap-1">
+          <div className={getSimplePaginationButtonsWrapperClasses()}>
             {/* Previous button */}
             <button
-              className={classNames(
-                'px-3 py-1 border border-gray-300 rounded text-sm',
-                hasPrev ? 'hover:bg-gray-50 text-gray-700' : 'text-gray-400 cursor-not-allowed'
-              )}
+              className={getSimplePaginationButtonClasses(!hasPrev)}
               disabled={!hasPrev}
               onClick={() => handlePageChange(currentPage - 1)}>
               Previous
             </button>
 
             {/* Current page indicator */}
-            <span className="px-3 py-1 text-sm text-gray-700">
+            <span className={getSimplePaginationPageIndicatorClasses()}>
               Page {currentPage} of {totalPages}
             </span>
 
             {/* Next button */}
             <button
-              className={classNames(
-                'px-3 py-1 border border-gray-300 rounded text-sm',
-                hasNext ? 'hover:bg-gray-50 text-gray-700' : 'text-gray-400 cursor-not-allowed'
-              )}
+              className={getSimplePaginationButtonClasses(!hasNext)}
               disabled={!hasNext}
               onClick={() => handlePageChange(currentPage + 1)}>
               Next

@@ -12,7 +12,6 @@ import {
   tableBaseClasses,
   tableEmptyStateClasses,
   tableLoadingOverlayClasses,
-  tablePaginationContainerClasses,
   getSpinnerSVG,
   normalizeSvgAttrs,
   getLoadingOverlaySpinnerClasses,
@@ -21,6 +20,14 @@ import {
   paginateData,
   calculatePagination,
   getRowKey,
+  // Simple pagination style utilities
+  getSimplePaginationContainerClasses,
+  getSimplePaginationTotalClasses,
+  getSimplePaginationControlsClasses,
+  getSimplePaginationSelectClasses,
+  getSimplePaginationButtonClasses,
+  getSimplePaginationPageIndicatorClasses,
+  getSimplePaginationButtonsWrapperClasses,
   type TableColumn,
   type TableSize,
   type SortDirection,
@@ -933,25 +940,25 @@ export const Table = defineComponent({
       const total = processedData.value.length
       const paginationConfig = props.pagination as PaginationConfig
 
-      return h('div', { class: tablePaginationContainerClasses }, [
+      return h('div', { class: getSimplePaginationContainerClasses() }, [
         // Total info
         paginationConfig.showTotal !== false &&
           h(
             'div',
-            { class: 'text-sm text-gray-700' },
+            { class: getSimplePaginationTotalClasses() },
             paginationConfig.totalText
               ? paginationConfig.totalText(total, [startIndex, endIndex])
               : `Showing ${startIndex} to ${endIndex} of ${total} results`
           ),
 
         // Pagination controls
-        h('div', { class: 'flex items-center gap-2' }, [
+        h('div', { class: getSimplePaginationControlsClasses() }, [
           // Page size selector
           paginationConfig.showSizeChanger !== false &&
             h(
               'select',
               {
-                class: 'px-3 py-1 border border-gray-300 rounded text-sm',
+                class: getSimplePaginationSelectClasses(),
                 value: currentPageSize.value,
                 onChange: (e: Event) =>
                   handlePageSizeChange(Number((e.target as HTMLSelectElement).value))
@@ -962,15 +969,12 @@ export const Table = defineComponent({
             ),
 
           // Page buttons
-          h('div', { class: 'flex gap-1' }, [
+          h('div', { class: getSimplePaginationButtonsWrapperClasses() }, [
             // Previous button
             h(
               'button',
               {
-                class: classNames(
-                  'px-3 py-1 border border-gray-300 rounded text-sm',
-                  hasPrev ? 'hover:bg-gray-50 text-gray-700' : 'text-gray-400 cursor-not-allowed'
-                ),
+                class: getSimplePaginationButtonClasses(!hasPrev),
                 disabled: !hasPrev,
                 onClick: () => handlePageChange(currentPage.value - 1)
               },
@@ -980,7 +984,7 @@ export const Table = defineComponent({
             // Current page indicator
             h(
               'span',
-              { class: 'px-3 py-1 text-sm text-gray-700' },
+              { class: getSimplePaginationPageIndicatorClasses() },
               `Page ${currentPage.value} of ${totalPages}`
             ),
 
@@ -988,10 +992,7 @@ export const Table = defineComponent({
             h(
               'button',
               {
-                class: classNames(
-                  'px-3 py-1 border border-gray-300 rounded text-sm',
-                  hasNext ? 'hover:bg-gray-50 text-gray-700' : 'text-gray-400 cursor-not-allowed'
-                ),
+                class: getSimplePaginationButtonClasses(!hasNext),
                 disabled: !hasNext,
                 onClick: () => handlePageChange(currentPage.value + 1)
               },

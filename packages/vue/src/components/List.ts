@@ -22,7 +22,6 @@ import {
   listSizeClasses,
   listEmptyStateClasses,
   listLoadingOverlayClasses,
-  listPaginationContainerClasses,
   listItemMetaClasses,
   listItemAvatarClasses,
   listItemContentClasses,
@@ -33,6 +32,14 @@ import {
   getSpinnerSVG,
   normalizeSvgAttrs,
   getLoadingOverlaySpinnerClasses,
+  // Simple pagination style utilities
+  getSimplePaginationContainerClasses,
+  getSimplePaginationTotalClasses,
+  getSimplePaginationControlsClasses,
+  getSimplePaginationSelectClasses,
+  getSimplePaginationButtonClasses,
+  getSimplePaginationPageIndicatorClasses,
+  getSimplePaginationButtonsWrapperClasses,
   type ListSize,
   type ListBorderStyle,
   type ListItemLayout,
@@ -418,26 +425,25 @@ export const List = defineComponent({
       const total = props.dataSource.length
       const paginationConfig = props.pagination as ListPaginationConfig
 
-      return h('div', { class: listPaginationContainerClasses }, [
+      return h('div', { class: getSimplePaginationContainerClasses() }, [
         // Total info
         paginationConfig.showTotal !== false &&
           h(
             'div',
-            { class: 'text-sm text-[var(--tiger-text,#111827)]' },
+            { class: getSimplePaginationTotalClasses() },
             paginationConfig.totalText
               ? paginationConfig.totalText(total, [startIndex, endIndex])
               : `Showing ${startIndex} to ${endIndex} of ${total} items`
           ),
 
         // Pagination controls
-        h('div', { class: 'flex items-center gap-2' }, [
+        h('div', { class: getSimplePaginationControlsClasses() }, [
           // Page size selector
           paginationConfig.showSizeChanger !== false &&
             h(
               'select',
               {
-                class:
-                  'px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)]',
+                class: getSimplePaginationSelectClasses(),
                 value: currentPageSize.value,
                 onChange: (e: Event) =>
                   handlePageSizeChange(Number((e.target as HTMLSelectElement).value))
@@ -448,17 +454,12 @@ export const List = defineComponent({
             ),
 
           // Page buttons
-          h('div', { class: 'flex gap-1' }, [
+          h('div', { class: getSimplePaginationButtonsWrapperClasses() }, [
             // Previous button
             h(
               'button',
               {
-                class: classNames(
-                  'px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]',
-                  hasPrev
-                    ? 'hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]'
-                    : 'text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed'
-                ),
+                class: getSimplePaginationButtonClasses(!hasPrev),
                 disabled: !hasPrev,
                 onClick: () => handlePageChange(currentPage.value - 1)
               },
@@ -468,7 +469,7 @@ export const List = defineComponent({
             // Current page indicator
             h(
               'span',
-              { class: 'px-3 py-1 text-sm text-[var(--tiger-text,#111827)]' },
+              { class: getSimplePaginationPageIndicatorClasses() },
               `Page ${currentPage.value} of ${totalPages}`
             ),
 
@@ -476,12 +477,7 @@ export const List = defineComponent({
             h(
               'button',
               {
-                class: classNames(
-                  'px-3 py-1 border border-[var(--tiger-border,#e5e7eb)] rounded text-sm bg-[var(--tiger-surface,#ffffff)]',
-                  hasNext
-                    ? 'hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]'
-                    : 'text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed'
-                ),
+                class: getSimplePaginationButtonClasses(!hasNext),
                 disabled: !hasNext,
                 onClick: () => handlePageChange(currentPage.value + 1)
               },

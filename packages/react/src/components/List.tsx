@@ -13,7 +13,6 @@ import {
   listSizeClasses,
   listEmptyStateClasses,
   listLoadingOverlayClasses,
-  listPaginationContainerClasses,
   listItemMetaClasses,
   listItemAvatarClasses,
   listItemContentClasses,
@@ -23,6 +22,12 @@ import {
   listGridContainerClasses,
   getSpinnerSVG,
   getLoadingOverlaySpinnerClasses,
+  // Simple pagination style utilities
+  getSimplePaginationContainerClasses,
+  getSimplePaginationTotalClasses,
+  getSimplePaginationControlsClasses,
+  getSimplePaginationPageIndicatorClasses,
+  getSimplePaginationButtonsWrapperClasses,
   type ListSize,
   type ListBorderStyle,
   type ListItemLayout,
@@ -368,10 +373,10 @@ export const List = <T extends ListItem = ListItem>({
     const paginationConfig = pagination as ListPaginationConfig
 
     return (
-      <div className={listPaginationContainerClasses}>
+      <div className={getSimplePaginationContainerClasses()}>
         {/* Total info */}
         {paginationConfig.showTotal !== false && (
-          <div className="text-sm text-[var(--tiger-text,#111827)]">
+          <div className={getSimplePaginationTotalClasses()}>
             {paginationConfig.totalText
               ? paginationConfig.totalText(total, [startIndex, endIndex])
               : `Showing ${startIndex} to ${endIndex} of ${total} items`}
@@ -379,7 +384,7 @@ export const List = <T extends ListItem = ListItem>({
         )}
 
         {/* Pagination controls */}
-        <div className="flex items-center gap-2">
+        <div className={getSimplePaginationControlsClasses()}>
           {/* Page size selector */}
           {paginationConfig.showSizeChanger !== false && (
             <Select
@@ -399,7 +404,7 @@ export const List = <T extends ListItem = ListItem>({
           )}
 
           {/* Page buttons */}
-          <div className="flex gap-1">
+          <div className={getSimplePaginationButtonsWrapperClasses()}>
             {/* Previous button */}
             <Button
               size="sm"
@@ -414,7 +419,7 @@ export const List = <T extends ListItem = ListItem>({
             </Button>
 
             {/* Current page indicator */}
-            <span className="px-3 py-1 text-sm text-[var(--tiger-text,#111827)]">
+            <span className={getSimplePaginationPageIndicatorClasses()}>
               Page {currentPage} of {totalPages}
             </span>
 
