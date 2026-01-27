@@ -60,7 +60,7 @@ export * from '../popconfirm-utils'
 export * from '../popover-utils'
 export * from '../tooltip-utils'
 
-// Other components
+// Basic components
 export * from '../link-utils'
 export * from '../icon-utils'
 export * from '../code-utils'

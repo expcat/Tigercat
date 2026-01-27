@@ -5,6 +5,10 @@ import {
   iconSizeClasses,
   iconSvgBaseClasses,
   iconWrapperClasses,
+  SVG_DEFAULT_XMLNS,
+  SVG_DEFAULT_VIEWBOX_24,
+  SVG_DEFAULT_FILL,
+  SVG_DEFAULT_STROKE,
   type IconSize
 } from '@expcat/tigercat-core'
 
@@ -89,10 +93,10 @@ export const Icon = defineComponent({
             {
               ...svgProps,
               class: classNames(svgBaseClasses.value, coerceClassValue(svgProps.class)),
-              xmlns: (svgProps.xmlns as string | undefined) ?? 'http://www.w3.org/2000/svg',
-              viewBox: (svgProps.viewBox as string | undefined) ?? '0 0 24 24',
-              fill: (svgProps.fill as string | undefined) ?? 'none',
-              stroke: (svgProps.stroke as string | undefined) ?? 'currentColor',
+              xmlns: (svgProps.xmlns as string | undefined) ?? SVG_DEFAULT_XMLNS,
+              viewBox: (svgProps.viewBox as string | undefined) ?? SVG_DEFAULT_VIEWBOX_24,
+              fill: (svgProps.fill as string | undefined) ?? SVG_DEFAULT_FILL,
+              stroke: (svgProps.stroke as string | undefined) ?? SVG_DEFAULT_STROKE,
               'stroke-width': (svgProps['stroke-width'] as string | number | undefined) ?? '2',
               'stroke-linecap': (svgProps['stroke-linecap'] as string | undefined) ?? 'round',
               'stroke-linejoin': (svgProps['stroke-linejoin'] as string | undefined) ?? 'round'
