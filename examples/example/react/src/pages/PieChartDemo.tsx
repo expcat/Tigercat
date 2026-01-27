@@ -9,13 +9,6 @@ const basicData: PieChartDatum[] = [
   { value: 15, label: 'D' }
 ]
 
-const donutData: PieChartDatum[] = [
-  { value: 320, label: 'Q1' },
-  { value: 280, label: 'Q2' },
-  { value: 360, label: 'Q3' },
-  { value: 420, label: 'Q4' }
-]
-
 const interactiveData: PieChartDatum[] = [
   { value: 35, label: '产品 A', color: '#2563eb' },
   { value: 28, label: '产品 B', color: '#22c55e' },
@@ -27,15 +20,6 @@ const basicSnippet = `<PieChart
   data={data}
   width={320}
   height={220}
-  showLabels
-/>`
-
-const donutSnippet = `<PieChart
-  data={donutData}
-  width={320}
-  height={220}
-  innerRadius={60}
-  padAngle={0.02}
   showLabels
 />`
 
@@ -97,17 +81,6 @@ const PieChartDemo: React.FC = () => {
 
       <DemoBlock title="基础用法" description="默认饼图与标签。" code={basicSnippet}>
         <PieChart data={basicData} width={320} height={220} showLabels />
-      </DemoBlock>
-
-      <DemoBlock title="环形图" description="通过内半径渲染环形图。" code={donutSnippet}>
-        <PieChart
-          data={donutData}
-          width={320}
-          height={220}
-          innerRadius={60}
-          padAngle={0.02}
-          showLabels
-        />
       </DemoBlock>
 
       <DemoBlock
