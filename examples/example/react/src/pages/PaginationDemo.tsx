@@ -30,20 +30,20 @@ const PaginationDemo: React.FC = () => {
   const customLabels = useMemo<Partial<TigerLocalePagination>>(() => {
     return demoLang === 'zh-CN'
       ? {
-          prevPage: '上一页',
-          nextPage: '下一页',
-          page: '页',
-          itemsPerPage: '条/页',
-          jumpTo: '跳至',
-          totalItems: (total: number) => `共 ${total} 条`
+          prevPageAriaLabel: '上一页',
+          nextPageAriaLabel: '下一页',
+          pageText: '页',
+          itemsPerPageText: '条/页',
+          jumpToText: '跳至',
+          totalText: '共 {total} 条'
         }
       : {
-          prevPage: 'Previous',
-          nextPage: 'Next',
-          page: 'Page',
-          itemsPerPage: 'items/page',
-          jumpTo: 'Go to',
-          totalItems: (total: number) => `Total ${total} items`
+          prevPageAriaLabel: 'Previous',
+          nextPageAriaLabel: 'Next',
+          pageText: 'Page',
+          itemsPerPageText: 'items/page',
+          jumpToText: 'Go to',
+          totalText: 'Total {total} items'
         }
   }, [demoLang])
 
@@ -271,8 +271,7 @@ const customLabels: Partial<TigerLocalePagination> = {
             current={current9}
             onChange={setCurrent9}
             total={500}
-            locale={demoLang}
-            labels={customLabels}
+            locale={{ pagination: customLabels }}
             showQuickJumper
             showSizeChanger
           />

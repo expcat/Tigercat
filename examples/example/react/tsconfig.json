@@ -23,12 +23,13 @@
 
     /* Path mapping */
     "baseUrl": ".",
+    "types": ["node"],
     "paths": {
       "@/*": ["./src/*"],
       "@demo-shared/*": ["../shared/*"],
-      "@expcat/tigercat-core": ["../../../packages/core/src/index.ts"],
-      "@expcat/tigercat-react": ["../../../packages/react/src/index.tsx"],
-      "@expcat/tigercat-react/*": ["../../../packages/react/src/components/*"]
+      "@expcat/tigercat-core": ["../../../packages/core/dist/index.d.ts"],
+      "@expcat/tigercat-react": ["../../../packages/react/dist/index.d.ts"],
+      "@expcat/tigercat-react/*": ["../../../packages/react/dist/components/*"]
     }
   },
   "include": ["src", "../shared"],

@@ -115,7 +115,6 @@ const RadarChartDemo: React.FC = () => {
           selectable
           showLegend
           legendPosition="right"
-          mutedOpacity={0.2}
           tooltipFormatter={tooltipFormatter}
         />
       </DemoBlock>
