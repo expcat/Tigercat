@@ -24,10 +24,11 @@ export const checkboxLabelSizeClasses: Record<CheckboxSize, string> = {
 
 /**
  * Get checkbox classes based on size and state
+ * @since 0.2.0 - Changed to focus-visible, added active:scale
  */
 export function getCheckboxClasses(size: CheckboxSize = 'md', disabled: boolean = false): string {
   const baseClasses =
-    'rounded border-2 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2'
+    'rounded border-2 transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] active:scale-95'
   const sizeClass = checkboxSizeClasses[size]
   const colorClasses = [
     'border-[var(--tiger-primary,#2563eb)]',

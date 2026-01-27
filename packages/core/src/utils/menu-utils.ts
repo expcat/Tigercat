@@ -34,9 +34,10 @@ export const menuDarkThemeClasses =
 
 /**
  * Menu item base classes
+ * @since 0.2.0 - Added focus-visible ring (inset) and active state
  */
 export const menuItemBaseClasses =
-  'flex w-full items-center px-4 py-2 text-left bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none'
+  'flex w-full items-center px-4 py-2 text-left bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] focus-visible:ring-inset active:opacity-90'
 
 /**
  * Menu item hover classes - light theme
@@ -72,9 +73,10 @@ export const menuItemIconClasses = 'mr-2 flex-shrink-0'
 
 /**
  * Submenu title classes
+ * @since 0.2.0 - Added focus-visible ring (inset) and active state
  */
 export const submenuTitleClasses =
-  'flex w-full items-center justify-between px-4 py-2 text-left bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none'
+  'flex w-full items-center justify-between px-4 py-2 text-left bg-transparent border-0 cursor-pointer transition-colors duration-200 select-none appearance-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] focus-visible:ring-inset active:opacity-90'
 
 /**
  * Submenu expand icon classes

@@ -47,9 +47,10 @@ export const tabNavListCenteredClasses = 'justify-center'
 
 /**
  * Tab item base classes
+ * @since 0.2.0 - Added focus-visible ring for keyboard navigation
  */
 export const tabItemBaseClasses =
-  'relative px-4 py-2 cursor-pointer transition-all duration-200 select-none flex items-center gap-2'
+  'relative px-4 py-2 cursor-pointer transition-all duration-200 select-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] focus-visible:ring-offset-2 active:opacity-90'
 
 /**
  * Tab item size classes

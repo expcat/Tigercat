@@ -5,6 +5,9 @@
  * These functions produce framework-agnostic class name strings.
  */
 
+// Interaction styles (0.2.0+)
+export * from '../interaction-styles'
+
 // Form components
 export * from '../button-utils'
 export * from '../input-styles'

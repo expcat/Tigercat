@@ -8,6 +8,7 @@ export const selectBaseClasses = 'relative inline-block w-full'
 
 /**
  * Select trigger button base classes
+ * @since 0.2.0 - Changed to focus-visible, added active:scale
  */
 const SELECT_TRIGGER_BASE_CLASSES = [
   'w-full',
@@ -24,11 +25,13 @@ const SELECT_TRIGGER_BASE_CLASSES = [
   'rounded-md',
   'shadow-sm',
   'cursor-pointer',
-  'transition-colors',
+  'transition-all',
+  'duration-150',
   'focus:outline-none',
-  'focus:ring-2',
-  'focus:ring-[var(--tiger-select-ring,var(--tiger-primary,#2563eb))]',
-  'focus:border-[var(--tiger-select-trigger-border-focus,var(--tiger-primary,#2563eb))]'
+  'focus-visible:ring-2',
+  'focus-visible:ring-[var(--tiger-select-ring,var(--tiger-primary,#2563eb))]',
+  'focus-visible:border-[var(--tiger-select-trigger-border-focus,var(--tiger-primary,#2563eb))]',
+  'active:scale-[0.99]'
 ] as const
 
 /**
