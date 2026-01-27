@@ -354,4 +354,69 @@ describe('Modal', () => {
       await expectNoA11yViolations(document.body)
     })
   })
+
+  describe('Focus Trap', () => {
+    it('should trap focus within modal on Tab key', async () => {
+      const user = userEvent.setup()
+      render(
+        <Modal visible={true} title="Focus Trap Test" showDefaultFooter={true}>
+          <input data-testid="modal-input" />
+        </Modal>
+      )
+
+      await waitFor(() => {
+        expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+      })
+
+      const dialog = document.querySelector('[role="dialog"]')!
+      const focusableElements = dialog.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      expect(focusableElements.length).toBeGreaterThan(0)
+
+      const firstFocusable = focusableElements[0] as HTMLElement
+      const lastFocusable = focusableElements[focusableElements.length - 1] as HTMLElement
+
+      firstFocusable.focus()
+      expect(document.activeElement).toBe(firstFocusable)
+
+      // Tab through all elements
+      for (let i = 1; i < focusableElements.length; i++) {
+        await user.tab()
+      }
+
+      // After last element, Tab should wrap to first
+      await user.tab()
+      expect(document.activeElement).toBe(firstFocusable)
+    })
+
+    it('should trap focus on Shift+Tab from first element', async () => {
+      const user = userEvent.setup()
+      render(
+        <Modal visible={true} title="Focus Trap Test" showDefaultFooter={true}>
+          <input data-testid="modal-input" />
+        </Modal>
+      )
+
+      await waitFor(() => {
+        expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+      })
+
+      const dialog = document.querySelector('[role="dialog"]')!
+      const focusableElements = dialog.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      expect(focusableElements.length).toBeGreaterThan(0)
+
+      const firstFocusable = focusableElements[0] as HTMLElement
+      const lastFocusable = focusableElements[focusableElements.length - 1] as HTMLElement
+
+      firstFocusable.focus()
+      expect(document.activeElement).toBe(firstFocusable)
+
+      // Shift+Tab from first should go to last
+      await user.tab({ shift: true })
+      expect(document.activeElement).toBe(lastFocusable)
+    })
+  })
 })

@@ -476,11 +476,7 @@ export const Select: React.FC<SelectProps> = (props) => {
               xmlns="http://www.w3.org/2000/svg"
               viewBox={icon20ViewBox}
               fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d={checkSolidIcon20PathD}
-                clipRule="evenodd"
-              />
+              <path fillRule="evenodd" d={checkSolidIcon20PathD} clipRule="evenodd" />
             </svg>
           )}
         </span>
@@ -549,11 +545,7 @@ export const Select: React.FC<SelectProps> = (props) => {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox={icon20ViewBox}
                 fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d={closeSolidIcon20PathD}
-                  clipRule="evenodd"
-                />
+                <path fillRule="evenodd" d={closeSolidIcon20PathD} clipRule="evenodd" />
               </svg>
             </span>
           )}
@@ -563,11 +555,7 @@ export const Select: React.FC<SelectProps> = (props) => {
               xmlns="http://www.w3.org/2000/svg"
               viewBox={icon20ViewBox}
               fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d={chevronDownSolidIcon20PathD}
-                clipRule="evenodd"
-              />
+              <path fillRule="evenodd" d={chevronDownSolidIcon20PathD} clipRule="evenodd" />
             </svg>
           </span>
         </span>

@@ -177,20 +177,17 @@ export const Modal: React.FC<ModalProps> = ({
   useEscapeKey({ enabled: visible, onEscape: handleClose })
 
   // Focus trap handler
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent) => {
-      if (event.key === 'Tab' && dialogRef.current) {
-        const focusables = getFocusableElements(dialogRef.current)
-        const result = getFocusTrapNavigation(event.nativeEvent, focusables, document.activeElement)
+  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (event.key === 'Tab' && dialogRef.current) {
+      const focusables = getFocusableElements(dialogRef.current)
+      const result = getFocusTrapNavigation(event.nativeEvent, focusables, document.activeElement)
 
-        if (result.shouldHandle && result.next) {
-          event.preventDefault()
-          result.next.focus()
-        }
+      if (result.shouldHandle && result.next) {
+        event.preventDefault()
+        result.next.focus()
       }
-    },
-    []
-  )
+    }
+  }, [])
 
   // Close icon component
   const CloseIcon = (
