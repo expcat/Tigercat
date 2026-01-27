@@ -20,6 +20,7 @@ import {
   getNotificationIconPath,
   notificationCloseIconPath,
   isBrowser,
+  ANIMATION_DURATION_MS,
   type NotificationPosition,
   type NotificationInstance,
   type NotificationOptions,
@@ -116,7 +117,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClo
 
   const handleClose = () => {
     setIsVisible(false)
-    setTimeout(() => onClose(notification.id), 300)
+    setTimeout(() => onClose(notification.id), ANIMATION_DURATION_MS)
   }
 
   const a11yRole = notification.type === 'error' ? 'alert' : 'status'

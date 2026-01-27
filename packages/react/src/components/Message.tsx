@@ -19,6 +19,7 @@ import {
   getMessageIconPath,
   messageCloseIconPath,
   isBrowser,
+  ANIMATION_DURATION_MS,
   type MessagePosition,
   type MessageInstance,
   type MessageOptions,
@@ -105,7 +106,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
 
   const handleClose = useCallback(() => {
     setIsVisible(false)
-    setTimeout(() => onClose(message.id), 300)
+    setTimeout(() => onClose(message.id), ANIMATION_DURATION_MS)
   }, [message.id, onClose])
 
   const a11yRole = message.type === 'error' ? 'alert' : 'status'
