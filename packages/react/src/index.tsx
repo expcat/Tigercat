@@ -195,4 +195,11 @@ export type { ChartLegendProps } from './components/ChartLegend'
 export { ChartTooltip } from './components/ChartTooltip'
 export type { ChartTooltipProps } from './components/ChartTooltip'
 
+// Hooks
+export { useChartInteraction } from './hooks/useChartInteraction'
+export type {
+  UseChartInteractionOptions,
+  UseChartInteractionReturn
+} from './hooks/useChartInteraction'
+
 export const version = '0.0.1'

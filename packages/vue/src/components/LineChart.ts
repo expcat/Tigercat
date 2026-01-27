@@ -25,6 +25,7 @@ import { ChartGrid } from './ChartGrid'
 import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
+import { useChartInteraction } from '../composables/useChartInteraction'
 
 export interface VueLineChartProps extends CoreLineChartProps {
   data?: LineChartDatum[]
@@ -221,8 +222,7 @@ export const LineChart = defineComponent({
     'point-hover'
   ],
   setup(props, { emit }) {
-    const localHoveredIndex = ref<number | null>(null)
-    const localSelectedIndex = ref<number | null>(null)
+    // Point-level hover state (not managed by composable)
     const hoveredPointInfo = ref<{ seriesIndex: number; pointIndex: number } | null>(null)
     const tooltipPosition = ref({ x: 0, y: 0 })
 
@@ -233,6 +233,34 @@ export const LineChart = defineComponent({
       if (props.series && props.series.length > 0) return props.series
       if (props.data && props.data.length > 0) return [{ data: props.data }]
       return []
+    })
+
+    // Use shared interaction composable for series-level interaction
+    const {
+      resolvedHoveredIndex,
+      resolvedSelectedIndex,
+      activeIndex,
+      handleMouseEnter: handleSeriesHoverEnter,
+      handleMouseLeave: handleSeriesHoverLeave,
+      handleClick: handleSeriesSelect,
+      handleLegendClick,
+      handleLegendHover,
+      handleLegendLeave,
+      wrapperClasses
+    } = useChartInteraction<LineChartSeries>({
+      hoverable: computed(() => props.hoverable),
+      hoveredIndexProp: props.hoveredIndex,
+      selectable: computed(() => props.selectable),
+      selectedIndexProp: props.selectedIndex,
+      activeOpacity: computed(() => props.activeOpacity),
+      inactiveOpacity: computed(() => props.inactiveOpacity),
+      legendPosition: computed(() => props.legendPosition),
+      emit: emit as (event: string, ...args: unknown[]) => void,
+      getData: (index: number) => resolvedSeries.value[index],
+      eventNames: {
+        hover: 'series-hover',
+        click: 'series-click'
+      }
     })
 
     // Collect all x values and y values
@@ -268,20 +296,6 @@ export const LineChart = defineComponent({
     const palette = computed(() =>
       props.colors && props.colors.length > 0 ? props.colors : [...DEFAULT_CHART_COLORS]
     )
-
-    const resolvedHoveredIndex = computed(() =>
-      props.hoveredIndex !== undefined ? props.hoveredIndex : localHoveredIndex.value
-    )
-
-    const resolvedSelectedIndex = computed(() =>
-      props.selectedIndex !== undefined ? props.selectedIndex : localSelectedIndex.value
-    )
-
-    const activeIndex = computed(() => {
-      if (resolvedSelectedIndex.value !== null) return resolvedSelectedIndex.value
-      if (props.hoverable && resolvedHoveredIndex.value !== null) return resolvedHoveredIndex.value
-      return null
-    })
 
     // Calculate line paths and points for each series
     const seriesData = computed(() =>
@@ -349,24 +363,6 @@ export const LineChart = defineComponent({
       return datum ? formatTooltip.value(datum, seriesIndex, pointIndex, series) : ''
     })
 
-    const handleSeriesMouseEnter = (seriesIndex: number, _event: MouseEvent) => {
-      if (!props.hoverable) return
-      if (props.hoveredIndex === undefined) {
-        localHoveredIndex.value = seriesIndex
-      }
-      emit('update:hoveredIndex', seriesIndex)
-      emit('series-hover', seriesIndex, resolvedSeries.value[seriesIndex])
-    }
-
-    const handleSeriesMouseLeave = () => {
-      if (!props.hoverable) return
-      if (props.hoveredIndex === undefined) {
-        localHoveredIndex.value = null
-      }
-      emit('update:hoveredIndex', null)
-      emit('series-hover', null, null)
-    }
-
     const handlePointMouseEnter = (seriesIndex: number, pointIndex: number, event: MouseEvent) => {
       hoveredPointInfo.value = { seriesIndex, pointIndex }
       tooltipPosition.value = { x: event.clientX, y: event.clientY }
@@ -387,16 +383,6 @@ export const LineChart = defineComponent({
       emit('point-hover', null, null, null)
     }
 
-    const handleSeriesClick = (seriesIndex: number) => {
-      if (!props.selectable) return
-      const nextIndex = resolvedSelectedIndex.value === seriesIndex ? null : seriesIndex
-      if (props.selectedIndex === undefined) {
-        localSelectedIndex.value = nextIndex
-      }
-      emit('update:selectedIndex', nextIndex)
-      emit('series-click', seriesIndex, resolvedSeries.value[seriesIndex])
-    }
-
     const handlePointClick = (seriesIndex: number, pointIndex: number) => {
       emit(
         'point-click',
@@ -404,44 +390,15 @@ export const LineChart = defineComponent({
         pointIndex,
         resolvedSeries.value[seriesIndex]?.data[pointIndex]
       )
-      handleSeriesClick(seriesIndex)
+      handleSeriesSelect(seriesIndex)
     }
 
     const handleKeyDown = (event: KeyboardEvent, seriesIndex: number) => {
       if (!props.selectable) return
       if (event.key !== 'Enter' && event.key !== ' ') return
       event.preventDefault()
-      handleSeriesClick(seriesIndex)
+      handleSeriesSelect(seriesIndex)
     }
-
-    const handleLegendClick = (index: number) => {
-      handleSeriesClick(index)
-    }
-
-    const handleLegendHover = (index: number) => {
-      if (!props.hoverable) return
-      if (props.hoveredIndex === undefined) {
-        localHoveredIndex.value = index
-      }
-      emit('update:hoveredIndex', index)
-    }
-
-    const handleLegendLeave = () => {
-      handleSeriesMouseLeave()
-    }
-
-    const wrapperClasses = computed(() =>
-      classNames(
-        'inline-flex',
-        props.legendPosition === 'right'
-          ? 'flex-row items-start gap-4'
-          : props.legendPosition === 'left'
-            ? 'flex-row-reverse items-start gap-4'
-            : props.legendPosition === 'top'
-              ? 'flex-col-reverse gap-2'
-              : 'flex-col gap-2'
-      )
-    )
 
     return () => {
       const chart = h(
@@ -505,9 +462,9 @@ export const LineChart = defineComponent({
                       sd.series.className,
                       (props.hoverable || props.selectable) && 'cursor-pointer'
                     ),
-                    onMouseenter: (e: MouseEvent) => handleSeriesMouseEnter(sd.seriesIndex, e),
-                    onMouseleave: handleSeriesMouseLeave,
-                    onClick: () => handleSeriesClick(sd.seriesIndex),
+                    onMouseenter: (e: MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e),
+                    onMouseleave: handleSeriesHoverLeave,
+                    onClick: () => handleSeriesSelect(sd.seriesIndex),
                     tabindex: props.selectable ? 0 : undefined,
                     onKeydown: (e: KeyboardEvent) => handleKeyDown(e, sd.seriesIndex)
                   },
