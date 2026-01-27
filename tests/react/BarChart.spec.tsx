@@ -1,7 +1,9 @@
-import { describe, it, expect } from 'vitest'
-import React from 'react'
+import { describe, it, expect, vi } from 'vitest'
 import { BarChart } from '@expcat/tigercat-react'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
+import { fireEvent } from '@testing-library/react'
+
+const defaultSize = { width: 240, height: 160 }
 
 describe('BarChart', () => {
   it('renders bars', () => {
@@ -10,8 +12,7 @@ describe('BarChart', () => {
         { x: 'A', y: 10 },
         { x: 'B', y: 20 }
       ],
-      width: 240,
-      height: 160
+      ...defaultSize
     })
 
     expect(container.querySelectorAll('rect')).toHaveLength(2)
@@ -28,69 +29,106 @@ describe('BarChart', () => {
   it('renders empty state with no data', () => {
     const { container } = renderWithProps(BarChart, {
       data: [],
-      width: 240,
-      height: 160
+      ...defaultSize
     })
 
     expect(container.querySelectorAll('rect')).toHaveLength(0)
     expect(container.querySelector('svg')).toBeTruthy()
   })
 
-  it('renders single bar', () => {
-    const { container } = renderWithProps(BarChart, {
-      data: [{ x: 'A', y: 50 }],
-      width: 240,
-      height: 160
-    })
-
-    expect(container.querySelectorAll('rect')).toHaveLength(1)
-  })
-
   it('handles negative y values', () => {
     const { container } = renderWithProps(BarChart, {
       data: [
         { x: 'A', y: 20 },
-        { x: 'B', y: -10 },
-        { x: 'C', y: 15 }
+        { x: 'B', y: -10 }
       ],
-      width: 240,
-      height: 160
+      ...defaultSize
     })
 
-    expect(container.querySelectorAll('rect')).toHaveLength(3)
+    expect(container.querySelectorAll('rect')).toHaveLength(2)
   })
 
   it('uses custom barColor', () => {
     const { container } = renderWithProps(BarChart, {
       data: [{ x: 'A', y: 10 }],
       barColor: '#ff0000',
-      width: 240,
-      height: 160
+      ...defaultSize
     })
 
-    const rect = container.querySelector('rect')
-    expect(rect).toHaveAttribute('fill', '#ff0000')
+    expect(container.querySelector('rect')).toHaveAttribute('fill', '#ff0000')
   })
 
-  it('hides axis when showAxis is false', () => {
+  it('hides axis and grid when disabled', () => {
     const { container } = renderWithProps(BarChart, {
       data: [{ x: 'A', y: 10 }],
       showAxis: false,
-      width: 240,
-      height: 160
+      showGrid: false,
+      ...defaultSize
     })
 
     expect(container.querySelectorAll('[data-axis-tick]')).toHaveLength(0)
+    expect(container.querySelectorAll('[data-chart-grid] line')).toHaveLength(0)
   })
 
-  it('hides grid when showGrid is false', () => {
-    const { container } = renderWithProps(BarChart, {
-      data: [{ x: 'A', y: 10 }],
-      showGrid: false,
-      width: 240,
-      height: 160
+  describe('interaction', () => {
+    it('triggers hover events when hoverable', () => {
+      const onHoveredIndexChange = vi.fn()
+      const { container } = renderWithProps(BarChart, {
+        data: [
+          { x: 'A', y: 10 },
+          { x: 'B', y: 20 }
+        ],
+        hoverable: true,
+        onHoveredIndexChange,
+        ...defaultSize
+      })
+
+      fireEvent.mouseEnter(container.querySelector('rect')!)
+      expect(onHoveredIndexChange).toHaveBeenCalledWith(0)
     })
 
-    expect(container.querySelectorAll('[data-chart-grid] line')).toHaveLength(0)
+    it('triggers click events when selectable', () => {
+      const onBarClick = vi.fn()
+      const { container } = renderWithProps(BarChart, {
+        data: [
+          { x: 'A', y: 10 },
+          { x: 'B', y: 20 }
+        ],
+        selectable: true,
+        onBarClick,
+        ...defaultSize
+      })
+
+      fireEvent.click(container.querySelectorAll('rect')[1])
+      expect(onBarClick).toHaveBeenCalled()
+    })
+
+    it('renders legend when showLegend is true', () => {
+      const { container } = renderWithProps(BarChart, {
+        data: [
+          { x: 'A', y: 10, color: '#ff0000' },
+          { x: 'B', y: 20, color: '#00ff00' }
+        ],
+        showLegend: true,
+        ...defaultSize
+      })
+
+      expect(container.querySelector('[role="list"][aria-label="Chart legend"]')).toBeTruthy()
+    })
+
+    it('clears hover on mouse leave', () => {
+      const onHoveredIndexChange = vi.fn()
+      const { container } = renderWithProps(BarChart, {
+        data: [{ x: 'A', y: 10 }],
+        hoverable: true,
+        onHoveredIndexChange,
+        ...defaultSize
+      })
+
+      const rect = container.querySelector('rect')!
+      fireEvent.mouseEnter(rect)
+      fireEvent.mouseLeave(rect)
+      expect(onHoveredIndexChange).toHaveBeenLastCalledWith(null)
+    })
   })
 })

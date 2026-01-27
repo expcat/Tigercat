@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ScatterChart, type ScatterChartDatum } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
@@ -14,6 +14,14 @@ const customData: ScatterChartDatum[] = [
   { x: 15, y: 10, size: 8, color: '#22c55e' },
   { x: 25, y: 80, size: 10, color: '#f97316' },
   { x: 35, y: 50, size: 12, color: '#a855f7' }
+]
+
+const interactiveData: ScatterChartDatum[] = [
+  { x: 10, y: 25, label: 'Point A' },
+  { x: 25, y: 60, label: 'Point B' },
+  { x: 40, y: 35, label: 'Point C' },
+  { x: 55, y: 75, label: 'Point D' },
+  { x: 70, y: 45, label: 'Point E' }
 ]
 
 const basicSnippet = `<ScatterChart
@@ -34,7 +42,37 @@ const customSnippet = `<ScatterChart
   showYAxis={false}
 />`
 
+const hoverableSnippet = `<ScatterChart
+  data={data}
+  width={420}
+  height={240}
+  hoverable
+  hoveredIndex={hoveredIndex}
+  onHoveredIndexChange={setHoveredIndex}
+/>`
+
+const selectableSnippet = `<ScatterChart
+  data={data}
+  width={420}
+  height={240}
+  hoverable
+  selectable
+  selectedIndex={selectedIndex}
+  onSelectedIndexChange={setSelectedIndex}
+/>`
+
+const tooltipSnippet = `<ScatterChart
+  data={data}
+  width={420}
+  height={240}
+  hoverable
+  showTooltip
+/>`
+
 const ScatterChartDemo: React.FC = () => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
+
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
@@ -59,6 +97,52 @@ const ScatterChartDemo: React.FC = () => {
           gridLineStyle="dotted"
           showYAxis={false}
         />
+      </DemoBlock>
+
+      <DemoBlock
+        title="悬停高亮"
+        description="启用 hoverable 后，鼠标悬停时高亮数据点。"
+        code={hoverableSnippet}>
+        <div className="space-y-4">
+          <ScatterChart
+            data={interactiveData}
+            width={420}
+            height={240}
+            hoverable
+            hoveredIndex={hoveredIndex}
+            onHoveredIndexChange={setHoveredIndex}
+          />
+          <p className="text-sm text-gray-500">
+            当前悬停: {hoveredIndex !== null ? interactiveData[hoveredIndex]?.label : '无'}
+          </p>
+        </div>
+      </DemoBlock>
+
+      <DemoBlock
+        title="点击选中"
+        description="启用 selectable 后，点击可选中数据点。"
+        code={selectableSnippet}>
+        <div className="space-y-4">
+          <ScatterChart
+            data={interactiveData}
+            width={420}
+            height={240}
+            hoverable
+            selectable
+            selectedIndex={selectedIndex}
+            onSelectedIndexChange={setSelectedIndex}
+          />
+          <p className="text-sm text-gray-500">
+            选中: {selectedIndex !== null ? interactiveData[selectedIndex]?.label : '无'}
+          </p>
+        </div>
+      </DemoBlock>
+
+      <DemoBlock
+        title="显示提示框"
+        description="通过 showTooltip 在悬停时显示坐标信息。"
+        code={tooltipSnippet}>
+        <ScatterChart data={interactiveData} width={420} height={240} hoverable showTooltip />
       </DemoBlock>
     </div>
   )

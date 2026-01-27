@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { ScatterChart, type ScatterChartDatum } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
@@ -16,6 +17,17 @@ const customData: ScatterChartDatum[] = [
   { x: 35, y: 50, size: 12, color: '#a855f7' }
 ]
 
+const interactiveData: ScatterChartDatum[] = [
+  { x: 10, y: 25, label: 'Point A' },
+  { x: 25, y: 60, label: 'Point B' },
+  { x: 40, y: 35, label: 'Point C' },
+  { x: 55, y: 75, label: 'Point D' },
+  { x: 70, y: 45, label: 'Point E' }
+]
+
+const hoveredIndex = ref<number | null>(null)
+const selectedIndex = ref<number | null>(null)
+
 const basicSnippet = `<ScatterChart
   :data="data"
   :width="420"
@@ -32,6 +44,31 @@ const customSnippet = `<ScatterChart
   :pointOpacity="0.8"
   grid-line-style="dotted"
   :show-y-axis="false"
+/>`
+
+const hoverableSnippet = `<ScatterChart
+  :data="data"
+  :width="420"
+  :height="240"
+  hoverable
+  v-model:hoveredIndex="hoveredIndex"
+/>`
+
+const selectableSnippet = `<ScatterChart
+  :data="data"
+  :width="420"
+  :height="240"
+  hoverable
+  selectable
+  v-model:selectedIndex="selectedIndex"
+/>`
+
+const tooltipSnippet = `<ScatterChart
+  :data="data"
+  :width="420"
+  :height="240"
+  hoverable
+  show-tooltip
 />`
 </script>
 
@@ -62,6 +99,47 @@ const customSnippet = `<ScatterChart
                     :pointOpacity="0.8"
                     grid-line-style="dotted"
                     :show-y-axis="false" />
+    </DemoBlock>
+
+    <DemoBlock title="悬停高亮"
+               description="启用 hoverable 后，鼠标悬停时高亮数据点。"
+               :code="hoverableSnippet">
+      <div class="space-y-4">
+        <ScatterChart :data="interactiveData"
+                      :width="420"
+                      :height="240"
+                      hoverable
+                      v-model:hoveredIndex="hoveredIndex" />
+        <p class="text-sm text-gray-500">
+          当前悬停: {{ hoveredIndex !== null ? interactiveData[hoveredIndex]?.label : '无' }}
+        </p>
+      </div>
+    </DemoBlock>
+
+    <DemoBlock title="点击选中"
+               description="启用 selectable 后，点击可选中数据点。"
+               :code="selectableSnippet">
+      <div class="space-y-4">
+        <ScatterChart :data="interactiveData"
+                      :width="420"
+                      :height="240"
+                      hoverable
+                      selectable
+                      v-model:selectedIndex="selectedIndex" />
+        <p class="text-sm text-gray-500">
+          选中: {{ selectedIndex !== null ? interactiveData[selectedIndex]?.label : '无' }}
+        </p>
+      </div>
+    </DemoBlock>
+
+    <DemoBlock title="显示提示框"
+               description="通过 show-tooltip 在悬停时显示坐标信息。"
+               :code="tooltipSnippet">
+      <ScatterChart :data="interactiveData"
+                    :width="420"
+                    :height="240"
+                    hoverable
+                    show-tooltip />
     </DemoBlock>
   </div>
 </template>

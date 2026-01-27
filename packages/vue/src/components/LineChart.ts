@@ -349,7 +349,7 @@ export const LineChart = defineComponent({
       return datum ? formatTooltip.value(datum, seriesIndex, pointIndex, series) : ''
     })
 
-    const handleSeriesMouseEnter = (seriesIndex: number, event: MouseEvent) => {
+    const handleSeriesMouseEnter = (seriesIndex: number, _event: MouseEvent) => {
       if (!props.hoverable) return
       if (props.hoveredIndex === undefined) {
         localHoveredIndex.value = seriesIndex

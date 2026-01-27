@@ -103,8 +103,9 @@ export const BarChart: React.FC<BarChartProps> = ({
   }, [yScale, yValues, innerRect.height])
 
   const palette = useMemo(
-    () => (colors && colors.length > 0 ? colors : [...DEFAULT_CHART_COLORS]),
-    [colors]
+    () =>
+      colors && colors.length > 0 ? colors : barColor ? [barColor] : [...DEFAULT_CHART_COLORS],
+    [colors, barColor]
   )
 
   const resolvedHoveredIndex = hoveredIndexProp !== undefined ? hoveredIndexProp : localHoveredIndex

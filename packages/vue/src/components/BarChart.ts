@@ -214,7 +214,11 @@ export const BarChart = defineComponent({
     const showYAxis = computed(() => props.showAxis && props.showYAxis)
 
     const palette = computed(() =>
-      props.colors && props.colors.length > 0 ? props.colors : [...DEFAULT_CHART_COLORS]
+      props.colors && props.colors.length > 0
+        ? props.colors
+        : props.barColor
+          ? [props.barColor]
+          : [...DEFAULT_CHART_COLORS]
     )
 
     const resolvedHoveredIndex = computed(() =>
@@ -430,7 +434,7 @@ export const BarChart = defineComponent({
                             'cursor-pointer transition-opacity duration-150'
                         ),
                         tabindex: props.selectable ? 0 : undefined,
-                        role: props.selectable ? 'button' : undefined,
+                        role: props.selectable ? 'button' : 'img',
                         'aria-label': bar.datum.label ?? String(bar.datum.x),
                         'data-bar-index': index,
                         onMouseenter: (e: MouseEvent) => handleMouseEnter(index, e),

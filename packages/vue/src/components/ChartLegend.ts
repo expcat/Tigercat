@@ -42,12 +42,14 @@ export const ChartLegend = defineComponent({
     const containerClasses = computed(() =>
       classNames(
         'flex flex-wrap',
-        props.position === 'right' || props.position === 'left'
-          ? 'flex-col gap-2'
-          : 'flex-row gap-3',
+        props.position === 'right' || props.position === 'left' ? 'flex-col' : 'flex-row',
         props.className
       )
     )
+
+    const containerStyle = computed(() => ({
+      gap: `${props.gap}px`
+    }))
 
     const handleClick = (item: ChartLegendItem) => {
       if (!props.interactive) return
@@ -69,8 +71,10 @@ export const ChartLegend = defineComponent({
         'div',
         {
           class: containerClasses.value,
+          style: containerStyle.value,
           role: 'list',
-          'aria-label': 'Chart legend'
+          'aria-label': 'Chart legend',
+          'data-chart-legend': 'true'
         },
         props.items.map((item) =>
           h(
@@ -87,6 +91,7 @@ export const ChartLegend = defineComponent({
                 item.active === false ? 'opacity-50' : undefined
               ),
               role: 'listitem',
+              'data-legend-item': 'true',
               onClick: props.interactive ? () => handleClick(item) : undefined,
               onMouseenter: props.interactive ? () => handleHover(item) : undefined,
               onMouseleave: props.interactive ? handleLeave : undefined
@@ -99,7 +104,8 @@ export const ChartLegend = defineComponent({
                   height: `${props.markerSize}px`,
                   backgroundColor: item.color
                 },
-                'aria-hidden': 'true'
+                'aria-hidden': 'true',
+                'data-legend-marker': 'true'
               }),
               h('span', { style: { marginRight: `${props.gap}px` } }, item.label)
             ]
