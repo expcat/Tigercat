@@ -3,6 +3,7 @@ import {
   classNames,
   getChartInnerRect,
   type ChartPadding,
+  type ChartLegendPosition,
   type DonutChartDatum,
   type DonutChartProps as CoreDonutChartProps
 } from '@expcat/tigercat-core'
@@ -64,11 +65,69 @@ export const DonutChart = defineComponent({
     labelFormatter: {
       type: Function as PropType<(value: number, datum: DonutChartDatum, index: number) => string>
     },
+    // Interaction props
+    hoverable: {
+      type: Boolean,
+      default: false
+    },
+    hoveredIndex: {
+      type: Number as PropType<number | null>,
+      default: undefined
+    },
+    activeOpacity: {
+      type: Number,
+      default: 1
+    },
+    inactiveOpacity: {
+      type: Number,
+      default: 0.25
+    },
+    selectable: {
+      type: Boolean,
+      default: false
+    },
+    selectedIndex: {
+      type: Number as PropType<number | null>,
+      default: undefined
+    },
+    // Legend props
+    showLegend: {
+      type: Boolean,
+      default: false
+    },
+    legendPosition: {
+      type: String as PropType<ChartLegendPosition>,
+      default: 'bottom'
+    },
+    legendMarkerSize: {
+      type: Number,
+      default: 10
+    },
+    legendGap: {
+      type: Number,
+      default: 8
+    },
+    // Tooltip props
+    showTooltip: {
+      type: Boolean,
+      default: true
+    },
+    tooltipFormatter: {
+      type: Function as PropType<(datum: DonutChartDatum, index: number) => string>
+    },
+    // Accessibility
+    title: {
+      type: String
+    },
+    desc: {
+      type: String
+    },
     className: {
       type: String
     }
   },
-  setup(props) {
+  emits: ['update:hoveredIndex', 'update:selectedIndex', 'slice-click', 'slice-hover'],
+  setup(props, { emit }) {
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 
     const resolvedOuterRadius = computed(() => {
@@ -85,6 +144,23 @@ export const DonutChart = defineComponent({
       return resolvedOuterRadius.value * ratio
     })
 
+    // Event handlers to forward to PieChart
+    const handleHoveredIndexUpdate = (index: number | null) => {
+      emit('update:hoveredIndex', index)
+    }
+
+    const handleSelectedIndexUpdate = (index: number | null) => {
+      emit('update:selectedIndex', index)
+    }
+
+    const handleSliceClick = (datum: DonutChartDatum, index: number) => {
+      emit('slice-click', datum, index)
+    }
+
+    const handleSliceHover = (datum: DonutChartDatum | null, index: number | null) => {
+      emit('slice-hover', datum, index)
+    }
+
     return () =>
       h(PieChart, {
         width: props.width,
@@ -99,7 +175,30 @@ export const DonutChart = defineComponent({
         colors: props.colors,
         showLabels: props.showLabels,
         labelFormatter: props.labelFormatter,
-        className: classNames(props.className)
+        // Interaction props
+        hoverable: props.hoverable,
+        hoveredIndex: props.hoveredIndex,
+        activeOpacity: props.activeOpacity,
+        inactiveOpacity: props.inactiveOpacity,
+        selectable: props.selectable,
+        selectedIndex: props.selectedIndex,
+        // Legend props
+        showLegend: props.showLegend,
+        legendPosition: props.legendPosition,
+        legendMarkerSize: props.legendMarkerSize,
+        legendGap: props.legendGap,
+        // Tooltip props
+        showTooltip: props.showTooltip,
+        tooltipFormatter: props.tooltipFormatter,
+        // Accessibility
+        title: props.title,
+        desc: props.desc,
+        className: classNames(props.className),
+        // Event handlers
+        'onUpdate:hoveredIndex': handleHoveredIndexUpdate,
+        'onUpdate:selectedIndex': handleSelectedIndexUpdate,
+        onSliceClick: handleSliceClick,
+        onSliceHover: handleSliceHover
       })
   }
 })

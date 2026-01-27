@@ -29,6 +29,8 @@ import {
   modalBodyClasses,
   modalFooterClasses,
   resolveLocaleText,
+  getFocusableElements,
+  getFocusTrapNavigation,
   type TigerLocale,
   type ModalSize
 } from '@expcat/tigercat-core'
@@ -246,18 +248,31 @@ export const Modal = defineComponent({
       }
     }
 
-    const handleEscKey = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Handle Escape key
       if (event.key === 'Escape' && props.visible) {
         handleClose()
+        return
+      }
+
+      // Handle Tab key for focus trap
+      if (event.key === 'Tab' && props.visible && dialogRef.value) {
+        const focusables = getFocusableElements(dialogRef.value)
+        const result = getFocusTrapNavigation(event, focusables, document.activeElement)
+
+        if (result.shouldHandle && result.next) {
+          event.preventDefault()
+          result.next.focus()
+        }
       }
     }
 
     onMounted(() => {
-      document.addEventListener('keydown', handleEscKey)
+      document.addEventListener('keydown', handleKeyDown)
     })
 
     onBeforeUnmount(() => {
-      document.removeEventListener('keydown', handleEscKey)
+      document.removeEventListener('keydown', handleKeyDown)
     })
 
     watch(

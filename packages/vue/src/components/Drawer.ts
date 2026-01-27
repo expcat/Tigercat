@@ -32,6 +32,8 @@ import {
   getDrawerCloseButtonClasses,
   getDrawerTitleClasses,
   restoreFocus,
+  getFocusableElements,
+  getFocusTrapNavigation,
   type DrawerPlacement,
   type DrawerSize
 } from '@expcat/tigercat-core'
@@ -218,15 +220,30 @@ export const Drawer = defineComponent({
     const escapeEnabled = computed(() => props.visible)
     let cleanupEscape: (() => void) | undefined
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Handle Tab key for focus trap
+      if (event.key === 'Tab' && props.visible && dialogRef.value) {
+        const focusables = getFocusableElements(dialogRef.value)
+        const result = getFocusTrapNavigation(event, focusables, document.activeElement)
+
+        if (result.shouldHandle && result.next) {
+          event.preventDefault()
+          result.next.focus()
+        }
+      }
+    }
+
     onMounted(() => {
       cleanupEscape = useVueEscapeKey({
         enabled: escapeEnabled,
         onEscape: handleClose
       })
+      document.addEventListener('keydown', handleKeyDown)
     })
 
     onBeforeUnmount(() => {
       cleanupEscape?.()
+      document.removeEventListener('keydown', handleKeyDown)
     })
 
     watch(

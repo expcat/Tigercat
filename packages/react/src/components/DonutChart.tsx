@@ -3,6 +3,7 @@ import {
   classNames,
   getChartInnerRect,
   type ChartPadding,
+  type ChartLegendPosition,
   type DonutChartDatum,
   type DonutChartProps as CoreDonutChartProps
 } from '@expcat/tigercat-core'
@@ -11,6 +12,11 @@ import { PieChart } from './PieChart'
 export interface DonutChartProps extends CoreDonutChartProps {
   data: DonutChartDatum[]
   padding?: ChartPadding
+  // Interaction callbacks
+  onHoveredIndexChange?: (index: number | null) => void
+  onSelectedIndexChange?: (index: number | null) => void
+  onSliceClick?: (index: number, datum: DonutChartDatum) => void
+  onSliceHover?: (index: number | null, datum: DonutChartDatum | null) => void
 }
 
 export const DonutChart: React.FC<DonutChartProps> = ({
@@ -27,7 +33,30 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   colors,
   showLabels = false,
   labelFormatter,
-  className
+  // Interaction props
+  hoverable = false,
+  hoveredIndex,
+  activeOpacity = 1,
+  inactiveOpacity = 0.25,
+  selectable = false,
+  selectedIndex,
+  // Legend props
+  showLegend = false,
+  legendPosition = 'bottom',
+  legendMarkerSize = 10,
+  legendGap = 8,
+  // Tooltip props
+  showTooltip = true,
+  tooltipFormatter,
+  // Accessibility
+  title,
+  desc,
+  className,
+  // Callbacks
+  onHoveredIndexChange,
+  onSelectedIndexChange,
+  onSliceClick,
+  onSliceHover
 }) => {
   const innerRect = useMemo(
     () => getChartInnerRect(width, height, padding),
@@ -62,7 +91,30 @@ export const DonutChart: React.FC<DonutChartProps> = ({
       colors={colors}
       showLabels={showLabels}
       labelFormatter={labelFormatter}
+      // Interaction props
+      hoverable={hoverable}
+      hoveredIndex={hoveredIndex}
+      activeOpacity={activeOpacity}
+      inactiveOpacity={inactiveOpacity}
+      selectable={selectable}
+      selectedIndex={selectedIndex}
+      // Legend props
+      showLegend={showLegend}
+      legendPosition={legendPosition}
+      legendMarkerSize={legendMarkerSize}
+      legendGap={legendGap}
+      // Tooltip props
+      showTooltip={showTooltip}
+      tooltipFormatter={tooltipFormatter}
+      // Accessibility
+      title={title}
+      desc={desc}
       className={classNames(className)}
+      // Callbacks
+      onHoveredIndexChange={onHoveredIndexChange}
+      onSelectedIndexChange={onSelectedIndexChange}
+      onSliceClick={onSliceClick}
+      onSliceHover={onSliceHover}
     />
   )
 }

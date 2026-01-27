@@ -19,6 +19,8 @@ import {
   getDrawerTitleClasses,
   resolveLocaleText,
   restoreFocus,
+  getFocusableElements,
+  getFocusTrapNavigation,
   type DrawerProps as CoreDrawerProps
 } from '@expcat/tigercat-core'
 import { useEscapeKey } from '../utils/overlay'
@@ -160,6 +162,22 @@ export const Drawer: React.FC<DrawerProps> = ({
     restoreFocus(previousActiveElementRef.current)
   }, [visible])
 
+  // Focus trap handler
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Tab' && dialogRef.current) {
+        const focusables = getFocusableElements(dialogRef.current)
+        const result = getFocusTrapNavigation(event.nativeEvent, focusables, document.activeElement)
+
+        if (result.shouldHandle && result.next) {
+          event.preventDefault()
+          result.next.focus()
+        }
+      }
+    },
+    []
+  )
+
   const containerClasses = classNames(
     getDrawerContainerClasses(zIndex),
     !visible && 'pointer-events-none'
@@ -207,6 +225,7 @@ export const Drawer: React.FC<DrawerProps> = ({
         aria-labelledby={ariaLabelledby}
         tabIndex={-1}
         ref={dialogRef}
+        onKeyDown={handleKeyDown}
         data-tiger-drawer="">
         {(title || header || closable) && (
           <div className={headerClasses}>
