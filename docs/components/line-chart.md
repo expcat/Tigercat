@@ -115,7 +115,7 @@ const series = [
 | showAxis         | 显示坐标轴           | `boolean`                                                                      | `true`                         |
 | showXAxis        | 显示 X 轴            | `boolean`                                                                      | `true`                         |
 | showYAxis        | 显示 Y 轴            | `boolean`                                                                      | `true`                         |
-| includeZero      | Y 轴包含 0           | `boolean`                                                                      | `true`                         |
+| includeZero      | Y 轴包含 0           | `boolean`                                                                      | `false`                        |
 | xAxisLabel       | X 轴标题             | `string`                                                                       | -                              |
 | yAxisLabel       | Y 轴标题             | `string`                                                                       | -                              |
 | xTicks           | X 轴刻度数           | `number`                                                                       | `5`                            |

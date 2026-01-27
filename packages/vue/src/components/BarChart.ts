@@ -1,10 +1,9 @@
-import { defineComponent, computed, h, PropType, ref } from 'vue'
+import { defineComponent, computed, h, PropType } from 'vue'
 import {
   classNames,
   createBandScale,
   createLinearScale,
   DEFAULT_CHART_COLORS,
-  getChartElementOpacity,
   getChartInnerRect,
   getNumberExtent,
   type BarChartDatum,
@@ -22,6 +21,7 @@ import { ChartGrid } from './ChartGrid'
 import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
+import { useChartInteraction } from '../composables/useChartInteraction'
 
 export interface VueBarChartProps extends CoreBarChartProps {
   data: BarChartDatum[]
@@ -187,9 +187,34 @@ export const BarChart = defineComponent({
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'bar-click', 'bar-hover'],
   setup(props, { emit }) {
-    const localHoveredIndex = ref<number | null>(null)
-    const localSelectedIndex = ref<number | null>(null)
-    const tooltipPosition = ref({ x: 0, y: 0 })
+    // Use shared interaction composable
+    const {
+      tooltipPosition,
+      resolvedHoveredIndex,
+      activeIndex,
+      getElementOpacity,
+      handleMouseEnter,
+      handleMouseMove,
+      handleMouseLeave,
+      handleClick,
+      handleKeyDown,
+      handleLegendClick,
+      handleLegendHover,
+      handleLegendLeave,
+      wrapperClasses
+    } = useChartInteraction<BarChartDatum>({
+      hoverable: computed(() => props.hoverable),
+      hoveredIndexProp: props.hoveredIndex,
+      selectable: computed(() => props.selectable),
+      selectedIndexProp: props.selectedIndex,
+      activeOpacity: computed(() => props.activeOpacity),
+      inactiveOpacity: computed(() => props.inactiveOpacity),
+      legendPosition: computed(() => props.legendPosition),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      emit: emit as (event: string, ...args: any[]) => void,
+      getData: (index) => props.data[index],
+      eventNames: { hover: 'bar-hover', click: 'bar-click' }
+    })
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 
@@ -221,20 +246,6 @@ export const BarChart = defineComponent({
           : [...DEFAULT_CHART_COLORS]
     )
 
-    const resolvedHoveredIndex = computed(() =>
-      props.hoveredIndex !== undefined ? props.hoveredIndex : localHoveredIndex.value
-    )
-
-    const resolvedSelectedIndex = computed(() =>
-      props.selectedIndex !== undefined ? props.selectedIndex : localSelectedIndex.value
-    )
-
-    const activeIndex = computed(() => {
-      if (resolvedSelectedIndex.value !== null) return resolvedSelectedIndex.value
-      if (props.hoverable && resolvedHoveredIndex.value !== null) return resolvedHoveredIndex.value
-      return null
-    })
-
     const bars = computed(() => {
       const scale = resolvedXScale.value
       const bandWidth =
@@ -252,10 +263,7 @@ export const BarChart = defineComponent({
         const barHeight = Math.abs(baseline - barYValue)
         const barY = Math.min(baseline, barYValue)
         const color = item.color ?? palette.value[index % palette.value.length]
-        const opacity = getChartElementOpacity(index, activeIndex.value, {
-          activeOpacity: props.activeOpacity,
-          inactiveOpacity: props.inactiveOpacity
-        })
+        const opacity = getElementOpacity(index)
 
         return {
           x: barX,
@@ -292,75 +300,6 @@ export const BarChart = defineComponent({
       const datum = props.data[resolvedHoveredIndex.value]
       return datum ? formatTooltip.value(datum, resolvedHoveredIndex.value) : ''
     })
-
-    const handleMouseEnter = (index: number, event: MouseEvent) => {
-      if (!props.hoverable) return
-      if (props.hoveredIndex === undefined) {
-        localHoveredIndex.value = index
-      }
-      tooltipPosition.value = { x: event.clientX, y: event.clientY }
-      emit('update:hoveredIndex', index)
-      emit('bar-hover', index, props.data[index])
-    }
-
-    const handleMouseMove = (event: MouseEvent) => {
-      tooltipPosition.value = { x: event.clientX, y: event.clientY }
-    }
-
-    const handleMouseLeave = () => {
-      if (!props.hoverable) return
-      if (props.hoveredIndex === undefined) {
-        localHoveredIndex.value = null
-      }
-      emit('update:hoveredIndex', null)
-      emit('bar-hover', null, null)
-    }
-
-    const handleClick = (index: number) => {
-      if (!props.selectable) return
-      const nextIndex = resolvedSelectedIndex.value === index ? null : index
-      if (props.selectedIndex === undefined) {
-        localSelectedIndex.value = nextIndex
-      }
-      emit('update:selectedIndex', nextIndex)
-      emit('bar-click', index, props.data[index])
-    }
-
-    const handleKeyDown = (event: KeyboardEvent, index: number) => {
-      if (!props.selectable) return
-      if (event.key !== 'Enter' && event.key !== ' ') return
-      event.preventDefault()
-      handleClick(index)
-    }
-
-    const handleLegendClick = (index: number) => {
-      handleClick(index)
-    }
-
-    const handleLegendHover = (index: number) => {
-      if (!props.hoverable) return
-      if (props.hoveredIndex === undefined) {
-        localHoveredIndex.value = index
-      }
-      emit('update:hoveredIndex', index)
-    }
-
-    const handleLegendLeave = () => {
-      handleMouseLeave()
-    }
-
-    const wrapperClasses = computed(() =>
-      classNames(
-        'inline-flex',
-        props.legendPosition === 'right'
-          ? 'flex-row items-start gap-4'
-          : props.legendPosition === 'left'
-            ? 'flex-row-reverse items-start gap-4'
-            : props.legendPosition === 'top'
-              ? 'flex-col-reverse gap-2'
-              : 'flex-col gap-2'
-      )
-    )
 
     return () => {
       const chart = h(
