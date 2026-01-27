@@ -119,8 +119,6 @@ export const AreaChart: React.FC<AreaChartProps> = ({
 
   // Use shared interaction hook for series-level interaction
   const {
-    resolvedHoveredIndex,
-    resolvedSelectedIndex,
     activeIndex,
     handleMouseEnter: handleSeriesHoverEnter,
     handleMouseLeave: handleSeriesHoverLeave,

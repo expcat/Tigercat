@@ -16,7 +16,6 @@ import {
   getPageSizeSelectorClasses,
   getTotalTextClasses,
   getPaginationLabels,
-  formatPaginationTotal,
   formatPageAriaLabel,
   type PaginationSize,
   type PaginationAlign,

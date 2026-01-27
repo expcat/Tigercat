@@ -91,8 +91,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
 
   // Use shared interaction hook for series-based interaction
   const {
-    resolvedHoveredIndex,
-    resolvedSelectedIndex,
+    resolvedHoveredIndex: _resolvedHoveredIndex,
+    resolvedSelectedIndex: _resolvedSelectedIndex,
     activeIndex: resolvedActiveIndex,
     tooltipPosition,
     handleMouseEnter: handleHoverEnter,

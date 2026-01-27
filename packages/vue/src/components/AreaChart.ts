@@ -247,15 +247,15 @@ export const AreaChart = defineComponent({
 
     // Use shared interaction composable for series-level interaction
     const {
-      resolvedHoveredIndex,
-      resolvedSelectedIndex,
+      resolvedHoveredIndex: _resolvedHoveredIndex,
+      resolvedSelectedIndex: _resolvedSelectedIndex,
       activeIndex,
       handleMouseEnter: handleSeriesHoverEnter,
       handleMouseLeave: handleSeriesHoverLeave,
       handleClick: handleSeriesSelect,
-      handleLegendClick,
-      handleLegendHover,
-      handleLegendLeave,
+      handleLegendClick: _handleLegendClick,
+      handleLegendHover: _handleLegendHover,
+      handleLegendLeave: _handleLegendLeave,
       wrapperClasses
     } = useChartInteraction<AreaChartSeries>({
       hoverable: computed(() => props.hoverable),

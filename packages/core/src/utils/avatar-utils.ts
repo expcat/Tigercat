@@ -63,7 +63,8 @@ export function getInitials(name: string): string {
 
   if (words.length === 1) {
     const firstWord = words[0]
-    const hasNonASCII = /[^\u0000-\u007F]/.test(firstWord)
+    // Check if contains non-ASCII characters (Unicode range above 0x007F)
+    const hasNonASCII = /[^\x20-\x7E]/.test(firstWord)
     return hasNonASCII ? firstWord.slice(0, 2).toUpperCase() : firstWord.charAt(0).toUpperCase()
   }
 
