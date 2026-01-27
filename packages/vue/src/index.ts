@@ -164,4 +164,11 @@ export type { VueChartLegendProps } from './components/ChartLegend'
 export { ChartTooltip } from './components/ChartTooltip'
 export type { VueChartTooltipProps } from './components/ChartTooltip'
 
+// Composables
+export { useChartInteraction } from './composables/useChartInteraction'
+export type {
+  UseChartInteractionOptions,
+  UseChartInteractionReturn
+} from './composables/useChartInteraction'
+
 export const version = '0.0.1'

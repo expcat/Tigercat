@@ -94,6 +94,30 @@
 | 回到顶部 | BackTop   | ⬜  | ⬜    | ⬜   | ⬜   |
 | 锚点     | Anchor    | ⬜  | ⬜    | ⬜   | ⬜   |
 
+### 数据可视化组件 (Chart Components)
+
+| 组件   | Component    | Vue | React | 文档 | 测试 |
+| ------ | ------------ | --- | ----- | ---- | ---- |
+| 画布   | ChartCanvas  | ✅  | ✅    | ✅   | ✅   |
+| 坐标轴 | ChartAxis    | ✅  | ✅    | ✅   | ✅   |
+| 网格   | ChartGrid    | ✅  | ✅    | ✅   | ✅   |
+| 图例   | ChartLegend  | ✅  | ✅    | ✅   | ✅   |
+| 系列   | ChartSeries  | ✅  | ✅    | ✅   | ✅   |
+| 提示框 | ChartTooltip | ✅  | ✅    | ✅   | ✅   |
+| 柱状图 | BarChart     | ✅  | ✅    | ✅   | ✅   |
+| 折线图 | LineChart    | ✅  | ✅    | ✅   | ✅   |
+| 面积图 | AreaChart    | ✅  | ✅    | ✅   | ✅   |
+| 饼图   | PieChart     | ✅  | ✅    | ✅   | ✅   |
+| 环形图 | DonutChart   | ✅  | ✅    | ✅   | ✅   |
+| 散点图 | ScatterChart | ✅  | ✅    | ✅   | ✅   |
+| 雷达图 | RadarChart   | ✅  | ✅    | ✅   | ✅   |
+
+### 共享逻辑 (Composables / Hooks)
+
+| 功能             | Composable/Hook     | Vue | React | 说明                              |
+| ---------------- | ------------------- | --- | ----- | --------------------------------- |
+| 图表交互状态管理 | useChartInteraction | ✅  | ✅    | 统一处理 hover/select/legend 交互 |
+
 ## 开发优先级
 
 我们将按照以下优先级进行开发：

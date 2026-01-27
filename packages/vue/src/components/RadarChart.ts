@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, ref } from 'vue'
+import { defineComponent, computed, h, PropType } from 'vue'
 import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
@@ -17,6 +17,7 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartSeries } from './ChartSeries'
+import { useChartInteraction } from '../composables/useChartInteraction'
 
 export interface VueRadarChartProps extends CoreRadarChartProps {
   data?: RadarChartDatum[]
@@ -193,9 +194,6 @@ export const RadarChart = defineComponent({
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'series-click', 'series-hover'],
   setup(props, { emit }) {
-    const localHoveredIndex = ref<number | null>(null)
-    const localSelectedIndex = ref<number | null>(null)
-
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 
     const radius = computed(() =>
@@ -208,6 +206,31 @@ export const RadarChart = defineComponent({
     const resolvedSeries = computed<RadarChartSeries[]>(() => {
       if (props.series && props.series.length > 0) return props.series
       return [{ data: props.data ?? [] }]
+    })
+
+    // Use shared interaction composable
+    const {
+      resolvedHoveredIndex,
+      resolvedSelectedIndex,
+      activeIndex: resolvedActiveIndex,
+      handleMouseEnter: handleHoverEnter,
+      handleMouseLeave: handleHoverLeave,
+      handleClick: handleSelectIndex,
+      wrapperClasses
+    } = useChartInteraction<RadarChartSeries>({
+      hoverable: computed(() => props.hoverable),
+      hoveredIndexProp: props.hoveredIndex,
+      selectable: computed(() => props.selectable),
+      selectedIndexProp: props.selectedIndex,
+      activeOpacity: computed(() => props.activeOpacity),
+      inactiveOpacity: computed(() => props.inactiveOpacity),
+      legendPosition: computed(() => props.legendPosition),
+      emit: emit as (event: string, ...args: unknown[]) => void,
+      getData: (index: number) => resolvedSeries.value[index],
+      eventNames: {
+        hover: 'series-hover',
+        click: 'series-click'
+      }
     })
 
     const axisData = computed(() => {
@@ -326,42 +349,6 @@ export const RadarChart = defineComponent({
           return `${name} · ${label}: ${value}`
         })
     )
-    const resolvedSelectedIndex = computed(() =>
-      props.selectedIndex !== undefined ? props.selectedIndex : localSelectedIndex.value
-    )
-
-    const resolvedHoveredIndex = computed(() =>
-      props.hoveredIndex !== undefined ? props.hoveredIndex : localHoveredIndex.value
-    )
-
-    const resolvedActiveIndex = computed(() => {
-      if (resolvedSelectedIndex.value !== null) return resolvedSelectedIndex.value
-      if (props.hoverable && resolvedHoveredIndex.value !== null) return resolvedHoveredIndex.value
-      return null
-    })
-
-    const handleHover = (index: number | null) => {
-      if (!props.hoverable) return
-      if (props.hoveredIndex === undefined) {
-        localHoveredIndex.value = index
-      }
-      emit('update:hoveredIndex', index)
-      if (index !== null) {
-        emit('series-hover', index, resolvedSeries.value[index])
-      } else {
-        emit('series-hover', null, null)
-      }
-    }
-
-    const handleSelectIndex = (index: number) => {
-      if (!props.selectable) return
-      const nextIndex = resolvedSelectedIndex.value === index ? null : index
-      if (props.selectedIndex === undefined) {
-        localSelectedIndex.value = nextIndex
-      }
-      emit('update:selectedIndex', nextIndex)
-      emit('series-click', index, resolvedSeries.value[index])
-    }
     const resolvedLegendItems = computed(() =>
       resolvedSeries.value.map((item, index) => {
         const color = item.color ?? palette.value[index % palette.value.length]
@@ -380,12 +367,6 @@ export const RadarChart = defineComponent({
       classNames(
         'flex flex-wrap',
         props.legendPosition === 'right' ? 'flex-col gap-2' : 'flex-row gap-3'
-      )
-    )
-    const wrapperClasses = computed(() =>
-      classNames(
-        'inline-flex',
-        props.legendPosition === 'right' ? 'flex-row items-start gap-4' : 'flex-col gap-2'
       )
     )
 
@@ -458,8 +439,10 @@ export const RadarChart = defineComponent({
                       props.hoverable || props.selectable ? 'cursor-pointer' : null
                     ),
                     opacity: resolvedOpacity,
-                    onMouseenter: props.hoverable ? () => handleHover(seriesIndex) : undefined,
-                    onMouseleave: props.hoverable ? () => handleHover(null) : undefined,
+                    onMouseenter: props.hoverable
+                      ? (e: MouseEvent) => handleHoverEnter(seriesIndex, e)
+                      : undefined,
+                    onMouseleave: props.hoverable ? handleHoverLeave : undefined,
                     onClick: props.selectable ? () => handleSelectIndex(seriesIndex) : undefined,
                     tabindex: props.selectable ? 0 : undefined,
                     onKeydown: (event: KeyboardEvent) => {
@@ -563,8 +546,10 @@ export const RadarChart = defineComponent({
                   props.selectable ? 'cursor-pointer' : 'cursor-default'
                 ),
                 onClick: props.selectable ? () => handleSelectIndex(item.index) : undefined,
-                onMouseenter: props.hoverable ? () => handleHover(item.index) : undefined,
-                onMouseleave: props.hoverable ? () => handleHover(null) : undefined
+                onMouseenter: props.hoverable
+                  ? (e: MouseEvent) => handleHoverEnter(item.index, e)
+                  : undefined,
+                onMouseleave: props.hoverable ? handleHoverLeave : undefined
               },
               [
                 h('span', {
