@@ -88,7 +88,7 @@ const BarChartDemo: React.FC = () => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [clickedBar, setClickedBar] = useState('')
 
-  const handleBarClick = (datum: BarChartDatum, index: number) => {
+  const handleBarClick = (_index: number, datum: BarChartDatum) => {
     setClickedBar(`点击了 ${datum.x}，值为 ${datum.y}`)
   }
 

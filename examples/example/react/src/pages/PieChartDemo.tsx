@@ -68,7 +68,7 @@ const PieChartDemo: React.FC = () => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [clickedSlice, setClickedSlice] = useState('')
 
-  const handleSliceClick = (datum: PieChartDatum, index: number) => {
+  const handleSliceClick = (_index: number, datum: PieChartDatum) => {
     setClickedSlice(`点击了 ${datum.label}，占比 ${datum.value}%`)
   }
 
