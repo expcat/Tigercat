@@ -4,6 +4,10 @@ import {
   iconSizeClasses,
   iconSvgBaseClasses,
   iconWrapperClasses,
+  SVG_DEFAULT_XMLNS,
+  SVG_DEFAULT_VIEWBOX_24,
+  SVG_DEFAULT_FILL,
+  SVG_DEFAULT_STROKE,
   type IconProps as CoreIconProps
 } from '@expcat/tigercat-core'
 
@@ -35,10 +39,10 @@ export const Icon: React.FC<IconProps> = ({
     return React.cloneElement(child, {
       ...svgProps,
       className: classNames(iconSvgBaseClasses, iconSizeClasses[size], svgProps.className),
-      xmlns: svgProps.xmlns ?? 'http://www.w3.org/2000/svg',
-      viewBox: svgProps.viewBox ?? '0 0 24 24',
-      fill: svgProps.fill ?? 'none',
-      stroke: svgProps.stroke ?? 'currentColor',
+      xmlns: svgProps.xmlns ?? SVG_DEFAULT_XMLNS,
+      viewBox: svgProps.viewBox ?? SVG_DEFAULT_VIEWBOX_24,
+      fill: svgProps.fill ?? SVG_DEFAULT_FILL,
+      stroke: svgProps.stroke ?? SVG_DEFAULT_STROKE,
       strokeWidth: svgProps.strokeWidth ?? 2,
       strokeLinecap: svgProps.strokeLinecap ?? 'round',
       strokeLinejoin: svgProps.strokeLinejoin ?? 'round'
