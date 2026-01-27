@@ -6,6 +6,4 @@
  */
 
 export * from '../common-icons'
-export * from '../datepicker-icons'
-export * from '../timepicker-icons'
 export * from '../svg-attrs'

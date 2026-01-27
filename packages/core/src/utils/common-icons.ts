@@ -96,3 +96,34 @@ export const statusIconPaths: Record<StatusIconType, string> = {
   error: statusErrorIconPath,
   info: statusInfoIconPath
 }
+
+/**
+ * Table sort icon paths (16x16)
+ */
+export const icon16ViewBox = '0 0 16 16'
+export const sortAscIcon16PathD = 'M8 3l4 4H4l4-4z'
+export const sortDescIcon16PathD = 'M8 13l-4-4h8l-4 4z'
+export const sortBothIcon16PathD = 'M8 3l4 4H4l4-4zM8 13l-4-4h8l-4 4z'
+
+/**
+ * Lock icon paths (24x24)
+ * Used by Table fixed column indicator.
+ */
+export const lockClosedIcon24PathD =
+  'M17 8h-1V6a4 4 0 10-8 0v2H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V10a2 2 0 00-2-2zm-7-2a2 2 0 114 0v2h-4V6z'
+export const lockOpenIcon24PathD =
+  'M17 8h-1V6a4 4 0 00-7.75-1.41 1 1 0 101.9.62A2 2 0 0114 6v2H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V10a2 2 0 00-2-2zm0 12H7V10h10v10z'
+
+/**
+ * DatePicker icon aliases (re-exports for backward compatibility)
+ */
+export const CalendarIconPath = calendarSolidIcon20PathD
+export const CloseIconPath = closeSolidIcon20PathD
+export const ChevronLeftIconPath = chevronLeftSolidIcon20PathD
+export const ChevronRightIconPath = chevronRightSolidIcon20PathD
+
+/**
+ * TimePicker icon aliases (re-exports for backward compatibility)
+ */
+export const ClockIconPath = clockSolidIcon20PathD
+export const TimePickerCloseIconPath = closeSolidIcon20PathD

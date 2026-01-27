@@ -18,7 +18,25 @@ export * from '../radio-group-utils'
 export * from '../date-utils'
 export * from '../datepicker-styles'
 export * from '../time-utils'
-export * from '../timepicker-styles'
+export {
+  // Style classes
+  timePickerBaseClasses,
+  timePickerInputWrapperClasses,
+  getTimePickerInputClasses,
+  getTimePickerIconButtonClasses,
+  timePickerClearButtonClasses,
+  timePickerPanelClasses,
+  timePickerPanelContentClasses,
+  timePickerRangeHeaderClasses,
+  getTimePickerRangeTabButtonClasses,
+  timePickerColumnClasses,
+  timePickerColumnHeaderClasses,
+  timePickerColumnListClasses,
+  getTimePickerItemClasses,
+  getTimePickerPeriodButtonClasses,
+  timePickerFooterClasses,
+  timePickerFooterButtonClasses
+} from '../timepicker-utils'
 export * from '../upload-utils'
 
 // Layout components

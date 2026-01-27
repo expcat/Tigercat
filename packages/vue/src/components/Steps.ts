@@ -149,48 +149,25 @@ export const Steps = defineComponent({
       handleStepClick: props.clickable ? handleStepClick : undefined
     })
 
-    // Watch for changes to current and update context
+    // Batch watch all props that need to sync to context
     watch(
-      () => props.current,
-      (newCurrent) => {
-        stepsContextValue.current = newCurrent
-      }
-    )
-
-    // Watch for changes to status and update context
-    watch(
-      () => props.status,
-      (newStatus) => {
-        stepsContextValue.status = newStatus
-      }
-    )
-
-    watch(
-      () => props.direction,
-      (newDirection) => {
-        stepsContextValue.direction = newDirection
-      }
-    )
-
-    watch(
-      () => props.size,
-      (newSize) => {
-        stepsContextValue.size = newSize
-      }
-    )
-
-    watch(
-      () => props.simple,
-      (newSimple) => {
-        stepsContextValue.simple = newSimple
-      }
-    )
-
-    watch(
-      () => props.clickable,
-      (newClickable) => {
-        stepsContextValue.clickable = newClickable
-        stepsContextValue.handleStepClick = newClickable ? handleStepClick : undefined
+      () =>
+        [
+          props.current,
+          props.status,
+          props.direction,
+          props.size,
+          props.simple,
+          props.clickable
+        ] as const,
+      ([current, status, direction, size, simple, clickable]) => {
+        stepsContextValue.current = current
+        stepsContextValue.status = status
+        stepsContextValue.direction = direction
+        stepsContextValue.size = size
+        stepsContextValue.simple = simple
+        stepsContextValue.clickable = clickable
+        stepsContextValue.handleStepClick = clickable ? handleStepClick : undefined
       }
     )
 
