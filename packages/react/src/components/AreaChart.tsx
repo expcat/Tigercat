@@ -24,6 +24,7 @@ import { ChartGrid } from './ChartGrid'
 import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
+import { useChartInteraction } from '../hooks/useChartInteraction'
 
 export interface AreaChartProps extends CoreAreaChartProps {
   data?: AreaChartDatum[]
@@ -98,8 +99,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   onPointClick,
   onPointHover
 }) => {
-  const [localHoveredIndex, setLocalHoveredIndex] = useState<number | null>(null)
-  const [localSelectedIndex, setLocalSelectedIndex] = useState<number | null>(null)
+  // Point-level hover state (not managed by hook)
   const [hoveredPointInfo, setHoveredPointInfo] = useState<{
     seriesIndex: number
     pointIndex: number
@@ -116,6 +116,39 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     if (data && data.length > 0) return [{ data }]
     return []
   }, [series, data])
+
+  // Use shared interaction hook for series-level interaction
+  const {
+    resolvedHoveredIndex,
+    resolvedSelectedIndex,
+    activeIndex,
+    handleMouseEnter: handleSeriesHoverEnter,
+    handleMouseLeave: handleSeriesHoverLeave,
+    handleClick: handleSeriesSelect,
+    handleLegendClick,
+    handleLegendHover,
+    handleLegendLeave,
+    wrapperClasses
+  } = useChartInteraction<AreaChartSeries>({
+    hoverable,
+    hoveredIndexProp,
+    selectable,
+    selectedIndexProp,
+    activeOpacity,
+    inactiveOpacity,
+    legendPosition,
+    getData: (index: number) => resolvedSeries[index],
+    onHoveredIndexChange: (index) => {
+      onHoveredIndexChange?.(index)
+      onSeriesHover?.(index, index !== null ? resolvedSeries[index] : null)
+    },
+    onSelectedIndexChange: (index) => {
+      onSelectedIndexChange?.(index)
+      if (index !== null) {
+        onSeriesClick?.(index, resolvedSeries[index])
+      }
+    }
+  })
 
   const allData = useMemo(() => resolvedSeries.flatMap((s) => s.data), [resolvedSeries])
   const xValues = useMemo(() => allData.map((d) => d.x), [allData])
@@ -156,16 +189,6 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     () => (colors && colors.length > 0 ? colors : [...DEFAULT_CHART_COLORS]),
     [colors]
   )
-
-  const resolvedHoveredIndex = hoveredIndexProp !== undefined ? hoveredIndexProp : localHoveredIndex
-  const resolvedSelectedIndex =
-    selectedIndexProp !== undefined ? selectedIndexProp : localSelectedIndex
-
-  const activeIndex = useMemo(() => {
-    if (resolvedSelectedIndex !== null) return resolvedSelectedIndex
-    if (hoverable && resolvedHoveredIndex !== null) return resolvedHoveredIndex
-    return null
-  }, [resolvedSelectedIndex, hoverable, resolvedHoveredIndex])
 
   const seriesData = useMemo(() => {
     const stackedData = stacked ? stackSeriesData(resolvedSeries.map((s) => s.data)) : null
@@ -280,27 +303,6 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     return datum ? formatTooltip(datum, seriesIndex, pointIndex, s) : ''
   }, [hoveredPointInfo, resolvedSeries, formatTooltip])
 
-  const handleSeriesMouseEnter = useCallback(
-    (seriesIndex: number) => {
-      if (!hoverable) return
-      if (hoveredIndexProp === undefined) {
-        setLocalHoveredIndex(seriesIndex)
-      }
-      onHoveredIndexChange?.(seriesIndex)
-      onSeriesHover?.(seriesIndex, resolvedSeries[seriesIndex])
-    },
-    [hoverable, hoveredIndexProp, onHoveredIndexChange, onSeriesHover, resolvedSeries]
-  )
-
-  const handleSeriesMouseLeave = useCallback(() => {
-    if (!hoverable) return
-    if (hoveredIndexProp === undefined) {
-      setLocalHoveredIndex(null)
-    }
-    onHoveredIndexChange?.(null)
-    onSeriesHover?.(null, null)
-  }, [hoverable, hoveredIndexProp, onHoveredIndexChange, onSeriesHover])
-
   const handlePointMouseEnter = useCallback(
     (seriesIndex: number, pointIndex: number, event: React.MouseEvent) => {
       setHoveredPointInfo({ seriesIndex, pointIndex })
@@ -319,32 +321,12 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     onPointHover?.(null, null, null)
   }, [onPointHover])
 
-  const handleSeriesClick = useCallback(
-    (seriesIndex: number) => {
-      if (!selectable) return
-      const nextIndex = resolvedSelectedIndex === seriesIndex ? null : seriesIndex
-      if (selectedIndexProp === undefined) {
-        setLocalSelectedIndex(nextIndex)
-      }
-      onSelectedIndexChange?.(nextIndex)
-      onSeriesClick?.(seriesIndex, resolvedSeries[seriesIndex])
-    },
-    [
-      selectable,
-      resolvedSelectedIndex,
-      selectedIndexProp,
-      onSelectedIndexChange,
-      onSeriesClick,
-      resolvedSeries
-    ]
-  )
-
   const handlePointClick = useCallback(
     (seriesIndex: number, pointIndex: number) => {
       onPointClick?.(seriesIndex, pointIndex, resolvedSeries[seriesIndex]?.data[pointIndex])
-      handleSeriesClick(seriesIndex)
+      handleSeriesSelect(seriesIndex)
     },
-    [onPointClick, resolvedSeries, handleSeriesClick]
+    [onPointClick, resolvedSeries, handleSeriesSelect]
   )
 
   const handleKeyDown = useCallback(
@@ -352,46 +334,9 @@ export const AreaChart: React.FC<AreaChartProps> = ({
       if (!selectable) return
       if (event.key !== 'Enter' && event.key !== ' ') return
       event.preventDefault()
-      handleSeriesClick(seriesIndex)
+      handleSeriesSelect(seriesIndex)
     },
-    [selectable, handleSeriesClick]
-  )
-
-  const handleLegendClick = useCallback(
-    (index: number) => {
-      handleSeriesClick(index)
-    },
-    [handleSeriesClick]
-  )
-
-  const handleLegendHover = useCallback(
-    (index: number) => {
-      if (!hoverable) return
-      if (hoveredIndexProp === undefined) {
-        setLocalHoveredIndex(index)
-      }
-      onHoveredIndexChange?.(index)
-    },
-    [hoverable, hoveredIndexProp, onHoveredIndexChange]
-  )
-
-  const handleLegendLeave = useCallback(() => {
-    handleSeriesMouseLeave()
-  }, [handleSeriesMouseLeave])
-
-  const wrapperClasses = useMemo(
-    () =>
-      classNames(
-        'inline-flex',
-        legendPosition === 'right'
-          ? 'flex-row items-start gap-4'
-          : legendPosition === 'left'
-            ? 'flex-row-reverse items-start gap-4'
-            : legendPosition === 'top'
-              ? 'flex-col-reverse gap-2'
-              : 'flex-col gap-2'
-      ),
-    [legendPosition]
+    [selectable, handleSeriesSelect]
   )
 
   // Reverse for proper stacking visual
@@ -447,9 +392,9 @@ export const AreaChart: React.FC<AreaChartProps> = ({
           type="area"
           opacity={sd.opacity}
           className={classNames(sd.series.className, (hoverable || selectable) && 'cursor-pointer')}
-          onMouseEnter={() => handleSeriesMouseEnter(sd.seriesIndex)}
-          onMouseLeave={handleSeriesMouseLeave}
-          onClick={() => handleSeriesClick(sd.seriesIndex)}
+          onMouseEnter={(e: React.MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e)}
+          onMouseLeave={handleSeriesHoverLeave}
+          onClick={() => handleSeriesSelect(sd.seriesIndex)}
           tabIndex={selectable ? 0 : undefined}
           onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, sd.seriesIndex)}>
           <path
