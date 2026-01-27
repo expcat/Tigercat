@@ -5,6 +5,11 @@
 import type { SpaceSize, SpaceAlign, SpaceDirection } from '../types/space'
 
 /**
+ * Base class for Space component
+ */
+export const SPACE_BASE_CLASS = 'inline-flex'
+
+/**
  * Get gap size class or style based on SpaceSize
  * @param size - Space size (preset or custom number)
  * @returns Object with class or style property
