@@ -50,9 +50,9 @@ const blockSnippet = `<Space direction="vertical" class="w-full">
 </Space>`
 
 const fullWidthSnippet = `<Space direction="vertical" class="w-full">
-  <Button variant="primary" class="w-full">主要按钮</Button>
-  <Button variant="secondary" class="w-full">次要按钮</Button>
-  <Button variant="outline" class="w-full">轮廓按钮</Button>
+  <Button variant="primary" class="w-1/2">50% 宽度</Button>
+  <Button variant="secondary" class="w-3/4">75% 宽度</Button>
+  <Button variant="outline" class="w-full">100% 宽度</Button>
 </Space>`
 
 const customLoadingSnippet = `<Button loading>
@@ -160,18 +160,18 @@ const customLoadingSnippet = `<Button loading>
       </Space>
     </DemoBlock>
 
-    <!-- 全宽按钮 -->
-    <DemoBlock title="全宽按钮"
-               description="使用 class 设置按钮宽度。"
+    <!-- 自定义宽度按钮 -->
+    <DemoBlock title="自定义宽度按钮"
+               description="使用 class 设置按钮为任意宽度，与 block 属性不同，可以灵活控制宽度比例。"
                :code="fullWidthSnippet">
       <Space direction="vertical"
              class="w-full">
         <Button variant="primary"
-                class="w-full">主要按钮</Button>
+                class="w-1/2">50% 宽度</Button>
         <Button variant="secondary"
-                class="w-full">次要按钮</Button>
+                class="w-3/4">75% 宽度</Button>
         <Button variant="outline"
-                class="w-full">轮廓按钮</Button>
+                class="w-full">100% 宽度</Button>
       </Space>
     </DemoBlock>
   </div>

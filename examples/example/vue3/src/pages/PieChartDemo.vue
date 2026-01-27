@@ -10,13 +10,6 @@ const basicData: PieChartDatum[] = [
   { value: 15, label: 'D' }
 ]
 
-const donutData: PieChartDatum[] = [
-  { value: 320, label: 'Q1' },
-  { value: 280, label: 'Q2' },
-  { value: 360, label: 'Q3' },
-  { value: 420, label: 'Q4' }
-]
-
 const interactiveData: PieChartDatum[] = [
   { value: 35, label: '产品 A', color: '#2563eb' },
   { value: 28, label: '产品 B', color: '#22c55e' },
@@ -36,15 +29,6 @@ const basicSnippet = `<PieChart
   :data="data"
   :width="320"
   :height="220"
-  :show-labels="true"
-/>`
-
-const donutSnippet = `<PieChart
-  :data="donutData"
-  :width="320"
-  :height="220"
-  :inner-radius="60"
-  :pad-angle="0.02"
   :show-labels="true"
 />`
 
@@ -103,17 +87,6 @@ const tooltipSnippet = `<PieChart
                 :show-labels="true" />
     </DemoBlock>
 
-    <DemoBlock title="环形图"
-               description="通过内半径渲染环形图。"
-               :code="donutSnippet">
-      <PieChart :data="donutData"
-                :width="320"
-                :height="220"
-                :inner-radius="60"
-                :pad-angle="0.02"
-                :show-labels="true" />
-    </DemoBlock>
-
     <DemoBlock title="悬停高亮"
                description="启用 hoverable 后，鼠标悬停时高亮扇区。"
                :code="hoverableSnippet">
@@ -144,7 +117,8 @@ const tooltipSnippet = `<PieChart
                   @slice-click="handleSliceClick" />
         <p class="text-sm text-gray-500">
           选中: {{ selectedIndex !== null ? interactiveData[selectedIndex]?.label : '无' }}
-          <span v-if="clickedSlice" class="ml-4">{{ clickedSlice }}</span>
+          <span v-if="clickedSlice"
+                class="ml-4">{{ clickedSlice }}</span>
         </p>
       </div>
     </DemoBlock>
