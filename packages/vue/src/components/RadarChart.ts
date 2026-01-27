@@ -90,14 +90,15 @@ export const RadarChart = defineComponent({
       type: Boolean,
       default: false
     },
-    activeSeriesIndex: {
-      type: Number
+    hoveredIndex: {
+      type: Number as PropType<number | null>,
+      default: undefined
     },
-    hoverOpacity: {
+    activeOpacity: {
       type: Number,
       default: 1
     },
-    mutedOpacity: {
+    inactiveOpacity: {
       type: Number,
       default: 0.25
     },
@@ -105,8 +106,9 @@ export const RadarChart = defineComponent({
       type: Boolean,
       default: false
     },
-    selectedSeriesIndex: {
-      type: Number
+    selectedIndex: {
+      type: Number as PropType<number | null>,
+      default: undefined
     },
     showLegend: {
       type: Boolean,
@@ -189,9 +191,9 @@ export const RadarChart = defineComponent({
       type: String
     }
   },
-  emits: ['update:selectedSeriesIndex', 'series-click'],
+  emits: ['update:hoveredIndex', 'update:selectedIndex', 'series-click', 'series-hover'],
   setup(props, { emit }) {
-    const hoveredIndex = ref<number | null>(null)
+    const localHoveredIndex = ref<number | null>(null)
     const localSelectedIndex = ref<number | null>(null)
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
@@ -325,39 +327,39 @@ export const RadarChart = defineComponent({
         })
     )
     const resolvedSelectedIndex = computed(() =>
-      typeof props.selectedSeriesIndex === 'number'
-        ? props.selectedSeriesIndex
-        : localSelectedIndex.value
+      props.selectedIndex !== undefined ? props.selectedIndex : localSelectedIndex.value
     )
-    const resolvedActiveIndex = computed(() =>
-      typeof props.activeSeriesIndex === 'number'
-        ? props.activeSeriesIndex
-        : resolvedSelectedIndex.value !== null
-          ? resolvedSelectedIndex.value
-          : props.hoverable
-            ? hoveredIndex.value
-            : null
+
+    const resolvedHoveredIndex = computed(() =>
+      props.hoveredIndex !== undefined ? props.hoveredIndex : localHoveredIndex.value
     )
-    const shouldHandleHover = computed(
-      () =>
-        props.hoverable &&
-        typeof props.activeSeriesIndex !== 'number' &&
-        resolvedSelectedIndex.value === null
-    )
-    const shouldHandleSelect = computed(
-      () => props.selectable && typeof props.selectedSeriesIndex !== 'number'
-    )
+
+    const resolvedActiveIndex = computed(() => {
+      if (resolvedSelectedIndex.value !== null) return resolvedSelectedIndex.value
+      if (props.hoverable && resolvedHoveredIndex.value !== null) return resolvedHoveredIndex.value
+      return null
+    })
+
     const handleHover = (index: number | null) => {
-      if (!shouldHandleHover.value) return
-      hoveredIndex.value = index
+      if (!props.hoverable) return
+      if (props.hoveredIndex === undefined) {
+        localHoveredIndex.value = index
+      }
+      emit('update:hoveredIndex', index)
+      if (index !== null) {
+        emit('series-hover', index, resolvedSeries.value[index])
+      } else {
+        emit('series-hover', null, null)
+      }
     }
+
     const handleSelectIndex = (index: number) => {
       if (!props.selectable) return
       const nextIndex = resolvedSelectedIndex.value === index ? null : index
-      if (typeof props.selectedSeriesIndex !== 'number') {
+      if (props.selectedIndex === undefined) {
         localSelectedIndex.value = nextIndex
       }
-      emit('update:selectedSeriesIndex', nextIndex)
+      emit('update:selectedIndex', nextIndex)
       emit('series-click', index, resolvedSeries.value[index])
     }
     const resolvedLegendItems = computed(() =>
@@ -441,8 +443,8 @@ export const RadarChart = defineComponent({
                   resolvedActiveIndex.value === null
                     ? undefined
                     : seriesIndex === resolvedActiveIndex.value
-                      ? props.hoverOpacity
-                      : props.mutedOpacity
+                      ? props.activeOpacity
+                      : props.inactiveOpacity
 
                 return h(
                   ChartSeries,
@@ -456,14 +458,12 @@ export const RadarChart = defineComponent({
                       props.hoverable || props.selectable ? 'cursor-pointer' : null
                     ),
                     opacity: resolvedOpacity,
-                    onMouseenter: shouldHandleHover.value
-                      ? () => handleHover(seriesIndex)
-                      : undefined,
-                    onMouseleave: shouldHandleHover.value ? () => handleHover(null) : undefined,
+                    onMouseenter: props.hoverable ? () => handleHover(seriesIndex) : undefined,
+                    onMouseleave: props.hoverable ? () => handleHover(null) : undefined,
                     onClick: props.selectable ? () => handleSelectIndex(seriesIndex) : undefined,
                     tabindex: props.selectable ? 0 : undefined,
                     onKeydown: (event: KeyboardEvent) => {
-                      if (!shouldHandleSelect.value) return
+                      if (!props.selectable) return
                       if (event.key !== 'Enter' && event.key !== ' ') return
                       event.preventDefault()
                       handleSelectIndex(seriesIndex)
@@ -563,8 +563,8 @@ export const RadarChart = defineComponent({
                   props.selectable ? 'cursor-pointer' : 'cursor-default'
                 ),
                 onClick: props.selectable ? () => handleSelectIndex(item.index) : undefined,
-                onMouseenter: shouldHandleHover.value ? () => handleHover(item.index) : undefined,
-                onMouseleave: shouldHandleHover.value ? () => handleHover(null) : undefined
+                onMouseenter: props.hoverable ? () => handleHover(item.index) : undefined,
+                onMouseleave: props.hoverable ? () => handleHover(null) : undefined
               },
               [
                 h('span', {

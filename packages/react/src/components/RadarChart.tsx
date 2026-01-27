@@ -27,25 +27,10 @@ export interface RadarChartProps extends CoreRadarChartProps {
   levelLabelOffset?: number
   title?: string
   desc?: string
-  hoverable?: boolean
-  activeSeriesIndex?: number
-  hoverOpacity?: number
-  mutedOpacity?: number
-  showTooltip?: boolean
-  tooltipFormatter?: (
-    datum: RadarChartDatum,
-    seriesIndex: number,
-    index: number,
-    series?: RadarChartSeries
-  ) => string
-  selectable?: boolean
-  selectedSeriesIndex?: number
-  onSelectedSeriesChange?: (index: number | null) => void
-  showLegend?: boolean
-  legendPosition?: 'bottom' | 'right'
-  legendFormatter?: (series: RadarChartSeries, index: number) => string
-  legendMarkerSize?: number
-  legendGap?: number
+  onHoveredIndexChange?: (index: number | null) => void
+  onSelectedIndexChange?: (index: number | null) => void
+  onSeriesClick?: (index: number, series: RadarChartSeries) => void
+  onSeriesHover?: (index: number | null, series: RadarChartSeries | null) => void
 }
 
 export const RadarChart: React.FC<RadarChartProps> = ({
@@ -69,14 +54,17 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   gridLineStyle = 'solid',
   gridStrokeWidth = 1,
   hoverable = false,
-  activeSeriesIndex,
-  hoverOpacity = 1,
-  mutedOpacity = 0.25,
+  hoveredIndex: hoveredIndexProp,
+  activeOpacity = 1,
+  inactiveOpacity = 0.25,
   showTooltip = true,
   tooltipFormatter,
   selectable = false,
-  selectedSeriesIndex,
-  onSelectedSeriesChange,
+  selectedIndex: selectedIndexProp,
+  onHoveredIndexChange,
+  onSelectedIndexChange,
+  onSeriesClick,
+  onSeriesHover,
   showLegend = false,
   legendPosition = 'bottom',
   legendFormatter,
@@ -93,7 +81,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   desc,
   className
 }) => {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const [localHoveredIndex, setLocalHoveredIndex] = useState<number | null>(null)
   const [localSelectedIndex, setLocalSelectedIndex] = useState<number | null>(null)
   const innerRect = useMemo(
     () => getChartInnerRect(width, height, padding),
@@ -232,29 +220,35 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     [tooltipFormatter]
   )
   const resolvedSelectedIndex =
-    typeof selectedSeriesIndex === 'number' ? selectedSeriesIndex : localSelectedIndex
-  const resolvedActiveIndex =
-    typeof activeSeriesIndex === 'number'
-      ? activeSeriesIndex
-      : resolvedSelectedIndex !== null
-        ? resolvedSelectedIndex
-        : hoverable
-          ? hoveredIndex
-          : null
-  const shouldHandleHover =
-    hoverable && typeof activeSeriesIndex !== 'number' && resolvedSelectedIndex === null
-  const shouldHandleSelect = selectable && typeof selectedSeriesIndex !== 'number'
+    selectedIndexProp !== undefined ? selectedIndexProp : localSelectedIndex
+  const resolvedHoveredIndex = hoveredIndexProp !== undefined ? hoveredIndexProp : localHoveredIndex
+  const resolvedActiveIndex = useMemo(() => {
+    if (resolvedSelectedIndex !== null) return resolvedSelectedIndex
+    if (hoverable && resolvedHoveredIndex !== null) return resolvedHoveredIndex
+    return null
+  }, [resolvedSelectedIndex, hoverable, resolvedHoveredIndex])
+
   const handleHover = (index: number | null) => {
-    if (!shouldHandleHover) return
-    setHoveredIndex(index)
+    if (!hoverable) return
+    if (hoveredIndexProp === undefined) {
+      setLocalHoveredIndex(index)
+    }
+    onHoveredIndexChange?.(index)
+    if (index !== null) {
+      onSeriesHover?.(index, resolvedSeries[index])
+    } else {
+      onSeriesHover?.(null, null)
+    }
   }
+
   const handleSelectIndex = (index: number) => {
     if (!selectable) return
     const nextIndex = resolvedSelectedIndex === index ? null : index
-    if (typeof selectedSeriesIndex !== 'number') {
+    if (selectedIndexProp === undefined) {
       setLocalSelectedIndex(nextIndex)
     }
-    onSelectedSeriesChange?.(nextIndex)
+    onSelectedIndexChange?.(nextIndex)
+    onSeriesClick?.(index, resolvedSeries[index])
   }
   const resolvedLegendItems = useMemo(
     () =>
@@ -325,8 +319,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
           resolvedActiveIndex === null
             ? undefined
             : seriesIndex === resolvedActiveIndex
-              ? hoverOpacity
-              : mutedOpacity
+              ? activeOpacity
+              : inactiveOpacity
 
         return (
           <ChartSeries
@@ -337,12 +331,12 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             className={item.series.className}
             opacity={resolvedOpacity}
             style={hoverable || selectable ? { cursor: 'pointer' } : undefined}
-            onMouseEnter={shouldHandleHover ? () => handleHover(seriesIndex) : undefined}
-            onMouseLeave={shouldHandleHover ? () => handleHover(null) : undefined}
+            onMouseEnter={hoverable ? () => handleHover(seriesIndex) : undefined}
+            onMouseLeave={hoverable ? () => handleHover(null) : undefined}
             onClick={selectable ? () => handleSelectIndex(seriesIndex) : undefined}
             tabIndex={selectable ? 0 : undefined}
             onKeyDown={(event) => {
-              if (!shouldHandleSelect) return
+              if (!selectable) return
               if (event.key !== 'Enter' && event.key !== ' ') return
               event.preventDefault()
               handleSelectIndex(seriesIndex)
@@ -422,8 +416,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
               selectable ? 'cursor-pointer' : 'cursor-default'
             )}
             onClick={selectable ? () => handleSelectIndex(item.index) : undefined}
-            onMouseEnter={shouldHandleHover ? () => handleHover(item.index) : undefined}
-            onMouseLeave={shouldHandleHover ? () => handleHover(null) : undefined}>
+            onMouseEnter={hoverable ? () => handleHover(item.index) : undefined}
+            onMouseLeave={hoverable ? () => handleHover(null) : undefined}>
             <span
               className="inline-block rounded-full"
               style={{

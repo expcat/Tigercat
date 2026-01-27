@@ -56,14 +56,15 @@ describe('RadarChart', () => {
   it('applies hover highlight opacity', () => {
     const { container } = renderWithProps(RadarChart, {
       series: multiSeriesData,
-      activeSeriesIndex: 1,
-      hoverOpacity: 1,
-      mutedOpacity: 0.2
+      hoverable: true,
+      hoveredIndex: 1,
+      activeOpacity: 1,
+      inactiveOpacity: 0.25
     })
 
     expect(container.querySelector('g[data-series-name="Series A"]')).toHaveAttribute(
       'opacity',
-      '0.2'
+      '0.25'
     )
     expect(container.querySelector('g[data-series-name="Series B"]')).toHaveAttribute(
       'opacity',
@@ -87,7 +88,7 @@ describe('RadarChart', () => {
     const { container } = renderWithProps(RadarChart, {
       series: multiSeriesData,
       selectable: true,
-      mutedOpacity: 0.2
+      inactiveOpacity: 0.25
     })
 
     const seriesA = container.querySelector('g[data-series-name="Series A"]') as SVGGElement
@@ -96,7 +97,7 @@ describe('RadarChart', () => {
     expect(seriesA).toHaveAttribute('opacity', '1')
     expect(container.querySelector('g[data-series-name="Series B"]')).toHaveAttribute(
       'opacity',
-      '0.2'
+      '0.25'
     )
   })
 

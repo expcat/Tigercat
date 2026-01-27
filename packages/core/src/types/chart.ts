@@ -145,6 +145,99 @@ export interface ChartTooltipProps {
 }
 
 /**
+ * Common props for charts with X/Y axes (Bar, Line, Area, Scatter)
+ */
+export interface ChartWithAxesProps {
+  /**
+   * Custom x scale
+   */
+  xScale?: ChartScale
+
+  /**
+   * Custom y scale
+   */
+  yScale?: ChartScale
+
+  /**
+   * Whether to show grid
+   * @default true
+   */
+  showGrid?: boolean
+
+  /**
+   * Whether to show axes
+   * @default true
+   */
+  showAxis?: boolean
+
+  /**
+   * Whether to show X axis
+   * @default true
+   */
+  showXAxis?: boolean
+
+  /**
+   * Whether to show Y axis
+   * @default true
+   */
+  showYAxis?: boolean
+
+  /**
+   * X axis label
+   */
+  xAxisLabel?: string
+
+  /**
+   * Y axis label
+   */
+  yAxisLabel?: string
+
+  /**
+   * X ticks
+   * @default 5
+   */
+  xTicks?: number
+
+  /**
+   * Y ticks
+   * @default 5
+   */
+  yTicks?: number
+
+  /**
+   * X tick values
+   */
+  xTickValues?: ChartScaleValue[]
+
+  /**
+   * Y tick values
+   */
+  yTickValues?: number[]
+
+  /**
+   * X tick format
+   */
+  xTickFormat?: (value: ChartScaleValue) => string
+
+  /**
+   * Y tick format
+   */
+  yTickFormat?: (value: ChartScaleValue) => string
+
+  /**
+   * Grid line style
+   * @default 'solid'
+   */
+  gridLineStyle?: ChartGridLineStyle
+
+  /**
+   * Grid stroke width
+   * @default 1
+   */
+  gridStrokeWidth?: number
+}
+
+/**
  * Legend item data
  */
 export interface ChartLegendItem {
@@ -581,39 +674,17 @@ export interface ScatterChartDatum {
   label?: string
 }
 
-export interface ScatterChartProps {
-  /**
-   * Chart width
-   * @default 320
-   */
-  width?: number
-
-  /**
-   * Chart height
-   * @default 200
-   */
-  height?: number
-
-  /**
-   * Chart padding
-   * @default 24
-   */
-  padding?: ChartPadding
-
+export interface ScatterChartProps
+  extends
+    BaseChartProps,
+    ChartInteractionProps,
+    ChartLegendProps,
+    ChartTooltipProps,
+    ChartWithAxesProps {
   /**
    * Chart data
    */
   data: ScatterChartDatum[]
-
-  /**
-   * Custom x scale
-   */
-  xScale?: ChartScale
-
-  /**
-   * Custom y scale
-   */
-  yScale?: ChartScale
 
   /**
    * Point size
@@ -627,43 +698,9 @@ export interface ScatterChartProps {
   pointColor?: string
 
   /**
-   * Accessible title for the SVG
-   */
-  title?: string
-
-  /**
-   * Accessible description for the SVG
-   */
-  desc?: string
-
-  /**
    * Point opacity
    */
   pointOpacity?: number
-
-  /**
-   * Whether to show grid
-   * @default true
-   */
-  showGrid?: boolean
-
-  /**
-   * Whether to show axes
-   * @default true
-   */
-  showAxis?: boolean
-
-  /**
-   * Whether to show X axis
-   * @default true
-   */
-  showXAxis?: boolean
-
-  /**
-   * Whether to show Y axis
-   * @default true
-   */
-  showYAxis?: boolean
 
   /**
    * Include zero in domain
@@ -672,63 +709,19 @@ export interface ScatterChartProps {
   includeZero?: boolean
 
   /**
-   * X axis label
+   * Custom colors for points
    */
-  xAxisLabel?: string
+  colors?: string[]
 
   /**
-   * Y axis label
+   * Tooltip formatter
    */
-  yAxisLabel?: string
+  tooltipFormatter?: (datum: ScatterChartDatum, index: number) => string
 
   /**
-   * X ticks
-   * @default 5
+   * Legend formatter
    */
-  xTicks?: number
-
-  /**
-   * Y ticks
-   * @default 5
-   */
-  yTicks?: number
-
-  /**
-   * X tick values
-   */
-  xTickValues?: ChartScaleValue[]
-
-  /**
-   * Y tick values
-   */
-  yTickValues?: ChartScaleValue[]
-
-  /**
-   * X tick format
-   */
-  xTickFormat?: (value: ChartScaleValue) => string
-
-  /**
-   * Y tick format
-   */
-  yTickFormat?: (value: ChartScaleValue) => string
-
-  /**
-   * Grid line style
-   * @default 'solid'
-   */
-  gridLineStyle?: ChartGridLineStyle
-
-  /**
-   * Grid stroke width
-   * @default 1
-   */
-  gridStrokeWidth?: number
-
-  /**
-   * Additional CSS classes
-   */
-  className?: string
+  legendFormatter?: (datum: ScatterChartDatum, index: number) => string
 }
 
 export interface PieChartDatum extends ChartSeriesPoint {
@@ -1290,32 +1283,14 @@ export interface AreaChartProps
    */
   legendFormatter?: (series: AreaChartSeries, index: number) => string
 }
-export interface RadarChartProps {
+export interface RadarChartProps extends BaseChartProps, ChartLegendProps, ChartTooltipProps {
   /**
-   * Chart width
-   * @default 320
-   */
-  width?: number
-
-  /**
-   * Chart height
-   * @default 200
-   */
-  height?: number
-
-  /**
-   * Chart padding
-   * @default 24
-   */
-  padding?: ChartPadding
-
-  /**
-   * Chart data
+   * Chart data (single series)
    */
   data?: RadarChartDatum[]
 
   /**
-   * Series list
+   * Multiple series
    */
   series?: RadarChartSeries[]
 
@@ -1389,27 +1364,32 @@ export interface RadarChartProps {
   hoverable?: boolean
 
   /**
-   * Active series index (controlled)
+   * Hovered series index (controlled)
    */
-  activeSeriesIndex?: number
+  hoveredIndex?: number | null
 
   /**
-   * Opacity for active series
+   * Opacity for active/hovered series
    * @default 1
    */
-  hoverOpacity?: number
+  activeOpacity?: number
 
   /**
    * Opacity for inactive series
    * @default 0.25
    */
-  mutedOpacity?: number
+  inactiveOpacity?: number
 
   /**
-   * Whether to show tooltip on points
-   * @default true
+   * Enable click selection
+   * @default false
    */
-  showTooltip?: boolean
+  selectable?: boolean
+
+  /**
+   * Selected series index (controlled)
+   */
+  selectedIndex?: number | null
 
   /**
    * Tooltip formatter
@@ -1422,44 +1402,9 @@ export interface RadarChartProps {
   ) => string
 
   /**
-   * Enable click selection
-   * @default false
-   */
-  selectable?: boolean
-
-  /**
-   * Selected series index (controlled)
-   */
-  selectedSeriesIndex?: number
-
-  /**
-   * Whether to show legend
-   * @default false
-   */
-  showLegend?: boolean
-
-  /**
-   * Legend position
-   * @default 'bottom'
-   */
-  legendPosition?: 'bottom' | 'right'
-
-  /**
    * Legend formatter
    */
   legendFormatter?: (series: RadarChartSeries, index: number) => string
-
-  /**
-   * Legend marker size
-   * @default 10
-   */
-  legendMarkerSize?: number
-
-  /**
-   * Legend item gap
-   * @default 8
-   */
-  legendGap?: number
 
   /**
    * Colors for series
@@ -1516,9 +1461,4 @@ export interface RadarChartProps {
    * Point color
    */
   pointColor?: string
-
-  /**
-   * Additional CSS classes
-   */
-  className?: string
 }
