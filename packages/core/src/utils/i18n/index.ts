@@ -6,5 +6,9 @@
 
 export * from '../locale-utils'
 export * from '../datepicker-i18n'
-export * from '../timepicker-labels'
+export {
+  getTimePickerLabels,
+  getTimePickerOptionAriaLabel,
+  type TimePickerOptionUnit
+} from '../timepicker-utils'
 export * from '../upload-labels'

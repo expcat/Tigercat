@@ -210,42 +210,24 @@ export const Tabs = defineComponent({
       handleTabClose
     })
 
-    watch(currentActiveKey, (newKey) => {
-      tabsContextValue.activeKey = newKey
-    })
-
+    // Batch watch all props that need to sync to context
     watch(
-      () => props.type,
-      (newType) => {
-        tabsContextValue.type = newType
-      }
-    )
-
-    watch(
-      () => props.tabPosition,
-      (newPos) => {
-        tabsContextValue.tabPosition = newPos
-      }
-    )
-
-    watch(
-      () => props.size,
-      (newSize) => {
-        tabsContextValue.size = newSize
-      }
-    )
-
-    watch(
-      () => props.closable,
-      (newClosable) => {
-        tabsContextValue.closable = newClosable
-      }
-    )
-
-    watch(
-      () => props.destroyInactiveTabPane,
-      (newDestroy) => {
-        tabsContextValue.destroyInactiveTabPane = newDestroy
+      () =>
+        [
+          currentActiveKey.value,
+          props.type,
+          props.tabPosition,
+          props.size,
+          props.closable,
+          props.destroyInactiveTabPane
+        ] as const,
+      ([activeKey, type, tabPosition, size, closable, destroyInactiveTabPane]) => {
+        tabsContextValue.activeKey = activeKey
+        tabsContextValue.type = type
+        tabsContextValue.tabPosition = tabPosition
+        tabsContextValue.size = size
+        tabsContextValue.closable = closable
+        tabsContextValue.destroyInactiveTabPane = destroyInactiveTabPane
       }
     )
 

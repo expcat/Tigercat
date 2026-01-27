@@ -15,6 +15,14 @@ import {
   getSpinnerSVG,
   normalizeSvgAttrs,
   getLoadingOverlaySpinnerClasses,
+  // Icon constants
+  icon16ViewBox,
+  icon24ViewBox,
+  sortAscIcon16PathD,
+  sortDescIcon16PathD,
+  sortBothIcon16PathD,
+  lockClosedIcon24PathD,
+  lockOpenIcon24PathD,
   sortData,
   filterData,
   paginateData,
@@ -69,14 +77,10 @@ const SortIcon = (direction: SortDirection) => {
         class: getSortIconClasses(true),
         width: '16',
         height: '16',
-        viewBox: '0 0 16 16',
+        viewBox: icon16ViewBox,
         fill: 'currentColor'
       },
-      [
-        h('path', {
-          d: 'M8 3l4 4H4l4-4z'
-        })
-      ]
+      [h('path', { d: sortAscIcon16PathD })]
     )
   }
 
@@ -87,14 +91,10 @@ const SortIcon = (direction: SortDirection) => {
         class: getSortIconClasses(true),
         width: '16',
         height: '16',
-        viewBox: '0 0 16 16',
+        viewBox: icon16ViewBox,
         fill: 'currentColor'
       },
-      [
-        h('path', {
-          d: 'M8 13l-4-4h8l-4 4z'
-        })
-      ]
+      [h('path', { d: sortDescIcon16PathD })]
     )
   }
 
@@ -104,35 +104,24 @@ const SortIcon = (direction: SortDirection) => {
       class: getSortIconClasses(false),
       width: '16',
       height: '16',
-      viewBox: '0 0 16 16',
+      viewBox: icon16ViewBox,
       fill: 'currentColor'
     },
-    [
-      h('path', {
-        d: 'M8 3l4 4H4l4-4zM8 13l-4-4h8l-4 4z'
-      })
-    ]
+    [h('path', { d: sortBothIcon16PathD })]
   )
 }
+
 const LockIcon = (locked: boolean) => {
   return h(
     'svg',
     {
       width: '14',
       height: '14',
-      viewBox: '0 0 24 24',
+      viewBox: icon24ViewBox,
       fill: 'currentColor',
       'aria-hidden': 'true'
     },
-    [
-      locked
-        ? h('path', {
-            d: 'M17 8h-1V6a4 4 0 10-8 0v2H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V10a2 2 0 00-2-2zm-7-2a2 2 0 114 0v2h-4V6z'
-          })
-        : h('path', {
-            d: 'M17 8h-1V6a4 4 0 00-7.75-1.41 1 1 0 101.9.62A2 2 0 0114 6v2H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V10a2 2 0 00-2-2zm0 12H7V10h10v10z'
-          })
-    ]
+    [h('path', { d: locked ? lockClosedIcon24PathD : lockOpenIcon24PathD })]
   )
 }
 
