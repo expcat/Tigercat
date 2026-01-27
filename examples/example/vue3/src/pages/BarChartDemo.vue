@@ -31,7 +31,7 @@ const hoveredIndex = ref<number | null>(null)
 const selectedIndex = ref<number | null>(null)
 const clickedBar = ref<string>('')
 
-const handleBarClick = (datum: BarChartDatum, index: number) => {
+const handleBarClick = (datum: BarChartDatum, _index: number) => {
   clickedBar.value = `点击了 ${datum.x}，值为 ${datum.y}`
 }
 
@@ -148,7 +148,8 @@ const tooltipSnippet = `<BarChart
                   @bar-click="handleBarClick" />
         <p class="text-sm text-gray-500">
           选中: {{ selectedIndex !== null ? interactiveData[selectedIndex]?.x : '无' }}
-          <span v-if="clickedBar" class="ml-4">{{ clickedBar }}</span>
+          <span v-if="clickedBar"
+                class="ml-4">{{ clickedBar }}</span>
         </p>
       </div>
     </DemoBlock>

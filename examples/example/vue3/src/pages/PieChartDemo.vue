@@ -21,7 +21,7 @@ const hoveredIndex = ref<number | null>(null)
 const selectedIndex = ref<number | null>(null)
 const clickedSlice = ref<string>('')
 
-const handleSliceClick = (datum: PieChartDatum, index: number) => {
+const handleSliceClick = (datum: PieChartDatum, _index: number) => {
   clickedSlice.value = `点击了 ${datum.label}，占比 ${datum.value}%`
 }
 
