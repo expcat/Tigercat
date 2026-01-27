@@ -43,7 +43,7 @@ describe('ChartLegend', () => {
     const { container } = renderWithProps(ChartLegend, {
       items,
       interactive: true,
-      'onItem-click': onItemClick
+      onItemClick
     })
 
     const firstItem = container.querySelector('[data-legend-item]')

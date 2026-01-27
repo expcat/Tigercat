@@ -398,9 +398,9 @@ export const ScatterChart = defineComponent({
           markerSize: props.legendMarkerSize,
           gap: props.legendGap,
           interactive: props.hoverable || props.selectable,
-          'onItem-click': handleLegendClick,
-          'onItem-hover': handleLegendHover,
-          'onItem-leave': handleLegendLeave
+          onItemClick: handleLegendClick,
+          onItemHover: handleLegendHover,
+          onItemLeave: handleLegendLeave
         }),
         tooltip
       ])

@@ -721,33 +721,34 @@ export const Button: React.FC<ButtonProps> = ({
 
 ### 12.1 阶段划分
 
-| 阶段   | 内容             | 任务数 | 状态      |
-| ------ | ---------------- | ------ | --------- |
-| 阶段 0 | 代码扫描与分析   | -      | ✅ 已完成 |
-| 阶段 1 | Core 包重构      | 4      | ⬜ 未开始 |
-| 阶段 2 | 高优先级组件修复 | 7      | ⬜ 未开始 |
-| 阶段 3 | 中优先级代码优化 | 6      | ⬜ 未开始 |
-| 阶段 4 | 样式与动画优化   | 4      | ⬜ 未开始 |
-| 阶段 5 | 测试与文档完善   | 5      | ⬜ 未开始 |
+| 阶段   | 内容             | 任务数 | 状态          |
+| ------ | ---------------- | ------ | ------------- |
+| 阶段 0 | 代码扫描与分析   | -      | ✅ 已完成     |
+| 阶段 1 | Core 包重构      | 4      | ✅ 已完成     |
+| 阶段 2 | 高优先级组件修复 | 8      | 🔄 进行中 4/8 |
+| 阶段 3 | 中优先级代码优化 | 6      | ⬜ 未开始     |
+| 阶段 4 | 样式与动画优化   | 4      | ⬜ 未开始     |
+| 阶段 5 | 测试与文档完善   | 5      | ⬜ 未开始     |
 
 ### 12.2 阶段详情
 
-#### 阶段 1：Core 包重构
+#### 阶段 1：Core 包重构 ✅ 已完成
 
-1. 重组 utils 目录结构（icons/, styles/, helpers/, a11y/, i18n/）
-2. 统一图标导出（common-icons 扩展）
-3. 简化 index.ts 导出
-4. 统一主题变量命名
+1. ✅ 重组 utils 目录结构（helpers/, icons/, a11y/, i18n/, styles/）
+2. ✅ 统一图标导出（通过 icons/ 子模块）
+3. ✅ 简化 index.ts 导出（从 125 行减至 ~30 行）
+4. ✅ 主题变量命名统一（已使用 `--tiger-xxx` 格式）
 
 #### 阶段 2：高优先级组件修复
 
-1. 修复 ScatterChart 事件绑定 Bug
-2. DonutChart 透传交互 props
-3. Modal/Drawer 完善 Focus Trap
-4. Select/DatePicker/TimePicker 内联 SVG 迁移
-5. Table/Tree/List 内联 Spinner 迁移
-6. 下沉键盘导航逻辑
-7. 下沉 Slider 计算逻辑
+1. ✅ 修复 ScatterChart 事件绑定 Bug（`'onItem-click'` → `onItemClick`）
+2. ✅ DonutChart 透传交互 props（Vue/React 均已完善）
+3. ✅ Modal/Drawer 完善 Focus Trap（使用 `getFocusTrapNavigation`）
+4. ✅ Select SVG 图标迁移至 Core（chevronDownSolidIcon20PathD, checkSolidIcon20PathD, closeSolidIcon20PathD）
+5. DatePicker/TimePicker 内联 SVG 迁移
+6. Table/Tree/List 内联 Spinner 迁移
+7. 下沉键盘导航逻辑
+8. 下沉 Slider 计算逻辑
 
 #### 阶段 3：中优先级代码优化
 

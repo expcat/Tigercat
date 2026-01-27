@@ -20,6 +20,8 @@ import {
   modalBodyClasses,
   modalFooterClasses,
   restoreFocus,
+  getFocusableElements,
+  getFocusTrapNavigation,
   type TigerLocale,
   type ModalProps as CoreModalProps
 } from '@expcat/tigercat-core'
@@ -174,6 +176,22 @@ export const Modal: React.FC<ModalProps> = ({
 
   useEscapeKey({ enabled: visible, onEscape: handleClose })
 
+  // Focus trap handler
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (event.key === 'Tab' && dialogRef.current) {
+        const focusables = getFocusableElements(dialogRef.current)
+        const result = getFocusTrapNavigation(event.nativeEvent, focusables, document.activeElement)
+
+        if (result.shouldHandle && result.next) {
+          event.preventDefault()
+          result.next.focus()
+        }
+      }
+    },
+    []
+  )
+
   // Close icon component
   const CloseIcon = (
     <svg
@@ -226,6 +244,7 @@ export const Modal: React.FC<ModalProps> = ({
           aria-labelledby={ariaLabelledby}
           tabIndex={-1}
           ref={dialogRef}
+          onKeyDown={handleKeyDown}
           data-tiger-modal="">
           {/* Header */}
           {(title || titleContent || closable) && (

@@ -52,6 +52,20 @@ export const chevronRightSolidIcon20PathD =
   'M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z'
 
 /**
+ * Chevron down icon path (20x20 solid)
+ * Used by Select, Dropdown, etc.
+ */
+export const chevronDownSolidIcon20PathD =
+  'M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'
+
+/**
+ * Check icon path (20x20 solid)
+ * Used by Select selected option, Checkbox, etc.
+ */
+export const checkSolidIcon20PathD =
+  'M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+
+/**
  * Common 20x20 solid status icon paths
  * Used by Upload.
  */

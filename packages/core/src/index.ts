@@ -2,128 +2,31 @@
  * Tigercat Core
  *
  * Shared Tailwind CSS configuration and utilities for Tigercat UI library
+ *
+ * @module @expcat/tigercat-core
+ *
+ * Utils are organized into submodules:
+ * - helpers/  : class-names, coerce-class-value, env, style-values, copy-text, animation
+ * - icons/    : common-icons, datepicker-icons, timepicker-icons, svg-attrs
+ * - a11y/     : a11y-utils, focus-utils, overlay-utils
+ * - i18n/     : locale-utils, datepicker-i18n, timepicker-labels, upload-labels
+ * - styles/   : component-specific style utilities (button, input, select, etc.)
  */
 
-export const version = '0.0.1'
+export const version = '0.2.0'
 
-// Utilities
-export * from './utils/class-names'
-export * from './utils/coerce-class-value'
-export * from './utils/env'
-export * from './utils/a11y-utils'
-export * from './utils/overlay-utils'
-export * from './utils/focus-utils'
-export * from './utils/locale-utils'
-export * from './utils/style-values'
-export * from './utils/button-utils'
-export * from './utils/select-utils'
-export * from './utils/input-styles'
-export * from './utils/animation'
-export * from './utils/textarea-auto-resize'
-export * from './utils/form-validation'
-export * from './utils/grid'
-export * from './utils/divider'
-export * from './utils/layout-utils'
-export * from './utils/container-utils'
-export * from './utils/date-utils'
-export * from './utils/datepicker-styles'
-export * from './utils/datepicker-icons'
-export * from './utils/datepicker-i18n'
-export * from './utils/time-utils'
-export * from './utils/timepicker-styles'
-export * from './utils/timepicker-icons'
-export * from './utils/timepicker-labels'
-export * from './utils/upload-utils'
-export * from './utils/upload-labels'
-export * from './utils/space'
-export * from './utils/table-utils'
-export * from './utils/tag-utils'
-export * from './utils/badge-utils'
-export * from './utils/card-utils'
-export * from './utils/link-utils'
-export * from './utils/avatar-utils'
-export * from './utils/icon-utils'
-export * from './utils/common-icons'
-export * from './utils/list-utils'
-export * from './utils/descriptions-utils'
-export * from './utils/timeline-utils'
-export * from './utils/tree-utils'
-export * from './utils/skeleton-utils'
-export * from './utils/progress-utils'
-export * from './utils/menu-utils'
-export * from './utils/tabs-utils'
-export * from './utils/breadcrumb-utils'
-export * from './utils/steps-utils'
-export * from './utils/pagination-utils'
-export * from './utils/dropdown-utils'
-export * from './utils/drawer-utils'
-export * from './utils/modal-utils'
-export * from './utils/alert-utils'
-export * from './utils/message-utils'
-export * from './utils/notification-utils'
-export * from './utils/loading-utils'
-export * from './utils/svg-attrs'
-export * from './utils/popconfirm-utils'
-export * from './utils/popover-utils'
-export * from './utils/tooltip-utils'
-export * from './utils/radio-utils'
-export * from './utils/radio-group-utils'
-export * from './utils/code-utils'
-export * from './utils/copy-text'
-export * from './utils/chart-utils'
-export * from './utils/chart-interaction'
+// ============================================================================
+// UTILITIES (re-exported from organized submodules for backward compatibility)
+// ============================================================================
+export * from './utils'
 
-// Types
-export * from './types/button'
-export * from './types/slider'
-export * from './types/switch'
-export * from './types/checkbox'
-export * from './types/radio'
-export * from './types/select'
-export * from './types/textarea'
-export * from './types/input'
-export * from './types/form'
-export * from './types/space'
-export * from './types/divider'
-export * from './types/layout'
-export * from './types/grid'
-export * from './types/container'
-export * from './types/link'
-export * from './types/text'
-export * from './types/icon'
-export * from './types/datepicker'
-export * from './types/timepicker'
-export * from './types/upload'
-export * from './types/table'
-export * from './types/tag'
-export * from './types/badge'
-export * from './types/card'
-export * from './types/avatar'
-export * from './types/list'
-export * from './types/descriptions'
-export * from './types/timeline'
-export * from './types/tree'
-export * from './types/skeleton'
-export * from './types/progress'
-export * from './types/menu'
-export * from './types/tabs'
-export * from './types/breadcrumb'
-export * from './types/steps'
-export * from './types/pagination'
-export * from './types/dropdown'
-export * from './types/drawer'
-export * from './types/modal'
-export * from './types/locale'
-export * from './types/alert'
-export * from './types/message'
-export * from './types/notification'
-export * from './types/loading'
-export * from './types/popconfirm'
-export * from './types/popover'
-export * from './types/tooltip'
-export * from './types/code'
-export * from './types/chart'
+// ============================================================================
+// TYPES
+// ============================================================================
+export * from './types'
 
-// Theme
+// ============================================================================
+// THEME
+// ============================================================================
 export * from './theme'
 export * from './tailwind-plugin'
