@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import {
   classNames,
   createBandScale,
@@ -19,6 +19,7 @@ import { ChartGrid } from './ChartGrid'
 import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
+import { useChartInteraction } from '../hooks/useChartInteraction'
 
 export interface BarChartProps extends CoreBarChartProps {
   data: BarChartDatum[]
@@ -78,9 +79,39 @@ export const BarChart: React.FC<BarChartProps> = ({
   onBarClick,
   onBarHover
 }) => {
-  const [localHoveredIndex, setLocalHoveredIndex] = useState<number | null>(null)
-  const [localSelectedIndex, setLocalSelectedIndex] = useState<number | null>(null)
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+  // Use shared interaction hook
+  const {
+    tooltipPosition,
+    resolvedHoveredIndex,
+    activeIndex,
+    handleMouseEnter,
+    handleMouseMove,
+    handleMouseLeave,
+    handleClick,
+    handleKeyDown,
+    handleLegendClick,
+    handleLegendHover,
+    handleLegendLeave,
+    wrapperClasses
+  } = useChartInteraction<BarChartDatum>({
+    hoverable,
+    hoveredIndexProp,
+    selectable,
+    selectedIndexProp,
+    activeOpacity,
+    inactiveOpacity,
+    legendPosition,
+    getData: (index: number) => data[index],
+    onHoveredIndexChange: (index) => {
+      onHoveredIndexChange?.(index)
+      onBarHover?.(index, index !== null ? data[index] : null)
+    },
+    onSelectedIndexChange,
+    callbacks: {
+      onClick: onBarClick
+    }
+  })
+
   const innerRect = useMemo(
     () => getChartInnerRect(width, height, padding),
     [width, height, padding]
@@ -107,16 +138,6 @@ export const BarChart: React.FC<BarChartProps> = ({
       colors && colors.length > 0 ? colors : barColor ? [barColor] : [...DEFAULT_CHART_COLORS],
     [colors, barColor]
   )
-
-  const resolvedHoveredIndex = hoveredIndexProp !== undefined ? hoveredIndexProp : localHoveredIndex
-  const resolvedSelectedIndex =
-    selectedIndexProp !== undefined ? selectedIndexProp : localSelectedIndex
-
-  const activeIndex = useMemo(() => {
-    if (resolvedSelectedIndex !== null) return resolvedSelectedIndex
-    if (hoverable && resolvedHoveredIndex !== null) return resolvedHoveredIndex
-    return null
-  }, [resolvedSelectedIndex, hoverable, resolvedHoveredIndex])
 
   const bars = useMemo(() => {
     const scale = resolvedXScale
@@ -186,95 +207,8 @@ export const BarChart: React.FC<BarChartProps> = ({
     return datum ? formatTooltip(datum, resolvedHoveredIndex) : ''
   }, [resolvedHoveredIndex, data, formatTooltip])
 
-  const handleBarMouseEnter = useCallback(
-    (index: number, event: React.MouseEvent) => {
-      if (!hoverable) return
-      if (hoveredIndexProp === undefined) {
-        setLocalHoveredIndex(index)
-      }
-      setTooltipPosition({ x: event.clientX, y: event.clientY })
-      onHoveredIndexChange?.(index)
-      onBarHover?.(index, data[index])
-    },
-    [hoverable, hoveredIndexProp, onHoveredIndexChange, onBarHover, data]
-  )
-
-  const handleBarMouseMove = useCallback((event: React.MouseEvent) => {
-    setTooltipPosition({ x: event.clientX, y: event.clientY })
-  }, [])
-
-  const handleBarMouseLeave = useCallback(() => {
-    if (!hoverable) return
-    if (hoveredIndexProp === undefined) {
-      setLocalHoveredIndex(null)
-    }
-    onHoveredIndexChange?.(null)
-    onBarHover?.(null, null)
-  }, [hoverable, hoveredIndexProp, onHoveredIndexChange, onBarHover])
-
-  const handleBarClick = useCallback(
-    (index: number) => {
-      if (selectable) {
-        const nextIndex = resolvedSelectedIndex === index ? null : index
-        if (selectedIndexProp === undefined) {
-          setLocalSelectedIndex(nextIndex)
-        }
-        onSelectedIndexChange?.(nextIndex)
-      }
-      onBarClick?.(index, data[index])
-    },
-    [selectable, resolvedSelectedIndex, selectedIndexProp, onSelectedIndexChange, onBarClick, data]
-  )
-
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent, index: number) => {
-      if (!selectable) return
-      if (event.key !== 'Enter' && event.key !== ' ') return
-      event.preventDefault()
-      handleBarClick(index)
-    },
-    [selectable, handleBarClick]
-  )
-
-  const handleLegendClick = useCallback(
-    (index: number) => {
-      handleBarClick(index)
-    },
-    [handleBarClick]
-  )
-
-  const handleLegendHover = useCallback(
-    (index: number) => {
-      if (!hoverable) return
-      if (hoveredIndexProp === undefined) {
-        setLocalHoveredIndex(index)
-      }
-      onHoveredIndexChange?.(index)
-    },
-    [hoverable, hoveredIndexProp, onHoveredIndexChange]
-  )
-
-  const handleLegendLeave = useCallback(() => {
-    handleBarMouseLeave()
-  }, [handleBarMouseLeave])
-
   const shouldShowXAxis = showAxis && showXAxis
   const shouldShowYAxis = showAxis && showYAxis
-
-  const wrapperClasses = useMemo(
-    () =>
-      classNames(
-        'inline-flex',
-        legendPosition === 'right'
-          ? 'flex-row items-start gap-4'
-          : legendPosition === 'left'
-            ? 'flex-row-reverse items-start gap-4'
-            : legendPosition === 'top'
-              ? 'flex-col-reverse gap-2'
-              : 'flex-col gap-2'
-      ),
-    [legendPosition]
-  )
 
   const chart = (
     <ChartCanvas
@@ -335,10 +269,10 @@ export const BarChart: React.FC<BarChartProps> = ({
               (hoverable || selectable) && 'cursor-pointer'
             )}
             tabIndex={selectable ? 0 : undefined}
-            onMouseEnter={(e) => handleBarMouseEnter(bar.index, e)}
-            onMouseMove={handleBarMouseMove}
-            onMouseLeave={handleBarMouseLeave}
-            onClick={() => handleBarClick(bar.index)}
+            onMouseEnter={(e) => handleMouseEnter(bar.index, e)}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            onClick={() => handleClick(bar.index)}
             onKeyDown={(e) => handleKeyDown(e, bar.index)}
           />
         ))}

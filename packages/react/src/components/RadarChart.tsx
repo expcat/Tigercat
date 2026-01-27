@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import {
   chartAxisTickTextClasses,
   chartGridLineClasses,
@@ -17,6 +17,7 @@ import {
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartSeries } from './ChartSeries'
+import { useChartInteraction } from '../hooks/useChartInteraction'
 
 export interface RadarChartProps extends CoreRadarChartProps {
   data?: RadarChartDatum[]
@@ -81,8 +82,41 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   desc,
   className
 }) => {
-  const [localHoveredIndex, setLocalHoveredIndex] = useState<number | null>(null)
-  const [localSelectedIndex, setLocalSelectedIndex] = useState<number | null>(null)
+  // Resolve series first (needed for hook callbacks)
+  const resolvedSeries = useMemo<RadarChartSeries[]>(() => {
+    if (series && series.length > 0) return series
+    return [{ data: data ?? [] }]
+  }, [series, data])
+
+  // Use shared interaction hook for series-based interaction
+  const {
+    resolvedHoveredIndex,
+    resolvedSelectedIndex,
+    activeIndex: resolvedActiveIndex,
+    handleMouseEnter: handleHoverEnter,
+    handleMouseLeave: handleHoverLeave,
+    handleClick: handleSelectIndex
+  } = useChartInteraction<RadarChartSeries>({
+    hoverable,
+    hoveredIndexProp,
+    selectable,
+    selectedIndexProp,
+    activeOpacity,
+    inactiveOpacity,
+    legendPosition,
+    getData: (index: number) => resolvedSeries[index],
+    onHoveredIndexChange: (index) => {
+      onHoveredIndexChange?.(index)
+      onSeriesHover?.(index, index !== null ? resolvedSeries[index] : null)
+    },
+    onSelectedIndexChange: (index) => {
+      onSelectedIndexChange?.(index)
+      if (index !== null) {
+        onSeriesClick?.(index, resolvedSeries[index])
+      }
+    }
+  })
+
   const innerRect = useMemo(
     () => getChartInnerRect(width, height, padding),
     [width, height, padding]
@@ -95,11 +129,6 @@ export const RadarChart: React.FC<RadarChartProps> = ({
 
   const cx = innerRect.width / 2
   const cy = innerRect.height / 2
-
-  const resolvedSeries = useMemo<RadarChartSeries[]>(() => {
-    if (series && series.length > 0) return series
-    return [{ data: data ?? [] }]
-  }, [series, data])
 
   const axisData = useMemo(() => {
     if (series && series.length > 0) return series[0]?.data ?? []
@@ -219,37 +248,6 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       }),
     [tooltipFormatter]
   )
-  const resolvedSelectedIndex =
-    selectedIndexProp !== undefined ? selectedIndexProp : localSelectedIndex
-  const resolvedHoveredIndex = hoveredIndexProp !== undefined ? hoveredIndexProp : localHoveredIndex
-  const resolvedActiveIndex = useMemo(() => {
-    if (resolvedSelectedIndex !== null) return resolvedSelectedIndex
-    if (hoverable && resolvedHoveredIndex !== null) return resolvedHoveredIndex
-    return null
-  }, [resolvedSelectedIndex, hoverable, resolvedHoveredIndex])
-
-  const handleHover = (index: number | null) => {
-    if (!hoverable) return
-    if (hoveredIndexProp === undefined) {
-      setLocalHoveredIndex(index)
-    }
-    onHoveredIndexChange?.(index)
-    if (index !== null) {
-      onSeriesHover?.(index, resolvedSeries[index])
-    } else {
-      onSeriesHover?.(null, null)
-    }
-  }
-
-  const handleSelectIndex = (index: number) => {
-    if (!selectable) return
-    const nextIndex = resolvedSelectedIndex === index ? null : index
-    if (selectedIndexProp === undefined) {
-      setLocalSelectedIndex(nextIndex)
-    }
-    onSelectedIndexChange?.(nextIndex)
-    onSeriesClick?.(index, resolvedSeries[index])
-  }
   const resolvedLegendItems = useMemo(
     () =>
       resolvedSeries.map((item, index) => {
@@ -331,8 +329,10 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             className={item.series.className}
             opacity={resolvedOpacity}
             style={hoverable || selectable ? { cursor: 'pointer' } : undefined}
-            onMouseEnter={hoverable ? () => handleHover(seriesIndex) : undefined}
-            onMouseLeave={hoverable ? () => handleHover(null) : undefined}
+            onMouseEnter={
+              hoverable ? (e: React.MouseEvent) => handleHoverEnter(seriesIndex, e) : undefined
+            }
+            onMouseLeave={hoverable ? handleHoverLeave : undefined}
             onClick={selectable ? () => handleSelectIndex(seriesIndex) : undefined}
             tabIndex={selectable ? 0 : undefined}
             onKeyDown={(event) => {
@@ -416,8 +416,10 @@ export const RadarChart: React.FC<RadarChartProps> = ({
               selectable ? 'cursor-pointer' : 'cursor-default'
             )}
             onClick={selectable ? () => handleSelectIndex(item.index) : undefined}
-            onMouseEnter={hoverable ? () => handleHover(item.index) : undefined}
-            onMouseLeave={hoverable ? () => handleHover(null) : undefined}>
+            onMouseEnter={
+              hoverable ? (e: React.MouseEvent) => handleHoverEnter(item.index, e) : undefined
+            }
+            onMouseLeave={hoverable ? handleHoverLeave : undefined}>
             <span
               className="inline-block rounded-full"
               style={{
