@@ -38,7 +38,7 @@ export function useSelectKeyboard(options: UseSelectKeyboardOptions): UseSelectK
   const {
     isOpen,
     disabled,
-    searchable,
+    searchable: _searchable,
     activeIndex,
     triggerRef,
     findFirstEnabledIndex,

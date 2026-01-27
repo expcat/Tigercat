@@ -1,4 +1,4 @@
-import { ref, computed, Ref, nextTick, watch, onBeforeUnmount } from 'vue'
+import { ref, computed, Ref, nextTick } from 'vue'
 import {
   filterOptions,
   isOptionGroup,

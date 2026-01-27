@@ -1,4 +1,4 @@
-import { ref, Ref } from 'vue'
+import { Ref } from 'vue'
 
 export interface UseTimePanelKeyboardOptions {
   /** Panel container ref */
