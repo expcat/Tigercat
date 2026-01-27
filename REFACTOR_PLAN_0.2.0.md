@@ -672,48 +672,49 @@ export const Button: React.FC<ButtonProps> = ({
 
 ### 11.1 代码重构任务
 
-| 优先级 | 任务                          | 涉及模块             | 状态      |
-| ------ | ----------------------------- | -------------------- | --------- |
-| 🔴 高  | 重组 Core utils 目录结构      | Core                 | ✅ 已完成 |
-| 🔴 高  | 统一 SVG 图标到 Core          | Core, 表单, 数据展示 | ✅ 已完成 |
-| 🔴 高  | 下沉键盘导航逻辑到 Core       | Core, 导航, 表单     | ✅ 已完成 |
-| 🔴 高  | 下沉 Slider 计算逻辑到 Core   | Core, Slider         | ✅ 已完成 |
-| 🔴 高  | 修复 ScatterChart 事件绑定    | 图表                 | ✅ 已完成 |
-| 🔴 高  | DonutChart 透传交互 props     | 图表                 | ✅ 已完成 |
-| 🔴 高  | 完善 Focus Trap               | Modal, Drawer        | ✅ 已完成 |
-| 🟡 中  | 创建 useClickOutside          | 表单, 反馈           | ✅ 已存在 |
-| 🟡 中  | 统一 LoadingSpinner           | Table, Tree, List    | ✅ 已完成 |
-| 🟡 中  | Space baseClasses 下沉到 Core | 布局                 | ✅ 已完成 |
-| 🟡 中  | Container Vue 添加 as prop    | 布局                 | ✅ 已完成 |
-| 🟡 中  | 抽取 Pagination 子组件        | 导航, 数据展示       | ⏸️ 推迟   |
-| 🟡 中  | 合并 Tooltip/Popover 抽象     | 反馈                 | ⏸️ 推迟   |
-| 🟡 中  | RadarChart 复用 ChartTooltip  | 图表                 | ⏸️ 推迟   |
-| 🟢 低  | 拆分大型 setup 函数           | 表单, 数据展示       | ⏸️ 推迟   |
-| 🟢 低  | 简化 Vue Props 定义           | 全部 Vue 组件        | ⏸️ 推迟   |
+| 优先级 | 任务                          | 涉及模块                       | 工作量 | 状态      |
+| ------ | ----------------------------- | ------------------------------ | ------ | --------- |
+| 🔴 高  | 重组 Core utils 目录结构      | Core                           | -      | ✅ 已完成 |
+| 🔴 高  | 统一 SVG 图标到 Core          | Core, 表单, 数据展示           | -      | ✅ 已完成 |
+| 🔴 高  | 下沉键盘导航逻辑到 Core       | Core, 导航, 表单               | -      | ✅ 已完成 |
+| 🔴 高  | 下沉 Slider 计算逻辑到 Core   | Core, Slider                   | -      | ✅ 已完成 |
+| 🔴 高  | 修复 ScatterChart 事件绑定    | 图表                           | -      | ✅ 已完成 |
+| 🔴 高  | DonutChart 透传交互 props     | 图表                           | -      | ✅ 已完成 |
+| 🔴 高  | 完善 Focus Trap               | Modal, Drawer                  | -      | ✅ 已完成 |
+| 🟡 中  | 创建 useClickOutside          | 表单, 反馈                     | -      | ✅ 已存在 |
+| 🟡 中  | 统一 LoadingSpinner           | Table, Tree, List              | -      | ✅ 已完成 |
+| 🟡 中  | Space baseClasses 下沉到 Core | 布局                           | -      | ✅ 已完成 |
+| 🟡 中  | Container Vue 添加 as prop    | 布局                           | -      | ✅ 已完成 |
+| 🟡 中  | 引入 Floating UI 定位系统     | Tooltip, Popover, Dropdown     | 中     | ⬜ 待完成 |
+| 🟡 中  | 合并 Tooltip/Popover 抽象     | 反馈                           | 中     | ⬜ 待完成 |
+| 🟡 中  | 抽取 Pagination 子组件        | 导航, 数据展示                 | 中     | ⬜ 待完成 |
+| 🟡 中  | RadarChart 复用 ChartTooltip  | 图表                           | 中     | ⬜ 待完成 |
+| 🟡 中  | 拆分大型 setup 函数           | DatePicker, TimePicker, Select | 中     | ⬜ 待完成 |
+| 🟢 低  | 简化 Vue Props 定义           | 全部 Vue 组件                  | 大     | ⬜ 待完成 |
 
 ### 11.2 样式优化任务
 
-| 优先级 | 任务                  | 涉及模块                   | 状态      |
-| ------ | --------------------- | -------------------------- | --------- |
-| 🟡 中  | 统一主题变量命名      | Core theme                 | ✅ 已统一 |
-| 🟡 中  | 引入 Floating UI 定位 | Tooltip, Popover, Dropdown | ⏸️ 推迟   |
-| 🟡 中  | 统一动画系统          | 反馈组件                   | ⏸️ 推迟   |
-| 🟢 低  | 添加 SVG 路径动画     | 图表组件                   | ⏸️ 推迟   |
+| 优先级 | 任务              | 涉及模块 | 工作量 | 状态      |
+| ------ | ----------------- | -------- | ------ | --------- |
+| 🟡 中  | 统一主题变量命名  | Core     | -      | ✅ 已统一 |
+| 🟡 中  | 统一动画系统      | 反馈组件 | 小     | ⬜ 待完成 |
+| 🟢 低  | 添加 SVG 路径动画 | 图表组件 | 中     | ⬜ 待完成 |
 
 ### 11.3 测试完善任务
 
-| 优先级 | 任务                 | 涉及模块      | 状态      |
-| ------ | -------------------- | ------------- | --------- |
-| 🟡 中  | 补充 Menu 组件测试   | 导航          | ✅ 已完成 |
-| 🟡 中  | 核实表单组件测试状态 | 表单          | ✅ 已完成 |
-| 🟢 低  | 添加 Focus Trap 测试 | Modal, Drawer | ✅ 已完成 |
+| 优先级 | 任务                 | 涉及模块      | 工作量 | 状态      |
+| ------ | -------------------- | ------------- | ------ | --------- |
+| 🟡 中  | 补充 Menu 组件测试   | 导航          | -      | ✅ 已完成 |
+| 🟡 中  | 核实表单组件测试状态 | 表单          | -      | ✅ 已完成 |
+| 🟢 低  | 添加 Focus Trap 测试 | Modal, Drawer | -      | ✅ 已完成 |
 
 ### 11.4 文档更新任务
 
-| 优先级 | 任务           | 涉及模块                           | 状态    |
-| ------ | -------------- | ---------------------------------- | ------- |
-| 🟡 中  | 添加 i18n 文档 | Pagination, DatePicker, TimePicker | ⏸️ 推迟 |
-| 🟢 低  | 更新 Demo 示例 | 全部组件                           | ⏸️ 推迟 |
+| 优先级 | 任务                  | 涉及模块                           | 工作量 | 状态      |
+| ------ | --------------------- | ---------------------------------- | ------ | --------- |
+| 🟡 中  | 添加 i18n 文档        | Pagination, DatePicker, TimePicker | 小     | ⬜ 待完成 |
+| 🟡 中  | Pagination 国际化实现 | Pagination                         | 小     | ⬜ 待完成 |
+| 🟢 低  | 更新 Demo 示例        | 全部组件                           | 中     | ⬜ 待完成 |
 
 ---
 
@@ -721,14 +722,16 @@ export const Button: React.FC<ButtonProps> = ({
 
 ### 12.1 阶段划分
 
-| 阶段   | 内容             | 任务数 | 状态                |
-| ------ | ---------------- | ------ | ------------------- |
-| 阶段 0 | 代码扫描与分析   | -      | ✅ 已完成           |
-| 阶段 1 | Core 包重构      | 4      | ✅ 已完成           |
-| 阶段 2 | 高优先级组件修复 | 8      | ✅ 已完成 8/8       |
-| 阶段 3 | 中优先级代码优化 | 8      | ✅ 已完成 5/8 推迟3 |
-| 阶段 4 | 样式与动画优化   | 4      | ⏸️ 推迟到 0.2.1     |
-| 阶段 5 | 测试与文档完善   | 5      | ✅ 已完成 3/5 推迟2 |
+| 阶段    | 内容             | 任务数 | 状态      |
+| ------- | ---------------- | ------ | --------- |
+| 阶段 0  | 代码扫描与分析   | -      | ✅ 已完成 |
+| 阶段 1  | Core 包重构      | 4      | ✅ 已完成 |
+| 阶段 2  | 高优先级组件修复 | 8      | ✅ 已完成 |
+| 阶段 3A | 定位系统升级     | 3      | ⬜ 待开始 |
+| 阶段 3B | 组件拆分与抽象   | 3      | ⬜ 待开始 |
+| 阶段 3C | 代码精简         | 2      | ⬜ 待开始 |
+| 阶段 4  | 动画系统统一     | 2      | ⬜ 待开始 |
+| 阶段 5  | 文档与 Demo 完善 | 3      | ⬜ 待开始 |
 
 ### 12.2 阶段详情
 
@@ -744,48 +747,91 @@ export const Button: React.FC<ButtonProps> = ({
 1. ✅ 修复 ScatterChart 事件绑定 Bug（`'onItem-click'` → `onItemClick`）
 2. ✅ DonutChart 透传交互 props（Vue/React 均已完善）
 3. ✅ Modal/Drawer 完善 Focus Trap（使用 `getFocusTrapNavigation`）
-4. ✅ Select SVG 图标迁移至 Core（chevronDownSolidIcon20PathD, checkSolidIcon20PathD, closeSolidIcon20PathD）
-5. ✅ DatePicker/TimePicker 内联 SVG 迁移（早期已完成，使用 CalendarIconPath 等）
-6. ✅ Table/Tree/List 内联 Spinner 迁移（早期已完成，使用 getSpinnerSVG）
-7. ✅ 下沉键盘导航逻辑（通过 sliderGetKeyboardValue 实现）
-8. ✅ 下沉 Slider 计算逻辑（sliderNormalizeValue, sliderGetPercentage, sliderGetValueFromPosition）
+4. ✅ Select SVG 图标迁移至 Core
+5. ✅ DatePicker/TimePicker 内联 SVG 迁移
+6. ✅ Table/Tree/List 内联 Spinner 迁移
+7. ✅ 下沉键盘导航逻辑
+8. ✅ 下沉 Slider 计算逻辑
 
-#### 阶段 3：中优先级代码优化
+#### 阶段 3A：定位系统升级 ⬜ 待开始
+
+> 目标：引入 Floating UI 实现边界碰撞检测，统一弹出层定位逻辑
+
+1. ⬜ 引入 Floating UI 依赖到 `@expcat/tigercat-core`（作为 dependency 直接打包，~15KB gzip）
+2. ⬜ 迁移 Tooltip/Popover/Popconfirm/Dropdown 使用 Floating UI 定位
+3. ⬜ 合并 Tooltip/Popover 抽象，抽取 `useFloatingOverlay` composable/hook
+
+**预期收益**：解决弹出层超出视口问题，减少 Tooltip/Popover 重复代码 ~200 行
+
+#### 阶段 3B：组件拆分与抽象 ⬜ 待开始
+
+> 目标：提高组件复用性，减少 Table/List 分页代码重复
+
+1. ⬜ 抽取 Pagination 子组件（`PaginationButton`, `PaginationEllipsis`, `PaginationSizeChanger`, `PaginationQuickJumper`）
+2. ⬜ Table/List 复用 Pagination 子组件（预计减少 100+ 行重复）
+3. ⬜ RadarChart 复用 ChartTooltip 组件（需重写交互逻辑，统一图表 tooltip 体验）
+
+#### 阶段 3C：代码精简 ⬜ 待开始
+
+> 目标：拆分复杂组件，提高可维护性
+
+1. ⬜ 拆分大型 setup 函数（仅针对 DatePicker/TimePicker/Select 三个最复杂组件）
+   - DatePicker：抽取 `useDateNavigation`, `useDateSelection` composable
+   - TimePicker：抽取 `useTimeWheel`, `useTimeSelection` composable
+   - Select：抽取 `useSelectKeyboard`, `useSelectFilter` composable
+2. ⬜ 简化 Vue Props 定义（考虑使用 `defineProps<T>()` 泛型语法减少冗余）
+
+#### 阶段 4：动画系统统一 ⬜ 待开始
+
+> 目标：统一动画配置，提供可定制的过渡效果
+
+1. ⬜ 统一 transition 配置（抽取 `ANIMATION_DURATION` 常量，替换硬编码 300ms）
+2. ⬜ 添加 SVG 路径动画（图表组件入场动画，可选功能）
+
+#### 阶段 5：文档与 Demo 完善 ⬜ 待开始
+
+> 目标：完善国际化支持，优化示例代码
+
+1. ⬜ Pagination 国际化实现（扩展 `locale-utils.ts`，添加 `getPaginationLabels(locale)` 函数）
+2. ⬜ 添加 i18n 文档（说明 DatePicker/TimePicker/Pagination 的国际化用法）
+3. ⬜ 更新 Demo 示例（以最少示例展示全部功能）
+
+#### 已完成的中优先级优化
 
 1. ✅ useClickOutside composable/hook（已存在于 `packages/{vue,react}/src/utils/overlay.ts`）
 2. ✅ 统一 LoadingSpinner（Table/Tree/List 均已使用 `getSpinnerSVG`）
-3. ⬜ 抽取 Pagination 子组件（推迟：涉及 Table/List 多组件重构）
-4. ⬜ 合并 Tooltip/Popover 抽象（推迟：需要完整定位系统重构）
-5. ⬜ RadarChart 复用 ChartTooltip（推迟：需要重写交互逻辑）
-6. ✅ Range 类型（已有 TimePickerRangeValue、DatePickerRangeValue 等，其余使用 inline tuple 足够）
-7. ✅ Space baseClasses 下沉到 Core（`SPACE_BASE_CLASS` 常量）
-8. ✅ Container Vue 添加 as prop（与 React 版本对齐）
+3. ✅ Range 类型（已有 TimePickerRangeValue、DatePickerRangeValue 等）
+4. ✅ Space baseClasses 下沉到 Core（`SPACE_BASE_CLASS` 常量）
+5. ✅ Container Vue 添加 as prop（与 React 版本对齐）
 
-#### 阶段 4：样式与动画优化
-
-1. ⬜ 引入 Floating UI 定位系统（推迟到 0.2.1：需要较大重构）
-2. ⬜ 统一动画系统（推迟：可在后续迭代中逐步优化）
-3. ⬜ 添加 SVG 路径动画（推迟：可选功能）
-4. ⬜ 优化组件视觉效果（推迟：当前视觉已满足需求）
-
-#### 阶段 5：测试与文档完善
+#### 已完成的测试任务
 
 1. ✅ 补充 Menu 组件测试（Vue 7 tests + React 8 tests 已存在）
 2. ✅ 核实表单组件测试状态（Form/Select/DatePicker 共 118 tests 通过）
 3. ✅ 添加 Focus Trap 测试（Modal Vue/React 各 2 tests）
-4. ⬜ 添加 i18n 文档（推迟）
-5. ⬜ 更新 Demo 示例（推迟）
 
 ### 12.3 版本发布计划
 
-| 版本          | 包含阶段 | 说明             |
-| ------------- | -------- | ---------------- |
-| 0.2.0-alpha.1 | 阶段 1   | Core 包重构完成  |
-| 0.2.0-alpha.2 | 阶段 2   | 高优先级修复完成 |
-| 0.2.0-beta.1  | 阶段 3   | 中优先级优化完成 |
-| 0.2.0-beta.2  | 阶段 4   | 样式优化完成     |
-| 0.2.0-rc.1    | 阶段 5   | 测试文档完善     |
-| **0.2.0**     | 全部     | 正式发布         |
+| 版本          | 包含阶段     | 说明                |
+| ------------- | ------------ | ------------------- |
+| 0.2.0-alpha.1 | 阶段 1       | ✅ Core 包重构完成  |
+| 0.2.0-alpha.2 | 阶段 2       | ✅ 高优先级修复完成 |
+| 0.2.0-beta.1  | 阶段 3A      | 定位系统升级完成    |
+| 0.2.0-beta.2  | 阶段 3B + 3C | 组件优化完成        |
+| 0.2.0-rc.1    | 阶段 4       | 动画系统完成        |
+| 0.2.0-rc.2    | 阶段 5       | 文档 Demo 完成      |
+| **0.2.0**     | 全部         | 正式发布            |
+
+### 12.4 下一步行动
+
+**立即开始阶段 3A**，按以下顺序执行：
+
+1. 在 `packages/core/package.json` 添加 `@floating-ui/dom` 依赖
+2. 创建 `packages/core/src/utils/floating.ts` 封装定位逻辑
+3. 迁移 Vue Tooltip 组件使用 Floating UI
+4. 迁移 React Tooltip 组件使用 Floating UI
+5. 同步更新 Popover/Popconfirm/Dropdown
+6. 抽取 `useFloatingOverlay` 共享逻辑
 
 ---
 
