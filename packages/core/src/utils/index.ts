@@ -12,3 +12,9 @@ export * from './icons'
 export * from './a11y'
 export * from './i18n'
 export * from './styles'
+
+// Floating UI positioning utilities
+export * from './floating'
+
+// Animation constants and utilities
+export * from './animation'

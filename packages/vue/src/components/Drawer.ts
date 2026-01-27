@@ -11,6 +11,7 @@ import {
   nextTick
 } from 'vue'
 import {
+  ANIMATION_DURATION_MS,
   captureActiveElement,
   classNames,
   coerceClassValue,
@@ -269,7 +270,7 @@ export const Drawer = defineComponent({
 
           const timer = window.setTimeout(() => {
             emit('after-enter')
-          }, 300)
+          }, ANIMATION_DURATION_MS)
 
           onCleanup(() => window.clearTimeout(timer))
           return
@@ -279,7 +280,7 @@ export const Drawer = defineComponent({
 
         const timer = window.setTimeout(() => {
           emit(nextVisible ? 'after-enter' : 'after-leave')
-        }, 300)
+        }, ANIMATION_DURATION_MS)
 
         onCleanup(() => window.clearTimeout(timer))
       },

@@ -36,8 +36,8 @@ describe('Popover', () => {
         }
       )
 
-      // Content should be hidden initially
-      expect(queryByText('Popover content')).not.toBeVisible()
+      // Content should not be rendered initially (conditional rendering)
+      expect(queryByText('Popover content')).toBeNull()
     })
 
     it('should show popover content when trigger is clicked', async () => {
@@ -206,7 +206,7 @@ describe('Popover', () => {
   describe('Trigger', () => {
     it('should show/hide on click when trigger is "click"', async () => {
       const user = userEvent.setup()
-      const { getByText } = renderWithProps(
+      const { getByText, queryByText } = renderWithProps(
         Popover,
         {
           trigger: 'click',
@@ -231,7 +231,7 @@ describe('Popover', () => {
       await user.click(trigger)
       await waitFor(
         () => {
-          expect(getByText('Click content')).not.toBeVisible()
+          expect(queryByText('Click content')).toBeNull()
         },
         { timeout: 2000 }
       )
@@ -239,7 +239,7 @@ describe('Popover', () => {
 
     it('should show/hide on hover when trigger is "hover"', async () => {
       const user = userEvent.setup()
-      const { getByText } = renderWithProps(
+      const { getByText, queryByText } = renderWithProps(
         Popover,
         {
           trigger: 'hover',
@@ -264,7 +264,7 @@ describe('Popover', () => {
       await user.unhover(trigger)
       await waitFor(
         () => {
-          expect(getByText('Hover content')).not.toBeVisible()
+          expect(queryByText('Hover content')).toBeNull()
         },
         { timeout: 2000 }
       )
@@ -272,7 +272,7 @@ describe('Popover', () => {
 
     it('should show/hide on focus when trigger is "focus"', async () => {
       const user = userEvent.setup()
-      const { getByText } = renderWithProps(
+      const { getByText, queryByText } = renderWithProps(
         Popover,
         {
           trigger: 'focus',
@@ -297,7 +297,7 @@ describe('Popover', () => {
       await user.tab()
       await waitFor(
         () => {
-          expect(getByText('Focus content')).not.toBeVisible()
+          expect(queryByText('Focus content')).toBeNull()
         },
         { timeout: 2000 }
       )
@@ -307,7 +307,7 @@ describe('Popover', () => {
   describe('States', () => {
     it('should support disabled state', async () => {
       const user = userEvent.setup()
-      const { getByText } = renderWithProps(
+      const { getByText, queryByText } = renderWithProps(
         Popover,
         {
           disabled: true,
@@ -325,8 +325,8 @@ describe('Popover', () => {
       // Wait a bit to ensure it doesn't show
       await new Promise((resolve) => setTimeout(resolve, 100))
 
-      // Content should still not be visible
-      expect(getByText('Disabled content')).not.toBeVisible()
+      // Content should still not be rendered
+      expect(queryByText('Disabled content')).toBeNull()
     })
 
     it('should support defaultVisible', () => {
@@ -347,7 +347,7 @@ describe('Popover', () => {
     })
 
     it('should support controlled visible state', async () => {
-      const { getByText, rerender } = renderWithProps(
+      const { getByText, queryByText, rerender } = renderWithProps(
         Popover,
         {
           visible: false,
@@ -360,8 +360,8 @@ describe('Popover', () => {
         }
       )
 
-      // Initially hidden
-      expect(getByText('Controlled content')).not.toBeVisible()
+      // Initially not rendered
+      expect(queryByText('Controlled content')).toBeNull()
 
       await rerender({ visible: true })
 
@@ -373,7 +373,7 @@ describe('Popover', () => {
       await rerender({ visible: false })
 
       await waitFor(() => {
-        expect(getByText('Controlled content')).not.toBeVisible()
+        expect(queryByText('Controlled content')).toBeNull()
       })
     })
   })
@@ -513,7 +513,7 @@ describe('Popover', () => {
 
     it('should close on Escape (non-manual)', async () => {
       const user = userEvent.setup()
-      const { getByText } = renderWithProps(
+      const { getByText, queryByText } = renderWithProps(
         Popover,
         {
           trigger: 'click',
@@ -533,7 +533,7 @@ describe('Popover', () => {
 
       await user.keyboard('{Escape}')
       await waitFor(() => {
-        expect(getByText('Esc content')).not.toBeVisible()
+        expect(queryByText('Esc content')).toBeNull()
       })
     })
 

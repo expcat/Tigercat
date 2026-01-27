@@ -1,13 +1,14 @@
 import { defineComponent, computed, ref, h, onBeforeUnmount, watch, PropType } from 'vue'
+import { useVueFloating, useVueClickOutside, useVueEscapeKey } from '../utils/overlay'
 import {
   classNames,
   coerceClassValue,
   getTooltipContainerClasses,
   getTooltipTriggerClasses,
   getTooltipContentClasses,
-  getDropdownMenuWrapperClasses,
+  getTransformOrigin,
   type TooltipTrigger,
-  type DropdownPlacement,
+  type FloatingPlacement,
   type StyleValue
 } from '@expcat/tigercat-core'
 
@@ -59,8 +60,8 @@ export const Tooltip = defineComponent({
      * @default 'top'
      */
     placement: {
-      type: String as PropType<DropdownPlacement>,
-      default: 'top' as DropdownPlacement
+      type: String as PropType<FloatingPlacement>,
+      default: 'top' as FloatingPlacement
     },
     /**
      * Whether the tooltip is disabled
@@ -69,6 +70,14 @@ export const Tooltip = defineComponent({
     disabled: {
       type: Boolean,
       default: false
+    },
+    /**
+     * Offset distance from trigger (in pixels)
+     * @default 8
+     */
+    offset: {
+      type: Number,
+      default: 8
     },
     /**
      * Additional CSS classes
@@ -108,10 +117,25 @@ export const Tooltip = defineComponent({
 
     const currentVisible = computed(() => internalVisible.value)
 
-    // Ref to the container element
+    // Element refs
     const containerRef = ref<HTMLElement | null>(null)
+    const triggerRef = ref<HTMLElement | null>(null)
+    const floatingRef = ref<HTMLElement | null>(null)
 
     const tooltipId = createTooltipId()
+
+    // Floating UI positioning
+    const {
+      x,
+      y,
+      placement: actualPlacement
+    } = useVueFloating({
+      referenceRef: triggerRef,
+      floatingRef: floatingRef,
+      enabled: currentVisible,
+      placement: props.placement as FloatingPlacement,
+      offset: props.offset
+    })
 
     // Handle visibility change
     const setVisible = (nextVisible: boolean) => {
@@ -157,49 +181,57 @@ export const Tooltip = defineComponent({
       setVisible(false)
     }
 
-    // Handle outside click to close tooltip (only for click trigger)
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target
-      if (!target) return
-      if (containerRef.value?.contains(target as Node)) return
-      setVisible(false)
-    }
+    // Click outside handler (only for click trigger)
+    const shouldHandleClickOutside = computed(
+      () => currentVisible.value && props.trigger === 'click'
+    )
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      setVisible(false)
-    }
+    let cleanupClickOutside: (() => void) | null = null
 
-    let outsideClickTimeoutId: number | undefined
+    watch(
+      shouldHandleClickOutside,
+      (shouldHandle) => {
+        if (cleanupClickOutside) {
+          cleanupClickOutside()
+          cleanupClickOutside = null
+        }
 
-    // Setup and cleanup event listeners based on visibility and trigger
-    watch([currentVisible, () => props.trigger], ([visible, trigger]) => {
-      if (outsideClickTimeoutId !== undefined) {
-        clearTimeout(outsideClickTimeoutId)
-        outsideClickTimeoutId = undefined
-      }
+        if (shouldHandle) {
+          cleanupClickOutside = useVueClickOutside({
+            enabled: currentVisible,
+            containerRef,
+            onOutsideClick: () => setVisible(false),
+            defer: true
+          })
+        }
+      },
+      { immediate: true }
+    )
 
-      document.removeEventListener('click', handleClickOutside)
-      document.removeEventListener('keydown', handleKeyDown)
+    // Escape key handler
+    let cleanupEscapeKey: (() => void) | null = null
 
-      if (visible && trigger === 'click') {
-        // Use setTimeout to avoid immediate triggering on the same click that opened it
-        outsideClickTimeoutId = window.setTimeout(() => {
-          document.addEventListener('click', handleClickOutside)
-        }, 0)
-      }
+    watch(
+      currentVisible,
+      (visible) => {
+        if (cleanupEscapeKey) {
+          cleanupEscapeKey()
+          cleanupEscapeKey = null
+        }
 
-      if (visible) {
-        document.addEventListener('keydown', handleKeyDown)
-      }
-    })
+        if (visible) {
+          cleanupEscapeKey = useVueEscapeKey({
+            enabled: currentVisible,
+            onEscape: () => setVisible(false)
+          })
+        }
+      },
+      { immediate: true }
+    )
 
     onBeforeUnmount(() => {
-      if (outsideClickTimeoutId !== undefined) {
-        clearTimeout(outsideClickTimeoutId)
-      }
-      document.removeEventListener('click', handleClickOutside)
-      document.removeEventListener('keydown', handleKeyDown)
+      if (cleanupClickOutside) cleanupClickOutside()
+      if (cleanupEscapeKey) cleanupEscapeKey()
     })
 
     // Container classes
@@ -216,15 +248,19 @@ export const Tooltip = defineComponent({
       return getTooltipTriggerClasses(props.disabled)
     })
 
-    // Content wrapper classes
-    const contentWrapperClasses = computed(() => {
-      return getDropdownMenuWrapperClasses(currentVisible.value, props.placement)
-    })
-
     // Content classes
     const contentClasses = computed(() => {
       return getTooltipContentClasses()
     })
+
+    // Floating content styles
+    const floatingStyles = computed(() => ({
+      position: 'absolute' as const,
+      left: `${x.value}px`,
+      top: `${y.value}px`,
+      transformOrigin: getTransformOrigin(actualPlacement.value),
+      zIndex: 1000
+    }))
 
     return () => {
       const defaultSlot = slots.default?.()
@@ -257,6 +293,7 @@ export const Tooltip = defineComponent({
       const trigger = h(
         'div',
         {
+          ref: triggerRef,
           class: triggerClasses.value,
           'aria-describedby': hasTooltipContent ? tooltipId : undefined,
           ...triggerHandlers
@@ -264,26 +301,28 @@ export const Tooltip = defineComponent({
         defaultSlot
       )
 
-      // Tooltip content
-      const content = h(
-        'div',
-        {
-          class: contentWrapperClasses.value,
-          hidden: !currentVisible.value,
-          'aria-hidden': !currentVisible.value
-        },
-        [
-          h(
+      // Tooltip content (positioned with Floating UI)
+      const content = currentVisible.value
+        ? h(
             'div',
             {
-              id: tooltipId,
-              role: 'tooltip',
-              class: contentClasses.value
+              ref: floatingRef,
+              style: floatingStyles.value,
+              'aria-hidden': false
             },
-            slots.content ? slots.content() : props.content
+            [
+              h(
+                'div',
+                {
+                  id: tooltipId,
+                  role: 'tooltip',
+                  class: contentClasses.value
+                },
+                slots.content ? slots.content() : props.content
+              )
+            ]
           )
-        ]
-      )
+        : null
 
       return h(
         'div',

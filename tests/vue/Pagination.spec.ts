@@ -13,7 +13,7 @@ describe('Pagination', () => {
     const nav = container.querySelector('nav')
     expect(nav).toBeInTheDocument()
     expect(nav).toHaveAttribute('role', 'navigation')
-    expect(nav).toHaveAttribute('aria-label', '分页导航')
+    expect(nav).toHaveAttribute('aria-label', 'Pagination')
   })
 
   it('merges attrs.class with className prop', () => {
@@ -31,13 +31,13 @@ describe('Pagination', () => {
       props: { total: 100, pageSize: 10 },
       attrs: { onChange }
     })
-    await fireEvent.click(screen.getByLabelText('第 2 页'))
+    await fireEvent.click(screen.getByLabelText('Page 2'))
     expect(onChange).toHaveBeenCalledWith(2, 10)
   })
 
   it('sets aria-current on the active page', () => {
     render(Pagination, { props: { total: 100, pageSize: 10, current: 3 } })
-    expect(screen.getByLabelText('第 3 页')).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByLabelText('Page 3')).toHaveAttribute('aria-current', 'page')
   })
 
   it('disables all page buttons when disabled', () => {
@@ -61,7 +61,7 @@ describe('Pagination', () => {
       attrs: { onChange }
     })
 
-    const input = screen.getByLabelText('跳转页码') as HTMLInputElement
+    const input = screen.getByLabelText('Go to') as HTMLInputElement
     await user.type(input, '5')
     await user.keyboard('{Enter}')
 
@@ -82,7 +82,8 @@ describe('Pagination', () => {
       attrs: { onPageSizeChange }
     })
 
-    await fireEvent.change(screen.getByLabelText('每页条数'), {
+    // Use default English label from i18n system
+    await fireEvent.change(screen.getByLabelText('/ page'), {
       target: { value: '50' }
     })
 
