@@ -207,3 +207,76 @@ export function getTotalTextClasses(size: PaginationSize = 'medium'): string {
 
   return classNames('text-[var(--tiger-text-muted,#6b7280)]', 'mr-2', sizeClasses[size])
 }
+
+// ============================================================================
+// Simple Pagination Styles (for Table/List components)
+// ============================================================================
+
+/**
+ * Get simple pagination container classes
+ * Used by Table and List components for their built-in pagination
+ */
+export function getSimplePaginationContainerClasses(): string {
+  return classNames(
+    'flex items-center justify-between',
+    'px-4 py-3',
+    'border-t border-[var(--tiger-border,#e5e7eb)]'
+  )
+}
+
+/**
+ * Get simple pagination total text classes
+ */
+export function getSimplePaginationTotalClasses(): string {
+  return 'text-sm text-[var(--tiger-text,#111827)]'
+}
+
+/**
+ * Get simple pagination controls container classes
+ */
+export function getSimplePaginationControlsClasses(): string {
+  return 'flex items-center gap-2'
+}
+
+/**
+ * Get simple pagination page size selector classes
+ */
+export function getSimplePaginationSelectClasses(): string {
+  return classNames(
+    'px-3 py-1',
+    'border border-[var(--tiger-border,#e5e7eb)] rounded',
+    'text-sm',
+    'bg-[var(--tiger-surface,#ffffff)]',
+    'text-[var(--tiger-text,#111827)]'
+  )
+}
+
+/**
+ * Get simple pagination button classes
+ * @param disabled - Whether the button is disabled
+ */
+export function getSimplePaginationButtonClasses(disabled: boolean): string {
+  return classNames(
+    'px-3 py-1',
+    'border border-[var(--tiger-border,#e5e7eb)] rounded',
+    'text-sm',
+    'bg-[var(--tiger-surface,#ffffff)]',
+    disabled
+      ? 'text-[var(--tiger-text-muted,#6b7280)] cursor-not-allowed'
+      : 'hover:bg-[var(--tiger-surface-muted,#f9fafb)] text-[var(--tiger-text,#111827)]'
+  )
+}
+
+/**
+ * Get simple pagination page indicator classes
+ */
+export function getSimplePaginationPageIndicatorClasses(): string {
+  return 'px-3 py-1 text-sm text-[var(--tiger-text,#111827)]'
+}
+
+/**
+ * Get simple pagination buttons wrapper classes
+ */
+export function getSimplePaginationButtonsWrapperClasses(): string {
+  return 'flex gap-1'
+}

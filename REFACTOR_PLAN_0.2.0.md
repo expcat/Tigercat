@@ -768,18 +768,26 @@ export const Button: React.FC<ButtonProps> = ({
 - 新增 floating.ts (~250 行) 统一定位逻辑
 - 所有 72 个 Tooltip/Popover 测试通过
 
-#### 阶段 3B：组件拆分与抽象 🔄 进行中
+#### 阶段 3B：组件拆分与抽象 ✅ 已完成
 
 > 目标：提高组件复用性，减少 Table/List 分页代码重复
 
-1. ⬜ 抽取 Pagination 子组件（`PaginationButton`, `PaginationEllipsis`, `PaginationSizeChanger`, `PaginationQuickJumper`）
-2. ⬜ Table/List 复用 Pagination 子组件（预计减少 100+ 行重复）
+1. ✅ 抽取简单分页样式工具函数到 `pagination-utils.ts`
+   - `getSimplePaginationContainerClasses()` - 容器样式
+   - `getSimplePaginationTotalClasses()` - 总数文本样式
+   - `getSimplePaginationControlsClasses()` - 控件容器样式
+   - `getSimplePaginationSelectClasses()` - 页大小选择器样式
+   - `getSimplePaginationButtonClasses(disabled)` - 上/下页按钮样式
+   - `getSimplePaginationPageIndicatorClasses()` - 页码指示器样式
+   - `getSimplePaginationButtonsWrapperClasses()` - 按钮组容器样式
+2. ✅ Table/List 复用共享分页样式工具函数（Vue + React 均已更新）
+   - 旧常量 `tablePaginationContainerClasses` 和 `listPaginationContainerClasses` 已标记为 @deprecated
 3. ✅ RadarChart 复用 ChartTooltip 组件（统一图表 tooltip 体验）
    - 移除原生 `<title>` 元素，改用 ChartTooltip 组件
    - 添加 point 级别 hover 状态（`hoveredPoint`）
    - Vue + React 均已更新，测试通过
 
-#### 阶段 3C：代码精简 ⬜ 待开始
+#### 阶段 3C：代码精简 ⬜ 待开始（可推迟到 0.2.1）
 
 > 目标：拆分复杂组件，提高可维护性
 
@@ -863,10 +871,15 @@ export const Button: React.FC<ButtonProps> = ({
 
 ### 12.5 下一步行动
 
-**阶段 3B 已完成**，Popconfirm/Dropdown 已迁移至 Floating UI。当前可选后续任务：
+**阶段 3B 已完成**，组件拆分与抽象工作已完成：
 
-1. **Pagination 子组件抽取** - Table/List 复用，减少代码重复
-2. **准备 0.2.0-beta.1 发布** - 当前功能已满足发布要求
+- ✅ Popconfirm/Dropdown 已迁移至 Floating UI
+- ✅ Pagination 子组件抽取 - Table/List 共享简单分页样式工具函数
+
+当前可选后续任务：
+
+1. **准备 0.2.0-beta.1 发布** - 当前功能已满足发布要求
+2. **阶段 3C 可选任务** - DatePicker/TimePicker/Select setup 拆分（可推迟）
 
 ---
 
