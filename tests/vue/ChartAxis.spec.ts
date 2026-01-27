@@ -7,78 +7,34 @@ import { ChartAxis } from '@expcat/tigercat-vue'
 import { createLinearScale } from '@expcat/tigercat-core'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
 
+const scale = createLinearScale([0, 100], [0, 200])
+const tickValues = [0, 50, 100]
+
 describe('ChartAxis', () => {
   it('renders ticks and label', () => {
-    const scale = createLinearScale([0, 100], [0, 200])
-    const { container } = renderWithProps(ChartAxis, {
-      scale,
-      tickValues: [0, 50, 100],
-      label: 'Value'
-    })
+    const { container } = renderWithProps(ChartAxis, { scale, tickValues, label: 'Value' })
 
     expect(container.querySelectorAll('[data-axis-tick]')).toHaveLength(3)
     expect(container.querySelector('[data-axis-label]')).toHaveTextContent('Value')
   })
 
   it('passes basic a11y checks', async () => {
-    const scale = createLinearScale([0, 100], [0, 200])
-    const { container } = renderWithProps(ChartAxis, {
-      scale,
-      tickValues: [0, 50, 100]
-    })
-
+    const { container } = renderWithProps(ChartAxis, { scale, tickValues })
     await expectNoA11yViolations(container)
   })
 
-  it('renders with position bottom', () => {
-    const scale = createLinearScale([0, 100], [0, 200])
-    const { container } = renderWithProps(ChartAxis, {
-      scale,
-      tickValues: [0, 50, 100],
-      position: 'bottom'
+  it('renders with all positions', () => {
+    const positions = ['bottom', 'top', 'left', 'right'] as const
+    positions.forEach((position) => {
+      const { container } = renderWithProps(ChartAxis, { scale, tickValues, position })
+      expect(container.querySelectorAll('[data-axis-tick]')).toHaveLength(3)
     })
-
-    expect(container.querySelectorAll('[data-axis-tick]')).toHaveLength(3)
-  })
-
-  it('renders with position top', () => {
-    const scale = createLinearScale([0, 100], [0, 200])
-    const { container } = renderWithProps(ChartAxis, {
-      scale,
-      tickValues: [0, 50, 100],
-      position: 'top'
-    })
-
-    expect(container.querySelectorAll('[data-axis-tick]')).toHaveLength(3)
-  })
-
-  it('renders with position left', () => {
-    const scale = createLinearScale([0, 100], [0, 200])
-    const { container } = renderWithProps(ChartAxis, {
-      scale,
-      tickValues: [0, 50, 100],
-      position: 'left'
-    })
-
-    expect(container.querySelectorAll('[data-axis-tick]')).toHaveLength(3)
-  })
-
-  it('renders with position right', () => {
-    const scale = createLinearScale([0, 100], [0, 200])
-    const { container } = renderWithProps(ChartAxis, {
-      scale,
-      tickValues: [0, 50, 100],
-      position: 'right'
-    })
-
-    expect(container.querySelectorAll('[data-axis-tick]')).toHaveLength(3)
   })
 
   it('renders with custom tick format', () => {
-    const scale = createLinearScale([0, 100], [0, 200])
     const { container } = renderWithProps(ChartAxis, {
       scale,
-      tickValues: [0, 50, 100],
+      tickValues,
       tickFormat: (v: number) => `$${v}`
     })
 
@@ -89,12 +45,7 @@ describe('ChartAxis', () => {
   })
 
   it('renders with empty tickValues', () => {
-    const scale = createLinearScale([0, 100], [0, 200])
-    const { container } = renderWithProps(ChartAxis, {
-      scale,
-      tickValues: []
-    })
-
+    const { container } = renderWithProps(ChartAxis, { scale, tickValues: [] })
     expect(container.querySelectorAll('[data-axis-tick]')).toHaveLength(0)
   })
 })

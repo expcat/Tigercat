@@ -56,7 +56,11 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
   }, [interactive, onItemLeave])
 
   return (
-    <div className={containerClasses} role="list" aria-label="Chart legend">
+    <div
+      className={containerClasses}
+      role="list"
+      aria-label="Chart legend"
+      data-chart-legend="true">
       {items.map((item) => {
         const ItemComponent = interactive ? 'button' : 'div'
         return (
@@ -72,6 +76,7 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
               item.active === false ? 'opacity-50' : undefined
             )}
             role="listitem"
+            data-legend-item="true"
             onClick={interactive ? () => handleClick(item) : undefined}
             onMouseEnter={interactive ? () => handleHover(item) : undefined}
             onMouseLeave={interactive ? handleLeave : undefined}>
@@ -83,6 +88,7 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
                 backgroundColor: item.color
               }}
               aria-hidden="true"
+              data-legend-marker="true"
             />
             <span style={{ marginRight: `${gap}px` }}>{item.label}</span>
           </ItemComponent>

@@ -328,7 +328,7 @@ export const PieChart = defineComponent({
                             'cursor-pointer transition-opacity duration-150'
                         ),
                         tabindex: props.selectable ? 0 : undefined,
-                        role: props.selectable ? 'button' : undefined,
+                        role: props.selectable ? 'button' : 'img',
                         'aria-label': arc.data.label ?? `${arc.value}`,
                         'data-pie-slice': 'true',
                         'data-index': arc.index,

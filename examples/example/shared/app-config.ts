@@ -212,6 +212,16 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'RadarChart', 'en-US': 'RadarChart' }
       },
       {
+        key: 'line-chart',
+        path: '/line-chart',
+        label: { 'zh-CN': 'LineChart', 'en-US': 'LineChart' }
+      },
+      {
+        key: 'area-chart',
+        path: '/area-chart',
+        label: { 'zh-CN': 'AreaChart', 'en-US': 'AreaChart' }
+      },
+      {
         key: 'skeleton',
         path: '/skeleton',
         label: { 'zh-CN': 'Skeleton', 'en-US': 'Skeleton' }

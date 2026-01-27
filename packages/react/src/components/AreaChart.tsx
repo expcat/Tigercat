@@ -14,12 +14,9 @@ import {
   type AreaChartProps as CoreAreaChartProps,
   type AreaChartSeries,
   type ChartCurveType,
-  type ChartGridLineStyle,
   type ChartLegendItem,
-  type ChartLegendPosition,
   type ChartPadding,
-  type ChartScale,
-  type ChartScaleValue
+  type ChartScale
 } from '@expcat/tigercat-core'
 import { ChartAxis } from './ChartAxis'
 import { ChartCanvas } from './ChartCanvas'
@@ -54,13 +51,13 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   series,
   xScale: xScaleProp,
   yScale: yScaleProp,
-  areaColor = 'var(--tiger-primary,#2563eb)',
+  areaColor: _areaColor = 'var(--tiger-primary,#2563eb)',
   strokeWidth = 2,
   fillOpacity = 0.2,
   curve = 'linear',
   showPoints = false,
   pointSize = 4,
-  pointColor,
+  pointColor: _pointColor,
   stacked = false,
   showGrid = true,
   showAxis = true,

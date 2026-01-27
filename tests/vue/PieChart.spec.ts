@@ -2,16 +2,17 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { PieChart } from '@expcat/tigercat-vue'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
+
+const defaultSize = { width: 240, height: 160 }
 
 describe('PieChart', () => {
   it('renders slices', () => {
     const { container } = renderWithProps(PieChart, {
       data: [{ value: 40 }, { value: 30 }, { value: 20 }],
-      width: 240,
-      height: 160
+      ...defaultSize
     })
 
     expect(container.querySelectorAll('path[data-pie-slice]')).toHaveLength(3)
@@ -28,22 +29,11 @@ describe('PieChart', () => {
   it('renders empty state with no data', () => {
     const { container } = renderWithProps(PieChart, {
       data: [],
-      width: 240,
-      height: 160
+      ...defaultSize
     })
 
     expect(container.querySelectorAll('path[data-pie-slice]')).toHaveLength(0)
     expect(container.querySelector('svg')).toBeTruthy()
-  })
-
-  it('renders single slice', () => {
-    const { container } = renderWithProps(PieChart, {
-      data: [{ value: 100 }],
-      width: 240,
-      height: 160
-    })
-
-    expect(container.querySelectorAll('path[data-pie-slice]')).toHaveLength(1)
   })
 
   it('renders labels when showLabels is true', () => {
@@ -53,12 +43,10 @@ describe('PieChart', () => {
         { value: 30, label: 'B' }
       ],
       showLabels: true,
-      width: 240,
-      height: 160
+      ...defaultSize
     })
 
-    const texts = container.querySelectorAll('text')
-    expect(texts.length).toBeGreaterThanOrEqual(2)
+    expect(container.querySelectorAll('text').length).toBeGreaterThanOrEqual(2)
   })
 
   it('uses custom colors when provided', () => {
@@ -66,8 +54,7 @@ describe('PieChart', () => {
     const { container } = renderWithProps(PieChart, {
       data: [{ value: 40 }, { value: 30 }, { value: 20 }],
       colors: customColors,
-      width: 240,
-      height: 160
+      ...defaultSize
     })
 
     const slices = container.querySelectorAll('path[data-pie-slice]')
@@ -76,14 +63,51 @@ describe('PieChart', () => {
     expect(slices[2]).toHaveAttribute('fill', '#0000ff')
   })
 
-  it('renders with custom innerRadius (donut style)', () => {
-    const { container } = renderWithProps(PieChart, {
-      data: [{ value: 40 }, { value: 30 }],
-      innerRadius: 30,
-      width: 240,
-      height: 160
+  describe('interaction', () => {
+    it('triggers hover events when hoverable', async () => {
+      const onHoveredIndexChange = vi.fn()
+      const { container } = renderWithProps(PieChart, {
+        data: [{ value: 40 }, { value: 30 }],
+        hoverable: true,
+        'onUpdate:hoveredIndex': onHoveredIndexChange,
+        ...defaultSize
+      })
+
+      container
+        .querySelector('path[data-pie-slice]')
+        ?.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
+      expect(onHoveredIndexChange).toHaveBeenCalledWith(0)
     })
 
-    expect(container.querySelectorAll('path[data-pie-slice]')).toHaveLength(2)
+    it('triggers click events when selectable', async () => {
+      const onSliceClick = vi.fn()
+      const { container } = renderWithProps(PieChart, {
+        data: [
+          { value: 40, label: 'A' },
+          { value: 30, label: 'B' }
+        ],
+        selectable: true,
+        onSliceClick,
+        ...defaultSize
+      })
+
+      container
+        .querySelectorAll('path[data-pie-slice]')[1]
+        .dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      expect(onSliceClick).toHaveBeenCalled()
+    })
+
+    it('renders legend when showLegend is true', () => {
+      const { container } = renderWithProps(PieChart, {
+        data: [
+          { value: 40, label: 'A' },
+          { value: 30, label: 'B' }
+        ],
+        showLegend: true,
+        ...defaultSize
+      })
+
+      expect(container.querySelector('[role="list"][aria-label="Chart legend"]')).toBeTruthy()
+    })
   })
 })

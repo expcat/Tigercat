@@ -71,6 +71,9 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
     [visible, className]
   )
 
+  // Don't render if content is empty
+  if (!content) return null
+
   const tooltip = (
     <div
       ref={tooltipRef}
@@ -79,7 +82,8 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
         left: `${adjustedPosition.x}px`,
         top: `${adjustedPosition.y}px`
       }}
-      role="tooltip">
+      role="tooltip"
+      data-chart-tooltip="true">
       {content}
     </div>
   )

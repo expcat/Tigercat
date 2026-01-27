@@ -80,6 +80,14 @@ const router = createRouter({
           path: 'radar-chart',
           component: () => import('./pages/RadarChartDemo.vue')
         },
+        {
+          path: 'line-chart',
+          component: () => import('./pages/LineChartDemo.vue')
+        },
+        {
+          path: 'area-chart',
+          component: () => import('./pages/AreaChartDemo.vue')
+        },
         { path: 'menu', component: () => import('./pages/MenuDemo.vue') },
         {
           path: 'breadcrumb',

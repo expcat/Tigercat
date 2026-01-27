@@ -1,4 +1,4 @@
-import { defineComponent, h, PropType, computed, ref, watch, Teleport } from 'vue'
+import { defineComponent, h, computed, ref, watch, Teleport } from 'vue'
 import { classNames } from '@expcat/tigercat-core'
 
 export interface VueChartTooltipProps {
@@ -89,8 +89,11 @@ export const ChartTooltip = defineComponent({
       )
     )
 
-    return () =>
-      h(Teleport, { to: 'body' }, [
+    return () => {
+      // Don't render if content is empty
+      if (!props.content) return null
+
+      return h(Teleport, { to: 'body' }, [
         h(
           'div',
           {
@@ -100,11 +103,13 @@ export const ChartTooltip = defineComponent({
               left: `${adjustedPosition.value.x}px`,
               top: `${adjustedPosition.value.y}px`
             },
-            role: 'tooltip'
+            role: 'tooltip',
+            'data-chart-tooltip': 'true'
           },
           props.content
         )
       ])
+    }
   }
 })
 

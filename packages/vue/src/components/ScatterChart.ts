@@ -1,10 +1,14 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, PropType, ref } from 'vue'
 import {
   classNames,
   createLinearScale,
+  DEFAULT_CHART_COLORS,
+  getChartElementOpacity,
   getChartInnerRect,
   getNumberExtent,
   type ChartGridLineStyle,
+  type ChartLegendItem,
+  type ChartLegendPosition,
   type ChartPadding,
   type ChartScale,
   type ChartScaleValue,
@@ -14,7 +18,9 @@ import {
 import { ChartAxis } from './ChartAxis'
 import { ChartCanvas } from './ChartCanvas'
 import { ChartGrid } from './ChartGrid'
+import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
+import { ChartTooltip } from './ChartTooltip'
 
 export interface VueScatterChartProps extends CoreScatterChartProps {
   data: ScatterChartDatum[]
@@ -113,11 +119,79 @@ export const ScatterChart = defineComponent({
       type: Number,
       default: 1
     },
+    // Interaction props
+    hoverable: {
+      type: Boolean,
+      default: false
+    },
+    hoveredIndex: {
+      type: Number as PropType<number | null>,
+      default: undefined
+    },
+    activeOpacity: {
+      type: Number,
+      default: 1
+    },
+    inactiveOpacity: {
+      type: Number,
+      default: 0.25
+    },
+    selectable: {
+      type: Boolean,
+      default: false
+    },
+    selectedIndex: {
+      type: Number as PropType<number | null>,
+      default: undefined
+    },
+    // Legend props
+    showLegend: {
+      type: Boolean,
+      default: false
+    },
+    legendPosition: {
+      type: String as PropType<ChartLegendPosition>,
+      default: 'bottom'
+    },
+    legendMarkerSize: {
+      type: Number,
+      default: 10
+    },
+    legendGap: {
+      type: Number,
+      default: 8
+    },
+    legendFormatter: {
+      type: Function as PropType<(datum: ScatterChartDatum, index: number) => string>
+    },
+    // Tooltip props
+    showTooltip: {
+      type: Boolean,
+      default: true
+    },
+    tooltipFormatter: {
+      type: Function as PropType<(datum: ScatterChartDatum, index: number) => string>
+    },
+    // Other
+    colors: {
+      type: Array as PropType<string[]>
+    },
+    title: {
+      type: String
+    },
+    desc: {
+      type: String
+    },
     className: {
       type: String
     }
   },
-  setup(props) {
+  emits: ['update:hoveredIndex', 'update:selectedIndex', 'point-click', 'point-hover'],
+  setup(props, { emit }) {
+    const localHoveredIndex = ref<number | null>(null)
+    const localSelectedIndex = ref<number | null>(null)
+    const tooltipPosition = ref({ x: 0, y: 0 })
+
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 
     const xValues = computed(() => props.data.map((item) => item.x))
@@ -138,13 +212,152 @@ export const ScatterChart = defineComponent({
     const showXAxis = computed(() => props.showAxis && props.showXAxis)
     const showYAxis = computed(() => props.showAxis && props.showYAxis)
 
-    return () =>
-      h(
+    const palette = computed(() =>
+      props.colors && props.colors.length > 0
+        ? props.colors
+        : props.pointColor
+          ? [props.pointColor]
+          : [...DEFAULT_CHART_COLORS]
+    )
+
+    const resolvedHoveredIndex = computed(() =>
+      props.hoveredIndex !== undefined ? props.hoveredIndex : localHoveredIndex.value
+    )
+
+    const resolvedSelectedIndex = computed(() =>
+      props.selectedIndex !== undefined ? props.selectedIndex : localSelectedIndex.value
+    )
+
+    const activeIndex = computed(() => {
+      if (resolvedSelectedIndex.value !== null) return resolvedSelectedIndex.value
+      if (props.hoverable && resolvedHoveredIndex.value !== null) return resolvedHoveredIndex.value
+      return null
+    })
+
+    const points = computed(() =>
+      props.data.map((item, index) => {
+        const color = item.color ?? palette.value[index % palette.value.length]
+        const opacity = getChartElementOpacity(index, activeIndex.value, {
+          activeOpacity: props.activeOpacity,
+          inactiveOpacity: props.inactiveOpacity
+        })
+
+        return {
+          cx: resolvedXScale.value.map(item.x),
+          cy: resolvedYScale.value.map(item.y),
+          r: item.size ?? props.pointSize,
+          color,
+          opacity: props.pointOpacity ?? opacity,
+          datum: item
+        }
+      })
+    )
+
+    const legendItems = computed<ChartLegendItem[]>(() =>
+      props.data.map((item, index) => ({
+        index,
+        label: props.legendFormatter
+          ? props.legendFormatter(item, index)
+          : (item.label ?? `(${item.x}, ${item.y})`),
+        color: item.color ?? palette.value[index % palette.value.length],
+        active: activeIndex.value === null || activeIndex.value === index
+      }))
+    )
+
+    const formatTooltip = computed(
+      () =>
+        props.tooltipFormatter ??
+        ((datum: ScatterChartDatum, index: number) => {
+          const label = datum.label ?? `Point ${index + 1}`
+          return `${label}: (${datum.x}, ${datum.y})`
+        })
+    )
+
+    const tooltipContent = computed(() => {
+      if (resolvedHoveredIndex.value === null) return ''
+      const datum = props.data[resolvedHoveredIndex.value]
+      return datum ? formatTooltip.value(datum, resolvedHoveredIndex.value) : ''
+    })
+
+    const handleMouseEnter = (index: number, event: MouseEvent) => {
+      if (!props.hoverable) return
+      if (props.hoveredIndex === undefined) {
+        localHoveredIndex.value = index
+      }
+      tooltipPosition.value = { x: event.clientX, y: event.clientY }
+      emit('update:hoveredIndex', index)
+      emit('point-hover', index, props.data[index])
+    }
+
+    const handleMouseMove = (event: MouseEvent) => {
+      tooltipPosition.value = { x: event.clientX, y: event.clientY }
+    }
+
+    const handleMouseLeave = () => {
+      if (!props.hoverable) return
+      if (props.hoveredIndex === undefined) {
+        localHoveredIndex.value = null
+      }
+      emit('update:hoveredIndex', null)
+      emit('point-hover', null, null)
+    }
+
+    const handleClick = (index: number) => {
+      if (props.selectable) {
+        const nextIndex = resolvedSelectedIndex.value === index ? null : index
+        if (props.selectedIndex === undefined) {
+          localSelectedIndex.value = nextIndex
+        }
+        emit('update:selectedIndex', nextIndex)
+      }
+      emit('point-click', index, props.data[index])
+    }
+
+    const handleKeyDown = (event: KeyboardEvent, index: number) => {
+      if (!props.selectable) return
+      if (event.key !== 'Enter' && event.key !== ' ') return
+      event.preventDefault()
+      handleClick(index)
+    }
+
+    const handleLegendClick = (index: number) => {
+      handleClick(index)
+    }
+
+    const handleLegendHover = (index: number) => {
+      if (!props.hoverable) return
+      if (props.hoveredIndex === undefined) {
+        localHoveredIndex.value = index
+      }
+      emit('update:hoveredIndex', index)
+    }
+
+    const handleLegendLeave = () => {
+      handleMouseLeave()
+    }
+
+    const wrapperClasses = computed(() =>
+      classNames(
+        'inline-flex',
+        props.legendPosition === 'right'
+          ? 'flex-row items-start gap-4'
+          : props.legendPosition === 'left'
+            ? 'flex-row-reverse items-start gap-4'
+            : props.legendPosition === 'top'
+              ? 'flex-col-reverse gap-2'
+              : 'flex-col gap-2'
+      )
+    )
+
+    return () => {
+      const chart = h(
         ChartCanvas,
         {
           width: props.width,
           height: props.height,
           padding: props.padding,
+          title: props.title,
+          desc: props.desc,
           className: classNames(props.className)
         },
         {
@@ -192,14 +405,29 @@ export const ScatterChart = defineComponent({
                 },
                 {
                   default: () =>
-                    props.data.map((item, index) =>
+                    points.value.map((point, index) =>
                       h('circle', {
                         key: `point-${index}`,
-                        cx: resolvedXScale.value.map(item.x),
-                        cy: resolvedYScale.value.map(item.y),
-                        r: item.size ?? props.pointSize,
-                        fill: item.color ?? props.pointColor,
-                        opacity: props.pointOpacity
+                        cx: point.cx,
+                        cy: point.cy,
+                        r: point.r,
+                        fill: point.color,
+                        opacity: point.opacity,
+                        class: classNames(
+                          'transition-opacity duration-150',
+                          (props.hoverable || props.selectable) && 'cursor-pointer'
+                        ),
+                        tabindex: props.selectable ? 0 : undefined,
+                        role: props.selectable ? 'button' : 'img',
+                        'aria-label':
+                          point.datum.label ??
+                          `Point ${index + 1}: (${point.datum.x}, ${point.datum.y})`,
+                        'data-point-index': index,
+                        onMouseenter: (e: MouseEvent) => handleMouseEnter(index, e),
+                        onMousemove: handleMouseMove,
+                        onMouseleave: handleMouseLeave,
+                        onClick: () => handleClick(index),
+                        onKeydown: (e: KeyboardEvent) => handleKeyDown(e, index)
                       })
                     )
                 }
@@ -207,6 +435,36 @@ export const ScatterChart = defineComponent({
             ].filter(Boolean)
         }
       )
+
+      const tooltip =
+        props.showTooltip && props.hoverable
+          ? h(ChartTooltip, {
+              content: tooltipContent.value,
+              visible: resolvedHoveredIndex.value !== null && tooltipContent.value !== '',
+              x: tooltipPosition.value.x,
+              y: tooltipPosition.value.y
+            })
+          : null
+
+      if (!props.showLegend) {
+        return h('div', { class: 'inline-block relative' }, [chart, tooltip])
+      }
+
+      return h('div', { class: wrapperClasses.value }, [
+        chart,
+        h(ChartLegend, {
+          items: legendItems.value,
+          position: props.legendPosition,
+          markerSize: props.legendMarkerSize,
+          gap: props.legendGap,
+          interactive: props.hoverable || props.selectable,
+          'onItem-click': handleLegendClick,
+          'onItem-hover': handleLegendHover,
+          'onItem-leave': handleLegendLeave
+        }),
+        tooltip
+      ])
+    }
   }
 })
 

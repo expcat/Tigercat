@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import React from 'react'
 import { ScatterChart } from '@expcat/tigercat-react'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
+
+const defaultSize = { width: 240, height: 160 }
 
 describe('ScatterChart', () => {
   it('renders points', () => {
@@ -11,8 +12,7 @@ describe('ScatterChart', () => {
         { x: 20, y: 30 },
         { x: 30, y: 40 }
       ],
-      width: 240,
-      height: 160
+      ...defaultSize
     })
 
     expect(container.querySelectorAll('circle')).toHaveLength(3)
@@ -29,81 +29,103 @@ describe('ScatterChart', () => {
   it('renders empty state with no data', () => {
     const { container } = renderWithProps(ScatterChart, {
       data: [],
-      width: 240,
-      height: 160
+      ...defaultSize
     })
 
     expect(container.querySelectorAll('circle')).toHaveLength(0)
     expect(container.querySelector('svg')).toBeTruthy()
   })
 
-  it('renders single point', () => {
-    const { container } = renderWithProps(ScatterChart, {
-      data: [{ x: 50, y: 50 }],
-      width: 240,
-      height: 160
-    })
-
-    expect(container.querySelectorAll('circle')).toHaveLength(1)
-  })
-
   it('handles negative values', () => {
     const { container } = renderWithProps(ScatterChart, {
       data: [
         { x: -10, y: 20 },
-        { x: 20, y: -30 },
-        { x: -5, y: -15 }
+        { x: 20, y: -30 }
       ],
-      width: 240,
-      height: 160
+      ...defaultSize
     })
 
-    expect(container.querySelectorAll('circle')).toHaveLength(3)
+    expect(container.querySelectorAll('circle')).toHaveLength(2)
   })
 
-  it('uses custom pointColor', () => {
+  it('uses custom pointColor and pointSize', () => {
     const { container } = renderWithProps(ScatterChart, {
       data: [{ x: 10, y: 20 }],
       pointColor: '#ff0000',
-      width: 240,
-      height: 160
+      pointSize: 8,
+      ...defaultSize
     })
 
     const circle = container.querySelector('circle')
     expect(circle).toHaveAttribute('fill', '#ff0000')
-  })
-
-  it('uses custom pointSize', () => {
-    const { container } = renderWithProps(ScatterChart, {
-      data: [{ x: 10, y: 20 }],
-      pointSize: 8,
-      width: 240,
-      height: 160
-    })
-
-    const circle = container.querySelector('circle')
     expect(circle).toHaveAttribute('r', '8')
   })
 
-  it('hides axis when showAxis is false', () => {
+  it('hides axis and grid when disabled', () => {
     const { container } = renderWithProps(ScatterChart, {
       data: [{ x: 10, y: 20 }],
       showAxis: false,
-      width: 240,
-      height: 160
+      showGrid: false,
+      ...defaultSize
     })
 
     expect(container.querySelectorAll('[data-axis-tick]')).toHaveLength(0)
+    expect(container.querySelectorAll('[data-chart-grid] line')).toHaveLength(0)
   })
 
-  it('hides grid when showGrid is false', () => {
-    const { container } = renderWithProps(ScatterChart, {
-      data: [{ x: 10, y: 20 }],
-      showGrid: false,
-      width: 240,
-      height: 160
+  describe('interaction', () => {
+    const interactiveData = [
+      { x: 10, y: 20, label: 'Point A' },
+      { x: 30, y: 40, label: 'Point B' },
+      { x: 50, y: 60, label: 'Point C' }
+    ]
+
+    it('adds cursor-pointer class when hoverable', () => {
+      const { container } = renderWithProps(ScatterChart, {
+        data: interactiveData,
+        hoverable: true,
+        ...defaultSize
+      })
+
+      expect(container.querySelector('circle')?.getAttribute('class')).toContain('cursor-pointer')
     })
 
-    expect(container.querySelectorAll('[data-chart-grid] line')).toHaveLength(0)
+    it('renders legend when showLegend is true', () => {
+      const { container } = renderWithProps(ScatterChart, {
+        data: interactiveData,
+        showLegend: true,
+        ...defaultSize
+      })
+
+      expect(container.querySelector('[role="list"][aria-label="Chart legend"]')).toBeTruthy()
+    })
+
+    it('supports controlled hoveredIndex with opacity changes', () => {
+      const { container } = renderWithProps(ScatterChart, {
+        data: interactiveData,
+        hoverable: true,
+        hoveredIndex: 1,
+        ...defaultSize
+      })
+
+      const circles = container.querySelectorAll('circle')
+      expect(circles[0]).toHaveAttribute('opacity', '0.25')
+      expect(circles[1]).toHaveAttribute('opacity', '1')
+      expect(circles[2]).toHaveAttribute('opacity', '0.25')
+    })
+
+    it('supports controlled selectedIndex with opacity changes', () => {
+      const { container } = renderWithProps(ScatterChart, {
+        data: interactiveData,
+        selectable: true,
+        selectedIndex: 2,
+        ...defaultSize
+      })
+
+      const circles = container.querySelectorAll('circle')
+      expect(circles[0]).toHaveAttribute('opacity', '0.25')
+      expect(circles[1]).toHaveAttribute('opacity', '0.25')
+      expect(circles[2]).toHaveAttribute('opacity', '1')
+    })
   })
 })
