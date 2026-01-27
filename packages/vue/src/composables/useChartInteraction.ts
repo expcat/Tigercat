@@ -39,7 +39,7 @@ export interface UseChartInteractionOptions<T = unknown> {
 /**
  * Return type for useChartInteraction
  */
-export interface UseChartInteractionReturn<T = unknown> {
+export interface UseChartInteractionReturn {
   /** Local hovered index state */
   localHoveredIndex: Ref<number | null>
   /** Local selected index state */
@@ -93,7 +93,7 @@ function unref<T>(value: T | Ref<T>): T {
  */
 export function useChartInteraction<T = unknown>(
   options: UseChartInteractionOptions<T>
-): UseChartInteractionReturn<T> {
+): UseChartInteractionReturn {
   const { emit, getData, eventNames } = options
 
   // Local state

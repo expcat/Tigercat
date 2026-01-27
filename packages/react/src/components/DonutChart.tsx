@@ -3,7 +3,6 @@ import {
   classNames,
   getChartInnerRect,
   type ChartPadding,
-  type ChartLegendPosition,
   type DonutChartDatum,
   type DonutChartProps as CoreDonutChartProps
 } from '@expcat/tigercat-core'

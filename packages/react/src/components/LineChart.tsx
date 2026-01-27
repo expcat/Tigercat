@@ -115,8 +115,6 @@ export const LineChart: React.FC<LineChartProps> = ({
 
   // Use shared interaction hook for series-level interaction
   const {
-    resolvedHoveredIndex,
-    resolvedSelectedIndex,
     activeIndex,
     handleMouseEnter: handleSeriesHoverEnter,
     handleMouseLeave: handleSeriesHoverLeave,

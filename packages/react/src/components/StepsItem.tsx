@@ -101,7 +101,7 @@ export const StepsItem: React.FC<StepsItemProps> = ({
   const titleClasses = getStepTitleClasses(stepStatus, stepsContext.size, isClickable)
   const descriptionClasses = getStepDescriptionClasses(stepStatus, stepsContext.size)
 
-  const handleClick = (event: React.MouseEvent) => {
+  const handleClick = (_event: React.MouseEvent) => {
     if (!isClickable) {
       return
     }

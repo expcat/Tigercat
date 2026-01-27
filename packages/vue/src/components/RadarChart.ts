@@ -211,8 +211,8 @@ export const RadarChart = defineComponent({
 
     // Use shared interaction composable
     const {
-      resolvedHoveredIndex,
-      resolvedSelectedIndex,
+      resolvedHoveredIndex: _resolvedHoveredIndex,
+      resolvedSelectedIndex: _resolvedSelectedIndex,
       activeIndex: resolvedActiveIndex,
       tooltipPosition,
       handleMouseEnter: handleHoverEnter,

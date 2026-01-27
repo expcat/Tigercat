@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useFloating, useClickOutside, useEscapeKey } from '../utils/overlay'
 import {
   classNames,

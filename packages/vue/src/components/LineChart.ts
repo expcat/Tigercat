@@ -237,8 +237,6 @@ export const LineChart = defineComponent({
 
     // Use shared interaction composable for series-level interaction
     const {
-      resolvedHoveredIndex,
-      resolvedSelectedIndex,
       activeIndex,
       handleMouseEnter: handleSeriesHoverEnter,
       handleMouseLeave: handleSeriesHoverLeave,

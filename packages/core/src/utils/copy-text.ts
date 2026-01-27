@@ -5,7 +5,9 @@ export const copyTextToClipboard = async (text: string): Promise<boolean> => {
     try {
       await navigator.clipboard.writeText(text)
       return true
-    } catch {}
+    } catch {
+      // Clipboard API failed, fall back to textarea method
+    }
   }
 
   if (typeof document === 'undefined') return false

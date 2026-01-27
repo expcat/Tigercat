@@ -22,7 +22,6 @@ import {
   restoreFocus,
   getFocusableElements,
   getFocusTrapNavigation,
-  type TigerLocale,
   type ModalProps as CoreModalProps
 } from '@expcat/tigercat-core'
 import { useEscapeKey } from '../utils/overlay'

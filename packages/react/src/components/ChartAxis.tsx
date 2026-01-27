@@ -6,7 +6,6 @@ import {
   chartAxisTickTextClasses,
   classNames,
   getChartAxisTicks,
-  type ChartAxisOrientation,
   type ChartAxisProps as CoreChartAxisProps,
   type ChartScale
 } from '@expcat/tigercat-core'

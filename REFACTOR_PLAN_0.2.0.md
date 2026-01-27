@@ -728,10 +728,11 @@ export const Button: React.FC<ButtonProps> = ({
 | 阶段 1  | Core 包重构      | 4      | ✅ 已完成 |
 | 阶段 2  | 高优先级组件修复 | 8      | ✅ 已完成 |
 | 阶段 3A | 定位系统升级     | 3      | ✅ 已完成 |
-| 阶段 3B | 组件拆分与抽象   | 3      | 🔄 进行中 |
+| 阶段 3B | 组件拆分与抽象   | 3      | ✅ 已完成 |
 | 阶段 3C | 代码精简         | 2      | ⬜ 待开始 |
-| 阶段 4  | 动画系统统一     | 3      | 🔄 进行中 |
-| 阶段 5  | 文档与 Demo 完善 | 3      | 🔄 进行中 |
+| 阶段 4  | 动画系统统一     | 3      | ✅ 已完成 |
+| 阶段 5  | 文档与 Demo 完善 | 3      | ✅ 已完成 |
+| 阶段 6  | 代码质量清理     | 1      | ✅ 已完成 |
 
 ### 12.2 阶段详情
 
@@ -861,6 +862,7 @@ export const Button: React.FC<ButtonProps> = ({
 - [x] Pagination 国际化支持
 - [x] i18n 文档
 - [x] Popconfirm/Dropdown 迁移 Floating UI
+- [x] Lint 错误全部清理（70 个错误降至 0）
 
 #### 可选/推迟
 
@@ -871,12 +873,14 @@ export const Button: React.FC<ButtonProps> = ({
 
 ### 12.5 下一步行动
 
-**阶段 3B 已完成**，组件拆分与抽象工作已完成：
+**0.2.0 发布准备就绪**，所有必须完成的任务已完成：
 
 - ✅ Popconfirm/Dropdown 已迁移至 Floating UI
 - ✅ Pagination 子组件抽取 - Table/List 共享简单分页样式工具函数
+- ✅ Lint 配置优化 - 添加 varsIgnorePattern 和 no-empty-object-type 规则
+- ✅ 全部 1698 个测试通过
 
-当前可选后续任务：
+当前可执行：
 
 1. **准备 0.2.0-beta.1 发布** - 当前功能已满足发布要求
 2. **阶段 3C 可选任务** - DatePicker/TimePicker/Select setup 拆分（可推迟）
