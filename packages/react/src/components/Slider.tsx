@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, memo } from 'react'
+import React, { useState, useRef, useEffect, useCallback, memo, useMemo } from 'react'
 import {
   classNames,
   type SliderProps as CoreSliderProps,
@@ -7,7 +7,10 @@ import {
   sliderRangeClasses,
   getSliderTrackClasses,
   getSliderThumbClasses,
-  getSliderTooltipClasses
+  getSliderTooltipClasses,
+  sliderNormalizeValue,
+  sliderGetPercentage,
+  sliderGetKeyboardValue
 } from '@expcat/tigercat-core'
 
 export interface SliderProps
@@ -138,20 +141,14 @@ export const Slider: React.FC<SliderProps> = ({
     }
   }, [controlledValue])
 
-  // Normalize value to step
+  // Use Core utilities wrapped with component props
   const normalizeValue = useCallback(
-    (val: number): number => {
-      const steps = Math.round((val - min) / step)
-      return Math.min(Math.max(min + steps * step, min), max)
-    },
+    (val: number): number => sliderNormalizeValue(val, min, max, step),
     [min, max, step]
   )
 
-  // Calculate percentage
   const getPercentage = useCallback(
-    (val: number): number => {
-      return ((val - min) / (max - min)) * 100
-    },
+    (val: number): number => sliderGetPercentage(val, min, max),
     [min, max]
   )
 
@@ -265,23 +262,10 @@ export const Slider: React.FC<SliderProps> = ({
   ) => {
     if (disabled) return
 
-    let newValue = value
+    const newValue = sliderGetKeyboardValue(e.key, value, min, max, step)
 
-    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
-      e.preventDefault()
-      newValue = normalizeValue(value + step)
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
-      e.preventDefault()
-      newValue = normalizeValue(value - step)
-    } else if (e.key === 'Home') {
-      e.preventDefault()
-      newValue = min
-    } else if (e.key === 'End') {
-      e.preventDefault()
-      newValue = max
-    } else {
-      return
-    }
+    if (newValue === null) return
+    e.preventDefault()
 
     if (range && Array.isArray(internalValue)) {
       const [minVal, maxVal] = internalValue

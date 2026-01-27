@@ -15,7 +15,10 @@ import {
   sliderRangeClasses,
   getSliderTrackClasses,
   getSliderThumbClasses,
-  getSliderTooltipClasses
+  getSliderTooltipClasses,
+  sliderNormalizeValue,
+  sliderGetPercentage,
+  sliderGetKeyboardValue
 } from '@expcat/tigercat-core'
 
 export interface VueSliderProps {
@@ -164,16 +167,11 @@ export const Slider = defineComponent({
       }
     )
 
-    // Normalize value to step
-    const normalizeValue = (val: number): number => {
-      const steps = Math.round((val - props.min) / props.step)
-      return Math.min(Math.max(props.min + steps * props.step, props.min), props.max)
-    }
+    // Use Core utilities with component props
+    const normalizeValue = (val: number): number =>
+      sliderNormalizeValue(val, props.min, props.max, props.step)
 
-    // Calculate percentage
-    const getPercentage = (val: number): number => {
-      return ((val - props.min) / (props.max - props.min)) * 100
-    }
+    const getPercentage = (val: number): number => sliderGetPercentage(val, props.min, props.max)
 
     // Calculate value from position
     const getValueFromPosition = (clientX: number, trackElement: HTMLElement): number => {
@@ -346,23 +344,17 @@ export const Slider = defineComponent({
             },
             onKeydown: (e: KeyboardEvent) => {
               if (props.disabled) return
-              let newValue = value
 
-              if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
-                e.preventDefault()
-                newValue = normalizeValue(value + props.step)
-              } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
-                e.preventDefault()
-                newValue = normalizeValue(value - props.step)
-              } else if (e.key === 'Home') {
-                e.preventDefault()
-                newValue = props.min
-              } else if (e.key === 'End') {
-                e.preventDefault()
-                newValue = props.max
-              } else {
-                return
-              }
+              const newValue = sliderGetKeyboardValue(
+                e.key,
+                value,
+                props.min,
+                props.max,
+                props.step
+              )
+
+              if (newValue === null) return
+              e.preventDefault()
 
               if (props.range && Array.isArray(internalValue.value)) {
                 const [minVal, maxVal] = internalValue.value
