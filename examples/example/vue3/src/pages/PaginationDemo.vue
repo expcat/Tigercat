@@ -33,12 +33,12 @@ const customTotalText = (total: number, range: [number, number]) => {
 const customLabels = computed<Partial<TigerLocalePagination>>(() => {
   const isZh = demoLang.value === 'zh-CN'
   return {
-    prev: isZh ? '上一页' : 'Previous',
-    next: isZh ? '下一页' : 'Next',
-    page: isZh ? '页' : 'Page',
-    itemsPerPage: isZh ? '条/页' : 'items/page',
-    jumpTo: isZh ? '跳至' : 'Go to',
-    total: isZh ? (t: number) => `共 ${t} 条` : (t: number) => `Total ${t} items`
+    prevPageAriaLabel: isZh ? '上一页' : 'Previous',
+    nextPageAriaLabel: isZh ? '下一页' : 'Next',
+    pageText: isZh ? '页' : 'Page',
+    itemsPerPageText: isZh ? '条/页' : 'items/page',
+    jumpToText: isZh ? '跳至' : 'Go to',
+    totalText: isZh ? '共 {total} 条' : 'Total {total} items'
   }
 })
 
@@ -241,7 +241,6 @@ const fullSnippet = `<Pagination
         </p>
         <Pagination v-model:current="current9"
                     :total="500"
-                    :locale="demoLang"
                     :labels="customLabels"
                     showQuickJumper
                     showSizeChanger />
