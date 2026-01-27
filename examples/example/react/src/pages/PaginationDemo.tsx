@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Pagination } from '@expcat/tigercat-react'
+import { type TigerLocalePagination } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 
 const PaginationDemo: React.FC = () => {
@@ -12,6 +13,8 @@ const PaginationDemo: React.FC = () => {
   const [current6, setCurrent6] = useState(1)
   const [current7, setCurrent7] = useState(1)
   const [current8, setCurrent8] = useState(1)
+  const [current9, setCurrent9] = useState(1)
+  const [demoLang, setDemoLang] = useState<'en-US' | 'zh-CN'>('zh-CN')
 
   const handlePageSizeChange = (page: number, size: number) => {
     console.log('页码大小改变 - 当前页:', page, '每页条数:', size)
@@ -22,6 +25,27 @@ const PaginationDemo: React.FC = () => {
   const customTotalText = (total: number, range: [number, number]) => {
     return `显示 ${range[0]}-${range[1]} 条，共 ${total} 条记录`
   }
+
+  // i18n custom labels
+  const customLabels = useMemo<Partial<TigerLocalePagination>>(() => {
+    return demoLang === 'zh-CN'
+      ? {
+          prevPage: '上一页',
+          nextPage: '下一页',
+          page: '页',
+          itemsPerPage: '条/页',
+          jumpTo: '跳至',
+          totalItems: (total: number) => `共 ${total} 条`
+        }
+      : {
+          prevPage: 'Previous',
+          nextPage: 'Next',
+          page: 'Page',
+          itemsPerPage: 'items/page',
+          jumpTo: 'Go to',
+          totalItems: (total: number) => `Total ${total} items`
+        }
+  }, [demoLang])
 
   const basicSnippet = `<Pagination current={current1} onChange={setCurrent1} total={100} pageSize={10} />`
 
@@ -83,6 +107,26 @@ const PaginationDemo: React.FC = () => {
   />`
 
   const disabledSnippet = `<Pagination current={current8} onChange={setCurrent8} total={100} disabled />`
+
+  const i18nSnippet = `// 定义国际化标签
+const customLabels: Partial<TigerLocalePagination> = {
+  prevPage: '上一页',
+  nextPage: '下一页',
+  page: '页',
+  itemsPerPage: '条/页',
+  jumpTo: '跳至',
+  totalItems: (total) => \`共 \${total} 条\`
+}
+
+<Pagination
+  current={current9}
+  onChange={setCurrent9}
+  total={500}
+  locale={demoLang}
+  labels={customLabels}
+  showQuickJumper
+  showSizeChanger
+/>`
 
   const fullSnippet = `<Pagination
     current={current3}
@@ -205,6 +249,34 @@ const PaginationDemo: React.FC = () => {
       {/* 禁用状态 */}
       <DemoBlock title="禁用状态" description="禁用分页组件的所有交互。" code={disabledSnippet}>
         <Pagination current={current8} onChange={setCurrent8} total={100} disabled />
+      </DemoBlock>
+
+      {/* 国际化 */}
+      <DemoBlock
+        title="国际化 (i18n)"
+        description="通过 locale 和 labels 属性自定义国际化文本。点击按钮切换语言查看效果。"
+        code={i18nSnippet}>
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-500">
+              当前语言：{demoLang === 'zh-CN' ? '中文' : 'English'}
+            </span>
+            <button
+              className="px-3 py-1 text-sm border rounded hover:bg-gray-50"
+              onClick={() => setDemoLang(demoLang === 'zh-CN' ? 'en-US' : 'zh-CN')}>
+              切换语言
+            </button>
+          </div>
+          <Pagination
+            current={current9}
+            onChange={setCurrent9}
+            total={500}
+            locale={demoLang}
+            labels={customLabels}
+            showQuickJumper
+            showSizeChanger
+          />
+        </div>
       </DemoBlock>
 
       {/* 完整示例 */}
