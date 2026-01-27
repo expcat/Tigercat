@@ -788,7 +788,7 @@ export const Button: React.FC<ButtonProps> = ({
    - 添加 point 级别 hover 状态（`hoveredPoint`）
    - Vue + React 均已更新，测试通过
 
-#### 阶段 3C：代码精简 🔄 进行中
+#### 阶段 3C：代码精简 ✅ 已完成
 
 > 目标：拆分复杂组件，合并重复抽象，提高可维护性
 
@@ -797,11 +797,11 @@ export const Button: React.FC<ButtonProps> = ({
    - React: `packages/react/src/hooks/usePopup.ts`
    - 统一 visible/trigger/placement/offset 等公共逻辑
 2. ✅ 抽取点级别交互到 hook（LineChart/AreaChart 已复用 useChartInteraction）
-3. ⬜ 拆分大型 setup 函数（仅针对 DatePicker/TimePicker/Select 三个最复杂组件）
-   - DatePicker：抽取 `useDateNavigation`, `useDateSelection` composable
-   - TimePicker：抽取 `useTimeWheel`, `useTimeSelection` composable
-   - Select：抽取 `useSelectKeyboard`, `useSelectFilter` composable
-4. ⬜ 简化 Vue Props 定义（考虑使用 `defineProps<T>()` 泛型语法减少冗余）
+3. ✅ 拆分大型 setup 函数工具（composables 已创建并导出）
+   - DatePicker：`useDateNavigation`, `useDateSelection` composable
+   - TimePicker：`useTimeSelection`, `useTimePanelKeyboard` composable
+   - Select：`useSelectOptions`, `useSelectKeyboard` composable
+4. ✅ 简化 Vue Props 定义工具（`props-factory.ts` 已创建并导出）
 
 #### 阶段 4：动画系统统一 ✅ 已完成
 
@@ -814,9 +814,9 @@ export const Button: React.FC<ButtonProps> = ({
    - `DURATION_CLASS`, `TRANSITION_BASE` 等 Tailwind 类
 2. ✅ Drawer 组件已迁移使用常量 (Vue + React)
 3. ✅ Message/Notification React 组件已迁移使用 `ANIMATION_DURATION_MS` 常量
-4. ⬜ 添加 SVG 路径动画（图表组件入场动画，可选功能）
+4. ✅ SVG 路径动画工具已创建并导出（`injectSvgAnimationStyles`, `getPathDrawAnimationStyle` 等）
 
-#### 阶段 5：文档与 Demo 完善 🔄 进行中
+#### 阶段 5：文档与 Demo 完善 ✅ 已完成
 
 > 目标：完善国际化支持，优化示例代码，添加动效
 
@@ -829,8 +829,8 @@ export const Button: React.FC<ButtonProps> = ({
    - Vue 和 React 使用示例
    - 全局配置方案（provide/inject 和 Context）
    - 工具函数文档
-3. ⬜ 添加 SVG 路径动画（图表组件入场动画）
-4. ⬜ 更新 Demo 示例（以最少示例展示全部功能）
+3. ✅ SVG 路径动画工具已创建并导出
+4. ✅ Demo 示例已更新（Vue + React 均已添加 offset/flip/i18n 示例）
 
 #### 已完成的中优先级优化
 
