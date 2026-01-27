@@ -86,8 +86,8 @@ export default function Demo() {
   :height="260"
   :max-value="100"
   hoverable
-  :hover-opacity="1"
-  :muted-opacity="0.2" />
+  :active-opacity="1"
+  :inactive-opacity="0.2" />
 ```
 
 #### React
@@ -99,8 +99,8 @@ export default function Demo() {
   height={260}
   maxValue={100}
   hoverable
-  hoverOpacity={1}
-  mutedOpacity={0.2}
+  activeOpacity={1}
+  inactiveOpacity={0.2}
 />
 ```
 
@@ -115,13 +115,20 @@ export default function Demo() {
   :height="260"
   :max-value="100"
   selectable
-  :muted-opacity="0.2" />
+  :inactive-opacity="0.2" />
 ```
 
 #### React
 
 ```tsx
-<RadarChart series={series} width={360} height={260} maxValue={100} selectable mutedOpacity={0.2} />
+<RadarChart
+  series={series}
+  width={360}
+  height={260}
+  maxValue={100}
+  selectable
+  inactiveOpacity={0.2}
+/>
 ```
 
 ### 图例
@@ -233,11 +240,11 @@ export default function Demo() {
 | levelLabelFormatter | 层级标签格式化函数 | `(value, level) => string`                                                   | -              |
 | levelLabelOffset    | 层级标签偏移       | `number`                                                                     | `8`            |
 | hoverable           | 启用悬浮高亮       | `boolean`                                                                    | `false`        |
-| activeSeriesIndex   | 高亮系列索引       | `number`                                                                     | -              |
-| hoverOpacity        | 高亮系列透明度     | `number`                                                                     | `1`            |
-| mutedOpacity        | 其他系列透明度     | `number`                                                                     | `0.25`         |
+| hoveredIndex        | 高亮系列索引       | `number`                                                                     | -              |
+| activeOpacity       | 高亮系列透明度     | `number`                                                                     | `1`            |
+| inactiveOpacity     | 其他系列透明度     | `number`                                                                     | `0.25`         |
 | selectable          | 启用点击选择       | `boolean`                                                                    | `false`        |
-| selectedSeriesIndex | 选中系列索引       | `number`                                                                     | -              |
+| selectedIndex       | 选中系列索引       | `number`                                                                     | -              |
 | showLegend          | 显示图例           | `boolean`                                                                    | `false`        |
 | legendPosition      | 图例位置           | `'bottom' \| 'right'`                                                        | `'bottom'`     |
 | legendFormatter     | 图例格式化函数     | `(series, index) => string`                                                  | -              |
