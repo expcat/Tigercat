@@ -35,16 +35,26 @@ export * from './slider'
  *   --tiger-ghost-bg-hover: #1e3a8a;
  * }
  * ```
+ *
+ * @since 0.2.0 - Added interaction state variables (focusRing, primaryActive, etc.)
  */
 export const THEME_CSS_VARS = {
+  // Primary colors
   primary: '--tiger-primary',
   primaryHover: '--tiger-primary-hover',
+  primaryActive: '--tiger-primary-active',
   primaryDisabled: '--tiger-primary-disabled',
+  // Secondary colors
   secondary: '--tiger-secondary',
   secondaryHover: '--tiger-secondary-hover',
+  secondaryActive: '--tiger-secondary-active',
   secondaryDisabled: '--tiger-secondary-disabled',
+  // Background hover states
   outlineBgHover: '--tiger-outline-bg-hover',
-  ghostBgHover: '--tiger-ghost-bg-hover'
+  ghostBgHover: '--tiger-ghost-bg-hover',
+  // Interaction states (0.2.0+)
+  focusRing: '--tiger-focus-ring',
+  surface: '--tiger-surface'
 } as const
 
 /**

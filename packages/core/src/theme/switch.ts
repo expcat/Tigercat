@@ -7,9 +7,10 @@ import type { SwitchSize } from '../types/switch'
 
 /**
  * Base classes for Switch component
+ * @since 0.2.0 - Changed to focus-visible, added active:scale
  */
 export const switchBaseClasses =
-  'relative inline-flex items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)]'
+  'relative inline-flex items-center rounded-full transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] active:scale-[0.98]'
 
 /**
  * Switch container size classes
