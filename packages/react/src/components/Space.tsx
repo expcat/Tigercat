@@ -4,6 +4,7 @@ import {
   getSpaceAlignClass,
   getSpaceDirectionClass,
   getSpaceGapSize,
+  SPACE_BASE_CLASS,
   type SpaceProps as CoreSpaceProps
 } from '@expcat/tigercat-core'
 
@@ -13,8 +14,6 @@ export type SpaceProps = CoreSpaceProps &
     className?: string
     style?: React.CSSProperties
   }
-
-const baseClasses = 'inline-flex'
 
 export const Space: React.FC<SpaceProps> = ({
   direction = 'horizontal',
@@ -35,7 +34,7 @@ export const Space: React.FC<SpaceProps> = ({
     <div
       {...props}
       className={classNames(
-        baseClasses,
+        SPACE_BASE_CLASS,
         getSpaceDirectionClass(direction),
         getSpaceAlignClass(align),
         gapSize.class,

@@ -1,10 +1,18 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, PropType, Component, resolveDynamicComponent } from 'vue'
 import { getContainerClasses, type ContainerMaxWidth } from '@expcat/tigercat-core'
 
 export const Container = defineComponent({
   name: 'TigerContainer',
   inheritAttrs: false,
   props: {
+    /**
+     * HTML element or component to render as
+     * @default 'div'
+     */
+    as: {
+      type: [String, Object] as PropType<string | Component>,
+      default: 'div'
+    },
     /**
      * Maximum width constraint (false for no constraint)
      * @default false
@@ -41,8 +49,9 @@ export const Container = defineComponent({
 
     return () => {
       const { class: attrsClass, style: attrsStyle, ...restAttrs } = attrs
+      const tag = resolveDynamicComponent(props.as) as string | Component
       return h(
-        'div',
+        tag,
         {
           ...restAttrs,
           class: [containerClasses.value, attrsClass],

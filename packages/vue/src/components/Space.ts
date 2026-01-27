@@ -4,12 +4,11 @@ import {
   getSpaceGapSize,
   getSpaceAlignClass,
   getSpaceDirectionClass,
+  SPACE_BASE_CLASS,
   type SpaceDirection,
   type SpaceSize,
   type SpaceAlign
 } from '@expcat/tigercat-core'
-
-const baseClasses = 'inline-flex'
 
 export interface VueSpaceProps {
   direction?: SpaceDirection
@@ -43,7 +42,7 @@ export const Space = defineComponent({
 
     const spaceClasses = computed(() =>
       classNames(
-        baseClasses,
+        SPACE_BASE_CLASS,
         getSpaceDirectionClass(props.direction),
         getSpaceAlignClass(props.align),
         gapSize.value.class,
