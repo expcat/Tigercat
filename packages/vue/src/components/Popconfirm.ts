@@ -9,6 +9,7 @@ import {
   watch,
   PropType
 } from 'vue'
+import { useVueFloating, useVueClickOutside, useVueEscapeKey } from '../utils/overlay'
 import {
   classNames,
   coerceClassValue,
@@ -23,14 +24,14 @@ import {
   getPopconfirmButtonsClasses,
   getPopconfirmCancelButtonClasses,
   getPopconfirmOkButtonClasses,
-  getDropdownMenuWrapperClasses,
+  getTransformOrigin,
   mergeStyleValues,
   popconfirmIconPathStrokeLinecap,
   popconfirmIconPathStrokeLinejoin,
   popconfirmIconStrokeWidth,
   popconfirmIconViewBox,
   type PopconfirmIconType,
-  type DropdownPlacement,
+  type FloatingPlacement,
   type StyleValue
 } from '@expcat/tigercat-core'
 
@@ -140,8 +141,16 @@ export const Popconfirm = defineComponent({
      * @default 'top'
      */
     placement: {
-      type: String as PropType<DropdownPlacement>,
-      default: 'top' as DropdownPlacement
+      type: String as PropType<FloatingPlacement>,
+      default: 'top' as FloatingPlacement
+    },
+    /**
+     * Offset distance from trigger (in pixels)
+     * @default 8
+     */
+    offset: {
+      type: Number,
+      default: 8
     },
     /**
      * Whether the popconfirm is disabled
@@ -173,12 +182,27 @@ export const Popconfirm = defineComponent({
       return props.visible !== undefined ? props.visible : internalVisible.value
     })
 
-    // Ref to the container element
+    // Element refs
     const containerRef = ref<HTMLElement | null>(null)
+    const triggerRef = ref<HTMLElement | null>(null)
+    const floatingRef = ref<HTMLElement | null>(null)
 
     const popconfirmId = createPopconfirmId()
     const titleId = `${popconfirmId}-title`
     const descriptionId = `${popconfirmId}-description`
+
+    // Floating UI positioning
+    const {
+      x,
+      y,
+      placement: actualPlacement
+    } = useVueFloating({
+      referenceRef: triggerRef,
+      floatingRef: floatingRef,
+      enabled: currentVisible,
+      placement: props.placement as FloatingPlacement,
+      offset: props.offset
+    })
 
     // Handle visibility change
     const setVisible = (visible: boolean) => {
@@ -212,46 +236,54 @@ export const Popconfirm = defineComponent({
       setVisible(!currentVisible.value)
     }
 
-    // Handle outside click to close popconfirm
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement
+    // Click outside handler (close when clicking outside)
+    // Click outside handler (close when clicking outside)
+    let cleanupClickOutside: (() => void) | null = null
 
-      if (containerRef.value && !containerRef.value.contains(target)) {
-        setVisible(false)
-      }
-    }
+    watch(
+      currentVisible,
+      (visible) => {
+        if (cleanupClickOutside) {
+          cleanupClickOutside()
+          cleanupClickOutside = null
+        }
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      setVisible(false)
-    }
+        if (visible) {
+          cleanupClickOutside = useVueClickOutside({
+            enabled: currentVisible,
+            containerRef,
+            onOutsideClick: () => setVisible(false),
+            defer: true
+          })
+        }
+      },
+      { immediate: true }
+    )
 
-    let outsideClickTimeoutId: number | undefined
+    // Escape key handler
+    let cleanupEscapeKey: (() => void) | null = null
 
-    watch(currentVisible, (visible) => {
-      if (outsideClickTimeoutId !== undefined) {
-        clearTimeout(outsideClickTimeoutId)
-        outsideClickTimeoutId = undefined
-      }
+    watch(
+      currentVisible,
+      (visible) => {
+        if (cleanupEscapeKey) {
+          cleanupEscapeKey()
+          cleanupEscapeKey = null
+        }
 
-      document.removeEventListener('click', handleClickOutside)
-      document.removeEventListener('keydown', handleKeyDown)
-
-      if (!visible) return
-
-      outsideClickTimeoutId = window.setTimeout(() => {
-        document.addEventListener('click', handleClickOutside)
-      }, 0)
-
-      document.addEventListener('keydown', handleKeyDown)
-    })
+        if (visible) {
+          cleanupEscapeKey = useVueEscapeKey({
+            enabled: currentVisible,
+            onEscape: () => setVisible(false)
+          })
+        }
+      },
+      { immediate: true }
+    )
 
     onBeforeUnmount(() => {
-      if (outsideClickTimeoutId !== undefined) {
-        clearTimeout(outsideClickTimeoutId)
-      }
-      document.removeEventListener('click', handleClickOutside)
-      document.removeEventListener('keydown', handleKeyDown)
+      cleanupClickOutside?.()
+      cleanupEscapeKey?.()
     })
 
     // Container classes
@@ -268,13 +300,21 @@ export const Popconfirm = defineComponent({
       return getPopconfirmTriggerClasses(props.disabled)
     })
 
-    // Content wrapper classes
+    // Content wrapper classes (using Floating UI positioning)
     const contentWrapperClasses = computed(() => {
-      return getDropdownMenuWrapperClasses(currentVisible.value, props.placement)
+      return classNames('absolute z-50', currentVisible.value ? 'block' : 'hidden')
     })
 
+    // Content wrapper styles (positioned by Floating UI)
+    const contentWrapperStyles = computed(() => ({
+      position: 'absolute' as const,
+      left: `${x.value}px`,
+      top: `${y.value}px`,
+      transformOrigin: getTransformOrigin(actualPlacement.value)
+    }))
+
     const arrowClasses = computed(() => {
-      return getPopconfirmArrowClasses(props.placement)
+      return getPopconfirmArrowClasses(actualPlacement.value)
     })
 
     // Content classes
@@ -359,14 +399,23 @@ export const Popconfirm = defineComponent({
               handleTriggerClick()
             }
 
-            return cloneVNode(
-              only,
+            return h(
+              'div',
               {
-                ...triggerA11yProps,
-                class: classNames(coerceClassValue(existingProps.class), triggerClasses.value),
-                onClick
+                ref: triggerRef,
+                class: 'inline-block'
               },
-              true
+              [
+                cloneVNode(
+                  only,
+                  {
+                    ...triggerA11yProps,
+                    class: classNames(coerceClassValue(existingProps.class), triggerClasses.value),
+                    onClick
+                  },
+                  true
+                )
+              ]
             )
           }
         }
@@ -374,6 +423,7 @@ export const Popconfirm = defineComponent({
         return h(
           'div',
           {
+            ref: triggerRef,
             class: triggerClasses.value,
             onClick: handleTriggerClick,
             role: 'button',
@@ -396,7 +446,9 @@ export const Popconfirm = defineComponent({
       const content = h(
         'div',
         {
+          ref: floatingRef,
           class: contentWrapperClasses.value,
+          style: contentWrapperStyles.value,
           hidden: !currentVisible.value,
           'aria-hidden': !currentVisible.value
         },

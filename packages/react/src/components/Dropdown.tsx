@@ -1,13 +1,14 @@
-import React, { createContext, useState, useEffect, useRef, useCallback } from 'react'
+import React, { createContext, useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import {
   classNames,
   getDropdownContainerClasses,
   getDropdownTriggerClasses,
-  getDropdownMenuWrapperClasses,
-  type DropdownProps as CoreDropdownProps
+  getTransformOrigin,
+  type DropdownProps as CoreDropdownProps,
+  type FloatingPlacement
 } from '@expcat/tigercat-core'
 import { DropdownMenu } from './DropdownMenu'
-import { useClickOutside, useEscapeKey } from '../utils/overlay'
+import { useClickOutside, useEscapeKey, useFloating } from '../utils/overlay'
 
 // Dropdown context interface
 export interface DropdownContextValue {
@@ -19,8 +20,22 @@ export interface DropdownContextValue {
 export const DropdownContext = createContext<DropdownContextValue | null>(null)
 
 export interface DropdownProps
-  extends Omit<CoreDropdownProps, 'style'>, Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
+  extends
+    Omit<CoreDropdownProps, 'style' | 'placement'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
   style?: React.CSSProperties
+
+  /**
+   * Dropdown placement relative to trigger
+   * @default 'bottom-start'
+   */
+  placement?: FloatingPlacement
+
+  /**
+   * Offset distance from trigger element
+   * @default 4
+   */
+  offset?: number
 
   /**
    * Visibility change event handler
@@ -35,7 +50,8 @@ export interface DropdownProps
 
 export const Dropdown: React.FC<DropdownProps> = ({
   trigger = 'hover',
-  placement = 'bottom-start',
+  placement: initialPlacement = 'bottom-start',
+  offset = 4,
   disabled = false,
   visible: controlledVisible,
   defaultVisible = false,
@@ -53,8 +69,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
   // Use controlled or uncontrolled state
   const visible = controlledVisible !== undefined ? controlledVisible : internalVisible
 
-  // Refs
+  // Refs for Floating UI positioning
   const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLDivElement>(null)
+  const floatingRef = useRef<HTMLDivElement>(null)
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Handle visibility change
@@ -124,6 +142,15 @@ export const Dropdown: React.FC<DropdownProps> = ({
     onEscape: () => setVisible(false)
   })
 
+  // Floating UI positioning
+  const { x, y, placement } = useFloating({
+    referenceRef: triggerRef,
+    floatingRef,
+    enabled: visible,
+    placement: initialPlacement,
+    offset
+  })
+
   // Cleanup timer on unmount
   useEffect(() => {
     return () => {
@@ -141,7 +168,17 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   const triggerClasses = getDropdownTriggerClasses(disabled)
 
-  const menuWrapperClasses = getDropdownMenuWrapperClasses(visible, placement)
+  const menuWrapperClasses = 'absolute z-50'
+
+  const menuWrapperStyles = useMemo<React.CSSProperties>(
+    () => ({
+      position: 'absolute',
+      left: x,
+      top: y,
+      transformOrigin: getTransformOrigin(placement)
+    }),
+    [x, y, placement]
+  )
 
   const contextValue: DropdownContextValue = {
     closeOnClick,
@@ -183,6 +220,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         {...divProps}>
         {/* Trigger element */}
         <div
+          ref={triggerRef}
           className={triggerClasses}
           onClick={handleClick}
           onMouseEnter={handleMouseEnter}
@@ -192,9 +230,11 @@ export const Dropdown: React.FC<DropdownProps> = ({
           {triggerElement}
         </div>
 
-        {/* Dropdown menu */}
+        {/* Dropdown menu with Floating UI positioning */}
         <div
+          ref={floatingRef}
           className={menuWrapperClasses}
+          style={menuWrapperStyles}
           hidden={!visible}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}>

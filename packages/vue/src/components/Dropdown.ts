@@ -5,7 +5,6 @@ import {
   provide,
   PropType,
   h,
-  onMounted,
   onBeforeUnmount,
   VNode,
   watch
@@ -16,13 +15,14 @@ import {
   mergeStyleValues,
   getDropdownContainerClasses,
   getDropdownTriggerClasses,
-  getDropdownMenuWrapperClasses,
+  getTransformOrigin,
   type DropdownTrigger,
-  type DropdownPlacement
+  type FloatingPlacement
 } from '@expcat/tigercat-core'
 
 import type { DropdownProps as CoreDropdownProps } from '@expcat/tigercat-core'
 import { DropdownMenu } from './DropdownMenu'
+import { useVueFloating, useVueClickOutside, useVueEscapeKey } from '../utils/overlay'
 
 // Dropdown context key
 export const DropdownContextKey = Symbol('DropdownContext')
@@ -33,7 +33,18 @@ export interface DropdownContext {
   handleItemClick: () => void
 }
 
-export interface VueDropdownProps extends CoreDropdownProps {}
+export interface VueDropdownProps extends Omit<CoreDropdownProps, 'placement'> {
+  /**
+   * Dropdown placement relative to trigger
+   * @default 'bottom-start'
+   */
+  placement?: FloatingPlacement
+  /**
+   * Offset distance from trigger element
+   * @default 4
+   */
+  offset?: number
+}
 
 export const Dropdown = defineComponent({
   name: 'TigerDropdown',
@@ -52,8 +63,16 @@ export const Dropdown = defineComponent({
      * @default 'bottom-start'
      */
     placement: {
-      type: String as PropType<DropdownPlacement>,
-      default: 'bottom-start' as DropdownPlacement
+      type: String as PropType<FloatingPlacement>,
+      default: 'bottom-start' as FloatingPlacement
+    },
+    /**
+     * Offset distance from trigger element
+     * @default 4
+     */
+    offset: {
+      type: Number,
+      default: 4
     },
     /**
      * Whether the dropdown is disabled
@@ -112,8 +131,10 @@ export const Dropdown = defineComponent({
       return props.visible !== undefined ? props.visible : internalVisible.value
     })
 
-    // Ref to the container element
+    // Refs for Floating UI positioning
     const containerRef = ref<HTMLElement | null>(null)
+    const triggerRef = ref<HTMLElement | null>(null)
+    const floatingRef = ref<HTMLElement | null>(null)
 
     // Handle visibility change
     const setVisible = (visible: boolean) => {
@@ -171,33 +192,57 @@ export const Dropdown = defineComponent({
       setVisible(!currentVisible.value)
     }
 
-    // Handle outside click to close dropdown
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement
-      if (containerRef.value && !containerRef.value.contains(target)) {
-        setVisible(false)
-      }
-    }
-
-    const handleKeydown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setVisible(false)
-      }
-    }
-
-    // Setup and cleanup event listeners
-    onMounted(() => {
-      document.addEventListener('keydown', handleKeydown)
+    // Floating UI positioning
+    const {
+      x,
+      y,
+      placement: currentPlacement
+    } = useVueFloating({
+      referenceRef: triggerRef,
+      floatingRef,
+      enabled: currentVisible,
+      placement: props.placement,
+      offset: props.offset
     })
 
+    // Computed for whether click outside should be enabled
+    const clickOutsideEnabled = computed(() => currentVisible.value && props.trigger === 'click')
+
+    // Handle click outside for click trigger mode
+    let cleanupClickOutside: (() => void) | null = null
     watch(
-      () => props.trigger,
-      (next, prev) => {
-        if (prev === 'click') {
-          document.removeEventListener('click', handleClickOutside)
+      clickOutsideEnabled,
+      (enabled) => {
+        if (cleanupClickOutside) {
+          cleanupClickOutside()
+          cleanupClickOutside = null
         }
-        if (next === 'click') {
-          document.addEventListener('click', handleClickOutside)
+        if (enabled) {
+          cleanupClickOutside = useVueClickOutside({
+            enabled: currentVisible,
+            containerRef,
+            onOutsideClick: () => setVisible(false),
+            defer: true
+          })
+        }
+      },
+      { immediate: true }
+    )
+
+    // Handle escape key
+    let cleanupEscapeKey: (() => void) | null = null
+    watch(
+      currentVisible,
+      (visible) => {
+        if (cleanupEscapeKey) {
+          cleanupEscapeKey()
+          cleanupEscapeKey = null
+        }
+        if (visible) {
+          cleanupEscapeKey = useVueEscapeKey({
+            enabled: currentVisible,
+            onEscape: () => setVisible(false)
+          })
         }
       },
       { immediate: true }
@@ -207,8 +252,12 @@ export const Dropdown = defineComponent({
       if (hoverTimer) {
         clearTimeout(hoverTimer)
       }
-      document.removeEventListener('click', handleClickOutside)
-      document.removeEventListener('keydown', handleKeydown)
+      if (cleanupClickOutside) {
+        cleanupClickOutside()
+      }
+      if (cleanupEscapeKey) {
+        cleanupEscapeKey()
+      }
     })
 
     // Container classes
@@ -228,10 +277,16 @@ export const Dropdown = defineComponent({
       return getDropdownTriggerClasses(props.disabled)
     })
 
-    // Menu wrapper classes
-    const menuWrapperClasses = computed(() => {
-      return getDropdownMenuWrapperClasses(currentVisible.value, props.placement)
-    })
+    // Menu wrapper classes using Floating UI positioning
+    const menuWrapperClasses = computed(() => 'absolute z-50')
+
+    // Menu wrapper styles using Floating UI positioning
+    const menuWrapperStyles = computed(() => ({
+      position: 'absolute' as const,
+      left: `${x.value}px`,
+      top: `${y.value}px`,
+      transformOrigin: getTransformOrigin(currentPlacement.value)
+    }))
 
     // Provide dropdown context
     provide<DropdownContext>(DropdownContextKey, {
@@ -259,11 +314,12 @@ export const Dropdown = defineComponent({
         triggerNode = node
       })
 
-      // Trigger element with event handlers
+      // Trigger element with event handlers and ref
       const trigger = triggerNode
         ? h(
             'div',
             {
+              ref: triggerRef,
               class: triggerClasses.value,
               onClick: handleClick,
               onMouseenter: handleMouseEnter,
@@ -275,12 +331,14 @@ export const Dropdown = defineComponent({
           )
         : null
 
-      // Dropdown menu
+      // Dropdown menu with Floating UI positioning
       const menu = menuNode
         ? h(
             'div',
             {
+              ref: floatingRef,
               class: menuWrapperClasses.value,
+              style: menuWrapperStyles.value,
               onMouseenter: handleMouseEnter,
               onMouseleave: handleMouseLeave,
               hidden: !currentVisible.value
