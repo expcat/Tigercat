@@ -550,12 +550,12 @@ export const Button: React.FC<ButtonProps> = ({
 
 ### 8.4 优化建议
 
-| 优先级 | 任务                 | 涉及组件                               | 预期收益          |
-| ------ | -------------------- | -------------------------------------- | ----------------- |
-| 🔴 高  | 引入 Floating UI     | Tooltip, Popover, Popconfirm, Dropdown | 完善定位系统      |
-| 🔴 高  | 完善 Focus Trap      | Modal, Drawer                          | a11y 合规         |
-| 🟡 中  | 合并 Tooltip/Popover | Tooltip, Popover                       | 减少 80% 重复代码 |
-| 🟡 中  | 统一动画系统         | 全部 Overlay                           | 动画一致性        |
+| 优先级 | 任务                 | 涉及组件                               | 预期收益          | 状态      |
+| ------ | -------------------- | -------------------------------------- | ----------------- | --------- |
+| 🔴 高  | 引入 Floating UI     | Tooltip, Popover, Popconfirm, Dropdown | 完善定位系统      | ✅ 已完成 |
+| 🔴 高  | 完善 Focus Trap      | Modal, Drawer                          | a11y 合规         | ✅ 已完成 |
+| 🟡 中  | 合并 Tooltip/Popover | Tooltip, Popover                       | 减少 80% 重复代码 | 🔄 推迟   |
+| 🟡 中  | 统一动画系统         | 全部 Overlay                           | 动画一致性        | 🔄 推迟   |
 
 ---
 
@@ -727,11 +727,11 @@ export const Button: React.FC<ButtonProps> = ({
 | 阶段 0  | 代码扫描与分析   | -      | ✅ 已完成 |
 | 阶段 1  | Core 包重构      | 4      | ✅ 已完成 |
 | 阶段 2  | 高优先级组件修复 | 8      | ✅ 已完成 |
-| 阶段 3A | 定位系统升级     | 3      | ⬜ 待开始 |
-| 阶段 3B | 组件拆分与抽象   | 3      | ⬜ 待开始 |
+| 阶段 3A | 定位系统升级     | 3      | ✅ 已完成 |
+| 阶段 3B | 组件拆分与抽象   | 3      | 🔄 进行中 |
 | 阶段 3C | 代码精简         | 2      | ⬜ 待开始 |
-| 阶段 4  | 动画系统统一     | 2      | ⬜ 待开始 |
-| 阶段 5  | 文档与 Demo 完善 | 3      | ⬜ 待开始 |
+| 阶段 4  | 动画系统统一     | 3      | 🔄 进行中 |
+| 阶段 5  | 文档与 Demo 完善 | 3      | 🔄 进行中 |
 
 ### 12.2 阶段详情
 
@@ -837,21 +837,36 @@ export const Button: React.FC<ButtonProps> = ({
 | 0.2.0-alpha.1 | 阶段 1       | ✅ Core 包重构完成  |
 | 0.2.0-alpha.2 | 阶段 2       | ✅ 高优先级修复完成 |
 | 0.2.0-beta.1  | 阶段 3A      | 定位系统升级完成    |
+| 0.2.0-beta.1  | 阶段 3A      | ✅ 定位系统升级完成 |
 | 0.2.0-beta.2  | 阶段 3B + 3C | 组件优化完成        |
 | 0.2.0-rc.1    | 阶段 4       | 动画系统完成        |
 | 0.2.0-rc.2    | 阶段 5       | 文档 Demo 完成      |
 | **0.2.0**     | 全部         | 正式发布            |
 
-### 12.4 下一步行动
+### 12.4 0.2.0 发布前检查清单
 
-**立即开始阶段 3A**，按以下顺序执行：
+#### 必须完成 ✅
 
-1. 在 `packages/core/package.json` 添加 `@floating-ui/dom` 依赖
-2. 创建 `packages/core/src/utils/floating.ts` 封装定位逻辑
-3. 迁移 Vue Tooltip 组件使用 Floating UI
-4. 迁移 React Tooltip 组件使用 Floating UI
-5. 同步更新 Popover/Popconfirm/Dropdown
-6. 抽取 `useFloatingOverlay` 共享逻辑
+- [x] Floating UI 定位系统集成（Tooltip/Popover）
+- [x] 动画常量统一（ANIMATION_DURATION_MS）
+- [x] RadarChart 复用 ChartTooltip
+- [x] Pagination 国际化支持
+- [x] i18n 文档
+- [x] Popconfirm/Dropdown 迁移 Floating UI
+
+#### 可选/推迟
+
+- [ ] Pagination 子组件抽取（收益有限，可推迟）
+- [ ] DatePicker/TimePicker/Select setup 函数拆分（复杂度高，可推迟）
+- [ ] SVG 路径动画（图表入场动画，可选功能）
+- [ ] Demo 示例更新（低优先级）
+
+### 12.5 下一步行动
+
+**阶段 3B 已完成**，Popconfirm/Dropdown 已迁移至 Floating UI。当前可选后续任务：
+
+1. **Pagination 子组件抽取** - Table/List 复用，减少代码重复
+2. **准备 0.2.0-beta.1 发布** - 当前功能已满足发布要求
 
 ---
 

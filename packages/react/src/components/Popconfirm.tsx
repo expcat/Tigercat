@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useRef } from 'react'
+import React, { useCallback, useMemo, useState, useRef } from 'react'
 import {
   classNames,
   getPopconfirmIconPath,
@@ -12,15 +12,17 @@ import {
   getPopconfirmButtonsClasses,
   getPopconfirmCancelButtonClasses,
   getPopconfirmOkButtonClasses,
-  getDropdownMenuWrapperClasses,
+  getTransformOrigin,
   mergeStyleValues,
   popconfirmIconPathStrokeLinecap,
   popconfirmIconPathStrokeLinejoin,
   popconfirmIconStrokeWidth,
   popconfirmIconViewBox,
   type PopconfirmProps as CorePopconfirmProps,
-  type PopconfirmIconType
+  type PopconfirmIconType,
+  type FloatingPlacement
 } from '@expcat/tigercat-core'
+import { useFloating, useClickOutside, useEscapeKey } from '../utils/overlay'
 
 let popconfirmIdCounter = 0
 const createPopconfirmId = () => `tiger-popconfirm-${++popconfirmIdCounter}`
@@ -40,7 +42,7 @@ const PopconfirmIcon: React.FC<{ type: PopconfirmIconType }> = ({ type }) => (
   </svg>
 )
 
-export type PopconfirmProps = Omit<CorePopconfirmProps, 'style'> &
+export type PopconfirmProps = Omit<CorePopconfirmProps, 'style' | 'placement'> &
   Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style'> & {
     /**
      * The element to trigger the popconfirm
@@ -71,6 +73,19 @@ export type PopconfirmProps = Omit<CorePopconfirmProps, 'style'> &
      * Callback when cancel button is clicked
      */
     onCancel?: () => void
+
+    /**
+     * Placement of the popconfirm relative to trigger
+     * @default 'top'
+     */
+    placement?: FloatingPlacement
+
+    /**
+     * Offset distance from trigger element
+     * @default 8
+     */
+    offset?: number
+
     className?: string
     style?: React.CSSProperties
   }
@@ -85,7 +100,8 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
   okText = '确定',
   cancelText = '取消',
   okType = 'primary',
-  placement = 'top',
+  placement: initialPlacement = 'top',
+  offset = 8,
   disabled = false,
   className,
   style,
@@ -102,8 +118,10 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
 
   const currentVisible = isControlled ? visible : internalVisible
 
-  // Ref to the container element
+  // Refs for Floating UI positioning
   const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLDivElement>(null)
+  const floatingRef = useRef<HTMLDivElement>(null)
 
   const popconfirmIdRef = useRef<string | null>(null)
   if (!popconfirmIdRef.current) {
@@ -143,38 +161,41 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     setVisible(!currentVisible)
   }
 
-  // Handle outside click to close popconfirm
-  useEffect(() => {
-    if (!currentVisible) return
+  // Floating UI positioning
+  const { x, y, placement } = useFloating({
+    referenceRef: triggerRef,
+    floatingRef,
+    enabled: currentVisible,
+    placement: initialPlacement,
+    offset
+  })
 
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target
-      if (!target) return
-      if (containerRef.current?.contains(target as Node)) return
-      setVisible(false)
-    }
+  // Handle click outside and escape key
+  const handleOutsideClick = useCallback(() => setVisible(false), [])
+  const handleEscape = useCallback(() => setVisible(false), [])
 
-    const timeoutId = window.setTimeout(() => {
-      document.addEventListener('click', handleClickOutside)
-    }, 0)
+  useClickOutside({
+    enabled: currentVisible,
+    refs: [containerRef],
+    onOutsideClick: handleOutsideClick,
+    defer: true
+  })
 
-    return () => {
-      clearTimeout(timeoutId)
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [currentVisible])
+  useEscapeKey({
+    enabled: currentVisible,
+    onEscape: handleEscape
+  })
 
-  useEffect(() => {
-    if (!currentVisible) return
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      setVisible(false)
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [currentVisible])
+  // Compute styles for floating element
+  const contentWrapperStyles = useMemo<React.CSSProperties>(
+    () => ({
+      position: 'absolute',
+      left: x,
+      top: y,
+      transformOrigin: getTransformOrigin(placement)
+    }),
+    [x, y, placement]
+  )
 
   // Container classes
   const containerClasses = useMemo(
@@ -184,10 +205,7 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
 
   const triggerClasses = useMemo(() => getPopconfirmTriggerClasses(disabled), [disabled])
 
-  const contentWrapperClasses = useMemo(
-    () => getDropdownMenuWrapperClasses(Boolean(currentVisible), placement),
-    [currentVisible, placement]
-  )
+  const contentWrapperClasses = useMemo(() => 'absolute z-50', [])
 
   const arrowClasses = useMemo(() => getPopconfirmArrowClasses(placement), [placement])
   const contentClasses = useMemo(() => getPopconfirmContentClasses(), [])
@@ -257,9 +275,14 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
 
   return (
     <div ref={containerRef} className={containerClasses} style={mergedStyle} {...divProps}>
-      {triggerNode}
+      <div ref={triggerRef}>{triggerNode}</div>
 
-      <div className={contentWrapperClasses} hidden={!currentVisible} aria-hidden={!currentVisible}>
+      <div
+        ref={floatingRef}
+        className={contentWrapperClasses}
+        style={contentWrapperStyles}
+        hidden={!currentVisible}
+        aria-hidden={!currentVisible}>
         <div className="relative">
           <div className={arrowClasses} aria-hidden="true" />
           <div

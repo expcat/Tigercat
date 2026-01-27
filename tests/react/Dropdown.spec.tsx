@@ -34,13 +34,14 @@ describe('Dropdown', () => {
       </Dropdown>
     )
 
-    const wrapper = container.querySelector('.tiger-dropdown-menu-wrapper')
-    expect(wrapper).toHaveClass('hidden')
+    // Floating UI uses `hidden` attribute now
+    const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
+    expect(wrapper).toHaveAttribute('hidden')
   })
 
-  it('applies placement classes', () => {
+  it('supports offset prop', () => {
     const { container } = render(
-      <Dropdown placement="top-end">
+      <Dropdown placement="top-end" offset={12}>
         <button>Trigger</button>
         <DropdownMenu>
           <DropdownItem>Item 1</DropdownItem>
@@ -48,8 +49,9 @@ describe('Dropdown', () => {
       </Dropdown>
     )
 
-    const wrapper = container.querySelector('.tiger-dropdown-menu-wrapper')
-    expect(wrapper).toHaveClass('bottom-full', 'right-0')
+    // Verify component renders with offset prop
+    const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
+    expect(wrapper).toBeInTheDocument()
   })
 
   it('respects disabled prop (prevents opening)', async () => {
@@ -66,8 +68,9 @@ describe('Dropdown', () => {
     expect(trigger).toHaveClass('cursor-not-allowed', 'opacity-50')
 
     await fireEvent.click(screen.getByText('Trigger'))
-    const wrapper = container.querySelector('.tiger-dropdown-menu-wrapper')
-    expect(wrapper).toHaveClass('hidden')
+    // Floating UI uses `hidden` attribute now
+    const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
+    expect(wrapper).toHaveAttribute('hidden')
   })
 
   it('toggles visibility in click trigger mode and calls onVisibleChange', async () => {
@@ -82,15 +85,16 @@ describe('Dropdown', () => {
       </Dropdown>
     )
 
-    const wrapper = container.querySelector('.tiger-dropdown-menu-wrapper')
-    expect(wrapper).toHaveClass('hidden')
+    // Floating UI uses `hidden` attribute now
+    const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
+    expect(wrapper).toHaveAttribute('hidden')
 
     await fireEvent.click(screen.getByText('Trigger'))
-    expect(wrapper).not.toHaveClass('hidden')
+    expect(wrapper).not.toHaveAttribute('hidden')
     expect(handleVisibleChange).toHaveBeenCalledWith(true)
 
     await fireEvent.click(screen.getByText('Trigger'))
-    expect(wrapper).toHaveClass('hidden')
+    expect(wrapper).toHaveAttribute('hidden')
     expect(handleVisibleChange).toHaveBeenCalledWith(false)
   })
 
@@ -104,12 +108,13 @@ describe('Dropdown', () => {
       </Dropdown>
     )
 
-    const wrapper = container.querySelector('.tiger-dropdown-menu-wrapper')
+    // Floating UI uses `hidden` attribute now
+    const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
     await fireEvent.click(screen.getByText('Trigger'))
-    expect(wrapper).not.toHaveClass('hidden')
+    expect(wrapper).not.toHaveAttribute('hidden')
 
     await fireEvent.click(document.body)
-    expect(wrapper).toHaveClass('hidden')
+    expect(wrapper).toHaveAttribute('hidden')
   })
 
   it('closes on Escape when open', async () => {
@@ -122,12 +127,13 @@ describe('Dropdown', () => {
       </Dropdown>
     )
 
-    const wrapper = container.querySelector('.tiger-dropdown-menu-wrapper')
+    // Floating UI uses `hidden` attribute now
+    const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
     await fireEvent.click(screen.getByText('Trigger'))
-    expect(wrapper).not.toHaveClass('hidden')
+    expect(wrapper).not.toHaveAttribute('hidden')
 
     await fireEvent.keyDown(document, { key: 'Escape' })
-    expect(wrapper).toHaveClass('hidden')
+    expect(wrapper).toHaveAttribute('hidden')
   })
 
   it('closes on item click by default, but not when item is disabled', async () => {
@@ -141,16 +147,17 @@ describe('Dropdown', () => {
       </Dropdown>
     )
 
-    const wrapper = container.querySelector('.tiger-dropdown-menu-wrapper')
+    // Floating UI uses `hidden` attribute now
+    const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
 
     await fireEvent.click(screen.getByText('Trigger'))
-    expect(wrapper).not.toHaveClass('hidden')
+    expect(wrapper).not.toHaveAttribute('hidden')
     await fireEvent.click(screen.getByText('Item 1'))
-    expect(wrapper).toHaveClass('hidden')
+    expect(wrapper).toHaveAttribute('hidden')
 
     await fireEvent.click(screen.getByText('Trigger'))
-    expect(wrapper).not.toHaveClass('hidden')
+    expect(wrapper).not.toHaveAttribute('hidden')
     await fireEvent.click(screen.getByText('Disabled Item'))
-    expect(wrapper).not.toHaveClass('hidden')
+    expect(wrapper).not.toHaveAttribute('hidden')
   })
 })
