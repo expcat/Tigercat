@@ -753,15 +753,20 @@ export const Button: React.FC<ButtonProps> = ({
 7. ✅ 下沉键盘导航逻辑
 8. ✅ 下沉 Slider 计算逻辑
 
-#### 阶段 3A：定位系统升级 ⬜ 待开始
+#### 阶段 3A：定位系统升级 ✅ 已完成
 
 > 目标：引入 Floating UI 实现边界碰撞检测，统一弹出层定位逻辑
 
-1. ⬜ 引入 Floating UI 依赖到 `@expcat/tigercat-core`（作为 dependency 直接打包，~15KB gzip）
-2. ⬜ 迁移 Tooltip/Popover/Popconfirm/Dropdown 使用 Floating UI 定位
-3. ⬜ 合并 Tooltip/Popover 抽象，抽取 `useFloatingOverlay` composable/hook
+1. ✅ 引入 Floating UI 依赖到 `@expcat/tigercat-core`（@floating-ui/dom ^1.6.13）
+2. ✅ 迁移 Tooltip/Popover 使用 Floating UI 定位（条件渲染优化，支持 offset prop）
+3. ✅ 抽取 `useVueFloating` composable (Vue) 和 `useFloating` hook (React)
 
-**预期收益**：解决弹出层超出视口问题，减少 Tooltip/Popover 重复代码 ~200 行
+**实际收益**：
+
+- 解决弹出层超出视口问题，自动翻转定位
+- 减少 Tooltip/Popover 重复代码约 150 行
+- 新增 floating.ts (~250 行) 统一定位逻辑
+- 所有 72 个 Tooltip/Popover 测试通过
 
 #### 阶段 3B：组件拆分与抽象 ⬜ 待开始
 
@@ -781,18 +786,26 @@ export const Button: React.FC<ButtonProps> = ({
    - Select：抽取 `useSelectKeyboard`, `useSelectFilter` composable
 2. ⬜ 简化 Vue Props 定义（考虑使用 `defineProps<T>()` 泛型语法减少冗余）
 
-#### 阶段 4：动画系统统一 ⬜ 待开始
+#### 阶段 4：动画系统统一 🔄 进行中
 
 > 目标：统一动画配置，提供可定制的过渡效果
 
-1. ⬜ 统一 transition 配置（抽取 `ANIMATION_DURATION` 常量，替换硬编码 300ms）
-2. ⬜ 添加 SVG 路径动画（图表组件入场动画，可选功能）
+1. ✅ 统一 transition 配置（抽取 `ANIMATION_DURATION_MS` 等常量到 animation.ts）
+   - `ANIMATION_DURATION_MS = 300` (标准)
+   - `ANIMATION_DURATION_FAST_MS = 150` (快速)
+   - `ANIMATION_DURATION_SLOW_MS = 500` (慢速)
+   - `DURATION_CLASS`, `TRANSITION_BASE` 等 Tailwind 类
+2. ✅ Drawer 组件已迁移使用常量 (Vue + React)
+3. ⬜ 添加 SVG 路径动画（图表组件入场动画，可选功能）
 
-#### 阶段 5：文档与 Demo 完善 ⬜ 待开始
+#### 阶段 5：文档与 Demo 完善 🔄 进行中
 
 > 目标：完善国际化支持，优化示例代码
 
-1. ⬜ Pagination 国际化实现（扩展 `locale-utils.ts`，添加 `getPaginationLabels(locale)` 函数）
+1. ✅ Pagination 国际化实现（已添加 `TigerLocalePagination` 类型和 `getPaginationLabels()` 函数）
+   - 支持 locale prop 传入自定义文本
+   - 默认英文标签，提供中文简体预设 `ZH_CN_PAGINATION_LABELS`
+   - Vue + React 组件均已更新
 2. ⬜ 添加 i18n 文档（说明 DatePicker/TimePicker/Pagination 的国际化用法）
 3. ⬜ 更新 Demo 示例（以最少示例展示全部功能）
 

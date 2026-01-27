@@ -28,8 +28,8 @@ describe('Popover', () => {
         content: 'Popover content'
       })
 
-      // Content should be hidden initially
-      expect(queryByText('Popover content')).not.toBeVisible()
+      // Content should not be rendered initially (conditional rendering)
+      expect(queryByText('Popover content')).toBeNull()
     })
 
     it('should show popover content when trigger is clicked', async () => {
@@ -155,7 +155,7 @@ describe('Popover', () => {
   describe('Trigger', () => {
     it('should show/hide on click when trigger is "click"', async () => {
       const user = userEvent.setup()
-      const { getByText } = renderWithProps(Popover, {
+      const { getByText, queryByText } = renderWithProps(Popover, {
         trigger: 'click',
         content: 'Click content',
         children: <button>Click trigger</button>
@@ -173,7 +173,7 @@ describe('Popover', () => {
       await user.click(trigger)
       await waitFor(
         () => {
-          expect(getByText('Click content')).not.toBeVisible()
+          expect(queryByText('Click content')).toBeNull()
         },
         { timeout: 2000 }
       )
@@ -181,7 +181,7 @@ describe('Popover', () => {
 
     it('should show/hide on hover when trigger is "hover"', async () => {
       const user = userEvent.setup()
-      const { getByText } = renderWithProps(Popover, {
+      const { getByText, queryByText } = renderWithProps(Popover, {
         trigger: 'hover',
         content: 'Hover content',
         children: <button>Hover trigger</button>
@@ -199,7 +199,7 @@ describe('Popover', () => {
       await user.unhover(trigger)
       await waitFor(
         () => {
-          expect(getByText('Hover content')).not.toBeVisible()
+          expect(queryByText('Hover content')).toBeNull()
         },
         { timeout: 2000 }
       )
@@ -207,7 +207,7 @@ describe('Popover', () => {
 
     it('should show/hide on focus when trigger is "focus"', async () => {
       const user = userEvent.setup()
-      const { getByText } = renderWithProps(Popover, {
+      const { getByText, queryByText } = renderWithProps(Popover, {
         trigger: 'focus',
         content: 'Focus content',
         children: <button>Focus trigger</button>
@@ -225,7 +225,7 @@ describe('Popover', () => {
       await user.tab()
       await waitFor(
         () => {
-          expect(getByText('Focus content')).not.toBeVisible()
+          expect(queryByText('Focus content')).toBeNull()
         },
         { timeout: 2000 }
       )
@@ -235,7 +235,7 @@ describe('Popover', () => {
   describe('States', () => {
     it('should support disabled state', async () => {
       const user = userEvent.setup()
-      const { getByText } = renderWithProps(Popover, {
+      const { getByText, queryByText } = renderWithProps(Popover, {
         disabled: true,
         content: 'Disabled content',
         children: <button>Disabled trigger</button>
@@ -246,8 +246,8 @@ describe('Popover', () => {
       // Wait a bit to ensure it doesn't show
       await new Promise((resolve) => setTimeout(resolve, 100))
 
-      // Content should still not be visible
-      expect(getByText('Disabled content')).not.toBeVisible()
+      // Content should not be rendered
+      expect(queryByText('Disabled content')).toBeNull()
     })
 
     it('should support defaultVisible', () => {
@@ -261,14 +261,14 @@ describe('Popover', () => {
     })
 
     it('should support controlled visible state', async () => {
-      const { getByText, rerender } = renderWithProps(Popover, {
+      const { getByText, queryByText, rerender } = renderWithProps(Popover, {
         visible: false,
         content: 'Controlled content',
         children: <button>Trigger</button>
       })
 
-      // Initially hidden
-      expect(getByText('Controlled content')).not.toBeVisible()
+      // Initially not rendered
+      expect(queryByText('Controlled content')).toBeNull()
 
       rerender(
         <Popover visible={true} content="Controlled content">
@@ -288,7 +288,7 @@ describe('Popover', () => {
       )
 
       await waitFor(() => {
-        expect(getByText('Controlled content')).not.toBeVisible()
+        expect(queryByText('Controlled content')).toBeNull()
       })
     })
   })
@@ -370,7 +370,7 @@ describe('Popover', () => {
 
     it('should close on Escape (non-manual)', async () => {
       const user = userEvent.setup()
-      const { getByText } = renderWithProps(Popover, {
+      const { getByText, queryByText } = renderWithProps(Popover, {
         trigger: 'click',
         content: 'Esc content',
         children: <button>Trigger</button>
@@ -383,7 +383,7 @@ describe('Popover', () => {
 
       await user.keyboard('{Escape}')
       await waitFor(() => {
-        expect(getByText('Esc content')).not.toBeVisible()
+        expect(queryByText('Esc content')).toBeNull()
       })
     })
 

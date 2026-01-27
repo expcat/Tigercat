@@ -56,7 +56,7 @@ describe('Tooltip', () => {
 
   it('shows/hides on hover (default)', async () => {
     const user = userEvent.setup()
-    const { getByText, container } = renderWithSlots(
+    const { getByText, queryByText, container } = renderWithSlots(
       Tooltip,
       { default: '<button>Trigger</button>' },
       { content: 'Tooltip content' }
@@ -65,13 +65,14 @@ describe('Tooltip', () => {
     const trigger = container.querySelector('.tiger-tooltip-trigger') as HTMLElement
     expect(trigger).toBeTruthy()
 
-    expect(getByText('Tooltip content')).not.toBeVisible()
+    // Tooltip not rendered initially
+    expect(queryByText('Tooltip content')).toBeNull()
 
     await user.hover(trigger)
     await waitFor(() => expect(getByText('Tooltip content')).toBeVisible())
 
     await user.unhover(trigger)
-    await waitFor(() => expect(getByText('Tooltip content')).not.toBeVisible())
+    await waitFor(() => expect(queryByText('Tooltip content')).toBeNull())
   })
 
   it('supports content slot', async () => {
@@ -94,7 +95,7 @@ describe('Tooltip', () => {
 
   it('toggles on click and closes on outside click', async () => {
     const user = userEvent.setup()
-    const { getByText } = renderWithSlots(
+    const { getByText, queryByText } = renderWithSlots(
       Tooltip,
       { default: '<button>Trigger</button>' },
       { content: 'Tooltip content', trigger: 'click' }
@@ -104,12 +105,12 @@ describe('Tooltip', () => {
     await waitFor(() => expect(getByText('Tooltip content')).toBeVisible())
 
     await user.click(document.body)
-    await waitFor(() => expect(getByText('Tooltip content')).not.toBeVisible())
+    await waitFor(() => expect(queryByText('Tooltip content')).toBeNull())
   })
 
   it('shows on focus and hides on blur', async () => {
     const user = userEvent.setup()
-    const { getByText, container } = renderWithSlots(
+    const { getByText, queryByText, container } = renderWithSlots(
       Tooltip,
       { default: '<button>Trigger</button>' },
       { content: 'Tooltip content', trigger: 'focus' }
@@ -122,34 +123,34 @@ describe('Tooltip', () => {
     await waitFor(() => expect(getByText('Tooltip content')).toBeVisible())
 
     trigger.blur()
-    await waitFor(() => expect(getByText('Tooltip content')).not.toBeVisible())
+    await waitFor(() => expect(queryByText('Tooltip content')).toBeNull())
   })
 
   it('does not auto-open in manual mode', async () => {
     const user = userEvent.setup()
-    const { getByText } = renderWithSlots(
+    const { getByText, queryByText } = renderWithSlots(
       Tooltip,
       { default: '<button>Trigger</button>' },
       { content: 'Tooltip content', trigger: 'manual', visible: false }
     )
 
     await user.hover(getByText('Trigger'))
-    expect(getByText('Tooltip content')).not.toBeVisible()
+    expect(queryByText('Tooltip content')).toBeNull()
 
     await user.click(getByText('Trigger'))
-    expect(getByText('Tooltip content')).not.toBeVisible()
+    expect(queryByText('Tooltip content')).toBeNull()
   })
 
   it('does not open when disabled', async () => {
     const user = userEvent.setup()
-    const { getByText, container } = renderWithSlots(
+    const { getByText, queryByText, container } = renderWithSlots(
       Tooltip,
       { default: '<button>Trigger</button>' },
       { content: 'Tooltip content', disabled: true }
     )
 
     await user.hover(getByText('Trigger'))
-    expect(getByText('Tooltip content')).not.toBeVisible()
+    expect(queryByText('Tooltip content')).toBeNull()
     expect(container.querySelector('.tiger-tooltip-trigger')).toHaveClass('cursor-not-allowed')
   })
 
@@ -188,19 +189,27 @@ describe('Tooltip', () => {
     await waitFor(() => expect(onVisibleChange).toHaveBeenCalledWith(true))
   })
 
-  it('sets aria-describedby and role=tooltip', () => {
-    const { container } = renderWithSlots(
+  it('sets aria-describedby and role=tooltip when visible', async () => {
+    const user = userEvent.setup()
+    const { container, getByText } = renderWithSlots(
       Tooltip,
       { default: '<button>Trigger</button>' },
       { content: 'Tooltip content' }
     )
 
     const triggerWrapper = container.querySelector('.tiger-tooltip-trigger') as HTMLElement
-    const tooltipEl = container.querySelector('[role="tooltip"]') as HTMLElement
-
     expect(triggerWrapper).toBeTruthy()
-    expect(tooltipEl).toBeTruthy()
-    expect(triggerWrapper.getAttribute('aria-describedby')).toBe(tooltipEl.id)
+
+    // aria-describedby should exist even before tooltip is shown
+    expect(triggerWrapper.getAttribute('aria-describedby')).toBeTruthy()
+
+    // Show tooltip and verify role
+    await user.hover(triggerWrapper)
+    await waitFor(() => {
+      const tooltipEl = container.querySelector('[role="tooltip"]') as HTMLElement
+      expect(tooltipEl).toBeTruthy()
+      expect(triggerWrapper.getAttribute('aria-describedby')).toBe(tooltipEl.id)
+    })
   })
 
   it('has no accessibility violations', async () => {

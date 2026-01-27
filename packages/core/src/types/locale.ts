@@ -48,9 +48,27 @@ export interface TigerLocaleUpload {
   previewFileAriaLabel?: string
 }
 
+export interface TigerLocalePagination {
+  /** Total text template: supports {total}, {start}, {end} */
+  totalText?: string
+  /** Items per page text */
+  itemsPerPageText?: string
+  /** Quick jumper label */
+  jumpToText?: string
+  /** Page text (after number) */
+  pageText?: string
+  /** Previous page button aria-label */
+  prevPageAriaLabel?: string
+  /** Next page button aria-label */
+  nextPageAriaLabel?: string
+  /** Page button aria-label template: supports {page} */
+  pageAriaLabel?: string
+}
+
 export interface TigerLocale {
   common?: TigerLocaleCommon
   modal?: TigerLocaleModal
   drawer?: TigerLocaleDrawer
   upload?: TigerLocaleUpload
+  pagination?: TigerLocalePagination
 }

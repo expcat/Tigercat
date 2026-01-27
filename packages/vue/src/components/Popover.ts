@@ -1,5 +1,5 @@
 import { defineComponent, computed, ref, h, onBeforeUnmount, watch, PropType } from 'vue'
-import { useVueClickOutside, useVueEscapeKey } from '../utils/overlay'
+import { useVueFloating, useVueClickOutside, useVueEscapeKey } from '../utils/overlay'
 import {
   classNames,
   coerceClassValue,
@@ -8,9 +8,9 @@ import {
   getPopoverContentClasses,
   getPopoverTitleClasses,
   getPopoverContentTextClasses,
-  getDropdownMenuWrapperClasses,
+  getTransformOrigin,
   type PopoverTrigger,
-  type DropdownPlacement,
+  type FloatingPlacement,
   type StyleValue
 } from '@expcat/tigercat-core'
 
@@ -68,8 +68,8 @@ export const Popover = defineComponent({
      * @default 'top'
      */
     placement: {
-      type: String as PropType<DropdownPlacement>,
-      default: 'top' as DropdownPlacement
+      type: String as PropType<FloatingPlacement>,
+      default: 'top' as FloatingPlacement
     },
     /**
      * Whether the popover is disabled
@@ -86,6 +86,14 @@ export const Popover = defineComponent({
     width: {
       type: [String, Number],
       default: undefined
+    },
+    /**
+     * Offset distance from trigger (in pixels)
+     * @default 8
+     */
+    offset: {
+      type: Number,
+      default: 8
     },
     /**
      * Additional CSS classes
@@ -124,11 +132,27 @@ export const Popover = defineComponent({
 
     const currentVisible = computed(() => internalVisible.value)
 
+    // Element refs
     const containerRef = ref<HTMLElement | null>(null)
+    const triggerRef = ref<HTMLElement | null>(null)
+    const floatingRef = ref<HTMLElement | null>(null)
 
     const popoverId = createPopoverId()
     const titleId = `${popoverId}-title`
     const contentId = `${popoverId}-content`
+
+    // Floating UI positioning
+    const {
+      x,
+      y,
+      placement: actualPlacement
+    } = useVueFloating({
+      referenceRef: triggerRef,
+      floatingRef,
+      enabled: currentVisible,
+      placement: props.placement as FloatingPlacement,
+      offset: props.offset
+    })
 
     const setVisible = (nextVisible: boolean) => {
       if (props.disabled && nextVisible) return
@@ -217,11 +241,6 @@ export const Popover = defineComponent({
       return getPopoverTriggerClasses(props.disabled)
     })
 
-    // Content wrapper classes
-    const contentWrapperClasses = computed(() => {
-      return getDropdownMenuWrapperClasses(currentVisible.value, props.placement)
-    })
-
     // Content classes
     const contentClasses = computed(() => {
       return getPopoverContentClasses(props.width)
@@ -236,6 +255,15 @@ export const Popover = defineComponent({
     const contentTextClasses = computed(() => {
       return getPopoverContentTextClasses()
     })
+
+    // Floating content styles
+    const floatingStyles = computed(() => ({
+      position: 'absolute' as const,
+      left: `${x.value}px`,
+      top: `${y.value}px`,
+      transformOrigin: getTransformOrigin(actualPlacement.value),
+      zIndex: 1000
+    }))
 
     return () => {
       const defaultSlot = slots.default?.()
@@ -274,6 +302,7 @@ export const Popover = defineComponent({
       const trigger = h(
         'div',
         {
+          ref: triggerRef,
           class: triggerClasses.value,
           ...triggerA11yProps,
           ...triggerHandlers
@@ -281,50 +310,52 @@ export const Popover = defineComponent({
         defaultSlot
       )
 
-      // Popover content
-      const content = h(
-        'div',
-        {
-          class: contentWrapperClasses.value,
-          hidden: !currentVisible.value,
-          'aria-hidden': !currentVisible.value
-        },
-        [
-          h(
+      // Popover content (positioned with Floating UI)
+      const content = currentVisible.value
+        ? h(
             'div',
             {
-              id: popoverId,
-              role: 'dialog',
-              'aria-modal': 'false',
-              'aria-labelledby': hasTitle ? titleId : undefined,
-              'aria-describedby': hasContent ? contentId : undefined,
-              class: contentClasses.value
+              ref: floatingRef,
+              style: floatingStyles.value,
+              'aria-hidden': false
             },
             [
-              // Title
-              (props.title || slots.title) &&
-                h(
-                  'div',
-                  {
-                    id: titleId,
-                    class: titleClasses.value
-                  },
-                  slots.title ? slots.title() : props.title
-                ),
-              // Content
-              (props.content || slots.content) &&
-                h(
-                  'div',
-                  {
-                    id: contentId,
-                    class: contentTextClasses.value
-                  },
-                  slots.content ? slots.content() : props.content
-                )
-            ].filter(Boolean)
+              h(
+                'div',
+                {
+                  id: popoverId,
+                  role: 'dialog',
+                  'aria-modal': 'false',
+                  'aria-labelledby': hasTitle ? titleId : undefined,
+                  'aria-describedby': hasContent ? contentId : undefined,
+                  class: contentClasses.value
+                },
+                [
+                  // Title
+                  (props.title || slots.title) &&
+                    h(
+                      'div',
+                      {
+                        id: titleId,
+                        class: titleClasses.value
+                      },
+                      slots.title ? slots.title() : props.title
+                    ),
+                  // Content
+                  (props.content || slots.content) &&
+                    h(
+                      'div',
+                      {
+                        id: contentId,
+                        class: contentTextClasses.value
+                      },
+                      slots.content ? slots.content() : props.content
+                    )
+                ].filter(Boolean)
+              )
+            ]
           )
-        ]
-      )
+        : null
 
       return h(
         'div',

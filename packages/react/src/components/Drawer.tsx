@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useId, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import {
+  ANIMATION_DURATION_MS,
   captureActiveElement,
   classNames,
   closeIconViewBox,
@@ -115,7 +116,7 @@ export const Drawer: React.FC<DrawerProps> = ({
       } else {
         onAfterLeave?.()
       }
-    }, 300)
+    }, ANIMATION_DURATION_MS)
 
     return () => window.clearTimeout(timer)
   }, [visible, onAfterEnter, onAfterLeave])

@@ -1,18 +1,20 @@
 import React, { useEffect, useCallback, useRef, useState } from 'react'
+import { useFloating, useClickOutside, useEscapeKey } from '../utils/overlay'
 import {
   classNames,
   getTooltipContainerClasses,
   getTooltipTriggerClasses,
   getTooltipContentClasses,
-  getDropdownMenuWrapperClasses,
-  type TooltipProps as CoreTooltipProps
+  getTransformOrigin,
+  type TooltipProps as CoreTooltipProps,
+  type FloatingPlacement
 } from '@expcat/tigercat-core'
 
 let tooltipIdCounter = 0
 
 const createTooltipId = () => `tiger-tooltip-${++tooltipIdCounter}`
 
-export type TooltipProps = Omit<CoreTooltipProps, 'content' | 'style'> &
+export type TooltipProps = Omit<CoreTooltipProps, 'content' | 'style' | 'placement'> &
   Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style' | 'content'> & {
     children?: React.ReactNode
     content?: React.ReactNode
@@ -20,6 +22,16 @@ export type TooltipProps = Omit<CoreTooltipProps, 'content' | 'style'> &
     contentContent?: React.ReactNode
     className?: string
     style?: React.CSSProperties
+    /**
+     * Tooltip placement relative to trigger
+     * @default 'top'
+     */
+    placement?: FloatingPlacement
+    /**
+     * Offset distance from trigger (in pixels)
+     * @default 8
+     */
+    offset?: number
     onVisibleChange?: (visible: boolean) => void
   }
 
@@ -30,6 +42,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
   trigger = 'hover',
   placement = 'top',
   disabled = false,
+  offset = 8,
   className,
   style,
   children,
@@ -42,6 +55,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
   const currentVisible = isControlled ? visible : internalVisible
 
   const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLDivElement>(null)
+  const floatingRef = useRef<HTMLDivElement>(null)
   const tooltipIdRef = useRef<string | null>(null)
 
   if (!tooltipIdRef.current) {
@@ -51,6 +66,19 @@ export const Tooltip: React.FC<TooltipProps> = ({
   const tooltipId = tooltipIdRef.current
   const tooltipContent = contentContent ?? content
   const describedBy = tooltipContent != null ? tooltipId : undefined
+
+  // Floating UI positioning
+  const {
+    x,
+    y,
+    placement: actualPlacement
+  } = useFloating({
+    referenceRef: triggerRef,
+    floatingRef,
+    enabled: currentVisible,
+    placement,
+    offset
+  })
 
   const setVisible = useCallback(
     (newVisible: boolean) => {
@@ -90,43 +118,31 @@ export const Tooltip: React.FC<TooltipProps> = ({
     setVisible(false)
   }
 
-  // Handle outside click to close tooltip (only for click trigger)
-  useEffect(() => {
-    if (!currentVisible || trigger !== 'click') return
+  // Click outside handler (only for click trigger)
+  useClickOutside({
+    enabled: currentVisible && trigger === 'click',
+    refs: [containerRef],
+    onOutsideClick: () => setVisible(false),
+    defer: true
+  })
 
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target
-      if (!target) return
-      if (containerRef.current?.contains(target as Node)) return
-      setVisible(false)
-    }
-
-    const timeoutId = setTimeout(() => {
-      document.addEventListener('click', handleClickOutside)
-    }, 0)
-
-    return () => {
-      clearTimeout(timeoutId)
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [currentVisible, trigger, setVisible])
-
-  useEffect(() => {
-    if (!currentVisible) return
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      setVisible(false)
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [currentVisible, setVisible])
+  // Escape key handler
+  useEscapeKey({
+    enabled: currentVisible,
+    onEscape: () => setVisible(false)
+  })
 
   const containerClasses = classNames(getTooltipContainerClasses(), className)
   const triggerClasses = getTooltipTriggerClasses(disabled)
-  const contentWrapperClasses = getDropdownMenuWrapperClasses(currentVisible, placement)
   const contentClasses = getTooltipContentClasses()
+
+  const floatingStyles: React.CSSProperties = {
+    position: 'absolute',
+    left: x,
+    top: y,
+    transformOrigin: getTransformOrigin(actualPlacement),
+    zIndex: 1000
+  }
 
   const triggerHandlers: React.DOMAttributes<HTMLDivElement> = {}
   if (trigger === 'click') {
@@ -145,15 +161,21 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   return (
     <div ref={containerRef} className={containerClasses} style={style} {...divProps}>
-      <div className={triggerClasses} aria-describedby={describedBy} {...triggerHandlers}>
+      <div
+        ref={triggerRef}
+        className={triggerClasses}
+        aria-describedby={describedBy}
+        {...triggerHandlers}>
         {children}
       </div>
 
-      <div className={contentWrapperClasses} hidden={!currentVisible} aria-hidden={!currentVisible}>
-        <div id={tooltipId} role="tooltip" className={contentClasses}>
-          {tooltipContent}
+      {currentVisible && (
+        <div ref={floatingRef} style={floatingStyles} aria-hidden={false}>
+          <div id={tooltipId} role="tooltip" className={contentClasses}>
+            {tooltipContent}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

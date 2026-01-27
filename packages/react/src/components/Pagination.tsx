@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import {
   classNames,
   getTotalPages,
@@ -13,7 +13,10 @@ import {
   getQuickJumperInputClasses,
   getPageSizeSelectorClasses,
   getTotalTextClasses,
-  type PaginationProps as CorePaginationProps
+  getPaginationLabels,
+  formatPageAriaLabel,
+  type PaginationProps as CorePaginationProps,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 
 export interface PaginationProps
@@ -22,6 +25,11 @@ export interface PaginationProps
 
   onChange?: (current: number, pageSize: number) => void
   onPageSizeChange?: (current: number, pageSize: number) => void
+
+  /**
+   * Locale configuration for i18n support
+   */
+  locale?: Partial<TigerLocale>
 }
 
 export const Pagination: React.FC<PaginationProps> = ({
@@ -45,9 +53,13 @@ export const Pagination: React.FC<PaginationProps> = ({
   style,
   onChange,
   onPageSizeChange,
+  locale,
   ...props
 }) => {
   const { 'aria-label': ariaLabelProp, ...navProps } = props
+
+  // Get resolved locale labels
+  const labels = useMemo(() => getPaginationLabels(locale), [locale])
 
   // Internal state for uncontrolled mode
   const [internalCurrent, setInternalCurrent] = useState<number>(defaultCurrent)
@@ -179,7 +191,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         className={getPaginationButtonBaseClasses(size)}
         disabled={prevDisabled}
         onClick={() => handlePageChange(validatedCurrentPage - 1)}
-        aria-label="上一页">
+        aria-label={labels.prevPageAriaLabel}>
         ‹
       </button>
     )
@@ -204,7 +216,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         className={getPaginationButtonBaseClasses(size)}
         disabled={nextDisabled}
         onClick={() => handlePageChange(validatedCurrentPage + 1)}
-        aria-label="下一页">
+        aria-label={labels.nextPageAriaLabel}>
         ›
       </button>
     )
@@ -221,7 +233,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         className={getPaginationButtonBaseClasses(size)}
         disabled={prevDisabled}
         onClick={() => handlePageChange(validatedCurrentPage - 1)}
-        aria-label="上一页">
+        aria-label={labels.prevPageAriaLabel}>
         ‹
       </button>
     )
@@ -250,7 +262,7 @@ export const Pagination: React.FC<PaginationProps> = ({
             )}
             disabled={disabled}
             onClick={() => handlePageChange(pageNum as number)}
-            aria-label={`第 ${pageNum} 页`}
+            aria-label={formatPageAriaLabel(labels.pageAriaLabel, pageNum as number)}
             aria-current={isActive ? 'page' : undefined}>
             {String(pageNum)}
           </button>
@@ -266,7 +278,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         className={getPaginationButtonBaseClasses(size)}
         disabled={nextDisabled}
         onClick={() => handlePageChange(validatedCurrentPage + 1)}
-        aria-label="下一页">
+        aria-label={labels.nextPageAriaLabel}>
         ›
       </button>
     )
@@ -281,10 +293,10 @@ export const Pagination: React.FC<PaginationProps> = ({
         disabled={disabled}
         value={currentPageSize}
         onChange={(e) => handlePageSizeChange(parseInt(e.target.value, 10))}
-        aria-label="每页条数">
+        aria-label={labels.itemsPerPageText}>
         {pageSizeOptions.map((sizeOption) => (
           <option key={sizeOption} value={sizeOption}>
-            {sizeOption} 条/页
+            {sizeOption} {labels.itemsPerPageText}
           </option>
         ))}
       </select>
@@ -300,7 +312,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           'ml-2',
           size === 'small' ? 'text-sm' : size === 'large' ? 'text-lg' : 'text-base'
         )}>
-        跳至
+        {labels.jumpToText}
       </span>
     )
     elements.push(
@@ -314,14 +326,14 @@ export const Pagination: React.FC<PaginationProps> = ({
         onKeyDown={handleQuickJumperKeyPress}
         min={1}
         max={totalPages}
-        aria-label="跳转页码"
+        aria-label={labels.jumpToText}
       />
     )
     elements.push(
       <span
         key="jumper-label-end"
         className={size === 'small' ? 'text-sm' : size === 'large' ? 'text-lg' : 'text-base'}>
-        页
+        {labels.pageText}
       </span>
     )
   }
@@ -331,7 +343,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       className={containerClasses}
       {...navProps}
       role="navigation"
-      aria-label={ariaLabelProp ?? '分页导航'}
+      aria-label={ariaLabelProp ?? 'Pagination'}
       style={style}>
       {elements}
     </nav>

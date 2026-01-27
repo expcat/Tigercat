@@ -15,8 +15,12 @@ import {
   getQuickJumperInputClasses,
   getPageSizeSelectorClasses,
   getTotalTextClasses,
+  getPaginationLabels,
+  formatPaginationTotal,
+  formatPageAriaLabel,
   type PaginationSize,
-  type PaginationAlign
+  type PaginationAlign,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 
 export interface VuePaginationProps {
@@ -38,6 +42,10 @@ export interface VuePaginationProps {
   showLessItems?: boolean
   className?: string
   style?: Record<string, unknown>
+  /**
+   * Locale configuration for i18n support
+   */
+  locale?: Partial<TigerLocale>
 }
 
 export const Pagination = defineComponent({
@@ -181,6 +189,13 @@ export const Pagination = defineComponent({
     style: {
       type: Object as PropType<Record<string, unknown>>,
       default: undefined
+    },
+    /**
+     * Locale configuration for i18n support
+     */
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
+      default: undefined
     }
   },
   emits: ['update:current', 'update:pageSize', 'change', 'page-size-change'],
@@ -188,6 +203,9 @@ export const Pagination = defineComponent({
     const attrsRecord = attrs as Record<string, unknown>
     const attrsClass = (attrsRecord as { class?: unknown }).class
     const attrsStyle = (attrsRecord as { style?: unknown }).style
+
+    // Get resolved locale labels
+    const labels = computed(() => getPaginationLabels(props.locale))
 
     // Internal state for uncontrolled mode
     const internalCurrent = ref<number>(props.defaultCurrent)
@@ -337,7 +355,7 @@ export const Pagination = defineComponent({
               class: getPaginationButtonBaseClasses(props.size),
               disabled: prevDisabled,
               onClick: () => handlePageChange(validatedCurrentPage.value - 1),
-              'aria-label': '上一页'
+              'aria-label': labels.value.prevPageAriaLabel
             },
             '‹'
           )
@@ -370,7 +388,7 @@ export const Pagination = defineComponent({
               class: getPaginationButtonBaseClasses(props.size),
               disabled: nextDisabled,
               onClick: () => handlePageChange(validatedCurrentPage.value + 1),
-              'aria-label': '下一页'
+              'aria-label': labels.value.nextPageAriaLabel
             },
             '›'
           )
@@ -389,7 +407,7 @@ export const Pagination = defineComponent({
               class: getPaginationButtonBaseClasses(props.size),
               disabled: prevDisabled,
               onClick: () => handlePageChange(validatedCurrentPage.value - 1),
-              'aria-label': '上一页'
+              'aria-label': labels.value.prevPageAriaLabel
             },
             '‹'
           )
@@ -426,7 +444,7 @@ export const Pagination = defineComponent({
                   ),
                   disabled: props.disabled,
                   onClick: () => handlePageChange(pageNum as number),
-                  'aria-label': `第 ${pageNum} 页`,
+                  'aria-label': formatPageAriaLabel(labels.value.pageAriaLabel, pageNum as number),
                   'aria-current': isActive ? 'page' : undefined
                 },
                 String(pageNum)
@@ -444,7 +462,7 @@ export const Pagination = defineComponent({
               class: getPaginationButtonBaseClasses(props.size),
               disabled: nextDisabled,
               onClick: () => handlePageChange(validatedCurrentPage.value + 1),
-              'aria-label': '下一页'
+              'aria-label': labels.value.nextPageAriaLabel
             },
             '›'
           )
@@ -464,7 +482,7 @@ export const Pagination = defineComponent({
                 const target = e.target as HTMLSelectElement
                 handlePageSizeChange(parseInt(target.value, 10))
               },
-              'aria-label': '每页条数'
+              'aria-label': labels.value.itemsPerPageText
             },
             props.pageSizeOptions.map((size) =>
               h(
@@ -473,7 +491,7 @@ export const Pagination = defineComponent({
                   value: size,
                   key: size
                 },
-                `${size} 条/页`
+                `${size} ${labels.value.itemsPerPageText}`
               )
             )
           )
@@ -495,7 +513,7 @@ export const Pagination = defineComponent({
                     : 'text-base'
               )
             },
-            '跳至'
+            labels.value.jumpToText
           )
         )
         elements.push(
@@ -511,7 +529,7 @@ export const Pagination = defineComponent({
             onKeydown: handleQuickJumperKeypress,
             min: 1,
             max: totalPages.value,
-            'aria-label': '跳转页码'
+            'aria-label': labels.value.jumpToText
           })
         )
         elements.push(
@@ -525,7 +543,7 @@ export const Pagination = defineComponent({
                     ? 'text-lg'
                     : 'text-base'
             },
-            '页'
+            labels.value.pageText
           )
         )
       }
@@ -548,7 +566,7 @@ export const Pagination = defineComponent({
           class: containerClasses.value,
           style: mergedStyle.value,
           role: 'navigation',
-          'aria-label': typeof ariaLabelAttr === 'string' ? ariaLabelAttr : '分页导航'
+          'aria-label': typeof ariaLabelAttr === 'string' ? ariaLabelAttr : 'Pagination'
         },
         elements
       )

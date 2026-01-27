@@ -14,7 +14,7 @@ describe('Pagination', () => {
     const nav = container.querySelector('nav')
     expect(nav).toBeInTheDocument()
     expect(nav).toHaveAttribute('role', 'navigation')
-    expect(nav).toHaveAttribute('aria-label', '分页导航')
+    expect(nav).toHaveAttribute('aria-label', 'Pagination')
   })
 
   it('allows overriding aria-label via props', () => {
@@ -25,22 +25,22 @@ describe('Pagination', () => {
   it('calls onChange when a page button is clicked', async () => {
     const onChange = vi.fn()
     render(<Pagination total={100} pageSize={10} onChange={onChange} />)
-    await fireEvent.click(screen.getByLabelText('第 2 页'))
+    await fireEvent.click(screen.getByLabelText('Page 2'))
     expect(onChange).toHaveBeenCalledWith(2, 10)
   })
 
   it('sets aria-current on the active page', () => {
     render(<Pagination total={100} pageSize={10} current={3} />)
-    expect(screen.getByLabelText('第 3 页')).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByLabelText('Page 3')).toHaveAttribute('aria-current', 'page')
   })
 
   it('disables prev/next on boundaries', () => {
     const { unmount } = render(<Pagination total={100} pageSize={10} current={1} />)
-    expect(screen.getByLabelText('上一页')).toBeDisabled()
+    expect(screen.getByLabelText('Previous page')).toBeDisabled()
 
     unmount()
     render(<Pagination total={100} pageSize={10} current={10} />)
-    expect(screen.getByLabelText('下一页')).toBeDisabled()
+    expect(screen.getByLabelText('Next page')).toBeDisabled()
   })
 
   it('disables all page buttons when disabled', () => {
@@ -59,7 +59,7 @@ describe('Pagination', () => {
 
     render(<Pagination total={100} pageSize={10} showQuickJumper onChange={onChange} />)
 
-    const input = screen.getByLabelText('跳转页码') as HTMLInputElement
+    const input = screen.getByLabelText('Go to') as HTMLInputElement
     await user.type(input, '5')
     await user.keyboard('{Enter}')
 
@@ -80,7 +80,7 @@ describe('Pagination', () => {
       />
     )
 
-    await fireEvent.change(screen.getByLabelText('每页条数'), {
+    await fireEvent.change(screen.getByLabelText('/ page'), {
       target: { value: '50' }
     })
 
