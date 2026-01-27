@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, ref } from 'vue'
+import { defineComponent, computed, h, PropType } from 'vue'
 import {
   chartAxisTickTextClasses,
   classNames,
@@ -18,6 +18,7 @@ import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
+import { useChartInteraction } from '../composables/useChartInteraction'
 
 export interface VuePieChartProps extends CorePieChartProps {
   data: PieChartDatum[]
@@ -135,9 +136,32 @@ export const PieChart = defineComponent({
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'slice-click', 'slice-hover'],
   setup(props, { emit }) {
-    const localHoveredIndex = ref<number | null>(null)
-    const localSelectedIndex = ref<number | null>(null)
-    const tooltipPosition = ref({ x: 0, y: 0 })
+    // Use shared interaction composable
+    const {
+      tooltipPosition,
+      resolvedHoveredIndex,
+      activeIndex,
+      handleMouseEnter,
+      handleMouseMove,
+      handleMouseLeave,
+      handleClick,
+      handleKeyDown,
+      handleLegendClick,
+      handleLegendHover,
+      handleLegendLeave,
+      wrapperClasses
+    } = useChartInteraction<PieChartDatum>({
+      hoverable: computed(() => props.hoverable),
+      hoveredIndexProp: props.hoveredIndex,
+      selectable: computed(() => props.selectable),
+      selectedIndexProp: props.selectedIndex,
+      activeOpacity: computed(() => props.activeOpacity),
+      inactiveOpacity: computed(() => props.inactiveOpacity),
+      legendPosition: computed(() => props.legendPosition),
+      emit: emit as (event: string, ...args: unknown[]) => void,
+      getData: (index: number) => props.data[index],
+      eventNames: { hover: 'slice-hover', click: 'slice-click' }
+    })
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 
@@ -161,20 +185,6 @@ export const PieChart = defineComponent({
     const palette = computed(() =>
       props.colors && props.colors.length > 0 ? props.colors : [...DEFAULT_CHART_COLORS]
     )
-
-    const resolvedHoveredIndex = computed(() =>
-      props.hoveredIndex !== undefined ? props.hoveredIndex : localHoveredIndex.value
-    )
-
-    const resolvedSelectedIndex = computed(() =>
-      props.selectedIndex !== undefined ? props.selectedIndex : localSelectedIndex.value
-    )
-
-    const activeIndex = computed(() => {
-      if (resolvedSelectedIndex.value !== null) return resolvedSelectedIndex.value
-      if (props.hoverable && resolvedHoveredIndex.value !== null) return resolvedHoveredIndex.value
-      return null
-    })
 
     const legendItems = computed<ChartLegendItem[]>(() =>
       props.data.map((datum, index) => ({
@@ -201,75 +211,6 @@ export const PieChart = defineComponent({
       const datum = props.data[resolvedHoveredIndex.value]
       return datum ? formatTooltip.value(datum, resolvedHoveredIndex.value) : ''
     })
-
-    const handleMouseEnter = (index: number, event: MouseEvent) => {
-      if (!props.hoverable) return
-      if (props.hoveredIndex === undefined) {
-        localHoveredIndex.value = index
-      }
-      tooltipPosition.value = { x: event.clientX, y: event.clientY }
-      emit('update:hoveredIndex', index)
-      emit('slice-hover', index, props.data[index])
-    }
-
-    const handleMouseMove = (event: MouseEvent) => {
-      tooltipPosition.value = { x: event.clientX, y: event.clientY }
-    }
-
-    const handleMouseLeave = () => {
-      if (!props.hoverable) return
-      if (props.hoveredIndex === undefined) {
-        localHoveredIndex.value = null
-      }
-      emit('update:hoveredIndex', null)
-      emit('slice-hover', null, null)
-    }
-
-    const handleClick = (index: number) => {
-      if (!props.selectable) return
-      const nextIndex = resolvedSelectedIndex.value === index ? null : index
-      if (props.selectedIndex === undefined) {
-        localSelectedIndex.value = nextIndex
-      }
-      emit('update:selectedIndex', nextIndex)
-      emit('slice-click', index, props.data[index])
-    }
-
-    const handleKeyDown = (event: KeyboardEvent, index: number) => {
-      if (!props.selectable) return
-      if (event.key !== 'Enter' && event.key !== ' ') return
-      event.preventDefault()
-      handleClick(index)
-    }
-
-    const handleLegendClick = (index: number) => {
-      handleClick(index)
-    }
-
-    const handleLegendHover = (index: number) => {
-      if (!props.hoverable) return
-      if (props.hoveredIndex === undefined) {
-        localHoveredIndex.value = index
-      }
-      emit('update:hoveredIndex', index)
-    }
-
-    const handleLegendLeave = () => {
-      handleMouseLeave()
-    }
-
-    const wrapperClasses = computed(() =>
-      classNames(
-        'inline-flex',
-        props.legendPosition === 'right'
-          ? 'flex-row items-center gap-4'
-          : props.legendPosition === 'left'
-            ? 'flex-row-reverse items-center gap-4'
-            : props.legendPosition === 'top'
-              ? 'flex-col-reverse gap-2'
-              : 'flex-col gap-2'
-      )
-    )
 
     return () => {
       const rect = innerRect.value

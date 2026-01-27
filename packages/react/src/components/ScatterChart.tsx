@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import {
   classNames,
   createLinearScale,
@@ -19,6 +19,7 @@ import { ChartGrid } from './ChartGrid'
 import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
+import { useChartInteraction } from '../hooks/useChartInteraction'
 
 export interface ScatterChartProps extends CoreScatterChartProps {
   data: ScatterChartDatum[]
@@ -102,9 +103,38 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
   desc,
   className
 }) => {
-  const [localHoveredIndex, setLocalHoveredIndex] = useState<number | null>(null)
-  const [localSelectedIndex, setLocalSelectedIndex] = useState<number | null>(null)
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+  // Use shared interaction hook
+  const {
+    tooltipPosition,
+    resolvedHoveredIndex,
+    activeIndex,
+    handleMouseEnter,
+    handleMouseMove,
+    handleMouseLeave,
+    handleClick,
+    handleKeyDown,
+    handleLegendClick,
+    handleLegendHover,
+    handleLegendLeave,
+    wrapperClasses
+  } = useChartInteraction<ScatterChartDatum>({
+    hoverable,
+    hoveredIndexProp,
+    selectable,
+    selectedIndexProp,
+    activeOpacity,
+    inactiveOpacity,
+    legendPosition,
+    getData: (index: number) => data[index],
+    onHoveredIndexChange: (index) => {
+      onHoveredIndexChange?.(index)
+      onPointHover?.(index, index !== null ? data[index] : null)
+    },
+    onSelectedIndexChange,
+    callbacks: {
+      onClick: onPointClick
+    }
+  })
 
   const innerRect = useMemo(
     () => getChartInnerRect(width, height, padding),
@@ -130,16 +160,6 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
       colors && colors.length > 0 ? colors : pointColor ? [pointColor] : [...DEFAULT_CHART_COLORS],
     [colors, pointColor]
   )
-
-  const resolvedHoveredIndex = hoveredIndexProp !== undefined ? hoveredIndexProp : localHoveredIndex
-  const resolvedSelectedIndex =
-    selectedIndexProp !== undefined ? selectedIndexProp : localSelectedIndex
-
-  const activeIndex = useMemo(() => {
-    if (resolvedSelectedIndex !== null) return resolvedSelectedIndex
-    if (hoverable && resolvedHoveredIndex !== null) return resolvedHoveredIndex
-    return null
-  }, [resolvedSelectedIndex, hoverable, resolvedHoveredIndex])
 
   const points = useMemo(
     () =>
@@ -200,102 +220,8 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
     return datum ? formatTooltip(datum, resolvedHoveredIndex) : ''
   }, [resolvedHoveredIndex, data, formatTooltip])
 
-  const handlePointMouseEnter = useCallback(
-    (index: number, event: React.MouseEvent) => {
-      if (!hoverable) return
-      if (hoveredIndexProp === undefined) {
-        setLocalHoveredIndex(index)
-      }
-      setTooltipPosition({ x: event.clientX, y: event.clientY })
-      onHoveredIndexChange?.(index)
-      onPointHover?.(index, data[index])
-    },
-    [hoverable, hoveredIndexProp, onHoveredIndexChange, onPointHover, data]
-  )
-
-  const handlePointMouseMove = useCallback((event: React.MouseEvent) => {
-    setTooltipPosition({ x: event.clientX, y: event.clientY })
-  }, [])
-
-  const handlePointMouseLeave = useCallback(() => {
-    if (!hoverable) return
-    if (hoveredIndexProp === undefined) {
-      setLocalHoveredIndex(null)
-    }
-    onHoveredIndexChange?.(null)
-    onPointHover?.(null, null)
-  }, [hoverable, hoveredIndexProp, onHoveredIndexChange, onPointHover])
-
-  const handlePointClick = useCallback(
-    (index: number) => {
-      if (selectable) {
-        const nextIndex = resolvedSelectedIndex === index ? null : index
-        if (selectedIndexProp === undefined) {
-          setLocalSelectedIndex(nextIndex)
-        }
-        onSelectedIndexChange?.(nextIndex)
-      }
-      onPointClick?.(index, data[index])
-    },
-    [
-      selectable,
-      resolvedSelectedIndex,
-      selectedIndexProp,
-      onSelectedIndexChange,
-      onPointClick,
-      data
-    ]
-  )
-
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent, index: number) => {
-      if (!selectable) return
-      if (event.key !== 'Enter' && event.key !== ' ') return
-      event.preventDefault()
-      handlePointClick(index)
-    },
-    [selectable, handlePointClick]
-  )
-
-  const handleLegendClick = useCallback(
-    (index: number) => {
-      handlePointClick(index)
-    },
-    [handlePointClick]
-  )
-
-  const handleLegendHover = useCallback(
-    (index: number) => {
-      if (!hoverable) return
-      if (hoveredIndexProp === undefined) {
-        setLocalHoveredIndex(index)
-      }
-      onHoveredIndexChange?.(index)
-    },
-    [hoverable, hoveredIndexProp, onHoveredIndexChange]
-  )
-
-  const handleLegendLeave = useCallback(() => {
-    handlePointMouseLeave()
-  }, [handlePointMouseLeave])
-
   const shouldShowXAxis = showAxis && showXAxis
   const shouldShowYAxis = showAxis && showYAxis
-
-  const wrapperClasses = useMemo(
-    () =>
-      classNames(
-        'inline-flex',
-        legendPosition === 'right'
-          ? 'flex-row items-start gap-4'
-          : legendPosition === 'left'
-            ? 'flex-row-reverse items-start gap-4'
-            : legendPosition === 'top'
-              ? 'flex-col-reverse gap-2'
-              : 'flex-col gap-2'
-      ),
-    [legendPosition]
-  )
 
   const chart = (
     <ChartCanvas
@@ -358,10 +284,10 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
               point.datum.label ?? `Point ${index + 1}: (${point.datum.x}, ${point.datum.y})`
             }
             data-point-index={index}
-            onMouseEnter={(e) => handlePointMouseEnter(index, e)}
-            onMouseMove={handlePointMouseMove}
-            onMouseLeave={handlePointMouseLeave}
-            onClick={() => handlePointClick(index)}
+            onMouseEnter={(e) => handleMouseEnter(index, e)}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            onClick={() => handleClick(index)}
             onKeyDown={(e) => handleKeyDown(e, index)}
           />
         ))}

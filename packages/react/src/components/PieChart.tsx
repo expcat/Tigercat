@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import {
   chartAxisTickTextClasses,
   classNames,
@@ -16,6 +16,7 @@ import {
 import { ChartCanvas } from './ChartCanvas'
 import { ChartLegend } from './ChartLegend'
 import { ChartTooltip } from './ChartTooltip'
+import { useChartInteraction } from '../hooks/useChartInteraction'
 
 export interface PieChartProps extends CorePieChartProps {
   data: PieChartDatum[]
@@ -60,9 +61,39 @@ export const PieChart: React.FC<PieChartProps> = ({
   onSliceClick,
   onSliceHover
 }) => {
-  const [localHoveredIndex, setLocalHoveredIndex] = useState<number | null>(null)
-  const [localSelectedIndex, setLocalSelectedIndex] = useState<number | null>(null)
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+  // Use shared interaction hook
+  const {
+    tooltipPosition,
+    resolvedHoveredIndex,
+    activeIndex,
+    handleMouseEnter,
+    handleMouseMove,
+    handleMouseLeave,
+    handleClick,
+    handleKeyDown,
+    handleLegendClick,
+    handleLegendHover,
+    handleLegendLeave,
+    wrapperClasses
+  } = useChartInteraction<PieChartDatum>({
+    hoverable,
+    hoveredIndexProp,
+    selectable,
+    selectedIndexProp,
+    activeOpacity,
+    inactiveOpacity,
+    legendPosition,
+    getData: (index: number) => data[index],
+    onHoveredIndexChange: (index) => {
+      onHoveredIndexChange?.(index)
+      onSliceHover?.(index, index !== null ? data[index] : null)
+    },
+    onSelectedIndexChange,
+    callbacks: {
+      onClick: onSliceClick
+    }
+  })
+
   const innerRect = useMemo(
     () => getChartInnerRect(width, height, padding),
     [width, height, padding]
@@ -97,16 +128,6 @@ export const PieChart: React.FC<PieChartProps> = ({
   const cy = innerRect.height / 2
   const labelRadius = resolvedInnerRadius + (resolvedOuterRadius - resolvedInnerRadius) / 2
 
-  const resolvedHoveredIndex = hoveredIndexProp !== undefined ? hoveredIndexProp : localHoveredIndex
-  const resolvedSelectedIndex =
-    selectedIndexProp !== undefined ? selectedIndexProp : localSelectedIndex
-
-  const activeIndex = useMemo(() => {
-    if (resolvedSelectedIndex !== null) return resolvedSelectedIndex
-    if (hoverable && resolvedHoveredIndex !== null) return resolvedHoveredIndex
-    return null
-  }, [resolvedSelectedIndex, hoverable, resolvedHoveredIndex])
-
   const total = useMemo(() => data.reduce((sum, d) => sum + d.value, 0), [data])
 
   const formatLabel =
@@ -140,100 +161,6 @@ export const PieChart: React.FC<PieChartProps> = ({
     const datum = data[resolvedHoveredIndex]
     return datum ? formatTooltip(datum, resolvedHoveredIndex) : ''
   }, [resolvedHoveredIndex, data, formatTooltip])
-
-  const handleSliceMouseEnter = useCallback(
-    (index: number, event: React.MouseEvent) => {
-      if (!hoverable) return
-      if (hoveredIndexProp === undefined) {
-        setLocalHoveredIndex(index)
-      }
-      setTooltipPosition({ x: event.clientX, y: event.clientY })
-      onHoveredIndexChange?.(index)
-      onSliceHover?.(index, data[index])
-    },
-    [hoverable, hoveredIndexProp, onHoveredIndexChange, onSliceHover, data]
-  )
-
-  const handleSliceMouseMove = useCallback((event: React.MouseEvent) => {
-    setTooltipPosition({ x: event.clientX, y: event.clientY })
-  }, [])
-
-  const handleSliceMouseLeave = useCallback(() => {
-    if (!hoverable) return
-    if (hoveredIndexProp === undefined) {
-      setLocalHoveredIndex(null)
-    }
-    onHoveredIndexChange?.(null)
-    onSliceHover?.(null, null)
-  }, [hoverable, hoveredIndexProp, onHoveredIndexChange, onSliceHover])
-
-  const handleSliceClick = useCallback(
-    (index: number) => {
-      if (selectable) {
-        const nextIndex = resolvedSelectedIndex === index ? null : index
-        if (selectedIndexProp === undefined) {
-          setLocalSelectedIndex(nextIndex)
-        }
-        onSelectedIndexChange?.(nextIndex)
-      }
-      onSliceClick?.(index, data[index])
-    },
-    [
-      selectable,
-      resolvedSelectedIndex,
-      selectedIndexProp,
-      onSelectedIndexChange,
-      onSliceClick,
-      data
-    ]
-  )
-
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent, index: number) => {
-      if (!selectable) return
-      if (event.key !== 'Enter' && event.key !== ' ') return
-      event.preventDefault()
-      handleSliceClick(index)
-    },
-    [selectable, handleSliceClick]
-  )
-
-  const handleLegendClick = useCallback(
-    (index: number) => {
-      handleSliceClick(index)
-    },
-    [handleSliceClick]
-  )
-
-  const handleLegendHover = useCallback(
-    (index: number) => {
-      if (!hoverable) return
-      if (hoveredIndexProp === undefined) {
-        setLocalHoveredIndex(index)
-      }
-      onHoveredIndexChange?.(index)
-    },
-    [hoverable, hoveredIndexProp, onHoveredIndexChange]
-  )
-
-  const handleLegendLeave = useCallback(() => {
-    handleSliceMouseLeave()
-  }, [handleSliceMouseLeave])
-
-  const wrapperClasses = useMemo(
-    () =>
-      classNames(
-        'inline-flex',
-        legendPosition === 'right'
-          ? 'flex-row items-start gap-4'
-          : legendPosition === 'left'
-            ? 'flex-row-reverse items-start gap-4'
-            : legendPosition === 'top'
-              ? 'flex-col-reverse gap-2'
-              : 'flex-col gap-2'
-      ),
-    [legendPosition]
-  )
 
   const chart = (
     <ChartCanvas
@@ -272,10 +199,10 @@ export const PieChart: React.FC<PieChartProps> = ({
               tabIndex={selectable ? 0 : undefined}
               data-pie-slice="true"
               data-index={arc.index}
-              onMouseEnter={(e) => handleSliceMouseEnter(arc.index, e)}
-              onMouseMove={handleSliceMouseMove}
-              onMouseLeave={handleSliceMouseLeave}
-              onClick={() => handleSliceClick(arc.index)}
+              onMouseEnter={(e) => handleMouseEnter(arc.index, e)}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              onClick={() => handleClick(arc.index)}
               onKeyDown={(e) => handleKeyDown(e, arc.index)}
             />
           )
