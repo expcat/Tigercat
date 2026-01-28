@@ -12,22 +12,52 @@ packages:
   - @expcat/tigercat-react → packages/react/ (React components, .tsx files)
 key-files:
   - packages/*/src/index.ts(x) → public exports
-  - docs/components-vue.md → Vue API reference
-  - docs/components-react.md → React API reference
-  - docs/theme.md → theming guide
+  - skills/tigercat/SKILL.md → AI Agent 入口，组件文档导航
+  - skills/tigercat/references/vue/ → Vue 3 组件 API 文档
+  - skills/tigercat/references/react/ → React 组件 API 文档
+  - skills/tigercat/references/theme.md → 主题配置指南
+  - skills/tigercat/references/i18n.md → 国际化配置
 -->
 
 Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 React 实现。仓库是 TypeScript 严格模式 + pnpm workspace 的 monorepo。
 
 ## 任务快查（按任务类型）
 
-| 任务类型         | 关键步骤                                                                                                    |
-| ---------------- | ----------------------------------------------------------------------------------------------------------- |
-| **新增组件**     | 1) 参照 `Button` 写法 2) core 抽共享类型/utils 3) vue + react 各实现 4) 导出到 index 5) 补测试 6) 更新 docs |
-| **修改现有组件** | 1) 先读源码理解 2) 改 core 或 vue/react 3) 同步另一框架(如适用) 4) 更新测试                                 |
-| **修复类型错误** | 1) 定位根因(tsup/vue-tsc 报错) 2) 优先改类型定义 3) 不用 `any`                                              |
-| **添加测试**     | 1) 参照同类组件测试 2) Vue: `tests/vue/` React: `tests/react/` 3) 用 Testing Library                        |
-| **更新文档**     | 1) API 变更 → `docs/components-*.md` 及 `docs/components/*.md` 2) 新模式/约定 → 本文件                      |
+| 任务类型         | 关键步骤                                                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **新增组件**     | 1) 参照 `Button` 写法 2) core 抽共享类型/utils 3) vue + react 各实现 4) 导出到 index 5) 补测试 6) 更新 skills 文档 |
+| **修改现有组件** | 1) 先读源码理解 2) 改 core 或 vue/react 3) 同步另一框架(如适用) 4) 更新测试                                        |
+| **修复类型错误** | 1) 定位根因(tsup/vue-tsc 报错) 2) 优先改类型定义 3) 不用 `any`                                                     |
+| **添加测试**     | 1) 参照同类组件测试 2) Vue: `tests/vue/` React: `tests/react/` 3) 用 Testing Library                               |
+| **更新文档**     | 1) API 变更 → `skills/tigercat/references/vue/*.md` 或 `react/*.md` 2) 新模式/约定 → 本文件                        |
+
+## Skills 文档结构（AI Agent 专用）
+
+项目文档采用 Agent Skills 格式，位于 `skills/tigercat/`：
+
+```
+skills/tigercat/
+├── SKILL.md                    # AI Agent 入口（快速导航、安装配置）
+└── references/
+    ├── theme.md                # 主题配置（CSS 变量、深色模式）
+    ├── i18n.md                 # 国际化配置
+    ├── vue/                    # Vue 3 组件文档
+    │   ├── index.md            # Vue 概述与约定
+    │   ├── basic.md            # 基础组件 (Alert, Button, Badge...)
+    │   ├── form.md             # 表单组件 (Input, Select, Checkbox...)
+    │   ├── layout.md           # 布局组件 (Grid, Card, Container...)
+    │   ├── navigation.md       # 导航组件 (Menu, Tabs, Breadcrumb...)
+    │   ├── feedback.md         # 反馈组件 (Modal, Message, Loading...)
+    │   ├── data.md             # 数据展示 (Table, Timeline)
+    │   └── charts.md           # 图表组件 (LineChart, BarChart...)
+    └── react/                  # React 组件文档（同上分类）
+```
+
+**文档更新规则：**
+
+- 组件 API 变更 → 修改对应分类文件（如 `references/vue/form.md`）
+- 主题/i18n 变更 → 修改 `references/theme.md` 或 `references/i18n.md`
+- 新增组件 → 在对应分类文件中添加，并更新 `SKILL.md` 组件列表
 
 ## 工作方式（高信噪比规则）
 
@@ -75,9 +105,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 - `packages/react/`：React 组件实现
   - `packages/react/src/components/`：组件（PascalCase 文件名，例如 `Button.tsx`）
   - `packages/react/src/index.tsx`：对外导出（组件 + `type` 导出）
-- `docs/components-vue.md`：Vue 组件总览（简要）
-- `docs/components-react.md`：React 组件总览（简要）
-- `docs/components/*.md`：各组件详细文档（包含 API 表格与示例代码）
+- `skills/tigercat/`：AI Agent 文档（见上方 Skills 文档结构）
 - `tests/`：Vitest + Testing Library 测试（Vue/React 分目录）
 
 ## 决策指南（快速判断放哪）
@@ -96,7 +124,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 2. Vue：新增/修改组件文件，并在 `packages/vue/src/index.ts` 导出
 3. React：新增/修改组件文件，并在 `packages/react/src/index.tsx` 导出（需要时同时导出 `type Props`）
 4. Tests：至少补齐对应框架的单测；复杂组件补充 a11y/边界场景
-5. Docs：在 `docs/components-vue.md` 与 `docs/components-react.md` 补齐简要描述与分组；同时更新 `docs/components/[name].md` 详细文档
+5. Docs：在 `skills/tigercat/references/vue/` 或 `skills/tigercat/references/react/` 对应分类文件中补齐组件文档
 6. 进度文件：必要时更新 `ROADMAP.md`、测试清单（见 `tests/*CHECKLIST*.md`）
 
 ## 代码约定
@@ -124,7 +152,7 @@ Tigercat 是一个基于 Tailwind CSS 的 UI 组件库，同时提供 Vue 3 与 
 - Core utils：kebab-case（例如 `class-names.ts`、`button-utils.ts`）
 - Vue components：PascalCase + `.ts`（例如 `Button.ts`）
 - React components：PascalCase + `.tsx`（例如 `Button.tsx`）
-- Docs：kebab-case（例如 `components-vue.md`）
+- Skills docs：kebab-case（例如 `basic.md`、`form.md`）
 
 ## Styling / Theme（必须支持主题）
 
@@ -209,4 +237,4 @@ export const MyComponent: React.FC<MyComponentProps> = ({
 ## 维护文档（何时更新）
 
 - 只有当出现“新的通用模式/约束/目录结构/测试约定”时才更新本文件。
-- 组件的简要说明与分组应写在 `docs/components-vue.md` 与 `docs/components-react.md`，不要把实现细节塞进本文件。
+- 组件的 API 文档写在 `skills/tigercat/references/` 对应分类文件，不要把实现细节塞进本文件。
