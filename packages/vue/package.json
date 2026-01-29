@@ -9,6 +9,10 @@
     "url": "https://github.com/expcats/Tigercat.git",
     "directory": "packages/vue"
   },
+  "homepage": "https://expcat.github.io/Tigercat/vue/",
+  "bugs": {
+    "url": "https://github.com/expcats/Tigercat/issues"
+  },
   "keywords": [
     "tigercat",
     "ui",

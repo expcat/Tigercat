@@ -9,6 +9,10 @@
     "url": "https://github.com/expcats/Tigercat.git",
     "directory": "packages/react"
   },
+  "homepage": "https://expcat.github.io/Tigercat/react/",
+  "bugs": {
+    "url": "https://github.com/expcats/Tigercat/issues"
+  },
   "keywords": [
     "tigercat",
     "ui",

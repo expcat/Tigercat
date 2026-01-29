@@ -10,6 +10,10 @@
     "url": "https://github.com/expcats/Tigercat.git",
     "directory": "packages/core"
   },
+  "homepage": "https://github.com/expcats/Tigercat/tree/main/packages/core#readme",
+  "bugs": {
+    "url": "https://github.com/expcats/Tigercat/issues"
+  },
   "keywords": [
     "tigercat",
     "ui",
