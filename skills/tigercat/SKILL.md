@@ -9,18 +9,18 @@ Tailwind CSS 驱动的跨框架组件库，支持 Vue 3 和 React。
 
 ## Quick Navigation
 
-| Category   | Shared Props                          | Vue Examples                   | React Examples                   |
-| ---------- | ------------------------------------- | ------------------------------ | -------------------------------- |
-| Basic      | [shared/props/basic.md](references/shared/props/basic.md)       | [vue/basic.md](references/vue/basic.md)       | [react/basic.md](references/react/basic.md)       |
-| Form       | [shared/props/form.md](references/shared/props/form.md)         | [vue/form.md](references/vue/form.md)         | [react/form.md](references/react/form.md)         |
-| Feedback   | [shared/props/feedback.md](references/shared/props/feedback.md) | [vue/feedback.md](references/vue/feedback.md) | [react/feedback.md](references/react/feedback.md) |
-| Layout     | [shared/props/layout.md](references/shared/props/layout.md)     | [vue/layout.md](references/vue/layout.md)     | [react/layout.md](references/react/layout.md)     |
+| Category   | Shared Props                                                        | Vue Examples                                      | React Examples                                        |
+| ---------- | ------------------------------------------------------------------- | ------------------------------------------------- | ----------------------------------------------------- |
+| Basic      | [shared/props/basic.md](references/shared/props/basic.md)           | [vue/basic.md](references/vue/basic.md)           | [react/basic.md](references/react/basic.md)           |
+| Form       | [shared/props/form.md](references/shared/props/form.md)             | [vue/form.md](references/vue/form.md)             | [react/form.md](references/react/form.md)             |
+| Feedback   | [shared/props/feedback.md](references/shared/props/feedback.md)     | [vue/feedback.md](references/vue/feedback.md)     | [react/feedback.md](references/react/feedback.md)     |
+| Layout     | [shared/props/layout.md](references/shared/props/layout.md)         | [vue/layout.md](references/vue/layout.md)         | [react/layout.md](references/react/layout.md)         |
 | Navigation | [shared/props/navigation.md](references/shared/props/navigation.md) | [vue/navigation.md](references/vue/navigation.md) | [react/navigation.md](references/react/navigation.md) |
-| Data       | [shared/props/data.md](references/shared/props/data.md)         | [vue/data.md](references/vue/data.md)         | [react/data.md](references/react/data.md)         |
-| Charts     | -                                     | [vue/charts.md](references/vue/charts.md)     | [react/charts.md](references/react/charts.md)     |
-| Theme      | [theme.md](references/theme.md)       | -                              | -                                |
-| i18n       | [i18n.md](references/i18n.md)         | -                              | -                                |
-| Patterns   | [shared/patterns/common.md](references/shared/patterns/common.md) | - | - |
+| Data       | [shared/props/data.md](references/shared/props/data.md)             | [vue/data.md](references/vue/data.md)             | [react/data.md](references/react/data.md)             |
+| Charts     | [shared/props/charts.md](references/shared/props/charts.md)         | [vue/charts.md](references/vue/charts.md)         | [react/charts.md](references/react/charts.md)         |
+| Theme      | [theme.md](references/theme.md)                                     | -                                                 | -                                                     |
+| i18n       | [i18n.md](references/i18n.md)                                       | -                                                 | -                                                     |
+| Patterns   | [shared/patterns/common.md](references/shared/patterns/common.md)   | -                                                 | -                                                     |
 
 ## Installation
 
@@ -37,10 +37,7 @@ pnpm add @expcat/tigercat-react
 ```js
 // tailwind.config.js
 module.exports = {
-  content: [
-    './src/**/*.{vue,tsx,ts}',
-    './node_modules/@expcat/tigercat-{vue,react}/dist/**/*.js'
-  ]
+  content: ['./src/**/*.{vue,tsx,ts}', './node_modules/@expcat/tigercat-{vue,react}/dist/**/*.js']
 }
 ```
 
@@ -58,12 +55,12 @@ import { Button, Input } from '@expcat/tigercat-react'
 
 详见 [shared/patterns/common.md](references/shared/patterns/common.md)
 
-| Concept       | Vue                          | React                      |
-| ------------- | ---------------------------- | -------------------------- |
-| Two-way bind  | `v-model` / `v-model:xxx`    | `value` + `onChange`       |
-| Visibility    | `visible` (v-model:visible)  | `open` + `onOpenChange`    |
-| Events        | `@click`, `@change`          | `onClick`, `onChange`      |
-| Slots         | `<template #name>`           | `xxxRender` props          |
+| Concept      | Vue                         | React                   |
+| ------------ | --------------------------- | ----------------------- |
+| Two-way bind | `v-model` / `v-model:xxx`   | `value` + `onChange`    |
+| Visibility   | `visible` (v-model:visible) | `open` + `onOpenChange` |
+| Events       | `@click`, `@change`         | `onClick`, `onChange`   |
+| Slots        | `<template #name>`          | `xxxRender` props       |
 
 ## Components (60+)
 
