@@ -13,8 +13,9 @@ packages:
 key-files:
   - packages/*/src/index.ts(x) → public exports
   - skills/tigercat/SKILL.md → AI Agent 入口，组件文档导航
-  - skills/tigercat/references/vue/ → Vue 3 组件 API 文档
-  - skills/tigercat/references/react/ → React 组件 API 文档
+  - skills/tigercat/references/shared/ → 共享 Props 和模式文档
+  - skills/tigercat/references/vue/ → Vue 3 代码示例
+  - skills/tigercat/references/react/ → React 代码示例
   - skills/tigercat/references/theme.md → 主题配置指南
   - skills/tigercat/references/i18n.md → 国际化配置
 -->
@@ -41,23 +42,31 @@ skills/tigercat/
 └── references/
     ├── theme.md                # 主题配置（CSS 变量、深色模式）
     ├── i18n.md                 # 国际化配置
-    ├── vue/                    # Vue 3 组件文档
-    │   ├── index.md            # Vue 概述与约定
-    │   ├── basic.md            # 基础组件 (Alert, Button, Badge...)
-    │   ├── form.md             # 表单组件 (Input, Select, Checkbox...)
-    │   ├── layout.md           # 布局组件 (Grid, Card, Container...)
-    │   ├── navigation.md       # 导航组件 (Menu, Tabs, Breadcrumb...)
-    │   ├── feedback.md         # 反馈组件 (Modal, Message, Loading...)
-    │   ├── data.md             # 数据展示 (Table, Timeline)
-    │   └── charts.md           # 图表组件 (LineChart, BarChart...)
-    └── react/                  # React 组件文档（同上分类）
+    ├── shared/                 # 共享文档（Props 定义、通用模式）
+    │   ├── props/              # 组件 Props 表格（Vue/React 共用）
+    │   │   ├── basic.md, form.md, feedback.md, layout.md
+    │   │   ├── navigation.md, data.md, charts.md
+    │   └── patterns/
+    │       └── common.md       # Vue vs React 差异速查
+    ├── vue/                    # Vue 3 代码示例
+    └── react/                  # React 代码示例
 ```
 
 **文档更新规则：**
 
-- 组件 API 变更 → 修改对应分类文件（如 `references/vue/form.md`）
-- 主题/i18n 变更 → 修改 `references/theme.md` 或 `references/i18n.md`
-- 新增组件 → 在对应分类文件中添加，并更新 `SKILL.md` 组件列表
+- Props 变更 → 修改 `shared/props/*.md`
+- 代码示例变更 → 修改 `vue/*.md` 或 `react/*.md`
+- 主题/i18n 变更 → 修改 `theme.md` 或 `i18n.md`
+
+### Charts 技术选型
+
+| 决策     | 选择         | 理由                                                     |
+| -------- | ------------ | -------------------------------------------------------- |
+| 渲染方式 | **纯 SVG**   | CSS 变量原生支持、Tailwind 兼容、零依赖                  |
+| 共享层   | Core 抽象    | `types/chart.ts` + `utils/chart-utils.ts` (~2400 行共享) |
+| 框架层   | 仅 rendering | Vue/React 各自负责 h()/JSX 渲染和事件绑定                |
+
+新增 Chart 组件时遵循此架构，不引入 chart.js/echarts 等第三方库。
 
 ## 工作方式（高信噪比规则）
 
