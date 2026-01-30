@@ -1,127 +1,82 @@
----
+﻿---
 name: tigercat
-description: Tigercat UI component library for Vue 3 and React with Tailwind CSS theming. Use when building frontend applications that need UI components like Button, Input, Modal, Table, Form, Charts (60+ components). For Vue 3 projects query references/vue/, for React projects query references/react/. Supports dark mode, i18n, and CSS variable theming.
-metadata:
-  packages: '@expcat/tigercat-vue, @expcat/tigercat-react, @expcat/tigercat-core'
-  styling: 'Tailwind CSS + CSS Variables'
-  vue-version: '>=3.3.0'
-  react-version: '>=18.0.0'
-  tailwind-version: '>=3.4.0'
+description: Tigercat UI component library for Vue 3 and React
 ---
 
-# Tigercat UI
+# Tigercat UI Component Library
 
-基于 Tailwind CSS 的 UI 组件库，同时支持 Vue 3 与 React。
+Tailwind CSS 驱动的跨框架组件库，支持 Vue 3 和 React。
 
 ## Quick Navigation
 
-根据项目技术栈选择对应文档：
-
-| 技术栈       | 参考文档                                               |
-| ------------ | ------------------------------------------------------ |
-| **Vue 3**    | [references/vue/index.md](references/vue/index.md)     |
-| **React**    | [references/react/index.md](references/react/index.md) |
-| **主题配置** | [references/theme.md](references/theme.md)             |
-| **国际化**   | [references/i18n.md](references/i18n.md)               |
+| Category   | Shared Props                          | Vue Examples                   | React Examples                   |
+| ---------- | ------------------------------------- | ------------------------------ | -------------------------------- |
+| Basic      | [shared/props/basic.md](references/shared/props/basic.md)       | [vue/basic.md](references/vue/basic.md)       | [react/basic.md](references/react/basic.md)       |
+| Form       | [shared/props/form.md](references/shared/props/form.md)         | [vue/form.md](references/vue/form.md)         | [react/form.md](references/react/form.md)         |
+| Feedback   | [shared/props/feedback.md](references/shared/props/feedback.md) | [vue/feedback.md](references/vue/feedback.md) | [react/feedback.md](references/react/feedback.md) |
+| Layout     | [shared/props/layout.md](references/shared/props/layout.md)     | [vue/layout.md](references/vue/layout.md)     | [react/layout.md](references/react/layout.md)     |
+| Navigation | [shared/props/navigation.md](references/shared/props/navigation.md) | [vue/navigation.md](references/vue/navigation.md) | [react/navigation.md](references/react/navigation.md) |
+| Data       | [shared/props/data.md](references/shared/props/data.md)         | [vue/data.md](references/vue/data.md)         | [react/data.md](references/react/data.md)         |
+| Charts     | -                                     | [vue/charts.md](references/vue/charts.md)     | [react/charts.md](references/react/charts.md)     |
+| Theme      | [theme.md](references/theme.md)       | -                              | -                                |
+| i18n       | [i18n.md](references/i18n.md)         | -                              | -                                |
+| Patterns   | [shared/patterns/common.md](references/shared/patterns/common.md) | - | - |
 
 ## Installation
 
 ```bash
 # Vue 3
-pnpm add @expcat/tigercat-vue @expcat/tigercat-core
+pnpm add @expcat/tigercat-vue
 
 # React
-pnpm add @expcat/tigercat-react @expcat/tigercat-core
+pnpm add @expcat/tigercat-react
 ```
 
-## Tailwind Configuration (Required)
+## Tailwind Setup
 
 ```js
 // tailwind.config.js
-import { tigercatPlugin } from '@expcat/tigercat-core'
-
-export default {
+module.exports = {
   content: [
-    './src/**/*.{vue,js,ts,jsx,tsx}',
-    './node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}'
-  ],
-  plugins: [tigercatPlugin]
+    './src/**/*.{vue,tsx,ts}',
+    './node_modules/@expcat/tigercat-{vue,react}/dist/**/*.js'
+  ]
 }
 ```
 
-## CSS Import
+## Import
 
-```css
-@import 'tailwindcss';
-@source '../node_modules/@expcat/tigercat-vue/dist/**/*.{js,mjs}'; /* Vue */
-@source '../node_modules/@expcat/tigercat-react/dist/**/*.{js,mjs}'; /* React */
-@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
-```
+```ts
+// Vue
+import { Button, Input } from '@expcat/tigercat-vue'
 
-## Component Categories
-
-| Category       | Components                                                                                                                                                |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Basic**      | Alert, Avatar, Badge, Button, Code, Divider, Icon, Link, Tag, Text                                                                                        |
-| **Layout**     | Card, Container, Descriptions, Grid, Layout, List, Skeleton, Space                                                                                        |
-| **Form**       | Checkbox, CheckboxGroup, DatePicker, Form, FormItem, Input, Radio, RadioGroup, Select, Slider, Switch, Textarea, TimePicker, Upload                       |
-| **Navigation** | Breadcrumb, Dropdown, Menu, Pagination, Steps, Tabs, Tree                                                                                                 |
-| **Feedback**   | Drawer, Loading, Message, Modal, Notification, Popconfirm, Popover, Progress, Tooltip                                                                     |
-| **Data**       | Table, Timeline                                                                                                                                           |
-| **Charts**     | AreaChart, BarChart, DonutChart, LineChart, PieChart, RadarChart, ScatterChart, ChartCanvas, ChartAxis, ChartGrid, ChartLegend, ChartSeries, ChartTooltip |
-
-## Key Differences: Vue vs React
-
-| Aspect          | Vue 3                              | React                                        |
-| --------------- | ---------------------------------- | -------------------------------------------- |
-| Package         | `@expcat/tigercat-vue`             | `@expcat/tigercat-react`                     |
-| Event naming    | kebab-case (`@click`, `@change`)   | camelCase (`onClick`, `onChange`)            |
-| Two-way binding | `v-model` supported                | Controlled components (`value` + `onChange`) |
-| Class prop      | `class`                            | `className`                                  |
-| Slot/Children   | Named slots (`<template #footer>`) | Props (`footer={<Component />}`)             |
-
-## Core Conventions
-
-### Styling with Theme Variables
-
-Always use CSS variables with fallbacks for theme colors:
-
-```html
-<!-- Correct -->
-<div class="bg-[var(--tiger-primary,#2563eb)]">...</div>
-
-<!-- Wrong - no fallback -->
-<div class="bg-[var(--tiger-primary)]">...</div>
-```
-
-### ConfigProvider
-
-Wrap your app with `ConfigProvider` for global configuration:
-
-```vue
-<!-- Vue -->
-<ConfigProvider :locale="zhCN">
-  <App />
-</ConfigProvider>
-```
-
-```tsx
 // React
-<ConfigProvider locale={zhCN}>
-  <App />
-</ConfigProvider>
+import { Button, Input } from '@expcat/tigercat-react'
 ```
 
-### Common Pitfalls
+## Vue vs React Differences
 
-1. **Styles not applied**: Ensure Tailwind `content` includes `./node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}`
-2. **Theme variables not working**: Must add `tigercatPlugin` to Tailwind plugins
-3. **Vue: v-model not reactive**: Don't mix `:value` with `@update:modelValue`, use only `v-model`
-4. **React: Controlled vs Uncontrolled**: Don't mix `value` (controlled) with `defaultValue` (uncontrolled)
+详见 [shared/patterns/common.md](references/shared/patterns/common.md)
 
-## File References
+| Concept       | Vue                          | React                      |
+| ------------- | ---------------------------- | -------------------------- |
+| Two-way bind  | `v-model` / `v-model:xxx`    | `value` + `onChange`       |
+| Visibility    | `visible` (v-model:visible)  | `open` + `onOpenChange`    |
+| Events        | `@click`, `@change`          | `onClick`, `onChange`      |
+| Slots         | `<template #name>`           | `xxxRender` props          |
 
-- Vue components: See [references/vue/](references/vue/) for all Vue 3 component docs
-- React components: See [references/react/](references/react/) for all React component docs
-- Theme customization: See [references/theme.md](references/theme.md)
-- Internationalization: See [references/i18n.md](references/i18n.md)
+## Components (60+)
+
+**Basic**: Alert, Avatar, Badge, Button, Code, Divider, Icon, Link, Tag, Text
+
+**Form**: Checkbox, DatePicker, Form, Input, Radio, Select, Slider, Switch, Textarea, TimePicker, Upload
+
+**Feedback**: Drawer, Loading, Message, Modal, Notification, Popconfirm, Popover, Progress, Tooltip
+
+**Layout**: Card, Container, Descriptions, Grid, Layout, List, Skeleton, Space
+
+**Navigation**: Breadcrumb, Dropdown, Menu, Pagination, Steps, Tabs, Tree
+
+**Data**: Table, Timeline
+
+**Charts**: AreaChart, BarChart, DonutChart, LineChart, PieChart, RadarChart, ScatterChart
