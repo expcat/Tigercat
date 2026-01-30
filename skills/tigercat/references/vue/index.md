@@ -1,137 +1,65 @@
----
-name: tigercat-vue-index
-description: Vue 3 component overview for Tigercat UI. Import all components from @expcat/tigercat-vue. Events use kebab-case, v-model supported.
+﻿---
+name: tigercat-vue
+description: Vue 3 component library overview
 ---
 
-# Tigercat Vue 3 组件总览
-
-从 `@expcat/tigercat-vue` 导入所有组件。
+# Tigercat Vue 3 Components
 
 ## Quick Start
 
 ```vue
 <script setup>
-import { Button, ConfigProvider } from '@expcat/tigercat-vue'
-</script>
-
-<template>
-  <ConfigProvider>
-    <Button variant="primary" @click="handleClick">Click Me</Button>
-  </ConfigProvider>
-</template>
-```
-
-## Vue 3 Conventions
-
-- **Event naming**: kebab-case (`@click`, `@change`, `@update:modelValue`)
-- **Two-way binding**: Use `v-model` (e.g., `v-model="value"`, `v-model:visible="show"`)
-- **Class binding**: Use `class` attribute
-- **Slots**: Use `<template #slotName>` syntax
-
-## Component Index by Category
-
-| Category       | Components                                                                                                                                                | Reference                      |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| **Basic**      | Alert, Avatar, Badge, Button, Code, Divider, Icon, Link, Tag, Text                                                                                        | [basic.md](basic.md)           |
-| **Layout**     | Card, Container, Descriptions, Grid, Layout, List, Skeleton, Space                                                                                        | [layout.md](layout.md)         |
-| **Form**       | Checkbox, CheckboxGroup, DatePicker, Form, FormItem, Input, Radio, RadioGroup, Select, Slider, Switch, Textarea, TimePicker, Upload                       | [form.md](form.md)             |
-| **Navigation** | Breadcrumb, Dropdown, Menu, Pagination, Steps, Tabs, Tree                                                                                                 | [navigation.md](navigation.md) |
-| **Feedback**   | Drawer, Loading, Message, Modal, Notification, Popconfirm, Popover, Progress, Tooltip                                                                     | [feedback.md](feedback.md)     |
-| **Data**       | Table, Timeline                                                                                                                                           | [data.md](data.md)             |
-| **Charts**     | AreaChart, BarChart, DonutChart, LineChart, PieChart, RadarChart, ScatterChart, ChartCanvas, ChartAxis, ChartGrid, ChartLegend, ChartSeries, ChartTooltip | [charts.md](charts.md)         |
-
-## Quick Props Reference
-
-### Basic
-
-- **Button**: `variant`(primary/secondary/outline/ghost/link), `size`(sm/md/lg), `disabled`, `loading`, `block`, `type`
-- **Icon**: `name`, `size`, `color`, `rotate`
-- **Text**: `size`, `weight`, `color`, `ellipsis`
-- **Tag**: `color`, `size`, `closable` → `@close`
-- **Badge**: `value`, `max`, `dot`
-- **Avatar**: `src`, `size`, `shape`, `text`
-- **Alert**: `type`(success/info/warning/error), `closable`, `title`, `description` → `@close`
-
-### Form (v-model supported)
-
-- **Input**: `v-model`, `placeholder`, `disabled`, `clearable`, `prefix`, `suffix`, `status`, `errorMessage`
-- **Select**: `v-model`, `options`, `multiple`, `clearable`
-- **Checkbox/Radio**: `v-model`, `disabled`
-- **Switch**: `v-model`, `disabled`, `size`
-- **DatePicker**: `v-model`, `format`, `disabled`, `range`
-
-### Feedback
-
-- **Modal**: `v-model:visible`, `title`, `size`, `okText`, `cancelText` → `@ok`, `@cancel`
-- **Drawer**: `v-model:visible`, `title`, `placement` → `@close`
-- **Message**: `Message.success(content)`, `Message.error(content)`, `Message.info(content)`
-- **Notification**: `Notification.open({ title, description, type })`
-
-### Charts
-
-- **BarChart/LineChart/PieChart**: `data`, `width`, `height`, `hoverable`, `selectable`, `showLegend`, `showTooltip`
-- **Events**: `@bar-click`, `@series-click`, `@slice-click`, `@point-hover`
-
-## Common Patterns
-
-### Form Validation
-
-```vue
-<template>
-  <Form ref="formRef" :model="form" :rules="rules">
-    <FormItem prop="email" label="Email">
-      <Input v-model="form.email" />
-    </FormItem>
-    <Button @click="submit">Submit</Button>
-  </Form>
-</template>
-
-<script setup>
+import { Button, Input, Modal } from '@expcat/tigercat-vue'
 import { ref } from 'vue'
-import { Form, FormItem, Input, Button } from '@expcat/tigercat-vue'
 
-const formRef = ref()
-const form = ref({ email: '' })
-const rules = {
-  email: [{ required: true, message: 'Email is required' }]
-}
-
-const submit = async () => {
-  const valid = await formRef.value.validate()
-  if (valid) {
-    /* submit */
-  }
-}
+const value = ref('')
+const visible = ref(false)
 </script>
-```
 
-### Modal with Form
-
-```vue
 <template>
+  <Input v-model="value" placeholder="Type here" />
   <Button @click="visible = true">Open Modal</Button>
-  <Modal v-model:visible="visible" title="Edit">
-    <Input v-model="value" />
-    <template #footer>
-      <Button variant="secondary" @click="visible = false">Cancel</Button>
-      <Button @click="handleOk">OK</Button>
-    </template>
-  </Modal>
+  <Modal v-model:visible="visible" title="Hello">Content</Modal>
 </template>
 ```
 
-### Data Table
+## Documentation
+
+| Category   | Props Reference                              | Code Examples              |
+| ---------- | -------------------------------------------- | -------------------------- |
+| Basic      | [../shared/props/basic.md](../shared/props/basic.md)         | [basic.md](basic.md)       |
+| Form       | [../shared/props/form.md](../shared/props/form.md)           | [form.md](form.md)         |
+| Feedback   | [../shared/props/feedback.md](../shared/props/feedback.md)   | [feedback.md](feedback.md) |
+| Layout     | [../shared/props/layout.md](../shared/props/layout.md)       | [layout.md](layout.md)     |
+| Navigation | [../shared/props/navigation.md](../shared/props/navigation.md) | [navigation.md](navigation.md) |
+| Data       | [../shared/props/data.md](../shared/props/data.md)           | [data.md](data.md)         |
+| Charts     | -                                            | [charts.md](charts.md)     |
+
+## Vue-Specific Patterns
+
+### v-model
 
 ```vue
-<template>
-  <Table :columns="columns" :data="data" row-key="id" @row-click="handleRowClick" />
-</template>
-
-<script setup>
-const columns = [
-  { key: 'name', title: 'Name' },
-  { key: 'age', title: 'Age' },
-  { key: 'action', title: 'Action', render: (row) => h(Button, { size: 'sm' }, 'Edit') }
-]
-</script>
+<Input v-model="text" />
+<Select v-model="selected" :options="options" />
+<Modal v-model:visible="show" />
 ```
+
+### Slots
+
+```vue
+<Card>
+  <template #header>Title</template>
+  <template #default>Content</template>
+  <template #footer>Actions</template>
+</Card>
+```
+
+### Events
+
+```vue
+<Button @click="handleClick">Click</Button>
+<Input @change="handleChange" @focus="handleFocus" />
+```
+
+See [../shared/patterns/common.md](../shared/patterns/common.md) for framework comparison.
