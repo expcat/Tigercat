@@ -126,8 +126,4 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ---
 
-> **See also**: [Vue examples](../vue/layout.md) ¡¤ [React examples](../react/layout.md)
-
----
-
-> **See also**: [Vue examples](../vue/layout.md) ¡¤ [React examples](../react/layout.md)
+> **See also**: [Vue examples](../vue/layout.md) Â· [React examples](../react/layout.md)

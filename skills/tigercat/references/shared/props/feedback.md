@@ -196,8 +196,4 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ---
 
-> **See also**: [Vue examples](../vue/feedback.md) ¡¤ [React examples](../react/feedback.md)
-
----
-
-> **See also**: [Vue examples](../vue/feedback.md) ¡¤ [React examples](../react/feedback.md)
+> **See also**: [Vue examples](../vue/feedback.md) Â· [React examples](../react/feedback.md)

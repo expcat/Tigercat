@@ -87,8 +87,4 @@ description: Shared props definitions for data display components - Table, Timel
 
 ---
 
-> **See also**: [Vue examples](../vue/data.md) ¡¤ [React examples](../react/data.md)
-
----
-
-> **See also**: [Vue examples](../vue/data.md) ¡¤ [React examples](../react/data.md)
+> **See also**: [Vue examples](../vue/data.md) Â· [React examples](../react/data.md)

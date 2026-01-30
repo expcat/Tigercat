@@ -126,8 +126,4 @@ description: Shared charts props and concepts
 
 ---
 
-> **See also**: [Vue examples](../vue/charts.md) ¡¤ [React examples](../react/charts.md)
-
----
-
-> **See also**: [Vue examples](../vue/charts.md) ¡¤ [React examples](../react/charts.md)
+> **See also**: [Vue examples](../vue/charts.md) Â· [React examples](../react/charts.md)
