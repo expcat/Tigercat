@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { defineComponent, reactive, ref, h, nextTick } from 'vue'
-import { Form, FormItem, Input, type FormRule, type FormRules } from '@expcat/tigercat-vue'
+import { Form, FormItem, type FormRule, type FormRules } from '@expcat/tigercat-vue'
 import { expectNoA11yViolations } from '../utils'
 
 describe('Form', () => {
@@ -511,8 +511,7 @@ describe('Form', () => {
       render(Demo)
       const input = screen.getByLabelText('name')
 
-      // Focus and then blur without typing - should not trigger change validation
-      await fireEvent.focus(input)
+      // Trigger input event (which simulates change) on empty value
       await fireEvent.input(input, { target: { value: '' } })
 
       // Change event should trigger validation

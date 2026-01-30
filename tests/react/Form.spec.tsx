@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import React, { useState, useRef } from 'react'
+import React, { useState } from 'react'
 import { Form, FormItem, type FormHandle, type FormRule, type FormRules } from '@expcat/tigercat-react'
 import { expectNoA11yViolations } from '../utils/react'
 
@@ -831,33 +831,6 @@ describe('Form', () => {
       await waitFor(() => {
         expect(onValidate).toHaveBeenCalledWith('username', false, 'Username required')
       })
-    })
-
-    it('calls onChange when form values change', async () => {
-      const user = userEvent.setup()
-      const onChange = vi.fn()
-
-      function Demo() {
-        const [model, setModel] = useState({ username: '' })
-        return (
-          <Form model={model} onChange={(values) => {
-            onChange(values)
-            setModel(values as { username: string })
-          }}>
-            <FormItem label="Username" name="username">
-              <input
-                aria-label="username"
-                value={model.username}
-                onChange={() => {}}
-              />
-            </FormItem>
-          </Form>
-        )
-      }
-
-      render(<Demo />)
-      // onChange is called when model updates via Form context
-      // This tests the integration
     })
   })
 
