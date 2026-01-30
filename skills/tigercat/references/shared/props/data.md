@@ -84,3 +84,11 @@ description: Shared props definitions for data display components - Table, Timel
 | ------------------------- | ---------- | ----------- |
 | `default` (Timeline.Item) | `children` | 时间线项    |
 | `dot` (Timeline.Item)     | `dot`      | 自定义节点  |
+
+---
+
+> **See also**: [Vue examples](../vue/data.md) �� [React examples](../react/data.md)
+
+---
+
+> **See also**: [Vue examples](../vue/data.md) �� [React examples](../react/data.md)

@@ -199,3 +199,7 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 | Vue Slot  | React Prop | Description |
 | --------- | ---------- | ----------- |
 | `default` | `children` | 分割线文本  |
+
+---
+
+> **See also**: [Vue examples](../vue/basic.md) · [React examples](../react/basic.md)

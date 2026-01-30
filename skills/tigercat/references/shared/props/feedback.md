@@ -193,3 +193,11 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 | status      | `'normal' \| 'success' \| 'error'` | `'normal'` |  ✓  |   ✓   | 状态           |
 | showText    | `boolean`                          | `true`     |  ✓  |   ✓   | 显示进度文本   |
 | strokeWidth | `number`                           | `8`        |  ✓  |   ✓   | 线条宽度       |
+
+---
+
+> **See also**: [Vue examples](../vue/feedback.md) �� [React examples](../react/feedback.md)
+
+---
+
+> **See also**: [Vue examples](../vue/feedback.md) �� [React examples](../react/feedback.md)

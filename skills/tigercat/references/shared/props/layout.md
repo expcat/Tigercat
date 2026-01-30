@@ -123,3 +123,11 @@ description: Shared props definitions for layout components - Card, Container, D
 | rows     | `number`                                    | `3`      |  ✓  |   ✓   | 行数        |
 | shape    | `'text' \| 'circle' \| 'button' \| 'image'` | `'text'` |  ✓  |   ✓   | 形状        |
 | animated | `boolean`                                   | `true`   |  ✓  |   ✓   | 动画效果    |
+
+---
+
+> **See also**: [Vue examples](../vue/layout.md) �� [React examples](../react/layout.md)
+
+---
+
+> **See also**: [Vue examples](../vue/layout.md) �� [React examples](../react/layout.md)

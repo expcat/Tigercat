@@ -140,3 +140,11 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 | title    | `string`     | 节点标题    |
 | children | `TreeNode[]` | 子节点      |
 | disabled | `boolean`    | 禁用        |
+
+---
+
+> **See also**: [Vue examples](../vue/navigation.md) �� [React examples](../react/navigation.md)
+
+---
+
+> **See also**: [Vue examples](../vue/navigation.md) �� [React examples](../react/navigation.md)
