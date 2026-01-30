@@ -462,6 +462,12 @@ describe('Menu', () => {
       await fireEvent.keyDown(trigger, { key: 'Enter' })
 
       expect(trigger).toHaveAttribute('aria-expanded', 'true')
+
+      await waitFor(() => {
+        expect(
+          screen.getByRole('menuitem', { name: 'Sub Item 1' })
+        ).toHaveFocus()
+      })
     })
 
     it('closes submenu with Escape key', async () => {
