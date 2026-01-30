@@ -19,7 +19,9 @@ function App() {
     <>
       <Input value={value} onChange={setValue} placeholder="Type here" />
       <Button onClick={() => setOpen(true)}>Open Modal</Button>
-      <Modal open={open} onOpenChange={setOpen} title="Hello">Content</Modal>
+      <Modal open={open} onOpenChange={setOpen} title="Hello">
+        Content
+      </Modal>
     </>
   )
 }
@@ -27,15 +29,15 @@ function App() {
 
 ## Documentation
 
-| Category   | Props Reference                              | Code Examples              |
-| ---------- | -------------------------------------------- | -------------------------- |
-| Basic      | [../shared/props/basic.md](../shared/props/basic.md)         | [basic.md](basic.md)       |
-| Form       | [../shared/props/form.md](../shared/props/form.md)           | [form.md](form.md)         |
-| Feedback   | [../shared/props/feedback.md](../shared/props/feedback.md)   | [feedback.md](feedback.md) |
-| Layout     | [../shared/props/layout.md](../shared/props/layout.md)       | [layout.md](layout.md)     |
+| Category   | Props Reference                                                | Code Examples                  |
+| ---------- | -------------------------------------------------------------- | ------------------------------ |
+| Basic      | [../shared/props/basic.md](../shared/props/basic.md)           | [basic.md](basic.md)           |
+| Form       | [../shared/props/form.md](../shared/props/form.md)             | [form.md](form.md)             |
+| Feedback   | [../shared/props/feedback.md](../shared/props/feedback.md)     | [feedback.md](feedback.md)     |
+| Layout     | [../shared/props/layout.md](../shared/props/layout.md)         | [layout.md](layout.md)         |
 | Navigation | [../shared/props/navigation.md](../shared/props/navigation.md) | [navigation.md](navigation.md) |
-| Data       | [../shared/props/data.md](../shared/props/data.md)           | [data.md](data.md)         |
-| Charts     | -                                            | [charts.md](charts.md)     |
+| Data       | [../shared/props/data.md](../shared/props/data.md)             | [data.md](data.md)             |
+| Charts     | [../shared/props/charts.md](../shared/props/charts.md)         | [charts.md](charts.md)         |
 
 ## React-Specific Patterns
 
