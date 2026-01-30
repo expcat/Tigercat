@@ -158,3 +158,6 @@ mq.addEventListener('change', (e) => {
 | `--tiger-text` | 主文本 |
 | `--tiger-text-secondary` | 次要文本 |
 | `--tiger-chart-N` | 图表色板 (N=1-6) |
+
+
+> **See also**: [shared/props/charts.md](shared/props/charts.md) for chart palette details

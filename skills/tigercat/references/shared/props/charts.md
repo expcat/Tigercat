@@ -123,3 +123,11 @@ description: Shared charts props and concepts
 | maxValue    | `number`   | auto    | âœ“   | âœ“     |
 | levels      | `number`   | `5`     | âœ“   | âœ“     |
 | fillOpacity | `number`   | `0.2`   | âœ“   | âœ“     |
+
+---
+
+> **See also**: [Vue examples](../vue/charts.md) ¡¤ [React examples](../react/charts.md)
+
+---
+
+> **See also**: [Vue examples](../vue/charts.md) ¡¤ [React examples](../react/charts.md)

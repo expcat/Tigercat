@@ -63,3 +63,15 @@ const visible = ref(false)
 ```
 
 See [../shared/patterns/common.md](../shared/patterns/common.md) for framework comparison.
+
+---
+
+## Component Quick Links
+
+**Basic**: Button · Icon · Badge · Tag · Alert · Avatar · Link · Code · Divider · Text  
+**Form**: Input · Select · Checkbox · Radio · Switch · Slider · DatePicker · Form  
+**Feedback**: Modal · Drawer · Message · Notification · Popconfirm · Popover · Loading · Progress · Skeleton  
+**Layout**: Card · Container · Grid · Space · Divider · Descriptions  
+**Navigation**: Menu · Breadcrumb · Dropdown · Pagination · Steps · Tabs  
+**Data**: Table · List · Tree · Collapse · Timeline  
+**Charts**: LineChart · AreaChart · BarChart · PieChart · DonutChart · RadarChart · ScatterChart
