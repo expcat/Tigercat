@@ -143,8 +143,4 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ---
 
-> **See also**: [Vue examples](../vue/navigation.md) ¡¤ [React examples](../react/navigation.md)
-
----
-
-> **See also**: [Vue examples](../vue/navigation.md) ¡¤ [React examples](../react/navigation.md)
+> **See also**: [Vue examples](../vue/navigation.md) Â· [React examples](../react/navigation.md)

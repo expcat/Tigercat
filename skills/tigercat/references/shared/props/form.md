@@ -262,8 +262,4 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ---
 
-> **See also**: [Vue examples](../vue/form.md) ¡¤ [React examples](../react/form.md)
-
----
-
-> **See also**: [Vue examples](../vue/form.md) ¡¤ [React examples](../react/form.md)
+> **See also**: [Vue examples](../vue/form.md) Â· [React examples](../react/form.md)
