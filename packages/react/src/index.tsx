@@ -201,6 +201,10 @@ export type { ChartLegendProps } from './components/ChartLegend'
 export { ChartTooltip } from './components/ChartTooltip'
 export type { ChartTooltipProps } from './components/ChartTooltip'
 
+// Other components
+export { Carousel } from './components/Carousel'
+export type { CarouselProps, CarouselRef } from './components/Carousel'
+
 // Hooks
 export { useChartInteraction } from './hooks/useChartInteraction'
 export type {

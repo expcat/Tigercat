@@ -87,6 +87,9 @@ export * from '../link-utils'
 export * from '../icon-utils'
 export * from '../code-utils'
 
+// Other components
+export * from '../carousel-utils'
+
 // Chart components
 export * from '../chart-utils'
 export * from '../chart-interaction'
