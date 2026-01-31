@@ -5,9 +5,130 @@ description: Vue data display components usage
 
 # Data Components (Vue)
 
-数据展示组件：Table, Timeline
+数据展示组件：Table, Timeline, Collapse
 
 > **Props Reference**: [shared/props/data.md](../shared/props/data.md)
+
+---
+
+## Collapse 折叠面板
+
+### 基础用法
+
+```vue
+<template>
+  <Collapse>
+    <CollapsePanel panel-key="1" header="Section 1">
+      Content of section 1
+    </CollapsePanel>
+    <CollapsePanel panel-key="2" header="Section 2">
+      Content of section 2
+    </CollapsePanel>
+    <CollapsePanel panel-key="3" header="Section 3">
+      Content of section 3
+    </CollapsePanel>
+  </Collapse>
+</template>
+```
+
+### 手风琴模式（Accordion）
+
+```vue
+<template>
+  <Collapse accordion :default-active-key="'1'">
+    <CollapsePanel panel-key="1" header="Panel 1">
+      Only one panel can be expanded at a time
+    </CollapsePanel>
+    <CollapsePanel panel-key="2" header="Panel 2">
+      Click to expand this panel
+    </CollapsePanel>
+  </Collapse>
+</template>
+```
+
+### 受控模式
+
+```vue
+<template>
+  <Collapse v-model:active-key="activeKeys" @change="handleChange">
+    <CollapsePanel panel-key="1" header="Panel 1">
+      Content 1
+    </CollapsePanel>
+    <CollapsePanel panel-key="2" header="Panel 2">
+      Content 2
+    </CollapsePanel>
+  </Collapse>
+</template>
+<script setup>
+import { ref } from 'vue'
+
+const activeKeys = ref(['1'])
+
+const handleChange = (keys) => {
+  console.log('Active keys:', keys)
+}
+</script>
+```
+
+### 自定义样式
+
+```vue
+<template>
+  <!-- 无边框 -->
+  <Collapse :bordered="false">
+    <CollapsePanel panel-key="1" header="No Border">
+      Content without border
+    </CollapsePanel>
+  </Collapse>
+
+  <!-- Ghost 模式（透明背景） -->
+  <Collapse ghost>
+    <CollapsePanel panel-key="1" header="Ghost Style">
+      Transparent background
+    </CollapsePanel>
+  </Collapse>
+
+  <!-- 箭头在右侧 -->
+  <Collapse expand-icon-position="end">
+    <CollapsePanel panel-key="1" header="Arrow on right">
+      Content
+    </CollapsePanel>
+  </Collapse>
+</template>
+```
+
+### 禁用面板
+
+```vue
+<template>
+  <Collapse>
+    <CollapsePanel panel-key="1" header="Normal Panel">
+      This panel can be expanded
+    </CollapsePanel>
+    <CollapsePanel panel-key="2" header="Disabled Panel" disabled>
+      This panel is disabled
+    </CollapsePanel>
+  </Collapse>
+</template>
+```
+
+### 自定义标题与额外内容
+
+```vue
+<template>
+  <Collapse>
+    <CollapsePanel panel-key="1">
+      <template #header>
+        <span class="font-bold text-blue-600">Custom Header</span>
+      </template>
+      <template #extra>
+        <Button size="sm" @click.stop="handleEdit">Edit</Button>
+      </template>
+      Panel content
+    </CollapsePanel>
+  </Collapse>
+</template>
+```
 
 ---
 

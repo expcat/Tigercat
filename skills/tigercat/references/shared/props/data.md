@@ -87,4 +87,46 @@ description: Shared props definitions for data display components - Table, Timel
 
 ---
 
+## Collapse 折叠面板
+
+### Collapse Props
+
+| Prop               | Type                                   | Default   | Vue | React | Description            |
+| ------------------ | -------------------------------------- | --------- | :-: | :---: | ---------------------- |
+| activeKey          | `string \| number \| (string\|number)[]` | -         |  ✓  |   ✓   | 当前激活的面板 key     |
+| defaultActiveKey   | `string \| number \| (string\|number)[]` | -         |  ✓  |   ✓   | 默认激活的面板 key     |
+| accordion          | `boolean`                              | `false`   |  ✓  |   ✓   | 手风琴模式（只能展开一个） |
+| bordered           | `boolean`                              | `true`    |  ✓  |   ✓   | 是否有边框             |
+| expandIconPosition | `'start' \| 'end'`                     | `'start'` |  ✓  |   ✓   | 展开图标位置           |
+| ghost              | `boolean`                              | `false`   |  ✓  |   ✓   | 透明无边框样式         |
+
+> **Vue**: 使用 `v-model:active-key` 或 `@change` 监听变化
+> **React**: 使用 `activeKey` + `onChange` 控制
+
+### CollapsePanel Props
+
+| Prop      | Type              | Default | Vue | React | Description        |
+| --------- | ----------------- | ------- | :-: | :---: | ------------------ |
+| panelKey  | `string \| number` | -       |  ✓  |   ✓   | 唯一标识（必需）   |
+| header    | `string \| slot`  | -       |  ✓  |   ✓   | 面板标题           |
+| disabled  | `boolean`         | `false` |  ✓  |   ✓   | 禁用状态           |
+| showArrow | `boolean`         | `true`  |  ✓  |   ✓   | 是否显示箭头       |
+
+### Events
+
+| Vue Event             | React Callback | Payload                              | Description  |
+| --------------------- | -------------- | ------------------------------------ | ------------ |
+| `@change`             | `onChange`     | `string \| number \| (string\|number)[]` | 切换面板时触发 |
+| `@update:active-key`  | -              | `string \| number \| (string\|number)[]` | v-model 更新  |
+
+### Slots / Children
+
+| Vue Slot   | React Prop | Description      |
+| ---------- | ---------- | ---------------- |
+| `default`  | `children` | CollapsePanel 组件 |
+| `header`   | `header`   | 自定义标题内容   |
+| `extra`    | `extra`    | 右侧额外内容     |
+
+---
+
 > **See also**: [Vue examples](../vue/data.md) · [React examples](../react/data.md)
