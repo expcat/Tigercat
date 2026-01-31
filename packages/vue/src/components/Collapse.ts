@@ -131,8 +131,15 @@ export const Collapse = defineComponent({
       }
 
       // Emit events
-      emit('update:activeKey', props.accordion ? newKeys[0] : newKeys)
-      emit('change', props.accordion ? newKeys[0] : newKeys)
+      // In accordion mode, emit single value or undefined
+      // In normal mode, emit array
+      if (props.accordion) {
+        emit('update:activeKey', newKeys.length > 0 ? newKeys[0] : undefined)
+        emit('change', newKeys.length > 0 ? newKeys[0] : undefined)
+      } else {
+        emit('update:activeKey', newKeys)
+        emit('change', newKeys)
+      }
     }
 
     // Container classes

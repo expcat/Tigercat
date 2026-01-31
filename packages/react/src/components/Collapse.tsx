@@ -30,7 +30,7 @@ export interface CollapseProps extends Omit<CoreCollapseProps, 'style'> {
   /**
    * Collapse change event handler
    */
-  onChange?: (activeKey: string | number | (string | number)[]) => void
+  onChange?: (activeKey: string | number | (string | number)[] | undefined) => void
 
   /**
    * Collapse panels
@@ -78,8 +78,14 @@ export const Collapse: React.FC<CollapseProps> = ({
       }
 
       // Emit change event
+      // In accordion mode, emit single value or undefined
+      // In normal mode, emit array
       if (onChange) {
-        onChange(accordion ? newKeys[0] : newKeys)
+        if (accordion) {
+          onChange(newKeys.length > 0 ? newKeys[0] : undefined)
+        } else {
+          onChange(newKeys)
+        }
       }
     },
     [activeKeys, accordion, controlledActiveKey, onChange]
