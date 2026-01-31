@@ -427,8 +427,8 @@ describe('Select', () => {
       expect(getByText('Option 1, Option 2, Option 3')).toBeInTheDocument()
 
       await user.click(trigger)
-      const checkIcons = container.querySelectorAll('[role="option"] svg')
-      expect(checkIcons.length).toBe(3)
+      const selectedOptions = container.querySelectorAll('[role="option"][aria-selected="true"]')
+      expect(selectedOptions.length).toBe(3)
     })
 
     it('should display multiple selected values as comma-separated text', () => {
@@ -603,38 +603,38 @@ describe('Select', () => {
     it('should toggle selection in multiple mode', async () => {
       const user = userEvent.setup()
       const handleChange = vi.fn()
-      const { container } = render(
+      const { getByRole } = render(
         <Select options={testOptions} multiple value={['1']} onChange={handleChange} />
       )
 
-      const trigger = container.querySelector('button')!
+      const trigger = getByRole('button')
       await user.click(trigger)
 
-      const option1 = container.querySelector('[role="option"][data-option-index="0"]')!
+      const option1 = getByRole('option', { name: 'Option 1' })
       await user.click(option1)
       expect(handleChange).toHaveBeenCalledWith([])
 
-      const option2 = container.querySelector('[role="option"][data-option-index="1"]')!
+      const option2 = getByRole('option', { name: 'Option 2' })
       await user.click(option2)
       expect(handleChange).toHaveBeenCalledWith(['1', '2'])
     })
 
     it('should show check icon for selected items in multiple mode', async () => {
       const user = userEvent.setup()
-      const { container, getByText } = render(
+      const { container, getByRole } = render(
         <Select options={testOptions} multiple value={['1', '2']} />
       )
 
       const trigger = container.querySelector('button')!
       await user.click(trigger)
 
-      const option1 = getByText('Option 1').closest('[role="option"]')
-      const option2 = getByText('Option 2').closest('[role="option"]')
-      const option3 = getByText('Option 3').closest('[role="option"]')
+      const option1 = getByRole('option', { name: 'Option 1' })
+      const option2 = getByRole('option', { name: 'Option 2' })
+      const option3 = getByRole('option', { name: 'Option 3' })
 
-      expect(option1?.querySelector('svg')).toBeInTheDocument()
-      expect(option2?.querySelector('svg')).toBeInTheDocument()
-      expect(option3?.querySelector('svg')).not.toBeInTheDocument()
+      expect(option1).toHaveAttribute('aria-selected', 'true')
+      expect(option2).toHaveAttribute('aria-selected', 'true')
+      expect(option3).toHaveAttribute('aria-selected', 'false')
     })
   })
 

@@ -543,8 +543,8 @@ describe('Select', () => {
       expect(getByText('Option 1, Option 2, Option 3')).toBeInTheDocument()
 
       await fireEvent.click(trigger)
-      const checkIcons = container.querySelectorAll('[role="option"] svg')
-      expect(checkIcons.length).toBe(3)
+      const selectedOptions = container.querySelectorAll('[role="option"][aria-selected="true"]')
+      expect(selectedOptions.length).toBe(3)
     })
 
     it('should display multiple selected values as comma-separated text', () => {
@@ -746,7 +746,7 @@ describe('Select', () => {
   describe('Multiple Selection Features', () => {
     it('should toggle selection in multiple mode', async () => {
       const onUpdate = vi.fn()
-      const { container } = render(Select, {
+      const { container, getByRole } = render(Select, {
         props: {
           options: testOptions,
           multiple: true,
@@ -758,17 +758,17 @@ describe('Select', () => {
       const trigger = container.querySelector('button')!
       await fireEvent.click(trigger)
 
-      const option1 = container.querySelector('[role="option"][data-option-index="0"]')!
+      const option1 = getByRole('option', { name: 'Option 1' })
       await fireEvent.click(option1)
       expect(onUpdate).toHaveBeenCalledWith([])
 
-      const option2 = container.querySelector('[role="option"][data-option-index="1"]')!
+      const option2 = getByRole('option', { name: 'Option 2' })
       await fireEvent.click(option2)
       expect(onUpdate).toHaveBeenCalledWith(['1', '2'])
     })
 
     it('should show check icon for selected items in multiple mode', async () => {
-      const { container, getByText } = render(Select, {
+      const { container, getByRole } = render(Select, {
         props: {
           options: testOptions,
           multiple: true,
@@ -779,13 +779,13 @@ describe('Select', () => {
       const trigger = container.querySelector('button')!
       await fireEvent.click(trigger)
 
-      const option1 = getByText('Option 1').closest('[role="option"]')
-      const option2 = getByText('Option 2').closest('[role="option"]')
-      const option3 = getByText('Option 3').closest('[role="option"]')
+      const option1 = getByRole('option', { name: 'Option 1' })
+      const option2 = getByRole('option', { name: 'Option 2' })
+      const option3 = getByRole('option', { name: 'Option 3' })
 
-      expect(option1?.querySelector('svg')).toBeInTheDocument()
-      expect(option2?.querySelector('svg')).toBeInTheDocument()
-      expect(option3?.querySelector('svg')).not.toBeInTheDocument()
+      expect(option1).toHaveAttribute('aria-selected', 'true')
+      expect(option2).toHaveAttribute('aria-selected', 'true')
+      expect(option3).toHaveAttribute('aria-selected', 'false')
     })
   })
 
@@ -831,8 +831,8 @@ describe('Select', () => {
       expect(getByText('Option 2')).toBeInTheDocument()
     })
 
-    it('should allow Space key in search input without stopping propagation', async () => {
-      const { container } = render(Select, {
+    it('should allow Space key in search input without closing dropdown', async () => {
+      const { container, queryByRole } = render(Select, {
         props: {
           options: testOptions,
           searchable: true
@@ -845,10 +845,11 @@ describe('Select', () => {
       const input = container.querySelector('input')!
       await fireEvent.update(input, 'Option 1')
 
-      const event = new KeyboardEvent('keydown', { key: ' ' })
-      input.dispatchEvent(event)
+      await fireEvent.keyDown(input, { key: ' ', bubbles: true })
 
-      expect(input.value).toBe('Option 1')
+      // Dropdown should still be open after Space key
+      const listbox = queryByRole('listbox')
+      expect(listbox).toBeInTheDocument()
     })
   })
 })
