@@ -99,9 +99,7 @@ export function getAnchorInkActiveClasses(direction: AnchorDirection): string {
  * Get anchor link list classes based on direction
  */
 export function getAnchorLinkListClasses(direction: AnchorDirection): string {
-  return direction === 'vertical'
-    ? anchorLinkListVerticalClasses
-    : anchorLinkListHorizontalClasses
+  return direction === 'vertical' ? anchorLinkListVerticalClasses : anchorLinkListHorizontalClasses
 }
 
 /**
@@ -160,21 +158,30 @@ export function getContainerHeight(container: HTMLElement | Window): number {
 /**
  * Get element offset relative to container
  */
-export function getElementOffsetTop(
-  element: HTMLElement,
-  container: HTMLElement | Window
-): number {
+export function getElementOffsetTop(element: HTMLElement, container: HTMLElement | Window): number {
   if (container === window) {
     const rect = element.getBoundingClientRect()
     return rect.top + window.scrollY
   }
 
   // Calculate offset relative to scrolling container
+  // Walk up the offsetParent chain to find the position relative to container
   const containerEl = container as HTMLElement
-  const containerRect = containerEl.getBoundingClientRect()
-  const elementRect = element.getBoundingClientRect()
+  let offset = 0
+  let el: HTMLElement | null = element
 
-  return elementRect.top - containerRect.top + containerEl.scrollTop
+  while (el && el !== containerEl) {
+    offset += el.offsetTop
+    el = el.offsetParent as HTMLElement | null
+    // If we've gone outside the container, just use bounding rect calculation
+    if (el === null || el === document.body) {
+      const containerRect = containerEl.getBoundingClientRect()
+      const elementRect = element.getBoundingClientRect()
+      return elementRect.top - containerRect.top + containerEl.scrollTop
+    }
+  }
+
+  return offset
 }
 
 /**

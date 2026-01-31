@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { h } from 'vue'
 import { Anchor, AnchorLink } from '@expcat/tigercat-vue'
 
@@ -141,9 +141,7 @@ describe('Anchor', () => {
       render(Anchor, {
         props: { getContainer: () => scrollContainer },
         slots: {
-          default: () => [
-            h(AnchorLink, { href: '#section1' }, () => h('span', 'Custom Content'))
-          ]
+          default: () => [h(AnchorLink, { href: '#section1' }, () => h('span', 'Custom Content'))]
         }
       })
 
@@ -299,7 +297,7 @@ describe('Anchor', () => {
       expect(container.firstChild).toBeInTheDocument()
     })
 
-    it('should use custom getContainer', () => {
+    it('should use custom getContainer', async () => {
       const customContainer = document.createElement('div')
       const getContainer = vi.fn(() => customContainer)
 
@@ -310,7 +308,9 @@ describe('Anchor', () => {
         }
       })
 
-      expect(getContainer).toHaveBeenCalled()
+      await waitFor(() => {
+        expect(getContainer).toHaveBeenCalled()
+      })
     })
   })
 

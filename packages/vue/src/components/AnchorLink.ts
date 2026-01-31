@@ -68,7 +68,34 @@ export const AnchorLink = defineComponent({
     })
 
     return () => {
-      const content = slots.default?.() ?? props.title
+      const slotContent = slots.default?.()
+      const hasNestedLinks =
+        slotContent &&
+        Array.isArray(slotContent) &&
+        slotContent.some(
+          (vnode) => vnode.type && (vnode.type as { name?: string }).name === 'TigerAnchorLink'
+        )
+
+      // If has nested links, render title in <a> and children separately
+      if (hasNestedLinks) {
+        return h('div', { class: 'anchor-link-wrapper' }, [
+          h(
+            'a',
+            {
+              ...attrs,
+              href: props.href,
+              target: props.target,
+              class: linkClasses.value,
+              'data-anchor-href': props.href,
+              onClick: handleClick
+            },
+            props.title
+          ),
+          h('div', { class: 'pl-3 mt-1 space-y-1' }, slotContent)
+        ])
+      }
+
+      const content = slotContent ?? props.title
 
       return h(
         'a',

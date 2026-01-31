@@ -82,12 +82,12 @@ export const Anchor: React.FC<AnchorProps> = ({
   const inkRef = useRef<HTMLDivElement>(null)
   const isScrollingRef = useRef(false)
   const animationFrameRef = useRef<number | null>(null)
+  // Cache getContainer to avoid recreating on every render
+  const getContainerRef = useRef(getContainer)
+  getContainerRef.current = getContainer
 
   // Get scroll offset
-  const scrollOffset = useMemo(
-    () => targetOffset ?? offsetTop,
-    [targetOffset, offsetTop]
-  )
+  const scrollOffset = useMemo(() => targetOffset ?? offsetTop, [targetOffset, offsetTop])
 
   // Register a link
   const registerLink = useCallback((href: string) => {
@@ -105,10 +105,13 @@ export const Anchor: React.FC<AnchorProps> = ({
   }, [])
 
   // Scroll to anchor
-  const scrollTo = useCallback((href: string) => {
-    const container = getContainer()
-    scrollToAnchor(href, container, scrollOffset)
-  }, [getContainer, scrollOffset])
+  const scrollTo = useCallback(
+    (href: string) => {
+      const container = getContainerRef.current()
+      scrollToAnchor(href, container, scrollOffset)
+    },
+    [scrollOffset]
+  )
 
   // Handle link click
   const handleLinkClick = useCallback(
@@ -130,45 +133,57 @@ export const Anchor: React.FC<AnchorProps> = ({
     [onClick, scrollTo]
   )
 
+  // Store scroll handler ref for proper cleanup
+  const scrollHandlerRef = useRef<(() => void) | null>(null)
+  const boundContainerRef = useRef<HTMLElement | Window | null>(null)
+
   // Handle scroll events
   useEffect(() => {
-    const container = getContainer()
+    // Small delay to ensure sibling refs are ready
+    const timeoutId = setTimeout(() => {
+      const container = getContainerRef.current()
+      boundContainerRef.current = container
 
-    const handleScroll = () => {
-      if (isScrollingRef.current) return
+      const handleScroll = () => {
+        if (isScrollingRef.current) return
 
-      if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current)
+        if (animationFrameRef.current !== null) {
+          cancelAnimationFrame(animationFrameRef.current)
+        }
+
+        animationFrameRef.current = requestAnimationFrame(() => {
+          // Get container fresh each time to handle dynamic refs
+          const currentContainer = getContainerRef.current()
+          const newActiveLink = findActiveAnchor(links, currentContainer, bounds, scrollOffset)
+
+          // Apply custom getCurrentAnchor if provided
+          const finalActiveLink = getCurrentAnchor ? getCurrentAnchor(newActiveLink) : newActiveLink
+
+          setActiveLink((prevActiveLink) => {
+            if (finalActiveLink !== prevActiveLink) {
+              onChange?.(finalActiveLink)
+              return finalActiveLink
+            }
+            return prevActiveLink
+          })
+        })
       }
 
-      animationFrameRef.current = requestAnimationFrame(() => {
-        const newActiveLink = findActiveAnchor(links, container, bounds, scrollOffset)
-
-        // Apply custom getCurrentAnchor if provided
-        const finalActiveLink = getCurrentAnchor
-          ? getCurrentAnchor(newActiveLink)
-          : newActiveLink
-
-        setActiveLink((prevActiveLink) => {
-          if (finalActiveLink !== prevActiveLink) {
-            onChange?.(finalActiveLink)
-            return finalActiveLink
-          }
-          return prevActiveLink
-        })
-      })
-    }
-
-    container.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
+      scrollHandlerRef.current = handleScroll
+      container.addEventListener('scroll', handleScroll, { passive: true })
+      handleScroll()
+    }, 0)
 
     return () => {
-      container.removeEventListener('scroll', handleScroll)
+      clearTimeout(timeoutId)
+      if (boundContainerRef.current && scrollHandlerRef.current) {
+        boundContainerRef.current.removeEventListener('scroll', scrollHandlerRef.current)
+      }
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [getContainer, links, bounds, scrollOffset, getCurrentAnchor, onChange])
+  }, [links, bounds, scrollOffset, getCurrentAnchor, onChange])
 
   // Update ink position
   useEffect(() => {
@@ -202,20 +217,11 @@ export const Anchor: React.FC<AnchorProps> = ({
     [affix, className]
   )
 
-  const inkContainerClasses = useMemo(
-    () => getAnchorInkContainerClasses(direction),
-    [direction]
-  )
+  const inkContainerClasses = useMemo(() => getAnchorInkContainerClasses(direction), [direction])
 
-  const inkActiveClasses = useMemo(
-    () => getAnchorInkActiveClasses(direction),
-    [direction]
-  )
+  const inkActiveClasses = useMemo(() => getAnchorInkActiveClasses(direction), [direction])
 
-  const linkListClasses = useMemo(
-    () => getAnchorLinkListClasses(direction),
-    [direction]
-  )
+  const linkListClasses = useMemo(() => getAnchorLinkListClasses(direction), [direction])
 
   const showInk = useMemo(() => {
     if (!affix) return true

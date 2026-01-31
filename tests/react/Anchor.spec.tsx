@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
 import { Anchor, AnchorLink } from '@expcat/tigercat-react'
 
@@ -273,7 +273,7 @@ describe('Anchor', () => {
       expect(container.firstChild).toBeInTheDocument()
     })
 
-    it('should use custom getContainer', () => {
+    it('should use custom getContainer', async () => {
       const customContainer = document.createElement('div')
       const getContainer = vi.fn(() => customContainer)
 
@@ -283,7 +283,9 @@ describe('Anchor', () => {
         </Anchor>
       )
 
-      expect(getContainer).toHaveBeenCalled()
+      await waitFor(() => {
+        expect(getContainer).toHaveBeenCalled()
+      })
     })
   })
 

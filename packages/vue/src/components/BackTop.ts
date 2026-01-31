@@ -50,7 +50,7 @@ export const BackTop = defineComponent({
      */
     target: {
       type: Function as PropType<() => HTMLElement | Window>,
-      default: () => () => window
+      default: () => window
     },
     /**
      * Duration of scroll animation in milliseconds
