@@ -57,6 +57,10 @@ const StepsDemo = lazy(() => import('./pages/StepsDemo'))
 const PaginationDemo = lazy(() => import('./pages/PaginationDemo'))
 const DrawerDemo = lazy(() => import('./pages/DrawerDemo'))
 const LoadingDemo = lazy(() => import('./pages/LoadingDemo'))
+const CollapseDemo = lazy(() => import('./pages/CollapseDemo'))
+const CarouselDemo = lazy(() => import('./pages/CarouselDemo'))
+const BackTopDemo = lazy(() => import('./pages/BackTopDemo'))
+const AnchorDemo = lazy(() => import('./pages/AnchorDemo'))
 
 const router = createBrowserRouter(
   [
@@ -117,7 +121,11 @@ const router = createBrowserRouter(
         { path: 'steps', element: <StepsDemo /> },
         { path: 'pagination', element: <PaginationDemo /> },
         { path: 'drawer', element: <DrawerDemo /> },
-        { path: 'loading', element: <LoadingDemo /> }
+        { path: 'loading', element: <LoadingDemo /> },
+        { path: 'collapse', element: <CollapseDemo /> },
+        { path: 'carousel', element: <CarouselDemo /> },
+        { path: 'backtop', element: <BackTopDemo /> },
+        { path: 'anchor', element: <AnchorDemo /> }
       ]
     }
   ],

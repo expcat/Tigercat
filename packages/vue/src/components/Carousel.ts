@@ -7,7 +7,9 @@ import {
   onUnmounted,
   PropType,
   h,
-  Comment
+  Comment,
+  Fragment,
+  type VNode
 } from 'vue'
 import {
   classNames,
@@ -163,10 +165,7 @@ export const Carousel = defineComponent({
 
     // Container classes
     const containerClasses = computed(() => {
-      return classNames(
-        getCarouselContainerClasses(props.className),
-        coerceClassValue(attrs.class)
-      )
+      return classNames(getCarouselContainerClasses(props.className), coerceClassValue(attrs.class))
     })
 
     // Track classes
@@ -192,8 +191,11 @@ export const Carousel = defineComponent({
     const getSlideClasses = (index: number) => {
       const isActive = index === currentIndex.value
       if (props.effect === 'fade') {
+        // First slide uses relative to establish container height, others are absolute
+        const positionClass = index === 0 ? 'relative' : 'absolute inset-0'
         return classNames(
-          carouselSlideFadeClasses,
+          positionClass,
+          'w-full transition-opacity ease-in-out',
           isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
         )
       }
@@ -229,7 +231,9 @@ export const Carousel = defineComponent({
 
     const goTo = (index: number) => {
       const clampedIndex = clampSlideIndex(index, slideCount.value)
-      if (clampedIndex === currentIndex.value) return
+      if (clampedIndex === currentIndex.value) {
+        return
+      }
 
       emit('before-change', currentIndex.value, clampedIndex)
       const prevIndex = currentIndex.value
@@ -289,13 +293,16 @@ export const Carousel = defineComponent({
     )
 
     // Watch for autoplay changes
-    watch(() => props.autoplay, (newVal) => {
-      if (newVal) {
-        startAutoplay()
-      } else {
-        stopAutoplay()
+    watch(
+      () => props.autoplay,
+      (newVal) => {
+        if (newVal) {
+          startAutoplay()
+        } else {
+          stopAutoplay()
+        }
       }
-    })
+    )
 
     // Lifecycle
     onMounted(() => {
@@ -316,11 +323,17 @@ export const Carousel = defineComponent({
     })
 
     return () => {
-      // Get slot content
+      // Get slot content and flatten Fragments (from v-for)
       const defaultSlot = slots.default?.() || []
-      const slides = defaultSlot.filter(
-        (child) => child.type !== Comment
-      )
+      const flattenSlots = (nodes: VNode[]): VNode[] => {
+        return nodes.flatMap((node) => {
+          if (node.type === Fragment && Array.isArray(node.children)) {
+            return flattenSlots(node.children as VNode[])
+          }
+          return node
+        })
+      }
+      const slides = flattenSlots(defaultSlot).filter((child) => child.type !== Comment)
       slideCount.value = slides.length
 
       // Render arrows
