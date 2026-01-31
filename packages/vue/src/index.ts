@@ -173,6 +173,10 @@ export { Carousel } from './components/Carousel'
 export type { VueCarouselProps } from './components/Carousel'
 export { BackTop } from './components/BackTop'
 export type { VueBackTopProps } from './components/BackTop'
+export { Anchor } from './components/Anchor'
+export type { VueAnchorProps, AnchorContext } from './components/Anchor'
+export { AnchorLink } from './components/AnchorLink'
+export type { VueAnchorLinkProps } from './components/AnchorLink'
 
 // Composables
 export { useChartInteraction } from './composables/useChartInteraction'
