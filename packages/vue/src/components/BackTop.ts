@@ -87,9 +87,11 @@ export const BackTop = defineComponent({
     }
 
     onMounted(() => {
-      targetElement = props.target()
-      targetElement.addEventListener('scroll', handleScroll, { passive: true })
-      handleScroll()
+      targetElement = props.target() ?? window
+      if (targetElement) {
+        targetElement.addEventListener('scroll', handleScroll, { passive: true })
+        handleScroll()
+      }
     })
 
     onBeforeUnmount(() => {

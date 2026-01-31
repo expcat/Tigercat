@@ -230,6 +230,16 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'tree',
         path: '/tree',
         label: { 'zh-CN': 'Tree', 'en-US': 'Tree' }
+      },
+      {
+        key: 'collapse',
+        path: '/collapse',
+        label: { 'zh-CN': 'Collapse', 'en-US': 'Collapse' }
+      },
+      {
+        key: 'carousel',
+        path: '/carousel',
+        label: { 'zh-CN': 'Carousel', 'en-US': 'Carousel' }
       }
     ]
   },
@@ -266,6 +276,16 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'pagination',
         path: '/pagination',
         label: { 'zh-CN': 'Pagination', 'en-US': 'Pagination' }
+      },
+      {
+        key: 'anchor',
+        path: '/anchor',
+        label: { 'zh-CN': 'Anchor', 'en-US': 'Anchor' }
+      },
+      {
+        key: 'backtop',
+        path: '/backtop',
+        label: { 'zh-CN': 'BackTop', 'en-US': 'BackTop' }
       }
     ]
   },

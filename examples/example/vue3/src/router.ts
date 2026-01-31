@@ -122,7 +122,20 @@ const router = createRouter({
           component: () => import('./pages/PaginationDemo.vue')
         },
         { path: 'drawer', component: () => import('./pages/DrawerDemo.vue') },
-        { path: 'loading', component: () => import('./pages/LoadingDemo.vue') }
+        { path: 'loading', component: () => import('./pages/LoadingDemo.vue') },
+        {
+          path: 'collapse',
+          component: () => import('./pages/CollapseDemo.vue')
+        },
+        {
+          path: 'carousel',
+          component: () => import('./pages/CarouselDemo.vue')
+        },
+        {
+          path: 'backtop',
+          component: () => import('./pages/BackTopDemo.vue')
+        },
+        { path: 'anchor', component: () => import('./pages/AnchorDemo.vue') }
       ]
     }
   ]

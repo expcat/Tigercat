@@ -80,9 +80,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
 
     // Get slides from children
     const slides = useMemo(() => {
-      return React.Children.toArray(children).filter(
-        (child) => React.isValidElement(child)
-      )
+      return React.Children.toArray(children).filter((child) => React.isValidElement(child))
     }, [children])
 
     const slideCount = slides.length
@@ -117,8 +115,11 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       (index: number) => {
         const isActive = index === currentIndex
         if (effect === 'fade') {
+          // First slide uses relative to establish container height, others are absolute
+          const positionClass = index === 0 ? 'relative' : 'absolute inset-0'
           return classNames(
-            carouselSlideFadeClasses,
+            positionClass,
+            'w-full transition-opacity ease-in-out',
             isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
           )
         }
@@ -291,10 +292,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       if (!dots || slideCount <= 1) return null
 
       return (
-        <div
-          className={dotsClasses}
-          role="tablist"
-          aria-label="Carousel navigation">
+        <div className={dotsClasses} role="tablist" aria-label="Carousel navigation">
           {slides.map((_, index) => (
             <button
               type="button"
