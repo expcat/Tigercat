@@ -7,6 +7,7 @@ import {
   onMounted,
   onBeforeUnmount,
   watch,
+  nextTick,
   PropType,
   reactive
 } from 'vue'
@@ -105,7 +106,7 @@ export const Anchor = defineComponent({
      */
     getContainer: {
       type: Function as PropType<() => HTMLElement | Window>,
-      default: () => () => window
+      default: () => window
     },
     /**
      * Direction of the anchor navigation
@@ -132,8 +133,10 @@ export const Anchor = defineComponent({
     const inkRef = ref<HTMLElement | null>(null)
     const isScrolling = ref(false)
 
-    let container: HTMLElement | Window = window
     let animationFrameId: number | null = null
+
+    // Get current container (call fresh each time to handle lazy refs)
+    const getContainer = () => props.getContainer()
 
     // Register a link
     const registerLink = (href: string) => {
@@ -156,6 +159,7 @@ export const Anchor = defineComponent({
       }
 
       animationFrameId = requestAnimationFrame(() => {
+        const container = getContainer()
         const scrollOffset = props.targetOffset ?? props.offsetTop
         const newActiveLink = findActiveAnchor(links.value, container, props.bounds, scrollOffset)
 
@@ -173,6 +177,7 @@ export const Anchor = defineComponent({
 
     // Scroll to anchor
     const scrollTo = (href: string) => {
+      const container = getContainer()
       const scrollOffset = props.targetOffset ?? props.offsetTop
       scrollToAnchor(href, container, scrollOffset)
     }
@@ -227,17 +232,25 @@ export const Anchor = defineComponent({
     // Watch direction for ink position updates
     watch(() => props.direction, updateInkPosition)
 
-    onMounted(() => {
-      container = props.getContainer()
-      container.addEventListener('scroll', handleScroll, { passive: true })
-      handleScroll()
+    // Store current container for cleanup
+    let currentContainer: HTMLElement | Window | null = null
 
-      // Initial ink position update
-      setTimeout(updateInkPosition, 0)
+    onMounted(() => {
+      // Use nextTick to ensure sibling refs are ready
+      nextTick(() => {
+        currentContainer = getContainer()
+        currentContainer.addEventListener('scroll', handleScroll, { passive: true })
+        handleScroll()
+
+        // Initial ink position update
+        setTimeout(updateInkPosition, 0)
+      })
     })
 
     onBeforeUnmount(() => {
-      container.removeEventListener('scroll', handleScroll)
+      if (currentContainer) {
+        currentContainer.removeEventListener('scroll', handleScroll)
+      }
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId)
       }
@@ -291,9 +304,12 @@ export const Anchor = defineComponent({
       contextValue.activeLink = newVal
     })
 
-    watch(() => props.direction, (newVal) => {
-      contextValue.direction = newVal
-    })
+    watch(
+      () => props.direction,
+      (newVal) => {
+        contextValue.direction = newVal
+      }
+    )
 
     provide(AnchorContextKey, contextValue)
 

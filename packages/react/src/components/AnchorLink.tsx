@@ -2,8 +2,10 @@ import React, { useEffect, useMemo } from 'react'
 import { classNames, getAnchorLinkClasses } from '@expcat/tigercat-core'
 import { useAnchorContext } from './Anchor'
 
-export interface AnchorLinkProps
-  extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
+export interface AnchorLinkProps extends Omit<
+  React.AnchorHTMLAttributes<HTMLAnchorElement>,
+  'href'
+> {
   /**
    * Target anchor ID (with #)
    */
@@ -52,6 +54,29 @@ export const AnchorLink: React.FC<AnchorLinkProps> = ({
     const isActive = anchorContext?.activeLink === href
     return classNames(getAnchorLinkClasses(isActive, className))
   }, [anchorContext?.activeLink, href, className])
+
+  // Check if children contains nested AnchorLinks
+  const hasNestedLinks = React.Children.toArray(children).some(
+    (child) => React.isValidElement(child) && child.type === AnchorLink
+  )
+
+  // If has nested links, render title in <a> and children separately
+  if (hasNestedLinks) {
+    return (
+      <div className="anchor-link-wrapper">
+        <a
+          href={href}
+          target={target}
+          className={linkClasses}
+          data-anchor-href={href}
+          onClick={handleClick}
+          {...props}>
+          {title}
+        </a>
+        <div className="pl-3 mt-1 space-y-1">{children}</div>
+      </div>
+    )
+  }
 
   const content = children ?? title
 
