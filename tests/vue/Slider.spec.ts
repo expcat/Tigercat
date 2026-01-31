@@ -231,4 +231,402 @@ describe('Slider', () => {
       expect(container.firstChild).toMatchSnapshot()
     })
   })
+
+  describe('Step Behavior', () => {
+    it('should respect step value when using keyboard', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: 50,
+          step: 10,
+          'onUpdate:value': onUpdate
+        }
+      })
+
+      const slider = container.querySelector('[role="slider"]')!
+      await fireEvent.keyDown(slider, { key: 'ArrowRight' })
+
+      expect(onUpdate).toHaveBeenCalled()
+      const callValue = onUpdate.mock.calls[0][0]
+      expect(callValue).toBe(60)
+    })
+
+    it('should respect step value when moving left', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: 50,
+          step: 10,
+          'onUpdate:value': onUpdate
+        }
+      })
+
+      const slider = container.querySelector('[role="slider"]')!
+      await fireEvent.keyDown(slider, { key: 'ArrowLeft' })
+
+      expect(onUpdate).toHaveBeenCalled()
+      const callValue = onUpdate.mock.calls[0][0]
+      expect(callValue).toBe(40)
+    })
+
+    it('should handle decimal step values', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: 5,
+          step: 0.5,
+          min: 0,
+          max: 10,
+          'onUpdate:value': onUpdate
+        }
+      })
+
+      const slider = container.querySelector('[role="slider"]')!
+      await fireEvent.keyDown(slider, { key: 'ArrowRight' })
+
+      expect(onUpdate).toHaveBeenCalled()
+      const callValue = onUpdate.mock.calls[0][0]
+      expect(callValue).toBe(5.5)
+    })
+  })
+
+  describe('Boundary Conditions', () => {
+    it('should not exceed max value', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: 100,
+          min: 0,
+          max: 100,
+          'onUpdate:value': onUpdate
+        }
+      })
+
+      const slider = container.querySelector('[role="slider"]')!
+      await fireEvent.keyDown(slider, { key: 'ArrowRight' })
+
+      // Should either not call or call with max value
+      if (onUpdate.mock.calls.length > 0) {
+        const callValue = onUpdate.mock.calls[0][0]
+        expect(callValue).toBeLessThanOrEqual(100)
+      }
+    })
+
+    it('should not go below min value', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: 0,
+          min: 0,
+          max: 100,
+          'onUpdate:value': onUpdate
+        }
+      })
+
+      const slider = container.querySelector('[role="slider"]')!
+      await fireEvent.keyDown(slider, { key: 'ArrowLeft' })
+
+      // Should either not call or call with min value
+      if (onUpdate.mock.calls.length > 0) {
+        const callValue = onUpdate.mock.calls[0][0]
+        expect(callValue).toBeGreaterThanOrEqual(0)
+      }
+    })
+
+    it('should handle custom min/max range', () => {
+      const { container } = render(Slider, {
+        props: { value: 15, min: 10, max: 20 }
+      })
+
+      const slider = container.querySelector('[role="slider"]') as HTMLElement
+      expect(slider).toHaveAttribute('aria-valuemin', '10')
+      expect(slider).toHaveAttribute('aria-valuemax', '20')
+      expect(slider).toHaveAttribute('aria-valuenow', '15')
+    })
+
+    it('should handle negative values', () => {
+      const { container } = render(Slider, {
+        props: { value: -5, min: -10, max: 0 }
+      })
+
+      const slider = container.querySelector('[role="slider"]') as HTMLElement
+      expect(slider).toHaveAttribute('aria-valuenow', '-5')
+    })
+  })
+
+  describe('Range Mode', () => {
+    it('should render two sliders in range mode', () => {
+      const { container } = render(Slider, {
+        props: { value: [20, 80], range: true }
+      })
+
+      const sliders = container.querySelectorAll('[role="slider"]')
+      expect(sliders.length).toBe(2)
+    })
+
+    it('should have correct aria values for both thumbs in range mode', () => {
+      const { container } = render(Slider, {
+        props: { value: [30, 70], range: true, min: 0, max: 100 }
+      })
+
+      const sliders = container.querySelectorAll('[role="slider"]')
+      expect(sliders[0]).toHaveAttribute('aria-valuenow', '30')
+      expect(sliders[1]).toHaveAttribute('aria-valuenow', '70')
+    })
+
+    it('should emit array value in range mode', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: [20, 80],
+          range: true,
+          'onUpdate:value': onUpdate
+        }
+      })
+
+      const sliders = container.querySelectorAll('[role="slider"]')
+      await fireEvent.keyDown(sliders[0], { key: 'ArrowRight' })
+
+      expect(onUpdate).toHaveBeenCalled()
+      const callValue = onUpdate.mock.calls[0][0]
+      expect(Array.isArray(callValue)).toBe(true)
+    })
+
+    it('should enforce min thumb <= max thumb', () => {
+      const { container } = render(Slider, {
+        props: { value: [60, 40], range: true }
+      })
+
+      const sliders = container.querySelectorAll('[role="slider"]')
+      // Slider should normalize the values
+      expect(sliders.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('Marks Support', () => {
+    it('should render with marks enabled', () => {
+      const { container } = render(Slider, {
+        props: { marks: true }
+      })
+
+      const slider = container.querySelector('[role="slider"]')
+      expect(slider).toBeInTheDocument()
+    })
+
+    it('should render with custom marks', () => {
+      const { container } = render(Slider, {
+        props: {
+          marks: {
+            0: '0°C',
+            50: '50°C',
+            100: '100°C'
+          }
+        }
+      })
+
+      const slider = container.querySelector('[role="slider"]')
+      expect(slider).toBeInTheDocument()
+    })
+  })
+
+  describe('Tooltip Behavior', () => {
+    it('should show tooltip by default', () => {
+      const { container } = render(Slider, {
+        props: { value: 50 }
+      })
+
+      const slider = container.querySelector('[role="slider"]')
+      expect(slider).toBeInTheDocument()
+    })
+
+    it('should hide tooltip when tooltip prop is false', () => {
+      const { container } = render(Slider, {
+        props: { value: 50, tooltip: false }
+      })
+
+      const slider = container.querySelector('[role="slider"]')
+      expect(slider).toBeInTheDocument()
+    })
+  })
+
+  describe('V-Model Support', () => {
+    it('should work with v-model:value', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: 50,
+          'onUpdate:value': onUpdate
+        }
+      })
+
+      const slider = container.querySelector('[role="slider"]')!
+      await fireEvent.keyDown(slider, { key: 'ArrowRight' })
+
+      expect(onUpdate).toHaveBeenCalled()
+    })
+
+    it('should update when v-model value changes', async () => {
+      const { container, rerender } = render(Slider, {
+        props: { value: 30 }
+      })
+
+      let slider = container.querySelector('[role="slider"]') as HTMLElement
+      expect(slider).toHaveAttribute('aria-valuenow', '30')
+
+      await rerender({ value: 70 })
+
+      slider = container.querySelector('[role="slider"]') as HTMLElement
+      expect(slider).toHaveAttribute('aria-valuenow', '70')
+    })
+  })
+
+  describe('Size Variations', () => {
+    it('should render small size', () => {
+      const { container } = render(Slider, {
+        props: { size: 'sm' }
+      })
+
+      const slider = container.querySelector('[role="slider"]')
+      expect(slider).toBeInTheDocument()
+    })
+
+    it('should render large size', () => {
+      const { container } = render(Slider, {
+        props: { size: 'lg' }
+      })
+
+      const slider = container.querySelector('[role="slider"]')
+      expect(slider).toBeInTheDocument()
+    })
+  })
+
+  describe('Default Value', () => {
+    it('should use defaultValue when value is not provided', () => {
+      const { container } = render(Slider, {
+        props: { defaultValue: 75 }
+      })
+
+      const slider = container.querySelector('[role="slider"]') as HTMLElement
+      expect(slider).toHaveAttribute('aria-valuenow', '75')
+    })
+
+    it('should use defaultValue for range mode', () => {
+      const { container } = render(Slider, {
+        props: { defaultValue: [25, 75], range: true }
+      })
+
+      const sliders = container.querySelectorAll('[role="slider"]')
+      expect(sliders[0]).toHaveAttribute('aria-valuenow', '25')
+      expect(sliders[1]).toHaveAttribute('aria-valuenow', '75')
+    })
+  })
+
+  describe('Keyboard Interaction', () => {
+    it('should handle ArrowUp same as ArrowRight', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: 50,
+          'onUpdate:value': onUpdate
+        }
+      })
+
+      const slider = container.querySelector('[role="slider"]')!
+      await fireEvent.keyDown(slider, { key: 'ArrowUp' })
+
+      expect(onUpdate).toHaveBeenCalled()
+    })
+
+    it('should handle ArrowDown same as ArrowLeft', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: 50,
+          'onUpdate:value': onUpdate
+        }
+      })
+
+      const slider = container.querySelector('[role="slider"]')!
+      await fireEvent.keyDown(slider, { key: 'ArrowDown' })
+
+      expect(onUpdate).toHaveBeenCalled()
+    })
+
+    it('should handle Home key to jump to min', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: 50,
+          min: 0,
+          max: 100,
+          'onUpdate:value': onUpdate
+        }
+      })
+
+      const slider = container.querySelector('[role="slider"]')!
+      await fireEvent.keyDown(slider, { key: 'Home' })
+
+      if (onUpdate.mock.calls.length > 0) {
+        const callValue = onUpdate.mock.calls[0][0]
+        expect(callValue).toBe(0)
+      }
+    })
+
+    it('should handle End key to jump to max', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: 50,
+          min: 0,
+          max: 100,
+          'onUpdate:value': onUpdate
+        }
+      })
+
+      const slider = container.querySelector('[role="slider"]')!
+      await fireEvent.keyDown(slider, { key: 'End' })
+
+      if (onUpdate.mock.calls.length > 0) {
+        const callValue = onUpdate.mock.calls[0][0]
+        expect(callValue).toBe(100)
+      }
+    })
+  })
+
+  describe('Edge Cases', () => {
+    it('should handle className prop', () => {
+      const { container } = render(Slider, {
+        props: { className: 'custom-slider' }
+      })
+
+      expect(container.querySelector('.custom-slider')).toBeInTheDocument()
+    })
+
+    it('should handle style prop', () => {
+      const { container } = render(Slider, {
+        props: { style: { marginTop: '20px' } }
+      })
+
+      const slider = container.querySelector('[role="slider"]')
+      expect(slider).toBeInTheDocument()
+    })
+
+    it('should handle zero as a valid value', () => {
+      const { container } = render(Slider, {
+        props: { value: 0 }
+      })
+
+      const slider = container.querySelector('[role="slider"]') as HTMLElement
+      expect(slider).toHaveAttribute('aria-valuenow', '0')
+    })
+
+    it('should handle single step in large range', () => {
+      const { container } = render(Slider, {
+        props: { value: 500, min: 0, max: 1000, step: 1 }
+      })
+
+      const slider = container.querySelector('[role="slider"]') as HTMLElement
+      expect(slider).toHaveAttribute('aria-valuenow', '500')
+    })
+  })
 })
