@@ -168,6 +168,10 @@ export type { VueChartLegendProps } from './components/ChartLegend'
 export { ChartTooltip } from './components/ChartTooltip'
 export type { VueChartTooltipProps } from './components/ChartTooltip'
 
+// Other components
+export { Carousel } from './components/Carousel'
+export type { VueCarouselProps } from './components/Carousel'
+
 // Composables
 export { useChartInteraction } from './composables/useChartInteraction'
 export type {

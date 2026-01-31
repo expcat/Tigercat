@@ -195,3 +195,121 @@ const columns = [
   ]" />
 </template>
 ```
+
+---
+
+## Carousel 轮播图
+
+### 基础用法
+
+```vue
+<template>
+  <Carousel>
+    <div class="h-48 bg-blue-500 flex items-center justify-center text-white text-2xl">
+      Slide 1
+    </div>
+    <div class="h-48 bg-green-500 flex items-center justify-center text-white text-2xl">
+      Slide 2
+    </div>
+    <div class="h-48 bg-red-500 flex items-center justify-center text-white text-2xl">
+      Slide 3
+    </div>
+  </Carousel>
+</template>
+```
+
+### 显示箭头
+
+```vue
+<template>
+  <Carousel arrows>
+    <div class="h-48 bg-blue-500">Slide 1</div>
+    <div class="h-48 bg-green-500">Slide 2</div>
+    <div class="h-48 bg-red-500">Slide 3</div>
+  </Carousel>
+</template>
+```
+
+### 自动播放
+
+```vue
+<template>
+  <Carousel autoplay :autoplay-speed="3000" pause-on-hover>
+    <div class="h-48 bg-blue-500">Slide 1</div>
+    <div class="h-48 bg-green-500">Slide 2</div>
+    <div class="h-48 bg-red-500">Slide 3</div>
+  </Carousel>
+</template>
+```
+
+### 淡入淡出效果
+
+```vue
+<template>
+  <Carousel effect="fade" arrows>
+    <div class="h-48 bg-blue-500">Slide 1</div>
+    <div class="h-48 bg-green-500">Slide 2</div>
+    <div class="h-48 bg-red-500">Slide 3</div>
+  </Carousel>
+</template>
+```
+
+### 指示点位置
+
+```vue
+<template>
+  <!-- 指示点在上方 -->
+  <Carousel dot-position="top">
+    <div class="h-48 bg-blue-500">Slide 1</div>
+    <div class="h-48 bg-green-500">Slide 2</div>
+  </Carousel>
+  
+  <!-- 指示点在左侧 -->
+  <Carousel dot-position="left">
+    <div class="h-48 bg-blue-500">Slide 1</div>
+    <div class="h-48 bg-green-500">Slide 2</div>
+  </Carousel>
+</template>
+```
+
+### 使用 ref 调用方法
+
+```vue
+<template>
+  <Carousel ref="carouselRef">
+    <div class="h-48 bg-blue-500">Slide 1</div>
+    <div class="h-48 bg-green-500">Slide 2</div>
+    <div class="h-48 bg-red-500">Slide 3</div>
+  </Carousel>
+  <Space>
+    <Button @click="carouselRef?.prev()">Prev</Button>
+    <Button @click="carouselRef?.next()">Next</Button>
+    <Button @click="carouselRef?.goTo(0)">Go to First</Button>
+  </Space>
+</template>
+<script setup>
+import { ref } from 'vue'
+
+const carouselRef = ref()
+</script>
+```
+
+### 事件监听
+
+```vue
+<template>
+  <Carousel @change="handleChange" @before-change="handleBeforeChange">
+    <div class="h-48 bg-blue-500">Slide 1</div>
+    <div class="h-48 bg-green-500">Slide 2</div>
+  </Carousel>
+</template>
+<script setup>
+const handleChange = (current, prev) => {
+  console.log(`Changed from slide ${prev} to slide ${current}`)
+}
+
+const handleBeforeChange = (current, next) => {
+  console.log(`About to change from slide ${current} to slide ${next}`)
+}
+</script>
+```

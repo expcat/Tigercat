@@ -172,3 +172,108 @@ const columns = [
   { content: 'Updated', time: '2024-01-02', color: 'blue' }
 ]} />
 ```
+
+---
+
+## Carousel 轮播图
+
+### 基础用法
+
+```tsx
+<Carousel>
+  <div className="h-48 bg-blue-500 flex items-center justify-center text-white text-2xl">
+    Slide 1
+  </div>
+  <div className="h-48 bg-green-500 flex items-center justify-center text-white text-2xl">
+    Slide 2
+  </div>
+  <div className="h-48 bg-red-500 flex items-center justify-center text-white text-2xl">
+    Slide 3
+  </div>
+</Carousel>
+```
+
+### 显示箭头
+
+```tsx
+<Carousel arrows>
+  <div className="h-48 bg-blue-500">Slide 1</div>
+  <div className="h-48 bg-green-500">Slide 2</div>
+  <div className="h-48 bg-red-500">Slide 3</div>
+</Carousel>
+```
+
+### 自动播放
+
+```tsx
+<Carousel autoplay autoplaySpeed={3000} pauseOnHover>
+  <div className="h-48 bg-blue-500">Slide 1</div>
+  <div className="h-48 bg-green-500">Slide 2</div>
+  <div className="h-48 bg-red-500">Slide 3</div>
+</Carousel>
+```
+
+### 淡入淡出效果
+
+```tsx
+<Carousel effect="fade" arrows>
+  <div className="h-48 bg-blue-500">Slide 1</div>
+  <div className="h-48 bg-green-500">Slide 2</div>
+  <div className="h-48 bg-red-500">Slide 3</div>
+</Carousel>
+```
+
+### 指示点位置
+
+```tsx
+{/* 指示点在上方 */}
+<Carousel dotPosition="top">
+  <div className="h-48 bg-blue-500">Slide 1</div>
+  <div className="h-48 bg-green-500">Slide 2</div>
+</Carousel>
+
+{/* 指示点在左侧 */}
+<Carousel dotPosition="left">
+  <div className="h-48 bg-blue-500">Slide 1</div>
+  <div className="h-48 bg-green-500">Slide 2</div>
+</Carousel>
+```
+
+### 使用 ref 调用方法
+
+```tsx
+import { useRef } from 'react'
+import { Carousel, Button, Space, type CarouselRef } from '@expcat/tigercat-react'
+
+const carouselRef = useRef<CarouselRef>(null)
+
+<>
+  <Carousel ref={carouselRef}>
+    <div className="h-48 bg-blue-500">Slide 1</div>
+    <div className="h-48 bg-green-500">Slide 2</div>
+    <div className="h-48 bg-red-500">Slide 3</div>
+  </Carousel>
+  <Space>
+    <Button onClick={() => carouselRef.current?.prev()}>Prev</Button>
+    <Button onClick={() => carouselRef.current?.next()}>Next</Button>
+    <Button onClick={() => carouselRef.current?.goTo(0)}>Go to First</Button>
+  </Space>
+</>
+```
+
+### 事件监听
+
+```tsx
+const handleChange = (current: number, prev: number) => {
+  console.log(`Changed from slide ${prev} to slide ${current}`)
+}
+
+const handleBeforeChange = (current: number, next: number) => {
+  console.log(`About to change from slide ${current} to slide ${next}`)
+}
+
+<Carousel onChange={handleChange} onBeforeChange={handleBeforeChange}>
+  <div className="h-48 bg-blue-500">Slide 1</div>
+  <div className="h-48 bg-green-500">Slide 2</div>
+</Carousel>
+```
