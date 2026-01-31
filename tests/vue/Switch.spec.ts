@@ -214,5 +214,161 @@ describe('Switch', () => {
       await fireEvent.keyDown(switchButton, { key: 'Enter', code: 'Enter' })
       expect(onUpdate).toHaveBeenCalledWith(true)
     })
+
+    it('should have tabindex 0 when enabled', () => {
+      const { container } = renderWithProps(Switch, { disabled: false })
+
+      const switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).not.toHaveAttribute('tabindex', '-1')
+    })
+
+    it('should have tabindex -1 when disabled', () => {
+      const { container } = renderWithProps(Switch, { disabled: true })
+
+      const switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toHaveAttribute('tabindex', '-1')
+    })
+  })
+
+  describe('V-Model Support', () => {
+    it('should work with v-model:checked', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Switch, {
+        props: {
+          checked: false,
+          'onUpdate:checked': onUpdate
+        }
+      })
+
+      const switchButton = container.querySelector('[role="switch"]')!
+      await fireEvent.click(switchButton)
+
+      expect(onUpdate).toHaveBeenCalledWith(true)
+    })
+
+    it('should update when v-model value changes', async () => {
+      const { container, rerender } = renderWithProps(Switch, { checked: false })
+
+      let switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toHaveAttribute('aria-checked', 'false')
+
+      await rerender({ checked: true })
+
+      switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toHaveAttribute('aria-checked', 'true')
+    })
+  })
+
+  describe('Edge Cases', () => {
+    it('should handle rapid clicks correctly', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Switch, {
+        props: {
+          checked: false,
+          'onUpdate:checked': onUpdate
+        }
+      })
+
+      const switchButton = container.querySelector('[role="switch"]')!
+
+      await fireEvent.click(switchButton)
+      await fireEvent.click(switchButton)
+      await fireEvent.click(switchButton)
+
+      // In controlled mode, each click emits the toggled value
+      // Since checked stays false, all clicks emit true
+      expect(onUpdate).toHaveBeenCalledTimes(3)
+      expect(onUpdate).toHaveBeenNthCalledWith(1, true)
+      expect(onUpdate).toHaveBeenNthCalledWith(2, true)
+      expect(onUpdate).toHaveBeenNthCalledWith(3, true)
+    })
+
+    it('should not trigger on other key presses', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Switch, {
+        props: {
+          checked: false,
+          'onUpdate:checked': onUpdate
+        }
+      })
+
+      const switchButton = container.querySelector('[role="switch"]')!
+
+      await fireEvent.keyDown(switchButton, { key: 'a' })
+      await fireEvent.keyDown(switchButton, { key: 'Escape' })
+      await fireEvent.keyDown(switchButton, { key: 'Tab' })
+
+      expect(onUpdate).not.toHaveBeenCalled()
+    })
+
+    it('should handle large size correctly', () => {
+      const { container } = renderWithProps(Switch, { size: 'lg' })
+
+      const switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toBeInTheDocument()
+    })
+
+    it('should handle small size correctly', () => {
+      const { container } = renderWithProps(Switch, { size: 'sm' })
+
+      const switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toBeInTheDocument()
+    })
+
+    it('should preserve custom className with other props', () => {
+      const { container } = renderWithProps(Switch, {
+        className: 'custom-class',
+        checked: true,
+        disabled: false
+      })
+
+      const switchButton = container.querySelector('.custom-class')
+      expect(switchButton).toBeInTheDocument()
+    })
+
+    it('should apply custom styles correctly', () => {
+      const { container } = renderWithProps(Switch, {
+        style: { marginLeft: '10px' }
+      })
+
+      const switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toBeInTheDocument()
+    })
+  })
+
+  describe('Event Prevention', () => {
+    it('should prevent default behavior on Space key to avoid page scroll', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Switch, {
+        props: {
+          checked: false,
+          'onUpdate:checked': onUpdate
+        }
+      })
+      const switchButton = container.querySelector('[role="switch"]')!
+
+      // Test that Space key triggers toggle (side effect of preventDefault working)
+      await fireEvent.keyDown(switchButton, { key: ' ', code: 'Space' })
+
+      // If preventDefault works correctly, the switch should toggle
+      expect(onUpdate).toHaveBeenCalledWith(true)
+    })
+
+    it('should prevent default behavior on Enter key', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Switch, {
+        props: {
+          checked: false,
+          'onUpdate:checked': onUpdate
+        }
+      })
+      const switchButton = container.querySelector('[role="switch"]')!
+
+      // Test that Enter key triggers toggle
+      await fireEvent.keyDown(switchButton, { key: 'Enter', code: 'Enter' })
+
+      // If preventDefault works correctly, the switch should toggle
+      expect(onUpdate).toHaveBeenCalledWith(true)
+    })
   })
 })

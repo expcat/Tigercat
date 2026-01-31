@@ -182,5 +182,208 @@ describe('Switch', () => {
       expect(switchButton).toHaveAttribute('role', 'switch')
       expect(switchButton).toHaveAttribute('aria-checked', 'false')
     })
+
+    it('should be keyboard accessible with Enter', async () => {
+      const user = userEvent.setup()
+      const handleChange = vi.fn()
+      const { container } = render(<Switch checked={false} onChange={handleChange} />)
+
+      const switchButton = container.querySelector('[role="switch"]')!
+      switchButton.focus()
+      await user.keyboard('[Enter]')
+
+      expect(handleChange).toHaveBeenCalledWith(true)
+    })
+
+    it('should have tabindex 0 when enabled', () => {
+      const { container } = render(<Switch disabled={false} />)
+
+      const switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).not.toHaveAttribute('tabindex', '-1')
+    })
+
+    it('should have tabindex -1 when disabled', () => {
+      const { container } = render(<Switch disabled />)
+
+      const switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toHaveAttribute('tabindex', '-1')
+    })
+  })
+
+  describe('Uncontrolled Component', () => {
+    it('should work as uncontrolled component', async () => {
+      const user = userEvent.setup()
+      const handleChange = vi.fn()
+      const { container } = render(<Switch onChange={handleChange} />)
+
+      const switchButton = container.querySelector('[role="switch"]')!
+
+      expect(switchButton).toHaveAttribute('aria-checked', 'false')
+
+      await user.click(switchButton)
+
+      expect(handleChange).toHaveBeenCalledWith(true)
+    })
+  })
+
+  describe('Edge Cases', () => {
+    it('should handle rapid clicks correctly', async () => {
+      const user = userEvent.setup()
+      const handleChange = vi.fn()
+      const { container } = render(<Switch checked={false} onChange={handleChange} />)
+
+      const switchButton = container.querySelector('[role="switch"]')!
+
+      await user.click(switchButton)
+      await user.click(switchButton)
+      await user.click(switchButton)
+
+      // In controlled mode, each click emits the toggled value
+      // Since checked stays false, all clicks emit true
+      expect(handleChange).toHaveBeenCalledTimes(3)
+      expect(handleChange).toHaveBeenNthCalledWith(1, true)
+      expect(handleChange).toHaveBeenNthCalledWith(2, true)
+      expect(handleChange).toHaveBeenNthCalledWith(3, true)
+    })
+
+    it('should not trigger on other key presses', async () => {
+      const user = userEvent.setup()
+      const handleChange = vi.fn()
+      const { container } = render(<Switch checked={false} onChange={handleChange} />)
+
+      const switchButton = container.querySelector('[role="switch"]')!
+      switchButton.focus()
+
+      await user.keyboard('a')
+      await user.keyboard('[Escape]')
+      await user.keyboard('[Tab]')
+
+      expect(handleChange).not.toHaveBeenCalled()
+    })
+
+    it('should handle large size correctly', () => {
+      const { container } = render(<Switch size="lg" />)
+
+      const switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toBeInTheDocument()
+    })
+
+    it('should handle small size correctly', () => {
+      const { container } = render(<Switch size="sm" />)
+
+      const switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toBeInTheDocument()
+    })
+
+    it('should preserve custom className with other props', () => {
+      const { container } = render(<Switch className="custom-class" checked disabled={false} />)
+
+      const switchButton = container.querySelector('.custom-class')
+      expect(switchButton).toBeInTheDocument()
+    })
+
+    it('should handle aria-label prop', () => {
+      const { container } = render(<Switch aria-label="Custom label" />)
+
+      const switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toHaveAttribute('aria-label', 'Custom label')
+    })
+
+    it('should handle aria-labelledby prop', () => {
+      const { container } = render(<Switch aria-labelledby="label-id" />)
+
+      const switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toHaveAttribute('aria-labelledby', 'label-id')
+    })
+  })
+
+  describe('Event Handling', () => {
+    it('should call both onClick and onChange', async () => {
+      const user = userEvent.setup()
+      const handleClick = vi.fn()
+      const handleChange = vi.fn()
+      const { container } = render(
+        <Switch checked={false} onClick={handleClick} onChange={handleChange} />
+      )
+
+      const switchButton = container.querySelector('[role="switch"]')!
+      await user.click(switchButton)
+
+      expect(handleClick).toHaveBeenCalled()
+      expect(handleChange).toHaveBeenCalledWith(true)
+    })
+
+    it('should not call onChange when onClick prevents default', async () => {
+      const user = userEvent.setup()
+      const handleClick = vi.fn((e) => e.preventDefault())
+      const handleChange = vi.fn()
+      const { container } = render(
+        <Switch checked={false} onClick={handleClick} onChange={handleChange} />
+      )
+
+      const switchButton = container.querySelector('[role="switch"]')!
+      await user.click(switchButton)
+
+      expect(handleClick).toHaveBeenCalled()
+      expect(handleChange).not.toHaveBeenCalled()
+    })
+
+    it('should call both onKeyDown and onChange', async () => {
+      const user = userEvent.setup()
+      const handleKeyDown = vi.fn()
+      const handleChange = vi.fn()
+      const { container } = render(
+        <Switch checked={false} onKeyDown={handleKeyDown} onChange={handleChange} />
+      )
+
+      const switchButton = container.querySelector('[role="switch"]')!
+      switchButton.focus()
+      await user.keyboard('[Space]')
+
+      expect(handleKeyDown).toHaveBeenCalled()
+      expect(handleChange).toHaveBeenCalledWith(true)
+    })
+
+    it('should not call onChange when onKeyDown prevents default', async () => {
+      const user = userEvent.setup()
+      const handleKeyDown = vi.fn((e) => e.preventDefault())
+      const handleChange = vi.fn()
+      const { container } = render(
+        <Switch checked={false} onKeyDown={handleKeyDown} onChange={handleChange} />
+      )
+
+      const switchButton = container.querySelector('[role="switch"]')!
+      switchButton.focus()
+      await user.keyboard('[Space]')
+
+      expect(handleKeyDown).toHaveBeenCalled()
+      expect(handleChange).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('State Management', () => {
+    it('should maintain checked state across re-renders', () => {
+      const { container, rerender } = render(<Switch checked={true} />)
+
+      let switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toHaveAttribute('aria-checked', 'true')
+
+      rerender(<Switch checked={true} disabled />)
+
+      switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toHaveAttribute('aria-checked', 'true')
+    })
+
+    it('should update when checked prop changes', () => {
+      const { container, rerender } = render(<Switch checked={false} />)
+
+      let switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toHaveAttribute('aria-checked', 'false')
+
+      rerender(<Switch checked={true} />)
+
+      switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toHaveAttribute('aria-checked', 'true')
+    })
   })
 })
