@@ -171,6 +171,8 @@ export type { VueChartTooltipProps } from './components/ChartTooltip'
 // Other components
 export { Carousel } from './components/Carousel'
 export type { VueCarouselProps } from './components/Carousel'
+export { BackTop } from './components/BackTop'
+export type { VueBackTopProps } from './components/BackTop'
 
 // Composables
 export { useChartInteraction } from './composables/useChartInteraction'

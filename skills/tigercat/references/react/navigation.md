@@ -98,3 +98,29 @@ const treeData = [
 
 <Tree data={treeData} expandedKeys={expandedKeys} onExpand={setExpandedKeys} checkedKeys={checkedKeys} onCheck={setCheckedKeys} checkable />
 ```
+
+---
+
+## BackTop 回到顶部
+
+```tsx
+// 基础用法
+<BackTop />
+
+// 自定义显示高度
+<BackTop visibilityHeight={200} />
+
+// 自定义滚动目标
+const scrollRef = useRef<HTMLDivElement>(null)
+<BackTop target={() => scrollRef.current!} />
+
+// 自定义内容
+<BackTop>
+  <div className="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-full text-white">
+    ↑
+  </div>
+</BackTop>
+
+// 点击事件
+<BackTop onClick={(e) => console.log('clicked', e)} />
+```

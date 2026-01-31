@@ -106,3 +106,27 @@ const treeData = [
 ]
 </script>
 ```
+
+---
+
+## BackTop 回到顶部
+
+```vue
+<template>
+  <!-- 基础用法 -->
+  <BackTop />
+
+  <!-- 自定义显示高度 -->
+  <BackTop :visibility-height="200" />
+
+  <!-- 自定义滚动目标 -->
+  <BackTop :target="() => $refs.scrollContainer" />
+
+  <!-- 自定义内容 -->
+  <BackTop>
+    <div class="flex items-center justify-center w-10 h-10 bg-blue-500 rounded-full text-white">
+      ↑
+    </div>
+  </BackTop>
+</template>
+```

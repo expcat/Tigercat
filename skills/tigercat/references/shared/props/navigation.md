@@ -143,4 +143,28 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ---
 
+## BackTop 回到顶部
+
+### Props
+
+| Prop             | Type                        | Default      | Vue | React | Description          |
+| ---------------- | --------------------------- | ------------ | :-: | :---: | -------------------- |
+| visibilityHeight | `number`                    | `400`        |  ✓  |   ✓   | 滚动高度达到此值显示 |
+| target           | `() => HTMLElement \| Window` | `() => window` |  ✓  |   ✓   | 监听滚动的目标元素   |
+| duration         | `number`                    | `450`        |  ✓  |   ✓   | 滚动到顶部的动画时长（ms） |
+
+### Events
+
+| Vue Event | React Callback | Payload              | Description |
+| --------- | -------------- | -------------------- | ----------- |
+| `@click`  | `onClick`      | `MouseEvent`         | 点击时触发  |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description      |
+| --------- | ---------- | ---------------- |
+| `default` | `children` | 自定义按钮内容   |
+
+---
+
 > **See also**: [Vue examples](../vue/navigation.md) · [React examples](../react/navigation.md)
