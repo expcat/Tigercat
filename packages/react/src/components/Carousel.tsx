@@ -178,28 +178,6 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       [next, prev, goTo]
     )
 
-    // Autoplay control
-    const startAutoplay = useCallback(() => {
-      if (!autoplay || autoplayTimerRef.current) return
-      autoplayTimerRef.current = setInterval(() => {
-        if (!isPaused) {
-          const nextIdx = getNextSlideIndex(currentIndex, slideCount, infinite)
-          if (nextIdx !== currentIndex) {
-            onBeforeChange?.(currentIndex, nextIdx)
-            setCurrentIndex(nextIdx)
-            onChange?.(nextIdx, currentIndex)
-          }
-        }
-      }, autoplaySpeed)
-    }, [autoplay, autoplaySpeed, isPaused, currentIndex, slideCount, infinite, onBeforeChange, onChange])
-
-    const stopAutoplay = useCallback(() => {
-      if (autoplayTimerRef.current) {
-        clearInterval(autoplayTimerRef.current)
-        autoplayTimerRef.current = null
-      }
-    }, [])
-
     // Autoplay effect
     useEffect(() => {
       if (autoplay && !isPaused) {
