@@ -43,6 +43,7 @@ export * from './timeline'
 export * from './tree'
 export * from './skeleton'
 export * from './progress'
+export * from './collapse'
 
 // Navigation components
 export * from './menu'

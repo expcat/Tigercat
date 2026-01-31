@@ -110,6 +110,12 @@ export type { SkeletonProps } from './components/Skeleton'
 export { Progress } from './components/Progress'
 export type { ProgressProps } from './components/Progress'
 
+export { Collapse, useCollapseContext } from './components/Collapse'
+export type { CollapseProps, CollapseContextValue } from './components/Collapse'
+
+export { CollapsePanel } from './components/CollapsePanel'
+export type { CollapsePanelProps } from './components/CollapsePanel'
+
 export { Menu, useMenuContext } from './components/Menu'
 export type { MenuProps, MenuContextValue } from './components/Menu'
 

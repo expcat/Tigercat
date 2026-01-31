@@ -61,6 +61,7 @@ export * from '../timeline-utils'
 export * from '../tree-utils'
 export * from '../skeleton-utils'
 export * from '../progress-utils'
+export * from '../collapse-utils'
 
 // Navigation components
 export * from '../menu-utils'
