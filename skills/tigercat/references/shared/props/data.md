@@ -114,10 +114,12 @@ description: Shared props definitions for data display components - Table, Timel
 
 ### Events
 
-| Vue Event             | React Callback | Payload                              | Description  |
-| --------------------- | -------------- | ------------------------------------ | ------------ |
-| `@change`             | `onChange`     | `string \| number \| (string\|number)[]` | 切换面板时触发 |
-| `@update:active-key`  | -              | `string \| number \| (string\|number)[]` | v-model 更新  |
+| Vue Event             | React Callback | Payload                                             | Description  |
+| --------------------- | -------------- | --------------------------------------------------- | ------------ |
+| `@change`             | `onChange`     | `string \| number \| (string\|number)[] \| undefined` | 切换面板时触发 |
+| `@update:active-key`  | -              | `string \| number \| (string\|number)[] \| undefined` | v-model 更新  |
+
+> **Accordion 模式说明**：当启用手风琴模式且所有面板都收起时，这两个事件会发出 `undefined` 作为 payload。
 
 ### Slots / Children
 

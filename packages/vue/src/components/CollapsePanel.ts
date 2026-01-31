@@ -1,4 +1,4 @@
-import { defineComponent, computed, inject, PropType, h, ref } from 'vue'
+import { defineComponent, computed, inject, PropType, h } from 'vue'
 import {
   classNames,
   getCollapsePanelClasses,
@@ -76,9 +76,6 @@ export const CollapsePanel = defineComponent({
     if (!collapseContext) {
       throw new Error('CollapsePanel must be used within a Collapse component')
     }
-
-    // Content element ref for height animation
-    const contentRef = ref<HTMLElement | null>(null)
 
     // Check if this panel is active
     const isActive = computed(() => {
@@ -204,8 +201,7 @@ export const CollapsePanel = defineComponent({
           h(
             'div',
             {
-              class: collapsePanelContentBaseClasses,
-              ref: contentRef
+              class: collapsePanelContentBaseClasses
             },
             slots.default?.()
           )

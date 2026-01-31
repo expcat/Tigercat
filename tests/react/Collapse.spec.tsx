@@ -179,6 +179,31 @@ describe('Collapse', () => {
       expect(panel1Header).toHaveAttribute('aria-expanded', 'false')
       expect(panel2Header).toHaveAttribute('aria-expanded', 'true')
     })
+
+    it('should call onChange with undefined when all panels are collapsed in accordion mode', async () => {
+      const onChange = vi.fn()
+
+      render(
+        <Collapse accordion defaultActiveKey="1" onChange={onChange}>
+          <CollapsePanel panelKey="1" header="Panel 1">
+            Content 1
+          </CollapsePanel>
+          <CollapsePanel panelKey="2" header="Panel 2">
+            Content 2
+          </CollapsePanel>
+        </Collapse>
+      )
+
+      const panel1Header = screen.getByText('Panel 1').closest('[role="button"]')
+
+      expect(panel1Header).toHaveAttribute('aria-expanded', 'true')
+
+      // Click the active panel to collapse it
+      await fireEvent.click(panel1Header!)
+
+      expect(panel1Header).toHaveAttribute('aria-expanded', 'false')
+      expect(onChange).toHaveBeenCalledWith(undefined)
+    })
   })
 
   describe('Interactions', () => {

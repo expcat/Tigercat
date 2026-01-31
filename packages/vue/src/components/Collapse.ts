@@ -6,9 +6,7 @@ import {
   PropType,
   h,
   reactive,
-  watch,
-  getCurrentInstance,
-  type VNode
+  watch
 } from 'vue'
 import {
   classNames,
