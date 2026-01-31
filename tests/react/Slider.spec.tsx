@@ -7,7 +7,12 @@ import { render, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Slider } from '@expcat/tigercat-react'
-import { expectNoA11yViolations, setThemeVariables, clearThemeVariables } from '../utils/react'
+import {
+  expectNoA11yViolations,
+  componentSizes,
+  setThemeVariables,
+  clearThemeVariables
+} from '../utils/react'
 
 describe('Slider', () => {
   describe('Rendering', () => {
@@ -244,32 +249,26 @@ describe('Slider', () => {
   })
 
   describe('Boundary Conditions', () => {
-    it('should not exceed max value', async () => {
+    it('should clamp value at max boundary', async () => {
       const handleChange = vi.fn()
       const { container } = render(<Slider value={100} min={0} max={100} onChange={handleChange} />)
 
       const slider = container.querySelector('[role="slider"]')!
       await fireEvent.keyDown(slider, { key: 'ArrowRight' })
 
-      // Should either not call or call with max value
-      if (handleChange.mock.calls.length > 0) {
-        const callValue = handleChange.mock.calls[0][0]
-        expect(callValue).toBeLessThanOrEqual(100)
-      }
+      // Component still calls handler but value stays at max
+      expect(handleChange).toHaveBeenCalledWith(100)
     })
 
-    it('should not go below min value', async () => {
+    it('should clamp value at min boundary', async () => {
       const handleChange = vi.fn()
       const { container } = render(<Slider value={0} min={0} max={100} onChange={handleChange} />)
 
       const slider = container.querySelector('[role="slider"]')!
       await fireEvent.keyDown(slider, { key: 'ArrowLeft' })
 
-      // Should either not call or call with min value
-      if (handleChange.mock.calls.length > 0) {
-        const callValue = handleChange.mock.calls[0][0]
-        expect(callValue).toBeGreaterThanOrEqual(0)
-      }
+      // Component still calls handler but value stays at min
+      expect(handleChange).toHaveBeenCalledWith(0)
     })
 
     it('should handle custom min/max range', () => {
@@ -336,42 +335,43 @@ describe('Slider', () => {
   })
 
   describe('Marks Support', () => {
-    it('should render with marks enabled', () => {
-      const { container } = render(<Slider marks />)
+    it('should render slider with marks prop', () => {
+      const { container } = render(<Slider marks min={0} max={100} />)
 
       const slider = container.querySelector('[role="slider"]')
       expect(slider).toBeInTheDocument()
+      // Marks should be rendered but their exact DOM structure is implementation detail
     })
 
-    it('should render with custom marks', () => {
-      const { container } = render(
-        <Slider
-          marks={{
-            0: '0°C',
-            50: '50°C',
-            100: '100°C'
-          }}
-        />
-      )
+    it('should accept custom marks object', () => {
+      const customMarks = {
+        0: '0°C',
+        50: '50°C',
+        100: '100°C'
+      }
+      const { container } = render(<Slider marks={customMarks} />)
 
       const slider = container.querySelector('[role="slider"]')
       expect(slider).toBeInTheDocument()
+      // Custom marks rendering is implementation detail
     })
   })
 
   describe('Tooltip Behavior', () => {
-    it('should show tooltip by default', () => {
-      const { container } = render(<Slider value={50} />)
+    it('should enable tooltip by default', () => {
+      const { container } = render(<Slider value={50} tooltip />)
 
       const slider = container.querySelector('[role="slider"]')
       expect(slider).toBeInTheDocument()
+      // Tooltip presence/visibility is controlled by hover/drag, not static DOM
     })
 
-    it('should hide tooltip when tooltip prop is false', () => {
+    it('should accept tooltip prop as false', () => {
       const { container } = render(<Slider value={50} tooltip={false} />)
 
       const slider = container.querySelector('[role="slider"]')
       expect(slider).toBeInTheDocument()
+      // Tooltip disabled - behavior is internal
     })
   })
 
@@ -405,15 +405,8 @@ describe('Slider', () => {
   })
 
   describe('Size Variations', () => {
-    it('should render small size', () => {
-      const { container } = render(<Slider size="sm" />)
-
-      const slider = container.querySelector('[role="slider"]')
-      expect(slider).toBeInTheDocument()
-    })
-
-    it('should render large size', () => {
-      const { container } = render(<Slider size="lg" />)
+    it.each(componentSizes)('should render %s size correctly', (size) => {
+      const { container } = render(<Slider size={size} />)
 
       const slider = container.querySelector('[role="slider"]')
       expect(slider).toBeInTheDocument()
@@ -448,10 +441,9 @@ describe('Slider', () => {
       const slider = container.querySelector('[role="slider"]')!
       await fireEvent.keyDown(slider, { key: 'Home' })
 
-      if (handleChange.mock.calls.length > 0) {
-        const callValue = handleChange.mock.calls[0][0]
-        expect(callValue).toBe(0)
-      }
+      expect(handleChange).toHaveBeenCalled()
+      const callValue = handleChange.mock.calls[0][0]
+      expect(callValue).toBe(0)
     })
 
     it('should handle End key to jump to max', async () => {
@@ -461,36 +453,35 @@ describe('Slider', () => {
       const slider = container.querySelector('[role="slider"]')!
       await fireEvent.keyDown(slider, { key: 'End' })
 
-      if (handleChange.mock.calls.length > 0) {
-        const callValue = handleChange.mock.calls[0][0]
-        expect(callValue).toBe(100)
-      }
+      expect(handleChange).toHaveBeenCalled()
+      const callValue = handleChange.mock.calls[0][0]
+      expect(callValue).toBe(100)
     })
 
     it('should handle PageUp for larger increments', async () => {
       const handleChange = vi.fn()
-      const { container } = render(<Slider value={50} onChange={handleChange} />)
+      const { container } = render(<Slider value={50} step={1} onChange={handleChange} />)
 
       const slider = container.querySelector('[role="slider"]')!
       await fireEvent.keyDown(slider, { key: 'PageUp' })
 
-      if (handleChange.mock.calls.length > 0) {
-        const callValue = handleChange.mock.calls[0][0]
-        expect(callValue).toBeGreaterThan(50)
-      }
+      expect(handleChange).toHaveBeenCalled()
+      const callValue = handleChange.mock.calls[0][0]
+      // PageUp should increment by 10 * step (default large step)
+      expect(callValue).toBe(60)
     })
 
     it('should handle PageDown for larger decrements', async () => {
       const handleChange = vi.fn()
-      const { container } = render(<Slider value={50} onChange={handleChange} />)
+      const { container } = render(<Slider value={50} step={1} onChange={handleChange} />)
 
       const slider = container.querySelector('[role="slider"]')!
       await fireEvent.keyDown(slider, { key: 'PageDown' })
 
-      if (handleChange.mock.calls.length > 0) {
-        const callValue = handleChange.mock.calls[0][0]
-        expect(callValue).toBeLessThan(50)
-      }
+      expect(handleChange).toHaveBeenCalled()
+      const callValue = handleChange.mock.calls[0][0]
+      // PageDown should decrement by 10 * step (default large step)
+      expect(callValue).toBe(40)
     })
   })
 
