@@ -92,7 +92,7 @@
 | 折叠面板 | Collapse  | ⬜  | ⬜    | ⬜   | ⬜   |
 | 轮播图   | Carousel  | ✅  | ✅    | ✅   | ✅   |
 | 回到顶部 | BackTop   | ✅  | ✅    | ✅   | ✅   |
-| 锚点     | Anchor    | ⬜  | ⬜    | ⬜   | ⬜   |
+| 锚点     | Anchor    | ✅  | ✅    | ✅   | ✅   |
 
 ### 数据可视化组件 (Chart Components)
 

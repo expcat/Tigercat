@@ -167,4 +167,42 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ---
 
+## Anchor 锚点导航
+
+### Anchor Props
+
+| Prop            | Type                               | Default        | Vue | React | Description            |
+| --------------- | ---------------------------------- | -------------- | :-: | :---: | ---------------------- |
+| affix           | `boolean`                          | `true`         |  ✓  |   ✓   | 是否固定定位           |
+| bounds          | `number`                           | `5`            |  ✓  |   ✓   | 锚点区域边界（px）     |
+| offsetTop       | `number`                           | `0`            |  ✓  |   ✓   | 距窗口顶部偏移量       |
+| showInkInFixed  | `boolean`                          | `false`        |  ✓  |   ✓   | 固定时是否显示小圆点   |
+| targetOffset    | `number`                           | -              |  ✓  |   ✓   | 锚点滚动偏移量         |
+| getCurrentAnchor| `(activeLink: string) => string`   | -              |  ✓  |   ✓   | 自定义高亮锚点         |
+| getContainer    | `() => HTMLElement \| Window`      | `() => window` |  ✓  |   ✓   | 滚动容器               |
+| direction       | `'vertical' \| 'horizontal'`       | `'vertical'`   |  ✓  |   ✓   | 导航方向               |
+
+### Anchor Events
+
+| Vue Event | React Callback | Payload                    | Description    |
+| --------- | -------------- | -------------------------- | -------------- |
+| `@click`  | `onClick`      | `(event, href)`            | 点击链接时触发 |
+| `@change` | `onChange`     | `currentActiveLink: string`| 锚点变化时触发 |
+
+### AnchorLink Props
+
+| Prop   | Type     | Default | Vue | React | Description  |
+| ------ | -------- | ------- | :-: | :---: | ------------ |
+| href   | `string` | -       |  ✓  |   ✓   | 锚点链接     |
+| title  | `string` | -       |  ✓  |   ✓   | 文字内容     |
+| target | `string` | -       |  ✓  |   ✓   | 链接 target  |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description      |
+| --------- | ---------- | ---------------- |
+| `default` | `children` | 自定义链接内容   |
+
+---
+
 > **See also**: [Vue examples](../vue/navigation.md) · [React examples](../react/navigation.md)
