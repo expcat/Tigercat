@@ -7,13 +7,14 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Input } from '@expcat/tigercat-react'
-import type { InputType } from '@expcat/tigercat-core'
+import type { InputType, InputStatus } from '@expcat/tigercat-core'
 import {
   renderWithProps,
   expectNoA11yViolations,
   componentSizes,
   setThemeVariables,
-  clearThemeVariables
+  clearThemeVariables,
+  edgeCaseData
 } from '../utils/react'
 
 describe('Input', () => {
@@ -62,6 +63,20 @@ describe('Input', () => {
       expect(input).toHaveAttribute('title', 'Input title')
       expect(input).toHaveAttribute('aria-describedby', 'input-help')
     })
+
+    it('should render wrapper div with correct structure', () => {
+      const { container } = render(<Input />)
+      const wrapper = container.firstChild as HTMLElement
+      expect(wrapper.tagName).toBe('DIV')
+      expect(wrapper).toHaveClass('relative')
+      expect(wrapper).toHaveClass('w-full')
+    })
+
+    it('should apply style prop to wrapper', () => {
+      const { container } = render(<Input style={{ width: '200px' }} />)
+      const wrapper = container.firstChild as HTMLElement
+      expect(wrapper).toHaveStyle({ width: '200px' })
+    })
   })
 
   describe('Affix', () => {
@@ -73,6 +88,22 @@ describe('Input', () => {
     it('should render suffix', () => {
       const { getByText } = render(<Input suffix="Suf" />)
       expect(getByText('Suf')).toBeInTheDocument()
+    })
+
+    it('should render both prefix and suffix together', () => {
+      const { getByText } = render(<Input prefix="$" suffix=".00" />)
+      expect(getByText('$')).toBeInTheDocument()
+      expect(getByText('.00')).toBeInTheDocument()
+    })
+
+    it('should render prefix as React node', () => {
+      const { getByTestId } = render(<Input prefix={<span data-testid="prefix-icon">Icon</span>} />)
+      expect(getByTestId('prefix-icon')).toBeInTheDocument()
+    })
+
+    it('should render suffix as React node', () => {
+      const { getByTestId } = render(<Input suffix={<span data-testid="suffix-icon">Icon</span>} />)
+      expect(getByTestId('suffix-icon')).toBeInTheDocument()
     })
   })
 
@@ -89,6 +120,17 @@ describe('Input', () => {
       )
       expect(getByText('Bad input')).toBeInTheDocument()
       expect(queryByText('HiddenSuffix')).not.toBeInTheDocument()
+    })
+
+    it('should show suffix when status is error but no errorMessage', () => {
+      const { getByText } = render(<Input status="error" suffix="Visible" />)
+      expect(getByText('Visible')).toBeInTheDocument()
+    })
+
+    it.each(['success', 'warning'] as InputStatus[])('should handle %s status', (status) => {
+      const { container } = render(<Input status={status} />)
+      const input = container.querySelector('input')
+      expect(input).toBeInTheDocument()
     })
   })
 
@@ -110,6 +152,12 @@ describe('Input', () => {
         expect(input).toHaveAttribute('type', type)
         unmount()
       })
+    })
+
+    it('should handle search input type', () => {
+      const { container } = render(<Input type="search" />)
+      const input = container.querySelector('input')
+      expect(input).toHaveAttribute('type', 'search')
     })
 
     it('should apply maxLength attribute', () => {
@@ -171,6 +219,14 @@ describe('Input', () => {
       const { getByRole } = render(<Input required />)
 
       expect(getByRole('textbox')).toBeRequired()
+    })
+
+    it('should combine disabled and readonly states', () => {
+      const { getByRole } = render(<Input disabled readonly />)
+
+      const input = getByRole('textbox')
+      expect(input).toBeDisabled()
+      expect(input).toHaveAttribute('readonly')
     })
   })
 
@@ -239,6 +295,33 @@ describe('Input', () => {
       await user.type(input, 'test')
 
       expect(input.value).toBe('initial')
+    })
+
+    it('should handle multiple event handlers together', async () => {
+      const user = userEvent.setup()
+      const handleChange = vi.fn()
+      const handleInput = vi.fn()
+      const handleFocus = vi.fn()
+      const handleBlur = vi.fn()
+
+      const { getByRole } = render(
+        <Input
+          onChange={handleChange}
+          onInput={handleInput}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+        />
+      )
+
+      const input = getByRole('textbox')
+      await user.click(input)
+      await user.type(input, 'a')
+      await user.tab()
+
+      expect(handleFocus).toHaveBeenCalled()
+      expect(handleInput).toHaveBeenCalled()
+      expect(handleChange).toHaveBeenCalled()
+      expect(handleBlur).toHaveBeenCalled()
     })
   })
 
@@ -312,6 +395,116 @@ describe('Input', () => {
 
       expect(input.value).toBe('42')
     })
+
+    it('should handle empty string value', () => {
+      const { getByRole } = render(<Input value="" />)
+
+      const input = getByRole('textbox') as HTMLInputElement
+      expect(input.value).toBe('')
+    })
+
+    it('should handle undefined value (uncontrolled)', () => {
+      const { getByRole } = render(<Input defaultValue="" />)
+
+      const input = getByRole('textbox') as HTMLInputElement
+      expect(input.value).toBe('')
+    })
+
+    it('should handle numeric value for text input', () => {
+      const { getByRole } = render(<Input value={123} />)
+
+      const input = getByRole('textbox') as HTMLInputElement
+      expect(input.value).toBe('123')
+    })
+  })
+
+  describe('Type Variants', () => {
+    it('should render text input by default', () => {
+      const { container } = render(<Input />)
+      const input = container.querySelector('input')
+      expect(input).toHaveAttribute('type', 'text')
+    })
+
+    it('should render password input', () => {
+      const { container } = render(<Input type="password" />)
+      const input = container.querySelector('input')
+      expect(input).toHaveAttribute('type', 'password')
+    })
+
+    it('should render email input', () => {
+      const { container } = render(<Input type="email" />)
+      const input = container.querySelector('input')
+      expect(input).toHaveAttribute('type', 'email')
+    })
+
+    it('should render number input with spinbutton role', () => {
+      const { getByRole } = render(<Input type="number" />)
+      expect(getByRole('spinbutton')).toBeInTheDocument()
+    })
+
+    it('should render tel input', () => {
+      const { container } = render(<Input type="tel" />)
+      const input = container.querySelector('input')
+      expect(input).toHaveAttribute('type', 'tel')
+    })
+
+    it('should render url input', () => {
+      const { container } = render(<Input type="url" />)
+      const input = container.querySelector('input')
+      expect(input).toHaveAttribute('type', 'url')
+    })
+
+    it('should handle number input with decimal values', async () => {
+      const user = userEvent.setup()
+      const handleChange = vi.fn()
+
+      const TestComponent = () => {
+        const [value, setValue] = React.useState<string | number>('')
+
+        return (
+          <Input
+            type="number"
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value)
+              handleChange(e)
+            }}
+          />
+        )
+      }
+
+      const { getByRole } = render(<TestComponent />)
+      const input = getByRole('spinbutton')
+      await user.type(input, '3.14')
+
+      expect(handleChange).toHaveBeenCalled()
+    })
+
+    it('should handle negative numbers', async () => {
+      const user = userEvent.setup()
+      const handleChange = vi.fn()
+
+      const TestComponent = () => {
+        const [value, setValue] = React.useState<string | number>('')
+
+        return (
+          <Input
+            type="number"
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value)
+              handleChange(e)
+            }}
+          />
+        )
+      }
+
+      const { getByRole } = render(<TestComponent />)
+      const input = getByRole('spinbutton')
+      await user.type(input, '-5')
+
+      expect(handleChange).toHaveBeenCalled()
+    })
   })
 
   describe('Theme Support', () => {
@@ -357,6 +550,163 @@ describe('Input', () => {
       const { getByRole } = render(<Input />)
 
       expect(getByRole('textbox')).toBeInTheDocument()
+    })
+
+    it('should support aria-label', () => {
+      const { getByLabelText } = render(<Input aria-label="Username input" />)
+
+      expect(getByLabelText('Username input')).toBeInTheDocument()
+    })
+
+    it('should support aria-invalid for error state', () => {
+      const { getByRole } = render(<Input status="error" aria-invalid="true" />)
+
+      const input = getByRole('textbox')
+      expect(input).toHaveAttribute('aria-invalid', 'true')
+    })
+
+    it('should handle Tab key navigation', async () => {
+      const user = userEvent.setup()
+      const handleFocus = vi.fn()
+      const handleBlur = vi.fn()
+
+      const { getByRole } = render(<Input onFocus={handleFocus} onBlur={handleBlur} />)
+
+      const input = getByRole('textbox')
+
+      await user.tab()
+      expect(input).toHaveFocus()
+      expect(handleFocus).toHaveBeenCalled()
+
+      await user.tab()
+      expect(input).not.toHaveFocus()
+      expect(handleBlur).toHaveBeenCalled()
+    })
+  })
+
+  describe('Edge Cases', () => {
+    it('should handle empty string value', () => {
+      const { getByRole } = render(<Input value="" />)
+
+      const input = getByRole('textbox') as HTMLInputElement
+      expect(input.value).toBe('')
+    })
+
+    it('should handle whitespace-only value', () => {
+      const { getByRole } = render(<Input value={edgeCaseData.whitespace} />)
+
+      const input = getByRole('textbox') as HTMLInputElement
+      expect(input.value).toBe(edgeCaseData.whitespace)
+    })
+
+    it('should handle special characters', () => {
+      const { getByRole } = render(<Input value={edgeCaseData.specialCharacters} />)
+
+      const input = getByRole('textbox') as HTMLInputElement
+      expect(input.value).toBe(edgeCaseData.specialCharacters)
+    })
+
+    it('should handle unicode characters', () => {
+      const { getByRole } = render(<Input value={edgeCaseData.unicode} />)
+
+      const input = getByRole('textbox') as HTMLInputElement
+      expect(input.value).toBe(edgeCaseData.unicode)
+    })
+
+    it('should handle very long text', () => {
+      const longText = 'a'.repeat(1000)
+      const { getByRole } = render(<Input value={longText} />)
+
+      const input = getByRole('textbox') as HTMLInputElement
+      expect(input.value).toBe(longText)
+    })
+
+    it('should handle rapid value changes', async () => {
+      const user = userEvent.setup()
+      const handleChange = vi.fn()
+
+      const TestComponent = () => {
+        const [value, setValue] = React.useState('')
+
+        return (
+          <Input
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value)
+              handleChange(e)
+            }}
+          />
+        )
+      }
+
+      const { getByRole } = render(<TestComponent />)
+      const input = getByRole('textbox')
+
+      await user.type(input, 'abc')
+
+      expect(handleChange).toHaveBeenCalledTimes(3)
+    })
+
+    it('should handle zero value for number input', () => {
+      const { getByRole } = render(<Input type="number" value={0} />)
+
+      const input = getByRole('spinbutton') as HTMLInputElement
+      expect(input.value).toBe('0')
+    })
+
+    it('should handle maxLength constraint', () => {
+      const { getByRole } = render(<Input maxLength={5} />)
+
+      const input = getByRole('textbox') as HTMLInputElement
+      expect(input).toHaveAttribute('maxlength', '5')
+    })
+
+    it('should render without crashing with all props', () => {
+      const { getByRole } = render(
+        <Input
+          value="test"
+          size="lg"
+          type="text"
+          status="error"
+          errorMessage="Error"
+          prefix="Pre"
+          suffix="Suf"
+          placeholder="Placeholder"
+          disabled={false}
+          readonly={false}
+          required={true}
+          maxLength={100}
+          minLength={1}
+          name="test-input"
+          id="test-id"
+          autoComplete="off"
+          autoFocus={false}
+          className="custom-class"
+          style={{ width: '100%' }}
+        />
+      )
+
+      expect(getByRole('textbox')).toBeInTheDocument()
+    })
+
+    it('should handle HTML-like content safely', () => {
+      const htmlContent = '<script>alert("xss")</script>'
+      const { getByRole } = render(<Input value={htmlContent} />)
+
+      const input = getByRole('textbox') as HTMLInputElement
+      expect(input.value).toBe(htmlContent)
+    })
+  })
+
+  describe('Shake Animation', () => {
+    it('should trigger shake animation when status changes to error', () => {
+      const { container, rerender } = render(<Input status="default" />)
+
+      rerender(<Input status="error" />)
+
+      const wrapper = container.firstChild as HTMLElement
+      // The shake class should be applied
+      expect(wrapper.className).toContain('tiger-animate-shake')
     })
   })
 })
