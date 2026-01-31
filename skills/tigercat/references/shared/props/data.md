@@ -131,4 +131,48 @@ description: Shared props definitions for data display components - Table, Timel
 
 ---
 
+## Carousel 轮播图
+
+### Props
+
+| Prop          | Type                                        | Default    | Vue | React | Description              |
+| ------------- | ------------------------------------------- | ---------- | :-: | :---: | ------------------------ |
+| autoplay      | `boolean`                                   | `false`    |  ✓  |   ✓   | 是否自动播放             |
+| autoplaySpeed | `number`                                    | `3000`     |  ✓  |   ✓   | 自动播放间隔（ms）       |
+| dots          | `boolean`                                   | `true`     |  ✓  |   ✓   | 是否显示指示点           |
+| dotPosition   | `'top' \| 'bottom' \| 'left' \| 'right'`    | `'bottom'` |  ✓  |   ✓   | 指示点位置               |
+| effect        | `'scroll' \| 'fade'`                        | `'scroll'` |  ✓  |   ✓   | 切换效果                 |
+| arrows        | `boolean`                                   | `false`    |  ✓  |   ✓   | 是否显示切换箭头         |
+| infinite      | `boolean`                                   | `true`     |  ✓  |   ✓   | 是否无限循环             |
+| speed         | `number`                                    | `500`      |  ✓  |   ✓   | 切换动画速度（ms）       |
+| initialSlide  | `number`                                    | `0`        |  ✓  |   ✓   | 初始幻灯片索引           |
+| pauseOnHover  | `boolean`                                   | `true`     |  ✓  |   ✓   | 鼠标悬停时暂停           |
+| pauseOnFocus  | `boolean`                                   | `true`     |  ✓  |   ✓   | 聚焦时暂停               |
+
+### Events
+
+| Vue Event        | React Callback   | Payload                 | Description  |
+| ---------------- | ---------------- | ----------------------- | ------------ |
+| `@change`        | `onChange`       | `(current, prev)`       | 切换时触发   |
+| `@before-change` | `onBeforeChange` | `(current, next)`       | 切换前触发   |
+
+### Methods (Imperative API)
+
+| Method   | Arguments         | Description        |
+| -------- | ----------------- | ------------------ |
+| `next()` | -                 | 下一张             |
+| `prev()` | -                 | 上一张             |
+| `goTo()` | `index: number`   | 跳转到指定张       |
+
+> **Vue**: 使用 `ref` 获取组件实例调用方法
+> **React**: 使用 `useRef<CarouselRef>` 获取 ref 调用方法
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description    |
+| --------- | ---------- | -------------- |
+| `default` | `children` | 轮播内容       |
+
+---
+
 > **See also**: [Vue examples](../vue/data.md) · [React examples](../react/data.md)
