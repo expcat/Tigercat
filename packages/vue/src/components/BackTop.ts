@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, computed, onMounted, onBeforeUnmount, PropType, Transition } from 'vue'
+import { defineComponent, h, ref, computed, onMounted, onBeforeUnmount, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -112,19 +112,17 @@ export const BackTop = defineComponent({
     return () => {
       const content = slots.default ? slots.default() : DefaultIcon
 
-      return h(Transition, { name: 'tiger-back-top' }, () =>
-        h(
-          'button',
-          {
-            ...attrs,
-            type: 'button',
-            class: buttonClasses.value,
-            style: mergedStyle.value,
-            'aria-label': attrs['aria-label'] ?? 'Back to top',
-            onClick: handleClick
-          },
-          content
-        )
+      return h(
+        'button',
+        {
+          ...attrs,
+          type: 'button',
+          class: buttonClasses.value,
+          style: mergedStyle.value,
+          'aria-label': attrs['aria-label'] ?? 'Back to top',
+          onClick: handleClick
+        },
+        content
       )
     }
   }
