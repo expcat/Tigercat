@@ -113,7 +113,7 @@ export const Anchor: React.FC<AnchorProps> = ({
   // Handle link click
   const handleLinkClick = useCallback(
     (href: string, event: React.MouseEvent) => {
-      event.preventDefault()
+      // Note: preventDefault is called by AnchorLink before invoking this handler
       onClick?.(event, href)
 
       // Prevent scroll handler from running during programmatic scroll

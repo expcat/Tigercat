@@ -18,7 +18,6 @@ import {
   getAnchorInkContainerClasses,
   getAnchorInkActiveClasses,
   getAnchorLinkListClasses,
-  getContainerScrollTop,
   findActiveAnchor,
   scrollToAnchor,
   type AnchorDirection

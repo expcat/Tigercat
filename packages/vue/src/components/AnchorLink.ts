@@ -1,4 +1,4 @@
-import { defineComponent, h, computed, inject, onMounted, onBeforeUnmount, PropType } from 'vue'
+import { defineComponent, h, computed, inject, onMounted, onBeforeUnmount } from 'vue'
 import { classNames, coerceClassValue, getAnchorLinkClasses } from '@expcat/tigercat-core'
 import { AnchorContextKey, type AnchorContext } from './Anchor'
 
