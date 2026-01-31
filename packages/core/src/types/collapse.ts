@@ -80,21 +80,3 @@ export interface CollapsePanelProps {
    */
   style?: Record<string, string | number>
 }
-
-/**
- * Collapse change event info
- */
-export interface CollapseChangeInfo {
-  /**
-   * The currently active keys after the change
-   */
-  activeKey: (string | number)[]
-  /**
-   * The key that triggered the change
-   */
-  key: string | number
-  /**
-   * Whether the panel was expanded or collapsed
-   */
-  expanded: boolean
-}
