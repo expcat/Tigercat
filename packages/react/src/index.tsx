@@ -204,6 +204,8 @@ export type { ChartTooltipProps } from './components/ChartTooltip'
 // Other components
 export { Carousel } from './components/Carousel'
 export type { CarouselProps, CarouselRef } from './components/Carousel'
+export { BackTop } from './components/BackTop'
+export type { BackTopProps } from './components/BackTop'
 
 // Hooks
 export { useChartInteraction } from './hooks/useChartInteraction'
