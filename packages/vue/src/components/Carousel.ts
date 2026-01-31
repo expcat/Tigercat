@@ -6,7 +6,8 @@ import {
   onMounted,
   onUnmounted,
   PropType,
-  h
+  h,
+  Comment
 } from 'vue'
 import {
   classNames,
@@ -428,7 +429,7 @@ export const Carousel = defineComponent({
           return h(
             'div',
             {
-              class: trackClasses.value + ' h-full'
+              class: classNames(trackClasses.value, 'h-full')
             },
             slideElements
           )

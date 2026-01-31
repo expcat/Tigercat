@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { h } from 'vue'
+import { h, ref, nextTick } from 'vue'
 import { Carousel } from '@expcat/tigercat-vue'
 
 describe('Carousel', () => {
@@ -488,6 +488,99 @@ describe('Carousel', () => {
       const dots = container.querySelectorAll('[role="tablist"] button')
       expect(dots[0]).toHaveAttribute('aria-label', 'Go to slide 1')
       expect(dots[1]).toHaveAttribute('aria-label', 'Go to slide 2')
+    })
+  })
+
+  describe('Imperative API', () => {
+    it('should expose next method via ref', async () => {
+      const onChange = vi.fn()
+      const carouselRef = ref<{ next: () => void; prev: () => void; goTo: (index: number) => void }>()
+
+      render({
+        setup() {
+          return () =>
+            h(
+              Carousel,
+              {
+                ref: carouselRef,
+                onChange
+              },
+              {
+                default: () => [
+                  h('div', { key: '1' }, 'Slide 1'),
+                  h('div', { key: '2' }, 'Slide 2'),
+                  h('div', { key: '3' }, 'Slide 3')
+                ]
+              }
+            )
+        }
+      })
+
+      carouselRef.value?.next()
+      await nextTick()
+
+      expect(onChange).toHaveBeenCalledWith(1, 0)
+    })
+
+    it('should expose prev method via ref', async () => {
+      const onChange = vi.fn()
+      const carouselRef = ref<{ next: () => void; prev: () => void; goTo: (index: number) => void }>()
+
+      render({
+        setup() {
+          return () =>
+            h(
+              Carousel,
+              {
+                ref: carouselRef,
+                initialSlide: 1,
+                onChange
+              },
+              {
+                default: () => [
+                  h('div', { key: '1' }, 'Slide 1'),
+                  h('div', { key: '2' }, 'Slide 2'),
+                  h('div', { key: '3' }, 'Slide 3')
+                ]
+              }
+            )
+        }
+      })
+
+      carouselRef.value?.prev()
+      await nextTick()
+
+      expect(onChange).toHaveBeenCalledWith(0, 1)
+    })
+
+    it('should expose goTo method via ref', async () => {
+      const onChange = vi.fn()
+      const carouselRef = ref<{ next: () => void; prev: () => void; goTo: (index: number) => void }>()
+
+      render({
+        setup() {
+          return () =>
+            h(
+              Carousel,
+              {
+                ref: carouselRef,
+                onChange
+              },
+              {
+                default: () => [
+                  h('div', { key: '1' }, 'Slide 1'),
+                  h('div', { key: '2' }, 'Slide 2'),
+                  h('div', { key: '3' }, 'Slide 3')
+                ]
+              }
+            )
+        }
+      })
+
+      carouselRef.value?.goTo(2)
+      await nextTick()
+
+      expect(onChange).toHaveBeenCalledWith(2, 0)
     })
   })
 })

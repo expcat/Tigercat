@@ -189,6 +189,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
           setCurrentIndex((prevIndex) => {
             const nextIdx = getNextSlideIndex(prevIndex, slideCount, infinite)
             if (nextIdx !== prevIndex) {
+              onBeforeChange?.(prevIndex, nextIdx)
               onChange?.(nextIdx, prevIndex)
             }
             return nextIdx
@@ -201,7 +202,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
           autoplayTimerRef.current = null
         }
       }
-    }, [autoplay, autoplaySpeed, isPaused, slideCount, infinite, onChange])
+    }, [autoplay, autoplaySpeed, isPaused, slideCount, infinite, onChange, onBeforeChange])
 
     // Pause/Resume handlers
     const handleMouseEnter = useCallback(() => {
@@ -325,7 +326,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
 
       // For fade effect, wrap slides in a relative container
       if (effect === 'fade') {
-        return <div className={`${trackClasses} h-full`}>{slideElements}</div>
+        return <div className={classNames(trackClasses, 'h-full')}>{slideElements}</div>
       }
 
       // For scroll effect

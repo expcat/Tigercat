@@ -89,32 +89,6 @@ export function getCarouselContainerClasses(className?: string): string {
 }
 
 /**
- * Get carousel track classes based on effect
- */
-export function getCarouselTrackClasses(effect: CarouselEffect, speed: number): string {
-  if (effect === 'fade') {
-    return carouselTrackFadeClasses
-  }
-  return `${carouselTrackScrollClasses} duration-[${speed}ms]`
-}
-
-/**
- * Get carousel slide classes based on effect and active state
- */
-export function getCarouselSlideClasses(
-  effect: CarouselEffect,
-  isActive: boolean,
-  speed: number
-): string {
-  if (effect === 'fade') {
-    const classes = [carouselSlideFadeClasses, `duration-[${speed}ms]`]
-    classes.push(isActive ? 'opacity-100 z-10' : 'opacity-0 z-0')
-    return classes.filter(Boolean).join(' ')
-  }
-  return carouselSlideBaseClasses
-}
-
-/**
  * Get carousel dots container classes based on position
  */
 export function getCarouselDotsClasses(position: CarouselDotPosition): string {
