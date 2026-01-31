@@ -270,7 +270,6 @@ describe('Radio', () => {
         </Radio>
       )
 
-      const radio = container.querySelector('input[type="radio"]')!
       await user.keyboard('{Enter}')
 
       expect(handleChange).not.toHaveBeenCalled()
