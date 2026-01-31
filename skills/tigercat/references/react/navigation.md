@@ -5,7 +5,7 @@ description: React navigation components usage
 
 # Navigation Components (React)
 
-导航组件：Breadcrumb, Dropdown, Menu, Pagination, Steps, Tabs, Tree
+导航组件：Breadcrumb, Dropdown, Menu, Pagination, Steps, Tabs, Tree, BackTop, Anchor
 
 > **Props Reference**: [shared/props/navigation.md](../shared/props/navigation.md)
 
@@ -123,4 +123,61 @@ const scrollRef = useRef<HTMLDivElement>(null)
 
 // 点击事件
 <BackTop onClick={(e) => console.log('clicked', e)} />
+```
+
+---
+
+## Anchor 锚点导航
+
+```tsx
+import { Anchor, AnchorLink } from '@expcat/tigercat-react'
+
+// 基础用法
+<Anchor>
+  <AnchorLink href="#section1" title="Section 1" />
+  <AnchorLink href="#section2" title="Section 2" />
+  <AnchorLink href="#section3" title="Section 3" />
+</Anchor>
+
+// 横向导航
+<Anchor direction="horizontal">
+  <AnchorLink href="#intro" title="Introduction" />
+  <AnchorLink href="#api" title="API" />
+  <AnchorLink href="#examples" title="Examples" />
+</Anchor>
+
+// 固定定位并显示指示器
+<Anchor affix offsetTop={80} showInkInFixed>
+  <AnchorLink href="#overview" title="Overview" />
+  <AnchorLink href="#features" title="Features" />
+</Anchor>
+
+// 自定义滚动容器
+const containerRef = useRef<HTMLDivElement>(null)
+
+<div ref={containerRef} className="h-96 overflow-auto">
+  <Anchor getContainer={() => containerRef.current!}>
+    <AnchorLink href="#part1" title="Part 1" />
+    <AnchorLink href="#part2" title="Part 2" />
+  </Anchor>
+</div>
+
+// 监听事件
+<Anchor
+  onClick={(e, href) => console.log('Clicked:', href)}
+  onChange={(activeLink) => console.log('Active link changed:', activeLink)}
+>
+  <AnchorLink href="#section1" title="Section 1" />
+  <AnchorLink href="#section2" title="Section 2" />
+</Anchor>
+
+// 自定义链接内容
+<Anchor>
+  <AnchorLink href="#custom">
+    <span className="flex items-center gap-2">
+      <Icon name="star" />
+      Custom Link
+    </span>
+  </AnchorLink>
+</Anchor>
 ```

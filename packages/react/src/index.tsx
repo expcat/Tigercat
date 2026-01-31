@@ -206,6 +206,10 @@ export { Carousel } from './components/Carousel'
 export type { CarouselProps, CarouselRef } from './components/Carousel'
 export { BackTop } from './components/BackTop'
 export type { BackTopProps } from './components/BackTop'
+export { Anchor, useAnchorContext } from './components/Anchor'
+export type { AnchorProps, AnchorContextValue } from './components/Anchor'
+export { AnchorLink } from './components/AnchorLink'
+export type { AnchorLinkProps } from './components/AnchorLink'
 
 // Hooks
 export { useChartInteraction } from './hooks/useChartInteraction'

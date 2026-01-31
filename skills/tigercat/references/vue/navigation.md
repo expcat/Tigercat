@@ -5,7 +5,7 @@ description: Vue navigation components usage
 
 # Navigation Components (Vue)
 
-导航组件：Breadcrumb, Dropdown, Menu, Pagination, Steps, Tabs, Tree
+导航组件：Breadcrumb, Dropdown, Menu, Pagination, Steps, Tabs, Tree, BackTop, Anchor
 
 > **Props Reference**: [shared/props/navigation.md](../shared/props/navigation.md)
 
@@ -129,4 +129,61 @@ const treeData = [
     </div>
   </BackTop>
 </template>
+```
+
+---
+
+## Anchor 锚点导航
+
+```vue
+<template>
+  <!-- 基础用法 -->
+  <Anchor>
+    <AnchorLink href="#section1" title="Section 1" />
+    <AnchorLink href="#section2" title="Section 2" />
+    <AnchorLink href="#section3" title="Section 3" />
+  </Anchor>
+
+  <!-- 横向导航 -->
+  <Anchor direction="horizontal">
+    <AnchorLink href="#intro" title="Introduction" />
+    <AnchorLink href="#api" title="API" />
+    <AnchorLink href="#examples" title="Examples" />
+  </Anchor>
+
+  <!-- 固定定位并显示指示器 -->
+  <Anchor :affix="true" :offset-top="80" :show-ink-in-fixed="true">
+    <AnchorLink href="#overview" title="Overview" />
+    <AnchorLink href="#features" title="Features" />
+  </Anchor>
+
+  <!-- 自定义滚动容器 -->
+  <div ref="containerRef" class="h-96 overflow-auto">
+    <Anchor :get-container="() => containerRef">
+      <AnchorLink href="#part1" title="Part 1" />
+      <AnchorLink href="#part2" title="Part 2" />
+    </Anchor>
+  </div>
+
+  <!-- 监听事件 -->
+  <Anchor @click="handleClick" @change="handleChange">
+    <AnchorLink href="#section1" title="Section 1" />
+    <AnchorLink href="#section2" title="Section 2" />
+  </Anchor>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { Anchor, AnchorLink } from '@expcat/tigercat-vue'
+
+const containerRef = ref(null)
+
+const handleClick = (e, href) => {
+  console.log('Clicked:', href)
+}
+
+const handleChange = (activeLink) => {
+  console.log('Active link changed:', activeLink)
+}
+</script>
 ```
