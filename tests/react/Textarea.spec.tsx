@@ -502,8 +502,7 @@ describe('Textarea', () => {
       const { getByRole } = render(<Textarea />)
 
       expect(getByRole('textbox')).toBeInTheDocument()
-    }
-    )
+    })
 
     it('supports aria-label', () => {
       const { getByLabelText } = render(<Textarea aria-label="Comments textarea" />)

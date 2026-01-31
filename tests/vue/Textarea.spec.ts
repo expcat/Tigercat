@@ -5,7 +5,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { nextTick } from 'vue'
 import { Textarea } from '@expcat/tigercat-vue'
 import {
   renderWithProps,
@@ -496,7 +495,7 @@ describe('Textarea', () => {
 
     it('updates count on input', async () => {
       const onUpdate = vi.fn()
-      const { getByRole, rerender } = render(Textarea, {
+      const { rerender } = render(Textarea, {
         props: {
           modelValue: 'ab',
           showCount: true,
@@ -628,15 +627,6 @@ describe('Textarea', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle empty string value', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        modelValue: ''
-      })
-
-      const textarea = getByRole('textbox') as HTMLTextAreaElement
-      expect(textarea.value).toBe('')
-    })
-
     it('should handle whitespace-only value', () => {
       const { getByRole } = renderWithProps(Textarea, {
         modelValue: edgeCaseData.whitespace

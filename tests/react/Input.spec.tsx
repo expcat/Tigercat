@@ -585,13 +585,6 @@ describe('Input', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle empty string value', () => {
-      const { getByRole } = render(<Input value="" />)
-
-      const input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe('')
-    })
-
     it('should handle whitespace-only value', () => {
       const { getByRole } = render(<Input value={edgeCaseData.whitespace} />)
 

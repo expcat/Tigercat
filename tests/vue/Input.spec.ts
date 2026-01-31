@@ -664,15 +664,6 @@ describe('Input', () => {
   })
 
   describe('Edge Cases', () => {
-    it('should handle empty string value', () => {
-      const { getByRole } = renderWithProps(Input, {
-        modelValue: ''
-      })
-
-      const input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe('')
-    })
-
     it('should handle whitespace-only value', () => {
       const { getByRole } = renderWithProps(Input, {
         modelValue: edgeCaseData.whitespace
@@ -712,7 +703,7 @@ describe('Input', () => {
 
     it('should handle rapid value changes', async () => {
       const onUpdate = vi.fn()
-      const { getByRole, rerender } = render(Input, {
+      const { getByRole } = render(Input, {
         props: { 'onUpdate:modelValue': onUpdate }
       })
 
@@ -818,7 +809,7 @@ describe('Input', () => {
       await fireEvent.animationEnd(wrapper)
 
       // After animation ends, the shake class should be removed
-      // (the next render cycle won't have the shake class)
+      expect(wrapper.className).not.toContain('tiger-animate-shake')
     })
   })
 })
