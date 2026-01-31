@@ -746,7 +746,7 @@ describe('Select', () => {
   describe('Multiple Selection Features', () => {
     it('should toggle selection in multiple mode', async () => {
       const onUpdate = vi.fn()
-      const { container, getByText } = render(Select, {
+      const { container } = render(Select, {
         props: {
           options: testOptions,
           multiple: true,
@@ -809,7 +809,7 @@ describe('Select', () => {
     })
 
     it('should reset search query when dropdown closes', async () => {
-      const { container, getByText, queryByText } = render(Select, {
+      const { container, getByText } = render(Select, {
         props: {
           options: testOptions,
           searchable: true
