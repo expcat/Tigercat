@@ -16,10 +16,11 @@ const basicSnippet = `<Anchor>
   <AnchorLink href="#section3" title="Section 3" />
 </Anchor>`
 
-const horizontalSnippet = `<Anchor direction="horizontal">
-  <AnchorLink href="#intro" title="介绍" />
-  <AnchorLink href="#usage" title="使用方法" />
-  <AnchorLink href="#api" title="API" />
+const horizontalSnippet = `<Anchor direction="horizontal" :getContainer="getMainContainer">
+  <AnchorLink href="#demo-basic" title="基本用法" />
+  <AnchorLink href="#demo-horizontal" title="水平方向" />
+  <AnchorLink href="#demo-container" title="自定义容器" />
+  <AnchorLink href="#demo-nested" title="嵌套锚点" />
 </Anchor>`
 
 const nestedSnippet = `<Anchor>
@@ -78,18 +79,19 @@ const handleChange = (href: string) => {
                      :code="horizontalSnippet">
             <div class="p-6 bg-gray-50 rounded-lg">
               <Anchor direction="horizontal"
+                      :getContainer="getMainContainer"
                       @change="handleChange">
-                <AnchorLink href="#horizontal-intro"
-                            title="介绍" />
-                <AnchorLink href="#horizontal-usage"
-                            title="使用方法" />
-                <AnchorLink href="#horizontal-api"
-                            title="API 文档" />
-                <AnchorLink href="#horizontal-faq"
-                            title="常见问题" />
+                <AnchorLink href="#demo-basic"
+                            title="基本用法" />
+                <AnchorLink href="#demo-horizontal"
+                            title="水平方向" />
+                <AnchorLink href="#demo-container"
+                            title="自定义容器" />
+                <AnchorLink href="#demo-nested"
+                            title="嵌套锚点" />
               </Anchor>
               <p class="mt-4 text-sm text-gray-500">
-                水平锚点适合用于文章顶部的快速导航。
+                水平锚点适合用于页面顶部的快速导航。
               </p>
             </div>
           </DemoBlock>
