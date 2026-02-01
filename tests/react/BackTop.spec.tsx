@@ -46,9 +46,7 @@ describe('BackTop', () => {
   })
 
   it('is hidden when scroll position is below visibilityHeight', () => {
-    const { container } = render(
-      <BackTop visibilityHeight={400} target={() => scrollContainer} />
-    )
+    const { container } = render(<BackTop visibilityHeight={400} target={() => scrollContainer} />)
 
     scrollContainer.scrollTop = 100
 
@@ -57,9 +55,7 @@ describe('BackTop', () => {
   })
 
   it('becomes visible when scroll position exceeds visibilityHeight', async () => {
-    const { container } = render(
-      <BackTop visibilityHeight={100} target={() => scrollContainer} />
-    )
+    const { container } = render(<BackTop visibilityHeight={100} target={() => scrollContainer} />)
 
     scrollContainer.scrollTop = 200
     fireEvent.scroll(scrollContainer)
@@ -80,10 +76,20 @@ describe('BackTop', () => {
   })
 
   it('merges custom className', () => {
-    const { container } = render(<BackTop target={() => scrollContainer} className="custom-class" />)
+    const { container } = render(
+      <BackTop target={() => scrollContainer} className="custom-class" />
+    )
 
     const button = container.querySelector('button')
     expect(button).toHaveClass('custom-class')
+    // When target is a custom container (not window), uses absolute positioning
+    expect(button).toHaveClass('absolute')
+  })
+
+  it('uses fixed positioning when target is window', () => {
+    const { container } = render(<BackTop target={() => window} />)
+
+    const button = container.querySelector('button')
     expect(button).toHaveClass('fixed')
   })
 
@@ -98,9 +104,7 @@ describe('BackTop', () => {
   })
 
   it('uses custom visibilityHeight', async () => {
-    const { container } = render(
-      <BackTop visibilityHeight={50} target={() => scrollContainer} />
-    )
+    const { container } = render(<BackTop visibilityHeight={50} target={() => scrollContainer} />)
 
     scrollContainer.scrollTop = 60
     fireEvent.scroll(scrollContainer)
@@ -124,7 +128,9 @@ describe('BackTop', () => {
     })
 
     it('uses custom aria-label when provided', () => {
-      const { container } = render(<BackTop target={() => scrollContainer} aria-label="Scroll to top" />)
+      const { container } = render(
+        <BackTop target={() => scrollContainer} aria-label="Scroll to top" />
+      )
 
       const button = container.querySelector('button')
       expect(button).toHaveAttribute('aria-label', 'Scroll to top')

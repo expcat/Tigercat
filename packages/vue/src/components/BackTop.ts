@@ -1,4 +1,14 @@
-import { defineComponent, h, ref, computed, onMounted, onBeforeUnmount, PropType } from 'vue'
+import {
+  defineComponent,
+  h,
+  ref,
+  shallowRef,
+  computed,
+  onMounted,
+  onBeforeUnmount,
+  unref,
+  PropType
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -6,6 +16,7 @@ import {
   getScrollTop,
   scrollToTop,
   backTopButtonClasses,
+  backTopContainerClasses,
   backTopHiddenClasses,
   backTopVisibleClasses,
   backTopIconPath,
@@ -13,7 +24,7 @@ import {
 } from '@expcat/tigercat-core'
 
 export interface VueBackTopProps extends BackTopProps {
-  target?: () => HTMLElement | Window
+  target?: () => HTMLElement | Window | null
   className?: string
   style?: Record<string, unknown>
 }
@@ -49,7 +60,7 @@ export const BackTop = defineComponent({
      * @default () => window
      */
     target: {
-      type: Function as PropType<() => HTMLElement | Window>,
+      type: Function as PropType<() => HTMLElement | Window | null>,
       default: () => window
     },
     /**
@@ -72,37 +83,40 @@ export const BackTop = defineComponent({
   emits: ['click'],
   setup(props, { slots, emit, attrs }) {
     const visible = ref(false)
-    let targetElement: HTMLElement | Window | null = null
+    const targetElement = shallowRef<HTMLElement | Window | null>(null)
 
     const handleScroll = () => {
-      if (!targetElement) return
-      const scrollTop = getScrollTop(targetElement)
+      if (!targetElement.value) return
+      const scrollTop = getScrollTop(targetElement.value)
       visible.value = scrollTop >= props.visibilityHeight
     }
 
     const handleClick = (event: MouseEvent) => {
-      if (!targetElement) return
-      scrollToTop(targetElement, props.duration)
+      if (!targetElement.value) return
+      scrollToTop(targetElement.value, props.duration)
       emit('click', event)
     }
 
     onMounted(() => {
-      targetElement = props.target() ?? window
-      if (targetElement) {
-        targetElement.addEventListener('scroll', handleScroll, { passive: true })
-        handleScroll()
-      }
+      const nextTarget = unref(props.target()) ?? window
+      targetElement.value = nextTarget
+      targetElement.value.addEventListener('scroll', handleScroll, { passive: true })
+      handleScroll()
     })
 
     onBeforeUnmount(() => {
-      if (targetElement) {
-        targetElement.removeEventListener('scroll', handleScroll)
+      if (targetElement.value) {
+        targetElement.value.removeEventListener('scroll', handleScroll)
       }
     })
 
     const buttonClasses = computed(() => {
+      // Use targetElement.value after mount, fallback to props.target() for initial render
+      const targetResult = targetElement.value ?? unref(props.target())
+      const isWindowTarget = !targetResult || targetResult === window
+      const positionClasses = isWindowTarget ? backTopButtonClasses : backTopContainerClasses
       return classNames(
-        backTopButtonClasses,
+        positionClasses,
         visible.value ? backTopVisibleClasses : backTopHiddenClasses,
         props.className,
         coerceClassValue(attrs.class)

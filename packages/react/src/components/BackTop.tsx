@@ -4,6 +4,7 @@ import {
   getScrollTop,
   scrollToTop,
   backTopButtonClasses,
+  backTopContainerClasses,
   backTopHiddenClasses,
   backTopVisibleClasses,
   backTopIconPath,
@@ -11,13 +12,12 @@ import {
 } from '@expcat/tigercat-core'
 
 export interface BackTopProps
-  extends CoreBackTopProps,
-    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> {
+  extends CoreBackTopProps, Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> {
   /**
    * Target element to listen for scroll events
    * @default () => window
    */
-  target?: () => HTMLElement | Window
+  target?: () => HTMLElement | Window | null
   /**
    * Click event handler
    */
@@ -55,6 +55,7 @@ export const BackTop: React.FC<BackTopProps> = ({
 
   const handleScroll = useCallback(() => {
     const targetElement = target()
+    if (!targetElement) return
     const scrollTop = getScrollTop(targetElement)
     setVisible(scrollTop >= visibilityHeight)
   }, [target, visibilityHeight])
@@ -62,7 +63,9 @@ export const BackTop: React.FC<BackTopProps> = ({
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const targetElement = target()
-      scrollToTop(targetElement, duration)
+      if (targetElement) {
+        scrollToTop(targetElement, duration)
+      }
       onClick?.(event)
     },
     [target, duration, onClick]
@@ -70,6 +73,8 @@ export const BackTop: React.FC<BackTopProps> = ({
 
   useEffect(() => {
     const targetElement = target()
+    if (!targetElement) return
+
     targetElement.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll()
 
@@ -78,15 +83,16 @@ export const BackTop: React.FC<BackTopProps> = ({
     }
   }, [target, handleScroll])
 
-  const buttonClasses = useMemo(
-    () =>
-      classNames(
-        backTopButtonClasses,
-        visible ? backTopVisibleClasses : backTopHiddenClasses,
-        className
-      ),
-    [visible, className]
-  )
+  const buttonClasses = useMemo(() => {
+    const targetElement = target()
+    const positionClasses =
+      !targetElement || targetElement === window ? backTopButtonClasses : backTopContainerClasses
+    return classNames(
+      positionClasses,
+      visible ? backTopVisibleClasses : backTopHiddenClasses,
+      className
+    )
+  }, [target, visible, className])
 
   return (
     <button
