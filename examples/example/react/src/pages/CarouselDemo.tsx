@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Carousel, Button, Space } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 

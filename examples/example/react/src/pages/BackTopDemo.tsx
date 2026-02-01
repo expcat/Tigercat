@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { BackTop, Button } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 

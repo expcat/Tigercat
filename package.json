@@ -35,6 +35,7 @@
     "test:validate": "node ./scripts/validate-tests.mjs",
     "example:vue": "pnpm --filter @expcat/tigercat-example-vue3 dev",
     "example:react": "pnpm --filter @expcat/tigercat-example-react dev",
+    "example:build": "pnpm --filter @expcat/tigercat-example-react build && pnpm --filter @expcat/tigercat-example-vue3 build",
     "example:all": "node ./scripts/run-examples.mjs",
     "dev:check": "node ./scripts/check-env.mjs",
     "setup": "node ./scripts/setup.mjs"
