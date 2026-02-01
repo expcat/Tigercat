@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { List, Card, Space, Button, type ListProps } from '@expcat/tigercat-react'
+import { List, Card, Space, Button, Pagination, type ListProps } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 type DemoItem = NonNullable<ListProps['dataSource']>[number]
@@ -88,10 +88,15 @@ const renderSnippet = `<List dataSource={productData} hoverable renderItem={(ite
 
 const headerFooterSnippet = `<List dataSource={basicData} header={...} footer={...} />`
 
-const paginationSnippet = `<List
-  dataSource={largeData}
-  pagination={{ current: 1, pageSize: 10, showSizeChanger: true, showTotal: true }}
-  onPageChange={(page) => setPageInfo(page)}
+const paginationSnippet = `<List dataSource={pagedListData} />
+<Pagination
+  current={pageInfo.current}
+  pageSize={pageInfo.pageSize}
+  total={largeData.length}
+  showSizeChanger
+  showTotal
+  onChange={(current, pageSize) => setPageInfo({ current, pageSize })}
+  onPageSizeChange={(current, pageSize) => setPageInfo({ current, pageSize })}
 />`
 
 const gridSnippet = `<List
@@ -110,6 +115,11 @@ const clickableSnippet = `<List dataSource={basicData} hoverable onItemClick={ha
 export default function ListDemo() {
   const [loading, setLoading] = useState(false)
   const [pageInfo, setPageInfo] = useState({ current: 1, pageSize: 10 })
+
+  const pagedListData = largeData.slice(
+    (pageInfo.current - 1) * pageInfo.pageSize,
+    pageInfo.current * pageInfo.pageSize
+  )
 
   const handleItemClick = (item: DemoItem, index: number) => {
     console.log('点击了列表项:', item, '索引:', index)
@@ -211,16 +221,18 @@ export default function ListDemo() {
         description="通过 renderItem 自定义每一项的布局。"
         code={renderSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <List
-            dataSource={productData}
-            hoverable
-            renderItem={(item) => {
-              const name = typeof item.name === 'string' ? item.name : ''
-              const price = typeof item.price === 'string' ? item.price : ''
-              const stock =
-                typeof item.stock === 'number'
-                  ? item.stock
-                  : typeof item.stock === 'string'
+          <div className="space-y-3">
+            <List dataSource={pagedListData} />
+            <Pagination
+              current={pageInfo.current}
+              pageSize={pageInfo.pageSize}
+              total={largeData.length}
+              showSizeChanger
+              showTotal
+              onChange={(current, pageSize) => setPageInfo({ current, pageSize })}
+              onPageSizeChange={(current, pageSize) => setPageInfo({ current, pageSize })}
+            />
+          </div>
                     ? Number(item.stock)
                     : undefined
 

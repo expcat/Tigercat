@@ -3,7 +3,7 @@ import { computed, nextTick, onMounted, provide, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { DemoLang } from '@demo-shared/app-config'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
-import { ConfigProvider, Link } from '@expcat/tigercat-vue'
+import { Anchor, AnchorLink, Breadcrumb, BreadcrumbItem, ConfigProvider } from '@expcat/tigercat-vue'
 import { getStoredLang, getStoredSiderCollapsed, setStoredLang, setStoredSiderCollapsed } from '@demo-shared/prefs'
 import AppHeader from '../components/AppHeader.vue'
 import AppSider from '../components/AppSider.vue'
@@ -25,6 +25,7 @@ function slugify(input: string): string {
 
 const route = useRoute()
 const pageRootRef = ref<HTMLElement | null>(null)
+const mainScrollRef = ref<HTMLElement | null>(null)
 const sections = ref<DemoSection[]>([])
 const pageTitle = ref('')
 const lang = ref<DemoLang>(getStoredLang())
@@ -35,6 +36,8 @@ provide('demo-lang', lang)
 const isHome = computed(() => route.path === '/')
 
 const tigerLocale = computed(() => getDemoTigerLocale(lang.value))
+
+const homeLabel = computed(() => (lang.value === 'zh-CN' ? '首页' : 'Home'))
 
 const headerTitle = computed(() => {
   if (pageTitle.value) return pageTitle.value
@@ -50,11 +53,11 @@ const toggleSider = () => {
   isSiderCollapsed.value = !isSiderCollapsed.value
 }
 
-const scrollToSection = (id: string) => {
-  const el = document.getElementById(id)
-  el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+const getMainContainer = () => mainScrollRef.value || window
+
+const handleAnchorClick = (_event: Event, href: string) => {
   try {
-    window.history.replaceState(null, '', `#${id}`)
+    window.history.replaceState(null, '', href)
   } catch {
     // ignore
   }
@@ -140,26 +143,31 @@ watch(
                   :is-sider-collapsed="isSiderCollapsed" />
 
         <main class="flex-1 min-w-0 h-full overflow-hidden">
-          <div class="h-full overflow-y-auto">
+          <div ref="mainScrollRef"
+               class="h-full overflow-y-auto">
             <div v-if="!isHome && (headerTitle || sections.length > 0)"
                  class="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
               <div class="px-6 py-3">
                 <div class="flex items-center justify-between gap-4">
                   <div class="min-w-0 text-sm font-semibold text-gray-900 truncate dark:text-gray-100">
-                    {{ headerTitle }}
-                  </div>
-                  <div v-if="sections.length > 0"
-                       class="flex items-center gap-2 flex-wrap justify-end">
-                    <Link v-for="s in sections"
-                          :key="s.id"
-                          :href="`#${s.id}`"
-                          :underline="false"
-                          variant="default"
-                          size="sm"
-                          @click.prevent="scrollToSection(s.id)"
-                          class="text-sm px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800">
-                      {{ s.label }}
-                    </Link>
+                    <Breadcrumb>
+                      <BreadcrumbItem href="/">{{ homeLabel }}</BreadcrumbItem>
+                      <BreadcrumbItem current>{{ headerTitle }}</BreadcrumbItem>
+                      <template #extra>
+                        <Anchor v-if="sections.length > 0"
+                                :affix="false"
+                                direction="horizontal"
+                                :getContainer="getMainContainer"
+                                class="flex items-center justify-end"
+                                @click="handleAnchorClick">
+                          <AnchorLink v-for="s in sections"
+                                      :key="s.id"
+                                      :href="`#${s.id}`"
+                                      :title="s.label"
+                                      class="text-sm px-2 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-800" />
+                        </Anchor>
+                      </template>
+                    </Breadcrumb>
                   </div>
                 </div>
               </div>

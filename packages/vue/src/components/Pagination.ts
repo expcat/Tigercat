@@ -19,6 +19,7 @@ import {
   formatPageAriaLabel,
   type PaginationSize,
   type PaginationAlign,
+  type PaginationPageSizeOptionItem,
   type TigerLocale
 } from '@expcat/tigercat-core'
 
@@ -28,7 +29,7 @@ export interface VuePaginationProps {
   total?: number
   pageSize?: number
   defaultPageSize?: number
-  pageSizeOptions?: number[]
+  pageSizeOptions?: PaginationPageSizeOptionItem[]
   showQuickJumper?: boolean
   showSizeChanger?: boolean
   showTotal?: boolean
@@ -96,7 +97,7 @@ export const Pagination = defineComponent({
      * @default [10, 20, 50, 100]
      */
     pageSizeOptions: {
-      type: Array as PropType<number[]>,
+      type: Array as PropType<PaginationPageSizeOptionItem[]>,
       default: () => [10, 20, 50, 100]
     },
     /**
@@ -317,6 +318,20 @@ export const Pagination = defineComponent({
 
     const mergedStyle = computed(() => mergeStyleValues(attrsStyle, props.style))
 
+    const normalizedPageSizeOptions = computed(() => {
+      return (props.pageSizeOptions || []).map((option) => {
+        if (typeof option === 'number') {
+          return {
+            value: option,
+            label: `${option} ${labels.value.itemsPerPageText}`
+          }
+        }
+
+        const label = option.label ?? `${option.value} ${labels.value.itemsPerPageText}`
+        return { value: option.value, label }
+      })
+    })
+
     return () => {
       if (shouldHide.value) {
         return null
@@ -341,11 +356,10 @@ export const Pagination = defineComponent({
       }
 
       if (props.simple) {
-        // Simple mode: only prev, current/total, next
+        // Simple mode: prev, current/total, next
         const prevDisabled = validatedCurrentPage.value <= 1 || props.disabled
         const nextDisabled = validatedCurrentPage.value >= totalPages.value || props.disabled
 
-        // Previous button
         elements.push(
           h(
             'button',
@@ -360,7 +374,6 @@ export const Pagination = defineComponent({
           )
         )
 
-        // Current/Total display
         elements.push(
           h(
             'span',
@@ -378,7 +391,6 @@ export const Pagination = defineComponent({
           )
         )
 
-        // Next button
         elements.push(
           h(
             'button',
@@ -397,7 +409,6 @@ export const Pagination = defineComponent({
         const prevDisabled = validatedCurrentPage.value <= 1 || props.disabled
         const nextDisabled = validatedCurrentPage.value >= totalPages.value || props.disabled
 
-        // Previous button
         elements.push(
           h(
             'button',
@@ -412,7 +423,6 @@ export const Pagination = defineComponent({
           )
         )
 
-        // Page numbers
         const pageNumbers = getPageNumbers(
           validatedCurrentPage.value,
           totalPages.value,
@@ -452,7 +462,6 @@ export const Pagination = defineComponent({
           }
         })
 
-        // Next button
         elements.push(
           h(
             'button',
@@ -468,7 +477,6 @@ export const Pagination = defineComponent({
         )
       }
 
-      // Show page size selector
       if (props.showSizeChanger) {
         elements.push(
           h(
@@ -483,21 +491,20 @@ export const Pagination = defineComponent({
               },
               'aria-label': labels.value.itemsPerPageText
             },
-            props.pageSizeOptions.map((size) =>
+            normalizedPageSizeOptions.value.map((sizeOption) =>
               h(
                 'option',
                 {
-                  value: size,
-                  key: size
+                  value: sizeOption.value,
+                  key: sizeOption.value
                 },
-                `${size} ${labels.value.itemsPerPageText}`
+                sizeOption.label
               )
             )
           )
         )
       }
 
-      // Show quick jumper
       if (props.showQuickJumper) {
         elements.push(
           h(

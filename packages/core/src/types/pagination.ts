@@ -13,6 +13,16 @@ export type PaginationSize = 'small' | 'medium' | 'large'
 export type PaginationAlign = 'left' | 'center' | 'right'
 
 /**
+ * Page size option type
+ */
+export interface PaginationPageSizeOption {
+  value: number
+  label?: string
+}
+
+export type PaginationPageSizeOptionItem = number | PaginationPageSizeOption
+
+/**
  * Base pagination props interface
  */
 export interface PaginationProps {
@@ -50,7 +60,7 @@ export interface PaginationProps {
    * Available page size options
    * @default [10, 20, 50, 100]
    */
-  pageSizeOptions?: number[]
+  pageSizeOptions?: PaginationPageSizeOptionItem[]
 
   /**
    * Whether to show quick jumper (input for page number)

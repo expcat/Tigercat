@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, h } from 'vue'
-import { List, Card, Space, Button } from '@expcat/tigercat-vue'
+import { computed, ref, h } from 'vue'
+import { List, Card, Space, Button, Pagination } from '@expcat/tigercat-vue'
 import type { ListItem } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
@@ -30,11 +30,15 @@ const headerFooterSnippet = `<List :dataSource="basicData">
   <template #footer>...</template>
 </List>`
 
-const paginationSnippet = `<List
-  :dataSource="largeData"
-  :pagination="{ current: 1, pageSize: 10, showSizeChanger: true, showTotal: true }"
-  @page-change="handlePageChange"
-/>`
+const paginationSnippet = `<List :dataSource="pagedListData" />
+<Pagination
+  :current="pageInfo.current"
+  :pageSize="pageInfo.pageSize"
+  :total="largeData.length"
+  showSizeChanger
+  showTotal
+  @change="handlePageChange"
+  @page-size-change="handlePageChange" />`
 
 const gridSnippet = `<List
   :dataSource="gridData"
@@ -123,6 +127,11 @@ const productData = ref([
 const loading = ref(false)
 const pageInfo = ref({ current: 1, pageSize: 10 })
 
+const pagedListData = computed(() => {
+  const start = (pageInfo.value.current - 1) * pageInfo.value.pageSize
+  return largeData.value.slice(start, start + pageInfo.value.pageSize)
+})
+
 function handleItemClick(item: ListItem, index: number) {
   console.log('点击了列表项:', item, '索引:', index)
 }
@@ -134,9 +143,9 @@ function simulateLoading() {
   }, 2000)
 }
 
-function handlePageChange(page: { current: number; pageSize: number }) {
-  pageInfo.value = page
-  console.log('分页变化:', page)
+function handlePageChange(current: number, pageSize: number) {
+  pageInfo.value = { current, pageSize }
+  console.log('分页变化:', { current, pageSize })
 }
 </script>
 
@@ -288,14 +297,16 @@ function handlePageChange(page: { current: number; pageSize: number }) {
                description="当数据较多时，可以使用分页功能。"
                :code="paginationSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <List :dataSource="largeData"
-              :pagination="{
-                current: 1,
-                pageSize: 10,
-                showSizeChanger: true,
-                showTotal: true
-              }"
-              @page-change="handlePageChange" />
+        <div class="space-y-3">
+          <List :dataSource="pagedListData" />
+          <Pagination :current="pageInfo.current"
+                      :pageSize="pageInfo.pageSize"
+                      :total="largeData.length"
+                      showSizeChanger
+                      showTotal
+                      @change="handlePageChange"
+                      @page-size-change="handlePageChange" />
+        </div>
         <div class="mt-3 text-sm text-gray-600">
           当前：第 {{ pageInfo.current }} 页，{{ pageInfo.pageSize }} / 页
         </div>
