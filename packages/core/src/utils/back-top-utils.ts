@@ -57,10 +57,21 @@ export function scrollToTop(
 }
 
 /**
- * Default CSS classes for the BackTop button
+ * Base CSS classes for the BackTop button (without positioning)
  */
-export const backTopButtonClasses =
-  'fixed bottom-8 right-8 z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[var(--tiger-primary,#2563eb)] text-white shadow-lg transition-all duration-300 hover:bg-[var(--tiger-primary-hover,#1d4ed8)] focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-offset-2'
+export const backTopBaseClasses =
+  'z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[var(--tiger-primary,#2563eb)] text-white shadow-lg transition-all duration-300 hover:bg-[var(--tiger-primary-hover,#1d4ed8)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-offset-2'
+
+/**
+ * Default CSS classes for the BackTop button (fixed positioning for window target)
+ */
+export const backTopButtonClasses = `fixed bottom-8 right-8 ${backTopBaseClasses}`
+
+/**
+ * CSS classes for the BackTop button when using a custom scroll container (sticky positioning)
+ * Should be placed inside the scroll container content to stay visible while scrolling
+ */
+export const backTopContainerClasses = `sticky bottom-4 ml-auto mr-4 ${backTopBaseClasses}`
 
 /**
  * Default CSS classes for hidden state
@@ -75,5 +86,4 @@ export const backTopVisibleClasses = 'opacity-100 translate-y-0'
 /**
  * Default up arrow icon SVG path
  */
-export const backTopIconPath =
-  'M12 19V5M12 5l-7 7M12 5l7 7'
+export const backTopIconPath = 'M12 19V5M12 5l-7 7M12 5l7 7'

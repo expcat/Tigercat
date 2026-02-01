@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { BackTop, Button } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
@@ -12,13 +12,14 @@ const customContentSnippet = `<BackTop>
   <div className="custom-back-top">UP</div>
 </BackTop>`
 
-const targetSnippet = `<div ref={scrollContainer} className="scroll-container">
-  {/* 长内容 */}
-</div>
-<BackTop target={() => scrollContainer.current} />`
-
 export default function BackTopDemo() {
-  const scrollContainer = useRef<HTMLDivElement>(null)
+  const [pageScrollContainer, setPageScrollContainer] = useState<HTMLElement | null>(null)
+
+  useEffect(() => {
+    // 获取布局中的实际滚动容器
+    const container = document.querySelector('main > div.overflow-y-auto') as HTMLElement
+    setPageScrollContainer(container)
+  }, [])
 
   const handleClick = () => {
     console.log('BackTop clicked!')
@@ -72,27 +73,6 @@ export default function BackTopDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock
-        title="滚动容器"
-        description="可以指定滚动容器，在容器内滚动时触发。"
-        code={targetSnippet}>
-        <div className="p-6 bg-gray-50 rounded-lg">
-          <p className="text-gray-600 mb-4">在下方容器内滚动，查看回到顶部效果：</p>
-          <div
-            ref={scrollContainer}
-            className="h-64 overflow-auto border border-gray-200 rounded-lg p-4 bg-white relative">
-            <div className="space-y-4">
-              {Array.from({ length: 20 }, (_, i) => (
-                <p key={i} className="text-gray-600">
-                  这是第 {i + 1} 段内容。向下滚动查看更多...
-                </p>
-              ))}
-            </div>
-            <BackTop target={() => scrollContainer.current} visibilityHeight={100} />
-          </div>
-        </div>
-      </DemoBlock>
-
       <DemoBlock title="点击回调" description="点击按钮时触发回调函数。" code={basicSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <p className="text-gray-600 mb-4">
@@ -116,8 +96,8 @@ export default function BackTopDemo() {
         ))}
       </div>
 
-      {/* 页面级 BackTop */}
-      <BackTop onClick={handleClick} />
+      {/* 页面级 BackTop - 监听布局的滚动容器 */}
+      {pageScrollContainer && <BackTop target={() => pageScrollContainer} onClick={handleClick} />}
     </div>
   )
 }
