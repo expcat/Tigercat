@@ -221,18 +221,16 @@ export default function ListDemo() {
         description="通过 renderItem 自定义每一项的布局。"
         code={renderSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="space-y-3">
-            <List dataSource={pagedListData} />
-            <Pagination
-              current={pageInfo.current}
-              pageSize={pageInfo.pageSize}
-              total={largeData.length}
-              showSizeChanger
-              showTotal
-              onChange={(current, pageSize) => setPageInfo({ current, pageSize })}
-              onPageSizeChange={(current, pageSize) => setPageInfo({ current, pageSize })}
-            />
-          </div>
+          <List
+            dataSource={productData}
+            hoverable
+            renderItem={(item) => {
+              const name = typeof item.name === 'string' ? item.name : ''
+              const price = typeof item.price === 'string' ? item.price : ''
+              const stock =
+                typeof item.stock === 'number'
+                  ? item.stock
+                  : typeof item.stock === 'string'
                     ? Number(item.stock)
                     : undefined
 
@@ -276,19 +274,18 @@ export default function ListDemo() {
         description="当数据较多时，可以使用分页功能。"
         code={paginationSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <List
-            dataSource={largeData}
-            pagination={{
-              current: 1,
-              pageSize: 10,
-              showSizeChanger: true,
-              showTotal: true
-            }}
-            onPageChange={(page) => {
-              setPageInfo(page)
-              console.log('分页变化:', page)
-            }}
-          />
+          <div className="space-y-3">
+            <List dataSource={pagedListData} />
+            <Pagination
+              current={pageInfo.current}
+              pageSize={pageInfo.pageSize}
+              total={largeData.length}
+              showSizeChanger
+              showTotal
+              onChange={(current, pageSize) => setPageInfo({ current, pageSize })}
+              onPageSizeChange={(current, pageSize) => setPageInfo({ current, pageSize })}
+            />
+          </div>
           <div className="mt-3 text-sm text-gray-600">
             当前：第 {pageInfo.current} 页，{pageInfo.pageSize} / 页
           </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Collapse, CollapsePanel } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
@@ -49,6 +49,30 @@ export default function CollapseDemo() {
   const [activeKey6, setActiveKey6] = useState<string[]>([])
   const [activeKey7, setActiveKey7] = useState<string[]>(['1'])
 
+  const toStringArray = (value: string | number | (string | number)[] | undefined) => {
+    if (Array.isArray(value)) {
+      return value.map((item) => String(item))
+    }
+
+    if (value === undefined) {
+      return []
+    }
+
+    return [String(value)]
+  }
+
+  const toStringValue = (value: string | number | (string | number)[] | undefined) => {
+    if (Array.isArray(value)) {
+      return value.length > 0 ? String(value[0]) : undefined
+    }
+
+    if (value === undefined) {
+      return undefined
+    }
+
+    return String(value)
+  }
+
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
@@ -58,7 +82,9 @@ export default function CollapseDemo() {
 
       <DemoBlock title="基本用法" description="可以同时展开多个面板。" code={basicSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <Collapse activeKey={activeKey1} onChange={setActiveKey1}>
+          <Collapse
+            activeKey={activeKey1}
+            onChange={(value) => setActiveKey1(toStringArray(value))}>
             <CollapsePanel panelKey="1" header="面板标题 1">
               <p>这是面板 1 的内容。可以包含任意 HTML 元素。</p>
             </CollapsePanel>
@@ -74,7 +100,10 @@ export default function CollapseDemo() {
 
       <DemoBlock title="手风琴模式" description="每次只能展开一个面板。" code={accordionSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <Collapse accordion activeKey={activeKey2} onChange={setActiveKey2}>
+          <Collapse
+            accordion
+            activeKey={activeKey2}
+            onChange={(value) => setActiveKey2(toStringValue(value))}>
             <CollapsePanel panelKey="1" header="手风琴面板 1">
               <p>手风琴模式下，展开一个面板会自动收起其他面板。</p>
             </CollapsePanel>
@@ -90,7 +119,10 @@ export default function CollapseDemo() {
 
       <DemoBlock title="无边框" description="简洁的无边框样式。" code={borderlessSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <Collapse bordered={false} activeKey={activeKey3} onChange={setActiveKey3}>
+          <Collapse
+            bordered={false}
+            activeKey={activeKey3}
+            onChange={(value) => setActiveKey3(toStringArray(value))}>
             <CollapsePanel panelKey="1" header="无边框面板 1">
               <p>这是无边框面板的内容。</p>
             </CollapsePanel>
@@ -102,8 +134,11 @@ export default function CollapseDemo() {
       </DemoBlock>
 
       <DemoBlock title="透明背景" description="背景透明的 Ghost 模式。" code={ghostSnippet}>
-        <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
-          <Collapse ghost activeKey={activeKey4} onChange={setActiveKey4}>
+        <div className="p-6 bg-linear-to-r from-blue-50 to-purple-50 rounded-lg">
+          <Collapse
+            ghost
+            activeKey={activeKey4}
+            onChange={(value) => setActiveKey4(toStringArray(value))}>
             <CollapsePanel panelKey="1" header="Ghost 面板 1">
               <p>Ghost 模式的面板没有背景色，适合放在有背景的容器中。</p>
             </CollapsePanel>
@@ -116,7 +151,10 @@ export default function CollapseDemo() {
 
       <DemoBlock title="图标位置" description="可以将展开图标放在右侧。" code={iconPositionSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <Collapse expandIconPosition="end" activeKey={activeKey5} onChange={setActiveKey5}>
+          <Collapse
+            expandIconPosition="end"
+            activeKey={activeKey5}
+            onChange={(value) => setActiveKey5(toStringArray(value))}>
             <CollapsePanel panelKey="1" header="箭头在右侧">
               <p>展开图标位于面板标题的右侧。</p>
             </CollapsePanel>
@@ -129,7 +167,9 @@ export default function CollapseDemo() {
 
       <DemoBlock title="禁用面板" description="可以禁用某个面板。" code={disabledSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <Collapse activeKey={activeKey6} onChange={setActiveKey6}>
+          <Collapse
+            activeKey={activeKey6}
+            onChange={(value) => setActiveKey6(toStringArray(value))}>
             <CollapsePanel panelKey="1" header="正常面板">
               <p>这个面板可以正常展开和折叠。</p>
             </CollapsePanel>
@@ -145,7 +185,9 @@ export default function CollapseDemo() {
 
       <DemoBlock title="嵌套面板" description="折叠面板可以嵌套使用。" code={nestedSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <Collapse activeKey={activeKey7} onChange={setActiveKey7}>
+          <Collapse
+            activeKey={activeKey7}
+            onChange={(value) => setActiveKey7(toStringArray(value))}>
             <CollapsePanel panelKey="1" header="外层面板 1">
               <Collapse>
                 <CollapsePanel panelKey="1-1" header="嵌套面板 1-1">
