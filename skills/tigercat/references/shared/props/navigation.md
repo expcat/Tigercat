@@ -17,6 +17,7 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 | --------- | ------------------------------------ | ------- | :-: | :---: | ----------- |
 | items     | `{ label: string, href?: string }[]` | `[]`    |  ✓  |   ✓   | 层级数据    |
 | separator | `string`                             | `'/'`   |  ✓  |   ✓   | 分隔符      |
+| extra     | `VNode \| ReactNode`                 | -       |  ✓  |   ✓   | 末尾扩展区  |
 
 ---
 
@@ -87,18 +88,18 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ### Props
 
-| Prop            | Type                               | Default          | Vue | React | Description  |
-| --------------- | ---------------------------------- | ---------------- | :-: | :---: | ------------ |
-| page            | `number`                           | `1`              |  ✓  |   ✓   | 当前页       |
-| pageSize        | `number`                           | `10`             |  ✓  |   ✓   | 每页条数     |
-| total           | `number`                           | `0`              |  ✓  |   ✓   | 总条数       |
-| pageSizes       | `number[]`                         | `[10,20,50,100]` |  ✓  |   ✓   | 每页条数选项 |
-| showSizeChanger | `boolean`                          | `false`          |  ✓  |   ✓   | 显示条数选择 |
-| showQuickJumper | `boolean`                          | `false`          |  ✓  |   ✓   | 显示快速跳转 |
-| locale          | `{ pagination: PaginationLocale }` | -                |  ✓  |   ✓   | 国际化       |
+| Prop            | Type                                              | Default          | Vue | React | Description  |
+| --------------- | ------------------------------------------------- | ---------------- | :-: | :---: | ------------ |
+| current         | `number`                                          | `1`              |  ✓  |   ✓   | 当前页       |
+| pageSize        | `number`                                          | `10`             |  ✓  |   ✓   | 每页条数     |
+| total           | `number`                                          | `0`              |  ✓  |   ✓   | 总条数       |
+| pageSizeOptions | `(number \| { value: number, label?: string })[]` | `[10,20,50,100]` |  ✓  |   ✓   | 每页条数选项 |
+| showSizeChanger | `boolean`                                         | `false`          |  ✓  |   ✓   | 显示条数选择 |
+| showQuickJumper | `boolean`                                         | `false`          |  ✓  |   ✓   | 显示快速跳转 |
+| locale          | `{ pagination: PaginationLocale }`                | -                |  ✓  |   ✓   | 国际化       |
 
-> **Vue**: 使用 `v-model:page` 和 `v-model:page-size` 绑定
-> **React**: 使用 `page`/`pageSize` + `onChange`/`onPageSizeChange` 控制
+> **Vue**: 使用 `v-model:current` 和 `v-model:page-size` 绑定
+> **React**: 使用 `current`/`pageSize` + `onChange`/`onPageSizeChange` 控制
 
 ---
 
@@ -147,23 +148,23 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ### Props
 
-| Prop             | Type                        | Default      | Vue | React | Description          |
-| ---------------- | --------------------------- | ------------ | :-: | :---: | -------------------- |
-| visibilityHeight | `number`                    | `400`        |  ✓  |   ✓   | 滚动高度达到此值显示 |
-| target           | `() => HTMLElement \| Window` | `() => window` |  ✓  |   ✓   | 监听滚动的目标元素   |
-| duration         | `number`                    | `450`        |  ✓  |   ✓   | 滚动到顶部的动画时长（ms） |
+| Prop             | Type                          | Default        | Vue | React | Description                |
+| ---------------- | ----------------------------- | -------------- | :-: | :---: | -------------------------- |
+| visibilityHeight | `number`                      | `400`          |  ✓  |   ✓   | 滚动高度达到此值显示       |
+| target           | `() => HTMLElement \| Window` | `() => window` |  ✓  |   ✓   | 监听滚动的目标元素         |
+| duration         | `number`                      | `450`          |  ✓  |   ✓   | 滚动到顶部的动画时长（ms） |
 
 ### Events
 
-| Vue Event | React Callback | Payload              | Description |
-| --------- | -------------- | -------------------- | ----------- |
-| `@click`  | `onClick`      | `MouseEvent`         | 点击时触发  |
+| Vue Event | React Callback | Payload      | Description |
+| --------- | -------------- | ------------ | ----------- |
+| `@click`  | `onClick`      | `MouseEvent` | 点击时触发  |
 
 ### Slots / Children
 
-| Vue Slot  | React Prop | Description      |
-| --------- | ---------- | ---------------- |
-| `default` | `children` | 自定义按钮内容   |
+| Vue Slot  | React Prop | Description    |
+| --------- | ---------- | -------------- |
+| `default` | `children` | 自定义按钮内容 |
 
 ---
 
@@ -171,37 +172,37 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ### Anchor Props
 
-| Prop            | Type                               | Default        | Vue | React | Description            |
-| --------------- | ---------------------------------- | -------------- | :-: | :---: | ---------------------- |
-| affix           | `boolean`                          | `true`         |  ✓  |   ✓   | 是否固定定位           |
-| bounds          | `number`                           | `5`            |  ✓  |   ✓   | 锚点区域边界（px）     |
-| offsetTop       | `number`                           | `0`            |  ✓  |   ✓   | 距窗口顶部偏移量       |
-| showInkInFixed  | `boolean`                          | `false`        |  ✓  |   ✓   | 固定时是否显示小圆点   |
-| targetOffset    | `number`                           | -              |  ✓  |   ✓   | 锚点滚动偏移量         |
-| getCurrentAnchor| `(activeLink: string) => string`   | -              |  ✓  |   ✓   | 自定义高亮锚点         |
-| getContainer    | `() => HTMLElement \| Window`      | `() => window` |  ✓  |   ✓   | 滚动容器               |
-| direction       | `'vertical' \| 'horizontal'`       | `'vertical'`   |  ✓  |   ✓   | 导航方向               |
+| Prop             | Type                             | Default        | Vue | React | Description          |
+| ---------------- | -------------------------------- | -------------- | :-: | :---: | -------------------- |
+| affix            | `boolean`                        | `true`         |  ✓  |   ✓   | 是否固定定位         |
+| bounds           | `number`                         | `5`            |  ✓  |   ✓   | 锚点区域边界（px）   |
+| offsetTop        | `number`                         | `0`            |  ✓  |   ✓   | 距窗口顶部偏移量     |
+| showInkInFixed   | `boolean`                        | `false`        |  ✓  |   ✓   | 固定时是否显示小圆点 |
+| targetOffset     | `number`                         | -              |  ✓  |   ✓   | 锚点滚动偏移量       |
+| getCurrentAnchor | `(activeLink: string) => string` | -              |  ✓  |   ✓   | 自定义高亮锚点       |
+| getContainer     | `() => HTMLElement \| Window`    | `() => window` |  ✓  |   ✓   | 滚动容器             |
+| direction        | `'vertical' \| 'horizontal'`     | `'vertical'`   |  ✓  |   ✓   | 导航方向             |
 
 ### Anchor Events
 
-| Vue Event | React Callback | Payload                    | Description    |
-| --------- | -------------- | -------------------------- | -------------- |
-| `@click`  | `onClick`      | `(event, href)`            | 点击链接时触发 |
-| `@change` | `onChange`     | `currentActiveLink: string`| 锚点变化时触发 |
+| Vue Event | React Callback | Payload                     | Description    |
+| --------- | -------------- | --------------------------- | -------------- |
+| `@click`  | `onClick`      | `(event, href)`             | 点击链接时触发 |
+| `@change` | `onChange`     | `currentActiveLink: string` | 锚点变化时触发 |
 
 ### AnchorLink Props
 
-| Prop   | Type     | Default | Vue | React | Description  |
-| ------ | -------- | ------- | :-: | :---: | ------------ |
-| href   | `string` | -       |  ✓  |   ✓   | 锚点链接     |
-| title  | `string` | -       |  ✓  |   ✓   | 文字内容     |
-| target | `string` | -       |  ✓  |   ✓   | 链接 target  |
+| Prop   | Type     | Default | Vue | React | Description |
+| ------ | -------- | ------- | :-: | :---: | ----------- |
+| href   | `string` | -       |  ✓  |   ✓   | 锚点链接    |
+| title  | `string` | -       |  ✓  |   ✓   | 文字内容    |
+| target | `string` | -       |  ✓  |   ✓   | 链接 target |
 
 ### Slots / Children
 
-| Vue Slot  | React Prop | Description      |
-| --------- | ---------- | ---------------- |
-| `default` | `children` | 自定义链接内容   |
+| Vue Slot  | React Prop | Description    |
+| --------- | ---------- | -------------- |
+| `default` | `children` | 自定义链接内容 |
 
 ---
 

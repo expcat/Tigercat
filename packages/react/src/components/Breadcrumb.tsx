@@ -22,19 +22,26 @@ export function useBreadcrumbContext(): BreadcrumbContextValue | null {
 export interface BreadcrumbProps
   extends Omit<CoreBreadcrumbProps, 'style'>, React.HTMLAttributes<HTMLElement> {
   separator?: BreadcrumbSeparator
+  /**
+   * Extra content aligned to the end of the breadcrumb
+   */
+  extra?: React.ReactNode
 }
 
 export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   separator = '/',
   className,
   style,
+  extra,
   children,
   ...props
 }) => {
+  const hasExtra = Boolean(extra)
+
   // Container classes
   const containerClasses = React.useMemo(
-    () => classNames(breadcrumbContainerClasses, className),
-    [className]
+    () => classNames(breadcrumbContainerClasses, hasExtra && 'w-full', className),
+    [className, hasExtra]
   )
 
   // Context value
@@ -44,6 +51,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
     <BreadcrumbContext.Provider value={contextValue}>
       <nav className={containerClasses} aria-label="Breadcrumb" style={style} {...props}>
         <ol className="flex items-center flex-wrap gap-2">{children}</ol>
+        {hasExtra && <div className="ml-auto flex items-center">{extra}</div>}
       </nav>
     </BreadcrumbContext.Provider>
   )

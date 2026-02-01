@@ -18,6 +18,11 @@ export interface BreadcrumbProps {
   separator?: BreadcrumbSeparator
 
   /**
+   * Extra content aligned to the end of the breadcrumb
+   */
+  extra?: unknown
+
+  /**
    * Additional CSS classes
    */
   className?: string

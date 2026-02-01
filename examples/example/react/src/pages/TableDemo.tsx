@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Table, Button, Space, type TableColumn } from '@expcat/tigercat-react'
+import { Table, Button, Space, Pagination, type TableColumn } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 interface UserData extends Record<string, unknown> {
@@ -45,15 +45,18 @@ const customSnippet = `<Table<UserData>
 
 const paginationSnippet = `<Table<UserData>
   columns={basicColumns}
-  dataSource={largeData}
-  pagination={{
-    ...pagination,
-    total: largeData.length,
-    pageSizeOptions: [10, 20, 50],
-    showSizeChanger: true,
-    showTotal: true
-  }}
-  onPageChange={setPagination}
+  dataSource={pagedData}
+  pagination={false}
+/>
+<Pagination
+  current={pagination.current}
+  pageSize={pagination.pageSize}
+  total={largeData.length}
+  pageSizeOptions={[10, 20, 50]}
+  showSizeChanger
+  showTotal
+  onChange={(current, pageSize) => setPagination({ current, pageSize })}
+  onPageSizeChange={(current, pageSize) => setPagination({ current, pageSize })}
 />`
 
 const selectionSnippet = `<div className="mb-4">
@@ -164,6 +167,11 @@ const TableDemo: React.FC = () => {
 
   // Controlled pagination state
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10 })
+
+  const pagedData = largeData.slice(
+    (pagination.current - 1) * pagination.pageSize,
+    pagination.current * pagination.pageSize
+  )
 
   // Row selection state
   const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([])
@@ -353,18 +361,19 @@ const TableDemo: React.FC = () => {
         title="分页功能"
         description="大数据集的分页展示（受控模式）。"
         code={paginationSnippet}>
-        <Table<UserData>
-          columns={basicColumns}
-          dataSource={largeData}
-          pagination={{
-            ...pagination,
-            total: largeData.length,
-            pageSizeOptions: [10, 20, 50],
-            showSizeChanger: true,
-            showTotal: true
-          }}
-          onPageChange={setPagination}
-        />
+        <div className="space-y-3">
+          <Table<UserData> columns={basicColumns} dataSource={pagedData} pagination={false} />
+          <Pagination
+            current={pagination.current}
+            pageSize={pagination.pageSize}
+            total={largeData.length}
+            pageSizeOptions={[10, 20, 50]}
+            showSizeChanger
+            showTotal
+            onChange={(current, pageSize) => setPagination({ current, pageSize })}
+            onPageSizeChange={(current, pageSize) => setPagination({ current, pageSize })}
+          />
+        </div>
       </DemoBlock>
 
       {/* 行选择 */}

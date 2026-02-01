@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, h } from 'vue'
-import { Table, Button, Space, type TableColumn } from '@expcat/tigercat-vue'
+import { computed, ref, h } from 'vue'
+import { Table, Button, Space, Pagination, type TableColumn } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 // Basic data
@@ -30,9 +30,17 @@ const customSnippet = `<Table :columns="customColumns" :dataSource="basicData" :
 
 const paginationSnippet = `<Table
   :columns="basicColumns"
-  :dataSource="largeData"
-  :pagination="pagination"
-  @page-change="handlePageChange" />`
+  :dataSource="pagedData"
+  :pagination="false" />
+<Pagination
+  :current="pagination.current"
+  :pageSize="pagination.pageSize"
+  :total="largeData.length"
+  :pageSizeOptions="[10, 20, 50]"
+  showSizeChanger
+  showTotal
+  @change="handlePageChange"
+  @page-size-change="handlePageChange" />`
 
 const selectionSnippet = `<div class="mb-4">
   <p class="text-sm text-gray-600">已选择: {{ selectedRowKeys.join(', ') || '无' }}</p>
@@ -266,10 +274,7 @@ const selectedRowKeys = ref<number[]>([])
 // Controlled pagination
 const pagination = ref({
   current: 1,
-  pageSize: 10,
-  pageSizeOptions: [10, 20, 50],
-  showSizeChanger: true,
-  showTotal: true
+  pageSize: 10
 })
 
 function handleEdit(record: UserData) {
@@ -290,8 +295,8 @@ function handleSelectionChange(keys: (string | number)[]) {
   selectedRowKeys.value = keys as number[]
 }
 
-function handlePageChange(next: { current: number; pageSize: number }) {
-  pagination.value = { ...pagination.value, ...next }
+function handlePageChange(current: number, pageSize: number) {
+  pagination.value = { current, pageSize }
 }
 
 // Large dataset for pagination demo
@@ -305,6 +310,11 @@ const largeData = ref(
     address: ['New York', 'London', 'Paris', 'Tokyo', 'Berlin'][i % 5]
   }))
 )
+
+const pagedData = computed(() => {
+  const start = (pagination.value.current - 1) * pagination.value.pageSize
+  return largeData.value.slice(start, start + pagination.value.pageSize)
+})
 </script>
 
 <template>
@@ -365,10 +375,19 @@ const largeData = ref(
     <DemoBlock title="分页功能"
                description="大数据集的分页展示（受控模式）。"
                :code="paginationSnippet">
-      <Table :columns="basicColumns"
-             :dataSource="largeData"
-             :pagination="pagination"
-             @page-change="handlePageChange" />
+      <div class="space-y-3">
+        <Table :columns="basicColumns"
+               :dataSource="pagedData"
+               :pagination="false" />
+        <Pagination :current="pagination.current"
+                    :pageSize="pagination.pageSize"
+                    :total="largeData.length"
+                    :pageSizeOptions="[10, 20, 50]"
+                    showSizeChanger
+                    showTotal
+                    @change="handlePageChange"
+                    @page-size-change="handlePageChange" />
+      </div>
     </DemoBlock>
 
     <!-- 行选择 -->

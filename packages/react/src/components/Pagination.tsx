@@ -16,6 +16,7 @@ import {
   getPaginationLabels,
   formatPageAriaLabel,
   type PaginationProps as CorePaginationProps,
+  type PaginationPageSizeOptionItem,
   type TigerLocale
 } from '@expcat/tigercat-core'
 
@@ -161,6 +162,20 @@ export const Pagination: React.FC<PaginationProps> = ({
     [handleQuickJumperSubmit]
   )
 
+  const normalizedPageSizeOptions = useMemo(() => {
+    return (pageSizeOptions as PaginationPageSizeOptionItem[]).map((option) => {
+      if (typeof option === 'number') {
+        return {
+          value: option,
+          label: `${option} ${labels.itemsPerPageText}`
+        }
+      }
+
+      const label = option.label ?? `${option.value} ${labels.itemsPerPageText}`
+      return { value: option.value, label }
+    })
+  }, [pageSizeOptions, labels.itemsPerPageText])
+
   // Container classes
   const containerClasses = getPaginationContainerClasses(align, className)
 
@@ -294,9 +309,9 @@ export const Pagination: React.FC<PaginationProps> = ({
         value={currentPageSize}
         onChange={(e) => handlePageSizeChange(parseInt(e.target.value, 10))}
         aria-label={labels.itemsPerPageText}>
-        {pageSizeOptions.map((sizeOption) => (
-          <option key={sizeOption} value={sizeOption}>
-            {sizeOption} {labels.itemsPerPageText}
+        {normalizedPageSizeOptions.map((sizeOption) => (
+          <option key={sizeOption.value} value={sizeOption.value}>
+            {sizeOption.label}
           </option>
         ))}
       </select>
