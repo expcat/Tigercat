@@ -19,8 +19,8 @@ export interface IconProps {
 
   /**
    * Icon color
-    * Uses CSS color value
-    * @example '#2563eb' | 'currentColor'
+   * Uses CSS color value
+   * @example '#2563eb' | 'currentColor'
    */
   color?: string
 
