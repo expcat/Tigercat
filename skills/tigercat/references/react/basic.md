@@ -62,9 +62,16 @@ import { Button } from '@expcat/tigercat-react'
 ## Icon 图标
 
 ```tsx
-<Icon name="check" />
-<Icon name="close" size={24} color="#f00" />
-<Icon name="loading" rotate />
+<Icon>
+	<svg viewBox="0 0 24 24">
+		<path d="M5 12h14" />
+	</svg>
+</Icon>
+<Icon size="xl" color="#f00">
+	<svg viewBox="0 0 24 24">
+		<path d="M6 6l12 12M18 6l-12 12" />
+	</svg>
+</Icon>
 ```
 
 ---

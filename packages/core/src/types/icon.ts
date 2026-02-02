@@ -19,8 +19,8 @@ export interface IconProps {
 
   /**
    * Icon color
-   * Uses Tailwind's text color classes or custom color value
-   * @example 'text-blue-500' | 'currentColor'
+    * Uses CSS color value
+    * @example '#2563eb' | 'currentColor'
    */
   color?: string
 

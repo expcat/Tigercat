@@ -117,12 +117,17 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop   | Type               | Default | Vue | React | Description |
-| ------ | ------------------ | ------- | :-: | :---: | ----------- |
-| name   | `string`           | -       |  ✓  |   ✓   | 图标名称    |
-| size   | `number \| string` | `16`    |  ✓  |   ✓   | 尺寸        |
-| color  | `string`           | -       |  ✓  |   ✓   | 颜色        |
-| rotate | `boolean`          | `false` |  ✓  |   ✓   | 旋转动画    |
+| Prop      | Type                           | Default        | Vue | React | Description          |
+| --------- | ------------------------------ | -------------- | :-: | :---: | -------------------- |
+| size      | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`         |  ✓  |   ✓   | 尺寸                 |
+| color     | `string`                       | `currentColor` |  ✓  |   ✓   | 颜色（CSS color 值） |
+| className | `string`                       | -              |  ✓  |   ✓   | 自定义类名           |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description       |
+| --------- | ---------- | ----------------- |
+| `default` | `children` | 传入 SVG 图标内容 |
 
 ---
 
