@@ -348,6 +348,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'chat-window',
         path: '/chat-window',
         label: { 'zh-CN': 'ChatWindow', 'en-US': 'ChatWindow' }
+      },
+      {
+        key: 'activity-feed',
+        path: '/activity-feed',
+        label: { 'zh-CN': 'ActivityFeed', 'en-US': 'ActivityFeed' }
       }
     ]
   }
