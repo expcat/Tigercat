@@ -95,6 +95,17 @@
 | 回到顶部 | BackTop   | ✅  | ✅    | ✅   | ✅   |
 | 锚点     | Anchor    | ✅  | ✅    | ✅   | ✅   |
 
+### 组合组件 (Composite Components)
+
+| 组件       | Component            | 功能                     | Vue | React | 文档 | 测试 |
+| ---------- | -------------------- | ------------------------ | --- | ----- | ---- | ---- |
+| 聊天窗口   | ChatWindow           | 消息列表 + 输入区 + 状态 | ⬜  | ⬜    | ⬜   | ⬜   |
+| 评论线程   | CommentThread        | 递归回复 + 操作栏        | ⬜  | ⬜    | ⬜   | ⬜   |
+| 通知中心   | NotificationCenter   | 分组/已读管理            | ⬜  | ⬜    | ⬜   | ⬜   |
+| 表单向导   | FormWizard           | 多步表单流               | ⬜  | ⬜    | ⬜   | ⬜   |
+| 表格工具栏 | DataTableWithToolbar | 搜索/筛选/批量操作       | ⬜  | ⬜    | ⬜   | ⬜   |
+| 活动动态流 | ActivityFeed         | 动态/审计时间线          | ⬜  | ⬜    | ⬜   | ⬜   |
+
 ### 数据可视化组件 (Chart Components)
 
 | 组件   | Component    | Vue | React | 文档 | 测试 |
