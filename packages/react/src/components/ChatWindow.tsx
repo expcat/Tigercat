@@ -59,7 +59,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   onSend,
   renderMessage,
   className,
-  style: _style,
   ...props
 }) => {
   const [innerValue, setInnerValue] = useState<string>(value ?? defaultValue)
@@ -90,8 +89,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
   const canSend = useMemo(() => {
     if (disabled) return false
+    if (allowEmpty) return true
     const raw = String(inputValue ?? '')
-    return allowEmpty ? raw.length > 0 : raw.trim().length > 0
+    return raw.trim().length > 0
   }, [allowEmpty, disabled, inputValue])
 
   const handleValueChange = useCallback(

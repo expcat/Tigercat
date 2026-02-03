@@ -163,14 +163,15 @@ export const ChatWindow = defineComponent({
       )
     )
 
-    const wrapperStyle = computed(() => mergeStyleValues(props.style, attrs.style))
+    const wrapperStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
     const inputValue = computed(() => (props.modelValue !== undefined ? props.modelValue : localValue.value))
 
     const canSend = computed(() => {
       if (props.disabled) return false
+      if (props.allowEmpty) return true
       const raw = String(inputValue.value ?? '')
-      return props.allowEmpty ? raw.length > 0 : raw.trim().length > 0
+      return raw.trim().length > 0
     })
 
     const handleValueChange = (nextValue: string) => {
@@ -292,6 +293,7 @@ export const ChatWindow = defineComponent({
       h(
         'div',
         {
+          ...attrs,
           class: wrapperClasses.value,
           style: wrapperStyle.value,
           'data-tiger-chat-window': ''

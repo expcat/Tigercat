@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, fireEvent, screen } from '@testing-library/vue'
 import { ChatWindow } from '@expcat/tigercat-vue'
 import type { ChatMessage } from '@expcat/tigercat-core'
