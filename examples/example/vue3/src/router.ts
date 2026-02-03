@@ -135,7 +135,11 @@ const router = createRouter({
           path: 'backtop',
           component: () => import('./pages/BackTopDemo.vue')
         },
-        { path: 'anchor', component: () => import('./pages/AnchorDemo.vue') }
+        { path: 'anchor', component: () => import('./pages/AnchorDemo.vue') },
+        {
+          path: 'chat-window',
+          component: () => import('./pages/ChatWindowDemo.vue')
+        }
       ]
     }
   ]

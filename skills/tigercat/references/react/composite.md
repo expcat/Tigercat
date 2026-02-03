@@ -52,6 +52,10 @@ export default function ChatDemo() {
       onSend={handleSend}
       messages={messages}
       statusText="对方正在输入..."
+      allowShiftEnter
+      messageListAriaLabel="会话消息"
+      inputAriaLabel="输入消息"
+      sendAriaLabel="发送消息"
       renderMessage={(message) => <span>{message.content}</span>}
     />
   )

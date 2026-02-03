@@ -13,61 +13,71 @@ description: Shared props definitions for composite components - ChatWindow
 
 ### Props
 
-| Prop            | Type                                             | Default      | Vue | React | Description                         |
-| --------------- | ------------------------------------------------ | ------------ | :-: | :---: | ----------------------------------- |
-| messages        | `ChatMessage[]`                                  | `[]`         |  ✓  |   ✓   | 消息列表                            |
-| modelValue      | `string`                                         | -            |  ✓  |   -   | 输入内容（v-model）                 |
-| value           | `string`                                         | -            |  -  |   ✓   | 输入内容（受控）                    |
-| defaultValue    | `string`                                         | `''`         |  ✓  |   ✓   | 输入默认值（非受控）                |
-| placeholder     | `string`                                         | `'请输入消息'` |  ✓  |   ✓   | 输入占位                           |
-| disabled        | `boolean`                                        | `false`      |  ✓  |   ✓   | 输入区禁用                          |
-| maxLength       | `number`                                         | -            |  ✓  |   ✓   | 最大字数                            |
-| emptyText       | `string`                                         | `'暂无消息'` |  ✓  |   ✓   | 空态文案                            |
-| sendText        | `string`                                         | `'发送'`     |  ✓  |   ✓   | 发送按钮文案                        |
-| statusText      | `string`                                         | -            |  ✓  |   ✓   | 状态区文案                          |
-| statusVariant   | `BadgeVariant`                                   | `'info'`     |  ✓  |   ✓   | 状态区 Badge 颜色                  |
-| showAvatar      | `boolean`                                        | `true`       |  ✓  |   ✓   | 显示头像                            |
-| showName        | `boolean`                                        | `true`       |  ✓  |   ✓   | 显示名称                            |
-| showTime        | `boolean`                                        | `false`      |  ✓  |   ✓   | 显示时间                            |
-| inputType       | `'input' \| 'textarea'`                         | `'textarea'` |  ✓  |   ✓   | 输入组件类型                        |
-| inputRows       | `number`                                         | `3`          |  ✓  |   ✓   | Textarea 行数                       |
-| sendOnEnter     | `boolean`                                        | `true`       |  ✓  |   ✓   | Enter 快捷发送                      |
-| allowShiftEnter | `boolean`                                        | `true`       |  ✓  |   ✓   | Shift+Enter 换行                    |
-| allowEmpty      | `boolean`                                        | `false`      |  ✓  |   ✓   | 允许发送空内容                      |
-| clearOnSend     | `boolean`                                        | `true`       |  ✓  |   ✓   | 发送后清空输入                      |
+| Prop                 | Type                    | Default        | Vue | React | Description          |
+| -------------------- | ----------------------- | -------------- | :-: | :---: | -------------------- |
+| messages             | `ChatMessage[]`         | `[]`           |  ✓  |   ✓   | 消息列表             |
+| modelValue           | `string`                | -              |  ✓  |   -   | 输入内容（v-model）  |
+| value                | `string`                | -              |  -  |   ✓   | 输入内容（受控）     |
+| defaultValue         | `string`                | `''`           |  ✓  |   ✓   | 输入默认值（非受控） |
+| placeholder          | `string`                | `'请输入消息'` |  ✓  |   ✓   | 输入占位             |
+| disabled             | `boolean`               | `false`        |  ✓  |   ✓   | 输入区禁用           |
+| maxLength            | `number`                | -              |  ✓  |   ✓   | 最大字数             |
+| emptyText            | `string`                | `'暂无消息'`   |  ✓  |   ✓   | 空态文案             |
+| sendText             | `string`                | `'发送'`       |  ✓  |   ✓   | 发送按钮文案         |
+| messageListAriaLabel | `string`                | `'消息列表'`   |  ✓  |   ✓   | 消息列表无障碍标签   |
+| inputAriaLabel       | `string`                | `placeholder`  |  ✓  |   ✓   | 输入框无障碍标签     |
+| sendAriaLabel        | `string`                | `sendText`     |  ✓  |   ✓   | 发送按钮无障碍标签   |
+| statusText           | `string`                | -              |  ✓  |   ✓   | 状态区文案           |
+| statusVariant        | `BadgeVariant`          | `'info'`       |  ✓  |   ✓   | 状态区 Badge 颜色    |
+| showAvatar           | `boolean`               | `true`         |  ✓  |   ✓   | 显示头像             |
+| showName             | `boolean`               | `true`         |  ✓  |   ✓   | 显示名称             |
+| showTime             | `boolean`               | `false`        |  ✓  |   ✓   | 显示时间             |
+| inputType            | `'input' \| 'textarea'` | `'textarea'`   |  ✓  |   ✓   | 输入组件类型         |
+| inputRows            | `number`                | `3`            |  ✓  |   ✓   | Textarea 行数        |
+| sendOnEnter          | `boolean`               | `true`         |  ✓  |   ✓   | Enter 快捷发送       |
+| allowShiftEnter      | `boolean`               | `true`         |  ✓  |   ✓   | Shift+Enter 换行     |
+| allowEmpty           | `boolean`               | `false`        |  ✓  |   ✓   | 允许发送空内容       |
+| clearOnSend          | `boolean`               | `true`         |  ✓  |   ✓   | 发送后清空输入       |
+
+### Behavior
+
+- `allowEmpty=true` 时允许发送空字符串。
+- `allowShiftEnter` 仅在 `inputType='textarea'` 时生效。
+- 消息状态文案默认使用 `发送中/已送达/发送失败`，可通过 `ChatMessage.statusText` 覆盖。
+- `statusText` 为底部状态区文案，与消息内 `status` 文案无关。
 
 ### Events
 
-| Vue Event             | React Callback | Payload     | Description |
-| --------------------- | -------------- | ----------- | ----------- |
-| `@update:modelValue`  | `onChange`     | `string`    | 输入变更    |
-| `@input`              | `onChange`     | `string`    | 输入变更    |
-| `@change`             | `onChange`     | `string`    | 输入变更    |
-| `@send`               | `onSend`       | `string`    | 发送消息    |
+| Vue Event            | React Callback | Payload  | Description |
+| -------------------- | -------------- | -------- | ----------- |
+| `@update:modelValue` | `onChange`     | `string` | 输入变更    |
+| `@input`             | `onChange`     | `string` | 输入变更    |
+| `@change`            | `onChange`     | `string` | 输入变更    |
+| `@send`              | `onSend`       | `string` | 发送消息    |
 
 ### Slots / Render Props
 
-| Vue Slot                         | React Prop     | Description        |
-| -------------------------------- | -------------- | ------------------ |
+| Vue Slot                                 | React Prop      | Description        |
+| ---------------------------------------- | --------------- | ------------------ |
 | `message` (scoped: `{ message, index }`) | `renderMessage` | 自定义消息气泡内容 |
 
 ### ChatMessage
 
-| Prop        | Type                                 | Default | Description            |
-| ----------- | ------------------------------------ | ------- | ---------------------- |
-| id          | `string \| number`                  | -       | 消息唯一标识           |
-| content     | `string \| number`                  | -       | 消息内容               |
-| direction   | `'self' \| 'other'`                 | `'other'` | 消息方向             |
-| user        | `ChatUser`                           | -       | 发送者                 |
-| time        | `string \| number \| Date`         | -       | 时间                   |
-| status      | `'sending' \| 'sent' \| 'failed'`  | -       | 发送状态               |
-| statusText  | `string`                             | -       | 自定义状态文案         |
-| meta        | `Record<string, unknown>`            | -       | 扩展数据               |
+| Prop       | Type                              | Default   | Description    |
+| ---------- | --------------------------------- | --------- | -------------- |
+| id         | `string \| number`                | -         | 消息唯一标识   |
+| content    | `string \| number`                | -         | 消息内容       |
+| direction  | `'self' \| 'other'`               | `'other'` | 消息方向       |
+| user       | `ChatUser`                        | -         | 发送者         |
+| time       | `string \| number \| Date`        | -         | 时间           |
+| status     | `'sending' \| 'sent' \| 'failed'` | -         | 发送状态       |
+| statusText | `string`                          | -         | 自定义状态文案 |
+| meta       | `Record<string, unknown>`         | -         | 扩展数据       |
 
 ### ChatUser
 
-| Prop    | Type                 | Default | Description |
-| ------- | -------------------- | ------- | ----------- |
-| id      | `string \| number`  | -       | 用户标识    |
-| name    | `string`             | -       | 显示名称    |
-| avatar  | `string`             | -       | 头像地址    |
+| Prop   | Type               | Default | Description |
+| ------ | ------------------ | ------- | ----------- |
+| id     | `string \| number` | -       | 用户标识    |
+| name   | `string`           | -       | 显示名称    |
+| avatar | `string`           | -       | 头像地址    |

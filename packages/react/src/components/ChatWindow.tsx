@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   classNames,
+  getChatMessageStatusInfo,
   type ChatMessage,
-  type ChatMessageStatus,
   type ChatWindowProps as CoreChatWindowProps,
   type BadgeVariant
 } from '@expcat/tigercat-core'
@@ -14,18 +14,13 @@ import { Button } from './Button'
 import { Badge } from './Badge'
 
 export interface ChatWindowProps
-  extends CoreChatWindowProps,
+  extends
+    CoreChatWindowProps,
     Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
   /**
    * Custom render for message bubble
    */
   renderMessage?: (message: ChatMessage, index: number) => React.ReactNode
-}
-
-const statusTextMap: Record<ChatMessageStatus, { text: string; className: string }> = {
-  sending: { text: '发送中', className: 'text-[var(--tiger-text-muted,#6b7280)]' },
-  sent: { text: '已送达', className: 'text-[var(--tiger-text-muted,#6b7280)]' },
-  failed: { text: '发送失败', className: 'text-[var(--tiger-danger,#ef4444)]' }
 }
 
 const formatTime = (value?: string | number | Date): string => {
@@ -44,6 +39,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   maxLength,
   emptyText = '暂无消息',
   sendText = '发送',
+  messageListAriaLabel,
+  inputAriaLabel,
+  sendAriaLabel,
   statusText,
   statusVariant = 'info',
   showAvatar = true,
@@ -64,10 +62,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const [innerValue, setInnerValue] = useState<string>(value ?? defaultValue)
 
   useEffect(() => {
-    if (value !== undefined && value !== innerValue) {
+    if (value !== undefined) {
       setInnerValue(value)
     }
-  }, [value, innerValue])
+  }, [value])
 
   const inputValue = value !== undefined ? value : innerValue
 
@@ -149,7 +147,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       )
 
       const metaText = formatTime(message.time)
-      const statusInfo = message.status ? statusTextMap[message.status] : undefined
+      const statusInfo = message.status ? getChatMessageStatusInfo(message.status) : undefined
       const customContent = renderMessage?.(message, index)
 
       const nameNode = showName && message.user?.name && (
@@ -163,11 +161,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         </div>
       )
 
-      const timeNode = showTime && metaText ? (
-        <div className={classNames('text-xs', 'text-[var(--tiger-text-muted,#6b7280)]')}>
-          {metaText}
-        </div>
-      ) : null
+      const timeNode =
+        showTime && metaText ? (
+          <div className={classNames('text-xs', 'text-[var(--tiger-text-muted,#6b7280)]')}>
+            {metaText}
+          </div>
+        ) : null
 
       const statusNode = statusInfo ? (
         <div className={classNames('text-xs', statusInfo.className)}>
@@ -176,7 +175,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       ) : null
 
       return (
-        <div className={rowClasses} data-tiger-chat-message>
+        <div className={rowClasses} data-tiger-chat-message role="listitem">
           {showAvatar && message.user ? (
             <Avatar
               size="sm"
@@ -200,10 +199,18 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   )
 
   const statusVariantSafe = statusVariant as BadgeVariant
+  const resolvedMessageListLabel = messageListAriaLabel ?? '消息列表'
+  const resolvedInputLabel = inputAriaLabel ?? placeholder ?? '消息输入'
+  const resolvedSendLabel = sendAriaLabel ?? sendText
 
   return (
     <div className={wrapperClasses} data-tiger-chat-window {...props}>
-      <div className="flex-1 overflow-auto p-4">
+      <div
+        className="flex-1 overflow-auto p-4"
+        role="log"
+        aria-live="polite"
+        aria-relevant="additions text"
+        aria-label={resolvedMessageListLabel}>
         <List
           dataSource={messages}
           rowKey="id"
@@ -229,6 +236,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               placeholder={placeholder}
               disabled={disabled}
               maxLength={maxLength}
+              aria-label={resolvedInputLabel}
               onChange={(event) => handleValueChange(event.currentTarget.value)}
               onKeyDown={handleKeyDown}
             />
@@ -239,12 +247,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               disabled={disabled}
               maxLength={maxLength}
               rows={inputRows}
+              aria-label={resolvedInputLabel}
               onChange={(event) => handleValueChange(event.currentTarget.value)}
               onKeyDown={handleKeyDown}
             />
           )}
         </div>
-        <Button disabled={!canSend} onClick={handleSend}>
+        <Button disabled={!canSend} onClick={handleSend} aria-label={resolvedSendLabel}>
           {sendText}
         </Button>
       </div>
