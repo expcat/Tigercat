@@ -64,6 +64,9 @@ export * from './popconfirm'
 export * from './popover'
 export * from './tooltip'
 
+// Composite components
+export * from './composite'
+
 // Other components
 export * from './link'
 export * from './text'
