@@ -1,0 +1,255 @@
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  classNames,
+  type ChatMessage,
+  type ChatMessageStatus,
+  type ChatWindowProps as CoreChatWindowProps,
+  type BadgeVariant
+} from '@expcat/tigercat-core'
+import { List } from './List'
+import { Avatar } from './Avatar'
+import { Textarea } from './Textarea'
+import { Input } from './Input'
+import { Button } from './Button'
+import { Badge } from './Badge'
+
+export interface ChatWindowProps
+  extends CoreChatWindowProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'> {
+  /**
+   * Custom render for message bubble
+   */
+  renderMessage?: (message: ChatMessage, index: number) => React.ReactNode
+}
+
+const statusTextMap: Record<ChatMessageStatus, { text: string; className: string }> = {
+  sending: { text: '发送中', className: 'text-[var(--tiger-text-muted,#6b7280)]' },
+  sent: { text: '已送达', className: 'text-[var(--tiger-text-muted,#6b7280)]' },
+  failed: { text: '发送失败', className: 'text-[var(--tiger-danger,#ef4444)]' }
+}
+
+const formatTime = (value?: string | number | Date): string => {
+  if (!value) return ''
+  if (value instanceof Date) return value.toLocaleTimeString()
+  if (typeof value === 'number') return new Date(value).toLocaleTimeString()
+  return value
+}
+
+export const ChatWindow: React.FC<ChatWindowProps> = ({
+  messages = [],
+  value,
+  defaultValue = '',
+  placeholder = '请输入消息',
+  disabled = false,
+  maxLength,
+  emptyText = '暂无消息',
+  sendText = '发送',
+  statusText,
+  statusVariant = 'info',
+  showAvatar = true,
+  showName = true,
+  showTime = false,
+  inputType = 'textarea',
+  inputRows = 3,
+  sendOnEnter = true,
+  allowShiftEnter = true,
+  allowEmpty = false,
+  clearOnSend = true,
+  onChange,
+  onSend,
+  renderMessage,
+  className,
+  ...props
+}) => {
+  const [innerValue, setInnerValue] = useState<string>(value ?? defaultValue)
+
+  useEffect(() => {
+    if (value !== undefined && value !== innerValue) {
+      setInnerValue(value)
+    }
+  }, [value, innerValue])
+
+  const inputValue = value !== undefined ? value : innerValue
+
+  const wrapperClasses = useMemo(
+    () =>
+      classNames(
+        'tiger-chat-window',
+        'flex',
+        'flex-col',
+        'w-full',
+        'rounded-lg',
+        'border',
+        'border-[var(--tiger-border,#e5e7eb)]',
+        'bg-[var(--tiger-surface,#ffffff)]',
+        className
+      ),
+    [className]
+  )
+
+  const canSend = useMemo(() => {
+    if (disabled) return false
+    if (allowEmpty) return true
+    const raw = String(inputValue ?? '')
+    return raw.trim().length > 0
+  }, [allowEmpty, disabled, inputValue])
+
+  const handleValueChange = useCallback(
+    (nextValue: string) => {
+      if (value === undefined) {
+        setInnerValue(nextValue)
+      }
+      onChange?.(nextValue)
+    },
+    [onChange, value]
+  )
+
+  const handleSend = useCallback(() => {
+    if (!canSend) return
+    const payload = String(inputValue ?? '')
+    onSend?.(payload)
+    if (clearOnSend) {
+      if (value === undefined) {
+        setInnerValue('')
+      }
+      onChange?.('')
+    }
+  }, [canSend, clearOnSend, inputValue, onSend, onChange, value])
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      if (!sendOnEnter) return
+      if (event.key !== 'Enter') return
+      if (inputType === 'textarea' && allowShiftEnter && event.shiftKey) return
+      event.preventDefault()
+      handleSend()
+    },
+    [allowShiftEnter, handleSend, inputType, sendOnEnter]
+  )
+
+  const renderMessageItem = useCallback(
+    (message: ChatMessage, index: number) => {
+      const isSelf = message.direction === 'self'
+      const rowClasses = classNames(
+        'flex',
+        'gap-3',
+        'items-start',
+        isSelf ? 'justify-end flex-row-reverse' : 'justify-start'
+      )
+
+      const bubbleClasses = classNames(
+        'rounded-lg',
+        'px-3',
+        'py-2',
+        'text-sm',
+        'max-w-[70%]',
+        isSelf
+          ? 'bg-[var(--tiger-primary,#2563eb)] text-white'
+          : 'bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)]'
+      )
+
+      const metaText = formatTime(message.time)
+      const statusInfo = message.status ? statusTextMap[message.status] : undefined
+      const customContent = renderMessage?.(message, index)
+
+      const nameNode = showName && message.user?.name && (
+        <div
+          className={classNames(
+            'text-xs',
+            'text-[var(--tiger-text-muted,#6b7280)]',
+            isSelf && 'text-right'
+          )}>
+          {message.user.name}
+        </div>
+      )
+
+      const timeNode = showTime && metaText ? (
+        <div className={classNames('text-xs', 'text-[var(--tiger-text-muted,#6b7280)]')}>
+          {metaText}
+        </div>
+      ) : null
+
+      const statusNode = statusInfo ? (
+        <div className={classNames('text-xs', statusInfo.className)}>
+          {message.statusText || statusInfo.text}
+        </div>
+      ) : null
+
+      return (
+        <div className={rowClasses} data-tiger-chat-message>
+          {showAvatar && message.user ? (
+            <Avatar
+              size="sm"
+              src={message.user.avatar}
+              text={message.user.name}
+              className={classNames(isSelf ? 'ml-2' : 'mr-2')}
+            />
+          ) : null}
+          <div className={classNames('flex', 'flex-col', isSelf && 'items-end')}>
+            {nameNode}
+            <div className={bubbleClasses} data-tiger-chat-bubble>
+              {customContent ?? message.content}
+            </div>
+            {statusNode}
+            {timeNode}
+          </div>
+        </div>
+      )
+    },
+    [renderMessage, showAvatar, showName, showTime]
+  )
+
+  const statusVariantSafe = statusVariant as BadgeVariant
+
+  return (
+    <div className={wrapperClasses} data-tiger-chat-window {...props}>
+      <div className="flex-1 overflow-auto p-4">
+        <List
+          dataSource={messages}
+          rowKey="id"
+          size="sm"
+          bordered="none"
+          split={false}
+          itemLayout="vertical"
+          emptyText={emptyText}
+          renderItem={renderMessageItem}
+          className="tiger-chat-window-list"
+        />
+      </div>
+      {statusText ? (
+        <div className="px-4 py-2 border-t border-[var(--tiger-border,#e5e7eb)]">
+          <Badge type="text" variant={statusVariantSafe} content={statusText} />
+        </div>
+      ) : null}
+      <div className="flex items-end gap-3 px-4 py-3 border-t border-[var(--tiger-border,#e5e7eb)]">
+        <div className="flex-1">
+          {inputType === 'input' ? (
+            <Input
+              value={inputValue}
+              placeholder={placeholder}
+              disabled={disabled}
+              maxLength={maxLength}
+              onChange={(event) => handleValueChange(event.currentTarget.value)}
+              onKeyDown={handleKeyDown}
+            />
+          ) : (
+            <Textarea
+              value={inputValue}
+              placeholder={placeholder}
+              disabled={disabled}
+              maxLength={maxLength}
+              rows={inputRows}
+              onChange={(event) => handleValueChange(event.currentTarget.value)}
+              onKeyDown={handleKeyDown}
+            />
+          )}
+        </div>
+        <Button disabled={!canSend} onClick={handleSend}>
+          {sendText}
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+export default ChatWindow

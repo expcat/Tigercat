@@ -34,6 +34,7 @@ const visible = ref(false)
 | Navigation | [../shared/props/navigation.md](../shared/props/navigation.md) | [navigation.md](navigation.md) |
 | Data       | [../shared/props/data.md](../shared/props/data.md)             | [data.md](data.md)             |
 | Charts     | [../shared/props/charts.md](../shared/props/charts.md)         | [charts.md](charts.md)         |
+| Composite  | [../shared/props/composite.md](../shared/props/composite.md)   | [composite.md](composite.md)   |
 
 ## Vue-Specific Patterns
 
@@ -64,7 +65,6 @@ const visible = ref(false)
 
 See [../shared/patterns/common.md](../shared/patterns/common.md) for framework comparison.
 
----
 
 ## Component Quick Links
 
@@ -75,3 +75,4 @@ See [../shared/patterns/common.md](../shared/patterns/common.md) for framework c
 **Navigation**: Menu · Breadcrumb · Dropdown · Pagination · Steps · Tabs  
 **Data**: Table · List · Tree · Collapse · Timeline  
 **Charts**: LineChart · AreaChart · BarChart · PieChart · DonutChart · RadarChart · ScatterChart
+**Composite**: ChatWindow
