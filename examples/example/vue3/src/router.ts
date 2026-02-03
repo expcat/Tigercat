@@ -139,6 +139,10 @@ const router = createRouter({
         {
           path: 'chat-window',
           component: () => import('./pages/ChatWindowDemo.vue')
+        },
+        {
+          path: 'activity-feed',
+          component: () => import('./pages/ActivityFeedDemo.vue')
         }
       ]
     }
