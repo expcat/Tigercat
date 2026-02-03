@@ -339,5 +339,16 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'Loading', 'en-US': 'Loading' }
       }
     ]
+  },
+  {
+    key: 'composite',
+    label: { 'zh-CN': '组合组件', 'en-US': 'Composite' },
+    items: [
+      {
+        key: 'chat-window',
+        path: '/chat-window',
+        label: { 'zh-CN': 'ChatWindow', 'en-US': 'ChatWindow' }
+      }
+    ]
   }
 ]

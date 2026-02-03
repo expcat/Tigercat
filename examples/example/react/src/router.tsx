@@ -61,6 +61,7 @@ const CollapseDemo = lazy(() => import('./pages/CollapseDemo'))
 const CarouselDemo = lazy(() => import('./pages/CarouselDemo'))
 const BackTopDemo = lazy(() => import('./pages/BackTopDemo'))
 const AnchorDemo = lazy(() => import('./pages/AnchorDemo'))
+const ChatWindowDemo = lazy(() => import('./pages/ChatWindowDemo'))
 
 const router = createBrowserRouter(
   [
@@ -125,7 +126,8 @@ const router = createBrowserRouter(
         { path: 'collapse', element: <CollapseDemo /> },
         { path: 'carousel', element: <CarouselDemo /> },
         { path: 'backtop', element: <BackTopDemo /> },
-        { path: 'anchor', element: <AnchorDemo /> }
+        { path: 'anchor', element: <AnchorDemo /> },
+        { path: 'chat-window', element: <ChatWindowDemo /> }
       ]
     }
   ],

@@ -2,9 +2,9 @@ import { defineComponent, h, computed, ref, watch, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
+  getChatMessageStatusInfo,
   mergeStyleValues,
   type ChatMessage,
-  type ChatMessageStatus,
   type ChatWindowProps as CoreChatWindowProps,
   type BadgeVariant
 } from '@expcat/tigercat-core'
@@ -15,14 +15,6 @@ import { Input } from './Input'
 import { Button } from './Button'
 import { Badge } from './Badge'
 
-type MessageStatusInfo = { text: string; className: string }
-
-const statusTextMap: Record<ChatMessageStatus, MessageStatusInfo> = {
-  sending: { text: '发送中', className: 'text-[var(--tiger-text-muted,#6b7280)]' },
-  sent: { text: '已送达', className: 'text-[var(--tiger-text-muted,#6b7280)]' },
-  failed: { text: '发送失败', className: 'text-[var(--tiger-danger,#ef4444)]' }
-}
-
 const formatTime = (value?: string | number | Date): string => {
   if (!value) return ''
   if (value instanceof Date) return value.toLocaleTimeString()
@@ -30,8 +22,10 @@ const formatTime = (value?: string | number | Date): string => {
   return value
 }
 
-export interface VueChatWindowProps
-  extends Omit<CoreChatWindowProps, 'value' | 'onChange' | 'onSend'> {
+export interface VueChatWindowProps extends Omit<
+  CoreChatWindowProps,
+  'value' | 'onChange' | 'onSend'
+> {
   /**
    * Input value (v-model)
    */
@@ -79,6 +73,15 @@ export const ChatWindow = defineComponent({
     sendText: {
       type: String,
       default: '发送'
+    },
+    messageListAriaLabel: {
+      type: String
+    },
+    inputAriaLabel: {
+      type: String
+    },
+    sendAriaLabel: {
+      type: String
     },
     statusText: {
       type: String
@@ -165,7 +168,9 @@ export const ChatWindow = defineComponent({
 
     const wrapperStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
-    const inputValue = computed(() => (props.modelValue !== undefined ? props.modelValue : localValue.value))
+    const inputValue = computed(() =>
+      props.modelValue !== undefined ? props.modelValue : localValue.value
+    )
 
     const canSend = computed(() => {
       if (props.disabled) return false
@@ -220,7 +225,7 @@ export const ChatWindow = defineComponent({
           : 'bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)]'
       )
 
-      const statusInfo = message.status ? statusTextMap[message.status] : undefined
+      const statusInfo = message.status ? getChatMessageStatusInfo(message.status) : undefined
       const customContent = slots.message?.({ message, index })
 
       const nameNode =
@@ -251,10 +256,14 @@ export const ChatWindow = defineComponent({
           : null
 
       const statusNode = statusInfo
-        ? h('div', { class: classNames('text-xs', statusInfo.className) }, message.statusText || statusInfo.text)
+        ? h(
+            'div',
+            { class: classNames('text-xs', statusInfo.className) },
+            message.statusText || statusInfo.text
+          )
         : null
 
-      return h('div', { class: rowClasses, 'data-tiger-chat-message': '' }, [
+      return h('div', { class: rowClasses, 'data-tiger-chat-message': '', role: 'listitem' }, [
         props.showAvatar && message.user
           ? h(Avatar, {
               size: 'sm',
@@ -265,7 +274,11 @@ export const ChatWindow = defineComponent({
           : null,
         h('div', { class: classNames('flex', 'flex-col', isSelf && 'items-end') }, [
           nameNode,
-          h('div', { class: bubbleClasses, 'data-tiger-chat-bubble': '' }, customContent ?? message.content),
+          h(
+            'div',
+            { class: bubbleClasses, 'data-tiger-chat-bubble': '' },
+            customContent ?? message.content
+          ),
           statusNode,
           timeNode
         ])
@@ -273,13 +286,15 @@ export const ChatWindow = defineComponent({
     }
 
     const renderInput = () => {
+      const resolvedInputLabel = props.inputAriaLabel ?? props.placeholder ?? '消息输入'
       const commonProps = {
         modelValue: inputValue.value,
         placeholder: props.placeholder,
         disabled: props.disabled,
         maxLength: props.maxLength,
         onKeydown: handleKeydown,
-        'onUpdate:modelValue': handleValueChange
+        'onUpdate:modelValue': handleValueChange,
+        'aria-label': resolvedInputLabel
       }
 
       if (props.inputType === 'input') {
@@ -299,25 +314,35 @@ export const ChatWindow = defineComponent({
           'data-tiger-chat-window': ''
         },
         [
-          h('div', { class: 'flex-1 overflow-auto p-4' }, [
-            h(
-              List,
-              {
-                dataSource: props.messages,
-                rowKey: 'id',
-                size: 'sm',
-                bordered: 'none',
-                split: false,
-                itemLayout: 'vertical',
-                emptyText: props.emptyText,
-                className: 'tiger-chat-window-list'
-              },
-              {
-                renderItem: ({ item, index }: { item: ChatMessage; index: number }) =>
-                  renderMessageItem(item, index)
-              }
-            )
-          ]),
+          h(
+            'div',
+            {
+              class: 'flex-1 overflow-auto p-4',
+              role: 'log',
+              'aria-live': 'polite',
+              'aria-relevant': 'additions text',
+              'aria-label': props.messageListAriaLabel ?? '消息列表'
+            },
+            [
+              h(
+                List,
+                {
+                  dataSource: props.messages,
+                  rowKey: 'id',
+                  size: 'sm',
+                  bordered: 'none',
+                  split: false,
+                  itemLayout: 'vertical',
+                  emptyText: props.emptyText,
+                  className: 'tiger-chat-window-list'
+                },
+                {
+                  renderItem: ({ item, index }: { item: ChatMessage; index: number }) =>
+                    renderMessageItem(item, index)
+                }
+              )
+            ]
+          ),
           props.statusText
             ? h(
                 'div',
@@ -329,17 +354,24 @@ export const ChatWindow = defineComponent({
                 })
               )
             : null,
-          h('div', { class: 'flex items-end gap-3 px-4 py-3 border-t border-[var(--tiger-border,#e5e7eb)]' }, [
-            h('div', { class: 'flex-1' }, [renderInput()]),
-            h(
-              Button,
-              {
-                disabled: !canSend.value,
-                onClick: handleSend
-              },
-              () => props.sendText
-            )
-          ])
+          h(
+            'div',
+            {
+              class: 'flex items-end gap-3 px-4 py-3 border-t border-[var(--tiger-border,#e5e7eb)]'
+            },
+            [
+              h('div', { class: 'flex-1' }, [renderInput()]),
+              h(
+                Button,
+                {
+                  disabled: !canSend.value,
+                  onClick: handleSend,
+                  'aria-label': props.sendAriaLabel ?? props.sendText
+                },
+                () => props.sendText
+              )
+            ]
+          )
         ]
       )
   }

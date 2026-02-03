@@ -60,8 +60,11 @@ const handleSend = (value: string) => {
     v-model="input"
     :messages="messages"
     status-text="对方正在输入..."
-    @send="handleSend"
-  >
+    allow-shift-enter
+    message-list-aria-label="会话消息"
+    input-aria-label="输入消息"
+    send-aria-label="发送消息"
+    @send="handleSend">
     <template #message="{ message }">
       <span>{{ message.content }}</span>
     </template>

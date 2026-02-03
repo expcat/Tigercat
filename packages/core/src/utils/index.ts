@@ -18,3 +18,6 @@ export * from './floating'
 
 // Animation constants and utilities
 export * from './animation'
+
+// ChatWindow utilities
+export * from './chat-window-utils'

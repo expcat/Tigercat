@@ -113,6 +113,18 @@ export interface ChatWindowProps {
    */
   sendText?: string
   /**
+   * Aria label for message list container
+   */
+  messageListAriaLabel?: string
+  /**
+   * Aria label for input
+   */
+  inputAriaLabel?: string
+  /**
+   * Aria label for send button
+   */
+  sendAriaLabel?: string
+  /**
    * Status bar text (e.g. typing, delivered)
    */
   statusText?: string
