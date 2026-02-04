@@ -65,7 +65,6 @@ const visible = ref(false)
 
 See [../shared/patterns/common.md](../shared/patterns/common.md) for framework comparison.
 
-
 ## Component Quick Links
 
 **Basic**: Button · Icon · Badge · Tag · Alert · Avatar · Link · Code · Divider · Text  
@@ -75,4 +74,4 @@ See [../shared/patterns/common.md](../shared/patterns/common.md) for framework c
 **Navigation**: Menu · Breadcrumb · Dropdown · Pagination · Steps · Tabs  
 **Data**: Table · List · Tree · Collapse · Timeline  
 **Charts**: LineChart · AreaChart · BarChart · PieChart · DonutChart · RadarChart · ScatterChart
-**Composite**: ChatWindow
+**Composite**: ChatWindow · ActivityFeed · DataTableWithToolbar
