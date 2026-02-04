@@ -39,4 +39,34 @@ describe('ActivityFeed (React)', () => {
 
     expect(screen.getByText('暂无活动')).toBeInTheDocument()
   })
+
+  it('groups items with groupBy and groupOrder', () => {
+    const items = [
+      {
+        id: 1,
+        title: 'Item A',
+        group: 'Group A'
+      },
+      {
+        id: 2,
+        title: 'Item B',
+        group: 'Group B'
+      }
+    ]
+
+    render(
+      <ActivityFeed
+        items={items}
+        groupBy={(item) => String(item.group)}
+        groupOrder={['Group B', 'Group A']}
+      />
+    )
+
+    const first = screen.getByText('Group B')
+    const second = screen.getByText('Group A')
+
+    expect(first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(screen.getByText('Item A')).toBeInTheDocument()
+    expect(screen.getByText('Item B')).toBeInTheDocument()
+  })
 })
