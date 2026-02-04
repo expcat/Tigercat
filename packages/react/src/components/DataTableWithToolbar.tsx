@@ -16,7 +16,8 @@ import { Space } from './Space'
 import { Pagination, type PaginationProps } from './Pagination'
 
 export interface DataTableWithToolbarProps<T = Record<string, unknown>>
-  extends Omit<TableProps<T>, 'pagination' | 'className'>,
+  extends
+    Omit<TableProps<T>, 'pagination' | 'className'>,
     Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   /**
    * Toolbar configuration
@@ -44,10 +45,7 @@ export interface DataTableWithToolbarProps<T = Record<string, unknown>>
   tableClassName?: string
 }
 
-const resolveFilterLabel = (
-  filter: TableToolbarFilter,
-  value: TableToolbarFilterValue
-): string => {
+const resolveFilterLabel = (filter: TableToolbarFilter, value: TableToolbarFilterValue): string => {
   const option = filter.options.find((item) => item.value === value)
   if (option) return `${filter.label}: ${option.label}`
   if (value !== null && value !== undefined && value !== '') {
@@ -65,9 +63,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   tableClassName,
   ...tableProps
 }: DataTableWithToolbarProps<T>) => {
-  const [internalSearch, setInternalSearch] = useState<string>(
-    toolbar?.defaultSearchValue ?? ''
-  )
+  const [internalSearch, setInternalSearch] = useState<string>(toolbar?.defaultSearchValue ?? '')
   const [internalFilters, setInternalFilters] = useState<Record<string, TableToolbarFilterValue>>(
     () => {
       const initial: Record<string, TableToolbarFilterValue> = {}
@@ -107,19 +103,19 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       next[filter.key] =
         filter.value !== undefined
           ? filter.value
-          : internalFilters[filter.key] ?? filter.defaultValue ?? null
+          : (internalFilters[filter.key] ?? filter.defaultValue ?? null)
     })
     return next
   }, [toolbar?.filters, internalFilters])
 
   const hasSearch = Boolean(
     toolbar &&
-      (toolbar.searchPlaceholder ||
-        toolbar.searchValue !== undefined ||
-        toolbar.defaultSearchValue !== undefined ||
-        toolbar.showSearchButton ||
-        toolbar.onSearchChange ||
-        toolbar.onSearch)
+    (toolbar.searchPlaceholder ||
+      toolbar.searchValue !== undefined ||
+      toolbar.defaultSearchValue !== undefined ||
+      toolbar.showSearchButton ||
+      toolbar.onSearchChange ||
+      toolbar.onSearch)
   )
   const hasFilters = Boolean(toolbar?.filters && toolbar.filters.length > 0)
   const hasBulkActions = Boolean(toolbar?.bulkActions && toolbar.bulkActions.length > 0)
@@ -129,14 +125,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   const bulkLabel = toolbar?.bulkActionsLabel ?? '已选择'
 
   const wrapperClasses = useMemo(
-    () =>
-      classNames(
-        'tiger-data-table-with-toolbar',
-        'flex',
-        'flex-col',
-        'gap-3',
-        className
-      ),
+    () => classNames('tiger-data-table-with-toolbar', 'flex', 'flex-col', 'gap-3', className),
     [className]
   )
 
@@ -202,7 +191,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                   }
                 }}
               />
-              {toolbar?.showSearchButton ?? true ? (
+              {(toolbar?.showSearchButton ?? true) ? (
                 <Button
                   size="sm"
                   variant="outline"
@@ -275,11 +264,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       <Table {...tableProps} pagination={false} className={tableClassName} />
       {showPagination ? (
         <div className="pt-2">
-          <Pagination
-            {...pagination}
-            onChange={onPageChange}
-            onPageSizeChange={onPageSizeChange}
-          />
+          <Pagination {...pagination} onChange={onPageChange} onPageSizeChange={onPageSizeChange} />
         </div>
       ) : null}
     </div>

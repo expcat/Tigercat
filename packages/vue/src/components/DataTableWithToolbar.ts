@@ -24,11 +24,10 @@ import { Pagination } from './Pagination'
 
 type HChildren = Parameters<typeof h>[2]
 
-export interface VueTableToolbarProps
-  extends Omit<
-    CoreTableToolbarProps,
-    'onSearchChange' | 'onSearch' | 'onFiltersChange' | 'onBulkAction'
-  > {}
+export interface VueTableToolbarProps extends Omit<
+  CoreTableToolbarProps,
+  'onSearchChange' | 'onSearch' | 'onFiltersChange' | 'onBulkAction'
+> {}
 
 export interface VueDataTableWithToolbarProps {
   columns: TableColumn[]
@@ -55,10 +54,7 @@ export interface VueDataTableWithToolbarProps {
   style?: Record<string, string | number>
 }
 
-const resolveFilterLabel = (
-  filter: TableToolbarFilter,
-  value: TableToolbarFilterValue
-): string => {
+const resolveFilterLabel = (filter: TableToolbarFilter, value: TableToolbarFilterValue): string => {
   const option = filter.options.find((item) => item.value === value)
   if (option) return `${filter.label}: ${option.label}`
   if (value !== null && value !== undefined && value !== '') {
@@ -210,7 +206,7 @@ export const DataTableWithToolbar = defineComponent({
         next[filter.key] =
           filter.value !== undefined
             ? filter.value
-            : internalFilters.value[filter.key] ?? filter.defaultValue ?? null
+            : (internalFilters.value[filter.key] ?? filter.defaultValue ?? null)
       })
       return next
     })
@@ -218,10 +214,10 @@ export const DataTableWithToolbar = defineComponent({
     const hasSearch = computed(() => {
       return Boolean(
         props.toolbar &&
-          (props.toolbar.searchPlaceholder ||
-            props.toolbar.searchValue !== undefined ||
-            props.toolbar.defaultSearchValue !== undefined ||
-            props.toolbar.showSearchButton)
+        (props.toolbar.searchPlaceholder ||
+          props.toolbar.searchValue !== undefined ||
+          props.toolbar.defaultSearchValue !== undefined ||
+          props.toolbar.showSearchButton)
       )
     })
 
@@ -335,38 +331,30 @@ export const DataTableWithToolbar = defineComponent({
               { trigger: 'click' },
               {
                 default: () => [
-                  h(
-                    Button,
-                    { size: 'sm', variant: 'outline' },
-                    { default: () => triggerLabel }
-                  ),
-                  h(
-                    DropdownMenu,
-                    null,
-                    {
-                      default: () => [
-                        ...(clearable
-                          ? [
-                              h(
-                                DropdownItem,
-                                { onClick: () => handleFilterSelect(filter, null) },
-                                { default: () => clearLabel }
-                              )
-                            ]
-                          : []),
-                        ...filter.options.map((option) =>
-                          h(
-                            DropdownItem,
-                            {
-                              key: String(option.value),
-                              onClick: () => handleFilterSelect(filter, option.value)
-                            },
-                            { default: () => option.label }
-                          )
+                  h(Button, { size: 'sm', variant: 'outline' }, { default: () => triggerLabel }),
+                  h(DropdownMenu, null, {
+                    default: () => [
+                      ...(clearable
+                        ? [
+                            h(
+                              DropdownItem,
+                              { onClick: () => handleFilterSelect(filter, null) },
+                              { default: () => clearLabel }
+                            )
+                          ]
+                        : []),
+                      ...filter.options.map((option) =>
+                        h(
+                          DropdownItem,
+                          {
+                            key: String(option.value),
+                            onClick: () => handleFilterSelect(filter, option.value)
+                          },
+                          { default: () => option.label }
                         )
-                      ]
-                    }
-                  )
+                      )
+                    ]
+                  })
                 ]
               }
             )
@@ -400,20 +388,26 @@ export const DataTableWithToolbar = defineComponent({
         })
       }
 
-      return h('div', { class: classNames('tiger-data-table-toolbar', 'flex', 'flex-wrap', 'items-center', 'justify-between', 'gap-3', 'pb-2') }, [
-        h(
-          Space,
-          { size: 'sm', align: 'center', wrap: true },
-          { default: () => leftNodes }
-        ),
-        hasBulkActions.value
-          ? h(
-              Space,
-              { size: 'sm', align: 'center', wrap: true },
-              { default: () => rightNodes }
-            )
-          : null
-      ])
+      return h(
+        'div',
+        {
+          class: classNames(
+            'tiger-data-table-toolbar',
+            'flex',
+            'flex-wrap',
+            'items-center',
+            'justify-between',
+            'gap-3',
+            'pb-2'
+          )
+        },
+        [
+          h(Space, { size: 'sm', align: 'center', wrap: true }, { default: () => leftNodes }),
+          hasBulkActions.value
+            ? h(Space, { size: 'sm', align: 'center', wrap: true }, { default: () => rightNodes })
+            : null
+        ]
+      )
     }
 
     return () => {
