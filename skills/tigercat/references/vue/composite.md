@@ -5,7 +5,7 @@ description: Vue 3 composite components usage
 
 # Composite Components (Vue 3)
 
-组合组件：ChatWindow
+组合组件：ChatWindow / ActivityFeed / DataTableWithToolbar
 
 > **Props Reference**: [shared/props/composite.md](../shared/props/composite.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -72,7 +72,6 @@ const handleSend = (value: string) => {
 </template>
 ```
 
-
 ---
 
 ## ActivityFeed 活动动态流
@@ -128,5 +127,88 @@ const activityGroups = ref<ActivityGroup[]>([
 
 <template>
   <ActivityFeed :groups="activityGroups" />
+</template>
+```
+
+---
+
+## DataTableWithToolbar 表格工具栏
+
+```vue
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import {
+  DataTableWithToolbar,
+  type TableColumn,
+  type TableToolbarFilterValue
+} from '@expcat/tigercat-vue'
+
+interface UserRow extends Record<string, unknown> {
+  id: number
+  name: string
+  role: 'admin' | 'editor' | 'viewer'
+  status: 'active' | 'disabled'
+}
+
+const columns: TableColumn<UserRow>[] = [
+  { key: 'name', title: '姓名' },
+  { key: 'role', title: '角色' },
+  { key: 'status', title: '状态' }
+]
+
+const statusOptions = [
+  { label: '启用', value: 'active' },
+  { label: '禁用', value: 'disabled' }
+]
+
+const roleOptions = [
+  { label: '管理员', value: 'admin' },
+  { label: '编辑', value: 'editor' },
+  { label: '访客', value: 'viewer' }
+]
+
+const keyword = ref('')
+const filters = ref<Record<string, TableToolbarFilterValue>>({ status: null, role: null })
+const pagination = ref({ current: 1, pageSize: 10 })
+
+const data: UserRow[] = [
+  { id: 1, name: 'A', role: 'admin', status: 'active' },
+  { id: 2, name: 'B', role: 'editor', status: 'disabled' }
+]
+
+const filtered = computed(() => {
+  return data.filter((item) => {
+    const matchKeyword = !keyword.value || item.name.includes(keyword.value)
+    const matchStatus = !filters.value.status || item.status === filters.value.status
+    const matchRole = !filters.value.role || item.role === filters.value.role
+    return matchKeyword && matchStatus && matchRole
+  })
+})
+
+const toolbar = computed(() => ({
+  searchValue: keyword.value,
+  searchPlaceholder: '搜索姓名',
+  filters: [
+    { key: 'status', label: '状态', options: statusOptions },
+    { key: 'role', label: '角色', options: roleOptions }
+  ]
+}))
+</script>
+
+<template>
+  <DataTableWithToolbar
+    :columns="columns"
+    :dataSource="filtered"
+    :toolbar="toolbar"
+    :pagination="{
+      current: pagination.current,
+      pageSize: pagination.pageSize,
+      total: filtered.length,
+      showTotal: true
+    }"
+    @search-change="(val) => (keyword = val)"
+    @filters-change="(val) => (filters = val)"
+    @page-change="(current, pageSize) => (pagination = { current, pageSize })"
+    @page-size-change="(current, pageSize) => (pagination = { current, pageSize })" />
 </template>
 ```
