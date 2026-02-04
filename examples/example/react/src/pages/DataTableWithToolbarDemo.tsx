@@ -21,15 +21,17 @@ const basicSnippet = `<DataTableWithToolbar
   toolbar={{
     searchValue: keyword,
     searchPlaceholder: '搜索姓名/邮箱',
-    onSearchChange: setKeyword,
     filters: [
       { key: 'status', label: '状态', options: statusOptions },
       { key: 'role', label: '角色', options: roleOptions }
     ],
-    onFiltersChange: setFilters,
     bulkActions: [{ key: 'export', label: '导出' }],
     selectedKeys: selectedRowKeys
   }}
+  onSearchChange={setKeyword}
+  onSearch={setKeyword}
+  onFiltersChange={setFilters}
+  onBulkAction={handleBulkAction}
   pagination={{ current, pageSize, total, showSizeChanger: true, showTotal: true }}
   onPageChange={handlePageChange}
   onPageSizeChange={handlePageChange}
@@ -89,7 +91,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
       const matchRole = !filters.role || item.role === filters.role
       return matchKeyword && matchStatus && matchRole
     })
-  }, [keyword, filters, seedData])
+  }, [keyword, filters])
 
   const pagedData = useMemo(() => {
     const start = (pagination.current - 1) * pagination.pageSize
@@ -105,7 +107,8 @@ const DataTableWithToolbarDemo: React.FC = () => {
     setFilters(nextFilters)
   }
 
-  const handleBulkAction = (actionKey: string) => {
+  const handleBulkAction = (action: { key: string | number }) => {
+    const actionKey = String(action.key)
     if (selectedRowKeys.length === 0) return
     alert(`执行批量操作: ${actionKey}，选中 ${selectedRowKeys.length} 项`) // demo only
   }
@@ -128,28 +131,27 @@ const DataTableWithToolbarDemo: React.FC = () => {
           toolbar={{
             searchValue: keyword,
             searchPlaceholder: '搜索姓名/邮箱',
-            onSearchChange: setKeyword,
-            onSearch: setKeyword,
             filters: [
               { key: 'status', label: '状态', options: statusOptions },
               { key: 'role', label: '角色', options: roleOptions }
             ],
-            onFiltersChange: handleFiltersChange,
             bulkActions: [
               {
                 key: 'export',
-                label: '导出',
-                onClick: () => handleBulkAction('export')
+                label: '导出'
               },
               {
                 key: 'delete',
                 label: '删除',
-                variant: 'outline',
-                onClick: () => handleBulkAction('delete')
+                variant: 'outline'
               }
             ],
             selectedKeys: selectedRowKeys
           }}
+          onSearchChange={setKeyword}
+          onSearch={setKeyword}
+          onFiltersChange={handleFiltersChange}
+          onBulkAction={handleBulkAction}
           pagination={{
             current: pagination.current,
             pageSize: pagination.pageSize,

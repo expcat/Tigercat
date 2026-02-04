@@ -161,12 +161,13 @@ export const DataTableWithToolbar = defineComponent({
     }
   },
   emits: {
-    'search-change': null,
-    search: null,
-    'filters-change': null,
-    'bulk-action': null,
-    'page-change': null,
-    'page-size-change': null
+    'search-change': (value: string) => true,
+    search: (value: string) => true,
+    'filters-change': (filters: Record<string, TableToolbarFilterValue>) => true,
+    'bulk-action': (action: TableToolbarAction, keys: (string | number)[]) => true,
+    'selection-change': (keys: (string | number)[]) => true,
+    'page-change': (current: number, pageSize: number) => true,
+    'page-size-change': (current: number, pageSize: number) => true
   },
   setup(props, { attrs, emit }) {
     const internalSearch = ref<string>(props.toolbar?.defaultSearchValue ?? '')
@@ -223,6 +224,7 @@ export const DataTableWithToolbar = defineComponent({
 
     const hasFilters = computed(() => Boolean(props.toolbar?.filters?.length))
     const hasBulkActions = computed(() => Boolean(props.toolbar?.bulkActions?.length))
+    const canSearch = computed(() => Boolean(attrs.onSearch))
 
     const selectedKeys = computed(
       () => props.toolbar?.selectedKeys ?? props.rowSelection?.selectedRowKeys ?? []
@@ -309,7 +311,8 @@ export const DataTableWithToolbar = defineComponent({
                   {
                     size: 'sm',
                     variant: 'outline',
-                    onClick: handleSearchSubmit
+                    onClick: handleSearchSubmit,
+                    disabled: !canSearch.value
                   },
                   { default: () => props.toolbar?.searchButtonText ?? '搜索' }
                 )
@@ -445,7 +448,8 @@ export const DataTableWithToolbar = defineComponent({
               rowKey: props.rowKey,
               rowClassName: props.rowClassName,
               stickyHeader: props.stickyHeader,
-              maxHeight: props.maxHeight
+              maxHeight: props.maxHeight,
+              onSelectionChange: (keys: (string | number)[]) => emit('selection-change', keys)
             },
             null
           ),
