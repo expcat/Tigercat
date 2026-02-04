@@ -36,7 +36,9 @@ describe('DataTableWithToolbar (Vue)', () => {
             }
           ]
         },
-        pagination: { current: 1, pageSize: 10, total: 20, showTotal: true },
+        pagination: { current: 1, pageSize: 10, total: 20, showTotal: true }
+      },
+      attrs: {
         onFiltersChange,
         onPageChange
       }
@@ -66,5 +68,29 @@ describe('DataTableWithToolbar (Vue)', () => {
 
     expect(screen.getByText('已选择 2 项')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '导出' })).toBeInTheDocument()
+  })
+
+  it('forwards selection-change event', async () => {
+    const onSelectionChange = vi.fn()
+
+    render(DataTableWithToolbar, {
+      props: {
+        columns,
+        dataSource: [{ id: 1, name: 'A' }],
+        rowSelection: {
+          selectedRowKeys: [],
+          type: 'checkbox'
+        },
+        pagination: false
+      },
+      attrs: {
+        onSelectionChange
+      }
+    })
+
+    const checkboxes = screen.getAllByRole('checkbox') as HTMLInputElement[]
+    await userEvent.click(checkboxes[1])
+
+    expect(onSelectionChange).toHaveBeenCalledWith([1])
   })
 })

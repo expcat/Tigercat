@@ -88,4 +88,23 @@ describe('DataTableWithToolbar (React)', () => {
 
     expect(onSearchChange).toHaveBeenCalled()
   })
+
+  it('forwards selection change', async () => {
+    const onSelectionChange = vi.fn()
+
+    render(
+      <DataTableWithToolbar<RowData>
+        columns={columns}
+        dataSource={[{ id: 1, name: 'A' }]}
+        rowSelection={{ selectedRowKeys: [], type: 'checkbox' }}
+        onSelectionChange={onSelectionChange}
+        pagination={false}
+      />
+    )
+
+    const checkboxes = screen.getAllByRole('checkbox') as HTMLInputElement[]
+    await userEvent.click(checkboxes[1])
+
+    expect(onSelectionChange).toHaveBeenCalledWith([1])
+  })
 })

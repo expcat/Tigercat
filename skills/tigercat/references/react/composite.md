@@ -183,13 +183,14 @@ export default function DataTableWithToolbarDemo() {
       toolbar={{
         searchValue: keyword,
         searchPlaceholder: '搜索姓名',
-        onSearchChange: setKeyword,
         filters: [
           { key: 'status', label: '状态', options: statusOptions },
           { key: 'role', label: '角色', options: roleOptions }
-        ],
-        onFiltersChange: setFilters
+        ]
       }}
+      onSearchChange={setKeyword}
+      onSearch={setKeyword}
+      onFiltersChange={setFilters}
       pagination={{
         current: pagination.current,
         pageSize: pagination.pageSize,

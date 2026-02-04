@@ -24,6 +24,22 @@ export interface DataTableWithToolbarProps<T = Record<string, unknown>>
    */
   toolbar?: TableToolbarProps
   /**
+   * Search change handler
+   */
+  onSearchChange?: (value: string) => void
+  /**
+   * Search submit handler
+   */
+  onSearch?: (value: string) => void
+  /**
+   * Filters change handler
+   */
+  onFiltersChange?: (filters: Record<string, TableToolbarFilterValue>) => void
+  /**
+   * Bulk action handler
+   */
+  onBulkAction?: (action: TableToolbarAction, selectedKeys: (string | number)[]) => void
+  /**
    * Pagination configuration
    */
   pagination?: PaginationProps | false
@@ -56,6 +72,10 @@ const resolveFilterLabel = (filter: TableToolbarFilter, value: TableToolbarFilte
 
 export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<string, unknown>>({
   toolbar,
+  onSearchChange,
+  onSearch,
+  onFiltersChange,
+  onBulkAction,
   pagination = false,
   onPageChange,
   onPageSizeChange,
@@ -115,7 +135,9 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       toolbar.defaultSearchValue !== undefined ||
       toolbar.showSearchButton ||
       toolbar.onSearchChange ||
-      toolbar.onSearch)
+      toolbar.onSearch ||
+      onSearchChange ||
+      onSearch)
   )
   const hasFilters = Boolean(toolbar?.filters && toolbar.filters.length > 0)
   const hasBulkActions = Boolean(toolbar?.bulkActions && toolbar.bulkActions.length > 0)
@@ -133,10 +155,12 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     if (toolbar?.searchValue === undefined) {
       setInternalSearch(value)
     }
+    onSearchChange?.(value)
     toolbar?.onSearchChange?.(value)
   }
 
   const handleSearchSubmit = () => {
+    onSearch?.(searchValue ?? '')
     toolbar?.onSearch?.(searchValue ?? '')
   }
 
@@ -153,12 +177,14 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       }))
     }
 
+    onFiltersChange?.(nextFilters)
     toolbar?.onFiltersChange?.(nextFilters)
   }
 
   const handleBulkAction = (action: TableToolbarAction) => {
     const keys = selectedKeys ?? []
     action.onClick?.(keys)
+    onBulkAction?.(action, keys)
     toolbar?.onBulkAction?.(action, keys)
   }
 
@@ -196,7 +222,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                   size="sm"
                   variant="outline"
                   onClick={handleSearchSubmit}
-                  disabled={!toolbar?.onSearch}>
+                  disabled={!onSearch && !toolbar?.onSearch}>
                   {toolbar?.searchButtonText ?? '搜索'}
                 </Button>
               ) : null}
