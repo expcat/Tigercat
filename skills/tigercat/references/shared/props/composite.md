@@ -186,15 +186,15 @@ description: Shared props definitions for composite components - ChatWindow
 
 ### Events
 
-| Vue Event           | React Callback       | Payload                                   | Description  |
-| ------------------- | -------------------- | ----------------------------------------- | ------------ |
-| `@search-change`    | `onSearchChange`     | `string`                                  | 搜索输入变化 |
-| `@search`           | `onSearch`           | `string`                                  | 提交搜索     |
-| `@filters-change`   | `onFiltersChange`    | `Record<string, TableToolbarFilterValue>` | 筛选变化     |
-| `@bulk-action`      | `onBulkAction`       | `(action, selectedKeys)`                  | 批量操作触发 |
-| `@selection-change` | `onSelectionChange`  | `(string \| number)[]`                    | 选中行变化   |
-| `@page-change`      | `onPageChange`       | `current, pageSize`                       | 分页变化     |
-| `@page-size-change` | `onPageSizeChange`   | `current, pageSize`                       | 页大小变化   |
+| Vue Event           | React Callback      | Payload                                   | Description  |
+| ------------------- | ------------------- | ----------------------------------------- | ------------ |
+| `@search-change`    | `onSearchChange`    | `string`                                  | 搜索输入变化 |
+| `@search`           | `onSearch`          | `string`                                  | 提交搜索     |
+| `@filters-change`   | `onFiltersChange`   | `Record<string, TableToolbarFilterValue>` | 筛选变化     |
+| `@bulk-action`      | `onBulkAction`      | `(action, selectedKeys)`                  | 批量操作触发 |
+| `@selection-change` | `onSelectionChange` | `(string \| number)[]`                    | 选中行变化   |
+| `@page-change`      | `onPageChange`      | `current, pageSize`                       | 分页变化     |
+| `@page-size-change` | `onPageSizeChange`  | `current, pageSize`                       | 页大小变化   |
 
 ### TableToolbarProps
 
