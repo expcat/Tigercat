@@ -39,4 +39,29 @@ describe('ActivityFeed (React)', () => {
 
     expect(screen.getByText('暂无活动')).toBeInTheDocument()
   })
+
+  it('groups items by groupBy function and respects groupOrder', () => {
+    const items = [
+      { id: 1, title: '任务A', category: 'work' },
+      { id: 2, title: '任务B', category: 'personal' },
+      { id: 3, title: '任务C', category: 'work' },
+      { id: 4, title: '任务D', category: 'personal' }
+    ]
+
+    const groupBy = (item: { category: string }) => item.category
+    const groupOrder = ['personal', 'work']
+
+    render(<ActivityFeed items={items} groupBy={groupBy} groupOrder={groupOrder} />)
+
+    expect(screen.getByText('personal')).toBeInTheDocument()
+    expect(screen.getByText('work')).toBeInTheDocument()
+    expect(screen.getByText('任务A')).toBeInTheDocument()
+    expect(screen.getByText('任务B')).toBeInTheDocument()
+    expect(screen.getByText('任务C')).toBeInTheDocument()
+    expect(screen.getByText('任务D')).toBeInTheDocument()
+
+    const groupHeaders = screen.getAllByText(/^(personal|work)$/)
+    expect(groupHeaders[0]).toHaveTextContent('personal')
+    expect(groupHeaders[1]).toHaveTextContent('work')
+  })
 })
