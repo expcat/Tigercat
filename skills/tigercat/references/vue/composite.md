@@ -72,7 +72,6 @@ const handleSend = (value: string) => {
 </template>
 ```
 
-
 ---
 
 ## ActivityFeed 活动动态流
@@ -210,7 +209,6 @@ const toolbar = computed(() => ({
     @search-change="(val) => (keyword = val)"
     @filters-change="(val) => (filters = val)"
     @page-change="(current, pageSize) => (pagination = { current, pageSize })"
-    @page-size-change="(current, pageSize) => (pagination = { current, pageSize })"
-  />
+    @page-size-change="(current, pageSize) => (pagination = { current, pageSize })" />
 </template>
 ```

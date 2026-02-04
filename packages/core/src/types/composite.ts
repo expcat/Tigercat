@@ -519,8 +519,10 @@ export interface TableToolbarProps {
 /**
  * Data table with toolbar props
  */
-export interface DataTableWithToolbarProps<T = Record<string, unknown>>
-  extends Omit<TableProps<T>, 'pagination'> {
+export interface DataTableWithToolbarProps<T = Record<string, unknown>> extends Omit<
+  TableProps<T>,
+  'pagination'
+> {
   /**
    * Toolbar configuration
    */
