@@ -1,8 +1,11 @@
 import { defineComponent, computed, h, PropType } from 'vue'
 import {
   classNames,
+  buildActivityGroups,
   coerceClassValue,
+  formatActivityTime,
   mergeStyleValues,
+  toActivityTimelineItems,
   type ActivityFeedProps as CoreActivityFeedProps,
   type ActivityGroup,
   type ActivityItem,
@@ -23,68 +26,6 @@ export interface VueActivityFeedProps
   extends Omit<CoreActivityFeedProps, 'renderItem' | 'renderGroupHeader'> {
   className?: string
   style?: Record<string, string | number>
-}
-
-const formatTime = (value?: string | number | Date): string => {
-  if (!value) return ''
-  if (value instanceof Date) return value.toLocaleString()
-  if (typeof value === 'number') return new Date(value).toLocaleString()
-  return value
-}
-
-const sortGroups = (groups: ActivityGroup[], groupOrder?: string[]) => {
-  if (!groupOrder || groupOrder.length === 0) return groups
-  const orderMap = new Map(groupOrder.map((key, index) => [key, index]))
-  return [...groups].sort((a, b) => {
-    const aKey = String(a.key ?? a.title ?? '')
-    const bKey = String(b.key ?? b.title ?? '')
-    const aIndex = orderMap.has(aKey) ? (orderMap.get(aKey) as number) : Number.POSITIVE_INFINITY
-    const bIndex = orderMap.has(bKey) ? (orderMap.get(bKey) as number) : Number.POSITIVE_INFINITY
-    if (aIndex === bIndex) return 0
-    return aIndex - bIndex
-  })
-}
-
-const buildGroups = (
-  items?: ActivityItem[],
-  groups?: ActivityGroup[],
-  groupBy?: (item: ActivityItem) => string,
-  groupOrder?: string[]
-): ActivityGroup[] => {
-  if (groups && groups.length > 0) {
-    return sortGroups(groups, groupOrder)
-  }
-
-  if (!items || items.length === 0) return []
-
-  if (groupBy) {
-    const groupMap = new Map<string, ActivityItem[]>()
-    items.forEach((item) => {
-      const key = groupBy(item) || '其他'
-      const bucket = groupMap.get(key) ?? []
-      bucket.push(item)
-      groupMap.set(key, bucket)
-    })
-
-    const mappedGroups = Array.from(groupMap.entries()).map(([title, groupItems]) => ({
-      key: title,
-      title,
-      items: groupItems
-    }))
-
-    return sortGroups(mappedGroups, groupOrder)
-  }
-
-  return [{ key: 'default', title: '', items }]
-}
-
-const getTimelineItems = (items: ActivityItem[], showTime: boolean): TimelineItem[] => {
-  return items.map((item, index) => ({
-    key: item.id ?? index,
-    label: showTime ? formatTime(item.time) : undefined,
-    content: undefined,
-    activity: item
-  }))
 }
 
 const renderAction = (item: ActivityItem, action: ActivityAction, index: number) => {
@@ -161,7 +102,7 @@ export const ActivityFeed = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const resolvedGroups = computed(() =>
-      buildGroups(props.items, props.groups, props.groupBy, props.groupOrder)
+      buildActivityGroups(props.items, props.groups, props.groupBy, props.groupOrder)
     )
 
     const wrapperClasses = computed(() =>
@@ -190,7 +131,7 @@ export const ActivityFeed = defineComponent({
           ? String(item.content)
           : '')
       const descriptionText = item.description
-      const timeText = props.showTime ? formatTime(item.time) : ''
+      const timeText = props.showTime ? formatActivityTime(item.time) : ''
       const actionNodes = item.actions?.map((action, actionIndex) =>
         renderAction(item, action, actionIndex)
       )
@@ -263,10 +204,10 @@ export const ActivityFeed = defineComponent({
         return h(
           'div',
           {
+            ...attrs,
             class: wrapperClasses.value,
             style: wrapperStyle.value,
-            'data-tiger-activity-feed': true,
-            ...attrs
+            'data-tiger-activity-feed': true
           },
           [
             h(
@@ -292,10 +233,10 @@ export const ActivityFeed = defineComponent({
         return h(
           'div',
           {
+            ...attrs,
             class: wrapperClasses.value,
             style: wrapperStyle.value,
-            'data-tiger-activity-feed': true,
-            ...attrs
+            'data-tiger-activity-feed': true
           },
           [
             h(
@@ -312,15 +253,15 @@ export const ActivityFeed = defineComponent({
       return h(
         'div',
         {
+          ...attrs,
           class: wrapperClasses.value,
           style: wrapperStyle.value,
-          'data-tiger-activity-feed': true,
-          ...attrs
+          'data-tiger-activity-feed': true
         },
         resolvedGroups.value.map((group, groupIndex) => {
           const headerNode = slots.groupTitle ? slots.groupTitle({ group }) : undefined
           const groupTitle = group.title
-          const timelineItems = getTimelineItems(group.items, props.showTime)
+          const timelineItems = toActivityTimelineItems(group.items, props.showTime)
 
           return h('div', { key: group.key ?? groupIndex, class: 'space-y-3' }, [
             props.showGroupTitle && groupTitle

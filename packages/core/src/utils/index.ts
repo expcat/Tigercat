@@ -21,3 +21,6 @@ export * from './animation'
 
 // ChatWindow utilities
 export * from './chat-window-utils'
+
+// ActivityFeed utilities
+export * from './activity-feed-utils'
