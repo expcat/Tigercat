@@ -81,3 +81,83 @@ description: Shared props definitions for composite components - ChatWindow
 | id     | `string \| number` | -       | 用户标识    |
 | name   | `string`           | -       | 显示名称    |
 | avatar | `string`           | -       | 头像地址    |
+
+---
+
+## ActivityFeed 活动动态流
+
+### Props
+
+| Prop           | Type                               | Default   | Vue | React | Description          |
+| -------------- | ---------------------------------- | --------- | :-: | :---: | -------------------- |
+| items          | `ActivityItem[]`                   | `[]`      |  ✓  |   ✓   | 动态列表（扁平）     |
+| groups         | `ActivityGroup[]`                  | -         |  ✓  |   ✓   | 分组数据             |
+| groupBy        | `(item) => string`                 | -         |  ✓  |   ✓   | 分组函数             |
+| groupOrder     | `string[]`                         | -         |  ✓  |   ✓   | 分组顺序             |
+| loading        | `boolean`                          | `false`   |  ✓  |   ✓   | 加载中状态           |
+| loadingText    | `string`                           | `'加载中...'` |  ✓  |   ✓   | 加载文案             |
+| emptyText      | `string`                           | `'暂无动态'` |  ✓  |   ✓   | 空态文案             |
+| showAvatar     | `boolean`                          | `true`    |  ✓  |   ✓   | 显示头像             |
+| showTime       | `boolean`                          | `true`    |  ✓  |   ✓   | 显示时间             |
+| showGroupTitle | `boolean`                          | `true`    |  ✓  |   ✓   | 显示分组标题         |
+
+### Behavior
+
+- `groups` 优先生效；未提供 `groups` 时可用 `groupBy` 对 `items` 进行分组。
+- `groupOrder` 可用于控制分组顺序，未包含的分组会排在后面。
+
+### Slots / Render Props
+
+| Vue Slot                                    | React Prop         | Description          |
+| ------------------------------------------- | ------------------ | -------------------- |
+| `item` (scoped: `{ item, index, group }`)   | `renderItem`       | 自定义条目渲染       |
+| `groupTitle` (scoped: `{ group }`)          | `renderGroupHeader`| 自定义分组标题       |
+| `empty`                                     | -                  | 自定义空态           |
+| `loading`                                   | -                  | 自定义加载态         |
+
+### ActivityItem
+
+| Prop        | Type                          | Default | Description    |
+| ----------- | ----------------------------- | ------- | -------------- |
+| id          | `string \| number`            | -       | 唯一标识       |
+| title       | `string`                      | -       | 标题           |
+| description | `string`                      | -       | 描述           |
+| time        | `string \| number \| Date`   | -       | 时间           |
+| user        | `ActivityUser`                | -       | 用户           |
+| status      | `ActivityStatusTag`           | -       | 状态标签       |
+| actions     | `ActivityAction[]`            | -       | 操作入口       |
+| content     | `unknown`                     | -       | 自定义内容     |
+
+### ActivityGroup
+
+| Prop  | Type            | Default | Description |
+| ----- | --------------- | ------- | ----------- |
+| key   | `string \| number` | -   | 分组键       |
+| title | `string`        | -       | 分组标题     |
+| items | `ActivityItem[]`| -       | 分组内容     |
+
+### ActivityStatusTag
+
+| Prop    | Type         | Default   | Description |
+| ------- | ------------ | --------- | ----------- |
+| label   | `string`     | -         | 状态文案    |
+| variant | `TagVariant` | `'default'` | 标签风格  |
+
+### ActivityAction
+
+| Prop     | Type                                  | Default | Description |
+| -------- | ------------------------------------- | ------- | ----------- |
+| key      | `string \| number`                     | -       | 唯一标识    |
+| label    | `string`                              | -       | 操作文案    |
+| href     | `string`                              | -       | 链接地址    |
+| target   | `'_blank' \| '_self' \| '_parent' \| '_top'` | - | 链接 target |
+| disabled | `boolean`                             | `false` | 禁用        |
+| onClick  | `(item, action) => void`              | -       | 点击回调    |
+
+### ActivityUser
+
+| Prop   | Type               | Default | Description |
+| ------ | ------------------ | ------- | ----------- |
+| id     | `string \| number` | -      | 用户标识    |
+| name   | `string`           | -       | 显示名称    |
+| avatar | `string`           | -       | 头像地址    |
