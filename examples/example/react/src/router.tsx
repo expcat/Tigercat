@@ -25,6 +25,7 @@ const DatePickerDemo = lazy(() => import('./pages/DatePickerDemo'))
 const TimePickerDemo = lazy(() => import('./pages/TimePickerDemo'))
 const UploadDemo = lazy(() => import('./pages/UploadDemo'))
 const TableDemo = lazy(() => import('./pages/TableDemo'))
+const DataTableWithToolbarDemo = lazy(() => import('./pages/DataTableWithToolbarDemo'))
 const TagDemo = lazy(() => import('./pages/TagDemo'))
 const BadgeDemo = lazy(() => import('./pages/BadgeDemo'))
 const CardDemo = lazy(() => import('./pages/CardDemo'))
@@ -92,6 +93,7 @@ const router = createBrowserRouter(
         { path: 'timepicker', element: <TimePickerDemo /> },
         { path: 'upload', element: <UploadDemo /> },
         { path: 'table', element: <TableDemo /> },
+        { path: 'data-table-with-toolbar', element: <DataTableWithToolbarDemo /> },
         { path: 'tag', element: <TagDemo /> },
         { path: 'badge', element: <BadgeDemo /> },
         { path: 'card', element: <CardDemo /> },

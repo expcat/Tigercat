@@ -161,3 +161,74 @@ description: Shared props definitions for composite components - ChatWindow
 | id     | `string \| number` | -      | 用户标识    |
 | name   | `string`           | -       | 显示名称    |
 | avatar | `string`           | -       | 头像地址    |
+
+---
+
+## DataTableWithToolbar 表格工具栏
+
+> 组合 Table + Toolbar + Pagination 的统一容器。
+
+### Props
+
+| Prop        | Type                              | Default | Vue | React | Description              |
+| ----------- | --------------------------------- | ------- | :-: | :---: | ------------------------ |
+| columns     | `TableColumn[]`                   | -       |  ✓  |   ✓   | 表格列配置（同 Table）   |
+| dataSource  | `any[]`                           | `[]`    |  ✓  |   ✓   | 数据源                   |
+| rowSelection| `RowSelectionConfig`              | -       |  ✓  |   ✓   | 行选择配置               |
+| rowKey      | `string \| ((row) => string)`     | `'id'`  |  ✓  |   ✓   | 行唯一键                 |
+| loading     | `boolean`                         | `false` |  ✓  |   ✓   | 加载状态                 |
+| toolbar     | `TableToolbarProps`               | -       |  ✓  |   ✓   | 工具栏配置               |
+| pagination  | `PaginationProps \| false`        | `false` |  ✓  |   ✓   | 分页配置                 |
+| onPageChange| `(current, pageSize) => void`     | -       |  -  |   ✓   | 分页变化回调（React）    |
+| onPageSizeChange | `(current, pageSize) => void` | -    |  -  |   ✓   | 页大小变化回调（React）  |
+
+> 其余 Table 相关 Props（如 `striped`/`hoverable`/`stickyHeader`）保持一致。
+
+### Events
+
+| Vue Event            | React Callback     | Payload                                | Description            |
+| -------------------- | ------------------ | -------------------------------------- | ---------------------- |
+| `@search-change`     | `onSearchChange`   | `string`                               | 搜索输入变化           |
+| `@search`            | `onSearch`         | `string`                               | 提交搜索               |
+| `@filters-change`    | `onFiltersChange`  | `Record<string, TableToolbarFilterValue>` | 筛选变化           |
+| `@bulk-action`       | `onBulkAction`     | `(action, selectedKeys)`               | 批量操作触发           |
+| `@page-change`       | `onPageChange`     | `current, pageSize`                    | 分页变化               |
+| `@page-size-change`  | `onPageSizeChange` | `current, pageSize`                    | 页大小变化             |
+
+### TableToolbarProps
+
+| Prop             | Type                              | Default | Description          |
+| ---------------- | --------------------------------- | ------- | -------------------- |
+| searchValue      | `string`                          | -       | 搜索值（受控）       |
+| defaultSearchValue | `string`                        | -       | 搜索默认值（非受控） |
+| searchPlaceholder | `string`                         | `'搜索'`| 搜索占位             |
+| searchButtonText | `string`                          | `'搜索'`| 搜索按钮文案         |
+| showSearchButton | `boolean`                         | `true`  | 显示搜索按钮         |
+| filters          | `TableToolbarFilter[]`            | -       | 筛选配置             |
+| bulkActions      | `TableToolbarAction[]`            | -       | 批量操作配置         |
+| selectedKeys     | `(string \| number)[]`            | `[]`    | 选中行 keys           |
+| selectedCount    | `number`                          | -       | 选中行数量           |
+| bulkActionsLabel | `string`                          | `'已选择'` | 批量操作前缀文案  |
+
+### TableToolbarFilter
+
+| Prop         | Type                       | Default | Description      |
+| ------------ | -------------------------- | ------- | ---------------- |
+| key          | `string`                   | -       | 过滤键           |
+| label        | `string`                   | -       | 过滤标题         |
+| options      | `FilterOption[]`           | -       | 过滤选项         |
+| placeholder  | `string`                   | -       | 触发按钮占位     |
+| clearable    | `boolean`                  | `true`  | 是否可清空       |
+| clearLabel   | `string`                   | `'全部'`| 清空文案         |
+| value        | `TableToolbarFilterValue`  | -       | 受控值           |
+| defaultValue | `TableToolbarFilterValue`  | -       | 非受控默认值     |
+
+### TableToolbarAction
+
+| Prop     | Type           | Default   | Description |
+| -------- | -------------- | --------- | ----------- |
+| key      | `string \| number` | -    | 操作键     |
+| label    | `string`       | -         | 操作文案   |
+| variant  | `ButtonVariant`| `'outline'` | 按钮风格 |
+| disabled | `boolean`      | `false`   | 禁用       |
+| onClick  | `(selectedKeys) => void` | - | 点击回调 |

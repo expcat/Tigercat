@@ -4,6 +4,9 @@
 
 import type { BadgeVariant } from './badge'
 import type { TagVariant } from './tag'
+import type { ButtonVariant } from './button'
+import type { FilterOption, TableProps } from './table'
+import type { PaginationProps } from './pagination'
 
 /**
  * Chat message direction
@@ -373,4 +376,166 @@ export interface ActivityFeedProps {
    * Custom render for group header
    */
   renderGroupHeader?: (group: ActivityGroup) => unknown
+}
+
+/**
+ * Toolbar filter value
+ */
+export type TableToolbarFilterValue = string | number | null
+
+/**
+ * Table toolbar filter definition
+ */
+export interface TableToolbarFilter {
+  /**
+   * Filter key
+   */
+  key: string
+  /**
+   * Filter label
+   */
+  label: string
+  /**
+   * Filter options
+   */
+  options: FilterOption[]
+  /**
+   * Placeholder text for the trigger
+   */
+  placeholder?: string
+  /**
+   * Whether the filter can be cleared
+   * @default true
+   */
+  clearable?: boolean
+  /**
+   * Label for the clear option
+   * @default '全部'
+   */
+  clearLabel?: string
+  /**
+   * Controlled filter value
+   */
+  value?: TableToolbarFilterValue
+  /**
+   * Default filter value (uncontrolled)
+   */
+  defaultValue?: TableToolbarFilterValue
+}
+
+/**
+ * Table toolbar bulk action
+ */
+export interface TableToolbarAction {
+  /**
+   * Action key
+   */
+  key: string | number
+  /**
+   * Action label
+   */
+  label: string
+  /**
+   * Button variant
+   * @default 'outline'
+   */
+  variant?: ButtonVariant
+  /**
+   * Whether the action is disabled
+   * @default false
+   */
+  disabled?: boolean
+  /**
+   * Click handler
+   */
+  onClick?: (selectedKeys: (string | number)[]) => void
+}
+
+/**
+ * Table toolbar props
+ */
+export interface TableToolbarProps {
+  /**
+   * Search value (controlled)
+   */
+  searchValue?: string
+  /**
+   * Default search value (uncontrolled)
+   */
+  defaultSearchValue?: string
+  /**
+   * Search input placeholder
+   */
+  searchPlaceholder?: string
+  /**
+   * Search button text
+   * @default '搜索'
+   */
+  searchButtonText?: string
+  /**
+   * Whether to show search button
+   * @default true
+   */
+  showSearchButton?: boolean
+  /**
+   * Search value change callback
+   */
+  onSearchChange?: (value: string) => void
+  /**
+   * Search submit callback
+   */
+  onSearch?: (value: string) => void
+  /**
+   * Filter definitions
+   */
+  filters?: TableToolbarFilter[]
+  /**
+   * Filters change callback
+   */
+  onFiltersChange?: (filters: Record<string, TableToolbarFilterValue>) => void
+  /**
+   * Bulk actions
+   */
+  bulkActions?: TableToolbarAction[]
+  /**
+   * Selected row keys
+   */
+  selectedKeys?: (string | number)[]
+  /**
+   * Selected row count
+   */
+  selectedCount?: number
+  /**
+   * Bulk actions label prefix
+   * @default '已选择'
+   */
+  bulkActionsLabel?: string
+  /**
+   * Bulk action click callback
+   */
+  onBulkAction?: (action: TableToolbarAction, selectedKeys: (string | number)[]) => void
+}
+
+/**
+ * Data table with toolbar props
+ */
+export interface DataTableWithToolbarProps<T = Record<string, unknown>>
+  extends Omit<TableProps<T>, 'pagination'> {
+  /**
+   * Toolbar configuration
+   */
+  toolbar?: TableToolbarProps
+  /**
+   * Pagination configuration
+   * Set to false to disable
+   */
+  pagination?: PaginationProps | false
+  /**
+   * Page change callback
+   */
+  onPageChange?: (current: number, pageSize: number) => void
+  /**
+   * Page size change callback
+   */
+  onPageSizeChange?: (current: number, pageSize: number) => void
 }

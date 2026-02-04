@@ -345,6 +345,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
     label: { 'zh-CN': '组合组件', 'en-US': 'Composite' },
     items: [
       {
+        key: 'data-table-with-toolbar',
+        path: '/data-table-with-toolbar',
+        label: { 'zh-CN': 'DataTableWithToolbar', 'en-US': 'DataTableWithToolbar' }
+      },
+      {
         key: 'chat-window',
         path: '/chat-window',
         label: { 'zh-CN': 'ChatWindow', 'en-US': 'ChatWindow' }
