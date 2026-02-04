@@ -2,7 +2,7 @@ import type { ActivityGroup, ActivityItem } from '../types/composite'
 import type { TimelineItem } from '../types/timeline'
 
 export const formatActivityTime = (value?: string | number | Date): string => {
-  if (!value) return ''
+  if (value == null || value === '') return ''
   if (value instanceof Date) return value.toLocaleString()
   if (typeof value === 'number') return new Date(value).toLocaleString()
   return value
@@ -54,7 +54,10 @@ export const buildActivityGroups = (
   return [{ key: 'default', title: '', items }]
 }
 
-export const toActivityTimelineItems = (items: ActivityItem[], showTime: boolean): TimelineItem[] => {
+export const toActivityTimelineItems = (
+  items: ActivityItem[],
+  showTime: boolean
+): TimelineItem[] => {
   return items.map((item, index) => ({
     key: item.id ?? index,
     label: showTime ? formatActivityTime(item.time) : undefined,

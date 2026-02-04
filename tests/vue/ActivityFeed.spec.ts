@@ -56,7 +56,7 @@ describe('ActivityFeed (Vue)', () => {
     render(ActivityFeed, {
       props: {
         items,
-        groupBy: (item: { group: string }) => item.group,
+        groupBy: (item) => String(item.group),
         groupOrder: ['Group B', 'Group A']
       }
     })
