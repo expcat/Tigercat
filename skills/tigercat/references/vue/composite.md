@@ -71,6 +71,7 @@ const handleSend = (value: string) => {
   </ChatWindow>
 </template>
 ```
+```
 
 ---
 

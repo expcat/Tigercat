@@ -212,7 +212,7 @@ description: Shared props definitions for composite components - ChatWindow
 | id          | `string \| number`           | -       | 唯一标识    |
 | title       | `string`                     | -       | 标题        |
 | description | `string`                     | -       | 描述        |
-| time        | `string \| number \| Date`   | -      | 时间        |
+| time        | `string \| number \| Date`   | - | 时间        |
 | type        | `string`                     | -       | 类型/分组键 |
 | read        | `boolean`                    | `false` | 是否已读    |
 | meta        | `Record<string, unknown>`    | -       | 扩展数据    |
