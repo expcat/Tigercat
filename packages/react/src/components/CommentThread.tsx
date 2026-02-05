@@ -263,9 +263,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             ) : null}
 
             {showReplies ? (
-              <div
-                id={repliesId}
-                className="mt-3 pl-6 border-l border-gray-100 space-y-3">
+              <div id={repliesId} className="mt-3 pl-6 border-l border-gray-100 space-y-3">
                 {visibleChildren.map((child, index) =>
                   renderNode(child, depth + 1, index === visibleChildren.length - 1)
                 )}
@@ -282,9 +280,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     <div
       className={classNames('tiger-comment-thread', 'flex', 'flex-col', 'gap-4', className)}
       data-tiger-comment-thread
-      aria-label={
-        divProps['aria-label'] ?? (divProps['aria-labelledby'] ? undefined : '评论线程')
-      }
+      aria-label={divProps['aria-label'] ?? (divProps['aria-labelledby'] ? undefined : '评论线程')}
       {...divProps}>
       {resolvedNodes.length === 0 ? (
         <Text tag="div" size="sm" color="muted" className="text-center py-6">

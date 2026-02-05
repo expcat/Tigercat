@@ -57,7 +57,6 @@ const handleSend = (value: string) => {
 
 <template>
   <ChatWindow
-
     status-text="对方正在输入..."
     allow-shift-enter
     message-list-aria-label="会话消息"
@@ -374,3 +373,4 @@ const toolbar = computed(() => ({
     @page-size-change="(current, pageSize) => (pagination = { current, pageSize })" />
 </template>
 ```
+````
