@@ -12,7 +12,7 @@ const steps: WizardStep[] = [
 
 const current = ref(0)
 const finished = ref(false)
-const formRef = ref<any>(null)
+const formRef = ref<InstanceType<typeof Form> | null>(null)
 const model = reactive({ name: '', email: '', phone: '' })
 
 const handleBeforeNext = async () => {

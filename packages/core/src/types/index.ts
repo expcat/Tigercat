@@ -67,9 +67,6 @@ export * from './tooltip'
 // Composite components
 export * from './composite'
 
-// Composite components
-export * from './composite'
-
 // Other components
 export * from './link'
 export * from './text'

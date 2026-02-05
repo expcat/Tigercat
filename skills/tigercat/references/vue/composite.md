@@ -76,7 +76,7 @@ const handleSend = (value: string) => {
 
 ## ActivityFeed 活动动态流
 
-````vue
+```vue
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ActivityFeed } from '@expcat/tigercat-vue'
@@ -94,7 +94,44 @@ const activityGroups = ref<ActivityGroup[]>([
         time: '09:30',
         user: { name: '管理员', avatar: 'https://i.pravatar.cc/40?img=12' },
         status: { label: '已完成', variant: 'success' },
+        actions: [{ label: '查看详情', href: '#' }]
       },
+      {
+        id: 2,
+        title: '导入审计日志',
+        description: '共导入 24 条记录。',
+        time: '10:05',
+        user: { name: '系统' },
+        status: { label: '处理中', variant: 'warning' },
+        actions: [{ label: '重试', href: '#' }]
+      }
+    ]
+  },
+  {
+    key: 'yesterday',
+    title: '昨天',
+    items: [
+      {
+        id: 3,
+        title: '发布版本 2.1',
+        description: '包含安全修复与性能优化。',
+        time: '16:45',
+        user: { name: 'DevOps', avatar: 'https://i.pravatar.cc/40?img=6' },
+        status: { label: '成功', variant: 'primary' },
+        actions: [{ label: '变更记录', href: '#' }]
+      }
+    ]
+  }
+])
+</script>
+
+<template>
+  <ActivityFeed :groups="activityGroups" />
+</template>
+```
+
+---
+
 ## FormWizard 表单向导
 
 ```vue
@@ -144,43 +181,6 @@ const handleFinish = () => {
       </Form>
     </template>
   </FormWizard>
-</template>
-````
-
----
-
-      {
-        id: 2,
-        title: '导入审计日志',
-        description: '共导入 24 条记录。',
-        time: '10:05',
-        user: { name: '系统' },
-        status: { label: '处理中', variant: 'warning' },
-        actions: [{ label: '重试', href: '#' }]
-      }
-    ]
-
-},
-{
-key: 'yesterday',
-title: '昨天',
-items: [
-{
-id: 3,
-title: '发布版本 2.1',
-description: '包含安全修复与性能优化。',
-time: '16:45',
-user: { name: 'DevOps', avatar: 'https://i.pravatar.cc/40?img=6' },
-status: { label: '成功', variant: 'primary' },
-actions: [{ label: '变更记录', href: '#' }]
-}
-]
-}
-])
-</script>
-
-<template>
-  <ActivityFeed :groups="activityGroups" />
 </template>
 ```
 

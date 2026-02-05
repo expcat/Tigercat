@@ -171,7 +171,7 @@ description: Shared props definitions for composite components - ChatWindow
 | Prop           | Type                         | Default        | Vue | React | Description                             |
 | -------------- | ---------------------------- | -------------- | :-: | :---: | --------------------------------------- |
 | steps          | `WizardStep[]`               | `[]`           |  ✓  |   ✓   | 步骤配置                                |
-| current        | `number`                     | `0`            |  ✓  |   ✓   | 当前步骤（受控）                        |
+| current        | `number`                     | -              |  ✓  |   ✓   | 当前步骤（受控）                        |
 | defaultCurrent | `number`                     | `0`            |  ✓  |   ✓   | 默认步骤（非受控）                      |
 | clickable      | `boolean`                    | `false`        |  ✓  |   ✓   | 允许点击步骤切换                        |
 | direction      | `'horizontal' \| 'vertical'` | `'horizontal'` |  ✓  |   ✓   | 步骤方向                                |
@@ -191,11 +191,11 @@ description: Shared props definitions for composite components - ChatWindow
 
 ### Events
 
-| Vue Event         | React Callback | Payload          | Description |
-| ----------------- | -------------- | ---------------- | ----------- |
-| `@update:current` | `onChange`     | `current`        | 步骤变化    |
-| `@change`         | `onChange`     | `current, prev`  | 步骤变化    |
-| `@finish`         | `onFinish`     | `current, steps` | 完成        |
+| Vue Event         | React Callback | Payload          | Description                                      |
+| ----------------- | -------------- | ---------------- | ----------------------------------------------- |
+| `@update:current` | `-`            | `current`        | 当前步骤 v-model 更新（Vue 专用，无直接 React 等价） |
+| `@change`         | `onChange`     | `current, prev`  | 步骤变化（React: `onChange(current, prev)`）    |
+| `@finish`         | `onFinish`     | `current, steps` | 完成                                            |
 
 ### Slots / Render Props
 
