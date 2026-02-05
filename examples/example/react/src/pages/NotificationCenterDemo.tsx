@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { NotificationCenter } from '@expcat/tigercat-react'
 import type { NotificationItem } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'

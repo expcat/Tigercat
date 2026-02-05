@@ -5,6 +5,7 @@ import {
   type TableColumn,
   type TableToolbarFilterValue
 } from '@expcat/tigercat-vue'
+import type { TableToolbarAction } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 
 interface UserRow extends Record<string, unknown> {
@@ -37,7 +38,7 @@ const basicSnippet = `<DataTableWithToolbar
   @selection-change="handleSelectionChange"
 />`
 
-const columns: TableColumn<UserRow>[] = [
+const columns: TableColumn<Record<string, unknown>>[] = [
   { key: 'name', title: '姓名' },
   { key: 'email', title: '邮箱' },
   { key: 'role', title: '角色' },
@@ -98,6 +99,11 @@ const pagedData = computed(() => {
   return filteredData.value.slice(start, end)
 })
 
+const bulkActions: TableToolbarAction[] = [
+  { key: 'export', label: '导出' },
+  { key: 'delete', label: '删除', variant: 'outline' }
+]
+
 const toolbar = computed(() => ({
   searchValue: keyword.value,
   searchPlaceholder: '搜索姓名/邮箱',
@@ -105,10 +111,7 @@ const toolbar = computed(() => ({
     { key: 'status', label: '状态', options: statusOptions },
     { key: 'role', label: '角色', options: roleOptions }
   ],
-  bulkActions: [
-    { key: 'export', label: '导出' },
-    { key: 'delete', label: '删除', variant: 'outline' }
-  ],
+  bulkActions,
   selectedKeys: selectedRowKeys.value
 }))
 
