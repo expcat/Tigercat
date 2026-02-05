@@ -27,3 +27,6 @@ export * from './activity-feed-utils'
 
 // NotificationCenter utilities
 export * from './notification-center-utils'
+
+// CommentThread utilities
+export * from './comment-thread-utils'

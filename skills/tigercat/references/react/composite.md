@@ -5,7 +5,7 @@ description: React composite components usage
 
 # Composite Components (React)
 
-组合组件：ChatWindow / ActivityFeed / NotificationCenter / DataTableWithToolbar
+组合组件：ChatWindow / ActivityFeed / CommentThread / NotificationCenter / DataTableWithToolbar
 
 > **Props Reference**: [shared/props/composite.md](../shared/props/composite.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -115,6 +115,39 @@ const groups: ActivityGroup[] = [
 
 export default function ActivityFeedDemo() {
   return <ActivityFeed groups={groups} />
+}
+```
+
+---
+
+## CommentThread 评论线程
+
+```tsx
+import React from 'react'
+import { CommentThread } from '@expcat/tigercat-react'
+import type { CommentNode } from '@expcat/tigercat-core'
+
+const nodes: CommentNode[] = [
+  {
+    id: 1,
+    content: '这个功能点考虑得很周到。',
+    user: { name: 'Ada', avatar: 'https://i.pravatar.cc/40?img=12', title: '产品经理' },
+    time: '10:25',
+    likes: 3,
+    children: [
+      {
+        id: 2,
+        parentId: 1,
+        content: '赞同，尤其是回复区的设计。',
+        user: { name: 'Ben', avatar: 'https://i.pravatar.cc/40?img=32' },
+        time: '10:30'
+      }
+    ]
+  }
+]
+
+export default function CommentThreadDemo() {
+  return <CommentThread nodes={nodes} defaultExpandedKeys={[1]} />
 }
 ```
 
