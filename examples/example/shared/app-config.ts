@@ -99,11 +99,6 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'Form', 'en-US': 'Form' }
       },
       {
-        key: 'form-wizard',
-        path: '/form-wizard',
-        label: { 'zh-CN': 'FormWizard', 'en-US': 'FormWizard' }
-      },
-      {
         key: 'datepicker',
         path: '/datepicker',
         label: { 'zh-CN': 'DatePicker', 'en-US': 'DatePicker' }
@@ -353,6 +348,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'data-table-with-toolbar',
         path: '/data-table-with-toolbar',
         label: { 'zh-CN': 'DataTableWithToolbar', 'en-US': 'DataTableWithToolbar' }
+      },
+      {
+        key: 'form-wizard',
+        path: '/form-wizard',
+        label: { 'zh-CN': 'FormWizard', 'en-US': 'FormWizard' }
       },
       {
         key: 'chat-window',

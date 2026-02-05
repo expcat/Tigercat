@@ -5,6 +5,7 @@ import {
   mergeStyleValues,
   buildCommentTree,
   clipCommentTreeDepth,
+  formatCommentTime,
   type CommentAction,
   type CommentNode,
   type CommentThreadProps as CoreCommentThreadProps
@@ -20,13 +21,6 @@ import { Text } from './Text'
 export interface VueCommentThreadProps extends CoreCommentThreadProps {
   className?: string
   style?: Record<string, string | number>
-}
-
-const formatCommentTime = (value?: string | number | Date): string => {
-  if (value == null || value === '') return ''
-  if (value instanceof Date) return value.toLocaleString()
-  if (typeof value === 'number') return new Date(value).toLocaleString()
-  return value
 }
 
 export const CommentThread = defineComponent({
@@ -198,7 +192,11 @@ export const CommentThread = defineComponent({
         { default: () => label }
       )
 
-    const renderNode = (node: CommentNode, depth: number, isLast: boolean) => {
+    const renderNode = (
+      node: CommentNode,
+      depth: number,
+      isLast: boolean
+    ): ReturnType<typeof h> => {
       const hasChildren = !!node.children && node.children.length > 0
       const isExpanded = expandedSet.value.has(node.id)
       const showReplies = hasChildren && isExpanded
@@ -420,7 +418,13 @@ export const CommentThread = defineComponent({
           List,
           { dataSource: resolvedNodes.value, split: false, bordered: 'none' },
           {
-            renderItem: ({ item, index }: { item: CommentNode; index: number }) =>
+            renderItem: ({
+              item,
+              index
+            }: {
+              item: CommentNode
+              index: number
+            }): ReturnType<typeof h> =>
               renderNode(item, 1, index === resolvedNodes.value.length - 1)
           }
         )

@@ -17,8 +17,8 @@ import { Pagination, type PaginationProps } from './Pagination'
 
 export interface DataTableWithToolbarProps<T = Record<string, unknown>>
   extends
-    Omit<TableProps<T>, 'pagination' | 'className'>,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
+    Omit<TableProps<T>, 'pagination' | 'className' | 'onPageChange'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   /**
    * Toolbar configuration
    */
@@ -103,10 +103,11 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   }, [toolbar?.searchValue])
 
   useEffect(() => {
-    if (!toolbar?.filters) return
+    const filters = toolbar?.filters
+    if (!filters) return
     setInternalFilters((prev) => {
       const next = { ...prev }
-      toolbar.filters.forEach((filter) => {
+      filters.forEach((filter) => {
         if (filter.value === undefined && !(filter.key in next)) {
           next[filter.key] = filter.defaultValue ?? null
         }

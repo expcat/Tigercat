@@ -3,6 +3,7 @@ import {
   classNames,
   coerceClassValue,
   getChatMessageStatusInfo,
+  formatChatTime,
   mergeStyleValues,
   type ChatMessage,
   type ChatWindowProps as CoreChatWindowProps,
@@ -14,13 +15,6 @@ import { Textarea } from './Textarea'
 import { Input } from './Input'
 import { Button } from './Button'
 import { Badge } from './Badge'
-
-const formatTime = (value?: string | number | Date): string => {
-  if (!value) return ''
-  if (value instanceof Date) return value.toLocaleTimeString()
-  if (typeof value === 'number') return new Date(value).toLocaleTimeString()
-  return value
-}
 
 export interface VueChatWindowProps extends Omit<
   CoreChatWindowProps,
@@ -243,7 +237,7 @@ export const ChatWindow = defineComponent({
             )
           : null
 
-      const timeText = props.showTime ? formatTime(message.time) : ''
+      const timeText = props.showTime ? formatChatTime(message.time) : ''
       const timeNode =
         props.showTime && timeText
           ? h(

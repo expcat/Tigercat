@@ -107,8 +107,8 @@ describe('BackTop', () => {
 
     const button = container.querySelector('button')
     expect(button).toHaveClass('custom-class')
-    // When target is a custom container (not window), uses absolute positioning
-    expect(button).toHaveClass('absolute')
+    // When target is a custom container (not window), uses sticky positioning
+    expect(button).toHaveClass('sticky')
   })
 
   it('uses fixed positioning when target is window', () => {

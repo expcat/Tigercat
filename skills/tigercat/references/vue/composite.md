@@ -5,7 +5,7 @@ description: Vue 3 composite components usage
 
 # Composite Components (Vue 3)
 
-组合组件：ChatWindow / ActivityFeed / CommentThread / NotificationCenter / DataTableWithToolbar
+组合组件：ChatWindow / ActivityFeed / CommentThread / NotificationCenter / FormWizard / DataTableWithToolbar
 
 > **Props Reference**: [shared/props/composite.md](../shared/props/composite.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 

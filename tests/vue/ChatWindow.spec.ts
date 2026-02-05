@@ -96,4 +96,29 @@ describe('ChatWindow (Vue)', () => {
 
     expect(screen.getByText('Custom: Hi')).toBeInTheDocument()
   })
+
+  it('keeps input value when clearOnSend is false', async () => {
+    const { emitted } = render(ChatWindow, {
+      props: { inputType: 'input', clearOnSend: false }
+    })
+
+    const input = screen.getByPlaceholderText('请输入消息') as HTMLInputElement
+    await fireEvent.update(input, 'Ping')
+    await fireEvent.keyDown(input, { key: 'Enter' })
+
+    expect(emitted().send?.[0]).toEqual(['Ping'])
+    expect(input.value).toBe('Ping')
+  })
+
+  it('does not send on enter when sendOnEnter is false', async () => {
+    const { emitted } = render(ChatWindow, {
+      props: { sendOnEnter: false }
+    })
+
+    const textarea = screen.getByPlaceholderText('请输入消息') as HTMLTextAreaElement
+    await fireEvent.update(textarea, 'Hello')
+    await fireEvent.keyDown(textarea, { key: 'Enter' })
+
+    expect(emitted().send).toBeFalsy()
+  })
 })

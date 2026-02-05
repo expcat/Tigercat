@@ -70,6 +70,44 @@ describe('DataTableWithToolbar (Vue)', () => {
     expect(screen.getByRole('button', { name: '导出' })).toBeInTheDocument()
   })
 
+  it('renders search input when only search-change listener is provided', () => {
+    const onSearchChange = vi.fn()
+
+    render(DataTableWithToolbar, {
+      props: {
+        columns,
+        dataSource: [],
+        toolbar: {}
+      },
+      attrs: {
+        onSearchChange
+      }
+    })
+
+    expect(screen.getByPlaceholderText('搜索')).toBeInTheDocument()
+  })
+
+  it('submits search on enter without search button', async () => {
+    const onSearch = vi.fn()
+
+    render(DataTableWithToolbar, {
+      props: {
+        columns,
+        dataSource: [],
+        toolbar: { searchPlaceholder: '搜索名称', showSearchButton: false }
+      },
+      attrs: {
+        onSearch
+      }
+    })
+
+    const input = screen.getByPlaceholderText('搜索名称') as HTMLInputElement
+    await userEvent.type(input, 'Alpha{enter}')
+
+    expect(onSearch).toHaveBeenCalledWith('Alpha')
+    expect(screen.queryByRole('button', { name: '搜索' })).not.toBeInTheDocument()
+  })
+
   it('forwards selection-change event', async () => {
     const onSelectionChange = vi.fn()
 

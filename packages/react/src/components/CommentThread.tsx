@@ -3,6 +3,7 @@ import {
   classNames,
   buildCommentTree,
   clipCommentTreeDepth,
+  formatCommentTime,
   type CommentAction,
   type CommentNode,
   type CommentThreadProps as CoreCommentThreadProps
@@ -17,13 +18,6 @@ import { Text } from './Text'
 
 export interface CommentThreadProps
   extends CoreCommentThreadProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {}
-
-const formatCommentTime = (value?: string | number | Date): string => {
-  if (value == null || value === '') return ''
-  if (value instanceof Date) return value.toLocaleString()
-  if (typeof value === 'number') return new Date(value).toLocaleString()
-  return value
-}
 
 export const CommentThread: React.FC<CommentThreadProps> = ({
   nodes,
