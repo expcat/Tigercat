@@ -68,4 +68,25 @@ describe('ActivityFeed (Vue)', () => {
     expect(screen.getByText('Item A')).toBeInTheDocument()
     expect(screen.getByText('Item B')).toBeInTheDocument()
   })
+
+  it('renders loading state', () => {
+    render(ActivityFeed, { props: { loading: true, loadingText: '加载中...' } })
+
+    expect(screen.getByText('加载中...')).toBeInTheDocument()
+  })
+
+  it('hides group title when showGroupTitle is false', () => {
+    const groups: ActivityGroup[] = [
+      {
+        key: 'today',
+        title: '今天',
+        items: [{ id: 1, title: 'A' }]
+      }
+    ]
+
+    render(ActivityFeed, { props: { groups, showGroupTitle: false } })
+
+    expect(screen.queryByText('今天')).not.toBeInTheDocument()
+    expect(screen.getByText('A')).toBeInTheDocument()
+  })
 })

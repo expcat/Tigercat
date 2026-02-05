@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   classNames,
   getChatMessageStatusInfo,
+  formatChatTime,
   type ChatMessage,
   type ChatWindowProps as CoreChatWindowProps,
   type BadgeVariant
@@ -21,13 +22,6 @@ export interface ChatWindowProps
    * Custom render for message bubble
    */
   renderMessage?: (message: ChatMessage, index: number) => React.ReactNode
-}
-
-const formatTime = (value?: string | number | Date): string => {
-  if (!value) return ''
-  if (value instanceof Date) return value.toLocaleTimeString()
-  if (typeof value === 'number') return new Date(value).toLocaleTimeString()
-  return value
 }
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({
@@ -146,7 +140,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           : 'bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)]'
       )
 
-      const metaText = formatTime(message.time)
+      const metaText = formatChatTime(message.time)
       const statusInfo = message.status ? getChatMessageStatusInfo(message.status) : undefined
       const customContent = renderMessage?.(message, index)
 

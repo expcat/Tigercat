@@ -11,8 +11,11 @@ import { Button } from './Button'
 import { Alert } from './Alert'
 
 export interface FormWizardProps
-  extends CoreFormWizardProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children'> {
+  extends
+    Omit<CoreFormWizardProps, 'style'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children' | 'style'> {
   renderStep?: (step: WizardStep, index: number) => React.ReactNode
+  style?: React.CSSProperties
 }
 
 export const FormWizard: React.FC<FormWizardProps> = ({
@@ -173,7 +176,7 @@ export const FormWizard: React.FC<FormWizardProps> = ({
           title={step.title}
           description={step.description}
           status={step.status}
-          icon={step.icon}
+          icon={step.icon as React.ReactNode}
           disabled={step.disabled}
         />
       )),

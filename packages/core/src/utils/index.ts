@@ -30,3 +30,6 @@ export * from './notification-center-utils'
 
 // CommentThread utilities
 export * from './comment-thread-utils'
+
+// Composite time helpers
+export * from './composite-time-utils'

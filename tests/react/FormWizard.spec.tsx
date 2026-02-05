@@ -42,4 +42,23 @@ describe('FormWizard (React)', () => {
     expect(beforeNext).toHaveBeenCalledTimes(1)
     expect(screen.getByText('Content 1')).toBeInTheDocument()
   })
+
+  it('shows error message when beforeNext returns string', async () => {
+    const user = userEvent.setup()
+    const beforeNext = vi.fn().mockReturnValue('需要先完成校验')
+
+    render(
+      <FormWizard
+        steps={steps}
+        beforeNext={beforeNext}
+        renderStep={(_step, index) => <div>Content {index + 1}</div>}
+      />
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+
+    expect(beforeNext).toHaveBeenCalledTimes(1)
+    expect(screen.getByText('需要先完成校验')).toBeInTheDocument()
+    expect(screen.getByText('Content 1')).toBeInTheDocument()
+  })
 })

@@ -44,4 +44,24 @@ describe('FormWizard (Vue)', () => {
     expect(beforeNext).toHaveBeenCalledTimes(1)
     expect(screen.getByText('Content 1')).toBeInTheDocument()
   })
+
+  it('shows error message when beforeNext returns string', async () => {
+    const beforeNext = vi.fn().mockReturnValue('需要先完成校验')
+
+    render(FormWizard, {
+      props: {
+        steps,
+        beforeNext
+      },
+      slots: {
+        step: ({ index }: { index: number }) => h('div', `Content ${index + 1}`)
+      }
+    })
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+
+    expect(beforeNext).toHaveBeenCalledTimes(1)
+    expect(screen.getByText('需要先完成校验')).toBeInTheDocument()
+    expect(screen.getByText('Content 1')).toBeInTheDocument()
+  })
 })

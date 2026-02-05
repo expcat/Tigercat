@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, ref, watch } from 'vue'
+import { defineComponent, computed, getCurrentInstance, h, PropType, ref, watch } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -172,6 +172,8 @@ export const DataTableWithToolbar = defineComponent({
   setup(props, { attrs, emit }) {
     const internalSearch = ref<string>(props.toolbar?.defaultSearchValue ?? '')
     const internalFilters = ref<Record<string, TableToolbarFilterValue>>({})
+    const vnodeProps = (getCurrentInstance()?.vnode.props ?? {}) as Record<string, unknown>
+    const hasSearchListener = Boolean(vnodeProps.onSearch || vnodeProps.onSearchChange)
 
     watch(
       () => props.toolbar?.searchValue,
@@ -213,18 +215,19 @@ export const DataTableWithToolbar = defineComponent({
     })
 
     const hasSearch = computed(() => {
+      if (!props.toolbar) return hasSearchListener
       return Boolean(
-        props.toolbar &&
-        (props.toolbar.searchPlaceholder ||
-          props.toolbar.searchValue !== undefined ||
-          props.toolbar.defaultSearchValue !== undefined ||
-          props.toolbar.showSearchButton)
+        props.toolbar.searchPlaceholder ||
+        props.toolbar.searchValue !== undefined ||
+        props.toolbar.defaultSearchValue !== undefined ||
+        props.toolbar.showSearchButton ||
+        hasSearchListener
       )
     })
 
     const hasFilters = computed(() => Boolean(props.toolbar?.filters?.length))
     const hasBulkActions = computed(() => Boolean(props.toolbar?.bulkActions?.length))
-    const canSearch = computed(() => Boolean(attrs.onSearch))
+    const canSearch = computed(() => Boolean(vnodeProps.onSearch))
 
     const selectedKeys = computed(
       () => props.toolbar?.selectedKeys ?? props.rowSelection?.selectedRowKeys ?? []
@@ -416,6 +419,29 @@ export const DataTableWithToolbar = defineComponent({
     return () => {
       const { class: _class, style: _style, ...restAttrs } = attrs
       const showPagination = props.pagination && typeof props.pagination === 'object'
+      const tableProps = {
+        ...(restAttrs as Record<string, unknown>),
+        columns: props.columns,
+        columnLockable: props.columnLockable,
+        dataSource: props.dataSource,
+        ...(props.sort !== undefined ? { sort: props.sort } : {}),
+        ...(props.defaultSort !== undefined ? { defaultSort: props.defaultSort } : {}),
+        ...(props.filters !== undefined ? { filters: props.filters } : {}),
+        ...(props.defaultFilters !== undefined ? { defaultFilters: props.defaultFilters } : {}),
+        size: props.size,
+        bordered: props.bordered,
+        striped: props.striped,
+        hoverable: props.hoverable,
+        loading: props.loading,
+        emptyText: props.emptyText,
+        pagination: false,
+        rowSelection: props.rowSelection,
+        rowKey: props.rowKey,
+        rowClassName: props.rowClassName,
+        stickyHeader: props.stickyHeader,
+        maxHeight: props.maxHeight,
+        onSelectionChange: (keys: (string | number)[]) => emit('selection-change', keys)
+      }
 
       return h(
         'div',
@@ -426,33 +452,7 @@ export const DataTableWithToolbar = defineComponent({
         },
         [
           renderToolbar(),
-          h(
-            Table,
-            {
-              ...restAttrs,
-              columns: props.columns,
-              columnLockable: props.columnLockable,
-              dataSource: props.dataSource,
-              sort: props.sort,
-              defaultSort: props.defaultSort,
-              filters: props.filters,
-              defaultFilters: props.defaultFilters,
-              size: props.size,
-              bordered: props.bordered,
-              striped: props.striped,
-              hoverable: props.hoverable,
-              loading: props.loading,
-              emptyText: props.emptyText,
-              pagination: false,
-              rowSelection: props.rowSelection,
-              rowKey: props.rowKey,
-              rowClassName: props.rowClassName,
-              stickyHeader: props.stickyHeader,
-              maxHeight: props.maxHeight,
-              onSelectionChange: (keys: (string | number)[]) => emit('selection-change', keys)
-            },
-            null
-          ),
+          h(Table as unknown as any, tableProps),
           showPagination
             ? h('div', { class: 'pt-2' }, [
                 h(Pagination, {

@@ -1,4 +1,4 @@
-import { defineComponent, computed, ref, watch, h, PropType } from 'vue'
+import { defineComponent, computed, ref, watch, h, PropType, type Component } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -259,13 +259,13 @@ export const FormWizard = defineComponent({
 
     return () => {
       const stepsNodes = props.steps.map((step, index) =>
-        h(StepsItem, {
+        h(StepsItem as unknown as Component, {
           key: step.key ?? index,
           title: step.title,
-          description: step.description,
-          status: step.status,
-          icon: step.icon,
-          disabled: step.disabled
+          ...(step.description !== undefined ? { description: step.description } : {}),
+          ...(step.status !== undefined ? { status: step.status } : {}),
+          ...(step.icon !== undefined ? { icon: step.icon } : {}),
+          ...(step.disabled !== undefined ? { disabled: step.disabled } : {})
         })
       )
 

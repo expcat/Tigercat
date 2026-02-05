@@ -92,4 +92,25 @@ describe('ChatWindow (React)', () => {
 
     expect(screen.getByText('Custom: Hi')).toBeInTheDocument()
   })
+
+  it('keeps input value when clearOnSend is false', async () => {
+    const onSend = vi.fn()
+    render(<ChatWindow inputType="input" clearOnSend={false} onSend={onSend} />)
+
+    const input = screen.getByPlaceholderText('请输入消息') as HTMLInputElement
+    await userEvent.type(input, 'Ping{enter}')
+
+    expect(onSend).toHaveBeenCalledWith('Ping')
+    expect(input).toHaveValue('Ping')
+  })
+
+  it('does not send on enter when sendOnEnter is false', async () => {
+    const onSend = vi.fn()
+    render(<ChatWindow sendOnEnter={false} onSend={onSend} />)
+
+    const input = screen.getByPlaceholderText('请输入消息') as HTMLTextAreaElement
+    await userEvent.type(input, 'Hello{enter}')
+
+    expect(onSend).not.toHaveBeenCalled()
+  })
 })

@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-composite
-description: Shared props definitions for composite components - ChatWindow / ActivityFeed / CommentThread / NotificationCenter
+description: Shared props definitions for composite components - ChatWindow / ActivityFeed / CommentThread / NotificationCenter / FormWizard / DataTableWithToolbar
 ---
 
 # Composite Components - Props Reference

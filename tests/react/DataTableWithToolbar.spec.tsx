@@ -89,6 +89,26 @@ describe('DataTableWithToolbar (React)', () => {
     expect(onSearchChange).toHaveBeenCalled()
   })
 
+  it('submits search on enter without search button', async () => {
+    const onSearch = vi.fn()
+
+    render(
+      <DataTableWithToolbar<RowData>
+        columns={columns}
+        dataSource={[]}
+        toolbar={{ searchPlaceholder: '搜索名称', showSearchButton: false }}
+        onSearch={onSearch}
+        pagination={false}
+      />
+    )
+
+    const input = screen.getByPlaceholderText('搜索名称') as HTMLInputElement
+    await userEvent.type(input, 'Alpha{enter}')
+
+    expect(onSearch).toHaveBeenCalledWith('Alpha')
+    expect(screen.queryByRole('button', { name: '搜索' })).not.toBeInTheDocument()
+  })
+
   it('forwards selection change', async () => {
     const onSelectionChange = vi.fn()
 

@@ -9,16 +9,22 @@ import { notification } from '@expcat/tigercat-react'
 const notificationPositions = ['top-left', 'top-right', 'bottom-left', 'bottom-right'] as const
 
 describe('Notification (React)', () => {
-  beforeEach(() => {
-    // Clear all notifications before each test
-    notification.clear()
+  beforeEach(async () => {
+    await act(async () => {
+      // Clear all notifications before each test
+      notification.clear()
+      await flushMicrotasks()
+    })
     // Clear any existing notification containers
     document.body.innerHTML = ''
   })
 
-  afterEach(() => {
-    // Clean up after each test
-    notification.clear()
+  afterEach(async () => {
+    await act(async () => {
+      // Clean up after each test
+      notification.clear()
+      await flushMicrotasks()
+    })
     document.body.innerHTML = ''
     vi.useRealTimers()
   })
