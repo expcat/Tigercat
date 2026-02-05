@@ -41,15 +41,15 @@ const basicSnippet = `<FormWizard
   <template #step="{ index }">
     <Form ref="formRef" :model="model" class="max-w-xl mx-auto">
       <template v-if="index === 0">
-        <FormItem name="name" label="姓名" :rules="{ required: true, message: '请输入姓名' }">
+        <FormItem name="name" label="姓名" required :rules="{ required: true, message: '请输入姓名' }">
           <Input v-model="model.name" placeholder="请输入姓名" />
         </FormItem>
-        <FormItem name="email" label="邮箱" :rules="{ required: true, message: '请输入邮箱' }">
+        <FormItem name="email" label="邮箱" required :rules="{ required: true, message: '请输入邮箱' }">
           <Input v-model="model.email" placeholder="请输入邮箱" />
         </FormItem>
       </template>
       <template v-else-if="index === 1">
-        <FormItem name="phone" label="手机号" :rules="{ required: true, message: '请输入手机号' }">
+        <FormItem name="phone" label="手机号" required :rules="{ required: true, message: '请输入手机号' }">
           <Input v-model="model.phone" placeholder="请输入手机号" />
         </FormItem>
       </template>
@@ -86,12 +86,14 @@ const basicSnippet = `<FormWizard
                 <template v-if="index === 0">
                   <FormItem name="name"
                         label="姓名"
+                        required
                         :rules="{ required: true, message: '请输入姓名' }">
                     <Input v-model="model.name"
                          placeholder="请输入姓名" />
                   </FormItem>
                   <FormItem name="email"
                         label="邮箱"
+                        required
                         :rules="{ required: true, message: '请输入邮箱' }">
                     <Input v-model="model.email"
                          placeholder="请输入邮箱" />
@@ -100,6 +102,7 @@ const basicSnippet = `<FormWizard
                 <template v-else-if="index === 1">
                   <FormItem name="phone"
                         label="手机号"
+                        required
                         :rules="{ required: true, message: '请输入手机号' }">
                     <Input v-model="model.phone"
                          placeholder="请输入手机号" />
