@@ -25,6 +25,7 @@ const router = createRouter({
         { path: 'slider', component: () => import('./pages/SliderDemo.vue') },
         { path: 'select', component: () => import('./pages/SelectDemo.vue') },
         { path: 'form', component: () => import('./pages/FormDemo.vue') },
+        { path: 'form-wizard', component: () => import('./pages/FormWizardDemo.vue') },
         { path: 'space', component: () => import('./pages/SpaceDemo.vue') },
         { path: 'divider', component: () => import('./pages/DividerDemo.vue') },
         { path: 'layout', component: () => import('./pages/LayoutDemo.vue') },

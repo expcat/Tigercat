@@ -7,6 +7,7 @@ import type { TagVariant } from './tag'
 import type { ButtonVariant } from './button'
 import type { FilterOption, TableProps } from './table'
 import type { PaginationProps } from './pagination'
+import type { StepStatus, StepsDirection, StepSize } from './steps'
 
 /**
  * Chat message direction
@@ -540,4 +541,137 @@ export interface DataTableWithToolbarProps<T = Record<string, unknown>> extends 
    * Page size change callback
    */
   onPageSizeChange?: (current: number, pageSize: number) => void
+}
+
+/**
+ * Form wizard step definition
+ */
+export interface WizardStep {
+  /**
+   * Unique step key
+   */
+  key?: string | number
+  /**
+   * Step title
+   */
+  title: string
+  /**
+   * Step description
+   */
+  description?: string
+  /**
+   * Step status (overrides automatic status)
+   */
+  status?: StepStatus
+  /**
+   * Step icon (optional)
+   */
+  icon?: unknown
+  /**
+   * Whether the step is disabled
+   */
+  disabled?: boolean
+  /**
+   * Step content (framework-specific)
+   */
+  content?: unknown
+  /**
+   * Custom data
+   */
+  [key: string]: unknown
+}
+
+/**
+ * Form wizard validation result
+ */
+export type FormWizardValidateResult = boolean | string
+
+/**
+ * Form wizard validation callback
+ */
+export type FormWizardValidator = (
+  current: number,
+  step: WizardStep,
+  steps: WizardStep[]
+) => FormWizardValidateResult | Promise<FormWizardValidateResult>
+
+/**
+ * Form wizard props
+ */
+export interface FormWizardProps {
+  /**
+   * Steps configuration
+   */
+  steps: WizardStep[]
+  /**
+   * Current step index (0-based)
+   */
+  current?: number
+  /**
+   * Default step index (uncontrolled)
+   * @default 0
+   */
+  defaultCurrent?: number
+  /**
+   * Whether steps are clickable
+   * @default false
+   */
+  clickable?: boolean
+  /**
+   * Steps direction
+   * @default 'horizontal'
+   */
+  direction?: StepsDirection
+  /**
+   * Steps size
+   * @default 'default'
+   */
+  size?: StepSize
+  /**
+   * Whether to use simple steps style
+   * @default false
+   */
+  simple?: boolean
+  /**
+   * Whether to show steps header
+   * @default true
+   */
+  showSteps?: boolean
+  /**
+   * Whether to show action buttons
+   * @default true
+   */
+  showActions?: boolean
+  /**
+   * Previous button text
+   */
+  prevText?: string
+  /**
+   * Next button text
+   */
+  nextText?: string
+  /**
+   * Finish button text
+   */
+  finishText?: string
+  /**
+   * Validation hook before moving to next step
+   */
+  beforeNext?: FormWizardValidator
+  /**
+   * Step change callback
+   */
+  onChange?: (current: number, prev: number) => void
+  /**
+   * Finish callback
+   */
+  onFinish?: (current: number, steps: WizardStep[]) => void
+  /**
+   * Additional CSS classes
+   */
+  className?: string
+  /**
+   * Custom styles
+   */
+  style?: Record<string, unknown>
 }

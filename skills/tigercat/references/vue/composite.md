@@ -94,8 +94,60 @@ const activityGroups = ref<ActivityGroup[]>([
         time: '09:30',
         user: { name: '管理员', avatar: 'https://i.pravatar.cc/40?img=12' },
         status: { label: '已完成', variant: 'success' },
-        actions: [{ label: '查看详情', href: '#' }]
       },
+## FormWizard 表单向导
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { FormWizard, Form, FormItem, Input } from '@expcat/tigercat-vue'
+import type { WizardStep } from '@expcat/tigercat-core'
+
+const steps: WizardStep[] = [
+  { title: '基本信息', description: '填写姓名与邮箱' },
+  { title: '确认信息', description: '确认后提交' }
+]
+
+const current = ref(0)
+const formRef = ref<InstanceType<typeof Form> | null>(null)
+const model = ref({ name: '', email: '' })
+
+const handleBeforeNext = async () => {
+  const valid = await formRef.value?.validate()
+  return valid ?? true
+}
+
+const handleFinish = () => {
+  alert('完成提交')
+}
+</script>
+
+<template>
+  <FormWizard
+    v-model:current="current"
+    :steps="steps"
+    :before-next="handleBeforeNext"
+    @finish="handleFinish">
+    <template #step="{ index }">
+      <Form ref="formRef" :model="model" class="max-w-md">
+        <template v-if="index === 0">
+          <FormItem name="name" label="姓名" :rules="{ required: true, message: '请输入姓名' }">
+            <Input v-model="model.name" placeholder="请输入姓名" />
+          </FormItem>
+          <FormItem name="email" label="邮箱" :rules="{ required: true, message: '请输入邮箱' }">
+            <Input v-model="model.email" placeholder="请输入邮箱" />
+          </FormItem>
+        </template>
+        <template v-else>
+          <div class="text-sm text-gray-600">请确认信息无误后完成提交。</div>
+        </template>
+      </Form>
+    </template>
+  </FormWizard>
+</template>
+```
+
+---
       {
         id: 2,
         title: '导入审计日志',

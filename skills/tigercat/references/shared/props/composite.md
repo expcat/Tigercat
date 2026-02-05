@@ -164,6 +164,59 @@ description: Shared props definitions for composite components - ChatWindow
 
 ---
 
+## FormWizard 表单向导
+
+### Props
+
+| Prop           | Type                                         | Default        | Vue | React | Description              |
+| -------------- | -------------------------------------------- | -------------- | :-: | :---: | ------------------------ |
+| steps          | `WizardStep[]`                               | `[]`           |  ✓  |   ✓   | 步骤配置                 |
+| current        | `number`                                     | `0`            |  ✓  |   ✓   | 当前步骤（受控）         |
+| defaultCurrent | `number`                                     | `0`            |  ✓  |   ✓   | 默认步骤（非受控）       |
+| clickable      | `boolean`                                    | `false`        |  ✓  |   ✓   | 允许点击步骤切换         |
+| direction      | `'horizontal' \| 'vertical'`                | `'horizontal'` |  ✓  |   ✓   | 步骤方向                 |
+| size           | `'small' \| 'default'`                      | `'default'`    |  ✓  |   ✓   | 步骤尺寸                 |
+| simple         | `boolean`                                    | `false`        |  ✓  |   ✓   | Steps 简洁模式           |
+| showSteps      | `boolean`                                    | `true`         |  ✓  |   ✓   | 显示步骤条               |
+| showActions    | `boolean`                                    | `true`         |  ✓  |   ✓   | 显示操作按钮             |
+| prevText       | `string`                                     | `'Previous'`   |  ✓  |   ✓   | 上一步按钮文案           |
+| nextText       | `string`                                     | `'Next'`       |  ✓  |   ✓   | 下一步按钮文案           |
+| finishText     | `string`                                     | `'Finish'`     |  ✓  |   ✓   | 完成按钮文案             |
+| beforeNext     | `FormWizardValidator`                        | -              |  ✓  |   ✓   | 下一步校验（返回 false 或 string 阻断） |
+
+### Behavior
+
+- `beforeNext` 返回 `string` 时会显示错误提示并阻断前进。
+- 当点击可跳转步骤时，若目标步骤在前方，会先执行 `beforeNext`。
+
+### Events
+
+| Vue Event           | React Callback | Payload                  | Description |
+| ------------------- | -------------- | ------------------------ | ----------- |
+| `@update:current`   | `onChange`     | `current`                | 步骤变化    |
+| `@change`           | `onChange`     | `current, prev`          | 步骤变化    |
+| `@finish`           | `onFinish`     | `current, steps`         | 完成        |
+
+### Slots / Render Props
+
+| Vue Slot                               | React Prop     | Description          |
+| -------------------------------------- | -------------- | -------------------- |
+| `step` (scoped: `{ step, index }`)     | `renderStep`   | 自定义步骤内容渲染   |
+
+### WizardStep
+
+| Prop        | Type                                         | Default | Description |
+| ----------- | -------------------------------------------- | ------- | ----------- |
+| key         | `string \| number`                           | -       | 唯一标识    |
+| title       | `string`                                     | -       | 标题        |
+| description | `string`                                     | -       | 描述        |
+| status      | `'wait' \| 'process' \| 'finish' \| 'error'` | -     | 步骤状态    |
+| icon        | `unknown`                                    | -       | 自定义图标  |
+| disabled    | `boolean`                                    | `false` | 禁用步骤    |
+| content     | `unknown`                                    | -       | 自定义内容  |
+
+---
+
 ## DataTableWithToolbar 表格工具栏
 
 > 组合 Table + Toolbar + Pagination 的统一容器。
