@@ -56,23 +56,37 @@ const flatItems = ref<CommentNode[]>([
 ])
 
 const handleReply = (node: CommentNode, value: string) => {
-  const next = comments.value.map((item) => ({
-    ...item,
-    children: item.children ? [...item.children] : []
-  }))
-  const target = next.find((item) => item.id === node.id)
-  if (!target) return
-  target.children = [
-    ...(target.children ?? []),
-    {
-      id: Date.now(),
-      parentId: node.id,
-      content: value,
-      user: { name: '我' },
-      time: new Date().toLocaleTimeString()
-    }
-  ]
-  comments.value = next
+  let inserted = false
+  const reply: CommentNode = {
+    id: Date.now(),
+    parentId: node.id,
+    content: value,
+    user: { name: '我' },
+    time: new Date().toLocaleTimeString()
+  }
+
+  const appendReply = (items: CommentNode[]): CommentNode[] =>
+    items.map((item) => {
+      const next = {
+        ...item,
+        children: item.children ? [...item.children] : []
+      }
+
+      if (!inserted && item.id === node.id) {
+        next.children = [...(next.children ?? []), reply]
+        inserted = true
+        return next
+      }
+
+      if (!inserted && next.children && next.children.length > 0) {
+        next.children = appendReply(next.children)
+      }
+
+      return next
+    })
+
+  const next = appendReply(comments.value)
+  if (inserted) comments.value = next
 }
 
 const handleLoadMore = (node: CommentNode) => {

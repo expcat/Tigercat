@@ -203,6 +203,7 @@ export const CommentThread = defineComponent({
       const isExpanded = expandedSet.value.has(node.id)
       const showReplies = hasChildren && isExpanded
       const showAllReplies = expandedAllKeys.value.has(node.id)
+      const repliesId = `tiger-comment-replies-${node.id}`
       const visibleChildren = showReplies
         ? props.maxReplies > 0 && !showAllReplies
           ? node.children!.slice(0, props.maxReplies)
@@ -349,7 +350,13 @@ export const CommentThread = defineComponent({
               ? h('div', { class: 'flex items-center gap-2' }, [
                   h(
                     Button,
-                    { size: 'sm', variant: 'link', onClick: () => toggleExpanded(node.id) },
+                    {
+                      size: 'sm',
+                      variant: 'link',
+                      'aria-expanded': isExpanded,
+                      'aria-controls': repliesId,
+                      onClick: () => toggleExpanded(node.id)
+                    },
                     {
                       default: () =>
                         isExpanded ? '收起回复' : `展开 ${node.children!.length} 条回复`
@@ -365,7 +372,7 @@ export const CommentThread = defineComponent({
                 ])
               : null,
             showReplies
-              ? h('div', { class: 'mt-3 pl-6 border-l border-gray-100 space-y-3' }, [
+              ? h('div', { id: repliesId, class: 'mt-3 pl-6 border-l border-gray-100 space-y-3' }, [
                   ...visibleChildren.map((child, index) =>
                     renderNode(child, depth + 1, index === visibleChildren.length - 1)
                   )
@@ -378,6 +385,10 @@ export const CommentThread = defineComponent({
     }
 
     return () => {
+      const ariaLabel =
+        (attrs['aria-label'] as string | undefined) ??
+        (attrs['aria-labelledby'] ? undefined : '评论线程')
+
       if (resolvedNodes.value.length === 0) {
         return h(
           'div',
@@ -385,7 +396,8 @@ export const CommentThread = defineComponent({
             ...attrs,
             class: wrapperClasses.value,
             style: wrapperStyle.value,
-            'data-tiger-comment-thread': true
+            'data-tiger-comment-thread': true,
+            'aria-label': ariaLabel
           },
           h(
             Text,
@@ -401,7 +413,8 @@ export const CommentThread = defineComponent({
           ...attrs,
           class: wrapperClasses.value,
           style: wrapperStyle.value,
-          'data-tiger-comment-thread': true
+          'data-tiger-comment-thread': true,
+          'aria-label': ariaLabel
         },
         h(
           List,
