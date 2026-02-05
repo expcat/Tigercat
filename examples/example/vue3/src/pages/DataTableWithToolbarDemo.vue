@@ -157,6 +157,7 @@ const handleBulkAction = (actionKey: string) => {
           showTotal: true
         }"
         @search-change="(value) => (keyword = value)"
+        @search="(value) => (keyword = value)"
         @filters-change="handleFiltersChange"
         @page-change="handlePageChange"
         @page-size-change="handlePageChange"
