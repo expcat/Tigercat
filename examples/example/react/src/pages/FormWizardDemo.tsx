@@ -20,16 +20,16 @@ const basicSnippet = `<FormWizard
     <Form ref={formRef} model={model} className="max-w-xl mx-auto">
       {index === 0 && (
         <>
-          <FormItem name="name" label="姓名" rules={{ required: true, message: '请输入姓名' }}>
+          <FormItem name="name" label="姓名" required rules={{ required: true, message: '请输入姓名' }}>
             <Input value={model.name} onChange={(e) => setModel((prev) => ({ ...prev, name: e.target.value }))} />
           </FormItem>
-          <FormItem name="email" label="邮箱" rules={{ required: true, message: '请输入邮箱' }}>
+          <FormItem name="email" label="邮箱" required rules={{ required: true, message: '请输入邮箱' }}>
             <Input value={model.email} onChange={(e) => setModel((prev) => ({ ...prev, email: e.target.value }))} />
           </FormItem>
         </>
       )}
       {index === 1 && (
-        <FormItem name="phone" label="手机号" rules={{ required: true, message: '请输入手机号' }}>
+        <FormItem name="phone" label="手机号" required rules={{ required: true, message: '请输入手机号' }}>
           <Input value={model.phone} onChange={(e) => setModel((prev) => ({ ...prev, phone: e.target.value }))} />
         </FormItem>
       )}
@@ -91,6 +91,7 @@ const FormWizardDemo: React.FC = () => {
                   <FormItem
                     name="name"
                     label="姓名"
+                    required
                     rules={{ required: true, message: '请输入姓名' }}>
                     <Input
                       value={model.name}
@@ -103,6 +104,7 @@ const FormWizardDemo: React.FC = () => {
                   <FormItem
                     name="email"
                     label="邮箱"
+                    required
                     rules={{ required: true, message: '请输入邮箱' }}>
                     <Input
                       value={model.email}
@@ -118,6 +120,7 @@ const FormWizardDemo: React.FC = () => {
                 <FormItem
                   name="phone"
                   label="手机号"
+                  required
                   rules={{ required: true, message: '请输入手机号' }}>
                   <Input
                     value={model.phone}

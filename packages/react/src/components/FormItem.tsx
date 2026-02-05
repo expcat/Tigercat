@@ -2,6 +2,7 @@ import React, { useMemo, useEffect, useState, useCallback, useId } from 'react'
 import {
   classNames,
   type FormSize,
+  type FormRule,
   type FormItemProps as CoreFormItemProps,
   getFieldError,
   getFormItemClasses,
@@ -79,25 +80,19 @@ export const FormItem: React.FC<FormItemProps> = ({
     return width
   }, [labelWidth, formContext?.labelWidth])
 
-  const hasRequiredRule = useCallback((maybeRules: unknown): boolean => {
+  const hasRequiredRule = useCallback((maybeRules: FormRule | FormRule[] | undefined): boolean => {
     if (!maybeRules) {
       return false
     }
 
-    const unwrapped =
-      typeof maybeRules === 'object' &&
-      maybeRules &&
-      'value' in (maybeRules as Record<string, unknown>)
-        ? (maybeRules as { value?: unknown }).value
-        : maybeRules
+    const rules = Array.isArray(maybeRules) ? maybeRules : [maybeRules]
 
-    const rules = Array.isArray(unwrapped) ? unwrapped : [unwrapped]
-
-    return rules.some((rule) =>
-      !!rule && typeof rule === 'object' && 'required' in (rule as Record<string, unknown>)
-        ? !!(rule as { required?: boolean }).required
-        : false
-    )
+    return rules.some((rule) => {
+      if (!rule || typeof rule !== 'object') {
+        return false
+      }
+      return !!rule.required
+    })
   }, [])
 
   const showRequiredAsterisk = useMemo(() => {
