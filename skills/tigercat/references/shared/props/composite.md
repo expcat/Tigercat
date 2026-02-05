@@ -164,6 +164,69 @@ description: Shared props definitions for composite components - ChatWindow
 
 ---
 
+## NotificationCenter 通知中心
+
+### Props
+
+| Prop                  | Type                                | Default          | Vue | React | Description          |
+| --------------------- | ----------------------------------- | ---------------- | :-: | :---: | -------------------- |
+| items                 | `NotificationItem[]`                | `[]`             |  ✓  |   ✓   | 通知列表（扁平）     |
+| groups                | `NotificationGroup[]`               | -                |  ✓  |   ✓   | 分组数据             |
+| groupBy               | `(item) => string`                  | -                |  ✓  |   ✓   | 分组函数             |
+| groupOrder            | `string[]`                          | -                |  ✓  |   ✓   | 分组顺序             |
+| activeGroupKey        | `string \| number`                  | -                |  ✓  |   ✓   | 当前分组（受控）     |
+| defaultActiveGroupKey | `string \| number`                  | -                |  ✓  |   ✓   | 默认分组（非受控）   |
+| readFilter            | `'all' \| 'unread' \| 'read'`      | `'all'`          |  ✓  |   ✓   | 已读筛选（受控）     |
+| defaultReadFilter     | `'all' \| 'unread' \| 'read'`      | `'all'`          |  ✓  |   ✓   | 已读筛选（非受控）   |
+| loading               | `boolean`                           | `false`          |  ✓  |   ✓   | 加载中状态           |
+| loadingText           | `string`                            | `'加载中...'`    |  ✓  |   ✓   | 加载文案             |
+| emptyText             | `string`                            | `'暂无通知'`     |  ✓  |   ✓   | 空态文案             |
+| title                 | `string`                            | `'通知中心'`     |  ✓  |   ✓   | 标题                 |
+| allLabel              | `string`                            | `'全部'`         |  ✓  |   ✓   | 全部筛选文案         |
+| unreadLabel           | `string`                            | `'未读'`         |  ✓  |   ✓   | 未读筛选文案         |
+| readLabel             | `string`                            | `'已读'`         |  ✓  |   ✓   | 已读筛选文案         |
+| markAllReadText       | `string`                            | `'全部标记已读'` |  ✓  |   ✓   | 批量标记已读文案     |
+| markReadText          | `string`                            | `'标记已读'`     |  ✓  |   ✓   | 单条标记已读文案     |
+| markUnreadText        | `string`                            | `'标记未读'`     |  ✓  |   ✓   | 单条标记未读文案     |
+
+### Behavior
+
+- `groups` 优先生效；未提供 `groups` 时可用 `groupBy` 对 `items` 进行分组。
+- 分组标签会显示当前分组未读数量。
+- `readFilter` 控制列表筛选范围：全部/未读/已读。
+
+### Events
+
+| Vue Event                | React Callback       | Payload           | Description       |
+| ------------------------ | -------------------- | ----------------- | ----------------- |
+| `@update:activeGroupKey` | `onGroupChange`      | `key`             | 切换分组          |
+| `@update:readFilter`     | `onReadFilterChange` | `filter`          | 切换已读筛选      |
+| `@mark-all-read`         | `onMarkAllRead`      | `groupKey, items` | 批量标记已读      |
+| `@item-click`            | `onItemClick`        | `item, index`     | 点击通知条目      |
+| `@item-read-change`      | `onItemReadChange`   | `item, read`      | 单条标记已读/未读 |
+
+### NotificationItem
+
+| Prop        | Type                         | Default | Description |
+| ----------- | ---------------------------- | ------- | ----------- |
+| id          | `string \| number`           | -       | 唯一标识    |
+| title       | `string`                     | -       | 标题        |
+| description | `string`                     | -       | 描述        |
+| time        | `string \| number \| Date`   | -      | 时间        |
+| type        | `string`                     | -       | 类型/分组键 |
+| read        | `boolean`                    | `false` | 是否已读    |
+| meta        | `Record<string, unknown>`    | -       | 扩展数据    |
+
+### NotificationGroup
+
+| Prop  | Type                 | Default | Description |
+| ----- | -------------------- | ------- | ----------- |
+| key   | `string \| number`   | -       | 分组键      |
+| title | `string`             | -       | 分组标题    |
+| items | `NotificationItem[]` | -       | 分组内容    |
+
+---
+
 ## FormWizard 表单向导
 
 ### Props
