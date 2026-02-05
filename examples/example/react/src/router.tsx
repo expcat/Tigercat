@@ -13,6 +13,7 @@ const SwitchDemo = lazy(() => import('./pages/SwitchDemo'))
 const SliderDemo = lazy(() => import('./pages/SliderDemo'))
 const SelectDemo = lazy(() => import('./pages/SelectDemo'))
 const FormDemo = lazy(() => import('./pages/FormDemo'))
+const FormWizardDemo = lazy(() => import('./pages/FormWizardDemo'))
 const SpaceDemo = lazy(() => import('./pages/SpaceDemo'))
 const DividerDemo = lazy(() => import('./pages/DividerDemo'))
 const LayoutDemo = lazy(() => import('./pages/LayoutDemo'))
@@ -81,6 +82,7 @@ const router = createBrowserRouter(
         { path: 'slider', element: <SliderDemo /> },
         { path: 'select', element: <SelectDemo /> },
         { path: 'form', element: <FormDemo /> },
+        { path: 'form-wizard', element: <FormWizardDemo /> },
         { path: 'space', element: <SpaceDemo /> },
         { path: 'divider', element: <DividerDemo /> },
         { path: 'layout', element: <LayoutDemo /> },
