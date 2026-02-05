@@ -5,7 +5,7 @@ description: Vue 3 composite components usage
 
 # Composite Components (Vue 3)
 
-组合组件：ChatWindow / ActivityFeed / NotificationCenter / DataTableWithToolbar
+组合组件：ChatWindow / ActivityFeed / CommentThread / NotificationCenter / DataTableWithToolbar
 
 > **Props Reference**: [shared/props/composite.md](../shared/props/composite.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -71,7 +71,8 @@ const handleSend = (value: string) => {
   </ChatWindow>
 </template>
 ```
-```
+
+````
 
 ---
 
@@ -128,6 +129,52 @@ const activityGroups = ref<ActivityGroup[]>([
 
 <template>
   <ActivityFeed :groups="activityGroups" />
+</template>
+````
+
+---
+
+## CommentThread 评论线程
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { CommentThread } from '@expcat/tigercat-vue'
+import type { CommentNode } from '@expcat/tigercat-core'
+
+const comments = ref<CommentNode[]>([
+  {
+    id: 1,
+    content: '这个功能点考虑得很周到。',
+    user: { name: 'Ada', avatar: 'https://i.pravatar.cc/40?img=12', title: '产品经理' },
+    time: '10:25',
+    likes: 3,
+    children: [
+      {
+        id: 2,
+        parentId: 1,
+        content: '赞同，尤其是回复区的设计。',
+        user: { name: 'Ben', avatar: 'https://i.pravatar.cc/40?img=32' },
+        time: '10:30'
+      }
+    ]
+  },
+  {
+    id: 3,
+    content: '建议增加加载更多按钮。',
+    user: { name: 'Chris', avatar: 'https://i.pravatar.cc/40?img=45' },
+    time: '10:42',
+    likes: 1
+  }
+])
+
+const handleReply = (_node: CommentNode, value: string) => {
+  console.log('reply', value)
+}
+</script>
+
+<template>
+  <CommentThread :nodes="comments" :default-expanded-keys="[1]" @reply="handleReply" />
 </template>
 ```
 
@@ -327,3 +374,4 @@ const toolbar = computed(() => ({
     @page-change="(current, pageSize) => (pagination = { current, pageSize })"
     @page-size-change="(current, pageSize) => (pagination = { current, pageSize })" />
 </template>
+```

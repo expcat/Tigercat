@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-composite
-description: Shared props definitions for composite components - ChatWindow
+description: Shared props definitions for composite components - ChatWindow / ActivityFeed / CommentThread / NotificationCenter
 ---
 
 # Composite Components - Props Reference
@@ -164,30 +164,119 @@ description: Shared props definitions for composite components - ChatWindow
 
 ---
 
+## CommentThread 评论线程
+
+### Props
+
+| Prop                | Type                   | Default         | Vue | React | Description                    |
+| ------------------- | ---------------------- | --------------- | :-: | :---: | ------------------------------ |
+| nodes               | `CommentNode[]`        | -               |  ✓  |   ✓   | 树形数据                       |
+| items               | `CommentNode[]`        | -               |  ✓  |   ✓   | 扁平数据（通过 parentId 组装） |
+| maxDepth            | `number`               | `3`             |  ✓  |   ✓   | 最大嵌套层级                   |
+| maxReplies          | `number`               | `3`             |  ✓  |   ✓   | 单条最大展示回复数             |
+| defaultExpandedKeys | `(string \| number)[]` | `[]`            |  ✓  |   ✓   | 默认展开回复                   |
+| expandedKeys        | `(string \| number)[]` | -               |  ✓  |   ✓   | 展开回复（受控）               |
+| emptyText           | `string`               | `'暂无评论'`    |  ✓  |   ✓   | 空态文案                       |
+| replyPlaceholder    | `string`               | `'写下回复...'` |  ✓  |   ✓   | 回复输入占位                   |
+| replyButtonText     | `string`               | `'回复'`        |  ✓  |   ✓   | 回复提交文案                   |
+| cancelReplyText     | `string`               | `'取消'`        |  ✓  |   ✓   | 取消回复文案                   |
+| likeText            | `string`               | `'点赞'`        |  ✓  |   ✓   | 点赞文案                       |
+| likedText           | `string`               | `'已赞'`        |  ✓  |   ✓   | 已点赞文案                     |
+| replyText           | `string`               | `'回复'`        |  ✓  |   ✓   | 操作栏回复文案                 |
+| moreText            | `string`               | `'更多'`        |  ✓  |   ✓   | 操作栏更多文案                 |
+| loadMoreText        | `string`               | `'加载更多'`    |  ✓  |   ✓   | 加载更多文案                   |
+| showAvatar          | `boolean`              | `true`          |  ✓  |   ✓   | 显示头像                       |
+| showDivider         | `boolean`              | `true`          |  ✓  |   ✓   | 显示分隔线                     |
+| showLike            | `boolean`              | `true`          |  ✓  |   ✓   | 显示点赞                       |
+| showReply           | `boolean`              | `true`          |  ✓  |   ✓   | 显示回复                       |
+| showMore            | `boolean`              | `true`          |  ✓  |   ✓   | 显示更多                       |
+
+### Behavior
+
+- `nodes` 优先生效；未提供时会使用 `items` 并基于 `parentId` 构建树。
+- 当 `maxDepth` 到达时，超出层级的回复不会渲染。
+- 回复区支持展开/收起与“加载更多”。
+
+### Events
+
+| Vue Event        | React Callback     | Payload        | Description   |
+| ---------------- | ------------------ | -------------- | ------------- |
+| `@like`          | `onLike`           | `node, liked`  | 点赞/取消点赞 |
+| `@reply`         | `onReply`          | `node, value`  | 提交回复      |
+| `@more`          | `onMore`           | `node`         | 更多操作      |
+| `@action`        | `onAction`         | `node, action` | 自定义动作    |
+| `@expand-change` | `onExpandedChange` | `keys`         | 展开回复变化  |
+| `@load-more`     | `onLoadMore`       | `node`         | 加载更多回复  |
+
+### CommentNode
+
+| Prop     | Type                       | Default | Description |
+| -------- | -------------------------- | ------- | ----------- |
+| id       | `string \| number`         | -       | 唯一标识    |
+| parentId | `string \| number`         | -       | 父级标识    |
+| content  | `string \| number`         | -       | 内容        |
+| user     | `CommentUser`              | -       | 用户信息    |
+| time     | `string \| number \| Date` | -       | 时间        |
+| likes    | `number`                   | -       | 点赞数      |
+| liked    | `boolean`                  | -       | 是否已点赞  |
+| tag      | `CommentTag`               | -       | 单个标签    |
+| tags     | `CommentTag[]`             | -       | 额外标签    |
+| actions  | `CommentAction[]`          | -       | 自定义操作  |
+| children | `CommentNode[]`            | -       | 子回复      |
+| meta     | `Record<string, unknown>`  | -       | 扩展数据    |
+
+### CommentUser
+
+| Prop   | Type               | Default | Description |
+| ------ | ------------------ | ------- | ----------- |
+| id     | `string \| number` | -       | 用户标识    |
+| name   | `string`           | -       | 显示名称    |
+| avatar | `string`           | -       | 头像地址    |
+| title  | `string`           | -       | 角色/头衔   |
+
+### CommentTag
+
+| Prop    | Type         | Default     | Description |
+| ------- | ------------ | ----------- | ----------- |
+| label   | `string`     | -           | 标签文案    |
+| variant | `TagVariant` | `'default'` | 标签风格    |
+
+### CommentAction
+
+| Prop     | Type                     | Default   | Description |
+| -------- | ------------------------ | --------- | ----------- |
+| key      | `string \| number`       | -         | 唯一标识    |
+| label    | `string`                 | -         | 操作文案    |
+| variant  | `ButtonVariant`          | `'ghost'` | 按钮风格    |
+| disabled | `boolean`                | `false`   | 禁用        |
+| onClick  | `(node, action) => void` | -         | 点击回调    |
+
+---
+
 ## NotificationCenter 通知中心
 
 ### Props
 
-| Prop                  | Type                                | Default          | Vue | React | Description          |
-| --------------------- | ----------------------------------- | ---------------- | :-: | :---: | -------------------- |
-| items                 | `NotificationItem[]`                | `[]`             |  ✓  |   ✓   | 通知列表（扁平）     |
-| groups                | `NotificationGroup[]`               | -                |  ✓  |   ✓   | 分组数据             |
-| groupBy               | `(item) => string`                  | -                |  ✓  |   ✓   | 分组函数             |
-| groupOrder            | `string[]`                          | -                |  ✓  |   ✓   | 分组顺序             |
-| activeGroupKey        | `string \| number`                  | -                |  ✓  |   ✓   | 当前分组（受控）     |
-| defaultActiveGroupKey | `string \| number`                  | -                |  ✓  |   ✓   | 默认分组（非受控）   |
-| readFilter            | `'all' \| 'unread' \| 'read'`      | `'all'`          |  ✓  |   ✓   | 已读筛选（受控）     |
-| defaultReadFilter     | `'all' \| 'unread' \| 'read'`      | `'all'`          |  ✓  |   ✓   | 已读筛选（非受控）   |
-| loading               | `boolean`                           | `false`          |  ✓  |   ✓   | 加载中状态           |
-| loadingText           | `string`                            | `'加载中...'`    |  ✓  |   ✓   | 加载文案             |
-| emptyText             | `string`                            | `'暂无通知'`     |  ✓  |   ✓   | 空态文案             |
-| title                 | `string`                            | `'通知中心'`     |  ✓  |   ✓   | 标题                 |
-| allLabel              | `string`                            | `'全部'`         |  ✓  |   ✓   | 全部筛选文案         |
-| unreadLabel           | `string`                            | `'未读'`         |  ✓  |   ✓   | 未读筛选文案         |
-| readLabel             | `string`                            | `'已读'`         |  ✓  |   ✓   | 已读筛选文案         |
-| markAllReadText       | `string`                            | `'全部标记已读'` |  ✓  |   ✓   | 批量标记已读文案     |
-| markReadText          | `string`                            | `'标记已读'`     |  ✓  |   ✓   | 单条标记已读文案     |
-| markUnreadText        | `string`                            | `'标记未读'`     |  ✓  |   ✓   | 单条标记未读文案     |
+| Prop                  | Type                          | Default          | Vue | React | Description        |
+| --------------------- | ----------------------------- | ---------------- | :-: | :---: | ------------------ |
+| items                 | `NotificationItem[]`          | `[]`             |  ✓  |   ✓   | 通知列表（扁平）   |
+| groups                | `NotificationGroup[]`         | -                |  ✓  |   ✓   | 分组数据           |
+| groupBy               | `(item) => string`            | -                |  ✓  |   ✓   | 分组函数           |
+| groupOrder            | `string[]`                    | -                |  ✓  |   ✓   | 分组顺序           |
+| activeGroupKey        | `string \| number`            | -                |  ✓  |   ✓   | 当前分组（受控）   |
+| defaultActiveGroupKey | `string \| number`            | -                |  ✓  |   ✓   | 默认分组（非受控） |
+| readFilter            | `'all' \| 'unread' \| 'read'` | `'all'`          |  ✓  |   ✓   | 已读筛选（受控）   |
+| defaultReadFilter     | `'all' \| 'unread' \| 'read'` | `'all'`          |  ✓  |   ✓   | 已读筛选（非受控） |
+| loading               | `boolean`                     | `false`          |  ✓  |   ✓   | 加载中状态         |
+| loadingText           | `string`                      | `'加载中...'`    |  ✓  |   ✓   | 加载文案           |
+| emptyText             | `string`                      | `'暂无通知'`     |  ✓  |   ✓   | 空态文案           |
+| title                 | `string`                      | `'通知中心'`     |  ✓  |   ✓   | 标题               |
+| allLabel              | `string`                      | `'全部'`         |  ✓  |   ✓   | 全部筛选文案       |
+| unreadLabel           | `string`                      | `'未读'`         |  ✓  |   ✓   | 未读筛选文案       |
+| readLabel             | `string`                      | `'已读'`         |  ✓  |   ✓   | 已读筛选文案       |
+| markAllReadText       | `string`                      | `'全部标记已读'` |  ✓  |   ✓   | 批量标记已读文案   |
+| markReadText          | `string`                      | `'标记已读'`     |  ✓  |   ✓   | 单条标记已读文案   |
+| markUnreadText        | `string`                      | `'标记未读'`     |  ✓  |   ✓   | 单条标记未读文案   |
 
 ### Behavior
 
@@ -207,15 +296,15 @@ description: Shared props definitions for composite components - ChatWindow
 
 ### NotificationItem
 
-| Prop        | Type                         | Default | Description |
-| ----------- | ---------------------------- | ------- | ----------- |
-| id          | `string \| number`           | -       | 唯一标识    |
-| title       | `string`                     | -       | 标题        |
-| description | `string`                     | -       | 描述        |
-| time        | `string \| number \| Date`   | - | 时间        |
-| type        | `string`                     | -       | 类型/分组键 |
-| read        | `boolean`                    | `false` | 是否已读    |
-| meta        | `Record<string, unknown>`    | -       | 扩展数据    |
+| Prop        | Type                       | Default | Description |
+| ----------- | -------------------------- | ------- | ----------- |
+| id          | `string \| number`         | -       | 唯一标识    |
+| title       | `string`                   | -       | 标题        |
+| description | `string`                   | -       | 描述        |
+| time        | `string \| number \| Date` | -       | 时间        |
+| type        | `string`                   | -       | 类型/分组键 |
+| read        | `boolean`                  | `false` | 是否已读    |
+| meta        | `Record<string, unknown>`  | -       | 扩展数据    |
 
 ### NotificationGroup
 

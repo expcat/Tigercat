@@ -360,6 +360,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'ChatWindow', 'en-US': 'ChatWindow' }
       },
       {
+        key: 'comment-thread',
+        path: '/comment-thread',
+        label: { 'zh-CN': 'CommentThread', 'en-US': 'CommentThread' }
+      },
+      {
         key: 'activity-feed',
         path: '/activity-feed',
         label: { 'zh-CN': 'ActivityFeed', 'en-US': 'ActivityFeed' }

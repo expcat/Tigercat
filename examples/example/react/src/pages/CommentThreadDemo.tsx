@@ -1,0 +1,122 @@
+import React, { useCallback, useState } from 'react'
+import { CommentThread } from '@expcat/tigercat-react'
+import type { CommentNode } from '@expcat/tigercat-core'
+import DemoBlock from '../components/DemoBlock'
+
+const initialNodes: CommentNode[] = [
+  {
+    id: 1,
+    content: '这个功能点考虑得很周到。',
+    user: { name: 'Ada', avatar: 'https://i.pravatar.cc/40?img=12', title: '产品经理' },
+    time: '10:25',
+    likes: 3,
+    tag: { label: '作者', variant: 'primary' },
+    children: [
+      {
+        id: 2,
+        parentId: 1,
+        content: '赞同，尤其是回复区的设计。',
+        user: { name: 'Ben', avatar: 'https://i.pravatar.cc/40?img=32' },
+        time: '10:30'
+      },
+      {
+        id: 3,
+        parentId: 1,
+        content: '可以考虑再加一个加载更多。',
+        user: { name: 'Chris', avatar: 'https://i.pravatar.cc/40?img=45' },
+        time: '10:32'
+      }
+    ]
+  },
+  {
+    id: 4,
+    content: '交互逻辑清晰，点赞按钮很顺手。',
+    user: { name: 'Dana', avatar: 'https://i.pravatar.cc/40?img=28' },
+    time: '10:40',
+    likes: 1,
+    actions: [{ label: '标记', variant: 'ghost' }]
+  }
+]
+
+const basicSnippet = `<CommentThread
+  nodes={nodes}
+  defaultExpandedKeys={[1]}
+  maxReplies={1}
+  onReply={handleReply}
+  onLoadMore={handleLoadMore}
+/>`
+
+const flatSnippet = `<CommentThread
+  items={items}
+  defaultExpandedKeys={[100]}
+/>`
+
+const emptySnippet = `<CommentThread items={[]} emptyText="暂无评论" />`
+
+const flatItems: CommentNode[] = [
+  {
+    id: 100,
+    content: '扁平数据也能渲染成树。',
+    user: { name: 'Evan', avatar: 'https://i.pravatar.cc/40?img=22' },
+    time: '11:05'
+  },
+  {
+    id: 101,
+    parentId: 100,
+    content: '是的，parentId 会自动组装。',
+    user: { name: 'Fiona', avatar: 'https://i.pravatar.cc/40?img=14' },
+    time: '11:07'
+  }
+]
+
+export default function CommentThreadDemo() {
+  const [nodes, setNodes] = useState<CommentNode[]>(initialNodes)
+
+  const handleReply = useCallback((node: CommentNode, value: string) => {
+    setNodes((prev) => {
+      const next = prev.map((item) => ({ ...item }))
+      const target = next.find((item) => item.id === node.id)
+      if (!target) return prev
+      const reply: CommentNode = {
+        id: Date.now(),
+        parentId: node.id,
+        content: value,
+        user: { name: '我' },
+        time: new Date().toLocaleTimeString()
+      }
+      target.children = [...(target.children ?? []), reply]
+      return next
+    })
+  }, [])
+
+  const handleLoadMore = useCallback((node: CommentNode) => {
+    console.log('load more', node)
+  }, [])
+
+  return (
+    <div className="max-w-6xl mx-auto p-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">CommentThread 评论线程</h1>
+        <p className="text-gray-600">组合组件，适配评论与讨论场景。</p>
+      </div>
+
+      <DemoBlock title="嵌套回复" description="支持展开/收起与加载更多。" code={basicSnippet}>
+        <CommentThread
+          nodes={nodes}
+          defaultExpandedKeys={[1]}
+          maxReplies={1}
+          onReply={handleReply}
+          onLoadMore={handleLoadMore}
+        />
+      </DemoBlock>
+
+      <DemoBlock title="扁平数据" description="使用 parentId 构建层级。" code={flatSnippet}>
+        <CommentThread items={flatItems} defaultExpandedKeys={[100]} />
+      </DemoBlock>
+
+      <DemoBlock title="空态" description="无数据时的展示。" code={emptySnippet}>
+        <CommentThread items={[]} emptyText="暂无评论" />
+      </DemoBlock>
+    </div>
+  )
+}

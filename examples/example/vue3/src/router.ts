@@ -146,6 +146,10 @@ const router = createRouter({
           component: () => import('./pages/ChatWindowDemo.vue')
         },
         {
+          path: 'comment-thread',
+          component: () => import('./pages/CommentThreadDemo.vue')
+        },
+        {
           path: 'activity-feed',
           component: () => import('./pages/ActivityFeedDemo.vue')
         },
