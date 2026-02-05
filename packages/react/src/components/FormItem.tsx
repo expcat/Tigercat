@@ -85,7 +85,9 @@ export const FormItem: React.FC<FormItemProps> = ({
     }
 
     const unwrapped =
-      typeof maybeRules === 'object' && maybeRules && 'value' in (maybeRules as Record<string, unknown>)
+      typeof maybeRules === 'object' &&
+      maybeRules &&
+      'value' in (maybeRules as Record<string, unknown>)
         ? (maybeRules as { value?: unknown }).value
         : maybeRules
 
