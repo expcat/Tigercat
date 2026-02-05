@@ -191,11 +191,11 @@ description: Shared props definitions for composite components - ChatWindow
 
 ### Events
 
-| Vue Event         | React Callback | Payload          | Description                                      |
-| ----------------- | -------------- | ---------------- | ----------------------------------------------- |
+| Vue Event         | React Callback | Payload          | Description                                          |
+| ----------------- | -------------- | ---------------- | ---------------------------------------------------- |
 | `@update:current` | `-`            | `current`        | 当前步骤 v-model 更新（Vue 专用，无直接 React 等价） |
-| `@change`         | `onChange`     | `current, prev`  | 步骤变化（React: `onChange(current, prev)`）    |
-| `@finish`         | `onFinish`     | `current, steps` | 完成                                            |
+| `@change`         | `onChange`     | `current, prev`  | 步骤变化（React: `onChange(current, prev)`）         |
+| `@finish`         | `onFinish`     | `current, steps` | 完成                                                 |
 
 ### Slots / Render Props
 
