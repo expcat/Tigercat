@@ -3,7 +3,14 @@ import {
   classNames,
   type FormSize,
   type FormItemProps as CoreFormItemProps,
-  getFieldError
+  getFieldError,
+  getFormItemClasses,
+  getFormItemLabelClasses,
+  getFormItemContentClasses,
+  getFormItemFieldClasses,
+  getFormItemErrorClasses,
+  getFormItemAsteriskClasses,
+  getFormItemAsteriskStyle
 } from '@expcat/tigercat-core'
 import { useFormContext } from './Form'
 
@@ -72,6 +79,25 @@ export const FormItem: React.FC<FormItemProps> = ({
     return width
   }, [labelWidth, formContext?.labelWidth])
 
+  const hasRequiredRule = useCallback((maybeRules: unknown): boolean => {
+    if (!maybeRules) {
+      return false
+    }
+
+    const unwrapped =
+      typeof maybeRules === 'object' && maybeRules && 'value' in (maybeRules as Record<string, unknown>)
+        ? (maybeRules as { value?: unknown }).value
+        : maybeRules
+
+    const rules = Array.isArray(unwrapped) ? unwrapped : [unwrapped]
+
+    return rules.some((rule) =>
+      !!rule && typeof rule === 'object' && 'required' in (rule as Record<string, unknown>)
+        ? !!(rule as { required?: boolean }).required
+        : false
+    )
+  }, [])
+
   const showRequiredAsterisk = useMemo(() => {
     if (required !== undefined) {
       return required
@@ -79,21 +105,19 @@ export const FormItem: React.FC<FormItemProps> = ({
 
     // Check if any rule has required: true
     if (rules) {
-      const ruleArray = Array.isArray(rules) ? rules : [rules]
-      return ruleArray.some((rule) => rule.required)
+      return hasRequiredRule(rules)
     }
 
     // Check form-level rules
     if (name && formContext?.rules) {
       const fieldRules = formContext.rules[name]
       if (fieldRules) {
-        const ruleArray = Array.isArray(fieldRules) ? fieldRules : [fieldRules]
-        return ruleArray.some((rule) => rule.required)
+        return hasRequiredRule(fieldRules)
       }
     }
 
     return false
-  }, [required, rules, name, formContext?.rules])
+  }, [required, rules, name, formContext?.rules, hasRequiredRule])
 
   const isRequired = useMemo(
     () => showRequiredAsterisk && (formContext?.showRequiredAsterisk ?? true),
@@ -206,11 +230,12 @@ export const FormItem: React.FC<FormItemProps> = ({
   const formItemClasses = useMemo(
     () =>
       classNames(
-        'tiger-form-item',
-        `tiger-form-item--${actualSize}`,
-        `tiger-form-item--label-${labelPosition}`,
-        hasError && 'tiger-form-item--error',
-        formContext?.disabled && 'tiger-form-item--disabled',
+        getFormItemClasses({
+          size: actualSize,
+          labelPosition,
+          hasError,
+          disabled: formContext?.disabled
+        }),
         className
       ),
     [actualSize, labelPosition, hasError, formContext?.disabled, className]
@@ -218,12 +243,13 @@ export const FormItem: React.FC<FormItemProps> = ({
 
   const labelClasses = useMemo(
     () =>
-      classNames(
-        'tiger-form-item__label',
-        `tiger-form-item__label--${labelAlign}`,
-        isRequired && 'tiger-form-item__label--required'
-      ),
-    [labelAlign, isRequired]
+      getFormItemLabelClasses({
+        size: actualSize,
+        labelAlign,
+        labelPosition,
+        isRequired
+      }),
+    [actualSize, labelAlign, labelPosition, isRequired]
   )
 
   const labelStyles = useMemo((): React.CSSProperties => {
@@ -234,9 +260,17 @@ export const FormItem: React.FC<FormItemProps> = ({
   }, [labelPosition, actualLabelWidth])
 
   const errorClasses = useMemo(
-    () => classNames('tiger-form-item__error', hasError && 'tiger-form-item__error--show'),
-    [hasError]
+    () =>
+      classNames(getFormItemErrorClasses(actualSize), hasError && 'tiger-form-item__error--show'),
+    [actualSize, hasError]
   )
+
+  const contentClasses = useMemo(() => getFormItemContentClasses(labelPosition), [labelPosition])
+
+  const fieldClasses = useMemo(() => getFormItemFieldClasses(), [])
+
+  const asteriskClasses = useMemo(() => getFormItemAsteriskClasses(), [])
+  const asteriskStyle = useMemo(() => getFormItemAsteriskStyle(), [])
 
   return (
     <div className={formItemClasses}>
@@ -246,13 +280,17 @@ export const FormItem: React.FC<FormItemProps> = ({
           className={labelClasses}
           style={labelStyles}
           htmlFor={isClonableChild ? effectiveFieldId : undefined}>
-          {isRequired && <span className="tiger-form-item__asterisk">*</span>}
+          {isRequired && (
+            <span className={asteriskClasses} style={asteriskStyle}>
+              *
+            </span>
+          )}
           {label}
         </label>
       )}
-      <div className="tiger-form-item__content">
+      <div className={contentClasses}>
         <div
-          className="tiger-form-item__field"
+          className={fieldClasses}
           role="group"
           aria-labelledby={label ? labelId : undefined}
           aria-describedby={describedById}

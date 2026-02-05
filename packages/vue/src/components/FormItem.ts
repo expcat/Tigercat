@@ -12,7 +12,19 @@ import {
   isVNode,
   type VNode
 } from 'vue'
-import { classNames, type FormRule, type FormSize, getFieldError } from '@expcat/tigercat-core'
+import {
+  classNames,
+  type FormRule,
+  type FormSize,
+  getFieldError,
+  getFormItemClasses,
+  getFormItemLabelClasses,
+  getFormItemContentClasses,
+  getFormItemFieldClasses,
+  getFormItemErrorClasses,
+  getFormItemAsteriskClasses,
+  getFormItemAsteriskStyle
+} from '@expcat/tigercat-core'
 import { FormContextKey, type FormContext } from './Form'
 
 let formItemIdCounter = 0
@@ -103,6 +115,21 @@ export const FormItem = defineComponent({
       return formContext.value?.labelAlign || 'right'
     })
 
+    const hasRequiredRule = (maybeRules: FormRule | FormRule[] | undefined): boolean => {
+      if (!maybeRules) {
+        return false
+      }
+
+      const rules = Array.isArray(maybeRules) ? maybeRules : [maybeRules]
+
+      return rules.some((rule) => {
+        if (!rule || typeof rule !== 'object') {
+          return false
+        }
+        return !!rule.required
+      })
+    }
+
     const showRequiredAsterisk = computed(() => {
       if (props.required !== undefined) {
         return props.required
@@ -110,16 +137,14 @@ export const FormItem = defineComponent({
 
       // Check if any rule has required: true
       if (props.rules) {
-        const rules = Array.isArray(props.rules) ? props.rules : [props.rules]
-        return rules.some((rule) => rule.required)
+        return hasRequiredRule(props.rules)
       }
 
       // Check form-level rules
       if (props.name && formContext.value?.rules) {
         const fieldRules = formContext.value.rules[props.name]
         if (fieldRules) {
-          const rules = Array.isArray(fieldRules) ? fieldRules : [fieldRules]
-          return rules.some((rule) => rule.required)
+          return hasRequiredRule(fieldRules)
         }
       }
 
@@ -202,21 +227,21 @@ export const FormItem = defineComponent({
     })
 
     const formItemClasses = computed(() => {
-      return classNames(
-        'tiger-form-item',
-        `tiger-form-item--${actualSize.value}`,
-        `tiger-form-item--label-${labelPosition.value}`,
-        hasError.value && 'tiger-form-item--error',
-        formContext.value?.disabled && 'tiger-form-item--disabled'
-      )
+      return getFormItemClasses({
+        size: actualSize.value,
+        labelPosition: labelPosition.value,
+        hasError: hasError.value,
+        disabled: formContext.value?.disabled
+      })
     })
 
     const labelClasses = computed(() => {
-      return classNames(
-        'tiger-form-item__label',
-        `tiger-form-item__label--${labelAlign.value}`,
-        isRequired.value && 'tiger-form-item__label--required'
-      )
+      return getFormItemLabelClasses({
+        size: actualSize.value,
+        labelAlign: labelAlign.value,
+        labelPosition: labelPosition.value,
+        isRequired: isRequired.value
+      })
     })
 
     const labelStyles = computed(() => {
@@ -226,11 +251,18 @@ export const FormItem = defineComponent({
       return actualLabelWidth.value ? { width: actualLabelWidth.value } : {}
     })
 
-    const contentClasses = 'tiger-form-item__content'
+    const contentClasses = computed(() => getFormItemContentClasses(labelPosition.value))
 
     const errorClasses = computed(() => {
-      return classNames('tiger-form-item__error', hasError.value && 'tiger-form-item__error--show')
+      return classNames(
+        getFormItemErrorClasses(actualSize.value),
+        hasError.value && 'tiger-form-item__error--show'
+      )
     })
+
+    const fieldClasses = computed(() => getFormItemFieldClasses())
+    const asteriskClasses = computed(() => getFormItemAsteriskClasses())
+    const asteriskStyle = computed(() => getFormItemAsteriskStyle())
 
     return () => {
       const mergeAriaDescribedBy = (
@@ -323,7 +355,8 @@ export const FormItem = defineComponent({
               for: effectiveFieldId
             },
             [
-              isRequired.value && h('span', { class: 'tiger-form-item__asterisk' }, '*'),
+              isRequired.value &&
+                h('span', { class: asteriskClasses.value, style: asteriskStyle.value }, '*'),
               props.label
             ]
           )
@@ -332,13 +365,13 @@ export const FormItem = defineComponent({
       const contentElement = h(
         'div',
         {
-          class: contentClasses
+          class: contentClasses.value
         },
         [
           h(
             'div',
             {
-              class: 'tiger-form-item__field',
+              class: fieldClasses.value,
               role: 'group',
               'aria-labelledby': props.label ? labelId : undefined,
               'aria-describedby': describedById.value,
