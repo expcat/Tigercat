@@ -169,9 +169,7 @@ export default function FormWizardDemo() {
               <FormItem name="email" label="邮箱" rules={{ required: true, message: '请输入邮箱' }}>
                 <Input
                   value={model.email}
-                  onChange={(event) =>
-                    setModel((prev) => ({ ...prev, email: event.target.value }))
-                  }
+                  onChange={(event) => setModel((prev) => ({ ...prev, email: event.target.value }))}
                   placeholder="请输入邮箱"
                 />
               </FormItem>

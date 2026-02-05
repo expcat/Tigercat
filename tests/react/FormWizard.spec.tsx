@@ -15,10 +15,7 @@ describe('FormWizard (React)', () => {
     const user = userEvent.setup()
 
     render(
-      <FormWizard
-        steps={steps}
-        renderStep={(_step, index) => <div>Content {index + 1}</div>}
-      />
+      <FormWizard steps={steps} renderStep={(_step, index) => <div>Content {index + 1}</div>} />
     )
 
     expect(screen.getByText('Content 1')).toBeInTheDocument()

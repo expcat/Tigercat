@@ -88,7 +88,10 @@ const FormWizardDemo: React.FC = () => {
             <Form ref={formRef} model={model} className="max-w-xl">
               {index === 0 && (
                 <>
-                  <FormItem name="name" label="姓名" rules={{ required: true, message: '请输入姓名' }}>
+                  <FormItem
+                    name="name"
+                    label="姓名"
+                    rules={{ required: true, message: '请输入姓名' }}>
                     <Input
                       value={model.name}
                       onChange={(event) =>
@@ -97,7 +100,10 @@ const FormWizardDemo: React.FC = () => {
                       placeholder="请输入姓名"
                     />
                   </FormItem>
-                  <FormItem name="email" label="邮箱" rules={{ required: true, message: '请输入邮箱' }}>
+                  <FormItem
+                    name="email"
+                    label="邮箱"
+                    rules={{ required: true, message: '请输入邮箱' }}>
                     <Input
                       value={model.email}
                       onChange={(event) =>
@@ -109,7 +115,10 @@ const FormWizardDemo: React.FC = () => {
                 </>
               )}
               {index === 1 && (
-                <FormItem name="phone" label="手机号" rules={{ required: true, message: '请输入手机号' }}>
+                <FormItem
+                  name="phone"
+                  label="手机号"
+                  rules={{ required: true, message: '请输入手机号' }}>
                   <Input
                     value={model.phone}
                     onChange={(event) =>

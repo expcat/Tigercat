@@ -76,7 +76,7 @@ const handleSend = (value: string) => {
 
 ## ActivityFeed 活动动态流
 
-```vue
+````vue
 <script setup lang="ts">
 import { ref } from 'vue'
 import { ActivityFeed } from '@expcat/tigercat-vue'
@@ -145,9 +145,10 @@ const handleFinish = () => {
     </template>
   </FormWizard>
 </template>
-```
+````
 
 ---
+
       {
         id: 2,
         title: '导入审计日志',
@@ -158,22 +159,23 @@ const handleFinish = () => {
         actions: [{ label: '重试', href: '#' }]
       }
     ]
-  },
-  {
-    key: 'yesterday',
-    title: '昨天',
-    items: [
-      {
-        id: 3,
-        title: '发布版本 2.1',
-        description: '包含安全修复与性能优化。',
-        time: '16:45',
-        user: { name: 'DevOps', avatar: 'https://i.pravatar.cc/40?img=6' },
-        status: { label: '成功', variant: 'primary' },
-        actions: [{ label: '变更记录', href: '#' }]
-      }
-    ]
-  }
+
+},
+{
+key: 'yesterday',
+title: '昨天',
+items: [
+{
+id: 3,
+title: '发布版本 2.1',
+description: '包含安全修复与性能优化。',
+time: '16:45',
+user: { name: 'DevOps', avatar: 'https://i.pravatar.cc/40?img=6' },
+status: { label: '成功', variant: 'primary' },
+actions: [{ label: '变更记录', href: '#' }]
+}
+]
+}
 ])
 </script>
 

@@ -11,9 +11,7 @@ import { Button } from './Button'
 import { Alert } from './Alert'
 
 export interface FormWizardProps
-  extends
-    CoreFormWizardProps,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children'> {
+  extends CoreFormWizardProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children'> {
   renderStep?: (step: WizardStep, index: number) => React.ReactNode
 }
 
@@ -52,15 +50,7 @@ export const FormWizard: React.FC<FormWizardProps> = ({
   const currentStep = steps[currentIndex]
 
   const wrapperClasses = useMemo(
-    () =>
-      classNames(
-        'tiger-form-wizard',
-        'flex',
-        'flex-col',
-        'gap-4',
-        'w-full',
-        className
-      ),
+    () => classNames('tiger-form-wizard', 'flex', 'flex-col', 'gap-4', 'w-full', className),
     [className]
   )
 
