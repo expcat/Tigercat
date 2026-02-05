@@ -1,4 +1,4 @@
-﻿---
+---
 name: tigercat-react
 description: React component library overview
 ---
@@ -82,4 +82,4 @@ See [../shared/patterns/common.md](../shared/patterns/common.md) for framework c
 **Navigation**: Menu · Breadcrumb · Dropdown · Pagination · Steps · Tabs  
 **Data**: Table · List · Tree · Collapse · Timeline  
 **Charts**: LineChart · AreaChart · BarChart · PieChart · DonutChart · RadarChart · ScatterChart  
-**Composite**: ChatWindow · ActivityFeed · DataTableWithToolbar
+**Composite**: ChatWindow · ActivityFeed · NotificationCenter · DataTableWithToolbar
