@@ -151,6 +151,10 @@ export const DataTableWithToolbar = defineComponent({
       type: [Object, Boolean] as PropType<PaginationProps | false>,
       default: false
     },
+    tableLayout: {
+      type: String as PropType<'auto' | 'fixed'>,
+      default: 'auto'
+    },
     className: {
       type: String,
       default: undefined
@@ -313,7 +317,8 @@ export const DataTableWithToolbar = defineComponent({
                   Button,
                   {
                     size: 'sm',
-                    variant: 'outline',
+                    variant: 'primary',
+                    class: 'whitespace-nowrap',
                     onClick: handleSearchSubmit,
                     disabled: !canSearch.value
                   },
@@ -330,6 +335,8 @@ export const DataTableWithToolbar = defineComponent({
           const triggerLabel = resolveFilterLabel(filter, currentValue)
           const clearable = filter.clearable !== false
           const clearLabel = filter.clearLabel ?? '全部'
+          const isActive =
+            currentValue !== null && currentValue !== undefined && currentValue !== ''
 
           leftNodes.push(
             h(
@@ -337,7 +344,15 @@ export const DataTableWithToolbar = defineComponent({
               { trigger: 'click' },
               {
                 default: () => [
-                  h(Button, { size: 'sm', variant: 'outline' }, { default: () => triggerLabel }),
+                  h(
+                    Button,
+                    {
+                      size: 'sm',
+                      variant: isActive ? 'secondary' : 'outline',
+                      class: 'whitespace-nowrap'
+                    },
+                    { default: () => triggerLabel }
+                  ),
                   h(DropdownMenu, null, {
                     default: () => [
                       ...(clearable
@@ -440,6 +455,7 @@ export const DataTableWithToolbar = defineComponent({
         rowClassName: props.rowClassName,
         stickyHeader: props.stickyHeader,
         maxHeight: props.maxHeight,
+        tableLayout: props.tableLayout,
         onSelectionChange: (keys: (string | number)[]) => emit('selection-change', keys)
       }
 

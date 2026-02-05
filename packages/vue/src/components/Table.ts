@@ -288,6 +288,13 @@ export const Table = defineComponent({
      */
     maxHeight: {
       type: [String, Number] as PropType<string | number>
+    },
+    /**
+     * Table layout algorithm
+     */
+    tableLayout: {
+      type: String as PropType<'auto' | 'fixed'>,
+      default: 'auto'
     }
   },
   emits: ['change', 'row-click', 'selection-change', 'sort-change', 'filter-change', 'page-change'],
@@ -1012,7 +1019,10 @@ export const Table = defineComponent({
             h(
               'table',
               {
-                class: tableBaseClasses,
+                class: classNames(
+                  tableBaseClasses,
+                  props.tableLayout === 'fixed' ? 'table-fixed' : 'table-auto'
+                ),
                 style:
                   fixedColumnsInfo.value.hasFixedColumns && fixedColumnsInfo.value.minTableWidth
                     ? { minWidth: `${fixedColumnsInfo.value.minTableWidth}px` }

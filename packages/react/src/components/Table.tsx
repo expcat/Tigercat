@@ -173,6 +173,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   rowClassName,
   stickyHeader = false,
   maxHeight,
+  tableLayout = 'auto',
   onChange,
   onRowClick,
   onSelectionChange,
@@ -901,7 +902,10 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         style={wrapperStyle}
         aria-busy={loading}>
         <table
-          className={tableBaseClasses}
+          className={classNames(
+            tableBaseClasses,
+            tableLayout === 'fixed' ? 'table-fixed' : 'table-auto'
+          )}
           {...props}
           style={
             fixedColumnsInfo.hasFixedColumns && fixedColumnsInfo.minTableWidth
