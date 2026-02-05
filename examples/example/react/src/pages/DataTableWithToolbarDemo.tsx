@@ -38,10 +38,10 @@ const basicSnippet = `<DataTableWithToolbar
 />`
 
 const columns: TableColumn<UserRow>[] = [
-  { key: 'name', title: '姓名' },
-  { key: 'email', title: '邮箱' },
-  { key: 'role', title: '角色' },
-  { key: 'status', title: '状态' }
+  { key: 'name', title: '姓名', width: '25%' },
+  { key: 'email', title: '邮箱', width: '35%' },
+  { key: 'role', title: '角色', width: '20%' },
+  { key: 'status', title: '状态', width: '20%' }
 ]
 
 const statusOptions = [
@@ -124,6 +124,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
         <DataTableWithToolbar<UserRow>
           columns={columns}
           dataSource={pagedData}
+          tableLayout="fixed"
           rowSelection={{
             selectedRowKeys,
             type: 'checkbox'

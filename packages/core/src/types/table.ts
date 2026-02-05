@@ -369,4 +369,10 @@ export interface TableProps<T = Record<string, unknown>> {
    * Max height for scrollable table
    */
   maxHeight?: string | number
+
+  /**
+   * Table layout algorithm
+   * @default 'auto'
+   */
+  tableLayout?: 'auto' | 'fixed'
 }

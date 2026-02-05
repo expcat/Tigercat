@@ -221,7 +221,8 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
               {(toolbar?.showSearchButton ?? true) ? (
                 <Button
                   size="sm"
-                  variant="outline"
+                  variant="primary"
+                  className="whitespace-nowrap"
                   onClick={handleSearchSubmit}
                   disabled={!onSearch && !toolbar?.onSearch}>
                   {toolbar?.searchButtonText ?? '搜索'}
@@ -236,10 +237,15 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 const triggerLabel = resolveFilterLabel(filter, currentValue)
                 const clearable = filter.clearable !== false
                 const clearLabel = filter.clearLabel ?? '全部'
+                const isActive =
+                  currentValue !== null && currentValue !== undefined && currentValue !== ''
 
                 return (
                   <Dropdown key={filter.key} trigger="click">
-                    <Button size="sm" variant="outline">
+                    <Button
+                      size="sm"
+                      variant={isActive ? 'secondary' : 'outline'}
+                      className="whitespace-nowrap">
                       {triggerLabel}
                     </Button>
                     <DropdownMenu>
