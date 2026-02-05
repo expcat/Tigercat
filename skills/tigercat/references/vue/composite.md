@@ -57,8 +57,7 @@ const handleSend = (value: string) => {
 
 <template>
   <ChatWindow
-    v-model="input"
-    :messages="messages"
+
     status-text="对方正在输入..."
     allow-shift-enter
     message-list-aria-label="会话消息"
@@ -130,7 +129,7 @@ const activityGroups = ref<ActivityGroup[]>([
 <template>
   <ActivityFeed :groups="activityGroups" />
 </template>
-````
+```
 
 ---
 

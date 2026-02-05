@@ -74,9 +74,7 @@ export default function CommentThreadDemo() {
 
   const handleReply = useCallback((node: CommentNode, value: string) => {
     setNodes((prev) => {
-      const next = prev.map((item) => ({ ...item }))
-      const target = next.find((item) => item.id === node.id)
-      if (!target) return prev
+      let inserted = false
       const reply: CommentNode = {
         id: Date.now(),
         parentId: node.id,
@@ -84,8 +82,29 @@ export default function CommentThreadDemo() {
         user: { name: '我' },
         time: new Date().toLocaleTimeString()
       }
-      target.children = [...(target.children ?? []), reply]
-      return next
+
+      const appendReply = (items: CommentNode[]): CommentNode[] =>
+        items.map((item) => {
+          const next = {
+            ...item,
+            children: item.children ? [...item.children] : []
+          }
+
+          if (!inserted && item.id === node.id) {
+            next.children = [...(next.children ?? []), reply]
+            inserted = true
+            return next
+          }
+
+          if (!inserted && next.children && next.children.length > 0) {
+            next.children = appendReply(next.children)
+          }
+
+          return next
+        })
+
+      const next = appendReply(prev)
+      return inserted ? next : prev
     })
   }, [])
 

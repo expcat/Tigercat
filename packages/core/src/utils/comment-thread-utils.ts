@@ -9,7 +9,7 @@ export const buildCommentTree = (items: CommentNode[] = []): CommentNode[] => {
   items.forEach((item) => {
     nodeMap.set(item.id, {
       ...item,
-      children: item.children ? [...item.children] : []
+      children: []
     })
     order.push(item.id)
   })

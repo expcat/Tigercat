@@ -124,6 +124,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     const isExpanded = expandedSet.has(node.id)
     const showReplies = hasChildren && isExpanded
     const showAllReplies = expandedAllKeys.has(node.id)
+    const repliesId = `tiger-comment-replies-${node.id}`
     const visibleChildren = showReplies
       ? maxReplies > 0 && !showAllReplies
         ? node.children!.slice(0, maxReplies)
@@ -245,7 +246,12 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
 
             {hasChildren ? (
               <div className="flex items-center gap-2">
-                <Button size="sm" variant="link" onClick={() => toggleExpanded(node.id)}>
+                <Button
+                  size="sm"
+                  variant="link"
+                  aria-expanded={isExpanded}
+                  aria-controls={repliesId}
+                  onClick={() => toggleExpanded(node.id)}>
                   {isExpanded ? '收起回复' : `展开 ${node.children!.length} 条回复`}
                 </Button>
                 {showLoadMore ? (
@@ -257,7 +263,9 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             ) : null}
 
             {showReplies ? (
-              <div className="mt-3 pl-6 border-l border-gray-100 space-y-3">
+              <div
+                id={repliesId}
+                className="mt-3 pl-6 border-l border-gray-100 space-y-3">
                 {visibleChildren.map((child, index) =>
                   renderNode(child, depth + 1, index === visibleChildren.length - 1)
                 )}
@@ -274,6 +282,9 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     <div
       className={classNames('tiger-comment-thread', 'flex', 'flex-col', 'gap-4', className)}
       data-tiger-comment-thread
+      aria-label={
+        divProps['aria-label'] ?? (divProps['aria-labelledby'] ? undefined : '评论线程')
+      }
       {...divProps}>
       {resolvedNodes.length === 0 ? (
         <Text tag="div" size="sm" color="muted" className="text-center py-6">
