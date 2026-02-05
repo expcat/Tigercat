@@ -12,7 +12,8 @@ const steps: WizardStep[] = [
 
 const current = ref(0)
 const finished = ref(false)
-const formRef = ref<InstanceType<typeof Form> | null>(null)
+type FormExpose = { validate: () => Promise<boolean> }
+const formRef = ref<FormExpose | null>(null)
 const model = reactive({ name: '', email: '', phone: '' })
 
 const handleBeforeNext = async () => {
