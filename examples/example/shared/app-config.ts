@@ -99,6 +99,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'Form', 'en-US': 'Form' }
       },
       {
+        key: 'form-wizard',
+        path: '/form-wizard',
+        label: { 'zh-CN': 'FormWizard', 'en-US': 'FormWizard' }
+      },
+      {
         key: 'datepicker',
         path: '/datepicker',
         label: { 'zh-CN': 'DatePicker', 'en-US': 'DatePicker' }
