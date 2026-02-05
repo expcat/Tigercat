@@ -65,6 +65,7 @@ const BackTopDemo = lazy(() => import('./pages/BackTopDemo'))
 const AnchorDemo = lazy(() => import('./pages/AnchorDemo'))
 const ChatWindowDemo = lazy(() => import('./pages/ChatWindowDemo'))
 const ActivityFeedDemo = lazy(() => import('./pages/ActivityFeedDemo'))
+const NotificationCenterDemo = lazy(() => import('./pages/NotificationCenterDemo'))
 
 const router = createBrowserRouter(
   [
@@ -133,7 +134,8 @@ const router = createBrowserRouter(
         { path: 'backtop', element: <BackTopDemo /> },
         { path: 'anchor', element: <AnchorDemo /> },
         { path: 'chat-window', element: <ChatWindowDemo /> },
-        { path: 'activity-feed', element: <ActivityFeedDemo /> }
+        { path: 'activity-feed', element: <ActivityFeedDemo /> },
+        { path: 'notification-center', element: <NotificationCenterDemo /> }
       ]
     }
   ],

@@ -148,6 +148,10 @@ const router = createRouter({
         {
           path: 'activity-feed',
           component: () => import('./pages/ActivityFeedDemo.vue')
+        },
+        {
+          path: 'notification-center',
+          component: () => import('./pages/NotificationCenterDemo.vue')
         }
       ]
     }

@@ -5,7 +5,7 @@ description: React composite components usage
 
 # Composite Components (React)
 
-组合组件：ChatWindow / ActivityFeed / DataTableWithToolbar
+组合组件：ChatWindow / ActivityFeed / NotificationCenter / DataTableWithToolbar
 
 > **Props Reference**: [shared/props/composite.md](../shared/props/composite.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -115,6 +115,68 @@ const groups: ActivityGroup[] = [
 
 export default function ActivityFeedDemo() {
   return <ActivityFeed groups={groups} />
+}
+```
+
+---
+
+## NotificationCenter 通知中心
+
+```tsx
+import React, { useMemo, useState } from 'react'
+import { NotificationCenter } from '@expcat/tigercat-react'
+import type { NotificationItem } from '@expcat/tigercat-core'
+
+export default function NotificationCenterDemo() {
+  const [items, setItems] = useState<NotificationItem[]>([
+    {
+      id: 1,
+      title: '系统维护提醒',
+      description: '今晚 23:00-01:00 系统维护，请提前保存工作。',
+      time: '10:30',
+      type: '系统',
+      read: false
+    },
+    {
+      id: 2,
+      title: '评论回复',
+      description: '你在「设计文档」的评论有新回复。',
+      time: '09:12',
+      type: '评论',
+      read: true
+    },
+    {
+      id: 3,
+      title: '任务到期',
+      description: '任务「月度总结」将在 2 天后到期。',
+      time: '昨天',
+      type: '任务',
+      read: false
+    }
+  ])
+
+  const handleReadChange = (item: NotificationItem, read: boolean) => {
+    setItems((prev) => prev.map((entry) => (entry.id === item.id ? { ...entry, read } : entry)))
+  }
+
+  const handleMarkAllRead = (
+    groupKey: string | number | undefined,
+    groupItems: NotificationItem[]
+  ) => {
+    const ids = new Set(groupItems.map((entry) => entry.id))
+    setItems((prev) => prev.map((entry) => (ids.has(entry.id) ? { ...entry, read: true } : entry)))
+  }
+
+  const groupOrder = useMemo(() => ['系统', '评论', '任务'], [])
+
+  return (
+    <NotificationCenter
+      items={items}
+      groupOrder={groupOrder}
+      onItemReadChange={handleReadChange}
+      onMarkAllRead={handleMarkAllRead}
+    />
+  )
 }
 ```
 

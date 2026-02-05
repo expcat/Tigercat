@@ -363,6 +363,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'activity-feed',
         path: '/activity-feed',
         label: { 'zh-CN': 'ActivityFeed', 'en-US': 'ActivityFeed' }
+      },
+      {
+        key: 'notification-center',
+        path: '/notification-center',
+        label: { 'zh-CN': 'NotificationCenter', 'en-US': 'NotificationCenter' }
       }
     ]
   }
