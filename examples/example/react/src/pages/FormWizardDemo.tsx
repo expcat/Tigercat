@@ -17,7 +17,7 @@ const basicSnippet = `<FormWizard
   beforeNext={handleBeforeNext}
   onFinish={handleFinish}
   renderStep={(_step, index) => (
-    <Form ref={formRef} model={model} className="max-w-xl">
+    <Form ref={formRef} model={model} className="max-w-xl mx-auto">
       {index === 0 && (
         <>
           <FormItem name="name" label="姓名" rules={{ required: true, message: '请输入姓名' }}>
@@ -85,7 +85,7 @@ const FormWizardDemo: React.FC = () => {
           beforeNext={handleBeforeNext}
           onFinish={handleFinish}
           renderStep={(_step, index) => (
-            <Form ref={formRef} model={model} className="max-w-xl">
+            <Form ref={formRef} model={model} className="max-w-xl mx-auto">
               {index === 0 && (
                 <>
                   <FormItem

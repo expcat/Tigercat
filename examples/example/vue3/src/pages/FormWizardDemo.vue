@@ -39,7 +39,7 @@ const basicSnippet = `<FormWizard
   @change="handleChange"
   @finish="handleFinish">
   <template #step="{ index }">
-    <Form ref="formRef" :model="model" class="max-w-xl">
+    <Form ref="formRef" :model="model" class="max-w-xl mx-auto">
       <template v-if="index === 0">
         <FormItem name="name" label="姓名" :rules="{ required: true, message: '请输入姓名' }">
           <Input v-model="model.name" placeholder="请输入姓名" />
@@ -72,49 +72,49 @@ const basicSnippet = `<FormWizard
         </div>
 
         <DemoBlock title="基础用法"
-                   description="多步校验阻断 + 完成态"
-                   :code="basicSnippet">
-            <FormWizard v-model:current="current"
-                        :steps="steps"
-                        :before-next="handleBeforeNext"
-                        @change="handleChange"
-                        @finish="handleFinish">
-                <template #step="{ index }">
-                    <Form ref="formRef"
-                          :model="model"
-                          class="max-w-xl">
-                        <template v-if="index === 0">
-                            <FormItem name="name"
-                                      label="姓名"
-                                      :rules="{ required: true, message: '请输入姓名' }">
-                                <Input v-model="model.name"
-                                       placeholder="请输入姓名" />
-                            </FormItem>
-                            <FormItem name="email"
-                                      label="邮箱"
-                                      :rules="{ required: true, message: '请输入邮箱' }">
-                                <Input v-model="model.email"
-                                       placeholder="请输入邮箱" />
-                            </FormItem>
-                        </template>
-                        <template v-else-if="index === 1">
-                            <FormItem name="phone"
-                                      label="手机号"
-                                      :rules="{ required: true, message: '请输入手机号' }">
-                                <Input v-model="model.phone"
-                                       placeholder="请输入手机号" />
-                            </FormItem>
-                        </template>
-                        <template v-else>
-                            <div class="space-y-3">
-                                <div class="text-sm text-gray-600">确认信息无误后点击完成。</div>
-                                <Alert :type="finished ? 'success' : 'info'"
-                                       :description="finished ? '已完成提交' : '等待完成提交'" />
-                            </div>
-                        </template>
-                    </Form>
+               description="多步校验阻断 + 完成态"
+               :code="basicSnippet">
+          <FormWizard v-model:current="current"
+                :steps="steps"
+                :before-next="handleBeforeNext"
+                @change="handleChange"
+                @finish="handleFinish">
+            <template #step="{ index }">
+              <Form ref="formRef"
+                  :model="model"
+                  class="max-w-xl mx-auto">
+                <template v-if="index === 0">
+                  <FormItem name="name"
+                        label="姓名"
+                        :rules="{ required: true, message: '请输入姓名' }">
+                    <Input v-model="model.name"
+                         placeholder="请输入姓名" />
+                  </FormItem>
+                  <FormItem name="email"
+                        label="邮箱"
+                        :rules="{ required: true, message: '请输入邮箱' }">
+                    <Input v-model="model.email"
+                         placeholder="请输入邮箱" />
+                  </FormItem>
                 </template>
-            </FormWizard>
+                <template v-else-if="index === 1">
+                  <FormItem name="phone"
+                        label="手机号"
+                        :rules="{ required: true, message: '请输入手机号' }">
+                    <Input v-model="model.phone"
+                         placeholder="请输入手机号" />
+                  </FormItem>
+                </template>
+                <template v-else>
+                  <div class="space-y-3">
+                    <div class="text-sm text-gray-600">确认信息无误后点击完成。</div>
+                    <Alert :type="finished ? 'success' : 'info'"
+                         :description="finished ? '已完成提交' : '等待完成提交'" />
+                  </div>
+                </template>
+              </Form>
+            </template>
+          </FormWizard>
         </DemoBlock>
     </div>
 </template>

@@ -47,7 +47,7 @@ export function getStepItemClasses(
     return `${baseClasses} flex flex-row ${!isLast ? 'pb-6' : ''}`
   }
 
-  return `${baseClasses} flex flex-col flex-1 ${simple ? 'items-center' : ''}`
+  return `${baseClasses} flex flex-col flex-1 items-center`
 }
 
 /**
@@ -124,7 +124,7 @@ export function getStepContentClasses(direction: StepsDirection, simple: boolean
     return `${baseClasses} ml-4 flex-1`
   }
 
-  return `${baseClasses} mt-2 ${simple ? 'text-center' : ''}`
+  return `${baseClasses} mt-2 text-center`
 }
 
 /**

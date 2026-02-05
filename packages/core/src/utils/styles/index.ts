@@ -11,6 +11,7 @@ export * from '../interaction-styles'
 // Form components
 export * from '../button-utils'
 export * from '../input-styles'
+export * from '../form-item-styles'
 export * from '../select-utils'
 export * from '../textarea-auto-resize'
 export * from '../form-validation'
