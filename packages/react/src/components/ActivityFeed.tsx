@@ -94,7 +94,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
     )
 
     return (
-      <Card variant="bordered" size="sm" className="tiger-activity-item">
+      <div className="tiger-activity-item">
         <div className="flex gap-3 items-start">
           {showAvatar && item.user ? (
             <Avatar size="sm" src={item.user.avatar} text={item.user.name} className="shrink-0" />
@@ -127,7 +127,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
             {actionNodes?.length ? <div className="flex flex-wrap gap-2">{actionNodes}</div> : null}
           </div>
         </div>
-      </Card>
+      </div>
     )
   }
 
@@ -162,7 +162,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
       {resolvedGroups.map((group, groupIndex) => {
         const headerNode = renderGroupHeader?.(group)
         const groupTitle = group.title
-        const timelineItems = toActivityTimelineItems(group.items, showTime)
+        const timelineItems = toActivityTimelineItems(group.items)
 
         return (
           <div key={group.key ?? groupIndex} className="space-y-3">

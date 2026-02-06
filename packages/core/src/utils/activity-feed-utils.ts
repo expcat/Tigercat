@@ -55,13 +55,10 @@ export const buildActivityGroups = (
 }
 
 export const toActivityTimelineItems = (
-  items: ActivityItem[],
-  showTime: boolean
-): TimelineItem[] => {
+  items: ActivityItem[]
+): (TimelineItem & { activity: ActivityItem })[] => {
   return items.map((item, index) => ({
     key: item.id ?? index,
-    label: showTime ? formatActivityTime(item.time) : undefined,
-    content: undefined,
     activity: item
   }))
 }
