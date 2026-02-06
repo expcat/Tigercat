@@ -95,7 +95,14 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     onReply?.(node, replyValue)
     setReplyValue('')
     setReplyingTo(null)
+    if (!expandedSet.has(node.id)) {
+      const next = [...mergedExpandedKeys, node.id]
+      updateExpandedKeys(next)
+    }
   }
+
+  const ACTION_BUTTON_CLASS =
+    'text-gray-500 hover:text-gray-700 px-0 h-auto min-h-0 font-normal hover:bg-transparent text-xs'
 
   const renderActionButton = (
     label: string,
@@ -106,8 +113,11 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     <Button
       key={key}
       size="sm"
-      variant="link"
-      className={classNames(active && 'text-[var(--tiger-primary,#2563eb)]')}
+      variant="ghost"
+      className={classNames(
+        ACTION_BUTTON_CLASS,
+        active && 'text-[var(--tiger-primary,#2563eb)] font-medium'
+      )}
       onClick={onClick}>
       {label}
     </Button>
@@ -178,12 +188,17 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       <div key={node.id} className="tiger-comment-thread-item">
         <div className="flex gap-3">
           {showAvatar && node.user ? (
-            <Avatar size="sm" src={node.user.avatar} text={node.user.name} className="shrink-0" />
+            <Avatar
+              size="sm"
+              src={node.user.avatar}
+              text={node.user.name}
+              className="shrink-0 mt-1"
+            />
           ) : null}
-          <div className="flex-1 space-y-2">
-            <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-1">
               {node.user?.name ? (
-                <Text tag="div" size="sm" weight="medium">
+                <Text tag="div" size="sm" weight="bold" className="text-gray-900">
                   {node.user.name}
                 </Text>
               ) : null}
@@ -208,23 +223,25 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                 </Text>
               ) : null}
             </div>
-            <Text tag="div" size="sm">
+
+            <Text tag="div" size="sm" className="text-gray-700 leading-relaxed break-words mb-2">
               {node.content}
             </Text>
-            {actions.length > 0 ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
+
+            {actions.length > 0 ? (
+              <div className="flex flex-wrap items-center gap-4 mb-2">{actions}</div>
+            ) : null}
 
             {replyingTo === node.id ? (
-              <div className="space-y-2">
+              <div className="space-y-2 bg-gray-50 p-3 rounded-lg mb-3">
                 <Textarea
                   rows={3}
                   value={replyValue}
                   placeholder={replyPlaceholder}
+                  className="bg-white"
                   onChange={(event) => setReplyValue(event.target.value)}
                 />
-                <div className="flex items-center gap-2">
-                  <Button size="sm" variant="primary" onClick={() => handleReplySubmit(node)}>
-                    {replyButtonText}
-                  </Button>
+                <div className="flex items-center gap-2 justify-end">
                   <Button
                     size="sm"
                     variant="ghost"
@@ -233,6 +250,9 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                       setReplyValue('')
                     }}>
                     {cancelReplyText}
+                  </Button>
+                  <Button size="sm" variant="primary" onClick={() => handleReplySubmit(node)}>
+                    {replyButtonText}
                   </Button>
                 </div>
               </div>
@@ -243,13 +263,18 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                 <Button
                   size="sm"
                   variant="link"
+                  className={ACTION_BUTTON_CLASS}
                   aria-expanded={isExpanded}
                   aria-controls={repliesId}
                   onClick={() => toggleExpanded(node.id)}>
                   {isExpanded ? '收起回复' : `展开 ${node.children!.length} 条回复`}
                 </Button>
                 {showLoadMore ? (
-                  <Button size="sm" variant="link" onClick={() => handleLoadMore(node)}>
+                  <Button
+                    size="sm"
+                    variant="link"
+                    className={ACTION_BUTTON_CLASS}
+                    onClick={() => handleLoadMore(node)}>
                     {loadMoreText}
                   </Button>
                 ) : null}
@@ -257,7 +282,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             ) : null}
 
             {showReplies ? (
-              <div id={repliesId} className="mt-3 pl-6 border-l border-gray-100 space-y-3">
+              <div id={repliesId} className="mt-3 pl-4 border-l-2 border-gray-100 space-y-4">
                 {visibleChildren.map((child, index) =>
                   renderNode(child, depth + 1, index === visibleChildren.length - 1)
                 )}
@@ -265,14 +290,14 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             ) : null}
           </div>
         </div>
-        {showDivider && depth === 1 && !isLast ? <Divider className="my-4" /> : null}
+        {showDivider && depth === 1 && !isLast ? <Divider /> : null}
       </div>
     )
   }
 
   return (
     <div
-      className={classNames('tiger-comment-thread', 'flex', 'flex-col', 'gap-4', className)}
+      className={classNames('tiger-comment-thread', 'flex', 'flex-col', className)}
       data-tiger-comment-thread
       aria-label={divProps['aria-label'] ?? (divProps['aria-labelledby'] ? undefined : '评论线程')}
       {...divProps}>

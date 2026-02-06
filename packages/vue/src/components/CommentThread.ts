@@ -138,7 +138,6 @@ export const CommentThread = defineComponent({
         'tiger-comment-thread',
         'flex',
         'flex-col',
-        'gap-4',
         props.className,
         coerceClassValue(attrs.class)
       )
@@ -172,7 +171,14 @@ export const CommentThread = defineComponent({
       emit('reply', node, replyValue.value)
       replyValue.value = ''
       replyingTo.value = null
+      if (!expandedSet.value.has(node.id)) {
+        const next = [...mergedExpandedKeys.value, node.id]
+        updateExpandedKeys(next)
+      }
     }
+
+    const ACTION_BUTTON_CLASS =
+      'text-gray-500 hover:text-gray-700 px-0 h-auto min-h-0 font-normal hover:bg-transparent text-xs'
 
     const renderActionButton = (
       label: string,
@@ -185,8 +191,11 @@ export const CommentThread = defineComponent({
         {
           key,
           size: 'sm',
-          variant: 'link',
-          className: classNames(active && 'text-[var(--tiger-primary,#2563eb)]'),
+          variant: 'ghost',
+          className: classNames(
+            ACTION_BUTTON_CLASS,
+            active && 'text-[var(--tiger-primary,#2563eb)] font-medium'
+          ),
           onClick
         },
         { default: () => label }
@@ -270,15 +279,15 @@ export const CommentThread = defineComponent({
                 size: 'sm',
                 src: node.user.avatar,
                 text: node.user.name,
-                className: 'shrink-0'
+                className: 'shrink-0 mt-1'
               })
             : null,
-          h('div', { class: 'flex-1 space-y-2' }, [
-            h('div', { class: 'flex items-center gap-2 flex-wrap' }, [
+          h('div', { class: 'flex-1 min-w-0' }, [
+            h('div', { class: 'flex items-center gap-2 flex-wrap mb-1' }, [
               node.user?.name
                 ? h(
                     Text,
-                    { tag: 'div', size: 'sm', weight: 'medium' },
+                    { tag: 'div', size: 'sm', weight: 'bold', class: 'text-gray-900' },
                     { default: () => node.user?.name }
                   )
                 : null,
@@ -299,7 +308,11 @@ export const CommentThread = defineComponent({
               ...(node.tags ?? []).map((tag, index) =>
                 h(
                   Tag,
-                  { key: `${node.id}-tag-${index}`, size: 'sm', variant: tag.variant ?? 'default' },
+                  {
+                    key: `${node.id}-tag-${index}`,
+                    size: 'sm',
+                    variant: tag.variant ?? 'default'
+                  },
                   { default: () => tag.label }
                 )
               ),
@@ -311,24 +324,26 @@ export const CommentThread = defineComponent({
                   )
                 : null
             ]),
-            h(Text, { tag: 'div', size: 'sm' }, { default: () => node.content }),
-            actions.length > 0 ? h('div', { class: 'flex flex-wrap gap-2' }, actions) : null,
+            h(
+              Text,
+              { tag: 'div', size: 'sm', class: 'text-gray-700 leading-relaxed break-words mb-2' },
+              { default: () => node.content }
+            ),
+            actions.length > 0
+              ? h('div', { class: 'flex flex-wrap items-center gap-4 mb-2' }, actions)
+              : null,
             replyingTo.value === node.id
-              ? h('div', { class: 'space-y-2' }, [
+              ? h('div', { class: 'space-y-2 bg-gray-50 p-3 rounded-lg mb-3' }, [
                   h(Textarea, {
                     rows: 3,
                     modelValue: replyValue.value,
                     placeholder: props.replyPlaceholder,
+                    className: 'bg-white',
                     'onUpdate:modelValue': (value: string) => {
                       replyValue.value = value
                     }
                   }),
-                  h('div', { class: 'flex items-center gap-2' }, [
-                    h(
-                      Button,
-                      { size: 'sm', variant: 'primary', onClick: () => handleReplySubmit(node) },
-                      { default: () => props.replyButtonText }
-                    ),
+                  h('div', { class: 'flex items-center gap-2 justify-end' }, [
                     h(
                       Button,
                       {
@@ -340,6 +355,15 @@ export const CommentThread = defineComponent({
                         }
                       },
                       { default: () => props.cancelReplyText }
+                    ),
+                    h(
+                      Button,
+                      {
+                        size: 'sm',
+                        variant: 'primary',
+                        onClick: () => handleReplySubmit(node)
+                      },
+                      { default: () => props.replyButtonText }
                     )
                   ])
                 ])
@@ -351,6 +375,7 @@ export const CommentThread = defineComponent({
                     {
                       size: 'sm',
                       variant: 'link',
+                      className: ACTION_BUTTON_CLASS,
                       'aria-expanded': isExpanded,
                       'aria-controls': repliesId,
                       onClick: () => toggleExpanded(node.id)
@@ -363,22 +388,31 @@ export const CommentThread = defineComponent({
                   showLoadMore
                     ? h(
                         Button,
-                        { size: 'sm', variant: 'link', onClick: () => handleLoadMore(node) },
+                        {
+                          size: 'sm',
+                          variant: 'link',
+                          className: ACTION_BUTTON_CLASS,
+                          onClick: () => handleLoadMore(node)
+                        },
                         { default: () => props.loadMoreText }
                       )
                     : null
                 ])
               : null,
             showReplies
-              ? h('div', { id: repliesId, class: 'mt-3 pl-6 border-l border-gray-100 space-y-3' }, [
-                  ...visibleChildren.map((child, index) =>
-                    renderNode(child, depth + 1, index === visibleChildren.length - 1)
-                  )
-                ])
+              ? h(
+                  'div',
+                  { id: repliesId, class: 'mt-3 pl-4 border-l-2 border-gray-100 space-y-4' },
+                  [
+                    ...visibleChildren.map((child, index) =>
+                      renderNode(child, depth + 1, index === visibleChildren.length - 1)
+                    )
+                  ]
+                )
               : null
           ])
         ]),
-        props.showDivider && depth === 1 && !isLast ? h(Divider, { className: 'my-4' }) : null
+        props.showDivider && depth === 1 && !isLast ? h(Divider) : null
       ])
     }
 
@@ -399,7 +433,7 @@ export const CommentThread = defineComponent({
           },
           h(
             Text,
-            { tag: 'div', size: 'sm', color: 'muted', className: 'text-center py-6' },
+            { tag: 'div', size: 'sm', color: 'muted', class: 'text-center py-6' },
             { default: () => props.emptyText }
           )
         )
