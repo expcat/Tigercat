@@ -8,12 +8,10 @@ import {
   type CommentNode,
   type CommentThreadProps as CoreCommentThreadProps
 } from '@expcat/tigercat-core'
-import { List } from './List'
 import { Avatar } from './Avatar'
 import { Tag } from './Tag'
 import { Button } from './Button'
 import { Textarea } from './Textarea'
-import { Divider } from './Divider'
 import { Text } from './Text'
 
 export interface CommentThreadProps
@@ -101,8 +99,9 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     }
   }
 
-  const ACTION_BUTTON_CLASS =
-    'text-gray-500 hover:text-gray-700 px-0 h-auto min-h-0 font-normal hover:bg-transparent text-xs'
+  const BTN_BASE = 'px-1.5 py-0.5 h-auto min-h-0 text-xs rounded'
+  const ACTION_BTN = `${BTN_BASE} text-gray-400 hover:text-gray-600 font-normal hover:bg-gray-50`
+  const PRIMARY_BTN = `${BTN_BASE} text-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary-hover,#1d4ed8)] font-medium hover:bg-[var(--tiger-primary,#2563eb)]/5`
 
   const renderActionButton = (
     label: string,
@@ -115,8 +114,9 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
       size="sm"
       variant="ghost"
       className={classNames(
-        ACTION_BUTTON_CLASS,
-        active && 'text-[var(--tiger-primary,#2563eb)] font-medium'
+        ACTION_BTN,
+        active &&
+          'text-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)] font-medium'
       )}
       onClick={onClick}>
       {label}
@@ -134,7 +134,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
         ? node.children!.slice(0, maxReplies)
         : node.children!
       : []
-    const showLoadMore =
+    const showLoadMoreBtn =
       showReplies && maxReplies > 0 && node.children!.length > maxReplies && !showAllReplies
 
     const actions: React.ReactNode[] = []
@@ -173,6 +173,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             key={actionKey}
             size="sm"
             variant={action.variant ?? 'ghost'}
+            className={ACTION_BTN}
             disabled={action.disabled}
             onClick={() => {
               action.onClick?.(node, action)
@@ -185,25 +186,31 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
     }
 
     return (
-      <div key={node.id} className="tiger-comment-thread-item">
+      <div
+        key={node.id}
+        className={classNames(
+          'tiger-comment-thread-item',
+          depth === 1 && 'py-4',
+          depth === 1 && !isLast && showDivider && 'border-b border-[var(--tiger-border,#e5e7eb)]'
+        )}>
         <div className="flex gap-3">
           {showAvatar && node.user ? (
             <Avatar
-              size="sm"
+              size={depth === 1 ? 'md' : 'sm'}
               src={node.user.avatar}
               text={node.user.name}
-              className="shrink-0 mt-1"
+              className="shrink-0 mt-0.5"
             />
           ) : null}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-1">
+            <div className="flex items-center gap-2 flex-wrap">
               {node.user?.name ? (
-                <Text tag="div" size="sm" weight="bold" className="text-gray-900">
+                <Text tag="span" size="sm" weight="bold">
                   {node.user.name}
                 </Text>
               ) : null}
               {node.user?.title ? (
-                <Text tag="div" size="xs" color="muted">
+                <Text tag="span" size="xs" color="muted">
                   {node.user.title}
                 </Text>
               ) : null}
@@ -218,27 +225,27 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
                 </Tag>
               ))}
               {node.time ? (
-                <Text tag="div" size="xs" color="muted">
+                <Text tag="span" size="xs" color="muted" className="ml-auto">
                   {formatCommentTime(node.time)}
                 </Text>
               ) : null}
             </div>
 
-            <Text tag="div" size="sm" className="text-gray-700 leading-relaxed break-words mb-2">
+            <div className="text-sm text-[var(--tiger-text-secondary,#4b5563)] leading-relaxed break-words mt-1.5 mb-2">
               {node.content}
-            </Text>
+            </div>
 
             {actions.length > 0 ? (
-              <div className="flex flex-wrap items-center gap-4 mb-2">{actions}</div>
+              <div className="flex flex-wrap items-center gap-1">{actions}</div>
             ) : null}
 
             {replyingTo === node.id ? (
-              <div className="space-y-2 bg-gray-50 p-3 rounded-lg mb-3">
+              <div className="mt-3 space-y-2 bg-[var(--tiger-surface-muted,#f9fafb)] p-3 rounded-lg">
                 <Textarea
-                  rows={3}
+                  rows={2}
                   value={replyValue}
                   placeholder={replyPlaceholder}
-                  className="bg-white"
+                  className="bg-[var(--tiger-surface,#ffffff)]"
                   onChange={(event) => setReplyValue(event.target.value)}
                 />
                 <div className="flex items-center gap-2 justify-end">
@@ -259,61 +266,53 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             ) : null}
 
             {hasChildren ? (
-              <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="link"
-                  className={ACTION_BUTTON_CLASS}
-                  aria-expanded={isExpanded}
-                  aria-controls={repliesId}
-                  onClick={() => toggleExpanded(node.id)}>
-                  {isExpanded ? '收起回复' : `展开 ${node.children!.length} 条回复`}
-                </Button>
-                {showLoadMore ? (
+              <Button
+                size="sm"
+                variant="ghost"
+                className={classNames('mt-2', PRIMARY_BTN)}
+                aria-expanded={isExpanded}
+                aria-controls={repliesId}
+                onClick={() => toggleExpanded(node.id)}>
+                {isExpanded ? '▾ 收起回复' : `▸ 展开 ${node.children!.length} 条回复`}
+              </Button>
+            ) : null}
+
+            {showReplies ? (
+              <div
+                id={repliesId}
+                className="mt-3 ml-1 pl-4 border-l-2 border-[var(--tiger-border,#e5e7eb)] space-y-3">
+                {visibleChildren.map((child, index) =>
+                  renderNode(child, depth + 1, index === visibleChildren.length - 1)
+                )}
+                {showLoadMoreBtn ? (
                   <Button
                     size="sm"
-                    variant="link"
-                    className={ACTION_BUTTON_CLASS}
+                    variant="ghost"
+                    className={PRIMARY_BTN}
                     onClick={() => handleLoadMore(node)}>
                     {loadMoreText}
                   </Button>
                 ) : null}
               </div>
             ) : null}
-
-            {showReplies ? (
-              <div id={repliesId} className="mt-3 pl-4 border-l-2 border-gray-100 space-y-4">
-                {visibleChildren.map((child, index) =>
-                  renderNode(child, depth + 1, index === visibleChildren.length - 1)
-                )}
-              </div>
-            ) : null}
           </div>
         </div>
-        {showDivider && depth === 1 && !isLast ? <Divider /> : null}
       </div>
     )
   }
 
   return (
     <div
-      className={classNames('tiger-comment-thread', 'flex', 'flex-col', className)}
+      className={classNames('tiger-comment-thread flex flex-col', className)}
       data-tiger-comment-thread
       aria-label={divProps['aria-label'] ?? (divProps['aria-labelledby'] ? undefined : '评论线程')}
       {...divProps}>
       {resolvedNodes.length === 0 ? (
-        <Text tag="div" size="sm" color="muted" className="text-center py-6">
+        <Text tag="div" size="sm" color="muted" className="text-center py-8">
           {emptyText}
         </Text>
       ) : (
-        <List
-          dataSource={resolvedNodes}
-          split={false}
-          bordered="none"
-          renderItem={(item, index) =>
-            renderNode(item as CommentNode, 1, index === resolvedNodes.length - 1)
-          }
-        />
+        resolvedNodes.map((node, index) => renderNode(node, 1, index === resolvedNodes.length - 1))
       )}
     </div>
   )
