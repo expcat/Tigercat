@@ -268,7 +268,7 @@ export const ActivityFeed = defineComponent({
         resolvedGroups.value.map((group, groupIndex) => {
           const headerNode = slots.groupTitle ? slots.groupTitle({ group }) : undefined
           const groupTitle = group.title
-          const timelineItems = toActivityTimelineItems(group.items, props.showTime)
+          const timelineItems = toActivityTimelineItems(group.items)
 
           return h('div', { key: group.key ?? groupIndex, class: 'space-y-3' }, [
             props.showGroupTitle && groupTitle
