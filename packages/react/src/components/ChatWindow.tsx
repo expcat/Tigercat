@@ -7,7 +7,6 @@ import {
   type ChatWindowProps as CoreChatWindowProps,
   type BadgeVariant
 } from '@expcat/tigercat-core'
-import { List } from './List'
 import { Avatar } from './Avatar'
 import { Textarea } from './Textarea'
 import { Input } from './Input'
@@ -126,7 +125,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         'flex',
         'gap-3',
         'items-start',
-        isSelf ? 'justify-end flex-row-reverse' : 'justify-start'
+        isSelf ? 'flex-row-reverse' : 'justify-start'
       )
 
       const bubbleClasses = classNames(
@@ -134,10 +133,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         'px-3',
         'py-2',
         'text-sm',
-        'max-w-[70%]',
+        'break-words',
         isSelf
-          ? 'bg-[var(--tiger-primary,#2563eb)] text-white'
-          : 'bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)]'
+          ? 'bg-[var(--tiger-primary,#2563eb)] text-white rounded-tr-none'
+          : 'bg-[var(--tiger-surface-muted,#f3f4f6)] text-[var(--tiger-text,#111827)] rounded-tl-none'
       )
 
       const metaText = formatChatTime(message.time)
@@ -148,6 +147,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         <div
           className={classNames(
             'text-xs',
+            'mb-1',
             'text-[var(--tiger-text-muted,#6b7280)]',
             isSelf && 'text-right'
           )}>
@@ -157,28 +157,32 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
 
       const timeNode =
         showTime && metaText ? (
-          <div className={classNames('text-xs', 'text-[var(--tiger-text-muted,#6b7280)]')}>
+          <div className={classNames('text-xs', 'mt-1', 'text-[var(--tiger-text-muted,#6b7280)]')}>
             {metaText}
           </div>
         ) : null
 
       const statusNode = statusInfo ? (
-        <div className={classNames('text-xs', statusInfo.className)}>
+        <div className={classNames('text-xs', 'mt-1', statusInfo.className)}>
           {message.statusText || statusInfo.text}
         </div>
       ) : null
 
       return (
-        <div className={rowClasses} data-tiger-chat-message role="listitem">
+        <div
+          key={message.id ?? index}
+          className={rowClasses}
+          data-tiger-chat-message
+          role="listitem">
           {showAvatar && message.user ? (
             <Avatar
               size="sm"
               src={message.user.avatar}
               text={message.user.name}
-              className={classNames(isSelf ? 'ml-2' : 'mr-2')}
+              className={classNames('flex-shrink-0', isSelf ? 'ml-0' : 'mr-0')}
             />
           ) : null}
-          <div className={classNames('flex', 'flex-col', isSelf && 'items-end')}>
+          <div className={classNames('flex', 'flex-col', 'max-w-[75%]', isSelf && 'items-end')}>
             {nameNode}
             <div className={bubbleClasses} data-tiger-chat-bubble>
               {customContent ?? message.content}
@@ -200,29 +204,25 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   return (
     <div className={wrapperClasses} data-tiger-chat-window {...props}>
       <div
-        className="flex-1 overflow-auto p-4"
+        className="flex-1 overflow-auto p-4 space-y-4"
         role="log"
         aria-live="polite"
         aria-relevant="additions text"
         aria-label={resolvedMessageListLabel}>
-        <List
-          dataSource={messages}
-          rowKey="id"
-          size="sm"
-          bordered="none"
-          split={false}
-          itemLayout="vertical"
-          emptyText={emptyText}
-          renderItem={renderMessageItem}
-          className="tiger-chat-window-list"
-        />
+        {messages.length === 0 ? (
+          <div className="h-full flex items-center justify-center text-[var(--tiger-text-muted,#6b7280)]">
+            {emptyText}
+          </div>
+        ) : (
+          messages.map(renderMessageItem)
+        )}
       </div>
       {statusText ? (
-        <div className="px-4 py-2 border-t border-[var(--tiger-border,#e5e7eb)]">
+        <div className="px-4 py-2 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)]">
           <Badge type="text" variant={statusVariantSafe} content={statusText} />
         </div>
       ) : null}
-      <div className="flex items-end gap-3 px-4 py-3 border-t border-[var(--tiger-border,#e5e7eb)]">
+      <div className="flex items-end gap-3 px-4 py-3 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] rounded-b-lg">
         <div className="flex-1">
           {inputType === 'input' ? (
             <Input
