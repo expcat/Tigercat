@@ -17,24 +17,24 @@ const basicSnippet = `<FormWizard
   beforeNext={handleBeforeNext}
   onFinish={handleFinish}
   renderStep={(_step, index) => (
-    <Form ref={formRef} model={model} className="max-w-xl mx-auto">
+    <Form ref={formRef} model={model}>
       {index === 0 && (
         <>
-          <FormItem name="name" label="姓名" required rules={{ required: true, message: '请输入姓名' }}>
-            <Input value={model.name} onChange={(e) => setModel((prev) => ({ ...prev, name: e.target.value }))} />
+          <FormItem name="name" label="姓名" required>
+            <Input value={model.name} onChange={...} placeholder="请输入姓名" />
           </FormItem>
-          <FormItem name="email" label="邮箱" required rules={{ required: true, message: '请输入邮箱' }}>
-            <Input value={model.email} onChange={(e) => setModel((prev) => ({ ...prev, email: e.target.value }))} />
+          <FormItem name="email" label="邮箱" required>
+            <Input value={model.email} onChange={...} placeholder="请输入邮箱" />
           </FormItem>
         </>
       )}
       {index === 1 && (
-        <FormItem name="phone" label="手机号" required rules={{ required: true, message: '请输入手机号' }}>
-          <Input value={model.phone} onChange={(e) => setModel((prev) => ({ ...prev, phone: e.target.value }))} />
+        <FormItem name="phone" label="手机号" required>
+          <Input value={model.phone} onChange={...} placeholder="请输入手机号" />
         </FormItem>
       )}
       {index === 2 && (
-        <div className="text-sm text-gray-600">确认信息无误后点击完成。</div>
+        <div>确认信息无误后点击完成。</div>
       )}
     </Form>
   )}
@@ -85,7 +85,7 @@ const FormWizardDemo: React.FC = () => {
           beforeNext={handleBeforeNext}
           onFinish={handleFinish}
           renderStep={(_step, index) => (
-            <Form ref={formRef} model={model} className="max-w-xl mx-auto">
+            <Form ref={formRef} model={model}>
               {index === 0 && (
                 <>
                   <FormItem
@@ -133,12 +133,13 @@ const FormWizardDemo: React.FC = () => {
               )}
               {index === 2 && (
                 <div className="space-y-3">
-                  <div className="text-sm text-gray-600">确认信息无误后点击完成。</div>
-                  {finished ? (
-                    <Alert type="success" description="已完成提交" />
-                  ) : (
-                    <Alert type="info" description="等待完成提交" />
-                  )}
+                  <div className="text-sm text-[var(--tiger-text-secondary,#6b7280)]">
+                    确认信息无误后点击完成。
+                  </div>
+                  <Alert
+                    type={finished ? 'success' : 'info'}
+                    description={finished ? '已完成提交' : '等待完成提交'}
+                  />
                 </div>
               )}
             </Form>
