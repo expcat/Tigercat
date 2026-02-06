@@ -152,7 +152,7 @@ export const Timeline = defineComponent({
       const position = item.position
 
       const itemClasses = getTimelineItemClasses(props.mode, position, isLast)
-      const tailClasses = getTimelineTailClasses(props.mode, position, isLast, index === 0)
+      const tailClasses = getTimelineTailClasses(props.mode, position, isLast)
       const headClasses = getTimelineHeadClasses(props.mode, position)
       const contentClasses = getTimelineContentClasses(props.mode, position)
 
