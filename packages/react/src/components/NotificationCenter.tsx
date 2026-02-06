@@ -51,6 +51,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   markAllReadText = '全部标记已读',
   markReadText = '标记已读',
   markUnreadText = '标记未读',
+  manageReadState = false,
   onGroupChange,
   onReadFilterChange,
   onMarkAllRead,
@@ -100,10 +101,57 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   }, [currentGroupKey, resolvedGroups])
 
   const currentGroupItems = currentGroup?.items ?? []
-  const hasUnread = currentGroupItems.some((item) => !item.read)
+
+  // --- Internal read-state management ---
+  const [readStateOverrides, setReadStateOverrides] = useState(
+    () => new Map<string | number, boolean>()
+  )
+
+  // Reset overrides when source items change
+  useEffect(() => {
+    if (manageReadState) setReadStateOverrides(new Map())
+  }, [items, manageReadState])
+
+  const applyReadOverrides = (list: NotificationItem[]): NotificationItem[] => {
+    if (!manageReadState || readStateOverrides.size === 0) return list
+    return list.map((item) => {
+      const override = readStateOverrides.get(item.id)
+      return override !== undefined ? { ...item, read: override } : item
+    })
+  }
+
+  const effectiveGroups = useMemo(
+    () =>
+      resolvedGroups.map((group) => ({
+        ...group,
+        items: applyReadOverrides(group.items)
+      })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [resolvedGroups, readStateOverrides]
+  )
+
+  const effectiveCurrentGroup = useMemo(() => {
+    if (effectiveGroups.length === 0) return undefined
+    if (currentGroupKey === undefined) return effectiveGroups[0]
+    const index = effectiveGroups.findIndex(
+      (group, groupIndex) => getGroupKey(group, groupIndex) === currentGroupKey
+    )
+    return index >= 0 ? effectiveGroups[index] : effectiveGroups[0]
+  }, [currentGroupKey, effectiveGroups])
+
+  const effectiveCurrentGroupItems = effectiveCurrentGroup?.items ?? []
+  const effectiveItems = useMemo(() => applyReadOverrides(items), [items, readStateOverrides]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const hasUnread = effectiveCurrentGroupItems.some((item) => !item.read)
+
+  const totalUnread = useMemo(() => {
+    const allItems = effectiveGroups.flatMap((group) => group.items)
+    if (allItems.length === 0) return effectiveItems.filter((item) => !item.read).length
+    return allItems.filter((item) => !item.read).length
+  }, [effectiveGroups, effectiveItems])
 
   const wrapperClasses = useMemo(
-    () => classNames('tiger-notification-center', 'w-full', 'flex', 'flex-col', 'gap-4', className),
+    () => classNames('tiger-notification-center', 'w-full', 'flex', 'flex-col', className),
     [className]
   )
 
@@ -122,7 +170,14 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   }
 
   const handleMarkAllRead = () => {
-    onMarkAllRead?.(currentGroupKey, currentGroupItems)
+    if (manageReadState) {
+      setReadStateOverrides((prev) => {
+        const next = new Map(prev)
+        effectiveCurrentGroupItems.forEach((item) => next.set(item.id, true))
+        return next
+      })
+    }
+    onMarkAllRead?.(currentGroupKey, effectiveCurrentGroupItems)
   }
 
   const renderItem = (item: NotificationItem, index: number) => {
@@ -130,34 +185,41 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     const timeText = item.time ? formatActivityTime(item.time) : ''
 
     return (
-      <div className="flex items-start gap-3 w-full">
-        <span
-          className={classNames(
-            'mt-2 h-2 w-2 rounded-full',
-            isRead ? 'bg-gray-300' : 'bg-[var(--tiger-primary,#2563eb)]'
-          )}
-          aria-hidden="true"
-        />
-        <div className="flex-1 space-y-1">
-          <Text tag="div" size="sm" weight="medium">
-            {item.title}
-          </Text>
+      <div
+        className={classNames(
+          'flex items-start gap-3 w-full py-0.5 transition-colors',
+          !isRead &&
+            'border-l-2 border-l-[var(--tiger-primary,#2563eb)] -ml-[2px] pl-[calc(0.75rem-2px)]'
+        )}>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline justify-between gap-2">
+            <Text tag="span" size="sm" weight={isRead ? 'normal' : 'semibold'}>
+              {item.title}
+            </Text>
+            {timeText ? (
+              <span className="text-xs text-[var(--tiger-text-muted,#6b7280)] whitespace-nowrap flex-shrink-0">
+                {timeText}
+              </span>
+            ) : null}
+          </div>
           {item.description ? (
-            <Text tag="div" size="sm" color="muted">
+            <div className="mt-0.5 text-xs text-[var(--tiger-text-muted,#6b7280)] line-clamp-2 leading-relaxed">
               {item.description}
-            </Text>
-          ) : null}
-          {timeText ? (
-            <Text tag="div" size="xs" color="muted">
-              {timeText}
-            </Text>
+            </div>
           ) : null}
         </div>
         <Button
           size="sm"
-          variant="outline"
+          variant="ghost"
           onClick={(event) => {
             event.stopPropagation()
+            if (manageReadState) {
+              setReadStateOverrides((prev) => {
+                const next = new Map(prev)
+                next.set(item.id, !isRead)
+                return next
+              })
+            }
             onItemReadChange?.(item, !isRead)
           }}>
           {isRead ? markUnreadText : markReadText}
@@ -185,28 +247,38 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   ]
 
   const content = loading ? (
-    <div className="flex items-center justify-center py-6">
+    <div className="flex items-center justify-center py-12">
       <Loading text={loadingText} />
     </div>
   ) : resolvedGroups.length > 0 ? (
-    <Tabs type="line" size="small" activeKey={currentGroupKey} onChange={handleGroupChange}>
-      {resolvedGroups.map((group, index) => {
-        const unreadCount = group.items.filter((item) => !item.read).length
-        const labelBase = group.title || String(group.key ?? index)
-        const label = unreadCount > 0 ? `${labelBase} (${unreadCount})` : labelBase
+    <div className="-mx-4 -mb-4">
+      <Tabs type="line" size="small" activeKey={currentGroupKey} onChange={handleGroupChange}>
+        {resolvedGroups.map((group, index) => {
+          const effectiveGroup = effectiveGroups.find(
+            (eg, ei) => getGroupKey(eg, ei) === getGroupKey(group, index)
+          )
+          const groupItems = effectiveGroup?.items ?? group.items
+          const unreadCount = groupItems.filter((item) => !item.read).length
+          const labelBase = group.title || String(group.key ?? index)
+          const label = unreadCount > 0 ? `${labelBase} (${unreadCount})` : labelBase
 
-        return (
-          <TabPane
-            key={String(getGroupKey(group, index))}
-            tabKey={getGroupKey(group, index)}
-            label={label}>
-            {renderList(filterItems(group.items, currentReadFilter))}
-          </TabPane>
-        )
-      })}
-    </Tabs>
+          return (
+            <TabPane
+              key={String(getGroupKey(group, index))}
+              tabKey={getGroupKey(group, index)}
+              label={label}>
+              <div className="max-h-[380px] overflow-y-auto">
+                {renderList(filterItems(groupItems, currentReadFilter))}
+              </div>
+            </TabPane>
+          )
+        })}
+      </Tabs>
+    </div>
   ) : (
-    renderList(filterItems(items, currentReadFilter))
+    <div className="-mx-4 -mb-4 max-h-[380px] overflow-y-auto">
+      {renderList(filterItems(effectiveItems, currentReadFilter))}
+    </div>
   )
 
   return (
@@ -215,25 +287,37 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         variant="bordered"
         className="w-full"
         header={
-          <div className="flex items-center justify-between gap-3">
-            <Text tag="div" size="sm" weight="medium">
-              {title}
-            </Text>
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex items-center gap-2">
-                {filterButtons.map((option) => (
-                  <Button
-                    key={option.key}
-                    size="sm"
-                    variant={currentReadFilter === option.key ? 'primary' : 'outline'}
-                    onClick={() => handleReadFilterChange(option.key)}>
-                    {option.label}
-                  </Button>
-                ))}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <Text tag="div" size="base" weight="bold">
+                  {title}
+                </Text>
+                {totalUnread > 0 ? (
+                  <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-semibold rounded-full bg-[var(--tiger-primary,#2563eb)] text-white">
+                    {totalUnread}
+                  </span>
+                ) : null}
               </div>
-              <Button size="sm" variant="outline" disabled={!hasUnread} onClick={handleMarkAllRead}>
+              <Button size="sm" variant="ghost" disabled={!hasUnread} onClick={handleMarkAllRead}>
                 {markAllReadText}
               </Button>
+            </div>
+            <div className="inline-flex rounded-md border border-[var(--tiger-border,#e5e7eb)] overflow-hidden self-start">
+              {filterButtons.map((option) => (
+                <button
+                  key={option.key}
+                  className={classNames(
+                    'px-3 py-1 text-xs font-medium transition-colors',
+                    'border-r border-[var(--tiger-border,#e5e7eb)] last:border-r-0',
+                    currentReadFilter === option.key
+                      ? 'bg-[var(--tiger-primary,#2563eb)] text-white'
+                      : 'bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text-muted,#6b7280)] hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
+                  )}
+                  onClick={() => handleReadFilterChange(option.key)}>
+                  {option.label}
+                </button>
+              ))}
             </div>
           </div>
         }>

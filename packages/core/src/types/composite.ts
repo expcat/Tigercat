@@ -779,6 +779,14 @@ export interface NotificationCenterProps {
    * Item read change callback
    */
   onItemReadChange?: (item: NotificationItem, read: boolean) => void
+  /**
+   * Whether to manage read state internally.
+   * When true, the component tracks read/unread state itself,
+   * so you don't need to wire up onItemReadChange / onMarkAllRead handlers.
+   * Callbacks are still fired for external side-effects (e.g. API calls).
+   * @default false
+   */
+  manageReadState?: boolean
 }
 
 /**
