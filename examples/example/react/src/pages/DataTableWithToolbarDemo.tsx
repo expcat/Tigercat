@@ -25,16 +25,23 @@ const basicSnippet = `<DataTableWithToolbar
       { key: 'status', label: '状态', options: statusOptions },
       { key: 'role', label: '角色', options: roleOptions }
     ],
-    bulkActions: [{ key: 'export', label: '导出' }],
+    bulkActions: [
+      { key: 'export', label: '导出' },
+      { key: 'delete', label: '删除', variant: 'outline' }
+    ],
     selectedKeys: selectedRowKeys
   }}
+  pagination={{
+    current, pageSize,
+    total: filteredData.length,
+    showSizeChanger: true,
+    showTotal: true
+  }}
   onSearchChange={setKeyword}
-  onSearch={setKeyword}
   onFiltersChange={setFilters}
   onBulkAction={handleBulkAction}
-  pagination={{ current, pageSize, total, showSizeChanger: true, showTotal: true }}
   onPageChange={handlePageChange}
-  onPageSizeChange={handlePageChange}
+  onSelectionChange={setSelectedRowKeys}
 />`
 
 const columns: TableColumn<UserRow>[] = [

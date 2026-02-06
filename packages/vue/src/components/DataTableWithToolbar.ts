@@ -1,4 +1,13 @@
-import { defineComponent, computed, getCurrentInstance, h, PropType, ref, watch } from 'vue'
+import {
+  defineComponent,
+  computed,
+  getCurrentInstance,
+  h,
+  PropType,
+  ref,
+  watch,
+  type VNodeArrayChildren
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -19,10 +28,7 @@ import { Dropdown } from './Dropdown'
 import { DropdownMenu } from './DropdownMenu'
 import { DropdownItem } from './DropdownItem'
 import { Button } from './Button'
-import { Space } from './Space'
 import { Pagination } from './Pagination'
-
-type HChildren = Parameters<typeof h>[2]
 
 export interface VueTableToolbarProps extends Omit<
   CoreTableToolbarProps,
@@ -245,10 +251,7 @@ export const DataTableWithToolbar = defineComponent({
 
     const wrapperClasses = computed(() =>
       classNames(
-        'tiger-data-table-with-toolbar',
-        'flex',
-        'flex-col',
-        'gap-3',
+        'tiger-data-table-with-toolbar flex flex-col gap-3',
         props.className,
         coerceClassValue(attrs.class)
       )
@@ -292,8 +295,7 @@ export const DataTableWithToolbar = defineComponent({
     const renderToolbar = () => {
       if (!hasSearch.value && !hasFilters.value && !hasBulkActions.value) return null
 
-      const leftNodes: HChildren[] = []
-      const rightNodes: HChildren[] = []
+      const leftNodes: VNodeArrayChildren = []
 
       if (hasSearch.value) {
         const showButton = props.toolbar?.showSearchButton ?? true
@@ -383,17 +385,19 @@ export const DataTableWithToolbar = defineComponent({
         })
       }
 
+      const bulkChildren: VNodeArrayChildren = []
       if (hasBulkActions.value) {
-        rightNodes.push(
-          h(
-            'span',
-            { class: 'text-sm text-[var(--tiger-text-muted,#6b7280)]' },
-            `${bulkLabel.value} ${selectedCount.value} 项`
+        if (selectedCount.value > 0) {
+          bulkChildren.push(
+            h(
+              'span',
+              { class: 'text-sm text-[var(--tiger-text-muted,#6b7280)]' },
+              `${bulkLabel.value} ${selectedCount.value} 项`
+            )
           )
-        )
-
-        props.toolbar?.bulkActions?.forEach((action) => {
-          rightNodes.push(
+        }
+        ;(props.toolbar?.bulkActions ?? []).forEach((action) => {
+          bulkChildren.push(
             h(
               Button,
               {
@@ -409,26 +413,12 @@ export const DataTableWithToolbar = defineComponent({
         })
       }
 
-      return h(
-        'div',
-        {
-          class: classNames(
-            'tiger-data-table-toolbar',
-            'flex',
-            'flex-wrap',
-            'items-center',
-            'justify-between',
-            'gap-3',
-            'pb-2'
-          )
-        },
-        [
-          h(Space, { size: 'sm', align: 'center', wrap: true }, { default: () => leftNodes }),
-          hasBulkActions.value
-            ? h(Space, { size: 'sm', align: 'center', wrap: true }, { default: () => rightNodes })
-            : null
-        ]
-      )
+      return h('div', { class: 'tiger-data-table-toolbar flex flex-wrap items-center gap-2' }, [
+        h('div', { class: 'flex items-center gap-2 flex-wrap' }, leftNodes),
+        hasBulkActions.value
+          ? h('div', { class: 'ml-auto flex items-center gap-2 flex-wrap' }, bulkChildren)
+          : null
+      ])
     }
 
     return () => {
@@ -470,15 +460,13 @@ export const DataTableWithToolbar = defineComponent({
           renderToolbar(),
           h(Table as unknown as any, tableProps),
           showPagination
-            ? h('div', { class: 'pt-2' }, [
-                h(Pagination, {
-                  ...(props.pagination as PaginationProps),
-                  onChange: (current: number, pageSize: number) =>
-                    emit('page-change', current, pageSize),
-                  onPageSizeChange: (current: number, pageSize: number) =>
-                    emit('page-size-change', current, pageSize)
-                })
-              ])
+            ? h(Pagination, {
+                ...(props.pagination as PaginationProps),
+                onChange: (current: number, pageSize: number) =>
+                  emit('page-change', current, pageSize),
+                onPageSizeChange: (current: number, pageSize: number) =>
+                  emit('page-size-change', current, pageSize)
+              })
             : null
         ]
       )
