@@ -116,7 +116,7 @@ export const Timeline: React.FC<TimelineProps> = ({
     const position = item.position
 
     const itemClasses = getTimelineItemClasses(mode, position, isLast)
-    const tailClasses = getTimelineTailClasses(mode, position, isLast)
+    const tailClasses = getTimelineTailClasses(mode, position, isLast, index === 0)
     const headClasses = getTimelineHeadClasses(mode, position)
     const contentClasses = getTimelineContentClasses(mode, position)
 

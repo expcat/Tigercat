@@ -19,7 +19,8 @@ import { Link } from './Link'
 import { Loading } from './Loading'
 
 export interface ActivityFeedProps
-  extends Omit<CoreActivityFeedProps, 'renderItem' | 'renderGroupHeader'>,
+  extends
+    Omit<CoreActivityFeedProps, 'renderItem' | 'renderGroupHeader'>,
     Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   renderItem?: (item: ActivityItem, index: number, group?: ActivityGroup) => React.ReactNode
   renderGroupHeader?: (group: ActivityGroup) => React.ReactNode
@@ -63,17 +64,13 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
     [items, groups, groupBy, groupOrder]
   )
 
-  const wrapperClasses = useMemo(
-    () =>
-      classNames(
-        'tiger-activity-feed',
-        'flex',
-        'flex-col',
-        'gap-6',
-        'w-full',
-        className
-      ),
-    [className]
+  const wrapperClasses = classNames(
+    'tiger-activity-feed',
+    'flex',
+    'flex-col',
+    'gap-6',
+    'w-full',
+    className
   )
 
   const renderDefaultItem = (
@@ -98,41 +95,36 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
     return (
       <Card variant="bordered" size="sm" className="tiger-activity-item">
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-start">
           {showAvatar && item.user ? (
-            <Avatar
-              size="sm"
-              src={item.user.avatar}
-              text={item.user.name}
-              className="shrink-0"
-            />
+            <Avatar size="sm" src={item.user.avatar} text={item.user.name} className="shrink-0" />
           ) : null}
-          <div className="flex-1 space-y-2">
-            <div className="flex items-center gap-2 flex-wrap">
-              {titleText ? (
-                <Text tag="div" size="sm" weight="medium">
-                  {titleText}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <div className="flex items-center gap-2 min-w-0">
+                {titleText ? (
+                  <Text tag="div" size="sm" weight="medium" className="truncate">
+                    {titleText}
+                  </Text>
+                ) : null}
+                {item.status ? (
+                  <Tag variant={item.status.variant ?? 'default'} size="sm" className="shrink-0">
+                    {item.status.label}
+                  </Tag>
+                ) : null}
+              </div>
+              {timeText ? (
+                <Text tag="div" size="xs" color="muted" className="shrink-0 whitespace-nowrap">
+                  {timeText}
                 </Text>
-              ) : null}
-              {item.status ? (
-                <Tag variant={item.status.variant ?? 'default'} size="sm">
-                  {item.status.label}
-                </Tag>
               ) : null}
             </div>
             {descriptionText ? (
-              <Text tag="div" size="sm" color="muted">
+              <Text tag="div" size="sm" color="muted" className="mb-2 break-words">
                 {descriptionText}
               </Text>
             ) : null}
-            {timeText ? (
-              <Text tag="div" size="xs" color="muted">
-                {timeText}
-              </Text>
-            ) : null}
-            {actionNodes && actionNodes.length > 0 ? (
-              <div className="flex flex-wrap gap-3">{actionNodes}</div>
-            ) : null}
+            {actionNodes?.length ? <div className="flex flex-wrap gap-2">{actionNodes}</div> : null}
           </div>
         </div>
       </Card>
@@ -174,17 +166,18 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
         return (
           <div key={group.key ?? groupIndex} className="space-y-3">
-            {showGroupTitle && groupTitle ? (
-              headerNode ?? (
-                <Text tag="div" size="sm" weight="medium" color="muted">
-                  {groupTitle}
-                </Text>
-              )
-            ) : null}
+            {showGroupTitle && groupTitle
+              ? (headerNode ?? (
+                  <Text tag="div" size="sm" weight="medium" color="muted">
+                    {groupTitle}
+                  </Text>
+                ))
+              : null}
             <Timeline
               items={timelineItems}
               renderItem={(timelineItem, index) => {
-                const activity = (timelineItem as TimelineItem & { activity?: ActivityItem }).activity
+                const activity = (timelineItem as TimelineItem & { activity?: ActivityItem })
+                  .activity
                 if (!activity) return null
                 return renderDefaultItem(activity, index, group)
               }}
