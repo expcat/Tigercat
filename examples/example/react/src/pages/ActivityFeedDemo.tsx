@@ -19,11 +19,15 @@ const activityGroups: ActivityGroup[] = [
       {
         id: 2,
         title: '导入审计日志',
-        description: '共导入 24 条记录。',
+        description:
+          '共导入 24 条记录。这是一条较长的描述，用来测试文本换行和布局在长内容下的表现是否良好，确保没有溢出或错位。',
         time: '10:05',
         user: { name: '系统' },
         status: { label: '处理中', variant: 'warning' },
-        actions: [{ label: '重试', href: '#' }]
+        actions: [
+          { label: '重试', href: '#' },
+          { label: '取消', href: '#' }
+        ]
       }
     ]
   },

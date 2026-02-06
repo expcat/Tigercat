@@ -22,8 +22,10 @@ import { Loading } from './Loading'
 
 type HChildren = Parameters<typeof h>[2]
 
-export interface VueActivityFeedProps
-  extends Omit<CoreActivityFeedProps, 'renderItem' | 'renderGroupHeader'> {
+export interface VueActivityFeedProps extends Omit<
+  CoreActivityFeedProps,
+  'renderItem' | 'renderGroupHeader'
+> {
   className?: string
   style?: Record<string, string | number>
 }
@@ -137,61 +139,68 @@ export const ActivityFeed = defineComponent({
       )
 
       return h(
-        Card,
+        'div',
         {
-          variant: 'bordered',
-          size: 'sm',
-          className: 'tiger-activity-item'
+          class: 'tiger-activity-item'
         },
-        {
-          default: () => [
-            h('div', { class: 'flex gap-3' }, [
-              props.showAvatar && item.user
-                ? h(Avatar, {
-                    size: 'sm',
-                    src: item.user.avatar,
-                    text: item.user.name,
-                    className: 'shrink-0'
-                  })
-                : null,
-              h('div', { class: 'flex-1 space-y-2' }, [
-                h('div', { class: 'flex items-center gap-2 flex-wrap' }, [
+        [
+          h('div', { class: 'flex gap-3 items-start' }, [
+            props.showAvatar && item.user
+              ? h(Avatar, {
+                  size: 'sm',
+                  src: item.user.avatar,
+                  text: item.user.name,
+                  className: 'shrink-0'
+                })
+              : null,
+            h('div', { class: 'flex-1 min-w-0' }, [
+              h('div', { class: 'flex items-center justify-between gap-2 mb-1' }, [
+                h('div', { class: 'flex items-center gap-2 min-w-0' }, [
                   titleText
                     ? h(
                         Text,
-                        { tag: 'div', size: 'sm', weight: 'medium' },
+                        { tag: 'div', size: 'sm', weight: 'medium', class: 'truncate' },
                         { default: () => titleText }
                       )
                     : null,
                   item.status
                     ? h(
                         Tag,
-                        { variant: item.status.variant ?? 'default', size: 'sm' },
+                        {
+                          variant: item.status.variant ?? 'default',
+                          size: 'sm',
+                          className: 'shrink-0'
+                        },
                         { default: () => item.status?.label }
                       )
                     : null
                 ]),
-                descriptionText
-                  ? h(
-                      Text,
-                      { tag: 'div', size: 'sm', color: 'muted' },
-                      { default: () => descriptionText }
-                    )
-                  : null,
                 timeText
                   ? h(
                       Text,
-                      { tag: 'div', size: 'xs', color: 'muted' },
+                      {
+                        tag: 'div',
+                        size: 'xs',
+                        color: 'muted',
+                        class: 'shrink-0 whitespace-nowrap'
+                      },
                       { default: () => timeText }
                     )
-                  : null,
-                actionNodes && actionNodes.length > 0
-                  ? h('div', { class: 'flex flex-wrap gap-3' }, actionNodes as HChildren)
                   : null
-              ])
+              ]),
+              descriptionText
+                ? h(
+                    Text,
+                    { tag: 'div', size: 'sm', color: 'muted', class: 'mb-2 break-words' },
+                    { default: () => descriptionText }
+                  )
+                : null,
+              actionNodes?.length
+                ? h('div', { class: 'flex flex-wrap gap-2' }, actionNodes as HChildren)
+                : null
             ])
-          ]
-        }
+          ])
+        ]
       )
     }
 
@@ -214,7 +223,8 @@ export const ActivityFeed = defineComponent({
               Card,
               { variant: 'bordered', size: 'sm', className: 'tiger-activity-feed-loading' },
               {
-                default: () => h('div', { class: 'flex items-center justify-center py-4' }, loadingNode)
+                default: () =>
+                  h('div', { class: 'flex items-center justify-center py-4' }, loadingNode)
               }
             )
           ]
@@ -224,11 +234,7 @@ export const ActivityFeed = defineComponent({
       if (resolvedGroups.value.length === 0) {
         const emptyNode = slots.empty
           ? slots.empty()
-          : h(
-              Text,
-              { tag: 'div', size: 'sm', color: 'muted' },
-              { default: () => props.emptyText }
-            )
+          : h(Text, { tag: 'div', size: 'sm', color: 'muted' }, { default: () => props.emptyText })
 
         return h(
           'div',
@@ -243,7 +249,8 @@ export const ActivityFeed = defineComponent({
               Card,
               { variant: 'bordered', size: 'sm', className: 'tiger-activity-feed-empty' },
               {
-                default: () => h('div', { class: 'flex items-center justify-center py-6' }, emptyNode)
+                default: () =>
+                  h('div', { class: 'flex items-center justify-center py-6' }, emptyNode)
               }
             )
           ]
@@ -265,12 +272,12 @@ export const ActivityFeed = defineComponent({
 
           return h('div', { key: group.key ?? groupIndex, class: 'space-y-3' }, [
             props.showGroupTitle && groupTitle
-              ? headerNode ??
+              ? (headerNode ??
                 h(
                   Text,
                   { tag: 'div', size: 'sm', weight: 'medium', color: 'muted' },
                   { default: () => groupTitle }
-                )
+                ))
               : null,
             h(
               Timeline,
