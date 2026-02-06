@@ -6,7 +6,6 @@ import {
 } from '@expcat/tigercat-core'
 import { Steps } from './Steps'
 import { StepsItem } from './StepsItem'
-import { Card } from './Card'
 import { Button } from './Button'
 import { Alert } from './Alert'
 
@@ -43,19 +42,16 @@ export const FormWizard: React.FC<FormWizardProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
-    if (current !== undefined) {
-      setInnerCurrent(current)
-    }
+    if (current !== undefined) setInnerCurrent(current)
   }, [current])
 
   const totalCount = steps.length
   const currentIndex = current ?? innerCurrent
   const currentStep = steps[currentIndex]
+  const isFirst = currentIndex <= 0
+  const isLast = currentIndex >= totalCount - 1
 
-  const wrapperClasses = useMemo(
-    () => classNames('tiger-form-wizard', 'flex', 'flex-col', 'gap-4', 'w-full', className),
-    [className]
-  )
+  const wrapperClasses = classNames('tiger-form-wizard flex flex-col gap-6 w-full', className)
 
   const setCurrent = useCallback(
     (next: number) => {
@@ -91,61 +87,31 @@ export const FormWizard: React.FC<FormWizardProps> = ({
   }, [beforeNext, currentIndex, currentStep, steps])
 
   const handlePrev = useCallback(() => {
-    if (currentIndex <= 0) {
-      return
-    }
-
-    const prevIndex = currentIndex - 1
-    if (steps[prevIndex]?.disabled) {
-      return
-    }
-
+    if (currentIndex <= 0 || steps[currentIndex - 1]?.disabled) return
     setErrorMessage(null)
-    setCurrent(prevIndex)
+    setCurrent(currentIndex - 1)
   }, [currentIndex, setCurrent, steps])
 
   const handleNext = useCallback(async () => {
-    if (totalCount === 0) {
-      return
-    }
-
-    const isLast = currentIndex >= totalCount - 1
+    if (totalCount === 0) return
     const ok = await runBeforeNext()
-    if (!ok) {
-      return
-    }
-
+    if (!ok) return
     if (isLast) {
       onFinish?.(currentIndex, steps)
       return
     }
-
-    const nextIndex = currentIndex + 1
-    if (steps[nextIndex]?.disabled) {
-      return
-    }
-
+    if (steps[currentIndex + 1]?.disabled) return
     setErrorMessage(null)
-    setCurrent(nextIndex)
-  }, [currentIndex, totalCount, onFinish, runBeforeNext, setCurrent, steps])
+    setCurrent(currentIndex + 1)
+  }, [currentIndex, totalCount, isLast, onFinish, runBeforeNext, setCurrent, steps])
 
   const handleStepChange = useCallback(
     async (nextIndex: number) => {
-      if (nextIndex === currentIndex) {
-        return
-      }
-
-      if (steps[nextIndex]?.disabled) {
-        return
-      }
-
+      if (nextIndex === currentIndex || steps[nextIndex]?.disabled) return
       if (nextIndex > currentIndex) {
         const ok = await runBeforeNext()
-        if (!ok) {
-          return
-        }
+        if (!ok) return
       }
-
       setErrorMessage(null)
       setCurrent(nextIndex)
     },
@@ -153,19 +119,9 @@ export const FormWizard: React.FC<FormWizardProps> = ({
   )
 
   const contentNode = useMemo(() => {
-    if (!currentStep) {
-      return null
-    }
-
-    if (renderStep) {
-      return renderStep(currentStep, currentIndex)
-    }
-
-    if (currentStep.content != null) {
-      return currentStep.content as React.ReactNode
-    }
-
-    return null
+    if (!currentStep) return null
+    if (renderStep) return renderStep(currentStep, currentIndex)
+    return (currentStep.content as React.ReactNode) ?? null
   }, [currentIndex, currentStep, renderStep])
 
   const stepsNodes = useMemo(
@@ -183,12 +139,9 @@ export const FormWizard: React.FC<FormWizardProps> = ({
     [steps]
   )
 
-  const isFirst = currentIndex <= 0
-  const isLast = currentIndex >= totalCount - 1
-
   return (
     <div className={wrapperClasses} style={style} data-tiger-form-wizard {...props}>
-      {showSteps && steps.length > 0 ? (
+      {showSteps && steps.length > 0 && (
         <Steps
           current={currentIndex}
           direction={direction}
@@ -198,26 +151,23 @@ export const FormWizard: React.FC<FormWizardProps> = ({
           onChange={handleStepChange}>
           {stepsNodes}
         </Steps>
-      ) : null}
-      {errorMessage ? (
+      )}
+      {errorMessage && (
         <Alert type="error" description={errorMessage} className="tiger-form-wizard-alert" />
-      ) : null}
-      <Card
-        className="tiger-form-wizard-card"
-        actions={
-          showActions ? (
-            <div className="flex items-center justify-between gap-3">
-              <Button type="button" variant="secondary" disabled={isFirst} onClick={handlePrev}>
-                {prevText}
-              </Button>
-              <Button type="button" variant="primary" onClick={handleNext}>
-                {isLast ? finishText : nextText}
-              </Button>
-            </div>
-          ) : undefined
-        }>
+      )}
+      <div className="tiger-form-wizard-body rounded-lg border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-6">
         {contentNode}
-      </Card>
+        {showActions && (
+          <div className="tiger-form-wizard-actions flex items-center justify-between border-t border-[var(--tiger-border,#e5e7eb)] pt-4 mt-6">
+            <Button type="button" variant="secondary" disabled={isFirst} onClick={handlePrev}>
+              {prevText}
+            </Button>
+            <Button type="button" variant="primary" onClick={handleNext}>
+              {isLast ? finishText : nextText}
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

@@ -10,7 +10,6 @@ import {
 } from '@expcat/tigercat-core'
 import { Steps } from './Steps'
 import { StepsItem } from './StepsItem'
-import { Card } from './Card'
 import { Button } from './Button'
 import { Alert } from './Alert'
 
@@ -128,11 +127,7 @@ export const FormWizard = defineComponent({
 
     const wrapperClasses = computed(() =>
       classNames(
-        'tiger-form-wizard',
-        'flex',
-        'flex-col',
-        'gap-4',
-        'w-full',
+        'tiger-form-wizard flex flex-col gap-6 w-full',
         props.className,
         coerceClassValue((attrs as Record<string, unknown>).class)
       )
@@ -179,60 +174,31 @@ export const FormWizard = defineComponent({
     }
 
     const handlePrev = () => {
-      if (currentIndex.value <= 0) {
-        return
-      }
-
-      const prevIndex = currentIndex.value - 1
-      if (props.steps[prevIndex]?.disabled) {
-        return
-      }
-
+      if (currentIndex.value <= 0 || props.steps[currentIndex.value - 1]?.disabled) return
       errorMessage.value = null
-      setCurrent(prevIndex)
+      setCurrent(currentIndex.value - 1)
     }
 
     const handleNext = async () => {
-      if (totalCount.value === 0) {
-        return
-      }
-
+      if (totalCount.value === 0) return
       const isLast = currentIndex.value >= totalCount.value - 1
       const ok = await runBeforeNext()
-      if (!ok) {
-        return
-      }
-
+      if (!ok) return
       if (isLast) {
         emit('finish', currentIndex.value, props.steps)
         return
       }
-
-      const nextIndex = currentIndex.value + 1
-      if (props.steps[nextIndex]?.disabled) {
-        return
-      }
-
+      if (props.steps[currentIndex.value + 1]?.disabled) return
       errorMessage.value = null
-      setCurrent(nextIndex)
+      setCurrent(currentIndex.value + 1)
     }
 
     const handleStepChange = async (nextIndex: number) => {
-      if (nextIndex === currentIndex.value) {
-        return
-      }
-
-      if (props.steps[nextIndex]?.disabled) {
-        return
-      }
-
+      if (nextIndex === currentIndex.value || props.steps[nextIndex]?.disabled) return
       if (nextIndex > currentIndex.value) {
         const ok = await runBeforeNext()
-        if (!ok) {
-          return
-        }
+        if (!ok) return
       }
-
       errorMessage.value = null
       setCurrent(nextIndex)
     }
@@ -262,39 +228,15 @@ export const FormWizard = defineComponent({
         h(StepsItem as unknown as Component, {
           key: step.key ?? index,
           title: step.title,
-          ...(step.description !== undefined ? { description: step.description } : {}),
-          ...(step.status !== undefined ? { status: step.status } : {}),
-          ...(step.icon !== undefined ? { icon: step.icon } : {}),
-          ...(step.disabled !== undefined ? { disabled: step.disabled } : {})
+          description: step.description,
+          status: step.status,
+          icon: step.icon,
+          disabled: step.disabled
         })
       )
 
       const isFirst = currentIndex.value <= 0
       const isLast = currentIndex.value >= totalCount.value - 1
-
-      const actionsNode = props.showActions
-        ? h('div', { class: 'flex items-center justify-between gap-3' }, [
-            h(
-              Button,
-              {
-                type: 'button',
-                variant: 'secondary',
-                disabled: isFirst,
-                onClick: handlePrev
-              },
-              { default: () => props.prevText }
-            ),
-            h(
-              Button,
-              {
-                type: 'button',
-                variant: 'primary',
-                onClick: handleNext
-              },
-              { default: () => (isLast ? props.finishText : props.nextText) }
-            )
-          ])
-        : null
 
       return h(
         'div',
@@ -327,13 +269,45 @@ export const FormWizard = defineComponent({
               })
             : null,
           h(
-            Card,
+            'div',
             {
-              className: 'tiger-form-wizard-card'
+              class:
+                'tiger-form-wizard-body rounded-lg border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-6'
             },
             {
-              default: () => renderContent(),
-              actions: actionsNode ? () => actionsNode : undefined
+              default: () => [
+                renderContent(),
+                props.showActions
+                  ? h(
+                      'div',
+                      {
+                        class:
+                          'tiger-form-wizard-actions flex items-center justify-between border-t border-[var(--tiger-border,#e5e7eb)] pt-4 mt-6'
+                      },
+                      [
+                        h(
+                          Button,
+                          {
+                            type: 'button',
+                            variant: 'secondary',
+                            disabled: isFirst,
+                            onClick: handlePrev
+                          },
+                          { default: () => props.prevText }
+                        ),
+                        h(
+                          Button,
+                          {
+                            type: 'button',
+                            variant: 'primary',
+                            onClick: handleNext
+                          },
+                          { default: () => (isLast ? props.finishText : props.nextText) }
+                        )
+                      ]
+                    )
+                  : null
+              ]
             }
           )
         ]
