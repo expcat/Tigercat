@@ -12,7 +12,6 @@ import { Dropdown } from './Dropdown'
 import { DropdownMenu } from './DropdownMenu'
 import { DropdownItem } from './DropdownItem'
 import { Button } from './Button'
-import { Space } from './Space'
 import { Pagination, type PaginationProps } from './Pagination'
 
 export interface DataTableWithToolbarProps<T = Record<string, unknown>>
@@ -148,7 +147,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   const bulkLabel = toolbar?.bulkActionsLabel ?? '已选择'
 
   const wrapperClasses = useMemo(
-    () => classNames('tiger-data-table-with-toolbar', 'flex', 'flex-col', 'gap-3', className),
+    () => classNames('tiger-data-table-with-toolbar flex flex-col gap-3', className),
     [className]
   )
 
@@ -193,17 +192,8 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     if (!hasSearch && !hasFilters && !hasBulkActions) return null
 
     return (
-      <div
-        className={classNames(
-          'tiger-data-table-toolbar',
-          'flex',
-          'flex-wrap',
-          'items-center',
-          'justify-between',
-          'gap-3',
-          'pb-2'
-        )}>
-        <Space size="sm" align="center" wrap>
+      <div className="tiger-data-table-toolbar flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {hasSearch ? (
             <div className="flex items-center gap-2">
               <Input
@@ -266,13 +256,15 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 )
               })
             : null}
-        </Space>
+        </div>
 
         {hasBulkActions ? (
-          <Space size="sm" align="center" wrap>
-            <span className="text-sm text-[var(--tiger-text-muted,#6b7280)]">
-              {bulkLabel} {selectedCount} 项
-            </span>
+          <div className="ml-auto flex items-center gap-2 flex-wrap">
+            {selectedCount > 0 ? (
+              <span className="text-sm text-[var(--tiger-text-muted,#6b7280)]">
+                {bulkLabel} {selectedCount} 项
+              </span>
+            ) : null}
             {toolbar?.bulkActions?.map((action) => (
               <Button
                 key={action.key}
@@ -283,7 +275,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 {action.label}
               </Button>
             ))}
-          </Space>
+          </div>
         ) : null}
       </div>
     )
@@ -296,9 +288,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       {renderToolbar()}
       <Table {...tableProps} pagination={false} className={tableClassName} />
       {showPagination ? (
-        <div className="pt-2">
-          <Pagination {...pagination} onChange={onPageChange} onPageSizeChange={onPageSizeChange} />
-        </div>
+        <Pagination {...pagination} onChange={onPageChange} onPageSizeChange={onPageSizeChange} />
       ) : null}
     </div>
   )

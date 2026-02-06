@@ -27,14 +27,21 @@ const basicSnippet = `<DataTableWithToolbar
       { key: 'status', label: '状态', options: statusOptions },
       { key: 'role', label: '角色', options: roleOptions }
     ],
-    bulkActions: [{ key: 'export', label: '导出' }],
+    bulkActions: [
+      { key: 'export', label: '导出' },
+      { key: 'delete', label: '删除', variant: 'outline' }
+    ],
     selectedKeys: selectedRowKeys
   }"
-  :pagination="{ current, pageSize, total, showSizeChanger: true, showTotal: true }"
+  :pagination="{
+    current, pageSize,
+    total: filteredData.length,
+    showSizeChanger: true,
+    showTotal: true
+  }"
   @search-change="(val) => (keyword = val)"
   @filters-change="(val) => (filters = val)"
   @page-change="handlePageChange"
-  @page-size-change="handlePageChange"
   @selection-change="handleSelectionChange"
 />`
 
@@ -140,29 +147,17 @@ const handleBulkAction = (actionKey: string) => {
       <p class="text-gray-600">搜索、筛选、批量操作与分页联动的组合组件。</p>
     </div>
 
-    <DemoBlock title="基础用法"
-               description="搜索/筛选/批量操作 + 分页联动"
-               :code="basicSnippet">
-      <DataTableWithToolbar
-        :columns="columns"
-        :dataSource="pagedData"
-        table-layout="fixed"
-        :rowSelection="{ selectedRowKeys, type: 'checkbox' }"
-        :toolbar="toolbar"
-        :pagination="{
+    <DemoBlock title="基础用法" description="搜索/筛选/批量操作 + 分页联动" :code="basicSnippet">
+      <DataTableWithToolbar :columns="columns" :dataSource="pagedData" table-layout="fixed"
+        :rowSelection="{ selectedRowKeys, type: 'checkbox' }" :toolbar="toolbar" :pagination="{
           current: pagination.current,
           pageSize: pagination.pageSize,
           total: filteredData.length,
           showSizeChanger: true,
           showTotal: true
-        }"
-        @search-change="(value) => (keyword = value)"
-        @search="(value) => (keyword = value)"
-        @filters-change="handleFiltersChange"
-        @page-change="handlePageChange"
-        @page-size-change="handlePageChange"
-        @selection-change="handleSelectionChange"
-        @bulk-action="(action) => handleBulkAction(action.key as string)" />
+        }" @search-change="(value) => (keyword = value)" @search="(value) => (keyword = value)"
+        @filters-change="handleFiltersChange" @page-change="handlePageChange" @page-size-change="handlePageChange"
+        @selection-change="handleSelectionChange" @bulk-action="(action) => handleBulkAction(action.key as string)" />
     </DemoBlock>
   </div>
 </template>
