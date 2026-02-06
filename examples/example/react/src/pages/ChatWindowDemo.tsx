@@ -6,7 +6,7 @@ import DemoBlock from '../components/DemoBlock'
 const baseMessages: ChatMessage[] = [
   {
     id: 1,
-    content: '你好，我是 Tigercat。',
+    content: '你好！欢迎使用 Tigercat 组件库 👋',
     direction: 'other',
     user: { name: 'Tigercat', avatar: 'https://i.pravatar.cc/40?img=3' },
     time: new Date(Date.now() - 1000 * 60 * 5),
@@ -14,10 +14,27 @@ const baseMessages: ChatMessage[] = [
   },
   {
     id: 2,
-    content: '请问有什么可以帮助？',
+    content: '请问有什么可以帮助你的？',
     direction: 'other',
     user: { name: 'Tigercat', avatar: 'https://i.pravatar.cc/40?img=3' },
     time: new Date(Date.now() - 1000 * 60 * 4),
+    status: 'sent'
+  },
+  {
+    id: 3,
+    content: '我想了解一下 ChatWindow 组件的用法',
+    direction: 'self',
+    user: { name: '我', avatar: 'https://i.pravatar.cc/40?img=5' },
+    time: new Date(Date.now() - 1000 * 60 * 3),
+    status: 'sent'
+  },
+  {
+    id: 4,
+    content:
+      'ChatWindow 是一个开箱即用的聊天窗口组件，支持 textarea 和 input 两种输入模式，可以自定义消息气泡渲染。',
+    direction: 'other',
+    user: { name: 'Tigercat', avatar: 'https://i.pravatar.cc/40?img=3' },
+    time: new Date(Date.now() - 1000 * 60 * 2),
     status: 'sent'
   }
 ]
@@ -30,10 +47,6 @@ const basicSnippet = `<ChatWindow
   showTime
   allowShiftEnter
   statusText="对方正在输入..."
-  messageListAriaLabel="会话消息"
-  inputAriaLabel="输入消息"
-  sendAriaLabel="发送消息"
-  renderMessage={(message) => <span>{message.content}</span>}
 />`
 
 const inputSnippet = `<ChatWindow
@@ -105,7 +118,7 @@ export default function ChatWindowDemo() {
         description="默认 textarea 输入，支持 Shift+Enter 换行。"
         code={basicSnippet}>
         <ChatWindow
-          className="h-[520px]"
+          className="h-[480px]"
           messages={messages}
           value={value}
           onChange={setValue}
@@ -113,16 +126,12 @@ export default function ChatWindowDemo() {
           showTime
           allowShiftEnter
           statusText="对方正在输入..."
-          messageListAriaLabel="会话消息"
-          inputAriaLabel="输入消息"
-          sendAriaLabel="发送消息"
-          renderMessage={(message) => <span>{message.content}</span>}
         />
       </DemoBlock>
 
       <DemoBlock title="单行输入" description="使用 input 模式，回车即可发送。" code={inputSnippet}>
         <ChatWindow
-          className="h-[420px]"
+          className="h-[380px]"
           inputType="input"
           placeholder="输入并回车发送"
           messages={quickMessages}

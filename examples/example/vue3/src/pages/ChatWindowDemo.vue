@@ -7,7 +7,7 @@ import DemoBlock from '../components/DemoBlock.vue'
 const baseMessages: ChatMessage[] = [
   {
     id: 1,
-    content: '你好，我是 Tigercat。',
+    content: '你好！欢迎使用 Tigercat 组件库 👋',
     direction: 'other',
     user: { name: 'Tigercat', avatar: 'https://i.pravatar.cc/40?img=3' },
     time: new Date(Date.now() - 1000 * 60 * 5),
@@ -15,10 +15,26 @@ const baseMessages: ChatMessage[] = [
   },
   {
     id: 2,
-    content: '请问有什么可以帮助？',
+    content: '请问有什么可以帮助你的？',
     direction: 'other',
     user: { name: 'Tigercat', avatar: 'https://i.pravatar.cc/40?img=3' },
     time: new Date(Date.now() - 1000 * 60 * 4),
+    status: 'sent'
+  },
+  {
+    id: 3,
+    content: '我想了解一下 ChatWindow 组件的用法',
+    direction: 'self',
+    user: { name: '我', avatar: 'https://i.pravatar.cc/40?img=5' },
+    time: new Date(Date.now() - 1000 * 60 * 3),
+    status: 'sent'
+  },
+  {
+    id: 4,
+    content: 'ChatWindow 是一个开箱即用的聊天窗口组件，支持 textarea 和 input 两种输入模式，可以自定义消息气泡渲染。',
+    direction: 'other',
+    user: { name: 'Tigercat', avatar: 'https://i.pravatar.cc/40?img=3' },
+    time: new Date(Date.now() - 1000 * 60 * 2),
     status: 'sent'
   }
 ]
@@ -76,15 +92,8 @@ const basicSnippet = `<ChatWindow
   show-time
   allow-shift-enter
   status-text="对方正在输入..."
-  message-list-aria-label="会话消息"
-  input-aria-label="输入消息"
-  send-aria-label="发送消息"
   @send="handleSend"
->
-  <template #message="{ message }">
-    <span>{{ message.content }}</span>
-  </template>
-</ChatWindow>`
+/>`
 
 const inputSnippet = `<ChatWindow
   v-model="quickInput"
@@ -103,35 +112,14 @@ const inputSnippet = `<ChatWindow
       <p class="text-gray-600">组合组件，用于构建完整聊天交互区域。</p>
     </div>
 
-    <DemoBlock title="基础用法"
-               description="默认 textarea 输入，支持 Shift+Enter 换行。"
-               :code="basicSnippet">
-      <ChatWindow v-model="input"
-                  class="h-[520px]"
-                  :messages="messages"
-                  show-time
-                  allow-shift-enter
-                  status-text="对方正在输入..."
-                  message-list-aria-label="会话消息"
-                  input-aria-label="输入消息"
-                  send-aria-label="发送消息"
-                  @send="handleSend">
-        <template #message="{ message }">
-          <span>{{ message.content }}</span>
-        </template>
-      </ChatWindow>
+    <DemoBlock title="基础用法" description="默认 textarea 输入，支持 Shift+Enter 换行。" :code="basicSnippet">
+      <ChatWindow v-model="input" class="h-[480px]" :messages="messages" show-time allow-shift-enter
+        status-text="对方正在输入..." @send="handleSend" />
     </DemoBlock>
 
-    <DemoBlock title="单行输入"
-               description="使用 input 模式，回车即可发送。"
-               :code="inputSnippet">
-      <ChatWindow v-model="quickInput"
-                  class="h-[420px]"
-                  input-type="input"
-                  placeholder="输入并回车发送"
-                  :messages="quickMessages"
-                  send-on-enter
-                  @send="handleQuickSend" />
+    <DemoBlock title="单行输入" description="使用 input 模式，回车即可发送。" :code="inputSnippet">
+      <ChatWindow v-model="quickInput" class="h-[380px]" input-type="input" placeholder="输入并回车发送"
+        :messages="quickMessages" send-on-enter @send="handleQuickSend" />
     </DemoBlock>
   </div>
 </template>

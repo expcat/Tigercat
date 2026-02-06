@@ -4,14 +4,12 @@ import {
   getChatMessageStatusInfo,
   formatChatTime,
   type ChatMessage,
-  type ChatWindowProps as CoreChatWindowProps,
-  type BadgeVariant
+  type ChatWindowProps as CoreChatWindowProps
 } from '@expcat/tigercat-core'
 import { Avatar } from './Avatar'
 import { Textarea } from './Textarea'
 import { Input } from './Input'
 import { Button } from './Button'
-import { Badge } from './Badge'
 
 export interface ChatWindowProps
   extends
@@ -46,6 +44,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   allowShiftEnter = true,
   allowEmpty = false,
   clearOnSend = true,
+  statusVariant: _sv,
   onChange,
   onSend,
   renderMessage,
@@ -65,14 +64,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const wrapperClasses = useMemo(
     () =>
       classNames(
-        'tiger-chat-window',
-        'flex',
-        'flex-col',
-        'w-full',
-        'rounded-lg',
-        'border',
-        'border-[var(--tiger-border,#e5e7eb)]',
-        'bg-[var(--tiger-surface,#ffffff)]',
+        'tiger-chat-window flex flex-col w-full rounded-lg border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)]',
         className
       ),
     [className]
@@ -121,57 +113,16 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const renderMessageItem = useCallback(
     (message: ChatMessage, index: number) => {
       const isSelf = message.direction === 'self'
-      const rowClasses = classNames(
-        'flex',
-        'gap-3',
-        'items-start',
-        isSelf ? 'flex-row-reverse' : 'justify-start'
-      )
-
-      const bubbleClasses = classNames(
-        'rounded-lg',
-        'px-3',
-        'py-2',
-        'text-sm',
-        'break-words',
-        isSelf
-          ? 'bg-[var(--tiger-primary,#2563eb)] text-white rounded-tr-none'
-          : 'bg-[var(--tiger-surface-muted,#f3f4f6)] text-[var(--tiger-text,#111827)] rounded-tl-none'
-      )
-
-      const metaText = formatChatTime(message.time)
       const statusInfo = message.status ? getChatMessageStatusInfo(message.status) : undefined
-      const customContent = renderMessage?.(message, index)
-
-      const nameNode = showName && message.user?.name && (
-        <div
-          className={classNames(
-            'text-xs',
-            'mb-1',
-            'text-[var(--tiger-text-muted,#6b7280)]',
-            isSelf && 'text-right'
-          )}>
-          {message.user.name}
-        </div>
-      )
-
-      const timeNode =
-        showTime && metaText ? (
-          <div className={classNames('text-xs', 'mt-1', 'text-[var(--tiger-text-muted,#6b7280)]')}>
-            {metaText}
-          </div>
-        ) : null
-
-      const statusNode = statusInfo ? (
-        <div className={classNames('text-xs', 'mt-1', statusInfo.className)}>
-          {message.statusText || statusInfo.text}
-        </div>
-      ) : null
+      const timeText = showTime ? formatChatTime(message.time) : ''
 
       return (
         <div
           key={message.id ?? index}
-          className={rowClasses}
+          className={classNames(
+            'flex gap-3 items-start',
+            isSelf ? 'flex-row-reverse' : 'justify-start'
+          )}
           data-tiger-chat-message
           role="listitem">
           {showAvatar && message.user ? (
@@ -179,16 +130,37 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               size="sm"
               src={message.user.avatar}
               text={message.user.name}
-              className={classNames('flex-shrink-0', isSelf ? 'ml-0' : 'mr-0')}
+              className="flex-shrink-0"
             />
           ) : null}
-          <div className={classNames('flex', 'flex-col', 'max-w-[75%]', isSelf && 'items-end')}>
-            {nameNode}
-            <div className={bubbleClasses} data-tiger-chat-bubble>
-              {customContent ?? message.content}
+          <div className={classNames('flex flex-col max-w-[75%]', isSelf && 'items-end')}>
+            {showName && message.user?.name && (
+              <div
+                className={classNames(
+                  'text-xs mb-1 text-[var(--tiger-text-muted,#6b7280)]',
+                  isSelf && 'text-right'
+                )}>
+                {message.user.name}
+              </div>
+            )}
+            <div
+              className={classNames(
+                'rounded-lg px-3 py-2 text-sm break-words',
+                isSelf
+                  ? 'bg-[var(--tiger-primary,#2563eb)] text-white rounded-tr-none'
+                  : 'bg-[var(--tiger-surface-muted,#f3f4f6)] text-[var(--tiger-text,#111827)] rounded-tl-none'
+              )}
+              data-tiger-chat-bubble>
+              {renderMessage?.(message, index) ?? message.content}
             </div>
-            {statusNode}
-            {timeNode}
+            {statusInfo && (
+              <div className={classNames('text-xs mt-1', statusInfo.className)}>
+                {message.statusText || statusInfo.text}
+              </div>
+            )}
+            {timeText && (
+              <div className="text-xs mt-1 text-[var(--tiger-text-muted,#6b7280)]">{timeText}</div>
+            )}
           </div>
         </div>
       )
@@ -196,19 +168,14 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     [renderMessage, showAvatar, showName, showTime]
   )
 
-  const statusVariantSafe = statusVariant as BadgeVariant
-  const resolvedMessageListLabel = messageListAriaLabel ?? '消息列表'
-  const resolvedInputLabel = inputAriaLabel ?? placeholder ?? '消息输入'
-  const resolvedSendLabel = sendAriaLabel ?? sendText
-
   return (
     <div className={wrapperClasses} data-tiger-chat-window {...props}>
       <div
-        className="flex-1 overflow-auto p-4 space-y-4"
+        className="flex-1 overflow-auto p-4 space-y-3"
         role="log"
         aria-live="polite"
         aria-relevant="additions text"
-        aria-label={resolvedMessageListLabel}>
+        aria-label={messageListAriaLabel ?? '消息列表'}>
         {messages.length === 0 ? (
           <div className="h-full flex items-center justify-center text-[var(--tiger-text-muted,#6b7280)]">
             {emptyText}
@@ -217,11 +184,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
           messages.map(renderMessageItem)
         )}
       </div>
-      {statusText ? (
-        <div className="px-4 py-2 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)]">
-          <Badge type="text" variant={statusVariantSafe} content={statusText} />
+      {statusText && (
+        <div className="px-4 py-1.5 border-t border-[var(--tiger-border,#e5e7eb)] text-xs italic text-[var(--tiger-text-muted,#6b7280)]">
+          {statusText}
         </div>
-      ) : null}
+      )}
       <div className="flex items-end gap-3 px-4 py-3 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] rounded-b-lg">
         <div className="flex-1">
           {inputType === 'input' ? (
@@ -230,7 +197,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               placeholder={placeholder}
               disabled={disabled}
               maxLength={maxLength}
-              aria-label={resolvedInputLabel}
+              aria-label={inputAriaLabel ?? placeholder ?? '消息输入'}
               onChange={(event) => handleValueChange(event.currentTarget.value)}
               onKeyDown={handleKeyDown}
             />
@@ -241,13 +208,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
               disabled={disabled}
               maxLength={maxLength}
               rows={inputRows}
-              aria-label={resolvedInputLabel}
+              aria-label={inputAriaLabel ?? placeholder ?? '消息输入'}
               onChange={(event) => handleValueChange(event.currentTarget.value)}
               onKeyDown={handleKeyDown}
             />
           )}
         </div>
-        <Button disabled={!canSend} onClick={handleSend} aria-label={resolvedSendLabel}>
+        <Button disabled={!canSend} onClick={handleSend} aria-label={sendAriaLabel ?? sendText}>
           {sendText}
         </Button>
       </div>

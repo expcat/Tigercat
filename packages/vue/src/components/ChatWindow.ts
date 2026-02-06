@@ -6,14 +6,12 @@ import {
   formatChatTime,
   mergeStyleValues,
   type ChatMessage,
-  type ChatWindowProps as CoreChatWindowProps,
-  type BadgeVariant
+  type ChatWindowProps as CoreChatWindowProps
 } from '@expcat/tigercat-core'
 import { Avatar } from './Avatar'
 import { Textarea } from './Textarea'
 import { Input } from './Input'
 import { Button } from './Button'
-import { Badge } from './Badge'
 
 export interface VueChatWindowProps extends Omit<
   CoreChatWindowProps,
@@ -71,7 +69,7 @@ export const ChatWindow = defineComponent({
       type: String
     },
     statusVariant: {
-      type: String as PropType<BadgeVariant>,
+      type: String as PropType<string>,
       default: 'info'
     },
     showAvatar: {
@@ -137,14 +135,7 @@ export const ChatWindow = defineComponent({
 
     const wrapperClasses = computed(() =>
       classNames(
-        'tiger-chat-window',
-        'flex',
-        'flex-col',
-        'w-full',
-        'rounded-lg',
-        'border',
-        'border-[var(--tiger-border,#e5e7eb)]',
-        'bg-[var(--tiger-surface,#ffffff)]',
+        'tiger-chat-window flex flex-col w-full rounded-lg border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)]',
         props.className,
         coerceClassValue(attrs.class)
       )
@@ -191,67 +182,17 @@ export const ChatWindow = defineComponent({
 
     const renderMessageItem = (message: ChatMessage, index: number) => {
       const isSelf = message.direction === 'self'
-      const rowClasses = classNames(
-        'flex',
-        'gap-3',
-        'items-start',
-        isSelf ? 'flex-row-reverse' : 'justify-start'
-      )
-
-      const bubbleClasses = classNames(
-        'rounded-lg',
-        'px-3',
-        'py-2',
-        'text-sm',
-        'break-words',
-        isSelf
-          ? 'bg-[var(--tiger-primary,#2563eb)] text-white rounded-tr-none'
-          : 'bg-[var(--tiger-surface-muted,#f3f4f6)] text-[var(--tiger-text,#111827)] rounded-tl-none'
-      )
-
       const statusInfo = message.status ? getChatMessageStatusInfo(message.status) : undefined
-      const customContent = slots.message?.({ message, index })
-
-      const nameNode =
-        props.showName && message.user?.name
-          ? h(
-              'div',
-              {
-                class: classNames(
-                  'text-xs',
-                  'mb-1',
-                  'text-[var(--tiger-text-muted,#6b7280)]',
-                  isSelf && 'text-right'
-                )
-              },
-              message.user.name
-            )
-          : null
-
       const timeText = props.showTime ? formatChatTime(message.time) : ''
-      const timeNode =
-        props.showTime && timeText
-          ? h(
-              'div',
-              {
-                class: classNames('text-xs', 'mt-1', 'text-[var(--tiger-text-muted,#6b7280)]')
-              },
-              timeText
-            )
-          : null
-
-      const statusNode = statusInfo
-        ? h(
-            'div',
-            { class: classNames('text-xs', 'mt-1', statusInfo.className) },
-            message.statusText || statusInfo.text
-          )
-        : null
+      const customContent = slots.message?.({ message, index })
 
       return h(
         'div',
         {
-          class: rowClasses,
+          class: classNames(
+            'flex gap-3 items-start',
+            isSelf ? 'flex-row-reverse' : 'justify-start'
+          ),
           'data-tiger-chat-message': '',
           role: 'listitem',
           key: message.id ?? index
@@ -262,23 +203,46 @@ export const ChatWindow = defineComponent({
                 size: 'sm',
                 src: message.user.avatar,
                 text: message.user.name,
-                className: classNames('flex-shrink-0', isSelf ? 'ml-0' : 'mr-0')
+                className: 'flex-shrink-0'
               })
             : null,
-          h(
-            'div',
-            { class: classNames('flex', 'flex-col', 'max-w-[75%]', isSelf && 'items-end') },
-            [
-              nameNode,
-              h(
-                'div',
-                { class: bubbleClasses, 'data-tiger-chat-bubble': '' },
-                customContent ?? message.content
-              ),
-              statusNode,
-              timeNode
-            ]
-          )
+          h('div', { class: classNames('flex flex-col max-w-[75%]', isSelf && 'items-end') }, [
+            props.showName && message.user?.name
+              ? h(
+                  'div',
+                  {
+                    class: classNames(
+                      'text-xs mb-1 text-[var(--tiger-text-muted,#6b7280)]',
+                      isSelf && 'text-right'
+                    )
+                  },
+                  message.user.name
+                )
+              : null,
+            h(
+              'div',
+              {
+                class: classNames(
+                  'rounded-lg px-3 py-2 text-sm break-words',
+                  isSelf
+                    ? 'bg-[var(--tiger-primary,#2563eb)] text-white rounded-tr-none'
+                    : 'bg-[var(--tiger-surface-muted,#f3f4f6)] text-[var(--tiger-text,#111827)] rounded-tl-none'
+                ),
+                'data-tiger-chat-bubble': ''
+              },
+              customContent ?? message.content
+            ),
+            statusInfo
+              ? h(
+                  'div',
+                  { class: classNames('text-xs mt-1', statusInfo.className) },
+                  message.statusText || statusInfo.text
+                )
+              : null,
+            timeText
+              ? h('div', { class: 'text-xs mt-1 text-[var(--tiger-text-muted,#6b7280)]' }, timeText)
+              : null
+          ])
         ]
       )
     }
@@ -315,7 +279,7 @@ export const ChatWindow = defineComponent({
           h(
             'div',
             {
-              class: 'flex-1 overflow-auto p-4 space-y-4',
+              class: 'flex-1 overflow-auto p-4 space-y-3',
               role: 'log',
               'aria-live': 'polite',
               'aria-relevant': 'additions text',
@@ -339,13 +303,9 @@ export const ChatWindow = defineComponent({
                 'div',
                 {
                   class:
-                    'px-4 py-2 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)]'
+                    'px-4 py-1.5 border-t border-[var(--tiger-border,#e5e7eb)] text-xs italic text-[var(--tiger-text-muted,#6b7280)]'
                 },
-                h(Badge, {
-                  type: 'text',
-                  variant: props.statusVariant,
-                  content: props.statusText
-                })
+                props.statusText
               )
             : null,
           h(
