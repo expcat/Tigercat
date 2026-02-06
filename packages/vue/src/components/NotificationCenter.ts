@@ -108,6 +108,10 @@ export const NotificationCenter = defineComponent({
       type: String,
       default: '标记未读'
     },
+    manageReadState: {
+      type: Boolean,
+      default: false
+    },
     className: {
       type: String,
       default: undefined
@@ -177,6 +181,53 @@ export const NotificationCenter = defineComponent({
 
     const currentGroupItems = computed(() => currentGroup.value?.items ?? [])
 
+    // --- Internal read-state management ---
+    const readStateOverrides = ref(new Map<string | number, boolean>())
+
+    const applyReadOverrides = (items: NotificationItem[]): NotificationItem[] => {
+      if (!props.manageReadState || readStateOverrides.value.size === 0) return items
+      return items.map((item) => {
+        const override = readStateOverrides.value.get(item.id)
+        return override !== undefined ? { ...item, read: override } : item
+      })
+    }
+
+    // Reset overrides when source items change
+    watch(
+      () => props.items,
+      () => {
+        if (props.manageReadState) readStateOverrides.value = new Map()
+      }
+    )
+
+    const effectiveGroups = computed(() =>
+      resolvedGroups.value.map((group) => ({
+        ...group,
+        items: applyReadOverrides(group.items)
+      }))
+    )
+
+    const effectiveCurrentGroup = computed(() => {
+      const groups = effectiveGroups.value
+      if (groups.length === 0) return undefined
+      const activeKey = currentGroupKey.value
+      if (activeKey === undefined) return groups[0]
+      const matchedIndex = groups.findIndex(
+        (group, index) => getGroupKey(group, index) === activeKey
+      )
+      return matchedIndex >= 0 ? groups[matchedIndex] : groups[0]
+    })
+
+    const effectiveCurrentGroupItems = computed(() => effectiveCurrentGroup.value?.items ?? [])
+
+    const effectiveItems = computed(() => applyReadOverrides(props.items))
+
+    const totalUnread = computed(() => {
+      const allItems = effectiveGroups.value.flatMap((group) => group.items)
+      if (allItems.length === 0) return effectiveItems.value.filter((item) => !item.read).length
+      return allItems.filter((item) => !item.read).length
+    })
+
     const filterItems = (items: NotificationItem[]) => {
       const filter = currentReadFilter.value
       return items.filter((item) => {
@@ -187,7 +238,7 @@ export const NotificationCenter = defineComponent({
       })
     }
 
-    const hasUnread = computed(() => currentGroupItems.value.some((item) => !item.read))
+    const hasUnread = computed(() => effectiveCurrentGroupItems.value.some((item) => !item.read))
 
     const wrapperClasses = computed(() =>
       classNames(
@@ -195,7 +246,6 @@ export const NotificationCenter = defineComponent({
         'w-full',
         'flex',
         'flex-col',
-        'gap-4',
         props.className,
         coerceClassValue(attrs.class)
       )
@@ -220,7 +270,13 @@ export const NotificationCenter = defineComponent({
     }
 
     const handleMarkAllRead = () => {
-      emit('mark-all-read', currentGroupKey.value, currentGroupItems.value)
+      const items = effectiveCurrentGroupItems.value
+      if (props.manageReadState) {
+        const next = new Map(readStateOverrides.value)
+        items.forEach((item) => next.set(item.id, true))
+        readStateOverrides.value = next
+      }
+      emit('mark-all-read', currentGroupKey.value, items)
     }
 
     const handleItemClick = (item: NotificationItem, index: number) => {
@@ -228,6 +284,11 @@ export const NotificationCenter = defineComponent({
     }
 
     const handleItemReadChange = (item: NotificationItem, nextRead: boolean) => {
+      if (props.manageReadState) {
+        const next = new Map(readStateOverrides.value)
+        next.set(item.id, nextRead)
+        readStateOverrides.value = next
+      }
       emit('item-read-change', item, nextRead)
     }
 
@@ -238,16 +299,28 @@ export const NotificationCenter = defineComponent({
         { key: 'read', label: props.readLabel }
       ]
 
-      return options.map((option) =>
-        h(
-          Button,
-          {
-            key: option.key,
-            size: 'sm',
-            variant: currentReadFilter.value === option.key ? 'primary' : 'outline',
-            onClick: () => handleReadFilterChange(option.key)
-          },
-          { default: () => option.label }
+      return h(
+        'div',
+        {
+          class:
+            'inline-flex self-start rounded-md border border-[var(--tiger-border,#e5e7eb)] overflow-hidden'
+        },
+        options.map((option) =>
+          h(
+            'button',
+            {
+              key: option.key,
+              class: classNames(
+                'px-3 py-1 text-xs font-medium transition-colors',
+                'border-r border-[var(--tiger-border,#e5e7eb)] last:border-r-0',
+                currentReadFilter.value === option.key
+                  ? 'bg-[var(--tiger-primary,#2563eb)] text-white'
+                  : 'bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text-muted,#6b7280)] hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
+              ),
+              onClick: () => handleReadFilterChange(option.key)
+            },
+            option.label
+          )
         )
       )
     }
@@ -256,40 +329,63 @@ export const NotificationCenter = defineComponent({
       const isRead = Boolean(item.read)
       const timeText = item.time ? formatActivityTime(item.time) : ''
 
-      return h('div', { class: 'flex items-start gap-3 w-full' }, [
-        h('span', {
+      return h(
+        'div',
+        {
           class: classNames(
-            'mt-2 h-2 w-2 rounded-full',
-            isRead ? 'bg-gray-300' : 'bg-[var(--tiger-primary,#2563eb)]'
-          ),
-          'aria-hidden': 'true'
-        }),
-        h('div', { class: 'flex-1 space-y-1' }, [
-          h(Text, { tag: 'div', size: 'sm', weight: 'medium' }, { default: () => item.title }),
-          item.description
-            ? h(
+            'flex items-start gap-3 w-full py-0.5 transition-colors',
+            !isRead &&
+              'border-l-2 border-l-[var(--tiger-primary,#2563eb)] -ml-[2px] pl-[calc(0.75rem-2px)]'
+          )
+        },
+        [
+          h('div', { class: 'flex-1 min-w-0' }, [
+            h('div', { class: 'flex items-baseline justify-between gap-2' }, [
+              h(
                 Text,
-                { tag: 'div', size: 'sm', color: 'muted' },
-                { default: () => item.description }
-              )
-            : null,
-          timeText
-            ? h(Text, { tag: 'div', size: 'xs', color: 'muted' }, { default: () => timeText })
-            : null
-        ]),
-        h(
-          Button,
-          {
-            size: 'sm',
-            variant: 'outline',
-            onClick: (event: MouseEvent) => {
-              event.stopPropagation()
-              handleItemReadChange(item, !isRead)
-            }
-          },
-          { default: () => (isRead ? props.markUnreadText : props.markReadText) }
-        )
-      ])
+                {
+                  tag: 'span',
+                  size: 'sm',
+                  weight: isRead ? 'normal' : 'semibold'
+                },
+                { default: () => item.title }
+              ),
+              timeText
+                ? h(
+                    'span',
+                    {
+                      class:
+                        'text-xs text-[var(--tiger-text-muted,#6b7280)] whitespace-nowrap flex-shrink-0'
+                    },
+                    timeText
+                  )
+                : null
+            ]),
+            item.description
+              ? h(
+                  'div',
+                  {
+                    class:
+                      'mt-0.5 text-xs text-[var(--tiger-text-muted,#6b7280)] line-clamp-2 leading-relaxed'
+                  },
+                  item.description
+                )
+              : null
+          ]),
+          h(
+            Button,
+            {
+              size: 'sm',
+              variant: 'ghost',
+              onClick: (event: MouseEvent) => {
+                event.stopPropagation()
+                handleItemReadChange(item, !isRead)
+              }
+            },
+            { default: () => (isRead ? props.markUnreadText : props.markReadText) }
+          )
+        ]
+      )
     }
 
     const renderList = (items: NotificationItem[]) =>
@@ -321,7 +417,11 @@ export const NotificationCenter = defineComponent({
         {
           default: () =>
             resolvedGroups.value.map((group, index) => {
-              const unreadCount = group.items.filter((item) => !item.read).length
+              const effectiveGroup = effectiveGroups.value.find(
+                (eg, ei) => getGroupKey(eg, ei) === getGroupKey(group, index)
+              )
+              const groupItems = effectiveGroup?.items ?? group.items
+              const unreadCount = groupItems.filter((item) => !item.read).length
               const labelBase = group.title || String(group.key ?? index)
               const label = unreadCount > 0 ? `${labelBase} (${unreadCount})` : labelBase
 
@@ -333,7 +433,12 @@ export const NotificationCenter = defineComponent({
                   label
                 },
                 {
-                  default: () => renderList(filterItems(group.items))
+                  default: () =>
+                    h(
+                      'div',
+                      { class: 'max-h-[380px] overflow-y-auto' },
+                      renderList(filterItems(groupItems))
+                    )
                 }
               )
             })
@@ -341,30 +446,44 @@ export const NotificationCenter = defineComponent({
       )
 
     return () => {
-      const header = h('div', { class: 'flex items-center justify-between gap-3' }, [
-        h(Text, { tag: 'div', size: 'sm', weight: 'medium' }, { default: () => props.title }),
-        h('div', { class: 'flex items-center gap-2 flex-wrap' }, [
-          h('div', { class: 'flex items-center gap-2' }, renderReadFilterButtons()),
+      const header = h('div', { class: 'flex flex-col gap-3' }, [
+        h('div', { class: 'flex items-center justify-between' }, [
+          h('div', { class: 'flex items-center gap-2.5' }, [
+            h(Text, { tag: 'div', size: 'base', weight: 'bold' }, { default: () => props.title }),
+            totalUnread.value > 0
+              ? h(
+                  'span',
+                  {
+                    class:
+                      'inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-semibold rounded-full bg-[var(--tiger-primary,#2563eb)] text-white'
+                  },
+                  String(totalUnread.value)
+                )
+              : null
+          ]),
           h(
             Button,
             {
               size: 'sm',
-              variant: 'outline',
+              variant: 'ghost',
               disabled: !hasUnread.value,
               onClick: handleMarkAllRead
             },
             { default: () => props.markAllReadText }
           )
-        ])
+        ]),
+        renderReadFilterButtons()
       ])
 
       const content = props.loading
-        ? h('div', { class: 'flex items-center justify-center py-6' }, [
+        ? h('div', { class: 'flex items-center justify-center py-12' }, [
             h(Loading, { text: props.loadingText })
           ])
         : resolvedGroups.value.length > 0
-          ? renderTabs()
-          : renderList(filterItems(props.items))
+          ? h('div', { class: '-mx-4 -mb-4' }, [renderTabs()])
+          : h('div', { class: '-mx-4 -mb-4 max-h-[380px] overflow-y-auto' }, [
+              renderList(filterItems(effectiveItems.value))
+            ])
 
       return h(
         'div',
