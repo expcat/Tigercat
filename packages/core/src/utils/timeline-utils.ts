@@ -14,9 +14,18 @@ export const timelineDescriptionClasses = 'text-[var(--tiger-text,#374151)]'
 const dotBg = 'bg-[var(--tiger-timeline-dot,#d1d5db)]'
 export const timelineDotClasses = `w-2.5 h-2.5 rounded-full border-2 border-[var(--tiger-surface,#ffffff)] ${dotBg}`
 
-// Dot center offset: aligns the dot center with the baseline of timeline items
-// This value accounts for half the dot height (5px) + border (2px × 2 / 2) + visual centering offset
-const DOT_CENTER_OFFSET = '11px'
+// ── Position tokens ──────────────────────────────────────────────
+// IMPORTANT: Tailwind JIT scans source for COMPLETE class strings.
+// NEVER interpolate variables into arbitrary-value brackets
+// (e.g. top-[${var}]) — the scanner will NOT resolve them.
+//
+// Layout math (label text-sm 20px + mb-1 4px + content ~24px = 48px):
+//   Dot top  = 18px  → dot center = 18 + 5 (half 10px dot) = 23px
+//   Tail top = 23px  → line starts at dot center
+//   Tail bot = -23px → line extends to next item's dot center
+const HEAD_TOP = 'top-[18px]'
+const TAIL_TOP = 'top-[23px]'
+const TAIL_BOTTOM = '-bottom-[23px]'
 
 // --- Helpers ---
 
@@ -43,27 +52,22 @@ export function getTimelineItemClasses(
 export function getTimelineTailClasses(
   mode: TimelineMode,
   _position?: TimelineItemPosition,
-  isLast = false,
-  isFirst = false
+  isLast = false
 ): string {
   if (isLast) return 'hidden'
-  const top = isFirst ? `top-[${DOT_CENTER_OFFSET}]` : 'top-0'
-  // Extend line to the next item's dot center
-  const span = `${timelineTailClasses} ${top} bottom-[-${DOT_CENTER_OFFSET}]`
+  const span = `${timelineTailClasses} ${TAIL_TOP} ${TAIL_BOTTOM}`
   if (mode === 'right') return `${span} right-0 translate-x-1/2`
   if (mode === 'alternate') return `${span} left-1/2 -translate-x-1/2`
   return `${span} left-0 -translate-x-1/2`
 }
 
-/** Dot center aligns with sm-Avatar center (32 px → 16 px). */
 export function getTimelineHeadClasses(
   mode: TimelineMode,
   _position?: TimelineItemPosition
 ): string {
-  const top = `top-[${DOT_CENTER_OFFSET}]`
-  if (mode === 'right') return `${timelineHeadClasses} right-0 ${top} translate-x-1/2`
-  if (mode === 'alternate') return `${timelineHeadClasses} left-1/2 -translate-x-1/2 ${top}`
-  return `${timelineHeadClasses} left-0 ${top} -translate-x-1/2`
+  if (mode === 'right') return `${timelineHeadClasses} right-0 ${HEAD_TOP} translate-x-1/2`
+  if (mode === 'alternate') return `${timelineHeadClasses} left-1/2 -translate-x-1/2 ${HEAD_TOP}`
+  return `${timelineHeadClasses} left-0 ${HEAD_TOP} -translate-x-1/2`
 }
 
 export function getTimelineDotClasses(color?: string, isCustom = false): string {
