@@ -211,7 +211,8 @@ const [value, setValue] = useState('male')
 ```tsx
 <Slider value={value} onChange={setValue} />
 <Slider value={value} onChange={setValue} min={0} max={200} step={10} />
-<Slider value={rangeValue} onChange={setRangeValue} range showTooltip />
+<Slider value={rangeValue} onChange={setRangeValue} range marks={marks} />
+<Slider defaultValue={50} />
 ```
 
 ---

@@ -1,13 +1,4 @@
-import {
-  defineComponent,
-  computed,
-  ref,
-  watch,
-  watchEffect,
-  onBeforeUnmount,
-  h,
-  PropType
-} from 'vue'
+import { defineComponent, computed, ref, watch, watchEffect, h, PropType } from 'vue'
 import {
   classNames,
   type SliderSize,
@@ -16,8 +7,8 @@ import {
   getSliderTrackClasses,
   getSliderThumbClasses,
   getSliderTooltipClasses,
-  sliderNormalizeValue,
   sliderGetPercentage,
+  sliderGetValueFromPosition,
   sliderGetKeyboardValue
 } from '@expcat/tigercat-core'
 
@@ -167,18 +158,17 @@ export const Slider = defineComponent({
       }
     )
 
-    // Use Core utilities with component props
-    const normalizeValue = (val: number): number =>
-      sliderNormalizeValue(val, props.min, props.max, props.step)
-
     const getPercentage = (val: number): number => sliderGetPercentage(val, props.min, props.max)
 
-    // Calculate value from position
-    const getValueFromPosition = (clientX: number, trackElement: HTMLElement): number => {
-      const rect = trackElement.getBoundingClientRect()
-      const percentage = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
-      const rawValue = props.min + percentage * (props.max - props.min)
-      return normalizeValue(rawValue)
+    const getValueFromPosition = (clientX: number, el: HTMLElement): number => {
+      const rect = el.getBoundingClientRect()
+      return sliderGetValueFromPosition(
+        clientX - rect.left,
+        rect.width,
+        props.min,
+        props.max,
+        props.step
+      )
     }
 
     // Update value
@@ -189,11 +179,11 @@ export const Slider = defineComponent({
     }
 
     // Handle mouse/touch move
-    const handleMove = (event: MouseEvent | TouchEvent, trackElement: HTMLElement) => {
+    const handleMove = (event: MouseEvent | TouchEvent, el: HTMLElement) => {
       if (props.disabled || !isDragging.value) return
 
       const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX
-      const newValue = getValueFromPosition(clientX, trackElement)
+      const newValue = getValueFromPosition(clientX, el)
 
       if (props.range && Array.isArray(internalValue.value)) {
         const [minVal, maxVal] = internalValue.value
@@ -225,9 +215,7 @@ export const Slider = defineComponent({
     }
 
     // Computed styles
-    const trackStyles = computed(() => {
-      return getSliderTrackClasses(props.size, props.disabled)
-    })
+    const trackClasses = computed(() => getSliderTrackClasses(props.size, props.disabled))
 
     const rangeStyles = computed(() => {
       if (props.range && Array.isArray(internalValue.value)) {
@@ -248,13 +236,9 @@ export const Slider = defineComponent({
       }
     })
 
-    const thumbClasses_computed = computed(() => {
-      return getSliderThumbClasses(props.size, props.disabled)
-    })
+    const thumbClasses = computed(() => getSliderThumbClasses(props.size, props.disabled))
 
-    const tooltipClasses_computed = computed(() => {
-      return getSliderTooltipClasses(props.size)
-    })
+    const tooltipClasses = computed(() => getSliderTooltipClasses(props.size))
 
     // Event handlers for dragging
     const handleTrackMouseMove = (e: MouseEvent) => {
@@ -283,13 +267,6 @@ export const Slider = defineComponent({
     })
 
     // Cleanup on component unmount
-    onBeforeUnmount(() => {
-      document.removeEventListener('mousemove', handleTrackMouseMove)
-      document.removeEventListener('mouseup', handleEnd)
-      document.removeEventListener('touchmove', handleTrackTouchMove)
-      document.removeEventListener('touchend', handleEnd)
-    })
-
     return () => {
       const ariaLabel = (attrs as Record<string, unknown>)['aria-label']
       const ariaLabelledby = (attrs as Record<string, unknown>)['aria-labelledby']
@@ -322,7 +299,7 @@ export const Slider = defineComponent({
         return h(
           'div',
           {
-            class: thumbClasses_computed.value,
+            class: thumbClasses.value,
             style: { left: `${left}%` },
             tabindex: props.disabled ? -1 : 0,
             role: 'slider',
@@ -369,7 +346,7 @@ export const Slider = defineComponent({
             }
           },
           showThumbTooltip && props.tooltip
-            ? h('div', { class: tooltipClasses_computed.value }, value.toString())
+            ? h('div', { class: tooltipClasses.value }, value.toString())
             : undefined
         )
       }
@@ -414,7 +391,7 @@ export const Slider = defineComponent({
             'div',
             {
               ref: trackElement,
-              class: trackStyles.value,
+              class: trackClasses.value,
               onClick: (e: MouseEvent) => {
                 if (props.disabled || !trackElement.value) return
                 const newValue = getValueFromPosition(e.clientX, trackElement.value)

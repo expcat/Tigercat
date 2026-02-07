@@ -293,16 +293,25 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop        | Type                         | Default | Vue | React | Description |
-| ----------- | ---------------------------- | ------- | :-: | :---: | ----------- |
-| modelValue  | `number \| [number, number]` | `0`     |  ✓  |   -   | 绑定值      |
-| value       | `number \| [number, number]` | `0`     |  -  |   ✓   | 值          |
-| min         | `number`                     | `0`     |  ✓  |   ✓   | 最小值      |
-| max         | `number`                     | `100`   |  ✓  |   ✓   | 最大值      |
-| step        | `number`                     | `1`     |  ✓  |   ✓   | 步长        |
-| range       | `boolean`                    | `false` |  ✓  |   ✓   | 范围选择    |
-| disabled    | `boolean`                    | `false` |  ✓  |   ✓   | 禁用        |
-| showTooltip | `boolean`                    | `false` |  ✓  |   ✓   | 显示提示    |
+| Prop         | Type                                | Default | Vue | React | Description                    |
+| ------------ | ----------------------------------- | ------- | :-: | :---: | ------------------------------ |
+| value        | `number \| [number, number]`        | -       |  ✓  |   ✓   | 当前值（Vue 用 v-model:value） |
+| defaultValue | `number \| [number, number]`        | -       |  ✓  |   ✓   | 默认值（非受控模式）           |
+| min          | `number`                            | `0`     |  ✓  |   ✓   | 最小值                         |
+| max          | `number`                            | `100`   |  ✓  |   ✓   | 最大值                         |
+| step         | `number`                            | `1`     |  ✓  |   ✓   | 步长                           |
+| range        | `boolean`                           | `false` |  ✓  |   ✓   | 范围选择                       |
+| disabled     | `boolean`                           | `false` |  ✓  |   ✓   | 禁用                           |
+| marks        | `boolean \| Record<number, string>` | `false` |  ✓  |   ✓   | 刻度标记                       |
+| tooltip      | `boolean`                           | `true`  |  ✓  |   ✓   | 拖动时显示值提示               |
+| size         | `'sm' \| 'md' \| 'lg'`              | `'md'`  |  ✓  |   ✓   | 尺寸                           |
+
+### Events
+
+| Vue Event       | React Callback | Payload                      | Description |
+| --------------- | -------------- | ---------------------------- | ----------- |
+| `@update:value` | `onChange`     | `number \| [number, number]` | 值变更      |
+| `@change`       | -              | `number \| [number, number]` | 值变更      |
 
 ---
 

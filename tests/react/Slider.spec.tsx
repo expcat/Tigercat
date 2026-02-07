@@ -75,10 +75,10 @@ describe('Slider', () => {
     })
 
     it('should support range mode', () => {
-      const { container } = render(<Slider value={[20, 80]} />)
+      const { container } = render(<Slider value={[20, 80]} range />)
 
       const sliders = container.querySelectorAll('[role="slider"]')
-      expect(sliders.length).toBeGreaterThan(0)
+      expect(sliders.length).toBe(2)
     })
   })
 
@@ -321,7 +321,7 @@ describe('Slider', () => {
       const { container } = render(<Slider value={[20, 80]} range onChange={handleChange} />)
 
       const sliders = container.querySelectorAll('[role="slider"]')
-      
+
       // Update min thumb
       await fireEvent.keyDown(sliders[0], { key: 'ArrowRight' })
       expect(handleChange).toHaveBeenCalled()
@@ -351,9 +351,9 @@ describe('Slider', () => {
       }
       const { container } = render(<Slider marks={customMarks} />)
 
-      const slider = container.querySelector('[role="slider"]')
-      expect(slider).toBeInTheDocument()
-      // Custom marks rendering is implementation detail
+      expect(container.textContent).toContain('0°C')
+      expect(container.textContent).toContain('50°C')
+      expect(container.textContent).toContain('100°C')
     })
   })
 

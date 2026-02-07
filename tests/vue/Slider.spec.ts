@@ -81,11 +81,11 @@ describe('Slider', () => {
 
     it('should support range mode', () => {
       const { container } = render(Slider, {
-        props: { value: [20, 80] }
+        props: { value: [20, 80], range: true }
       })
 
       const sliders = container.querySelectorAll('[role="slider"]')
-      expect(sliders.length).toBeGreaterThan(0)
+      expect(sliders.length).toBe(2)
     })
   })
 
@@ -394,7 +394,7 @@ describe('Slider', () => {
 
       const sliders = container.querySelectorAll('[role="slider"]')
       expect(sliders.length).toBe(2)
-      
+
       // Component renders values as-is (doesn't auto-normalize)
       expect(sliders[0]).toHaveAttribute('aria-valuenow', '60')
       expect(sliders[1]).toHaveAttribute('aria-valuenow', '40')
@@ -422,9 +422,9 @@ describe('Slider', () => {
         props: { marks: customMarks }
       })
 
-      const slider = container.querySelector('[role="slider"]')
-      expect(slider).toBeInTheDocument()
-      // Custom marks rendering is implementation detail
+      expect(container.textContent).toContain('0°C')
+      expect(container.textContent).toContain('50°C')
+      expect(container.textContent).toContain('100°C')
     })
   })
 

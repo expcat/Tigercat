@@ -226,9 +226,10 @@ const value = ref('male')
 
 ```vue
 <template>
-  <Slider v-model="value" />
-  <Slider v-model="value" :min="0" :max="200" :step="10" />
-  <Slider v-model="rangeValue" range show-tooltip />
+  <Slider v-model:value="value" />
+  <Slider v-model:value="value" :min="0" :max="200" :step="10" />
+  <Slider v-model:value="rangeValue" range :marks="marks" />
+  <Slider :default-value="50" />
 </template>
 ```
 

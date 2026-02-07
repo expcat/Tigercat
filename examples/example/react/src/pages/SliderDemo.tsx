@@ -22,6 +22,7 @@ const SliderDemo: React.FC = () => {
   }
 
   const [tooltipOffValue, setTooltipOffValue] = useState(50)
+  const [tooltipOnValue, setTooltipOnValue] = useState(50)
 
   const disabledValue = 75
 
@@ -77,9 +78,19 @@ const SliderDemo: React.FC = () => {
   </Space>`
 
   const tooltipSnippet = `<Space direction="vertical" className="w-full max-w-md">
-    <div className="flex items-center gap-4 w-full">
-      <Slider value={tooltipOffValue} onChange={(val) => setTooltipOffValue(toNumber(val))} min={0} max={100} tooltip={false} className="flex-1" />
-      <Text>{tooltipOffValue}</Text>
+    <div className="w-full">
+      <Text className="text-sm text-gray-600 mb-2">tooltip on（默认）</Text>
+      <div className="flex items-center gap-4 w-full">
+        <Slider value={tooltipOnValue} onChange={(val) => setTooltipOnValue(toNumber(val))} min={0} max={100} className="flex-1" />
+        <Text>{tooltipOnValue}</Text>
+      </div>
+    </div>
+    <div className="w-full">
+      <Text className="text-sm text-gray-600 mb-2">tooltip off</Text>
+      <div className="flex items-center gap-4 w-full">
+        <Slider value={tooltipOffValue} onChange={(val) => setTooltipOffValue(toNumber(val))} min={0} max={100} tooltip={false} className="flex-1" />
+        <Text>{tooltipOffValue}</Text>
+      </div>
     </div>
   </Space>`
 
@@ -111,6 +122,12 @@ const SliderDemo: React.FC = () => {
         <Slider value={sizeLg} onChange={(val) => setSizeLg(toNumber(val))} size="lg" min={0} max={100} className="flex-1" />
         <Text>{sizeLg}</Text>
       </div>
+    </div>
+  </Space>`
+
+  const defaultValueSnippet = `<Space direction="vertical" className="w-full max-w-md">
+    <div className="flex items-center gap-4 w-full">
+      <Slider defaultValue={60} min={0} max={100} className="flex-1" />
     </div>
   </Space>`
 
@@ -231,16 +248,32 @@ const SliderDemo: React.FC = () => {
         description="通过 tooltip 控制是否显示提示（默认开启）。"
         code={tooltipSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
-          <div className="flex items-center gap-4 w-full">
-            <Slider
-              value={tooltipOffValue}
-              onChange={(val) => setTooltipOffValue(toNumber(val))}
-              min={0}
-              max={100}
-              tooltip={false}
-              className="flex-1"
-            />
-            <Text>{tooltipOffValue}</Text>
+          <div className="w-full">
+            <Text className="text-sm text-gray-600 mb-2">tooltip on（默认）</Text>
+            <div className="flex items-center gap-4 w-full">
+              <Slider
+                value={tooltipOnValue}
+                onChange={(val) => setTooltipOnValue(toNumber(val))}
+                min={0}
+                max={100}
+                className="flex-1"
+              />
+              <Text>{tooltipOnValue}</Text>
+            </div>
+          </div>
+          <div className="w-full">
+            <Text className="text-sm text-gray-600 mb-2">tooltip off</Text>
+            <div className="flex items-center gap-4 w-full">
+              <Slider
+                value={tooltipOffValue}
+                onChange={(val) => setTooltipOffValue(toNumber(val))}
+                min={0}
+                max={100}
+                tooltip={false}
+                className="flex-1"
+              />
+              <Text>{tooltipOffValue}</Text>
+            </div>
           </div>
         </Space>
       </DemoBlock>
@@ -302,6 +335,18 @@ const SliderDemo: React.FC = () => {
               />
               <Text>{sizeLg}</Text>
             </div>
+          </div>
+        </Space>
+      </DemoBlock>
+
+      {/* 默认值（非受控） */}
+      <DemoBlock
+        title="默认值"
+        description="通过 defaultValue 设置初始值，无需绱定受控状态（非受控模式）。"
+        code={defaultValueSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <div className="flex items-center gap-4 w-full">
+            <Slider defaultValue={60} min={0} max={100} className="flex-1" />
           </div>
         </Space>
       </DemoBlock>

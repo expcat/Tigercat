@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, memo } from 'react'
+import React, { useState, useRef, useEffect, useCallback, useMemo, memo } from 'react'
 import {
   classNames,
   type SliderProps as CoreSliderProps,
@@ -8,8 +8,8 @@ import {
   getSliderTrackClasses,
   getSliderThumbClasses,
   getSliderTooltipClasses,
-  sliderNormalizeValue,
   sliderGetPercentage,
+  sliderGetValueFromPosition,
   sliderGetKeyboardValue
 } from '@expcat/tigercat-core'
 
@@ -23,7 +23,6 @@ export interface SliderProps
   onChange?: (value: number | [number, number]) => void
 }
 
-// Thumb component (memoized for performance)
 interface ThumbProps {
   value: number
   thumbType?: 'min' | 'max' | null
@@ -32,14 +31,13 @@ interface ThumbProps {
   showTooltip: boolean
   activeThumb: 'min' | 'max' | null
   isDragging: boolean
-  size: SliderSize
   min: number
   max: number
   ariaLabel?: string
   ariaLabelledby?: string
   ariaDescribedby?: string
-  thumbClassesCombined: string
-  tooltipClassesCombined: string
+  thumbClasses: string
+  tooltipClasses: string
   setShowTooltip: (show: boolean) => void
   handleStart: (event: React.MouseEvent | React.TouchEvent, thumb: 'min' | 'max' | null) => void
   handleKeyDown: (e: React.KeyboardEvent, value: number, thumbType: 'min' | 'max' | null) => void
@@ -60,8 +58,8 @@ const Thumb = memo<ThumbProps>(
     ariaLabel,
     ariaLabelledby,
     ariaDescribedby,
-    thumbClassesCombined,
-    tooltipClassesCombined,
+    thumbClasses,
+    tooltipClasses,
     setShowTooltip,
     handleStart,
     handleKeyDown,
@@ -72,7 +70,7 @@ const Thumb = memo<ThumbProps>(
 
     return (
       <div
-        className={thumbClassesCombined}
+        className={thumbClasses}
         style={{ left: `${left}%` }}
         tabIndex={disabled ? -1 : 0}
         role="slider"
@@ -93,7 +91,7 @@ const Thumb = memo<ThumbProps>(
           if (!isDragging) setShowTooltip(false)
         }}
         onKeyDown={(e) => handleKeyDown(e, value, thumbType)}>
-        {showThumbTooltip && tooltip && <div className={tooltipClassesCombined}>{value}</div>}
+        {showThumbTooltip && tooltip && <div className={tooltipClasses}>{value}</div>}
       </div>
     )
   }
@@ -141,28 +139,18 @@ export const Slider: React.FC<SliderProps> = ({
     }
   }, [controlledValue])
 
-  // Use Core utilities wrapped with component props
-  const normalizeValue = useCallback(
-    (val: number): number => sliderNormalizeValue(val, min, max, step),
-    [min, max, step]
-  )
-
   const getPercentage = useCallback(
     (val: number): number => sliderGetPercentage(val, min, max),
     [min, max]
   )
 
-  // Calculate value from position
   const getValueFromPosition = useCallback(
     (clientX: number): number => {
       if (!trackRef.current) return min
-
       const rect = trackRef.current.getBoundingClientRect()
-      const percentage = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
-      const rawValue = min + percentage * (max - min)
-      return normalizeValue(rawValue)
+      return sliderGetValueFromPosition(clientX - rect.left, rect.width, min, max, step)
     },
-    [min, max, normalizeValue]
+    [min, max, step]
   )
 
   // Update value
@@ -223,15 +211,16 @@ export const Slider: React.FC<SliderProps> = ({
     }
   }, [isDragging, handleMove, handleEnd])
 
-  // Handle mouse/touch start
-  const handleStart = (event: React.MouseEvent | React.TouchEvent, thumb: 'min' | 'max' | null) => {
-    if (disabled) return
-
-    event.preventDefault()
-    setIsDragging(true)
-    setActiveThumb(thumb)
-    if (tooltip) setShowTooltip(true)
-  }
+  const handleStart = useCallback(
+    (event: React.MouseEvent | React.TouchEvent, thumb: 'min' | 'max' | null) => {
+      if (disabled) return
+      event.preventDefault()
+      setIsDragging(true)
+      setActiveThumb(thumb)
+      if (tooltip) setShowTooltip(true)
+    },
+    [disabled, tooltip]
+  )
 
   // Handle track click
   const handleTrackClick = (e: React.MouseEvent) => {
@@ -254,49 +243,39 @@ export const Slider: React.FC<SliderProps> = ({
     }
   }
 
-  // Handle keyboard navigation
-  const handleKeyDown = (
-    e: React.KeyboardEvent,
-    value: number,
-    thumbType: 'min' | 'max' | null
-  ) => {
-    if (disabled) return
-
-    const newValue = sliderGetKeyboardValue(e.key, value, min, max, step)
-
-    if (newValue === null) return
-    e.preventDefault()
-
-    if (range && Array.isArray(internalValue)) {
-      const [minVal, maxVal] = internalValue
-      if (thumbType === 'min') {
-        updateValue([Math.min(newValue, maxVal), maxVal])
-      } else if (thumbType === 'max') {
-        updateValue([minVal, Math.max(newValue, minVal)])
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent, value: number, thumbType: 'min' | 'max' | null) => {
+      if (disabled) return
+      const newValue = sliderGetKeyboardValue(e.key, value, min, max, step)
+      if (newValue === null) return
+      e.preventDefault()
+      if (range && Array.isArray(internalValue)) {
+        const [minVal, maxVal] = internalValue
+        if (thumbType === 'min') {
+          updateValue([Math.min(newValue, maxVal), maxVal])
+        } else if (thumbType === 'max') {
+          updateValue([minVal, Math.max(newValue, minVal)])
+        }
+      } else {
+        updateValue(newValue)
       }
-    } else {
-      updateValue(newValue)
+    },
+    [disabled, min, max, step, range, internalValue, updateValue]
+  )
+
+  const trackClasses = useMemo(() => getSliderTrackClasses(size, disabled), [size, disabled])
+
+  const rangeStyles = useMemo<React.CSSProperties>(() => {
+    if (range && Array.isArray(internalValue)) {
+      const left = getPercentage(internalValue[0])
+      return { left: `${left}%`, width: `${getPercentage(internalValue[1]) - left}%` }
     }
-  }
+    const val = typeof internalValue === 'number' ? internalValue : internalValue[0]
+    return { left: '0%', width: `${getPercentage(val)}%` }
+  }, [range, internalValue, getPercentage])
 
-  // Compute styles
-  const trackStyles = getSliderTrackClasses(size, disabled)
-
-  const rangeStyles: React.CSSProperties =
-    range && Array.isArray(internalValue)
-      ? {
-          left: `${getPercentage(internalValue[0])}%`,
-          width: `${getPercentage(internalValue[1]) - getPercentage(internalValue[0])}%`
-        }
-      : {
-          left: '0%',
-          width: `${getPercentage(
-            typeof internalValue === 'number' ? internalValue : internalValue[0]
-          )}%`
-        }
-
-  const thumbClassesCombined = getSliderThumbClasses(size, disabled)
-  const tooltipClassesCombined = getSliderTooltipClasses(size)
+  const thumbClasses = useMemo(() => getSliderThumbClasses(size, disabled), [size, disabled])
+  const tooltipClasses = useMemo(() => getSliderTooltipClasses(size), [size])
 
   // Create marks
   const renderMarks = () => {
@@ -327,7 +306,7 @@ export const Slider: React.FC<SliderProps> = ({
       className={classNames(sliderBaseClasses, disabled && 'cursor-not-allowed', className)}
       {...divProps}>
       {/* Track */}
-      <div ref={trackRef} className={trackStyles} onClick={handleTrackClick}>
+      <div ref={trackRef} className={trackClasses} onClick={handleTrackClick}>
         {/* Range */}
         <div className={sliderRangeClasses} style={rangeStyles} />
 
@@ -342,14 +321,13 @@ export const Slider: React.FC<SliderProps> = ({
               showTooltip={showTooltip}
               activeThumb={activeThumb}
               isDragging={isDragging}
-              size={size}
               min={min}
               max={max}
               ariaLabel={ariaLabel ? `${ariaLabel} (min)` : 'Minimum value'}
               ariaLabelledby={ariaLabelledby}
               ariaDescribedby={ariaDescribedby}
-              thumbClassesCombined={thumbClassesCombined}
-              tooltipClassesCombined={tooltipClassesCombined}
+              thumbClasses={thumbClasses}
+              tooltipClasses={tooltipClasses}
               setShowTooltip={setShowTooltip}
               handleStart={handleStart}
               handleKeyDown={handleKeyDown}
@@ -363,14 +341,13 @@ export const Slider: React.FC<SliderProps> = ({
               showTooltip={showTooltip}
               activeThumb={activeThumb}
               isDragging={isDragging}
-              size={size}
               min={min}
               max={max}
               ariaLabel={ariaLabel ? `${ariaLabel} (max)` : 'Maximum value'}
               ariaLabelledby={ariaLabelledby}
               ariaDescribedby={ariaDescribedby}
-              thumbClassesCombined={thumbClassesCombined}
-              tooltipClassesCombined={tooltipClassesCombined}
+              thumbClasses={thumbClasses}
+              tooltipClasses={tooltipClasses}
               setShowTooltip={setShowTooltip}
               handleStart={handleStart}
               handleKeyDown={handleKeyDown}
@@ -385,14 +362,13 @@ export const Slider: React.FC<SliderProps> = ({
             showTooltip={showTooltip}
             activeThumb={activeThumb}
             isDragging={isDragging}
-            size={size}
             min={min}
             max={max}
             ariaLabel={ariaLabel}
             ariaLabelledby={ariaLabelledby}
             ariaDescribedby={ariaDescribedby}
-            thumbClassesCombined={thumbClassesCombined}
-            tooltipClassesCombined={tooltipClassesCombined}
+            thumbClasses={thumbClasses}
+            tooltipClasses={tooltipClasses}
             setShowTooltip={setShowTooltip}
             handleStart={handleStart}
             handleKeyDown={handleKeyDown}
