@@ -51,6 +51,12 @@ describe('Checkbox', () => {
       const label = container.querySelector('label')
       expect(label).toHaveClass('custom-checkbox')
     })
+
+    it('applies custom className to standalone checkbox', () => {
+      const { container } = render(<Checkbox className="custom-checkbox" />)
+      const checkbox = container.querySelector('input[type="checkbox"]')
+      expect(checkbox).toHaveClass('custom-checkbox')
+    })
   })
 
   describe('Sizes', () => {
@@ -462,10 +468,7 @@ describe('Checkbox', () => {
 
           return (
             <div>
-              <Checkbox
-                checked={isAllChecked}
-                indeterminate={isIndeterminate}
-                onChange={toggleAll}>
+              <Checkbox checked={isAllChecked} indeterminate={isIndeterminate} onChange={toggleAll}>
                 Select All
               </Checkbox>
               <CheckboxGroup value={values} onChange={setValues}>

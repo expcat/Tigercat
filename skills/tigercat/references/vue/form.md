@@ -151,10 +151,19 @@ const options = [
 ## Checkbox & CheckboxGroup
 
 ```vue
+<script setup>
+import { ref } from 'vue'
+const checked = ref(false)
+const checkedList = ref(['apple'])
+</script>
+
 <template>
   <Checkbox v-model="checked">Agree</Checkbox>
   <Checkbox v-model="checked" indeterminate>Partial</Checkbox>
-  <CheckboxGroup v-model="checkedList" :options="options" />
+  <CheckboxGroup v-model="checkedList">
+    <Checkbox value="apple">Apple</Checkbox>
+    <Checkbox value="banana">Banana</Checkbox>
+  </CheckboxGroup>
 </template>
 ```
 

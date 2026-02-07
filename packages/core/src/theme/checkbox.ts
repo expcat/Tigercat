@@ -30,16 +30,8 @@ export function getCheckboxClasses(size: CheckboxSize = 'md', disabled: boolean 
   const baseClasses =
     'rounded border-2 transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] active:scale-95'
   const sizeClass = checkboxSizeClasses[size]
-  const colorClasses = [
-    'border-[var(--tiger-primary,#2563eb)]',
-    'accent-[var(--tiger-primary,#2563eb)]',
-    'text-white',
-    'checked:bg-[var(--tiger-primary,#2563eb)]',
-    'checked:border-[var(--tiger-primary,#2563eb)]',
-    'indeterminate:bg-[var(--tiger-primary,#2563eb)]',
-    'indeterminate:border-[var(--tiger-primary,#2563eb)]',
-    'focus:ring-[var(--tiger-primary,#2563eb)]'
-  ].join(' ')
+  const colorClasses =
+    'border-[var(--tiger-primary,#2563eb)] accent-[var(--tiger-primary,#2563eb)] text-white checked:bg-[var(--tiger-primary,#2563eb)] checked:border-[var(--tiger-primary,#2563eb)] indeterminate:bg-[var(--tiger-primary,#2563eb)] indeterminate:border-[var(--tiger-primary,#2563eb)]'
 
   const disabledClasses = disabled
     ? 'cursor-not-allowed opacity-50 disabled:bg-[var(--tiger-surface-muted,#f3f4f6)] disabled:border-[var(--tiger-border,#e5e7eb)]'
@@ -57,7 +49,7 @@ export function getCheckboxLabelClasses(
 ): string {
   const baseClasses = 'inline-flex items-center cursor-pointer select-none'
   const sizeClass = checkboxLabelSizeClasses[size]
-  const disabledClasses = disabled ? 'cursor-not-allowed opacity-50' : ''
+  const disabledClasses = disabled ? 'cursor-not-allowed' : ''
 
   return [baseClasses, sizeClass, disabledClasses].filter(Boolean).join(' ')
 }

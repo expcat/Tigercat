@@ -84,8 +84,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
 
   // Determine effective size and disabled state - simple logical operations
   const effectiveSize = propSize || groupContext?.size || 'md'
-  const effectiveDisabled =
-    propDisabled !== undefined ? propDisabled : groupContext?.disabled || false
+  const effectiveDisabled = propDisabled || groupContext?.disabled || false
 
   const checked =
     groupContext && value !== undefined
@@ -123,33 +122,31 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   }
 
   const checkboxClasses = getCheckboxClasses(effectiveSize, effectiveDisabled)
+
+  const inputProps = {
+    ref: checkboxRef,
+    type: 'checkbox' as const,
+    checked,
+    disabled: effectiveDisabled,
+    value: typeof value === 'boolean' ? String(value) : (value as string | number | undefined),
+    onChange: handleChange,
+    ...props
+  }
+
+  // If there's no label content, return just the checkbox
+  if (!children) {
+    return <input {...inputProps} className={classNames(checkboxClasses, className)} />
+  }
+
+  // Return label with checkbox and content
   const labelClasses = classNames(
     getCheckboxLabelClasses(effectiveSize, effectiveDisabled),
     className
   )
 
-  const checkboxElement = (
-    <input
-      ref={checkboxRef}
-      type="checkbox"
-      className={checkboxClasses}
-      checked={checked}
-      disabled={effectiveDisabled}
-      value={typeof value === 'boolean' ? String(value) : (value as string | number | undefined)}
-      onChange={handleChange}
-      {...props}
-    />
-  )
-
-  // If there's no label content, return just the checkbox
-  if (!children) {
-    return checkboxElement
-  }
-
-  // Return label with checkbox and content
   return (
     <label className={labelClasses}>
-      {checkboxElement}
+      <input {...inputProps} className={checkboxClasses} />
       <span className="ml-2">{children}</span>
     </label>
   )

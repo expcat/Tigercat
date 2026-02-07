@@ -168,18 +168,23 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop          | Type      | Default | Vue | React | Description |
-| ------------- | --------- | ------- | :-: | :---: | ----------- |
-| modelValue    | `boolean` | `false` |  ✓  |   -   | 绑定值      |
-| checked       | `boolean` | `false` |  -  |   ✓   | 选中状态    |
-| disabled      | `boolean` | `false` |  ✓  |   ✓   | 禁用        |
-| indeterminate | `boolean` | `false` |  ✓  |   ✓   | 半选状态    |
+| Prop           | Type                          | Default | Vue | React | Description        |
+| -------------- | ----------------------------- | ------- | :-: | :---: | ------------------ |
+| modelValue     | `boolean`                     | -       |  ✓  |   -   | 绑定值 (v-model)   |
+| checked        | `boolean`                     | -       |  -  |   ✓   | 选中状态（受控）   |
+| defaultChecked | `boolean`                     | `false` |  ✓  |   ✓   | 默认选中（非受控） |
+| value          | `string \| number \| boolean` | -       |  ✓  |   ✓   | 选项值（用于分组） |
+| size           | `'sm' \| 'md' \| 'lg'`        | `'md'`  |  ✓  |   ✓   | 尺寸               |
+| disabled       | `boolean`                     | `false` |  ✓  |   ✓   | 禁用               |
+| indeterminate  | `boolean`                     | `false` |  ✓  |   ✓   | 半选状态           |
+| className      | `string`                      | -       |  ✓  |   ✓   | 自定义 CSS 类      |
 
 ### Events
 
-| Vue Event            | React Callback | Payload   | Description |
-| -------------------- | -------------- | --------- | ----------- |
-| `@update:modelValue` | `onChange`     | `boolean` | 状态变更    |
+| Vue Event            | React Callback | Payload          | Description |
+| -------------------- | -------------- | ---------------- | ----------- |
+| `@update:modelValue` | `onChange`     | `boolean`        | 状态变更    |
+| `@change`            | -              | `boolean, Event` | 值变更      |
 
 ---
 
@@ -187,12 +192,21 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop       | Type                                                  | Default        | Vue | React | Description |
-| ---------- | ----------------------------------------------------- | -------------- | :-: | :---: | ----------- |
-| modelValue | `any[]`                                               | `[]`           |  ✓  |   -   | 绑定值      |
-| value      | `any[]`                                               | `[]`           |  -  |   ✓   | 选中值数组  |
-| options    | `{ label: string, value: any, disabled?: boolean }[]` | `[]`           |  ✓  |   ✓   | 选项        |
-| direction  | `'horizontal' \| 'vertical'`                          | `'horizontal'` |  ✓  |   ✓   | 排列方向    |
+| Prop         | Type                              | Default | Vue | React | Description      |
+| ------------ | --------------------------------- | ------- | :-: | :---: | ---------------- |
+| modelValue   | `(string \| number \| boolean)[]` | `[]`    |  ✓  |   -   | 绑定值 (v-model) |
+| value        | `(string \| number \| boolean)[]` | `[]`    |  -  |   ✓   | 选中值（受控）   |
+| defaultValue | `(string \| number \| boolean)[]` | `[]`    |  ✓  |   ✓   | 默认值（非受控） |
+| disabled     | `boolean`                         | `false` |  ✓  |   ✓   | 禁用所有复选框   |
+| size         | `'sm' \| 'md' \| 'lg'`            | `'md'`  |  ✓  |   ✓   | 统一尺寸         |
+| className    | `string`                          | -       |  ✓  |   ✓   | 自定义 CSS 类    |
+
+### Events
+
+| Vue Event            | React Callback | Payload                           | Description |
+| -------------------- | -------------- | --------------------------------- | ----------- |
+| `@update:modelValue` | `onChange`     | `(string \| number \| boolean)[]` | 值变更      |
+| `@change`            | -              | `(string \| number \| boolean)[]` | 值变更      |
 
 ---
 

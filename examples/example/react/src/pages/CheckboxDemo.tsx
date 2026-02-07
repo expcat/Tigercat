@@ -45,12 +45,30 @@ const sizeSnippet = `<Space>
   <Checkbox size="lg">Large</Checkbox>
 </Space>`
 
+const groupDisabledSnippet = `<Space direction="vertical">
+  <CheckboxGroup disabled value={['apple']}>
+    <Checkbox value="apple">苹果</Checkbox>
+    <Checkbox value="banana">香蕉</Checkbox>
+    <Checkbox value="orange">橙子</Checkbox>
+  </CheckboxGroup>
+</Space>`
+
+const groupSizeSnippet = `<Space direction="vertical">
+  <CheckboxGroup size="lg" value={groupSizeValues} onChange={setGroupSizeValues}>
+    <Checkbox value="apple">苹果</Checkbox>
+    <Checkbox value="banana">香蕉</Checkbox>
+    <Checkbox value="orange" size="sm">橙子 (sm 覆盖)</Checkbox>
+  </CheckboxGroup>
+  <p className="text-sm text-gray-600">已选择：{groupSizeValues.join(', ')}</p>
+</Space>`
+
 const CheckboxDemo: React.FC = () => {
   const [checked, setChecked] = useState(false)
   const [indeterminateValues, setIndeterminateValues] = useState<(string | number | boolean)[]>([
     'apple'
   ])
   const [fruits, setFruits] = useState<(string | number | boolean)[]>(['apple'])
+  const [groupSizeValues, setGroupSizeValues] = useState<(string | number | boolean)[]>(['apple'])
 
   const options = ['apple', 'banana', 'orange']
 
@@ -163,6 +181,40 @@ const CheckboxDemo: React.FC = () => {
           <Checkbox size="sm">Small</Checkbox>
           <Checkbox size="md">Medium</Checkbox>
           <Checkbox size="lg">Large</Checkbox>
+        </Space>
+      </DemoBlock>
+
+      {/* 分组禁用 */}
+      <DemoBlock
+        title="分组禁用"
+        description="设置 CheckboxGroup 的 disabled 可禁用所有子复选框。"
+        code={groupDisabledSnippet}>
+        <Space direction="vertical">
+          <CheckboxGroup disabled value={['apple']}>
+            <Checkbox value="apple">苹果</Checkbox>
+            <Checkbox value="banana">香蕉</Checkbox>
+            <Checkbox value="orange">橙子</Checkbox>
+          </CheckboxGroup>
+        </Space>
+      </DemoBlock>
+
+      {/* 分组尺寸继承 */}
+      <DemoBlock
+        title="分组尺寸继承"
+        description="CheckboxGroup 设置 size 后子复选框继承，个别子项可通过自身 size 覆盖。"
+        code={groupSizeSnippet}>
+        <Space direction="vertical">
+          <CheckboxGroup size="lg" value={groupSizeValues} onChange={setGroupSizeValues}>
+            <Checkbox value="apple">苹果</Checkbox>
+            <Checkbox value="banana">香蕉</Checkbox>
+            <Checkbox value="orange" size="sm">
+              橙子 (sm 覆盖)
+            </Checkbox>
+          </CheckboxGroup>
+          <p className="text-sm text-gray-600">
+            已选择：
+            {groupSizeValues.filter((f) => typeof f === 'string').join(', ')}
+          </p>
         </Space>
       </DemoBlock>
     </div>

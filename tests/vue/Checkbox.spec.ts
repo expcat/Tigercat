@@ -72,6 +72,15 @@ describe('Checkbox', () => {
       expect(label).toHaveClass('custom-checkbox')
     })
 
+    it('applies custom className to standalone checkbox', () => {
+      const { container } = render(Checkbox, {
+        props: { className: 'custom-checkbox' }
+      })
+
+      const checkbox = container.querySelector('input[type="checkbox"]')
+      expect(checkbox).toHaveClass('custom-checkbox')
+    })
+
     it('applies custom style', () => {
       const { container } = render(Checkbox, {
         props: { style: { marginTop: '10px' } },
@@ -290,9 +299,8 @@ describe('Checkbox', () => {
     })
 
     it('emits both update:modelValue and change events', async () => {
-      const events: string[] = []
-      const onUpdate = vi.fn(() => events.push('update'))
-      const onChange = vi.fn(() => events.push('change'))
+      const onUpdate = vi.fn()
+      const onChange = vi.fn()
 
       const { container } = render(Checkbox, {
         props: { 'onUpdate:modelValue': onUpdate, onChange },
@@ -838,7 +846,8 @@ describe('Checkbox', () => {
                 }
               },
               {
-                default: () => options.map((opt) => h(Checkbox, { value: opt, key: opt }, () => opt))
+                default: () =>
+                  options.map((opt) => h(Checkbox, { value: opt, key: opt }, () => opt))
               }
             )
         }

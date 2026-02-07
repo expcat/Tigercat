@@ -135,9 +135,15 @@ const options = [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: 
 ## Checkbox & CheckboxGroup
 
 ```tsx
+const [checked, setChecked] = useState(false)
+const [checkedList, setCheckedList] = useState<string[]>(['apple'])
+
 <Checkbox checked={checked} onChange={setChecked}>Agree</Checkbox>
 <Checkbox checked={checked} onChange={setChecked} indeterminate>Partial</Checkbox>
-<CheckboxGroup value={checkedList} onChange={setCheckedList} options={options} />
+<CheckboxGroup value={checkedList} onChange={setCheckedList}>
+  <Checkbox value="apple">Apple</Checkbox>
+  <Checkbox value="banana">Banana</Checkbox>
+</CheckboxGroup>
 ```
 
 ---

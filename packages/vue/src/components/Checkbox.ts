@@ -1,7 +1,20 @@
-import { defineComponent, computed, h, ref, watch, inject, type PropType } from 'vue'
-import { classNames, coerceClassValue } from '@expcat/tigercat-core'
-import { getCheckboxClasses, getCheckboxLabelClasses, type CheckboxSize } from '@expcat/tigercat-core'
-import type { ComputedRef } from 'vue'
+import {
+  defineComponent,
+  computed,
+  h,
+  ref,
+  watch,
+  inject,
+  type PropType,
+  type ComputedRef
+} from 'vue'
+import {
+  classNames,
+  coerceClassValue,
+  getCheckboxClasses,
+  getCheckboxLabelClasses,
+  type CheckboxSize
+} from '@expcat/tigercat-core'
 import { CheckboxGroupKey, type CheckboxGroupContext } from './CheckboxGroup'
 
 export interface VueCheckboxProps {
@@ -99,10 +112,9 @@ export const Checkbox = defineComponent({
 
     // Determine effective size and disabled state
     const effectiveSize = computed(() => props.size || groupContext.value?.size || 'md')
-    const effectiveDisabled = computed(() => {
-      if (props.disabled !== undefined) return props.disabled
-      return groupContext.value?.disabled || false
-    })
+    const effectiveDisabled = computed(
+      () => props.disabled || groupContext.value?.disabled || false
+    )
 
     // Current checked state
     const checked = computed(() => {
@@ -145,44 +157,40 @@ export const Checkbox = defineComponent({
 
     return () => {
       const checkboxClasses = getCheckboxClasses(effectiveSize.value, effectiveDisabled.value)
-
-      const rootStyle = [attrs.style, props.style]
-      const rootClass = classNames(props.className, coerceClassValue(attrs.class))
-
       const { class: _class, style: _style, ...restAttrs } = attrs
 
-      const checkboxElement = h('input', {
+      const inputProps = {
         ref: checkboxRef,
         type: 'checkbox',
-        class: checkboxClasses,
         checked: checked.value,
         disabled: effectiveDisabled.value,
         value: props.value,
         onChange: handleChange,
         ...restAttrs
-      })
+      }
 
       // If there's no label content, return just the checkbox
       if (!slots.default) {
         return h('input', {
-          ref: checkboxRef,
-          type: 'checkbox',
-          class: classNames(checkboxClasses, rootClass),
-          style: rootStyle,
-          checked: checked.value,
-          disabled: effectiveDisabled.value,
-          value: props.value,
-          onChange: handleChange,
-          ...restAttrs
+          ...inputProps,
+          class: classNames(checkboxClasses, props.className, coerceClassValue(attrs.class)),
+          style: [attrs.style, props.style]
         })
       }
 
       // Return label with checkbox and content
       const labelClasses = getCheckboxLabelClasses(effectiveSize.value, effectiveDisabled.value)
-      return h('label', { class: classNames(labelClasses, rootClass), style: rootStyle }, [
-        checkboxElement,
-        h('span', { class: 'ml-2' }, slots.default())
-      ])
+      return h(
+        'label',
+        {
+          class: classNames(labelClasses, props.className, coerceClassValue(attrs.class)),
+          style: [attrs.style, props.style]
+        },
+        [
+          h('input', { ...inputProps, class: checkboxClasses }),
+          h('span', { class: 'ml-2' }, slots.default())
+        ]
+      )
     }
   }
 })
