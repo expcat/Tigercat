@@ -210,17 +210,63 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ---
 
+## Radio 单选框
+
+### Props
+
+| Prop           | Type                   | Default | Vue | React | Description        |
+| -------------- | ---------------------- | ------- | :-: | :---: | ------------------ |
+| value          | `string \| number`     | -       |  ✓  |   ✓   | 选项值（必填）     |
+| checked        | `boolean`              | -       |  ✓  |   ✓   | 选中状态（受控）   |
+| defaultChecked | `boolean`              | `false` |  ✓  |   ✓   | 默认选中（非受控） |
+| size           | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸               |
+| disabled       | `boolean`              | `false` |  ✓  |   ✓   | 禁用               |
+| name           | `string`               | -       |  ✓  |   ✓   | name 属性          |
+| className      | `string`               | -       |  ✓  |   ✓   | 自定义 CSS 类      |
+| style          | `object`               | -       |  ✓  |   ✓   | 自定义行内样式     |
+
+### Events
+
+| Vue Event         | React Callback | Payload            | Description |
+| ----------------- | -------------- | ------------------ | ----------- |
+| `@change`         | `onChange`     | `string \| number` | 值变更      |
+| `@update:checked` | -              | `boolean`          | 选中状态    |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description |
+| --------- | ---------- | ----------- |
+| `default` | `children` | 标签内容    |
+
+---
+
 ## RadioGroup 单选框组
 
 ### Props
 
-| Prop       | Type                                                  | Default        | Vue | React | Description |
-| ---------- | ----------------------------------------------------- | -------------- | :-: | :---: | ----------- |
-| modelValue | `any`                                                 | -              |  ✓  |   -   | 绑定值      |
-| value      | `any`                                                 | -              |  -  |   ✓   | 当前值      |
-| options    | `{ label: string, value: any, disabled?: boolean }[]` | `[]`           |  ✓  |   ✓   | 选项        |
-| direction  | `'horizontal' \| 'vertical'`                          | `'horizontal'` |  ✓  |   ✓   | 排列方向    |
-| button     | `boolean`                                             | `false`        |  ✓  |   ✓   | 按钮样式    |
+| Prop         | Type                   | Default | Vue | React | Description      |
+| ------------ | ---------------------- | ------- | :-: | :---: | ---------------- |
+| value        | `string \| number`     | -       |  ✓  |   ✓   | 当前值（受控）   |
+| defaultValue | `string \| number`     | -       |  ✓  |   ✓   | 默认值（非受控） |
+| name         | `string`               | auto    |  ✓  |   ✓   | name 属性        |
+| disabled     | `boolean`              | `false` |  ✓  |   ✓   | 禁用所有选项     |
+| size         | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 统一尺寸         |
+| className    | `string`               | -       |  ✓  |   ✓   | 自定义 CSS 类    |
+
+> Vue 使用 `v-model:value` 绑定；React 使用 `value` + `onChange`
+
+### Events
+
+| Vue Event       | React Callback | Payload            | Description |
+| --------------- | -------------- | ------------------ | ----------- |
+| `@update:value` | `onChange`     | `string \| number` | 值变更      |
+| `@change`       | -              | `string \| number` | 值变更      |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description      |
+| --------- | ---------- | ---------------- |
+| `default` | `children` | Radio 子组件列表 |
 
 ---
 

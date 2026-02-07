@@ -5,11 +5,15 @@ import {
   computed,
   h,
   PropType,
-  watch,
   getCurrentInstance,
   type ComputedRef
 } from 'vue'
-import { classNames, coerceClassValue, getRadioGroupClasses, type RadioSize } from '@expcat/tigercat-core'
+import {
+  classNames,
+  coerceClassValue,
+  getRadioGroupClasses,
+  type RadioSize
+} from '@expcat/tigercat-core'
 
 export const RadioGroupKey = Symbol('RadioGroup')
 
@@ -108,19 +112,7 @@ export const RadioGroup = defineComponent({
     })
 
     // Current value - use prop value if controlled, otherwise use internal state
-    const currentValue = computed(() => {
-      return isControlled.value ? props.value : internalValue.value
-    })
-
-    // Watch for changes to defaultValue in uncontrolled mode
-    watch(
-      () => props.defaultValue,
-      (newVal) => {
-        if (!isControlled.value) {
-          internalValue.value = newVal
-        }
-      }
-    )
+    const currentValue = computed(() => (isControlled.value ? props.value : internalValue.value))
 
     const handleChange = (value: string | number) => {
       if (props.disabled) return
@@ -192,10 +184,7 @@ export const RadioGroup = defineComponent({
     return () => {
       const rootStyle = [attrs.style, props.style]
       const mergedClass = classNames(props.className, coerceClassValue(attrs.class))
-      const rootClass = getRadioGroupClasses({
-        className: mergedClass,
-        hasCustomClass: !!mergedClass
-      })
+      const rootClass = getRadioGroupClasses({ className: mergedClass })
 
       const { class: _class, style: _style, ...restAttrs } = attrs
 

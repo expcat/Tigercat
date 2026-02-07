@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { getRadioGroupClasses } from '@expcat/tigercat-core'
 import { type RadioGroupProps as CoreRadioGroupProps, type RadioSize } from '@expcat/tigercat-core'
 
@@ -58,15 +58,18 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
 
   const groupName = name || generatedNameRef.current
 
-  const handleChange = (newValue: string | number) => {
-    if (disabled) return
+  const handleChange = useCallback(
+    (newValue: string | number) => {
+      if (disabled) return
 
-    if (!isControlled) {
-      setInternalValue(newValue)
-    }
+      if (!isControlled) {
+        setInternalValue(newValue)
+      }
 
-    onChange?.(newValue)
-  }
+      onChange?.(newValue)
+    },
+    [disabled, isControlled, onChange]
+  )
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (disabled) return
@@ -104,21 +107,21 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
     nextInput.click()
   }
 
-  const contextValue: RadioGroupContextValue = {
-    value: currentValue,
-    name: groupName,
-    disabled,
-    size,
-    onChange: handleChange
-  }
+  const contextValue = useMemo<RadioGroupContextValue>(
+    () => ({
+      value: currentValue,
+      name: groupName,
+      disabled,
+      size,
+      onChange: handleChange
+    }),
+    [currentValue, groupName, disabled, size, handleChange]
+  )
 
   return (
     <RadioGroupContext.Provider value={contextValue}>
       <div
-        className={getRadioGroupClasses({
-          className,
-          hasCustomClass: !!className
-        })}
+        className={getRadioGroupClasses({ className })}
         role="radiogroup"
         onKeyDown={handleKeyDown}
         {...props}>

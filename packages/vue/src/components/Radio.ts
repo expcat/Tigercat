@@ -13,8 +13,9 @@ import {
   coerceClassValue,
   getRadioDotClasses,
   getRadioLabelClasses,
-  getRadioColorClasses,
   getRadioVisualClasses,
+  defaultRadioColors,
+  radioRootBaseClasses,
   type RadioSize
 } from '@expcat/tigercat-core'
 
@@ -130,32 +131,30 @@ export const Radio = defineComponent({
       return internalChecked.value
     })
 
-    const colors = getRadioColorClasses()
-
-    const radioClasses = computed(() => {
-      return getRadioVisualClasses({
+    const radioClasses = computed(() =>
+      getRadioVisualClasses({
         size: actualSize.value,
         checked: !!isChecked.value,
         disabled: actualDisabled.value,
-        colors
+        colors: defaultRadioColors
       })
-    })
+    )
 
-    const dotClasses = computed(() => {
-      return getRadioDotClasses({
+    const dotClasses = computed(() =>
+      getRadioDotClasses({
         size: actualSize.value,
         checked: !!isChecked.value,
-        colors
+        colors: defaultRadioColors
       })
-    })
+    )
 
-    const labelClasses = computed(() => {
-      return getRadioLabelClasses({
+    const labelClasses = computed(() =>
+      getRadioLabelClasses({
         size: actualSize.value,
         disabled: actualDisabled.value,
-        colors
+        colors: defaultRadioColors
       })
-    })
+    )
 
     const handleChange = (event: Event) => {
       if (actualDisabled.value) {
@@ -189,7 +188,7 @@ export const Radio = defineComponent({
     return () => {
       const rootStyle = [attrs.style, props.style]
       const rootClass = classNames(
-        'inline-flex items-center',
+        radioRootBaseClasses,
         props.className,
         coerceClassValue(attrs.class)
       )

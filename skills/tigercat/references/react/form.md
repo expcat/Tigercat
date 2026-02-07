@@ -151,8 +151,47 @@ const [checkedList, setCheckedList] = useState<string[]>(['apple'])
 ## Radio & RadioGroup
 
 ```tsx
-<RadioGroup value={value} onChange={setValue} options={options} />
-<RadioGroup value={value} onChange={setValue} options={options} button />
+const [value, setValue] = useState('male')
+
+{
+  /* 基础用法 */
+}
+;<RadioGroup value={value} onChange={setValue}>
+  <Radio value="male">男</Radio>
+  <Radio value="female">女</Radio>
+  <Radio value="other">其他</Radio>
+</RadioGroup>
+
+{
+  /* 非受控 */
+}
+;<RadioGroup defaultValue="male" onChange={handleChange}>
+  <Radio value="a">A</Radio>
+  <Radio value="b">B</Radio>
+</RadioGroup>
+
+{
+  /* 禁用 */
+}
+;<RadioGroup value={value} onChange={setValue} disabled>
+  <Radio value="a">A</Radio>
+  <Radio value="b">B</Radio>
+</RadioGroup>
+
+{
+  /* 尺寸 */
+}
+;<RadioGroup value={value} onChange={setValue} size="sm">
+  <Radio value="a">A</Radio>
+  <Radio value="b">B</Radio>
+</RadioGroup>
+
+{
+  /* 单独使用 */
+}
+;<Radio value="standalone" checked={checked} onChange={() => setChecked(true)}>
+  独立选项
+</Radio>
 ```
 
 ---

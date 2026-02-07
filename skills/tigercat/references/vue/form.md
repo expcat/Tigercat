@@ -172,9 +172,39 @@ const checkedList = ref(['apple'])
 ## Radio & RadioGroup
 
 ```vue
+<script setup>
+import { ref } from 'vue'
+const value = ref('male')
+</script>
+
 <template>
-  <RadioGroup v-model="value" :options="options" />
-  <RadioGroup v-model="value" :options="options" button />
+  <!-- 基础用法 -->
+  <RadioGroup v-model:value="value">
+    <Radio value="male">男</Radio>
+    <Radio value="female">女</Radio>
+    <Radio value="other">其他</Radio>
+  </RadioGroup>
+
+  <!-- 非受控 -->
+  <RadioGroup default-value="male" @change="handleChange">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
+
+  <!-- 禁用 -->
+  <RadioGroup v-model:value="value" disabled>
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
+
+  <!-- 尺寸 -->
+  <RadioGroup v-model:value="value" size="sm">
+    <Radio value="a">A</Radio>
+    <Radio value="b">B</Radio>
+  </RadioGroup>
+
+  <!-- 单独使用 -->
+  <Radio value="standalone" :checked="checked" @update:checked="setChecked">独立选项</Radio>
 </template>
 ```
 

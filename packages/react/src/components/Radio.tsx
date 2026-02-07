@@ -1,10 +1,11 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useMemo, useState } from 'react'
 import {
   classNames,
   getRadioDotClasses,
   getRadioLabelClasses,
-  getRadioColorClasses,
   getRadioVisualClasses,
+  defaultRadioColors,
+  radioRootBaseClasses,
   type RadioProps as CoreRadioProps
 } from '@expcat/tigercat-core'
 import { RadioGroupContext } from './RadioGroup'
@@ -63,25 +64,36 @@ export const Radio: React.FC<RadioProps> = ({
         ? groupContext.value === value
         : internalChecked
 
-  const colors = getRadioColorClasses()
-  const radioClasses = getRadioVisualClasses({
-    size: actualSize,
-    checked: isChecked,
-    disabled: actualDisabled,
-    colors
-  })
+  const radioClasses = useMemo(
+    () =>
+      getRadioVisualClasses({
+        size: actualSize,
+        checked: isChecked,
+        disabled: actualDisabled,
+        colors: defaultRadioColors
+      }),
+    [actualSize, isChecked, actualDisabled]
+  )
 
-  const dotClasses = getRadioDotClasses({
-    size: actualSize,
-    checked: isChecked,
-    colors
-  })
+  const dotClasses = useMemo(
+    () =>
+      getRadioDotClasses({
+        size: actualSize,
+        checked: isChecked,
+        colors: defaultRadioColors
+      }),
+    [actualSize, isChecked]
+  )
 
-  const labelClasses = getRadioLabelClasses({
-    size: actualSize,
-    disabled: actualDisabled,
-    colors
-  })
+  const labelClasses = useMemo(
+    () =>
+      getRadioLabelClasses({
+        size: actualSize,
+        disabled: actualDisabled,
+        colors: defaultRadioColors
+      }),
+    [actualSize, actualDisabled]
+  )
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (actualDisabled) {
@@ -113,7 +125,7 @@ export const Radio: React.FC<RadioProps> = ({
   }
 
   return (
-    <label className={classNames('inline-flex items-center', className)} style={style}>
+    <label className={classNames(radioRootBaseClasses, className)} style={style}>
       {/* Hidden native radio input */}
       <input
         type="radio"

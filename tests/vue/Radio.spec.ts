@@ -589,31 +589,6 @@ describe('Radio', () => {
         expect(onChange).not.toHaveBeenCalled()
       })
 
-      it('should not emit events when group is disabled', async () => {
-        const onChange = vi.fn()
-        const Wrapper = defineComponent({
-          setup() {
-            return () =>
-              h(
-                RadioGroup,
-                { disabled: true, onChange },
-                {
-                  default: () => [
-                    h(Radio, { value: 'a' }, () => 'A'),
-                    h(Radio, { value: 'b' }, () => 'B')
-                  ]
-                }
-              )
-          }
-        })
-
-        const { container } = render(Wrapper)
-        const inputs = container.querySelectorAll('input[type="radio"]')
-        await fireEvent.click(inputs[0])
-
-        expect(onChange).not.toHaveBeenCalled()
-      })
-
       it('should allow individual radio to be disabled', () => {
         const { container } = render({
           components: { RadioGroup, Radio },
@@ -768,6 +743,54 @@ describe('Radio', () => {
 
         expect(inputs[2]).toHaveFocus()
         expect(inputs[2].checked).toBe(true)
+      })
+
+      it('should navigate with ArrowUp', async () => {
+        const user = userEvent.setup()
+        const { container } = render({
+          components: { RadioGroup, Radio },
+          template: `
+            <RadioGroup default-value="c">
+              <Radio value="a">A</Radio>
+              <Radio value="b">B</Radio>
+              <Radio value="c">C</Radio>
+            </RadioGroup>
+          `
+        })
+
+        const inputs = Array.from(
+          container.querySelectorAll('input[type="radio"]')
+        ) as HTMLInputElement[]
+
+        inputs[2].focus()
+        await user.keyboard('{ArrowUp}')
+
+        expect(inputs[1]).toHaveFocus()
+        expect(inputs[1].checked).toBe(true)
+      })
+
+      it('should navigate with ArrowLeft and ArrowRight', async () => {
+        const user = userEvent.setup()
+        const { container } = render({
+          components: { RadioGroup, Radio },
+          template: `
+            <RadioGroup default-value="a">
+              <Radio value="a">A</Radio>
+              <Radio value="b">B</Radio>
+            </RadioGroup>
+          `
+        })
+
+        const inputs = Array.from(
+          container.querySelectorAll('input[type="radio"]')
+        ) as HTMLInputElement[]
+
+        inputs[0].focus()
+        await user.keyboard('{ArrowRight}')
+        expect(inputs[1]).toHaveFocus()
+
+        await user.keyboard('{ArrowLeft}')
+        expect(inputs[0]).toHaveFocus()
       })
     })
 

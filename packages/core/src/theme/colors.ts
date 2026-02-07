@@ -203,15 +203,11 @@ export const defaultRadioColors: RadioColorScheme = {
 }
 
 /**
- * Get radio color classes
- * @param colors - Radio color scheme (uses default if not provided)
- * @returns Radio color scheme with all class strings
+ * @deprecated Use `defaultRadioColors` directly. This is an identity function kept for backward compatibility.
  */
-export function getRadioColorClasses(
+export const getRadioColorClasses = (
   colors: RadioColorScheme = defaultRadioColors
-): RadioColorScheme {
-  return colors
-}
+): RadioColorScheme => colors
 
 /**
  * Link color scheme interface
