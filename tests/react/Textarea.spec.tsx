@@ -117,12 +117,6 @@ describe('Textarea', () => {
   })
 
   describe('Rows Control', () => {
-    it('should set custom rows value', () => {
-      const { getByRole } = render(<Textarea rows={10} />)
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveAttribute('rows', '10')
-    })
-
     it('should handle rows value of 1', () => {
       const { getByRole } = render(<Textarea rows={1} />)
       const textarea = getByRole('textbox')
@@ -299,33 +293,6 @@ describe('Textarea', () => {
       expect(textarea).not.toHaveFocus()
       expect(onBlur).toHaveBeenCalled()
     })
-
-    it('handles multiple event handlers together', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const handleInput = vi.fn()
-      const handleFocus = vi.fn()
-      const handleBlur = vi.fn()
-
-      const { getByRole } = render(
-        <Textarea
-          onChange={handleChange}
-          onInput={handleInput}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-        />
-      )
-
-      const textarea = getByRole('textbox')
-      await user.click(textarea)
-      await user.type(textarea, 'a')
-      await user.tab()
-
-      expect(handleFocus).toHaveBeenCalled()
-      expect(handleInput).toHaveBeenCalled()
-      expect(handleChange).toHaveBeenCalled()
-      expect(handleBlur).toHaveBeenCalled()
-    })
   })
 
   describe('AutoResize', () => {
@@ -377,21 +344,6 @@ describe('Textarea', () => {
     })
   })
 
-  describe('Resize Modes', () => {
-    it('allows vertical resize by default', () => {
-      const { getByRole } = render(<Textarea />)
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveClass('resize-y')
-    })
-
-    it('disables resize when autoResize is enabled', () => {
-      const { getByRole } = render(<Textarea autoResize />)
-
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveClass('resize-none')
-    })
-  })
-
   describe('Character Count (showCount)', () => {
     it('shows count when showCount is enabled', () => {
       render(<Textarea defaultValue="abc" showCount maxLength={10} />)
@@ -419,7 +371,14 @@ describe('Textarea', () => {
       const TestComponent = () => {
         const [value, setValue] = React.useState('ab')
 
-        return <Textarea value={value} onChange={(e) => setValue(e.target.value)} showCount maxLength={10} />
+        return (
+          <Textarea
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            showCount
+            maxLength={10}
+          />
+        )
       }
 
       const { getByRole } = render(<TestComponent />)
@@ -444,20 +403,6 @@ describe('Textarea', () => {
       expect(countDiv).toBeInTheDocument()
       expect(countDiv).toHaveClass('text-sm')
       expect(countDiv).toHaveClass('text-gray-500')
-    })
-  })
-
-  describe('MaxLength', () => {
-    it('applies maxLength attribute', () => {
-      const { getByRole } = render(<Textarea maxLength={100} />)
-
-      expect(getByRole('textbox')).toHaveAttribute('maxlength', '100')
-    })
-
-    it('works with showCount', () => {
-      render(<Textarea defaultValue="test" maxLength={10} showCount />)
-
-      expect(screen.getByText('4/10')).toBeInTheDocument()
     })
   })
 

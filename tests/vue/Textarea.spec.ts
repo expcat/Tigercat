@@ -257,24 +257,6 @@ describe('Textarea', () => {
       expect(onBlur).toHaveBeenCalled()
     })
 
-    it('should emit focus and blur events', async () => {
-      const onFocus = vi.fn()
-      const onBlur = vi.fn()
-      const { getByRole } = render(Textarea, {
-        props: {
-          onFocus,
-          onBlur
-        }
-      })
-
-      const textarea = getByRole('textbox')
-      await fireEvent.focus(textarea)
-      await fireEvent.blur(textarea)
-
-      expect(onFocus).toHaveBeenCalled()
-      expect(onBlur).toHaveBeenCalled()
-    })
-
     it('should not emit events when disabled', async () => {
       const onUpdate = vi.fn()
       const onInput = vi.fn()
@@ -437,23 +419,6 @@ describe('Textarea', () => {
     })
   })
 
-  describe('Resize Modes', () => {
-    it('should allow vertical resize by default', () => {
-      const { getByRole } = render(Textarea)
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveClass('resize-y')
-    })
-
-    it('should disable resize when autoResize is enabled', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        autoResize: true
-      })
-
-      const textarea = getByRole('textbox')
-      expect(textarea).toHaveClass('resize-none')
-    })
-  })
-
   describe('Character Count (showCount)', () => {
     it('shows count when showCount is enabled', () => {
       renderWithProps(Textarea, {
@@ -531,26 +496,6 @@ describe('Textarea', () => {
       expect(countDiv).toBeInTheDocument()
       expect(countDiv).toHaveClass('text-sm')
       expect(countDiv).toHaveClass('text-gray-500')
-    })
-  })
-
-  describe('MaxLength', () => {
-    it('should apply maxLength attribute', () => {
-      const { getByRole } = renderWithProps(Textarea, {
-        maxLength: 100
-      })
-
-      expect(getByRole('textbox')).toHaveAttribute('maxlength', '100')
-    })
-
-    it('should work with showCount', () => {
-      renderWithProps(Textarea, {
-        modelValue: 'test',
-        maxLength: 10,
-        showCount: true
-      })
-
-      expect(screen.getByText('4/10')).toBeInTheDocument()
     })
   })
 

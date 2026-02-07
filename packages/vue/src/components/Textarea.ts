@@ -1,4 +1,4 @@
-import { defineComponent, computed, ref, watch, nextTick, h, PropType } from 'vue'
+import { defineComponent, computed, ref, watch, onMounted, nextTick, h, PropType } from 'vue'
 import {
   autoResizeTextarea,
   classNames,
@@ -218,10 +218,6 @@ export const Textarea = defineComponent({
       localValue.value = value
       emit('update:modelValue', value)
       emit('input', event)
-
-      if (props.autoResize) {
-        nextTick(adjustHeight)
-      }
     }
 
     const handleChange = (event: Event) => {
@@ -236,17 +232,15 @@ export const Textarea = defineComponent({
       emit('blur', event)
     }
 
-    watch(
-      () => [props.modelValue, props.autoResize, props.minRows, props.maxRows],
-      () => {
-        if (!props.autoResize) return
-        nextTick(adjustHeight)
-      }
-    )
-
-    watch(textareaRef, (textarea) => {
-      if (!textarea || !props.autoResize) return
+    // Single watcher for all autoResize triggers (value change, prop change)
+    watch([localValue, () => props.autoResize, () => props.minRows, () => props.maxRows], () => {
+      if (!props.autoResize) return
       nextTick(adjustHeight)
+    })
+
+    // Initial resize on mount
+    onMounted(() => {
+      if (props.autoResize) nextTick(adjustHeight)
     })
 
     return () => {

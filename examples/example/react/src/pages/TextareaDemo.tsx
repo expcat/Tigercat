@@ -50,16 +50,35 @@ const countSnippet = `<Space direction="vertical" className="w-full max-w-md">
 </Space>`
 
 const disabledSnippet = `<Space direction="vertical" className="w-full max-w-md">
-  <Textarea value={disabled} disabled rows={3} />
-  <Textarea value={readonly} readonly rows={3} />
+  <FormItem label="禁用">
+    <Textarea value="禁用的文本域" disabled rows={3} />
+  </FormItem>
+  <FormItem label="只读">
+    <Textarea value="只读的文本域" readonly rows={3} />
+  </FormItem>
+  <FormItem label="必填">
+    <Textarea placeholder="必填的文本域" required rows={3} />
+  </FormItem>
+</Space>`
+
+const combinedSnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <Textarea
+    value={combined}
+    onInput={(e) => setCombined(e.currentTarget.value)}
+    autoResize
+    minRows={3}
+    maxRows={10}
+    showCount
+    maxLength={500}
+    placeholder="自动高度 + 字符计数 + 最大长度"
+  />
 </Space>`
 
 const TextareaDemo: React.FC = () => {
   const [text, setText] = useState('')
   const [autoResizeText, setAutoResizeText] = useState('')
   const [limited, setLimited] = useState('')
-  const [disabled] = useState('禁用的文本域')
-  const [readonly] = useState('只读的文本域')
+  const [combined, setCombined] = useState('')
 
   return (
     <div className="max-w-5xl mx-auto p-8">
@@ -152,14 +171,40 @@ const TextareaDemo: React.FC = () => {
         </Space>
       </DemoBlock>
 
-      {/* 禁用和只读 */}
+      {/* 禁用、只读和必填 */}
       <DemoBlock
-        title="禁用和只读"
-        description="文本域可以设置为禁用或只读状态。"
+        title="禁用、只读和必填"
+        description="文本域可以设置为禁用、只读或必填状态。"
         code={disabledSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
-          <Textarea value={disabled} disabled rows={3} />
-          <Textarea value={readonly} readonly rows={3} />
+          <FormItem label="禁用">
+            <Textarea value="禁用的文本域" disabled rows={3} />
+          </FormItem>
+          <FormItem label="只读">
+            <Textarea value="只读的文本域" readonly rows={3} />
+          </FormItem>
+          <FormItem label="必填">
+            <Textarea placeholder="必填的文本域" required rows={3} />
+          </FormItem>
+        </Space>
+      </DemoBlock>
+
+      {/* 组合功能 */}
+      <DemoBlock
+        title="组合功能"
+        description="autoResize + showCount + maxLength 组合使用。"
+        code={combinedSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <Textarea
+            value={combined}
+            onInput={(e) => setCombined(e.currentTarget.value)}
+            autoResize
+            minRows={3}
+            maxRows={10}
+            showCount
+            maxLength={500}
+            placeholder="自动高度 + 字符计数 + 最大长度"
+          />
         </Space>
       </DemoBlock>
     </div>

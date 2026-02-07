@@ -93,9 +93,29 @@ const [value, setValue] = useState('')
 ## Textarea 文本域
 
 ```tsx
-<Textarea value={content} onChange={(e) => setContent(e.target.value)} rows={4} />
-<Textarea value={content} onChange={(e) => setContent(e.target.value)} autosize />
-<Textarea value={content} onChange={(e) => setContent(e.target.value)} autosize={{ minRows: 2, maxRows: 6 }} />
+const [content, setContent] = useState('')
+
+{/* 基础 */}
+<Textarea value={content} onChange={(e) => setContent(e.target.value)} rows={4} placeholder="请输入内容" />
+
+{/* 非受控 */}
+<Textarea defaultValue="initial" />
+
+{/* 尺寸 */}
+<Textarea value={content} onChange={(e) => setContent(e.target.value)} size="sm" />
+<Textarea value={content} onChange={(e) => setContent(e.target.value)} size="lg" />
+
+{/* 自动高度 */}
+<Textarea value={content} onChange={(e) => setContent(e.target.value)} autoResize />
+<Textarea value={content} onChange={(e) => setContent(e.target.value)} autoResize minRows={2} maxRows={6} />
+
+{/* 字符计数 */}
+<Textarea value={content} onChange={(e) => setContent(e.target.value)} showCount maxLength={200} />
+
+{/* 状态 */}
+<Textarea value={content} disabled />
+<Textarea value={content} readonly />
+<Textarea value={content} required />
 ```
 
 ---

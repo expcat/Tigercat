@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   autoResizeTextarea,
   classNames,
@@ -58,16 +58,20 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       else if (ref) (ref as React.MutableRefObject<HTMLTextAreaElement | null>).current = node
     }
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (!autoResize || !textareaRef.current) return
       autoResizeTextarea(textareaRef.current, { minRows, maxRows })
     }, [autoResize, currentValue, minRows, maxRows])
 
-    const textareaClasses = classNames(
-      'block',
-      getInputClasses({ size }),
-      autoResize ? 'resize-none' : 'resize-y',
-      className
+    const textareaClasses = useMemo(
+      () =>
+        classNames(
+          'block',
+          getInputClasses({ size }),
+          autoResize ? 'resize-none' : 'resize-y',
+          className
+        ),
+      [size, autoResize, className]
     )
 
     const handleInput = (event: React.FormEvent<HTMLTextAreaElement>) => {
@@ -76,10 +80,6 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       }
 
       onInput?.(event)
-
-      if (autoResize) {
-        autoResizeTextarea(event.currentTarget, { minRows, maxRows })
-      }
     }
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {

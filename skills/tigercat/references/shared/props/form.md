@@ -104,14 +104,39 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop        | Type                                | Default | Vue | React | Description |
-| ----------- | ----------------------------------- | ------- | :-: | :---: | ----------- |
-| modelValue  | `string`                            | -       |  ✓  |   -   | 绑定值      |
-| value       | `string`                            | -       |  -  |   ✓   | 绑定值      |
-| rows        | `number`                            | `3`     |  ✓  |   ✓   | 行数        |
-| autosize    | `boolean \| { minRows?, maxRows? }` | `false` |  ✓  |   ✓   | 自适应高度  |
-| placeholder | `string`                            | -       |  ✓  |   ✓   | 占位符      |
-| disabled    | `boolean`                           | `false` |  ✓  |   ✓   | 禁用        |
+| Prop         | Type                   | Default | Vue | React | Description                 |
+| ------------ | ---------------------- | ------- | :-: | :---: | --------------------------- |
+| modelValue   | `string`               | -       |  ✓  |   -   | 绑定值 (v-model)            |
+| value        | `string`               | -       |  -  |   ✓   | 绑定值（受控）              |
+| defaultValue | `string`               | -       |  -  |   ✓   | 默认值（非受控）            |
+| size         | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸                        |
+| placeholder  | `string`               | `''`    |  ✓  |   ✓   | 占位符                      |
+| disabled     | `boolean`              | `false` |  ✓  |   ✓   | 禁用                        |
+| readonly     | `boolean`              | `false` |  ✓  |   ✓   | 只读                        |
+| required     | `boolean`              | `false` |  ✓  |   ✓   | 必填                        |
+| rows         | `number`               | `3`     |  ✓  |   ✓   | 行数                        |
+| autoResize   | `boolean`              | `false` |  ✓  |   ✓   | 自适应高度                  |
+| minRows      | `number`               | -       |  ✓  |   ✓   | 最小行数（配合 autoResize） |
+| maxRows      | `number`               | -       |  ✓  |   ✓   | 最大行数（配合 autoResize） |
+| maxLength    | `number`               | -       |  ✓  |   ✓   | 最大字符数                  |
+| minLength    | `number`               | -       |  ✓  |   ✓   | 最小字符数                  |
+| showCount    | `boolean`              | `false` |  ✓  |   ✓   | 显示字符计数                |
+| name         | `string`               | -       |  ✓  |   ✓   | name 属性                   |
+| id           | `string`               | -       |  ✓  |   ✓   | id 属性                     |
+| autoComplete | `string`               | -       |  ✓  |   ✓   | 自动完成                    |
+| autoFocus    | `boolean`              | `false` |  ✓  |   ✓   | 自动聚焦                    |
+| className    | `string`               | -       |  ✓  |   ✓   | 自定义 CSS 类               |
+| style        | `object`               | -       |  ✓  |   -   | 自定义行内样式              |
+
+### Events
+
+| Vue Event            | React Callback | Payload      | Description |
+| -------------------- | -------------- | ------------ | ----------- |
+| `@update:modelValue` | -              | `string`     | 值变更      |
+| `@input`             | `onInput`      | `Event`      | 输入事件    |
+| `@change`            | `onChange`     | `Event`      | 值变更      |
+| `@focus`             | `onFocus`      | `FocusEvent` | 聚焦        |
+| `@blur`              | `onBlur`       | `FocusEvent` | 失焦        |
 
 ---
 

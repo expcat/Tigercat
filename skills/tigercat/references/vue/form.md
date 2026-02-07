@@ -100,10 +100,30 @@ const value = ref('')
 ## Textarea 文本域
 
 ```vue
+<script setup>
+import { ref } from 'vue'
+const content = ref('')
+</script>
+
 <template>
-  <Textarea v-model="content" :rows="4" />
-  <Textarea v-model="content" autosize />
-  <Textarea v-model="content" :autosize="{ minRows: 2, maxRows: 6 }" />
+  <!-- 基础 -->
+  <Textarea v-model="content" :rows="4" placeholder="请输入内容" />
+
+  <!-- 尺寸 -->
+  <Textarea v-model="content" size="sm" />
+  <Textarea v-model="content" size="lg" />
+
+  <!-- 自动高度 -->
+  <Textarea v-model="content" autoResize />
+  <Textarea v-model="content" autoResize :minRows="2" :maxRows="6" />
+
+  <!-- 字符计数 -->
+  <Textarea v-model="content" showCount :maxLength="200" />
+
+  <!-- 状态 -->
+  <Textarea v-model="content" disabled />
+  <Textarea v-model="content" readonly />
+  <Textarea v-model="content" required />
 </template>
 ```
 
