@@ -10,3 +10,9 @@ export const iconSizeClasses: Record<IconSize, string> = {
   lg: 'w-6 h-6',
   xl: 'w-8 h-8'
 } as const
+
+export const iconSvgDefaultStrokeWidth = 2
+
+export const iconSvgDefaultStrokeLinecap = 'round'
+
+export const iconSvgDefaultStrokeLinejoin = 'round'

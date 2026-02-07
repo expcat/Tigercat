@@ -64,15 +64,40 @@ import { Button } from '@expcat/tigercat-react'
 ## Icon 图标
 
 ```tsx
-<Icon>
-	<svg viewBox="0 0 24 24">
-		<path d="M5 12h14" />
-	</svg>
+{
+  /* 基础用法（默认 md / currentColor） */
+}
+;<Icon>
+  <svg viewBox="0 0 24 24">
+    <path d="M5 12h14" />
+  </svg>
 </Icon>
-<Icon size="xl" color="#f00">
-	<svg viewBox="0 0 24 24">
-		<path d="M6 6l12 12M18 6l-12 12" />
-	</svg>
+
+{
+  /* 尺寸 + 颜色 */
+}
+;<Icon size="xl" color="#f00">
+  <svg viewBox="0 0 24 24">
+    <path d="M6 6l12 12M18 6l-12 12" />
+  </svg>
+</Icon>
+
+{
+  /* 填充图标（覆盖 SVG 默认值） */
+}
+;<Icon size="lg">
+  <svg viewBox="0 0 20 20" fill="currentColor" stroke="none">
+    <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
+  </svg>
+</Icon>
+
+{
+  /* 语义化图标（a11y） */
+}
+;<Icon aria-label="搜索">
+  <svg viewBox="0 0 24 24">
+    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+  </svg>
 </Icon>
 ```
 

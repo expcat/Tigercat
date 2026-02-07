@@ -4,19 +4,20 @@ import {
   coerceClassValue,
   iconSizeClasses,
   iconSvgBaseClasses,
+  iconSvgDefaultStrokeLinecap,
+  iconSvgDefaultStrokeLinejoin,
+  iconSvgDefaultStrokeWidth,
   iconWrapperClasses,
-  SVG_DEFAULT_XMLNS,
-  SVG_DEFAULT_VIEWBOX_24,
   SVG_DEFAULT_FILL,
   SVG_DEFAULT_STROKE,
+  SVG_DEFAULT_VIEWBOX_24,
+  SVG_DEFAULT_XMLNS,
   type IconSize
 } from '@expcat/tigercat-core'
 
 export interface VueIconProps {
   size?: IconSize
   color?: string
-  className?: string
-  style?: CSSProperties
 }
 
 export const Icon = defineComponent({
@@ -38,70 +39,43 @@ export const Icon = defineComponent({
     color: {
       type: String,
       default: 'currentColor'
-    },
-    /**
-     * Additional CSS classes
-     */
-    className: {
-      type: String,
-      default: undefined
-    },
-
-    /**
-     * Custom styles for the wrapper
-     */
-    style: {
-      type: Object as PropType<CSSProperties>,
-      default: undefined
     }
   },
   setup(props, { slots, attrs }) {
-    const wrapperClasses = computed(() => {
-      return classNames(iconWrapperClasses, coerceClassValue(attrs.class), props.className)
-    })
+    const wrapperClasses = computed(() =>
+      classNames(iconWrapperClasses, coerceClassValue(attrs.class))
+    )
 
-    const svgBaseClasses = computed(() => {
-      return classNames(iconSvgBaseClasses, iconSizeClasses[props.size])
-    })
-
-    const wrapperStyle = computed((): CSSProperties => {
-      return {
-        ...(attrs.style as CSSProperties | undefined),
-        ...(props.style ?? {}),
-        color: props.color
-      }
-    })
+    const svgClasses = computed(() => classNames(iconSvgBaseClasses, iconSizeClasses[props.size]))
 
     return () => {
       const defaultSlot = slots.default?.()
-
-      const ariaLabel = attrs['aria-label']
-      const ariaLabelledBy = attrs['aria-labelledby']
-      const hasExplicitRole = attrs.role != null
-      const isDecorative = ariaLabel == null && ariaLabelledBy == null && !hasExplicitRole
+      const isDecorative =
+        attrs['aria-label'] == null && attrs['aria-labelledby'] == null && attrs.role == null
 
       const children = (defaultSlot ?? []).map((node) => {
         if (node && typeof node === 'object' && (node as VNode).type === 'svg') {
           const svgNode = node as VNode
           const svgProps = (svgNode.props ?? {}) as Record<string, unknown>
-          const svgChildren = svgNode.children === null ? undefined : svgNode.children
-
           type HChildren = Parameters<typeof h>[2]
 
           return h(
             'svg',
             {
               ...svgProps,
-              class: classNames(svgBaseClasses.value, coerceClassValue(svgProps.class)),
-              xmlns: (svgProps.xmlns as string | undefined) ?? SVG_DEFAULT_XMLNS,
-              viewBox: (svgProps.viewBox as string | undefined) ?? SVG_DEFAULT_VIEWBOX_24,
-              fill: (svgProps.fill as string | undefined) ?? SVG_DEFAULT_FILL,
-              stroke: (svgProps.stroke as string | undefined) ?? SVG_DEFAULT_STROKE,
-              'stroke-width': (svgProps['stroke-width'] as string | number | undefined) ?? '2',
-              'stroke-linecap': (svgProps['stroke-linecap'] as string | undefined) ?? 'round',
-              'stroke-linejoin': (svgProps['stroke-linejoin'] as string | undefined) ?? 'round'
+              class: classNames(svgClasses.value, coerceClassValue(svgProps.class)),
+              xmlns: (svgProps.xmlns as string) ?? SVG_DEFAULT_XMLNS,
+              viewBox: (svgProps.viewBox as string) ?? SVG_DEFAULT_VIEWBOX_24,
+              fill: (svgProps.fill as string) ?? SVG_DEFAULT_FILL,
+              stroke: (svgProps.stroke as string) ?? SVG_DEFAULT_STROKE,
+              'stroke-width':
+                (svgProps['stroke-width'] as string | number) ?? iconSvgDefaultStrokeWidth,
+              'stroke-linecap':
+                (svgProps['stroke-linecap'] as string) ?? iconSvgDefaultStrokeLinecap,
+              'stroke-linejoin':
+                (svgProps['stroke-linejoin'] as string) ?? iconSvgDefaultStrokeLinejoin
             },
-            svgChildren as HChildren
+            (svgNode.children === null ? undefined : svgNode.children) as HChildren
           )
         }
 
@@ -113,10 +87,8 @@ export const Icon = defineComponent({
         {
           ...attrs,
           class: wrapperClasses.value,
-          style: wrapperStyle.value,
-          ...(isDecorative
-            ? { 'aria-hidden': 'true' }
-            : { role: (attrs.role as string | undefined) ?? 'img' })
+          style: { ...(attrs.style as CSSProperties | undefined), color: props.color },
+          ...(isDecorative ? { 'aria-hidden': 'true' } : { role: (attrs.role as string) ?? 'img' })
         },
         children
       )

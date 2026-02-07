@@ -117,17 +117,37 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop      | Type                           | Default        | Vue | React | Description          |
-| --------- | ------------------------------ | -------------- | :-: | :---: | -------------------- |
-| size      | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`         |  ✓  |   ✓   | 尺寸                 |
-| color     | `string`                       | `currentColor` |  ✓  |   ✓   | 颜色（CSS color 值） |
-| className | `string`                       | -              |  ✓  |   ✓   | 自定义类名           |
+| Prop      | Type                           | Default        | Vue | React | Description                         |
+| --------- | ------------------------------ | -------------- | :-: | :---: | ----------------------------------- |
+| size      | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`         |  ✓  |   ✓   | 尺寸                                |
+| color     | `string`                       | `currentColor` |  ✓  |   ✓   | 颜色（CSS color 值）                |
+| className | `string`                       | -              |  ✗  |   ✓   | 自定义类名（Vue 使用 `class` attr） |
 
 ### Slots / Children
 
 | Vue Slot  | React Prop | Description       |
 | --------- | ---------- | ----------------- |
 | `default` | `children` | 传入 SVG 图标内容 |
+
+### Accessibility
+
+- 无 `aria-label` / `aria-labelledby` / `role` 时自动设置 `aria-hidden="true"`（装饰性图标）
+- 提供 `aria-label` 或 `aria-labelledby` 时自动添加 `role="img"`
+- 支持自定义 `role` 覆盖默认行为
+
+### SVG 默认属性
+
+传入的 `<svg>` 子元素会自动注入以下默认属性（可被显式值覆盖）：
+
+| 属性            | 默认值                       |
+| --------------- | ---------------------------- |
+| xmlns           | `http://www.w3.org/2000/svg` |
+| viewBox         | `0 0 24 24`                  |
+| fill            | `none`                       |
+| stroke          | `currentColor`               |
+| stroke-width    | `2`                          |
+| stroke-linecap  | `round`                      |
+| stroke-linejoin | `round`                      |
 
 ---
 
