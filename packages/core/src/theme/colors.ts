@@ -285,6 +285,12 @@ export const defaultLinkThemeColors: LinkThemeColors = {
 
 /**
  * Get link variant classes based on theme colors
+ *
+ * Notes:
+ * - `scheme.focus` is not included because `linkBaseClasses` already provides
+ *   `focus-visible:ring-*` with proper CSS variable fallback.
+ * - `disabled:` pseudo-class is omitted because it has no effect on `<a>` elements;
+ *   disabled styling is applied directly when `options.disabled` is true.
  */
 export function getLinkVariantClasses(
   variant: keyof LinkThemeColors,
@@ -292,15 +298,8 @@ export function getLinkVariantClasses(
   options?: { disabled?: boolean }
 ): string {
   const scheme = (colors ?? defaultLinkThemeColors)[variant]
-  const classes = [
-    scheme.text,
-    scheme.textHover,
-    scheme.focus,
-    `disabled:${scheme.disabled}`,
-    options?.disabled ? scheme.disabled : undefined
-  ].filter(Boolean)
-
-  return classes.join(' ')
+  if (options?.disabled) return scheme.disabled
+  return `${scheme.text} ${scheme.textHover}`
 }
 
 /**

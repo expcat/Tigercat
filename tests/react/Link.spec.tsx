@@ -26,6 +26,46 @@ describe('Link (React)', () => {
     expect(link).toHaveAttribute('aria-label', 'Custom')
   })
 
+  it('applies variant color classes', () => {
+    const { container: c1 } = render(<Link variant="secondary">Sec</Link>)
+    expect(c1.querySelector('a')?.className).toContain('--tiger-secondary')
+
+    const { container: c2 } = render(<Link variant="default">Def</Link>)
+    expect(c2.querySelector('a')?.className).toContain('text-gray-700')
+  })
+
+  it('applies size classes', () => {
+    const { container: sm } = render(<Link size="sm">S</Link>)
+    expect(sm.querySelector('a')).toHaveClass('text-sm')
+
+    const { container: lg } = render(<Link size="lg">L</Link>)
+    expect(lg.querySelector('a')).toHaveClass('text-lg')
+  })
+
+  it('adds hover:underline when underline=true (default)', () => {
+    const { container } = render(<Link>U</Link>)
+    expect(container.querySelector('a')).toHaveClass('hover:underline')
+  })
+
+  it('omits hover:underline when underline=false', () => {
+    const { container } = render(<Link underline={false}>U</Link>)
+    expect(container.querySelector('a')).not.toHaveClass('hover:underline')
+  })
+
+  it('fires onClick when not disabled', async () => {
+    const user = userEvent.setup()
+    const onClick = vi.fn()
+
+    render(
+      <Link href="#" onClick={onClick}>
+        Go
+      </Link>
+    )
+
+    await user.click(screen.getByText('Go'))
+    expect(onClick).toHaveBeenCalledOnce()
+  })
+
   it('disables navigation and interactions when disabled', async () => {
     const user = userEvent.setup()
     const onClick = vi.fn()
@@ -54,6 +94,17 @@ describe('Link (React)', () => {
 
     const link = screen.getByRole('link', { name: 'External' })
     expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
+  it('preserves custom rel when provided', () => {
+    render(
+      <Link href="https://example.com" target="_blank" rel="nofollow">
+        Custom
+      </Link>
+    )
+
+    const link = screen.getByRole('link', { name: 'Custom' })
+    expect(link).toHaveAttribute('rel', 'nofollow')
   })
 
   it('has no accessibility violations', async () => {

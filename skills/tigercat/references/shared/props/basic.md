@@ -189,11 +189,15 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop     | Type                     | Default     | Vue | React | Description |
-| -------- | ------------------------ | ----------- | :-: | :---: | ----------- |
-| href     | `string`                 | -           |  ✓  |   ✓   | 链接地址    |
-| variant  | `'default' \| 'primary'` | `'default'` |  ✓  |   ✓   | 样式        |
-| disabled | `boolean`                | `false`     |  ✓  |   ✓   | 禁用        |
+| Prop      | Type                                         | Default     | Vue | React | Description                                               |
+| --------- | -------------------------------------------- | ----------- | :-: | :---: | --------------------------------------------------------- |
+| href      | `string`                                     | -           |  ✓  |   ✓   | 链接地址                                                  |
+| variant   | `'primary' \| 'secondary' \| 'default'`      | `'primary'` |  ✓  |   ✓   | 颜色变体                                                  |
+| size      | `'sm' \| 'md' \| 'lg'`                       | `'md'`      |  ✓  |   ✓   | 尺寸                                                      |
+| disabled  | `boolean`                                    | `false`     |  ✓  |   ✓   | 禁用（移除 href、tabindex=-1、aria-disabled）             |
+| underline | `boolean`                                    | `true`      |  ✓  |   ✓   | 悬停下划线                                                |
+| target    | `'_blank' \| '_self' \| '_parent' \| '_top'` | -           |  ✓  |   ✓   | 打开方式                                                  |
+| rel       | `string`                                     | -           |  ✓  |   ✓   | rel 属性（target="\_blank" 时自动补 noopener noreferrer） |
 
 ### Events
 

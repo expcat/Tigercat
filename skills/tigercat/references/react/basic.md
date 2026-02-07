@@ -125,8 +125,26 @@ import { Button } from '@expcat/tigercat-react'
 ## Link 链接
 
 ```tsx
-<Link href="https://example.com">External Link</Link>
-<Link href="/about" variant="primary">Primary</Link>
+{/* 变体 */}
+<Link href="/about">Primary（默认）</Link>
+<Link href="/about" variant="secondary">Secondary</Link>
+<Link href="/about" variant="default">Default</Link>
+
+{/* 尺寸 */}
+<Link href="#" size="sm">Small</Link>
+<Link href="#" size="lg">Large</Link>
+
+{/* 禁用 */}
+<Link href="/no" disabled>Disabled</Link>
+
+{/* 隐藏下划线 */}
+<Link href="#" underline={false}>No underline</Link>
+
+{/* 外部链接（自动 rel） */}
+<Link href="https://github.com" target="_blank">GitHub</Link>
+
+{/* 点击事件 */}
+<Link href="#" onClick={handleClick}>Click me</Link>
 ```
 
 ---

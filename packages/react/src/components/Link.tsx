@@ -76,6 +76,7 @@ export const Link: React.FC<LinkProps> = ({
 
   return (
     <a
+      {...props}
       className={linkClasses}
       href={disabled ? undefined : href}
       target={target}
@@ -83,8 +84,7 @@ export const Link: React.FC<LinkProps> = ({
       aria-disabled={disabled || undefined}
       tabIndex={disabled ? -1 : tabIndex}
       onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      {...props}>
+      onKeyDown={handleKeyDown}>
       {children}
     </a>
   )
