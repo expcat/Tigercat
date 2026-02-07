@@ -17,7 +17,6 @@ const SELECT_TRIGGER_BASE_CLASSES = [
   'justify-between',
   'gap-2',
   'px-3',
-  'py-2',
   'bg-[var(--tiger-select-trigger-bg,var(--tiger-surface,#ffffff))]',
   'border',
   'border-[var(--tiger-select-trigger-border,var(--tiger-border,#d1d5db))]',
@@ -156,6 +155,23 @@ export function isOptionGroup(
   return (
     !!option && typeof option === 'object' && 'options' in option && Array.isArray(option.options)
   )
+}
+
+/**
+ * Flatten options (including groups) into a flat array of SelectOption
+ * @param options - Array of options or option groups
+ * @returns Flat array of all SelectOption items
+ */
+export function flattenSelectOptions(options: SelectOptions): SelectOption[] {
+  const all: SelectOption[] = []
+  for (const item of options) {
+    if (isOptionGroup(item)) {
+      all.push(...item.options)
+    } else {
+      all.push(item)
+    }
+  }
+  return all
 }
 
 /**

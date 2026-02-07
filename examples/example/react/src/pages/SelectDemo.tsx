@@ -64,6 +64,11 @@ const multipleSnippet = `<Space direction="vertical" className="w-full max-w-md"
   <p className="text-sm text-gray-600">选中：{multipleValue.length ? multipleValue.join(', ') : '未选择'}</p>
 </Space>`
 
+const multipleSearchableSnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <Select value={multiSearchValue} onChange={(v) => setMultiSearchValue(v)} options={countries} multiple searchable placeholder="搜索并多选" />
+  <p className="text-sm text-gray-600">选中：{multiSearchValue.length ? multiSearchValue.join(', ') : '未选择'}</p>
+</Space>`
+
 const groupedSnippet = `<Space direction="vertical" className="w-full max-w-md">
   <Select value={groupedValue} onChange={(v) => setGroupedValue(v ?? '')} options={groupedOptions} />
   <p className="text-sm text-gray-600">选中的值：{groupedValue}</p>
@@ -91,6 +96,8 @@ const SelectDemo: React.FC = () => {
   const [lastSearchQuery, setLastSearchQuery] = useState('')
 
   const [multipleValue, setMultipleValue] = useState<(string | number)[]>(['option1', 'option3'])
+
+  const [multiSearchValue, setMultiSearchValue] = useState<(string | number)[]>([])
 
   const [groupedValue, setGroupedValue] = useState<string | number>('apple')
 
@@ -280,6 +287,26 @@ const SelectDemo: React.FC = () => {
           />
           <p className="text-sm text-gray-600">
             选中：{multipleValue.length ? multipleValue.join(', ') : '未选择'}
+          </p>
+        </Space>
+      </DemoBlock>
+
+      {/* 多选 + 可搜索 */}
+      <DemoBlock
+        title="多选 + 可搜索"
+        description="同时启用 multiple 和 searchable，支持搜索并多选。"
+        code={multipleSearchableSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <Select
+            value={multiSearchValue}
+            onChange={(v) => setMultiSearchValue(v)}
+            options={countries}
+            multiple
+            searchable
+            placeholder="搜索并多选"
+          />
+          <p className="text-sm text-gray-600">
+            选中：{multiSearchValue.length ? multiSearchValue.join(', ') : '未选择'}
           </p>
         </Space>
       </DemoBlock>

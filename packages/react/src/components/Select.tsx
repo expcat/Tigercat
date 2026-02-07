@@ -10,6 +10,7 @@ import {
   selectEmptyStateClasses,
   isOptionGroup,
   filterOptions,
+  flattenSelectOptions,
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
   closeSolidIcon20PathD,
@@ -20,18 +21,6 @@ import {
   type SelectValue,
   type SelectValues
 } from '@expcat/tigercat-core'
-
-const flattenSelectOptions = (options: SelectOptions): SelectOption[] => {
-  const all: SelectOption[] = []
-  for (const item of options) {
-    if (isOptionGroup(item)) {
-      all.push(...item.options)
-    } else {
-      all.push(item)
-    }
-  }
-  return all
-}
 
 type SelectDivProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
@@ -78,9 +67,25 @@ export const Select: React.FC<SelectProps> = (props) => {
     className
   } = props
 
-  const divProps = (({ value: _value, onChange: _onChange, multiple: _multiple, ...rest }) => rest)(
-    props
-  )
+  const SELECT_KEYS = new Set([
+    'options',
+    'size',
+    'disabled',
+    'placeholder',
+    'searchable',
+    'clearable',
+    'noOptionsText',
+    'noDataText',
+    'onSearch',
+    'className',
+    'value',
+    'onChange',
+    'multiple'
+  ])
+  const divProps: Record<string, unknown> = {}
+  for (const [k, v] of Object.entries(props)) {
+    if (!SELECT_KEYS.has(k)) divProps[k] = v
+  }
 
   const instanceId = useId()
   const listboxId = `tiger-select-listbox-${instanceId}`
@@ -104,31 +109,31 @@ export const Select: React.FC<SelectProps> = (props) => {
 
   const allOptions = useMemo(() => flattenSelectOptions(options), [options])
 
-  const displayText = (() => {
+  const displayText = useMemo(() => {
     if (isMultipleSelect(props)) {
       const value = props.value ?? []
-      if (value.length === 0) {
-        return placeholder
-      }
-      const selectedOptions = allOptions.filter((opt) => value.includes(opt.value))
-      return selectedOptions.map((opt) => opt.label).join(', ')
+      if (value.length === 0) return placeholder
+      return allOptions
+        .filter((opt) => value.includes(opt.value))
+        .map((opt) => opt.label)
+        .join(', ')
     }
 
     const value = props.value
-    if (value === undefined || value === null || value === '') {
-      return placeholder
-    }
-
+    if (value === undefined || value === null || value === '') return placeholder
     return allOptions.find((opt) => opt.value === value)?.label ?? placeholder
-  })()
+  }, [props.multiple, props.value, allOptions, placeholder])
 
-  const showClearButton =
-    clearable &&
-    !disabled &&
-    props.value !== undefined &&
-    props.value !== null &&
-    props.value !== '' &&
-    (!Array.isArray(props.value) || props.value.length > 0)
+  const showClearButton = useMemo(
+    () =>
+      clearable &&
+      !disabled &&
+      props.value !== undefined &&
+      props.value !== null &&
+      props.value !== '' &&
+      (!Array.isArray(props.value) || props.value.length > 0),
+    [clearable, disabled, props.value]
+  )
 
   const isSelected = (option: SelectOption): boolean => {
     if (isMultipleSelect(props)) {
@@ -518,7 +523,7 @@ export const Select: React.FC<SelectProps> = (props) => {
   const containerClasses = classNames(selectBaseClasses, className)
 
   return (
-    <div className={containerClasses} {...divProps}>
+    <div {...divProps} className={containerClasses}>
       <button
         ref={triggerRef}
         type="button"

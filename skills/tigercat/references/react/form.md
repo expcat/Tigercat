@@ -124,10 +124,22 @@ const [content, setContent] = useState('')
 
 ```tsx
 const options = [{ label: 'Option 1', value: '1' }, { label: 'Option 2', value: '2' }]
+const groupedOptions = [
+  {
+    label: 'Group A',
+    options: [
+      { label: 'A-1', value: 'a1' },
+      { label: 'A-2', value: 'a2' }
+    ]
+  }
+]
 
 <Select value={value} onChange={setValue} options={options} />
 <Select value={multiValue} onChange={setMultiValue} options={options} multiple />
-<Select value={value} onChange={setValue} options={options} clearable filterable />
+<Select value={value} onChange={setValue} options={options} clearable searchable />
+<Select value={value} onChange={setValue} options={groupedOptions} />
+<Select value={value} onChange={setValue} options={options} size="sm" />
+<Select value={value} onChange={setValue} options={[]} noDataText="暂无数据" />
 ```
 
 ---

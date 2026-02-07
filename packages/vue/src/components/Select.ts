@@ -10,6 +10,7 @@ import {
   selectEmptyStateClasses,
   isOptionGroup,
   filterOptions,
+  flattenSelectOptions,
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
   closeSolidIcon20PathD,
@@ -168,20 +169,8 @@ export const Select = defineComponent({
       return filterOptions(props.options, searchQuery.value)
     })
 
-    function flattenOptions(options: SelectOptions): SelectOption[] {
-      const allOptions: SelectOption[] = []
-      options.forEach((item) => {
-        if (isOptionGroup(item)) {
-          allOptions.push(...item.options)
-        } else {
-          allOptions.push(item)
-        }
-      })
-      return allOptions
-    }
-
-    const allOptions = computed(() => flattenOptions(props.options))
-    const flatFilteredOptions = computed(() => flattenOptions(filteredOptions.value))
+    const allOptions = computed(() => flattenSelectOptions(props.options))
+    const flatFilteredOptions = computed(() => flattenSelectOptions(filteredOptions.value))
 
     const displayText = computed(() => {
       if (props.multiple && Array.isArray(props.modelValue)) {
@@ -613,83 +602,50 @@ export const Select = defineComponent({
                 ? (() => {
                     let optionIndex = -1
 
+                    const renderOptionItem = (option: SelectOption, idx: number) => {
+                      const selected = isSelected(option)
+                      const active = idx === activeIndex.value
+
+                      return h(
+                        'div',
+                        {
+                          key: option.value,
+                          id: getOptionId(idx),
+                          'data-option-index': idx,
+                          role: 'option',
+                          'aria-selected': selected,
+                          'aria-disabled': option.disabled ? true : undefined,
+                          tabindex: active ? 0 : -1,
+                          class: getSelectOptionClasses(selected, !!option.disabled, props.size),
+                          onMouseenter: () => {
+                            if (!option.disabled) {
+                              activeIndex.value = idx
+                            }
+                          },
+                          onClick: () => selectOption(option)
+                        },
+                        [
+                          h('span', { class: 'flex items-center justify-between w-full' }, [
+                            h('span', option.label),
+                            selected && h('span', CheckIcon)
+                          ])
+                        ]
+                      )
+                    }
+
                     return filteredOptions.value.map((item) => {
                       if (isOptionGroup(item)) {
                         return h('div', { key: item.label }, [
                           h('div', { class: selectGroupLabelClasses }, item.label),
                           item.options.map((option) => {
                             optionIndex += 1
-                            const selected = isSelected(option)
-                            const active = optionIndex === activeIndex.value
-
-                            return h(
-                              'div',
-                              {
-                                key: option.value,
-                                id: getOptionId(optionIndex),
-                                'data-option-index': optionIndex,
-                                role: 'option',
-                                'aria-selected': selected,
-                                'aria-disabled': option.disabled ? true : undefined,
-                                tabindex: active ? 0 : -1,
-                                class: getSelectOptionClasses(
-                                  selected,
-                                  !!option.disabled,
-                                  props.size
-                                ),
-                                onMouseenter: () => {
-                                  if (!option.disabled) {
-                                    activeIndex.value = optionIndex
-                                  }
-                                },
-                                onClick: () => selectOption(option)
-                              },
-                              [
-                                h(
-                                  'span',
-                                  {
-                                    class: 'flex items-center justify-between w-full'
-                                  },
-                                  [h('span', option.label), selected && h('span', CheckIcon)]
-                                )
-                              ]
-                            )
+                            return renderOptionItem(option, optionIndex)
                           })
                         ])
                       }
 
                       optionIndex += 1
-                      const selected = isSelected(item)
-                      const active = optionIndex === activeIndex.value
-
-                      return h(
-                        'div',
-                        {
-                          key: item.value,
-                          id: getOptionId(optionIndex),
-                          'data-option-index': optionIndex,
-                          role: 'option',
-                          'aria-selected': selected,
-                          'aria-disabled': item.disabled ? true : undefined,
-                          tabindex: active ? 0 : -1,
-                          class: getSelectOptionClasses(selected, !!item.disabled, props.size),
-                          onMouseenter: () => {
-                            if (!item.disabled) {
-                              activeIndex.value = optionIndex
-                            }
-                          },
-                          onClick: () => selectOption(item)
-                        },
-                        [
-                          h(
-                            'span',
-                            {
-                              class: 'flex items-center justify-between w-full'
-                            },
-                            [h('span', item.label), selected && h('span', CheckIcon)]
-                          )
-                        ]
-                      )
+                      return renderOptionItem(item, optionIndex)
                     })
                   })()
                 : h(

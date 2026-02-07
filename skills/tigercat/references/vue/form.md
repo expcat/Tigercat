@@ -137,12 +137,24 @@ const options = [
   { label: 'Option 1', value: '1' },
   { label: 'Option 2', value: '2' }
 ]
+const groupedOptions = [
+  {
+    label: 'Group A',
+    options: [
+      { label: 'A-1', value: 'a1' },
+      { label: 'A-2', value: 'a2' }
+    ]
+  }
+]
 </script>
 
 <template>
   <Select v-model="value" :options="options" />
   <Select v-model="multiValue" :options="options" multiple />
-  <Select v-model="value" :options="options" clearable filterable />
+  <Select v-model="value" :options="options" clearable searchable />
+  <Select v-model="value" :options="groupedOptions" />
+  <Select v-model="value" :options="options" size="sm" />
+  <Select v-model="value" :options="[]" no-data-text="暂无数据" />
 </template>
 ```
 

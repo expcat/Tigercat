@@ -144,23 +144,30 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop        | Type                                                  | Default | Vue | React | Description |
-| ----------- | ----------------------------------------------------- | ------- | :-: | :---: | ----------- |
-| modelValue  | `any`                                                 | -       |  ✓  |   -   | 绑定值      |
-| value       | `any`                                                 | -       |  -  |   ✓   | 绑定值      |
-| options     | `{ label: string, value: any, disabled?: boolean }[]` | `[]`    |  ✓  |   ✓   | 选项        |
-| multiple    | `boolean`                                             | `false` |  ✓  |   ✓   | 多选        |
-| clearable   | `boolean`                                             | `false` |  ✓  |   ✓   | 可清除      |
-| filterable  | `boolean`                                             | `false` |  ✓  |   ✓   | 可搜索      |
-| placeholder | `string`                                              | -       |  ✓  |   ✓   | 占位符      |
-| disabled    | `boolean`                                             | `false` |  ✓  |   ✓   | 禁用        |
+| Prop          | Type                                       | Default                  | Vue | React | Description          |
+| ------------- | ------------------------------------------ | ------------------------ | :-: | :---: | -------------------- |
+| modelValue    | `SelectValue \| SelectValues \| undefined` | -                        |  ✓  |   -   | 绑定值 (v-model)     |
+| value         | `SelectValue \| SelectValues`              | -                        |  -  |   ✓   | 绑定值               |
+| options       | `(SelectOption \| SelectOptionGroup)[]`    | `[]`                     |  ✓  |   ✓   | 选项（支持分组）     |
+| size          | `'sm' \| 'md' \| 'lg'`                     | `'md'`                   |  ✓  |   ✓   | 尺寸                 |
+| multiple      | `boolean`                                  | `false`                  |  ✓  |   ✓   | 多选                 |
+| clearable     | `boolean`                                  | `true`                   |  ✓  |   ✓   | 可清除               |
+| searchable    | `boolean`                                  | `false`                  |  ✓  |   ✓   | 可搜索               |
+| placeholder   | `string`                                   | `'Select an option'`     |  ✓  |   ✓   | 占位符               |
+| disabled      | `boolean`                                  | `false`                  |  ✓  |   ✓   | 禁用                 |
+| noOptionsText | `string`                                   | `'No options found'`     |  ✓  |   ✓   | 搜索无结果时提示文案 |
+| noDataText    | `string`                                   | `'No options available'` |  ✓  |   ✓   | 选项为空时提示文案   |
+
+> `SelectOption = { label: string, value: string | number, disabled?: boolean }`
+> `SelectOptionGroup = { label: string, options: SelectOption[] }`
 
 ### Events
 
-| Vue Event            | React Callback | Payload | Description |
-| -------------------- | -------------- | ------- | ----------- |
-| `@update:modelValue` | `onChange`     | `any`   | 值变更      |
-| `@change`            | `onChange`     | `any`   | 值变更      |
+| Vue Event            | React Callback | Payload                       | Description |
+| -------------------- | -------------- | ----------------------------- | ----------- |
+| `@update:modelValue` | `onChange`     | `SelectValue \| SelectValues` | 值变更      |
+| `@change`            | -              | `SelectValue \| SelectValues` | 值变更      |
+| `@search`            | `onSearch`     | `string`                      | 搜索关键字  |
 
 ---
 
