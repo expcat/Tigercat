@@ -183,21 +183,14 @@ export const Form = defineComponent({
     }
 
     const validate = async (): Promise<boolean> => {
+      errors.splice(0, errors.length)
       const effectiveRules = getEffectiveRules()
       if (!effectiveRules) {
         return true
       }
 
       const result = await validateForm(props.model, effectiveRules)
-
-      // Clear all errors
-      errors.splice(0, errors.length)
-
-      // Add new errors
-      if (result.errors.length > 0) {
-        errors.push(...result.errors)
-      }
-
+      errors.push(...result.errors)
       return result.valid
     }
 
@@ -223,26 +216,8 @@ export const Form = defineComponent({
 
     const handleSubmit = async (event: Event): Promise<void> => {
       event.preventDefault()
-
-      const effectiveRules = getEffectiveRules()
-      if (!effectiveRules) {
-        errors.splice(0, errors.length)
-        emit('submit', { valid: true, values: props.model, errors })
-        return
-      }
-
-      const result = await validateForm(props.model, effectiveRules)
-
-      errors.splice(0, errors.length)
-      if (result.errors.length > 0) {
-        errors.push(...result.errors)
-      }
-
-      emit('submit', {
-        valid: result.valid,
-        values: props.model,
-        errors
-      })
+      const valid = await validate()
+      emit('submit', { valid, values: props.model, errors })
     }
 
     // Provide form context to child FormItems

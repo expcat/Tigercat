@@ -123,11 +123,15 @@ export const Form = forwardRef<FormHandle, FormProps>(
     const [errors, setErrors] = useState<FormError[]>([])
     const [formValues, setFormValues] = useState<FormValues>(model)
     const fieldRulesRef = React.useRef<FormRules>({})
+    const formValuesRef = React.useRef<FormValues>(model)
 
     // Update form values when model changes
     React.useEffect(() => {
       setFormValues(model)
     }, [model])
+
+    // Keep ref always in sync with the latest model for imperative methods
+    formValuesRef.current = model
 
     const registerFieldRules = useCallback(
       (fieldName: string, nextRules?: FormRule | FormRule[]) => {
@@ -164,8 +168,9 @@ export const Form = forwardRef<FormHandle, FormProps>(
           return
         }
 
-        const value = getValueByPath(formValues, fieldName)
-        const error = await validateFieldUtil(fieldName, value, fieldRules, formValues, trigger)
+        const currentValues = formValuesRef.current
+        const value = getValueByPath(currentValues, fieldName)
+        const error = await validateFieldUtil(fieldName, value, fieldRules, currentValues, trigger)
 
         setErrors((prevErrors) => {
           // Remove existing errors for this field
@@ -181,21 +186,27 @@ export const Form = forwardRef<FormHandle, FormProps>(
 
         onValidate?.(fieldName, !error, error)
       },
-      [rules, formValues, onValidate]
+      [rules, onValidate]
     )
 
-    const validate = useCallback(async (): Promise<boolean> => {
+    const runValidation = useCallback(async (): Promise<{
+      valid: boolean
+      errors: FormError[]
+    }> => {
       const effectiveRules = getEffectiveRules()
-
       if (!effectiveRules) {
         setErrors([])
-        return true
+        return { valid: true, errors: [] }
       }
-
-      const result = await validateForm(formValues, effectiveRules)
+      const result = await validateForm(formValuesRef.current, effectiveRules)
       setErrors(result.errors)
+      return result
+    }, [getEffectiveRules])
+
+    const validate = useCallback(async (): Promise<boolean> => {
+      const result = await runValidation()
       return result.valid
-    }, [getEffectiveRules, formValues])
+    }, [runValidation])
 
     const clearValidate = useCallback((fieldNames?: string | string[]): void => {
       if (!fieldNames) {
@@ -265,24 +276,10 @@ export const Form = forwardRef<FormHandle, FormProps>(
     const handleSubmit = useCallback(
       async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault()
-
-        const effectiveRules = getEffectiveRules()
-        if (!effectiveRules) {
-          setErrors([])
-          onSubmit?.({ valid: true, values: formValues, errors: [] })
-          return
-        }
-
-        const result = await validateForm(formValues, effectiveRules)
-        setErrors(result.errors)
-
-        onSubmit?.({
-          valid: result.valid,
-          values: formValues,
-          errors: result.errors
-        })
+        const result = await runValidation()
+        onSubmit?.({ ...result, values: formValuesRef.current })
       },
-      [getEffectiveRules, formValues, onSubmit]
+      [runValidation, onSubmit]
     )
 
     // Expose methods via ref

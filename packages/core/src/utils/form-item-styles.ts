@@ -25,6 +25,12 @@ const ERROR_TEXT_SIZE: Record<FormSize, string> = {
   lg: 'text-sm'
 }
 
+const ERROR_MIN_HEIGHT: Record<FormSize, string> = {
+  sm: 'min-h-[1rem]',
+  md: 'min-h-[1.25rem]',
+  lg: 'min-h-[1.5rem]'
+}
+
 export interface FormItemClassOptions {
   size?: FormSize
   labelPosition?: FormLabelPosition
@@ -97,7 +103,11 @@ export function getFormItemErrorClasses(size: FormSize = 'md'): string {
     'tiger-form-item__error',
     'mt-1',
     ERROR_TEXT_SIZE[size],
-    'text-[var(--tiger-error,#ef4444)]'
+    ERROR_MIN_HEIGHT[size],
+    'text-[var(--tiger-error,#ef4444)]',
+    'transition-opacity',
+    'duration-150',
+    'opacity-0'
   )
 }
 

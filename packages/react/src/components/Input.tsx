@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import {
   classNames,
   getInputClasses,
@@ -109,20 +109,24 @@ export const Input: React.FC<InputProps> = ({
   ...props
 }) => {
   injectShakeStyle()
-  const [isShaking, setIsShaking] = useState(false)
 
   const inputRef = useRef<HTMLInputElement>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
   const [internalValue, setInternalValue] = useState<string | number>(defaultValue ?? '')
 
+  // Trigger shake animation via direct DOM manipulation for reliable re-trigger
   useEffect(() => {
-    if (status === 'error') {
-      setIsShaking(true)
+    if (status === 'error' && wrapperRef.current) {
+      const el = wrapperRef.current
+      el.classList.remove(SHAKE_CLASS)
+      void el.offsetWidth // force reflow to restart animation
+      el.classList.add(SHAKE_CLASS)
     }
   }, [status, _shakeTrigger])
 
-  const handleAnimationEnd = () => {
-    setIsShaking(false)
-  }
+  const handleAnimationEnd = useCallback(() => {
+    wrapperRef.current?.classList.remove(SHAKE_CLASS)
+  }, [])
 
   // Determine if the component is controlled - simple comparison, no need to memoize
   const isControlled = value !== undefined
@@ -168,7 +172,8 @@ export const Input: React.FC<InputProps> = ({
 
   return (
     <div
-      className={classNames(getInputWrapperClasses(), className, isShaking && SHAKE_CLASS)}
+      ref={wrapperRef}
+      className={classNames(getInputWrapperClasses(), className)}
       style={style}
       onAnimationEnd={handleAnimationEnd}>
       {hasPrefix && <div className={getInputAffixClasses('prefix', size)}>{prefix}</div>}

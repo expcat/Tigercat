@@ -27,6 +27,39 @@ export interface FormItemProps extends CoreFormItemProps {
   className?: string
 }
 
+type FieldLikeProps = {
+  id?: string
+  status?: string
+  errorMessage?: string
+  _shakeTrigger?: number
+  onBlur?: React.FocusEventHandler<unknown>
+  onChange?: React.ChangeEventHandler<unknown>
+  'aria-invalid'?: boolean | 'true' | 'false'
+  'aria-describedby'?: string
+  'aria-required'?: boolean | 'true' | 'false'
+}
+
+function hasRequiredRule(maybeRules: FormRule | FormRule[] | undefined): boolean {
+  if (!maybeRules) return false
+  const ruleArr = Array.isArray(maybeRules) ? maybeRules : [maybeRules]
+  return ruleArr.some((rule) => !!rule && typeof rule === 'object' && !!rule.required)
+}
+
+function mergeAriaDescribedBy(
+  existing: string | undefined,
+  next: string | undefined
+): string | undefined {
+  if (!existing) return next
+  if (!next) return existing
+  const parts = new Set(
+    `${existing} ${next}`
+      .split(' ')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  )
+  return Array.from(parts).join(' ')
+}
+
 export const FormItem: React.FC<FormItemProps> = ({
   name,
   label,
@@ -44,29 +77,10 @@ export const FormItem: React.FC<FormItemProps> = ({
   const [shakeTrigger, setShakeTrigger] = useState(0)
 
   const reactId = useId()
-  const baseId = useMemo(() => `tiger-form-item-${reactId}`, [reactId])
+  const baseId = `tiger-form-item-${reactId}`
   const labelId = `${baseId}-label`
   const fieldId = `${baseId}-field`
   const errorId = `${baseId}-error`
-
-  const mergeAriaDescribedBy = useCallback(
-    (existing: string | undefined, next: string | undefined): string | undefined => {
-      if (!existing) {
-        return next
-      }
-      if (!next) {
-        return existing
-      }
-      const parts = new Set(
-        `${existing} ${next}`
-          .split(' ')
-          .map((s) => s.trim())
-          .filter(Boolean)
-      )
-      return Array.from(parts).join(' ')
-    },
-    []
-  )
 
   // Simple logical operations - no need to memoize
   const actualSize: FormSize = size || formContext?.size || 'md'
@@ -80,21 +94,6 @@ export const FormItem: React.FC<FormItemProps> = ({
     }
     return width
   }, [labelWidth, formContext?.labelWidth])
-
-  const hasRequiredRule = useCallback((maybeRules: FormRule | FormRule[] | undefined): boolean => {
-    if (!maybeRules) {
-      return false
-    }
-
-    const rules = Array.isArray(maybeRules) ? maybeRules : [maybeRules]
-
-    return rules.some((rule) => {
-      if (!rule || typeof rule !== 'object') {
-        return false
-      }
-      return !!rule.required
-    })
-  }, [])
 
   const showRequiredAsterisk = useMemo(() => {
     if (required !== undefined) {
@@ -115,7 +114,7 @@ export const FormItem: React.FC<FormItemProps> = ({
     }
 
     return false
-  }, [required, rules, name, formContext?.rules, hasRequiredRule])
+  }, [required, rules, name, formContext?.rules])
 
   const isRequired = useMemo(
     () => showRequiredAsterisk && (formContext?.showRequiredAsterisk ?? true),
@@ -173,18 +172,6 @@ export const FormItem: React.FC<FormItemProps> = ({
     [showMessage, hasError, errorId]
   )
 
-  type FieldLikeProps = {
-    id?: string
-    status?: string
-    errorMessage?: string
-    _shakeTrigger?: number
-    onBlur?: React.FocusEventHandler<unknown>
-    onChange?: React.ChangeEventHandler<unknown>
-    'aria-invalid'?: boolean | 'true' | 'false'
-    'aria-describedby'?: string
-    'aria-required'?: boolean | 'true' | 'false'
-  }
-
   const onlyChild = useMemo(() => {
     const count = React.Children.count(children)
     if (count !== 1) {
@@ -234,7 +221,6 @@ export const FormItem: React.FC<FormItemProps> = ({
     shakeTrigger,
     isRequired,
     isNativeElement,
-    mergeAriaDescribedBy,
     describedById,
     handleBlur,
     handleChange
@@ -273,8 +259,7 @@ export const FormItem: React.FC<FormItemProps> = ({
   }, [labelPosition, actualLabelWidth])
 
   const errorClasses = useMemo(
-    () =>
-      classNames(getFormItemErrorClasses(actualSize), hasError && 'tiger-form-item__error--show'),
+    () => classNames(getFormItemErrorClasses(actualSize), hasError && 'opacity-100'),
     [actualSize, hasError]
   )
 
@@ -313,9 +298,13 @@ export const FormItem: React.FC<FormItemProps> = ({
           onChange={isClonableChild ? undefined : handleChange}>
           {enhancedChild}
         </div>
-        {showMessage && hasError && (
-          <div id={errorId} role="alert" className={errorClasses}>
-            {errorMessage}
+        {showMessage && (
+          <div
+            id={hasError ? errorId : undefined}
+            role={hasError ? 'alert' : undefined}
+            className={errorClasses}
+            aria-hidden={hasError ? undefined : true}>
+            {hasError ? errorMessage : ''}
           </div>
         )}
       </div>

@@ -164,8 +164,8 @@ export const Input = defineComponent({
   setup(props, { emit, attrs, slots }) {
     injectShakeStyle()
     const inputRef = ref<HTMLInputElement | null>(null)
+    const wrapperRef = ref<HTMLDivElement | null>(null)
     const localValue = ref<string | number>(props.modelValue ?? '')
-    const isShaking = ref(false)
 
     // Sync localValue with modelValue prop
     watch(
@@ -178,15 +178,18 @@ export const Input = defineComponent({
       }
     )
 
-    // Trigger shake animation when status changes to error or shakeTrigger increments
+    // Trigger shake animation via direct DOM manipulation for reliable re-trigger
     watch([() => props.status, () => props._shakeTrigger] as const, ([newStatus]) => {
-      if (newStatus === 'error') {
-        isShaking.value = true
+      if (newStatus === 'error' && wrapperRef.value) {
+        const el = wrapperRef.value
+        el.classList.remove(SHAKE_CLASS)
+        void el.offsetWidth // force reflow to restart animation
+        el.classList.add(SHAKE_CLASS)
       }
     })
 
     const handleAnimationEnd = () => {
-      isShaking.value = false
+      wrapperRef.value?.classList.remove(SHAKE_CLASS)
     }
 
     const hasPrefix = computed(() => !!slots.prefix || !!props.prefix)
@@ -232,12 +235,8 @@ export const Input = defineComponent({
       return h(
         'div',
         {
-          class: classNames(
-            getInputWrapperClasses(),
-            props.className,
-            coerceClassValue(attrClass),
-            isShaking.value && SHAKE_CLASS
-          ),
+          ref: wrapperRef,
+          class: classNames(getInputWrapperClasses(), props.className, coerceClassValue(attrClass)),
           style: [attrStyle, props.style],
           onAnimationend: handleAnimationEnd
         },

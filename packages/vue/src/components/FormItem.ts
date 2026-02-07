@@ -27,6 +27,21 @@ import {
 } from '@expcat/tigercat-core'
 import { FormContextKey, type FormContext } from './Form'
 
+function mergeAriaDescribedBy(
+  existing: string | undefined,
+  next: string | undefined
+): string | undefined {
+  if (!existing) return next
+  if (!next) return existing
+  const parts = new Set(
+    `${existing} ${next}`
+      .split(' ')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  )
+  return Array.from(parts).join(' ')
+}
+
 let formItemIdCounter = 0
 
 export const FormItem = defineComponent({
@@ -258,37 +273,14 @@ export const FormItem = defineComponent({
     const contentClasses = computed(() => getFormItemContentClasses(labelPosition.value))
 
     const errorClasses = computed(() => {
-      return classNames(
-        getFormItemErrorClasses(actualSize.value),
-        hasError.value && 'tiger-form-item__error--show'
-      )
+      return classNames(getFormItemErrorClasses(actualSize.value), hasError.value && 'opacity-100')
     })
 
-    const fieldClasses = computed(() => getFormItemFieldClasses())
-    const asteriskClasses = computed(() => getFormItemAsteriskClasses())
-    const asteriskStyle = computed(() => getFormItemAsteriskStyle())
+    const fieldClasses = getFormItemFieldClasses()
+    const asteriskClasses = getFormItemAsteriskClasses()
+    const asteriskStyle = getFormItemAsteriskStyle()
 
     return () => {
-      const mergeAriaDescribedBy = (
-        existing: string | undefined,
-        next: string | undefined
-      ): string | undefined => {
-        if (!existing) {
-          return next
-        }
-        if (!next) {
-          return existing
-        }
-
-        const parts = new Set(
-          `${existing} ${next}`
-            .split(' ')
-            .map((s) => s.trim())
-            .filter(Boolean)
-        )
-        return Array.from(parts).join(' ')
-      }
-
       const defaultSlot = slots.default?.() ?? []
       const only = defaultSlot.length === 1 ? defaultSlot[0] : undefined
       const isSingleVNode = only != null && isVNode(only)
@@ -369,8 +361,7 @@ export const FormItem = defineComponent({
               for: effectiveFieldId
             },
             [
-              isRequired.value &&
-                h('span', { class: asteriskClasses.value, style: asteriskStyle.value }, '*'),
+              isRequired.value && h('span', { class: asteriskClasses, style: asteriskStyle }, '*'),
               props.label
             ]
           )
@@ -385,7 +376,7 @@ export const FormItem = defineComponent({
           h(
             'div',
             {
-              class: fieldClasses.value,
+              class: fieldClasses,
               role: 'group',
               'aria-labelledby': props.label ? labelId : undefined,
               'aria-describedby': describedById.value,
@@ -398,15 +389,15 @@ export const FormItem = defineComponent({
             fieldChildren
           ),
           props.showMessage &&
-            hasError.value &&
             h(
               'div',
               {
-                id: errorId,
-                role: 'alert',
-                class: errorClasses.value
+                id: hasError.value ? errorId : undefined,
+                role: hasError.value ? 'alert' : undefined,
+                class: errorClasses.value,
+                'aria-hidden': hasError.value ? undefined : 'true'
               },
-              errorMessage.value
+              hasError.value ? errorMessage.value : ''
             )
         ]
       )
