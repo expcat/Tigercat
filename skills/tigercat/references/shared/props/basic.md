@@ -155,15 +155,17 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop     | Type                                                            | Default    | Vue | React | Description               |
-| -------- | --------------------------------------------------------------- | ---------- | :-: | :---: | ------------------------- |
-| size     | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`                          | `'md'`     |  ✓  |   ✓   | 字号                      |
-| weight   | `'normal' \| 'medium' \| 'semibold' \| 'bold'`                  | `'normal'` |  ✓  |   ✓   | 字重                      |
-| color    | `'primary' \| 'secondary' \| 'success' \| 'warning' \| 'error'` | -          |  ✓  |   ✓   | 颜色                      |
-| ellipsis | `boolean`                                                       | `false`    |  ✓  |   ✓   | 文本溢出省略              |
-| maxWidth | `number`                                                        | -          |  ✓  |   ✓   | 最大宽度（配合 ellipsis） |
-
-> **Vue 注意**: maxWidth 使用 kebab-case `max-width`
+| Prop        | Type                                                                                                        | Default     | Vue | React | Description      |
+| ----------- | ----------------------------------------------------------------------------------------------------------- | ----------- | :-: | :---: | ---------------- |
+| tag         | `'p'` \| `'span'` \| `'div'` \| `'h1'`–`'h6'` \| `'label'` \| `'strong'` \| `'em'` \| `'small'`             | `'p'`       |  ✓  |   ✓   | 渲染的 HTML 标签 |
+| size        | `'xs'` \| `'sm'` \| `'base'` \| `'lg'` \| `'xl'` \| `'2xl'`–`'6xl'`                                         | `'base'`    |  ✓  |   ✓   | 字号             |
+| weight      | `'thin'` \| `'light'` \| `'normal'` \| `'medium'` \| `'semibold'` \| `'bold'` \| `'extrabold'` \| `'black'` | `'normal'`  |  ✓  |   ✓   | 字重             |
+| align       | `'left'` \| `'center'` \| `'right'` \| `'justify'`                                                          | -           |  ✓  |   ✓   | 文本对齐         |
+| color       | `'default'` \| `'primary'` \| `'secondary'` \| `'success'` \| `'warning'` \| `'danger'` \| `'muted'`        | `'default'` |  ✓  |   ✓   | 颜色             |
+| truncate    | `boolean`                                                                                                   | `false`     |  ✓  |   ✓   | 文本溢出省略     |
+| italic      | `boolean`                                                                                                   | `false`     |  ✓  |   ✓   | 斜体             |
+| underline   | `boolean`                                                                                                   | `false`     |  ✓  |   ✓   | 下划线           |
+| lineThrough | `boolean`                                                                                                   | `false`     |  ✓  |   ✓   | 删除线           |
 
 ### Slots / Children
 

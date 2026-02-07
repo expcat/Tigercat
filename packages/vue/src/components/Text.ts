@@ -1,11 +1,7 @@
 import { defineComponent, computed, h, PropType } from 'vue'
 import {
-  classNames,
-  textSizeClasses,
-  textWeightClasses,
-  textAlignClasses,
-  textColorClasses,
-  textDecorationClasses,
+  getTextClasses,
+  type TextProps,
   type TextTag,
   type TextSize,
   type TextWeight,
@@ -13,17 +9,7 @@ import {
   type TextColor
 } from '@expcat/tigercat-core'
 
-export interface VueTextProps {
-  tag?: TextTag
-  size?: TextSize
-  weight?: TextWeight
-  align?: TextAlign
-  color?: TextColor
-  truncate?: boolean
-  italic?: boolean
-  underline?: boolean
-  lineThrough?: boolean
-}
+export type VueTextProps = TextProps
 
 export const Text = defineComponent({
   name: 'TigerText',
@@ -100,30 +86,10 @@ export const Text = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    const textClasses = computed(() => {
-      return classNames(
-        textSizeClasses[props.size],
-        textWeightClasses[props.weight],
-        props.align && textAlignClasses[props.align],
-        textColorClasses[props.color],
-        props.truncate && textDecorationClasses.truncate,
-        props.italic && textDecorationClasses.italic,
-        props.underline && textDecorationClasses.underline,
-        props.lineThrough && textDecorationClasses.lineThrough
-      )
-    })
+    const textClasses = computed(() => getTextClasses(props))
 
-    return () => {
-      return h(
-        props.tag,
-        {
-          ...attrs,
-          class: [textClasses.value, attrs.class],
-          style: attrs.style
-        },
-        slots.default?.()
-      )
-    }
+    return () =>
+      h(props.tag, { ...attrs, class: [textClasses.value, attrs.class] }, slots.default?.())
   }
 })
 

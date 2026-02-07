@@ -20,6 +20,7 @@ const colorSnippet = `<Space direction="vertical" className="w-full">
   <Text color="success">成功文本 Success</Text>
   <Text color="warning">警告文本 Warning</Text>
   <Text color="danger">危险文本 Danger</Text>
+  <Text color="muted">弱化文本 Muted</Text>
   <Text>默认文本 Default</Text>
 </Space>`
 
@@ -44,6 +45,9 @@ const alignSnippet = `<div className="grid grid-cols-1 gap-4">
   </div>
   <div className="p-4 bg-white rounded">
     <Text align="right">Right aligned text</Text>
+  </div>
+  <div className="p-4 bg-white rounded">
+    <Text align="justify">Justify aligned — 两端对齐模式下，较长的文本内容会均匀分布在行内，呈现整齐的段落效果。</Text>
   </div>
 </div>`
 
@@ -96,6 +100,7 @@ const TextDemo: React.FC = () => {
           <Text color="success">成功文本 Success</Text>
           <Text color="warning">警告文本 Warning</Text>
           <Text color="danger">危险文本 Danger</Text>
+          <Text color="muted">弱化文本 Muted</Text>
           <Text>默认文本 Default</Text>
         </Space>
       </DemoBlock>
@@ -129,6 +134,11 @@ const TextDemo: React.FC = () => {
           </div>
           <div className="p-4 bg-white rounded">
             <Text align="right">Right aligned text</Text>
+          </div>
+          <div className="p-4 bg-white rounded">
+            <Text align="justify">
+              Justify aligned — 两端对齐模式下，较长的文本内容会均匀分布在行内，呈现整齐的段落效果。
+            </Text>
           </div>
         </div>
       </DemoBlock>

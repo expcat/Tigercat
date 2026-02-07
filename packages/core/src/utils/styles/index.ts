@@ -87,6 +87,7 @@ export * from '../tooltip-utils'
 export * from '../link-utils'
 export * from '../icon-utils'
 export * from '../code-utils'
+export * from '../text-utils'
 
 // Other components
 export * from '../carousel-utils'

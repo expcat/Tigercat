@@ -116,8 +116,10 @@ import { Button } from '@expcat/tigercat-vue'
 ```vue
 <template>
   <Text>Default text</Text>
-  <Text size="lg" weight="bold">Large bold</Text>
-  <Text ellipsis :max-width="200">Very long text...</Text>
+  <Text tag="h2" size="2xl" weight="bold">Heading</Text>
+  <Text color="primary">Primary color</Text>
+  <Text truncate>Very long text that will be truncated...</Text>
+  <Text italic underline>Styled text</Text>
 </template>
 ```
 

@@ -61,6 +61,29 @@ describe('Text (Vue)', () => {
     expect(heading).toHaveClass('underline')
   })
 
+  it('applies text decoration props individually', () => {
+    const { container: c1 } = renderWithProps(
+      Text,
+      { truncate: true },
+      { slots: { default: 'Truncated' } }
+    )
+    expect(c1.querySelector('p')).toHaveClass('truncate')
+
+    const { container: c2 } = renderWithProps(
+      Text,
+      { italic: true },
+      { slots: { default: 'Italic' } }
+    )
+    expect(c2.querySelector('p')).toHaveClass('italic')
+
+    const { container: c3 } = renderWithProps(
+      Text,
+      { lineThrough: true },
+      { slots: { default: 'Deleted' } }
+    )
+    expect(c3.querySelector('p')).toHaveClass('line-through')
+  })
+
   it('has no obvious a11y violations', async () => {
     const { container } = renderWithProps(
       Text,
