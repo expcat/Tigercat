@@ -61,16 +61,37 @@ const value = ref('')
 </script>
 
 <template>
+  <!-- Basic -->
   <Input v-model="value" placeholder="Enter text" />
-  <Input v-model="value" clearable />
-  <Input v-model="value" type="password" />
-  <Input v-model="value" status="error" error-message="Invalid" />
 
-  <!-- Slots -->
+  <!-- Sizes -->
+  <Input v-model="value" size="sm" placeholder="Small" />
+  <Input v-model="value" size="lg" placeholder="Large" />
+
+  <!-- Types -->
+  <Input v-model="value" type="password" />
+  <Input type="number" placeholder="Number" />
+  <Input type="email" placeholder="Email" />
+  <Input type="tel" placeholder="Phone" />
+  <Input type="url" placeholder="URL" />
+
+  <!-- States -->
+  <Input v-model="value" disabled />
+  <Input v-model="value" readonly />
+
+  <!-- Validation -->
+  <Input v-model="value" status="error" error-message="Invalid" />
+  <Input v-model="value" status="success" />
+  <Input v-model="value" status="warning" />
+
+  <!-- Prefix/Suffix Slots -->
   <Input v-model="value">
     <template #prefix>🔍</template>
     <template #suffix>USD</template>
   </Input>
+
+  <!-- Prefix/Suffix Props -->
+  <Input v-model="value" prefix="$" suffix=".00" />
 </template>
 ```
 

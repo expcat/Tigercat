@@ -65,7 +65,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
     const textareaClasses = classNames(
       'block',
-      getInputClasses(size),
+      getInputClasses({ size }),
       autoResize ? 'resize-none' : 'resize-y',
       className
     )

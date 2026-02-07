@@ -20,7 +20,7 @@ const shakeError = ref('')
 const triggerShake = () => {
   shakeStatus.value = 'default'
   shakeError.value = ''
-  
+
   // 使用 nextTick 或 setTimeout 来确保状态变更被捕捉，从而由 default -> error 触发动画
   setTimeout(() => {
     shakeStatus.value = 'error'
@@ -28,8 +28,8 @@ const triggerShake = () => {
   }, 50)
 }
 const resetShake = () => {
-    shakeStatus.value = 'default'
-    shakeError.value = ''
+  shakeStatus.value = 'default'
+  shakeError.value = ''
 }
 
 const handleUncontrolledInput = (event: Event) => {
@@ -63,6 +63,15 @@ const typeSnippet = `<Space direction="vertical" class="w-full max-w-md">
   </FormItem>
   <FormItem label="邮箱输入">
     <Input type="email" placeholder="邮箱输入" />
+  </FormItem>
+  <FormItem label="电话输入">
+    <Input type="tel" placeholder="电话输入" />
+  </FormItem>
+  <FormItem label="网址输入">
+    <Input type="url" placeholder="网址输入" />
+  </FormItem>
+  <FormItem label="搜索">
+    <Input type="search" placeholder="搜索内容" />
   </FormItem>
 </Space>`
 
@@ -121,114 +130,85 @@ const shakeSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法"
-               description="基础的输入框组件。"
-               :code="basicSnippet">
-      <Space direction="vertical"
-             class="w-full max-w-md">
-        <Input v-model="basicText"
-               placeholder="请输入内容" />
+    <DemoBlock title="基础用法" description="基础的输入框组件。" :code="basicSnippet">
+      <Space direction="vertical" class="w-full max-w-md">
+        <Input v-model="basicText" placeholder="请输入内容" />
         <p class="text-sm text-gray-600">输入的内容：{{ basicText }}</p>
       </Space>
     </DemoBlock>
 
     <!-- 受控与非受控 -->
-    <DemoBlock title="受控与非受控"
-               description="受控模式绑定值（v-model）；非受控模式不绑定值，仅监听 input 事件。"
-               :code="controlledSnippet">
-      <Space direction="vertical"
-             class="w-full max-w-md">
+    <DemoBlock title="受控与非受控" description="受控模式绑定值（v-model）；非受控模式不绑定值，仅监听 input 事件。" :code="controlledSnippet">
+      <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="受控输入">
-          <Input v-model="controlledText"
-                 placeholder="受控输入" />
+          <Input v-model="controlledText" placeholder="受控输入" />
         </FormItem>
         <FormItem label="非受控输入">
-          <Input placeholder="非受控输入"
-                 @input="handleUncontrolledInput" />
+          <Input placeholder="非受控输入" @input="handleUncontrolledInput" />
           <p class="text-sm text-gray-600">输入的内容：{{ uncontrolled }}</p>
         </FormItem>
       </Space>
     </DemoBlock>
 
     <!-- 不同类型 -->
-    <DemoBlock title="不同类型"
-               description="Input 支持多种类型，如文本、密码、数字等。"
-               :code="typeSnippet">
-      <Space direction="vertical"
-             class="w-full max-w-md">
+    <DemoBlock title="不同类型" description="Input 支持多种类型，如文本、密码、数字等。" :code="typeSnippet">
+      <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="文本输入">
-          <Input v-model="typeText"
-                 type="text"
-                 placeholder="文本输入" />
+          <Input v-model="typeText" type="text" placeholder="文本输入" />
         </FormItem>
         <FormItem label="密码输入">
-          <Input v-model="password"
-                 type="password"
-                 placeholder="密码输入" />
+          <Input v-model="password" type="password" placeholder="密码输入" />
         </FormItem>
         <FormItem label="数字输入">
-          <Input type="number"
-                 placeholder="数字输入" />
+          <Input type="number" placeholder="数字输入" />
         </FormItem>
         <FormItem label="邮箱输入">
-          <Input type="email"
-                 placeholder="邮箱输入" />
+          <Input type="email" placeholder="邮箱输入" />
+        </FormItem>
+        <FormItem label="电话输入">
+          <Input type="tel" placeholder="电话输入" />
+        </FormItem>
+        <FormItem label="网址输入">
+          <Input type="url" placeholder="网址输入" />
+        </FormItem>
+        <FormItem label="搜索">
+          <Input type="search" placeholder="搜索内容" />
         </FormItem>
       </Space>
     </DemoBlock>
 
     <!-- 不同尺寸 -->
-    <DemoBlock title="不同尺寸"
-               description="输入框有三种尺寸：小、中、大。"
-               :code="sizeSnippet">
-      <Space direction="vertical"
-             class="w-full max-w-md">
-        <Input size="sm"
-               placeholder="小尺寸输入框" />
-        <Input size="md"
-               placeholder="中尺寸输入框" />
-        <Input size="lg"
-               placeholder="大尺寸输入框" />
+    <DemoBlock title="不同尺寸" description="输入框有三种尺寸：小、中、大。" :code="sizeSnippet">
+      <Space direction="vertical" class="w-full max-w-md">
+        <Input size="sm" placeholder="小尺寸输入框" />
+        <Input size="md" placeholder="中尺寸输入框" />
+        <Input size="lg" placeholder="大尺寸输入框" />
       </Space>
     </DemoBlock>
 
     <!-- 禁用和只读 -->
-    <DemoBlock title="禁用和只读"
-               description="输入框可以设置为禁用或只读状态。"
-               :code="disabledSnippet">
-      <Space direction="vertical"
-             class="w-full max-w-md">
-        <Input v-model="disabled"
-               disabled />
-        <Input v-model="readonly"
-               readonly />
+    <DemoBlock title="禁用和只读" description="输入框可以设置为禁用或只读状态。" :code="disabledSnippet">
+      <Space direction="vertical" class="w-full max-w-md">
+        <Input v-model="disabled" disabled />
+        <Input v-model="readonly" readonly />
       </Space>
     </DemoBlock>
 
     <!-- 必填与长度限制 -->
-    <DemoBlock title="必填与长度限制"
-               description="使用 required / minLength / maxLength 约束输入。"
-               :code="limitSnippet">
-      <Space direction="vertical"
-             class="w-full max-w-md">
+    <DemoBlock title="必填与长度限制" description="使用 required / minLength / maxLength 约束输入。" :code="limitSnippet">
+      <Space direction="vertical" class="w-full max-w-md">
         <FormItem label="必填输入">
-          <Input required
-                 placeholder="必填项" />
+          <Input required placeholder="必填项" />
         </FormItem>
         <FormItem label="长度限制（3~10）">
-          <Input v-model="limited"
-                 :minLength="3"
-                 :maxLength="10"
-                 placeholder="请输入 3~10 个字符" />
+          <Input v-model="limited" :minLength="3" :maxLength="10" placeholder="请输入 3~10 个字符" />
           <p class="text-sm text-gray-600">当前长度：{{ limited.length }}</p>
         </FormItem>
       </Space>
     </DemoBlock>
 
     <!-- 前缀与后缀 -->
-    <DemoBlock title="前缀与后缀"
-               description="可以在输入框前后添加图标或文本。"
-               :code="affixSnippet">
+    <DemoBlock title="前缀与后缀" description="可以在输入框前后添加图标或文本。" :code="affixSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Input placeholder="前缀图标">
           <template #prefix>👤</template>
@@ -241,9 +221,7 @@ const shakeSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 状态与错误提示 -->
-    <DemoBlock title="状态与错误提示"
-               description="支持 error、warning、success 状态，error 状态下可显示内部错误信息。"
-               :code="statusSnippet">
+    <DemoBlock title="状态与错误提示" description="支持 error、warning、success 状态，error 状态下可显示内部错误信息。" :code="statusSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Input status="error" placeholder="错误状态" />
         <Input status="warning" placeholder="警告状态" />
@@ -253,17 +231,11 @@ const shakeSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </DemoBlock>
 
     <!-- 错误抖动 -->
-    <DemoBlock title="错误抖动"
-               description="当状态变为 error 时会自动触发抖动动画。"
-               :code="shakeSnippet">
-      <Space direction="vertical"
-             class="w-full max-w-md">
-        <Input :status="shakeStatus"
-               :errorMessage="shakeError"
-               placeholder="点击按钮触发错误抖动" />
+    <DemoBlock title="错误抖动" description="当状态变为 error 时会自动触发抖动动画。" :code="shakeSnippet">
+      <Space direction="vertical" class="w-full max-w-md">
+        <Input :status="shakeStatus" :errorMessage="shakeError" placeholder="点击按钮触发错误抖动" />
         <Space>
-          <Button @click="triggerShake"
-                  variant="primary">触发错误</Button>
+          <Button @click="triggerShake" variant="primary">触发错误</Button>
           <Button @click="resetShake">重置</Button>
         </Space>
       </Space>

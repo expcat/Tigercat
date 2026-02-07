@@ -57,11 +57,35 @@ function MyForm() {
 ```tsx
 const [value, setValue] = useState('')
 
+{/* Basic */}
 <Input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Enter text" />
-<Input value={value} onChange={(e) => setValue(e.target.value)} clearable />
+
+{/* Uncontrolled */}
+<Input defaultValue="initial" />
+
+{/* Sizes */}
+<Input value={value} onChange={(e) => setValue(e.target.value)} size="sm" placeholder="Small" />
+<Input value={value} onChange={(e) => setValue(e.target.value)} size="lg" placeholder="Large" />
+
+{/* Types */}
 <Input type="password" value={value} onChange={(e) => setValue(e.target.value)} />
+<Input type="number" placeholder="Number" />
+<Input type="email" placeholder="Email" />
+<Input type="tel" placeholder="Phone" />
+<Input type="url" placeholder="URL" />
+
+{/* States */}
+<Input value={value} disabled />
+<Input value={value} readonly />
+
+{/* Validation */}
 <Input value={value} onChange={(e) => setValue(e.target.value)} status="error" errorMessage="Invalid" />
+<Input value={value} onChange={(e) => setValue(e.target.value)} status="success" />
+<Input value={value} onChange={(e) => setValue(e.target.value)} status="warning" />
+
+{/* Prefix/Suffix */}
 <Input value={value} onChange={(e) => setValue(e.target.value)} prefix="🔍" suffix="USD" />
+<Input value={value} onChange={(e) => setValue(e.target.value)} prefix={<Icon />} />
 ```
 
 ---

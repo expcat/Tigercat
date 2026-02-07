@@ -195,7 +195,7 @@ export const Textarea = defineComponent({
     const textareaClasses = computed(() =>
       classNames(
         'block',
-        getInputClasses(props.size),
+        getInputClasses({ size: props.size }),
         props.autoResize ? 'resize-none' : 'resize-y',
         props.className,
         coerceClassValue(attrs.class)

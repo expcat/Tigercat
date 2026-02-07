@@ -5,10 +5,10 @@ import {
   getInputWrapperClasses,
   getInputAffixClasses,
   getInputErrorClasses,
+  parseInputValue,
   injectShakeStyle,
   SHAKE_CLASS,
-  type InputProps as CoreInputProps,
-  type InputStatus
+  type InputProps as CoreInputProps
 } from '@expcat/tigercat-core'
 
 export interface InputProps
@@ -52,16 +52,6 @@ export interface InputProps
    * Additional CSS classes
    */
   className?: string
-
-  /**
-   * Validation status
-   */
-  status?: InputStatus
-
-  /**
-   * Error message to display
-   */
-  errorMessage?: string
 
   /**
    * Internal shake trigger counter (used by FormItem)
@@ -110,7 +100,6 @@ export const Input: React.FC<InputProps> = ({
 }) => {
   injectShakeStyle()
 
-  const inputRef = useRef<HTMLInputElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const [internalValue, setInternalValue] = useState<string | number>(defaultValue ?? '')
 
@@ -128,33 +117,20 @@ export const Input: React.FC<InputProps> = ({
     wrapperRef.current?.classList.remove(SHAKE_CLASS)
   }, [])
 
-  // Determine if the component is controlled - simple comparison, no need to memoize
+  // Determine if the component is controlled
   const isControlled = value !== undefined
   const inputValue = isControlled ? value : internalValue
 
-  useEffect(() => {
-    if (autoFocus && inputRef.current) {
-      inputRef.current.focus()
-    }
-  }, [autoFocus])
-
-  const getNextValue = (target: HTMLInputElement): string | number => {
-    if (type === 'number') {
-      return Number.isNaN(target.valueAsNumber) ? target.value : target.valueAsNumber
-    }
-    return target.value
-  }
-
   const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
     if (!isControlled) {
-      setInternalValue(getNextValue(event.currentTarget))
+      setInternalValue(parseInputValue(event.currentTarget, type))
     }
     onInput?.(event)
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!isControlled) {
-      setInternalValue(getNextValue(event.currentTarget))
+      setInternalValue(parseInputValue(event.currentTarget, type))
     }
     onChange?.(event)
   }
@@ -179,7 +155,6 @@ export const Input: React.FC<InputProps> = ({
       {hasPrefix && <div className={getInputAffixClasses('prefix', size)}>{prefix}</div>}
       <input
         {...props}
-        ref={inputRef}
         className={inputClasses}
         type={type}
         value={inputValue}

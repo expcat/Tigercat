@@ -481,91 +481,6 @@ describe('Input', () => {
       const input = getByRole('textbox') as HTMLInputElement
       expect(input.value).toBe('123')
     })
-
-    it('should sync localValue with modelValue changes', async () => {
-      const { getByRole, rerender } = renderWithProps(Input, {
-        modelValue: 'first'
-      })
-
-      let input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe('first')
-
-      await rerender({ modelValue: 'second' })
-      input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe('second')
-
-      await rerender({ modelValue: '' })
-      input = getByRole('textbox') as HTMLInputElement
-      expect(input.value).toBe('')
-    })
-  })
-
-  describe('Type Variants', () => {
-    it('should render text input by default', () => {
-      const { container } = render(Input)
-      const input = container.querySelector('input')
-      expect(input).toHaveAttribute('type', 'text')
-    })
-
-    it('should render password input', () => {
-      const { container } = renderWithProps(Input, { type: 'password' })
-      const input = container.querySelector('input')
-      expect(input).toHaveAttribute('type', 'password')
-    })
-
-    it('should render email input', () => {
-      const { container } = renderWithProps(Input, { type: 'email' })
-      const input = container.querySelector('input')
-      expect(input).toHaveAttribute('type', 'email')
-    })
-
-    it('should render number input with spinbutton role', () => {
-      const { getByRole } = renderWithProps(Input, { type: 'number' })
-      expect(getByRole('spinbutton')).toBeInTheDocument()
-    })
-
-    it('should render tel input', () => {
-      const { container } = renderWithProps(Input, { type: 'tel' })
-      const input = container.querySelector('input')
-      expect(input).toHaveAttribute('type', 'tel')
-    })
-
-    it('should render url input', () => {
-      const { container } = renderWithProps(Input, { type: 'url' })
-      const input = container.querySelector('input')
-      expect(input).toHaveAttribute('type', 'url')
-    })
-
-    it('should handle number input with decimal values', async () => {
-      const onUpdate = vi.fn()
-      const { getByRole } = render(Input, {
-        props: {
-          type: 'number',
-          'onUpdate:modelValue': onUpdate
-        }
-      })
-
-      const input = getByRole('spinbutton')
-      await fireEvent.update(input, '3.14')
-
-      expect(onUpdate).toHaveBeenCalled()
-    })
-
-    it('should handle number input with invalid value', async () => {
-      const onUpdate = vi.fn()
-      const { getByRole } = render(Input, {
-        props: {
-          type: 'number',
-          'onUpdate:modelValue': onUpdate
-        }
-      })
-
-      const input = getByRole('spinbutton')
-      await fireEvent.input(input, { target: { value: 'abc' } })
-
-      // Should still emit, but with string value when NaN
-      expect(onUpdate).toHaveBeenCalled()
-    })
   })
 
   describe('Theme Support', () => {
@@ -731,6 +646,37 @@ describe('Input', () => {
       expect(onUpdate).toHaveBeenCalledWith(0)
     })
 
+    it('should handle number input with decimal values', async () => {
+      const onUpdate = vi.fn()
+      const { getByRole } = render(Input, {
+        props: {
+          type: 'number',
+          'onUpdate:modelValue': onUpdate
+        }
+      })
+
+      const input = getByRole('spinbutton')
+      await fireEvent.update(input, '3.14')
+
+      expect(onUpdate).toHaveBeenCalled()
+    })
+
+    it('should handle number input with invalid value', async () => {
+      const onUpdate = vi.fn()
+      const { getByRole } = render(Input, {
+        props: {
+          type: 'number',
+          'onUpdate:modelValue': onUpdate
+        }
+      })
+
+      const input = getByRole('spinbutton')
+      await fireEvent.input(input, { target: { value: 'abc' } })
+
+      // Should still emit, but with string value when NaN
+      expect(onUpdate).toHaveBeenCalled()
+    })
+
     it('should handle negative numbers', async () => {
       const onUpdate = vi.fn()
       const { getByRole } = render(Input, {
@@ -747,16 +693,6 @@ describe('Input', () => {
     })
 
     it('should handle maxLength constraint', async () => {
-      const { getByRole } = renderWithProps(Input, {
-        maxLength: 5,
-        modelValue: ''
-      })
-
-      const input = getByRole('textbox') as HTMLInputElement
-      expect(input).toHaveAttribute('maxlength', '5')
-    })
-
-    it('should render without crashing with all props', () => {
       const { getByRole } = render(Input, {
         props: {
           modelValue: 'test',

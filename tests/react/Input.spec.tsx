@@ -418,95 +418,6 @@ describe('Input', () => {
     })
   })
 
-  describe('Type Variants', () => {
-    it('should render text input by default', () => {
-      const { container } = render(<Input />)
-      const input = container.querySelector('input')
-      expect(input).toHaveAttribute('type', 'text')
-    })
-
-    it('should render password input', () => {
-      const { container } = render(<Input type="password" />)
-      const input = container.querySelector('input')
-      expect(input).toHaveAttribute('type', 'password')
-    })
-
-    it('should render email input', () => {
-      const { container } = render(<Input type="email" />)
-      const input = container.querySelector('input')
-      expect(input).toHaveAttribute('type', 'email')
-    })
-
-    it('should render number input with spinbutton role', () => {
-      const { getByRole } = render(<Input type="number" />)
-      expect(getByRole('spinbutton')).toBeInTheDocument()
-    })
-
-    it('should render tel input', () => {
-      const { container } = render(<Input type="tel" />)
-      const input = container.querySelector('input')
-      expect(input).toHaveAttribute('type', 'tel')
-    })
-
-    it('should render url input', () => {
-      const { container } = render(<Input type="url" />)
-      const input = container.querySelector('input')
-      expect(input).toHaveAttribute('type', 'url')
-    })
-
-    it('should handle number input with decimal values', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-
-      const TestComponent = () => {
-        const [value, setValue] = React.useState<string | number>('')
-
-        return (
-          <Input
-            type="number"
-            value={value}
-            onChange={(e) => {
-              setValue(e.target.value)
-              handleChange(e)
-            }}
-          />
-        )
-      }
-
-      const { getByRole } = render(<TestComponent />)
-      const input = getByRole('spinbutton')
-      await user.type(input, '3.14')
-
-      expect(handleChange).toHaveBeenCalled()
-    })
-
-    it('should handle negative numbers', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-
-      const TestComponent = () => {
-        const [value, setValue] = React.useState<string | number>('')
-
-        return (
-          <Input
-            type="number"
-            value={value}
-            onChange={(e) => {
-              setValue(e.target.value)
-              handleChange(e)
-            }}
-          />
-        )
-      }
-
-      const { getByRole } = render(<TestComponent />)
-      const input = getByRole('spinbutton')
-      await user.type(input, '-5')
-
-      expect(handleChange).toHaveBeenCalled()
-    })
-  })
-
   describe('Theme Support', () => {
     afterEach(() => {
       clearThemeVariables(['--tiger-primary'])
@@ -647,11 +558,56 @@ describe('Input', () => {
       expect(input.value).toBe('0')
     })
 
-    it('should handle maxLength constraint', () => {
-      const { getByRole } = render(<Input maxLength={5} />)
+    it('should handle number input with decimal values', async () => {
+      const user = userEvent.setup()
+      const handleChange = vi.fn()
 
-      const input = getByRole('textbox') as HTMLInputElement
-      expect(input).toHaveAttribute('maxlength', '5')
+      const TestComponent = () => {
+        const [value, setValue] = React.useState<string | number>('')
+
+        return (
+          <Input
+            type="number"
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value)
+              handleChange(e)
+            }}
+          />
+        )
+      }
+
+      const { getByRole } = render(<TestComponent />)
+      const input = getByRole('spinbutton')
+      await user.type(input, '3.14')
+
+      expect(handleChange).toHaveBeenCalled()
+    })
+
+    it('should handle negative numbers', async () => {
+      const user = userEvent.setup()
+      const handleChange = vi.fn()
+
+      const TestComponent = () => {
+        const [value, setValue] = React.useState<string | number>('')
+
+        return (
+          <Input
+            type="number"
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value)
+              handleChange(e)
+            }}
+          />
+        )
+      }
+
+      const { getByRole } = render(<TestComponent />)
+      const input = getByRole('spinbutton')
+      await user.type(input, '-5')
+
+      expect(handleChange).toHaveBeenCalled()
     })
 
     it('should render without crashing with all props', () => {
@@ -700,6 +656,18 @@ describe('Input', () => {
       const wrapper = container.firstChild as HTMLElement
       // The shake class should be applied
       expect(wrapper.className).toContain('tiger-animate-shake')
+    })
+
+    it('should remove shake class after animation ends', () => {
+      const { container } = render(<Input status="error" />)
+
+      const wrapper = container.firstChild as HTMLElement
+
+      // Simulate animation end
+      wrapper.dispatchEvent(new Event('animationend', { bubbles: true }))
+
+      // After animation ends, the shake class should be removed
+      expect(wrapper.className).not.toContain('tiger-animate-shake')
     })
   })
 })

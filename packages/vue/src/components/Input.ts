@@ -6,6 +6,7 @@ import {
   getInputWrapperClasses,
   getInputAffixClasses,
   getInputErrorClasses,
+  parseInputValue,
   injectShakeStyle,
   SHAKE_CLASS,
   type InputSize,
@@ -17,6 +18,10 @@ export interface VueInputProps {
   modelValue?: string | number
   size?: InputSize
   type?: InputType
+  status?: InputStatus
+  errorMessage?: string
+  prefix?: string
+  suffix?: string
   placeholder?: string
   disabled?: boolean
   readonly?: boolean
@@ -47,7 +52,7 @@ export const Input = defineComponent({
      */
     size: {
       type: String as PropType<InputSize>,
-      default: 'md' as InputSize
+      default: 'md'
     },
     /**
      * Input type
@@ -55,7 +60,7 @@ export const Input = defineComponent({
      */
     type: {
       type: String as PropType<InputType>,
-      default: 'text' as InputType
+      default: 'text'
     },
     /**
      * Input status
@@ -96,36 +101,16 @@ export const Input = defineComponent({
      * Whether the input is required
      */
     required: Boolean,
-    /**
-     * Maximum length
-     */
-    maxLength: {
-      type: Number
-    },
-    /**
-     * Minimum length
-     */
-    minLength: {
-      type: Number
-    },
-    /**
-     * Input name attribute
-     */
-    name: {
-      type: String
-    },
-    /**
-     * Input id attribute
-     */
-    id: {
-      type: String
-    },
-    /**
-     * Autocomplete attribute
-     */
-    autoComplete: {
-      type: String
-    },
+    /** Maximum length */
+    maxLength: Number,
+    /** Minimum length */
+    minLength: Number,
+    /** Input name attribute */
+    name: String,
+    /** Input id attribute */
+    id: String,
+    /** Autocomplete attribute */
+    autoComplete: String,
     /**
      * Whether to autofocus on mount
      */
@@ -140,12 +125,8 @@ export const Input = defineComponent({
       default: undefined
     },
 
-    /**
-     * Additional CSS classes
-     */
-    className: {
-      type: String
-    },
+    /** Additional CSS classes */
+    className: String,
 
     /**
      * Inline styles
@@ -205,21 +186,9 @@ export const Input = defineComponent({
       })
     )
 
-    /**
-     * Helper to extract the correct value from input target
-     * For number inputs, returns the numeric value if valid, otherwise the string value
-     */
-    const getInputValue = (target: HTMLInputElement): string | number => {
-      return props.type === 'number'
-        ? Number.isNaN(target.valueAsNumber)
-          ? target.value
-          : target.valueAsNumber
-        : target.value
-    }
-
     const handleInput = (event: Event) => {
       const target = event.target as HTMLInputElement
-      const value = getInputValue(target)
+      const value = parseInputValue(target, props.type)
       localValue.value = value
       emit('update:modelValue', value)
       emit('input', event)

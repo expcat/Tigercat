@@ -31,6 +31,15 @@ const typeSnippet = `<Space direction="vertical" className="w-full max-w-md">
   <FormItem label="邮箱输入">
     <Input type="email" placeholder="邮箱输入" />
   </FormItem>
+  <FormItem label="电话输入">
+    <Input type="tel" placeholder="电话输入" />
+  </FormItem>
+  <FormItem label="网址输入">
+    <Input type="url" placeholder="网址输入" />
+  </FormItem>
+  <FormItem label="搜索">
+    <Input type="search" placeholder="搜索内容" />
+  </FormItem>
 </Space>`
 
 const sizeSnippet = `<Space direction="vertical" className="w-full max-w-md">
@@ -172,6 +181,15 @@ const InputDemo: React.FC = () => {
           </FormItem>
           <FormItem label="邮箱输入">
             <Input type="email" placeholder="邮箱输入" />
+          </FormItem>
+          <FormItem label="电话输入">
+            <Input type="tel" placeholder="电话输入" />
+          </FormItem>
+          <FormItem label="网址输入">
+            <Input type="url" placeholder="网址输入" />
+          </FormItem>
+          <FormItem label="搜索">
+            <Input type="search" placeholder="搜索内容" />
           </FormItem>
         </Space>
       </DemoBlock>

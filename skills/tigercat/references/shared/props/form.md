@@ -55,30 +55,41 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop         | Type                                          | Default  | Vue | React | Description      |
-| ------------ | --------------------------------------------- | -------- | :-: | :---: | ---------------- |
-| modelValue   | `string`                                      | -        |  ✓  |   -   | 绑定值 (v-model) |
-| value        | `string`                                      | -        |  -  |   ✓   | 绑定值           |
-| type         | `'text' \| 'password' \| 'email' \| 'number'` | `'text'` |  ✓  |   ✓   | 输入类型         |
-| placeholder  | `string`                                      | -        |  ✓  |   ✓   | 占位符           |
-| disabled     | `boolean`                                     | `false`  |  ✓  |   ✓   | 禁用             |
-| clearable    | `boolean`                                     | `false`  |  ✓  |   ✓   | 可清除           |
-| prefix       | `string`                                      | -        |  ✓  |   -   | 前缀文本         |
-| prefix       | `ReactNode`                                   | -        |  -  |   ✓   | 前缀节点         |
-| suffix       | `string`                                      | -        |  ✓  |   -   | 后缀文本         |
-| suffix       | `ReactNode`                                   | -        |  -  |   ✓   | 后缀节点         |
-| status       | `'error' \| 'warning'`                        | -        |  ✓  |   ✓   | 状态             |
-| errorMessage | `string`                                      | -        |  ✓  |   ✓   | 错误信息         |
+| Prop         | Type                                                                        | Default     | Vue | React | Description      |
+| ------------ | --------------------------------------------------------------------------- | ----------- | :-: | :---: | ---------------- |
+| modelValue   | `string \| number`                                                          | -           |  ✓  |   -   | 绑定值 (v-model) |
+| value        | `string \| number`                                                          | -           |  -  |   ✓   | 绑定值（受控）   |
+| defaultValue | `string \| number`                                                          | -           |  -  |   ✓   | 默认值（非受控） |
+| type         | `'text' \| 'password' \| 'email' \| 'number' \| 'tel' \| 'url' \| 'search'` | `'text'`    |  ✓  |   ✓   | 输入类型         |
+| size         | `'sm' \| 'md' \| 'lg'`                                                      | `'md'`      |  ✓  |   ✓   | 尺寸             |
+| placeholder  | `string`                                                                    | `''`        |  ✓  |   ✓   | 占位符           |
+| disabled     | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 禁用             |
+| readonly     | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 只读             |
+| required     | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 必填             |
+| maxLength    | `number`                                                                    | -           |  ✓  |   ✓   | 最大长度         |
+| minLength    | `number`                                                                    | -           |  ✓  |   ✓   | 最小长度         |
+| name         | `string`                                                                    | -           |  ✓  |   ✓   | name 属性        |
+| id           | `string`                                                                    | -           |  ✓  |   ✓   | id 属性          |
+| autoComplete | `string`                                                                    | -           |  ✓  |   ✓   | 自动完成         |
+| autoFocus    | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 自动聚焦         |
+| prefix       | `string`                                                                    | -           |  ✓  |   -   | 前缀文本         |
+| prefix       | `ReactNode`                                                                 | -           |  -  |   ✓   | 前缀节点         |
+| suffix       | `string`                                                                    | -           |  ✓  |   -   | 后缀文本         |
+| suffix       | `ReactNode`                                                                 | -           |  -  |   ✓   | 后缀节点         |
+| status       | `'default' \| 'error' \| 'success' \| 'warning'`                            | `'default'` |  ✓  |   ✓   | 验证状态         |
+| errorMessage | `string`                                                                    | -           |  ✓  |   ✓   | 错误信息         |
+| className    | `string`                                                                    | -           |  ✓  |   ✓   | 自定义 CSS 类    |
+| style        | `object`                                                                    | -           |  ✓  |   ✓   | 自定义行内样式   |
 
 ### Events
 
-| Vue Event            | React Callback | Payload           | Description |
-| -------------------- | -------------- | ----------------- | ----------- |
-| `@update:modelValue` | `onChange`     | `string \| Event` | 值变更      |
-| `@change`            | `onChange`     | `Event`           | 值变更      |
-| `@blur`              | `onBlur`       | `FocusEvent`      | 失焦        |
-| `@focus`             | `onFocus`      | `FocusEvent`      | 聚焦        |
-| `@clear`             | `onClear`      | -                 | 清除        |
+| Vue Event            | React Callback | Payload            | Description |
+| -------------------- | -------------- | ------------------ | ----------- |
+| `@update:modelValue` | -              | `string \| number` | 值变更      |
+| `@input`             | `onInput`      | `Event`            | 输入事件    |
+| `@change`            | `onChange`     | `Event`            | 值变更      |
+| `@focus`             | `onFocus`      | `FocusEvent`       | 聚焦        |
+| `@blur`              | `onBlur`       | `FocusEvent`       | 失焦        |
 
 ### Slots / Children
 
