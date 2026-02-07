@@ -22,7 +22,7 @@ description: Common patterns and framework differences for Tigercat UI component
 | CheckboxGroup | `modelValue` | `value`    | 选中值数组 |
 | Radio         | `modelValue` | `checked`  | 选中状态   |
 | RadioGroup    | `modelValue` | `value`    | 选中值     |
-| Switch        | `modelValue` | `checked`  | 开关状态   |
+| Switch        | `checked`    | `checked`  | 开关状态   |
 | Slider        | `modelValue` | `value`    | 滑块值     |
 | DatePicker    | `modelValue` | `value`    | 日期值     |
 | TimePicker    | `modelValue` | `value`    | 时间值     |

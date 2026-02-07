@@ -64,7 +64,7 @@ export function getSwitchClasses(
  */
 export function getSwitchThumbClasses(size: SwitchSize = 'md', checked: boolean = false): string {
   const baseClasses =
-    'inline-block transform rounded-full bg-[var(--tiger-surface,#ffffff)] shadow-lg transition-transform'
+    'inline-block rounded-full bg-[var(--tiger-surface,#ffffff)] shadow-lg transition-transform'
   const sizeClass = switchThumbSizeClasses[size]
   const translateClass = checked ? switchThumbTranslateClasses[size] : 'translate-x-0.5'
 

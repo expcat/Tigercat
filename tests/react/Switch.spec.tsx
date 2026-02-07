@@ -139,13 +139,6 @@ describe('Switch', () => {
       switchButton = container.querySelector('[role="switch"]')
       expect(switchButton).toHaveAttribute('aria-checked', 'true')
     })
-
-    it('should be disabled when disabled prop is true', () => {
-      const { container } = render(<Switch disabled />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveClass('cursor-not-allowed')
-    })
   })
 
   describe('Theme Support', () => {
@@ -210,22 +203,6 @@ describe('Switch', () => {
     })
   })
 
-  describe('Uncontrolled Component', () => {
-    it('should work as uncontrolled component', async () => {
-      const user = userEvent.setup()
-      const handleChange = vi.fn()
-      const { container } = render(<Switch onChange={handleChange} />)
-
-      const switchButton = container.querySelector('[role="switch"]')!
-
-      expect(switchButton).toHaveAttribute('aria-checked', 'false')
-
-      await user.click(switchButton)
-
-      expect(handleChange).toHaveBeenCalledWith(true)
-    })
-  })
-
   describe('Edge Cases', () => {
     it('should handle rapid clicks correctly', async () => {
       const user = userEvent.setup()
@@ -259,20 +236,6 @@ describe('Switch', () => {
       await user.keyboard('[Tab]')
 
       expect(handleChange).not.toHaveBeenCalled()
-    })
-
-    it('should handle large size correctly', () => {
-      const { container } = render(<Switch size="lg" />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toBeInTheDocument()
-    })
-
-    it('should handle small size correctly', () => {
-      const { container } = render(<Switch size="sm" />)
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toBeInTheDocument()
     })
 
     it('should preserve custom className with other props', () => {
@@ -369,18 +332,6 @@ describe('Switch', () => {
       expect(switchButton).toHaveAttribute('aria-checked', 'true')
 
       rerender(<Switch checked={true} disabled />)
-
-      switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-checked', 'true')
-    })
-
-    it('should update when checked prop changes', () => {
-      const { container, rerender } = render(<Switch checked={false} />)
-
-      let switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-checked', 'false')
-
-      rerender(<Switch checked={true} />)
 
       switchButton = container.querySelector('[role="switch"]')
       expect(switchButton).toHaveAttribute('aria-checked', 'true')

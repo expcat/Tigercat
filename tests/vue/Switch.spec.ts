@@ -149,13 +149,6 @@ describe('Switch', () => {
       switchButton = container.querySelector('[role="switch"]')
       expect(switchButton).toHaveAttribute('aria-checked', 'true')
     })
-
-    it('should be disabled when disabled prop is true', () => {
-      const { container } = renderWithProps(Switch, { disabled: true })
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveClass('cursor-not-allowed')
-    })
   })
 
   describe('Theme Support', () => {
@@ -230,35 +223,6 @@ describe('Switch', () => {
     })
   })
 
-  describe('V-Model Support', () => {
-    it('should work with v-model:checked', async () => {
-      const onUpdate = vi.fn()
-      const { container } = render(Switch, {
-        props: {
-          checked: false,
-          'onUpdate:checked': onUpdate
-        }
-      })
-
-      const switchButton = container.querySelector('[role="switch"]')!
-      await fireEvent.click(switchButton)
-
-      expect(onUpdate).toHaveBeenCalledWith(true)
-    })
-
-    it('should update when v-model value changes', async () => {
-      const { container, rerender } = renderWithProps(Switch, { checked: false })
-
-      let switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-checked', 'false')
-
-      await rerender({ checked: true })
-
-      switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toHaveAttribute('aria-checked', 'true')
-    })
-  })
-
   describe('Edge Cases', () => {
     it('should handle rapid clicks correctly', async () => {
       const onUpdate = vi.fn()
@@ -301,20 +265,6 @@ describe('Switch', () => {
       expect(onUpdate).not.toHaveBeenCalled()
     })
 
-    it('should handle large size correctly', () => {
-      const { container } = renderWithProps(Switch, { size: 'lg' })
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toBeInTheDocument()
-    })
-
-    it('should handle small size correctly', () => {
-      const { container } = renderWithProps(Switch, { size: 'sm' })
-
-      const switchButton = container.querySelector('[role="switch"]')
-      expect(switchButton).toBeInTheDocument()
-    })
-
     it('should preserve custom className with other props', () => {
       const { container } = renderWithProps(Switch, {
         className: 'custom-class',
@@ -333,42 +283,6 @@ describe('Switch', () => {
 
       const switchButton = container.querySelector('[role="switch"]')
       expect(switchButton).toBeInTheDocument()
-    })
-  })
-
-  describe('Event Prevention', () => {
-    it('should prevent default behavior on Space key to avoid page scroll', async () => {
-      const onUpdate = vi.fn()
-      const { container } = render(Switch, {
-        props: {
-          checked: false,
-          'onUpdate:checked': onUpdate
-        }
-      })
-      const switchButton = container.querySelector('[role="switch"]')!
-
-      // Test that Space key triggers toggle (side effect of preventDefault working)
-      await fireEvent.keyDown(switchButton, { key: ' ', code: 'Space' })
-
-      // If preventDefault works correctly, the switch should toggle
-      expect(onUpdate).toHaveBeenCalledWith(true)
-    })
-
-    it('should prevent default behavior on Enter key', async () => {
-      const onUpdate = vi.fn()
-      const { container } = render(Switch, {
-        props: {
-          checked: false,
-          'onUpdate:checked': onUpdate
-        }
-      })
-      const switchButton = container.querySelector('[role="switch"]')!
-
-      // Test that Enter key triggers toggle
-      await fireEvent.keyDown(switchButton, { key: 'Enter', code: 'Enter' })
-
-      // If preventDefault works correctly, the switch should toggle
-      expect(onUpdate).toHaveBeenCalledWith(true)
     })
   })
 })

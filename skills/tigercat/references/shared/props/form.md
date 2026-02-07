@@ -274,12 +274,18 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop       | Type                   | Default | Vue | React | Description |
-| ---------- | ---------------------- | ------- | :-: | :---: | ----------- |
-| modelValue | `boolean`              | `false` |  ✓  |   -   | 绑定值      |
-| checked    | `boolean`              | `false` |  -  |   ✓   | 开关状态    |
-| size       | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸        |
-| disabled   | `boolean`              | `false` |  ✓  |   ✓   | 禁用        |
+| Prop     | Type                   | Default | Vue | React | Description                      |
+| -------- | ---------------------- | ------- | :-: | :---: | -------------------------------- |
+| checked  | `boolean`              | `false` |  ✓  |   ✓   | 开关状态（Vue: v-model:checked） |
+| size     | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸                             |
+| disabled | `boolean`              | `false` |  ✓  |   ✓   | 禁用                             |
+
+### Events
+
+| Vue Event         | React Callback | Payload   | Description |
+| ----------------- | -------------- | --------- | ----------- |
+| `@update:checked` | `onChange`     | `boolean` | 状态变更    |
+| `@change`         | -              | `boolean` | 状态变更    |
 
 ---
 

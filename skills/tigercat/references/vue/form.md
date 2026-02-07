@@ -214,9 +214,9 @@ const value = ref('male')
 
 ```vue
 <template>
-  <Switch v-model="enabled" />
-  <Switch v-model="enabled" size="sm" />
-  <Switch v-model="enabled" disabled />
+  <Switch v-model:checked="enabled" />
+  <Switch v-model:checked="enabled" size="sm" />
+  <Switch v-model:checked="enabled" disabled />
 </template>
 ```
 

@@ -78,10 +78,6 @@ export const Switch = defineComponent({
       emit('change', newValue)
     }
 
-    const handleClick = () => {
-      emitChange()
-    }
-
     const handleKeyDown = (event: KeyboardEvent) => {
       if (props.disabled) return
 
@@ -101,10 +97,10 @@ export const Switch = defineComponent({
           'aria-checked': props.checked,
           'aria-disabled': props.disabled ? 'true' : undefined,
           class: [switchClasses.value, attrs.class],
-          style: [props.style, attrs.style],
+          style: props.style,
           disabled: props.disabled,
           tabindex: props.disabled ? -1 : attrs.tabindex,
-          onClick: handleClick,
+          onClick: emitChange,
           onKeydown: handleKeyDown
         },
         [
