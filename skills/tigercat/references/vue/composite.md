@@ -273,12 +273,20 @@ const handleFinish = () => {
     :before-next="handleBeforeNext"
     @finish="handleFinish">
     <template #step="{ index }">
-      <Form ref="formRef" :model="model" class="max-w-md">
+      <Form ref="formRef" :model="model" class="w-full max-w-[520px]">
         <template v-if="index === 0">
-          <FormItem name="name" label="姓名" :rules="{ required: true, message: '请输入姓名' }">
+          <FormItem
+            name="name"
+            label="姓名"
+            :rules="{ required: true, message: '请输入姓名' }"
+            :show-message="false">
             <Input v-model="model.name" placeholder="请输入姓名" />
           </FormItem>
-          <FormItem name="email" label="邮箱" :rules="{ required: true, message: '请输入邮箱' }">
+          <FormItem
+            name="email"
+            label="邮箱"
+            :rules="{ required: true, message: '请输入邮箱' }"
+            :show-message="false">
             <Input v-model="model.email" placeholder="请输入邮箱" />
           </FormItem>
         </template>

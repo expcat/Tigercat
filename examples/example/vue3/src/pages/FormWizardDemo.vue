@@ -18,10 +18,7 @@ const model = reactive({ name: '', email: '', phone: '' })
 
 const handleBeforeNext = async () => {
   const valid = await formRef.value?.validate()
-  if (!valid) {
-    return '请先完成当前步骤校验'
-  }
-  return true
+  return valid === true
 }
 
 const handleFinish = () => {
@@ -39,17 +36,17 @@ const basicSnippet = `<FormWizard
   @change="handleChange"
   @finish="handleFinish">
   <template #step="{ index }">
-    <Form ref="formRef" :model="model">
+    <Form ref="formRef" :model="model" class="w-full max-w-md">
       <template v-if="index === 0">
-        <FormItem name="name" label="姓名" required>
+        <FormItem name="name" label="姓名" required :show-message="false">
           <Input v-model="model.name" placeholder="请输入姓名" />
         </FormItem>
-        <FormItem name="email" label="邮箱" required>
+        <FormItem name="email" label="邮箱" required :show-message="false">
           <Input v-model="model.email" placeholder="请输入邮箱" />
         </FormItem>
       </template>
       <template v-else-if="index === 1">
-        <FormItem name="phone" label="手机号" required>
+        <FormItem name="phone" label="手机号" required :show-message="false">
           <Input v-model="model.phone" placeholder="请输入手机号" />
         </FormItem>
       </template>
@@ -72,23 +69,38 @@ const basicSnippet = `<FormWizard
       <FormWizard v-model:current="current" :steps="steps" :before-next="handleBeforeNext" @change="handleChange"
         @finish="handleFinish">
         <template #step="{ index }">
-          <Form ref="formRef" :model="model">
+          <Form ref="formRef" :model="model" class="w-full max-w-md">
             <template v-if="index === 0">
-              <FormItem name="name" label="姓名" required :rules="{ required: true, message: '请输入姓名' }">
+              <FormItem
+                name="name"
+                label="姓名"
+                required
+                :rules="{ required: true, message: '请输入姓名' }"
+                :show-message="false">
                 <Input v-model="model.name" placeholder="请输入姓名" />
               </FormItem>
-              <FormItem name="email" label="邮箱" required :rules="{ required: true, message: '请输入邮箱' }">
+              <FormItem
+                name="email"
+                label="邮箱"
+                required
+                :rules="{ required: true, message: '请输入邮箱' }"
+                :show-message="false">
                 <Input v-model="model.email" placeholder="请输入邮箱" />
               </FormItem>
             </template>
             <template v-else-if="index === 1">
-              <FormItem name="phone" label="手机号" required :rules="{ required: true, message: '请输入手机号' }">
+              <FormItem
+                name="phone"
+                label="手机号"
+                required
+                :rules="{ required: true, message: '请输入手机号' }"
+                :show-message="false">
                 <Input v-model="model.phone" placeholder="请输入手机号" />
               </FormItem>
             </template>
             <template v-else>
               <div class="space-y-3">
-                <div class="text-sm text-[var(--tiger-text-secondary,#6b7280)]">确认信息无误后点击完成。</div>
+                <div class="text-sm text-(--tiger-text-secondary,#6b7280)">确认信息无误后点击完成。</div>
                 <Alert :type="finished ? 'success' : 'info'" :description="finished ? '已完成提交' : '等待完成提交'" />
               </div>
             </template>

@@ -88,6 +88,7 @@ export const FormItem = defineComponent({
     const formContext = computed(() => formContextRef?.value ?? null)
 
     const errorMessage = ref<string>('')
+    const shakeTrigger = ref(0)
 
     const instanceId = ++formItemIdCounter
     const baseId = `tiger-form-item-${instanceId}`
@@ -162,6 +163,9 @@ export const FormItem = defineComponent({
         if (props.name && errors) {
           const error = getFieldError(props.name, errors)
           errorMessage.value = error || ''
+          if (error) {
+            shakeTrigger.value++
+          }
         }
       },
       { deep: true, immediate: true }
@@ -304,6 +308,7 @@ export const FormItem = defineComponent({
 
         const vnode = only as VNode
         const existingProps = (vnode.props ?? {}) as Record<string, unknown>
+        const isNativeElement = typeof vnode.type === 'string'
 
         const existingOnBlur = existingProps.onBlur as ((event: FocusEvent) => void) | undefined
         const existingOnFocusout = existingProps.onFocusout as
@@ -316,6 +321,15 @@ export const FormItem = defineComponent({
           vnode,
           {
             id: effectiveFieldId,
+            status:
+              !isNativeElement && hasError.value
+                ? 'error'
+                : (existingProps.status as string | undefined),
+            errorMessage:
+              !isNativeElement && hasError.value && !props.showMessage
+                ? errorMessage.value
+                : (existingProps.errorMessage as string | undefined),
+            _shakeTrigger: !isNativeElement && hasError.value ? shakeTrigger.value : undefined,
             'aria-invalid': hasError.value ? 'true' : existingProps['aria-invalid'],
             'aria-required': isRequired.value ? 'true' : existingProps['aria-required'],
             'aria-describedby': mergeAriaDescribedBy(

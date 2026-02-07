@@ -159,9 +159,9 @@ describe('Steps', () => {
         }
       })
 
-      // Finished steps should have SVG checkmarks
-      const svgs = container.querySelectorAll('svg')
-      expect(svgs.length).toBeGreaterThanOrEqual(2)
+      // Finished steps should show checkmark character
+      const checkmarks = screen.getAllByText('✓')
+      expect(checkmarks).toHaveLength(2)
     })
 
     it('should allow custom status override', () => {

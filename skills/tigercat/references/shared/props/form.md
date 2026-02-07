@@ -40,13 +40,14 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop     | Type      | Default | Vue | React | Description                   |
-| -------- | --------- | ------- | :-: | :---: | ----------------------------- |
-| prop     | `string`  | -       |  ✓  |   -   | 字段名（对应 model 中的 key） |
-| name     | `string`  | -       |  -  |   ✓   | 字段名                        |
-| label    | `string`  | -       |  ✓  |   ✓   | 标签文本                      |
-| required | `boolean` | `false` |  ✓  |   ✓   | 必填标记                      |
-| error    | `string`  | -       |  ✓  |   ✓   | 错误信息                      |
+| Prop        | Type      | Default | Vue | React | Description                                                                           |
+| ----------- | --------- | ------- | :-: | :---: | ------------------------------------------------------------------------------------- |
+| prop        | `string`  | -       |  ✓  |   -   | 字段名（对应 model 中的 key）                                                         |
+| name        | `string`  | -       |  -  |   ✓   | 字段名                                                                                |
+| label       | `string`  | -       |  ✓  |   ✓   | 标签文本                                                                              |
+| required    | `boolean` | `false` |  ✓  |   ✓   | 必填标记                                                                              |
+| error       | `string`  | -       |  ✓  |   ✓   | 错误信息                                                                              |
+| showMessage | `boolean` | `true`  |  ✓  |   ✓   | 是否在表单项下方显示错误信息。设为 `false` 可让 Input 内部显示错误（抖动 + 错误文字） |
 
 ---
 

@@ -5,20 +5,9 @@
 import type { StepsDirection, StepStatus, StepSize } from '../types/steps'
 
 /**
- * Default check icon used by StepsItem when status is "finish"
- * (Shared between React/Vue to keep visuals consistent)
+ * Checkmark character used by StepsItem when status is "finish"
  */
-export const stepFinishIconSvgClasses = 'w-5 h-5'
-
-export const stepFinishIconViewBox = '0 0 24 24'
-
-export const stepFinishIconPathD = 'M5 13l4 4L19 7'
-
-export const stepFinishIconPathStrokeLinecap = 'round'
-
-export const stepFinishIconPathStrokeLinejoin = 'round'
-
-export const stepFinishIconPathStrokeWidth = 2
+export const stepFinishChar = '✓'
 
 /**
  * Get Steps container classes
@@ -60,7 +49,7 @@ export function getStepIconClasses(
   isCustomIcon: boolean
 ): string {
   const baseClasses =
-    'tiger-step-icon flex items-center justify-center rounded-full border-2 transition-all duration-200'
+    'tiger-step-icon relative z-10 flex items-center justify-center rounded-full border-2'
 
   // Size classes
   const sizeClasses = simple
@@ -96,7 +85,7 @@ export function getStepTailClasses(
     return 'hidden'
   }
 
-  const baseClasses = 'tiger-step-tail transition-all duration-200'
+  const baseClasses = 'tiger-step-tail'
 
   // Position and size based on direction
   if (direction === 'vertical') {
@@ -106,8 +95,8 @@ export function getStepTailClasses(
     return `${baseClasses} ${positionClasses} ${colorClasses}`
   }
 
-  // Horizontal
-  const positionClasses = 'flex-1 h-0.5 mx-2 mt-5'
+  // Horizontal — absolute from icon center to next icon center
+  const positionClasses = 'absolute top-5 left-1/2 w-full h-0.5'
   const colorClasses =
     status === 'finish' ? 'bg-[var(--tiger-primary,#2563eb)]' : 'bg-[var(--tiger-border,#e5e7eb)]'
 
@@ -135,8 +124,7 @@ export function getStepTitleClasses(
   size: StepSize,
   clickable: boolean
 ): string {
-  const baseClasses =
-    'tiger-step-title font-medium transition-colors duration-200 bg-transparent border-0 p-0'
+  const baseClasses = 'tiger-step-title font-medium'
 
   const sizeClasses = size === 'small' ? 'text-sm' : 'text-base'
 
@@ -148,7 +136,7 @@ export function getStepTitleClasses(
   }
 
   const cursorClasses = clickable
-    ? 'cursor-pointer hover:text-[var(--tiger-primary,#2563eb)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
+    ? 'bg-transparent border-0 p-0 cursor-pointer hover:text-[var(--tiger-primary,#2563eb)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
     : ''
 
   return `${baseClasses} ${sizeClasses} ${statusClasses[status]} ${cursorClasses}`
@@ -158,7 +146,7 @@ export function getStepTitleClasses(
  * Get Step description classes
  */
 export function getStepDescriptionClasses(status: StepStatus, size: StepSize): string {
-  const baseClasses = 'tiger-step-description mt-1 transition-colors duration-200'
+  const baseClasses = 'tiger-step-description mt-1'
 
   const sizeClasses = size === 'small' ? 'text-xs' : 'text-sm'
 

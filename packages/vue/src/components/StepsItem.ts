@@ -18,12 +18,7 @@ import {
   getStepTitleClasses,
   getStepDescriptionClasses,
   calculateStepStatus,
-  stepFinishIconSvgClasses,
-  stepFinishIconViewBox,
-  stepFinishIconPathD,
-  stepFinishIconPathStrokeLinecap,
-  stepFinishIconPathStrokeLinejoin,
-  stepFinishIconPathStrokeWidth,
+  stepFinishChar,
   type StepStatus
 } from '@expcat/tigercat-core'
 import { StepsContextKey, type StepsContext } from './Steps'
@@ -181,42 +176,18 @@ export const StepsItem = defineComponent({
 
     // Render icon
     const renderIcon = () => {
-      // Custom icon from slot
       if (slots.icon) {
         return h('div', { class: iconClasses.value }, slots.icon())
       }
 
-      // Custom icon from prop
       if (props.icon) {
         return h('div', { class: iconClasses.value }, props.icon as unknown as RawChildren)
       }
 
-      // Default: show step number or checkmark for finished steps
       if (stepStatus.value === 'finish') {
-        return h(
-          'div',
-          { class: iconClasses.value },
-          h(
-            'svg',
-            {
-              class: stepFinishIconSvgClasses,
-              fill: 'none',
-              stroke: 'currentColor',
-              viewBox: stepFinishIconViewBox,
-              'aria-hidden': 'true',
-              focusable: 'false'
-            },
-            h('path', {
-              'stroke-linecap': stepFinishIconPathStrokeLinecap,
-              'stroke-linejoin': stepFinishIconPathStrokeLinejoin,
-              'stroke-width': stepFinishIconPathStrokeWidth,
-              d: stepFinishIconPathD
-            })
-          )
-        )
+        return h('div', { class: iconClasses.value, 'aria-hidden': 'true' }, stepFinishChar)
       }
 
-      // Default: show step number
       return h('div', { class: iconClasses.value }, String(props.stepIndex + 1))
     }
 

@@ -32,7 +32,10 @@ function MyForm() {
   return (
     <Form labelWidth={100}>
       <FormItem label="Username" error={errors.username}>
-        <Input value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} />
+        <Input
+          value={form.username}
+          onChange={(e) => setForm({ ...form, username: e.target.value })}
+        />
       </FormItem>
       <FormItem label="Email" error={errors.email}>
         <Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
@@ -44,6 +47,8 @@ function MyForm() {
   )
 }
 ```
+
+> 错误提示方式：默认在 FormItem 下方显示错误信息（`showMessage` 默认 `true`）。设置 `showMessage={false}` 可让 Input 内部显示错误（抖动 + 错误文字），推荐在 FormWizard 等紧凑布局中使用。
 
 ---
 

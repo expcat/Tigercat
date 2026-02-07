@@ -132,6 +132,15 @@ export const Input = defineComponent({
     autoFocus: Boolean,
 
     /**
+     * Internal shake trigger counter (used by FormItem)
+     * @internal
+     */
+    _shakeTrigger: {
+      type: Number,
+      default: undefined
+    },
+
+    /**
      * Additional CSS classes
      */
     className: {
@@ -169,15 +178,12 @@ export const Input = defineComponent({
       }
     )
 
-    // Trigger shake animation when status changes to error
-    watch(
-      () => props.status,
-      (newStatus) => {
-        if (newStatus === 'error') {
-          isShaking.value = true
-        }
+    // Trigger shake animation when status changes to error or shakeTrigger increments
+    watch([() => props.status, () => props._shakeTrigger] as const, ([newStatus]) => {
+      if (newStatus === 'error') {
+        isShaking.value = true
       }
-    )
+    })
 
     const handleAnimationEnd = () => {
       isShaking.value = false

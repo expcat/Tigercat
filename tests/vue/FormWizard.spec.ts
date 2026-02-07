@@ -45,7 +45,7 @@ describe('FormWizard (Vue)', () => {
     expect(screen.getByText('Content 1')).toBeInTheDocument()
   })
 
-  it('shows error message when beforeNext returns string', async () => {
+  it('blocks next step when beforeNext returns string (treated as non-true)', async () => {
     const beforeNext = vi.fn().mockReturnValue('需要先完成校验')
 
     render(FormWizard, {
@@ -61,7 +61,6 @@ describe('FormWizard (Vue)', () => {
     await fireEvent.click(screen.getByRole('button', { name: 'Next' }))
 
     expect(beforeNext).toHaveBeenCalledTimes(1)
-    expect(screen.getByText('需要先完成校验')).toBeInTheDocument()
     expect(screen.getByText('Content 1')).toBeInTheDocument()
   })
 })

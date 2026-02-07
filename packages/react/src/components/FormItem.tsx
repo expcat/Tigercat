@@ -41,6 +41,7 @@ export const FormItem: React.FC<FormItemProps> = ({
 }) => {
   const formContext = useFormContext()
   const [errorMessage, setErrorMessage] = useState<string>('')
+  const [shakeTrigger, setShakeTrigger] = useState(0)
 
   const reactId = useId()
   const baseId = useMemo(() => `tiger-form-item-${reactId}`, [reactId])
@@ -126,6 +127,9 @@ export const FormItem: React.FC<FormItemProps> = ({
     if (name && formContext?.errors) {
       const error = getFieldError(name, formContext.errors)
       setErrorMessage(error || '')
+      if (error) {
+        setShakeTrigger((prev) => prev + 1)
+      }
     }
   }, [name, formContext?.errors])
 
@@ -171,6 +175,9 @@ export const FormItem: React.FC<FormItemProps> = ({
 
   type FieldLikeProps = {
     id?: string
+    status?: string
+    errorMessage?: string
+    _shakeTrigger?: number
     onBlur?: React.FocusEventHandler<unknown>
     onChange?: React.ChangeEventHandler<unknown>
     'aria-invalid'?: boolean | 'true' | 'false'
@@ -187,6 +194,7 @@ export const FormItem: React.FC<FormItemProps> = ({
   }, [children])
 
   const isClonableChild = React.isValidElement<FieldLikeProps>(onlyChild)
+  const isNativeElement = isClonableChild && typeof onlyChild.type === 'string'
   const childId = isClonableChild ? onlyChild.props.id : undefined
   const effectiveFieldId = childId ?? fieldId
 
@@ -197,6 +205,10 @@ export const FormItem: React.FC<FormItemProps> = ({
 
     const nextProps: Partial<FieldLikeProps> = {
       id: effectiveFieldId,
+      status: !isNativeElement && hasError ? 'error' : onlyChild.props.status,
+      errorMessage:
+        !isNativeElement && hasError && !showMessage ? errorMessage : onlyChild.props.errorMessage,
+      _shakeTrigger: !isNativeElement && hasError ? shakeTrigger : undefined,
       'aria-invalid': hasError ? true : onlyChild.props['aria-invalid'],
       'aria-required': isRequired ? true : onlyChild.props['aria-required'],
       'aria-describedby': mergeAriaDescribedBy(onlyChild.props['aria-describedby'], describedById),
@@ -217,7 +229,11 @@ export const FormItem: React.FC<FormItemProps> = ({
     onlyChild,
     effectiveFieldId,
     hasError,
+    errorMessage,
+    showMessage,
+    shakeTrigger,
     isRequired,
+    isNativeElement,
     mergeAriaDescribedBy,
     describedById,
     handleBlur,

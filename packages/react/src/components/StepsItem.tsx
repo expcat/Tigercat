@@ -8,12 +8,7 @@ import {
   getStepTitleClasses,
   getStepDescriptionClasses,
   calculateStepStatus,
-  stepFinishIconSvgClasses,
-  stepFinishIconViewBox,
-  stepFinishIconPathD,
-  stepFinishIconPathStrokeLinecap,
-  stepFinishIconPathStrokeLinejoin,
-  stepFinishIconPathStrokeWidth,
+  stepFinishChar,
   type StepStatus
 } from '@expcat/tigercat-core'
 import { useStepsContext } from './Steps'
@@ -110,34 +105,18 @@ export const StepsItem: React.FC<StepsItemProps> = ({
 
   // Render icon
   const renderIcon = () => {
-    // Custom icon from prop
     if (icon) {
       return <div className={iconClasses}>{icon}</div>
     }
 
-    // Default: show step number or checkmark for finished steps
     if (stepStatus === 'finish') {
       return (
-        <div className={iconClasses}>
-          <svg
-            className={stepFinishIconSvgClasses}
-            fill="none"
-            stroke="currentColor"
-            viewBox={stepFinishIconViewBox}
-            aria-hidden="true"
-            focusable="false">
-            <path
-              strokeLinecap={stepFinishIconPathStrokeLinecap}
-              strokeLinejoin={stepFinishIconPathStrokeLinejoin}
-              strokeWidth={stepFinishIconPathStrokeWidth}
-              d={stepFinishIconPathD}
-            />
-          </svg>
+        <div className={iconClasses} aria-hidden="true">
+          {stepFinishChar}
         </div>
       )
     }
 
-    // Default: show step number
     return <div className={iconClasses}>{stepIndex + 1}</div>
   }
 

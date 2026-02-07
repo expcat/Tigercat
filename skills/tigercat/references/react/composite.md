@@ -251,17 +251,25 @@ export default function FormWizardDemo() {
       beforeNext={handleBeforeNext}
       onFinish={() => alert('完成提交')}
       renderStep={(_step, index) => (
-        <Form ref={formRef} model={model} onChange={setModel} className="max-w-md">
+        <Form ref={formRef} model={model} onChange={setModel} className="w-full max-w-[520px]">
           {index === 0 ? (
             <>
-              <FormItem name="name" label="姓名" rules={{ required: true, message: '请输入姓名' }}>
+              <FormItem
+                name="name"
+                label="姓名"
+                rules={{ required: true, message: '请输入姓名' }}
+                showMessage={false}>
                 <Input
                   value={model.name}
                   onChange={(event) => setModel((prev) => ({ ...prev, name: event.target.value }))}
                   placeholder="请输入姓名"
                 />
               </FormItem>
-              <FormItem name="email" label="邮箱" rules={{ required: true, message: '请输入邮箱' }}>
+              <FormItem
+                name="email"
+                label="邮箱"
+                rules={{ required: true, message: '请输入邮箱' }}
+                showMessage={false}>
                 <Input
                   value={model.email}
                   onChange={(event) => setModel((prev) => ({ ...prev, email: event.target.value }))}

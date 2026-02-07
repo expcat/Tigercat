@@ -64,6 +64,12 @@ export interface InputProps
   errorMessage?: string
 
   /**
+   * Internal shake trigger counter (used by FormItem)
+   * @internal
+   */
+  _shakeTrigger?: number
+
+  /**
    * Prefix content
    */
   prefix?: React.ReactNode
@@ -79,6 +85,7 @@ export const Input: React.FC<InputProps> = ({
   type = 'text',
   status = 'default',
   errorMessage,
+  _shakeTrigger,
   prefix,
   suffix,
   value,
@@ -111,7 +118,7 @@ export const Input: React.FC<InputProps> = ({
     if (status === 'error') {
       setIsShaking(true)
     }
-  }, [status])
+  }, [status, _shakeTrigger])
 
   const handleAnimationEnd = () => {
     setIsShaking(false)

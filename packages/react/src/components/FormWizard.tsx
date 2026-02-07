@@ -7,7 +7,6 @@ import {
 import { Steps } from './Steps'
 import { StepsItem } from './StepsItem'
 import { Button } from './Button'
-import { Alert } from './Alert'
 
 export interface FormWizardProps
   extends
@@ -39,7 +38,6 @@ export const FormWizard: React.FC<FormWizardProps> = ({
   ...props
 }) => {
   const [innerCurrent, setInnerCurrent] = useState(defaultCurrent)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
     if (current !== undefined) setInnerCurrent(current)
@@ -51,7 +49,10 @@ export const FormWizard: React.FC<FormWizardProps> = ({
   const isFirst = currentIndex <= 0
   const isLast = currentIndex >= totalCount - 1
 
-  const wrapperClasses = classNames('tiger-form-wizard flex flex-col gap-6 w-full', className)
+  const wrapperClasses = classNames(
+    'tiger-form-wizard w-full rounded-lg border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm overflow-hidden',
+    className
+  )
 
   const setCurrent = useCallback(
     (next: number) => {
@@ -67,28 +68,15 @@ export const FormWizard: React.FC<FormWizardProps> = ({
 
   const runBeforeNext = useCallback(async (): Promise<boolean> => {
     if (!beforeNext || !currentStep) {
-      setErrorMessage(null)
       return true
     }
 
     const result = await beforeNext(currentIndex, currentStep, steps)
-    if (result === true) {
-      setErrorMessage(null)
-      return true
-    }
-
-    if (typeof result === 'string') {
-      setErrorMessage(result)
-    } else {
-      setErrorMessage(null)
-    }
-
-    return false
+    return result === true
   }, [beforeNext, currentIndex, currentStep, steps])
 
   const handlePrev = useCallback(() => {
     if (currentIndex <= 0 || steps[currentIndex - 1]?.disabled) return
-    setErrorMessage(null)
     setCurrent(currentIndex - 1)
   }, [currentIndex, setCurrent, steps])
 
@@ -101,7 +89,6 @@ export const FormWizard: React.FC<FormWizardProps> = ({
       return
     }
     if (steps[currentIndex + 1]?.disabled) return
-    setErrorMessage(null)
     setCurrent(currentIndex + 1)
   }, [currentIndex, totalCount, isLast, onFinish, runBeforeNext, setCurrent, steps])
 
@@ -112,7 +99,6 @@ export const FormWizard: React.FC<FormWizardProps> = ({
         const ok = await runBeforeNext()
         if (!ok) return
       }
-      setErrorMessage(null)
       setCurrent(nextIndex)
     },
     [currentIndex, runBeforeNext, setCurrent, steps]
@@ -142,32 +128,29 @@ export const FormWizard: React.FC<FormWizardProps> = ({
   return (
     <div className={wrapperClasses} style={style} data-tiger-form-wizard {...props}>
       {showSteps && steps.length > 0 && (
-        <Steps
-          current={currentIndex}
-          direction={direction}
-          size={size}
-          simple={simple}
-          clickable={clickable}
-          onChange={handleStepChange}>
-          {stepsNodes}
-        </Steps>
+        <div className="px-6 py-5 bg-[var(--tiger-surface-muted,#f9fafb)]">
+          <Steps
+            current={currentIndex}
+            direction={direction}
+            size={size}
+            simple={simple}
+            clickable={clickable}
+            onChange={handleStepChange}>
+            {stepsNodes}
+          </Steps>
+        </div>
       )}
-      {errorMessage && (
-        <Alert type="error" description={errorMessage} className="tiger-form-wizard-alert" />
+      <div className="px-6 py-4 flex flex-col items-center">{contentNode}</div>
+      {showActions && (
+        <div className="flex items-center justify-center gap-3 px-6 py-2 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface-muted,#f9fafb)]">
+          <Button type="button" variant="secondary" disabled={isFirst} onClick={handlePrev}>
+            {prevText}
+          </Button>
+          <Button type="button" variant="primary" onClick={handleNext}>
+            {isLast ? finishText : nextText}
+          </Button>
+        </div>
       )}
-      <div className="tiger-form-wizard-body rounded-lg border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-6">
-        {contentNode}
-        {showActions && (
-          <div className="tiger-form-wizard-actions flex items-center justify-between border-t border-[var(--tiger-border,#e5e7eb)] pt-4 mt-6">
-            <Button type="button" variant="secondary" disabled={isFirst} onClick={handlePrev}>
-              {prevText}
-            </Button>
-            <Button type="button" variant="primary" onClick={handleNext}>
-              {isLast ? finishText : nextText}
-            </Button>
-          </div>
-        )}
-      </div>
     </div>
   )
 }

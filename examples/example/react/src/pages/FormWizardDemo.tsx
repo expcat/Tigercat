@@ -17,19 +17,19 @@ const basicSnippet = `<FormWizard
   beforeNext={handleBeforeNext}
   onFinish={handleFinish}
   renderStep={(_step, index) => (
-    <Form ref={formRef} model={model}>
+    <Form ref={formRef} model={model} className="w-full max-w-md">
       {index === 0 && (
         <>
-          <FormItem name="name" label="姓名" required>
+          <FormItem name="name" label="姓名" required showMessage={false}>
             <Input value={model.name} onChange={...} placeholder="请输入姓名" />
           </FormItem>
-          <FormItem name="email" label="邮箱" required>
+          <FormItem name="email" label="邮箱" required showMessage={false}>
             <Input value={model.email} onChange={...} placeholder="请输入邮箱" />
           </FormItem>
         </>
       )}
       {index === 1 && (
-        <FormItem name="phone" label="手机号" required>
+        <FormItem name="phone" label="手机号" required showMessage={false}>
           <Input value={model.phone} onChange={...} placeholder="请输入手机号" />
         </FormItem>
       )}
@@ -57,10 +57,7 @@ const FormWizardDemo: React.FC = () => {
 
   const handleBeforeNext = async () => {
     const valid = await formRef.current?.validate()
-    if (!valid) {
-      return '请先完成当前步骤校验'
-    }
-    return true
+    return valid === true
   }
 
   const handleFinish = () => {
@@ -85,14 +82,15 @@ const FormWizardDemo: React.FC = () => {
           beforeNext={handleBeforeNext}
           onFinish={handleFinish}
           renderStep={(_step, index) => (
-            <Form ref={formRef} model={model}>
+            <Form ref={formRef} model={model} className="w-full max-w-md">
               {index === 0 && (
                 <>
                   <FormItem
                     name="name"
                     label="姓名"
                     required
-                    rules={{ required: true, message: '请输入姓名' }}>
+                    rules={{ required: true, message: '请输入姓名' }}
+                    showMessage={false}>
                     <Input
                       value={model.name}
                       onChange={(event) =>
@@ -105,7 +103,8 @@ const FormWizardDemo: React.FC = () => {
                     name="email"
                     label="邮箱"
                     required
-                    rules={{ required: true, message: '请输入邮箱' }}>
+                    rules={{ required: true, message: '请输入邮箱' }}
+                    showMessage={false}>
                     <Input
                       value={model.email}
                       onChange={(event) =>
@@ -121,7 +120,8 @@ const FormWizardDemo: React.FC = () => {
                   name="phone"
                   label="手机号"
                   required
-                  rules={{ required: true, message: '请输入手机号' }}>
+                  rules={{ required: true, message: '请输入手机号' }}
+                  showMessage={false}>
                   <Input
                     value={model.phone}
                     onChange={(event) =>
@@ -133,7 +133,7 @@ const FormWizardDemo: React.FC = () => {
               )}
               {index === 2 && (
                 <div className="space-y-3">
-                  <div className="text-sm text-[var(--tiger-text-secondary,#6b7280)]">
+                  <div className="text-sm text-(--tiger-text-secondary,#6b7280)">
                     确认信息无误后点击完成。
                   </div>
                   <Alert

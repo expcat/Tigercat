@@ -11,7 +11,6 @@ import {
 import { Steps } from './Steps'
 import { StepsItem } from './StepsItem'
 import { Button } from './Button'
-import { Alert } from './Alert'
 
 type HChildren = Parameters<typeof h>[2]
 
@@ -101,7 +100,6 @@ export const FormWizard = defineComponent({
   emits: ['change', 'update:current', 'finish'],
   setup(props, { slots, attrs, emit }) {
     const innerCurrent = ref(props.current ?? props.defaultCurrent)
-    const errorMessage = ref<string | null>(null)
 
     watch(
       () => props.current,
@@ -127,7 +125,7 @@ export const FormWizard = defineComponent({
 
     const wrapperClasses = computed(() =>
       classNames(
-        'tiger-form-wizard flex flex-col gap-6 w-full',
+        'tiger-form-wizard w-full rounded-lg border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm overflow-hidden',
         props.className,
         coerceClassValue((attrs as Record<string, unknown>).class)
       )
@@ -154,28 +152,18 @@ export const FormWizard = defineComponent({
 
     const runBeforeNext = async (): Promise<boolean> => {
       if (!props.beforeNext || !currentStep.value) {
-        errorMessage.value = null
         return true
       }
 
       const result = await props.beforeNext(currentIndex.value, currentStep.value, props.steps)
       if (result === true) {
-        errorMessage.value = null
         return true
       }
-
-      if (typeof result === 'string') {
-        errorMessage.value = result
-      } else {
-        errorMessage.value = null
-      }
-
       return false
     }
 
     const handlePrev = () => {
       if (currentIndex.value <= 0 || props.steps[currentIndex.value - 1]?.disabled) return
-      errorMessage.value = null
       setCurrent(currentIndex.value - 1)
     }
 
@@ -189,7 +177,6 @@ export const FormWizard = defineComponent({
         return
       }
       if (props.steps[currentIndex.value + 1]?.disabled) return
-      errorMessage.value = null
       setCurrent(currentIndex.value + 1)
     }
 
@@ -199,7 +186,6 @@ export const FormWizard = defineComponent({
         const ok = await runBeforeNext()
         if (!ok) return
       }
-      errorMessage.value = null
       setCurrent(nextIndex)
     }
 
@@ -248,68 +234,56 @@ export const FormWizard = defineComponent({
         },
         [
           props.showSteps && props.steps.length > 0
-            ? h(
-                Steps,
-                {
-                  current: currentIndex.value,
-                  direction: props.direction,
-                  size: props.size,
-                  simple: props.simple,
-                  clickable: props.clickable,
-                  'onUpdate:current': handleStepChange
-                },
-                { default: () => stepsNodes }
-              )
-            : null,
-          errorMessage.value
-            ? h(Alert, {
-                type: 'error',
-                description: errorMessage.value,
-                className: 'tiger-form-wizard-alert'
-              })
+            ? h('div', { class: 'px-6 py-5 bg-[var(--tiger-surface-muted,#f9fafb)]' }, [
+                h(
+                  Steps,
+                  {
+                    current: currentIndex.value,
+                    direction: props.direction,
+                    size: props.size,
+                    simple: props.simple,
+                    clickable: props.clickable,
+                    'onUpdate:current': handleStepChange
+                  },
+                  { default: () => stepsNodes }
+                )
+              ])
             : null,
           h(
             'div',
-            {
-              class:
-                'tiger-form-wizard-body rounded-lg border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-6'
-            },
-            {
-              default: () => [
-                renderContent(),
-                props.showActions
-                  ? h(
-                      'div',
-                      {
-                        class:
-                          'tiger-form-wizard-actions flex items-center justify-between border-t border-[var(--tiger-border,#e5e7eb)] pt-4 mt-6'
-                      },
-                      [
-                        h(
-                          Button,
-                          {
-                            type: 'button',
-                            variant: 'secondary',
-                            disabled: isFirst,
-                            onClick: handlePrev
-                          },
-                          { default: () => props.prevText }
-                        ),
-                        h(
-                          Button,
-                          {
-                            type: 'button',
-                            variant: 'primary',
-                            onClick: handleNext
-                          },
-                          { default: () => (isLast ? props.finishText : props.nextText) }
-                        )
-                      ]
-                    )
-                  : null
-              ]
-            }
-          )
+            { class: 'px-6 py-4 flex flex-col items-center' },
+            { default: () => renderContent() }
+          ),
+          props.showActions
+            ? h(
+                'div',
+                {
+                  class:
+                    'flex items-center justify-center gap-3 px-6 py-2 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface-muted,#f9fafb)]'
+                },
+                [
+                  h(
+                    Button,
+                    {
+                      type: 'button',
+                      variant: 'secondary',
+                      disabled: isFirst,
+                      onClick: handlePrev
+                    },
+                    { default: () => props.prevText }
+                  ),
+                  h(
+                    Button,
+                    {
+                      type: 'button',
+                      variant: 'primary',
+                      onClick: handleNext
+                    },
+                    { default: () => (isLast ? props.finishText : props.nextText) }
+                  )
+                ]
+              )
+            : null
         ]
       )
     }
