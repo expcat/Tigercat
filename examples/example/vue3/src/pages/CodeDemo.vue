@@ -15,7 +15,7 @@ const themeSnippet = `:root {
 
 const lastCopied = ref('')
 const handleCopy = (code: string) => {
-  lastCopied.value = code
+    lastCopied.value = code
 }
 
 const basicDemoSnippet = '<Code :code="installSnippet" />'
@@ -31,30 +31,19 @@ const eventSnippet = '<Code :code="installSnippet" @copy="handleCopy" />'
             <p class="text-gray-600">展示代码片段并支持一键复制。</p>
         </div>
 
-        <DemoBlock title="基础用法"
-                   description="展示代码内容与默认复制按钮。"
-                   :code="basicDemoSnippet">
+        <DemoBlock title="基础用法" description="展示代码内容与默认复制按钮。" :code="basicDemoSnippet">
             <Code :code="installSnippet" />
         </DemoBlock>
 
-        <DemoBlock title="自定义按钮文案"
-                   description="通过 copy-label / copied-label 自定义按钮文案。"
-                   :code="customLabelSnippet">
-            <Code :code="usageSnippet"
-                  copy-label="复制代码"
-                  copied-label="已复制" />
+        <DemoBlock title="自定义按钮文案" description="通过 copy-label / copied-label 自定义按钮文案。" :code="customLabelSnippet">
+            <Code :code="usageSnippet" copy-label="复制代码" copied-label="已复制" />
         </DemoBlock>
 
-        <DemoBlock title="禁用复制"
-                   description="关闭 copyable 不显示复制按钮。"
-                   :code="disabledSnippet">
-            <Code :code="themeSnippet"
-                  :copyable="false" />
+        <DemoBlock title="禁用复制" description="关闭 copyable 不显示复制按钮。" :code="disabledSnippet">
+            <Code :code="themeSnippet" :copyable="false" />
         </DemoBlock>
 
-        <DemoBlock title="复制事件回调"
-                   description="通过 @copy 监听复制事件，获取被复制的代码内容。"
-                   :code="eventSnippet">
+        <DemoBlock title="复制事件回调" description="通过 @copy 监听复制事件，获取被复制的代码内容。" :code="eventSnippet">
             <Code :code="installSnippet" @copy="handleCopy" />
             <p v-if="lastCopied" class="mt-2 text-sm text-gray-500">上次复制: {{ lastCopied }}</p>
         </DemoBlock>

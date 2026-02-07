@@ -54,9 +54,7 @@ export default function CodeDemo() {
         description="通过 onCopy 监听复制事件，获取被复制的代码内容。"
         code={eventSnippet}>
         <Code code={installSnippet} onCopy={setLastCopied} />
-        {lastCopied && (
-          <p className="mt-2 text-sm text-gray-500">上次复制: {lastCopied}</p>
-        )}
+        {lastCopied && <p className="mt-2 text-sm text-gray-500">上次复制: {lastCopied}</p>}
       </DemoBlock>
     </div>
   )
