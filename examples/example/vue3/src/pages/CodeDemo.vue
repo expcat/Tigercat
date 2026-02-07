@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { Code } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
@@ -12,9 +13,15 @@ const themeSnippet = `:root {
   --tiger-primary: #2563eb;
 }`
 
+const lastCopied = ref('')
+const handleCopy = (code: string) => {
+  lastCopied.value = code
+}
+
 const basicDemoSnippet = '<Code :code="installSnippet" />'
 const customLabelSnippet = '<Code :code="usageSnippet" copy-label="复制代码" copied-label="已复制" />'
 const disabledSnippet = '<Code :code="themeSnippet" :copyable="false" />'
+const eventSnippet = '<Code :code="installSnippet" @copy="handleCopy" />'
 </script>
 
 <template>
@@ -43,6 +50,13 @@ const disabledSnippet = '<Code :code="themeSnippet" :copyable="false" />'
                    :code="disabledSnippet">
             <Code :code="themeSnippet"
                   :copyable="false" />
+        </DemoBlock>
+
+        <DemoBlock title="复制事件回调"
+                   description="通过 @copy 监听复制事件，获取被复制的代码内容。"
+                   :code="eventSnippet">
+            <Code :code="installSnippet" @copy="handleCopy" />
+            <p v-if="lastCopied" class="mt-2 text-sm text-gray-500">上次复制: {{ lastCopied }}</p>
         </DemoBlock>
     </div>
 </template>

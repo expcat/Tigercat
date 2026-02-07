@@ -118,8 +118,19 @@ import { Button } from '@expcat/tigercat-react'
 ## Code 代码
 
 ```tsx
-<Code value="const x = 1" lang="javascript" />
-<Code value="npm install" copyable />
+import { Code } from '@expcat/tigercat-react'
+
+{/* 基础用法（默认显示复制按钮） */}
+<Code code="const x = 1" />
+
+{/* 自定义按钮文案 */}
+<Code code="npm install" copyLabel="复制代码" copiedLabel="已复制" />
+
+{/* 禁用复制 */}
+<Code code="readonly" copyable={false} />
+
+{/* 监听复制事件 */}
+<Code code="npm install" onCopy={(code) => console.log(code)} />
 ```
 
 ---

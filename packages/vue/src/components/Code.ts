@@ -2,7 +2,6 @@ import { computed, defineComponent, h, onBeforeUnmount, PropType, ref } from 'vu
 import {
   classNames,
   coerceClassValue,
-  mergeStyleValues,
   codeBlockContainerClasses,
   codeBlockCopyButtonBaseClasses,
   codeBlockCopyButtonCopiedClasses,
@@ -91,16 +90,13 @@ export const Code = defineComponent({
       clearTimer()
     })
 
-    return () => {
-      const attrsRecord = attrs as Record<string, unknown>
-      const attrsStyle = attrsRecord.style
-
-      return h(
+    return () =>
+      h(
         'div',
         {
           ...attrs,
           class: containerClasses.value,
-          style: mergeStyleValues(attrsStyle, props.style)
+          style: props.style
         },
         [
           h('pre', { class: codeBlockPreClasses }, [h('code', { class: 'block' }, props.code)]),
@@ -118,7 +114,6 @@ export const Code = defineComponent({
             : null
         ]
       )
-    }
   }
 })
 

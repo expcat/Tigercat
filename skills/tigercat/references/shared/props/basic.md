@@ -179,11 +179,18 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop     | Type      | Default | Vue | React | Description |
-| -------- | --------- | ------- | :-: | :---: | ----------- |
-| value    | `string`  | -       |  ✓  |   ✓   | 代码内容    |
-| lang     | `string`  | -       |  ✓  |   ✓   | 语言        |
-| copyable | `boolean` | `false` |  ✓  |   ✓   | 可复制      |
+| Prop        | Type      | Default  | Vue | React | Description          |
+| ----------- | --------- | -------- | :-: | :---: | -------------------- |
+| code        | `string`  | -        |  ✓  |   ✓   | 代码内容（必填）     |
+| copyable    | `boolean` | `true`   |  ✓  |   ✓   | 显示复制按钮         |
+| copyLabel   | `string`  | `'复制'` |  ✓  |   ✓   | 复制按钮文案         |
+| copiedLabel | `string`  | `'已复制'` |  ✓  |   ✓   | 复制成功后按钮文案   |
+
+### Events
+
+| Vue Event | React Callback | Payload  | Description          |
+| --------- | -------------- | -------- | -------------------- |
+| `@copy`   | `onCopy`       | `string` | 复制成功，返回代码文本 |
 
 ---
 

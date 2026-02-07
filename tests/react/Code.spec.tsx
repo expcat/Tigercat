@@ -41,6 +41,16 @@ describe('Code (React)', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
+  it('renders custom copy labels', () => {
+    render(<Code code="x = 1" copyLabel="Copy" copiedLabel="Done" />)
+    expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument()
+  })
+
+  it('merges className onto container', () => {
+    const { container } = render(<Code code="x = 1" className="custom-class" />)
+    expect(container.firstElementChild).toHaveClass('custom-class')
+  })
+
   it('has no obvious a11y violations', async () => {
     const { container } = renderWithProps(Code, { code: 'const sum = 1 + 2' })
     await expectNoA11yViolations(container)

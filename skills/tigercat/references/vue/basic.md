@@ -128,9 +128,22 @@ import { Button } from '@expcat/tigercat-vue'
 ## Code 代码
 
 ```vue
+<script setup>
+import { Code } from '@expcat/tigercat-vue'
+</script>
+
 <template>
-  <Code value="const x = 1" lang="javascript" />
-  <Code value="npm install" copyable />
+  <!-- 基础用法（默认显示复制按钮） -->
+  <Code :code="'const x = 1'" />
+
+  <!-- 自定义按钮文案 -->
+  <Code :code="'npm install'" copy-label="复制代码" copied-label="已复制" />
+
+  <!-- 禁用复制 -->
+  <Code :code="'readonly'" :copyable="false" />
+
+  <!-- 监听复制事件 -->
+  <Code :code="'npm install'" @copy="handleCopy" />
 </template>
 ```
 
