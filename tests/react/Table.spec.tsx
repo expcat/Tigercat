@@ -91,7 +91,7 @@ describe('Table', () => {
       const { container } = render(<Table columns={columns} dataSource={dataSource} striped />)
 
       const rows = container.querySelectorAll('tbody tr')
-      expect(rows[0]).toHaveClass('bg-gray-50/50')
+      expect(rows[0]).toHaveClass('bg-[var(--tiger-surface-muted,#f9fafb)]/50')
     })
 
     it('should disable pagination when pagination is false', () => {

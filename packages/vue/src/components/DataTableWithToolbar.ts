@@ -24,9 +24,7 @@ import {
 } from '@expcat/tigercat-core'
 import { Table } from './Table'
 import { Input } from './Input'
-import { Dropdown } from './Dropdown'
-import { DropdownMenu } from './DropdownMenu'
-import { DropdownItem } from './DropdownItem'
+import { Select } from './Select'
 import { Button } from './Button'
 import { Pagination } from './Pagination'
 
@@ -58,15 +56,6 @@ export interface VueDataTableWithToolbarProps {
   pagination?: PaginationProps | false
   className?: string
   style?: Record<string, string | number>
-}
-
-const resolveFilterLabel = (filter: TableToolbarFilter, value: TableToolbarFilterValue): string => {
-  const option = filter.options.find((item) => item.value === value)
-  if (option) return `${filter.label}: ${option.label}`
-  if (value !== null && value !== undefined && value !== '') {
-    return `${filter.label}: ${String(value)}`
-  }
-  return filter.placeholder ?? filter.label
 }
 
 export const DataTableWithToolbar = defineComponent({
@@ -300,87 +289,62 @@ export const DataTableWithToolbar = defineComponent({
       if (hasSearch.value) {
         const showButton = props.toolbar?.showSearchButton ?? true
         leftNodes.push(
-          h('div', { class: 'flex items-center gap-2' }, [
-            h(Input, {
-              type: 'search',
-              size: 'sm',
-              modelValue: searchValue.value,
-              placeholder: props.toolbar?.searchPlaceholder ?? '搜索',
-              'onUpdate:modelValue': (value: string | number) =>
-                handleSearchChange(String(value ?? '')),
-              onKeydown: (event: KeyboardEvent) => {
-                if (event.key === 'Enter') {
-                  handleSearchSubmit()
+          h(
+            'div',
+            { class: 'flex items-center gap-2 w-full sm:w-auto sm:min-w-[200px] sm:max-w-[320px]' },
+            [
+              h(Input, {
+                type: 'search',
+                size: 'sm',
+                modelValue: searchValue.value,
+                placeholder: props.toolbar?.searchPlaceholder ?? '搜索',
+                'onUpdate:modelValue': (value: string | number) =>
+                  handleSearchChange(String(value ?? '')),
+                onKeydown: (event: KeyboardEvent) => {
+                  if (event.key === 'Enter') {
+                    handleSearchSubmit()
+                  }
                 }
-              }
-            }),
-            showButton
-              ? h(
-                  Button,
-                  {
-                    size: 'sm',
-                    variant: 'primary',
-                    class: 'whitespace-nowrap',
-                    onClick: handleSearchSubmit,
-                    disabled: !canSearch.value
-                  },
-                  { default: () => props.toolbar?.searchButtonText ?? '搜索' }
-                )
-              : null
-          ])
+              }),
+              showButton
+                ? h(
+                    Button,
+                    {
+                      size: 'sm',
+                      variant: 'primary',
+                      class: 'whitespace-nowrap shrink-0',
+                      onClick: handleSearchSubmit,
+                      disabled: !canSearch.value
+                    },
+                    { default: () => props.toolbar?.searchButtonText ?? '搜索' }
+                  )
+                : null
+            ]
+          )
         )
       }
 
       if (hasFilters.value) {
         props.toolbar?.filters?.forEach((filter) => {
           const currentValue = resolvedFilters.value[filter.key]
-          const triggerLabel = resolveFilterLabel(filter, currentValue)
           const clearable = filter.clearable !== false
-          const clearLabel = filter.clearLabel ?? '全部'
-          const isActive =
-            currentValue !== null && currentValue !== undefined && currentValue !== ''
 
           leftNodes.push(
-            h(
-              Dropdown,
-              { trigger: 'click' },
-              {
-                default: () => [
-                  h(
-                    Button,
-                    {
-                      size: 'sm',
-                      variant: isActive ? 'secondary' : 'outline',
-                      class: 'whitespace-nowrap'
-                    },
-                    { default: () => triggerLabel }
-                  ),
-                  h(DropdownMenu, null, {
-                    default: () => [
-                      ...(clearable
-                        ? [
-                            h(
-                              DropdownItem,
-                              { onClick: () => handleFilterSelect(filter, null) },
-                              { default: () => clearLabel }
-                            )
-                          ]
-                        : []),
-                      ...filter.options.map((option) =>
-                        h(
-                          DropdownItem,
-                          {
-                            key: String(option.value),
-                            onClick: () => handleFilterSelect(filter, option.value)
-                          },
-                          { default: () => option.label }
-                        )
-                      )
-                    ]
-                  })
-                ]
-              }
-            )
+            h('div', { class: 'w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]' }, [
+              h(Select, {
+                size: 'sm',
+                options: filter.options.map((opt) => ({
+                  label: opt.label,
+                  value: opt.value
+                })),
+                modelValue: currentValue ?? undefined,
+                placeholder: filter.placeholder ?? filter.label,
+                clearable,
+                'onUpdate:modelValue': (value: string | number | undefined) => {
+                  handleFilterSelect(filter, value ?? null)
+                }
+              })
+            ])
           )
         })
       }
@@ -413,12 +377,20 @@ export const DataTableWithToolbar = defineComponent({
         })
       }
 
-      return h('div', { class: 'tiger-data-table-toolbar flex flex-wrap items-center gap-2' }, [
-        h('div', { class: 'flex items-center gap-2 flex-wrap' }, leftNodes),
-        hasBulkActions.value
-          ? h('div', { class: 'ml-auto flex items-center gap-2 flex-wrap' }, bulkChildren)
-          : null
-      ])
+      return h(
+        'div',
+        { class: 'tiger-data-table-toolbar flex flex-wrap items-center gap-2 pb-3' },
+        [
+          h('div', { class: 'flex items-center gap-2 flex-wrap flex-1 min-w-0' }, leftNodes),
+          hasBulkActions.value
+            ? h(
+                'div',
+                { class: 'flex items-center gap-2 flex-wrap ml-auto shrink-0' },
+                bulkChildren
+              )
+            : null
+        ]
+      )
     }
 
     return () => {

@@ -8,9 +8,7 @@ import {
 } from '@expcat/tigercat-core'
 import { Table, type TableProps } from './Table'
 import { Input } from './Input'
-import { Dropdown } from './Dropdown'
-import { DropdownMenu } from './DropdownMenu'
-import { DropdownItem } from './DropdownItem'
+import { Select } from './Select'
 import { Button } from './Button'
 import { Pagination, type PaginationProps } from './Pagination'
 
@@ -58,15 +56,6 @@ export interface DataTableWithToolbarProps<T = Record<string, unknown>>
    * Table class name
    */
   tableClassName?: string
-}
-
-const resolveFilterLabel = (filter: TableToolbarFilter, value: TableToolbarFilterValue): string => {
-  const option = filter.options.find((item) => item.value === value)
-  if (option) return `${filter.label}: ${option.label}`
-  if (value !== null && value !== undefined && value !== '') {
-    return `${filter.label}: ${String(value)}`
-  }
-  return filter.placeholder ?? filter.label
 }
 
 export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<string, unknown>>({
@@ -192,10 +181,10 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     if (!hasSearch && !hasFilters && !hasBulkActions) return null
 
     return (
-      <div className="tiger-data-table-toolbar flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-2 flex-wrap">
+      <div className="tiger-data-table-toolbar flex flex-wrap items-center gap-2 pb-3">
+        <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
           {hasSearch ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto sm:min-w-[200px] sm:max-w-[320px]">
               <Input
                 type="search"
                 size="sm"
@@ -212,7 +201,7 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
                 <Button
                   size="sm"
                   variant="primary"
-                  className="whitespace-nowrap"
+                  className="whitespace-nowrap shrink-0"
                   onClick={handleSearchSubmit}
                   disabled={!onSearch && !toolbar?.onSearch}>
                   {toolbar?.searchButtonText ?? '搜索'}
@@ -224,42 +213,33 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
           {hasFilters
             ? toolbar?.filters?.map((filter) => {
                 const currentValue = resolvedFilters[filter.key]
-                const triggerLabel = resolveFilterLabel(filter, currentValue)
                 const clearable = filter.clearable !== false
-                const clearLabel = filter.clearLabel ?? '全部'
-                const isActive =
-                  currentValue !== null && currentValue !== undefined && currentValue !== ''
 
                 return (
-                  <Dropdown key={filter.key} trigger="click">
-                    <Button
+                  <div
+                    key={filter.key}
+                    className="w-full sm:w-auto sm:min-w-[120px] sm:max-w-[180px]">
+                    <Select
                       size="sm"
-                      variant={isActive ? 'secondary' : 'outline'}
-                      className="whitespace-nowrap">
-                      {triggerLabel}
-                    </Button>
-                    <DropdownMenu>
-                      {clearable ? (
-                        <DropdownItem onClick={() => handleFilterSelect(filter, null)}>
-                          {clearLabel}
-                        </DropdownItem>
-                      ) : null}
-                      {filter.options.map((option) => (
-                        <DropdownItem
-                          key={String(option.value)}
-                          onClick={() => handleFilterSelect(filter, option.value)}>
-                          {option.label}
-                        </DropdownItem>
-                      ))}
-                    </DropdownMenu>
-                  </Dropdown>
+                      options={filter.options.map((opt) => ({
+                        label: opt.label,
+                        value: opt.value
+                      }))}
+                      value={currentValue ?? undefined}
+                      placeholder={filter.placeholder ?? filter.label}
+                      clearable={clearable}
+                      onChange={(value) => {
+                        handleFilterSelect(filter, value ?? null)
+                      }}
+                    />
+                  </div>
                 )
               })
             : null}
         </div>
 
         {hasBulkActions ? (
-          <div className="ml-auto flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap ml-auto shrink-0">
             {selectedCount > 0 ? (
               <span className="text-sm text-[var(--tiger-text-muted,#6b7280)]">
                 {bulkLabel} {selectedCount} 项

@@ -81,8 +81,9 @@ export function getFixedColumnOffsets<T = Record<string, unknown>>(
  */
 export function getTableWrapperClasses(bordered: boolean, maxHeight?: string | number): string {
   return classNames(
+    'relative',
     tableContainerClasses,
-    bordered && 'border border-gray-200 rounded-lg',
+    bordered && 'border border-[var(--tiger-border,#e5e7eb)] rounded-lg overflow-hidden',
     maxHeight && 'overflow-y-auto'
   )
 }
@@ -91,7 +92,10 @@ export function getTableWrapperClasses(bordered: boolean, maxHeight?: string | n
  * Get table header classes
  */
 export function getTableHeaderClasses(stickyHeader: boolean): string {
-  return classNames('bg-gray-50 border-b border-gray-200', stickyHeader && 'sticky top-0 z-10')
+  return classNames(
+    'bg-[var(--tiger-surface-muted,#f9fafb)] border-b border-[var(--tiger-border,#e5e7eb)]',
+    stickyHeader && 'sticky top-0 z-10'
+  )
 }
 
 /**
@@ -116,10 +120,11 @@ export function getTableHeaderCellClasses(
   }
 
   return classNames(
-    'font-medium text-gray-700 text-sm',
+    'font-medium text-[var(--tiger-text-muted,#6b7280)] text-xs uppercase tracking-wider',
     paddingClasses[size],
     alignClasses[align],
-    sortable && 'cursor-pointer select-none hover:bg-gray-100 transition-colors',
+    sortable &&
+      'cursor-pointer select-none hover:bg-[var(--tiger-surface,#ffffff)]/50 transition-colors',
     customClassName
   )
 }
@@ -134,9 +139,9 @@ export function getTableRowClasses(
   customClassName?: string
 ): string {
   return classNames(
-    'border-b border-gray-200 last:border-b-0',
-    hoverable && 'hover:bg-gray-50 transition-colors',
-    striped && isEven && 'bg-gray-50/50',
+    'border-b border-[var(--tiger-border,#e5e7eb)] last:border-b-0',
+    hoverable && 'hover:bg-[var(--tiger-surface-muted,#f9fafb)] transition-colors',
+    striped && isEven && 'bg-[var(--tiger-surface-muted,#f9fafb)]/50',
     customClassName
   )
 }
@@ -162,7 +167,7 @@ export function getTableCellClasses(
   }
 
   return classNames(
-    'text-sm text-gray-900',
+    'text-sm text-[var(--tiger-text,#111827)]',
     paddingClasses[size],
     alignClasses[align],
     customClassName
@@ -182,13 +187,13 @@ export function getSortIconClasses(active: boolean): string {
 /**
  * Get empty state classes
  */
-export const tableEmptyStateClasses = 'text-center py-12 text-gray-500'
+export const tableEmptyStateClasses = 'text-center py-12 text-[var(--tiger-text-muted,#6b7280)]'
 
 /**
  * Get loading overlay classes
  */
 export const tableLoadingOverlayClasses = classNames(
-  'absolute inset-0 bg-white/80 flex items-center justify-center z-20'
+  'absolute inset-0 bg-[var(--tiger-surface,#ffffff)]/80 flex items-center justify-center z-20'
 )
 
 /**

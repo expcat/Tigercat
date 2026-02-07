@@ -605,7 +605,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
                     !!column.sortable,
                     column.headerClassName
                   ),
-                  (isFixedLeft || isFixedRight) && 'bg-gray-50'
+                  (isFixedLeft || isFixedRight) && 'bg-[var(--tiger-surface-muted,#f9fafb)]'
                 )}
                 style={style}
                 onClick={column.sortable ? () => handleSort(column.key) : undefined}>
@@ -770,11 +770,17 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
 
                 const style = fixedStyle ? { ...widthStyle, ...fixedStyle } : widthStyle
 
-                const stickyBgClass = striped && index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white'
+                const stickyBgClass =
+                  striped && index % 2 === 0
+                    ? 'bg-[var(--tiger-surface-muted,#f9fafb)]/50'
+                    : 'bg-[var(--tiger-surface,#ffffff)]'
 
                 const stickyCellClass =
                   isFixedLeft || isFixedRight
-                    ? classNames(stickyBgClass, hoverable && 'group-hover:bg-gray-50')
+                    ? classNames(
+                        stickyBgClass,
+                        hoverable && 'group-hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
+                      )
                     : undefined
 
                 return (
@@ -896,41 +902,40 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   )
 
   return (
-    <div className={classNames('relative', className)}>
-      <div
-        className={getTableWrapperClasses(bordered, maxHeight)}
-        style={wrapperStyle}
-        aria-busy={loading}>
-        <table
-          className={classNames(
-            tableBaseClasses,
-            tableLayout === 'fixed' ? 'table-fixed' : 'table-auto'
-          )}
-          {...props}
-          style={
-            fixedColumnsInfo.hasFixedColumns && fixedColumnsInfo.minTableWidth
-              ? {
-                  ...(props as React.HTMLAttributes<HTMLTableElement>).style,
-                  minWidth: `${fixedColumnsInfo.minTableWidth}px`
-                }
-              : (props as React.HTMLAttributes<HTMLTableElement>).style
-          }>
-          {renderTableHeader()}
-          {renderTableBody()}
-        </table>
-
-        {/* Loading overlay */}
-        {loading && (
-          <div
-            className={tableLoadingOverlayClasses}
-            role="status"
-            aria-live="polite"
-            aria-label="Loading">
-            <LoadingSpinner />
-            <span className="sr-only">Loading</span>
-          </div>
+    <div
+      className={getTableWrapperClasses(bordered, maxHeight)}
+      style={wrapperStyle}
+      aria-busy={loading}>
+      <table
+        className={classNames(
+          tableBaseClasses,
+          tableLayout === 'fixed' ? 'table-fixed' : 'table-auto',
+          className
         )}
-      </div>
+        {...props}
+        style={
+          fixedColumnsInfo.hasFixedColumns && fixedColumnsInfo.minTableWidth
+            ? {
+                ...(props as React.HTMLAttributes<HTMLTableElement>).style,
+                minWidth: `${fixedColumnsInfo.minTableWidth}px`
+              }
+            : (props as React.HTMLAttributes<HTMLTableElement>).style
+        }>
+        {renderTableHeader()}
+        {renderTableBody()}
+      </table>
+
+      {/* Loading overlay */}
+      {loading && (
+        <div
+          className={tableLoadingOverlayClasses}
+          role="status"
+          aria-live="polite"
+          aria-label="Loading">
+          <LoadingSpinner />
+          <span className="sr-only">Loading</span>
+        </div>
+      )}
 
       {/* Pagination */}
       {renderPagination()}

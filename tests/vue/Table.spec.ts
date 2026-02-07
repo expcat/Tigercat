@@ -110,7 +110,7 @@ describe('Table', () => {
 
       const rows = container.querySelectorAll('tbody tr')
       // Check even rows (0-indexed, so row[0] is index 0 which is even)
-      expect(rows[0]).toHaveClass('bg-gray-50/50')
+      expect(rows[0]).toHaveClass('bg-[var(--tiger-surface-muted,#f9fafb)]/50')
     })
 
     it('should disable pagination when pagination is false', () => {

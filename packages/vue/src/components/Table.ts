@@ -740,7 +740,7 @@ export const Table = defineComponent({
                   !!column.sortable,
                   column.headerClassName
                 ),
-                (isFixedLeft || isFixedRight) && 'bg-gray-50'
+                (isFixedLeft || isFixedRight) && 'bg-[var(--tiger-surface-muted,#f9fafb)]'
               ),
               style,
               onClick: column.sortable ? () => handleSort(column.key) : undefined
@@ -883,10 +883,16 @@ export const Table = defineComponent({
 
           const style = fixedStyle ? { ...widthStyle, ...fixedStyle } : widthStyle
 
-          const stickyBgClass = props.striped && index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white'
+          const stickyBgClass =
+            props.striped && index % 2 === 0
+              ? 'bg-[var(--tiger-surface-muted,#f9fafb)]/50'
+              : 'bg-[var(--tiger-surface,#ffffff)]'
           const stickyCellClass =
             isFixedLeft || isFixedRight
-              ? classNames(stickyBgClass, props.hoverable && 'group-hover:bg-gray-50')
+              ? classNames(
+                  stickyBgClass,
+                  props.hoverable && 'group-hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
+                )
               : undefined
 
           cells.push(
@@ -1007,48 +1013,46 @@ export const Table = defineComponent({
           }
         : undefined
 
-      return h('div', { class: 'relative' }, [
-        h(
-          'div',
-          {
-            class: getTableWrapperClasses(props.bordered, props.maxHeight),
-            style: wrapperStyle,
-            'aria-busy': props.loading
-          },
-          [
+      return h(
+        'div',
+        {
+          class: getTableWrapperClasses(props.bordered, props.maxHeight),
+          style: wrapperStyle,
+          'aria-busy': props.loading
+        },
+        [
+          h(
+            'table',
+            {
+              class: classNames(
+                tableBaseClasses,
+                props.tableLayout === 'fixed' ? 'table-fixed' : 'table-auto'
+              ),
+              style:
+                fixedColumnsInfo.value.hasFixedColumns && fixedColumnsInfo.value.minTableWidth
+                  ? { minWidth: `${fixedColumnsInfo.value.minTableWidth}px` }
+                  : undefined
+            },
+            [renderTableHeader(), renderTableBody()]
+          ),
+
+          // Loading overlay
+          props.loading &&
             h(
-              'table',
+              'div',
               {
-                class: classNames(
-                  tableBaseClasses,
-                  props.tableLayout === 'fixed' ? 'table-fixed' : 'table-auto'
-                ),
-                style:
-                  fixedColumnsInfo.value.hasFixedColumns && fixedColumnsInfo.value.minTableWidth
-                    ? { minWidth: `${fixedColumnsInfo.value.minTableWidth}px` }
-                    : undefined
+                class: tableLoadingOverlayClasses,
+                role: 'status',
+                'aria-live': 'polite',
+                'aria-label': 'Loading'
               },
-              [renderTableHeader(), renderTableBody()]
+              [LoadingSpinner(), h('span', { class: 'sr-only' }, 'Loading')]
             ),
 
-            // Loading overlay
-            props.loading &&
-              h(
-                'div',
-                {
-                  class: tableLoadingOverlayClasses,
-                  role: 'status',
-                  'aria-live': 'polite',
-                  'aria-label': 'Loading'
-                },
-                [LoadingSpinner(), h('span', { class: 'sr-only' }, 'Loading')]
-              )
-          ]
-        ),
-
-        // Pagination
-        renderPagination()
-      ])
+          // Pagination
+          renderPagination()
+        ]
+      )
     }
   }
 })
