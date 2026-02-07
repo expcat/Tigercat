@@ -60,4 +60,28 @@ describe('FormWizard (React)', () => {
     expect(beforeNext).toHaveBeenCalledTimes(1)
     expect(screen.getByText('Content 1')).toBeInTheDocument()
   })
+
+  it('supports step-scoped validation metadata', async () => {
+    const user = userEvent.setup()
+    const stepsWithFields = [
+      { title: 'Step 1', fields: ['name'] },
+      { title: 'Step 2', fields: ['email'] }
+    ]
+    const beforeNext = vi.fn().mockImplementation((_current, step) => {
+      return !(step.fields as string[]).includes('name')
+    })
+
+    render(
+      <FormWizard
+        steps={stepsWithFields}
+        beforeNext={beforeNext}
+        renderStep={(_step, index) => <div>Content {index + 1}</div>}
+      />
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+
+    expect(beforeNext).toHaveBeenCalledWith(0, stepsWithFields[0], stepsWithFields)
+    expect(screen.getByText('Content 1')).toBeInTheDocument()
+  })
 })

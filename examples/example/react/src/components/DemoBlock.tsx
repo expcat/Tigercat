@@ -18,41 +18,6 @@ const exampleBoxClasses =
 const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, children }) => {
   const [activeKey, setActiveKey] = useState('preview')
 
-  const tabs = [
-    {
-      key: 'preview',
-      label: '示例',
-      content: <div className={previewPanelClasses}>{children}</div>
-    },
-    {
-      key: 'code',
-      label: '代码',
-      content: (
-        <div className={codePanelClasses}>
-          <Code code={code} />
-        </div>
-      )
-    },
-    {
-      key: 'mixed',
-      label: '混合',
-      content: (
-        <div className={previewPanelClasses}>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="w-full">
-              <div className="text-xs text-gray-500 mb-2">示例</div>
-              <div className={exampleBoxClasses}>{children}</div>
-            </div>
-            <div className="w-full">
-              <div className="text-xs text-gray-500 mb-2">代码</div>
-              <Code code={code} />
-            </div>
-          </div>
-        </div>
-      )
-    }
-  ]
-
   return (
     <section className="mb-12">
       <div className="mb-4">
@@ -62,12 +27,30 @@ const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, childre
 
       <div className="rounded-lg">
         <Tabs activeKey={activeKey} onChange={(key) => setActiveKey(String(key))} type="card">
-          {tabs.map((tab) => (
-            <TabPane key={tab.key} tabKey={tab.key} label={tab.label}>
-              {tab.content}
-            </TabPane>
-          ))}
+          <TabPane tabKey="preview" label="示例" />
+          <TabPane tabKey="code" label="代码" />
+          <TabPane tabKey="mixed" label="混合" />
         </Tabs>
+        {activeKey === 'preview' && <div className={previewPanelClasses}>{children}</div>}
+        {activeKey === 'code' && (
+          <div className={codePanelClasses}>
+            <Code code={code} />
+          </div>
+        )}
+        {activeKey === 'mixed' && (
+          <div className={previewPanelClasses}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="w-full">
+                <div className="text-xs text-gray-500 mb-2">示例</div>
+                <div className={exampleBoxClasses}>{children}</div>
+              </div>
+              <div className="w-full">
+                <div className="text-xs text-gray-500 mb-2">代码</div>
+                <Code code={code} />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )

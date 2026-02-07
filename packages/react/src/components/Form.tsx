@@ -56,6 +56,7 @@ export const useFormContext = () => {
 // Form handle type for imperative methods
 export interface FormHandle {
   validate: () => Promise<boolean>
+  validateFields: (fieldNames: string[]) => Promise<boolean>
   validateField: (
     fieldName: string,
     rulesOverride?: FormRule | FormRule[],
@@ -156,27 +157,47 @@ export const Form = forwardRef<FormHandle, FormProps>(
       return Object.keys(merged).length > 0 ? merged : undefined
     }, [rules])
 
+    const resolveFieldRules = useCallback(
+      (fieldName: string, rulesOverride?: FormRule | FormRule[]) => {
+        return rulesOverride ?? fieldRulesRef.current[fieldName] ?? rules?.[fieldName]
+      },
+      [rules]
+    )
+
+    const runFieldValidation = useCallback(
+      async (
+        fieldName: string,
+        rulesOverride?: FormRule | FormRule[],
+        trigger?: FormRuleTrigger
+      ): Promise<string | null> => {
+        const fieldRules = resolveFieldRules(fieldName, rulesOverride)
+        if (!fieldRules) {
+          return null
+        }
+
+        const currentValues = formValuesRef.current
+        const value = getValueByPath(currentValues, fieldName)
+        return validateFieldUtil(fieldName, value, fieldRules, currentValues, trigger)
+      },
+      [resolveFieldRules]
+    )
+
     const validateField = useCallback(
       async (
         fieldName: string,
         rulesOverride?: FormRule | FormRule[],
         trigger?: FormRuleTrigger
       ): Promise<void> => {
-        const fieldRules = rulesOverride ?? fieldRulesRef.current[fieldName] ?? rules?.[fieldName]
-
+        const fieldRules = resolveFieldRules(fieldName, rulesOverride)
         if (!fieldRules) {
           return
         }
 
-        const currentValues = formValuesRef.current
-        const value = getValueByPath(currentValues, fieldName)
-        const error = await validateFieldUtil(fieldName, value, fieldRules, currentValues, trigger)
+        const error = await runFieldValidation(fieldName, rulesOverride, trigger)
 
         setErrors((prevErrors) => {
-          // Remove existing errors for this field
           const filtered = prevErrors.filter((e) => e.field !== fieldName)
 
-          // Add new error if validation failed
           if (error) {
             return [...filtered, { field: fieldName, message: error }]
           }
@@ -186,7 +207,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
 
         onValidate?.(fieldName, !error, error)
       },
-      [rules, onValidate]
+      [resolveFieldRules, runFieldValidation, onValidate]
     )
 
     const runValidation = useCallback(async (): Promise<{
@@ -207,6 +228,41 @@ export const Form = forwardRef<FormHandle, FormProps>(
       const result = await runValidation()
       return result.valid
     }, [runValidation])
+
+    const validateFields = useCallback(
+      async (fieldNames: string[]): Promise<boolean> => {
+        if (!fieldNames || fieldNames.length === 0) {
+          return true
+        }
+
+        const nextErrors: FormError[] = []
+        const fieldSet = new Set(fieldNames)
+
+        for (const fieldName of fieldNames) {
+          const fieldRules = resolveFieldRules(fieldName)
+          if (!fieldRules) {
+            onValidate?.(fieldName, true, null)
+            continue
+          }
+
+          const error = await runFieldValidation(fieldName)
+
+          if (error) {
+            nextErrors.push({ field: fieldName, message: error })
+          }
+
+          onValidate?.(fieldName, !error, error)
+        }
+
+        setErrors((prevErrors) => {
+          const filtered = prevErrors.filter((entry) => !fieldSet.has(entry.field))
+          return [...filtered, ...nextErrors]
+        })
+
+        return nextErrors.length === 0
+      },
+      [resolveFieldRules, runFieldValidation, onValidate]
+    )
 
     const clearValidate = useCallback((fieldNames?: string | string[]): void => {
       if (!fieldNames) {
@@ -287,11 +343,12 @@ export const Form = forwardRef<FormHandle, FormProps>(
       ref,
       () => ({
         validate,
+        validateFields,
         validateField,
         clearValidate,
         resetFields
       }),
-      [validate, validateField, clearValidate, resetFields]
+      [validate, validateFields, validateField, clearValidate, resetFields]
     )
 
     const contextValue: FormContextValue = useMemo(

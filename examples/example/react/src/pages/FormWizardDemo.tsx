@@ -14,7 +14,12 @@ const basicSnippet = `<FormWizard
   steps={steps}
   current={current}
   onChange={setCurrent}
-  beforeNext={handleBeforeNext}
+  beforeNext={async (_current, step) => {
+    const fields = step.fields ?? []
+    if (fields.length === 0) return true
+    const valid = await formRef.current?.validateFields(fields)
+    return valid === true
+  }}
   onFinish={handleFinish}
   renderStep={(_step, index) => (
     <Form ref={formRef} model={model} className="w-full max-w-md">
@@ -43,9 +48,9 @@ const basicSnippet = `<FormWizard
 const FormWizardDemo: React.FC = () => {
   const steps = useMemo<WizardStep[]>(
     () => [
-      { title: '基本信息', description: '填写姓名与邮箱' },
-      { title: '联系方式', description: '填写手机号' },
-      { title: '完成', description: '提交并确认' }
+      { title: '基本信息', description: '填写姓名与邮箱', fields: ['name', 'email'] },
+      { title: '联系方式', description: '填写手机号', fields: ['phone'] },
+      { title: '完成', description: '提交并确认', fields: [] }
     ],
     []
   )
@@ -55,8 +60,12 @@ const FormWizardDemo: React.FC = () => {
   const [finished, setFinished] = useState(false)
   const formRef = useRef<FormHandle | null>(null)
 
-  const handleBeforeNext = async () => {
-    const valid = await formRef.current?.validate()
+  const handleBeforeNext = async (_current: number, step: WizardStep) => {
+    const fields = step.fields ?? []
+    if (fields.length === 0) {
+      return true
+    }
+    const valid = await formRef.current?.validateFields(fields)
     return valid === true
   }
 

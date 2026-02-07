@@ -6,7 +6,13 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React, { useState } from 'react'
-import { Form, FormItem, type FormHandle, type FormRule, type FormRules } from '@expcat/tigercat-react'
+import {
+  Form,
+  FormItem,
+  type FormHandle,
+  type FormRule,
+  type FormRules
+} from '@expcat/tigercat-react'
 import { expectNoA11yViolations } from '../utils/react'
 
 describe('Form', () => {
@@ -320,12 +326,14 @@ describe('Form', () => {
       function Demo() {
         const [model] = useState({ age: 15 })
         const rules: FormRules = {
-          age: [{
-            validator: (value) => {
-              if ((value as number) < 18) return 'Must be 18 or older'
-              return true
+          age: [
+            {
+              validator: (value) => {
+                if ((value as number) < 18) return 'Must be 18 or older'
+                return true
+              }
             }
-          }]
+          ]
         }
         return (
           <Form ref={formRef} model={model} rules={rules}>
@@ -350,13 +358,15 @@ describe('Form', () => {
       function Demo() {
         const [model] = useState({ username: 'taken' })
         const rules: FormRules = {
-          username: [{
-            validator: async (value) => {
-              await new Promise(resolve => setTimeout(resolve, 10))
-              if (value === 'taken') return 'Username is already taken'
-              return true
+          username: [
+            {
+              validator: async (value) => {
+                await new Promise((resolve) => setTimeout(resolve, 10))
+                if (value === 'taken') return 'Username is already taken'
+                return true
+              }
             }
-          }]
+          ]
         }
         return (
           <Form ref={formRef} model={model} rules={rules}>
@@ -650,6 +660,43 @@ describe('Form', () => {
 
       expect(await screen.findByText('Username required')).toBeInTheDocument()
       expect(await screen.findByText('Email required')).toBeInTheDocument()
+    })
+
+    it('validates only specified fields via validateFields', async () => {
+      const formRef = React.createRef<FormHandle>()
+
+      function Demo() {
+        const [model] = useState({ username: '', email: '' })
+        const rules: FormRules = {
+          username: [{ required: true, message: 'Username required' }],
+          email: [{ required: true, message: 'Email required' }]
+        }
+        return (
+          <Form ref={formRef} model={model} rules={rules}>
+            <FormItem label="Username" name="username">
+              <input aria-label="username" />
+            </FormItem>
+            <FormItem label="Email" name="email">
+              <input aria-label="email" />
+            </FormItem>
+          </Form>
+        )
+      }
+
+      render(<Demo />)
+
+      await act(async () => {
+        await formRef.current?.validateFields(['email'])
+      })
+
+      expect(await screen.findByText('Email required')).toBeInTheDocument()
+      expect(screen.queryByText('Username required')).not.toBeInTheDocument()
+
+      await act(async () => {
+        await formRef.current?.validateFields(['username'])
+      })
+
+      expect(await screen.findByText('Username required')).toBeInTheDocument()
     })
 
     it('clearValidate clears all errors when called without args', async () => {
@@ -957,7 +1004,7 @@ describe('Form', () => {
       })
 
       // Wait a bit for potential error message
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 100))
       expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     })
 
@@ -1070,11 +1117,13 @@ describe('Form', () => {
       function Demo() {
         const [model] = useState({ email: '  test@example.com  ' })
         const rules: FormRules = {
-          email: [{
-            type: 'email',
-            message: 'Invalid email',
-            transform: (value) => (value as string).trim()
-          }]
+          email: [
+            {
+              type: 'email',
+              message: 'Invalid email',
+              transform: (value) => (value as string).trim()
+            }
+          ]
         }
         return (
           <Form ref={formRef} model={model} rules={rules}>
@@ -1091,7 +1140,7 @@ describe('Form', () => {
       })
 
       // Should pass validation after trim
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 100))
       expect(screen.queryByText('Invalid email')).not.toBeInTheDocument()
     })
   })

@@ -65,10 +65,17 @@ export interface TigerLocalePagination {
   pageAriaLabel?: string
 }
 
+export interface TigerLocaleFormWizard {
+  prevText?: string
+  nextText?: string
+  finishText?: string
+}
+
 export interface TigerLocale {
   common?: TigerLocaleCommon
   modal?: TigerLocaleModal
   drawer?: TigerLocaleDrawer
   upload?: TigerLocaleUpload
   pagination?: TigerLocalePagination
+  formWizard?: TigerLocaleFormWizard
 }

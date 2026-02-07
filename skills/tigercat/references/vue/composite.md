@@ -248,16 +248,20 @@ import { FormWizard, Form, FormItem, Input } from '@expcat/tigercat-vue'
 import type { WizardStep } from '@expcat/tigercat-core'
 
 const steps: WizardStep[] = [
-  { title: '基本信息', description: '填写姓名与邮箱' },
-  { title: '确认信息', description: '确认后提交' }
+  { title: '基本信息', description: '填写姓名与邮箱', fields: ['name', 'email'] },
+  { title: '确认信息', description: '确认后提交', fields: [] }
 ]
 
 const current = ref(0)
 const formRef = ref<InstanceType<typeof Form> | null>(null)
 const model = ref({ name: '', email: '' })
 
-const handleBeforeNext = async () => {
-  const valid = await formRef.value?.validate()
+const handleBeforeNext = async (_current: number, step: WizardStep) => {
+  const fields = step.fields ?? []
+  if (fields.length === 0) {
+    return true
+  }
+  const valid = await formRef.value?.validateFields(fields)
   return valid ?? true
 }
 

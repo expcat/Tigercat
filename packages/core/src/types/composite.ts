@@ -8,6 +8,7 @@ import type { ButtonVariant } from './button'
 import type { FilterOption, TableProps } from './table'
 import type { PaginationProps } from './pagination'
 import type { StepStatus, StepsDirection, StepSize } from './steps'
+import type { TigerLocale } from './locale'
 
 /**
  * Chat message direction
@@ -986,6 +987,10 @@ export interface WizardStep {
    */
   content?: unknown
   /**
+   * Field names for step-scoped validation
+   */
+  fields?: string[]
+  /**
    * Custom data
    */
   [key: string]: unknown
@@ -1064,6 +1069,10 @@ export interface FormWizardProps {
    * Finish button text
    */
   finishText?: string
+  /**
+   * Locale overrides for FormWizard UI text
+   */
+  locale?: Partial<TigerLocale>
   /**
    * Validation hook before moving to next step
    */

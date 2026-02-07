@@ -36,11 +36,20 @@ describe('Form', () => {
         setup() {
           const model = reactive({ name: '' })
           return () =>
-            h(Form, { model }, {
-              default: () => h(FormItem, { label: 'Name' }, {
-                default: () => h('input', { type: 'text' })
-              })
-            })
+            h(
+              Form,
+              { model },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name' },
+                    {
+                      default: () => h('input', { type: 'text' })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -53,11 +62,20 @@ describe('Form', () => {
         setup() {
           const model = reactive({ name: '' })
           return () =>
-            h(Form, { model }, {
-              default: () => h(FormItem, { label: 'Name', required: true }, {
-                default: () => h('input', { type: 'text' })
-              })
-            })
+            h(
+              Form,
+              { model },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name', required: true },
+                    {
+                      default: () => h('input', { type: 'text' })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -72,11 +90,20 @@ describe('Form', () => {
         setup() {
           const model = reactive({ name: '' })
           return () =>
-            h(Form, { model, showRequiredAsterisk: false }, {
-              default: () => h(FormItem, { label: 'Name', required: true }, {
-                default: () => h('input', { type: 'text' })
-              })
-            })
+            h(
+              Form,
+              { model, showRequiredAsterisk: false },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name', required: true },
+                    {
+                      default: () => h('input', { type: 'text' })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -93,11 +120,20 @@ describe('Form', () => {
         setup() {
           const model = reactive({ name: '' })
           return () =>
-            h(Form, { model }, {
-              default: () => h(FormItem, { label: 'Name' }, {
-                default: () => h('input', { type: 'text' })
-              })
-            })
+            h(
+              Form,
+              { model },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name' },
+                    {
+                      default: () => h('input', { type: 'text' })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -110,11 +146,20 @@ describe('Form', () => {
         setup() {
           const model = reactive({ name: '' })
           return () =>
-            h(Form, { model, labelPosition: 'left' }, {
-              default: () => h(FormItem, { label: 'Name' }, {
-                default: () => h('input', { type: 'text' })
-              })
-            })
+            h(
+              Form,
+              { model, labelPosition: 'left' },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name' },
+                    {
+                      default: () => h('input', { type: 'text' })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -127,11 +172,20 @@ describe('Form', () => {
         setup() {
           const model = reactive({ name: '' })
           return () =>
-            h(Form, { model, labelPosition: 'top' }, {
-              default: () => h(FormItem, { label: 'Name' }, {
-                default: () => h('input', { type: 'text' })
-              })
-            })
+            h(
+              Form,
+              { model, labelPosition: 'top' },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name' },
+                    {
+                      default: () => h('input', { type: 'text' })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -144,11 +198,20 @@ describe('Form', () => {
         setup() {
           const model = reactive({ name: '' })
           return () =>
-            h(Form, { model, labelWidth: 120 }, {
-              default: () => h(FormItem, { label: 'Name' }, {
-                default: () => h('input', { type: 'text' })
-              })
-            })
+            h(
+              Form,
+              { model, labelWidth: 120 },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name' },
+                    {
+                      default: () => h('input', { type: 'text' })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -162,11 +225,20 @@ describe('Form', () => {
         setup() {
           const model = reactive({ name: '' })
           return () =>
-            h(Form, { model, labelWidth: 100 }, {
-              default: () => h(FormItem, { label: 'Name', labelWidth: 150 }, {
-                default: () => h('input', { type: 'text' })
-              })
-            })
+            h(
+              Form,
+              { model, labelWidth: 100 },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name', labelWidth: 150 },
+                    {
+                      default: () => h('input', { type: 'text' })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -233,14 +305,24 @@ describe('Form', () => {
             email: [{ required: true, message: 'Email is required' }]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, { label: 'Email', name: 'email' }, {
-                default: () => h('input', {
-                  'aria-label': 'email',
-                  value: model.email
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Email', name: 'email' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'email',
+                          value: model.email
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -258,14 +340,24 @@ describe('Form', () => {
             email: [{ type: 'email', message: 'Please enter valid email' }]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, { label: 'Email', name: 'email' }, {
-                default: () => h('input', {
-                  'aria-label': 'email',
-                  value: model.email
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Email', name: 'email' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'email',
+                          value: model.email
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -283,15 +375,25 @@ describe('Form', () => {
             password: [{ min: 6, message: 'Password must be at least 6 characters' }]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, { label: 'Password', name: 'password' }, {
-                default: () => h('input', {
-                  'aria-label': 'password',
-                  type: 'password',
-                  value: model.password
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Password', name: 'password' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'password',
+                          type: 'password',
+                          value: model.password
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -309,14 +411,24 @@ describe('Form', () => {
             name: [{ max: 10, message: 'Name must be at most 10 characters' }]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, { label: 'Name', name: 'name' }, {
-                default: () => h('input', {
-                  'aria-label': 'name',
-                  value: model.name
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name', name: 'name' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'name',
+                          value: model.name
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -334,14 +446,24 @@ describe('Form', () => {
             phone: [{ pattern: /^\d+$/, message: 'Phone must contain only numbers' }]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, { label: 'Phone', name: 'phone' }, {
-                default: () => h('input', {
-                  'aria-label': 'phone',
-                  value: model.phone
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Phone', name: 'phone' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'phone',
+                          value: model.phone
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -356,23 +478,35 @@ describe('Form', () => {
         setup() {
           const model = reactive({ age: 15 })
           const rules: FormRules = {
-            age: [{
-              validator: (value) => {
-                if ((value as number) < 18) return 'Must be 18 or older'
-                return true
+            age: [
+              {
+                validator: (value) => {
+                  if ((value as number) < 18) return 'Must be 18 or older'
+                  return true
+                }
               }
-            }]
+            ]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, { label: 'Age', name: 'age' }, {
-                default: () => h('input', {
-                  'aria-label': 'age',
-                  type: 'number',
-                  value: model.age
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Age', name: 'age' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'age',
+                          type: 'number',
+                          value: model.age
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -387,23 +521,35 @@ describe('Form', () => {
         setup() {
           const model = reactive({ username: 'taken' })
           const rules: FormRules = {
-            username: [{
-              validator: async (value) => {
-                await new Promise(resolve => setTimeout(resolve, 10))
-                if (value === 'taken') return 'Username is already taken'
-                return true
+            username: [
+              {
+                validator: async (value) => {
+                  await new Promise((resolve) => setTimeout(resolve, 10))
+                  if (value === 'taken') return 'Username is already taken'
+                  return true
+                }
               }
-            }]
+            ]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, { label: 'Username', name: 'username' }, {
-                default: () => h('input', {
-                  'aria-label': 'username',
-                  value: model.username
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Username', name: 'username' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'username',
+                          value: model.username
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -421,14 +567,24 @@ describe('Form', () => {
             field: [{ required: true, message: 'Field is required' }]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, { label: 'Field', name: 'field' }, {
-                default: () => h('input', {
-                  'aria-label': 'field',
-                  value: model.field
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Field', name: 'field' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'field',
+                          value: model.field
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -494,17 +650,27 @@ describe('Form', () => {
             name: [{ required: true, message: 'Name is required', trigger: 'change' }]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, { label: 'Name', name: 'name' }, {
-                default: () => h('input', {
-                  'aria-label': 'name',
-                  value: model.name,
-                  onInput: (e: Event) => {
-                    model.name = (e.target as HTMLInputElement).value
-                  }
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name', name: 'name' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'name',
+                          value: model.name,
+                          onInput: (e: Event) => {
+                            model.name = (e.target as HTMLInputElement).value
+                          }
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -526,17 +692,27 @@ describe('Form', () => {
             name: [{ required: true, message: 'Name is required' }]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, { label: 'Name', name: 'name' }, {
-                default: () => h('input', {
-                  'aria-label': 'name',
-                  value: model.name,
-                  onInput: (e: Event) => {
-                    model.name = (e.target as HTMLInputElement).value
-                  }
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name', name: 'name' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'name',
+                          value: model.name,
+                          onInput: (e: Event) => {
+                            model.name = (e.target as HTMLInputElement).value
+                          }
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -565,17 +741,26 @@ describe('Form', () => {
         setup() {
           const model = reactive({ username: 'john', password: 'secret123' })
           return () =>
-            h(Form, { model, onSubmit }, {
-              default: () => [
-                h(FormItem, { label: 'Username', name: 'username' }, {
-                  default: () => h('input', {
-                    'aria-label': 'username',
-                    value: model.username
-                  })
-                }),
-                h('button', { type: 'submit' }, 'Submit')
-              ]
-            })
+            h(
+              Form,
+              { model, onSubmit },
+              {
+                default: () => [
+                  h(
+                    FormItem,
+                    { label: 'Username', name: 'username' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'username',
+                          value: model.username
+                        })
+                    }
+                  ),
+                  h('button', { type: 'submit' }, 'Submit')
+                ]
+              }
+            )
         }
       })
 
@@ -599,17 +784,26 @@ describe('Form', () => {
             username: [{ required: true, message: 'Username is required' }]
           }
           return () =>
-            h(Form, { model, rules, onSubmit }, {
-              default: () => [
-                h(FormItem, { label: 'Username', name: 'username' }, {
-                  default: () => h('input', {
-                    'aria-label': 'username',
-                    value: model.username
-                  })
-                }),
-                h('button', { type: 'submit' }, 'Submit')
-              ]
-            })
+            h(
+              Form,
+              { model, rules, onSubmit },
+              {
+                default: () => [
+                  h(
+                    FormItem,
+                    { label: 'Username', name: 'username' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'username',
+                          value: model.username
+                        })
+                    }
+                  ),
+                  h('button', { type: 'submit' }, 'Submit')
+                ]
+              }
+            )
         }
       })
 
@@ -719,12 +913,20 @@ describe('Form', () => {
               },
               {
                 default: () => [
-                  h(FormItem, { label: 'Username', name: 'username' }, {
-                    default: () => h('input', { 'aria-label': 'username', value: model.username })
-                  }),
-                  h(FormItem, { label: 'Email', name: 'email' }, {
-                    default: () => h('input', { 'aria-label': 'email', value: model.email })
-                  })
+                  h(
+                    FormItem,
+                    { label: 'Username', name: 'username' },
+                    {
+                      default: () => h('input', { 'aria-label': 'username', value: model.username })
+                    }
+                  ),
+                  h(
+                    FormItem,
+                    { label: 'Email', name: 'email' },
+                    {
+                      default: () => h('input', { 'aria-label': 'email', value: model.email })
+                    }
+                  )
                 ]
               }
             )
@@ -740,11 +942,8 @@ describe('Form', () => {
       expect(await screen.findByText('Email required')).toBeInTheDocument()
     })
 
-    it('clearValidate clears all errors when called without args', async () => {
-      let formApi: {
-        validate: () => Promise<boolean>
-        clearValidate: (names?: string | string[]) => void
-      } | undefined
+    it('validates only specified fields via validateFields', async () => {
+      let formApi: { validateFields: (fields: string[]) => Promise<boolean> } | undefined
 
       const Demo = defineComponent({
         setup() {
@@ -765,12 +964,77 @@ describe('Form', () => {
               },
               {
                 default: () => [
-                  h(FormItem, { label: 'Username', name: 'username' }, {
-                    default: () => h('input', { 'aria-label': 'username', value: model.username })
-                  }),
-                  h(FormItem, { label: 'Email', name: 'email' }, {
-                    default: () => h('input', { 'aria-label': 'email', value: model.email })
-                  })
+                  h(
+                    FormItem,
+                    { label: 'Username', name: 'username' },
+                    {
+                      default: () => h('input', { 'aria-label': 'username', value: model.username })
+                    }
+                  ),
+                  h(
+                    FormItem,
+                    { label: 'Email', name: 'email' },
+                    {
+                      default: () => h('input', { 'aria-label': 'email', value: model.email })
+                    }
+                  )
+                ]
+              }
+            )
+        }
+      })
+
+      render(Demo)
+
+      await formApi?.validateFields(['email'])
+      expect(await screen.findByText('Email required')).toBeInTheDocument()
+      expect(screen.queryByText('Username required')).not.toBeInTheDocument()
+
+      await formApi?.validateFields(['username'])
+      expect(await screen.findByText('Username required')).toBeInTheDocument()
+    })
+
+    it('clearValidate clears all errors when called without args', async () => {
+      let formApi:
+        | {
+            validate: () => Promise<boolean>
+            clearValidate: (names?: string | string[]) => void
+          }
+        | undefined
+
+      const Demo = defineComponent({
+        setup() {
+          const model = reactive({ username: '', email: '' })
+          const rules: FormRules = {
+            username: [{ required: true, message: 'Username required' }],
+            email: [{ required: true, message: 'Email required' }]
+          }
+          return () =>
+            h(
+              Form,
+              {
+                model,
+                rules,
+                ref: (el) => {
+                  formApi = (el as typeof formApi) ?? undefined
+                }
+              },
+              {
+                default: () => [
+                  h(
+                    FormItem,
+                    { label: 'Username', name: 'username' },
+                    {
+                      default: () => h('input', { 'aria-label': 'username', value: model.username })
+                    }
+                  ),
+                  h(
+                    FormItem,
+                    { label: 'Email', name: 'email' },
+                    {
+                      default: () => h('input', { 'aria-label': 'email', value: model.email })
+                    }
+                  )
                 ]
               }
             )
@@ -792,10 +1056,12 @@ describe('Form', () => {
     })
 
     it('clearValidate clears specific field errors', async () => {
-      let formApi: {
-        validate: () => Promise<boolean>
-        clearValidate: (names?: string | string[]) => void
-      } | undefined
+      let formApi:
+        | {
+            validate: () => Promise<boolean>
+            clearValidate: (names?: string | string[]) => void
+          }
+        | undefined
 
       const Demo = defineComponent({
         setup() {
@@ -816,12 +1082,20 @@ describe('Form', () => {
               },
               {
                 default: () => [
-                  h(FormItem, { label: 'Username', name: 'username' }, {
-                    default: () => h('input', { 'aria-label': 'username', value: model.username })
-                  }),
-                  h(FormItem, { label: 'Email', name: 'email' }, {
-                    default: () => h('input', { 'aria-label': 'email', value: model.email })
-                  })
+                  h(
+                    FormItem,
+                    { label: 'Username', name: 'username' },
+                    {
+                      default: () => h('input', { 'aria-label': 'username', value: model.username })
+                    }
+                  ),
+                  h(
+                    FormItem,
+                    { label: 'Email', name: 'email' },
+                    {
+                      default: () => h('input', { 'aria-label': 'email', value: model.email })
+                    }
+                  )
                 ]
               }
             )
@@ -843,10 +1117,12 @@ describe('Form', () => {
     })
 
     it('clearValidate clears multiple field errors via array', async () => {
-      let formApi: {
-        validate: () => Promise<boolean>
-        clearValidate: (names?: string | string[]) => void
-      } | undefined
+      let formApi:
+        | {
+            validate: () => Promise<boolean>
+            clearValidate: (names?: string | string[]) => void
+          }
+        | undefined
 
       const Demo = defineComponent({
         setup() {
@@ -868,15 +1144,27 @@ describe('Form', () => {
               },
               {
                 default: () => [
-                  h(FormItem, { label: 'Username', name: 'username' }, {
-                    default: () => h('input', { 'aria-label': 'username', value: model.username })
-                  }),
-                  h(FormItem, { label: 'Email', name: 'email' }, {
-                    default: () => h('input', { 'aria-label': 'email', value: model.email })
-                  }),
-                  h(FormItem, { label: 'Phone', name: 'phone' }, {
-                    default: () => h('input', { 'aria-label': 'phone', value: model.phone })
-                  })
+                  h(
+                    FormItem,
+                    { label: 'Username', name: 'username' },
+                    {
+                      default: () => h('input', { 'aria-label': 'username', value: model.username })
+                    }
+                  ),
+                  h(
+                    FormItem,
+                    { label: 'Email', name: 'email' },
+                    {
+                      default: () => h('input', { 'aria-label': 'email', value: model.email })
+                    }
+                  ),
+                  h(
+                    FormItem,
+                    { label: 'Phone', name: 'phone' },
+                    {
+                      default: () => h('input', { 'aria-label': 'phone', value: model.phone })
+                    }
+                  )
                 ]
               }
             )
@@ -896,10 +1184,12 @@ describe('Form', () => {
     })
 
     it('resetFields clears validation errors', async () => {
-      let formApi: {
-        validate: () => Promise<boolean>
-        resetFields: () => void
-      } | undefined
+      let formApi:
+        | {
+            validate: () => Promise<boolean>
+            resetFields: () => void
+          }
+        | undefined
 
       const Demo = defineComponent({
         setup() {
@@ -918,9 +1208,14 @@ describe('Form', () => {
                 }
               },
               {
-                default: () => h(FormItem, { label: 'Username', name: 'username' }, {
-                  default: () => h('input', { 'aria-label': 'username', value: model.username })
-                })
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Username', name: 'username' },
+                    {
+                      default: () => h('input', { 'aria-label': 'username', value: model.username })
+                    }
+                  )
               }
             )
         }
@@ -947,14 +1242,24 @@ describe('Form', () => {
             username: [{ required: true, message: 'Username required' }]
           }
           return () =>
-            h(Form, { model, rules, onValidate }, {
-              default: () => h(FormItem, { label: 'Username', name: 'username' }, {
-                default: () => h('input', {
-                  'aria-label': 'username',
-                  value: model.username
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules, onValidate },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Username', name: 'username' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'username',
+                          value: model.username
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -983,14 +1288,24 @@ describe('Form', () => {
             'user.profile.name': [{ required: true, message: 'Name is required' }]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, { label: 'Name', name: 'user.profile.name' }, {
-                default: () => h('input', {
-                  'aria-label': 'name',
-                  value: model.user.profile.name
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name', name: 'user.profile.name' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'name',
+                          value: model.user.profile.name
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -1010,29 +1325,48 @@ describe('Form', () => {
             field2: [{ required: true, message: 'Field 2 required' }]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => [
-                h(FormItem, { label: 'Field 1', name: 'field1' }, {
-                  default: () => h('input', {
-                    'aria-label': 'field1',
-                    value: model.field1
-                  })
-                }),
-                showField2.value && h(FormItem, { label: 'Field 2', name: 'field2' }, {
-                  default: () => h('input', {
-                    'aria-label': 'field2',
-                    value: model.field2 || ''
-                  })
-                }),
-                h('button', {
-                  type: 'button',
-                  onClick: () => {
-                    showField2.value = true
-                    model.field2 = ''
-                  }
-                }, 'Add Field')
-              ]
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () => [
+                  h(
+                    FormItem,
+                    { label: 'Field 1', name: 'field1' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'field1',
+                          value: model.field1
+                        })
+                    }
+                  ),
+                  showField2.value &&
+                    h(
+                      FormItem,
+                      { label: 'Field 2', name: 'field2' },
+                      {
+                        default: () =>
+                          h('input', {
+                            'aria-label': 'field2',
+                            value: model.field2 || ''
+                          })
+                      }
+                    ),
+                  h(
+                    'button',
+                    {
+                      type: 'button',
+                      onClick: () => {
+                        showField2.value = true
+                        model.field2 = ''
+                      }
+                    },
+                    'Add Field'
+                  )
+                ]
+              }
+            )
         }
       })
 
@@ -1058,14 +1392,24 @@ describe('Form', () => {
         setup() {
           const model = reactive({ username: '' })
           return () =>
-            h(Form, { model, disabled: true }, {
-              default: () => h(FormItem, { label: 'Username', name: 'username' }, {
-                default: () => h('input', {
-                  'aria-label': 'username',
-                  value: model.username
-                })
-              })
-            })
+            h(
+              Form,
+              { model, disabled: true },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Username', name: 'username' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'username',
+                          value: model.username
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -1079,18 +1423,28 @@ describe('Form', () => {
         setup() {
           const model = reactive({ username: '' })
           return () =>
-            h(Form, { model }, {
-              default: () => h(FormItem, {
-                label: 'Username',
-                name: 'username',
-                error: 'Custom error message'
-              }, {
-                default: () => h('input', {
-                  'aria-label': 'username',
-                  value: model.username
-                })
-              })
-            })
+            h(
+              Form,
+              { model },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    {
+                      label: 'Username',
+                      name: 'username',
+                      error: 'Custom error message'
+                    },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'username',
+                          value: model.username
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -1106,18 +1460,28 @@ describe('Form', () => {
             username: [{ required: true, message: 'Username required' }]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, {
-                label: 'Username',
-                name: 'username',
-                showMessage: false
-              }, {
-                default: () => h('input', {
-                  'aria-label': 'username',
-                  value: model.username
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    {
+                      label: 'Username',
+                      name: 'username',
+                      showMessage: false
+                    },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'username',
+                          value: model.username
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -1125,7 +1489,7 @@ describe('Form', () => {
       await fireEvent.focusOut(screen.getByLabelText('username'))
 
       // Wait a bit for potential error message
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 100))
       expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     })
 
@@ -1137,11 +1501,20 @@ describe('Form', () => {
           setup() {
             const model = reactive({ name: '' })
             return () =>
-              h(Form, { model, size }, {
-                default: () => h(FormItem, { label: 'Name', name: 'name' }, {
-                  default: () => h('input', { type: 'text' })
-                })
-              })
+              h(
+                Form,
+                { model, size },
+                {
+                  default: () =>
+                    h(
+                      FormItem,
+                      { label: 'Name', name: 'name' },
+                      {
+                        default: () => h('input', { type: 'text' })
+                      }
+                    )
+                }
+              )
           }
         })
 
@@ -1156,11 +1529,20 @@ describe('Form', () => {
         setup() {
           const model = reactive({ name: '' })
           return () =>
-            h(Form, { model, size: 'sm' }, {
-              default: () => h(FormItem, { label: 'Name', name: 'name', size: 'lg' }, {
-                default: () => h('input', { type: 'text' })
-              })
-            })
+            h(
+              Form,
+              { model, size: 'sm' },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name', name: 'name', size: 'lg' },
+                    {
+                      default: () => h('input', { type: 'text' })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -1178,18 +1560,28 @@ describe('Form', () => {
             { min: 8, message: 'Password must be at least 8 characters' }
           ]
           return () =>
-            h(Form, { model }, {
-              default: () => h(FormItem, { label: 'Password', name: 'password', rules }, {
-                default: () => h('input', {
-                  'aria-label': 'password',
-                  type: 'password',
-                  value: model.password,
-                  onInput: (e: Event) => {
-                    model.password = (e.target as HTMLInputElement).value
-                  }
-                })
-              })
-            })
+            h(
+              Form,
+              { model },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Password', name: 'password', rules },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'password',
+                          type: 'password',
+                          value: model.password,
+                          onInput: (e: Event) => {
+                            model.password = (e.target as HTMLInputElement).value
+                          }
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -1216,17 +1608,26 @@ describe('Form', () => {
         setup() {
           const model = reactive({ username: 'john' })
           return () =>
-            h(Form, { model, onSubmit }, {
-              default: () => [
-                h(FormItem, { label: 'Username', name: 'username' }, {
-                  default: () => h('input', {
-                    'aria-label': 'username',
-                    value: model.username
-                  })
-                }),
-                h('button', { type: 'submit' }, 'Submit')
-              ]
-            })
+            h(
+              Form,
+              { model, onSubmit },
+              {
+                default: () => [
+                  h(
+                    FormItem,
+                    { label: 'Username', name: 'username' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'username',
+                          value: model.username
+                        })
+                    }
+                  ),
+                  h('button', { type: 'submit' }, 'Submit')
+                ]
+              }
+            )
         }
       })
 
@@ -1246,21 +1647,33 @@ describe('Form', () => {
         setup() {
           const model = reactive({ email: '  test@example.com  ' })
           const rules: FormRules = {
-            email: [{
-              type: 'email',
-              message: 'Invalid email',
-              transform: (value) => (value as string).trim()
-            }]
+            email: [
+              {
+                type: 'email',
+                message: 'Invalid email',
+                transform: (value) => (value as string).trim()
+              }
+            ]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, { label: 'Email', name: 'email' }, {
-                default: () => h('input', {
-                  'aria-label': 'email',
-                  value: model.email
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Email', name: 'email' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'email',
+                          value: model.email
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -1268,7 +1681,7 @@ describe('Form', () => {
       await fireEvent.focusOut(screen.getByLabelText('email'))
 
       // Should pass validation after trim
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 100))
       expect(screen.queryByText('Invalid email')).not.toBeInTheDocument()
     })
   })
@@ -1289,11 +1702,20 @@ describe('Form', () => {
         setup() {
           const model = reactive({ name: '' })
           return () =>
-            h(Form, { model }, {
-              default: () => h(FormItem, { label: 'Full Name', name: 'name' }, {
-                default: () => h('input', { type: 'text' })
-              })
-            })
+            h(
+              Form,
+              { model },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Full Name', name: 'name' },
+                    {
+                      default: () => h('input', { type: 'text' })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -1314,14 +1736,24 @@ describe('Form', () => {
             name: [{ required: true, message: 'Required' }]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, { label: 'Name', name: 'name' }, {
-                default: () => h('input', {
-                  'aria-label': 'name',
-                  value: model.name
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name', name: 'name' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'name',
+                          value: model.name
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -1342,14 +1774,24 @@ describe('Form', () => {
         setup() {
           const model = reactive({ name: '' })
           return () =>
-            h(Form, { model }, {
-              default: () => h(FormItem, { label: 'Name', name: 'name', required: true }, {
-                default: () => h('input', {
-                  'aria-label': 'name',
-                  value: model.name
-                })
-              })
-            })
+            h(
+              Form,
+              { model },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name', name: 'name', required: true },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'name',
+                          value: model.name
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 
@@ -1366,14 +1808,24 @@ describe('Form', () => {
             name: [{ required: true, message: 'Name required' }]
           }
           return () =>
-            h(Form, { model, rules }, {
-              default: () => h(FormItem, { label: 'Name', name: 'name' }, {
-                default: () => h('input', {
-                  'aria-label': 'name',
-                  value: model.name
-                })
-              })
-            })
+            h(
+              Form,
+              { model, rules },
+              {
+                default: () =>
+                  h(
+                    FormItem,
+                    { label: 'Name', name: 'name' },
+                    {
+                      default: () =>
+                        h('input', {
+                          'aria-label': 'name',
+                          value: model.name
+                        })
+                    }
+                  )
+              }
+            )
         }
       })
 

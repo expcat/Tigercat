@@ -146,24 +146,35 @@ export const Form = defineComponent({
       return Object.keys(merged).length > 0 ? merged : undefined
     }
 
+    const resolveFieldRules = (fieldName: string, rulesOverride?: FormRule | FormRule[]) => {
+      return rulesOverride ?? fieldRules[fieldName] ?? props.rules?.[fieldName]
+    }
+
+    const runFieldValidation = async (
+      fieldName: string,
+      rulesOverride?: FormRule | FormRule[],
+      trigger?: FormRuleTrigger
+    ): Promise<string | null> => {
+      const effectiveFieldRules = resolveFieldRules(fieldName, rulesOverride)
+      if (!effectiveFieldRules) {
+        return null
+      }
+
+      const value = getValueByPath(props.model, fieldName)
+      return validateFieldUtil(fieldName, value, effectiveFieldRules, props.model, trigger)
+    }
+
     const validateField = async (
       fieldName: string,
       rulesOverride?: FormRule | FormRule[],
       trigger?: FormRuleTrigger
     ): Promise<void> => {
-      const effectiveFieldRules = rulesOverride ?? fieldRules[fieldName] ?? props.rules?.[fieldName]
+      const effectiveFieldRules = resolveFieldRules(fieldName, rulesOverride)
       if (!effectiveFieldRules) {
         return
       }
 
-      const value = getValueByPath(props.model, fieldName)
-      const error = await validateFieldUtil(
-        fieldName,
-        value,
-        effectiveFieldRules,
-        props.model,
-        trigger
-      )
+      const error = await runFieldValidation(fieldName, rulesOverride, trigger)
 
       // Remove existing errors for this field
       const index = errors.findIndex((e) => e.field === fieldName)
@@ -192,6 +203,40 @@ export const Form = defineComponent({
       const result = await validateForm(props.model, effectiveRules)
       errors.push(...result.errors)
       return result.valid
+    }
+
+    const validateFields = async (fieldNames: string[]): Promise<boolean> => {
+      if (!fieldNames || fieldNames.length === 0) {
+        return true
+      }
+
+      const nextErrors: FormError[] = []
+      const fieldSet = new Set(fieldNames)
+
+      for (const fieldName of fieldNames) {
+        const effectiveFieldRules = resolveFieldRules(fieldName)
+        if (!effectiveFieldRules) {
+          emit('validate', fieldName, true, undefined)
+          continue
+        }
+
+        const error = await runFieldValidation(fieldName)
+
+        if (error) {
+          nextErrors.push({ field: fieldName, message: error })
+        }
+
+        emit('validate', fieldName, !error, error || undefined)
+      }
+
+      for (let i = errors.length - 1; i >= 0; i--) {
+        if (fieldSet.has(errors[i].field)) {
+          errors.splice(i, 1)
+        }
+      }
+
+      errors.push(...nextErrors)
+      return nextErrors.length === 0
     }
 
     const clearValidate = (fieldNames?: string | string[]): void => {
@@ -242,6 +287,7 @@ export const Form = defineComponent({
     // Expose methods
     expose({
       validate,
+      validateFields,
       validateField,
       clearValidate,
       resetFields

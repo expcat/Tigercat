@@ -11,7 +11,7 @@ export function resolveLocaleText(
   return fallback
 }
 
-import type { TigerLocale, TigerLocalePagination } from '../types/locale'
+import type { TigerLocale, TigerLocalePagination, TigerLocaleFormWizard } from '../types/locale'
 
 export function mergeTigerLocale(
   base?: Partial<TigerLocale>,
@@ -24,7 +24,8 @@ export function mergeTigerLocale(
     modal: { ...base?.modal, ...override?.modal },
     drawer: { ...base?.drawer, ...override?.drawer },
     upload: { ...base?.upload, ...override?.upload },
-    pagination: { ...base?.pagination, ...override?.pagination }
+    pagination: { ...base?.pagination, ...override?.pagination },
+    formWizard: { ...base?.formWizard, ...override?.formWizard }
   }
 }
 
@@ -56,6 +57,32 @@ export const ZH_CN_PAGINATION_LABELS: Required<TigerLocalePagination> = {
   prevPageAriaLabel: '上一页',
   nextPageAriaLabel: '下一页',
   pageAriaLabel: '第 {page} 页'
+}
+
+// ============================================================================
+// FormWizard Labels
+// ============================================================================
+
+export const DEFAULT_FORM_WIZARD_LABELS: Required<TigerLocaleFormWizard> = {
+  prevText: 'Previous',
+  nextText: 'Next',
+  finishText: 'Finish'
+}
+
+export const ZH_CN_FORM_WIZARD_LABELS: Required<TigerLocaleFormWizard> = {
+  prevText: '上一步',
+  nextText: '下一步',
+  finishText: '完成'
+}
+
+export function getFormWizardLabels(
+  locale?: Partial<TigerLocale>
+): Required<TigerLocaleFormWizard> {
+  return {
+    prevText: locale?.formWizard?.prevText ?? DEFAULT_FORM_WIZARD_LABELS.prevText,
+    nextText: locale?.formWizard?.nextText ?? DEFAULT_FORM_WIZARD_LABELS.nextText,
+    finishText: locale?.formWizard?.finishText ?? DEFAULT_FORM_WIZARD_LABELS.finishText
+  }
 }
 
 /**

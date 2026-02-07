@@ -3,14 +3,19 @@ import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
+  getFormWizardLabels,
+  mergeTigerLocale,
+  resolveLocaleText,
   type WizardStep,
   type StepsDirection,
   type StepSize,
-  type FormWizardValidator
+  type FormWizardValidator,
+  type TigerLocale
 } from '@expcat/tigercat-core'
 import { Steps } from './Steps'
 import { StepsItem } from './StepsItem'
 import { Button } from './Button'
+import { useTigerConfig } from './ConfigProvider'
 
 type HChildren = Parameters<typeof h>[2]
 
@@ -28,6 +33,7 @@ export interface VueFormWizardProps {
   nextText?: string
   finishText?: string
   beforeNext?: FormWizardValidator
+  locale?: Partial<TigerLocale>
   className?: string
   style?: Record<string, string | number>
 }
@@ -74,18 +80,22 @@ export const FormWizard = defineComponent({
     },
     prevText: {
       type: String,
-      default: 'Previous'
+      default: undefined
     },
     nextText: {
       type: String,
-      default: 'Next'
+      default: undefined
     },
     finishText: {
       type: String,
-      default: 'Finish'
+      default: undefined
     },
     beforeNext: {
       type: Function as PropType<FormWizardValidator>,
+      default: undefined
+    },
+    locale: {
+      type: Object as PropType<Partial<TigerLocale>>,
       default: undefined
     },
     className: {
@@ -99,6 +109,10 @@ export const FormWizard = defineComponent({
   },
   emits: ['change', 'update:current', 'finish'],
   setup(props, { slots, attrs, emit }) {
+    const config = useTigerConfig()
+    const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
+    const labels = computed(() => getFormWizardLabels(mergedLocale.value))
+
     const innerCurrent = ref(props.current ?? props.defaultCurrent)
 
     watch(
@@ -270,7 +284,7 @@ export const FormWizard = defineComponent({
                       disabled: isFirst,
                       onClick: handlePrev
                     },
-                    { default: () => props.prevText }
+                    { default: () => resolveLocaleText(labels.value.prevText, props.prevText) }
                   ),
                   h(
                     Button,
@@ -279,7 +293,12 @@ export const FormWizard = defineComponent({
                       variant: 'primary',
                       onClick: handleNext
                     },
-                    { default: () => (isLast ? props.finishText : props.nextText) }
+                    {
+                      default: () =>
+                        isLast
+                          ? resolveLocaleText(labels.value.finishText, props.finishText)
+                          : resolveLocaleText(labels.value.nextText, props.nextText)
+                    }
                   )
                 ]
               )

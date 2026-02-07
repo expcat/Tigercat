@@ -22,45 +22,37 @@ const exampleBoxClasses =
     <section class="mb-12">
         <div class="mb-4">
             <h2 class="text-2xl font-bold mb-2">{{ props.title }}</h2>
-            <p v-if="props.description"
-               class="text-gray-600">
+            <p v-if="props.description" class="text-gray-600">
                 {{ props.description }}
             </p>
         </div>
 
         <div class="rounded-lg">
-            <Tabs v-model:activeKey="activeKey"
-                  type="card">
-                <TabPane tabKey="preview"
-                         label="示例">
-                    <div :class="previewPanelClasses">
-                        <slot />
-                    </div>
-                </TabPane>
-                <TabPane tabKey="code"
-                         label="代码">
-                    <div :class="codePanelClasses">
-                        <Code :code="props.code" />
-                    </div>
-                </TabPane>
-                <TabPane tabKey="mixed"
-                         label="混合">
-                    <div :class="previewPanelClasses">
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <div class="w-full">
-                                <div class="text-xs text-gray-500 mb-2">示例</div>
-                                <div :class="exampleBoxClasses">
-                                    <slot />
-                                </div>
-                            </div>
-                            <div class="w-full">
-                                <div class="text-xs text-gray-500 mb-2">代码</div>
-                                <Code :code="props.code" />
-                            </div>
+            <Tabs v-model:activeKey="activeKey" type="card">
+                <TabPane tabKey="preview" label="示例" />
+                <TabPane tabKey="code" label="代码" />
+                <TabPane tabKey="mixed" label="混合" />
+            </Tabs>
+            <div v-if="activeKey === 'preview'" :class="previewPanelClasses">
+                <slot />
+            </div>
+            <div v-else-if="activeKey === 'code'" :class="codePanelClasses">
+                <Code :code="props.code" />
+            </div>
+            <div v-else :class="previewPanelClasses">
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div class="w-full">
+                        <div class="text-xs text-gray-500 mb-2">示例</div>
+                        <div :class="exampleBoxClasses">
+                            <slot />
                         </div>
                     </div>
-                </TabPane>
-            </Tabs>
+                    <div class="w-full">
+                        <div class="text-xs text-gray-500 mb-2">代码</div>
+                        <Code :code="props.code" />
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 </template>

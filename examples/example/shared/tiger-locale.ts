@@ -4,6 +4,11 @@ import type { DemoLang } from './app-config'
 export function getDemoTigerLocale(lang: DemoLang): Partial<TigerLocale> {
   if (lang === 'zh-CN') {
     return {
+      formWizard: {
+        prevText: '上一步',
+        nextText: '下一步',
+        finishText: '完成'
+      },
       upload: {
         dragAreaAriaLabel: '上传文件：点击或拖拽',
         buttonAriaLabel: '上传文件',
@@ -23,6 +28,11 @@ export function getDemoTigerLocale(lang: DemoLang): Partial<TigerLocale> {
   }
 
   return {
+    formWizard: {
+      prevText: 'Previous',
+      nextText: 'Next',
+      finishText: 'Finish'
+    },
     upload: {
       dragAreaAriaLabel: 'Upload file by clicking or dragging',
       buttonAriaLabel: 'Upload file',

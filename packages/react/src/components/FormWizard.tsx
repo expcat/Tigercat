@@ -1,12 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   classNames,
+  getFormWizardLabels,
+  mergeTigerLocale,
+  resolveLocaleText,
   type FormWizardProps as CoreFormWizardProps,
   type WizardStep
 } from '@expcat/tigercat-core'
 import { Steps } from './Steps'
 import { StepsItem } from './StepsItem'
 import { Button } from './Button'
+import { useTigerConfig } from './ConfigProvider'
 
 export interface FormWizardProps
   extends
@@ -26,9 +30,10 @@ export const FormWizard: React.FC<FormWizardProps> = ({
   simple = false,
   showSteps = true,
   showActions = true,
-  prevText = 'Previous',
-  nextText = 'Next',
-  finishText = 'Finish',
+  prevText,
+  nextText,
+  finishText,
+  locale,
   beforeNext,
   onChange,
   onFinish,
@@ -37,6 +42,13 @@ export const FormWizard: React.FC<FormWizardProps> = ({
   style,
   ...props
 }) => {
+  const config = useTigerConfig()
+  const mergedLocale = useMemo(
+    () => mergeTigerLocale(config.locale, locale),
+    [config.locale, locale]
+  )
+  const labels = useMemo(() => getFormWizardLabels(mergedLocale), [mergedLocale])
+
   const [innerCurrent, setInnerCurrent] = useState(defaultCurrent)
 
   useEffect(() => {
@@ -144,10 +156,12 @@ export const FormWizard: React.FC<FormWizardProps> = ({
       {showActions && (
         <div className="flex items-center justify-center gap-3 px-6 py-2 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface-muted,#f9fafb)]">
           <Button type="button" variant="secondary" disabled={isFirst} onClick={handlePrev}>
-            {prevText}
+            {resolveLocaleText(labels.prevText, prevText)}
           </Button>
           <Button type="button" variant="primary" onClick={handleNext}>
-            {isLast ? finishText : nextText}
+            {isLast
+              ? resolveLocaleText(labels.finishText, finishText)
+              : resolveLocaleText(labels.nextText, nextText)}
           </Button>
         </div>
       )}
