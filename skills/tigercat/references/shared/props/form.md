@@ -15,24 +15,36 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop          | Type                         | Default   | Vue | React | Description    |
-| ------------- | ---------------------------- | --------- | :-: | :---: | -------------- |
-| model         | `object`                     | -         |  ✓  |   -   | 表单数据对象   |
-| rules         | `object`                     | -         |  ✓  |   -   | 校验规则       |
-| labelWidth    | `string \| number`           | -         |  ✓  |   ✓   | 标签宽度       |
-| labelPosition | `'left' \| 'right' \| 'top'` | `'right'` |  ✓  |   ✓   | 标签位置       |
-| disabled      | `boolean`                    | `false`   |  ✓  |   ✓   | 禁用所有表单项 |
+| Prop                 | Type                         | Default   | Vue | React | Description              |
+| -------------------- | ---------------------------- | --------- | :-: | :---: | ------------------------ |
+| model                | `object`                     | `{}`      |  ✓  |   ✓   | 表单数据对象             |
+| rules                | `FormRules`                  | -         |  ✓  |   ✓   | 校验规则（字段名→规则）  |
+| labelWidth           | `string \| number`           | -         |  ✓  |   ✓   | 标签宽度                 |
+| labelPosition        | `'left' \| 'right' \| 'top'` | `'right'` |  ✓  |   ✓   | 标签位置                 |
+| labelAlign           | `'left' \| 'right' \| 'top'` | `'right'` |  ✓  |   ✓   | 标签文字对齐             |
+| size                 | `'sm' \| 'md' \| 'lg'`       | `'md'`    |  ✓  |   ✓   | 表单尺寸（影响子表单项） |
+| inlineMessage        | `boolean`                    | `true`    |  ✓  |   ✓   | 是否行内显示校验消息     |
+| showRequiredAsterisk | `boolean`                    | `true`    |  ✓  |   ✓   | 必填字段显示星号         |
+| disabled             | `boolean`                    | `false`   |  ✓  |   ✓   | 禁用所有表单项           |
+| className            | `string`                     | -         |  -  |   ✓   | 自定义 CSS 类            |
 
-### Methods (Vue only)
+### Events
 
-| Method        | Type                                 | Description  |
-| ------------- | ------------------------------------ | ------------ |
-| validate      | `() => Promise<boolean>`             | 验证表单     |
-| validateField | `(prop: string) => Promise<boolean>` | 验证单个字段 |
-| resetFields   | `() => void`                         | 重置表单     |
-| clearValidate | `(props?: string[]) => void`         | 清除验证状态 |
+| Vue Event   | React Callback | Payload                                      | Description     |
+| ----------- | -------------- | -------------------------------------------- | --------------- |
+| `@submit`   | `onSubmit`     | `{ valid, values, errors }`                  | 表单提交        |
+| `@validate` | `onValidate`   | `(fieldName: string, valid, error?: string)` | 字段校验完成    |
+| -           | `onChange`     | `FormValues`                                 | 值变更（React） |
 
-> **React**: 表单验证需自行实现或使用第三方库（如 react-hook-form）
+### Methods (Vue expose / React FormHandle ref)
+
+| Method         | Type                                          | Description      |
+| -------------- | --------------------------------------------- | ---------------- |
+| validate       | `() => Promise<boolean>`                      | 验证整个表单     |
+| validateFields | `(fields: string[]) => Promise<boolean>`      | 验证指定字段列表 |
+| validateField  | `(name: string, rules?, trigger?) => Promise` | 验证单个字段     |
+| clearValidate  | `(fields?: string \| string[]) => void`       | 清除验证状态     |
+| resetFields    | `() => void`                                  | 重置表单         |
 
 ---
 
@@ -40,14 +52,17 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop        | Type      | Default | Vue | React | Description                                                                           |
-| ----------- | --------- | ------- | :-: | :---: | ------------------------------------------------------------------------------------- |
-| prop        | `string`  | -       |  ✓  |   -   | 字段名（对应 model 中的 key）                                                         |
-| name        | `string`  | -       |  -  |   ✓   | 字段名                                                                                |
-| label       | `string`  | -       |  ✓  |   ✓   | 标签文本                                                                              |
-| required    | `boolean` | `false` |  ✓  |   ✓   | 必填标记                                                                              |
-| error       | `string`  | -       |  ✓  |   ✓   | 错误信息                                                                              |
-| showMessage | `boolean` | `true`  |  ✓  |   ✓   | 是否在表单项下方显示错误信息。设为 `false` 可让 Input 内部显示错误（抖动 + 错误文字） |
+| Prop        | Type                     | Default | Vue | React | Description                                                                           |
+| ----------- | ------------------------ | ------- | :-: | :---: | ------------------------------------------------------------------------------------- |
+| name        | `string`                 | -       |  ✓  |   ✓   | 字段名（对应 model 中的 key，支持嵌套如 `user.name`）                                 |
+| label       | `string`                 | -       |  ✓  |   ✓   | 标签文本                                                                              |
+| labelWidth  | `string \| number`       | -       |  ✓  |   ✓   | 标签宽度（覆盖 Form 级别）                                                            |
+| required    | `boolean`                | -       |  ✓  |   ✓   | 必填标记（也可通过 rules 中 required 自动推断）                                       |
+| rules       | `FormRule \| FormRule[]` | -       |  ✓  |   ✓   | 字段校验规则（覆盖 Form 级别）                                                        |
+| error       | `string`                 | -       |  ✓  |   ✓   | 错误信息（受控模式）                                                                  |
+| showMessage | `boolean`                | `true`  |  ✓  |   ✓   | 是否在表单项下方显示错误信息。设为 `false` 可让 Input 内部显示错误（抖动 + 错误文字） |
+| size        | `'sm' \| 'md' \| 'lg'`   | -       |  ✓  |   ✓   | 尺寸（覆盖 Form 级别）                                                                |
+| className   | `string`                 | -       |  -  |   ✓   | 自定义 CSS 类                                                                         |
 
 ---
 

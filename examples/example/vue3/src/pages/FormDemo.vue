@@ -169,6 +169,92 @@ const validateSnippet = `<Space direction="vertical" class="w-full">
 const previewSnippet = `<pre class="text-sm text-gray-700 bg-white p-4 rounded border">
   {{ JSON.stringify({ basicForm, validateForm }, null, 2) }}
 </pre>`
+
+const layoutPosition = ref<'left' | 'right' | 'top'>('right')
+const layoutModel = reactive({ name: '', email: '' })
+
+const layoutSnippet = `<Form :model="layoutModel" :labelPosition="layoutPosition" label-width="100px">
+  <FormItem label="姓名" name="name">
+    <Input v-model="layoutModel.name" placeholder="请输入姓名" />
+  </FormItem>
+  <FormItem label="邮箱" name="email">
+    <Input v-model="layoutModel.email" placeholder="请输入邮箱" />
+  </FormItem>
+</Form>`
+
+const sizeValue = ref<'sm' | 'md' | 'lg'>('md')
+const sizeModel = reactive({ name: '' })
+
+const sizeSnippet = `<Form :model="sizeModel" :size="sizeValue">
+  <FormItem label="姓名" name="name">
+    <Input v-model="sizeModel.name" placeholder="请输入姓名" />
+  </FormItem>
+</Form>`
+
+const disabledModel = reactive({ name: '张三', email: 'zhangsan@example.com' })
+
+const disabledSnippet = `<Form :model="disabledModel" disabled>
+  <FormItem label="姓名" name="name">
+    <Input v-model="disabledModel.name" />
+  </FormItem>
+  <FormItem label="邮箱" name="email">
+    <Input v-model="disabledModel.email" />
+  </FormItem>
+</Form>`
+
+const customValidatorFormRef = ref<any>(null)
+const customValidatorModel = reactive({ username: '', age: '' })
+const customValidatorRules = {
+  username: [
+    { required: true, message: '请输入用户名' },
+    {
+      validator: async (value: unknown) => {
+        await new Promise((r) => setTimeout(r, 500))
+        if (value === 'admin') return '用户名已被占用'
+        return true
+      },
+      message: '用户名校验失败'
+    }
+  ],
+  age: [
+    { required: true, message: '请输入年龄' },
+    {
+      validator: (value: unknown) => {
+        const num = Number(value)
+        if (isNaN(num) || num < 18 || num > 120) return '年龄必须在 18-120 之间'
+        return true
+      }
+    }
+  ]
+}
+
+const customValidatorSnippet = `<Form :model="customValidatorModel" :rules="customValidatorRules">
+  <FormItem label="用户名" name="username">
+    <Input v-model="customValidatorModel.username" placeholder="输入 admin 试试" />
+  </FormItem>
+  <FormItem label="年龄" name="age">
+    <Input v-model="customValidatorModel.age" type="number" placeholder="18-120" />
+  </FormItem>
+</Form>`
+
+const showMessageFormRef = ref<any>(null)
+const showMessageModel = reactive({ email: '' })
+const showMessageRules = {
+  email: [
+    { required: true, message: '请输入邮箱' },
+    { type: 'email' as const, message: '请输入有效的邮箱地址' }
+  ]
+}
+
+const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 FormItem 下方 -->
+<FormItem label="邮箱" name="email">
+  <Input v-model="showMessageModel.email" placeholder="错误显示在输入框下方" />
+</FormItem>
+
+<!-- showMessage=false：错误通过 Input 内部显示（抖动 + 红色边框） -->
+<FormItem label="邮箱" name="email" :show-message="false">
+  <Input v-model="showMessageModel.email" placeholder="错误在输入框内显示" />
+</FormItem>`
 </script>
 
 <template>
@@ -181,25 +267,14 @@ const previewSnippet = `<pre class="text-sm text-gray-700 bg-white p-4 rounded b
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法"
-               description="完整的表单示例，包含多种表单控件。"
-               :code="basicSnippet">
-      <Form :model="basicForm"
-            @submit="handleBasicSubmit"
-            class="max-w-md">
-        <FormItem label="用户名"
-                  name="username"
-                  required>
-          <Input v-model="basicForm.username"
-                 placeholder="请输入用户名" />
+    <DemoBlock title="基础用法" description="完整的表单示例，包含多种表单控件。" :code="basicSnippet">
+      <Form :model="basicForm" @submit="handleBasicSubmit" class="max-w-md">
+        <FormItem label="用户名" name="username" required>
+          <Input v-model="basicForm.username" placeholder="请输入用户名" />
         </FormItem>
 
-        <FormItem label="邮箱"
-                  name="email"
-                  required>
-          <Input v-model="basicForm.email"
-                 type="email"
-                 placeholder="请输入邮箱" />
+        <FormItem label="邮箱" name="email" required>
+          <Input v-model="basicForm.email" type="email" placeholder="请输入邮箱" />
         </FormItem>
 
         <FormItem label="性别">
@@ -211,14 +286,11 @@ const previewSnippet = `<pre class="text-sm text-gray-700 bg-white p-4 rounded b
         </FormItem>
 
         <FormItem label="国家">
-          <Select v-model="basicForm.country"
-                  :options="countries" />
+          <Select v-model="basicForm.country" :options="countries" />
         </FormItem>
 
         <FormItem label="个人简介">
-          <Textarea v-model="basicForm.bio"
-                    placeholder="请输入个人简介"
-                    :rows="4" />
+          <Textarea v-model="basicForm.bio" placeholder="请输入个人简介" :rows="4" />
         </FormItem>
 
         <FormItem>
@@ -227,65 +299,40 @@ const previewSnippet = `<pre class="text-sm text-gray-700 bg-white p-4 rounded b
 
         <FormItem>
           <Space>
-            <Button type="submit"
-                    variant="primary">提交</Button>
-            <Button type="button"
-                    variant="secondary"
-                    @click="resetBasic">重置</Button>
+            <Button type="submit" variant="primary">提交</Button>
+            <Button type="button" variant="secondary" @click="resetBasic">重置</Button>
           </Space>
         </FormItem>
       </Form>
     </DemoBlock>
 
     <!-- 表单验证 -->
-    <DemoBlock title="表单验证"
-               description="通过 rules + name 实现校验，支持提交校验与手动校验。"
-               :code="validateSnippet">
-      <Space direction="vertical"
-             class="w-full">
-        <Form ref="validateFormRef"
-              :model="validateForm"
-              :rules="validateRules"
-              @submit="handleValidateSubmit"
-              class="max-w-md">
-          <FormItem label="用户名"
-                    name="username">
-            <Input v-model="validateForm.username"
-                   placeholder="至少 3 个字符" />
+    <DemoBlock title="表单验证" description="通过 rules + name 实现校验，支持提交校验与手动校验。" :code="validateSnippet">
+      <Space direction="vertical" class="w-full">
+        <Form ref="validateFormRef" :model="validateForm" :rules="validateRules" @submit="handleValidateSubmit"
+          class="max-w-md">
+          <FormItem label="用户名" name="username">
+            <Input v-model="validateForm.username" placeholder="至少 3 个字符" />
           </FormItem>
 
-          <FormItem label="邮箱"
-                    name="email">
-            <Input v-model="validateForm.email"
-                   placeholder="example@domain.com" />
+          <FormItem label="邮箱" name="email">
+            <Input v-model="validateForm.email" placeholder="example@domain.com" />
           </FormItem>
 
-          <FormItem label="年龄"
-                    name="age">
-            <Input v-model="validateForm.age"
-                   type="number"
-                   placeholder="1-150" />
+          <FormItem label="年龄" name="age">
+            <Input v-model="validateForm.age" type="number" placeholder="1-150" />
           </FormItem>
 
-          <FormItem label="网站"
-                    name="website">
-            <Input v-model="validateForm.website"
-                   placeholder="https://example.com" />
+          <FormItem label="网站" name="website">
+            <Input v-model="validateForm.website" placeholder="https://example.com" />
           </FormItem>
 
           <FormItem>
             <Space>
-              <Button type="submit"
-                      variant="primary">提交并校验</Button>
-              <Button type="button"
-                      variant="secondary"
-                      @click="validateManually">手动校验</Button>
-              <Button type="button"
-                      variant="secondary"
-                      @click="clearValidateManually">清除校验</Button>
-              <Button type="button"
-                      variant="secondary"
-                      @click="resetValidateForm">重置</Button>
+              <Button type="submit" variant="primary">提交并校验</Button>
+              <Button type="button" variant="secondary" @click="validateManually">手动校验</Button>
+              <Button type="button" variant="secondary" @click="clearValidateManually">清除校验</Button>
+              <Button type="button" variant="secondary" @click="resetValidateForm">重置</Button>
             </Space>
           </FormItem>
         </Form>
@@ -299,10 +346,93 @@ const previewSnippet = `<pre class="text-sm text-gray-700 bg-white p-4 rounded b
       </Space>
     </DemoBlock>
 
+    <!-- 布局模式 -->
+    <DemoBlock title="布局模式" description="通过 labelPosition 切换标签位置：right（默认）、left、top。" :code="layoutSnippet">
+      <div class="max-w-md">
+        <Space class="mb-4">
+          <Button :variant="layoutPosition === 'right' ? 'primary' : 'secondary'" size="sm"
+            @click="layoutPosition = 'right'">Right</Button>
+          <Button :variant="layoutPosition === 'left' ? 'primary' : 'secondary'" size="sm"
+            @click="layoutPosition = 'left'">Left</Button>
+          <Button :variant="layoutPosition === 'top' ? 'primary' : 'secondary'" size="sm"
+            @click="layoutPosition = 'top'">Top</Button>
+        </Space>
+        <Form :model="layoutModel" :labelPosition="layoutPosition" :labelWidth="100">
+          <FormItem label="姓名" name="name">
+            <Input v-model="layoutModel.name" placeholder="请输入姓名" />
+          </FormItem>
+          <FormItem label="邮箱" name="email">
+            <Input v-model="layoutModel.email" placeholder="请输入邮箱" />
+          </FormItem>
+        </Form>
+      </div>
+    </DemoBlock>
+
+    <!-- 表单尺寸 -->
+    <DemoBlock title="表单尺寸" description="通过 size 设置表单整体尺寸：sm、md（默认）、lg。" :code="sizeSnippet">
+      <div class="max-w-md">
+        <Space class="mb-4">
+          <Button :variant="sizeValue === 'sm' ? 'primary' : 'secondary'" size="sm"
+            @click="sizeValue = 'sm'">Small</Button>
+          <Button :variant="sizeValue === 'md' ? 'primary' : 'secondary'" size="sm"
+            @click="sizeValue = 'md'">Medium</Button>
+          <Button :variant="sizeValue === 'lg' ? 'primary' : 'secondary'" size="sm"
+            @click="sizeValue = 'lg'">Large</Button>
+        </Space>
+        <Form :model="sizeModel" :size="sizeValue">
+          <FormItem label="姓名" name="name">
+            <Input v-model="sizeModel.name" placeholder="请输入姓名" />
+          </FormItem>
+        </Form>
+      </div>
+    </DemoBlock>
+
+    <!-- 禁用表单 -->
+    <DemoBlock title="禁用表单" description="设置 disabled 禁用整个表单。" :code="disabledSnippet">
+      <Form :model="disabledModel" disabled class="max-w-md">
+        <FormItem label="姓名" name="name">
+          <Input v-model="disabledModel.name" />
+        </FormItem>
+        <FormItem label="邮箱" name="email">
+          <Input v-model="disabledModel.email" />
+        </FormItem>
+      </Form>
+    </DemoBlock>
+
+    <!-- 自定义校验器 -->
+    <DemoBlock title="自定义校验器" description="通过 validator 函数实现自定义校验，支持同步和异步。输入 admin 触发异步校验。"
+      :code="customValidatorSnippet">
+      <Form ref="customValidatorFormRef" :model="customValidatorModel" :rules="customValidatorRules" class="max-w-md">
+        <FormItem label="用户名" name="username">
+          <Input v-model="customValidatorModel.username" placeholder="输入 admin 试试" />
+        </FormItem>
+        <FormItem label="年龄" name="age">
+          <Input v-model="customValidatorModel.age" type="number" placeholder="18-120" />
+        </FormItem>
+        <FormItem>
+          <Button type="button" variant="primary" @click="customValidatorFormRef?.validate()">校验</Button>
+        </FormItem>
+      </Form>
+    </DemoBlock>
+
+    <!-- 错误消息模式 -->
+    <DemoBlock title="错误消息模式" description="showMessage 控制错误提示位置。默认在 FormItem 下方显示；设为 false 则让 Input 内部显示错误（抖动 + 红色边框）。"
+      :code="showMessageSnippet">
+      <Form ref="showMessageFormRef" :model="showMessageModel" :rules="showMessageRules" class="max-w-md">
+        <FormItem label="默认模式" name="email">
+          <Input v-model="showMessageModel.email" placeholder="错误显示在输入框下方" />
+        </FormItem>
+        <FormItem label="内联模式" name="email" :show-message="false">
+          <Input v-model="showMessageModel.email" placeholder="错误在输入框内显示" />
+        </FormItem>
+        <FormItem>
+          <Button type="button" variant="primary" @click="showMessageFormRef?.validate()">校验对比</Button>
+        </FormItem>
+      </Form>
+    </DemoBlock>
+
     <!-- 表单数据预览 -->
-    <DemoBlock title="表单数据预览"
-               description="实时查看表单数据。"
-               :code="previewSnippet">
+    <DemoBlock title="表单数据预览" description="实时查看表单数据。" :code="previewSnippet">
       <pre class="text-sm text-gray-700 bg-white p-4 rounded border">{{
         JSON.stringify({ basicForm, validateForm }, null, 2)
       }}</pre>

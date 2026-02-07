@@ -65,8 +65,7 @@ export function getFormItemClasses(options: FormItemClassOptions = {}): string {
 export function getFormItemLabelClasses(options: FormItemLabelClassOptions = {}): string {
   const { size = 'md', labelPosition = 'right', labelAlign = 'right', isRequired = false } = options
 
-  const alignClass =
-    labelAlign === 'right' ? 'text-right' : labelAlign === 'left' ? 'text-left' : 'text-left'
+  const alignClass = labelAlign === 'right' ? 'text-right' : 'text-left'
 
   const positionClasses = labelPosition === 'top' ? 'w-full' : 'shrink-0'
   const paddingClass = labelPosition === 'top' ? '' : LABEL_PADDING_TOP[size]
@@ -116,13 +115,6 @@ export function getFormItemAsteriskClasses(): string {
     'tiger-form-item__asterisk',
     'mr-1',
     'font-semibold',
-    'text-red-500',
     'text-[var(--tiger-error,#ef4444)]'
   )
-}
-
-export function getFormItemAsteriskStyle(): Record<string, string> {
-  return {
-    color: 'var(--tiger-error,#ef4444)'
-  }
 }

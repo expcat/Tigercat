@@ -10,8 +10,7 @@ import {
   getFormItemContentClasses,
   getFormItemFieldClasses,
   getFormItemErrorClasses,
-  getFormItemAsteriskClasses,
-  getFormItemAsteriskStyle
+  getFormItemAsteriskClasses
 } from '@expcat/tigercat-core'
 import { useFormContext } from './Form'
 
@@ -59,6 +58,9 @@ function mergeAriaDescribedBy(
   )
   return Array.from(parts).join(' ')
 }
+
+const FIELD_CLASSES = getFormItemFieldClasses()
+const ASTERISK_CLASSES = getFormItemAsteriskClasses()
 
 export const FormItem: React.FC<FormItemProps> = ({
   name,
@@ -170,7 +172,7 @@ export const FormItem: React.FC<FormItemProps> = ({
     }
   }, [name, formContext, rules])
 
-  const hasError = useMemo(() => !!errorMessage, [errorMessage])
+  const hasError = !!errorMessage
 
   const describedById = useMemo(
     () => (showMessage && hasError ? errorId : undefined),
@@ -270,11 +272,6 @@ export const FormItem: React.FC<FormItemProps> = ({
 
   const contentClasses = useMemo(() => getFormItemContentClasses(labelPosition), [labelPosition])
 
-  const fieldClasses = useMemo(() => getFormItemFieldClasses(), [])
-
-  const asteriskClasses = useMemo(() => getFormItemAsteriskClasses(), [])
-  const asteriskStyle = useMemo(() => getFormItemAsteriskStyle(), [])
-
   return (
     <div className={formItemClasses}>
       {label && (
@@ -283,17 +280,13 @@ export const FormItem: React.FC<FormItemProps> = ({
           className={labelClasses}
           style={labelStyles}
           htmlFor={isClonableChild ? effectiveFieldId : undefined}>
-          {isRequired && (
-            <span className={asteriskClasses} style={asteriskStyle}>
-              *
-            </span>
-          )}
+          {isRequired && <span className={ASTERISK_CLASSES}>*</span>}
           {label}
         </label>
       )}
       <div className={contentClasses}>
         <div
-          className={fieldClasses}
+          className={FIELD_CLASSES}
           role="group"
           aria-labelledby={label ? labelId : undefined}
           aria-describedby={describedById}

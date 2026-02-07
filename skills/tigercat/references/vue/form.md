@@ -15,40 +15,73 @@ description: Vue 3 form components usage - all support v-model
 
 ```vue
 <script setup>
-import { ref } from 'vue'
-import { Form, FormItem, Input, Button } from '@expcat/tigercat-vue'
+import { ref, reactive } from 'vue'
+import { Form, FormItem, Input, Button, Space } from '@expcat/tigercat-vue'
 
 const formRef = ref()
-const form = ref({ username: '', email: '' })
+const form = reactive({ username: '', email: '' })
 const rules = {
   username: [{ required: true, message: 'Required' }],
   email: [{ required: true }, { type: 'email', message: 'Invalid email' }]
 }
 
-const handleSubmit = async () => {
-  if (await formRef.value.validate()) {
-    console.log('Form data:', form.value)
-  }
+const handleSubmit = ({ valid, values, errors }) => {
+  if (valid) console.log('Form data:', values)
+  else console.error('Validation errors:', errors)
 }
 </script>
 
 <template>
-  <Form ref="formRef" :model="form" :rules="rules" label-width="100px">
-    <FormItem prop="username" label="Username">
+  <!-- 基础校验 -->
+  <Form ref="formRef" :model="form" :rules="rules" label-width="100px" @submit="handleSubmit">
+    <FormItem name="username" label="Username">
       <Input v-model="form.username" />
     </FormItem>
-    <FormItem prop="email" label="Email">
+    <FormItem name="email" label="Email">
       <Input v-model="form.email" />
     </FormItem>
     <FormItem>
-      <Button @click="handleSubmit">Submit</Button>
-      <Button variant="secondary" @click="formRef.resetFields()">Reset</Button>
+      <Space>
+        <Button type="submit" variant="primary">Submit</Button>
+        <Button variant="secondary" @click="formRef.clearValidate()">Clear</Button>
+        <Button variant="secondary" @click="formRef.resetFields()">Reset</Button>
+      </Space>
+    </FormItem>
+  </Form>
+
+  <!-- 布局变体: label 在顶部 -->
+  <Form :model="form" label-position="top">
+    <FormItem name="username" label="Username">
+      <Input v-model="form.username" />
+    </FormItem>
+  </Form>
+
+  <!-- 表单尺寸 -->
+  <Form :model="form" size="sm"> ... </Form>
+  <Form :model="form" size="lg"> ... </Form>
+
+  <!-- 禁用表单 -->
+  <Form :model="form" disabled> ... </Form>
+
+  <!-- FormItem 级别规则 (覆盖 Form rules) -->
+  <Form :model="form">
+    <FormItem name="username" label="Username" :rules="[{ required: true, message: 'Required' }]">
+      <Input v-model="form.username" />
+    </FormItem>
+  </Form>
+
+  <!-- 关闭 FormItem 错误消息，让 Input 内部显示错误 -->
+  <Form :model="form" :rules="rules">
+    <FormItem name="email" label="Email" :show-message="false">
+      <Input v-model="form.email" />
     </FormItem>
   </Form>
 </template>
 ```
 
-> 错误提示方式：默认在 FormItem 下方显示错误信息（`show-message` 默认 `true`）。设置 `:show-message="false"` 可让 Input 内部显示错误（抖动 + 错误文字），推荐在 FormWizard 等紧凑布局中使用。
+> **错误提示方式**：默认在 FormItem 下方显示错误信息（`show-message` 默认 `true`）。设置 `:show-message="false"` 可让 Input 内部显示错误（抖动 + 错误文字），推荐在 FormWizard 等紧凑布局中使用。
+>
+> **暴露方法**：通过 `ref` 获取 Form 实例后可调用 `validate()`、`validateFields(names)`、`validateField(name)`、`clearValidate(names?)`、`resetFields()`。
 
 ---
 

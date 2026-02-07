@@ -22,8 +22,7 @@ import {
   getFormItemContentClasses,
   getFormItemFieldClasses,
   getFormItemErrorClasses,
-  getFormItemAsteriskClasses,
-  getFormItemAsteriskStyle
+  getFormItemAsteriskClasses
 } from '@expcat/tigercat-core'
 import { FormContextKey, type FormContext } from './Form'
 
@@ -283,7 +282,6 @@ export const FormItem = defineComponent({
 
     const fieldClasses = getFormItemFieldClasses()
     const asteriskClasses = getFormItemAsteriskClasses()
-    const asteriskStyle = getFormItemAsteriskStyle()
 
     return () => {
       const defaultSlot = slots.default?.() ?? []
@@ -352,10 +350,7 @@ export const FormItem = defineComponent({
               id: labelId,
               for: effectiveFieldId
             },
-            [
-              isRequired.value && h('span', { class: asteriskClasses, style: asteriskStyle }, '*'),
-              props.label
-            ]
+            [isRequired.value && h('span', { class: asteriskClasses }, '*'), props.label]
           )
         : null
 

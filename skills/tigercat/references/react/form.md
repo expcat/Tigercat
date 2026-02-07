@@ -14,41 +14,114 @@ description: React form components usage - controlled components pattern
 ## Form & FormItem 表单
 
 ```tsx
-import { useState } from 'react'
-import { Form, FormItem, Input, Button } from '@expcat/tigercat-react'
+import { useRef, useState } from 'react'
+import {
+  Form,
+  FormItem,
+  Input,
+  Button,
+  Space,
+  type FormHandle,
+  type FormRules
+} from '@expcat/tigercat-react'
 
 function MyForm() {
+  const formRef = useRef<FormHandle>(null)
   const [form, setForm] = useState({ username: '', email: '' })
-  const [errors, setErrors] = useState<Record<string, string>>({})
-
-  const handleSubmit = () => {
-    const newErrors: Record<string, string> = {}
-    if (!form.username) newErrors.username = 'Required'
-    if (!form.email) newErrors.email = 'Required'
-    setErrors(newErrors)
-    if (Object.keys(newErrors).length === 0) console.log(form)
+  const rules: FormRules = {
+    username: [{ required: true, message: 'Required' }],
+    email: [{ required: true }, { type: 'email', message: 'Invalid email' }]
   }
 
   return (
-    <Form labelWidth={100}>
-      <FormItem label="Username" error={errors.username}>
-        <Input
-          value={form.username}
-          onChange={(e) => setForm({ ...form, username: e.target.value })}
-        />
-      </FormItem>
-      <FormItem label="Email" error={errors.email}>
-        <Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-      </FormItem>
-      <FormItem>
-        <Button onClick={handleSubmit}>Submit</Button>
-      </FormItem>
-    </Form>
+    <>
+      {/* 基础校验 */}
+      <Form
+        ref={formRef}
+        model={form}
+        rules={rules}
+        labelWidth={100}
+        onSubmit={({ valid, values, errors }) => {
+          if (valid) console.log('Form data:', values)
+          else console.error('Validation errors:', errors)
+        }}>
+        <FormItem name="username" label="Username">
+          <Input
+            value={form.username}
+            onChange={(e) => setForm({ ...form, username: e.target.value })}
+          />
+        </FormItem>
+        <FormItem name="email" label="Email">
+          <Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+        </FormItem>
+        <FormItem>
+          <Space>
+            <Button type="submit" variant="primary">
+              Submit
+            </Button>
+            <Button variant="secondary" onClick={() => formRef.current?.clearValidate()}>
+              Clear
+            </Button>
+            <Button variant="secondary" onClick={() => formRef.current?.resetFields()}>
+              Reset
+            </Button>
+          </Space>
+        </FormItem>
+      </Form>
+
+      {/* 布局变体: label 在顶部 */}
+      <Form model={form} labelPosition="top">
+        <FormItem name="username" label="Username">
+          <Input
+            value={form.username}
+            onChange={(e) => setForm({ ...form, username: e.target.value })}
+          />
+        </FormItem>
+      </Form>
+
+      {/* 表单尺寸 */}
+      <Form model={form} size="sm">
+        {' '}
+        ...{' '}
+      </Form>
+      <Form model={form} size="lg">
+        {' '}
+        ...{' '}
+      </Form>
+
+      {/* 禁用表单 */}
+      <Form model={form} disabled>
+        {' '}
+        ...{' '}
+      </Form>
+
+      {/* FormItem 级别规则 (覆盖 Form rules) */}
+      <Form model={form}>
+        <FormItem
+          name="username"
+          label="Username"
+          rules={[{ required: true, message: 'Required' }]}>
+          <Input
+            value={form.username}
+            onChange={(e) => setForm({ ...form, username: e.target.value })}
+          />
+        </FormItem>
+      </Form>
+
+      {/* 关闭 FormItem 错误消息，让 Input 内部显示错误 */}
+      <Form model={form} rules={rules}>
+        <FormItem name="email" label="Email" showMessage={false}>
+          <Input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+        </FormItem>
+      </Form>
+    </>
   )
 }
 ```
 
-> 错误提示方式：默认在 FormItem 下方显示错误信息（`showMessage` 默认 `true`）。设置 `showMessage={false}` 可让 Input 内部显示错误（抖动 + 错误文字），推荐在 FormWizard 等紧凑布局中使用。
+> **错误提示方式**：默认在 FormItem 下方显示错误信息（`showMessage` 默认 `true`）。设置 `showMessage={false}` 可让 Input 内部显示错误（抖动 + 错误文字），推荐在 FormWizard 等紧凑布局中使用。
+>
+> **暴露方法**：通过 `useRef<FormHandle>` 获取 Form 实例后可调用 `validate()`、`validateFields(names)`、`validateField(name)`、`clearValidate(names?)`、`resetFields()`。
 
 ---
 
