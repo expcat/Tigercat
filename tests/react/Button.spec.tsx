@@ -6,7 +6,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { Button } from '@expcat/tigercat-react'
+import { Button, getButtonVariantClasses, buttonSizeClasses } from '@expcat/tigercat-react'
 import { expectNoA11yViolations, setThemeVariables, clearThemeVariables } from '../utils/react'
 
 describe('Button', () => {
@@ -28,6 +28,36 @@ describe('Button', () => {
 
     const button = screen.getByTestId('test-button')
     expect(button).toHaveAttribute('aria-label', 'Custom label')
+  })
+
+  it('applies variant classes for each variant', () => {
+    const variants = ['primary', 'secondary', 'outline', 'ghost', 'link'] as const
+    for (const variant of variants) {
+      const { unmount } = render(<Button variant={variant}>{variant}</Button>)
+      const button = screen.getByRole('button', { name: variant })
+      const expected = getButtonVariantClasses(variant)
+      expected.split(' ').forEach((cls) => {
+        expect(button.className).toContain(cls)
+      })
+      unmount()
+    }
+  })
+
+  it('applies size classes for each size', () => {
+    const sizes = ['sm', 'md', 'lg'] as const
+    for (const size of sizes) {
+      const { unmount } = render(<Button size={size}>{size}</Button>)
+      const button = screen.getByRole('button', { name: size })
+      buttonSizeClasses[size].split(' ').forEach((cls) => {
+        expect(button.className).toContain(cls)
+      })
+      unmount()
+    }
+  })
+
+  it('renders block button with full width', () => {
+    render(<Button block>Block</Button>)
+    expect(screen.getByRole('button', { name: 'Block' })).toHaveClass('w-full')
   })
 
   it('respects type prop (submit/reset/button)', () => {

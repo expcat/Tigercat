@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
-import { Button } from '@expcat/tigercat-vue'
+import { Button, getButtonVariantClasses, buttonSizeClasses } from '@expcat/tigercat-vue'
 import { expectNoA11yViolations, setThemeVariables, clearThemeVariables } from '../utils'
 
 describe('Button', () => {
@@ -31,6 +31,65 @@ describe('Button', () => {
 
     const button = screen.getByTestId('btn')
     expect(button).toHaveAttribute('aria-label', 'Custom')
+  })
+
+  it('applies variant classes for each variant', () => {
+    const variants = ['primary', 'secondary', 'outline', 'ghost', 'link'] as const
+    for (const variant of variants) {
+      const { container } = render(Button, {
+        props: { variant },
+        slots: { default: variant }
+      })
+      const button = container.querySelector('button')!
+      const expected = getButtonVariantClasses(variant)
+      expected.split(' ').forEach((cls) => {
+        expect(button.className).toContain(cls)
+      })
+    }
+  })
+
+  it('applies size classes for each size', () => {
+    const sizes = ['sm', 'md', 'lg'] as const
+    for (const size of sizes) {
+      const { container } = render(Button, {
+        props: { size },
+        slots: { default: size }
+      })
+      const button = container.querySelector('button')!
+      buttonSizeClasses[size].split(' ').forEach((cls) => {
+        expect(button.className).toContain(cls)
+      })
+    }
+  })
+
+  it('renders block button with full width', () => {
+    const { container } = render(Button, {
+      props: { block: true },
+      slots: { default: 'Block' }
+    })
+    const button = container.querySelector('button')
+    expect(button).toHaveClass('w-full')
+  })
+
+  it('respects type prop (submit/reset/button)', () => {
+    const { container, rerender } = render(Button, {
+      props: { type: 'submit' },
+      slots: { default: 'Submit' }
+    })
+    expect(container.querySelector('button')).toHaveAttribute('type', 'submit')
+  })
+
+  it('calls onClick when enabled', async () => {
+    const user = userEvent.setup()
+    const onClick = vi.fn()
+
+    render(Button, {
+      slots: { default: 'Click' },
+      attrs: { onClick }
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Click' }))
+    expect(onClick).toHaveBeenCalledTimes(1)
   })
 
   it('does not call onClick when disabled', async () => {
@@ -112,6 +171,26 @@ describe('Button', () => {
 
     await user.keyboard('{Enter}')
     expect(onClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not activate via keyboard when loading', async () => {
+    const user = userEvent.setup()
+    const onClick = vi.fn()
+
+    render(Button, {
+      props: { loading: true },
+      slots: { default: 'Loading' },
+      attrs: { onClick }
+    })
+
+    const button = screen.getByRole('button', { name: 'Loading' })
+    expect(button).toBeDisabled()
+
+    await user.tab()
+    expect(button).not.toHaveFocus()
+
+    await user.keyboard('{Enter}')
+    expect(onClick).not.toHaveBeenCalled()
   })
 
   describe('Theme Support', () => {

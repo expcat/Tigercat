@@ -49,7 +49,7 @@ export const Button = defineComponent({
      */
     variant: {
       type: String as PropType<ButtonVariant>,
-      default: 'primary' as ButtonVariant
+      default: 'primary'
     },
     /**
      * Button size
@@ -57,7 +57,7 @@ export const Button = defineComponent({
      */
     size: {
       type: String as PropType<ButtonSize>,
-      default: 'md' as ButtonSize
+      default: 'md'
     },
     /**
      * Whether the button is disabled
@@ -108,23 +108,7 @@ export const Button = defineComponent({
     const mergedStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
     return () => {
-      type HChildren = Parameters<typeof h>[2]
-      type HArrayChildren = Extract<NonNullable<HChildren>, unknown[]>
-
-      const children: HArrayChildren = []
-
       const isDisabled = props.disabled || props.loading
-      const ariaBusy = attrs['aria-busy'] ?? (props.loading ? 'true' : undefined)
-      const ariaDisabled = attrs['aria-disabled'] ?? (isDisabled ? 'true' : undefined)
-
-      if (props.loading) {
-        const loadingIcon = slots['loading-icon'] ? slots['loading-icon']() : LoadingSpinner
-        children.push(h('span', { class: 'mr-2' }, loadingIcon))
-      }
-
-      if (slots.default) {
-        children.push(slots.default())
-      }
 
       return h(
         'button',
@@ -132,16 +116,21 @@ export const Button = defineComponent({
           ...attrs,
           class: buttonClasses.value,
           style: mergedStyle.value,
-          'aria-busy': ariaBusy,
-          'aria-disabled': ariaDisabled,
+          'aria-busy': attrs['aria-busy'] ?? (props.loading ? 'true' : undefined),
+          'aria-disabled': attrs['aria-disabled'] ?? (isDisabled ? 'true' : undefined),
           disabled: isDisabled,
           type: props.type,
-          onClick: (event: MouseEvent) => {
-            if (isDisabled) return
-            emit('click', event)
-          }
+          onClick: isDisabled ? undefined : (event: MouseEvent) => emit('click', event)
         },
-        children
+        [
+          props.loading &&
+            h(
+              'span',
+              { class: 'mr-2' },
+              slots['loading-icon'] ? slots['loading-icon']() : LoadingSpinner
+            ),
+          slots.default?.()
+        ]
       )
     }
   }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Button, Space } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
@@ -57,6 +57,25 @@ const customLoadingSnippet = `<Space>
   </Button>
 </Space>`
 
+const eventSnippet = `const [count, setCount] = useState(0)
+
+<Space align="center">
+  <Button variant="primary" onClick={() => setCount(c => c + 1)}>
+    已点击 {count} 次
+  </Button>
+  <Button variant="secondary" onClick={() => setCount(0)}>
+    重置
+  </Button>
+</Space>`
+
+const htmlTypeSnippet = `<form onSubmit={(e) => { e.preventDefault(); alert('已提交') }}>
+  <Space>
+    <Button type="submit" variant="primary">提交</Button>
+    <Button type="reset" variant="outline">重置</Button>
+    <Button type="button" variant="ghost">普通按钮</Button>
+  </Space>
+</form>`
+
 const blockSnippet = `<Space direction="vertical" className="w-full">
   <Button variant="primary" block>主要按钮</Button>
   <Button variant="secondary" block>次要按钮</Button>
@@ -70,6 +89,8 @@ const fullWidthSnippet = `<Space direction="vertical" className="w-full">
 </Space>`
 
 const ButtonDemo: React.FC = () => {
+  const [clickCount, setClickCount] = useState(0)
+
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
@@ -176,6 +197,38 @@ const ButtonDemo: React.FC = () => {
             自定义加载图标
           </Button>
         </Space>
+      </DemoBlock>
+
+      {/* 事件处理 */}
+      <DemoBlock title="事件处理" description="通过 onClick 监听按钮点击事件。" code={eventSnippet}>
+        <Space align="center">
+          <Button variant="primary" onClick={() => setClickCount((c) => c + 1)}>
+            已点击 {clickCount} 次
+          </Button>
+          <Button variant="secondary" onClick={() => setClickCount(0)}>
+            重置
+          </Button>
+        </Space>
+      </DemoBlock>
+
+      {/* 原生类型 */}
+      <DemoBlock
+        title="原生类型"
+        description="通过 type 属性设置 HTML 原生 button 类型（submit / reset / button）。"
+        code={htmlTypeSnippet}>
+        <form onSubmit={(e) => e.preventDefault()}>
+          <Space>
+            <Button type="submit" variant="primary">
+              提交
+            </Button>
+            <Button type="reset" variant="outline">
+              重置
+            </Button>
+            <Button type="button" variant="ghost">
+              普通按钮
+            </Button>
+          </Space>
+        </form>
       </DemoBlock>
 
       {/* 块级按钮 */}

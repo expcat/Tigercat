@@ -20,6 +20,8 @@ import { Button } from '@expcat/tigercat-react'
 <Button variant="outline" size="sm">Small Outline</Button>
 <Button disabled>Disabled</Button>
 <Button loading>Loading...</Button>
+<Button block>Full Width</Button>
+<Button type="submit" variant="primary">Submit</Button>
 <Button onClick={handleClick}>Click Me</Button>
 
 {/* Custom loading icon (prop) */}
