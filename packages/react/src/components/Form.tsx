@@ -196,6 +196,14 @@ export const Form = forwardRef<FormHandle, FormProps>(
         const error = await runFieldValidation(fieldName, rulesOverride, trigger)
 
         setErrors((prevErrors) => {
+          const existing = prevErrors.find((e) => e.field === fieldName)
+          const existingMessage = existing?.message ?? null
+
+          // Return same reference if error state for this field hasn't changed,
+          // avoiding unnecessary re-renders for unrelated FormItems.
+          if (!error && !existingMessage) return prevErrors
+          if (error && error === existingMessage) return prevErrors
+
           const filtered = prevErrors.filter((e) => e.field !== fieldName)
 
           if (error) {

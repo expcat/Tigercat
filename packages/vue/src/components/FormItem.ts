@@ -104,6 +104,7 @@ export const FormItem = defineComponent({
 
     const errorMessage = ref<string>('')
     const shakeTrigger = ref(0)
+    const prevFormError = ref<string>('')
 
     const instanceId = ++formItemIdCounter
     const baseId = `tiger-form-item-${instanceId}`
@@ -176,11 +177,15 @@ export const FormItem = defineComponent({
       () => formContext.value?.errors,
       (errors) => {
         if (props.name && errors) {
-          const error = getFieldError(props.name, errors)
-          errorMessage.value = error || ''
-          if (error) {
+          const error = getFieldError(props.name, errors) || ''
+          errorMessage.value = error
+          // Only trigger shake when error is newly set (transition from no-error
+          // to error, or error message changes). Prevents re-shaking unrelated
+          // fields when another field's validation mutates the shared errors array.
+          if (error && error !== prevFormError.value) {
             shakeTrigger.value++
           }
+          prevFormError.value = error
         }
       },
       { deep: true, immediate: true }
@@ -302,13 +307,14 @@ export const FormItem = defineComponent({
         const existingProps = (vnode.props ?? {}) as Record<string, unknown>
         const isNativeElement = typeof vnode.type === 'string'
 
-        const existingOnBlur = existingProps.onBlur as ((event: FocusEvent) => void) | undefined
-        const existingOnFocusout = existingProps.onFocusout as
-          | ((event: FocusEvent) => void)
-          | undefined
-        const existingOnInput = existingProps.onInput as ((event: Event) => void) | undefined
-        const existingOnChange = existingProps.onChange as ((event: Event) => void) | undefined
-
+        // cloneVNode uses mergeProps internally, which auto-merges event
+        // handlers into arrays. So we only set our handlers — existing
+        // handlers on the child VNode are preserved without manual wrapping.
+        // Use onFocusout (not onBlur) to avoid double-trigger: focusout
+        // bubbles and works for both native elements and custom components
+        // forwarding attrs (like TigerInput).
+        // Use onInput (not onChange) to match React's per-keystroke trigger
+        // and avoid the extra onChange-on-blur that native inputs emit.
         const merged = cloneVNode(
           vnode,
           {
@@ -328,22 +334,8 @@ export const FormItem = defineComponent({
               existingProps['aria-describedby'] as string | undefined,
               describedById.value
             ),
-            onBlur: (event: FocusEvent) => {
-              existingOnBlur?.(event)
-              handleBlur()
-            },
-            onFocusout: (event: FocusEvent) => {
-              existingOnFocusout?.(event)
-              handleBlur()
-            },
-            onInput: (event: Event) => {
-              existingOnInput?.(event)
-              handleChange()
-            },
-            onChange: (event: Event) => {
-              existingOnChange?.(event)
-              handleChange()
-            }
+            onFocusout: handleBlur,
+            onInput: handleChange
           },
           true
         )
@@ -383,8 +375,7 @@ export const FormItem = defineComponent({
               'aria-invalid': hasError.value ? 'true' : undefined,
               'aria-required': isRequired.value ? 'true' : undefined,
               onFocusout: isSingleVNode ? undefined : handleBlur,
-              onInput: isSingleVNode ? undefined : handleChange,
-              onChange: isSingleVNode ? undefined : handleChange
+              onInput: isSingleVNode ? undefined : handleChange
             },
             fieldChildren
           ),

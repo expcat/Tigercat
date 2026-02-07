@@ -5,19 +5,26 @@ import type { WizardStep } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const steps: WizardStep[] = [
-  { title: '基本信息', description: '填写姓名与邮箱' },
-  { title: '联系方式', description: '填写手机号' },
-  { title: '完成', description: '提交并确认' }
+  { title: '基本信息', description: '填写姓名与邮箱', fields: ['name', 'email'] },
+  { title: '联系方式', description: '填写手机号', fields: ['phone'] },
+  { title: '完成', description: '提交并确认', fields: [] }
 ]
 
 const current = ref(0)
 const finished = ref(false)
-type FormExpose = { validate: () => Promise<boolean> }
+type FormExpose = {
+  validate: () => Promise<boolean>
+  validateFields: (fieldNames: string[]) => Promise<boolean>
+}
 const formRef = ref<FormExpose | null>(null)
 const model = reactive({ name: '', email: '', phone: '' })
 
-const handleBeforeNext = async () => {
-  const valid = await formRef.value?.validate()
+const handleBeforeNext = async (_current: number, step: WizardStep) => {
+  const fields = step.fields ?? []
+  if (fields.length === 0) {
+    return true
+  }
+  const valid = await formRef.value?.validateFields(fields)
   return valid === true
 }
 
@@ -71,29 +78,17 @@ const basicSnippet = `<FormWizard
         <template #step="{ index }">
           <Form ref="formRef" :model="model" class="w-full max-w-md">
             <template v-if="index === 0">
-              <FormItem
-                name="name"
-                label="姓名"
-                required
-                :rules="{ required: true, message: '请输入姓名' }"
+              <FormItem name="name" label="姓名" required :rules="{ required: true, message: '请输入姓名' }"
                 :show-message="false">
                 <Input v-model="model.name" placeholder="请输入姓名" />
               </FormItem>
-              <FormItem
-                name="email"
-                label="邮箱"
-                required
-                :rules="{ required: true, message: '请输入邮箱' }"
+              <FormItem name="email" label="邮箱" required :rules="{ required: true, message: '请输入邮箱' }"
                 :show-message="false">
                 <Input v-model="model.email" placeholder="请输入邮箱" />
               </FormItem>
             </template>
             <template v-else-if="index === 1">
-              <FormItem
-                name="phone"
-                label="手机号"
-                required
-                :rules="{ required: true, message: '请输入手机号' }"
+              <FormItem name="phone" label="手机号" required :rules="{ required: true, message: '请输入手机号' }"
                 :show-message="false">
                 <Input v-model="model.phone" placeholder="请输入手机号" />
               </FormItem>

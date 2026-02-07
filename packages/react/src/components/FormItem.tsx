@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState, useCallback, useId } from 'react'
+import React, { useMemo, useEffect, useState, useCallback, useId, useRef } from 'react'
 import {
   classNames,
   type FormSize,
@@ -75,6 +75,7 @@ export const FormItem: React.FC<FormItemProps> = ({
   const formContext = useFormContext()
   const [errorMessage, setErrorMessage] = useState<string>('')
   const [shakeTrigger, setShakeTrigger] = useState(0)
+  const prevFormErrorRef = useRef<string>('')
 
   const reactId = useId()
   const baseId = `tiger-form-item-${reactId}`
@@ -124,11 +125,15 @@ export const FormItem: React.FC<FormItemProps> = ({
   // Watch for errors in form context
   useEffect(() => {
     if (name && formContext?.errors) {
-      const error = getFieldError(name, formContext.errors)
-      setErrorMessage(error || '')
-      if (error) {
+      const error = getFieldError(name, formContext.errors) || ''
+      setErrorMessage(error)
+      // Only trigger shake when error is newly set (transition from no-error to error,
+      // or error message changes). Prevents re-shaking unrelated fields when another
+      // field's validation updates the shared errors array.
+      if (error && error !== prevFormErrorRef.current) {
         setShakeTrigger((prev) => prev + 1)
       }
+      prevFormErrorRef.current = error
     }
   }, [name, formContext?.errors])
 

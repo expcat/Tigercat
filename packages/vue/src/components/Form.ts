@@ -176,18 +176,28 @@ export const Form = defineComponent({
 
       const error = await runFieldValidation(fieldName, rulesOverride, trigger)
 
-      // Remove existing errors for this field
-      const index = errors.findIndex((e) => e.field === fieldName)
-      if (index !== -1) {
-        errors.splice(index, 1)
-      }
+      // Skip mutation if error state for this field hasn't changed,
+      // avoiding unnecessary watcher triggers in unrelated FormItems.
+      const existingIndex = errors.findIndex((e) => e.field === fieldName)
+      const existingMessage = existingIndex !== -1 ? errors[existingIndex].message : null
 
-      // Add new error if validation failed
-      if (error) {
-        errors.push({
-          field: fieldName,
-          message: error
-        })
+      if (!error && existingMessage === null) {
+        // No error before, no error now — nothing to do
+      } else if (error && error === existingMessage) {
+        // Same error as before — nothing to do
+      } else {
+        // Remove existing error for this field
+        if (existingIndex !== -1) {
+          errors.splice(existingIndex, 1)
+        }
+
+        // Add new error if validation failed
+        if (error) {
+          errors.push({
+            field: fieldName,
+            message: error
+          })
+        }
       }
 
       emit('validate', fieldName, !error, error || undefined)
