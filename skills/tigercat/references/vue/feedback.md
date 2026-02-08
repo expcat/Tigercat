@@ -20,6 +20,7 @@ const visible = ref(false)
 </script>
 
 <template>
+  <!-- 基本用法 -->
   <Button @click="visible = true">Open Modal</Button>
   <Modal v-model:visible="visible" title="Title" @ok="handleOk">
     <p>Modal content</p>
@@ -28,6 +29,10 @@ const visible = ref(false)
       <Button @click="ok()">OK</Button>
     </template>
   </Modal>
+
+  <!-- 使用内置默认页脚 -->
+  <Modal v-model:visible="visible" title="Title" show-default-footer
+         @ok="handleOk" @cancel="handleCancel" />
 </template>
 ```
 

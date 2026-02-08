@@ -14,17 +14,27 @@ description: React feedback components usage
 ## Modal 对话框
 
 ```tsx
-const [open, setOpen] = useState(false)
+const [visible, setVisible] = useState(false)
 
-<Button onClick={() => setOpen(true)}>Open Modal</Button>
+{/* 基本用法：自定义页脚 */}
+<Button onClick={() => setVisible(true)}>Open Modal</Button>
 <Modal
-  open={open}
+  visible={visible}
   title="Title"
-  onOk={() => setOpen(false)}
-  onCancel={() => setOpen(false)}
-  footer={<><Button onClick={() => setOpen(false)}>OK</Button></>}>
+  onOk={() => setVisible(false)}
+  onCancel={() => setVisible(false)}
+  footer={<><Button onClick={() => setVisible(false)}>OK</Button></>}>
   <p>Modal content</p>
 </Modal>
+
+{/* 使用内置默认页脚 */}
+<Modal
+  visible={visible}
+  title="Title"
+  showDefaultFooter
+  onOk={() => setVisible(false)}
+  onCancel={() => setVisible(false)}
+/>
 ```
 
 ---

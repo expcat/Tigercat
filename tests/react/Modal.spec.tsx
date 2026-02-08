@@ -97,6 +97,33 @@ describe('Modal', () => {
       })
     })
 
+    it('should render default footer when showDefaultFooter is true', async () => {
+      render(<Modal visible={true} title="Test Modal" showDefaultFooter={true} />)
+
+      await waitFor(() => {
+        const footer = document.querySelector('[data-tiger-modal-footer]')
+        expect(footer).toBeInTheDocument()
+        expect(screen.getByText('取消')).toBeInTheDocument()
+        expect(screen.getByText('确定')).toBeInTheDocument()
+      })
+    })
+
+    it('should allow overriding ok/cancel via locale when using default footer', async () => {
+      render(
+        <Modal
+          visible={true}
+          title="Test Modal"
+          showDefaultFooter={true}
+          locale={{ common: { okText: 'OK (i18n)', cancelText: 'Cancel (i18n)' } }}
+        />
+      )
+
+      await waitFor(() => {
+        expect(screen.getByText('OK (i18n)')).toBeInTheDocument()
+        expect(screen.getByText('Cancel (i18n)')).toBeInTheDocument()
+      })
+    })
+
     it('should hide close button when closable is false', async () => {
       render(<Modal visible={true} title="Test Modal" closable={false} />)
 
@@ -165,6 +192,23 @@ describe('Modal', () => {
       await user.click(closeButton)
 
       expect(onCancel).toHaveBeenCalled()
+    })
+
+    it('should call onOk when OK button in default footer is clicked', async () => {
+      const user = userEvent.setup()
+      const onOk = vi.fn()
+
+      render(
+        <Modal visible={true} title="Test Modal" showDefaultFooter={true} onOk={onOk} />
+      )
+
+      await waitFor(() => {
+        expect(screen.getByText('确定')).toBeInTheDocument()
+      })
+
+      await user.click(screen.getByText('确定'))
+
+      expect(onOk).toHaveBeenCalled()
     })
 
     it('should call onCancel when ESC is pressed', async () => {

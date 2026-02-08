@@ -25,6 +25,7 @@ import {
   type ModalProps as CoreModalProps
 } from '@expcat/tigercat-core'
 import { useEscapeKey } from '../utils/overlay'
+import { Button } from './Button'
 
 export interface ModalProps
   extends CoreModalProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
@@ -68,6 +69,24 @@ export interface ModalProps
    * @default 'Close'
    */
   closeAriaLabel?: string
+
+  /**
+   * Whether to render a default footer when no `footer` prop is provided
+   * @default false
+   */
+  showDefaultFooter?: boolean
+
+  /**
+   * Default OK button text (used in default footer)
+   * @default '确定'
+   */
+  okText?: string
+
+  /**
+   * Default Cancel button text (used in default footer)
+   * @default '取消'
+   */
+  cancelText?: string
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -87,8 +106,11 @@ export const Modal: React.FC<ModalProps> = ({
   onVisibleChange,
   onClose,
   onCancel,
-  onOk: _onOk,
+  onOk,
   closeAriaLabel,
+  showDefaultFooter = false,
+  okText,
+  cancelText,
   locale,
   style,
   ...rest
@@ -116,6 +138,11 @@ export const Modal: React.FC<ModalProps> = ({
     onVisibleChange?.(false)
   }, [onCancel, onVisibleChange])
 
+  const handleOk = useCallback(() => {
+    onOk?.()
+    onVisibleChange?.(false)
+  }, [onOk, onVisibleChange])
+
   const handleMaskClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       if (maskClosable && event.target === event.currentTarget) {
@@ -134,6 +161,20 @@ export const Modal: React.FC<ModalProps> = ({
     closeAriaLabel,
     locale?.modal?.closeAriaLabel,
     locale?.common?.closeText
+  )
+
+  const resolvedCancelText = resolveLocaleText(
+    '取消',
+    cancelText,
+    locale?.modal?.cancelText,
+    locale?.common?.cancelText
+  )
+
+  const resolvedOkText = resolveLocaleText(
+    '确定',
+    okText,
+    locale?.modal?.okText,
+    locale?.common?.okText
   )
 
   // Unique ids for a11y
@@ -157,19 +198,16 @@ export const Modal: React.FC<ModalProps> = ({
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
-    if (!visible) return
+    if (visible) {
+      previousActiveElementRef.current = captureActiveElement()
 
-    previousActiveElementRef.current = captureActiveElement()
+      const timer = setTimeout(() => {
+        focusFirst([closeButtonRef.current, dialogRef.current])
+      }, 0)
 
-    const timer = setTimeout(() => {
-      focusFirst([closeButtonRef.current, dialogRef.current])
-    }, 0)
+      return () => clearTimeout(timer)
+    }
 
-    return () => clearTimeout(timer)
-  }, [visible])
-
-  useEffect(() => {
-    if (visible) return
     restoreFocus(previousActiveElementRef.current)
   }, [visible])
 
@@ -209,10 +247,6 @@ export const Modal: React.FC<ModalProps> = ({
     return null
   }
 
-  if (destroyOnClose && !visible) {
-    return null
-  }
-
   const modalContent = (
     <div
       className={classNames(modalWrapperClasses, !visible && 'pointer-events-none')}
@@ -232,7 +266,7 @@ export const Modal: React.FC<ModalProps> = ({
       {/* Content Container */}
       <div className={containerClasses} onClick={handleMaskClick}>
         <div
-          className={classNames(contentClasses)}
+          className={contentClasses}
           style={style}
           {...dialogDivProps}
           role="dialog"
@@ -269,11 +303,20 @@ export const Modal: React.FC<ModalProps> = ({
           {children && <div className={modalBodyClasses}>{children}</div>}
 
           {/* Footer */}
-          {footer && (
+          {footer ? (
             <div className={modalFooterClasses} data-tiger-modal-footer="">
               {footer}
             </div>
-          )}
+          ) : showDefaultFooter ? (
+            <div className={modalFooterClasses} data-tiger-modal-footer="">
+              <Button variant="secondary" onClick={handleClose}>
+                {resolvedCancelText}
+              </Button>
+              <Button onClick={handleOk}>
+                {resolvedOkText}
+              </Button>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

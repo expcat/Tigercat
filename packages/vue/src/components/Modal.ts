@@ -205,7 +205,7 @@ export const Modal = defineComponent({
   emits: ['update:visible', 'close', 'cancel', 'ok'],
   setup(props, { slots, emit, attrs }) {
     const instanceId = ref<string>(createModalId())
-    const hasBeenOpened = ref(false)
+    const hasBeenOpened = ref(props.visible)
 
     const dialogRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
@@ -214,23 +214,10 @@ export const Modal = defineComponent({
     const titleId = computed(() => `${instanceId.value}-title`)
 
     const shouldRender = computed(() => {
-      if (props.visible) {
-        hasBeenOpened.value = true
-        return true
-      }
-
+      if (props.visible) return true
       if (props.destroyOnClose) return false
       return hasBeenOpened.value
     })
-
-    watch(
-      () => props.visible,
-      (newVal) => {
-        if (!newVal) {
-          emit('close')
-        }
-      }
-    )
 
     const handleClose = () => {
       emit('update:visible', false)
@@ -279,16 +266,18 @@ export const Modal = defineComponent({
       () => props.visible,
       async (nextVisible) => {
         if (nextVisible) {
+          hasBeenOpened.value = true
+
           const active = document.activeElement
           previousActiveElement.value = active instanceof HTMLElement ? active : null
 
           await nextTick()
           const el = closeButtonRef.value ?? dialogRef.value
           el?.focus?.()
-          return
+        } else {
+          emit('close')
+          previousActiveElement.value?.focus?.()
         }
-
-        previousActiveElement.value?.focus?.()
       }
     )
 

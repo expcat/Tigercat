@@ -19,6 +19,13 @@ const customFooterSnippet = `<Modal
   footer={<Space>...</Space>}
 >...</Modal>`
 
+const defaultFooterSnippet = `<Modal
+  title="默认页脚对话框"
+  showDefaultFooter
+  onOk={handleOk}
+  onCancel={handleCancel}
+>...</Modal>`
+
 const nestedSnippet = `<Modal title="第一层对话框">
   <Modal title="第二层对话框" zIndex={1100}>...</Modal>
 </Modal>`
@@ -57,6 +64,7 @@ export default function ModalDemo() {
   const [visibleNoMask, setVisibleNoMask] = useState(false)
   const [visibleDestroyOnClose, setVisibleDestroyOnClose] = useState(false)
   const [visibleCustomFooter, setVisibleCustomFooter] = useState(false)
+  const [visibleDefaultFooter, setVisibleDefaultFooter] = useState(false)
 
   const [visibleConfirm, setVisibleConfirm] = useState(false)
   const [confirmLoading, setConfirmLoading] = useState(false)
@@ -236,6 +244,26 @@ export default function ModalDemo() {
             }
             onCancel={() => setVisibleCustomFooter(false)}>
             <p>这是对话框的内容。</p>
+          </Modal>
+        </div>
+      </DemoBlock>
+
+      <DemoBlock
+        title="默认页脚"
+        description="设置 showDefaultFooter 属性可以使用内置的确定/取消页脚，通过 onOk/onCancel 监听操作。"
+        code={defaultFooterSnippet}>
+        <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+          <Button onClick={() => setVisibleDefaultFooter(true)}>默认页脚对话框</Button>
+          <Modal
+            visible={visibleDefaultFooter}
+            title="默认页脚对话框"
+            showDefaultFooter
+            onOk={() => {
+              console.log('OK clicked')
+              setVisibleDefaultFooter(false)
+            }}
+            onCancel={() => setVisibleDefaultFooter(false)}>
+            <p>这个对话框使用内置的默认页脚按钮。</p>
           </Modal>
         </div>
       </DemoBlock>

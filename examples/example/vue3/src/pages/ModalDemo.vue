@@ -21,6 +21,13 @@ const customFooterSnippet = `<Modal title="自定义页脚对话框">
   </template>
 </Modal>`
 
+const defaultFooterSnippet = `<Modal
+  title="默认页脚对话框"
+  show-default-footer
+  @ok="handleOk"
+  @cancel="handleCancel"
+>...</Modal>`
+
 const nestedSnippet = `<Modal title="第一层对话框">
   <Modal title="第二层对话框" :z-index="1100">...</Modal>
 </Modal>`
@@ -51,6 +58,7 @@ const visibleNested2 = ref(false)
 const visibleNoMask = ref(false)
 const visibleDestroyOnClose = ref(false)
 const visibleCustomFooter = ref(false)
+const visibleDefaultFooter = ref(false)
 
 const visibleConfirm = ref(false)
 const confirmLoading = ref(false)
@@ -217,6 +225,21 @@ const handleFormSubmit = async () => {
               <Button @click="visibleCustomFooter = false">提交</Button>
             </Space>
           </template>
+        </Modal>
+      </div>
+    </DemoBlock>
+
+    <DemoBlock title="默认页脚"
+               description="设置 show-default-footer 属性可以使用内置的确定/取消页脚，通过 @ok/@cancel 监听操作。"
+               :code="defaultFooterSnippet">
+      <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
+        <Button @click="visibleDefaultFooter = true">默认页脚对话框</Button>
+        <Modal v-model:visible="visibleDefaultFooter"
+               title="默认页脚对话框"
+               show-default-footer
+               @ok="() => { console.log('OK clicked') }"
+               @cancel="() => { console.log('Cancel clicked') }">
+          <p>这个对话框使用内置的默认页脚按钮。</p>
         </Modal>
       </div>
     </DemoBlock>
