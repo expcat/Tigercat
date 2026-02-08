@@ -42,8 +42,45 @@ const [visible, setVisible] = useState(false)
 ## Drawer 抽屉
 
 ```tsx
-<Drawer open={open} title="Title" placement="right" onClose={() => setOpen(false)}>
+const [visible, setVisible] = useState(false)
+
+{/* 基本用法 */}
+<Drawer
+  visible={visible}
+  title="Title"
+  placement="right"
+  size="md"
+  footer={<Button variant="secondary" onClick={() => setVisible(false)}>关闭</Button>}
+  onClose={() => setVisible(false)}>
   <p>Drawer content</p>
+</Drawer>
+
+{/* 自定义头部 */}
+<Drawer
+  visible={visible}
+  header={<span>⚙️ 设置</span>}
+  onClose={() => setVisible(false)}>
+  <p>Content</p>
+</Drawer>
+
+{/* 无蒙层 / 点击蒙层不关闭 / 隐藏关闭按钮 */}
+<Drawer visible={visible} mask={false} title="无蒙层" onClose={() => setVisible(false)} />
+<Drawer visible={visible} maskClosable={false} title="蒙层不可关" onClose={() => setVisible(false)} />
+<Drawer visible={visible} closable={false} title="无关闭按钮" onClose={() => setVisible(false)} />
+
+{/* 关闭时销毁内容 */}
+<Drawer visible={visible} destroyOnClose title="销毁模式" onClose={() => setVisible(false)}>
+  <FormContent />
+</Drawer>
+
+{/* 动画回调 */}
+<Drawer
+  visible={visible}
+  title="动画"
+  onClose={() => setVisible(false)}
+  onAfterEnter={() => console.log('opened')}
+  onAfterLeave={() => console.log('closed')}>
+  <p>Content</p>
 </Drawer>
 ```
 

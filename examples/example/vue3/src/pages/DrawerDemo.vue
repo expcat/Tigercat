@@ -29,6 +29,9 @@ const noMaskVisible = ref(false)
 // Not closable by mask
 const notClosableVisible = ref(false)
 
+// No close button
+const noCloseButtonVisible = ref(false)
+
 // Destroy on close
 const destroyVisible = ref(false)
 
@@ -39,6 +42,7 @@ const closeAll = () => {
   customVisible.value = false
   noMaskVisible.value = false
   notClosableVisible.value = false
+  noCloseButtonVisible.value = false
   destroyVisible.value = false
 }
 
@@ -72,6 +76,11 @@ const openNoMask = () => {
 const openNotClosable = () => {
   closeAll()
   notClosableVisible.value = true
+}
+
+const openNoCloseButton = () => {
+  closeAll()
+  noCloseButtonVisible.value = true
 }
 
 const openDestroy = () => {
@@ -168,6 +177,17 @@ const notClosableSnippet = `<Button @click="openNotClosable">打开抽屉</Butto
   <template #footer>
     <Space>
       <Button variant="secondary" @click="notClosableVisible = false">关闭</Button>
+    </Space>
+  </template>
+</Drawer>`
+
+const noCloseButtonSnippet = `<Button @click="openNoCloseButton">打开抽屉</Button>
+<Drawer v-model:visible="noCloseButtonVisible" :closable="false" title="隐藏关闭按钮">
+  <p>这个抽屉没有关闭按钮</p>
+  <p class="mt-2">仍可使用 ESC 或底部按钮关闭</p>
+  <template #footer>
+    <Space>
+      <Button variant="secondary" @click="noCloseButtonVisible = false">关闭</Button>
     </Space>
   </template>
 </Drawer>`
@@ -408,6 +428,27 @@ const DestroyOnCloseContent = defineComponent({
             <Space>
               <Button variant="secondary"
                       @click="notClosableVisible = false">关闭</Button>
+            </Space>
+          </template>
+        </Drawer>
+      </div>
+    </DemoBlock>
+
+    <!-- 隐藏关闭按钮 -->
+    <DemoBlock title="隐藏关闭按钮"
+               description="设置 closable=false 可以隐藏关闭按钮。"
+               :code="noCloseButtonSnippet">
+      <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <Button @click="openNoCloseButton">打开抽屉</Button>
+        <Drawer v-model:visible="noCloseButtonVisible"
+                :closable="false"
+                title="隐藏关闭按钮">
+          <p>这个抽屉没有关闭按钮</p>
+          <p class="mt-2">仍可使用 ESC 或底部按钮关闭</p>
+          <template #footer>
+            <Space>
+              <Button variant="secondary"
+                      @click="noCloseButtonVisible = false">关闭</Button>
             </Space>
           </template>
         </Drawer>

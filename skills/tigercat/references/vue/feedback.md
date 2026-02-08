@@ -41,9 +41,40 @@ const visible = ref(false)
 ## Drawer 抽屉
 
 ```vue
+<script setup>
+import { ref } from 'vue'
+const visible = ref(false)
+</script>
+
 <template>
-  <Drawer v-model:visible="visible" title="Title" placement="right">
+  <!-- 基本用法 -->
+  <Drawer v-model:visible="visible" title="Title" placement="right" size="md">
     <p>Drawer content</p>
+    <template #footer>
+      <Button variant="secondary" @click="visible = false">关闭</Button>
+    </template>
+  </Drawer>
+
+  <!-- 自定义头部 -->
+  <Drawer v-model:visible="visible">
+    <template #header><span>⚙️ 设置</span></template>
+    <p>Content</p>
+  </Drawer>
+
+  <!-- 无蒙层 / 点击蒙层不关闭 / 隐藏关闭按钮 -->
+  <Drawer v-model:visible="visible" :mask="false" title="无蒙层" />
+  <Drawer v-model:visible="visible" :mask-closable="false" title="蒙层不可关" />
+  <Drawer v-model:visible="visible" :closable="false" title="无关闭按钮" />
+
+  <!-- 关闭时销毁内容 -->
+  <Drawer v-model:visible="visible" :destroy-on-close="true" title="销毁模式">
+    <FormContent />
+  </Drawer>
+
+  <!-- 动画回调 -->
+  <Drawer v-model:visible="visible" title="动画"
+          @after-enter="onOpened" @after-leave="onClosed">
+    <p>Content</p>
   </Drawer>
 </template>
 ```

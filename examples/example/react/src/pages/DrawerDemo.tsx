@@ -128,6 +128,17 @@ const notClosableSnippet = `<Button onClick={openNotClosable}>打开抽屉</Butt
   <p className="mt-2">仍可使用关闭按钮或按 ESC 关闭</p>
 </Drawer>`
 
+const noCloseButtonSnippet = `<Button onClick={openNoCloseButton}>打开抽屉</Button>
+<Drawer
+  visible={noCloseButtonVisible}
+  closable={false}
+  title="隐藏关闭按钮"
+  footer={getCloseFooter(() => setNoCloseButtonVisible(false))}
+  onClose={() => setNoCloseButtonVisible(false)}>
+  <p>这个抽屉没有关闭按钮</p>
+  <p className="mt-2">仍可使用 ESC 或底部按钮关闭</p>
+</Drawer>`
+
 const destroySnippet = `<Button onClick={openDestroy}>打开抽屉</Button>
 <Drawer
   visible={destroyVisible}
@@ -206,6 +217,9 @@ const DrawerDemo: React.FC = () => {
   // Not closable by mask
   const [notClosableVisible, setNotClosableVisible] = useState(false)
 
+  // No close button
+  const [noCloseButtonVisible, setNoCloseButtonVisible] = useState(false)
+
   // Destroy on close
   const [destroyVisible, setDestroyVisible] = useState(false)
 
@@ -216,6 +230,7 @@ const DrawerDemo: React.FC = () => {
     setCustomVisible(false)
     setNoMaskVisible(false)
     setNotClosableVisible(false)
+    setNoCloseButtonVisible(false)
     setDestroyVisible(false)
   }
 
@@ -249,6 +264,11 @@ const DrawerDemo: React.FC = () => {
   const openNotClosable = () => {
     closeAll()
     setNotClosableVisible(true)
+  }
+
+  const openNoCloseButton = () => {
+    closeAll()
+    setNoCloseButtonVisible(true)
   }
 
   const openDestroy = () => {
@@ -439,6 +459,25 @@ const DrawerDemo: React.FC = () => {
             onClose={() => setNotClosableVisible(false)}>
             <p>点击蒙层不会关闭</p>
             <p className="mt-2">仍可使用关闭按钮或按 ESC 关闭</p>
+          </Drawer>
+        </div>
+      </DemoBlock>
+
+      {/* 隐藏关闭按钮 */}
+      <DemoBlock
+        title="隐藏关闭按钮"
+        description="设置 closable=false 可以隐藏关闭按钮。"
+        code={noCloseButtonSnippet}>
+        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+          <Button onClick={openNoCloseButton}>打开抽屉</Button>
+          <Drawer
+            visible={noCloseButtonVisible}
+            closable={false}
+            title="隐藏关闭按钮"
+            footer={getCloseFooter(() => setNoCloseButtonVisible(false))}
+            onClose={() => setNoCloseButtonVisible(false)}>
+            <p>这个抽屉没有关闭按钮</p>
+            <p className="mt-2">仍可使用 ESC 或底部按钮关闭</p>
           </Drawer>
         </div>
       </DemoBlock>

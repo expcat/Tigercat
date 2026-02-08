@@ -147,19 +147,15 @@ export const Drawer: React.FC<DrawerProps> = ({
   )
 
   useEffect(() => {
-    if (!visible) return
+    if (visible) {
+      previousActiveElementRef.current = captureActiveElement()
 
-    previousActiveElementRef.current = captureActiveElement()
+      const timer = window.setTimeout(() => {
+        focusFirst([closeButtonRef.current, dialogRef.current])
+      }, 0)
 
-    const timer = window.setTimeout(() => {
-      focusFirst([closeButtonRef.current, dialogRef.current])
-    }, 0)
-
-    return () => window.clearTimeout(timer)
-  }, [visible])
-
-  useEffect(() => {
-    if (visible) return
+      return () => window.clearTimeout(timer)
+    }
     restoreFocus(previousActiveElementRef.current)
   }, [visible])
 
@@ -177,7 +173,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   }, [])
 
   const containerClasses = classNames(
-    getDrawerContainerClasses(zIndex),
+    getDrawerContainerClasses(),
     !visible && 'pointer-events-none'
   )
 

@@ -56,23 +56,38 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Props
 
-| Prop         | Type                                     | Default   | Vue | React | Description                |
-| ------------ | ---------------------------------------- | --------- | :-: | :---: | -------------------------- |
-| visible      | `boolean`                                | `false`   |  ✓  |   -   | 显示状态 (v-model:visible) |
-| open         | `boolean`                                | `false`   |  -  |   ✓   | 显示状态                   |
-| title        | `string`                                 | -         |  ✓  |   ✓   | 标题                       |
-| placement    | `'left' \| 'right' \| 'top' \| 'bottom'` | `'right'` |  ✓  |   ✓   | 弹出位置                   |
-| width        | `string \| number`                       | `300`     |  ✓  |   ✓   | 宽度（left/right 时）      |
-| height       | `string \| number`                       | `300`     |  ✓  |   ✓   | 高度（top/bottom 时）      |
-| closable     | `boolean`                                | `true`    |  ✓  |   ✓   | 显示关闭按钮               |
-| maskClosable | `boolean`                                | `true`    |  ✓  |   ✓   | 点击遮罩关闭               |
+| Prop           | Type                                      | Default   | Vue | React | Description                    |
+| -------------- | ----------------------------------------- | --------- | :-: | :---: | ------------------------------ |
+| visible        | `boolean`                                 | `false`   |  ✓  |   ✓   | 显示状态 (Vue: v-model:visible) |
+| title          | `string`                                  | -         |  ✓  |   ✓   | 标题                           |
+| placement      | `'left' \| 'right' \| 'top' \| 'bottom'` | `'right'` |  ✓  |   ✓   | 弹出位置                       |
+| size           | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | `'md'`    |  ✓  |   ✓   | 尺寸（left/right 为宽度，top/bottom 为高度） |
+| closable       | `boolean`                                 | `true`    |  ✓  |   ✓   | 显示关闭按钮                   |
+| mask           | `boolean`                                 | `true`    |  ✓  |   ✓   | 显示遮罩层                     |
+| maskClosable   | `boolean`                                 | `true`    |  ✓  |   ✓   | 点击遮罩关闭                   |
+| zIndex         | `number`                                  | `1000`    |  ✓  |   ✓   | 层级                           |
+| destroyOnClose | `boolean`                                 | `false`   |  ✓  |   ✓   | 关闭时销毁内容                 |
+| className      | `string`                                  | -         |  ✓  |   ✓   | 面板自定义类名                 |
+| bodyClassName  | `string`                                  | -         |  ✓  |   ✓   | 内容区域自定义类名             |
+| closeAriaLabel | `string`                                  | `'Close drawer'` | ✓ | ✓  | 关闭按钮 aria-label            |
+| locale         | `{ drawer: DrawerLocale }`                | -         |  ✓  |   ✓   | 国际化                         |
 
 ### Events
 
-| Vue Event         | React Callback | Description  |
-| ----------------- | -------------- | ------------ |
-| `@update:visible` | `onOpenChange` | 显示状态变更 |
-| `@close`          | `onClose`      | 关闭事件     |
+| Vue Event         | React Callback | Description        |
+| ----------------- | -------------- | ------------------ |
+| `@update:visible` | -              | 显示状态变更       |
+| `@close`          | `onClose`      | 关闭事件           |
+| `@after-enter`    | `onAfterEnter` | 打开动画结束       |
+| `@after-leave`    | `onAfterLeave` | 关闭动画结束       |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description  |
+| --------- | ---------- | ------------ |
+| `default` | `children` | 内容         |
+| `header`  | `header`   | 自定义头部   |
+| `footer`  | `footer`   | 自定义底部   |
 
 ---
 

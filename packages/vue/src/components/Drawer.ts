@@ -265,18 +265,9 @@ export const Drawer = defineComponent({
     watch(
       () => props.visible,
       (nextVisible, prevVisible, onCleanup) => {
-        if (typeof prevVisible === 'undefined') {
-          if (!nextVisible) return
-
-          const timer = window.setTimeout(() => {
-            emit('after-enter')
-          }, ANIMATION_DURATION_MS)
-
-          onCleanup(() => window.clearTimeout(timer))
+        // Skip initial mount when closed, or no actual change
+        if (nextVisible === prevVisible || (typeof prevVisible === 'undefined' && !nextVisible))
           return
-        }
-
-        if (nextVisible === prevVisible) return
 
         const timer = window.setTimeout(() => {
           emit(nextVisible ? 'after-enter' : 'after-leave')
@@ -303,7 +294,7 @@ export const Drawer = defineComponent({
         ariaLabelledbyFromAttrs ?? (props.title || slots.header ? titleId.value : undefined)
 
       const containerClasses = classNames(
-        getDrawerContainerClasses(props.zIndex),
+        getDrawerContainerClasses(),
         !props.visible && 'pointer-events-none'
       )
 

@@ -158,6 +158,35 @@ describe('Drawer', () => {
     })
   })
 
+  it('should fire onAfterEnter/onAfterLeave after animation', async () => {
+    const onAfterEnter = vi.fn()
+    const onAfterLeave = vi.fn()
+
+    const { rerender } = render(
+      <Drawer
+        visible={true}
+        title="Test Drawer"
+        onAfterEnter={onAfterEnter}
+        onAfterLeave={onAfterLeave}
+      />
+    )
+
+    await new Promise((resolve) => setTimeout(resolve, 350))
+    expect(onAfterEnter).toHaveBeenCalled()
+
+    rerender(
+      <Drawer
+        visible={false}
+        title="Test Drawer"
+        onAfterEnter={onAfterEnter}
+        onAfterLeave={onAfterLeave}
+      />
+    )
+
+    await new Promise((resolve) => setTimeout(resolve, 350))
+    expect(onAfterLeave).toHaveBeenCalled()
+  })
+
   it('should pass basic accessibility checks', async () => {
     render(
       <Drawer visible={true} title="Accessible Drawer">

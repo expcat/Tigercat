@@ -18,8 +18,7 @@ export function getDrawerMaskClasses(visible: boolean): string {
 /**
  * Get drawer container classes (wrapper positioned over mask)
  */
-export function getDrawerContainerClasses(zIndex: number): string {
-  void zIndex
+export function getDrawerContainerClasses(): string {
   return 'fixed inset-0 overflow-hidden'
 }
 
