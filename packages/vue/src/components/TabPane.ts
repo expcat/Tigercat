@@ -1,4 +1,4 @@
-import { defineComponent, computed, inject, PropType, h } from 'vue'
+import { defineComponent, computed, inject, PropType, h, type VNode } from 'vue'
 import {
   classNames,
   getTabItemClasses,
@@ -15,7 +15,7 @@ export interface VueTabPaneProps {
   label: string
   disabled?: boolean
   closable?: boolean
-  icon?: unknown
+  icon?: string | VNode
   className?: string
   style?: Record<string, string | number>
 }
@@ -56,7 +56,7 @@ export const TabPane = defineComponent({
      * Icon for the tab
      */
     icon: {
-      type: [String, Object] as PropType<unknown>,
+      type: [String, Object] as PropType<string | VNode>,
       default: undefined
     },
     /**

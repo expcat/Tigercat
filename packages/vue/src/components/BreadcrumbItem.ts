@@ -1,4 +1,4 @@
-import { defineComponent, computed, inject, PropType, h } from 'vue'
+import { defineComponent, computed, inject, PropType, h, type VNode } from 'vue'
 import {
   getBreadcrumbItemClasses,
   getBreadcrumbLinkClasses,
@@ -15,7 +15,7 @@ export interface VueBreadcrumbItemProps {
   separator?: BreadcrumbSeparator
   className?: string
   style?: Record<string, unknown>
-  icon?: unknown
+  icon?: string | VNode
 }
 
 export const BreadcrumbItem = defineComponent({
@@ -68,7 +68,7 @@ export const BreadcrumbItem = defineComponent({
      * Icon to display before the item content
      */
     icon: {
-      type: [String, Object] as PropType<unknown>,
+      type: [String, Object] as PropType<string | VNode>,
       default: undefined
     }
   },
