@@ -15,9 +15,6 @@ import {
 
 export type BadgeProps = CoreBadgeProps &
   Omit<React.HTMLAttributes<HTMLSpanElement>, 'children' | 'content'> & {
-    /**
-     * Badge content (children for wrapped mode)
-     */
     children?: React.ReactNode
   }
 
@@ -39,11 +36,10 @@ export const Badge: React.FC<BadgeProps> = ({
   const isHidden = shouldHideBadge(content, type, showZero)
   const displayContent = formatBadgeContent(content, max, showZero)
 
-  const sizeClass = isDot ? dotSizeClasses[size] : badgeSizeClasses[size]
   const badgeClasses = classNames(
     badgeBaseClasses,
     getBadgeVariantClasses(variant),
-    sizeClass,
+    isDot ? dotSizeClasses[size] : badgeSizeClasses[size],
     badgeTypeClasses[type],
     !standalone && badgePositionClasses[position],
     className
@@ -57,27 +53,20 @@ export const Badge: React.FC<BadgeProps> = ({
         ? `${displayContent} notifications`
         : `${displayContent ?? ''}`)
 
-  // If badge should be hidden, render only children (or nothing if standalone)
   if (isHidden) {
-    if (standalone) {
-      return null
-    }
-    return <>{children}</>
+    return standalone ? null : <>{children}</>
   }
 
-  // Create badge element
   const badgeElement = (
     <span {...props} className={badgeClasses} role="status" aria-label={computedAriaLabel}>
       {!isDot && displayContent}
     </span>
   )
 
-  // If standalone, return badge only
   if (standalone) {
     return badgeElement
   }
 
-  // If wrapping content, return wrapper with badge and children
   return (
     <span className={badgeWrapperClasses}>
       {children}

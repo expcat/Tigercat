@@ -1,51 +1,38 @@
 /**
  * Badge component utilities
- * Shared styles and helpers for Badge components
  */
 
 import type { BadgePosition, BadgeSize, BadgeType } from '../types/badge'
 
-/**
- * Base classes for all badge variants
- */
+/** Base classes for all badge variants */
 export const badgeBaseClasses =
   'inline-flex items-center justify-center font-medium transition-colors'
 
-/**
- * Size classes for badge variants
- */
+/** Size classes for badge content (number/text) */
 export const badgeSizeClasses: Record<BadgeSize, string> = {
   sm: 'min-w-4 h-4 text-xs px-1',
   md: 'min-w-5 h-5 text-xs px-1.5',
   lg: 'min-w-6 h-6 text-sm px-2'
 } as const
 
-/**
- * Dot size classes
- */
+/** Size classes for dot badges */
 export const dotSizeClasses: Record<BadgeSize, string> = {
   sm: 'w-2 h-2',
   md: 'w-2.5 h-2.5',
   lg: 'w-3 h-3'
 } as const
 
-/**
- * Badge type specific classes
- */
+/** Shape classes per badge type */
 export const badgeTypeClasses: Record<BadgeType, string> = {
   dot: 'rounded-full',
   number: 'rounded-full',
   text: 'rounded-md'
 } as const
 
-/**
- * Wrapper classes when badge is not standalone
- */
+/** Wrapper classes for non-standalone badge */
 export const badgeWrapperClasses = 'relative inline-flex'
 
-/**
- * Position classes for badge when used as wrapper
- */
+/** Position classes for non-standalone badge */
 export const badgePositionClasses: Record<BadgePosition, string> = {
   'top-right': 'absolute -top-1 -right-1',
   'top-left': 'absolute -top-1 -left-1',
@@ -54,61 +41,32 @@ export const badgePositionClasses: Record<BadgePosition, string> = {
 } as const
 
 /**
- * Format badge content for display
- * @param content - Badge content (number or string)
- * @param max - Maximum count to display
- * @param showZero - Whether to show zero count
- * @returns Formatted content string or null if should not display
+ * Format badge content for display.
+ * Returns null when badge should not display (e.g. zero without showZero).
  */
 export function formatBadgeContent(
   content: number | string | undefined,
   max: number = 99,
   showZero: boolean = false
 ): string | null {
-  // If content is undefined or null, don't display
-  if (content === undefined || content === null) {
-    return null
-  }
-
-  // If content is a string, return as-is
-  if (typeof content === 'string') {
-    return content
-  }
-
-  // If content is a number
-  const num = Number(content)
-
-  // Don't show zero unless showZero is true
-  if (num === 0 && !showZero) {
-    return null
-  }
-
-  // If exceeds max, show 'max+'
-  if (num > max) {
-    return `${max}+`
-  }
-
-  return String(num)
+  if (content === undefined || content === null) return null
+  if (typeof content === 'string') return content
+  if (content === 0 && !showZero) return null
+  if (content > max) return `${max}+`
+  return String(content)
 }
 
 /**
- * Check if badge should be hidden
- * @param content - Badge content
- * @param type - Badge type
- * @param showZero - Whether to show zero count
- * @returns true if badge should be hidden
+ * Check if badge should be hidden.
+ * Dot badges are always visible; number/text badges hide when content is empty or zero.
  */
 export function shouldHideBadge(
   content: number | string | undefined,
   type: BadgeType,
   showZero: boolean
 ): boolean {
-  // Dot badges are always shown
-  if (type === 'dot') {
-    return false
-  }
-
-  // For number and text types, check content
-  const formattedContent = formatBadgeContent(content, 99, showZero)
-  return formattedContent === null || formattedContent === ''
+  if (type === 'dot') return false
+  if (content === undefined || content === null) return true
+  if (typeof content === 'string') return content === ''
+  return content === 0 && !showZero
 }

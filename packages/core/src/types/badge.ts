@@ -1,86 +1,40 @@
 /**
- * Badge component types and interfaces
+ * Badge component types
  */
 
-/**
- * Badge variant types
- */
+/** Badge variant types */
 export type BadgeVariant = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info'
 
-/**
- * Badge size types
- */
+/** Badge size types */
 export type BadgeSize = 'sm' | 'md' | 'lg'
 
-/**
- * Badge display types
- */
+/** Badge display types */
 export type BadgeType = 'dot' | 'number' | 'text'
 
-/**
- * Badge position types (for positioning badge on wrapper)
- */
+/** Badge position types (for non-standalone mode) */
 export type BadgePosition = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left'
 
-/**
- * Base badge props interface
- */
+/** Base badge props interface */
 export interface BadgeProps {
-  /**
-   * Badge variant style
-   * @default 'danger'
-   */
+  /** Badge variant style @default 'danger' */
   variant?: BadgeVariant
-
-  /**
-   * Badge size
-   * @default 'md'
-   */
+  /** Badge size @default 'md' */
   size?: BadgeSize
-
-  /**
-   * Badge display type
-   * @default 'number'
-   */
+  /** Badge display type @default 'number' */
   type?: BadgeType
-
   /**
-   * Badge content (number or text)
-   * For type='number', this should be a number or string
-   * For type='text', this should be a string
-   * For type='dot', this prop is ignored
+   * Badge content (number or text).
+   * Ignored when type='dot'.
    */
   content?: number | string
-
-  /**
-   * Maximum count to display (only for type='number')
-   * When content exceeds max, displays 'max+' (e.g., '99+')
-   * @default 99
-   */
+  /** Maximum count (type='number' only). Exceeds shows 'max+'. @default 99 */
   max?: number
-
-  /**
-   * Whether to show zero count
-   * @default false
-   */
+  /** Whether to show zero count @default false */
   showZero?: boolean
-
-  /**
-   * Badge position when used as wrapper (standalone mode)
-   * @default 'top-right'
-   */
+  /** Badge position in non-standalone mode @default 'top-right' */
   position?: BadgePosition
-
-  /**
-   * Whether badge is standalone or wrapping content
-   * When true, badge is displayed inline
-   * When false, badge wraps children and positions badge absolutely
-   * @default true
-   */
+  /** Standalone (inline) or wrapping children @default true */
   standalone?: boolean
-
-  /**
-   * Additional CSS classes
-   */
+  /** Additional CSS classes */
   className?: string
 }

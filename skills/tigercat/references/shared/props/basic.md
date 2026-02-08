@@ -87,17 +87,23 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop  | Type               | Default | Vue | React | Description               |
-| ----- | ------------------ | ------- | :-: | :---: | ------------------------- |
-| value | `number \| string` | -       |  ✓  |   ✓   | 显示值                    |
-| max   | `number`           | `99`    |  ✓  |   ✓   | 最大值，超过显示 `{max}+` |
-| dot   | `boolean`          | `false` |  ✓  |   ✓   | 小红点模式                |
+| Prop       | Type                                                                     | Default       | Vue | React | Description                                   |
+| ---------- | ------------------------------------------------------------------------ | ------------- | :-: | :---: | --------------------------------------------- |
+| variant    | `'default' \| 'primary' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'danger'`    |  ✓  |   ✓   | 颜色变体                                      |
+| size       | `'sm' \| 'md' \| 'lg'`                                                   | `'md'`        |  ✓  |   ✓   | 尺寸                                          |
+| type       | `'dot' \| 'number' \| 'text'`                                            | `'number'`    |  ✓  |   ✓   | 显示类型（小红点 / 数字 / 文本）              |
+| content    | `number \| string`                                                       | -             |  ✓  |   ✓   | 显示内容（type='dot' 时忽略）                 |
+| max        | `number`                                                                 | `99`          |  ✓  |   ✓   | 最大值，超过显示 `{max}+`（仅 type='number'） |
+| showZero   | `boolean`                                                                | `false`       |  ✓  |   ✓   | 是否显示零值                                  |
+| position   | `'top-right' \| 'top-left' \| 'bottom-right' \| 'bottom-left'`           | `'top-right'` |  ✓  |   ✓   | 非独立模式下的位置                            |
+| standalone | `boolean`                                                                | `true`        |  ✓  |   ✓   | 独立模式（true）或包裹子元素模式（false）     |
+| className  | `string`                                                                 | -             |  ✓  |   ✓   | 自定义类名                                    |
 
 ### Slots / Children
 
-| Vue Slot  | React Prop | Description    |
-| --------- | ---------- | -------------- |
-| `default` | `children` | 徽标包裹的内容 |
+| Vue Slot  | React Prop | Description                           |
+| --------- | ---------- | ------------------------------------- |
+| `default` | `children` | 包裹的内容（standalone=false 时有效） |
 
 ---
 

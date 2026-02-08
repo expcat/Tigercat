@@ -68,8 +68,12 @@ import { Button } from '@expcat/tigercat-react'
 <Avatar src="/avatar.jpg" size="lg" />
 <Avatar text="AB" shape="square" />
 
-<Badge value={5}><Avatar /></Badge>
-<Badge dot><Avatar /></Badge>
+{/* 数字徽标 */}
+<Badge content={5} standalone={false}><Avatar /></Badge>
+{/* 小红点 */}
+<Badge type="dot" standalone={false}><Avatar /></Badge>
+{/* 文本徽标 */}
+<Badge type="text" content="NEW" variant="primary" />
 ```
 
 ---
