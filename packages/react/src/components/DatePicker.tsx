@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import {
   classNames,
   icon20ViewBox,
@@ -152,8 +152,8 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     return [start, end]
   })()
 
-  const minDateParsed = parseDate(props.minDate ?? null)
-  const maxDateParsed = parseDate(props.maxDate ?? null)
+  const minDateParsed = useMemo(() => parseDate(props.minDate ?? null), [props.minDate])
+  const maxDateParsed = useMemo(() => parseDate(props.maxDate ?? null), [props.maxDate])
 
   // Current viewing month/year in calendar
   const [viewingMonth, setViewingMonth] = useState(
@@ -183,16 +183,22 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     return selectedRange[0] !== null || selectedRange[1] !== null
   })()
 
-  const calendarDays = getCalendarDays(viewingYear, viewingMonth)
-  const dayNames = getShortDayNames(props.locale)
+  const calendarDays = useMemo(
+    () => getCalendarDays(viewingYear, viewingMonth),
+    [viewingYear, viewingMonth]
+  )
+  const dayNames = useMemo(() => getShortDayNames(props.locale), [props.locale])
 
-  const labels = getDatePickerLabels(props.locale, props.labels)
+  const labels = useMemo(
+    () => getDatePickerLabels(props.locale, props.labels),
+    [props.locale, props.labels]
+  )
 
   const toggleCalendar = () => {
     if (!disabled && !readonly) {
       setIsOpen(!isOpen)
       if (!isOpen) {
-        restoreFocusRef.current = (document.activeElement as HTMLElement) ?? null
+        restoreFocusRef.current = inputRef.current ?? null
         // Reset viewing month to selected date or current month
         const baseDate = selectedDate ?? selectedRange[0]
         if (baseDate) {
@@ -368,12 +374,8 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
       return
     }
 
-    if (normalizedDate < start) {
-      // Range rule (same as TimePicker): end cannot be earlier than start
-      setRangeValue([start, start])
-    } else {
-      setRangeValue([start, normalizedDate])
-    }
+    // Range rule: end cannot be earlier than start
+    setRangeValue([start, normalizedDate < start ? start : normalizedDate])
   }
 
   const setToday = () => {
@@ -387,7 +389,6 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
       if (!isControlled) {
         setInternalValue(null)
       }
-
       ;(props as DatePickerSingleProps).onChange?.(null)
     } else {
       setRangeValue([null, null])
@@ -424,33 +425,22 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     return date.getMonth() === viewingMonth
   }
 
-  const handleInputClick = () => {
-    toggleCalendar()
-  }
-
+  // Consolidated open/close effect: click-outside listener + focus management
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        calendarRef.current &&
-        inputWrapperRef.current &&
-        !calendarRef.current.contains(event.target as Node) &&
-        !inputWrapperRef.current.contains(event.target as Node)
-      ) {
-        closeCalendar()
-      }
-    }
-
     if (isOpen) {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (
+          calendarRef.current &&
+          inputWrapperRef.current &&
+          !calendarRef.current.contains(event.target as Node) &&
+          !inputWrapperRef.current.contains(event.target as Node)
+        ) {
+          closeCalendar()
+        }
+      }
+
       document.addEventListener('click', handleClickOutside)
-      return () => {
-        document.removeEventListener('click', handleClickOutside)
-      }
-    }
-  }, [isOpen])
 
-  useEffect(() => {
-    if (isOpen) {
-      restoreFocusRef.current = (document.activeElement as HTMLElement) ?? null
       const preferred = pendingFocusIsoRef.current ?? getPreferredFocusIso()
       pendingFocusIsoRef.current = null
 
@@ -460,12 +450,10 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
         if (fallback) focusDateButtonByIso(fallback)
       }, 0)
 
-      return
+      return () => document.removeEventListener('click', handleClickOutside)
     }
 
-    setTimeout(() => {
-      restoreFocus()
-    }, 0)
+    setTimeout(() => restoreFocus(), 0)
   }, [isOpen])
 
   useEffect(() => {
@@ -481,8 +469,11 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     }, 0)
   }, [isOpen, viewingMonth, viewingYear])
 
-  const inputClasses = getDatePickerInputClasses(size, disabled || readonly)
-  const iconButtonClasses = getDatePickerIconButtonClasses(size)
+  const inputClasses = useMemo(
+    () => getDatePickerInputClasses(size, disabled || readonly),
+    [size, disabled, readonly]
+  )
+  const iconButtonClasses = useMemo(() => getDatePickerIconButtonClasses(size), [size])
 
   return (
     <div className={classNames(datePickerBaseClasses, props.className)} {...divProps}>
@@ -500,7 +491,7 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
           required={required}
           name={props.name}
           id={props.id}
-          onClick={handleInputClick}
+          onClick={toggleCalendar}
           aria-label={placeholder || 'Select date'}
         />
 
@@ -566,68 +557,77 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
           </div>
 
           {/* Calendar grid */}
-          <div
-            className={datePickerCalendarGridClasses}
-            role="grid"
-            aria-rowcount={6}
-            aria-colcount={7}>
-            {calendarDays.map((date, index) => {
-              if (!date) return null
+          {(() => {
+            // Pre-compute range values once instead of per-cell
+            const [rangeStart, rangeEnd] = selectedRange
+            const normStart = rangeStart ? normalizeDate(rangeStart) : null
+            const normEnd = rangeEnd ? normalizeDate(rangeEnd) : null
+            const isSelectingEnd = isRangeMode && Boolean(rangeStart) && !rangeEnd
 
-              const [rangeStart, rangeEnd] = selectedRange
+            return (
+              <div
+                className={datePickerCalendarGridClasses}
+                role="grid"
+                aria-rowcount={6}
+                aria-colcount={7}>
+                {calendarDays.map((date, index) => {
+                  if (!date) return null
 
-              const isRangeStart = isRangeMode && rangeStart ? isSameDay(date, rangeStart) : false
-              const isRangeEnd = isRangeMode && rangeEnd ? isSameDay(date, rangeEnd) : false
-              const isInRange =
-                isRangeMode &&
-                rangeStart &&
-                rangeEnd &&
-                normalizeDate(date) >= normalizeDate(rangeStart) &&
-                normalizeDate(date) <= normalizeDate(rangeEnd)
+                  const normDate = normalizeDate(date)
 
-              const isSelected = !isRangeMode
-                ? selectedDate
-                  ? isSameDay(date, selectedDate)
-                  : false
-                : isRangeStart || isRangeEnd
+                  const isRangeStart =
+                    isRangeMode && rangeStart ? isSameDay(date, rangeStart) : false
+                  const isRangeEnd = isRangeMode && rangeEnd ? isSameDay(date, rangeEnd) : false
+                  const isInRange =
+                    isRangeMode &&
+                    normStart &&
+                    normEnd &&
+                    normDate >= normStart &&
+                    normDate <= normEnd
 
-              const isCurrentMonthDay = isCurrentMonth(date)
-              const isTodayDay = isTodayUtil(date)
-              const isSelectingRangeEnd = isRangeMode && Boolean(rangeStart) && !rangeEnd
-              const isBeforeRangeStart =
-                isSelectingRangeEnd && rangeStart && normalizeDate(date) < normalizeDate(rangeStart)
+                  const isSelected = !isRangeMode
+                    ? selectedDate
+                      ? isSameDay(date, selectedDate)
+                      : false
+                    : isRangeStart || isRangeEnd
 
-              const isDisabled = isDateDisabled(date) || Boolean(isBeforeRangeStart)
+                  const isCurrentMonthDay = isCurrentMonth(date)
+                  const isTodayDay = isTodayUtil(date)
+                  const isBeforeRangeStart = isSelectingEnd && normStart && normDate < normStart
 
-              const iso = formatDate(date, 'yyyy-MM-dd')
+                  const isDisabled = isDateDisabled(date) || Boolean(isBeforeRangeStart)
 
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  className={getDatePickerDayCellClasses(
-                    isCurrentMonthDay,
-                    isSelected,
-                    isTodayDay,
-                    isDisabled,
-                    Boolean(isInRange),
-                    Boolean(isRangeStart),
-                    Boolean(isRangeEnd)
-                  )}
-                  disabled={isDisabled}
-                  onClick={() => selectDate(date)}
-                  role="gridcell"
-                  data-date={iso}
-                  onFocus={() => setActiveDateIso(iso)}
-                  tabIndex={activeDateIso === iso && !isDisabled ? 0 : -1}
-                  aria-label={iso}
-                  aria-selected={isSelected}
-                  aria-current={isTodayDay ? 'date' : undefined}>
-                  {date.getDate()}
-                </button>
-              )
-            })}
-          </div>
+                  const iso = formatDate(date, 'yyyy-MM-dd')
+
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      className={getDatePickerDayCellClasses(
+                        isCurrentMonthDay,
+                        isSelected,
+                        isTodayDay,
+                        isDisabled,
+                        Boolean(isInRange),
+                        Boolean(isRangeStart),
+                        Boolean(isRangeEnd)
+                      )}
+                      disabled={isDisabled}
+                      onClick={() => selectDate(date)}
+                      role="gridcell"
+                      data-date={iso}
+                      onFocus={() => setActiveDateIso(iso)}
+                      tabIndex={activeDateIso === iso && !isDisabled ? 0 : -1}
+                      aria-label={iso}
+                      aria-selected={isSelected}
+                      aria-current={isTodayDay ? 'date' : undefined}>
+                      {date.getDate()}
+                    </button>
+                  )
+                })}
+              </div>
+            )
+          })()}
 
           {/* Footer (range mode only) */}
           {isRangeMode && (

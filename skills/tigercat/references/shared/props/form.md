@@ -341,15 +341,33 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop        | Type                           | Default        | Vue | React | Description |
-| ----------- | ------------------------------ | -------------- | :-: | :---: | ----------- |
-| modelValue  | `Date \| null \| [Date, Date]` | `null`         |  ✓  |   -   | 绑定值      |
-| value       | `Date \| null \| [Date, Date]` | `null`         |  -  |   ✓   | 值          |
-| format      | `string`                       | `'YYYY-MM-DD'` |  ✓  |   ✓   | 日期格式    |
-| placeholder | `string`                       | -              |  ✓  |   ✓   | 占位符      |
-| range       | `boolean`                      | `false`        |  ✓  |   ✓   | 范围选择    |
-| disabled    | `boolean`                      | `false`        |  ✓  |   ✓   | 禁用        |
-| locale      | `DatePickerLocale`             | -              |  ✓  |   ✓   | 国际化配置  |
+| Prop         | Type                               | Default         | Vue | React | Description   |
+| ------------ | ---------------------------------- | --------------- | :-: | :---: | ------------- |
+| modelValue   | `Date \| string \| null \| [*, *]` | `null`          |  ✓  |   -   | 绑定值        |
+| value        | `Date \| string \| null \| [*, *]` | -               |  -  |   ✓   | 受控值        |
+| defaultValue | `Date \| string \| null \| [*, *]` | -               |  -  |   ✓   | 非受控默认值  |
+| range        | `boolean`                          | `false`         |  ✓  |   ✓   | 范围选择      |
+| size         | `'sm' \| 'md' \| 'lg'`             | `'md'`          |  ✓  |   ✓   | 尺寸          |
+| format       | `DateFormat`                       | `'yyyy-MM-dd'`  |  ✓  |   ✓   | 日期格式      |
+| placeholder  | `string`                           | `'Select date'` |  ✓  |   ✓   | 占位符        |
+| disabled     | `boolean`                          | `false`         |  ✓  |   ✓   | 禁用          |
+| readonly     | `boolean`                          | `false`         |  ✓  |   ✓   | 只读          |
+| required     | `boolean`                          | `false`         |  ✓  |   ✓   | 必填          |
+| minDate      | `Date \| string \| null`           | -               |  ✓  |   ✓   | 最小可选日期  |
+| maxDate      | `Date \| string \| null`           | -               |  ✓  |   ✓   | 最大可选日期  |
+| clearable    | `boolean`                          | `true`          |  ✓  |   ✓   | 显示清除按钮  |
+| locale       | `string`                           | -               |  ✓  |   ✓   | 国际化 locale |
+| labels       | `Partial<DatePickerLabels>`        | -               |  ✓  |   ✓   | 自定义文案    |
+| name         | `string`                           | -               |  ✓  |   ✓   | input name    |
+| id           | `string`                           | -               |  ✓  |   ✓   | input id      |
+
+### Events
+
+| Vue Event            | React Callback | Payload                        | Description |
+| -------------------- | -------------- | ------------------------------ | ----------- |
+| `@update:modelValue` | `onChange`     | `Date \| null \| [Date, Date]` | 值变更      |
+| `@change`            | -              | `Date \| null \| [Date, Date]` | 值变更      |
+| `@clear`             | `onClear`      | -                              | 清除        |
 
 ---
 

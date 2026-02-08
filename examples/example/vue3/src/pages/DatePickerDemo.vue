@@ -99,6 +99,20 @@ const formatSnippet = `<Space direction="vertical" class="w-full max-w-md">
       format="MM/dd/yyyy"
       :locale="locale" />
   </FormItem>
+  <FormItem label="dd/MM/yyyy">
+    <DatePicker
+      v-model="dateWithDefault"
+      class="w-full max-w-[260px]"
+      format="dd/MM/yyyy"
+      :locale="locale" />
+  </FormItem>
+  <FormItem label="yyyy/MM/dd">
+    <DatePicker
+      v-model="dateWithDefault"
+      class="w-full max-w-[260px]"
+      format="yyyy/MM/dd"
+      :locale="locale" />
+  </FormItem>
 </Space>`
 
 const minMaxSnippet = `<Space direction="vertical" class="w-full max-w-md">
@@ -233,7 +247,7 @@ const clearableSnippet = `<Space direction="vertical" class="w-full max-w-md">
 
     <!-- 日期格式 -->
     <DemoBlock title="日期格式"
-               description="仅展示两种常用日期显示格式。"
+               description="支持四种日期显示格式。"
                :code="formatSnippet">
       <Space direction="vertical"
              class="w-full max-w-md">
@@ -247,6 +261,18 @@ const clearableSnippet = `<Space direction="vertical" class="w-full max-w-md">
           <DatePicker v-model="dateWithDefault"
                       class="w-full max-w-[260px]"
                       format="MM/dd/yyyy"
+                      :locale="locale" />
+        </FormItem>
+        <FormItem label="dd/MM/yyyy">
+          <DatePicker v-model="dateWithDefault"
+                      class="w-full max-w-[260px]"
+                      format="dd/MM/yyyy"
+                      :locale="locale" />
+        </FormItem>
+        <FormItem label="yyyy/MM/dd">
+          <DatePicker v-model="dateWithDefault"
+                      class="w-full max-w-[260px]"
+                      format="yyyy/MM/dd"
                       :locale="locale" />
         </FormItem>
       </Space>

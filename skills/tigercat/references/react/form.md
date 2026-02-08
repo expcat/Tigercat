@@ -306,8 +306,14 @@ const [value, setValue] = useState('male')
 
 ```tsx
 <DatePicker value={date} onChange={setDate} placeholder="Select date" />
-<DatePicker value={date} onChange={setDate} format="YYYY/MM/DD" />
-<DatePicker value={dateRange} onChange={setDateRange} range />
+<DatePicker value={date} onChange={setDate} format="yyyy/MM/dd" />
+<DatePicker range value={dateRange} onChange={setDateRange} />
+<DatePicker value={date} onChange={setDate} size="sm" />
+<DatePicker value={date} onChange={setDate} minDate={minDate} maxDate={maxDate} />
+<DatePicker value={date} onChange={setDate} disabled />
+<DatePicker value={date} onChange={setDate} clearable onClear={onClear} />
+<DatePicker defaultValue={new Date()} />
+<DatePicker value={date} onChange={setDate} locale="zh-CN" labels={{ today: '今日' }} />
 ```
 
 ---

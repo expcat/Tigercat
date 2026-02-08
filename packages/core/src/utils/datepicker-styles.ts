@@ -137,7 +137,9 @@ export const datePickerDayNameClasses = classNames(
 )
 
 /**
- * Get day cell classes
+ * Get day cell classes.
+ * Uses early returns to avoid conflicting Tailwind classes
+ * (e.g. text-gray-900 + text-white, hover:bg-gray-100 + hover:bg-primary).
  */
 export function getDatePickerDayCellClasses(
   isCurrentMonth: boolean,
@@ -148,40 +150,26 @@ export function getDatePickerDayCellClasses(
   isRangeStart = false,
   isRangeEnd = false
 ): string {
-  const baseClasses = [
-    'w-10',
-    'h-10',
-    'flex',
-    'items-center',
-    'justify-center',
-    'rounded-md',
-    'text-sm',
-    'transition-colors'
-  ]
+  const base = 'w-10 h-10 flex items-center justify-center rounded-md text-sm transition-colors'
 
-  const interactionClasses = isDisabled
-    ? ['cursor-not-allowed', 'text-gray-300']
-    : ['cursor-pointer', 'hover:bg-gray-100']
-
-  const monthClasses = isCurrentMonth ? ['text-gray-900'] : ['text-gray-400']
-
-  const stateClasses = []
-  if (isInRange && !isDisabled && !isSelected) {
-    stateClasses.push('bg-[var(--tiger-outline-bg-hover,#eff6ff)]')
+  if (isDisabled) {
+    return classNames(base, 'cursor-not-allowed text-gray-300')
   }
 
   if (isSelected || isRangeStart || isRangeEnd) {
-    stateClasses.push(
-      'bg-[var(--tiger-primary,#2563eb)]',
-      'text-white',
-      'hover:bg-[var(--tiger-primary-hover,#1d4ed8)]',
-      'font-semibold'
+    return classNames(
+      base,
+      'cursor-pointer',
+      'bg-[var(--tiger-primary,#2563eb)] text-white',
+      'hover:bg-[var(--tiger-primary-hover,#1d4ed8)] font-semibold'
     )
-  } else if (isToday) {
-    stateClasses.push('border', 'border-[var(--tiger-primary,#2563eb)]', 'font-semibold')
   }
 
-  return classNames(...baseClasses, ...interactionClasses, ...monthClasses, ...stateClasses)
+  const color = isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
+  const range = isInRange ? 'bg-[var(--tiger-outline-bg-hover,#eff6ff)]' : ''
+  const today = isToday ? 'border border-[var(--tiger-primary,#2563eb)] font-semibold' : ''
+
+  return classNames(base, 'cursor-pointer hover:bg-gray-100', color, range, today)
 }
 
 /**

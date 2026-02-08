@@ -285,8 +285,13 @@ const value = ref('male')
 ```vue
 <template>
   <DatePicker v-model="date" placeholder="Select date" />
-  <DatePicker v-model="date" format="YYYY/MM/DD" />
+  <DatePicker v-model="date" format="yyyy/MM/dd" />
   <DatePicker v-model="dateRange" range />
+  <DatePicker v-model="date" size="sm" />
+  <DatePicker v-model="date" :min-date="minDate" :max-date="maxDate" />
+  <DatePicker v-model="date" disabled />
+  <DatePicker v-model="date" clearable @clear="onClear" />
+  <DatePicker v-model="date" locale="zh-CN" :labels="{ today: '今日' }" />
 </template>
 ```
 

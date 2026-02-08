@@ -316,6 +316,12 @@ export const DatePicker = defineComponent({
 
     const labels = computed(() => getDatePickerLabels(props.locale, props.labels))
 
+    /** Emit both update:modelValue and change in one call */
+    const emitValue = (value: DatePickerModelValue | null) => {
+      emit('update:modelValue', value)
+      emit('change', value)
+    }
+
     const addDays = (date: Date, days: number): Date => {
       const next = new Date(date)
       next.setDate(next.getDate() + days)
@@ -453,11 +459,7 @@ export const DatePicker = defineComponent({
       if (!props.disabled && !props.readonly) {
         isOpen.value = !isOpen.value
         if (isOpen.value) {
-          restoreFocusEl.value =
-            restoreFocusEl.value ??
-            (document.activeElement as HTMLElement) ??
-            inputRef.value ??
-            null
+          restoreFocusEl.value = inputRef.value ?? null
           // Reset viewing month to selected date or current month
           const baseDate = selectedDate.value ?? selectedRange.value[0]
           if (baseDate) {
@@ -487,8 +489,7 @@ export const DatePicker = defineComponent({
       }
 
       if (!isRangeMode.value) {
-        emit('update:modelValue', normalizedDate)
-        emit('change', normalizedDate)
+        emitValue(normalizedDate)
         closeCalendar()
         return
       }
@@ -496,32 +497,17 @@ export const DatePicker = defineComponent({
       const [start, end] = selectedRange.value
 
       if (!start || (start && end)) {
-        emit('update:modelValue', [normalizedDate, null])
-        emit('change', [normalizedDate, null])
+        emitValue([normalizedDate, null])
         return
       }
 
-      if (normalizedDate < start) {
-        // Range rule (same as TimePicker): end cannot be earlier than start
-        emit('update:modelValue', [start, start])
-        emit('change', [start, start])
-      } else {
-        emit('update:modelValue', [start, normalizedDate])
-        emit('change', [start, normalizedDate])
-      }
+      // Range rule: end cannot be earlier than start
+      emitValue([start, normalizedDate < start ? start : normalizedDate])
     }
 
     function clearDate(event: Event) {
       event.stopPropagation()
-
-      if (!isRangeMode.value) {
-        emit('update:modelValue', null)
-        emit('change', null)
-      } else {
-        emit('update:modelValue', [null, null])
-        emit('change', [null, null])
-      }
-
+      emitValue(!isRangeMode.value ? null : [null, null])
       emit('clear')
     }
 
@@ -565,7 +551,6 @@ export const DatePicker = defineComponent({
     }
 
     function handleInputClick() {
-      inputRef.value?.focus()
       toggleCalendar()
     }
 
@@ -573,8 +558,6 @@ export const DatePicker = defineComponent({
       if (newValue) {
         document.addEventListener('click', handleClickOutside)
 
-        restoreFocusEl.value =
-          restoreFocusEl.value ?? (document.activeElement as HTMLElement) ?? inputRef.value ?? null
         const preferred = pendingFocusIso.value ?? getPreferredFocusIso()
         pendingFocusIso.value = null
 
@@ -723,81 +706,85 @@ export const DatePicker = defineComponent({
                   )
                 ]),
                 // Calendar grid
-                h(
-                  'div',
-                  {
-                    class: datePickerCalendarGridClasses,
-                    role: 'grid',
-                    'aria-rowcount': 6,
-                    'aria-colcount': 7
-                  },
-                  [
-                    ...calendarDays.value.map((date, index) => {
-                      if (!date) return null
+                (() => {
+                  // Pre-compute range values once instead of per-cell
+                  const [rangeStart, rangeEnd] = selectedRange.value
+                  const normStart = rangeStart ? normalizeDate(rangeStart) : null
+                  const normEnd = rangeEnd ? normalizeDate(rangeEnd) : null
+                  const isSelectingEnd = isRangeMode.value && Boolean(rangeStart) && !rangeEnd
 
-                      const [rangeStart, rangeEnd] = selectedRange.value
+                  return h(
+                    'div',
+                    {
+                      class: datePickerCalendarGridClasses,
+                      role: 'grid',
+                      'aria-rowcount': 6,
+                      'aria-colcount': 7
+                    },
+                    [
+                      ...calendarDays.value.map((date, index) => {
+                        if (!date) return null
 
-                      const isRangeStart =
-                        isRangeMode.value && rangeStart ? isSameDay(date, rangeStart) : false
-                      const isRangeEnd =
-                        isRangeMode.value && rangeEnd ? isSameDay(date, rangeEnd) : false
-                      const isInRange =
-                        isRangeMode.value &&
-                        rangeStart &&
-                        rangeEnd &&
-                        normalizeDate(date) >= normalizeDate(rangeStart) &&
-                        normalizeDate(date) <= normalizeDate(rangeEnd)
+                        const normDate = normalizeDate(date)
 
-                      const isSelected = !isRangeMode.value
-                        ? selectedDate.value
-                          ? isSameDay(date, selectedDate.value)
-                          : false
-                        : isRangeStart || isRangeEnd
-                      const isCurrentMonthDay = isCurrentMonth(date)
-                      const isTodayDay = isTodayUtil(date)
+                        const isRangeStart =
+                          isRangeMode.value && rangeStart ? isSameDay(date, rangeStart) : false
+                        const isRangeEnd =
+                          isRangeMode.value && rangeEnd ? isSameDay(date, rangeEnd) : false
+                        const isInRange =
+                          isRangeMode.value &&
+                          normStart &&
+                          normEnd &&
+                          normDate >= normStart &&
+                          normDate <= normEnd
 
-                      const isSelectingRangeEnd =
-                        isRangeMode.value && Boolean(rangeStart) && !rangeEnd
-                      const isBeforeRangeStart =
-                        isSelectingRangeEnd &&
-                        rangeStart &&
-                        normalizeDate(date) < normalizeDate(rangeStart)
+                        const isSelected = !isRangeMode.value
+                          ? selectedDate.value
+                            ? isSameDay(date, selectedDate.value)
+                            : false
+                          : isRangeStart || isRangeEnd
+                        const isCurrentMonthDay = isCurrentMonth(date)
+                        const isTodayDay = isTodayUtil(date)
 
-                      const isDisabled = isDateDisabled(date) || Boolean(isBeforeRangeStart)
+                        const isBeforeRangeStart =
+                          isSelectingEnd && normStart && normDate < normStart
 
-                      const iso = formatDate(date, 'yyyy-MM-dd')
+                        const isDisabled = isDateDisabled(date) || Boolean(isBeforeRangeStart)
 
-                      return h(
-                        'button',
-                        {
-                          key: index,
-                          type: 'button',
-                          class: getDatePickerDayCellClasses(
-                            isCurrentMonthDay,
-                            isSelected,
-                            isTodayDay,
-                            isDisabled,
-                            Boolean(isInRange),
-                            Boolean(isRangeStart),
-                            Boolean(isRangeEnd)
-                          ),
-                          disabled: isDisabled,
-                          onClick: () => selectDate(date),
-                          role: 'gridcell',
-                          'data-date': iso,
-                          onFocus: () => {
-                            activeDateIso.value = iso
+                        const iso = formatDate(date, 'yyyy-MM-dd')
+
+                        return h(
+                          'button',
+                          {
+                            key: index,
+                            type: 'button',
+                            class: getDatePickerDayCellClasses(
+                              isCurrentMonthDay,
+                              isSelected,
+                              isTodayDay,
+                              isDisabled,
+                              Boolean(isInRange),
+                              Boolean(isRangeStart),
+                              Boolean(isRangeEnd)
+                            ),
+                            disabled: isDisabled,
+                            onClick: () => selectDate(date),
+                            role: 'gridcell',
+                            'data-date': iso,
+                            onFocus: () => {
+                              activeDateIso.value = iso
+                            },
+                            tabindex: activeDateIso.value === iso && !isDisabled ? 0 : -1,
+                            'aria-label': iso,
+                            'aria-selected': isSelected,
+                            'aria-current': isTodayDay ? 'date' : undefined
                           },
-                          tabindex: activeDateIso.value === iso && !isDisabled ? 0 : -1,
-                          'aria-label': iso,
-                          'aria-selected': isSelected,
-                          'aria-current': isTodayDay ? 'date' : undefined
-                        },
-                        date.getDate()
-                      )
-                    })
-                  ]
-                ),
+                          date.getDate()
+                        )
+                      })
+                    ]
+                  )
+                })(),
 
                 // Footer (range mode only)
                 isRangeMode.value

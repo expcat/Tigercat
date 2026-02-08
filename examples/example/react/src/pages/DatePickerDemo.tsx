@@ -61,6 +61,14 @@ const formatSnippet = `<div>
 <div>
   <label className="block text-sm font-medium text-gray-700 mb-2">MM/dd/yyyy</label>
   <DatePicker className={PICKER_WIDTH} value={dateWithDefault} onChange={setDateWithDefault} format="MM/dd/yyyy" locale={locale} />
+</div>
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">dd/MM/yyyy</label>
+  <DatePicker className={PICKER_WIDTH} value={dateWithDefault} onChange={setDateWithDefault} format="dd/MM/yyyy" locale={locale} />
+</div>
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-2">yyyy/MM/dd</label>
+  <DatePicker className={PICKER_WIDTH} value={dateWithDefault} onChange={setDateWithDefault} format="yyyy/MM/dd" locale={locale} />
 </div>`
 
 const minMaxSnippet = `<DatePicker
@@ -203,7 +211,7 @@ const DatePickerDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 日期格式 */}
-      <DemoBlock title="日期格式" description="仅展示两种常用日期显示格式。" code={formatSnippet}>
+      <DemoBlock title="日期格式" description="支持四种日期显示格式。" code={formatSnippet}>
         <div className="max-w-md space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">yyyy-MM-dd</label>
@@ -222,6 +230,26 @@ const DatePickerDemo: React.FC = () => {
               value={dateWithDefault}
               onChange={setDateWithDefault}
               format="MM/dd/yyyy"
+              locale={locale}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">dd/MM/yyyy</label>
+            <DatePicker
+              className={PICKER_WIDTH}
+              value={dateWithDefault}
+              onChange={setDateWithDefault}
+              format="dd/MM/yyyy"
+              locale={locale}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">yyyy/MM/dd</label>
+            <DatePicker
+              className={PICKER_WIDTH}
+              value={dateWithDefault}
+              onChange={setDateWithDefault}
+              format="yyyy/MM/dd"
               locale={locale}
             />
           </div>

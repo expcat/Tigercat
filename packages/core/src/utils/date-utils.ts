@@ -5,17 +5,6 @@
 import type { DateFormat } from '../types/datepicker'
 
 /**
- * Validate if a value is a valid date
- * @param value - Value to validate
- * @returns True if value is a valid date
- */
-function isValidDate(value: Date | string | null | undefined): boolean {
-  if (!value) return false
-  const date = value instanceof Date ? value : new Date(value)
-  return !isNaN(date.getTime())
-}
-
-/**
  * Parse a date string or Date object to a Date instance
  * @param value - Date string, Date object, or null/undefined
  * @returns Date instance or null if invalid
@@ -36,7 +25,7 @@ export function parseDate(value: Date | string | null | undefined): Date | null 
  * @returns Formatted date string, empty string if date is null
  */
 export function formatDate(date: Date | null, format: DateFormat = 'yyyy-MM-dd'): string {
-  if (!date || !isValidDate(date)) return ''
+  if (!date || isNaN(date.getTime())) return ''
 
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
@@ -92,19 +81,16 @@ export function isDateInRange(
   minDate: Date | null | undefined,
   maxDate: Date | null | undefined
 ): boolean {
-  if (!isValidDate(date)) return false
+  if (isNaN(date.getTime())) return false
 
-  // Normalize dates to midnight for accurate comparison
   const normalizedDate = normalizeDate(date)
 
-  if (minDate && isValidDate(minDate)) {
-    const normalizedMin = normalizeDate(minDate)
-    if (normalizedDate < normalizedMin) return false
+  if (minDate && !isNaN(minDate.getTime())) {
+    if (normalizedDate < normalizeDate(minDate)) return false
   }
 
-  if (maxDate && isValidDate(maxDate)) {
-    const normalizedMax = normalizeDate(maxDate)
-    if (normalizedDate > normalizedMax) return false
+  if (maxDate && !isNaN(maxDate.getTime())) {
+    if (normalizedDate > normalizeDate(maxDate)) return false
   }
 
   return true
