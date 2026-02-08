@@ -278,8 +278,29 @@ const collapsed = ref(false)
 
 ```vue
 <template>
-  <Steps v-model:current="step" :items="[{ title: 'Step 1' }, { title: 'Step 2' }, { title: 'Step 3' }]" />
-  <Steps direction="vertical" :items="items" />
+  <!-- 基本用法 -->
+  <Steps v-model:current="step">
+    <StepsItem title="Step 1" description="Description" />
+    <StepsItem title="Step 2" description="Description" />
+    <StepsItem title="Step 3" description="Description" />
+  </Steps>
+
+  <!-- 纵向 / 简洁 / 小尺寸 / 可点击 -->
+  <Steps :current="0" direction="vertical">...</Steps>
+  <Steps :current="0" simple>...</Steps>
+  <Steps :current="0" size="small">...</Steps>
+  <Steps v-model:current="step" clickable>...</Steps>
+
+  <!-- 自定义图标 -->
+  <StepsItem title="Login">
+    <template #icon><MyIcon /></template>
+  </StepsItem>
+
+  <!-- 禁用步骤 -->
+  <StepsItem title="Disabled" disabled />
+
+  <!-- 覆盖步骤状态 -->
+  <StepsItem title="Error" status="error" />
 </template>
 ```
 

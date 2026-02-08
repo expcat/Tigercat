@@ -9,8 +9,9 @@ const current3 = ref(0)
 const current4 = ref(1)
 const current5 = ref(0)
 const current6 = ref(1)
+const current7 = ref(0)
 
-const currents = [current1, current2, current3, current4, current5, current6] as const
+const currents = [current1, current2, current3, current4, current5, current6, current7] as const
 
 const next = (index: number) => {
   const currentRef = currents[index]
@@ -115,6 +116,19 @@ const iconSnippet = `<Steps :current="1">
       </svg>
     </template>
   </StepsItem>
+</Steps>`
+
+const disabledSnippet = `<Steps v-model:current="current7" clickable>
+  <StepsItem title="步骤 1" description="可点击的步骤" />
+  <StepsItem title="步骤 2" description="该步骤已禁用" disabled />
+  <StepsItem title="步骤 3" description="可点击的步骤" />
+</Steps>
+<div class="mt-4 text-gray-600">当前步骤: {{ current7 + 1 }}</div>`
+
+const customStatusSnippet = `<Steps :current="2">
+  <StepsItem title="已完成" description="自动推导为 finish" />
+  <StepsItem title="自定义错误" description="status 覆盖自动状态" status="error" />
+  <StepsItem title="处理中" description="当前步骤" />
 </Steps>`
 </script>
 
@@ -288,6 +302,38 @@ const iconSnippet = `<Steps :current="1">
             </svg>
           </template>
         </StepsItem>
+      </Steps>
+    </DemoBlock>
+
+    <!-- 禁用步骤 -->
+    <DemoBlock title="禁用步骤"
+               description="可点击模式下，可禁用某个步骤使其无法点击切换。"
+               :code="disabledSnippet">
+      <Steps v-model:current="current7"
+             clickable>
+        <StepsItem title="步骤 1"
+                   description="可点击的步骤" />
+        <StepsItem title="步骤 2"
+                   description="该步骤已禁用"
+                   disabled />
+        <StepsItem title="步骤 3"
+                   description="可点击的步骤" />
+      </Steps>
+      <div class="mt-4 text-gray-600">当前步骤: {{ current7 + 1 }}</div>
+    </DemoBlock>
+
+    <!-- 自定义步骤状态 -->
+    <DemoBlock title="自定义步骤状态"
+               description="通过 StepsItem 的 status 属性覆盖自动推导的步骤状态。"
+               :code="customStatusSnippet">
+      <Steps :current="2">
+        <StepsItem title="已完成"
+                   description="自动推导为 finish" />
+        <StepsItem title="自定义错误"
+                   description="status 覆盖自动状态"
+                   status="error" />
+        <StepsItem title="处理中"
+                   description="当前步骤" />
       </Steps>
     </DemoBlock>
   </div>

@@ -117,7 +117,7 @@ describe('Steps', () => {
 
   describe('Step Status', () => {
     it('should show step numbers for wait and process status', () => {
-      const { container } = render(
+      render(
         <Steps current={0}>
           <StepsItem title="Step 1" />
           <StepsItem title="Step 2" />
@@ -133,7 +133,7 @@ describe('Steps', () => {
     })
 
     it('should show checkmark for finished steps', () => {
-      const { container } = render(
+      render(
         <Steps current={2}>
           <StepsItem title="Step 1" />
           <StepsItem title="Step 2" />

@@ -27,8 +27,7 @@ export function getStepsContainerClasses(direction: StepsDirection): string {
  */
 export function getStepItemClasses(
   direction: StepsDirection,
-  isLast: boolean,
-  simple: boolean
+  isLast: boolean
 ): string {
   const baseClasses = 'tiger-step-item relative'
 
@@ -62,10 +61,11 @@ export function getStepIconClasses(
   const iconClasses = isCustomIcon ? '' : 'font-medium'
 
   // Status-based colors using CSS variables with fallbacks
+  const activeClasses = 'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white'
   const statusClasses = {
     wait: 'bg-[var(--tiger-surface-muted,#f3f4f6)] border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text-muted,#6b7280)]',
-    process: 'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white',
-    finish: 'bg-[var(--tiger-primary,#2563eb)] border-[var(--tiger-primary,#2563eb)] text-white',
+    process: activeClasses,
+    finish: activeClasses,
     error:
       'bg-[var(--tiger-error-bg,#fef2f2)] border-[var(--tiger-error,#ef4444)] text-[var(--tiger-error,#ef4444)]'
   }
@@ -79,34 +79,41 @@ export function getStepIconClasses(
 export function getStepTailClasses(
   direction: StepsDirection,
   status: StepStatus,
-  isLast: boolean
+  isLast: boolean,
+  size: StepSize,
+  simple: boolean
 ): string {
-  if (isLast) {
-    return 'hidden'
-  }
+  if (isLast) return 'hidden'
 
-  const baseClasses = 'tiger-step-tail'
-
-  // Position and size based on direction
-  if (direction === 'vertical') {
-    const positionClasses = 'absolute left-4 top-10 w-0.5 h-full'
-    const colorClasses =
-      status === 'finish' ? 'bg-[var(--tiger-primary,#2563eb)]' : 'bg-[var(--tiger-border,#e5e7eb)]'
-    return `${baseClasses} ${positionClasses} ${colorClasses}`
-  }
-
-  // Horizontal — absolute from icon center to next icon center
-  const positionClasses = 'absolute top-5 left-1/2 w-full h-0.5'
   const colorClasses =
     status === 'finish' ? 'bg-[var(--tiger-primary,#2563eb)]' : 'bg-[var(--tiger-border,#e5e7eb)]'
 
-  return `${baseClasses} ${positionClasses} ${colorClasses}`
+  // Icon sizes: simple → w-6(24px), small → w-8(32px), default → w-10(40px)
+  // Center offset: simple → 12px(top-3/left-3), small → 16px(top-4/left-4), default → 20px(top-5/left-5)
+  // Below-icon offset: simple → 24px(top-6), small → 32px(top-8), default → 40px(top-10)
+  // Use full class strings so Tailwind JIT can detect them
+  if (direction === 'vertical') {
+    const verticalClasses = simple
+      ? 'absolute left-3 top-6 w-0.5 h-full'
+      : size === 'small'
+        ? 'absolute left-4 top-8 w-0.5 h-full'
+        : 'absolute left-5 top-10 w-0.5 h-full'
+    return `tiger-step-tail ${verticalClasses} ${colorClasses}`
+  }
+
+  const horizontalClasses = simple
+    ? 'absolute top-3 left-1/2 w-full h-0.5'
+    : size === 'small'
+      ? 'absolute top-4 left-1/2 w-full h-0.5'
+      : 'absolute top-5 left-1/2 w-full h-0.5'
+
+  return `tiger-step-tail ${horizontalClasses} ${colorClasses}`
 }
 
 /**
  * Get Step content container classes
  */
-export function getStepContentClasses(direction: StepsDirection, simple: boolean): string {
+export function getStepContentClasses(direction: StepsDirection): string {
   const baseClasses = 'tiger-step-content'
 
   if (direction === 'vertical') {
@@ -150,14 +157,11 @@ export function getStepDescriptionClasses(status: StepStatus, size: StepSize): s
 
   const sizeClasses = size === 'small' ? 'text-xs' : 'text-sm'
 
-  const statusClasses = {
-    wait: 'text-[var(--tiger-text-muted,#6b7280)]',
-    process: 'text-[var(--tiger-text-muted,#6b7280)]',
-    finish: 'text-[var(--tiger-text-muted,#6b7280)]',
-    error: 'text-[var(--tiger-error,#ef4444)]'
-  }
+  const statusClass = status === 'error'
+    ? 'text-[var(--tiger-error,#ef4444)]'
+    : 'text-[var(--tiger-text-muted,#6b7280)]'
 
-  return `${baseClasses} ${sizeClasses} ${statusClasses[status]}`
+  return `${baseClasses} ${sizeClasses} ${statusClass}`
 }
 
 /**

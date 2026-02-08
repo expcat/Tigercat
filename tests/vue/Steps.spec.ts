@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
 import { h } from 'vue'
 import { Steps, StepsItem } from '@expcat/tigercat-vue'
 
@@ -129,7 +130,7 @@ describe('Steps', () => {
 
   describe('Step Status', () => {
     it('should show step numbers for wait and process status', () => {
-      const { container } = render(Steps, {
+      render(Steps, {
         props: { current: 0 },
         slots: {
           default: () => [
@@ -148,7 +149,7 @@ describe('Steps', () => {
     })
 
     it('should show checkmark for finished steps', () => {
-      const { container } = render(Steps, {
+      render(Steps, {
         props: { current: 2 },
         slots: {
           default: () => [
@@ -182,6 +183,7 @@ describe('Steps', () => {
 
   describe('Events', () => {
     it('should emit change event when clickable and step is clicked', async () => {
+      const user = userEvent.setup()
       const onChange = vi.fn()
 
       render(Steps, {
@@ -200,12 +202,38 @@ describe('Steps', () => {
       })
 
       const step2Button = screen.getByRole('button', { name: 'Step 2' })
-      await step2Button.click()
+      await user.click(step2Button)
+
+      expect(onChange).toHaveBeenCalledWith(1)
+    })
+
+    it('should support keyboard activation when clickable', async () => {
+      const user = userEvent.setup()
+      const onChange = vi.fn()
+
+      render(Steps, {
+        props: {
+          current: 0,
+          clickable: true,
+          'onUpdate:current': onChange
+        },
+        slots: {
+          default: () => [
+            h(StepsItem, { title: 'Step 1' }),
+            h(StepsItem, { title: 'Step 2' })
+          ]
+        }
+      })
+
+      const step2Button = screen.getByRole('button', { name: 'Step 2' })
+      step2Button.focus()
+      await user.keyboard('{Enter}')
 
       expect(onChange).toHaveBeenCalledWith(1)
     })
 
     it('should not emit change event when not clickable', async () => {
+      const user = userEvent.setup()
       const onChange = vi.fn()
 
       render(Steps, {
@@ -220,12 +248,13 @@ describe('Steps', () => {
       })
 
       const step2Title = screen.getByText('Step 2')
-      await step2Title.click()
+      await user.click(step2Title)
 
       expect(onChange).not.toHaveBeenCalled()
     })
 
     it('should not emit change event when step is disabled', async () => {
+      const user = userEvent.setup()
       const onChange = vi.fn()
 
       render(Steps, {
@@ -244,7 +273,7 @@ describe('Steps', () => {
 
       const step2Button = screen.getByRole('button', { name: 'Step 2' })
       expect(step2Button).toBeDisabled()
-      await step2Button.click()
+      await user.click(step2Button)
 
       expect(onChange).not.toHaveBeenCalled()
     })

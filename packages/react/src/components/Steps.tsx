@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactElement } from 'react'
+import React, { createContext, useContext, useMemo, useCallback, ReactElement } from 'react'
 import {
   classNames,
   getStepsContainerClasses,
@@ -62,17 +62,17 @@ export const Steps: React.FC<StepsProps> = ({
   children,
   ...props
 }) => {
-  const containerClasses = classNames(getStepsContainerClasses(direction), className)
+  const containerClasses = useMemo(
+    () => classNames(getStepsContainerClasses(direction), className),
+    [direction, className]
+  )
 
-  const handleStepClick = (index: number) => {
-    if (!clickable) {
-      return
-    }
-
+  const handleStepClick = useCallback((index: number) => {
+    if (!clickable) return
     onChange?.(index)
-  }
+  }, [clickable, onChange])
 
-  const contextValue: StepsContextValue = {
+  const contextValue = useMemo<StepsContextValue>(() => ({
     current,
     status,
     direction,
@@ -80,7 +80,7 @@ export const Steps: React.FC<StepsProps> = ({
     simple,
     clickable,
     handleStepClick: clickable ? handleStepClick : undefined
-  }
+  }), [current, status, direction, size, simple, clickable, handleStepClick])
 
   const totalCount = React.Children.count(children)
   const stepsWithProps = React.Children.map(children, (child, index) => {
@@ -93,13 +93,9 @@ export const Steps: React.FC<StepsProps> = ({
     return child as ReactElement
   })
 
-  const mergedStyle = {
-    ...(style ?? {})
-  }
-
   return (
     <StepsContext.Provider value={contextValue}>
-      <ol {...props} className={containerClasses} style={mergedStyle}>
+      <ol {...props} className={containerClasses} style={style}>
         {stepsWithProps}
       </ol>
     </StepsContext.Provider>

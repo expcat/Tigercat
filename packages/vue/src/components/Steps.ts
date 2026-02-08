@@ -5,7 +5,6 @@ import {
   PropType,
   h,
   reactive,
-  watch,
   type VNode,
   type VNodeArrayChildren,
   type Component
@@ -114,19 +113,15 @@ export const Steps = defineComponent({
   },
   emits: ['change', 'update:current'],
   setup(props, { slots, attrs, emit }) {
-    const attrsRecord = attrs as Record<string, unknown>
-    const attrsClass = (attrsRecord as { class?: unknown }).class
-    const attrsStyle = (attrsRecord as { style?: unknown }).style
-
     const containerClasses = computed(() =>
       classNames(
         getStepsContainerClasses(props.direction),
         props.className,
-        coerceClassValue(attrsClass)
+        coerceClassValue(attrs.class)
       )
     )
 
-    const mergedStyle = computed(() => mergeStyleValues(attrsStyle, props.style))
+    const mergedStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
     // Handle step click
     const handleStepClick = (index: number) => {
@@ -138,40 +133,19 @@ export const Steps = defineComponent({
       emit('change', index)
     }
 
-    // Provide steps context to child components (make it reactive)
-    const stepsContextValue = reactive<StepsContext>({
-      current: props.current,
-      status: props.status,
-      direction: props.direction,
-      size: props.size,
-      simple: props.simple,
-      clickable: props.clickable,
-      handleStepClick: props.clickable ? handleStepClick : undefined
-    })
-
-    // Batch watch all props that need to sync to context
-    watch(
-      () =>
-        [
-          props.current,
-          props.status,
-          props.direction,
-          props.size,
-          props.simple,
-          props.clickable
-        ] as const,
-      ([current, status, direction, size, simple, clickable]) => {
-        stepsContextValue.current = current
-        stepsContextValue.status = status
-        stepsContextValue.direction = direction
-        stepsContextValue.size = size
-        stepsContextValue.simple = simple
-        stepsContextValue.clickable = clickable
-        stepsContextValue.handleStepClick = clickable ? handleStepClick : undefined
-      }
+    // Provide steps context to child components via reactive computed refs
+    provide<StepsContext>(
+      StepsContextKey,
+      reactive({
+        current: computed(() => props.current),
+        status: computed(() => props.status),
+        direction: computed(() => props.direction),
+        size: computed(() => props.size),
+        simple: computed(() => props.simple),
+        clickable: computed(() => props.clickable),
+        handleStepClick: computed(() => props.clickable ? handleStepClick : undefined)
+      }) as StepsContext
     )
-
-    provide<StepsContext>(StepsContextKey, stepsContextValue)
 
     return () => {
       const children = (slots.default?.() || []) as VNode[]
@@ -180,7 +154,7 @@ export const Steps = defineComponent({
         class: _class,
         style: _style,
         ...restAttrs
-      } = attrsRecord as { class?: unknown; style?: unknown } & Record<string, unknown>
+      } = attrs as Record<string, unknown>
 
       // Add step index and isLast props to each step item
       const stepsWithProps = children.map((child, index: number) => {

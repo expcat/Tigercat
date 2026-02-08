@@ -212,14 +212,46 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ## Steps 步骤条
 
-### Props
+使用组合式 API：`<Steps>` + `<StepsItem>` 子组件。
+
+### Steps Props
 
 | Prop      | Type                                         | Default        | Vue | React | Description  |
 | --------- | -------------------------------------------- | -------------- | :-: | :---: | ------------ |
 | current   | `number`                                     | `0`            |  ✓  |   ✓   | 当前步骤     |
-| items     | `{ title: string, description?: string }[]`  | `[]`           |  ✓  |   ✓   | 步骤数据     |
+| status    | `'wait' \| 'process' \| 'finish' \| 'error'` | `'process'`    |  ✓  |   ✓   | 当前步骤状态 |
 | direction | `'horizontal' \| 'vertical'`                 | `'horizontal'` |  ✓  |   ✓   | 方向         |
-| status    | `'wait' \| 'process' \| 'finish' \| 'error'` | -              |  ✓  |   ✓   | 当前步骤状态 |
+| size      | `'small' \| 'default'`                       | `'default'`    |  ✓  |   ✓   | 尺寸         |
+| simple    | `boolean`                                    | `false`        |  ✓  |   ✓   | 简洁模式     |
+| clickable | `boolean`                                    | `false`        |  ✓  |   ✓   | 可点击       |
+
+> **Vue**: 使用 `v-model:current` 绑定，`@change` 事件
+> **React**: 使用 `current` + `onChange` 控制
+
+### StepsItem Props
+
+| Prop        | Type                                         | Default | Vue | React | Description      |
+| ----------- | -------------------------------------------- | ------- | :-: | :---: | ---------------- |
+| title       | `string`                                     | -       |  ✓  |   ✓   | 步骤标题（必填） |
+| description | `string`                                     | -       |  ✓  |   ✓   | 步骤描述         |
+| icon        | `slot` / `ReactNode`                         | -       |  ✓  |   ✓   | 自定义图标       |
+| status      | `'wait' \| 'process' \| 'finish' \| 'error'` | -       |  ✓  |   ✓   | 覆盖自动状态     |
+| disabled    | `boolean`                                    | `false` |  ✓  |   ✓   | 禁用             |
+
+### Events
+
+| Vue Event         | React Callback | Payload  | Description    |
+| ----------------- | -------------- | -------- | -------------- |
+| `@change`         | `onChange`     | `number` | 步骤变更时触发 |
+| `@update:current` | -              | `number` | v-model 绑定   |
+
+### Slots / Children
+
+| Vue Slot               | React Prop    | Description    |
+| ---------------------- | ------------- | -------------- |
+| `default`              | `children`    | StepsItem 子组件 |
+| StepsItem: `icon`      | `icon`        | 自定义图标     |
+| StepsItem: `description` | `description` | 步骤描述     |
 
 ---
 

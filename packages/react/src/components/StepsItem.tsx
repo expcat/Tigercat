@@ -85,21 +85,19 @@ export const StepsItem: React.FC<StepsItemProps> = ({
   const isClickable = !!stepsContext.handleStepClick && !disabled
 
   const itemClasses = classNames(
-    getStepItemClasses(stepsContext.direction, isLast, stepsContext.simple),
+    getStepItemClasses(stepsContext.direction, isLast),
     className
   )
 
   const iconClasses = getStepIconClasses(stepStatus, stepsContext.size, stepsContext.simple, !!icon)
 
-  const tailClasses = getStepTailClasses(stepsContext.direction, stepStatus, isLast)
-  const contentClasses = getStepContentClasses(stepsContext.direction, stepsContext.simple)
+  const tailClasses = getStepTailClasses(stepsContext.direction, stepStatus, isLast, stepsContext.size, stepsContext.simple)
+  const contentClasses = getStepContentClasses(stepsContext.direction)
   const titleClasses = getStepTitleClasses(stepStatus, stepsContext.size, isClickable)
   const descriptionClasses = getStepDescriptionClasses(stepStatus, stepsContext.size)
 
-  const handleClick = (_event: React.MouseEvent) => {
-    if (!isClickable) {
-      return
-    }
+  const handleClick = () => {
+    if (!isClickable) return
     stepsContext.handleStepClick?.(stepIndex)
   }
 

@@ -108,10 +108,6 @@ export const StepsItem = defineComponent({
       clickable: false
     })
 
-    const attrsRecord = attrs as Record<string, unknown>
-    const attrsClass = (attrsRecord as { class?: unknown }).class
-    const attrsStyle = (attrsRecord as { style?: unknown }).style
-
     // Calculate step status
     const stepStatus = computed(() => {
       return calculateStepStatus(
@@ -125,9 +121,9 @@ export const StepsItem = defineComponent({
     // Item classes
     const itemClasses = computed(() => {
       return classNames(
-        getStepItemClasses(stepsContext.direction, props.isLast, stepsContext.simple),
+        getStepItemClasses(stepsContext.direction, props.isLast),
         props.className,
-        coerceClassValue(attrsClass)
+        coerceClassValue(attrs.class)
       )
     })
 
@@ -144,12 +140,12 @@ export const StepsItem = defineComponent({
 
     // Tail classes
     const tailClasses = computed(() => {
-      return getStepTailClasses(stepsContext.direction, stepStatus.value, props.isLast)
+      return getStepTailClasses(stepsContext.direction, stepStatus.value, props.isLast, stepsContext.size, stepsContext.simple)
     })
 
     // Content classes
     const contentClasses = computed(() => {
-      return getStepContentClasses(stepsContext.direction, stepsContext.simple)
+      return getStepContentClasses(stepsContext.direction)
     })
 
     // Title classes
@@ -228,14 +224,14 @@ export const StepsItem = defineComponent({
       return h('div', { class: contentClasses.value }, children)
     }
 
-    const mergedStyle = computed(() => mergeStyleValues(attrsStyle, props.style))
+    const mergedStyle = computed(() => mergeStyleValues(attrs.style, props.style))
 
     return () => {
       const {
         class: _class,
         style: _style,
         ...restAttrs
-      } = attrsRecord as { class?: unknown; style?: unknown } & Record<string, unknown>
+      } = attrs as Record<string, unknown>
 
       // For vertical layout
       if (stepsContext.direction === 'vertical') {
