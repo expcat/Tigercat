@@ -3,34 +3,22 @@
  */
 import { classNames } from './class-names'
 
-/**
- * Get base popover container classes
- */
+/** Base popover container classes */
 export function getPopoverContainerClasses(): string {
   return classNames('tiger-popover', 'relative', 'inline-block')
 }
 
-/**
- * Get popover trigger classes
- */
+/** Popover trigger classes */
 export function getPopoverTriggerClasses(disabled: boolean): string {
   return classNames('tiger-popover-trigger', disabled && 'cursor-not-allowed opacity-50')
 }
 
-/**
- * Get popover content wrapper classes
- */
+/** Popover content wrapper classes */
 export function getPopoverContentClasses(width?: string | number): string {
   let widthClass = 'min-w-[200px]'
-
-  if (width) {
-    if (typeof width === 'number') {
-      widthClass = `w-[${width}px]`
-    } else if (width.match(/^\d+$/)) {
-      widthClass = `w-[${width}px]`
-    } else {
-      widthClass = width
-    }
+  if (width != null && width !== '') {
+    const w = String(width)
+    widthClass = /^\d+$/.test(w) ? `w-[${w}px]` : w
   }
 
   return classNames(
@@ -46,25 +34,35 @@ export function getPopoverContentClasses(width?: string | number): string {
   )
 }
 
+/** Popover title classes (static) */
+export const POPOVER_TITLE_CLASSES = classNames(
+  'tiger-popover-title',
+  'text-sm',
+  'font-semibold',
+  'text-[var(--tiger-text,#111827)]',
+  'mb-2',
+  'border-b',
+  'border-[var(--tiger-border,#e5e7eb)]',
+  'pb-2'
+)
+
+/** Popover content text classes (static) */
+export const POPOVER_TEXT_CLASSES = classNames(
+  'tiger-popover-text',
+  'text-sm',
+  'text-[var(--tiger-text-muted,#374151)]'
+)
+
 /**
- * Get popover title classes
+ * @deprecated Use POPOVER_TITLE_CLASSES instead
  */
 export function getPopoverTitleClasses(): string {
-  return classNames(
-    'tiger-popover-title',
-    'text-sm',
-    'font-semibold',
-    'text-[var(--tiger-text,#111827)]',
-    'mb-2',
-    'border-b',
-    'border-[var(--tiger-border,#e5e7eb)]',
-    'pb-2'
-  )
+  return POPOVER_TITLE_CLASSES
 }
 
 /**
- * Get popover content text classes
+ * @deprecated Use POPOVER_TEXT_CLASSES instead
  */
 export function getPopoverContentTextClasses(): string {
-  return classNames('tiger-popover-text', 'text-sm', 'text-[var(--tiger-text-muted,#374151)]')
+  return POPOVER_TEXT_CLASSES
 }

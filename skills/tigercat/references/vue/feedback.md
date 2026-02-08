@@ -141,12 +141,21 @@ Notification.open({
 
 ```vue
 <template>
-  <Popover content="Simple content">
-    <Button>Hover me</Button>
+  <!-- 基本用法（默认 click 触发） -->
+  <Popover title="标题" content="气泡卡片内容">
+    <Button>点击触发</Button>
   </Popover>
-  <Popover trigger="click" placement="bottom">
-    <template #content><div>Custom content</div></template>
-    <Button>Click me</Button>
+
+  <!-- 自定义内容 + hover 触发 -->
+  <Popover trigger="hover" placement="bottom">
+    <template #title><span style="color: #2563eb">自定义标题</span></template>
+    <template #content><div>自定义内容</div></template>
+    <Button>悬停触发</Button>
+  </Popover>
+
+  <!-- 受控模式 -->
+  <Popover v-model:visible="visible" trigger="manual" content="手动控制">
+    <Button @click="visible = !visible">手动触发</Button>
   </Popover>
 </template>
 ```

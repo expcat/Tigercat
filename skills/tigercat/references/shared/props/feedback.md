@@ -169,19 +169,34 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Props
 
-| Prop      | Type                                     | Default   | Vue | React | Description |
-| --------- | ---------------------------------------- | --------- | :-: | :---: | ----------- |
-| content   | `string`                                 | -         |  ✓  |   -   | 内容文本    |
-| content   | `ReactNode`                              | -         |  -  |   ✓   | 内容节点    |
-| trigger   | `'hover' \| 'click' \| 'focus'`          | `'hover'` |  ✓  |   ✓   | 触发方式    |
-| placement | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'`   |  ✓  |   ✓   | 位置        |
+| Prop           | Type                                                         | Default   | Vue | React | Description            |
+| -------------- | ------------------------------------------------------------ | --------- | :-: | :---: | ---------------------- |
+| visible        | `boolean`                                                    | -         |  ✓  |   ✓   | 受控显示状态           |
+| defaultVisible | `boolean`                                                    | `false`   |  ✓  |   ✓   | 默认显示状态           |
+| title          | `string`                                                     | -         |  ✓  |   ✓   | 标题文本               |
+| content        | `string`                                                     | -         |  ✓  |   ✓   | 内容文本               |
+| trigger        | `'click' \| 'hover' \| 'focus' \| 'manual'`                  | `'click'` |  ✓  |   ✓   | 触发方式               |
+| placement      | `FloatingPlacement`                                          | `'top'`   |  ✓  |   ✓   | 弹出位置               |
+| disabled       | `boolean`                                                    | `false`   |  ✓  |   ✓   | 禁用状态               |
+| width          | `string \| number`                                           | -         |  ✓  |   ✓   | 宽度（像素数或类名）   |
+| offset         | `number`                                                     | `8`       |  ✓  |   ✓   | 偏移距离 (px)          |
+| className      | `string`                                                     | -         |  ✓  |   ✓   | 自定义 CSS 类          |
+| style          | `StyleValue` / `CSSProperties`                               | -         |  ✓  |   ✓   | 自定义样式             |
 
 ### Slots / Children
 
-| Vue Slot  | React Prop | Description |
-| --------- | ---------- | ----------- |
-| `default` | `children` | 触发元素    |
-| `content` | `content`  | 弹出内容    |
+| Vue Slot  | React Prop       | Description  |
+| --------- | ---------------- | ------------ |
+| `default` | `children`       | 触发元素     |
+| `title`   | `titleContent`   | 自定义标题   |
+| `content` | `contentContent` | 自定义内容   |
+
+### Events
+
+| Vue Event        | React Prop       | Description  |
+| ---------------- | ---------------- | ------------ |
+| `update:visible` | `onVisibleChange` | 显示状态变化 |
+| `visible-change` | `onVisibleChange` | 显示状态变化 |
 
 ---
 

@@ -7,7 +7,6 @@ import { waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Popover } from '@expcat/tigercat-vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolations } from '../utils'
-import { h } from 'vue'
 
 describe('Popover', () => {
   describe('Rendering', () => {
@@ -301,6 +300,34 @@ describe('Popover', () => {
         },
         { timeout: 2000 }
       )
+    })
+
+    it('should only respond to controlled visible when trigger is "manual"', async () => {
+      const user = userEvent.setup()
+      const { getByText, queryByText, rerender } = renderWithProps(
+        Popover,
+        {
+          trigger: 'manual',
+          visible: false,
+          content: 'Manual content'
+        },
+        {
+          slots: {
+            default: '<button>Manual trigger</button>'
+          }
+        }
+      )
+
+      // Click should NOT open
+      await user.click(getByText('Manual trigger'))
+      await new Promise((r) => setTimeout(r, 100))
+      expect(queryByText('Manual content')).toBeNull()
+
+      // Controlled visible=true should open
+      await rerender({ visible: true })
+      await waitFor(() => {
+        expect(getByText('Manual content')).toBeVisible()
+      })
     })
   })
 

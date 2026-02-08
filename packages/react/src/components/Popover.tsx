@@ -1,12 +1,12 @@
-import React, { useCallback, useState, useRef } from 'react'
+import React, { useCallback, useMemo, useState, useRef } from 'react'
 import { useFloating, useClickOutside, useEscapeKey } from '../utils/overlay'
 import {
   classNames,
   getPopoverContainerClasses,
   getPopoverTriggerClasses,
   getPopoverContentClasses,
-  getPopoverTitleClasses,
-  getPopoverContentTextClasses,
+  POPOVER_TITLE_CLASSES,
+  POPOVER_TEXT_CLASSES,
   getTransformOrigin,
   type PopoverProps as CorePopoverProps,
   type FloatingPlacement
@@ -22,15 +22,9 @@ export type PopoverProps = Omit<CorePopoverProps, 'style' | 'placement'> &
     contentContent?: React.ReactNode
     className?: string
     style?: React.CSSProperties
-    /**
-     * Popover placement relative to trigger
-     * @default 'top'
-     */
+    /** Popover placement @default 'top' */
     placement?: FloatingPlacement
-    /**
-     * Offset distance from trigger (in pixels)
-     * @default 8
-     */
+    /** Offset distance in pixels @default 8 */
     offset?: number
     onVisibleChange?: (visible: boolean) => void
   }
@@ -55,7 +49,6 @@ export const Popover: React.FC<PopoverProps> = ({
 }) => {
   const isControlled = visible !== undefined
   const [internalVisible, setInternalVisible] = useState(defaultVisible)
-
   const currentVisible = isControlled ? visible : internalVisible
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -63,14 +56,11 @@ export const Popover: React.FC<PopoverProps> = ({
   const floatingRef = useRef<HTMLDivElement>(null)
 
   const popoverIdRef = useRef<string | null>(null)
-  if (!popoverIdRef.current) {
-    popoverIdRef.current = createPopoverId()
-  }
+  if (!popoverIdRef.current) popoverIdRef.current = createPopoverId()
   const popoverId = popoverIdRef.current
   const titleId = `${popoverId}-title`
   const contentId = `${popoverId}-content`
 
-  // Floating UI positioning
   const {
     x,
     y,
@@ -86,87 +76,75 @@ export const Popover: React.FC<PopoverProps> = ({
   const setVisible = useCallback(
     (nextVisible: boolean) => {
       if (disabled && nextVisible) return
-
-      if (!isControlled) {
-        setInternalVisible(nextVisible)
-      }
-
+      if (!isControlled) setInternalVisible(nextVisible)
       onVisibleChange?.(nextVisible)
     },
     [disabled, isControlled, onVisibleChange]
   )
 
-  const handleTriggerClick = () => {
-    if (disabled || trigger !== 'click') return
-    setVisible(!currentVisible)
-  }
+  // Trigger event handlers
+  const handleTriggerClick = useCallback(() => {
+    if (!disabled && trigger === 'click') setVisible(!currentVisible)
+  }, [disabled, trigger, currentVisible, setVisible])
 
-  const handleTriggerMouseEnter = () => {
-    if (disabled || trigger !== 'hover') return
-    setVisible(true)
-  }
+  const handleMouseEnter = useCallback(() => {
+    if (!disabled && trigger === 'hover') setVisible(true)
+  }, [disabled, trigger, setVisible])
 
-  const handleTriggerMouseLeave = () => {
-    if (disabled || trigger !== 'hover') return
-    setVisible(false)
-  }
+  const handleMouseLeave = useCallback(() => {
+    if (!disabled && trigger === 'hover') setVisible(false)
+  }, [disabled, trigger, setVisible])
 
-  const handleTriggerFocus = () => {
-    if (disabled || trigger !== 'focus') return
-    setVisible(true)
-  }
+  const handleFocus = useCallback(() => {
+    if (!disabled && trigger === 'focus') setVisible(true)
+  }, [disabled, trigger, setVisible])
 
-  const handleTriggerBlur = () => {
-    if (disabled || trigger !== 'focus') return
-    setVisible(false)
-  }
+  const handleBlur = useCallback(() => {
+    if (!disabled && trigger === 'focus') setVisible(false)
+  }, [disabled, trigger, setVisible])
 
-  // Click outside handler (only for click trigger)
+  // Overlay dismiss
   useClickOutside({
     enabled: currentVisible && trigger === 'click',
     refs: [containerRef],
     onOutsideClick: () => setVisible(false),
     defer: true
   })
-
-  // Escape key handler
   useEscapeKey({
     enabled: currentVisible && trigger !== 'manual',
     onEscape: () => setVisible(false)
   })
 
-  const containerClasses = classNames(getPopoverContainerClasses(), className)
-  const triggerClasses = getPopoverTriggerClasses(disabled)
-  const contentClasses = getPopoverContentClasses(width)
-  const titleClasses = getPopoverTitleClasses()
-  const contentTextClasses = getPopoverContentTextClasses()
+  // Memoized classes
+  const containerClasses = useMemo(
+    () => classNames(getPopoverContainerClasses(), className),
+    [className]
+  )
+  const triggerClasses = useMemo(() => getPopoverTriggerClasses(disabled), [disabled])
+  const contentClasses = useMemo(() => getPopoverContentClasses(width), [width])
 
-  const floatingStyles: React.CSSProperties = {
-    position: 'absolute',
-    left: x,
-    top: y,
-    transformOrigin: getTransformOrigin(actualPlacement),
-    zIndex: 1000
-  }
+  const floatingStyles = useMemo<React.CSSProperties>(
+    () => ({
+      position: 'absolute',
+      left: x,
+      top: y,
+      transformOrigin: getTransformOrigin(actualPlacement),
+      zIndex: 1000
+    }),
+    [x, y, actualPlacement]
+  )
 
-  const triggerHandlers: React.DOMAttributes<HTMLDivElement> = {}
-  if (trigger === 'click') {
-    triggerHandlers.onClick = handleTriggerClick
-  } else if (trigger === 'hover') {
-    triggerHandlers.onMouseEnter = handleTriggerMouseEnter
-    triggerHandlers.onMouseLeave = handleTriggerMouseLeave
-  } else if (trigger === 'focus') {
-    triggerHandlers.onFocus = handleTriggerFocus
-    triggerHandlers.onBlur = handleTriggerBlur
-  }
+  const triggerHandlers = useMemo<React.DOMAttributes<HTMLDivElement>>(() => {
+    if (trigger === 'click') return { onClick: handleTriggerClick }
+    if (trigger === 'hover') return { onMouseEnter: handleMouseEnter, onMouseLeave: handleMouseLeave }
+    if (trigger === 'focus') return { onFocus: handleFocus, onBlur: handleBlur }
+    return {}
+  }, [trigger, handleTriggerClick, handleMouseEnter, handleMouseLeave, handleFocus, handleBlur])
 
-  if (!children) {
-    return null
-  }
+  if (!children) return null
 
   const hasTitle = Boolean(title || titleContent)
   const hasContent = Boolean(content || contentContent)
-  const describedBy = hasContent ? contentId : undefined
 
   return (
     <div ref={containerRef} className={containerClasses} style={style} {...divProps}>
@@ -186,16 +164,15 @@ export const Popover: React.FC<PopoverProps> = ({
             role="dialog"
             aria-modal="false"
             aria-labelledby={hasTitle ? titleId : undefined}
-            aria-describedby={describedBy}
+            aria-describedby={hasContent ? contentId : undefined}
             className={contentClasses}>
             {hasTitle && (
-              <div id={titleId} className={titleClasses}>
+              <div id={titleId} className={POPOVER_TITLE_CLASSES}>
                 {titleContent || title}
               </div>
             )}
-
             {hasContent && (
-              <div id={contentId} className={contentTextClasses}>
+              <div id={contentId} className={POPOVER_TEXT_CLASSES}>
                 {contentContent || content}
               </div>
             )}

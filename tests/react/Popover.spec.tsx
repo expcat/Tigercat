@@ -230,6 +230,31 @@ describe('Popover', () => {
         { timeout: 2000 }
       )
     })
+
+    it('should only respond to controlled visible when trigger is "manual"', async () => {
+      const user = userEvent.setup()
+      const { getByText, queryByText, rerender } = renderWithProps(Popover, {
+        trigger: 'manual',
+        visible: false,
+        content: 'Manual content',
+        children: <button>Manual trigger</button>
+      })
+
+      // Click should NOT open
+      await user.click(getByText('Manual trigger'))
+      await new Promise((r) => setTimeout(r, 100))
+      expect(queryByText('Manual content')).toBeNull()
+
+      // Controlled visible=true should open
+      rerender(
+        <Popover trigger="manual" visible={true} content="Manual content">
+          <button>Manual trigger</button>
+        </Popover>
+      )
+      await waitFor(() => {
+        expect(getByText('Manual content')).toBeVisible()
+      })
+    })
   })
 
   describe('States', () => {

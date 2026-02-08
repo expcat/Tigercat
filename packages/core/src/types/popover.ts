@@ -2,7 +2,7 @@
  * Popover component types and interfaces
  */
 
-import type { DropdownPlacement } from './dropdown'
+import type { FloatingPlacement } from '../utils/floating'
 
 /**
  * Popover trigger type
@@ -13,9 +13,7 @@ export type PopoverTrigger = 'click' | 'hover' | 'focus' | 'manual'
  * Base popover props interface
  */
 export interface PopoverProps {
-  /**
-   * Whether the popover is visible (controlled mode)
-   */
+  /** Whether the popover is visible (controlled mode) */
   visible?: boolean
 
   /**
@@ -24,14 +22,10 @@ export interface PopoverProps {
    */
   defaultVisible?: boolean
 
-  /**
-   * Popover title text
-   */
+  /** Popover title text */
   title?: string
 
-  /**
-   * Popover content text (can be overridden by content slot/prop)
-   */
+  /** Popover content text (can be overridden by content slot/prop) */
   content?: string
 
   /**
@@ -44,7 +38,7 @@ export interface PopoverProps {
    * Popover placement relative to trigger
    * @default 'top'
    */
-  placement?: DropdownPlacement
+  placement?: FloatingPlacement
 
   /**
    * Whether the popover is disabled
@@ -53,18 +47,19 @@ export interface PopoverProps {
   disabled?: boolean
 
   /**
-   * Popover width (CSS value)
-   * @default 'auto'
+   * Popover width (pixel number or Tailwind class)
    */
   width?: string | number
 
   /**
-   * Additional CSS classes
+   * Offset distance from trigger (in pixels)
+   * @default 8
    */
+  offset?: number
+
+  /** Additional CSS classes */
   className?: string
 
-  /**
-   * Custom styles
-   */
+  /** Custom styles */
   style?: Record<string, string | number>
 }
