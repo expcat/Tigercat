@@ -12,10 +12,6 @@ import {
 import {
   classNames,
   coerceClassValue,
-  icon24PathStrokeLinecap,
-  icon24PathStrokeLinejoin,
-  icon24StrokeWidth,
-  icon24ViewBox,
   getNotificationIconPath,
   getNotificationTypeClasses,
   notificationBaseClasses,
@@ -28,12 +24,14 @@ import {
   notificationIconClasses,
   notificationPositionClasses,
   notificationTitleClasses,
+  normalizeStringOption,
   type NotificationConfig,
   type NotificationInstance,
   type NotificationOptions,
   type NotificationPosition,
   isBrowser
 } from '@expcat/tigercat-core'
+import { createStatusIcon } from '../utils/icon-helpers'
 
 type HArrayChildren = Extract<NonNullable<Parameters<typeof h>[2]>, unknown[]>
 
@@ -76,32 +74,6 @@ const updateCallbacks: Record<NotificationPosition, (() => void) | null> = {
  */
 function getNextInstanceId(): number {
   return ++instanceIdCounter
-}
-
-/**
- * Create icon element
- */
-function createIcon(path: string, className: string) {
-  return h(
-    'svg',
-    {
-      class: className,
-      xmlns: 'http://www.w3.org/2000/svg',
-      fill: 'none',
-      viewBox: icon24ViewBox,
-      stroke: 'currentColor',
-      'stroke-width': String(icon24StrokeWidth),
-      'aria-hidden': 'true',
-      focusable: 'false'
-    },
-    [
-      h('path', {
-        'stroke-linecap': icon24PathStrokeLinecap,
-        'stroke-linejoin': icon24PathStrokeLinejoin,
-        d: path
-      })
-    ]
-  )
 }
 
 function getContainerRootId(position: NotificationPosition) {
@@ -177,7 +149,7 @@ export const NotificationContainer = defineComponent({
       }
 
       const children: HArrayChildren = [
-        createIcon(iconPath, iconClass),
+        createStatusIcon(iconPath, iconClass, { 'aria-hidden': 'true', focusable: 'false' }),
         h('div', { class: notificationContentClasses }, contentChildren)
       ]
 
@@ -194,7 +166,7 @@ export const NotificationContainer = defineComponent({
               'aria-label': NOTIFICATION_CLOSE_ARIA_LABEL,
               type: 'button'
             },
-            createIcon(notificationCloseIconPath, notificationCloseIconClasses)
+            createStatusIcon(notificationCloseIconPath, notificationCloseIconClasses, { 'aria-hidden': 'true', focusable: 'false' })
           )
         )
       }
@@ -385,51 +357,29 @@ function clearAll(position?: NotificationPosition) {
  * Normalize notification options
  */
 function normalizeOptions(options: NotificationOptions): NotificationConfig {
-  if (typeof options === 'string') {
-    return { title: options }
-  }
-  return options
+  return normalizeStringOption<NotificationConfig>(options, 'title')
 }
 
 /**
  * Notification API
  */
 export const notification = {
-  /**
-   * Show an info notification
-   */
   info(options: NotificationOptions): () => void {
     const config = normalizeOptions(options)
     return addNotification({ ...config, type: 'info' })
   },
-
-  /**
-   * Show a success notification
-   */
   success(options: NotificationOptions): () => void {
     const config = normalizeOptions(options)
     return addNotification({ ...config, type: 'success' })
   },
-
-  /**
-   * Show a warning notification
-   */
   warning(options: NotificationOptions): () => void {
     const config = normalizeOptions(options)
     return addNotification({ ...config, type: 'warning' })
   },
-
-  /**
-   * Show an error notification
-   */
   error(options: NotificationOptions): () => void {
     const config = normalizeOptions(options)
     return addNotification({ ...config, type: 'error' })
   },
-
-  /**
-   * Clear all notifications
-   */
   clear(position?: NotificationPosition) {
     clearAll(position)
   }

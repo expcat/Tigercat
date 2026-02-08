@@ -2,10 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { createRoot, Root } from 'react-dom/client'
 import {
   classNames,
-  icon24PathStrokeLinecap,
-  icon24PathStrokeLinejoin,
-  icon24StrokeWidth,
-  icon24ViewBox,
   getNotificationTypeClasses,
   notificationContainerBaseClasses,
   notificationPositionClasses,
@@ -20,11 +16,13 @@ import {
   notificationCloseIconPath,
   isBrowser,
   ANIMATION_DURATION_MS,
+  normalizeStringOption,
   type NotificationPosition,
   type NotificationInstance,
   type NotificationOptions,
   type NotificationConfig
 } from '@expcat/tigercat-core'
+import { StatusIcon } from './shared/icons'
 
 /**
  * Global notification container id prefix
@@ -60,29 +58,6 @@ const updateCallbacks: Record<NotificationPosition, (() => void) | null> = {
  */
 function getNextInstanceId(): number {
   return ++instanceIdCounter
-}
-
-/**
- * Icon component
- */
-const Icon: React.FC<{ path: string; className: string }> = ({ path, className }) => {
-  return (
-    <svg
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox={icon24ViewBox}
-      stroke="currentColor"
-      strokeWidth={icon24StrokeWidth}
-      aria-hidden="true"
-      focusable="false">
-      <path
-        strokeLinecap={icon24PathStrokeLinecap}
-        strokeLinejoin={icon24PathStrokeLinejoin}
-        d={path}
-      />
-    </svg>
-  )
 }
 
 /**
@@ -141,7 +116,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClo
       data-tiger-notification=""
       data-tiger-notification-type={notification.type}
       data-tiger-notification-id={String(notification.id)}>
-      <Icon path={iconPath} className={iconClass} />
+      <StatusIcon path={iconPath} className={iconClass} aria-hidden="true" focusable="false" />
       <div className={notificationContentClasses}>
         <div className={classNames(notificationTitleClasses, colorScheme.titleText)}>
           {notification.title}
@@ -161,7 +136,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClo
           }}
           aria-label="Close notification"
           type="button">
-          <Icon path={notificationCloseIconPath} className={notificationCloseIconClasses} />
+          <StatusIcon path={notificationCloseIconPath} className={notificationCloseIconClasses} />
         </button>
       )}
     </div>
@@ -357,51 +332,29 @@ function clearAll(position?: NotificationPosition) {
  * Normalize notification options
  */
 function normalizeOptions(options: NotificationOptions): NotificationConfig {
-  if (typeof options === 'string') {
-    return { title: options }
-  }
-  return options
+  return normalizeStringOption<NotificationConfig>(options, 'title')
 }
 
 /**
  * Notification API
  */
 export const notification = {
-  /**
-   * Show an info notification
-   */
   info(options: NotificationOptions): () => void {
     const config = normalizeOptions(options)
     return addNotification({ ...config, type: 'info' })
   },
-
-  /**
-   * Show a success notification
-   */
   success(options: NotificationOptions): () => void {
     const config = normalizeOptions(options)
     return addNotification({ ...config, type: 'success' })
   },
-
-  /**
-   * Show a warning notification
-   */
   warning(options: NotificationOptions): () => void {
     const config = normalizeOptions(options)
     return addNotification({ ...config, type: 'warning' })
   },
-
-  /**
-   * Show an error notification
-   */
   error(options: NotificationOptions): () => void {
     const config = normalizeOptions(options)
     return addNotification({ ...config, type: 'error' })
   },
-
-  /**
-   * Clear all notifications
-   */
   clear(position?: NotificationPosition) {
     clearAll(position)
   }

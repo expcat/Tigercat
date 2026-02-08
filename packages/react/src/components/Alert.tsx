@@ -1,10 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import {
   classNames,
-  icon24PathStrokeLinecap,
-  icon24PathStrokeLinejoin,
-  icon24StrokeWidth,
-  icon24ViewBox,
   getAlertTypeClasses,
   defaultAlertThemeColors,
   alertBaseClasses,
@@ -19,6 +15,7 @@ import {
   alertCloseIconPath,
   type AlertProps as CoreAlertProps
 } from '@expcat/tigercat-core'
+import { StatusIcon } from './shared/icons'
 
 export interface AlertProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>, CoreAlertProps {
@@ -42,25 +39,6 @@ export interface AlertProps
    */
   onClose?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
-
-/**
- * Icon component
- */
-const Icon: React.FC<{ path: string; className: string }> = ({ path, className }) => (
-  <svg
-    className={className}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox={icon24ViewBox}
-    stroke="currentColor"
-    strokeWidth={icon24StrokeWidth}>
-    <path
-      strokeLinecap={icon24PathStrokeLinecap}
-      strokeLinejoin={icon24PathStrokeLinejoin}
-      d={path}
-    />
-  </svg>
-)
 
 export const Alert: React.FC<AlertProps> = ({
   type = 'info',
@@ -144,7 +122,7 @@ export const Alert: React.FC<AlertProps> = ({
     <div {...props} className={alertClasses} role="alert">
       {showIcon && (
         <div className={alertIconContainerClasses}>
-          <Icon path={iconPath} className={iconClasses} />
+          <StatusIcon path={iconPath} className={iconClasses} />
         </div>
       )}
 
@@ -164,7 +142,7 @@ export const Alert: React.FC<AlertProps> = ({
           onClick={handleClose}
           aria-label={closeAriaLabel}
           type="button">
-          <Icon path={alertCloseIconPath} className="h-4 w-4" />
+          <StatusIcon path={alertCloseIconPath} className="h-4 w-4" />
         </button>
       )}
     </div>

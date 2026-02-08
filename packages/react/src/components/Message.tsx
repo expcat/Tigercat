@@ -3,10 +3,6 @@ import { createRoot, Root } from 'react-dom/client'
 import { flushSync } from 'react-dom'
 import {
   classNames,
-  icon24PathStrokeLinecap,
-  icon24PathStrokeLinejoin,
-  icon24StrokeWidth,
-  icon24ViewBox,
   getMessageTypeClasses,
   defaultMessageThemeColors,
   messageContainerBaseClasses,
@@ -20,11 +16,13 @@ import {
   messageCloseIconPath,
   isBrowser,
   ANIMATION_DURATION_MS,
+  normalizeStringOption,
   type MessagePosition,
   type MessageInstance,
   type MessageOptions,
   type MessageConfig
 } from '@expcat/tigercat-core'
+import { StatusIconWithLoading, StatusIcon } from './shared/icons'
 
 /**
  * Global message container id
@@ -45,33 +43,6 @@ let updateCallback: (() => void) | null = null
  */
 function getNextInstanceId(): number {
   return ++instanceIdCounter
-}
-
-/**
- * Icon component
- */
-const Icon: React.FC<{
-  path: string
-  className: string
-  isLoading?: boolean
-}> = ({ path, className, isLoading = false }) => {
-  const iconClass = classNames(className, isLoading && messageLoadingSpinnerClasses)
-
-  return (
-    <svg
-      className={iconClass}
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox={icon24ViewBox}
-      stroke="currentColor"
-      strokeWidth={icon24StrokeWidth}>
-      <path
-        strokeLinecap={icon24PathStrokeLinecap}
-        strokeLinejoin={icon24PathStrokeLinejoin}
-        d={path}
-      />
-    </svg>
-  )
 }
 
 /**
@@ -123,7 +94,12 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
       data-tiger-message
       data-tiger-message-type={message.type}
       data-tiger-message-id={String(message.id)}>
-      <Icon path={iconPath} className={iconClass} isLoading={message.type === 'loading'} />
+      <StatusIconWithLoading
+        path={iconPath}
+        className={iconClass}
+        isLoading={message.type === 'loading'}
+        spinnerClass={messageLoadingSpinnerClasses}
+      />
       <div className={messageContentClasses}>{message.content}</div>
       {message.closable && (
         <button
@@ -131,7 +107,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
           onClick={handleClose}
           aria-label={MESSAGE_CLOSE_ARIA_LABEL}
           type="button">
-          <Icon path={messageCloseIconPath} className="w-4 h-4" />
+          <StatusIcon path={messageCloseIconPath} className="w-4 h-4" />
         </button>
       )}
     </div>
@@ -311,59 +287,33 @@ function clearAll() {
  * Normalize message options
  */
 function normalizeOptions(options: MessageOptions): MessageConfig {
-  if (typeof options === 'string') {
-    return { content: options }
-  }
-  return options
+  return normalizeStringOption<MessageConfig>(options, 'content')
 }
 
 /**
  * Message API
  */
 export const Message = {
-  /**
-   * Show an info message
-   */
   info(options: MessageOptions): () => void {
     const config = normalizeOptions(options)
     return addMessage({ ...config, type: 'info' })
   },
-
-  /**
-   * Show a success message
-   */
   success(options: MessageOptions): () => void {
     const config = normalizeOptions(options)
     return addMessage({ ...config, type: 'success' })
   },
-
-  /**
-   * Show a warning message
-   */
   warning(options: MessageOptions): () => void {
     const config = normalizeOptions(options)
     return addMessage({ ...config, type: 'warning' })
   },
-
-  /**
-   * Show an error message
-   */
   error(options: MessageOptions): () => void {
     const config = normalizeOptions(options)
     return addMessage({ ...config, type: 'error' })
   },
-
-  /**
-   * Show a loading message
-   */
   loading(options: MessageOptions): () => void {
     const config = normalizeOptions(options)
     return addMessage({ ...config, type: 'loading', duration: 0 })
   },
-
-  /**
-   * Clear all messages
-   */
   clear() {
     clearAll()
   }

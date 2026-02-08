@@ -2,10 +2,6 @@ import { defineComponent, computed, h, ref, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
-  icon24PathStrokeLinecap,
-  icon24PathStrokeLinejoin,
-  icon24StrokeWidth,
-  icon24ViewBox,
   getAlertTypeClasses,
   defaultAlertThemeColors,
   alertBaseClasses,
@@ -22,30 +18,7 @@ import {
   type AlertType,
   type AlertSize
 } from '@expcat/tigercat-core'
-
-/**
- * Create icon element
- */
-function createIcon(path: string, className: string) {
-  return h(
-    'svg',
-    {
-      class: className,
-      xmlns: 'http://www.w3.org/2000/svg',
-      fill: 'none',
-      viewBox: icon24ViewBox,
-      stroke: 'currentColor',
-      'stroke-width': String(icon24StrokeWidth)
-    },
-    [
-      h('path', {
-        'stroke-linecap': icon24PathStrokeLinecap,
-        'stroke-linejoin': icon24PathStrokeLinejoin,
-        d: path
-      })
-    ]
-  )
-}
+import { createStatusIcon } from '../utils/icon-helpers'
 
 export interface VueAlertProps {
   type?: AlertType
@@ -193,7 +166,7 @@ export const Alert = defineComponent({
       if (props.showIcon) {
         const iconPath = getAlertIconPath(props.type)
         children.push(
-          h('div', { class: alertIconContainerClasses }, createIcon(iconPath, iconClasses.value))
+          h('div', { class: alertIconContainerClasses }, createStatusIcon(iconPath, iconClasses.value))
         )
       }
 
@@ -244,7 +217,7 @@ export const Alert = defineComponent({
               'aria-label': props.closeAriaLabel,
               type: 'button'
             },
-            createIcon(alertCloseIconPath, 'h-4 w-4')
+            createStatusIcon(alertCloseIconPath, 'h-4 w-4')
           )
         )
       }

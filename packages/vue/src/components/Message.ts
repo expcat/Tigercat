@@ -13,10 +13,6 @@ import {
   classNames,
   getMessageTypeClasses,
   defaultMessageThemeColors,
-  icon24PathStrokeLinecap,
-  icon24PathStrokeLinejoin,
-  icon24StrokeWidth,
-  icon24ViewBox,
   messageContainerBaseClasses,
   messagePositionClasses,
   messageBaseClasses,
@@ -26,12 +22,14 @@ import {
   messageLoadingSpinnerClasses,
   getMessageIconPath,
   messageCloseIconPath,
+  normalizeStringOption,
   type MessagePosition,
   type MessageInstance,
   type MessageOptions,
   type MessageConfig,
   isBrowser
 } from '@expcat/tigercat-core'
+import { createStatusIconWithLoading, createStatusIcon } from '../utils/icon-helpers'
 
 /**
  * Global message container id
@@ -59,32 +57,6 @@ let containerApp: App<Element> | null = null
  */
 function getNextInstanceId(): number {
   return ++instanceIdCounter
-}
-
-/**
- * Create icon element
- */
-function createIcon(path: string, className: string, isLoading = false) {
-  const iconClass = classNames(className, isLoading && messageLoadingSpinnerClasses)
-
-  return h(
-    'svg',
-    {
-      class: iconClass,
-      xmlns: 'http://www.w3.org/2000/svg',
-      fill: 'none',
-      viewBox: icon24ViewBox,
-      stroke: 'currentColor',
-      'stroke-width': String(icon24StrokeWidth)
-    },
-    [
-      h('path', {
-        'stroke-linecap': icon24PathStrokeLinecap,
-        'stroke-linejoin': icon24PathStrokeLinejoin,
-        d: path
-      })
-    ]
-  )
 }
 
 /**
@@ -121,7 +93,12 @@ export const MessageContainer = defineComponent({
       const ariaLive = message.type === 'error' ? 'assertive' : 'polite'
 
       const children = [
-        createIcon(iconPath, iconClass, message.type === 'loading'),
+        createStatusIconWithLoading(
+          iconPath,
+          iconClass,
+          message.type === 'loading',
+          messageLoadingSpinnerClasses
+        ),
         h('div', { class: messageContentClasses }, message.content)
       ]
 
@@ -135,7 +112,7 @@ export const MessageContainer = defineComponent({
               'aria-label': MESSAGE_CLOSE_ARIA_LABEL,
               type: 'button'
             },
-            createIcon(messageCloseIconPath, 'w-4 h-4')
+            createStatusIcon(messageCloseIconPath, 'w-4 h-4')
           )
         )
       }
@@ -286,59 +263,33 @@ function clearAll() {
  * Normalize message options
  */
 function normalizeOptions(options: MessageOptions): MessageConfig {
-  if (typeof options === 'string') {
-    return { content: options }
-  }
-  return options
+  return normalizeStringOption<MessageConfig>(options, 'content')
 }
 
 /**
  * Message API
  */
 export const Message = {
-  /**
-   * Show an info message
-   */
   info(options: MessageOptions): () => void {
     const config = normalizeOptions(options)
     return addMessage({ ...config, type: 'info' })
   },
-
-  /**
-   * Show a success message
-   */
   success(options: MessageOptions): () => void {
     const config = normalizeOptions(options)
     return addMessage({ ...config, type: 'success' })
   },
-
-  /**
-   * Show a warning message
-   */
   warning(options: MessageOptions): () => void {
     const config = normalizeOptions(options)
     return addMessage({ ...config, type: 'warning' })
   },
-
-  /**
-   * Show an error message
-   */
   error(options: MessageOptions): () => void {
     const config = normalizeOptions(options)
     return addMessage({ ...config, type: 'error' })
   },
-
-  /**
-   * Show a loading message
-   */
   loading(options: MessageOptions): () => void {
     const config = normalizeOptions(options)
     return addMessage({ ...config, type: 'loading', duration: 0 })
   },
-
-  /**
-   * Clear all messages
-   */
   clear() {
     clearAll()
   }
