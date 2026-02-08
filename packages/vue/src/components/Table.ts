@@ -68,46 +68,26 @@ export interface VueTableProps {
   maxHeight?: string | number
 }
 
-// Sort icons
+// Sort icon
 const SortIcon = (direction: SortDirection) => {
-  if (direction === 'asc') {
-    return h(
-      'svg',
-      {
-        class: getSortIconClasses(true),
-        width: '16',
-        height: '16',
-        viewBox: icon16ViewBox,
-        fill: 'currentColor'
-      },
-      [h('path', { d: sortAscIcon16PathD })]
-    )
-  }
-
-  if (direction === 'desc') {
-    return h(
-      'svg',
-      {
-        class: getSortIconClasses(true),
-        width: '16',
-        height: '16',
-        viewBox: icon16ViewBox,
-        fill: 'currentColor'
-      },
-      [h('path', { d: sortDescIcon16PathD })]
-    )
-  }
+  const active = direction !== null
+  const pathD =
+    direction === 'asc'
+      ? sortAscIcon16PathD
+      : direction === 'desc'
+        ? sortDescIcon16PathD
+        : sortBothIcon16PathD
 
   return h(
     'svg',
     {
-      class: getSortIconClasses(false),
+      class: getSortIconClasses(active),
       width: '16',
       height: '16',
       viewBox: icon16ViewBox,
       fill: 'currentColor'
     },
-    [h('path', { d: sortBothIcon16PathD })]
+    [h('path', { d: pathD })]
   )
 }
 
@@ -524,11 +504,7 @@ export const Table = defineComponent({
     }
 
     function handlePageChange(page: number) {
-      if (!isCurrentPageControlled.value) {
-        uncontrolledCurrentPage.value = page
-      } else {
-        uncontrolledCurrentPage.value = page
-      }
+      uncontrolledCurrentPage.value = page
 
       emit('page-change', { current: page, pageSize: currentPageSize.value })
       emit('change', {
@@ -542,17 +518,8 @@ export const Table = defineComponent({
     }
 
     function handlePageSizeChange(pageSize: number) {
-      if (!isPageSizeControlled.value) {
-        uncontrolledCurrentPageSize.value = pageSize
-      } else {
-        uncontrolledCurrentPageSize.value = pageSize
-      }
-
-      if (!isCurrentPageControlled.value) {
-        uncontrolledCurrentPage.value = 1
-      } else {
-        uncontrolledCurrentPage.value = 1
-      }
+      uncontrolledCurrentPageSize.value = pageSize
+      uncontrolledCurrentPage.value = 1
 
       emit('page-change', { current: 1, pageSize })
       emit('change', {
@@ -686,13 +653,11 @@ export const Table = defineComponent({
 
         const headerContent: VNodeChild[] = []
 
-        if (column.renderHeader) {
-          const slotContent = slots[`header-${column.key}`]?.()
-          if (slotContent && slotContent.length > 0) {
-            headerContent.push(...slotContent)
-          } else {
-            headerContent.push(column.title)
-          }
+        const slotContent = slots[`header-${column.key}`]?.()
+        if (slotContent && slotContent.length > 0) {
+          headerContent.push(...slotContent)
+        } else if (column.renderHeader) {
+          headerContent.push(column.renderHeader() as VNodeChild)
         } else {
           headerContent.push(column.title)
         }

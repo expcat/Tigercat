@@ -78,6 +78,18 @@ const emptySnippet = `<Table
   emptyText="暂无数据"
   :pagination="false" />`
 
+const sizeSnippet = `<div class="space-y-6">
+  <Table :columns="basicColumns" :dataSource="basicData" size="sm" :pagination="false" />
+  <Table :columns="basicColumns" :dataSource="basicData" size="md" :pagination="false" />
+  <Table :columns="basicColumns" :dataSource="basicData" size="lg" :pagination="false" />
+</div>`
+
+const layoutSnippet = `<Table
+  :columns="basicColumns"
+  :dataSource="basicData"
+  tableLayout="fixed"
+  :pagination="false" />`
+
 const basicData = ref<UserData[]>([
   {
     id: 1,
@@ -454,6 +466,45 @@ const pagedData = computed(() => {
       <Table :columns="basicColumns"
              :dataSource="[]"
              emptyText="暂无数据"
+             :pagination="false" />
+    </DemoBlock>
+
+    <!-- 尺寸变体 -->
+    <DemoBlock title="尺寸变体"
+               description="通过 size 属性设置表格的紧凑程度：sm / md / lg。"
+               :code="sizeSnippet">
+      <div class="space-y-6">
+        <div>
+          <p class="text-sm text-gray-500 mb-2">size="sm"</p>
+          <Table :columns="basicColumns"
+                 :dataSource="basicData"
+                 size="sm"
+                 :pagination="false" />
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-2">size="md"（默认）</p>
+          <Table :columns="basicColumns"
+                 :dataSource="basicData"
+                 size="md"
+                 :pagination="false" />
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-2">size="lg"</p>
+          <Table :columns="basicColumns"
+                 :dataSource="basicData"
+                 size="lg"
+                 :pagination="false" />
+        </div>
+      </div>
+    </DemoBlock>
+
+    <!-- 固定布局 -->
+    <DemoBlock title="固定布局"
+               description="tableLayout=&quot;fixed&quot; 使列宽按设定平均分配，不随内容自适应。"
+               :code="layoutSnippet">
+      <Table :columns="basicColumns"
+             :dataSource="basicData"
+             tableLayout="fixed"
              :pagination="false" />
     </DemoBlock>
   </div>

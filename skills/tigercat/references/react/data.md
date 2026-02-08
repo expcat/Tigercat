@@ -52,7 +52,7 @@ const handleChange = (keys: string | number | (string | number)[]) => {
   setActiveKeys(Array.isArray(keys) ? keys : [keys])
 }
 
-<Collapse activeKey={activeKeys} onChange={handleChange}>
+;<Collapse activeKey={activeKeys} onChange={handleChange}>
   <CollapsePanel panelKey="1" header="Panel 1">
     Content 1
   </CollapsePanel>
@@ -65,22 +65,28 @@ const handleChange = (keys: string | number | (string | number)[]) => {
 ### 自定义样式
 
 ```tsx
-{/* 无边框 */}
-<Collapse bordered={false}>
+{
+  /* 无边框 */
+}
+;<Collapse bordered={false}>
   <CollapsePanel panelKey="1" header="No Border">
     Content without border
   </CollapsePanel>
 </Collapse>
 
-{/* Ghost 模式（透明背景） */}
-<Collapse ghost>
+{
+  /* Ghost 模式（透明背景） */
+}
+;<Collapse ghost>
   <CollapsePanel panelKey="1" header="Ghost Style">
     Transparent background
   </CollapsePanel>
 </Collapse>
 
-{/* 箭头在右侧 */}
-<Collapse expandIconPosition="end">
+{
+  /* 箭头在右侧 */
+}
+;<Collapse expandIconPosition="end">
   <CollapsePanel panelKey="1" header="Arrow on right">
     Content
   </CollapsePanel>
@@ -104,11 +110,19 @@ const handleChange = (keys: string | number | (string | number)[]) => {
 
 ```tsx
 <Collapse>
-  <CollapsePanel 
+  <CollapsePanel
     panelKey="1"
     header={<span className="font-bold text-blue-600">Custom Header</span>}
-    extra={<Button size="sm" onClick={(e) => { e.stopPropagation(); handleEdit(); }}>Edit</Button>}
-  >
+    extra={
+      <Button
+        size="sm"
+        onClick={(e) => {
+          e.stopPropagation()
+          handleEdit()
+        }}>
+        Edit
+      </Button>
+    }>
     Panel content
   </CollapsePanel>
 </Collapse>
@@ -131,28 +145,39 @@ const tableData = [
   { id: 2, name: 'Jane', age: 32, email: 'jane@example.com' }
 ]
 
-<Table columns={columns} data={tableData} rowKey="id" />
+<Table columns={columns} dataSource={tableData} pagination={false} />
 ```
 
-### 可选择、分页、自定义渲染
+### 行选择、分页、自定义渲染
 
 ```tsx
-const [selectedKeys, setSelectedKeys] = useState<number[]>([])
+const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([])
 const columns = [
   { key: 'name', title: 'Name' },
-  { key: 'status', title: 'Status', render: (row) => <Badge color={row.status === 'active' ? 'green' : 'gray'}>{row.status}</Badge> },
-  { key: 'action', title: 'Action', render: (row) => <Button size="sm" onClick={() => edit(row)}>Edit</Button> }
+  {
+    key: 'status', title: 'Status',
+    render: (record) => (
+      <span className={record.status === 'active' ? 'text-green-600' : 'text-gray-400'}>
+        {record.status}
+      </span>
+    )
+  },
+  {
+    key: 'action', title: 'Action',
+    render: (record) => <Button size="sm" onClick={() => edit(record)}>Edit</Button>
+  }
 ]
 
 <Table
   columns={columns}
-  data={tableData}
-  rowKey="id"
-  selectedKeys={selectedKeys}
-  onSelect={setSelectedKeys}
-  selectable
-  pagination={{ current: 1, pageSize: 10, total: 100 }}
-  onPageChange={handlePageChange}
+  dataSource={tableData}
+  rowSelection={{
+    selectedRowKeys,
+    type: 'checkbox'
+  }}
+  pagination={{ current: 1, pageSize: 10 }}
+  onSelectionChange={setSelectedRowKeys}
+  onPageChange={({ current, pageSize }) => { /* ... */ }}
 />
 ```
 
@@ -226,14 +251,18 @@ const columns = [
 ### 指示点位置
 
 ```tsx
-{/* 指示点在上方 */}
-<Carousel dotPosition="top">
+{
+  /* 指示点在上方 */
+}
+;<Carousel dotPosition="top">
   <div className="h-48 bg-blue-500">Slide 1</div>
   <div className="h-48 bg-green-500">Slide 2</div>
 </Carousel>
 
-{/* 指示点在左侧 */}
-<Carousel dotPosition="left">
+{
+  /* 指示点在左侧 */
+}
+;<Carousel dotPosition="left">
   <div className="h-48 bg-blue-500">Slide 1</div>
   <div className="h-48 bg-green-500">Slide 2</div>
 </Carousel>
@@ -272,7 +301,7 @@ const handleBeforeChange = (current: number, next: number) => {
   console.log(`About to change from slide ${current} to slide ${next}`)
 }
 
-<Carousel onChange={handleChange} onBeforeChange={handleBeforeChange}>
+;<Carousel onChange={handleChange} onBeforeChange={handleBeforeChange}>
   <div className="h-48 bg-blue-500">Slide 1</div>
   <div className="h-48 bg-green-500">Slide 2</div>
 </Carousel>

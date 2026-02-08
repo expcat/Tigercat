@@ -18,15 +18,9 @@ description: Vue data display components usage
 ```vue
 <template>
   <Collapse>
-    <CollapsePanel panel-key="1" header="Section 1">
-      Content of section 1
-    </CollapsePanel>
-    <CollapsePanel panel-key="2" header="Section 2">
-      Content of section 2
-    </CollapsePanel>
-    <CollapsePanel panel-key="3" header="Section 3">
-      Content of section 3
-    </CollapsePanel>
+    <CollapsePanel panel-key="1" header="Section 1"> Content of section 1 </CollapsePanel>
+    <CollapsePanel panel-key="2" header="Section 2"> Content of section 2 </CollapsePanel>
+    <CollapsePanel panel-key="3" header="Section 3"> Content of section 3 </CollapsePanel>
   </Collapse>
 </template>
 ```
@@ -39,9 +33,7 @@ description: Vue data display components usage
     <CollapsePanel panel-key="1" header="Panel 1">
       Only one panel can be expanded at a time
     </CollapsePanel>
-    <CollapsePanel panel-key="2" header="Panel 2">
-      Click to expand this panel
-    </CollapsePanel>
+    <CollapsePanel panel-key="2" header="Panel 2"> Click to expand this panel </CollapsePanel>
   </Collapse>
 </template>
 ```
@@ -51,12 +43,8 @@ description: Vue data display components usage
 ```vue
 <template>
   <Collapse v-model:active-key="activeKeys" @change="handleChange">
-    <CollapsePanel panel-key="1" header="Panel 1">
-      Content 1
-    </CollapsePanel>
-    <CollapsePanel panel-key="2" header="Panel 2">
-      Content 2
-    </CollapsePanel>
+    <CollapsePanel panel-key="1" header="Panel 1"> Content 1 </CollapsePanel>
+    <CollapsePanel panel-key="2" header="Panel 2"> Content 2 </CollapsePanel>
   </Collapse>
 </template>
 <script setup>
@@ -76,23 +64,17 @@ const handleChange = (keys) => {
 <template>
   <!-- 无边框 -->
   <Collapse :bordered="false">
-    <CollapsePanel panel-key="1" header="No Border">
-      Content without border
-    </CollapsePanel>
+    <CollapsePanel panel-key="1" header="No Border"> Content without border </CollapsePanel>
   </Collapse>
 
   <!-- Ghost 模式（透明背景） -->
   <Collapse ghost>
-    <CollapsePanel panel-key="1" header="Ghost Style">
-      Transparent background
-    </CollapsePanel>
+    <CollapsePanel panel-key="1" header="Ghost Style"> Transparent background </CollapsePanel>
   </Collapse>
 
   <!-- 箭头在右侧 -->
   <Collapse expand-icon-position="end">
-    <CollapsePanel panel-key="1" header="Arrow on right">
-      Content
-    </CollapsePanel>
+    <CollapsePanel panel-key="1" header="Arrow on right"> Content </CollapsePanel>
   </Collapse>
 </template>
 ```
@@ -102,9 +84,7 @@ const handleChange = (keys) => {
 ```vue
 <template>
   <Collapse>
-    <CollapsePanel panel-key="1" header="Normal Panel">
-      This panel can be expanded
-    </CollapsePanel>
+    <CollapsePanel panel-key="1" header="Normal Panel"> This panel can be expanded </CollapsePanel>
     <CollapsePanel panel-key="2" header="Disabled Panel" disabled>
       This panel is disabled
     </CollapsePanel>
@@ -138,7 +118,7 @@ const handleChange = (keys) => {
 
 ```vue
 <template>
-  <Table :columns="columns" :data="tableData" row-key="id" />
+  <Table :columns="columns" :dataSource="tableData" :pagination="false" />
 </template>
 <script setup>
 const columns = [
@@ -153,26 +133,49 @@ const tableData = [
 </script>
 ```
 
-### 可选择、分页、自定义渲染
+### 行选择、分页、自定义渲染
 
 ```vue
 <template>
   <Table
     :columns="columns"
-    :data="tableData"
-    row-key="id"
-    v-model:selected-keys="selectedKeys"
-    selectable
-    :pagination="{ current: 1, pageSize: 10, total: 100 }"
-    @page-change="onPageChange"
-  />
+    :dataSource="tableData"
+    :rowSelection="{
+      selectedRowKeys,
+      type: 'checkbox'
+    }"
+    :pagination="{ current: 1, pageSize: 10 }"
+    @selection-change="handleSelect"
+    @page-change="handlePage" />
 </template>
 <script setup>
-const selectedKeys = ref([])
+import { ref, h } from 'vue'
+const selectedRowKeys = ref([])
+const handleSelect = (keys) => {
+  selectedRowKeys.value = keys
+}
+const handlePage = ({ current, pageSize }) => {
+  /* ... */
+}
 const columns = [
   { key: 'name', title: 'Name' },
-  { key: 'status', title: 'Status', render: (row) => h(Badge, { color: row.status === 'active' ? 'green' : 'gray' }, row.status) },
-  { key: 'action', title: 'Action', render: (row) => h(Button, { size: 'sm', onClick: () => edit(row) }, 'Edit') }
+  {
+    key: 'status',
+    title: 'Status',
+    render: (record) =>
+      h(
+        'span',
+        {
+          class: record.status === 'active' ? 'text-green-600' : 'text-gray-400'
+        },
+        record.status
+      )
+  },
+  {
+    key: 'action',
+    title: 'Action',
+    render: (record) => h(Button, { size: 'sm', onClick: () => edit(record) }, () => 'Edit')
+  }
 ]
 </script>
 ```
@@ -188,11 +191,12 @@ const columns = [
     <TimelineItem color="blue">Processing 2024-01-02</TimelineItem>
     <TimelineItem color="gray">Pending 2024-01-03</TimelineItem>
   </Timeline>
-  
-  <Timeline :items="[
-    { content: 'Created', time: '2024-01-01', color: 'green' },
-    { content: 'Updated', time: '2024-01-02', color: 'blue' }
-  ]" />
+
+  <Timeline
+    :items="[
+      { content: 'Created', time: '2024-01-01', color: 'green' },
+      { content: 'Updated', time: '2024-01-02', color: 'blue' }
+    ]" />
 </template>
 ```
 
@@ -205,15 +209,11 @@ const columns = [
 ```vue
 <template>
   <Carousel>
-    <div class="h-48 bg-blue-500 flex items-center justify-center text-white text-2xl">
-      Slide 1
-    </div>
+    <div class="h-48 bg-blue-500 flex items-center justify-center text-white text-2xl">Slide 1</div>
     <div class="h-48 bg-green-500 flex items-center justify-center text-white text-2xl">
       Slide 2
     </div>
-    <div class="h-48 bg-red-500 flex items-center justify-center text-white text-2xl">
-      Slide 3
-    </div>
+    <div class="h-48 bg-red-500 flex items-center justify-center text-white text-2xl">Slide 3</div>
   </Carousel>
 </template>
 ```
@@ -263,7 +263,7 @@ const columns = [
     <div class="h-48 bg-blue-500">Slide 1</div>
     <div class="h-48 bg-green-500">Slide 2</div>
   </Carousel>
-  
+
   <!-- 指示点在左侧 -->
   <Carousel dot-position="left">
     <div class="h-48 bg-blue-500">Slide 1</div>

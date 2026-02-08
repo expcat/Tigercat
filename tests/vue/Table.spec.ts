@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, fireEvent } from '@testing-library/vue'
-import { nextTick } from 'vue'
+import { nextTick, h } from 'vue'
 import { Table } from '@expcat/tigercat-vue'
 import { renderWithProps, expectNoA11yViolations } from '../utils'
 
@@ -158,6 +158,53 @@ describe('Table', () => {
 
       expect(nameHeaderCell).toHaveAttribute('aria-sort', 'ascending')
     })
+
+    it('should toggle sort direction on multiple clicks', async () => {
+      const sortableColumns = [{ key: 'name', title: 'Name', sortable: true }]
+
+      const onSortChange = vi.fn()
+
+      const { getByText } = render(Table, {
+        props: {
+          columns: sortableColumns,
+          dataSource
+        },
+        attrs: {
+          onSortChange
+        }
+      })
+
+      const nameHeaderCell = getByText('Name').closest('th')!
+
+      expect(nameHeaderCell).toHaveAttribute('aria-sort', 'none')
+
+      // First click - asc
+      await fireEvent.click(nameHeaderCell)
+      await nextTick()
+      expect(onSortChange).toHaveBeenCalledWith({
+        key: 'name',
+        direction: 'asc'
+      })
+      expect(nameHeaderCell).toHaveAttribute('aria-sort', 'ascending')
+
+      // Second click - desc
+      await fireEvent.click(nameHeaderCell)
+      await nextTick()
+      expect(onSortChange).toHaveBeenCalledWith({
+        key: 'name',
+        direction: 'desc'
+      })
+      expect(nameHeaderCell).toHaveAttribute('aria-sort', 'descending')
+
+      // Third click - null (clear sort)
+      await fireEvent.click(nameHeaderCell)
+      await nextTick()
+      expect(onSortChange).toHaveBeenCalledWith({
+        key: null,
+        direction: null
+      })
+      expect(nameHeaderCell).toHaveAttribute('aria-sort', 'none')
+    })
   })
 
   describe('Filtering', () => {
@@ -258,6 +305,16 @@ describe('Table', () => {
         current: 2,
         pageSize: 10
       })
+    })
+
+    it('should disable previous button on first page', () => {
+      const { getByText } = renderWithProps(Table, {
+        columns,
+        dataSource
+      })
+
+      const prevButton = getByText('Previous')
+      expect(prevButton).toBeDisabled()
     })
 
     it('should respect controlled pagination on rerender', async () => {
@@ -409,6 +466,20 @@ describe('Table', () => {
       const firstRowCheckboxAfter = container.querySelectorAll('input[type="checkbox"]')[1]
       expect(firstRowCheckboxAfter).toBeChecked()
     })
+
+    it('should support radio selection', () => {
+      const { container } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        rowSelection: {
+          selectedRowKeys: [],
+          type: 'radio'
+        }
+      })
+
+      const radios = container.querySelectorAll('input[type="radio"]')
+      expect(radios.length).toBe(dataSource.length)
+    })
   })
 
   describe('Loading State', () => {
@@ -434,6 +505,45 @@ describe('Table', () => {
 
       const thead = container.querySelector('thead')
       expect(thead).toHaveClass('sticky')
+    })
+  })
+
+  describe('Custom Rendering', () => {
+    it('should render custom cell content', () => {
+      const customColumns = [
+        {
+          key: 'name',
+          title: 'Name',
+          render: (record: Record<string, unknown>) => h('strong', {}, record.name as string)
+        }
+      ]
+
+      const { container } = renderWithProps(Table, {
+        columns: customColumns,
+        dataSource
+      })
+
+      const strongElements = container.querySelectorAll('strong')
+      expect(strongElements.length).toBe(dataSource.length)
+    })
+
+    it('should render custom header content', () => {
+      const customColumns = [
+        {
+          key: 'name',
+          title: 'Name',
+          renderHeader: () => h('span', { class: 'custom-header' }, 'Custom Name')
+        }
+      ]
+
+      const { container } = renderWithProps(Table, {
+        columns: customColumns,
+        dataSource
+      })
+
+      const customHeader = container.querySelector('.custom-header')
+      expect(customHeader).toBeInTheDocument()
+      expect(customHeader).toHaveTextContent('Custom Name')
     })
   })
 

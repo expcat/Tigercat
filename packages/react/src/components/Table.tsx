@@ -83,42 +83,24 @@ export interface TableProps<T = Record<string, unknown>> extends CoreTableProps<
   className?: string
 }
 
-// Sort icons
+// Sort icon
 const SortIcon: React.FC<{ direction: 'asc' | 'desc' | null }> = ({ direction }) => {
-  if (direction === 'asc') {
-    return (
-      <svg
-        className={getSortIconClasses(true)}
-        width="16"
-        height="16"
-        viewBox={icon16ViewBox}
-        fill="currentColor">
-        <path d={sortAscIcon16PathD} />
-      </svg>
-    )
-  }
-
-  if (direction === 'desc') {
-    return (
-      <svg
-        className={getSortIconClasses(true)}
-        width="16"
-        height="16"
-        viewBox={icon16ViewBox}
-        fill="currentColor">
-        <path d={sortDescIcon16PathD} />
-      </svg>
-    )
-  }
+  const active = direction !== null
+  const pathD =
+    direction === 'asc'
+      ? sortAscIcon16PathD
+      : direction === 'desc'
+        ? sortDescIcon16PathD
+        : sortBothIcon16PathD
 
   return (
     <svg
-      className={getSortIconClasses(false)}
+      className={getSortIconClasses(active)}
       width="16"
       height="16"
       viewBox={icon16ViewBox}
       fill="currentColor">
-      <path d={sortBothIcon16PathD} />
+      <path d={pathD} />
     </svg>
   )
 }
@@ -434,11 +416,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
 
   const handlePageChange = useCallback(
     (page: number) => {
-      if (!isCurrentPageControlled) {
-        setUncontrolledCurrentPage(page)
-      } else {
-        setUncontrolledCurrentPage(page)
-      }
+      setUncontrolledCurrentPage(page)
 
       onPageChange?.({ current: page, pageSize: currentPageSize })
       onChange?.({
@@ -450,21 +428,13 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         }
       })
     },
-    [currentPageSize, sortState, filterState, isCurrentPageControlled, onPageChange, onChange]
+    [currentPageSize, sortState, filterState, onPageChange, onChange]
   )
 
   const handlePageSizeChange = useCallback(
     (pageSize: number) => {
-      if (!isPageSizeControlled) {
-        setUncontrolledCurrentPageSize(pageSize)
-      } else {
-        setUncontrolledCurrentPageSize(pageSize)
-      }
-      if (!isCurrentPageControlled) {
-        setUncontrolledCurrentPage(1)
-      } else {
-        setUncontrolledCurrentPage(1)
-      }
+      setUncontrolledCurrentPageSize(pageSize)
+      setUncontrolledCurrentPage(1)
 
       onPageChange?.({ current: 1, pageSize })
       onChange?.({
@@ -476,7 +446,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         }
       })
     },
-    [sortState, filterState, isPageSizeControlled, isCurrentPageControlled, onPageChange, onChange]
+    [sortState, filterState, onPageChange, onChange]
   )
 
   const handleRowClick = useCallback(
