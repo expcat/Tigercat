@@ -221,4 +221,44 @@ describe('Tooltip', () => {
 
     await expectNoA11yViolations(container)
   })
+
+  it('supports defaultVisible', async () => {
+    const { getByText } = renderWithSlots(
+      Tooltip,
+      { default: '<button>Trigger</button>' },
+      { content: 'Tooltip content', defaultVisible: true }
+    )
+
+    await waitFor(() => expect(getByText('Tooltip content')).toBeVisible())
+  })
+
+  it('closes on escape key', async () => {
+    const user = userEvent.setup()
+    const { getByText, queryByText, container } = renderWithSlots(
+      Tooltip,
+      { default: '<button>Trigger</button>' },
+      { content: 'Tooltip content', trigger: 'click' }
+    )
+
+    await user.click(getByText('Trigger'))
+    await waitFor(() => expect(getByText('Tooltip content')).toBeVisible())
+
+    await user.keyboard('{Escape}')
+    await waitFor(() => expect(queryByText('Tooltip content')).toBeNull())
+  })
+
+  it('does not close on escape in manual mode', async () => {
+    const user = userEvent.setup()
+    const { getByText } = renderWithSlots(
+      Tooltip,
+      { default: '<button>Trigger</button>' },
+      { content: 'Tooltip content', trigger: 'manual', visible: true }
+    )
+
+    await waitFor(() => expect(getByText('Tooltip content')).toBeVisible())
+
+    await user.keyboard('{Escape}')
+    // Should remain visible in manual mode
+    expect(getByText('Tooltip content')).toBeVisible()
+  })
 })

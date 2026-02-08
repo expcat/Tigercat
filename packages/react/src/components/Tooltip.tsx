@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { useFloating, useClickOutside, useEscapeKey } from '../utils/overlay'
 import {
   classNames,
@@ -14,12 +14,10 @@ let tooltipIdCounter = 0
 
 const createTooltipId = () => `tiger-tooltip-${++tooltipIdCounter}`
 
-export type TooltipProps = Omit<CoreTooltipProps, 'content' | 'style' | 'placement'> &
+export type TooltipProps = Omit<CoreTooltipProps, 'content' | 'placement'> &
   Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style' | 'content'> & {
     children?: React.ReactNode
     content?: React.ReactNode
-    /** @deprecated Use `content` (supports ReactNode). */
-    contentContent?: React.ReactNode
     className?: string
     style?: React.CSSProperties
     /**
@@ -46,7 +44,6 @@ export const Tooltip: React.FC<TooltipProps> = ({
   className,
   style,
   children,
-  contentContent,
   onVisibleChange,
   ...divProps
 }) => {
@@ -64,8 +61,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
   }
 
   const tooltipId = tooltipIdRef.current
-  const tooltipContent = contentContent ?? content
-  const describedBy = tooltipContent != null ? tooltipId : undefined
+  const describedBy = content != null ? tooltipId : undefined
 
   // Floating UI positioning
   const {
@@ -83,40 +79,31 @@ export const Tooltip: React.FC<TooltipProps> = ({
   const setVisible = useCallback(
     (newVisible: boolean) => {
       if (disabled && newVisible) return
-
-      if (!isControlled) {
-        setInternalVisible(newVisible)
-      }
-
+      if (!isControlled) setInternalVisible(newVisible)
       onVisibleChange?.(newVisible)
     },
     [disabled, isControlled, onVisibleChange]
   )
 
-  const handleTriggerClick = () => {
-    if (disabled || trigger !== 'click') return
-    setVisible(!currentVisible)
-  }
+  const handleTriggerClick = useCallback(() => {
+    if (!disabled && trigger === 'click') setVisible(!currentVisible)
+  }, [disabled, trigger, currentVisible, setVisible])
 
-  const handleTriggerMouseEnter = () => {
-    if (disabled || trigger !== 'hover') return
-    setVisible(true)
-  }
+  const handleMouseEnter = useCallback(() => {
+    if (!disabled && trigger === 'hover') setVisible(true)
+  }, [disabled, trigger, setVisible])
 
-  const handleTriggerMouseLeave = () => {
-    if (disabled || trigger !== 'hover') return
-    setVisible(false)
-  }
+  const handleMouseLeave = useCallback(() => {
+    if (!disabled && trigger === 'hover') setVisible(false)
+  }, [disabled, trigger, setVisible])
 
-  const handleTriggerFocus = () => {
-    if (disabled || trigger !== 'focus') return
-    setVisible(true)
-  }
+  const handleFocus = useCallback(() => {
+    if (!disabled && trigger === 'focus') setVisible(true)
+  }, [disabled, trigger, setVisible])
 
-  const handleTriggerBlur = () => {
-    if (disabled || trigger !== 'focus') return
-    setVisible(false)
-  }
+  const handleBlur = useCallback(() => {
+    if (!disabled && trigger === 'focus') setVisible(false)
+  }, [disabled, trigger, setVisible])
 
   // Click outside handler (only for click trigger)
   useClickOutside({
@@ -126,38 +113,39 @@ export const Tooltip: React.FC<TooltipProps> = ({
     defer: true
   })
 
-  // Escape key handler
+  // Escape key handler (all non-manual triggers)
   useEscapeKey({
-    enabled: currentVisible,
+    enabled: currentVisible && trigger !== 'manual',
     onEscape: () => setVisible(false)
   })
 
-  const containerClasses = classNames(getTooltipContainerClasses(), className)
-  const triggerClasses = getTooltipTriggerClasses(disabled)
-  const contentClasses = getTooltipContentClasses()
+  // Memoized classes
+  const containerClasses = useMemo(
+    () => classNames(getTooltipContainerClasses(), className),
+    [className]
+  )
+  const triggerClasses = useMemo(() => getTooltipTriggerClasses(disabled), [disabled])
+  const contentClasses = useMemo(() => getTooltipContentClasses(), [])
 
-  const floatingStyles: React.CSSProperties = {
-    position: 'absolute',
-    left: x,
-    top: y,
-    transformOrigin: getTransformOrigin(actualPlacement),
-    zIndex: 1000
-  }
+  const floatingStyles = useMemo<React.CSSProperties>(
+    () => ({
+      position: 'absolute',
+      left: x,
+      top: y,
+      transformOrigin: getTransformOrigin(actualPlacement),
+      zIndex: 1000
+    }),
+    [x, y, actualPlacement]
+  )
 
-  const triggerHandlers: React.DOMAttributes<HTMLDivElement> = {}
-  if (trigger === 'click') {
-    triggerHandlers.onClick = handleTriggerClick
-  } else if (trigger === 'hover') {
-    triggerHandlers.onMouseEnter = handleTriggerMouseEnter
-    triggerHandlers.onMouseLeave = handleTriggerMouseLeave
-  } else if (trigger === 'focus') {
-    triggerHandlers.onFocus = handleTriggerFocus
-    triggerHandlers.onBlur = handleTriggerBlur
-  }
+  const triggerHandlers = useMemo<React.DOMAttributes<HTMLDivElement>>(() => {
+    if (trigger === 'click') return { onClick: handleTriggerClick }
+    if (trigger === 'hover') return { onMouseEnter: handleMouseEnter, onMouseLeave: handleMouseLeave }
+    if (trigger === 'focus') return { onFocus: handleFocus, onBlur: handleBlur }
+    return {}
+  }, [trigger, handleTriggerClick, handleMouseEnter, handleMouseLeave, handleFocus, handleBlur])
 
-  if (!children) {
-    return null
-  }
+  if (!children) return null
 
   return (
     <div ref={containerRef} className={containerClasses} style={style} {...divProps}>
@@ -172,7 +160,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
       {currentVisible && (
         <div ref={floatingRef} style={floatingStyles} aria-hidden={false}>
           <div id={tooltipId} role="tooltip" className={contentClasses}>
-            {tooltipContent}
+            {content}
           </div>
         </div>
       )}

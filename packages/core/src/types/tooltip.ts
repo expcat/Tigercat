@@ -2,7 +2,7 @@
  * Tooltip component types and interfaces
  */
 
-import type { DropdownPlacement } from './dropdown'
+import type { FloatingPlacement } from '../utils/floating'
 
 /**
  * Tooltip trigger type
@@ -39,7 +39,7 @@ export interface TooltipProps {
    * Tooltip placement relative to trigger
    * @default 'top'
    */
-  placement?: DropdownPlacement
+  placement?: FloatingPlacement
 
   /**
    * Whether the tooltip is disabled
@@ -48,12 +48,13 @@ export interface TooltipProps {
   disabled?: boolean
 
   /**
+   * Offset distance from trigger (in pixels)
+   * @default 8
+   */
+  offset?: number
+
+  /**
    * Additional CSS classes
    */
   className?: string
-
-  /**
-   * Custom styles
-   */
-  style?: Record<string, string | number>
 }

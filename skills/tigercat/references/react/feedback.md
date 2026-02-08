@@ -157,7 +157,40 @@ Notification.open({
 ## Tooltip 文字提示
 
 ```tsx
-<Tooltip content="Tooltip text"><Button>Hover</Button></Tooltip>
+{/* 基本用法 */}
+<Tooltip content="提示文字">
+  <Button>Hover</Button>
+</Tooltip>
+
+{/* 不同位置 */}
+<Tooltip content="底部" placement="bottom">
+  <Button>Bottom</Button>
+</Tooltip>
+
+{/* 触发方式 */}
+<Tooltip content="点击触发" trigger="click">
+  <Button>Click</Button>
+</Tooltip>
+
+{/* 自定义内容（ReactNode） */}
+<Tooltip content={<strong>自定义内容</strong>}>
+  <Button>Custom</Button>
+</Tooltip>
+
+{/* 受控模式 */}
+<Tooltip visible={visible} onVisibleChange={setVisible} content="受控提示">
+  <Button>Controlled</Button>
+</Tooltip>
+
+{/* 禁用 */}
+<Tooltip content="禁用" disabled>
+  <Button>Disabled</Button>
+</Tooltip>
+
+{/* 偏移距离 */}
+<Tooltip content="偏移 16px" offset={16}>
+  <Button>Offset</Button>
+</Tooltip>
 ```
 
 ---

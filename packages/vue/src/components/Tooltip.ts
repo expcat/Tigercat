@@ -95,27 +95,16 @@ export const Tooltip = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
 
-    const coerceBoolean = (val: unknown) => {
-      if (val === '') return true
-      return Boolean(val)
-    }
-
     // Internal state for uncontrolled mode
-    const internalVisible = ref(
-      props.visible !== undefined ? coerceBoolean(props.visible) : props.defaultVisible
-    )
-
+    const internalVisible = ref(props.visible ?? props.defaultVisible)
     const isControlled = computed(() => props.visible !== undefined)
 
     watch(
       () => props.visible,
       (next) => {
-        if (next === undefined) return
-        internalVisible.value = coerceBoolean(next)
+        if (next !== undefined) internalVisible.value = next
       }
     )
-
-    const currentVisible = computed(() => internalVisible.value)
 
     // Element refs
     const containerRef = ref<HTMLElement | null>(null)
@@ -132,7 +121,7 @@ export const Tooltip = defineComponent({
     } = useVueFloating({
       referenceRef: triggerRef,
       floatingRef: floatingRef,
-      enabled: currentVisible,
+      enabled: internalVisible,
       placement: props.placement as FloatingPlacement,
       offset: props.offset
     })
@@ -141,117 +130,72 @@ export const Tooltip = defineComponent({
     const setVisible = (nextVisible: boolean) => {
       if (props.disabled && nextVisible) return
 
-      // Update internal state if uncontrolled
       if (!isControlled.value) {
         internalVisible.value = nextVisible
       }
 
-      // Emit events
       emit('update:visible', nextVisible)
       emit('visible-change', nextVisible)
     }
 
-    // Handle trigger click
+    // Trigger event handlers
     const handleTriggerClick = () => {
-      if (props.disabled || props.trigger !== 'click') return
-      setVisible(!currentVisible.value)
+      if (!props.disabled && props.trigger === 'click') setVisible(!internalVisible.value)
     }
 
-    // Handle trigger mouse enter
-    const handleTriggerMouseEnter = () => {
-      if (props.disabled || props.trigger !== 'hover') return
-      setVisible(true)
+    const handleMouseEnter = () => {
+      if (!props.disabled && props.trigger === 'hover') setVisible(true)
     }
 
-    // Handle trigger mouse leave
-    const handleTriggerMouseLeave = () => {
-      if (props.disabled || props.trigger !== 'hover') return
-      setVisible(false)
+    const handleMouseLeave = () => {
+      if (!props.disabled && props.trigger === 'hover') setVisible(false)
     }
 
-    // Handle trigger focus
-    const handleTriggerFocus = () => {
-      if (props.disabled || props.trigger !== 'focus') return
-      setVisible(true)
+    const handleFocus = () => {
+      if (!props.disabled && props.trigger === 'focus') setVisible(true)
     }
 
-    // Handle trigger blur
-    const handleTriggerBlur = () => {
-      if (props.disabled || props.trigger !== 'focus') return
-      setVisible(false)
+    const handleBlur = () => {
+      if (!props.disabled && props.trigger === 'focus') setVisible(false)
     }
 
-    // Click outside handler (only for click trigger)
-    const shouldHandleClickOutside = computed(
-      () => currentVisible.value && props.trigger === 'click'
-    )
+    // Overlay dismiss (click outside + escape) — single watcher like Popover
+    let outsideClickCleanup: (() => void) | undefined
+    let escapeKeyCleanup: (() => void) | undefined
 
-    let cleanupClickOutside: (() => void) | null = null
+    watch([internalVisible, () => props.trigger], ([visible, trigger]) => {
+      outsideClickCleanup?.()
+      escapeKeyCleanup?.()
+      outsideClickCleanup = undefined
+      escapeKeyCleanup = undefined
 
-    watch(
-      shouldHandleClickOutside,
-      (shouldHandle) => {
-        if (cleanupClickOutside) {
-          cleanupClickOutside()
-          cleanupClickOutside = null
-        }
-
-        if (shouldHandle) {
-          cleanupClickOutside = useVueClickOutside({
-            enabled: currentVisible,
-            containerRef,
-            onOutsideClick: () => setVisible(false),
-            defer: true
-          })
-        }
-      },
-      { immediate: true }
-    )
-
-    // Escape key handler
-    let cleanupEscapeKey: (() => void) | null = null
-
-    watch(
-      currentVisible,
-      (visible) => {
-        if (cleanupEscapeKey) {
-          cleanupEscapeKey()
-          cleanupEscapeKey = null
-        }
-
-        if (visible) {
-          cleanupEscapeKey = useVueEscapeKey({
-            enabled: currentVisible,
-            onEscape: () => setVisible(false)
-          })
-        }
-      },
-      { immediate: true }
-    )
+      if (visible && trigger === 'click') {
+        outsideClickCleanup = useVueClickOutside({
+          enabled: internalVisible,
+          containerRef,
+          onOutsideClick: () => setVisible(false),
+          defer: true
+        })
+      }
+      if (visible && trigger !== 'manual') {
+        escapeKeyCleanup = useVueEscapeKey({
+          enabled: internalVisible,
+          onEscape: () => setVisible(false)
+        })
+      }
+    })
 
     onBeforeUnmount(() => {
-      if (cleanupClickOutside) cleanupClickOutside()
-      if (cleanupEscapeKey) cleanupEscapeKey()
+      outsideClickCleanup?.()
+      escapeKeyCleanup?.()
     })
 
-    // Container classes
-    const containerClasses = computed(() => {
-      return classNames(
-        getTooltipContainerClasses(),
-        props.className,
-        coerceClassValue(attrsRecord.class)
-      )
-    })
-
-    // Trigger classes
-    const triggerClasses = computed(() => {
-      return getTooltipTriggerClasses(props.disabled)
-    })
-
-    // Content classes
-    const contentClasses = computed(() => {
-      return getTooltipContentClasses()
-    })
+    // Memoized classes
+    const containerClasses = computed(() =>
+      classNames(getTooltipContainerClasses(), props.className, coerceClassValue(attrsRecord.class))
+    )
+    const triggerClasses = computed(() => getTooltipTriggerClasses(props.disabled))
+    const contentClasses = computed(() => getTooltipContentClasses())
 
     // Floating content styles
     const floatingStyles = computed(() => ({
@@ -264,9 +208,7 @@ export const Tooltip = defineComponent({
 
     return () => {
       const defaultSlot = slots.default?.()
-      if (!defaultSlot || defaultSlot.length === 0) {
-        return null
-      }
+      if (!defaultSlot || defaultSlot.length === 0) return null
 
       const {
         class: _class,
@@ -277,52 +219,14 @@ export const Tooltip = defineComponent({
       const hasTooltipContent = Boolean(props.content || slots.content)
 
       // Build trigger event handlers
-      const triggerHandlers: Record<string, unknown> = {}
-
-      if (props.trigger === 'click') {
-        triggerHandlers.onClick = handleTriggerClick
-      } else if (props.trigger === 'hover') {
-        triggerHandlers.onMouseenter = handleTriggerMouseEnter
-        triggerHandlers.onMouseleave = handleTriggerMouseLeave
-      } else if (props.trigger === 'focus') {
-        triggerHandlers.onFocus = handleTriggerFocus
-        triggerHandlers.onBlur = handleTriggerBlur
-      }
-
-      // Trigger element
-      const trigger = h(
-        'div',
-        {
-          ref: triggerRef,
-          class: triggerClasses.value,
-          'aria-describedby': hasTooltipContent ? tooltipId : undefined,
-          ...triggerHandlers
-        },
-        defaultSlot
-      )
-
-      // Tooltip content (positioned with Floating UI)
-      const content = currentVisible.value
-        ? h(
-            'div',
-            {
-              ref: floatingRef,
-              style: floatingStyles.value,
-              'aria-hidden': false
-            },
-            [
-              h(
-                'div',
-                {
-                  id: tooltipId,
-                  role: 'tooltip',
-                  class: contentClasses.value
-                },
-                slots.content ? slots.content() : props.content
-              )
-            ]
-          )
-        : null
+      const triggerHandlers: Record<string, unknown> =
+        props.trigger === 'click'
+          ? { onClick: handleTriggerClick }
+          : props.trigger === 'hover'
+            ? { onMouseenter: handleMouseEnter, onMouseleave: handleMouseLeave }
+            : props.trigger === 'focus'
+              ? { onFocus: handleFocus, onBlur: handleBlur }
+              : {}
 
       return h(
         'div',
@@ -332,7 +236,41 @@ export const Tooltip = defineComponent({
           class: containerClasses.value,
           style: props.style
         },
-        [trigger, content]
+        [
+          // Trigger element
+          h(
+            'div',
+            {
+              ref: triggerRef,
+              class: triggerClasses.value,
+              'aria-describedby': hasTooltipContent ? tooltipId : undefined,
+              ...triggerHandlers
+            },
+            defaultSlot
+          ),
+          // Tooltip content (positioned with Floating UI)
+          internalVisible.value
+            ? h(
+                'div',
+                {
+                  ref: floatingRef,
+                  style: floatingStyles.value,
+                  'aria-hidden': false
+                },
+                [
+                  h(
+                    'div',
+                    {
+                      id: tooltipId,
+                      role: 'tooltip',
+                      class: contentClasses.value
+                    },
+                    slots.content ? slots.content() : props.content
+                  )
+                ]
+              )
+            : null
+        ]
       )
     }
   }

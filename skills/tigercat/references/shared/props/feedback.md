@@ -204,11 +204,30 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Props
 
-| Prop      | Type                                     | Default   | Vue | React | Description |
-| --------- | ---------------------------------------- | --------- | :-: | :---: | ----------- |
-| content   | `string`                                 | -         |  ✓  |   ✓   | 提示内容    |
-| placement | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'`   |  ✓  |   ✓   | 位置        |
-| trigger   | `'hover' \| 'click' \| 'focus'`          | `'hover'` |  ✓  |   ✓   | 触发方式    |
+| Prop           | Type                                                                                            | Default   | Vue | React | Description              |
+| -------------- | ----------------------------------------------------------------------------------------------- | --------- | :-: | :---: | ------------------------ |
+| visible        | `boolean`                                                                                       | -         |  ✓  |   ✓   | 受控显示状态             |
+| defaultVisible | `boolean`                                                                                       | `false`   |  ✓  |   ✓   | 默认显示（非受控）       |
+| content        | `string` (Vue) / `ReactNode` (React)                                                            | -         |  ✓  |   ✓   | 提示内容                 |
+| placement      | `'top' \| 'top-start' \| 'top-end' \| 'bottom' \| 'bottom-start' \| 'bottom-end' \| 'left' \| 'right'` | `'top'`   |  ✓  |   ✓   | 位置                     |
+| trigger        | `'hover' \| 'click' \| 'focus' \| 'manual'`                                                    | `'hover'` |  ✓  |   ✓   | 触发方式                 |
+| disabled       | `boolean`                                                                                       | `false`   |  ✓  |   ✓   | 禁用                     |
+| offset         | `number`                                                                                        | `8`       |  ✓  |   ✓   | 偏移距离 (px)            |
+| className      | `string`                                                                                        | -         |  ✓  |   ✓   | 自定义 class             |
+
+### Slots (Vue) / Children (React)
+
+| Vue Slot  | React Prop | Description |
+| --------- | ---------- | ----------- |
+| `default` | `children` | 触发元素    |
+| `content` | `content`  | 自定义内容  |
+
+### Events
+
+| Vue Event        | React Prop        | Description  |
+| ---------------- | ----------------- | ------------ |
+| `update:visible` | `onVisibleChange` | 显示状态变化 |
+| `visible-change` | `onVisibleChange` | 显示状态变化 |
 
 ---
 
