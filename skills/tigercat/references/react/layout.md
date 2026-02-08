@@ -130,6 +130,8 @@ const [collapsed, setCollapsed] = useState(false)
 ```tsx
 <Space><Button>A</Button><Button>B</Button></Space>
 <Space direction="vertical" size="lg"><div>1</div><div>2</div></Space>
+<Space size={24}><div>Custom 24px gap</div><div>Item</div></Space>
+<Space align="center"><div className="h-10">Short</div><div className="h-16">Tall</div></Space>
 <Space wrap>{[1,2,3,4,5].map(i => <Button key={i}>{i}</Button>)}</Space>
 ```
 

@@ -1,21 +1,14 @@
 import { defineComponent, computed, h, PropType } from 'vue'
 import {
-  classNames,
-  getSpaceGapSize,
-  getSpaceAlignClass,
-  getSpaceDirectionClass,
-  SPACE_BASE_CLASS,
+  getSpaceClasses,
+  getSpaceStyle,
+  type SpaceProps,
   type SpaceDirection,
   type SpaceSize,
   type SpaceAlign
 } from '@expcat/tigercat-core'
 
-export interface VueSpaceProps {
-  direction?: SpaceDirection
-  size?: SpaceSize
-  align?: SpaceAlign
-  wrap?: boolean
-}
+export type VueSpaceProps = SpaceProps
 
 export const Space = defineComponent({
   name: 'TigerSpace',
@@ -38,33 +31,19 @@ export const Space = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    const gapSize = computed(() => getSpaceGapSize(props.size))
+    const classes = computed(() => getSpaceClasses(props))
+    const style = computed(() => getSpaceStyle(props.size))
 
-    const spaceClasses = computed(() =>
-      classNames(
-        SPACE_BASE_CLASS,
-        getSpaceDirectionClass(props.direction),
-        getSpaceAlignClass(props.align),
-        gapSize.value.class,
-        props.wrap && 'flex-wrap'
-      )
-    )
-
-    const spaceStyle = computed(() =>
-      gapSize.value.style ? { gap: gapSize.value.style } : undefined
-    )
-
-    return () => {
-      return h(
+    return () =>
+      h(
         'div',
         {
           ...attrs,
-          class: [spaceClasses.value, attrs.class],
-          style: [spaceStyle.value, attrs.style]
+          class: [classes.value, attrs.class],
+          style: [style.value, attrs.style]
         },
         slots.default?.()
       )
-    }
   }
 })
 

@@ -2,54 +2,48 @@
  * Space component utility functions
  */
 
-import type { SpaceSize, SpaceAlign, SpaceDirection } from '../types/space'
+import type { SpaceSize, SpaceAlign, SpaceProps } from '../types/space'
+import { classNames } from './class-names'
 
-/**
- * Base class for Space component
- */
-export const SPACE_BASE_CLASS = 'inline-flex'
+const SIZE_CLASS: Record<string, string> = {
+  sm: 'gap-2',
+  md: 'gap-4',
+  lg: 'gap-6'
+}
 
-/**
- * Get gap size class or style based on SpaceSize
- * @param size - Space size (preset or custom number)
- * @returns Object with class or style property
- */
-export function getSpaceGapSize(size: SpaceSize = 'md'): { class?: string; style?: string } {
-  if (typeof size === 'number') {
-    return { style: `${size}px` }
-  }
-
-  const sizeMap: Record<Exclude<SpaceSize, number>, string> = {
-    sm: 'gap-2', // 8px
-    md: 'gap-4', // 16px
-    lg: 'gap-6' // 24px
-  }
-
-  return { class: sizeMap[size] }
+const ALIGN_CLASS: Record<SpaceAlign, string> = {
+  start: 'items-start',
+  end: 'items-end',
+  center: 'items-center',
+  baseline: 'items-baseline',
+  stretch: 'items-stretch'
 }
 
 /**
- * Get alignment class based on SpaceAlign
- * @param align - Alignment option
- * @returns Tailwind alignment class
+ * Build all Tailwind classes for the Space component
+ * @param props - SpaceProps (direction, size, align, wrap)
+ * @param className - Optional extra class string (e.g. React className)
+ * @returns Combined class string
  */
-export function getSpaceAlignClass(align: SpaceAlign = 'start'): string {
-  const alignMap: Record<SpaceAlign, string> = {
-    start: 'items-start',
-    end: 'items-end',
-    center: 'items-center',
-    baseline: 'items-baseline',
-    stretch: 'items-stretch'
-  }
-
-  return alignMap[align]
+export function getSpaceClasses(
+  { direction = 'horizontal', size = 'md', align = 'start', wrap = false }: SpaceProps = {},
+  className?: string
+): string {
+  return classNames(
+    'inline-flex',
+    direction === 'horizontal' ? 'flex-row' : 'flex-col',
+    ALIGN_CLASS[align],
+    typeof size === 'string' ? SIZE_CLASS[size] : undefined,
+    wrap && 'flex-wrap',
+    className
+  )
 }
 
 /**
- * Get flex direction class based on SpaceDirection
- * @param direction - Space direction
- * @returns Tailwind flex direction class
+ * Build inline style for numeric gap size
+ * @param size - SpaceSize (only numeric values produce a style)
+ * @returns Style object with gap property, or undefined
  */
-export function getSpaceDirectionClass(direction: SpaceDirection = 'horizontal'): string {
-  return direction === 'horizontal' ? 'flex-row' : 'flex-col'
+export function getSpaceStyle(size: SpaceSize = 'md'): Record<string, string> | undefined {
+  return typeof size === 'number' ? { gap: `${size}px` } : undefined
 }

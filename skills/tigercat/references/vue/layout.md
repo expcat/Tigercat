@@ -128,6 +128,14 @@ const collapsed = ref(false)
     ><div>1</div>
     <div>2</div></Space
   >
+  <Space :size="24"
+    ><div>Custom 24px gap</div>
+    <div>Item</div></Space
+  >
+  <Space align="center"
+    ><div class="h-10">Short</div>
+    <div class="h-16">Tall</div></Space
+  >
   <Space wrap
     ><Button v-for="i in 10" :key="i">{{ i }}</Button></Space
   >

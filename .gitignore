@@ -33,3 +33,6 @@ coverage/
 # Cache
 .cache/
 .eslintcache
+
+# local settings
+.vscode/

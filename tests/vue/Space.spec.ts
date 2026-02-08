@@ -60,4 +60,16 @@ describe('Space (Vue)', () => {
     expect(el.style.backgroundColor).toBe('red')
     expect(el.style.gap).toBe('20px')
   })
+
+  it('passes through div attributes', () => {
+    const { container } = renderWithProps(
+      Space,
+      { id: 'my-space', 'aria-label': 'space' },
+      { slots: { default: ItemSlot } }
+    )
+
+    const el = container.querySelector('div') as HTMLElement
+    expect(el).toHaveAttribute('id', 'my-space')
+    expect(el).toHaveAttribute('aria-label', 'space')
+  })
 })

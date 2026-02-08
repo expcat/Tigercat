@@ -1,10 +1,7 @@
 import React from 'react'
 import {
-  classNames,
-  getSpaceAlignClass,
-  getSpaceDirectionClass,
-  getSpaceGapSize,
-  SPACE_BASE_CLASS,
+  getSpaceClasses,
+  getSpaceStyle,
   type SpaceProps as CoreSpaceProps
 } from '@expcat/tigercat-core'
 
@@ -25,23 +22,13 @@ export const Space: React.FC<SpaceProps> = ({
   style,
   ...props
 }) => {
-  const gapSize = getSpaceGapSize(size)
-  const mergedStyle: React.CSSProperties | undefined = gapSize.style
-    ? { gap: gapSize.style, ...style }
-    : style
+  const gapStyle = getSpaceStyle(size)
 
   return (
     <div
       {...props}
-      className={classNames(
-        SPACE_BASE_CLASS,
-        getSpaceDirectionClass(direction),
-        getSpaceAlignClass(align),
-        gapSize.class,
-        wrap && 'flex-wrap',
-        className
-      )}
-      style={mergedStyle}>
+      className={getSpaceClasses({ direction, size, align, wrap }, className)}
+      style={gapStyle ? { ...gapStyle, ...style } : style}>
       {children}
     </div>
   )

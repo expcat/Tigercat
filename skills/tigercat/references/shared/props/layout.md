@@ -106,12 +106,12 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Props
 
-| Prop      | Type                                         | Default        | Vue | React | Description |
-| --------- | -------------------------------------------- | -------------- | :-: | :---: | ----------- |
-| direction | `'horizontal' \| 'vertical'`                 | `'horizontal'` |  ✓  |   ✓   | 方向        |
-| size      | `'sm' \| 'md' \| 'lg' \| number`             | `'md'`         |  ✓  |   ✓   | 间距大小    |
-| wrap      | `boolean`                                    | `false`        |  ✓  |   ✓   | 自动换行    |
-| align     | `'start' \| 'center' \| 'end' \| 'baseline'` | -              |  ✓  |   ✓   | 对齐方式    |
+| Prop      | Type                                                      | Default        | Vue | React | Description |
+| --------- | --------------------------------------------------------- | -------------- | :-: | :---: | ----------- |
+| direction | `'horizontal' \| 'vertical'`                              | `'horizontal'` |  ✓  |   ✓   | 方向        |
+| size      | `'sm' \| 'md' \| 'lg' \| number`                          | `'md'`         |  ✓  |   ✓   | 间距大小    |
+| wrap      | `boolean`                                                 | `false`        |  ✓  |   ✓   | 自动换行    |
+| align     | `'start' \| 'end' \| 'center' \| 'baseline' \| 'stretch'` | `'start'`      |  ✓  |   ✓   | 对齐方式    |
 
 ---
 
