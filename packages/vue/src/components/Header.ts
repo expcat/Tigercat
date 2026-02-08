@@ -1,5 +1,10 @@
 import { defineComponent, h, PropType, computed } from 'vue'
-import { classNames, coerceClassValue, layoutHeaderClasses, mergeStyleValues } from '@expcat/tigercat-core'
+import {
+  classNames,
+  coerceClassValue,
+  layoutHeaderClasses,
+  mergeStyleValues
+} from '@expcat/tigercat-core'
 
 export interface VueHeaderProps {
   className?: string
@@ -36,25 +41,24 @@ export const Header = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    const attrsRecord = attrs as Record<string, unknown>
-
     const headerClasses = computed(() =>
-      classNames(layoutHeaderClasses, props.className, coerceClassValue(attrsRecord.class))
+      classNames(
+        layoutHeaderClasses,
+        props.className,
+        coerceClassValue((attrs as Record<string, unknown>).class)
+      )
     )
 
-    return () => {
-      return h(
+    return () =>
+      h(
         'header',
         {
           ...attrs,
           class: headerClasses.value,
-          style: mergeStyleValues(attrsRecord.style, props.style, {
-            height: props.height
-          })
+          style: mergeStyleValues(props.style, { height: props.height })
         },
         slots.default?.()
       )
-    }
   }
 })
 

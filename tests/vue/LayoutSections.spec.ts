@@ -40,9 +40,9 @@ describe('Layout Sections', () => {
     expect(screen.getByText('Footer')).toBeInTheDocument()
   })
 
-  it('Header applies height and forwards aria attrs', () => {
+  it('Header applies height and merges style', () => {
     const { container } = render(Header, {
-      props: { height: '80px' },
+      props: { height: '80px', style: { paddingLeft: '12px' } },
       attrs: { 'aria-label': 'Site header' },
       slots: { default: () => 'Header' }
     })
@@ -50,6 +50,7 @@ describe('Layout Sections', () => {
     const header = container.querySelector('header') as HTMLElement | null
     expect(header).toBeTruthy()
     expect(header?.style.height).toBe('80px')
+    expect(header?.style.paddingLeft).toBe('12px')
     expect(header).toHaveAttribute('aria-label', 'Site header')
   })
 

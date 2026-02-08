@@ -48,13 +48,35 @@ description: React layout components usage
 ## Layout 布局
 
 ```tsx
+import { useState } from 'react'
+import { Layout, Header, Sidebar, Content, Footer } from '@expcat/tigercat-react'
+
+{/* 基础布局 */}
 <Layout>
-  <Layout.Header>Header</Layout.Header>
-  <Layout>
-    <Layout.Sider width="200px">Sidebar</Layout.Sider>
-    <Layout.Content>Main</Layout.Content>
-  </Layout>
-  <Layout.Footer>Footer</Layout.Footer>
+  <Header>Header</Header>
+  <Content>Main</Content>
+  <Footer>Footer</Footer>
+</Layout>
+
+{/* 侧边栏布局 */}
+<Layout>
+  <Header>Header</Header>
+  <div className="flex flex-1">
+    <Sidebar width="256px">Sidebar</Sidebar>
+    <Content>Main</Content>
+  </div>
+  <Footer>Footer</Footer>
+</Layout>
+
+{/* 可折叠侧边栏 */}
+const [collapsed, setCollapsed] = useState(false)
+<Layout>
+  <Header>Header</Header>
+  <div className="flex flex-1">
+    <Sidebar width="256px" collapsed={collapsed}>Sidebar</Sidebar>
+    <Content>Main</Content>
+  </div>
+  <Footer>Footer</Footer>
 </Layout>
 ```
 

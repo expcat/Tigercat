@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Container, Layout, Header, Sidebar, Content, Footer } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
@@ -12,10 +12,27 @@ const basicSnippet = `<Layout>
   <Footer>Footer</Footer>
 </Layout>`
 
+const heightSnippet = `<Layout>
+  <Header height="48px">Header (48px)</Header>
+  <Content>Content</Content>
+  <Footer height="64px">Footer (64px)</Footer>
+</Layout>`
+
 const sidebarSnippet = `<Layout>
   <Header>Header</Header>
   <div className="flex flex-1">
     <Sidebar width="192px">Sidebar</Sidebar>
+    <Content>Content</Content>
+  </div>
+  <Footer>Footer</Footer>
+</Layout>`
+
+const collapsedSnippet = `const [collapsed, setCollapsed] = useState(false)
+
+<Layout>
+  <Header>Header</Header>
+  <div className="flex flex-1">
+    <Sidebar width="192px" collapsed={collapsed}>Sidebar</Sidebar>
     <Content>Content</Content>
   </div>
   <Footer>Footer</Footer>
@@ -34,6 +51,7 @@ const complexSnippet = `<Layout>
 </Layout>`
 
 const LayoutDemo: React.FC = () => {
+  const [collapsed, setCollapsed] = useState(false)
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
@@ -67,12 +85,52 @@ const LayoutDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
+      <DemoBlock
+        title="自定义高度"
+        description="自定义 Header 和 Footer 的高度。"
+        code={heightSnippet}>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <Layout className="border border-gray-300 overflow-hidden min-h-[260px]">
+            <Header height="48px" className="!bg-blue-600 !text-white !p-4">
+              Header (48px)
+            </Header>
+            <Content className="!bg-white !p-4">Content</Content>
+            <Footer height="64px" className="!bg-gray-800 !text-white !p-4">
+              Footer (64px)
+            </Footer>
+          </Layout>
+        </div>
+      </DemoBlock>
+
       <DemoBlock title="侧边栏布局" description="带有侧边栏的布局。" code={sidebarSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Layout className="border border-gray-300 overflow-hidden min-h-[260px]">
             <Header className="!bg-blue-600 !text-white !p-4">Header</Header>
             <div className="flex flex-1">
               <Sidebar width="192px" className="!bg-gray-200 !p-4">
+                Sidebar
+              </Sidebar>
+              <Content className="!bg-white !p-4">Content</Content>
+            </div>
+            <Footer className="!bg-gray-800 !text-white !p-4">Footer</Footer>
+          </Layout>
+        </div>
+      </DemoBlock>
+
+      <DemoBlock
+        title="Sidebar 折叠"
+        description="可折叠的侧边栏，点击按钮切换。"
+        code={collapsedSnippet}>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <button
+            className="mb-4 px-3 py-1 rounded bg-blue-500 text-white text-sm"
+            onClick={() => setCollapsed((c) => !c)}>
+            {collapsed ? '展开侧边栏' : '折叠侧边栏'}
+          </button>
+          <Layout className="border border-gray-300 overflow-hidden min-h-[260px]">
+            <Header className="!bg-blue-600 !text-white !p-4">Header</Header>
+            <div className="flex flex-1">
+              <Sidebar width="192px" collapsed={collapsed} className="!bg-gray-200 !p-4">
                 Sidebar
               </Sidebar>
               <Content className="!bg-white !p-4">Content</Content>

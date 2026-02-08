@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { Container, Layout, Header, Sidebar, Content, Footer } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
+
+const collapsed = ref(false)
 
 const containerSnippet = `<Container maxWidth="lg">
   <div>这里是 Container 内容区域</div>
@@ -12,10 +15,25 @@ const basicSnippet = `<Layout>
   <Footer>Footer</Footer>
 </Layout>`
 
+const heightSnippet = `<Layout>
+  <Header height="48px">Header (48px)</Header>
+  <Content>Content</Content>
+  <Footer height="64px">Footer (64px)</Footer>
+</Layout>`
+
 const sidebarSnippet = `<Layout>
   <Header>Header</Header>
   <div class="flex flex-1">
     <Sidebar width="192px">Sidebar</Sidebar>
+    <Content>Content</Content>
+  </div>
+  <Footer>Footer</Footer>
+</Layout>`
+
+const collapsedSnippet = `<Layout>
+  <Header>Header</Header>
+  <div class="flex flex-1">
+    <Sidebar width="192px" :collapsed="collapsed">Sidebar</Sidebar>
     <Content>Content</Content>
   </div>
   <Footer>Footer</Footer>
@@ -68,6 +86,18 @@ const complexSnippet = `<Layout>
       </div>
     </DemoBlock>
 
+    <DemoBlock title="自定义高度"
+               description="自定义 Header 和 Footer 的高度。"
+               :code="heightSnippet">
+      <div class="p-6 bg-gray-50 rounded-lg">
+        <Layout class-name="border border-gray-300 overflow-hidden min-h-[260px]">
+          <Header height="48px" class-name="!bg-blue-600 !text-white !p-4">Header (48px)</Header>
+          <Content class-name="!bg-white !p-4 min-h-[200px]">Content</Content>
+          <Footer height="64px" class-name="!bg-gray-800 !text-white !p-4">Footer (64px)</Footer>
+        </Layout>
+      </div>
+    </DemoBlock>
+
     <DemoBlock title="侧边栏布局"
                description="带有侧边栏的布局。"
                :code="sidebarSnippet">
@@ -76,6 +106,27 @@ const complexSnippet = `<Layout>
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
           <div class="flex flex-1">
             <Sidebar width="192px"
+                     class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
+            <Content class-name="!bg-white !p-4 min-h-[200px]">Content</Content>
+          </div>
+          <Footer class-name="!bg-gray-800 !text-white !p-4">Footer</Footer>
+        </Layout>
+      </div>
+    </DemoBlock>
+
+    <DemoBlock title="Sidebar 折叠"
+               description="可折叠的侧边栏，点击按钮切换。"
+               :code="collapsedSnippet">
+      <div class="p-6 bg-gray-50 rounded-lg">
+        <button class="mb-4 px-3 py-1 rounded bg-blue-500 text-white text-sm"
+                @click="collapsed = !collapsed">
+          {{ collapsed ? '展开侧边栏' : '折叠侧边栏' }}
+        </button>
+        <Layout class-name="border border-gray-300 overflow-hidden min-h-[260px]">
+          <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
+          <div class="flex flex-1">
+            <Sidebar width="192px"
+                     :collapsed="collapsed"
                      class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
             <Content class-name="!bg-white !p-4 min-h-[200px]">Content</Content>
           </div>

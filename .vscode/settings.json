@@ -31,6 +31,10 @@
   "vitest.enable": true,
   "vitest.commandLine": "pnpm test",
   "chat.tools.terminal.autoApprove": {
-    "pnpm": true
+    "pnpm": true,
+    "/^set -o pipefail && pnpm build 2>&1 \\| tail -n 40$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
   }
 }

@@ -50,29 +50,29 @@ export const Sidebar = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    const attrsRecord = attrs as Record<string, unknown>
-
     const sidebarClasses = computed(() =>
-      classNames(layoutSidebarClasses, props.className, coerceClassValue(attrsRecord.class))
+      classNames(
+        layoutSidebarClasses,
+        props.className,
+        coerceClassValue((attrs as Record<string, unknown>).class)
+      )
     )
 
     const sidebarStyle = computed(() => ({
       width: props.collapsed ? '0px' : props.width,
-      minWidth: props.collapsed ? '0px' : props.width,
-      overflow: 'hidden'
+      minWidth: props.collapsed ? '0px' : props.width
     }))
 
-    return () => {
-      return h(
+    return () =>
+      h(
         'aside',
         {
           ...attrs,
           class: sidebarClasses.value,
-          style: mergeStyleValues(attrsRecord.style, props.style, sidebarStyle.value)
+          style: mergeStyleValues(props.style, sidebarStyle.value)
         },
         !props.collapsed && slots.default?.()
       )
-    }
   }
 })
 

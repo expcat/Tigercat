@@ -42,7 +42,9 @@ description: Vue 3 layout components usage
 ```vue
 <template>
   <Grid :cols="3" gap="16px">
-    <div>Col 1</div><div>Col 2</div><div>Col 3</div>
+    <div>Col 1</div>
+    <div>Col 2</div>
+    <div>Col 3</div>
   </Grid>
   <Grid :cols="{ xs: 1, sm: 2, md: 3, lg: 4 }" gap="16px">
     <div v-for="i in 8" :key="i">Item {{ i }}</div>
@@ -55,14 +57,39 @@ description: Vue 3 layout components usage
 ## Layout 布局
 
 ```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { Layout, Header, Sidebar, Content, Footer } from '@expcat/tigercat-vue'
+
+const collapsed = ref(false)
+</script>
+
 <template>
+  <!-- 基础布局 -->
   <Layout>
-    <Layout.Header>Header</Layout.Header>
-    <Layout>
-      <Layout.Sider width="200px">Sidebar</Layout.Sider>
-      <Layout.Content>Main</Layout.Content>
-    </Layout>
-    <Layout.Footer>Footer</Layout.Footer>
+    <Header>Header</Header>
+    <Content>Main</Content>
+    <Footer>Footer</Footer>
+  </Layout>
+
+  <!-- 侧边栏布局 -->
+  <Layout>
+    <Header>Header</Header>
+    <div class="flex flex-1">
+      <Sidebar width="256px">Sidebar</Sidebar>
+      <Content>Main</Content>
+    </div>
+    <Footer>Footer</Footer>
+  </Layout>
+
+  <!-- 可折叠侧边栏 -->
+  <Layout>
+    <Header>Header</Header>
+    <div class="flex flex-1">
+      <Sidebar width="256px" :collapsed="collapsed">Sidebar</Sidebar>
+      <Content>Main</Content>
+    </div>
+    <Footer>Footer</Footer>
   </Layout>
 </template>
 ```
@@ -74,8 +101,13 @@ description: Vue 3 layout components usage
 ```vue
 <template>
   <Space><Button>A</Button><Button>B</Button></Space>
-  <Space direction="vertical" size="lg"><div>1</div><div>2</div></Space>
-  <Space wrap><Button v-for="i in 10" :key="i">{{ i }}</Button></Space>
+  <Space direction="vertical" size="lg"
+    ><div>1</div>
+    <div>2</div></Space
+  >
+  <Space wrap
+    ><Button v-for="i in 10" :key="i">{{ i }}</Button></Space
+  >
 </template>
 ```
 

@@ -55,17 +55,37 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Layout Props
 
-| Prop | Type                         | Default      | Vue | React | Description |
-| ---- | ---------------------------- | ------------ | :-: | :---: | ----------- |
-| mode | `'horizontal' \| 'vertical'` | `'vertical'` |  ✓  |   ✓   | 布局模式    |
+| Prop      | Type     | Default | Vue | React | Description      |
+| --------- | -------- | ------- | :-: | :---: | ---------------- |
+| className | `string` | -       |  ✓  |   ✓   | 自定义 CSS class |
 
-### Sider Props
+### Header Props
 
-| Prop           | Type               | Default | Vue | React | Description |
-| -------------- | ------------------ | ------- | :-: | :---: | ----------- |
-| width          | `string \| number` | `200`   |  ✓  |   ✓   | 宽度        |
-| collapsed      | `boolean`          | `false` |  ✓  |   ✓   | 折叠状态    |
-| collapsedWidth | `number`           | `80`    |  ✓  |   ✓   | 折叠宽度    |
+| Prop      | Type     | Default  | Vue | React | Description      |
+| --------- | -------- | -------- | :-: | :---: | ---------------- |
+| className | `string` | -        |  ✓  |   ✓   | 自定义 CSS class |
+| height    | `string` | `'64px'` |  ✓  |   ✓   | 头部高度         |
+
+### Sidebar Props
+
+| Prop      | Type      | Default   | Vue | React | Description      |
+| --------- | --------- | --------- | :-: | :---: | ---------------- |
+| className | `string`  | -         |  ✓  |   ✓   | 自定义 CSS class |
+| width     | `string`  | `'256px'` |  ✓  |   ✓   | 侧边栏宽度       |
+| collapsed | `boolean` | `false`   |  ✓  |   ✓   | 是否折叠         |
+
+### Content Props
+
+| Prop      | Type     | Default | Vue | React | Description      |
+| --------- | -------- | ------- | :-: | :---: | ---------------- |
+| className | `string` | -       |  ✓  |   ✓   | 自定义 CSS class |
+
+### Footer Props
+
+| Prop      | Type     | Default  | Vue | React | Description      |
+| --------- | -------- | -------- | :-: | :---: | ---------------- |
+| className | `string` | -        |  ✓  |   ✓   | 自定义 CSS class |
+| height    | `string` | `'auto'` |  ✓  |   ✓   | 底部高度         |
 
 ---
 

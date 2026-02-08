@@ -1,10 +1,5 @@
 import { defineComponent, h, PropType, computed } from 'vue'
-import {
-  classNames,
-  coerceClassValue,
-  layoutContentClasses,
-  mergeStyleValues
-} from '@expcat/tigercat-core'
+import { classNames, coerceClassValue, layoutContentClasses } from '@expcat/tigercat-core'
 
 export interface VueContentProps {
   className?: string
@@ -32,23 +27,16 @@ export const Content = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    const attrsRecord = attrs as Record<string, unknown>
-
     const contentClasses = computed(() =>
-      classNames(layoutContentClasses, props.className, coerceClassValue(attrsRecord.class))
+      classNames(
+        layoutContentClasses,
+        props.className,
+        coerceClassValue((attrs as Record<string, unknown>).class)
+      )
     )
 
-    return () => {
-      return h(
-        'main',
-        {
-          ...attrs,
-          class: contentClasses.value,
-          style: mergeStyleValues(attrsRecord.style, props.style)
-        },
-        slots.default?.()
-      )
-    }
+    return () =>
+      h('main', { ...attrs, class: contentClasses.value, style: props.style }, slots.default?.())
   }
 })
 

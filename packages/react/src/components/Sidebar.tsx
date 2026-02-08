@@ -22,8 +22,7 @@ export const Sidebar: React.FC<ReactSidebarProps> = ({
   const sidebarStyle: React.CSSProperties = {
     ...style,
     width: collapsed ? '0px' : width,
-    minWidth: collapsed ? '0px' : width,
-    overflow: 'hidden'
+    minWidth: collapsed ? '0px' : width
   }
 
   return (
