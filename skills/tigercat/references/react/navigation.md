@@ -61,8 +61,60 @@ import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react'
 ## Dropdown 下拉菜单
 
 ```tsx
-<Dropdown items={[{ key: 'edit', label: 'Edit' }, { key: 'delete', label: 'Delete' }]} onSelect={handleSelect}>
-  <Button>Actions</Button>
+import { useState } from 'react'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-react'
+
+// 基本用法（悬浮触发）
+<Dropdown>
+  <Button>操作</Button>
+  <DropdownMenu>
+    <DropdownItem onClick={() => console.log('edit')}>编辑</DropdownItem>
+    <DropdownItem onClick={() => console.log('copy')}>复制</DropdownItem>
+    <DropdownItem divided onClick={() => console.log('delete')}>删除</DropdownItem>
+  </DropdownMenu>
+</Dropdown>
+
+// 点击触发
+<Dropdown trigger="click">
+  <Button>点击打开</Button>
+  <DropdownMenu>
+    <DropdownItem>菜单项 1</DropdownItem>
+    <DropdownItem>菜单项 2</DropdownItem>
+  </DropdownMenu>
+</Dropdown>
+
+// 受控模式
+const [visible, setVisible] = useState(false)
+<Dropdown visible={visible} onVisibleChange={setVisible}>
+  <Button>受控</Button>
+  <DropdownMenu>
+    <DropdownItem>菜单项 1</DropdownItem>
+  </DropdownMenu>
+</Dropdown>
+
+// 无箭头
+<Dropdown showArrow={false}>
+  <Button>无箭头</Button>
+  <DropdownMenu>
+    <DropdownItem>菜单项 1</DropdownItem>
+  </DropdownMenu>
+</Dropdown>
+
+// 禁用
+<Dropdown disabled>
+  <Button disabled>禁用</Button>
+  <DropdownMenu>
+    <DropdownItem>菜单项 1</DropdownItem>
+  </DropdownMenu>
+</Dropdown>
+
+// 点击不关闭
+<Dropdown closeOnClick={false} trigger="click">
+  <Button>点击不关闭</Button>
+  <DropdownMenu>
+    <DropdownItem>多选项 1</DropdownItem>
+    <DropdownItem>多选项 2</DropdownItem>
+  </DropdownMenu>
 </Dropdown>
 ```
 

@@ -164,6 +164,32 @@ const variantSnippet = `<div className="flex gap-4">
   </Dropdown>
 </div>`
 
+const noArrowSnippet = `<Dropdown showArrow={false}>
+  <Button>无箭头指示器</Button>
+  <DropdownMenu>
+    <DropdownItem>菜单项 1</DropdownItem>
+    <DropdownItem>菜单项 2</DropdownItem>
+    <DropdownItem>菜单项 3</DropdownItem>
+  </DropdownMenu>
+</Dropdown>`
+
+const closeOnClickSnippet = `<Dropdown closeOnClick={false} trigger="click">
+  <Button>点击不关闭</Button>
+  <DropdownMenu>
+    <DropdownItem>多选项 1</DropdownItem>
+    <DropdownItem>多选项 2</DropdownItem>
+    <DropdownItem>多选项 3</DropdownItem>
+  </DropdownMenu>
+</Dropdown>`
+
+const defaultVisibleSnippet = `<Dropdown defaultVisible trigger="click">
+  <Button>默认展开</Button>
+  <DropdownMenu>
+    <DropdownItem>菜单项 1</DropdownItem>
+    <DropdownItem>菜单项 2</DropdownItem>
+  </DropdownMenu>
+</Dropdown>`
+
 export default function DropdownDemo() {
   const [visible1, setVisible1] = useState(false)
 
@@ -384,6 +410,50 @@ export default function DropdownDemo() {
             </DropdownMenu>
           </Dropdown>
         </div>
+      </DemoBlock>
+
+      {/* 无箭头 */}
+      <DemoBlock
+        title="无箭头指示器"
+        description="通过 showArrow={false} 隐藏下拉箭头。"
+        code={noArrowSnippet}>
+        <Dropdown showArrow={false}>
+          <Button>无箭头指示器</Button>
+          <DropdownMenu>
+            <DropdownItem>菜单项 1</DropdownItem>
+            <DropdownItem>菜单项 2</DropdownItem>
+            <DropdownItem>菜单项 3</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      </DemoBlock>
+
+      {/* 点击不关闭 */}
+      <DemoBlock
+        title="点击不关闭"
+        description="设置 closeOnClick={false}，点击菜单项不会自动关闭。"
+        code={closeOnClickSnippet}>
+        <Dropdown closeOnClick={false} trigger="click">
+          <Button>点击不关闭</Button>
+          <DropdownMenu>
+            <DropdownItem>多选项 1</DropdownItem>
+            <DropdownItem>多选项 2</DropdownItem>
+            <DropdownItem>多选项 3</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      </DemoBlock>
+
+      {/* 默认展开 */}
+      <DemoBlock
+        title="默认展开"
+        description="通过 defaultVisible 设置初始展开状态。"
+        code={defaultVisibleSnippet}>
+        <Dropdown defaultVisible trigger="click">
+          <Button>默认展开</Button>
+          <DropdownMenu>
+            <DropdownItem>菜单项 1</DropdownItem>
+            <DropdownItem>菜单项 2</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
       </DemoBlock>
     </div>
   )

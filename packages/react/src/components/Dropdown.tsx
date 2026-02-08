@@ -3,7 +3,11 @@ import {
   classNames,
   getDropdownContainerClasses,
   getDropdownTriggerClasses,
+  getDropdownChevronClasses,
   getTransformOrigin,
+  injectDropdownStyles,
+  DROPDOWN_CHEVRON_PATH,
+  DROPDOWN_ENTER_CLASS,
   type DropdownProps as CoreDropdownProps,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
@@ -21,30 +25,12 @@ export const DropdownContext = createContext<DropdownContextValue | null>(null)
 
 export interface DropdownProps
   extends
-    Omit<CoreDropdownProps, 'style' | 'placement'>,
+    Omit<CoreDropdownProps, 'style'>,
     Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
   style?: React.CSSProperties
-
-  /**
-   * Dropdown placement relative to trigger
-   * @default 'bottom-start'
-   */
   placement?: FloatingPlacement
-
-  /**
-   * Offset distance from trigger element
-   * @default 4
-   */
   offset?: number
-
-  /**
-   * Visibility change event handler
-   */
   onVisibleChange?: (visible: boolean) => void
-
-  /**
-   * Dropdown content (trigger and menu)
-   */
   children?: React.ReactNode
 }
 
@@ -56,11 +42,11 @@ export const Dropdown: React.FC<DropdownProps> = ({
   visible: controlledVisible,
   defaultVisible = false,
   closeOnClick = true,
+  showArrow = true,
   className,
   style,
   onVisibleChange,
   children,
-  onKeyDown,
   ...divProps
 }) => {
   // Internal state for uncontrolled mode
@@ -74,6 +60,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
   const triggerRef = useRef<HTMLDivElement>(null)
   const floatingRef = useRef<HTMLDivElement>(null)
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Inject animation styles once
+  useEffect(() => { injectDropdownStyles() }, [])
 
   // Handle visibility change
   const setVisible = useCallback(
@@ -160,15 +149,14 @@ export const Dropdown: React.FC<DropdownProps> = ({
     }
   }, [])
 
-  const containerClasses = classNames(
-    getDropdownContainerClasses(),
-    'tiger-dropdown-container',
-    className
+  const containerClasses = useMemo(
+    () => classNames(getDropdownContainerClasses(), 'tiger-dropdown-container', className),
+    [className]
   )
 
-  const triggerClasses = getDropdownTriggerClasses(disabled)
+  const triggerClasses = useMemo(() => getDropdownTriggerClasses(disabled), [disabled])
 
-  const menuWrapperClasses = 'absolute z-50'
+  const menuWrapperClasses = classNames('absolute z-50', DROPDOWN_ENTER_CLASS)
 
   const menuWrapperStyles = useMemo<React.CSSProperties>(
     () => ({
@@ -180,10 +168,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
     [x, y, placement]
   )
 
-  const contextValue: DropdownContextValue = {
-    closeOnClick,
-    handleItemClick
-  }
+  const contextValue = useMemo<DropdownContextValue>(
+    () => ({ closeOnClick, handleItemClick }),
+    [closeOnClick, handleItemClick]
+  )
 
   // Parse children to find trigger and menu
   const childrenArray = React.Children.toArray(children)
@@ -206,9 +194,19 @@ export const Dropdown: React.FC<DropdownProps> = ({
     }
   })
 
-  const handleContainerKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    onKeyDown?.(event)
-  }
+  const chevronNode = showArrow ? (
+    <svg
+      className={getDropdownChevronClasses(visible)}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true">
+      <path d={DROPDOWN_CHEVRON_PATH} />
+    </svg>
+  ) : null
 
   return (
     <DropdownContext.Provider value={contextValue}>
@@ -216,9 +214,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         ref={containerRef}
         className={containerClasses}
         style={style}
-        onKeyDown={handleContainerKeyDown}
         {...divProps}>
-        {/* Trigger element */}
         <div
           ref={triggerRef}
           className={triggerClasses}
@@ -228,9 +224,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
           aria-haspopup="menu"
           aria-expanded={visible}>
           {triggerElement}
+          {chevronNode}
         </div>
-
-        {/* Dropdown menu with Floating UI positioning */}
         <div
           ref={floatingRef}
           className={menuWrapperClasses}

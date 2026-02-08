@@ -6,6 +6,7 @@ import {
   PropType,
   h,
   onBeforeUnmount,
+  onMounted,
   VNode,
   watch
 } from 'vue'
@@ -15,7 +16,11 @@ import {
   mergeStyleValues,
   getDropdownContainerClasses,
   getDropdownTriggerClasses,
+  getDropdownChevronClasses,
   getTransformOrigin,
+  injectDropdownStyles,
+  DROPDOWN_CHEVRON_PATH,
+  DROPDOWN_ENTER_CLASS,
   type DropdownTrigger,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
@@ -33,7 +38,7 @@ export interface DropdownContext {
   handleItemClick: () => void
 }
 
-export interface VueDropdownProps extends Omit<CoreDropdownProps, 'placement'> {
+export interface VueDropdownProps extends CoreDropdownProps {
   /**
    * Dropdown placement relative to trigger
    * @default 'bottom-start'
@@ -106,6 +111,14 @@ export const Dropdown = defineComponent({
       default: true
     },
     /**
+     * Whether to show the dropdown arrow/chevron indicator
+     * @default true
+     */
+    showArrow: {
+      type: Boolean,
+      default: true
+    },
+    /**
      * Additional CSS classes
      */
     className: {
@@ -123,70 +136,49 @@ export const Dropdown = defineComponent({
     const attrsClass = (attrsRecord as { class?: unknown }).class
     const attrsStyle = (attrsRecord as { style?: unknown }).style
 
+    // Inject animation styles
+    onMounted(() => injectDropdownStyles())
+
     // Internal state for uncontrolled mode
     const internalVisible = ref(props.defaultVisible)
 
     // Computed visible state (controlled or uncontrolled)
-    const currentVisible = computed(() => {
-      return props.visible !== undefined ? props.visible : internalVisible.value
-    })
+    const currentVisible = computed(() =>
+      props.visible !== undefined ? props.visible : internalVisible.value
+    )
 
     // Refs for Floating UI positioning
     const containerRef = ref<HTMLElement | null>(null)
     const triggerRef = ref<HTMLElement | null>(null)
     const floatingRef = ref<HTMLElement | null>(null)
 
-    // Handle visibility change
     const setVisible = (visible: boolean) => {
       if (props.disabled && visible) return
-
-      // Update internal state if uncontrolled
       if (props.visible === undefined) {
         internalVisible.value = visible
       }
-
-      // Emit events
       emit('update:visible', visible)
       emit('visible-change', visible)
     }
 
-    // Handle item click (close dropdown)
     const handleItemClick = () => {
-      if (props.closeOnClick) {
-        setVisible(false)
-      }
+      if (props.closeOnClick) setVisible(false)
     }
 
-    // Hover timer for delayed open/close
     let hoverTimer: ReturnType<typeof setTimeout> | null = null
 
-    // Handle mouse enter (for hover trigger)
     const handleMouseEnter = () => {
       if (props.trigger !== 'hover') return
-
-      if (hoverTimer) {
-        clearTimeout(hoverTimer)
-      }
-
-      hoverTimer = setTimeout(() => {
-        setVisible(true)
-      }, 100)
+      if (hoverTimer) clearTimeout(hoverTimer)
+      hoverTimer = setTimeout(() => setVisible(true), 100)
     }
 
-    // Handle mouse leave (for hover trigger)
     const handleMouseLeave = () => {
       if (props.trigger !== 'hover') return
-
-      if (hoverTimer) {
-        clearTimeout(hoverTimer)
-      }
-
-      hoverTimer = setTimeout(() => {
-        setVisible(false)
-      }, 150)
+      if (hoverTimer) clearTimeout(hoverTimer)
+      hoverTimer = setTimeout(() => setVisible(false), 150)
     }
 
-    // Handle click (for click trigger)
     const handleClick = () => {
       if (props.trigger !== 'click') return
       setVisible(!currentVisible.value)
@@ -205,18 +197,14 @@ export const Dropdown = defineComponent({
       offset: props.offset
     })
 
-    // Computed for whether click outside should be enabled
     const clickOutsideEnabled = computed(() => currentVisible.value && props.trigger === 'click')
 
-    // Handle click outside for click trigger mode
     let cleanupClickOutside: (() => void) | null = null
     watch(
       clickOutsideEnabled,
       (enabled) => {
-        if (cleanupClickOutside) {
-          cleanupClickOutside()
-          cleanupClickOutside = null
-        }
+        cleanupClickOutside?.()
+        cleanupClickOutside = null
         if (enabled) {
           cleanupClickOutside = useVueClickOutside({
             enabled: currentVisible,
@@ -229,15 +217,12 @@ export const Dropdown = defineComponent({
       { immediate: true }
     )
 
-    // Handle escape key
     let cleanupEscapeKey: (() => void) | null = null
     watch(
       currentVisible,
       (visible) => {
-        if (cleanupEscapeKey) {
-          cleanupEscapeKey()
-          cleanupEscapeKey = null
-        }
+        cleanupEscapeKey?.()
+        cleanupEscapeKey = null
         if (visible) {
           cleanupEscapeKey = useVueEscapeKey({
             enabled: currentVisible,
@@ -249,38 +234,26 @@ export const Dropdown = defineComponent({
     )
 
     onBeforeUnmount(() => {
-      if (hoverTimer) {
-        clearTimeout(hoverTimer)
-      }
-      if (cleanupClickOutside) {
-        cleanupClickOutside()
-      }
-      if (cleanupEscapeKey) {
-        cleanupEscapeKey()
-      }
+      if (hoverTimer) clearTimeout(hoverTimer)
+      cleanupClickOutside?.()
+      cleanupEscapeKey?.()
     })
 
-    // Container classes
-    const containerClasses = computed(() => {
-      return classNames(
+    const containerClasses = computed(() =>
+      classNames(
         getDropdownContainerClasses(),
         'tiger-dropdown-container',
         props.className,
         coerceClassValue(attrsClass)
       )
-    })
+    )
 
     const mergedStyle = computed(() => mergeStyleValues(attrsStyle, props.style))
 
-    // Trigger classes
-    const triggerClasses = computed(() => {
-      return getDropdownTriggerClasses(props.disabled)
-    })
+    const triggerClasses = computed(() => getDropdownTriggerClasses(props.disabled))
 
-    // Menu wrapper classes using Floating UI positioning
-    const menuWrapperClasses = computed(() => 'absolute z-50')
+    const menuWrapperClasses = classNames('absolute z-50', DROPDOWN_ENTER_CLASS)
 
-    // Menu wrapper styles using Floating UI positioning
     const menuWrapperStyles = computed(() => ({
       position: 'absolute' as const,
       left: `${x.value}px`,
@@ -296,11 +269,8 @@ export const Dropdown = defineComponent({
 
     return () => {
       const defaultSlot = slots.default?.()
-      if (!defaultSlot || defaultSlot.length === 0) {
-        return null
-      }
+      if (!defaultSlot || defaultSlot.length === 0) return null
 
-      // Find trigger and menu from slots
       let triggerNode: VNode | null = null
       let menuNode: VNode | null = null
 
@@ -309,12 +279,26 @@ export const Dropdown = defineComponent({
           menuNode = node
           return
         }
-
-        // Default to trigger if not DropdownMenu
         triggerNode = node
       })
 
-      // Trigger element with event handlers and ref
+      const chevronNode = props.showArrow
+        ? h(
+            'svg',
+            {
+              class: getDropdownChevronClasses(currentVisible.value),
+              viewBox: '0 0 24 24',
+              fill: 'none',
+              stroke: 'currentColor',
+              'stroke-width': '2',
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round',
+              'aria-hidden': 'true'
+            },
+            [h('path', { d: DROPDOWN_CHEVRON_PATH })]
+          )
+        : null
+
       const trigger = triggerNode
         ? h(
             'div',
@@ -327,17 +311,16 @@ export const Dropdown = defineComponent({
               'aria-haspopup': 'menu',
               'aria-expanded': currentVisible.value
             },
-            triggerNode
+            [triggerNode, chevronNode]
           )
         : null
 
-      // Dropdown menu with Floating UI positioning
       const menu = menuNode
         ? h(
             'div',
             {
               ref: floatingRef,
-              class: menuWrapperClasses.value,
+              class: menuWrapperClasses,
               style: menuWrapperStyles.value,
               onMouseenter: handleMouseEnter,
               onMouseleave: handleMouseLeave,

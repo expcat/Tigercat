@@ -65,7 +65,7 @@ describe('Dropdown', () => {
     )
 
     const trigger = container.querySelector('.tiger-dropdown-trigger')
-    expect(trigger).toHaveClass('cursor-not-allowed', 'opacity-50')
+    expect(trigger).toHaveClass('cursor-not-allowed', 'opacity-50', 'pointer-events-none')
 
     await fireEvent.click(screen.getByText('Trigger'))
     // Floating UI uses `hidden` attribute now
@@ -159,5 +159,51 @@ describe('Dropdown', () => {
     expect(wrapper).not.toHaveAttribute('hidden')
     await fireEvent.click(screen.getByText('Disabled Item'))
     expect(wrapper).not.toHaveAttribute('hidden')
+  })
+
+  it('renders chevron indicator by default', () => {
+    const { container } = render(
+      <Dropdown>
+        <button>Trigger</button>
+        <DropdownMenu>
+          <DropdownItem>Item 1</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+    )
+
+    const chevron = container.querySelector('.tiger-dropdown-chevron')
+    expect(chevron).toBeInTheDocument()
+    expect(chevron?.tagName.toLowerCase()).toBe('svg')
+  })
+
+  it('hides chevron when showArrow is false', () => {
+    const { container } = render(
+      <Dropdown showArrow={false}>
+        <button>Trigger</button>
+        <DropdownMenu>
+          <DropdownItem>Item 1</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+    )
+
+    const chevron = container.querySelector('.tiger-dropdown-chevron')
+    expect(chevron).not.toBeInTheDocument()
+  })
+
+  it('rotates chevron when dropdown is open', async () => {
+    const { container } = render(
+      <Dropdown trigger="click">
+        <button>Trigger</button>
+        <DropdownMenu>
+          <DropdownItem>Item 1</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+    )
+
+    const chevron = container.querySelector('.tiger-dropdown-chevron')
+    expect(chevron).not.toHaveClass('rotate-180')
+
+    await fireEvent.click(screen.getByText('Trigger'))
+    expect(chevron).toHaveClass('rotate-180')
   })
 })

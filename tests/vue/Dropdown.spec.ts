@@ -97,4 +97,52 @@ describe('Dropdown', () => {
     await fireEvent.keyDown(document, { key: 'Escape' })
     expect(wrapper).toHaveAttribute('hidden')
   })
+
+  it('renders chevron indicator by default', () => {
+    const { container } = render(Dropdown, {
+      slots: {
+        default: () => [
+          h('button', null, 'Trigger'),
+          h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+        ]
+      }
+    })
+
+    const chevron = container.querySelector('.tiger-dropdown-chevron')
+    expect(chevron).toBeInTheDocument()
+    expect(chevron?.tagName.toLowerCase()).toBe('svg')
+  })
+
+  it('hides chevron when showArrow is false', () => {
+    const { container } = render(Dropdown, {
+      props: { showArrow: false },
+      slots: {
+        default: () => [
+          h('button', null, 'Trigger'),
+          h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+        ]
+      }
+    })
+
+    const chevron = container.querySelector('.tiger-dropdown-chevron')
+    expect(chevron).not.toBeInTheDocument()
+  })
+
+  it('rotates chevron when dropdown is open', async () => {
+    const { container } = render(Dropdown, {
+      props: { trigger: 'click' },
+      slots: {
+        default: () => [
+          h('button', null, 'Trigger'),
+          h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+        ]
+      }
+    })
+
+    const chevron = container.querySelector('.tiger-dropdown-chevron')
+    expect(chevron).not.toHaveClass('rotate-180')
+
+    await fireEvent.click(screen.getByText('Trigger'))
+    expect(chevron).toHaveClass('rotate-180')
+  })
 })

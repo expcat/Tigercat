@@ -2,27 +2,18 @@
  * Dropdown component types and interfaces
  */
 
+import type { FloatingPlacement } from '../utils/floating'
+
 /**
  * Dropdown trigger mode - determines how the dropdown is opened
  */
 export type DropdownTrigger = 'click' | 'hover'
 
 /**
- * Dropdown placement - position relative to the trigger element
+ * @deprecated Use `FloatingPlacement` from floating utils instead.
+ * Kept for backward compatibility with popover/tooltip/popconfirm types.
  */
-export type DropdownPlacement =
-  | 'bottom-start'
-  | 'bottom'
-  | 'bottom-end'
-  | 'top-start'
-  | 'top'
-  | 'top-end'
-  | 'left-start'
-  | 'left'
-  | 'left-end'
-  | 'right-start'
-  | 'right'
-  | 'right-end'
+export type DropdownPlacement = FloatingPlacement
 
 /**
  * Base dropdown props interface
@@ -33,11 +24,6 @@ export interface DropdownProps {
    * @default 'hover'
    */
   trigger?: DropdownTrigger
-  /**
-   * Dropdown placement relative to trigger
-   * @default 'bottom-start'
-   */
-  placement?: DropdownPlacement
   /**
    * Whether the dropdown is disabled
    * @default false
@@ -57,6 +43,11 @@ export interface DropdownProps {
    * @default true
    */
   closeOnClick?: boolean
+  /**
+   * Whether to show the dropdown arrow/chevron indicator
+   * @default true
+   */
+  showArrow?: boolean
   /**
    * Additional CSS classes
    */

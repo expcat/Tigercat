@@ -73,10 +73,74 @@ const homeIcon = h('svg', { class: 'w-4 h-4', fill: 'currentColor', viewBox: '0 
 
 ```vue
 <template>
-  <Dropdown :items="[{ key: 'edit', label: 'Edit' }, { key: 'delete', label: 'Delete' }]" @select="onSelect">
-    <Button>Actions</Button>
+  <!-- 基本用法（悬浮触发） -->
+  <Dropdown>
+    <Button>操作</Button>
+    <DropdownMenu>
+      <DropdownItem @click="handleEdit">编辑</DropdownItem>
+      <DropdownItem @click="handleCopy">复制</DropdownItem>
+      <DropdownItem divided @click="handleDelete">删除</DropdownItem>
+    </DropdownMenu>
+  </Dropdown>
+
+  <!-- 点击触发 -->
+  <Dropdown trigger="click">
+    <Button>点击打开</Button>
+    <DropdownMenu>
+      <DropdownItem>菜单项 1</DropdownItem>
+      <DropdownItem>菜单项 2</DropdownItem>
+    </DropdownMenu>
+  </Dropdown>
+
+  <!-- 受控模式 -->
+  <Dropdown v-model:visible="visible">
+    <Button>受控</Button>
+    <DropdownMenu>
+      <DropdownItem>菜单项 1</DropdownItem>
+    </DropdownMenu>
+  </Dropdown>
+
+  <!-- 无箭头 -->
+  <Dropdown :show-arrow="false">
+    <Button>无箭头</Button>
+    <DropdownMenu>
+      <DropdownItem>菜单项 1</DropdownItem>
+    </DropdownMenu>
+  </Dropdown>
+
+  <!-- 禁用 + 部分禁用 -->
+  <Dropdown disabled>
+    <Button disabled>禁用</Button>
+    <DropdownMenu>
+      <DropdownItem>菜单项 1</DropdownItem>
+    </DropdownMenu>
+  </Dropdown>
+  <Dropdown>
+    <Button>部分禁用</Button>
+    <DropdownMenu>
+      <DropdownItem>编辑</DropdownItem>
+      <DropdownItem disabled>删除（已禁用）</DropdownItem>
+    </DropdownMenu>
+  </Dropdown>
+
+  <!-- 点击不关闭 -->
+  <Dropdown :close-on-click="false" trigger="click">
+    <Button>点击不关闭</Button>
+    <DropdownMenu>
+      <DropdownItem>多选项 1</DropdownItem>
+      <DropdownItem>多选项 2</DropdownItem>
+    </DropdownMenu>
   </Dropdown>
 </template>
+<script setup>
+import { ref } from 'vue'
+import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-vue'
+
+const visible = ref(false)
+const handleEdit = () => console.log('edit')
+const handleCopy = () => console.log('copy')
+const handleDelete = () => console.log('delete')
+</script>
 ```
 
 ---

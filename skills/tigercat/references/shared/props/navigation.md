@@ -52,20 +52,50 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ## Dropdown 下拉菜单
 
-### Props
+组合式组件，由 `Dropdown`、`DropdownMenu`、`DropdownItem` 组成。
 
-| Prop      | Type                                         | Default          | Vue | React | Description |
-| --------- | -------------------------------------------- | ---------------- | :-: | :---: | ----------- |
-| items     | `DropdownItem[]`                             | `[]`             |  ✓  |   ✓   | 菜单项      |
-| trigger   | `'hover' \| 'click'`                         | `'hover'`        |  ✓  |   ✓   | 触发方式    |
-| placement | `'bottom-start' \| 'bottom' \| 'bottom-end'` | `'bottom-start'` |  ✓  |   ✓   | 弹出位置    |
-| disabled  | `boolean`                                    | `false`          |  ✓  |   ✓   | 禁用        |
+### Dropdown Props
+
+| Prop           | Type                  | Default          | Vue | React | Description                |
+| -------------- | --------------------- | ---------------- | :-: | :---: | -------------------------- |
+| trigger        | `'hover' \| 'click'`  | `'hover'`        |  ✓  |   ✓   | 触发方式                   |
+| placement      | `FloatingPlacement`   | `'bottom-start'` |  ✓  |   ✓   | 弹出位置（12 方向）        |
+| offset         | `number`              | `4`              |  ✓  |   ✓   | 与触发器的间距（px）       |
+| disabled       | `boolean`             | `false`          |  ✓  |   ✓   | 禁用                       |
+| visible        | `boolean`             | -                |  ✓  |   ✓   | 显示状态（受控）           |
+| defaultVisible | `boolean`             | `false`          |  ✓  |   ✓   | 默认显示状态               |
+| closeOnClick   | `boolean`             | `true`           |  ✓  |   ✓   | 点击菜单项后关闭           |
+| showArrow      | `boolean`             | `true`           |  ✓  |   ✓   | 显示下拉箭头指示器         |
+| className      | `string`              | -                |  ✓  |   ✓   | 自定义 CSS 类名            |
+
+### DropdownMenu Props
+
+| Prop      | Type                                           | Default | Vue | React | Description     |
+| --------- | ---------------------------------------------- | ------- | :-: | :---: | --------------- |
+| className | `string`                                        | -       |  ✓  |   ✓   | 自定义 CSS 类名 |
+| style     | `Record<string, unknown> \| React.CSSProperties` | -       |  ✓  |   ✓   | 内联样式        |
+
+### DropdownItem Props
+
+| Prop     | Type               | Default | Vue | React | Description      |
+| -------- | ------------------ | ------- | :-: | :---: | ---------------- |
+| disabled | `boolean`          | `false` |  ✓  |   ✓   | 禁用             |
+| divided  | `boolean`          | `false` |  ✓  |   ✓   | 与上方项分割     |
+| itemKey  | `string \| number` | -       |  ✓  |   -   | 唯一标识（Vue）  |
 
 ### Events
 
-| Vue Event | React Callback | Payload       | Description |
-| --------- | -------------- | ------------- | ----------- |
-| `@select` | `onSelect`     | `key: string` | 选中事件    |
+| Vue Event          | React Callback    | Payload             | Description  |
+| ------------------ | ----------------- | ------------------- | ------------ |
+| `@visible-change`  | `onVisibleChange` | `visible: boolean`  | 显示状态变化 |
+| `@update:visible`  | -                 | `visible: boolean`  | v-model 更新 |
+| `@click` (Item)    | `onClick` (Item)  | `MouseEvent`        | 点击菜单项   |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description           |
+| --------- | ---------- | --------------------- |
+| `default` | `children` | 触发器 + DropdownMenu |
 
 ---
 
