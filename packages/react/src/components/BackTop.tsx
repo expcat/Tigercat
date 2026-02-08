@@ -53,40 +53,35 @@ export const BackTop: React.FC<BackTopProps> = ({
 }) => {
   const [visible, setVisible] = useState(false)
 
-  const handleScroll = useCallback(() => {
-    const targetElement = target()
-    if (!targetElement) return
-    const scrollTop = getScrollTop(targetElement)
-    setVisible(scrollTop >= visibilityHeight)
+  useEffect(() => {
+    const el = target()
+    if (!el) return
+
+    const onScroll = () => {
+      setVisible(getScrollTop(el) >= visibilityHeight)
+    }
+
+    el.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+
+    return () => {
+      el.removeEventListener('scroll', onScroll)
+    }
   }, [target, visibilityHeight])
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
-      const targetElement = target()
-      if (targetElement) {
-        scrollToTop(targetElement, duration)
-      }
+      const el = target()
+      if (el) scrollToTop(el, duration)
       onClick?.(event)
     },
     [target, duration, onClick]
   )
 
-  useEffect(() => {
-    const targetElement = target()
-    if (!targetElement) return
-
-    targetElement.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-
-    return () => {
-      targetElement.removeEventListener('scroll', handleScroll)
-    }
-  }, [target, handleScroll])
-
   const buttonClasses = useMemo(() => {
-    const targetElement = target()
+    const el = target()
     const positionClasses =
-      !targetElement || targetElement === window ? backTopButtonClasses : backTopContainerClasses
+      !el || el === window ? backTopButtonClasses : backTopContainerClasses
     return classNames(
       positionClasses,
       visible ? backTopVisibleClasses : backTopHiddenClasses,

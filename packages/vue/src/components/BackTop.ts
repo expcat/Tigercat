@@ -6,7 +6,6 @@ import {
   computed,
   onMounted,
   onBeforeUnmount,
-  unref,
   PropType
 } from 'vue'
 import {
@@ -98,8 +97,7 @@ export const BackTop = defineComponent({
     }
 
     onMounted(() => {
-      const nextTarget = unref(props.target()) ?? window
-      targetElement.value = nextTarget
+      targetElement.value = props.target() ?? window
       targetElement.value.addEventListener('scroll', handleScroll, { passive: true })
       handleScroll()
     })
@@ -111,9 +109,8 @@ export const BackTop = defineComponent({
     })
 
     const buttonClasses = computed(() => {
-      // Use targetElement.value after mount, fallback to props.target() for initial render
-      const targetResult = targetElement.value ?? unref(props.target())
-      const isWindowTarget = !targetResult || targetResult === window
+      const target = targetElement.value ?? props.target()
+      const isWindowTarget = !target || target === window
       const positionClasses = isWindowTarget ? backTopButtonClasses : backTopContainerClasses
       return classNames(
         positionClasses,

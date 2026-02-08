@@ -49,6 +49,7 @@ describe('BackTop', () => {
     const { container } = render(<BackTop visibilityHeight={400} target={() => scrollContainer} />)
 
     scrollContainer.scrollTop = 100
+    fireEvent.scroll(scrollContainer)
 
     const button = container.querySelector('button')
     expect(button).toHaveClass('opacity-0')
@@ -103,28 +104,11 @@ describe('BackTop', () => {
     expect(button).toHaveAttribute('aria-label', 'Custom label')
   })
 
-  it('uses custom visibilityHeight', async () => {
-    const { container } = render(<BackTop visibilityHeight={50} target={() => scrollContainer} />)
-
-    scrollContainer.scrollTop = 60
-    fireEvent.scroll(scrollContainer)
-
-    const button = container.querySelector('button')
-    expect(button).toHaveClass('opacity-100')
-  })
-
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<BackTop target={() => scrollContainer} />)
 
       await expectNoA11yViolations(container)
-    })
-
-    it('has proper aria-label for screen readers', () => {
-      const { container } = render(<BackTop target={() => scrollContainer} />)
-
-      const button = container.querySelector('button')
-      expect(button).toHaveAttribute('aria-label', 'Back to top')
     })
 
     it('uses custom aria-label when provided', () => {

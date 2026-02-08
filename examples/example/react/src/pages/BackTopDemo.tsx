@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { BackTop, Button } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
@@ -12,13 +12,27 @@ const customContentSnippet = `<BackTop>
   <div className="custom-back-top">UP</div>
 </BackTop>`
 
+const customDurationSnippet = `<BackTop duration={800} />
+{/* 滚动动画持续 800ms */}`
+
+const customTargetSnippet = `const scrollRef = useRef<HTMLDivElement>(null)
+
+<div ref={scrollRef} className="h-64 overflow-auto">
+  <div className="h-[1000px] p-4">长内容...</div>
+  {scrollRef.current && <BackTop target={() => scrollRef.current!} />}
+</div>`
+
+const clickSnippet = `<BackTop onClick={() => console.log('clicked')} />`
+
 export default function BackTopDemo() {
   const [pageScrollContainer, setPageScrollContainer] = useState<HTMLElement | null>(null)
+  const innerContainerRef = useRef<HTMLDivElement>(null)
+  const [innerMounted, setInnerMounted] = useState(false)
 
   useEffect(() => {
-    // 获取布局中的实际滚动容器
     const container = document.querySelector('main > div.overflow-y-auto') as HTMLElement
     setPageScrollContainer(container)
+    setInnerMounted(true)
   }, [])
 
   const handleClick = () => {
@@ -73,7 +87,40 @@ export default function BackTopDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="点击回调" description="点击按钮时触发回调函数。" code={basicSnippet}>
+      <DemoBlock
+        title="自定义动画时长"
+        description="通过 duration 属性控制滚动到顶部的动画时长。"
+        code={customDurationSnippet}>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <p className="text-gray-600">
+            通过 <code className="bg-gray-200 px-1 rounded">duration</code>{' '}
+            属性设置动画时长（毫秒），默认 450ms。
+          </p>
+        </div>
+      </DemoBlock>
+
+      <DemoBlock
+        title="自定义滚动容器"
+        description="指定 target 监听自定义容器的滚动。"
+        code={customTargetSnippet}>
+        <div
+          ref={innerContainerRef}
+          className="h-64 overflow-auto rounded-lg border border-gray-200 relative">
+          <div className="h-[1000px] p-4">
+            <p className="text-gray-600 mb-4">在此容器内向下滚动查看回到顶部按钮。</p>
+            {Array.from({ length: 20 }, (_, i) => (
+              <p key={i} className="text-gray-400 py-2">
+                滚动内容行 {i + 1}
+              </p>
+            ))}
+          </div>
+          {innerMounted && innerContainerRef.current && (
+            <BackTop target={() => innerContainerRef.current!} visibilityHeight={100} />
+          )}
+        </div>
+      </DemoBlock>
+
+      <DemoBlock title="点击回调" description="点击按钮时触发回调函数。" code={clickSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <p className="text-gray-600 mb-4">
             通过 <code className="bg-gray-200 px-1 rounded">onClick</code> 监听点击事件。

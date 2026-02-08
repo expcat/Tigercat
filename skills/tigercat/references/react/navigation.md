@@ -346,6 +346,9 @@ const treeData = [
 // 自定义显示高度
 <BackTop visibilityHeight={200} />
 
+// 自定义动画时长
+<BackTop duration={800} />
+
 // 自定义滚动目标
 const scrollRef = useRef<HTMLDivElement>(null)
 <BackTop target={() => scrollRef.current!} />

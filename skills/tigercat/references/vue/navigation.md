@@ -363,6 +363,9 @@ const treeData = [
   <!-- 自定义显示高度 -->
   <BackTop :visibility-height="200" />
 
+  <!-- 自定义动画时长 -->
+  <BackTop :duration="800" />
+
   <!-- 自定义滚动目标 -->
   <BackTop :target="() => $refs.scrollContainer" />
 
@@ -372,6 +375,9 @@ const treeData = [
       ↑
     </div>
   </BackTop>
+
+  <!-- 点击事件 -->
+  <BackTop @click="handleClick" />
 </template>
 ```
 

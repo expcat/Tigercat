@@ -6,17 +6,27 @@ import DemoBlock from '../components/DemoBlock.vue'
 const basicSnippet = `<BackTop />
 <!-- 滚动页面超过 400px 后显示 -->`
 
-const customHeightSnippet = `<BackTop :visibilityHeight="200" />
+const customHeightSnippet = `<BackTop :visibility-height="200" />
 <!-- 滚动 200px 后即显示 -->`
 
 const customContentSnippet = `<BackTop>
   <div class="custom-back-top">UP</div>
 </BackTop>`
 
+const customDurationSnippet = `<BackTop :duration="800" />
+<!-- 滚动动画持续 800ms -->`
+
+const customTargetSnippet = `<div ref="scrollContainer" class="h-64 overflow-auto">
+  <div class="h-[1000px] p-4">长内容...</div>
+  <BackTop :target="() => scrollContainer" />
+</div>`
+
+const clickSnippet = `<BackTop @click="handleClick" />`
+
 const pageScrollContainer = ref<HTMLElement | null>(null)
+const innerContainer = ref<HTMLElement | null>(null)
 
 onMounted(() => {
-  // 获取布局中的实际滚动容器
   pageScrollContainer.value = document.querySelector('main > div.overflow-y-auto') as HTMLElement
 })
 
@@ -68,9 +78,36 @@ const handleClick = () => {
       </div>
     </DemoBlock>
 
+    <DemoBlock title="自定义动画时长"
+               description="通过 duration 属性控制滚动到顶部的动画时长。"
+               :code="customDurationSnippet">
+      <div class="p-6 bg-gray-50 rounded-lg">
+        <p class="text-gray-600">
+          通过 <code class="bg-gray-200 px-1 rounded">duration</code> 属性设置动画时长（毫秒），默认 450ms。
+        </p>
+      </div>
+    </DemoBlock>
+
+    <DemoBlock title="自定义滚动容器"
+               description="指定 target 监听自定义容器的滚动。"
+               :code="customTargetSnippet">
+      <div ref="innerContainer"
+           class="h-64 overflow-auto rounded-lg border border-gray-200 relative">
+        <div class="h-[1000px] p-4">
+          <p class="text-gray-600 mb-4">在此容器内向下滚动查看回到顶部按钮。</p>
+          <p v-for="i in 20"
+             :key="i"
+             class="text-gray-400 py-2">滚动内容行 {{ i }}</p>
+        </div>
+        <BackTop v-if="innerContainer"
+                 :target="() => innerContainer!"
+                 :visibility-height="100" />
+      </div>
+    </DemoBlock>
+
     <DemoBlock title="点击回调"
                description="点击按钮时触发回调函数。"
-               :code="basicSnippet">
+               :code="clickSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <p class="text-gray-600 mb-4">
           通过 <code class="bg-gray-200 px-1 rounded">@click</code> 监听点击事件。
