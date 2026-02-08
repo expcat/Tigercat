@@ -36,14 +36,6 @@ export const messageBaseClasses =
   'flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg border pointer-events-auto transition-all duration-300 ease-in-out'
 
 /**
- * Message animation classes
- */
-export const messageEnterClasses = 'opacity-0 -translate-y-2'
-export const messageEnterActiveClasses = 'opacity-100 translate-y-0'
-export const messageLeaveClasses = 'opacity-100 translate-y-0'
-export const messageLeaveActiveClasses = 'opacity-0 -translate-y-2'
-
-/**
  * Message type color schemes
  */
 export interface MessageColorScheme {
@@ -96,7 +88,7 @@ export function getMessageTypeClasses(
   type: MessageType,
   themeColors: Record<MessageType, MessageColorScheme> = defaultMessageThemeColors
 ): MessageColorScheme {
-  return themeColors[type] || themeColors.info
+  return themeColors[type]
 }
 
 /**
@@ -115,7 +107,7 @@ export const messageIconPaths: Record<MessageType, string> = {
  * Get icon path for message type
  */
 export function getMessageIconPath(type: MessageType): string {
-  return messageIconPaths[type] || messageIconPaths.info
+  return messageIconPaths[type]
 }
 
 /**

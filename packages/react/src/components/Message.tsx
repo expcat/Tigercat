@@ -55,7 +55,7 @@ const Icon: React.FC<{
   className: string
   isLoading?: boolean
 }> = ({ path, className, isLoading = false }) => {
-  const iconClass = classNames(className, isLoading ? messageLoadingSpinnerClasses : '')
+  const iconClass = classNames(className, isLoading && messageLoadingSpinnerClasses)
 
   return (
     <svg
@@ -87,7 +87,8 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, onClose }) => {
 
   useEffect(() => {
     // Trigger enter animation
-    setTimeout(() => setIsVisible(true), 10)
+    const timer = setTimeout(() => setIsVisible(true), 10)
+    return () => clearTimeout(timer)
   }, [])
 
   const colorScheme = getMessageTypeClasses(message.type, defaultMessageThemeColors)
@@ -169,17 +170,7 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({ position = '
   const containerClasses = classNames(messageContainerBaseClasses, messagePositionClasses[position])
 
   const handleRemove = useCallback((id: string | number) => {
-    const index = messageInstances.findIndex((msg) => msg.id === id)
-    if (index !== -1) {
-      const instance = messageInstances[index]
-      messageInstances.splice(index, 1)
-      if (instance.onClose) {
-        instance.onClose()
-      }
-      if (updateCallback) {
-        updateCallback()
-      }
-    }
+    removeMessage(id)
   }, [])
 
   return (

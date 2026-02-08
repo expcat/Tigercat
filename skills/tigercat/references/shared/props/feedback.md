@@ -73,23 +73,29 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ## Message 消息提示
 
-静态方法调用，Vue 和 React API 完全相同。
+静态方法调用，Vue 和 React API 完全相同。每个方法返回一个 `() => void` 关闭函数，可用于手动关闭该条消息。
 
 ### API Methods
 
-| Method                                | Description |
-| ------------------------------------- | ----------- |
-| `Message.success(content \| options)` | 成功提示    |
-| `Message.error(content \| options)`   | 错误提示    |
-| `Message.info(content \| options)`    | 信息提示    |
-| `Message.warning(content \| options)` | 警告提示    |
+| Method                                | Return       | Description |
+| ------------------------------------- | ------------ | ----------- |
+| `Message.info(content \| options)`    | `() => void` | 信息提示    |
+| `Message.success(content \| options)` | `() => void` | 成功提示    |
+| `Message.warning(content \| options)` | `() => void` | 警告提示    |
+| `Message.error(content \| options)`   | `() => void` | 错误提示    |
+| `Message.loading(content \| options)` | `() => void` | 加载提示（默认不自动关闭） |
+| `Message.clear()`                     | `void`       | 清空所有消息 |
 
 ### Options
 
-| Option   | Type     | Default | Description    |
-| -------- | -------- | ------- | -------------- |
-| content  | `string` | -       | 消息内容       |
-| duration | `number` | `3000`  | 显示时长（ms） |
+| Option    | Type         | Default | Description                       |
+| --------- | ------------ | ------- | --------------------------------- |
+| content   | `string`     | -       | 消息内容（必填）                  |
+| duration  | `number`     | `3000`  | 显示时长（ms），`0` 表示不自动关闭 |
+| closable  | `boolean`    | `false` | 是否显示关闭按钮                  |
+| onClose   | `() => void` | -       | 关闭时的回调                      |
+| icon      | `string`     | -       | 自定义图标 SVG path d 属性        |
+| className | `string`     | -       | 额外 CSS 类名                     |
 
 ---
 

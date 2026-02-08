@@ -44,8 +44,28 @@ const [open, setOpen] = useState(false)
 ```tsx
 import { Message } from '@expcat/tigercat-react'
 
-Message.success('Operation successful')
-Message.error({ content: 'Error', duration: 5000 })
+// 基本用法
+Message.info('信息提示')
+Message.success('操作成功')
+Message.warning('警告信息')
+Message.error('操作失败')
+
+// 加载状态（默认不自动关闭）
+const close = Message.loading('加载中...')
+setTimeout(close, 3000)
+
+// 完整配置
+Message.success({
+  content: '操作成功',
+  duration: 5000,
+  closable: true,
+  icon: 'M5 13l4 4L19 7',
+  className: 'shadow-2xl',
+  onClose: () => console.log('已关闭')
+})
+
+// 清空所有消息
+Message.clear()
 ```
 
 ---

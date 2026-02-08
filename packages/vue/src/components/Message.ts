@@ -65,7 +65,7 @@ function getNextInstanceId(): number {
  * Create icon element
  */
 function createIcon(path: string, className: string, isLoading = false) {
-  const iconClass = classNames(className, isLoading ? messageLoadingSpinnerClasses : '')
+  const iconClass = classNames(className, isLoading && messageLoadingSpinnerClasses)
 
   return h(
     'svg',
@@ -102,17 +102,6 @@ export const MessageContainer = defineComponent({
     const containerClasses = computed(() => {
       return classNames(messageContainerBaseClasses, messagePositionClasses[props.position])
     })
-
-    const removeMessage = (id: string | number) => {
-      const index = messageInstances.value.findIndex((msg) => msg.id === id)
-      if (index !== -1) {
-        const instance = messageInstances.value[index]
-        messageInstances.value.splice(index, 1)
-        if (instance.onClose) {
-          instance.onClose()
-        }
-      }
-    }
 
     const renderMessageItem = (message: MessageInstance) => {
       const colorScheme = getMessageTypeClasses(message.type, defaultMessageThemeColors)
