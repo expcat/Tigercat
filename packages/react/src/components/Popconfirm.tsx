@@ -1,6 +1,7 @@
-import React, { useMemo, useState, useRef } from 'react'
+import React, { useMemo, useRef } from 'react'
 import {
   classNames,
+  createFloatingIdFactory,
   getPopconfirmIconPath,
   getPopconfirmContainerClasses,
   getPopconfirmTriggerClasses,
@@ -12,7 +13,6 @@ import {
   getPopconfirmButtonsClasses,
   getPopconfirmCancelButtonClasses,
   getPopconfirmOkButtonClasses,
-  getTransformOrigin,
   mergeStyleValues,
   popconfirmIconPathStrokeLinecap,
   popconfirmIconPathStrokeLinejoin,
@@ -22,10 +22,9 @@ import {
   type PopconfirmIconType,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
-import { useFloating, useClickOutside, useEscapeKey } from '../utils/overlay'
+import { usePopup } from '../utils/use-popup'
 
-let popconfirmIdCounter = 0
-const createPopconfirmId = () => `tiger-popconfirm-${++popconfirmIdCounter}`
+const createPopconfirmId = createFloatingIdFactory('popconfirm')
 
 const PopconfirmIcon: React.FC<{ type: PopconfirmIconType }> = ({ type }) => (
   <svg
@@ -44,48 +43,14 @@ const PopconfirmIcon: React.FC<{ type: PopconfirmIconType }> = ({ type }) => (
 
 export type PopconfirmProps = Omit<CorePopconfirmProps, 'style' | 'placement'> &
   Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'style'> & {
-    /**
-     * The element to trigger the popconfirm
-     */
     children?: React.ReactNode
-
-    /**
-     * Custom title content (alternative to title prop)
-     */
     titleContent?: React.ReactNode
-
-    /**
-     * Custom description content (alternative to description prop)
-     */
     descriptionContent?: React.ReactNode
-
-    /**
-     * Callback when visibility changes
-     */
     onVisibleChange?: (visible: boolean) => void
-
-    /**
-     * Callback when confirm button is clicked
-     */
     onConfirm?: () => void
-
-    /**
-     * Callback when cancel button is clicked
-     */
     onCancel?: () => void
-
-    /**
-     * Placement of the popconfirm relative to trigger
-     * @default 'top'
-     */
     placement?: FloatingPlacement
-
-    /**
-     * Offset distance from trigger element
-     * @default 8
-     */
     offset?: number
-
     className?: string
     style?: React.CSSProperties
   }
@@ -113,98 +78,64 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
   onCancel,
   ...divProps
 }) => {
-  const isControlled = visible !== undefined
-  const [internalVisible, setInternalVisible] = useState(defaultVisible)
-
-  const currentVisible = isControlled ? visible : internalVisible
-
-  // Refs for Floating UI positioning
-  const containerRef = useRef<HTMLDivElement>(null)
-  const triggerRef = useRef<HTMLDivElement>(null)
-  const floatingRef = useRef<HTMLDivElement>(null)
-
   const popconfirmIdRef = useRef<string | null>(null)
-  if (!popconfirmIdRef.current) {
-    popconfirmIdRef.current = createPopconfirmId()
-  }
+  if (!popconfirmIdRef.current) popconfirmIdRef.current = createPopconfirmId()
   const popconfirmId = popconfirmIdRef.current
   const titleId = `${popconfirmId}-title`
   const descriptionId = `${popconfirmId}-description`
   const describedBy = description || descriptionContent ? descriptionId : undefined
 
-  // Handle visibility change
-  const setVisible = (newVisible: boolean) => {
-    if (disabled && newVisible) return
+  // Shared popup logic (click-only, multiTrigger=false)
+  const {
+    currentVisible,
+    setVisible,
+    containerRef,
+    triggerRef,
+    floatingRef,
+    actualPlacement,
+    floatingStyles: baseFloatingStyles
+  } = usePopup({
+    visible,
+    defaultVisible,
+    disabled,
+    placement: initialPlacement,
+    offset,
+    multiTrigger: false,
+    onVisibleChange
+  })
 
-    if (!isControlled) {
-      setInternalVisible(newVisible)
-    }
-
-    onVisibleChange?.(newVisible)
-  }
-
-  // Handle confirm
   const handleConfirm = () => {
     onConfirm?.()
     setVisible(false)
   }
-
-  // Handle cancel
   const handleCancel = () => {
     onCancel?.()
     setVisible(false)
   }
-
-  // Handle trigger click
   const handleTriggerClick = () => {
     if (disabled) return
     setVisible(!currentVisible)
   }
 
-  // Floating UI positioning
-  const { x, y, placement } = useFloating({
-    referenceRef: triggerRef,
-    floatingRef,
-    enabled: currentVisible,
-    placement: initialPlacement,
-    offset
-  })
-
-  // Handle click outside and escape key
-  useClickOutside({
-    enabled: currentVisible,
-    refs: [containerRef],
-    onOutsideClick: () => setVisible(false),
-    defer: true
-  })
-
-  useEscapeKey({
-    enabled: currentVisible,
-    onEscape: () => setVisible(false)
-  })
-
-  // Compute styles for floating element
+  // Compute styles (strip zIndex since Popconfirm uses its own z-50 class)
   const contentWrapperStyles = useMemo<React.CSSProperties>(
     () => ({
       position: 'absolute',
-      left: x,
-      top: y,
-      transformOrigin: getTransformOrigin(placement)
+      left: baseFloatingStyles.left,
+      top: baseFloatingStyles.top,
+      transformOrigin: baseFloatingStyles.transformOrigin
     }),
-    [x, y, placement]
+    [baseFloatingStyles]
   )
 
-  // Container classes
+  // Classes
   const containerClasses = useMemo(
     () => classNames(getPopconfirmContainerClasses(), className),
     [className]
   )
-
   const triggerClasses = useMemo(() => getPopconfirmTriggerClasses(disabled), [disabled])
-
   const contentWrapperClasses = 'absolute z-50'
-
-  const arrowClasses = useMemo(() => getPopconfirmArrowClasses(placement), [placement])
+  const arrowClasses = useMemo(() => getPopconfirmArrowClasses(actualPlacement), [actualPlacement])
   const contentClasses = getPopconfirmContentClasses()
   const titleClasses = getPopconfirmTitleClasses()
   const descriptionClasses = getPopconfirmDescriptionClasses()
@@ -213,9 +144,7 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
   const cancelButtonClasses = getPopconfirmCancelButtonClasses()
   const okButtonClasses = useMemo(() => getPopconfirmOkButtonClasses(okType), [okType])
 
-  if (!children) {
-    return null
-  }
+  if (!children) return null
 
   const mergedStyle = mergeStyleValues(style) as React.CSSProperties | undefined
 
@@ -223,14 +152,12 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     className: triggerClasses,
     onClick: (event: React.MouseEvent) => {
       const target = children
-
       if (React.isValidElement<{ onClick?: unknown }>(target)) {
         const onChildClick = target.props.onClick
         if (typeof onChildClick === 'function') {
           ;(onChildClick as (e: React.MouseEvent) => void)(event)
         }
       }
-
       if (event.defaultPrevented) return
       handleTriggerClick()
     },
@@ -239,10 +166,7 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     'aria-controls': currentVisible ? popconfirmId : undefined
   }
 
-  type TriggerChildProps = {
-    className?: string
-    onClick?: unknown
-  }
+  type TriggerChildProps = { className?: string; onClick?: unknown }
 
   const triggerNode = (() => {
     if (React.isValidElement<TriggerChildProps>(children)) {
@@ -251,7 +175,6 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
         className: classNames(children.props.className, triggerProps.className)
       })
     }
-
     return (
       <div
         {...triggerProps}
@@ -295,12 +218,10 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
                   <PopconfirmIcon type={icon} />
                 </div>
               )}
-
               <div className="flex-1">
                 <div id={titleId} className={titleClasses}>
                   {titleContent || title}
                 </div>
-
                 {(description || descriptionContent) && (
                   <div id={descriptionId} className={descriptionClasses}>
                     {descriptionContent || description}
@@ -308,7 +229,6 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
                 )}
               </div>
             </div>
-
             <div className={buttonsClasses}>
               <button type="button" className={cancelButtonClasses} onClick={handleCancel}>
                 {cancelText}

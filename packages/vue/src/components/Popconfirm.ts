@@ -1,18 +1,16 @@
 import {
   defineComponent,
   computed,
-  ref,
   h,
   cloneVNode,
   isVNode,
-  onBeforeUnmount,
-  watch,
   PropType
 } from 'vue'
-import { useVueFloating, useVueClickOutside, useVueEscapeKey } from '../utils/overlay'
+import { useFloatingPopup } from '../utils/use-floating-popup'
 import {
   classNames,
   coerceClassValue,
+  createFloatingIdFactory,
   getPopconfirmIconPath,
   getPopconfirmContainerClasses,
   getPopconfirmTriggerClasses,
@@ -24,7 +22,6 @@ import {
   getPopconfirmButtonsClasses,
   getPopconfirmCancelButtonClasses,
   getPopconfirmOkButtonClasses,
-  getTransformOrigin,
   mergeStyleValues,
   popconfirmIconPathStrokeLinecap,
   popconfirmIconPathStrokeLinejoin,
@@ -55,8 +52,7 @@ const renderPopconfirmIcon = (iconType: PopconfirmIconType) => {
   )
 }
 
-let popconfirmIdCounter = 0
-const createPopconfirmId = () => `tiger-popconfirm-${++popconfirmIdCounter}`
+const createPopconfirmId = createFloatingIdFactory('popconfirm')
 
 export interface VuePopconfirmProps {
   className?: string
@@ -67,223 +63,67 @@ export const Popconfirm = defineComponent({
   name: 'TigerPopconfirm',
   inheritAttrs: false,
   props: {
-    /**
-     * Whether the popconfirm is visible (controlled mode)
-     */
-    visible: {
-      type: Boolean,
-      default: undefined
-    },
-    /**
-     * Default visibility (uncontrolled mode)
-     * @default false
-     */
-    defaultVisible: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Popconfirm title/question text
-     */
-    title: {
-      type: String,
-      default: '确定要执行此操作吗？'
-    },
-    /**
-     * Popconfirm description text
-     */
-    description: {
-      type: String,
-      default: undefined
-    },
-    /**
-     * Icon type to display
-     * @default 'warning'
-     */
+    /** Whether the popconfirm is visible (controlled mode) */
+    visible: { type: Boolean, default: undefined },
+    /** Default visibility (uncontrolled mode) @default false */
+    defaultVisible: { type: Boolean, default: false },
+    /** Popconfirm title/question text */
+    title: { type: String, default: '确定要执行此操作吗？' },
+    /** Popconfirm description text */
+    description: { type: String, default: undefined },
+    /** Icon type to display @default 'warning' */
     icon: {
       type: String as PropType<PopconfirmIconType>,
       default: 'warning' as PopconfirmIconType
     },
-    /**
-     * Whether to show icon
-     * @default true
-     */
-    showIcon: {
-      type: Boolean,
-      default: true
-    },
-    /**
-     * Confirm button text
-     * @default '确定'
-     */
-    okText: {
-      type: String,
-      default: '确定'
-    },
-    /**
-     * Cancel button text
-     * @default '取消'
-     */
-    cancelText: {
-      type: String,
-      default: '取消'
-    },
-    /**
-     * Confirm button type
-     * @default 'primary'
-     */
-    okType: {
-      type: String as PropType<'primary' | 'danger'>,
-      default: 'primary' as const
-    },
-    /**
-     * Popconfirm placement relative to trigger
-     * @default 'top'
-     */
-    placement: {
-      type: String as PropType<FloatingPlacement>,
-      default: 'top' as FloatingPlacement
-    },
-    /**
-     * Offset distance from trigger (in pixels)
-     * @default 8
-     */
-    offset: {
-      type: Number,
-      default: 8
-    },
-    /**
-     * Whether the popconfirm is disabled
-     * @default false
-     */
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Additional CSS classes
-     */
-    className: {
-      type: String,
-      default: undefined
-    },
-    style: {
-      type: [String, Object, Array] as PropType<StyleValue>,
-      default: undefined
-    }
+    /** Whether to show icon @default true */
+    showIcon: { type: Boolean, default: true },
+    /** Confirm button text @default '确定' */
+    okText: { type: String, default: '确定' },
+    /** Cancel button text @default '取消' */
+    cancelText: { type: String, default: '取消' },
+    /** Confirm button type @default 'primary' */
+    okType: { type: String as PropType<'primary' | 'danger'>, default: 'primary' as const },
+    /** Placement @default 'top' */
+    placement: { type: String as PropType<FloatingPlacement>, default: 'top' as FloatingPlacement },
+    /** Offset in pixels @default 8 */
+    offset: { type: Number, default: 8 },
+    /** Disabled state @default false */
+    disabled: { type: Boolean, default: false },
+    /** Additional CSS classes */
+    className: { type: String, default: undefined },
+    style: { type: [String, Object, Array] as PropType<StyleValue>, default: undefined }
   },
   emits: ['update:visible', 'visible-change', 'confirm', 'cancel'],
   setup(props, { slots, emit, attrs }) {
-    // Internal state for uncontrolled mode
-    const internalVisible = ref(props.defaultVisible)
-
-    // Computed visible state (controlled or uncontrolled)
-    const currentVisible = computed(() => {
-      return props.visible !== undefined ? props.visible : internalVisible.value
-    })
-
-    // Element refs
-    const containerRef = ref<HTMLElement | null>(null)
-    const triggerRef = ref<HTMLElement | null>(null)
-    const floatingRef = ref<HTMLElement | null>(null)
+    // Shared floating-popup logic (click-only, multiTrigger=false)
+    const {
+      currentVisible,
+      setVisible,
+      containerRef,
+      triggerRef,
+      floatingRef,
+      floatingStyles,
+      actualPlacement
+    } = useFloatingPopup({ props, emit, multiTrigger: false })
 
     const popconfirmId = createPopconfirmId()
     const titleId = `${popconfirmId}-title`
     const descriptionId = `${popconfirmId}-description`
 
-    // Floating UI positioning
-    const {
-      x,
-      y,
-      placement: actualPlacement
-    } = useVueFloating({
-      referenceRef: triggerRef,
-      floatingRef: floatingRef,
-      enabled: currentVisible,
-      placement: props.placement as FloatingPlacement,
-      offset: props.offset
-    })
-
-    // Handle visibility change
-    const setVisible = (visible: boolean) => {
-      if (props.disabled && visible) return
-
-      // Update internal state if uncontrolled
-      if (props.visible === undefined) {
-        internalVisible.value = visible
-      }
-
-      // Emit events
-      emit('update:visible', visible)
-      emit('visible-change', visible)
-    }
-
-    // Handle confirm
+    // Handle confirm / cancel
     const handleConfirm = () => {
       emit('confirm')
       setVisible(false)
     }
-
-    // Handle cancel
     const handleCancel = () => {
       emit('cancel')
       setVisible(false)
     }
-
-    // Handle trigger click
     const handleTriggerClick = () => {
       if (props.disabled) return
       setVisible(!currentVisible.value)
     }
-
-    // Click outside handler (close when clicking outside)
-    let cleanupClickOutside: (() => void) | null = null
-
-    watch(
-      currentVisible,
-      (visible) => {
-        if (cleanupClickOutside) {
-          cleanupClickOutside()
-          cleanupClickOutside = null
-        }
-
-        if (visible) {
-          cleanupClickOutside = useVueClickOutside({
-            enabled: currentVisible,
-            containerRef,
-            onOutsideClick: () => setVisible(false),
-            defer: true
-          })
-        }
-      },
-      { immediate: true }
-    )
-
-    // Escape key handler
-    let cleanupEscapeKey: (() => void) | null = null
-
-    watch(
-      currentVisible,
-      (visible) => {
-        if (cleanupEscapeKey) {
-          cleanupEscapeKey()
-          cleanupEscapeKey = null
-        }
-
-        if (visible) {
-          cleanupEscapeKey = useVueEscapeKey({
-            enabled: currentVisible,
-            onEscape: () => setVisible(false)
-          })
-        }
-      },
-      { immediate: true }
-    )
-
-    onBeforeUnmount(() => {
-      cleanupClickOutside?.()
-      cleanupEscapeKey?.()
-    })
 
     // Container classes
     const containerClasses = computed(() => {
@@ -294,27 +134,13 @@ export const Popconfirm = defineComponent({
       )
     })
 
-    // Trigger classes
-    const triggerClasses = computed(() => {
-      return getPopconfirmTriggerClasses(props.disabled)
-    })
+    const triggerClasses = computed(() => getPopconfirmTriggerClasses(props.disabled))
 
-    // Content wrapper classes (using Floating UI positioning)
-    const contentWrapperClasses = computed(() => {
-      return classNames('absolute z-50', currentVisible.value ? 'block' : 'hidden')
-    })
+    const contentWrapperClasses = computed(() =>
+      classNames('absolute z-50', currentVisible.value ? 'block' : 'hidden')
+    )
 
-    // Content wrapper styles (positioned by Floating UI)
-    const contentWrapperStyles = computed(() => ({
-      position: 'absolute' as const,
-      left: `${x.value}px`,
-      top: `${y.value}px`,
-      transformOrigin: getTransformOrigin(actualPlacement.value)
-    }))
-
-    const arrowClasses = computed(() => {
-      return getPopconfirmArrowClasses(actualPlacement.value)
-    })
+    const arrowClasses = computed(() => getPopconfirmArrowClasses(actualPlacement.value))
 
     // Static class strings (no reactive deps)
     const contentClasses = getPopconfirmContentClasses()
@@ -329,9 +155,7 @@ export const Popconfirm = defineComponent({
 
     return () => {
       const defaultSlot = slots.default?.()
-      if (!defaultSlot || defaultSlot.length === 0) {
-        return null
-      }
+      if (!defaultSlot || defaultSlot.length === 0) return null
 
       const {
         class: _class,
@@ -423,7 +247,7 @@ export const Popconfirm = defineComponent({
         {
           ref: floatingRef,
           class: contentWrapperClasses.value,
-          style: contentWrapperStyles.value,
+          style: floatingStyles.value,
           hidden: !currentVisible.value,
           'aria-hidden': !currentVisible.value
         },
@@ -442,76 +266,38 @@ export const Popconfirm = defineComponent({
               },
               [
                 // Title section with icon
-                h(
-                  'div',
-                  {
-                    class: 'flex items-start'
-                  },
-                  [
-                    // Icon
-                    props.showIcon &&
-                      h(
-                        'div',
-                        {
-                          class: iconClasses.value,
-                          'aria-hidden': 'true'
-                        },
-                        renderPopconfirmIcon(props.icon)
-                      ),
-                    // Title and description
+                h('div', { class: 'flex items-start' }, [
+                  props.showIcon &&
                     h(
                       'div',
-                      {
-                        class: 'flex-1'
-                      },
-                      [
-                        // Title
-                        slots.title
-                          ? h('div', { id: titleId, class: titleClasses }, slots.title())
-                          : h('div', { id: titleId, class: titleClasses }, props.title),
-                        // Description
-                        hasDescription &&
-                          h(
-                            'div',
-                            {
-                              id: descriptionId,
-                              class: descriptionClasses
-                            },
-                            slots.description ? slots.description() : props.description
-                          )
-                      ]
-                    )
-                  ]
-                ),
-                // Buttons
-                h(
-                  'div',
-                  {
-                    class: buttonsClasses
-                  },
-                  [
-                    // Cancel button
-                    h(
-                      'button',
-                      {
-                        type: 'button',
-                        class: cancelButtonClasses,
-                        onClick: handleCancel
-                      },
-                      props.cancelText
+                      { class: iconClasses.value, 'aria-hidden': 'true' },
+                      renderPopconfirmIcon(props.icon)
                     ),
-                    // OK button
-                    h(
-                      'button',
-                      {
-                        type: 'button',
-                        class: okButtonClasses.value,
-                        onClick: handleConfirm
-                      },
-                      props.okText
-                    )
-                  ]
-                )
+                  h('div', { class: 'flex-1' }, [
+                    slots.title
+                      ? h('div', { id: titleId, class: titleClasses }, slots.title())
+                      : h('div', { id: titleId, class: titleClasses }, props.title),
+                    hasDescription &&
+                      h(
+                        'div',
+                        { id: descriptionId, class: descriptionClasses },
+                        slots.description ? slots.description() : props.description
+                      )
+                  ])
+                ]),
+                // Buttons
+                h('div', { class: buttonsClasses }, [
+                  h(
+                    'button',
+                    { type: 'button', class: cancelButtonClasses, onClick: handleCancel },
+                    props.cancelText
+                  ),
+                  h(
+                    'button',
+                    { type: 'button', class: okButtonClasses.value, onClick: handleConfirm },
+                    props.okText
+                  )
+                ])
               ]
             )
           ])

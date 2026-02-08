@@ -7,7 +7,9 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 共享 Props 定义，框架差异在表格中标注。
 
-> **显示状态差异**: Vue 使用 `visible`，React 使用 `open`。详见 [patterns/common.md](../patterns/common.md)
+> **显示状态差异**: Modal/Drawer → Vue 使用 `visible`，React 使用 `open`。Tooltip/Popover/Popconfirm → 双框架统一使用 `visible`。详见 [patterns/common.md](../patterns/common.md)
+>
+> **Floating Popup 共享架构**: Tooltip、Popover、Popconfirm 共享 `useFloatingPopup` (Vue) / `usePopup` (React) hook，统一管理 visibility、定位、dismiss 与 trigger 事件。详见 [patterns/common.md](../patterns/common.md#floating-popup-共享架构)
 
 ---
 
