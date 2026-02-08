@@ -242,9 +242,30 @@ notification.clear('top-right')
 ## Loading 加载
 
 ```tsx
-<Loading spinning={loading} text="Loading...">
-  <div>Content</div>
-</Loading>
+{/* 基本用法 */}
+<Loading />
+<Loading text="加载中..." />
+
+{/* 动画变体 */}
+<Loading variant="spinner" />
+<Loading variant="ring" />
+<Loading variant="dots" />
+<Loading variant="bars" />
+<Loading variant="pulse" />
+
+{/* 尺寸 */}
+<Loading size="sm" />
+<Loading size="lg" />
+
+{/* 颜色 */}
+<Loading color="success" />
+<Loading customColor="#ff6b6b" />
+
+{/* 全屏遮罩 */}
+{loading && <Loading fullscreen text="页面加载中..." />}
+
+{/* 延迟显示（避免闪烁） */}
+<Loading delay={300} text="延迟 300ms" />
 ```
 
 ---

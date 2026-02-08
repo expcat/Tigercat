@@ -41,6 +41,40 @@ describe('Loading (Vue)', () => {
     expect(barsContainer.querySelectorAll('.animate-scale-bar')).toHaveLength(3)
   })
 
+  it('renders ring and pulse variants as SVG', () => {
+    const { container: ringContainer } = render(Loading, {
+      props: { variant: 'ring' }
+    })
+    expect(ringContainer.querySelector('svg')).toBeInTheDocument()
+    expect(ringContainer.querySelector('svg')).toHaveClass('animate-spin')
+
+    const { container: pulseContainer } = render(Loading, {
+      props: { variant: 'pulse' }
+    })
+    expect(pulseContainer.querySelector('svg')).toBeInTheDocument()
+    expect(pulseContainer.querySelector('svg')).toHaveClass('animate-pulse')
+  })
+
+  it('applies size classes', () => {
+    const { container: smContainer } = render(Loading, { props: { size: 'sm' } })
+    expect(smContainer.querySelector('svg')).toHaveClass('h-4', 'w-4')
+
+    const { container: xlContainer } = render(Loading, { props: { size: 'xl' } })
+    expect(xlContainer.querySelector('svg')).toHaveClass('h-16', 'w-16')
+  })
+
+  it('applies color classes', () => {
+    const { container } = render(Loading, { props: { color: 'success' } })
+    const svg = container.querySelector('svg')
+    expect(svg?.className).toContain('--tiger-success')
+  })
+
+  it('applies customColor as inline style', () => {
+    const { container } = render(Loading, { props: { customColor: '#ff0000' } })
+    const wrapper = container.firstChild as HTMLElement
+    expect(wrapper).toHaveStyle({ color: '#ff0000' })
+  })
+
   it('supports fullscreen background', () => {
     const { container } = render(Loading, {
       props: { fullscreen: true, background: 'rgba(0, 0, 0, 0.8)' }

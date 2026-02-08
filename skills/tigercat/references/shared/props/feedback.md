@@ -258,10 +258,17 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Props
 
-| Prop     | Type      | Default | Vue | React | Description |
-| -------- | --------- | ------- | :-: | :---: | ----------- |
-| spinning | `boolean` | `false` |  ✓  |   ✓   | 加载状态    |
-| text     | `string`  | -       |  ✓  |   ✓   | 加载文案    |
+| Prop        | Type                                                                  | Default                    | Vue | React | Description                          |
+| ----------- | --------------------------------------------------------------------- | -------------------------- | :-: | :---: | ------------------------------------ |
+| variant     | `'spinner' \| 'dots' \| 'bars' \| 'ring' \| 'pulse'`               | `'spinner'`                |  ✓  |   ✓   | 动画样式                             |
+| size        | `'sm' \| 'md' \| 'lg' \| 'xl'`                                     | `'md'`                     |  ✓  |   ✓   | 尺寸                                 |
+| color       | `'primary' \| 'secondary' \| 'success' \| 'warning' \| 'danger' \| 'info' \| 'default'` | `'primary'` |  ✓  |   ✓   | 颜色变体                             |
+| text        | `string`                                                              | -                          |  ✓  |   ✓   | 加载文案                             |
+| fullscreen  | `boolean`                                                             | `false`                    |  ✓  |   ✓   | 全屏遮罩模式                         |
+| delay       | `number`                                                              | `0`                        |  ✓  |   ✓   | 延迟显示 (ms)，避免闪烁              |
+| background  | `string`                                                              | `'rgba(255,255,255,0.9)'`  |  ✓  |   ✓   | 全屏模式背景色                       |
+| customColor | `string`                                                              | -                          |  ✓  |   ✓   | 自定义颜色（覆盖 color）             |
+| className   | `string`                                                              | -                          |  ✓  |   ✓   | 自定义类名                           |
 
 ---
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import {
   classNames,
   getLoadingBarClasses,
@@ -27,44 +27,47 @@ export const Loading: React.FC<LoadingProps> = ({
   delay = 0,
   background = 'rgba(255, 255, 255, 0.9)',
   customColor,
-  className = '',
+  className,
   style,
   ...props
 }) => {
-  // Inject animation styles when component is first used
   useEffect(() => {
     injectLoadingAnimationStyles()
   }, [])
 
-  const [visible, setVisible] = useState(delay === 0)
+  const [visible, setVisible] = useState(delay <= 0)
 
   useEffect(() => {
-    if (delay > 0) {
-      const timer = setTimeout(() => {
-        setVisible(true)
-      }, delay)
-
-      return () => clearTimeout(timer)
+    if (delay <= 0) {
+      setVisible(true)
+      return
     }
+    setVisible(false)
+    const timer = setTimeout(() => setVisible(true), delay)
+    return () => clearTimeout(timer)
   }, [delay])
 
-  const spinnerClasses = getLoadingClasses(variant, size, color, customColor)
-  const textClasses = getLoadingTextClasses(size, color, customColor)
-
-  const containerClasses = classNames(
-    fullscreen ? loadingFullscreenBaseClasses : loadingContainerBaseClasses,
-    className
+  const containerClasses = useMemo(
+    () =>
+      classNames(
+        fullscreen ? loadingFullscreenBaseClasses : loadingContainerBaseClasses,
+        className
+      ),
+    [fullscreen, className]
   )
 
-  const mergedStyle: React.CSSProperties = {
-    ...(customColor ? { color: customColor } : null),
-    ...(fullscreen ? { backgroundColor: background } : null),
-    ...style
-  }
+  const mergedStyle = useMemo<React.CSSProperties>(
+    () => ({
+      ...(customColor ? { color: customColor } : null),
+      ...(fullscreen ? { backgroundColor: background } : null),
+      ...style
+    }),
+    [customColor, fullscreen, background, style]
+  )
 
-  // Render spinner variant
   const renderSpinner = () => {
     const svg = getSpinnerSVG(variant)
+    const spinnerClasses = getLoadingClasses(variant, size, color, customColor)
 
     return (
       <svg
@@ -84,7 +87,6 @@ export const Loading: React.FC<LoadingProps> = ({
     )
   }
 
-  // Render dots variant
   const renderDots = () => {
     const colorClass = customColor ? '' : loadingColorClasses[color]
     const steps = [0, 1, 2] as const
@@ -98,7 +100,6 @@ export const Loading: React.FC<LoadingProps> = ({
     )
   }
 
-  // Render bars variant
   const renderBars = () => {
     const colorClass = customColor ? '' : loadingColorClasses[color]
     const steps = [0, 1, 2] as const
@@ -112,7 +113,6 @@ export const Loading: React.FC<LoadingProps> = ({
     )
   }
 
-  // Render loading indicator based on variant
   const renderIndicator = () => {
     switch (variant) {
       case 'dots':
@@ -141,7 +141,7 @@ export const Loading: React.FC<LoadingProps> = ({
       aria-busy={true}
       {...props}>
       {renderIndicator()}
-      {text && <div className={textClasses}>{text}</div>}
+      {text && <div className={getLoadingTextClasses(size, color, customColor)}>{text}</div>}
     </div>
   )
 }

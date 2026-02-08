@@ -15,21 +15,13 @@ import {
   mergeStyleValues,
   normalizeSvgAttrs,
   injectLoadingAnimationStyles,
+  type LoadingProps,
   type LoadingVariant,
   type LoadingSize,
   type LoadingColor
 } from '@expcat/tigercat-core'
 
-export interface VueLoadingProps {
-  variant?: LoadingVariant
-  size?: LoadingSize
-  color?: LoadingColor
-  text?: string
-  fullscreen?: boolean
-  delay?: number
-  background?: string
-  customColor?: string
-  className?: string
+export interface VueLoadingProps extends LoadingProps {
   style?: Record<string, string | number>
 }
 
@@ -37,86 +29,48 @@ export const Loading = defineComponent({
   name: 'TigerLoading',
   inheritAttrs: false,
   props: {
-    /**
-     * Loading spinner variant - determines animation style
-     * @default 'spinner'
-     */
     variant: {
       type: String as PropType<LoadingVariant>,
       default: 'spinner' as LoadingVariant
     },
-    /**
-     * Size of the loading indicator
-     * @default 'md'
-     */
     size: {
       type: String as PropType<LoadingSize>,
       default: 'md' as LoadingSize
     },
-    /**
-     * Color variant
-     * @default 'primary'
-     */
     color: {
       type: String as PropType<LoadingColor>,
       default: 'primary' as LoadingColor
     },
-    /**
-     * Custom text to display below the spinner
-     */
     text: {
       type: String,
       default: undefined
     },
-    /**
-     * Whether to show loading as fullscreen overlay
-     * @default false
-     */
     fullscreen: {
       type: Boolean,
       default: false
     },
-    /**
-     * Delay before showing the loading indicator (ms)
-     * @default 0
-     */
     delay: {
       type: Number,
       default: 0
     },
-    /**
-     * Custom background color (for fullscreen mode)
-     * @default 'rgba(255, 255, 255, 0.9)'
-     */
     background: {
       type: String,
       default: 'rgba(255, 255, 255, 0.9)'
     },
-    /**
-     * Custom spinner color (overrides color variant)
-     */
     customColor: {
       type: String,
       default: undefined
     },
-    /**
-     * Additional CSS classes
-     */
     className: {
       type: String,
-      default: ''
+      default: undefined
     },
-
-    /**
-     * Custom styles
-     */
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
     }
   },
   setup(props, { attrs }) {
-    // Inject animation styles when component is first used
     injectLoadingAnimationStyles()
 
     const visible = ref(false)
@@ -181,7 +135,6 @@ export const Loading = defineComponent({
       return mergeStyleValues(attrs.style, props.style, baseStyle)
     })
 
-    // Render spinner variant
     const renderSpinner = () => {
       const svg = getSpinnerSVG(props.variant)
 
@@ -197,7 +150,6 @@ export const Loading = defineComponent({
       )
     }
 
-    // Render dots variant
     const renderDots = () => {
       const colorClass = props.customColor ? '' : loadingColorClasses[props.color]
       const steps = [0, 1, 2] as const
@@ -215,7 +167,6 @@ export const Loading = defineComponent({
       )
     }
 
-    // Render bars variant
     const renderBars = () => {
       const colorClass = props.customColor ? '' : loadingColorClasses[props.color]
       const steps = [0, 1, 2] as const
@@ -233,7 +184,6 @@ export const Loading = defineComponent({
       )
     }
 
-    // Render loading indicator based on variant
     const renderIndicator = () => {
       switch (props.variant) {
         case 'dots':

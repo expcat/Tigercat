@@ -78,16 +78,13 @@ export function getLoadingClasses(
   const baseClasses = classNames(sizeClass, colorClass)
 
   switch (variant) {
-    case 'spinner':
-      return classNames(baseClasses, loadingSpinnerBaseClasses)
     case 'dots':
-      return baseClasses
     case 'bars':
       return baseClasses
-    case 'ring':
-      return classNames(baseClasses, loadingSpinnerBaseClasses)
     case 'pulse':
       return classNames(baseClasses, 'animate-pulse')
+    case 'spinner':
+    case 'ring':
     default:
       return classNames(baseClasses, loadingSpinnerBaseClasses)
   }
@@ -102,6 +99,7 @@ export function getSpinnerSVG(variant: LoadingVariant): {
 } {
   switch (variant) {
     case 'spinner':
+    default:
       return {
         viewBox: '0 0 24 24',
         elements: [
@@ -172,25 +170,6 @@ export function getSpinnerSVG(variant: LoadingVariant): {
               cy: '12',
               r: '10',
               fill: 'currentColor'
-            }
-          }
-        ]
-      }
-
-    default:
-      return {
-        viewBox: '0 0 24 24',
-        elements: [
-          {
-            type: 'circle',
-            attrs: {
-              className: 'opacity-25',
-              cx: '12',
-              cy: '12',
-              r: '10',
-              stroke: 'currentColor',
-              strokeWidth: '4',
-              fill: 'none'
             }
           }
         ]
