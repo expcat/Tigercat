@@ -375,14 +375,37 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop        | Type               | Default      | Vue | React | Description |
-| ----------- | ------------------ | ------------ | :-: | :---: | ----------- |
-| modelValue  | `string`           | -            |  ✓  |   -   | 绑定值      |
-| value       | `string`           | -            |  -  |   ✓   | 值          |
-| format      | `string`           | `'HH:mm:ss'` |  ✓  |   ✓   | 时间格式    |
-| placeholder | `string`           | -            |  ✓  |   ✓   | 占位符      |
-| disabled    | `boolean`          | `false`      |  ✓  |   ✓   | 禁用        |
-| labels      | `TimePickerLabels` | -            |  ✓  |   ✓   | 标签文本    |
+| Prop         | Type                         | Default | Vue | React | Description      |
+| ------------ | ---------------------------- | ------- | :-: | :---: | ---------------- |
+| modelValue   | `string \| [string, string]` | -       |  ✓  |   -   | 绑定值 (v-model) |
+| value        | `string \| [string, string]` | -       |  -  |   ✓   | 受控值           |
+| defaultValue | `string \| [string, string]` | -       |  -  |   ✓   | 非受控默认值     |
+| range        | `boolean`                    | `false` |  ✓  |   ✓   | 时间段选择       |
+| size         | `'sm' \| 'md' \| 'lg'`       | `'md'`  |  ✓  |   ✓   | 尺寸             |
+| format       | `'12' \| '24'`               | `'24'`  |  ✓  |   ✓   | 时间制式         |
+| showSeconds  | `boolean`                    | `false` |  ✓  |   ✓   | 显示秒           |
+| hourStep     | `number`                     | `1`     |  ✓  |   ✓   | 小时步长         |
+| minuteStep   | `number`                     | `1`     |  ✓  |   ✓   | 分钟步长         |
+| secondStep   | `number`                     | `1`     |  ✓  |   ✓   | 秒步长           |
+| placeholder  | `string`                     | -       |  ✓  |   ✓   | 占位符           |
+| disabled     | `boolean`                    | `false` |  ✓  |   ✓   | 禁用             |
+| readonly     | `boolean`                    | `false` |  ✓  |   ✓   | 只读             |
+| required     | `boolean`                    | `false` |  ✓  |   ✓   | 必填             |
+| minTime      | `string`                     | -       |  ✓  |   ✓   | 最小可选时间     |
+| maxTime      | `string`                     | -       |  ✓  |   ✓   | 最大可选时间     |
+| clearable    | `boolean`                    | `true`  |  ✓  |   ✓   | 可清除           |
+| locale       | `string`                     | -       |  ✓  |   ✓   | 语言标识         |
+| labels       | `Partial<TimePickerLabels>`  | -       |  ✓  |   ✓   | 自定义文案       |
+| name         | `string`                     | -       |  ✓  |   ✓   | input name       |
+| id           | `string`                     | -       |  ✓  |   ✓   | input id         |
+
+### Events
+
+| Vue Event            | React Callback | Payload                              | Description |
+| -------------------- | -------------- | ------------------------------------ | ----------- |
+| `@update:modelValue` | `onChange`     | `string \| null \| [string, string]` | 值变更      |
+| `@change`            | -              | `string \| null \| [string, string]` | 值变更      |
+| `@clear`             | `onClear`      | -                                    | 清除        |
 
 ---
 

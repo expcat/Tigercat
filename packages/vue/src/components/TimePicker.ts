@@ -396,15 +396,8 @@ export const TimePicker = defineComponent({
     function togglePanel() {
       if (!props.disabled && !props.readonly) {
         isOpen.value = !isOpen.value
-        if (isOpen.value && parsedTime.value) {
-          selectedHours.value = parsedTime.value.hours
-          selectedMinutes.value = parsedTime.value.minutes
-          selectedSeconds.value = parsedTime.value.seconds
-
-          if (props.format === '12') {
-            const { period } = to12HourFormat(parsedTime.value.hours)
-            selectedPeriod.value = period
-          }
+        if (isOpen.value) {
+          syncSelectionFromActiveValue()
         }
       }
     }
@@ -785,7 +778,6 @@ export const TimePicker = defineComponent({
                     'div',
                     { class: timePickerColumnListClasses },
                     hoursList.value.map((hour) => {
-                      const displayHour = props.format === '12' ? hour : hour
                       const hours24 =
                         props.format === '12' ? to24HourFormat(hour, selectedPeriod.value) : hour
                       const isSelected = selectedHours.value === hours24
@@ -801,14 +793,14 @@ export const TimePicker = defineComponent({
                           onClick: () => selectHour(hour),
                           'data-tiger-timepicker-unit': 'hour',
                           'aria-label': getTimePickerOptionAriaLabel(
-                            displayHour,
+                            hour,
                             'hour',
                             props.locale,
                             props.labels
                           ),
                           'aria-selected': isSelected
                         },
-                        displayHour.toString().padStart(2, '0')
+                        hour.toString().padStart(2, '0')
                       )
                     })
                   )

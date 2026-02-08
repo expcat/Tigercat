@@ -302,7 +302,16 @@ const value = ref('male')
 ```vue
 <template>
   <TimePicker v-model="time" placeholder="Select time" />
-  <TimePicker v-model="time" format="HH:mm" />
+  <TimePicker v-model="time" format="12" />
+  <TimePicker v-model="time" :show-seconds="true" />
+  <TimePicker v-model="time" :hour-step="2" :minute-step="15" />
+  <TimePicker v-model="timeRange" range />
+  <TimePicker v-model="time" size="sm" />
+  <TimePicker v-model="time" min-time="09:00" max-time="18:00" />
+  <TimePicker v-model="time" disabled />
+  <TimePicker v-model="time" readonly />
+  <TimePicker v-model="time" clearable @clear="onClear" />
+  <TimePicker v-model="time" locale="zh-CN" :labels="{ now: '此刻' }" />
 </template>
 ```
 

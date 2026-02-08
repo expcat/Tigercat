@@ -83,24 +83,18 @@ export function getTimePickerOptionAriaLabel(
   labelOverrides?: Partial<TimePickerLabels>
 ): string {
   const labels = getTimePickerLabels(locale, labelOverrides)
-
-  if (isZhLocale(locale)) {
-    const suffix = unit === 'hour' ? labels.hour : unit === 'minute' ? labels.minute : labels.second
-    return `${value}${suffix}`
-  }
-
-  const lc = (locale ?? '').toLowerCase()
-
-  const useEnglishPlural = lc.length === 0 ? labelOverrides == null : lc.startsWith('en')
-
-  if (useEnglishPlural) {
-    if (unit === 'hour') return `${value} ${pluralizeEn(value, 'hour')}`
-    if (unit === 'minute') return `${value} ${pluralizeEn(value, 'minute')}`
-    return `${value} ${pluralizeEn(value, 'second')}`
-  }
-
   const unitLabel =
     unit === 'hour' ? labels.hour : unit === 'minute' ? labels.minute : labels.second
+
+  // Chinese: no space between value and unit
+  if (isZhLocale(locale)) return `${value}${unitLabel}`
+
+  // English pluralization when locale is explicitly English or using default EN labels
+  const lc = (locale ?? '').toLowerCase()
+  if (lc.startsWith('en') || (!lc && !labelOverrides)) {
+    return `${value} ${pluralizeEn(value, unit)}`
+  }
+
   return `${value} ${unitLabel}`
 }
 

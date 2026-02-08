@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { TimePicker } from '@expcat/tigercat-react'
@@ -88,9 +88,11 @@ describe('TimePicker', () => {
     await user.click(screen.getByRole('textbox'))
     const dialog = await screen.findByRole('dialog')
 
-    const hourButtons = within(dialog)
-      .getAllByRole('button', { name: /hours/i })
-      .filter((el) => !(el as HTMLButtonElement).disabled) as HTMLButtonElement[]
+    const hourButtons = Array.from(
+      dialog.querySelectorAll<HTMLButtonElement>(
+        'button[data-tiger-timepicker-unit="hour"]:not([disabled])'
+      )
+    )
 
     expect(hourButtons.length).toBeGreaterThanOrEqual(1)
     expect(document.activeElement).toBe(hourButtons[0])
@@ -111,9 +113,9 @@ describe('TimePicker', () => {
 
     await user.click(screen.getByRole('textbox'))
     const dialog = await screen.findByRole('dialog')
-    const hourButton = within(dialog).getAllByRole('button', {
-      name: /hours/i
-    })[0]
+    const hourButton = dialog.querySelector<HTMLButtonElement>(
+      'button[data-tiger-timepicker-unit="hour"]:not([disabled])'
+    )!
 
     await user.click(hourButton)
     expect(onChange).toHaveBeenCalled()

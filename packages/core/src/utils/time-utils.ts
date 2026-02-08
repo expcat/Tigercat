@@ -134,15 +134,7 @@ export function formatTimeDisplay(
   format: TimeFormat = '24',
   showSeconds: boolean = false
 ): string {
-  if (format === '12') {
-    const { hours: hours12, period } = to12HourFormat(hours)
-    const h = hours12.toString().padStart(2, '0')
-    const m = clampValue(minutes, 0, 59).toString().padStart(2, '0')
-    const s = clampValue(seconds, 0, 59).toString().padStart(2, '0')
-    const timeStr = showSeconds ? `${h}:${m}:${s}` : `${h}:${m}`
-    return `${timeStr} ${period}`
-  }
-  return formatTime(hours, minutes, seconds, showSeconds)
+  return formatTimeDisplayWithLocale(hours, minutes, seconds, format, showSeconds)
 }
 
 export function getTimePeriodLabels(locale?: string): {
@@ -252,19 +244,24 @@ export function generateHours(step: number = 1, format: TimeFormat = '24'): numb
 }
 
 /**
+ * Generate a list of time values from 0 up to (but not including) max, using the given step.
+ */
+function generateTimeSlots(step: number, max: number): number[] {
+  const validStep = validateStep(step)
+  const values: number[] = []
+  for (let i = 0; i < max; i += validStep) {
+    values.push(i)
+  }
+  return values
+}
+
+/**
  * Generate list of minutes based on step
  * @param step - Minute step, defaults to 1
  * @returns Array of minute values
  */
 export function generateMinutes(step: number = 1): number[] {
-  const minutes: number[] = []
-  const validStep = validateStep(step)
-
-  for (let i = 0; i < 60; i += validStep) {
-    minutes.push(i)
-  }
-
-  return minutes
+  return generateTimeSlots(step, 60)
 }
 
 /**
@@ -273,14 +270,7 @@ export function generateMinutes(step: number = 1): number[] {
  * @returns Array of second values
  */
 export function generateSeconds(step: number = 1): number[] {
-  const seconds: number[] = []
-  const validStep = validateStep(step)
-
-  for (let i = 0; i < 60; i += validStep) {
-    seconds.push(i)
-  }
-
-  return seconds
+  return generateTimeSlots(step, 60)
 }
 
 /**

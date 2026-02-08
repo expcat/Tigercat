@@ -322,7 +322,17 @@ const [value, setValue] = useState('male')
 
 ```tsx
 <TimePicker value={time} onChange={setTime} placeholder="Select time" />
-<TimePicker value={time} onChange={setTime} format="HH:mm" />
+<TimePicker value={time} onChange={setTime} format="12" />
+<TimePicker value={time} onChange={setTime} showSeconds />
+<TimePicker value={time} onChange={setTime} hourStep={2} minuteStep={15} />
+<TimePicker range value={timeRange} onChange={setTimeRange} />
+<TimePicker value={time} onChange={setTime} size="sm" />
+<TimePicker value={time} onChange={setTime} minTime="09:00" maxTime="18:00" />
+<TimePicker value={time} onChange={setTime} disabled />
+<TimePicker value={time} onChange={setTime} readonly />
+<TimePicker value={time} onChange={setTime} clearable onClear={onClear} />
+<TimePicker defaultValue="10:00" />
+<TimePicker value={time} onChange={setTime} locale="zh-CN" labels={{ now: '此刻' }} />
 ```
 
 ---

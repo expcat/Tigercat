@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
 import {
   classNames,
   icon20ViewBox,
@@ -165,40 +165,47 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
   const [selectedPeriod, setSelectedPeriod] = useState<'AM' | 'PM'>('AM')
 
   // Update internal state when value changes (or active part changes in range mode)
-  useEffect(() => {
+  const syncFromActiveValue = () => {
     const parsed = parseTime(activeValue)
-    if (parsed) {
-      setSelectedHours(parsed.hours)
-      setSelectedMinutes(parsed.minutes)
-      setSelectedSeconds(parsed.seconds)
+    if (!parsed) return
 
-      if (format === '12') {
-        const { period } = to12HourFormat(parsed.hours)
-        setSelectedPeriod(period)
-      }
+    setSelectedHours(parsed.hours)
+    setSelectedMinutes(parsed.minutes)
+    setSelectedSeconds(parsed.seconds)
+
+    if (format === '12') {
+      const { period } = to12HourFormat(parsed.hours)
+      setSelectedPeriod(period)
     }
+  }
+
+  useEffect(() => {
+    syncFromActiveValue()
   }, [activeValue, format, activePart, isRangeMode])
 
-  const labels = getTimePickerLabels(locale, labelsOverrides)
+  const labels = useMemo(
+    () => getTimePickerLabels(locale, labelsOverrides),
+    [locale, labelsOverrides]
+  )
 
   const placeholder =
     allProps.placeholder ?? (isRangeMode ? labels.selectTimeRange : labels.selectTime)
 
-  const periodLabels = getTimePeriodLabels(locale)
-
-  const singleDisplayValue = parsedTime
-    ? formatTimeDisplayWithLocale(
-        parsedTime.hours,
-        parsedTime.minutes,
-        parsedTime.seconds,
-        format,
-        showSeconds,
-        locale
-      )
-    : ''
+  const periodLabels = useMemo(() => getTimePeriodLabels(locale), [locale])
 
   const displayValue = (() => {
-    if (!isRangeMode) return singleDisplayValue
+    if (!isRangeMode) {
+      return parsedTime
+        ? formatTimeDisplayWithLocale(
+            parsedTime.hours,
+            parsedTime.minutes,
+            parsedTime.seconds,
+            format,
+            showSeconds,
+            locale
+          )
+        : ''
+    }
 
     const toDisplay = (timeStr: string | null): string => {
       const parsed = parseTime(timeStr)
@@ -225,9 +232,9 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
     return currentRangeValue[0] !== null || currentRangeValue[1] !== null
   })()
 
-  const hoursList = generateHours(hourStep, format)
-  const minutesList = generateMinutes(minuteStep)
-  const secondsList = generateSeconds(secondStep)
+  const hoursList = useMemo(() => generateHours(hourStep, format), [hourStep, format])
+  const minutesList = useMemo(() => generateMinutes(minuteStep), [minuteStep])
+  const secondsList = useMemo(() => generateSeconds(secondStep), [secondStep])
 
   const togglePanel = () => {
     if (!disabled && !readonly) {
@@ -237,16 +244,7 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
       }
 
       setIsOpen(true)
-      if (parsedTime) {
-        setSelectedHours(parsedTime.hours)
-        setSelectedMinutes(parsedTime.minutes)
-        setSelectedSeconds(parsedTime.seconds)
-
-        if (format === '12') {
-          const { period } = to12HourFormat(parsedTime.hours)
-          setSelectedPeriod(period)
-        }
-      }
+      syncFromActiveValue()
     }
   }
 
@@ -596,7 +594,6 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
               <div className={timePickerColumnHeaderClasses}>{labels.hour}</div>
               <div className={timePickerColumnListClasses}>
                 {hoursList.map((hour) => {
-                  const displayHour = format === '12' ? hour : hour
                   const hours24 = format === '12' ? to24HourFormat(hour, selectedPeriod) : hour
                   const isSelected = selectedHours === hours24
                   const isDisabled = isHourDisabled(hour)
@@ -610,13 +607,13 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
                       onClick={() => selectHour(hour)}
                       data-tiger-timepicker-unit="hour"
                       aria-label={getTimePickerOptionAriaLabel(
-                        displayHour,
+                        hour,
                         'hour',
                         locale,
                         labelsOverrides
                       )}
                       aria-selected={isSelected}>
-                      {displayHour.toString().padStart(2, '0')}
+                      {hour.toString().padStart(2, '0')}
                     </button>
                   )
                 })}
