@@ -32,18 +32,97 @@ description: React navigation components usage
 ## Menu 菜单
 
 ```tsx
-const [selectedKeys, setSelectedKeys] = useState(['home'])
-const [openKeys, setOpenKeys] = useState(['sub1'])
-const menuItems = [
-  { key: 'home', label: 'Home', icon: <HomeIcon /> },
-  { key: 'sub1', label: 'Sub Menu', children: [
-    { key: 'opt1', label: 'Option 1' },
-    { key: 'opt2', label: 'Option 2' }
-  ]}
-]
+import { useState } from 'react'
+import { Menu, MenuItem, SubMenu, MenuItemGroup } from '@expcat/tigercat-react'
 
-<Menu selectedKeys={selectedKeys} onSelect={setSelectedKeys} items={menuItems} mode="horizontal" />
-<Menu selectedKeys={selectedKeys} openKeys={openKeys} onOpenChange={setOpenKeys} items={menuItems} mode="vertical" collapsed />
+// 基本垂直菜单
+const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['home'])
+
+<Menu selectedKeys={selectedKeys} onSelect={(key) => setSelectedKeys([key])}>
+  <MenuItem itemKey="home">首页</MenuItem>
+  <MenuItem itemKey="products">产品</MenuItem>
+  <MenuItem itemKey="about" disabled>关于</MenuItem>
+</Menu>
+
+// 水平菜单
+<Menu mode="horizontal" selectedKeys={selectedKeys} onSelect={(key) => setSelectedKeys([key])}>
+  <MenuItem itemKey="home">首页</MenuItem>
+  <MenuItem itemKey="products">产品</MenuItem>
+</Menu>
+
+// 带子菜单
+const [openKeys, setOpenKeys] = useState<(string | number)[]>(['sub1'])
+
+<Menu
+  selectedKeys={selectedKeys}
+  openKeys={openKeys}
+  onSelect={(key) => setSelectedKeys([key])}
+  onOpenChange={(_key, { openKeys }) => setOpenKeys(openKeys)}>
+  <SubMenu itemKey="sub1" title="导航一" icon={homeIcon}>
+    <MenuItem itemKey="1">选项 1</MenuItem>
+    <MenuItem itemKey="2">选项 2</MenuItem>
+  </SubMenu>
+  <MenuItem itemKey="3">导航二</MenuItem>
+</Menu>
+
+// 内联模式 + 自定义缩进
+<Menu mode="inline" inlineIndent={32}
+  selectedKeys={selectedKeys} openKeys={openKeys}
+  onSelect={(key) => setSelectedKeys([key])}
+  onOpenChange={(_key, { openKeys }) => setOpenKeys(openKeys)}>
+  <SubMenu itemKey="sub1" title="分类一">
+    <MenuItem itemKey="1">子项 1</MenuItem>
+    <SubMenu itemKey="sub1-1" title="分类一-一">
+      <MenuItem itemKey="1-1">深层子项</MenuItem>
+    </SubMenu>
+  </SubMenu>
+</Menu>
+
+// 折叠菜单
+<Menu mode="vertical" collapsed={collapsed}
+  selectedKeys={selectedKeys} onSelect={(key) => setSelectedKeys([key])}>
+  <MenuItem itemKey="1" icon={homeIcon}>首页</MenuItem>
+  <SubMenu itemKey="sub1" title="设置" icon={settingsIcon}>
+    <MenuItem itemKey="2">常规</MenuItem>
+  </SubMenu>
+</Menu>
+
+// 暗色主题
+<Menu theme="dark" selectedKeys={selectedKeys} onSelect={(key) => setSelectedKeys([key])}>
+  <MenuItem itemKey="1">菜单项 1</MenuItem>
+  <MenuItem itemKey="2">菜单项 2</MenuItem>
+</Menu>
+
+// 单一展开模式（multiple=false）
+<Menu multiple={false}
+  selectedKeys={selectedKeys} openKeys={openKeys}
+  onSelect={(key) => setSelectedKeys([key])}
+  onOpenChange={(_key, { openKeys }) => setOpenKeys(openKeys)}>
+  <SubMenu itemKey="sub1" title="导航一">
+    <MenuItem itemKey="1">选项 1</MenuItem>
+  </SubMenu>
+  <SubMenu itemKey="sub2" title="导航二">
+    <MenuItem itemKey="2">选项 2</MenuItem>
+  </SubMenu>
+</Menu>
+
+// 非受控模式（使用 defaultSelectedKeys / defaultOpenKeys）
+<Menu defaultSelectedKeys={['1']} defaultOpenKeys={['sub1']}>
+  <SubMenu itemKey="sub1" title="导航一">
+    <MenuItem itemKey="1">选项 1</MenuItem>
+  </SubMenu>
+</Menu>
+
+// 分组菜单
+<Menu>
+  <MenuItemGroup title="分组一">
+    <MenuItem itemKey="1">选项 1</MenuItem>
+    <MenuItem itemKey="2">选项 2</MenuItem>
+  </MenuItemGroup>
+  <MenuItemGroup title="分组二">
+    <MenuItem itemKey="3">选项 3</MenuItem>
+  </MenuItemGroup>
+</Menu>
 ```
 
 ---

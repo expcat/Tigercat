@@ -5,6 +5,8 @@ import {
   getMenuItemIndent,
   isKeySelected,
   menuItemIconClasses,
+  moveFocusInMenu,
+  focusMenuEdge,
   type MenuItemProps as CoreMenuItemProps
 } from '@expcat/tigercat-core'
 import { useMenuContext } from './Menu'
@@ -24,45 +26,6 @@ export interface MenuItemProps extends CoreMenuItemProps {
    * Internal override for collapsed rendering (used by SubMenu popup)
    */
   collapsed?: boolean
-}
-
-function getMenuButtonsWithin(menuEl: HTMLElement): HTMLButtonElement[] {
-  return Array.from(
-    menuEl.querySelectorAll<HTMLButtonElement>('button[data-tiger-menuitem="true"]')
-  ).filter((el) => !el.disabled)
-}
-
-function roveFocus(current: HTMLButtonElement, next: HTMLButtonElement) {
-  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
-  if (!menuEl) {
-    next.focus()
-    return
-  }
-
-  const items = getMenuButtonsWithin(menuEl)
-  items.forEach((el) => {
-    el.tabIndex = el === next ? 0 : -1
-  })
-  next.focus()
-}
-
-function moveFocus(current: HTMLButtonElement, delta: number) {
-  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
-  if (!menuEl) return
-  const items = getMenuButtonsWithin(menuEl)
-  const currentIndex = items.indexOf(current)
-  if (currentIndex < 0) return
-
-  const nextIndex = (currentIndex + delta + items.length) % items.length
-  roveFocus(current, items[nextIndex])
-}
-
-function focusEdge(current: HTMLButtonElement, edge: 'start' | 'end') {
-  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
-  if (!menuEl) return
-  const items = getMenuButtonsWithin(menuEl)
-  if (items.length === 0) return
-  roveFocus(current, edge === 'start' ? items[0] : items[items.length - 1])
 }
 
 export const MenuItem: React.FC<MenuItemProps> = ({
@@ -115,25 +78,25 @@ export const MenuItem: React.FC<MenuItemProps> = ({
 
       if (event.key === nextKey) {
         event.preventDefault()
-        moveFocus(current, 1)
+        moveFocusInMenu(current, 1)
         return
       }
 
       if (event.key === prevKey) {
         event.preventDefault()
-        moveFocus(current, -1)
+        moveFocusInMenu(current, -1)
         return
       }
 
       if (event.key === 'Home') {
         event.preventDefault()
-        focusEdge(current, 'start')
+        focusMenuEdge(current, 'start')
         return
       }
 
       if (event.key === 'End') {
         event.preventDefault()
-        focusEdge(current, 'end')
+        focusMenuEdge(current, 'end')
         return
       }
 

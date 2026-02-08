@@ -10,6 +10,9 @@ import {
   submenuContentPopupClasses,
   submenuContentVerticalClasses,
   submenuContentInlineClasses,
+  moveFocusInMenu,
+  focusMenuEdge,
+  focusFirstChildItem,
   type SubMenuProps as CoreSubMenuProps
 } from '@expcat/tigercat-core'
 import { useMenuContext } from './Menu'
@@ -43,58 +46,6 @@ const ExpandIcon: React.FC<{ expanded: boolean }> = ({ expanded }) => (
     <path d="M6 9L1.5 4.5L2.205 3.795L6 7.59L9.795 3.795L10.5 4.5L6 9Z" />
   </svg>
 )
-
-function getMenuButtonsWithin(menuEl: HTMLElement): HTMLButtonElement[] {
-  return Array.from(
-    menuEl.querySelectorAll<HTMLButtonElement>('button[data-tiger-menuitem="true"]')
-  ).filter((el) => !el.disabled && !el.closest('[data-tiger-menu-hidden="true"]'))
-}
-
-function roveFocus(current: HTMLButtonElement, next: HTMLButtonElement) {
-  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
-  if (!menuEl) {
-    next.focus()
-    return
-  }
-
-  const items = getMenuButtonsWithin(menuEl)
-  items.forEach((el) => {
-    el.tabIndex = el === next ? 0 : -1
-  })
-  next.focus()
-}
-
-function moveFocus(current: HTMLButtonElement, delta: number) {
-  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
-  if (!menuEl) return
-  const items = getMenuButtonsWithin(menuEl)
-  const currentIndex = items.indexOf(current)
-  if (currentIndex < 0) return
-  const nextIndex = (currentIndex + delta + items.length) % items.length
-  roveFocus(current, items[nextIndex])
-}
-
-function focusEdge(current: HTMLButtonElement, edge: 'start' | 'end') {
-  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
-  if (!menuEl) return
-  const items = getMenuButtonsWithin(menuEl)
-  if (items.length === 0) return
-  roveFocus(current, edge === 'start' ? items[0] : items[items.length - 1])
-}
-
-function focusFirstChildItemFromTitle(titleEl: HTMLButtonElement) {
-  const li = titleEl.closest('li')
-  const submenu = li?.querySelector('ul[role="menu"]') as HTMLElement | null
-  if (!submenu) return
-
-  const items = getMenuButtonsWithin(submenu)
-  if (items.length === 0) return
-
-  items.forEach((el, idx) => {
-    el.tabIndex = idx === 0 ? 0 : -1
-  })
-  items[0].focus()
-}
 
 export const SubMenu: React.FC<SubMenuProps> = ({
   itemKey,
@@ -136,8 +87,8 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
   const titleClasses = useMemo(() => {
     if (!menuContext) return ''
-    return getSubMenuTitleClasses(menuContext.theme, disabled)
-  }, [menuContext, disabled])
+    return classNames(getSubMenuTitleClasses(menuContext.theme, disabled), className)
+  }, [menuContext, disabled, className])
 
   const contentClasses = useMemo(() => {
     if (!menuContext) return ''
@@ -180,7 +131,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({
       if (!menuContext) return
       setHasRenderedInline(true)
       menuContext.handleOpenChange(itemKey)
-      setTimeout(() => focusFirstChildItemFromTitle(titleEl), 0)
+      setTimeout(() => focusFirstChildItem(titleEl), 0)
     },
     [menuContext, itemKey]
   )
@@ -199,25 +150,25 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
       if (event.key === nextKey) {
         event.preventDefault()
-        moveFocus(current, 1)
+        moveFocusInMenu(current, 1)
         return
       }
 
       if (event.key === prevKey) {
         event.preventDefault()
-        moveFocus(current, -1)
+        moveFocusInMenu(current, -1)
         return
       }
 
       if (event.key === 'Home') {
         event.preventDefault()
-        focusEdge(current, 'start')
+        focusMenuEdge(current, 'start')
         return
       }
 
       if (event.key === 'End') {
         event.preventDefault()
-        focusEdge(current, 'end')
+        focusMenuEdge(current, 'end')
         return
       }
 
@@ -347,10 +298,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
   return (
     <li
-      className={classNames(
-        menuContext.mode === 'horizontal' || isPopup ? 'relative' : '',
-        className
-      )}
+      className={menuContext.mode === 'horizontal' || isPopup ? 'relative' : ''}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       role="none">

@@ -247,3 +247,78 @@ export function replaceKeys(key: string | number, keys: (string | number)[]): (s
   }
   return [key]
 }
+
+// ============================================================================
+// DOM utilities for keyboard navigation (shared by Vue & React)
+// ============================================================================
+
+/**
+ * Query all enabled, visible menu-item buttons within a menu container.
+ */
+export function getMenuButtons(container: HTMLElement): HTMLButtonElement[] {
+  return Array.from(
+    container.querySelectorAll<HTMLButtonElement>('button[data-tiger-menuitem="true"]')
+  ).filter((el) => !el.disabled && !el.closest('[data-tiger-menu-hidden="true"]'))
+}
+
+/**
+ * Move roving-tabindex focus by `delta` steps (±1) within the nearest `ul[role="menu"]`.
+ */
+export function moveFocusInMenu(current: HTMLButtonElement, delta: number): void {
+  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
+  if (!menuEl) return
+  const items = getMenuButtons(menuEl)
+  const idx = items.indexOf(current)
+  if (idx < 0) return
+  const next = items[(idx + delta + items.length) % items.length]
+  items.forEach((el) => {
+    el.tabIndex = el === next ? 0 : -1
+  })
+  next.focus()
+}
+
+/**
+ * Move roving-tabindex focus to the first or last item.
+ */
+export function focusMenuEdge(current: HTMLButtonElement, edge: 'start' | 'end'): void {
+  const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
+  if (!menuEl) return
+  const items = getMenuButtons(menuEl)
+  if (items.length === 0) return
+  const target = edge === 'start' ? items[0] : items[items.length - 1]
+  items.forEach((el) => {
+    el.tabIndex = el === target ? 0 : -1
+  })
+  target.focus()
+}
+
+/**
+ * Initialise roving tabindex on a menu root element.
+ * Sets tabindex=0 on the selected (or first) item, -1 on the rest.
+ */
+export function initRovingTabIndex(root: HTMLElement): void {
+  const items = getMenuButtons(root)
+  if (items.length === 0) return
+  const hasActive = items.some((el) => el.tabIndex === 0)
+  if (hasActive) return
+  const selected = items.find((el) => el.dataset.tigerSelected === 'true')
+  const active = selected ?? items[0]
+  items.forEach((el) => {
+    el.tabIndex = el === active ? 0 : -1
+  })
+}
+
+/**
+ * Focus the first child menu-item inside a submenu (called after expanding).
+ */
+export function focusFirstChildItem(titleEl: HTMLElement): void {
+  const li = titleEl.closest('li')
+  const submenu = li?.querySelector('ul[role="menu"]') as HTMLElement | null
+  if (!submenu) return
+  const items = getMenuButtons(submenu)
+  if (items.length === 0) return
+  items.forEach((el, idx) => {
+    el.tabIndex = idx === 0 ? 0 : -1
+  })
+  items[0].focus()
+}

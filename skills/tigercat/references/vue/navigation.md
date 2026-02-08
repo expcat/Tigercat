@@ -37,19 +37,80 @@ description: Vue navigation components usage
 
 ```vue
 <template>
-  <Menu v-model:selected-keys="selectedKeys" :items="menuItems" mode="horizontal" />
-  <Menu v-model:selected-keys="selectedKeys" v-model:open-keys="openKeys" :items="menuItems" mode="vertical" collapsed />
+  <!-- 基本垂直菜单 -->
+  <Menu v-model:selected-keys="selectedKeys">
+    <MenuItem itemKey="home">首页</MenuItem>
+    <MenuItem itemKey="products">产品</MenuItem>
+    <MenuItem itemKey="about" disabled>关于</MenuItem>
+  </Menu>
+
+  <!-- 水平菜单 -->
+  <Menu mode="horizontal" v-model:selected-keys="selectedKeys">
+    <MenuItem itemKey="home">首页</MenuItem>
+    <MenuItem itemKey="products">产品</MenuItem>
+  </Menu>
+
+  <!-- 带子菜单 -->
+  <Menu v-model:selected-keys="selectedKeys" v-model:open-keys="openKeys">
+    <SubMenu itemKey="sub1" title="导航一" :icon="homeIcon">
+      <MenuItem itemKey="1">选项 1</MenuItem>
+      <MenuItem itemKey="2">选项 2</MenuItem>
+    </SubMenu>
+    <MenuItem itemKey="3">导航二</MenuItem>
+  </Menu>
+
+  <!-- 内联模式 + 自定义缩进 -->
+  <Menu mode="inline" :inline-indent="32" v-model:selected-keys="selectedKeys" v-model:open-keys="openKeys">
+    <SubMenu itemKey="sub1" title="分类一">
+      <MenuItem itemKey="1">子项 1</MenuItem>
+      <SubMenu itemKey="sub1-1" title="分类一-一">
+        <MenuItem itemKey="1-1">深层子项</MenuItem>
+      </SubMenu>
+    </SubMenu>
+  </Menu>
+
+  <!-- 折叠菜单 -->
+  <Menu mode="vertical" :collapsed="collapsed" v-model:selected-keys="selectedKeys">
+    <MenuItem itemKey="1" :icon="homeIcon">首页</MenuItem>
+    <SubMenu itemKey="sub1" title="设置" :icon="settingsIcon">
+      <MenuItem itemKey="2">常规</MenuItem>
+    </SubMenu>
+  </Menu>
+
+  <!-- 暗色主题 -->
+  <Menu theme="dark" v-model:selected-keys="selectedKeys">
+    <MenuItem itemKey="1">菜单项 1</MenuItem>
+    <MenuItem itemKey="2">菜单项 2</MenuItem>
+  </Menu>
+
+  <!-- 单一展开模式（multiple=false） -->
+  <Menu :multiple="false" v-model:selected-keys="selectedKeys" v-model:open-keys="openKeys">
+    <SubMenu itemKey="sub1" title="导航一">
+      <MenuItem itemKey="1">选项 1</MenuItem>
+    </SubMenu>
+    <SubMenu itemKey="sub2" title="导航二">
+      <MenuItem itemKey="2">选项 2</MenuItem>
+    </SubMenu>
+  </Menu>
+
+  <!-- 分组菜单 -->
+  <Menu>
+    <MenuItemGroup title="分组一">
+      <MenuItem itemKey="1">选项 1</MenuItem>
+      <MenuItem itemKey="2">选项 2</MenuItem>
+    </MenuItemGroup>
+    <MenuItemGroup title="分组二">
+      <MenuItem itemKey="3">选项 3</MenuItem>
+    </MenuItemGroup>
+  </Menu>
 </template>
 <script setup>
+import { ref } from 'vue'
+import { Menu, MenuItem, SubMenu, MenuItemGroup } from '@expcat/tigercat-vue'
+
 const selectedKeys = ref(['home'])
 const openKeys = ref(['sub1'])
-const menuItems = [
-  { key: 'home', label: 'Home', icon: HomeIcon },
-  { key: 'sub1', label: 'Sub Menu', children: [
-    { key: 'opt1', label: 'Option 1' },
-    { key: 'opt2', label: 'Option 2' }
-  ]}
-]
+const collapsed = ref(false)
 </script>
 ```
 

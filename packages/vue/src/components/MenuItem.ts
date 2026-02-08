@@ -6,7 +6,9 @@ import {
   getMenuItemIndent,
   isKeySelected,
   menuItemIconClasses,
-  mergeStyleValues
+  mergeStyleValues,
+  moveFocusInMenu,
+  focusMenuEdge
 } from '@expcat/tigercat-core'
 import { MenuContextKey, type MenuContext } from './Menu'
 
@@ -83,20 +85,20 @@ export const MenuItem = defineComponent({
         )
       }
 
-      const effectiveCollapsed = props.collapsed ?? (menuContext ? menuContext.collapsed : false)
+      const effectiveCollapsed = props.collapsed ?? menuContext.collapsed.value
 
       return classNames(
-        getMenuItemClasses(isSelected.value, props.disabled, menuContext.theme, effectiveCollapsed),
+        getMenuItemClasses(isSelected.value, props.disabled, menuContext.theme.value, effectiveCollapsed),
         props.className,
         coerceClassValue(attrs.class)
       )
     })
 
     const indentStyle = computed(() => {
-      if (!menuContext || menuContext.mode !== 'inline' || props.level === 0) {
+      if (!menuContext || menuContext.mode.value !== 'inline' || props.level === 0) {
         return {}
       }
-      return getMenuItemIndent(props.level, menuContext.inlineIndent)
+      return getMenuItemIndent(props.level, menuContext.inlineIndent.value)
     })
 
     const itemStyle = computed(() => mergeStyleValues(attrs.style, props.style, indentStyle.value))
@@ -113,75 +115,37 @@ export const MenuItem = defineComponent({
       }
     }
 
-    const getMenuButtonsWithin = (menuEl: HTMLElement) => {
-      return Array.from(
-        menuEl.querySelectorAll<HTMLButtonElement>('button[data-tiger-menuitem="true"]')
-      ).filter((el) => !el.disabled)
-    }
-
-    const roveFocus = (current: HTMLButtonElement, next: HTMLButtonElement) => {
-      const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
-      if (!menuEl) {
-        next.focus()
-        return
-      }
-
-      const items = getMenuButtonsWithin(menuEl)
-      items.forEach((el) => {
-        el.tabIndex = el === next ? 0 : -1
-      })
-      next.focus()
-    }
-
-    const moveFocus = (current: HTMLButtonElement, delta: number) => {
-      const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
-      if (!menuEl) return
-      const items = getMenuButtonsWithin(menuEl)
-      const currentIndex = items.indexOf(current)
-      if (currentIndex < 0) return
-      const nextIndex = (currentIndex + delta + items.length) % items.length
-      roveFocus(current, items[nextIndex])
-    }
-
-    const focusEdge = (current: HTMLButtonElement, edge: 'start' | 'end') => {
-      const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
-      if (!menuEl) return
-      const items = getMenuButtonsWithin(menuEl)
-      if (items.length === 0) return
-      roveFocus(current, edge === 'start' ? items[0] : items[items.length - 1])
-    }
-
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!menuContext) return
       const current = event.currentTarget as HTMLButtonElement
       const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null
       const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true'
-      const isHorizontalRoot = isRoot && menuContext.mode === 'horizontal'
+      const isHorizontalRoot = isRoot && menuContext.mode.value === 'horizontal'
 
       const nextKey = isHorizontalRoot ? 'ArrowRight' : 'ArrowDown'
       const prevKey = isHorizontalRoot ? 'ArrowLeft' : 'ArrowUp'
 
       if (event.key === nextKey) {
         event.preventDefault()
-        moveFocus(current, 1)
+        moveFocusInMenu(current, 1)
         return
       }
 
       if (event.key === prevKey) {
         event.preventDefault()
-        moveFocus(current, -1)
+        moveFocusInMenu(current, -1)
         return
       }
 
       if (event.key === 'Home') {
         event.preventDefault()
-        focusEdge(current, 'start')
+        focusMenuEdge(current, 'start')
         return
       }
 
       if (event.key === 'End') {
         event.preventDefault()
-        focusEdge(current, 'end')
+        focusMenuEdge(current, 'end')
         return
       }
 
@@ -195,7 +159,7 @@ export const MenuItem = defineComponent({
       const children = []
       type HChildren = Parameters<typeof h>[2]
 
-      const effectiveCollapsed = props.collapsed ?? (menuContext ? menuContext.collapsed : false)
+      const effectiveCollapsed = props.collapsed ?? (menuContext ? menuContext.collapsed.value : false)
 
       // Render icon if provided
       if (props.icon) {

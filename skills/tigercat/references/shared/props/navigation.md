@@ -42,24 +42,54 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ## Menu 菜单
 
-### Props
+### Menu Props
 
-| Prop      | Type                         | Default      | Vue | React | Description |
-| --------- | ---------------------------- | ------------ | :-: | :---: | ----------- |
-| activeKey | `string`                     | -            |  ✓  |   ✓   | 当前选中项  |
-| items     | `MenuItem[]`                 | `[]`         |  ✓  |   ✓   | 菜单数据    |
-| mode      | `'vertical' \| 'horizontal'` | `'vertical'` |  ✓  |   ✓   | 模式        |
-| collapsed | `boolean`                    | `false`      |  ✓  |   ✓   | 折叠状态    |
+| Prop                | Type                                        | Default      | Vue | React | Description                    |
+| ------------------- | ------------------------------------------- | ------------ | :-: | :---: | ------------------------------ |
+| mode                | `'horizontal' \| 'vertical' \| 'inline'`    | `'vertical'` |  ✓  |   ✓   | 菜单模式                       |
+| theme               | `'light' \| 'dark'`                          | `'light'`    |  ✓  |   ✓   | 主题                           |
+| selectedKeys        | `(string \| number)[]`                       | -            |  ✓  |   ✓   | 当前选中项（受控）             |
+| defaultSelectedKeys | `(string \| number)[]`                       | `[]`         |  ✓  |   ✓   | 默认选中项                     |
+| openKeys            | `(string \| number)[]`                       | -            |  ✓  |   ✓   | 当前展开子菜单（受控）         |
+| defaultOpenKeys     | `(string \| number)[]`                       | `[]`         |  ✓  |   ✓   | 默认展开子菜单                 |
+| collapsed           | `boolean`                                    | `false`      |  ✓  |   ✓   | 折叠状态（vertical 模式）      |
+| multiple            | `boolean`                                    | `true`       |  ✓  |   ✓   | 是否同时展开多个子菜单         |
+| inlineIndent        | `number`                                     | `24`         |  ✓  |   ✓   | inline 模式缩进量（px）        |
 
-> **Vue**: 使用 `v-model:active-key` 绑定
-> **React**: 使用 `activeKey` + `onChange` 控制
+> **Vue**: 使用 `v-model:selected-keys` / `v-model:open-keys` 双向绑定
+> **React**: 使用 `selectedKeys` + `onSelect` / `openKeys` + `onOpenChange` 控制
+
+### MenuItem Props
+
+| Prop     | Type               | Default | Vue | React | Description |
+| -------- | ------------------ | ------- | :-: | :---: | ----------- |
+| itemKey  | `string \| number` | -       |  ✓  |   ✓   | 唯一标识    |
+| disabled | `boolean`          | `false` |  ✓  |   ✓   | 禁用        |
+| icon     | `string \| VNode \| ReactNode` | -  |  ✓  |   ✓   | 图标       |
+
+### SubMenu Props
+
+| Prop     | Type               | Default | Vue | React | Description |
+| -------- | ------------------ | ------- | :-: | :---: | ----------- |
+| itemKey  | `string \| number` | -       |  ✓  |   ✓   | 唯一标识    |
+| title    | `string`           | `''`    |  ✓  |   ✓   | 标题        |
+| icon     | `string \| VNode \| ReactNode` | -  |  ✓  |   ✓   | 图标       |
+| disabled | `boolean`          | `false` |  ✓  |   ✓   | 禁用        |
+
+### MenuItemGroup Props
+
+| Prop  | Type     | Default | Vue | React | Description |
+| ----- | -------- | ------- | :-: | :---: | ----------- |
+| title | `string` | `''`    |  ✓  |   ✓   | 分组标题    |
 
 ### Events
 
-| Vue Event            | React Callback | Payload       | Description    |
-| -------------------- | -------------- | ------------- | -------------- |
-| `@select`            | `onSelect`     | `key: string` | 选中事件       |
-| `@update:active-key` | `onChange`     | `key: string` | activeKey 变更 |
+| Vue Event              | React Callback | Payload                                              | Description     |
+| ---------------------- | -------------- | ---------------------------------------------------- | --------------- |
+| `@select`              | `onSelect`     | `(key, { selectedKeys })`                             | 选中菜单项      |
+| `@open-change`         | `onOpenChange` | `(key, { openKeys })`                                 | 子菜单展开/收起 |
+| `@update:selectedKeys` | -              | `selectedKeys`                                        | v-model 更新    |
+| `@update:openKeys`     | -              | `openKeys`                                            | v-model 更新    |
 
 ---
 

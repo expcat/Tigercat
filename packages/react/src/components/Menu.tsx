@@ -10,6 +10,9 @@ import React, {
 import {
   classNames,
   getMenuClasses,
+  replaceKeys,
+  toggleKey,
+  initRovingTabIndex,
   type MenuMode,
   type MenuTheme,
   type MenuProps as CoreMenuProps
@@ -83,7 +86,7 @@ export const Menu: React.FC<MenuProps> = ({
   // Handle menu item selection
   const handleSelect = useCallback(
     (key: string | number) => {
-      const newSelectedKeys = [key]
+      const newSelectedKeys = replaceKeys(key, selectedKeys)
 
       // Update internal state if uncontrolled
       if (controlledSelectedKeys === undefined) {
@@ -93,26 +96,14 @@ export const Menu: React.FC<MenuProps> = ({
       // Call event handler
       onSelect?.(key, { selectedKeys: newSelectedKeys })
     },
-    [controlledSelectedKeys, onSelect]
+    [controlledSelectedKeys, selectedKeys, onSelect]
   )
 
   // Handle submenu open/close
   const handleOpenChange = useCallback(
     (key: string | number) => {
-      const isOpen = openKeys.includes(key)
-      let newOpenKeys: (string | number)[]
-
-      if (isOpen) {
-        // Close submenu
-        newOpenKeys = openKeys.filter((k) => k !== key)
-      } else {
-        // Open submenu
-        if (multiple) {
-          newOpenKeys = [...openKeys, key]
-        } else {
-          newOpenKeys = [key]
-        }
-      }
+      const toggled = toggleKey(key, openKeys)
+      const newOpenKeys = multiple ? toggled : toggled.includes(key) ? [key] : []
 
       // Update internal state if uncontrolled
       if (controlledOpenKeys === undefined) {
@@ -146,23 +137,7 @@ export const Menu: React.FC<MenuProps> = ({
   )
 
   useEffect(() => {
-    const root = menuRef.current
-    if (!root) return
-
-    const items = Array.from(
-      root.querySelectorAll<HTMLButtonElement>('button[data-tiger-menuitem="true"]')
-    ).filter((el) => !el.disabled && !el.closest('[data-tiger-menu-hidden="true"]'))
-
-    if (items.length === 0) return
-
-    const hasActive = items.some((el) => el.tabIndex === 0)
-    if (hasActive) return
-
-    const selected = items.find((el) => el.dataset.tigerSelected === 'true')
-    const active = selected ?? items[0]
-    items.forEach((el) => {
-      el.tabIndex = el === active ? 0 : -1
-    })
+    if (menuRef.current) initRovingTabIndex(menuRef.current)
   }, [mode, collapsed, selectedKeys, openKeys])
 
   return (

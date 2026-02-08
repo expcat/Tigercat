@@ -20,7 +20,8 @@ import {
   type MenuKey,
   type MenuProps as CoreMenuProps,
   replaceKeys,
-  toggleKey
+  toggleKey,
+  initRovingTabIndex
 } from '@expcat/tigercat-core'
 
 // Menu context key
@@ -28,10 +29,10 @@ export const MenuContextKey = Symbol('MenuContext')
 
 // Menu context interface
 export interface MenuContext {
-  mode: MenuMode
-  theme: MenuTheme
-  collapsed: boolean
-  inlineIndent: number
+  mode: ComputedRef<MenuMode>
+  theme: ComputedRef<MenuTheme>
+  collapsed: ComputedRef<boolean>
+  inlineIndent: ComputedRef<number>
   selectedKeys: ComputedRef<MenuKey[]>
   openKeys: ComputedRef<MenuKey[]>
   handleSelect: (key: string | number) => void
@@ -197,51 +198,35 @@ export const Menu = defineComponent({
     })
 
     // Provide menu context to child components
+    const modeRef = computed(() => props.mode)
+    const themeRef = computed(() => props.theme)
+    const collapsedRef = computed(() => props.collapsed)
+    const inlineIndentRef = computed(() => props.inlineIndent)
+
     provide<MenuContext>(MenuContextKey, {
-      mode: props.mode,
-      theme: props.theme,
-      collapsed: props.collapsed,
-      inlineIndent: props.inlineIndent,
+      mode: modeRef,
+      theme: themeRef,
+      collapsed: collapsedRef,
+      inlineIndent: inlineIndentRef,
       selectedKeys: currentSelectedKeys,
       openKeys: currentOpenKeys,
       handleSelect,
       handleOpenChange
     })
 
-    const initRovingTabIndex = async () => {
+    const runRovingTabIndex = async () => {
       await nextTick()
-      const root = menuEl.value
-      if (!root) return
-
-      const items = Array.from(
-        root.querySelectorAll<HTMLButtonElement>('button[data-tiger-menuitem="true"]')
-      ).filter((el) => !el.disabled)
-
-      if (items.length === 0) return
-
-      const hasActive = items.some((el) => el.tabIndex === 0)
-      if (hasActive) return
-
-      const selected = items.find((el) => el.dataset.tigerSelected === 'true')
-      const active = selected ?? items[0]
-      items.forEach((el) => {
-        el.tabIndex = el === active ? 0 : -1
-      })
+      if (menuEl.value) initRovingTabIndex(menuEl.value)
     }
 
     onMounted(() => {
-      void initRovingTabIndex()
+      void runRovingTabIndex()
     })
 
     watch(
-      [
-        () => props.mode,
-        () => props.collapsed,
-        () => currentSelectedKeys.value,
-        () => currentOpenKeys.value
-      ],
+      [modeRef, collapsedRef, currentSelectedKeys, currentOpenKeys],
       () => {
-        void initRovingTabIndex()
+        void runRovingTabIndex()
       },
       { deep: true }
     )

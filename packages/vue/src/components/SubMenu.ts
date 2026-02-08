@@ -23,7 +23,10 @@ import {
   submenuContentHorizontalClasses,
   submenuContentPopupClasses,
   submenuContentVerticalClasses,
-  submenuContentInlineClasses
+  submenuContentInlineClasses,
+  moveFocusInMenu,
+  focusMenuEdge,
+  focusFirstChildItem
 } from '@expcat/tigercat-core'
 import { MenuContextKey, type MenuContext } from './Menu'
 
@@ -128,16 +131,16 @@ export const SubMenu = defineComponent({
     const isOpenByKeyboard = ref(false)
 
     const effectiveCollapsed = computed(() => {
-      return props.collapsed ?? (menuContext ? menuContext.collapsed : false)
+      return props.collapsed ?? (menuContext ? menuContext.collapsed.value : false)
     })
 
     const isPopup = computed(() => {
-      return !!menuContext && menuContext.mode === 'vertical' && effectiveCollapsed.value
+      return !!menuContext && menuContext.mode.value === 'vertical' && effectiveCollapsed.value
     })
 
     // Determine if submenu should be shown
     const isExpanded = computed(() => {
-      if (menuContext?.mode === 'horizontal' || isPopup.value) {
+      if (menuContext?.mode.value === 'horizontal' || isPopup.value) {
         return isHovered.value || isOpenByKeyboard.value
       }
       return isOpen.value
@@ -147,7 +150,7 @@ export const SubMenu = defineComponent({
     const titleClasses = computed(() => {
       if (!menuContext) return ''
       return classNames(
-        getSubMenuTitleClasses(menuContext.theme, props.disabled),
+        getSubMenuTitleClasses(menuContext.theme.value, props.disabled),
         props.className,
         coerceClassValue(attrs.class)
       )
@@ -164,13 +167,13 @@ export const SubMenu = defineComponent({
     const contentClasses = computed(() => {
       if (!menuContext) return ''
 
-      if (menuContext.mode === 'horizontal') {
+      if (menuContext.mode.value === 'horizontal') {
         return submenuContentHorizontalClasses
       }
 
       if (isPopup.value) return submenuContentPopupClasses
 
-      if (menuContext.mode === 'inline') return submenuContentInlineClasses
+      if (menuContext.mode.value === 'inline') return submenuContentInlineClasses
 
       return submenuContentVerticalClasses
     })
@@ -178,7 +181,7 @@ export const SubMenu = defineComponent({
     // Handle title click
     const handleTitleClick = () => {
       if (!menuContext || props.disabled) return
-      if (menuContext.mode === 'horizontal') return
+      if (menuContext.mode.value === 'horizontal') return
 
       if (isPopup.value) {
         isOpenByKeyboard.value = !isOpenByKeyboard.value
@@ -189,56 +192,10 @@ export const SubMenu = defineComponent({
       menuContext.handleOpenChange(props.itemKey)
     }
 
-    const getMenuButtonsWithin = (menuEl: HTMLElement) => {
-      return Array.from(
-        menuEl.querySelectorAll<HTMLButtonElement>('button[data-tiger-menuitem="true"]')
-      ).filter((el) => !el.disabled)
-    }
-
-    const roveFocus = (current: HTMLButtonElement, next: HTMLButtonElement) => {
-      const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
-      if (!menuEl) {
-        next.focus()
-        return
-      }
-
-      const items = getMenuButtonsWithin(menuEl)
-      items.forEach((el) => {
-        el.tabIndex = el === next ? 0 : -1
-      })
-      next.focus()
-    }
-
-    const moveFocus = (current: HTMLButtonElement, delta: number) => {
-      const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
-      if (!menuEl) return
-      const items = getMenuButtonsWithin(menuEl)
-      const currentIndex = items.indexOf(current)
-      if (currentIndex < 0) return
-      const nextIndex = (currentIndex + delta + items.length) % items.length
-      roveFocus(current, items[nextIndex])
-    }
-
-    const focusEdge = (current: HTMLButtonElement, edge: 'start' | 'end') => {
-      const menuEl = current.closest('ul[role="menu"]') as HTMLElement | null
-      if (!menuEl) return
-      const items = getMenuButtonsWithin(menuEl)
-      if (items.length === 0) return
-      roveFocus(current, edge === 'start' ? items[0] : items[items.length - 1])
-    }
-
-    const focusFirstChildItem = async () => {
+    const focusFirstChild = async () => {
       await nextTick()
       const titleEl = document.activeElement as HTMLElement | null
-      const li = titleEl?.closest('li')
-      const submenu = li?.querySelector('ul[role="menu"]') as HTMLElement | null
-      if (!submenu) return
-      const items = getMenuButtonsWithin(submenu)
-      if (items.length === 0) return
-      items.forEach((el, idx) => {
-        el.tabIndex = idx === 0 ? 0 : -1
-      })
-      items[0].focus()
+      if (titleEl) focusFirstChildItem(titleEl)
     }
 
     const handleTitleKeyDown = async (event: KeyboardEvent) => {
@@ -247,37 +204,37 @@ export const SubMenu = defineComponent({
 
       const rootMenu = current.closest('ul[role="menu"]') as HTMLElement | null
       const isRoot = rootMenu?.dataset.tigerMenuRoot === 'true'
-      const isHorizontalRoot = isRoot && menuContext.mode === 'horizontal'
+      const isHorizontalRoot = isRoot && menuContext.mode.value === 'horizontal'
 
       const nextKey = isHorizontalRoot ? 'ArrowRight' : 'ArrowDown'
       const prevKey = isHorizontalRoot ? 'ArrowLeft' : 'ArrowUp'
 
       if (event.key === nextKey) {
         event.preventDefault()
-        moveFocus(current, 1)
+        moveFocusInMenu(current, 1)
         return
       }
 
       if (event.key === prevKey) {
         event.preventDefault()
-        moveFocus(current, -1)
+        moveFocusInMenu(current, -1)
         return
       }
 
       if (event.key === 'Home') {
         event.preventDefault()
-        focusEdge(current, 'start')
+        focusMenuEdge(current, 'start')
         return
       }
 
       if (event.key === 'End') {
         event.preventDefault()
-        focusEdge(current, 'end')
+        focusMenuEdge(current, 'end')
         return
       }
 
       if (event.key === 'Escape' || event.key === 'ArrowLeft') {
-        if (menuContext.mode === 'horizontal' || isPopup.value) {
+        if (menuContext.mode.value === 'horizontal' || isPopup.value) {
           event.preventDefault()
           isOpenByKeyboard.value = false
           isHovered.value = false
@@ -293,17 +250,17 @@ export const SubMenu = defineComponent({
 
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault()
-        if (menuContext.mode === 'horizontal' || isPopup.value) {
+        if (menuContext.mode.value === 'horizontal' || isPopup.value) {
           isOpenByKeyboard.value = true
           return
         }
         menuContext.handleOpenChange(props.itemKey)
-        await focusFirstChildItem()
+        await focusFirstChild()
         return
       }
 
       if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-        if (menuContext.mode === 'horizontal' || isPopup.value) {
+        if (menuContext.mode.value === 'horizontal' || isPopup.value) {
           event.preventDefault()
           isOpenByKeyboard.value = true
           return
@@ -312,21 +269,21 @@ export const SubMenu = defineComponent({
         if (!isOpen.value) {
           event.preventDefault()
           menuContext.handleOpenChange(props.itemKey)
-          await focusFirstChildItem()
+          await focusFirstChild()
         }
       }
     }
 
     // Handle mouse enter for horizontal mode
     const handleMouseEnter = () => {
-      if (menuContext?.mode === 'horizontal' || isPopup.value) {
+      if (menuContext?.mode.value === 'horizontal' || isPopup.value) {
         isHovered.value = true
       }
     }
 
     // Handle mouse leave for horizontal mode
     const handleMouseLeave = () => {
-      if (menuContext?.mode === 'horizontal' || isPopup.value) {
+      if (menuContext?.mode.value === 'horizontal' || isPopup.value) {
         isHovered.value = false
         isOpenByKeyboard.value = false
       }
@@ -334,10 +291,10 @@ export const SubMenu = defineComponent({
 
     // Get indent style for nested menus in inline mode
     const indentStyle = computed(() => {
-      if (!menuContext || menuContext.mode !== 'inline' || props.level === 0) {
+      if (!menuContext || menuContext.mode.value !== 'inline' || props.level === 0) {
         return {}
       }
-      return getMenuItemIndent(props.level, menuContext.inlineIndent)
+      return getMenuItemIndent(props.level, menuContext.inlineIndent.value)
     })
 
     const withChildLevel = (nodes: VNode[] | undefined): VNode[] | undefined => {
@@ -398,7 +355,7 @@ export const SubMenu = defineComponent({
         titleChildren.push(h('span', { class: 'flex-1' }, props.title))
 
         // Add expand icon
-        if (menuContext.mode !== 'horizontal' && !isPopup.value) {
+        if (menuContext.mode.value !== 'horizontal' && !isPopup.value) {
           titleChildren.push(ExpandIcon(isExpanded.value))
         }
       } else if (!props.icon) {
@@ -431,7 +388,7 @@ export const SubMenu = defineComponent({
 
       // Render submenu content
       const contentNode =
-        menuContext.mode === 'horizontal' || isPopup.value
+        menuContext.mode.value === 'horizontal' || isPopup.value
           ? h(
               'ul',
               {
@@ -487,7 +444,7 @@ export const SubMenu = defineComponent({
       return h(
         'li',
         {
-          class: menuContext.mode === 'horizontal' || isPopup.value ? 'relative' : '',
+          class: menuContext.mode.value === 'horizontal' || isPopup.value ? 'relative' : '',
           onMouseenter: handleMouseEnter,
           onMouseleave: handleMouseLeave,
           role: 'none'

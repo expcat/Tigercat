@@ -494,6 +494,31 @@ describe('Menu', () => {
       await user.click(trigger)
       expect(onOpenChange).not.toHaveBeenCalled()
     })
+    it('closes other submenus when multiple is false', async () => {
+      const user = userEvent.setup()
+      const onOpenChange = vi.fn()
+
+      render(
+        <Menu multiple={false} defaultOpenKeys={['sub1']} onOpenChange={onOpenChange}>
+          <SubMenu itemKey="sub1" title="Submenu 1">
+            <MenuItem itemKey="1">Item 1</MenuItem>
+          </SubMenu>
+          <SubMenu itemKey="sub2" title="Submenu 2">
+            <MenuItem itemKey="2">Item 2</MenuItem>
+          </SubMenu>
+        </Menu>
+      )
+
+      const trigger1 = screen.getByRole('menuitem', { name: 'Submenu 1' })
+      expect(trigger1).toHaveAttribute('aria-expanded', 'true')
+
+      const trigger2 = screen.getByRole('menuitem', { name: 'Submenu 2' })
+      await user.click(trigger2)
+
+      expect(onOpenChange).toHaveBeenCalledWith('sub2', { openKeys: ['sub2'] })
+      expect(trigger1).toHaveAttribute('aria-expanded', 'false')
+      expect(trigger2).toHaveAttribute('aria-expanded', 'true')
+    })
   })
 
   describe('MenuItemGroup', () => {

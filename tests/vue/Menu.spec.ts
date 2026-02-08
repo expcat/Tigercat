@@ -526,6 +526,30 @@ describe('Menu', () => {
       await fireEvent.click(trigger)
       expect(onOpenChange).not.toHaveBeenCalled()
     })
+    it('closes other submenus when multiple is false', async () => {
+      const { emitted } = render(Menu, {
+        props: { multiple: false, defaultOpenKeys: ['sub1'] },
+        slots: {
+          default: () => [
+            h(SubMenu, { itemKey: 'sub1', title: 'Submenu 1' }, () => [
+              h(MenuItem, { itemKey: '1' }, () => 'Item 1')
+            ]),
+            h(SubMenu, { itemKey: 'sub2', title: 'Submenu 2' }, () => [
+              h(MenuItem, { itemKey: '2' }, () => 'Item 2')
+            ])
+          ]
+        }
+      })
+
+      const trigger1 = screen.getByRole('menuitem', { name: 'Submenu 1' })
+      expect(trigger1).toHaveAttribute('aria-expanded', 'true')
+
+      const trigger2 = screen.getByRole('menuitem', { name: 'Submenu 2' })
+      await fireEvent.click(trigger2)
+
+      const updates = emitted()['update:openKeys'] as unknown as Array<[unknown]>
+      expect(updates[0][0]).toEqual(['sub2'])
+    })
   })
 
   describe('MenuItemGroup', () => {

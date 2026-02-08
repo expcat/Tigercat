@@ -96,6 +96,26 @@ const groupSnippet = `<Menu>
   </MenuItemGroup>
 </Menu>`
 
+const singleOpenSnippet = `<Menu
+  multiple={false}
+  selectedKeys={selectedKeys8}
+  openKeys={openKeys8}
+  onSelect={(key) => setSelectedKeys8([key])}
+  onOpenChange={(_key, { openKeys }) => setOpenKeys8(openKeys)}>
+  <SubMenu itemKey="sub1" title="导航 1">
+    <MenuItem itemKey="1">选项 1</MenuItem>
+    <MenuItem itemKey="2">选项 2</MenuItem>
+  </SubMenu>
+  <SubMenu itemKey="sub2" title="导航 2">
+    <MenuItem itemKey="3">选项 3</MenuItem>
+    <MenuItem itemKey="4">选项 4</MenuItem>
+  </SubMenu>
+  <SubMenu itemKey="sub3" title="导航 3">
+    <MenuItem itemKey="5">选项 5</MenuItem>
+    <MenuItem itemKey="6">选项 6</MenuItem>
+  </SubMenu>
+</Menu>`
+
 const MenuDemo: React.FC = () => {
   const [selectedKeys1, setSelectedKeys1] = useState<(string | number)[]>(['1'])
   const [selectedKeys2, setSelectedKeys2] = useState<(string | number)[]>(['home'])
@@ -107,6 +127,8 @@ const MenuDemo: React.FC = () => {
   const [selectedKeys5, setSelectedKeys5] = useState<(string | number)[]>(['1'])
   const [selectedKeys6, setSelectedKeys6] = useState<(string | number)[]>(['1'])
   const [selectedKeys7, setSelectedKeys7] = useState<(string | number)[]>(['1'])
+  const [selectedKeys8, setSelectedKeys8] = useState<(string | number)[]>(['1'])
+  const [openKeys8, setOpenKeys8] = useState<(string | number)[]>([])
 
   const homeIcon =
     '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>'
@@ -284,6 +306,36 @@ const MenuDemo: React.FC = () => {
                 <MenuItem itemKey="3">选项 3</MenuItem>
                 <MenuItem itemKey="4">选项 4</MenuItem>
               </MenuItemGroup>
+            </Menu>
+          </div>
+        </div>
+      </DemoBlock>
+
+      {/* 单一展开模式 */}
+      <DemoBlock
+        title="单一展开模式"
+        description="设置 multiple={false}，同时只能展开一个子菜单。"
+        code={singleOpenSnippet}>
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <div className="bg-white inline-block">
+            <Menu
+              multiple={false}
+              selectedKeys={selectedKeys8}
+              openKeys={openKeys8}
+              onSelect={(key) => setSelectedKeys8([key])}
+              onOpenChange={(_key, { openKeys }) => setOpenKeys8(openKeys)}>
+              <SubMenu itemKey="sub1" title="导航 1">
+                <MenuItem itemKey="1">选项 1</MenuItem>
+                <MenuItem itemKey="2">选项 2</MenuItem>
+              </SubMenu>
+              <SubMenu itemKey="sub2" title="导航 2">
+                <MenuItem itemKey="3">选项 3</MenuItem>
+                <MenuItem itemKey="4">选项 4</MenuItem>
+              </SubMenu>
+              <SubMenu itemKey="sub3" title="导航 3">
+                <MenuItem itemKey="5">选项 5</MenuItem>
+                <MenuItem itemKey="6">选项 6</MenuItem>
+              </SubMenu>
             </Menu>
           </div>
         </div>
