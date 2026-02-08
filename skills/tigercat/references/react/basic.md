@@ -33,8 +33,31 @@ import { Button } from '@expcat/tigercat-react'
 ## Alert 警告提示
 
 ```tsx
+{/* 基本类型 */}
 <Alert type="success" title="Success" description="Operation completed" />
-<Alert type="warning" title="Warning" closable onClose={handleClose} />
+<Alert type="warning" title="Warning" />
+<Alert type="error" title="Error" />
+<Alert type="info" title="Info" />
+
+{/* 尺寸 */}
+<Alert size="sm" title="Small" />
+<Alert size="lg" title="Large" description="Detailed text" />
+
+{/* 隐藏图标 */}
+<Alert title="No icon" showIcon={false} />
+
+{/* 可关闭 + 自定义无障碍标签 */}
+<Alert title="Closable" closable closeAriaLabel="关闭" onClose={handleClose} />
+
+{/* 自定义内容 */}
+<Alert
+  type="info"
+  titleSlot={<strong>Custom title</strong>}
+  descriptionSlot={<em>Custom description</em>}
+/>
+
+{/* children 默认内容 */}
+<Alert type="warning">Simple text content</Alert>
 ```
 
 ---

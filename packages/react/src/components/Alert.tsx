@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import {
   classNames,
   icon24PathStrokeLinecap,
@@ -79,32 +79,55 @@ export const Alert: React.FC<AlertProps> = ({
 }) => {
   const [visible, setVisible] = useState(true)
 
-  const colorScheme = getAlertTypeClasses(type, defaultAlertThemeColors)
-
-  const alertClasses = classNames(
-    alertBaseClasses,
-    alertSizeClasses[size],
-    colorScheme.bg,
-    colorScheme.border,
-    className
+  const colorScheme = useMemo(
+    () => getAlertTypeClasses(type, defaultAlertThemeColors),
+    [type]
   )
 
-  const iconClasses = classNames(alertIconSizeClasses[size], colorScheme.icon)
-  const titleClasses = classNames(alertTitleSizeClasses[size], colorScheme.title)
-  const descriptionClasses = classNames(alertDescriptionSizeClasses[size], colorScheme.description)
-  const closeButtonClasses = classNames(
-    alertCloseButtonBaseClasses,
-    colorScheme.closeButton,
-    colorScheme.closeButtonHover,
-    colorScheme.focus
+  const alertClasses = useMemo(
+    () =>
+      classNames(
+        alertBaseClasses,
+        alertSizeClasses[size],
+        colorScheme.bg,
+        colorScheme.border,
+        className
+      ),
+    [size, colorScheme, className]
   )
 
-  const handleClose = (event: React.MouseEvent<HTMLButtonElement>) => {
-    onClose?.(event)
-    if (!event.defaultPrevented) {
-      setVisible(false)
-    }
-  }
+  const iconClasses = useMemo(
+    () => classNames(alertIconSizeClasses[size], colorScheme.icon),
+    [size, colorScheme]
+  )
+  const titleClasses = useMemo(
+    () => classNames(alertTitleSizeClasses[size], colorScheme.title),
+    [size, colorScheme]
+  )
+  const descriptionClasses = useMemo(
+    () => classNames(alertDescriptionSizeClasses[size], colorScheme.description),
+    [size, colorScheme]
+  )
+  const closeButtonClasses = useMemo(
+    () =>
+      classNames(
+        alertCloseButtonBaseClasses,
+        colorScheme.closeButton,
+        colorScheme.closeButtonHover,
+        colorScheme.focus
+      ),
+    [colorScheme]
+  )
+
+  const handleClose = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      onClose?.(event)
+      if (!event.defaultPrevented) {
+        setVisible(false)
+      }
+    },
+    [onClose]
+  )
 
   if (!visible) {
     return null
@@ -112,32 +135,29 @@ export const Alert: React.FC<AlertProps> = ({
 
   const iconPath = getAlertIconPath(type)
 
+  const hasTitle = !!(title || titleSlot)
+  const hasDescription = !!(description || descriptionSlot)
+  const hasDefaultContent = !hasTitle && !hasDescription && !!children
+  const hasContent = hasTitle || hasDescription || hasDefaultContent
+
   return (
     <div {...props} className={alertClasses} role="alert">
-      {/* Icon */}
       {showIcon && (
         <div className={alertIconContainerClasses}>
           <Icon path={iconPath} className={iconClasses} />
         </div>
       )}
 
-      {/* Content */}
-      <div className={alertContentClasses}>
-        {/* Title */}
-        {(title || titleSlot) && <div className={titleClasses}>{titleSlot || title}</div>}
+      {hasContent && (
+        <div className={alertContentClasses}>
+          {hasTitle && <div className={titleClasses}>{titleSlot || title}</div>}
+          {hasDescription && (
+            <div className={descriptionClasses}>{descriptionSlot || description}</div>
+          )}
+          {hasDefaultContent && <div className={titleClasses}>{children}</div>}
+        </div>
+      )}
 
-        {/* Description */}
-        {(description || descriptionSlot) && (
-          <div className={descriptionClasses}>{descriptionSlot || description}</div>
-        )}
-
-        {/* Default content if no title/description */}
-        {!title && !description && !titleSlot && !descriptionSlot && children && (
-          <div className={titleClasses}>{children}</div>
-        )}
-      </div>
-
-      {/* Close button */}
       {closable && (
         <button
           className={closeButtonClasses}

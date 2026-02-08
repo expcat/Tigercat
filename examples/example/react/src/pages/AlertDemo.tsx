@@ -19,7 +19,8 @@ const sizeSnippet = `<Alert size="sm" type="info" title="小尺寸提示" />
 const iconSnippet = `<Alert type="success" title="带图标的成功提示" showIcon />
 <Alert type="warning" title="不带图标的警告提示" showIcon={false} />`
 
-const closableSnippet = `<Alert closable title="可关闭的提示" />`
+const closableSnippet = `<Alert closable title="可关闭的提示" />
+<Alert closable closeAriaLabel="关闭" title="自定义关闭标签" />`
 
 const descriptionSnippet = `<Alert type="success" title="操作成功" description="您的订单已成功提交..." />`
 
@@ -118,6 +119,7 @@ export default function AlertDemo() {
               title="操作成功"
               description="您的操作已成功完成"
               closable
+              closeAriaLabel="关闭提示"
               onClose={() => setShowAlert2(false)}
             />
           )}

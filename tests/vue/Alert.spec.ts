@@ -21,6 +21,24 @@ describe('Alert', () => {
     expect(screen.getByText('Alert description')).toBeInTheDocument()
   })
 
+  it('renders each type with correct icon', () => {
+    const types = ['info', 'success', 'warning', 'error'] as const
+    for (const type of types) {
+      const { container, unmount } = renderWithProps(Alert, { type, title: type })
+      expect(container.querySelector('[role="alert"] svg')).toBeInTheDocument()
+      unmount()
+    }
+  })
+
+  it('renders each size', () => {
+    const sizes = ['sm', 'md', 'lg'] as const
+    for (const size of sizes) {
+      const { unmount } = renderWithProps(Alert, { size, title: size })
+      expect(screen.getByText(size)).toBeInTheDocument()
+      unmount()
+    }
+  })
+
   it('renders slots for title/description', () => {
     renderWithSlots(
       Alert,
@@ -116,6 +134,16 @@ describe('Alert', () => {
 
     expect(onClose).toHaveBeenCalledTimes(1)
     expect(container.querySelector('[role="alert"]')).toBeInTheDocument()
+  })
+
+  it('uses custom closeAriaLabel', () => {
+    const { container } = renderWithProps(Alert, {
+      title: 'Alert',
+      closable: true,
+      closeAriaLabel: '关闭'
+    })
+
+    expect(container.querySelector('button[aria-label="关闭"]')).toBeInTheDocument()
   })
 
   it('has no a11y violations', async () => {

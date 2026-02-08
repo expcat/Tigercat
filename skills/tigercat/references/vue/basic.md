@@ -41,8 +41,30 @@ import { Button } from '@expcat/tigercat-vue'
 
 ```vue
 <template>
+  <!-- 基本类型 -->
   <Alert type="success" title="Success" description="Operation completed" />
-  <Alert type="warning" title="Warning" closable @close="handleClose" />
+  <Alert type="warning" title="Warning" />
+  <Alert type="error" title="Error" />
+  <Alert type="info" title="Info" />
+
+  <!-- 尺寸 -->
+  <Alert size="sm" title="Small" />
+  <Alert size="lg" title="Large" description="Detailed text" />
+
+  <!-- 隐藏图标 -->
+  <Alert title="No icon" :show-icon="false" />
+
+  <!-- 可关闭 + 自定义无障碍标签 -->
+  <Alert title="Closable" closable close-aria-label="关闭" @close="handleClose" />
+
+  <!-- 插槽自定义内容 -->
+  <Alert type="info">
+    <template #title><strong>Custom title</strong></template>
+    <template #description><em>Custom description</em></template>
+  </Alert>
+
+  <!-- 默认插槽 -->
+  <Alert type="warning">Simple text content</Alert>
 </template>
 ```
 

@@ -71,29 +71,19 @@ export const alertIconContainerClasses = 'flex-shrink-0'
 export const alertContentClasses = 'flex-1 ml-3'
 
 /**
- * SVG path for success (check circle) icon
- */
-export const alertSuccessIconPath = statusSuccessIconPath
-
-/**
- * SVG path for warning (exclamation triangle) icon
- */
-export const alertWarningIconPath = statusWarningIconPath
-
-/**
- * SVG path for error (x circle) icon
- */
-export const alertErrorIconPath = statusErrorIconPath
-
-/**
- * SVG path for info (information circle) icon
- */
-export const alertInfoIconPath = statusInfoIconPath
-
-/**
  * SVG path for close (x) icon
  */
 export const alertCloseIconPath = closeIconPathD
+
+/**
+ * Icon paths keyed by alert type
+ */
+const alertIconPaths: Record<AlertType, string> = {
+  success: statusSuccessIconPath,
+  warning: statusWarningIconPath,
+  error: statusErrorIconPath,
+  info: statusInfoIconPath
+}
 
 /**
  * Get icon path based on alert type
@@ -101,12 +91,5 @@ export const alertCloseIconPath = closeIconPathD
  * @returns SVG path string for the icon
  */
 export function getAlertIconPath(type: AlertType): string {
-  const iconPaths: Record<AlertType, string> = {
-    success: alertSuccessIconPath,
-    warning: alertWarningIconPath,
-    error: alertErrorIconPath,
-    info: alertInfoIconPath
-  }
-
-  return iconPaths[type]
+  return alertIconPaths[type]
 }
