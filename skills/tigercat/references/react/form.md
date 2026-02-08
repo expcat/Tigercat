@@ -340,8 +340,20 @@ const [value, setValue] = useState('male')
 ## Upload 上传
 
 ```tsx
-<Upload fileList={fileList} onChange={setFileList} action="/api/upload" limit={3} accept="image/*">
-  <Button>Click to Upload</Button>
+{
+  /* 基础按钮上传 */
+}
+;<Upload fileList={fileList} onChange={handleChange} limit={3} accept="image/*">
+  Click to Upload
 </Upload>
-<Upload fileList={fileList} onChange={setFileList} action="/api/upload" drag />
+
+{
+  /* 拖拽上传 */
+}
+;<Upload fileList={fileList} onChange={handleChange} drag />
+
+{
+  /* 自定义上传请求 */
+}
+;<Upload fileList={fileList} onChange={handleChange} customRequest={simulateUpload} drag />
 ```

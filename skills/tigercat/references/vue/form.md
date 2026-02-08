@@ -321,9 +321,13 @@ const value = ref('male')
 
 ```vue
 <template>
-  <Upload v-model:file-list="fileList" action="/api/upload" :limit="3" accept="image/*">
-    <Button>Click to Upload</Button>
-  </Upload>
-  <Upload v-model:file-list="fileList" action="/api/upload" drag />
+  <!-- 基础按钮上传 -->
+  <Upload v-model:file-list="fileList" :limit="3" accept="image/*"> Click to Upload </Upload>
+
+  <!-- 拖拽上传 -->
+  <Upload v-model:file-list="fileList" drag />
+
+  <!-- 自定义上传请求 -->
+  <Upload v-model:file-list="fileList" :custom-request="simulateUpload" drag />
 </template>
 ```

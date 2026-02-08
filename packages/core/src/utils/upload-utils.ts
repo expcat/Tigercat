@@ -235,11 +235,10 @@ export function formatFileSize(bytes: number): string {
 
 /**
  * Get upload button classes
- * @param drag - Whether in drag mode
  * @param disabled - Whether the button is disabled
  * @returns Complete button class string
  */
-export function getUploadButtonClasses(drag: boolean, disabled: boolean): string {
+export function getUploadButtonClasses(disabled: boolean): string {
   const baseClasses = [
     'inline-flex',
     'items-center',

@@ -24,6 +24,8 @@ import {
 
 import { useTigerConfig } from './ConfigProvider'
 
+const spinnerSvg = getSpinnerSVG('spinner')
+
 export interface UploadProps
   extends
     Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'onError' | 'onProgress'>,
@@ -68,7 +70,6 @@ export const Upload: React.FC<UploadProps> = ({
   style,
   ...divProps
 }) => {
-  const spinnerSvg = getSpinnerSVG('spinner')
   const config = useTigerConfig()
   const mergedLocale = useMemo(
     () => mergeTigerLocale(config.locale, locale),
@@ -186,9 +187,7 @@ export const Upload: React.FC<UploadProps> = ({
   }
 
   const handlePreview = (file: UploadFile) => {
-    if (onPreview) {
-      onPreview(file)
-    }
+    onPreview?.(file)
   }
 
   const handleDragOver = (event: React.DragEvent) => {
@@ -271,7 +270,7 @@ export const Upload: React.FC<UploadProps> = ({
     return (
       <button
         type="button"
-        className={getUploadButtonClasses(drag, disabled)}
+        className={getUploadButtonClasses(disabled)}
         onClick={handleClick}
         disabled={disabled}
         aria-label={labels.buttonAriaLabel}>

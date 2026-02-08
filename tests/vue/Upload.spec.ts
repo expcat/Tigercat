@@ -240,6 +240,27 @@ describe('Upload', () => {
       })
     })
 
+    it('should emit preview event when preview button is clicked in picture-card mode', async () => {
+      const onPreview = vi.fn()
+      const { container } = renderWithProps(Upload, {
+        fileList: [
+          {
+            uid: 'file-1',
+            name: 'test.jpg',
+            status: 'success',
+            url: 'https://example.com/test.jpg'
+          }
+        ],
+        listType: 'picture-card',
+        onPreview
+      })
+
+      const previewButton = container.querySelector('[aria-label*="Preview"]') as HTMLButtonElement
+      await fireEvent.click(previewButton)
+
+      expect(onPreview).toHaveBeenCalled()
+    })
+
     it('should accumulate multiple selected files into fileList', async () => {
       const { container, emitted } = renderWithProps(Upload, {
         multiple: true,
@@ -315,6 +336,33 @@ describe('Upload', () => {
       await fireEvent.change(input)
 
       await waitFor(() => {
+        expect(onChange).not.toHaveBeenCalled()
+      })
+
+      expect(emitted()).not.toHaveProperty('update:file-list')
+      expect(container.querySelector('[role="list"]')).not.toBeInTheDocument()
+    })
+
+    it('should prevent upload when beforeUpload returns false', async () => {
+      const beforeUpload = vi.fn(() => false)
+      const onChange = vi.fn()
+      const { container, emitted } = renderWithProps(Upload, {
+        beforeUpload,
+        onChange
+      })
+
+      const input = container.querySelector('input[type="file"]') as HTMLInputElement
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' })
+
+      Object.defineProperty(input, 'files', {
+        value: [file],
+        writable: false
+      })
+
+      await fireEvent.change(input)
+
+      await waitFor(() => {
+        expect(beforeUpload).toHaveBeenCalled()
         expect(onChange).not.toHaveBeenCalled()
       })
 
@@ -489,6 +537,20 @@ describe('Upload', () => {
       await waitFor(() => {
         expect(onChange).toHaveBeenCalled()
       })
+    })
+
+    it('should not handle drag events when disabled', async () => {
+      const { container } = renderWithProps(Upload, {
+        drag: true,
+        disabled: true
+      })
+
+      const dragArea = container.querySelector('[role="button"]') as HTMLElement
+      const initialClassName = dragArea.className
+
+      await fireEvent.dragOver(dragArea)
+
+      expect(dragArea.className).toBe(initialClassName)
     })
   })
 

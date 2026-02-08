@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Upload, type UploadFile } from '@expcat/tigercat-react'
+import type { UploadRequestOptions } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Upload fileList={fileList} onChange={handleChange}>选择文件</Upload>`
@@ -43,6 +44,14 @@ const disabledSnippet = `<div className="max-w-md space-y-6">
   </div>
 </div>`
 
+const customRequestSnippet = `<Upload
+  fileList={fileList7}
+  onChange={handleChange7}
+  customRequest={simulateUpload}
+  multiple
+  drag
+/>`
+
 const UploadDemo: React.FC = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([])
   const [fileList2, setFileList2] = useState<UploadFile[]>([])
@@ -50,6 +59,7 @@ const UploadDemo: React.FC = () => {
   const [fileList4, setFileList4] = useState<UploadFile[]>([])
   const [fileList5, setFileList5] = useState<UploadFile[]>([])
   const [fileList6, setFileList6] = useState<UploadFile[]>([])
+  const [fileList7, setFileList7] = useState<UploadFile[]>([])
 
   const handleChange = (file: UploadFile, list: UploadFile[]) => {
     console.log('File changed:', file, list)
@@ -74,6 +84,22 @@ const UploadDemo: React.FC = () => {
 
   const handleChange6 = (_file: UploadFile, list: UploadFile[]) => {
     setFileList6(list)
+  }
+
+  const handleChange7 = (_file: UploadFile, list: UploadFile[]) => {
+    setFileList7(list)
+  }
+
+  const simulateUpload = (options: UploadRequestOptions) => {
+    let progress = 0
+    const timer = setInterval(() => {
+      progress += 20
+      options.onProgress?.(progress)
+      if (progress >= 100) {
+        clearInterval(timer)
+        options.onSuccess?.({ url: URL.createObjectURL(options.file) })
+      }
+    }, 500)
   }
 
   const handlePreview = (file: UploadFile) => {
@@ -210,6 +236,22 @@ const UploadDemo: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 mb-2">禁用的拖拽上传</label>
             <Upload disabled drag />
           </div>
+        </div>
+      </DemoBlock>
+
+      {/* 自定义上传 */}
+      <DemoBlock
+        title="自定义上传"
+        description="通过 customRequest 实现自定义上传逻辑，可观察上传进度。"
+        code={customRequestSnippet}>
+        <div className="max-w-md">
+          <Upload
+            fileList={fileList7}
+            onChange={handleChange7}
+            customRequest={simulateUpload}
+            multiple
+            drag
+          />
         </div>
       </DemoBlock>
     </div>

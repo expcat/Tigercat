@@ -413,27 +413,38 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop     | Type           | Default | Vue | React | Description    |
-| -------- | -------------- | ------- | :-: | :---: | -------------- |
-| fileList | `UploadFile[]` | `[]`    |  ✓  |   ✓   | 文件列表       |
-| action   | `string`       | -       |  ✓  |   ✓   | 上传地址       |
-| limit    | `number`       | -       |  ✓  |   ✓   | 最大数量       |
-| accept   | `string`       | -       |  ✓  |   ✓   | 接受的文件类型 |
-| drag     | `boolean`      | `false` |  ✓  |   ✓   | 拖拽上传       |
-| multiple | `boolean`      | `false` |  ✓  |   ✓   | 多选           |
-| disabled | `boolean`      | `false` |  ✓  |   ✓   | 禁用           |
+| Prop          | Type                                          | Default  | Vue | React | Description                             |
+| ------------- | --------------------------------------------- | -------- | :-: | :---: | --------------------------------------- |
+| fileList      | `UploadFile[]`                                | `[]`     |  ✓  |   ✓   | 文件列表                                |
+| accept        | `string`                                      | -        |  ✓  |   ✓   | 接受的文件类型（同 HTML accept）        |
+| multiple      | `boolean`                                     | `false`  |  ✓  |   ✓   | 多选                                    |
+| limit         | `number`                                      | -        |  ✓  |   ✓   | 最大文件数量                            |
+| maxSize       | `number`                                      | -        |  ✓  |   ✓   | 最大文件大小（字节）                    |
+| disabled      | `boolean`                                     | `false`  |  ✓  |   ✓   | 禁用                                    |
+| drag          | `boolean`                                     | `false`  |  ✓  |   ✓   | 拖拽上传                                |
+| listType      | `'text' \| 'picture' \| 'picture-card'`       | `'text'` |  ✓  |   ✓   | 文件列表展示类型                        |
+| showFileList  | `boolean`                                     | `true`   |  ✓  |   ✓   | 是否显示文件列表                        |
+| autoUpload    | `boolean`                                     | `true`   |  ✓  |   ✓   | 选择文件后是否自动上传                  |
+| customRequest | `(options: UploadRequestOptions) => void`     | -        |  ✓  |   ✓   | 自定义上传请求                          |
+| beforeUpload  | `(file: File) => boolean \| Promise<boolean>` | -        |  ✓  |   ✓   | 上传前回调，返回 false 阻止上传         |
+| locale        | `Partial<TigerLocale>`                        | -        |  ✓  |   ✓   | 国际化文案覆盖                          |
+| labels        | `Partial<UploadLabels>`                       | -        |  ✓  |   ✓   | Upload UI 标签覆盖（优先级高于 locale） |
 
 > **Vue**: 使用 `v-model:file-list` 绑定文件列表
 > **React**: 使用 `fileList` + `onChange` 控制
 
 ### Events
 
-| Vue Event          | React Callback | Payload            | Description  |
-| ------------------ | -------------- | ------------------ | ------------ |
-| `@update:fileList` | `onChange`     | `UploadFile[]`     | 文件列表变更 |
-| `@success`         | `onSuccess`    | `(file, response)` | 上传成功     |
-| `@error`           | `onError`      | `(file, error)`    | 上传失败     |
-| `@remove`          | `onRemove`     | `file`             | 移除文件     |
+| Vue Event           | React Callback | Payload                                      | Description                           |
+| ------------------- | -------------- | -------------------------------------------- | ------------------------------------- |
+| `@update:file-list` | -              | `(fileList: UploadFile[])`                   | 文件列表变更（Vue v-model 专用）      |
+| `@change`           | `onChange`     | `(file: UploadFile, fileList: UploadFile[])` | 文件变更                              |
+| `@remove`           | `onRemove`     | `(file: UploadFile, fileList: UploadFile[])` | 移除文件（React 返回 `false` 可阻止） |
+| `@preview`          | `onPreview`    | `(file: UploadFile)`                         | 预览文件                              |
+| `@progress`         | `onProgress`   | `(progress: number, file: UploadFile)`       | 上传进度                              |
+| `@success`          | `onSuccess`    | `(response: unknown, file: UploadFile)`      | 上传成功                              |
+| `@error`            | `onError`      | `(error: Error, file: UploadFile)`           | 上传失败                              |
+| `@exceed`           | `onExceed`     | `(files: File[], fileList: UploadFile[])`    | 超出文件数量限制                      |
 
 ---
 

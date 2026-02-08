@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Upload, type UploadFile } from '@expcat/tigercat-vue'
+import type { UploadRequestOptions } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const fileList = ref<UploadFile[]>([])
@@ -9,6 +10,7 @@ const fileList3 = ref<UploadFile[]>([])
 const fileList4 = ref<UploadFile[]>([])
 const fileList5 = ref<UploadFile[]>([])
 const fileList6 = ref<UploadFile[]>([])
+const fileList7 = ref<UploadFile[]>([])
 
 const handleChange = (file: UploadFile, list: UploadFile[]) => {
   console.log('File changed:', file, list)
@@ -39,6 +41,18 @@ const beforeUpload = (file: File) => {
     return false
   }
   return true
+}
+
+const simulateUpload = (options: UploadRequestOptions) => {
+  let progress = 0
+  const timer = setInterval(() => {
+    progress += 20
+    options.onProgress?.(progress)
+    if (progress >= 100) {
+      clearInterval(timer)
+      options.onSuccess?.({ url: URL.createObjectURL(options.file) })
+    }
+  }, 500)
 }
 
 const basicSnippet = `<div class="max-w-md space-y-4">
@@ -94,6 +108,14 @@ const disabledSnippet = `<div class="max-w-md space-y-6">
     <label class="block text-sm font-medium text-gray-700 mb-2">禁用的拖拽上传</label>
     <Upload disabled drag />
   </div>
+</div>`
+
+const customRequestSnippet = `<div class="max-w-md">
+  <Upload
+    v-model:file-list="fileList7"
+    :custom-request="simulateUpload"
+    multiple
+    drag />
 </div>`
 </script>
 
@@ -198,6 +220,18 @@ const disabledSnippet = `<div class="max-w-md space-y-6">
           <Upload disabled
                   drag />
         </div>
+      </div>
+    </DemoBlock>
+
+    <!-- 自定义上传 -->
+    <DemoBlock title="自定义上传"
+               description="通过 customRequest 实现自定义上传逻辑，可观察上传进度。"
+               :code="customRequestSnippet">
+      <div class="max-w-md">
+        <Upload v-model:file-list="fileList7"
+                :custom-request="simulateUpload"
+                multiple
+                drag />
       </div>
     </DemoBlock>
   </div>

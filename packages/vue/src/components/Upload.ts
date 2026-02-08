@@ -209,7 +209,6 @@ export const Upload = defineComponent({
   setup(props, { emit, slots, attrs }) {
     const inputRef = ref<HTMLInputElement | null>(null)
     const isDragging = ref(false)
-    const attrsRecord = attrs as Record<string, unknown>
 
     const spinnerSvg = getSpinnerSVG('spinner')
 
@@ -433,7 +432,7 @@ export const Upload = defineComponent({
         'button',
         {
           type: 'button',
-          class: getUploadButtonClasses(props.drag, props.disabled),
+          class: getUploadButtonClasses(props.disabled),
           onClick: handleClick,
           disabled: props.disabled,
           'aria-label': labels.value.buttonAriaLabel
@@ -710,8 +709,12 @@ export const Upload = defineComponent({
         'div',
         {
           ...attrs,
-          class: classNames('tiger-upload', props.className, coerceClassValue(attrsRecord.class)),
-          style: mergeStyleValues(attrsRecord.style, props.style)
+          class: classNames(
+            'tiger-upload',
+            props.className,
+            coerceClassValue((attrs as Record<string, unknown>).class)
+          ),
+          style: mergeStyleValues((attrs as Record<string, unknown>).style, props.style)
         },
         [renderInput(), renderUploadButton(), renderFileList()]
       )
