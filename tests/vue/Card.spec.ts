@@ -56,6 +56,41 @@ describe('Card', () => {
     expect(screen.getByTestId('card')).toBeInTheDocument()
   })
 
+  it('applies variant classes', () => {
+    const variants = [
+      { variant: 'default', expected: 'border ' },
+      { variant: 'bordered', expected: 'border-2' },
+      { variant: 'shadow', expected: 'shadow-md' },
+      { variant: 'elevated', expected: 'shadow-lg' }
+    ] as const
+
+    for (const { variant, expected } of variants) {
+      const { container, unmount } = render(Card, {
+        props: { variant },
+        slots: { default: 'body' }
+      })
+      expect(container.firstElementChild?.className).toContain(expected)
+      unmount()
+    }
+  })
+
+  it('applies size classes', () => {
+    const sizes = [
+      { size: 'sm', expected: 'p-3' },
+      { size: 'md', expected: 'p-4' },
+      { size: 'lg', expected: 'p-6' }
+    ] as const
+
+    for (const { size, expected } of sizes) {
+      const { container, unmount } = render(Card, {
+        props: { size },
+        slots: { default: 'body' }
+      })
+      expect(container.firstElementChild?.className).toContain(expected)
+      unmount()
+    }
+  })
+
   it('supports hoverable', () => {
     const { container } = render(Card, {
       props: {

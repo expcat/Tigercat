@@ -14,9 +14,34 @@ description: React layout components usage
 ## Card 卡片
 
 ```tsx
-<Card title="Title"><p>Content</p></Card>
-<Card title="With Actions" bordered shadow="hover" extra={<Button size="sm">Edit</Button>}>
-  <p>Content</p>
+{/* 基本用法 */}
+<Card><p>基础卡片内容</p></Card>
+
+{/* 变体 */}
+<Card variant="bordered">粗边框</Card>
+<Card variant="shadow">带阴影</Card>
+<Card variant="elevated">浮起</Card>
+
+{/* 尺寸 */}
+<Card size="sm">紧凑</Card>
+<Card size="lg">宽松</Card>
+
+{/* 悬停效果 */}
+<Card hoverable variant="shadow">可交互卡片</Card>
+
+{/* 封面图片 */}
+<Card cover="/img.jpg" coverAlt="描述">
+  <p>带封面的卡片</p>
+</Card>
+
+{/* 完整结构 */}
+<Card
+  variant="shadow"
+  hoverable
+  header={<h3>标题</h3>}
+  footer={<span>底部信息</span>}
+  actions={<Button size="sm">操作</Button>}>
+  <p>主体内容</p>
 </Card>
 ```
 

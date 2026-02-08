@@ -4,7 +4,6 @@ import {
   getCardClasses,
   cardSizeClasses,
   cardHeaderClasses,
-  cardBodyClasses,
   cardFooterClasses,
   cardCoverWrapperClasses,
   cardCoverClasses,
@@ -59,28 +58,18 @@ export const Card: React.FC<CardProps> = ({
     !cover && cardSizeClasses[size],
     className
   )
-  const bodyClasses = classNames(cardBodyClasses, sectionSizeClass)
   const getSectionClasses = (baseClasses: string) => classNames(baseClasses, sectionSizeClass)
 
   return (
     <div className={cardClasses} {...props}>
-      {/* Cover Image */}
       {cover && (
         <div className={cardCoverWrapperClasses}>
           <img src={cover} alt={coverAlt} className={cardCoverClasses} />
         </div>
       )}
-
-      {/* Header */}
       {header != null && <div className={getSectionClasses(cardHeaderClasses)}>{header}</div>}
-
-      {/* Body */}
-      {children != null && <div className={bodyClasses}>{children}</div>}
-
-      {/* Footer */}
+      {children != null && <div className={sectionSizeClass}>{children}</div>}
       {footer != null && <div className={getSectionClasses(cardFooterClasses)}>{footer}</div>}
-
-      {/* Actions */}
       {actions != null && (
         <div className={getSectionClasses(classNames(cardActionsClasses, cardFooterClasses))}>
           {actions}

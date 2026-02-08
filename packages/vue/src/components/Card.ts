@@ -6,7 +6,6 @@ import {
   getCardClasses,
   cardSizeClasses,
   cardHeaderClasses,
-  cardBodyClasses,
   cardFooterClasses,
   cardCoverWrapperClasses,
   cardCoverClasses,
@@ -85,16 +84,12 @@ export const Card = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    const cardClasses = computed(() => {
-      return classNames(
+    const cardClasses = computed(() =>
+      classNames(
         getCardClasses(props.variant, props.hoverable),
         !props.cover && cardSizeClasses[props.size]
       )
-    })
-
-    const bodyClasses = computed(() => {
-      return classNames(cardBodyClasses, props.cover && cardSizeClasses[props.size])
-    })
+    )
 
     const sectionSizeClass = computed(() => (props.cover ? cardSizeClasses[props.size] : undefined))
     const getSectionClasses = (baseClasses: string) =>
@@ -125,7 +120,7 @@ export const Card = defineComponent({
           slots.header
             ? h('div', { class: getSectionClasses(cardHeaderClasses) }, slots.header())
             : null,
-          slots.default ? h('div', { class: bodyClasses.value }, slots.default()) : null,
+          slots.default ? h('div', { class: sectionSizeClass.value }, slots.default()) : null,
           slots.footer
             ? h('div', { class: getSectionClasses(cardFooterClasses) }, slots.footer())
             : null,

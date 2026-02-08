@@ -13,19 +13,23 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Props
 
-| Prop     | Type                             | Default    | Vue | React | Description  |
-| -------- | -------------------------------- | ---------- | :-: | :---: | ------------ |
-| title    | `string`                         | -          |  ✓  |   ✓   | 标题         |
-| bordered | `boolean`                        | `true`     |  ✓  |   ✓   | 显示边框     |
-| shadow   | `'always' \| 'hover' \| 'never'` | `'always'` |  ✓  |   ✓   | 阴影显示方式 |
+| Prop      | Type                                                | Default              | Vue | React | Description        |
+| --------- | --------------------------------------------------- | -------------------- | :-: | :---: | ------------------ |
+| variant   | `'default' \| 'bordered' \| 'shadow' \| 'elevated'` | `'default'`          |  ✓  |   ✓   | 卡片样式变体       |
+| size      | `'sm' \| 'md' \| 'lg'`                              | `'md'`               |  ✓  |   ✓   | 尺寸（影响内边距） |
+| hoverable | `boolean`                                           | `false`              |  ✓  |   ✓   | 显示悬停交互效果   |
+| cover     | `string`                                            | -                    |  ✓  |   ✓   | 封面图片 URL       |
+| coverAlt  | `string`                                            | `'Card cover image'` |  ✓  |   ✓   | 封面图片 alt 文本  |
+| className | `string`                                            | -                    |  ✓  |   ✓   | 自定义 CSS 类名    |
 
 ### Slots / Children
 
-| Vue Slot  | React Prop | Description    |
-| --------- | ---------- | -------------- |
-| `default` | `children` | 内容           |
-| `header`  | `header`   | 自定义头部     |
-| `extra`   | `extra`    | 头部右侧操作区 |
+| Vue Slot  | React Prop | Description        |
+| --------- | ---------- | ------------------ |
+| `default` | `children` | 主体内容           |
+| `header`  | `header`   | 头部区域           |
+| `footer`  | `footer`   | 底部区域           |
+| `actions` | `actions`  | 操作区域（右对齐） |
 
 ---
 
@@ -44,13 +48,13 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Props
 
-| Prop        | Type                                        | Default          | Vue | React | Description                            |
-| ----------- | ------------------------------------------- | ---------------- | :-: | :---: | -------------------------------------- |
-| orientation | `'horizontal' \| 'vertical'`                | `'horizontal'`   |  ✓  |   ✓   | 方向                                   |
-| lineStyle   | `'solid' \| 'dashed' \| 'dotted'`           | `'solid'`        |  ✓  |   ✓   | 线条样式                               |
-| spacing     | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`     |  ✓  |   ✓   | 周围间距                               |
-| color       | `string`                                    | -                |  ✓  |   ✓   | 自定义颜色（CSS 值或变量）             |
-| thickness   | `string`                                    | -                |  ✓  |   ✓   | 自定义线条粗细                         |
+| Prop        | Type                                             | Default        | Vue | React | Description                |
+| ----------- | ------------------------------------------------ | -------------- | :-: | :---: | -------------------------- |
+| orientation | `'horizontal' \| 'vertical'`                     | `'horizontal'` |  ✓  |   ✓   | 方向                       |
+| lineStyle   | `'solid' \| 'dashed' \| 'dotted'`                | `'solid'`      |  ✓  |   ✓   | 线条样式                   |
+| spacing     | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`         |  ✓  |   ✓   | 周围间距                   |
+| color       | `string`                                         | -              |  ✓  |   ✓   | 自定义颜色（CSS 值或变量） |
+| thickness   | `string`                                         | -              |  ✓  |   ✓   | 自定义线条粗细             |
 
 无 Slots / Children。渲染为 `<div role="separator">`。
 

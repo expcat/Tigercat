@@ -28,6 +28,35 @@ describe('Card', () => {
     expect(screen.getByText('Action')).toBeInTheDocument()
   })
 
+  it('applies variant classes', () => {
+    const variants = [
+      { variant: 'default' as const, expected: 'border ' },
+      { variant: 'bordered' as const, expected: 'border-2' },
+      { variant: 'shadow' as const, expected: 'shadow-md' },
+      { variant: 'elevated' as const, expected: 'shadow-lg' }
+    ]
+
+    for (const { variant, expected } of variants) {
+      const { container, unmount } = render(<Card variant={variant}>body</Card>)
+      expect(container.firstElementChild?.className).toContain(expected)
+      unmount()
+    }
+  })
+
+  it('applies size classes', () => {
+    const sizes = [
+      { size: 'sm' as const, expected: 'p-3' },
+      { size: 'md' as const, expected: 'p-4' },
+      { size: 'lg' as const, expected: 'p-6' }
+    ]
+
+    for (const { size, expected } of sizes) {
+      const { container, unmount } = render(<Card size={size}>body</Card>)
+      expect(container.firstElementChild?.className).toContain(expected)
+      unmount()
+    }
+  })
+
   it('supports hoverable and native attributes passthrough', () => {
     const { container } = render(
       <Card hoverable id="card-id" data-testid="card">

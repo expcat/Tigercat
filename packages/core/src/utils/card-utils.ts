@@ -20,8 +20,6 @@ export const cardHoverClasses = 'cursor-pointer hover:shadow-xl hover:scale-[1.0
 
 export const cardHeaderClasses = 'border-b border-[var(--tiger-border,#e5e7eb)] pb-3 mb-3'
 
-export const cardBodyClasses = ''
-
 export const cardFooterClasses = 'border-t border-[var(--tiger-border,#e5e7eb)] pt-3 mt-3'
 
 export const cardCoverClasses = 'w-full h-48 object-cover'
