@@ -132,19 +132,36 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Props
 
-| Prop       | Type                                     | Default    | Vue | React | Description  |
-| ---------- | ---------------------------------------- | ---------- | :-: | :---: | ------------ |
-| title      | `string`                                 | -          |  ✓  |   ✓   | 确认标题     |
-| okText     | `string`                                 | `'OK'`     |  ✓  |   ✓   | 确认按钮文案 |
-| cancelText | `string`                                 | `'Cancel'` |  ✓  |   ✓   | 取消按钮文案 |
-| placement  | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'`    |  ✓  |   ✓   | 弹出位置     |
+| Prop           | Type                                                                                                           | Default      | Vue | React | Description        |
+| -------------- | -------------------------------------------------------------------------------------------------------------- | ------------ | :-: | :---: | ------------------ |
+| visible        | `boolean`                                                                                                      | -            |  ✓  |   ✓   | 受控显示状态       |
+| defaultVisible | `boolean`                                                                                                      | `false`      |  ✓  |   ✓   | 默认显示状态       |
+| title          | `string`                                                                                                       | -            |  ✓  |   ✓   | 确认标题           |
+| description    | `string`                                                                                                       | -            |  ✓  |   ✓   | 描述文本           |
+| icon           | `'warning' \| 'info' \| 'error' \| 'success' \| 'question'`                                                   | `'warning'`  |  ✓  |   ✓   | 图标类型           |
+| showIcon       | `boolean`                                                                                                      | `true`       |  ✓  |   ✓   | 是否显示图标       |
+| okText         | `string`                                                                                                       | `'确定'`     |  ✓  |   ✓   | 确认按钮文案       |
+| cancelText     | `string`                                                                                                       | `'取消'`     |  ✓  |   ✓   | 取消按钮文案       |
+| okType         | `'primary' \| 'danger'`                                                                                        | `'primary'`  |  ✓  |   ✓   | 确认按钮类型       |
+| placement      | `'top' \| 'top-start' \| 'top-end' \| 'bottom' \| ... \| 'left' \| 'left-start' \| ... \| 'right' \| ...`     | `'top'`      |  ✓  |   ✓   | 弹出位置           |
+| offset         | `number`                                                                                                       | `8`          |  ✓  |   ✓   | 距触发元素偏移(px) |
+| disabled       | `boolean`                                                                                                      | `false`      |  ✓  |   ✓   | 是否禁用           |
 
 ### Events
 
-| Vue Event  | React Callback | Description |
-| ---------- | -------------- | ----------- |
-| `@confirm` | `onConfirm`    | 确认事件    |
-| `@cancel`  | `onCancel`     | 取消事件    |
+| Vue Event        | React Callback    | Description      |
+| ---------------- | ----------------- | ---------------- |
+| `@confirm`       | `onConfirm`       | 确认事件         |
+| `@cancel`        | `onCancel`        | 取消事件         |
+| `@visible-change`| `onVisibleChange`  | 显示状态变更事件 |
+
+### Slots / Children
+
+| Vue Slot      | React Prop         | Description      |
+| ------------- | ------------------ | ---------------- |
+| `default`     | `children`         | 触发元素         |
+| `title`       | `titleContent`     | 自定义标题内容   |
+| `description` | `descriptionContent` | 自定义描述内容 |
 
 ---
 

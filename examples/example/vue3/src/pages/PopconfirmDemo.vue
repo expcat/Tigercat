@@ -28,6 +28,13 @@ const controlledSnippet = `<Popconfirm v-model:visible="visible1" title="确定�
 
 const noIconSnippet = `<Popconfirm :show-icon="false" title="确定要继续吗？">...</Popconfirm>`
 
+const disabledSnippet = `<Popconfirm title="此操作已禁用" :disabled="true">
+  <Button variant="secondary" disabled>禁用按钮</Button>
+</Popconfirm>
+<Popconfirm title="Popconfirm 已禁用" :disabled="true">
+  <Button>按钮未禁用</Button>
+</Popconfirm>`
+
 const visible1 = ref(false)
 
 const handleConfirm = () => {
@@ -195,6 +202,24 @@ const handleCancel = () => {
                     @confirm="() => console.log('Confirmed')">
           <Button>无图标</Button>
         </Popconfirm>
+      </div>
+    </DemoBlock>
+
+    <DemoBlock title="禁用状态"
+               description="通过 disabled 属性禁用 Popconfirm，点击触发元素不会打开确认框。"
+               :code="disabledSnippet">
+      <div class="p-6 bg-gray-50 rounded-lg">
+        <Space>
+          <Popconfirm title="此操作已禁用"
+                      :disabled="true">
+            <Button variant="secondary" disabled>禁用按钮</Button>
+          </Popconfirm>
+
+          <Popconfirm title="Popconfirm 已禁用"
+                      :disabled="true">
+            <Button>按钮未禁用</Button>
+          </Popconfirm>
+        </Space>
       </div>
     </DemoBlock>
   </div>

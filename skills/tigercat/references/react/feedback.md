@@ -98,9 +98,33 @@ Notification.open({
 ## Popconfirm 气泡确认框
 
 ```tsx
-<Popconfirm title="Are you sure?" onConfirm={handleConfirm}>
-  <Button variant="outline">Delete</Button>
+{/* 基本用法 */}
+<Popconfirm title="确定要删除吗？" onConfirm={handleConfirm}>
+  <Button variant="secondary">删除</Button>
 </Popconfirm>
+
+{/* 危险操作 + 描述 */}
+<Popconfirm
+  title="确定要删除用户吗？"
+  description="此操作不可撤销。"
+  icon="error"
+  okType="danger"
+  okText="删除"
+  onConfirm={handleDelete}>
+  <Button variant="secondary">删除用户</Button>
+</Popconfirm>
+
+{/* 受控模式 */}
+<Popconfirm
+  visible={showConfirm}
+  onVisibleChange={setShowConfirm}
+  title="确定继续吗？">
+  <Button>操作</Button>
+</Popconfirm>
+
+{/* 隐藏图标 / 禁用 */}
+<Popconfirm title="确认？" showIcon={false}><Button>无图标</Button></Popconfirm>
+<Popconfirm title="已禁用" disabled><Button disabled>禁用</Button></Popconfirm>
 ```
 
 ---

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, useRef } from 'react'
+import React, { useMemo, useState, useRef } from 'react'
 import {
   classNames,
   getPopconfirmIconPath,
@@ -171,19 +171,16 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
   })
 
   // Handle click outside and escape key
-  const handleOutsideClick = useCallback(() => setVisible(false), [])
-  const handleEscape = useCallback(() => setVisible(false), [])
-
   useClickOutside({
     enabled: currentVisible,
     refs: [containerRef],
-    onOutsideClick: handleOutsideClick,
+    onOutsideClick: () => setVisible(false),
     defer: true
   })
 
   useEscapeKey({
     enabled: currentVisible,
-    onEscape: handleEscape
+    onEscape: () => setVisible(false)
   })
 
   // Compute styles for floating element
@@ -205,15 +202,15 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
 
   const triggerClasses = useMemo(() => getPopconfirmTriggerClasses(disabled), [disabled])
 
-  const contentWrapperClasses = useMemo(() => 'absolute z-50', [])
+  const contentWrapperClasses = 'absolute z-50'
 
   const arrowClasses = useMemo(() => getPopconfirmArrowClasses(placement), [placement])
-  const contentClasses = useMemo(() => getPopconfirmContentClasses(), [])
-  const titleClasses = useMemo(() => getPopconfirmTitleClasses(), [])
-  const descriptionClasses = useMemo(() => getPopconfirmDescriptionClasses(), [])
+  const contentClasses = getPopconfirmContentClasses()
+  const titleClasses = getPopconfirmTitleClasses()
+  const descriptionClasses = getPopconfirmDescriptionClasses()
   const iconClasses = useMemo(() => getPopconfirmIconClasses(icon), [icon])
-  const buttonsClasses = useMemo(() => getPopconfirmButtonsClasses(), [])
-  const cancelButtonClasses = useMemo(() => getPopconfirmCancelButtonClasses(), [])
+  const buttonsClasses = getPopconfirmButtonsClasses()
+  const cancelButtonClasses = getPopconfirmCancelButtonClasses()
   const okButtonClasses = useMemo(() => getPopconfirmOkButtonClasses(okType), [okType])
 
   if (!children) {

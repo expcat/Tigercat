@@ -134,6 +134,29 @@ describe('Popconfirm', () => {
     expect(container.querySelector('.custom-popconfirm')).toBeInTheDocument()
   })
 
+  it('renders description text', async () => {
+    const user = userEvent.setup()
+    const { getByText } = renderWithChildren(Popconfirm, <button>Action</button>, {
+      title: 'Confirm?',
+      description: 'This cannot be undone.'
+    })
+
+    await user.click(getByText('Action'))
+    await waitFor(() => expect(getByText('This cannot be undone.')).toBeVisible())
+  })
+
+  it('hides icon when showIcon is false', async () => {
+    const user = userEvent.setup()
+    const { container, getByText } = renderWithChildren(Popconfirm, <button>Action</button>, {
+      title: 'Confirm?',
+      showIcon: false
+    })
+
+    await user.click(getByText('Action'))
+    await waitFor(() => expect(getByText('Confirm?')).toBeVisible())
+    expect(container.querySelector('.tiger-popconfirm-icon')).not.toBeInTheDocument()
+  })
+
   it('renders descriptionContent', async () => {
     const user = userEvent.setup()
     const { getByText } = renderWithChildren(Popconfirm, <button>Delete</button>, {

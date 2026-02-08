@@ -2,7 +2,7 @@
  * Popconfirm component types and interfaces
  */
 
-import type { DropdownPlacement } from './dropdown'
+import type { FloatingPlacement } from '../utils/floating'
 
 /**
  * Popconfirm icon type
@@ -68,7 +68,7 @@ export interface PopconfirmProps {
    * Popconfirm placement relative to trigger
    * @default 'top'
    */
-  placement?: DropdownPlacement
+  placement?: FloatingPlacement
 
   /**
    * Whether the popconfirm is disabled

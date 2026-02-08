@@ -3,7 +3,7 @@
  */
 import { classNames } from './class-names'
 import type { PopconfirmIconType } from '../types/popconfirm'
-import type { DropdownPlacement } from '../types/dropdown'
+import type { FloatingPlacement } from './floating'
 
 /**
  * Get base popconfirm container classes
@@ -45,7 +45,7 @@ export function getPopconfirmContentClasses(): string {
 /**
  * Get popconfirm arrow classes (small pointer to the trigger)
  */
-export function getPopconfirmArrowClasses(placement: DropdownPlacement): string {
+export function getPopconfirmArrowClasses(placement: FloatingPlacement): string {
   const base = classNames(
     'tiger-popconfirm-arrow',
     'absolute',
@@ -63,7 +63,7 @@ export function getPopconfirmArrowClasses(placement: DropdownPlacement): string 
     'z-0'
   )
 
-  const placementMap: Record<DropdownPlacement, string> = {
+  const placementMap: Record<FloatingPlacement, string> = {
     'top-start': 'bottom-0 left-6 translate-y-1/2',
     top: 'bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2',
     'top-end': 'bottom-0 right-6 translate-y-1/2',

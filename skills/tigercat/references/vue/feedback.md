@@ -104,9 +104,34 @@ Notification.open({
 
 ```vue
 <template>
-  <Popconfirm title="Are you sure?" @confirm="handleConfirm">
-    <Button variant="outline">Delete</Button>
+  <!-- 基本用法 -->
+  <Popconfirm title="确定要删除吗？" @confirm="handleConfirm">
+    <Button variant="secondary">删除</Button>
   </Popconfirm>
+
+  <!-- 危险操作 + 描述 -->
+  <Popconfirm
+    title="确定要删除用户吗？"
+    description="此操作不可撤销。"
+    icon="error"
+    ok-type="danger"
+    ok-text="删除"
+    @confirm="handleDelete">
+    <Button variant="secondary">删除用户</Button>
+  </Popconfirm>
+
+  <!-- 受控模式 -->
+  <Popconfirm
+    v-model:visible="showConfirm"
+    title="确定继续吗？"
+    @confirm="showConfirm = false"
+    @cancel="showConfirm = false">
+    <Button>操作</Button>
+  </Popconfirm>
+
+  <!-- 隐藏图标 / 禁用 -->
+  <Popconfirm title="确认？" :show-icon="false"><Button>无图标</Button></Popconfirm>
+  <Popconfirm title="已禁用" :disabled="true"><Button disabled>禁用</Button></Popconfirm>
 </template>
 ```
 

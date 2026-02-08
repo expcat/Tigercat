@@ -220,14 +220,14 @@ export const Popconfirm = defineComponent({
 
     // Handle confirm
     const handleConfirm = () => {
-      setVisible(false)
       emit('confirm')
+      setVisible(false)
     }
 
     // Handle cancel
     const handleCancel = () => {
-      setVisible(false)
       emit('cancel')
+      setVisible(false)
     }
 
     // Handle trigger click
@@ -236,7 +236,6 @@ export const Popconfirm = defineComponent({
       setVisible(!currentVisible.value)
     }
 
-    // Click outside handler (close when clicking outside)
     // Click outside handler (close when clicking outside)
     let cleanupClickOutside: (() => void) | null = null
 
@@ -317,40 +316,16 @@ export const Popconfirm = defineComponent({
       return getPopconfirmArrowClasses(actualPlacement.value)
     })
 
-    // Content classes
-    const contentClasses = computed(() => {
-      return getPopconfirmContentClasses()
-    })
+    // Static class strings (no reactive deps)
+    const contentClasses = getPopconfirmContentClasses()
+    const titleClasses = getPopconfirmTitleClasses()
+    const descriptionClasses = getPopconfirmDescriptionClasses()
+    const buttonsClasses = getPopconfirmButtonsClasses()
+    const cancelButtonClasses = getPopconfirmCancelButtonClasses()
 
-    // Title classes
-    const titleClasses = computed(() => {
-      return getPopconfirmTitleClasses()
-    })
-
-    // Description classes
-    const descriptionClasses = computed(() => {
-      return getPopconfirmDescriptionClasses()
-    })
-
-    // Icon classes
-    const iconClasses = computed(() => {
-      return getPopconfirmIconClasses(props.icon)
-    })
-
-    // Buttons classes
-    const buttonsClasses = computed(() => {
-      return getPopconfirmButtonsClasses()
-    })
-
-    // Cancel button classes
-    const cancelButtonClasses = computed(() => {
-      return getPopconfirmCancelButtonClasses()
-    })
-
-    // OK button classes
-    const okButtonClasses = computed(() => {
-      return getPopconfirmOkButtonClasses(props.okType)
-    })
+    // Dynamic class strings
+    const iconClasses = computed(() => getPopconfirmIconClasses(props.icon))
+    const okButtonClasses = computed(() => getPopconfirmOkButtonClasses(props.okType))
 
     return () => {
       const defaultSlot = slots.default?.()
@@ -463,7 +438,7 @@ export const Popconfirm = defineComponent({
                 'aria-modal': 'false',
                 'aria-labelledby': titleId,
                 'aria-describedby': hasDescription ? descriptionId : undefined,
-                class: contentClasses.value
+                class: contentClasses
               },
               [
                 // Title section with icon
@@ -492,15 +467,15 @@ export const Popconfirm = defineComponent({
                       [
                         // Title
                         slots.title
-                          ? h('div', { id: titleId, class: titleClasses.value }, slots.title())
-                          : h('div', { id: titleId, class: titleClasses.value }, props.title),
+                          ? h('div', { id: titleId, class: titleClasses }, slots.title())
+                          : h('div', { id: titleId, class: titleClasses }, props.title),
                         // Description
                         hasDescription &&
                           h(
                             'div',
                             {
                               id: descriptionId,
-                              class: descriptionClasses.value
+                              class: descriptionClasses
                             },
                             slots.description ? slots.description() : props.description
                           )
@@ -512,7 +487,7 @@ export const Popconfirm = defineComponent({
                 h(
                   'div',
                   {
-                    class: buttonsClasses.value
+                    class: buttonsClasses
                   },
                   [
                     // Cancel button
@@ -520,7 +495,7 @@ export const Popconfirm = defineComponent({
                       'button',
                       {
                         type: 'button',
-                        class: cancelButtonClasses.value,
+                        class: cancelButtonClasses,
                         onClick: handleCancel
                       },
                       props.cancelText

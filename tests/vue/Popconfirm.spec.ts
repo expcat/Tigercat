@@ -3,8 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, waitFor, fireEvent } from '@testing-library/vue'
-import { within } from '@testing-library/dom'
+import { render, waitFor } from '@testing-library/vue'
 import userEvent from '@testing-library/user-event'
 import { Popconfirm } from '@expcat/tigercat-vue'
 import { renderWithSlots, expectNoA11yViolations } from '../utils'
@@ -12,7 +11,8 @@ import { h } from 'vue'
 
 describe.sequential('Popconfirm', () => {
   it('opens on trigger click and closes on cancel/confirm', async () => {
-    const { container } = render(Popconfirm, {
+    const user = userEvent.setup()
+    const { getByText, queryByText } = render(Popconfirm, {
       props: {
         title: 'Confirm?'
       },
@@ -21,21 +21,19 @@ describe.sequential('Popconfirm', () => {
       }
     })
 
-    const scope = within(container)
+    expect(queryByText('Confirm?')).not.toBeVisible()
 
-    expect(scope.queryByText('Confirm?')).not.toBeVisible()
+    await user.click(getByText('Action'))
+    await waitFor(() => expect(getByText('Confirm?')).toBeVisible())
 
-    await fireEvent.click(scope.getByText('Action'))
-    expect(scope.getByText('Confirm?')).toBeVisible()
+    await user.click(getByText('取消'))
+    await waitFor(() => expect(queryByText('Confirm?')).not.toBeVisible())
 
-    await fireEvent.click(scope.getByText('取消'))
-    expect(scope.queryByText('Confirm?')).not.toBeVisible()
+    await user.click(getByText('Action'))
+    await waitFor(() => expect(getByText('Confirm?')).toBeVisible())
 
-    await fireEvent.click(scope.getByText('Action'))
-    expect(scope.getByText('Confirm?')).toBeVisible()
-
-    await fireEvent.click(scope.getByText('确定'))
-    expect(scope.queryByText('Confirm?')).not.toBeVisible()
+    await user.click(getByText('确定'))
+    await waitFor(() => expect(queryByText('Confirm?')).not.toBeVisible())
   })
 
   it('respects disabled (cannot open)', async () => {
@@ -171,6 +169,29 @@ describe.sequential('Popconfirm', () => {
     )
 
     expect(container.querySelector('.custom-popconfirm')).toBeInTheDocument()
+  })
+
+  it('renders description text', async () => {
+    const user = userEvent.setup()
+    const { getByText } = render(Popconfirm, {
+      props: { title: 'Confirm?', description: 'This cannot be undone.' },
+      slots: { default: () => h('button', {}, 'Action') }
+    })
+
+    await user.click(getByText('Action'))
+    await waitFor(() => expect(getByText('This cannot be undone.')).toBeVisible())
+  })
+
+  it('hides icon when showIcon is false', async () => {
+    const user = userEvent.setup()
+    const { container, getByText } = render(Popconfirm, {
+      props: { title: 'Confirm?', showIcon: false },
+      slots: { default: () => h('button', {}, 'Action') }
+    })
+
+    await user.click(getByText('Action'))
+    await waitFor(() => expect(getByText('Confirm?')).toBeVisible())
+    expect(container.querySelector('.tiger-popconfirm-icon')).not.toBeInTheDocument()
   })
 
   describe('Accessibility', () => {
