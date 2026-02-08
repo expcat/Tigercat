@@ -82,6 +82,66 @@ describe('Grid (Vue)', () => {
     expect(col.style.getPropertyValue('--tiger-col-order-md')).toBe('1')
   })
 
+  it('disables wrapping with wrap=false', () => {
+    render(Row, {
+      props: { wrap: false },
+      attrs: { 'data-testid': 'row' }
+    })
+
+    const row = screen.getByTestId('row')
+    expect(row).toHaveClass('flex', 'w-full')
+    expect(row).not.toHaveClass('flex-wrap')
+  })
+
+  it('applies both axes with tuple gutter [horizontal, vertical]', () => {
+    render(Row, {
+      props: { gutter: [16, 24] },
+      attrs: { 'data-testid': 'row' },
+      slots: {
+        default: () => h(Col, { 'data-testid': 'col' }, () => 'Content')
+      }
+    })
+
+    const row = screen.getByTestId('row') as HTMLElement
+    const col = screen.getByTestId('col') as HTMLElement
+
+    expect(row.style.marginLeft).toBe('-8px')
+    expect(row.style.marginRight).toBe('-8px')
+    expect(row.style.marginTop).toBe('-12px')
+    expect(row.style.marginBottom).toBe('-12px')
+    expect(col.style.paddingLeft).toBe('8px')
+    expect(col.style.paddingRight).toBe('8px')
+    expect(col.style.paddingTop).toBe('12px')
+    expect(col.style.paddingBottom).toBe('12px')
+  })
+
+  it('applies responsive span CSS variables', () => {
+    render(Col, {
+      props: { span: { xs: 24, md: 12, lg: 8 } },
+      attrs: { 'data-testid': 'col' }
+    })
+
+    const col = screen.getByTestId('col') as HTMLElement
+    expect(col.style.getPropertyValue('--tiger-col-span')).toBe('100%')
+    expect(col.style.getPropertyValue('--tiger-col-span-md')).toBe('50%')
+    expect(col.style.getPropertyValue('--tiger-col-span-lg')).toBe('33.333333%')
+  })
+
+  it('forwards custom class and style on Col', () => {
+    render(Col, {
+      props: { span: 12 },
+      attrs: {
+        'data-testid': 'col',
+        class: 'custom-class',
+        style: { color: 'red' }
+      }
+    })
+
+    const col = screen.getByTestId('col') as HTMLElement
+    expect(col).toHaveClass('custom-class')
+    expect(col.style.color).toBe('red')
+  })
+
   it('has no a11y violations for a basic grid', async () => {
     const { container } = render(Row, {
       slots: {

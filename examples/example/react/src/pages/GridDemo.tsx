@@ -29,8 +29,14 @@ const responsiveSnippet = `<Row gutter={[16, 16]}>
   <Col span={8} offset={{ xs: 0, md: 8 }}>...</Col>
 </Row>`
 
-const alignSnippet = `<Row justify="space-between">...</Row>
-<Row align="middle">...</Row>`
+const alignSnippet = `{/* justify 水平分布 */}
+<Row justify="start | center | end | space-between | space-around | space-evenly">
+  ...
+</Row>
+{/* align 垂直对齐 */}
+<Row align="top | middle | bottom | stretch">
+  ...
+</Row>`
 
 const offsetSnippet = `<Row gutter={16}>
   <Col span={8}>...</Col>
@@ -45,6 +51,12 @@ const orderSnippet = `<Row gutter={16}>
   <Col span={8} order={3}>...</Col>
   <Col span={8} order={1}>...</Col>
   <Col span={8} order={2}>...</Col>
+</Row>
+{/* 响应式排序 */}
+<Row gutter={16}>
+  <Col span={8} order={{ xs: 3, md: 1 }}>...</Col>
+  <Col span={8} order={{ xs: 1, md: 2 }}>...</Col>
+  <Col span={8} order={{ xs: 2, md: 3 }}>...</Col>
 </Row>`
 
 const nowrapSnippet = `<Row gutter={16} wrap={false} className="min-w-[720px]">...</Row>`
@@ -226,41 +238,49 @@ const GridDemo: React.FC = () => {
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
             <Space direction="vertical" className="w-full">
-              <div>
-                <p className="text-sm text-gray-600 mb-2">justify: space-between</p>
-                <Row gutter={16} justify="space-between">
-                  <Col span={6}>
-                    <div className="bg-amber-500 text-white p-4 rounded text-center">A</div>
-                  </Col>
-                  <Col span={6}>
-                    <div className="bg-amber-500 text-white p-4 rounded text-center">B</div>
-                  </Col>
-                  <Col span={6}>
-                    <div className="bg-amber-500 text-white p-4 rounded text-center">C</div>
-                  </Col>
-                </Row>
-              </div>
+              <p className="text-sm font-medium text-gray-700">justify 水平分布</p>
+              {(
+                ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'] as const
+              ).map((j) => (
+                <div key={j}>
+                  <p className="text-sm text-gray-600 mb-1">justify: {j}</p>
+                  <Row gutter={16} justify={j}>
+                    <Col span={4}>
+                      <div className="bg-amber-500 text-white p-3 rounded text-center">A</div>
+                    </Col>
+                    <Col span={4}>
+                      <div className="bg-amber-400 text-white p-3 rounded text-center">B</div>
+                    </Col>
+                    <Col span={4}>
+                      <div className="bg-amber-300 text-white p-3 rounded text-center">C</div>
+                    </Col>
+                  </Row>
+                </div>
+              ))}
 
-              <div>
-                <p className="text-sm text-gray-600 mb-2">align: middle</p>
-                <Row gutter={16} align="middle">
-                  <Col span={8}>
-                    <div className="bg-rose-500 text-white p-4 rounded text-center h-10 flex items-center justify-center">
-                      h-10
-                    </div>
-                  </Col>
-                  <Col span={8}>
-                    <div className="bg-rose-500 text-white p-4 rounded text-center h-16 flex items-center justify-center">
-                      h-16
-                    </div>
-                  </Col>
-                  <Col span={8}>
-                    <div className="bg-rose-500 text-white p-4 rounded text-center h-12 flex items-center justify-center">
-                      h-12
-                    </div>
-                  </Col>
-                </Row>
-              </div>
+              <p className="text-sm font-medium text-gray-700 mt-4">align 垂直对齐</p>
+              {(['top', 'middle', 'bottom', 'stretch'] as const).map((a) => (
+                <div key={a}>
+                  <p className="text-sm text-gray-600 mb-1">align: {a}</p>
+                  <Row gutter={16} align={a}>
+                    <Col span={8}>
+                      <div className="bg-rose-500 text-white p-3 rounded text-center h-8 flex items-center justify-center">
+                        h-8
+                      </div>
+                    </Col>
+                    <Col span={8}>
+                      <div className="bg-rose-400 text-white p-3 rounded text-center h-16 flex items-center justify-center">
+                        h-16
+                      </div>
+                    </Col>
+                    <Col span={8}>
+                      <div className="bg-rose-300 text-white p-3 rounded text-center h-12 flex items-center justify-center">
+                        h-12
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
+              ))}
             </Space>
           </Container>
         </div>
@@ -302,27 +322,49 @@ const GridDemo: React.FC = () => {
 
       <DemoBlock
         title="列排序"
-        description="使用 order 改变列的显示顺序（不改变 DOM 顺序）。"
+        description="使用 order 改变列的显示顺序（不改变 DOM 顺序），支持响应式。"
         code={orderSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Container>
-            <Row gutter={16}>
-              <Col span={8} order={3}>
-                <div className="bg-fuchsia-500 text-white p-4 rounded text-center">
-                  order=3（DOM 第1）
-                </div>
-              </Col>
-              <Col span={8} order={1}>
-                <div className="bg-fuchsia-600 text-white p-4 rounded text-center">
-                  order=1（DOM 第2）
-                </div>
-              </Col>
-              <Col span={8} order={2}>
-                <div className="bg-fuchsia-400 text-white p-4 rounded text-center">
-                  order=2（DOM 第3）
-                </div>
-              </Col>
-            </Row>
+            <Space direction="vertical" className="w-full">
+              <Row gutter={16}>
+                <Col span={8} order={3}>
+                  <div className="bg-fuchsia-500 text-white p-4 rounded text-center">
+                    order=3（DOM 第1）
+                  </div>
+                </Col>
+                <Col span={8} order={1}>
+                  <div className="bg-fuchsia-600 text-white p-4 rounded text-center">
+                    order=1（DOM 第2）
+                  </div>
+                </Col>
+                <Col span={8} order={2}>
+                  <div className="bg-fuchsia-400 text-white p-4 rounded text-center">
+                    order=2（DOM 第3）
+                  </div>
+                </Col>
+              </Row>
+              <div>
+                <p className="text-sm text-gray-600 mb-2">响应式排序（缩小窗口试试）</p>
+                <Row gutter={16}>
+                  <Col span={8} order={{ xs: 3, md: 1 }}>
+                    <div className="bg-fuchsia-600 text-white p-4 rounded text-center">
+                      xs:3 → md:1
+                    </div>
+                  </Col>
+                  <Col span={8} order={{ xs: 1, md: 2 }}>
+                    <div className="bg-fuchsia-500 text-white p-4 rounded text-center">
+                      xs:1 → md:2
+                    </div>
+                  </Col>
+                  <Col span={8} order={{ xs: 2, md: 3 }}>
+                    <div className="bg-fuchsia-400 text-white p-4 rounded text-center">
+                      xs:2 → md:3
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+            </Space>
           </Container>
         </div>
       </DemoBlock>

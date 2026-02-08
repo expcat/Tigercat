@@ -40,14 +40,27 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ---
 
-## Grid 栅格
+## Grid 栅格（Row + Col）
 
-### Props
+采用 24 分栏的 Row + Col 模式。
 
-| Prop | Type                                    | Default | Vue | React | Description |
-| ---- | --------------------------------------- | ------- | :-: | :---: | ----------- |
-| cols | `number \| { xs?, sm?, md?, lg?, xl? }` | `1`     |  ✓  |   ✓   | 列数        |
-| gap  | `string \| number`                      | `0`     |  ✓  |   ✓   | 间距        |
+### Row Props
+
+| Prop    | Type                                                                                  | Default   | Vue | React | Description                     |
+| ------- | ------------------------------------------------------------------------------------- | --------- | :-: | :---: | ------------------------------- |
+| gutter  | `number \| [number, number]`                                                          | `0`       |  ✓  |   ✓   | 栅格间隔（水平或 [水平, 垂直]） |
+| align   | `'top' \| 'middle' \| 'bottom' \| 'stretch'`                                          | `'top'`   |  ✓  |   ✓   | 垂直对齐方式                    |
+| justify | `'start' \| 'end' \| 'center' \| 'space-around' \| 'space-between' \| 'space-evenly'` | `'start'` |  ✓  |   ✓   | 水平排列方式                    |
+| wrap    | `boolean`                                                                             | `true`    |  ✓  |   ✓   | 是否自动换行                    |
+
+### Col Props
+
+| Prop   | Type                                            | Default | Vue | React | Description                     |
+| ------ | ----------------------------------------------- | ------- | :-: | :---: | ------------------------------- |
+| span   | `number \| Partial<Record<Breakpoint, number>>` | `24`    |  ✓  |   ✓   | 栅格占位数（1-24 或响应式对象） |
+| offset | `number \| Partial<Record<Breakpoint, number>>` | `0`     |  ✓  |   ✓   | 栅格左侧偏移数                  |
+| order  | `number \| Partial<Record<Breakpoint, number>>` | -       |  ✓  |   ✓   | 栅格排列顺序                    |
+| flex   | `string \| number`                              | -       |  ✓  |   ✓   | flex 布局填充                   |
 
 ---
 

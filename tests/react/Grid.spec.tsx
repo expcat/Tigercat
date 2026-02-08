@@ -66,6 +66,55 @@ describe('Grid (React)', () => {
     expect(col.style.getPropertyValue('--tiger-col-order-md')).toBe('1')
   })
 
+  it('disables wrapping with wrap={false}', () => {
+    render(<Row data-testid="row" wrap={false} />)
+
+    const row = screen.getByTestId('row')
+    expect(row).toHaveClass('flex', 'w-full')
+    expect(row).not.toHaveClass('flex-wrap')
+  })
+
+  it('applies both axes with tuple gutter [horizontal, vertical]', () => {
+    render(
+      <Row data-testid="row" gutter={[16, 24]}>
+        <Col data-testid="col">Content</Col>
+      </Row>
+    )
+
+    const row = screen.getByTestId('row')
+    const col = screen.getByTestId('col')
+
+    expect(row).toHaveStyle({
+      marginLeft: '-8px',
+      marginRight: '-8px',
+      marginTop: '-12px',
+      marginBottom: '-12px'
+    })
+    expect(col).toHaveStyle({
+      paddingLeft: '8px',
+      paddingRight: '8px',
+      paddingTop: '12px',
+      paddingBottom: '12px'
+    })
+  })
+
+  it('applies responsive span CSS variables', () => {
+    render(<Col data-testid="col" span={{ xs: 24, md: 12, lg: 8 }} />)
+
+    const col = screen.getByTestId('col')
+    expect(col.style.getPropertyValue('--tiger-col-span')).toBe('100%')
+    expect(col.style.getPropertyValue('--tiger-col-span-md')).toBe('50%')
+    expect(col.style.getPropertyValue('--tiger-col-span-lg')).toBe('33.333333%')
+  })
+
+  it('forwards custom className and style on Col', () => {
+    render(<Col data-testid="col" span={12} className="custom-class" style={{ color: 'red' }} />)
+
+    const col = screen.getByTestId('col')
+    expect(col).toHaveClass('custom-class')
+    expect(col.style.color).toBe('red')
+  })
+
   it('has no a11y violations for a basic grid', async () => {
     const { container } = render(
       <Row>

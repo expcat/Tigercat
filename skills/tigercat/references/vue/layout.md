@@ -37,18 +37,41 @@ description: Vue 3 layout components usage
 
 ---
 
-## Grid 栅格
+## Grid 栅格（Row + Col）
 
 ```vue
 <template>
-  <Grid :cols="3" gap="16px">
-    <div>Col 1</div>
-    <div>Col 2</div>
-    <div>Col 3</div>
-  </Grid>
-  <Grid :cols="{ xs: 1, sm: 2, md: 3, lg: 4 }" gap="16px">
-    <div v-for="i in 8" :key="i">Item {{ i }}</div>
-  </Grid>
+  <!-- 基础 24 分栏 -->
+  <Row :gutter="16">
+    <Col :span="8">A</Col>
+    <Col :span="8">B</Col>
+    <Col :span="8">C</Col>
+  </Row>
+
+  <!-- 响应式 -->
+  <Row :gutter="[16, 16]">
+    <Col :span="{ xs: 24, md: 12, lg: 8 }">1</Col>
+    <Col :span="{ xs: 24, md: 12, lg: 8 }">2</Col>
+    <Col :span="{ xs: 24, md: 12, lg: 8 }">3</Col>
+  </Row>
+
+  <!-- 对齐与分布 -->
+  <Row justify="space-between" align="middle">
+    <Col :span="6">A</Col>
+    <Col :span="6">B</Col>
+  </Row>
+
+  <!-- 偏移与排序 -->
+  <Row :gutter="16">
+    <Col :span="8" :offset="4">offset=4</Col>
+    <Col :span="8" :order="{ xs: 2, md: 1 }">order</Col>
+  </Row>
+
+  <!-- Flex 自适应 -->
+  <Row :gutter="16">
+    <Col :span="0" :flex="1">auto</Col>
+    <Col :span="0" flex="0_0_200px">fixed</Col>
+  </Row>
 </template>
 ```
 

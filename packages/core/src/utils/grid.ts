@@ -165,6 +165,24 @@ export function getColOrderStyleVars(order?: ColOrder): Record<string, string> {
 }
 
 /**
+ * Get all Col CSS variable styles in a single pass
+ * Combines span, offset, order and flex vars into one object
+ */
+export function getColMergedStyleVars(
+  span?: ColSpan,
+  offset?: ColOffset,
+  order?: ColOrder,
+  flex?: string | number
+): Record<string, string> {
+  const vars: Record<string, string> = {}
+  if (span !== undefined && span !== null) setSpanVars(vars, span)
+  if (offset !== undefined && offset !== null) setOffsetVars(vars, offset)
+  if (order !== undefined && order !== null) setOrderVars(vars, order)
+  if (flex !== undefined) vars['--tiger-col-flex'] = String(flex).replace(/_/g, ' ')
+  return vars
+}
+
+/**
  * Get align classes for Row component
  */
 export function getAlignClasses(align: Align): string {

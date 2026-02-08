@@ -1,8 +1,7 @@
-import React, { useContext } from 'react'
+import React, { useContext, useMemo } from 'react'
 import {
   classNames,
-  getColStyleVars,
-  getColOrderStyleVars,
+  getColMergedStyleVars,
   getSpanClasses,
   getOffsetClasses,
   getOrderClasses,
@@ -25,34 +24,28 @@ export const Col: React.FC<ColProps> = ({
   ...divProps
 }) => {
   const { gutter } = useContext(RowContext)
-
-  const { colStyle } = getGutterStyles(gutter || 0)
   const isFlexSpanMode = flex !== undefined && span === 0
-  const colStyleVars = getColStyleVars(isFlexSpanMode ? undefined : span, offset)
-  const colOrderVars = getColOrderStyleVars(order)
 
-  const colFlexVar: Record<string, string> =
-    flex === undefined
-      ? {}
-      : {
-          '--tiger-col-flex': String(flex).replace(/_/g, ' ')
-        }
-
-  const colClasses = classNames(
-    isFlexSpanMode ? '' : getSpanClasses(span),
-    getOffsetClasses(offset),
-    getOrderClasses(order),
-    getFlexClasses(flex),
-    className
+  const colClasses = useMemo(
+    () =>
+      classNames(
+        isFlexSpanMode ? '' : getSpanClasses(span),
+        getOffsetClasses(offset),
+        getOrderClasses(order),
+        getFlexClasses(flex),
+        className
+      ),
+    [isFlexSpanMode, span, offset, order, flex, className]
   )
 
-  const mergedStyle: React.CSSProperties = {
-    ...colStyle,
-    ...colStyleVars,
-    ...colOrderVars,
-    ...colFlexVar,
-    ...style
-  }
+  const mergedStyle = useMemo<React.CSSProperties>(
+    () => ({
+      ...getGutterStyles(gutter || 0).colStyle,
+      ...getColMergedStyleVars(isFlexSpanMode ? undefined : span, offset, order, flex),
+      ...style
+    }),
+    [gutter, isFlexSpanMode, span, offset, order, flex, style]
+  )
 
   return (
     <div className={colClasses} style={mergedStyle} {...divProps}>

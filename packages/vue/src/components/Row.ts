@@ -75,17 +75,16 @@ export const Row = defineComponent({
 
     provide(RowContextKey, { gutter })
 
-    return () => {
-      return h(
+    return () =>
+      h(
         'div',
         {
           ...attrs,
           class: [rowClasses.value, attrs.class],
           style: [rowStyle.value, attrs.style]
         },
-        slots.default ? slots.default() : []
+        slots.default?.()
       )
-    }
   }
 })
 

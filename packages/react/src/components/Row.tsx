@@ -1,4 +1,4 @@
-import React, { createContext } from 'react'
+import React, { createContext, useMemo } from 'react'
 import {
   classNames,
   getAlignClasses,
@@ -25,23 +25,25 @@ export const Row: React.FC<RowProps> = ({
   style,
   ...divProps
 }) => {
-  const { rowStyle } = getGutterStyles(gutter)
-
-  const rowClasses = classNames(
-    'flex',
-    'w-full',
-    wrap && 'flex-wrap',
-    getAlignClasses(align),
-    getJustifyClasses(justify),
-    className
+  const rowClasses = useMemo(
+    () =>
+      classNames(
+        'flex',
+        'w-full',
+        wrap && 'flex-wrap',
+        getAlignClasses(align),
+        getJustifyClasses(justify),
+        className
+      ),
+    [wrap, align, justify, className]
   )
 
-  const mergedStyle: React.CSSProperties = {
-    ...rowStyle,
-    ...style
-  }
+  const mergedStyle = useMemo<React.CSSProperties>(
+    () => ({ ...getGutterStyles(gutter).rowStyle, ...style }),
+    [gutter, style]
+  )
 
-  const contextValue = { gutter }
+  const contextValue = useMemo(() => ({ gutter }), [gutter])
 
   return (
     <RowContext.Provider value={contextValue}>
