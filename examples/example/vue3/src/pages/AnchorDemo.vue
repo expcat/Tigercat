@@ -31,6 +31,24 @@ const nestedSnippet = `<Anchor>
   <AnchorLink href="#chapter2" title="第二章" />
 </Anchor>`
 
+const inkSnippet = `<Anchor :show-ink-in-fixed="true" :offset-top="80">
+  <AnchorLink href="#part1" title="Part 1" />
+  <AnchorLink href="#part2" title="Part 2" />
+</Anchor>
+
+<!-- affix=false 时墨水指示器默认可见 -->
+<Anchor :affix="false">
+  <AnchorLink href="#part1" title="Part 1" />
+</Anchor>`
+
+const eventsSnippet = `<Anchor
+  @click="handleClick"
+  @change="handleChange"
+  :target-offset="60">
+  <AnchorLink href="#section1" title="Section 1" />
+  <AnchorLink href="#section2" title="Section 2" />
+</Anchor>`
+
 const targetSnippet = `<div ref="scrollContainerRef" class="scroll-container">
   <div id="target-section1">...</div>
   <div id="target-section2">...</div>
@@ -49,6 +67,14 @@ const getScrollContainer = () => {
 const handleChange = (href: string) => {
   console.log('Anchor changed:', href)
 }
+
+const lastEvent = ref('')
+const handleDemoClick = (_e: MouseEvent, href: string) => {
+  lastEvent.value = `点击: ${href}`
+}
+const handleDemoChange = (activeLink: string) => {
+  lastEvent.value = `激活: ${activeLink}`
+}
 </script>
 
 <template>
@@ -61,7 +87,7 @@ const handleChange = (href: string) => {
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
       <!-- 左侧内容区 -->
       <div class="lg:col-span-3 space-y-8">
-        <div id="demo-basic">
+        <div id="demo-basic" class="scroll-mt-20">
           <DemoBlock title="基本用法"
                      description="最简单的锚点导航。"
                      :code="basicSnippet">
@@ -73,7 +99,7 @@ const handleChange = (href: string) => {
           </DemoBlock>
         </div>
 
-        <div id="demo-horizontal">
+        <div id="demo-horizontal" class="scroll-mt-20">
           <DemoBlock title="水平方向"
                      description="锚点可以水平排列。"
                      :code="horizontalSnippet">
@@ -97,7 +123,7 @@ const handleChange = (href: string) => {
           </DemoBlock>
         </div>
 
-        <div id="demo-container">
+        <div id="demo-container" class="scroll-mt-20">
           <DemoBlock title="自定义容器"
                      description="可以指定滚动容器。"
                      :code="targetSnippet">
@@ -144,7 +170,7 @@ const handleChange = (href: string) => {
           </DemoBlock>
         </div>
 
-        <div id="demo-nested">
+        <div id="demo-nested" class="scroll-mt-20">
           <DemoBlock title="嵌套锚点"
                      description="支持多级嵌套的锚点。"
                      :code="nestedSnippet">
@@ -182,6 +208,70 @@ const handleChange = (href: string) => {
             </div>
           </DemoBlock>
         </div>
+
+        <div id="demo-ink" class="scroll-mt-20">
+          <DemoBlock title="墨水指示器"
+                     description="固定模式下通过 showInkInFixed 显示墨水指示器；非固定模式默认可见。"
+                     :code="inkSnippet">
+            <div class="p-6 bg-gray-50 rounded-lg">
+              <div class="flex gap-8">
+                <div class="flex-1">
+                  <p class="text-gray-600 mb-2">
+                    <code>affix=false</code> 时墨水指示器默认显示：
+                  </p>
+                  <Anchor :affix="false"
+                          :getContainer="getMainContainer">
+                    <AnchorLink href="#demo-basic"
+                                title="基本用法" />
+                    <AnchorLink href="#demo-horizontal"
+                                title="水平方向" />
+                  </Anchor>
+                </div>
+                <div class="flex-1">
+                  <p class="text-gray-600 mb-2">
+                    <code>showInkInFixed</code> 在固定模式下也显示：
+                  </p>
+                  <Anchor :show-ink-in-fixed="true"
+                          :getContainer="getMainContainer">
+                    <AnchorLink href="#demo-container"
+                                title="自定义容器" />
+                    <AnchorLink href="#demo-nested"
+                                title="嵌套锚点" />
+                  </Anchor>
+                </div>
+              </div>
+            </div>
+          </DemoBlock>
+        </div>
+
+        <div id="demo-events" class="scroll-mt-20">
+          <DemoBlock title="事件处理"
+                     description="监听 @click 和 @change 事件，可配合 targetOffset 使用。"
+                     :code="eventsSnippet">
+            <div class="p-6 bg-gray-50 rounded-lg">
+              <div class="flex gap-8 items-start">
+                <div class="flex-1">
+                  <Anchor :affix="false"
+                          :getContainer="getMainContainer"
+                          :target-offset="60"
+                          @click="handleDemoClick"
+                          @change="handleDemoChange">
+                    <AnchorLink href="#demo-basic"
+                                title="基本用法" />
+                    <AnchorLink href="#demo-horizontal"
+                                title="水平方向" />
+                    <AnchorLink href="#demo-container"
+                                title="自定义容器" />
+                  </Anchor>
+                </div>
+                <div class="flex-1 p-3 bg-white border border-gray-200 rounded-lg text-sm">
+                  <p class="text-gray-500 mb-1">最近事件：</p>
+                  <p class="font-mono text-gray-800">{{ lastEvent || '（点击或滚动触发）' }}</p>
+                </div>
+              </div>
+            </div>
+          </DemoBlock>
+        </div>
       </div>
 
       <!-- 右侧固定锚点导航 -->
@@ -198,6 +288,10 @@ const handleChange = (href: string) => {
                         title="自定义容器" />
             <AnchorLink href="#demo-nested"
                         title="嵌套锚点" />
+            <AnchorLink href="#demo-ink"
+                        title="墨水指示器" />
+            <AnchorLink href="#demo-events"
+                        title="事件处理" />
           </Anchor>
         </div>
       </div>

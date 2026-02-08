@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Anchor, AnchorLink } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
@@ -30,6 +30,24 @@ const nestedSnippet = `<Anchor>
   <AnchorLink href="#chapter2" title="第二章" />
 </Anchor>`
 
+const inkSnippet = `<Anchor showInkInFixed offsetTop={80}>
+  <AnchorLink href="#part1" title="Part 1" />
+  <AnchorLink href="#part2" title="Part 2" />
+</Anchor>
+
+// affix=false 时墨水指示器默认可见
+<Anchor affix={false}>
+  <AnchorLink href="#part1" title="Part 1" />
+</Anchor>`
+
+const eventsSnippet = `<Anchor
+  onClick={(e, href) => console.log('Clicked:', href)}
+  onChange={(activeLink) => console.log('Active:', activeLink)}
+  targetOffset={60}>
+  <AnchorLink href="#section1" title="Section 1" />
+  <AnchorLink href="#section2" title="Section 2" />
+</Anchor>`
+
 const targetSnippet = `const scrollContainerRef = useRef<HTMLDivElement>(null)
 const getScrollContainer = () => scrollContainerRef.current || window
 
@@ -49,6 +67,14 @@ export default function AnchorDemo() {
 
   const handleChange = (href: string) => {
     console.log('Anchor changed:', href)
+  }
+
+  const [lastEvent, setLastEvent] = useState('')
+  const handleDemoClick = (_e: React.MouseEvent, href: string) => {
+    setLastEvent(`点击: ${href}`)
+  }
+  const handleDemoChange = (activeLink: string) => {
+    setLastEvent(`激活: ${activeLink}`)
   }
 
   return (
@@ -157,6 +183,64 @@ export default function AnchorDemo() {
               </div>
             </DemoBlock>
           </div>
+
+          <div id="demo-ink" className="scroll-mt-20">
+            <DemoBlock
+              title="墨水指示器"
+              description="固定模式下通过 showInkInFixed 显示墨水指示器；非固定模式默认可见。"
+              code={inkSnippet}>
+              <div className="p-6 bg-gray-50 rounded-lg">
+                <div className="flex gap-8">
+                  <div className="flex-1">
+                    <p className="text-gray-600 mb-2">
+                      <code>affix=false</code> 时墨水指示器默认显示：
+                    </p>
+                    <Anchor affix={false} getContainer={getMainContainer}>
+                      <AnchorLink href="#demo-basic" title="基本用法" />
+                      <AnchorLink href="#demo-horizontal" title="水平方向" />
+                    </Anchor>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-gray-600 mb-2">
+                      <code>showInkInFixed</code> 在固定模式下也显示：
+                    </p>
+                    <Anchor showInkInFixed getContainer={getMainContainer}>
+                      <AnchorLink href="#demo-container" title="自定义容器" />
+                      <AnchorLink href="#demo-nested" title="嵌套锚点" />
+                    </Anchor>
+                  </div>
+                </div>
+              </div>
+            </DemoBlock>
+          </div>
+
+          <div id="demo-events" className="scroll-mt-20">
+            <DemoBlock
+              title="事件处理"
+              description="监听 onClick 和 onChange 事件，可配合 targetOffset 使用。"
+              code={eventsSnippet}>
+              <div className="p-6 bg-gray-50 rounded-lg">
+                <div className="flex gap-8 items-start">
+                  <div className="flex-1">
+                    <Anchor
+                      affix={false}
+                      getContainer={getMainContainer}
+                      targetOffset={60}
+                      onClick={handleDemoClick}
+                      onChange={handleDemoChange}>
+                      <AnchorLink href="#demo-basic" title="基本用法" />
+                      <AnchorLink href="#demo-horizontal" title="水平方向" />
+                      <AnchorLink href="#demo-container" title="自定义容器" />
+                    </Anchor>
+                  </div>
+                  <div className="flex-1 p-3 bg-white border border-gray-200 rounded-lg text-sm">
+                    <p className="text-gray-500 mb-1">最近事件：</p>
+                    <p className="font-mono text-gray-800">{lastEvent || '（点击或滚动触发）'}</p>
+                  </div>
+                </div>
+              </div>
+            </DemoBlock>
+          </div>
         </div>
 
         {/* 右侧固定锚点导航 */}
@@ -168,6 +252,8 @@ export default function AnchorDemo() {
               <AnchorLink href="#demo-horizontal" title="水平方向" />
               <AnchorLink href="#demo-container" title="自定义容器" />
               <AnchorLink href="#demo-nested" title="嵌套锚点" />
+              <AnchorLink href="#demo-ink" title="墨水指示器" />
+              <AnchorLink href="#demo-events" title="事件处理" />
             </Anchor>
           </div>
         </div>

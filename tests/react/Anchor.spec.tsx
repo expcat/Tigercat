@@ -253,26 +253,6 @@ describe('Anchor', () => {
   })
 
   describe('Props', () => {
-    it('should respect bounds prop', () => {
-      const { container } = render(
-        <Anchor bounds={10} getContainer={() => scrollContainer}>
-          <AnchorLink href="#section1" title="Link" />
-        </Anchor>
-      )
-
-      expect(container.firstChild).toBeInTheDocument()
-    })
-
-    it('should respect targetOffset prop', () => {
-      const { container } = render(
-        <Anchor targetOffset={50} getContainer={() => scrollContainer}>
-          <AnchorLink href="#section1" title="Link" />
-        </Anchor>
-      )
-
-      expect(container.firstChild).toBeInTheDocument()
-    })
-
     it('should use custom getContainer', async () => {
       const customContainer = document.createElement('div')
       const getContainer = vi.fn(() => customContainer)
@@ -285,6 +265,22 @@ describe('Anchor', () => {
 
       await waitFor(() => {
         expect(getContainer).toHaveBeenCalled()
+      })
+    })
+
+    it('should call onChange when active link is detected on scroll', async () => {
+      const onChange = vi.fn()
+
+      render(
+        <Anchor onChange={onChange} getContainer={() => scrollContainer}>
+          <AnchorLink href="#section1" title="Link 1" />
+          <AnchorLink href="#section2" title="Link 2" />
+        </Anchor>
+      )
+
+      // The scroll handler fires on mount and should detect the initial active link
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalled()
       })
     })
   })

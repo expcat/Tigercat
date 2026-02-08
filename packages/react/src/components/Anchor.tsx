@@ -82,6 +82,7 @@ export const Anchor: React.FC<AnchorProps> = ({
   const inkRef = useRef<HTMLDivElement>(null)
   const isScrollingRef = useRef(false)
   const animationFrameRef = useRef<number | null>(null)
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Cache getContainer to avoid recreating on every render
   const getContainerRef = useRef(getContainer)
   getContainerRef.current = getContainer
@@ -125,26 +126,26 @@ export const Anchor: React.FC<AnchorProps> = ({
 
       scrollTo(href)
 
-      // Re-enable scroll handler after animation
-      setTimeout(() => {
+      // Clear previous timeout to avoid premature reset on rapid clicks
+      if (scrollTimeoutRef.current !== null) clearTimeout(scrollTimeoutRef.current)
+      scrollTimeoutRef.current = setTimeout(() => {
         isScrollingRef.current = false
+        scrollTimeoutRef.current = null
       }, 500)
     },
     [onClick, scrollTo]
   )
 
-  // Store scroll handler ref for proper cleanup
-  const scrollHandlerRef = useRef<(() => void) | null>(null)
-  const boundContainerRef = useRef<HTMLElement | Window | null>(null)
-
   // Handle scroll events
   useEffect(() => {
+    let container: HTMLElement | Window | null = null
+    let handleScroll: (() => void) | null = null
+
     // Small delay to ensure sibling refs are ready
     const timeoutId = setTimeout(() => {
-      const container = getContainerRef.current()
-      boundContainerRef.current = container
+      container = getContainerRef.current()
 
-      const handleScroll = () => {
+      handleScroll = () => {
         if (isScrollingRef.current) return
 
         if (animationFrameRef.current !== null) {
@@ -169,18 +170,20 @@ export const Anchor: React.FC<AnchorProps> = ({
         })
       }
 
-      scrollHandlerRef.current = handleScroll
       container.addEventListener('scroll', handleScroll, { passive: true })
       handleScroll()
     }, 0)
 
     return () => {
       clearTimeout(timeoutId)
-      if (boundContainerRef.current && scrollHandlerRef.current) {
-        boundContainerRef.current.removeEventListener('scroll', scrollHandlerRef.current)
+      if (container && handleScroll) {
+        container.removeEventListener('scroll', handleScroll)
       }
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current)
+      }
+      if (scrollTimeoutRef.current !== null) {
+        clearTimeout(scrollTimeoutRef.current)
       }
     }
   }, [links, bounds, scrollOffset, getCurrentAnchor, onChange])
@@ -223,10 +226,7 @@ export const Anchor: React.FC<AnchorProps> = ({
 
   const linkListClasses = useMemo(() => getAnchorLinkListClasses(direction), [direction])
 
-  const showInk = useMemo(() => {
-    if (!affix) return true
-    return showInkInFixed
-  }, [affix, showInkInFixed])
+  const showInk = useMemo(() => !affix || showInkInFixed, [affix, showInkInFixed])
 
   const wrapperStyle = useMemo<React.CSSProperties>(() => {
     const baseStyle: React.CSSProperties = {}

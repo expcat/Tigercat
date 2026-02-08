@@ -64,17 +64,7 @@ export const anchorLinkActiveClasses = 'text-[var(--tiger-primary,#2563eb)] font
  * Get anchor wrapper classes
  */
 export function getAnchorWrapperClasses(affix: boolean, className?: string): string {
-  const classes = [anchorBaseClasses]
-
-  if (affix) {
-    classes.push(anchorAffixClasses)
-  }
-
-  if (className) {
-    classes.push(className)
-  }
-
-  return classes.filter(Boolean).join(' ')
+  return [anchorBaseClasses, affix && anchorAffixClasses, className].filter(Boolean).join(' ')
 }
 
 /**
@@ -106,17 +96,9 @@ export function getAnchorLinkListClasses(direction: AnchorDirection): string {
  * Get anchor link classes based on active state
  */
 export function getAnchorLinkClasses(active: boolean, className?: string): string {
-  const classes = [anchorLinkBaseClasses]
-
-  if (active) {
-    classes.push(anchorLinkActiveClasses)
-  }
-
-  if (className) {
-    classes.push(className)
-  }
-
-  return classes.filter(Boolean).join(' ')
+  return [anchorLinkBaseClasses, active && anchorLinkActiveClasses, className]
+    .filter(Boolean)
+    .join(' ')
 }
 
 /**
@@ -197,19 +179,9 @@ export function scrollToAnchor(
     return
   }
 
-  const offsetTop = getElementOffsetTop(element, container) - targetOffset
-
-  if (container === window) {
-    window.scrollTo({
-      top: offsetTop,
-      behavior: 'smooth'
-    })
-  } else {
-    ;(container as HTMLElement).scrollTo({
-      top: offsetTop,
-      behavior: 'smooth'
-    })
-  }
+  const top = getElementOffsetTop(element, container) - targetOffset
+  const scrollTarget = container === window ? window : (container as HTMLElement)
+  scrollTarget.scrollTo({ top, behavior: 'smooth' })
 }
 
 /**

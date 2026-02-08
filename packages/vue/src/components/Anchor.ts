@@ -134,9 +134,13 @@ export const Anchor = defineComponent({
     const isScrolling = ref(false)
 
     let animationFrameId: number | null = null
+    let scrollTimeoutId: ReturnType<typeof setTimeout> | null = null
 
     // Get current container (call fresh each time to handle lazy refs)
     const getContainer = () => props.getContainer()
+
+    // Scroll offset: targetOffset takes priority, falling back to offsetTop
+    const scrollOffset = computed(() => props.targetOffset ?? props.offsetTop)
 
     // Register a link
     const registerLink = (href: string) => {
@@ -160,8 +164,12 @@ export const Anchor = defineComponent({
 
       animationFrameId = requestAnimationFrame(() => {
         const container = getContainer()
-        const scrollOffset = props.targetOffset ?? props.offsetTop
-        const newActiveLink = findActiveAnchor(links.value, container, props.bounds, scrollOffset)
+        const newActiveLink = findActiveAnchor(
+          links.value,
+          container,
+          props.bounds,
+          scrollOffset.value
+        )
 
         // Apply custom getCurrentAnchor if provided
         const finalActiveLink = props.getCurrentAnchor
@@ -177,9 +185,7 @@ export const Anchor = defineComponent({
 
     // Scroll to anchor
     const scrollTo = (href: string) => {
-      const container = getContainer()
-      const scrollOffset = props.targetOffset ?? props.offsetTop
-      scrollToAnchor(href, container, scrollOffset)
+      scrollToAnchor(href, getContainer(), scrollOffset.value)
     }
 
     // Handle link click
@@ -192,9 +198,11 @@ export const Anchor = defineComponent({
 
       scrollTo(href)
 
-      // Re-enable scroll handler after animation
-      setTimeout(() => {
+      // Clear previous timeout to avoid premature reset on rapid clicks
+      if (scrollTimeoutId !== null) clearTimeout(scrollTimeoutId)
+      scrollTimeoutId = setTimeout(() => {
         isScrolling.value = false
+        scrollTimeoutId = null
       }, 500)
     }
 
@@ -254,6 +262,9 @@ export const Anchor = defineComponent({
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId)
       }
+      if (scrollTimeoutId !== null) {
+        clearTimeout(scrollTimeoutId)
+      }
     })
 
     // Computed classes
@@ -276,10 +287,7 @@ export const Anchor = defineComponent({
       return getAnchorLinkListClasses(props.direction)
     })
 
-    const showInk = computed(() => {
-      if (!props.affix) return true
-      return props.showInkInFixed
-    })
+    const showInk = computed(() => !props.affix || props.showInkInFixed)
 
     const wrapperStyle = computed(() => {
       const baseStyle: Record<string, unknown> = {}
@@ -300,16 +308,10 @@ export const Anchor = defineComponent({
     })
 
     // Keep context in sync
-    watch(activeLink, (newVal) => {
-      contextValue.activeLink = newVal
+    watch([activeLink, () => props.direction], ([newActive, newDir]) => {
+      contextValue.activeLink = newActive
+      contextValue.direction = newDir
     })
-
-    watch(
-      () => props.direction,
-      (newVal) => {
-        contextValue.direction = newVal
-      }
-    )
 
     provide(AnchorContextKey, contextValue)
 
