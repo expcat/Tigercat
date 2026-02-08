@@ -43,29 +43,29 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop           | Type                                          | Default          | Vue | React | Description                |
-| -------------- | --------------------------------------------- | ---------------- | :-: | :---: | -------------------------- |
-| type           | `'success' \| 'info' \| 'warning' \| 'error'` | `'info'`         |  ✓  |   ✓   | 类型                       |
-| size           | `'sm' \| 'md' \| 'lg'`                        | `'md'`           |  ✓  |   ✓   | 尺寸                       |
-| title          | `string`                                      | -                |  ✓  |   ✓   | 标题                       |
-| description    | `string`                                      | -                |  ✓  |   ✓   | 描述内容                   |
-| showIcon       | `boolean`                                     | `true`           |  ✓  |   ✓   | 是否显示图标               |
-| closable       | `boolean`                                     | `false`          |  ✓  |   ✓   | 可关闭                     |
-| closeAriaLabel | `string`                                      | `'Close alert'`  |  ✓  |   ✓   | 关闭按钮无障碍标签         |
-| className      | `string`                                      | -                |  ✓  |   ✓   | 自定义类名                 |
+| Prop           | Type                                          | Default         | Vue | React | Description        |
+| -------------- | --------------------------------------------- | --------------- | :-: | :---: | ------------------ |
+| type           | `'success' \| 'info' \| 'warning' \| 'error'` | `'info'`        |  ✓  |   ✓   | 类型               |
+| size           | `'sm' \| 'md' \| 'lg'`                        | `'md'`          |  ✓  |   ✓   | 尺寸               |
+| title          | `string`                                      | -               |  ✓  |   ✓   | 标题               |
+| description    | `string`                                      | -               |  ✓  |   ✓   | 描述内容           |
+| showIcon       | `boolean`                                     | `true`          |  ✓  |   ✓   | 是否显示图标       |
+| closable       | `boolean`                                     | `false`         |  ✓  |   ✓   | 可关闭             |
+| closeAriaLabel | `string`                                      | `'Close alert'` |  ✓  |   ✓   | 关闭按钮无障碍标签 |
+| className      | `string`                                      | -               |  ✓  |   ✓   | 自定义类名         |
 
 ### Events
 
-| Vue Event | React Callback | Payload      | Description                            |
-| --------- | -------------- | ------------ | -------------------------------------- |
+| Vue Event | React Callback | Payload      | Description                              |
+| --------- | -------------- | ------------ | ---------------------------------------- |
 | `@close`  | `onClose`      | `MouseEvent` | 关闭事件（可 `preventDefault` 阻止隐藏） |
 
 ### Slots / Children
 
-| Vue Slot      | React Prop        | Description                       |
-| ------------- | ----------------- | --------------------------------- |
+| Vue Slot      | React Prop        | Description                             |
+| ------------- | ----------------- | --------------------------------------- |
 | `default`     | `children`        | 默认内容（无 title/description 时生效） |
-| `title`       | `titleSlot`       | 自定义标题内容（覆盖 title prop） |
+| `title`       | `titleSlot`       | 自定义标题内容（覆盖 title prop）       |
 | `description` | `descriptionSlot` | 自定义描述内容（覆盖 description prop） |
 
 ---
@@ -105,17 +105,18 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop     | Type           | Default | Vue | React | Description |
-| -------- | -------------- | ------- | :-: | :---: | ----------- |
-| color    | `string`       | -       |  ✓  |   ✓   | 颜色        |
-| size     | `'sm' \| 'md'` | `'md'`  |  ✓  |   ✓   | 尺寸        |
-| closable | `boolean`      | `false` |  ✓  |   ✓   | 可关闭      |
+| Prop           | Type                                                                     | Default       | Vue | React | Description                            |
+| -------------- | ------------------------------------------------------------------------ | ------------- | :-: | :---: | -------------------------------------- |
+| variant        | `'default' \| 'primary' \| 'success' \| 'warning' \| 'danger' \| 'info'` | `'default'`   |  ✓  |   ✓   | 变体样式                               |
+| size           | `'sm' \| 'md' \| 'lg'`                                                   | `'md'`        |  ✓  |   ✓   | 尺寸                                   |
+| closable       | `boolean`                                                                | `false`       |  ✓  |   ✓   | 可关闭                                 |
+| closeAriaLabel | `string`                                                                 | `'Close tag'` |  ✓  |   ✓   | 关闭按钮的 aria-label（无障碍/多语言） |
 
 ### Events
 
-| Vue Event | React Callback | Payload | Description |
-| --------- | -------------- | ------- | ----------- |
-| `@close`  | `onClose`      | -       | 关闭事件    |
+| Vue Event | React Callback | Payload      | Description                                  |
+| --------- | -------------- | ------------ | -------------------------------------------- |
+| `@close`  | `onClose`      | `MouseEvent` | 关闭事件；调用 `preventDefault()` 可阻止关闭 |
 
 ### Slots / Children
 

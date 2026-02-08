@@ -126,4 +126,35 @@ describe('Tag', () => {
 
     await expectNoA11yViolations(container)
   })
+
+  it('applies variant classes to root element', () => {
+    const { container } = render(Tag, {
+      props: { variant: 'success' },
+      slots: { default: 'Tag' }
+    })
+
+    const root = container.querySelector('[role="status"]')
+    expect(root?.className).toContain('bg-[var(--tiger-tag-success-bg')
+    expect(root?.className).toContain('text-[var(--tiger-success')
+  })
+
+  it('applies size classes to root element', () => {
+    const { container } = render(Tag, {
+      props: { size: 'lg' },
+      slots: { default: 'Tag' }
+    })
+
+    const root = container.querySelector('[role="status"]')
+    expect(root).toHaveClass('px-3')
+    expect(root).toHaveClass('text-base')
+  })
+
+  it('renders custom closeAriaLabel on close button', () => {
+    render(Tag, {
+      props: { closable: true, closeAriaLabel: 'Remove' },
+      slots: { default: 'Tag' }
+    })
+
+    expect(screen.getByLabelText('Remove')).toBeInTheDocument()
+  })
 })

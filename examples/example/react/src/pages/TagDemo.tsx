@@ -37,6 +37,8 @@ const closeAriaSnippet = `<Space wrap>
   <Tag variant="success" closable closeAriaLabel="移除标签：已完成">已完成</Tag>
 </Space>`
 
+const preventCloseSnippet = `<Tag closable onClose={(e) => e.preventDefault()}>点击关闭按钮不会消失</Tag>`
+
 const closableVariantSnippet = `<Space wrap>
   <Tag variant="default" closable>默认标签</Tag>
   <Tag variant="primary" closable>主要标签</Tag>
@@ -164,6 +166,16 @@ const TagDemo: React.FC = () => {
             已完成
           </Tag>
         </Space>
+      </DemoBlock>
+
+      {/* 阻止关闭 */}
+      <DemoBlock
+        title="阻止关闭"
+        description="通过 preventDefault() 阻止标签自动关闭，适用于二次确认等场景。"
+        code={preventCloseSnippet}>
+        <Tag closable onClose={(e) => e.preventDefault()}>
+          点击关闭按钮不会消失
+        </Tag>
       </DemoBlock>
 
       {/* 不同类型的可关闭标签 */}

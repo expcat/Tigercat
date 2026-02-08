@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   classNames,
   getTagVariantClasses,
@@ -57,15 +57,16 @@ export const Tag: React.FC<TagProps> = ({
 }) => {
   const [isVisible, setIsVisible] = useState(true)
 
-  const tagClasses = classNames(
-    tagBaseClasses,
-    getTagVariantClasses(variant),
-    tagSizeClasses[size],
-    className
+  const tagClasses = useMemo(
+    () =>
+      classNames(tagBaseClasses, getTagVariantClasses(variant), tagSizeClasses[size], className),
+    [variant, size, className]
   )
 
-  const scheme = defaultTagThemeColors[variant]
-  const closeButtonClasses = classNames(tagCloseButtonBaseClasses, scheme.closeBgHover, scheme.text)
+  const closeButtonClasses = useMemo(() => {
+    const scheme = defaultTagThemeColors[variant]
+    return classNames(tagCloseButtonBaseClasses, scheme.closeBgHover, scheme.text)
+  }, [variant])
 
   const handleClose = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()

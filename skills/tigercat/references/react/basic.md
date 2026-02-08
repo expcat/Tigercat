@@ -78,8 +78,10 @@ import { Button } from '@expcat/tigercat-react'
 
 ```tsx
 <Tag>Default</Tag>
-<Tag color="blue">Blue</Tag>
+<Tag variant="primary">Primary</Tag>
+<Tag size="lg" variant="success">Large</Tag>
 <Tag closable onClose={handleClose}>Closable</Tag>
+<Tag closable closeAriaLabel="移除标签">自定义 aria-label</Tag>
 ```
 
 ---

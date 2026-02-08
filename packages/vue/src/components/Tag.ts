@@ -36,7 +36,8 @@ const CloseIcon = () =>
       viewBox: icon24ViewBox,
       stroke: 'currentColor',
       'stroke-width': String(icon24StrokeWidth),
-      'aria-hidden': 'true'
+      'aria-hidden': 'true',
+      focusable: 'false'
     },
     [
       h('path', {
@@ -57,7 +58,7 @@ export const Tag = defineComponent({
      */
     variant: {
       type: String as PropType<TagVariant>,
-      default: 'default' as TagVariant
+      default: 'default'
     },
     /**
      * Tag size
@@ -65,7 +66,7 @@ export const Tag = defineComponent({
      */
     size: {
       type: String as PropType<TagSize>,
-      default: 'md' as TagSize
+      default: 'md'
     },
     /**
      * Whether the tag can be closed
@@ -105,13 +106,14 @@ export const Tag = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const isVisible = ref(true)
 
-    const tagClasses = computed(() => {
-      return classNames(
+    const tagClasses = computed(() =>
+      classNames(
         tagBaseClasses,
         getTagVariantClasses(props.variant),
-        tagSizeClasses[props.size]
+        tagSizeClasses[props.size],
+        props.className
       )
-    })
+    )
 
     const closeButtonClasses = computed(() => {
       const scheme = defaultTagThemeColors[props.variant]
@@ -140,7 +142,7 @@ export const Tag = defineComponent({
         'span',
         {
           ...attrs,
-          class: classNames(tagClasses.value, props.className, coerceClassValue(attrsClass)),
+          class: classNames(tagClasses.value, coerceClassValue(attrsClass)),
           style: mergeStyleValues(attrsStyle, props.style),
           role: 'status'
         },
