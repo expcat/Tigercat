@@ -19,7 +19,7 @@ export const avatarSizeClasses: Record<AvatarSize, string> = {
   md: 'w-10 h-10 text-sm',
   lg: 'w-12 h-12 text-base',
   xl: 'w-16 h-16 text-lg'
-} as const
+}
 
 /**
  * Shape classes for avatar
@@ -27,7 +27,7 @@ export const avatarSizeClasses: Record<AvatarSize, string> = {
 export const avatarShapeClasses: Record<AvatarShape, string> = {
   circle: 'rounded-full',
   square: 'rounded-md'
-} as const
+}
 
 /**
  * Default background color for avatar
@@ -55,11 +55,10 @@ export const avatarImageClasses = 'w-full h-full object-cover'
  * getInitials('张三') // '张三'
  */
 export function getInitials(name: string): string {
-  const trimmed = typeof name === 'string' ? name.trim() : ''
+  const trimmed = name.trim()
   if (!trimmed) return ''
 
   const words = trimmed.split(/\s+/).filter(Boolean)
-  if (words.length === 0) return ''
 
   if (words.length === 1) {
     const firstWord = words[0]

@@ -100,6 +100,52 @@ describe('Avatar', () => {
     expect(avatar?.className).toContain('bg-[var(--tiger-avatar-bg,#e5e7eb)]')
   })
 
+  it('applies size classes', () => {
+    const sizes = [
+      { size: 'sm', expected: 'w-8 h-8 text-xs' },
+      { size: 'md', expected: 'w-10 h-10 text-sm' },
+      { size: 'lg', expected: 'w-12 h-12 text-base' },
+      { size: 'xl', expected: 'w-16 h-16 text-lg' }
+    ] as const
+
+    sizes.forEach(({ size, expected }) => {
+      const { container } = render(Avatar, {
+        props: { text: size.toUpperCase(), size }
+      })
+      const avatar = container.querySelector('[role="img"]')
+      expected.split(' ').forEach((cls) => {
+        expect(avatar?.className).toContain(cls)
+      })
+    })
+  })
+
+  it('applies shape classes', () => {
+    const { container: circleContainer } = render(Avatar, {
+      props: { text: 'C', shape: 'circle' }
+    })
+    expect(circleContainer.querySelector('[role="img"]')?.className).toContain('rounded-full')
+
+    const { container: squareContainer } = render(Avatar, {
+      props: { text: 'S', shape: 'square' }
+    })
+    expect(squareContainer.querySelector('[role="img"]')?.className).toContain('rounded-md')
+  })
+
+  it('applies custom bgColor and textColor', () => {
+    const { container } = render(Avatar, {
+      props: {
+        text: 'T',
+        bgColor: 'bg-blue-500',
+        textColor: 'text-white'
+      }
+    })
+
+    const avatar = container.querySelector('[role="img"]')
+    expect(avatar?.className).toContain('bg-blue-500')
+    expect(avatar?.className).toContain('text-white')
+    expect(avatar?.className).not.toContain('bg-[var(--tiger-avatar-bg')
+  })
+
   it('passes accessibility checks', async () => {
     const { container } = render(Avatar, {
       props: {

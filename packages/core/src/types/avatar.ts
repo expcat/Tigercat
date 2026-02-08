@@ -45,12 +45,6 @@ export interface AvatarProps {
   text?: string
 
   /**
-   * Icon content (slot/children)
-   * Used when both src and text are not provided
-   */
-  icon?: boolean
-
-  /**
    * Background color for text/icon avatars
    * Uses Tailwind color classes or CSS color value
    * @example 'bg-blue-500' | '#3b82f6'

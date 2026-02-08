@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
   classNames,
   avatarBaseClasses,
@@ -11,7 +11,8 @@ import {
   type AvatarProps as CoreAvatarProps
 } from '@expcat/tigercat-core'
 
-export interface AvatarProps extends CoreAvatarProps, React.HTMLAttributes<HTMLSpanElement> {
+export interface AvatarProps
+  extends Omit<CoreAvatarProps, 'icon'>, React.HTMLAttributes<HTMLSpanElement> {
   /**
    * Icon content (children for icon mode)
    */
@@ -44,13 +45,17 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   const isDecorative = ariaHiddenProp === true || (!computedLabel && !ariaLabelledbyProp)
 
-  const avatarClasses = classNames(
-    avatarBaseClasses,
-    avatarSizeClasses[size],
-    avatarShapeClasses[shape],
-    !hasImage && bgColor,
-    !hasImage && textColor,
-    className
+  const avatarClasses = useMemo(
+    () =>
+      classNames(
+        avatarBaseClasses,
+        avatarSizeClasses[size],
+        avatarShapeClasses[shape],
+        !hasImage && bgColor,
+        !hasImage && textColor,
+        className
+      ),
+    [size, shape, hasImage, bgColor, textColor, className]
   )
 
   // Priority: image > text > icon (children)
@@ -58,10 +63,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   // If src is provided and not errored, show image
   if (hasImage) {
     return (
-      <span
-        {...props}
-        className={avatarClasses}
-        aria-hidden={isDecorative ? true : props['aria-hidden']}>
+      <span {...props} className={avatarClasses} aria-hidden={isDecorative ? true : ariaHiddenProp}>
         <img
           src={src}
           alt={alt}
@@ -72,25 +74,7 @@ export const Avatar: React.FC<AvatarProps> = ({
     )
   }
 
-  // If text is provided, show text
-  if (displayText) {
-    return (
-      <span
-        {...props}
-        className={avatarClasses}
-        {...(isDecorative
-          ? { 'aria-hidden': true }
-          : {
-              role: 'img',
-              'aria-label': computedLabel,
-              'aria-labelledby': ariaLabelledbyProp
-            })}>
-        {displayText}
-      </span>
-    )
-  }
-
-  // Otherwise, show icon from children
+  // Text or icon (children) fallback
   return (
     <span
       {...props}
@@ -102,7 +86,7 @@ export const Avatar: React.FC<AvatarProps> = ({
             'aria-label': computedLabel,
             'aria-labelledby': ariaLabelledbyProp
           })}>
-      {children}
+      {displayText || children}
     </span>
   )
 }

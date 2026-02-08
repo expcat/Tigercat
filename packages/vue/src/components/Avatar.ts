@@ -158,25 +158,7 @@ export const Avatar = defineComponent({
         )
       }
 
-      // If text is provided, show text
-      if (displayText.value) {
-        return h(
-          'span',
-          {
-            ...baseSpanProps,
-            ...(isDecorative
-              ? { 'aria-hidden': true }
-              : {
-                  role: 'img',
-                  'aria-label': computedLabel,
-                  'aria-labelledby': ariaLabelledbyProp
-                })
-          },
-          displayText.value
-        )
-      }
-
-      // Otherwise, show icon from slot
+      // Text or icon (slot) fallback
       return h(
         'span',
         {
@@ -189,7 +171,7 @@ export const Avatar = defineComponent({
                 'aria-labelledby': ariaLabelledbyProp
               })
         },
-        slots.default ? slots.default() : undefined
+        displayText.value || slots.default?.()
       )
     }
   }

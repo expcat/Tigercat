@@ -74,12 +74,22 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop  | Type                             | Default    | Vue | React | Description          |
-| ----- | -------------------------------- | ---------- | :-: | :---: | -------------------- |
-| src   | `string`                         | -          |  ✓  |   ✓   | 图片地址             |
-| size  | `'sm' \| 'md' \| 'lg' \| number` | `'md'`     |  ✓  |   ✓   | 尺寸                 |
-| shape | `'circle' \| 'square'`           | `'circle'` |  ✓  |   ✓   | 形状                 |
-| text  | `string`                         | -          |  ✓  |   ✓   | 文字（无图片时显示） |
+| Prop      | Type                           | Default    | Vue | React | Description                          |
+| --------- | ------------------------------ | ---------- | :-: | :---: | ------------------------------------ |
+| src       | `string`                       | -          |  ✓  |   ✓   | 图片地址                             |
+| alt       | `string`                       | `''`       |  ✓  |   ✓   | 图片替代文字                         |
+| size      | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`     |  ✓  |   ✓   | 尺寸                                 |
+| shape     | `'circle' \| 'square'`         | `'circle'` |  ✓  |   ✓   | 形状                                 |
+| text      | `string`                       | -          |  ✓  |   ✓   | 文字（无图片时显示首字母缩写）       |
+| bgColor   | `string`                       | 主题变量   |  ✓  |   ✓   | 文字/图标头像背景色（Tailwind 类名） |
+| textColor | `string`                       | 主题变量   |  ✓  |   ✓   | 文字/图标头像文字色（Tailwind 类名） |
+| className | `string`                       | -          |  ✓  |   ✓   | 自定义类名                           |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description                    |
+| --------- | ---------- | ------------------------------ |
+| `default` | `children` | 图标内容（无图片和文字时显示） |
 
 ---
 

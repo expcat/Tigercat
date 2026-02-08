@@ -74,14 +74,22 @@ import { Button } from '@expcat/tigercat-vue'
 
 ```vue
 <template>
-  <Avatar src="/avatar.jpg" size="lg" />
+  <!-- 图片头像 -->
+  <Avatar src="/avatar.jpg" alt="User Name" size="lg" />
+  <!-- 文字头像 -->
   <Avatar text="AB" shape="square" />
+  <!-- 图标头像 -->
+  <Avatar aria-label="用户">
+    <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="..." /></svg>
+  </Avatar>
+  <!-- 自定义颜色 -->
+  <Avatar text="U" bg-color="bg-[var(--tiger-primary,#2563eb)]" text-color="text-white" />
+  <!-- 图片加载失败回退到文字 -->
+  <Avatar src="/broken.jpg" text="Fallback" alt="Fallback" />
 
-  <!-- 数字徽标 -->
+  <!-- 搭配 Badge -->
   <Badge :content="5" :standalone="false"><Avatar /></Badge>
-  <!-- 小红点 -->
   <Badge type="dot" :standalone="false"><Avatar /></Badge>
-  <!-- 文本徽标 -->
   <Badge type="text" content="NEW" variant="primary" />
 </template>
 ```

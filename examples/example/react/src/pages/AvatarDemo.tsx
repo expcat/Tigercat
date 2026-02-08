@@ -7,6 +7,13 @@ const imageSnippet = `<Space>
   <Avatar src="https://i.pravatar.cc/150?img=3" alt="User 3" />
 </Space>`
 
+const fallbackSnippet = `<Space>
+  {/* 图片加载失败时，自动回退到文字头像 */}
+  <Avatar src="/does-not-exist.jpg" text="回退" alt="加载失败回退" />
+  {/* 未指定 src 时直接显示文字 */}
+  <Avatar text="无图" />
+</Space>`
+
 const textSnippet = `<Space>
   <Avatar text="Alice" />
   <Avatar text="Bob Smith" />
@@ -172,6 +179,17 @@ export default function AvatarDemo() {
           <Avatar src="https://i.pravatar.cc/150?img=1" alt="User 1" />
           <Avatar src="https://i.pravatar.cc/150?img=2" alt="User 2" />
           <Avatar src="https://i.pravatar.cc/150?img=3" alt="User 3" />
+        </Space>
+      </DemoBlock>
+
+      {/* 图片加载失败回退 */}
+      <DemoBlock
+        title="图片加载失败回退"
+        description="当图片加载失败时，自动回退到 text 文字头像。"
+        code={fallbackSnippet}>
+        <Space>
+          <Avatar src="/does-not-exist.jpg" text="回退" alt="加载失败回退" />
+          <Avatar text="无图" />
         </Space>
       </DemoBlock>
 
