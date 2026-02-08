@@ -5,7 +5,7 @@ description: React layout components usage
 
 # Layout Components (React)
 
-布局组件：Card, Container, Descriptions, Grid, Layout, List, Skeleton, Space
+布局组件：Card, Container, Descriptions, Divider, Grid, Layout, List, Skeleton, Space
 
 > **Props Reference**: [shared/props/layout.md](../shared/props/layout.md)
 
@@ -28,6 +28,34 @@ description: React layout components usage
 <Container width="1200px" padding="24px">
   <p>Centered content</p>
 </Container>
+```
+
+---
+
+## Divider 分割线
+
+```tsx
+{/* 基础水平分割线 */}
+<Divider />
+
+{/* 线条样式 */}
+<Divider lineStyle="dashed" />
+<Divider lineStyle="dotted" />
+
+{/* 间距 */}
+<Divider spacing="none" />
+<Divider spacing="xs" />
+<Divider spacing="lg" />
+
+{/* 自定义颜色与粗细 */}
+<Divider color="#2563eb" thickness="2px" />
+
+{/* 垂直分割线 */}
+<div className="flex items-center h-12">
+  <span>Left</span>
+  <Divider orientation="vertical" className="h-6" />
+  <span>Right</span>
+</div>
 ```
 
 ---

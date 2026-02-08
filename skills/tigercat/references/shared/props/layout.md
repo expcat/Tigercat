@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-layout
-description: Shared props definitions for layout components - Card, Container, Descriptions, Grid, Layout, List, Skeleton, Space
+description: Shared props definitions for layout components - Card, Container, Descriptions, Divider, Grid, Layout, List, Skeleton, Space
 ---
 
 # Layout Components - Props Reference
@@ -37,6 +37,22 @@ description: Shared props definitions for layout components - Card, Container, D
 | ------- | ------------------ | ------- | :-: | :---: | ----------- |
 | width   | `string \| number` | -       |  ✓  |   ✓   | 最大宽度    |
 | padding | `string \| number` | -       |  ✓  |   ✓   | 内边距      |
+
+---
+
+## Divider 分割线
+
+### Props
+
+| Prop        | Type                                        | Default          | Vue | React | Description                            |
+| ----------- | ------------------------------------------- | ---------------- | :-: | :---: | -------------------------------------- |
+| orientation | `'horizontal' \| 'vertical'`                | `'horizontal'`   |  ✓  |   ✓   | 方向                                   |
+| lineStyle   | `'solid' \| 'dashed' \| 'dotted'`           | `'solid'`        |  ✓  |   ✓   | 线条样式                               |
+| spacing     | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`     |  ✓  |   ✓   | 周围间距                               |
+| color       | `string`                                    | -                |  ✓  |   ✓   | 自定义颜色（CSS 值或变量）             |
+| thickness   | `string`                                    | -                |  ✓  |   ✓   | 自定义线条粗细                         |
+
+无 Slots / Children。渲染为 `<div role="separator">`。
 
 ---
 

@@ -1,9 +1,7 @@
 import { defineComponent, computed, h, PropType } from 'vue'
 import {
-  classNames,
-  getDividerSpacingClasses,
-  getDividerLineStyleClasses,
-  getDividerOrientationClasses,
+  getDividerClasses,
+  getDividerStyle,
   type DividerOrientation,
   type DividerLineStyle,
   type DividerSpacing
@@ -14,53 +12,36 @@ export const Divider = defineComponent({
   props: {
     orientation: {
       type: String as PropType<DividerOrientation>,
-      default: 'horizontal' as DividerOrientation
+      default: 'horizontal'
     },
     lineStyle: {
       type: String as PropType<DividerLineStyle>,
-      default: 'solid' as DividerLineStyle
+      default: 'solid'
     },
     spacing: {
       type: String as PropType<DividerSpacing>,
-      default: 'md' as DividerSpacing
+      default: 'md'
     },
-    color: {
-      type: String
-    },
-    thickness: {
-      type: String
-    }
+    color: String,
+    thickness: String
   },
   setup(props, { attrs }) {
-    const dividerClasses = computed(() =>
-      classNames(
-        getDividerOrientationClasses(props.orientation),
-        getDividerLineStyleClasses(props.lineStyle),
-        getDividerSpacingClasses(props.spacing, props.orientation)
-      )
+    const classes = computed(() =>
+      getDividerClasses(props.orientation, props.lineStyle, props.spacing)
     )
 
-    const dividerStyle = computed(() => {
-      const style: Record<string, string> = {}
+    const style = computed(() =>
+      getDividerStyle(props.orientation, props.color, props.thickness)
+    )
 
-      if (props.color) style.borderColor = props.color
-      if (props.thickness) {
-        style[props.orientation === 'horizontal' ? 'borderTopWidth' : 'borderLeftWidth'] =
-          props.thickness
-      }
-
-      return style
-    })
-
-    return () => {
-      return h('div', {
+    return () =>
+      h('div', {
         ...attrs,
-        class: [dividerClasses.value, attrs.class],
-        style: [dividerStyle.value, attrs.style],
+        class: [classes.value, attrs.class],
+        style: [style.value, attrs.style],
         role: 'separator',
         'aria-orientation': props.orientation
       })
-    }
   }
 })
 

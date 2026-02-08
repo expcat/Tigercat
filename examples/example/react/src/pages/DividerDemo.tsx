@@ -6,37 +6,26 @@ const basicSnippet = `<div className="text-gray-700">上方内容</div>
 <Divider />
 <div className="text-gray-700">下方内容</div>`
 
-const lineStyleSnippet = `<div>
-  <div className="text-gray-700 mb-2">solid</div>
-  <Divider lineStyle="solid" />
-</div>
-<div>
-  <div className="text-gray-700 mb-2">dashed</div>
-  <Divider lineStyle="dashed" />
-</div>
-<div>
-  <div className="text-gray-700 mb-2">dotted</div>
-  <Divider lineStyle="dotted" />
-</div>`
+const lineStyleSnippet = `<Divider lineStyle="solid" />
+<Divider lineStyle="dashed" />
+<Divider lineStyle="dotted" />`
 
-const spacingSnippet = `<div className="text-gray-700">spacing="sm"</div>
+const spacingSnippet = `<Divider spacing="none" />
+<Divider spacing="xs" />
 <Divider spacing="sm" />
-<div className="text-gray-700">spacing="md"</div>
 <Divider spacing="md" />
-<div className="text-gray-700">spacing="lg"</div>
-<Divider spacing="lg" />`
+<Divider spacing="lg" />
+<Divider spacing="xl" />`
 
-const customSnippet = `<div className="text-gray-700">color="#2563eb" thickness="2px"</div>
-<Divider color="#2563eb" thickness="2px" />
-<div className="text-gray-700">color="#10b981" thickness="4px"（dashed）</div>
+const customSnippet = `<Divider color="#2563eb" thickness="2px" />
 <Divider color="#10b981" thickness="4px" lineStyle="dashed" />`
 
 const verticalSnippet = `<div className="flex items-center h-12">
-  <span className="text-gray-700">Left</span>
+  <span>Left</span>
   <Divider orientation="vertical" className="h-6" />
-  <span className="text-gray-700">Middle</span>
+  <span>Middle</span>
   <Divider orientation="vertical" className="h-6" lineStyle="dashed" />
-  <span className="text-gray-700">Right</span>
+  <span>Right</span>
 </div>`
 
 const DividerDemo: React.FC = () => {
@@ -75,14 +64,23 @@ const DividerDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="间距" description="spacing 控制分割线周围留白。" code={spacingSnippet}>
+      <DemoBlock
+        title="间距"
+        description="spacing 控制分割线周围留白（none / xs / sm / md / lg / xl）。"
+        code={spacingSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="text-gray-700">spacing="sm"</div>
+          <div className="text-gray-700">none</div>
+          <Divider spacing="none" />
+          <div className="text-gray-700">xs</div>
+          <Divider spacing="xs" />
+          <div className="text-gray-700">sm</div>
           <Divider spacing="sm" />
-          <div className="text-gray-700">spacing="md"</div>
+          <div className="text-gray-700">md (default)</div>
           <Divider spacing="md" />
-          <div className="text-gray-700">spacing="lg"</div>
+          <div className="text-gray-700">lg</div>
           <Divider spacing="lg" />
+          <div className="text-gray-700">xl</div>
+          <Divider spacing="xl" />
         </div>
       </DemoBlock>
 

@@ -5,7 +5,7 @@ description: Vue 3 layout components usage
 
 # Layout Components (Vue 3)
 
-布局组件：Card, Container, Descriptions, Grid, Layout, List, Skeleton, Space
+布局组件：Card, Container, Descriptions, Divider, Grid, Layout, List, Skeleton, Space
 
 > **Props Reference**: [shared/props/layout.md](../shared/props/layout.md)
 
@@ -32,6 +32,36 @@ description: Vue 3 layout components usage
   <Container width="1200px" padding="24px">
     <p>Centered content</p>
   </Container>
+</template>
+```
+
+---
+
+## Divider 分割线
+
+```vue
+<template>
+  <!-- 基础水平分割线 -->
+  <Divider />
+
+  <!-- 线条样式 -->
+  <Divider line-style="dashed" />
+  <Divider line-style="dotted" />
+
+  <!-- 间距 -->
+  <Divider spacing="none" />
+  <Divider spacing="xs" />
+  <Divider spacing="lg" />
+
+  <!-- 自定义颜色与粗细 -->
+  <Divider color="#2563eb" thickness="2px" />
+
+  <!-- 垂直分割线 -->
+  <div class="flex items-center h-12">
+    <span>Left</span>
+    <Divider orientation="vertical" class="h-6" />
+    <span>Right</span>
+  </div>
 </template>
 ```
 
