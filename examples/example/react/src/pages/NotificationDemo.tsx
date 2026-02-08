@@ -35,6 +35,9 @@ const quickSnippet = `<Button onClick={quickInfo}>快速信息</Button>
 <Button onClick={quickWarning}>快速警告</Button>
 <Button onClick={quickError}>快速错误</Button>`
 
+const customSnippet = `<Button onClick={showCustomIcon}>自定义图标</Button>
+<Button onClick={showCustomClass}>自定义样式</Button>`
+
 export default function NotificationDemo() {
   const closeNotificationRef = useRef<(() => void) | null>(null)
 
@@ -245,6 +248,25 @@ export default function NotificationDemo() {
     notification.error('快速错误通知')
   }
 
+  // 自定义外观
+  const showCustomIcon = () => {
+    notification.info({
+      title: '自定义图标',
+      description: '使用自定义 SVG 路径作为图标',
+      icon: 'M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0',
+      duration: 0
+    })
+  }
+
+  const showCustomClass = () => {
+    notification.success({
+      title: '自定义样式',
+      description: '通过 className 自定义通知样式',
+      className: 'shadow-2xl ring-2 ring-blue-300',
+      duration: 0
+    })
+  }
+
   return (
     <div className="p-6 space-y-8">
       <div>
@@ -422,6 +444,21 @@ export default function NotificationDemo() {
             onClick={quickError}
             className="px-4 py-2 bg-slate-500 text-white rounded hover:bg-slate-600">
             快速错误
+          </Button>
+        </div>
+      </DemoBlock>
+
+      <DemoBlock title="自定义外观" description="通过 icon 和 className 自定义通知外观。" code={customSnippet}>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            onClick={showCustomIcon}
+            className="px-4 py-2 bg-cyan-500 text-white rounded hover:bg-cyan-600">
+            自定义图标
+          </Button>
+          <Button
+            onClick={showCustomClass}
+            className="px-4 py-2 bg-cyan-500 text-white rounded hover:bg-cyan-600">
+            自定义样式
           </Button>
         </div>
       </DemoBlock>

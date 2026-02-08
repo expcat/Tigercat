@@ -83,14 +83,21 @@ Message.clear()
 ## Notification 通知
 
 ```tsx
-import { Notification } from '@expcat/tigercat-react'
+import { notification } from '@expcat/tigercat-react'
 
-Notification.open({
-  title: 'Title',
-  description: 'Content',
-  type: 'success',
-  placement: 'top-right'
-})
+// 基本用法
+notification.info('信息通知')
+notification.success({ title: '操作成功', description: '操作已完成' })
+notification.warning({ title: '警告', position: 'top-left' })
+notification.error({ title: '失败', duration: 0, closable: true })
+
+// 手动关闭
+const close = notification.info({ title: '处理中', duration: 0 })
+close()
+
+// 清空
+notification.clear()
+notification.clear('top-right')
 ```
 
 ---

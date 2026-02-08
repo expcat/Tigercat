@@ -7,7 +7,6 @@ import {
   icon24StrokeWidth,
   icon24ViewBox,
   getNotificationTypeClasses,
-  defaultNotificationThemeColors,
   notificationContainerBaseClasses,
   notificationPositionClasses,
   notificationBaseClasses,
@@ -102,7 +101,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClo
     setTimeout(() => setIsVisible(true), 10)
   }, [])
 
-  const colorScheme = getNotificationTypeClasses(notification.type, defaultNotificationThemeColors)
+  const colorScheme = getNotificationTypeClasses(notification.type)
 
   const notificationClasses = classNames(
     notificationBaseClasses,
@@ -204,16 +203,7 @@ export const NotificationContainer: React.FC<NotificationContainerProps> = ({
   )
 
   const handleRemove = (id: string | number) => {
-    const instances = notificationInstancesByPosition[position]
-    const index = instances.findIndex((notif) => notif.id === id)
-    if (index !== -1) {
-      const instance = instances[index]
-      instances.splice(index, 1)
-      if (instance.onClose) {
-        instance.onClose()
-      }
-      updateCallbacks[position]?.()
-    }
+    removeNotification(id, position)
   }
 
   return (
@@ -243,8 +233,7 @@ function ensureContainer(position: NotificationPosition) {
     return
   }
 
-  const containerId = `${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}`
-  const rootId = `${containerId}-root`
+  const rootId = `${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}-root`
 
   // If we already created a root but the DOM was externally cleared (e.g. tests), reset.
   const existingRootEl = document.getElementById(rootId)
@@ -267,6 +256,24 @@ function ensureContainer(position: NotificationPosition) {
 
   containerRoots[position] = createRoot(rootEl)
   containerRoots[position]!.render(<NotificationContainer position={position} />)
+}
+
+/**
+ * Destroy notification container for a position
+ */
+function destroyContainer(position: NotificationPosition) {
+  const rootId = `${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}-root`
+
+  if (containerRoots[position]) {
+    containerRoots[position]!.unmount()
+    containerRoots[position] = null
+  }
+
+  updateCallbacks[position] = null
+
+  if (isBrowser()) {
+    document.getElementById(rootId)?.remove()
+  }
 }
 
 /**
@@ -293,11 +300,7 @@ function addNotification(config: NotificationConfig): () => void {
   }
 
   notificationInstancesByPosition[position].push(instance)
-
-  // Trigger update
-  if (updateCallbacks[position]) {
-    updateCallbacks[position]!()
-  }
+  updateCallbacks[position]?.()
 
   // Auto close after duration
   if (instance.duration > 0) {
@@ -319,12 +322,12 @@ function removeNotification(id: string | number, position: NotificationPosition)
   if (index !== -1) {
     const instance = instances[index]
     instances.splice(index, 1)
-    if (instance.onClose) {
-      instance.onClose()
-    }
-    if (updateCallbacks[position]) {
-      updateCallbacks[position]!()
-    }
+    instance.onClose?.()
+    updateCallbacks[position]?.()
+  }
+
+  if (notificationInstancesByPosition[position].length === 0) {
+    destroyContainer(position)
   }
 }
 
@@ -334,27 +337,18 @@ function removeNotification(id: string | number, position: NotificationPosition)
 function clearAll(position?: NotificationPosition) {
   if (position) {
     notificationInstancesByPosition[position].forEach((instance) => {
-      if (instance.onClose) {
-        instance.onClose()
-      }
+      instance.onClose?.()
     })
     notificationInstancesByPosition[position] = []
-    if (updateCallbacks[position]) {
-      updateCallbacks[position]!()
-    }
+    destroyContainer(position)
   } else {
-    // Clear all positions
     Object.keys(notificationInstancesByPosition).forEach((pos) => {
       const p = pos as NotificationPosition
       notificationInstancesByPosition[p].forEach((instance) => {
-        if (instance.onClose) {
-          instance.onClose()
-        }
+        instance.onClose?.()
       })
       notificationInstancesByPosition[p] = []
-      if (updateCallbacks[p]) {
-        updateCallbacks[p]!()
-      }
+      destroyContainer(p)
     })
   }
 }

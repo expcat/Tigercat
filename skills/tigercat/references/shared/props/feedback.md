@@ -106,27 +106,33 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ## Notification 通知
 
-静态方法调用，Vue 和 React API 完全相同。
+静态方法调用，Vue 和 React API 完全相同。每个方法返回一个 `() => void` 关闭函数，可用于手动关闭该条通知。支持字符串快捷方式（等同于 `{ title: string }`）。
 
 ### API Methods
 
-| Method                          | Description |
-| ------------------------------- | ----------- |
-| `Notification.open(options)`    | 打开通知    |
-| `Notification.success(options)` | 成功通知    |
-| `Notification.error(options)`   | 错误通知    |
-| `Notification.info(options)`    | 信息通知    |
-| `Notification.warning(options)` | 警告通知    |
+| Method                               | Return       | Description |
+| ------------------------------------ | ------------ | ----------- |
+| `notification.info(options)`         | `() => void` | 信息通知    |
+| `notification.success(options)`      | `() => void` | 成功通知    |
+| `notification.warning(options)`      | `() => void` | 警告通知    |
+| `notification.error(options)`        | `() => void` | 错误通知    |
+| `notification.clear(position?)`      | `void`       | 清空通知    |
 
 ### Options
 
-| Option      | Type                                                           | Default       | Description    |
-| ----------- | -------------------------------------------------------------- | ------------- | -------------- |
-| title       | `string`                                                       | -             | 标题           |
-| description | `string`                                                       | -             | 描述           |
-| type        | `'success' \| 'error' \| 'info' \| 'warning'`                  | -             | 类型           |
-| duration    | `number`                                                       | `4500`        | 显示时长（ms） |
-| placement   | `'top-left' \| 'top-right' \| 'bottom-left' \| 'bottom-right'` | `'top-right'` | 位置           |
+`options` 可以是 `string`（等同 `{ title: string }`）或如下配置对象：
+
+| Option      | Type                                                           | Default       | Description                        |
+| ----------- | -------------------------------------------------------------- | ------------- | ---------------------------------- |
+| title       | `string`                                                       | -             | 标题（必填）                       |
+| description | `string`                                                       | -             | 描述                               |
+| duration    | `number`                                                       | `4500`        | 显示时长（ms），`0` 表示不自动关闭 |
+| position    | `'top-left' \| 'top-right' \| 'bottom-left' \| 'bottom-right'` | `'top-right'` | 位置                               |
+| closable    | `boolean`                                                      | `true`        | 是否显示关闭按钮                   |
+| onClose     | `() => void`                                                   | -             | 关闭时的回调                       |
+| onClick     | `() => void`                                                   | -             | 点击通知时的回调                   |
+| icon        | `string`                                                       | -             | 自定义图标 SVG path d 属性         |
+| className   | `string`                                                       | -             | 额外 CSS 类名                      |
 
 ---
 

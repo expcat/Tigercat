@@ -16,7 +16,6 @@ import {
   icon24PathStrokeLinejoin,
   icon24StrokeWidth,
   icon24ViewBox,
-  defaultNotificationThemeColors,
   getNotificationIconPath,
   getNotificationTypeClasses,
   notificationBaseClasses,
@@ -36,8 +35,7 @@ import {
   isBrowser
 } from '@expcat/tigercat-core'
 
-type HChildren = Parameters<typeof h>[2]
-type HArrayChildren = Extract<NonNullable<HChildren>, unknown[]>
+type HArrayChildren = Extract<NonNullable<Parameters<typeof h>[2]>, unknown[]>
 
 /**
  * Global notification container id prefix
@@ -141,10 +139,7 @@ export const NotificationContainer = defineComponent({
     )
 
     const renderNotificationItem = (notification: NotificationInstance) => {
-      const colorScheme = getNotificationTypeClasses(
-        notification.type,
-        defaultNotificationThemeColors
-      )
+      const colorScheme = getNotificationTypeClasses(notification.type)
 
       const notificationClasses = classNames(
         notificationBaseClasses,
@@ -302,10 +297,7 @@ function destroyContainer(position: NotificationPosition) {
   updateCallbacks[position] = null
 
   if (isBrowser()) {
-    const rootEl = document.getElementById(rootId)
-    if (rootEl?.parentNode) {
-      rootEl.parentNode.removeChild(rootEl)
-    }
+    document.getElementById(rootId)?.remove()
   }
 }
 
@@ -356,9 +348,7 @@ function removeNotification(id: string | number, position: NotificationPosition)
   if (index !== -1) {
     const instance = instances[index]
     instances.splice(index, 1)
-    if (instance.onClose) {
-      instance.onClose()
-    }
+    instance.onClose?.()
   }
 
   updateCallbacks[position]?.()
@@ -374,24 +364,18 @@ function removeNotification(id: string | number, position: NotificationPosition)
 function clearAll(position?: NotificationPosition) {
   if (position) {
     notificationInstancesByPosition[position].forEach((instance) => {
-      if (instance.onClose) {
-        instance.onClose()
-      }
+      instance.onClose?.()
     })
     notificationInstancesByPosition[position] = []
-    updateCallbacks[position]?.()
     destroyContainer(position)
   } else {
     // Clear all positions
     Object.keys(notificationInstancesByPosition).forEach((pos) => {
       const p = pos as NotificationPosition
       notificationInstancesByPosition[p].forEach((instance) => {
-        if (instance.onClose) {
-          instance.onClose()
-        }
+        instance.onClose?.()
       })
       notificationInstancesByPosition[p] = []
-      updateCallbacks[p]?.()
       destroyContainer(p)
     })
   }
