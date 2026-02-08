@@ -86,7 +86,7 @@ export const BreadcrumbItem = defineComponent({
 
     // Item classes
     const itemClasses = computed(() => {
-      return getBreadcrumbItemClasses(props.current, props.className)
+      return getBreadcrumbItemClasses(props.className)
     })
 
     // Link classes
@@ -139,7 +139,6 @@ export const BreadcrumbItem = defineComponent({
                 href: props.href,
                 target: props.target,
                 rel: computedRel.value,
-                'aria-current': props.current ? 'page' : undefined,
                 onClick: handleClick
               },
               contentElements

@@ -47,6 +47,19 @@ describe('Breadcrumb', () => {
       expect(ol).toBeInTheDocument()
       expect(ol?.querySelectorAll('li')).toHaveLength(2)
     })
+
+    it('should render extra content', () => {
+      const { container } = render(
+        <Breadcrumb extra={<button>Action</button>}>
+          <BreadcrumbItem href="/">Home</BreadcrumbItem>
+          <BreadcrumbItem current>Current</BreadcrumbItem>
+        </Breadcrumb>
+      )
+
+      expect(screen.getByText('Action')).toBeInTheDocument()
+      const extraDiv = container.querySelector('.ml-auto')
+      expect(extraDiv).toBeInTheDocument()
+    })
   })
 
   describe('Separator', () => {

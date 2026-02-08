@@ -15,8 +15,56 @@ description: Vue navigation components usage
 
 ```vue
 <template>
-  <Breadcrumb :items="[{ label: 'Home', path: '/' }, { label: 'Products', path: '/products' }, { label: 'Detail' }]" separator="/" />
+  <!-- 基本用法 -->
+  <Breadcrumb>
+    <BreadcrumbItem href="/">首页</BreadcrumbItem>
+    <BreadcrumbItem href="/products">产品</BreadcrumbItem>
+    <BreadcrumbItem current>详情</BreadcrumbItem>
+  </Breadcrumb>
+
+  <!-- 箭头分隔符 -->
+  <Breadcrumb separator="arrow">
+    <BreadcrumbItem href="/">首页</BreadcrumbItem>
+    <BreadcrumbItem current>详情</BreadcrumbItem>
+  </Breadcrumb>
+
+  <!-- 带图标 -->
+  <Breadcrumb>
+    <BreadcrumbItem href="/" :icon="homeIcon">首页</BreadcrumbItem>
+    <BreadcrumbItem current>详情</BreadcrumbItem>
+  </Breadcrumb>
+
+  <!-- extra 扩展区 -->
+  <Breadcrumb>
+    <template #extra>
+      <Button size="small">编辑</Button>
+    </template>
+    <BreadcrumbItem href="/">首页</BreadcrumbItem>
+    <BreadcrumbItem current>详情</BreadcrumbItem>
+  </Breadcrumb>
+
+  <!-- 外部链接 -->
+  <Breadcrumb>
+    <BreadcrumbItem href="/">首页</BreadcrumbItem>
+    <BreadcrumbItem href="https://github.com" target="_blank">GitHub</BreadcrumbItem>
+    <BreadcrumbItem current>当前页面</BreadcrumbItem>
+  </Breadcrumb>
+
+  <!-- 单独设置分隔符 -->
+  <Breadcrumb>
+    <BreadcrumbItem href="/" separator="arrow">首页</BreadcrumbItem>
+    <BreadcrumbItem href="/products" separator="chevron">产品</BreadcrumbItem>
+    <BreadcrumbItem current>详情</BreadcrumbItem>
+  </Breadcrumb>
 </template>
+<script setup>
+import { h } from 'vue'
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-vue'
+
+const homeIcon = h('svg', { class: 'w-4 h-4', fill: 'currentColor', viewBox: '0 0 20 20' }, [
+  h('path', { d: 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z' })
+])
+</script>
 ```
 
 ---

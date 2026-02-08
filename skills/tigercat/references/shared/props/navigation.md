@@ -11,13 +11,42 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ## Breadcrumb 面包屑
 
-### Props
+### Breadcrumb Props
 
-| Prop      | Type                                 | Default | Vue | React | Description |
-| --------- | ------------------------------------ | ------- | :-: | :---: | ----------- |
-| items     | `{ label: string, href?: string }[]` | `[]`    |  ✓  |   ✓   | 层级数据    |
-| separator | `string`                             | `'/'`   |  ✓  |   ✓   | 分隔符      |
-| extra     | `VNode \| ReactNode`                 | -       |  ✓  |   ✓   | 末尾扩展区  |
+| Prop      | Type                                           | Default | Vue | React | Description        |
+| --------- | ---------------------------------------------- | ------- | :-: | :---: | ------------------ |
+| separator | `'slash' \| 'arrow' \| 'chevron' \| string`    | `'/'`   |  ✓  |   ✓   | 分隔符             |
+| extra     | `VNode \| ReactNode`                            | -       |  ✓  |   ✓   | 末尾扩展区         |
+| className | `string`                                        | -       |  ✓  |   ✓   | 自定义 CSS 类名    |
+| style     | `Record<string, unknown> \| React.CSSProperties` | -       |  ✓  |   ✓   | 内联样式           |
+
+> **Vue**: `extra` 支持 slot 和 prop 两种方式（slot 优先）
+> **React**: `extra` 仅通过 prop 传入
+
+### BreadcrumbItem Props
+
+| Prop      | Type                                           | Default | Vue | React | Description                        |
+| --------- | ---------------------------------------------- | ------- | :-: | :---: | ---------------------------------- |
+| href      | `string`                                        | -       |  ✓  |   ✓   | 导航链接 URL                     |
+| target    | `'_blank' \| '_self' \| '_parent' \| '_top'`    | -       |  ✓  |   ✓   | 链接 target 属性                  |
+| current   | `boolean`                                       | `false` |  ✓  |   ✓   | 是否当前页（末尾项不可点击）       |
+| separator | `'slash' \| 'arrow' \| 'chevron' \| string`    | -       |  ✓  |   ✓   | 覆盖全局分隔符                   |
+| icon      | `VNode \| ReactNode`                            | -       |  ✓  |   ✓   | 图标                               |
+| className | `string`                                        | -       |  ✓  |   ✓   | 自定义 CSS 类名                |
+| style     | `Record<string, unknown> \| React.CSSProperties` | -       |  ✓  |   ✓   | 内联样式                       |
+
+### Events
+
+| Vue Event | React Callback | Payload      | Description              |
+| --------- | -------------- | ------------ | ------------------------ |
+| `@click`  | `onClick`      | `MouseEvent` | 点击项时触发（current 不触发） |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description      |
+| --------- | ---------- | ---------------- |
+| `default` | `children` | 面包屑项内容       |
+| `extra`   | `extra`    | 末尾扩展区内容     |
 
 ---
 

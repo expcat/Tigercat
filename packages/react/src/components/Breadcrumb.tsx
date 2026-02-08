@@ -21,7 +21,6 @@ export function useBreadcrumbContext(): BreadcrumbContextValue | null {
 
 export interface BreadcrumbProps
   extends Omit<CoreBreadcrumbProps, 'style'>, React.HTMLAttributes<HTMLElement> {
-  separator?: BreadcrumbSeparator
   /**
    * Extra content aligned to the end of the breadcrumb
    */

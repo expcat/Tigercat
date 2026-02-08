@@ -47,8 +47,8 @@ export const BreadcrumbItem: React.FC<BreadcrumbItemProps> = ({
 
   // Item classes
   const itemClasses = useMemo(
-    () => getBreadcrumbItemClasses(current, className),
-    [current, className]
+    () => getBreadcrumbItemClasses(className),
+    [className]
   )
 
   // Link classes
@@ -100,7 +100,6 @@ export const BreadcrumbItem: React.FC<BreadcrumbItemProps> = ({
         href={href}
         target={target}
         rel={computedRel}
-        aria-current={current ? 'page' : undefined}
         onClick={handleClick}>
         {contentElements}
       </a>

@@ -54,33 +54,16 @@ export const Breadcrumb = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    const extraContent = computed<VNodeChild | VNodeChild[] | undefined>(() => {
+    const extraContent = computed(() => {
       const slotValue = slots.extra?.()
-      if (slotValue && slotValue.length > 0) {
-        return slotValue
-      }
-
-      if (props.extra !== undefined && props.extra !== null) {
-        return props.extra
-      }
-
-      return undefined
+      if (slotValue && slotValue.length > 0) return slotValue
+      if (props.extra != null) return props.extra
+      return null
     })
-    const extraChildren = computed(() => {
-      const value = extraContent.value
-      if (!value) return []
-
-      if (Array.isArray(value)) {
-        return value.filter((node) => node !== null && node !== undefined)
-      }
-
-      return [value]
-    })
-    const hasExtra = computed(() => extraChildren.value.length > 0)
 
     // Container classes
     const containerClasses = computed(() => {
-      return classNames(breadcrumbContainerClasses, hasExtra.value && 'w-full', props.className)
+      return classNames(breadcrumbContainerClasses, extraContent.value && 'w-full', props.className)
     })
 
     // Provide breadcrumb context to child components
@@ -105,13 +88,13 @@ export const Breadcrumb = defineComponent({
             },
             slots.default?.()
           ),
-          hasExtra.value
+          extraContent.value
             ? h(
                 'div',
                 {
                   class: 'ml-auto flex items-center'
                 },
-                extraChildren.value
+                extraContent.value
               )
             : null
         ]

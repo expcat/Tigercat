@@ -14,7 +14,46 @@ description: React navigation components usage
 ## Breadcrumb 面包屑
 
 ```tsx
-<Breadcrumb items={[{ label: 'Home', path: '/' }, { label: 'Products', path: '/products' }, { label: 'Detail' }]} separator="/" />
+import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-react'
+
+// 基本用法
+<Breadcrumb>
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem href="/products">Products</BreadcrumbItem>
+  <BreadcrumbItem current>Details</BreadcrumbItem>
+</Breadcrumb>
+
+// 箭头分隔符
+<Breadcrumb separator="arrow">
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem current>Details</BreadcrumbItem>
+</Breadcrumb>
+
+// 带图标
+<Breadcrumb>
+  <BreadcrumbItem href="/" icon={<HomeIcon />}>Home</BreadcrumbItem>
+  <BreadcrumbItem current>Details</BreadcrumbItem>
+</Breadcrumb>
+
+// extra 扩展区
+<Breadcrumb extra={<Button size="small">Edit</Button>}>
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem current>Details</BreadcrumbItem>
+</Breadcrumb>
+
+// 外部链接
+<Breadcrumb>
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem href="https://github.com" target="_blank">GitHub</BreadcrumbItem>
+  <BreadcrumbItem current>Current Page</BreadcrumbItem>
+</Breadcrumb>
+
+// 单独设置分隔符
+<Breadcrumb>
+  <BreadcrumbItem href="/" separator="arrow">Home</BreadcrumbItem>
+  <BreadcrumbItem href="/products" separator="chevron">Products</BreadcrumbItem>
+  <BreadcrumbItem current>Details</BreadcrumbItem>
+</Breadcrumb>
 ```
 
 ---

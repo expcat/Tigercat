@@ -51,6 +51,35 @@ describe('Breadcrumb', () => {
       expect(ol).toBeInTheDocument()
       expect(ol?.querySelectorAll('li')).toHaveLength(2)
     })
+
+    it('should render extra content via slot', () => {
+      const { container } = render(Breadcrumb, {
+        slots: {
+          default: () => [
+            h(BreadcrumbItem, { href: '/' }, () => 'Home'),
+            h(BreadcrumbItem, { current: true }, () => 'Current')
+          ],
+          extra: () => h('button', {}, 'Action')
+        }
+      })
+
+      expect(screen.getByText('Action')).toBeInTheDocument()
+      const extraDiv = container.querySelector('.ml-auto')
+      expect(extraDiv).toBeInTheDocument()
+    })
+
+    it('should render extra content via prop', () => {
+      const { container } = render(Breadcrumb, {
+        props: { extra: h('span', {}, 'Extra') },
+        slots: {
+          default: () => [h(BreadcrumbItem, { current: true }, () => 'Current')]
+        }
+      })
+
+      expect(screen.getByText('Extra')).toBeInTheDocument()
+      const extraDiv = container.querySelector('.ml-auto')
+      expect(extraDiv).toBeInTheDocument()
+    })
   })
 
   describe('Separator', () => {
@@ -193,6 +222,19 @@ describe('Breadcrumb', () => {
       expect(link).toHaveAttribute('target', '_blank')
       expect(link).toHaveAttribute('rel', 'noopener noreferrer')
     })
+
+    it('should render icon when provided', () => {
+      render(Breadcrumb, {
+        slots: {
+          default: () => [
+            h(BreadcrumbItem, { href: '/', icon: '🏠' }, () => 'Home')
+          ]
+        }
+      })
+
+      expect(screen.getByText('🏠')).toBeInTheDocument()
+      expect(screen.getByText('Home')).toBeInTheDocument()
+    })
   })
 
   describe('Events', () => {
@@ -311,6 +353,17 @@ describe('Breadcrumb', () => {
 
       const item = container.querySelector('li')
       expect(item).toHaveClass('custom-item')
+    })
+
+    it('should apply custom style to item', () => {
+      const { container } = render(Breadcrumb, {
+        slots: {
+          default: () => [h(BreadcrumbItem, { style: { color: 'red' } }, () => 'Home')]
+        }
+      })
+
+      const item = container.querySelector('li')
+      expect(item).toHaveStyle({ color: 'red' })
     })
 
     it('should merge attrs.class with className on item', () => {

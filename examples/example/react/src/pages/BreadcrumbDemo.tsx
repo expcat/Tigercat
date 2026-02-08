@@ -60,6 +60,12 @@ const itemSeparatorSnippet = `<Breadcrumb>
   <BreadcrumbItem current>Details</BreadcrumbItem>
 </Breadcrumb>`
 
+const extraSnippet = `<Breadcrumb extra={<button className="text-sm text-blue-600 hover:underline">Edit</button>}>
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem href="/products">Products</BreadcrumbItem>
+  <BreadcrumbItem current>Details</BreadcrumbItem>
+</Breadcrumb>`
+
 const BreadcrumbDemo: React.FC = () => {
   const handleClick = (event: React.MouseEvent) => {
     console.log('Breadcrumb item clicked:', event)
@@ -202,6 +208,22 @@ const BreadcrumbDemo: React.FC = () => {
             <BreadcrumbItem href="/products" separator="chevron">
               Products
             </BreadcrumbItem>
+            <BreadcrumbItem current>Details</BreadcrumbItem>
+          </Breadcrumb>
+        </div>
+      </DemoBlock>
+
+      <DemoBlock
+        title="扩展区域"
+        description="通过 extra 属性在面包屑末尾添加操作按钮等扩展内容。"
+        code={extraSnippet}>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <Breadcrumb
+            extra={
+              <button className="text-sm text-blue-600 hover:underline">Edit</button>
+            }>
+            <BreadcrumbItem href="/">Home</BreadcrumbItem>
+            <BreadcrumbItem href="/products">Products</BreadcrumbItem>
             <BreadcrumbItem current>Details</BreadcrumbItem>
           </Breadcrumb>
         </div>

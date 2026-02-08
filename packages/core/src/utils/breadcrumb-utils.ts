@@ -38,7 +38,7 @@ export const breadcrumbSeparatorBaseClasses = 'text-gray-400 select-none'
 /**
  * Get breadcrumb item classes
  */
-export function getBreadcrumbItemClasses(current?: boolean, className?: string): string {
+export function getBreadcrumbItemClasses(className?: string): string {
   return classNames(breadcrumbItemBaseClasses, className)
 }
 
@@ -53,9 +53,7 @@ export function getBreadcrumbLinkClasses(current?: boolean): string {
  * Get separator content based on separator type
  */
 export function getSeparatorContent(separator?: BreadcrumbSeparator): string {
-  if (!separator || separator === '/') {
-    return '/'
-  }
+  if (!separator) return '/'
 
   switch (separator) {
     case 'slash':
