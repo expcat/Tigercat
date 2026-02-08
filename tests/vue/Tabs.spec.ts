@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, cleanup } from '@testing-library/vue'
-import { h } from 'vue'
+import { defineComponent, h, ref } from 'vue'
 import { Tabs, TabPane } from '@expcat/tigercat-vue'
 
 describe('Tabs', () => {
@@ -60,6 +60,56 @@ describe('Tabs', () => {
       const tab = screen.getByRole('tab', { name: 'Tab 1' })
       expect(tab).toHaveClass('border')
       expect(tab).toHaveClass('rounded-t')
+    })
+
+    it('should render dynamic v-for children (Fragment flattening)', async () => {
+      const Wrapper = defineComponent({
+        setup() {
+          const tabs = ref([
+            { key: '1', label: 'A' },
+            { key: '2', label: 'B' },
+            { key: '3', label: 'C' }
+          ])
+          const activeKey = ref('1')
+          const handleEdit = ({ targetKey, action }: { targetKey?: string | number; action: 'add' | 'remove' }) => {
+            if (action === 'add') {
+              const k = `${tabs.value.length + 1}`
+              tabs.value.push({ key: k, label: `New ${k}` })
+              activeKey.value = k
+            } else if (action === 'remove' && targetKey != null) {
+              tabs.value = tabs.value.filter(t => t.key !== String(targetKey))
+            }
+          }
+          return () =>
+            h(
+              Tabs,
+              {
+                activeKey: activeKey.value,
+                'onUpdate:activeKey': (k: string | number) => { activeKey.value = k },
+                type: 'editable-card',
+                closable: true,
+                onEdit: handleEdit
+              },
+              {
+                default: () =>
+                  tabs.value.map(tab =>
+                    h(TabPane, { tabKey: tab.key, label: tab.label, key: tab.key }, () => `Content ${tab.key}`)
+                  )
+              }
+            )
+        }
+      })
+
+      render(Wrapper)
+
+      // All 3 initial tabs should be visible
+      expect(screen.getByRole('tab', { name: 'A' })).toBeInTheDocument()
+      expect(screen.getByRole('tab', { name: 'B' })).toBeInTheDocument()
+      expect(screen.getByRole('tab', { name: 'C' })).toBeInTheDocument()
+
+      // Click add button should create a new tab
+      await fireEvent.click(screen.getByRole('button', { name: 'Add tab' }))
+      expect(screen.getByRole('tab', { name: 'New 4' })).toBeInTheDocument()
     })
   })
 
@@ -364,6 +414,16 @@ describe('Tabs', () => {
 
       expect(screen.getByRole('tablist')).toHaveAttribute('aria-orientation', 'vertical')
     })
+
+    it('should set aria-orientation to horizontal for top/bottom', () => {
+      render(Tabs, {
+        slots: {
+          default: () => [h(TabPane, { tabKey: '1', label: 'Tab 1' }, () => 'C1')]
+        }
+      })
+
+      expect(screen.getByRole('tablist')).toHaveAttribute('aria-orientation', 'horizontal')
+    })
   })
 
   describe('TabPane', () => {
@@ -457,6 +517,43 @@ describe('Tabs', () => {
       expect(screen.getByText('Content 2')).toBeInTheDocument()
       expect(screen.queryByText('Content 1')).not.toBeInTheDocument()
     })
+
+    it('should render tab with icon', () => {
+      render(Tabs, {
+        slots: {
+          default: () => [
+            h(TabPane, { tabKey: '1', label: 'Tab 1', icon: h('span', { 'data-testid': 'test-icon' }, 'Icon') }, () => 'Content 1')
+          ]
+        }
+      })
+
+      expect(screen.getByTestId('test-icon')).toBeInTheDocument()
+    })
+
+    it('should override closable prop per tab', () => {
+      render(Tabs, {
+        props: {
+          type: 'editable-card',
+          closable: true
+        },
+        slots: {
+          default: () => [
+            h(TabPane, { tabKey: '1', label: 'Tab 1', closable: false }, () => 'Content 1'),
+            h(TabPane, { tabKey: '2', label: 'Tab 2' }, () => 'Content 2')
+          ]
+        }
+      })
+
+      const tabs = screen.getAllByRole('tab')
+
+      // First tab should not have close button
+      const tab1CloseButtons = tabs[0].querySelectorAll('svg')
+      expect(tab1CloseButtons.length).toBe(0)
+
+      // Second tab should have close button
+      const tab2CloseButtons = tabs[1].querySelectorAll('svg')
+      expect(tab2CloseButtons.length).toBeGreaterThan(0)
+    })
   })
 
   describe('Accessibility', () => {
@@ -512,6 +609,23 @@ describe('Tabs', () => {
       const panels = screen.getAllByRole('tabpanel', { hidden: true })
       expect(panels[0]).toHaveAttribute('aria-hidden', 'false')
       expect(panels[1]).toHaveAttribute('aria-hidden', 'true')
+    })
+
+    it('should have proper aria-disabled attributes', () => {
+      render(Tabs, {
+        slots: {
+          default: () => [
+            h(TabPane, { tabKey: '1', label: 'Tab 1' }, () => 'Content 1'),
+            h(TabPane, { tabKey: '2', label: 'Tab 2', disabled: true }, () => 'Content 2')
+          ]
+        }
+      })
+
+      const tab1 = screen.getByRole('tab', { name: 'Tab 1' })
+      const tab2 = screen.getByRole('tab', { name: 'Tab 2' })
+
+      expect(tab1).toHaveAttribute('aria-disabled', 'false')
+      expect(tab2).toHaveAttribute('aria-disabled', 'true')
     })
   })
 })

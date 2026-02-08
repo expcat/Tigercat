@@ -16,8 +16,7 @@ import {
   tabContentBaseClasses,
   type TabType,
   type TabSize,
-  type TabPosition,
-  type TabsProps as CoreTabsProps
+  type TabPosition
 } from '@expcat/tigercat-core'
 import { TabPane, type TabPaneProps } from './TabPane'
 
@@ -42,27 +41,65 @@ export function useTabsContext(): TabsContextValue | null {
   return useContext(TabsContext)
 }
 
-export interface TabsProps extends Omit<CoreTabsProps, 'style'> {
+export interface TabsProps {
+  /**
+   * Currently active tab key
+   */
+  activeKey?: string | number
+  /**
+   * Default active tab key (for uncontrolled mode)
+   */
+  defaultActiveKey?: string | number
+  /**
+   * Tab type - line, card, or editable-card
+   * @default 'line'
+   */
+  type?: TabType
+  /**
+   * Tab position - top, bottom, left, or right
+   * @default 'top'
+   */
+  tabPosition?: TabPosition
+  /**
+   * Tab size - small, medium, or large
+   * @default 'medium'
+   */
+  size?: TabSize
+  /**
+   * Whether tabs can be closed (only works with editable-card type)
+   * @default false
+   */
+  closable?: boolean
+  /**
+   * Whether tabs are centered
+   * @default false
+   */
+  centered?: boolean
+  /**
+   * Whether to destroy inactive tab panes
+   * @default false
+   */
+  destroyInactiveTabPane?: boolean
+  /**
+   * Additional CSS classes
+   */
+  className?: string
   /**
    * Tab change event handler
    */
   onChange?: (key: string | number) => void
-
   /**
    * Tab click event handler
    */
   onTabClick?: (key: string | number) => void
-
   /**
    * Tab edit event handler (for closable tabs)
    */
   onEdit?: (info: { targetKey?: string | number; action: 'add' | 'remove' }) => void
-
   /**
    * Tab panes
    */
   children?: React.ReactNode
-
   /**
    * Custom styles
    */
@@ -108,52 +145,31 @@ export const Tabs: React.FC<TabsProps> = ({
     return getTabNavListClasses(tabPosition, centered)
   }, [tabPosition, centered])
 
-  // Tab content classes
-  const tabContentClasses = useMemo(() => {
-    return tabContentBaseClasses
-  }, [])
-
-  // Extract tab items and tab panes from children
+  // Extract tab items and tab panes from children (single pass)
   const { tabItems, tabPanes, firstTabKey } = useMemo(() => {
     const items: ReactElement[] = []
     const panes: ReactElement[] = []
     let firstKey: string | number | undefined
 
-    const childrenArray: ReactElement<TabPaneProps>[] = []
     React.Children.forEach(children, (child) => {
-      if (React.isValidElement<TabPaneProps>(child) && child.type === TabPane) {
-        childrenArray.push(child)
-      }
-    })
+      if (!React.isValidElement<TabPaneProps>(child) || child.type !== TabPane) return
 
-    const resolvedFirstKey = childrenArray[0]?.props.tabKey
-    if (resolvedFirstKey !== undefined) {
-      firstKey = resolvedFirstKey
-    }
+      const key = child.props.tabKey
+      if (firstKey === undefined) firstKey = key
 
-    const resolvedActiveKey =
-      controlledActiveKey !== undefined
-        ? controlledActiveKey
-        : defaultActiveKey !== undefined
-          ? defaultActiveKey
-          : firstKey
+      const resolvedActiveKey = controlledActiveKey ?? defaultActiveKey ?? firstKey
+      const tabId = `${idBase}-tab-${String(key)}`
+      const panelId = `${idBase}-panel-${String(key)}`
 
-    childrenArray.forEach((child) => {
-      if (React.isValidElement<TabPaneProps>(child) && child.type === TabPane) {
-        const key = child.props.tabKey
-        const tabId = `${idBase}-tab-${String(key)}`
-        const panelId = `${idBase}-panel-${String(key)}`
-
-        items.push(
-          React.cloneElement(child, {
-            renderMode: 'tab',
-            tabId,
-            panelId,
-            tabIndex: key === resolvedActiveKey ? 0 : -1
-          })
-        )
-        panes.push(React.cloneElement(child, { renderMode: 'pane', tabId, panelId }))
-      }
+      items.push(
+        React.cloneElement(child, {
+          renderMode: 'tab',
+          tabId,
+          panelId,
+          tabIndex: key === resolvedActiveKey ? 0 : -1
+        })
+      )
+      panes.push(React.cloneElement(child, { renderMode: 'pane', tabId, panelId }))
     })
 
     return { tabItems: items, tabPanes: panes, firstTabKey: firstKey }
@@ -228,7 +244,12 @@ export const Tabs: React.FC<TabsProps> = ({
 
   // Render tab nav
   const tabNavContent = (
-    <div className={tabNavClasses} role="tablist">
+    <div
+      className={tabNavClasses}
+      role="tablist"
+      aria-orientation={
+        tabPosition === 'left' || tabPosition === 'right' ? 'vertical' : 'horizontal'
+      }>
       <div className={tabNavListClasses}>
         {tabItems}
         {type === 'editable-card' && (
@@ -245,37 +266,14 @@ export const Tabs: React.FC<TabsProps> = ({
   )
 
   // Render tab content
-  const tabContent = <div className={tabContentClasses}>{tabPanes}</div>
-
-  // Render container based on position
-  let content: React.ReactNode
-  if (tabPosition === 'left' || tabPosition === 'right') {
-    content = (
-      <>
-        {tabNavContent}
-        {tabContent}
-      </>
-    )
-  } else if (tabPosition === 'bottom') {
-    content = (
-      <>
-        {tabContent}
-        {tabNavContent}
-      </>
-    )
-  } else {
-    content = (
-      <>
-        {tabNavContent}
-        {tabContent}
-      </>
-    )
-  }
+  const tabContent = <div className={tabContentBaseClasses}>{tabPanes}</div>
 
   return (
     <TabsContext.Provider value={contextValue}>
       <div className={containerClasses} style={style}>
-        {content}
+        {tabPosition === 'bottom'
+          ? <>{tabContent}{tabNavContent}</>
+          : <>{tabNavContent}{tabContent}</>}
       </div>
     </TabsContext.Provider>
   )

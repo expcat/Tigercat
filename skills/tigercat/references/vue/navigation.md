@@ -232,11 +232,33 @@ const collapsed = ref(false)
 
 ```vue
 <template>
-  <Tabs v-model="activeKey" :items="[{ key: 'tab1', label: 'Tab 1' }, { key: 'tab2', label: 'Tab 2' }]">
-    <template #tab1>Tab 1 content</template>
-    <template #tab2>Tab 2 content</template>
+  <!-- 基本用法 -->
+  <Tabs v-model:activeKey="activeKey">
+    <TabPane tabKey="1" label="标签 1">内容 1</TabPane>
+    <TabPane tabKey="2" label="标签 2">内容 2</TabPane>
   </Tabs>
-  <Tabs v-model="activeKey" type="card" addable closable @add="onAdd" @close="onClose" />
+
+  <!-- 卡片式 -->
+  <Tabs v-model:activeKey="activeKey" type="card">
+    <TabPane tabKey="1" label="标签 1">内容 1</TabPane>
+  </Tabs>
+
+  <!-- 可编辑卡片（新增/删除） -->
+  <Tabs v-model:activeKey="activeKey" type="editable-card" closable @edit="handleEdit">
+    <TabPane v-for="tab in tabs" :key="tab.key" :tabKey="tab.key" :label="tab.label">
+      {{ tab.content }}
+    </TabPane>
+  </Tabs>
+
+  <!-- 位置 / 居中 / 尺寸 -->
+  <Tabs v-model:activeKey="activeKey" tabPosition="left" />
+  <Tabs v-model:activeKey="activeKey" centered />
+  <Tabs v-model:activeKey="activeKey" size="small" />
+
+  <!-- 销毁非激活面板 -->
+  <Tabs v-model:activeKey="activeKey" destroyInactiveTabPane>
+    <TabPane tabKey="1" label="标签 1">仅激活时渲染</TabPane>
+  </Tabs>
 </template>
 ```
 

@@ -3,28 +3,44 @@ import {
   classNames,
   closeIconViewBox,
   closeIconPathD,
-  closeIconPathStrokeLinecap,
-  closeIconPathStrokeLinejoin,
-  closeIconPathStrokeWidth,
   getTabItemClasses,
   getTabPaneClasses,
   isKeyActive,
-  tabCloseButtonClasses,
-  type TabPaneProps as CoreTabPaneProps
+  tabCloseButtonClasses
 } from '@expcat/tigercat-core'
 import { useTabsContext } from './Tabs'
 
-export interface TabPaneProps extends Omit<CoreTabPaneProps, 'tabKey' | 'icon' | 'style'> {
+export interface TabPaneProps {
   /**
    * Unique key for the tab pane (required)
-   * Note: In React we use 'key' prop, but internally we use 'tabKey' to avoid conflicts
    */
   tabKey: string | number
+
+  /**
+   * Tab label/title
+   */
+  label: string
+
+  /**
+   * Whether the tab is disabled
+   * @default false
+   */
+  disabled?: boolean
+
+  /**
+   * Whether the tab can be closed (overrides parent closable)
+   */
+  closable?: boolean
 
   /**
    * Icon for the tab
    */
   icon?: React.ReactNode
+
+  /**
+   * Additional CSS classes
+   */
+  className?: string
 
   /**
    * Tab pane content
@@ -93,7 +109,7 @@ export const TabPane: React.FC<TabPaneProps> = ({
 
   // Tab item classes
   const tabItemClasses = useMemo(() => {
-    return classNames(getTabItemClasses(isActive, disabled, tabsContext.type, tabsContext.size))
+    return getTabItemClasses(isActive, disabled, tabsContext.type, tabsContext.size)
   }, [isActive, disabled, tabsContext.type, tabsContext.size])
 
   // Tab pane classes
@@ -226,9 +242,9 @@ export const TabPane: React.FC<TabPaneProps> = ({
             onClick={handleClose}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox={closeIconViewBox}>
               <path
-                strokeLinecap={closeIconPathStrokeLinecap}
-                strokeLinejoin={closeIconPathStrokeLinejoin}
-                strokeWidth={closeIconPathStrokeWidth}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d={closeIconPathD}
               />
             </svg>

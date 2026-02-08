@@ -221,14 +221,31 @@ const [openKeys, setOpenKeys] = useState<(string | number)[]>(['sub1'])
 ## Tabs 标签页
 
 ```tsx
-const [activeKey, setActiveKey] = useState('tab1')
-const items = [
-  { key: 'tab1', label: 'Tab 1', content: <div>Tab 1 content</div> },
-  { key: 'tab2', label: 'Tab 2', content: <div>Tab 2 content</div> }
-]
+const [activeKey, setActiveKey] = useState('1')
 
-<Tabs activeKey={activeKey} onChange={setActiveKey} items={items} />
-<Tabs activeKey={activeKey} onChange={setActiveKey} type="card" addable closable onAdd={handleAdd} onClose={handleClose} />
+{/* 基本用法 */}
+<Tabs activeKey={activeKey} onChange={setActiveKey}>
+  <TabPane tabKey="1" label="标签 1">内容 1</TabPane>
+  <TabPane tabKey="2" label="标签 2">内容 2</TabPane>
+</Tabs>
+
+{/* 非受控模式 */}
+<Tabs defaultActiveKey="1">
+  <TabPane tabKey="1" label="标签 1">内容 1</TabPane>
+</Tabs>
+
+{/* 可编辑卡片 */}
+<Tabs activeKey={activeKey} onChange={setActiveKey} type="editable-card" closable onEdit={handleEdit}>
+  {tabs.map(tab => (
+    <TabPane key={tab.key} tabKey={tab.key} label={tab.label}>{tab.content}</TabPane>
+  ))}
+</Tabs>
+
+{/* 位置 / 居中 / 尺寸 / 销毁非激活面板 */}
+<Tabs tabPosition="left" />
+<Tabs centered />
+<Tabs size="small" />
+<Tabs destroyInactiveTabPane />
 ```
 
 ---

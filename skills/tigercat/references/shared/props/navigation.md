@@ -154,22 +154,40 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ## Tabs 标签页
 
-### Props
+### Tabs Props
 
-| Prop       | Type                                                   | Default  | Vue | React | Description            |
-| ---------- | ------------------------------------------------------ | -------- | :-: | :---: | ---------------------- |
-| modelValue | `string`                                               | -        |  ✓  |   -   | 当前激活 key (v-model) |
-| activeKey  | `string`                                               | -        |  -  |   ✓   | 当前激活 key           |
-| items      | `{ key: string, label: string, disabled?: boolean }[]` | `[]`     |  ✓  |   ✓   | 标签项                 |
-| type       | `'line' \| 'card'`                                     | `'line'` |  ✓  |   ✓   | 样式类型               |
-| closable   | `boolean`                                              | `false`  |  ✓  |   ✓   | 可关闭                 |
+| Prop                    | Type                                    | Default    | Vue | React | Description                        |
+| ----------------------- | --------------------------------------- | ---------- | :-: | :---: | ---------------------------------- |
+| activeKey               | `string \| number`                     | -          |  ✓  |   ✓   | 当前激活 key（受控）               |
+| defaultActiveKey        | `string \| number`                     | -          |  ✓  |   ✓   | 默认激活 key（非受控）             |
+| type                    | `'line' \| 'card' \| 'editable-card'` | `'line'`   |  ✓  |   ✓   | 样式类型                           |
+| tabPosition             | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'` |  ✓  |   ✓   | 标签位置                           |
+| size                    | `'small' \| 'medium' \| 'large'`      | `'medium'` |  ✓  |   ✓   | 尺寸                               |
+| closable                | `boolean`                               | `false`    |  ✓  |   ✓   | 标签可关闭（仅 editable-card）     |
+| centered                | `boolean`                               | `false`    |  ✓  |   ✓   | 标签居中                           |
+| destroyInactiveTabPane  | `boolean`                               | `false`    |  ✓  |   ✓   | 销毁非激活面板                     |
+
+### TabPane Props
+
+| Prop     | Type               | Default | Vue | React | Description              |
+| -------- | ------------------ | ------- | :-: | :---: | ------------------------ |
+| tabKey   | `string \| number` | -       |  ✓  |   ✓   | 唯一标识（必填）         |
+| label    | `string`           | -       |  ✓  |   ✓   | 标签标题（必填）         |
+| disabled | `boolean`          | `false` |  ✓  |   ✓   | 禁用                     |
+| closable | `boolean`          | -       |  ✓  |   ✓   | 覆盖父级 closable 设置   |
+| icon     | 组件/VNode         | -       |  ✓  |   ✓   | 图标                     |
+
+> **Vue**: 使用 `v-model:activeKey` 绑定激活 key，子组件用 `<TabPane>` slot 渲染内容
+> **React**: 使用 `activeKey` + `onChange` 受控，或 `defaultActiveKey` 非受控
 
 ### Events
 
-| Vue Event            | React Callback | Payload       | Description |
-| -------------------- | -------------- | ------------- | ----------- |
-| `@update:modelValue` | `onChange`     | `key: string` | 激活项变更  |
-| `@close`             | `onClose`      | `key: string` | 关闭标签    |
+| Vue Event            | React Callback | Payload                                    | Description      |
+| -------------------- | -------------- | ------------------------------------------ | ---------------- |
+| `@update:activeKey`  | `onChange`     | `key: string \| number`                   | 激活项变更       |
+| `@change`            | `onChange`     | `key: string \| number`                   | 激活项变更       |
+| `@tab-click`         | `onTabClick`   | `key: string \| number`                   | 标签点击         |
+| `@edit`              | `onEdit`       | `{ targetKey?, action: 'add' \| 'remove' }` | 新增/删除标签 |
 
 ---
 

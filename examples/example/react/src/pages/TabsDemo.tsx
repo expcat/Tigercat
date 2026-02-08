@@ -20,6 +20,10 @@ const sizeSnippet = `<Tabs size="small">...</Tabs>
 
 const disabledSnippet = `<TabPane tabKey="2" label="禁用标签" disabled>...</TabPane>`
 
+const iconSnippet = `<TabPane tabKey="1" label="首页" icon={<span>🏠</span>}>...</TabPane>`
+
+const destroySnippet = `<Tabs destroyInactiveTabPane>...</Tabs>`
+
 export default function TabsDemo() {
   const [activeKey1, setActiveKey1] = useState('1')
   const [activeKey2, setActiveKey2] = useState('1')
@@ -27,6 +31,8 @@ export default function TabsDemo() {
   const [activeKey4, setActiveKey4] = useState('1')
   const [activeKey5, setActiveKey5] = useState('1')
   const [activeKey6, setActiveKey6] = useState('1')
+  const [activeKey7, setActiveKey7] = useState('1')
+  const [activeKey8, setActiveKey8] = useState('1')
   const [position, setPosition] = useState<'top' | 'bottom' | 'left' | 'right'>('top')
 
   // Editable tabs
@@ -250,6 +256,44 @@ export default function TabsDemo() {
             </TabPane>
             <TabPane tabKey="3" label="标签页 3">
               <div className="p-4">标签页 3 的内容</div>
+            </TabPane>
+          </Tabs>
+        </div>
+      </DemoBlock>
+
+      <DemoBlock title="带图标的标签" description="标签可以配置图标。" code={iconSnippet}>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <Tabs activeKey={activeKey7} onChange={(key) => setActiveKey7(String(key))}>
+            <TabPane tabKey="1" label="首页" icon={<span>🏠</span>}>
+              <div className="p-4">首页内容</div>
+            </TabPane>
+            <TabPane tabKey="2" label="用户" icon={<span>👤</span>}>
+              <div className="p-4">用户内容</div>
+            </TabPane>
+            <TabPane tabKey="3" label="设置" icon={<span>⚙️</span>}>
+              <div className="p-4">设置内容</div>
+            </TabPane>
+          </Tabs>
+        </div>
+      </DemoBlock>
+
+      <DemoBlock
+        title="销毁非激活面板"
+        description="切换时销毁已隐藏的标签面板，而非仅隐藏。"
+        code={destroySnippet}>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <Tabs
+            activeKey={activeKey8}
+            onChange={(key) => setActiveKey8(String(key))}
+            destroyInactiveTabPane>
+            <TabPane tabKey="1" label="标签页 1">
+              <div className="p-4">标签页 1 — 切换后此内容被销毁</div>
+            </TabPane>
+            <TabPane tabKey="2" label="标签页 2">
+              <div className="p-4">标签页 2 — 切换后此内容被销毁</div>
+            </TabPane>
+            <TabPane tabKey="3" label="标签页 3">
+              <div className="p-4">标签页 3 — 切换后此内容被销毁</div>
             </TabPane>
           </Tabs>
         </div>

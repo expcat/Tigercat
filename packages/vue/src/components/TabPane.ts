@@ -6,10 +6,7 @@ import {
   isKeyActive,
   tabCloseButtonClasses,
   closeIconViewBox,
-  closeIconPathD,
-  closeIconPathStrokeLinecap,
-  closeIconPathStrokeLinejoin,
-  closeIconPathStrokeWidth
+  closeIconPathD
 } from '@expcat/tigercat-core'
 import { TabsContextKey, type TabsContext } from './Tabs'
 
@@ -121,9 +118,7 @@ export const TabPane = defineComponent({
 
     // Tab item classes
     const tabItemClasses = computed(() => {
-      return classNames(
-        getTabItemClasses(isActive.value, props.disabled, tabsContext.type, tabsContext.size)
-      )
+      return getTabItemClasses(isActive.value, props.disabled, tabsContext.type, tabsContext.size)
     })
 
     // Tab pane classes
@@ -272,9 +267,9 @@ export const TabPane = defineComponent({
                     viewBox: closeIconViewBox
                   },
                   h('path', {
-                    'stroke-linecap': closeIconPathStrokeLinecap,
-                    'stroke-linejoin': closeIconPathStrokeLinejoin,
-                    'stroke-width': closeIconPathStrokeWidth,
+                    'stroke-linecap': 'round',
+                    'stroke-linejoin': 'round',
+                    'stroke-width': '2',
                     d: closeIconPathD
                   })
                 )

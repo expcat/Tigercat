@@ -5,11 +5,9 @@ import {
   provide,
   PropType,
   h,
-  reactive,
-  watch,
+  Fragment,
   getCurrentInstance,
   type VNode,
-  type VNodeArrayChildren,
   type Component
 } from 'vue'
 import {
@@ -52,9 +50,6 @@ export interface VueTabsProps {
   className?: string
   style?: Record<string, string | number>
 }
-
-type RawChildren = string | number | boolean | VNode | VNodeArrayChildren | (() => unknown)
-type RawSlotsLike = { [name: string]: unknown; $stable?: boolean }
 
 export const Tabs = defineComponent({
   name: 'TigerTabs',
@@ -153,18 +148,13 @@ export const Tabs = defineComponent({
     const handleTabClick = (key: string | number) => {
       emit('tab-click', key)
 
-      const prevKey = currentActiveKey.value
-
-      if (prevKey === key) {
-        return
-      }
+      if (currentActiveKey.value === key) return
 
       // Update internal state if uncontrolled
       if (props.activeKey === undefined) {
         internalActiveKey.value = key
       }
 
-      // Emit events only when switching
       emit('update:activeKey', key)
       emit('change', key)
     }
@@ -172,8 +162,6 @@ export const Tabs = defineComponent({
     // Handle tab close
     const handleTabClose = (key: string | number, event: Event) => {
       event.stopPropagation()
-
-      // Emit edit event
       emit('edit', { targetKey: key, action: 'remove' })
     }
 
@@ -192,118 +180,101 @@ export const Tabs = defineComponent({
       return getTabNavListClasses(props.tabPosition, props.centered)
     })
 
-    // Tab content classes
-    const tabContentClasses = computed(() => {
-      return tabContentBaseClasses
-    })
-
-    // Provide tabs context to child components (make it reactive)
-    const tabsContextValue = reactive<TabsContext>({
-      activeKey: currentActiveKey.value,
-      type: props.type,
-      size: props.size,
-      tabPosition: props.tabPosition,
-      closable: props.closable,
-      destroyInactiveTabPane: props.destroyInactiveTabPane,
+    // Provide tabs context via plain object with getters — reactive props
+    // are tracked automatically when the consumer reads them in a computed/render.
+    provide<TabsContext>(TabsContextKey, {
+      get activeKey() { return currentActiveKey.value },
+      get type() { return props.type },
+      get size() { return props.size },
+      get tabPosition() { return props.tabPosition },
+      get closable() { return props.closable },
+      get destroyInactiveTabPane() { return props.destroyInactiveTabPane },
       idBase,
       handleTabClick,
       handleTabClose
     })
 
-    // Batch watch all props that need to sync to context
-    watch(
-      () =>
-        [
-          currentActiveKey.value,
-          props.type,
-          props.tabPosition,
-          props.size,
-          props.closable,
-          props.destroyInactiveTabPane
-        ] as const,
-      ([activeKey, type, tabPosition, size, closable, destroyInactiveTabPane]) => {
-        tabsContextValue.activeKey = activeKey
-        tabsContextValue.type = type
-        tabsContextValue.tabPosition = tabPosition
-        tabsContextValue.size = size
-        tabsContextValue.closable = closable
-        tabsContextValue.destroyInactiveTabPane = destroyInactiveTabPane
-      }
-    )
-
-    provide<TabsContext>(TabsContextKey, tabsContextValue)
-
     return () => {
-      const children = (slots.default?.() || []) as VNode[]
+      const rawChildren = (slots.default?.() || []) as VNode[]
+
+      // Flatten Fragment VNodes (produced by v-for) into a flat list
+      const children: VNode[] = []
+      const flatten = (vnodes: VNode[]) => {
+        for (const vnode of vnodes) {
+          if (vnode.type === Fragment && Array.isArray(vnode.children)) {
+            flatten(vnode.children as VNode[])
+          } else {
+            children.push(vnode)
+          }
+        }
+      }
+      flatten(rawChildren)
 
       // Extract tab items (for nav) and tab panes (for content)
       const tabItems: VNode[] = []
       const tabPanes: VNode[] = []
       let firstTabKey: string | number | undefined
 
-      children.forEach((child) => {
+      // First pass: collect valid TabPane children and determine firstTabKey
+      type ChildInfo = { type: string | Component; props: Record<string, unknown>; children: unknown }
+      const validChildren: ChildInfo[] = []
+
+      for (const child of children) {
         const childType = child?.type
         const childName =
           typeof childType === 'object' && childType && 'name' in childType
             ? (childType as { name?: string }).name
             : undefined
 
-        if (childName === 'TigerTabPane') {
-          const childProps = (child.props ?? {}) as Record<string, unknown>
+        if (childName !== 'TigerTabPane') continue
 
-          if (firstTabKey === undefined) {
-            const k = childProps.tabKey
-            if (typeof k === 'string' || typeof k === 'number') {
-              firstTabKey = k
-            }
-          }
-          // `VNode.type` is `VNodeTypes` but `h()` expects `string | Component` here.
-          // Narrow to keep DTS generation happy.
-          const tabPaneType =
-            typeof child.type === 'string' || typeof child.type === 'object'
-              ? (child.type as string | Component)
-              : 'div'
-
-          // Store both the tab item and pane components
-          // Pass the original child for tab rendering
-          const resolvedActiveKey =
-            props.activeKey ?? internalActiveKey.value ?? props.defaultActiveKey ?? firstTabKey
-
-          const tabId = `${idBase}-tab-${String(childProps.tabKey ?? '')}`
-          const panelId = `${idBase}-panel-${String(childProps.tabKey ?? '')}`
-
-          tabItems.push(
-            h(tabPaneType, {
-              ...childProps,
-              renderMode: 'tab',
-              tabId,
-              panelId,
-              tabIndex: childProps.tabKey === resolvedActiveKey ? 0 : -1
-            })
-          )
-          // Pass the child with its children/slots for pane rendering
-          tabPanes.push(
-            h(
-              tabPaneType,
-              {
-                ...childProps,
-                renderMode: 'pane',
-                tabId,
-                panelId
-              },
-              (child.children ?? undefined) as unknown as RawChildren | RawSlotsLike
-            )
-          )
+        const childProps = (child.props ?? {}) as Record<string, unknown>
+        const k = childProps.tabKey
+        if (firstTabKey === undefined && (typeof k === 'string' || typeof k === 'number')) {
+          firstTabKey = k
         }
-      })
 
+        const tabPaneType =
+          typeof child.type === 'string' || typeof child.type === 'object'
+            ? (child.type as string | Component)
+            : 'div'
+
+        validChildren.push({ type: tabPaneType, props: childProps, children: child.children })
+      }
+
+      // Auto-activate first tab when no key is specified
       if (
         props.activeKey === undefined &&
         internalActiveKey.value === undefined &&
         firstTabKey !== undefined
       ) {
         internalActiveKey.value = firstTabKey
-        tabsContextValue.activeKey = firstTabKey
+      }
+
+      // Compute resolvedActiveKey once for roving tabindex
+      const resolvedActiveKey = currentActiveKey.value ?? firstTabKey
+
+      // Second pass: build tab items and panes
+      for (const { type, props: childProps, children: childChildren } of validChildren) {
+        const tabId = `${idBase}-tab-${String(childProps.tabKey ?? '')}`
+        const panelId = `${idBase}-panel-${String(childProps.tabKey ?? '')}`
+
+        tabItems.push(
+          h(type, {
+            ...childProps,
+            renderMode: 'tab',
+            tabId,
+            panelId,
+            tabIndex: childProps.tabKey === resolvedActiveKey ? 0 : -1
+          })
+        )
+        tabPanes.push(
+          h(
+            type,
+            { ...childProps, renderMode: 'pane', tabId, panelId },
+            childChildren as VNode[] | undefined
+          )
+        )
       }
 
       // Render tab nav
@@ -318,58 +289,33 @@ export const Tabs = defineComponent({
               : 'horizontal'
         },
         [
-          h(
-            'div',
-            {
-              class: tabNavListClasses.value
-            },
-            [
-              ...tabItems,
-              props.type === 'editable-card'
-                ? h(
-                    'button',
-                    {
-                      type: 'button',
-                      class: tabAddButtonClasses,
-                      onClick: () => emit('edit', { targetKey: undefined, action: 'add' }),
-                      'aria-label': 'Add tab'
-                    },
-                    '+'
-                  )
-                : null
-            ]
-          )
+          h('div', { class: tabNavListClasses.value }, [
+            ...tabItems,
+            props.type === 'editable-card'
+              ? h(
+                  'button',
+                  {
+                    type: 'button',
+                    class: tabAddButtonClasses,
+                    onClick: () => emit('edit', { targetKey: undefined, action: 'add' }),
+                    'aria-label': 'Add tab'
+                  },
+                  '+'
+                )
+              : null
+          ])
         ]
       )
 
       // Render tab content
-      const tabContent = h(
-        'div',
-        {
-          class: tabContentClasses.value
-        },
-        tabPanes
-      )
+      const tabContent = h('div', { class: tabContentBaseClasses }, tabPanes)
 
-      // For left/right position, we need different layout
-      if (props.tabPosition === 'left' || props.tabPosition === 'right') {
-        return h(
-          'div',
-          {
-            class: containerClasses.value
-          },
-          [tabNavContent, tabContent]
-        )
-      }
-
-      // For top/bottom position
       return h(
         'div',
-        {
-          class: containerClasses.value,
-          style: props.style
-        },
-        props.tabPosition === 'bottom' ? [tabContent, tabNavContent] : [tabNavContent, tabContent]
+        { class: containerClasses.value, style: props.style },
+        props.tabPosition === 'bottom'
+          ? [tabContent, tabNavContent]
+          : [tabNavContent, tabContent]
       )
     }
   }

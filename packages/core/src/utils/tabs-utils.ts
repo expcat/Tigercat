@@ -13,16 +13,26 @@ export const tabsBaseClasses = 'w-full'
 /**
  * Tab nav base classes
  */
-export const tabNavBaseClasses = 'flex transition-colors duration-200'
+export const tabNavBaseClasses = 'flex'
 
 /**
- * Tab nav position classes
+ * Tab nav position classes (direction only)
  */
 export const tabNavPositionClasses = {
-  top: 'flex-row border-b border-gray-200',
-  bottom: 'flex-row border-t border-gray-200',
-  left: 'flex-col border-r border-gray-200',
-  right: 'flex-col border-l border-gray-200'
+  top: 'flex-row',
+  bottom: 'flex-row',
+  left: 'flex-col',
+  right: 'flex-col'
+}
+
+/**
+ * Tab nav border classes (applied only for line type)
+ */
+export const tabNavLineBorderClasses = {
+  top: 'border-b border-gray-200',
+  bottom: 'border-t border-gray-200',
+  left: 'border-r border-gray-200',
+  right: 'border-l border-gray-200'
 }
 
 /**
@@ -50,7 +60,7 @@ export const tabNavListCenteredClasses = 'justify-center'
  * @since 0.2.0 - Added focus-visible ring for keyboard navigation
  */
 export const tabItemBaseClasses =
-  'relative px-4 py-2 cursor-pointer transition-all duration-200 select-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] focus-visible:ring-offset-2 active:opacity-90'
+  'relative cursor-pointer transition-all duration-200 select-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] focus-visible:ring-offset-2 active:opacity-90'
 
 /**
  * Tab item size classes
@@ -133,43 +143,27 @@ export const tabAddButtonClasses =
  * Get tabs container classes
  */
 export function getTabsContainerClasses(position: TabPosition): string {
-  const classes = [tabsBaseClasses]
-
-  if (position === 'left' || position === 'right') {
-    classes.push('flex')
-    if (position === 'right') {
-      classes.push('flex-row-reverse')
-    }
-  }
-
-  return classes.filter(Boolean).join(' ')
+  if (position === 'right') return `${tabsBaseClasses} flex flex-row-reverse`
+  if (position === 'left') return `${tabsBaseClasses} flex`
+  return tabsBaseClasses
 }
 
 /**
  * Get tab nav classes based on position
  */
 export function getTabNavClasses(position: TabPosition, type: TabType): string {
-  const classes = [tabNavBaseClasses, tabNavPositionClasses[position]]
-
-  // No border for card types since they have their own borders
-  if (type === 'card' || type === 'editable-card') {
-    classes.push('border-0')
-  }
-
-  return classes.filter(Boolean).join(' ')
+  const base = `${tabNavBaseClasses} ${tabNavPositionClasses[position]}`
+  return type === 'line' ? `${base} ${tabNavLineBorderClasses[position]}` : base
 }
 
 /**
  * Get tab nav list classes
  */
 export function getTabNavListClasses(position: TabPosition, centered: boolean): string {
-  const classes = [tabNavListBaseClasses, tabNavListPositionClasses[position]]
-
-  if (centered && (position === 'top' || position === 'bottom')) {
-    classes.push(tabNavListCenteredClasses)
-  }
-
-  return classes.filter(Boolean).join(' ')
+  const base = `${tabNavListBaseClasses} ${tabNavListPositionClasses[position]}`
+  return centered && (position === 'top' || position === 'bottom')
+    ? `${base} ${tabNavListCenteredClasses}`
+    : base
 }
 
 /**
@@ -181,47 +175,33 @@ export function getTabItemClasses(
   type: TabType,
   size: TabSize
 ): string {
-  const classes = [tabItemBaseClasses, tabItemSizeClasses[size]]
+  let cls = `${tabItemBaseClasses} ${tabItemSizeClasses[size]}`
 
-  if (disabled) {
-    classes.push(tabItemDisabledClasses)
-  } else {
-    switch (type) {
-      case 'line':
-        classes.push(tabItemLineClasses)
-        if (active) {
-          classes.push(tabItemLineActiveClasses)
-        }
-        break
-      case 'card':
-        classes.push(tabItemCardClasses)
-        if (active) {
-          classes.push(tabItemCardActiveClasses)
-        }
-        break
-      case 'editable-card':
-        classes.push(tabItemEditableCardClasses)
-        if (active) {
-          classes.push(tabItemEditableCardActiveClasses)
-        }
-        break
-    }
+  if (disabled) return `${cls} ${tabItemDisabledClasses}`
+
+  switch (type) {
+    case 'line':
+      cls += ` ${tabItemLineClasses}`
+      if (active) cls += ` ${tabItemLineActiveClasses}`
+      break
+    case 'card':
+      cls += ` ${tabItemCardClasses}`
+      if (active) cls += ` ${tabItemCardActiveClasses}`
+      break
+    case 'editable-card':
+      cls += ` ${tabItemEditableCardClasses}`
+      if (active) cls += ` ${tabItemEditableCardActiveClasses}`
+      break
   }
 
-  return classes.filter(Boolean).join(' ')
+  return cls
 }
 
 /**
  * Get tab pane classes based on active state
  */
 export function getTabPaneClasses(active: boolean): string {
-  const classes = [tabPaneBaseClasses]
-
-  if (!active) {
-    classes.push(tabPaneHiddenClasses)
-  }
-
-  return classes.filter(Boolean).join(' ')
+  return active ? tabPaneBaseClasses : `${tabPaneBaseClasses} ${tabPaneHiddenClasses}`
 }
 
 /**

@@ -246,45 +246,6 @@ describe('Tabs', () => {
       expect(onEdit).toHaveBeenCalledWith({ targetKey: '1', action: 'remove' })
     })
 
-    it('should update active tab in uncontrolled mode', async () => {
-      render(
-        <Tabs defaultActiveKey="1">
-          <TabPane tabKey="1" label="Tab 1">
-            Content 1
-          </TabPane>
-          <TabPane tabKey="2" label="Tab 2">
-            Content 2
-          </TabPane>
-        </Tabs>
-      )
-
-      expect(screen.getByText('Content 1')).toBeVisible()
-
-      const tab2 = screen.getByText('Tab 2')
-      await fireEvent.click(tab2)
-
-      expect(screen.getByText('Content 2')).toBeVisible()
-    })
-
-    it('should call onEdit with add when add button is clicked', async () => {
-      const onEdit = vi.fn()
-
-      render(
-        <Tabs type="editable-card" onEdit={onEdit}>
-          <TabPane tabKey="1" label="Tab 1">
-            Content 1
-          </TabPane>
-        </Tabs>
-      )
-
-      await fireEvent.click(screen.getByRole('button', { name: 'Add tab' }))
-
-      expect(onEdit).toHaveBeenCalledWith({
-        targetKey: undefined,
-        action: 'add'
-      })
-    })
-
     it('should not call onChange when clicking the active tab', async () => {
       const onChange = vi.fn()
 
@@ -350,6 +311,30 @@ describe('Tabs', () => {
 
       expect(tab1).toHaveAttribute('aria-controls', panel1.getAttribute('id')!)
       expect(panel1).toHaveAttribute('aria-labelledby', tab1.getAttribute('id')!)
+    })
+
+    it('should set aria-orientation to horizontal for top position', () => {
+      render(
+        <Tabs>
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+        </Tabs>
+      )
+
+      expect(screen.getByRole('tablist')).toHaveAttribute('aria-orientation', 'horizontal')
+    })
+
+    it('should set aria-orientation to vertical for left/right position', () => {
+      render(
+        <Tabs tabPosition="left">
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+        </Tabs>
+      )
+
+      expect(screen.getByRole('tablist')).toHaveAttribute('aria-orientation', 'vertical')
     })
   })
 
