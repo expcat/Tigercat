@@ -16,6 +16,14 @@ describe('Pagination', () => {
     expect(nav).toHaveAttribute('aria-label', 'Pagination')
   })
 
+  it('allows overriding aria-label via attrs', () => {
+    const { container } = render(Pagination, {
+      props: { total: 100 },
+      attrs: { 'aria-label': 'My pagination' }
+    })
+    expect(container.querySelector('nav')).toHaveAttribute('aria-label', 'My pagination')
+  })
+
   it('merges attrs.class with className prop', () => {
     const { container } = render(Pagination, {
       props: { total: 100, className: 'from-prop' },
@@ -38,6 +46,17 @@ describe('Pagination', () => {
   it('sets aria-current on the active page', () => {
     render(Pagination, { props: { total: 100, pageSize: 10, current: 3 } })
     expect(screen.getByLabelText('Page 3')).toHaveAttribute('aria-current', 'page')
+  })
+
+  it('disables prev/next on boundaries', () => {
+    const { unmount } = render(Pagination, {
+      props: { total: 100, pageSize: 10, current: 1 }
+    })
+    expect(screen.getByLabelText('Previous page')).toBeDisabled()
+
+    unmount()
+    render(Pagination, { props: { total: 100, pageSize: 10, current: 10 } })
+    expect(screen.getByLabelText('Next page')).toBeDisabled()
   })
 
   it('disables all page buttons when disabled', () => {

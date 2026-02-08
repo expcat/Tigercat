@@ -256,7 +256,37 @@ const [activeKey, setActiveKey] = useState('1')
 const [page, setPage] = useState(1)
 const [pageSize, setPageSize] = useState(10)
 
-<Pagination current={page} pageSize={pageSize} total={100} onChange={setPage} onPageSizeChange={setPageSize} showSizeChanger showQuickJumper />
+{/* 基本用法 */}
+<Pagination current={page} total={100} pageSize={10} onChange={(p) => setPage(p)} />
+
+{/* 完整功能：条数选择 + 快速跳页 */}
+<Pagination current={page} pageSize={pageSize} total={500}
+  showSizeChanger showQuickJumper
+  onChange={(p) => setPage(p)}
+  onPageSizeChange={(p, s) => { setPage(p); setPageSize(s) }} />
+
+{/* 简洁模式 */}
+<Pagination current={page} total={500} simple onChange={(p) => setPage(p)} />
+
+{/* 三种尺寸 */}
+<Pagination current={page} total={100} size="small" onChange={(p) => setPage(p)} />
+<Pagination current={page} total={100} size="medium" onChange={(p) => setPage(p)} />
+<Pagination current={page} total={100} size="large" onChange={(p) => setPage(p)} />
+
+{/* 对齐方式 */}
+<Pagination current={page} total={100} align="left" onChange={(p) => setPage(p)} />
+<Pagination current={page} total={100} align="right" onChange={(p) => setPage(p)} />
+
+{/* 禁用 / 单页隐藏 / 紧凑页码 */}
+<Pagination current={page} total={100} disabled onChange={(p) => setPage(p)} />
+<Pagination current={page} total={5} hideOnSinglePage onChange={(p) => setPage(p)} />
+<Pagination current={page} total={500} showLessItems onChange={(p) => setPage(p)} />
+
+{/* 自定义总条数文本 */}
+<Pagination current={page} total={100} totalText={(total, range) => `${range[0]}-${range[1]} / ${total}`} onChange={(p) => setPage(p)} />
+
+{/* 国际化 */}
+<Pagination current={page} total={500} locale={{ pagination: customLabels }} showQuickJumper showSizeChanger onChange={(p) => setPage(p)} />
 ```
 
 ---

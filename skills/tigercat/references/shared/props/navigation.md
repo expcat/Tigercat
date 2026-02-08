@@ -195,18 +195,39 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ### Props
 
-| Prop            | Type                                              | Default          | Vue | React | Description  |
-| --------------- | ------------------------------------------------- | ---------------- | :-: | :---: | ------------ |
-| current         | `number`                                          | `1`              |  ✓  |   ✓   | 当前页       |
-| pageSize        | `number`                                          | `10`             |  ✓  |   ✓   | 每页条数     |
-| total           | `number`                                          | `0`              |  ✓  |   ✓   | 总条数       |
-| pageSizeOptions | `(number \| { value: number, label?: string })[]` | `[10,20,50,100]` |  ✓  |   ✓   | 每页条数选项 |
-| showSizeChanger | `boolean`                                         | `false`          |  ✓  |   ✓   | 显示条数选择 |
-| showQuickJumper | `boolean`                                         | `false`          |  ✓  |   ✓   | 显示快速跳转 |
-| locale          | `{ pagination: PaginationLocale }`                | -                |  ✓  |   ✓   | 国际化       |
+| Prop            | Type                                              | Default          | Vue | React | Description                        |
+| --------------- | ------------------------------------------------- | ---------------- | :-: | :---: | ---------------------------------- |
+| current         | `number`                                          | `1`              |  ✓  |   ✓   | 当前页（受控）                     |
+| defaultCurrent  | `number`                                          | `1`              |  ✓  |   ✓   | 默认当前页（非受控）               |
+| total           | `number`                                          | `0`              |  ✓  |   ✓   | 总条数                             |
+| pageSize        | `number`                                          | `10`             |  ✓  |   ✓   | 每页条数（受控）                   |
+| defaultPageSize | `number`                                          | `10`             |  ✓  |   ✓   | 默认每页条数（非受控）             |
+| pageSizeOptions | `(number \| { value: number, label?: string })[]` | `[10,20,50,100]` |  ✓  |   ✓   | 每页条数选项                       |
+| showSizeChanger | `boolean`                                         | `false`          |  ✓  |   ✓   | 显示条数选择                       |
+| showQuickJumper | `boolean`                                         | `false`          |  ✓  |   ✓   | 显示快速跳转                       |
+| showTotal       | `boolean`                                         | `true`           |  ✓  |   ✓   | 显示总条数                         |
+| totalText       | `(total, range) => string`                        | -                |  ✓  |   ✓   | 自定义总条数文本                   |
+| simple          | `boolean`                                         | `false`          |  ✓  |   ✓   | 简洁模式（仅上/下页）              |
+| size            | `'small' \| 'medium' \| 'large'`                  | `'medium'`       |  ✓  |   ✓   | 尺寸                               |
+| align           | `'left' \| 'center' \| 'right'`                   | `'center'`       |  ✓  |   ✓   | 对齐方式                           |
+| disabled        | `boolean`                                         | `false`          |  ✓  |   ✓   | 禁用                               |
+| hideOnSinglePage| `boolean`                                         | `false`          |  ✓  |   ✓   | 单页时隐藏                         |
+| showLessItems   | `boolean`                                         | `false`          |  ✓  |   ✓   | 显示更少的页码按钮                 |
+| locale          | `{ pagination: PaginationLocale }`                | -                |  ✓  |   ✓   | 国际化                             |
+| className       | `string`                                          | -                |  ✓  |   ✓   | 自定义 CSS 类名                    |
+| style           | `Record<string, unknown> \| React.CSSProperties`  | -                |  ✓  |   ✓   | 内联样式                           |
 
-> **Vue**: 使用 `v-model:current` 和 `v-model:page-size` 绑定
+> **Vue**: 使用 `v-model:current` 和 `v-model:pageSize` 绑定
 > **React**: 使用 `current`/`pageSize` + `onChange`/`onPageSizeChange` 控制
+
+### Events
+
+| Vue Event              | React Callback   | Payload                        | Description        |
+| ---------------------- | ---------------- | ------------------------------ | ------------------ |
+| `@change`              | `onChange`        | `(current, pageSize)`          | 页码变更时触发     |
+| `@page-size-change`    | `onPageSizeChange`| `(current, pageSize)`          | 每页条数变更时触发 |
+| `@update:current`      | -                | `current: number`              | v-model 双向绑定   |
+| `@update:pageSize`     | -                | `pageSize: number`             | v-model 双向绑定   |
 
 ---
 

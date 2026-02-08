@@ -14,6 +14,8 @@ const PaginationDemo: React.FC = () => {
   const [current7, setCurrent7] = useState(1)
   const [current8, setCurrent8] = useState(1)
   const [current9, setCurrent9] = useState(1)
+  const [current10, setCurrent10] = useState(1)
+  const [current11, setCurrent11] = useState(1)
   const [demoLang, setDemoLang] = useState<'en-US' | 'zh-CN'>('zh-CN')
 
   const handlePageSizeChange = (page: number, size: number) => {
@@ -107,6 +109,10 @@ const PaginationDemo: React.FC = () => {
   />`
 
   const disabledSnippet = `<Pagination current={current8} onChange={setCurrent8} total={100} disabled />`
+
+  const hideOnSinglePageSnippet = `<Pagination current={current10} onChange={setCurrent10} total={5} pageSize={10} hideOnSinglePage />`
+
+  const showLessItemsSnippet = `<Pagination current={current11} onChange={setCurrent11} total={500} showLessItems />`
 
   const i18nSnippet = `// 定义国际化标签
 const customLabels: Partial<TigerLocalePagination> = {
@@ -249,6 +255,34 @@ const customLabels: Partial<TigerLocalePagination> = {
       {/* 禁用状态 */}
       <DemoBlock title="禁用状态" description="禁用分页组件的所有交互。" code={disabledSnippet}>
         <Pagination current={current8} onChange={setCurrent8} total={100} disabled />
+      </DemoBlock>
+
+      {/* 单页隐藏 */}
+      <DemoBlock
+        title="单页隐藏"
+        description="当只有一页时自动隐藏分页组件。"
+        code={hideOnSinglePageSnippet}>
+        <div className="space-y-2">
+          <p className="text-sm text-gray-500">下方分页组件因为只有 1 页而被隐藏：</p>
+          <Pagination
+            current={current10}
+            onChange={setCurrent10}
+            total={5}
+            pageSize={10}
+            hideOnSinglePage
+          />
+          <p className="text-sm text-gray-400 italic">
+            （如果看不到分页组件，说明 hideOnSinglePage 生效了）
+          </p>
+        </div>
+      </DemoBlock>
+
+      {/* 紧凑页码 */}
+      <DemoBlock
+        title="紧凑页码 (showLessItems)"
+        description="显示更少的页码按钮，适合空间有限的场景。"
+        code={showLessItemsSnippet}>
+        <Pagination current={current11} onChange={setCurrent11} total={500} showLessItems />
       </DemoBlock>
 
       {/* 国际化 */}

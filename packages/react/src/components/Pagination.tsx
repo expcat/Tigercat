@@ -13,6 +13,7 @@ import {
   getQuickJumperInputClasses,
   getPageSizeSelectorClasses,
   getTotalTextClasses,
+  getSizeTextClasses,
   getPaginationLabels,
   formatPageAriaLabel,
   type PaginationProps as CorePaginationProps,
@@ -179,83 +180,44 @@ export const Pagination: React.FC<PaginationProps> = ({
   // Container classes
   const containerClasses = getPaginationContainerClasses(align, className)
 
+  const prevDisabled = validatedCurrentPage <= 1 || disabled
+  const nextDisabled = validatedCurrentPage >= totalPages || disabled
+
   const elements: React.ReactNode[] = []
 
-  // Show total text
+  // Total text
   if (showTotal) {
     const totalTextFn = totalText || defaultTotalText
-    const totalTextContent = totalTextFn(total, pageRange)
-
     elements.push(
       <span key="total" className={getTotalTextClasses(size)}>
-        {totalTextContent}
+        {totalTextFn(total, pageRange)}
       </span>
     )
   }
 
+  // Previous button
+  elements.push(
+    <button
+      key="prev"
+      type="button"
+      className={getPaginationButtonBaseClasses(size)}
+      disabled={prevDisabled}
+      onClick={() => handlePageChange(validatedCurrentPage - 1)}
+      aria-label={labels.prevPageAriaLabel}>
+      ‹
+    </button>
+  )
+
   if (simple) {
-    // Simple mode: only prev, current/total, next
-    const prevDisabled = validatedCurrentPage <= 1 || disabled
-    const nextDisabled = validatedCurrentPage >= totalPages || disabled
-
-    // Previous button
+    // Simple mode: current / total
     elements.push(
-      <button
-        key="prev"
-        type="button"
-        className={getPaginationButtonBaseClasses(size)}
-        disabled={prevDisabled}
-        onClick={() => handlePageChange(validatedCurrentPage - 1)}
-        aria-label={labels.prevPageAriaLabel}>
-        ‹
-      </button>
-    )
-
-    // Current/Total display
-    elements.push(
-      <span
-        key="current"
-        className={classNames(
-          'mx-2',
-          size === 'small' ? 'text-sm' : size === 'large' ? 'text-lg' : 'text-base'
-        )}>
+      <span key="current" className={classNames('mx-2', getSizeTextClasses(size))}>
         {validatedCurrentPage} / {totalPages}
       </span>
     )
-
-    // Next button
-    elements.push(
-      <button
-        key="next"
-        type="button"
-        className={getPaginationButtonBaseClasses(size)}
-        disabled={nextDisabled}
-        onClick={() => handlePageChange(validatedCurrentPage + 1)}
-        aria-label={labels.nextPageAriaLabel}>
-        ›
-      </button>
-    )
   } else {
-    // Full mode: prev, page numbers, next
-    const prevDisabled = validatedCurrentPage <= 1 || disabled
-    const nextDisabled = validatedCurrentPage >= totalPages || disabled
-
-    // Previous button
-    elements.push(
-      <button
-        key="prev"
-        type="button"
-        className={getPaginationButtonBaseClasses(size)}
-        disabled={prevDisabled}
-        onClick={() => handlePageChange(validatedCurrentPage - 1)}
-        aria-label={labels.prevPageAriaLabel}>
-        ‹
-      </button>
-    )
-
-    // Page numbers
-    const pageNumbers = getPageNumbers(validatedCurrentPage, totalPages, showLessItems)
-    pageNumbers.forEach((pageNum, index) => {
+    // Full mode: page number buttons
+    getPageNumbers(validatedCurrentPage, totalPages, showLessItems).forEach((pageNum, index) => {
       if (pageNum === '...') {
         elements.push(
           <span
@@ -284,22 +246,22 @@ export const Pagination: React.FC<PaginationProps> = ({
         )
       }
     })
-
-    // Next button
-    elements.push(
-      <button
-        key="next"
-        type="button"
-        className={getPaginationButtonBaseClasses(size)}
-        disabled={nextDisabled}
-        onClick={() => handlePageChange(validatedCurrentPage + 1)}
-        aria-label={labels.nextPageAriaLabel}>
-        ›
-      </button>
-    )
   }
 
-  // Show page size selector
+  // Next button
+  elements.push(
+    <button
+      key="next"
+      type="button"
+      className={getPaginationButtonBaseClasses(size)}
+      disabled={nextDisabled}
+      onClick={() => handlePageChange(validatedCurrentPage + 1)}
+      aria-label={labels.nextPageAriaLabel}>
+      ›
+    </button>
+  )
+
+  // Page size selector
   if (showSizeChanger) {
     elements.push(
       <select
@@ -318,15 +280,11 @@ export const Pagination: React.FC<PaginationProps> = ({
     )
   }
 
-  // Show quick jumper
+  // Quick jumper
   if (showQuickJumper) {
+    const sizeText = getSizeTextClasses(size)
     elements.push(
-      <span
-        key="jumper-label-start"
-        className={classNames(
-          'ml-2',
-          size === 'small' ? 'text-sm' : size === 'large' ? 'text-lg' : 'text-base'
-        )}>
+      <span key="jumper-label-start" className={classNames('ml-2', sizeText)}>
         {labels.jumpToText}
       </span>
     )
@@ -345,9 +303,7 @@ export const Pagination: React.FC<PaginationProps> = ({
       />
     )
     elements.push(
-      <span
-        key="jumper-label-end"
-        className={size === 'small' ? 'text-sm' : size === 'large' ? 'text-lg' : 'text-base'}>
+      <span key="jumper-label-end" className={sizeText}>
         {labels.pageText}
       </span>
     )

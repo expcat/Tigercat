@@ -268,7 +268,35 @@ const collapsed = ref(false)
 
 ```vue
 <template>
-  <Pagination v-model:current="page" v-model:page-size="pageSize" :total="100" show-size-changer show-quick-jumper />
+  <!-- 基本用法 -->
+  <Pagination v-model:current="page" :total="100" :pageSize="10" />
+
+  <!-- 完整功能：条数选择 + 快速跳页 -->
+  <Pagination v-model:current="page" v-model:pageSize="pageSize" :total="500"
+    showSizeChanger showQuickJumper @change="handleChange" @page-size-change="handleSizeChange" />
+
+  <!-- 简洁模式 -->
+  <Pagination v-model:current="page" :total="500" simple />
+
+  <!-- 三种尺寸 -->
+  <Pagination v-model:current="page" :total="100" size="small" />
+  <Pagination v-model:current="page" :total="100" size="medium" />
+  <Pagination v-model:current="page" :total="100" size="large" />
+
+  <!-- 对齐方式 -->
+  <Pagination v-model:current="page" :total="100" align="left" />
+  <Pagination v-model:current="page" :total="100" align="right" />
+
+  <!-- 禁用 / 单页隐藏 / 紧凑页码 -->
+  <Pagination v-model:current="page" :total="100" disabled />
+  <Pagination v-model:current="page" :total="5" hideOnSinglePage />
+  <Pagination v-model:current="page" :total="500" showLessItems />
+
+  <!-- 自定义总条数文本 -->
+  <Pagination v-model:current="page" :total="100" :totalText="(total, range) => `${range[0]}-${range[1]} / ${total}`" />
+
+  <!-- 国际化 -->
+  <Pagination v-model:current="page" :total="500" :locale="{ pagination: customLabels }" showQuickJumper showSizeChanger />
 </template>
 ```
 

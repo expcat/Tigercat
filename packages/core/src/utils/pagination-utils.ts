@@ -196,16 +196,22 @@ export function getPageSizeSelectorClasses(size: PaginationSize = 'medium'): str
 }
 
 /**
- * Get total text classes
+ * Get text size class for a given pagination size
  */
-export function getTotalTextClasses(size: PaginationSize = 'medium'): string {
+export function getSizeTextClasses(size: PaginationSize = 'medium'): string {
   const sizeClasses = {
     small: 'text-sm',
     medium: 'text-base',
     large: 'text-lg'
   }
+  return sizeClasses[size]
+}
 
-  return classNames('text-[var(--tiger-text-muted,#6b7280)]', 'mr-2', sizeClasses[size])
+/**
+ * Get total text classes
+ */
+export function getTotalTextClasses(size: PaginationSize = 'medium'): string {
+  return classNames('text-[var(--tiger-text-muted,#6b7280)]', 'mr-2', getSizeTextClasses(size))
 }
 
 // ============================================================================

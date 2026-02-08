@@ -13,6 +13,8 @@ const current6 = ref(1)
 const current7 = ref(1)
 const current8 = ref(1)
 const current9 = ref(1)
+const current10 = ref(1)
+const current11 = ref(1)
 const pageSize = ref(10)
 
 const demoLang = inject<Ref<DemoLang>>('demo-lang', ref<DemoLang>('zh-CN'))
@@ -90,11 +92,14 @@ const totalTextSnippet = `<Pagination v-model:current="current7" :total="100" :t
 
 const disabledSnippet = `<Pagination v-model:current="current8" :total="100" disabled />`
 
+const hideOnSinglePageSnippet = `<Pagination v-model:current="current10" :total="5" :pageSize="10" hideOnSinglePage />`
+
+const showLessItemsSnippet = `<Pagination v-model:current="current11" :total="500" showLessItems />`
+
 const i18nSnippet = `<Pagination
   v-model:current="current9"
   :total="500"
-  :locale="locale"
-  :labels="customLabels"
+  :locale="{ pagination: customLabels }"
   showQuickJumper
   showSizeChanger />`
 
@@ -231,9 +236,32 @@ const fullSnippet = `<Pagination
                   disabled />
     </DemoBlock>
 
+    <!-- 单页隐藏 -->
+    <DemoBlock title="单页隐藏"
+               description="当只有一页时自动隐藏分页组件。"
+               :code="hideOnSinglePageSnippet">
+      <div class="space-y-2">
+        <p class="text-sm text-gray-500">下方分页组件因为只有 1 页而被隐藏：</p>
+        <Pagination v-model:current="current10"
+                    :total="5"
+                    :pageSize="10"
+                    hideOnSinglePage />
+        <p class="text-sm text-gray-400 italic">（如果看不到分页组件，说明 hideOnSinglePage 生效了）</p>
+      </div>
+    </DemoBlock>
+
+    <!-- 紧凑页码 -->
+    <DemoBlock title="紧凑页码 (showLessItems)"
+               description="显示更少的页码按钮，适合空间有限的场景。"
+               :code="showLessItemsSnippet">
+      <Pagination v-model:current="current11"
+                  :total="500"
+                  showLessItems />
+    </DemoBlock>
+
     <!-- 国际化 -->
     <DemoBlock title="国际化 (i18n)"
-               description="通过 locale 和 labels 属性自定义国际化文本。切换顶部的语言开关可查看效果。"
+               description="通过 locale 属性自定义国际化文本。切换顶部的语言开关可查看效果。"
                :code="i18nSnippet">
       <div class="space-y-2">
         <p class="text-sm text-gray-500">
@@ -241,7 +269,7 @@ const fullSnippet = `<Pagination
         </p>
         <Pagination v-model:current="current9"
                     :total="500"
-                    :labels="customLabels"
+                    :locale="{ pagination: customLabels }"
                     showQuickJumper
                     showSizeChanger />
       </div>

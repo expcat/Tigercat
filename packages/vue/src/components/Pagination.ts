@@ -15,6 +15,7 @@ import {
   getQuickJumperInputClasses,
   getPageSizeSelectorClasses,
   getTotalTextClasses,
+  getSizeTextClasses,
   getPaginationLabels,
   formatPageAriaLabel,
   type PaginationSize,
@@ -338,117 +339,60 @@ export const Pagination = defineComponent({
       }
 
       const elements: VNodeChild[] = []
+      const size = props.size
+      const page = validatedCurrentPage.value
+      const pages = totalPages.value
+      const prevDisabled = page <= 1 || props.disabled
+      const nextDisabled = page >= pages || props.disabled
 
-      // Show total text
+      // Total text
       if (props.showTotal) {
         const totalTextFn = props.totalText || defaultTotalText
-        const totalTextContent = totalTextFn(props.total, pageRange.value)
-
         elements.push(
-          h(
-            'span',
-            {
-              class: getTotalTextClasses(props.size)
-            },
-            totalTextContent
-          )
+          h('span', { class: getTotalTextClasses(size) }, totalTextFn(props.total, pageRange.value))
         )
       }
 
+      // Previous button
+      elements.push(
+        h(
+          'button',
+          {
+            type: 'button',
+            class: getPaginationButtonBaseClasses(size),
+            disabled: prevDisabled,
+            onClick: () => handlePageChange(page - 1),
+            'aria-label': labels.value.prevPageAriaLabel
+          },
+          '‹'
+        )
+      )
+
       if (props.simple) {
-        // Simple mode: prev, current/total, next
-        const prevDisabled = validatedCurrentPage.value <= 1 || props.disabled
-        const nextDisabled = validatedCurrentPage.value >= totalPages.value || props.disabled
-
+        // Simple mode: current / total
         elements.push(
-          h(
-            'button',
-            {
-              type: 'button',
-              class: getPaginationButtonBaseClasses(props.size),
-              disabled: prevDisabled,
-              onClick: () => handlePageChange(validatedCurrentPage.value - 1),
-              'aria-label': labels.value.prevPageAriaLabel
-            },
-            '‹'
-          )
-        )
-
-        elements.push(
-          h(
-            'span',
-            {
-              class: classNames(
-                'mx-2',
-                props.size === 'small'
-                  ? 'text-sm'
-                  : props.size === 'large'
-                    ? 'text-lg'
-                    : 'text-base'
-              )
-            },
-            `${validatedCurrentPage.value} / ${totalPages.value}`
-          )
-        )
-
-        elements.push(
-          h(
-            'button',
-            {
-              type: 'button',
-              class: getPaginationButtonBaseClasses(props.size),
-              disabled: nextDisabled,
-              onClick: () => handlePageChange(validatedCurrentPage.value + 1),
-              'aria-label': labels.value.nextPageAriaLabel
-            },
-            '›'
-          )
+          h('span', { class: classNames('mx-2', getSizeTextClasses(size)) }, `${page} / ${pages}`)
         )
       } else {
-        // Full mode: prev, page numbers, next
-        const prevDisabled = validatedCurrentPage.value <= 1 || props.disabled
-        const nextDisabled = validatedCurrentPage.value >= totalPages.value || props.disabled
-
-        elements.push(
-          h(
-            'button',
-            {
-              type: 'button',
-              class: getPaginationButtonBaseClasses(props.size),
-              disabled: prevDisabled,
-              onClick: () => handlePageChange(validatedCurrentPage.value - 1),
-              'aria-label': labels.value.prevPageAriaLabel
-            },
-            '‹'
-          )
-        )
-
-        const pageNumbers = getPageNumbers(
-          validatedCurrentPage.value,
-          totalPages.value,
-          props.showLessItems
-        )
-        pageNumbers.forEach((pageNum) => {
+        // Full mode: page number buttons
+        getPageNumbers(page, pages, props.showLessItems).forEach((pageNum) => {
           if (pageNum === '...') {
             elements.push(
               h(
                 'span',
-                {
-                  class: getPaginationEllipsisClasses(props.size),
-                  'aria-hidden': 'true'
-                },
+                { class: getPaginationEllipsisClasses(size), 'aria-hidden': 'true' },
                 '...'
               )
             )
           } else {
-            const isActive = pageNum === validatedCurrentPage.value
+            const isActive = pageNum === page
             elements.push(
               h(
                 'button',
                 {
                   type: 'button',
                   class: classNames(
-                    getPaginationButtonBaseClasses(props.size),
+                    getPaginationButtonBaseClasses(size),
                     isActive && getPaginationButtonActiveClasses()
                   ),
                   disabled: props.disabled,
@@ -461,97 +405,66 @@ export const Pagination = defineComponent({
             )
           }
         })
-
-        elements.push(
-          h(
-            'button',
-            {
-              type: 'button',
-              class: getPaginationButtonBaseClasses(props.size),
-              disabled: nextDisabled,
-              onClick: () => handlePageChange(validatedCurrentPage.value + 1),
-              'aria-label': labels.value.nextPageAriaLabel
-            },
-            '›'
-          )
-        )
       }
 
+      // Next button
+      elements.push(
+        h(
+          'button',
+          {
+            type: 'button',
+            class: getPaginationButtonBaseClasses(size),
+            disabled: nextDisabled,
+            onClick: () => handlePageChange(page + 1),
+            'aria-label': labels.value.nextPageAriaLabel
+          },
+          '›'
+        )
+      )
+
+      // Page size selector
       if (props.showSizeChanger) {
         elements.push(
           h(
             'select',
             {
-              class: getPageSizeSelectorClasses(props.size),
+              class: getPageSizeSelectorClasses(size),
               disabled: props.disabled,
               value: currentPageSize.value,
               onChange: (e: Event) => {
-                const target = e.target as HTMLSelectElement
-                handlePageSizeChange(parseInt(target.value, 10))
+                handlePageSizeChange(parseInt((e.target as HTMLSelectElement).value, 10))
               },
               'aria-label': labels.value.itemsPerPageText
             },
             normalizedPageSizeOptions.value.map((sizeOption) =>
-              h(
-                'option',
-                {
-                  value: sizeOption.value,
-                  key: sizeOption.value
-                },
-                sizeOption.label
-              )
+              h('option', { value: sizeOption.value, key: sizeOption.value }, sizeOption.label)
             )
           )
         )
       }
 
+      // Quick jumper
       if (props.showQuickJumper) {
+        const sizeText = getSizeTextClasses(size)
         elements.push(
-          h(
-            'span',
-            {
-              class: classNames(
-                'ml-2',
-                props.size === 'small'
-                  ? 'text-sm'
-                  : props.size === 'large'
-                    ? 'text-lg'
-                    : 'text-base'
-              )
-            },
-            labels.value.jumpToText
-          )
+          h('span', { class: classNames('ml-2', sizeText) }, labels.value.jumpToText)
         )
         elements.push(
           h('input', {
             type: 'number',
-            class: classNames(getQuickJumperInputClasses(props.size), 'mx-2'),
+            class: classNames(getQuickJumperInputClasses(size), 'mx-2'),
             disabled: props.disabled,
             value: quickJumperValue.value,
             onInput: (e: Event) => {
-              const target = e.target as HTMLInputElement
-              quickJumperValue.value = target.value
+              quickJumperValue.value = (e.target as HTMLInputElement).value
             },
             onKeydown: handleQuickJumperKeypress,
             min: 1,
-            max: totalPages.value,
+            max: pages,
             'aria-label': labels.value.jumpToText
           })
         )
-        elements.push(
-          h(
-            'span',
-            {
-              class:
-                props.size === 'small'
-                  ? 'text-sm'
-                  : props.size === 'large'
-                    ? 'text-lg'
-                    : 'text-base'
-            },
-            labels.value.pageText
-          )
-        )
+        elements.push(h('span', { class: sizeText }, labels.value.pageText))
       }
 
       const {

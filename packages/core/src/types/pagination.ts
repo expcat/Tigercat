@@ -119,8 +119,8 @@ export interface PaginationProps {
   hideOnSinglePage?: boolean
 
   /**
-   * Number of page buttons to show on each side of current page
-   * @default 2
+   * Whether to show fewer page buttons around current page
+   * @default false
    */
   showLessItems?: boolean
 
