@@ -5,8 +5,7 @@ import {
   provide,
   PropType,
   h,
-  reactive,
-  watch
+  reactive
 } from 'vue'
 import {
   classNames,
@@ -148,34 +147,15 @@ export const Collapse = defineComponent({
       )
     })
 
-    // Provide collapse context to child components (make it reactive)
+    // Provide collapse context to child components (reactive getters auto-track dependencies)
     const collapseContextValue = reactive<CollapseContext>({
-      activeKeys: currentActiveKeys.value,
-      accordion: props.accordion,
-      expandIconPosition: props.expandIconPosition,
-      bordered: props.bordered,
-      ghost: props.ghost,
+      get activeKeys() { return currentActiveKeys.value },
+      get accordion() { return props.accordion },
+      get expandIconPosition() { return props.expandIconPosition },
+      get bordered() { return props.bordered },
+      get ghost() { return props.ghost },
       handlePanelClick
     })
-
-    // Watch props that need to sync to context
-    watch(
-      () =>
-        [
-          currentActiveKeys.value,
-          props.accordion,
-          props.expandIconPosition,
-          props.bordered,
-          props.ghost
-        ] as const,
-      ([activeKeys, accordion, expandIconPosition, bordered, ghost]) => {
-        collapseContextValue.activeKeys = activeKeys
-        collapseContextValue.accordion = accordion
-        collapseContextValue.expandIconPosition = expandIconPosition
-        collapseContextValue.bordered = bordered
-        collapseContextValue.ghost = ghost
-      }
-    )
 
     provide<CollapseContext>(CollapseContextKey, collapseContextValue)
 

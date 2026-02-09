@@ -78,11 +78,6 @@ export const collapseIconPositionClasses = {
 export const collapseHeaderTextClasses = 'flex-1 font-medium text-gray-900'
 
 /**
- * Collapse extra content classes
- */
-export const collapseExtraClasses = 'ml-auto'
-
-/**
  * Get collapse container classes
  */
 export function getCollapseContainerClasses(
@@ -102,14 +97,14 @@ export function getCollapseContainerClasses(
     classes.push(className)
   }
 
-  return classes.filter(Boolean).join(' ')
+  return classes.join(' ')
 }
 
 /**
  * Get collapse panel classes
  */
 export function getCollapsePanelClasses(ghost: boolean, className?: string): string {
-  const classes = []
+  const classes: string[] = []
 
   if (!ghost) {
     classes.push(collapsePanelBaseClasses)
@@ -119,7 +114,7 @@ export function getCollapsePanelClasses(ghost: boolean, className?: string): str
     classes.push(className)
   }
 
-  return classes.filter(Boolean).join(' ')
+  return classes.join(' ')
 }
 
 /**
@@ -142,7 +137,7 @@ export function getCollapsePanelHeaderClasses(
     classes.push(className)
   }
 
-  return classes.filter(Boolean).join(' ')
+  return classes.join(' ')
 }
 
 /**
@@ -163,7 +158,7 @@ export function getCollapseIconClasses(
     classes.push(className)
   }
 
-  return classes.filter(Boolean).join(' ')
+  return classes.join(' ')
 }
 
 /**
@@ -213,11 +208,4 @@ export function togglePanelKey(
   }
 }
 
-/**
- * Right arrow SVG icon for collapse
- */
-export const collapseRightArrowIcon = `
-<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-`.trim()
+

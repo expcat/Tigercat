@@ -76,7 +76,7 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
     if (!disabled) {
       collapseContext.handlePanelClick(panelKey)
     }
-  }, [disabled, collapseContext, panelKey])
+  }, [disabled, collapseContext.handlePanelClick, panelKey])
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
@@ -90,7 +90,7 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
         collapseContext.handlePanelClick(panelKey)
       }
     },
-    [disabled, collapseContext, panelKey]
+    [disabled, collapseContext.handlePanelClick, panelKey]
   )
 
   // Arrow icon
