@@ -576,7 +576,8 @@ export const AreaChart = defineComponent({
                     opacity: sd.opacity,
                     class: classNames(
                       sd.series.className,
-                      (props.hoverable || props.selectable) && 'cursor-pointer'
+                      (props.hoverable || props.selectable) && 'cursor-pointer',
+                      'outline-none'
                     ),
                     onMouseenter: (e: MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e),
                     onMouseleave: handleSeriesHoverLeave,

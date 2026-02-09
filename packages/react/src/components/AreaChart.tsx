@@ -426,7 +426,11 @@ export const AreaChart: React.FC<AreaChartProps> = ({
           name={sd.series.name}
           type="area"
           opacity={sd.opacity}
-          className={classNames(sd.series.className, (hoverable || selectable) && 'cursor-pointer')}
+          className={classNames(
+            sd.series.className,
+            (hoverable || selectable) && 'cursor-pointer',
+            'outline-none'
+          )}
           onMouseEnter={(e: React.MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e)}
           onMouseLeave={handleSeriesHoverLeave}
           onClick={() => handleSeriesSelect(sd.seriesIndex)}
