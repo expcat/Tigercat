@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, type VNode, type VNodeArrayChildren } from 'vue'
+import { defineComponent, computed, h, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -19,7 +19,7 @@ import {
   type DescriptionsItem
 } from '@expcat/tigercat-core'
 
-type RawChildren = string | number | boolean | VNode | VNodeArrayChildren | (() => unknown)
+type HChildren = Parameters<typeof h>[2]
 
 export interface VueDescriptionsProps {
   title?: string | number
@@ -127,7 +127,7 @@ export const Descriptions = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const descriptionsClasses = computed(() => {
-      return getDescriptionsClasses(props.bordered, props.size)
+      return getDescriptionsClasses(props.size)
     })
 
     const tableClasses = computed(() => {
@@ -148,7 +148,7 @@ export const Descriptions = defineComponent({
           ? h(
               'div',
               { class: descriptionsExtraClasses },
-              slots.extra?.() || ((props.extra ?? undefined) as unknown as RawChildren)
+              slots.extra?.() || (props.extra as HChildren)
             )
           : null
       ])
@@ -174,7 +174,7 @@ export const Descriptions = defineComponent({
 
     // Render a single row in horizontal layout
     function renderRow(rowItems: DescriptionsItem[]) {
-      const cells: VNode[] = []
+      const cells: ReturnType<typeof h>[] = []
 
       rowItems.forEach((item) => {
         const span = Math.min(item.span || 1, props.column)
@@ -195,7 +195,7 @@ export const Descriptions = defineComponent({
               class: labelClass,
               style: props.labelStyle
             },
-            [item.label, props.colon && props.layout === 'horizontal' ? ':' : '']
+            [item.label, props.colon ? ':' : '']
           )
         )
 
@@ -208,7 +208,7 @@ export const Descriptions = defineComponent({
               style: props.contentStyle,
               colspan: span > 1 ? span * 2 - 1 : 1
             },
-            (item.content ?? undefined) as unknown as RawChildren
+            item.content as HChildren
           )
         )
       })
@@ -269,13 +269,13 @@ export const Descriptions = defineComponent({
               class: contentClass,
               style: props.contentStyle
             },
-            (item.content ?? undefined) as unknown as RawChildren
+            item.content as HChildren
           )
         ])
       }
 
       // Simple div for non-bordered layout
-      const itemClasses = getDescriptionsVerticalItemClasses(props.bordered, props.size)
+      const itemClasses = getDescriptionsVerticalItemClasses(props.size)
       return h('div', { class: itemClasses }, [
         h(
           'dt',
@@ -291,7 +291,7 @@ export const Descriptions = defineComponent({
             class: contentClass,
             style: props.contentStyle
           },
-          (item.content ?? undefined) as unknown as RawChildren
+          item.content as HChildren
         )
       ])
     }

@@ -313,3 +313,78 @@ const handleBeforeChange = (current, next) => {
 }
 </script>
 ```
+
+---
+
+## Descriptions 描述列表
+
+### 基础用法
+
+```vue
+<template>
+  <Descriptions title="用户信息" :items="items" />
+</template>
+<script setup>
+const items = [
+  { label: '姓名', content: '张三' },
+  { label: '电话', content: '1234567890' },
+  { label: '邮箱', content: 'zhangsan@example.com' }
+]
+</script>
+```
+
+### 带边框 + 自定义列数
+
+```vue
+<template>
+  <Descriptions bordered :column="2" :items="items" />
+</template>
+```
+
+### 垂直布局
+
+```vue
+<template>
+  <Descriptions layout="vertical" :items="items" />
+  <Descriptions layout="vertical" bordered :items="items" />
+</template>
+```
+
+### Extra 插槽 + 跨列 + 无冒号
+
+```vue
+<template>
+  <Descriptions title="订单" bordered :column="3" :colon="false" :items="orderItems">
+    <template #extra><Button size="sm">编辑</Button></template>
+  </Descriptions>
+</template>
+<script setup>
+const orderItems = [
+  { label: '订单号', content: 'ORDER-001' },
+  { label: '地址', content: '上海市浦东新区', span: 2 }
+]
+</script>
+```
+
+### 自定义样式 + Item 级 class
+
+```vue
+<template>
+  <Descriptions
+    bordered
+    :column="2"
+    :items="items"
+    :labelStyle="{ fontWeight: '600' }"
+    :contentStyle="{ color: '#6b7280' }" />
+</template>
+<script setup>
+const items = [
+  {
+    label: '高亮',
+    content: '重要信息',
+    labelClassName: 'text-red-600',
+    contentClassName: 'font-bold'
+  }
+]
+</script>
+```

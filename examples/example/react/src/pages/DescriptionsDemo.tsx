@@ -22,6 +22,8 @@ const styleSnippet = `<Descriptions bordered column={2} items={userInfo} labelSt
 
 const colonSnippet = `<Descriptions title="服务器配置" colon={false} bordered items={serverConfig} />`
 
+const itemClassSnippet = `<Descriptions bordered column={2} items={highlightItems} />`
+
 export default function DescriptionsDemo() {
   // Basic user information
   const userInfo = [
@@ -66,6 +68,19 @@ export default function DescriptionsDemo() {
     { label: '带宽', content: '10 Mbps' },
     { label: '操作系统', content: 'Ubuntu 20.04 LTS' },
     { label: 'IP 地址', content: '192.168.1.100' }
+  ]
+
+  // Items with per-item custom classes
+  const highlightItems = [
+    {
+      label: '状态',
+      content: '运行中',
+      labelClassName: 'text-blue-600',
+      contentClassName: 'text-green-600 font-semibold'
+    },
+    { label: '告警', content: '2 条未处理', contentClassName: 'text-amber-600' },
+    { label: '错误', content: '无', contentClassName: 'text-gray-400' },
+    { label: 'CPU 使用率', content: '68%' }
   ]
 
   return (
@@ -185,6 +200,15 @@ export default function DescriptionsDemo() {
         code={colonSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Descriptions title="服务器配置" colon={false} bordered items={serverConfig} />
+        </div>
+      </DemoBlock>
+
+      <DemoBlock
+        title="Item 级自定义 class"
+        description="通过 labelClassName / contentClassName 为单个描述项设置独立样式。"
+        code={itemClassSnippet}>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <Descriptions bordered column={2} items={highlightItems} />
         </div>
       </DemoBlock>
     </div>

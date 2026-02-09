@@ -211,3 +211,41 @@ description: Shared props definitions for data display components - Table, Timel
 ---
 
 > **See also**: [Vue examples](../vue/data.md) · [React examples](../react/data.md)
+
+---
+
+## Descriptions 描述列表
+
+### Props
+
+| Prop         | Type                         | Default        | Vue | React | Description      |
+| ------------ | ---------------------------- | -------------- | :-: | :---: | ---------------- |
+| title        | `string` / `ReactNode`       | -              |  ✓  |   ✓   | 标题             |
+| extra        | `unknown` / `ReactNode`      | -              |  ✓  |   ✓   | 标题右侧额外内容 |
+| bordered     | `boolean`                    | `false`        |  ✓  |   ✓   | 显示边框         |
+| column       | `number`                     | `3`            |  ✓  |   ✓   | 每行列数         |
+| size         | `'sm' \| 'md' \| 'lg'`       | `'md'`         |  ✓  |   ✓   | 尺寸             |
+| layout       | `'horizontal' \| 'vertical'` | `'horizontal'` |  ✓  |   ✓   | 布局方向         |
+| colon        | `boolean`                    | `true`         |  ✓  |   ✓   | 标签后显示冒号   |
+| labelStyle   | `CSSProperties`              | -              |  ✓  |   ✓   | 标签全局样式     |
+| contentStyle | `CSSProperties`              | -              |  ✓  |   ✓   | 内容全局样式     |
+| items        | `DescriptionsItem[]`         | `[]`           |  ✓  |   ✓   | 数据项           |
+| className    | `string`                     | -              |  ✓  |   ✓   | 额外 CSS class   |
+
+### DescriptionsItem
+
+| Prop             | Type      | Default  | Description      |
+| ---------------- | --------- | -------- | ---------------- |
+| label            | `string`  | required | 标签文本         |
+| content          | `unknown` | -        | 内容             |
+| span             | `number`  | `1`      | 跨列数           |
+| labelClassName   | `string`  | -        | 标签自定义 class |
+| contentClassName | `string`  | -        | 内容自定义 class |
+
+### Slots (Vue) / Props (React)
+
+| Vue Slot  | React Prop | Description    |
+| --------- | ---------- | -------------- |
+| `title`   | `title`    | 标题内容       |
+| `extra`   | `extra`    | 额外操作区域   |
+| `default` | `children` | 自定义附加内容 |

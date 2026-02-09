@@ -306,3 +306,71 @@ const handleBeforeChange = (current: number, next: number) => {
   <div className="h-48 bg-green-500">Slide 2</div>
 </Carousel>
 ```
+
+---
+
+## Descriptions 描述列表
+
+### 基础用法
+
+```tsx
+const items = [
+  { label: '姓名', content: '张三' },
+  { label: '电话', content: '1234567890' },
+  { label: '邮箱', content: 'zhangsan@example.com' }
+]
+
+;<Descriptions title="用户信息" items={items} />
+```
+
+### 带边框 + 自定义列数
+
+```tsx
+<Descriptions bordered column={2} items={items} />
+```
+
+### 垂直布局
+
+```tsx
+<Descriptions layout="vertical" items={items} />
+<Descriptions layout="vertical" bordered items={items} />
+```
+
+### Extra + 跨列 + 无冒号
+
+```tsx
+const orderItems = [
+  { label: '订单号', content: 'ORDER-001' },
+  { label: '地址', content: '上海市浦东新区', span: 2 }
+]
+
+;<Descriptions
+  title="订单"
+  bordered
+  column={3}
+  colon={false}
+  items={orderItems}
+  extra={<Button size="sm">编辑</Button>}
+/>
+```
+
+### 自定义样式 + Item 级 class
+
+```tsx
+const items = [
+  {
+    label: '高亮',
+    content: '重要信息',
+    labelClassName: 'text-red-600',
+    contentClassName: 'font-bold'
+  }
+]
+
+;<Descriptions
+  bordered
+  column={2}
+  items={items}
+  labelStyle={{ fontWeight: 600 }}
+  contentStyle={{ color: '#6b7280' }}
+/>
+```

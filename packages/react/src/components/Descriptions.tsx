@@ -119,7 +119,7 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
       cells.push(
         <th key={`${key}-label`} className={labelClass} style={labelStyle}>
           {item.label}
-          {colon && layout === 'horizontal' ? ':' : ''}
+          {colon ? ':' : ''}
         </th>
       )
 
@@ -177,7 +177,7 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
       )
     }
 
-    const itemClasses = getDescriptionsVerticalItemClasses(bordered, size)
+    const itemClasses = getDescriptionsVerticalItemClasses(size)
     return (
       <div key={index} className={itemClasses}>
         <dt className={labelClass} style={labelStyle}>
@@ -215,7 +215,7 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
 
   const descriptionsClasses = classNames(
     descriptionsWrapperClasses,
-    getDescriptionsClasses(bordered, size),
+    getDescriptionsClasses(size),
     className
   )
 

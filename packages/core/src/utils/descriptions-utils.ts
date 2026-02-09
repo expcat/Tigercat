@@ -22,11 +22,6 @@ export const descriptionsTableClasses = 'w-full border-collapse'
 export const descriptionsTableBorderedClasses = 'border border-[var(--tiger-border,#e5e7eb)]'
 
 /**
- * Descriptions row classes
- */
-export const descriptionsRowClasses = ''
-
-/**
  * Size classes for descriptions cells
  */
 export const descriptionsCellSizeClasses: Record<DescriptionsSize, string> = {
@@ -47,7 +42,7 @@ export const descriptionsContentBorderedClasses = 'border border-[var(--tiger-bo
 /**
  * Vertical layout wrapper classes
  */
-export const descriptionsVerticalWrapperClasses = 'space-y-0'
+export const descriptionsVerticalWrapperClasses = ''
 
 /**
  * Vertical layout item classes
@@ -68,12 +63,11 @@ export const descriptionsVerticalContentClasses = 'text-[var(--tiger-text,#11182
 
 /**
  * Get descriptions container classes
- * @param bordered - Whether to show border
  * @param size - Descriptions size
  * @returns Combined class string
  */
-export function getDescriptionsClasses(bordered: boolean, size: DescriptionsSize): string {
-  return [descriptionsBaseClasses, descriptionsSizeClasses[size]].join(' ')
+export function getDescriptionsClasses(size: DescriptionsSize): string {
+  return `${descriptionsBaseClasses} ${descriptionsSizeClasses[size]}`
 }
 
 /**
@@ -137,19 +131,11 @@ export function getDescriptionsContentClasses(
 
 /**
  * Get descriptions vertical item classes
- * @param bordered - Whether to show border
  * @param size - Descriptions size
  * @returns Combined class string
  */
-export function getDescriptionsVerticalItemClasses(
-  bordered: boolean,
-  size: DescriptionsSize
-): string {
-  const classes = [descriptionsCellSizeClasses[size]]
-  if (!bordered) {
-    classes.push(descriptionsVerticalItemClasses)
-  }
-  return classes.join(' ')
+export function getDescriptionsVerticalItemClasses(size: DescriptionsSize): string {
+  return `${descriptionsCellSizeClasses[size]} ${descriptionsVerticalItemClasses}`
 }
 
 /**
