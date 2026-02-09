@@ -495,7 +495,7 @@ describe('Tree', () => {
     })
 
     it('should highlight matched nodes', async () => {
-      const { getByText, rerender } = render(Tree, {
+      const { getByText } = render(Tree, {
         props: {
           treeData: sampleTreeData,
           filterValue: 'Parent 1'
@@ -604,6 +604,66 @@ describe('Tree', () => {
       })
 
       await expectNoA11yViolations(container)
+    })
+  })
+
+  describe('Controlled Mode', () => {
+    it('should work in controlled mode for expanded keys', async () => {
+      const onExpand = vi.fn()
+
+      const { getByText, queryByText, rerender } = render(Tree, {
+        props: {
+          treeData: sampleTreeData,
+          expandedKeys: [] as (string | number)[],
+          onExpand
+        }
+      })
+
+      expect(queryByText('Child 1-1')).not.toBeInTheDocument()
+
+      const parent1 = getByText('Parent 1')
+      const expandIcon = parent1.parentElement?.querySelector('svg')
+
+      if (expandIcon) {
+        await fireEvent.click(expandIcon)
+        await nextTick()
+      }
+
+      expect(onExpand).toHaveBeenCalled()
+
+      // Manually update expandedKeys
+      await rerender({ expandedKeys: ['1'] })
+      await nextTick()
+
+      expect(getByText('Child 1-1')).toBeInTheDocument()
+    })
+
+    it('should work in controlled mode for checked keys', async () => {
+      const onCheck = vi.fn()
+
+      const { container, rerender } = render(Tree, {
+        props: {
+          treeData: sampleTreeData,
+          checkable: true,
+          checkedKeys: [] as (string | number)[],
+          onCheck
+        }
+      })
+
+      const checkbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
+      expect(checkbox.checked).toBe(false)
+
+      await fireEvent.click(checkbox)
+      await nextTick()
+
+      expect(onCheck).toHaveBeenCalled()
+
+      // Manually update checkedKeys
+      await rerender({ checkedKeys: ['1'] })
+      await nextTick()
+
+      const updatedCheckbox = container.querySelector('input[type="checkbox"]') as HTMLInputElement
+      expect(updatedCheckbox.checked).toBe(true)
     })
   })
 

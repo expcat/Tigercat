@@ -4,6 +4,7 @@
  */
 
 import type { TreeNode, TreeCheckedState, TreeCheckStrategy, TreeFilterFn } from '../types/tree'
+import { classNames } from './class-names'
 
 export interface VisibleTreeItem {
   key: string | number
@@ -62,7 +63,7 @@ export const treeNodeHoverClasses = 'hover:bg-gray-50'
  * Tree node selected classes
  */
 export const treeNodeSelectedClasses =
-  'bg-[var(--tiger-primary,#2563eb)] bg-opacity-10 text-[var(--tiger-primary,#2563eb)]'
+  'bg-[color-mix(in_srgb,var(--tiger-primary,#2563eb)_10%,transparent)] text-[var(--tiger-primary,#2563eb)]'
 
 /**
  * Tree node disabled classes
@@ -133,25 +134,13 @@ export function getTreeNodeClasses(
   disabled: boolean,
   blockNode = false
 ): string {
-  const classes = [treeNodeContentClasses]
-
-  if (!disabled) {
-    classes.push(treeNodeHoverClasses)
-  }
-
-  if (selected) {
-    classes.push(treeNodeSelectedClasses)
-  }
-
-  if (disabled) {
-    classes.push(treeNodeDisabledClasses)
-  }
-
-  if (blockNode) {
-    classes.push('w-full')
-  }
-
-  return classes.join(' ')
+  return classNames(
+    treeNodeContentClasses,
+    !disabled && treeNodeHoverClasses,
+    selected && treeNodeSelectedClasses,
+    disabled && treeNodeDisabledClasses,
+    blockNode && 'w-full'
+  )
 }
 
 /**
@@ -160,39 +149,7 @@ export function getTreeNodeClasses(
  * @returns Combined class string for expand icon
  */
 export function getTreeNodeExpandIconClasses(expanded: boolean): string {
-  const classes = [treeNodeExpandIconClasses]
-
-  if (expanded) {
-    classes.push(treeNodeExpandIconExpandedClasses)
-  }
-
-  return classes.join(' ')
-}
-
-/**
- * Flatten tree data to a flat array
- * @param treeData - Tree data
- * @param expandedKeys - Expanded node keys
- * @returns Flattened array of nodes with level information
- */
-export function flattenTree(
-  treeData: TreeNode[],
-  expandedKeys: Set<string | number> = new Set()
-): Array<TreeNode & { level: number; parentKey?: string | number }> {
-  const result: Array<TreeNode & { level: number; parentKey?: string | number }> = []
-
-  function traverse(nodes: TreeNode[], level = 0, parentKey?: string | number) {
-    nodes.forEach((node) => {
-      result.push({ ...node, level, parentKey })
-
-      if (node.children && node.children.length > 0 && expandedKeys.has(node.key)) {
-        traverse(node.children, level + 1, node.key)
-      }
-    })
-  }
-
-  traverse(treeData)
-  return result
+  return classNames(treeNodeExpandIconClasses, expanded && treeNodeExpandIconExpandedClasses)
 }
 
 /**
@@ -560,21 +517,15 @@ export function getAutoExpandKeys(
 }
 
 /**
- * Default expand icon SVG
+ * Create Set-based lookup from TreeCheckedState for O(1) per-node checks.
+ * Use this in render loops instead of Array.includes() for better performance.
  */
-export const defaultExpandIcon = (expanded: boolean) => `
-  <svg class="${getTreeNodeExpandIconClasses(
-    expanded
-  )}" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-    <path d="M6 4l4 4-4 4V4z"/>
-  </svg>
-`
-
-/**
- * Default checkbox icon SVG (indeterminate state)
- */
-export const defaultIndeterminateIcon = `
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-    <rect x="4" y="7" width="8" height="2" rx="1"/>
-  </svg>
-`
+export function checkedSetsFromState(state: TreeCheckedState): {
+  checkedSet: Set<string | number>
+  halfCheckedSet: Set<string | number>
+} {
+  return {
+    checkedSet: new Set(state.checked),
+    halfCheckedSet: new Set(state.halfChecked)
+  }
+}

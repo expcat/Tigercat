@@ -106,6 +106,12 @@ const filterTreeData = ref<TreeNode[]>([
   }
 ])
 
+// Multiple selection data
+const multiSelectedKeys = ref<(string | number)[]>([])
+
+// Controlled expanded keys
+const controlledExpandedKeys = ref<(string | number)[]>(['1'])
+
 const basicSnippet = `<Tree :treeData="basicTreeData" ariaLabel="Tree 基本用法" />`
 
 const expandAllSnippet = `<Tree :treeData="basicTreeData" defaultExpandAll />`
@@ -135,6 +141,23 @@ const lazySnippet = `<p class="text-sm text-gray-600 mb-4">点击节点展开，
 
 const filterSnippet = `<Input v-model="filterValue" placeholder="搜索节点..." class="mb-4" />
 <Tree :treeData="filterTreeData" :filterValue="filterValue" ariaLabel="Tree 节点过滤" />`
+
+const showLineSnippet = `<Tree :treeData="basicTreeData" showLine defaultExpandAll />`
+
+const multiSelectSnippet = `<p class="text-sm text-gray-600 mb-4">已选择: {{ multiSelectedKeys.join(', ') }}</p>
+<Tree
+  :treeData="basicTreeData"
+  selectionMode="multiple"
+  defaultExpandAll
+  v-model:selectedKeys="multiSelectedKeys" />`
+
+const controlledExpandSnippet = `<p class="text-sm text-gray-600 mb-4">展开节点: {{ controlledExpandedKeys.join(', ') }}</p>
+<Tree
+  :treeData="basicTreeData"
+  :expandedKeys="controlledExpandedKeys"
+  @expand="(keys) => controlledExpandedKeys = keys" />`
+
+const emptySnippet = `<Tree :treeData="[]" emptyText="暂无数据" />`
 
 const blockSnippet = `<p class="text-sm text-gray-600 mb-4">节点占据整行宽度</p>
 <Tree :treeData="basicTreeData" blockNode defaultExpandAll />`
@@ -217,6 +240,40 @@ const blockSnippet = `<p class="text-sm text-gray-600 mb-4">节点占据整行�
       <Tree :treeData="filterTreeData"
             :filterValue="filterValue"
             ariaLabel="Tree 节点过滤" />
+    </DemoBlock>
+
+    <DemoBlock title="连接线"
+               description="显示节点连接线。"
+               :code="showLineSnippet">
+      <Tree :treeData="basicTreeData"
+            showLine
+            defaultExpandAll />
+    </DemoBlock>
+
+    <DemoBlock title="多选（selectionMode）"
+               description="通过 selectionMode='multiple' 支持多选。"
+               :code="multiSelectSnippet">
+      <p class="text-sm text-gray-600 mb-4">已选择: {{ multiSelectedKeys.join(', ') }}</p>
+      <Tree :treeData="basicTreeData"
+            selectionMode="multiple"
+            defaultExpandAll
+            v-model:selectedKeys="multiSelectedKeys" />
+    </DemoBlock>
+
+    <DemoBlock title="受控展开"
+               description="通过 expandedKeys 外部控制展开状态。"
+               :code="controlledExpandSnippet">
+      <p class="text-sm text-gray-600 mb-4">展开节点: {{ controlledExpandedKeys.join(', ') }}</p>
+      <Tree :treeData="basicTreeData"
+            :expandedKeys="controlledExpandedKeys"
+            @expand="(keys: (string | number)[]) => controlledExpandedKeys = keys" />
+    </DemoBlock>
+
+    <DemoBlock title="空数据"
+               description="自定义空数据提示文案。"
+               :code="emptySnippet">
+      <Tree :treeData="[]"
+            emptyText="暂无数据" />
     </DemoBlock>
 
     <DemoBlock title="Block 节点"

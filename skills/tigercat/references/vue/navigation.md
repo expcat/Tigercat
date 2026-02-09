@@ -62,7 +62,9 @@ import { h } from 'vue'
 import { Breadcrumb, BreadcrumbItem } from '@expcat/tigercat-vue'
 
 const homeIcon = h('svg', { class: 'w-4 h-4', fill: 'currentColor', viewBox: '0 0 20 20' }, [
-  h('path', { d: 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z' })
+  h('path', {
+    d: 'M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z'
+  })
 ])
 </script>
 ```
@@ -172,7 +174,11 @@ const handleDelete = () => console.log('delete')
   </Menu>
 
   <!-- 内联模式 + 自定义缩进 -->
-  <Menu mode="inline" :inline-indent="32" v-model:selected-keys="selectedKeys" v-model:open-keys="openKeys">
+  <Menu
+    mode="inline"
+    :inline-indent="32"
+    v-model:selected-keys="selectedKeys"
+    v-model:open-keys="openKeys">
     <SubMenu itemKey="sub1" title="分类一">
       <MenuItem itemKey="1">子项 1</MenuItem>
       <SubMenu itemKey="sub1-1" title="分类一-一">
@@ -272,8 +278,14 @@ const collapsed = ref(false)
   <Pagination v-model:current="page" :total="100" :pageSize="10" />
 
   <!-- 完整功能：条数选择 + 快速跳页 -->
-  <Pagination v-model:current="page" v-model:pageSize="pageSize" :total="500"
-    showSizeChanger showQuickJumper @change="handleChange" @page-size-change="handleSizeChange" />
+  <Pagination
+    v-model:current="page"
+    v-model:pageSize="pageSize"
+    :total="500"
+    showSizeChanger
+    showQuickJumper
+    @change="handleChange"
+    @page-size-change="handleSizeChange" />
 
   <!-- 简洁模式 -->
   <Pagination v-model:current="page" :total="500" simple />
@@ -293,10 +305,18 @@ const collapsed = ref(false)
   <Pagination v-model:current="page" :total="500" showLessItems />
 
   <!-- 自定义总条数文本 -->
-  <Pagination v-model:current="page" :total="100" :totalText="(total, range) => `${range[0]}-${range[1]} / ${total}`" />
+  <Pagination
+    v-model:current="page"
+    :total="100"
+    :totalText="(total, range) => `${range[0]}-${range[1]} / ${total}`" />
 
   <!-- 国际化 -->
-  <Pagination v-model:current="page" :total="500" :locale="{ pagination: customLabels }" showQuickJumper showSizeChanger />
+  <Pagination
+    v-model:current="page"
+    :total="500"
+    :locale="{ pagination: customLabels }"
+    showQuickJumper
+    showSizeChanger />
 </template>
 ```
 
@@ -338,15 +358,56 @@ const collapsed = ref(false)
 
 ```vue
 <template>
-  <Tree :data="treeData" v-model:expanded-keys="expandedKeys" v-model:checked-keys="checkedKeys" checkable />
+  <!-- 基本用法 -->
+  <Tree :treeData="treeData" ariaLabel="基本树" />
+
+  <!-- 默认展开全部 -->
+  <Tree :treeData="treeData" defaultExpandAll />
+
+  <!-- 可选择 -->
+  <Tree :treeData="treeData" selectable v-model:selectedKeys="selectedKeys" />
+
+  <!-- 多选树（级联勾选） -->
+  <Tree :treeData="treeData" checkable defaultExpandAll v-model:checkedKeys="checkedKeys" />
+
+  <!-- 父子独立勾选 -->
+  <Tree
+    :treeData="treeData"
+    checkable
+    checkStrictly
+    defaultExpandAll
+    v-model:checkedKeys="strictKeys" />
+
+  <!-- 连接线 -->
+  <Tree :treeData="treeData" showLine defaultExpandAll />
+
+  <!-- 节点占满整行 -->
+  <Tree :treeData="treeData" blockNode defaultExpandAll />
+
+  <!-- 懒加载 -->
+  <Tree :treeData="lazyData" :loadData="loadChildren" />
+
+  <!-- 过滤节点 -->
+  <Input v-model="filterValue" placeholder="搜索..." />
+  <Tree :treeData="treeData" :filterValue="filterValue" />
+
+  <!-- 受控展开 -->
+  <Tree
+    :treeData="treeData"
+    :expandedKeys="expandedKeys"
+    @expand="(keys) => (expandedKeys = keys)" />
+
+  <!-- selectionMode 多选 -->
+  <Tree :treeData="treeData" selectionMode="multiple" @select="onSelect" />
 </template>
 <script setup>
 const expandedKeys = ref(['node1'])
+const selectedKeys = ref([])
 const checkedKeys = ref([])
+const strictKeys = ref([])
+const filterValue = ref('')
 const treeData = [
-  { key: 'node1', label: 'Node 1', children: [
-    { key: 'node1-1', label: 'Child 1' }
-  ]}
+  { key: 'node1', label: 'Node 1', children: [{ key: 'node1-1', label: 'Child 1' }] }
 ]
 </script>
 ```

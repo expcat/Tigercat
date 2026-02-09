@@ -106,6 +106,12 @@ export default function TreeDemo() {
     }
   ]
 
+  // Multiple selection
+  const [multiSelectedKeys, setMultiSelectedKeys] = useState<(string | number)[]>([])
+
+  // Controlled expanded keys
+  const [controlledExpandedKeys, setControlledExpandedKeys] = useState<(string | number)[]>(['1'])
+
   const handleSelect = (keys: (string | number)[]) => {
     setSelectedKeys(keys)
   }
@@ -153,6 +159,26 @@ export default function TreeDemo() {
   className="mb-4"
 />
 <Tree treeData={filterTreeData} filterValue={filterValue} ariaLabel="Tree 节点过滤" />`
+
+  const showLineSnippet = `<Tree treeData={basicTreeData} showLine defaultExpandAll />`
+
+  const multiSelectSnippet = `<p className="text-sm text-gray-600 mb-4">已选择: {multiSelectedKeys.join(', ')}</p>
+<Tree
+  treeData={basicTreeData}
+  selectionMode="multiple"
+  defaultExpandAll
+  selectedKeys={multiSelectedKeys}
+  onSelect={(keys) => setMultiSelectedKeys(keys)}
+/>`
+
+  const controlledExpandSnippet = `<p className="text-sm text-gray-600 mb-4">展开节点: {controlledExpandedKeys.join(', ')}</p>
+<Tree
+  treeData={basicTreeData}
+  expandedKeys={controlledExpandedKeys}
+  onExpand={(keys) => setControlledExpandedKeys(keys)}
+/>`
+
+  const emptySnippet = `<Tree treeData={[]} emptyText="暂无数据" />`
 
   const blockSnippet = `<p className="text-sm text-gray-600 mb-4">节点占据整行宽度</p>
 <Tree treeData={basicTreeData} blockNode defaultExpandAll />`
@@ -229,6 +255,40 @@ export default function TreeDemo() {
           className="mb-4"
         />
         <Tree treeData={filterTreeData} filterValue={filterValue} ariaLabel="Tree 节点过滤" />
+      </DemoBlock>
+
+      <DemoBlock title="连接线" description="显示节点连接线。" code={showLineSnippet}>
+        <Tree treeData={basicTreeData} showLine defaultExpandAll />
+      </DemoBlock>
+
+      <DemoBlock
+        title="多选（selectionMode）"
+        description="通过 selectionMode='multiple' 支持多选。"
+        code={multiSelectSnippet}>
+        <p className="text-sm text-gray-600 mb-4">已选择: {multiSelectedKeys.join(', ')}</p>
+        <Tree
+          treeData={basicTreeData}
+          selectionMode="multiple"
+          defaultExpandAll
+          selectedKeys={multiSelectedKeys}
+          onSelect={(keys) => setMultiSelectedKeys(keys)}
+        />
+      </DemoBlock>
+
+      <DemoBlock
+        title="受控展开"
+        description="通过 expandedKeys 外部控制展开状态。"
+        code={controlledExpandSnippet}>
+        <p className="text-sm text-gray-600 mb-4">展开节点: {controlledExpandedKeys.join(', ')}</p>
+        <Tree
+          treeData={basicTreeData}
+          expandedKeys={controlledExpandedKeys}
+          onExpand={(keys) => setControlledExpandedKeys(keys)}
+        />
+      </DemoBlock>
+
+      <DemoBlock title="空数据" description="自定义空数据提示文案。" code={emptySnippet}>
+        <Tree treeData={[]} emptyText="暂无数据" />
       </DemoBlock>
 
       <DemoBlock title="Block 节点" description="节点占据整行宽度。" code={blockSnippet}>

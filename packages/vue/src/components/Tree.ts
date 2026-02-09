@@ -25,6 +25,7 @@ import {
   getCheckedKeysByStrategy,
   filterTreeNodes,
   getAutoExpandKeys,
+  checkedSetsFromState,
   type TreeNode,
   type TreeSelectionMode,
   type TreeCheckStrategy,
@@ -357,6 +358,8 @@ export const Tree = defineComponent({
       return internalCheckedState.value
     })
 
+    const checkedSets = computed(() => checkedSetsFromState(computedCheckedState.value))
+
     const visibleItems = computed(() =>
       getVisibleTreeItems(props.treeData, computedExpandedKeys.value, filteredNodeKeys.value)
     )
@@ -544,16 +547,12 @@ export const Tree = defineComponent({
       return undefined
     }
 
-    function renderTreeNode(
-      node: TreeNode,
-      level: number,
-      _parentKey?: string | number
-    ): VNodeChild {
+    function renderTreeNode(node: TreeNode, level: number): VNodeChild {
       const hasChildren = !!(node.children && node.children.length > 0)
       const isExpanded = computedExpandedKeys.value.has(node.key)
       const isSelected = computedSelectedKeys.value.has(node.key)
-      const isChecked = computedCheckedState.value.checked.includes(node.key)
-      const isHalfChecked = computedCheckedState.value.halfChecked.includes(node.key)
+      const isChecked = checkedSets.value.checkedSet.has(node.key)
+      const isHalfChecked = checkedSets.value.halfCheckedSet.has(node.key)
       const isLoading = loadingNodes.value.has(node.key)
       const isFiltered = filteredNodeKeys.value.size > 0
       const isMatched = filteredNodeKeys.value.has(node.key)
@@ -765,7 +764,7 @@ export const Tree = defineComponent({
               {
                 class: classNames(treeNodeChildrenClasses, props.showLine && treeLineClasses)
               },
-              node.children!.map((child) => renderTreeNode(child, level + 1, node.key))
+              node.children!.map((child) => renderTreeNode(child, level + 1))
             )
         ]
       )
@@ -799,7 +798,7 @@ export const Tree = defineComponent({
           'aria-multiselectable': effectiveMultiple.value ? true : undefined,
           ref: rootEl
         },
-        [props.treeData.map((node) => renderTreeNode(node, 0))]
+        props.treeData.map((node) => renderTreeNode(node, 0))
       )
     }
   }

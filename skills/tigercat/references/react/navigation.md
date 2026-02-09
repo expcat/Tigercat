@@ -325,14 +325,49 @@ const [step, setStep] = useState(0)
 
 ```tsx
 const [expandedKeys, setExpandedKeys] = useState(['node1'])
+const [selectedKeys, setSelectedKeys] = useState([])
 const [checkedKeys, setCheckedKeys] = useState([])
+const [strictKeys, setStrictKeys] = useState([])
+const [filterValue, setFilterValue] = useState('')
 const treeData = [
   { key: 'node1', label: 'Node 1', children: [
     { key: 'node1-1', label: 'Child 1' }
   ]}
 ]
 
-<Tree data={treeData} expandedKeys={expandedKeys} onExpand={setExpandedKeys} checkedKeys={checkedKeys} onCheck={setCheckedKeys} checkable />
+// 基本用法
+<Tree treeData={treeData} ariaLabel="基本树" />
+
+// 默认展开全部
+<Tree treeData={treeData} defaultExpandAll />
+
+// 可选择
+<Tree treeData={treeData} selectable selectedKeys={selectedKeys} onSelect={setSelectedKeys} />
+
+// 多选树（级联勾选）
+<Tree treeData={treeData} checkable defaultExpandAll checkedKeys={checkedKeys} onCheck={setCheckedKeys} />
+
+// 父子独立勾选
+<Tree treeData={treeData} checkable checkStrictly defaultExpandAll checkedKeys={strictKeys} onCheck={setStrictKeys} />
+
+// 连接线
+<Tree treeData={treeData} showLine defaultExpandAll />
+
+// 节点占满整行
+<Tree treeData={treeData} blockNode defaultExpandAll />
+
+// 懒加载
+<Tree treeData={lazyData} loadData={loadChildren} />
+
+// 过滤节点
+<Input value={filterValue} onChange={(e) => setFilterValue(e.target.value)} placeholder="搜索..." />
+<Tree treeData={treeData} filterValue={filterValue} />
+
+// 受控展开
+<Tree treeData={treeData} expandedKeys={expandedKeys} onExpand={setExpandedKeys} />
+
+// selectionMode 多选
+<Tree treeData={treeData} selectionMode="multiple" onSelect={handleSelect} />
 ```
 
 ---

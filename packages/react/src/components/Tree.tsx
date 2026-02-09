@@ -23,6 +23,7 @@ import {
   getCheckedKeysByStrategy,
   filterTreeNodes,
   getAutoExpandKeys,
+  checkedSetsFromState,
   type TreeNode,
   type TreeSelectionMode,
   type TreeCheckStrategy,
@@ -364,6 +365,11 @@ export const Tree: React.FC<TreeProps> = ({
     return internalCheckedState
   }, [controlledCheckedKeys, internalCheckedState, treeData, checkStrictly])
 
+  const checkedSets = useMemo(
+    () => checkedSetsFromState(computedCheckedState),
+    [computedCheckedState]
+  )
+
   // Update filtered nodes when filter value changes
   useEffect(() => {
     if (filterValue) {
@@ -515,6 +521,23 @@ export const Tree: React.FC<TreeProps> = ({
     [treeData, computedCheckedState, checkStrictly, checkStrategy, controlledCheckedKeys, onCheck]
   )
 
+  const getFirstChildKey = useCallback(
+    (nodeKey: string | number) => {
+      const index = visibleItems.findIndex((i) => i.key === nodeKey)
+      if (index < 0) return undefined
+
+      const base = visibleItems[index]
+      for (let i = index + 1; i < visibleItems.length; i++) {
+        const item = visibleItems[i]
+        if (item.level <= base.level) break
+        if (item.parentKey === nodeKey && !item.node.disabled) return item.key
+      }
+
+      return undefined
+    },
+    [visibleItems]
+  )
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent, node: TreeNode, isExpanded: boolean, isChecked: boolean) => {
       if (node.disabled) return
@@ -526,21 +549,6 @@ export const Tree: React.FC<TreeProps> = ({
 
       const parents = getParentKeys(treeData, node.key)
       const parentKey = parents[parents.length - 1]
-
-      const getFirstChildKey = () => {
-        const list = visibleItems
-        const index = list.findIndex((i) => i.key === node.key)
-        if (index < 0) return undefined
-
-        const base = list[index]
-        for (let i = index + 1; i < list.length; i++) {
-          const item = list[i]
-          if (item.level <= base.level) break
-          if (item.parentKey === node.key && !item.node.disabled) return item.key
-        }
-
-        return undefined
-      }
 
       if (e.key === 'ArrowDown') {
         e.preventDefault()
@@ -573,7 +581,7 @@ export const Tree: React.FC<TreeProps> = ({
           return
         }
         if (isExpandable && isExpanded) {
-          setActiveKey(getFirstChildKey() ?? currentKey)
+          setActiveKey(getFirstChildKey(node.key) ?? currentKey)
         }
         return
       }
@@ -632,168 +640,138 @@ export const Tree: React.FC<TreeProps> = ({
       activeKey,
       defaultActiveKey,
       focusableKeys,
-      visibleItems,
       treeData,
       loadData,
       checkable,
       computedExpandedKeys,
       effectiveSelectable,
+      getFirstChildKey,
       handleExpand,
       handleSelect,
       handleCheck
     ]
   )
 
-  const handleNodeClickInternal = useCallback(
-    (node: TreeNode, event: React.MouseEvent) => {
-      if (node.disabled) return
-      onNodeClick?.(node, event)
-    },
-    [onNodeClick]
-  )
+  const renderTreeNode = (node: TreeNode, level: number): React.ReactNode => {
+    const hasChildren = !!(node.children && node.children.length > 0)
+    const isExpanded = computedExpandedKeys.has(node.key)
+    const isSelected = computedSelectedKeys.has(node.key)
+    const isChecked = checkedSets.checkedSet.has(node.key)
+    const isHalfChecked = checkedSets.halfCheckedSet.has(node.key)
+    const isLoading = loadingNodes.has(node.key)
+    const isFiltered = filteredNodeKeys.size > 0
+    const isMatched = filteredNodeKeys.has(node.key)
+    const isVisible = !isFiltered || isMatched
 
-  const renderTreeNode = useCallback(
-    (node: TreeNode, level: number, _parentKey?: string | number): React.ReactNode => {
-      const hasChildren = !!(node.children && node.children.length > 0)
-      const isExpanded = computedExpandedKeys.has(node.key)
-      const isSelected = computedSelectedKeys.has(node.key)
-      const isChecked = computedCheckedState.checked.includes(node.key)
-      const isHalfChecked = computedCheckedState.halfChecked.includes(node.key)
-      const isLoading = loadingNodes.has(node.key)
-      const isFiltered = filteredNodeKeys.size > 0
-      const isMatched = filteredNodeKeys.has(node.key)
-      const isVisible = !isFiltered || isMatched
+    const isExpandable = hasChildren || !!(loadData && !node.isLeaf)
+    const isFocusable = !node.disabled && node.key === (activeKey ?? defaultActiveKey)
 
-      const isExpandable = hasChildren || !!(loadData && !node.isLeaf)
-      const isFocusable = !node.disabled && node.key === (activeKey ?? defaultActiveKey)
+    if (!isVisible) {
+      return null
+    }
 
-      if (!isVisible) {
-        return null
-      }
+    const indent = []
+    for (let i = 0; i < level; i++) {
+      indent.push(<span key={i} className={treeNodeIndentClasses} />)
+    }
 
-      const indent = []
-      for (let i = 0; i < level; i++) {
-        indent.push(<span key={i} className={treeNodeIndentClasses} />)
-      }
+    // Node content
+    const nodeContent = (
+      <>
+        {/* Indentation */}
+        {indent}
 
-      // Node content
-      const nodeContent = (
-        <>
-          {/* Indentation */}
-          {indent}
+        {/* Expand icon */}
+        <span
+          className={isExpandable ? 'cursor-pointer' : ''}
+          onClick={(e) => {
+            e.stopPropagation()
+            if (isExpandable) {
+              setActiveKey(node.key)
+              handleExpand(node.key)
+            }
+          }}>
+          <ExpandIcon expanded={isExpanded} hasChildren={isExpandable} />
+        </span>
 
-          {/* Expand icon */}
-          <span
-            className={isExpandable ? 'cursor-pointer' : ''}
+        {/* Checkbox */}
+        {checkable && (
+          <input
+            type="checkbox"
+            aria-label={`Select ${node.label}`}
+            className={treeNodeCheckboxClasses}
+            checked={isChecked}
+            ref={(input) => {
+              if (input) {
+                input.indeterminate = isHalfChecked
+              }
+            }}
+            disabled={node.disabled}
             onClick={(e) => {
               e.stopPropagation()
-              if (isExpandable) {
-                setActiveKey(node.key)
-                handleExpand(node.key)
-              }
-            }}>
-            <ExpandIcon expanded={isExpanded} hasChildren={isExpandable} />
-          </span>
-
-          {/* Checkbox */}
-          {checkable && (
-            <input
-              type="checkbox"
-              aria-label={`Select ${node.label}`}
-              className={treeNodeCheckboxClasses}
-              checked={isChecked}
-              ref={(input) => {
-                if (input) {
-                  input.indeterminate = isHalfChecked
-                }
-              }}
-              disabled={node.disabled}
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-              onChange={(e) => {
-                handleCheck(node.key, e.target.checked)
-              }}
-            />
-          )}
-
-          {showIcon && node.icon && (
-            <span className={treeNodeIconClasses}>{node.icon as React.ReactNode}</span>
-          )}
-
-          {/* Label */}
-          <span
-            className={classNames(
-              treeNodeLabelClasses,
-              isFiltered && isMatched ? 'font-semibold text-[var(--tiger-primary,#2563eb)]' : ''
-            )}>
-            {node.label}
-          </span>
-
-          {/* Loading indicator */}
-          {isLoading && <LoadingSpinner />}
-        </>
-      )
-
-      return (
-        <div key={node.key} className={treeNodeWrapperClasses}>
-          {/* Node content */}
-          <div
-            className={getTreeNodeClasses(isSelected, !!node.disabled, blockNode)}
-            ref={(el) => {
-              itemRefs.current.set(node.key, el)
             }}
-            role="treeitem"
-            aria-level={level + 1}
-            aria-disabled={node.disabled || undefined}
-            aria-selected={effectiveSelectable ? isSelected : undefined}
-            aria-expanded={isExpandable ? isExpanded : undefined}
-            aria-checked={checkable ? (isHalfChecked ? 'mixed' : isChecked) : undefined}
-            tabIndex={isFocusable ? 0 : -1}
-            onFocus={() => {
-              if (!node.disabled) setActiveKey(node.key)
+            onChange={(e) => {
+              handleCheck(node.key, e.target.checked)
             }}
-            onKeyDown={(e) => handleKeyDown(e, node, isExpanded, isChecked)}
-            onClick={(e) => {
-              setActiveKey(node.key)
-              handleNodeClickInternal(node, e)
-              if (effectiveSelectable && !node.disabled) {
-                handleSelect(node.key, e)
-              }
-            }}>
-            {nodeContent}
-          </div>
+          />
+        )}
 
-          {/* Children */}
-          {hasChildren && isExpanded && (
-            <div className={classNames(treeNodeChildrenClasses, showLine && treeLineClasses)}>
-              {node.children!.map((child) => renderTreeNode(child, level + 1, node.key))}
-            </div>
-          )}
+        {showIcon && node.icon && (
+          <span className={treeNodeIconClasses}>{node.icon as React.ReactNode}</span>
+        )}
+
+        {/* Label */}
+        <span
+          className={classNames(
+            treeNodeLabelClasses,
+            isFiltered && isMatched ? 'font-semibold text-[var(--tiger-primary,#2563eb)]' : ''
+          )}>
+          {node.label}
+        </span>
+
+        {/* Loading indicator */}
+        {isLoading && <LoadingSpinner />}
+      </>
+    )
+
+    return (
+      <div key={node.key} className={treeNodeWrapperClasses}>
+        {/* Node content */}
+        <div
+          className={getTreeNodeClasses(isSelected, !!node.disabled, blockNode)}
+          ref={(el) => {
+            itemRefs.current.set(node.key, el)
+          }}
+          role="treeitem"
+          aria-level={level + 1}
+          aria-disabled={node.disabled || undefined}
+          aria-selected={effectiveSelectable ? isSelected : undefined}
+          aria-expanded={isExpandable ? isExpanded : undefined}
+          aria-checked={checkable ? (isHalfChecked ? 'mixed' : isChecked) : undefined}
+          tabIndex={isFocusable ? 0 : -1}
+          onFocus={() => {
+            if (!node.disabled) setActiveKey(node.key)
+          }}
+          onKeyDown={(e) => handleKeyDown(e, node, isExpanded, isChecked)}
+          onClick={(e) => {
+            setActiveKey(node.key)
+            if (!node.disabled) onNodeClick?.(node, e)
+            if (effectiveSelectable && !node.disabled) {
+              handleSelect(node.key, e)
+            }
+          }}>
+          {nodeContent}
         </div>
-      )
-    },
-    [
-      computedExpandedKeys,
-      computedSelectedKeys,
-      computedCheckedState,
-      loadingNodes,
-      filteredNodeKeys,
-      activeKey,
-      defaultActiveKey,
-      loadData,
-      checkable,
-      blockNode,
-      effectiveSelectable,
-      showIcon,
-      showLine,
-      handleExpand,
-      handleCheck,
-      handleSelect,
-      handleNodeClickInternal,
-      handleKeyDown
-    ]
-  )
+
+        {/* Children */}
+        {hasChildren && isExpanded && (
+          <div className={classNames(treeNodeChildrenClasses, showLine && treeLineClasses)}>
+            {node.children!.map((child) => renderTreeNode(child, level + 1))}
+          </div>
+        )}
+      </div>
+    )
+  }
 
   if (!treeData || treeData.length === 0) {
     return (
