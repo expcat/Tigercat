@@ -152,8 +152,8 @@ export const Timeline = defineComponent({
       const position = item.position
 
       const itemClasses = getTimelineItemClasses(props.mode, position, isLast)
-      const tailClasses = getTimelineTailClasses(props.mode, position, isLast)
-      const headClasses = getTimelineHeadClasses(props.mode, position)
+      const tailClasses = getTimelineTailClasses(props.mode, isLast)
+      const headClasses = getTimelineHeadClasses(props.mode)
       const contentClasses = getTimelineContentClasses(props.mode, position)
 
       // Custom render from slot
@@ -195,7 +195,7 @@ export const Timeline = defineComponent({
           : undefined
 
       const itemClasses = getTimelineItemClasses(props.mode, position, true)
-      const headClasses = getTimelineHeadClasses(props.mode, position)
+      const headClasses = getTimelineHeadClasses(props.mode)
       const contentClasses = getTimelineContentClasses(props.mode, position)
 
       // Pending content from slot

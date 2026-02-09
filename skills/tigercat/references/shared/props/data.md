@@ -99,26 +99,35 @@ description: Shared props definitions for data display components - Table, Timel
 
 ### Props
 
-| Prop    | Type                               | Default  | Vue | React | Description      |
-| ------- | ---------------------------------- | -------- | :-: | :---: | ---------------- |
-| items   | `TimelineItem[]`                   | `[]`     |  ✓  |   ✓   | 时间线数据       |
-| mode    | `'left' \| 'right' \| 'alternate'` | `'left'` |  ✓  |   ✓   | 布局模式         |
-| pending | `boolean \| string`                | `false`  |  ✓  |   ✓   | 最后一项为进行中 |
+| Prop       | Type                               | Default  | Vue | React | Description        |
+| ---------- | ---------------------------------- | -------- | :-: | :---: | ------------------ |
+| items      | `TimelineItem[]`                   | `[]`     |  ✓  |   ✓   | 时间线数据         |
+| mode       | `'left' \| 'right' \| 'alternate'` | `'left'` |  ✓  |   ✓   | 布局模式           |
+| pending    | `boolean`                          | `false`  |  ✓  |   ✓   | 是否显示等待中状态 |
+| pendingDot | `VNode / ReactNode`                | -        |  ✓  |   ✓   | 自定义等待节点内容 |
+| reverse    | `boolean`                          | `false`  |  ✓  |   ✓   | 是否反转时间线顺序 |
+| className  | `string`                           | -        |  ✓  |   ✓   | 额外 CSS 类名      |
+
+> **React 专有 Props**: `pendingContent`（自定义等待内容）、`renderItem`（自定义项渲染）、`renderDot`（自定义节点渲染）
 
 ### TimelineItem
 
-| Prop    | Type                                             | Default  | Description |
-| ------- | ------------------------------------------------ | -------- | ----------- |
-| content | `string`                                         | -        | 内容        |
-| time    | `string`                                         | -        | 时间        |
-| color   | `'blue' \| 'green' \| 'red' \| 'gray' \| string` | `'blue'` | 节点颜色    |
+| Prop     | Type                | Default | Description            |
+| -------- | ------------------- | ------- | ---------------------- |
+| key      | `string \| number`  | -       | 唯一标识               |
+| label    | `string`            | -       | 标签/时间戳            |
+| content  | `string`            | -       | 内容描述               |
+| color    | `string`            | -       | 节点颜色（CSS 颜色值） |
+| dot      | `unknown`           | -       | 自定义节点内容         |
+| position | `'left' \| 'right'` | -       | 交替模式下指定位置     |
 
-### Slots / Children
+### Slots / Render Props
 
-| Vue Slot                  | React Prop | Description |
-| ------------------------- | ---------- | ----------- |
-| `default` (Timeline.Item) | `children` | 时间线项    |
-| `dot` (Timeline.Item)     | `dot`      | 自定义节点  |
+| Vue Slot   | React Prop       | Description        |
+| ---------- | ---------------- | ------------------ |
+| `#item`    | `renderItem`     | 自定义时间线项内容 |
+| `#dot`     | `renderDot`      | 自定义节点渲染     |
+| `#pending` | `pendingContent` | 自定义等待中内容   |
 
 ---
 

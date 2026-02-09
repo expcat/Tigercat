@@ -184,19 +184,67 @@ const columns = [
 
 ## Timeline 时间轴
 
+### 基础用法
+
 ```vue
 <template>
-  <Timeline>
-    <TimelineItem color="green">Created 2024-01-01</TimelineItem>
-    <TimelineItem color="blue">Processing 2024-01-02</TimelineItem>
-    <TimelineItem color="gray">Pending 2024-01-03</TimelineItem>
-  </Timeline>
-
+  <!-- 通过 items 数据驱动 -->
   <Timeline
     :items="[
-      { content: 'Created', time: '2024-01-01', color: 'green' },
-      { content: 'Updated', time: '2024-01-02', color: 'blue' }
+      { key: 1, label: '2024-01-01', content: 'Created', color: '#10b981' },
+      { key: 2, label: '2024-01-02', content: 'Processing', color: '#3b82f6' },
+      { key: 3, label: '2024-01-03', content: 'Pending' }
     ]" />
+</template>
+```
+
+### 布局模式
+
+```vue
+<template>
+  <Timeline :items="items" mode="right" />
+  <Timeline :items="items" mode="alternate" />
+</template>
+```
+
+### 自定义渲染（slot）
+
+```vue
+<template>
+  <!-- 自定义节点 -->
+  <Timeline :items="items">
+    <template #dot="{ item }">
+      <div class="w-4 h-4 bg-green-500 rounded-full" />
+    </template>
+  </Timeline>
+
+  <!-- 自定义内容 -->
+  <Timeline :items="items">
+    <template #item="{ item, index }">
+      <div class="font-medium">{{ item.label }}</div>
+      <div class="text-gray-600">{{ item.content }}</div>
+    </template>
+  </Timeline>
+</template>
+```
+
+### 等待中状态
+
+```vue
+<template>
+  <Timeline :items="items" :pending="true">
+    <template #pending>
+      <span>正在处理...</span>
+    </template>
+  </Timeline>
+</template>
+```
+
+### 反转顺序
+
+```vue
+<template>
+  <Timeline :items="items" :reverse="true" />
 </template>
 ```
 

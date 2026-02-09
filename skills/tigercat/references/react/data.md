@@ -185,17 +185,65 @@ const columns = [
 
 ## Timeline 时间轴
 
-```tsx
-<Timeline>
-  <Timeline.Item color="green">Created 2024-01-01</Timeline.Item>
-  <Timeline.Item color="blue">Processing 2024-01-02</Timeline.Item>
-  <Timeline.Item color="gray">Pending 2024-01-03</Timeline.Item>
-</Timeline>
+### 基础用法
 
-<Timeline items={[
-  { content: 'Created', time: '2024-01-01', color: 'green' },
-  { content: 'Updated', time: '2024-01-02', color: 'blue' }
-]} />
+```tsx
+<Timeline
+  items={[
+    { key: 1, label: '2024-01-01', content: 'Created', color: '#10b981' },
+    { key: 2, label: '2024-01-02', content: 'Processing', color: '#3b82f6' },
+    { key: 3, label: '2024-01-03', content: 'Pending' }
+  ]}
+/>
+```
+
+### 布局模式
+
+```tsx
+<Timeline items={items} mode="right" />
+<Timeline items={items} mode="alternate" />
+```
+
+### 自定义渲染
+
+```tsx
+{
+  /* 自定义节点 */
+}
+;<Timeline
+  items={items}
+  renderDot={(item) => <div className="w-4 h-4 bg-green-500 rounded-full" />}
+/>
+
+{
+  /* 自定义内容 */
+}
+;<Timeline
+  items={items}
+  renderItem={(item, index) => (
+    <div>
+      <div className="font-medium">{item.label}</div>
+      <div className="text-gray-600">{item.content}</div>
+    </div>
+  )}
+/>
+```
+
+### 等待中状态
+
+```tsx
+<Timeline
+  items={items}
+  pending
+  pendingContent={<span>正在处理...</span>}
+  pendingDot={<div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse" />}
+/>
+```
+
+### 反转顺序
+
+```tsx
+<Timeline items={items} reverse />
 ```
 
 ---

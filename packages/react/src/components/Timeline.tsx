@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
   classNames,
   getTimelineContainerClasses,
@@ -70,19 +70,20 @@ export const Timeline: React.FC<TimelineProps> = ({
   className,
   ...ulProps
 }) => {
-  let processedItems = [...items]
-  if (reverse) processedItems = processedItems.reverse()
-  if (mode === 'alternate') {
-    processedItems = processedItems.map((item, index) => ({
-      ...item,
-      position: (item.position || (index % 2 === 0 ? 'left' : 'right')) as TimelineItemPosition
-    }))
-  }
+  const processedItems = useMemo(() => {
+    let result = reverse ? [...items].reverse() : [...items]
+    if (mode === 'alternate') {
+      result = result.map((item, index) => ({
+        ...item,
+        position: (item.position || (index % 2 === 0 ? 'left' : 'right')) as TimelineItemPosition
+      }))
+    }
+    return result
+  }, [items, reverse, mode])
 
-  const containerClasses = classNames(
-    getTimelineContainerClasses(mode),
-    timelineListClasses,
-    className
+  const containerClasses = useMemo(
+    () => classNames(getTimelineContainerClasses(mode), timelineListClasses, className),
+    [mode, className]
   )
 
   const getItemKey = (item: TimelineItem, index: number): string | number => item.key || index
@@ -116,8 +117,8 @@ export const Timeline: React.FC<TimelineProps> = ({
     const position = item.position
 
     const itemClasses = getTimelineItemClasses(mode, position, isLast)
-    const tailClasses = getTimelineTailClasses(mode, position, isLast)
-    const headClasses = getTimelineHeadClasses(mode, position)
+    const tailClasses = getTimelineTailClasses(mode, isLast)
+    const headClasses = getTimelineHeadClasses(mode)
     const contentClasses = getTimelineContentClasses(mode, position)
 
     if (renderItem) {
@@ -155,7 +156,7 @@ export const Timeline: React.FC<TimelineProps> = ({
         : undefined
 
     const itemClasses = getTimelineItemClasses(mode, position, true)
-    const headClasses = getTimelineHeadClasses(mode, position)
+    const headClasses = getTimelineHeadClasses(mode)
     const contentClasses = getTimelineContentClasses(mode, position)
 
     return (

@@ -11,8 +11,9 @@ export const timelineCustomDotClasses = 'flex items-center justify-center'
 export const timelineLabelClasses = 'text-sm text-[var(--tiger-text-muted,#6b7280)] mb-1'
 export const timelineDescriptionClasses = 'text-[var(--tiger-text,#374151)]'
 
-const dotBg = 'bg-[var(--tiger-timeline-dot,#d1d5db)]'
-export const timelineDotClasses = `w-2.5 h-2.5 rounded-full border-2 border-[var(--tiger-surface,#ffffff)] ${dotBg}`
+const timelineDotBase = 'w-2.5 h-2.5 rounded-full border-2 border-[var(--tiger-surface,#ffffff)]'
+const timelineDotBg = 'bg-[var(--tiger-timeline-dot,#d1d5db)]'
+export const timelineDotClasses = `${timelineDotBase} ${timelineDotBg}`
 
 // ── Position tokens ──────────────────────────────────────────────
 // IMPORTANT: Tailwind JIT scans source for COMPLETE class strings.
@@ -49,11 +50,7 @@ export function getTimelineItemClasses(
   return `${base} pl-8`
 }
 
-export function getTimelineTailClasses(
-  mode: TimelineMode,
-  _position?: TimelineItemPosition,
-  isLast = false
-): string {
+export function getTimelineTailClasses(mode: TimelineMode, isLast = false): string {
   if (isLast) return 'hidden'
   const span = `${timelineTailClasses} ${TAIL_TOP} ${TAIL_BOTTOM}`
   if (mode === 'right') return `${span} right-0 translate-x-1/2`
@@ -61,10 +58,7 @@ export function getTimelineTailClasses(
   return `${span} left-0 -translate-x-1/2`
 }
 
-export function getTimelineHeadClasses(
-  mode: TimelineMode,
-  _position?: TimelineItemPosition
-): string {
+export function getTimelineHeadClasses(mode: TimelineMode): string {
   if (mode === 'right') return `${timelineHeadClasses} right-0 ${HEAD_TOP} translate-x-1/2`
   if (mode === 'alternate') return `${timelineHeadClasses} left-1/2 -translate-x-1/2 ${HEAD_TOP}`
   return `${timelineHeadClasses} left-0 ${HEAD_TOP} -translate-x-1/2`
@@ -72,8 +66,7 @@ export function getTimelineHeadClasses(
 
 export function getTimelineDotClasses(color?: string, isCustom = false): string {
   if (isCustom) return timelineCustomDotClasses
-  if (color) return timelineDotClasses.replace(dotBg, '')
-  return timelineDotClasses
+  return color ? timelineDotBase : timelineDotClasses
 }
 
 export function getTimelineContentClasses(
