@@ -443,6 +443,22 @@ export function resetLineGradientCounter(): void {
   lineGradientCounter = 0
 }
 
+let areaGradientCounter = 0
+
+/**
+ * Generate a unique gradient ID prefix for an AreaChart instance.
+ */
+export function getAreaGradientPrefix(): string {
+  return `tiger-area-grad-${++areaGradientCounter}`
+}
+
+/**
+ * Reset the area gradient counter (for testing only)
+ */
+export function resetAreaGradientCounter(): void {
+  areaGradientCounter = 0
+}
+
 /**
  * CSS transition classes for line chart point hover
  */

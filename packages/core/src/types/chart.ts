@@ -1356,6 +1356,24 @@ export interface AreaChartProps
   colors?: string[]
 
   /**
+   * Enable linear gradient fill (top-to-bottom, ECharts style)
+   * @default false
+   */
+  gradient?: boolean
+
+  /**
+   * Hollow point style (stroke + white fill, ECharts emptyCircle)
+   * @default false
+   */
+  pointHollow?: boolean
+
+  /**
+   * Enable line draw entrance animation
+   * @default false
+   */
+  animated?: boolean
+
+  /**
    * Tooltip formatter
    */
   tooltipFormatter?: (

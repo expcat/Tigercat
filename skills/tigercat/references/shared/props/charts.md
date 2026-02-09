@@ -117,7 +117,9 @@ description: Shared charts props and concepts
 | ----------- | --------- | ------- | --- | ----- |
 | fillOpacity | `number`  | `0.2`   | ✓   | ✓     |
 | stacked     | `boolean` | `false` | ✓   | ✓     |
-| gradient    | `boolean` | `false` | -   | ✓     |
+| gradient    | `boolean` | `false` | ✓   | ✓     |
+| pointHollow | `boolean` | `false` | ✓   | ✓     |
+| animated    | `boolean` | `false` | ✓   | ✓     |
 
 ### ScatterChart
 

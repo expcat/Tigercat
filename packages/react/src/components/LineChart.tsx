@@ -384,11 +384,7 @@ export const LineChart: React.FC<LineChartProps> = ({
           name={sd.series.name}
           type="line"
           opacity={sd.opacity}
-          className={classNames(
-            sd.series.className,
-            (hoverable || selectable) && 'cursor-pointer',
-            'outline-none'
-          )}
+          className={classNames(sd.series.className, (hoverable || selectable) && 'cursor-pointer')}
           onMouseEnter={(e: React.MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e)}
           onMouseLeave={handleSeriesHoverLeave}
           onClick={() => handleSeriesSelect(sd.seriesIndex)}

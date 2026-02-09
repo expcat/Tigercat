@@ -104,6 +104,17 @@ const interactiveSnippet = `<AreaChart
   onHoveredIndexChange={setHoveredIndex}
 />`
 
+const gradientSnippet = `<AreaChart
+  data={data}
+  width={420}
+  height={240}
+  gradient
+  curve="monotone"
+  showPoints
+  pointHollow
+  animated
+/>`
+
 const AreaChartDemo: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
@@ -122,6 +133,22 @@ const AreaChartDemo: React.FC = () => {
           fillOpacity={0.3}
           xAxisLabel="Month"
           yAxisLabel="Value"
+        />
+      </DemoBlock>
+
+      <DemoBlock
+        title="渐变填充 + 动画"
+        description="渐变面积填充、曲线平滑、空心数据点与入场动画，对齐 ECharts 视觉效果。"
+        code={gradientSnippet}>
+        <AreaChart
+          data={basicData}
+          width={420}
+          height={240}
+          gradient
+          curve="monotone"
+          showPoints
+          pointHollow
+          animated
         />
       </DemoBlock>
 

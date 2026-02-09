@@ -114,8 +114,14 @@ const data = [
 
 ```vue
 <template>
+  <!-- 基础面积图 -->
   <AreaChart :data="data" :fill-opacity="0.3" />
+
+  <!-- 堆叠，图例 -->
   <AreaChart :series="series" stacked show-legend />
+
+  <!-- 渐变填充 + 曲线平滑 + 空心点 + 入场动画 -->
+  <AreaChart :data="data" gradient curve="monotone" show-points point-hollow animated />
 </template>
 ```
 

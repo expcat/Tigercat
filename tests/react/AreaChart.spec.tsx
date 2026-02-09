@@ -137,4 +137,51 @@ describe('AreaChart', () => {
     const axes = container.querySelectorAll('[data-axis]')
     expect(axes).toHaveLength(0)
   })
+
+  it('renders gradient defs when gradient is true', () => {
+    const { container } = renderWithProps(AreaChart, {
+      data: basicData,
+      gradient: true,
+      ...defaultSize
+    })
+
+    const gradients = container.querySelectorAll('linearGradient')
+    expect(gradients.length).toBeGreaterThan(0)
+    const areaPath = container.querySelector('path[data-area-series]')
+    expect(areaPath?.getAttribute('fill')).toMatch(/^url\(#tiger-area-grad-/)
+  })
+
+  it('renders animation styles when animated is true', () => {
+    const { container } = renderWithProps(AreaChart, {
+      data: basicData,
+      animated: true,
+      ...defaultSize
+    })
+
+    const styleEl = container.querySelector('style')
+    expect(styleEl?.textContent).toContain('tiger-area-animated')
+  })
+
+  it('renders hollow points when pointHollow is true', () => {
+    const { container } = renderWithProps(AreaChart, {
+      data: basicData,
+      showPoints: true,
+      pointHollow: true,
+      ...defaultSize
+    })
+
+    const circle = container.querySelector('circle')
+    expect(circle?.getAttribute('fill')).toBe('white')
+    expect(circle?.getAttribute('stroke')).not.toBe('none')
+  })
+
+  it('applies outline-none on series group', () => {
+    const { container } = renderWithProps(AreaChart, {
+      data: basicData,
+      ...defaultSize
+    })
+
+    const seriesGroup = container.querySelector('g[data-series-type="area"]')
+    expect(seriesGroup?.getAttribute('class')).toContain('outline-none')
+  })
 })

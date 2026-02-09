@@ -6,6 +6,7 @@ import {
   createLinePath,
   createPointScale,
   DEFAULT_CHART_COLORS,
+  getAreaGradientPrefix,
   getChartElementOpacity,
   getChartInnerRect,
   getNumberExtent,
@@ -199,6 +200,18 @@ export const AreaChart = defineComponent({
       type: Boolean,
       default: true
     },
+    gradient: {
+      type: Boolean,
+      default: false
+    },
+    animated: {
+      type: Boolean,
+      default: false
+    },
+    pointHollow: {
+      type: Boolean,
+      default: false
+    },
     tooltipFormatter: {
       type: Function as PropType<
         (
@@ -235,6 +248,9 @@ export const AreaChart = defineComponent({
     // Point-level hover state (not managed by composable)
     const hoveredPointInfo = ref<{ seriesIndex: number; pointIndex: number } | null>(null)
     const tooltipPosition = ref({ x: 0, y: 0 })
+
+    // Unique gradient prefix for area fills
+    const gradientPrefix = getAreaGradientPrefix()
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 
@@ -297,7 +313,7 @@ export const AreaChart = defineComponent({
         return createLinearScale(extent, [0, innerRect.value.width])
       } else {
         const categories = [...new Set(xValues.value.map(String))]
-        return createPointScale(categories, [0, innerRect.value.width], { padding: 0.1 })
+        return createPointScale(categories, [0, innerRect.value.width], { padding: 0 })
       }
     })
 
@@ -386,7 +402,8 @@ export const AreaChart = defineComponent({
           strokeDasharray: series.strokeDasharray,
           showPoints: series.showPoints ?? props.showPoints,
           pointSize: series.pointSize ?? props.pointSize,
-          pointColor: series.pointColor ?? color
+          pointColor: series.pointColor ?? color,
+          pointHollow: series.pointHollow ?? props.pointHollow
         }
       })
     })
@@ -463,6 +480,8 @@ export const AreaChart = defineComponent({
     }
 
     return () => {
+      const reversedSeriesData = [...seriesData.value].reverse()
+
       const chart = h(
         ChartCanvas,
         {
@@ -476,6 +495,55 @@ export const AreaChart = defineComponent({
         {
           default: () =>
             [
+              // Gradient defs and animation styles
+              props.gradient || props.animated
+                ? h('defs', null, [
+                    // Animation keyframes
+                    props.animated
+                      ? h(
+                          'style',
+                          null,
+                          `
+                          .tiger-area-animated {
+                            animation: tiger-area-draw 1.2s cubic-bezier(.4,0,.2,1) forwards;
+                          }
+                          @keyframes tiger-area-draw {
+                            from { stroke-dashoffset: 1; }
+                            to { stroke-dashoffset: 0; }
+                          }
+                        `
+                        )
+                      : null,
+                    // Area fill gradients
+                    ...(props.gradient
+                      ? reversedSeriesData.map((sd) =>
+                          h(
+                            'linearGradient',
+                            {
+                              key: `area-grad-${sd.seriesIndex}`,
+                              id: `${gradientPrefix}-${sd.seriesIndex}`,
+                              x1: '0',
+                              y1: '0',
+                              x2: '0',
+                              y2: '1'
+                            },
+                            [
+                              h('stop', {
+                                offset: '0%',
+                                'stop-color': sd.fillColor,
+                                'stop-opacity': sd.fillOpacity
+                              }),
+                              h('stop', {
+                                offset: '100%',
+                                'stop-color': sd.fillColor,
+                                'stop-opacity': 0.02
+                              })
+                            ]
+                          )
+                        )
+                      : [])
+                  ])
+                : null,
               props.showGrid
                 ? h(ChartGrid, {
                     xScale: resolvedXScale.value,
@@ -510,8 +578,8 @@ export const AreaChart = defineComponent({
                     label: props.yAxisLabel
                   })
                 : null,
-              // Render each series (reverse order for proper stacking visual)
-              ...[...seriesData.value].reverse().map((sd) =>
+              // Layer 1: area fills + line strokes (reverse order for proper stacking visual)
+              ...reversedSeriesData.map((sd) =>
                 h(
                   ChartSeries,
                   {
@@ -535,10 +603,12 @@ export const AreaChart = defineComponent({
                       // Area fill
                       h('path', {
                         d: sd.areaPath,
-                        fill: sd.fillColor,
-                        'fill-opacity': sd.fillOpacity,
+                        fill: props.gradient
+                          ? `url(#${gradientPrefix}-${sd.seriesIndex})`
+                          : sd.fillColor,
+                        'fill-opacity': props.gradient ? 1 : sd.fillOpacity,
                         stroke: 'none',
-                        class: 'transition-opacity duration-150',
+                        class: 'transition-opacity duration-300',
                         'data-area-series': sd.seriesIndex
                       }),
                       // Line stroke
@@ -547,37 +617,57 @@ export const AreaChart = defineComponent({
                         fill: 'none',
                         stroke: sd.color,
                         'stroke-width': sd.strokeWidth,
-                        'stroke-dasharray': sd.strokeDasharray,
+                        'stroke-dasharray': props.animated
+                          ? (sd.strokeDasharray ?? '1')
+                          : sd.strokeDasharray,
+                        'stroke-dashoffset': props.animated ? '1' : undefined,
                         'stroke-linecap': 'round',
                         'stroke-linejoin': 'round',
-                        class: 'transition-opacity duration-150'
-                      }),
-                      // Data points
-                      sd.showPoints
-                        ? sd.points.map((point) =>
-                            h('circle', {
-                              key: `point-${sd.seriesIndex}-${point.pointIndex}`,
-                              cx: point.x,
-                              cy: point.y,
-                              r: sd.pointSize,
-                              fill: sd.pointColor,
-                              class: 'transition-all duration-150',
-                              'data-point-index': point.pointIndex,
-                              onMouseenter: (e: MouseEvent) =>
-                                handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e),
-                              onMousemove: handlePointMouseMove,
-                              onMouseleave: handlePointMouseLeave,
-                              onClick: (e: MouseEvent) => {
-                                e.stopPropagation()
-                                handlePointClick(sd.seriesIndex, point.pointIndex)
-                              }
-                            })
-                          )
-                        : null
+                        pathLength: props.animated ? 1 : undefined,
+                        class: classNames(
+                          'transition-opacity duration-200',
+                          props.animated && 'tiger-area-animated'
+                        )
+                      })
                     ]
                   }
                 )
-              )
+              ),
+              // Layer 2: data points on top of all areas (prevents coverage)
+              ...seriesData.value
+                .filter((sd) => sd.showPoints)
+                .map((sd) =>
+                  h(
+                    'g',
+                    { key: `points-${sd.seriesIndex}`, opacity: sd.opacity },
+                    sd.points.map((point) => {
+                      const isHovered =
+                        hoveredPointInfo.value?.seriesIndex === sd.seriesIndex &&
+                        hoveredPointInfo.value?.pointIndex === point.pointIndex
+                      const hoverSize = sd.pointSize + 2
+                      return h('circle', {
+                        key: `point-${sd.seriesIndex}-${point.pointIndex}`,
+                        cx: point.x,
+                        cy: point.y,
+                        r: isHovered ? hoverSize : sd.pointSize,
+                        fill: sd.pointHollow ? 'white' : sd.pointColor,
+                        stroke: sd.pointHollow ? sd.pointColor : 'none',
+                        'stroke-width': sd.pointHollow ? 2 : 0,
+                        class: 'transition-all duration-200 ease-out',
+                        style: isHovered ? `filter: drop-shadow(0 0 4px ${sd.color})` : undefined,
+                        'data-point-index': point.pointIndex,
+                        onMouseenter: (e: MouseEvent) =>
+                          handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e),
+                        onMousemove: handlePointMouseMove,
+                        onMouseleave: handlePointMouseLeave,
+                        onClick: (e: MouseEvent) => {
+                          e.stopPropagation()
+                          handlePointClick(sd.seriesIndex, point.pointIndex)
+                        }
+                      })
+                    })
+                  )
+                )
             ].filter(Boolean)
         }
       )

@@ -37,7 +37,7 @@ export const ChartSeries = <T extends ChartSeriesPoint = ChartSeriesPoint>({
   return (
     <g
       {...props}
-      className={classNames(className)}
+      className={classNames('outline-none', className)}
       data-series-name={name}
       data-series-type={type}
       fill={color}

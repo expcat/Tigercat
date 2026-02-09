@@ -77,8 +77,20 @@ const data = [
 ## AreaChart
 
 ```tsx
-<AreaChart data={data} fillOpacity={0.3} />
-<AreaChart series={series} stacked showLegend gradient />
+{
+  /* 基础面积图 */
+}
+;<AreaChart data={data} fillOpacity={0.3} />
+
+{
+  /* 堆叠，图例 */
+}
+;<AreaChart series={series} stacked showLegend />
+
+{
+  /* 渐变填充 + 曲线平滑 + 空心点 + 入场动画 */
+}
+;<AreaChart data={data} gradient curve="monotone" showPoints pointHollow animated />
 ```
 
 ---

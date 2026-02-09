@@ -105,6 +105,17 @@ const interactiveSnippet = `<AreaChart
   curve="monotone"
   v-model:hoveredIndex="hoveredIndex"
 />`
+
+const gradientSnippet = `<AreaChart
+  :data="data"
+  :width="420"
+  :height="240"
+  gradient
+  curve="monotone"
+  show-points
+  point-hollow
+  animated
+/>`
 </script>
 
 <template>
@@ -123,6 +134,19 @@ const interactiveSnippet = `<AreaChart
                        :fill-opacity="0.3"
                        x-axis-label="Month"
                        y-axis-label="Value" />
+        </DemoBlock>
+
+        <DemoBlock title="渐变填充 + 动画"
+                   description="渐变面积填充、曲线平滑、空心数据点与入场动画，对齐 ECharts 视觉效果。"
+                   :code="gradientSnippet">
+            <AreaChart :data="basicData"
+                       :width="420"
+                       :height="240"
+                       gradient
+                       curve="monotone"
+                       show-points
+                       point-hollow
+                       animated />
         </DemoBlock>
 
         <DemoBlock title="多系列"

@@ -539,8 +539,7 @@ export const LineChart = defineComponent({
                     opacity: sd.opacity,
                     class: classNames(
                       sd.series.className,
-                      (props.hoverable || props.selectable) && 'cursor-pointer',
-                      'outline-none'
+                      (props.hoverable || props.selectable) && 'cursor-pointer'
                     ),
                     onMouseenter: (e: MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e),
                     onMouseleave: handleSeriesHoverLeave,
