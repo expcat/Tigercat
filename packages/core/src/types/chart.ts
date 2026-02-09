@@ -836,6 +836,36 @@ export interface PieChartProps
    * Legend formatter
    */
   legendFormatter?: (datum: PieChartDatum, index: number) => string
+
+  /**
+   * Border width between slices
+   * @default 2
+   */
+  borderWidth?: number
+
+  /**
+   * Border color between slices
+   * @default '#ffffff'
+   */
+  borderColor?: string
+
+  /**
+   * Distance slices translate outward on hover (ECharts emphasis style)
+   * @default 8
+   */
+  hoverOffset?: number
+
+  /**
+   * Label position: inside the slice or outside with leader lines
+   * @default 'inside'
+   */
+  labelPosition?: 'inside' | 'outside'
+
+  /**
+   * Enable drop shadow on slices
+   * @default false
+   */
+  shadow?: boolean
 }
 
 export interface DonutChartDatum extends PieChartDatum {}

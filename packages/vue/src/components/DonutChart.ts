@@ -124,6 +124,27 @@ export const DonutChart = defineComponent({
     },
     className: {
       type: String
+    },
+    // Visual enhancements
+    borderWidth: {
+      type: Number,
+      default: 2
+    },
+    borderColor: {
+      type: String,
+      default: '#ffffff'
+    },
+    hoverOffset: {
+      type: Number,
+      default: 8
+    },
+    labelPosition: {
+      type: String as PropType<'inside' | 'outside'>,
+      default: 'inside'
+    },
+    shadow: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'slice-click', 'slice-hover'],
@@ -175,6 +196,12 @@ export const DonutChart = defineComponent({
         colors: props.colors,
         showLabels: props.showLabels,
         labelFormatter: props.labelFormatter,
+        labelPosition: props.labelPosition,
+        // Visual enhancements
+        borderWidth: props.borderWidth,
+        borderColor: props.borderColor,
+        hoverOffset: props.hoverOffset,
+        shadow: props.shadow,
         // Interaction props
         hoverable: props.hoverable,
         hoveredIndex: props.hoveredIndex,

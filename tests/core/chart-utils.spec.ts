@@ -21,7 +21,11 @@ import {
   clampBarWidth,
   ensureBarMinHeight,
   getBarValueLabelY,
-  getBarGradientPrefix
+  getBarGradientPrefix,
+  computePieHoverOffset,
+  computePieLabelLine,
+  PIE_EMPHASIS_SHADOW,
+  PIE_BASE_SHADOW
 } from '@expcat/tigercat-core'
 
 describe('chart-utils', () => {
@@ -338,6 +342,68 @@ describe('chart-utils', () => {
     it('handles full circle', () => {
       const path = createPieArcPath({ ...baseOptions, endAngle: Math.PI * 2 })
       expect(path.length).toBeGreaterThan(0)
+    })
+  })
+
+  // ==========================================================================
+  // Pie Hover & Label Helpers
+  // ==========================================================================
+
+  describe('computePieHoverOffset', () => {
+    it('returns offset along bisector angle', () => {
+      const { dx, dy } = computePieHoverOffset(0, Math.PI, 10)
+      // Bisector = PI/2, cos(PI/2) ≈ 0, sin(PI/2) ≈ 1
+      expect(dx).toBeCloseTo(0, 1)
+      expect(dy).toBeCloseTo(10, 1)
+    })
+
+    it('returns zero offset when distance is 0', () => {
+      const { dx, dy } = computePieHoverOffset(0, Math.PI, 0)
+      expect(dx).toBe(0)
+      expect(dy).toBe(0)
+    })
+
+    it('handles full circle arc', () => {
+      const { dx, dy } = computePieHoverOffset(0, Math.PI * 2, 8)
+      // Bisector = PI, cos(PI) ≈ -1, sin(PI) ≈ 0
+      expect(dx).toBeCloseTo(-8, 1)
+      expect(dy).toBeCloseTo(0, 1)
+    })
+  })
+
+  describe('computePieLabelLine', () => {
+    it('returns anchor, elbow, label positions and textAnchor', () => {
+      const result = computePieLabelLine(50, 50, 40, 0, Math.PI / 2)
+      expect(result.anchor).toBeDefined()
+      expect(result.elbow).toBeDefined()
+      expect(result.label).toBeDefined()
+      expect(result.textAnchor).toBeDefined()
+    })
+
+    it('sets textAnchor to start for right-side labels', () => {
+      // Arc from -PI/4 to PI/4 → bisector at 0 → cos(0) > 0 → right side
+      const result = computePieLabelLine(50, 50, 40, -Math.PI / 4, Math.PI / 4)
+      expect(result.textAnchor).toBe('start')
+    })
+
+    it('sets textAnchor to end for left-side labels', () => {
+      // Arc around PI → bisector at ~PI → cos(PI) < 0 → left side
+      const result = computePieLabelLine(50, 50, 40, Math.PI * 0.75, Math.PI * 1.25)
+      expect(result.textAnchor).toBe('end')
+    })
+
+    it('places label further out than anchor', () => {
+      const result = computePieLabelLine(50, 50, 40, 0, Math.PI / 2)
+      const anchorDist = Math.sqrt((result.anchor.x - 50) ** 2 + (result.anchor.y - 50) ** 2)
+      const labelDist = Math.sqrt((result.label.x - 50) ** 2 + (result.label.y - 50) ** 2)
+      expect(labelDist).toBeGreaterThan(anchorDist)
+    })
+  })
+
+  describe('PIE shadow constants', () => {
+    it('exports shadow filter strings', () => {
+      expect(PIE_EMPHASIS_SHADOW).toContain('drop-shadow')
+      expect(PIE_BASE_SHADOW).toContain('drop-shadow')
     })
   })
 

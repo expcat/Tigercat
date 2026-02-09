@@ -3,18 +3,20 @@ import { ref } from 'vue'
 import { PieChart, type PieChartDatum } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
-const basicData: PieChartDatum[] = [
-  { value: 40, label: 'A' },
-  { value: 25, label: 'B' },
-  { value: 20, label: 'C' },
-  { value: 15, label: 'D' }
+const salesData: PieChartDatum[] = [
+  { value: 335, label: '直接访问' },
+  { value: 310, label: '邮件营销' },
+  { value: 234, label: '联盟广告' },
+  { value: 135, label: '视频广告' },
+  { value: 148, label: '搜索引擎' }
 ]
 
-const interactiveData: PieChartDatum[] = [
-  { value: 35, label: '产品 A', color: '#2563eb' },
-  { value: 28, label: '产品 B', color: '#22c55e' },
-  { value: 22, label: '产品 C', color: '#f97316' },
-  { value: 15, label: '产品 D', color: '#a855f7' }
+const colorfulData: PieChartDatum[] = [
+  { value: 40, label: '产品 A', color: '#5470c6' },
+  { value: 28, label: '产品 B', color: '#91cc75' },
+  { value: 22, label: '产品 C', color: '#fac858' },
+  { value: 15, label: '产品 D', color: '#ee6666' },
+  { value: 12, label: '产品 E', color: '#73c0de' }
 ]
 
 const hoveredIndex = ref<number | null>(null)
@@ -22,52 +24,59 @@ const selectedIndex = ref<number | null>(null)
 const clickedSlice = ref<string>('')
 
 const handleSliceClick = (datum: PieChartDatum, _index: number) => {
-  clickedSlice.value = `点击了 ${datum.label}，占比 ${datum.value}%`
+  clickedSlice.value = `点击了 ${datum.label}，值 ${datum.value}`
 }
 
 const basicSnippet = `<PieChart
   :data="data"
-  :width="320"
-  :height="220"
+  :width="380"
+  :height="280"
   :show-labels="true"
 />`
 
-const hoverableSnippet = `<PieChart
+const hoverSnippet = `<PieChart
   :data="data"
-  :width="320"
-  :height="220"
+  :width="380"
+  :height="280"
   hoverable
-  :show-labels="true"
+  shadow
   v-model:hoveredIndex="hoveredIndex"
+/>`
+
+const outsideSnippet = `<PieChart
+  :data="data"
+  :width="440"
+  :height="320"
+  :show-labels="true"
+  label-position="outside"
+  hoverable
+  shadow
 />`
 
 const selectableSnippet = `<PieChart
   :data="data"
-  :width="320"
-  :height="220"
+  :width="380"
+  :height="280"
   hoverable
   selectable
-  :show-labels="true"
+  shadow
+  show-legend
+  legend-position="right"
   v-model:selectedIndex="selectedIndex"
   @slice-click="handleSliceClick"
 />`
 
-const legendSnippet = `<PieChart
+const fullSnippet = `<PieChart
   :data="data"
-  :width="320"
-  :height="220"
+  :width="480"
+  :height="340"
   hoverable
+  shadow
+  :show-labels="true"
+  label-position="outside"
   show-legend
   legend-position="right"
-/>`
-
-const tooltipSnippet = `<PieChart
-  :data="data"
-  :width="320"
-  :height="220"
-  hoverable
   show-tooltip
-  :show-labels="true"
 />`
 </script>
 
@@ -75,74 +84,81 @@ const tooltipSnippet = `<PieChart
   <div class="max-w-5xl mx-auto p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">PieChart 饼图</h1>
-      <p class="text-gray-600">用于展示分类占比。</p>
+      <p class="text-gray-600">ECharts 风格饼图：悬停偏移、边框分隔、外部标签引导线、阴影等特效。</p>
     </div>
 
-    <DemoBlock title="基础用法"
-               description="默认饼图与标签。"
+    <DemoBlock title="基础饼图"
+               description="自带 2px 白色边框分隔扇区，视觉更清晰。"
                :code="basicSnippet">
-      <PieChart :data="basicData"
-                :width="320"
-                :height="220"
+      <PieChart :data="salesData"
+                :width="380"
+                :height="280"
                 :show-labels="true" />
     </DemoBlock>
 
-    <DemoBlock title="悬停高亮"
-               description="启用 hoverable 后，鼠标悬停时高亮扇区。"
-               :code="hoverableSnippet">
+    <DemoBlock title="悬停偏移 + 阴影"
+               description="hoverable + shadow 模拟 ECharts emphasis 效果：悬停时扇区向外偏移并附带阴影。"
+               :code="hoverSnippet">
       <div class="space-y-4">
-        <PieChart :data="interactiveData"
-                  :width="320"
-                  :height="220"
+        <PieChart :data="colorfulData"
+                  :width="380"
+                  :height="280"
                   hoverable
-                  :show-labels="true"
+                  shadow
                   v-model:hoveredIndex="hoveredIndex" />
         <p class="text-sm text-gray-500">
-          当前悬停: {{ hoveredIndex !== null ? interactiveData[hoveredIndex]?.label : '无' }}
+          当前悬停: {{ hoveredIndex !== null ? colorfulData[hoveredIndex]?.label : '无' }}
         </p>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="点击选中"
-               description="启用 selectable 后，点击可选中扇区，支持事件回调。"
+    <DemoBlock title="外部标签 + 引导线"
+               description="labelPosition='outside' 时标签在扇区外侧，带引导线显示名称与百分比。"
+               :code="outsideSnippet">
+      <PieChart :data="salesData"
+                :width="440"
+                :height="320"
+                :show-labels="true"
+                label-position="outside"
+                hoverable
+                shadow />
+    </DemoBlock>
+
+    <DemoBlock title="点击选中 + 图例"
+               description="selectable 支持点击选中；配合图例实现完整交互。"
                :code="selectableSnippet">
       <div class="space-y-4">
-        <PieChart :data="interactiveData"
-                  :width="320"
-                  :height="220"
+        <PieChart :data="colorfulData"
+                  :width="380"
+                  :height="280"
                   hoverable
                   selectable
-                  :show-labels="true"
+                  shadow
+                  show-legend
+                  legend-position="right"
                   v-model:selectedIndex="selectedIndex"
                   @slice-click="handleSliceClick" />
         <p class="text-sm text-gray-500">
-          选中: {{ selectedIndex !== null ? interactiveData[selectedIndex]?.label : '无' }}
+          选中: {{ selectedIndex !== null ? colorfulData[selectedIndex]?.label : '无' }}
           <span v-if="clickedSlice"
                 class="ml-4">{{ clickedSlice }}</span>
         </p>
       </div>
     </DemoBlock>
 
-    <DemoBlock title="显示图例"
-               description="通过 show-legend 显示图例，可设置位置。"
-               :code="legendSnippet">
-      <PieChart :data="interactiveData"
-                :width="320"
-                :height="220"
+    <DemoBlock title="完整效果"
+               description="悬停偏移 + 阴影 + 外部标签 + 图例 + 提示框的完整示例。"
+               :code="fullSnippet">
+      <PieChart :data="salesData"
+                :width="480"
+                :height="340"
                 hoverable
+                shadow
+                :show-labels="true"
+                label-position="outside"
                 show-legend
-                legend-position="right" />
-    </DemoBlock>
-
-    <DemoBlock title="显示提示框"
-               description="通过 show-tooltip 在悬停时显示数据提示。"
-               :code="tooltipSnippet">
-      <PieChart :data="interactiveData"
-                :width="320"
-                :height="220"
-                hoverable
-                show-tooltip
-                :show-labels="true" />
+                legend-position="right"
+                show-tooltip />
     </DemoBlock>
   </div>
 </template>

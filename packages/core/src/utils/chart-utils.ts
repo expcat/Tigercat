@@ -361,6 +361,60 @@ export function createPieArcPath(options: {
   ].join(' ')
 }
 
+/**
+ * Compute translate offset for a pie slice hover emphasis effect.
+ * The slice moves outward along its bisector angle.
+ */
+export function computePieHoverOffset(
+  startAngle: number,
+  endAngle: number,
+  offset: number
+): { dx: number; dy: number } {
+  const midAngle = (startAngle + endAngle) / 2
+  return {
+    dx: offset * Math.cos(midAngle),
+    dy: offset * Math.sin(midAngle)
+  }
+}
+
+/**
+ * Compute positions for an outside label with a leader line.
+ * Returns anchor (on slice edge), elbow (turn point), label (text position), and textAnchor.
+ */
+export function computePieLabelLine(
+  cx: number,
+  cy: number,
+  outerRadius: number,
+  startAngle: number,
+  endAngle: number,
+  offset?: number
+): {
+  anchor: { x: number; y: number }
+  elbow: { x: number; y: number }
+  label: { x: number; y: number }
+  textAnchor: 'start' | 'end'
+} {
+  const midAngle = (startAngle + endAngle) / 2
+  const gap = offset ?? Math.max(12, outerRadius * 0.15)
+  const anchor = polarToCartesian(cx, cy, outerRadius, midAngle)
+  const elbow = polarToCartesian(cx, cy, outerRadius + gap * 0.6, midAngle)
+  const isRight = Math.cos(midAngle) >= 0
+
+  return {
+    anchor,
+    elbow,
+    label: {
+      x: elbow.x + (isRight ? gap * 0.8 : -gap * 0.8),
+      y: elbow.y
+    },
+    textAnchor: isRight ? 'start' : 'end'
+  }
+}
+
+/** Drop shadow filter value for emphasized pie slices */
+export const PIE_EMPHASIS_SHADOW = 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))'
+export const PIE_BASE_SHADOW = 'drop-shadow(0 1px 2px rgba(0,0,0,0.06))'
+
 export function getRadarAngles(count: number, startAngle = -Math.PI / 2): number[] {
   if (count <= 0) return []
   const step = (Math.PI * 2) / count

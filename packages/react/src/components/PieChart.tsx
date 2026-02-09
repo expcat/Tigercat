@@ -2,11 +2,15 @@ import React, { useMemo, useCallback } from 'react'
 import {
   chartAxisTickTextClasses,
   classNames,
+  computePieHoverOffset,
+  computePieLabelLine,
   createPieArcPath,
   DEFAULT_CHART_COLORS,
   getChartElementOpacity,
   getChartInnerRect,
   getPieArcs,
+  PIE_BASE_SHADOW,
+  PIE_EMPHASIS_SHADOW,
   polarToCartesian,
   type ChartLegendItem,
   type ChartPadding,
@@ -40,6 +44,11 @@ export const PieChart: React.FC<PieChartProps> = ({
   colors,
   showLabels = false,
   labelFormatter,
+  labelPosition = 'inside',
+  borderWidth = 2,
+  borderColor = '#ffffff',
+  hoverOffset = 8,
+  shadow = false,
   hoverable = false,
   hoveredIndex: hoveredIndexProp,
   activeOpacity = 1,
@@ -101,8 +110,9 @@ export const PieChart: React.FC<PieChartProps> = ({
 
   const resolvedOuterRadius = useMemo(() => {
     if (typeof outerRadius === 'number') return Math.max(0, outerRadius)
-    return Math.max(0, Math.min(innerRect.width, innerRect.height) / 2)
-  }, [outerRadius, innerRect.width, innerRect.height])
+    const maxR = Math.min(innerRect.width, innerRect.height) / 2
+    return labelPosition === 'outside' ? maxR * 0.72 : maxR
+  }, [outerRadius, innerRect.width, innerRect.height, labelPosition])
 
   const resolvedInnerRadius = useMemo(
     () => Math.min(Math.max(0, innerRadius ?? 0), resolvedOuterRadius),
@@ -162,6 +172,8 @@ export const PieChart: React.FC<PieChartProps> = ({
     return datum ? formatTooltip(datum, resolvedHoveredIndex) : ''
   }, [resolvedHoveredIndex, data, formatTooltip])
 
+  const interactive = hoverable || selectable
+
   const chart = (
     <ChartCanvas
       width={width}
@@ -181,10 +193,15 @@ export const PieChart: React.FC<PieChartProps> = ({
             startAngle: arc.startAngle,
             endAngle: arc.endAngle
           })
+          const isEmphasized = activeIndex === arc.index
           const opacity = getChartElementOpacity(arc.index, activeIndex, {
             activeOpacity,
             inactiveOpacity
           })
+          const { dx, dy } =
+            interactive && isEmphasized && hoverOffset > 0
+              ? computePieHoverOffset(arc.startAngle, arc.endAngle, hoverOffset)
+              : { dx: 0, dy: 0 }
 
           return (
             <path
@@ -192,10 +209,16 @@ export const PieChart: React.FC<PieChartProps> = ({
               d={path}
               fill={color}
               opacity={opacity}
-              className={classNames(
-                'transition-opacity duration-150',
-                (hoverable || selectable) && 'cursor-pointer'
-              )}
+              stroke={borderColor}
+              strokeWidth={borderWidth}
+              strokeLinejoin="round"
+              className={classNames(interactive && 'cursor-pointer')}
+              style={{
+                transform: `translate(${dx}px, ${dy}px)`,
+                transition:
+                  'transform 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease-out, filter 0.25s ease-out',
+                filter: shadow ? (isEmphasized ? PIE_EMPHASIS_SHADOW : PIE_BASE_SHADOW) : undefined
+              }}
               tabIndex={selectable ? 0 : undefined}
               data-pie-slice="true"
               data-index={arc.index}
@@ -209,6 +232,43 @@ export const PieChart: React.FC<PieChartProps> = ({
         })}
       </g>
       {showLabels &&
+        labelPosition === 'outside' &&
+        arcs.map((arc) => {
+          const color = arc.data.color ?? palette[arc.index % palette.length]
+          const line = computePieLabelLine(
+            cx,
+            cy,
+            resolvedOuterRadius,
+            arc.startAngle,
+            arc.endAngle
+          )
+          const pct = total > 0 ? ((arc.value / total) * 100).toFixed(1) : '0'
+          const labelText = labelFormatter
+            ? labelFormatter(arc.value, arc.data, arc.index)
+            : `${arc.data.label ?? arc.value} ${pct}%`
+
+          return (
+            <g key={`label-group-${arc.index}`}>
+              <polyline
+                points={`${line.anchor.x},${line.anchor.y} ${line.elbow.x},${line.elbow.y} ${line.label.x},${line.label.y}`}
+                fill="none"
+                stroke={color}
+                strokeWidth={1}
+                opacity={0.5}
+              />
+              <text
+                x={line.label.x}
+                y={line.label.y}
+                textAnchor={line.textAnchor}
+                dominantBaseline="middle"
+                className="fill-[color:var(--tiger-text-secondary,#6b7280)] text-xs">
+                {labelText}
+              </text>
+            </g>
+          )
+        })}
+      {showLabels &&
+        labelPosition !== 'outside' &&
         arcs.map((arc) => {
           const angle = (arc.startAngle + arc.endAngle) / 2
           const { x, y } = polarToCartesian(cx, cy, labelRadius, angle)
@@ -255,7 +315,7 @@ export const PieChart: React.FC<PieChartProps> = ({
         position={legendPosition}
         markerSize={legendMarkerSize}
         gap={legendGap}
-        interactive={hoverable || selectable}
+        interactive={interactive}
         onItemClick={handleLegendClick}
         onItemHover={handleLegendHover}
         onItemLeave={handleLegendLeave}

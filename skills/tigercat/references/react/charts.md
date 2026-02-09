@@ -67,10 +67,22 @@ const data = [
   { value: 15, label: 'Product D' }
 ]
 
-<PieChart data={data} width={320} height={220} showLabels />
-<PieChart data={data} showLegend legendPosition="right" hoverable onSliceClick={handleSliceClick} />
-<DonutChart data={data} innerRadius={0.6} centerContent={<span className="text-2xl font-bold">75%</span>} />
+{/* 基础饼图（默认 2px 白色边框分隔） */}
+<PieChart data={data} width={380} height={280} showLabels />
+{/* ECharts 风格：悬停偏移 + 阴影 */}
+<PieChart data={data} hoverable shadow />
+{/* 外部标签 + 引导线 */}
+<PieChart data={data} showLabels labelPosition="outside" hoverable shadow />
+{/* 图例 + 交互 */}
+<PieChart data={data} showLegend legendPosition="right" hoverable selectable shadow onSliceClick={handleSliceClick} />
+{/* 自定义边框 */}
+<PieChart data={data} borderWidth={3} borderColor="#e5e7eb" />
+{/* 无边框 */}
+<PieChart data={data} borderWidth={0} />
+<DonutChart data={data} innerRadius={0.6} hoverable shadow centerContent={<span className="text-2xl font-bold">75%</span>} />
 ```
+
+````
 
 ---
 
@@ -91,7 +103,7 @@ const data = [
   /* 渐变填充 + 曲线平滑 + 空心点 + 入场动画 */
 }
 ;<AreaChart data={data} gradient curve="monotone" showPoints pointHollow animated />
-```
+````
 
 ---
 

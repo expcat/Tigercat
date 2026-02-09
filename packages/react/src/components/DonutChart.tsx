@@ -32,6 +32,11 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   colors,
   showLabels = false,
   labelFormatter,
+  labelPosition = 'inside',
+  borderWidth = 2,
+  borderColor = '#ffffff',
+  hoverOffset = 8,
+  shadow = false,
   // Interaction props
   hoverable = false,
   hoveredIndex,
@@ -90,6 +95,12 @@ export const DonutChart: React.FC<DonutChartProps> = ({
       colors={colors}
       showLabels={showLabels}
       labelFormatter={labelFormatter}
+      labelPosition={labelPosition}
+      // Visual enhancements
+      borderWidth={borderWidth}
+      borderColor={borderColor}
+      hoverOffset={hoverOffset}
+      shadow={shadow}
       // Interaction props
       hoverable={hoverable}
       hoveredIndex={hoveredIndex}

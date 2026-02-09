@@ -105,11 +105,16 @@ description: Shared charts props and concepts
 
 ### PieChart / DonutChart
 
-| Prop          | Type        | Default     | Vue    | React   |
-| ------------- | ----------- | ----------- | ------ | ------- |
-| showLabels    | `boolean`   | `false`     | ✓      | ✓       |
-| innerRadius   | `number`    | `0` / `0.6` | ✓ (px) | ✓ (0-1) |
-| centerContent | `ReactNode` | -           | -      | ✓       |
+| Prop          | Type                    | Default     | Vue    | React   |
+| ------------- | ----------------------- | ----------- | ------ | ------- |
+| showLabels    | `boolean`               | `false`     | ✓      | ✓       |
+| labelPosition | `'inside' \| 'outside'` | `'inside'`  | ✓      | ✓       |
+| innerRadius   | `number`                | `0` / `0.6` | ✓ (px) | ✓ (0-1) |
+| borderWidth   | `number`                | `2`         | ✓      | ✓       |
+| borderColor   | `string`                | `'#ffffff'` | ✓      | ✓       |
+| hoverOffset   | `number`                | `8`         | ✓      | ✓       |
+| shadow        | `boolean`               | `false`     | ✓      | ✓       |
+| centerContent | `ReactNode`             | -           | -      | ✓       |
 
 ### AreaChart
 

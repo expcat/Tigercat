@@ -97,14 +97,26 @@ const data = [
 </script>
 
 <template>
-  <PieChart :data="data" :width="320" :height="220" show-labels />
+  <!-- 基础饼图（默认 2px 白色边框分隔） -->
+  <PieChart :data="data" :width="380" :height="280" show-labels />
+  <!-- ECharts 风格：悬停偏移 + 阴影 -->
+  <PieChart :data="data" hoverable shadow />
+  <!-- 外部标签 + 引导线 -->
+  <PieChart :data="data" show-labels label-position="outside" hoverable shadow />
+  <!-- 图例 + 交互 -->
   <PieChart
     :data="data"
     show-legend
     legend-position="right"
     hoverable
+    selectable
+    shadow
     @slice-click="handleSliceClick" />
-  <DonutChart :data="data" :inner-radius-ratio="0.6" />
+  <!-- 自定义边框 -->
+  <PieChart :data="data" :border-width="3" border-color="#e5e7eb" />
+  <!-- 无边框 -->
+  <PieChart :data="data" :border-width="0" />
+  <DonutChart :data="data" :inner-radius-ratio="0.6" hoverable shadow />
 </template>
 ```
 

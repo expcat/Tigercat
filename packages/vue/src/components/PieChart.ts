@@ -2,11 +2,15 @@ import { defineComponent, computed, h, PropType } from 'vue'
 import {
   chartAxisTickTextClasses,
   classNames,
+  computePieHoverOffset,
+  computePieLabelLine,
   createPieArcPath,
   DEFAULT_CHART_COLORS,
   getChartElementOpacity,
   getChartInnerRect,
   getPieArcs,
+  PIE_BASE_SHADOW,
+  PIE_EMPHASIS_SHADOW,
   polarToCartesian,
   type ChartLegendItem,
   type ChartLegendPosition,
@@ -132,6 +136,27 @@ export const PieChart = defineComponent({
     },
     className: {
       type: String
+    },
+    // Visual enhancements
+    borderWidth: {
+      type: Number,
+      default: 2
+    },
+    borderColor: {
+      type: String,
+      default: '#ffffff'
+    },
+    hoverOffset: {
+      type: Number,
+      default: 8
+    },
+    labelPosition: {
+      type: String as PropType<'inside' | 'outside'>,
+      default: 'inside'
+    },
+    shadow: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'slice-click', 'slice-hover'],
@@ -167,7 +192,8 @@ export const PieChart = defineComponent({
 
     const resolvedOuterRadius = computed(() => {
       if (typeof props.outerRadius === 'number') return Math.max(0, props.outerRadius)
-      return Math.max(0, Math.min(innerRect.value.width, innerRect.value.height) / 2)
+      const maxR = Math.min(innerRect.value.width, innerRect.value.height) / 2
+      return Math.max(0, props.labelPosition === 'outside' ? maxR * 0.72 : maxR)
     })
 
     const resolvedInnerRadius = computed(() =>
@@ -195,12 +221,13 @@ export const PieChart = defineComponent({
       }))
     )
 
+    const total = computed(() => props.data.reduce((sum, d) => sum + d.value, 0))
+
     const formatTooltip = computed(
       () =>
         props.tooltipFormatter ??
         ((datum: PieChartDatum, index: number) => {
-          const total = props.data.reduce((sum, d) => sum + d.value, 0)
-          const percent = total > 0 ? ((datum.value / total) * 100).toFixed(1) : '0'
+          const percent = total.value > 0 ? ((datum.value / total.value) * 100).toFixed(1) : '0'
           const label = datum.label ?? `#${index + 1}`
           return `${label}: ${datum.value} (${percent}%)`
         })
@@ -216,9 +243,10 @@ export const PieChart = defineComponent({
       const rect = innerRect.value
       const cx = rect.width / 2
       const cy = rect.height / 2
-      const outerRadius = resolvedOuterRadius.value
-      const innerRadius = resolvedInnerRadius.value
-      const labelRadius = innerRadius + (outerRadius - innerRadius) / 2
+      const outerR = resolvedOuterRadius.value
+      const innerR = resolvedInnerRadius.value
+      const interactive = props.hoverable || props.selectable
+      const hoverOff = props.hoverOffset ?? 8
       const formatLabel =
         props.labelFormatter ?? ((value: number, datum: PieChartDatum) => datum.label ?? `${value}`)
 
@@ -233,76 +261,128 @@ export const PieChart = defineComponent({
           className: classNames(props.className)
         },
         {
-          default: () =>
-            [
-              h(
-                ChartSeries,
-                {
-                  data: props.data,
-                  type: 'pie'
-                },
-                {
-                  default: () =>
-                    arcs.value.map((arc) => {
-                      const color =
-                        arc.data.color ?? palette.value[arc.index % palette.value.length]
-                      const path = createPieArcPath({
-                        cx,
-                        cy,
-                        innerRadius,
-                        outerRadius,
-                        startAngle: arc.startAngle,
-                        endAngle: arc.endAngle
-                      })
-                      const opacity = getChartElementOpacity(arc.index, activeIndex.value, {
-                        activeOpacity: props.activeOpacity,
-                        inactiveOpacity: props.inactiveOpacity
-                      })
-
-                      return h('path', {
-                        key: `slice-${arc.index}`,
-                        d: path,
-                        fill: color,
-                        opacity,
-                        class: classNames(
-                          (props.hoverable || props.selectable) &&
-                            'cursor-pointer transition-opacity duration-150'
-                        ),
-                        tabindex: props.selectable ? 0 : undefined,
-                        role: props.selectable ? 'button' : 'img',
-                        'aria-label': arc.data.label ?? `${arc.value}`,
-                        'data-pie-slice': 'true',
-                        'data-index': arc.index,
-                        onMouseenter: (e: MouseEvent) => handleMouseEnter(arc.index, e),
-                        onMousemove: handleMouseMove,
-                        onMouseleave: handleMouseLeave,
-                        onClick: () => handleClick(arc.index),
-                        onKeydown: (e: KeyboardEvent) => handleKeyDown(e, arc.index)
-                      })
+          default: () => {
+            // Slices
+            const slices = h(
+              ChartSeries,
+              { data: props.data, type: 'pie' },
+              {
+                default: () =>
+                  arcs.value.map((arc) => {
+                    const color = arc.data.color ?? palette.value[arc.index % palette.value.length]
+                    const path = createPieArcPath({
+                      cx,
+                      cy,
+                      innerRadius: innerR,
+                      outerRadius: outerR,
+                      startAngle: arc.startAngle,
+                      endAngle: arc.endAngle
                     })
-                }
-              ),
-              props.showLabels
-                ? arcs.value.map((arc) => {
-                    const angle = (arc.startAngle + arc.endAngle) / 2
-                    const { x, y } = polarToCartesian(cx, cy, labelRadius, angle)
-                    const label = formatLabel(arc.value, arc.data, arc.index)
+                    const isEmphasized = activeIndex.value === arc.index
+                    const opacity = getChartElementOpacity(arc.index, activeIndex.value, {
+                      activeOpacity: props.activeOpacity,
+                      inactiveOpacity: props.inactiveOpacity
+                    })
+                    const { dx, dy } =
+                      interactive && isEmphasized && hoverOff > 0
+                        ? computePieHoverOffset(arc.startAngle, arc.endAngle, hoverOff)
+                        : { dx: 0, dy: 0 }
 
-                    return h(
+                    return h('path', {
+                      key: `slice-${arc.index}`,
+                      d: path,
+                      fill: color,
+                      opacity,
+                      stroke: props.borderColor,
+                      'stroke-width': props.borderWidth,
+                      'stroke-linejoin': 'round',
+                      class: classNames(interactive && 'cursor-pointer'),
+                      style: {
+                        transform: `translate(${dx}px, ${dy}px)`,
+                        transition:
+                          'transform 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease-out, filter 0.25s ease-out',
+                        filter: props.shadow
+                          ? isEmphasized
+                            ? PIE_EMPHASIS_SHADOW
+                            : PIE_BASE_SHADOW
+                          : undefined
+                      },
+                      tabindex: props.selectable ? 0 : undefined,
+                      role: props.selectable ? 'button' : 'img',
+                      'aria-label': arc.data.label ?? `${arc.value}`,
+                      'data-pie-slice': 'true',
+                      'data-index': arc.index,
+                      onMouseenter: (e: MouseEvent) => handleMouseEnter(arc.index, e),
+                      onMousemove: handleMouseMove,
+                      onMouseleave: handleMouseLeave,
+                      onClick: () => handleClick(arc.index),
+                      onKeydown: (e: KeyboardEvent) => handleKeyDown(e, arc.index)
+                    })
+                  })
+              }
+            )
+
+            if (!props.showLabels) return [slices]
+
+            // Outside labels with leader lines
+            if (props.labelPosition === 'outside') {
+              const labelNodes = arcs.value
+                .map((arc) => {
+                  const color = arc.data.color ?? palette.value[arc.index % palette.value.length]
+                  const line = computePieLabelLine(cx, cy, outerR, arc.startAngle, arc.endAngle)
+                  const pct = total.value > 0 ? ((arc.value / total.value) * 100).toFixed(1) : '0'
+                  const labelText = props.labelFormatter
+                    ? props.labelFormatter(arc.value, arc.data, arc.index)
+                    : `${arc.data.label ?? arc.value} ${pct}%`
+
+                  return [
+                    h('polyline', {
+                      key: `line-${arc.index}`,
+                      points: `${line.anchor.x},${line.anchor.y} ${line.elbow.x},${line.elbow.y} ${line.label.x},${line.label.y}`,
+                      fill: 'none',
+                      stroke: color,
+                      'stroke-width': 1,
+                      opacity: 0.5
+                    }),
+                    h(
                       'text',
                       {
                         key: `label-${arc.index}`,
-                        x,
-                        y,
-                        class: chartAxisTickTextClasses,
-                        'text-anchor': 'middle',
-                        'dominant-baseline': 'middle'
+                        x: line.label.x,
+                        y: line.label.y,
+                        'text-anchor': line.textAnchor,
+                        'dominant-baseline': 'middle',
+                        class: 'fill-[color:var(--tiger-text-secondary,#6b7280)] text-xs'
                       },
-                      label
+                      labelText
                     )
-                  })
-                : null
-            ].filter(Boolean)
+                  ]
+                })
+                .flat()
+              return [slices, ...labelNodes]
+            }
+
+            // Inside labels
+            const labelRadius = innerR + (outerR - innerR) / 2
+            const insideLabels = arcs.value.map((arc) => {
+              const angle = (arc.startAngle + arc.endAngle) / 2
+              const { x, y } = polarToCartesian(cx, cy, labelRadius, angle)
+              const label = formatLabel(arc.value, arc.data, arc.index)
+              return h(
+                'text',
+                {
+                  key: `label-${arc.index}`,
+                  x,
+                  y,
+                  class: chartAxisTickTextClasses,
+                  'text-anchor': 'middle',
+                  'dominant-baseline': 'middle'
+                },
+                label
+              )
+            })
+            return [slices, ...insideLabels]
+          }
         }
       )
 
@@ -327,7 +407,7 @@ export const PieChart = defineComponent({
           position: props.legendPosition,
           markerSize: props.legendMarkerSize,
           gap: props.legendGap,
-          interactive: props.hoverable || props.selectable,
+          interactive,
           onItemClick: handleLegendClick,
           onItemHover: handleLegendHover,
           onItemLeave: handleLegendLeave
