@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Carousel, Button, Space } from '@expcat/tigercat-react'
+import { useState, useRef } from 'react'
+import { Carousel, Button, Space, type CarouselRef } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Carousel>
@@ -28,6 +28,25 @@ const dotPositionSnippet = `<Carousel dotPosition={position}>
   <div className="slide">Slide 2</div>
 </Carousel>`
 
+const nonInfiniteSnippet = `<Carousel infinite={false} arrows>
+  <div className="slide">Slide 1</div>
+  <div className="slide">Slide 2</div>
+  <div className="slide">Slide 3</div>
+</Carousel>`
+
+const imperativeSnippet = `const carouselRef = useRef<CarouselRef>(null)
+
+<Carousel ref={carouselRef}>
+  <div className="slide">Slide 1</div>
+  <div className="slide">Slide 2</div>
+  <div className="slide">Slide 3</div>
+</Carousel>
+<Space>
+  <Button onClick={() => carouselRef.current?.prev()}>Prev</Button>
+  <Button onClick={() => carouselRef.current?.next()}>Next</Button>
+  <Button onClick={() => carouselRef.current?.goTo(0)}>Go to First</Button>
+</Space>`
+
 const slideColors = [
   'bg-gradient-to-r from-blue-500 to-blue-600',
   'bg-gradient-to-r from-green-500 to-green-600',
@@ -37,6 +56,7 @@ const slideColors = [
 
 export default function CarouselDemo() {
   const [dotPosition, setDotPosition] = useState<'top' | 'bottom' | 'left' | 'right'>('bottom')
+  const carouselRef = useRef<CarouselRef>(null)
 
   return (
     <div className="max-w-5xl mx-auto p-8">
@@ -129,6 +149,53 @@ export default function CarouselDemo() {
               </div>
             ))}
           </Carousel>
+        </div>
+      </DemoBlock>
+
+      <DemoBlock
+        title="非循环模式"
+        description="关闭无限循环，到达边界时箭头自动禁用。"
+        code={nonInfiniteSnippet}>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <Carousel infinite={false} arrows>
+            {slideColors.map((color, index) => (
+              <div
+                key={index}
+                className={`${color} h-48 flex items-center justify-center text-white text-2xl font-bold rounded-lg`}>
+                Slide {index + 1}
+              </div>
+            ))}
+          </Carousel>
+        </div>
+      </DemoBlock>
+
+      <DemoBlock
+        title="编程式控制"
+        description="通过 ref 调用 next / prev / goTo 方法。"
+        code={imperativeSnippet}>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <Carousel ref={carouselRef}>
+            {slideColors.map((color, index) => (
+              <div
+                key={index}
+                className={`${color} h-48 flex items-center justify-center text-white text-2xl font-bold rounded-lg`}>
+                Slide {index + 1}
+              </div>
+            ))}
+          </Carousel>
+          <div className="mt-4">
+            <Space>
+              <Button size="sm" onClick={() => carouselRef.current?.prev()}>
+                Prev
+              </Button>
+              <Button size="sm" onClick={() => carouselRef.current?.next()}>
+                Next
+              </Button>
+              <Button size="sm" onClick={() => carouselRef.current?.goTo(0)}>
+                Go to First
+              </Button>
+            </Space>
+          </div>
         </div>
       </DemoBlock>
     </div>

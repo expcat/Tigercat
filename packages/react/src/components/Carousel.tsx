@@ -13,7 +13,6 @@ import {
   carouselTrackScrollClasses,
   carouselTrackFadeClasses,
   carouselSlideBaseClasses,
-  carouselSlideFadeClasses,
   getCarouselDotsClasses,
   getCarouselDotClasses,
   getCarouselArrowClasses,
@@ -76,7 +75,15 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
   ) => {
     const [currentIndex, setCurrentIndex] = useState(initialSlide)
     const [isPaused, setIsPaused] = useState(false)
-    const autoplayTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+    // Stable refs for callbacks (avoid restarting autoplay timer on callback changes)
+    const onChangeRef = useRef(onChange)
+    const onBeforeChangeRef = useRef(onBeforeChange)
+    onChangeRef.current = onChange
+    onBeforeChangeRef.current = onBeforeChange
+
+    const currentIndexRef = useRef(currentIndex)
+    currentIndexRef.current = currentIndex
 
     // Get slides from children
     const slides = useMemo(() => {
@@ -93,10 +100,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
 
     // Track classes
     const trackClasses = useMemo(() => {
-      if (effect === 'fade') {
-        return carouselTrackFadeClasses
-      }
-      return carouselTrackScrollClasses
+      return effect === 'fade' ? carouselTrackFadeClasses : carouselTrackScrollClasses
     }, [effect])
 
     // Track style for scroll effect
@@ -110,30 +114,22 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       return {}
     }, [effect, currentIndex, speed])
 
-    // Get slide classes
-    const getSlideClasses = useCallback(
-      (index: number) => {
-        const isActive = index === currentIndex
-        if (effect === 'fade') {
-          // First slide uses relative to establish container height, others are absolute
-          const positionClass = index === 0 ? 'relative' : 'absolute inset-0'
-          return classNames(
-            positionClass,
-            'w-full transition-opacity ease-in-out',
-            isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
-          )
-        }
-        return carouselSlideBaseClasses
-      },
-      [effect, currentIndex]
-    )
+    // Slide style for fade effect
+    const slideStyle = useMemo(() => ({ transitionDuration: `${speed}ms` }), [speed])
 
-    // Get slide style for fade effect
-    const getSlideStyle = useCallback(() => {
-      return {
-        transitionDuration: `${speed}ms`
+    // Get slide classes
+    const getSlideClasses = (index: number) => {
+      const isActive = index === currentIndex
+      if (effect === 'fade') {
+        const positionClass = index === 0 ? 'relative' : 'absolute inset-0'
+        return classNames(
+          positionClass,
+          'w-full transition-opacity ease-in-out',
+          isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
+        )
       }
-    }, [speed])
+      return carouselSlideBaseClasses
+    }
 
     // Dots classes
     const dotsClasses = useMemo(() => {
@@ -181,29 +177,20 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
 
     // Autoplay effect
     useEffect(() => {
-      if (autoplay && !isPaused) {
-        // Clear any existing timer first
-        if (autoplayTimerRef.current) {
-          clearInterval(autoplayTimerRef.current)
+      if (!autoplay || isPaused) return
+
+      const timer = setInterval(() => {
+        const curr = currentIndexRef.current
+        const nextIdx = getNextSlideIndex(curr, slideCount, infinite)
+        if (nextIdx !== curr) {
+          onBeforeChangeRef.current?.(curr, nextIdx)
+          setCurrentIndex(nextIdx)
+          onChangeRef.current?.(nextIdx, curr)
         }
-        autoplayTimerRef.current = setInterval(() => {
-          setCurrentIndex((prevIndex) => {
-            const nextIdx = getNextSlideIndex(prevIndex, slideCount, infinite)
-            if (nextIdx !== prevIndex) {
-              onBeforeChange?.(prevIndex, nextIdx)
-              onChange?.(nextIdx, prevIndex)
-            }
-            return nextIdx
-          })
-        }, autoplaySpeed)
-      }
-      return () => {
-        if (autoplayTimerRef.current) {
-          clearInterval(autoplayTimerRef.current)
-          autoplayTimerRef.current = null
-        }
-      }
-    }, [autoplay, autoplaySpeed, isPaused, slideCount, infinite, onChange, onBeforeChange])
+      }, autoplaySpeed)
+
+      return () => clearInterval(timer)
+    }, [autoplay, autoplaySpeed, isPaused, slideCount, infinite])
 
     // Pause/Resume handlers
     const handleMouseEnter = useCallback(() => {
@@ -241,48 +228,40 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       [currentIndex, slideCount, infinite]
     )
 
+    // Arrow button helper
+    const renderArrowButton = (
+      type: 'prev' | 'next',
+      disabled: boolean,
+      onClick: () => void,
+      path: string
+    ) => (
+      <button
+        type="button"
+        className={getCarouselArrowClasses(type, disabled)}
+        onClick={onClick}
+        disabled={disabled}
+        aria-label={type === 'prev' ? 'Previous slide' : 'Next slide'}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="w-6 h-6">
+          <path d={path} />
+        </svg>
+      </button>
+    )
+
     // Render arrows
     const renderArrows = () => {
       if (!arrows) return null
-
       return (
         <>
-          <button
-            type="button"
-            className={getCarouselArrowClasses('prev', isPrevArrowDisabled)}
-            onClick={prev}
-            disabled={isPrevArrowDisabled}
-            aria-label="Previous slide">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-6 h-6">
-              <path d={carouselPrevArrowPath} />
-            </svg>
-          </button>
-          <button
-            type="button"
-            className={getCarouselArrowClasses('next', isNextArrowDisabled)}
-            onClick={next}
-            disabled={isNextArrowDisabled}
-            aria-label="Next slide">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-6 h-6">
-              <path d={carouselNextArrowPath} />
-            </svg>
-          </button>
+          {renderArrowButton('prev', isPrevArrowDisabled, prev, carouselPrevArrowPath)}
+          {renderArrowButton('next', isNextArrowDisabled, next, carouselNextArrowPath)}
         </>
       )
     }
@@ -313,7 +292,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
         <div
           key={index}
           className={getSlideClasses(index)}
-          style={effect === 'fade' ? getSlideStyle() : undefined}
+          style={effect === 'fade' ? slideStyle : undefined}
           role="group"
           aria-roledescription="slide"
           aria-label={`Slide ${index + 1} of ${slideCount}`}

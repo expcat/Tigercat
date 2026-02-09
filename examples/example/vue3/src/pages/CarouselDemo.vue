@@ -29,7 +29,25 @@ const dotPositionSnippet = `<Carousel :dotPosition="position">
   <div class="slide">Slide 2</div>
 </Carousel>`
 
+const nonInfiniteSnippet = `<Carousel :infinite="false" arrows>
+  <div class="slide">Slide 1</div>
+  <div class="slide">Slide 2</div>
+  <div class="slide">Slide 3</div>
+</Carousel>`
+
+const imperativeSnippet = `<Carousel ref="carouselRef">
+  <div class="slide">Slide 1</div>
+  <div class="slide">Slide 2</div>
+  <div class="slide">Slide 3</div>
+</Carousel>
+<Space>
+  <Button @click="carouselRef?.prev()">Prev</Button>
+  <Button @click="carouselRef?.next()">Next</Button>
+  <Button @click="carouselRef?.goTo(0)">Go to First</Button>
+</Space>`
+
 const dotPosition = ref<'top' | 'bottom' | 'left' | 'right'>('bottom')
+const carouselRef = ref<{ next: () => void; prev: () => void; goTo: (index: number) => void }>()
 
 const slideColors = [
     'bg-gradient-to-r from-blue-500 to-blue-600',
@@ -130,6 +148,42 @@ const slideColors = [
                         Slide {{ index + 1 }}
                     </div>
                 </Carousel>
+            </div>
+        </DemoBlock>
+
+        <DemoBlock title="非循环模式"
+                   description="关闭无限循环，到达边界时箭头自动禁用。"
+                   :code="nonInfiniteSnippet">
+            <div class="p-6 bg-gray-50 rounded-lg">
+                <Carousel :infinite="false"
+                          arrows>
+                    <div v-for="(color, index) in slideColors"
+                         :key="index"
+                         :class="[color, 'h-48 flex items-center justify-center text-white text-2xl font-bold rounded-lg']">
+                        Slide {{ index + 1 }}
+                    </div>
+                </Carousel>
+            </div>
+        </DemoBlock>
+
+        <DemoBlock title="编程式控制"
+                   description="通过 ref 调用 next / prev / goTo 方法。"
+                   :code="imperativeSnippet">
+            <div class="p-6 bg-gray-50 rounded-lg">
+                <Carousel ref="carouselRef">
+                    <div v-for="(color, index) in slideColors"
+                         :key="index"
+                         :class="[color, 'h-48 flex items-center justify-center text-white text-2xl font-bold rounded-lg']">
+                        Slide {{ index + 1 }}
+                    </div>
+                </Carousel>
+                <div class="mt-4">
+                    <Space>
+                        <Button size="sm" @click="carouselRef?.prev()">Prev</Button>
+                        <Button size="sm" @click="carouselRef?.next()">Next</Button>
+                        <Button size="sm" @click="carouselRef?.goTo(0)">Go to First</Button>
+                    </Space>
+                </div>
             </div>
         </DemoBlock>
     </div>

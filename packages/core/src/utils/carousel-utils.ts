@@ -3,7 +3,7 @@
  * Shared styles and helpers for Carousel components
  */
 
-import type { CarouselDotPosition, CarouselEffect } from '../types/carousel'
+import type { CarouselDotPosition } from '../types/carousel'
 
 /**
  * Base carousel container classes
@@ -24,11 +24,6 @@ export const carouselTrackFadeClasses = 'relative'
  * Carousel slide base classes
  */
 export const carouselSlideBaseClasses = 'flex-shrink-0 w-full'
-
-/**
- * Carousel slide classes for fade effect
- */
-export const carouselSlideFadeClasses = 'absolute inset-0 transition-opacity ease-in-out'
 
 /**
  * Carousel dots container base classes
@@ -81,11 +76,7 @@ export const carouselArrowDisabledClasses = 'opacity-50 cursor-not-allowed point
  * Get carousel container classes
  */
 export function getCarouselContainerClasses(className?: string): string {
-  const classes = [carouselBaseClasses]
-  if (className) {
-    classes.push(className)
-  }
-  return classes.filter(Boolean).join(' ')
+  return className ? `${carouselBaseClasses} ${className}` : carouselBaseClasses
 }
 
 /**
@@ -99,23 +90,17 @@ export function getCarouselDotsClasses(position: CarouselDotPosition): string {
  * Get carousel dot classes based on active state
  */
 export function getCarouselDotClasses(isActive: boolean): string {
-  const classes = [carouselDotClasses]
-  if (isActive) {
-    classes.push(carouselDotActiveClasses)
-  }
-  return classes.filter(Boolean).join(' ')
+  return isActive ? `${carouselDotClasses} ${carouselDotActiveClasses}` : carouselDotClasses
 }
 
 /**
  * Get carousel arrow classes based on type and disabled state
  */
 export function getCarouselArrowClasses(type: 'prev' | 'next', disabled: boolean): string {
-  const classes = [carouselArrowBaseClasses]
-  classes.push(type === 'prev' ? carouselPrevArrowClasses : carouselNextArrowClasses)
-  if (disabled) {
-    classes.push(carouselArrowDisabledClasses)
-  }
-  return classes.filter(Boolean).join(' ')
+  const position = type === 'prev' ? carouselPrevArrowClasses : carouselNextArrowClasses
+  return disabled
+    ? `${carouselArrowBaseClasses} ${position} ${carouselArrowDisabledClasses}`
+    : `${carouselArrowBaseClasses} ${position}`
 }
 
 /**
@@ -194,11 +179,9 @@ export function getScrollTransform(currentIndex: number): string {
 /**
  * Prev arrow SVG path
  */
-export const carouselPrevArrowPath =
-  'M15.75 19.5L8.25 12l7.5-7.5'
+export const carouselPrevArrowPath = 'M15.75 19.5L8.25 12l7.5-7.5'
 
 /**
  * Next arrow SVG path
  */
-export const carouselNextArrowPath =
-  'M8.25 4.5l7.5 7.5-7.5 7.5'
+export const carouselNextArrowPath = 'M8.25 4.5l7.5 7.5-7.5 7.5'

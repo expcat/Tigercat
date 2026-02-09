@@ -18,7 +18,6 @@ import {
   carouselTrackScrollClasses,
   carouselTrackFadeClasses,
   carouselSlideBaseClasses,
-  carouselSlideFadeClasses,
   getCarouselDotsClasses,
   getCarouselDotClasses,
   getCarouselArrowClasses,
@@ -202,12 +201,10 @@ export const Carousel = defineComponent({
       return carouselSlideBaseClasses
     }
 
-    // Get slide style for fade effect
-    const getSlideStyle = () => {
-      return {
-        transitionDuration: `${props.speed}ms`
-      }
-    }
+    // Slide style for fade effect
+    const slideStyle = computed(() => ({
+      transitionDuration: `${props.speed}ms`
+    }))
 
     // Dots classes
     const dotsClasses = computed(() => {
@@ -336,61 +333,45 @@ export const Carousel = defineComponent({
       const slides = flattenSlots(defaultSlot).filter((child) => child.type !== Comment)
       slideCount.value = slides.length
 
+      // Arrow button helper
+      const renderArrowButton = (
+        type: 'prev' | 'next',
+        disabled: boolean,
+        onClick: () => void,
+        path: string
+      ) =>
+        h(
+          'button',
+          {
+            type: 'button',
+            class: getCarouselArrowClasses(type, disabled),
+            onClick,
+            disabled,
+            'aria-label': type === 'prev' ? 'Previous slide' : 'Next slide'
+          },
+          h(
+            'svg',
+            {
+              xmlns: 'http://www.w3.org/2000/svg',
+              viewBox: '0 0 24 24',
+              fill: 'none',
+              stroke: 'currentColor',
+              'stroke-width': '2',
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round',
+              class: 'w-6 h-6'
+            },
+            h('path', { d: path })
+          )
+        )
+
       // Render arrows
       const renderArrows = () => {
         if (!props.arrows) return null
-
-        const prevArrow = h(
-          'button',
-          {
-            type: 'button',
-            class: getCarouselArrowClasses('prev', isPrevArrowDisabled.value),
-            onClick: prev,
-            disabled: isPrevArrowDisabled.value,
-            'aria-label': 'Previous slide'
-          },
-          h(
-            'svg',
-            {
-              xmlns: 'http://www.w3.org/2000/svg',
-              viewBox: '0 0 24 24',
-              fill: 'none',
-              stroke: 'currentColor',
-              'stroke-width': '2',
-              'stroke-linecap': 'round',
-              'stroke-linejoin': 'round',
-              class: 'w-6 h-6'
-            },
-            h('path', { d: carouselPrevArrowPath })
-          )
-        )
-
-        const nextArrow = h(
-          'button',
-          {
-            type: 'button',
-            class: getCarouselArrowClasses('next', isNextArrowDisabled.value),
-            onClick: next,
-            disabled: isNextArrowDisabled.value,
-            'aria-label': 'Next slide'
-          },
-          h(
-            'svg',
-            {
-              xmlns: 'http://www.w3.org/2000/svg',
-              viewBox: '0 0 24 24',
-              fill: 'none',
-              stroke: 'currentColor',
-              'stroke-width': '2',
-              'stroke-linecap': 'round',
-              'stroke-linejoin': 'round',
-              class: 'w-6 h-6'
-            },
-            h('path', { d: carouselNextArrowPath })
-          )
-        )
-
-        return [prevArrow, nextArrow]
+        return [
+          renderArrowButton('prev', isPrevArrowDisabled.value, prev, carouselPrevArrowPath),
+          renderArrowButton('next', isNextArrowDisabled.value, next, carouselNextArrowPath)
+        ]
       }
 
       // Render dots
@@ -427,7 +408,7 @@ export const Carousel = defineComponent({
             {
               key: index,
               class: getSlideClasses(index),
-              style: props.effect === 'fade' ? getSlideStyle() : undefined,
+              style: props.effect === 'fade' ? slideStyle.value : undefined,
               role: 'group',
               'aria-roledescription': 'slide',
               'aria-label': `Slide ${index + 1} of ${slides.length}`,
