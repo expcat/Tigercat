@@ -844,3 +844,65 @@ export const barValueLabelInsideClasses =
  */
 export const barAnimatedTransition =
   'transition: y 600ms cubic-bezier(.4,0,.2,1), height 600ms cubic-bezier(.4,0,.2,1), opacity 200ms ease-out, filter 200ms ease-out'
+
+// ============================================================================
+// Scatter Chart Utilities
+// ============================================================================
+
+let scatterGradientCounter = 0
+
+/**
+ * Generate a unique gradient ID prefix for a ScatterChart instance.
+ */
+export function getScatterGradientPrefix(): string {
+  return `tiger-scatter-grad-${++scatterGradientCounter}`
+}
+
+/**
+ * Reset the scatter gradient counter (for testing only)
+ */
+export function resetScatterGradientCounter(): void {
+  scatterGradientCounter = 0
+}
+
+/** CSS transition for scatter point hover */
+export const scatterPointTransitionClasses = 'transition-all duration-200 ease-out'
+
+/** Drop shadow filter for hovered scatter points */
+export function getScatterHoverShadow(color: string): string {
+  return `drop-shadow(0 0 4px ${color})`
+}
+
+/**
+ * Generate SVG path for different point shapes centered at (0, 0).
+ * Use with transform="translate(cx, cy)".
+ */
+export function getScatterPointPath(
+  style: 'square' | 'triangle' | 'diamond',
+  size: number
+): string {
+  switch (style) {
+    case 'square':
+      return `M ${-size} ${-size} L ${size} ${-size} L ${size} ${size} L ${-size} ${size} Z`
+    case 'triangle': {
+      const h = size * 1.15
+      return `M 0 ${-h} L ${size} ${h * 0.75} L ${-size} ${h * 0.75} Z`
+    }
+    case 'diamond':
+      return `M 0 ${-size * 1.2} L ${size} 0 L 0 ${size * 1.2} L ${-size} 0 Z`
+  }
+}
+
+/**
+ * Compute the hovered size for a scatter point.
+ */
+export function getScatterHoverSize(baseSize: number): number {
+  return baseSize + 2
+}
+
+/**
+ * CSS animation keyframes and class for scatter entrance animation.
+ * Inject once via <style> tag.
+ */
+export const SCATTER_ENTRANCE_KEYFRAMES = `@keyframes tiger-scatter-entrance{from{opacity:0;transform:scale(0)}60%{transform:scale(1.15)}to{opacity:1;transform:scale(1)}}`
+export const SCATTER_ENTRANCE_CLASS = 'tiger-scatter-entrance'

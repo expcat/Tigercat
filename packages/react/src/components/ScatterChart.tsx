@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useState, useEffect, useRef } from 'react'
 import {
   classNames,
   createLinearScale,
@@ -6,6 +6,13 @@ import {
   getChartElementOpacity,
   getChartInnerRect,
   getNumberExtent,
+  getScatterGradientPrefix,
+  getScatterHoverShadow,
+  getScatterHoverSize,
+  getScatterPointPath,
+  scatterPointTransitionClasses,
+  SCATTER_ENTRANCE_KEYFRAMES,
+  SCATTER_ENTRANCE_CLASS,
   type ChartLegendItem,
   type ChartLegendPosition,
   type ChartPadding,
@@ -59,9 +66,14 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
   data,
   xScale,
   yScale,
-  pointSize = 4,
+  pointSize = 6,
   pointColor = 'var(--tiger-primary,#2563eb)',
   pointOpacity,
+  pointStyle = 'circle',
+  gradient = false,
+  animated = false,
+  pointBorderWidth = 0,
+  pointBorderColor = 'white',
   showGrid = true,
   showAxis = true,
   showXAxis = true,
@@ -77,7 +89,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
   yTickFormat,
   gridLineStyle = 'solid',
   gridStrokeWidth = 1,
-  // Interaction props
+  // Interaction
   hoverable = false,
   hoveredIndex: hoveredIndexProp,
   onHoveredIndexChange,
@@ -88,13 +100,13 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
   onSelectedIndexChange,
   onPointClick,
   onPointHover,
-  // Legend props
+  // Legend
   showLegend = false,
   legendPosition = 'bottom',
   legendMarkerSize = 10,
   legendGap = 8,
   legendFormatter,
-  // Tooltip props
+  // Tooltip
   showTooltip = true,
   tooltipFormatter,
   // Other
@@ -103,7 +115,14 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
   desc,
   className
 }) => {
-  // Use shared interaction hook
+  const gradientPrefixRef = useRef(getScatterGradientPrefix())
+  const gradientPrefix = gradientPrefixRef.current
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    if (animated) setMounted(true)
+  }, [animated])
+
   const {
     tooltipPosition,
     resolvedHoveredIndex,
@@ -131,9 +150,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
       onPointHover?.(index, index !== null ? data[index] : null)
     },
     onSelectedIndexChange,
-    callbacks: {
-      onClick: onPointClick
-    }
+    callbacks: { onClick: onPointClick }
   })
 
   const innerRect = useMemo(
@@ -169,13 +186,18 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
           activeOpacity,
           inactiveOpacity
         })
+        const isHovered = resolvedHoveredIndex === index
+        const baseSize = item.size ?? pointSize
+        const r = isHovered ? getScatterHoverSize(baseSize) : baseSize
 
         return {
           cx: resolvedXScale.map(item.x),
           cy: resolvedYScale.map(item.y),
-          r: item.size ?? pointSize,
+          r,
+          baseSize,
           color,
           opacity: pointOpacity ?? opacity,
+          isHovered,
           datum: item
         }
       }),
@@ -185,6 +207,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
       activeIndex,
       activeOpacity,
       inactiveOpacity,
+      resolvedHoveredIndex,
       resolvedXScale,
       resolvedYScale,
       pointSize,
@@ -222,6 +245,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
 
   const shouldShowXAxis = showAxis && showXAxis
   const shouldShowYAxis = showAxis && showYAxis
+  const interactive = hoverable || selectable
 
   const chart = (
     <ChartCanvas
@@ -231,6 +255,25 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
       title={title}
       desc={desc}
       className={classNames(className)}>
+      {/* Radial gradient defs */}
+      {gradient && (
+        <defs>
+          {palette.map((color, i) => (
+            <radialGradient
+              key={`grad-${i}`}
+              id={`${gradientPrefix}-${i}`}
+              cx="35%"
+              cy="35%"
+              r="65%">
+              <stop offset="0%" stopColor="#fff" stopOpacity={0.5} />
+              <stop offset="50%" stopColor={color} stopOpacity={0.95} />
+              <stop offset="100%" stopColor={color} stopOpacity={1} />
+            </radialGradient>
+          ))}
+        </defs>
+      )}
+      {/* Animation keyframes */}
+      {animated && mounted && <style>{SCATTER_ENTRANCE_KEYFRAMES}</style>}
       {showGrid && (
         <ChartGrid
           xScale={resolvedXScale}
@@ -266,31 +309,63 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
         />
       )}
       <ChartSeries data={data} type="scatter">
-        {points.map((point, index) => (
-          <circle
-            key={`point-${index}`}
-            cx={point.cx}
-            cy={point.cy}
-            r={point.r}
-            fill={point.color}
-            opacity={point.opacity}
-            className={classNames(
-              'transition-opacity duration-150',
-              (hoverable || selectable) && 'cursor-pointer'
-            )}
-            tabIndex={selectable ? 0 : undefined}
-            role={selectable ? 'button' : 'img'}
-            aria-label={
-              point.datum.label ?? `Point ${index + 1}: (${point.datum.x}, ${point.datum.y})`
-            }
-            data-point-index={index}
-            onMouseEnter={(e) => handleMouseEnter(index, e)}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            onClick={() => handleClick(index)}
-            onKeyDown={(e) => handleKeyDown(e, index)}
-          />
-        ))}
+        {points.map((point, index) => {
+          const paletteIdx = index % palette.length
+          const fill = gradient ? `url(#${gradientPrefix}-${paletteIdx})` : point.color
+
+          const filterStyle = point.isHovered ? getScatterHoverShadow(point.color) : undefined
+
+          const animDelay = animated && mounted ? `${index * 60}ms` : undefined
+
+          const styleObj: React.CSSProperties = {
+            ...(filterStyle ? { filter: filterStyle } : {}),
+            ...(animDelay
+              ? {
+                  animation: `${SCATTER_ENTRANCE_CLASS} 500ms cubic-bezier(.34,1.56,.64,1) ${animDelay} both`
+                }
+              : {})
+          }
+
+          const sharedProps = {
+            fill,
+            opacity: point.opacity,
+            stroke: pointBorderColor,
+            strokeWidth: pointBorderWidth,
+            className: classNames(scatterPointTransitionClasses, interactive && 'cursor-pointer'),
+            style: Object.keys(styleObj).length > 0 ? styleObj : undefined,
+            tabIndex: selectable ? 0 : undefined,
+            role: selectable ? 'button' : ('img' as const),
+            'aria-label':
+              point.datum.label ?? `Point ${index + 1}: (${point.datum.x}, ${point.datum.y})`,
+            'data-point-index': index,
+            onMouseEnter: (e: React.MouseEvent) => handleMouseEnter(index, e),
+            onMouseMove: handleMouseMove,
+            onMouseLeave: handleMouseLeave,
+            onClick: () => handleClick(index),
+            onKeyDown: (e: React.KeyboardEvent) => handleKeyDown(e, index)
+          }
+
+          if (pointStyle === 'circle') {
+            return (
+              <circle
+                key={`point-${index}`}
+                cx={point.cx}
+                cy={point.cy}
+                r={point.r}
+                {...sharedProps}
+              />
+            )
+          }
+
+          return (
+            <path
+              key={`point-${index}`}
+              d={getScatterPointPath(pointStyle, point.r)}
+              transform={`translate(${point.cx},${point.cy})`}
+              {...sharedProps}
+            />
+          )
+        })}
       </ChartSeries>
     </ChartCanvas>
   )
@@ -321,7 +396,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
         position={legendPosition}
         markerSize={legendMarkerSize}
         gap={legendGap}
-        interactive={hoverable || selectable}
+        interactive={interactive}
         onItemClick={handleLegendClick}
         onItemHover={handleLegendHover}
         onItemLeave={handleLegendLeave}

@@ -162,6 +162,7 @@ const total = data.reduce((s, d) => s + d.value, 0)
 
 ```vue
 <template>
+  <!-- 基础用法（默认扁平纯色填充） -->
   <ScatterChart
     :data="[
       { x: 10, y: 20 },
@@ -169,7 +170,14 @@ const total = data.reduce((s, d) => s + d.value, 0)
     ]"
     :width="360"
     :height="200" />
-  <ScatterChart :data="data" x-axis-label="X" y-axis-label="Y" :point-size="6" hoverable />
+  <!-- 坐标轴标签 + 悬停交互 -->
+  <ScatterChart :data="data" x-axis-label="X" y-axis-label="Y" hoverable />
+  <!-- 渐变 + 描边 + 入场动画 -->
+  <ScatterChart :data="data" gradient :point-border-width="1.5" animated hoverable />
+  <!-- 菱形散点 -->
+  <ScatterChart :data="data" point-style="diamond" :point-size="8" hoverable />
+  <!-- 图例组合 -->
+  <ScatterChart :data="data" show-legend hoverable @point-click="handleClick" />
 </template>
 ```
 

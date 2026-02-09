@@ -133,10 +133,14 @@ description: Shared charts props and concepts
 
 ### ScatterChart
 
-| Prop       | Type                                 | Default    | Vue | React |
-| ---------- | ------------------------------------ | ---------- | --- | ----- |
-| pointSize  | `number`                             | `4` / `6`  | ✓   | ✓     |
-| pointStyle | `'circle' \| 'square' \| 'triangle'` | `'circle'` | -   | ✓     |
+| Prop             | Type                                              | Default    | Vue | React |
+| ---------------- | ------------------------------------------------- | ---------- | --- | ----- |
+| pointSize        | `number`                                          | `6`        | ✓   | ✓     |
+| pointStyle       | `'circle' \| 'square' \| 'triangle' \| 'diamond'` | `'circle'` | ✓   | ✓     |
+| gradient         | `boolean`                                         | `false`    | ✓   | ✓     |
+| animated         | `boolean`                                         | `false`    | ✓   | ✓     |
+| pointBorderWidth | `number`                                          | `0`        | ✓   | ✓     |
+| pointBorderColor | `string`                                          | `'white'`  | ✓   | ✓     |
 
 ### RadarChart
 

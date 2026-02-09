@@ -155,8 +155,33 @@ const total = data.reduce((s, d) => s + d.value, 0)
 ## ScatterChart
 
 ```tsx
-<ScatterChart data={[{ x: 10, y: 20 }, { x: 30, y: 80 }]} width={360} height={200} />
-<ScatterChart data={data} xAxisLabel="X" yAxisLabel="Y" pointSize={6} pointStyle="circle" hoverable />
+{
+  /* 基础用法（默认扁平纯色填充） */
+}
+;<ScatterChart
+  data={[
+    { x: 10, y: 20 },
+    { x: 30, y: 80 }
+  ]}
+  width={360}
+  height={200}
+/>
+{
+  /* 坐标轴标签 + 悬停交互 */
+}
+;<ScatterChart data={data} xAxisLabel="X" yAxisLabel="Y" hoverable />
+{
+  /* 渐变 + 描边 + 入场动画 */
+}
+;<ScatterChart data={data} gradient pointBorderWidth={1.5} animated hoverable />
+{
+  /* 菱形散点 */
+}
+;<ScatterChart data={data} pointStyle="diamond" pointSize={8} hoverable />
+{
+  /* 图例组合 */
+}
+;<ScatterChart data={data} showLegend hoverable onPointClick={handleClick} />
 ```
 
 ---

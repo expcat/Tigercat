@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, PropType, onMounted, ref } from 'vue'
 import {
   classNames,
   createLinearScale,
@@ -6,6 +6,13 @@ import {
   getChartElementOpacity,
   getChartInnerRect,
   getNumberExtent,
+  getScatterGradientPrefix,
+  getScatterHoverShadow,
+  getScatterHoverSize,
+  getScatterPointPath,
+  scatterPointTransitionClasses,
+  SCATTER_ENTRANCE_KEYFRAMES,
+  SCATTER_ENTRANCE_CLASS,
   type ChartGridLineStyle,
   type ChartLegendItem,
   type ChartLegendPosition,
@@ -33,14 +40,8 @@ export interface VueScatterChartProps extends CoreScatterChartProps {
 export const ScatterChart = defineComponent({
   name: 'TigerScatterChart',
   props: {
-    width: {
-      type: Number,
-      default: 320
-    },
-    height: {
-      type: Number,
-      default: 200
-    },
+    width: { type: Number, default: 320 },
+    height: { type: Number, default: 200 },
     padding: {
       type: [Number, Object] as PropType<ChartPadding>,
       default: 24
@@ -49,63 +50,33 @@ export const ScatterChart = defineComponent({
       type: Array as PropType<ScatterChartDatum[]>,
       required: true
     },
-    xScale: {
-      type: Object as PropType<ChartScale>
-    },
-    yScale: {
-      type: Object as PropType<ChartScale>
-    },
-    pointSize: {
-      type: Number,
-      default: 4
-    },
+    xScale: { type: Object as PropType<ChartScale> },
+    yScale: { type: Object as PropType<ChartScale> },
+    pointSize: { type: Number, default: 6 },
     pointColor: {
       type: String,
       default: 'var(--tiger-primary,#2563eb)'
     },
-    pointOpacity: {
-      type: Number
+    pointOpacity: { type: Number },
+    pointStyle: {
+      type: String as PropType<'circle' | 'square' | 'triangle' | 'diamond'>,
+      default: 'circle'
     },
-    showGrid: {
-      type: Boolean,
-      default: true
-    },
-    showAxis: {
-      type: Boolean,
-      default: true
-    },
-    showXAxis: {
-      type: Boolean,
-      default: true
-    },
-    showYAxis: {
-      type: Boolean,
-      default: true
-    },
-    includeZero: {
-      type: Boolean,
-      default: false
-    },
-    xAxisLabel: {
-      type: String
-    },
-    yAxisLabel: {
-      type: String
-    },
-    xTicks: {
-      type: Number,
-      default: 5
-    },
-    yTicks: {
-      type: Number,
-      default: 5
-    },
-    xTickValues: {
-      type: Array as PropType<number[]>
-    },
-    yTickValues: {
-      type: Array as PropType<number[]>
-    },
+    gradient: { type: Boolean, default: false },
+    animated: { type: Boolean, default: false },
+    pointBorderWidth: { type: Number, default: 0 },
+    pointBorderColor: { type: String, default: 'white' },
+    showGrid: { type: Boolean, default: true },
+    showAxis: { type: Boolean, default: true },
+    showXAxis: { type: Boolean, default: true },
+    showYAxis: { type: Boolean, default: true },
+    includeZero: { type: Boolean, default: false },
+    xAxisLabel: { type: String },
+    yAxisLabel: { type: String },
+    xTicks: { type: Number, default: 5 },
+    yTicks: { type: Number, default: 5 },
+    xTickValues: { type: Array as PropType<number[]> },
+    yTickValues: { type: Array as PropType<number[]> },
     xTickFormat: {
       type: Function as PropType<(value: ChartScaleValue) => string>
     },
@@ -116,80 +87,51 @@ export const ScatterChart = defineComponent({
       type: String as PropType<ChartGridLineStyle>,
       default: 'solid' as ChartGridLineStyle
     },
-    gridStrokeWidth: {
-      type: Number,
-      default: 1
-    },
-    // Interaction props
-    hoverable: {
-      type: Boolean,
-      default: false
-    },
+    gridStrokeWidth: { type: Number, default: 1 },
+    // Interaction
+    hoverable: { type: Boolean, default: false },
     hoveredIndex: {
       type: Number as PropType<number | null>,
       default: undefined
     },
-    activeOpacity: {
-      type: Number,
-      default: 1
-    },
-    inactiveOpacity: {
-      type: Number,
-      default: 0.25
-    },
-    selectable: {
-      type: Boolean,
-      default: false
-    },
+    activeOpacity: { type: Number, default: 1 },
+    inactiveOpacity: { type: Number, default: 0.25 },
+    selectable: { type: Boolean, default: false },
     selectedIndex: {
       type: Number as PropType<number | null>,
       default: undefined
     },
-    // Legend props
-    showLegend: {
-      type: Boolean,
-      default: false
-    },
+    // Legend
+    showLegend: { type: Boolean, default: false },
     legendPosition: {
       type: String as PropType<ChartLegendPosition>,
       default: 'bottom'
     },
-    legendMarkerSize: {
-      type: Number,
-      default: 10
-    },
-    legendGap: {
-      type: Number,
-      default: 8
-    },
+    legendMarkerSize: { type: Number, default: 10 },
+    legendGap: { type: Number, default: 8 },
     legendFormatter: {
       type: Function as PropType<(datum: ScatterChartDatum, index: number) => string>
     },
-    // Tooltip props
-    showTooltip: {
-      type: Boolean,
-      default: true
-    },
+    // Tooltip
+    showTooltip: { type: Boolean, default: true },
     tooltipFormatter: {
       type: Function as PropType<(datum: ScatterChartDatum, index: number) => string>
     },
     // Other
-    colors: {
-      type: Array as PropType<string[]>
-    },
-    title: {
-      type: String
-    },
-    desc: {
-      type: String
-    },
-    className: {
-      type: String
-    }
+    colors: { type: Array as PropType<string[]> },
+    title: { type: String },
+    desc: { type: String },
+    className: { type: String }
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'point-click', 'point-hover'],
   setup(props, { emit }) {
-    // Use shared interaction composable
+    const gradientPrefix = getScatterGradientPrefix()
+    const mounted = ref(false)
+
+    onMounted(() => {
+      if (props.animated) mounted.value = true
+    })
+
     const {
       tooltipPosition,
       resolvedHoveredIndex,
@@ -251,13 +193,18 @@ export const ScatterChart = defineComponent({
           activeOpacity: props.activeOpacity,
           inactiveOpacity: props.inactiveOpacity
         })
+        const isHovered = resolvedHoveredIndex.value === index
+        const baseSize = item.size ?? props.pointSize
+        const r = isHovered ? getScatterHoverSize(baseSize) : baseSize
 
         return {
           cx: resolvedXScale.value.map(item.x),
           cy: resolvedYScale.value.map(item.y),
-          r: item.size ?? props.pointSize,
+          r,
+          baseSize,
           color,
           opacity: props.pointOpacity ?? opacity,
+          isHovered,
           datum: item
         }
       })
@@ -290,6 +237,29 @@ export const ScatterChart = defineComponent({
     })
 
     return () => {
+      // Radial gradient defs for depth effect
+      const defs = props.gradient
+        ? h(
+            'defs',
+            null,
+            palette.value.map((color, i) =>
+              h(
+                'radialGradient',
+                { id: `${gradientPrefix}-${i}`, cx: '35%', cy: '35%', r: '65%' },
+                [
+                  h('stop', { offset: '0%', 'stop-color': '#fff', 'stop-opacity': '0.5' }),
+                  h('stop', { offset: '50%', 'stop-color': color, 'stop-opacity': '0.95' }),
+                  h('stop', { offset: '100%', 'stop-color': color, 'stop-opacity': '1' })
+                ]
+              )
+            )
+          )
+        : null
+
+      // Animation keyframes
+      const animStyle =
+        props.animated && mounted.value ? h('style', null, SCATTER_ENTRANCE_KEYFRAMES) : null
+
       const chart = h(
         ChartCanvas,
         {
@@ -303,6 +273,8 @@ export const ScatterChart = defineComponent({
         {
           default: () =>
             [
+              defs,
+              animStyle,
               props.showGrid
                 ? h(ChartGrid, {
                     xScale: resolvedXScale.value,
@@ -339,24 +311,42 @@ export const ScatterChart = defineComponent({
                 : null,
               h(
                 ChartSeries,
-                {
-                  data: props.data,
-                  type: 'scatter'
-                },
+                { data: props.data, type: 'scatter' },
                 {
                   default: () =>
-                    points.value.map((point, index) =>
-                      h('circle', {
-                        key: `point-${index}`,
-                        cx: point.cx,
-                        cy: point.cy,
-                        r: point.r,
-                        fill: point.color,
+                    points.value.map((point, index) => {
+                      const paletteIdx = index % palette.value.length
+                      const fill = props.gradient
+                        ? `url(#${gradientPrefix}-${paletteIdx})`
+                        : point.color
+                      const interactive = props.hoverable || props.selectable
+
+                      const filterStyle = point.isHovered
+                        ? getScatterHoverShadow(point.color)
+                        : undefined
+
+                      const animDelay =
+                        props.animated && mounted.value ? `${index * 60}ms` : undefined
+
+                      const styleStr = [
+                        filterStyle ? `filter:${filterStyle}` : '',
+                        animDelay
+                          ? `animation:${SCATTER_ENTRANCE_CLASS} 500ms cubic-bezier(.34,1.56,.64,1) ${animDelay} both`
+                          : ''
+                      ]
+                        .filter(Boolean)
+                        .join(';')
+
+                      const shared = {
+                        fill,
                         opacity: point.opacity,
+                        stroke: props.pointBorderColor,
+                        'stroke-width': props.pointBorderWidth,
                         class: classNames(
-                          'transition-opacity duration-150',
-                          (props.hoverable || props.selectable) && 'cursor-pointer'
+                          scatterPointTransitionClasses,
+                          interactive && 'cursor-pointer'
                         ),
+                        style: styleStr || undefined,
                         tabindex: props.selectable ? 0 : undefined,
                         role: props.selectable ? 'button' : 'img',
                         'aria-label':
@@ -368,8 +358,25 @@ export const ScatterChart = defineComponent({
                         onMouseleave: handleMouseLeave,
                         onClick: () => handleClick(index),
                         onKeydown: (e: KeyboardEvent) => handleKeyDown(e, index)
+                      }
+
+                      if (props.pointStyle === 'circle') {
+                        return h('circle', {
+                          key: `point-${index}`,
+                          cx: point.cx,
+                          cy: point.cy,
+                          r: point.r,
+                          ...shared
+                        })
+                      }
+
+                      return h('path', {
+                        key: `point-${index}`,
+                        d: getScatterPointPath(props.pointStyle, point.r),
+                        transform: `translate(${point.cx},${point.cy})`,
+                        ...shared
                       })
-                    )
+                    })
                 }
               )
             ].filter(Boolean)

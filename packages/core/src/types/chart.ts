@@ -732,8 +732,8 @@ export interface ScatterChartProps
   data: ScatterChartDatum[]
 
   /**
-   * Point size
-   * @default 4
+   * Point size (radius)
+   * @default 6
    */
   pointSize?: number
 
@@ -746,6 +746,36 @@ export interface ScatterChartProps
    * Point opacity
    */
   pointOpacity?: number
+
+  /**
+   * Point shape
+   * @default 'circle'
+   */
+  pointStyle?: 'circle' | 'square' | 'triangle' | 'diamond'
+
+  /**
+   * Enable radial gradient fill for points
+   * @default false
+   */
+  gradient?: boolean
+
+  /**
+   * Enable entrance animation with stagger
+   * @default false
+   */
+  animated?: boolean
+
+  /**
+   * Point border (stroke) width
+   * @default 0
+   */
+  pointBorderWidth?: number
+
+  /**
+   * Point border (stroke) color
+   * @default 'white'
+   */
+  pointBorderColor?: string
 
   /**
    * Include zero in domain

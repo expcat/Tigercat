@@ -57,12 +57,61 @@ describe('ScatterChart', () => {
       data: [{ x: 10, y: 20 }],
       pointColor: '#ff0000',
       pointSize: 8,
+      gradient: false,
       ...defaultSize
     })
 
     const circle = container.querySelector('circle')
     expect(circle).toHaveAttribute('fill', '#ff0000')
     expect(circle).toHaveAttribute('r', '8')
+  })
+
+  it('renders flat fill by default (no gradient, no stroke)', () => {
+    const { container } = renderWithProps(ScatterChart, {
+      data: [{ x: 10, y: 20 }],
+      ...defaultSize
+    })
+
+    const circle = container.querySelector('circle')
+    expect(circle).toHaveAttribute('stroke-width', '0')
+    expect(container.querySelectorAll('radialGradient')).toHaveLength(0)
+  })
+
+  it('renders radial gradient when gradient is true', () => {
+    const { container } = renderWithProps(ScatterChart, {
+      data: [{ x: 10, y: 20 }],
+      gradient: true,
+      ...defaultSize
+    })
+
+    const gradients = container.querySelectorAll('radialGradient')
+    expect(gradients.length).toBeGreaterThan(0)
+  })
+
+  it('applies custom border when pointBorderWidth > 0', () => {
+    const { container } = renderWithProps(ScatterChart, {
+      data: [{ x: 10, y: 20 }],
+      pointBorderWidth: 2,
+      pointBorderColor: '#333',
+      ...defaultSize
+    })
+
+    const circle = container.querySelector('circle')
+    expect(circle).toHaveAttribute('stroke', '#333')
+    expect(circle).toHaveAttribute('stroke-width', '2')
+  })
+
+  it('renders non-circle pointStyle as path', () => {
+    const { container } = renderWithProps(ScatterChart, {
+      data: [{ x: 10, y: 20 }],
+      pointStyle: 'square',
+      ...defaultSize
+    })
+
+    expect(container.querySelectorAll('circle')).toHaveLength(0)
+    const paths = container.querySelectorAll('path[data-point-index]')
+    expect(paths).toHaveLength(1)
+    expect(paths[0]).toHaveAttribute('d')
   })
 
   it('hides axis and grid when disabled', () => {
@@ -130,6 +179,19 @@ describe('ScatterChart', () => {
       expect(circles[0]).toHaveAttribute('opacity', '0.25')
       expect(circles[1]).toHaveAttribute('opacity', '0.25')
       expect(circles[2]).toHaveAttribute('opacity', '1')
+    })
+
+    it('applies hover glow filter on hovered point', () => {
+      const { container } = renderWithProps(ScatterChart, {
+        data: interactiveData,
+        hoverable: true,
+        hoveredIndex: 0,
+        ...defaultSize
+      })
+
+      const circle = container.querySelector('circle')
+      const style = circle?.getAttribute('style') ?? ''
+      expect(style).toContain('drop-shadow')
     })
   })
 })
