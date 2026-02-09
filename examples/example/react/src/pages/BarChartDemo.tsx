@@ -26,6 +26,14 @@ const interactiveData: BarChartDatum[] = [
   { x: 'Jun', y: 310 }
 ]
 
+const smallValuesData: BarChartDatum[] = [
+  { x: 'A', y: 500 },
+  { x: 'B', y: 420 },
+  { x: 'C', y: 2 },
+  { x: 'D', y: 380 },
+  { x: 'E', y: 0.5 }
+]
+
 const currencyFormat = (value: number | string) => `$${value}`
 
 const basicSnippet = `<BarChart
@@ -34,6 +42,17 @@ const basicSnippet = `<BarChart
   height={240}
   xAxisLabel="Weekday"
   yAxisLabel="Sales"
+/>`
+
+const gradientSnippet = `<BarChart
+  data={data}
+  width={420}
+  height={240}
+  gradient
+  animated
+  barRadius={6}
+  gridLineStyle="dashed"
+  showValueLabels
 />`
 
 const customSnippet = `<BarChart
@@ -51,6 +70,7 @@ const hoverableSnippet = `<BarChart
   width={420}
   height={240}
   hoverable
+  gradient
   hoveredIndex={hoveredIndex}
   onHoveredIndexChange={setHoveredIndex}
 />`
@@ -61,6 +81,7 @@ const selectableSnippet = `<BarChart
   height={240}
   hoverable
   selectable
+  gradient
   selectedIndex={selectedIndex}
   onSelectedIndexChange={setSelectedIndex}
   onBarClick={handleBarClick}
@@ -81,6 +102,27 @@ const tooltipSnippet = `<BarChart
   height={240}
   hoverable
   showTooltip
+  gradient
+/>`
+
+const valueLabelSnippet = `<BarChart
+  data={data}
+  width={420}
+  height={240}
+  showValueLabels
+  valueLabelPosition="top"
+  gradient
+  barRadius={6}
+/>`
+
+const constraintSnippet = `<BarChart
+  data={smallValuesData}
+  width={420}
+  height={240}
+  barMinHeight={3}
+  barMaxWidth={40}
+  gradient
+  showValueLabels
 />`
 
 const BarChartDemo: React.FC = () => {
@@ -96,7 +138,9 @@ const BarChartDemo: React.FC = () => {
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">BarChart 柱状图</h1>
-        <p className="text-gray-600">用于展示分类数据的柱状图。</p>
+        <p className="text-gray-600">
+          用于展示分类数据的柱状图，支持渐变填充、数值标签、入场动画等 ECharts 风格特性。
+        </p>
       </div>
 
       <DemoBlock title="基础用法" description="自动生成坐标轴与网格。" code={basicSnippet}>
@@ -106,6 +150,22 @@ const BarChartDemo: React.FC = () => {
           height={240}
           xAxisLabel="Weekday"
           yAxisLabel="Sales"
+        />
+      </DemoBlock>
+
+      <DemoBlock
+        title="渐变填充 + 动画"
+        description="启用 gradient 渐变与 animated 平滑过渡，配合数值标签。"
+        code={gradientSnippet}>
+        <BarChart
+          data={interactiveData}
+          width={420}
+          height={240}
+          gradient
+          animated
+          barRadius={6}
+          gridLineStyle="dashed"
+          showValueLabels
         />
       </DemoBlock>
 
@@ -122,8 +182,38 @@ const BarChartDemo: React.FC = () => {
       </DemoBlock>
 
       <DemoBlock
+        title="数值标签"
+        description="showValueLabels 在柱子上方或内部显示数值。"
+        code={valueLabelSnippet}>
+        <BarChart
+          data={basicData}
+          width={420}
+          height={240}
+          showValueLabels
+          valueLabelPosition="top"
+          gradient
+          barRadius={6}
+        />
+      </DemoBlock>
+
+      <DemoBlock
+        title="柱宽/柱高约束"
+        description="barMaxWidth 限制最大柱宽，barMinHeight 保证微小值可见。"
+        code={constraintSnippet}>
+        <BarChart
+          data={smallValuesData}
+          width={420}
+          height={240}
+          barMinHeight={3}
+          barMaxWidth={40}
+          gradient
+          showValueLabels
+        />
+      </DemoBlock>
+
+      <DemoBlock
         title="悬停高亮"
-        description="启用 hoverable 后，鼠标悬停时高亮柱子。"
+        description="启用 hoverable 后，鼠标悬停时高亮柱子，其余淡出。"
         code={hoverableSnippet}>
         <div className="space-y-4">
           <BarChart
@@ -131,6 +221,7 @@ const BarChartDemo: React.FC = () => {
             width={420}
             height={240}
             hoverable
+            gradient
             hoveredIndex={hoveredIndex}
             onHoveredIndexChange={setHoveredIndex}
           />
@@ -151,6 +242,7 @@ const BarChartDemo: React.FC = () => {
             height={240}
             hoverable
             selectable
+            gradient
             selectedIndex={selectedIndex}
             onSelectedIndexChange={setSelectedIndex}
             onBarClick={handleBarClick}
@@ -180,7 +272,7 @@ const BarChartDemo: React.FC = () => {
         title="显示提示框"
         description="通过 showTooltip 在悬停时显示数据提示。"
         code={tooltipSnippet}>
-        <BarChart data={interactiveData} width={420} height={240} hoverable showTooltip />
+        <BarChart data={interactiveData} width={420} height={240} hoverable showTooltip gradient />
       </DemoBlock>
     </div>
   )

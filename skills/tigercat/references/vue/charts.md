@@ -14,13 +14,29 @@ description: Vue 3 chart components
 import { LineChart } from '@expcat/tigercat-vue'
 
 const data = [
-  { x: 'Jan', y: 30 }, { x: 'Feb', y: 40 }, { x: 'Mar', y: 35 },
-  { x: 'Apr', y: 50 }, { x: 'May', y: 49 }, { x: 'Jun', y: 60 }
+  { x: 'Jan', y: 30 },
+  { x: 'Feb', y: 40 },
+  { x: 'Mar', y: 35 },
+  { x: 'Apr', y: 50 },
+  { x: 'May', y: 49 },
+  { x: 'Jun', y: 60 }
 ]
 
 const series = [
-  { name: 'Series A', data: [{ x: 'Jan', y: 30 }, { x: 'Feb', y: 40 }] },
-  { name: 'Series B', data: [{ x: 'Jan', y: 20 }, { x: 'Feb', y: 35 }] }
+  {
+    name: 'Series A',
+    data: [
+      { x: 'Jan', y: 30 },
+      { x: 'Feb', y: 40 }
+    ]
+  },
+  {
+    name: 'Series B',
+    data: [
+      { x: 'Jan', y: 20 },
+      { x: 'Feb', y: 35 }
+    ]
+  }
 ]
 </script>
 
@@ -28,7 +44,12 @@ const series = [
   <LineChart :data="data" :width="400" :height="240" />
   <LineChart :data="data" curve="monotone" show-points :point-size="4" />
   <LineChart :series="series" show-legend legend-position="bottom" />
-  <LineChart :data="data" hoverable selectable @point-click="handleClick" @point-hover="handleHover" />
+  <LineChart
+    :data="data"
+    hoverable
+    selectable
+    @point-click="handleClick"
+    @point-hover="handleHover" />
 </template>
 ```
 
@@ -38,10 +59,22 @@ const series = [
 
 ```vue
 <template>
+  <!-- 基础 -->
   <BarChart :data="data" :width="360" :height="200" />
   <BarChart :data="data" x-axis-label="Weekday" y-axis-label="Sales" />
+  <!-- 交互 -->
   <BarChart :data="data" hoverable selectable @bar-click="handleBarClick" />
+  <!-- 自定义颜色 -->
   <BarChart :data="data" :colors="['#3b82f6', '#10b981', '#f59e0b']" />
+  <!-- 渐变填充 + 动画 -->
+  <BarChart :data="data" gradient animated :barRadius="6" />
+  <!-- 数值标签 -->
+  <BarChart :data="data" show-value-labels value-label-position="top" />
+  <BarChart :data="data" show-value-labels value-label-position="inside" />
+  <!-- 自定义标签格式 -->
+  <BarChart :data="data" show-value-labels :valueLabelFormatter="(d) => `$${d.y}`" />
+  <!-- 柱宽/柱高约束 -->
+  <BarChart :data="data" :barMaxWidth="40" :barMinHeight="3" />
 </template>
 ```
 
@@ -61,7 +94,12 @@ const data = [
 
 <template>
   <PieChart :data="data" :width="320" :height="220" show-labels />
-  <PieChart :data="data" show-legend legend-position="right" hoverable @slice-click="handleSliceClick" />
+  <PieChart
+    :data="data"
+    show-legend
+    legend-position="right"
+    hoverable
+    @slice-click="handleSliceClick" />
   <DonutChart :data="data" :inner-radius-ratio="0.6" />
 </template>
 ```
@@ -83,7 +121,13 @@ const data = [
 
 ```vue
 <template>
-  <ScatterChart :data="[{ x: 10, y: 20 }, { x: 30, y: 80 }]" :width="360" :height="200" />
+  <ScatterChart
+    :data="[
+      { x: 10, y: 20 },
+      { x: 30, y: 80 }
+    ]"
+    :width="360"
+    :height="200" />
   <ScatterChart :data="data" x-axis-label="X" y-axis-label="Y" :point-size="6" hoverable />
 </template>
 ```
@@ -110,7 +154,10 @@ const series = [
 
 <template>
   <RadarChart :data="data" :width="360" :height="260" />
-  <RadarChart :series="series" :labels="['Speed', 'Stability', 'Design', 'Battery', 'Price']" show-legend />
+  <RadarChart
+    :series="series"
+    :labels="['Speed', 'Stability', 'Design', 'Battery', 'Price']"
+    show-legend />
 </template>
 ```
 
@@ -120,7 +167,13 @@ const series = [
 
 ```vue
 <script setup>
-import { ChartCanvas, ChartAxis, ChartGrid, ChartSeries, createLinearScale } from '@expcat/tigercat-vue'
+import {
+  ChartCanvas,
+  ChartAxis,
+  ChartGrid,
+  ChartSeries,
+  createLinearScale
+} from '@expcat/tigercat-vue'
 
 const xScale = createLinearScale([0, 100], [0, 240])
 const yScale = createLinearScale([0, 100], [160, 0])
@@ -144,9 +197,9 @@ const yScale = createLinearScale([0, 100], [160, 0])
 
 ```ts
 import {
-  createLinearScale,  // 线性比例尺
-  createBandScale,    // 分类比例尺
-  createTimeScale,    // 时间比例尺
-  CHART_COLORS        // 默认调色板
+  createLinearScale, // 线性比例尺
+  createBandScale, // 分类比例尺
+  createTimeScale, // 时间比例尺
+  CHART_COLORS // 默认调色板
 } from '@expcat/tigercat-vue'
 ```

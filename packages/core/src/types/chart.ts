@@ -525,6 +525,11 @@ export interface ChartSeriesProps<T = ChartSeriesPoint> {
   className?: string
 }
 
+/**
+ * Value label position for bar charts
+ */
+export type BarValueLabelPosition = 'top' | 'inside'
+
 export interface BarChartDatum {
   x: ChartScaleValue
   y: number
@@ -654,6 +659,46 @@ export interface BarChartProps
    * @default 1
    */
   gridStrokeWidth?: number
+
+  /**
+   * Show value labels above or inside bars
+   * @default false
+   */
+  showValueLabels?: boolean
+
+  /**
+   * Value label position
+   * @default 'top'
+   */
+  valueLabelPosition?: BarValueLabelPosition
+
+  /**
+   * Value label formatter
+   */
+  valueLabelFormatter?: (datum: BarChartDatum, index: number) => string
+
+  /**
+   * Minimum bar height in px (ensures near-zero values remain visible)
+   * @default 0
+   */
+  barMinHeight?: number
+
+  /**
+   * Maximum bar width in px (prevents overly wide bars with few data points)
+   */
+  barMaxWidth?: number
+
+  /**
+   * Enable linear gradient fill on bars (top-to-bottom, lighter to full)
+   * @default false
+   */
+  gradient?: boolean
+
+  /**
+   * Enable CSS transitions for smooth bar updates
+   * @default false
+   */
+  animated?: boolean
 
   /**
    * Tooltip formatter

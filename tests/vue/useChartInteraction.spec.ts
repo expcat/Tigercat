@@ -131,7 +131,7 @@ describe('useChartInteraction (Vue)', () => {
   describe('controlled hover mode', () => {
     it('should not update local state when controlled', () => {
       const emit = createMockEmit()
-      const options = createTestOptions({ hoveredIndexProp: 0, emit })
+      const options = createTestOptions({ hoveredIndexProp: () => 0, emit })
       const { localHoveredIndex, resolvedHoveredIndex, handleMouseEnter } =
         useChartInteraction(options)
 

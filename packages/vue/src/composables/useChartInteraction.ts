@@ -12,12 +12,12 @@ import {
 export interface UseChartInteractionOptions<T = unknown> {
   /** Enable hover highlight */
   hoverable: boolean | Ref<boolean>
-  /** Controlled hovered index from props */
-  hoveredIndexProp?: number | null
+  /** Getter for controlled hovered index from props (e.g. () => props.hoveredIndex) */
+  hoveredIndexProp?: () => number | null | undefined
   /** Enable click selection */
   selectable: boolean | Ref<boolean>
-  /** Controlled selected index from props */
-  selectedIndexProp?: number | null
+  /** Getter for controlled selected index from props (e.g. () => props.selectedIndex) */
+  selectedIndexProp?: () => number | null | undefined
   /** Opacity for active element */
   activeOpacity: number | Ref<number>
   /** Opacity for inactive elements */
@@ -102,13 +102,15 @@ export function useChartInteraction<T = unknown>(
   const tooltipPosition = ref({ x: 0, y: 0 })
 
   // Resolved indices (controlled vs uncontrolled)
-  const resolvedHoveredIndex = computed(() =>
-    options.hoveredIndexProp !== undefined ? options.hoveredIndexProp : localHoveredIndex.value
-  )
+  const resolvedHoveredIndex = computed(() => {
+    const prop = options.hoveredIndexProp?.()
+    return prop !== undefined ? prop : localHoveredIndex.value
+  })
 
-  const resolvedSelectedIndex = computed(() =>
-    options.selectedIndexProp !== undefined ? options.selectedIndexProp : localSelectedIndex.value
-  )
+  const resolvedSelectedIndex = computed(() => {
+    const prop = options.selectedIndexProp?.()
+    return prop !== undefined ? prop : localSelectedIndex.value
+  })
 
   // Active index for highlighting
   const activeIndex = computed(() => {
@@ -130,7 +132,7 @@ export function useChartInteraction<T = unknown>(
   // Event handlers
   const handleMouseEnter = (index: number, event: MouseEvent) => {
     if (!unref(options.hoverable)) return
-    if (options.hoveredIndexProp === undefined) {
+    if (options.hoveredIndexProp?.() === undefined) {
       localHoveredIndex.value = index
     }
     tooltipPosition.value = { x: event.clientX, y: event.clientY }
@@ -146,7 +148,7 @@ export function useChartInteraction<T = unknown>(
 
   const handleMouseLeave = () => {
     if (!unref(options.hoverable)) return
-    if (options.hoveredIndexProp === undefined) {
+    if (options.hoveredIndexProp?.() === undefined) {
       localHoveredIndex.value = null
     }
     emit('update:hoveredIndex', null)
@@ -158,7 +160,7 @@ export function useChartInteraction<T = unknown>(
   const handleClick = (index: number) => {
     if (!unref(options.selectable)) return
     const nextIndex = resolvedSelectedIndex.value === index ? null : index
-    if (options.selectedIndexProp === undefined) {
+    if (options.selectedIndexProp?.() === undefined) {
       localSelectedIndex.value = nextIndex
     }
     emit('update:selectedIndex', nextIndex)
@@ -181,7 +183,7 @@ export function useChartInteraction<T = unknown>(
 
   const handleLegendHover = (index: number) => {
     if (!unref(options.hoverable)) return
-    if (options.hoveredIndexProp === undefined) {
+    if (options.hoveredIndexProp?.() === undefined) {
       localHoveredIndex.value = index
     }
     emit('update:hoveredIndex', index)

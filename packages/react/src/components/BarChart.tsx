@@ -1,14 +1,22 @@
 import React, { useMemo, useCallback } from 'react'
 import {
   classNames,
+  clampBarWidth,
   createBandScale,
   createLinearScale,
   DEFAULT_CHART_COLORS,
+  ensureBarMinHeight,
+  getBarGradientPrefix,
+  getBarValueLabelY,
   getChartElementOpacity,
   getChartInnerRect,
   getNumberExtent,
+  barValueLabelClasses,
+  barValueLabelInsideClasses,
+  barAnimatedTransition,
   type BarChartDatum,
   type BarChartProps as CoreBarChartProps,
+  type BarValueLabelPosition,
   type ChartLegendItem,
   type ChartPadding,
   type ChartScale
@@ -71,6 +79,13 @@ export const BarChart: React.FC<BarChartProps> = ({
   showTooltip = true,
   tooltipFormatter,
   legendFormatter,
+  showValueLabels = false,
+  valueLabelPosition = 'top',
+  valueLabelFormatter,
+  barMinHeight = 0,
+  barMaxWidth,
+  gradient = false,
+  animated = false,
   title,
   desc,
   className,
@@ -79,6 +94,9 @@ export const BarChart: React.FC<BarChartProps> = ({
   onBarClick,
   onBarHover
 }) => {
+  // Unique gradient prefix for this instance
+  const gradientPrefix = useMemo(() => getBarGradientPrefix(), [])
+
   // Use shared interaction hook
   const {
     tooltipPosition,
@@ -141,18 +159,28 @@ export const BarChart: React.FC<BarChartProps> = ({
 
   const bars = useMemo(() => {
     const scale = resolvedXScale
-    const bandWidth =
+    const rawBandWidth =
       scale.bandwidth ??
       (scale.step ? scale.step * 0.7 : (innerRect.width / Math.max(1, data.length)) * 0.8)
+    const bandWidth = clampBarWidth(rawBandWidth, barMaxWidth)
+    const bandOffset = rawBandWidth > bandWidth ? (rawBandWidth - bandWidth) / 2 : 0
     const baseline = resolvedYScale.map(0)
 
     return data.map((item, index) => {
       const xKey = scale.type === 'linear' ? Number(item.x) : String(item.x)
       const xPos = scale.map(xKey)
-      const barX = scale.bandwidth ? xPos : xPos - bandWidth / 2
+      const barX = (scale.bandwidth ? xPos : xPos - rawBandWidth / 2) + bandOffset
       const barYValue = resolvedYScale.map(item.y)
-      const barHeight = Math.abs(baseline - barYValue)
-      const barY = Math.min(baseline, barYValue)
+      let barHeight = Math.abs(baseline - barYValue)
+      let barY = Math.min(baseline, barYValue)
+
+      // Apply minimum height constraint
+      if (barMinHeight > 0 && barHeight > 0) {
+        const clamped = ensureBarMinHeight(barY, barHeight, baseline, barMinHeight)
+        barY = clamped.y
+        barHeight = clamped.height
+      }
+
       const color = item.color ?? palette[index % palette.length]
       const opacity = getChartElementOpacity(index, activeIndex, {
         activeOpacity,
@@ -178,7 +206,9 @@ export const BarChart: React.FC<BarChartProps> = ({
     palette,
     activeIndex,
     activeOpacity,
-    inactiveOpacity
+    inactiveOpacity,
+    barMinHeight,
+    barMaxWidth
   ])
 
   const legendItems = useMemo<ChartLegendItem[]>(
@@ -218,6 +248,22 @@ export const BarChart: React.FC<BarChartProps> = ({
       title={title}
       desc={desc}
       className={classNames(className)}>
+      {gradient && (
+        <defs>
+          {bars.map((bar) => (
+            <linearGradient
+              key={`grad-${bar.index}`}
+              id={`${gradientPrefix}-${bar.index}`}
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1">
+              <stop offset="0%" stopColor={bar.color} stopOpacity={0.65} />
+              <stop offset="100%" stopColor={bar.color} stopOpacity={1} />
+            </linearGradient>
+          ))}
+        </defs>
+      )}
       {showGrid && (
         <ChartGrid
           xScale={resolvedXScale}
@@ -262,12 +308,20 @@ export const BarChart: React.FC<BarChartProps> = ({
             height={bar.height}
             rx={barRadius}
             ry={barRadius}
-            fill={bar.color}
+            fill={gradient ? `url(#${gradientPrefix}-${bar.index})` : bar.color}
             opacity={bar.opacity}
             className={classNames(
-              'transition-opacity duration-150',
-              (hoverable || selectable) && 'cursor-pointer'
+              'transition-[opacity,filter] duration-200 outline-none',
+              (hoverable || selectable) && 'cursor-pointer hover:brightness-110'
             )}
+            style={
+              animated
+                ? {
+                    transition:
+                      'y 600ms cubic-bezier(.4,0,.2,1), height 600ms cubic-bezier(.4,0,.2,1), opacity 200ms ease-out, filter 200ms ease-out'
+                  }
+                : undefined
+            }
             tabIndex={selectable ? 0 : undefined}
             onMouseEnter={(e) => handleMouseEnter(bar.index, e)}
             onMouseMove={handleMouseMove}
@@ -277,6 +331,27 @@ export const BarChart: React.FC<BarChartProps> = ({
           />
         ))}
       </ChartSeries>
+      {showValueLabels &&
+        bars.map((bar) => {
+          const labelText = valueLabelFormatter
+            ? valueLabelFormatter(bar.datum, bar.index)
+            : String(bar.datum.y)
+          const labelY = getBarValueLabelY(bar.y, bar.height, valueLabelPosition, 8)
+          const isInside = valueLabelPosition === 'inside'
+          return (
+            <text
+              key={`label-${bar.index}`}
+              x={bar.x + bar.width / 2}
+              y={labelY}
+              textAnchor="middle"
+              dominantBaseline={isInside ? 'central' : 'auto'}
+              className={isInside ? barValueLabelInsideClasses : barValueLabelClasses}
+              opacity={bar.opacity}
+              data-value-label="">
+              {labelText}
+            </text>
+          )
+        })}
     </ChartCanvas>
   )
 

@@ -665,3 +665,86 @@ export function stackSeriesData<T extends { x: unknown; y: number }>(
 
   return result
 }
+
+// ============================================================================
+// Bar Chart Utilities
+// ============================================================================
+
+let barGradientCounter = 0
+
+/**
+ * Generate a unique gradient ID prefix for a BarChart instance.
+ * Each BarChart must have its own prefix to avoid gradient ID collisions.
+ */
+export function getBarGradientPrefix(): string {
+  return `tiger-bar-grad-${++barGradientCounter}`
+}
+
+/**
+ * Reset the gradient counter (for testing only)
+ */
+export function resetBarGradientCounter(): void {
+  barGradientCounter = 0
+}
+
+/**
+ * Clamp bar width to a maximum value
+ */
+export function clampBarWidth(width: number, maxWidth?: number): number {
+  if (maxWidth === undefined || maxWidth <= 0) return width
+  return Math.min(width, maxWidth)
+}
+
+/**
+ * Ensure bar meets minimum height for near-zero values.
+ * Returns adjusted y and height while keeping the bar anchored at the baseline.
+ */
+export function ensureBarMinHeight(
+  barY: number,
+  barHeight: number,
+  baseline: number,
+  minHeight: number
+): { y: number; height: number } {
+  if (minHeight <= 0 || barHeight === 0 || barHeight >= minHeight) {
+    return { y: barY, height: barHeight }
+  }
+  // Positive value: bar top is above baseline → extend upward
+  if (barY < baseline) {
+    return { y: baseline - minHeight, height: minHeight }
+  }
+  // Negative value: bar top is at baseline → extend downward
+  return { y: baseline, height: minHeight }
+}
+
+/**
+ * Get the Y coordinate for a value label on a bar
+ */
+export function getBarValueLabelY(
+  barY: number,
+  barHeight: number,
+  position: 'top' | 'inside',
+  offset = 8
+): number {
+  if (position === 'inside') {
+    return barY + barHeight / 2
+  }
+  return barY - offset
+}
+
+/**
+ * CSS classes for value labels displayed on bars
+ */
+export const barValueLabelClasses =
+  'fill-[color:var(--tiger-text,#374151)] text-[11px] font-medium pointer-events-none select-none'
+
+/**
+ * CSS classes for value labels inside bars (needs contrasting color)
+ */
+export const barValueLabelInsideClasses =
+  'fill-white text-[11px] font-medium pointer-events-none select-none'
+
+/**
+ * CSS transition string for animated bars
+ */
+export const barAnimatedTransition =
+  'transition: y 600ms cubic-bezier(.4,0,.2,1), height 600ms cubic-bezier(.4,0,.2,1), opacity 200ms ease-out, filter 200ms ease-out'

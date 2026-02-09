@@ -86,11 +86,18 @@ description: Shared charts props and concepts
 
 ### BarChart
 
-| Prop       | Type      | Default | Vue | React |
-| ---------- | --------- | ------- | --- | ----- |
-| barRadius  | `number`  | `4`     | ✓   | ✓     |
-| horizontal | `boolean` | `false` | ✓   | ✓     |
-| stacked    | `boolean` | `false` | ✓   | ✓     |
+| Prop                | Type                    | Default | Vue | React |
+| ------------------- | ----------------------- | ------- | --- | ----- |
+| barRadius           | `number`                | `4`     | ✓   | ✓     |
+| barPaddingInner     | `number`                | `0.2`   | ✓   | ✓     |
+| barPaddingOuter     | `number`                | `0.1`   | ✓   | ✓     |
+| barMinHeight        | `number`                | `0`     | ✓   | ✓     |
+| barMaxWidth         | `number`                | -       | ✓   | ✓     |
+| gradient            | `boolean`               | `false` | ✓   | ✓     |
+| animated            | `boolean`               | `false` | ✓   | ✓     |
+| showValueLabels     | `boolean`               | `false` | ✓   | ✓     |
+| valueLabelPosition  | `'top' \| 'inside'`     | `'top'` | ✓   | ✓     |
+| valueLabelFormatter | `(datum, index) => str` | -       | ✓   | ✓     |
 
 ### PieChart / DonutChart
 

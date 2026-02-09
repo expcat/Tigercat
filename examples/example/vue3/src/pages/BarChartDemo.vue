@@ -27,11 +27,19 @@ const interactiveData: BarChartDatum[] = [
   { x: 'Jun', y: 310 }
 ]
 
+const smallValuesData: BarChartDatum[] = [
+  { x: 'A', y: 500 },
+  { x: 'B', y: 420 },
+  { x: 'C', y: 2 },
+  { x: 'D', y: 380 },
+  { x: 'E', y: 0.5 }
+]
+
 const hoveredIndex = ref<number | null>(null)
 const selectedIndex = ref<number | null>(null)
 const clickedBar = ref<string>('')
 
-const handleBarClick = (datum: BarChartDatum, _index: number) => {
+const handleBarClick = (_index: number, datum: BarChartDatum) => {
   clickedBar.value = `点击了 ${datum.x}，值为 ${datum.y}`
 }
 
@@ -43,6 +51,17 @@ const basicSnippet = `<BarChart
   :height="240"
   x-axis-label="Weekday"
   y-axis-label="Sales"
+/>`
+
+const gradientSnippet = `<BarChart
+  :data="data"
+  :width="420"
+  :height="240"
+  gradient
+  animated
+  :barRadius="6"
+  grid-line-style="dashed"
+  show-value-labels
 />`
 
 const customSnippet = `<BarChart
@@ -60,6 +79,7 @@ const hoverableSnippet = `<BarChart
   :width="420"
   :height="240"
   hoverable
+  gradient
   v-model:hoveredIndex="hoveredIndex"
 />`
 
@@ -69,6 +89,7 @@ const selectableSnippet = `<BarChart
   :height="240"
   hoverable
   selectable
+  gradient
   v-model:selectedIndex="selectedIndex"
   @bar-click="handleBarClick"
 />`
@@ -88,6 +109,27 @@ const tooltipSnippet = `<BarChart
   :height="240"
   hoverable
   show-tooltip
+  gradient
+/>`
+
+const valueLabelSnippet = `<BarChart
+  :data="data"
+  :width="420"
+  :height="240"
+  show-value-labels
+  value-label-position="top"
+  gradient
+  :barRadius="6"
+/>`
+
+const constraintSnippet = `<BarChart
+  :data="smallValuesData"
+  :width="420"
+  :height="240"
+  :barMinHeight="3"
+  :barMaxWidth="40"
+  gradient
+  show-value-labels
 />`
 </script>
 
@@ -95,7 +137,9 @@ const tooltipSnippet = `<BarChart
   <div class="max-w-5xl mx-auto p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">BarChart 柱状图</h1>
-      <p class="text-gray-600">用于展示分类数据的柱状图。</p>
+      <p class="text-gray-600">
+        用于展示分类数据的柱状图，支持渐变填充、数值标签、入场动画等 ECharts 风格特性。
+      </p>
     </div>
 
     <DemoBlock title="基础用法"
@@ -106,6 +150,19 @@ const tooltipSnippet = `<BarChart
                 :height="240"
                 x-axis-label="Weekday"
                 y-axis-label="Sales" />
+    </DemoBlock>
+
+    <DemoBlock title="渐变填充 + 动画"
+               description="启用 gradient 渐变与 animated 平滑过渡，配合数值标签。"
+               :code="gradientSnippet">
+      <BarChart :data="interactiveData"
+                :width="420"
+                :height="240"
+                gradient
+                animated
+                :barRadius="6"
+                grid-line-style="dashed"
+                show-value-labels />
     </DemoBlock>
 
     <DemoBlock title="自定义样式"
@@ -120,14 +177,39 @@ const tooltipSnippet = `<BarChart
                 :show-x-axis="false" />
     </DemoBlock>
 
+    <DemoBlock title="数值标签"
+               description="show-value-labels 在柱子上方或内部显示数值。"
+               :code="valueLabelSnippet">
+      <BarChart :data="basicData"
+                :width="420"
+                :height="240"
+                show-value-labels
+                value-label-position="top"
+                gradient
+                :barRadius="6" />
+    </DemoBlock>
+
+    <DemoBlock title="柱宽/柱高约束"
+               description="barMaxWidth 限制最大柱宽，barMinHeight 保证微小值可见。"
+               :code="constraintSnippet">
+      <BarChart :data="smallValuesData"
+                :width="420"
+                :height="240"
+                :barMinHeight="3"
+                :barMaxWidth="40"
+                gradient
+                show-value-labels />
+    </DemoBlock>
+
     <DemoBlock title="悬停高亮"
-               description="启用 hoverable 后，鼠标悬停时高亮柱子。"
+               description="启用 hoverable 后，鼠标悬停时高亮柱子，其余淡出。"
                :code="hoverableSnippet">
       <div class="space-y-4">
         <BarChart :data="interactiveData"
                   :width="420"
                   :height="240"
                   hoverable
+                  gradient
                   v-model:hoveredIndex="hoveredIndex" />
         <p class="text-sm text-gray-500">
           当前悬停: {{ hoveredIndex !== null ? interactiveData[hoveredIndex]?.x : '无' }}
@@ -144,6 +226,7 @@ const tooltipSnippet = `<BarChart
                   :height="240"
                   hoverable
                   selectable
+                  gradient
                   v-model:selectedIndex="selectedIndex"
                   @bar-click="handleBarClick" />
         <p class="text-sm text-gray-500">
@@ -172,7 +255,8 @@ const tooltipSnippet = `<BarChart
                 :width="420"
                 :height="240"
                 hoverable
-                show-tooltip />
+                show-tooltip
+                gradient />
     </DemoBlock>
   </div>
 </template>

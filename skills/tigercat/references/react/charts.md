@@ -33,11 +33,22 @@ const series = [
 ## BarChart
 
 ```tsx
+{/* 基础 */}
 <BarChart data={data} width={360} height={200} />
 <BarChart data={data} xAxisLabel="Weekday" yAxisLabel="Sales" />
+{/* 交互 */}
 <BarChart data={data} hoverable selectable onBarClick={handleBarClick} />
+{/* 自定义颜色 */}
 <BarChart data={data} colors={['#3b82f6', '#10b981', '#f59e0b']} />
-<BarChart data={data} horizontal stacked />
+{/* 渐变填充 + 动画 */}
+<BarChart data={data} gradient animated barRadius={6} />
+{/* 数值标签 */}
+<BarChart data={data} showValueLabels valueLabelPosition="top" />
+<BarChart data={data} showValueLabels valueLabelPosition="inside" />
+{/* 自定义标签格式 */}
+<BarChart data={data} showValueLabels valueLabelFormatter={(d) => `$${d.y}`} />
+{/* 柱宽/柱高约束 */}
+<BarChart data={data} barMaxWidth={40} barMinHeight={3} />
 ```
 
 ---
@@ -102,7 +113,14 @@ const series = [
 ## 底层组件
 
 ```tsx
-import { ChartCanvas, ChartAxis, ChartGrid, ChartSeries, ChartLegend, ChartTooltip } from '@expcat/tigercat-react'
+import {
+  ChartCanvas,
+  ChartAxis,
+  ChartGrid,
+  ChartSeries,
+  ChartLegend,
+  ChartTooltip
+} from '@expcat/tigercat-react'
 
 function CustomChart() {
   return (
@@ -124,8 +142,15 @@ function CustomChart() {
 import type { ChartProps, ChartData, AxisConfig } from '@expcat/tigercat-react'
 
 // 数据点
-interface DataPoint { x: string | number; y: number }
+interface DataPoint {
+  x: string | number
+  y: number
+}
 
 // 系列
-interface ChartSeries { name: string; data: DataPoint[]; color?: string }
+interface ChartSeries {
+  name: string
+  data: DataPoint[]
+  color?: string
+}
 ```

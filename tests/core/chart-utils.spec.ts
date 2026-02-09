@@ -17,7 +17,11 @@ import {
   createLinePath,
   createAreaPath,
   stackSeriesData,
-  DEFAULT_CHART_COLORS
+  DEFAULT_CHART_COLORS,
+  clampBarWidth,
+  ensureBarMinHeight,
+  getBarValueLabelY,
+  getBarGradientPrefix
 } from '@expcat/tigercat-core'
 
 describe('chart-utils', () => {
@@ -520,6 +524,83 @@ describe('chart-utils', () => {
 
     it('uses CSS variables with fallbacks', () => {
       expect(DEFAULT_CHART_COLORS[0]).toMatch(/var\(--tiger-chart-\d+,#[0-9a-f]+\)/i)
+    })
+  })
+
+  // ==========================================================================
+  // Bar Chart Utilities
+  // ==========================================================================
+
+  describe('clampBarWidth', () => {
+    it('returns original width when no maxWidth', () => {
+      expect(clampBarWidth(50)).toBe(50)
+      expect(clampBarWidth(50, undefined)).toBe(50)
+    })
+
+    it('clamps width to maxWidth', () => {
+      expect(clampBarWidth(100, 50)).toBe(50)
+    })
+
+    it('returns original when under maxWidth', () => {
+      expect(clampBarWidth(30, 50)).toBe(30)
+    })
+
+    it('ignores maxWidth <= 0', () => {
+      expect(clampBarWidth(50, 0)).toBe(50)
+      expect(clampBarWidth(50, -10)).toBe(50)
+    })
+  })
+
+  describe('ensureBarMinHeight', () => {
+    it('returns original values when height >= minHeight', () => {
+      const result = ensureBarMinHeight(50, 20, 100, 4)
+      expect(result).toEqual({ y: 50, height: 20 })
+    })
+
+    it('extends upward for positive bars below minHeight', () => {
+      const result = ensureBarMinHeight(98, 2, 100, 6)
+      expect(result).toEqual({ y: 94, height: 6 })
+    })
+
+    it('extends downward for negative bars below minHeight', () => {
+      const result = ensureBarMinHeight(100, 2, 100, 6)
+      expect(result).toEqual({ y: 100, height: 6 })
+    })
+
+    it('returns original when minHeight <= 0', () => {
+      const result = ensureBarMinHeight(50, 2, 100, 0)
+      expect(result).toEqual({ y: 50, height: 2 })
+    })
+
+    it('returns original for zero-height bars', () => {
+      const result = ensureBarMinHeight(100, 0, 100, 4)
+      expect(result).toEqual({ y: 100, height: 0 })
+    })
+  })
+
+  describe('getBarValueLabelY', () => {
+    it('positions label above bar for top position', () => {
+      const y = getBarValueLabelY(30, 50, 'top', 8)
+      expect(y).toBe(22) // barY - offset
+    })
+
+    it('positions label at center for inside position', () => {
+      const y = getBarValueLabelY(30, 50, 'inside')
+      expect(y).toBe(55) // barY + barHeight / 2
+    })
+
+    it('uses custom offset for top position', () => {
+      const y = getBarValueLabelY(30, 50, 'top', 12)
+      expect(y).toBe(18)
+    })
+  })
+
+  describe('getBarGradientPrefix', () => {
+    it('returns unique prefixes on successive calls', () => {
+      const a = getBarGradientPrefix()
+      const b = getBarGradientPrefix()
+      expect(a).not.toBe(b)
+      expect(a).toMatch(/^tiger-bar-grad-\d+$/)
     })
   })
 })

@@ -222,9 +222,9 @@ export const RadarChart = defineComponent({
       wrapperClasses
     } = useChartInteraction<RadarChartSeries>({
       hoverable: computed(() => props.hoverable),
-      hoveredIndexProp: props.hoveredIndex,
+      hoveredIndexProp: () => props.hoveredIndex,
       selectable: computed(() => props.selectable),
-      selectedIndexProp: props.selectedIndex,
+      selectedIndexProp: () => props.selectedIndex,
       activeOpacity: computed(() => props.activeOpacity),
       inactiveOpacity: computed(() => props.inactiveOpacity),
       legendPosition: computed(() => props.legendPosition),
