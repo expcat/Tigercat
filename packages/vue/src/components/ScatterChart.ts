@@ -2,7 +2,6 @@ import { defineComponent, computed, h, PropType, onMounted, ref } from 'vue'
 import {
   classNames,
   createLinearScale,
-  DEFAULT_CHART_COLORS,
   getChartElementOpacity,
   getChartInnerRect,
   getNumberExtent,
@@ -13,6 +12,9 @@ import {
   scatterPointTransitionClasses,
   SCATTER_ENTRANCE_KEYFRAMES,
   SCATTER_ENTRANCE_CLASS,
+  resolveChartPalette,
+  buildChartLegendItems,
+  resolveChartTooltipContent,
   type ChartGridLineStyle,
   type ChartLegendItem,
   type ChartLegendPosition,
@@ -175,16 +177,10 @@ export const ScatterChart = defineComponent({
       return createLinearScale(extent, [innerRect.value.height, 0])
     })
 
-    const showXAxis = computed(() => props.showAxis && props.showXAxis)
-    const showYAxis = computed(() => props.showAxis && props.showYAxis)
+    const shouldShowXAxis = computed(() => props.showAxis && props.showXAxis)
+    const shouldShowYAxis = computed(() => props.showAxis && props.showYAxis)
 
-    const palette = computed(() =>
-      props.colors && props.colors.length > 0
-        ? props.colors
-        : props.pointColor
-          ? [props.pointColor]
-          : [...DEFAULT_CHART_COLORS]
-    )
+    const palette = computed(() => resolveChartPalette(props.colors, props.pointColor))
 
     const points = computed(() =>
       props.data.map((item, index) => {
@@ -211,30 +207,27 @@ export const ScatterChart = defineComponent({
     )
 
     const legendItems = computed<ChartLegendItem[]>(() =>
-      props.data.map((item, index) => ({
-        index,
-        label: props.legendFormatter
-          ? props.legendFormatter(item, index)
-          : (item.label ?? `(${item.x}, ${item.y})`),
-        color: item.color ?? palette.value[index % palette.value.length],
-        active: activeIndex.value === null || activeIndex.value === index
-      }))
+      buildChartLegendItems({
+        data: props.data,
+        palette: palette.value,
+        activeIndex: activeIndex.value,
+        getLabel: (d, i) =>
+          props.legendFormatter ? props.legendFormatter(d, i) : (d.label ?? `(${d.x}, ${d.y})`),
+        getColor: (d, i) => d.color ?? palette.value[i % palette.value.length]
+      })
     )
 
-    const formatTooltip = computed(
-      () =>
-        props.tooltipFormatter ??
-        ((datum: ScatterChartDatum, index: number) => {
+    const tooltipContent = computed(() =>
+      resolveChartTooltipContent(
+        resolvedHoveredIndex.value,
+        props.data,
+        props.tooltipFormatter,
+        (datum, index) => {
           const label = datum.label ?? `Point ${index + 1}`
           return `${label}: (${datum.x}, ${datum.y})`
-        })
+        }
+      )
     )
-
-    const tooltipContent = computed(() => {
-      if (resolvedHoveredIndex.value === null) return ''
-      const datum = props.data[resolvedHoveredIndex.value]
-      return datum ? formatTooltip.value(datum, resolvedHoveredIndex.value) : ''
-    })
 
     return () => {
       // Radial gradient defs for depth effect
@@ -288,7 +281,7 @@ export const ScatterChart = defineComponent({
                     strokeWidth: props.gridStrokeWidth
                   })
                 : null,
-              showXAxis.value
+              shouldShowXAxis.value
                 ? h(ChartAxis, {
                     scale: resolvedXScale.value,
                     orientation: 'bottom',
@@ -299,7 +292,7 @@ export const ScatterChart = defineComponent({
                     label: props.xAxisLabel
                   })
                 : null,
-              showYAxis.value
+              shouldShowYAxis.value
                 ? h(ChartAxis, {
                     scale: resolvedYScale.value,
                     orientation: 'left',

@@ -4,7 +4,6 @@ import {
   chartGridLineClasses,
   classNames,
   createPolygonPath,
-  DEFAULT_CHART_COLORS,
   getChartGridLineDasharray,
   getChartInnerRect,
   getRadarAngles,
@@ -12,12 +11,18 @@ import {
   getRadarPoints,
   polarToCartesian,
   RADAR_SPLIT_AREA_COLORS,
+  resolveChartPalette,
+  buildChartLegendItems,
+  resolveMultiSeriesTooltipContent,
+  resolveSeriesData,
+  defaultRadarTooltipFormatter,
   type ChartPadding,
   type RadarChartDatum,
   type RadarChartProps as CoreRadarChartProps,
   type RadarChartSeries
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
+import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../hooks/useChartInteraction'
@@ -82,9 +87,9 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   legendFormatter,
   legendMarkerSize = 10,
   legendGap = 8,
-  strokeColor = DEFAULT_CHART_COLORS[0],
+  strokeColor,
   strokeWidth = 2,
-  fillColor = DEFAULT_CHART_COLORS[0],
+  fillColor,
   fillOpacity = 0.2,
   showPoints = true,
   pointSize = 3,
@@ -102,10 +107,13 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   className
 }) => {
   // Resolve series first (needed for hook callbacks)
-  const resolvedSeries = useMemo<RadarChartSeries[]>(() => {
-    if (series && series.length > 0) return series
-    return [{ data: data ?? [] }]
-  }, [series, data])
+  const resolvedSeries = useMemo<RadarChartSeries[]>(
+    () =>
+      resolveSeriesData<RadarChartDatum, RadarChartSeries>(series, data, {
+        data: [] as RadarChartDatum[]
+      } as Partial<Omit<RadarChartSeries, 'data'>>),
+    [series, data]
+  )
 
   // Use shared interaction hook for series-based interaction
   const {
@@ -116,7 +124,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     handleMouseEnter: handleHoverEnter,
     handleMouseMove,
     handleMouseLeave: handleHoverLeave,
-    handleClick: handleSelectIndex
+    handleClick: handleSelectIndex,
+    handleLegendClick,
+    handleLegendHover,
+    handleLegendLeave,
+    wrapperClasses
   } = useChartInteraction<RadarChartSeries>({
     hoverable,
     hoveredIndexProp,
@@ -311,54 +323,30 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   ])
 
   const dasharray = getChartGridLineDasharray(gridLineStyle)
-  const palette = useMemo(
-    () => (colors && colors.length > 0 ? colors : [...DEFAULT_CHART_COLORS]),
-    [colors]
-  )
-  const formatTooltip = useMemo(
+  const palette = useMemo(() => resolveChartPalette(colors), [colors])
+
+  const tooltipContent = useMemo(
     () =>
-      tooltipFormatter ??
-      ((datum: RadarChartDatum, seriesIndex: number, index: number, series?: RadarChartSeries) => {
-        const label = datum.label ?? `#${index + 1}`
-        const value = datum.value
-        const name = series?.name ?? `Series ${seriesIndex + 1}`
-        return `${name} · ${label}: ${value}`
-      }),
-    [tooltipFormatter]
+      resolveMultiSeriesTooltipContent(
+        hoveredPoint,
+        resolvedSeries,
+        tooltipFormatter,
+        defaultRadarTooltipFormatter
+      ),
+    [hoveredPoint, resolvedSeries, tooltipFormatter]
   )
 
-  const tooltipContent = useMemo(() => {
-    if (!hoveredPoint) return ''
-    const { seriesIndex, pointIndex } = hoveredPoint
-    const series = resolvedSeries[seriesIndex]
-    if (!series) return ''
-    const datum = series.data[pointIndex]
-    if (!datum) return ''
-    return formatTooltip(datum, seriesIndex, pointIndex, series)
-  }, [hoveredPoint, resolvedSeries, formatTooltip])
-  const resolvedLegendItems = useMemo(
+  const legendItems = useMemo(
     () =>
-      resolvedSeries.map((item, index) => {
-        const color = item.color ?? palette[index % palette.length]
-        const label = legendFormatter
-          ? legendFormatter(item, index)
-          : (item.name ?? `Series ${index + 1}`)
-
-        return {
-          index,
-          label,
-          color
-        }
+      buildChartLegendItems<RadarChartSeries>({
+        data: resolvedSeries,
+        palette,
+        activeIndex: resolvedActiveIndex,
+        getLabel: (s, i) =>
+          legendFormatter ? legendFormatter(s, i) : (s.name ?? `Series ${i + 1}`),
+        getColor: (s, i) => s.color ?? palette[i % palette.length]
       }),
-    [resolvedSeries, palette, legendFormatter]
-  )
-  const legendContainerClasses = classNames(
-    'flex flex-wrap',
-    legendPosition === 'right' ? 'flex-col gap-2' : 'flex-row gap-3'
-  )
-  const wrapperClasses = classNames(
-    'inline-flex',
-    legendPosition === 'right' ? 'flex-row items-start gap-4' : 'flex-col gap-2'
+    [resolvedSeries, palette, resolvedActiveIndex, legendFormatter]
   )
 
   const chart = (
@@ -455,8 +443,9 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       ))}
       {seriesPoints.map((item, seriesIndex) => {
         const seriesColor = item.series.color ?? palette[seriesIndex % palette.length]
-        const resolvedStrokeColor = item.series.strokeColor ?? seriesColor ?? strokeColor
-        const resolvedFillColor = item.series.fillColor ?? seriesColor ?? fillColor
+        const resolvedStrokeColor =
+          item.series.strokeColor ?? seriesColor ?? strokeColor ?? palette[0]
+        const resolvedFillColor = item.series.fillColor ?? seriesColor ?? fillColor ?? palette[0]
         const resolvedFillOpacity = item.series.fillOpacity ?? fillOpacity
         const resolvedStrokeWidth = item.series.strokeWidth ?? strokeWidth
         const resolvedShowPoints = item.series.showPoints ?? showPoints
@@ -598,32 +587,16 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   return (
     <div className={wrapperClasses}>
       {chart}
-      <div className={legendContainerClasses}>
-        {resolvedLegendItems.map((item) => (
-          <button
-            key={`legend-${item.index}`}
-            type="button"
-            className={classNames(
-              'flex items-center gap-2 text-sm text-gray-600',
-              selectable ? 'cursor-pointer' : 'cursor-default'
-            )}
-            onClick={selectable ? () => handleSelectIndex(item.index) : undefined}
-            onMouseEnter={
-              hoverable ? (e: React.MouseEvent) => handleHoverEnter(item.index, e) : undefined
-            }
-            onMouseLeave={hoverable ? handlePointLeave : undefined}>
-            <span
-              className="inline-block rounded-full"
-              style={{
-                width: `${legendMarkerSize}px`,
-                height: `${legendMarkerSize}px`,
-                backgroundColor: item.color
-              }}
-            />
-            <span style={{ marginRight: `${legendGap}px` }}>{item.label}</span>
-          </button>
-        ))}
-      </div>
+      <ChartLegend
+        items={legendItems}
+        position={legendPosition}
+        markerSize={legendMarkerSize}
+        gap={legendGap}
+        interactive={hoverable || selectable}
+        onItemClick={handleLegendClick}
+        onItemHover={handleLegendHover}
+        onItemLeave={handleLegendLeave}
+      />
       {tooltip}
     </div>
   )

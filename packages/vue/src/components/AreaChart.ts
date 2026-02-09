@@ -5,12 +5,16 @@ import {
   createLinearScale,
   createLinePath,
   createPointScale,
-  DEFAULT_CHART_COLORS,
   getAreaGradientPrefix,
   getChartElementOpacity,
   getChartInnerRect,
   getNumberExtent,
   stackSeriesData,
+  resolveChartPalette,
+  buildChartLegendItems,
+  resolveMultiSeriesTooltipContent,
+  resolveSeriesData,
+  defaultSeriesXYTooltipFormatter,
   type AreaChartDatum,
   type AreaChartProps as CoreAreaChartProps,
   type AreaChartSeries,
@@ -255,11 +259,9 @@ export const AreaChart = defineComponent({
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 
     // Normalize series data
-    const resolvedSeries = computed<AreaChartSeries[]>(() => {
-      if (props.series && props.series.length > 0) return props.series
-      if (props.data && props.data.length > 0) return [{ data: props.data }]
-      return []
-    })
+    const resolvedSeries = computed<AreaChartSeries[]>(() =>
+      resolveSeriesData(props.series, props.data)
+    )
 
     // Use shared interaction composable for series-level interaction
     const {
@@ -325,12 +327,10 @@ export const AreaChart = defineComponent({
 
     const baseline = computed(() => resolvedYScale.value.map(0))
 
-    const showXAxis = computed(() => props.showAxis && props.showXAxis)
-    const showYAxis = computed(() => props.showAxis && props.showYAxis)
+    const shouldShowXAxis = computed(() => props.showAxis && props.showXAxis)
+    const shouldShowYAxis = computed(() => props.showAxis && props.showYAxis)
 
-    const palette = computed(() =>
-      props.colors && props.colors.length > 0 ? props.colors : [...DEFAULT_CHART_COLORS]
-    )
+    const palette = computed(() => resolveChartPalette(props.colors))
 
     // Calculate area paths and points for each series
     const seriesData = computed(() => {
@@ -409,38 +409,24 @@ export const AreaChart = defineComponent({
     })
 
     const legendItems = computed<ChartLegendItem[]>(() =>
-      resolvedSeries.value.map((series, index) => ({
-        index,
-        label: props.legendFormatter
-          ? props.legendFormatter(series, index)
-          : (series.name ?? `Series ${index + 1}`),
-        color: series.color ?? palette.value[index % palette.value.length],
-        active: activeIndex.value === null || activeIndex.value === index
-      }))
+      buildChartLegendItems({
+        data: resolvedSeries.value,
+        palette: palette.value,
+        activeIndex: activeIndex.value,
+        getLabel: (s, i) =>
+          props.legendFormatter ? props.legendFormatter(s, i) : (s.name ?? `Series ${i + 1}`),
+        getColor: (s, i) => s.color ?? palette.value[i % palette.value.length]
+      })
     )
 
-    const formatTooltip = computed(
-      () =>
-        props.tooltipFormatter ??
-        ((
-          datum: AreaChartDatum,
-          seriesIndex: number,
-          _pointIndex: number,
-          series?: AreaChartSeries
-        ) => {
-          const seriesName = series?.name ?? `Series ${seriesIndex + 1}`
-          const label = datum.label ?? String(datum.x)
-          return `${seriesName} · ${label}: ${datum.y}`
-        })
+    const tooltipContent = computed(() =>
+      resolveMultiSeriesTooltipContent(
+        hoveredPointInfo.value,
+        resolvedSeries.value,
+        props.tooltipFormatter,
+        defaultSeriesXYTooltipFormatter
+      )
     )
-
-    const tooltipContent = computed(() => {
-      if (!hoveredPointInfo.value) return ''
-      const { seriesIndex, pointIndex } = hoveredPointInfo.value
-      const series = resolvedSeries.value[seriesIndex]
-      const datum = series?.data[pointIndex]
-      return datum ? formatTooltip.value(datum, seriesIndex, pointIndex, series) : ''
-    })
 
     const handlePointMouseEnter = (seriesIndex: number, pointIndex: number, event: MouseEvent) => {
       hoveredPointInfo.value = { seriesIndex, pointIndex }
@@ -557,7 +543,7 @@ export const AreaChart = defineComponent({
                     strokeWidth: props.gridStrokeWidth
                   })
                 : null,
-              showXAxis.value
+              shouldShowXAxis.value
                 ? h(ChartAxis, {
                     scale: resolvedXScale.value,
                     orientation: 'bottom',
@@ -568,7 +554,7 @@ export const AreaChart = defineComponent({
                     label: props.xAxisLabel
                   })
                 : null,
-              showYAxis.value
+              shouldShowYAxis.value
                 ? h(ChartAxis, {
                     scale: resolvedYScale.value,
                     orientation: 'left',
@@ -685,7 +671,7 @@ export const AreaChart = defineComponent({
         return h('div', { class: 'inline-block relative' }, [chart, tooltip])
       }
 
-      return h('div', { class: wrapperClasses }, [
+      return h('div', { class: wrapperClasses.value }, [
         chart,
         h(ChartLegend, {
           items: legendItems.value,

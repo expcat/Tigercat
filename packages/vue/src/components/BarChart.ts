@@ -4,12 +4,15 @@ import {
   clampBarWidth,
   createBandScale,
   createLinearScale,
-  DEFAULT_CHART_COLORS,
   ensureBarMinHeight,
   getBarGradientPrefix,
   getBarValueLabelY,
   getChartInnerRect,
   getNumberExtent,
+  resolveChartPalette,
+  buildChartLegendItems,
+  resolveChartTooltipContent,
+  defaultXYTooltipFormatter,
   barValueLabelClasses,
   barValueLabelInsideClasses,
   barAnimatedTransition,
@@ -275,16 +278,10 @@ export const BarChart = defineComponent({
       return createLinearScale(extent, [innerRect.value.height, 0])
     })
 
-    const showXAxis = computed(() => props.showAxis && props.showXAxis)
-    const showYAxis = computed(() => props.showAxis && props.showYAxis)
+    const shouldShowXAxis = computed(() => props.showAxis && props.showXAxis)
+    const shouldShowYAxis = computed(() => props.showAxis && props.showYAxis)
 
-    const palette = computed(() =>
-      props.colors && props.colors.length > 0
-        ? props.colors
-        : props.barColor
-          ? [props.barColor]
-          : [...DEFAULT_CHART_COLORS]
-    )
+    const palette = computed(() => resolveChartPalette(props.colors, props.barColor))
 
     const bars = computed(() => {
       const scale = resolvedXScale.value
@@ -329,28 +326,23 @@ export const BarChart = defineComponent({
     })
 
     const legendItems = computed<ChartLegendItem[]>(() =>
-      props.data.map((item, index) => ({
-        index,
-        label: item.label ?? String(item.x),
-        color: item.color ?? palette.value[index % palette.value.length],
-        active: activeIndex.value === null || activeIndex.value === index
-      }))
+      buildChartLegendItems({
+        data: props.data,
+        palette: palette.value,
+        activeIndex: activeIndex.value,
+        getLabel: (d) => d.label ?? String(d.x),
+        getColor: (d, i) => d.color ?? palette.value[i % palette.value.length]
+      })
     )
 
-    const formatTooltip = computed(
-      () =>
-        props.tooltipFormatter ??
-        ((datum: BarChartDatum) => {
-          const label = datum.label ?? String(datum.x)
-          return `${label}: ${datum.y}`
-        })
+    const tooltipContent = computed(() =>
+      resolveChartTooltipContent(
+        resolvedHoveredIndex.value,
+        props.data,
+        props.tooltipFormatter,
+        defaultXYTooltipFormatter
+      )
     )
-
-    const tooltipContent = computed(() => {
-      if (resolvedHoveredIndex.value === null) return ''
-      const datum = props.data[resolvedHoveredIndex.value]
-      return datum ? formatTooltip.value(datum, resolvedHoveredIndex.value) : ''
-    })
 
     return () => {
       // Gradient defs (when gradient is enabled)
@@ -438,7 +430,7 @@ export const BarChart = defineComponent({
                     strokeWidth: props.gridStrokeWidth
                   })
                 : null,
-              showXAxis.value
+              shouldShowXAxis.value
                 ? h(ChartAxis, {
                     scale: resolvedXScale.value,
                     orientation: 'bottom',
@@ -449,7 +441,7 @@ export const BarChart = defineComponent({
                     label: props.xAxisLabel
                   })
                 : null,
-              showYAxis.value
+              shouldShowYAxis.value
                 ? h(ChartAxis, {
                     scale: resolvedYScale.value,
                     orientation: 'left',

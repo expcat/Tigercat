@@ -138,7 +138,7 @@ describe('RadarChart', () => {
       showLegend: true
     })
 
-    expect(container.querySelectorAll('button')).toHaveLength(2)
+    expect(container.querySelectorAll('[data-legend-item]')).toHaveLength(2)
   })
 
   it('renders circle grid when gridShape is circle', () => {

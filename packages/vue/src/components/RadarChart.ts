@@ -4,7 +4,6 @@ import {
   chartGridLineClasses,
   classNames,
   createPolygonPath,
-  DEFAULT_CHART_COLORS,
   getChartGridLineDasharray,
   getChartInnerRect,
   getRadarAngles,
@@ -12,12 +11,18 @@ import {
   getRadarPoints,
   polarToCartesian,
   RADAR_SPLIT_AREA_COLORS,
+  resolveChartPalette,
+  buildChartLegendItems,
+  resolveMultiSeriesTooltipContent,
+  resolveSeriesData,
+  defaultRadarTooltipFormatter,
   type ChartPadding,
   type RadarChartDatum,
   type RadarChartProps as CoreRadarChartProps,
   type RadarChartSeries
 } from '@expcat/tigercat-core'
 import { ChartCanvas } from './ChartCanvas'
+import { ChartLegend } from './ChartLegend'
 import { ChartSeries } from './ChartSeries'
 import { ChartTooltip } from './ChartTooltip'
 import { useChartInteraction } from '../composables/useChartInteraction'
@@ -159,16 +164,14 @@ export const RadarChart = defineComponent({
       default: 1
     },
     strokeColor: {
-      type: String,
-      default: DEFAULT_CHART_COLORS[0]
+      type: String
     },
     strokeWidth: {
       type: Number,
       default: 2
     },
     fillColor: {
-      type: String,
-      default: DEFAULT_CHART_COLORS[0]
+      type: String
     },
     fillOpacity: {
       type: Number,
@@ -237,10 +240,11 @@ export const RadarChart = defineComponent({
     const cx = computed(() => innerRect.value.width / 2)
     const cy = computed(() => innerRect.value.height / 2)
 
-    const resolvedSeries = computed<RadarChartSeries[]>(() => {
-      if (props.series && props.series.length > 0) return props.series
-      return [{ data: props.data ?? [] }]
-    })
+    const resolvedSeries = computed<RadarChartSeries[]>(() =>
+      resolveSeriesData<RadarChartDatum, RadarChartSeries>(props.series, props.data, {
+        data: [] as RadarChartDatum[]
+      } as Partial<Omit<RadarChartSeries, 'data'>>)
+    )
 
     // Use shared interaction composable
     const {
@@ -252,6 +256,9 @@ export const RadarChart = defineComponent({
       handleMouseMove,
       handleMouseLeave: handleHoverLeave,
       handleClick: handleSelectIndex,
+      handleLegendClick,
+      handleLegendHover,
+      handleLegendLeave,
       wrapperClasses
     } = useChartInteraction<RadarChartSeries>({
       hoverable: computed(() => props.hoverable),
@@ -435,54 +442,26 @@ export const RadarChart = defineComponent({
     })
 
     const dasharray = computed(() => getChartGridLineDasharray(props.gridLineStyle))
-    const palette = computed(() =>
-      props.colors && props.colors.length > 0 ? props.colors : [...DEFAULT_CHART_COLORS]
-    )
-    const formatTooltip = computed(
-      () =>
-        props.tooltipFormatter ??
-        ((
-          datum: RadarChartDatum,
-          seriesIndex: number,
-          index: number,
-          series?: RadarChartSeries
-        ) => {
-          const label = datum.label ?? `#${index + 1}`
-          const value = datum.value
-          const name = series?.name ?? `Series ${seriesIndex + 1}`
-          return `${name} · ${label}: ${value}`
-        })
-    )
+    const palette = computed(() => resolveChartPalette(props.colors))
 
-    const tooltipContent = computed(() => {
-      if (!hoveredPoint.value) return ''
-      const { seriesIndex, pointIndex } = hoveredPoint.value
-      const series = resolvedSeries.value[seriesIndex]
-      if (!series) return ''
-      const datum = series.data[pointIndex]
-      if (!datum) return ''
-      return formatTooltip.value(datum, seriesIndex, pointIndex, series)
-    })
-
-    const resolvedLegendItems = computed(() =>
-      resolvedSeries.value.map((item, index) => {
-        const color = item.color ?? palette.value[index % palette.value.length]
-        const label = props.legendFormatter
-          ? props.legendFormatter(item, index)
-          : (item.name ?? `Series ${index + 1}`)
-
-        return {
-          index,
-          label,
-          color
-        }
-      })
-    )
-    const legendContainerClasses = computed(() =>
-      classNames(
-        'flex flex-wrap',
-        props.legendPosition === 'right' ? 'flex-col gap-2' : 'flex-row gap-3'
+    const tooltipContent = computed(() =>
+      resolveMultiSeriesTooltipContent(
+        hoveredPoint.value,
+        resolvedSeries.value,
+        props.tooltipFormatter,
+        defaultRadarTooltipFormatter
       )
+    )
+
+    const legendItems = computed(() =>
+      buildChartLegendItems<RadarChartSeries>({
+        data: resolvedSeries.value,
+        palette: palette.value,
+        activeIndex: resolvedActiveIndex.value,
+        getLabel: (s, i) =>
+          props.legendFormatter ? props.legendFormatter(s, i) : (s.name ?? `Series ${i + 1}`),
+        getColor: (s, i) => s.color ?? palette.value[i % palette.value.length]
+      })
     )
 
     return () => {
@@ -584,8 +563,9 @@ export const RadarChart = defineComponent({
                 const seriesColor =
                   item.series.color ?? palette.value[seriesIndex % palette.value.length]
                 const resolvedStrokeColor =
-                  item.series.strokeColor ?? seriesColor ?? props.strokeColor
-                const resolvedFillColor = item.series.fillColor ?? seriesColor ?? props.fillColor
+                  item.series.strokeColor ?? seriesColor ?? props.strokeColor ?? palette.value[0]
+                const resolvedFillColor =
+                  item.series.fillColor ?? seriesColor ?? props.fillColor ?? palette.value[0]
                 const resolvedFillOpacity = item.series.fillOpacity ?? props.fillOpacity
                 const resolvedStrokeWidth = item.series.strokeWidth ?? props.strokeWidth
                 const resolvedShowPoints = item.series.showPoints ?? props.showPoints
@@ -737,39 +717,16 @@ export const RadarChart = defineComponent({
 
       return h('div', { class: wrapperClasses.value }, [
         chart,
-        h(
-          'div',
-          { class: legendContainerClasses.value },
-          resolvedLegendItems.value.map((item) =>
-            h(
-              'button',
-              {
-                key: `legend-${item.index}`,
-                type: 'button',
-                class: classNames(
-                  'flex items-center gap-2 text-sm text-gray-600',
-                  props.selectable ? 'cursor-pointer' : 'cursor-default'
-                ),
-                onClick: props.selectable ? () => handleSelectIndex(item.index) : undefined,
-                onMouseenter: props.hoverable
-                  ? (e: MouseEvent) => handleHoverEnter(item.index, e)
-                  : undefined,
-                onMouseleave: props.hoverable ? handlePointLeave : undefined
-              },
-              [
-                h('span', {
-                  class: 'inline-block rounded-full',
-                  style: {
-                    width: `${props.legendMarkerSize}px`,
-                    height: `${props.legendMarkerSize}px`,
-                    backgroundColor: item.color
-                  }
-                }),
-                h('span', { style: { marginRight: `${props.legendGap}px` } }, item.label)
-              ]
-            )
-          )
-        ),
+        h(ChartLegend, {
+          items: legendItems.value,
+          position: props.legendPosition,
+          markerSize: props.legendMarkerSize,
+          gap: props.legendGap,
+          interactive: props.hoverable || props.selectable,
+          onItemClick: handleLegendClick,
+          onItemHover: handleLegendHover,
+          onItemLeave: handleLegendLeave
+        }),
         tooltip
       ])
     }

@@ -5,12 +5,16 @@ import {
   createLinearScale,
   createLinePath,
   createPointScale,
-  DEFAULT_CHART_COLORS,
-  getAreaGradientPrefix,
   getChartElementOpacity,
   getChartInnerRect,
+  getAreaGradientPrefix,
   getNumberExtent,
   stackSeriesData,
+  resolveChartPalette,
+  buildChartLegendItems,
+  resolveMultiSeriesTooltipContent,
+  resolveSeriesData,
+  defaultSeriesXYTooltipFormatter,
   type AreaChartDatum,
   type AreaChartProps as CoreAreaChartProps,
   type AreaChartSeries,
@@ -121,11 +125,10 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     [width, height, padding]
   )
 
-  const resolvedSeries = useMemo<AreaChartSeries[]>(() => {
-    if (series && series.length > 0) return series
-    if (data && data.length > 0) return [{ data }]
-    return []
-  }, [series, data])
+  const resolvedSeries = useMemo<AreaChartSeries[]>(
+    () => resolveSeriesData<AreaChartDatum, AreaChartSeries>(series, data),
+    [series, data]
+  )
 
   // Use shared interaction hook for series-level interaction
   const {
@@ -190,13 +193,10 @@ export const AreaChart: React.FC<AreaChartProps> = ({
 
   const baseline = useMemo(() => resolvedYScale.map(0), [resolvedYScale])
 
-  const resolvedShowXAxis = showAxis && showXAxis
-  const resolvedShowYAxis = showAxis && showYAxis
+  const shouldShowXAxis = showAxis && showXAxis
+  const shouldShowYAxis = showAxis && showYAxis
 
-  const palette = useMemo(
-    () => (colors && colors.length > 0 ? colors : [...DEFAULT_CHART_COLORS]),
-    [colors]
-  )
+  const palette = useMemo(() => resolveChartPalette(colors), [colors])
 
   const seriesData = useMemo(() => {
     const stackedData = stacked ? stackSeriesData(resolvedSeries.map((s) => s.data)) : null
@@ -286,32 +286,27 @@ export const AreaChart: React.FC<AreaChartProps> = ({
 
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
-      resolvedSeries.map((s, index) => ({
-        index,
-        label: legendFormatter ? legendFormatter(s, index) : (s.name ?? `Series ${index + 1}`),
-        color: s.color ?? palette[index % palette.length],
-        active: activeIndex === null || activeIndex === index
-      })),
+      buildChartLegendItems<AreaChartSeries>({
+        data: resolvedSeries,
+        palette,
+        activeIndex,
+        getLabel: (s, i) =>
+          legendFormatter ? legendFormatter(s, i) : (s.name ?? `Series ${i + 1}`),
+        getColor: (s, i) => s.color ?? palette[i % palette.length]
+      }),
     [resolvedSeries, legendFormatter, palette, activeIndex]
   )
 
-  const formatTooltip = useCallback(
-    (datum: AreaChartDatum, seriesIndex: number, _pointIndex: number, s?: AreaChartSeries) => {
-      if (tooltipFormatter) return tooltipFormatter(datum, seriesIndex, _pointIndex, s)
-      const seriesName = s?.name ?? `Series ${seriesIndex + 1}`
-      const label = datum.label ?? String(datum.x)
-      return `${seriesName} · ${label}: ${datum.y}`
-    },
-    [tooltipFormatter]
+  const tooltipContent = useMemo(
+    () =>
+      resolveMultiSeriesTooltipContent(
+        hoveredPointInfo,
+        resolvedSeries,
+        tooltipFormatter,
+        defaultSeriesXYTooltipFormatter
+      ),
+    [hoveredPointInfo, resolvedSeries, tooltipFormatter]
   )
-
-  const tooltipContent = useMemo(() => {
-    if (!hoveredPointInfo) return ''
-    const { seriesIndex, pointIndex } = hoveredPointInfo
-    const s = resolvedSeries[seriesIndex]
-    const datum = s?.data[pointIndex]
-    return datum ? formatTooltip(datum, seriesIndex, pointIndex, s) : ''
-  }, [hoveredPointInfo, resolvedSeries, formatTooltip])
 
   const handlePointMouseEnter = useCallback(
     (seriesIndex: number, pointIndex: number, event: React.MouseEvent) => {
@@ -402,7 +397,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
           strokeWidth={gridStrokeWidth}
         />
       )}
-      {resolvedShowXAxis && (
+      {shouldShowXAxis && (
         <ChartAxis
           scale={resolvedXScale}
           orientation="bottom"
@@ -413,7 +408,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
           label={xAxisLabel}
         />
       )}
-      {resolvedShowYAxis && (
+      {shouldShowYAxis && (
         <ChartAxis
           scale={resolvedYScale}
           orientation="left"

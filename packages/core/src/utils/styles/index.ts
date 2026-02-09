@@ -97,3 +97,4 @@ export * from '../anchor-utils'
 // Chart components
 export * from '../chart-utils'
 export * from '../chart-interaction'
+export * from '../chart-shared'

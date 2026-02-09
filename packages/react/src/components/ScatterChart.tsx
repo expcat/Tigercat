@@ -2,7 +2,6 @@ import React, { useMemo, useCallback, useState, useEffect, useRef } from 'react'
 import {
   classNames,
   createLinearScale,
-  DEFAULT_CHART_COLORS,
   getChartElementOpacity,
   getChartInnerRect,
   getNumberExtent,
@@ -13,6 +12,9 @@ import {
   scatterPointTransitionClasses,
   SCATTER_ENTRANCE_KEYFRAMES,
   SCATTER_ENTRANCE_CLASS,
+  resolveChartPalette,
+  buildChartLegendItems,
+  resolveChartTooltipContent,
   type ChartLegendItem,
   type ChartLegendPosition,
   type ChartPadding,
@@ -172,11 +174,7 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
     return createLinearScale(extent, [innerRect.height, 0])
   }, [yScale, yValues, includeZero, innerRect.height])
 
-  const palette = useMemo(
-    () =>
-      colors && colors.length > 0 ? colors : pointColor ? [pointColor] : [...DEFAULT_CHART_COLORS],
-    [colors, pointColor]
-  )
+  const palette = useMemo(() => resolveChartPalette(colors, pointColor), [colors, pointColor])
 
   const points = useMemo(
     () =>
@@ -217,31 +215,25 @@ export const ScatterChart: React.FC<ScatterChartProps> = ({
 
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
-      data.map((item, index) => ({
-        index,
-        label: legendFormatter
-          ? legendFormatter(item, index)
-          : (item.label ?? `(${item.x}, ${item.y})`),
-        color: item.color ?? palette[index % palette.length],
-        active: activeIndex === null || activeIndex === index
-      })),
+      buildChartLegendItems({
+        data,
+        palette,
+        activeIndex,
+        getLabel: (d, i) =>
+          legendFormatter ? legendFormatter(d, i) : (d.label ?? `(${d.x}, ${d.y})`),
+        getColor: (d, i) => d.color ?? palette[i % palette.length]
+      }),
     [data, legendFormatter, palette, activeIndex]
   )
 
-  const formatTooltip = useCallback(
-    (datum: ScatterChartDatum, index: number) => {
-      if (tooltipFormatter) return tooltipFormatter(datum, index)
-      const label = datum.label ?? `Point ${index + 1}`
-      return `${label}: (${datum.x}, ${datum.y})`
-    },
-    [tooltipFormatter]
+  const tooltipContent = useMemo(
+    () =>
+      resolveChartTooltipContent(resolvedHoveredIndex, data, tooltipFormatter, (datum, index) => {
+        const label = datum.label ?? `Point ${index + 1}`
+        return `${label}: (${datum.x}, ${datum.y})`
+      }),
+    [resolvedHoveredIndex, data, tooltipFormatter]
   )
-
-  const tooltipContent = useMemo(() => {
-    if (resolvedHoveredIndex === null) return ''
-    const datum = data[resolvedHoveredIndex]
-    return datum ? formatTooltip(datum, resolvedHoveredIndex) : ''
-  }, [resolvedHoveredIndex, data, formatTooltip])
 
   const shouldShowXAxis = showAxis && showXAxis
   const shouldShowYAxis = showAxis && showYAxis

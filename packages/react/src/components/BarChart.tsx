@@ -4,13 +4,16 @@ import {
   clampBarWidth,
   createBandScale,
   createLinearScale,
-  DEFAULT_CHART_COLORS,
   ensureBarMinHeight,
   getBarGradientPrefix,
   getBarValueLabelY,
   getChartElementOpacity,
   getChartInnerRect,
   getNumberExtent,
+  resolveChartPalette,
+  buildChartLegendItems,
+  resolveChartTooltipContent,
+  defaultXYTooltipFormatter,
   barValueLabelClasses,
   barValueLabelInsideClasses,
   barAnimatedTransition,
@@ -151,11 +154,7 @@ export const BarChart: React.FC<BarChartProps> = ({
     return createLinearScale(extent, [innerRect.height, 0])
   }, [yScale, yValues, innerRect.height])
 
-  const palette = useMemo(
-    () =>
-      colors && colors.length > 0 ? colors : barColor ? [barColor] : [...DEFAULT_CHART_COLORS],
-    [colors, barColor]
-  )
+  const palette = useMemo(() => resolveChartPalette(colors, barColor), [colors, barColor])
 
   const bars = useMemo(() => {
     const scale = resolvedXScale
@@ -213,29 +212,26 @@ export const BarChart: React.FC<BarChartProps> = ({
 
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
-      data.map((item, index) => ({
-        index,
-        label: legendFormatter ? legendFormatter(item, index) : (item.label ?? String(item.x)),
-        color: item.color ?? palette[index % palette.length],
-        active: activeIndex === null || activeIndex === index
-      })),
+      buildChartLegendItems({
+        data,
+        palette,
+        activeIndex,
+        getLabel: (d, i) => (legendFormatter ? legendFormatter(d, i) : (d.label ?? String(d.x))),
+        getColor: (d, i) => d.color ?? palette[i % palette.length]
+      }),
     [data, legendFormatter, palette, activeIndex]
   )
 
-  const formatTooltip = useCallback(
-    (datum: BarChartDatum, index: number) => {
-      if (tooltipFormatter) return tooltipFormatter(datum, index)
-      const label = datum.label ?? String(datum.x)
-      return `${label}: ${datum.y}`
-    },
-    [tooltipFormatter]
+  const tooltipContent = useMemo(
+    () =>
+      resolveChartTooltipContent(
+        resolvedHoveredIndex,
+        data,
+        tooltipFormatter,
+        defaultXYTooltipFormatter
+      ),
+    [resolvedHoveredIndex, data, tooltipFormatter]
   )
-
-  const tooltipContent = useMemo(() => {
-    if (resolvedHoveredIndex === null) return ''
-    const datum = data[resolvedHoveredIndex]
-    return datum ? formatTooltip(datum, resolvedHoveredIndex) : ''
-  }, [resolvedHoveredIndex, data, formatTooltip])
 
   const shouldShowXAxis = showAxis && showXAxis
   const shouldShowYAxis = showAxis && showYAxis

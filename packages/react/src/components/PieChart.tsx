@@ -5,13 +5,15 @@ import {
   computePieHoverOffset,
   computePieLabelLine,
   createPieArcPath,
-  DEFAULT_CHART_COLORS,
   getChartElementOpacity,
   getChartInnerRect,
   getPieArcs,
   PIE_BASE_SHADOW,
   PIE_EMPHASIS_SHADOW,
   polarToCartesian,
+  resolveChartPalette,
+  buildChartLegendItems,
+  resolveChartTooltipContent,
   type ChartLegendItem,
   type ChartPadding,
   type PieChartDatum,
@@ -129,10 +131,7 @@ export const PieChart: React.FC<PieChartProps> = ({
     [data, startAngle, endAngle, padAngle]
   )
 
-  const palette = useMemo(
-    () => (colors && colors.length > 0 ? colors : [...DEFAULT_CHART_COLORS]),
-    [colors]
-  )
+  const palette = useMemo(() => resolveChartPalette(colors), [colors])
 
   const cx = innerRect.width / 2
   const cy = innerRect.height / 2
@@ -145,32 +144,25 @@ export const PieChart: React.FC<PieChartProps> = ({
 
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
-      arcs.map((arc) => ({
-        index: arc.index,
-        label: legendFormatter
-          ? legendFormatter(arc.data, arc.index)
-          : (arc.data.label ?? `${arc.index + 1}`),
-        color: arc.data.color ?? palette[arc.index % palette.length],
-        active: activeIndex === null || activeIndex === arc.index
-      })),
+      buildChartLegendItems({
+        data: arcs.map((a) => a.data),
+        palette,
+        activeIndex,
+        getLabel: (d, i) => (legendFormatter ? legendFormatter(d, i) : (d.label ?? `${i + 1}`)),
+        getColor: (d, i) => d.color ?? palette[i % palette.length]
+      }),
     [arcs, legendFormatter, palette, activeIndex]
   )
 
-  const formatTooltip = useCallback(
-    (datum: PieChartDatum, index: number) => {
-      if (tooltipFormatter) return tooltipFormatter(datum, index)
-      const label = datum.label ?? `Slice ${index + 1}`
-      const percentage = total > 0 ? ((datum.value / total) * 100).toFixed(1) : '0'
-      return `${label}: ${datum.value} (${percentage}%)`
-    },
-    [tooltipFormatter, total]
+  const tooltipContent = useMemo(
+    () =>
+      resolveChartTooltipContent(resolvedHoveredIndex, data, tooltipFormatter, (datum, index) => {
+        const label = datum.label ?? `Slice ${index + 1}`
+        const percentage = total > 0 ? ((datum.value / total) * 100).toFixed(1) : '0'
+        return `${label}: ${datum.value} (${percentage}%)`
+      }),
+    [resolvedHoveredIndex, data, tooltipFormatter, total]
   )
-
-  const tooltipContent = useMemo(() => {
-    if (resolvedHoveredIndex === null) return ''
-    const datum = data[resolvedHoveredIndex]
-    return datum ? formatTooltip(datum, resolvedHoveredIndex) : ''
-  }, [resolvedHoveredIndex, data, formatTooltip])
 
   const interactive = hoverable || selectable
 

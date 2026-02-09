@@ -5,13 +5,15 @@ import {
   computePieHoverOffset,
   computePieLabelLine,
   createPieArcPath,
-  DEFAULT_CHART_COLORS,
   getChartElementOpacity,
   getChartInnerRect,
   getPieArcs,
   PIE_BASE_SHADOW,
   PIE_EMPHASIS_SHADOW,
   polarToCartesian,
+  resolveChartPalette,
+  buildChartLegendItems,
+  resolveChartTooltipContent,
   type ChartLegendItem,
   type ChartLegendPosition,
   type ChartPadding,
@@ -208,36 +210,32 @@ export const PieChart = defineComponent({
       })
     )
 
-    const palette = computed(() =>
-      props.colors && props.colors.length > 0 ? props.colors : [...DEFAULT_CHART_COLORS]
-    )
+    const palette = computed(() => resolveChartPalette(props.colors))
 
     const legendItems = computed<ChartLegendItem[]>(() =>
-      props.data.map((datum, index) => ({
-        index,
-        label: datum.label ?? `${datum.value}`,
-        color: datum.color ?? palette.value[index % palette.value.length],
-        active: activeIndex.value === null || activeIndex.value === index
-      }))
+      buildChartLegendItems({
+        data: props.data,
+        palette: palette.value,
+        activeIndex: activeIndex.value,
+        getLabel: (d) => d.label ?? `${d.value}`,
+        getColor: (d, i) => d.color ?? palette.value[i % palette.value.length]
+      })
     )
 
     const total = computed(() => props.data.reduce((sum, d) => sum + d.value, 0))
 
-    const formatTooltip = computed(
-      () =>
-        props.tooltipFormatter ??
-        ((datum: PieChartDatum, index: number) => {
+    const tooltipContent = computed(() =>
+      resolveChartTooltipContent(
+        resolvedHoveredIndex.value,
+        props.data,
+        props.tooltipFormatter,
+        (datum, index) => {
           const percent = total.value > 0 ? ((datum.value / total.value) * 100).toFixed(1) : '0'
           const label = datum.label ?? `#${index + 1}`
           return `${label}: ${datum.value} (${percent}%)`
-        })
+        }
+      )
     )
-
-    const tooltipContent = computed(() => {
-      if (resolvedHoveredIndex.value === null) return ''
-      const datum = props.data[resolvedHoveredIndex.value]
-      return datum ? formatTooltip.value(datum, resolvedHoveredIndex.value) : ''
-    })
 
     return () => {
       const rect = innerRect.value
