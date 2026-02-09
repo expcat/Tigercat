@@ -187,41 +187,6 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         label: { 'zh-CN': 'Progress', 'en-US': 'Progress' }
       },
       {
-        key: 'bar-chart',
-        path: '/bar-chart',
-        label: { 'zh-CN': 'BarChart', 'en-US': 'BarChart' }
-      },
-      {
-        key: 'scatter-chart',
-        path: '/scatter-chart',
-        label: { 'zh-CN': 'ScatterChart', 'en-US': 'ScatterChart' }
-      },
-      {
-        key: 'pie-chart',
-        path: '/pie-chart',
-        label: { 'zh-CN': 'PieChart', 'en-US': 'PieChart' }
-      },
-      {
-        key: 'donut-chart',
-        path: '/donut-chart',
-        label: { 'zh-CN': 'DonutChart', 'en-US': 'DonutChart' }
-      },
-      {
-        key: 'radar-chart',
-        path: '/radar-chart',
-        label: { 'zh-CN': 'RadarChart', 'en-US': 'RadarChart' }
-      },
-      {
-        key: 'line-chart',
-        path: '/line-chart',
-        label: { 'zh-CN': 'LineChart', 'en-US': 'LineChart' }
-      },
-      {
-        key: 'area-chart',
-        path: '/area-chart',
-        label: { 'zh-CN': 'AreaChart', 'en-US': 'AreaChart' }
-      },
-      {
         key: 'skeleton',
         path: '/skeleton',
         label: { 'zh-CN': 'Skeleton', 'en-US': 'Skeleton' }
@@ -337,6 +302,47 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'loading',
         path: '/loading',
         label: { 'zh-CN': 'Loading', 'en-US': 'Loading' }
+      }
+    ]
+  },
+  {
+    key: 'charts',
+    label: { 'zh-CN': '图表', 'en-US': 'Charts' },
+    items: [
+      {
+        key: 'bar-chart',
+        path: '/bar-chart',
+        label: { 'zh-CN': 'BarChart', 'en-US': 'BarChart' }
+      },
+      {
+        key: 'line-chart',
+        path: '/line-chart',
+        label: { 'zh-CN': 'LineChart', 'en-US': 'LineChart' }
+      },
+      {
+        key: 'area-chart',
+        path: '/area-chart',
+        label: { 'zh-CN': 'AreaChart', 'en-US': 'AreaChart' }
+      },
+      {
+        key: 'pie-chart',
+        path: '/pie-chart',
+        label: { 'zh-CN': 'PieChart', 'en-US': 'PieChart' }
+      },
+      {
+        key: 'donut-chart',
+        path: '/donut-chart',
+        label: { 'zh-CN': 'DonutChart', 'en-US': 'DonutChart' }
+      },
+      {
+        key: 'scatter-chart',
+        path: '/scatter-chart',
+        label: { 'zh-CN': 'ScatterChart', 'en-US': 'ScatterChart' }
+      },
+      {
+        key: 'radar-chart',
+        path: '/radar-chart',
+        label: { 'zh-CN': 'RadarChart', 'en-US': 'RadarChart' }
       }
     ]
   },

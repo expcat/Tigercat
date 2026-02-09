@@ -130,7 +130,7 @@ export const AppLayout: React.FC = () => {
             <AppSider lang={lang} isSiderCollapsed={isSiderCollapsed} />
 
             <main className="flex-1 min-w-0 h-full overflow-hidden">
-              <div ref={scrollContainerRef} className="h-full overflow-y-auto">
+              <div ref={scrollContainerRef} className="h-full overflow-y-auto overflow-x-hidden">
                 {!isHome && (headerTitle || sections.length > 0) && (
                   <div className="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
                     <div className="px-6 py-3">
