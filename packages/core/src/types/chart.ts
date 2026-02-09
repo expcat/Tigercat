@@ -876,6 +876,22 @@ export interface DonutChartProps extends PieChartProps {
    * @default 0.6
    */
   innerRadiusRatio?: number
+
+  /**
+   * Text shown as the main value in the donut center
+   */
+  centerValue?: string | number
+
+  /**
+   * Descriptive label shown below centerValue in the donut center
+   */
+  centerLabel?: string
+
+  /**
+   * Enable entrance animation (fade + scale)
+   * @default false
+   */
+  animated?: boolean
 }
 
 export interface RadarChartDatum extends ChartSeriesPoint {

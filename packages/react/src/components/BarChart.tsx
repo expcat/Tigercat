@@ -311,7 +311,7 @@ export const BarChart: React.FC<BarChartProps> = ({
             fill={gradient ? `url(#${gradientPrefix}-${bar.index})` : bar.color}
             opacity={bar.opacity}
             className={classNames(
-              'transition-[opacity,filter] duration-200 outline-none',
+              'transition-[opacity,filter] duration-200',
               (hoverable || selectable) && 'cursor-pointer hover:brightness-110'
             )}
             style={

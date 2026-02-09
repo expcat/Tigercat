@@ -89,15 +89,17 @@ const series = [
 ```vue
 <script setup>
 const data = [
-  { value: 40, label: 'Product A' },
-  { value: 25, label: 'Product B' },
-  { value: 20, label: 'Product C' },
-  { value: 15, label: 'Product D' }
+  { value: 335, label: '直接访问' },
+  { value: 310, label: '邮件营销' },
+  { value: 234, label: '联盟广告' },
+  { value: 135, label: '视频广告' },
+  { value: 548, label: '搜索引擎' }
 ]
+const total = data.reduce((s, d) => s + d.value, 0)
 </script>
 
 <template>
-  <!-- 基础饼图（默认 2px 白色边框分隔） -->
+  <!-- 基础饼图 -->
   <PieChart :data="data" :width="380" :height="280" show-labels />
   <!-- ECharts 风格：悬停偏移 + 阴影 -->
   <PieChart :data="data" hoverable shadow />
@@ -112,11 +114,28 @@ const data = [
     selectable
     shadow
     @slice-click="handleSliceClick" />
-  <!-- 自定义边框 -->
-  <PieChart :data="data" :border-width="3" border-color="#e5e7eb" />
-  <!-- 无边框 -->
-  <PieChart :data="data" :border-width="0" />
-  <DonutChart :data="data" :inner-radius-ratio="0.6" hoverable shadow />
+
+  <!-- DonutChart：默认带阴影、间隙、ECharts 配色 -->
+  <DonutChart :data="data" hoverable />
+  <!-- 中心显示汇总数据 -->
+  <DonutChart :data="data" hoverable :center-value="total" center-label="访问量" />
+  <!-- 图例 + 中心内容 -->
+  <DonutChart
+    :data="data"
+    hoverable
+    show-legend
+    legend-position="right"
+    :center-value="total"
+    center-label="总计" />
+  <!-- 自定义配色和间隙 -->
+  <DonutChart
+    :data="data"
+    hoverable
+    :colors="['#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae']"
+    :inner-radius-ratio="0.5"
+    :pad-angle="0.06"
+    center-value="1562"
+    center-label="总量" />
 </template>
 ```
 

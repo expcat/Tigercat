@@ -105,16 +105,21 @@ description: Shared charts props and concepts
 
 ### PieChart / DonutChart
 
-| Prop          | Type                    | Default     | Vue    | React   |
-| ------------- | ----------------------- | ----------- | ------ | ------- |
-| showLabels    | `boolean`               | `false`     | ✓      | ✓       |
-| labelPosition | `'inside' \| 'outside'` | `'inside'`  | ✓      | ✓       |
-| innerRadius   | `number`                | `0` / `0.6` | ✓ (px) | ✓ (0-1) |
-| borderWidth   | `number`                | `2`         | ✓      | ✓       |
-| borderColor   | `string`                | `'#ffffff'` | ✓      | ✓       |
-| hoverOffset   | `number`                | `8`         | ✓      | ✓       |
-| shadow        | `boolean`               | `false`     | ✓      | ✓       |
-| centerContent | `ReactNode`             | -           | -      | ✓       |
+| Prop             | Type                    | Default     | Vue    | React   |
+| ---------------- | ----------------------- | ----------- | ------ | ------- |
+| showLabels       | `boolean`               | `false`     | ✓      | ✓       |
+| labelPosition    | `'inside' \| 'outside'` | `'inside'`  | ✓      | ✓       |
+| innerRadius      | `number`                | `0` / `0.6` | ✓ (px) | ✓ (0-1) |
+| innerRadiusRatio | `number`                | `0.62`      | ✓      | ✓       |
+| padAngle         | `number`                | `0.04`      | ✓      | ✓       |
+| borderWidth      | `number`                | `0`         | ✓      | ✓       |
+| borderColor      | `string`                | `'#ffffff'` | ✓      | ✓       |
+| hoverOffset      | `number`                | `10`        | ✓      | ✓       |
+| shadow           | `boolean`               | `true`      | ✓      | ✓       |
+| centerValue      | `string \| number`      | -           | ✓      | ✓       |
+| centerLabel      | `string`                | -           | ✓      | ✓       |
+| animated         | `boolean`               | `false`     | ✓      | ✓       |
+| centerContent    | `ReactNode`             | -           | -      | ✓       |
 
 ### AreaChart
 

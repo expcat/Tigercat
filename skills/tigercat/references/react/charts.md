@@ -61,25 +61,70 @@ const series = [
 
 ```tsx
 const data = [
-  { value: 40, label: 'Product A' },
-  { value: 25, label: 'Product B' },
-  { value: 20, label: 'Product C' },
-  { value: 15, label: 'Product D' }
+  { value: 335, label: '直接访问' },
+  { value: 310, label: '邮件营销' },
+  { value: 234, label: '联盟广告' },
+  { value: 135, label: '视频广告' },
+  { value: 548, label: '搜索引擎' }
 ]
+const total = data.reduce((s, d) => s + d.value, 0)
 
-{/* 基础饼图（默认 2px 白色边框分隔） */}
-<PieChart data={data} width={380} height={280} showLabels />
-{/* ECharts 风格：悬停偏移 + 阴影 */}
-<PieChart data={data} hoverable shadow />
-{/* 外部标签 + 引导线 */}
-<PieChart data={data} showLabels labelPosition="outside" hoverable shadow />
-{/* 图例 + 交互 */}
-<PieChart data={data} showLegend legendPosition="right" hoverable selectable shadow onSliceClick={handleSliceClick} />
-{/* 自定义边框 */}
-<PieChart data={data} borderWidth={3} borderColor="#e5e7eb" />
-{/* 无边框 */}
-<PieChart data={data} borderWidth={0} />
-<DonutChart data={data} innerRadius={0.6} hoverable shadow centerContent={<span className="text-2xl font-bold">75%</span>} />
+{
+  /* 基础饼图 */
+}
+;<PieChart data={data} width={380} height={280} showLabels />
+{
+  /* ECharts 风格：悬停偏移 + 阴影 */
+}
+;<PieChart data={data} hoverable shadow />
+{
+  /* 外部标签 + 引导线 */
+}
+;<PieChart data={data} showLabels labelPosition="outside" hoverable shadow />
+{
+  /* 图例 + 交互 */
+}
+;<PieChart
+  data={data}
+  showLegend
+  legendPosition="right"
+  hoverable
+  selectable
+  shadow
+  onSliceClick={handleSliceClick}
+/>
+
+{
+  /* DonutChart：默认带阴影、间隙、ECharts 配色 */
+}
+;<DonutChart data={data} hoverable />
+{
+  /* 中心显示汇总数据 */
+}
+;<DonutChart data={data} hoverable centerValue={total} centerLabel="访问量" />
+{
+  /* 图例 + 中心内容 */
+}
+;<DonutChart
+  data={data}
+  hoverable
+  showLegend
+  legendPosition="right"
+  centerValue={total}
+  centerLabel="总计"
+/>
+{
+  /* 自定义配色和间隙 */
+}
+;<DonutChart
+  data={data}
+  hoverable
+  colors={['#c23531', '#2f4554', '#61a0a8', '#d48265', '#91c7ae']}
+  innerRadiusRatio={0.5}
+  padAngle={0.06}
+  centerValue="1562"
+  centerLabel="总量"
+/>
 ```
 
 ````

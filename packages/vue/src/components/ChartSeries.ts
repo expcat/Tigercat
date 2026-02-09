@@ -42,7 +42,7 @@ export const ChartSeries = defineComponent({
         'g',
         {
           ...attrs,
-          class: classNames('outline-none', coerceClassValue(attrs.class), props.className),
+          class: classNames(coerceClassValue(attrs.class), props.className),
           'data-series-name': props.name,
           'data-series-type': props.type,
           fill: props.color,

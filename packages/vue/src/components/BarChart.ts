@@ -479,7 +479,7 @@ export const BarChart = defineComponent({
                         fill: props.gradient ? `url(#${gradientPrefix}-${index})` : bar.color,
                         opacity: bar.opacity,
                         class: classNames(
-                          'transition-[opacity,filter] duration-200 outline-none',
+                          'transition-[opacity,filter] duration-200',
                           (props.hoverable || props.selectable) &&
                             'cursor-pointer hover:brightness-110'
                         ),

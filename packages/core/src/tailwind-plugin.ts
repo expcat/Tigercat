@@ -23,7 +23,11 @@ export const tigercatTheme = {
  */
 export const tigercatPlugin = plugin(function ({ addBase }) {
   addBase({
-    ':root': tigercatTheme
+    ':root': tigercatTheme,
+    // Remove browser default focus outline on interactive SVG elements
+    'svg [tabindex], svg [role="button"]': {
+      outline: 'none'
+    }
   })
 })
 

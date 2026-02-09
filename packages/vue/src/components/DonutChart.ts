@@ -2,6 +2,7 @@ import { defineComponent, computed, h, PropType } from 'vue'
 import {
   classNames,
   getChartInnerRect,
+  normalizeChartPadding,
   type ChartPadding,
   type ChartLegendPosition,
   type DonutChartDatum,
@@ -14,6 +15,19 @@ export interface VueDonutChartProps extends CoreDonutChartProps {
   padding?: ChartPadding
 }
 
+/** ECharts-inspired vibrant palette for donut charts */
+const DONUT_PALETTE = [
+  '#5470c6',
+  '#91cc75',
+  '#fac858',
+  '#ee6666',
+  '#73c0de',
+  '#3ba272',
+  '#fc8452',
+  '#9a60b4',
+  '#ea7ccc'
+]
+
 export const DonutChart = defineComponent({
   name: 'TigerDonutChart',
   props: {
@@ -23,7 +37,7 @@ export const DonutChart = defineComponent({
     },
     height: {
       type: Number,
-      default: 200
+      default: 240
     },
     padding: {
       type: [Number, Object] as PropType<ChartPadding>,
@@ -38,7 +52,7 @@ export const DonutChart = defineComponent({
     },
     innerRadiusRatio: {
       type: Number,
-      default: 0.6
+      default: 0.62
     },
     outerRadius: {
       type: Number
@@ -53,7 +67,7 @@ export const DonutChart = defineComponent({
     },
     padAngle: {
       type: Number,
-      default: 0
+      default: 0.04
     },
     colors: {
       type: Array as PropType<string[]>
@@ -80,7 +94,7 @@ export const DonutChart = defineComponent({
     },
     inactiveOpacity: {
       type: Number,
-      default: 0.25
+      default: 0.3
     },
     selectable: {
       type: Boolean,
@@ -128,7 +142,7 @@ export const DonutChart = defineComponent({
     // Visual enhancements
     borderWidth: {
       type: Number,
-      default: 2
+      default: 0
     },
     borderColor: {
       type: String,
@@ -136,7 +150,7 @@ export const DonutChart = defineComponent({
     },
     hoverOffset: {
       type: Number,
-      default: 8
+      default: 10
     },
     labelPosition: {
       type: String as PropType<'inside' | 'outside'>,
@@ -144,12 +158,24 @@ export const DonutChart = defineComponent({
     },
     shadow: {
       type: Boolean,
+      default: true
+    },
+    // DonutChart-specific
+    centerValue: {
+      type: [String, Number] as PropType<string | number>
+    },
+    centerLabel: {
+      type: String
+    },
+    animated: {
+      type: Boolean,
       default: false
     }
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'slice-click', 'slice-hover'],
   setup(props, { emit }) {
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
+    const pad = computed(() => normalizeChartPadding(props.padding))
 
     const resolvedOuterRadius = computed(() => {
       if (typeof props.outerRadius === 'number') return Math.max(0, props.outerRadius)
@@ -160,30 +186,48 @@ export const DonutChart = defineComponent({
       if (typeof props.innerRadius === 'number') {
         return Math.min(Math.max(0, props.innerRadius), resolvedOuterRadius.value)
       }
-
-      const ratio = Math.min(Math.max(props.innerRadiusRatio ?? 0.6, 0), 1)
+      const ratio = Math.min(Math.max(props.innerRadiusRatio ?? 0.62, 0), 1)
       return resolvedOuterRadius.value * ratio
     })
 
-    // Event handlers to forward to PieChart
+    const centerPos = computed(() => ({
+      x: pad.value.left + innerRect.value.width / 2,
+      y: pad.value.top + innerRect.value.height / 2
+    }))
+
+    const hasCenterContent = computed(
+      () => props.centerValue !== undefined || props.centerLabel !== undefined
+    )
+
+    const resolvedColors = computed(() =>
+      props.colors && props.colors.length > 0 ? props.colors : DONUT_PALETTE
+    )
+
+    const donutTooltipFormatter = computed(() => {
+      if (props.tooltipFormatter) return props.tooltipFormatter
+      const total = props.data.reduce((s, d) => s + d.value, 0)
+      return (datum: DonutChartDatum, index: number) => {
+        const pct = total > 0 ? ((datum.value / total) * 100).toFixed(1) : '0'
+        const label = datum.label ?? `#${index + 1}`
+        return `${label}: ${datum.value} (${pct}%)`
+      }
+    })
+
     const handleHoveredIndexUpdate = (index: number | null) => {
       emit('update:hoveredIndex', index)
     }
-
     const handleSelectedIndexUpdate = (index: number | null) => {
       emit('update:selectedIndex', index)
     }
-
     const handleSliceClick = (datum: DonutChartDatum, index: number) => {
       emit('slice-click', datum, index)
     }
-
     const handleSliceHover = (datum: DonutChartDatum | null, index: number | null) => {
       emit('slice-hover', datum, index)
     }
 
-    return () =>
-      h(PieChart, {
+    return () => {
+      const pie = h(PieChart, {
         width: props.width,
         height: props.height,
         padding: props.padding,
@@ -193,40 +237,77 @@ export const DonutChart = defineComponent({
         startAngle: props.startAngle,
         endAngle: props.endAngle,
         padAngle: props.padAngle,
-        colors: props.colors,
+        colors: resolvedColors.value,
         showLabels: props.showLabels,
         labelFormatter: props.labelFormatter,
         labelPosition: props.labelPosition,
-        // Visual enhancements
         borderWidth: props.borderWidth,
         borderColor: props.borderColor,
         hoverOffset: props.hoverOffset,
         shadow: props.shadow,
-        // Interaction props
         hoverable: props.hoverable,
         hoveredIndex: props.hoveredIndex,
         activeOpacity: props.activeOpacity,
         inactiveOpacity: props.inactiveOpacity,
         selectable: props.selectable,
         selectedIndex: props.selectedIndex,
-        // Legend props
         showLegend: props.showLegend,
         legendPosition: props.legendPosition,
         legendMarkerSize: props.legendMarkerSize,
         legendGap: props.legendGap,
-        // Tooltip props
         showTooltip: props.showTooltip,
-        tooltipFormatter: props.tooltipFormatter,
-        // Accessibility
+        tooltipFormatter: donutTooltipFormatter.value,
         title: props.title,
         desc: props.desc,
         className: classNames(props.className),
-        // Event handlers
         'onUpdate:hoveredIndex': handleHoveredIndexUpdate,
         'onUpdate:selectedIndex': handleSelectedIndexUpdate,
         onSliceClick: handleSliceClick,
         onSliceHover: handleSliceHover
       })
+
+      const center = hasCenterContent.value
+        ? h(
+            'div',
+            {
+              style: {
+                position: 'absolute',
+                left: `${centerPos.value.x}px`,
+                top: `${centerPos.value.y}px`,
+                transform: 'translate(-50%, -50%)',
+                textAlign: 'center',
+                pointerEvents: 'none',
+                lineHeight: '1.3'
+              },
+              'data-donut-center': 'true'
+            },
+            [
+              props.centerValue !== undefined
+                ? h(
+                    'div',
+                    {
+                      class: 'text-xl font-semibold text-[color:var(--tiger-text,#1f2937)]',
+                      style: { lineHeight: '1.2' }
+                    },
+                    `${props.centerValue}`
+                  )
+                : null,
+              props.centerLabel !== undefined
+                ? h(
+                    'div',
+                    {
+                      class: 'text-xs text-[color:var(--tiger-text-secondary,#6b7280)]',
+                      style: { marginTop: '2px' }
+                    },
+                    props.centerLabel
+                  )
+                : null
+            ]
+          )
+        : null
+
+      return h('div', { class: 'inline-block relative', 'data-donut-chart': 'true' }, [pie, center])
+    }
   }
 })
 

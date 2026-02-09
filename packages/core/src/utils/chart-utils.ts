@@ -415,6 +415,11 @@ export function computePieLabelLine(
 export const PIE_EMPHASIS_SHADOW = 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))'
 export const PIE_BASE_SHADOW = 'drop-shadow(0 1px 2px rgba(0,0,0,0.06))'
 
+/** Enhanced donut-specific shadow – deeper & more diffuse for richer emphasis */
+export const DONUT_EMPHASIS_SHADOW =
+  'drop-shadow(0 8px 20px rgba(0,0,0,0.28)) drop-shadow(0 2px 6px rgba(0,0,0,0.12))'
+export const DONUT_BASE_SHADOW = 'drop-shadow(0 2px 8px rgba(0,0,0,0.10))'
+
 export function getRadarAngles(count: number, startAngle = -Math.PI / 2): number[] {
   if (count <= 0) return []
   const step = (Math.PI * 2) / count

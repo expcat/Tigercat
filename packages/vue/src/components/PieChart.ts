@@ -298,9 +298,12 @@ export const PieChart = defineComponent({
                       'stroke-linejoin': 'round',
                       class: classNames(interactive && 'cursor-pointer'),
                       style: {
-                        transform: `translate(${dx}px, ${dy}px)`,
+                        transform: isEmphasized
+                          ? `translate(${dx}px, ${dy}px) scale(1.04)`
+                          : `translate(${dx}px, ${dy}px)`,
+                        transformOrigin: `${cx}px ${cy}px`,
                         transition:
-                          'transform 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease-out, filter 0.25s ease-out',
+                          'transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease-out, filter 0.3s ease-out',
                         filter: props.shadow
                           ? isEmphasized
                             ? PIE_EMPHASIS_SHADOW
