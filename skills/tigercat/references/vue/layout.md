@@ -259,8 +259,35 @@ const data = [
 
 ```vue
 <template>
-  <Skeleton :loading="loading" :rows="3" animated>
-    <p>Loaded content</p>
-  </Skeleton>
+  <!-- 基本用法 -->
+  <Skeleton />
+
+  <!-- 变体 -->
+  <Skeleton variant="avatar" shape="circle" />
+  <Skeleton variant="image" />
+  <Skeleton variant="button" />
+  <Skeleton variant="custom" width="300px" height="150px" />
+
+  <!-- 动画 -->
+  <Skeleton animation="wave" />
+  <Skeleton animation="none" />
+
+  <!-- 多行文本 -->
+  <Skeleton variant="text" :rows="3" />
+
+  <!-- 段落模式（行宽自动变化） -->
+  <Skeleton variant="text" :rows="4" paragraph />
+
+  <!-- 自定义尺寸 -->
+  <Skeleton width="200px" height="50px" />
+
+  <!-- 组合使用 -->
+  <div class="flex items-start gap-4">
+    <Skeleton variant="avatar" />
+    <div class="flex-1">
+      <Skeleton variant="text" width="150px" class="mb-2" />
+      <Skeleton variant="text" :rows="2" paragraph />
+    </div>
+  </div>
 </template>
 ```

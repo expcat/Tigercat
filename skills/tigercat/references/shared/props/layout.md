@@ -189,12 +189,16 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Props
 
-| Prop     | Type                                        | Default  | Vue | React | Description |
-| -------- | ------------------------------------------- | -------- | :-: | :---: | ----------- |
-| loading  | `boolean`                                   | `true`   |  ✓  |   ✓   | 加载状态    |
-| rows     | `number`                                    | `3`      |  ✓  |   ✓   | 行数        |
-| shape    | `'text' \| 'circle' \| 'button' \| 'image'` | `'text'` |  ✓  |   ✓   | 形状        |
-| animated | `boolean`                                   | `true`   |  ✓  |   ✓   | 动画效果    |
+| Prop      | Type                                                    | Default    | Vue | React | Description                         |
+| --------- | ------------------------------------------------------- | ---------- | :-: | :---: | ----------------------------------- |
+| variant   | `'text' \| 'avatar' \| 'image' \| 'button' \| 'custom'` | `'text'`   |  ✓  |   ✓   | 骨架屏变体                          |
+| animation | `'pulse' \| 'wave' \| 'none'`                           | `'pulse'`  |  ✓  |   ✓   | 动画类型                            |
+| width     | `string`                                                | -          |  ✓  |   ✓   | 宽度（CSS 值）                      |
+| height    | `string`                                                | -          |  ✓  |   ✓   | 高度（CSS 值）                      |
+| shape     | `'circle' \| 'square'`                                  | `'circle'` |  ✓  |   ✓   | 形状（avatar 变体）                 |
+| rows      | `number`                                                | `1`        |  ✓  |   ✓   | 行数（text 变体，>1 时渲染多行）    |
+| paragraph | `boolean`                                               | `false`    |  ✓  |   ✓   | 段落模式（text 变体，行宽自动变化） |
+| className | `string`                                                | -          |  ✓  |   ✓   | 自定义类名                          |
 
 ---
 

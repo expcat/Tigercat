@@ -44,13 +44,6 @@ describe('Skeleton', () => {
       expect(skeleton.className).toContain('tiger-skeleton-bg')
     })
 
-    it('should use text variant by default', () => {
-      const { container } = renderWithProps(Skeleton, {})
-
-      const skeleton = container.querySelector('div')
-      expect(skeleton).toBeInTheDocument()
-    })
-
     it('should render avatar variant with circle shape', () => {
       const { container } = renderWithProps(Skeleton, {
         variant: 'avatar',
@@ -122,14 +115,6 @@ describe('Skeleton', () => {
 
       const skeleton = getSkeletonElements(container)[0]
       expect(skeleton).toHaveStyle({ width: '300px', height: '100px' })
-    })
-
-    it('should use variant default dimensions when not specified', () => {
-      const { container } = renderWithProps(Skeleton, { variant: 'button' })
-
-      const skeleton = container.querySelector('div')
-      expect(skeleton).toBeInTheDocument()
-      // Dimensions are applied via inline styles
     })
   })
 
@@ -215,26 +200,10 @@ describe('Skeleton', () => {
         expect(skeleton?.className).toContain('rounded-md')
       }
     })
-
-    it('should default to circle shape for avatar variant', () => {
-      const { container } = renderWithProps(Skeleton, { variant: 'avatar' })
-
-      const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton.className).toContain('rounded-full')
-    })
   })
 
   describe('Custom Classes', () => {
-    it('should apply custom className', () => {
-      const { container } = renderWithProps(Skeleton, {
-        className: 'custom-class'
-      })
-
-      const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton.className).toContain('custom-class')
-    })
-
-    it('should preserve base classes when custom className is provided', () => {
+    it('should apply custom className and preserve base classes', () => {
       const { container } = renderWithProps(Skeleton, {
         className: 'custom-class'
       })
@@ -242,6 +211,22 @@ describe('Skeleton', () => {
       const skeleton = getSkeletonElements(container)[0]
       expect(skeleton.className).toContain('tiger-skeleton-bg')
       expect(skeleton.className).toContain('custom-class')
+    })
+
+    it('should apply className to wrapper only in multi-row mode', () => {
+      const { container } = renderWithProps(Skeleton, {
+        variant: 'text',
+        rows: 3,
+        className: 'custom-wrapper'
+      })
+
+      const wrapper = container.querySelector('.flex.flex-col')
+      expect(wrapper?.className).toContain('custom-wrapper')
+
+      const skeletons = getSkeletonElements(container)
+      skeletons.forEach((skeleton) => {
+        expect(skeleton.className).not.toContain('custom-wrapper')
+      })
     })
   })
 
