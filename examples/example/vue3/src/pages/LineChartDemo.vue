@@ -60,6 +60,30 @@ const curveSnippet = `<LineChart
   :height="240"
   curve="monotone"
   show-points
+  show-area
+/>`
+
+const areaGradientSnippet = `<LineChart
+  :series="multiSeries"
+  :width="420"
+  :height="240"
+  show-area
+  :area-opacity="0.2"
+  point-hollow
+  show-points
+  curve="monotone"
+  show-legend
+/>`
+
+const animatedSnippet = `<LineChart
+  :data="data"
+  :width="420"
+  :height="240"
+  animated
+  show-area
+  curve="monotone"
+  show-points
+  point-hollow
 />`
 
 const interactiveSnippet = `<LineChart
@@ -105,14 +129,42 @@ const interactiveSnippet = `<LineChart
                        show-points />
         </DemoBlock>
 
-        <DemoBlock title="曲线插值"
-                   description="使用 monotone 平滑曲线。"
+        <DemoBlock title="曲线插值 + 面积填充"
+                   description="使用 monotone 平滑曲线并显示渐变面积。"
                    :code="curveSnippet">
             <LineChart :data="basicData"
                        :width="420"
                        :height="240"
                        curve="monotone"
-                       show-points />
+                       show-points
+                       show-area />
+        </DemoBlock>
+
+        <DemoBlock title="面积渐变 + 空心圆点"
+                   description="ECharts 风格：渐变填充区域、空心数据点、平滑曲线。"
+                   :code="areaGradientSnippet">
+            <LineChart :series="multiSeries"
+                       :width="420"
+                       :height="240"
+                       show-area
+                       :area-opacity="0.2"
+                       point-hollow
+                       show-points
+                       curve="monotone"
+                       show-legend />
+        </DemoBlock>
+
+        <DemoBlock title="入场动画"
+                   description="线条从左到右绘制的入场动画效果。"
+                   :code="animatedSnippet">
+            <LineChart :data="basicData"
+                       :width="420"
+                       :height="240"
+                       animated
+                       show-area
+                       curve="monotone"
+                       show-points
+                       point-hollow />
         </DemoBlock>
 
         <DemoBlock title="交互功能"

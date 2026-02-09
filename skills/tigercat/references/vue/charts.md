@@ -44,6 +44,10 @@ const series = [
   <LineChart :data="data" :width="400" :height="240" />
   <LineChart :data="data" curve="monotone" show-points :point-size="4" />
   <LineChart :series="series" show-legend legend-position="bottom" />
+  <!-- ECharts 风格：渐变面积 + 空心圆点 + 平滑曲线 -->
+  <LineChart :data="data" show-area curve="monotone" show-points point-hollow />
+  <!-- 入场动画 -->
+  <LineChart :data="data" animated show-area curve="monotone" show-points />
   <LineChart
     :data="data"
     hoverable

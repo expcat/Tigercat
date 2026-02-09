@@ -25,6 +25,10 @@ const series = [
 <LineChart data={data} width={400} height={240} />
 <LineChart data={data} curve="monotone" showPoints pointSize={4} />
 <LineChart series={series} showLegend legendPosition="bottom" />
+{/* ECharts 风格：渐变面积 + 空心圆点 + 平滑曲线 */}
+<LineChart data={data} showArea curve="monotone" showPoints pointHollow />
+{/* 入场动画 */}
+<LineChart data={data} animated showArea curve="monotone" showPoints />
 <LineChart data={data} hoverable selectable onPointClick={handleClick} onPointHover={handleHover} />
 ```
 

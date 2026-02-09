@@ -971,6 +971,24 @@ export interface LineChartSeries {
   pointColor?: string
 
   /**
+   * Hollow point style (stroke + white fill, ECharts emptyCircle)
+   * @default false
+   */
+  pointHollow?: boolean
+
+  /**
+   * Show gradient area fill under line
+   * @default false
+   */
+  showArea?: boolean
+
+  /**
+   * Area fill opacity
+   * @default 0.15
+   */
+  areaOpacity?: number
+
+  /**
    * Additional CSS classes for this series
    */
   className?: string
@@ -1120,6 +1138,30 @@ export interface LineChartProps
    * Custom colors for multi-series
    */
   colors?: string[]
+
+  /**
+   * Show gradient area fill under lines
+   * @default false
+   */
+  showArea?: boolean
+
+  /**
+   * Area fill opacity
+   * @default 0.15
+   */
+  areaOpacity?: number
+
+  /**
+   * Hollow point style (stroke + white fill, ECharts emptyCircle)
+   * @default false
+   */
+  pointHollow?: boolean
+
+  /**
+   * Enable line draw entrance animation
+   * @default false
+   */
+  animated?: boolean
 
   /**
    * Tooltip formatter

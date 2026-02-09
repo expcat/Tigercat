@@ -78,11 +78,15 @@ description: Shared charts props and concepts
 
 ### LineChart
 
-| Prop       | Type                                            | Default    | Vue | React |
-| ---------- | ----------------------------------------------- | ---------- | --- | ----- |
-| curve      | `'linear' \| 'monotone' \| 'step' \| 'natural'` | `'linear'` | ✓   | ✓     |
-| showPoints | `boolean`                                       | `false`    | ✓   | ✓     |
-| pointSize  | `number`                                        | `4`        | ✓   | ✓     |
+| Prop        | Type                                            | Default    | Vue | React |
+| ----------- | ----------------------------------------------- | ---------- | --- | ----- |
+| curve       | `'linear' \| 'monotone' \| 'step' \| 'natural'` | `'linear'` | ✓   | ✓     |
+| showPoints  | `boolean`                                       | `true`     | ✓   | ✓     |
+| pointSize   | `number`                                        | `4`        | ✓   | ✓     |
+| pointHollow | `boolean`                                       | `false`    | ✓   | ✓     |
+| showArea    | `boolean`                                       | `false`    | ✓   | ✓     |
+| areaOpacity | `number`                                        | `0.15`     | ✓   | ✓     |
+| animated    | `boolean`                                       | `false`    | ✓   | ✓     |
 
 ### BarChart
 

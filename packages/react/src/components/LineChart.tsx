@@ -1,12 +1,14 @@
 import React, { useMemo, useState, useCallback } from 'react'
 import {
   classNames,
+  createAreaPath,
   createLinearScale,
   createLinePath,
   createPointScale,
   DEFAULT_CHART_COLORS,
   getChartElementOpacity,
   getChartInnerRect,
+  getLineGradientPrefix,
   getNumberExtent,
   type ChartCurveType,
   type ChartLegendItem,
@@ -83,6 +85,10 @@ export const LineChart: React.FC<LineChartProps> = ({
   legendMarkerSize = 10,
   legendGap = 8,
   showTooltip = true,
+  showArea = false,
+  areaOpacity = 0.15,
+  pointHollow = false,
+  animated = false,
   tooltipFormatter,
   legendFormatter,
   title,
@@ -101,6 +107,9 @@ export const LineChart: React.FC<LineChartProps> = ({
     pointIndex: number
   } | null>(null)
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+
+  // Unique gradient prefix for area fills
+  const gradientPrefix = useMemo(() => getLineGradientPrefix(), [])
 
   const innerRect = useMemo(
     () => getChartInnerRect(width, height, padding),
@@ -156,7 +165,7 @@ export const LineChart: React.FC<LineChartProps> = ({
       return createLinearScale(extent, [0, innerRect.width])
     } else {
       const categories = [...new Set(xValues.map(String))]
-      return createPointScale(categories, [0, innerRect.width], { padding: 0.1 })
+      return createPointScale(categories, [0, innerRect.width], { padding: 0 })
     }
   }, [xScaleProp, isXNumeric, xValues, innerRect.width])
 
@@ -185,6 +194,10 @@ export const LineChart: React.FC<LineChartProps> = ({
           pointIndex
         }))
         const linePath = createLinePath(points, curve as ChartCurveType)
+        const seriesShowArea = s.showArea ?? showArea
+        const areaPath = seriesShowArea
+          ? createAreaPath(points, innerRect.height, curve as ChartCurveType)
+          : ''
         const opacity = getChartElementOpacity(seriesIndex, activeIndex, {
           activeOpacity,
           inactiveOpacity
@@ -195,13 +208,17 @@ export const LineChart: React.FC<LineChartProps> = ({
           seriesIndex,
           color,
           linePath,
+          areaPath,
+          showArea: seriesShowArea,
+          areaOpacity: s.areaOpacity ?? areaOpacity,
           points,
           opacity,
           strokeWidth: s.strokeWidth ?? strokeWidth,
           strokeDasharray: s.strokeDasharray,
           showPoints: s.showPoints ?? showPoints,
           pointSize: s.pointSize ?? pointSize,
-          pointColor: s.pointColor ?? color
+          pointColor: s.pointColor ?? color,
+          pointHollow: s.pointHollow ?? pointHollow
         }
       }),
     [
@@ -215,7 +232,11 @@ export const LineChart: React.FC<LineChartProps> = ({
       inactiveOpacity,
       strokeWidth,
       showPoints,
-      pointSize
+      pointSize,
+      showArea,
+      areaOpacity,
+      pointHollow,
+      innerRect.height
     ]
   )
 
@@ -292,6 +313,36 @@ export const LineChart: React.FC<LineChartProps> = ({
       title={title}
       desc={desc}
       className={classNames(className)}>
+      {/* Gradient defs and animation styles */}
+      {(seriesData.some((sd) => sd.showArea) || animated) && (
+        <defs>
+          {animated && (
+            <style>{`
+              .tiger-line-animated {
+                animation: tiger-line-draw 1.2s cubic-bezier(.4,0,.2,1) forwards;
+              }
+              @keyframes tiger-line-draw {
+                from { stroke-dashoffset: 1; }
+                to { stroke-dashoffset: 0; }
+              }
+            `}</style>
+          )}
+          {seriesData
+            .filter((sd) => sd.showArea)
+            .map((sd) => (
+              <linearGradient
+                key={`area-grad-${sd.seriesIndex}`}
+                id={`${gradientPrefix}-${sd.seriesIndex}`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1">
+                <stop offset="0%" stopColor={sd.color} stopOpacity={sd.areaOpacity} />
+                <stop offset="100%" stopColor={sd.color} stopOpacity={0.02} />
+              </linearGradient>
+            ))}
+        </defs>
+      )}
       {showGrid && (
         <ChartGrid
           xScale={resolvedXScale}
@@ -333,42 +384,70 @@ export const LineChart: React.FC<LineChartProps> = ({
           name={sd.series.name}
           type="line"
           opacity={sd.opacity}
-          className={classNames(sd.series.className, (hoverable || selectable) && 'cursor-pointer')}
+          className={classNames(
+            sd.series.className,
+            (hoverable || selectable) && 'cursor-pointer',
+            'outline-none'
+          )}
           onMouseEnter={(e: React.MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e)}
           onMouseLeave={handleSeriesHoverLeave}
           onClick={() => handleSeriesSelect(sd.seriesIndex)}
           tabIndex={selectable ? 0 : undefined}
           onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, sd.seriesIndex)}>
+          {/* Area fill path */}
+          {sd.showArea && sd.areaPath && (
+            <path
+              d={sd.areaPath}
+              fill={`url(#${gradientPrefix}-${sd.seriesIndex})`}
+              stroke="none"
+              className="transition-opacity duration-300"
+              data-area-series={sd.seriesIndex}
+            />
+          )}
           <path
             d={sd.linePath}
             fill="none"
             stroke={sd.color}
             strokeWidth={sd.strokeWidth}
-            strokeDasharray={sd.strokeDasharray}
+            strokeDasharray={animated ? (sd.strokeDasharray ?? '1') : sd.strokeDasharray}
+            strokeDashoffset={animated ? '1' : undefined}
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="transition-opacity duration-150"
+            pathLength={animated ? 1 : undefined}
+            className={classNames(
+              'transition-opacity duration-200',
+              animated && 'tiger-line-animated'
+            )}
             data-line-series={sd.seriesIndex}
           />
           {sd.showPoints &&
-            sd.points.map((point) => (
-              <circle
-                key={`point-${sd.seriesIndex}-${point.pointIndex}`}
-                cx={point.x}
-                cy={point.y}
-                r={sd.pointSize}
-                fill={sd.pointColor}
-                className="transition-all duration-150"
-                data-point-index={point.pointIndex}
-                onMouseEnter={(e) => handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)}
-                onMouseMove={handlePointMouseMove}
-                onMouseLeave={handlePointMouseLeave}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  handlePointClick(sd.seriesIndex, point.pointIndex)
-                }}
-              />
-            ))}
+            sd.points.map((point) => {
+              const isHovered =
+                hoveredPointInfo?.seriesIndex === sd.seriesIndex &&
+                hoveredPointInfo?.pointIndex === point.pointIndex
+              const hoverSize = sd.pointSize + 2
+              return (
+                <circle
+                  key={`point-${sd.seriesIndex}-${point.pointIndex}`}
+                  cx={point.x}
+                  cy={point.y}
+                  r={isHovered ? hoverSize : sd.pointSize}
+                  fill={sd.pointHollow ? 'white' : sd.pointColor}
+                  stroke={sd.pointHollow ? sd.pointColor : 'none'}
+                  strokeWidth={sd.pointHollow ? 2 : 0}
+                  className="transition-all duration-200 ease-out"
+                  style={isHovered ? { filter: `drop-shadow(0 0 4px ${sd.color})` } : undefined}
+                  data-point-index={point.pointIndex}
+                  onMouseEnter={(e) => handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)}
+                  onMouseMove={handlePointMouseMove}
+                  onMouseLeave={handlePointMouseLeave}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handlePointClick(sd.seriesIndex, point.pointIndex)
+                  }}
+                />
+              )
+            })}
         </ChartSeries>
       ))}
     </ChartCanvas>

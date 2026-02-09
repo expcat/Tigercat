@@ -1,12 +1,14 @@
 import { defineComponent, computed, h, PropType, ref } from 'vue'
 import {
   classNames,
+  createAreaPath,
   createLinearScale,
   createLinePath,
   createPointScale,
   DEFAULT_CHART_COLORS,
   getChartElementOpacity,
   getChartInnerRect,
+  getLineGradientPrefix,
   getNumberExtent,
   type ChartCurveType,
   type ChartGridLineStyle,
@@ -184,6 +186,25 @@ export const LineChart = defineComponent({
       type: Number,
       default: 8
     },
+    // Area fill props
+    showArea: {
+      type: Boolean,
+      default: false
+    },
+    areaOpacity: {
+      type: Number,
+      default: 0.15
+    },
+    // Point styling
+    pointHollow: {
+      type: Boolean,
+      default: false
+    },
+    // Animation
+    animated: {
+      type: Boolean,
+      default: false
+    },
     // Tooltip props
     showTooltip: {
       type: Boolean,
@@ -225,6 +246,9 @@ export const LineChart = defineComponent({
     // Point-level hover state (not managed by composable)
     const hoveredPointInfo = ref<{ seriesIndex: number; pointIndex: number } | null>(null)
     const tooltipPosition = ref({ x: 0, y: 0 })
+
+    // Unique gradient prefix for area fills
+    const gradientPrefix = getLineGradientPrefix()
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 
@@ -278,7 +302,7 @@ export const LineChart = defineComponent({
         return createLinearScale(extent, [0, innerRect.value.width])
       } else {
         const categories = [...new Set(xValues.value.map(String))]
-        return createPointScale(categories, [0, innerRect.value.width], { padding: 0.1 })
+        return createPointScale(categories, [0, innerRect.value.width], { padding: 0 })
       }
     })
 
@@ -306,6 +330,10 @@ export const LineChart = defineComponent({
           pointIndex
         }))
         const linePath = createLinePath(points, props.curve)
+        const seriesShowArea = series.showArea ?? props.showArea
+        const areaPath = seriesShowArea
+          ? createAreaPath(points, innerRect.value.height, props.curve)
+          : ''
         const opacity = getChartElementOpacity(seriesIndex, activeIndex.value, {
           activeOpacity: props.activeOpacity,
           inactiveOpacity: props.inactiveOpacity
@@ -316,13 +344,17 @@ export const LineChart = defineComponent({
           seriesIndex,
           color,
           linePath,
+          areaPath,
+          showArea: seriesShowArea,
+          areaOpacity: series.areaOpacity ?? props.areaOpacity,
           points,
           opacity,
           strokeWidth: series.strokeWidth ?? props.strokeWidth,
           strokeDasharray: series.strokeDasharray,
           showPoints: series.showPoints ?? props.showPoints,
           pointSize: series.pointSize ?? props.pointSize,
-          pointColor: series.pointColor ?? color
+          pointColor: series.pointColor ?? color,
+          pointHollow: series.pointHollow ?? props.pointHollow
         }
       })
     )
@@ -446,6 +478,55 @@ export const LineChart = defineComponent({
                     label: props.yAxisLabel
                   })
                 : null,
+              // Gradient defs and animation styles
+              seriesData.value.some((sd) => sd.showArea) || props.animated
+                ? h('defs', null, [
+                    // Animation keyframes
+                    props.animated
+                      ? h(
+                          'style',
+                          null,
+                          `
+                          .tiger-line-animated {
+                            animation: tiger-line-draw 1.2s cubic-bezier(.4,0,.2,1) forwards;
+                          }
+                          @keyframes tiger-line-draw {
+                            from { stroke-dashoffset: 1; }
+                            to { stroke-dashoffset: 0; }
+                          }
+                        `
+                        )
+                      : null,
+                    // Area fill gradients
+                    ...seriesData.value
+                      .filter((sd) => sd.showArea)
+                      .map((sd) =>
+                        h(
+                          'linearGradient',
+                          {
+                            key: `area-grad-${sd.seriesIndex}`,
+                            id: `${gradientPrefix}-${sd.seriesIndex}`,
+                            x1: '0',
+                            y1: '0',
+                            x2: '0',
+                            y2: '1'
+                          },
+                          [
+                            h('stop', {
+                              offset: '0%',
+                              'stop-color': sd.color,
+                              'stop-opacity': sd.areaOpacity
+                            }),
+                            h('stop', {
+                              offset: '100%',
+                              'stop-color': sd.color,
+                              'stop-opacity': 0.02
+                            })
+                          ]
+                        )
+                      )
+                  ])
+                : null,
               // Render each series
               ...seriesData.value.map((sd) =>
                 h(
@@ -458,7 +539,8 @@ export const LineChart = defineComponent({
                     opacity: sd.opacity,
                     class: classNames(
                       sd.series.className,
-                      (props.hoverable || props.selectable) && 'cursor-pointer'
+                      (props.hoverable || props.selectable) && 'cursor-pointer',
+                      'outline-none'
                     ),
                     onMouseenter: (e: MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e),
                     onMouseleave: handleSeriesHoverLeave,
@@ -468,28 +550,54 @@ export const LineChart = defineComponent({
                   },
                   {
                     default: () => [
+                      // Area fill path
+                      sd.showArea && sd.areaPath
+                        ? h('path', {
+                            d: sd.areaPath,
+                            fill: `url(#${gradientPrefix}-${sd.seriesIndex})`,
+                            stroke: 'none',
+                            class: 'transition-opacity duration-300',
+                            'data-area-series': sd.seriesIndex
+                          })
+                        : null,
                       // Line path
                       h('path', {
                         d: sd.linePath,
                         fill: 'none',
                         stroke: sd.color,
                         'stroke-width': sd.strokeWidth,
-                        'stroke-dasharray': sd.strokeDasharray,
+                        'stroke-dasharray': props.animated
+                          ? (sd.strokeDasharray ?? '1')
+                          : sd.strokeDasharray,
+                        'stroke-dashoffset': props.animated ? '1' : undefined,
                         'stroke-linecap': 'round',
                         'stroke-linejoin': 'round',
-                        class: 'transition-opacity duration-150',
+                        pathLength: props.animated ? 1 : undefined,
+                        class: classNames(
+                          'transition-opacity duration-200',
+                          props.animated && 'tiger-line-animated'
+                        ),
                         'data-line-series': sd.seriesIndex
                       }),
                       // Data points
                       sd.showPoints
-                        ? sd.points.map((point) =>
-                            h('circle', {
+                        ? sd.points.map((point) => {
+                            const isHovered =
+                              hoveredPointInfo.value?.seriesIndex === sd.seriesIndex &&
+                              hoveredPointInfo.value?.pointIndex === point.pointIndex
+                            const hoverSize = sd.pointSize + 2
+                            return h('circle', {
                               key: `point-${sd.seriesIndex}-${point.pointIndex}`,
                               cx: point.x,
                               cy: point.y,
-                              r: sd.pointSize,
-                              fill: sd.pointColor,
-                              class: 'transition-all duration-150 hover:r-[6]',
+                              r: isHovered ? hoverSize : sd.pointSize,
+                              fill: sd.pointHollow ? 'white' : sd.pointColor,
+                              stroke: sd.pointHollow ? sd.pointColor : 'none',
+                              'stroke-width': sd.pointHollow ? 2 : 0,
+                              class: 'transition-all duration-200 ease-out',
+                              style: isHovered
+                                ? `filter: drop-shadow(0 0 4px ${sd.color})`
+                                : undefined,
                               'data-point-index': point.pointIndex,
                               onMouseenter: (e: MouseEvent) =>
                                 handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e),
@@ -500,7 +608,7 @@ export const LineChart = defineComponent({
                                 handlePointClick(sd.seriesIndex, point.pointIndex)
                               }
                             })
-                          )
+                          })
                         : null
                     ]
                   }

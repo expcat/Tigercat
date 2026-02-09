@@ -57,6 +57,30 @@ const curveSnippet = `<LineChart
   height={240}
   curve="monotone"
   showPoints
+  showArea
+/>`
+
+const areaGradientSnippet = `<LineChart
+  series={multiSeries}
+  width={420}
+  height={240}
+  showArea
+  areaOpacity={0.2}
+  pointHollow
+  showPoints
+  curve="monotone"
+  showLegend
+/>`
+
+const animatedSnippet = `<LineChart
+  data={data}
+  width={420}
+  height={240}
+  animated
+  showArea
+  curve="monotone"
+  showPoints
+  pointHollow
 />`
 
 const interactiveSnippet = `<LineChart
@@ -100,8 +124,44 @@ const LineChartDemo: React.FC = () => {
         <LineChart series={multiSeries} width={420} height={240} hoverable showLegend showPoints />
       </DemoBlock>
 
-      <DemoBlock title="曲线插值" description="使用 monotone 平滑曲线。" code={curveSnippet}>
-        <LineChart data={basicData} width={420} height={240} curve="monotone" showPoints />
+      <DemoBlock
+        title="曲线插值 + 面积填充"
+        description="使用 monotone 平滑曲线并显示渐变面积。"
+        code={curveSnippet}>
+        <LineChart data={basicData} width={420} height={240} curve="monotone" showPoints showArea />
+      </DemoBlock>
+
+      <DemoBlock
+        title="面积渐变 + 空心圆点"
+        description="ECharts 风格：渐变填充区域、空心数据点、平滑曲线。"
+        code={areaGradientSnippet}>
+        <LineChart
+          series={multiSeries}
+          width={420}
+          height={240}
+          showArea
+          areaOpacity={0.2}
+          pointHollow
+          showPoints
+          curve="monotone"
+          showLegend
+        />
+      </DemoBlock>
+
+      <DemoBlock
+        title="入场动画"
+        description="线条从左到右绘制的入场动画效果。"
+        code={animatedSnippet}>
+        <LineChart
+          data={basicData}
+          width={420}
+          height={240}
+          animated
+          showArea
+          curve="monotone"
+          showPoints
+          pointHollow
+        />
       </DemoBlock>
 
       <DemoBlock

@@ -427,6 +427,27 @@ export function createPolygonPath(points: Array<{ x: number; y: number }>): stri
 
 import type { ChartCurveType } from '../types/chart'
 
+let lineGradientCounter = 0
+
+/**
+ * Generate a unique gradient ID prefix for a LineChart instance.
+ */
+export function getLineGradientPrefix(): string {
+  return `tiger-line-grad-${++lineGradientCounter}`
+}
+
+/**
+ * Reset the line gradient counter (for testing only)
+ */
+export function resetLineGradientCounter(): void {
+  lineGradientCounter = 0
+}
+
+/**
+ * CSS transition classes for line chart point hover
+ */
+export const linePointTransitionClasses = 'transition-all duration-200 ease-out'
+
 /**
  * Create a line path from points
  */
