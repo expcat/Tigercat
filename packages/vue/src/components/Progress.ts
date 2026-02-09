@@ -20,27 +20,14 @@ import {
   progressTrackBgClasses,
   progressCircleTextClasses,
   progressCircleTrackStrokeClasses,
+  type ProgressProps,
   type ProgressVariant,
   type ProgressSize,
   type ProgressType,
   type ProgressStatus
 } from '@expcat/tigercat-core'
 
-export interface VueProgressProps {
-  variant?: ProgressVariant
-  size?: ProgressSize
-  type?: ProgressType
-  percentage?: number
-  status?: ProgressStatus
-  showText?: boolean
-  text?: string
-  format?: (percentage: number) => string
-  striped?: boolean
-  stripedAnimation?: boolean
-  strokeWidth?: number
-  width?: string | number
-  height?: number
-  className?: string
+export interface VueProgressProps extends ProgressProps {
   style?: Record<string, string | number>
 }
 
@@ -48,300 +35,159 @@ export const Progress = defineComponent({
   name: 'TigerProgress',
   inheritAttrs: false,
   props: {
-    /**
-     * Progress variant style
-     * @default 'primary'
-     */
-    variant: {
-      type: String as PropType<ProgressVariant>,
-      default: 'primary' as ProgressVariant
-    },
-    /**
-     * Progress size
-     * @default 'md'
-     */
-    size: {
-      type: String as PropType<ProgressSize>,
-      default: 'md' as ProgressSize
-    },
-    /**
-     * Progress type (shape)
-     * @default 'line'
-     */
-    type: {
-      type: String as PropType<ProgressType>,
-      default: 'line' as ProgressType
-    },
-    /**
-     * Current progress percentage (0-100)
-     * @default 0
-     */
-    percentage: {
-      type: Number,
-      default: 0
-    },
-    /**
-     * Progress status
-     * @default 'normal'
-     */
-    status: {
-      type: String as PropType<ProgressStatus>,
-      default: 'normal' as ProgressStatus
-    },
-    /**
-     * Whether to show progress text
-     * @default true for line, false for circle
-     */
-    showText: {
-      type: Boolean,
-      default: undefined
-    },
-    /**
-     * Custom text to display
-     */
-    text: {
-      type: String,
-      default: undefined
-    },
-    /**
-     * Format function for custom text
-     */
-    format: {
-      type: Function as PropType<(percentage: number) => string>,
-      default: undefined
-    },
-    /**
-     * Whether to show striped pattern
-     * @default false
-     */
-    striped: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Whether to animate stripes
-     * @default false
-     */
-    stripedAnimation: {
-      type: Boolean,
-      default: false
-    },
-    /**
-     * Stroke width for circle type
-     * @default 6
-     */
-    strokeWidth: {
-      type: Number,
-      default: 6
-    },
-    /**
-     * Width of progress bar
-     * @default 'auto'
-     */
-    width: {
-      type: [String, Number],
-      default: 'auto'
-    },
-    /**
-     * Height of progress bar (line type only)
-     */
-    height: {
-      type: Number,
-      default: undefined
-    },
-
-    /**
-     * Additional CSS classes
-     */
-    className: {
-      type: String,
-      default: undefined
-    },
-
-    /**
-     * Custom styles
-     */
-    style: {
-      type: Object as PropType<Record<string, string | number>>,
-      default: undefined
-    }
+    variant: { type: String as PropType<ProgressVariant>, default: 'primary' as ProgressVariant },
+    size: { type: String as PropType<ProgressSize>, default: 'md' as ProgressSize },
+    type: { type: String as PropType<ProgressType>, default: 'line' as ProgressType },
+    percentage: { type: Number, default: 0 },
+    status: { type: String as PropType<ProgressStatus>, default: 'normal' as ProgressStatus },
+    showText: { type: Boolean, default: undefined },
+    text: { type: String, default: undefined },
+    format: { type: Function as PropType<(p: number) => string>, default: undefined },
+    striped: { type: Boolean, default: false },
+    stripedAnimation: { type: Boolean, default: false },
+    strokeWidth: { type: Number, default: 6 },
+    width: { type: [String, Number], default: 'auto' },
+    height: { type: Number, default: undefined },
+    className: { type: String, default: undefined },
+    style: { type: Object as PropType<Record<string, string | number>>, default: undefined }
   },
   setup(props, { attrs }) {
-    const clampedPercentage = computed(() => clampPercentage(props.percentage))
+    const clamped = computed(() => clampPercentage(props.percentage))
+    const effectiveVariant = computed(
+      () => (getStatusVariant(props.status) || props.variant) as ProgressVariant
+    )
+    const shouldShowText = computed(() => props.showText ?? props.type === 'line')
+    const displayText = computed(() =>
+      shouldShowText.value ? formatProgressText(clamped.value, props.text, props.format) : ''
+    )
+    const resolvedAriaLabel = computed(() => {
+      const label = attrs['aria-label'] as string | undefined
+      return label ?? (attrs['aria-labelledby'] != null ? undefined : `Progress: ${clamped.value}%`)
+    })
 
-    // Render line progress
+    const ariaProps = computed(() => ({
+      role: 'progressbar',
+      'aria-label': resolvedAriaLabel.value,
+      'aria-labelledby': attrs['aria-labelledby'],
+      'aria-describedby': attrs['aria-describedby'],
+      'aria-valuenow': clamped.value,
+      'aria-valuemin': 0,
+      'aria-valuemax': 100
+    }))
+
     const renderLineProgress = () => {
-      const percentage = clampedPercentage.value
-      const effectiveVariant = (getStatusVariant(props.status) || props.variant) as ProgressVariant
-      const shouldShowText = props.showText ?? props.type === 'line'
-      const displayText = shouldShowText
-        ? formatProgressText(percentage, props.text, props.format)
-        : ''
-
-      const ariaLabel = attrs['aria-label']
-      const ariaLabelledBy = attrs['aria-labelledby']
-      const ariaDescribedBy = attrs['aria-describedby']
-      const resolvedAriaLabel =
-        (ariaLabel as string | undefined) ??
-        (ariaLabelledBy != null ? undefined : `Progress: ${percentage}%`)
-
       const containerStyle =
         props.width !== 'auto'
-          ? {
-              width: typeof props.width === 'number' ? `${props.width}px` : props.width
-            }
+          ? { width: typeof props.width === 'number' ? `${props.width}px` : props.width }
           : {}
-
-      const wrapperClasses = classNames(
-        'flex items-center w-full',
-        coerceClassValue(attrs.class),
-        props.className
-      )
-      const wrapperStyle = {
-        ...(attrs.style as Record<string, unknown> | undefined),
-        ...(props.style ?? {}),
-        ...containerStyle
-      }
-
-      const lineTrackClasses = classNames(
-        progressLineBaseClasses,
-        progressTrackBgClasses,
-        !props.height && progressLineSizeClasses[props.size]
-      )
-
-      const trackStyle = {
-        flex: 1,
-        ...(props.height ? { height: `${props.height}px` } : {})
-      }
-
-      const lineBarClasses = classNames(
-        progressLineInnerClasses,
-        getProgressVariantClasses(effectiveVariant),
-        props.striped && progressStripedClasses,
-        props.striped && props.stripedAnimation && progressStripedAnimationClasses
-      )
-
-      const textClasses = classNames(
-        progressTextBaseClasses,
-        progressTextSizeClasses[props.size],
-        getProgressTextColorClasses(effectiveVariant)
-      )
 
       return h(
         'div',
         {
           ...attrs,
-          class: wrapperClasses,
-          style: wrapperStyle
+          class: classNames(
+            'flex items-center w-full',
+            coerceClassValue(attrs.class),
+            props.className
+          ),
+          style: {
+            ...(attrs.style as Record<string, unknown> | undefined),
+            ...(props.style ?? {}),
+            ...containerStyle
+          }
         },
         [
-          h('div', { class: lineTrackClasses, style: trackStyle }, [
-            h('div', {
-              class: lineBarClasses,
-              style: { width: `${percentage}%` },
-              role: 'progressbar',
-              'aria-label': resolvedAriaLabel,
-              'aria-labelledby': ariaLabelledBy,
-              'aria-describedby': ariaDescribedBy,
-              'aria-valuenow': percentage,
-              'aria-valuemin': 0,
-              'aria-valuemax': 100
-            })
-          ]),
-          shouldShowText ? h('span', { class: textClasses }, displayText) : undefined
+          h(
+            'div',
+            {
+              class: classNames(
+                progressLineBaseClasses,
+                progressTrackBgClasses,
+                !props.height && progressLineSizeClasses[props.size]
+              ),
+              style: { flex: 1, ...(props.height ? { height: `${props.height}px` } : {}) }
+            },
+            [
+              h('div', {
+                class: classNames(
+                  progressLineInnerClasses,
+                  getProgressVariantClasses(effectiveVariant.value),
+                  props.striped && progressStripedClasses,
+                  props.striped && props.stripedAnimation && progressStripedAnimationClasses
+                ),
+                style: { width: `${clamped.value}%` },
+                ...ariaProps.value
+              })
+            ]
+          ),
+          shouldShowText.value
+            ? h(
+                'span',
+                {
+                  class: classNames(
+                    progressTextBaseClasses,
+                    progressTextSizeClasses[props.size],
+                    getProgressTextColorClasses(effectiveVariant.value)
+                  )
+                },
+                displayText.value
+              )
+            : undefined
         ].filter(Boolean)
       )
     }
 
-    // Render circle progress
     const renderCircleProgress = () => {
-      const percentage = clampedPercentage.value
-      const effectiveVariant = (getStatusVariant(props.status) || props.variant) as ProgressVariant
-      const shouldShowText = props.showText ?? props.type === 'line'
-      const displayText = shouldShowText
-        ? formatProgressText(percentage, props.text, props.format)
-        : ''
-
-      const ariaLabel = attrs['aria-label']
-      const ariaLabelledBy = attrs['aria-labelledby']
-      const ariaDescribedBy = attrs['aria-describedby']
-      const resolvedAriaLabel =
-        (ariaLabel as string | undefined) ??
-        (ariaLabelledBy != null ? undefined : `Progress: ${percentage}%`)
-
       const { width, height, radius, cx, cy } = getCircleSize(props.size, props.strokeWidth)
-      const { strokeDasharray, strokeDashoffset } = calculateCirclePath(
-        radius,
-        props.strokeWidth,
-        percentage
-      )
-
-      const wrapperClasses = classNames(
-        progressCircleBaseClasses,
-        coerceClassValue(attrs.class),
-        props.className
-      )
-      const wrapperStyle = {
-        ...(attrs.style as Record<string, unknown> | undefined),
-        ...(props.style ?? {}),
-        width: `${width}px`,
-        height: `${height}px`
-      }
+      const { strokeDasharray, strokeDashoffset } = calculateCirclePath(radius, clamped.value)
 
       return h(
         'div',
         {
           ...attrs,
-          class: wrapperClasses,
-          style: wrapperStyle
+          class: classNames(
+            progressCircleBaseClasses,
+            coerceClassValue(attrs.class),
+            props.className
+          ),
+          style: {
+            ...(attrs.style as Record<string, unknown> | undefined),
+            ...(props.style ?? {}),
+            width: `${width}px`,
+            height: `${height}px`
+          }
         },
         [
-          h(
-            'svg',
-            {
-              width,
-              height,
-              viewBox: `0 0 ${width} ${height}`
-            },
-            [
-              // Background circle
-              h('circle', {
-                cx,
-                cy,
-                r: radius,
-                fill: 'none',
-                stroke: 'currentColor',
-                class: progressCircleTrackStrokeClasses,
-                'stroke-width': props.strokeWidth
-              }),
-              // Progress circle
-              h('circle', {
-                cx,
-                cy,
-                r: radius,
-                fill: 'none',
-                stroke: 'currentColor',
-                class: getProgressVariantClasses(effectiveVariant).replace('bg-', 'text-'),
-                'stroke-width': props.strokeWidth,
-                'stroke-linecap': 'round',
-                'stroke-dasharray': strokeDasharray,
-                'stroke-dashoffset': strokeDashoffset,
-                style: {
-                  transition: 'stroke-dashoffset 0.3s ease',
-                  transform: 'rotate(-90deg)',
-                  transformOrigin: 'center'
-                },
-                role: 'progressbar',
-                'aria-label': resolvedAriaLabel,
-                'aria-labelledby': ariaLabelledBy,
-                'aria-describedby': ariaDescribedBy,
-                'aria-valuenow': percentage,
-                'aria-valuemin': 0,
-                'aria-valuemax': 100
-              })
-            ]
-          ),
-          shouldShowText
+          h('svg', { width, height, viewBox: `0 0 ${width} ${height}` }, [
+            h('circle', {
+              cx,
+              cy,
+              r: radius,
+              fill: 'none',
+              stroke: 'currentColor',
+              class: progressCircleTrackStrokeClasses,
+              'stroke-width': props.strokeWidth
+            }),
+            h('circle', {
+              cx,
+              cy,
+              r: radius,
+              fill: 'none',
+              stroke: 'currentColor',
+              class: getProgressVariantClasses(effectiveVariant.value).replace('bg-', 'text-'),
+              'stroke-width': props.strokeWidth,
+              'stroke-linecap': 'round',
+              'stroke-dasharray': strokeDasharray,
+              'stroke-dashoffset': strokeDashoffset,
+              style: {
+                transition: 'stroke-dashoffset 0.3s ease',
+                transform: 'rotate(-90deg)',
+                transformOrigin: 'center'
+              },
+              ...ariaProps.value
+            })
+          ]),
+          shouldShowText.value
             ? h(
                 'div',
                 {
@@ -349,22 +195,17 @@ export const Progress = defineComponent({
                     progressCircleTextClasses,
                     progressTextSizeClasses[props.size],
                     'font-medium',
-                    getProgressTextColorClasses(effectiveVariant)
+                    getProgressTextColorClasses(effectiveVariant.value)
                   )
                 },
-                displayText
+                displayText.value
               )
             : undefined
         ].filter(Boolean)
       )
     }
 
-    return () => {
-      if (props.type === 'circle') {
-        return renderCircleProgress()
-      }
-      return renderLineProgress()
-    }
+    return () => (props.type === 'circle' ? renderCircleProgress() : renderLineProgress())
   }
 })
 

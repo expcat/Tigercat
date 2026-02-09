@@ -18,17 +18,51 @@ describe('Progress', () => {
     expect(progressbar).toHaveAttribute('aria-valuemax', '100')
     expect(progressbar).toHaveAttribute('aria-label', 'Progress: 0%')
 
-    // Should expand by default so it doesn't collapse inside non-stretching flex layouts.
     const wrapper = progressbar?.parentElement?.parentElement as HTMLElement | null
     expect(wrapper?.className).toContain('w-full')
   })
 
-  it('clamps percentage and updates bar width', () => {
-    const { container } = renderWithProps(Progress, { percentage: 150 })
+  it('clamps percentage to 0-100 range', () => {
+    const { container: over } = renderWithProps(Progress, { percentage: 150 })
+    const bar1 = over.querySelector('[role="progressbar"]')
+    expect(bar1).toHaveAttribute('aria-valuenow', '100')
+    expect(bar1).toHaveStyle({ width: '100%' })
 
+    const { container: under } = renderWithProps(Progress, { percentage: -20 })
+    const bar2 = under.querySelector('[role="progressbar"]')
+    expect(bar2).toHaveAttribute('aria-valuenow', '0')
+    expect(bar2).toHaveStyle({ width: '0%' })
+  })
+
+  it('applies variant color classes', () => {
+    const { container } = renderWithProps(Progress, { percentage: 50, variant: 'success' })
     const progressbar = container.querySelector('[role="progressbar"]')
-    expect(progressbar).toHaveAttribute('aria-valuenow', '100')
-    expect(progressbar).toHaveStyle({ width: '100%' })
+    expect(progressbar?.className).toContain('success')
+  })
+
+  it('status overrides variant color', () => {
+    const { container } = renderWithProps(Progress, {
+      percentage: 50,
+      variant: 'primary',
+      status: 'exception'
+    })
+    const progressbar = container.querySelector('[role="progressbar"]')
+    expect(progressbar?.className).toContain('error')
+    expect(progressbar?.className).not.toContain('primary')
+  })
+
+  it('hides text when showText is false', () => {
+    const { container } = renderWithProps(Progress, { percentage: 50, showText: false })
+    expect(container.querySelector('span')).not.toBeInTheDocument()
+  })
+
+  it('forwards className prop', () => {
+    const { container } = renderWithProps(Progress, {
+      percentage: 50,
+      className: 'my-custom-class'
+    })
+    const wrapper = container.querySelector('[role="progressbar"]')?.parentElement?.parentElement
+    expect(wrapper?.className).toContain('my-custom-class')
   })
 
   it('forwards aria-label to the progressbar element', () => {

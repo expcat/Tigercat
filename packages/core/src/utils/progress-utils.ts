@@ -5,7 +5,7 @@ export const progressLineBaseClasses = 'relative overflow-hidden rounded-full'
 export const progressLineInnerClasses =
   'h-full rounded-full transition-all duration-300 ease-in-out flex items-center justify-end'
 
-export const progressTextBaseClasses = 'font-medium ml-2 text-[color:var(--tiger-text,#374151)]'
+export const progressTextBaseClasses = 'font-medium ml-2'
 
 export const progressCircleBaseClasses = 'relative inline-flex items-center justify-center'
 
@@ -64,7 +64,6 @@ export function clampPercentage(percentage: number): number {
 
 export function calculateCirclePath(
   radius: number,
-  strokeWidth: number,
   percentage: number
 ): {
   circumference: number

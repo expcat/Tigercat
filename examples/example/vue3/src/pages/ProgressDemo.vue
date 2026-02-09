@@ -71,6 +71,12 @@ const stripedSnippet = `<Space direction="vertical" class="w-full">
   <Progress :percentage="70" :striped="true" :striped-animation="true" />
 </Space>`
 
+const customSizeSnippet = `<Space direction="vertical" class="w-full">
+  <Progress :percentage="60" width="300px" />
+  <Progress :percentage="60" :height="20" />
+  <Progress type="circle" :percentage="60" :stroke-width="10" :show-text="true" />
+</Space>`
+
 const uploadSnippet = `<Space direction="vertical" class="w-full">
   <Progress :percentage="uploadProgress" />
   <Button variant="primary" @click="startUpload">开始上传</Button>
@@ -246,6 +252,23 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
         <Progress :percentage="70"
                   :striped="true"
                   :striped-animation="true" />
+      </Space>
+    </DemoBlock>
+
+    <!-- 自定义尺寸 -->
+    <DemoBlock title="自定义尺寸"
+               description="支持自定义宽度、高度以及圆形进度条的线条宽度。"
+               :code="customSizeSnippet">
+      <Space direction="vertical"
+             class="w-full">
+        <Progress :percentage="60"
+                  width="300px" />
+        <Progress :percentage="60"
+                  :height="20" />
+        <Progress type="circle"
+                  :percentage="60"
+                  :stroke-width="10"
+                  :show-text="true" />
       </Space>
     </DemoBlock>
 

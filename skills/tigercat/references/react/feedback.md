@@ -176,13 +176,17 @@ notification.clear('top-right')
 ## Popover 气泡卡片
 
 ```tsx
-{/* 基本用法（默认 click 触发） */}
-<Popover title="标题" content="气泡卡片内容">
+{
+  /* 基本用法（默认 click 触发） */
+}
+;<Popover title="标题" content="气泡卡片内容">
   <Button>点击触发</Button>
 </Popover>
 
-{/* 自定义内容 + hover 触发 */}
-<Popover
+{
+  /* 自定义内容 + hover 触发 */
+}
+;<Popover
   trigger="hover"
   placement="bottom"
   titleContent={<span style={{ color: '#2563eb' }}>自定义标题</span>}
@@ -190,8 +194,10 @@ notification.clear('top-right')
   <Button>悬停触发</Button>
 </Popover>
 
-{/* 受控模式 */}
-<Popover visible={visible} onVisibleChange={setVisible} trigger="manual" content="手动控制">
+{
+  /* 受控模式 */
+}
+;<Popover visible={visible} onVisibleChange={setVisible} trigger="manual" content="手动控制">
   <Button onClick={() => setVisible(!visible)}>手动触发</Button>
 </Popover>
 ```
@@ -201,38 +207,52 @@ notification.clear('top-right')
 ## Tooltip 文字提示
 
 ```tsx
-{/* 基本用法 */}
-<Tooltip content="提示文字">
+{
+  /* 基本用法 */
+}
+;<Tooltip content="提示文字">
   <Button>Hover</Button>
 </Tooltip>
 
-{/* 不同位置 */}
-<Tooltip content="底部" placement="bottom">
+{
+  /* 不同位置 */
+}
+;<Tooltip content="底部" placement="bottom">
   <Button>Bottom</Button>
 </Tooltip>
 
-{/* 触发方式 */}
-<Tooltip content="点击触发" trigger="click">
+{
+  /* 触发方式 */
+}
+;<Tooltip content="点击触发" trigger="click">
   <Button>Click</Button>
 </Tooltip>
 
-{/* 自定义内容（ReactNode） */}
-<Tooltip content={<strong>自定义内容</strong>}>
+{
+  /* 自定义内容（ReactNode） */
+}
+;<Tooltip content={<strong>自定义内容</strong>}>
   <Button>Custom</Button>
 </Tooltip>
 
-{/* 受控模式 */}
-<Tooltip visible={visible} onVisibleChange={setVisible} content="受控提示">
+{
+  /* 受控模式 */
+}
+;<Tooltip visible={visible} onVisibleChange={setVisible} content="受控提示">
   <Button>Controlled</Button>
 </Tooltip>
 
-{/* 禁用 */}
-<Tooltip content="禁用" disabled>
+{
+  /* 禁用 */
+}
+;<Tooltip content="禁用" disabled>
   <Button>Disabled</Button>
 </Tooltip>
 
-{/* 偏移距离 */}
-<Tooltip content="偏移 16px" offset={16}>
+{
+  /* 偏移距离 */
+}
+;<Tooltip content="偏移 16px" offset={16}>
   <Button>Offset</Button>
 </Tooltip>
 ```
@@ -273,7 +293,38 @@ notification.clear('top-right')
 ## Progress 进度条
 
 ```tsx
-<Progress value={30} />
-<Progress value={70} status="success" />
-<Progress value={75} type="circle" />
+{/* 基本用法 */}
+<Progress percentage={30} />
+<Progress percentage={70} />
+<Progress percentage={100} />
+
+{/* 变体 */}
+<Progress variant="success" percentage={60} />
+<Progress variant="warning" percentage={80} />
+<Progress variant="danger" percentage={90} />
+
+{/* 状态（覆盖 variant 颜色） */}
+<Progress percentage={100} status="success" />
+<Progress percentage={50} status="exception" />
+<Progress percentage={70} status="paused" />
+
+{/* 尺寸 */}
+<Progress size="sm" percentage={50} />
+<Progress size="lg" percentage={50} />
+
+{/* 圆形 */}
+<Progress type="circle" percentage={75} showText={true} />
+
+{/* 自定义文本 / format */}
+<Progress percentage={50} text="进行中" />
+<Progress percentage={50} format={(p) => `${p}/100`} />
+
+{/* 隐藏文本 */}
+<Progress percentage={50} showText={false} />
+
+{/* 条纹与动画 */}
+<Progress percentage={70} striped={true} stripedAnimation={true} />
+
+{/* 自定义宽高 */}
+<Progress percentage={50} width="300px" height={20} />
 ```

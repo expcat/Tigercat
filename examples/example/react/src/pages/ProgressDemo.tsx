@@ -58,6 +58,12 @@ const stripedSnippet = `<Space direction="vertical" className="w-full">
   <Progress percentage={70} striped={true} stripedAnimation={true} />
 </Space>`
 
+const customSizeSnippet = `<Space direction="vertical" className="w-full">
+  <Progress percentage={60} width="300px" />
+  <Progress percentage={60} height={20} />
+  <Progress type="circle" percentage={60} strokeWidth={10} showText={true} />
+</Space>`
+
 const uploadSnippet = `<Space direction="vertical" className="w-full">
   <Progress percentage={uploadProgress} />
   <Button variant="primary" onClick={startUpload}>开始上传</Button>
@@ -106,7 +112,10 @@ export default function ProgressDemo() {
       </div>
 
       {/* 基本用法 */}
-      <DemoBlock title="基本用法" description="线形进度条，默认展示百分比文本。" code={basicSnippet}>
+      <DemoBlock
+        title="基本用法"
+        description="线形进度条，默认展示百分比文本。"
+        code={basicSnippet}>
         <Space direction="vertical" className="w-full">
           <Progress percentage={0} />
           <Progress percentage={50} />
@@ -127,7 +136,10 @@ export default function ProgressDemo() {
       </DemoBlock>
 
       {/* 进度条状态 */}
-      <DemoBlock title="进度条状态" description="通过状态显示不同的进度状态，状态会覆盖变体颜色。" code={statusSnippet}>
+      <DemoBlock
+        title="进度条状态"
+        description="通过状态显示不同的进度状态，状态会覆盖变体颜色。"
+        code={statusSnippet}>
         <Space direction="vertical" className="w-full">
           <Progress percentage={100} status="success" />
           <Progress percentage={50} status="exception" />
@@ -145,7 +157,10 @@ export default function ProgressDemo() {
       </DemoBlock>
 
       {/* 圆形进度条 */}
-      <DemoBlock title="圆形进度条" description='通过设置 type="circle" 展示圆形进度条。' code={circleSnippet}>
+      <DemoBlock
+        title="圆形进度条"
+        description='通过设置 type="circle" 展示圆形进度条。'
+        code={circleSnippet}>
         <Space align="center">
           <Progress type="circle" percentage={0} showText={true} />
           <Progress type="circle" percentage={25} showText={true} />
@@ -155,7 +170,10 @@ export default function ProgressDemo() {
       </DemoBlock>
 
       {/* 圆形进度条尺寸 */}
-      <DemoBlock title="圆形进度条尺寸" description="圆形进度条支持三种尺寸。" code={circleSizeSnippet}>
+      <DemoBlock
+        title="圆形进度条尺寸"
+        description="圆形进度条支持三种尺寸。"
+        code={circleSizeSnippet}>
         <Space align="center">
           <Progress type="circle" size="sm" percentage={75} showText={true} />
           <Progress type="circle" size="md" percentage={75} showText={true} />
@@ -181,10 +199,25 @@ export default function ProgressDemo() {
       </DemoBlock>
 
       {/* 条纹进度条 */}
-      <DemoBlock title="条纹进度条" description="线形进度条支持条纹样式和动画效果。" code={stripedSnippet}>
+      <DemoBlock
+        title="条纹进度条"
+        description="线形进度条支持条纹样式和动画效果。"
+        code={stripedSnippet}>
         <Space direction="vertical" className="w-full">
           <Progress percentage={70} striped={true} />
           <Progress percentage={70} striped={true} stripedAnimation={true} />
+        </Space>
+      </DemoBlock>
+
+      {/* 自定义尺寸 */}
+      <DemoBlock
+        title="自定义尺寸"
+        description="支持自定义宽度、高度以及圆形进度条的线条宽度。"
+        code={customSizeSnippet}>
+        <Space direction="vertical" className="w-full">
+          <Progress percentage={60} width="300px" />
+          <Progress percentage={60} height={20} />
+          <Progress type="circle" percentage={60} strokeWidth={10} showText={true} />
         </Space>
       </DemoBlock>
 
@@ -199,7 +232,10 @@ export default function ProgressDemo() {
       </DemoBlock>
 
       {/* 仪表盘展示 */}
-      <DemoBlock title="仪表盘展示" description="使用圆形进度条展示系统资源使用情况。" code={dashboardSnippet}>
+      <DemoBlock
+        title="仪表盘展示"
+        description="使用圆形进度条展示系统资源使用情况。"
+        code={dashboardSnippet}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div className="text-center">
             <h4 className="mb-4 text-sm font-medium">CPU 使用率</h4>

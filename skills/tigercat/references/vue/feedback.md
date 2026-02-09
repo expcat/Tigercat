@@ -31,8 +31,12 @@ const visible = ref(false)
   </Modal>
 
   <!-- 使用内置默认页脚 -->
-  <Modal v-model:visible="visible" title="Title" show-default-footer
-         @ok="handleOk" @cancel="handleCancel" />
+  <Modal
+    v-model:visible="visible"
+    title="Title"
+    show-default-footer
+    @ok="handleOk"
+    @cancel="handleCancel" />
 </template>
 ```
 
@@ -72,8 +76,7 @@ const visible = ref(false)
   </Drawer>
 
   <!-- 动画回调 -->
-  <Drawer v-model:visible="visible" title="动画"
-          @after-enter="onOpened" @after-leave="onClosed">
+  <Drawer v-model:visible="visible" title="动画" @after-enter="onOpened" @after-leave="onClosed">
     <p>Content</p>
   </Drawer>
 </template>
@@ -283,8 +286,39 @@ notification.clear('top-right')
 
 ```vue
 <template>
-  <Progress :value="30" />
-  <Progress :value="70" status="success" />
-  <Progress :value="75" type="circle" />
+  <!-- 基本用法 -->
+  <Progress :percentage="30" />
+  <Progress :percentage="70" />
+  <Progress :percentage="100" />
+
+  <!-- 变体 -->
+  <Progress variant="success" :percentage="60" />
+  <Progress variant="warning" :percentage="80" />
+  <Progress variant="danger" :percentage="90" />
+
+  <!-- 状态（覆盖 variant 颜色） -->
+  <Progress :percentage="100" status="success" />
+  <Progress :percentage="50" status="exception" />
+  <Progress :percentage="70" status="paused" />
+
+  <!-- 尺寸 -->
+  <Progress size="sm" :percentage="50" />
+  <Progress size="lg" :percentage="50" />
+
+  <!-- 圆形 -->
+  <Progress type="circle" :percentage="75" :show-text="true" />
+
+  <!-- 自定义文本 / format -->
+  <Progress :percentage="50" text="进行中" />
+  <Progress :percentage="50" :format="(p) => `${p}/100`" />
+
+  <!-- 隐藏文本 -->
+  <Progress :percentage="50" :show-text="false" />
+
+  <!-- 条纹与动画 -->
+  <Progress :percentage="70" :striped="true" :striped-animation="true" />
+
+  <!-- 自定义宽高 -->
+  <Progress :percentage="50" width="300px" :height="20" />
 </template>
 ```

@@ -51,74 +51,63 @@ export const Progress: React.FC<ProgressProps> = ({
   const effectiveVariant = (getStatusVariant(status) || variant) as ProgressVariant
   const shouldShowText = showText ?? type === 'line'
   const displayText = shouldShowText ? formatProgressText(clampedPercentage, text, format) : ''
-
   const resolvedAriaLabel =
     ariaLabel ?? (ariaLabelledby ? undefined : `Progress: ${clampedPercentage}%`)
 
-  const lineTrackClasses = classNames(
-    progressLineBaseClasses,
-    progressTrackBgClasses,
-    !height && progressLineSizeClasses[size]
-  )
+  const ariaAttrs = {
+    role: 'progressbar' as const,
+    'aria-label': resolvedAriaLabel,
+    'aria-labelledby': ariaLabelledby,
+    'aria-describedby': ariaDescribedby,
+    'aria-valuenow': clampedPercentage,
+    'aria-valuemin': 0,
+    'aria-valuemax': 100
+  }
 
-  const lineBarClasses = classNames(
-    progressLineInnerClasses,
-    getProgressVariantClasses(effectiveVariant),
-    striped && progressStripedClasses,
-    striped && stripedAnimation && progressStripedAnimationClasses
-  )
-
-  const textClasses = classNames(
-    progressTextBaseClasses,
-    progressTextSizeClasses[size],
-    getProgressTextColorClasses(effectiveVariant)
-  )
-
-  // Render line progress
   const renderLineProgress = () => {
     const containerStyle =
       width !== 'auto' ? { width: typeof width === 'number' ? `${width}px` : width } : {}
-
-    const mergedStyle = {
-      ...(style ?? {}),
-      ...containerStyle
-    }
 
     return (
       <div
         {...props}
         className={classNames('flex items-center w-full', className)}
-        style={mergedStyle}>
+        style={{ ...(style ?? {}), ...containerStyle }}>
         <div
-          className={lineTrackClasses}
+          className={classNames(
+            progressLineBaseClasses,
+            progressTrackBgClasses,
+            !height && progressLineSizeClasses[size]
+          )}
           style={{ flex: 1, ...(height ? { height: `${height}px` } : {}) }}>
           <div
-            className={lineBarClasses}
+            className={classNames(
+              progressLineInnerClasses,
+              getProgressVariantClasses(effectiveVariant),
+              striped && progressStripedClasses,
+              striped && stripedAnimation && progressStripedAnimationClasses
+            )}
             style={{ width: `${clampedPercentage}%` }}
-            role="progressbar"
-            aria-label={resolvedAriaLabel}
-            aria-labelledby={ariaLabelledby}
-            aria-describedby={ariaDescribedby}
-            aria-valuenow={clampedPercentage}
-            aria-valuemin={0}
-            aria-valuemax={100}
+            {...ariaAttrs}
           />
         </div>
-        {shouldShowText && <span className={textClasses}>{displayText}</span>}
+        {shouldShowText && (
+          <span
+            className={classNames(
+              progressTextBaseClasses,
+              progressTextSizeClasses[size],
+              getProgressTextColorClasses(effectiveVariant)
+            )}>
+            {displayText}
+          </span>
+        )}
       </div>
     )
   }
 
-  // Render circle progress
   const renderCircleProgress = () => {
     const { width: svgWidth, height: svgHeight, radius, cx, cy } = getCircleSize(size, strokeWidth)
-    const { strokeDasharray, strokeDashoffset } = calculateCirclePath(
-      radius,
-      strokeWidth,
-      clampedPercentage
-    )
-
-    const strokeColor = getProgressVariantClasses(effectiveVariant).replace('bg-', 'text-')
+    const { strokeDasharray, strokeDashoffset } = calculateCirclePath(radius, clampedPercentage)
 
     return (
       <div
@@ -145,7 +134,7 @@ export const Progress: React.FC<ProgressProps> = ({
             r={radius}
             fill="none"
             stroke="currentColor"
-            className={strokeColor}
+            className={getProgressVariantClasses(effectiveVariant).replace('bg-', 'text-')}
             strokeWidth={strokeWidth}
             strokeLinecap="round"
             strokeDasharray={strokeDasharray}
@@ -155,13 +144,7 @@ export const Progress: React.FC<ProgressProps> = ({
               transform: 'rotate(-90deg)',
               transformOrigin: 'center'
             }}
-            role="progressbar"
-            aria-label={resolvedAriaLabel}
-            aria-labelledby={ariaLabelledby}
-            aria-describedby={ariaDescribedby}
-            aria-valuenow={clampedPercentage}
-            aria-valuemin={0}
-            aria-valuemax={100}
+            {...ariaAttrs}
           />
         </svg>
         {shouldShowText && (
