@@ -207,10 +207,37 @@ const collapsed = ref(false)
 ## List 列表
 
 ```vue
+<script setup>
+import { List } from '@expcat/tigercat-vue'
+
+const data = [
+  { key: 1, title: '列表项 1', description: '描述信息' },
+  { key: 2, title: '列表项 2', description: '描述信息' }
+]
+</script>
+
 <template>
-  <List :items="items" row-key="id" split>
-    <template #default="{ item }">
-      <div>{{ item.title }}</div>
+  <!-- 基本用法 -->
+  <List :dataSource="data" />
+
+  <!-- 自定义渲染 + 头尾 + hoverable -->
+  <List
+    :dataSource="data"
+    size="sm"
+    bordered="bordered"
+    hoverable
+    @item-click="(item, i) => console.log(item, i)">
+    <template #header>标题</template>
+    <template #renderItem="{ item }">
+      <span>{{ item.title }}</span>
+    </template>
+    <template #footer>底部</template>
+  </List>
+
+  <!-- 网格布局 -->
+  <List :dataSource="data" :grid="{ column: 3, gutter: 16 }" bordered="none">
+    <template #renderItem="{ item }">
+      <Card>{{ item.title }}</Card>
     </template>
   </List>
 </template>

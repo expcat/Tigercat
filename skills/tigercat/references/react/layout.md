@@ -193,7 +193,41 @@ const [collapsed, setCollapsed] = useState(false)
 ## List 列表
 
 ```tsx
-<List items={items} rowKey="id" split renderItem={(item) => <div>{item.title}</div>} />
+import { List } from '@expcat/tigercat-react'
+
+const data = [
+  { key: 1, title: '列表项 1', description: '描述信息' },
+  { key: 2, title: '列表项 2', description: '描述信息' }
+]
+
+{
+  /* 基本用法 */
+}
+;<List dataSource={data} />
+
+{
+  /* 自定义渲染 + 头尾 + hoverable */
+}
+;<List
+  dataSource={data}
+  size="sm"
+  bordered="bordered"
+  hoverable
+  header={<span>标题</span>}
+  footer={<span>底部</span>}
+  renderItem={(item) => <span>{item.title}</span>}
+  onItemClick={(item, i) => console.log(item, i)}
+/>
+
+{
+  /* 网格布局 */
+}
+;<List
+  dataSource={data}
+  grid={{ column: 3, gutter: 16 }}
+  bordered="none"
+  renderItem={(item) => <Card>{item.title}</Card>}
+/>
 ```
 
 ---

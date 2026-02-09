@@ -53,6 +53,8 @@ const emptySnippet = `<List :dataSource="[]" emptyText="暂无数据" />`
 
 const clickableSnippet = `<List :dataSource="basicData" hoverable @item-click="handleItemClick" />`
 
+const verticalSnippet = `<List :dataSource="userData" itemLayout="vertical" />`
+
 // Basic list data
 const basicData = ref([
   { key: 1, title: '列表项 1', description: '这是第一个列表项的描述' },
@@ -366,6 +368,15 @@ function handlePageChange(current: number, pageSize: number) {
         <List :dataSource="basicData"
               hoverable
               @item-click="handleItemClick" />
+      </div>
+    </DemoBlock>
+
+    <DemoBlock title="竖直布局"
+               description="通过 itemLayout=&quot;vertical&quot; 将列表项内容竖直排列。"
+               :code="verticalSnippet">
+      <div class="p-6 bg-gray-50 rounded-lg">
+        <List :dataSource="userData"
+              itemLayout="vertical" />
       </div>
     </DemoBlock>
   </div>

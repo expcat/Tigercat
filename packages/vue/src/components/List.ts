@@ -284,45 +284,45 @@ export const List = defineComponent({
       )
     }
 
-    function renderListItem(item: ListItem, index: number) {
+    function getItemAttrs(item: ListItem, index: number, itemClasses: string) {
       const key = getItemKey(item, index)
+      const clickable = hasItemClickListener.value
+      return {
+        key,
+        class: classNames(itemClasses, clickable && 'cursor-pointer'),
+        role: 'listitem' as const,
+        tabindex: clickable ? 0 : undefined,
+        onClick: () => handleItemClick(item, index),
+        onKeydown: clickable
+          ? (e: KeyboardEvent) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                handleItemClick(item, index)
+              }
+            }
+          : undefined
+      }
+    }
+
+    function renderListItem(item: ListItem, index: number) {
       const itemClasses = getListItemClasses(
         props.size,
         props.itemLayout,
         props.split && props.bordered === 'divided' && !props.grid,
         props.hoverable
       )
-
-      const clickable = hasItemClickListener.value
+      const attrs = getItemAttrs(item, index, itemClasses)
 
       // Custom render from slot
       if (slots.renderItem) {
-        return h(
-          'div',
-          {
-            key,
-            class: classNames(itemClasses, clickable && 'cursor-pointer'),
-            role: 'listitem',
-            tabindex: clickable ? 0 : undefined,
-            onClick: () => handleItemClick(item, index),
-            onKeydown: clickable
-              ? (e: KeyboardEvent) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    handleItemClick(item, index)
-                  }
-                }
-              : undefined
-          },
-          slots.renderItem({ item, index })
-        )
+        return h('div', attrs, slots.renderItem({ item, index }))
       }
 
       // Default item render
-      const itemContent = []
+      const itemContent: RawChildren[] = []
 
       // Meta section (avatar + content)
-      const metaContent = []
+      const metaContent: RawChildren[] = []
 
       if (item.avatar) {
         metaContent.push(
@@ -338,7 +338,7 @@ export const List = defineComponent({
         )
       }
 
-      const contentChildren = []
+      const contentChildren: RawChildren[] = []
       if (item.title) {
         contentChildren.push(h('div', { class: listItemTitleClasses }, item.title))
       }
@@ -361,25 +361,7 @@ export const List = defineComponent({
         )
       }
 
-      return h(
-        'div',
-        {
-          key,
-          class: classNames(itemClasses, clickable && 'cursor-pointer'),
-          role: 'listitem',
-          tabindex: clickable ? 0 : undefined,
-          onClick: () => handleItemClick(item, index),
-          onKeydown: clickable
-            ? (e: KeyboardEvent) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  handleItemClick(item, index)
-                }
-              }
-            : undefined
-        },
-        itemContent
-      )
+      return h('div', attrs, itemContent)
     }
 
     function renderListItems() {

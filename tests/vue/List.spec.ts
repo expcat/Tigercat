@@ -35,6 +35,30 @@ describe('List', () => {
     expect(screen.getByRole('status')).toHaveTextContent('No data')
   })
 
+  it('renders custom empty text', () => {
+    render(List, {
+      props: {
+        dataSource: [],
+        emptyText: 'No items'
+      }
+    })
+
+    expect(screen.getByRole('status')).toHaveTextContent('No items')
+  })
+
+  it('sets aria-busy and shows loading overlay', () => {
+    render(List, {
+      props: {
+        dataSource: sampleData,
+        loading: true
+      }
+    })
+
+    expect(screen.getByRole('list')).toHaveAttribute('aria-busy', 'true')
+    expect(screen.getByRole('status')).toBeInTheDocument()
+    expect(screen.queryByText('Item 1')).not.toBeInTheDocument()
+  })
+
   it('renders header and footer slots', () => {
     render(List, {
       props: {

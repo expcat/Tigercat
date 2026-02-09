@@ -139,17 +139,36 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Props
 
-| Prop   | Type                           | Default | Vue | React | Description |
-| ------ | ------------------------------ | ------- | :-: | :---: | ----------- |
-| items  | `any[]`                        | `[]`    |  ✓  |   ✓   | 数据源      |
-| rowKey | `string \| ((item) => string)` | -       |  ✓  |   ✓   | 行键        |
-| split  | `boolean`                      | `false` |  ✓  |   ✓   | 显示分割线  |
+| Prop       | Type                                                  | Default        | Vue  | React | Description    |
+| ---------- | ----------------------------------------------------- | -------------- | :--: | :---: | -------------- |
+| dataSource | `ListItem[]`                                          | `[]`           |  ✓   |   ✓   | 数据源         |
+| size       | `'sm' \| 'md' \| 'lg'`                                | `'md'`         |  ✓   |   ✓   | 列表尺寸       |
+| bordered   | `'none' \| 'divided' \| 'bordered'`                   | `'divided'`    |  ✓   |   ✓   | 边框样式       |
+| split      | `boolean`                                             | `true`         |  ✓   |   ✓   | 是否显示分割线 |
+| itemLayout | `'horizontal' \| 'vertical'`                          | `'horizontal'` |  ✓   |   ✓   | 列表项布局     |
+| loading    | `boolean`                                             | `false`        |  ✓   |   ✓   | 加载状态       |
+| emptyText  | `string`                                              | `'No data'`    |  ✓   |   ✓   | 空状态文案     |
+| hoverable  | `boolean`                                             | `false`        |  ✓   |   ✓   | 鼠标悬停效果   |
+| rowKey     | `string \| ((item, index) => string \| number)`       | `'key'`        |  ✓   |   ✓   | 行键           |
+| pagination | `ListPaginationConfig \| false`                       | `false`        |  ✓   |   ✓   | 分页配置       |
+| grid       | `{ gutter?, column?, xs?, sm?, md?, lg?, xl?, xxl? }` | -              |  ✓   |   ✓   | 网格布局       |
+| header     | -                                                     | -              | slot | prop  | 头部内容       |
+| footer     | -                                                     | -              | slot | prop  | 底部内容       |
 
 ### Slots / Children
 
-| Vue Slot                              | React Prop   | Description |
-| ------------------------------------- | ------------ | ----------- |
-| `default` (scoped: `{ item, index }`) | `renderItem` | 列表项渲染  |
+| Vue Slot                        | React Prop                                | Description      |
+| ------------------------------- | ----------------------------------------- | ---------------- |
+| `#renderItem="{ item, index }"` | `renderItem={(item, index) => ReactNode}` | 自定义列表项渲染 |
+| `#header`                       | `header={ReactNode}`                      | 头部内容         |
+| `#footer`                       | `footer={ReactNode}`                      | 底部内容         |
+
+### Events
+
+| Vue Event     | React Prop     | Payload                                 | Description |
+| ------------- | -------------- | --------------------------------------- | ----------- |
+| `item-click`  | `onItemClick`  | `(item: ListItem, index: number)`       | 点击列表项  |
+| `page-change` | `onPageChange` | `{ current: number, pageSize: number }` | 分页变化    |
 
 ---
 

@@ -112,6 +112,8 @@ const emptySnippet = `<List dataSource={[]} emptyText="暂无数据" />`
 
 const clickableSnippet = `<List dataSource={basicData} hoverable onItemClick={handleItemClick} />`
 
+const verticalSnippet = `<List dataSource={userData} itemLayout="vertical" />`
+
 export default function ListDemo() {
   const [loading, setLoading] = useState(false)
   const [pageInfo, setPageInfo] = useState({ current: 1, pageSize: 10 })
@@ -343,6 +345,15 @@ export default function ListDemo() {
         code={clickableSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List dataSource={basicData} hoverable onItemClick={handleItemClick} />
+        </div>
+      </DemoBlock>
+
+      <DemoBlock
+        title="竖直布局"
+        description='通过 itemLayout="vertical" 将列表项内容竖直排列。'
+        code={verticalSnippet}>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <List dataSource={userData} itemLayout="vertical" />
         </div>
       </DemoBlock>
     </div>

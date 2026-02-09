@@ -89,14 +89,6 @@ export const listLoadingOverlayClasses =
   'absolute inset-0 bg-[var(--tiger-surface,#ffffff)]/75 flex items-center justify-center z-10'
 
 /**
- * List pagination container classes
- * @deprecated Use `getSimplePaginationContainerClasses()` from pagination-utils instead.
- * This constant will be removed in v0.3.0.
- */
-export const listPaginationContainerClasses =
-  'flex items-center justify-between px-4 py-3 border-t border-[var(--tiger-border,#e5e7eb)]'
-
-/**
  * List item meta classes (for avatar + content)
  */
 export const listItemMetaClasses = 'flex items-center gap-3 flex-1'

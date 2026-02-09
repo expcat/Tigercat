@@ -1,6 +1,4 @@
 import React, { useMemo, useState } from 'react'
-import { Button } from './Button'
-import { Select } from './Select'
 import {
   classNames,
   getListClasses,
@@ -22,10 +20,11 @@ import {
   listGridContainerClasses,
   getSpinnerSVG,
   getLoadingOverlaySpinnerClasses,
-  // Simple pagination style utilities
   getSimplePaginationContainerClasses,
   getSimplePaginationTotalClasses,
   getSimplePaginationControlsClasses,
+  getSimplePaginationSelectClasses,
+  getSimplePaginationButtonClasses,
   getSimplePaginationPageIndicatorClasses,
   getSimplePaginationButtonsWrapperClasses,
   type ListSize,
@@ -387,54 +386,37 @@ export const List = <T extends ListItem = ListItem>({
         <div className={getSimplePaginationControlsClasses()}>
           {/* Page size selector */}
           {paginationConfig.showSizeChanger !== false && (
-            <Select
-              size="sm"
+            <select
+              className={getSimplePaginationSelectClasses()}
               value={currentPageSize}
-              onChange={(value) => {
-                if (value == null) return
-                const nextSize = typeof value === 'number' ? value : Number(value)
-                if (!Number.isFinite(nextSize)) return
-                handlePageSizeChange(nextSize)
-              }}
-              options={(paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map((size) => ({
-                label: `${size} / page`,
-                value: size
-              }))}
-            />
+              onChange={(e) => handlePageSizeChange(Number(e.target.value))}>
+              {(paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map((size) => (
+                <option key={size} value={size}>
+                  {size} / page
+                </option>
+              ))}
+            </select>
           )}
 
           {/* Page buttons */}
           <div className={getSimplePaginationButtonsWrapperClasses()}>
-            {/* Previous button */}
-            <Button
-              size="sm"
-              variant="outline"
+            <button
+              className={getSimplePaginationButtonClasses(!hasPrev)}
               disabled={!hasPrev}
-              onClick={() => handlePageChange(currentPage - 1)}
-              className={classNames(
-                !hasPrev && 'cursor-not-allowed',
-                hasPrev && 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
-              )}>
+              onClick={() => handlePageChange(currentPage - 1)}>
               Previous
-            </Button>
+            </button>
 
-            {/* Current page indicator */}
             <span className={getSimplePaginationPageIndicatorClasses()}>
               Page {currentPage} of {totalPages}
             </span>
 
-            {/* Next button */}
-            <Button
-              size="sm"
-              variant="outline"
+            <button
+              className={getSimplePaginationButtonClasses(!hasNext)}
               disabled={!hasNext}
-              onClick={() => handlePageChange(currentPage + 1)}
-              className={classNames(
-                !hasNext && 'cursor-not-allowed',
-                hasNext && 'hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
-              )}>
+              onClick={() => handlePageChange(currentPage + 1)}>
               Next
-            </Button>
+            </button>
           </div>
         </div>
       </div>
