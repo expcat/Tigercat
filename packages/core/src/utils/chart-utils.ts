@@ -480,6 +480,58 @@ export function createPolygonPath(points: Array<{ x: number; y: number }>): stri
   )
 }
 
+/**
+ * Compute text-anchor and dominant-baseline for a radar label based on its angle.
+ * Mimics ECharts indicator name positioning for natural readability.
+ */
+export function getRadarLabelAlign(angle: number): {
+  textAnchor: 'start' | 'middle' | 'end'
+  dominantBaseline: 'auto' | 'middle' | 'hanging'
+} {
+  // Normalize angle to [0, 2π)
+  const TWO_PI = Math.PI * 2
+  const a = ((angle % TWO_PI) + TWO_PI) % TWO_PI
+
+  // Threshold for "near" top/bottom/left/right (~18°)
+  const threshold = Math.PI / 10
+
+  // Horizontal alignment
+  let textAnchor: 'start' | 'middle' | 'end'
+  if (
+    Math.abs(a - Math.PI * 1.5) < threshold ||
+    a < threshold ||
+    Math.abs(a - TWO_PI) < threshold
+  ) {
+    textAnchor = 'middle'
+  } else if (a > Math.PI - threshold && a < Math.PI + threshold) {
+    textAnchor = 'middle'
+  } else if (a < Math.PI) {
+    textAnchor = 'start'
+  } else {
+    textAnchor = 'end'
+  }
+
+  // Vertical alignment
+  let dominantBaseline: 'auto' | 'middle' | 'hanging'
+  if (Math.abs(a - Math.PI / 2) < threshold * 1.5) {
+    dominantBaseline = 'hanging'
+  } else if (Math.abs(a - Math.PI * 1.5) < threshold * 1.5) {
+    dominantBaseline = 'auto'
+  } else {
+    dominantBaseline = 'middle'
+  }
+
+  return { textAnchor, dominantBaseline }
+}
+
+/**
+ * Default split area colors (subtle alternating fills – ECharts style)
+ */
+export const RADAR_SPLIT_AREA_COLORS = [
+  'var(--tiger-chart-split-1,rgba(0,0,0,0.02))',
+  'var(--tiger-chart-split-2,rgba(0,0,0,0.05))'
+]
+
 // ============================================================================
 // Line/Area Chart Utilities
 // ============================================================================

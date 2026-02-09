@@ -8,8 +8,10 @@ import {
   getChartGridLineDasharray,
   getChartInnerRect,
   getRadarAngles,
+  getRadarLabelAlign,
   getRadarPoints,
   polarToCartesian,
+  RADAR_SPLIT_AREA_COLORS,
   type ChartPadding,
   type RadarChartDatum,
   type RadarChartProps as CoreRadarChartProps,
@@ -183,6 +185,37 @@ export const RadarChart = defineComponent({
     pointColor: {
       type: String
     },
+    gridShape: {
+      type: String as PropType<'polygon' | 'circle'>,
+      default: 'polygon'
+    },
+    showSplitArea: {
+      type: Boolean,
+      default: false
+    },
+    splitAreaOpacity: {
+      type: Number,
+      default: 0.06
+    },
+    splitAreaColors: {
+      type: Array as PropType<string[]>
+    },
+    pointBorderWidth: {
+      type: Number,
+      default: 2
+    },
+    pointBorderColor: {
+      type: String,
+      default: '#fff'
+    },
+    pointHoverSize: {
+      type: Number as PropType<number | undefined>,
+      default: undefined
+    },
+    labelAutoAlign: {
+      type: Boolean,
+      default: true
+    },
     title: {
       type: String
     },
@@ -287,10 +320,55 @@ export const RadarChart = defineComponent({
 
       return Array.from({ length: resolvedLevels }, (_, index) => {
         const levelRadius = radius.value * ((index + 1) / resolvedLevels)
+        if (props.gridShape === 'circle') {
+          return { type: 'circle' as const, cx: cx.value, cy: cy.value, r: levelRadius }
+        }
         const ringPoints = angles.value.map((angle) =>
           polarToCartesian(cx.value, cy.value, levelRadius, angle)
         )
-        return createPolygonPath(ringPoints)
+        return {
+          type: 'polygon' as const,
+          d: createPolygonPath(ringPoints),
+          cx: cx.value,
+          cy: cy.value,
+          r: levelRadius
+        }
+      })
+    })
+
+    const splitAreaPaths = computed(() => {
+      if (!props.showSplitArea || angles.value.length === 0) return []
+      const resolvedLevels = Math.max(1, Math.floor(props.levels))
+      const areaColors =
+        props.splitAreaColors && props.splitAreaColors.length > 0
+          ? props.splitAreaColors
+          : RADAR_SPLIT_AREA_COLORS
+
+      // Build rings from outermost to innermost
+      return Array.from({ length: resolvedLevels }, (_, index) => {
+        const outerIndex = resolvedLevels - 1 - index
+        const outerRadius = radius.value * ((outerIndex + 1) / resolvedLevels)
+        const innerRadius = radius.value * (outerIndex / resolvedLevels)
+        const color = areaColors[outerIndex % areaColors.length]
+
+        if (props.gridShape === 'circle') {
+          return {
+            type: 'circle-ring' as const,
+            cx: cx.value,
+            cy: cy.value,
+            outerRadius,
+            innerRadius,
+            color
+          }
+        }
+        const outerPoints = angles.value.map((angle) =>
+          polarToCartesian(cx.value, cy.value, outerRadius, angle)
+        )
+        const innerPoints =
+          outerIndex > 0
+            ? angles.value.map((angle) => polarToCartesian(cx.value, cy.value, innerRadius, angle))
+            : []
+        return { type: 'polygon-ring' as const, outerPoints, innerPoints, color }
       })
     })
 
@@ -320,10 +398,15 @@ export const RadarChart = defineComponent({
           radius.value + props.labelOffset,
           angle
         )
+        const align = props.labelAutoAlign
+          ? getRadarLabelAlign(angle)
+          : { textAnchor: 'middle' as const, dominantBaseline: 'middle' as const }
         return {
           x: position.x,
           y: position.y,
-          text: formatLabel(datum, index)
+          text: formatLabel(datum, index),
+          textAnchor: align.textAnchor,
+          dominantBaseline: align.dominantBaseline
         }
       })
     })
@@ -416,15 +499,74 @@ export const RadarChart = defineComponent({
         {
           default: () =>
             [
-              ...gridPaths.value.map((path, index) =>
-                h('path', {
-                  key: `grid-${index}`,
-                  d: path,
-                  class: chartGridLineClasses,
-                  fill: 'none',
-                  'stroke-width': props.gridStrokeWidth,
-                  'stroke-dasharray': dasharray.value
-                })
+              // Split area (alternating fills – ECharts splitArea style)
+              ...splitAreaPaths.value.map((area, index) => {
+                if (area.type === 'circle-ring') {
+                  // For circle grid: use two concentric circles via clipPath or just draw filled circles
+                  // Simpler: draw filled circle then overlay inner circle with background
+                  return h('g', { key: `split-${index}` }, [
+                    h('circle', {
+                      cx: area.cx,
+                      cy: area.cy,
+                      r: area.outerRadius,
+                      fill: area.color,
+                      'fill-opacity': props.splitAreaOpacity,
+                      stroke: 'none',
+                      'data-radar-split-area': 'true'
+                    }),
+                    area.innerRadius > 0
+                      ? h('circle', {
+                          cx: area.cx,
+                          cy: area.cy,
+                          r: area.innerRadius,
+                          fill: 'var(--tiger-bg,#fff)',
+                          stroke: 'none'
+                        })
+                      : null
+                  ])
+                }
+                // Polygon ring
+                const outerPath = createPolygonPath(area.outerPoints)
+                return h('g', { key: `split-${index}` }, [
+                  outerPath
+                    ? h('path', {
+                        d: outerPath,
+                        fill: area.color,
+                        'fill-opacity': props.splitAreaOpacity,
+                        stroke: 'none',
+                        'data-radar-split-area': 'true'
+                      })
+                    : null,
+                  area.innerPoints.length > 0
+                    ? h('path', {
+                        d: createPolygonPath(area.innerPoints),
+                        fill: 'var(--tiger-bg,#fff)',
+                        stroke: 'none'
+                      })
+                    : null
+                ])
+              }),
+              // Grid lines
+              ...gridPaths.value.map((grid, index) =>
+                grid.type === 'circle'
+                  ? h('circle', {
+                      key: `grid-${index}`,
+                      cx: grid.cx,
+                      cy: grid.cy,
+                      r: grid.r,
+                      class: chartGridLineClasses,
+                      fill: 'none',
+                      'stroke-width': props.gridStrokeWidth,
+                      'stroke-dasharray': dasharray.value
+                    })
+                  : h('path', {
+                      key: `grid-${index}`,
+                      d: grid.d,
+                      class: chartGridLineClasses,
+                      fill: 'none',
+                      'stroke-width': props.gridStrokeWidth,
+                      'stroke-dasharray': dasharray.value
+                    })
               ),
               ...axisLines.value.map((line, index) =>
                 h('line', {
@@ -493,19 +635,41 @@ export const RadarChart = defineComponent({
                             'fill-opacity': resolvedFillOpacity,
                             stroke: resolvedStrokeColor,
                             'stroke-width': resolvedStrokeWidth,
+                            'stroke-linejoin': 'round',
+                            class: 'transition-[fill-opacity,filter] duration-200 ease-out',
+                            style:
+                              resolvedActiveIndex.value === seriesIndex
+                                ? { filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.15))' }
+                                : undefined,
                             'data-radar-area': 'true',
                             'data-series-index': seriesIndex
                           })
                         : null,
                       resolvedShowPoints
                         ? item.points.map((point) => {
+                            const isHoveredPoint =
+                              hoveredPoint.value?.seriesIndex === seriesIndex &&
+                              hoveredPoint.value?.pointIndex === point.index
+                            const hoverSize = props.pointHoverSize ?? resolvedPointSize + 2
+                            const currentSize = isHoveredPoint
+                              ? hoverSize
+                              : (point.data.size ?? resolvedPointSize)
+                            const resolvedBorderWidth =
+                              item.series.pointBorderWidth ?? props.pointBorderWidth
+                            const resolvedBorderColor =
+                              item.series.pointBorderColor ?? props.pointBorderColor
                             return h('circle', {
                               key: `point-${seriesIndex}-${point.index}`,
                               cx: point.x,
                               cy: point.y,
-                              r: point.data.size ?? resolvedPointSize,
+                              r: currentSize,
                               fill: point.data.color ?? resolvedPointColor ?? resolvedStrokeColor,
-                              class: props.showTooltip && props.hoverable ? 'cursor-pointer' : null,
+                              stroke: resolvedBorderColor,
+                              'stroke-width': resolvedBorderWidth,
+                              class: classNames(
+                                props.showTooltip && props.hoverable ? 'cursor-pointer' : null,
+                                'transition-[r] duration-150 ease-out'
+                              ),
                               'data-radar-point': 'true',
                               'data-series-index': seriesIndex,
                               'data-point-index': point.index,
@@ -532,8 +696,8 @@ export const RadarChart = defineComponent({
                     x: label.x,
                     y: label.y,
                     class: chartAxisTickTextClasses,
-                    'text-anchor': 'middle',
-                    'dominant-baseline': 'middle'
+                    'text-anchor': label.textAnchor,
+                    'dominant-baseline': label.dominantBaseline
                   },
                   label.text
                 )

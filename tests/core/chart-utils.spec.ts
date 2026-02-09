@@ -14,6 +14,8 @@ import {
   getRadarAngles,
   getRadarPoints,
   createPolygonPath,
+  getRadarLabelAlign,
+  RADAR_SPLIT_AREA_COLORS,
   createLinePath,
   createAreaPath,
   stackSeriesData,
@@ -478,6 +480,40 @@ describe('chart-utils', () => {
 
     it('returns empty string for empty array', () => {
       expect(createPolygonPath([])).toBe('')
+    })
+  })
+
+  describe('getRadarLabelAlign', () => {
+    it('returns middle text-anchor for top position (-PI/2)', () => {
+      const result = getRadarLabelAlign(-Math.PI / 2)
+      expect(result.textAnchor).toBe('middle')
+    })
+
+    it('returns start text-anchor for right half', () => {
+      const result = getRadarLabelAlign(0) // right
+      expect(result.textAnchor).toBe('middle') // near 0 is "middle" zone
+    })
+
+    it('returns end text-anchor for left half', () => {
+      const result = getRadarLabelAlign(Math.PI * 1.25) // lower-left
+      expect(result.textAnchor).toBe('end')
+    })
+
+    it('returns hanging baseline for bottom region', () => {
+      const result = getRadarLabelAlign(Math.PI / 2)
+      expect(result.dominantBaseline).toBe('hanging')
+    })
+
+    it('returns auto baseline for top region', () => {
+      const result = getRadarLabelAlign(Math.PI * 1.5)
+      expect(result.dominantBaseline).toBe('auto')
+    })
+  })
+
+  describe('RADAR_SPLIT_AREA_COLORS', () => {
+    it('exports default split area colors', () => {
+      expect(RADAR_SPLIT_AREA_COLORS).toHaveLength(2)
+      expect(RADAR_SPLIT_AREA_COLORS[0]).toContain('var(')
     })
   })
 

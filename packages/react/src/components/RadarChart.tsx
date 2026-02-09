@@ -8,8 +8,10 @@ import {
   getChartGridLineDasharray,
   getChartInnerRect,
   getRadarAngles,
+  getRadarLabelAlign,
   getRadarPoints,
   polarToCartesian,
+  RADAR_SPLIT_AREA_COLORS,
   type ChartPadding,
   type RadarChartDatum,
   type RadarChartProps as CoreRadarChartProps,
@@ -27,6 +29,14 @@ export interface RadarChartProps extends CoreRadarChartProps {
   showLevelLabels?: boolean
   levelLabelFormatter?: (value: number, level: number) => string
   levelLabelOffset?: number
+  gridShape?: 'polygon' | 'circle'
+  showSplitArea?: boolean
+  splitAreaOpacity?: number
+  splitAreaColors?: string[]
+  pointBorderWidth?: number
+  pointBorderColor?: string
+  pointHoverSize?: number
+  labelAutoAlign?: boolean
   title?: string
   desc?: string
   onHoveredIndexChange?: (index: number | null) => void
@@ -79,6 +89,14 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   showPoints = true,
   pointSize = 3,
   pointColor,
+  gridShape = 'polygon',
+  showSplitArea = false,
+  splitAreaOpacity = 0.06,
+  splitAreaColors,
+  pointBorderWidth = 2,
+  pointBorderColor = '#fff',
+  pointHoverSize,
+  labelAutoAlign = true,
   title,
   desc,
   className
@@ -198,10 +216,35 @@ export const RadarChart: React.FC<RadarChartProps> = ({
 
     return Array.from({ length: resolvedLevels }, (_, index) => {
       const levelRadius = radius * ((index + 1) / resolvedLevels)
+      if (gridShape === 'circle') {
+        return { type: 'circle' as const, cx, cy, r: levelRadius }
+      }
       const ringPoints = angles.map((angle) => polarToCartesian(cx, cy, levelRadius, angle))
-      return createPolygonPath(ringPoints)
+      return { type: 'polygon' as const, d: createPolygonPath(ringPoints), cx, cy, r: levelRadius }
     })
-  }, [showGrid, levels, angles, radius, cx, cy])
+  }, [showGrid, levels, angles, radius, cx, cy, gridShape])
+
+  const splitAreaPaths = useMemo(() => {
+    if (!showSplitArea || angles.length === 0) return []
+    const resolvedLevels = Math.max(1, Math.floor(levels))
+    const areaColors =
+      splitAreaColors && splitAreaColors.length > 0 ? splitAreaColors : RADAR_SPLIT_AREA_COLORS
+
+    return Array.from({ length: resolvedLevels }, (_, index) => {
+      const outerIndex = resolvedLevels - 1 - index
+      const outerRadius = radius * ((outerIndex + 1) / resolvedLevels)
+      const innerRadius = radius * (outerIndex / resolvedLevels)
+      const color = areaColors[outerIndex % areaColors.length]
+
+      if (gridShape === 'circle') {
+        return { type: 'circle-ring' as const, cx, cy, outerRadius, innerRadius, color }
+      }
+      const outerPoints = angles.map((angle) => polarToCartesian(cx, cy, outerRadius, angle))
+      const innerPoints =
+        outerIndex > 0 ? angles.map((angle) => polarToCartesian(cx, cy, innerRadius, angle)) : []
+      return { type: 'polygon-ring' as const, outerPoints, innerPoints, color }
+    })
+  }, [showSplitArea, levels, angles, radius, cx, cy, gridShape, splitAreaColors, splitAreaOpacity])
 
   const axisLines = useMemo(() => {
     if (!showAxis || angles.length === 0) return []
@@ -224,13 +267,18 @@ export const RadarChart: React.FC<RadarChartProps> = ({
     return axisData.map((datum, index) => {
       const angle = angles[index]
       const position = polarToCartesian(cx, cy, radius + labelOffset, angle)
+      const align = labelAutoAlign
+        ? getRadarLabelAlign(angle)
+        : { textAnchor: 'middle' as const, dominantBaseline: 'middle' as const }
       return {
         x: position.x,
         y: position.y,
-        text: formatLabel(datum, index)
+        text: formatLabel(datum, index),
+        textAnchor: align.textAnchor,
+        dominantBaseline: align.dominantBaseline
       }
     })
-  }, [showLabels, axisData, angles, cx, cy, radius, labelOffset, labelFormatter])
+  }, [showLabels, axisData, angles, cx, cy, radius, labelOffset, labelFormatter, labelAutoAlign])
 
   const levelLabels = useMemo(() => {
     if (!showLevelLabels || !showGrid || angles.length === 0) return []
@@ -321,16 +369,78 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       title={title}
       desc={desc}
       className={classNames(className)}>
-      {gridPaths.map((path, index) => (
-        <path
-          key={`grid-${index}`}
-          d={path}
-          className={chartGridLineClasses}
-          fill="none"
-          strokeWidth={gridStrokeWidth}
-          strokeDasharray={dasharray}
-        />
-      ))}
+      {/* Split areas */}
+      {splitAreaPaths.map((area, index) => {
+        if (area.type === 'circle-ring') {
+          return (
+            <g key={`split-${index}`}>
+              <circle
+                cx={area.cx}
+                cy={area.cy}
+                r={area.outerRadius}
+                fill={area.color}
+                fillOpacity={splitAreaOpacity}
+                stroke="none"
+                data-radar-split-area="true"
+              />
+              {area.innerRadius > 0 ? (
+                <circle
+                  cx={area.cx}
+                  cy={area.cy}
+                  r={area.innerRadius}
+                  fill="var(--tiger-bg,#fff)"
+                  stroke="none"
+                />
+              ) : null}
+            </g>
+          )
+        }
+        const outerPath = createPolygonPath(area.outerPoints)
+        return (
+          <g key={`split-${index}`}>
+            {outerPath ? (
+              <path
+                d={outerPath}
+                fill={area.color}
+                fillOpacity={splitAreaOpacity}
+                stroke="none"
+                data-radar-split-area="true"
+              />
+            ) : null}
+            {area.innerPoints.length > 0 ? (
+              <path
+                d={createPolygonPath(area.innerPoints)}
+                fill="var(--tiger-bg,#fff)"
+                stroke="none"
+              />
+            ) : null}
+          </g>
+        )
+      })}
+      {/* Grid lines */}
+      {gridPaths.map((grid, index) =>
+        grid.type === 'circle' ? (
+          <circle
+            key={`grid-${index}`}
+            cx={grid.cx}
+            cy={grid.cy}
+            r={grid.r}
+            className={chartGridLineClasses}
+            fill="none"
+            strokeWidth={gridStrokeWidth}
+            strokeDasharray={dasharray}
+          />
+        ) : (
+          <path
+            key={`grid-${index}`}
+            d={grid.d}
+            className={chartGridLineClasses}
+            fill="none"
+            strokeWidth={gridStrokeWidth}
+            strokeDasharray={dasharray}
+          />
+        )
+      )}
       {axisLines.map((line, index) => (
         <line
           key={`axis-${index}`}
@@ -388,20 +498,41 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                 fillOpacity={resolvedFillOpacity}
                 stroke={resolvedStrokeColor}
                 strokeWidth={resolvedStrokeWidth}
+                strokeLinejoin="round"
+                className="transition-[fill-opacity,filter] duration-200 ease-out"
+                style={
+                  resolvedActiveIndex === seriesIndex
+                    ? { filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.15))' }
+                    : undefined
+                }
                 data-radar-area="true"
                 data-series-index={seriesIndex}
               />
             ) : null}
             {resolvedShowPoints
               ? item.points.map((point) => {
+                  const isHoveredPoint =
+                    hoveredPoint?.seriesIndex === seriesIndex &&
+                    hoveredPoint?.pointIndex === point.index
+                  const hoverSize = pointHoverSize ?? resolvedPointSize + 2
+                  const currentSize = isHoveredPoint
+                    ? hoverSize
+                    : (point.data.size ?? resolvedPointSize)
+                  const resolvedBorderWidth = item.series.pointBorderWidth ?? pointBorderWidth
+                  const resolvedBorderColor = item.series.pointBorderColor ?? pointBorderColor
                   return (
                     <circle
                       key={`point-${seriesIndex}-${point.index}`}
                       cx={point.x}
                       cy={point.y}
-                      r={point.data.size ?? resolvedPointSize}
+                      r={currentSize}
                       fill={point.data.color ?? resolvedPointColor ?? resolvedStrokeColor}
-                      className={showTooltip && hoverable ? 'cursor-pointer' : undefined}
+                      stroke={resolvedBorderColor}
+                      strokeWidth={resolvedBorderWidth}
+                      className={classNames(
+                        showTooltip && hoverable ? 'cursor-pointer' : undefined,
+                        'transition-[r] duration-150 ease-out'
+                      )}
                       data-radar-point="true"
                       data-series-index={seriesIndex}
                       data-point-index={point.index}
@@ -425,8 +556,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
           x={label.x}
           y={label.y}
           className={chartAxisTickTextClasses}
-          textAnchor="middle"
-          dominantBaseline="middle">
+          textAnchor={label.textAnchor}
+          dominantBaseline={label.dominantBaseline}>
           {label.text}
         </text>
       ))}

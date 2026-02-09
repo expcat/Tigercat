@@ -60,23 +60,39 @@ const customSnippet = `<RadarChart
   :height="260"
   :max-value="100"
   :levels="6"
-    show-level-labels
+  show-level-labels
   :fill-opacity="0.15"
   show-points
 />`
 
+const circleSnippet = `<RadarChart
+  :data="customData"
+  :width="360"
+  :height="260"
+  :max-value="100"
+  grid-shape="circle"
+  show-split-area
+  :levels="5"
+  show-level-labels
+  :fill-opacity="0.25"
+  :stroke-width="2"
+  :point-border-width="2"
+  point-border-color="#fff"
+/>`
+
 const multiSnippet = `<RadarChart
-    :series="multiSeries"
-    :width="360"
-    :height="260"
-    :max-value="100"
-    :colors="['#2563eb', '#f97316']"
-    hoverable
-    selectable
-    show-legend
-    legend-position="right"
-    :muted-opacity="0.2"
-    :tooltip-formatter="tooltipFormatter"
+  :series="multiSeries"
+  :width="360"
+  :height="260"
+  :max-value="100"
+  :colors="['#2563eb', '#f97316']"
+  hoverable
+  selectable
+  show-legend
+  legend-position="right"
+  show-split-area
+  :fill-opacity="0.15"
+  :tooltip-formatter="tooltipFormatter"
 />`
 </script>
 
@@ -108,8 +124,25 @@ const multiSnippet = `<RadarChart
                         show-points />
         </DemoBlock>
 
+        <DemoBlock title="圆形网格 + 分割区域"
+                   description="ECharts 风格的圆形网格与交替背景。"
+                   :code="circleSnippet">
+            <RadarChart :data="customData"
+                        :width="360"
+                        :height="260"
+                        :max-value="100"
+                        grid-shape="circle"
+                        show-split-area
+                        :levels="5"
+                        show-level-labels
+                        :fill-opacity="0.25"
+                        :stroke-width="2"
+                        :point-border-width="2"
+                        point-border-color="#fff" />
+        </DemoBlock>
+
         <DemoBlock title="多系列对比"
-                   description="多组数据叠加展示。"
+                   description="多组数据叠加展示，支持交互与分割区域。"
                    :code="multiSnippet">
             <RadarChart :series="multiSeries"
                         :width="360"
@@ -120,7 +153,8 @@ const multiSnippet = `<RadarChart
                         selectable
                         show-legend
                         legend-position="right"
-                        :muted-opacity="0.2"
+                        show-split-area
+                        :fill-opacity="0.15"
                         :tooltip-formatter="tooltipFormatter" />
         </DemoBlock>
     </div>

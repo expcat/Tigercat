@@ -987,6 +987,16 @@ export interface RadarChartSeries {
   pointColor?: string
 
   /**
+   * Point border width (stroke around data points)
+   */
+  pointBorderWidth?: number
+
+  /**
+   * Point border color
+   */
+  pointBorderColor?: string
+
+  /**
    * Additional CSS classes
    */
   className?: string
@@ -1642,4 +1652,50 @@ export interface RadarChartProps extends BaseChartProps, ChartLegendProps, Chart
    * Point color
    */
   pointColor?: string
+
+  /**
+   * Grid shape: polygon (default) or circle (ECharts style)
+   * @default 'polygon'
+   */
+  gridShape?: 'polygon' | 'circle'
+
+  /**
+   * Show alternating split area fills between grid levels
+   * @default false
+   */
+  showSplitArea?: boolean
+
+  /**
+   * Split area fill opacity
+   * @default 0.06
+   */
+  splitAreaOpacity?: number
+
+  /**
+   * Split area colors (alternates between entries)
+   */
+  splitAreaColors?: string[]
+
+  /**
+   * Point border width (white ring around data points)
+   * @default 2
+   */
+  pointBorderWidth?: number
+
+  /**
+   * Point border color
+   * @default '#fff'
+   */
+  pointBorderColor?: string
+
+  /**
+   * Point size when hovered (enlargement effect)
+   */
+  pointHoverSize?: number
+
+  /**
+   * Auto-align axis labels based on their angle position
+   * @default true
+   */
+  labelAutoAlign?: boolean
 }

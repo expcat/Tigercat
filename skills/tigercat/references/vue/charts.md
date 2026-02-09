@@ -196,17 +196,45 @@ const data = [
 ]
 
 const series = [
-  { name: 'Product A', data: [80, 65, 90, 70, 50] },
-  { name: 'Product B', data: [60, 80, 70, 85, 65] }
+  {
+    name: 'Product A',
+    data: [
+      { label: 'Speed', value: 80 },
+      { label: 'Stability', value: 65 },
+      { label: 'Design', value: 90 }
+    ]
+  },
+  {
+    name: 'Product B',
+    data: [
+      { label: 'Speed', value: 60 },
+      { label: 'Stability', value: 80 },
+      { label: 'Design', value: 70 }
+    ]
+  }
 ]
 </script>
 
 <template>
+  <!-- Basic -->
   <RadarChart :data="data" :width="360" :height="260" />
+  <!-- Circle grid + split area (ECharts style) -->
+  <RadarChart
+    :data="data"
+    :width="360"
+    :height="260"
+    grid-shape="circle"
+    show-split-area
+    :max-value="100"
+    show-level-labels />
+  <!-- Multi-series with interaction -->
   <RadarChart
     :series="series"
-    :labels="['Speed', 'Stability', 'Design', 'Battery', 'Price']"
-    show-legend />
+    show-legend
+    hoverable
+    selectable
+    show-split-area
+    :fill-opacity="0.15" />
 </template>
 ```
 

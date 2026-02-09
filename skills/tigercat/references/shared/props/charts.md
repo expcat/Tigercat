@@ -144,12 +144,20 @@ description: Shared charts props and concepts
 
 ### RadarChart
 
-| Prop        | Type       | Default | Vue | React |
-| ----------- | ---------- | ------- | --- | ----- |
-| labels      | `string[]` | -       | ✓   | ✓     |
-| maxValue    | `number`   | auto    | ✓   | ✓     |
-| levels      | `number`   | `5`     | ✓   | ✓     |
-| fillOpacity | `number`   | `0.2`   | ✓   | ✓     |
+| Prop             | Type                    | Default     | Vue | React |
+| ---------------- | ----------------------- | ----------- | --- | ----- |
+| labels           | `string[]`              | -           | ✓   | ✓     |
+| maxValue         | `number`                | auto        | ✓   | ✓     |
+| levels           | `number`                | `5`         | ✓   | ✓     |
+| fillOpacity      | `number`                | `0.2`       | ✓   | ✓     |
+| gridShape        | `'polygon' \| 'circle'` | `'polygon'` | ✓   | ✓     |
+| showSplitArea    | `boolean`               | `false`     | ✓   | ✓     |
+| splitAreaOpacity | `number`                | `0.06`      | ✓   | ✓     |
+| splitAreaColors  | `string[]`              | -           | ✓   | ✓     |
+| pointBorderWidth | `number`                | `2`         | ✓   | ✓     |
+| pointBorderColor | `string`                | `'#fff'`    | ✓   | ✓     |
+| pointHoverSize   | `number`                | pointSize+2 | ✓   | ✓     |
+| labelAutoAlign   | `boolean`               | `true`      | ✓   | ✓     |
 
 ---
 

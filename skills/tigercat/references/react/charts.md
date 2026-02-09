@@ -198,12 +198,44 @@ const data = [
 ]
 
 const series = [
-  { name: 'Product A', data: [80, 65, 90, 70, 50] },
-  { name: 'Product B', data: [60, 80, 70, 85, 65] }
+  {
+    name: 'Product A',
+    data: [
+      { label: 'Speed', value: 80 },
+      { label: 'Stability', value: 65 },
+      { label: 'Design', value: 90 }
+    ]
+  },
+  {
+    name: 'Product B',
+    data: [
+      { label: 'Speed', value: 60 },
+      { label: 'Stability', value: 80 },
+      { label: 'Design', value: 70 }
+    ]
+  }
 ]
 
-<RadarChart data={data} width={360} height={260} />
-<RadarChart series={series} labels={['Speed', 'Stability', 'Design', 'Battery', 'Price']} showLegend />
+{
+  /* Basic */
+}
+;<RadarChart data={data} width={360} height={260} />
+{
+  /* Circle grid + split area (ECharts style) */
+}
+;<RadarChart
+  data={data}
+  width={360}
+  height={260}
+  gridShape="circle"
+  showSplitArea
+  maxValue={100}
+  showLevelLabels
+/>
+{
+  /* Multi-series with interaction */
+}
+;<RadarChart series={series} showLegend hoverable selectable showSplitArea fillOpacity={0.15} />
 ```
 
 ---

@@ -65,6 +65,21 @@ const customSnippet = `<RadarChart
   showPoints
 />`
 
+const circleSnippet = `<RadarChart
+  data={customData}
+  width={360}
+  height={260}
+  maxValue={100}
+  gridShape="circle"
+  showSplitArea
+  levels={5}
+  showLevelLabels
+  fillOpacity={0.25}
+  strokeWidth={2}
+  pointBorderWidth={2}
+  pointBorderColor="#fff"
+/>`
+
 const multiSnippet = `<RadarChart
   series={multiSeries}
   width={360}
@@ -75,7 +90,8 @@ const multiSnippet = `<RadarChart
   selectable
   showLegend
   legendPosition="right"
-  mutedOpacity={0.2}
+  showSplitArea
+  fillOpacity={0.15}
   tooltipFormatter={tooltipFormatter}
 />`
 
@@ -104,7 +120,30 @@ const RadarChartDemo: React.FC = () => {
         />
       </DemoBlock>
 
-      <DemoBlock title="多系列对比" description="多组数据叠加展示。" code={multiSnippet}>
+      <DemoBlock
+        title="圆形网格 + 分割区域"
+        description="ECharts 风格的圆形网格与交替背景。"
+        code={circleSnippet}>
+        <RadarChart
+          data={customData}
+          width={360}
+          height={260}
+          maxValue={100}
+          gridShape="circle"
+          showSplitArea
+          levels={5}
+          showLevelLabels
+          fillOpacity={0.25}
+          strokeWidth={2}
+          pointBorderWidth={2}
+          pointBorderColor="#fff"
+        />
+      </DemoBlock>
+
+      <DemoBlock
+        title="多系列对比"
+        description="多组数据叠加展示，支持交互与分割区域。"
+        code={multiSnippet}>
         <RadarChart
           series={multiSeries}
           width={360}
@@ -115,6 +154,8 @@ const RadarChartDemo: React.FC = () => {
           selectable
           showLegend
           legendPosition="right"
+          showSplitArea
+          fillOpacity={0.15}
           tooltipFormatter={tooltipFormatter}
         />
       </DemoBlock>

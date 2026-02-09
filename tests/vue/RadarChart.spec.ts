@@ -140,4 +140,53 @@ describe('RadarChart', () => {
 
     expect(container.querySelectorAll('button')).toHaveLength(2)
   })
+
+  it('renders circle grid when gridShape is circle', () => {
+    const { container } = renderWithProps(RadarChart, {
+      data: singleSeriesData,
+      gridShape: 'circle',
+      levels: 4
+    })
+
+    // Should render circles instead of polygon paths for grid
+    const svgCircles = container.querySelectorAll('svg circle')
+    // 4 grid circles + 3 data point circles = 7
+    expect(svgCircles.length).toBeGreaterThanOrEqual(4)
+  })
+
+  it('renders split area when showSplitArea is enabled', () => {
+    const { container } = renderWithProps(RadarChart, {
+      data: singleSeriesData,
+      showSplitArea: true,
+      levels: 3
+    })
+
+    expect(container.querySelectorAll('[data-radar-split-area]').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('renders point borders', () => {
+    const { container } = renderWithProps(RadarChart, {
+      data: singleSeriesData,
+      pointBorderWidth: 2,
+      pointBorderColor: '#fff'
+    })
+
+    const points = container.querySelectorAll('circle[data-radar-point]')
+    expect(points).toHaveLength(3)
+    points.forEach((point) => {
+      expect(point.getAttribute('stroke')).toBe('#fff')
+      expect(point.getAttribute('stroke-width')).toBe('2')
+    })
+  })
+
+  it('renders circle grid with split area', () => {
+    const { container } = renderWithProps(RadarChart, {
+      data: singleSeriesData,
+      gridShape: 'circle',
+      showSplitArea: true,
+      levels: 3
+    })
+
+    expect(container.querySelectorAll('[data-radar-split-area]').length).toBeGreaterThanOrEqual(1)
+  })
 })
