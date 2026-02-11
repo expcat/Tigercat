@@ -1,11 +1,11 @@
 ﻿---
 name: tigercat-vue-basic
-description: Vue 3 basic components usage - Alert, Avatar, Badge, Button, Code, Divider, Icon, Link, Tag, Text
+description: Vue 3 basic components usage - Alert, Avatar, Badge, Button, Code, Divider, Icon, Image, ImagePreview, ImageGroup, ImageCropper, Link, Tag, Text
 ---
 
 # Basic Components (Vue 3)
 
-基础组件：Alert, Avatar, Badge, Button, Code, Divider, Icon, Link, Tag, Text
+基础组件：Alert, Avatar, Badge, Button, Code, Divider, Icon, Image, ImagePreview, ImageGroup, ImageCropper, Link, Tag, Text
 
 > **Props Reference**: [shared/props/basic.md](../shared/props/basic.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -221,5 +221,109 @@ import { Code } from '@expcat/tigercat-vue'
   <Divider />
   <Divider direction="vertical" />
   <Divider>Text</Divider>
+</template>
+```
+
+---
+
+## Image 图片
+
+```vue
+<script setup>
+import { Image } from '@expcat/tigercat-vue'
+</script>
+
+<template>
+  <!-- 基本用法 -->
+  <Image src="/photo.jpg" alt="Photo" />
+
+  <!-- 适配模式 -->
+  <Image src="/photo.jpg" fit="contain" :width="200" :height="200" />
+
+  <!-- 懒加载 -->
+  <Image src="/photo.jpg" lazy />
+
+  <!-- 点击预览 -->
+  <Image src="/photo.jpg" preview />
+
+  <!-- 回退图片 -->
+  <Image src="/broken.jpg" fallback="/fallback.jpg" />
+
+  <!-- 自定义错误/加载插槽 -->
+  <Image src="/broken.jpg">
+    <template #error><span>加载失败</span></template>
+    <template #placeholder><span>加载中...</span></template>
+  </Image>
+</template>
+```
+
+---
+
+## ImagePreview 图片预览
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import { ImagePreview } from '@expcat/tigercat-vue'
+
+const visible = ref(false)
+const images = ['/a.jpg', '/b.jpg', '/c.jpg']
+</script>
+
+<template>
+  <button @click="visible = true">预览</button>
+
+  <!-- 单张预览 -->
+  <ImagePreview v-model:visible="visible" src="/photo.jpg" />
+
+  <!-- 多张预览 -->
+  <ImagePreview v-model:visible="visible" :srcList="images" :currentIndex="0" />
+</template>
+```
+
+---
+
+## ImageGroup 图片组
+
+```vue
+<script setup>
+import { Image, ImageGroup } from '@expcat/tigercat-vue'
+</script>
+
+<template>
+  <ImageGroup>
+    <Image src="/a.jpg" preview />
+    <Image src="/b.jpg" preview />
+    <Image src="/c.jpg" preview />
+  </ImageGroup>
+</template>
+```
+
+---
+
+## ImageCropper 图片裁剪
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import { ImageCropper } from '@expcat/tigercat-vue'
+
+const cropperRef = ref()
+
+async function handleCrop() {
+  const result = await cropperRef.value.getCropResult()
+  console.log(result.dataURL, result.blob)
+}
+</script>
+
+<template>
+  <ImageCropper
+    ref="cropperRef"
+    src="/photo.jpg"
+    :aspectRatio="16 / 9"
+    guides
+    @crop-change="(rect) => console.log(rect)"
+    @ready="() => console.log('ready')" />
+  <button @click="handleCrop">裁剪</button>
 </template>
 ```

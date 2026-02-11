@@ -67,6 +67,9 @@ const ChatWindowDemo = lazy(() => import('./pages/ChatWindowDemo'))
 const CommentThreadDemo = lazy(() => import('./pages/CommentThreadDemo'))
 const ActivityFeedDemo = lazy(() => import('./pages/ActivityFeedDemo'))
 const NotificationCenterDemo = lazy(() => import('./pages/NotificationCenterDemo'))
+const ImageDemo = lazy(() => import('./pages/ImageDemo'))
+const ImageCropperDemo = lazy(() => import('./pages/ImageCropperDemo'))
+const CropUploadDemo = lazy(() => import('./pages/CropUploadDemo'))
 
 const router = createBrowserRouter(
   [
@@ -137,7 +140,10 @@ const router = createBrowserRouter(
         { path: 'chat-window', element: <ChatWindowDemo /> },
         { path: 'comment-thread', element: <CommentThreadDemo /> },
         { path: 'activity-feed', element: <ActivityFeedDemo /> },
-        { path: 'notification-center', element: <NotificationCenterDemo /> }
+        { path: 'notification-center', element: <NotificationCenterDemo /> },
+        { path: 'image', element: <ImageDemo /> },
+        { path: 'image-cropper', element: <ImageCropperDemo /> },
+        { path: 'crop-upload', element: <CropUploadDemo /> }
       ]
     }
   ],

@@ -5,7 +5,7 @@ description: React composite components usage
 
 # Composite Components (React)
 
-组合组件：ChatWindow / ActivityFeed / CommentThread / NotificationCenter / FormWizard / DataTableWithToolbar
+组合组件：ChatWindow / ActivityFeed / CommentThread / NotificationCenter / FormWizard / DataTableWithToolbar / CropUpload
 
 > **Props Reference**: [shared/props/composite.md](../shared/props/composite.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -375,4 +375,39 @@ export default function DataTableWithToolbarDemo() {
     />
   )
 }
+```
+
+---
+
+## CropUpload 裁剪上传
+
+```tsx
+import { CropUpload } from '@expcat/tigercat-react'
+
+function handleCrop(result) {
+  console.log(result.blob, result.dataURL)
+  // 可配合上传逻辑使用 result.blob
+}
+
+{
+  /* 基本用法 */
+}
+;<CropUpload onCropComplete={handleCrop} />
+
+{
+  /* 指定宽高比 */
+}
+;<CropUpload aspectRatio={1} onCropComplete={handleCrop} />
+
+{
+  /* 自定义触发按钮 */
+}
+;<CropUpload onCropComplete={handleCrop}>
+  <span>上传头像</span>
+</CropUpload>
+
+{
+  /* 禁用 */
+}
+;<CropUpload disabled />
 ```

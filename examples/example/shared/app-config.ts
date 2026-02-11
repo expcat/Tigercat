@@ -51,6 +51,16 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'code',
         path: '/code',
         label: { 'zh-CN': 'Code', 'en-US': 'Code' }
+      },
+      {
+        key: 'image',
+        path: '/image',
+        label: { 'zh-CN': 'Image', 'en-US': 'Image' }
+      },
+      {
+        key: 'image-cropper',
+        path: '/image-cropper',
+        label: { 'zh-CN': 'ImageCropper', 'en-US': 'ImageCropper' }
       }
     ]
   },
@@ -379,6 +389,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'notification-center',
         path: '/notification-center',
         label: { 'zh-CN': 'NotificationCenter', 'en-US': 'NotificationCenter' }
+      },
+      {
+        key: 'crop-upload',
+        path: '/crop-upload',
+        label: { 'zh-CN': 'CropUpload', 'en-US': 'CropUpload' }
       }
     ]
   }

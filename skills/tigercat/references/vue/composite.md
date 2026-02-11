@@ -5,7 +5,7 @@ description: Vue 3 composite components usage
 
 # Composite Components (Vue 3)
 
-组合组件：ChatWindow / ActivityFeed / CommentThread / NotificationCenter / FormWizard / DataTableWithToolbar
+组合组件：ChatWindow / ActivityFeed / CommentThread / NotificationCenter / FormWizard / DataTableWithToolbar / CropUpload
 
 > **Props Reference**: [shared/props/composite.md](../shared/props/composite.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -383,6 +383,37 @@ const toolbar = computed(() => ({
     @filters-change="(val) => (filters = val)"
     @page-change="(current, pageSize) => (pagination = { current, pageSize })"
     @page-size-change="(current, pageSize) => (pagination = { current, pageSize })" />
+</template>
+```
+
+---
+
+## CropUpload 裁剪上传
+
+```vue
+<script setup>
+import { CropUpload } from '@expcat/tigercat-vue'
+
+function handleCrop(result) {
+  console.log(result.blob, result.dataURL)
+  // 可配合上传逻辑使用 result.blob
+}
+</script>
+
+<template>
+  <!-- 基本用法 -->
+  <CropUpload @crop-complete="handleCrop" />
+
+  <!-- 指定宽高比 -->
+  <CropUpload :aspectRatio="1" @crop-complete="handleCrop" />
+
+  <!-- 自定义触发按钮 -->
+  <CropUpload @crop-complete="handleCrop">
+    <span>上传头像</span>
+  </CropUpload>
+
+  <!-- 禁用 -->
+  <CropUpload disabled />
 </template>
 ```
 ````

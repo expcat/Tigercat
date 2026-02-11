@@ -1,11 +1,11 @@
 ﻿---
 name: tigercat-react-basic
-description: React basic components usage - Alert, Avatar, Badge, Button, Code, Divider, Icon, Link, Tag, Text
+description: React basic components usage - Alert, Avatar, Badge, Button, Code, Divider, Icon, Image, ImagePreview, ImageGroup, ImageCropper, Link, Tag, Text
 ---
 
 # Basic Components (React)
 
-基础组件：Alert, Avatar, Badge, Button, Code, Divider, Icon, Link, Tag, Text
+基础组件：Alert, Avatar, Badge, Button, Code, Divider, Icon, Image, ImagePreview, ImageGroup, ImageCropper, Link, Tag, Text
 
 > **Props Reference**: [shared/props/basic.md](../shared/props/basic.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -213,4 +213,107 @@ import { Code } from '@expcat/tigercat-react'
 <Divider />
 <Divider direction="vertical" />
 <Divider>Text</Divider>
+```
+
+---
+
+## Image 图片
+
+```tsx
+import { Image } from '@expcat/tigercat-react'
+
+{
+  /* 基本用法 */
+}
+;<Image src="/photo.jpg" alt="Photo" />
+
+{
+  /* 适配模式 */
+}
+;<Image src="/photo.jpg" fit="contain" width={200} height={200} />
+
+{
+  /* 懒加载 */
+}
+;<Image src="/photo.jpg" lazy />
+
+{
+  /* 点击预览 */
+}
+;<Image src="/photo.jpg" preview />
+
+{
+  /* 回退图片 */
+}
+;<Image src="/broken.jpg" fallback="/fallback.jpg" />
+
+{
+  /* 自定义错误/加载渲染 */
+}
+;<Image
+  src="/broken.jpg"
+  errorRender={<span>加载失败</span>}
+  placeholderRender={<span>加载中...</span>}
+/>
+```
+
+---
+
+## ImagePreview 图片预览
+
+```tsx
+import { useState } from 'react'
+import { ImagePreview } from '@expcat/tigercat-react'
+
+const [visible, setVisible] = useState(false)
+const images = ['/a.jpg', '/b.jpg', '/c.jpg']
+
+<button onClick={() => setVisible(true)}>预览</button>
+
+{/* 单张预览 */}
+<ImagePreview visible={visible} src="/photo.jpg" onVisibleChange={setVisible} />
+
+{/* 多张预览 */}
+<ImagePreview visible={visible} srcList={images} currentIndex={0} onVisibleChange={setVisible} />
+```
+
+---
+
+## ImageGroup 图片组
+
+```tsx
+import { Image, ImageGroup } from '@expcat/tigercat-react'
+
+;<ImageGroup>
+  <Image src="/a.jpg" preview />
+  <Image src="/b.jpg" preview />
+  <Image src="/c.jpg" preview />
+</ImageGroup>
+```
+
+---
+
+## ImageCropper 图片裁剪
+
+```tsx
+import { useRef } from 'react'
+import { ImageCropper } from '@expcat/tigercat-react'
+import type { ImageCropperRef } from '@expcat/tigercat-react'
+
+const cropperRef = useRef<ImageCropperRef>(null)
+
+async function handleCrop() {
+  const result = await cropperRef.current?.getCropResult()
+  console.log(result?.dataURL, result?.blob)
+}
+
+<ImageCropper
+  ref={cropperRef}
+  src="/photo.jpg"
+  aspectRatio={16 / 9}
+  guides
+  onCropChange={(rect) => console.log(rect)}
+  onReady={() => console.log('ready')}
+/>
+<button onClick={handleCrop}>裁剪</button>
 ```

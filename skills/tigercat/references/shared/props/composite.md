@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-composite
-description: Shared props definitions for composite components - ChatWindow / ActivityFeed / CommentThread / NotificationCenter / FormWizard / DataTableWithToolbar
+description: Shared props definitions for composite components - ChatWindow / ActivityFeed / CommentThread / NotificationCenter / FormWizard / DataTableWithToolbar / CropUpload
 ---
 
 # Composite Components - Props Reference
@@ -442,3 +442,36 @@ description: Shared props definitions for composite components - ChatWindow / Ac
 | variant  | `ButtonVariant`          | `'outline'` | 按钮风格    |
 | disabled | `boolean`                | `false`     | 禁用        |
 | onClick  | `(selectedKeys) => void` | -           | 点击回调    |
+
+---
+
+## CropUpload 裁剪上传
+
+### Props
+
+| Prop        | Type      | Default       | Vue | React | Description      |
+| ----------- | --------- | ------------- | :-: | :---: | ---------------- |
+| accept      | `string`  | `'image/*'`   |  ✓  |   ✓   | 文件类型过滤     |
+| aspectRatio | `number`  | -             |  ✓  |   ✓   | 裁剪宽高比       |
+| outputType  | `string`  | `'image/png'` |  ✓  |   ✓   | 输出 MIME 类型   |
+| quality     | `number`  | `0.92`        |  ✓  |   ✓   | 输出质量（0-1）  |
+| guides      | `boolean` | `true`        |  ✓  |   ✓   | 显示裁剪辅助线   |
+| disabled    | `boolean` | `false`       |  ✓  |   ✓   | 禁用             |
+| triggerText | `string`  | `'选择图片'`  |  ✓  |   ✓   | 默认触发按钮文案 |
+| modalTitle  | `string`  | `'裁剪图片'`  |  ✓  |   ✓   | 弹窗标题         |
+| confirmText | `string`  | `'确认'`      |  ✓  |   ✓   | 确认按钮文案     |
+| cancelText  | `string`  | `'取消'`      |  ✓  |   ✓   | 取消按钮文案     |
+| className   | `string`  | -             |  -  |   ✓   | 自定义类名       |
+
+### Events
+
+| Vue Event        | React Callback   | Payload      | Description  |
+| ---------------- | ---------------- | ------------ | ------------ |
+| `@crop-complete` | `onCropComplete` | `CropResult` | 裁剪完成     |
+| `@error`         | `onError`        | `string`     | 文件读取出错 |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description            |
+| --------- | ---------- | ---------------------- |
+| `default` | `children` | 自定义触发按钮（可选） |

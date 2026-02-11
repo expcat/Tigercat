@@ -11,12 +11,16 @@
 
 ### 基础组件 (Basic Components)
 
-| 组件 | Component | Vue | React | 文档 | 测试 |
-| ---- | --------- | --- | ----- | ---- | ---- |
-| 按钮 | Button    | ✅  | ✅    | ✅   | ✅   |
-| 链接 | Link      | ✅  | ✅    | ✅   | ✅   |
-| 图标 | Icon      | ✅  | ✅    | ✅   | ✅   |
-| 文本 | Text      | ✅  | ✅    | ✅   | ✅   |
+| 组件     | Component    | Vue | React | 文档 | 测试 |
+| -------- | ------------ | --- | ----- | ---- | ---- |
+| 按钮     | Button       | ✅  | ✅    | ✅   | ✅   |
+| 链接     | Link         | ✅  | ✅    | ✅   | ✅   |
+| 图标     | Icon         | ✅  | ✅    | ✅   | ✅   |
+| 文本     | Text         | ✅  | ✅    | ✅   | ✅   |
+| 图片     | Image        | ✅  | ✅    | ✅   | ✅   |
+| 图片预览 | ImagePreview | ✅  | ✅    | ✅   | ✅   |
+| 图片组   | ImageGroup   | ✅  | ✅    | ✅   | ✅   |
+| 图片裁剪 | ImageCropper | ✅  | ✅    | ✅   | ✅   |
 
 ### 表单组件 (Form Components)
 
@@ -105,6 +109,7 @@
 | 表单向导   | FormWizard           | 多步表单流               | ✅  | ✅    | ✅   | ✅   |
 | 表格工具栏 | DataTableWithToolbar | 搜索/筛选/批量操作       | ✅  | ✅    | ✅   | ✅   |
 | 活动动态流 | ActivityFeed         | 动态/审计时间线          | ✅  | ✅    | ✅   | ✅   |
+| 裁剪上传   | CropUpload           | 图片选择 + 裁剪 + 输出   | ✅  | ✅    | ✅   | ✅   |
 
 ### 数据可视化组件 (Chart Components)
 

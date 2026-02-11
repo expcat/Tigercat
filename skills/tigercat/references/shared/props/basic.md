@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-basic
-description: Shared props definitions for basic components - Alert, Avatar, Badge, Button, Code, Divider, Icon, Link, Tag, Text
+description: Shared props definitions for basic components - Alert, Avatar, Badge, Button, Code, Divider, Icon, Image, ImagePreview, ImageGroup, ImageCropper, Link, Tag, Text
 ---
 
 # Basic Components - Props Reference
@@ -268,5 +268,112 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 | `default` | `children` | 分割线文本  |
 
 ---
+
+---
+
+## Image 图片
+
+### Props
+
+| Prop      | Type                                                       | Default   | Vue | React | Description          |
+| --------- | ---------------------------------------------------------- | --------- | :-: | :---: | -------------------- |
+| src       | `string`                                                   | -         |  ✓  |   ✓   | 图片地址             |
+| alt       | `string`                                                   | `''`      |  ✓  |   ✓   | 替代文本             |
+| fit       | `'contain' \| 'cover' \| 'fill' \| 'none' \| 'scale-down'` | `'cover'` |  ✓  |   ✓   | 适配模式             |
+| width     | `string \| number`                                         | -         |  ✓  |   ✓   | 宽度                 |
+| height    | `string \| number`                                         | -         |  ✓  |   ✓   | 高度                 |
+| lazy      | `boolean`                                                  | `false`   |  ✓  |   ✓   | 懒加载               |
+| preview   | `boolean`                                                  | `false`   |  ✓  |   ✓   | 点击预览             |
+| fallback  | `string`                                                   | -         |  ✓  |   ✓   | 加载失败时的回退图片 |
+| className | `string`                                                   | -         |  -  |   ✓   | 自定义类名           |
+
+### Events
+
+| Vue Event                 | React Callback           | Payload   | Description    |
+| ------------------------- | ------------------------ | --------- | -------------- |
+| `@load`                   | `onLoad`                 | `Event`   | 加载完成       |
+| `@error`                  | `onError`                | `Event`   | 加载失败       |
+| `@preview-visible-change` | `onPreviewVisibleChange` | `boolean` | 预览可见性变化 |
+
+### Slots / Children
+
+| Vue Slot      | React Prop          | Description    |
+| ------------- | ------------------- | -------------- |
+| `error`       | `errorRender`       | 自定义错误占位 |
+| `placeholder` | `placeholderRender` | 自定义加载占位 |
+
+---
+
+## ImagePreview 图片预览
+
+### Props
+
+| Prop         | Type       | Default | Vue | React | Description      |
+| ------------ | ---------- | ------- | :-: | :---: | ---------------- |
+| visible      | `boolean`  | `false` |  ✓  |   ✓   | 是否可见         |
+| src          | `string`   | -       |  ✓  |   ✓   | 单张预览图片地址 |
+| srcList      | `string[]` | -       |  ✓  |   ✓   | 多张预览图片列表 |
+| currentIndex | `number`   | `0`     |  ✓  |   ✓   | 当前显示索引     |
+| maskClosable | `boolean`  | `true`  |  ✓  |   ✓   | 点击遮罩关闭     |
+| className    | `string`   | -       |  -  |   ✓   | 自定义类名       |
+
+### Events
+
+| Vue Event              | React Callback         | Payload   | Description  |
+| ---------------------- | ---------------------- | --------- | ------------ |
+| `@update:visible`      | `onVisibleChange`      | `boolean` | 可见性变化   |
+| `@update:currentIndex` | `onCurrentIndexChange` | `number`  | 当前索引变化 |
+| `@scale-change`        | `onScaleChange`        | `number`  | 缩放倍率变化 |
+
+---
+
+## ImageGroup 图片组
+
+### Props
+
+| Prop      | Type     | Default | Vue | React | Description |
+| --------- | -------- | ------- | :-: | :---: | ----------- |
+| className | `string` | -       |  -  |   ✓   | 自定义类名  |
+
+### Behavior
+
+- 子组件 `Image` 自动注册到 Group，点击任一图片进入多图预览。
+- 自动管理预览状态、图片列表和当前索引。
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description  |
+| --------- | ---------- | ------------ |
+| `default` | `children` | Image 子组件 |
+
+---
+
+## ImageCropper 图片裁剪
+
+### Props
+
+| Prop        | Type      | Default       | Vue | React | Description        |
+| ----------- | --------- | ------------- | :-: | :---: | ------------------ |
+| src         | `string`  | -             |  ✓  |   ✓   | 原始图片地址       |
+| aspectRatio | `number`  | -             |  ✓  |   ✓   | 裁剪框宽高比       |
+| outputType  | `string`  | `'image/png'` |  ✓  |   ✓   | 输出 MIME 类型     |
+| quality     | `number`  | `0.92`        |  ✓  |   ✓   | 输出质量（0-1）    |
+| guides      | `boolean` | `true`        |  ✓  |   ✓   | 显示辅助线         |
+| minWidth    | `number`  | `20`          |  ✓  |   ✓   | 最小裁剪宽度（px） |
+| minHeight   | `number`  | `20`          |  ✓  |   ✓   | 最小裁剪高度（px） |
+| className   | `string`  | -             |  -  |   ✓   | 自定义类名         |
+
+### Events
+
+| Vue Event      | React Callback | Payload    | Description  |
+| -------------- | -------------- | ---------- | ------------ |
+| `@crop-change` | `onCropChange` | `CropRect` | 裁剪区域变化 |
+| `@ready`       | `onReady`      | -          | 图片加载完成 |
+
+### Exposed / Ref
+
+| Method / React Ref | Return                | Description                    |
+| ------------------ | --------------------- | ------------------------------ |
+| `getCropResult()`  | `Promise<CropResult>` | 获取裁剪结果（blob + dataURL） |
 
 > **See also**: [Vue examples](../vue/basic.md) · [React examples](../react/basic.md)

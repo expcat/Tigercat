@@ -156,6 +156,18 @@ const router = createRouter({
         {
           path: 'notification-center',
           component: () => import('./pages/NotificationCenterDemo.vue')
+        },
+        {
+          path: 'image',
+          component: () => import('./pages/ImageDemo.vue')
+        },
+        {
+          path: 'image-cropper',
+          component: () => import('./pages/ImageCropperDemo.vue')
+        },
+        {
+          path: 'crop-upload',
+          component: () => import('./pages/CropUploadDemo.vue')
         }
       ]
     }

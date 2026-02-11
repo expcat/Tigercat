@@ -90,6 +90,9 @@ export * from '../icon-utils'
 export * from '../code-utils'
 export * from '../text-utils'
 
+// Image components
+export * from '../image-utils'
+
 // Other components
 export * from '../carousel-utils'
 export * from '../anchor-utils'
