@@ -394,6 +394,11 @@ export const DEMO_NAV_GROUPS: DemoNavGroup[] = [
         key: 'crop-upload',
         path: '/crop-upload',
         label: { 'zh-CN': 'CropUpload', 'en-US': 'CropUpload' }
+      },
+      {
+        key: 'task-board',
+        path: '/task-board',
+        label: { 'zh-CN': 'TaskBoard 任务看板', 'en-US': 'TaskBoard' }
       }
     ]
   }

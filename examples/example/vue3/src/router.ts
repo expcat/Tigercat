@@ -168,6 +168,10 @@ const router = createRouter({
         {
           path: 'crop-upload',
           component: () => import('./pages/CropUploadDemo.vue')
+        },
+        {
+          path: 'task-board',
+          component: () => import('./pages/TaskBoardDemo.vue')
         }
       ]
     }

@@ -417,3 +417,56 @@ function handleCrop(result) {
 </template>
 ```
 ````
+
+## TaskBoard 任务看板
+
+````md
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import { TaskBoard } from '@expcat/tigercat-vue'
+import type { TaskBoardColumn, TaskBoardCardMoveEvent } from '@expcat/tigercat-core'
+
+const columns = ref<TaskBoardColumn[]>([
+  {
+    id: 'todo',
+    title: '待办',
+    cards: [
+      { id: 1, title: '需求评审', description: '与产品经理对齐 Q2 需求' },
+      { id: 2, title: '技术方案' }
+    ]
+  },
+  { id: 'doing', title: '进行中', wipLimit: 3, cards: [] },
+  { id: 'done', title: '已完成', cards: [] }
+])
+
+const handleCardMove = (e: TaskBoardCardMoveEvent) => {
+  console.log('card moved', e)
+}
+</script>
+
+<template>
+  <!-- 基本用法（受控 + v-model） -->
+  <TaskBoard
+    v-model:columns="columns"
+    @card-move="handleCardMove"
+    @column-move="(e) => console.log(e)" />
+
+  <!-- 自定义卡片 -->
+  <TaskBoard v-model:columns="columns">
+    <template #card="{ card }">
+      <div>{{ card.title }}</div>
+    </template>
+  </TaskBoard>
+
+  <!-- 新增卡片按钮 -->
+  <TaskBoard
+    v-model:columns="columns"
+    :on-card-add="
+      (colId) => {
+        /* add logic */
+      }
+    " />
+</template>
+```
+````

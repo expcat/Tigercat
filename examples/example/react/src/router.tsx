@@ -70,6 +70,7 @@ const NotificationCenterDemo = lazy(() => import('./pages/NotificationCenterDemo
 const ImageDemo = lazy(() => import('./pages/ImageDemo'))
 const ImageCropperDemo = lazy(() => import('./pages/ImageCropperDemo'))
 const CropUploadDemo = lazy(() => import('./pages/CropUploadDemo'))
+const TaskBoardDemo = lazy(() => import('./pages/TaskBoardDemo'))
 
 const router = createBrowserRouter(
   [
@@ -143,7 +144,8 @@ const router = createBrowserRouter(
         { path: 'notification-center', element: <NotificationCenterDemo /> },
         { path: 'image', element: <ImageDemo /> },
         { path: 'image-cropper', element: <ImageCropperDemo /> },
-        { path: 'crop-upload', element: <CropUploadDemo /> }
+        { path: 'crop-upload', element: <CropUploadDemo /> },
+        { path: 'task-board', element: <TaskBoardDemo /> }
       ]
     }
   ],

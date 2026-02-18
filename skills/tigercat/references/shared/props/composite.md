@@ -475,3 +475,58 @@ description: Shared props definitions for composite components - ChatWindow / Ac
 | Vue Slot  | React Prop | Description            |
 | --------- | ---------- | ---------------------- |
 | `default` | `children` | 自定义触发按钮（可选） |
+
+---
+
+## TaskBoard 任务看板
+
+可拖拽任务看板，支持卡片跨列流转、列拖拽排序、WIP 限制等。
+
+### TaskBoardCard
+
+| Prop        | Type               | Default | Description            |
+| ----------- | ------------------ | ------- | ---------------------- |
+| id          | `string \| number` | -       | 唯一标识               |
+| title       | `string`           | -       | 卡片标题               |
+| description | `string`           | -       | 卡片描述               |
+| [key]       | `unknown`          | -       | 开放扩展字段 (tags 等) |
+
+### TaskBoardColumn
+
+| Prop        | Type               | Default | Description        |
+| ----------- | ------------------ | ------- | ------------------ |
+| id          | `string \| number` | -       | 唯一标识           |
+| title       | `string`           | -       | 列标题             |
+| description | `string`           | -       | 列描述/副标题      |
+| wipLimit    | `number`           | -       | WIP 限制，超限高亮 |
+| cards       | `TaskBoardCard[]`  | `[]`    | 该列下卡片列表     |
+
+### TaskBoardProps
+
+| Prop            | Type                   | Default | Vue | React | Description    |
+| --------------- | ---------------------- | ------- | --- | ----- | -------------- |
+| columns         | `TaskBoardColumn[]`    | -       | ✓   | ✓     | 受控列数据     |
+| defaultColumns  | `TaskBoardColumn[]`    | `[]`    | ✓   | ✓     | 非受控初始值   |
+| draggable       | `boolean`              | `true`  | ✓   | ✓     | 星用卡片拖拽   |
+| columnDraggable | `boolean`              | `true`  | ✓   | ✓     | 启用列拖拽排序 |
+| locale          | `Partial<TigerLocale>` | -       | ✓   | ✓     | i18n 覆盖      |
+| className       | `string`               | -       | ✓   | ✓     | 自定义类名     |
+| style           | `Record / CSSProp`     | -       | ✓   | ✓     | 自定义样式     |
+
+### Events
+
+| Vue Event         | React Callback | Payload                    | Description  |
+| ----------------- | -------------- | -------------------------- | ------------ |
+| `@card-move`      | `onCardMove`   | `TaskBoardCardMoveEvent`   | 卡片移动后   |
+| `@column-move`    | `onColumnMove` | `TaskBoardColumnMoveEvent` | 列移动后     |
+| `@card-add`       | `onCardAdd`    | `columnId`                 | 点击新增卡片 |
+| `@update:columns` | -              | `TaskBoardColumn[]`        | v-model 同步 |
+
+### Slots / Render Props
+
+| Vue Slot        | React Prop           | Scoped Params      | Description |
+| --------------- | -------------------- | ------------------ | ----------- |
+| `card`          | `renderCard`         | `{ card, column }` | 自定义卡片  |
+| `column-header` | `renderColumnHeader` | `{ column }`       | 自定义列头  |
+| `column-footer` | `renderColumnFooter` | `{ column }`       | 自定义列尾  |
+| `empty-column`  | `renderEmptyColumn`  | `{ column }`       | 空列占位    |

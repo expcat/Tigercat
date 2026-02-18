@@ -199,6 +199,8 @@ export { Anchor } from './components/Anchor'
 export type { VueAnchorProps, AnchorContext } from './components/Anchor'
 export { AnchorLink } from './components/AnchorLink'
 export type { VueAnchorLinkProps } from './components/AnchorLink'
+export { TaskBoard } from './components/TaskBoard'
+export type { VueTaskBoardProps } from './components/TaskBoard'
 
 // Composables
 export { useChartInteraction } from './composables/useChartInteraction'

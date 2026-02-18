@@ -233,6 +233,8 @@ export { Anchor, useAnchorContext } from './components/Anchor'
 export type { AnchorProps, AnchorContextValue } from './components/Anchor'
 export { AnchorLink } from './components/AnchorLink'
 export type { AnchorLinkProps } from './components/AnchorLink'
+export { TaskBoard } from './components/TaskBoard'
+export type { TaskBoardProps } from './components/TaskBoard'
 
 // Hooks
 export { useChartInteraction } from './hooks/useChartInteraction'

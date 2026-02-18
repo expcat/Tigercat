@@ -11,7 +11,12 @@ export function resolveLocaleText(
   return fallback
 }
 
-import type { TigerLocale, TigerLocalePagination, TigerLocaleFormWizard } from '../types/locale'
+import type {
+  TigerLocale,
+  TigerLocalePagination,
+  TigerLocaleFormWizard,
+  TigerLocaleTaskBoard
+} from '../types/locale'
 
 export function mergeTigerLocale(
   base?: Partial<TigerLocale>,
@@ -25,7 +30,8 @@ export function mergeTigerLocale(
     drawer: { ...base?.drawer, ...override?.drawer },
     upload: { ...base?.upload, ...override?.upload },
     pagination: { ...base?.pagination, ...override?.pagination },
-    formWizard: { ...base?.formWizard, ...override?.formWizard }
+    formWizard: { ...base?.formWizard, ...override?.formWizard },
+    taskBoard: { ...base?.taskBoard, ...override?.taskBoard }
   }
 }
 
@@ -136,4 +142,32 @@ export function formatPaginationTotal(
  */
 export function formatPageAriaLabel(template: string, page: number): string {
   return template.replace('{page}', String(page))
+}
+
+// ============================================================================
+// TaskBoard Labels
+// ============================================================================
+
+export const DEFAULT_TASK_BOARD_LABELS: Required<TigerLocaleTaskBoard> = {
+  emptyColumnText: 'No tasks',
+  addCardText: 'Add task',
+  wipLimitText: 'WIP limit: {limit}',
+  dragHintText: 'Drag to move'
+}
+
+export const ZH_CN_TASK_BOARD_LABELS: Required<TigerLocaleTaskBoard> = {
+  emptyColumnText: '暂无任务',
+  addCardText: '添加任务',
+  wipLimitText: 'WIP 限制: {limit}',
+  dragHintText: '拖拽以移动'
+}
+
+export function getTaskBoardLabels(locale?: Partial<TigerLocale>): Required<TigerLocaleTaskBoard> {
+  return {
+    emptyColumnText:
+      locale?.taskBoard?.emptyColumnText ?? DEFAULT_TASK_BOARD_LABELS.emptyColumnText,
+    addCardText: locale?.taskBoard?.addCardText ?? DEFAULT_TASK_BOARD_LABELS.addCardText,
+    wipLimitText: locale?.taskBoard?.wipLimitText ?? DEFAULT_TASK_BOARD_LABELS.wipLimitText,
+    dragHintText: locale?.taskBoard?.dragHintText ?? DEFAULT_TASK_BOARD_LABELS.dragHintText
+  }
 }

@@ -411,3 +411,42 @@ function handleCrop(result) {
 }
 ;<CropUpload disabled />
 ```
+
+## TaskBoard 任务看板
+
+```tsx
+import { useState } from 'react'
+import { TaskBoard } from '@expcat/tigercat-react'
+import type { TaskBoardColumn, TaskBoardCardMoveEvent } from '@expcat/tigercat-core'
+
+const [columns, setColumns] = useState<TaskBoardColumn[]>([
+  {
+    id: 'todo',
+    title: '待办',
+    cards: [
+      { id: 1, title: '需求评审', description: '与产品经理对齐 Q2 需求' },
+      { id: 2, title: '技术方案' }
+    ]
+  },
+  { id: 'doing', title: '进行中', wipLimit: 3, cards: [] },
+  { id: 'done', title: '已完成', cards: [] }
+])
+
+// 基本用法（受控）
+;<TaskBoard
+  columns={columns}
+  onCardMove={(e) => console.log('card moved', e)}
+  onColumnMove={(e) => console.log('column moved', e)}
+/>
+
+// 自定义卡片
+;<TaskBoard columns={columns} renderCard={(card) => <div>{card.title}</div>} />
+
+// 新增卡片按钮
+;<TaskBoard
+  columns={columns}
+  onCardAdd={(colId) => {
+    /* add logic */
+  }}
+/>
+```

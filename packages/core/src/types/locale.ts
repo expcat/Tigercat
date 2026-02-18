@@ -71,6 +71,17 @@ export interface TigerLocaleFormWizard {
   finishText?: string
 }
 
+export interface TigerLocaleTaskBoard {
+  /** Placeholder shown inside an empty column */
+  emptyColumnText?: string
+  /** Label for the add-card button */
+  addCardText?: string
+  /** Template: supports {limit} */
+  wipLimitText?: string
+  /** Aria hint for draggable items */
+  dragHintText?: string
+}
+
 export interface TigerLocale {
   common?: TigerLocaleCommon
   modal?: TigerLocaleModal
@@ -78,4 +89,5 @@ export interface TigerLocale {
   upload?: TigerLocaleUpload
   pagination?: TigerLocalePagination
   formWizard?: TigerLocaleFormWizard
+  taskBoard?: TigerLocaleTaskBoard
 }

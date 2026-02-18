@@ -229,7 +229,7 @@ This document tracks the testing progress for all React components in the Tigerc
   - **Test Categories**: ✅ All categories covered
   - **Quality**: ⭐⭐⭐⭐⭐ Excellent
 
-### Other Components (5 total, 5 tested) ✅ COMPLETE
+### Other Components (6 total, 6 tested) ✅ COMPLETE
 
 - [x] Code - ✅ Completed (4 tests)
   - **Test File**: `tests/react/Code.spec.tsx`
@@ -254,6 +254,11 @@ This document tracks the testing progress for all React components in the Tigerc
 - [x] Collapse - ✅ Completed (23 tests)
   - **Test File**: `tests/react/Collapse.spec.tsx`
   - **Test Count**: 23
+  - **Test Categories**: ✅ All categories covered
+  - **Quality**: ⭐⭐⭐⭐ Good
+- [x] TaskBoard - ✅ Completed (25 tests)
+  - **Test File**: `tests/react/TaskBoard.spec.tsx`
+  - **Test Count**: 25
   - **Test Categories**: ✅ All categories covered
   - **Quality**: ⭐⭐⭐⭐ Good
 

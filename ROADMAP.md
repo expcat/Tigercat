@@ -110,6 +110,7 @@
 | 表格工具栏 | DataTableWithToolbar | 搜索/筛选/批量操作       | ✅  | ✅    | ✅   | ✅   |
 | 活动动态流 | ActivityFeed         | 动态/审计时间线          | ✅  | ✅    | ✅   | ✅   |
 | 裁剪上传   | CropUpload           | 图片选择 + 裁剪 + 输出   | ✅  | ✅    | ✅   | ✅   |
+| 任务看板   | TaskBoard            | 拖拽看板 + 列管理        | ✅  | ✅    | ✅   | ✅   |
 
 ### 数据可视化组件 (Chart Components)
 
