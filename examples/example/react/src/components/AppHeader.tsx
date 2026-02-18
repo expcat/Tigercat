@@ -9,6 +9,7 @@ export interface AppHeaderProps {
   lang: DemoLang
   onLangChange: (lang: DemoLang) => void
   isSiderCollapsed: boolean
+  isMobile: boolean
   onToggleSider: () => void
   rightHint?: string
 }
@@ -17,17 +18,27 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   lang,
   onLangChange,
   isSiderCollapsed,
+  isMobile,
   onToggleSider,
   rightHint
 }) => {
-  const siderLabel =
-    lang === 'zh-CN'
+  const siderLabel = isMobile
+    ? lang === 'zh-CN'
+      ? isSiderCollapsed
+        ? '打开菜单'
+        : '关闭菜单'
+      : isSiderCollapsed
+        ? 'Open menu'
+        : 'Close menu'
+    : lang === 'zh-CN'
       ? isSiderCollapsed
         ? '展开侧边栏'
         : '收起侧边栏'
       : isSiderCollapsed
         ? 'Expand sidebar'
         : 'Collapse sidebar'
+
+  const siderIcon = isMobile ? (isSiderCollapsed ? '☰' : '✕') : isSiderCollapsed ? '»' : '«'
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 h-14 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">
@@ -40,7 +51,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             onClick={onToggleSider}
             aria-label={siderLabel}
             className="size-8 p-0 border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900">
-            <span className="text-sm leading-none">{isSiderCollapsed ? '»' : '«'}</span>
+            <span className="text-sm leading-none">{siderIcon}</span>
           </Button>
           <Link
             to="/"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, provide, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, provide, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { DemoLang } from '@demo-shared/app-config'
 import { getDemoTigerLocale } from '@demo-shared/tiger-locale'
@@ -33,6 +33,20 @@ const isSiderCollapsed = ref<boolean>(getStoredSiderCollapsed())
 
 provide('demo-lang', lang)
 
+const isMobile = ref(false)
+let mqlCleanup: (() => void) | null = null
+
+function setupMobileDetection() {
+  const mql = window.matchMedia('(max-width: 767px)')
+  const handler = (e: MediaQueryListEvent | MediaQueryList) => {
+    isMobile.value = e.matches
+    if (e.matches) isSiderCollapsed.value = true
+  }
+  handler(mql)
+  mql.addEventListener('change', handler as (e: MediaQueryListEvent) => void)
+  mqlCleanup = () => mql.removeEventListener('change', handler as (e: MediaQueryListEvent) => void)
+}
+
 const isHome = computed(() => route.path === '/')
 
 const tigerLocale = computed(() => getDemoTigerLocale(lang.value))
@@ -51,6 +65,10 @@ const handleLangChange = (v: DemoLang) => {
 
 const toggleSider = () => {
   isSiderCollapsed.value = !isSiderCollapsed.value
+}
+
+const closeSider = () => {
+  isSiderCollapsed.value = true
 }
 
 const getMainContainer = () => mainScrollRef.value || window
@@ -74,7 +92,7 @@ watch(
 watch(
   () => isSiderCollapsed.value,
   (v) => {
-    setStoredSiderCollapsed(v)
+    if (!isMobile.value) setStoredSiderCollapsed(v)
   },
   { immediate: true }
 )
@@ -118,12 +136,19 @@ async function collectSections() {
 }
 
 onMounted(() => {
+  setupMobileDetection()
   collectSections()
+})
+
+onUnmounted(() => {
+  mqlCleanup?.()
 })
 
 watch(
   () => route.path,
   () => {
+    if (mainScrollRef.value) mainScrollRef.value.scrollTop = 0
+    if (isMobile.value) isSiderCollapsed.value = true
     collectSections()
   }
 )
@@ -134,13 +159,16 @@ watch(
     <div class="h-screen overflow-hidden box-border bg-gray-50 dark:bg-gray-950 pt-14">
       <AppHeader :lang="lang"
                  :is-sider-collapsed="isSiderCollapsed"
+                 :is-mobile="isMobile"
                  right-hint="Vue 3"
                  @update:lang="handleLangChange"
                  @toggle-sider="toggleSider" />
 
       <div class="flex h-full">
         <AppSider :lang="lang"
-                  :is-sider-collapsed="isSiderCollapsed" />
+                  :is-sider-collapsed="isSiderCollapsed"
+                  :is-mobile="isMobile"
+                  @close="closeSider" />
 
         <main class="flex-1 min-w-0 h-full overflow-hidden">
           <div ref="mainScrollRef"

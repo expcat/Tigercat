@@ -44,21 +44,39 @@ export const AppLayout: React.FC = () => {
   const [pageTitle, setPageTitle] = useState('')
   const [lang, setLang] = useState<DemoLang>(() => getStoredLang())
   const [isSiderCollapsed, setIsSiderCollapsed] = useState<boolean>(() => getStoredSiderCollapsed())
+  const [isMobile, setIsMobile] = useState(false)
 
   const isHome = location.pathname === '/'
+
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 767px)')
+    const handler = (e: MediaQueryListEvent | MediaQueryList) => {
+      setIsMobile(e.matches)
+      if (e.matches) setIsSiderCollapsed(true)
+    }
+    handler(mql)
+    mql.addEventListener('change', handler as (e: MediaQueryListEvent) => void)
+    return () => mql.removeEventListener('change', handler as (e: MediaQueryListEvent) => void)
+  }, [])
 
   useEffect(() => {
     setStoredLang(lang)
   }, [lang])
 
   useEffect(() => {
-    setStoredSiderCollapsed(isSiderCollapsed)
-  }, [isSiderCollapsed])
+    if (!isMobile) setStoredSiderCollapsed(isSiderCollapsed)
+  }, [isSiderCollapsed, isMobile])
 
   useEffect(() => {
     const storedTheme = getStoredTheme()
     applyTheme(storedTheme)
   }, [])
+
+  // Scroll to top & auto-close sider on route change
+  useEffect(() => {
+    if (scrollContainerRef.current) scrollContainerRef.current.scrollTop = 0
+    if (isMobile) setIsSiderCollapsed(true)
+  }, [location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const root = pageRootRef.current
@@ -123,11 +141,17 @@ export const AppLayout: React.FC = () => {
             onLangChange={setLang}
             rightHint="React"
             isSiderCollapsed={isSiderCollapsed}
+            isMobile={isMobile}
             onToggleSider={() => setIsSiderCollapsed((prev) => !prev)}
           />
 
           <div className="flex h-full">
-            <AppSider lang={lang} isSiderCollapsed={isSiderCollapsed} />
+            <AppSider
+              lang={lang}
+              isSiderCollapsed={isSiderCollapsed}
+              isMobile={isMobile}
+              onClose={() => setIsSiderCollapsed(true)}
+            />
 
             <main className="flex-1 min-w-0 h-full overflow-hidden">
               <div ref={scrollContainerRef} className="h-full overflow-y-auto overflow-x-hidden">

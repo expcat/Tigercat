@@ -55,3 +55,19 @@ h2[data-demo-anchor='true'] {
   width: 0;
   height: 0;
 }
+
+/* Mobile sider overlay animations */
+@keyframes demo-sider-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes demo-sider-slide-in {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+.demo-sider-overlay-enter {
+  animation: demo-sider-fade-in 0.3s ease;
+}
+.demo-sider-slide-enter {
+  animation: demo-sider-slide-in 0.3s ease;
+}

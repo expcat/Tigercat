@@ -5,7 +5,7 @@ import { Button } from '@expcat/tigercat-vue'
 import ThemeSwitch from './ThemeSwitch.vue'
 import LanguageSwitch from './LanguageSwitch.vue'
 
-const props = defineProps<{ lang: DemoLang; isSiderCollapsed: boolean; rightHint?: string }>()
+const props = defineProps<{ lang: DemoLang; isSiderCollapsed: boolean; isMobile: boolean; rightHint?: string }>()
 const emit = defineEmits<{
   (e: 'update:lang', v: DemoLang): void
   (e: 'toggle-sider'): void
@@ -13,8 +13,17 @@ const emit = defineEmits<{
 
 const title = computed(() => DEMO_APP_TITLE[props.lang])
 const siderLabel = computed(() => {
+  if (props.isMobile) {
+    if (props.lang === 'zh-CN') return props.isSiderCollapsed ? '打开菜单' : '关闭菜单'
+    return props.isSiderCollapsed ? 'Open menu' : 'Close menu'
+  }
   if (props.lang === 'zh-CN') return props.isSiderCollapsed ? '展开侧边栏' : '收起侧边栏'
   return props.isSiderCollapsed ? 'Expand sidebar' : 'Collapse sidebar'
+})
+
+const siderIcon = computed(() => {
+  if (props.isMobile) return props.isSiderCollapsed ? '☰' : '✕'
+  return props.isSiderCollapsed ? '»' : '«'
 })
 
 const handleLangChange = (v: DemoLang) => {
@@ -33,7 +42,7 @@ const handleLangChange = (v: DemoLang) => {
                 :aria-label="siderLabel"
                 class="size-8 p-0 border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900"
                 @click="emit('toggle-sider')">
-          <span class="text-sm leading-none">{{ props.isSiderCollapsed ? '»' : '«' }}</span>
+          <span class="text-sm leading-none">{{ siderIcon }}</span>
         </Button>
         <router-link to="/"
                      :aria-label="title"
