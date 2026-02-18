@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useLocation } from 'react-router-dom'
-import { Collapse, CollapsePanel } from '@expcat/tigercat-react'
-import { DEMO_NAV_GROUPS, type DemoLang } from '@demo-shared/app-config'
+import { Collapse, CollapsePanel, Button } from '@expcat/tigercat-react'
+import { DEMO_NAV_GROUPS, DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
 import { getStoredCollapsedNavGroups, setStoredCollapsedNavGroups } from '@demo-shared/prefs'
 
 export interface AppSiderProps {
@@ -159,12 +159,30 @@ export const AppSider: React.FC<AppSiderProps> = ({
   if (isMobile) {
     if (isSiderCollapsed) return null
     return createPortal(
-      <div className="fixed inset-0 z-40 demo-sider-overlay-enter">
+      <div className="fixed inset-0 z-50 demo-sider-overlay-enter">
         {/* Backdrop */}
         <div className="absolute inset-0 bg-black/30" onClick={onClose} />
         {/* Sidebar panel */}
-        <aside className="absolute left-0 top-14 bottom-0 w-56 bg-white border-r border-gray-200 dark:bg-gray-950 dark:border-gray-800 shadow-xl overflow-hidden demo-sider-slide-enter">
-          {renderMenuContent(false)}
+        <aside className="absolute left-0 top-0 bottom-0 w-56 bg-white border-r border-gray-200 dark:bg-gray-950 dark:border-gray-800 shadow-xl overflow-hidden flex flex-col demo-sider-slide-enter">
+          {/* Panel header with close button */}
+          <div className="shrink-0 h-14 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-800">
+            <Link
+              to="/"
+              onClick={onClose}
+              className="text-base font-semibold text-gray-900 truncate dark:text-gray-100">
+              {DEMO_APP_TITLE[lang]}
+            </Link>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onClose}
+              aria-label={lang === 'zh-CN' ? '关闭菜单' : 'Close menu'}
+              className="size-8 p-0 border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900">
+              <span className="text-sm leading-none">✕</span>
+            </Button>
+          </div>
+          <div className="flex-1 min-h-0">{renderMenuContent(false)}</div>
         </aside>
       </div>,
       document.body

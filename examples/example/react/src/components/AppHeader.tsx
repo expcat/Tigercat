@@ -24,12 +24,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 }) => {
   const siderLabel = isMobile
     ? lang === 'zh-CN'
-      ? isSiderCollapsed
-        ? '打开菜单'
-        : '关闭菜单'
-      : isSiderCollapsed
-        ? 'Open menu'
-        : 'Close menu'
+      ? '打开菜单'
+      : 'Open menu'
     : lang === 'zh-CN'
       ? isSiderCollapsed
         ? '展开侧边栏'
@@ -38,7 +34,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         ? 'Expand sidebar'
         : 'Collapse sidebar'
 
-  const siderIcon = isMobile ? (isSiderCollapsed ? '☰' : '✕') : isSiderCollapsed ? '»' : '«'
+  const siderIcon = isMobile ? '☰' : isSiderCollapsed ? '»' : '«'
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 h-14 border-b border-gray-200 bg-white/90 backdrop-blur dark:border-gray-800 dark:bg-gray-950/80">

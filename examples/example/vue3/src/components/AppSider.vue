@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { DEMO_NAV_GROUPS, type DemoLang } from '@demo-shared/app-config'
-import { Collapse, CollapsePanel } from '@expcat/tigercat-vue'
+import { DEMO_NAV_GROUPS, DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
+import { Button, Collapse, CollapsePanel } from '@expcat/tigercat-vue'
 import {
   getStoredCollapsedNavGroups,
   setStoredCollapsedNavGroups
@@ -54,14 +54,30 @@ watch(
   <Teleport to="body" v-if="props.isMobile">
     <Transition name="sider-overlay">
       <div v-if="!props.isSiderCollapsed"
-           class="fixed inset-0 z-40"
+           class="fixed inset-0 z-50"
            @keydown.escape="emit('close')">
         <!-- Backdrop -->
         <div class="absolute inset-0 bg-black/30 transition-opacity"
              @click="emit('close')" />
         <!-- Sidebar panel -->
-        <aside class="absolute left-0 top-14 bottom-0 w-56 bg-white border-r border-gray-200 dark:bg-gray-950 dark:border-gray-800 shadow-xl overflow-hidden">
-          <div class="h-full overflow-y-auto overflow-x-hidden demo-scrollbar py-4 px-3">
+        <aside class="absolute left-0 top-0 bottom-0 w-56 bg-white border-r border-gray-200 dark:bg-gray-950 dark:border-gray-800 shadow-xl overflow-hidden flex flex-col">
+          <!-- Panel header with close button -->
+          <div class="shrink-0 h-14 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-800">
+            <router-link to="/"
+                         class="text-base font-semibold text-gray-900 truncate dark:text-gray-100"
+                         @click="emit('close')">
+              {{ DEMO_APP_TITLE[props.lang] }}
+            </router-link>
+            <Button type="button"
+                    variant="outline"
+                    size="sm"
+                    :aria-label="props.lang === 'zh-CN' ? '关闭菜单' : 'Close menu'"
+                    class="size-8 p-0 border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-200 dark:hover:bg-gray-900"
+                    @click="emit('close')">
+              <span class="text-sm leading-none">✕</span>
+            </Button>
+          </div>
+          <div class="flex-1 min-h-0 overflow-y-auto overflow-x-hidden demo-scrollbar py-4 px-3">
             <div class="mt-4">
               <Collapse :bordered="false"
                         ghost

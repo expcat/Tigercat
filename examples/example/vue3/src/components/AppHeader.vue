@@ -14,15 +14,15 @@ const emit = defineEmits<{
 const title = computed(() => DEMO_APP_TITLE[props.lang])
 const siderLabel = computed(() => {
   if (props.isMobile) {
-    if (props.lang === 'zh-CN') return props.isSiderCollapsed ? '打开菜单' : '关闭菜单'
-    return props.isSiderCollapsed ? 'Open menu' : 'Close menu'
+    if (props.lang === 'zh-CN') return '打开菜单'
+    return 'Open menu'
   }
   if (props.lang === 'zh-CN') return props.isSiderCollapsed ? '展开侧边栏' : '收起侧边栏'
   return props.isSiderCollapsed ? 'Expand sidebar' : 'Collapse sidebar'
 })
 
 const siderIcon = computed(() => {
-  if (props.isMobile) return props.isSiderCollapsed ? '☰' : '✕'
+  if (props.isMobile) return '☰'
   return props.isSiderCollapsed ? '»' : '«'
 })
 
