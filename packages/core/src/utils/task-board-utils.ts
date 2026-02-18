@@ -119,15 +119,25 @@ export interface TaskBoardDragState {
 // ============================================================================
 
 /**
+ * Options for `moveCard()`.
+ */
+export interface MoveCardOptions {
+  /** When `true`, reject a cross-column move if the destination column has reached its `wipLimit`. */
+  enforceWipLimit?: boolean
+}
+
+/**
  * Move a card from one column to another (or reorder within the same column).
  * Returns a **new** columns array — the original is not mutated.
+ * Returns `null` when the move is a no-op or rejected by WIP enforcement.
  */
 export function moveCard(
   columns: TaskBoardColumn[],
   cardId: string | number,
   fromColumnId: string | number,
   toColumnId: string | number,
-  toIndex: number
+  toIndex: number,
+  options?: MoveCardOptions
 ): { columns: TaskBoardColumn[]; event: TaskBoardCardMoveEvent } | null {
   const srcColIdx = columns.findIndex((c) => c.id === fromColumnId)
   const dstColIdx = columns.findIndex((c) => c.id === toColumnId)
@@ -160,8 +170,19 @@ export function moveCard(
   }
 
   // Cross-column transfer
-  const newSrcCards = srcCol.cards.filter((c) => c.id !== cardId)
   const dstCol = columns[dstColIdx]
+
+  // WIP enforcement — reject if destination column is at or above its limit
+  if (
+    options?.enforceWipLimit &&
+    dstCol.wipLimit != null &&
+    dstCol.wipLimit > 0 &&
+    dstCol.cards.length >= dstCol.wipLimit
+  ) {
+    return null
+  }
+
+  const newSrcCards = srcCol.cards.filter((c) => c.id !== cardId)
   const newDstCards = [...dstCol.cards]
   newDstCards.splice(clampedTo, 0, card)
 

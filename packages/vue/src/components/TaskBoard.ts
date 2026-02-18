@@ -31,7 +31,10 @@ import {
   findColumnFromPoint,
   type TaskBoardColumn,
   type TaskBoardCard,
+  type TaskBoardCardMoveEvent,
+  type TaskBoardColumnMoveEvent,
   type TaskBoardDragState,
+  type TaskBoardMoveValidator,
   type TigerLocale,
   type TouchDragTracker
 } from '@expcat/tigercat-core'
@@ -42,6 +45,9 @@ export interface VueTaskBoardProps {
   defaultColumns?: TaskBoardColumn[]
   draggable?: boolean
   columnDraggable?: boolean
+  enforceWipLimit?: boolean
+  beforeCardMove?: TaskBoardMoveValidator<TaskBoardCardMoveEvent>
+  beforeColumnMove?: TaskBoardMoveValidator<TaskBoardColumnMoveEvent>
   onCardAdd?: (columnId: string | number) => void
   locale?: Partial<TigerLocale>
   className?: string
@@ -67,6 +73,18 @@ export const TaskBoard = defineComponent({
     columnDraggable: {
       type: Boolean,
       default: true
+    },
+    enforceWipLimit: {
+      type: Boolean,
+      default: false
+    },
+    beforeCardMove: {
+      type: Function as PropType<TaskBoardMoveValidator<TaskBoardCardMoveEvent>>,
+      default: undefined
+    },
+    beforeColumnMove: {
+      type: Function as PropType<TaskBoardMoveValidator<TaskBoardColumnMoveEvent>>,
+      default: undefined
     },
     onCardAdd: {
       type: Function as PropType<(columnId: string | number) => void>,
@@ -131,6 +149,48 @@ export const TaskBoard = defineComponent({
     const isTouchDevice = () =>
       typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0)
 
+    // ===================================================================
+    // Unified apply helpers — validation + WIP + commit
+    // ===================================================================
+
+    const applyCardMove = async (
+      cardId: string | number,
+      fromColumnId: string | number,
+      toColumnId: string | number,
+      toIdx: number
+    ) => {
+      const result = moveCard(currentColumns.value, cardId, fromColumnId, toColumnId, toIdx, {
+        enforceWipLimit: props.enforceWipLimit
+      })
+      if (!result) return
+
+      // beforeCardMove gate
+      if (props.beforeCardMove) {
+        const ok = await props.beforeCardMove(result.event)
+        if (!ok) return
+      }
+
+      updateColumns(result.columns)
+      emit('card-move', result.event)
+    }
+
+    const applyColumnMove = async (fromIdx: number, toIdx: number) => {
+      const result = reorderColumns(
+        currentColumns.value,
+        fromIdx,
+        Math.min(toIdx, currentColumns.value.length - 1)
+      )
+      if (!result) return
+
+      if (props.beforeColumnMove) {
+        const ok = await props.beforeColumnMove(result.event)
+        if (!ok) return
+      }
+
+      updateColumns(result.columns)
+      emit('column-move', result.event)
+    }
+
     // ----- HTML5 DnD: cards -----
     const handleCardDragStart = (e: DragEvent, card: TaskBoardCard, column: TaskBoardColumn) => {
       if (!props.draggable || !e.dataTransfer) return
@@ -157,19 +217,12 @@ export const TaskBoard = defineComponent({
       const data = parseDragData(e.dataTransfer)
       if (!data || data.type !== 'card') return
 
-      const result = moveCard(
-        currentColumns.value,
+      applyCardMove(
         data.cardId,
         data.columnId,
         column.id,
         dropIndex.value >= 0 ? dropIndex.value : column.cards.length
       )
-
-      if (result) {
-        updateColumns(result.columns)
-        emit('card-move', result.event)
-      }
-
       resetDragState()
     }
 
@@ -197,16 +250,7 @@ export const TaskBoard = defineComponent({
       colEls.forEach((el) => rects.push(el.getBoundingClientRect()))
       const toIdx = getColumnDropIndex(e.clientX, rects)
 
-      const result = reorderColumns(
-        currentColumns.value,
-        data.index,
-        Math.min(toIdx, currentColumns.value.length - 1)
-      )
-      if (result) {
-        updateColumns(result.columns)
-        emit('column-move', result.event)
-      }
-
+      applyColumnMove(data.index, toIdx)
       resetDragState()
     }
 
@@ -230,7 +274,7 @@ export const TaskBoard = defineComponent({
       dropIndex.value = -1
     }
 
-    // ----- Touch fallback -----
+    // ----- Touch fallback: cards -----
     const setupTouch = () => {
       if (!isTouchDevice()) return
       touchTracker = createTouchDragTracker()
@@ -250,15 +294,17 @@ export const TaskBoard = defineComponent({
       cancelAnimationFrame(touchRaf)
       touchRaf = requestAnimationFrame(() => {
         const st = touchTracker!.getState()
-        const colEl = findColumnFromPoint(st.currentX, st.currentY, boardRef.value)
-        if (colEl) {
-          const colId = colEl.getAttribute('data-tiger-taskboard-column-id')
-          dropTargetColumnId.value = colId ?? null
+        if (dragState.value?.type === 'card') {
+          const colEl = findColumnFromPoint(st.currentX, st.currentY, boardRef.value)
+          if (colEl) {
+            const colId = colEl.getAttribute('data-tiger-taskboard-column-id')
+            dropTargetColumnId.value = colId ?? null
 
-          const cardEls = colEl.querySelectorAll('[data-tiger-taskboard-card]')
-          const rects: DOMRect[] = []
-          cardEls.forEach((el) => rects.push(el.getBoundingClientRect()))
-          dropIndex.value = getDropIndex(st.currentY, rects)
+            const cardEls = colEl.querySelectorAll('[data-tiger-taskboard-card]')
+            const rects: DOMRect[] = []
+            cardEls.forEach((el) => rects.push(el.getBoundingClientRect()))
+            dropIndex.value = getDropIndex(st.currentY, rects)
+          }
         }
       })
     }
@@ -268,18 +314,42 @@ export const TaskBoard = defineComponent({
       touchTracker.onTouchEnd()
 
       if (dragState.value.type === 'card' && dropTargetColumnId.value != null) {
-        const result = moveCard(
-          currentColumns.value,
+        applyCardMove(
           dragState.value.id,
           dragState.value.fromColumnId!,
           dropTargetColumnId.value,
           dropIndex.value >= 0 ? dropIndex.value : 0
         )
-        if (result) {
-          updateColumns(result.columns)
-          emit('card-move', result.event)
-        }
       }
+      resetDragState()
+    }
+
+    // ----- Touch fallback: columns -----
+    const handleColumnTouchStart = (e: TouchEvent, column: TaskBoardColumn, index: number) => {
+      if (!props.columnDraggable || !touchTracker) return
+      touchTracker.onTouchStart(e, e.currentTarget as HTMLElement)
+      dragState.value = { type: 'column', id: column.id, fromIndex: index }
+    }
+
+    const handleColumnTouchMove = (e: TouchEvent) => {
+      if (!touchTracker || !dragState.value || dragState.value.type !== 'column') return
+      touchTracker.onTouchMove(e)
+    }
+
+    const handleColumnTouchEnd = () => {
+      if (!touchTracker || !dragState.value || dragState.value.type !== 'column') return
+      const st = touchTracker.onTouchEnd()
+
+      const colEls = boardRef.value?.querySelectorAll('[data-tiger-taskboard-column]')
+      if (!colEls) {
+        resetDragState()
+        return
+      }
+      const rects: DOMRect[] = []
+      colEls.forEach((el) => rects.push(el.getBoundingClientRect()))
+      const toIdx = getColumnDropIndex(st.currentX, rects)
+
+      applyColumnMove(dragState.value.fromIndex, Math.min(toIdx, currentColumns.value.length - 1))
       resetDragState()
     }
 
@@ -297,20 +367,9 @@ export const TaskBoard = defineComponent({
           kbDragState.value = { type: 'card', id: card.id, fromColumnId: column.id, fromIndex: idx }
         } else {
           // drop
-          const colIdx = currentColumns.value.findIndex((c) => c.id === column.id)
           const cardIdx = column.cards.findIndex((c) => c.id === card.id)
-          if (colIdx !== -1 && kbDragState.value.fromColumnId !== undefined) {
-            const result = moveCard(
-              currentColumns.value,
-              kbDragState.value.id,
-              kbDragState.value.fromColumnId,
-              column.id,
-              cardIdx
-            )
-            if (result) {
-              updateColumns(result.columns)
-              emit('card-move', result.event)
-            }
+          if (kbDragState.value.fromColumnId !== undefined) {
+            applyCardMove(kbDragState.value.id, kbDragState.value.fromColumnId, column.id, cardIdx)
           }
           kbDragState.value = null
         }
@@ -409,7 +468,12 @@ export const TaskBoard = defineComponent({
               column.wipLimit != null
                 ? h(
                     'span',
-                    { class: 'ml-2 text-xs font-normal opacity-70' },
+                    {
+                      class: 'ml-2 text-xs font-normal opacity-70',
+                      title: resolveLocaleText(
+                        labels.value.wipLimitText.replace('{limit}', String(column.wipLimit))
+                      )
+                    },
                     `(${column.cards.length}/${column.wipLimit})`
                   )
                 : h(
@@ -437,6 +501,9 @@ export const TaskBoard = defineComponent({
           draggable: props.columnDraggable,
           onDragstart: (e: DragEvent) => handleColumnDragStart(e, column, colIndex),
           onDragend: handleDragEnd,
+          onTouchstart: (e: TouchEvent) => handleColumnTouchStart(e, column, colIndex),
+          onTouchmove: handleColumnTouchMove,
+          onTouchend: handleColumnTouchEnd,
           style: props.columnDraggable ? 'cursor: grab' : undefined
         },
         headerContent
@@ -484,7 +551,7 @@ export const TaskBoard = defineComponent({
         cards
       )
 
-      // Footer (add card or custom)
+      // Footer — only emit, no direct prop call
       const footer = slots['column-footer']
         ? slots['column-footer']({ column })
         : props.onCardAdd
@@ -496,7 +563,6 @@ export const TaskBoard = defineComponent({
                   taskBoardAddCardClasses
                 ),
                 onClick: () => {
-                  props.onCardAdd?.(column.id)
                   emit('card-add', column.id)
                 }
               },
@@ -528,7 +594,7 @@ export const TaskBoard = defineComponent({
           class: wrapperClasses.value,
           style: wrapperStyle.value,
           role: 'region',
-          'aria-label': 'Task Board',
+          'aria-label': resolveLocaleText(labels.value.boardAriaLabel),
           'data-tiger-task-board': ''
         },
         currentColumns.value.map((col, i) => renderColumnNode(col, i))

@@ -152,14 +152,16 @@ export const DEFAULT_TASK_BOARD_LABELS: Required<TigerLocaleTaskBoard> = {
   emptyColumnText: 'No tasks',
   addCardText: 'Add task',
   wipLimitText: 'WIP limit: {limit}',
-  dragHintText: 'Drag to move'
+  dragHintText: 'Drag to move',
+  boardAriaLabel: 'Task Board'
 }
 
 export const ZH_CN_TASK_BOARD_LABELS: Required<TigerLocaleTaskBoard> = {
   emptyColumnText: '暂无任务',
   addCardText: '添加任务',
   wipLimitText: 'WIP 限制: {limit}',
-  dragHintText: '拖拽以移动'
+  dragHintText: '拖拽以移动',
+  boardAriaLabel: '任务看板'
 }
 
 export function getTaskBoardLabels(locale?: Partial<TigerLocale>): Required<TigerLocaleTaskBoard> {
@@ -168,6 +170,7 @@ export function getTaskBoardLabels(locale?: Partial<TigerLocale>): Required<Tige
       locale?.taskBoard?.emptyColumnText ?? DEFAULT_TASK_BOARD_LABELS.emptyColumnText,
     addCardText: locale?.taskBoard?.addCardText ?? DEFAULT_TASK_BOARD_LABELS.addCardText,
     wipLimitText: locale?.taskBoard?.wipLimitText ?? DEFAULT_TASK_BOARD_LABELS.wipLimitText,
-    dragHintText: locale?.taskBoard?.dragHintText ?? DEFAULT_TASK_BOARD_LABELS.dragHintText
+    dragHintText: locale?.taskBoard?.dragHintText ?? DEFAULT_TASK_BOARD_LABELS.dragHintText,
+    boardAriaLabel: locale?.taskBoard?.boardAriaLabel ?? DEFAULT_TASK_BOARD_LABELS.boardAriaLabel
   }
 }

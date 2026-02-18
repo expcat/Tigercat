@@ -280,4 +280,68 @@ describe('TaskBoard (React)', () => {
       expect((container.firstElementChild as HTMLElement).style.maxWidth).toBe('800px')
     })
   })
+
+  describe('boardAriaLabel locale', () => {
+    it('uses boardAriaLabel from locale', () => {
+      render(<TaskBoard columns={columns} />)
+      const region = screen.getByRole('region')
+      expect(region.getAttribute('aria-label')).toBe('Task Board')
+    })
+
+    it('uses custom boardAriaLabel from locale prop', () => {
+      render(
+        <TaskBoard columns={columns} locale={{ taskBoard: { boardAriaLabel: 'My Kanban' } }} />
+      )
+      const region = screen.getByRole('region')
+      expect(region.getAttribute('aria-label')).toBe('My Kanban')
+    })
+  })
+
+  describe('WIP Limit tooltip', () => {
+    it('shows wipLimitText as title on WIP counter', () => {
+      const wipCols: TaskBoardColumn[] = [
+        {
+          id: 'wip',
+          title: 'WIP Col',
+          wipLimit: 3,
+          cards: [{ id: 'w1', title: 'W1' }]
+        }
+      ]
+      const { container } = render(<TaskBoard columns={wipCols} />)
+      const wipSpan = container.querySelector('[title]')
+      expect(wipSpan).toBeInTheDocument()
+      expect(wipSpan!.getAttribute('title')).toContain('3')
+    })
+  })
+
+  describe('enforceWipLimit prop', () => {
+    it('accepts enforceWipLimit prop without error', () => {
+      const wipCols: TaskBoardColumn[] = [
+        {
+          id: 'wip',
+          title: 'WIP',
+          wipLimit: 1,
+          cards: [{ id: 'w1', title: 'W1' }]
+        }
+      ]
+      const { container } = render(<TaskBoard columns={wipCols} enforceWipLimit />)
+      expect(container.querySelector('[data-tiger-task-board]')).toBeInTheDocument()
+    })
+  })
+
+  describe('beforeCardMove / beforeColumnMove props', () => {
+    it('accepts beforeCardMove prop without error', () => {
+      const beforeCardMove = vi.fn(() => true)
+      const { container } = render(<TaskBoard columns={columns} beforeCardMove={beforeCardMove} />)
+      expect(container.querySelector('[data-tiger-task-board]')).toBeInTheDocument()
+    })
+
+    it('accepts beforeColumnMove prop without error', () => {
+      const beforeColumnMove = vi.fn(() => true)
+      const { container } = render(
+        <TaskBoard columns={columns} beforeColumnMove={beforeColumnMove} />
+      )
+      expect(container.querySelector('[data-tiger-task-board]')).toBeInTheDocument()
+    })
+  })
 })

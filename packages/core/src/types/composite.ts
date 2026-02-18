@@ -1160,6 +1160,12 @@ export interface TaskBoardColumnMoveEvent {
 }
 
 /**
+ * Validation callback for task board move operations.
+ * Return `false` (sync) or resolve to `false` (async) to cancel the move.
+ */
+export type TaskBoardMoveValidator<E> = (event: E) => boolean | Promise<boolean>
+
+/**
  * TaskBoard (Kanban) component props.
  */
 export interface TaskBoardProps {
@@ -1183,6 +1189,22 @@ export interface TaskBoardProps {
    * @default true
    */
   columnDraggable?: boolean
+  /**
+   * Enforce WIP limit — when `true`, cards cannot be dropped into a
+   * column that has already reached its `wipLimit`.
+   * @default false
+   */
+  enforceWipLimit?: boolean
+  /**
+   * Async / sync validation before a card move is committed.
+   * Return `false` to cancel the move (the card snaps back).
+   */
+  beforeCardMove?: TaskBoardMoveValidator<TaskBoardCardMoveEvent>
+  /**
+   * Async / sync validation before a column reorder is committed.
+   * Return `false` to cancel the reorder.
+   */
+  beforeColumnMove?: TaskBoardMoveValidator<TaskBoardColumnMoveEvent>
   /**
    * Callback fired after a card is moved.
    */

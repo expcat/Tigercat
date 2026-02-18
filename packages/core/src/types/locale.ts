@@ -80,6 +80,8 @@ export interface TigerLocaleTaskBoard {
   wipLimitText?: string
   /** Aria hint for draggable items */
   dragHintText?: string
+  /** Aria label for the board root region */
+  boardAriaLabel?: string
 }
 
 export interface TigerLocale {

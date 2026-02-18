@@ -503,24 +503,37 @@ description: Shared props definitions for composite components - ChatWindow / Ac
 
 ### TaskBoardProps
 
-| Prop            | Type                   | Default | Vue | React | Description    |
-| --------------- | ---------------------- | ------- | --- | ----- | -------------- |
-| columns         | `TaskBoardColumn[]`    | -       | ✓   | ✓     | 受控列数据     |
-| defaultColumns  | `TaskBoardColumn[]`    | `[]`    | ✓   | ✓     | 非受控初始值   |
-| draggable       | `boolean`              | `true`  | ✓   | ✓     | 星用卡片拖拽   |
-| columnDraggable | `boolean`              | `true`  | ✓   | ✓     | 启用列拖拽排序 |
-| locale          | `Partial<TigerLocale>` | -       | ✓   | ✓     | i18n 覆盖      |
-| className       | `string`               | -       | ✓   | ✓     | 自定义类名     |
-| style           | `Record / CSSProp`     | -       | ✓   | ✓     | 自定义样式     |
+| Prop             | Type                   | Default | Vue | React | Description                     |
+| ---------------- | ---------------------- | ------- | --- | ----- | ------------------------------- |
+| columns          | `TaskBoardColumn[]`    | -       | ✓   | ✓     | 受控列数据                      |
+| defaultColumns   | `TaskBoardColumn[]`    | `[]`    | ✓   | ✓     | 非受控初始值                    |
+| draggable        | `boolean`              | `true`  | ✓   | ✓     | 启用卡片拖拽                    |
+| columnDraggable  | `boolean`              | `true`  | ✓   | ✓     | 启用列拖拽排序                  |
+| enforceWipLimit  | `boolean`              | `false` | ✓   | ✓     | 严格阻止超 WIP 的跨列移入       |
+| beforeCardMove   | `(e) => bool\|Promise` | -       | ✓   | ✓     | 卡片移动前验证，返回 false 取消 |
+| beforeColumnMove | `(e) => bool\|Promise` | -       | ✓   | ✓     | 列移动前验证，返回 false 取消   |
+| locale           | `Partial<TigerLocale>` | -       | ✓   | ✓     | i18n 覆盖                       |
+| className        | `string`               | -       | ✓   | ✓     | 自定义类名                      |
+| style            | `Record / CSSProp`     | -       | ✓   | ✓     | 自定义样式                      |
 
 ### Events
 
-| Vue Event         | React Callback | Payload                    | Description  |
-| ----------------- | -------------- | -------------------------- | ------------ |
-| `@card-move`      | `onCardMove`   | `TaskBoardCardMoveEvent`   | 卡片移动后   |
-| `@column-move`    | `onColumnMove` | `TaskBoardColumnMoveEvent` | 列移动后     |
-| `@card-add`       | `onCardAdd`    | `columnId`                 | 点击新增卡片 |
-| `@update:columns` | -              | `TaskBoardColumn[]`        | v-model 同步 |
+| Vue Event         | React Callback    | Payload                    | Description  |
+| ----------------- | ----------------- | -------------------------- | ------------ |
+| `@card-move`      | `onCardMove`      | `TaskBoardCardMoveEvent`   | 卡片移动后   |
+| `@column-move`    | `onColumnMove`    | `TaskBoardColumnMoveEvent` | 列移动后     |
+| `@card-add`       | `onCardAdd`       | `columnId`                 | 点击新增卡片 |
+| `@update:columns` | `onColumnsChange` | `TaskBoardColumn[]`        | 列数据同步   |
+
+### Locale 字段 (`locale.taskBoard`)
+
+| Key             | Default (EN)         | Default (ZH)        | Description               |
+| --------------- | -------------------- | ------------------- | ------------------------- |
+| boardAriaLabel  | `Task Board`         | `任务看板`          | 根元素 aria-label         |
+| emptyColumnText | `No tasks`           | `暂无任务`          | 空列提示                  |
+| addCardText     | `Add task`           | `添加任务`          | 新增按钮文案              |
+| dragHintText    | `Draggable`          | `可拖拽`            | 卡片 aria-roledescription |
+| wipLimitText    | `WIP limit: {limit}` | `WIP 上限：{limit}` | WIP 计数 tooltip          |
 
 ### Slots / Render Props
 

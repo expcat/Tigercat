@@ -137,6 +137,83 @@ describe('moveCard', () => {
     moveCard(cols, 'c1', 'todo', 'doing', 0)
     expect(cols).toEqual(original)
   })
+
+  describe('WIP enforcement (options.enforceWipLimit)', () => {
+    function makeWipCols(): TaskBoardColumn[] {
+      return [
+        {
+          id: 'todo',
+          title: 'To Do',
+          cards: [
+            { id: 'c1', title: 'Card 1' },
+            { id: 'c2', title: 'Card 2' }
+          ]
+        },
+        {
+          id: 'doing',
+          title: 'In Progress',
+          wipLimit: 2,
+          cards: [
+            { id: 'c3', title: 'Card 3' },
+            { id: 'c4', title: 'Card 4' }
+          ]
+        },
+        {
+          id: 'done',
+          title: 'Done',
+          wipLimit: 5,
+          cards: []
+        }
+      ]
+    }
+
+    it('returns null when destination column is at WIP limit', () => {
+      const cols = makeWipCols()
+      const result = moveCard(cols, 'c1', 'todo', 'doing', 0, { enforceWipLimit: true })
+      expect(result).toBeNull()
+    })
+
+    it('allows move when enforceWipLimit is false (default)', () => {
+      const cols = makeWipCols()
+      const result = moveCard(cols, 'c1', 'todo', 'doing', 0)
+      expect(result).not.toBeNull()
+    })
+
+    it('allows move when destination has room', () => {
+      const cols = makeWipCols()
+      const result = moveCard(cols, 'c1', 'todo', 'done', 0, { enforceWipLimit: true })
+      expect(result).not.toBeNull()
+      expect(result!.columns[2].cards).toHaveLength(1)
+    })
+
+    it('allows move when destination has no wipLimit', () => {
+      const cols = makeWipCols()
+      // 'todo' has no wipLimit
+      const result = moveCard(cols, 'c3', 'doing', 'todo', 0, { enforceWipLimit: true })
+      expect(result).not.toBeNull()
+    })
+
+    it('allows reorder within same column even at WIP limit', () => {
+      const cols = makeWipCols()
+      // 'doing' is at limit 2/2, but reorder within same column should work
+      const result = moveCard(cols, 'c3', 'doing', 'doing', 1, { enforceWipLimit: true })
+      expect(result).not.toBeNull()
+    })
+
+    it('allows move when wipLimit is 0 (disabled)', () => {
+      const cols: TaskBoardColumn[] = [
+        { id: 'a', title: 'A', cards: [{ id: 'c1', title: 'C1' }] },
+        {
+          id: 'b',
+          title: 'B',
+          wipLimit: 0,
+          cards: [{ id: 'c2', title: 'C2' }]
+        }
+      ]
+      const result = moveCard(cols, 'c1', 'a', 'b', 0, { enforceWipLimit: true })
+      expect(result).not.toBeNull()
+    })
+  })
 })
 
 // ---------------------------------------------------------------------------

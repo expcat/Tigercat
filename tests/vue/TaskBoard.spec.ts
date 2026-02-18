@@ -207,5 +207,51 @@ describe('TaskBoard (Vue)', () => {
         expect(card.getAttribute('tabindex')).toBe('0')
       })
     })
+
+    it('uses boardAriaLabel from locale', () => {
+      render(TaskBoard, { props: { columns } })
+      const region = screen.getByRole('region')
+      expect(region.getAttribute('aria-label')).toBe('Task Board')
+    })
+
+    it('uses custom boardAriaLabel from locale prop', () => {
+      render(TaskBoard, {
+        props: {
+          columns,
+          locale: { taskBoard: { boardAriaLabel: 'My Board' } }
+        }
+      })
+      const region = screen.getByRole('region')
+      expect(region.getAttribute('aria-label')).toBe('My Board')
+    })
+  })
+
+  describe('WIP Limit tooltip', () => {
+    it('shows wipLimitText as title on WIP counter', () => {
+      const wipCols: TaskBoardColumn[] = [
+        {
+          id: 'wip',
+          title: 'WIP Col',
+          wipLimit: 3,
+          cards: [{ id: 'w1', title: 'W1' }]
+        }
+      ]
+      const { container } = render(TaskBoard, { props: { columns: wipCols } })
+      const wipSpan = container.querySelector('[title]')
+      expect(wipSpan).toBeInTheDocument()
+      expect(wipSpan!.getAttribute('title')).toContain('3')
+    })
+  })
+
+  describe('Add card emit-only', () => {
+    it('only emits card-add, does not call onCardAdd prop directly', async () => {
+      const onCardAdd = vi.fn()
+      const { emitted } = render(TaskBoard, { props: { columns, onCardAdd } })
+      const addBtns = screen.getAllByText('Add task')
+      await fireEvent.click(addBtns[0])
+      // The emit should fire
+      expect(emitted()['card-add']).toBeTruthy()
+      expect(emitted()['card-add'][0]).toEqual(['todo'])
+    })
   })
 })
