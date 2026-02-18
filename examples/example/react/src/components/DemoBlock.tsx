@@ -6,6 +6,7 @@ interface DemoBlockProps {
   description?: string
   code: string
   children: React.ReactNode
+  className?: string
 }
 
 const panelBaseClasses =
@@ -15,11 +16,12 @@ const codePanelClasses = `p-4 ${panelBaseClasses}`
 const exampleBoxClasses =
   'rounded-md border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900'
 
-const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, children }) => {
+const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, children, className }) => {
   const [activeKey, setActiveKey] = useState('preview')
+  const sectionClasses = className ? `mb-12 ${className}` : 'mb-12'
 
   return (
-    <section className="mb-12">
+    <section className={sectionClasses}>
       <div className="mb-4">
         <h2 className="text-2xl font-bold mb-2">{title}</h2>
         {description ? <p className="text-gray-600">{description}</p> : null}
