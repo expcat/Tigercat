@@ -134,12 +134,12 @@ watch(
   <!-- Desktop mode -->
   <aside v-else
          :class="[
-    'shrink-0 border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950',
+    'shrink-0 overflow-hidden border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950',
     'transition-[width] duration-300 ease-in-out',
     props.isSiderCollapsed ? 'w-20' : 'w-56'
   ]">
     <div :class="[
-      'sticky top-0 h-full overflow-y-auto overflow-x-hidden demo-scrollbar py-4',
+      'h-full overflow-y-auto overflow-x-hidden demo-scrollbar py-4',
       'transition-[padding] duration-300 ease-in-out',
       props.isSiderCollapsed ? 'px-2' : 'px-3'
     ]">

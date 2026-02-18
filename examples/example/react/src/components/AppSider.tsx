@@ -77,7 +77,7 @@ export const AppSider: React.FC<AppSiderProps> = ({
   const renderMenuContent = (collapsed: boolean) => (
     <div
       className={cn(
-        'sticky top-0 h-full overflow-y-auto overflow-x-hidden demo-scrollbar py-4',
+        'h-full overflow-y-auto overflow-x-hidden demo-scrollbar py-4',
         'transition-[padding] duration-300 ease-in-out',
         collapsed ? 'px-2' : 'px-3'
       )}>
@@ -193,7 +193,7 @@ export const AppSider: React.FC<AppSiderProps> = ({
   return (
     <aside
       className={cn(
-        'shrink-0 border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950',
+        'shrink-0 overflow-hidden border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950',
         'transition-[width] duration-300 ease-in-out',
         isSiderCollapsed ? 'w-20' : 'w-56'
       )}>
