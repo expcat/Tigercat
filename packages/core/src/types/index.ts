@@ -13,6 +13,7 @@
 // Form components
 export * from './button'
 export * from './input'
+export * from './input-number'
 export * from './textarea'
 export * from './select'
 export * from './checkbox'

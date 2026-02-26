@@ -11,7 +11,13 @@ const basicSnippet = `<Menu selectedKeys={selectedKeys1} onSelect={(key) => setS
 
 const horizontalSnippet = `<Menu mode="horizontal" selectedKeys={selectedKeys2} onSelect={(key) => setSelectedKeys2([key])}>
   <MenuItem itemKey="home">首页</MenuItem>
-  <MenuItem itemKey="products">产品</MenuItem>
+  <SubMenu itemKey="products" title="产品">
+    <MenuItem itemKey="product-a">产品 A</MenuItem>
+    <SubMenu itemKey="product-b" title="产品 B">
+      <MenuItem itemKey="product-b1">产品 B-1</MenuItem>
+      <MenuItem itemKey="product-b2">产品 B-2</MenuItem>
+    </SubMenu>
+  </SubMenu>
   <MenuItem itemKey="about">关于</MenuItem>
   <MenuItem itemKey="contact">联系我们</MenuItem>
 </Menu>`
@@ -161,7 +167,10 @@ const MenuDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 横向菜单 */}
-      <DemoBlock title="横向菜单" description="水平导航菜单。" code={horizontalSnippet}>
+      <DemoBlock
+        title="横向菜单"
+        description="水平导航菜单，支持多级嵌套级联展开。"
+        code={horizontalSnippet}>
         <div className="bg-gray-50 p-6 rounded-lg">
           <div className="bg-white">
             <Menu
@@ -169,7 +178,13 @@ const MenuDemo: React.FC = () => {
               selectedKeys={selectedKeys2}
               onSelect={(key) => setSelectedKeys2([key])}>
               <MenuItem itemKey="home">首页</MenuItem>
-              <MenuItem itemKey="products">产品</MenuItem>
+              <SubMenu itemKey="products" title="产品">
+                <MenuItem itemKey="product-a">产品 A</MenuItem>
+                <SubMenu itemKey="product-b" title="产品 B">
+                  <MenuItem itemKey="product-b1">产品 B-1</MenuItem>
+                  <MenuItem itemKey="product-b2">产品 B-2</MenuItem>
+                </SubMenu>
+              </SubMenu>
               <MenuItem itemKey="about">关于</MenuItem>
               <MenuItem itemKey="contact">联系我们</MenuItem>
             </Menu>

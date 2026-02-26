@@ -180,6 +180,45 @@ const columns = [
 </script>
 ```
 
+### 可展开行
+
+```vue
+<script setup>
+import { ref, h } from 'vue'
+const data = ref([
+  { id: 1, name: '项目 A', status: 'active', detail: '项目 A 的详细描述信息' },
+  { id: 2, name: '项目 B', status: 'inactive', detail: '项目 B 的详细描述信息' }
+])
+const columns = [
+  { key: 'name', title: '名称' },
+  { key: 'status', title: '状态' }
+]
+const expandedKeys = ref([])
+</script>
+
+<template>
+  <!-- 基础可展开 -->
+  <Table
+    :columns="columns"
+    :data-source="data"
+    :expandable="{
+      expandedRowRender: (record) => h('p', record.detail)
+    }" />
+
+  <!-- 受控展开 + 过滤可展开行 -->
+  <Table
+    :columns="columns"
+    :data-source="data"
+    :expandable="{
+      expandedRowKeys: expandedKeys,
+      expandedRowRender: (record) => h('p', record.detail),
+      rowExpandable: (record) => record.status === 'active',
+      expandIconPosition: 'end'
+    }"
+    @expanded-rows-change="(keys) => (expandedKeys = keys)" />
+</template>
+```
+
 ---
 
 ## Timeline 时间轴

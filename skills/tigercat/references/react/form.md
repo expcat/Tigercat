@@ -163,6 +163,49 @@ const [value, setValue] = useState('')
 
 ---
 
+## InputNumber 数字输入框
+
+```tsx
+const [count, setCount] = useState(0)
+
+{/* 基础 */}
+<InputNumber value={count} onChange={setCount} />
+
+{/* 非受控 */}
+<InputNumber defaultValue={10} />
+
+{/* 范围限制 */}
+<InputNumber value={count} onChange={setCount} min={0} max={100} step={5} />
+
+{/* 精度 */}
+<InputNumber value={count} onChange={setCount} precision={2} step={0.1} />
+
+{/* 尺寸 */}
+<InputNumber value={count} onChange={setCount} size="sm" />
+<InputNumber value={count} onChange={setCount} size="lg" />
+
+{/* 两侧按钮 */}
+<InputNumber value={count} onChange={setCount} controlsPosition="both" />
+
+{/* 隐藏步进按钮 */}
+<InputNumber value={count} onChange={setCount} controls={false} />
+
+{/* 格式化（千分位） */}
+<InputNumber
+  value={count}
+  onChange={setCount}
+  formatter={(v) => `$ ${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+  parser={(v) => Number(v.replace(/\$\s?|(,*)/g, ''))}
+/>
+
+{/* 状态 */}
+<InputNumber value={count} disabled />
+<InputNumber value={count} readonly />
+<InputNumber value={count} onChange={setCount} status="error" />
+```
+
+---
+
 ## Textarea 文本域
 
 ```tsx

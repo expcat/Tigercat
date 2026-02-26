@@ -90,6 +90,19 @@ const layoutSnippet = `<Table
   tableLayout="fixed"
   :pagination="false" />`
 
+const expandableSnippet = `<Table
+  :columns="basicColumns"
+  :dataSource="basicData"
+  :expandable="{
+    expandedRowKeys: expandedKeys,
+    expandedRowRender: (record) => h('div', { class: 'p-4 text-gray-600' },
+      \`详细信息：\${record.name}，年龄 \${record.age}，邮箱 \${record.email}，地址 \${record.address}\`
+    ),
+    rowExpandable: (record) => record.status === 'active'
+  }"
+  :pagination="false"
+  @expanded-rows-change="(keys) => (expandedKeys = keys)" />`
+
 const basicData = ref<UserData[]>([
   {
     id: 1,
@@ -282,6 +295,9 @@ const lockableColumns: TableColumn[] = [
 
 // Row selection
 const selectedRowKeys = ref<number[]>([])
+
+// Expandable rows
+const expandedKeys = ref<(string | number)[]>([])
 
 // Controlled pagination
 const pagination = ref({
@@ -506,6 +522,26 @@ const pagedData = computed(() => {
              :dataSource="basicData"
              tableLayout="fixed"
              :pagination="false" />
+    </DemoBlock>
+
+    <!-- 可展开行 -->
+    <DemoBlock title="可展开行"
+               description="通过 expandable 配置展开行内容，支持受控展开和行级禁用。仅 status=active 的行可展开。"
+               :code="expandableSnippet">
+      <Table :columns="basicColumns"
+             :dataSource="basicData"
+             :expandable="{
+               expandedRowKeys: expandedKeys,
+               expandedRowRender: (record: Record<string, unknown>) => {
+                 const r = record as UserData
+                 return h('div', { class: 'p-4 text-gray-600' },
+                   `详细信息：${r.name}，年龄 ${r.age}，邮箱 ${r.email}，地址 ${r.address}`
+                 )
+               },
+               rowExpandable: (record: Record<string, unknown>) => (record as UserData).status === 'active'
+             }"
+             :pagination="false"
+             @expanded-rows-change="(keys: (string | number)[]) => (expandedKeys = keys)" />
     </DemoBlock>
   </div>
 </template>

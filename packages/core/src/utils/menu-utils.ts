@@ -89,10 +89,16 @@ export const submenuExpandIconClasses = 'ml-2 transition-transform duration-200'
 export const submenuExpandIconExpandedClasses = 'transform rotate-180'
 
 /**
- * Submenu content classes - horizontal mode
+ * Submenu content classes - horizontal mode (top-level, drops below)
  */
 export const submenuContentHorizontalClasses =
   'absolute left-0 top-full mt-0 min-w-[160px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg z-50'
+
+/**
+ * Submenu content classes - horizontal mode nested (level >= 1, cascades right)
+ */
+export const submenuContentHorizontalNestedClasses =
+  'absolute left-full top-0 ml-0 min-w-[160px] bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#111827)] border border-[var(--tiger-border,#e5e7eb)] rounded shadow-lg z-50'
 
 /**
  * Submenu content classes - collapsed vertical mode (popup)
@@ -125,6 +131,14 @@ export const menuCollapsedClasses = 'min-w-[64px]'
  * Menu collapsed item classes
  */
 export const menuCollapsedItemClasses = 'justify-center px-2'
+
+/**
+ * Get z-index style for nested submenu popups.
+ * Each deeper level gets a higher z-index to stack correctly.
+ */
+export function getSubmenuPopupZIndex(level: number): Record<string, number> {
+  return { zIndex: 50 + level * 10 }
+}
 
 /**
  * Get menu classes based on mode and theme
@@ -253,12 +267,19 @@ export function replaceKeys(key: string | number, keys: (string | number)[]): (s
 // ============================================================================
 
 /**
- * Query all enabled, visible menu-item buttons within a menu container.
+ * Query all enabled, visible menu-item buttons that are **direct children**
+ * of the given menu container (i.e. not inside a nested sub-menu `<ul>`).
  */
 export function getMenuButtons(container: HTMLElement): HTMLButtonElement[] {
   return Array.from(
     container.querySelectorAll<HTMLButtonElement>('button[data-tiger-menuitem="true"]')
-  ).filter((el) => !el.disabled && !el.closest('[data-tiger-menu-hidden="true"]'))
+  ).filter((el) => {
+    if (el.disabled || el.closest('[data-tiger-menu-hidden="true"]')) return false
+    // Ensure the button's nearest menu ancestor is `container` itself,
+    // not some nested <ul role="menu">.
+    const nearest = el.closest('ul[role="menu"]')
+    return nearest === container
+  })
 }
 
 /**

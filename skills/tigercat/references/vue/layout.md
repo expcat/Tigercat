@@ -174,8 +174,102 @@ const collapsed = ref(false)
     </div>
     <Footer>Footer</Footer>
   </Layout>
+
+  <!-- Mini 模式侧边栏（折叠后保留 64px 宽） -->
+  <Layout>
+    <Header>Header</Header>
+    <div class="flex flex-1">
+      <Sidebar width="256px" collapsed-width="64px" :collapsed="collapsed">
+        <Menu mode="inline" :collapsed="collapsed" :items="menuItems" />
+      </Sidebar>
+      <Content>Main</Content>
+    </div>
+  </Layout>
 </template>
 ```
+
+### Admin 后台布局（组合示例）
+
+使用 `Layout` + `Sidebar` + `Menu` 组合搭建典型后台管理页面。不需要额外的 AdminLayout 组件。
+
+```vue
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { Layout, Header, Sidebar, Content, Footer, Menu, Button } from '@expcat/tigercat-vue'
+import type { MenuItem } from '@expcat/tigercat-core'
+
+const collapsed = ref(false)
+
+const menuItems: MenuItem[] = [
+  { key: 'dashboard', label: '仪表盘', icon: '📊' },
+  {
+    key: 'users',
+    label: '用户管理',
+    icon: '👥',
+    children: [
+      { key: 'user-list', label: '用户列表' },
+      { key: 'user-roles', label: '角色权限' }
+    ]
+  },
+  {
+    key: 'settings',
+    label: '系统设置',
+    icon: '⚙️',
+    children: [
+      { key: 'general', label: '通用设置' },
+      {
+        key: 'advanced',
+        label: '高级设置',
+        children: [
+          { key: 'cache', label: '缓存管理' },
+          { key: 'logs', label: '日志查看' }
+        ]
+      }
+    ]
+  }
+]
+
+const activeKey = ref('dashboard')
+</script>
+
+<template>
+  <Layout class="h-screen">
+    <!-- 顶部导航 -->
+    <Header class="flex items-center justify-between px-4">
+      <div class="flex items-center gap-3">
+        <Button size="sm" variant="ghost" @click="collapsed = !collapsed"> ☰ </Button>
+        <span class="text-lg font-bold">Admin</span>
+      </div>
+      <div>用户头像</div>
+    </Header>
+
+    <div class="flex flex-1 overflow-hidden">
+      <!-- 侧边栏（支持 mini 模式折叠） -->
+      <Sidebar width="256px" collapsed-width="64px" :collapsed="collapsed" class="overflow-y-auto">
+        <Menu
+          mode="inline"
+          :collapsed="collapsed"
+          :items="menuItems"
+          :selected-keys="[activeKey]"
+          @select="(key) => (activeKey = key)" />
+      </Sidebar>
+
+      <!-- 主内容区 -->
+      <Content class="overflow-y-auto p-6">
+        <router-view />
+      </Content>
+    </div>
+
+    <Footer class="text-center text-sm text-gray-500"> © 2025 My App </Footer>
+  </Layout>
+</template>
+```
+
+**要点：**
+
+- `Sidebar` 的 `collapsed-width="64px"` 实现 mini 模式，折叠后仍显示图标
+- `Menu` 的 `:collapsed="collapsed"` 同步折叠状态，inline 模式自动切换为 popup
+- 支持 3+ 层嵌套子菜单（如 设置 → 高级设置 → 缓存管理）
 
 ---
 

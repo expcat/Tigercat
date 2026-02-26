@@ -4,6 +4,7 @@ import { Container, Layout, Header, Sidebar, Content, Footer } from '@expcat/tig
 import DemoBlock from '../components/DemoBlock.vue'
 
 const collapsed = ref(false)
+const miniCollapsed = ref(true)
 
 const containerSnippet = `<Container maxWidth="lg">
   <div>这里是 Container 内容区域</div>
@@ -33,10 +34,21 @@ const sidebarSnippet = `<Layout>
 const collapsedSnippet = `<Layout>
   <Header>Header</Header>
   <div class="flex flex-1">
-    <Sidebar width="192px" :collapsed="collapsed">Sidebar</Sidebar>
+    <Sidebar width="192px" collapsed-width="64px" :collapsed="collapsed">Sidebar</Sidebar>
     <Content>Content</Content>
   </div>
   <Footer>Footer</Footer>
+</Layout>`
+
+const miniSnippet = `<Layout>
+  <Header>Header</Header>
+  <div class="flex flex-1">
+    <Sidebar width="192px" collapsed-width="48px" :collapsed="mini">
+      <div v-if="mini" class="text-center">☰</div>
+      <div v-else>Full Sidebar</div>
+    </Sidebar>
+    <Content>Content</Content>
+  </div>
 </Layout>`
 
 const complexSnippet = `<Layout>
@@ -115,7 +127,7 @@ const complexSnippet = `<Layout>
     </DemoBlock>
 
     <DemoBlock title="Sidebar 折叠"
-               description="可折叠的侧边栏，点击按钮切换。"
+               description="可折叠的侧边栏，通过 collapsed-width 设置折叠后的宽度（默认 64px）。"
                :code="collapsedSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <button class="mb-4 px-3 py-1 rounded bg-blue-500 text-white text-sm"
@@ -126,11 +138,41 @@ const complexSnippet = `<Layout>
           <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
           <div class="flex flex-1">
             <Sidebar width="192px"
+                     collapsed-width="64px"
                      :collapsed="collapsed"
                      class-name="!bg-gray-200 !p-4">Sidebar</Sidebar>
             <Content class-name="!bg-white !p-4 min-h-[200px]">Content</Content>
           </div>
           <Footer class-name="!bg-gray-800 !text-white !p-4">Footer</Footer>
+        </Layout>
+      </div>
+    </DemoBlock>
+
+    <DemoBlock title="Mini 模式侧边栏"
+               description="collapsed-width 设为更小的值（如 48px）实现 mini 模式，折叠时仅显示图标。"
+               :code="miniSnippet">
+      <div class="p-6 bg-gray-50 rounded-lg">
+        <button class="mb-4 px-3 py-1 rounded bg-blue-500 text-white text-sm"
+                @click="miniCollapsed = !miniCollapsed">
+          {{ miniCollapsed ? '展开' : '折叠为 Mini' }}
+        </button>
+        <Layout class-name="border border-gray-300 overflow-hidden min-h-[260px]">
+          <Header class-name="!bg-blue-600 !text-white !p-4">Header</Header>
+          <div class="flex flex-1">
+            <Sidebar width="192px"
+                     collapsed-width="48px"
+                     :collapsed="miniCollapsed"
+                     class-name="!bg-gray-200 !p-4">
+              <div v-if="miniCollapsed" class="text-center text-xl">☰</div>
+              <div v-else>
+                <div class="font-medium mb-2">导航菜单</div>
+                <div class="text-sm text-gray-600">菜单项 1</div>
+                <div class="text-sm text-gray-600">菜单项 2</div>
+                <div class="text-sm text-gray-600">菜单项 3</div>
+              </div>
+            </Sidebar>
+            <Content class-name="!bg-white !p-4 min-h-[200px]">Content</Content>
+          </div>
         </Layout>
       </div>
     </DemoBlock>

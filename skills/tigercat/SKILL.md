@@ -66,7 +66,7 @@ import { Button, Input } from '@expcat/tigercat-react'
 
 **Basic**: Alert, Avatar, Badge, Button, Code, Divider, Icon, Link, Tag, Text
 
-**Form**: Checkbox, DatePicker, Form, Input, Radio, Select, Slider, Switch, Textarea, TimePicker, Upload
+**Form**: Checkbox, DatePicker, Form, Input, InputNumber, Radio, Select, Slider, Switch, Textarea, TimePicker, Upload
 
 **Feedback**: Drawer, Loading, Message, Modal, Notification, Popconfirm, Popover, Progress, Tooltip
 

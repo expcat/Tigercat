@@ -258,6 +258,39 @@ export interface RowSelectionConfig<T = Record<string, unknown>> {
 }
 
 /**
+ * Table row expansion configuration
+ */
+export interface ExpandableConfig<T = Record<string, unknown>> {
+  /**
+   * Currently expanded row keys (controlled mode).
+   */
+  expandedRowKeys?: (string | number)[]
+
+  /**
+   * Default expanded row keys (uncontrolled mode).
+   */
+  defaultExpandedRowKeys?: (string | number)[]
+
+  /**
+   * Render function for the expanded content.
+   * Must return framework-appropriate nodes (VNode / ReactNode).
+   */
+  expandedRowRender: (record: T, index: number) => unknown
+
+  /**
+   * Determines whether a given row is expandable.
+   * Defaults to `() => true`.
+   */
+  rowExpandable?: (record: T) => boolean
+
+  /**
+   * Position of the expand toggle column.
+   * @default 'start'
+   */
+  expandIconPosition?: 'start' | 'end'
+}
+
+/**
  * Base table props interface
  */
 export interface TableProps<T = Record<string, unknown>> {
@@ -347,6 +380,12 @@ export interface TableProps<T = Record<string, unknown>> {
    * Row selection configuration
    */
   rowSelection?: RowSelectionConfig<T>
+
+  /**
+   * Row expansion configuration.
+   * Adds an expand toggle column and renders expanded content below each row.
+   */
+  expandable?: ExpandableConfig<T>
 
   /**
    * Function to get row key

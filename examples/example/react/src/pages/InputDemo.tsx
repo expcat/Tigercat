@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Input, Space, FormItem, Button } from '@expcat/tigercat-react'
+import { Input, InputNumber, Space, FormItem, Button } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 import type { InputStatus } from '@expcat/tigercat-core'
 
@@ -84,6 +84,35 @@ const shakeSnippet = `<Space direction="vertical" className="w-full max-w-md">
   </Space>
 </Space>`
 
+const inputNumberSnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <FormItem label="基础">
+    <InputNumber value={numValue} onChange={setNumValue} />
+  </FormItem>
+  <FormItem label="范围 (0~100, step=5)">
+    <InputNumber value={numValue} onChange={setNumValue} min={0} max={100} step={5} />
+  </FormItem>
+  <FormItem label="精度 (2位小数)">
+    <InputNumber value={numValue} onChange={setNumValue} precision={2} step={0.1} />
+  </FormItem>
+</Space>`
+
+const inputNumberControlsSnippet = `<Space direction="vertical" className="w-full max-w-md">
+  <FormItem label="右侧按钮（默认）">
+    <InputNumber value={numValue} onChange={setNumValue} />
+  </FormItem>
+  <FormItem label="两侧按钮">
+    <InputNumber value={numValue} onChange={setNumValue} controlsPosition="both" />
+  </FormItem>
+  <FormItem label="千分位格式化">
+    <InputNumber
+      value={numFormatted}
+      onChange={setNumFormatted}
+      formatter={(v) => \`$ \${v}\`.replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',')}
+      parser={(v) => Number(v.replace(/\\$\\s?|(,*)/g, ''))}
+    />
+  </FormItem>
+</Space>`
+
 const InputDemo: React.FC = () => {
   const [basicText, setBasicText] = useState('')
   const [controlledText, setControlledText] = useState('')
@@ -93,6 +122,10 @@ const InputDemo: React.FC = () => {
   const [limited, setLimited] = useState('')
   const [disabled] = useState('禁用的输入框')
   const [readonly] = useState('只读的输入框')
+
+  // InputNumber states
+  const [numValue, setNumValue] = useState<number | null>(0)
+  const [numFormatted, setNumFormatted] = useState<number | null>(1000)
 
   // Shake demo state
   const [shakeStatus, setShakeStatus] = useState<InputStatus>('default')
@@ -278,6 +311,64 @@ const InputDemo: React.FC = () => {
             </Button>
             <Button onClick={resetShake}>重置</Button>
           </Space>
+        </Space>
+      </DemoBlock>
+
+      {/* 数字输入框 InputNumber */}
+      <DemoBlock
+        title="数字输入框 InputNumber"
+        description="专用的数字输入组件，支持范围限制、精度、多种尺寸和状态。"
+        code={inputNumberSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <FormItem label="基础">
+            <InputNumber value={numValue} onChange={setNumValue} />
+          </FormItem>
+          <FormItem label="范围 (0~100, step=5)">
+            <InputNumber value={numValue} onChange={setNumValue} min={0} max={100} step={5} />
+          </FormItem>
+          <FormItem label="精度 (2位小数)">
+            <InputNumber value={numValue} onChange={setNumValue} precision={2} step={0.1} />
+          </FormItem>
+          <FormItem label="尺寸">
+            <Space>
+              <InputNumber value={numValue} onChange={setNumValue} size="sm" />
+              <InputNumber value={numValue} onChange={setNumValue} size="md" />
+              <InputNumber value={numValue} onChange={setNumValue} size="lg" />
+            </Space>
+          </FormItem>
+          <FormItem label="禁用 / 只读 / 错误">
+            <Space>
+              <InputNumber value={5} disabled />
+              <InputNumber value={5} readonly />
+              <InputNumber value={numValue} onChange={setNumValue} status="error" />
+            </Space>
+          </FormItem>
+        </Space>
+      </DemoBlock>
+
+      {/* 步进按钮与格式化 */}
+      <DemoBlock
+        title="步进按钮与格式化"
+        description="InputNumber 支持不同按钮布局和自定义格式化。"
+        code={inputNumberControlsSnippet}>
+        <Space direction="vertical" className="w-full max-w-md">
+          <FormItem label="右侧按钮（默认）">
+            <InputNumber value={numValue} onChange={setNumValue} />
+          </FormItem>
+          <FormItem label="两侧按钮">
+            <InputNumber value={numValue} onChange={setNumValue} controlsPosition="both" />
+          </FormItem>
+          <FormItem label="隐藏按钮">
+            <InputNumber value={numValue} onChange={setNumValue} controls={false} />
+          </FormItem>
+          <FormItem label="千分位格式化">
+            <InputNumber
+              value={numFormatted}
+              onChange={setNumFormatted}
+              formatter={(v) => `$ ${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={(v) => Number(v.replace(/\$\s?|(,*)/g, ''))}
+            />
+          </FormItem>
         </Space>
       </DemoBlock>
     </div>

@@ -24,19 +24,20 @@
 
 ### 表单组件 (Form Components)
 
-| 组件       | Component  | Vue | React | 文档 | 测试 |
-| ---------- | ---------- | --- | ----- | ---- | ---- |
-| 表单       | Form       | ✅  | ✅    | ✅   | ✅   |
-| 输入框     | Input      | ✅  | ✅    | ✅   | ✅   |
-| 文本域     | Textarea   | ✅  | ✅    | ✅   | ✅   |
-| 单选框     | Radio      | ✅  | ✅    | ✅   | ✅   |
-| 复选框     | Checkbox   | ✅  | ✅    | ✅   | ✅   |
-| 选择器     | Select     | ✅  | ✅    | ✅   | ✅   |
-| 开关       | Switch     | ✅  | ✅    | ✅   | ✅   |
-| 滑块       | Slider     | ✅  | ✅    | ✅   | ✅   |
-| 日期选择器 | DatePicker | ✅  | ✅    | ✅   | ✅   |
-| 时间选择器 | TimePicker | ✅  | ✅    | ✅   | ✅   |
-| 上传       | Upload     | ✅  | ✅    | ✅   | ✅   |
+| 组件       | Component   | Vue | React | 文档 | 测试 |
+| ---------- | ----------- | --- | ----- | ---- | ---- |
+| 表单       | Form        | ✅  | ✅    | ✅   | ✅   |
+| 输入框     | Input       | ✅  | ✅    | ✅   | ✅   |
+| 数字输入框 | InputNumber | ✅  | ✅    | ✅   | ✅   |
+| 文本域     | Textarea    | ✅  | ✅    | ✅   | ✅   |
+| 单选框     | Radio       | ✅  | ✅    | ✅   | ✅   |
+| 复选框     | Checkbox    | ✅  | ✅    | ✅   | ✅   |
+| 选择器     | Select      | ✅  | ✅    | ✅   | ✅   |
+| 开关       | Switch      | ✅  | ✅    | ✅   | ✅   |
+| 滑块       | Slider      | ✅  | ✅    | ✅   | ✅   |
+| 日期选择器 | DatePicker  | ✅  | ✅    | ✅   | ✅   |
+| 时间选择器 | TimePicker  | ✅  | ✅    | ✅   | ✅   |
+| 上传       | Upload      | ✅  | ✅    | ✅   | ✅   |
 
 ### 数据展示组件 (Data Display Components)
 

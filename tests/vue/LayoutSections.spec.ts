@@ -66,8 +66,8 @@ describe('Layout Sections', () => {
     expect(screen.getByText('Sidebar')).toBeInTheDocument()
 
     await rerender({ collapsed: true, width: '300px' })
-    expect(aside?.style.width).toBe('0px')
-    expect(screen.queryByText('Sidebar')).toBeNull()
+    expect(aside?.style.width).toBe('64px')
+    expect(screen.getByText('Sidebar')).toBeInTheDocument()
   })
 
   it('Content renders semantic main', () => {

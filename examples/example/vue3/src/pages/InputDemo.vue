@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Input, Space, FormItem, Button } from '@expcat/tigercat-vue'
+import { Input, InputNumber, Space, FormItem, Button } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 import type { InputStatus } from '@expcat/tigercat-core'
 
@@ -12,6 +12,10 @@ const disabled = ref('禁用的输入框')
 const readonly = ref('只读的输入框')
 const limited = ref('')
 const uncontrolled = ref('')
+
+// InputNumber states
+const numValue = ref(0)
+const numFormatted = ref(1000)
 
 // Shake Demo Logic
 const shakeStatus = ref<InputStatus>('default')
@@ -119,6 +123,50 @@ const shakeSnippet = `<Space direction="vertical" class="w-full max-w-md">
     <Button @click="triggerShake" variant="primary">触发错误</Button>
     <Button @click="resetShake">重置</Button>
   </Space>
+</Space>`
+
+const inputNumberSnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <FormItem label="基础">
+    <InputNumber v-model="numValue" />
+  </FormItem>
+  <FormItem label="范围 (0~100, step=5)">
+    <InputNumber v-model="numValue" :min="0" :max="100" :step="5" />
+  </FormItem>
+  <FormItem label="精度 (2位小数)">
+    <InputNumber v-model="numValue" :precision="2" :step="0.1" />
+  </FormItem>
+  <FormItem label="尺寸">
+    <Space>
+      <InputNumber v-model="numValue" size="sm" />
+      <InputNumber v-model="numValue" size="md" />
+      <InputNumber v-model="numValue" size="lg" />
+    </Space>
+  </FormItem>
+  <FormItem label="禁用 / 只读 / 错误">
+    <Space>
+      <InputNumber :model-value="5" disabled />
+      <InputNumber :model-value="5" readonly />
+      <InputNumber v-model="numValue" status="error" />
+    </Space>
+  </FormItem>
+</Space>`
+
+const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full max-w-md">
+  <FormItem label="右侧按钮（默认）">
+    <InputNumber v-model="numValue" />
+  </FormItem>
+  <FormItem label="两侧按钮">
+    <InputNumber v-model="numValue" controls-position="both" />
+  </FormItem>
+  <FormItem label="隐藏按钮">
+    <InputNumber v-model="numValue" :controls="false" />
+  </FormItem>
+  <FormItem label="千分位格式化">
+    <InputNumber
+      v-model="numFormatted"
+      :formatter="(v) => \`$ \${v}\`.replace(/\\B(?=(\\d{3})+(?!\\d))/g, ',')"
+      :parser="(v) => Number(v.replace(/\\$\\s?|(,*)/g, ''))" />
+  </FormItem>
 </Space>`
 </script>
 
@@ -238,6 +286,56 @@ const shakeSnippet = `<Space direction="vertical" class="w-full max-w-md">
           <Button @click="triggerShake" variant="primary">触发错误</Button>
           <Button @click="resetShake">重置</Button>
         </Space>
+      </Space>
+    </DemoBlock>
+
+    <!-- 数字输入框 InputNumber -->
+    <DemoBlock title="数字输入框 InputNumber" description="专用的数字输入组件，支持范围限制、精度、多种尺寸和状态。" :code="inputNumberSnippet">
+      <Space direction="vertical" class="w-full max-w-md">
+        <FormItem label="基础">
+          <InputNumber v-model="numValue" />
+        </FormItem>
+        <FormItem label="范围 (0~100, step=5)">
+          <InputNumber v-model="numValue" :min="0" :max="100" :step="5" />
+        </FormItem>
+        <FormItem label="精度 (2位小数)">
+          <InputNumber v-model="numValue" :precision="2" :step="0.1" />
+        </FormItem>
+        <FormItem label="尺寸">
+          <Space>
+            <InputNumber v-model="numValue" size="sm" />
+            <InputNumber v-model="numValue" size="md" />
+            <InputNumber v-model="numValue" size="lg" />
+          </Space>
+        </FormItem>
+        <FormItem label="禁用 / 只读 / 错误">
+          <Space>
+            <InputNumber :model-value="5" disabled />
+            <InputNumber :model-value="5" readonly />
+            <InputNumber v-model="numValue" status="error" />
+          </Space>
+        </FormItem>
+      </Space>
+    </DemoBlock>
+
+    <!-- 步进按钮与格式化 -->
+    <DemoBlock title="步进按钮与格式化" description="InputNumber 支持不同按钮布局和自定义格式化。" :code="inputNumberControlsSnippet">
+      <Space direction="vertical" class="w-full max-w-md">
+        <FormItem label="右侧按钮（默认）">
+          <InputNumber v-model="numValue" />
+        </FormItem>
+        <FormItem label="两侧按钮">
+          <InputNumber v-model="numValue" controls-position="both" />
+        </FormItem>
+        <FormItem label="隐藏按钮">
+          <InputNumber v-model="numValue" :controls="false" />
+        </FormItem>
+        <FormItem label="千分位格式化">
+          <InputNumber
+            v-model="numFormatted"
+            :formatter="(v) => `$ ${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+            :parser="(v) => Number(v.replace(/\$\s?|(,*)/g, ''))" />
+        </FormItem>
       </Space>
     </DemoBlock>
   </div>

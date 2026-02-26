@@ -118,6 +118,8 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 > **Vue**: 使用 `v-model:selected-keys` / `v-model:open-keys` 双向绑定
 > **React**: 使用 `selectedKeys` + `onSelect` / `openKeys` + `onOpenChange` 控制
 
+> **多级嵌套**：SubMenu 支持任意深度嵌套（3+ 层）。inline 模式下自动增加缩进；horizontal/collapsed 模式下嵌套子菜单以右侧弹出级联方式展示，层级自动叠加 z-index。
+
 ### MenuItem Props
 
 | Prop     | Type                           | Default | Vue | React | Description |

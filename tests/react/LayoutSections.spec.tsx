@@ -46,8 +46,8 @@ describe('Layout Sections', () => {
         Sidebar
       </Sidebar>
     )
-    expect(aside?.style.width).toBe('0px')
-    expect(container.textContent).not.toContain('Sidebar')
+    expect(aside?.style.width).toBe('64px')
+    expect(container.textContent).toContain('Sidebar')
   })
 
   it('Content renders semantic main and forwards className', () => {

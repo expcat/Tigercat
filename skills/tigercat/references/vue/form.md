@@ -130,6 +130,49 @@ const value = ref('')
 
 ---
 
+## InputNumber 数字输入框
+
+```vue
+<script setup>
+import { ref } from 'vue'
+const count = ref(0)
+</script>
+
+<template>
+  <!-- 基础 -->
+  <InputNumber v-model="count" />
+
+  <!-- 范围限制 -->
+  <InputNumber v-model="count" :min="0" :max="100" :step="5" />
+
+  <!-- 精度 -->
+  <InputNumber v-model="count" :precision="2" :step="0.1" />
+
+  <!-- 尺寸 -->
+  <InputNumber v-model="count" size="sm" />
+  <InputNumber v-model="count" size="lg" />
+
+  <!-- 两侧按钮 -->
+  <InputNumber v-model="count" controls-position="both" />
+
+  <!-- 隐藏步进按钮 -->
+  <InputNumber v-model="count" :controls="false" />
+
+  <!-- 格式化（千分位） -->
+  <InputNumber
+    v-model="count"
+    :formatter="(v) => `$ ${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+    :parser="(v) => Number(v.replace(/\$\s?|(,*)/g, ''))" />
+
+  <!-- 状态 -->
+  <InputNumber v-model="count" disabled />
+  <InputNumber v-model="count" readonly />
+  <InputNumber v-model="count" status="error" />
+</template>
+```
+
+---
+
 ## Textarea 文本域
 
 ```vue

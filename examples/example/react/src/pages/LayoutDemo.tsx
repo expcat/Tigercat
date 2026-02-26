@@ -32,10 +32,20 @@ const collapsedSnippet = `const [collapsed, setCollapsed] = useState(false)
 <Layout>
   <Header>Header</Header>
   <div className="flex flex-1">
-    <Sidebar width="192px" collapsed={collapsed}>Sidebar</Sidebar>
+    <Sidebar width="192px" collapsedWidth="64px" collapsed={collapsed}>Sidebar</Sidebar>
     <Content>Content</Content>
   </div>
   <Footer>Footer</Footer>
+</Layout>`
+
+const miniSnippet = `<Layout>
+  <Header>Header</Header>
+  <div className="flex flex-1">
+    <Sidebar width="192px" collapsedWidth="48px" collapsed={mini}>
+      {mini ? <div className="text-center">☰</div> : <div>Full Sidebar</div>}
+    </Sidebar>
+    <Content>Content</Content>
+  </div>
 </Layout>`
 
 const complexSnippet = `<Layout>
@@ -52,6 +62,7 @@ const complexSnippet = `<Layout>
 
 const LayoutDemo: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false)
+  const [miniCollapsed, setMiniCollapsed] = useState(true)
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
@@ -119,7 +130,7 @@ const LayoutDemo: React.FC = () => {
 
       <DemoBlock
         title="Sidebar 折叠"
-        description="可折叠的侧边栏，点击按钮切换。"
+        description="可折叠的侧边栏，通过 collapsedWidth 设置折叠后的宽度（默认 64px）。"
         code={collapsedSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <button
@@ -130,12 +141,51 @@ const LayoutDemo: React.FC = () => {
           <Layout className="border border-gray-300 overflow-hidden min-h-[260px]">
             <Header className="!bg-blue-600 !text-white !p-4">Header</Header>
             <div className="flex flex-1">
-              <Sidebar width="192px" collapsed={collapsed} className="!bg-gray-200 !p-4">
+              <Sidebar
+                width="192px"
+                collapsedWidth="64px"
+                collapsed={collapsed}
+                className="!bg-gray-200 !p-4">
                 Sidebar
               </Sidebar>
               <Content className="!bg-white !p-4">Content</Content>
             </div>
             <Footer className="!bg-gray-800 !text-white !p-4">Footer</Footer>
+          </Layout>
+        </div>
+      </DemoBlock>
+
+      <DemoBlock
+        title="Mini 模式侧边栏"
+        description="collapsedWidth 设为更小的值（如 48px）实现 mini 模式，折叠时仅显示图标。"
+        code={miniSnippet}>
+        <div className="p-6 bg-gray-50 rounded-lg">
+          <button
+            className="mb-4 px-3 py-1 rounded bg-blue-500 text-white text-sm"
+            onClick={() => setMiniCollapsed((c) => !c)}>
+            {miniCollapsed ? '展开' : '折叠为 Mini'}
+          </button>
+          <Layout className="border border-gray-300 overflow-hidden min-h-[260px]">
+            <Header className="!bg-blue-600 !text-white !p-4">Header</Header>
+            <div className="flex flex-1">
+              <Sidebar
+                width="192px"
+                collapsedWidth="48px"
+                collapsed={miniCollapsed}
+                className="!bg-gray-200 !p-4">
+                {miniCollapsed ? (
+                  <div className="text-center text-xl">☰</div>
+                ) : (
+                  <div>
+                    <div className="font-medium mb-2">导航菜单</div>
+                    <div className="text-sm text-gray-600">菜单项 1</div>
+                    <div className="text-sm text-gray-600">菜单项 2</div>
+                    <div className="text-sm text-gray-600">菜单项 3</div>
+                  </div>
+                )}
+              </Sidebar>
+              <Content className="!bg-white !p-4">Content</Content>
+            </div>
           </Layout>
         </div>
       </DemoBlock>

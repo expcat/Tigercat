@@ -101,11 +101,12 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Sidebar Props
 
-| Prop      | Type      | Default   | Vue | React | Description      |
-| --------- | --------- | --------- | :-: | :---: | ---------------- |
-| className | `string`  | -         |  ✓  |   ✓   | 自定义 CSS class |
-| width     | `string`  | `'256px'` |  ✓  |   ✓   | 侧边栏宽度       |
-| collapsed | `boolean` | `false`   |  ✓  |   ✓   | 是否折叠         |
+| Prop           | Type      | Default   | Vue | React | Description             |
+| -------------- | --------- | --------- | :-: | :---: | ----------------------- |
+| className      | `string`  | -         |  ✓  |   ✓   | 自定义 CSS class        |
+| width          | `string`  | `'256px'` |  ✓  |   ✓   | 侧边栏宽度              |
+| collapsedWidth | `string`  | `'64px'`  |  ✓  |   ✓   | 折叠后宽度（mini 模式） |
+| collapsed      | `boolean` | `false`   |  ✓  |   ✓   | 是否折叠                |
 
 ### Content Props
 

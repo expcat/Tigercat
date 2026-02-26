@@ -620,4 +620,104 @@ describe('Table', () => {
       )
     })
   })
+
+  describe('Expandable Rows', () => {
+    const expandable = {
+      expandedRowRender: (record: Record<string, unknown>) => `Details for ${record.name}`
+    }
+
+    it('should render expand toggle buttons', () => {
+      const { container } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        expandable
+      })
+      const expandButtons = container.querySelectorAll('button[aria-label="Expand row"]')
+      expect(expandButtons).toHaveLength(3)
+    })
+
+    it('should expand a row on button click', async () => {
+      const { container, getByText } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        expandable
+      })
+
+      const expandButton = container.querySelector('button[aria-label="Expand row"]')!
+      await fireEvent.click(expandButton)
+      expect(getByText('Details for John Doe')).toBeInTheDocument()
+    })
+
+    it('should collapse an expanded row', async () => {
+      const { container, getByText, queryByText } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        expandable
+      })
+
+      const expandButton = container.querySelector('button[aria-label="Expand row"]')!
+      await fireEvent.click(expandButton)
+      expect(getByText('Details for John Doe')).toBeInTheDocument()
+
+      const collapseButton = container.querySelector('button[aria-label="Collapse row"]')!
+      await fireEvent.click(collapseButton)
+      expect(queryByText('Details for John Doe')).toBeNull()
+    })
+
+    it('should support defaultExpandedRowKeys', () => {
+      const { getByText } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        expandable: { ...expandable, defaultExpandedRowKeys: [1] }
+      })
+      expect(getByText('Details for John Doe')).toBeInTheDocument()
+    })
+
+    it('should emit expanded-rows-change', async () => {
+      const { container, emitted } = render(Table, {
+        props: { columns, dataSource, expandable }
+      })
+
+      const expandButton = container.querySelector('button[aria-label="Expand row"]')!
+      await fireEvent.click(expandButton)
+      expect(emitted()['expanded-rows-change']).toBeTruthy()
+      expect(emitted()['expanded-rows-change'][0]).toEqual([[1]])
+    })
+
+    it('should support rowExpandable', () => {
+      const { container } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        expandable: {
+          ...expandable,
+          rowExpandable: (record: Record<string, unknown>) => (record.age as number) > 30
+        }
+      })
+      const expandButtons = container.querySelectorAll('button[aria-label="Expand row"]')
+      // Only Jane (32) and Bob (45) should have expand buttons
+      expect(expandButtons).toHaveLength(2)
+    })
+
+    it('should render expand column at end when expandIconPosition=end', () => {
+      const { container } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        expandable: { ...expandable, expandIconPosition: 'end' }
+      })
+      const headerCells = container.querySelectorAll('thead th')
+      const lastTh = headerCells[headerCells.length - 1]
+      expect(lastTh.textContent).toBe('')
+    })
+
+    it('should render expand column header at start by default', () => {
+      const { container } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        expandable
+      })
+      const headerCells = container.querySelectorAll('thead th')
+      expect(headerCells[0].textContent).toBe('')
+      expect(headerCells[1].textContent).toContain('Name')
+    })
+  })
 })

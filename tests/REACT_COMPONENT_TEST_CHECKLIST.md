@@ -4,8 +4,8 @@ This document tracks the testing progress for all React components in the Tigerc
 
 ## Progress Overview
 
-- **Total Components**: 60
-- **Components Tested**: 60
+- **Total Components**: 61
+- **Components Tested**: 61
 - **Components Remaining**: 0
 - **Progress**: 100%
 - **Total Tests**: 1500+
@@ -51,7 +51,7 @@ This document tracks the testing progress for all React components in the Tigerc
   - **Test Categories**: ✅ All categories covered
   - **Quality**: ⭐⭐⭐⭐⭐ Excellent
 
-### Form Components (11 total, 11 tested) ✅ COMPLETE
+### Form Components (12 total, 12 tested) ✅ COMPLETE
 
 - [x] Form - ✅ Completed (47 tests)
   - **Test File**: `tests/react/Form.spec.tsx`
@@ -108,6 +108,11 @@ This document tracks the testing progress for all React components in the Tigerc
   - **Test Count**: 38
   - **Test Categories**: ✅ All categories covered
   - **Quality**: ⭐⭐⭐⭐⭐ Excellent
+- [x] InputNumber - ✅ Completed (28 tests)
+  - **Test File**: `tests/react/InputNumber.spec.tsx`
+  - **Test Count**: 28
+  - **Test Categories**: ✅ All categories covered
+  - **Quality**: ⭐⭐⭐⭐ Good
 
 ### Data Display Components (11 total, 11 tested)
 

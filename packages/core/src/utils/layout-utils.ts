@@ -12,6 +12,20 @@ export const layoutHeaderClasses =
 export const layoutSidebarClasses =
   'tiger-sidebar bg-[var(--tiger-surface,#ffffff)] border-r border-[var(--tiger-border,#e5e7eb)] overflow-hidden transition-all duration-300'
 
+export const layoutSidebarCollapsedClasses = 'tiger-sidebar-collapsed'
+
+/**
+ * Compute the width/minWidth style for a sidebar.
+ */
+export function getSidebarStyle(
+  collapsed: boolean,
+  width: string = '256px',
+  collapsedWidth: string = '64px'
+): { width: string; minWidth: string } {
+  const w = collapsed ? collapsedWidth : width
+  return { width: w, minWidth: w }
+}
+
 export const layoutContentClasses =
   'tiger-content flex-1 bg-[var(--tiger-layout-content-bg,#f9fafb)] p-6'
 

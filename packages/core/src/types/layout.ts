@@ -44,6 +44,13 @@ export interface SidebarProps {
   width?: string
 
   /**
+   * Width when collapsed (mini mode).
+   * Set to '0px' to fully hide the sidebar when collapsed.
+   * @default '64px'
+   */
+  collapsedWidth?: string
+
+  /**
    * Whether sidebar is collapsed
    * @default false
    */

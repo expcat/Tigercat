@@ -17,10 +17,12 @@ import {
   getSubMenuTitleClasses,
   getSubMenuExpandIconClasses,
   getMenuItemIndent,
+  getSubmenuPopupZIndex,
   isKeyOpen,
   menuItemIconClasses,
   mergeStyleValues,
   submenuContentHorizontalClasses,
+  submenuContentHorizontalNestedClasses,
   submenuContentPopupClasses,
   submenuContentVerticalClasses,
   submenuContentInlineClasses,
@@ -135,7 +137,9 @@ export const SubMenu = defineComponent({
     })
 
     const isPopup = computed(() => {
-      return !!menuContext && menuContext.mode.value === 'vertical' && effectiveCollapsed.value
+      if (!menuContext) return false
+      if (menuContext.mode.value === 'horizontal') return true
+      return menuContext.mode.value === 'vertical' && effectiveCollapsed.value
     })
 
     // Determine if submenu should be shown
@@ -168,7 +172,10 @@ export const SubMenu = defineComponent({
       if (!menuContext) return ''
 
       if (menuContext.mode.value === 'horizontal') {
-        return submenuContentHorizontalClasses
+        // Top-level drops below; nested cascades right
+        return props.level === 0
+          ? submenuContentHorizontalClasses
+          : submenuContentHorizontalNestedClasses
       }
 
       if (isPopup.value) return submenuContentPopupClasses
@@ -177,6 +184,9 @@ export const SubMenu = defineComponent({
 
       return submenuContentVerticalClasses
     })
+
+    // Dynamic z-index for popup layers
+    const popupZIndex = computed(() => (isPopup.value ? getSubmenuPopupZIndex(props.level) : {}))
 
     // Handle title click
     const handleTitleClick = () => {
@@ -289,9 +299,9 @@ export const SubMenu = defineComponent({
       }
     }
 
-    // Get indent style for nested menus in inline mode
+    // Get indent style for nested menus in inline/vertical mode
     const indentStyle = computed(() => {
-      if (!menuContext || menuContext.mode.value !== 'inline' || props.level === 0) {
+      if (!menuContext || menuContext.mode.value === 'horizontal' || props.level === 0) {
         return {}
       }
       return getMenuItemIndent(props.level, menuContext.inlineIndent.value)
@@ -322,9 +332,9 @@ export const SubMenu = defineComponent({
           level: existingProps.level ?? nextLevel
         }
 
-        if (isPopup.value) {
-          nextProps.collapsed = false
-        }
+        // In collapsed vertical mode, children inside the popup keep collapsed
+        // so nested SubMenus also render as cascading popups.
+        // In horizontal mode, the popup context propagates naturally.
 
         return cloneVNode(node, nextProps)
       })
@@ -387,64 +397,64 @@ export const SubMenu = defineComponent({
       )
 
       // Render submenu content
-      const contentNode =
-        menuContext.mode.value === 'horizontal' || isPopup.value
-          ? h(
-              'ul',
-              {
-                class: contentClasses.value,
-                style: {
-                  display: isExpanded.value ? 'block' : 'none'
-                },
-                role: 'menu',
-                'aria-hidden': isExpanded.value ? undefined : 'true'
+      const contentNode = isPopup.value
+        ? h(
+            'ul',
+            {
+              class: contentClasses.value,
+              style: {
+                display: isExpanded.value ? 'block' : 'none',
+                ...popupZIndex.value
               },
-              withChildLevel(slots.default?.() as VNode[] | undefined)
-            )
-          : h(
-              Transition,
-              {
-                name: 'submenu-collapse',
-                onEnter: (el: Element) => {
-                  const element = el as HTMLElement
-                  element.style.height = '0'
-                  void element.offsetHeight // Force reflow
-                  element.style.height = element.scrollHeight + 'px'
-                },
-                onAfterEnter: (el: Element) => {
-                  const element = el as HTMLElement
-                  element.style.height = ''
-                },
-                onLeave: (el: Element) => {
-                  const element = el as HTMLElement
-                  element.style.height = element.scrollHeight + 'px'
-                  void element.offsetHeight // Force reflow
-                  element.style.height = '0'
-                },
-                onAfterLeave: (el: Element) => {
-                  const element = el as HTMLElement
-                  element.style.height = ''
-                }
+              role: 'menu',
+              'aria-hidden': isExpanded.value ? undefined : 'true'
+            },
+            withChildLevel(slots.default?.() as VNode[] | undefined)
+          )
+        : h(
+            Transition,
+            {
+              name: 'submenu-collapse',
+              onEnter: (el: Element) => {
+                const element = el as HTMLElement
+                element.style.height = '0'
+                void element.offsetHeight // Force reflow
+                element.style.height = element.scrollHeight + 'px'
               },
-              {
-                default: () =>
-                  isExpanded.value
-                    ? h(
-                        'ul',
-                        {
-                          class: contentClasses.value,
-                          role: 'menu'
-                        },
-                        withChildLevel(slots.default?.() as VNode[] | undefined)
-                      )
-                    : null
+              onAfterEnter: (el: Element) => {
+                const element = el as HTMLElement
+                element.style.height = ''
+              },
+              onLeave: (el: Element) => {
+                const element = el as HTMLElement
+                element.style.height = element.scrollHeight + 'px'
+                void element.offsetHeight // Force reflow
+                element.style.height = '0'
+              },
+              onAfterLeave: (el: Element) => {
+                const element = el as HTMLElement
+                element.style.height = ''
               }
-            )
+            },
+            {
+              default: () =>
+                isExpanded.value
+                  ? h(
+                      'ul',
+                      {
+                        class: contentClasses.value,
+                        role: 'menu'
+                      },
+                      withChildLevel(slots.default?.() as VNode[] | undefined)
+                    )
+                  : null
+            }
+          )
 
       return h(
         'li',
         {
-          class: menuContext.mode.value === 'horizontal' || isPopup.value ? 'relative' : '',
+          class: isPopup.value ? 'relative' : '',
           onMouseenter: handleMouseEnter,
           onMouseleave: handleMouseLeave,
           role: 'none'

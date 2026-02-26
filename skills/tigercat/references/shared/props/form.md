@@ -115,6 +115,44 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ---
 
+## InputNumber 数字输入框
+
+### Props
+
+| Prop             | Type                                             | Default     | Vue | React | Description          |
+| ---------------- | ------------------------------------------------ | ----------- | :-: | :---: | -------------------- |
+| modelValue       | `number \| null`                                 | -           |  ✓  |   -   | 绑定值 (v-model)     |
+| value            | `number \| null`                                 | -           |  -  |   ✓   | 绑定值（受控）       |
+| defaultValue     | `number \| null`                                 | -           |  -  |   ✓   | 默认值（非受控）     |
+| size             | `'sm' \| 'md' \| 'lg'`                           | `'md'`      |  ✓  |   ✓   | 尺寸                 |
+| status           | `'default' \| 'error' \| 'success' \| 'warning'` | `'default'` |  ✓  |   ✓   | 校验状态             |
+| min              | `number`                                         | `-Infinity` |  ✓  |   ✓   | 最小值               |
+| max              | `number`                                         | `Infinity`  |  ✓  |   ✓   | 最大值               |
+| step             | `number`                                         | `1`         |  ✓  |   ✓   | 步长                 |
+| precision        | `number`                                         | -           |  ✓  |   ✓   | 数值精度（小数位数） |
+| disabled         | `boolean`                                        | `false`     |  ✓  |   ✓   | 禁用                 |
+| readonly         | `boolean`                                        | `false`     |  ✓  |   ✓   | 只读                 |
+| placeholder      | `string`                                         | -           |  ✓  |   ✓   | 占位符               |
+| name             | `string`                                         | -           |  ✓  |   ✓   | 表单字段名           |
+| id               | `string`                                         | -           |  ✓  |   ✓   | 元素 ID              |
+| keyboard         | `boolean`                                        | `true`      |  ✓  |   ✓   | 支持键盘 ↑/↓ 调整    |
+| controls         | `boolean`                                        | `true`      |  ✓  |   ✓   | 显示步进按钮         |
+| controlsPosition | `'right' \| 'both'`                              | `'right'`   |  ✓  |   ✓   | 步进按钮位置         |
+| formatter        | `(value: number \| undefined) => string`         | -           |  ✓  |   ✓   | 显示格式化函数       |
+| parser           | `(displayValue: string) => number`               | -           |  ✓  |   ✓   | 输入解析函数         |
+| autoFocus        | `boolean`                                        | `false`     |  ✓  |   ✓   | 自动聚焦             |
+
+### Events
+
+| Vue Event            | React Callback | Payload          | Description |
+| -------------------- | -------------- | ---------------- | ----------- |
+| `@update:modelValue` | -              | `number \| null` | 值变更      |
+| `@change`            | `onChange`     | `number \| null` | 值提交      |
+| `@focus`             | `onFocus`      | `FocusEvent`     | 聚焦        |
+| `@blur`              | `onBlur`       | `FocusEvent`     | 失焦        |
+
+---
+
 ## Textarea 文本域
 
 ### Props

@@ -4,9 +4,11 @@ import {
   getSubMenuTitleClasses,
   getSubMenuExpandIconClasses,
   getMenuItemIndent,
+  getSubmenuPopupZIndex,
   isKeyOpen,
   menuItemIconClasses,
   submenuContentHorizontalClasses,
+  submenuContentHorizontalNestedClasses,
   submenuContentPopupClasses,
   submenuContentVerticalClasses,
   submenuContentInlineClasses,
@@ -68,12 +70,13 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
   const effectiveCollapsed = collapsedOverride ?? (menuContext ? menuContext.collapsed : false)
 
-  const isPopup = !!menuContext && menuContext.mode === 'vertical' && effectiveCollapsed
+  const isPopup =
+    !!menuContext &&
+    (menuContext.mode === 'horizontal' || (menuContext.mode === 'vertical' && effectiveCollapsed))
 
   const isOpen = !!menuContext && isKeyOpen(itemKey, menuContext.openKeys)
 
-  const isExpanded =
-    menuContext?.mode === 'horizontal' || isPopup ? isHovered || isOpenByKeyboard : isOpen
+  const isExpanded = isPopup ? isHovered || isOpenByKeyboard : isOpen
 
   const isInlineOrVertical = menuContext?.mode !== 'horizontal' && !isPopup
   const [hasRenderedInline, setHasRenderedInline] = useState(() =>
@@ -92,11 +95,13 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
   const contentClasses = useMemo(() => {
     if (!menuContext) return ''
-    if (menuContext.mode === 'horizontal') return submenuContentHorizontalClasses
+    if (menuContext.mode === 'horizontal') {
+      return level === 0 ? submenuContentHorizontalClasses : submenuContentHorizontalNestedClasses
+    }
     if (isPopup) return submenuContentPopupClasses
     if (menuContext.mode === 'inline') return submenuContentInlineClasses
     return submenuContentVerticalClasses
-  }, [menuContext, isPopup])
+  }, [menuContext, isPopup, level])
 
   const handleTitleClick = useCallback(() => {
     if (!menuContext || disabled) return
@@ -256,8 +261,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         return React.cloneElement(
           child as React.ReactElement<{ level?: number; collapsed?: boolean }>,
           {
-            level: nextLevel,
-            collapsed: isPopup ? false : undefined
+            level: nextLevel
           }
         )
       }
@@ -265,11 +269,13 @@ export const SubMenu: React.FC<SubMenuProps> = ({
       return child
     })
 
-    if (menuContext.mode === 'horizontal' || isPopup) {
+    const popupZIndex = isPopup ? getSubmenuPopupZIndex(level) : {}
+
+    if (isPopup) {
       return (
         <ul
           className={contentClasses}
-          style={{ display: isExpanded ? 'block' : 'none' }}
+          style={{ display: isExpanded ? 'block' : 'none', ...popupZIndex }}
           role="menu"
           aria-hidden={isExpanded ? undefined : 'true'}>
           {enhancedChildren}
@@ -298,7 +304,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
   return (
     <li
-      className={menuContext.mode === 'horizontal' || isPopup ? 'relative' : ''}
+      className={isPopup ? 'relative' : ''}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       role="none">

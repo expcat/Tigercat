@@ -174,7 +174,72 @@ const [collapsed, setCollapsed] = useState(false)
   </div>
   <Footer>Footer</Footer>
 </Layout>
+
+{/* Mini 模式侧边栏（折叠后保留 64px 宽度） */}
+const [collapsed, setCollapsed] = useState(false)
+<Sidebar width="256px" collapsedWidth="64px" collapsed={collapsed}>
+  {/* 折叠后仍可显示图标 */}
+</Sidebar>
 ```
+
+### Admin 后台布局组合示例
+
+将 `Layout`、`Header`、`Sidebar`、`Menu`、`Content` 组合为典型后台管理布局，
+包含 mini 模式侧边栏 + 3 级嵌套菜单。
+
+```tsx
+import { useState } from 'react'
+import { Layout, Header, Sidebar, Content, Footer, Menu, Button } from '@expcat/tigercat-react'
+import type { MenuItem } from '@expcat/tigercat-react'
+
+function AdminLayout() {
+  const [collapsed, setCollapsed] = useState(false)
+
+  const menuItems: MenuItem[] = [
+    { key: 'home', label: '首页' },
+    {
+      key: 'system',
+      label: '系统管理',
+      children: [
+        { key: 'users', label: '用户管理' },
+        {
+          key: 'roles',
+          label: '角色管理',
+          children: [
+            { key: 'role-list', label: '角色列表' },
+            { key: 'role-perms', label: '权限配置' }
+          ]
+        }
+      ]
+    },
+    { key: 'settings', label: '设置' }
+  ]
+
+  return (
+    <Layout className="min-h-screen">
+      <Header className="flex items-center justify-between px-4">
+        <span>Logo</span>
+        <Button size="sm" variant="ghost" onClick={() => setCollapsed((c) => !c)}>
+          {collapsed ? '展开' : '折叠'}
+        </Button>
+      </Header>
+      <div className="flex flex-1">
+        <Sidebar width="256px" collapsedWidth="64px" collapsed={collapsed}>
+          <Menu items={menuItems} mode="inline" collapsed={collapsed} />
+        </Sidebar>
+        <Content className="p-6">主内容区</Content>
+      </div>
+      <Footer>© 2025 Tigercat</Footer>
+    </Layout>
+  )
+}
+```
+
+**重点说明：**
+
+- `collapsedWidth="64px"`：折叠后保留 64px 宽度（mini 模式），而非完全隐藏
+- `Menu` 的 `collapsed` prop 需与 `Sidebar` 同步，使菜单在折叠态仅显示图标
+- 3 级嵌套菜单：`系统管理 → 角色管理 → 角色列表 / 权限配置`
 
 ---
 

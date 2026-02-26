@@ -4,8 +4,8 @@ This document tracks the testing progress for all Vue components in the Tigercat
 
 ## Progress Overview
 
-- **Total Components**: 60
-- **Components Tested**: 60
+- **Total Components**: 61
+- **Components Tested**: 61
 - **Components Remaining**: 0
 - **Progress**: 100%
 - **Total Tests**: 1500+
@@ -51,7 +51,7 @@ This document tracks the testing progress for all Vue components in the Tigercat
   - **Test Categories**: ✅ All categories covered
   - **Quality**: ⭐⭐⭐⭐⭐ Excellent
 
-### Form Components (11 total, 11 tested) ✅ COMPLETE
+### Form Components (12 total, 12 tested) ✅ COMPLETE
 
 - [x] Form - ✅ Completed (46 tests)
   - **Test File**: `tests/vue/Form.spec.ts`
@@ -106,6 +106,11 @@ This document tracks the testing progress for all Vue components in the Tigercat
 - [x] Upload - ✅ Completed (32 tests)
   - **Test File**: `tests/vue/Upload.spec.ts`
   - **Test Count**: 32
+  - **Test Categories**: ✅ All categories covered
+  - **Quality**: ⭐⭐⭐⭐ Good
+- [x] InputNumber - ✅ Completed (27 tests)
+  - **Test File**: `tests/vue/InputNumber.spec.ts`
+  - **Test Count**: 27
   - **Test Categories**: ✅ All categories covered
   - **Quality**: ⭐⭐⭐⭐ Good
 

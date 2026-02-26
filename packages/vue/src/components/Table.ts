@@ -9,6 +9,10 @@ import {
   getFixedColumnOffsets,
   getSortIconClasses,
   getCheckboxCellClasses,
+  getExpandCellClasses,
+  expandIconButtonClasses,
+  getExpandIconRotationClasses,
+  expandedRowContentClasses,
   tableBaseClasses,
   tableEmptyStateClasses,
   tableLoadingOverlayClasses,
@@ -41,7 +45,8 @@ import {
   type SortDirection,
   type SortState,
   type PaginationConfig,
-  type RowSelectionConfig
+  type RowSelectionConfig,
+  type ExpandableConfig
 } from '@expcat/tigercat-core'
 
 const spinnerSvg = getSpinnerSVG('spinner')
@@ -62,6 +67,7 @@ export interface VueTableProps {
   emptyText?: string
   pagination?: PaginationConfig | false
   rowSelection?: RowSelectionConfig
+  expandable?: ExpandableConfig
   rowKey?: string | ((record: Record<string, unknown>) => string | number)
   rowClassName?: string | ((record: Record<string, unknown>, index: number) => string)
   stickyHeader?: boolean
@@ -240,6 +246,12 @@ export const Table = defineComponent({
       type: Object as PropType<RowSelectionConfig>
     },
     /**
+     * Row expansion configuration
+     */
+    expandable: {
+      type: Object as PropType<ExpandableConfig>
+    },
+    /**
      * Function to get row key
      */
     rowKey: {
@@ -277,7 +289,15 @@ export const Table = defineComponent({
       default: 'auto'
     }
   },
-  emits: ['change', 'row-click', 'selection-change', 'sort-change', 'filter-change', 'page-change'],
+  emits: [
+    'change',
+    'row-click',
+    'selection-change',
+    'sort-change',
+    'filter-change',
+    'page-change',
+    'expanded-rows-change'
+  ],
   setup(props, { emit, slots }) {
     const paginationConfig = computed(() => {
       return props.pagination !== false && typeof props.pagination === 'object'
@@ -290,6 +310,7 @@ export const Table = defineComponent({
     const isCurrentPageControlled = computed(() => paginationConfig.value?.current !== undefined)
     const isPageSizeControlled = computed(() => paginationConfig.value?.pageSize !== undefined)
     const isSelectionControlled = computed(() => props.rowSelection?.selectedRowKeys !== undefined)
+    const isExpandControlled = computed(() => props.expandable?.expandedRowKeys !== undefined)
 
     const uncontrolledSortState = ref<SortState>(props.defaultSort)
     const uncontrolledFilterState = ref<Record<string, unknown>>(props.defaultFilters)
@@ -306,6 +327,10 @@ export const Table = defineComponent({
       props.rowSelection?.defaultSelectedRowKeys ?? props.rowSelection?.selectedRowKeys ?? []
     )
 
+    const uncontrolledExpandedRowKeys = ref<(string | number)[]>(
+      props.expandable?.defaultExpandedRowKeys ?? props.expandable?.expandedRowKeys ?? []
+    )
+
     const sortState = computed(() => props.sort ?? uncontrolledSortState.value)
     const filterState = computed(() => props.filters ?? uncontrolledFilterState.value)
     const currentPage = computed(() => {
@@ -317,6 +342,11 @@ export const Table = defineComponent({
     const selectedRowKeys = computed(() => {
       return props.rowSelection?.selectedRowKeys ?? uncontrolledSelectedRowKeys.value
     })
+
+    const expandedRowKeys = computed(() => {
+      return props.expandable?.expandedRowKeys ?? uncontrolledExpandedRowKeys.value
+    })
+    const expandedRowKeySet = computed(() => new Set<string | number>(expandedRowKeys.value))
 
     watch(
       () => props.sort,
@@ -585,8 +615,33 @@ export const Table = defineComponent({
       return selectedRowKeys.value.length > 0 && !allSelected.value
     })
 
+    function handleToggleExpand(key: string | number) {
+      const isExp = expandedRowKeySet.value.has(key)
+      const next = isExp
+        ? expandedRowKeys.value.filter((k) => k !== key)
+        : [...expandedRowKeys.value, key]
+
+      if (!isExpandControlled.value) {
+        uncontrolledExpandedRowKeys.value = next
+      }
+      emit('expanded-rows-change', next)
+    }
+
+    // Total column count (data + selection + expand)
+    const totalColumnCount = computed(() => {
+      let count = displayColumns.value.length
+      if (props.rowSelection && props.rowSelection.showCheckbox !== false) count++
+      if (props.expandable) count++
+      return count
+    })
+
     function renderTableHeader() {
       const headerCells = []
+
+      // Expand icon column header (at start position)
+      if (props.expandable && props.expandable.expandIconPosition !== 'end') {
+        headerCells.push(h('th', { class: getExpandCellClasses(props.size) }))
+      }
 
       // Selection checkbox column
       if (
@@ -748,6 +803,11 @@ export const Table = defineComponent({
         )
       })
 
+      // Expand icon column header (at end position)
+      if (props.expandable && props.expandable.expandIconPosition === 'end') {
+        headerCells.push(h('th', { class: getExpandCellClasses(props.size) }))
+      }
+
       return h('thead', { class: getTableHeaderClasses(props.stickyHeader) }, [
         h('tr', headerCells)
       ])
@@ -764,7 +824,7 @@ export const Table = defineComponent({
             h(
               'td',
               {
-                colspan: displayColumns.value.length + (props.rowSelection ? 1 : 0),
+                colspan: totalColumnCount.value,
                 class: tableEmptyStateClasses
               },
               [
@@ -782,15 +842,55 @@ export const Table = defineComponent({
         ])
       }
 
-      const rows = paginatedData.value.map((record, index) => {
+      const rows = paginatedData.value.flatMap((record, index) => {
         const key = paginatedRowKeys.value[index]
         const isSelected = selectedRowKeySet.value.has(key)
+        const isExpanded = expandedRowKeySet.value.has(key)
+        const isExpandable = props.expandable
+          ? (props.expandable.rowExpandable?.(record) ?? true)
+          : false
         const rowClass =
           typeof props.rowClassName === 'function'
             ? props.rowClassName(record, index)
             : props.rowClassName
 
         const cells = []
+
+        // Expand toggle cell (start position)
+        if (props.expandable && props.expandable.expandIconPosition !== 'end') {
+          cells.push(
+            h('td', { class: getExpandCellClasses(props.size) }, [
+              isExpandable
+                ? h(
+                    'button',
+                    {
+                      class: classNames(
+                        expandIconButtonClasses,
+                        getExpandIconRotationClasses(isExpanded)
+                      ),
+                      'aria-label': isExpanded ? 'Collapse row' : 'Expand row',
+                      onClick: (e: Event) => {
+                        e.stopPropagation()
+                        handleToggleExpand(key)
+                      }
+                    },
+                    [
+                      h(
+                        'svg',
+                        normalizeSvgAttrs({
+                          xmlns: 'http://www.w3.org/2000/svg',
+                          viewBox: icon16ViewBox,
+                          fill: 'currentColor',
+                          class: 'w-4 h-4'
+                        }),
+                        [h('path', { d: 'M6 3l6 5-6 5V3z' })]
+                      )
+                    ]
+                  )
+                : null
+            ])
+          )
+        }
 
         // Selection checkbox cell
         if (props.rowSelection && props.rowSelection.showCheckbox !== false) {
@@ -811,6 +911,7 @@ export const Table = defineComponent({
                       : 'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]',
                   checked: isSelected,
                   disabled: checkboxProps.disabled,
+                  onClick: (e: Event) => e.stopPropagation(),
                   onChange: (e: Event) =>
                     handleSelectRow(key, (e.target as HTMLInputElement).checked)
                 })
@@ -872,16 +973,50 @@ export const Table = defineComponent({
                 style
               },
               [
-                column.render
-                  ? slots[`cell-${column.key}`]?.({ record, index }) ||
-                    (column.render(record, index) as string)
-                  : (cellValue as string)
+                slots[`cell-${column.key}`]?.({ record, index }) ??
+                  (column.render ? (column.render(record, index) as string) : (cellValue as string))
               ]
             )
           )
         })
 
-        return h(
+        // Expand toggle cell (end position)
+        if (props.expandable && props.expandable.expandIconPosition === 'end') {
+          cells.push(
+            h('td', { class: getExpandCellClasses(props.size) }, [
+              isExpandable
+                ? h(
+                    'button',
+                    {
+                      class: classNames(
+                        expandIconButtonClasses,
+                        getExpandIconRotationClasses(isExpanded)
+                      ),
+                      'aria-label': isExpanded ? 'Collapse row' : 'Expand row',
+                      onClick: (e: Event) => {
+                        e.stopPropagation()
+                        handleToggleExpand(key)
+                      }
+                    },
+                    [
+                      h(
+                        'svg',
+                        normalizeSvgAttrs({
+                          xmlns: 'http://www.w3.org/2000/svg',
+                          viewBox: icon16ViewBox,
+                          fill: 'currentColor',
+                          class: 'w-4 h-4'
+                        }),
+                        [h('path', { d: 'M6 3l6 5-6 5V3z' })]
+                      )
+                    ]
+                  )
+                : null
+            ])
+          )
+        }
+
+        const row = h(
           'tr',
           {
             key,
@@ -893,6 +1028,21 @@ export const Table = defineComponent({
           },
           cells
         )
+
+        const result: VNodeChild[] = [row]
+
+        // Expanded content row
+        if (props.expandable && isExpanded && isExpandable) {
+          result.push(
+            h('tr', { key: `${key}-expanded`, class: expandedRowContentClasses }, [
+              h('td', { colspan: totalColumnCount.value }, [
+                props.expandable.expandedRowRender(record, index) as VNodeChild
+              ])
+            ])
+          )
+        }
+
+        return result
       })
 
       return h('tbody', rows)

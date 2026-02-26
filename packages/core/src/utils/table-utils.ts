@@ -219,6 +219,32 @@ export function getCheckboxCellClasses(size: TableSize): string {
 }
 
 /**
+ * Get expand toggle cell classes (same sizing as checkbox cell)
+ */
+export function getExpandCellClasses(size: TableSize): string {
+  return getCheckboxCellClasses(size)
+}
+
+/**
+ * Get expand icon button classes
+ */
+export const expandIconButtonClasses =
+  'inline-flex items-center justify-center w-5 h-5 rounded cursor-pointer border-0 bg-transparent transition-transform duration-200 text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
+
+/**
+ * Get expand icon rotation class
+ */
+export function getExpandIconRotationClasses(expanded: boolean): string {
+  return expanded ? 'rotate-90' : 'rotate-0'
+}
+
+/**
+ * Get expanded row content cell classes
+ */
+export const expandedRowContentClasses =
+  'bg-[var(--tiger-surface-muted,#f9fafb)] border-b border-[var(--tiger-border,#e5e7eb)]'
+
+/**
  * Default sort function for comparable values
  */
 export function defaultSortFn(a: unknown, b: unknown): number {

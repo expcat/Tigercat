@@ -32,7 +32,13 @@ const basicSnippet = `<Menu v-model:selectedKeys="selectedKeys1">
 
 const horizontalSnippet = `<Menu mode="horizontal" v-model:selectedKeys="selectedKeys2">
   <MenuItem itemKey="home">首页</MenuItem>
-  <MenuItem itemKey="products">产品</MenuItem>
+  <SubMenu itemKey="products" title="产品">
+    <MenuItem itemKey="product-a">产品 A</MenuItem>
+    <SubMenu itemKey="product-b" title="产品 B">
+      <MenuItem itemKey="product-b1">产品 B-1</MenuItem>
+      <MenuItem itemKey="product-b2">产品 B-2</MenuItem>
+    </SubMenu>
+  </SubMenu>
   <MenuItem itemKey="about">关于</MenuItem>
   <MenuItem itemKey="contact">联系我们</MenuItem>
 </Menu>`
@@ -146,14 +152,20 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
 
     <!-- 横向菜单 -->
     <DemoBlock title="横向菜单"
-               description="水平导航菜单。"
+               description="水平导航菜单，支持多级嵌套级联展开。"
                :code="horizontalSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white">
           <Menu mode="horizontal"
                 v-model:selectedKeys="selectedKeys2">
             <MenuItem itemKey="home">首页</MenuItem>
-            <MenuItem itemKey="products">产品</MenuItem>
+            <SubMenu itemKey="products" title="产品">
+              <MenuItem itemKey="product-a">产品 A</MenuItem>
+              <SubMenu itemKey="product-b" title="产品 B">
+                <MenuItem itemKey="product-b1">产品 B-1</MenuItem>
+                <MenuItem itemKey="product-b2">产品 B-2</MenuItem>
+              </SubMenu>
+            </SubMenu>
             <MenuItem itemKey="about">关于</MenuItem>
             <MenuItem itemKey="contact">联系我们</MenuItem>
           </Menu>

@@ -181,6 +181,43 @@ const columns = [
 />
 ```
 
+### 可展开行
+
+```tsx
+const [expandedKeys, setExpandedKeys] = useState<(string | number)[]>([])
+
+const data = [
+  { id: 1, name: '项目 A', status: 'active', detail: '项目 A 的详细描述信息' },
+  { id: 2, name: '项目 B', status: 'inactive', detail: '项目 B 的详细描述信息' }
+]
+
+{
+  /* 基础可展开 */
+}
+;<Table
+  columns={columns}
+  dataSource={data}
+  expandable={{
+    expandedRowRender: (record) => <p>{record.detail}</p>
+  }}
+/>
+
+{
+  /* 受控展开 + 过滤可展开行 */
+}
+;<Table
+  columns={columns}
+  dataSource={data}
+  expandable={{
+    expandedRowKeys: expandedKeys,
+    expandedRowRender: (record) => <p>{record.detail}</p>,
+    rowExpandable: (record) => record.status === 'active',
+    expandIconPosition: 'end'
+  }}
+  onExpandedRowsChange={setExpandedKeys}
+/>
+```
+
 ---
 
 ## Timeline 时间轴
