@@ -101,7 +101,7 @@ const expandableSnippet = `<Table
     rowExpandable: (record) => record.status === 'active'
   }"
   :pagination="false"
-  @expanded-rows-change="(keys) => (expandedKeys = keys)" />`
+  @expand-change="(keys) => (expandedKeys = keys)" />`
 
 const basicData = ref<UserData[]>([
   {
@@ -541,7 +541,7 @@ const pagedData = computed(() => {
                rowExpandable: (record: Record<string, unknown>) => (record as UserData).status === 'active'
              }"
              :pagination="false"
-             @expanded-rows-change="(keys: (string | number)[]) => (expandedKeys = keys)" />
+             @expand-change="(keys: (string | number)[]) => (expandedKeys = keys)" />
     </DemoBlock>
   </div>
 </template>

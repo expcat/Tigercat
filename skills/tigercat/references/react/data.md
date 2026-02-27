@@ -181,40 +181,46 @@ const columns = [
 />
 ```
 
-### 可展开行
+### 行展开（Expandable Row）
 
 ```tsx
-const [expandedKeys, setExpandedKeys] = useState<(string | number)[]>([])
-
-const data = [
-  { id: 1, name: '项目 A', status: 'active', detail: '项目 A 的详细描述信息' },
-  { id: 2, name: '项目 B', status: 'inactive', detail: '项目 B 的详细描述信息' }
-]
-
-{
-  /* 基础可展开 */
-}
-;<Table
+// 基础用法
+<Table
   columns={columns}
-  dataSource={data}
+  dataSource={tableData}
   expandable={{
-    expandedRowRender: (record) => <p>{record.detail}</p>
+    expandedRowRender: (record) => (
+      <div>Email: {record.email}, Age: {record.age}</div>
+    )
+  }}
+  onExpandChange={(keys, record, expanded) => {
+    console.log('Expand changed:', { keys, record, expanded })
   }}
 />
 
-{
-  /* 受控展开 + 过滤可展开行 */
-}
-;<Table
+// 受控模式 + rowExpandable + expandIconPosition
+const [expandedRowKeys, setExpandedRowKeys] = useState<(string | number)[]>([])
+
+<Table
   columns={columns}
-  dataSource={data}
+  dataSource={tableData}
   expandable={{
-    expandedRowKeys: expandedKeys,
-    expandedRowRender: (record) => <p>{record.detail}</p>,
-    rowExpandable: (record) => record.status === 'active',
+    expandedRowKeys,
+    expandedRowRender: (record) => <div>Details: {record.email}</div>,
+    rowExpandable: (record) => (record.age as number) > 25,
     expandIconPosition: 'end'
   }}
-  onExpandedRowsChange={setExpandedKeys}
+  onExpandChange={(keys) => setExpandedRowKeys(keys)}
+/>
+
+// 点击整行展开
+<Table
+  columns={columns}
+  dataSource={tableData}
+  expandable={{
+    expandedRowRender: (record) => <div>Details: {record.email}</div>,
+    expandRowByClick: true
+  }}
 />
 ```
 

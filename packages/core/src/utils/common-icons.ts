@@ -106,6 +106,12 @@ export const sortDescIcon16PathD = 'M8 13l-4-4h8l-4 4z'
 export const sortBothIcon16PathD = 'M8 3l4 4H4l4-4zM8 13l-4-4h8l-4 4z'
 
 /**
+ * Expand/collapse chevron icon path (16x16)
+ * Points right when collapsed, rotates 90° when expanded.
+ */
+export const expandChevronIcon16PathD = 'M6 3l5 5-5 5V3z'
+
+/**
  * Lock icon paths (24x24)
  * Used by Table fixed column indicator.
  */

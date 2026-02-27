@@ -134,7 +134,7 @@ const expandableSnippet = `<Table<UserData>
     rowExpandable: (record) => record.status === 'active'
   }}
   pagination={false}
-  onExpandedRowsChange={setExpandedKeys}
+  onExpandChange={setExpandedKeys}
 />`
 
 const TableDemo: React.FC = () => {
@@ -540,7 +540,7 @@ const TableDemo: React.FC = () => {
             rowExpandable: (record: UserData) => record.status === 'active'
           }}
           pagination={false}
-          onExpandedRowsChange={setExpandedKeys}
+          onExpandChange={setExpandedKeys}
         />
       </DemoBlock>
     </div>

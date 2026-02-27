@@ -30,7 +30,7 @@ description: Shared props definitions for data display components - Table, Timel
 | defaultFilters | `Record<string, unknown>`                     | -           |  ✓  |   ✓   | 非受控默认筛选          |
 | pagination     | `PaginationConfig \| false`                   | `{...}`     |  ✓  |   ✓   | 分页配置，false 禁用    |
 | rowSelection   | `RowSelectionConfig`                          | -           |  ✓  |   ✓   | 行选择配置              |
-| expandable     | `ExpandableConfig`                            | -           |  ✓  |   ✓   | 可展开行配置            |
+| expandable     | `ExpandableConfig`                            | -           |  ✓  |   ✓   | 行展开配置              |
 | rowClassName   | `string \| ((record, index) => string)`       | -           |  ✓  |   ✓   | 自定义行 class          |
 | stickyHeader   | `boolean`                                     | `false`     |  ✓  |   ✓   | 固定表头                |
 | maxHeight      | `string \| number`                            | -           |  ✓  |   ✓   | 最大高度（启用滚动）    |
@@ -82,28 +82,30 @@ description: Shared props definitions for data display components - Table, Timel
 | ---------------------- | --------------------------------------- | ------------ | ------------------------ |
 | expandedRowKeys        | `(string \| number)[]`                  | -            | 展开行键值（受控）       |
 | defaultExpandedRowKeys | `(string \| number)[]`                  | -            | 默认展开行键值（非受控） |
-| expandedRowRender      | `(record: T, index: number) => unknown` | required     | 展开内容渲染函数         |
+| expandedRowRender      | `(record: T, index: number) => unknown` | -            | 展开内容渲染函数         |
 | rowExpandable          | `(record: T) => boolean`                | `() => true` | 判断行是否可展开         |
+| expandRowByClick       | `boolean`                               | `false`      | 是否点击整行触发展开     |
 | expandIconPosition     | `'start' \| 'end'`                      | `'start'`    | 展开图标列位置           |
 
 ### Events
 
-| Vue Event               | React Callback         | Payload                                 | Description  |
-| ----------------------- | ---------------------- | --------------------------------------- | ------------ |
-| `@change`               | `onChange`             | `{ sort, filters, pagination }`         | 综合状态变更 |
-| `@row-click`            | `onRowClick`           | `(record, index)`                       | 行点击       |
-| `@sort-change`          | `onSortChange`         | `SortState`                             | 排序变更     |
-| `@filter-change`        | `onFilterChange`       | `Record<string, unknown>`               | 筛选变更     |
-| `@selection-change`     | `onSelectionChange`    | `(string \| number)[]`                  | 选中行变更   |
-| `@expanded-rows-change` | `onExpandedRowsChange` | `(string \| number)[]`                  | 展开行变更   |
-| `@page-change`          | `onPageChange`         | `{ current: number, pageSize: number }` | 分页变更     |
+| Vue Event           | React Callback      | Payload                                 | Description  |
+| ------------------- | ------------------- | --------------------------------------- | ------------ |
+| `@change`           | `onChange`          | `{ sort, filters, pagination }`         | 综合状态变更 |
+| `@row-click`        | `onRowClick`        | `(record, index)`                       | 行点击       |
+| `@sort-change`      | `onSortChange`      | `SortState`                             | 排序变更     |
+| `@filter-change`    | `onFilterChange`    | `Record<string, unknown>`               | 筛选变更     |
+| `@selection-change` | `onSelectionChange` | `(string \| number)[]`                  | 选中行变更   |
+| `@expand-change`    | `onExpandChange`    | `(expandedKeys[], record, expanded)`    | 展开行变更   |
+| `@page-change`      | `onPageChange`      | `{ current: number, pageSize: number }` | 分页变更     |
 
 ### Slots (Vue only)
 
-| Vue Slot       | Description      |
-| -------------- | ---------------- |
-| `header-{key}` | 自定义列头内容   |
-| `cell-{key}`   | 自定义单元格内容 |
+| Vue Slot       | Description                                          |
+| -------------- | ---------------------------------------------------- |
+| `header-{key}` | 自定义列头内容                                       |
+| `cell-{key}`   | 自定义单元格内容                                     |
+| `expanded-row` | 自定义展开行内容（作用域 slot：`{ record, index }`） |
 
 ---
 

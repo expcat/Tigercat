@@ -545,81 +545,188 @@ describe('Table', () => {
   })
 
   describe('Expandable Rows', () => {
-    const expandable = {
-      expandedRowRender: (record: Record<string, unknown>) => `Details for ${record.name}`
+    const expandableConfig = {
+      expandedRowRender: (record: Record<string, unknown>) => (
+        <div className="expanded-content">Details for {record.name as string}</div>
+      )
     }
 
-    it('should render expand toggle buttons', () => {
-      const { getAllByLabelText } = render(
-        <Table columns={columns} dataSource={dataSource} expandable={expandable} />
+    it('should render expand icon column when expandable is provided', () => {
+      const { container } = render(
+        <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
       )
-      const expandButtons = getAllByLabelText('Expand row')
-      expect(expandButtons).toHaveLength(3)
+
+      const headerCells = container.querySelectorAll('thead th')
+      // columns.length + 1 for expand icon column
+      expect(headerCells.length).toBe(columns.length + 1)
     })
 
-    it('should expand a row on button click', async () => {
-      const { getAllByLabelText, getByText } = render(
-        <Table columns={columns} dataSource={dataSource} expandable={expandable} />
+    it('should render expand buttons for each row', () => {
+      const { getAllByRole } = render(
+        <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
       )
 
-      const expandButtons = getAllByLabelText('Expand row')
+      const expandButtons = getAllByRole('button', { name: /expand row/i })
+      expect(expandButtons.length).toBe(dataSource.length)
+    })
+
+    it('should expand row on clicking expand button', async () => {
+      const { getAllByRole, getByText } = render(
+        <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
+      )
+
+      const expandButtons = getAllByRole('button', { name: /expand row/i })
       await fireEvent.click(expandButtons[0])
+
       expect(getByText('Details for John Doe')).toBeInTheDocument()
     })
 
-    it('should collapse an expanded row', async () => {
-      const { getAllByLabelText, getByText, queryByText } = render(
-        <Table columns={columns} dataSource={dataSource} expandable={expandable} />
+    it('should collapse row on clicking expand button again', async () => {
+      const { getAllByRole, queryByText } = render(
+        <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
       )
 
-      const expandButtons = getAllByLabelText('Expand row')
+      const expandButtons = getAllByRole('button', { name: /expand row/i })
       await fireEvent.click(expandButtons[0])
-      expect(getByText('Details for John Doe')).toBeInTheDocument()
 
-      await fireEvent.click(getAllByLabelText('Collapse row')[0])
-      expect(queryByText('Details for John Doe')).toBeNull()
+      // Now collapse
+      const collapseButton = getAllByRole('button', { name: /collapse row/i })[0]
+      await fireEvent.click(collapseButton)
+
+      expect(queryByText('Details for John Doe')).not.toBeInTheDocument()
     })
 
-    it('should support defaultExpandedRowKeys', () => {
+    it('should support defaultExpandedRowKeys (uncontrolled)', () => {
       const { getByText } = render(
         <Table
           columns={columns}
           dataSource={dataSource}
-          expandable={{ ...expandable, defaultExpandedRowKeys: [1] }}
+          expandable={{
+            ...expandableConfig,
+            defaultExpandedRowKeys: [1]
+          }}
         />
       )
+
       expect(getByText('Details for John Doe')).toBeInTheDocument()
     })
 
-    it('should call onExpandedRowsChange', async () => {
-      const onExpandedRowsChange = vi.fn()
-      const { getAllByLabelText } = render(
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          expandable={expandable}
-          onExpandedRowsChange={onExpandedRowsChange}
-        />
-      )
-
-      await fireEvent.click(getAllByLabelText('Expand row')[0])
-      expect(onExpandedRowsChange).toHaveBeenCalledWith([1])
-    })
-
-    it('should support rowExpandable to control which rows can expand', () => {
-      const { getAllByLabelText } = render(
+    it('should support controlled expandedRowKeys', () => {
+      const { getByText, queryByText } = render(
         <Table
           columns={columns}
           dataSource={dataSource}
           expandable={{
-            ...expandable,
-            rowExpandable: (record) => (record.age as number) > 30
+            ...expandableConfig,
+            expandedRowKeys: [2]
           }}
         />
       )
-      // Only Jane (32) and Bob (45) should have expand buttons
-      const expandButtons = getAllByLabelText('Expand row')
-      expect(expandButtons).toHaveLength(2)
+
+      expect(queryByText('Details for John Doe')).not.toBeInTheDocument()
+      expect(getByText('Details for Jane Smith')).toBeInTheDocument()
+    })
+
+    it('should call onExpandChange callback', async () => {
+      const onExpandChange = vi.fn()
+
+      const { getAllByRole } = render(
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          expandable={expandableConfig}
+          onExpandChange={onExpandChange}
+        />
+      )
+
+      const expandButtons = getAllByRole('button', { name: /expand row/i })
+      await fireEvent.click(expandButtons[0])
+
+      expect(onExpandChange).toHaveBeenCalledWith(
+        [1],
+        expect.objectContaining({ id: 1, name: 'John Doe' }),
+        true
+      )
+    })
+
+    it('should respect rowExpandable function', () => {
+      const { getAllByRole } = render(
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          expandable={{
+            ...expandableConfig,
+            rowExpandable: (record) => (record.age as number) !== 32
+          }}
+        />
+      )
+
+      // Only 2 out of 3 rows should have expand buttons (Jane age=32 excluded)
+      const expandButtons = getAllByRole('button', { name: /expand row/i })
+      expect(expandButtons.length).toBe(2)
+    })
+
+    it('should expand row by clicking entire row when expandRowByClick is true', async () => {
+      const { getByText } = render(
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          expandable={{
+            ...expandableConfig,
+            expandRowByClick: true
+          }}
+        />
+      )
+
+      // Click the row (via a cell)
+      await fireEvent.click(getByText('John Doe'))
+
+      expect(getByText('Details for John Doe')).toBeInTheDocument()
+    })
+
+    it('should set correct colspan on expanded row td', async () => {
+      const { getAllByRole, container } = render(
+        <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
+      )
+
+      const expandButtons = getAllByRole('button', { name: /expand row/i })
+      await fireEvent.click(expandButtons[0])
+
+      // columns (3) + expand icon column (1) = 4
+      const expandedTd = container.querySelector('.expanded-content')?.closest('td')
+      expect(expandedTd?.getAttribute('colspan')).toBe('4')
+    })
+
+    it('should set correct colspan with rowSelection and expandable', async () => {
+      const { getAllByRole, container } = render(
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          expandable={expandableConfig}
+          rowSelection={{ type: 'checkbox' }}
+        />
+      )
+
+      const expandButtons = getAllByRole('button', { name: /expand row/i })
+      await fireEvent.click(expandButtons[0])
+
+      // columns (3) + checkbox column (1) + expand icon column (1) = 5
+      const expandedTd = container.querySelector('.expanded-content')?.closest('td')
+      expect(expandedTd?.getAttribute('colspan')).toBe('5')
+    })
+
+    it('should set aria-expanded attribute on expand button', async () => {
+      const { getAllByRole } = render(
+        <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
+      )
+
+      const expandButtons = getAllByRole('button', { name: /expand row/i })
+      expect(expandButtons[0].getAttribute('aria-expanded')).toBe('false')
+
+      await fireEvent.click(expandButtons[0])
+
+      const collapseButton = getAllByRole('button', { name: /collapse row/i })[0]
+      expect(collapseButton.getAttribute('aria-expanded')).toBe('true')
     })
 
     it('should render expand column at end when expandIconPosition=end', () => {
@@ -627,10 +734,9 @@ describe('Table', () => {
         <Table
           columns={columns}
           dataSource={dataSource}
-          expandable={{ ...expandable, expandIconPosition: 'end' }}
+          expandable={{ ...expandableConfig, expandIconPosition: 'end' }}
         />
       )
-      // The last th in header should be the expand column (empty)
       const headerCells = container.querySelectorAll('thead th')
       const lastTh = headerCells[headerCells.length - 1]
       expect(lastTh.textContent).toBe('')
@@ -638,12 +744,10 @@ describe('Table', () => {
 
     it('should render expand column header at start by default', () => {
       const { container } = render(
-        <Table columns={columns} dataSource={dataSource} expandable={expandable} />
+        <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
       )
       const headerCells = container.querySelectorAll('thead th')
-      // First th should be the expand column (empty)
       expect(headerCells[0].textContent).toBe('')
-      // Second should be "Name"
       expect(headerCells[1].textContent).toContain('Name')
     })
   })

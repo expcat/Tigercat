@@ -180,43 +180,48 @@ const columns = [
 </script>
 ```
 
-### 可展开行
+### 行展开（Expandable Row）
 
 ```vue
-<script setup>
-import { ref, h } from 'vue'
-const data = ref([
-  { id: 1, name: '项目 A', status: 'active', detail: '项目 A 的详细描述信息' },
-  { id: 2, name: '项目 B', status: 'inactive', detail: '项目 B 的详细描述信息' }
-])
-const columns = [
-  { key: 'name', title: '名称' },
-  { key: 'status', title: '状态' }
-]
-const expandedKeys = ref([])
-</script>
-
 <template>
-  <!-- 基础可展开 -->
+  <!-- 方式一：使用 expandedRowRender 函数 -->
   <Table
     :columns="columns"
-    :data-source="data"
+    :dataSource="tableData"
     :expandable="{
-      expandedRowRender: (record) => h('p', record.detail)
-    }" />
+      expandedRowRender: (record) => h('div', `Email: ${record.email}, Age: ${record.age}`)
+    }"
+    @expand-change="handleExpandChange" />
 
-  <!-- 受控展开 + 过滤可展开行 -->
+  <!-- 方式二：使用 #expanded-row slot -->
+  <Table :columns="columns" :dataSource="tableData" :expandable="{}">
+    <template #expanded-row="{ record }">
+      <div class="p-4">
+        <p>Name: {{ record.name }}</p>
+        <p>Email: {{ record.email }}</p>
+      </div>
+    </template>
+  </Table>
+
+  <!-- 受控模式 + expandIconPosition -->
   <Table
     :columns="columns"
-    :data-source="data"
+    :dataSource="tableData"
     :expandable="{
-      expandedRowKeys: expandedKeys,
-      expandedRowRender: (record) => h('p', record.detail),
-      rowExpandable: (record) => record.status === 'active',
+      expandedRowKeys,
+      expandedRowRender: (record) => h('div', `Details: ${record.email}`),
+      rowExpandable: (record) => record.age > 25,
       expandIconPosition: 'end'
     }"
-    @expanded-rows-change="(keys) => (expandedKeys = keys)" />
+    @expand-change="(keys) => (expandedRowKeys = keys)" />
 </template>
+<script setup>
+import { ref, h } from 'vue'
+const expandedRowKeys = ref([])
+const handleExpandChange = (keys, record, expanded) => {
+  console.log('Expand changed:', { keys, record, expanded })
+}
+</script>
 ```
 
 ---

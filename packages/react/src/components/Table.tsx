@@ -9,10 +9,10 @@ import {
   getFixedColumnOffsets,
   getSortIconClasses,
   getCheckboxCellClasses,
-  getExpandCellClasses,
-  expandIconButtonClasses,
-  getExpandIconRotationClasses,
-  expandedRowContentClasses,
+  getExpandIconCellClasses,
+  getExpandIconClasses,
+  getExpandedRowClasses,
+  getExpandedRowContentClasses,
   tableBaseClasses,
   tableEmptyStateClasses,
   tableLoadingOverlayClasses,
@@ -24,6 +24,7 @@ import {
   sortAscIcon16PathD,
   sortDescIcon16PathD,
   sortBothIcon16PathD,
+  expandChevronIcon16PathD,
   lockClosedIcon24PathD,
   lockOpenIcon24PathD,
   sortData,
@@ -83,9 +84,9 @@ export interface TableProps<T = Record<string, unknown>> extends CoreTableProps<
   onPageChange?: (page: { current: number; pageSize: number }) => void
 
   /**
-   * Expanded rows change handler
+   * Expand change handler
    */
-  onExpandedRowsChange?: (expandedRowKeys: (string | number)[]) => void
+  onExpandChange?: (expandedKeys: (string | number)[], record: T, expanded: boolean) => void
 
   /**
    * Additional CSS classes
@@ -119,6 +120,20 @@ const LockIcon: React.FC<{ locked: boolean }> = ({ locked }) => {
   return (
     <svg width="14" height="14" viewBox={icon24ViewBox} fill="currentColor" aria-hidden="true">
       <path d={locked ? lockClosedIcon24PathD : lockOpenIcon24PathD} />
+    </svg>
+  )
+}
+
+const ExpandIcon: React.FC<{ expanded: boolean }> = ({ expanded }) => {
+  return (
+    <svg
+      className={getExpandIconClasses(expanded)}
+      width="16"
+      height="16"
+      viewBox={icon16ViewBox}
+      fill="currentColor"
+      aria-hidden="true">
+      <path d={expandChevronIcon16PathD} />
     </svg>
   )
 }
@@ -161,19 +176,19 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     showTotal: true
   },
   rowSelection,
+  expandable,
   rowKey = 'id',
   rowClassName,
   stickyHeader = false,
   maxHeight,
   tableLayout = 'auto',
-  expandable,
   onChange,
   onRowClick,
   onSelectionChange,
   onSortChange,
   onFilterChange,
   onPageChange,
-  onExpandedRowsChange,
+  onExpandChange,
   className,
   ...props
 }: TableProps<T>) {
@@ -187,6 +202,9 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
 
   const isSelectionControlled =
     rowSelection?.selectedRowKeys !== undefined && Array.isArray(rowSelection.selectedRowKeys)
+
+  const isExpandControlled =
+    expandable?.expandedRowKeys !== undefined && Array.isArray(expandable.expandedRowKeys)
 
   const [uncontrolledSortState, setUncontrolledSortState] = useState<SortState>(
     defaultSort ?? { key: null, direction: null }
@@ -208,6 +226,10 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     (string | number)[]
   >(rowSelection?.defaultSelectedRowKeys ?? rowSelection?.selectedRowKeys ?? [])
 
+  const [uncontrolledExpandedRowKeys, setUncontrolledExpandedRowKeys] = useState<
+    (string | number)[]
+  >(expandable?.defaultExpandedRowKeys ?? expandable?.expandedRowKeys ?? [])
+
   const sortState = isSortControlled ? (sort as SortState) : uncontrolledSortState
   const filterState = isFiltersControlled
     ? (filters as Record<string, unknown>)
@@ -221,6 +243,10 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   const selectedRowKeys = isSelectionControlled
     ? (rowSelection!.selectedRowKeys as (string | number)[])
     : uncontrolledSelectedRowKeys
+
+  const expandedRowKeys = isExpandControlled
+    ? (expandable!.expandedRowKeys as (string | number)[])
+    : uncontrolledExpandedRowKeys
 
   useEffect(() => {
     if (isSortControlled && sort) {
@@ -252,30 +278,11 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     }
   }, [isSelectionControlled, rowSelection?.selectedRowKeys])
 
-  // Expandable rows state
-  const isExpandControlled = expandable?.expandedRowKeys !== undefined
-  const [uncontrolledExpandedRowKeys, setUncontrolledExpandedRowKeys] = useState<
-    (string | number)[]
-  >(expandable?.defaultExpandedRowKeys ?? expandable?.expandedRowKeys ?? [])
-  const expandedRowKeys = isExpandControlled
-    ? (expandable!.expandedRowKeys as (string | number)[])
-    : uncontrolledExpandedRowKeys
-  const expandedRowKeySet = useMemo(
-    () => new Set<string | number>(expandedRowKeys),
-    [expandedRowKeys]
-  )
-
-  const handleToggleExpand = useCallback(
-    (key: string | number) => {
-      const isExp = expandedRowKeySet.has(key)
-      const next = isExp ? expandedRowKeys.filter((k) => k !== key) : [...expandedRowKeys, key]
-      if (!isExpandControlled) {
-        setUncontrolledExpandedRowKeys(next)
-      }
-      onExpandedRowsChange?.(next)
-    },
-    [expandedRowKeys, expandedRowKeySet, isExpandControlled, onExpandedRowsChange]
-  )
+  useEffect(() => {
+    if (isExpandControlled) {
+      setUncontrolledExpandedRowKeys((expandable?.expandedRowKeys as (string | number)[]) ?? [])
+    }
+  }, [isExpandControlled, expandable?.expandedRowKeys])
 
   const [fixedOverrides, setFixedOverrides] = useState<Record<string, 'left' | 'right' | false>>({})
 
@@ -360,6 +367,11 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   const selectedRowKeySet = useMemo(
     () => new Set<string | number>(selectedRowKeys),
     [selectedRowKeys]
+  )
+
+  const expandedRowKeySet = useMemo(
+    () => new Set<string | number>(expandedRowKeys),
+    [expandedRowKeys]
   )
 
   const paginationInfo = useMemo(() => {
@@ -493,11 +505,35 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     [sortState, filterState, onPageChange, onChange]
   )
 
+  const handleToggleExpand = useCallback(
+    (key: string | number, record: T) => {
+      const isExpanded = expandedRowKeySet.has(key)
+      const newKeys = isExpanded
+        ? expandedRowKeys.filter((k) => k !== key)
+        : [...expandedRowKeys, key]
+
+      if (!isExpandControlled) {
+        setUncontrolledExpandedRowKeys(newKeys)
+      }
+      onExpandChange?.(newKeys, record, !isExpanded)
+    },
+    [expandedRowKeySet, expandedRowKeys, isExpandControlled, onExpandChange]
+  )
+
   const handleRowClick = useCallback(
     (record: T, index: number) => {
       onRowClick?.(record, index)
+
+      // Toggle expand on row click if expandRowByClick is enabled
+      if (expandable?.expandRowByClick) {
+        const key = getRowKey(record, rowKey, index)
+        const isExpandableRow = expandable?.rowExpandable ? expandable.rowExpandable(record) : true
+        if (isExpandableRow) {
+          handleToggleExpand(key, record)
+        }
+      }
     },
-    [onRowClick]
+    [onRowClick, expandable, rowKey, handleToggleExpand]
   )
 
   const handleSelectRow = useCallback(
@@ -553,13 +589,16 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   }, [selectedRowKeys.length, allSelected])
 
   const renderTableHeader = useCallback(() => {
+    const expandHeaderTh = expandable ? (
+      <th className={getExpandIconCellClasses(size)} aria-label="Expand" />
+    ) : null
+    const expandAtStart = expandable?.expandIconPosition !== 'end'
+
     return (
       <thead className={getTableHeaderClasses(stickyHeader)}>
         <tr>
-          {/* Expand icon column header (start position) */}
-          {expandable && expandable.expandIconPosition !== 'end' && (
-            <th className={getExpandCellClasses(size)} />
-          )}
+          {/* Expand column header (start position - default) */}
+          {expandAtStart && expandHeaderTh}
 
           {/* Selection checkbox column */}
           {rowSelection && rowSelection.showCheckbox !== false && rowSelection.type !== 'radio' && (
@@ -687,10 +726,8 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
             )
           })}
 
-          {/* Expand icon column header (end position) */}
-          {expandable && expandable.expandIconPosition === 'end' && (
-            <th className={getExpandCellClasses(size)} />
-          )}
+          {/* Expand column header (end position) */}
+          {!expandAtStart && expandHeaderTh}
         </tr>
       </thead>
     )
@@ -700,6 +737,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     stickyHeader,
     sortState,
     rowSelection,
+    expandable,
     allSelected,
     someSelected,
     handleSort,
@@ -707,8 +745,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     handleSelectAll,
     columnLockable,
     toggleColumnLock,
-    fixedColumnsInfo,
-    expandable
+    fixedColumnsInfo
   ])
 
   const renderTableBody = useCallback(() => {
@@ -730,153 +767,150 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       )
     }
 
-    const ExpandToggle: React.FC<{
-      rowKey: string | number
-      expandableRow: boolean
-      expanded: boolean
-    }> = ({ rowKey: rk, expandableRow, expanded }) =>
-      expandableRow ? (
-        <button
-          className={classNames(expandIconButtonClasses, getExpandIconRotationClasses(expanded))}
-          aria-label={expanded ? 'Collapse row' : 'Expand row'}
-          onClick={(e) => {
-            e.stopPropagation()
-            handleToggleExpand(rk)
-          }}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox={icon16ViewBox}
-            fill="currentColor"
-            className="w-4 h-4">
-            <path d="M6 3l6 5-6 5V3z" />
-          </svg>
-        </button>
-      ) : null
-
     return (
       <tbody>
         {paginatedData.map((record, index) => {
           const key = pageRowKeys[index]
           const isSelected = selectedRowKeySet.has(key)
           const isExpanded = expandedRowKeySet.has(key)
-          const isExpandableRow = expandable ? (expandable.rowExpandable?.(record) ?? true) : false
+          const isRowExpandable = expandable
+            ? expandable.rowExpandable
+              ? expandable.rowExpandable(record)
+              : true
+            : false
           const rowClass =
             typeof rowClassName === 'function' ? rowClassName(record, index) : rowClassName
 
-          return (
-            <Fragment key={key}>
-              <tr
-                className={classNames(
-                  getTableRowClasses(hoverable, striped, index % 2 === 0, rowClass),
-                  fixedColumnsInfo.hasFixedColumns && 'group'
-                )}
-                onClick={() => handleRowClick(record, index)}>
-                {/* Expand toggle cell (start position) */}
-                {expandable && expandable.expandIconPosition !== 'end' && (
-                  <td className={getExpandCellClasses(size)}>
-                    <ExpandToggle
-                      rowKey={key}
-                      expandableRow={isExpandableRow}
-                      expanded={isExpanded}
-                    />
-                  </td>
-                )}
+          const expandToggleCell = expandable ? (
+            <td className={getExpandIconCellClasses(size)}>
+              {isRowExpandable && (
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center"
+                  aria-label={isExpanded ? 'Collapse row' : 'Expand row'}
+                  aria-expanded={isExpanded}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleToggleExpand(key, record)
+                  }}>
+                  <ExpandIcon expanded={isExpanded} />
+                </button>
+              )}
+            </td>
+          ) : null
 
-                {/* Selection checkbox cell */}
-                {rowSelection && rowSelection.showCheckbox !== false && (
-                  <td className={getCheckboxCellClasses(size)}>
-                    <input
-                      type={rowSelection?.type === 'radio' ? 'radio' : 'checkbox'}
-                      className={
-                        rowSelection?.type === 'radio'
-                          ? 'border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
-                          : 'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
-                      }
-                      checked={isSelected}
-                      disabled={rowSelection?.getCheckboxProps?.(record)?.disabled}
-                      onChange={(e) => handleSelectRow(key, e.target.checked)}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  </td>
-                )}
+          const expandAtStart = expandable?.expandIconPosition !== 'end'
 
-                {/* Data cells */}
-                {displayColumns.map((column) => {
-                  const dataKey = column.dataKey || column.key
-                  const cellValue = record[dataKey]
+          const rowNode = (
+            <tr
+              key={key}
+              className={classNames(
+                getTableRowClasses(hoverable, striped, index % 2 === 0, rowClass),
+                fixedColumnsInfo.hasFixedColumns && 'group'
+              )}
+              onClick={() => handleRowClick(record, index)}>
+              {/* Expand toggle cell (start position - default) */}
+              {expandAtStart && expandToggleCell}
 
-                  const isFixedLeft = column.fixed === 'left'
-                  const isFixedRight = column.fixed === 'right'
-                  const fixedStyle = isFixedLeft
+              {/* Selection checkbox cell */}
+              {rowSelection && rowSelection.showCheckbox !== false && (
+                <td className={getCheckboxCellClasses(size)}>
+                  <input
+                    type={rowSelection?.type === 'radio' ? 'radio' : 'checkbox'}
+                    className={
+                      rowSelection?.type === 'radio'
+                        ? 'border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
+                        : 'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
+                    }
+                    checked={isSelected}
+                    disabled={rowSelection?.getCheckboxProps?.(record)?.disabled}
+                    onChange={(e) => handleSelectRow(key, e.target.checked)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </td>
+              )}
+
+              {/* Data cells */}
+              {displayColumns.map((column) => {
+                const dataKey = column.dataKey || column.key
+                const cellValue = record[dataKey]
+
+                const isFixedLeft = column.fixed === 'left'
+                const isFixedRight = column.fixed === 'right'
+                const fixedStyle = isFixedLeft
+                  ? {
+                      position: 'sticky' as const,
+                      left: `${fixedColumnsInfo.leftOffsets[column.key] || 0}px`,
+                      zIndex: 10
+                    }
+                  : isFixedRight
                     ? {
                         position: 'sticky' as const,
-                        left: `${fixedColumnsInfo.leftOffsets[column.key] || 0}px`,
+                        right: `${fixedColumnsInfo.rightOffsets[column.key] || 0}px`,
                         zIndex: 10
-                      }
-                    : isFixedRight
-                      ? {
-                          position: 'sticky' as const,
-                          right: `${fixedColumnsInfo.rightOffsets[column.key] || 0}px`,
-                          zIndex: 10
-                        }
-                      : undefined
-
-                  const widthStyle = column.width
-                    ? {
-                        width: typeof column.width === 'number' ? `${column.width}px` : column.width
                       }
                     : undefined
 
-                  const style = fixedStyle ? { ...widthStyle, ...fixedStyle } : widthStyle
+                const widthStyle = column.width
+                  ? {
+                      width: typeof column.width === 'number' ? `${column.width}px` : column.width
+                    }
+                  : undefined
 
-                  const stickyBgClass =
-                    striped && index % 2 === 0
-                      ? 'bg-[var(--tiger-surface-muted,#f9fafb)]/50'
-                      : 'bg-[var(--tiger-surface,#ffffff)]'
+                const style = fixedStyle ? { ...widthStyle, ...fixedStyle } : widthStyle
 
-                  const stickyCellClass =
-                    isFixedLeft || isFixedRight
-                      ? classNames(
-                          stickyBgClass,
-                          hoverable && 'group-hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
-                        )
-                      : undefined
+                const stickyBgClass =
+                  striped && index % 2 === 0
+                    ? 'bg-[var(--tiger-surface-muted,#f9fafb)]/50'
+                    : 'bg-[var(--tiger-surface,#ffffff)]'
 
-                  return (
-                    <td
-                      key={column.key}
-                      className={classNames(
-                        getTableCellClasses(size, column.align || 'left', column.className),
-                        stickyCellClass
-                      )}
-                      style={style}>
-                      {column.render
-                        ? (column.render(record, index) as React.ReactNode)
-                        : (cellValue as React.ReactNode)}
-                    </td>
-                  )
-                })}
-                {/* Expand toggle cell (end position) */}
-                {expandable && expandable.expandIconPosition === 'end' && (
-                  <td className={getExpandCellClasses(size)}>
-                    <ExpandToggle
-                      rowKey={key}
-                      expandableRow={isExpandableRow}
-                      expanded={isExpanded}
-                    />
+                const stickyCellClass =
+                  isFixedLeft || isFixedRight
+                    ? classNames(
+                        stickyBgClass,
+                        hoverable && 'group-hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
+                      )
+                    : undefined
+
+                return (
+                  <td
+                    key={column.key}
+                    className={classNames(
+                      getTableCellClasses(size, column.align || 'left', column.className),
+                      stickyCellClass
+                    )}
+                    style={style}>
+                    {column.render
+                      ? (column.render(record, index) as React.ReactNode)
+                      : (cellValue as React.ReactNode)}
                   </td>
-                )}
-              </tr>
-              {/* Expanded content row */}
-              {expandable && isExpanded && isExpandableRow && (
-                <tr className={expandedRowContentClasses}>
-                  <td colSpan={totalColumnCount}>
-                    {expandable.expandedRowRender(record, index) as React.ReactNode}
+                )
+              })}
+
+              {/* Expand toggle cell (end position) */}
+              {!expandAtStart && expandToggleCell}
+            </tr>
+          )
+
+          // Expanded row content
+          if (expandable && isExpanded && isRowExpandable) {
+            const expandedContent = expandable.expandedRowRender
+              ? expandable.expandedRowRender(record, index)
+              : null
+
+            return (
+              <React.Fragment key={key}>
+                {rowNode}
+                <tr key={`${key}-expanded`} className={getExpandedRowClasses()}>
+                  <td colSpan={totalColumnCount} className={getExpandedRowContentClasses(size)}>
+                    {expandedContent as React.ReactNode}
                   </td>
                 </tr>
-              )}
-            </Fragment>
-          )
+              </React.Fragment>
+            )
+          }
+
+          return rowNode
         })}
       </tbody>
     )
@@ -885,20 +919,20 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     paginatedData,
     displayColumns,
     rowSelection,
+    expandable,
     emptyText,
     pageRowKeys,
     selectedRowKeySet,
+    expandedRowKeySet,
+    totalColumnCount,
     rowClassName,
     hoverable,
     striped,
     size,
     handleRowClick,
     handleSelectRow,
-    fixedColumnsInfo,
-    expandable,
-    expandedRowKeySet,
     handleToggleExpand,
-    totalColumnCount
+    fixedColumnsInfo
   ])
 
   const renderPagination = useCallback(() => {

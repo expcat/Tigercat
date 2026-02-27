@@ -9,10 +9,10 @@ import {
   getFixedColumnOffsets,
   getSortIconClasses,
   getCheckboxCellClasses,
-  getExpandCellClasses,
-  expandIconButtonClasses,
-  getExpandIconRotationClasses,
-  expandedRowContentClasses,
+  getExpandIconCellClasses,
+  getExpandIconClasses,
+  getExpandedRowClasses,
+  getExpandedRowContentClasses,
   tableBaseClasses,
   tableEmptyStateClasses,
   tableLoadingOverlayClasses,
@@ -25,6 +25,7 @@ import {
   sortAscIcon16PathD,
   sortDescIcon16PathD,
   sortBothIcon16PathD,
+  expandChevronIcon16PathD,
   lockClosedIcon24PathD,
   lockOpenIcon24PathD,
   sortData,
@@ -108,6 +109,21 @@ const LockIcon = (locked: boolean) => {
       'aria-hidden': 'true'
     },
     [h('path', { d: locked ? lockClosedIcon24PathD : lockOpenIcon24PathD })]
+  )
+}
+
+const ExpandIcon = (expanded: boolean) => {
+  return h(
+    'svg',
+    {
+      class: getExpandIconClasses(expanded),
+      width: '16',
+      height: '16',
+      viewBox: icon16ViewBox,
+      fill: 'currentColor',
+      'aria-hidden': 'true'
+    },
+    [h('path', { d: expandChevronIcon16PathD })]
   )
 }
 
@@ -296,7 +312,7 @@ export const Table = defineComponent({
     'sort-change',
     'filter-change',
     'page-change',
-    'expanded-rows-change'
+    'expand-change'
   ],
   setup(props, { emit, slots }) {
     const paginationConfig = computed(() => {
@@ -346,7 +362,6 @@ export const Table = defineComponent({
     const expandedRowKeys = computed(() => {
       return props.expandable?.expandedRowKeys ?? uncontrolledExpandedRowKeys.value
     })
-    const expandedRowKeySet = computed(() => new Set<string | number>(expandedRowKeys.value))
 
     watch(
       () => props.sort,
@@ -389,6 +404,15 @@ export const Table = defineComponent({
       (next) => {
         if (next !== undefined) {
           uncontrolledSelectedRowKeys.value = next
+        }
+      }
+    )
+
+    watch(
+      () => props.expandable?.expandedRowKeys,
+      (next) => {
+        if (next !== undefined) {
+          uncontrolledExpandedRowKeys.value = next
         }
       }
     )
@@ -456,6 +480,17 @@ export const Table = defineComponent({
 
     const selectedRowKeySet = computed(() => {
       return new Set<string | number>(selectedRowKeys.value)
+    })
+
+    const expandedRowKeySet = computed(() => {
+      return new Set<string | number>(expandedRowKeys.value)
+    })
+
+    const totalColumnCount = computed(() => {
+      let count = displayColumns.value.length
+      if (props.rowSelection) count += 1
+      if (props.expandable) count += 1
+      return count
     })
 
     const paginationInfo = computed(() => {
@@ -564,6 +599,29 @@ export const Table = defineComponent({
 
     function handleRowClick(record: Record<string, unknown>, index: number) {
       emit('row-click', record, index)
+
+      // Toggle expand on row click if expandRowByClick is enabled
+      if (props.expandable?.expandRowByClick) {
+        const key = getRowKey(record, props.rowKey, index)
+        const isExpandable = props.expandable?.rowExpandable
+          ? props.expandable.rowExpandable(record)
+          : true
+        if (isExpandable) {
+          handleToggleExpand(key, record)
+        }
+      }
+    }
+
+    function handleToggleExpand(key: string | number, record: Record<string, unknown>) {
+      const isExpanded = expandedRowKeySet.value.has(key)
+      const newKeys = isExpanded
+        ? expandedRowKeys.value.filter((k) => k !== key)
+        : [...expandedRowKeys.value, key]
+
+      if (!isExpandControlled.value) {
+        uncontrolledExpandedRowKeys.value = newKeys
+      }
+      emit('expand-change', newKeys, record, !isExpanded)
     }
 
     function handleSelectRow(key: string | number, checked: boolean) {
@@ -615,32 +673,20 @@ export const Table = defineComponent({
       return selectedRowKeys.value.length > 0 && !allSelected.value
     })
 
-    function handleToggleExpand(key: string | number) {
-      const isExp = expandedRowKeySet.value.has(key)
-      const next = isExp
-        ? expandedRowKeys.value.filter((k) => k !== key)
-        : [...expandedRowKeys.value, key]
-
-      if (!isExpandControlled.value) {
-        uncontrolledExpandedRowKeys.value = next
-      }
-      emit('expanded-rows-change', next)
-    }
-
-    // Total column count (data + selection + expand)
-    const totalColumnCount = computed(() => {
-      let count = displayColumns.value.length
-      if (props.rowSelection && props.rowSelection.showCheckbox !== false) count++
-      if (props.expandable) count++
-      return count
-    })
-
     function renderTableHeader() {
       const headerCells = []
+      const expandAtStart = props.expandable && props.expandable.expandIconPosition !== 'end'
+      const expandAtEnd = props.expandable && props.expandable.expandIconPosition === 'end'
+      const expandHeaderTh = props.expandable
+        ? h('th', {
+            class: getExpandIconCellClasses(props.size),
+            'aria-label': 'Expand'
+          })
+        : null
 
-      // Expand icon column header (at start position)
-      if (props.expandable && props.expandable.expandIconPosition !== 'end') {
-        headerCells.push(h('th', { class: getExpandCellClasses(props.size) }))
+      // Expand column header (start position - default)
+      if (expandAtStart && expandHeaderTh) {
+        headerCells.push(expandHeaderTh)
       }
 
       // Selection checkbox column
@@ -803,9 +849,9 @@ export const Table = defineComponent({
         )
       })
 
-      // Expand icon column header (at end position)
-      if (props.expandable && props.expandable.expandIconPosition === 'end') {
-        headerCells.push(h('th', { class: getExpandCellClasses(props.size) }))
+      // Expand column header (end position)
+      if (expandAtEnd && expandHeaderTh) {
+        headerCells.push(expandHeaderTh)
       }
 
       return h('thead', { class: getTableHeaderClasses(props.stickyHeader) }, [
@@ -846,8 +892,10 @@ export const Table = defineComponent({
         const key = paginatedRowKeys.value[index]
         const isSelected = selectedRowKeySet.value.has(key)
         const isExpanded = expandedRowKeySet.value.has(key)
-        const isExpandable = props.expandable
-          ? (props.expandable.rowExpandable?.(record) ?? true)
+        const isRowExpandable = props.expandable
+          ? props.expandable.rowExpandable
+            ? props.expandable.rowExpandable(record)
+            : true
           : false
         const rowClass =
           typeof props.rowClassName === 'function'
@@ -855,41 +903,38 @@ export const Table = defineComponent({
             : props.rowClassName
 
         const cells = []
+        const expandAtStart = props.expandable && props.expandable.expandIconPosition !== 'end'
 
-        // Expand toggle cell (start position)
-        if (props.expandable && props.expandable.expandIconPosition !== 'end') {
-          cells.push(
-            h('td', { class: getExpandCellClasses(props.size) }, [
-              isExpandable
-                ? h(
-                    'button',
-                    {
-                      class: classNames(
-                        expandIconButtonClasses,
-                        getExpandIconRotationClasses(isExpanded)
-                      ),
-                      'aria-label': isExpanded ? 'Collapse row' : 'Expand row',
-                      onClick: (e: Event) => {
-                        e.stopPropagation()
-                        handleToggleExpand(key)
-                      }
-                    },
-                    [
-                      h(
-                        'svg',
-                        normalizeSvgAttrs({
-                          xmlns: 'http://www.w3.org/2000/svg',
-                          viewBox: icon16ViewBox,
-                          fill: 'currentColor',
-                          class: 'w-4 h-4'
-                        }),
-                        [h('path', { d: 'M6 3l6 5-6 5V3z' })]
-                      )
-                    ]
-                  )
-                : null
-            ])
-          )
+        const expandToggleCell = props.expandable
+          ? h(
+              'td',
+              {
+                class: getExpandIconCellClasses(props.size)
+              },
+              isRowExpandable
+                ? [
+                    h(
+                      'button',
+                      {
+                        type: 'button',
+                        class: 'inline-flex items-center justify-center',
+                        'aria-label': isExpanded ? 'Collapse row' : 'Expand row',
+                        'aria-expanded': isExpanded,
+                        onClick: (e: Event) => {
+                          e.stopPropagation()
+                          handleToggleExpand(key, record)
+                        }
+                      },
+                      [ExpandIcon(isExpanded)]
+                    )
+                  ]
+                : []
+            )
+          : null
+
+        // Expand toggle cell (start position - default)
+        if (expandAtStart && expandToggleCell) {
+          cells.push(expandToggleCell)
         }
 
         // Selection checkbox cell
@@ -981,42 +1026,11 @@ export const Table = defineComponent({
         })
 
         // Expand toggle cell (end position)
-        if (props.expandable && props.expandable.expandIconPosition === 'end') {
-          cells.push(
-            h('td', { class: getExpandCellClasses(props.size) }, [
-              isExpandable
-                ? h(
-                    'button',
-                    {
-                      class: classNames(
-                        expandIconButtonClasses,
-                        getExpandIconRotationClasses(isExpanded)
-                      ),
-                      'aria-label': isExpanded ? 'Collapse row' : 'Expand row',
-                      onClick: (e: Event) => {
-                        e.stopPropagation()
-                        handleToggleExpand(key)
-                      }
-                    },
-                    [
-                      h(
-                        'svg',
-                        normalizeSvgAttrs({
-                          xmlns: 'http://www.w3.org/2000/svg',
-                          viewBox: icon16ViewBox,
-                          fill: 'currentColor',
-                          class: 'w-4 h-4'
-                        }),
-                        [h('path', { d: 'M6 3l6 5-6 5V3z' })]
-                      )
-                    ]
-                  )
-                : null
-            ])
-          )
+        if (!expandAtStart && expandToggleCell) {
+          cells.push(expandToggleCell)
         }
 
-        const row = h(
+        const rowNode = h(
           'tr',
           {
             key,
@@ -1029,20 +1043,36 @@ export const Table = defineComponent({
           cells
         )
 
-        const result: VNodeChild[] = [row]
+        // Expanded row content
+        if (props.expandable && isExpanded && isRowExpandable) {
+          const expandedContent =
+            slots['expanded-row']?.({ record, index }) ||
+            (props.expandable.expandedRowRender
+              ? props.expandable.expandedRowRender(record, index)
+              : null)
 
-        // Expanded content row
-        if (props.expandable && isExpanded && isExpandable) {
-          result.push(
-            h('tr', { key: `${key}-expanded`, class: expandedRowContentClasses }, [
-              h('td', { colspan: totalColumnCount.value }, [
-                props.expandable.expandedRowRender(record, index) as VNodeChild
-              ])
-            ])
+          const expandedRow = h(
+            'tr',
+            {
+              key: `${key}-expanded`,
+              class: getExpandedRowClasses()
+            },
+            [
+              h(
+                'td',
+                {
+                  colspan: totalColumnCount.value,
+                  class: getExpandedRowContentClasses(props.size)
+                },
+                [expandedContent as VNodeChild]
+              )
+            ]
           )
+
+          return [rowNode, expandedRow]
         }
 
-        return result
+        return rowNode
       })
 
       return h('tbody', rows)

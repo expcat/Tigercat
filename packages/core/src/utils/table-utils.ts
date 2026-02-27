@@ -218,31 +218,7 @@ export function getCheckboxCellClasses(size: TableSize): string {
   return classNames('text-center', widthClasses[size])
 }
 
-/**
- * Get expand toggle cell classes (same sizing as checkbox cell)
- */
-export function getExpandCellClasses(size: TableSize): string {
-  return getCheckboxCellClasses(size)
-}
 
-/**
- * Get expand icon button classes
- */
-export const expandIconButtonClasses =
-  'inline-flex items-center justify-center w-5 h-5 rounded cursor-pointer border-0 bg-transparent transition-transform duration-200 text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]'
-
-/**
- * Get expand icon rotation class
- */
-export function getExpandIconRotationClasses(expanded: boolean): string {
-  return expanded ? 'rotate-90' : 'rotate-0'
-}
-
-/**
- * Get expanded row content cell classes
- */
-export const expandedRowContentClasses =
-  'bg-[var(--tiger-surface-muted,#f9fafb)] border-b border-[var(--tiger-border,#e5e7eb)]'
 
 /**
  * Default sort function for comparable values
@@ -346,6 +322,47 @@ export function calculatePagination(
     hasNext: current < totalPages,
     hasPrev: current > 1
   }
+}
+
+/**
+ * Get expand icon cell classes (column width for the expand toggle).
+ * Reuses checkbox cell sizing since both are narrow action columns.
+ */
+export function getExpandIconCellClasses(size: TableSize): string {
+  return getCheckboxCellClasses(size)
+}
+
+/**
+ * Get expand icon button/svg classes
+ */
+export function getExpandIconClasses(expanded: boolean): string {
+  return classNames(
+    'inline-block transition-transform duration-200 cursor-pointer text-[var(--tiger-text-muted,#6b7280)]',
+    expanded && 'rotate-90'
+  )
+}
+
+/**
+ * Get expanded row <tr> classes
+ */
+export function getExpandedRowClasses(): string {
+  return classNames(
+    'border-b border-[var(--tiger-border,#e5e7eb)] last:border-b-0',
+    'bg-[var(--tiger-surface-muted,#f9fafb)]/30'
+  )
+}
+
+/**
+ * Get expanded row content <td> classes
+ */
+export function getExpandedRowContentClasses(size: TableSize): string {
+  const paddingClasses = {
+    sm: 'px-3 py-2',
+    md: 'px-4 py-3',
+    lg: 'px-6 py-4'
+  }
+
+  return classNames('text-sm text-[var(--tiger-text,#111827)]', paddingClasses[size])
 }
 
 /**

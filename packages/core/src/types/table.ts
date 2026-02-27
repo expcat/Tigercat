@@ -263,25 +263,35 @@ export interface RowSelectionConfig<T = Record<string, unknown>> {
 export interface ExpandableConfig<T = Record<string, unknown>> {
   /**
    * Currently expanded row keys (controlled mode).
+   * When provided, internal expand state will not be mutated.
    */
   expandedRowKeys?: (string | number)[]
 
   /**
-   * Default expanded row keys (uncontrolled mode).
+   * Default expanded row keys for uncontrolled mode.
+   * Used when `expandedRowKeys` is not provided.
    */
   defaultExpandedRowKeys?: (string | number)[]
 
   /**
-   * Render function for the expanded content.
-   * Must return framework-appropriate nodes (VNode / ReactNode).
+   * Render function for expanded row content.
+   * Framework-specific implementations may also support slots/children.
    */
-  expandedRowRender: (record: T, index: number) => unknown
+  expandedRowRender?: (record: T, index: number) => unknown
 
   /**
-   * Determines whether a given row is expandable.
-   * Defaults to `() => true`.
+   * Determine whether a row is expandable.
+   * Return false to hide the expand icon for that row.
+   * @default () => true
    */
   rowExpandable?: (record: T) => boolean
+
+  /**
+   * Whether clicking the entire row toggles expand state.
+   * When false, only clicking the expand icon triggers expansion.
+   * @default false
+   */
+  expandRowByClick?: boolean
 
   /**
    * Position of the expand toggle column.
