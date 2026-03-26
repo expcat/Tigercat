@@ -20,10 +20,10 @@ import {
 // Options
 // ---------------------------------------------------------------------------
 export interface UseFloatingPopupOptions {
-  /** Vue reactive props object — must contain at least visible / disabled */
+  /** Vue reactive props object — must contain at least open / disabled */
   props: {
-    visible?: boolean
-    defaultVisible?: boolean
+    open?: boolean
+    defaultOpen?: boolean
     disabled?: boolean
     trigger?: FloatingTrigger
     placement?: FloatingPlacement
@@ -81,26 +81,26 @@ export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingP
   const { props, emit, multiTrigger = true } = options
 
   // ─── Visibility ──────────────────────────────────────────────────────
-  const internalVisible = ref(props.visible ?? props.defaultVisible ?? false)
-  const isControlled = computed(() => props.visible !== undefined)
+  const internalVisible = ref(props.open ?? props.defaultOpen ?? false)
+  const isControlled = computed(() => props.open !== undefined)
 
   // Sync external controlled → internal
   watch(
-    () => props.visible,
+    () => props.open,
     (next) => {
       if (next !== undefined) internalVisible.value = next
     }
   )
 
   const currentVisible = computed(() =>
-    isControlled.value ? Boolean(props.visible) : internalVisible.value
+    isControlled.value ? Boolean(props.open) : internalVisible.value
   )
 
   const setVisible = (next: boolean) => {
     if (props.disabled && next) return
     if (!isControlled.value) internalVisible.value = next
-    emit('update:visible', next)
-    emit('visible-change', next)
+    emit('update:open', next)
+    emit('open-change', next)
   }
 
   // ─── Element refs ────────────────────────────────────────────────────

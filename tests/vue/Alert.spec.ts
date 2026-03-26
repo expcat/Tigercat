@@ -155,4 +155,35 @@ describe('Alert', () => {
 
     await expectNoA11yViolations(container)
   })
+
+  describe('Auto-close', () => {
+    it('should auto-close after duration when closable', async () => {
+      vi.useFakeTimers()
+      const { container } = renderWithProps(Alert, {
+        title: 'Auto-close Alert',
+        closable: true,
+        duration: 3000
+      })
+
+      expect(screen.getByRole('alert')).toBeInTheDocument()
+
+      vi.advanceTimersByTime(3000)
+      await vi.waitFor(() => {
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      })
+      vi.useRealTimers()
+    })
+
+    it('should not auto-close when duration is not set', async () => {
+      vi.useFakeTimers()
+      renderWithProps(Alert, {
+        title: 'No Auto-close',
+        closable: true
+      })
+
+      vi.advanceTimersByTime(10000)
+      expect(screen.getByRole('alert')).toBeInTheDocument()
+      vi.useRealTimers()
+    })
+  })
 })

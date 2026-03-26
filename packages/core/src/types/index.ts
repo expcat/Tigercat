@@ -82,3 +82,12 @@ export * from './locale'
 export * from './carousel'
 export * from './back-top'
 export * from './anchor'
+
+// Generic type-safe interfaces (v0.5.0+)
+export * from './generics'
+
+// Shared event callback types (v0.5.0+)
+export * from './events'
+
+// Shared slot/render-prop context types (v0.5.0+)
+export * from './slots'

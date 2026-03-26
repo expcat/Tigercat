@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import {
   classNames,
   getAlertTypeClasses,
@@ -48,6 +48,7 @@ export const Alert: React.FC<AlertProps> = ({
   showIcon = true,
   closable = false,
   closeAriaLabel = 'Close alert',
+  duration,
   className,
   children,
   titleSlot,
@@ -57,10 +58,7 @@ export const Alert: React.FC<AlertProps> = ({
 }) => {
   const [visible, setVisible] = useState(true)
 
-  const colorScheme = useMemo(
-    () => getAlertTypeClasses(type, defaultAlertThemeColors),
-    [type]
-  )
+  const colorScheme = useMemo(() => getAlertTypeClasses(type, defaultAlertThemeColors), [type])
 
   const alertClasses = useMemo(
     () =>
@@ -106,6 +104,16 @@ export const Alert: React.FC<AlertProps> = ({
     },
     [onClose]
   )
+
+  useEffect(() => {
+    if (duration && duration > 0 && closable) {
+      const timer = setTimeout(() => {
+        setVisible(false)
+        onClose?.(new MouseEvent('click') as unknown as React.MouseEvent<HTMLButtonElement>)
+      }, duration)
+      return () => clearTimeout(timer)
+    }
+  }, [duration, closable, onClose])
 
   if (!visible) {
     return null

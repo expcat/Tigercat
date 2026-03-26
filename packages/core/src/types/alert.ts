@@ -51,6 +51,13 @@ export interface AlertProps {
   closable?: boolean
 
   /**
+   * Auto-close duration in milliseconds.
+   * Set to 0 or undefined to disable auto-close.
+   * Requires closable to be true.
+   */
+  duration?: number
+
+  /**
    * Accessible label for the close button (when `closable` is true)
    * @default 'Close alert'
    */

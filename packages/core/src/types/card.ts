@@ -13,6 +13,11 @@ export type CardVariant = 'default' | 'bordered' | 'shadow' | 'elevated'
 export type CardSize = 'sm' | 'md' | 'lg'
 
 /**
+ * Card layout direction
+ */
+export type CardDirection = 'vertical' | 'horizontal'
+
+/**
  * Base card props interface
  */
 export interface CardProps {
@@ -33,6 +38,12 @@ export interface CardProps {
    * @default false
    */
   hoverable?: boolean
+
+  /**
+   * Card layout direction
+   * @default 'vertical'
+   */
+  direction?: CardDirection
 
   /**
    * Additional CSS classes

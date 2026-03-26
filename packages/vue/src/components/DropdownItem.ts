@@ -104,6 +104,7 @@ export const DropdownItem = defineComponent({
           type: 'button',
           class: itemClasses.value,
           role: 'menuitem',
+          tabindex: -1,
           'aria-disabled': props.disabled,
           disabled: props.disabled,
           onClick: handleClick,

@@ -18,6 +18,7 @@ description: Shared props definitions for layout components - Card, Container, D
 | variant   | `'default' \| 'bordered' \| 'shadow' \| 'elevated'` | `'default'`          |  ✓  |   ✓   | 卡片样式变体       |
 | size      | `'sm' \| 'md' \| 'lg'`                              | `'md'`               |  ✓  |   ✓   | 尺寸（影响内边距） |
 | hoverable | `boolean`                                           | `false`              |  ✓  |   ✓   | 显示悬停交互效果   |
+| direction | `'vertical' \| 'horizontal'`                        | `'vertical'`         |  ✓  |   ✓   | 布局方向           |
 | cover     | `string`                                            | -                    |  ✓  |   ✓   | 封面图片 URL       |
 | coverAlt  | `string`                                            | `'Card cover image'` |  ✓  |   ✓   | 封面图片 alt 文本  |
 | className | `string`                                            | -                    |  ✓  |   ✓   | 自定义 CSS 类名    |

@@ -147,6 +147,28 @@ export const Select = defineComponent({
     noDataText: {
       type: String,
       default: 'No options available'
+    },
+    /**
+     * Maximum number of tags in multi-select display
+     * @since 0.5.0
+     */
+    maxTagCount: {
+      type: Number,
+      default: undefined
+    },
+    /**
+     * Whether to use virtual scrolling
+     * @since 0.5.0
+     */
+    virtual: Boolean,
+    /**
+     * Height of the dropdown panel in pixels
+     * @default 256
+     * @since 0.5.0
+     */
+    listHeight: {
+      type: Number,
+      default: 256
     }
   },
   emits: ['update:modelValue', 'change', 'search'],
@@ -179,7 +201,12 @@ export const Select = defineComponent({
         }
         const currentValue = props.modelValue
         const selectedOptions = allOptions.value.filter((opt) => currentValue.includes(opt.value))
-        return selectedOptions.map((opt) => opt.label).join(', ')
+        const labels = selectedOptions.map((opt) => opt.label)
+        if (props.maxTagCount !== undefined && labels.length > props.maxTagCount) {
+          const visible = labels.slice(0, props.maxTagCount)
+          return `${visible.join(', ')} +${labels.length - props.maxTagCount}`
+        }
+        return labels.join(', ')
       }
 
       const value = Array.isArray(props.modelValue) ? undefined : props.modelValue
@@ -538,7 +565,9 @@ export const Select = defineComponent({
             onKeydown: handleTriggerKeyDown,
             'aria-haspopup': 'listbox',
             'aria-expanded': isOpen.value,
-            'aria-controls': listboxId
+            'aria-controls': listboxId,
+            'aria-activedescendant':
+              isOpen.value && activeIndex.value >= 0 ? getOptionId(activeIndex.value) : undefined
           },
           [
             h(
@@ -559,6 +588,7 @@ export const Select = defineComponent({
                   {
                     class: 'inline-flex',
                     'data-tiger-select-clear': '',
+                    'aria-label': 'Clear selection',
                     onClick: clearSelection
                   },
                   CloseIcon

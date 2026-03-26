@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
-import { Avatar } from '@expcat/tigercat-react'
+import { Avatar, AvatarGroup } from '@expcat/tigercat-react'
 import { expectNoA11yViolations } from '../utils/react'
 
 describe('Avatar', () => {
@@ -111,5 +111,42 @@ describe('Avatar', () => {
   it('passes accessibility checks', async () => {
     const { container } = render(<Avatar text="John Doe" />)
     await expectNoA11yViolations(container)
+  })
+})
+
+describe('AvatarGroup', () => {
+  it('should render all children when max is not set', () => {
+    const { container } = render(
+      <AvatarGroup>
+        <Avatar text="A" />
+        <Avatar text="B" />
+        <Avatar text="C" />
+      </AvatarGroup>
+    )
+    const group = container.querySelector('[role="group"]')!
+    expect(group.children.length).toBe(3)
+  })
+
+  it('should show overflow indicator when max is set', () => {
+    const { container } = render(
+      <AvatarGroup max={2}>
+        <Avatar text="A" />
+        <Avatar text="B" />
+        <Avatar text="C" />
+        <Avatar text="D" />
+      </AvatarGroup>
+    )
+    const overflow = screen.getByLabelText('2 more')
+    expect(overflow).toBeInTheDocument()
+    expect(overflow.textContent).toBe('+2')
+  })
+
+  it('should have role="group"', () => {
+    const { container } = render(
+      <AvatarGroup>
+        <Avatar text="A" />
+      </AvatarGroup>
+    )
+    expect(container.querySelector('[role="group"]')).toBeInTheDocument()
   })
 })

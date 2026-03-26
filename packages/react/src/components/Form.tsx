@@ -34,6 +34,7 @@ export interface FormContextValue {
   inlineMessage: boolean
   showRequiredAsterisk: boolean
   disabled: boolean
+  loading: boolean
   errors: FormError[]
   registerFieldRules: (fieldName: string, rules?: FormRule | FormRule[]) => void
   validateField: (
@@ -64,6 +65,8 @@ export interface FormHandle {
   ) => Promise<void>
   clearValidate: (fieldNames?: string | string[]) => void
   resetFields: () => void
+  addField: (fieldName: string, defaultValue?: unknown) => void
+  removeField: (fieldName: string) => void
 }
 
 // Form submit event
@@ -74,6 +77,11 @@ export interface FormSubmitEvent {
 }
 
 export interface FormProps extends CoreFormProps {
+  /**
+   * Whether the form is in a loading state (prevents submit)
+   */
+  loading?: boolean
+
   /**
    * Form content
    */
@@ -112,6 +120,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
       inlineMessage = true,
       showRequiredAsterisk = true,
       disabled = false,
+      loading = false,
       children,
       onSubmit,
       onValidate,
@@ -287,6 +296,31 @@ export const Form = forwardRef<FormHandle, FormProps>(
       setFormValues(model)
     }, [model, clearValidate])
 
+    const addField = useCallback(
+      (fieldName: string, defaultValue?: unknown): void => {
+        if (!fieldName) return
+        setFormValues((prev) => {
+          const next = { ...prev, [fieldName]: defaultValue ?? null }
+          onChange?.(next)
+          return next
+        })
+      },
+      [onChange]
+    )
+
+    const removeField = useCallback(
+      (fieldName: string): void => {
+        if (!fieldName) return
+        setFormValues((prev) => {
+          const { [fieldName]: _, ...next } = prev
+          onChange?.(next)
+          return next
+        })
+        clearValidate(fieldName)
+      },
+      [onChange, clearValidate]
+    )
+
     const updateValue = useCallback(
       (fieldName: string, value: unknown): void => {
         const setValueByPath = (
@@ -340,10 +374,11 @@ export const Form = forwardRef<FormHandle, FormProps>(
     const handleSubmit = useCallback(
       async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault()
+        if (loading) return
         const result = await runValidation()
         onSubmit?.({ ...result, values: formValuesRef.current })
       },
-      [runValidation, onSubmit]
+      [runValidation, onSubmit, loading]
     )
 
     // Expose methods via ref
@@ -354,9 +389,11 @@ export const Form = forwardRef<FormHandle, FormProps>(
         validateFields,
         validateField,
         clearValidate,
-        resetFields
+        resetFields,
+        addField,
+        removeField
       }),
-      [validate, validateFields, validateField, clearValidate, resetFields]
+      [validate, validateFields, validateField, clearValidate, resetFields, addField, removeField]
     )
 
     const contextValue: FormContextValue = useMemo(
@@ -370,6 +407,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
         inlineMessage,
         showRequiredAsterisk,
         disabled,
+        loading,
         errors,
         registerFieldRules,
         validateField,
@@ -386,6 +424,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
         inlineMessage,
         showRequiredAsterisk,
         disabled,
+        loading,
         errors,
         registerFieldRules,
         validateField,
@@ -398,6 +437,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
       'tiger-form',
       `tiger-form--label-${labelPosition}`,
       disabled && 'tiger-form--disabled',
+      loading && 'tiger-form--loading',
       className
     )
 

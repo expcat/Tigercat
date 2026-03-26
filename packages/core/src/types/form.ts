@@ -194,6 +194,12 @@ export interface FormProps {
    * @default false
    */
   disabled?: boolean
+
+  /**
+   * Whether the form is in a loading state (prevents submit)
+   * @default false
+   */
+  loading?: boolean
 }
 
 /**

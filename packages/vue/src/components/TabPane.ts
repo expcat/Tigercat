@@ -250,9 +250,9 @@ export const TabPane = defineComponent({
             // Close button
             isClosable.value &&
               h(
-                'button',
+                'span',
                 {
-                  type: 'button',
+                  role: 'button',
                   class: tabCloseButtonClasses,
                   'aria-label': `Close ${String(props.label)}`,
                   tabindex: -1,

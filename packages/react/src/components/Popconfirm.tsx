@@ -46,7 +46,7 @@ export type PopconfirmProps = Omit<CorePopconfirmProps, 'style' | 'placement'> &
     children?: React.ReactNode
     titleContent?: React.ReactNode
     descriptionContent?: React.ReactNode
-    onVisibleChange?: (visible: boolean) => void
+    onOpenChange?: (open: boolean) => void
     onConfirm?: () => void
     onCancel?: () => void
     placement?: FloatingPlacement
@@ -56,8 +56,8 @@ export type PopconfirmProps = Omit<CorePopconfirmProps, 'style' | 'placement'> &
   }
 
 export const Popconfirm: React.FC<PopconfirmProps> = ({
-  visible,
-  defaultVisible = false,
+  open,
+  defaultOpen = false,
   title = '确定要执行此操作吗？',
   description,
   icon = 'warning',
@@ -73,7 +73,7 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
   children,
   titleContent,
   descriptionContent,
-  onVisibleChange,
+  onOpenChange,
   onConfirm,
   onCancel,
   ...divProps
@@ -95,13 +95,13 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     actualPlacement,
     floatingStyles: baseFloatingStyles
   } = usePopup({
-    visible,
-    defaultVisible,
+    open,
+    defaultOpen,
     disabled,
     placement: initialPlacement,
     offset,
     multiTrigger: false,
-    onVisibleChange
+    onOpenChange
   })
 
   const handleConfirm = () => {

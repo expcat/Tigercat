@@ -1,11 +1,4 @@
-import {
-  defineComponent,
-  computed,
-  h,
-  cloneVNode,
-  isVNode,
-  PropType
-} from 'vue'
+import { defineComponent, computed, h, cloneVNode, isVNode, PropType } from 'vue'
 import { useFloatingPopup } from '../utils/use-floating-popup'
 import {
   classNames,
@@ -63,10 +56,10 @@ export const Popconfirm = defineComponent({
   name: 'TigerPopconfirm',
   inheritAttrs: false,
   props: {
-    /** Whether the popconfirm is visible (controlled mode) */
-    visible: { type: Boolean, default: undefined },
-    /** Default visibility (uncontrolled mode) @default false */
-    defaultVisible: { type: Boolean, default: false },
+    /** Whether the popconfirm is open (controlled mode) */
+    open: { type: Boolean, default: undefined },
+    /** Default open state (uncontrolled mode) @default false */
+    defaultOpen: { type: Boolean, default: false },
     /** Popconfirm title/question text */
     title: { type: String, default: '确定要执行此操作吗？' },
     /** Popconfirm description text */
@@ -94,7 +87,7 @@ export const Popconfirm = defineComponent({
     className: { type: String, default: undefined },
     style: { type: [String, Object, Array] as PropType<StyleValue>, default: undefined }
   },
-  emits: ['update:visible', 'visible-change', 'confirm', 'cancel'],
+  emits: ['update:open', 'open-change', 'confirm', 'cancel'],
   setup(props, { slots, emit, attrs }) {
     // Shared floating-popup logic (click-only, multiTrigger=false)
     const {

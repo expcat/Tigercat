@@ -128,4 +128,20 @@ export interface DatePickerProps {
    * Input id attribute
    */
   id?: string
+
+  /**
+   * Shortcut presets for quick date selection.
+   * Each shortcut has a label and a value (or getter function).
+   */
+  shortcuts?: DatePickerShortcut[]
+}
+
+/**
+ * DatePicker shortcut preset
+ */
+export interface DatePickerShortcut {
+  /** Display label */
+  label: string
+  /** Date value or getter function returning a date value */
+  value: DatePickerModelValue | (() => DatePickerModelValue)
 }

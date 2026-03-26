@@ -35,7 +35,8 @@ import {
   type DatePickerSize,
   type DateFormat,
   type DatePickerModelValue,
-  type DatePickerLabels
+  type DatePickerLabels,
+  type DatePickerShortcut
 } from '@expcat/tigercat-core'
 
 // Helper function to create SVG icon
@@ -228,6 +229,13 @@ export const DatePicker = defineComponent({
      */
     style: {
       type: Object as PropType<Record<string, unknown>>,
+      default: undefined
+    },
+    /**
+     * Shortcut presets for quick date selection
+     */
+    shortcuts: {
+      type: Array as PropType<DatePickerShortcut[]>,
       default: undefined
     }
   },
@@ -476,6 +484,12 @@ export const DatePicker = defineComponent({
 
     function setToday() {
       selectDate(new Date())
+    }
+
+    function handleShortcut(shortcut: DatePickerShortcut) {
+      const val = typeof shortcut.value === 'function' ? shortcut.value() : shortcut.value
+      emitValue(val)
+      closeCalendar()
     }
 
     function selectDate(date: Date | null) {
@@ -785,6 +799,28 @@ export const DatePicker = defineComponent({
                     ]
                   )
                 })(),
+
+                // Shortcuts panel
+                props.shortcuts?.length
+                  ? h(
+                      'div',
+                      {
+                        class:
+                          'flex flex-wrap gap-1 px-3 py-2 border-t border-[var(--tiger-border,#e5e7eb)]'
+                      },
+                      props.shortcuts.map((sc) =>
+                        h(
+                          'button',
+                          {
+                            type: 'button',
+                            class: datePickerFooterButtonClasses,
+                            onClick: () => handleShortcut(sc)
+                          },
+                          sc.label
+                        )
+                      )
+                    )
+                  : null,
 
                 // Footer (range mode only)
                 isRangeMode.value

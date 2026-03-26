@@ -29,14 +29,16 @@ description: Common patterns and framework differences for Tigercat UI component
 
 ### 显示状态 Prop 命名
 
-| 组件       | Vue Prop  | React Prop | 说明     |
-| ---------- | --------- | ---------- | -------- |
-| Modal      | `visible` | `open`     | 显示状态 |
-| Drawer     | `visible` | `open`     | 显示状态 |
-| Popover    | `visible` | `visible`  | 显示状态（Vue/React 统一） |
-| Popconfirm | `visible` | `visible`  | 显示状态（Vue/React 统一） |
-| Tooltip    | `visible` | `visible`  | 显示状态（Vue/React 统一） |
-| Dropdown   | `visible` | `open`     | 显示状态 |
+> **v0.5.0 Breaking Change**: 所有组件统一使用 `open`（Vue + React），原 `visible` 已废弃。
+
+| 组件       | Prop   | 说明                    |
+| ---------- | ------ | ----------------------- |
+| Modal      | `open` | 显示状态 (v-model:open) |
+| Drawer     | `open` | 显示状态 (v-model:open) |
+| Popover    | `open` | 显示状态                |
+| Popconfirm | `open` | 显示状态                |
+| Tooltip    | `open` | 显示状态                |
+| Dropdown   | `open` | 显示状态                |
 
 ### 样式类 Prop
 
@@ -51,7 +53,7 @@ description: Common patterns and framework differences for Tigercat UI component
 | -------------------------- | ------------------------- | -------------------- |
 | `@event-name` (kebab-case) | `onEventName` (camelCase) | `@close` → `onClose` |
 | `@update:modelValue`       | `onChange`                | 值变更事件           |
-| `@update:visible`          | `onOpenChange`            | 显示状态变更         |
+| `@update:open`             | `onOpenChange`            | 显示状态变更         |
 
 ---
 
@@ -73,7 +75,7 @@ const value = ref('')
   <Input :modelValue="value" @update:modelValue="value = $event" />
 
   <!-- 命名 v-model (Modal/Drawer) -->
-  <Modal v-model:visible="show" />
+  <Modal v-model:open="show" />
 </template>
 ```
 
@@ -180,15 +182,16 @@ function App() {
 
 Tooltip、Popover、Popconfirm 三个组件共享同一套 **floating-popup** 基础层，避免重复实现：
 
-| 层                | 文件                                        | 职责                                         |
-| ----------------- | ------------------------------------------- | -------------------------------------------- |
-| Core types        | `core/types/floating-popup.ts`              | `BaseFloatingPopupProps` + `FloatingTrigger`  |
-| Core utils        | `core/utils/floating-popup-utils.ts`        | `createFloatingIdFactory` + `buildTriggerHandlerMap` |
-| Vue composable    | `vue/utils/use-floating-popup.ts`           | `useFloatingPopup()` — 封装 visibility/floating/dismiss/trigger |
-| React hook        | `react/utils/use-popup.ts`                  | `usePopup()` — 对称的 React hook            |
+| 层             | 文件                                 | 职责                                                            |
+| -------------- | ------------------------------------ | --------------------------------------------------------------- |
+| Core types     | `core/types/floating-popup.ts`       | `BaseFloatingPopupProps` + `FloatingTrigger`                    |
+| Core utils     | `core/utils/floating-popup-utils.ts` | `createFloatingIdFactory` + `buildTriggerHandlerMap`            |
+| Vue composable | `vue/utils/use-floating-popup.ts`    | `useFloatingPopup()` — 封装 visibility/floating/dismiss/trigger |
+| React hook     | `react/utils/use-popup.ts`           | `usePopup()` — 对称的 React hook                                |
 
 三个组件只需关注自身差异（内容渲染、a11y role、特有 props），共享行为由 hook 统一管理：
-- 受控/非受控 visible 双模式
+
+- 受控/非受控 open 双模式
 - Floating UI 定位 (x, y, actualPlacement, floatingStyles)
 - Click-outside + Escape-key 关闭
 - Trigger 事件映射（click/hover/focus/manual）

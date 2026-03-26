@@ -1,4 +1,4 @@
-import type { CardSize, CardVariant } from '../types/card'
+import type { CardSize, CardVariant, CardDirection } from '../types/card'
 
 export const cardBaseClasses =
   'rounded-lg bg-[var(--tiger-surface,#ffffff)] overflow-hidden transition-all duration-200'
@@ -17,6 +17,13 @@ export const cardVariantClasses: Record<CardVariant, string> = {
 } as const
 
 export const cardHoverClasses = 'cursor-pointer hover:shadow-xl hover:scale-[1.02]'
+
+export const cardDirectionClasses: Record<CardDirection, string> = {
+  vertical: 'flex flex-col',
+  horizontal: 'flex flex-row'
+} as const
+
+export const cardHorizontalBodyClasses = 'flex flex-col flex-1 min-w-0'
 
 export const cardHeaderClasses = 'border-b border-[var(--tiger-border,#e5e7eb)] pb-3 mb-3'
 

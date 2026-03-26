@@ -71,13 +71,19 @@ describe('Tabs', () => {
             { key: '3', label: 'C' }
           ])
           const activeKey = ref('1')
-          const handleEdit = ({ targetKey, action }: { targetKey?: string | number; action: 'add' | 'remove' }) => {
+          const handleEdit = ({
+            targetKey,
+            action
+          }: {
+            targetKey?: string | number
+            action: 'add' | 'remove'
+          }) => {
             if (action === 'add') {
               const k = `${tabs.value.length + 1}`
               tabs.value.push({ key: k, label: `New ${k}` })
               activeKey.value = k
             } else if (action === 'remove' && targetKey != null) {
-              tabs.value = tabs.value.filter(t => t.key !== String(targetKey))
+              tabs.value = tabs.value.filter((t) => t.key !== String(targetKey))
             }
           }
           return () =>
@@ -85,15 +91,21 @@ describe('Tabs', () => {
               Tabs,
               {
                 activeKey: activeKey.value,
-                'onUpdate:activeKey': (k: string | number) => { activeKey.value = k },
+                'onUpdate:activeKey': (k: string | number) => {
+                  activeKey.value = k
+                },
                 type: 'editable-card',
                 closable: true,
                 onEdit: handleEdit
               },
               {
                 default: () =>
-                  tabs.value.map(tab =>
-                    h(TabPane, { tabKey: tab.key, label: tab.label, key: tab.key }, () => `Content ${tab.key}`)
+                  tabs.value.map((tab) =>
+                    h(
+                      TabPane,
+                      { tabKey: tab.key, label: tab.label, key: tab.key },
+                      () => `Content ${tab.key}`
+                    )
                   )
               }
             )
@@ -522,7 +534,15 @@ describe('Tabs', () => {
       render(Tabs, {
         slots: {
           default: () => [
-            h(TabPane, { tabKey: '1', label: 'Tab 1', icon: h('span', { 'data-testid': 'test-icon' }, 'Icon') }, () => 'Content 1')
+            h(
+              TabPane,
+              {
+                tabKey: '1',
+                label: 'Tab 1',
+                icon: h('span', { 'data-testid': 'test-icon' }, 'Icon')
+              },
+              () => 'Content 1'
+            )
           ]
         }
       })
@@ -626,6 +646,35 @@ describe('Tabs', () => {
 
       expect(tab1).toHaveAttribute('aria-disabled', 'false')
       expect(tab2).toHaveAttribute('aria-disabled', 'true')
+    })
+  })
+
+  describe('Pills variant', () => {
+    it('should render pills type with rounded-full class', () => {
+      render(Tabs, {
+        props: { type: 'pills' },
+        slots: {
+          default: () => [h(TabPane, { tabKey: '1', label: 'Tab 1' }, () => 'Content 1')]
+        }
+      })
+
+      const tab = screen.getByRole('tab', { name: 'Tab 1' })
+      expect(tab).toHaveClass('rounded-full')
+    })
+
+    it('should apply active pills class when tab is selected', () => {
+      render(Tabs, {
+        props: { type: 'pills', defaultActiveKey: '1' },
+        slots: {
+          default: () => [
+            h(TabPane, { tabKey: '1', label: 'Active' }, () => 'Content 1'),
+            h(TabPane, { tabKey: '2', label: 'Inactive' }, () => 'Content 2')
+          ]
+        }
+      })
+
+      const active = screen.getByRole('tab', { name: 'Active' })
+      expect(active.className).toContain('bg-[var(--tiger-primary')
     })
   })
 })

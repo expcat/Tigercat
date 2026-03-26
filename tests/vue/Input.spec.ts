@@ -748,4 +748,104 @@ describe('Input', () => {
       expect(wrapper.className).not.toContain('tiger-animate-shake')
     })
   })
+
+  describe('clearable', () => {
+    it('shows clear button when clearable and has value', async () => {
+      render(Input, {
+        props: { clearable: true, modelValue: 'hello' }
+      })
+      expect(screen.getByLabelText('Clear input')).toBeInTheDocument()
+    })
+
+    it('does not show clear button when value is empty', () => {
+      render(Input, {
+        props: { clearable: true, modelValue: '' }
+      })
+      expect(screen.queryByLabelText('Clear input')).not.toBeInTheDocument()
+    })
+
+    it('clears value when clear button is clicked', async () => {
+      const { emitted } = render(Input, {
+        props: { clearable: true, modelValue: 'hello' }
+      })
+
+      await fireEvent.click(screen.getByLabelText('Clear input'))
+      expect(emitted()['update:modelValue']).toBeTruthy()
+      expect(emitted()['update:modelValue'][0]).toEqual([''])
+      expect(emitted()['clear']).toBeTruthy()
+    })
+
+    it('does not show clear button when disabled', () => {
+      render(Input, {
+        props: { clearable: true, modelValue: 'hello', disabled: true }
+      })
+      expect(screen.queryByLabelText('Clear input')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('showPassword', () => {
+    it('shows password toggle for password type', () => {
+      render(Input, {
+        props: { type: 'password', showPassword: true, modelValue: 'secret' }
+      })
+      expect(screen.getByLabelText('Show password')).toBeInTheDocument()
+    })
+
+    it('toggles input type between password and text', async () => {
+      const { container } = render(Input, {
+        props: { type: 'password', showPassword: true, modelValue: 'secret' }
+      })
+      const input = container.querySelector('input')!
+
+      expect(input).toHaveAttribute('type', 'password')
+      await fireEvent.click(screen.getByLabelText('Show password'))
+      expect(input).toHaveAttribute('type', 'text')
+      expect(screen.getByLabelText('Hide password')).toBeInTheDocument()
+    })
+  })
+
+  describe('showCount', () => {
+    it('shows character count', () => {
+      render(Input, {
+        props: { showCount: true, modelValue: 'hello' }
+      })
+      expect(screen.getByText('5')).toBeInTheDocument()
+    })
+
+    it('shows current/max when maxLength is set', () => {
+      render(Input, {
+        props: { showCount: true, maxLength: 10, modelValue: 'hello' }
+      })
+      expect(screen.getByText('5 / 10')).toBeInTheDocument()
+    })
+  })
+
+  describe('a11y: standalone error state', () => {
+    it('sets aria-invalid when status is error', () => {
+      render(Input, {
+        props: { status: 'error' }
+      })
+      const input = screen.getByRole('textbox')
+      expect(input).toHaveAttribute('aria-invalid', 'true')
+    })
+
+    it('sets aria-describedby pointing to error message when status=error and errorMessage', () => {
+      render(Input, {
+        props: { status: 'error', errorMessage: 'Required field' }
+      })
+      const input = screen.getByRole('textbox')
+      const describedBy = input.getAttribute('aria-describedby')
+      expect(describedBy).toBeTruthy()
+
+      const errorEl = document.getElementById(describedBy!)
+      expect(errorEl).toBeInTheDocument()
+      expect(errorEl?.textContent).toBe('Required field')
+    })
+
+    it('does not set aria-invalid when status is default', () => {
+      render(Input)
+      const input = screen.getByRole('textbox')
+      expect(input).not.toHaveAttribute('aria-invalid')
+    })
+  })
 })

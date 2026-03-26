@@ -9,7 +9,10 @@ import {
   focusFirst,
   restoreFocus,
   isHTMLElement,
-  getActiveElement
+  getActiveElement,
+  getMenuItems,
+  handleMenuNavigation,
+  focusFirstMenuItem
 } from '@expcat/tigercat-core'
 
 describe('focus-utils', () => {
@@ -236,6 +239,111 @@ describe('focus-utils', () => {
       // Open dropdown, focus first option
       const focused = focusFirst([option1, option2, option3])
       expect(focused).toBe(option1)
+    })
+  })
+
+  describe('getMenuItems', () => {
+    it('returns only non-disabled menuitems', () => {
+      const container = document.createElement('div')
+      const item1 = document.createElement('button')
+      item1.setAttribute('role', 'menuitem')
+      const item2 = document.createElement('button')
+      item2.setAttribute('role', 'menuitem')
+      item2.setAttribute('disabled', '')
+      const item3 = document.createElement('button')
+      item3.setAttribute('role', 'menuitem')
+      container.append(item1, item2, item3)
+      document.body.appendChild(container)
+      cleanup.push(container)
+
+      const items = getMenuItems(container)
+      expect(items).toHaveLength(2)
+      expect(items).toEqual([item1, item3])
+    })
+  })
+
+  describe('handleMenuNavigation', () => {
+    const createMenu = () => {
+      const container = document.createElement('div')
+      const items = Array.from({ length: 3 }, () => {
+        const b = document.createElement('button')
+        b.setAttribute('role', 'menuitem')
+        container.appendChild(b)
+        return b
+      })
+      document.body.appendChild(container)
+      cleanup.push(container)
+      return { container, items }
+    }
+
+    it('ArrowDown moves focus to next item', () => {
+      const { container, items } = createMenu()
+      items[0].focus()
+      const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
+      const handled = handleMenuNavigation(container, event)
+      expect(handled).toBe(true)
+      expect(document.activeElement).toBe(items[1])
+    })
+
+    it('ArrowUp moves focus to previous item', () => {
+      const { container, items } = createMenu()
+      items[2].focus()
+      const event = new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true })
+      handleMenuNavigation(container, event)
+      expect(document.activeElement).toBe(items[1])
+    })
+
+    it('Home moves focus to first item', () => {
+      const { container, items } = createMenu()
+      items[2].focus()
+      const event = new KeyboardEvent('keydown', { key: 'Home', bubbles: true })
+      handleMenuNavigation(container, event)
+      expect(document.activeElement).toBe(items[0])
+    })
+
+    it('End moves focus to last item', () => {
+      const { container, items } = createMenu()
+      items[0].focus()
+      const event = new KeyboardEvent('keydown', { key: 'End', bubbles: true })
+      handleMenuNavigation(container, event)
+      expect(document.activeElement).toBe(items[2])
+    })
+
+    it('wraps from last to first on ArrowDown', () => {
+      const { container, items } = createMenu()
+      items[2].focus()
+      const event = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
+      handleMenuNavigation(container, event)
+      expect(document.activeElement).toBe(items[0])
+    })
+
+    it('returns false for unhandled keys', () => {
+      const { container } = createMenu()
+      const event = new KeyboardEvent('keydown', { key: 'a', bubbles: true })
+      expect(handleMenuNavigation(container, event)).toBe(false)
+    })
+  })
+
+  describe('focusFirstMenuItem', () => {
+    it('focuses the first menuitem in the container', () => {
+      const container = document.createElement('div')
+      const item = document.createElement('button')
+      item.setAttribute('role', 'menuitem')
+      container.appendChild(item)
+      document.body.appendChild(container)
+      cleanup.push(container)
+
+      const result = focusFirstMenuItem(container)
+      expect(result).toBe(true)
+      expect(document.activeElement).toBe(item)
+    })
+
+    it('returns false when no menuitems exist', () => {
+      const container = document.createElement('div')
+      document.body.appendChild(container)
+      cleanup.push(container)
+
+      expect(focusFirstMenuItem(container)).toBe(false)
     })
   })
 })

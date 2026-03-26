@@ -155,10 +155,10 @@ export const FormWizard: React.FC<FormWizardProps> = ({
       <div className="px-6 py-4 flex flex-col items-center">{contentNode}</div>
       {showActions && (
         <div className="flex items-center justify-center gap-3 px-6 py-2 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface-muted,#f9fafb)]">
-          <Button type="button" variant="secondary" disabled={isFirst} onClick={handlePrev}>
+          <Button htmlType="button" variant="secondary" disabled={isFirst} onClick={handlePrev}>
             {resolveLocaleText(labels.prevText, prevText)}
           </Button>
-          <Button type="button" variant="primary" onClick={handleNext}>
+          <Button htmlType="button" variant="primary" onClick={handleNext}>
             {isLast
               ? resolveLocaleText(labels.finishText, finishText)
               : resolveLocaleText(labels.nextText, nextText)}

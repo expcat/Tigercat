@@ -73,11 +73,11 @@ describe('Dropdown', () => {
     expect(wrapper).toHaveAttribute('hidden')
   })
 
-  it('toggles visibility in click trigger mode and calls onVisibleChange', async () => {
-    const handleVisibleChange = vi.fn()
+  it('toggles visibility in click trigger mode and calls onOpenChange', async () => {
+    const handleOpenChange = vi.fn()
 
     const { container } = render(
-      <Dropdown trigger="click" onVisibleChange={handleVisibleChange}>
+      <Dropdown trigger="click" onOpenChange={handleOpenChange}>
         <button>Trigger</button>
         <DropdownMenu>
           <DropdownItem>Item 1</DropdownItem>
@@ -91,11 +91,11 @@ describe('Dropdown', () => {
 
     await fireEvent.click(screen.getByText('Trigger'))
     expect(wrapper).not.toHaveAttribute('hidden')
-    expect(handleVisibleChange).toHaveBeenCalledWith(true)
+    expect(handleOpenChange).toHaveBeenCalledWith(true)
 
     await fireEvent.click(screen.getByText('Trigger'))
     expect(wrapper).toHaveAttribute('hidden')
-    expect(handleVisibleChange).toHaveBeenCalledWith(false)
+    expect(handleOpenChange).toHaveBeenCalledWith(false)
   })
 
   it('closes on outside click (click trigger)', async () => {
@@ -205,5 +205,62 @@ describe('Dropdown', () => {
 
     await fireEvent.click(screen.getByText('Trigger'))
     expect(chevron).toHaveClass('rotate-180')
+  })
+
+  describe('a11y', () => {
+    it('trigger has aria-haspopup and aria-expanded', () => {
+      render(
+        <Dropdown>
+          <button>Trigger</button>
+          <DropdownMenu>
+            <DropdownItem>Item 1</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      )
+
+      const trigger = screen.getByText('Trigger').closest('[aria-haspopup]')
+      expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('trigger has aria-controls pointing to menu id when open', async () => {
+      render(
+        <Dropdown trigger="click">
+          <button>Trigger</button>
+          <DropdownMenu>
+            <DropdownItem>Item 1</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      )
+
+      const trigger = screen.getByText('Trigger').closest('[aria-haspopup]')!
+      expect(trigger).not.toHaveAttribute('aria-controls')
+
+      await fireEvent.click(screen.getByText('Trigger'))
+      const controlsId = trigger.getAttribute('aria-controls')
+      expect(controlsId).toBeTruthy()
+
+      const menu = document.querySelector(`[id="${controlsId}"]`)
+      expect(menu).toBeInTheDocument()
+      expect(menu).toHaveAttribute('role', 'menu')
+    })
+
+    it('menu items have role="menuitem" and tabIndex={-1}', () => {
+      render(
+        <Dropdown defaultOpen>
+          <button>Trigger</button>
+          <DropdownMenu>
+            <DropdownItem>Item 1</DropdownItem>
+            <DropdownItem>Item 2</DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      )
+
+      const items = screen.getAllByRole('menuitem')
+      expect(items).toHaveLength(2)
+      items.forEach((item) => {
+        expect(item).toHaveAttribute('tabindex', '-1')
+      })
+    })
   })
 })

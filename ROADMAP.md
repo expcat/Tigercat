@@ -2,6 +2,24 @@
 
 本文档列出了 Tigercat UI 组件库的所有计划组件及其开发进度。
 
+## v0.5.0 架构筑基 (Architecture Foundation)
+
+| 阶段     | 内容                                         | 状态 |
+| -------- | -------------------------------------------- | ---- |
+| Phase 1  | Core 类型强化 (generics/events/slots)        | ✅   |
+| Phase 2  | Design Token 系统                            | ✅   |
+| Phase 3  | Props 命名统一 (visible→open, type→htmlType) | ✅   |
+| Phase 4A | 组件增强: Button/Input/Select/Form           | ✅   |
+| Phase 4B | 组件增强: Table/Modal/Drawer/DatePicker/Tree | ✅   |
+| Phase 4C | 组件增强: Card/AvatarGroup/Alert/Tabs        | ✅   |
+| Phase 5  | 动画过渡系统 (transition presets)            | ✅   |
+| Phase 6  | a11y 首轮 (Dropdown/Select/Input)            | ✅   |
+| Phase 7  | 测试覆盖率 & 文档收尾                        | ✅   |
+
+新增组件: `ButtonGroup`, `AvatarGroup`
+测试覆盖率: 81%+ (3321 tests)
+详见 [MIGRATION_v0.5.0.md](MIGRATION_v0.5.0.md)
+
 ## 进度说明
 
 - ⬜ 未开始

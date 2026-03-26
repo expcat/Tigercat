@@ -1,4 +1,12 @@
-import React, { createContext, useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+  useId
+} from 'react'
 import {
   classNames,
   getDropdownContainerClasses,
@@ -8,6 +16,10 @@ import {
   injectDropdownStyles,
   DROPDOWN_CHEVRON_PATH,
   DROPDOWN_ENTER_CLASS,
+  handleMenuNavigation,
+  focusFirstMenuItem,
+  captureActiveElement,
+  restoreFocus,
   type DropdownProps as CoreDropdownProps,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
@@ -24,13 +36,11 @@ export interface DropdownContextValue {
 export const DropdownContext = createContext<DropdownContextValue | null>(null)
 
 export interface DropdownProps
-  extends
-    Omit<CoreDropdownProps, 'style'>,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
+  extends Omit<CoreDropdownProps, 'style'>, Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
   style?: React.CSSProperties
   placement?: FloatingPlacement
   offset?: number
-  onVisibleChange?: (visible: boolean) => void
+  onOpenChange?: (open: boolean) => void
   children?: React.ReactNode
 }
 
@@ -39,45 +49,70 @@ export const Dropdown: React.FC<DropdownProps> = ({
   placement: initialPlacement = 'bottom-start',
   offset = 4,
   disabled = false,
-  visible: controlledVisible,
-  defaultVisible = false,
+  open: controlledOpen,
+  defaultOpen = false,
   closeOnClick = true,
   showArrow = true,
   className,
   style,
-  onVisibleChange,
+  onOpenChange,
   children,
   ...divProps
 }) => {
   // Internal state for uncontrolled mode
-  const [internalVisible, setInternalVisible] = useState(defaultVisible)
+  const [internalVisible, setInternalVisible] = useState(defaultOpen)
 
   // Use controlled or uncontrolled state
-  const visible = controlledVisible !== undefined ? controlledVisible : internalVisible
+  const visible = controlledOpen !== undefined ? controlledOpen : internalVisible
 
   // Refs for Floating UI positioning
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
   const floatingRef = useRef<HTMLDivElement>(null)
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const previousActiveElementRef = useRef<HTMLElement | null>(null)
+
+  // Unique menu ID for aria-controls
+  const reactId = useId()
+  const menuId = useMemo(() => `tiger-dropdown-menu-${reactId}`, [reactId])
 
   // Inject animation styles once
-  useEffect(() => { injectDropdownStyles() }, [])
+  useEffect(() => {
+    injectDropdownStyles()
+  }, [])
 
   // Handle visibility change
   const setVisible = useCallback(
     (newVisible: boolean) => {
       if (disabled && newVisible) return
 
+      // Capture focus before opening
+      if (newVisible && !visible) {
+        previousActiveElementRef.current = captureActiveElement()
+      }
+
       // Update internal state if uncontrolled
-      if (controlledVisible === undefined) {
+      if (controlledOpen === undefined) {
         setInternalVisible(newVisible)
       }
 
       // Call event handler
-      onVisibleChange?.(newVisible)
+      onOpenChange?.(newVisible)
+
+      // Focus management
+      if (newVisible) {
+        // Use rAF to wait for menu to render
+        requestAnimationFrame(() => {
+          if (floatingRef.current) {
+            focusFirstMenuItem(floatingRef.current)
+          }
+        })
+      } else {
+        restoreFocus(previousActiveElementRef.current)
+        previousActiveElementRef.current = null
+      }
     },
-    [disabled, controlledVisible, onVisibleChange]
+    [disabled, visible, controlledOpen, onOpenChange]
   )
 
   // Handle item click (close dropdown)
@@ -118,6 +153,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
     if (trigger !== 'click') return
     setVisible(!visible)
   }, [trigger, visible, setVisible])
+
+  // Handle keyboard navigation within menu
+  const handleMenuKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (floatingRef.current) {
+      handleMenuNavigation(floatingRef.current, event.nativeEvent)
+    }
+  }, [])
 
   // Handle outside click to close dropdown
   useClickOutside({
@@ -210,11 +252,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   return (
     <DropdownContext.Provider value={contextValue}>
-      <div
-        ref={containerRef}
-        className={containerClasses}
-        style={style}
-        {...divProps}>
+      <div ref={containerRef} className={containerClasses} style={style} {...divProps}>
         <div
           ref={triggerRef}
           className={triggerClasses}
@@ -222,7 +260,8 @@ export const Dropdown: React.FC<DropdownProps> = ({
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           aria-haspopup="menu"
-          aria-expanded={visible}>
+          aria-expanded={visible}
+          aria-controls={visible ? menuId : undefined}>
           {triggerElement}
           {chevronNode}
         </div>
@@ -232,8 +271,11 @@ export const Dropdown: React.FC<DropdownProps> = ({
           style={menuWrapperStyles}
           hidden={!visible}
           onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}>
-          {menuElement}
+          onMouseLeave={handleMouseLeave}
+          onKeyDown={handleMenuKeyDown}>
+          {menuElement && React.isValidElement(menuElement)
+            ? React.cloneElement(menuElement as React.ReactElement<any>, { id: menuId })
+            : menuElement}
         </div>
       </div>
     </DropdownContext.Provider>

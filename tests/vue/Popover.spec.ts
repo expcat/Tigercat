@@ -302,13 +302,13 @@ describe('Popover', () => {
       )
     })
 
-    it('should only respond to controlled visible when trigger is "manual"', async () => {
+    it('should only respond to controlled open when trigger is "manual"', async () => {
       const user = userEvent.setup()
       const { getByText, queryByText, rerender } = renderWithProps(
         Popover,
         {
           trigger: 'manual',
-          visible: false,
+          open: false,
           content: 'Manual content'
         },
         {
@@ -324,7 +324,7 @@ describe('Popover', () => {
       expect(queryByText('Manual content')).toBeNull()
 
       // Controlled visible=true should open
-      await rerender({ visible: true })
+      await rerender({ open: true })
       await waitFor(() => {
         expect(getByText('Manual content')).toBeVisible()
       })
@@ -360,8 +360,8 @@ describe('Popover', () => {
       const { getByText } = renderWithProps(
         Popover,
         {
-          defaultVisible: true,
-          content: 'Default visible content'
+          defaultOpen: true,
+          content: 'Default open content'
         },
         {
           slots: {
@@ -370,14 +370,14 @@ describe('Popover', () => {
         }
       )
 
-      expect(getByText('Default visible content')).toBeVisible()
+      expect(getByText('Default open content')).toBeVisible()
     })
 
-    it('should support controlled visible state', async () => {
+    it('should support controlled open state', async () => {
       const { getByText, queryByText, rerender } = renderWithProps(
         Popover,
         {
-          visible: false,
+          open: false,
           content: 'Controlled content'
         },
         {
@@ -390,14 +390,14 @@ describe('Popover', () => {
       // Initially not rendered
       expect(queryByText('Controlled content')).toBeNull()
 
-      await rerender({ visible: true })
+      await rerender({ open: true })
 
       await waitFor(() => {
         expect(getByText('Controlled content')).toBeVisible()
       })
 
       // Hide again
-      await rerender({ visible: false })
+      await rerender({ open: false })
 
       await waitFor(() => {
         expect(queryByText('Controlled content')).toBeNull()
@@ -406,15 +406,15 @@ describe('Popover', () => {
   })
 
   describe('Events', () => {
-    it('should emit visible-change event', async () => {
+    it('should emit open-change event', async () => {
       const user = userEvent.setup()
-      const onVisibleChange = vi.fn()
+      const onOpenChange = vi.fn()
 
       const { getByText } = renderWithProps(
         Popover,
         {
           content: 'Test content',
-          'onVisible-change': onVisibleChange
+          'onOpen-change': onOpenChange
         },
         {
           slots: {
@@ -426,19 +426,19 @@ describe('Popover', () => {
       await user.click(getByText('Trigger'))
 
       await waitFor(() => {
-        expect(onVisibleChange).toHaveBeenCalledWith(true)
+        expect(onOpenChange).toHaveBeenCalledWith(true)
       })
     })
 
-    it('should emit update:visible event', async () => {
+    it('should emit update:open event', async () => {
       const user = userEvent.setup()
-      const onUpdateVisible = vi.fn()
+      const onUpdateOpen = vi.fn()
 
       const { getByText } = renderWithProps(
         Popover,
         {
           content: 'Test content',
-          'onUpdate:visible': onUpdateVisible
+          'onUpdate:open': onUpdateOpen
         },
         {
           slots: {
@@ -450,7 +450,7 @@ describe('Popover', () => {
       await user.click(getByText('Trigger'))
 
       await waitFor(() => {
-        expect(onUpdateVisible).toHaveBeenCalledWith(true)
+        expect(onUpdateOpen).toHaveBeenCalledWith(true)
       })
     })
   })

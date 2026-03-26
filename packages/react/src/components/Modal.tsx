@@ -47,7 +47,7 @@ export interface ModalProps
   /**
    * Callback when modal visibility changes
    */
-  onVisibleChange?: (visible: boolean) => void
+  onOpenChange?: (open: boolean) => void
 
   /**
    * Callback when modal is closed
@@ -90,8 +90,9 @@ export interface ModalProps
 }
 
 export const Modal: React.FC<ModalProps> = ({
-  visible = false,
+  open = false,
   size = 'md',
+  width,
   title,
   titleContent,
   closable = true,
@@ -103,7 +104,7 @@ export const Modal: React.FC<ModalProps> = ({
   className,
   children,
   footer,
-  onVisibleChange,
+  onOpenChange,
   onClose,
   onCancel,
   onOk,
@@ -115,33 +116,33 @@ export const Modal: React.FC<ModalProps> = ({
   style,
   ...rest
 }) => {
-  const [hasBeenOpened, setHasBeenOpened] = React.useState(visible)
+  const [hasBeenOpened, setHasBeenOpened] = React.useState(open)
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       setHasBeenOpened(true)
     }
-  }, [visible])
+  }, [open])
 
   // Notify parent of visibility changes
   useEffect(() => {
-    onVisibleChange?.(visible)
-    if (!visible && onClose) {
+    onOpenChange?.(open)
+    if (!open && onClose) {
       onClose()
     }
-  }, [visible, onVisibleChange, onClose])
+  }, [open, onOpenChange, onClose])
 
-  const shouldRender = destroyOnClose ? visible : hasBeenOpened
+  const shouldRender = destroyOnClose ? open : hasBeenOpened
 
   const handleClose = useCallback(() => {
     onCancel?.()
-    onVisibleChange?.(false)
-  }, [onCancel, onVisibleChange])
+    onOpenChange?.(false)
+  }, [onCancel, onOpenChange])
 
   const handleOk = useCallback(() => {
     onOk?.()
-    onVisibleChange?.(false)
-  }, [onOk, onVisibleChange])
+    onOpenChange?.(false)
+  }, [onOk, onOpenChange])
 
   const handleMaskClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -198,7 +199,7 @@ export const Modal: React.FC<ModalProps> = ({
   const previousActiveElementRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       previousActiveElementRef.current = captureActiveElement()
 
       const timer = setTimeout(() => {
@@ -209,9 +210,9 @@ export const Modal: React.FC<ModalProps> = ({
     }
 
     restoreFocus(previousActiveElementRef.current)
-  }, [visible])
+  }, [open])
 
-  useEscapeKey({ enabled: visible, onEscape: handleClose })
+  useEscapeKey({ enabled: open, onEscape: handleClose })
 
   // Focus trap handler
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
@@ -249,15 +250,15 @@ export const Modal: React.FC<ModalProps> = ({
 
   const modalContent = (
     <div
-      className={classNames(modalWrapperClasses, !visible && 'pointer-events-none')}
+      className={classNames(modalWrapperClasses, !open && 'pointer-events-none')}
       style={{ zIndex }}
-      hidden={!visible}
-      aria-hidden={!visible ? 'true' : undefined}
+      hidden={!open}
+      aria-hidden={!open ? 'true' : undefined}
       data-tiger-modal-root="">
       {/* Mask */}
       {mask && (
         <div
-          className={classNames(modalMaskClasses, visible ? 'opacity-100' : 'opacity-0')}
+          className={classNames(modalMaskClasses, open ? 'opacity-100' : 'opacity-0')}
           aria-hidden="true"
           data-tiger-modal-mask=""
         />
@@ -267,7 +268,12 @@ export const Modal: React.FC<ModalProps> = ({
       <div className={containerClasses} onClick={handleMaskClick}>
         <div
           className={contentClasses}
-          style={style}
+          style={{
+            ...style,
+            ...(width
+              ? { width: typeof width === 'number' ? `${width}px` : width, maxWidth: '100%' }
+              : undefined)
+          }}
           {...dialogDivProps}
           role="dialog"
           aria-modal="true"
@@ -312,9 +318,7 @@ export const Modal: React.FC<ModalProps> = ({
               <Button variant="secondary" onClick={handleClose}>
                 {resolvedCancelText}
               </Button>
-              <Button onClick={handleOk}>
-                {resolvedOkText}
-              </Button>
+              <Button onClick={handleOk}>{resolvedOkText}</Button>
             </div>
           ) : null}
         </div>

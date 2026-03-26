@@ -6,11 +6,14 @@ import {
   buttonBaseClasses,
   buttonSizeClasses,
   buttonDisabledClasses,
+  buttonDangerClasses,
   getButtonVariantClasses,
   getSpinnerSVG,
   normalizeSvgAttrs,
   type ButtonVariant,
-  type ButtonSize
+  type ButtonSize,
+  type ButtonIconPosition,
+  type ButtonHtmlType
 } from '@expcat/tigercat-core'
 
 export interface VueButtonProps {
@@ -19,7 +22,9 @@ export interface VueButtonProps {
   disabled?: boolean
   loading?: boolean
   block?: boolean
-  type?: 'button' | 'submit' | 'reset'
+  iconPosition?: ButtonIconPosition
+  htmlType?: ButtonHtmlType
+  danger?: boolean
   className?: string
   style?: Record<string, unknown>
 }
@@ -74,13 +79,27 @@ export const Button = defineComponent({
     block: Boolean,
 
     /**
+     * Icon position relative to button text
+     * @default 'left'
+     */
+    iconPosition: {
+      type: String as PropType<ButtonIconPosition>,
+      default: 'left'
+    },
+
+    /**
      * HTML button type
      * @default 'button'
      */
-    type: {
-      type: String as PropType<'button' | 'submit' | 'reset'>,
+    htmlType: {
+      type: String as PropType<ButtonHtmlType>,
       default: 'button'
     },
+
+    /**
+     * Whether to apply danger/destructive styling
+     */
+    danger: Boolean,
 
     className: {
       type: String,
@@ -94,9 +113,13 @@ export const Button = defineComponent({
   emits: ['click'],
   setup(props, { slots, emit, attrs }) {
     const buttonClasses = computed(() => {
+      const variantClasses = props.danger
+        ? (buttonDangerClasses[props.variant] ?? buttonDangerClasses.primary)
+        : getButtonVariantClasses(props.variant)
+
       return classNames(
         buttonBaseClasses,
-        getButtonVariantClasses(props.variant),
+        variantClasses,
         buttonSizeClasses[props.size],
         (props.disabled || props.loading) && buttonDisabledClasses,
         props.block && 'w-full',
@@ -109,6 +132,20 @@ export const Button = defineComponent({
 
     return () => {
       const isDisabled = props.disabled || props.loading
+      const iconIsRight = props.iconPosition === 'right'
+
+      const loadingNode = props.loading
+        ? h(
+            'span',
+            { class: iconIsRight ? 'ml-2 order-1' : 'mr-2' },
+            slots['loading-icon'] ? slots['loading-icon']() : LoadingSpinner
+          )
+        : null
+
+      const iconNode =
+        !props.loading && slots.icon
+          ? h('span', { class: iconIsRight ? 'ml-2 order-1' : 'mr-2' }, slots.icon())
+          : null
 
       return h(
         'button',
@@ -119,18 +156,10 @@ export const Button = defineComponent({
           'aria-busy': attrs['aria-busy'] ?? (props.loading ? 'true' : undefined),
           'aria-disabled': attrs['aria-disabled'] ?? (isDisabled ? 'true' : undefined),
           disabled: isDisabled,
-          type: props.type,
+          type: props.htmlType,
           onClick: isDisabled ? undefined : (event: MouseEvent) => emit('click', event)
         },
-        [
-          props.loading &&
-            h(
-              'span',
-              { class: 'mr-2' },
-              slots['loading-icon'] ? slots['loading-icon']() : LoadingSpinner
-            ),
-          slots.default?.()
-        ]
+        [loadingNode, iconNode, slots.default?.()]
       )
     }
   }

@@ -1244,4 +1244,61 @@ describe('Form', () => {
       expect(alert).toHaveTextContent('Name required')
     })
   })
+
+  describe('loading prop', () => {
+    it('should add loading class when loading is true', () => {
+      const { container } = render(<Form loading>content</Form>)
+      expect(container.querySelector('form')!.className).toContain('tiger-form--loading')
+    })
+
+    it('should not submit when loading is true', async () => {
+      const onSubmit = vi.fn()
+      const { container } = render(
+        <Form loading onSubmit={onSubmit}>
+          content
+        </Form>
+      )
+      await fireEvent.submit(container.querySelector('form')!)
+      expect(onSubmit).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('addField / removeField', () => {
+    it('should add a field via ref addField method', async () => {
+      const formRef = React.createRef<FormHandle>()
+      const onChange = vi.fn()
+
+      render(
+        <Form ref={formRef} model={{ name: 'Alice' }} onChange={onChange}>
+          content
+        </Form>
+      )
+
+      await act(async () => {
+        formRef.current?.addField('age', 25)
+      })
+
+      expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ name: 'Alice', age: 25 }))
+    })
+
+    it('should remove a field via ref removeField method', async () => {
+      const formRef = React.createRef<FormHandle>()
+      const onChange = vi.fn()
+
+      render(
+        <Form ref={formRef} model={{ name: 'Alice', email: 'test@test.com' }} onChange={onChange}>
+          content
+        </Form>
+      )
+
+      await act(async () => {
+        formRef.current?.removeField('email')
+      })
+
+      expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ name: 'Alice' }))
+      expect(onChange).toHaveBeenCalledWith(
+        expect.not.objectContaining({ email: expect.anything() })
+      )
+    })
+  })
 })

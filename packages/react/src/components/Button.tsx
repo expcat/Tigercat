@@ -4,14 +4,20 @@ import {
   buttonBaseClasses,
   buttonSizeClasses,
   buttonDisabledClasses,
+  buttonDangerClasses,
   getButtonVariantClasses,
   getSpinnerSVG,
-  type ButtonProps as CoreButtonProps
+  type ButtonProps as CoreButtonProps,
+  type ButtonIconPosition,
+  type ButtonHtmlType
 } from '@expcat/tigercat-core'
 
 export interface ButtonProps
-  extends CoreButtonProps, Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled'> {
+  extends
+    CoreButtonProps,
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'disabled' | 'type'> {
   loadingIcon?: React.ReactNode
+  icon?: React.ReactNode
 }
 
 const spinnerSvg = getSpinnerSVG('spinner')
@@ -36,10 +42,13 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   loading = false,
   loadingIcon,
+  icon,
   block = false,
+  iconPosition = 'left',
+  htmlType = 'button',
+  danger = false,
   onClick,
   children,
-  type = 'button',
   className,
   'aria-busy': ariaBusyProp,
   'aria-disabled': ariaDisabledProp,
@@ -49,18 +58,22 @@ export const Button: React.FC<ButtonProps> = ({
   const ariaBusy = ariaBusyProp ?? (loading ? true : undefined)
   const ariaDisabled = ariaDisabledProp ?? (isDisabled ? true : undefined)
 
-  const buttonClasses = useMemo(
-    () =>
-      classNames(
-        buttonBaseClasses,
-        getButtonVariantClasses(variant),
-        buttonSizeClasses[size],
-        isDisabled && buttonDisabledClasses,
-        block && 'w-full',
-        className
-      ),
-    [variant, size, isDisabled, block, className]
-  )
+  const buttonClasses = useMemo(() => {
+    const variantClasses = danger
+      ? (buttonDangerClasses[variant] ?? buttonDangerClasses.primary)
+      : getButtonVariantClasses(variant)
+
+    return classNames(
+      buttonBaseClasses,
+      variantClasses,
+      buttonSizeClasses[size],
+      isDisabled && buttonDisabledClasses,
+      block && 'w-full',
+      className
+    )
+  }, [variant, size, isDisabled, block, danger, className])
+
+  const iconIsRight = iconPosition === 'right'
 
   return (
     <button
@@ -70,8 +83,13 @@ export const Button: React.FC<ButtonProps> = ({
       aria-disabled={ariaDisabled}
       disabled={isDisabled}
       onClick={isDisabled ? undefined : onClick}
-      type={type}>
-      {loading && <span className="mr-2">{loadingIcon ?? DefaultSpinner}</span>}
+      type={htmlType}>
+      {loading && (
+        <span className={iconIsRight ? 'ml-2 order-1' : 'mr-2'}>
+          {loadingIcon ?? DefaultSpinner}
+        </span>
+      )}
+      {!loading && icon && <span className={iconIsRight ? 'ml-2 order-1' : 'mr-2'}>{icon}</span>}
       {children}
     </button>
   )

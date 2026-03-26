@@ -14,16 +14,21 @@ export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full'
  */
 export interface ModalProps {
   /**
-   * Whether the modal is visible
+   * Whether the modal is open
    * @default false
    */
-  visible?: boolean
+  open?: boolean
 
   /**
    * Modal size
    * @default 'md'
    */
   size?: ModalSize
+
+  /**
+   * Custom width (overrides size). Accepts CSS value like '600px' or '80%'.
+   */
+  width?: string | number
 
   /**
    * Modal title

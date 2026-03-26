@@ -670,4 +670,85 @@ describe('Input', () => {
       expect(wrapper.className).not.toContain('tiger-animate-shake')
     })
   })
+
+  describe('clearable', () => {
+    it('shows clear button when clearable and has value', () => {
+      render(<Input clearable value="hello" />)
+      expect(screen.getByLabelText('Clear input')).toBeInTheDocument()
+    })
+
+    it('does not show clear button when value is empty', () => {
+      render(<Input clearable value="" />)
+      expect(screen.queryByLabelText('Clear input')).not.toBeInTheDocument()
+    })
+
+    it('clears value and calls onClear when clear button is clicked', async () => {
+      const user = userEvent.setup()
+      const onClear = vi.fn()
+      render(<Input clearable defaultValue="hello" onClear={onClear} />)
+
+      await user.click(screen.getByLabelText('Clear input'))
+      expect(onClear).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not show clear button when disabled', () => {
+      render(<Input clearable value="hello" disabled />)
+      expect(screen.queryByLabelText('Clear input')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('showPassword', () => {
+    it('shows password toggle for password type', () => {
+      render(<Input type="password" showPassword value="secret" />)
+      expect(screen.getByLabelText('Show password')).toBeInTheDocument()
+    })
+
+    it('toggles input type between password and text', async () => {
+      const user = userEvent.setup()
+      const { container } = render(<Input type="password" showPassword value="secret" />)
+      const input = container.querySelector('input')!
+
+      expect(input).toHaveAttribute('type', 'password')
+      await user.click(screen.getByLabelText('Show password'))
+      expect(input).toHaveAttribute('type', 'text')
+      expect(screen.getByLabelText('Hide password')).toBeInTheDocument()
+    })
+  })
+
+  describe('showCount', () => {
+    it('shows character count', () => {
+      render(<Input showCount value="hello" />)
+      expect(screen.getByText('5')).toBeInTheDocument()
+    })
+
+    it('shows current/max when maxLength is set', () => {
+      render(<Input showCount maxLength={10} value="hello" />)
+      expect(screen.getByText('5 / 10')).toBeInTheDocument()
+    })
+  })
+
+  describe('a11y: standalone error state', () => {
+    it('sets aria-invalid when status is error', () => {
+      render(<Input status="error" />)
+      const input = screen.getByRole('textbox')
+      expect(input).toHaveAttribute('aria-invalid', 'true')
+    })
+
+    it('sets aria-describedby pointing to error message when status=error and errorMessage', () => {
+      render(<Input status="error" errorMessage="Required field" />)
+      const input = screen.getByRole('textbox')
+      const describedBy = input.getAttribute('aria-describedby')
+      expect(describedBy).toBeTruthy()
+
+      const errorEl = document.getElementById(describedBy!)
+      expect(errorEl).toBeInTheDocument()
+      expect(errorEl?.textContent).toBe('Required field')
+    })
+
+    it('does not set aria-invalid when status is default', () => {
+      render(<Input />)
+      const input = screen.getByRole('textbox')
+      expect(input).not.toHaveAttribute('aria-invalid')
+    })
+  })
 })

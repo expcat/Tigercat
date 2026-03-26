@@ -14,10 +14,10 @@ export type FloatingTrigger = 'click' | 'hover' | 'focus' | 'manual'
  * (Tooltip, Popover, Popconfirm).
  */
 export interface BaseFloatingPopupProps {
-  /** Whether the popup is visible (controlled mode) */
-  visible?: boolean
-  /** Default visibility (uncontrolled mode) @default false */
-  defaultVisible?: boolean
+  /** Whether the popup is open (controlled mode) */
+  open?: boolean
+  /** Default open state (uncontrolled mode) @default false */
+  defaultOpen?: boolean
   /** Placement relative to trigger @default 'top' */
   placement?: FloatingPlacement
   /** Whether the popup is disabled @default false */

@@ -25,10 +25,10 @@ export const Popover = defineComponent({
   name: 'TigerPopover',
   inheritAttrs: false,
   props: {
-    /** Whether the popover is visible (controlled mode) */
-    visible: { type: Boolean, default: undefined },
-    /** Default visibility (uncontrolled mode) */
-    defaultVisible: { type: Boolean, default: false },
+    /** Whether the popover is open (controlled mode) */
+    open: { type: Boolean, default: undefined },
+    /** Default open state (uncontrolled mode) */
+    defaultOpen: { type: Boolean, default: false },
     /** Popover title text */
     title: { type: String, default: undefined },
     /** Popover content text */
@@ -47,7 +47,7 @@ export const Popover = defineComponent({
     className: { type: String, default: undefined },
     style: { type: [String, Object, Array] as PropType<StyleValue>, default: undefined }
   },
-  emits: ['update:visible', 'visible-change'],
+  emits: ['update:open', 'open-change'],
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
 
@@ -108,37 +108,33 @@ export const Popover = defineComponent({
           ),
           // Floating content
           currentVisible.value
-            ? h(
-                'div',
-                { ref: floatingRef, style: floatingStyles.value, 'aria-hidden': false },
-                [
-                  h(
-                    'div',
-                    {
-                      id: popoverId,
-                      role: 'dialog',
-                      'aria-modal': 'false',
-                      'aria-labelledby': hasTitle ? titleId : undefined,
-                      'aria-describedby': hasContent ? contentId : undefined,
-                      class: contentClasses.value
-                    },
-                    [
-                      hasTitle &&
-                        h(
-                          'div',
-                          { id: titleId, class: POPOVER_TITLE_CLASSES },
-                          slots.title ? slots.title() : props.title
-                        ),
-                      hasContent &&
-                        h(
-                          'div',
-                          { id: contentId, class: POPOVER_TEXT_CLASSES },
-                          slots.content ? slots.content() : props.content
-                        )
-                    ].filter(Boolean)
-                  )
-                ]
-              )
+            ? h('div', { ref: floatingRef, style: floatingStyles.value, 'aria-hidden': false }, [
+                h(
+                  'div',
+                  {
+                    id: popoverId,
+                    role: 'dialog',
+                    'aria-modal': 'false',
+                    'aria-labelledby': hasTitle ? titleId : undefined,
+                    'aria-describedby': hasContent ? contentId : undefined,
+                    class: contentClasses.value
+                  },
+                  [
+                    hasTitle &&
+                      h(
+                        'div',
+                        { id: titleId, class: POPOVER_TITLE_CLASSES },
+                        slots.title ? slots.title() : props.title
+                      ),
+                    hasContent &&
+                      h(
+                        'div',
+                        { id: contentId, class: POPOVER_TEXT_CLASSES },
+                        slots.content ? slots.content() : props.content
+                      )
+                  ].filter(Boolean)
+                )
+              ])
             : null
         ]
       )

@@ -175,7 +175,7 @@ export const CropUpload: React.FC<CropUploadProps> = ({
         )}
       </div>
       <Modal
-        visible={modalVisible}
+        open={modalVisible}
         size="lg"
         title={modalTitle}
         closable

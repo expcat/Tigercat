@@ -19,8 +19,8 @@ import {
 // Options
 // ---------------------------------------------------------------------------
 export interface UsePopupOptions {
-  visible?: boolean
-  defaultVisible?: boolean
+  open?: boolean
+  defaultOpen?: boolean
   disabled?: boolean
   trigger?: FloatingTrigger
   placement?: FloatingPlacement
@@ -31,7 +31,7 @@ export interface UsePopupOptions {
    * @default true
    */
   multiTrigger?: boolean
-  onVisibleChange?: (visible: boolean) => void
+  onOpenChange?: (visible: boolean) => void
 }
 
 // ---------------------------------------------------------------------------
@@ -55,20 +55,20 @@ export interface UsePopupReturn {
 // ---------------------------------------------------------------------------
 export function usePopup(options: UsePopupOptions): UsePopupReturn {
   const {
-    visible,
-    defaultVisible = false,
+    open,
+    defaultOpen = false,
     disabled = false,
     trigger = 'click',
     placement = 'top',
     offset = 8,
     multiTrigger = true,
-    onVisibleChange
+    onOpenChange
   } = options
 
   // ─── Visibility ──────────────────────────────────────────────────────
-  const isControlled = visible !== undefined
-  const [internalVisible, setInternalVisible] = useState(defaultVisible)
-  const currentVisible = isControlled ? visible : internalVisible
+  const isControlled = open !== undefined
+  const [internalVisible, setInternalVisible] = useState(defaultOpen)
+  const currentVisible = isControlled ? open : internalVisible
 
   const containerRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
@@ -92,9 +92,9 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
     (next: boolean) => {
       if (disabled && next) return
       if (!isControlled) setInternalVisible(next)
-      onVisibleChange?.(next)
+      onOpenChange?.(next)
     },
-    [disabled, isControlled, onVisibleChange]
+    [disabled, isControlled, onOpenChange]
   )
 
   // ─── Trigger handlers ────────────────────────────────────────────────

@@ -107,4 +107,25 @@ export interface InputProps {
    * @default false
    */
   autoFocus?: boolean
+
+  /**
+   * Whether to show a clear button when the input has value
+   * @default false
+   * @since 0.5.0
+   */
+  clearable?: boolean
+
+  /**
+   * Whether to show a password toggle button (only works with type='password')
+   * @default false
+   * @since 0.5.0
+   */
+  showPassword?: boolean
+
+  /**
+   * Whether to show a character count (requires maxLength to show "current/max")
+   * @default false
+   * @since 0.5.0
+   */
+  showCount?: boolean
 }

@@ -7,7 +7,7 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 共享 Props 定义，框架差异在表格中标注。
 
-> **显示状态差异**: Modal/Drawer → Vue 使用 `visible`，React 使用 `open`。Tooltip/Popover/Popconfirm → 双框架统一使用 `visible`。详见 [patterns/common.md](../patterns/common.md)
+> **显示状态 (v0.5.0)**: 所有组件统一使用 `open` prop（原 `visible` 已废弃）。详见 [MIGRATION_v0.5.0.md](../../../../MIGRATION_v0.5.0.md) 和 [patterns/common.md](../patterns/common.md)
 >
 > **Floating Popup 共享架构**: Tooltip、Popover、Popconfirm 共享 `useFloatingPopup` (Vue) / `usePopup` (React) hook，统一管理 visibility、定位、dismiss 与 trigger 事件。详见 [patterns/common.md](../patterns/common.md#floating-popup-共享架构)
 
@@ -17,31 +17,32 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Props
 
-| Prop              | Type                                     | Default  | Vue | React | Description                     |
-| ----------------- | ---------------------------------------- | -------- | :-: | :---: | ------------------------------- |
-| visible           | `boolean`                                | `false`  |  ✓  |   ✓   | 显示状态 (Vue: v-model:visible) |
-| title             | `string`                                 | -        |  ✓  |   ✓   | 标题                            |
-| size              | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | `'md'`   |  ✓  |   ✓   | 尺寸                            |
-| closable          | `boolean`                                | `true`   |  ✓  |   ✓   | 显示关闭按钮                    |
-| mask              | `boolean`                                | `true`   |  ✓  |   ✓   | 显示遮罩层                      |
-| maskClosable      | `boolean`                                | `true`   |  ✓  |   ✓   | 点击遮罩关闭                    |
-| centered          | `boolean`                                | `false`  |  ✓  |   ✓   | 垂直居中                        |
-| destroyOnClose    | `boolean`                                | `false`  |  ✓  |   ✓   | 关闭时销毁内容                  |
-| zIndex            | `number`                                 | `1000`   |  ✓  |   ✓   | 层级                            |
-| showDefaultFooter | `boolean`                                | `false`  |  ✓  |   ✓   | 显示内置确定/取消页脚           |
-| okText            | `string`                                 | `'确定'` |  ✓  |   ✓   | 确认按钮文案                    |
-| cancelText        | `string`                                 | `'取消'` |  ✓  |   ✓   | 取消按钮文案                    |
-| className         | `string`                                 | -        |  ✓  |   ✓   | 自定义类名                      |
-| locale            | `{ modal: ModalLocale }`                 | -        |  ✓  |   ✓   | 国际化                          |
+| Prop              | Type                                     | Default  | Vue | React | Description                  |
+| ----------------- | ---------------------------------------- | -------- | :-: | :---: | ---------------------------- |
+| open              | `boolean`                                | `false`  |  ✓  |   ✓   | 显示状态 (Vue: v-model:open) |
+| title             | `string`                                 | -        |  ✓  |   ✓   | 标题                         |
+| width             | `string \| number`                       | -        |  ✓  |   ✓   | 自定义宽度                   |
+| size              | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | `'md'`   |  ✓  |   ✓   | 尺寸                         |
+| closable          | `boolean`                                | `true`   |  ✓  |   ✓   | 显示关闭按钮                 |
+| mask              | `boolean`                                | `true`   |  ✓  |   ✓   | 显示遮罩层                   |
+| maskClosable      | `boolean`                                | `true`   |  ✓  |   ✓   | 点击遮罩关闭                 |
+| centered          | `boolean`                                | `false`  |  ✓  |   ✓   | 垂直居中                     |
+| destroyOnClose    | `boolean`                                | `false`  |  ✓  |   ✓   | 关闭时销毁内容               |
+| zIndex            | `number`                                 | `1000`   |  ✓  |   ✓   | 层级                         |
+| showDefaultFooter | `boolean`                                | `false`  |  ✓  |   ✓   | 显示内置确定/取消页脚        |
+| okText            | `string`                                 | `'确定'` |  ✓  |   ✓   | 确认按钮文案                 |
+| cancelText        | `string`                                 | `'取消'` |  ✓  |   ✓   | 取消按钮文案                 |
+| className         | `string`                                 | -        |  ✓  |   ✓   | 自定义类名                   |
+| locale            | `{ modal: ModalLocale }`                 | -        |  ✓  |   ✓   | 国际化                       |
 
 ### Events
 
-| Vue Event         | React Callback    | Description  |
-| ----------------- | ----------------- | ------------ |
-| `@update:visible` | `onVisibleChange` | 显示状态变更 |
-| `@ok`             | `onOk`            | 确认事件     |
-| `@cancel`         | `onCancel`        | 取消事件     |
-| `@close`          | `onClose`         | 关闭事件     |
+| Vue Event      | React Callback | Description  |
+| -------------- | -------------- | ------------ |
+| `@update:open` | `onOpenChange` | 显示状态变更 |
+| `@ok`          | `onOk`         | 确认事件     |
+| `@cancel`      | `onCancel`     | 取消事件     |
+| `@close`       | `onClose`      | 关闭事件     |
 
 ### Slots / Children
 
@@ -58,8 +59,9 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 | Prop           | Type                                     | Default          | Vue | React | Description                                  |
 | -------------- | ---------------------------------------- | ---------------- | :-: | :---: | -------------------------------------------- |
-| visible        | `boolean`                                | `false`          |  ✓  |   ✓   | 显示状态 (Vue: v-model:visible)              |
+| open           | `boolean`                                | `false`          |  ✓  |   ✓   | 显示状态 (Vue: v-model:open)                 |
 | title          | `string`                                 | -                |  ✓  |   ✓   | 标题                                         |
+| width          | `string \| number`                       | -                |  ✓  |   ✓   | 自定义宽度                                   |
 | placement      | `'left' \| 'right' \| 'top' \| 'bottom'` | `'right'`        |  ✓  |   ✓   | 弹出位置                                     |
 | size           | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | `'md'`           |  ✓  |   ✓   | 尺寸（left/right 为宽度，top/bottom 为高度） |
 | closable       | `boolean`                                | `true`           |  ✓  |   ✓   | 显示关闭按钮                                 |
@@ -74,12 +76,12 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Events
 
-| Vue Event         | React Callback | Description  |
-| ----------------- | -------------- | ------------ |
-| `@update:visible` | -              | 显示状态变更 |
-| `@close`          | `onClose`      | 关闭事件     |
-| `@after-enter`    | `onAfterEnter` | 打开动画结束 |
-| `@after-leave`    | `onAfterLeave` | 关闭动画结束 |
+| Vue Event      | React Callback | Description  |
+| -------------- | -------------- | ------------ |
+| `@update:open` | -              | 显示状态变更 |
+| `@close`       | `onClose`      | 关闭事件     |
+| `@after-enter` | `onAfterEnter` | 打开动画结束 |
+| `@after-leave` | `onAfterLeave` | 关闭动画结束 |
 
 ### Slots / Children
 

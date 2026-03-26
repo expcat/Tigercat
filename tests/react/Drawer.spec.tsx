@@ -10,14 +10,14 @@ import { Drawer } from '@expcat/tigercat-react'
 import { expectNoA11yViolations } from '../utils/react'
 
 describe('Drawer', () => {
-  it('should not render when visible is false (initial)', () => {
-    render(<Drawer visible={false} title="Test Drawer" />)
+  it('should not render when open is false (initial)', () => {
+    render(<Drawer open={false} title="Test Drawer" />)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('should render when visible is true', async () => {
+  it('should render when open is true', async () => {
     render(
-      <Drawer visible={true} title="Test Drawer">
+      <Drawer open={true} title="Test Drawer">
         <div>Drawer Content</div>
       </Drawer>
     )
@@ -29,7 +29,7 @@ describe('Drawer', () => {
   })
 
   it('should link aria-labelledby to an existing title element', async () => {
-    render(<Drawer visible={true} title="Accessible Drawer" />)
+    render(<Drawer open={true} title="Accessible Drawer" />)
 
     await waitFor(() => {
       const dialog = screen.getByRole('dialog')
@@ -45,7 +45,7 @@ describe('Drawer', () => {
     const user = userEvent.setup()
     const onClose = vi.fn()
 
-    render(<Drawer visible={true} title="Test Drawer" onClose={onClose} />)
+    render(<Drawer open={true} title="Test Drawer" onClose={onClose} />)
     await user.click(screen.getByLabelText('Close drawer'))
     expect(onClose).toHaveBeenCalled()
   })
@@ -56,7 +56,7 @@ describe('Drawer', () => {
 
     render(
       <Drawer
-        visible={true}
+        open={true}
         title="Test Drawer"
         onClose={onClose}
         locale={{ drawer: { closeAriaLabel: 'Close (i18n)' } }}
@@ -71,7 +71,7 @@ describe('Drawer', () => {
     const user = userEvent.setup()
     const onClose = vi.fn()
 
-    render(<Drawer visible={true} title="Test Drawer" onClose={onClose} />)
+    render(<Drawer open={true} title="Test Drawer" onClose={onClose} />)
 
     await user.keyboard('{Escape}')
     expect(onClose).toHaveBeenCalled()
@@ -81,7 +81,7 @@ describe('Drawer', () => {
     const user = userEvent.setup()
     const onClose = vi.fn()
 
-    render(<Drawer visible={true} title="Test Drawer" onClose={onClose} />)
+    render(<Drawer open={true} title="Test Drawer" onClose={onClose} />)
 
     const mask = document.querySelector('[data-tiger-drawer-mask]')
     expect(mask).toBeInTheDocument()
@@ -94,7 +94,7 @@ describe('Drawer', () => {
     const user = userEvent.setup()
     const onClose = vi.fn()
 
-    render(<Drawer visible={true} title="Test Drawer" maskClosable={false} onClose={onClose} />)
+    render(<Drawer open={true} title="Test Drawer" maskClosable={false} onClose={onClose} />)
 
     const mask = document.querySelector('[data-tiger-drawer-mask]')
     expect(mask).toBeInTheDocument()
@@ -104,7 +104,7 @@ describe('Drawer', () => {
   })
 
   it('should apply custom zIndex', async () => {
-    render(<Drawer visible={true} title="Test Drawer" zIndex={2000} />)
+    render(<Drawer open={true} title="Test Drawer" zIndex={2000} />)
 
     await waitFor(() => {
       const root = document.querySelector('[data-tiger-drawer-root]')
@@ -114,7 +114,7 @@ describe('Drawer', () => {
 
   it('should keep content mounted (hidden) when destroyOnClose is false', async () => {
     const { rerender } = render(
-      <Drawer visible={true} destroyOnClose={false}>
+      <Drawer open={true} destroyOnClose={false}>
         <div data-testid="drawer-content">Content</div>
       </Drawer>
     )
@@ -124,7 +124,7 @@ describe('Drawer', () => {
     })
 
     rerender(
-      <Drawer visible={false} destroyOnClose={false}>
+      <Drawer open={false} destroyOnClose={false}>
         <div data-testid="drawer-content">Content</div>
       </Drawer>
     )
@@ -138,7 +138,7 @@ describe('Drawer', () => {
 
   it('should destroy content when destroyOnClose is true', async () => {
     const { rerender } = render(
-      <Drawer visible={true} destroyOnClose={true}>
+      <Drawer open={true} destroyOnClose={true}>
         <div data-testid="drawer-content">Content</div>
       </Drawer>
     )
@@ -148,7 +148,7 @@ describe('Drawer', () => {
     })
 
     rerender(
-      <Drawer visible={false} destroyOnClose={true}>
+      <Drawer open={false} destroyOnClose={true}>
         <div data-testid="drawer-content">Content</div>
       </Drawer>
     )
@@ -164,7 +164,7 @@ describe('Drawer', () => {
 
     const { rerender } = render(
       <Drawer
-        visible={true}
+        open={true}
         title="Test Drawer"
         onAfterEnter={onAfterEnter}
         onAfterLeave={onAfterLeave}
@@ -176,7 +176,7 @@ describe('Drawer', () => {
 
     rerender(
       <Drawer
-        visible={false}
+        open={false}
         title="Test Drawer"
         onAfterEnter={onAfterEnter}
         onAfterLeave={onAfterLeave}
@@ -189,7 +189,7 @@ describe('Drawer', () => {
 
   it('should pass basic accessibility checks', async () => {
     render(
-      <Drawer visible={true} title="Accessible Drawer">
+      <Drawer open={true} title="Accessible Drawer">
         <div>Drawer content</div>
       </Drawer>
     )
@@ -199,5 +199,37 @@ describe('Drawer', () => {
     })
 
     await expectNoA11yViolations(document.body)
+  })
+
+  describe('width prop', () => {
+    it('should apply custom width style for right placement', () => {
+      render(
+        <Drawer open={true} placement="right" width="400px">
+          content
+        </Drawer>
+      )
+      const dialog = document.querySelector('[role="dialog"]') as HTMLElement
+      expect(dialog.style.width).toBe('400px')
+    })
+
+    it('should apply custom height style for top placement', () => {
+      render(
+        <Drawer open={true} placement="top" width="300px">
+          content
+        </Drawer>
+      )
+      const dialog = document.querySelector('[role="dialog"]') as HTMLElement
+      expect(dialog.style.height).toBe('300px')
+    })
+
+    it('should apply number width as pixels', () => {
+      render(
+        <Drawer open={true} width={500}>
+          content
+        </Drawer>
+      )
+      const dialog = document.querySelector('[role="dialog"]') as HTMLElement
+      expect(dialog.style.width).toBe('500px')
+    })
   })
 })

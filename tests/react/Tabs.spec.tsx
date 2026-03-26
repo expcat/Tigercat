@@ -608,4 +608,35 @@ describe('Tabs', () => {
       expect(screen.getByText('Content 2')).toBeVisible()
     })
   })
+
+  describe('Pills variant', () => {
+    it('should render pills type with rounded-full class', () => {
+      render(
+        <Tabs type="pills">
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+        </Tabs>
+      )
+
+      const tab = screen.getByRole('tab', { name: 'Tab 1' })
+      expect(tab).toHaveClass('rounded-full')
+    })
+
+    it('should apply active pills class when tab is selected', () => {
+      render(
+        <Tabs type="pills" defaultActiveKey="1">
+          <TabPane tabKey="1" label="Active">
+            Content 1
+          </TabPane>
+          <TabPane tabKey="2" label="Inactive">
+            Content 2
+          </TabPane>
+        </Tabs>
+      )
+
+      const active = screen.getByRole('tab', { name: 'Active' })
+      expect(active.className).toContain('bg-[var(--tiger-primary')
+    })
+  })
 })

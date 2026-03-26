@@ -4,7 +4,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Alert } from '@expcat/tigercat-react'
 import { expectNoA11yViolations } from '../utils/react'
@@ -104,5 +104,31 @@ describe('Alert', () => {
     )
 
     await expectNoA11yViolations(container)
+  })
+
+  describe('Auto-close', () => {
+    it('should auto-close after duration when closable', async () => {
+      vi.useFakeTimers()
+      const { unmount } = render(<Alert title="Auto-close Alert" closable duration={3000} />)
+
+      expect(screen.getByRole('alert')).toBeInTheDocument()
+
+      await act(() => {
+        vi.advanceTimersByTime(3000)
+      })
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      vi.useRealTimers()
+    })
+
+    it('should not auto-close when duration is not set', async () => {
+      vi.useFakeTimers()
+      render(<Alert title="No Auto-close" closable />)
+
+      await act(() => {
+        vi.advanceTimersByTime(10000)
+      })
+      expect(screen.getByRole('alert')).toBeInTheDocument()
+      vi.useRealTimers()
+    })
   })
 })

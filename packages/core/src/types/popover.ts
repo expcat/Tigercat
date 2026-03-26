@@ -13,14 +13,14 @@ export type PopoverTrigger = 'click' | 'hover' | 'focus' | 'manual'
  * Base popover props interface
  */
 export interface PopoverProps {
-  /** Whether the popover is visible (controlled mode) */
-  visible?: boolean
+  /** Whether the popover is open (controlled mode) */
+  open?: boolean
 
   /**
-   * Default visibility (uncontrolled mode)
+   * Default open state (uncontrolled mode)
    * @default false
    */
-  defaultVisible?: boolean
+  defaultOpen?: boolean
 
   /** Popover title text */
   title?: string

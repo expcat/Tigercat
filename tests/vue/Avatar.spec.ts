@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
-import { Avatar } from '@expcat/tigercat-vue'
+import { Avatar, AvatarGroup } from '@expcat/tigercat-vue'
 import { expectNoA11yViolations } from '../utils'
 
 describe('Avatar', () => {
@@ -154,5 +154,35 @@ describe('Avatar', () => {
     })
 
     await expectNoA11yViolations(container)
+  })
+})
+
+describe('AvatarGroup', () => {
+  it('should render all children when max is not set', () => {
+    const { container } = render(AvatarGroup, {
+      slots: {
+        default: ['<span>A</span>', '<span>B</span>', '<span>C</span>'].join('')
+      }
+    })
+    expect(container.querySelectorAll('span').length).toBe(3)
+  })
+
+  it('should show overflow indicator when max is set', () => {
+    const { container } = render(AvatarGroup, {
+      props: { max: 2 },
+      slots: {
+        default: ['<span>A</span>', '<span>B</span>', '<span>C</span>', '<span>D</span>'].join('')
+      }
+    })
+    const overflow = container.querySelector('[aria-label="2 more"]')
+    expect(overflow).toBeInTheDocument()
+    expect(overflow?.textContent).toBe('+2')
+  })
+
+  it('should have role="group"', () => {
+    const { container } = render(AvatarGroup, {
+      slots: { default: '<span>A</span>' }
+    })
+    expect(container.querySelector('[role="group"]')).toBeInTheDocument()
   })
 })

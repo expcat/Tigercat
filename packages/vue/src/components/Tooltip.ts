@@ -23,10 +23,10 @@ export const Tooltip = defineComponent({
   name: 'TigerTooltip',
   inheritAttrs: false,
   props: {
-    /** Whether the tooltip is visible (controlled mode) */
-    visible: { type: Boolean, default: undefined },
-    /** Default visibility (uncontrolled mode) @default false */
-    defaultVisible: { type: Boolean, default: false },
+    /** Whether the tooltip is open (controlled mode) */
+    open: { type: Boolean, default: undefined },
+    /** Default open state (uncontrolled mode) @default false */
+    defaultOpen: { type: Boolean, default: false },
     /** Tooltip content text */
     content: { type: String, default: undefined },
     /** Trigger type @default 'hover' */
@@ -41,7 +41,7 @@ export const Tooltip = defineComponent({
     className: { type: String, default: undefined },
     style: { type: [String, Object, Array] as PropType<StyleValue>, default: undefined }
   },
-  emits: ['update:visible', 'visible-change'],
+  emits: ['update:open', 'open-change'],
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
 

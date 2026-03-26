@@ -59,9 +59,10 @@ const CloseIcon: React.FC = () => (
 )
 
 export const Drawer: React.FC<DrawerProps> = ({
-  visible = false,
+  open = false,
   placement = 'right',
   size = 'md',
+  width,
   title,
   header,
   closable = true,
@@ -81,13 +82,13 @@ export const Drawer: React.FC<DrawerProps> = ({
   style,
   ...rest
 }) => {
-  const [hasBeenOpened, setHasBeenOpened] = React.useState(visible)
+  const [hasBeenOpened, setHasBeenOpened] = React.useState(open)
 
   useEffect(() => {
-    if (visible) setHasBeenOpened(true)
-  }, [visible])
+    if (open) setHasBeenOpened(true)
+  }, [open])
 
-  const shouldRender = destroyOnClose ? visible : hasBeenOpened
+  const shouldRender = destroyOnClose ? open : hasBeenOpened
 
   const handleClose = useCallback(() => {
     onClose?.()
@@ -103,15 +104,15 @@ export const Drawer: React.FC<DrawerProps> = ({
     [maskClosable, handleClose]
   )
 
-  useEscapeKey({ enabled: visible, onEscape: handleClose })
+  useEscapeKey({ enabled: open, onEscape: handleClose })
 
   const previousVisible = useRef(false)
   useEffect(() => {
-    if (visible === previousVisible.current) return
-    previousVisible.current = visible
+    if (open === previousVisible.current) return
+    previousVisible.current = open
 
     const timer = window.setTimeout(() => {
-      if (visible) {
+      if (open) {
         onAfterEnter?.()
       } else {
         onAfterLeave?.()
@@ -119,7 +120,7 @@ export const Drawer: React.FC<DrawerProps> = ({
     }, ANIMATION_DURATION_MS)
 
     return () => window.clearTimeout(timer)
-  }, [visible, onAfterEnter, onAfterLeave])
+  }, [open, onAfterEnter, onAfterLeave])
 
   const reactId = useId()
   const drawerId = useMemo(() => `tiger-drawer-${reactId}`, [reactId])
@@ -147,7 +148,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   )
 
   useEffect(() => {
-    if (visible) {
+    if (open) {
       previousActiveElementRef.current = captureActiveElement()
 
       const timer = window.setTimeout(() => {
@@ -157,7 +158,7 @@ export const Drawer: React.FC<DrawerProps> = ({
       return () => window.clearTimeout(timer)
     }
     restoreFocus(previousActiveElementRef.current)
-  }, [visible])
+  }, [open])
 
   // Focus trap handler
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
@@ -172,14 +173,11 @@ export const Drawer: React.FC<DrawerProps> = ({
     }
   }, [])
 
-  const containerClasses = classNames(
-    getDrawerContainerClasses(),
-    !visible && 'pointer-events-none'
-  )
+  const containerClasses = classNames(getDrawerContainerClasses(), !open && 'pointer-events-none')
 
-  const maskClasses = getDrawerMaskClasses(visible)
+  const maskClasses = getDrawerMaskClasses(open)
   const panelClasses = classNames(
-    getDrawerPanelClasses(placement, visible, size),
+    getDrawerPanelClasses(placement, open, size),
     'flex flex-col',
     className
   )
@@ -198,8 +196,8 @@ export const Drawer: React.FC<DrawerProps> = ({
     <div
       className={containerClasses}
       style={{ zIndex }}
-      hidden={!visible}
-      aria-hidden={!visible ? 'true' : undefined}
+      hidden={!open}
+      aria-hidden={!open ? 'true' : undefined}
       data-tiger-drawer-root="">
       {mask && (
         <div
@@ -212,7 +210,15 @@ export const Drawer: React.FC<DrawerProps> = ({
 
       <div
         className={panelClasses}
-        style={style}
+        style={{
+          ...style,
+          ...(width
+            ? {
+                [placement === 'left' || placement === 'right' ? 'width' : 'height']:
+                  typeof width === 'number' ? `${width}px` : width
+              }
+            : undefined)
+        }}
         {...dialogDivProps}
         role="dialog"
         aria-modal="true"

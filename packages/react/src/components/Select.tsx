@@ -63,6 +63,7 @@ export const Select: React.FC<SelectProps> = (props) => {
     clearable = true,
     noOptionsText = 'No options found',
     noDataText = 'No options available',
+    maxTagCount,
     onSearch,
     className
   } = props
@@ -76,6 +77,9 @@ export const Select: React.FC<SelectProps> = (props) => {
     'clearable',
     'noOptionsText',
     'noDataText',
+    'maxTagCount',
+    'virtual',
+    'listHeight',
     'onSearch',
     'className',
     'value',
@@ -113,16 +117,18 @@ export const Select: React.FC<SelectProps> = (props) => {
     if (isMultipleSelect(props)) {
       const value = props.value ?? []
       if (value.length === 0) return placeholder
-      return allOptions
-        .filter((opt) => value.includes(opt.value))
-        .map((opt) => opt.label)
-        .join(', ')
+      const labels = allOptions.filter((opt) => value.includes(opt.value)).map((opt) => opt.label)
+      if (maxTagCount !== undefined && labels.length > maxTagCount) {
+        const visible = labels.slice(0, maxTagCount)
+        return `${visible.join(', ')} +${labels.length - maxTagCount}`
+      }
+      return labels.join(', ')
     }
 
     const value = props.value
     if (value === undefined || value === null || value === '') return placeholder
     return allOptions.find((opt) => opt.value === value)?.label ?? placeholder
-  }, [props.multiple, props.value, allOptions, placeholder])
+  }, [props.multiple, props.value, allOptions, placeholder, maxTagCount])
 
   const showClearButton = useMemo(
     () =>
@@ -533,7 +539,8 @@ export const Select: React.FC<SelectProps> = (props) => {
         onKeyDown={handleTriggerKeyDown}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        aria-controls={listboxId}>
+        aria-controls={listboxId}
+        aria-activedescendant={isOpen && activeIndex >= 0 ? getOptionId(activeIndex) : undefined}>
         <span
           className={classNames(
             'flex-1 text-left truncate',
@@ -544,7 +551,11 @@ export const Select: React.FC<SelectProps> = (props) => {
         </span>
         <span className="flex items-center gap-1">
           {showClearButton && (
-            <span className="inline-flex" data-tiger-select-clear onClick={clearSelection}>
+            <span
+              className="inline-flex"
+              data-tiger-select-clear
+              aria-label="Clear selection"
+              onClick={clearSelection}>
               <svg
                 className="w-4 h-4 text-[var(--tiger-select-icon,var(--tiger-text-muted,#9ca3af))] hover:text-[var(--tiger-select-icon-hover,var(--tiger-text-muted,#6b7280))]"
                 xmlns="http://www.w3.org/2000/svg"

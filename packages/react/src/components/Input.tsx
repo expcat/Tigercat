@@ -1,10 +1,13 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useId } from 'react'
 import {
   classNames,
   getInputClasses,
   getInputWrapperClasses,
   getInputAffixClasses,
   getInputErrorClasses,
+  getInputClearButtonClasses,
+  getInputPasswordToggleClasses,
+  getInputCountClasses,
   parseInputValue,
   injectShakeStyle,
   SHAKE_CLASS,
@@ -68,6 +71,12 @@ export interface InputProps
    * Suffix content
    */
   suffix?: React.ReactNode
+
+  /**
+   * Clear event handler
+   * @since 0.5.0
+   */
+  onClear?: () => void
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -90,10 +99,14 @@ export const Input: React.FC<InputProps> = ({
   id,
   autoComplete,
   autoFocus = false,
+  clearable = false,
+  showPassword = false,
+  showCount = false,
   onInput,
   onChange,
   onFocus,
   onBlur,
+  onClear,
   className,
   style,
   ...props
@@ -101,7 +114,11 @@ export const Input: React.FC<InputProps> = ({
   injectShakeStyle()
 
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const reactId = useId()
+  const errorMsgId = `tiger-input-error-${reactId}`
   const [internalValue, setInternalValue] = useState<string | number>(defaultValue ?? '')
+  const [passwordVisible, setPasswordVisible] = useState(false)
 
   // Trigger shake animation via direct DOM manipulation for reliable re-trigger
   useEffect(() => {
@@ -120,6 +137,7 @@ export const Input: React.FC<InputProps> = ({
   // Determine if the component is controlled
   const isControlled = value !== undefined
   const inputValue = isControlled ? value : internalValue
+  const currentValStr = String(inputValue)
 
   const handleInput = (event: React.FormEvent<HTMLInputElement>) => {
     if (!isControlled) {
@@ -135,9 +153,26 @@ export const Input: React.FC<InputProps> = ({
     onChange?.(event)
   }
 
+  const handleClear = () => {
+    if (!isControlled) {
+      setInternalValue('')
+    }
+    onClear?.()
+    inputRef.current?.focus()
+  }
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible((v) => !v)
+  }
+
   const hasPrefix = !!prefix
-  const hasSuffix = !!suffix
+  const hasSuffix = !!suffix || clearable || showPassword
   const activeError = status === 'error' && !!errorMessage
+  const showClear = clearable && !disabled && !readonly && currentValStr.length > 0
+  const showPasswordToggle = showPassword && type === 'password' && !disabled
+
+  const effectiveType =
+    showPassword && type === 'password' ? (passwordVisible ? 'text' : 'password') : type
 
   const inputClasses = getInputClasses({
     size,
@@ -146,7 +181,45 @@ export const Input: React.FC<InputProps> = ({
     hasSuffix
   })
 
-  return (
+  const renderSuffix = () => {
+    if (activeError) {
+      return (
+        <div id={errorMsgId} className={getInputErrorClasses(size)}>
+          {errorMessage}
+        </div>
+      )
+    }
+    if (showClear) {
+      return (
+        <button
+          type="button"
+          className={getInputClearButtonClasses(size)}
+          onClick={handleClear}
+          aria-label="Clear input"
+          tabIndex={-1}>
+          ✕
+        </button>
+      )
+    }
+    if (showPasswordToggle) {
+      return (
+        <button
+          type="button"
+          className={getInputPasswordToggleClasses(size)}
+          onClick={togglePasswordVisibility}
+          aria-label={passwordVisible ? 'Hide password' : 'Show password'}
+          tabIndex={-1}>
+          {passwordVisible ? '🙈' : '👁'}
+        </button>
+      )
+    }
+    if (suffix) {
+      return <div className={getInputAffixClasses('suffix', size)}>{suffix}</div>
+    }
+    return null
+  }
+
+  const wrapperNode = (
     <div
       ref={wrapperRef}
       className={classNames(getInputWrapperClasses(), className)}
@@ -155,8 +228,9 @@ export const Input: React.FC<InputProps> = ({
       {hasPrefix && <div className={getInputAffixClasses('prefix', size)}>{prefix}</div>}
       <input
         {...props}
+        ref={inputRef}
         className={inputClasses}
-        type={type}
+        type={effectiveType}
         value={inputValue}
         placeholder={placeholder}
         disabled={disabled}
@@ -168,16 +242,28 @@ export const Input: React.FC<InputProps> = ({
         id={id}
         autoComplete={autoComplete}
         autoFocus={autoFocus}
+        {...(status === 'error' ? { 'aria-invalid': true as const } : {})}
+        {...(activeError ? { 'aria-describedby': errorMsgId } : {})}
         onInput={handleInput}
         onChange={handleChange}
         onFocus={onFocus}
         onBlur={onBlur}
       />
-      {activeError ? (
-        <div className={getInputErrorClasses(size)}>{errorMessage}</div>
-      ) : (
-        hasSuffix && <div className={getInputAffixClasses('suffix', size)}>{suffix}</div>
-      )}
+      {renderSuffix()}
     </div>
   )
+
+  if (showCount) {
+    const count = currentValStr.length
+    const isOver = maxLength !== undefined && count > maxLength
+    const countText = maxLength !== undefined ? `${count} / ${maxLength}` : `${count}`
+    return (
+      <div>
+        {wrapperNode}
+        <div className={getInputCountClasses(isOver)}>{countText}</div>
+      </div>
+    )
+  }
+
+  return wrapperNode
 }

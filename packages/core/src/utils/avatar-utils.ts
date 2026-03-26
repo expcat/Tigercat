@@ -104,3 +104,13 @@ export function generateAvatarColor(str: string): string {
   const index = Math.abs(hash) % colors.length
   return colors[index]
 }
+
+/**
+ * AvatarGroup shared classes
+ */
+export const avatarGroupBaseClasses = 'inline-flex items-center'
+
+export const avatarGroupItemClasses = '-ml-2 first:ml-0 ring-2 ring-[var(--tiger-surface,#ffffff)]'
+
+export const avatarGroupOverflowClasses =
+  '-ml-2 ring-2 ring-[var(--tiger-surface,#ffffff)] inline-flex items-center justify-center shrink-0 rounded-full bg-[var(--tiger-avatar-bg,#e5e7eb)] text-[var(--tiger-text-muted,#6b7280)] font-medium'

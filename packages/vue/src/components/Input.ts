@@ -6,6 +6,9 @@ import {
   getInputWrapperClasses,
   getInputAffixClasses,
   getInputErrorClasses,
+  getInputClearButtonClasses,
+  getInputPasswordToggleClasses,
+  getInputCountClasses,
   parseInputValue,
   injectShakeStyle,
   SHAKE_CLASS,
@@ -13,6 +16,8 @@ import {
   type InputType,
   type InputStatus
 } from '@expcat/tigercat-core'
+
+let inputIdCounter = 0
 
 export interface VueInputProps {
   modelValue?: string | number
@@ -32,6 +37,9 @@ export interface VueInputProps {
   id?: string
   autoComplete?: string
   autoFocus?: boolean
+  clearable?: boolean
+  showPassword?: boolean
+  showCount?: boolean
   className?: string
   style?: Record<string, string | number>
 }
@@ -117,6 +125,21 @@ export const Input = defineComponent({
     autoFocus: Boolean,
 
     /**
+     * Whether to show a clear button
+     */
+    clearable: Boolean,
+
+    /**
+     * Whether to show a password toggle button
+     */
+    showPassword: Boolean,
+
+    /**
+     * Whether to show a character count
+     */
+    showCount: Boolean,
+
+    /**
      * Internal shake trigger counter (used by FormItem)
      * @internal
      */
@@ -140,13 +163,17 @@ export const Input = defineComponent({
     input: null,
     change: null,
     focus: null,
-    blur: null
+    blur: null,
+    clear: null
   },
   setup(props, { emit, attrs, slots }) {
     injectShakeStyle()
     const inputRef = ref<HTMLInputElement | null>(null)
     const wrapperRef = ref<HTMLDivElement | null>(null)
     const localValue = ref<string | number>(props.modelValue ?? '')
+    const passwordVisible = ref(false)
+    const instanceId = ++inputIdCounter
+    const errorMsgId = `tiger-input-error-${instanceId}`
 
     // Sync localValue with modelValue prop
     watch(
@@ -174,7 +201,9 @@ export const Input = defineComponent({
     }
 
     const hasPrefix = computed(() => !!slots.prefix || !!props.prefix)
-    const hasSuffix = computed(() => !!slots.suffix || !!props.suffix)
+    const hasSuffix = computed(
+      () => !!slots.suffix || !!props.suffix || props.clearable || props.showPassword
+    )
     const activeError = computed(() => props.status === 'error' && !!props.errorMessage)
 
     const inputClasses = computed(() =>
@@ -185,6 +214,13 @@ export const Input = defineComponent({
         hasSuffix: hasSuffix.value
       })
     )
+
+    const effectiveType = computed(() => {
+      if (props.showPassword && props.type === 'password') {
+        return passwordVisible.value ? 'text' : 'password'
+      }
+      return props.type
+    })
 
     const handleInput = (event: Event) => {
       const target = event.target as HTMLInputElement
@@ -198,55 +234,131 @@ export const Input = defineComponent({
     const handleFocus = (event: FocusEvent) => emit('focus', event)
     const handleBlur = (event: FocusEvent) => emit('blur', event)
 
+    const handleClear = () => {
+      localValue.value = ''
+      emit('update:modelValue', '')
+      emit('clear')
+      inputRef.value?.focus()
+    }
+
+    const togglePasswordVisibility = () => {
+      passwordVisible.value = !passwordVisible.value
+    }
+
     return () => {
       const { class: attrClass, style: attrStyle, ...restAttrs } = attrs
+      const currentValStr = String(localValue.value)
+      const showClear =
+        props.clearable && !props.disabled && !props.readonly && currentValStr.length > 0
+      const showPasswordToggle = props.showPassword && props.type === 'password' && !props.disabled
 
-      return h(
-        'div',
-        {
-          ref: wrapperRef,
-          class: classNames(getInputWrapperClasses(), props.className, coerceClassValue(attrClass)),
-          style: [attrStyle, props.style],
-          onAnimationend: handleAnimationEnd
-        },
-        [
-          hasPrefix.value &&
+      const suffixNodes: ReturnType<typeof h>[] = []
+
+      if (activeError.value) {
+        suffixNodes.push(
+          h('div', { id: errorMsgId, class: getInputErrorClasses(props.size) }, props.errorMessage)
+        )
+      } else {
+        if (showClear) {
+          suffixNodes.push(
+            h(
+              'button',
+              {
+                type: 'button',
+                class: getInputClearButtonClasses(props.size),
+                onClick: handleClear,
+                'aria-label': 'Clear input',
+                tabindex: -1
+              },
+              '✕'
+            )
+          )
+        }
+        if (showPasswordToggle) {
+          suffixNodes.push(
+            h(
+              'button',
+              {
+                type: 'button',
+                class: getInputPasswordToggleClasses(props.size),
+                onClick: togglePasswordVisibility,
+                'aria-label': passwordVisible.value ? 'Hide password' : 'Show password',
+                tabindex: -1
+              },
+              passwordVisible.value ? '🙈' : '👁'
+            )
+          )
+        }
+        if (!showClear && !showPasswordToggle && hasSuffix.value) {
+          suffixNodes.push(
             h(
               'div',
-              { class: getInputAffixClasses('prefix', props.size) },
-              slots.prefix ? slots.prefix() : props.prefix
+              { class: getInputAffixClasses('suffix', props.size) },
+              slots.suffix ? slots.suffix() : props.suffix
+            )
+          )
+        }
+      }
+
+      const wrapperChildren = [
+        hasPrefix.value &&
+          h(
+            'div',
+            { class: getInputAffixClasses('prefix', props.size) },
+            slots.prefix ? slots.prefix() : props.prefix
+          ),
+        h('input', {
+          ...restAttrs,
+          ref: inputRef,
+          class: inputClasses.value,
+          type: effectiveType.value,
+          value: localValue.value,
+          placeholder: props.placeholder,
+          disabled: props.disabled,
+          readonly: props.readonly,
+          required: props.required,
+          maxlength: props.maxLength,
+          minlength: props.minLength,
+          name: props.name,
+          id: props.id,
+          autocomplete: props.autoComplete,
+          autofocus: props.autoFocus,
+          ...(props.status === 'error' ? { 'aria-invalid': true } : {}),
+          ...(activeError.value ? { 'aria-describedby': errorMsgId } : {}),
+          onInput: handleInput,
+          onChange: handleChange,
+          onFocus: handleFocus,
+          onBlur: handleBlur
+        }),
+        ...suffixNodes
+      ]
+
+      const nodes = [
+        h(
+          'div',
+          {
+            ref: wrapperRef,
+            class: classNames(
+              getInputWrapperClasses(),
+              props.className,
+              coerceClassValue(attrClass)
             ),
-          h('input', {
-            ...restAttrs,
-            ref: inputRef,
-            class: inputClasses.value,
-            type: props.type,
-            value: localValue.value,
-            placeholder: props.placeholder,
-            disabled: props.disabled,
-            readonly: props.readonly,
-            required: props.required,
-            maxlength: props.maxLength,
-            minlength: props.minLength,
-            name: props.name,
-            id: props.id,
-            autocomplete: props.autoComplete,
-            autofocus: props.autoFocus,
-            onInput: handleInput,
-            onChange: handleChange,
-            onFocus: handleFocus,
-            onBlur: handleBlur
-          }),
-          activeError.value
-            ? h('div', { class: getInputErrorClasses(props.size) }, props.errorMessage)
-            : hasSuffix.value &&
-              h(
-                'div',
-                { class: getInputAffixClasses('suffix', props.size) },
-                slots.suffix ? slots.suffix() : props.suffix
-              )
-        ]
-      )
+            style: [attrStyle, props.style],
+            onAnimationend: handleAnimationEnd
+          },
+          wrapperChildren
+        )
+      ]
+
+      if (props.showCount) {
+        const count = currentValStr.length
+        const isOver = props.maxLength !== undefined && count > props.maxLength
+        const countText =
+          props.maxLength !== undefined ? `${count} / ${props.maxLength}` : `${count}`
+        nodes.push(h('div', { class: getInputCountClasses(isOver) }, countText))
+      }
+
+      return nodes.length === 1 ? nodes[0] : h('div', null, nodes)
     }
   }
 })

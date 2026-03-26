@@ -12,9 +12,9 @@ const modalSizes = ['sm', 'md', 'lg', 'xl', 'full'] as const
 
 describe('Modal', () => {
   describe('Rendering', () => {
-    it('should not render when visible is false', () => {
+    it('should not render when open is false', () => {
       const { container } = renderWithProps(Modal, {
-        visible: false,
+        open: false,
         title: 'Test Modal',
         disableTeleport: true
       })
@@ -22,9 +22,9 @@ describe('Modal', () => {
       expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument()
     })
 
-    it('should render when visible is true', async () => {
+    it('should render when open is true', async () => {
       const { container } = renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Test Modal',
         disableTeleport: true
       })
@@ -36,7 +36,7 @@ describe('Modal', () => {
 
     it('should render with title', async () => {
       renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Modal Title',
         disableTeleport: true
       })
@@ -53,7 +53,7 @@ describe('Modal', () => {
           default: 'Modal Content'
         },
         {
-          visible: true,
+          open: true,
           disableTeleport: true
         }
       )
@@ -70,7 +70,7 @@ describe('Modal', () => {
           title: '<strong>Custom Title</strong>'
         },
         {
-          visible: true,
+          open: true,
           disableTeleport: true
         }
       )
@@ -88,7 +88,7 @@ describe('Modal', () => {
           footer: '<button>Custom Footer</button>'
         },
         {
-          visible: true,
+          open: true,
           disableTeleport: true
         }
       )
@@ -102,7 +102,7 @@ describe('Modal', () => {
   describe('Props', () => {
     it.each(modalSizes)('should render with size %s', async (size) => {
       const { container } = renderWithProps(Modal, {
-        visible: true,
+        open: true,
         size,
         title: 'Test Modal',
         disableTeleport: true
@@ -116,7 +116,7 @@ describe('Modal', () => {
 
     it('should show close button by default', async () => {
       const { container } = renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Test Modal',
         disableTeleport: true
       })
@@ -129,7 +129,7 @@ describe('Modal', () => {
 
     it('should allow overriding ok/cancel via locale when using default footer', async () => {
       renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Test Modal',
         showDefaultFooter: true,
         locale: {
@@ -146,7 +146,7 @@ describe('Modal', () => {
 
     it('should hide close button when closable is false', async () => {
       const { container } = renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Test Modal',
         closable: false,
         disableTeleport: true
@@ -160,7 +160,7 @@ describe('Modal', () => {
 
     it('should show mask by default', async () => {
       const { container } = renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Test Modal',
         disableTeleport: true
       })
@@ -173,7 +173,7 @@ describe('Modal', () => {
 
     it('should hide mask when mask is false', async () => {
       const { container } = renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Test Modal',
         mask: false,
         disableTeleport: true
@@ -187,7 +187,7 @@ describe('Modal', () => {
 
     it('should apply custom className', async () => {
       const { container } = renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Test Modal',
         className: 'custom-modal-class',
         disableTeleport: true
@@ -201,7 +201,7 @@ describe('Modal', () => {
 
     it('should apply custom zIndex', async () => {
       const { container } = renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Test Modal',
         zIndex: 2000,
         disableTeleport: true
@@ -215,17 +215,17 @@ describe('Modal', () => {
   })
 
   describe('Events', () => {
-    it('should emit update:visible and cancel when close button is clicked', async () => {
+    it('should emit update:open and cancel when close button is clicked', async () => {
       const user = userEvent.setup()
-      const onUpdateVisible = vi.fn()
+      const onUpdateOpen = vi.fn()
       const onCancel = vi.fn()
 
       const { container } = render(Modal, {
         props: {
-          visible: true,
+          open: true,
           title: 'Test Modal',
           disableTeleport: true,
-          'onUpdate:visible': onUpdateVisible,
+          'onUpdate:open': onUpdateOpen,
           onCancel
         }
       })
@@ -238,22 +238,22 @@ describe('Modal', () => {
       const closeButton = container.querySelector('button[aria-label="Close"]')!
       await user.click(closeButton)
 
-      expect(onUpdateVisible).toHaveBeenCalledWith(false)
+      expect(onUpdateOpen).toHaveBeenCalledWith(false)
       expect(onCancel).toHaveBeenCalled()
     })
 
-    it('should emit update:visible and cancel when mask is clicked (maskClosable=true)', async () => {
+    it('should emit update:open and cancel when mask is clicked (maskClosable=true)', async () => {
       const user = userEvent.setup()
-      const onUpdateVisible = vi.fn()
+      const onUpdateOpen = vi.fn()
       const onCancel = vi.fn()
 
       const { container } = render(Modal, {
         props: {
-          visible: true,
+          open: true,
           title: 'Test Modal',
           maskClosable: true,
           disableTeleport: true,
-          'onUpdate:visible': onUpdateVisible,
+          'onUpdate:open': onUpdateOpen,
           onCancel
         }
       })
@@ -266,22 +266,22 @@ describe('Modal', () => {
       const containerEl = container.querySelector('.flex.min-h-full')!
       await user.click(containerEl)
 
-      expect(onUpdateVisible).toHaveBeenCalledWith(false)
+      expect(onUpdateOpen).toHaveBeenCalledWith(false)
       expect(onCancel).toHaveBeenCalled()
     })
 
     it('should not emit events when mask is clicked (maskClosable=false)', async () => {
       const user = userEvent.setup()
-      const onUpdateVisible = vi.fn()
+      const onUpdateOpen = vi.fn()
       const onCancel = vi.fn()
 
       const { container } = render(Modal, {
         props: {
-          visible: true,
+          open: true,
           title: 'Test Modal',
           maskClosable: false,
           disableTeleport: true,
-          'onUpdate:visible': onUpdateVisible,
+          'onUpdate:open': onUpdateOpen,
           onCancel
         }
       })
@@ -294,23 +294,23 @@ describe('Modal', () => {
       const containerEl = container.querySelector('.flex.min-h-full')!
       await user.click(containerEl)
 
-      expect(onUpdateVisible).not.toHaveBeenCalled()
+      expect(onUpdateOpen).not.toHaveBeenCalled()
       expect(onCancel).not.toHaveBeenCalled()
     })
 
-    it('should emit close event when visible changes to false', async () => {
+    it('should emit close event when open changes to false', async () => {
       const onClose = vi.fn()
 
       const { rerender } = render(Modal, {
         props: {
-          visible: true,
+          open: true,
           title: 'Test Modal',
           disableTeleport: true,
           onClose
         }
       })
 
-      await rerender({ visible: false, disableTeleport: true })
+      await rerender({ open: false, disableTeleport: true })
 
       expect(onClose).toHaveBeenCalled()
     })
@@ -320,7 +320,7 @@ describe('Modal', () => {
 
       const { container } = render(Modal, {
         props: {
-          visible: true,
+          open: true,
           title: 'Test Modal',
           disableTeleport: true,
           onCancel
@@ -339,7 +339,7 @@ describe('Modal', () => {
   describe('States', () => {
     it('should handle centered prop', async () => {
       const { container } = renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Test Modal',
         centered: true,
         disableTeleport: true
@@ -353,7 +353,7 @@ describe('Modal', () => {
 
     it('should handle non-centered prop', async () => {
       const { container } = renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Test Modal',
         centered: false,
         disableTeleport: true
@@ -368,7 +368,7 @@ describe('Modal', () => {
     it('should destroy content when destroyOnClose is true and modal is closed', async () => {
       const { container, rerender } = render(Modal, {
         props: {
-          visible: true,
+          open: true,
           destroyOnClose: true,
           disableTeleport: true
         },
@@ -382,7 +382,7 @@ describe('Modal', () => {
       })
 
       await rerender({
-        visible: false,
+        open: false,
         destroyOnClose: true,
         disableTeleport: true
       })
@@ -395,7 +395,7 @@ describe('Modal', () => {
     it('should keep content mounted (hidden) when destroyOnClose is false', async () => {
       const { container, rerender } = render(Modal, {
         props: {
-          visible: true,
+          open: true,
           destroyOnClose: false,
           disableTeleport: true
         },
@@ -409,7 +409,7 @@ describe('Modal', () => {
       })
 
       await rerender({
-        visible: false,
+        open: false,
         destroyOnClose: false,
         disableTeleport: true
       })
@@ -425,7 +425,7 @@ describe('Modal', () => {
   describe('Accessibility', () => {
     it('should have proper ARIA attributes', async () => {
       const { container } = renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Test Modal',
         disableTeleport: true
       })
@@ -443,7 +443,7 @@ describe('Modal', () => {
 
     it('should have close button with aria-label', async () => {
       const { container } = renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Test Modal',
         disableTeleport: true
       })
@@ -456,7 +456,7 @@ describe('Modal', () => {
 
     it('should have mask with aria-hidden', async () => {
       const { container } = renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Test Modal',
         disableTeleport: true
       })
@@ -470,7 +470,7 @@ describe('Modal', () => {
 
     it('should pass basic accessibility checks', async () => {
       const { container } = renderWithProps(Modal, {
-        visible: true,
+        open: true,
         title: 'Accessible Modal',
         disableTeleport: true
       })
@@ -488,7 +488,7 @@ describe('Modal', () => {
       const user = userEvent.setup()
       const { container } = render(Modal, {
         props: {
-          visible: true,
+          open: true,
           title: 'Focus Trap Test',
           showDefaultFooter: true,
           disableTeleport: true
@@ -526,7 +526,7 @@ describe('Modal', () => {
       const user = userEvent.setup()
       const { container } = render(Modal, {
         props: {
-          visible: true,
+          open: true,
           title: 'Focus Trap Test',
           showDefaultFooter: true,
           disableTeleport: true
@@ -552,6 +552,24 @@ describe('Modal', () => {
       // Shift+Tab from first should go to last
       await user.tab({ shift: true })
       expect(document.activeElement).toBe(lastFocusable)
+    })
+  })
+
+  describe('width prop', () => {
+    it('should apply custom width style when width is a string', () => {
+      const { container } = render(Modal, {
+        props: { open: true, width: '600px', disableTeleport: true }
+      })
+      const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+      expect(dialog.style.width).toBe('600px')
+    })
+
+    it('should apply custom width as pixels when width is a number', () => {
+      const { container } = render(Modal, {
+        props: { open: true, width: 800, disableTeleport: true }
+      })
+      const dialog = container.querySelector('[role="dialog"]') as HTMLElement
+      expect(dialog.style.width).toBe('800px')
     })
   })
 })

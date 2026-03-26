@@ -19,10 +19,10 @@ export type DrawerSize = 'sm' | 'md' | 'lg' | 'xl' | 'full'
  */
 export interface DrawerProps {
   /**
-   * Whether the drawer is visible
+   * Whether the drawer is open
    * @default false
    */
-  visible?: boolean
+  open?: boolean
 
   /**
    * Drawer placement
@@ -35,6 +35,12 @@ export interface DrawerProps {
    * @default 'md'
    */
   size?: DrawerSize
+
+  /**
+   * Custom width/height (overrides size). Accepts CSS value like '400px' or '50%'.
+   * Applied as width for left/right placement, height for top/bottom.
+   */
+  width?: string | number
 
   /**
    * Drawer title

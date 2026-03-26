@@ -44,7 +44,7 @@ describe('Button', () => {
   })
 
   it('applies size classes for each size', () => {
-    const sizes = ['sm', 'md', 'lg'] as const
+    const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const
     for (const size of sizes) {
       const { unmount } = render(<Button size={size}>{size}</Button>)
       const button = screen.getByRole('button', { name: size })
@@ -60,11 +60,11 @@ describe('Button', () => {
     expect(screen.getByRole('button', { name: 'Block' })).toHaveClass('w-full')
   })
 
-  it('respects type prop (submit/reset/button)', () => {
-    const { rerender } = render(<Button type="submit">Submit</Button>)
+  it('respects htmlType prop (submit/reset/button)', () => {
+    const { rerender } = render(<Button htmlType="submit">Submit</Button>)
     expect(screen.getByRole('button')).toHaveAttribute('type', 'submit')
 
-    rerender(<Button type="reset">Reset</Button>)
+    rerender(<Button htmlType="reset">Reset</Button>)
     expect(screen.getByRole('button')).toHaveAttribute('type', 'reset')
 
     rerender(<Button>Button</Button>)
@@ -204,6 +204,55 @@ describe('Button', () => {
       const { container } = render(<Button>Accessible Button</Button>)
 
       await expectNoA11yViolations(container)
+    })
+  })
+
+  describe('danger prop', () => {
+    it('applies danger classes instead of variant classes when danger is true', () => {
+      const { container } = render(<Button danger>Delete</Button>)
+      const button = container.querySelector('button')!
+      expect(button.className).toContain('--tiger-error')
+    })
+
+    it('applies danger classes for outline variant', () => {
+      const { container } = render(
+        <Button danger variant="outline">
+          Delete
+        </Button>
+      )
+      const button = container.querySelector('button')!
+      expect(button.className).toContain('--tiger-error')
+      expect(button.className).toContain('border-2')
+    })
+  })
+
+  describe('iconPosition prop', () => {
+    it('renders icon on the left by default', () => {
+      const { container } = render(<Button icon={<span data-testid="icon">★</span>}>Star</Button>)
+      const iconSpan = screen.getByTestId('icon').parentElement!
+      expect(iconSpan).toHaveClass('mr-2')
+    })
+
+    it('renders icon on the right when iconPosition is right', () => {
+      const { container } = render(
+        <Button icon={<span data-testid="icon">★</span>} iconPosition="right">
+          Star
+        </Button>
+      )
+      const iconSpan = screen.getByTestId('icon').parentElement!
+      expect(iconSpan).toHaveClass('ml-2')
+      expect(iconSpan).toHaveClass('order-1')
+    })
+
+    it('renders loading spinner on the right when iconPosition is right', () => {
+      const { container } = render(
+        <Button loading iconPosition="right">
+          Loading
+        </Button>
+      )
+      const spinnerSpan = container.querySelector('svg.animate-spin')!.parentElement!
+      expect(spinnerSpan).toHaveClass('ml-2')
+      expect(spinnerSpan).toHaveClass('order-1')
     })
   })
 })

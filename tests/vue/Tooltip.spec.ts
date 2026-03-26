@@ -131,7 +131,7 @@ describe('Tooltip', () => {
     const { getByText, queryByText } = renderWithSlots(
       Tooltip,
       { default: '<button>Trigger</button>' },
-      { content: 'Tooltip content', trigger: 'manual', visible: false }
+      { content: 'Tooltip content', trigger: 'manual', open: false }
     )
 
     await user.hover(getByText('Trigger'))
@@ -154,10 +154,10 @@ describe('Tooltip', () => {
     expect(container.querySelector('.tiger-tooltip-trigger')).toHaveClass('cursor-not-allowed')
   })
 
-  it('supports controlled visible', async () => {
+  it('supports controlled open', async () => {
     const { getByText } = renderWithProps(
       Tooltip,
-      { content: 'Tooltip content', trigger: 'manual', visible: true },
+      { content: 'Tooltip content', trigger: 'manual', open: true },
       {
         slots: {
           default: '<button>Trigger</button>'
@@ -168,10 +168,10 @@ describe('Tooltip', () => {
     await waitFor(() => expect(getByText('Tooltip content')).toBeVisible())
   })
 
-  it('emits update:visible and visible-change', async () => {
+  it('emits update:open and open-change', async () => {
     const user = userEvent.setup()
-    const onUpdateVisible = vi.fn()
-    const onVisibleChange = vi.fn()
+    const onUpdateOpen = vi.fn()
+    const onOpenChange = vi.fn()
 
     const { getByText } = renderWithSlots(
       Tooltip,
@@ -179,14 +179,14 @@ describe('Tooltip', () => {
       {
         content: 'Tooltip content',
         trigger: 'click',
-        'onUpdate:visible': onUpdateVisible,
-        'onVisible-change': onVisibleChange
+        'onUpdate:open': onUpdateOpen,
+        'onOpen-change': onOpenChange
       }
     )
 
     await user.click(getByText('Trigger'))
-    await waitFor(() => expect(onUpdateVisible).toHaveBeenCalledWith(true))
-    await waitFor(() => expect(onVisibleChange).toHaveBeenCalledWith(true))
+    await waitFor(() => expect(onUpdateOpen).toHaveBeenCalledWith(true))
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(true))
   })
 
   it('sets aria-describedby and role=tooltip when visible', async () => {
@@ -226,7 +226,7 @@ describe('Tooltip', () => {
     const { getByText } = renderWithSlots(
       Tooltip,
       { default: '<button>Trigger</button>' },
-      { content: 'Tooltip content', defaultVisible: true }
+      { content: 'Tooltip content', defaultOpen: true }
     )
 
     await waitFor(() => expect(getByText('Tooltip content')).toBeVisible())
@@ -252,7 +252,7 @@ describe('Tooltip', () => {
     const { getByText } = renderWithSlots(
       Tooltip,
       { default: '<button>Trigger</button>' },
-      { content: 'Tooltip content', trigger: 'manual', visible: true }
+      { content: 'Tooltip content', trigger: 'manual', open: true }
     )
 
     await waitFor(() => expect(getByText('Tooltip content')).toBeVisible())

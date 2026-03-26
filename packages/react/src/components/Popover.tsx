@@ -23,12 +23,12 @@ export type PopoverProps = Omit<CorePopoverProps, 'style' | 'placement'> &
     style?: React.CSSProperties
     placement?: FloatingPlacement
     offset?: number
-    onVisibleChange?: (visible: boolean) => void
+    onOpenChange?: (open: boolean) => void
   }
 
 export const Popover: React.FC<PopoverProps> = ({
-  visible,
-  defaultVisible = false,
+  open,
+  defaultOpen = false,
   title,
   content,
   trigger = 'click',
@@ -41,7 +41,7 @@ export const Popover: React.FC<PopoverProps> = ({
   children,
   titleContent,
   contentContent,
-  onVisibleChange,
+  onOpenChange,
   ...divProps
 }) => {
   const popoverIdRef = useRef<string | null>(null)
@@ -51,14 +51,8 @@ export const Popover: React.FC<PopoverProps> = ({
   const contentId = `${popoverId}-content`
 
   // Shared popup logic
-  const {
-    currentVisible,
-    containerRef,
-    triggerRef,
-    floatingRef,
-    floatingStyles,
-    triggerHandlers
-  } = usePopup({ visible, defaultVisible, disabled, trigger, placement, offset, onVisibleChange })
+  const { currentVisible, containerRef, triggerRef, floatingRef, floatingStyles, triggerHandlers } =
+    usePopup({ open, defaultOpen, disabled, trigger, placement, offset, onOpenChange })
 
   // Memoized classes
   const containerClasses = useMemo(

@@ -10,13 +10,17 @@ import {
   cardCoverWrapperClasses,
   cardCoverClasses,
   cardActionsClasses,
+  cardDirectionClasses,
+  cardHorizontalBodyClasses,
   type CardVariant,
-  type CardSize
+  type CardSize,
+  type CardDirection
 } from '@expcat/tigercat-core'
 
 export interface VueCardProps {
   variant?: CardVariant
   size?: CardSize
+  direction?: CardDirection
   hoverable?: boolean
   cover?: string
   coverAlt?: string
@@ -53,6 +57,14 @@ export const Card = defineComponent({
       default: false
     },
     /**
+     * Card layout direction
+     * @default 'vertical'
+     */
+    direction: {
+      type: String as PropType<CardDirection>,
+      default: 'vertical' as CardDirection
+    },
+    /**
      * Cover image URL
      */
     cover: {
@@ -87,9 +99,12 @@ export const Card = defineComponent({
     const cardClasses = computed(() =>
       classNames(
         getCardClasses(props.variant, props.hoverable),
+        cardDirectionClasses[props.direction],
         !props.cover && cardSizeClasses[props.size]
       )
     )
+
+    const isHorizontal = computed(() => props.direction === 'horizontal')
 
     const sectionSizeClass = computed(() => (props.cover ? cardSizeClasses[props.size] : undefined))
     const getSectionClasses = (baseClasses: string) =>
@@ -113,26 +128,36 @@ export const Card = defineComponent({
                 h('img', {
                   src: props.cover,
                   alt: props.coverAlt,
-                  class: cardCoverClasses
+                  class: classNames(
+                    cardCoverClasses,
+                    isHorizontal.value && 'h-full w-48 object-cover'
+                  )
                 })
               ])
             : null,
-          slots.header
-            ? h('div', { class: getSectionClasses(cardHeaderClasses) }, slots.header())
-            : null,
-          slots.default ? h('div', { class: sectionSizeClass.value }, slots.default()) : null,
-          slots.footer
-            ? h('div', { class: getSectionClasses(cardFooterClasses) }, slots.footer())
-            : null,
-          slots.actions
-            ? h(
-                'div',
-                {
-                  class: getSectionClasses(classNames(cardActionsClasses, cardFooterClasses))
-                },
-                slots.actions()
-              )
-            : null
+          (() => {
+            const bodyChildren = [
+              slots.header
+                ? h('div', { class: getSectionClasses(cardHeaderClasses) }, slots.header())
+                : null,
+              slots.default ? h('div', { class: sectionSizeClass.value }, slots.default()) : null,
+              slots.footer
+                ? h('div', { class: getSectionClasses(cardFooterClasses) }, slots.footer())
+                : null,
+              slots.actions
+                ? h(
+                    'div',
+                    {
+                      class: getSectionClasses(classNames(cardActionsClasses, cardFooterClasses))
+                    },
+                    slots.actions()
+                  )
+                : null
+            ]
+            return isHorizontal.value
+              ? h('div', { class: cardHorizontalBodyClasses }, bodyChildren)
+              : bodyChildren
+          })()
         ]
       )
     }

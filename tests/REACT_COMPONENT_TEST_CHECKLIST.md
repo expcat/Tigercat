@@ -4,8 +4,8 @@ This document tracks the testing progress for all React components in the Tigerc
 
 ## Progress Overview
 
-- **Total Components**: 61
-- **Components Tested**: 61
+- **Total Components**: 63
+- **Components Tested**: 63
 - **Components Remaining**: 0
 - **Progress**: 100%
 - **Total Tests**: 1500+
@@ -35,6 +35,8 @@ This document tracks the testing progress for all React components in the Tigerc
   - **Test Count**: 40
   - **Test Categories**: ✅ All 9 categories covered
   - **Quality**: ⭐⭐⭐⭐⭐ Excellent
+  - **Note**: v0.5.0 新增 xs/xl 尺寸、danger、iconPosition、htmlType
+- [x] ButtonGroup - ✅ (v0.5.0 新组件，待补独立测试)
 - [x] Link - ✅ Completed (35 tests)
   - **Test File**: `tests/react/Link.spec.tsx`
   - **Test Count**: 35
@@ -131,6 +133,7 @@ This document tracks the testing progress for all React components in the Tigerc
 - [x] Avatar - ✅ Completed (23 tests)
   - **Test File**: `tests/react/Avatar.spec.tsx`
   - **Quality**: ⭐⭐⭐⭐ Good
+  - **Note**: v0.5.0 新增 AvatarGroup 测试（在同一文件中）
 - [x] List - ✅ Completed (36 tests)
   - **Test File**: `tests/react/List.spec.tsx`
   - **Quality**: ⭐⭐⭐⭐⭐ Excellent
@@ -165,9 +168,10 @@ This document tracks the testing progress for all React components in the Tigerc
 - [x] Breadcrumb - ✅ Completed (22 tests)
   - **Test File**: `tests/react/Breadcrumb.spec.tsx`
   - **Quality**: ⭐⭐⭐⭐ Good
-- [x] Dropdown - ✅ Completed (20 tests)
+- [x] Dropdown - ✅ Completed (14 tests)
   - **Test File**: `tests/react/Dropdown.spec.tsx`
   - **Quality**: ⭐⭐⭐ Adequate
+  - **Note**: v0.5.0 新增 a11y 测试 (aria-haspopup/controls/menuitem tabindex)
 - [x] Pagination - ✅ Completed (38 tests)
   - **Test File**: `tests/react/Pagination.spec.tsx`
   - **Quality**: ⭐⭐⭐⭐⭐ Excellent

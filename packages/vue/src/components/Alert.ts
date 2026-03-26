@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, ref, PropType } from 'vue'
+import { defineComponent, computed, h, ref, onMounted, onBeforeUnmount, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -93,6 +93,14 @@ export const Alert = defineComponent({
     },
 
     /**
+     * Auto-close duration in milliseconds. 0 or undefined to disable.
+     */
+    duration: {
+      type: Number,
+      default: undefined
+    },
+
+    /**
      * Additional CSS classes
      */
     className: {
@@ -151,6 +159,19 @@ export const Alert = defineComponent({
       }
     }
 
+    let autoCloseTimer: ReturnType<typeof setTimeout> | undefined
+    onMounted(() => {
+      if (props.duration && props.duration > 0 && props.closable) {
+        autoCloseTimer = setTimeout(() => {
+          visible.value = false
+          emit('close', new MouseEvent('click'))
+        }, props.duration)
+      }
+    })
+    onBeforeUnmount(() => {
+      if (autoCloseTimer) clearTimeout(autoCloseTimer)
+    })
+
     return () => {
       if (!visible.value) {
         return null
@@ -166,7 +187,11 @@ export const Alert = defineComponent({
       if (props.showIcon) {
         const iconPath = getAlertIconPath(props.type)
         children.push(
-          h('div', { class: alertIconContainerClasses }, createStatusIcon(iconPath, iconClasses.value))
+          h(
+            'div',
+            { class: alertIconContainerClasses },
+            createStatusIcon(iconPath, iconClasses.value)
+          )
         )
       }
 

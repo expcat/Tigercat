@@ -429,6 +429,74 @@ describe('DatePicker', () => {
     })
   })
 
+  describe('Shortcuts', () => {
+    it('should render shortcut buttons when shortcuts prop is provided', async () => {
+      const today = new Date()
+      const { container } = renderWithProps(DatePicker, {
+        shortcuts: [
+          { label: 'Today', value: today },
+          {
+            label: 'Yesterday',
+            value: () => {
+              const d = new Date()
+              d.setDate(d.getDate() - 1)
+              return d
+            }
+          }
+        ]
+      })
+
+      const input = container.querySelector('input') as HTMLInputElement
+      await fireEvent.click(input)
+
+      await waitFor(() => {
+        expect(screen.getByText('Today')).toBeInTheDocument()
+        expect(screen.getByText('Yesterday')).toBeInTheDocument()
+      })
+    })
+
+    it('should apply shortcut value and close calendar on click', async () => {
+      const targetDate = new Date('2024-06-15')
+      const { container, emitted } = renderWithProps(DatePicker, {
+        shortcuts: [{ label: 'Mid June', value: targetDate }]
+      })
+
+      const input = container.querySelector('input') as HTMLInputElement
+      await fireEvent.click(input)
+
+      await waitFor(() => {
+        expect(screen.getByText('Mid June')).toBeInTheDocument()
+      })
+
+      await fireEvent.click(screen.getByText('Mid June'))
+
+      await waitFor(() => {
+        expect(emitted()['change']).toBeTruthy()
+        const calendar = container.querySelector('[role="dialog"]')
+        expect(calendar).not.toBeInTheDocument()
+      })
+    })
+
+    it('should support function-based shortcut values', async () => {
+      const { container, emitted } = renderWithProps(DatePicker, {
+        shortcuts: [{ label: 'Computed', value: () => new Date('2024-01-01') }]
+      })
+
+      const input = container.querySelector('input') as HTMLInputElement
+      await fireEvent.click(input)
+
+      await waitFor(() => {
+        expect(screen.getByText('Computed')).toBeInTheDocument()
+      })
+
+      await fireEvent.click(screen.getByText('Computed'))
+
+      await waitFor(() => {
+        expect(emitted()['change']).toBeTruthy()
+      })
+    })
+  })
+
   describe('Accessibility', () => {
     it('should pass accessibility checks', async () => {
       const { container } = render(DatePicker)

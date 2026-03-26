@@ -5,7 +5,7 @@
 /**
  * Tab type - determines the style of the tabs
  */
-export type TabType = 'line' | 'card' | 'editable-card'
+export type TabType = 'line' | 'card' | 'editable-card' | 'pills'
 
 /**
  * Tab position - determines where the tabs are positioned

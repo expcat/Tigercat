@@ -26,6 +26,7 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 | inlineMessage        | `boolean`                    | `true`    |  ✓  |   ✓   | 是否行内显示校验消息     |
 | showRequiredAsterisk | `boolean`                    | `true`    |  ✓  |   ✓   | 必填字段显示星号         |
 | disabled             | `boolean`                    | `false`   |  ✓  |   ✓   | 禁用所有表单项           |
+| loading              | `boolean`                    | `false`   |  ✓  |   ✓   | 加载状态（防止重复提交） |
 | className            | `string`                     | -         |  -  |   ✓   | 自定义 CSS 类            |
 
 ### Events
@@ -70,31 +71,36 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop         | Type                                                                        | Default     | Vue | React | Description      |
-| ------------ | --------------------------------------------------------------------------- | ----------- | :-: | :---: | ---------------- |
-| modelValue   | `string \| number`                                                          | -           |  ✓  |   -   | 绑定值 (v-model) |
-| value        | `string \| number`                                                          | -           |  -  |   ✓   | 绑定值（受控）   |
-| defaultValue | `string \| number`                                                          | -           |  -  |   ✓   | 默认值（非受控） |
-| type         | `'text' \| 'password' \| 'email' \| 'number' \| 'tel' \| 'url' \| 'search'` | `'text'`    |  ✓  |   ✓   | 输入类型         |
-| size         | `'sm' \| 'md' \| 'lg'`                                                      | `'md'`      |  ✓  |   ✓   | 尺寸             |
-| placeholder  | `string`                                                                    | `''`        |  ✓  |   ✓   | 占位符           |
-| disabled     | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 禁用             |
-| readonly     | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 只读             |
-| required     | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 必填             |
-| maxLength    | `number`                                                                    | -           |  ✓  |   ✓   | 最大长度         |
-| minLength    | `number`                                                                    | -           |  ✓  |   ✓   | 最小长度         |
-| name         | `string`                                                                    | -           |  ✓  |   ✓   | name 属性        |
-| id           | `string`                                                                    | -           |  ✓  |   ✓   | id 属性          |
-| autoComplete | `string`                                                                    | -           |  ✓  |   ✓   | 自动完成         |
-| autoFocus    | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 自动聚焦         |
-| prefix       | `string`                                                                    | -           |  ✓  |   -   | 前缀文本         |
-| prefix       | `ReactNode`                                                                 | -           |  -  |   ✓   | 前缀节点         |
-| suffix       | `string`                                                                    | -           |  ✓  |   -   | 后缀文本         |
-| suffix       | `ReactNode`                                                                 | -           |  -  |   ✓   | 后缀节点         |
-| status       | `'default' \| 'error' \| 'success' \| 'warning'`                            | `'default'` |  ✓  |   ✓   | 验证状态         |
-| errorMessage | `string`                                                                    | -           |  ✓  |   ✓   | 错误信息         |
-| className    | `string`                                                                    | -           |  ✓  |   ✓   | 自定义 CSS 类    |
-| style        | `object`                                                                    | -           |  ✓  |   ✓   | 自定义行内样式   |
+| Prop         | Type                                                                        | Default     | Vue | React | Description                               |
+| ------------ | --------------------------------------------------------------------------- | ----------- | :-: | :---: | ----------------------------------------- |
+| modelValue   | `string \| number`                                                          | -           |  ✓  |   -   | 绑定值 (v-model)                          |
+| value        | `string \| number`                                                          | -           |  -  |   ✓   | 绑定值（受控）                            |
+| defaultValue | `string \| number`                                                          | -           |  -  |   ✓   | 默认值（非受控）                          |
+| type         | `'text' \| 'password' \| 'email' \| 'number' \| 'tel' \| 'url' \| 'search'` | `'text'`    |  ✓  |   ✓   | 输入类型                                  |
+| size         | `'sm' \| 'md' \| 'lg'`                                                      | `'md'`      |  ✓  |   ✓   | 尺寸                                      |
+| placeholder  | `string`                                                                    | `''`        |  ✓  |   ✓   | 占位符                                    |
+| disabled     | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 禁用                                      |
+| readonly     | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 只读                                      |
+| required     | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 必填                                      |
+| maxLength    | `number`                                                                    | -           |  ✓  |   ✓   | 最大长度                                  |
+| minLength    | `number`                                                                    | -           |  ✓  |   ✓   | 最小长度                                  |
+| name         | `string`                                                                    | -           |  ✓  |   ✓   | name 属性                                 |
+| id           | `string`                                                                    | -           |  ✓  |   ✓   | id 属性                                   |
+| autoComplete | `string`                                                                    | -           |  ✓  |   ✓   | 自动完成                                  |
+| autoFocus    | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 自动聚焦                                  |
+| prefix       | `string`                                                                    | -           |  ✓  |   -   | 前缀文本                                  |
+| prefix       | `ReactNode`                                                                 | -           |  -  |   ✓   | 前缀节点                                  |
+| suffix       | `string`                                                                    | -           |  ✓  |   -   | 后缀文本                                  |
+| suffix       | `ReactNode`                                                                 | -           |  -  |   ✓   | 后缀节点                                  |
+| status       | `'default' \| 'error' \| 'success' \| 'warning'`                            | `'default'` |  ✓  |   ✓   | 验证状态                                  |
+| errorMessage | `string`                                                                    | -           |  ✓  |   ✓   | 错误信息                                  |
+| clearable    | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 显示清除按钮                              |
+| showPassword | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 密码显示/隐藏切换（type=password 时生效） |
+| showCount    | `boolean`                                                                   | `false`     |  ✓  |   ✓   | 显示字符计数（需设 maxLength）            |
+| className    | `string`                                                                    | -           |  ✓  |   ✓   | 自定义 CSS 类                             |
+| style        | `object`                                                                    | -           |  ✓  |   ✓   | 自定义行内样式                            |
+
+> **a11y**: `status='error'` 时自动设置 `aria-invalid`；有 `errorMessage` 时自动关联 `aria-describedby`
 
 ### Events
 
@@ -197,19 +203,20 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 
 ### Props
 
-| Prop          | Type                                       | Default                  | Vue | React | Description          |
-| ------------- | ------------------------------------------ | ------------------------ | :-: | :---: | -------------------- |
-| modelValue    | `SelectValue \| SelectValues \| undefined` | -                        |  ✓  |   -   | 绑定值 (v-model)     |
-| value         | `SelectValue \| SelectValues`              | -                        |  -  |   ✓   | 绑定值               |
-| options       | `(SelectOption \| SelectOptionGroup)[]`    | `[]`                     |  ✓  |   ✓   | 选项（支持分组）     |
-| size          | `'sm' \| 'md' \| 'lg'`                     | `'md'`                   |  ✓  |   ✓   | 尺寸                 |
-| multiple      | `boolean`                                  | `false`                  |  ✓  |   ✓   | 多选                 |
-| clearable     | `boolean`                                  | `true`                   |  ✓  |   ✓   | 可清除               |
-| searchable    | `boolean`                                  | `false`                  |  ✓  |   ✓   | 可搜索               |
-| placeholder   | `string`                                   | `'Select an option'`     |  ✓  |   ✓   | 占位符               |
-| disabled      | `boolean`                                  | `false`                  |  ✓  |   ✓   | 禁用                 |
-| noOptionsText | `string`                                   | `'No options found'`     |  ✓  |   ✓   | 搜索无结果时提示文案 |
-| noDataText    | `string`                                   | `'No options available'` |  ✓  |   ✓   | 选项为空时提示文案   |
+| Prop          | Type                                       | Default                  | Vue | React | Description              |
+| ------------- | ------------------------------------------ | ------------------------ | :-: | :---: | ------------------------ |
+| modelValue    | `SelectValue \| SelectValues \| undefined` | -                        |  ✓  |   -   | 绑定值 (v-model)         |
+| value         | `SelectValue \| SelectValues`              | -                        |  -  |   ✓   | 绑定值                   |
+| options       | `(SelectOption \| SelectOptionGroup)[]`    | `[]`                     |  ✓  |   ✓   | 选项（支持分组）         |
+| size          | `'sm' \| 'md' \| 'lg'`                     | `'md'`                   |  ✓  |   ✓   | 尺寸                     |
+| multiple      | `boolean`                                  | `false`                  |  ✓  |   ✓   | 多选                     |
+| clearable     | `boolean`                                  | `true`                   |  ✓  |   ✓   | 可清除                   |
+| searchable    | `boolean`                                  | `false`                  |  ✓  |   ✓   | 可搜索                   |
+| placeholder   | `string`                                   | `'Select an option'`     |  ✓  |   ✓   | 占位符                   |
+| disabled      | `boolean`                                  | `false`                  |  ✓  |   ✓   | 禁用                     |
+| noOptionsText | `string`                                   | `'No options found'`     |  ✓  |   ✓   | 搜索无结果时提示文案     |
+| noDataText    | `string`                                   | `'No options available'` |  ✓  |   ✓   | 选项为空时提示文案       |
+| maxTagCount   | `number`                                   | -                        |  ✓  |   ✓   | 多选模式下最大显示标签数 |
 
 > `SelectOption = { label: string, value: string | number, disabled?: boolean }`
 > `SelectOptionGroup = { label: string, options: SelectOption[] }`
@@ -396,8 +403,11 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 | clearable    | `boolean`                          | `true`          |  ✓  |   ✓   | 显示清除按钮  |
 | locale       | `string`                           | -               |  ✓  |   ✓   | 国际化 locale |
 | labels       | `Partial<DatePickerLabels>`        | -               |  ✓  |   ✓   | 自定义文案    |
+| shortcuts    | `DatePickerShortcut[]`             | -               |  ✓  |   ✓   | 快捷选项列表  |
 | name         | `string`                           | -               |  ✓  |   ✓   | input name    |
 | id           | `string`                           | -               |  ✓  |   ✓   | input id      |
+
+> `DatePickerShortcut = { label: string, value: Date | [Date, Date] | (() => Date | [Date, Date]) }`
 
 ### Events
 

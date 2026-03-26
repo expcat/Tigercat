@@ -108,6 +108,18 @@ export const tabItemEditableCardActiveClasses =
   'bg-white border-[var(--tiger-primary,#2563eb)] border-b-white text-[var(--tiger-primary,#2563eb)] font-medium z-10'
 
 /**
+ * Tab item type classes - pills
+ */
+export const tabItemPillsClasses =
+  'rounded-full bg-transparent hover:bg-[var(--tiger-primary-subtle,#eff6ff)] hover:text-[var(--tiger-primary,#2563eb)] text-[var(--tiger-text-muted,#6b7280)]'
+
+/**
+ * Tab item type classes - pills active
+ */
+export const tabItemPillsActiveClasses =
+  'bg-[var(--tiger-primary,#2563eb)] text-white font-medium shadow-sm'
+
+/**
  * Tab item disabled classes
  */
 export const tabItemDisabledClasses = 'opacity-50 cursor-not-allowed pointer-events-none'
@@ -191,6 +203,10 @@ export function getTabItemClasses(
     case 'editable-card':
       cls += ` ${tabItemEditableCardClasses}`
       if (active) cls += ` ${tabItemEditableCardActiveClasses}`
+      break
+    case 'pills':
+      cls += ` ${tabItemPillsClasses}`
+      if (active) cls += ` ${tabItemPillsActiveClasses}`
       break
   }
 

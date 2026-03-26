@@ -14,15 +14,15 @@ export type PopconfirmIconType = 'warning' | 'info' | 'error' | 'success' | 'que
  */
 export interface PopconfirmProps {
   /**
-   * Whether the popconfirm is visible (controlled mode)
+   * Whether the popconfirm is open (controlled mode)
    */
-  visible?: boolean
+  open?: boolean
 
   /**
-   * Default visibility (uncontrolled mode)
+   * Default open state (uncontrolled mode)
    * @default false
    */
-  defaultVisible?: boolean
+  defaultOpen?: boolean
 
   /**
    * Popconfirm title/question text

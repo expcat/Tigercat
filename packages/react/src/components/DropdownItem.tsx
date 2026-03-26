@@ -57,6 +57,7 @@ export const DropdownItem: React.FC<DropdownItemProps> = ({
       type="button"
       className={itemClasses}
       role="menuitem"
+      tabIndex={-1}
       aria-disabled={disabled}
       disabled={disabled}
       onClick={handleClick}

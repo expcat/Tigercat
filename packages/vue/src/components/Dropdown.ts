@@ -7,6 +7,7 @@ import {
   h,
   onBeforeUnmount,
   onMounted,
+  nextTick,
   VNode,
   watch
 } from 'vue'
@@ -21,6 +22,10 @@ import {
   injectDropdownStyles,
   DROPDOWN_CHEVRON_PATH,
   DROPDOWN_ENTER_CLASS,
+  handleMenuNavigation,
+  focusFirstMenuItem,
+  captureActiveElement,
+  restoreFocus,
   type DropdownTrigger,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
@@ -28,6 +33,10 @@ import {
 import type { DropdownProps as CoreDropdownProps } from '@expcat/tigercat-core'
 import { DropdownMenu } from './DropdownMenu'
 import { useVueFloating, useVueClickOutside, useVueEscapeKey } from '../utils/overlay'
+
+// Counter for unique menu IDs
+let dropdownIdCounter = 0
+const createDropdownMenuId = () => `tiger-dropdown-menu-${++dropdownIdCounter}`
 
 // Dropdown context key
 export const DropdownContextKey = Symbol('DropdownContext')
@@ -88,17 +97,17 @@ export const Dropdown = defineComponent({
       default: false
     },
     /**
-     * Whether the dropdown is visible (controlled mode)
+     * Whether the dropdown is open (controlled mode)
      */
-    visible: {
+    open: {
       type: Boolean,
       default: undefined
     },
     /**
-     * Default visibility (uncontrolled mode)
+     * Default open state (uncontrolled mode)
      * @default false
      */
-    defaultVisible: {
+    defaultOpen: {
       type: Boolean,
       default: false
     },
@@ -130,7 +139,7 @@ export const Dropdown = defineComponent({
       default: undefined
     }
   },
-  emits: ['update:visible', 'visible-change'],
+  emits: ['update:open', 'open-change'],
   setup(props, { slots, emit, attrs }) {
     const attrsRecord = attrs as Record<string, unknown>
     const attrsClass = (attrsRecord as { class?: unknown }).class
@@ -139,12 +148,18 @@ export const Dropdown = defineComponent({
     // Inject animation styles
     onMounted(() => injectDropdownStyles())
 
+    // Unique ID for menu a11y
+    const menuId = createDropdownMenuId()
+
+    // Previous active element for focus restore
+    const previousActiveElement = ref<HTMLElement | null>(null)
+
     // Internal state for uncontrolled mode
-    const internalVisible = ref(props.defaultVisible)
+    const internalVisible = ref(props.defaultOpen)
 
     // Computed visible state (controlled or uncontrolled)
     const currentVisible = computed(() =>
-      props.visible !== undefined ? props.visible : internalVisible.value
+      props.open !== undefined ? props.open : internalVisible.value
     )
 
     // Refs for Floating UI positioning
@@ -154,11 +169,29 @@ export const Dropdown = defineComponent({
 
     const setVisible = (visible: boolean) => {
       if (props.disabled && visible) return
-      if (props.visible === undefined) {
+
+      // Capture focus before opening
+      if (visible && !currentVisible.value) {
+        previousActiveElement.value = captureActiveElement()
+      }
+
+      if (props.open === undefined) {
         internalVisible.value = visible
       }
-      emit('update:visible', visible)
-      emit('visible-change', visible)
+      emit('update:open', visible)
+      emit('open-change', visible)
+
+      // Focus management
+      if (visible) {
+        nextTick(() => {
+          if (floatingRef.value) {
+            focusFirstMenuItem(floatingRef.value)
+          }
+        })
+      } else {
+        restoreFocus(previousActiveElement.value)
+        previousActiveElement.value = null
+      }
     }
 
     const handleItemClick = () => {
@@ -182,6 +215,12 @@ export const Dropdown = defineComponent({
     const handleClick = () => {
       if (props.trigger !== 'click') return
       setVisible(!currentVisible.value)
+    }
+
+    const handleMenuKeyDown = (event: KeyboardEvent) => {
+      if (floatingRef.value) {
+        handleMenuNavigation(floatingRef.value, event)
+      }
     }
 
     // Floating UI positioning
@@ -267,6 +306,9 @@ export const Dropdown = defineComponent({
       handleItemClick
     })
 
+    // DropdownItem tabIndex: menuitem should be -1 (focused programmatically)
+    const menuItemTabIndex = -1
+
     return () => {
       const defaultSlot = slots.default?.()
       if (!defaultSlot || defaultSlot.length === 0) return null
@@ -309,12 +351,14 @@ export const Dropdown = defineComponent({
               onMouseenter: handleMouseEnter,
               onMouseleave: handleMouseLeave,
               'aria-haspopup': 'menu',
-              'aria-expanded': currentVisible.value
+              'aria-expanded': currentVisible.value,
+              'aria-controls': currentVisible.value ? menuId : undefined
             },
             [triggerNode, chevronNode]
           )
         : null
 
+      // Clone menuNode with id for aria-controls
       const menu = menuNode
         ? h(
             'div',
@@ -324,9 +368,16 @@ export const Dropdown = defineComponent({
               style: menuWrapperStyles.value,
               onMouseenter: handleMouseEnter,
               onMouseleave: handleMouseLeave,
+              onKeydown: handleMenuKeyDown,
               hidden: !currentVisible.value
             },
-            menuNode
+            [
+              h(
+                (menuNode as VNode).type as any,
+                { ...((menuNode as VNode).props || {}), id: menuId },
+                (menuNode as VNode).children as any
+              )
+            ]
           )
         : null
 

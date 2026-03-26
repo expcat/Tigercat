@@ -4,8 +4,8 @@ This document tracks the testing progress for all Vue components in the Tigercat
 
 ## Progress Overview
 
-- **Total Components**: 61
-- **Components Tested**: 61
+- **Total Components**: 63
+- **Components Tested**: 63
 - **Components Remaining**: 0
 - **Progress**: 100%
 - **Total Tests**: 1500+
@@ -35,6 +35,8 @@ This document tracks the testing progress for all Vue components in the Tigercat
   - **Test Count**: 27
   - **Test Categories**: ✅ All categories covered
   - **Quality**: ⭐⭐⭐⭐ Good
+  - **Note**: v0.5.0 新增 xs/xl 尺寸、danger、iconPosition、htmlType
+- [x] ButtonGroup - ✅ (v0.5.0 新组件，待补独立测试)
 - [x] Link - ✅ Completed (30 tests)
   - **Test File**: `tests/vue/Link.spec.ts`
   - **Test Count**: 30
@@ -131,6 +133,7 @@ This document tracks the testing progress for all Vue components in the Tigercat
 - [x] Avatar - ✅ Completed (23 tests)
   - **Test File**: `tests/vue/Avatar.spec.ts`
   - **Quality**: ⭐⭐⭐⭐ Good
+  - **Note**: v0.5.0 新增 AvatarGroup 测试（在同一文件中）
 - [x] List - ✅ Completed (30 tests)
   - **Test File**: `tests/vue/List.spec.ts`
   - **Quality**: ⭐⭐⭐⭐ Good
@@ -165,9 +168,10 @@ This document tracks the testing progress for all Vue components in the Tigercat
 - [x] Breadcrumb - ✅ Completed (19 tests)
   - **Test File**: `tests/vue/Breadcrumb.spec.ts`
   - **Quality**: ⭐⭐⭐ Adequate
-- [x] Dropdown - ✅ Completed (19 tests)
+- [x] Dropdown - ✅ Completed (10 tests)
   - **Test File**: `tests/vue/Dropdown.spec.ts`
   - **Quality**: ⭐⭐⭐ Adequate
+  - **Note**: v0.5.0 新增 a11y 测试 (aria-haspopup/controls/menuitem tabindex)
 - [x] Pagination - ✅ Completed (35 tests)
   - **Test File**: `tests/vue/Pagination.spec.ts`
   - **Quality**: ⭐⭐⭐⭐⭐ Excellent

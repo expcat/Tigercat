@@ -28,6 +28,7 @@ export interface FormContext {
   inlineMessage: boolean
   showRequiredAsterisk: boolean
   disabled: boolean
+  loading: boolean
   errors: FormError[]
   registerFieldRules: (fieldName: string, rules?: FormRule | FormRule[]) => void
   validateField: (
@@ -106,6 +107,14 @@ export const Form = defineComponent({
      * @default false
      */
     disabled: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * Whether the form is in a loading state (prevents submit)
+     * @default false
+     */
+    loading: {
       type: Boolean,
       default: false
     }
@@ -269,8 +278,22 @@ export const Form = defineComponent({
       clearValidate()
     }
 
+    const addField = (fieldName: string, defaultValue?: unknown): void => {
+      if (props.model && fieldName) {
+        props.model[fieldName] = defaultValue ?? null
+      }
+    }
+
+    const removeField = (fieldName: string): void => {
+      if (props.model && fieldName) {
+        delete props.model[fieldName]
+        clearValidate(fieldName)
+      }
+    }
+
     const handleSubmit = async (event: Event): Promise<void> => {
       event.preventDefault()
+      if (props.loading) return
       const valid = await validate()
       emit('submit', { valid, values: props.model, errors })
     }
@@ -286,6 +309,7 @@ export const Form = defineComponent({
       inlineMessage: props.inlineMessage,
       showRequiredAsterisk: props.showRequiredAsterisk,
       disabled: props.disabled,
+      loading: props.loading,
       errors,
       registerFieldRules,
       validateField,
@@ -300,14 +324,17 @@ export const Form = defineComponent({
       validateFields,
       validateField,
       clearValidate,
-      resetFields
+      resetFields,
+      addField,
+      removeField
     })
 
     const formClasses = computed(() => {
       return classNames(
         'tiger-form',
         `tiger-form--label-${props.labelPosition}`,
-        props.disabled && 'tiger-form--disabled'
+        props.disabled && 'tiger-form--disabled',
+        props.loading && 'tiger-form--loading'
       )
     })
 

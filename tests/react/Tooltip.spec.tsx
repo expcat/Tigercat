@@ -97,7 +97,7 @@ describe('Tooltip', () => {
     const user = userEvent.setup()
     const { getByText, queryByText } = renderWithChildren(
       Tooltip,
-      { content: 'Tooltip content', trigger: 'manual', visible: false },
+      { content: 'Tooltip content', trigger: 'manual', open: false },
       <button>Trigger</button>
     )
 
@@ -122,10 +122,10 @@ describe('Tooltip', () => {
     expect(container.querySelector('.tiger-tooltip-trigger')).toHaveClass('cursor-not-allowed')
   })
 
-  it('supports controlled visible', async () => {
+  it('supports controlled open', async () => {
     const { getByText, queryByText, rerender } = renderWithChildren(
       Tooltip,
-      { content: 'Tooltip content', visible: false },
+      { content: 'Tooltip content', open: false },
       <button>Trigger</button>
     )
 
@@ -133,7 +133,7 @@ describe('Tooltip', () => {
     expect(queryByText('Tooltip content')).toBeNull()
 
     rerender(
-      <Tooltip content="Tooltip content" visible={true}>
+      <Tooltip content="Tooltip content" open={true}>
         <button>Trigger</button>
       </Tooltip>
     )
@@ -141,18 +141,18 @@ describe('Tooltip', () => {
     await waitFor(() => expect(getByText('Tooltip content')).toBeVisible())
   })
 
-  it('calls onVisibleChange when visibility changes', async () => {
+  it('calls onOpenChange when open state changes', async () => {
     const user = userEvent.setup()
-    const onVisibleChange = vi.fn()
+    const onOpenChange = vi.fn()
 
     const { getByText } = renderWithChildren(
       Tooltip,
-      { content: 'Tooltip content', trigger: 'click', onVisibleChange },
+      { content: 'Tooltip content', trigger: 'click', onOpenChange },
       <button>Trigger</button>
     )
 
     await user.click(getByText('Trigger'))
-    await waitFor(() => expect(onVisibleChange).toHaveBeenCalledWith(true))
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(true))
   })
 
   it('sets aria-describedby and role=tooltip when visible', async () => {
@@ -188,10 +188,10 @@ describe('Tooltip', () => {
     await expectNoA11yViolations(container)
   })
 
-  it('supports defaultVisible', async () => {
+  it('supports defaultOpen', async () => {
     const { getByText } = renderWithChildren(
       Tooltip,
-      { content: 'Tooltip content', defaultVisible: true },
+      { content: 'Tooltip content', defaultOpen: true },
       <button>Trigger</button>
     )
 
@@ -216,7 +216,7 @@ describe('Tooltip', () => {
   it('does not close on escape in manual mode', async () => {
     const { getByText } = renderWithChildren(
       Tooltip,
-      { content: 'Tooltip content', visible: true, trigger: 'manual' },
+      { content: 'Tooltip content', open: true, trigger: 'manual' },
       <button>Trigger</button>
     )
 

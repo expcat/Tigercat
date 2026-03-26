@@ -56,17 +56,17 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ### Dropdown Props
 
-| Prop           | Type                 | Default          | Vue | React | Description          |
-| -------------- | -------------------- | ---------------- | :-: | :---: | -------------------- |
-| trigger        | `'hover' \| 'click'` | `'hover'`        |  ✓  |   ✓   | 触发方式             |
-| placement      | `FloatingPlacement`  | `'bottom-start'` |  ✓  |   ✓   | 弹出位置（12 方向）  |
-| offset         | `number`             | `4`              |  ✓  |   ✓   | 与触发器的间距（px） |
-| disabled       | `boolean`            | `false`          |  ✓  |   ✓   | 禁用                 |
-| visible        | `boolean`            | -                |  ✓  |   ✓   | 显示状态（受控）     |
-| defaultVisible | `boolean`            | `false`          |  ✓  |   ✓   | 默认显示状态         |
-| closeOnClick   | `boolean`            | `true`           |  ✓  |   ✓   | 点击菜单项后关闭     |
-| showArrow      | `boolean`            | `true`           |  ✓  |   ✓   | 显示下拉箭头指示器   |
-| className      | `string`             | -                |  ✓  |   ✓   | 自定义 CSS 类名      |
+| Prop         | Type                 | Default          | Vue | React | Description          |
+| ------------ | -------------------- | ---------------- | :-: | :---: | -------------------- |
+| trigger      | `'hover' \| 'click'` | `'hover'`        |  ✓  |   ✓   | 触发方式             |
+| placement    | `FloatingPlacement`  | `'bottom-start'` |  ✓  |   ✓   | 弹出位置（12 方向）  |
+| offset       | `number`             | `4`              |  ✓  |   ✓   | 与触发器的间距（px） |
+| disabled     | `boolean`            | `false`          |  ✓  |   ✓   | 禁用                 |
+| open         | `boolean`            | -                |  ✓  |   ✓   | 显示状态（受控）     |
+| defaultOpen  | `boolean`            | `false`          |  ✓  |   ✓   | 默认显示状态         |
+| closeOnClick | `boolean`            | `true`           |  ✓  |   ✓   | 点击菜单项后关闭     |
+| showArrow    | `boolean`            | `true`           |  ✓  |   ✓   | 显示下拉箭头指示器   |
+| className    | `string`             | -                |  ✓  |   ✓   | 自定义 CSS 类名      |
 
 ### DropdownMenu Props
 
@@ -85,11 +85,11 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ### Events
 
-| Vue Event         | React Callback    | Payload            | Description  |
-| ----------------- | ----------------- | ------------------ | ------------ |
-| `@visible-change` | `onVisibleChange` | `visible: boolean` | 显示状态变化 |
-| `@update:visible` | -                 | `visible: boolean` | v-model 更新 |
-| `@click` (Item)   | `onClick` (Item)  | `MouseEvent`       | 点击菜单项   |
+| Vue Event       | React Callback   | Payload         | Description  |
+| --------------- | ---------------- | --------------- | ------------ |
+| `@open-change`  | `onOpenChange`   | `open: boolean` | 显示状态变化 |
+| `@update:open`  | -                | `open: boolean` | v-model 更新 |
+| `@click` (Item) | `onClick` (Item) | `MouseEvent`    | 点击菜单项   |
 
 ### Slots / Children
 
@@ -158,16 +158,16 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ### Tabs Props
 
-| Prop                   | Type                                     | Default    | Vue | React | Description                    |
-| ---------------------- | ---------------------------------------- | ---------- | :-: | :---: | ------------------------------ |
-| activeKey              | `string \| number`                       | -          |  ✓  |   ✓   | 当前激活 key（受控）           |
-| defaultActiveKey       | `string \| number`                       | -          |  ✓  |   ✓   | 默认激活 key（非受控）         |
-| type                   | `'line' \| 'card' \| 'editable-card'`    | `'line'`   |  ✓  |   ✓   | 样式类型                       |
-| tabPosition            | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'`    |  ✓  |   ✓   | 标签位置                       |
-| size                   | `'small' \| 'medium' \| 'large'`         | `'medium'` |  ✓  |   ✓   | 尺寸                           |
-| closable               | `boolean`                                | `false`    |  ✓  |   ✓   | 标签可关闭（仅 editable-card） |
-| centered               | `boolean`                                | `false`    |  ✓  |   ✓   | 标签居中                       |
-| destroyInactiveTabPane | `boolean`                                | `false`    |  ✓  |   ✓   | 销毁非激活面板                 |
+| Prop                   | Type                                             | Default    | Vue | React | Description                    |
+| ---------------------- | ------------------------------------------------ | ---------- | :-: | :---: | ------------------------------ |
+| activeKey              | `string \| number`                               | -          |  ✓  |   ✓   | 当前激活 key（受控）           |
+| defaultActiveKey       | `string \| number`                               | -          |  ✓  |   ✓   | 默认激活 key（非受控）         |
+| type                   | `'line' \| 'card' \| 'editable-card' \| 'pills'` | `'line'`   |  ✓  |   ✓   | 样式类型                       |
+| tabPosition            | `'top' \| 'bottom' \| 'left' \| 'right'`         | `'top'`    |  ✓  |   ✓   | 标签位置                       |
+| size                   | `'small' \| 'medium' \| 'large'`                 | `'medium'` |  ✓  |   ✓   | 尺寸                           |
+| closable               | `boolean`                                        | `false`    |  ✓  |   ✓   | 标签可关闭（仅 editable-card） |
+| centered               | `boolean`                                        | `false`    |  ✓  |   ✓   | 标签居中                       |
+| destroyInactiveTabPane | `boolean`                                        | `false`    |  ✓  |   ✓   | 销毁非激活面板                 |
 
 ### TabPane Props
 

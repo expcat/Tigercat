@@ -84,6 +84,26 @@ describe('Card', () => {
     expect(container.querySelector('img')).toHaveAttribute('alt', 'Custom alt')
   })
 
+  describe('Direction', () => {
+    it('should render vertical layout by default', () => {
+      const { container } = render(<Card>Content</Card>)
+      const card = container.firstElementChild as HTMLElement
+      expect(card.className).toContain('flex-col')
+    })
+
+    it('should render horizontal layout when direction is horizontal', () => {
+      const { container } = render(<Card direction="horizontal">Content</Card>)
+      const card = container.firstElementChild as HTMLElement
+      expect(card.className).toContain('flex-row')
+    })
+
+    it('should wrap body in flex container when horizontal', () => {
+      const { container } = render(<Card direction="horizontal">Content</Card>)
+      const body = container.querySelector('.flex-1')
+      expect(body).toBeInTheDocument()
+    })
+  })
+
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(<Card>Accessible Card</Card>)

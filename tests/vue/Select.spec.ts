@@ -852,4 +852,41 @@ describe('Select', () => {
       expect(listbox).toBeInTheDocument()
     })
   })
+
+  describe('maxTagCount', () => {
+    it('should truncate display when selected items exceed maxTagCount', () => {
+      const { getByText } = render(Select, {
+        props: {
+          options: testOptions,
+          multiple: true,
+          modelValue: ['1', '2', '3'],
+          maxTagCount: 2
+        }
+      })
+      expect(getByText('Option 1, Option 2 +1')).toBeInTheDocument()
+    })
+
+    it('should show all labels when selected items do not exceed maxTagCount', () => {
+      const { getByText } = render(Select, {
+        props: {
+          options: testOptions,
+          multiple: true,
+          modelValue: ['1', '2'],
+          maxTagCount: 2
+        }
+      })
+      expect(getByText('Option 1, Option 2')).toBeInTheDocument()
+    })
+
+    it('should show all labels when maxTagCount is not set', () => {
+      const { getByText } = render(Select, {
+        props: {
+          options: testOptions,
+          multiple: true,
+          modelValue: ['1', '2', '3']
+        }
+      })
+      expect(getByText('Option 1, Option 2, Option 3')).toBeInTheDocument()
+    })
+  })
 })

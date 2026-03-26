@@ -106,4 +106,26 @@ export interface SelectProps {
    * @default 'No options available'
    */
   noDataText?: string
+
+  /**
+   * Maximum number of tags to display in multi-select mode.
+   * Remaining selections are shown as "+N more".
+   * @since 0.5.0
+   */
+  maxTagCount?: number
+
+  /**
+   * Whether to use virtual scrolling for large option lists.
+   * When enabled, only visible options are rendered for better performance.
+   * @default false
+   * @since 0.5.0
+   */
+  virtual?: boolean
+
+  /**
+   * Height of the dropdown panel in pixels (relevant when virtual is true)
+   * @default 256
+   * @since 0.5.0
+   */
+  listHeight?: number
 }

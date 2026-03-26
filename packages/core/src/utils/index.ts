@@ -19,6 +19,9 @@ export * from './floating'
 // Animation constants and utilities
 export * from './animation'
 
+// Transition system (enter/leave presets)
+export * from './transition'
+
 // ChatWindow utilities
 export * from './chat-window-utils'
 

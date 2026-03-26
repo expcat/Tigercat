@@ -33,7 +33,8 @@ import {
   type DatePickerProps as CoreDatePickerProps,
   type DatePickerSingleModelValue,
   type DatePickerRangeModelValue,
-  type DatePickerRangeValue
+  type DatePickerRangeValue,
+  type DatePickerShortcut
 } from '@expcat/tigercat-core'
 
 const Icon: React.FC<{ path: string; className: string }> = ({ path, className }) => (
@@ -110,6 +111,7 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     onChange: _onChange,
     onClear: _onClear,
     className: _className,
+    shortcuts: _shortcuts,
     ...rest
   }) => rest)(props)
 
@@ -382,6 +384,34 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     selectDate(new Date())
   }
 
+  const handleShortcut = (shortcut: DatePickerShortcut) => {
+    const val = typeof shortcut.value === 'function' ? shortcut.value() : shortcut.value
+    if (!isRangeMode) {
+      const date =
+        val instanceof Date
+          ? normalizeDate(val)
+          : val
+            ? normalizeDate(parseDate(val as string)!)
+            : null
+      if (!isControlled) setInternalValue(date)
+      ;(props as DatePickerSingleProps).onChange?.(date)
+    } else {
+      const range = val as DatePickerRangeModelValue | null
+      if (range && Array.isArray(range)) {
+        const parsed: DatePickerRangeValue = [
+          range[0]
+            ? normalizeDate(range[0] instanceof Date ? range[0] : parseDate(range[0])!)
+            : null,
+          range[1]
+            ? normalizeDate(range[1] instanceof Date ? range[1] : parseDate(range[1])!)
+            : null
+        ]
+        setRangeValue(parsed)
+      }
+    }
+    closeCalendar()
+  }
+
   const clearDate = (event: React.MouseEvent) => {
     event.stopPropagation()
 
@@ -628,6 +658,21 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
               </div>
             )
           })()}
+
+          {/* Shortcuts panel */}
+          {props.shortcuts && props.shortcuts.length > 0 && (
+            <div className="flex flex-wrap gap-1 px-3 py-2 border-t border-[var(--tiger-border,#e5e7eb)]">
+              {props.shortcuts.map((sc, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className={datePickerFooterButtonClasses}
+                  onClick={() => handleShortcut(sc)}>
+                  {sc.label}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Footer (range mode only) */}
           {isRangeMode && (

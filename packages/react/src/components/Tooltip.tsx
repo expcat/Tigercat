@@ -20,12 +20,12 @@ export type TooltipProps = Omit<CoreTooltipProps, 'content' | 'placement'> &
     style?: React.CSSProperties
     placement?: FloatingPlacement
     offset?: number
-    onVisibleChange?: (visible: boolean) => void
+    onOpenChange?: (open: boolean) => void
   }
 
 export const Tooltip: React.FC<TooltipProps> = ({
-  visible,
-  defaultVisible = false,
+  open,
+  defaultOpen = false,
   content,
   trigger = 'hover',
   placement = 'top',
@@ -34,7 +34,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
   className,
   style,
   children,
-  onVisibleChange,
+  onOpenChange,
   ...divProps
 }) => {
   const tooltipIdRef = useRef<string | null>(null)
@@ -43,14 +43,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
   const describedBy = content != null ? tooltipId : undefined
 
   // Shared popup logic
-  const {
-    currentVisible,
-    containerRef,
-    triggerRef,
-    floatingRef,
-    floatingStyles,
-    triggerHandlers
-  } = usePopup({ visible, defaultVisible, disabled, trigger, placement, offset, onVisibleChange })
+  const { currentVisible, containerRef, triggerRef, floatingRef, floatingStyles, triggerHandlers } =
+    usePopup({ open, defaultOpen, disabled, trigger, placement, offset, onOpenChange })
 
   // Memoized classes
   const containerClasses = useMemo(

@@ -231,11 +231,11 @@ describe('Popover', () => {
       )
     })
 
-    it('should only respond to controlled visible when trigger is "manual"', async () => {
+    it('should only respond to controlled open when trigger is "manual"', async () => {
       const user = userEvent.setup()
       const { getByText, queryByText, rerender } = renderWithProps(Popover, {
         trigger: 'manual',
-        visible: false,
+        open: false,
         content: 'Manual content',
         children: <button>Manual trigger</button>
       })
@@ -247,7 +247,7 @@ describe('Popover', () => {
 
       // Controlled visible=true should open
       rerender(
-        <Popover trigger="manual" visible={true} content="Manual content">
+        <Popover trigger="manual" open={true} content="Manual content">
           <button>Manual trigger</button>
         </Popover>
       )
@@ -275,19 +275,19 @@ describe('Popover', () => {
       expect(queryByText('Disabled content')).toBeNull()
     })
 
-    it('should support defaultVisible', () => {
+    it('should support defaultOpen', () => {
       const { getByText } = renderWithProps(Popover, {
-        defaultVisible: true,
-        content: 'Default visible content',
+        defaultOpen: true,
+        content: 'Default open content',
         children: <button>Trigger</button>
       })
 
-      expect(getByText('Default visible content')).toBeVisible()
+      expect(getByText('Default open content')).toBeVisible()
     })
 
-    it('should support controlled visible state', async () => {
+    it('should support controlled open state', async () => {
       const { getByText, queryByText, rerender } = renderWithProps(Popover, {
-        visible: false,
+        open: false,
         content: 'Controlled content',
         children: <button>Trigger</button>
       })
@@ -296,7 +296,7 @@ describe('Popover', () => {
       expect(queryByText('Controlled content')).toBeNull()
 
       rerender(
-        <Popover visible={true} content="Controlled content">
+        <Popover open={true} content="Controlled content">
           <button>Trigger</button>
         </Popover>
       )
@@ -307,7 +307,7 @@ describe('Popover', () => {
 
       // Hide again
       rerender(
-        <Popover visible={false} content="Controlled content">
+        <Popover open={false} content="Controlled content">
           <button>Trigger</button>
         </Popover>
       )
@@ -319,20 +319,20 @@ describe('Popover', () => {
   })
 
   describe('Events', () => {
-    it('should call onVisibleChange when visibility changes', async () => {
+    it('should call onOpenChange when open state changes', async () => {
       const user = userEvent.setup()
-      const onVisibleChange = vi.fn()
+      const onOpenChange = vi.fn()
 
       const { getByText } = renderWithProps(Popover, {
         content: 'Test content',
-        onVisibleChange,
+        onOpenChange,
         children: <button>Trigger</button>
       })
 
       await user.click(getByText('Trigger'))
 
       await waitFor(() => {
-        expect(onVisibleChange).toHaveBeenCalledWith(true)
+        expect(onOpenChange).toHaveBeenCalledWith(true)
       })
     })
   })

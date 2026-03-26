@@ -49,7 +49,7 @@ describe('Button', () => {
   })
 
   it('applies size classes for each size', () => {
-    const sizes = ['sm', 'md', 'lg'] as const
+    const sizes = ['xs', 'sm', 'md', 'lg', 'xl'] as const
     for (const size of sizes) {
       const { container } = render(Button, {
         props: { size },
@@ -71,9 +71,9 @@ describe('Button', () => {
     expect(button).toHaveClass('w-full')
   })
 
-  it('respects type prop (submit/reset/button)', () => {
+  it('respects htmlType prop (submit/reset/button)', () => {
     const { container, rerender } = render(Button, {
-      props: { type: 'submit' },
+      props: { htmlType: 'submit' },
       slots: { default: 'Submit' }
     })
     expect(container.querySelector('button')).toHaveAttribute('type', 'submit')
@@ -227,6 +227,63 @@ describe('Button', () => {
       })
 
       await expectNoA11yViolations(container)
+    })
+  })
+
+  describe('danger prop', () => {
+    it('applies danger classes when danger is true', () => {
+      const { container } = render(Button, {
+        props: { danger: true },
+        slots: { default: 'Delete' }
+      })
+      const button = container.querySelector('button')!
+      expect(button.className).toContain('--tiger-error')
+    })
+
+    it('applies danger classes for outline variant', () => {
+      const { container } = render(Button, {
+        props: { danger: true, variant: 'outline' },
+        slots: { default: 'Delete' }
+      })
+      const button = container.querySelector('button')!
+      expect(button.className).toContain('--tiger-error')
+      expect(button.className).toContain('border-2')
+    })
+  })
+
+  describe('iconPosition prop', () => {
+    it('renders icon slot on the left by default', () => {
+      const { container } = render(Button, {
+        slots: {
+          default: 'Star',
+          icon: '<span data-testid="icon">★</span>'
+        }
+      })
+      const icon = container.querySelector('[data-testid="icon"]')!
+      expect(icon.parentElement).toHaveClass('mr-2')
+    })
+
+    it('renders icon slot on the right when iconPosition is right', () => {
+      const { container } = render(Button, {
+        props: { iconPosition: 'right' },
+        slots: {
+          default: 'Star',
+          icon: '<span data-testid="icon">★</span>'
+        }
+      })
+      const icon = container.querySelector('[data-testid="icon"]')!
+      expect(icon.parentElement).toHaveClass('ml-2')
+      expect(icon.parentElement).toHaveClass('order-1')
+    })
+
+    it('renders loading spinner on the right when iconPosition is right', () => {
+      const { container } = render(Button, {
+        props: { loading: true, iconPosition: 'right' },
+        slots: { default: 'Loading' }
+      })
+      const spinner = container.querySelector('svg.animate-spin')!
+      expect(spinner.parentElement).toHaveClass('ml-2')
+      expect(spinner.parentElement).toHaveClass('order-1')
     })
   })
 })

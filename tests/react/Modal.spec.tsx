@@ -13,14 +13,14 @@ const modalSizes = ['sm', 'md', 'lg', 'xl', 'full'] as const
 
 describe('Modal', () => {
   describe('Rendering', () => {
-    it('should not render when visible is false', () => {
-      const { container } = render(<Modal visible={false} title="Test Modal" />)
+    it('should not render when open is false', () => {
+      const { container } = render(<Modal open={false} title="Test Modal" />)
 
       expect(container.querySelector('[role="dialog"]')).not.toBeInTheDocument()
     })
 
-    it('should render when visible is true', async () => {
-      render(<Modal visible={true} title="Test Modal" />)
+    it('should render when open is true', async () => {
+      render(<Modal open={true} title="Test Modal" />)
 
       await waitFor(() => {
         expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
@@ -28,7 +28,7 @@ describe('Modal', () => {
     })
 
     it('should render with title', async () => {
-      render(<Modal visible={true} title="Modal Title" />)
+      render(<Modal open={true} title="Modal Title" />)
 
       await waitFor(() => {
         expect(screen.getByText('Modal Title')).toBeInTheDocument()
@@ -37,7 +37,7 @@ describe('Modal', () => {
 
     it('should render children content', async () => {
       render(
-        <Modal visible={true}>
+        <Modal open={true}>
           <div>Modal Content</div>
         </Modal>
       )
@@ -48,7 +48,7 @@ describe('Modal', () => {
     })
 
     it('should render custom titleContent', async () => {
-      render(<Modal visible={true} titleContent={<strong>Custom Title</strong>} />)
+      render(<Modal open={true} titleContent={<strong>Custom Title</strong>} />)
 
       await waitFor(() => {
         expect(screen.getByText('Custom Title')).toBeInTheDocument()
@@ -56,7 +56,7 @@ describe('Modal', () => {
     })
 
     it('should render footer content when provided', async () => {
-      render(<Modal visible={true} footer={<button type="button">Custom Footer</button>} />)
+      render(<Modal open={true} footer={<button type="button">Custom Footer</button>} />)
 
       await waitFor(() => {
         expect(screen.getByText('Custom Footer')).toBeInTheDocument()
@@ -66,7 +66,7 @@ describe('Modal', () => {
 
   describe('Props', () => {
     it.each(modalSizes)('should render with size %s', async (size) => {
-      render(<Modal visible={true} size={size} title="Test Modal" />)
+      render(<Modal open={true} size={size} title="Test Modal" />)
 
       await waitFor(() => {
         const dialog = document.querySelector('[role="dialog"]')
@@ -75,7 +75,7 @@ describe('Modal', () => {
     })
 
     it('should show close button by default', async () => {
-      render(<Modal visible={true} title="Test Modal" />)
+      render(<Modal open={true} title="Test Modal" />)
 
       await waitFor(() => {
         const closeButton = document.querySelector('button[aria-label="Close"]')
@@ -86,7 +86,7 @@ describe('Modal', () => {
     it('should allow overriding close aria-label via locale', async () => {
       render(
         <Modal
-          visible={true}
+          open={true}
           title="Test Modal"
           locale={{ modal: { closeAriaLabel: 'Close (i18n)' } }}
         />
@@ -98,7 +98,7 @@ describe('Modal', () => {
     })
 
     it('should render default footer when showDefaultFooter is true', async () => {
-      render(<Modal visible={true} title="Test Modal" showDefaultFooter={true} />)
+      render(<Modal open={true} title="Test Modal" showDefaultFooter={true} />)
 
       await waitFor(() => {
         const footer = document.querySelector('[data-tiger-modal-footer]')
@@ -111,7 +111,7 @@ describe('Modal', () => {
     it('should allow overriding ok/cancel via locale when using default footer', async () => {
       render(
         <Modal
-          visible={true}
+          open={true}
           title="Test Modal"
           showDefaultFooter={true}
           locale={{ common: { okText: 'OK (i18n)', cancelText: 'Cancel (i18n)' } }}
@@ -125,7 +125,7 @@ describe('Modal', () => {
     })
 
     it('should hide close button when closable is false', async () => {
-      render(<Modal visible={true} title="Test Modal" closable={false} />)
+      render(<Modal open={true} title="Test Modal" closable={false} />)
 
       await waitFor(() => {
         const dialog = document.querySelector('[role="dialog"]')
@@ -137,7 +137,7 @@ describe('Modal', () => {
     })
 
     it('should show mask by default', async () => {
-      render(<Modal visible={true} title="Test Modal" />)
+      render(<Modal open={true} title="Test Modal" />)
 
       await waitFor(() => {
         const mask = document.querySelector('[data-tiger-modal-mask]')
@@ -146,7 +146,7 @@ describe('Modal', () => {
     })
 
     it('should hide mask when mask is false', async () => {
-      render(<Modal visible={true} title="Test Modal" mask={false} />)
+      render(<Modal open={true} title="Test Modal" mask={false} />)
 
       await waitFor(() => {
         const dialog = document.querySelector('[role="dialog"]')
@@ -158,7 +158,7 @@ describe('Modal', () => {
     })
 
     it('should apply custom className', async () => {
-      render(<Modal visible={true} title="Test Modal" className="custom-modal-class" />)
+      render(<Modal open={true} title="Test Modal" className="custom-modal-class" />)
 
       await waitFor(() => {
         const dialog = document.querySelector('.custom-modal-class')
@@ -167,7 +167,7 @@ describe('Modal', () => {
     })
 
     it('should apply custom zIndex', async () => {
-      render(<Modal visible={true} title="Test Modal" zIndex={2000} />)
+      render(<Modal open={true} title="Test Modal" zIndex={2000} />)
 
       await waitFor(() => {
         const wrapper = document.querySelector('.fixed')
@@ -181,7 +181,7 @@ describe('Modal', () => {
       const user = userEvent.setup()
       const onCancel = vi.fn()
 
-      render(<Modal visible={true} title="Test Modal" onCancel={onCancel} />)
+      render(<Modal open={true} title="Test Modal" onCancel={onCancel} />)
 
       await waitFor(() => {
         const closeButton = document.querySelector('button[aria-label="Close"]')
@@ -198,9 +198,7 @@ describe('Modal', () => {
       const user = userEvent.setup()
       const onOk = vi.fn()
 
-      render(
-        <Modal visible={true} title="Test Modal" showDefaultFooter={true} onOk={onOk} />
-      )
+      render(<Modal open={true} title="Test Modal" showDefaultFooter={true} onOk={onOk} />)
 
       await waitFor(() => {
         expect(screen.getByText('确定')).toBeInTheDocument()
@@ -214,7 +212,7 @@ describe('Modal', () => {
     it('should call onCancel when ESC is pressed', async () => {
       const onCancel = vi.fn()
 
-      render(<Modal visible={true} title="Test Modal" onCancel={onCancel} />)
+      render(<Modal open={true} title="Test Modal" onCancel={onCancel} />)
 
       await waitFor(() => {
         expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
@@ -228,7 +226,7 @@ describe('Modal', () => {
       const user = userEvent.setup()
       const onCancel = vi.fn()
 
-      render(<Modal visible={true} title="Test Modal" maskClosable={true} onCancel={onCancel} />)
+      render(<Modal open={true} title="Test Modal" maskClosable={true} onCancel={onCancel} />)
 
       await waitFor(() => {
         const containerEl = document.querySelector('.flex.min-h-full')
@@ -245,7 +243,7 @@ describe('Modal', () => {
       const user = userEvent.setup()
       const onCancel = vi.fn()
 
-      render(<Modal visible={true} title="Test Modal" maskClosable={false} onCancel={onCancel} />)
+      render(<Modal open={true} title="Test Modal" maskClosable={false} onCancel={onCancel} />)
 
       await waitFor(() => {
         const containerEl = document.querySelector('.flex.min-h-full')
@@ -261,35 +259,35 @@ describe('Modal', () => {
     it('should call onClose when modal is closed', async () => {
       const onClose = vi.fn()
 
-      const { rerender } = render(<Modal visible={true} title="Test Modal" onClose={onClose} />)
+      const { rerender } = render(<Modal open={true} title="Test Modal" onClose={onClose} />)
 
-      rerender(<Modal visible={false} title="Test Modal" onClose={onClose} />)
+      rerender(<Modal open={false} title="Test Modal" onClose={onClose} />)
 
       await waitFor(() => {
         expect(onClose).toHaveBeenCalled()
       })
     })
 
-    it('should call onVisibleChange when visibility changes', async () => {
-      const onVisibleChange = vi.fn()
+    it('should call onOpenChange when open state changes', async () => {
+      const onOpenChange = vi.fn()
 
       const { rerender } = render(
-        <Modal visible={true} title="Test Modal" onVisibleChange={onVisibleChange} />
+        <Modal open={true} title="Test Modal" onOpenChange={onOpenChange} />
       )
 
-      expect(onVisibleChange).toHaveBeenCalledWith(true)
+      expect(onOpenChange).toHaveBeenCalledWith(true)
 
-      rerender(<Modal visible={false} title="Test Modal" onVisibleChange={onVisibleChange} />)
+      rerender(<Modal open={false} title="Test Modal" onOpenChange={onOpenChange} />)
 
       await waitFor(() => {
-        expect(onVisibleChange).toHaveBeenCalledWith(false)
+        expect(onOpenChange).toHaveBeenCalledWith(false)
       })
     })
   })
 
   describe('States', () => {
     it('should handle centered prop', async () => {
-      render(<Modal visible={true} title="Test Modal" centered={true} />)
+      render(<Modal open={true} title="Test Modal" centered={true} />)
 
       await waitFor(() => {
         const containerEl = document.querySelector('.items-center')
@@ -298,7 +296,7 @@ describe('Modal', () => {
     })
 
     it('should handle non-centered prop', async () => {
-      render(<Modal visible={true} title="Test Modal" centered={false} />)
+      render(<Modal open={true} title="Test Modal" centered={false} />)
 
       await waitFor(() => {
         const containerEl = document.querySelector('.items-start')
@@ -308,7 +306,7 @@ describe('Modal', () => {
 
     it('should destroy content when destroyOnClose is true and modal is closed', async () => {
       const { rerender } = render(
-        <Modal visible={true} destroyOnClose={true}>
+        <Modal open={true} destroyOnClose={true}>
           <div data-testid="modal-content">Content</div>
         </Modal>
       )
@@ -318,7 +316,7 @@ describe('Modal', () => {
       })
 
       rerender(
-        <Modal visible={false} destroyOnClose={true}>
+        <Modal open={false} destroyOnClose={true}>
           <div data-testid="modal-content">Content</div>
         </Modal>
       )
@@ -330,7 +328,7 @@ describe('Modal', () => {
 
     it('should keep content mounted (hidden) when destroyOnClose is false', async () => {
       const { rerender } = render(
-        <Modal visible={true} destroyOnClose={false}>
+        <Modal open={true} destroyOnClose={false}>
           <div data-testid="modal-content">Content</div>
         </Modal>
       )
@@ -340,7 +338,7 @@ describe('Modal', () => {
       })
 
       rerender(
-        <Modal visible={false} destroyOnClose={false}>
+        <Modal open={false} destroyOnClose={false}>
           <div data-testid="modal-content">Content</div>
         </Modal>
       )
@@ -355,7 +353,7 @@ describe('Modal', () => {
 
   describe('Accessibility', () => {
     it('should have proper ARIA attributes', async () => {
-      render(<Modal visible={true} title="Test Modal" />)
+      render(<Modal open={true} title="Test Modal" />)
 
       await waitFor(() => {
         const dialog = document.querySelector('[role="dialog"]')
@@ -369,7 +367,7 @@ describe('Modal', () => {
     })
 
     it('should have close button with aria-label', async () => {
-      render(<Modal visible={true} title="Test Modal" />)
+      render(<Modal open={true} title="Test Modal" />)
 
       await waitFor(() => {
         const closeButton = document.querySelector('button[aria-label="Close"]')
@@ -378,7 +376,7 @@ describe('Modal', () => {
     })
 
     it('should have mask with aria-hidden', async () => {
-      render(<Modal visible={true} title="Test Modal" />)
+      render(<Modal open={true} title="Test Modal" />)
 
       await waitFor(() => {
         const mask = document.querySelector('[data-tiger-modal-mask]')
@@ -388,7 +386,7 @@ describe('Modal', () => {
     })
 
     it('should pass basic accessibility checks', async () => {
-      const { container } = render(<Modal visible={true} title="Accessible Modal" />)
+      const { container } = render(<Modal open={true} title="Accessible Modal" />)
 
       await waitFor(() => {
         expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
@@ -403,7 +401,7 @@ describe('Modal', () => {
     it('should trap focus within modal on Tab key', async () => {
       const user = userEvent.setup()
       render(
-        <Modal visible={true} title="Focus Trap Test" showDefaultFooter={true}>
+        <Modal open={true} title="Focus Trap Test" showDefaultFooter={true}>
           <input data-testid="modal-input" />
         </Modal>
       )
@@ -437,7 +435,7 @@ describe('Modal', () => {
     it('should trap focus on Shift+Tab from first element', async () => {
       const user = userEvent.setup()
       render(
-        <Modal visible={true} title="Focus Trap Test" showDefaultFooter={true}>
+        <Modal open={true} title="Focus Trap Test" showDefaultFooter={true}>
           <input data-testid="modal-input" />
         </Modal>
       )
@@ -461,6 +459,28 @@ describe('Modal', () => {
       // Shift+Tab from first should go to last
       await user.tab({ shift: true })
       expect(document.activeElement).toBe(lastFocusable)
+    })
+  })
+
+  describe('width prop', () => {
+    it('should apply custom width style when width is a string', () => {
+      render(
+        <Modal open={true} width="600px">
+          content
+        </Modal>
+      )
+      const dialog = document.querySelector('[role="dialog"]') as HTMLElement
+      expect(dialog.style.width).toBe('600px')
+    })
+
+    it('should apply custom width as pixels when width is a number', () => {
+      render(
+        <Modal open={true} width={800}>
+          content
+        </Modal>
+      )
+      const dialog = document.querySelector('[role="dialog"]') as HTMLElement
+      expect(dialog.style.width).toBe('800px')
     })
   })
 })

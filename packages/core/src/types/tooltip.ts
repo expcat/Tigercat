@@ -14,15 +14,15 @@ export type TooltipTrigger = 'hover' | 'focus' | 'click' | 'manual'
  */
 export interface TooltipProps {
   /**
-   * Whether the tooltip is visible (controlled mode)
+   * Whether the tooltip is open (controlled mode)
    */
-  visible?: boolean
+  open?: boolean
 
   /**
-   * Default visibility (uncontrolled mode)
+   * Default open state (uncontrolled mode)
    * @default false
    */
-  defaultVisible?: boolean
+  defaultOpen?: boolean
 
   /**
    * Tooltip content text

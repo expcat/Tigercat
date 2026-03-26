@@ -30,14 +30,14 @@ export interface DropdownProps {
    */
   disabled?: boolean
   /**
-   * Whether the dropdown is visible (controlled mode)
+   * Whether the dropdown is open (controlled mode)
    */
-  visible?: boolean
+  open?: boolean
   /**
-   * Default visibility (uncontrolled mode)
+   * Default open state (uncontrolled mode)
    * @default false
    */
-  defaultVisible?: boolean
+  defaultOpen?: boolean
   /**
    * Whether to close dropdown on menu item click
    * @default true

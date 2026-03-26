@@ -64,7 +64,7 @@ describe('Popconfirm', () => {
     expect(onConfirm).toHaveBeenCalledTimes(1)
   })
 
-  it('supports controlled mode via visible/onVisibleChange', async () => {
+  it('supports controlled mode via open/onOpenChange', async () => {
     const user = userEvent.setup()
 
     const TestComponent = () => {
@@ -73,7 +73,7 @@ describe('Popconfirm', () => {
       return (
         <>
           <button onClick={() => setVisible(true)}>Show</button>
-          <Popconfirm title="Confirm?" visible={visible} onVisibleChange={setVisible}>
+          <Popconfirm title="Confirm?" open={visible} onOpenChange={setVisible}>
             <button>Action</button>
           </Popconfirm>
         </>

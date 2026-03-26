@@ -13,16 +13,38 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop        | Type                                                         | Default     | Vue | React | Description    |
-| ----------- | ------------------------------------------------------------ | ----------- | :-: | :---: | -------------- |
-| variant     | `'primary' \| 'secondary' \| 'outline' \| 'ghost' \| 'link'` | `'primary'` |  ✓  |   ✓   | 按钮样式       |
-| size        | `'sm' \| 'md' \| 'lg'`                                       | `'md'`      |  ✓  |   ✓   | 按钮尺寸       |
-| disabled    | `boolean`                                                    | `false`     |  ✓  |   ✓   | 禁用状态       |
-| loading     | `boolean`                                                    | `false`     |  ✓  |   ✓   | 加载状态       |
-| block       | `boolean`                                                    | `false`     |  ✓  |   ✓   | 块级按钮       |
-| type        | `'button' \| 'submit' \| 'reset'`                            | `'button'`  |  ✓  |   ✓   | 原生类型       |
-| loadingIcon | `ReactNode`                                                  | -           |  -  |   ✓   | 自定义加载图标 |
-| className   | `string`                                                     | -           |  -  |   ✓   | 自定义类名     |
+| Prop         | Type                                                         | Default     | Vue | React | Description      |
+| ------------ | ------------------------------------------------------------ | ----------- | :-: | :---: | ---------------- |
+| variant      | `'primary' \| 'secondary' \| 'outline' \| 'ghost' \| 'link'` | `'primary'` |  ✓  |   ✓   | 按钮样式         |
+| size         | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'`                       | `'md'`      |  ✓  |   ✓   | 按钮尺寸         |
+| disabled     | `boolean`                                                    | `false`     |  ✓  |   ✓   | 禁用状态         |
+| loading      | `boolean`                                                    | `false`     |  ✓  |   ✓   | 加载状态         |
+| block        | `boolean`                                                    | `false`     |  ✓  |   ✓   | 块级按钮         |
+| danger       | `boolean`                                                    | `false`     |  ✓  |   ✓   | 危险按钮（红色） |
+| htmlType     | `'button' \| 'submit' \| 'reset'`                            | `'button'`  |  ✓  |   ✓   | 原生 type 属性   |
+| iconPosition | `'left' \| 'right'`                                          | `'left'`    |  ✓  |   ✓   | 图标位置         |
+| loadingIcon  | `ReactNode`                                                  | -           |  -  |   ✓   | 自定义加载图标   |
+| className    | `string`                                                     | -           |  -  |   ✓   | 自定义类名       |
+
+> **Breaking**: `type` 已重命名为 `htmlType`（详见 [MIGRATION_v0.5.0.md](../../../../MIGRATION_v0.5.0.md)）
+
+---
+
+## ButtonGroup 按钮组
+
+组合多个 Button，统一传递 `size`。
+
+### Props
+
+| Prop | Type                                   | Default | Vue | React | Description |
+| ---- | -------------------------------------- | ------- | :-: | :---: | ----------- |
+| size | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | -       |  ✓  |   ✓   | 统一尺寸    |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description |
+| --------- | ---------- | ----------- |
+| `default` | `children` | Button 列表 |
 
 ### Events
 
@@ -43,16 +65,17 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop           | Type                                          | Default         | Vue | React | Description        |
-| -------------- | --------------------------------------------- | --------------- | :-: | :---: | ------------------ |
-| type           | `'success' \| 'info' \| 'warning' \| 'error'` | `'info'`        |  ✓  |   ✓   | 类型               |
-| size           | `'sm' \| 'md' \| 'lg'`                        | `'md'`          |  ✓  |   ✓   | 尺寸               |
-| title          | `string`                                      | -               |  ✓  |   ✓   | 标题               |
-| description    | `string`                                      | -               |  ✓  |   ✓   | 描述内容           |
-| showIcon       | `boolean`                                     | `true`          |  ✓  |   ✓   | 是否显示图标       |
-| closable       | `boolean`                                     | `false`         |  ✓  |   ✓   | 可关闭             |
-| closeAriaLabel | `string`                                      | `'Close alert'` |  ✓  |   ✓   | 关闭按钮无障碍标签 |
-| className      | `string`                                      | -               |  ✓  |   ✓   | 自定义类名         |
+| Prop           | Type                                          | Default         | Vue | React | Description                          |
+| -------------- | --------------------------------------------- | --------------- | :-: | :---: | ------------------------------------ |
+| type           | `'success' \| 'info' \| 'warning' \| 'error'` | `'info'`        |  ✓  |   ✓   | 类型                                 |
+| size           | `'sm' \| 'md' \| 'lg'`                        | `'md'`          |  ✓  |   ✓   | 尺寸                                 |
+| title          | `string`                                      | -               |  ✓  |   ✓   | 标题                                 |
+| description    | `string`                                      | -               |  ✓  |   ✓   | 描述内容                             |
+| showIcon       | `boolean`                                     | `true`          |  ✓  |   ✓   | 是否显示图标                         |
+| closable       | `boolean`                                     | `false`         |  ✓  |   ✓   | 可关闭                               |
+| duration       | `number`                                      | -               |  ✓  |   ✓   | 自动关闭延时（ms，需 closable=true） |
+| closeAriaLabel | `string`                                      | `'Close alert'` |  ✓  |   ✓   | 关闭按钮无障碍标签                   |
+| className      | `string`                                      | -               |  ✓  |   ✓   | 自定义类名                           |
 
 ### Events
 
@@ -90,6 +113,24 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 | Vue Slot  | React Prop | Description                    |
 | --------- | ---------- | ------------------------------ |
 | `default` | `children` | 图标内容（无图片和文字时显示） |
+
+---
+
+## AvatarGroup 头像组
+
+### Props
+
+| Prop      | Type                           | Default | Vue | React | Description                 |
+| --------- | ------------------------------ | ------- | :-: | :---: | --------------------------- |
+| max       | `number`                       | -       |  ✓  |   ✓   | 最大显示数，溢出显示 "+N"   |
+| size      | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`  |  ✓  |   ✓   | 统一尺寸（级联到子 Avatar） |
+| className | `string`                       | -       |  ✓  |   ✓   | 自定义类名                  |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description |
+| --------- | ---------- | ----------- |
+| `default` | `children` | Avatar 列表 |
 
 ---
 

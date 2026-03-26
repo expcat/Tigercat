@@ -63,3 +63,25 @@ export interface AvatarProps {
    */
   className?: string
 }
+
+/**
+ * AvatarGroup props interface
+ */
+export interface AvatarGroupProps {
+  /**
+   * Maximum number of avatars to display
+   * Excess avatars will be shown as a "+N" indicator
+   */
+  max?: number
+
+  /**
+   * Size applied to all avatars in the group
+   * @default 'md'
+   */
+  size?: AvatarSize
+
+  /**
+   * Additional CSS classes
+   */
+  className?: string
+}

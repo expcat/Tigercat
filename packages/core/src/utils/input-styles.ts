@@ -100,6 +100,41 @@ export function getInputErrorClasses(size: InputSize = 'md'): string {
 }
 
 /**
+ * Clear button classes — positioned inside the input on the right
+ * @since 0.5.0
+ */
+export function getInputClearButtonClasses(size: InputSize = 'md'): string {
+  return classNames(
+    'absolute inset-y-0 right-0 flex items-center cursor-pointer',
+    'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]',
+    INPUT_PADDING[size].right
+  )
+}
+
+/**
+ * Password toggle button classes
+ * @since 0.5.0
+ */
+export function getInputPasswordToggleClasses(size: InputSize = 'md'): string {
+  return classNames(
+    'absolute inset-y-0 right-0 flex items-center cursor-pointer',
+    'text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)]',
+    INPUT_PADDING[size].right
+  )
+}
+
+/**
+ * Character count classes — below the input
+ * @since 0.5.0
+ */
+export function getInputCountClasses(isOverLimit: boolean = false): string {
+  return classNames(
+    'text-xs mt-1 text-right',
+    isOverLimit ? 'text-[var(--tiger-error,#dc2626)]' : 'text-[var(--tiger-text-muted,#6b7280)]'
+  )
+}
+
+/**
  * Extract value from an input element.
  * Returns the numeric value for number inputs (if valid), otherwise the string value.
  */

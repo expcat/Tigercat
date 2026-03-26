@@ -145,4 +145,65 @@ describe('Dropdown', () => {
     await fireEvent.click(screen.getByText('Trigger'))
     expect(chevron).toHaveClass('rotate-180')
   })
+
+  describe('a11y', () => {
+    it('trigger has aria-haspopup and aria-expanded', () => {
+      render(Dropdown, {
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+          ]
+        }
+      })
+
+      const trigger = screen.getByText('Trigger').closest('[aria-haspopup]')
+      expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
+      expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('trigger has aria-controls pointing to menu id when open', async () => {
+      render(Dropdown, {
+        props: { trigger: 'click' },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+          ]
+        }
+      })
+
+      const trigger = screen.getByText('Trigger').closest('[aria-haspopup]')!
+      expect(trigger).not.toHaveAttribute('aria-controls')
+
+      await fireEvent.click(screen.getByText('Trigger'))
+      const controlsId = trigger.getAttribute('aria-controls')
+      expect(controlsId).toBeTruthy()
+
+      const menu = document.querySelector(`[id="${controlsId}"]`)
+      expect(menu).toBeInTheDocument()
+      expect(menu).toHaveAttribute('role', 'menu')
+    })
+
+    it('menu items have role="menuitem" and tabindex="-1"', async () => {
+      render(Dropdown, {
+        props: { trigger: 'click', defaultOpen: true },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [
+              h(DropdownItem, null, () => 'Item 1'),
+              h(DropdownItem, null, () => 'Item 2')
+            ])
+          ]
+        }
+      })
+
+      const items = screen.getAllByRole('menuitem')
+      expect(items).toHaveLength(2)
+      items.forEach((item) => {
+        expect(item).toHaveAttribute('tabindex', '-1')
+      })
+    })
+  })
 })

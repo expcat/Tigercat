@@ -55,16 +55,16 @@ import { Button, Input } from '@expcat/tigercat-react'
 
 详见 [shared/patterns/common.md](references/shared/patterns/common.md)
 
-| Concept      | Vue                         | React                   |
-| ------------ | --------------------------- | ----------------------- |
-| Two-way bind | `v-model` / `v-model:xxx`   | `value` + `onChange`    |
-| Visibility   | `visible` (v-model:visible) | `open` + `onOpenChange` |
-| Events       | `@click`, `@change`         | `onClick`, `onChange`   |
-| Slots        | `<template #name>`          | `xxxRender` props       |
+| Concept      | Vue                       | React                   |
+| ------------ | ------------------------- | ----------------------- |
+| Two-way bind | `v-model` / `v-model:xxx` | `value` + `onChange`    |
+| Visibility   | `open` (v-model:open)     | `open` + `onOpenChange` |
+| Events       | `@click`, `@change`       | `onClick`, `onChange`   |
+| Slots        | `<template #name>`        | `xxxRender` props       |
 
-## Components (60+)
+## Components (63)
 
-**Basic**: Alert, Avatar, Badge, Button, Code, Divider, Icon, Link, Tag, Text
+**Basic**: Alert, Avatar, AvatarGroup, Badge, Button, ButtonGroup, Code, Divider, Icon, Link, Tag, Text
 
 **Form**: Checkbox, DatePicker, Form, Input, InputNumber, Radio, Select, Slider, Switch, Textarea, TimePicker, Upload
 

@@ -44,7 +44,7 @@ let drawerIdCounter = 0
 const createDrawerId = () => `tiger-drawer-${++drawerIdCounter}`
 
 export interface VueDrawerProps {
-  visible?: boolean
+  open?: boolean
   placement?: DrawerPlacement
   size?: DrawerSize
   title?: string
@@ -65,10 +65,10 @@ export const Drawer = defineComponent({
   inheritAttrs: false,
   props: {
     /**
-     * Whether the drawer is visible
+     * Whether the drawer is open
      * @default false
      */
-    visible: {
+    open: {
       type: Boolean,
       default: false
     },
@@ -87,6 +87,13 @@ export const Drawer = defineComponent({
     size: {
       type: String as PropType<DrawerSize>,
       default: 'md' as DrawerSize
+    },
+    /**
+     * Custom width/height (overrides size)
+     */
+    width: {
+      type: [String, Number] as PropType<string | number>,
+      default: undefined
     },
     /**
      * Drawer title
@@ -185,7 +192,7 @@ export const Drawer = defineComponent({
       default: false
     }
   },
-  emits: ['update:visible', 'close', 'after-enter', 'after-leave'],
+  emits: ['update:open', 'close', 'after-enter', 'after-leave'],
   setup(props, { slots, emit, attrs }) {
     const instanceId = ref<string>(createDrawerId())
     const hasBeenOpened = ref(false)
@@ -197,7 +204,7 @@ export const Drawer = defineComponent({
     const titleId = computed(() => `${instanceId.value}-title`)
 
     const shouldRender = computed(() => {
-      if (props.visible) {
+      if (props.open) {
         hasBeenOpened.value = true
         return true
       }
@@ -207,7 +214,7 @@ export const Drawer = defineComponent({
     })
 
     const handleClose = () => {
-      emit('update:visible', false)
+      emit('update:open', false)
       emit('close')
     }
 
@@ -218,12 +225,12 @@ export const Drawer = defineComponent({
       }
     }
 
-    const escapeEnabled = computed(() => props.visible)
+    const escapeEnabled = computed(() => props.open)
     let cleanupEscape: (() => void) | undefined
 
     const handleKeyDown = (event: KeyboardEvent) => {
       // Handle Tab key for focus trap
-      if (event.key === 'Tab' && props.visible && dialogRef.value) {
+      if (event.key === 'Tab' && props.open && dialogRef.value) {
         const focusables = getFocusableElements(dialogRef.value)
         const result = getFocusTrapNavigation(event, focusables, document.activeElement)
 
@@ -248,7 +255,7 @@ export const Drawer = defineComponent({
     })
 
     watch(
-      () => props.visible,
+      () => props.open,
       async (nextVisible) => {
         if (nextVisible) {
           previousActiveElement.value = captureActiveElement()
@@ -263,7 +270,7 @@ export const Drawer = defineComponent({
     )
 
     watch(
-      () => props.visible,
+      () => props.open,
       (nextVisible, prevVisible, onCleanup) => {
         // Skip initial mount when closed, or no actual change
         if (nextVisible === prevVisible || (typeof prevVisible === 'undefined' && !nextVisible))
@@ -295,19 +302,26 @@ export const Drawer = defineComponent({
 
       const containerClasses = classNames(
         getDrawerContainerClasses(),
-        !props.visible && 'pointer-events-none'
+        !props.open && 'pointer-events-none'
       )
 
-      const maskClasses = getDrawerMaskClasses(props.visible)
+      const maskClasses = getDrawerMaskClasses(props.open)
 
       const panelClasses = classNames(
-        getDrawerPanelClasses(props.placement, props.visible, props.size),
+        getDrawerPanelClasses(props.placement, props.open, props.size),
         'flex flex-col',
         props.className,
         coerceClassValue(attrs.class)
       )
 
-      const mergedStyle = mergeStyleValues(attrs.style, props.style)
+      const isHorizontal = props.placement === 'left' || props.placement === 'right'
+      const widthStyle = props.width
+        ? {
+            [isHorizontal ? 'width' : 'height']:
+              typeof props.width === 'number' ? `${props.width}px` : props.width
+          }
+        : undefined
+      const mergedStyle = mergeStyleValues(attrs.style, props.style, widthStyle)
 
       const headerClasses = getDrawerHeaderClasses()
       const bodyClasses = getDrawerBodyClasses(props.bodyClassName)
@@ -404,8 +418,8 @@ export const Drawer = defineComponent({
         {
           class: containerClasses,
           style: { zIndex: props.zIndex },
-          hidden: !props.visible,
-          'aria-hidden': !props.visible ? 'true' : undefined,
+          hidden: !props.open,
+          'aria-hidden': !props.open ? 'true' : undefined,
           'data-tiger-drawer-root': ''
         },
         [mask, panel]

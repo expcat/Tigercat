@@ -204,13 +204,13 @@ export const CropUpload = defineComponent({
       const modal = h(
         Modal,
         {
-          visible: modalVisible.value,
+          open: modalVisible.value,
           size: 'lg',
           title: props.modalTitle,
           closable: true,
           maskClosable: false,
           showDefaultFooter: false,
-          'onUpdate:visible': (val: boolean) => {
+          'onUpdate:open': (val: boolean) => {
             if (!val) handleCancel()
           }
         },

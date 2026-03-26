@@ -234,8 +234,8 @@ export const TabPane: React.FC<TabPaneProps> = ({
         <span>{label}</span>
         {/* Close button */}
         {isClosable && (
-          <button
-            type="button"
+          <span
+            role="button"
             className={tabCloseButtonClasses}
             aria-label={`Close ${String(label)}`}
             tabIndex={-1}
@@ -248,7 +248,7 @@ export const TabPane: React.FC<TabPaneProps> = ({
                 d={closeIconPathD}
               />
             </svg>
-          </button>
+          </span>
         )}
       </button>
     )

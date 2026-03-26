@@ -13,19 +13,19 @@ describe('Drawer', () => {
     document.body.innerHTML = ''
   })
 
-  it('should not render when visible is false (initial)', () => {
+  it('should not render when open is false (initial)', () => {
     render(Drawer, {
-      props: { visible: false, title: 'Test Drawer' }
+      props: { open: false, title: 'Test Drawer' }
     })
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('should render when visible is true', async () => {
+  it('should render when open is true', async () => {
     renderWithSlots(
       Drawer,
       { default: () => h('div', 'Drawer Content') },
-      { props: { visible: true, title: 'Test Drawer' } }
+      { props: { open: true, title: 'Test Drawer' } }
     )
 
     await waitFor(() => {
@@ -36,7 +36,7 @@ describe('Drawer', () => {
 
   it('should link aria-labelledby to an existing title element', async () => {
     render(Drawer, {
-      props: { visible: true, title: 'Accessible Drawer' }
+      props: { open: true, title: 'Accessible Drawer' }
     })
 
     await waitFor(() => {
@@ -49,15 +49,15 @@ describe('Drawer', () => {
     })
   })
 
-  it('should emit close and update:visible when close button is clicked', async () => {
+  it('should emit close and update:open when close button is clicked', async () => {
     const onClose = vi.fn()
-    const onUpdateVisible = vi.fn()
+    const onUpdateOpen = vi.fn()
 
     render(Drawer, {
       props: {
-        visible: true,
+        open: true,
         title: 'Test Drawer',
-        'onUpdate:visible': onUpdateVisible,
+        'onUpdate:open': onUpdateOpen,
         onClose
       }
     })
@@ -68,19 +68,19 @@ describe('Drawer', () => {
 
     await fireEvent.click(screen.getByLabelText('Close drawer'))
 
-    expect(onUpdateVisible).toHaveBeenCalledWith(false)
+    expect(onUpdateOpen).toHaveBeenCalledWith(false)
     expect(onClose).toHaveBeenCalled()
   })
 
   it('should allow overriding close aria-label via locale', async () => {
-    const onUpdateVisible = vi.fn()
+    const onUpdateOpen = vi.fn()
 
     render(Drawer, {
       props: {
-        visible: true,
+        open: true,
         title: 'Test Drawer',
         locale: { drawer: { closeAriaLabel: 'Close (i18n)' } },
-        'onUpdate:visible': onUpdateVisible
+        'onUpdate:open': onUpdateOpen
       }
     })
 
@@ -89,17 +89,17 @@ describe('Drawer', () => {
     })
 
     await fireEvent.click(screen.getByLabelText('Close (i18n)'))
-    expect(onUpdateVisible).toHaveBeenCalledWith(false)
+    expect(onUpdateOpen).toHaveBeenCalledWith(false)
   })
 
   it('should close on ESC key press', async () => {
-    const onUpdateVisible = vi.fn()
+    const onUpdateOpen = vi.fn()
 
     render(Drawer, {
       props: {
-        visible: true,
+        open: true,
         title: 'Test Drawer',
-        'onUpdate:visible': onUpdateVisible
+        'onUpdate:open': onUpdateOpen
       }
     })
 
@@ -108,17 +108,17 @@ describe('Drawer', () => {
     })
 
     fireEvent.keyDown(document, { key: 'Escape' })
-    expect(onUpdateVisible).toHaveBeenCalledWith(false)
+    expect(onUpdateOpen).toHaveBeenCalledWith(false)
   })
 
   it('should close when mask is clicked (maskClosable=true)', async () => {
-    const onUpdateVisible = vi.fn()
+    const onUpdateOpen = vi.fn()
 
     render(Drawer, {
       props: {
-        visible: true,
+        open: true,
         title: 'Test Drawer',
-        'onUpdate:visible': onUpdateVisible
+        'onUpdate:open': onUpdateOpen
       }
     })
 
@@ -127,18 +127,18 @@ describe('Drawer', () => {
     })
 
     fireEvent.click(document.querySelector('[data-tiger-drawer-mask]') as Element)
-    expect(onUpdateVisible).toHaveBeenCalledWith(false)
+    expect(onUpdateOpen).toHaveBeenCalledWith(false)
   })
 
   it('should not close when mask is clicked (maskClosable=false)', async () => {
-    const onUpdateVisible = vi.fn()
+    const onUpdateOpen = vi.fn()
 
     render(Drawer, {
       props: {
-        visible: true,
+        open: true,
         title: 'Test Drawer',
         maskClosable: false,
-        'onUpdate:visible': onUpdateVisible
+        'onUpdate:open': onUpdateOpen
       }
     })
 
@@ -147,12 +147,12 @@ describe('Drawer', () => {
     })
 
     fireEvent.click(document.querySelector('[data-tiger-drawer-mask]') as Element)
-    expect(onUpdateVisible).not.toHaveBeenCalled()
+    expect(onUpdateOpen).not.toHaveBeenCalled()
   })
 
   it('should apply custom zIndex', async () => {
     render(Drawer, {
-      props: { visible: true, title: 'Test Drawer', zIndex: 2000 }
+      props: { open: true, title: 'Test Drawer', zIndex: 2000 }
     })
 
     await waitFor(() => {
@@ -163,7 +163,7 @@ describe('Drawer', () => {
 
   it('should keep content mounted (hidden) when destroyOnClose is false', async () => {
     const { rerender } = render(Drawer, {
-      props: { visible: true, destroyOnClose: false },
+      props: { open: true, destroyOnClose: false },
       slots: {
         default: () => h('div', { 'data-testid': 'drawer-content' }, 'Content')
       }
@@ -173,7 +173,7 @@ describe('Drawer', () => {
       expect(screen.getByTestId('drawer-content')).toBeInTheDocument()
     })
 
-    await rerender({ visible: false, destroyOnClose: false })
+    await rerender({ open: false, destroyOnClose: false })
 
     await waitFor(() => {
       const root = document.querySelector('[data-tiger-drawer-root]') as HTMLElement
@@ -184,7 +184,7 @@ describe('Drawer', () => {
 
   it('should destroy content when destroyOnClose is true', async () => {
     const { rerender } = render(Drawer, {
-      props: { visible: true, destroyOnClose: true },
+      props: { open: true, destroyOnClose: true },
       slots: {
         default: () => h('div', { 'data-testid': 'drawer-content' }, 'Content')
       }
@@ -194,7 +194,7 @@ describe('Drawer', () => {
       expect(screen.getByTestId('drawer-content')).toBeInTheDocument()
     })
 
-    await rerender({ visible: false, destroyOnClose: true })
+    await rerender({ open: false, destroyOnClose: true })
 
     await waitFor(() => {
       expect(screen.queryByTestId('drawer-content')).not.toBeInTheDocument()
@@ -207,7 +207,7 @@ describe('Drawer', () => {
 
     const { rerender } = render(Drawer, {
       props: {
-        visible: true,
+        open: true,
         title: 'Test Drawer',
         onAfterEnter,
         onAfterLeave
@@ -218,7 +218,7 @@ describe('Drawer', () => {
     expect(onAfterEnter).toHaveBeenCalled()
 
     await rerender({
-      visible: false,
+      open: false,
       title: 'Test Drawer',
       onAfterEnter,
       onAfterLeave
@@ -229,7 +229,7 @@ describe('Drawer', () => {
 
   it('should pass basic accessibility checks', async () => {
     render(Drawer, {
-      props: { visible: true, title: 'Accessible Drawer' },
+      props: { open: true, title: 'Accessible Drawer' },
       slots: { default: () => h('div', 'Drawer content') }
     })
 
@@ -238,5 +238,31 @@ describe('Drawer', () => {
     })
 
     await expectNoA11yViolations(document.body)
+  })
+
+  describe('width prop', () => {
+    it('should apply custom width style for right placement', () => {
+      render(Drawer, {
+        props: { open: true, placement: 'right', width: '400px' }
+      })
+      const dialog = screen.getByRole('dialog') as HTMLElement
+      expect(dialog.style.width).toBe('400px')
+    })
+
+    it('should apply custom height style for top placement', () => {
+      render(Drawer, {
+        props: { open: true, placement: 'top', width: '300px' }
+      })
+      const dialog = screen.getByRole('dialog') as HTMLElement
+      expect(dialog.style.height).toBe('300px')
+    })
+
+    it('should apply number width as pixels', () => {
+      render(Drawer, {
+        props: { open: true, width: 500 }
+      })
+      const dialog = screen.getByRole('dialog') as HTMLElement
+      expect(dialog.style.width).toBe('500px')
+    })
   })
 })

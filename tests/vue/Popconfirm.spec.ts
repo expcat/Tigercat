@@ -80,9 +80,9 @@ describe.sequential('Popconfirm', () => {
     expect(onConfirm).toHaveBeenCalledTimes(1)
   })
 
-  it('supports controlled mode via visible', async () => {
+  it('supports controlled mode via open', async () => {
     const user = userEvent.setup()
-    const onVisibleChange = vi.fn()
+    const onOpenChange = vi.fn()
     const { getByText, rerender } = renderWithSlots(
       Popconfirm,
       {
@@ -90,8 +90,8 @@ describe.sequential('Popconfirm', () => {
       },
       {
         title: 'Confirm?',
-        visible: false,
-        onVisibleChange
+        open: false,
+        onOpenChange
       }
     )
 
@@ -99,19 +99,19 @@ describe.sequential('Popconfirm', () => {
 
     await rerender({
       title: 'Confirm?',
-      visible: true
+      open: true
     })
 
     await waitFor(() => expect(getByText('Confirm?')).toBeVisible())
 
     await user.keyboard('{Escape}')
 
-    await waitFor(() => expect(onVisibleChange).toHaveBeenCalledWith(false))
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false))
 
     await rerender({
       title: 'Confirm?',
-      visible: false,
-      onVisibleChange
+      open: false,
+      onOpenChange
     })
 
     await waitFor(() => expect(getByText('Confirm?')).not.toBeVisible())

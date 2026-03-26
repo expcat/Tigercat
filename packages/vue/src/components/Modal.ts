@@ -41,7 +41,7 @@ let modalIdCounter = 0
 const createModalId = () => `tiger-modal-${++modalIdCounter}`
 
 export interface VueModalProps {
-  visible?: boolean
+  open?: boolean
   size?: ModalSize
   title?: string
   closable?: boolean
@@ -63,10 +63,10 @@ export const Modal = defineComponent({
   inheritAttrs: false,
   props: {
     /**
-     * Whether the modal is visible
+     * Whether the modal is open
      * @default false
      */
-    visible: {
+    open: {
       type: Boolean,
       default: false
     },
@@ -77,6 +77,13 @@ export const Modal = defineComponent({
     size: {
       type: String as PropType<ModalSize>,
       default: 'md' as ModalSize
+    },
+    /**
+     * Custom width (overrides size)
+     */
+    width: {
+      type: [String, Number] as PropType<string | number>,
+      default: undefined
     },
     /**
      * Modal title
@@ -202,10 +209,10 @@ export const Modal = defineComponent({
       default: false
     }
   },
-  emits: ['update:visible', 'close', 'cancel', 'ok'],
+  emits: ['update:open', 'close', 'cancel', 'ok'],
   setup(props, { slots, emit, attrs }) {
     const instanceId = ref<string>(createModalId())
-    const hasBeenOpened = ref(props.visible)
+    const hasBeenOpened = ref(props.open)
 
     const dialogRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
@@ -214,19 +221,19 @@ export const Modal = defineComponent({
     const titleId = computed(() => `${instanceId.value}-title`)
 
     const shouldRender = computed(() => {
-      if (props.visible) return true
+      if (props.open) return true
       if (props.destroyOnClose) return false
       return hasBeenOpened.value
     })
 
     const handleClose = () => {
-      emit('update:visible', false)
+      emit('update:open', false)
       emit('cancel')
     }
 
     const handleOk = () => {
       emit('ok')
-      emit('update:visible', false)
+      emit('update:open', false)
     }
 
     const handleMaskClick = (event: MouseEvent) => {
@@ -237,13 +244,13 @@ export const Modal = defineComponent({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       // Handle Escape key
-      if (event.key === 'Escape' && props.visible) {
+      if (event.key === 'Escape' && props.open) {
         handleClose()
         return
       }
 
       // Handle Tab key for focus trap
-      if (event.key === 'Tab' && props.visible && dialogRef.value) {
+      if (event.key === 'Tab' && props.open && dialogRef.value) {
         const focusables = getFocusableElements(dialogRef.value)
         const result = getFocusTrapNavigation(event, focusables, document.activeElement)
 
@@ -263,7 +270,7 @@ export const Modal = defineComponent({
     })
 
     watch(
-      () => props.visible,
+      () => props.open,
       async (nextVisible) => {
         if (nextVisible) {
           hasBeenOpened.value = true
@@ -327,7 +334,13 @@ export const Modal = defineComponent({
 
       const mergedClass = classNames(contentClasses.value, coerceClassValue(attrs.class))
 
-      const mergedStyle = mergeStyleValues(attrs.style, props.style)
+      const widthStyle = props.width
+        ? {
+            width: typeof props.width === 'number' ? `${props.width}px` : props.width,
+            maxWidth: '100%'
+          }
+        : undefined
+      const mergedStyle = mergeStyleValues(attrs.style, props.style, widthStyle)
 
       const header =
         props.title || slots.title || props.closable
@@ -407,8 +420,8 @@ export const Modal = defineComponent({
         {
           class: modalWrapperClasses,
           style: { zIndex: props.zIndex },
-          hidden: !props.visible,
-          'aria-hidden': !props.visible ? 'true' : undefined,
+          hidden: !props.open,
+          'aria-hidden': !props.open ? 'true' : undefined,
           'data-tiger-modal-root': ''
         },
         [

@@ -1836,4 +1836,79 @@ describe('Form', () => {
       expect(alert).toHaveTextContent('Name required')
     })
   })
+
+  describe('loading prop', () => {
+    it('should add loading class when loading is true', () => {
+      const { container } = render(Form, {
+        props: { loading: true }
+      })
+      expect(container.querySelector('form')!.className).toContain('tiger-form--loading')
+    })
+
+    it('should not submit when loading is true', async () => {
+      const onSubmit = vi.fn()
+      const { container } = render(Form, {
+        props: { loading: true, onSubmit }
+      })
+      await fireEvent.submit(container.querySelector('form')!)
+      expect(onSubmit).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('addField / removeField', () => {
+    it('should add a field via exposed addField method', async () => {
+      const model = reactive<Record<string, unknown>>({ name: 'Alice' })
+      let formRef: { addField: (name: string, value?: unknown) => void } | null = null
+
+      const Demo = defineComponent({
+        setup() {
+          return () =>
+            h(
+              Form,
+              {
+                model,
+                ref: (el: unknown) => {
+                  formRef = el as typeof formRef
+                }
+              },
+              () => null
+            )
+        }
+      })
+
+      render(Demo)
+      formRef!.addField('age', 25)
+      expect(model.age).toBe(25)
+    })
+
+    it('should remove a field and clear its validation via exposed removeField method', async () => {
+      const model = reactive<Record<string, unknown>>({ name: 'Alice', email: 'test@test.com' })
+      const rules: FormRules = { email: { required: true, message: 'Email required' } }
+      let formRef: {
+        removeField: (name: string) => void
+        validateField: (name: string) => Promise<void>
+      } | null = null
+
+      const Demo = defineComponent({
+        setup() {
+          return () =>
+            h(
+              Form,
+              {
+                model,
+                rules,
+                ref: (el: unknown) => {
+                  formRef = el as typeof formRef
+                }
+              },
+              () => null
+            )
+        }
+      })
+
+      render(Demo)
+      formRef!.removeField('email')
+      expect(model.email).toBeUndefined()
+    })
+  })
 })
