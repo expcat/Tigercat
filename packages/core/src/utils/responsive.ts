@@ -3,12 +3,13 @@
  * @since 0.6.0
  */
 
-export type ResponsiveBreakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl'
+export type ResponsiveBreakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'xxxl'
 
 /**
  * Breakpoint minimum widths (px), ordered smallest → largest.
  */
 const BREAKPOINT_MIN_WIDTHS: [ResponsiveBreakpoint, number][] = [
+  ['xxxl', 1920],
   ['xxl', 1536],
   ['xl', 1280],
   ['lg', 1024],

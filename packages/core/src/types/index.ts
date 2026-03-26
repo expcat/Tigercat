@@ -106,3 +106,14 @@ export * from './events'
 
 // Shared slot/render-prop context types (v0.5.0+)
 export * from './slots'
+
+// New visual/feedback components (v0.7.0+)
+export * from './result'
+export * from './empty'
+export * from './watermark'
+export * from './float-button'
+export * from './tour'
+export * from './affix'
+
+// Theme configuration types (v0.7.0+)
+export * from './theme'

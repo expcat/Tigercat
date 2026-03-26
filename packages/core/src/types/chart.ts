@@ -1699,3 +1699,292 @@ export interface RadarChartProps extends BaseChartProps, ChartLegendProps, Chart
    */
   labelAutoAlign?: boolean
 }
+
+// -------------------------------------------------------------------
+// Funnel Chart
+// -------------------------------------------------------------------
+
+export interface FunnelChartDatum extends ChartSeriesPoint {
+  /** Stage / step label */
+  label?: string
+  /** Numeric value (determines width) */
+  value: number
+  /** Optional color override */
+  color?: string
+}
+
+export interface FunnelChartProps
+  extends BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartTooltipProps {
+  /**
+   * Data items — ordered from widest to narrowest
+   */
+  data: FunnelChartDatum[]
+
+  /**
+   * Vertical or horizontal layout
+   * @default 'vertical'
+   */
+  direction?: 'vertical' | 'horizontal'
+
+  /**
+   * Gap between funnel segments in px
+   * @default 2
+   */
+  gap?: number
+
+  /**
+   * Whether the last segment tapers to a point
+   * @default false
+   */
+  pinch?: boolean
+
+  /**
+   * Palette of colors
+   */
+  colors?: string[]
+}
+
+// -------------------------------------------------------------------
+// Gauge Chart
+// -------------------------------------------------------------------
+
+export interface GaugeChartProps extends BaseChartProps, ChartTooltipProps {
+  /**
+   * Current value
+   */
+  value: number
+
+  /**
+   * Minimum value of the scale
+   * @default 0
+   */
+  min?: number
+
+  /**
+   * Maximum value of the scale
+   * @default 100
+   */
+  max?: number
+
+  /**
+   * Start angle in degrees (0 = 3 o'clock, counter-clockwise)
+   * @default 135
+   */
+  startAngle?: number
+
+  /**
+   * End angle in degrees
+   * @default 405
+   */
+  endAngle?: number
+
+  /**
+   * Arc stroke width in px
+   * @default 20
+   */
+  arcWidth?: number
+
+  /**
+   * Whether to show tick marks
+   * @default true
+   */
+  showTicks?: boolean
+
+  /**
+   * Number of major ticks
+   * @default 5
+   */
+  tickCount?: number
+
+  /**
+   * Value label format function
+   */
+  valueFormatter?: (value: number) => string
+
+  /**
+   * Label shown below the value
+   */
+  label?: string
+
+  /**
+   * Color segments along the arc. Array of { range: [from, to], color }
+   */
+  segments?: Array<{
+    range: [number, number]
+    color: string
+  }>
+
+  /**
+   * Default arc track color
+   * @default 'var(--tiger-border,#e5e7eb)'
+   */
+  trackColor?: string
+
+  /**
+   * Default arc fill color
+   * @default 'var(--tiger-primary,#2563eb)'
+   */
+  color?: string
+
+  /**
+   * Palette of colors
+   */
+  colors?: string[]
+}
+
+// -------------------------------------------------------------------
+// Heatmap Chart
+// -------------------------------------------------------------------
+
+export interface HeatmapChartDatum {
+  /** X-axis index or label */
+  x: ChartScaleValue
+  /** Y-axis index or label */
+  y: ChartScaleValue
+  /** Heat value */
+  value: number
+}
+
+export interface HeatmapChartProps
+  extends BaseChartProps, ChartInteractionProps, ChartTooltipProps {
+  /**
+   * Data points
+   */
+  data: HeatmapChartDatum[]
+
+  /**
+   * X-axis labels
+   */
+  xLabels: string[]
+
+  /**
+   * Y-axis labels
+   */
+  yLabels: string[]
+
+  /**
+   * Min color (for lowest value)
+   * @default '#f0f9ff'
+   */
+  minColor?: string
+
+  /**
+   * Max color (for highest value)
+   * @default 'var(--tiger-primary,#2563eb)'
+   */
+  maxColor?: string
+
+  /**
+   * Cell border radius in px
+   * @default 2
+   */
+  cellRadius?: number
+
+  /**
+   * Gap between cells in px
+   * @default 1
+   */
+  cellGap?: number
+
+  /**
+   * Whether to show value labels inside cells
+   * @default false
+   */
+  showValues?: boolean
+
+  /**
+   * Value format function
+   */
+  valueFormatter?: (value: number) => string
+
+  /**
+   * Palette of colors
+   */
+  colors?: string[]
+}
+
+// -------------------------------------------------------------------
+// TreeMap Chart
+// -------------------------------------------------------------------
+
+export interface TreeMapChartDatum {
+  /** Node label */
+  label: string
+  /** Node value (determines area) */
+  value: number
+  /** Optional color override */
+  color?: string
+  /** Nested children */
+  children?: TreeMapChartDatum[]
+}
+
+export interface TreeMapChartProps
+  extends BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartTooltipProps {
+  /**
+   * Hierarchical data
+   */
+  data: TreeMapChartDatum[]
+
+  /**
+   * Gap between nodes in px
+   * @default 2
+   */
+  gap?: number
+
+  /**
+   * Whether to show labels inside nodes
+   * @default true
+   */
+  showLabels?: boolean
+
+  /**
+   * Minimum font size for labels (hide if cell too small)
+   * @default 10
+   */
+  minLabelSize?: number
+
+  /**
+   * Palette of colors
+   */
+  colors?: string[]
+}
+
+// -------------------------------------------------------------------
+// Sunburst Chart
+// -------------------------------------------------------------------
+
+export interface SunburstChartDatum {
+  /** Arc label */
+  label: string
+  /** Arc value */
+  value: number
+  /** Optional color override */
+  color?: string
+  /** Nested children */
+  children?: SunburstChartDatum[]
+}
+
+export interface SunburstChartProps
+  extends BaseChartProps, ChartInteractionProps, ChartLegendProps, ChartTooltipProps {
+  /**
+   * Hierarchical data
+   */
+  data: SunburstChartDatum[]
+
+  /**
+   * Inner radius ratio (0 = no hole, 0.3 = donut-like)
+   * @default 0
+   */
+  innerRadiusRatio?: number
+
+  /**
+   * Whether to show labels on arcs
+   * @default true
+   */
+  showLabels?: boolean
+
+  /**
+   * Palette of colors
+   */
+  colors?: string[]
+}

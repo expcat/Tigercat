@@ -37,6 +37,7 @@ export * from './slider'
  * ```
  *
  * @since 0.2.0 - Added interaction state variables (focusRing, primaryActive, etc.)
+ * @since 0.7.0 - Added semantic surface/text/border variables, status colors, chart palette
  */
 export const THEME_CSS_VARS = {
   // Primary colors
@@ -52,9 +53,31 @@ export const THEME_CSS_VARS = {
   // Background hover states
   outlineBgHover: '--tiger-outline-bg-hover',
   ghostBgHover: '--tiger-ghost-bg-hover',
-  // Interaction states (0.2.0+)
+  // Interaction states
   focusRing: '--tiger-focus-ring',
-  surface: '--tiger-surface'
+  // Surface & background
+  surface: '--tiger-surface',
+  surfaceMuted: '--tiger-surface-muted',
+  surfaceRaised: '--tiger-surface-raised',
+  // Text
+  text: '--tiger-text',
+  textSecondary: '--tiger-text-secondary',
+  textDisabled: '--tiger-text-disabled',
+  // Border
+  border: '--tiger-border',
+  borderStrong: '--tiger-border-strong',
+  // Status colors
+  success: '--tiger-success',
+  warning: '--tiger-warning',
+  error: '--tiger-error',
+  info: '--tiger-info',
+  // Chart palette
+  chart1: '--tiger-chart-1',
+  chart2: '--tiger-chart-2',
+  chart3: '--tiger-chart-3',
+  chart4: '--tiger-chart-4',
+  chart5: '--tiger-chart-5',
+  chart6: '--tiger-chart-6'
 } as const
 
 /**

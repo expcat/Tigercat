@@ -13,7 +13,7 @@
  * - styles/   : component-specific style utilities (button, input, select, timepicker-utils, etc.)
  */
 
-export const version = '0.2.0'
+export const version = '0.7.0'
 
 // ============================================================================
 // UTILITIES (re-exported from organized submodules for backward compatibility)
@@ -30,6 +30,11 @@ export * from './types'
 // ============================================================================
 export * from './theme'
 export * from './tailwind-plugin'
+
+// ============================================================================
+// THEME SYSTEM (v0.7.0+ — presets, ThemeManager)
+// ============================================================================
+export * from './themes'
 
 // ============================================================================
 // DESIGN TOKENS (v0.5.0+)
