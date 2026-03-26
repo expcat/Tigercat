@@ -20,7 +20,14 @@ import {
   type FormRuleTrigger,
   validateForm,
   validateField as validateFieldUtil,
-  getValueByPath
+  getValueByPath,
+  getDependentFields,
+  createFormHistory,
+  pushFormHistory,
+  undoFormHistory,
+  redoFormHistory,
+  canUndo,
+  canRedo
 } from '@expcat/tigercat-core'
 
 // Form context type
@@ -67,6 +74,11 @@ export interface FormHandle {
   resetFields: () => void
   addField: (fieldName: string, defaultValue?: unknown) => void
   removeField: (fieldName: string) => void
+  undo: () => void
+  redo: () => void
+  snapshotHistory: () => void
+  canUndo: boolean
+  canRedo: boolean
 }
 
 // Form submit event
@@ -106,6 +118,21 @@ export interface FormProps extends CoreFormProps {
    * Additional CSS classes
    */
   className?: string
+
+  /**
+   * Field dependencies for cross-field validation
+   */
+  fieldDependencies?: Map<string, string[]>
+
+  /**
+   * Enable undo/redo for form values
+   */
+  undoable?: boolean
+
+  /**
+   * Maximum undo history size
+   */
+  maxHistorySize?: number
 }
 
 export const Form = forwardRef<FormHandle, FormProps>(
@@ -126,6 +153,9 @@ export const Form = forwardRef<FormHandle, FormProps>(
       onValidate,
       onChange,
       className,
+      fieldDependencies,
+      undoable = false,
+      maxHistorySize = 50,
       ...props
     },
     ref
@@ -134,6 +164,9 @@ export const Form = forwardRef<FormHandle, FormProps>(
     const [formValues, setFormValues] = useState<FormValues>(model)
     const fieldRulesRef = React.useRef<FormRules>({})
     const formValuesRef = React.useRef<FormValues>(model)
+
+    // v0.6.0: undo/redo history
+    const [historyState, setHistoryState] = useState(() => createFormHistory(model, maxHistorySize))
 
     // Update form values when model changes
     React.useEffect(() => {
@@ -198,33 +231,39 @@ export const Form = forwardRef<FormHandle, FormProps>(
         trigger?: FormRuleTrigger
       ): Promise<void> => {
         const fieldRules = resolveFieldRules(fieldName, rulesOverride)
-        if (!fieldRules) {
-          return
+        if (fieldRules) {
+          const error = await runFieldValidation(fieldName, rulesOverride, trigger)
+
+          setErrors((prevErrors) => {
+            const existing = prevErrors.find((e) => e.field === fieldName)
+            const existingMessage = existing?.message ?? null
+
+            // Return same reference if error state for this field hasn't changed,
+            // avoiding unnecessary re-renders for unrelated FormItems.
+            if (!error && !existingMessage) return prevErrors
+            if (error && error === existingMessage) return prevErrors
+
+            const filtered = prevErrors.filter((e) => e.field !== fieldName)
+
+            if (error) {
+              return [...filtered, { field: fieldName, message: error }]
+            }
+
+            return filtered
+          })
+
+          onValidate?.(fieldName, !error, error)
         }
 
-        const error = await runFieldValidation(fieldName, rulesOverride, trigger)
-
-        setErrors((prevErrors) => {
-          const existing = prevErrors.find((e) => e.field === fieldName)
-          const existingMessage = existing?.message ?? null
-
-          // Return same reference if error state for this field hasn't changed,
-          // avoiding unnecessary re-renders for unrelated FormItems.
-          if (!error && !existingMessage) return prevErrors
-          if (error && error === existingMessage) return prevErrors
-
-          const filtered = prevErrors.filter((e) => e.field !== fieldName)
-
-          if (error) {
-            return [...filtered, { field: fieldName, message: error }]
+        // v0.6.0: revalidate dependent fields (even if current field has no rules)
+        if (fieldDependencies) {
+          const dependents = getDependentFields(fieldName, fieldDependencies)
+          for (const dep of dependents) {
+            await validateField(dep)
           }
-
-          return filtered
-        })
-
-        onValidate?.(fieldName, !error, error)
+        }
       },
-      [resolveFieldRules, runFieldValidation, onValidate]
+      [resolveFieldRules, runFieldValidation, onValidate, fieldDependencies]
     )
 
     const runValidation = useCallback(async (): Promise<{
@@ -371,6 +410,40 @@ export const Form = forwardRef<FormHandle, FormProps>(
       [onChange]
     )
 
+    // v0.6.0: undo/redo
+    const snapshotHistory = useCallback((): void => {
+      if (!undoable) return
+      setHistoryState((prev) => pushFormHistory(prev, formValuesRef.current))
+    }, [undoable])
+
+    const undo = useCallback((): void => {
+      if (!undoable) return
+      setHistoryState((prev) => {
+        const result = undoFormHistory(prev)
+        if (result) {
+          setFormValues(result.present)
+          formValuesRef.current = result.present
+          onChange?.(result.present)
+          return result
+        }
+        return prev
+      })
+    }, [undoable, onChange])
+
+    const redo = useCallback((): void => {
+      if (!undoable) return
+      setHistoryState((prev) => {
+        const result = redoFormHistory(prev)
+        if (result) {
+          setFormValues(result.present)
+          formValuesRef.current = result.present
+          onChange?.(result.present)
+          return result
+        }
+        return prev
+      })
+    }, [undoable, onChange])
+
     const handleSubmit = useCallback(
       async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault()
@@ -391,9 +464,26 @@ export const Form = forwardRef<FormHandle, FormProps>(
         clearValidate,
         resetFields,
         addField,
-        removeField
+        removeField,
+        undo,
+        redo,
+        snapshotHistory,
+        canUndo: canUndo(historyState),
+        canRedo: canRedo(historyState)
       }),
-      [validate, validateFields, validateField, clearValidate, resetFields, addField, removeField]
+      [
+        validate,
+        validateFields,
+        validateField,
+        clearValidate,
+        resetFields,
+        addField,
+        removeField,
+        undo,
+        redo,
+        snapshotHistory,
+        historyState
+      ]
     )
 
     const contextValue: FormContextValue = useMemo(

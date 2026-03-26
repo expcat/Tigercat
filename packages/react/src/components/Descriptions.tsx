@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo, useSyncExternalStore } from 'react'
 import {
   classNames,
   getDescriptionsClasses,
@@ -12,9 +12,11 @@ import {
   descriptionsTitleClasses,
   descriptionsExtraClasses,
   descriptionsVerticalWrapperClasses,
+  resolveResponsiveValue,
   type DescriptionsSize,
   type DescriptionsLayout,
-  type DescriptionsItem
+  type DescriptionsItem,
+  type ResponsiveBreakpoint
 } from '@expcat/tigercat-core'
 
 export interface DescriptionsProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -35,10 +37,10 @@ export interface DescriptionsProps extends Omit<React.HTMLAttributes<HTMLDivElem
   bordered?: boolean
 
   /**
-   * Number of columns per row
+   * Number of columns per row (number or responsive object)
    * @default 3
    */
-  column?: number
+  column?: number | Partial<Record<ResponsiveBreakpoint, number>>
 
   /**
    * Descriptions size
@@ -78,7 +80,7 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
   title,
   extra,
   bordered = false,
-  column = 3,
+  column: columnProp = 3,
   size = 'md',
   layout = 'horizontal',
   colon = true,
@@ -89,6 +91,21 @@ export const Descriptions: React.FC<DescriptionsProps> = ({
   children,
   ...props
 }) => {
+  // Responsive column resolution
+  const subscribe = useMemo(() => {
+    return (cb: () => void) => {
+      window.addEventListener('resize', cb)
+      return () => window.removeEventListener('resize', cb)
+    }
+  }, [])
+  const getSnapshot = () => window.innerWidth
+  const getServerSnapshot = () => 1024
+  const windowWidth = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+  const column = useMemo(
+    () => resolveResponsiveValue(columnProp, windowWidth, 3),
+    [columnProp, windowWidth]
+  )
+
   const renderHeader = () => {
     if (!title && !extra) return null
 

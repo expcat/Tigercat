@@ -88,4 +88,41 @@ describe('FormWizard (Vue)', () => {
     expect(beforeNext).toHaveBeenCalledWith(0, stepsWithFields[0], stepsWithFields)
     expect(screen.getByText('Content 1')).toBeInTheDocument()
   })
+
+  // ==================== v0.6.0 Features ====================
+  describe('v0.6.0 Features', () => {
+    it('skips steps with skipCondition returning true', async () => {
+      const stepsWithSkip: WizardStep[] = [
+        { title: 'Step 1' },
+        { title: 'Step 2', skipCondition: () => true },
+        { title: 'Step 3' }
+      ]
+
+      render(FormWizard, {
+        props: { steps: stepsWithSkip },
+        slots: {
+          step: ({ index }: { index: number }) => h('div', `Content ${index + 1}`)
+        }
+      })
+
+      expect(screen.getByText('Content 1')).toBeInTheDocument()
+      await fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+      // Step 2 should be skipped, we should be on Step 3
+      expect(screen.getByText('Content 3')).toBeInTheDocument()
+    })
+
+    it('calls autoSave on step change', async () => {
+      const autoSave = vi.fn()
+
+      render(FormWizard, {
+        props: { steps, autoSave },
+        slots: {
+          step: ({ index }: { index: number }) => h('div', `Content ${index + 1}`)
+        }
+      })
+
+      await fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+      expect(autoSave).toHaveBeenCalledWith(1, steps[1])
+    })
+  })
 })

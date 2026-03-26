@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 import {
   classNames,
   closeIconViewBox,
@@ -99,6 +99,10 @@ export const TabPane: React.FC<TabPaneProps> = ({
   const isActive = useMemo(() => {
     return isKeyActive(tabKey, tabsContext.activeKey)
   }, [tabKey, tabsContext.activeKey])
+
+  // Track if tab has ever been activated (for lazy rendering)
+  const hasBeenActivatedRef = useRef(isActive)
+  if (isActive) hasBeenActivatedRef.current = true
 
   // Check if tab is closable
   const isClosable = useMemo(() => {
@@ -255,7 +259,10 @@ export const TabPane: React.FC<TabPaneProps> = ({
   }
 
   // Render tab pane content
-  const shouldRender = isActive || !tabsContext.destroyInactiveTabPane
+  // lazy: don't render until first activated; destroyInactiveTabPane: remove when inactive
+  const shouldRender = tabsContext.lazy
+    ? hasBeenActivatedRef.current && (isActive || !tabsContext.destroyInactiveTabPane)
+    : isActive || !tabsContext.destroyInactiveTabPane
   if (!shouldRender) {
     return null
   }

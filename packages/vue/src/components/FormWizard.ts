@@ -98,6 +98,10 @@ export const FormWizard = defineComponent({
       type: Object as PropType<Partial<TigerLocale>>,
       default: undefined
     },
+    autoSave: {
+      type: Function as PropType<(current: number, step: WizardStep) => void | Promise<void>>,
+      default: undefined
+    },
     className: {
       type: String,
       default: undefined
@@ -162,6 +166,9 @@ export const FormWizard = defineComponent({
       }
       emit('update:current', clamped)
       emit('change', clamped, prev)
+      if (props.autoSave && props.steps[clamped]) {
+        props.autoSave(clamped, props.steps[clamped])
+      }
     }
 
     const runBeforeNext = async (): Promise<boolean> => {
@@ -176,9 +183,22 @@ export const FormWizard = defineComponent({
       return false
     }
 
+    const findNextUnskipped = (from: number, direction: 1 | -1): number => {
+      let idx = from
+      while (idx >= 0 && idx < totalCount.value) {
+        const step = props.steps[idx]
+        if (!step?.disabled && !step?.skipCondition?.()) return idx
+        idx += direction
+      }
+      // No valid step found — return current index to signal "no move"
+      return currentIndex.value
+    }
+
     const handlePrev = () => {
-      if (currentIndex.value <= 0 || props.steps[currentIndex.value - 1]?.disabled) return
-      setCurrent(currentIndex.value - 1)
+      if (currentIndex.value <= 0) return
+      const target = findNextUnskipped(currentIndex.value - 1, -1)
+      if (target === currentIndex.value) return
+      setCurrent(target)
     }
 
     const handleNext = async () => {
@@ -190,8 +210,9 @@ export const FormWizard = defineComponent({
         emit('finish', currentIndex.value, props.steps)
         return
       }
-      if (props.steps[currentIndex.value + 1]?.disabled) return
-      setCurrent(currentIndex.value + 1)
+      const target = findNextUnskipped(currentIndex.value + 1, 1)
+      if (target === currentIndex.value) return
+      setCurrent(target)
     }
 
     const handleStepChange = async (nextIndex: number) => {

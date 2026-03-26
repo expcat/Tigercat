@@ -4,6 +4,7 @@ import {
   type FormSize,
   type FormRule,
   type FormItemProps as CoreFormItemProps,
+  type FormErrorDisplayMode,
   getFieldError,
   getFormItemClasses,
   getFormItemLabelClasses,
@@ -70,6 +71,7 @@ export const FormItem: React.FC<FormItemProps> = ({
   rules,
   error: controlledError,
   showMessage = true,
+  errorDisplayMode = 'inline',
   size,
   children,
   className
@@ -270,7 +272,14 @@ export const FormItem: React.FC<FormItemProps> = ({
     [actualSize, hasError]
   )
 
-  const contentClasses = useMemo(() => getFormItemContentClasses(labelPosition), [labelPosition])
+  const contentClasses = useMemo(
+    () =>
+      classNames(
+        getFormItemContentClasses(labelPosition),
+        errorDisplayMode === 'popup' && 'relative'
+      ),
+    [labelPosition, errorDisplayMode]
+  )
 
   return (
     <div className={formItemClasses}>
@@ -300,7 +309,19 @@ export const FormItem: React.FC<FormItemProps> = ({
           <div
             id={hasError ? errorId : undefined}
             role={hasError ? 'alert' : undefined}
-            className={errorClasses}
+            className={
+              errorDisplayMode === 'block'
+                ? classNames(
+                    'mt-1 p-2 rounded bg-red-50 border border-red-200 text-red-600 text-sm',
+                    !hasError && 'hidden'
+                  )
+                : errorDisplayMode === 'popup'
+                  ? classNames(
+                      'absolute z-10 mt-1 px-2 py-1 rounded bg-red-600 text-white text-xs shadow-lg',
+                      !hasError && 'hidden'
+                    )
+                  : errorClasses
+            }
             aria-hidden={hasError ? undefined : true}>
             {hasError ? errorMessage : ''}
           </div>

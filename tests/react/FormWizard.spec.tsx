@@ -84,4 +84,44 @@ describe('FormWizard (React)', () => {
     expect(beforeNext).toHaveBeenCalledWith(0, stepsWithFields[0], stepsWithFields)
     expect(screen.getByText('Content 1')).toBeInTheDocument()
   })
+
+  // ==================== v0.6.0 Features ====================
+  describe('v0.6.0 Features', () => {
+    it('skips steps with skipCondition returning true', async () => {
+      const user = userEvent.setup()
+      const stepsWithSkip = [
+        { title: 'Step 1' },
+        { title: 'Step 2', skipCondition: () => true },
+        { title: 'Step 3' }
+      ]
+
+      render(
+        <FormWizard
+          steps={stepsWithSkip}
+          renderStep={(_step, index) => <div>Content {index + 1}</div>}
+        />
+      )
+
+      expect(screen.getByText('Content 1')).toBeInTheDocument()
+      await user.click(screen.getByRole('button', { name: 'Next' }))
+      // Step 2 should be skipped
+      expect(screen.getByText('Content 3')).toBeInTheDocument()
+    })
+
+    it('calls autoSave on step change', async () => {
+      const user = userEvent.setup()
+      const autoSave = vi.fn()
+
+      render(
+        <FormWizard
+          steps={steps}
+          autoSave={autoSave}
+          renderStep={(_step, index) => <div>Content {index + 1}</div>}
+        />
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Next' }))
+      expect(autoSave).toHaveBeenCalledWith(1, steps[1])
+    })
+  })
 })

@@ -221,6 +221,13 @@ export const Tree = defineComponent({
       default: ''
     },
     /**
+     * Whether to show built-in search input
+     */
+    searchable: {
+      type: Boolean,
+      default: false
+    },
+    /**
      * Custom filter function
      */
     filterFn: {
@@ -384,9 +391,15 @@ export const Tree = defineComponent({
       }
     )
 
+    // v0.6.0: internal search input state
+    const internalSearchValue = ref('')
+    const effectiveFilterValue = computed(() =>
+      props.searchable ? internalSearchValue.value : props.filterValue
+    )
+
     // Watch filter value changes
     watch(
-      () => props.filterValue,
+      () => effectiveFilterValue.value,
       (newValue) => {
         if (newValue) {
           const matched = filterTreeNodes(props.treeData, newValue, props.filterFn)
@@ -788,6 +801,19 @@ export const Tree = defineComponent({
         )
       }
 
+      const searchInput = props.searchable
+        ? h('input', {
+            type: 'text',
+            class:
+              'w-full mb-2 px-2 py-1 text-sm border border-[var(--tiger-border,#e5e7eb)] rounded bg-[var(--tiger-surface,#ffffff)] focus:outline-none focus:ring-1 focus:ring-[var(--tiger-primary,#2563eb)]',
+            placeholder: 'Search...',
+            value: internalSearchValue.value,
+            onInput: (e: Event) => {
+              internalSearchValue.value = (e.target as HTMLInputElement).value
+            }
+          })
+        : null
+
       return h(
         'div',
         {
@@ -798,7 +824,7 @@ export const Tree = defineComponent({
           'aria-multiselectable': effectiveMultiple.value ? true : undefined,
           ref: rootEl
         },
-        props.treeData.map((node) => renderTreeNode(node, 0))
+        [searchInput, ...props.treeData.map((node) => renderTreeNode(node, 0))]
       )
     }
   }

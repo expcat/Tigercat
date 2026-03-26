@@ -1,4 +1,4 @@
-import { defineComponent, computed, inject, PropType, h, type VNode } from 'vue'
+import { defineComponent, computed, inject, ref, watch, PropType, h, type VNode } from 'vue'
 import {
   classNames,
   getTabItemClasses,
@@ -107,6 +107,12 @@ export const TabPane = defineComponent({
     // Check if this tab is active
     const isActive = computed(() => {
       return isKeyActive(props.tabKey, tabsContext.activeKey)
+    })
+
+    // Track if tab has ever been activated (for lazy rendering)
+    const hasBeenActivated = ref(isActive.value)
+    watch(isActive, (val) => {
+      if (val) hasBeenActivated.value = true
     })
 
     // Check if tab is closable
@@ -279,7 +285,10 @@ export const TabPane = defineComponent({
       }
 
       // Render tab pane content
-      const shouldRender = isActive.value || !tabsContext.destroyInactiveTabPane
+      // lazy: don't render until first activated; destroyInactiveTabPane: remove when inactive
+      const shouldRender = tabsContext.lazy
+        ? hasBeenActivated.value && (isActive.value || !tabsContext.destroyInactiveTabPane)
+        : isActive.value || !tabsContext.destroyInactiveTabPane
       if (!shouldRender) {
         return null
       }

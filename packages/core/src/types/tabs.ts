@@ -60,6 +60,12 @@ export interface TabsProps {
    */
   destroyInactiveTabPane?: boolean
   /**
+   * Whether to lazily render tab panes (only render when first activated)
+   * @default false
+   * @since 0.6.0
+   */
+  lazy?: boolean
+  /**
    * Additional CSS classes
    */
   className?: string

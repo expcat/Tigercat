@@ -19,6 +19,10 @@ import {
   getSpinnerSVG,
   normalizeSvgAttrs,
   getLoadingOverlaySpinnerClasses,
+  tableSummaryRowClasses,
+  getEditableCellClasses,
+  editableCellInputClasses,
+  tableExportButtonClasses,
   // Icon constants
   icon16ViewBox,
   icon24ViewBox,
@@ -33,6 +37,13 @@ import {
   paginateData,
   calculatePagination,
   getRowKey,
+  filterDataAdvanced,
+  groupDataByColumn,
+  tableGroupHeaderClasses,
+  getGroupHeaderCellClasses,
+  exportTableToCsv,
+  downloadCsv,
+  getFixedVirtualRange,
   // Simple pagination style utilities
   getSimplePaginationContainerClasses,
   getSimplePaginationTotalClasses,
@@ -47,7 +58,8 @@ import {
   type SortState,
   type PaginationConfig,
   type RowSelectionConfig,
-  type ExpandableConfig
+  type ExpandableConfig,
+  type FilterRule
 } from '@expcat/tigercat-core'
 
 const spinnerSvg = getSpinnerSVG('spinner')
@@ -73,6 +85,19 @@ export interface VueTableProps {
   rowClassName?: string | ((record: Record<string, unknown>, index: number) => string)
   stickyHeader?: boolean
   maxHeight?: string | number
+  // v0.6.0
+  virtual?: boolean
+  virtualHeight?: number
+  virtualItemHeight?: number
+  editable?: boolean
+  editableCells?: Map<string, Set<number>>
+  filterMode?: 'basic' | 'advanced'
+  advancedFilterRules?: FilterRule[]
+  columnDraggable?: boolean
+  summaryRow?: { show: boolean; data: Record<string, unknown> }
+  groupBy?: string
+  exportable?: boolean
+  exportFilename?: string
 }
 
 // Sort icon
@@ -303,7 +328,20 @@ export const Table = defineComponent({
     tableLayout: {
       type: String as PropType<'auto' | 'fixed'>,
       default: 'auto'
-    }
+    },
+    // --- v0.6.0 props ---
+    virtual: { type: Boolean, default: false },
+    virtualHeight: { type: Number, default: 400 },
+    virtualItemHeight: { type: Number, default: 40 },
+    editable: { type: Boolean, default: false },
+    editableCells: { type: Object as PropType<Map<string, Set<number>>> },
+    filterMode: { type: String as PropType<'basic' | 'advanced'>, default: 'basic' },
+    advancedFilterRules: { type: Array as PropType<FilterRule[]>, default: () => [] },
+    columnDraggable: { type: Boolean, default: false },
+    summaryRow: { type: Object as PropType<{ show: boolean; data: Record<string, unknown> }> },
+    groupBy: { type: String },
+    exportable: { type: Boolean, default: false },
+    exportFilename: { type: String, default: 'export' }
   },
   emits: [
     'change',
@@ -312,7 +350,10 @@ export const Table = defineComponent({
     'sort-change',
     'filter-change',
     'page-change',
-    'expand-change'
+    'expand-change',
+    'cell-change',
+    'column-order-change',
+    'export'
   ],
   setup(props, { emit, slots }) {
     const paginationConfig = computed(() => {
@@ -454,8 +495,12 @@ export const Table = defineComponent({
     const processedData = computed(() => {
       let data = props.dataSource
 
-      // Apply filters
-      data = filterData(data, filterState.value)
+      // Apply filters (basic or advanced)
+      if (props.filterMode === 'advanced' && props.advancedFilterRules.length > 0) {
+        data = filterDataAdvanced(data, props.advancedFilterRules)
+      } else {
+        data = filterData(data, filterState.value)
+      }
 
       // Apply sorting
       if (sortState.value.key && sortState.value.direction) {
@@ -673,6 +718,107 @@ export const Table = defineComponent({
       return selectedRowKeys.value.length > 0 && !allSelected.value
     })
 
+    // --- v0.6.0: editable cell state ---
+    const editingCell = ref<{ rowIndex: number; columnKey: string } | null>(null)
+    const editingValue = ref<string>('')
+
+    function isCellEditable(columnKey: string, rowIndex: number): boolean {
+      if (!props.editable) return false
+      if (!props.editableCells) return true
+      return !!props.editableCells.get(columnKey)?.has(rowIndex)
+    }
+
+    function startEditing(rowIndex: number, columnKey: string, currentValue: unknown) {
+      editingCell.value = { rowIndex, columnKey }
+      editingValue.value = String(currentValue ?? '')
+    }
+
+    function commitEdit() {
+      if (editingCell.value) {
+        emit(
+          'cell-change',
+          editingCell.value.rowIndex,
+          editingCell.value.columnKey,
+          editingValue.value
+        )
+        editingCell.value = null
+      }
+    }
+
+    function cancelEdit() {
+      editingCell.value = null
+    }
+
+    // --- v0.6.0: export ---
+    function handleExport() {
+      const csv = exportTableToCsv(displayColumns.value, processedData.value)
+      downloadCsv(csv, props.exportFilename)
+      emit('export', csv)
+    }
+
+    // --- v0.6.0: column drag ---
+    const dragColumnKey = ref<string | null>(null)
+
+    function handleDragStart(columnKey: string) {
+      dragColumnKey.value = columnKey
+    }
+
+    function handleDrop(targetKey: string) {
+      if (!dragColumnKey.value || dragColumnKey.value === targetKey) return
+      const cols = [...displayColumns.value]
+      const fromIdx = cols.findIndex((c) => c.key === dragColumnKey.value)
+      const toIdx = cols.findIndex((c) => c.key === targetKey)
+      if (fromIdx >= 0 && toIdx >= 0) {
+        const [moved] = cols.splice(fromIdx, 1)
+        cols.splice(toIdx, 0, moved)
+        emit('column-order-change', cols)
+      }
+      dragColumnKey.value = null
+    }
+
+    // --- v0.6.0: virtual scroll ---
+    const virtualScrollTop = ref(0)
+    const virtualRange = computed(() => {
+      if (!props.virtual) return null
+      return getFixedVirtualRange(
+        virtualScrollTop.value,
+        props.virtualHeight,
+        props.virtualItemHeight,
+        paginatedData.value.length,
+        5
+      )
+    })
+
+    // --- v0.6.0: grouping ---
+    const groupedData = computed(() => {
+      if (!props.groupBy) return null
+      return groupDataByColumn(paginatedData.value, props.groupBy)
+    })
+
+    function renderSummaryRow() {
+      if (!props.summaryRow?.show) return null
+      const emptyCells = []
+      if (props.rowSelection) {
+        emptyCells.push(h('td', { class: getTableCellClasses(props.size, 'left') }))
+      }
+      if (props.expandable) {
+        emptyCells.push(h('td', { class: getTableCellClasses(props.size, 'left') }))
+      }
+      const dataCells = displayColumns.value.map((col) => {
+        const dataKey = col.dataKey || col.key
+        const val = props.summaryRow!.data[dataKey]
+        return h(
+          'td',
+          {
+            key: col.key,
+            class: getTableCellClasses(props.size, col.align || 'left', col.className)
+          },
+          val != null ? String(val) : ''
+        )
+      })
+      return h('tfoot', [h('tr', { class: tableSummaryRowClasses }, [...emptyCells, ...dataCells])])
+    }
+
     function renderTableHeader() {
       const headerCells = []
       const expandAtStart = props.expandable && props.expandable.expandIconPosition !== 'end'
@@ -809,6 +955,10 @@ export const Table = defineComponent({
                 (isFixedLeft || isFixedRight) && 'bg-[var(--tiger-surface-muted,#f9fafb)]'
               ),
               style,
+              draggable: props.columnDraggable ? 'true' : undefined,
+              onDragstart: props.columnDraggable ? () => handleDragStart(column.key) : undefined,
+              onDragover: props.columnDraggable ? (e: DragEvent) => e.preventDefault() : undefined,
+              onDrop: props.columnDraggable ? () => handleDrop(column.key) : undefined,
               onClick: column.sortable ? () => handleSort(column.key) : undefined
             },
             [
@@ -888,8 +1038,9 @@ export const Table = defineComponent({
         ])
       }
 
-      const rows = paginatedData.value.flatMap((record, index) => {
-        const key = paginatedRowKeys.value[index]
+      // Render a single data row with all features (selection, expand, editable, fixed columns)
+      function renderDataRow(record: Record<string, unknown>, index: number) {
+        const key = getRowKey(record, props.rowKey, index)
         const isSelected = selectedRowKeySet.value.has(key)
         const isExpanded = expandedRowKeySet.value.has(key)
         const isRowExpandable = props.expandable
@@ -1006,6 +1157,28 @@ export const Table = defineComponent({
                 )
               : undefined
 
+          const isEditing =
+            editingCell.value?.rowIndex === index && editingCell.value?.columnKey === column.key
+          const isEditableCell = isCellEditable(column.key, index)
+
+          const cellContent = isEditing
+            ? h('input', {
+                type: 'text',
+                class: editableCellInputClasses,
+                value: editingValue.value,
+                autofocus: true,
+                onInput: (e: Event) => {
+                  editingValue.value = (e.target as HTMLInputElement).value
+                },
+                onBlur: () => commitEdit(),
+                onKeydown: (e: KeyboardEvent) => {
+                  if (e.key === 'Enter') commitEdit()
+                  if (e.key === 'Escape') cancelEdit()
+                }
+              })
+            : (slots[`cell-${column.key}`]?.({ record, index }) ??
+              (column.render ? (column.render(record, index) as string) : (cellValue as string)))
+
           cells.push(
             h(
               'td',
@@ -1013,14 +1186,16 @@ export const Table = defineComponent({
                 key: column.key,
                 class: classNames(
                   getTableCellClasses(props.size, column.align || 'left', column.className),
-                  stickyCellClass
+                  stickyCellClass,
+                  isEditableCell && !isEditing && getEditableCellClasses(false)
                 ),
-                style
+                style,
+                onDblclick:
+                  isEditableCell && !isEditing
+                    ? () => startEditing(index, column.key, cellValue)
+                    : undefined
               },
-              [
-                slots[`cell-${column.key}`]?.({ record, index }) ??
-                  (column.render ? (column.render(record, index) as string) : (cellValue as string))
-              ]
+              [cellContent]
             )
           )
         })
@@ -1073,7 +1248,38 @@ export const Table = defineComponent({
         }
 
         return rowNode
-      })
+      }
+
+      // Grouping support
+      if (groupedData.value) {
+        const groupRows: VNodeChild[] = []
+        for (const [groupKey, groupItems] of groupedData.value) {
+          groupRows.push(
+            h('tr', { key: `group-${groupKey}`, class: tableGroupHeaderClasses }, [
+              h(
+                'td',
+                {
+                  colspan: totalColumnCount.value,
+                  class: getGroupHeaderCellClasses(props.size)
+                },
+                `${props.groupBy}: ${groupKey} (${groupItems.length})`
+              )
+            ])
+          )
+          groupItems.forEach((record, i) => {
+            const globalIndex = paginatedData.value.indexOf(record)
+            const result = renderDataRow(record, globalIndex >= 0 ? globalIndex : i)
+            if (Array.isArray(result)) {
+              groupRows.push(...result)
+            } else {
+              groupRows.push(result)
+            }
+          })
+        }
+        return h('tbody', groupRows)
+      }
+
+      const rows = paginatedData.value.flatMap((record, index) => renderDataRow(record, index))
 
       return h('tbody', rows)
     }
@@ -1158,15 +1364,36 @@ export const Table = defineComponent({
           }
         : undefined
 
-      return h(
-        'div',
-        {
-          class: getTableWrapperClasses(props.bordered, props.maxHeight),
-          style: wrapperStyle,
-          'aria-busy': props.loading
-        },
-        [
-          h(
+      const tableChildren = [renderTableHeader(), renderTableBody(), renderSummaryRow()]
+
+      // Virtual scroll wrapper
+      const tableContent = props.virtual
+        ? h(
+            'div',
+            {
+              style: { height: `${props.virtualHeight}px`, overflow: 'auto' },
+              onScroll: (e: Event) => {
+                virtualScrollTop.value = (e.target as HTMLElement).scrollTop
+              }
+            },
+            [
+              h(
+                'table',
+                {
+                  class: classNames(
+                    tableBaseClasses,
+                    props.tableLayout === 'fixed' ? 'table-fixed' : 'table-auto'
+                  ),
+                  style:
+                    fixedColumnsInfo.value.hasFixedColumns && fixedColumnsInfo.value.minTableWidth
+                      ? { minWidth: `${fixedColumnsInfo.value.minTableWidth}px` }
+                      : undefined
+                },
+                tableChildren
+              )
+            ]
+          )
+        : h(
             'table',
             {
               class: classNames(
@@ -1178,8 +1405,33 @@ export const Table = defineComponent({
                   ? { minWidth: `${fixedColumnsInfo.value.minTableWidth}px` }
                   : undefined
             },
-            [renderTableHeader(), renderTableBody()]
-          ),
+            tableChildren
+          )
+
+      return h(
+        'div',
+        {
+          class: getTableWrapperClasses(props.bordered, props.maxHeight),
+          style: wrapperStyle,
+          'aria-busy': props.loading
+        },
+        [
+          // Export button
+          props.exportable &&
+            h('div', { class: 'flex justify-end p-2' }, [
+              h(
+                'button',
+                {
+                  type: 'button',
+                  class: tableExportButtonClasses,
+                  onClick: handleExport,
+                  'aria-label': 'Export to CSV'
+                },
+                'Export CSV'
+              )
+            ]),
+
+          tableContent,
 
           // Loading overlay
           props.loading &&

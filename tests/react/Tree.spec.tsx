@@ -548,4 +548,31 @@ describe('Tree', () => {
       await expectNoA11yViolations(container)
     })
   })
+
+  // v0.6.0 — searchable
+  describe('Searchable (v0.6.0)', () => {
+    it('renders search input when searchable is true', () => {
+      const { container } = render(<Tree treeData={sampleTreeData} searchable />)
+      const input = container.querySelector('input[type="text"]')
+      expect(input).toBeTruthy()
+    })
+
+    it('does not render search input by default', () => {
+      const { container } = render(<Tree treeData={sampleTreeData} />)
+      const input = container.querySelector('input[type="text"]')
+      expect(input).toBeFalsy()
+    })
+
+    it('filters when typing in search input', async () => {
+      const user = userEvent.setup()
+      const { container } = render(<Tree treeData={sampleTreeData} searchable defaultExpandAll />)
+      const input = container.querySelector('input[type="text"]') as HTMLInputElement
+
+      await user.type(input, 'Child 1-1')
+
+      await waitFor(() => {
+        expect(input.value).toBe('Child 1-1')
+      })
+    })
+  })
 })

@@ -72,6 +72,18 @@ export type { ReactFooterProps as FooterProps } from './components/Footer'
 export { Select } from './components/Select'
 export type { SelectProps } from './components/Select'
 
+export { Cascader } from './components/Cascader'
+export type { CascaderProps } from './components/Cascader'
+
+export { AutoComplete } from './components/AutoComplete'
+export type { AutoCompleteProps } from './components/AutoComplete'
+
+export { Transfer } from './components/Transfer'
+export type { TransferProps } from './components/Transfer'
+
+export { TreeSelect } from './components/TreeSelect'
+export type { TreeSelectProps } from './components/TreeSelect'
+
 export { DatePicker } from './components/DatePicker'
 export type { DatePickerProps } from './components/DatePicker'
 
@@ -241,6 +253,26 @@ export { AnchorLink } from './components/AnchorLink'
 export type { AnchorLinkProps } from './components/AnchorLink'
 export { TaskBoard } from './components/TaskBoard'
 export type { TaskBoardProps } from './components/TaskBoard'
+
+// Phase 1B/1C components (v0.6.0+)
+export { Rate } from './components/Rate'
+export type { RateProps } from './components/Rate'
+export { Segmented } from './components/Segmented'
+export type { SegmentedProps } from './components/Segmented'
+export { Statistic } from './components/Statistic'
+export type { StatisticProps } from './components/Statistic'
+export { ColorPicker } from './components/ColorPicker'
+export type { ColorPickerProps } from './components/ColorPicker'
+export { VirtualList } from './components/VirtualList'
+export type { VirtualListProps } from './components/VirtualList'
+export { Stepper } from './components/Stepper'
+export type { StepperProps } from './components/Stepper'
+export { Calendar } from './components/Calendar'
+export type { CalendarProps } from './components/Calendar'
+export { Mentions } from './components/Mentions'
+export type { MentionsProps } from './components/Mentions'
+export { QRCode } from './components/QRCode'
+export type { QRCodeProps } from './components/QRCode'
 
 // Hooks
 export { useChartInteraction } from './hooks/useChartInteraction'

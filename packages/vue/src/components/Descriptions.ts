@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, ref, onMounted, onUnmounted, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -14,9 +14,11 @@ import {
   descriptionsTitleClasses,
   descriptionsExtraClasses,
   descriptionsVerticalWrapperClasses,
+  resolveResponsiveValue,
   type DescriptionsSize,
   type DescriptionsLayout,
-  type DescriptionsItem
+  type DescriptionsItem,
+  type ResponsiveBreakpoint
 } from '@expcat/tigercat-core'
 
 type HChildren = Parameters<typeof h>[2]
@@ -25,7 +27,7 @@ export interface VueDescriptionsProps {
   title?: string | number
   extra?: unknown
   bordered?: boolean
-  column?: number
+  column?: number | Partial<Record<ResponsiveBreakpoint, number>>
   size?: DescriptionsSize
   layout?: DescriptionsLayout
   colon?: boolean
@@ -63,13 +65,12 @@ export const Descriptions = defineComponent({
       default: false
     },
     /**
-     * Number of columns per row
+     * Number of columns per row (number or responsive object)
      * @default 3
      */
     column: {
-      type: Number,
-      default: 3,
-      validator: (value: number) => value > 0
+      type: [Number, Object] as PropType<number | Partial<Record<ResponsiveBreakpoint, number>>>,
+      default: 3
     },
     /**
      * Descriptions size
@@ -126,6 +127,25 @@ export const Descriptions = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
+    // Track window width for responsive column
+    const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
+    let onResize: (() => void) | undefined
+    if (typeof window !== 'undefined' && typeof props.column === 'object') {
+      onResize = () => {
+        windowWidth.value = window.innerWidth
+      }
+    }
+    onMounted(() => {
+      if (onResize) window.addEventListener('resize', onResize)
+    })
+    onUnmounted(() => {
+      if (onResize) window.removeEventListener('resize', onResize)
+    })
+
+    const effectiveColumn = computed(() => {
+      return resolveResponsiveValue(props.column, windowWidth.value, 3)
+    })
+
     const descriptionsClasses = computed(() => {
       return getDescriptionsClasses(props.size)
     })
@@ -161,7 +181,7 @@ export const Descriptions = defineComponent({
         return null
       }
 
-      const rows = groupItemsIntoRows(items, props.column)
+      const rows = groupItemsIntoRows(items, effectiveColumn.value)
 
       return h('table', { class: tableClasses.value }, [
         h(
@@ -177,7 +197,7 @@ export const Descriptions = defineComponent({
       const cells: ReturnType<typeof h>[] = []
 
       rowItems.forEach((item) => {
-        const span = Math.min(item.span || 1, props.column)
+        const span = Math.min(item.span || 1, effectiveColumn.value)
         const labelClass = classNames(
           getDescriptionsLabelClasses(props.bordered, props.size, props.layout),
           item.labelClassName

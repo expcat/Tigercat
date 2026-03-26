@@ -15,7 +15,7 @@ import { useTigerConfig } from './ConfigProvider'
 export interface FormWizardProps
   extends
     Omit<CoreFormWizardProps, 'style'>,
-    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children' | 'style'> {
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange' | 'children' | 'style' | 'autoSave'> {
   renderStep?: (step: WizardStep, index: number) => React.ReactNode
   style?: React.CSSProperties
 }
@@ -35,6 +35,7 @@ export const FormWizard: React.FC<FormWizardProps> = ({
   finishText,
   locale,
   beforeNext,
+  autoSave,
   onChange,
   onFinish,
   renderStep,
@@ -74,8 +75,11 @@ export const FormWizard: React.FC<FormWizardProps> = ({
         setInnerCurrent(clamped)
       }
       onChange?.(clamped, currentIndex)
+      if (autoSave && steps[clamped]) {
+        autoSave(clamped, steps[clamped])
+      }
     },
-    [current, currentIndex, onChange, totalCount]
+    [current, currentIndex, onChange, totalCount, autoSave, steps]
   )
 
   const runBeforeNext = useCallback(async (): Promise<boolean> => {
@@ -87,10 +91,26 @@ export const FormWizard: React.FC<FormWizardProps> = ({
     return result === true
   }, [beforeNext, currentIndex, currentStep, steps])
 
+  const findNextUnskipped = useCallback(
+    (from: number, dir: 1 | -1): number => {
+      let idx = from
+      while (idx >= 0 && idx < totalCount) {
+        const step = steps[idx]
+        if (!step?.disabled && !step?.skipCondition?.()) return idx
+        idx += dir
+      }
+      // No valid step found — return current index to signal "no move"
+      return currentIndex
+    },
+    [steps, totalCount, currentIndex]
+  )
+
   const handlePrev = useCallback(() => {
-    if (currentIndex <= 0 || steps[currentIndex - 1]?.disabled) return
-    setCurrent(currentIndex - 1)
-  }, [currentIndex, setCurrent, steps])
+    if (currentIndex <= 0) return
+    const target = findNextUnskipped(currentIndex - 1, -1)
+    if (target === currentIndex) return
+    setCurrent(target)
+  }, [currentIndex, setCurrent, findNextUnskipped])
 
   const handleNext = useCallback(async () => {
     if (totalCount === 0) return
@@ -100,9 +120,19 @@ export const FormWizard: React.FC<FormWizardProps> = ({
       onFinish?.(currentIndex, steps)
       return
     }
-    if (steps[currentIndex + 1]?.disabled) return
-    setCurrent(currentIndex + 1)
-  }, [currentIndex, totalCount, isLast, onFinish, runBeforeNext, setCurrent, steps])
+    const target = findNextUnskipped(currentIndex + 1, 1)
+    if (target === currentIndex) return
+    setCurrent(target)
+  }, [
+    currentIndex,
+    totalCount,
+    isLast,
+    onFinish,
+    runBeforeNext,
+    setCurrent,
+    steps,
+    findNextUnskipped
+  ])
 
   const handleStepChange = useCallback(
     async (nextIndex: number) => {

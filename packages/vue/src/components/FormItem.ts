@@ -16,6 +16,7 @@ import {
   classNames,
   type FormRule,
   type FormSize,
+  type FormErrorDisplayMode,
   getFieldError,
   getFormItemClasses,
   getFormItemLabelClasses,
@@ -95,6 +96,14 @@ export const FormItem = defineComponent({
      */
     size: {
       type: String as PropType<FormSize>
+    },
+    /**
+     * Error display mode
+     * @default 'inline'
+     */
+    errorDisplayMode: {
+      type: String as PropType<FormErrorDisplayMode>,
+      default: 'inline' as FormErrorDisplayMode
     }
   },
   setup(props, { slots }) {
@@ -357,7 +366,7 @@ export const FormItem = defineComponent({
       const contentElement = h(
         'div',
         {
-          class: contentClasses.value
+          class: classNames(contentClasses.value, props.errorDisplayMode === 'popup' && 'relative')
         },
         [
           h(
@@ -380,7 +389,18 @@ export const FormItem = defineComponent({
               {
                 id: hasError.value ? errorId : undefined,
                 role: hasError.value ? 'alert' : undefined,
-                class: errorClasses.value,
+                class:
+                  props.errorDisplayMode === 'block'
+                    ? classNames(
+                        'mt-1 p-2 rounded bg-red-50 border border-red-200 text-red-600 text-sm',
+                        !hasError.value && 'hidden'
+                      )
+                    : props.errorDisplayMode === 'popup'
+                      ? classNames(
+                          'absolute z-10 mt-1 px-2 py-1 rounded bg-red-600 text-white text-xs shadow-lg',
+                          !hasError.value && 'hidden'
+                        )
+                      : errorClasses.value,
                 'aria-hidden': hasError.value ? undefined : 'true'
               },
               hasError.value ? errorMessage.value : ''

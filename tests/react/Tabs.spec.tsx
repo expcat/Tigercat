@@ -639,4 +639,47 @@ describe('Tabs', () => {
       expect(active.className).toContain('bg-[var(--tiger-primary')
     })
   })
+
+  // v0.6.0 — lazy rendering
+  describe('Lazy rendering (v0.6.0)', () => {
+    it('does not render inactive tab pane content when lazy is true', () => {
+      render(
+        <Tabs defaultActiveKey="1" lazy>
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+          <TabPane tabKey="2" label="Tab 2">
+            Content 2
+          </TabPane>
+        </Tabs>
+      )
+
+      expect(screen.getByText('Content 1')).toBeTruthy()
+      expect(screen.queryByText('Content 2')).toBeFalsy()
+    })
+
+    it('renders tab pane content after activation and keeps it mounted', async () => {
+      render(
+        <Tabs defaultActiveKey="1" lazy>
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+          <TabPane tabKey="2" label="Tab 2">
+            Content 2
+          </TabPane>
+        </Tabs>
+      )
+
+      expect(screen.queryByText('Content 2')).toBeFalsy()
+
+      await fireEvent.click(screen.getByRole('tab', { name: 'Tab 2' }))
+
+      expect(screen.getByText('Content 2')).toBeTruthy()
+
+      await fireEvent.click(screen.getByRole('tab', { name: 'Tab 1' }))
+
+      // Tab 2 content still mounted
+      expect(screen.getByText('Content 2')).toBeTruthy()
+    })
+  })
 })

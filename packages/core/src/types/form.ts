@@ -200,7 +200,38 @@ export interface FormProps {
    * @default false
    */
   loading?: boolean
+
+  // --- v0.6.0 ---
+
+  /**
+   * Enable dynamic field management (addField/removeField)
+   * @default false
+   */
+  dynamicFields?: boolean
+
+  /**
+   * Field dependency map: key is the dependent field, value is array of fields it depends on
+   * When a dependency changes, the dependent field is re-validated
+   */
+  fieldDependencies?: Map<string, string[]>
+
+  /**
+   * Enable undo/redo for form values
+   * @default false
+   */
+  undoable?: boolean
+
+  /**
+   * Maximum undo history size
+   * @default 50
+   */
+  maxHistorySize?: number
 }
+
+/**
+ * Error display mode for form items
+ */
+export type FormErrorDisplayMode = 'inline' | 'popup' | 'block'
 
 /**
  * Base form item props interface
@@ -246,4 +277,13 @@ export interface FormItemProps {
    * Size (overrides form's size)
    */
   size?: FormSize
+
+  /**
+   * Error display mode
+   * - 'inline': shows error below the field (default)
+   * - 'popup': shows error in a tooltip/popup on hover
+   * - 'block': shows error in a block-level alert
+   * @default 'inline'
+   */
+  errorDisplayMode?: FormErrorDisplayMode
 }

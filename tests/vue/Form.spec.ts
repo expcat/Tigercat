@@ -1911,4 +1911,176 @@ describe('Form', () => {
       expect(model.email).toBeUndefined()
     })
   })
+
+  // ==================== v0.6.0 Features ====================
+  describe('v0.6.0 Features', () => {
+    describe('Field Dependencies', () => {
+      it('revalidates dependent fields when source field validates', async () => {
+        const model = reactive<Record<string, unknown>>({
+          password: 'abc',
+          confirmPassword: 'xyz'
+        })
+        const deps = new Map([['confirmPassword', ['password']]])
+        const rules: FormRules = {
+          confirmPassword: {
+            validator: (value: unknown) => {
+              if (value !== model.password) return 'Passwords must match'
+              return true
+            }
+          }
+        }
+        let formRef: { validateField: (name: string) => Promise<void> } | null = null
+
+        const Demo = defineComponent({
+          setup() {
+            return () =>
+              h(
+                Form,
+                {
+                  model,
+                  rules,
+                  fieldDependencies: deps,
+                  ref: (el: unknown) => {
+                    formRef = el as typeof formRef
+                  }
+                },
+                () => [
+                  h(FormItem, { name: 'password', label: 'Password' }, () => h('input')),
+                  h(FormItem, { name: 'confirmPassword', label: 'Confirm' }, () => h('input'))
+                ]
+              )
+          }
+        })
+
+        render(Demo)
+        await formRef!.validateField('password')
+        await nextTick()
+        await nextTick()
+        // confirmPassword should have been revalidated due to dependency
+        await waitFor(() => {
+          expect(screen.getByText('Passwords must match')).toBeInTheDocument()
+        })
+      })
+    })
+
+    describe('Undo / Redo', () => {
+      it('exposes undo/redo methods when undoable is true', async () => {
+        const model = reactive<Record<string, unknown>>({ name: 'Alice' })
+        let formRef: {
+          snapshotHistory: () => void
+          undo: () => void
+          redo: () => void
+          canUndo: boolean
+          canRedo: boolean
+        } | null = null
+
+        const Demo = defineComponent({
+          setup() {
+            return () =>
+              h(
+                Form,
+                {
+                  model,
+                  undoable: true,
+                  ref: (el: unknown) => {
+                    formRef = el as typeof formRef
+                  }
+                },
+                () => null
+              )
+          }
+        })
+
+        render(Demo)
+        expect(formRef!.canUndo).toBe(false)
+
+        // Snapshot, change, snapshot
+        formRef!.snapshotHistory()
+        model.name = 'Bob'
+        formRef!.snapshotHistory()
+
+        expect(formRef!.canUndo).toBe(true)
+        formRef!.undo()
+        expect(formRef!.canRedo).toBe(true)
+      })
+    })
+
+    describe('errorDisplayMode', () => {
+      it('renders error in block mode with block-level classes', async () => {
+        const model = reactive({ email: '' })
+        const rules: FormRules = { email: { required: true, message: 'Required' } }
+        let formRef: { validate: () => Promise<boolean> } | null = null
+
+        const Demo = defineComponent({
+          setup() {
+            return () =>
+              h(
+                Form,
+                {
+                  model,
+                  rules,
+                  ref: (el: unknown) => {
+                    formRef = el as typeof formRef
+                  }
+                },
+                () => [
+                  h(FormItem, { name: 'email', label: 'Email', errorDisplayMode: 'block' }, () =>
+                    h('input')
+                  )
+                ]
+              )
+          }
+        })
+
+        render(Demo)
+        try {
+          await formRef!.validate()
+        } catch {
+          // expected
+        }
+        await nextTick()
+        const errorEl = screen.getByRole('alert')
+        expect(errorEl.className).toContain('bg-red-50')
+        expect(errorEl.className).toContain('border-red-200')
+      })
+
+      it('renders error in popup mode with absolute positioning', async () => {
+        const model = reactive({ email: '' })
+        const rules: FormRules = { email: { required: true, message: 'Required' } }
+        let formRef: { validate: () => Promise<boolean> } | null = null
+
+        const Demo = defineComponent({
+          setup() {
+            return () =>
+              h(
+                Form,
+                {
+                  model,
+                  rules,
+                  ref: (el: unknown) => {
+                    formRef = el as typeof formRef
+                  }
+                },
+                () => [
+                  h(FormItem, { name: 'email', label: 'Email', errorDisplayMode: 'popup' }, () =>
+                    h('input')
+                  )
+                ]
+              )
+          }
+        })
+
+        render(Demo)
+        try {
+          await formRef!.validate()
+        } catch {
+          // expected
+        }
+        await nextTick()
+        const errorEl = screen.getByRole('alert')
+        expect(errorEl.className).toContain('absolute')
+        expect(errorEl.className).toContain('bg-red-600')
+      })
+    })
+  })
 })

@@ -869,4 +869,163 @@ describe('Table', () => {
       expect(headerCells[1].textContent).toContain('Name')
     })
   })
+
+  // --- v0.6.0 Table upgrade tests ---
+
+  describe('v0.6.0 - Advanced Filtering', () => {
+    it('should filter data with advanced rules', async () => {
+      const { queryByText } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        filterMode: 'advanced',
+        advancedFilterRules: [{ column: 'name', operator: 'equals', value: 'John Doe' }],
+        pagination: false
+      })
+
+      expect(queryByText('John Doe')).toBeInTheDocument()
+      expect(queryByText('Jane Smith')).not.toBeInTheDocument()
+      expect(queryByText('Bob Johnson')).not.toBeInTheDocument()
+    })
+
+    it('should show all when filterMode is basic', () => {
+      const { getByText } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        filterMode: 'basic',
+        pagination: false
+      })
+
+      expect(getByText('John Doe')).toBeInTheDocument()
+      expect(getByText('Jane Smith')).toBeInTheDocument()
+    })
+  })
+
+  describe('v0.6.0 - Editable Cells', () => {
+    it('should enter edit mode on double-click', async () => {
+      const { container, getByText } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        editable: true,
+        pagination: false
+      })
+
+      const cell = getByText('John Doe')
+      await fireEvent.dblClick(cell.closest('td')!)
+      await nextTick()
+
+      const input = container.querySelector('input')
+      expect(input).toBeInTheDocument()
+      expect((input as HTMLInputElement).value).toBe('John Doe')
+    })
+  })
+
+  describe('v0.6.0 - Summary Row', () => {
+    it('should render summary row when summaryRow.show is true', () => {
+      const { container } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        summaryRow: { show: true, data: { name: 'Total', age: '105', email: '-' } },
+        pagination: false
+      })
+
+      const tfoot = container.querySelector('tfoot')
+      expect(tfoot).toBeInTheDocument()
+      expect(tfoot!.textContent).toContain('Total')
+    })
+
+    it('should not render summary row when summaryRow.show is false', () => {
+      const { container } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        summaryRow: { show: false, data: { name: 'Total' } },
+        pagination: false
+      })
+
+      expect(container.querySelector('tfoot')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('v0.6.0 - Row Grouping', () => {
+    const groupData = [
+      { id: 1, name: 'Alice', age: 25, email: 'a@test.com', dept: 'Engineering' },
+      { id: 2, name: 'Bob', age: 30, email: 'b@test.com', dept: 'Design' },
+      { id: 3, name: 'Charlie', age: 35, email: 'c@test.com', dept: 'Engineering' }
+    ]
+
+    const groupColumns = [
+      { key: 'name', title: 'Name' },
+      { key: 'dept', title: 'Dept' }
+    ]
+
+    it('should render group headers when groupBy is set', () => {
+      const { container } = renderWithProps(Table, {
+        columns: groupColumns,
+        dataSource: groupData,
+        groupBy: 'dept',
+        pagination: false
+      })
+
+      const tbody = container.querySelector('tbody')
+      expect(tbody).toBeInTheDocument()
+      expect(tbody!.textContent).toContain('Engineering')
+      expect(tbody!.textContent).toContain('Design')
+    })
+  })
+
+  describe('v0.6.0 - Export', () => {
+    it('should render export button when exportable is true', () => {
+      const { getByText } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        exportable: true,
+        pagination: false
+      })
+
+      expect(getByText('Export CSV')).toBeInTheDocument()
+    })
+
+    it('should not render export button when exportable is false', () => {
+      const { queryByText } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        exportable: false,
+        pagination: false
+      })
+
+      expect(queryByText('Export CSV')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('v0.6.0 - Column Draggable', () => {
+    it('should set draggable attribute on headers when columnDraggable is true', () => {
+      const { container } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        columnDraggable: true,
+        pagination: false
+      })
+
+      const headers = container.querySelectorAll('thead th')
+      headers.forEach((th) => {
+        expect(th.getAttribute('draggable')).toBe('true')
+      })
+    })
+  })
+
+  describe('v0.6.0 - Virtual Scroll', () => {
+    it('should apply virtual height style when virtual is true', () => {
+      const { container } = renderWithProps(Table, {
+        columns,
+        dataSource,
+        virtual: true,
+        virtualHeight: 300,
+        pagination: false
+      })
+
+      const virtualWrapper = container.querySelector('div[style*="height"]') as HTMLElement
+      expect(virtualWrapper).toBeInTheDocument()
+      expect(virtualWrapper.style.height).toBe('300px')
+      expect(virtualWrapper.style.overflow).toBe('auto')
+    })
+  })
 })

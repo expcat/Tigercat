@@ -677,4 +677,49 @@ describe('Tabs', () => {
       expect(active.className).toContain('bg-[var(--tiger-primary')
     })
   })
+
+  // v0.6.0 — lazy rendering
+  describe('Lazy rendering (v0.6.0)', () => {
+    it('does not render inactive tab pane content when lazy is true', () => {
+      render(Tabs, {
+        props: { defaultActiveKey: '1', lazy: true },
+        slots: {
+          default: () => [
+            h(TabPane, { tabKey: '1', label: 'Tab 1' }, () => 'Content 1'),
+            h(TabPane, { tabKey: '2', label: 'Tab 2' }, () => 'Content 2')
+          ]
+        }
+      })
+
+      expect(screen.getByText('Content 1')).toBeTruthy()
+      expect(screen.queryByText('Content 2')).toBeFalsy()
+    })
+
+    it('renders tab pane content after activation and keeps it mounted', async () => {
+      render(Tabs, {
+        props: { defaultActiveKey: '1', lazy: true },
+        slots: {
+          default: () => [
+            h(TabPane, { tabKey: '1', label: 'Tab 1' }, () => 'Content 1'),
+            h(TabPane, { tabKey: '2', label: 'Tab 2' }, () => 'Content 2')
+          ]
+        }
+      })
+
+      // Tab 2 content not yet rendered
+      expect(screen.queryByText('Content 2')).toBeFalsy()
+
+      // Click Tab 2
+      await fireEvent.click(screen.getByRole('tab', { name: 'Tab 2' }))
+
+      // Tab 2 content now rendered
+      expect(screen.getByText('Content 2')).toBeTruthy()
+
+      // Click Tab 1 again
+      await fireEvent.click(screen.getByRole('tab', { name: 'Tab 1' }))
+
+      // Tab 2 content still mounted (lazy keeps it)
+      expect(screen.getByText('Content 2')).toBeTruthy()
+    })
+  })
 })

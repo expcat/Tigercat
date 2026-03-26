@@ -157,6 +157,12 @@ export interface TreeProps {
    */
   filterValue?: string
   /**
+   * Whether to show built-in search input
+   * @default false
+   * @since 0.6.0
+   */
+  searchable?: boolean
+  /**
    * Custom filter function
    */
   filterFn?: TreeFilterFn

@@ -12,3 +12,4 @@ export {
   type TimePickerOptionUnit
 } from '../timepicker-utils'
 export * from '../upload-labels'
+export * from './locales'

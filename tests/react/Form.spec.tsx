@@ -1301,4 +1301,79 @@ describe('Form', () => {
       )
     })
   })
+
+  // ==================== v0.6.0 Features ====================
+  describe('v0.6.0 Features', () => {
+    describe('Undo / Redo', () => {
+      it('exposes undo/redo/snapshotHistory via ref when undoable', async () => {
+        const formRef = React.createRef<FormHandle>()
+        const onChange = vi.fn()
+
+        render(
+          <Form ref={formRef} model={{ name: 'Alice' }} undoable onChange={onChange}>
+            content
+          </Form>
+        )
+
+        expect(formRef.current?.canUndo).toBe(false)
+        expect(formRef.current?.canRedo).toBe(false)
+
+        await act(async () => {
+          formRef.current?.snapshotHistory()
+        })
+      })
+    })
+
+    describe('errorDisplayMode', () => {
+      it('renders error in block mode', async () => {
+        const formRef = React.createRef<FormHandle>()
+        const rules: FormRules = { email: { required: true, message: 'Required' } }
+
+        render(
+          <Form ref={formRef} model={{ email: '' }} rules={rules}>
+            <FormItem name="email" label="Email" errorDisplayMode="block">
+              <input />
+            </FormItem>
+          </Form>
+        )
+
+        await act(async () => {
+          try {
+            await formRef.current?.validate()
+          } catch {
+            // expected
+          }
+        })
+
+        const errorEl = screen.getByRole('alert')
+        expect(errorEl.className).toContain('bg-red-50')
+        expect(errorEl.className).toContain('border-red-200')
+      })
+
+      it('renders error in popup mode with absolute positioning', async () => {
+        const formRef = React.createRef<FormHandle>()
+        const rules: FormRules = { email: { required: true, message: 'Required' } }
+
+        render(
+          <Form ref={formRef} model={{ email: '' }} rules={rules}>
+            <FormItem name="email" label="Email" errorDisplayMode="popup">
+              <input />
+            </FormItem>
+          </Form>
+        )
+
+        await act(async () => {
+          try {
+            await formRef.current?.validate()
+          } catch {
+            // expected
+          }
+        })
+
+        const errorEl = screen.getByRole('alert')
+        expect(errorEl.className).toContain('absolute')
+        expect(errorEl.className).toContain('bg-red-600')
+      })
+    })
+  })
 })

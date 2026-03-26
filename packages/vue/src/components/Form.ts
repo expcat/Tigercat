@@ -1,4 +1,13 @@
-import { defineComponent, provide, reactive, computed, h, PropType, type ComputedRef } from 'vue'
+import {
+  defineComponent,
+  provide,
+  reactive,
+  computed,
+  h,
+  ref,
+  PropType,
+  type ComputedRef
+} from 'vue'
 import {
   classNames,
   type FormRules,
@@ -11,7 +20,15 @@ import {
   type FormRuleTrigger,
   validateForm,
   validateField as validateFieldUtil,
-  getValueByPath
+  getValueByPath,
+  getDependentFields,
+  createFormHistory,
+  pushFormHistory,
+  undoFormHistory,
+  redoFormHistory,
+  canUndo,
+  canRedo,
+  type FormHistoryState
 } from '@expcat/tigercat-core'
 
 // Form context key
@@ -117,6 +134,19 @@ export const Form = defineComponent({
     loading: {
       type: Boolean,
       default: false
+    },
+    // v0.6.0 props
+    fieldDependencies: {
+      type: Object as PropType<Map<string, string[]>>,
+      default: undefined
+    },
+    undoable: {
+      type: Boolean,
+      default: false
+    },
+    maxHistorySize: {
+      type: Number,
+      default: 50
     }
   },
   emits: {
@@ -133,6 +163,11 @@ export const Form = defineComponent({
   setup(props, { slots, emit, expose }) {
     const errors = reactive<FormError[]>([])
     const fieldRules = reactive<Record<string, FormRule | FormRule[]>>({})
+
+    // v0.6.0: undo/redo history
+    const history = ref<FormHistoryState>(
+      createFormHistory(props.model ?? {}, props.maxHistorySize)
+    )
 
     const registerFieldRules = (fieldName: string, rules?: FormRule | FormRule[]): void => {
       if (!fieldName) {
@@ -179,37 +214,43 @@ export const Form = defineComponent({
       trigger?: FormRuleTrigger
     ): Promise<void> => {
       const effectiveFieldRules = resolveFieldRules(fieldName, rulesOverride)
-      if (!effectiveFieldRules) {
-        return
-      }
+      if (effectiveFieldRules) {
+        const error = await runFieldValidation(fieldName, rulesOverride, trigger)
 
-      const error = await runFieldValidation(fieldName, rulesOverride, trigger)
+        // Skip mutation if error state for this field hasn't changed,
+        // avoiding unnecessary watcher triggers in unrelated FormItems.
+        const existingIndex = errors.findIndex((e) => e.field === fieldName)
+        const existingMessage = existingIndex !== -1 ? errors[existingIndex].message : null
 
-      // Skip mutation if error state for this field hasn't changed,
-      // avoiding unnecessary watcher triggers in unrelated FormItems.
-      const existingIndex = errors.findIndex((e) => e.field === fieldName)
-      const existingMessage = existingIndex !== -1 ? errors[existingIndex].message : null
+        if (!error && existingMessage === null) {
+          // No error before, no error now — nothing to do
+        } else if (error && error === existingMessage) {
+          // Same error as before — nothing to do
+        } else {
+          // Remove existing error for this field
+          if (existingIndex !== -1) {
+            errors.splice(existingIndex, 1)
+          }
 
-      if (!error && existingMessage === null) {
-        // No error before, no error now — nothing to do
-      } else if (error && error === existingMessage) {
-        // Same error as before — nothing to do
-      } else {
-        // Remove existing error for this field
-        if (existingIndex !== -1) {
-          errors.splice(existingIndex, 1)
+          // Add new error if validation failed
+          if (error) {
+            errors.push({
+              field: fieldName,
+              message: error
+            })
+          }
         }
 
-        // Add new error if validation failed
-        if (error) {
-          errors.push({
-            field: fieldName,
-            message: error
-          })
-        }
+        emit('validate', fieldName, !error, error || undefined)
       }
 
-      emit('validate', fieldName, !error, error || undefined)
+      // v0.6.0: revalidate dependent fields (even if current field has no rules)
+      if (props.fieldDependencies) {
+        const dependents = getDependentFields(fieldName, props.fieldDependencies)
+        for (const dep of dependents) {
+          await validateField(dep)
+        }
+      }
     }
 
     const validate = async (): Promise<boolean> => {
@@ -291,6 +332,35 @@ export const Form = defineComponent({
       }
     }
 
+    // v0.6.0: undo/redo
+    const snapshotHistory = (): void => {
+      if (!props.undoable || !props.model) return
+      history.value = pushFormHistory(history.value, props.model)
+    }
+
+    const undo = (): void => {
+      if (!props.undoable) return
+      const result = undoFormHistory(history.value)
+      if (result && props.model) {
+        history.value = result
+        Object.keys(props.model).forEach((k) => delete props.model![k])
+        Object.assign(props.model, { ...result.present })
+      }
+    }
+
+    const redo = (): void => {
+      if (!props.undoable) return
+      const result = redoFormHistory(history.value)
+      if (result && props.model) {
+        history.value = result
+        Object.keys(props.model).forEach((k) => delete props.model![k])
+        Object.assign(props.model, { ...result.present })
+      }
+    }
+
+    const canUndoNow = computed(() => props.undoable && canUndo(history.value))
+    const canRedoNow = computed(() => props.undoable && canRedo(history.value))
+
     const handleSubmit = async (event: Event): Promise<void> => {
       event.preventDefault()
       if (props.loading) return
@@ -326,7 +396,12 @@ export const Form = defineComponent({
       clearValidate,
       resetFields,
       addField,
-      removeField
+      removeField,
+      undo,
+      redo,
+      snapshotHistory,
+      canUndo: canUndoNow,
+      canRedo: canRedoNow
     })
 
     const formClasses = computed(() => {

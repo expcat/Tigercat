@@ -218,8 +218,6 @@ export function getCheckboxCellClasses(size: TableSize): string {
   return classNames('text-center', widthClasses[size])
 }
 
-
-
 /**
  * Default sort function for comparable values
  */
@@ -385,3 +383,39 @@ export function getRowKey<T>(
 
   return index
 }
+
+// --- v0.6.0 additions ---
+
+/**
+ * Summary row footer classes
+ */
+export const tableSummaryRowClasses =
+  'bg-[var(--tiger-surface-muted,#f3f4f6)] font-semibold border-t-2 border-[var(--tiger-border,#e5e7eb)]'
+
+/**
+ * Editable cell classes
+ */
+export function getEditableCellClasses(isEditing: boolean): string {
+  return classNames(
+    isEditing
+      ? 'ring-2 ring-[var(--tiger-primary,#2563eb)] ring-inset bg-[var(--tiger-surface,#ffffff)]'
+      : 'cursor-pointer hover:bg-[var(--tiger-primary,#2563eb)]/5'
+  )
+}
+
+/**
+ * Editable cell input classes
+ */
+export const editableCellInputClasses =
+  'w-full bg-transparent border-none outline-none text-sm text-[var(--tiger-text,#111827)] p-0'
+
+/**
+ * Column drag handle classes
+ */
+export const columnDragHandleClasses =
+  'cursor-grab active:cursor-grabbing text-[var(--tiger-text-muted,#6b7280)] hover:text-[var(--tiger-text,#111827)] transition-colors'
+
+/**
+ * Column drag over indicator classes
+ */
+export const columnDragOverClasses = 'border-l-2 border-[var(--tiger-primary,#2563eb)]'

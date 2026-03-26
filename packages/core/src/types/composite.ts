@@ -991,6 +991,10 @@ export interface WizardStep {
    */
   fields?: string[]
   /**
+   * Condition function that returns true to skip this step
+   */
+  skipCondition?: () => boolean
+  /**
    * Custom data
    */
   [key: string]: unknown
@@ -1085,6 +1089,10 @@ export interface FormWizardProps {
    * Finish callback
    */
   onFinish?: (current: number, steps: WizardStep[]) => void
+  /**
+   * Auto-save callback invoked on each step change
+   */
+  autoSave?: (current: number, step: WizardStep) => void | Promise<void>
   /**
    * Additional CSS classes
    */

@@ -33,6 +33,7 @@ export interface TabsContext {
   tabPosition: TabPosition
   closable: boolean
   destroyInactiveTabPane: boolean
+  lazy: boolean
   idBase: string
   handleTabClick: (key: string | number) => void
   handleTabClose: (key: string | number, event: Event) => void
@@ -117,6 +118,15 @@ export const Tabs = defineComponent({
       default: false
     },
     /**
+     * Whether to lazily render tab panes (only render when first activated)
+     * @default false
+     * @since 0.6.0
+     */
+    lazy: {
+      type: Boolean,
+      default: false
+    },
+    /**
      * Additional CSS classes
      */
     className: {
@@ -183,12 +193,27 @@ export const Tabs = defineComponent({
     // Provide tabs context via plain object with getters — reactive props
     // are tracked automatically when the consumer reads them in a computed/render.
     provide<TabsContext>(TabsContextKey, {
-      get activeKey() { return currentActiveKey.value },
-      get type() { return props.type },
-      get size() { return props.size },
-      get tabPosition() { return props.tabPosition },
-      get closable() { return props.closable },
-      get destroyInactiveTabPane() { return props.destroyInactiveTabPane },
+      get activeKey() {
+        return currentActiveKey.value
+      },
+      get type() {
+        return props.type
+      },
+      get size() {
+        return props.size
+      },
+      get tabPosition() {
+        return props.tabPosition
+      },
+      get closable() {
+        return props.closable
+      },
+      get destroyInactiveTabPane() {
+        return props.destroyInactiveTabPane
+      },
+      get lazy() {
+        return props.lazy
+      },
       idBase,
       handleTabClick,
       handleTabClose
@@ -216,7 +241,11 @@ export const Tabs = defineComponent({
       let firstTabKey: string | number | undefined
 
       // First pass: collect valid TabPane children and determine firstTabKey
-      type ChildInfo = { type: string | Component; props: Record<string, unknown>; children: unknown }
+      type ChildInfo = {
+        type: string | Component
+        props: Record<string, unknown>
+        children: unknown
+      }
       const validChildren: ChildInfo[] = []
 
       for (const child of children) {
@@ -313,9 +342,7 @@ export const Tabs = defineComponent({
       return h(
         'div',
         { class: containerClasses.value, style: props.style },
-        props.tabPosition === 'bottom'
-          ? [tabContent, tabNavContent]
-          : [tabNavContent, tabContent]
+        props.tabPosition === 'bottom' ? [tabContent, tabNavContent] : [tabNavContent, tabContent]
       )
     }
   }

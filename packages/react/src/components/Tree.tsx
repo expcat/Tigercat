@@ -224,6 +224,12 @@ export interface TreeProps {
    * Additional CSS classes
    */
   className?: string
+  /**
+   * Whether to show a built-in search input
+   * @default false
+   * @since 0.6.0
+   */
+  searchable?: boolean
 }
 
 export const Tree: React.FC<TreeProps> = ({
@@ -245,6 +251,7 @@ export const Tree: React.FC<TreeProps> = ({
   multiple = false,
   loadData,
   filterValue = '',
+  searchable = false,
   filterFn,
   autoExpandParent = true,
   blockNode = false,
@@ -370,10 +377,14 @@ export const Tree: React.FC<TreeProps> = ({
     [computedCheckedState]
   )
 
+  // v0.6.0: internal search state
+  const [internalSearchValue, setInternalSearchValue] = useState('')
+  const effectiveFilterValue = searchable ? internalSearchValue : filterValue
+
   // Update filtered nodes when filter value changes
   useEffect(() => {
-    if (filterValue) {
-      const matched = filterTreeNodes(treeData, filterValue, filterFn)
+    if (effectiveFilterValue) {
+      const matched = filterTreeNodes(treeData, effectiveFilterValue, filterFn)
       setFilteredNodeKeys(matched)
 
       if (autoExpandParent) {
@@ -385,7 +396,7 @@ export const Tree: React.FC<TreeProps> = ({
     } else {
       setFilteredNodeKeys(new Set())
     }
-  }, [filterValue, treeData, filterFn, autoExpandParent, controlledExpandedKeys])
+  }, [effectiveFilterValue, treeData, filterFn, autoExpandParent, controlledExpandedKeys])
 
   const handleExpand = useCallback(
     (nodeKey: string | number) => {
@@ -790,6 +801,15 @@ export const Tree: React.FC<TreeProps> = ({
       role="tree"
       aria-label={ariaLabel}
       aria-multiselectable={effectiveMultiple || undefined}>
+      {searchable && (
+        <input
+          type="text"
+          className="w-full mb-2 px-2 py-1 text-sm border border-[var(--tiger-border,#e5e7eb)] rounded bg-[var(--tiger-surface,#ffffff)] focus:outline-none focus:ring-1 focus:ring-[var(--tiger-primary,#2563eb)]"
+          placeholder="Search..."
+          value={internalSearchValue}
+          onChange={(e) => setInternalSearchValue(e.target.value)}
+        />
+      )}
       {treeData.map((node) => renderTreeNode(node, 0))}
     </div>
   )

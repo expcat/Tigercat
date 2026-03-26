@@ -28,6 +28,7 @@ export interface TabsContextValue {
   tabPosition: TabPosition
   closable: boolean
   destroyInactiveTabPane: boolean
+  lazy: boolean
   idBase: string
   handleTabClick: (key: string | number) => void
   handleTabClose: (key: string | number, event: React.SyntheticEvent) => void
@@ -81,6 +82,12 @@ export interface TabsProps {
    */
   destroyInactiveTabPane?: boolean
   /**
+   * Whether to lazily render tab panes (only render when first activated)
+   * @default false
+   * @since 0.6.0
+   */
+  lazy?: boolean
+  /**
    * Additional CSS classes
    */
   className?: string
@@ -115,6 +122,7 @@ export const Tabs: React.FC<TabsProps> = ({
   closable = false,
   centered = false,
   destroyInactiveTabPane = false,
+  lazy = false,
   className,
   style,
   onChange,
@@ -225,6 +233,7 @@ export const Tabs: React.FC<TabsProps> = ({
       tabPosition,
       closable,
       destroyInactiveTabPane,
+      lazy,
       idBase,
       handleTabClick,
       handleTabClose
@@ -236,6 +245,7 @@ export const Tabs: React.FC<TabsProps> = ({
       tabPosition,
       closable,
       destroyInactiveTabPane,
+      lazy,
       idBase,
       handleTabClick,
       handleTabClose
@@ -271,9 +281,17 @@ export const Tabs: React.FC<TabsProps> = ({
   return (
     <TabsContext.Provider value={contextValue}>
       <div className={containerClasses} style={style}>
-        {tabPosition === 'bottom'
-          ? <>{tabContent}{tabNavContent}</>
-          : <>{tabNavContent}{tabContent}</>}
+        {tabPosition === 'bottom' ? (
+          <>
+            {tabContent}
+            {tabNavContent}
+          </>
+        ) : (
+          <>
+            {tabNavContent}
+            {tabContent}
+          </>
+        )}
       </div>
     </TabsContext.Provider>
   )

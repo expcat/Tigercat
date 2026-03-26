@@ -424,4 +424,86 @@ export interface TableProps<T = Record<string, unknown>> {
    * @default 'auto'
    */
   tableLayout?: 'auto' | 'fixed'
+
+  // --- v0.6.0 additions ---
+
+  /**
+   * Enable virtual scrolling for large datasets
+   * @default false
+   */
+  virtual?: boolean
+
+  /**
+   * Virtual scroll viewport height (px)
+   * @default 400
+   */
+  virtualHeight?: number
+
+  /**
+   * Virtual scroll row height (px)
+   * @default 40
+   */
+  virtualItemHeight?: number
+
+  /**
+   * Enable cell editing
+   * @default false
+   */
+  editable?: boolean
+
+  /**
+   * Set of editable cells: Map<columnKey, Set<rowIndex>>
+   * If not provided and editable=true, all cells are editable
+   */
+  editableCells?: Map<string, Set<number>>
+
+  /**
+   * Filter mode
+   * @default 'basic'
+   */
+  filterMode?: 'basic' | 'advanced'
+
+  /**
+   * Advanced filter rules (used when filterMode='advanced')
+   */
+  advancedFilterRules?: FilterRule[]
+
+  /**
+   * Enable column drag reorder
+   * @default false
+   */
+  columnDraggable?: boolean
+
+  /**
+   * Summary row configuration
+   */
+  summaryRow?: { show: boolean; data: Record<string, unknown> }
+
+  /**
+   * Group rows by column key
+   */
+  groupBy?: string
+
+  /**
+   * Enable CSV export
+   * @default false
+   */
+  exportable?: boolean
+
+  /**
+   * Export filename (without extension)
+   * @default 'export'
+   */
+  exportFilename?: string
+}
+
+/**
+ * Filter rule for advanced filtering
+ */
+export interface FilterRule {
+  column: string
+  operator: 'equals' | 'contains' | 'gt' | 'lt' | 'between' | 'notEquals'
+  value: unknown
+  valueTo?: unknown // for 'between' operator
+  logic?: 'and' | 'or'
 }

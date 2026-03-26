@@ -64,10 +64,12 @@ export interface DescriptionsProps {
   bordered?: boolean
 
   /**
-   * Number of columns per row
+   * Number of columns per row.
+   * Can be a number or responsive object { xs?: number, sm?: number, md?: number, lg?: number, xl?: number, xxl?: number }
    * @default 3
+   * @since 0.6.0 — responsive object support
    */
-  column?: number
+  column?: number | Partial<Record<'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl', number>>
 
   /**
    * Descriptions size
