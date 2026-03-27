@@ -30,7 +30,7 @@ export const Calendar = defineComponent({
     fullscreen: { type: Boolean, default: false },
     disabledDate: { type: Function as PropType<(date: Date) => boolean>, default: undefined }
   },
-  emits: ['update:modelValue', 'change', 'panelChange'],
+  emits: ['update:modelValue', 'change', 'panel-change'],
   setup(props, { emit, attrs }) {
     const today = new Date()
     const viewYear = ref(props.modelValue?.getFullYear() ?? today.getFullYear())
@@ -45,7 +45,7 @@ export const Calendar = defineComponent({
       } else {
         viewMonth.value--
       }
-      emit('panelChange', new Date(viewYear.value, viewMonth.value, 1), props.mode)
+      emit('panel-change', new Date(viewYear.value, viewMonth.value, 1), props.mode)
     }
 
     function nextMonth() {
@@ -55,17 +55,17 @@ export const Calendar = defineComponent({
       } else {
         viewMonth.value++
       }
-      emit('panelChange', new Date(viewYear.value, viewMonth.value, 1), props.mode)
+      emit('panel-change', new Date(viewYear.value, viewMonth.value, 1), props.mode)
     }
 
     function prevYear() {
       viewYear.value--
-      emit('panelChange', new Date(viewYear.value, viewMonth.value, 1), props.mode)
+      emit('panel-change', new Date(viewYear.value, viewMonth.value, 1), props.mode)
     }
 
     function nextYear() {
       viewYear.value++
-      emit('panelChange', new Date(viewYear.value, viewMonth.value, 1), props.mode)
+      emit('panel-change', new Date(viewYear.value, viewMonth.value, 1), props.mode)
     }
 
     function selectDay(date: Date) {
@@ -76,7 +76,7 @@ export const Calendar = defineComponent({
 
     function selectMonth(monthIdx: number) {
       viewMonth.value = monthIdx
-      emit('panelChange', new Date(viewYear.value, monthIdx, 1), props.mode)
+      emit('panel-change', new Date(viewYear.value, monthIdx, 1), props.mode)
     }
 
     return () => {

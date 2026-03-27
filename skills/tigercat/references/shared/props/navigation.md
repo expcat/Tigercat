@@ -13,12 +13,13 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 
 ### Breadcrumb Props
 
-| Prop      | Type                                             | Default | Vue | React | Description     |
-| --------- | ------------------------------------------------ | ------- | :-: | :---: | --------------- |
-| separator | `'slash' \| 'arrow' \| 'chevron' \| string`      | `'/'`   |  ✓  |   ✓   | 分隔符          |
-| extra     | `VNode \| ReactNode`                             | -       |  ✓  |   ✓   | 末尾扩展区      |
-| className | `string`                                         | -       |  ✓  |   ✓   | 自定义 CSS 类名 |
-| style     | `Record<string, unknown> \| React.CSSProperties` | -       |  ✓  |   ✓   | 内联样式        |
+| Prop      | Type                                             | Default | Vue | React | Description                                |
+| --------- | ------------------------------------------------ | ------- | :-: | :---: | ------------------------------------------ |
+| separator | `'slash' \| 'arrow' \| 'chevron' \| string`      | `'/'`   |  ✓  |   ✓   | 分隔符                                     |
+| extra     | `VNode \| ReactNode`                             | -       |  ✓  |   ✓   | 末尾扩展区                                 |
+| className | `string`                                         | -       |  ✓  |   ✓   | 自定义 CSS 类名                            |
+| style     | `Record<string, unknown> \| React.CSSProperties` | -       |  ✓  |   ✓   | 内联样式                                   |
+| maxItems  | `number`                                         | -       |  ✓  |   ✓   | 响应式折叠：超过此数量的中间项折叠为省略号 |
 
 > **Vue**: `extra` 支持 slot 和 prop 两种方式（slot 优先）
 > **React**: `extra` 仅通过 prop 传入

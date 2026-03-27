@@ -14,6 +14,10 @@ import {
   alertContentClasses,
   getAlertIconPath,
   alertCloseIconPath,
+  alertBannerClasses,
+  alertCountdownContainerClasses,
+  alertCountdownBarClasses,
+  alertCountdownColorClasses,
   mergeStyleValues,
   type AlertType,
   type AlertSize
@@ -28,6 +32,8 @@ export interface VueAlertProps {
   showIcon?: boolean
   closable?: boolean
   closeAriaLabel?: string
+  banner?: boolean
+  showCountdown?: boolean
   className?: string
   style?: Record<string, string | number>
 }
@@ -114,6 +120,24 @@ export const Alert = defineComponent({
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
+    },
+
+    /**
+     * Whether to display as full-width banner
+     * @since 0.9.0
+     */
+    banner: {
+      type: Boolean,
+      default: false
+    },
+
+    /**
+     * Whether to show countdown progress bar
+     * @since 0.9.0
+     */
+    showCountdown: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['close'],
@@ -126,7 +150,8 @@ export const Alert = defineComponent({
         alertBaseClasses,
         alertSizeClasses[props.size],
         colorScheme.value.bg,
-        colorScheme.value.border
+        colorScheme.value.border,
+        props.banner && alertBannerClasses
       )
     )
 
@@ -160,16 +185,28 @@ export const Alert = defineComponent({
     }
 
     let autoCloseTimer: ReturnType<typeof setTimeout> | undefined
+    const countdownProgress = ref(100)
+    let countdownInterval: ReturnType<typeof setInterval> | undefined
+
     onMounted(() => {
       if (props.duration && props.duration > 0 && props.closable) {
         autoCloseTimer = setTimeout(() => {
           visible.value = false
           emit('close', new MouseEvent('click'))
         }, props.duration)
+
+        if (props.showCountdown) {
+          const startTime = Date.now()
+          countdownInterval = setInterval(() => {
+            const elapsed = Date.now() - startTime
+            countdownProgress.value = Math.max(0, 100 - (elapsed / props.duration!) * 100)
+          }, 50)
+        }
       }
     })
     onBeforeUnmount(() => {
       if (autoCloseTimer) clearTimeout(autoCloseTimer)
+      if (countdownInterval) clearInterval(countdownInterval)
     })
 
     return () => {
@@ -244,6 +281,18 @@ export const Alert = defineComponent({
             },
             createStatusIcon(alertCloseIconPath, 'h-4 w-4')
           )
+        )
+      }
+
+      // Add countdown bar
+      if (props.showCountdown && props.duration && props.duration > 0 && props.closable) {
+        children.push(
+          h('div', { class: alertCountdownContainerClasses }, [
+            h('div', {
+              class: classNames(alertCountdownBarClasses, alertCountdownColorClasses[props.type]),
+              style: { width: `${countdownProgress.value}%` }
+            })
+          ])
         )
       }
 

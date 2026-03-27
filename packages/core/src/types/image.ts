@@ -113,8 +113,15 @@ export interface ImageProps {
 export interface ImagePreviewProps {
   /**
    * Whether the preview is visible
+   * @deprecated Use `open` instead (v0.9.0)
    */
-  visible: boolean
+  visible?: boolean
+
+  /**
+   * Whether the preview is open
+   * @since 0.9.0
+   */
+  open?: boolean
 
   /**
    * Array of image URLs to preview

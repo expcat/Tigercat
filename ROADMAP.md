@@ -56,11 +56,29 @@
 | Phase 3 | P1 组件: Kanban/VirtualTable/InfiniteScroll      | ✅   |
 | Phase 4 | P2 组件: FileManager + 拖拽增强现有组件          | ✅   |
 | Phase 5 | 性能优化: Bundle Size sideEffects + tree-shaking | ✅   |
-| Phase 6 | CLI 脚手架: @expcat/tigercat-cli                 | ⬜   |
+| Phase 6 | CLI 脚手架: @expcat/tigercat-cli                 | ✅   |
 | Phase 7 | 测试覆盖率 & a11y 合规                           | ✅   |
 | Phase 8 | 文档 & Skills 更新                               | ✅   |
 
 详见 [docs/roadmap/04-v0.8.0-SPEC.md](docs/roadmap/04-v0.8.0-SPEC.md)
+
+## v0.9.0 生态完善与质量冲刺 (Ecosystem & Quality Sprint)
+
+| 阶段    | 内容                                                | 状态 |
+| ------- | --------------------------------------------------- | ---- |
+| Phase 0 | CLI 脚手架工具 `@expcat/tigercat-cli`               | ✅   |
+| Phase 1 | 补齐缺失组件: InputGroup/PrintLayout/ImageViewer 等 | ✅   |
+| Phase 2 | API 一致性全面审查 (127+ 组件)                      | ✅   |
+| Phase 3 | a11y WCAG 2.1 AA 全达标 + axe-core CI               | ✅   |
+| Phase 4 | 测试覆盖率冲刺 (单元 95%+, 集成 85%+, e2e 50%+)     | ✅   |
+| Phase 5 | 迁移指南 + Codemod 脚本                             | ✅   |
+| Phase 6 | 文档站升级 (API 自动生成、搜索、主题切换)           | ✅   |
+| Phase 7 | 最终验收 & 发版                                     | ✅   |
+
+新增组件: `InputGroup`, `PrintLayout`, `ImageViewer`
+新增 a11y 工具: `createFocusTrap`, `announceToScreenReader`, `manageLiveRegion`
+测试覆盖率: 4619 tests (237 test files)
+详见 [MIGRATION_v0.9.0.md](MIGRATION_v0.9.0.md) | [docs/roadmap/05-v0.9.0-SPEC.md](docs/roadmap/05-v0.9.0-SPEC.md)
 
 ## 进度说明
 
@@ -210,6 +228,14 @@
 | 虚拟表格     | VirtualTable   | ✅  | ✅    | ✅   | ✅   |
 | 无限滚动     | InfiniteScroll | ✅  | ✅    | ✅   | ✅   |
 | 文件管理器   | FileManager    | ✅  | ✅    | ✅   | ✅   |
+
+### 生态完善组件 (Ecosystem Components) — v0.9.0
+
+| 组件       | Component   | Vue | React | 文档 | 测试 |
+| ---------- | ----------- | --- | ----- | ---- | ---- |
+| 输入框组   | InputGroup  | ✅  | ✅    | ✅   | ✅   |
+| 打印布局   | PrintLayout | ✅  | ✅    | ✅   | ✅   |
+| 图片查看器 | ImageViewer | ✅  | ✅    | ✅   | ✅   |
 
 ## 开发优先级
 

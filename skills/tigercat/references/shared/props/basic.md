@@ -76,6 +76,8 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 | duration       | `number`                                      | -               |  ✓  |   ✓   | 自动关闭延时（ms，需 closable=true） |
 | closeAriaLabel | `string`                                      | `'Close alert'` |  ✓  |   ✓   | 关闭按钮无障碍标签                   |
 | className      | `string`                                      | -               |  ✓  |   ✓   | 自定义类名                           |
+| banner         | `boolean`                                     | `false`         |  ✓  |   ✓   | 全宽横幅模式（页面顶部提示）         |
+| showCountdown  | `boolean`                                     | `false`         |  ✓  |   ✓   | 显示自动关闭倒计时进度条             |
 
 ### Events
 
@@ -349,22 +351,24 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop         | Type       | Default | Vue | React | Description      |
-| ------------ | ---------- | ------- | :-: | :---: | ---------------- |
-| visible      | `boolean`  | `false` |  ✓  |   ✓   | 是否可见         |
-| src          | `string`   | -       |  ✓  |   ✓   | 单张预览图片地址 |
-| srcList      | `string[]` | -       |  ✓  |   ✓   | 多张预览图片列表 |
-| currentIndex | `number`   | `0`     |  ✓  |   ✓   | 当前显示索引     |
-| maskClosable | `boolean`  | `true`  |  ✓  |   ✓   | 点击遮罩关闭     |
-| className    | `string`   | -       |  -  |   ✓   | 自定义类名       |
+| Prop         | Type       | Default | Vue | React | Description                 |
+| ------------ | ---------- | ------- | :-: | :---: | --------------------------- |
+| open         | `boolean`  | `false` |  ✓  |   ✓   | 是否可见 (v0.9.0+)          |
+| visible      | `boolean`  | `false` |  ✓  |   ✓   | ~~已废弃~~ 使用 `open` 代替 |
+| src          | `string`   | -       |  ✓  |   ✓   | 单张预览图片地址            |
+| srcList      | `string[]` | -       |  ✓  |   ✓   | 多张预览图片列表            |
+| currentIndex | `number`   | `0`     |  ✓  |   ✓   | 当前显示索引                |
+| maskClosable | `boolean`  | `true`  |  ✓  |   ✓   | 点击遮罩关闭                |
+| className    | `string`   | -       |  -  |   ✓   | 自定义类名                  |
 
 ### Events
 
-| Vue Event              | React Callback         | Payload   | Description  |
-| ---------------------- | ---------------------- | --------- | ------------ |
-| `@update:visible`      | `onVisibleChange`      | `boolean` | 可见性变化   |
-| `@update:currentIndex` | `onCurrentIndexChange` | `number`  | 当前索引变化 |
-| `@scale-change`        | `onScaleChange`        | `number`  | 缩放倍率变化 |
+| Vue Event              | React Callback         | Payload   | Description             |
+| ---------------------- | ---------------------- | --------- | ----------------------- |
+| `@update:open`         | `onOpenChange`         | `boolean` | 可见性变化 (v0.9.0+)    |
+| `@update:visible`      | `onVisibleChange`      | `boolean` | ~~已废弃~~ 使用上方代替 |
+| `@update:currentIndex` | `onCurrentIndexChange` | `number`  | 当前索引变化            |
+| `@scale-change`        | `onScaleChange`        | `number`  | 缩放倍率变化            |
 
 ---
 

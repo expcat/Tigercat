@@ -73,3 +73,48 @@ export function getSeparatorContent(separator?: BreadcrumbSeparator): string {
 export function getBreadcrumbSeparatorClasses(className?: string): string {
   return classNames(breadcrumbSeparatorBaseClasses, className)
 }
+
+/**
+ * Breadcrumb ellipsis button classes
+ * @since 0.9.0
+ */
+export const breadcrumbEllipsisClasses = classNames(
+  'text-gray-600 hover:text-[var(--tiger-primary,#2563eb)]',
+  'transition-colors duration-200 cursor-pointer',
+  'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-offset-1 rounded',
+  'px-1'
+)
+
+/**
+ * Calculate which items to show when maxItems is set.
+ * Returns { visible: number[], collapsed: number[] } with indices.
+ * Shows first item, last (maxItems - 1) items, and collapses the rest.
+ * @since 0.9.0
+ */
+export function getBreadcrumbCollapsedItems(
+  totalItems: number,
+  maxItems: number
+): { visible: number[]; collapsed: number[] } {
+  if (maxItems <= 0 || maxItems >= totalItems) {
+    return {
+      visible: Array.from({ length: totalItems }, (_, i) => i),
+      collapsed: []
+    }
+  }
+
+  const visible: number[] = [0]
+  const collapsed: number[] = []
+
+  const tailCount = maxItems - 1
+  const tailStart = totalItems - tailCount
+
+  for (let i = 1; i < totalItems; i++) {
+    if (i >= tailStart) {
+      visible.push(i)
+    } else {
+      collapsed.push(i)
+    }
+  }
+
+  return { visible, collapsed }
+}

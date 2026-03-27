@@ -301,4 +301,16 @@ export type { VueInfiniteScrollProps } from './components/InfiniteScroll'
 export { FileManager } from './components/FileManager'
 export type { VueFileManagerProps } from './components/FileManager'
 
+// InputGroup (v0.9.0+)
+export { InputGroup, InputGroupAddon } from './components/InputGroup'
+export type { VueInputGroupProps, VueInputGroupAddonProps } from './components/InputGroup'
+
+// PrintLayout (v0.9.0+)
+export { PrintLayout, PrintPageBreak } from './components/PrintLayout'
+export type { VuePrintLayoutProps } from './components/PrintLayout'
+
+// ImageViewer (v0.9.0+)
+export { ImageViewer } from './components/ImageViewer'
+export type { VueImageViewerProps } from './components/ImageViewer'
+
 export const version = '0.0.1'

@@ -339,4 +339,16 @@ export type { InfiniteScrollProps } from './components/InfiniteScroll'
 export { FileManager } from './components/FileManager'
 export type { FileManagerProps } from './components/FileManager'
 
+// InputGroup (v0.9.0+)
+export { InputGroup, InputGroupAddon } from './components/InputGroup'
+export type { InputGroupProps, InputGroupAddonProps } from './components/InputGroup'
+
+// PrintLayout (v0.9.0+)
+export { PrintLayout, PrintPageBreak } from './components/PrintLayout'
+export type { PrintLayoutProps, PrintPageBreakProps } from './components/PrintLayout'
+
+// ImageViewer (v0.9.0+)
+export { ImageViewer } from './components/ImageViewer'
+export type { ImageViewerProps } from './components/ImageViewer'
+
 export const version = '0.0.1'

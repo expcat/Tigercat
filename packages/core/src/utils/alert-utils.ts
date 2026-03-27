@@ -93,3 +93,33 @@ const alertIconPaths: Record<AlertType, string> = {
 export function getAlertIconPath(type: AlertType): string {
   return alertIconPaths[type]
 }
+
+/**
+ * Banner mode classes — full-width, no border-radius
+ * @since 0.9.0
+ */
+export const alertBannerClasses = 'rounded-none border-x-0 w-full'
+
+/**
+ * Countdown progress bar container classes
+ * @since 0.9.0
+ */
+export const alertCountdownContainerClasses =
+  'absolute bottom-0 left-0 right-0 h-1 overflow-hidden rounded-b-lg'
+
+/**
+ * Countdown progress bar classes
+ * @since 0.9.0
+ */
+export const alertCountdownBarClasses = 'h-full transition-all ease-linear'
+
+/**
+ * Countdown bar color classes by alert type
+ * @since 0.9.0
+ */
+export const alertCountdownColorClasses: Record<AlertType, string> = {
+  success: 'bg-[var(--tiger-success,#16a34a)]',
+  warning: 'bg-[var(--tiger-warning,#d97706)]',
+  error: 'bg-[var(--tiger-error,#dc2626)]',
+  info: 'bg-[var(--tiger-primary,#2563eb)]'
+}

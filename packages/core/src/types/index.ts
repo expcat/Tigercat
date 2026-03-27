@@ -144,3 +144,12 @@ export * from './infinite-scroll'
 
 // FileManager types (v0.8.0+)
 export * from './file-manager'
+
+// InputGroup types (v0.9.0+)
+export * from './input-group'
+
+// PrintLayout types (v0.9.0+)
+export * from './print-layout'
+
+// ImageViewer types (v0.9.0+)
+export * from './image-viewer'

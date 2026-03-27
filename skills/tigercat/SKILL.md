@@ -22,6 +22,7 @@ Tailwind CSS 驱动的跨框架组件库，支持 Vue 3 和 React。
 | Theme      | [theme.md](references/theme.md)                                     | -                                                 | -                                                     |
 | i18n       | [i18n.md](references/i18n.md)                                       | -                                                 | -                                                     |
 | Patterns   | [shared/patterns/common.md](references/shared/patterns/common.md)   | -                                                 | -                                                     |
+| CLI        | [cli.md](references/cli.md)                                         | -                                                 | -                                                     |
 
 ## Installation
 

@@ -56,7 +56,7 @@ export const Image = defineComponent({
       default: undefined
     }
   },
-  emits: ['load', 'error', 'preview-visible-change'],
+  emits: ['load', 'error', 'preview-open-change', 'preview-visible-change'],
   setup(props, { slots, emit, attrs }) {
     const loading = ref(true)
     const error = ref(false)
@@ -215,11 +215,12 @@ export const Image = defineComponent({
           ? (() => {
               const { ImagePreview } = require('./ImagePreview')
               return h(ImagePreview, {
-                visible: previewVisible.value,
+                open: previewVisible.value,
                 images: [props.src!],
                 currentIndex: 0,
-                'onUpdate:visible': (val: boolean) => {
+                'onUpdate:open': (val: boolean) => {
                   previewVisible.value = val
+                  emit('preview-open-change', val)
                   emit('preview-visible-change', val)
                 }
               })

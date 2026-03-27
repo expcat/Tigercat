@@ -81,6 +81,12 @@ export interface StepsProps {
    */
   simple?: boolean
   /**
+   * Whether steps are clickable for navigation
+   * @default false
+   * @since 0.9.0
+   */
+  clickable?: boolean
+  /**
    * Additional CSS classes
    */
   className?: string

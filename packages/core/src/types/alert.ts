@@ -64,6 +64,20 @@ export interface AlertProps {
   closeAriaLabel?: string
 
   /**
+   * Whether to display as full-width banner across the page
+   * @default false
+   * @since 0.9.0
+   */
+  banner?: boolean
+
+  /**
+   * Whether to show countdown progress bar (requires `duration` and `closable`)
+   * @default false
+   * @since 0.9.0
+   */
+  showCountdown?: boolean
+
+  /**
    * Additional CSS classes
    */
   className?: string

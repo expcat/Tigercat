@@ -101,3 +101,12 @@ export * from './infinite-scroll-utils'
 
 // FileManager utilities (v0.8.0+)
 export * from './file-manager-utils'
+
+// InputGroup utilities (v0.9.0+)
+export * from './input-group-utils'
+
+// PrintLayout utilities (v0.9.0+)
+export * from './print-layout-utils'
+
+// ImageViewer utilities (v0.9.0+)
+export * from './image-viewer-utils'

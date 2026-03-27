@@ -266,18 +266,18 @@ import { Image } from '@expcat/tigercat-vue'
 import { ref } from 'vue'
 import { ImagePreview } from '@expcat/tigercat-vue'
 
-const visible = ref(false)
+const show = ref(false)
 const images = ['/a.jpg', '/b.jpg', '/c.jpg']
 </script>
 
 <template>
-  <button @click="visible = true">预览</button>
+  <button @click="show = true">预览</button>
 
-  <!-- 单张预览 -->
-  <ImagePreview v-model:visible="visible" src="/photo.jpg" />
+  <!-- 单张预览 (v0.9.0: 使用 open 代替 visible) -->
+  <ImagePreview v-model:open="show" src="/photo.jpg" />
 
   <!-- 多张预览 -->
-  <ImagePreview v-model:visible="visible" :srcList="images" :currentIndex="0" />
+  <ImagePreview v-model:open="show" :srcList="images" :currentIndex="0" />
 </template>
 ```
 

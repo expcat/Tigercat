@@ -265,16 +265,16 @@ import { Image } from '@expcat/tigercat-react'
 import { useState } from 'react'
 import { ImagePreview } from '@expcat/tigercat-react'
 
-const [visible, setVisible] = useState(false)
+const [show, setShow] = useState(false)
 const images = ['/a.jpg', '/b.jpg', '/c.jpg']
 
-<button onClick={() => setVisible(true)}>预览</button>
+<button onClick={() => setShow(true)}>预览</button>
 
-{/* 单张预览 */}
-<ImagePreview visible={visible} src="/photo.jpg" onVisibleChange={setVisible} />
+{/* 单张预览 (v0.9.0: 使用 open/onOpenChange 代替 visible/onVisibleChange) */}
+<ImagePreview open={show} src="/photo.jpg" onOpenChange={setShow} />
 
 {/* 多张预览 */}
-<ImagePreview visible={visible} srcList={images} currentIndex={0} onVisibleChange={setVisible} />
+<ImagePreview open={show} srcList={images} currentIndex={0} onOpenChange={setShow} />
 ```
 
 ---
@@ -283,7 +283,6 @@ const images = ['/a.jpg', '/b.jpg', '/c.jpg']
 
 ```tsx
 import { Image, ImageGroup } from '@expcat/tigercat-react'
-
 ;<ImageGroup>
   <Image src="/a.jpg" preview />
   <Image src="/b.jpg" preview />

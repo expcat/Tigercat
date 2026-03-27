@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-form
-description: Shared props definitions for form components - Checkbox, CheckboxGroup, DatePicker, Form, FormItem, Input, Radio, RadioGroup, Select, Slider, Switch, Textarea, TimePicker, Upload
+description: Shared props definitions for form components - Checkbox, CheckboxGroup, DatePicker, Form, FormItem, Input, InputGroup, Radio, RadioGroup, Select, Slider, Switch, Textarea, TimePicker, Upload
 ---
 
 # Form Components - Props Reference
@@ -118,6 +118,35 @@ description: Shared props definitions for form components - Checkbox, CheckboxGr
 | -------- | ---------- | ----------- |
 | `prefix` | `prefix`   | 前缀内容    |
 | `suffix` | `suffix`   | 后缀内容    |
+
+---
+
+## InputGroup 输入框组
+
+组合式组件：`<InputGroup>` + `<InputGroupAddon>`，用于将输入框和附加元素组合。
+
+### InputGroup Props
+
+| Prop      | Type                   | Default | Vue | React | Description          |
+| --------- | ---------------------- | ------- | :-: | :---: | -------------------- |
+| size      | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸（传递给子组件） |
+| compact   | `boolean`              | `true`  |  ✓  |   ✓   | 紧凑模式（无间距）   |
+| className | `string`               | -       |  ✓  |   ✓   | 自定义类名           |
+
+### InputGroupAddon Props
+
+| Prop      | Type                               | Default    | Vue | React | Description  |
+| --------- | ---------------------------------- | ---------- | :-: | :---: | ------------ |
+| type      | `'prefix' \| 'suffix' \| 'button'` | `'prefix'` |  ✓  |   ✓   | 附加元素类型 |
+| className | `string`                           | -          |  ✓  |   ✓   | 自定义类名   |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description      |
+| --------- | ---------- | ---------------- |
+| `default` | `children` | Input / Addon 等 |
+
+> **Context**: InputGroup 通过 provide/inject (Vue) 或 createContext (React) 向子组件传递 `size` 和 `compact`。
 
 ---
 

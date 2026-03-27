@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-layout
-description: Shared props definitions for layout components - Card, Container, Descriptions, Divider, Grid, Layout, List, Skeleton, Space
+description: Shared props definitions for layout components - Card, Container, Descriptions, Divider, Grid, Layout, List, PrintLayout, Skeleton, Space
 ---
 
 # Layout Components - Props Reference
@@ -201,6 +201,37 @@ description: Shared props definitions for layout components - Card, Container, D
 | rows      | `number`                                                | `1`        |  ✓  |   ✓   | 行数（text 变体，>1 时渲染多行）    |
 | paragraph | `boolean`                                               | `false`    |  ✓  |   ✓   | 段落模式（text 变体，行宽自动变化） |
 | className | `string`                                                | -          |  ✓  |   ✓   | 自定义类名                          |
+
+---
+
+## PrintLayout 打印布局
+
+打印布局容器，提供 `@media print` 优化样式、页眉页脚、分页符。
+
+### PrintLayout Props
+
+| Prop           | Type                                              | Default      | Vue | React | Description      |
+| -------------- | ------------------------------------------------- | ------------ | :-: | :---: | ---------------- |
+| pageSize       | `'A4' \| 'A3' \| 'Letter' \| 'Legal' \| 'custom'` | `'A4'`       |  ✓  |   ✓   | 纸张尺寸         |
+| orientation    | `'portrait' \| 'landscape'`                       | `'portrait'` |  ✓  |   ✓   | 方向             |
+| showHeader     | `boolean`                                         | `false`      |  ✓  |   ✓   | 显示页眉         |
+| showFooter     | `boolean`                                         | `false`      |  ✓  |   ✓   | 显示页脚         |
+| headerText     | `string`                                          | -            |  ✓  |   ✓   | 页眉文本         |
+| footerText     | `string`                                          | -            |  ✓  |   ✓   | 页脚文本         |
+| showPageBreaks | `boolean`                                         | `true`       |  ✓  |   ✓   | 显示分页符指示器 |
+| className      | `string`                                          | -            |  ✓  |   ✓   | 自定义类名       |
+
+### Slots / Children
+
+| Vue Slot  | React Prop     | Description                   |
+| --------- | -------------- | ----------------------------- |
+| `default` | `children`     | 打印内容                      |
+| `header`  | `headerRender` | 自定义页眉（覆盖 headerText） |
+| `footer`  | `footerRender` | 自定义页脚（覆盖 footerText） |
+
+### PrintPageBreak 分页组件
+
+在内容中插入 `<PrintPageBreak />` 表示打印分页点。屏幕上显示虚线指示器，打印时触发 `break-before-page`。
 
 ---
 

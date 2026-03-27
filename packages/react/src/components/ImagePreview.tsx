@@ -25,7 +25,13 @@ import { useEscapeKey } from '../utils/overlay'
 
 export interface ImagePreviewProps extends CoreImagePreviewProps {
   /**
+   * Callback when open state changes
+   * @since 0.9.0
+   */
+  onOpenChange?: (open: boolean) => void
+  /**
    * Callback when visibility changes
+   * @deprecated Use `onOpenChange` instead
    */
   onVisibleChange?: (visible: boolean) => void
   /**
@@ -50,6 +56,7 @@ const SvgIcon: React.FC<{ d: string; cls?: string }> = ({ d, cls = 'w-5 h-5' }) 
 )
 
 export const ImagePreview: React.FC<ImagePreviewProps> = ({
+  open,
   visible,
   images,
   currentIndex = 0,
@@ -58,10 +65,12 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   scaleStep = 0.5,
   minScale = 0.25,
   maxScale = 5,
+  onOpenChange,
   onVisibleChange,
   onCurrentIndexChange,
   onScaleChange
 }) => {
+  const isOpen = open !== undefined ? open : visible
   const [scale, setScale] = useState(1)
   const [offsetX, setOffsetX] = useState(0)
   const [offsetY, setOffsetY] = useState(0)
@@ -81,7 +90,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   }, [currentIndex, resetTransform])
 
   useEffect(() => {
-    if (visible) {
+    if (isOpen) {
       resetTransform()
       setIndex(currentIndex)
       document.body.style.overflow = 'hidden'
@@ -91,13 +100,14 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     return () => {
       document.body.style.overflow = ''
     }
-  }, [visible, currentIndex, resetTransform])
+  }, [isOpen, currentIndex, resetTransform])
 
   const handleClose = useCallback(() => {
+    onOpenChange?.(false)
     onVisibleChange?.(false)
-  }, [onVisibleChange])
+  }, [onOpenChange, onVisibleChange])
 
-  useEscapeKey({ enabled: !!visible, onEscape: handleClose })
+  useEscapeKey({ enabled: !!isOpen, onEscape: handleClose })
 
   const navState = useMemo(() => getPreviewNavState(index, images.length), [index, images.length])
 
@@ -142,14 +152,14 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 
   // Keyboard navigation
   useEffect(() => {
-    if (!visible) return
+    if (!isOpen) return
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') handlePrev()
       if (e.key === 'ArrowRight') handleNext()
     }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
-  }, [visible, handlePrev, handleNext])
+  }, [isOpen, handlePrev, handleNext])
 
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
@@ -198,7 +208,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     [scale, offsetX, offsetY]
   )
 
-  if (!visible || !images.length) return null
+  if (!isOpen || !images.length) return null
 
   const currentSrc = images[index] || images[0]
 

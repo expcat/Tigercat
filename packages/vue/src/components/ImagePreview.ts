@@ -31,7 +31,9 @@ import {
 } from '@expcat/tigercat-core'
 
 export interface VueImagePreviewProps {
+  /** @deprecated Use `open` instead */
   visible?: boolean
+  open?: boolean
   images?: string[]
   currentIndex?: number
   zIndex?: number
@@ -66,6 +68,7 @@ export const ImagePreview = defineComponent({
   inheritAttrs: false,
   props: {
     visible: { type: Boolean, default: false },
+    open: { type: Boolean, default: undefined },
     images: { type: Array as PropType<string[]>, default: () => [] },
     currentIndex: { type: Number, default: 0 },
     zIndex: { type: Number, default: 1050 },
@@ -74,7 +77,7 @@ export const ImagePreview = defineComponent({
     minScale: { type: Number, default: 0.25 },
     maxScale: { type: Number, default: 5 }
   },
-  emits: ['update:visible', 'update:currentIndex', 'scale-change'],
+  emits: ['update:visible', 'update:open', 'update:currentIndex', 'scale-change'],
   setup(props, { emit }) {
     const scale = ref(1)
     const offsetX = ref(0)
@@ -97,8 +100,10 @@ export const ImagePreview = defineComponent({
       }
     )
 
+    const isOpen = computed(() => (props.open !== undefined ? props.open : props.visible))
+
     watch(
-      () => props.visible,
+      () => isOpen.value,
       (val) => {
         if (val) {
           resetTransform()
@@ -113,6 +118,7 @@ export const ImagePreview = defineComponent({
     const navState = computed(() => getPreviewNavState(index.value, props.images.length))
 
     const handleClose = () => {
+      emit('update:open', false)
       emit('update:visible', false)
     }
 
@@ -183,7 +189,7 @@ export const ImagePreview = defineComponent({
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!props.visible) return
+      if (!isOpen.value) return
       switch (e.key) {
         case 'Escape':
           handleClose()
@@ -209,7 +215,7 @@ export const ImagePreview = defineComponent({
     const transform = computed(() => calculateTransform(scale.value, offsetX.value, offsetY.value))
 
     return () => {
-      if (!props.visible || !props.images.length) return null
+      if (!isOpen.value || !props.images.length) return null
 
       const currentSrc = props.images[index.value] || props.images[0]
 

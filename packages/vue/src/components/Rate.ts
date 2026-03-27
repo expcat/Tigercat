@@ -25,7 +25,7 @@ export const Rate = defineComponent({
     allowClear: { type: Boolean, default: true },
     character: { type: String, default: undefined }
   },
-  emits: ['update:modelValue', 'change', 'hoverChange'],
+  emits: ['update:modelValue', 'change', 'hover-change'],
   setup(props, { emit, attrs }) {
     const hoverValue = ref(0)
 
@@ -56,14 +56,14 @@ export const Rate = defineComponent({
       const val = getStarValue(index, isHalf)
       if (val !== hoverValue.value) {
         hoverValue.value = val
-        emit('hoverChange', val)
+        emit('hover-change', val)
       }
     }
 
     function handleMouseLeave() {
       if (props.disabled) return
       hoverValue.value = 0
-      emit('hoverChange', 0)
+      emit('hover-change', 0)
     }
 
     return () => {

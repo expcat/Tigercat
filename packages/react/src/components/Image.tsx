@@ -28,6 +28,10 @@ export interface ImageProps
   /**
    * Callback when preview visibility changes
    */
+  onPreviewOpenChange?: (open: boolean) => void
+  /**
+   * @deprecated Use `onPreviewOpenChange` instead
+   */
   onPreviewVisibleChange?: (visible: boolean) => void
 }
 
@@ -54,6 +58,7 @@ export const Image: React.FC<ImageProps> = ({
   className,
   errorRender,
   placeholderRender,
+  onPreviewOpenChange,
   onPreviewVisibleChange,
   onClick,
   onKeyDown,
@@ -126,10 +131,11 @@ export const Image: React.FC<ImageProps> = ({
         group.openPreview(registeredIndexRef.current >= 0 ? registeredIndexRef.current : 0)
       } else {
         setPreviewVisible(true)
+        onPreviewOpenChange?.(true)
         onPreviewVisibleChange?.(true)
       }
     },
-    [preview, group, onClick, onPreviewVisibleChange]
+    [preview, group, onClick, onPreviewOpenChange, onPreviewVisibleChange]
   )
 
   const handleKeyDown = useCallback(
@@ -200,11 +206,12 @@ export const Image: React.FC<ImageProps> = ({
       </div>
       {!group && previewVisible && src && (
         <ImagePreview
-          visible={previewVisible}
+          open={previewVisible}
           images={[src]}
           currentIndex={0}
-          onVisibleChange={(val) => {
+          onOpenChange={(val) => {
             setPreviewVisible(val)
+            onPreviewOpenChange?.(val)
             onPreviewVisibleChange?.(val)
           }}
         />

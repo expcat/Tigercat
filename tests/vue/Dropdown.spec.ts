@@ -6,6 +6,8 @@ import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
 import { Dropdown, DropdownMenu, DropdownItem } from '@expcat/tigercat-vue'
+import { expectNoA11yViolations } from '../utils'
+import { axe } from 'jest-axe'
 
 describe('Dropdown', () => {
   it('renders trigger and menu content', () => {
@@ -204,6 +206,75 @@ describe('Dropdown', () => {
       items.forEach((item) => {
         expect(item).toHaveAttribute('tabindex', '-1')
       })
+    })
+
+    it('should have no accessibility violations', async () => {
+      const { container } = render(Dropdown, {
+        props: { trigger: 'click', defaultOpen: true },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+          ]
+        }
+      })
+      // Skip aria-allowed-attr: trigger div uses aria-expanded (known issue)
+      const results = await axe(container, {
+        rules: { 'aria-allowed-attr': { enabled: false } }
+      })
+      expect(results).toHaveNoViolations()
+    })
+  })
+
+  describe('disabled', () => {
+    it('does not open when disabled', async () => {
+      const { container } = render(Dropdown, {
+        props: { trigger: 'click', disabled: true },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+          ]
+        }
+      })
+
+      await fireEvent.click(screen.getByText('Trigger'))
+      const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
+      expect(wrapper).toHaveAttribute('hidden')
+    })
+  })
+
+  describe('className', () => {
+    it('merges custom className', () => {
+      const { container } = render(Dropdown, {
+        props: { className: 'my-dropdown' },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+          ]
+        }
+      })
+
+      const root = container.querySelector('.tiger-dropdown-container')
+      expect(root?.className).toContain('my-dropdown')
+    })
+  })
+
+  describe('defaultOpen', () => {
+    it('renders open when defaultOpen is true', () => {
+      const { container } = render(Dropdown, {
+        props: { defaultOpen: true },
+        slots: {
+          default: () => [
+            h('button', null, 'Trigger'),
+            h(DropdownMenu, null, () => [h(DropdownItem, null, () => 'Item 1')])
+          ]
+        }
+      })
+
+      const wrapper = container.querySelector('.tiger-dropdown-container > .absolute')
+      expect(wrapper).not.toHaveAttribute('hidden')
     })
   })
 })

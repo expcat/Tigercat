@@ -157,4 +157,43 @@ describe('Tag', () => {
 
     expect(screen.getByLabelText('Remove')).toBeInTheDocument()
   })
+
+  it('applies default variant classes', () => {
+    const { container } = render(Tag, {
+      slots: { default: 'Default Tag' }
+    })
+
+    const root = container.querySelector('[role="status"]')
+    expect(root?.className).toContain('bg-[var(--tiger-tag-default-bg')
+  })
+
+  it('applies sm size classes', () => {
+    const { container } = render(Tag, {
+      props: { size: 'sm' },
+      slots: { default: 'Tag' }
+    })
+
+    const root = container.querySelector('[role="status"]')
+    expect(root).toHaveClass('text-xs')
+  })
+
+  it('applies warning variant', () => {
+    const { container } = render(Tag, {
+      props: { variant: 'warning' },
+      slots: { default: 'Tag' }
+    })
+
+    const root = container.querySelector('[role="status"]')
+    expect(root?.className).toContain('bg-[var(--tiger-tag-warning-bg')
+  })
+
+  it('applies danger variant', () => {
+    const { container } = render(Tag, {
+      props: { variant: 'danger' },
+      slots: { default: 'Tag' }
+    })
+
+    const root = container.querySelector('[role="status"]')
+    expect(root?.className).toContain('bg-[var(--tiger-tag-danger-bg')
+  })
 })

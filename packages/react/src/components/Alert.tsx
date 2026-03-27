@@ -13,6 +13,10 @@ import {
   alertContentClasses,
   getAlertIconPath,
   alertCloseIconPath,
+  alertBannerClasses,
+  alertCountdownContainerClasses,
+  alertCountdownBarClasses,
+  alertCountdownColorClasses,
   type AlertProps as CoreAlertProps
 } from '@expcat/tigercat-core'
 import { StatusIcon } from './shared/icons'
@@ -49,6 +53,8 @@ export const Alert: React.FC<AlertProps> = ({
   closable = false,
   closeAriaLabel = 'Close alert',
   duration,
+  banner = false,
+  showCountdown = false,
   className,
   children,
   titleSlot,
@@ -57,6 +63,7 @@ export const Alert: React.FC<AlertProps> = ({
   ...props
 }) => {
   const [visible, setVisible] = useState(true)
+  const [countdownProgress, setCountdownProgress] = useState(100)
 
   const colorScheme = useMemo(() => getAlertTypeClasses(type, defaultAlertThemeColors), [type])
 
@@ -67,9 +74,10 @@ export const Alert: React.FC<AlertProps> = ({
         alertSizeClasses[size],
         colorScheme.bg,
         colorScheme.border,
+        banner && alertBannerClasses,
         className
       ),
-    [size, colorScheme, className]
+    [size, colorScheme, banner, className]
   )
 
   const iconClasses = useMemo(
@@ -107,13 +115,27 @@ export const Alert: React.FC<AlertProps> = ({
 
   useEffect(() => {
     if (duration && duration > 0 && closable) {
+      setCountdownProgress(100)
       const timer = setTimeout(() => {
         setVisible(false)
         onClose?.(new MouseEvent('click') as unknown as React.MouseEvent<HTMLButtonElement>)
       }, duration)
-      return () => clearTimeout(timer)
+
+      let countdownTimer: ReturnType<typeof setInterval> | undefined
+      if (showCountdown) {
+        const startTime = Date.now()
+        countdownTimer = setInterval(() => {
+          const elapsed = Date.now() - startTime
+          setCountdownProgress(Math.max(0, 100 - (elapsed / duration) * 100))
+        }, 50)
+      }
+
+      return () => {
+        clearTimeout(timer)
+        if (countdownTimer) clearInterval(countdownTimer)
+      }
     }
-  }, [duration, closable, onClose])
+  }, [duration, closable, showCountdown, onClose])
 
   if (!visible) {
     return null
@@ -152,6 +174,15 @@ export const Alert: React.FC<AlertProps> = ({
           type="button">
           <StatusIcon path={alertCloseIconPath} className="h-4 w-4" />
         </button>
+      )}
+
+      {showCountdown && duration && duration > 0 && closable && (
+        <div className={alertCountdownContainerClasses}>
+          <div
+            className={classNames(alertCountdownBarClasses, alertCountdownColorClasses[type])}
+            style={{ width: `${countdownProgress}%` }}
+          />
+        </div>
       )}
     </div>
   )

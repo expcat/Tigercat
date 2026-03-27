@@ -23,6 +23,13 @@ export interface BreadcrumbProps {
   extra?: unknown
 
   /**
+   * Maximum number of visible items before collapsing.
+   * When set, middle items are collapsed into '...' with expand capability.
+   * @since 0.9.0
+   */
+  maxItems?: number
+
+  /**
    * Additional CSS classes
    */
   className?: string

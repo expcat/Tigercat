@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-data
-description: Shared props definitions for data display components - Table, Timeline
+description: Shared props definitions for data display components - ImageViewer, Table, Timeline
 ---
 
 # Data Display Components - Props Reference
@@ -272,3 +272,41 @@ description: Shared props definitions for data display components - Table, Timel
 | `title`   | `title`    | 标题内容       |
 | `extra`   | `extra`    | 额外操作区域   |
 | `default` | `children` | 自定义附加内容 |
+
+---
+
+## ImageViewer 图片查看器
+
+全屏图片查看器，支持缩放、旋转、图片切换、键盘导航。
+
+### Props
+
+| Prop         | Type       | Default | Vue | React | Description                  |
+| ------------ | ---------- | ------- | :-: | :---: | ---------------------------- |
+| images       | `string[]` | -       |  ✓  |   ✓   | 图片 URL 数组（必填）        |
+| open         | `boolean`  | `false` |  ✓  |   ✓   | 显示状态 (Vue: v-model:open) |
+| currentIndex | `number`   | `0`     |  ✓  |   ✓   | 当前图片索引                 |
+| zoomable     | `boolean`  | `true`  |  ✓  |   ✓   | 启用缩放                     |
+| rotatable    | `boolean`  | `true`  |  ✓  |   ✓   | 启用旋转                     |
+| showNav      | `boolean`  | `true`  |  ✓  |   ✓   | 显示前后导航按钮             |
+| showCounter  | `boolean`  | `true`  |  ✓  |   ✓   | 显示图片计数 (1/3)           |
+| maskClosable | `boolean`  | `true`  |  ✓  |   ✓   | 点击遮罩关闭                 |
+| minZoom      | `number`   | `0.5`   |  ✓  |   ✓   | 最小缩放倍率                 |
+| maxZoom      | `number`   | `3`     |  ✓  |   ✓   | 最大缩放倍率                 |
+| className    | `string`   | -       |  ✓  |   ✓   | 自定义类名                   |
+
+### Events
+
+| Vue Event              | React Callback  | Payload   | Description      |
+| ---------------------- | --------------- | --------- | ---------------- |
+| `@update:open`         | -               | `boolean` | 显示状态变更     |
+| `@update:currentIndex` | `onIndexChange` | `number`  | 当前图片索引变更 |
+| `@close`               | `onClose`       | -         | 关闭事件         |
+
+### 键盘快捷键
+
+| Key      | Action |
+| -------- | ------ |
+| `Escape` | 关闭   |
+| `←`      | 上一张 |
+| `→`      | 下一张 |
