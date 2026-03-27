@@ -88,15 +88,12 @@ export const InputNumber: React.FC<InputNumberProps> = ({
     [formatter, precision]
   )
 
-  const parseValue = useCallback(
-    (str: string): number | null => {
-      if (str === '' || str === '-') return null
-      if (parser) return parser(str)
-      const num = Number(str)
-      return Number.isNaN(num) ? null : num
-    },
-    [parser]
-  )
+  const parseValue = (str: string): number | null => {
+    if (str === '' || str === '-') return null
+    if (parser) return parser(str)
+    const num = Number(str)
+    return Number.isNaN(num) ? null : num
+  }
 
   // Sync display value when value or focus changes
   useEffect(() => {
@@ -111,75 +108,60 @@ export const InputNumber: React.FC<InputNumberProps> = ({
     }
   }, [autoFocus])
 
-  const commitValue = useCallback(
-    (val: number | null) => {
-      let finalVal = val
-      if (finalVal !== null) {
-        finalVal = clampValue(finalVal, min, max)
-        if (precision !== undefined) {
-          finalVal = formatPrecision(finalVal, precision)
-        }
+  const commitValue = (val: number | null) => {
+    let finalVal = val
+    if (finalVal !== null) {
+      finalVal = clampValue(finalVal, min, max)
+      if (precision !== undefined) {
+        finalVal = formatPrecision(finalVal, precision)
       }
+    }
 
-      if (!isControlled) {
-        setInternalValue(finalVal)
-      }
-      onChange?.(finalVal)
-      setDisplayValue(toDisplayValue(finalVal))
-    },
-    [min, max, precision, isControlled, onChange, toDisplayValue]
-  )
+    if (!isControlled) {
+      setInternalValue(finalVal)
+    }
+    onChange?.(finalVal)
+    setDisplayValue(toDisplayValue(finalVal))
+  }
 
-  const handleStep = useCallback(
-    (direction: 'up' | 'down') => {
-      if (disabled || readonly) return
-      const next = stepValue(currentValue, step, direction, min, max, precision)
-      commitValue(next)
-    },
-    [currentValue, step, min, max, precision, disabled, readonly, commitValue]
-  )
+  const handleStep = (direction: 'up' | 'down') => {
+    if (disabled || readonly) return
+    const next = stepValue(currentValue, step, direction, min, max, precision)
+    commitValue(next)
+  }
 
-  const handleInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDisplayValue(e.target.value)
-  }, [])
+  }
 
-  const handleBlur = useCallback(
-    (e: React.FocusEvent<HTMLInputElement>) => {
-      setFocused(false)
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setFocused(false)
+    const parsed = parseValue(displayValue)
+    commitValue(parsed)
+    onBlur?.(e)
+  }
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setFocused(true)
+    if (formatter && currentValue !== null) {
+      setDisplayValue(String(currentValue))
+    }
+    onFocus?.(e)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!keyboard || disabled || readonly) return
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      handleStep('up')
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      handleStep('down')
+    } else if (e.key === 'Enter') {
       const parsed = parseValue(displayValue)
       commitValue(parsed)
-      onBlur?.(e)
-    },
-    [displayValue, parseValue, commitValue, onBlur]
-  )
-
-  const handleFocus = useCallback(
-    (e: React.FocusEvent<HTMLInputElement>) => {
-      setFocused(true)
-      if (formatter && currentValue !== null) {
-        setDisplayValue(String(currentValue))
-      }
-      onFocus?.(e)
-    },
-    [formatter, currentValue, onFocus]
-  )
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (!keyboard || disabled || readonly) return
-      if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        handleStep('up')
-      } else if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        handleStep('down')
-      } else if (e.key === 'Enter') {
-        const parsed = parseValue(displayValue)
-        commitValue(parsed)
-      }
-    },
-    [keyboard, disabled, readonly, handleStep, parseValue, displayValue, commitValue]
-  )
+    }
+  }
 
   const atMin = isAtMin(currentValue, min)
   const atMax = isAtMax(currentValue, max)

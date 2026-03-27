@@ -6,24 +6,27 @@ export type TextProps = CoreTextProps &
     children?: React.ReactNode
   }
 
-export const Text: React.FC<TextProps> = ({
-  tag = 'p',
-  size,
-  weight,
-  align,
-  color,
-  truncate,
-  italic,
-  underline,
-  lineThrough,
-  children,
-  className,
-  ...props
-}) => {
-  const textClasses = classNames(
-    getTextClasses({ size, weight, align, color, truncate, italic, underline, lineThrough }),
-    className
-  )
+export const Text: React.FC<TextProps> = React.memo(
+  ({
+    tag = 'p',
+    size,
+    weight,
+    align,
+    color,
+    truncate,
+    italic,
+    underline,
+    lineThrough,
+    children,
+    className,
+    ...props
+  }) => {
+    const textClasses = classNames(
+      getTextClasses({ size, weight, align, color, truncate, italic, underline, lineThrough }),
+      className
+    )
 
-  return React.createElement(tag, { ...props, className: textClasses }, children)
-}
+    return React.createElement(tag, { ...props, className: textClasses }, children)
+  }
+)
+Text.displayName = 'Text'

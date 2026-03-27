@@ -29,11 +29,7 @@ export interface ImagePreviewProps extends CoreImagePreviewProps {
    * @since 0.9.0
    */
   onOpenChange?: (open: boolean) => void
-  /**
-   * Callback when visibility changes
-   * @deprecated Use `onOpenChange` instead
-   */
-  onVisibleChange?: (visible: boolean) => void
+
   /**
    * Callback when current index changes
    */
@@ -57,7 +53,7 @@ const SvgIcon: React.FC<{ d: string; cls?: string }> = ({ d, cls = 'w-5 h-5' }) 
 
 export const ImagePreview: React.FC<ImagePreviewProps> = ({
   open,
-  visible,
+
   images,
   currentIndex = 0,
   zIndex = 1050,
@@ -66,11 +62,11 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   minScale = 0.25,
   maxScale = 5,
   onOpenChange,
-  onVisibleChange,
+
   onCurrentIndexChange,
   onScaleChange
 }) => {
-  const isOpen = open !== undefined ? open : visible
+  const isOpen = open
   const [scale, setScale] = useState(1)
   const [offsetX, setOffsetX] = useState(0)
   const [offsetY, setOffsetY] = useState(0)
@@ -104,8 +100,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 
   const handleClose = useCallback(() => {
     onOpenChange?.(false)
-    onVisibleChange?.(false)
-  }, [onOpenChange, onVisibleChange])
+  }, [onOpenChange])
 
   useEscapeKey({ enabled: !!isOpen, onEscape: handleClose })
 

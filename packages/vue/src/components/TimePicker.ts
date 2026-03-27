@@ -13,7 +13,6 @@ import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
-  icon20ViewBox,
   parseTime,
   formatTime,
   formatTimeDisplayWithLocale,
@@ -52,29 +51,11 @@ import {
   type TimeFormat
 } from '@expcat/tigercat-core'
 
-// Helper function to create SVG icon
-const createIcon = (path: string, className: string) => {
-  return h(
-    'svg',
-    {
-      class: className,
-      xmlns: 'http://www.w3.org/2000/svg',
-      viewBox: icon20ViewBox,
-      fill: 'currentColor'
-    },
-    [
-      h('path', {
-        'fill-rule': 'evenodd',
-        d: path,
-        'clip-rule': 'evenodd'
-      })
-    ]
-  )
-}
+import { createFilledIcon } from '../utils/icon-helpers'
 
 // Icons
-const ClockIcon = createIcon(ClockIconPath, 'w-5 h-5')
-const CloseIcon = createIcon(TimePickerCloseIconPath, 'w-4 h-4')
+const ClockIcon = createFilledIcon(ClockIconPath, 'w-5 h-5')
+const CloseIcon = createFilledIcon(TimePickerCloseIconPath, 'w-4 h-4')
 
 export type VueTimePickerModelValue = TimePickerModelValue
 

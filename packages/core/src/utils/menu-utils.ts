@@ -141,16 +141,19 @@ export function getSubmenuPopupZIndex(level: number): Record<string, number> {
 }
 
 /**
+ * Pick the appropriate class string based on menu theme
+ */
+function themeClass(theme: MenuTheme, light: string, dark: string): string {
+  return theme === 'dark' ? dark : light
+}
+
+/**
  * Get menu classes based on mode and theme
  */
 export function getMenuClasses(mode: MenuMode, theme: MenuTheme, collapsed?: boolean): string {
   const classes = [menuBaseClasses, menuModeClasses[mode]]
 
-  if (theme === 'dark') {
-    classes.push(menuDarkThemeClasses)
-  } else {
-    classes.push(menuLightThemeClasses)
-  }
+  classes.push(themeClass(theme, menuLightThemeClasses, menuDarkThemeClasses))
 
   if (collapsed && mode === 'vertical') {
     classes.push(menuCollapsedClasses)
@@ -178,9 +181,9 @@ export function getMenuItemClasses(
     classes.push(menuItemDisabledClasses)
   } else {
     if (selected) {
-      classes.push(theme === 'dark' ? menuItemSelectedDarkClasses : menuItemSelectedLightClasses)
+      classes.push(themeClass(theme, menuItemSelectedLightClasses, menuItemSelectedDarkClasses))
     } else {
-      classes.push(theme === 'dark' ? menuItemHoverDarkClasses : menuItemHoverLightClasses)
+      classes.push(themeClass(theme, menuItemHoverLightClasses, menuItemHoverDarkClasses))
     }
   }
 
@@ -196,7 +199,7 @@ export function getSubMenuTitleClasses(theme: MenuTheme, disabled?: boolean): st
   if (disabled) {
     classes.push(menuItemDisabledClasses)
   } else {
-    classes.push(theme === 'dark' ? menuItemHoverDarkClasses : menuItemHoverLightClasses)
+    classes.push(themeClass(theme, menuItemHoverLightClasses, menuItemHoverDarkClasses))
   }
 
   return classes.join(' ')

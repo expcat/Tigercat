@@ -1,4 +1,5 @@
 import React, { useRef, useState, useCallback, useMemo } from 'react'
+import { useControlledState } from '../hooks/useControlledState'
 import {
   classNames,
   taskBoardColumnClasses,
@@ -98,9 +99,10 @@ export const Kanban: React.FC<KanbanProps> = ({
   ...restProps
 }) => {
   const boardRef = useRef<HTMLDivElement>(null)
-  const [internalColumns, setInternalColumns] = useState<TaskBoardColumn[]>(defaultColumns)
-  const isControlled = controlledColumns !== undefined
-  const rawColumns = isControlled ? controlledColumns : internalColumns
+  const [rawColumns, setInternalColumns, isControlled] = useControlledState(
+    controlledColumns,
+    defaultColumns
+  )
 
   // Apply filter
   const visibleColumns = useMemo(

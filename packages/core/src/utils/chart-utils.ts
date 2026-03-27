@@ -538,36 +538,45 @@ export const RADAR_SPLIT_AREA_COLORS = [
 
 import type { ChartCurveType } from '../types/chart'
 
-let lineGradientCounter = 0
+function createGradientIdFactory(prefix: string) {
+  let counter = 0
+  return {
+    getPrefix: () => `tiger-${prefix}-grad-${++counter}`,
+    reset: () => {
+      counter = 0
+    }
+  }
+}
+
+const lineGradient = createGradientIdFactory('line')
+const areaGradient = createGradientIdFactory('area')
 
 /**
  * Generate a unique gradient ID prefix for a LineChart instance.
  */
 export function getLineGradientPrefix(): string {
-  return `tiger-line-grad-${++lineGradientCounter}`
+  return lineGradient.getPrefix()
 }
 
 /**
  * Reset the line gradient counter (for testing only)
  */
 export function resetLineGradientCounter(): void {
-  lineGradientCounter = 0
+  lineGradient.reset()
 }
-
-let areaGradientCounter = 0
 
 /**
  * Generate a unique gradient ID prefix for an AreaChart instance.
  */
 export function getAreaGradientPrefix(): string {
-  return `tiger-area-grad-${++areaGradientCounter}`
+  return areaGradient.getPrefix()
 }
 
 /**
  * Reset the area gradient counter (for testing only)
  */
 export function resetAreaGradientCounter(): void {
-  areaGradientCounter = 0
+  areaGradient.reset()
 }
 
 /**
@@ -818,21 +827,21 @@ export function stackSeriesData<T extends { x: unknown; y: number }>(
 // Bar Chart Utilities
 // ============================================================================
 
-let barGradientCounter = 0
+const barGradient = createGradientIdFactory('bar')
 
 /**
  * Generate a unique gradient ID prefix for a BarChart instance.
  * Each BarChart must have its own prefix to avoid gradient ID collisions.
  */
 export function getBarGradientPrefix(): string {
-  return `tiger-bar-grad-${++barGradientCounter}`
+  return barGradient.getPrefix()
 }
 
 /**
  * Reset the gradient counter (for testing only)
  */
 export function resetBarGradientCounter(): void {
-  barGradientCounter = 0
+  barGradient.reset()
 }
 
 /**
@@ -901,20 +910,20 @@ export const barAnimatedTransition =
 // Scatter Chart Utilities
 // ============================================================================
 
-let scatterGradientCounter = 0
+const scatterGradient = createGradientIdFactory('scatter')
 
 /**
  * Generate a unique gradient ID prefix for a ScatterChart instance.
  */
 export function getScatterGradientPrefix(): string {
-  return `tiger-scatter-grad-${++scatterGradientCounter}`
+  return scatterGradient.getPrefix()
 }
 
 /**
  * Reset the scatter gradient counter (for testing only)
  */
 export function resetScatterGradientCounter(): void {
-  scatterGradientCounter = 0
+  scatterGradient.reset()
 }
 
 /** CSS transition for scatter point hover */

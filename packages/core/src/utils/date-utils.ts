@@ -147,13 +147,21 @@ export function getCalendarDays(year: number, month: number): (Date | null)[] {
   return days
 }
 
+const intlCache = new Map<string, Intl.DateTimeFormat>()
+
 function safeIntlFormat(
   locale: string | undefined,
   options: Intl.DateTimeFormatOptions,
   date: Date
 ): string {
   try {
-    return new Intl.DateTimeFormat(locale, options).format(date)
+    const key = `${locale ?? ''}_${JSON.stringify(options)}`
+    let fmt = intlCache.get(key)
+    if (!fmt) {
+      fmt = new Intl.DateTimeFormat(locale, options)
+      intlCache.set(key, fmt)
+    }
+    return fmt.format(date)
   } catch {
     return ''
   }

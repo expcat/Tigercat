@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext } from 'react'
+import { useControlledState } from '../hooks/useControlledState'
 import { type CheckboxGroupValue, type CheckboxSize } from '@expcat/tigercat-core'
 
 export interface CheckboxGroupContext {
@@ -59,14 +60,7 @@ export const CheckboxGroup: React.FC<CheckboxGroupProps> = ({
   className,
   ...props
 }) => {
-  // Internal state for uncontrolled mode
-  const [internalValue, setInternalValue] = useState<CheckboxGroupValue>(defaultValue)
-
-  // Determine if controlled or uncontrolled - simple comparison, no need to memoize
-  const isControlled = controlledValue !== undefined
-
-  // Current selected values - don't use nullish coalescing here to allow proper controlled/uncontrolled switching
-  const value = isControlled ? controlledValue! : internalValue
+  const [value, setInternalValue, isControlled] = useControlledState(controlledValue, defaultValue)
 
   const updateValue = (val: CheckboxGroupValue[number], checked: boolean) => {
     if (disabled) return

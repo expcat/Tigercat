@@ -55,10 +55,10 @@ export const ImageGroup = defineComponent({
 
       const preview = props.preview
         ? h(ImagePreview, {
-            visible: previewVisible.value,
+            open: previewVisible.value,
             images: images.value,
             currentIndex: previewIndex.value,
-            'onUpdate:visible': (val: boolean) => {
+            'onUpdate:open': (val: boolean) => {
               previewVisible.value = val
               if (!val) emit('preview-visible-change', false)
             },

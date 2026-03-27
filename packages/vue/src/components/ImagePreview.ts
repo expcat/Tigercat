@@ -31,8 +31,6 @@ import {
 } from '@expcat/tigercat-core'
 
 export interface VueImagePreviewProps {
-  /** @deprecated Use `open` instead */
-  visible?: boolean
   open?: boolean
   images?: string[]
   currentIndex?: number
@@ -67,8 +65,7 @@ export const ImagePreview = defineComponent({
   name: 'TigerImagePreview',
   inheritAttrs: false,
   props: {
-    visible: { type: Boolean, default: false },
-    open: { type: Boolean, default: undefined },
+    open: { type: Boolean, default: false },
     images: { type: Array as PropType<string[]>, default: () => [] },
     currentIndex: { type: Number, default: 0 },
     zIndex: { type: Number, default: 1050 },
@@ -77,7 +74,7 @@ export const ImagePreview = defineComponent({
     minScale: { type: Number, default: 0.25 },
     maxScale: { type: Number, default: 5 }
   },
-  emits: ['update:visible', 'update:open', 'update:currentIndex', 'scale-change'],
+  emits: ['update:open', 'update:currentIndex', 'scale-change'],
   setup(props, { emit }) {
     const scale = ref(1)
     const offsetX = ref(0)
@@ -100,7 +97,7 @@ export const ImagePreview = defineComponent({
       }
     )
 
-    const isOpen = computed(() => (props.open !== undefined ? props.open : props.visible))
+    const isOpen = computed(() => props.open)
 
     watch(
       () => isOpen.value,
@@ -119,7 +116,6 @@ export const ImagePreview = defineComponent({
 
     const handleClose = () => {
       emit('update:open', false)
-      emit('update:visible', false)
     }
 
     const handleZoomIn = () => {

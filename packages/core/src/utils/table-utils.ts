@@ -197,15 +197,6 @@ export const tableLoadingOverlayClasses = classNames(
 )
 
 /**
- * Get pagination container classes
- * @deprecated Use `getSimplePaginationContainerClasses()` from pagination-utils instead.
- * This constant will be removed in v0.3.0.
- */
-export const tablePaginationContainerClasses = classNames(
-  'flex items-center justify-between px-4 py-3 border-t border-gray-200'
-)
-
-/**
  * Get checkbox cell classes
  */
 export function getCheckboxCellClasses(size: TableSize): string {

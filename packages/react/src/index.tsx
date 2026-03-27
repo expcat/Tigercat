@@ -306,6 +306,7 @@ export type {
 } from './hooks/useChartInteraction'
 export { useDrag } from './hooks/useDrag'
 export type { UseDragOptions, UseDragReturn } from './hooks/useDrag'
+export { useControlledState } from './hooks/useControlledState'
 
 // Splitter (v0.8.0+)
 export { Splitter } from './components/Splitter'

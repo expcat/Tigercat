@@ -1,4 +1,5 @@
-import React, { forwardRef, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useLayoutEffect, useMemo, useRef } from 'react'
+import { useControlledState } from '../hooks/useControlledState'
 import {
   autoResizeTextarea,
   classNames,
@@ -47,10 +48,10 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     ref
   ) => {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null)
-    const [internalValue, setInternalValue] = useState(defaultValue || '')
-
-    const isControlled = value !== undefined
-    const currentValue = isControlled ? value : internalValue
+    const [currentValue, setInternalValue, isControlled] = useControlledState(
+      value,
+      defaultValue || ''
+    )
 
     const setRefs = (node: HTMLTextAreaElement | null) => {
       textareaRef.current = node

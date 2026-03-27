@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
+import { useControlledState } from '../hooks/useControlledState'
 import { getRadioGroupClasses } from '@expcat/tigercat-core'
 import { type RadioGroupProps as CoreRadioGroupProps, type RadioSize } from '@expcat/tigercat-core'
 
@@ -43,14 +44,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
   className,
   ...props
 }) => {
-  // Internal state for uncontrolled mode
-  const [internalValue, setInternalValue] = useState<string | number | undefined>(defaultValue)
-
-  // Determine if controlled or uncontrolled
-  const isControlled = value !== undefined
-
-  // Current value - use prop value if controlled, otherwise use internal state
-  const currentValue = isControlled ? value : internalValue
+  const [currentValue, setInternalValue, isControlled] = useControlledState(value, defaultValue)
 
   const generatedNameRef = useRef(
     `tiger-radio-group-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`

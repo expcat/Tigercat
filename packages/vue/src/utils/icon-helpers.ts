@@ -9,8 +9,31 @@ import {
   icon24StrokeWidth,
   icon24PathStrokeLinecap,
   icon24PathStrokeLinejoin,
+  icon20ViewBox,
   classNames
 } from '@expcat/tigercat-core'
+
+/**
+ * Create a 20×20 filled SVG icon (e.g. DatePicker, TimePicker).
+ */
+export function createFilledIcon(path: string, className: string): VNode {
+  return h(
+    'svg',
+    {
+      class: className,
+      xmlns: 'http://www.w3.org/2000/svg',
+      viewBox: icon20ViewBox,
+      fill: 'currentColor'
+    },
+    [
+      h('path', {
+        'fill-rule': 'evenodd',
+        d: path,
+        'clip-rule': 'evenodd'
+      })
+    ]
+  )
+}
 
 /**
  * Create a 24×24 status SVG icon (info / success / warning / error).

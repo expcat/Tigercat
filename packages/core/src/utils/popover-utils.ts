@@ -52,17 +52,3 @@ export const POPOVER_TEXT_CLASSES = classNames(
   'text-sm',
   'text-[var(--tiger-text-muted,#374151)]'
 )
-
-/**
- * @deprecated Use POPOVER_TITLE_CLASSES instead
- */
-export function getPopoverTitleClasses(): string {
-  return POPOVER_TITLE_CLASSES
-}
-
-/**
- * @deprecated Use POPOVER_TEXT_CLASSES instead
- */
-export function getPopoverContentTextClasses(): string {
-  return POPOVER_TEXT_CLASSES
-}

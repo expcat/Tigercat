@@ -13,7 +13,7 @@ describe('ImagePreview', () => {
   it('renders nothing when not visible', () => {
     const { container } = render(ImagePreview, {
       props: {
-        visible: false,
+        open: false,
         images
       }
     })
@@ -24,7 +24,7 @@ describe('ImagePreview', () => {
   it('renders preview dialog when visible', () => {
     render(ImagePreview, {
       props: {
-        visible: true,
+        open: true,
         images
       }
     })
@@ -38,7 +38,7 @@ describe('ImagePreview', () => {
   it('displays current image', () => {
     render(ImagePreview, {
       props: {
-        visible: true,
+        open: true,
         images,
         currentIndex: 1
       }
@@ -51,7 +51,7 @@ describe('ImagePreview', () => {
   it('renders navigation buttons for multiple images', () => {
     render(ImagePreview, {
       props: {
-        visible: true,
+        open: true,
         images
       }
     })
@@ -65,7 +65,7 @@ describe('ImagePreview', () => {
   it('disables prev button on first image', () => {
     render(ImagePreview, {
       props: {
-        visible: true,
+        open: true,
         images,
         currentIndex: 0
       }
@@ -78,7 +78,7 @@ describe('ImagePreview', () => {
   it('disables next button on last image', () => {
     render(ImagePreview, {
       props: {
-        visible: true,
+        open: true,
         images,
         currentIndex: 2
       }
@@ -91,7 +91,7 @@ describe('ImagePreview', () => {
   it('renders toolbar with zoom buttons', () => {
     render(ImagePreview, {
       props: {
-        visible: true,
+        open: true,
         images
       }
     })
@@ -104,7 +104,7 @@ describe('ImagePreview', () => {
   it('renders close button', () => {
     render(ImagePreview, {
       props: {
-        visible: true,
+        open: true,
         images
       }
     })
@@ -112,10 +112,10 @@ describe('ImagePreview', () => {
     expect(document.querySelector('[aria-label="Close preview"]')).toBeInTheDocument()
   })
 
-  it('emits update:visible on close button click', async () => {
+  it('emits update:open on close button click', async () => {
     const { emitted } = render(ImagePreview, {
       props: {
-        visible: true,
+        open: true,
         images
       }
     })
@@ -123,14 +123,14 @@ describe('ImagePreview', () => {
     const closeBtn = document.querySelector('[aria-label="Close preview"]') as HTMLElement
     await fireEvent.click(closeBtn)
 
-    expect(emitted()['update:visible']).toBeTruthy()
-    expect(emitted()['update:visible'][0]).toEqual([false])
+    expect(emitted()['update:open']).toBeTruthy()
+    expect(emitted()['update:open'][0]).toEqual([false])
   })
 
   it('shows image counter for multiple images', () => {
     render(ImagePreview, {
       props: {
-        visible: true,
+        open: true,
         images,
         currentIndex: 1
       }
@@ -143,7 +143,7 @@ describe('ImagePreview', () => {
   it('does not show navigation for single image', () => {
     render(ImagePreview, {
       props: {
-        visible: true,
+        open: true,
         images: ['/single.jpg']
       }
     })

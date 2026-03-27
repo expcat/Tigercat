@@ -70,10 +70,10 @@ export const ImageGroup: React.FC<ImageGroupProps> = ({
         {children}
         {preview && (
           <ImagePreview
-            visible={previewVisible}
+            open={previewVisible}
             images={imagesRef.current}
             currentIndex={previewIndex}
-            onVisibleChange={(val) => {
+            onOpenChange={(val: boolean) => {
               setPreviewVisible(val)
               if (!val) onPreviewVisibleChange?.(false)
             }}

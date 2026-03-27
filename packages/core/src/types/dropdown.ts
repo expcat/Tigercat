@@ -10,12 +10,6 @@ import type { FloatingPlacement } from '../utils/floating'
 export type DropdownTrigger = 'click' | 'hover'
 
 /**
- * @deprecated Use `FloatingPlacement` from floating utils instead.
- * Kept for backward compatibility with popover/tooltip/popconfirm types.
- */
-export type DropdownPlacement = FloatingPlacement
-
-/**
  * Base dropdown props interface
  */
 export interface DropdownProps {

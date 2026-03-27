@@ -1,4 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect, useMemo } from 'react'
+import { useControlledState } from '../hooks/useControlledState'
 import {
   classNames,
   getRichTextContainerClasses,
@@ -56,11 +57,8 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   ...restProps
 }) => {
   const editorRef = useRef<HTMLDivElement>(null)
-  const [internalValue, setInternalValue] = useState(defaultValue)
+  const [currentContent, setInternalValue, isControlled] = useControlledState(value, defaultValue)
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set())
-
-  const isControlled = value !== undefined
-  const currentContent = isControlled ? value : internalValue
   const toolbarButtons = toolbar ?? defaultToolbar
   const empty = isContentEmpty(currentContent)
 
