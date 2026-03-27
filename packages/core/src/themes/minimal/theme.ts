@@ -39,7 +39,7 @@ export const minimalTheme: ThemePreset = {
       chart5: '#3f3f46',
       chart6: '#52525b'
     },
-    radius: { sm: '0', md: '2px', lg: '4px', xl: '6px', none: '0', full: '9999px' },
+    radius: { sm: '2px', md: '4px', lg: '6px', xl: '8px', none: '0', full: '9999px' },
     shadows: {
       xs: '0 1px 2px 0 rgba(0,0,0,0.03)',
       sm: '0 1px 2px 0 rgba(0,0,0,0.06)',

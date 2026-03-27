@@ -22,6 +22,17 @@ v1.x.x (patch) — Bug 修复；v1.y.0 (minor) — 新特性/新组件；v2.0.0 
 
 ### 自 v0.8.0 以来的变更
 
+#### 视觉样式升级
+
+- **圆角体系升级** — 控件级 `rounded-md→rounded-lg` (4px→8px)，容器级 `rounded-lg→rounded-xl` (8px→12px)，Modal `rounded-2xl`
+- **交互动效优化** — 过渡时长 150ms→200ms，新增 `ease-out` 缓动，slide 动画距离缩短 (translate-y-4→2)
+- **Focus Ring 柔化** — 聚焦环从硬色改为 `/40` 半透明，视觉更柔和
+- **叠加层模糊** — Modal/Drawer 遮罩新增 `backdrop-blur-[2px]` 毛玻璃效果
+- **Card 悬浮** — hover 效果从 `scale-[1.02]` 改为 `-translate-y-1 + shadow-lg`，更自然
+- **Token 同步** — tokens.ts / tokens.css / 5 套主题预设圆角值全部对齐
+- **新增缓动常量** — `EASING_SPRING` (弹性) / `EASING_SMOOTH` (平滑) + 对应 CSS 变量
+- 涉及 40+ 组件工具文件，所有 4619 测试通过
+
 #### 新增组件
 
 - **InputGroup** — 输入框组合容器，支持前后缀、嵌套 Input/Select/Button

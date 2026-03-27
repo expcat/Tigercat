@@ -48,7 +48,7 @@ describe('Transition System', () => {
     })
 
     it('slide-up should use translate-y classes', () => {
-      expect(transitionPresets['slide-up'].enterFrom).toContain('translate-y-4')
+      expect(transitionPresets['slide-up'].enterFrom).toContain('translate-y-2')
       expect(transitionPresets['slide-up'].enterTo).toContain('translate-y-0')
     })
   })

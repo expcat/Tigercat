@@ -25,7 +25,7 @@ export const fileManagerBreadcrumbSeparatorClasses = 'text-[var(--tiger-text-mut
 export const fileManagerContentClasses = 'flex-1 overflow-auto p-2'
 
 export const fileManagerListItemClasses =
-  'flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer transition-colors hover:bg-[var(--tiger-bg-hover,#f3f4f6)]'
+  'flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors hover:bg-[var(--tiger-bg-hover,#f3f4f6)]'
 
 export const fileManagerListItemSelectedClasses =
   'bg-[var(--tiger-primary,#2563eb)]/10 hover:bg-[var(--tiger-primary,#2563eb)]/15'
@@ -50,7 +50,7 @@ export const fileManagerLoadingClasses =
   'absolute inset-0 flex items-center justify-center bg-[var(--tiger-bg,#ffffff)]/60 z-10'
 
 export const fileManagerSearchClasses =
-  'px-3 py-1.5 text-sm border border-[var(--tiger-border,#e5e7eb)] rounded-md bg-[var(--tiger-bg,#ffffff)] focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/30'
+  'px-3 py-1.5 text-sm border border-[var(--tiger-border,#e5e7eb)] rounded-lg bg-[var(--tiger-bg,#ffffff)] focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/30'
 
 // ─── File operations ──────────────────────────────────────────────
 

@@ -61,7 +61,7 @@ export function getInputGroupAddonClasses(
   if (compact) {
     classes.push('first:rounded-l-md last:rounded-r-md')
   } else {
-    classes.push('rounded-md')
+    classes.push('rounded-lg')
   }
   if (className) classes.push(className)
   return classes.join(' ')

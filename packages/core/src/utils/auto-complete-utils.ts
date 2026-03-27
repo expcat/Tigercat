@@ -56,7 +56,7 @@ export function getAutoCompleteInputClasses(
   disabled: boolean = false,
   isOpen: boolean = false
 ): string {
-  const base = 'w-full rounded-lg border outline-none transition-all duration-150'
+  const base = 'w-full rounded-lg border outline-none transition-all duration-200'
 
   const sizeClass = classNames(sizeClasses[size], inputPaddingClasses[size])
 

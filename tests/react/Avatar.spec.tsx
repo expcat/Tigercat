@@ -96,7 +96,7 @@ describe('Avatar', () => {
     expect(circleContainer.querySelector('[role="img"]')?.className).toContain('rounded-full')
 
     const { container: squareContainer } = render(<Avatar text="S" shape="square" />)
-    expect(squareContainer.querySelector('[role="img"]')?.className).toContain('rounded-md')
+    expect(squareContainer.querySelector('[role="img"]')?.className).toContain('rounded-lg')
   })
 
   it('applies custom bgColor and textColor', () => {

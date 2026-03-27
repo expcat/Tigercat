@@ -147,17 +147,60 @@ mq.addEventListener('change', (e) => {
 
 ---
 
+## 圆角变量
+
+组件圆角通过 CSS 变量控制，支持主题级覆盖：
+
+```css
+:root {
+  /* 语义别名 */
+  --tiger-radius-component: 8px; /* 控件级（Button/Input/Select 等） */
+  --tiger-radius-card: 12px; /* 容器级（Card/Modal/Notification 等） */
+
+  /* 组件级覆盖（可选） */
+  --tiger-button-border-radius: 8px;
+  --tiger-input-border-radius: 8px;
+  --tiger-select-border-radius: 8px;
+  --tiger-modal-border-radius: 12px;
+  --tiger-card-border-radius: 12px;
+  --tiger-tag-border-radius: 6px;
+  --tiger-tooltip-border-radius: 8px;
+  --tiger-notification-border-radius: 12px;
+  --tiger-popover-border-radius: 12px;
+  --tiger-dropdown-border-radius: 12px;
+}
+```
+
+---
+
+## 缓动变量
+
+```css
+:root {
+  --tiger-easing-in: cubic-bezier(0.4, 0, 1, 1);
+  --tiger-easing-out: cubic-bezier(0, 0, 0.2, 1);
+  --tiger-easing-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --tiger-easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* 弹性回弹 */
+  --tiger-easing-smooth: cubic-bezier(0.25, 0.1, 0.25, 1); /* 平滑过渡 */
+}
+```
+
+---
+
 ## 变量速查
 
-| 变量 | 用途 |
-|------|------|
-| `--tiger-primary` | 主色（按钮、链接） |
-| `--tiger-primary-hover` | 主色悬停 |
-| `--tiger-secondary` | 次要色 |
-| `--tiger-border` | 边框、分割线 |
-| `--tiger-text` | 主文本 |
-| `--tiger-text-secondary` | 次要文本 |
-| `--tiger-chart-N` | 图表色板 (N=1-6) |
-
+| 变量                       | 用途               |
+| -------------------------- | ------------------ |
+| `--tiger-primary`          | 主色（按钮、链接） |
+| `--tiger-primary-hover`    | 主色悬停           |
+| `--tiger-secondary`        | 次要色             |
+| `--tiger-border`           | 边框、分割线       |
+| `--tiger-text`             | 主文本             |
+| `--tiger-text-secondary`   | 次要文本           |
+| `--tiger-chart-N`          | 图表色板 (N=1-6)   |
+| `--tiger-radius-component` | 控件圆角 (8px)     |
+| `--tiger-radius-card`      | 容器圆角 (12px)    |
+| `--tiger-easing-spring`    | 弹性缓动           |
+| `--tiger-easing-smooth`    | 平滑缓动           |
 
 > **See also**: [shared/props/charts.md](shared/props/charts.md) for chart palette details

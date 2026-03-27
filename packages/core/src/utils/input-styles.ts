@@ -11,8 +11,7 @@ import { classNames } from './class-names'
 const BASE_INPUT_CLASSES = [
   'w-full',
   'border',
-  'rounded-md',
-  'shadow-sm',
+  'rounded-lg',
   'bg-[var(--tiger-surface,#ffffff)]',
   'text-[var(--tiger-text,#111827)]',
   'focus:outline-none',
@@ -26,7 +25,7 @@ const BASE_INPUT_CLASSES = [
 
 const STATUS_CLASSES: Record<InputStatus, string> = {
   default:
-    'border-[var(--tiger-border,#e5e7eb)] focus:ring-[var(--tiger-primary,#2563eb)] focus:border-transparent',
+    'border-[var(--tiger-border,#e5e7eb)] focus:ring-[var(--tiger-primary,#2563eb)]/40 focus:border-transparent',
   error: 'border-red-500 focus:ring-red-500 focus:border-red-500 text-red-900 placeholder-red-300',
   success:
     'border-green-500 focus:ring-green-500 focus:border-green-500 text-green-900 placeholder-green-300',

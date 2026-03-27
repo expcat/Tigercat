@@ -12,7 +12,7 @@ export const globalColors = {
     '600': '#0284c7',
     '700': '#0369a1',
     '800': '#075985',
-    '950': '#0c3d66',
+    '950': '#0c3d66'
   },
   secondary: {
     '50': '#f8fafc',
@@ -24,7 +24,7 @@ export const globalColors = {
     '600': '#475569',
     '700': '#334155',
     '800': '#1e293b',
-    '950': '#0f172a',
+    '950': '#0f172a'
   },
   success: {
     '50': '#f0fdf4',
@@ -36,7 +36,7 @@ export const globalColors = {
     '600': '#16a34a',
     '700': '#15803d',
     '800': '#166534',
-    '950': '#052e16',
+    '950': '#052e16'
   },
   warning: {
     '50': '#fffbeb',
@@ -48,7 +48,7 @@ export const globalColors = {
     '600': '#d97706',
     '700': '#b45309',
     '800': '#92400e',
-    '950': '#451a03',
+    '950': '#451a03'
   },
   error: {
     '50': '#fef2f2',
@@ -60,7 +60,7 @@ export const globalColors = {
     '600': '#dc2626',
     '700': '#b91c1c',
     '800': '#991b1b',
-    '950': '#450a0a',
+    '950': '#450a0a'
   },
   info: {
     '50': '#eff6ff',
@@ -72,7 +72,7 @@ export const globalColors = {
     '600': '#2563eb',
     '700': '#1d4ed8',
     '800': '#1e40af',
-    '950': '#172554',
+    '950': '#172554'
   },
   neutral: {
     '50': '#fafafa',
@@ -84,20 +84,20 @@ export const globalColors = {
     '600': '#525252',
     '700': '#404040',
     '800': '#262626',
-    '950': '#0a0a0a',
-  },
+    '950': '#0a0a0a'
+  }
 } as const
 
 /** Spacing scale */
 export const globalSpace = {
-  'xs': '2px',
-  'sm': '4px',
-  'md': '8px',
-  'lg': '16px',
-  'xl': '24px',
+  xs: '2px',
+  sm: '4px',
+  md: '8px',
+  lg: '16px',
+  xl: '24px',
   '2xl': '32px',
   '3xl': '48px',
-  '4xl': '64px',
+  '4xl': '64px'
 } as const
 
 /** Border radius scale */
@@ -107,7 +107,7 @@ export const globalRadius = {
   md: '4px',
   lg: '8px',
   xl: '12px',
-  full: '9999px',
+  full: '9999px'
 } as const
 
 /** Box shadow scale */
@@ -116,37 +116,37 @@ export const globalShadow = {
   sm: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)',
   md: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
   lg: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-  xl: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+  xl: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)'
 } as const
 
 /** Typography tokens */
 export const globalFont = {
   family: {
     base: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
-    mono: "'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+    mono: "'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace"
   },
   size: {
-    'xs': '12px',
-    'sm': '14px',
-    'base': '16px',
-    'lg': '18px',
-    'xl': '20px',
+    xs: '12px',
+    sm: '14px',
+    base: '16px',
+    lg: '18px',
+    xl: '20px',
     '2xl': '24px',
     '3xl': '30px',
-    '4xl': '36px',
+    '4xl': '36px'
   },
   weight: {
     normal: '400',
     medium: '500',
     semibold: '600',
-    bold: '700',
+    bold: '700'
   },
   lineHeight: {
     tight: '1.25',
     normal: '1.5',
     relaxed: '1.625',
-    loose: '2',
-  },
+    loose: '2'
+  }
 } as const
 
 /** Animation duration tokens */
@@ -154,14 +154,16 @@ export const globalDuration = {
   fast: '100ms',
   base: '200ms',
   slow: '300ms',
-  slower: '500ms',
+  slower: '500ms'
 } as const
 
 /** Animation easing tokens */
 export const globalEasing = {
-  'in': 'cubic-bezier(0.4, 0, 1, 1)',
-  'out': 'cubic-bezier(0, 0, 0.2, 1)',
+  in: 'cubic-bezier(0.4, 0, 1, 1)',
+  out: 'cubic-bezier(0, 0, 0.2, 1)',
   'in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
+  spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+  smooth: 'cubic-bezier(0.25, 0.1, 0.25, 1)'
 } as const
 
 /** Alias (semantic) tokens */
@@ -201,18 +203,18 @@ export const aliasTokens = {
     'interactive-secondary-hover': '#334155',
     'interactive-danger': '#dc2626',
     'interactive-danger-hover': '#b91c1c',
-    'focus-ring': '#0ea5e9',
+    'focus-ring': '#0ea5e9'
   },
   space: {
     'component-gap': '8px',
     'section-gap': '24px',
-    'page-padding': '32px',
+    'page-padding': '32px'
   },
   radius: {
-    'component': '4px',
-    'card': '8px',
-    'pill': '9999px',
-  },
+    component: '8px',
+    card: '12px',
+    pill: '9999px'
+  }
 } as const
 
 /** Component-level tokens */
@@ -224,67 +226,67 @@ export const componentTokens = {
     'padding-x-sm': '8px',
     'padding-x-md': '16px',
     'padding-x-lg': '24px',
-    'border-radius': '4px',
+    'border-radius': '8px',
     'font-size-sm': '14px',
     'font-size-md': '16px',
     'font-size-lg': '18px',
-    'font-weight': '500',
+    'font-weight': '500'
   },
   input: {
     'height-sm': '32px',
     'height-md': '36px',
     'height-lg': '40px',
     'padding-x': '16px',
-    'border-radius': '4px',
+    'border-radius': '8px',
     'font-size': '16px',
     'border-color': '#e5e5e5',
     'border-color-focus': '#0ea5e9',
-    'border-color-error': '#ef4444',
+    'border-color-error': '#ef4444'
   },
   select: {
     'height-sm': '32px',
     'height-md': '36px',
     'height-lg': '40px',
     'padding-x': '16px',
-    'border-radius': '4px',
+    'border-radius': '8px',
     'dropdown-shadow': '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
     'option-height': '36px',
-    'option-padding-x': '16px',
+    'option-padding-x': '16px'
   },
   modal: {
-    'border-radius': '8px',
-    'padding': '24px',
-    'shadow': '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+    'border-radius': '12px',
+    padding: '24px',
+    shadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
     'header-font-size': '18px',
     'header-font-weight': '600',
     'overlay-bg': 'rgba(0,0,0,0.45)',
     'width-sm': '400px',
     'width-md': '520px',
     'width-lg': '680px',
-    'width-xl': '860px',
+    'width-xl': '860px'
   },
   drawer: {
-    'padding': '24px',
-    'shadow': '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+    padding: '24px',
+    shadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
     'header-font-size': '18px',
     'header-font-weight': '600',
     'overlay-bg': 'rgba(0,0,0,0.45)',
     'width-sm': '256px',
     'width-md': '378px',
     'width-lg': '520px',
-    'width-xl': '680px',
+    'width-xl': '680px'
   },
   card: {
-    'border-radius': '8px',
-    'padding': '24px',
-    'shadow': '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)',
-    'border-color': '#e5e5e5',
+    'border-radius': '12px',
+    padding: '24px',
+    shadow: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)',
+    'border-color': '#e5e5e5'
   },
   badge: {
     'font-size': '12px',
     'font-weight': '500',
     'padding-x': '8px',
-    'border-radius': '9999px',
+    'border-radius': '9999px'
   },
   avatar: {
     'size-sm': '32px',
@@ -294,7 +296,7 @@ export const componentTokens = {
     'border-radius': '9999px',
     'font-size-sm': '12px',
     'font-size-md': '14px',
-    'font-size-lg': '16px',
+    'font-size-lg': '16px'
   },
   table: {
     'header-bg': '#fafafa',
@@ -305,37 +307,37 @@ export const componentTokens = {
     'cell-padding-y-lg': '24px',
     'border-color': '#e5e5e5',
     'stripe-bg': '#fafafa',
-    'hover-bg': '#f0f9ff',
+    'hover-bg': '#f0f9ff'
   },
   tooltip: {
-    'bg': '#262626',
+    bg: '#262626',
     'text-color': '#ffffff',
     'font-size': '14px',
     'padding-x': '8px',
     'padding-y': '4px',
-    'border-radius': '4px',
-    'shadow': '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
-    'max-width': '280px',
+    'border-radius': '8px',
+    shadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
+    'max-width': '280px'
   },
   alert: {
-    'border-radius': '4px',
+    'border-radius': '8px',
     'padding-x': '16px',
     'padding-y': '16px',
     'font-size': '16px',
-    'icon-size': '20px',
+    'icon-size': '20px'
   },
   tabs: {
-    'height': '40px',
+    height: '40px',
     'font-size': '16px',
     'font-weight-active': '500',
     'indicator-height': '2px',
-    'gap': '24px',
+    gap: '24px'
   },
   pagination: {
     'item-size': '32px',
     'font-size': '14px',
-    'border-radius': '4px',
-    'gap': '4px',
+    'border-radius': '8px',
+    gap: '4px'
   },
   tag: {
     'height-sm': '22px',
@@ -343,38 +345,38 @@ export const componentTokens = {
     'height-lg': '32px',
     'padding-x': '8px',
     'font-size': '12px',
-    'border-radius': '2px',
+    'border-radius': '6px'
   },
   progress: {
     'height-sm': '4px',
     'height-md': '8px',
     'height-lg': '12px',
     'border-radius': '9999px',
-    'track-bg': '#e5e5e5',
+    'track-bg': '#e5e5e5'
   },
   skeleton: {
-    'bg': '#e5e5e5',
+    bg: '#e5e5e5',
     'shimmer-bg': '#f5f5f5',
-    'border-radius': '4px',
+    'border-radius': '8px'
   },
   divider: {
-    'color': '#e5e5e5',
-    'text-padding': '16px',
+    color: '#e5e5e5',
+    'text-padding': '16px'
   },
   collapse: {
     'header-padding-x': '16px',
     'header-padding-y': '16px',
     'content-padding': '16px',
-    'border-color': '#e5e5e5',
+    'border-color': '#e5e5e5'
   },
   steps: {
     'icon-size': '32px',
     'font-size': '16px',
-    'connector-width': '1px',
+    'connector-width': '1px'
   },
   breadcrumb: {
     'font-size': '14px',
-    'separator-margin': '8px',
+    'separator-margin': '8px'
   },
   dropdown: {
     'min-width': '120px',
@@ -382,33 +384,33 @@ export const componentTokens = {
     'item-height': '36px',
     'item-padding-x': '16px',
     'border-radius': '8px',
-    'shadow': '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    shadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)'
   },
   menu: {
     'item-height': '40px',
     'item-padding-x': '16px',
     'group-title-padding': '8px',
     'indent-width': '24px',
-    'border-radius': '4px',
+    'border-radius': '8px'
   },
   notification: {
-    'width': '384px',
-    'padding': '16px',
-    'border-radius': '8px',
-    'shadow': '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    width: '384px',
+    padding: '16px',
+    'border-radius': '12px',
+    shadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
     'title-font-size': '16px',
-    'title-font-weight': '500',
+    'title-font-weight': '500'
   },
   popover: {
-    'padding': '16px',
+    padding: '16px',
     'border-radius': '8px',
-    'shadow': '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-    'max-width': '320px',
-  },
+    shadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+    'max-width': '320px'
+  }
 } as const
 
 export type GlobalColorHue = keyof typeof globalColors
-export type GlobalColorLevel = keyof typeof globalColors[GlobalColorHue]
+export type GlobalColorLevel = keyof (typeof globalColors)[GlobalColorHue]
 export type GlobalSpaceKey = keyof typeof globalSpace
 export type GlobalRadiusKey = keyof typeof globalRadius
 export type GlobalShadowKey = keyof typeof globalShadow

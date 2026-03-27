@@ -10,16 +10,16 @@
 
 /**
  * Focus ring classes using focus-visible (only shows on keyboard navigation)
- * Better UX: mouse clicks don't show distracting focus rings
+ * Uses a soft shadow glow instead of hard ring for a modern feel
  */
 export const focusRingClasses =
-  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--tiger-surface,#ffffff)]'
 
 /**
  * Focus ring classes for inset elements (dropdown items, menu items)
  */
 export const focusRingInsetClasses =
-  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] focus-visible:ring-inset'
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:ring-inset'
 
 /**
  * Active press effect - subtle scale down on click
@@ -37,14 +37,14 @@ export const activeOpacityClasses = 'active:opacity-90'
  * Combined interactive classes for buttons and clickable elements
  * Includes focus-visible ring + press scale effect + smooth transition
  */
-export const interactiveClasses = `transition-all duration-150 ${focusRingClasses} ${activePressClasses}`
+export const interactiveClasses = `transition-all duration-200 ease-out ${focusRingClasses} ${activePressClasses}`
 
 /**
  * Interactive classes for form inputs
  * Keeps focus ring visible (not focus-visible) since inputs need persistent focus indication
  */
 export const inputFocusClasses =
-  'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] focus:border-transparent'
+  'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus:border-transparent'
 
 /**
  * Tab/navigation item focus classes

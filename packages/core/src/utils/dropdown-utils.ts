@@ -15,9 +15,7 @@ export function getDropdownTriggerClasses(disabled: boolean): string {
     'tiger-dropdown-trigger',
     'inline-flex items-center gap-1.5',
     'select-none',
-    disabled
-      ? 'cursor-not-allowed opacity-50 pointer-events-none'
-      : 'cursor-pointer'
+    disabled ? 'cursor-not-allowed opacity-50 pointer-events-none' : 'cursor-pointer'
   )
 }
 
@@ -62,13 +60,13 @@ export function getDropdownItemClasses(disabled: boolean, divided: boolean): str
   return classNames(
     'tiger-dropdown-item',
     'flex items-center gap-2',
-    'w-full rounded-md',
+    'w-full rounded-lg',
     'px-3 py-1.5',
     'text-sm text-[var(--tiger-text,#374151)]',
     'transition-colors duration-150',
     'text-left',
     'focus:outline-none',
-    'focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)] focus-visible:ring-inset',
+    'focus-visible:ring-2 focus-visible:ring-[var(--tiger-primary,#2563eb)]/40 focus-visible:ring-inset',
     divided && 'mt-1 border-t border-[var(--tiger-border,#e5e7eb)] pt-1',
     disabled
       ? 'cursor-not-allowed opacity-50'
@@ -88,15 +86,15 @@ const DROPDOWN_ANIMATION_CSS = `
 @keyframes tiger-dropdown-in {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.96) translateY(-2px);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
   }
 }
 .tiger-dropdown-enter {
-  animation: tiger-dropdown-in 0.15s ease-out;
+  animation: tiger-dropdown-in 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 `
 

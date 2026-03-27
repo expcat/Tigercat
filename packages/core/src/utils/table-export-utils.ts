@@ -57,4 +57,4 @@ export function downloadCsv(csvContent: string, filename: string = 'export'): vo
  * Get export button classes
  */
 export const tableExportButtonClasses =
-  'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md border border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)] bg-[var(--tiger-surface,#ffffff)] hover:bg-[var(--tiger-surface-muted,#f9fafb)] transition-colors'
+  'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border border-[var(--tiger-border,#e5e7eb)] text-[var(--tiger-text,#111827)] bg-[var(--tiger-surface,#ffffff)] hover:bg-[var(--tiger-surface-muted,#f9fafb)] transition-colors'

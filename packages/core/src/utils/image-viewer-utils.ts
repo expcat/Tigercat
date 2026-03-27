@@ -25,7 +25,7 @@ export const imageViewerToolbarClasses =
  * ImageViewer toolbar button classes
  */
 export const imageViewerToolbarBtnClasses =
-  'p-2 text-white hover:bg-white/20 rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white'
+  'p-2 text-white hover:bg-white/20 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white'
 
 /**
  * ImageViewer navigation button classes
@@ -37,7 +37,7 @@ export const imageViewerNavBtnClasses =
  * ImageViewer close button classes
  */
 export const imageViewerCloseBtnClasses =
-  'fixed top-4 right-4 z-50 p-2 text-white hover:bg-white/20 rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white'
+  'fixed top-4 right-4 z-50 p-2 text-white hover:bg-white/20 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white'
 
 /**
  * ImageViewer counter classes

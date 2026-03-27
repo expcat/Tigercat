@@ -60,7 +60,7 @@ export const tabNavListCenteredClasses = 'justify-center'
  * @since 0.2.0 - Added focus-visible ring for keyboard navigation
  */
 export const tabItemBaseClasses =
-  'relative cursor-pointer transition-all duration-200 select-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] focus-visible:ring-offset-2 active:opacity-90'
+  'relative cursor-pointer transition-all duration-200 select-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:ring-offset-2 active:opacity-90'
 
 /**
  * Tab item size classes
@@ -128,7 +128,7 @@ export const tabItemDisabledClasses = 'opacity-50 cursor-not-allowed pointer-eve
  * Tab close button classes
  */
 export const tabCloseButtonClasses =
-  'ml-2 p-0.5 rounded hover:bg-gray-200 transition-colors duration-150'
+  'ml-2 p-0.5 rounded-md hover:bg-gray-200 transition-colors duration-150'
 
 /**
  * Tab content container classes

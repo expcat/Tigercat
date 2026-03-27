@@ -21,7 +21,7 @@ export const datePickerInputWrapperClasses = 'relative w-full'
 export function getDatePickerInputClasses(size: DatePickerSize = 'md', disabled = false): string {
   const baseClasses = [
     'w-full',
-    'rounded-md',
+    'rounded-lg',
     'border',
     'border-gray-300',
     'bg-white',
@@ -105,7 +105,7 @@ export const datePickerCalendarHeaderClasses = classNames(
  */
 export const datePickerNavButtonClasses = classNames(
   'p-2',
-  'rounded-md',
+  'rounded-lg',
   'hover:bg-gray-100',
   'transition-colors',
   'text-gray-600',
@@ -150,7 +150,7 @@ export function getDatePickerDayCellClasses(
   isRangeStart = false,
   isRangeEnd = false
 ): string {
-  const base = 'w-10 h-10 flex items-center justify-center rounded-md text-sm transition-colors'
+  const base = 'w-10 h-10 flex items-center justify-center rounded-lg text-sm transition-colors'
 
   if (isDisabled) {
     return classNames(base, 'cursor-not-allowed text-gray-300')

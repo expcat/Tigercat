@@ -58,7 +58,7 @@ export const alertDescriptionSizeClasses: Record<AlertSize, string> = {
  * Close button base classes
  */
 export const alertCloseButtonBaseClasses =
-  'ml-auto -mr-1 -mt-0.5 rounded-md p-1.5 inline-flex focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors'
+  'ml-auto -mr-1 -mt-0.5 rounded-lg p-1.5 inline-flex focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors'
 
 /**
  * Alert icon container base classes

@@ -154,7 +154,7 @@ export function getPopconfirmButtonBaseClasses(): string {
     'py-1.5',
     'text-xs',
     'font-medium',
-    'rounded-md',
+    'rounded-lg',
     'transition-colors',
     'focus:outline-none',
     'focus:ring-2',

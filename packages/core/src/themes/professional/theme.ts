@@ -39,7 +39,7 @@ export const professionalTheme: ThemePreset = {
       chart5: '#0e7490',
       chart6: '#b91c1c'
     },
-    radius: { sm: '2px', md: '4px', lg: '6px', xl: '8px', none: '0', full: '9999px' },
+    radius: { sm: '2px', md: '4px', lg: '8px', xl: '10px', none: '0', full: '9999px' },
     typography: {
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       fontFamilyMono: "'JetBrains Mono', 'SF Mono', monospace",

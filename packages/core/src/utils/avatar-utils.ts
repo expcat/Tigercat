@@ -26,7 +26,7 @@ export const avatarSizeClasses: Record<AvatarSize, string> = {
  */
 export const avatarShapeClasses: Record<AvatarShape, string> = {
   circle: 'rounded-full',
-  square: 'rounded-md'
+  square: 'rounded-lg'
 }
 
 /**

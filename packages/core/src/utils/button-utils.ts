@@ -7,7 +7,7 @@ import { type ButtonSize } from '../types/button'
  * @since 0.2.0 - Improved interaction effects
  */
 export const buttonBaseClasses =
-  'inline-flex items-center justify-center font-medium rounded-md transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))] active:scale-[0.98]'
+  'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 active:scale-[0.98]'
 
 export const buttonSizeClasses: Record<ButtonSize, string> = {
   xs: 'px-2 py-1 text-xs',

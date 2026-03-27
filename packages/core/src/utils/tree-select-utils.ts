@@ -46,7 +46,7 @@ export function getTreeSelectTriggerClasses(
   isOpen: boolean = false
 ): string {
   const base =
-    'w-full rounded-lg border outline-none transition-all duration-150 text-left flex items-center'
+    'w-full rounded-lg border outline-none transition-all duration-200 text-left flex items-center'
 
   const stateClass = disabled
     ? 'bg-[var(--tiger-treeselect-bg-disabled,var(--tiger-outline-bg-disabled,#f3f4f6))] text-[var(--tiger-treeselect-text-disabled,var(--tiger-text-muted,#9ca3af))] border-[var(--tiger-treeselect-border-disabled,var(--tiger-border,#d1d5db))] cursor-not-allowed'

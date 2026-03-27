@@ -39,7 +39,7 @@ export const vibrantTheme: ThemePreset = {
       chart5: '#10b981',
       chart6: '#f43f5e'
     },
-    radius: { sm: '4px', md: '8px', lg: '12px', xl: '16px', none: '0', full: '9999px' }
+    radius: { sm: '6px', md: '10px', lg: '14px', xl: '18px', none: '0', full: '9999px' }
   },
   dark: {
     colors: {

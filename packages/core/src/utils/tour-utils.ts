@@ -30,7 +30,7 @@ export const tourIndicatorClasses = 'text-xs text-[var(--tiger-text-disabled,#9c
 
 /** Close button */
 export const tourCloseButtonClasses =
-  'absolute top-2 right-2 p-1 rounded-md text-[var(--tiger-text-secondary,#6b7280)] hover:bg-[var(--tiger-surface-muted,#f9fafb)] transition-colors'
+  'absolute top-2 right-2 p-1 rounded-lg text-[var(--tiger-text-secondary,#6b7280)] hover:bg-[var(--tiger-surface-muted,#f9fafb)] transition-colors'
 
 // ---------------------------------------------------------------------------
 // Positioning helpers

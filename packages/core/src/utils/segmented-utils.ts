@@ -32,7 +32,7 @@ export function getSegmentedOptionClasses(
   }
 
   return classNames(
-    'inline-flex items-center justify-center rounded-md font-medium transition-all duration-150',
+    'inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200',
     sizePad[size],
     isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
     isSelected

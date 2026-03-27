@@ -110,11 +110,11 @@ export function getPaginationButtonBaseClasses(size: PaginationSize = 'medium'):
 
   return classNames(
     'inline-flex items-center justify-center',
-    'rounded border border-[var(--tiger-border,#d1d5db)]',
+    'rounded-lg border border-[var(--tiger-border,#d1d5db)]',
     'bg-[var(--tiger-surface,#ffffff)] text-[var(--tiger-text,#374151)]',
     'transition-colors duration-200',
     'hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)]',
-    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-opacity-50',
+    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/40',
     'disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-[var(--tiger-border,#d1d5db)] disabled:hover:text-[var(--tiger-text,#374151)]',
     sizeClasses[size]
   )

@@ -24,7 +24,7 @@ export const taskBoardColumnBodyClasses = 'flex-1 overflow-y-auto p-2 space-y-2 
 
 /** Card base styles */
 export const taskBoardCardClasses =
-  'tiger-task-board-card rounded-md border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-3 shadow-sm cursor-grab select-none transition-opacity'
+  'tiger-task-board-card rounded-lg border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-3 shadow-sm cursor-grab select-none transition-opacity'
 
 /** Card while being dragged */
 export const taskBoardCardDraggingClasses = 'opacity-50 shadow-lg'

@@ -74,20 +74,20 @@ export const transitionPresets: Record<TransitionType, TransitionClasses> = {
     leaveTo: 'opacity-0'
   },
   'slide-up': {
-    enterFrom: 'opacity-0 translate-y-4',
+    enterFrom: 'opacity-0 translate-y-2',
     enterActive: `transition-all duration-300 ${EASING_ENTER}`,
     enterTo: 'opacity-100 translate-y-0',
     leaveFrom: 'opacity-100 translate-y-0',
     leaveActive: `transition-all duration-300 ${EASING_LEAVE}`,
-    leaveTo: 'opacity-0 translate-y-4'
+    leaveTo: 'opacity-0 translate-y-2'
   },
   'slide-down': {
-    enterFrom: 'opacity-0 -translate-y-4',
+    enterFrom: 'opacity-0 -translate-y-2',
     enterActive: `transition-all duration-300 ${EASING_ENTER}`,
     enterTo: 'opacity-100 translate-y-0',
     leaveFrom: 'opacity-100 translate-y-0',
     leaveActive: `transition-all duration-300 ${EASING_LEAVE}`,
-    leaveTo: 'opacity-0 -translate-y-4'
+    leaveTo: 'opacity-0 -translate-y-2'
   },
   'slide-left': {
     enterFrom: 'opacity-0 -translate-x-full',
@@ -107,10 +107,10 @@ export const transitionPresets: Record<TransitionType, TransitionClasses> = {
   },
   scale: {
     enterFrom: 'opacity-0 scale-95',
-    enterActive: `transition-all duration-150 ${EASING_ENTER}`,
+    enterActive: `transition-all duration-200 ${EASING_ENTER}`,
     enterTo: 'opacity-100 scale-100',
     leaveFrom: 'opacity-100 scale-100',
-    leaveActive: `transition-all duration-150 ${EASING_LEAVE}`,
+    leaveActive: `transition-all duration-200 ${EASING_LEAVE}`,
     leaveTo: 'opacity-0 scale-95'
   },
   collapse: {

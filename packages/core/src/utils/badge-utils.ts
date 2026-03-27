@@ -26,7 +26,7 @@ export const dotSizeClasses: Record<BadgeSize, string> = {
 export const badgeTypeClasses: Record<BadgeType, string> = {
   dot: 'rounded-full',
   number: 'rounded-full',
-  text: 'rounded-md'
+  text: 'rounded-lg'
 } as const
 
 /** Wrapper classes for non-standalone badge */

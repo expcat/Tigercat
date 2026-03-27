@@ -5,7 +5,7 @@
 
 import type { SkeletonVariant, SkeletonAnimation, SkeletonShape } from '../types/skeleton'
 
-export const skeletonBaseClasses = 'bg-[var(--tiger-skeleton-bg,#e5e7eb)] rounded'
+export const skeletonBaseClasses = 'bg-[var(--tiger-skeleton-bg,#e5e7eb)] rounded-md'
 
 /**
  * Animation classes for skeleton
@@ -48,7 +48,7 @@ export const skeletonVariantDefaults: Record<SkeletonVariant, { width?: string; 
  */
 export const skeletonShapeClasses: Record<SkeletonShape, string> = {
   circle: 'rounded-full',
-  square: 'rounded-md'
+  square: 'rounded-lg'
 } as const
 
 /**

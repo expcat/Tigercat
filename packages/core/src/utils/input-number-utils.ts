@@ -11,7 +11,7 @@ import { classNames } from './class-names'
 export function getInputNumberWrapperClasses(disabled?: boolean): string {
   return classNames(
     'inline-flex items-center relative w-full',
-    'border rounded-md shadow-sm',
+    'border rounded-lg shadow-sm',
     'bg-[var(--tiger-surface,#ffffff)]',
     'transition-colors',
     disabled

@@ -15,7 +15,7 @@ const triggerSizes: Record<ColorPickerSize, string> = {
 
 export function getColorPickerTriggerClasses(size: ColorPickerSize, disabled: boolean): string {
   return classNames(
-    'rounded-md border transition-all overflow-hidden',
+    'rounded-lg border transition-all overflow-hidden',
     'border-[var(--tiger-colorpicker-border,var(--tiger-border,#d1d5db))]',
     triggerSizes[size],
     disabled

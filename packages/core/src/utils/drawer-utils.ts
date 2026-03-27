@@ -10,7 +10,7 @@ import type { DrawerPlacement, DrawerSize } from '../types/drawer'
  */
 export function getDrawerMaskClasses(visible: boolean): string {
   return classNames(
-    'fixed inset-0 bg-[var(--tiger-drawer-mask,rgba(0,0,0,0.5))] transition-opacity duration-300',
+    'fixed inset-0 bg-[var(--tiger-drawer-mask,rgba(0,0,0,0.5))] backdrop-blur-[2px] transition-opacity duration-300',
     visible ? 'opacity-100' : 'opacity-0 pointer-events-none'
   )
 }
@@ -87,7 +87,7 @@ export function getDrawerBodyClasses(customClass?: string): string {
  * Get drawer footer classes
  */
 export function getDrawerFooterClasses(): string {
-  return 'px-6 py-4 border-t border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface-muted,#f9fafb)]'
+  return 'px-6 py-4 border-t border-[var(--tiger-border,#e5e7eb)]'
 }
 
 /**
@@ -96,10 +96,10 @@ export function getDrawerFooterClasses(): string {
 export function getDrawerCloseButtonClasses(): string {
   return classNames(
     'inline-flex items-center justify-center',
-    'w-8 h-8 rounded-md',
+    'w-8 h-8 rounded-lg',
     'text-[var(--tiger-text-muted,#9ca3af)] hover:text-[var(--tiger-text-muted,#6b7280)] hover:bg-[var(--tiger-surface-muted,#f9fafb)]',
     'transition-colors duration-200',
-    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-offset-2'
+    'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/40 focus:ring-offset-2'
   )
 }
 

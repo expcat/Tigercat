@@ -18,7 +18,7 @@ export const ANIMATION_DURATION_MS = 300
  * Fast animation duration for quick micro-interactions.
  * Used by: Hover effects, button states
  */
-export const ANIMATION_DURATION_FAST_MS = 150
+export const ANIMATION_DURATION_FAST_MS = 200
 
 /**
  * Slow animation duration for emphasized transitions.
@@ -38,7 +38,7 @@ export const DURATION_CLASS = 'duration-300'
 /**
  * Tailwind class for fast duration
  */
-export const DURATION_FAST_CLASS = 'duration-150'
+export const DURATION_FAST_CLASS = 'duration-200'
 
 /**
  * Tailwind class for slow duration
@@ -63,6 +63,16 @@ export const EASING_ENTER = 'ease-out'
  * Easing for elements leaving the view
  */
 export const EASING_LEAVE = 'ease-in'
+
+/**
+ * Spring easing for bouncy/elastic interactions (popover, dropdown enter)
+ */
+export const EASING_SPRING = 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+
+/**
+ * Smooth easing for gentle transitions
+ */
+export const EASING_SMOOTH = 'cubic-bezier(0.25, 0.1, 0.25, 1)'
 
 // ============================================================================
 // Transition Classes

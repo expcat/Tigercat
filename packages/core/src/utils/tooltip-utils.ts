@@ -30,8 +30,8 @@ export function getTooltipContentClasses(): string {
     'text-xs',
     'text-[var(--tiger-tooltip-text,#ffffff)]',
     'bg-[var(--tiger-tooltip-bg,#111827)]',
-    'rounded',
-    'shadow-md',
+    'rounded-md',
+    'shadow-lg',
     'whitespace-nowrap'
   )
 }

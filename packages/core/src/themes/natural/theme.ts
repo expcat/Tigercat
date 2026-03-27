@@ -39,7 +39,7 @@ export const naturalTheme: ThemePreset = {
       chart5: '#0d9488',
       chart6: '#be123c'
     },
-    radius: { sm: '4px', md: '6px', lg: '10px', xl: '14px', none: '0', full: '9999px' },
+    radius: { sm: '6px', md: '8px', lg: '12px', xl: '16px', none: '0', full: '9999px' },
     typography: {
       fontFamily: "'Source Sans 3', 'Georgia', -apple-system, sans-serif",
       fontFamilyMono: "'Source Code Pro', 'Menlo', monospace",
