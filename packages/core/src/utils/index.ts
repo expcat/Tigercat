@@ -74,3 +74,30 @@ export * from './form-history-utils'
 
 // Responsive utilities
 export * from './responsive'
+
+// Drag & Drop utilities (v0.8.0+)
+export * from './drag'
+
+// Splitter utilities (v0.8.0+)
+export * from './splitter-utils'
+
+// Resizable utilities (v0.8.0+)
+export * from './resizable-utils'
+
+// CodeEditor utilities (v0.8.0+)
+export * from './code-editor-utils'
+
+// RichTextEditor utilities (v0.8.0+)
+export * from './rich-text-editor-utils'
+
+// Kanban utilities (v0.8.0+)
+export * from './kanban-utils'
+
+// VirtualTable utilities (v0.8.0+)
+export * from './virtual-table-utils'
+
+// InfiniteScroll utilities (v0.8.0+)
+export * from './infinite-scroll-utils'
+
+// FileManager utilities (v0.8.0+)
+export * from './file-manager-utils'

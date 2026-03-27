@@ -136,6 +136,14 @@ export interface ListProps<
    */
   onPageChange?: (page: { current: number; pageSize: number }) => void
   className?: string
+  /**
+   * Whether list items are draggable for reorder
+   */
+  draggable?: boolean
+  /**
+   * Called when items are reordered via drag
+   */
+  onReorder?: (items: T[], from: number, to: number) => void
 }
 
 export const List = <T extends ListItem = ListItem>({
@@ -156,11 +164,15 @@ export const List = <T extends ListItem = ListItem>({
   onItemClick,
   onPageChange,
   className,
+  draggable: isDraggable = false,
+  onReorder,
   ...divProps
 }: ListProps<T>) => {
   const [currentPage, setCurrentPage] = useState(
     pagination && typeof pagination === 'object' ? pagination.current || 1 : 1
   )
+
+  const dragIndexRef = React.useRef<number | null>(null)
 
   const [currentPageSize, setCurrentPageSize] = useState(
     pagination && typeof pagination === 'object' ? pagination.pageSize || 10 : 10
@@ -323,11 +335,47 @@ export const List = <T extends ListItem = ListItem>({
     return (
       <div
         key={key}
-        className={classNames(itemClasses, clickable && 'cursor-pointer')}
+        className={classNames(
+          itemClasses,
+          clickable && 'cursor-pointer',
+          isDraggable && 'cursor-grab'
+        )}
         role="listitem"
         tabIndex={clickable ? 0 : undefined}
         onClick={handleClick}
-        onKeyDown={handleKeyDown}>
+        onKeyDown={handleKeyDown}
+        draggable={isDraggable || undefined}
+        onDragStart={
+          isDraggable
+            ? () => {
+                dragIndexRef.current = index
+              }
+            : undefined
+        }
+        onDragOver={isDraggable ? (e) => e.preventDefault() : undefined}
+        onDrop={
+          isDraggable
+            ? () => {
+                const from = dragIndexRef.current
+                if (from === null || from === index) {
+                  dragIndexRef.current = null
+                  return
+                }
+                dragIndexRef.current = null
+                const items = [...dataSource] as T[]
+                const [moved] = items.splice(from, 1)
+                items.splice(index, 0, moved)
+                onReorder?.(items, from, index)
+              }
+            : undefined
+        }
+        onDragEnd={
+          isDraggable
+            ? () => {
+                dragIndexRef.current = null
+              }
+            : undefined
+        }>
         {renderItem ? renderItem(item, index) : renderDefaultListItem(item, index)}
       </div>
     )

@@ -437,6 +437,19 @@ See **[TEST_QUALITY_GUIDELINES.md](./TEST_QUALITY_GUIDELINES.md)** for comprehen
   - Responsive behavior tested
   - Grid system and spacing covered
 
+### Advanced Interaction Components (v0.8.0) ✅
+
+- [x] **Splitter** — `tests/vue/Splitter.spec.ts` (44 tests) ⭐⭐⭐⭐
+- [x] **Resizable** — `tests/vue/Resizable.spec.ts` (32 tests) ⭐⭐⭐⭐
+- [x] **CodeEditor** — `tests/vue/CodeEditor.spec.ts` (34 tests) ⭐⭐⭐⭐
+- [x] **RichTextEditor** — `tests/vue/RichTextEditor.spec.ts` (40 tests) ⭐⭐⭐⭐
+- [x] **Kanban** — `tests/vue/Kanban.spec.ts` (30 tests) ⭐⭐⭐⭐
+- [x] **VirtualTable** — `tests/vue/VirtualTable.spec.ts` (25 tests) ⭐⭐⭐⭐
+- [x] **InfiniteScroll** — `tests/vue/InfiniteScroll.spec.ts` (12 tests) ⭐⭐⭐
+- [x] **FileManager** — `tests/vue/FileManager.spec.ts` (32 tests) ⭐⭐⭐⭐
+- [x] **DragEnhancements** — `tests/vue/DragEnhancements.spec.ts` (13 tests) ⭐⭐⭐⭐
+  - List/Tree/Modal drag support tested
+
 ## Next Steps
 
 All components have been tested! Future work:

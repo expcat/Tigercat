@@ -261,6 +261,13 @@ export const Tree = defineComponent({
     ariaLabel: {
       type: String,
       default: 'Tree'
+    },
+    /**
+     * Whether nodes are draggable
+     */
+    draggable: {
+      type: Boolean,
+      default: false
     }
   },
   emits: [
@@ -272,7 +279,8 @@ export const Tree = defineComponent({
     'node-collapse',
     'update:expandedKeys',
     'update:selectedKeys',
-    'update:checkedKeys'
+    'update:checkedKeys',
+    'drop'
   ],
   setup(props, { emit, attrs }) {
     const rootEl = ref<HTMLElement | null>(null)
@@ -293,6 +301,33 @@ export const Tree = defineComponent({
 
     // Internal state for expanded keys
     const internalExpandedKeys = ref<Set<string | number>>(new Set())
+
+    // Drag state for tree node reordering
+    const dragNodeKey = ref<string | number | null>(null)
+
+    function handleTreeDragStart(key: string | number) {
+      dragNodeKey.value = key
+    }
+
+    function handleTreeDragOver(e: DragEvent) {
+      e.preventDefault()
+    }
+
+    function handleTreeDrop(targetKey: string | number) {
+      if (dragNodeKey.value === null || dragNodeKey.value === targetKey) {
+        dragNodeKey.value = null
+        return
+      }
+      emit('drop', {
+        dragKey: dragNodeKey.value,
+        dropKey: targetKey
+      })
+      dragNodeKey.value = null
+    }
+
+    function handleTreeDragEnd() {
+      dragNodeKey.value = null
+    }
 
     // Internal state for selected keys
     const internalSelectedKeys = ref<Set<string | number>>(
@@ -663,6 +698,23 @@ export const Tree = defineComponent({
               'aria-expanded': isExpandable ? (isExpanded ? true : false) : undefined,
               'aria-checked': props.checkable ? (isHalfChecked ? 'mixed' : isChecked) : undefined,
               tabIndex: isFocusable ? 0 : -1,
+              draggable: props.draggable && !node.disabled ? true : undefined,
+              onDragstart:
+                props.draggable && !node.disabled
+                  ? (e: DragEvent) => {
+                      e.stopPropagation()
+                      handleTreeDragStart(node.key)
+                    }
+                  : undefined,
+              onDragover: props.draggable ? handleTreeDragOver : undefined,
+              onDrop: props.draggable
+                ? (e: DragEvent) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    handleTreeDrop(node.key)
+                  }
+                : undefined,
+              onDragend: props.draggable ? handleTreeDragEnd : undefined,
               onFocus: () => {
                 if (!node.disabled) activeKey.value = node.key
               },

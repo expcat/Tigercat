@@ -20,6 +20,48 @@
 测试覆盖率: 81%+ (3321 tests)
 详见 [MIGRATION_v0.5.0.md](MIGRATION_v0.5.0.md)
 
+## v0.6.0 高级表单与数据组件 (Advanced Form & Data)
+
+| 阶段    | 内容                                                    | 状态 |
+| ------- | ------------------------------------------------------- | ---- |
+| Phase 1 | 新增 P0 组件: Cascader/TreeSelect/AutoComplete/Transfer | ✅   |
+| Phase 2 | 新增 P1 组件: ColorPicker/Rate/VirtualList/Segmented    | ✅   |
+| Phase 3 | 新增 P2 组件: Calendar/Statistic/Mentions/QRCode        | ✅   |
+| Phase 4 | Table 增强: 虚拟滚动/行编辑/高级筛选/分组/导出          | ✅   |
+| Phase 5 | Form 增强: 动态字段/异步校验/字段依赖/撤销重做          | ✅   |
+| Phase 6 | 现有组件增强: Select/DatePicker/Tree/Tabs/Menu 等       | ✅   |
+| Phase 7 | i18n 扩展: 8 语言 (zh-CN/en-US/zh-TW/ja/ko/th/vi/id)    | ✅   |
+
+新增组件: `Cascader`, `TreeSelect`, `AutoComplete`, `Transfer`, `ColorPicker`, `Rate`, `VirtualList`, `Segmented`, `Calendar`, `Statistic`, `Mentions`, `QRCode`, `Stepper`, `Collapse`, `Carousel`
+
+## v0.7.0 视觉升级与主题系统 (Visual Upgrade & Theme System)
+
+| 阶段    | 内容                                                        | 状态 |
+| ------- | ----------------------------------------------------------- | ---- |
+| Phase 1 | 5 套预设主题: Default/Vibrant/Professional/Minimal/Natural  | ✅   |
+| Phase 2 | 主题管理器 + 暗色模式 (prefers-color-scheme)                | ✅   |
+| Phase 3 | 新增视觉组件: Result/Empty/Watermark/Tour/FloatButton/Affix | ✅   |
+| Phase 4 | 新增图表: TreeMap/Heatmap/Funnel/Gauge/Sunburst             | ✅   |
+| Phase 5 | 20-25 组件 WCAG AA 视觉升级                                 | ✅   |
+
+新增组件: `Result`, `Empty`, `Watermark`, `Tour`, `FloatButton`, `Affix`
+新增图表: `TreeMapChart`, `HeatmapChart`, `FunnelChart`, `GaugeChart`, `SunburstChart`
+
+## v0.8.0 高级交互与业务组件 (Advanced Interaction & Business)
+
+| 阶段    | 内容                                             | 状态 |
+| ------- | ------------------------------------------------ | ---- |
+| Phase 1 | Headless 拖拽系统 (core/utils + Vue/React 封装)  | ✅   |
+| Phase 2 | P0 组件: Splitter/Resizable/CodeEditor/RichText  | ✅   |
+| Phase 3 | P1 组件: Kanban/VirtualTable/InfiniteScroll      | ✅   |
+| Phase 4 | P2 组件: FileManager + 拖拽增强现有组件          | ✅   |
+| Phase 5 | 性能优化: Bundle Size sideEffects + tree-shaking | ✅   |
+| Phase 6 | CLI 脚手架: @expcat/tigercat-cli                 | ⬜   |
+| Phase 7 | 测试覆盖率 & a11y 合规                           | ✅   |
+| Phase 8 | 文档 & Skills 更新                               | ✅   |
+
+详见 [docs/roadmap/04-v0.8.0-SPEC.md](docs/roadmap/04-v0.8.0-SPEC.md)
+
 ## 进度说明
 
 - ⬜ 未开始
@@ -154,6 +196,20 @@
 | 功能             | Composable/Hook     | Vue | React | 说明                              |
 | ---------------- | ------------------- | --- | ----- | --------------------------------- |
 | 图表交互状态管理 | useChartInteraction | ✅  | ✅    | 统一处理 hover/select/legend 交互 |
+| 拖拽系统         | useDrag             | ✅  | ✅    | Headless 拖拽(排序/跨容器/树)     |
+
+### 高级交互组件 (Advanced Interaction Components) — v0.8.0
+
+| 组件         | Component      | Vue | React | 文档 | 测试 |
+| ------------ | -------------- | --- | ----- | ---- | ---- |
+| 分割面板     | Splitter       | ✅  | ✅    | ✅   | ✅   |
+| 可调整容器   | Resizable      | ✅  | ✅    | ✅   | ✅   |
+| 代码编辑器   | CodeEditor     | ✅  | ✅    | ✅   | ✅   |
+| 富文本编辑器 | RichTextEditor | ✅  | ✅    | ✅   | ✅   |
+| 看板         | Kanban         | ✅  | ✅    | ✅   | ✅   |
+| 虚拟表格     | VirtualTable   | ✅  | ✅    | ✅   | ✅   |
+| 无限滚动     | InfiniteScroll | ✅  | ✅    | ✅   | ✅   |
+| 文件管理器   | FileManager    | ✅  | ✅    | ✅   | ✅   |
 
 ## 开发优先级
 

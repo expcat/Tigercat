@@ -28,7 +28,9 @@ import { useEscapeKey } from '../utils/overlay'
 import { Button } from './Button'
 
 export interface ModalProps
-  extends CoreModalProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
+  extends
+    CoreModalProps,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'children' | 'draggable'> {
   /**
    * Modal content
    */
@@ -114,15 +116,41 @@ export const Modal: React.FC<ModalProps> = ({
   cancelText,
   locale,
   style,
+  draggable: isDraggable = false,
   ...rest
 }) => {
   const [hasBeenOpened, setHasBeenOpened] = React.useState(open)
+  const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 })
 
   useEffect(() => {
     if (open) {
       setHasBeenOpened(true)
+    } else {
+      setDragOffset({ x: 0, y: 0 })
     }
   }, [open])
+
+  const handleDragMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isDraggable) return
+      const startX = e.clientX
+      const startY = e.clientY
+      let offsetX = dragOffset.x
+      let offsetY = dragOffset.y
+      const onMouseMove = (ev: MouseEvent) => {
+        offsetX = dragOffset.x + (ev.clientX - startX)
+        offsetY = dragOffset.y + (ev.clientY - startY)
+        setDragOffset({ x: offsetX, y: offsetY })
+      }
+      const onMouseUp = () => {
+        document.removeEventListener('mousemove', onMouseMove)
+        document.removeEventListener('mouseup', onMouseUp)
+      }
+      document.addEventListener('mousemove', onMouseMove)
+      document.addEventListener('mouseup', onMouseUp)
+    },
+    [isDraggable, dragOffset]
+  )
 
   // Notify parent of visibility changes
   useEffect(() => {
@@ -272,6 +300,9 @@ export const Modal: React.FC<ModalProps> = ({
             ...style,
             ...(width
               ? { width: typeof width === 'number' ? `${width}px` : width, maxWidth: '100%' }
+              : undefined),
+            ...(isDraggable && (dragOffset.x !== 0 || dragOffset.y !== 0)
+              ? { transform: `translate(${dragOffset.x}px, ${dragOffset.y}px)` }
               : undefined)
           }}
           {...dialogDivProps}
@@ -284,7 +315,10 @@ export const Modal: React.FC<ModalProps> = ({
           data-tiger-modal="">
           {/* Header */}
           {(title || titleContent || closable) && (
-            <div className={modalHeaderClasses}>
+            <div
+              className={modalHeaderClasses}
+              onMouseDown={isDraggable ? handleDragMouseDown : undefined}
+              style={isDraggable ? { cursor: 'grab', userSelect: 'none' } : undefined}>
               {/* Title */}
               {(title || titleContent) && (
                 <h3 id={titleId} className={modalTitleClasses}>

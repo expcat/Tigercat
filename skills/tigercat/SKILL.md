@@ -18,6 +18,7 @@ Tailwind CSS 驱动的跨框架组件库，支持 Vue 3 和 React。
 | Navigation | [shared/props/navigation.md](references/shared/props/navigation.md) | [vue/navigation.md](references/vue/navigation.md) | [react/navigation.md](references/react/navigation.md) |
 | Data       | [shared/props/data.md](references/shared/props/data.md)             | [vue/data.md](references/vue/data.md)             | [react/data.md](references/react/data.md)             |
 | Charts     | [shared/props/charts.md](references/shared/props/charts.md)         | [vue/charts.md](references/vue/charts.md)         | [react/charts.md](references/react/charts.md)         |
+| Advanced   | [shared/props/advanced.md](references/shared/props/advanced.md)     | -                                                 | -                                                     |
 | Theme      | [theme.md](references/theme.md)                                     | -                                                 | -                                                     |
 | i18n       | [i18n.md](references/i18n.md)                                       | -                                                 | -                                                     |
 | Patterns   | [shared/patterns/common.md](references/shared/patterns/common.md)   | -                                                 | -                                                     |

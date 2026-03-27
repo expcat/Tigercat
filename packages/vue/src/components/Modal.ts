@@ -207,6 +207,14 @@ export const Modal = defineComponent({
     disableTeleport: {
       type: Boolean,
       default: false
+    },
+    /**
+     * Whether the modal is draggable by its header
+     * @default false
+     */
+    draggable: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:open', 'close', 'cancel', 'ok'],
@@ -217,6 +225,27 @@ export const Modal = defineComponent({
     const dialogRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
     const previousActiveElement = ref<HTMLElement | null>(null)
+
+    // Drag state
+    const dragOffset = ref({ x: 0, y: 0 })
+    const isDragging = ref(false)
+    const dragStart = ref({ x: 0, y: 0 })
+
+    const handleDragMouseDown = (e: MouseEvent) => {
+      if (!props.draggable) return
+      isDragging.value = true
+      dragStart.value = { x: e.clientX - dragOffset.value.x, y: e.clientY - dragOffset.value.y }
+      const onMouseMove = (ev: MouseEvent) => {
+        dragOffset.value = { x: ev.clientX - dragStart.value.x, y: ev.clientY - dragStart.value.y }
+      }
+      const onMouseUp = () => {
+        isDragging.value = false
+        document.removeEventListener('mousemove', onMouseMove)
+        document.removeEventListener('mouseup', onMouseUp)
+      }
+      document.addEventListener('mousemove', onMouseMove)
+      document.addEventListener('mouseup', onMouseUp)
+    }
 
     const titleId = computed(() => `${instanceId.value}-title`)
 
@@ -284,6 +313,7 @@ export const Modal = defineComponent({
         } else {
           emit('close')
           previousActiveElement.value?.focus?.()
+          dragOffset.value = { x: 0, y: 0 }
         }
       }
     )
@@ -341,39 +371,52 @@ export const Modal = defineComponent({
           }
         : undefined
       const mergedStyle = mergeStyleValues(attrs.style, props.style, widthStyle)
+      const dragStyle =
+        props.draggable && (dragOffset.value.x !== 0 || dragOffset.value.y !== 0)
+          ? { transform: `translate(${dragOffset.value.x}px, ${dragOffset.value.y}px)` }
+          : undefined
+      const finalStyle = mergeStyleValues(mergedStyle, dragStyle)
 
       const header =
         props.title || slots.title || props.closable
-          ? h('div', { class: modalHeaderClasses }, [
-              props.title || slots.title
-                ? h(
-                    'h3',
-                    {
-                      id: titleId.value,
-                      class: modalTitleClasses
-                    },
-                    slots.title ? slots.title() : props.title
-                  )
-                : null,
-              props.closable
-                ? h(
-                    'button',
-                    {
-                      type: 'button',
-                      class: modalCloseButtonClasses,
-                      onClick: handleClose,
-                      'aria-label': resolveLocaleText(
-                        'Close',
-                        props.closeAriaLabel,
-                        props.locale?.modal?.closeAriaLabel,
-                        props.locale?.common?.closeText
-                      ),
-                      ref: closeButtonRef
-                    },
-                    CloseIcon
-                  )
-                : null
-            ])
+          ? h(
+              'div',
+              {
+                class: modalHeaderClasses,
+                onMousedown: props.draggable ? handleDragMouseDown : undefined,
+                style: props.draggable ? 'cursor: grab; user-select: none' : undefined
+              },
+              [
+                props.title || slots.title
+                  ? h(
+                      'h3',
+                      {
+                        id: titleId.value,
+                        class: modalTitleClasses
+                      },
+                      slots.title ? slots.title() : props.title
+                    )
+                  : null,
+                props.closable
+                  ? h(
+                      'button',
+                      {
+                        type: 'button',
+                        class: modalCloseButtonClasses,
+                        onClick: handleClose,
+                        'aria-label': resolveLocaleText(
+                          'Close',
+                          props.closeAriaLabel,
+                          props.locale?.modal?.closeAriaLabel,
+                          props.locale?.common?.closeText
+                        ),
+                        ref: closeButtonRef
+                      },
+                      CloseIcon
+                    )
+                  : null
+              ]
+            )
           : null
 
       const body = slots.default ? h('div', { class: modalBodyClasses }, slots.default()) : null
@@ -443,7 +486,7 @@ export const Modal = defineComponent({
                 {
                   ...(forwardedAttrs as Record<string, unknown>),
                   class: mergedClass,
-                  style: mergedStyle,
+                  style: finalStyle,
                   role: 'dialog',
                   'aria-modal': 'true',
                   'aria-labelledby': ariaLabelledby,

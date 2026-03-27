@@ -117,3 +117,30 @@ export * from './affix'
 
 // Theme configuration types (v0.7.0+)
 export * from './theme'
+
+// Drag & Drop types (v0.8.0+)
+export * from './drag'
+
+// Splitter types (v0.8.0+)
+export * from './splitter'
+
+// Resizable types (v0.8.0+)
+export * from './resizable'
+
+// CodeEditor types (v0.8.0+)
+export * from './code-editor'
+
+// RichTextEditor types (v0.8.0+)
+export * from './rich-text-editor'
+
+// Kanban types (v0.8.0+)
+export * from './kanban'
+
+// VirtualTable types (v0.8.0+)
+export * from './virtual-table'
+
+// InfiniteScroll types (v0.8.0+)
+export * from './infinite-scroll'
+
+// FileManager types (v0.8.0+)
+export * from './file-manager'

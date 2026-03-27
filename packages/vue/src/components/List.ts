@@ -171,9 +171,16 @@ export const List = defineComponent({
     style: {
       type: Object as PropType<Record<string, string | number>>,
       default: undefined
+    },
+    /**
+     * Whether list items are draggable for reorder
+     */
+    draggable: {
+      type: Boolean,
+      default: false
     }
   },
-  emits: ['item-click', 'page-change'],
+  emits: ['item-click', 'page-change', 'reorder'],
   setup(props, { emit, slots, attrs }) {
     const instance = getCurrentInstance()
     const hasItemClickListener = computed(() => {
@@ -191,6 +198,34 @@ export const List = defineComponent({
         ? props.pagination.pageSize || 10
         : 10
     )
+
+    // Drag state
+    const dragIndex = ref<number | null>(null)
+
+    function handleDragStart(index: number) {
+      dragIndex.value = index
+    }
+
+    function handleDragOver(e: DragEvent) {
+      e.preventDefault()
+    }
+
+    function handleDrop(index: number) {
+      if (dragIndex.value === null || dragIndex.value === index) {
+        dragIndex.value = null
+        return
+      }
+      const from = dragIndex.value
+      dragIndex.value = null
+      const items = [...props.dataSource]
+      const [moved] = items.splice(from, 1)
+      items.splice(index, 0, moved)
+      emit('reorder', items, from, index)
+    }
+
+    function handleDragEnd() {
+      dragIndex.value = null
+    }
 
     // Paginated data
     const paginatedData = computed(() => {
@@ -287,9 +322,22 @@ export const List = defineComponent({
     function getItemAttrs(item: ListItem, index: number, itemClasses: string) {
       const key = getItemKey(item, index)
       const clickable = hasItemClickListener.value
+      const draggableAttrs = props.draggable
+        ? {
+            draggable: true,
+            onDragstart: () => handleDragStart(index),
+            onDragover: handleDragOver,
+            onDrop: () => handleDrop(index),
+            onDragend: handleDragEnd
+          }
+        : {}
       return {
         key,
-        class: classNames(itemClasses, clickable && 'cursor-pointer'),
+        class: classNames(
+          itemClasses,
+          clickable && 'cursor-pointer',
+          props.draggable && 'cursor-grab'
+        ),
         role: 'listitem' as const,
         tabindex: clickable ? 0 : undefined,
         onClick: () => handleItemClick(item, index),
@@ -300,7 +348,8 @@ export const List = defineComponent({
                 handleItemClick(item, index)
               }
             }
-          : undefined
+          : undefined,
+        ...draggableAttrs
       }
     }
 

@@ -400,6 +400,20 @@ All phases completed ✅
 - **Phase 3: Layout Components** ✅ Complete
 - **Phase 4: Other Components** ✅ Complete
 - **Phase 5: Chart Components** ✅ Complete
+- **Phase 6: Advanced Interaction (v0.8.0)** ✅ Complete
+
+### Phase 6: Advanced Interaction Components (v0.8.0) ✅
+
+- [x] **Splitter** — `tests/react/Splitter.spec.tsx` (44 tests) ⭐⭐⭐⭐
+- [x] **Resizable** — `tests/react/Resizable.spec.tsx` (31 tests) ⭐⭐⭐⭐
+- [x] **CodeEditor** — `tests/react/CodeEditor.spec.tsx` (33 tests) ⭐⭐⭐⭐
+- [x] **RichTextEditor** — `tests/react/RichTextEditor.spec.tsx` (39 tests) ⭐⭐⭐⭐
+- [x] **Kanban** — `tests/react/Kanban.spec.tsx` (31 tests) ⭐⭐⭐⭐
+- [x] **VirtualTable** — `tests/react/VirtualTable.spec.tsx` (24 tests) ⭐⭐⭐⭐
+- [x] **InfiniteScroll** — `tests/react/InfiniteScroll.spec.tsx` (25 tests) ⭐⭐⭐⭐
+- [x] **FileManager** — `tests/react/FileManager.spec.tsx` (31 tests) ⭐⭐⭐⭐
+- [x] **DragEnhancements** — `tests/react/DragEnhancements.spec.tsx` (13 tests) ⭐⭐⭐⭐
+  - List/Tree/Modal drag support tested
 
 ## Next Steps
 

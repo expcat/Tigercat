@@ -77,6 +77,12 @@ export interface ModalProps {
   className?: string
 
   /**
+   * Whether the modal can be dragged by its title bar
+   * @default false
+   */
+  draggable?: boolean
+
+  /**
    * Locale overrides for common texts
    */
   locale?: Partial<TigerLocale>

@@ -230,6 +230,15 @@ export interface TreeProps {
    * @since 0.6.0
    */
   searchable?: boolean
+  /**
+   * Whether tree nodes are draggable
+   * @default false
+   */
+  draggable?: boolean
+  /**
+   * Drop event handler
+   */
+  onDrop?: (info: { dragKey: string | number; dropKey: string | number }) => void
 }
 
 export const Tree: React.FC<TreeProps> = ({
@@ -263,9 +272,12 @@ export const Tree: React.FC<TreeProps> = ({
   onNodeClick,
   onNodeExpand,
   onNodeCollapse,
-  className
+  className,
+  draggable: isDraggable = false,
+  onDrop
 }) => {
   const itemRefs = useRef(new Map<string | number, HTMLDivElement | null>())
+  const dragNodeKeyRef = useRef<string | number | null>(null)
 
   const effectiveSelectable = useMemo(() => {
     if (selectionMode !== undefined) {
@@ -760,6 +772,42 @@ export const Tree: React.FC<TreeProps> = ({
           aria-expanded={isExpandable ? isExpanded : undefined}
           aria-checked={checkable ? (isHalfChecked ? 'mixed' : isChecked) : undefined}
           tabIndex={isFocusable ? 0 : -1}
+          draggable={isDraggable && !node.disabled ? true : undefined}
+          onDragStart={
+            isDraggable && !node.disabled
+              ? (e) => {
+                  e.stopPropagation()
+                  dragNodeKeyRef.current = node.key
+                }
+              : undefined
+          }
+          onDragOver={
+            isDraggable
+              ? (e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }
+              : undefined
+          }
+          onDrop={
+            isDraggable
+              ? (e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  if (dragNodeKeyRef.current !== null && dragNodeKeyRef.current !== node.key) {
+                    onDrop?.({ dragKey: dragNodeKeyRef.current, dropKey: node.key })
+                  }
+                  dragNodeKeyRef.current = null
+                }
+              : undefined
+          }
+          onDragEnd={
+            isDraggable
+              ? () => {
+                  dragNodeKeyRef.current = null
+                }
+              : undefined
+          }
           onFocus={() => {
             if (!node.disabled) setActiveKey(node.key)
           }}

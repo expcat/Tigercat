@@ -13,7 +13,7 @@
  * - styles/   : component-specific style utilities (button, input, select, timepicker-utils, etc.)
  */
 
-export const version = '0.7.0'
+export const version = '0.8.0'
 
 // ============================================================================
 // UTILITIES (re-exported from organized submodules for backward compatibility)

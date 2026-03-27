@@ -304,5 +304,39 @@ export type {
   UseChartInteractionOptions,
   UseChartInteractionReturn
 } from './hooks/useChartInteraction'
+export { useDrag } from './hooks/useDrag'
+export type { UseDragOptions, UseDragReturn } from './hooks/useDrag'
+
+// Splitter (v0.8.0+)
+export { Splitter } from './components/Splitter'
+export type { SplitterProps, SplitterResizeEvent } from './components/Splitter'
+
+// Resizable (v0.8.0+)
+export { Resizable } from './components/Resizable'
+export type { ResizableProps } from './components/Resizable'
+
+// CodeEditor (v0.8.0+)
+export { CodeEditor } from './components/CodeEditor'
+export type { CodeEditorProps } from './components/CodeEditor'
+
+// RichTextEditor (v0.8.0+)
+export { RichTextEditor } from './components/RichTextEditor'
+export type { RichTextEditorProps } from './components/RichTextEditor'
+
+// Kanban (v0.8.0+)
+export { Kanban } from './components/Kanban'
+export type { KanbanProps } from './components/Kanban'
+
+// VirtualTable (v0.8.0+)
+export { VirtualTable } from './components/VirtualTable'
+export type { VirtualTableProps } from './components/VirtualTable'
+
+// InfiniteScroll (v0.8.0+)
+export { InfiniteScroll } from './components/InfiniteScroll'
+export type { InfiniteScrollProps } from './components/InfiniteScroll'
+
+// FileManager (v0.8.0+)
+export { FileManager } from './components/FileManager'
+export type { FileManagerProps } from './components/FileManager'
 
 export const version = '0.0.1'

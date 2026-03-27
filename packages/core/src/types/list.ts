@@ -144,4 +144,9 @@ export interface ListProps {
    * Additional CSS classes
    */
   className?: string
+  /**
+   * Whether list items are draggable for reorder
+   * @default false
+   */
+  draggable?: boolean
 }
