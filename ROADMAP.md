@@ -80,6 +80,23 @@
 测试覆盖率: 4619 tests (237 test files)
 详见 [MIGRATION_v0.9.0.md](MIGRATION_v0.9.0.md) | [docs/roadmap/05-v0.9.0-SPEC.md](docs/roadmap/05-v0.9.0-SPEC.md)
 
+## v1.0.0 正式发布 (Stable Release)
+
+| 阶段    | 内容                                                 | 状态 |
+| ------- | ---------------------------------------------------- | ---- |
+| Phase 1 | 版本号对齐: core/vue/react/cli 统一升至 1.0.0        | ✅   |
+| Phase 2 | Bundle Size 监控: size-limit + CI 集成               | ✅   |
+| Phase 3 | 性能基准测试: Vitest bench (classNames/chart)        | ✅   |
+| Phase 4 | CI/CD 增强: PR 检查 + E2E 工作流 + 发布 dry-run      | ✅   |
+| Phase 5 | E2E 浏览器测试: Playwright (Chromium/Firefox/WebKit) | ✅   |
+| Phase 6 | 文档站升级: 搜索/暗色模式/API 自动生成/组件分类      | ✅   |
+| Phase 7 | 补充文档: 迁移指南/性能指南/浏览器兼容性             | ✅   |
+| Phase 8 | ROADMAP & README 更新                                | ✅   |
+
+版本: v0.9.0 功能合并进 v1.0.0，跳过 v0.9.0 直接发布稳定版
+133+ 组件 | 4619+ 测试 | WCAG 2.1 AA | 8 语言 | 5 主题
+详见 [MIGRATION_v1.0.0.md](MIGRATION_v1.0.0.md) | [docs/roadmap/06-v1.0.0-SPEC.md](docs/roadmap/06-v1.0.0-SPEC.md)
+
 ## 进度说明
 
 - ⬜ 未开始

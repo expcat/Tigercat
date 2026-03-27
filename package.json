@@ -33,6 +33,10 @@
     "test:vue": "vitest tests/vue",
     "test:react": "vitest tests/react",
     "test:validate": "node ./scripts/validate-tests.mjs",
+    "size": "size-limit",
+    "size:check": "size-limit --json",
+    "bench": "vitest bench",
+    "docs:api": "node ./scripts/generate-api-docs.mjs",
     "example:vue": "pnpm --filter @expcat/tigercat-example-vue3 dev",
     "example:react": "pnpm --filter @expcat/tigercat-example-react dev",
     "example:build": "pnpm --filter @expcat/tigercat-example-react build && pnpm --filter @expcat/tigercat-example-vue3 build",
@@ -42,6 +46,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@playwright/test": "^1.58.2",
+    "@size-limit/file": "^12.0.1",
+    "@size-limit/preset-small-lib": "^12.0.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
@@ -63,6 +70,7 @@
     "prettier": "^3.7.4",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
+    "size-limit": "^12.0.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16",
     "vue": "^3.5.26"

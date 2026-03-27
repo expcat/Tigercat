@@ -3,101 +3,340 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tigercat Examples</title>
+    <title>Tigercat UI — Component Library for Vue 3 & React</title>
     <style>
       :root {
         color-scheme: light;
+        --tc-primary: #2563eb;
+        --tc-primary-hover: #1d4ed8;
+        --tc-bg: #f8fafc;
+        --tc-surface: #ffffff;
+        --tc-text: #0f172a;
+        --tc-text-muted: #475569;
+        --tc-border: #e2e8f0;
+        --tc-shadow: rgba(15, 23, 42, 0.08);
       }
 
-      * {
-        box-sizing: border-box;
+      html[data-theme='dark'] {
+        color-scheme: dark;
+        --tc-bg: #0f172a;
+        --tc-surface: #1e293b;
+        --tc-text: #f1f5f9;
+        --tc-text-muted: #94a3b8;
+        --tc-border: #334155;
+        --tc-shadow: rgba(0, 0, 0, 0.3);
       }
 
+      * { box-sizing: border-box; margin: 0; }
       body {
-        margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        background: #f8fafc;
-        color: #0f172a;
+        background: var(--tc-bg);
+        color: var(--tc-text);
+        line-height: 1.6;
       }
 
-      main {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 48px 16px;
-      }
-
-      .container {
-        max-width: 960px;
-        width: 100%;
-      }
-
-      .title {
-        margin: 0 0 32px;
+      /* Header */
+      .header {
+        padding: 48px 16px 32px;
         text-align: center;
-        font-size: 28px;
-        font-weight: 700;
+      }
+      .header h1 { font-size: 36px; font-weight: 800; margin-bottom: 8px; }
+      .header p { font-size: 16px; color: var(--tc-text-muted); max-width: 600px; margin: 0 auto; }
+      .version-badge {
+        display: inline-block;
+        background: var(--tc-primary);
+        color: #fff;
+        padding: 2px 10px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        margin-left: 8px;
+        vertical-align: middle;
       }
 
-      .cards {
+      /* Toolbar */
+      .toolbar {
+        max-width: 960px;
+        margin: 0 auto 24px;
+        padding: 0 16px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .search-input {
+        flex: 1;
+        min-width: 200px;
+        padding: 10px 16px;
+        border: 1px solid var(--tc-border);
+        border-radius: 8px;
+        font-size: 14px;
+        background: var(--tc-surface);
+        color: var(--tc-text);
+        outline: none;
+      }
+      .search-input:focus { border-color: var(--tc-primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+      .theme-toggle {
+        padding: 8px 16px;
+        border: 1px solid var(--tc-border);
+        border-radius: 8px;
+        background: var(--tc-surface);
+        color: var(--tc-text);
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .theme-toggle:hover { border-color: var(--tc-primary); }
+
+      /* Framework Cards */
+      .fw-section {
+        max-width: 960px;
+        margin: 0 auto 40px;
+        padding: 0 16px;
+      }
+      .fw-cards {
         display: grid;
-        gap: 24px;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       }
-
-      .card {
-        background: #ffffff;
+      .fw-card {
+        background: var(--tc-surface);
         border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        padding: 28px;
+        box-shadow: 0 12px 30px var(--tc-shadow);
         text-decoration: none;
         color: inherit;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
+      .fw-card:hover { transform: translateY(-4px); box-shadow: 0 18px 36px var(--tc-shadow); }
+      .fw-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+      .fw-card p { font-size: 14px; color: var(--tc-text-muted); margin-bottom: 16px; }
+      .fw-card .link { font-weight: 600; color: var(--tc-primary); }
 
-      .card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
+      /* Component Overview */
+      .section { max-width: 960px; margin: 0 auto 40px; padding: 0 16px; }
+      .section h2 { font-size: 22px; font-weight: 700; margin-bottom: 16px; border-bottom: 2px solid var(--tc-border); padding-bottom: 8px; }
+      .component-grid {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       }
+      .component-tag {
+        padding: 6px 12px;
+        background: var(--tc-surface);
+        border: 1px solid var(--tc-border);
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        text-align: center;
+        transition: border-color 0.15s;
+      }
+      .component-tag:hover { border-color: var(--tc-primary); }
+      .component-tag.hidden { display: none; }
 
-      .card-title {
-        margin: 0 0 8px;
-        font-size: 20px;
-        font-weight: 600;
+      /* Stats */
+      .stats {
+        max-width: 960px;
+        margin: 0 auto 40px;
+        padding: 0 16px;
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       }
+      .stat {
+        background: var(--tc-surface);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 12px var(--tc-shadow);
+      }
+      .stat-value { font-size: 28px; font-weight: 800; color: var(--tc-primary); }
+      .stat-label { font-size: 13px; color: var(--tc-text-muted); margin-top: 4px; }
 
-      .card-desc {
-        margin: 0;
-        font-size: 14px;
-        color: #475569;
+      /* Footer */
+      .footer {
+        text-align: center;
+        padding: 32px 16px;
+        color: var(--tc-text-muted);
+        font-size: 13px;
+        border-top: 1px solid var(--tc-border);
       }
-
-      .card-link {
-        margin-top: 16px;
-        display: inline-block;
-        font-weight: 600;
-        color: #2563eb;
-      }
+      .footer a { color: var(--tc-primary); text-decoration: none; }
     </style>
   </head>
   <body>
-    <main>
-      <div class="container">
-        <h1 class="title">Tigercat 示例站点</h1>
-        <div class="cards">
-          <a class="card" href="./vue/">
-            <h2 class="card-title">Vue 3 示例</h2>
-            <p class="card-desc">浏览 Tigercat Vue 组件示例与主题效果。</p>
-            <span class="card-link">进入站点 →</span>
-          </a>
-          <a class="card" href="./react/">
-            <h2 class="card-title">React 示例</h2>
-            <p class="card-desc">查看 Tigercat React 组件示例与交互体验。</p>
-            <span class="card-link">进入站点 →</span>
-          </a>
-        </div>
+    <div class="header">
+      <h1>Tigercat <span class="version-badge">v1.0.0</span></h1>
+      <p>Tailwind CSS 驱动的跨框架 UI 组件库，支持 Vue 3 与 React，133+ 组件开箱即用。</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-value">133+</div><div class="stat-label">组件</div></div>
+      <div class="stat"><div class="stat-value">4619+</div><div class="stat-label">测试用例</div></div>
+      <div class="stat"><div class="stat-value">8</div><div class="stat-label">语言</div></div>
+      <div class="stat"><div class="stat-value">5</div><div class="stat-label">预设主题</div></div>
+    </div>
+
+    <div class="toolbar">
+      <input class="search-input" type="text" placeholder="搜索组件…" id="searchInput" />
+      <button class="theme-toggle" id="themeToggle">🌙 暗色模式</button>
+    </div>
+
+    <div class="fw-section">
+      <div class="fw-cards">
+        <a class="fw-card" href="./vue/">
+          <h2>Vue 3 示例</h2>
+          <p>浏览 Tigercat Vue 组件示例、主题效果与交互体验。</p>
+          <span class="link">进入站点 →</span>
+        </a>
+        <a class="fw-card" href="./react/">
+          <h2>React 示例</h2>
+          <p>查看 Tigercat React 组件示例、主题效果与交互体验。</p>
+          <span class="link">进入站点 →</span>
+        </a>
       </div>
-    </main>
+    </div>
+
+    <div class="section" id="basic">
+      <h2>基础组件 (Basic)</h2>
+      <div class="component-grid" data-category="basic">
+        <div class="component-tag">Button</div><div class="component-tag">ButtonGroup</div>
+        <div class="component-tag">Link</div><div class="component-tag">Icon</div>
+        <div class="component-tag">Text</div><div class="component-tag">Image</div>
+        <div class="component-tag">Avatar</div><div class="component-tag">AvatarGroup</div>
+        <div class="component-tag">Badge</div><div class="component-tag">Tag</div>
+        <div class="component-tag">Divider</div><div class="component-tag">Code</div>
+      </div>
+    </div>
+
+    <div class="section" id="form">
+      <h2>表单组件 (Form)</h2>
+      <div class="component-grid" data-category="form">
+        <div class="component-tag">Input</div><div class="component-tag">InputNumber</div>
+        <div class="component-tag">InputGroup</div><div class="component-tag">Textarea</div>
+        <div class="component-tag">Select</div><div class="component-tag">Cascader</div>
+        <div class="component-tag">TreeSelect</div><div class="component-tag">AutoComplete</div>
+        <div class="component-tag">Checkbox</div><div class="component-tag">Radio</div>
+        <div class="component-tag">Switch</div><div class="component-tag">Slider</div>
+        <div class="component-tag">DatePicker</div><div class="component-tag">TimePicker</div>
+        <div class="component-tag">ColorPicker</div><div class="component-tag">Rate</div>
+        <div class="component-tag">Upload</div><div class="component-tag">Transfer</div>
+        <div class="component-tag">Mentions</div><div class="component-tag">Form</div>
+      </div>
+    </div>
+
+    <div class="section" id="data">
+      <h2>数据展示 (Data Display)</h2>
+      <div class="component-grid" data-category="data">
+        <div class="component-tag">Table</div><div class="component-tag">VirtualTable</div>
+        <div class="component-tag">Card</div><div class="component-tag">List</div>
+        <div class="component-tag">Descriptions</div><div class="component-tag">Timeline</div>
+        <div class="component-tag">Tree</div><div class="component-tag">Progress</div>
+        <div class="component-tag">Skeleton</div><div class="component-tag">Statistic</div>
+        <div class="component-tag">Calendar</div><div class="component-tag">QRCode</div>
+        <div class="component-tag">Segmented</div><div class="component-tag">Empty</div>
+      </div>
+    </div>
+
+    <div class="section" id="navigation">
+      <h2>导航组件 (Navigation)</h2>
+      <div class="component-grid" data-category="navigation">
+        <div class="component-tag">Menu</div><div class="component-tag">Tabs</div>
+        <div class="component-tag">Breadcrumb</div><div class="component-tag">Dropdown</div>
+        <div class="component-tag">Pagination</div><div class="component-tag">Steps</div>
+        <div class="component-tag">Anchor</div>
+      </div>
+    </div>
+
+    <div class="section" id="feedback">
+      <h2>反馈组件 (Feedback)</h2>
+      <div class="component-grid" data-category="feedback">
+        <div class="component-tag">Alert</div><div class="component-tag">Modal</div>
+        <div class="component-tag">Drawer</div><div class="component-tag">Message</div>
+        <div class="component-tag">Notification</div><div class="component-tag">Loading</div>
+        <div class="component-tag">Popconfirm</div><div class="component-tag">Popover</div>
+        <div class="component-tag">Tooltip</div><div class="component-tag">Result</div>
+        <div class="component-tag">Watermark</div>
+      </div>
+    </div>
+
+    <div class="section" id="layout">
+      <h2>布局组件 (Layout)</h2>
+      <div class="component-grid" data-category="layout">
+        <div class="component-tag">Container</div><div class="component-tag">Grid</div>
+        <div class="component-tag">Layout</div><div class="component-tag">Space</div>
+        <div class="component-tag">Splitter</div><div class="component-tag">Resizable</div>
+      </div>
+    </div>
+
+    <div class="section" id="charts">
+      <h2>图表组件 (Charts)</h2>
+      <div class="component-grid" data-category="charts">
+        <div class="component-tag">BarChart</div><div class="component-tag">LineChart</div>
+        <div class="component-tag">AreaChart</div><div class="component-tag">PieChart</div>
+        <div class="component-tag">DonutChart</div><div class="component-tag">ScatterChart</div>
+        <div class="component-tag">RadarChart</div><div class="component-tag">TreeMapChart</div>
+        <div class="component-tag">HeatmapChart</div><div class="component-tag">FunnelChart</div>
+        <div class="component-tag">GaugeChart</div><div class="component-tag">SunburstChart</div>
+      </div>
+    </div>
+
+    <div class="section" id="advanced">
+      <h2>高级组件 (Advanced)</h2>
+      <div class="component-grid" data-category="advanced">
+        <div class="component-tag">CodeEditor</div><div class="component-tag">RichTextEditor</div>
+        <div class="component-tag">Kanban</div><div class="component-tag">FileManager</div>
+        <div class="component-tag">VirtualList</div><div class="component-tag">InfiniteScroll</div>
+        <div class="component-tag">Tour</div><div class="component-tag">FloatButton</div>
+        <div class="component-tag">Affix</div><div class="component-tag">BackTop</div>
+        <div class="component-tag">PrintLayout</div><div class="component-tag">ImageViewer</div>
+      </div>
+    </div>
+
+    <div class="section" id="composite">
+      <h2>组合组件 (Composite)</h2>
+      <div class="component-grid" data-category="composite">
+        <div class="component-tag">ChatWindow</div><div class="component-tag">CommentThread</div>
+        <div class="component-tag">NotificationCenter</div><div class="component-tag">FormWizard</div>
+        <div class="component-tag">DataTableWithToolbar</div><div class="component-tag">ActivityFeed</div>
+        <div class="component-tag">CropUpload</div><div class="component-tag">TaskBoard</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>Tigercat v1.0.0 · MIT License · <a href="https://github.com/expcats/Tigercat">GitHub</a></p>
+    </div>
+
+    <script>
+      // Dark mode toggle
+      const toggle = document.getElementById('themeToggle')
+      const html = document.documentElement
+      const savedTheme = localStorage.getItem('tc-theme')
+      if (savedTheme === 'dark' || (!savedTheme && matchMedia('(prefers-color-scheme: dark)').matches)) {
+        html.dataset.theme = 'dark'
+        toggle.textContent = '☀️ 浅色模式'
+      }
+      toggle.addEventListener('click', () => {
+        const isDark = html.dataset.theme === 'dark'
+        html.dataset.theme = isDark ? '' : 'dark'
+        toggle.textContent = isDark ? '🌙 暗色模式' : '☀️ 浅色模式'
+        localStorage.setItem('tc-theme', isDark ? 'light' : 'dark')
+      })
+
+      // Client-side search
+      const searchInput = document.getElementById('searchInput')
+      const allTags = document.querySelectorAll('.component-tag')
+      const allSections = document.querySelectorAll('.section')
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim()
+        allTags.forEach(tag => {
+          const match = !query || tag.textContent.toLowerCase().includes(query)
+          tag.classList.toggle('hidden', !match)
+        })
+        allSections.forEach(section => {
+          const visibleTags = section.querySelectorAll('.component-tag:not(.hidden)')
+          section.style.display = visibleTags.length === 0 && query ? 'none' : ''
+        })
+      })
+    </script>
   </body>
 </html>

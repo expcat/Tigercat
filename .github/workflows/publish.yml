@@ -2,6 +2,12 @@ name: Publish to NPM
 
 on:
   workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'Dry run (skip actual publish)'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   publish:
@@ -30,13 +36,25 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Lint
+        run: pnpm lint
+
       - name: Build packages
         run: pnpm build
 
+      - name: Run tests
+        run: pnpm test
+
+      - name: Check bundle size
+        run: pnpm size
+
       - name: Publish to NPM
+        if: ${{ inputs.dry-run != 'true' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
         run: |
           pnpm -r --filter "./packages/**" publish --no-git-checks --access public
 
+      - name: Dry run summary
+        if: ${{ inputs.dry-run == 'true' }}
+        run: echo "Dry run complete — all checks passed, publish skipped."

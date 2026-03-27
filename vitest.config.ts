@@ -9,6 +9,9 @@ export default defineConfig({
     environment: 'happy-dom',
     setupFiles: ['./tests/setup.ts'],
     include: ['tests/**/*.{test,spec}.{js,ts,tsx}'],
+    benchmark: {
+      include: ['benchmarks/**/*.bench.{js,ts}']
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

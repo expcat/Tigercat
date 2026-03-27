@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Core (full)",
+    "path": "packages/core/dist/index.js",
+    "limit": "100 kB",
+    "gzip": true
+  },
+  {
+    "name": "Vue (full)",
+    "path": "packages/vue/dist/index.mjs",
+    "limit": "250 kB",
+    "gzip": true
+  },
+  {
+    "name": "React (full)",
+    "path": "packages/react/dist/index.mjs",
+    "limit": "250 kB",
+    "gzip": true
+  }
+]
