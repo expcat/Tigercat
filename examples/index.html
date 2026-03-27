@@ -303,7 +303,7 @@
     </div>
 
     <div class="footer">
-      <p>Tigercat v1.0.0 · MIT License · <a href="https://github.com/expcats/Tigercat">GitHub</a></p>
+      <p>Tigercat v1.0.0 · MIT License · <a href="https://github.com/expcat/Tigercat">GitHub</a></p>
     </div>
 
     <script>
@@ -317,7 +317,11 @@
       }
       toggle.addEventListener('click', () => {
         const isDark = html.dataset.theme === 'dark'
-        html.dataset.theme = isDark ? '' : 'dark'
+        if (isDark) {
+          html.removeAttribute('data-theme')
+        } else {
+          html.dataset.theme = 'dark'
+        }
         toggle.textContent = isDark ? '🌙 暗色模式' : '☀️ 浅色模式'
         localStorage.setItem('tc-theme', isDark ? 'light' : 'dark')
       })

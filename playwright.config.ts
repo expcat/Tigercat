@@ -28,12 +28,14 @@ export default defineConfig({
     {
       command: 'pnpm --filter @expcat/tigercat-example-vue3 dev',
       port: 5173,
-      reuseExistingServer: !process.env.CI
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000
     },
     {
       command: 'pnpm --filter @expcat/tigercat-example-react dev',
       port: 5174,
-      reuseExistingServer: !process.env.CI
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000
     }
   ]
 })
