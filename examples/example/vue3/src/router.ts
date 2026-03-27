@@ -10,169 +10,117 @@ const router = createRouter({
       component: AppLayout,
       children: [
         { path: '', component: Home },
+        // Basic
         { path: 'button', component: () => import('./pages/ButtonDemo.vue') },
-        { path: 'input', component: () => import('./pages/InputDemo.vue') },
-        {
-          path: 'textarea',
-          component: () => import('./pages/TextareaDemo.vue')
-        },
-        {
-          path: 'checkbox',
-          component: () => import('./pages/CheckboxDemo.vue')
-        },
-        { path: 'radio', component: () => import('./pages/RadioDemo.vue') },
-        { path: 'switch', component: () => import('./pages/SwitchDemo.vue') },
-        { path: 'slider', component: () => import('./pages/SliderDemo.vue') },
-        { path: 'select', component: () => import('./pages/SelectDemo.vue') },
-        { path: 'form', component: () => import('./pages/FormDemo.vue') },
-        { path: 'form-wizard', component: () => import('./pages/FormWizardDemo.vue') },
-        { path: 'space', component: () => import('./pages/SpaceDemo.vue') },
-        { path: 'divider', component: () => import('./pages/DividerDemo.vue') },
-        { path: 'layout', component: () => import('./pages/LayoutDemo.vue') },
-        { path: 'grid', component: () => import('./pages/GridDemo.vue') },
+        { path: 'icon', component: () => import('./pages/IconDemo.vue') },
         { path: 'link', component: () => import('./pages/LinkDemo.vue') },
         { path: 'text', component: () => import('./pages/TextDemo.vue') },
         { path: 'code', component: () => import('./pages/CodeDemo.vue') },
-        { path: 'icon', component: () => import('./pages/IconDemo.vue') },
-        {
-          path: 'datepicker',
-          component: () => import('./pages/DatePickerDemo.vue')
-        },
-        {
-          path: 'timepicker',
-          component: () => import('./pages/TimePickerDemo.vue')
-        },
-        { path: 'upload', component: () => import('./pages/UploadDemo.vue') },
-        { path: 'table', component: () => import('./pages/TableDemo.vue') },
-        {
-          path: 'data-table-with-toolbar',
-          component: () => import('./pages/DataTableWithToolbarDemo.vue')
-        },
-        { path: 'tag', component: () => import('./pages/TagDemo.vue') },
-        { path: 'badge', component: () => import('./pages/BadgeDemo.vue') },
-        { path: 'card', component: () => import('./pages/CardDemo.vue') },
+        { path: 'image', component: () => import('./pages/ImageDemo.vue') },
+        { path: 'image-cropper', component: () => import('./pages/ImageCropperDemo.vue') },
+        { path: 'image-viewer', component: () => import('./pages/ImageViewerDemo.vue') },
         { path: 'avatar', component: () => import('./pages/AvatarDemo.vue') },
+        { path: 'badge', component: () => import('./pages/BadgeDemo.vue') },
+        { path: 'tag', component: () => import('./pages/TagDemo.vue') },
+        { path: 'empty', component: () => import('./pages/EmptyDemo.vue') },
+        { path: 'result', component: () => import('./pages/ResultDemo.vue') },
+        { path: 'qrcode', component: () => import('./pages/QRCodeDemo.vue') },
+        { path: 'statistic', component: () => import('./pages/StatisticDemo.vue') },
+        { path: 'rate', component: () => import('./pages/RateDemo.vue') },
+        { path: 'segmented', component: () => import('./pages/SegmentedDemo.vue') },
+        { path: 'watermark', component: () => import('./pages/WatermarkDemo.vue') },
+        // Form
+        { path: 'input', component: () => import('./pages/InputDemo.vue') },
+        { path: 'input-group', component: () => import('./pages/InputGroupDemo.vue') },
+        { path: 'textarea', component: () => import('./pages/TextareaDemo.vue') },
+        { path: 'checkbox', component: () => import('./pages/CheckboxDemo.vue') },
+        { path: 'radio', component: () => import('./pages/RadioDemo.vue') },
+        { path: 'switch', component: () => import('./pages/SwitchDemo.vue') },
+        { path: 'slider', component: () => import('./pages/SliderDemo.vue') },
+        { path: 'stepper', component: () => import('./pages/StepperDemo.vue') },
+        { path: 'select', component: () => import('./pages/SelectDemo.vue') },
+        { path: 'auto-complete', component: () => import('./pages/AutoCompleteDemo.vue') },
+        { path: 'cascader', component: () => import('./pages/CascaderDemo.vue') },
+        { path: 'tree-select', component: () => import('./pages/TreeSelectDemo.vue') },
+        { path: 'color-picker', component: () => import('./pages/ColorPickerDemo.vue') },
+        { path: 'mentions', component: () => import('./pages/MentionsDemo.vue') },
+        { path: 'transfer', component: () => import('./pages/TransferDemo.vue') },
+        { path: 'datepicker', component: () => import('./pages/DatePickerDemo.vue') },
+        { path: 'timepicker', component: () => import('./pages/TimePickerDemo.vue') },
+        { path: 'upload', component: () => import('./pages/UploadDemo.vue') },
+        { path: 'form', component: () => import('./pages/FormDemo.vue') },
+        // Layout
+        { path: 'layout', component: () => import('./pages/LayoutDemo.vue') },
+        { path: 'grid', component: () => import('./pages/GridDemo.vue') },
+        { path: 'space', component: () => import('./pages/SpaceDemo.vue') },
+        { path: 'divider', component: () => import('./pages/DividerDemo.vue') },
+        { path: 'card', component: () => import('./pages/CardDemo.vue') },
+        { path: 'descriptions', component: () => import('./pages/DescriptionsDemo.vue') },
         { path: 'list', component: () => import('./pages/ListDemo.vue') },
-        {
-          path: 'descriptions',
-          component: () => import('./pages/DescriptionsDemo.vue')
-        },
-        {
-          path: 'timeline',
-          component: () => import('./pages/TimelineDemo.vue')
-        },
-        {
-          path: 'progress',
-          component: () => import('./pages/ProgressDemo.vue')
-        },
-        {
-          path: 'bar-chart',
-          component: () => import('./pages/BarChartDemo.vue')
-        },
-        {
-          path: 'scatter-chart',
-          component: () => import('./pages/ScatterChartDemo.vue')
-        },
-        {
-          path: 'pie-chart',
-          component: () => import('./pages/PieChartDemo.vue')
-        },
-        {
-          path: 'donut-chart',
-          component: () => import('./pages/DonutChartDemo.vue')
-        },
-        {
-          path: 'radar-chart',
-          component: () => import('./pages/RadarChartDemo.vue')
-        },
-        {
-          path: 'line-chart',
-          component: () => import('./pages/LineChartDemo.vue')
-        },
-        {
-          path: 'area-chart',
-          component: () => import('./pages/AreaChartDemo.vue')
-        },
-        { path: 'menu', component: () => import('./pages/MenuDemo.vue') },
-        {
-          path: 'breadcrumb',
-          component: () => import('./pages/BreadcrumbDemo.vue')
-        },
-        {
-          path: 'dropdown',
-          component: () => import('./pages/DropdownDemo.vue')
-        },
-        { path: 'tabs', component: () => import('./pages/TabsDemo.vue') },
+        { path: 'skeleton', component: () => import('./pages/SkeletonDemo.vue') },
+        { path: 'splitter', component: () => import('./pages/SplitterDemo.vue') },
+        { path: 'print-layout', component: () => import('./pages/PrintLayoutDemo.vue') },
+        // Data Display
+        { path: 'table', component: () => import('./pages/TableDemo.vue') },
+        { path: 'virtual-table', component: () => import('./pages/VirtualTableDemo.vue') },
+        { path: 'timeline', component: () => import('./pages/TimelineDemo.vue') },
+        { path: 'progress', component: () => import('./pages/ProgressDemo.vue') },
         { path: 'tree', component: () => import('./pages/TreeDemo.vue') },
-        {
-          path: 'skeleton',
-          component: () => import('./pages/SkeletonDemo.vue')
-        },
+        { path: 'collapse', component: () => import('./pages/CollapseDemo.vue') },
+        { path: 'carousel', component: () => import('./pages/CarouselDemo.vue') },
+        { path: 'calendar', component: () => import('./pages/CalendarDemo.vue') },
+        // Navigation
+        { path: 'menu', component: () => import('./pages/MenuDemo.vue') },
+        { path: 'breadcrumb', component: () => import('./pages/BreadcrumbDemo.vue') },
+        { path: 'dropdown', component: () => import('./pages/DropdownDemo.vue') },
+        { path: 'tabs', component: () => import('./pages/TabsDemo.vue') },
+        { path: 'steps', component: () => import('./pages/StepsDemo.vue') },
+        { path: 'pagination', component: () => import('./pages/PaginationDemo.vue') },
+        { path: 'anchor', component: () => import('./pages/AnchorDemo.vue') },
+        { path: 'backtop', component: () => import('./pages/BackTopDemo.vue') },
+        { path: 'affix', component: () => import('./pages/AffixDemo.vue') },
+        { path: 'tour', component: () => import('./pages/TourDemo.vue') },
+        { path: 'float-button', component: () => import('./pages/FloatButtonDemo.vue') },
+        // Feedback
         { path: 'alert', component: () => import('./pages/AlertDemo.vue') },
         { path: 'message', component: () => import('./pages/MessageDemo.vue') },
         { path: 'modal', component: () => import('./pages/ModalDemo.vue') },
-        {
-          path: 'popconfirm',
-          component: () => import('./pages/PopconfirmDemo.vue')
-        },
+        { path: 'popconfirm', component: () => import('./pages/PopconfirmDemo.vue') },
         { path: 'popover', component: () => import('./pages/PopoverDemo.vue') },
         { path: 'tooltip', component: () => import('./pages/TooltipDemo.vue') },
-        {
-          path: 'notification',
-          component: () => import('./pages/NotificationDemo.vue')
-        },
-        { path: 'steps', component: () => import('./pages/StepsDemo.vue') },
-        {
-          path: 'pagination',
-          component: () => import('./pages/PaginationDemo.vue')
-        },
+        { path: 'notification', component: () => import('./pages/NotificationDemo.vue') },
         { path: 'drawer', component: () => import('./pages/DrawerDemo.vue') },
         { path: 'loading', component: () => import('./pages/LoadingDemo.vue') },
-        {
-          path: 'collapse',
-          component: () => import('./pages/CollapseDemo.vue')
-        },
-        {
-          path: 'carousel',
-          component: () => import('./pages/CarouselDemo.vue')
-        },
-        {
-          path: 'backtop',
-          component: () => import('./pages/BackTopDemo.vue')
-        },
-        { path: 'anchor', component: () => import('./pages/AnchorDemo.vue') },
-        {
-          path: 'chat-window',
-          component: () => import('./pages/ChatWindowDemo.vue')
-        },
-        {
-          path: 'comment-thread',
-          component: () => import('./pages/CommentThreadDemo.vue')
-        },
-        {
-          path: 'activity-feed',
-          component: () => import('./pages/ActivityFeedDemo.vue')
-        },
-        {
-          path: 'notification-center',
-          component: () => import('./pages/NotificationCenterDemo.vue')
-        },
-        {
-          path: 'image',
-          component: () => import('./pages/ImageDemo.vue')
-        },
-        {
-          path: 'image-cropper',
-          component: () => import('./pages/ImageCropperDemo.vue')
-        },
-        {
-          path: 'crop-upload',
-          component: () => import('./pages/CropUploadDemo.vue')
-        },
-        {
-          path: 'task-board',
-          component: () => import('./pages/TaskBoardDemo.vue')
-        }
+        // Charts
+        { path: 'bar-chart', component: () => import('./pages/BarChartDemo.vue') },
+        { path: 'line-chart', component: () => import('./pages/LineChartDemo.vue') },
+        { path: 'area-chart', component: () => import('./pages/AreaChartDemo.vue') },
+        { path: 'pie-chart', component: () => import('./pages/PieChartDemo.vue') },
+        { path: 'donut-chart', component: () => import('./pages/DonutChartDemo.vue') },
+        { path: 'scatter-chart', component: () => import('./pages/ScatterChartDemo.vue') },
+        { path: 'radar-chart', component: () => import('./pages/RadarChartDemo.vue') },
+        { path: 'funnel-chart', component: () => import('./pages/FunnelChartDemo.vue') },
+        { path: 'gauge-chart', component: () => import('./pages/GaugeChartDemo.vue') },
+        { path: 'heatmap-chart', component: () => import('./pages/HeatmapChartDemo.vue') },
+        { path: 'treemap-chart', component: () => import('./pages/TreeMapChartDemo.vue') },
+        { path: 'sunburst-chart', component: () => import('./pages/SunburstChartDemo.vue') },
+        // Advanced
+        { path: 'resizable', component: () => import('./pages/ResizableDemo.vue') },
+        { path: 'virtual-list', component: () => import('./pages/VirtualListDemo.vue') },
+        { path: 'infinite-scroll', component: () => import('./pages/InfiniteScrollDemo.vue') },
+        { path: 'code-editor', component: () => import('./pages/CodeEditorDemo.vue') },
+        { path: 'rich-text-editor', component: () => import('./pages/RichTextEditorDemo.vue') },
+        { path: 'kanban', component: () => import('./pages/KanbanDemo.vue') },
+        { path: 'file-manager', component: () => import('./pages/FileManagerDemo.vue') },
+        // Composite
+        { path: 'data-table-with-toolbar', component: () => import('./pages/DataTableWithToolbarDemo.vue') },
+        { path: 'form-wizard', component: () => import('./pages/FormWizardDemo.vue') },
+        { path: 'chat-window', component: () => import('./pages/ChatWindowDemo.vue') },
+        { path: 'comment-thread', component: () => import('./pages/CommentThreadDemo.vue') },
+        { path: 'activity-feed', component: () => import('./pages/ActivityFeedDemo.vue') },
+        { path: 'notification-center', component: () => import('./pages/NotificationCenterDemo.vue') },
+        { path: 'crop-upload', component: () => import('./pages/CropUploadDemo.vue') },
+        { path: 'task-board', component: () => import('./pages/TaskBoardDemo.vue') }
       ]
     }
   ]
