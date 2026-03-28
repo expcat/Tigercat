@@ -43,13 +43,13 @@ describe('Kanban', () => {
 
     it('should render all columns', () => {
       const { container } = renderKanban()
-      const cols = container.querySelectorAll('[data-kanban-column]')
+      const cols = container.querySelectorAll('[data-tiger-taskboard-column]')
       expect(cols.length).toBe(3)
     })
 
     it('should render cards', () => {
       const { container } = renderKanban()
-      const cards = container.querySelectorAll('[data-kanban-card]')
+      const cards = container.querySelectorAll('[data-tiger-taskboard-card]')
       expect(cards.length).toBe(3)
     })
 
@@ -76,23 +76,27 @@ describe('Kanban', () => {
       expect(text).toContain('1/3')
     })
 
-    it('should hide card count when showCardCount is false', () => {
+    it('should hide card count badge when showCardCount is false', () => {
       const { container } = renderKanban({ showCardCount: false })
-      const text = container.textContent
-      expect(text).not.toContain('1/3')
+      // With showCardCount disabled, the badge-style count is hidden
+      // but the inline WIP display (1/3) still appears for WIP-limited columns
+      const badges = container.querySelectorAll(
+        '.inline-flex.items-center.justify-center'
+      )
+      expect(badges.length).toBe(0)
     })
   })
 
   describe('Filtering', () => {
     it('should filter cards by filterText', () => {
       const { container } = renderKanban({ filterText: 'Task 1' })
-      const cards = container.querySelectorAll('[data-kanban-card]')
+      const cards = container.querySelectorAll('[data-tiger-taskboard-card]')
       expect(cards.length).toBe(1)
     })
 
     it('should show all cards when filterText is empty', () => {
       const { container } = renderKanban({ filterText: '' })
-      const cards = container.querySelectorAll('[data-kanban-card]')
+      const cards = container.querySelectorAll('[data-tiger-taskboard-card]')
       expect(cards.length).toBe(3)
     })
   })
@@ -100,7 +104,7 @@ describe('Kanban', () => {
   describe('Hidden columns', () => {
     it('should hide specified columns', () => {
       const { container } = renderKanban({ hiddenColumns: ['done'] })
-      const cols = container.querySelectorAll('[data-kanban-column]')
+      const cols = container.querySelectorAll('[data-tiger-taskboard-column]')
       expect(cols.length).toBe(2)
     })
   })
@@ -152,12 +156,12 @@ describe('Kanban', () => {
     it('should have aria-label on the board', () => {
       const { container } = renderKanban()
       const board = container.querySelector('[role="region"]')
-      expect(board?.getAttribute('aria-label')).toBe('Kanban board')
+      expect(board?.getAttribute('aria-label')).toBe('Task Board')
     })
 
     it('should set draggable on cards', () => {
       const { container } = renderKanban()
-      const cards = container.querySelectorAll('[data-kanban-card]')
+      const cards = container.querySelectorAll('[data-tiger-taskboard-card]')
       cards.forEach((card) => {
         expect(card.getAttribute('draggable')).toBe('true')
       })
@@ -165,9 +169,10 @@ describe('Kanban', () => {
 
     it('should set draggable on columns', () => {
       const { container } = renderKanban()
-      const cols = container.querySelectorAll('[data-kanban-column]')
-      cols.forEach((col) => {
-        expect(col.getAttribute('draggable')).toBe('true')
+      // TaskBoard sets draggable on the column header, not the column container
+      const headers = container.querySelectorAll('[data-tiger-taskboard-column] > div:first-child')
+      headers.forEach((header) => {
+        expect(header.getAttribute('draggable')).toBe('true')
       })
     })
   })

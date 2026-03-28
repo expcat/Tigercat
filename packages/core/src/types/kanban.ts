@@ -1,8 +1,8 @@
 /**
  * Kanban types — extends TaskBoard with kanban-specific features.
  *
- * Kanban is essentially a TaskBoard with enhanced drag integration
- * using the new unified drag system from Phase 1.
+ * Since v0.9.0, filter/card-count/add-button features have been merged into
+ * TaskBoardProps.  KanbanProps now only adds swimlane-specific extensions.
  */
 
 import type {
@@ -31,20 +31,10 @@ export interface KanbanSwimlane {
   collapsed?: boolean
 }
 
-/** Kanban props — extends TaskBoard with swim-lane and filter support */
+/** Kanban props — extends TaskBoard with swim-lane support */
 export interface KanbanProps extends TaskBoardProps {
   /** Enable swim-lane grouping (horizontal lanes across columns) */
   swimlanes?: KanbanSwimlane[]
   /** Card field used to assign swim-lanes */
   swimlaneField?: string
-  /** Quick filter / search term applied to card titles */
-  filterText?: string
-  /** Column IDs to hide (useful for saved views) */
-  hiddenColumns?: (string | number)[]
-  /** Show column card count badges */
-  showCardCount?: boolean
-  /** Allow adding new cards inline */
-  allowAddCard?: boolean
-  /** Allow adding new columns inline */
-  allowAddColumn?: boolean
 }

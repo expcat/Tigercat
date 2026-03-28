@@ -3,30 +3,19 @@
  *
  * Extends task-board-utils with kanban-specific features:
  * swimlane support, filtering, card counting, and column visibility.
+ *
+ * Since v0.9.0, filter/card-count/add-button features have been merged
+ * into TaskBoard.  The utils here are still used by TaskBoard directly.
  */
 
 import type { TaskBoardColumn, TaskBoardCard } from '../types/composite'
 import type { KanbanSwimlane } from '../types/kanban'
 import {
   taskBoardBaseClasses,
-  taskBoardColumnClasses,
-  taskBoardColumnHeaderClasses,
-  taskBoardColumnBodyClasses,
-  taskBoardCardClasses,
-  taskBoardEmptyClasses,
   taskBoardAddCardClasses
 } from './task-board-utils'
 
-// Re-export base classes as kanban aliases for convenience
-export const kanbanBoardClasses = taskBoardBaseClasses
-export const kanbanColumnClasses = taskBoardColumnClasses
-export const kanbanColumnHeaderClasses = taskBoardColumnHeaderClasses
-export const kanbanColumnBodyClasses = taskBoardColumnBodyClasses
-export const kanbanCardClasses = taskBoardCardClasses
-export const kanbanEmptyClasses = taskBoardEmptyClasses
-export const kanbanAddCardClasses = taskBoardAddCardClasses
-
-// ─── Additional Kanban-specific class constants ───────────────────
+// ─── Kanban-specific class constants ──────────────────────────────
 
 /** Card count badge */
 export const kanbanCardCountClasses =
@@ -51,6 +40,10 @@ export const kanbanFilterHighlightClasses = 'bg-[var(--tiger-warning,#fbbf24)]/2
 /** Add column button */
 export const kanbanAddColumnClasses =
   'flex items-center justify-center shrink-0 w-72 min-h-[80px] rounded-lg border-2 border-dashed border-[var(--tiger-border,#d1d5db)] text-[var(--tiger-text-muted,#9ca3af)] hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)] cursor-pointer transition-colors'
+
+// Backward-compat aliases (deprecated — use taskBoard* equivalents directly)
+/** @deprecated Use `taskBoardAddCardClasses` instead */
+export const kanbanAddCardClasses = taskBoardAddCardClasses
 
 // ─── Filter logic ─────────────────────────────────────────────────
 
@@ -158,7 +151,7 @@ export function getColumnCardCount(column: TaskBoardColumn): {
 // ─── Column class helpers ─────────────────────────────────────────
 
 export function getKanbanContainerClasses(className?: string): string {
-  const parts = [kanbanBoardClasses]
+  const parts = [taskBoardBaseClasses]
   if (className) parts.push(className)
   return parts.join(' ')
 }

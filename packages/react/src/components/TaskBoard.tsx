@@ -16,6 +16,10 @@ import {
   taskBoardEmptyClasses,
   taskBoardWipExceededClasses,
   taskBoardAddCardClasses,
+  kanbanCardCountClasses,
+  kanbanAddColumnClasses,
+  filterColumns,
+  getColumnCardCount,
   moveCard,
   reorderColumns,
   isWipExceeded,
@@ -149,6 +153,8 @@ interface ColumnItemProps {
   onCardKeyDown: (e: React.KeyboardEvent, card: TaskBoardCard, column: TaskBoardColumn) => void
   dragStateId: string | number | null
   kbDragStateId: string | number | null
+  showCardCount: boolean
+  allowAddCard: boolean
 }
 
 const ColumnItem = React.memo<ColumnItemProps>(
@@ -183,9 +189,12 @@ const ColumnItem = React.memo<ColumnItemProps>(
     onColumnTouchEnd,
     onCardKeyDown,
     dragStateId,
-    kbDragStateId
+    kbDragStateId,
+    showCardCount,
+    allowAddCard
   }) => {
     const wipOver = isWipExceeded(column)
+    const cardCount = showCardCount ? getColumnCardCount(column) : null
 
     const colClasses = classNames(
       taskBoardColumnClasses,
@@ -264,14 +273,27 @@ const ColumnItem = React.memo<ColumnItemProps>(
             <>
               <span className={wipOver ? taskBoardWipExceededClasses : undefined}>
                 {column.title}
-                {column.wipLimit != null ? (
-                  <span className="ml-2 text-xs font-normal opacity-70" title={wipTitle}>
-                    ({column.cards.length}/{column.wipLimit})
-                  </span>
-                ) : (
-                  <span className="ml-2 text-xs font-normal opacity-50">{column.cards.length}</span>
-                )}
+                {showCardCount && cardCount
+                  ? null
+                  : column.wipLimit != null ? (
+                    <span className="ml-2 text-xs font-normal opacity-70" title={wipTitle}>
+                      ({column.cards.length}/{column.wipLimit})
+                    </span>
+                  ) : (
+                    <span className="ml-2 text-xs font-normal opacity-50">{column.cards.length}</span>
+                  )}
               </span>
+              {showCardCount && cardCount && (
+                <span
+                  className={classNames(
+                    kanbanCardCountClasses,
+                    wipOver && taskBoardWipExceededClasses
+                  )}>
+                  {cardCount.limit
+                    ? `${cardCount.count}/${cardCount.limit}`
+                    : `${cardCount.count}`}
+                </span>
+              )}
               {column.description && (
                 <span className="text-xs font-normal text-[var(--tiger-text-muted,#6b7280)] truncate max-w-[120px]">
                   {column.description}
@@ -295,13 +317,21 @@ const ColumnItem = React.memo<ColumnItemProps>(
         {/* Column footer */}
         {renderColumnFooter ? (
           renderColumnFooter(column)
-        ) : onCardAdd ? (
+        ) : (onCardAdd || allowAddCard) ? (
           <div
             className={classNames(
               'border-t border-[var(--tiger-border,#e5e7eb)]',
               taskBoardAddCardClasses
             )}
-            onClick={() => onCardAdd(column.id)}>
+            role="button"
+            tabIndex={0}
+            onClick={() => onCardAdd?.(column.id)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onCardAdd?.(column.id)
+              }
+            }}>
             <span>+</span>
             <span>{resolveLocaleText(labels.addCardText)}</span>
           </div>
@@ -320,7 +350,9 @@ const ColumnItem = React.memo<ColumnItemProps>(
     prev.dragType === next.dragType &&
     prev.dragStateId === next.dragStateId &&
     prev.kbDragStateId === next.kbDragStateId &&
-    prev.onCardAdd === next.onCardAdd
+    prev.onCardAdd === next.onCardAdd &&
+    prev.showCardCount === next.showCardCount &&
+    prev.allowAddCard === next.allowAddCard
 )
 ColumnItem.displayName = 'TaskBoardColumnItem'
 
@@ -354,6 +386,12 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   onColumnMove,
   onColumnsChange,
   onCardAdd,
+  filterText = '',
+  hiddenColumns,
+  showCardCount = false,
+  allowAddCard = false,
+  allowAddColumn = false,
+  onColumnAdd,
   renderCard: renderCardProp,
   renderColumnHeader,
   renderColumnFooter,
@@ -378,6 +416,14 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   }, [controlledColumns])
 
   const currentColumns = controlledColumns ?? innerColumns
+
+  // Apply filter and hidden columns (no-op when filterText is empty and hiddenColumns is empty)
+  const visibleColumns = useMemo(() => {
+    if (!filterText && (!hiddenColumns || hiddenColumns.length === 0)) {
+      return currentColumns
+    }
+    return filterColumns(currentColumns, filterText, hiddenColumns)
+  }, [currentColumns, filterText, hiddenColumns])
 
   // Ref for async helpers to avoid stale closure
   const columnsRef = useRef(currentColumns)
@@ -696,7 +742,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
       aria-label={resolveLocaleText(labels.boardAriaLabel)}
       data-tiger-task-board=""
       {...rest}>
-      {currentColumns.map((col, i) => {
+      {visibleColumns.map((col, i) => {
         const isDropTarget = dragState?.type === 'card' && dropTargetColumnId === col.id
         const isColDragging = dragState?.type === 'column' && dragState.id === col.id
 
@@ -734,9 +780,26 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
             onCardKeyDown={handleCardKeyDown}
             dragStateId={dragStateId}
             kbDragStateId={kbDragStateId}
+            showCardCount={showCardCount}
+            allowAddCard={allowAddCard}
           />
         )
       })}
+      {allowAddColumn && (
+        <div
+          className={kanbanAddColumnClasses}
+          role="button"
+          tabIndex={0}
+          onClick={() => onColumnAdd?.()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              onColumnAdd?.()
+            }
+          }}>
+          + Add column
+        </div>
+      )}
     </div>
   )
 }

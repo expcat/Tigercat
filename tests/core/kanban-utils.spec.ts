@@ -5,7 +5,7 @@ import {
   groupBySwimlane,
   getColumnCardCount,
   getKanbanContainerClasses,
-  kanbanBoardClasses,
+  taskBoardBaseClasses,
   kanbanCardCountClasses,
   kanbanAddColumnClasses,
   type TaskBoardColumn,
@@ -173,7 +173,7 @@ describe('getColumnCardCount', () => {
 describe('getKanbanContainerClasses', () => {
   it('returns base classes', () => {
     const result = getKanbanContainerClasses()
-    expect(result).toContain(kanbanBoardClasses)
+    expect(result).toContain(taskBoardBaseClasses)
   })
 
   it('appends custom className', () => {

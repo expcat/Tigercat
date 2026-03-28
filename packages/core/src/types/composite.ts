@@ -1249,6 +1249,36 @@ export interface TaskBoardProps {
    */
   renderEmptyColumn?: (column: TaskBoardColumn) => unknown
   /**
+   * Quick filter / search term applied to card titles.
+   * When non-empty, only cards whose title or description contain
+   * the term are shown; hidden-column filtering is also applied.
+   */
+  filterText?: string
+  /**
+   * Column IDs to hide from the board (e.g. for saved views).
+   */
+  hiddenColumns?: (string | number)[]
+  /**
+   * Show column card-count badges in the header.
+   * @default false
+   */
+  showCardCount?: boolean
+  /**
+   * Show an inline "add card" button in each column footer.
+   * @default false
+   */
+  allowAddCard?: boolean
+  /**
+   * Show an inline "add column" button after all columns.
+   * @default false
+   */
+  allowAddColumn?: boolean
+  /**
+   * Callback fired when the "add column" button is clicked.
+   * If not provided (and `allowAddColumn` is true), the button is still rendered.
+   */
+  onColumnAdd?: () => void
+  /**
    * Locale overrides for TaskBoard UI text
    */
   locale?: Partial<import('./locale').TigerLocale>

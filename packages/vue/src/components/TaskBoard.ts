@@ -18,6 +18,10 @@ import {
   taskBoardEmptyClasses,
   taskBoardWipExceededClasses,
   taskBoardAddCardClasses,
+  kanbanCardCountClasses,
+  kanbanAddColumnClasses,
+  filterColumns,
+  getColumnCardCount,
   moveCard,
   reorderColumns,
   isWipExceeded,
@@ -49,6 +53,11 @@ export interface VueTaskBoardProps {
   beforeCardMove?: TaskBoardMoveValidator<TaskBoardCardMoveEvent>
   beforeColumnMove?: TaskBoardMoveValidator<TaskBoardColumnMoveEvent>
   onCardAdd?: (columnId: string | number) => void
+  filterText?: string
+  hiddenColumns?: (string | number)[]
+  showCardCount?: boolean
+  allowAddCard?: boolean
+  allowAddColumn?: boolean
   locale?: Partial<TigerLocale>
   className?: string
   style?: Record<string, string | number>
@@ -90,6 +99,14 @@ export const TaskBoard = defineComponent({
       type: Function as PropType<(columnId: string | number) => void>,
       default: undefined
     },
+    filterText: { type: String, default: '' },
+    hiddenColumns: {
+      type: Array as PropType<(string | number)[]>,
+      default: () => []
+    },
+    showCardCount: { type: Boolean, default: false },
+    allowAddCard: { type: Boolean, default: false },
+    allowAddColumn: { type: Boolean, default: false },
     locale: {
       type: Object as PropType<Partial<TigerLocale>>,
       default: undefined
@@ -103,7 +120,7 @@ export const TaskBoard = defineComponent({
       default: undefined
     }
   },
-  emits: ['card-move', 'column-move', 'card-add', 'update:columns'],
+  emits: ['card-move', 'column-move', 'card-add', 'column-add', 'update:columns'],
   setup(props, { slots, attrs, emit }) {
     const config = useTigerConfig()
     const mergedLocale = computed(() => mergeTigerLocale(config.value.locale, props.locale))
@@ -129,6 +146,15 @@ export const TaskBoard = defineComponent({
     )
 
     const currentColumns = computed(() => props.columns ?? innerColumns.value)
+
+    // Apply filter and hidden columns (no-op when filterText is empty and hiddenColumns is empty)
+    const visibleColumns = computed(() => {
+      const cols = currentColumns.value
+      if (!props.filterText && (!props.hiddenColumns || props.hiddenColumns.length === 0)) {
+        return cols
+      }
+      return filterColumns(cols, props.filterText || '', props.hiddenColumns)
+    })
 
     const updateColumns = (next: TaskBoardColumn[]) => {
       innerColumns.value = next
@@ -452,6 +478,7 @@ export const TaskBoard = defineComponent({
         dragState.value?.type === 'card' && dropTargetColumnId.value === column.id
       const isColDragging = dragState.value?.type === 'column' && dragState.value.id === column.id
       const wipOver = isWipExceeded(column)
+      const cardCount = props.showCardCount ? getColumnCardCount(column) : null
 
       const colClasses = classNames(
         taskBoardColumnClasses,
@@ -465,23 +492,41 @@ export const TaskBoard = defineComponent({
         : [
             h('span', { class: wipOver ? taskBoardWipExceededClasses : undefined }, [
               column.title,
-              column.wipLimit != null
-                ? h(
-                    'span',
-                    {
-                      class: 'ml-2 text-xs font-normal opacity-70',
-                      title: resolveLocaleText(
-                        labels.value.wipLimitText.replace('{limit}', String(column.wipLimit))
-                      )
-                    },
-                    `(${column.cards.length}/${column.wipLimit})`
-                  )
-                : h(
-                    'span',
-                    { class: 'ml-2 text-xs font-normal opacity-50' },
-                    String(column.cards.length)
-                  )
+              // When showCardCount is enabled, use the compact badge style
+              props.showCardCount && cardCount
+                ? null
+                : column.wipLimit != null
+                  ? h(
+                      'span',
+                      {
+                        class: 'ml-2 text-xs font-normal opacity-70',
+                        title: resolveLocaleText(
+                          labels.value.wipLimitText.replace('{limit}', String(column.wipLimit))
+                        )
+                      },
+                      `(${column.cards.length}/${column.wipLimit})`
+                    )
+                  : h(
+                      'span',
+                      { class: 'ml-2 text-xs font-normal opacity-50' },
+                      String(column.cards.length)
+                    )
             ]),
+            // Card count badge (Kanban-style)
+            props.showCardCount && cardCount
+              ? h(
+                  'span',
+                  {
+                    class: classNames(
+                      kanbanCardCountClasses,
+                      wipOver && taskBoardWipExceededClasses
+                    )
+                  },
+                  cardCount.limit
+                    ? `${cardCount.count}/${cardCount.limit}`
+                    : `${cardCount.count}`
+                )
+              : null,
             column.description
               ? h(
                   'span',
@@ -551,10 +596,11 @@ export const TaskBoard = defineComponent({
         cards
       )
 
-      // Footer — only emit, no direct prop call
+      // Footer — add-card button
+      const showAddCard = props.allowAddCard || props.onCardAdd
       const footer = slots['column-footer']
         ? slots['column-footer']({ column })
-        : props.onCardAdd
+        : showAddCard
           ? h(
               'div',
               {
@@ -562,8 +608,16 @@ export const TaskBoard = defineComponent({
                   'border-t border-[var(--tiger-border,#e5e7eb)]',
                   taskBoardAddCardClasses
                 ),
+                role: 'button',
+                tabindex: 0,
                 onClick: () => {
                   emit('card-add', column.id)
+                },
+                onKeydown: (e: KeyboardEvent) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    emit('card-add', column.id)
+                  }
                 }
               },
               [h('span', null, '+'), h('span', null, resolveLocaleText(labels.value.addCardText))]
@@ -585,8 +639,33 @@ export const TaskBoard = defineComponent({
     }
 
     // ----- main render -----
-    return () =>
-      h(
+    return () => {
+      const children = visibleColumns.value.map((col, i) => renderColumnNode(col, i))
+
+      // Add column button
+      if (props.allowAddColumn) {
+        children.push(
+          h(
+            'div',
+            {
+              key: '__add-column',
+              class: kanbanAddColumnClasses,
+              role: 'button',
+              tabindex: 0,
+              onClick: () => emit('column-add'),
+              onKeydown: (e: KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  emit('column-add')
+                }
+              }
+            },
+            '+ ' + resolveLocaleText(labels.value.addCardText)
+          )
+        )
+      }
+
+      return h(
         'div',
         {
           ...attrs,
@@ -597,8 +676,9 @@ export const TaskBoard = defineComponent({
           'aria-label': resolveLocaleText(labels.value.boardAriaLabel),
           'data-tiger-task-board': ''
         },
-        currentColumns.value.map((col, i) => renderColumnNode(col, i))
+        children
       )
+    }
   }
 })
 
