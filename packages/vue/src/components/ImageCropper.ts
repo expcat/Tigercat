@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, computed, watch, onMounted, onBeforeUnmount, PropType } from 'vue'
+import { defineComponent, h, ref, computed, watch, onMounted, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -12,14 +12,12 @@ import {
   getCropperHandleClasses,
   CROP_HANDLES,
   getInitialCropRect,
-  constrainCropRect,
   resizeCropRect,
   moveCropRect,
   cropCanvas,
   type CropRect,
   type CropResult,
-  type CropHandle,
-  type ImageCropperProps as CoreImageCropperProps
+  type CropHandle
 } from '@expcat/tigercat-core'
 
 export interface VueImageCropperProps {

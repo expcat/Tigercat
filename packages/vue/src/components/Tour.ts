@@ -11,7 +11,6 @@ import {
 } from 'vue'
 import {
   classNames,
-  coerceClassValue,
   tourPopoverClasses,
   tourTitleClasses,
   tourDescriptionClasses,

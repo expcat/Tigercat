@@ -121,7 +121,6 @@ export const Rate: React.FC<RateProps> = ({
       )
     }
     return items
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     count,
     displayValue,

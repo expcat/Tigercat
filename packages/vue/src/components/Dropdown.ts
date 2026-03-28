@@ -307,7 +307,7 @@ export const Dropdown = defineComponent({
     })
 
     // DropdownItem tabIndex: menuitem should be -1 (focused programmatically)
-    const menuItemTabIndex = -1
+    const _menuItemTabIndex = -1
 
     return () => {
       const defaultSlot = slots.default?.()
@@ -373,8 +373,10 @@ export const Dropdown = defineComponent({
             },
             [
               h(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (menuNode as VNode).type as any,
                 { ...((menuNode as VNode).props || {}), id: menuId },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (menuNode as VNode).children as any
               )
             ]

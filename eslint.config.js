@@ -32,8 +32,17 @@ export default [
       'no-undef': 'off' // TypeScript handles this
     }
   },
+  {
+    files: ['**/scripts/**/*.mjs'],
+    languageOptions: {
+      globals: {
+        console: 'readonly',
+        process: 'readonly'
+      }
+    }
+  },
   prettier,
   {
-    ignores: ['**/dist/', '**/node_modules/', '**/*.config.js']
+    ignores: ['**/dist/', '**/node_modules/', '**/*.config.js', '**/tokens/*.js']
   }
 ]

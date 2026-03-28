@@ -4,7 +4,6 @@ import {
   type FormSize,
   type FormRule,
   type FormItemProps as CoreFormItemProps,
-  type FormErrorDisplayMode,
   getFieldError,
   getFormItemClasses,
   getFormItemLabelClasses,

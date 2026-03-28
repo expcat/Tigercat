@@ -213,6 +213,7 @@ export const Image = defineComponent({
       const previewEl =
         !group && previewVisible.value && props.src
           ? (() => {
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
               const { ImagePreview } = require('./ImagePreview')
               return h(ImagePreview, {
                 open: previewVisible.value,

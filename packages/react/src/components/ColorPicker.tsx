@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
-import type { ColorPickerProps as CoreColorPickerProps, ColorFormat } from '@expcat/tigercat-core'
+import type { ColorPickerProps as CoreColorPickerProps } from '@expcat/tigercat-core'
 import {
   colorPickerBaseClasses,
   getColorPickerTriggerClasses,
@@ -25,8 +25,8 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   value = '#2563eb',
   disabled = false,
   size = 'md',
-  showAlpha = false,
-  format = 'hex',
+  showAlpha: _showAlpha = false,
+  format: _format = 'hex',
   presets,
   className,
   onChange

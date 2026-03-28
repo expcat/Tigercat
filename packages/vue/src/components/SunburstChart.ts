@@ -7,7 +7,6 @@ import {
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
-  chartAxisTickTextClasses,
   type ChartLegendItem,
   type ChartLegendPosition,
   type ChartPadding,

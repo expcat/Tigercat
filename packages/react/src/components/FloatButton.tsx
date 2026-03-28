@@ -78,7 +78,7 @@ export interface FloatButtonGroupProps
 }
 
 export const FloatButtonGroup: React.FC<FloatButtonGroupProps> = ({
-  shape = 'circle',
+  shape: _shape = 'circle',
   trigger = 'click',
   open: controlledOpen,
   triggerNode,

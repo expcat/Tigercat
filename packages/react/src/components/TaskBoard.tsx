@@ -30,10 +30,7 @@ import {
   type TaskBoardProps as CoreTaskBoardProps,
   type TaskBoardColumn,
   type TaskBoardCard,
-  type TaskBoardCardMoveEvent,
-  type TaskBoardColumnMoveEvent,
   type TaskBoardDragState,
-  type TaskBoardMoveValidator,
   type TouchDragTracker
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'

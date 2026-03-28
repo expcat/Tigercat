@@ -2,8 +2,6 @@
  * Dropdown component types and interfaces
  */
 
-import type { FloatingPlacement } from '../utils/floating'
-
 /**
  * Dropdown trigger mode - determines how the dropdown is opened
  */

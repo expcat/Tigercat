@@ -34,7 +34,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   inputAriaLabel,
   sendAriaLabel,
   statusText,
-  statusVariant = 'info',
+  statusVariant: _statusVariant = 'info',
   showAvatar = true,
   showName = true,
   showTime = false,

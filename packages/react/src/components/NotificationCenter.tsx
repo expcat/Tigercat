@@ -100,7 +100,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     return index >= 0 ? resolvedGroups[index] : resolvedGroups[0]
   }, [currentGroupKey, resolvedGroups])
 
-  const currentGroupItems = currentGroup?.items ?? []
+  const _currentGroupItems = currentGroup?.items ?? []
 
   // --- Internal read-state management ---
   const [readStateOverrides, setReadStateOverrides] = useState(
@@ -126,7 +126,6 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         ...group,
         items: applyReadOverrides(group.items)
       })),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [resolvedGroups, readStateOverrides]
   )
 
@@ -140,7 +139,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   }, [currentGroupKey, effectiveGroups])
 
   const effectiveCurrentGroupItems = effectiveCurrentGroup?.items ?? []
-  const effectiveItems = useMemo(() => applyReadOverrides(items), [items, readStateOverrides]) // eslint-disable-line react-hooks/exhaustive-deps
+  const effectiveItems = useMemo(() => applyReadOverrides(items), [items, readStateOverrides])
 
   const hasUnread = effectiveCurrentGroupItems.some((item) => !item.read)
 
@@ -180,7 +179,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     onMarkAllRead?.(currentGroupKey, effectiveCurrentGroupItems)
   }
 
-  const renderItem = (item: NotificationItem, index: number) => {
+  const renderItem = (item: NotificationItem, _index: number) => {
     const isRead = Boolean(item.read)
     const timeText = item.time ? formatActivityTime(item.time) : ''
 

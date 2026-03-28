@@ -24,8 +24,6 @@ import {
   getScrollTransform,
   carouselPrevArrowPath,
   carouselNextArrowPath,
-  type CarouselDotPosition,
-  type CarouselEffect,
   type CarouselProps as CoreCarouselProps,
   type CarouselMethods
 } from '@expcat/tigercat-core'

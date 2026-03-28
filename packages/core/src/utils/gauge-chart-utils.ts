@@ -3,8 +3,6 @@
  * Arc geometry helpers for rendering gauge (speedometer) charts
  */
 
-import { polarToCartesian } from './chart-utils'
-
 export interface GaugeArc {
   /** SVG arc path `d` */
   path: string

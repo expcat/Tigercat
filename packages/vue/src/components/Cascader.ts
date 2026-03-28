@@ -17,7 +17,6 @@ import {
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
   closeSolidIcon20PathD,
-  checkSolidIcon20PathD,
   coerceClassValue,
   type CascaderOption,
   type CascaderValue,

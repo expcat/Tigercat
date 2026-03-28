@@ -50,7 +50,7 @@ export interface InputGroupAddonProps extends React.HTMLAttributes<HTMLSpanEleme
 }
 
 export const InputGroupAddon: React.FC<InputGroupAddonProps> = ({
-  addonType = 'text',
+  addonType: _addonType = 'text',
   className,
   children,
   ...rest

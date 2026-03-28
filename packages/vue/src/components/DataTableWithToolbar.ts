@@ -160,13 +160,13 @@ export const DataTableWithToolbar = defineComponent({
     }
   },
   emits: {
-    'search-change': (value: string) => true,
-    search: (value: string) => true,
-    'filters-change': (filters: Record<string, TableToolbarFilterValue>) => true,
-    'bulk-action': (action: TableToolbarAction, keys: (string | number)[]) => true,
-    'selection-change': (keys: (string | number)[]) => true,
-    'page-change': (current: number, pageSize: number) => true,
-    'page-size-change': (current: number, pageSize: number) => true
+    'search-change': (_value: string) => true,
+    search: (_value: string) => true,
+    'filters-change': (_filters: Record<string, TableToolbarFilterValue>) => true,
+    'bulk-action': (_action: TableToolbarAction, _keys: (string | number)[]) => true,
+    'selection-change': (_keys: (string | number)[]) => true,
+    'page-change': (_current: number, _pageSize: number) => true,
+    'page-size-change': (_current: number, _pageSize: number) => true
   },
   setup(props, { attrs, emit }) {
     const internalSearch = ref<string>(props.toolbar?.defaultSearchValue ?? '')
@@ -430,6 +430,7 @@ export const DataTableWithToolbar = defineComponent({
         },
         [
           renderToolbar(),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           h(Table as unknown as any, tableProps),
           showPagination
             ? h(Pagination, {

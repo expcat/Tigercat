@@ -274,7 +274,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
           onMouseLeave={handleMouseLeave}
           onKeyDown={handleMenuKeyDown}>
           {menuElement && React.isValidElement(menuElement)
-            ? React.cloneElement(menuElement as React.ReactElement<any>, { id: menuId })
+            ? React.cloneElement(menuElement as React.ReactElement<Record<string, unknown>>, { id: menuId })
             : menuElement}
         </div>
       </div>

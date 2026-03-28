@@ -79,7 +79,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   // DonutChart-specific
   centerValue,
   centerLabel,
-  animated = false,
+  animated: _animated = false,
   // Callbacks
   onHoveredIndexChange,
   onSelectedIndexChange,

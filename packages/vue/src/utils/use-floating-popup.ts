@@ -6,10 +6,9 @@
  * Floating UI positioning, click-outside dismiss, escape-key dismiss,
  * trigger → event-handler mapping, floating styles.
  */
-import { computed, ref, watch, onBeforeUnmount, type Ref, type PropType } from 'vue'
+import { computed, ref, watch, onBeforeUnmount, type Ref } from 'vue'
 import { useVueFloating, useVueClickOutside, useVueEscapeKey } from './overlay'
 import {
-  classNames,
   getTransformOrigin,
   buildTriggerHandlerMap,
   type FloatingPlacement,

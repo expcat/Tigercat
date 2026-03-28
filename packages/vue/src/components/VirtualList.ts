@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, computed, onMounted, onBeforeUnmount, type PropType } from 'vue'
+import { defineComponent, h, ref, computed } from 'vue'
 import {
   virtualListContainerClasses,
   virtualListInnerClasses,

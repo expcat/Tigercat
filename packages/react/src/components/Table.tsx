@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect, Fragment } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import {
   classNames,
   getTableWrapperClasses,
@@ -52,9 +52,7 @@ import {
   getSimplePaginationButtonsWrapperClasses,
   type TableProps as CoreTableProps,
   type SortState,
-  type PaginationConfig,
-  type ExpandableConfig,
-  type FilterRule
+  type PaginationConfig
 } from '@expcat/tigercat-core'
 
 const spinnerSvg = getSpinnerSVG('spinner')
@@ -211,7 +209,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   // v0.6.0 props
   virtual = false,
   virtualHeight = 400,
-  virtualItemHeight = 40,
+  virtualItemHeight: _virtualItemHeight = 40,
   editable = false,
   editableCells,
   filterMode = 'basic',

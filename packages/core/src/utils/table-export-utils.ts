@@ -21,7 +21,7 @@ function escapeCsvValue(value: unknown): string {
 export function exportTableToCsv<T>(
   columns: TableColumn<T>[],
   data: T[],
-  filename?: string
+  _filename?: string
 ): string {
   const headers = columns.map((col) => escapeCsvValue(col.title))
   const rows = data.map((record) =>

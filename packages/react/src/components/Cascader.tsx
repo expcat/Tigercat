@@ -19,8 +19,7 @@ import {
   closeSolidIcon20PathD,
   type CascaderOption,
   type CascaderValue,
-  type CascaderProps as CoreCascaderProps,
-  type CascaderShowSearch
+  type CascaderProps as CoreCascaderProps
 } from '@expcat/tigercat-core'
 
 type CascaderDivProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange'>
@@ -112,7 +111,7 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
       setActivePath(value ? [...value] : [])
       setSearchQuery('')
     }
-  }, [isOpen]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isOpen])
 
   // Click outside to close
   useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo } from 'react'
 import {
   classNames,
   clampBarWidth,
@@ -16,10 +16,8 @@ import {
   defaultXYTooltipFormatter,
   barValueLabelClasses,
   barValueLabelInsideClasses,
-  barAnimatedTransition,
   type BarChartDatum,
   type BarChartProps as CoreBarChartProps,
-  type BarValueLabelPosition,
   type ChartLegendItem,
   type ChartPadding,
   type ChartScale

@@ -7,9 +7,7 @@ import {
   buttonDangerClasses,
   getButtonVariantClasses,
   getSpinnerSVG,
-  type ButtonProps as CoreButtonProps,
-  type ButtonIconPosition,
-  type ButtonHtmlType
+  type ButtonProps as CoreButtonProps
 } from '@expcat/tigercat-core'
 
 export interface ButtonProps

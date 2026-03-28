@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useCallback, useMemo, memo } from '
 import {
   classNames,
   type SliderProps as CoreSliderProps,
-  type SliderSize,
   sliderBaseClasses,
   sliderRangeClasses,
   getSliderTrackClasses,

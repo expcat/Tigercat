@@ -47,7 +47,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
   legendMarkerSize = 10,
   legendGap = 8,
   showTooltip = true,
-  tooltipFormatter,
+  tooltipFormatter: _tooltipFormatter,
   title,
   desc,
   className,

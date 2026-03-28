@@ -179,7 +179,7 @@ export const NotificationCenter = defineComponent({
       return matchedIndex >= 0 ? groups[matchedIndex] : groups[0]
     })
 
-    const currentGroupItems = computed(() => currentGroup.value?.items ?? [])
+    const _currentGroupItems = computed(() => currentGroup.value?.items ?? [])
 
     // --- Internal read-state management ---
     const readStateOverrides = ref(new Map<string | number, boolean>())
@@ -325,7 +325,7 @@ export const NotificationCenter = defineComponent({
       )
     }
 
-    const renderListItem = (item: NotificationItem, index: number) => {
+    const renderListItem = (item: NotificationItem, _index: number) => {
       const isRead = Boolean(item.read)
       const timeText = item.time ? formatActivityTime(item.time) : ''
 

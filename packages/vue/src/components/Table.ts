@@ -364,8 +364,8 @@ export const Table = defineComponent({
 
     const isSortControlled = computed(() => props.sort !== undefined)
     const isFiltersControlled = computed(() => props.filters !== undefined)
-    const isCurrentPageControlled = computed(() => paginationConfig.value?.current !== undefined)
-    const isPageSizeControlled = computed(() => paginationConfig.value?.pageSize !== undefined)
+    const _isCurrentPageControlled = computed(() => paginationConfig.value?.current !== undefined)
+    const _isPageSizeControlled = computed(() => paginationConfig.value?.pageSize !== undefined)
     const isSelectionControlled = computed(() => props.rowSelection?.selectedRowKeys !== undefined)
     const isExpandControlled = computed(() => props.expandable?.expandedRowKeys !== undefined)
 
@@ -778,7 +778,7 @@ export const Table = defineComponent({
 
     // --- v0.6.0: virtual scroll ---
     const virtualScrollTop = ref(0)
-    const virtualRange = computed(() => {
+    const _virtualRange = computed(() => {
       if (!props.virtual) return null
       return getFixedVirtualRange(
         virtualScrollTop.value,

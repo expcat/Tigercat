@@ -60,7 +60,7 @@ export const HeatmapChart = defineComponent({
       handleMouseMove,
       handleMouseLeave,
       handleClick,
-      wrapperClasses
+      wrapperClasses: _wrapperClasses
     } = useChartInteraction<HeatmapChartDatum>({
       hoverable: computed(() => props.hoverable),
       hoveredIndexProp: () => props.hoveredIndex,

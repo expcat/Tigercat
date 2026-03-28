@@ -64,7 +64,7 @@ export const CropUpload: React.FC<CropUploadProps> = ({
   maxSize,
   cropperProps,
   modalTitle = '裁剪图片',
-  modalWidth = 520,
+  modalWidth: _modalWidth = 520,
   className,
   children,
   onCropComplete,

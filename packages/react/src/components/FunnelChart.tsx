@@ -33,7 +33,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
   height = 300,
   padding = 24,
   data,
-  direction = 'vertical',
+  direction: _direction = 'vertical',
   gap = 2,
   pinch = false,
   colors,

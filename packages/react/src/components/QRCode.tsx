@@ -25,7 +25,7 @@ export const QRCode: React.FC<QRCodeProps> = ({
   size = 128,
   color = '#000000',
   bgColor = '#ffffff',
-  level = 'M',
+  level: _level = 'M',
   status = 'active',
   onRefresh,
   className

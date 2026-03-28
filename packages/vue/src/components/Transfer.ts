@@ -88,7 +88,7 @@ export const Transfer = defineComponent({
     const sourceSearch = ref('')
     const targetSearch = ref('')
 
-    const { sourceItems, targetItems } = computed(() =>
+    const { sourceItems: _sourceItems, targetItems: _targetItems } = computed(() =>
       splitTransferData(props.dataSource, props.modelValue)
     ).value
 

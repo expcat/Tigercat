@@ -6,16 +6,7 @@ import {
   cropUploadTriggerClasses,
   cropUploadTriggerDisabledClasses,
   uploadPlusIconPath,
-  modalHeaderClasses,
-  modalTitleClasses,
-  modalCloseButtonClasses,
-  modalBodyClasses,
   modalFooterClasses,
-  closeIconViewBox,
-  closeIconPathD,
-  closeIconPathStrokeLinecap,
-  closeIconPathStrokeLinejoin,
-  closeIconPathStrokeWidth,
   type ImageCropperProps as CoreImageCropperProps,
   type CropResult
 } from '@expcat/tigercat-core'
@@ -223,7 +214,7 @@ export const CropUpload = defineComponent({
                   ...props.cropperProps
                 })
               : null,
-          footer: ({ cancel }: { cancel: () => void }) =>
+          footer: ({ cancel: _cancel }: { cancel: () => void }) =>
             h('div', { class: modalFooterClasses }, [
               h(Button, { variant: 'secondary', onClick: handleCancel }, { default: () => '取消' }),
               h(
