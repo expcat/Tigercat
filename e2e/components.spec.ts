@@ -68,7 +68,7 @@ for (const [framework, baseUrl] of [
 
     test('modal open and close', async ({ page }) => {
       await page.goto(`${baseUrl}/modal`)
-      const trigger = page.locator('button').first()
+      const trigger = page.getByRole('button', { name: /打开对话框/ }).first()
       await trigger.click()
       const dialog = page.locator('[role="dialog"]')
       await expect(dialog).toBeVisible()
@@ -112,7 +112,7 @@ for (const [framework, baseUrl] of [
 
     test('pagination interaction', async ({ page }) => {
       await page.goto(`${baseUrl}/pagination`)
-      await expect(page.locator('[class*="pagination"]').first()).toBeVisible()
+      await expect(page.locator('nav[aria-label="Pagination"]').first()).toBeVisible()
     })
   })
 
