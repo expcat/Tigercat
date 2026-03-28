@@ -95,7 +95,7 @@ const homeIcon = h('svg', { class: 'w-4 h-4', fill: 'currentColor', viewBox: '0 
   </Dropdown>
 
   <!-- 受控模式 -->
-  <Dropdown v-model:visible="visible">
+  <Dropdown v-model:open="open">
     <Button>受控</Button>
     <DropdownMenu>
       <DropdownItem>菜单项 1</DropdownItem>

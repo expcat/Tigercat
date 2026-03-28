@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-layout
-description: Shared props definitions for layout components - Card, Container, Descriptions, Divider, Grid, Layout, List, PrintLayout, Skeleton, Space
+description: Shared props definitions for layout components - Card, Container, Descriptions, Divider, Grid, Layout, List, PrintLayout, Skeleton, Space, Statistic
 ---
 
 # Layout Components - Props Reference
@@ -178,12 +178,37 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Props
 
-| Prop       | Type                              | Default        | Vue | React | Description |
-| ---------- | --------------------------------- | -------------- | :-: | :---: | ----------- |
-| items      | `{ label: string, value: any }[]` | -              |  ✓  |   ✓   | 数据项      |
-| columns    | `number`                          | `3`            |  ✓  |   ✓   | 列数        |
-| layout     | `'horizontal' \| 'vertical'`      | `'horizontal'` |  ✓  |   ✓   | 布局        |
-| labelStyle | `CSSProperties`                   | -              |  ✓  |   ✓   | 标签样式    |
+| Prop         | Type                         | Default        | Vue | React | Description      |
+| ------------ | ---------------------------- | -------------- | :-: | :---: | ---------------- |
+| title        | `string` / `ReactNode`       | -              |  ✓  |   ✓   | 标题             |
+| extra        | `unknown` / `ReactNode`      | -              |  ✓  |   ✓   | 标题右侧额外内容 |
+| bordered     | `boolean`                    | `false`        |  ✓  |   ✓   | 显示边框         |
+| column       | `number`                     | `3`            |  ✓  |   ✓   | 每行列数         |
+| size         | `'sm' \| 'md' \| 'lg'`       | `'md'`         |  ✓  |   ✓   | 尺寸             |
+| layout       | `'horizontal' \| 'vertical'` | `'horizontal'` |  ✓  |   ✓   | 布局方向         |
+| colon        | `boolean`                    | `true`         |  ✓  |   ✓   | 标签后显示冒号   |
+| labelStyle   | `CSSProperties`              | -              |  ✓  |   ✓   | 标签全局样式     |
+| contentStyle | `CSSProperties`              | -              |  ✓  |   ✓   | 内容全局样式     |
+| items        | `DescriptionsItem[]`         | `[]`           |  ✓  |   ✓   | 数据项           |
+| className    | `string`                     | -              |  ✓  |   ✓   | 额外 CSS class   |
+
+### DescriptionsItem
+
+| Prop             | Type      | Default  | Description      |
+| ---------------- | --------- | -------- | ---------------- |
+| label            | `string`  | required | 标签文本         |
+| content          | `unknown` | -        | 内容             |
+| span             | `number`  | `1`      | 跨列数           |
+| labelClassName   | `string`  | -        | 标签自定义 class |
+| contentClassName | `string`  | -        | 内容自定义 class |
+
+### Slots (Vue) / Props (React)
+
+| Vue Slot  | React Prop | Description    |
+| --------- | ---------- | -------------- |
+| `title`   | `title`    | 标题内容       |
+| `extra`   | `extra`    | 额外操作区域   |
+| `default` | `children` | 自定义附加内容 |
 
 ---
 
@@ -232,6 +257,30 @@ description: Shared props definitions for layout components - Card, Container, D
 ### PrintPageBreak 分页组件
 
 在内容中插入 `<PrintPageBreak />` 表示打印分页点。屏幕上显示虚线指示器，打印时触发 `break-before-page`。
+
+---
+
+## Statistic 统计数值
+
+### Props
+
+| Prop           | Type                  | Default | Vue | React | Description                     |
+| -------------- | --------------------- | ------- | :-: | :---: | ------------------------------- |
+| title          | `string`              | -       |  ✓  |   ✓   | 标题/标签                       |
+| value          | `string \| number`    | -       |  ✓  |   ✓   | 数值或文本                      |
+| precision      | `number`              | -       |  ✓  |   ✓   | 数值精度（小数位数）            |
+| prefix         | `string`              | -       |  ✓  |   ✓   | 值前缀（如 ¥、$）              |
+| suffix         | `string`              | -       |  ✓  |   ✓   | 值后缀（如 %、元）             |
+| groupSeparator | `boolean`             | -       |  ✓  |   ✓   | 千分位分隔符（如 1,000）        |
+| size           | `'sm' \| 'md' \| 'lg'` | `'md'` |  ✓  |   ✓   | 尺寸                            |
+| className      | `string`              | -       |  -  |   ✓   | 自定义类名                      |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description      |
+| --------- | ---------- | ---------------- |
+| `prefix`  | `prefix`   | 自定义前缀内容   |
+| `suffix`  | `suffix`   | 自定义后缀内容   |
 
 ---
 

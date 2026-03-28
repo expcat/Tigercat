@@ -209,11 +209,7 @@ import { Code } from '@expcat/tigercat-react'
 
 ## Divider 分割线
 
-```tsx
-<Divider />
-<Divider direction="vertical" />
-<Divider>Text</Divider>
-```
+> 完整用法见 [layout.md](layout.md#divider-分割线)
 
 ---
 

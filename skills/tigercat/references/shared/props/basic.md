@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-basic
-description: Shared props definitions for basic components - Alert, Avatar, Badge, Button, Code, Divider, Icon, Image, ImagePreview, ImageGroup, ImageCropper, Link, Tag, Text
+description: Shared props definitions for basic components - Alert, Avatar, Badge, Button, Code, Divider, Empty, Icon, Image, ImagePreview, ImageGroup, ImageCropper, Link, QRCode, Tag, Text
 ---
 
 # Basic Components - Props Reference
@@ -296,21 +296,7 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ## Divider 分割线
 
-### Props
-
-| Prop      | Type                            | Default        | Vue | React | Description |
-| --------- | ------------------------------- | -------------- | :-: | :---: | ----------- |
-| direction | `'horizontal' \| 'vertical'`    | `'horizontal'` |  ✓  |   ✓   | 方向        |
-| align     | `'left' \| 'center' \| 'right'` | `'center'`     |  ✓  |   ✓   | 文本对齐    |
-| text      | `string`                        | -              |  ✓  |   -   | 分割线文本  |
-
-### Slots / Children
-
-| Vue Slot  | React Prop | Description |
-| --------- | ---------- | ----------- |
-| `default` | `children` | 分割线文本  |
-
----
+> Props 定义见 [layout.md](layout.md#divider-分割线)
 
 ---
 
@@ -420,5 +406,42 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 | Method / React Ref | Return                | Description                    |
 | ------------------ | --------------------- | ------------------------------ |
 | `getCropResult()`  | `Promise<CropResult>` | 获取裁剪结果（blob + dataURL） |
+
+---
+
+## Empty 空状态
+
+### Props
+
+| Prop        | Type                                                    | Default     | Vue | React | Description                |
+| ----------- | ------------------------------------------------------- | ----------- | :-: | :---: | -------------------------- |
+| preset      | `'default' \| 'simple' \| 'search' \| 'error' \| 'network'` | `'default'` |  ✓  |   ✓   | 预设空状态类型             |
+| description | `string`                                                | -           |  ✓  |   ✓   | 描述文字                   |
+| showImage   | `boolean`                                               | `true`      |  ✓  |   ✓   | 是否显示空状态图片         |
+| className   | `string`                                                | -           |  -  |   ✓   | 自定义类名                 |
+
+### Slots / Children
+
+| Vue Slot      | React Prop | Description        |
+| ------------- | ---------- | ------------------ |
+| `default`     | `children` | 底部额外操作区     |
+| `image`       | `image`    | 自定义图片内容     |
+| `description` | -          | 自定义描述内容     |
+
+---
+
+## QRCode 二维码
+
+### Props
+
+| Prop      | Type                                     | Default     | Vue | React | Description      |
+| --------- | ---------------------------------------- | ----------- | :-: | :---: | ---------------- |
+| value     | `string`                                 | required    |  ✓  |   ✓   | 二维码内容       |
+| size      | `number`                                 | `128`       |  ✓  |   ✓   | 尺寸（px）       |
+| color     | `string`                                 | `'#000000'` |  ✓  |   ✓   | 前景色           |
+| bgColor   | `string`                                 | `'#ffffff'` |  ✓  |   ✓   | 背景色           |
+| level     | `'L' \| 'M' \| 'Q' \| 'H'`              | `'M'`       |  ✓  |   ✓   | 纠错等级         |
+| status    | `'active' \| 'expired' \| 'loading'`     | `'active'`  |  ✓  |   ✓   | 二维码状态       |
+| className | `string`                                 | -           |  -  |   ✓   | 自定义类名       |
 
 > **See also**: [Vue examples](../vue/basic.md) · [React examples](../react/basic.md)

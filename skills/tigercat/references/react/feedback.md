@@ -5,7 +5,7 @@ description: React feedback components usage
 
 # Feedback Components (React)
 
-反馈组件：Drawer, Loading, Message, Modal, Notification, Popconfirm, Popover, Progress, Tooltip
+反馈组件：Drawer, Loading, Message, Modal, Notification, Popconfirm, Popover, Progress, Result, Tooltip, Tour, Watermark
 
 > **Props Reference**: [shared/props/feedback.md](../shared/props/feedback.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -14,26 +14,26 @@ description: React feedback components usage
 ## Modal 对话框
 
 ```tsx
-const [visible, setVisible] = useState(false)
+const [open, setOpen] = useState(false)
 
 {/* 基本用法：自定义页脚 */}
-<Button onClick={() => setVisible(true)}>Open Modal</Button>
+<Button onClick={() => setOpen(true)}>Open Modal</Button>
 <Modal
-  visible={visible}
+  open={open}
   title="Title"
-  onOk={() => setVisible(false)}
-  onCancel={() => setVisible(false)}
-  footer={<><Button onClick={() => setVisible(false)}>OK</Button></>}>
+  onOk={() => setOpen(false)}
+  onCancel={() => setOpen(false)}
+  footer={<><Button onClick={() => setOpen(false)}>OK</Button></>}>
   <p>Modal content</p>
 </Modal>
 
 {/* 使用内置默认页脚 */}
 <Modal
-  visible={visible}
+  open={open}
   title="Title"
   showDefaultFooter
-  onOk={() => setVisible(false)}
-  onCancel={() => setVisible(false)}
+  onOk={() => setOpen(false)}
+  onCancel={() => setOpen(false)}
 />
 ```
 
@@ -42,42 +42,42 @@ const [visible, setVisible] = useState(false)
 ## Drawer 抽屉
 
 ```tsx
-const [visible, setVisible] = useState(false)
+const [open, setOpen] = useState(false)
 
 {/* 基本用法 */}
 <Drawer
-  visible={visible}
+  open={open}
   title="Title"
   placement="right"
   size="md"
-  footer={<Button variant="secondary" onClick={() => setVisible(false)}>关闭</Button>}
-  onClose={() => setVisible(false)}>
+  footer={<Button variant="secondary" onClick={() => setOpen(false)}>关闭</Button>}
+  onClose={() => setOpen(false)}>
   <p>Drawer content</p>
 </Drawer>
 
 {/* 自定义头部 */}
 <Drawer
-  visible={visible}
+  open={open}
   header={<span>⚙️ 设置</span>}
-  onClose={() => setVisible(false)}>
+  onClose={() => setOpen(false)}>
   <p>Content</p>
 </Drawer>
 
 {/* 无蒙层 / 点击蒙层不关闭 / 隐藏关闭按钮 */}
-<Drawer visible={visible} mask={false} title="无蒙层" onClose={() => setVisible(false)} />
-<Drawer visible={visible} maskClosable={false} title="蒙层不可关" onClose={() => setVisible(false)} />
-<Drawer visible={visible} closable={false} title="无关闭按钮" onClose={() => setVisible(false)} />
+<Drawer open={open} mask={false} title="无蒙层" onClose={() => setOpen(false)} />
+<Drawer open={open} maskClosable={false} title="蒙层不可关" onClose={() => setOpen(false)} />
+<Drawer open={open} closable={false} title="无关闭按钮" onClose={() => setOpen(false)} />
 
 {/* 关闭时销毁内容 */}
-<Drawer visible={visible} destroyOnClose title="销毁模式" onClose={() => setVisible(false)}>
+<Drawer open={open} destroyOnClose title="销毁模式" onClose={() => setOpen(false)}>
   <FormContent />
 </Drawer>
 
 {/* 动画回调 */}
 <Drawer
-  visible={visible}
+  open={open}
   title="动画"
-  onClose={() => setVisible(false)}
+  onClose={() => setOpen(false)}
   onAfterEnter={() => console.log('opened')}
   onAfterLeave={() => console.log('closed')}>
   <p>Content</p>
@@ -160,8 +160,8 @@ notification.clear('top-right')
 
 {/* 受控模式 */}
 <Popconfirm
-  visible={showConfirm}
-  onVisibleChange={setShowConfirm}
+  open={showConfirm}
+  onOpenChange={setShowConfirm}
   title="确定继续吗？">
   <Button>操作</Button>
 </Popconfirm>
@@ -197,8 +197,8 @@ notification.clear('top-right')
 {
   /* 受控模式 */
 }
-;<Popover visible={visible} onVisibleChange={setVisible} trigger="manual" content="手动控制">
-  <Button onClick={() => setVisible(!visible)}>手动触发</Button>
+;<Popover open={open} onOpenChange={setOpen} trigger="manual" content="手动控制">
+  <Button onClick={() => setOpen(!open)}>手动触发</Button>
 </Popover>
 ```
 
@@ -238,7 +238,7 @@ notification.clear('top-right')
 {
   /* 受控模式 */
 }
-;<Tooltip visible={visible} onVisibleChange={setVisible} content="受控提示">
+;<Tooltip open={open} onOpenChange={setOpen} content="受控提示">
   <Button>Controlled</Button>
 </Tooltip>
 

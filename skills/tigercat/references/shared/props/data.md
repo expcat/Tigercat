@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-data
-description: Shared props definitions for data display components - ImageViewer, Table, Timeline
+description: Shared props definitions for data display components - Calendar, ImageViewer, Table, Timeline
 ---
 
 # Data Display Components - Props Reference
@@ -239,39 +239,7 @@ description: Shared props definitions for data display components - ImageViewer,
 
 ## Descriptions 描述列表
 
-### Props
-
-| Prop         | Type                         | Default        | Vue | React | Description      |
-| ------------ | ---------------------------- | -------------- | :-: | :---: | ---------------- |
-| title        | `string` / `ReactNode`       | -              |  ✓  |   ✓   | 标题             |
-| extra        | `unknown` / `ReactNode`      | -              |  ✓  |   ✓   | 标题右侧额外内容 |
-| bordered     | `boolean`                    | `false`        |  ✓  |   ✓   | 显示边框         |
-| column       | `number`                     | `3`            |  ✓  |   ✓   | 每行列数         |
-| size         | `'sm' \| 'md' \| 'lg'`       | `'md'`         |  ✓  |   ✓   | 尺寸             |
-| layout       | `'horizontal' \| 'vertical'` | `'horizontal'` |  ✓  |   ✓   | 布局方向         |
-| colon        | `boolean`                    | `true`         |  ✓  |   ✓   | 标签后显示冒号   |
-| labelStyle   | `CSSProperties`              | -              |  ✓  |   ✓   | 标签全局样式     |
-| contentStyle | `CSSProperties`              | -              |  ✓  |   ✓   | 内容全局样式     |
-| items        | `DescriptionsItem[]`         | `[]`           |  ✓  |   ✓   | 数据项           |
-| className    | `string`                     | -              |  ✓  |   ✓   | 额外 CSS class   |
-
-### DescriptionsItem
-
-| Prop             | Type      | Default  | Description      |
-| ---------------- | --------- | -------- | ---------------- |
-| label            | `string`  | required | 标签文本         |
-| content          | `unknown` | -        | 内容             |
-| span             | `number`  | `1`      | 跨列数           |
-| labelClassName   | `string`  | -        | 标签自定义 class |
-| contentClassName | `string`  | -        | 内容自定义 class |
-
-### Slots (Vue) / Props (React)
-
-| Vue Slot  | React Prop | Description    |
-| --------- | ---------- | -------------- |
-| `title`   | `title`    | 标题内容       |
-| `extra`   | `extra`    | 额外操作区域   |
-| `default` | `children` | 自定义附加内容 |
+> Props 定义见 [layout.md](layout.md#descriptions-描述列表)
 
 ---
 
@@ -310,3 +278,23 @@ description: Shared props definitions for data display components - ImageViewer,
 | `Escape` | 关闭   |
 | `←`      | 上一张 |
 | `→`      | 下一张 |
+
+---
+
+## Calendar 日历
+
+### Props
+
+| Prop         | Type                       | Default   | Vue | React | Description                   |
+| ------------ | -------------------------- | --------- | :-: | :---: | ----------------------------- |
+| mode         | `'month' \| 'year'`        | `'month'` |  ✓  |   ✓   | 显示模式（月/年）             |
+| fullscreen   | `boolean`                  | `true`    |  ✓  |   ✓   | 全屏或卡片样式                |
+| disabledDate | `(date: Date) => boolean`  | -         |  ✓  |   ✓   | 日期禁用函数                  |
+| className    | `string`                   | -         |  -  |   ✓   | 自定义类名                    |
+
+### Events
+
+| Vue Event       | React Prop     | Payload                          | Description |
+| --------------- | -------------- | -------------------------------- | ----------- |
+| `@change`       | `onChange`      | `(date: Date)`                  | 日期选中    |
+| `@panel-change` | `onPanelChange` | `(date: Date, mode: CalendarMode)` | 面板切换 |

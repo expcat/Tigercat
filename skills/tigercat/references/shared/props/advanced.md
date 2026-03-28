@@ -208,3 +208,24 @@ description: Shared props definitions for advanced interaction components - Spli
 | Prop       | Type       | Default | Description          |
 | ---------- | ---------- | ------- | -------------------- |
 | draggable  | `boolean`  | `false` | 允许拖拽移动弹窗     |
+
+---
+
+## VirtualList 虚拟列表
+
+### Props
+
+| Prop               | Type     | Default | Vue | React | Description                         |
+| ------------------ | -------- | ------- | :-: | :---: | ----------------------------------- |
+| itemCount          | `number` | -       |  ✓  |   ✓   | 列表总项数                          |
+| itemHeight         | `number` | -       |  ✓  |   ✓   | 固定行高（px，fixed 模式）          |
+| estimatedItemHeight | `number` | -      |  ✓  |   ✓   | 估算行高（variable 模式）           |
+| height             | `number` | -       |  ✓  |   ✓   | 可视区域高度（px）                  |
+| overscan           | `number` | `5`     |  ✓  |   ✓   | 额外渲染行数（上下各 n 行缓冲）    |
+| className          | `string` | -       |  -  |   ✓   | 自定义类名                          |
+
+### Events
+
+| Vue Event  | React Prop | Payload                                 | Description |
+| ---------- | ---------- | --------------------------------------- | ----------- |
+| `@scroll`  | `onScroll`  | `(scrollTop: number)`                  | 滚动事件    |

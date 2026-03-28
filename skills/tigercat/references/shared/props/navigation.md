@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-navigation
-description: Shared props definitions for navigation components - Breadcrumb, Dropdown, Menu, Pagination, Steps, Tabs, Tree
+description: Shared props definitions for navigation components - Affix, Breadcrumb, Dropdown, FloatButton, Menu, Pagination, Segmented, Steps, Tabs, Tree
 ---
 
 # Navigation Components - Props Reference
@@ -395,6 +395,87 @@ description: Shared props definitions for navigation components - Breadcrumb, Dr
 | Vue Slot  | React Prop | Description    |
 | --------- | ---------- | -------------- |
 | `default` | `children` | 自定义链接内容 |
+
+---
+
+## Affix 固钉
+
+### Props
+
+| Prop         | Type     | Default | Vue | React | Description                            |
+| ------------ | -------- | ------- | :-: | :---: | -------------------------------------- |
+| offsetTop    | `number` | `0`     |  ✓  |   ✓   | 距顶部触发固定距离（px，与 offsetBottom 互斥）|
+| offsetBottom | `number` | -       |  ✓  |   ✓   | 距底部触发固定距离（px）               |
+| target       | `string` | -       |  ✓  |   ✓   | 滚动容器 CSS 选择器（默认 window）     |
+| zIndex       | `number` | `10`    |  ✓  |   ✓   | 固定元素 z-index                       |
+| className    | `string` | -       |  -  |   ✓   | 自定义类名                             |
+
+### Events
+
+| Vue Event  | React Prop | Payload              | Description          |
+| ---------- | ---------- | -------------------- | -------------------- |
+| `@change`  | `onChange`  | `(affixed: boolean)` | 固定状态变更         |
+
+---
+
+## FloatButton 悬浮按钮
+
+### FloatButton Props
+
+| Prop      | Type                        | Default      | Vue | React | Description    |
+| --------- | --------------------------- | ------------ | :-: | :---: | -------------- |
+| shape     | `'circle' \| 'square'`      | `'circle'`   |  ✓  |   ✓   | 按钮形状       |
+| size      | `'sm' \| 'md' \| 'lg'`      | `'md'`       |  ✓  |   ✓   | 按钮尺寸       |
+| tooltip   | `string`                    | -            |  ✓  |   ✓   | 悬停提示文案   |
+| type      | `'primary' \| 'default'`    | `'primary'`  |  ✓  |   ✓   | 按钮样式       |
+| disabled  | `boolean`                   | `false`      |  ✓  |   ✓   | 禁用状态       |
+| ariaLabel | `string`                    | -            |  ✓  |   ✓   | 无障碍标签     |
+| className | `string`                    | -            |  -  |   ✓   | 自定义类名     |
+
+### FloatButtonGroup Props
+
+| Prop      | Type                        | Default    | Vue | React | Description                |
+| --------- | --------------------------- | ---------- | :-: | :---: | -------------------------- |
+| shape     | `'circle' \| 'square'`      | `'circle'` |  ✓  |   ✓   | 子按钮统一形状             |
+| trigger   | `'click' \| 'hover'`        | `'click'`  |  ✓  |   ✓   | 展开触发方式               |
+| open      | `boolean`                   | -          |  ✓  |   ✓   | 受控展开状态               |
+| className | `string`                    | -          |  -  |   ✓   | 自定义类名                 |
+
+### Events
+
+| Vue Event      | React Prop    | Payload            | Description    |
+| -------------- | ------------- | ------------------ | -------------- |
+| `@click`       | `onClick`     | -                  | 点击按钮       |
+| `@open-change` | `onOpenChange` | `(open: boolean)` | 组展开状态变更 |
+
+---
+
+## Segmented 分段控制器
+
+### SegmentedOption 选项配置
+
+| Prop     | Type               | Default | Description  |
+| -------- | ------------------ | ------- | ------------ |
+| value    | `string \| number` | -       | 选项值       |
+| label    | `string`           | -       | 显示文本     |
+| disabled | `boolean`          | `false` | 是否禁用     |
+| icon     | `string`           | -       | 图标（SVG path d）|
+
+### Props
+
+| Prop      | Type                  | Default | Vue | React | Description        |
+| --------- | --------------------- | ------- | :-: | :---: | ------------------ |
+| options   | `SegmentedOption[]`   | `[]`    |  ✓  |   ✓   | 分段选项配置       |
+| disabled  | `boolean`             | `false` |  ✓  |   ✓   | 整体禁用           |
+| size      | `'sm' \| 'md' \| 'lg'` | `'md'` |  ✓  |   ✓   | 尺寸               |
+| block     | `boolean`             | `false` |  ✓  |   ✓   | 撑满容器宽度       |
+| className | `string`              | -       |  -  |   ✓   | 自定义类名         |
+
+### Events
+
+| Vue Event  | React Prop | Payload                       | Description |
+| ---------- | ---------- | ----------------------------- | ----------- |
+| `@change`  | `onChange`  | `(value: string \| number)`   | 选中项变更  |
 
 ---
 

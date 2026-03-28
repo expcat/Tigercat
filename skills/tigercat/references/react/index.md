@@ -39,6 +39,7 @@ function App() {
 | Data       | [../shared/props/data.md](../shared/props/data.md)             | [data.md](data.md)             |
 | Charts     | [../shared/props/charts.md](../shared/props/charts.md)         | [charts.md](charts.md)         |
 | Composite  | [../shared/props/composite.md](../shared/props/composite.md)   | [composite.md](composite.md)   |
+| Advanced   | [../shared/props/advanced.md](../shared/props/advanced.md)     | -                              |
 
 ## React-Specific Patterns
 
@@ -75,11 +76,12 @@ See [../shared/patterns/common.md](../shared/patterns/common.md) for framework c
 
 ## Component Quick Links
 
-**Basic**: Button · Icon · Badge · Tag · Alert · Avatar · Link · Code · Divider · Text  
-**Form**: Input · Select · Checkbox · Radio · Switch · Slider · DatePicker · Form  
-**Feedback**: Modal · Drawer · Message · Notification · Popconfirm · Popover · Loading · Progress · Skeleton  
-**Layout**: Card · Container · Grid · Space · Divider · Descriptions  
-**Navigation**: Menu · Breadcrumb · Dropdown · Pagination · Steps · Tabs  
-**Data**: Table · List · Tree · Collapse · Timeline  
-**Charts**: LineChart · AreaChart · BarChart · PieChart · DonutChart · RadarChart · ScatterChart  
-**Composite**: ChatWindow · ActivityFeed · CommentThread · NotificationCenter · DataTableWithToolbar
+**Basic**: Alert · Avatar · AvatarGroup · Badge · Button · ButtonGroup · Code · Divider · Empty · Icon · Image · ImageCropper · Link · QRCode · Tag · Text
+**Form**: AutoComplete · Cascader · Checkbox · ColorPicker · DatePicker · Form · Input · InputGroup · InputNumber · Mentions · Radio · Rate · Select · Slider · Stepper · Switch · Textarea · TimePicker · Transfer · TreeSelect · Upload
+**Feedback**: Drawer · Loading · Message · Modal · Notification · Popconfirm · Popover · Progress · Result · Tooltip · Tour · Watermark
+**Layout**: Card · Carousel · Container · Descriptions · Grid (Row/Col) · Layout · List · Resizable · Skeleton · Space · Splitter · Statistic
+**Navigation**: Affix · Anchor · BackTop · Breadcrumb · Dropdown · FloatButton · Menu · Pagination · Segmented · Steps · Tabs · Tree
+**Data**: Calendar · Collapse · Table · Timeline
+**Charts**: AreaChart · BarChart · DonutChart · FunnelChart · GaugeChart · HeatmapChart · LineChart · PieChart · RadarChart · ScatterChart · SunburstChart · TreeMapChart
+**Advanced**: CodeEditor · FileManager · ImageViewer · InfiniteScroll · Kanban · PrintLayout · RichTextEditor · TaskBoard · VirtualList · VirtualTable
+**Composite**: ActivityFeed · ChatWindow · CommentThread · CropUpload · DataTableWithToolbar · FormWizard · NotificationCenter

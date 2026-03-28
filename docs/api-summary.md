@@ -129,6 +129,7 @@
 
 | File | Exported Types |
 |------|---------------|
+| composite.ts | `ChatMessageDirection`, `ChatMessageStatus`, `ChatUser`, `ChatMessage`, `ChatWindowProps`, `ActivityUser`, `ActivityStatusTag`, `ActivityAction`, `ActivityItem`, `ActivityGroup`, `ActivityFeedProps`, `CommentUser`, `CommentTag`, `CommentAction`, `CommentNode`, `CommentThreadProps`, `NotificationReadFilter`, `NotificationItem`, `NotificationGroup`, `NotificationCenterProps`, `TableToolbarFilterValue`, `TableToolbarFilter`, `TableToolbarAction`, `TableToolbarProps`, `DataTableWithToolbarProps`, `WizardStep`, `FormWizardValidateResult`, `FormWizardValidator`, `FormWizardProps`, `TaskBoardCard` |
 
 ## Core
 
@@ -142,4 +143,4 @@
 
 ---
 
-Total exported types: **462**
+Total exported types: **490+**

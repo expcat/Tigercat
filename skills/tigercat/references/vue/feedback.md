@@ -5,7 +5,7 @@ description: Vue 3 feedback components usage
 
 # Feedback Components (Vue 3)
 
-反馈组件：Drawer, Loading, Message, Modal, Notification, Popconfirm, Popover, Progress, Tooltip
+反馈组件：Drawer, Loading, Message, Modal, Notification, Popconfirm, Popover, Progress, Result, Tooltip, Tour, Watermark
 
 > **Props Reference**: [shared/props/feedback.md](../shared/props/feedback.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -16,13 +16,13 @@ description: Vue 3 feedback components usage
 ```vue
 <script setup>
 import { ref } from 'vue'
-const visible = ref(false)
+const open = ref(false)
 </script>
 
 <template>
   <!-- 基本用法 -->
-  <Button @click="visible = true">Open Modal</Button>
-  <Modal v-model:visible="visible" title="Title" @ok="handleOk">
+  <Button @click="open = true">Open Modal</Button>
+  <Modal v-model:open="open" title="Title" @ok="handleOk">
     <p>Modal content</p>
     <template #footer="{ ok, cancel }">
       <Button variant="secondary" @click="cancel()">Cancel</Button>
@@ -32,7 +32,7 @@ const visible = ref(false)
 
   <!-- 使用内置默认页脚 -->
   <Modal
-    v-model:visible="visible"
+    v-model:open="open"
     title="Title"
     show-default-footer
     @ok="handleOk"
@@ -47,36 +47,36 @@ const visible = ref(false)
 ```vue
 <script setup>
 import { ref } from 'vue'
-const visible = ref(false)
+const open = ref(false)
 </script>
 
 <template>
   <!-- 基本用法 -->
-  <Drawer v-model:visible="visible" title="Title" placement="right" size="md">
+  <Drawer v-model:open="open" title="Title" placement="right" size="md">
     <p>Drawer content</p>
     <template #footer>
-      <Button variant="secondary" @click="visible = false">关闭</Button>
+      <Button variant="secondary" @click="open = false">关闭</Button>
     </template>
   </Drawer>
 
   <!-- 自定义头部 -->
-  <Drawer v-model:visible="visible">
+  <Drawer v-model:open="open">
     <template #header><span>⚙️ 设置</span></template>
     <p>Content</p>
   </Drawer>
 
   <!-- 无蒙层 / 点击蒙层不关闭 / 隐藏关闭按钮 -->
-  <Drawer v-model:visible="visible" :mask="false" title="无蒙层" />
-  <Drawer v-model:visible="visible" :mask-closable="false" title="蒙层不可关" />
-  <Drawer v-model:visible="visible" :closable="false" title="无关闭按钮" />
+  <Drawer v-model:open="open" :mask="false" title="无蒙层" />
+  <Drawer v-model:open="open" :mask-closable="false" title="蒙层不可关" />
+  <Drawer v-model:open="open" :closable="false" title="无关闭按钮" />
 
   <!-- 关闭时销毁内容 -->
-  <Drawer v-model:visible="visible" :destroy-on-close="true" title="销毁模式">
+  <Drawer v-model:open="open" :destroy-on-close="true" title="销毁模式">
     <FormContent />
   </Drawer>
 
   <!-- 动画回调 -->
-  <Drawer v-model:visible="visible" title="动画" @after-enter="onOpened" @after-leave="onClosed">
+  <Drawer v-model:open="open" title="动画" @after-enter="onOpened" @after-leave="onClosed">
     <p>Content</p>
   </Drawer>
 </template>
@@ -163,7 +163,7 @@ notification.clear('top-right')
 
   <!-- 受控模式 -->
   <Popconfirm
-    v-model:visible="showConfirm"
+    v-model:open="showConfirm"
     title="确定继续吗？"
     @confirm="showConfirm = false"
     @cancel="showConfirm = false">
@@ -195,8 +195,8 @@ notification.clear('top-right')
   </Popover>
 
   <!-- 受控模式 -->
-  <Popover v-model:visible="visible" trigger="manual" content="手动控制">
-    <Button @click="visible = !visible">手动触发</Button>
+  <Popover v-model:open="open" trigger="manual" content="手动控制">
+    <Button @click="open = !open">手动触发</Button>
   </Popover>
 </template>
 ```
@@ -231,7 +231,7 @@ notification.clear('top-right')
   </Tooltip>
 
   <!-- 受控模式 -->
-  <Tooltip v-model:visible="visible" content="受控提示">
+  <Tooltip v-model:open="open" content="受控提示">
     <Button>Controlled</Button>
   </Tooltip>
 

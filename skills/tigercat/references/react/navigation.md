@@ -84,8 +84,8 @@ import { Dropdown, DropdownMenu, DropdownItem, Button } from '@expcat/tigercat-r
 </Dropdown>
 
 // 受控模式
-const [visible, setVisible] = useState(false)
-<Dropdown visible={visible} onVisibleChange={setVisible}>
+const [open, setOpen] = useState(false)
+<Dropdown open={open} onOpenChange={setOpen}>
   <Button>受控</Button>
   <DropdownMenu>
     <DropdownItem>菜单项 1</DropdownItem>

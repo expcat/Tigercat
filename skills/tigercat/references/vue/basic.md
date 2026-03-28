@@ -216,13 +216,7 @@ import { Code } from '@expcat/tigercat-vue'
 
 ## Divider 分割线
 
-```vue
-<template>
-  <Divider />
-  <Divider direction="vertical" />
-  <Divider>Text</Divider>
-</template>
-```
+> 完整用法见 [layout.md](layout.md#divider-分割线)
 
 ---
 
