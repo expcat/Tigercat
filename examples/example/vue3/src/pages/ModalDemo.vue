@@ -4,7 +4,7 @@ import { Modal, Button, Space, Input } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const basicSnippet = `<Button>打开对话框</Button>
-<Modal v-model:visible="visible1" title="基本对话框">...</Modal>`
+<Modal v-model:open="visible1" title="基本对话框">...</Modal>`
 
 const sizeSnippet = `<Button>小尺寸</Button>
 <Modal size="sm">...</Modal>
@@ -137,7 +137,7 @@ const handleFormSubmit = async () => {
                :code="basicSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visible1 = true">打开对话框</Button>
-        <Modal v-model:visible="visible1"
+        <Modal v-model:open="visible1"
                title="基本对话框"
                @ok="handleOk"
                @cancel="handleCancel">
@@ -166,27 +166,27 @@ const handleFormSubmit = async () => {
           <Button @click="visibleFull = true">全屏</Button>
         </Space>
 
-        <Modal v-model:visible="visibleSm"
+        <Modal v-model:open="visibleSm"
                title="小尺寸对话框"
                size="sm">
           <p>这是一个小尺寸的对话框。</p>
         </Modal>
-        <Modal v-model:visible="visibleMd"
+        <Modal v-model:open="visibleMd"
                title="中等尺寸对话框"
                size="md">
           <p>这是一个中等尺寸的对话框（默认）。</p>
         </Modal>
-        <Modal v-model:visible="visibleLg"
+        <Modal v-model:open="visibleLg"
                title="大尺寸对话框"
                size="lg">
           <p>这是一个大尺寸的对话框，可以容纳更多内容。</p>
         </Modal>
-        <Modal v-model:visible="visibleXl"
+        <Modal v-model:open="visibleXl"
                title="超大尺寸对话框"
                size="xl">
           <p>这是一个超大尺寸的对话框，适合复杂的内容展示。</p>
         </Modal>
-        <Modal v-model:visible="visibleFull"
+        <Modal v-model:open="visibleFull"
                title="全屏对话框"
                size="full">
           <p>这是一个全屏对话框，占据整个屏幕宽度。</p>
@@ -199,7 +199,7 @@ const handleFormSubmit = async () => {
                :code="centeredSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleCentered = true">打开居中对话框</Button>
-        <Modal v-model:visible="visibleCentered"
+        <Modal v-model:open="visibleCentered"
                title="居中对话框"
                centered>
           <p>这是一个垂直居中显示的对话框。</p>
@@ -213,7 +213,7 @@ const handleFormSubmit = async () => {
                :code="customFooterSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleCustomFooter = true">自定义页脚对话框</Button>
-        <Modal v-model:visible="visibleCustomFooter"
+        <Modal v-model:open="visibleCustomFooter"
                title="自定义页脚对话框">
           <p>这是对话框的内容。</p>
           <template #footer>
@@ -234,7 +234,7 @@ const handleFormSubmit = async () => {
                :code="defaultFooterSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleDefaultFooter = true">默认页脚对话框</Button>
-        <Modal v-model:visible="visibleDefaultFooter"
+        <Modal v-model:open="visibleDefaultFooter"
                title="默认页脚对话框"
                show-default-footer
                @ok="() => { console.log('OK clicked') }"
@@ -249,13 +249,13 @@ const handleFormSubmit = async () => {
                :code="nestedSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleNested = true">打开嵌套对话框</Button>
-        <Modal v-model:visible="visibleNested"
+        <Modal v-model:open="visibleNested"
                title="第一层对话框">
           <p>这是第一层对话框的内容。</p>
           <Button @click="visibleNested2 = true"
                   class="mt-4">打开第二层对话框</Button>
 
-          <Modal v-model:visible="visibleNested2"
+          <Modal v-model:open="visibleNested2"
                  title="第二层对话框"
                  :z-index="1100">
             <p>这是第二层嵌套的对话框。</p>
@@ -269,7 +269,7 @@ const handleFormSubmit = async () => {
                :code="maskClosableSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visible2 = true">禁用遮罩关闭</Button>
-        <Modal v-model:visible="visible2"
+        <Modal v-model:open="visible2"
                title="禁用遮罩关闭"
                :mask-closable="false">
           <p>点击遮罩层不会关闭此对话框。</p>
@@ -283,7 +283,7 @@ const handleFormSubmit = async () => {
                :code="noMaskSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleNoMask = true">无遮罩对话框</Button>
-        <Modal v-model:visible="visibleNoMask"
+        <Modal v-model:open="visibleNoMask"
                title="无遮罩对话框"
                :mask="false">
           <p>这个对话框没有遮罩层。</p>
@@ -296,7 +296,7 @@ const handleFormSubmit = async () => {
                :code="destroySnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visibleDestroyOnClose = true">关闭时销毁</Button>
-        <Modal v-model:visible="visibleDestroyOnClose"
+        <Modal v-model:open="visibleDestroyOnClose"
                title="关闭时销毁"
                destroy-on-close>
           <p>关闭对话框时，此内容将被销毁。</p>
@@ -310,7 +310,7 @@ const handleFormSubmit = async () => {
                :code="noCloseSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visible3 = true">无关闭按钮</Button>
-        <Modal v-model:visible="visible3"
+        <Modal v-model:open="visible3"
                title="无关闭按钮"
                :closable="false">
           <p>这个对话框没有关闭按钮。</p>
@@ -336,7 +336,7 @@ const handleFormSubmit = async () => {
             <p v-if="confirmResult"
                class="mt-3 text-sm text-green-700">{{ confirmResult }}</p>
 
-            <Modal v-model:visible="visibleConfirm"
+            <Modal v-model:open="visibleConfirm"
                    title="删除确认"
                    :mask-closable="false">
               <p class="text-gray-800">此操作不可撤销，是否继续？</p>
@@ -369,7 +369,7 @@ const handleFormSubmit = async () => {
               <Button @click="visibleInfo = true">查看详情</Button>
             </div>
 
-            <Modal v-model:visible="visibleInfo"
+            <Modal v-model:open="visibleInfo"
                    title="服务协议（示例）"
                    size="lg">
               <div class="max-h-[50vh] overflow-auto pr-2">
@@ -394,7 +394,7 @@ const handleFormSubmit = async () => {
               <Button @click="visibleForm = true">编辑资料</Button>
             </div>
 
-            <Modal v-model:visible="visibleForm"
+            <Modal v-model:open="visibleForm"
                    title="编辑资料"
                    :mask-closable="false">
               <div class="space-y-4">
