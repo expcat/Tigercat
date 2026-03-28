@@ -1,6 +1,6 @@
 {
   "name": "@expcat/tigercat-cli",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "type": "module",
   "description": "CLI tooling for Tigercat UI library — project scaffolding, component generation, and more",
   "license": "MIT",
