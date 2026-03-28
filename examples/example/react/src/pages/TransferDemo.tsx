@@ -4,12 +4,12 @@ import DemoBlock from '../components/DemoBlock'
 
 const dataSource = Array.from({ length: 10 }, (_, i) => ({
   key: String(i + 1),
-  title: `内容 ${i + 1}`,
+  label: `内容 ${i + 1}`,
   description: `描述 ${i + 1}`
 }))
 
 const basicSnippet = `<Transfer targetKeys={targetKeys} onChange={setTargetKeys} dataSource={dataSource} />`
-const searchSnippet = `<Transfer targetKeys={targetKeys} onChange={setTargetKeys} dataSource={dataSource} showSearch titles={['可选', '已选']} />`
+const searchSnippet = `<Transfer targetKeys={targetKeys} onChange={setTargetKeys} dataSource={dataSource} showSearch sourceTitle="可选" targetTitle="已选" />`
 
 const TransferDemo: React.FC = () => {
   const [targetKeys1, setTargetKeys1] = useState<(string | number)[]>(['3', '4'])
@@ -25,7 +25,7 @@ const TransferDemo: React.FC = () => {
       </DemoBlock>
 
       <DemoBlock title="搜索与标题" description="showSearch 开启搜索" code={searchSnippet}>
-        <Transfer targetKeys={targetKeys2} onChange={setTargetKeys2} dataSource={dataSource} showSearch titles={['可选', '已选']} />
+        <Transfer targetKeys={targetKeys2} onChange={setTargetKeys2} dataSource={dataSource} showSearch sourceTitle="可选" targetTitle="已选" />
       </DemoBlock>
     </div>
   )

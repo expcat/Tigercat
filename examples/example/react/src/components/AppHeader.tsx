@@ -41,7 +41,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       <div className="h-full px-4 sm:px-6 flex items-center justify-between gap-4">
         <div className="min-w-0 flex items-baseline gap-3">
           <Button
-            type="button"
+            htmlType="button"
             variant="outline"
             size="sm"
             onClick={onToggleSider}

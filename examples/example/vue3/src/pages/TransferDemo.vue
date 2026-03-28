@@ -7,7 +7,7 @@ const targetKeys1 = ref<(string | number)[]>(['3', '4'])
 const targetKeys2 = ref<(string | number)[]>(['3', '4'])
 const dataSource = Array.from({ length: 10 }, (_, i) => ({
   key: String(i + 1),
-  title: `内容 ${i + 1}`,
+  label: `内容 ${i + 1}`,
   description: `描述 ${i + 1}`
 }))
 

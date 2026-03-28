@@ -182,7 +182,7 @@ const closeOnClickSnippet = `<Dropdown closeOnClick={false} trigger="click">
   </DropdownMenu>
 </Dropdown>`
 
-const defaultVisibleSnippet = `<Dropdown defaultVisible trigger="click">
+const defaultVisibleSnippet = `<Dropdown defaultOpen trigger="click">
   <Button>默认展开</Button>
   <DropdownMenu>
     <DropdownItem>菜单项 1</DropdownItem>
@@ -360,10 +360,10 @@ export default function DropdownDemo() {
       {/* 受控模式 */}
       <DemoBlock
         title="受控模式"
-        description="通过 visible 和 onVisibleChange 控制下拉菜单的显示隐藏。"
+        description="通过 open 和 onOpenChange 控制下拉菜单的显示隐藏。"
         code={controlledSnippet}>
         <div className="flex gap-4 items-center">
-          <Dropdown visible={visible1} onVisibleChange={setVisible1}>
+          <Dropdown open={visible1} onOpenChange={setVisible1}>
             <Button>受控下拉菜单</Button>
             <DropdownMenu>
               <DropdownItem>菜单项 1</DropdownItem>
@@ -445,9 +445,9 @@ export default function DropdownDemo() {
       {/* 默认展开 */}
       <DemoBlock
         title="默认展开"
-        description="通过 defaultVisible 设置初始展开状态。"
+        description="通过 defaultOpen 设置初始展开状态。"
         code={defaultVisibleSnippet}>
-        <Dropdown defaultVisible trigger="click">
+        <Dropdown defaultOpen trigger="click">
           <Button>默认展开</Button>
           <DropdownMenu>
             <DropdownItem>菜单项 1</DropdownItem>

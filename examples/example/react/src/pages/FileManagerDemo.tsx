@@ -42,22 +42,28 @@ const FileManagerDemo: React.FC = () => {
       <p className="text-gray-500 mb-8">文件浏览管理组件，支持列表/网格视图和搜索。</p>
 
       <DemoBlock title="列表视图" description="默认列表模式，支持搜索" code={listSnippet}>
-        <FileManager files={files} viewMode="list" searchable style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }} />
+        <div style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }}>
+          <FileManager files={files} viewMode="list" searchable />
+        </div>
       </DemoBlock>
 
       <DemoBlock title="网格视图" description="viewMode='grid'" code={gridSnippet}>
-        <FileManager files={files} viewMode="grid" style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }} />
+        <div style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }}>
+          <FileManager files={files} viewMode="grid" />
+        </div>
       </DemoBlock>
 
       <DemoBlock title="多选 & 面包屑导航" description="multiple 多选" code={multiSnippet}>
-        <FileManager
-          files={nestedFiles}
-          viewMode="list"
-          multiple
-          searchable
-          currentPath={currentPath}
-          onNavigate={onNavigate}
-          style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }} />
+        <div style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }}>
+          <FileManager
+            files={nestedFiles}
+            viewMode="list"
+            multiple
+            searchable
+            currentPath={currentPath}
+            onNavigate={onNavigate}
+          />
+        </div>
       </DemoBlock>
     </div>
   )

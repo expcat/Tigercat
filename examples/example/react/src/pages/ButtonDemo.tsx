@@ -70,9 +70,9 @@ const eventSnippet = `const [count, setCount] = useState(0)
 
 const htmlTypeSnippet = `<form onSubmit={(e) => { e.preventDefault(); alert('已提交') }}>
   <Space>
-    <Button type="submit" variant="primary">提交</Button>
-    <Button type="reset" variant="outline">重置</Button>
-    <Button type="button" variant="ghost">普通按钮</Button>
+    <Button htmlType="submit" variant="primary">提交</Button>
+    <Button htmlType="reset" variant="outline">重置</Button>
+    <Button htmlType="button" variant="ghost">普通按钮</Button>
   </Space>
 </form>`
 
@@ -218,13 +218,13 @@ const ButtonDemo: React.FC = () => {
         code={htmlTypeSnippet}>
         <form onSubmit={(e) => e.preventDefault()}>
           <Space>
-            <Button type="submit" variant="primary">
+            <Button htmlType="submit" variant="primary">
               提交
             </Button>
-            <Button type="reset" variant="outline">
+            <Button htmlType="reset" variant="outline">
               重置
             </Button>
-            <Button type="button" variant="ghost">
+            <Button htmlType="button" variant="ghost">
               普通按钮
             </Button>
           </Space>

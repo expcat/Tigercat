@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { QRCode, Space } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
-
-const url = ref('https://github.com/nicepkg/tigercat')
 
 const basicSnippet = `<Space wrap>
   <QRCode value="https://github.com" />

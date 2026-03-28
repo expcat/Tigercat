@@ -3,7 +3,7 @@ import { Modal, Button, Space, Input } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Button>打开对话框</Button>
-<Modal visible={visible1} title="基本对话框">...</Modal>`
+<Modal open={visible1} title="基本对话框">...</Modal>`
 
 const sizeSnippet = `<Button>小尺寸</Button>
 <Modal size="sm">...</Modal>
@@ -139,7 +139,7 @@ export default function ModalDemo() {
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisible1(true)}>打开对话框</Button>
           <Modal
-            visible={visible1}
+            open={visible1}
             title="基本对话框"
             onOk={handleOk}
             onCancel={handleCancel}
@@ -171,35 +171,35 @@ export default function ModalDemo() {
           </Space>
 
           <Modal
-            visible={visibleSm}
+            open={visibleSm}
             title="小尺寸对话框"
             size="sm"
             onCancel={() => setVisibleSm(false)}>
             <p>这是一个小尺寸的对话框。</p>
           </Modal>
           <Modal
-            visible={visibleMd}
+            open={visibleMd}
             title="中等尺寸对话框"
             size="md"
             onCancel={() => setVisibleMd(false)}>
             <p>这是一个中等尺寸的对话框（默认）。</p>
           </Modal>
           <Modal
-            visible={visibleLg}
+            open={visibleLg}
             title="大尺寸对话框"
             size="lg"
             onCancel={() => setVisibleLg(false)}>
             <p>这是一个大尺寸的对话框，可以容纳更多内容。</p>
           </Modal>
           <Modal
-            visible={visibleXl}
+            open={visibleXl}
             title="超大尺寸对话框"
             size="xl"
             onCancel={() => setVisibleXl(false)}>
             <p>这是一个超大尺寸的对话框，适合复杂的内容展示。</p>
           </Modal>
           <Modal
-            visible={visibleFull}
+            open={visibleFull}
             title="全屏对话框"
             size="full"
             onCancel={() => setVisibleFull(false)}>
@@ -215,7 +215,7 @@ export default function ModalDemo() {
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleCentered(true)}>打开居中对话框</Button>
           <Modal
-            visible={visibleCentered}
+            open={visibleCentered}
             title="居中对话框"
             centered
             onCancel={() => setVisibleCentered(false)}>
@@ -232,7 +232,7 @@ export default function ModalDemo() {
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleCustomFooter(true)}>自定义页脚对话框</Button>
           <Modal
-            visible={visibleCustomFooter}
+            open={visibleCustomFooter}
             title="自定义页脚对话框"
             footer={
               <Space>
@@ -255,7 +255,7 @@ export default function ModalDemo() {
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleDefaultFooter(true)}>默认页脚对话框</Button>
           <Modal
-            visible={visibleDefaultFooter}
+            open={visibleDefaultFooter}
             title="默认页脚对话框"
             showDefaultFooter
             onOk={() => {
@@ -275,7 +275,7 @@ export default function ModalDemo() {
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleNested(true)}>打开嵌套对话框</Button>
           <Modal
-            visible={visibleNested}
+            open={visibleNested}
             title="第一层对话框"
             onCancel={() => setVisibleNested(false)}>
             <p>这是第一层对话框的内容。</p>
@@ -284,7 +284,7 @@ export default function ModalDemo() {
             </Button>
 
             <Modal
-              visible={visibleNested2}
+              open={visibleNested2}
               title="第二层对话框"
               zIndex={1100}
               onCancel={() => setVisibleNested2(false)}>
@@ -301,7 +301,7 @@ export default function ModalDemo() {
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisible2(true)}>禁用遮罩关闭</Button>
           <Modal
-            visible={visible2}
+            open={visible2}
             title="禁用遮罩关闭"
             maskClosable={false}
             onCancel={() => setVisible2(false)}>
@@ -318,7 +318,7 @@ export default function ModalDemo() {
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleNoMask(true)}>无遮罩对话框</Button>
           <Modal
-            visible={visibleNoMask}
+            open={visibleNoMask}
             title="无遮罩对话框"
             mask={false}
             onCancel={() => setVisibleNoMask(false)}>
@@ -334,7 +334,7 @@ export default function ModalDemo() {
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisibleDestroyOnClose(true)}>关闭时销毁</Button>
           <Modal
-            visible={visibleDestroyOnClose}
+            open={visibleDestroyOnClose}
             title="关闭时销毁"
             destroyOnClose
             onCancel={() => setVisibleDestroyOnClose(false)}>
@@ -351,7 +351,7 @@ export default function ModalDemo() {
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisible3(true)}>无关闭按钮</Button>
           <Modal
-            visible={visible3}
+            open={visible3}
             title="无关闭按钮"
             closable={false}
             footer={<Button onClick={() => setVisible3(false)}>确定</Button>}
@@ -378,7 +378,7 @@ export default function ModalDemo() {
               {confirmResult && <p className="mt-3 text-sm text-green-700">{confirmResult}</p>}
 
               <Modal
-                visible={visibleConfirm}
+                open={visibleConfirm}
                 title="删除确认"
                 onCancel={() => {
                   if (confirmLoading) return
@@ -418,7 +418,7 @@ export default function ModalDemo() {
               </div>
 
               <Modal
-                visible={visibleInfo}
+                open={visibleInfo}
                 title="服务协议（示例）"
                 size="lg"
                 onCancel={() => setVisibleInfo(false)}
@@ -437,7 +437,7 @@ export default function ModalDemo() {
               </div>
 
               <Modal
-                visible={visibleForm}
+                open={visibleForm}
                 title="编辑资料"
                 onCancel={() => {
                   if (formLoading) return

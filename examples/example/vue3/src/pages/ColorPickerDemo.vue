@@ -10,7 +10,7 @@ const basicSnippet = `<ColorPicker v-model="color" />
 <Text>选中颜色: {{ color }}</Text>`
 
 const featureSnippet = `<Space direction="vertical" :size="12">
-  <ColorPicker v-model="color" show-alpha format="rgba" />
+  <ColorPicker v-model="color" show-alpha format="rgb" />
   <ColorPicker v-model="color" :presets="['#f5222d', '#fa8c16', '#52c41a', '#1677ff', '#722ed1']" />
   <ColorPicker :model-value="'#ccc'" size="sm" />
   <ColorPicker :model-value="'#ccc'" size="lg" />
@@ -32,7 +32,7 @@ const featureSnippet = `<Space direction="vertical" :size="12">
 
     <DemoBlock title="透明度、预设与尺寸" description="showAlpha 透明度，presets 预设色板" :code="featureSnippet">
       <Space direction="vertical" :size="12">
-        <ColorPicker v-model="color2" show-alpha format="rgba" />
+        <ColorPicker v-model="color2" show-alpha format="rgb" />
         <ColorPicker v-model="color2" :presets="['#f5222d', '#fa8c16', '#52c41a', '#1677ff', '#722ed1']" />
         <Space :size="12">
           <ColorPicker :model-value="'#ccc'" size="sm" />

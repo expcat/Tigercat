@@ -46,8 +46,8 @@ const basicSnippet = `<Form model={basicForm} onSubmit={handleBasicSubmit} class
   </FormItem>
   <FormItem>
     <Space>
-      <Button type="submit" variant="primary">提交</Button>
-      <Button type="button" variant="secondary" onClick={resetBasic}>重置</Button>
+      <Button htmlType="submit" variant="primary">提交</Button>
+      <Button htmlType="button" variant="secondary" onClick={resetBasic}>重置</Button>
     </Space>
   </FormItem>
 </Form>`
@@ -68,10 +68,10 @@ const validateSnippet = `<Space direction="vertical" className="w-full">
     </FormItem>
     <FormItem>
       <Space>
-        <Button type="submit" variant="primary">提交并校验</Button>
-        <Button type="button" variant="secondary" onClick={validateManually}>手动校验</Button>
-        <Button type="button" variant="secondary" onClick={clearValidateManually}>清除校验</Button>
-        <Button type="button" variant="secondary" onClick={resetValidateForm}>重置</Button>
+        <Button htmlType="submit" variant="primary">提交并校验</Button>
+        <Button htmlType="button" variant="secondary" onClick={validateManually}>手动校验</Button>
+        <Button htmlType="button" variant="secondary" onClick={clearValidateManually}>清除校验</Button>
+        <Button htmlType="button" variant="secondary" onClick={resetValidateForm}>重置</Button>
       </Space>
     </FormItem>
   </Form>
@@ -321,10 +321,10 @@ const FormDemo: React.FC = () => {
 
           <FormItem>
             <Space>
-              <Button type="submit" variant="primary">
+              <Button htmlType="submit" variant="primary">
                 提交
               </Button>
-              <Button type="button" variant="secondary" onClick={resetBasic}>
+              <Button htmlType="button" variant="secondary" onClick={resetBasic}>
                 重置
               </Button>
             </Space>
@@ -399,16 +399,16 @@ const FormDemo: React.FC = () => {
 
             <FormItem>
               <Space>
-                <Button type="submit" variant="primary">
+                <Button htmlType="submit" variant="primary">
                   提交并校验
                 </Button>
-                <Button type="button" variant="secondary" onClick={validateManually}>
+                <Button htmlType="button" variant="secondary" onClick={validateManually}>
                   手动校验
                 </Button>
-                <Button type="button" variant="secondary" onClick={clearValidateManually}>
+                <Button htmlType="button" variant="secondary" onClick={clearValidateManually}>
                   清除校验
                 </Button>
-                <Button type="button" variant="secondary" onClick={resetValidateForm}>
+                <Button htmlType="button" variant="secondary" onClick={resetValidateForm}>
                   重置
                 </Button>
               </Space>
@@ -546,7 +546,7 @@ const FormDemo: React.FC = () => {
           </FormItem>
           <FormItem>
             <Button
-              type="button"
+              htmlType="button"
               variant="primary"
               onClick={() => customValidatorFormRef.current?.validate()}>
               校验
@@ -581,7 +581,7 @@ const FormDemo: React.FC = () => {
           </FormItem>
           <FormItem>
             <Button
-              type="button"
+              htmlType="button"
               variant="primary"
               onClick={() => showMessageFormRef.current?.validate()}>
               校验对比

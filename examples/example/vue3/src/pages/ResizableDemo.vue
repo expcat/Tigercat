@@ -21,7 +21,7 @@
         <Resizable :default-width="200" :default-height="200" lock-aspect-ratio>
           <div class="w-full h-full bg-green-50 border border-green-200 rounded flex items-center justify-center text-sm">lockAspectRatio</div>
         </Resizable>
-        <Resizable :default-width="200" :default-height="100" axis="x">
+        <Resizable :default-width="200" :default-height="100" axis="horizontal">
           <div class="w-full h-full bg-amber-50 border border-amber-200 rounded flex items-center justify-center text-sm">axis="x"</div>
         </Resizable>
       </div>
@@ -52,7 +52,7 @@ const basicSnippet = `<Resizable :default-width="300" :default-height="150" :min
 </Resizable>`
 
 const constrainedSnippet = `<Resizable :default-width="200" :default-height="200" lock-aspect-ratio>...</Resizable>
-<Resizable :default-width="200" :default-height="100" axis="x">...</Resizable>`
+<Resizable :default-width="200" :default-height="100" axis="horizontal">...</Resizable>`
 
 const disabledSnippet = `<Resizable :default-width="200" :default-height="100" disabled>...</Resizable>`
 </script>

@@ -212,10 +212,10 @@ const App: React.FC = () => {
 
               <FormItem>
                 <Space>
-                  <Button type="submit" variant="primary">
+                  <Button htmlType="submit" variant="primary">
                     提交
                   </Button>
-                  <Button type="button" variant="secondary" onClick={handleReset}>
+                  <Button htmlType="button" variant="secondary" onClick={handleReset}>
                     重置
                   </Button>
                 </Space>

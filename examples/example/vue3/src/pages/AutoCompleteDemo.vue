@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { AutoComplete, Space } from '@expcat/tigercat-vue'
+import { AutoComplete } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const val = ref('')
 const val2 = ref('')
-const allOptions = ['React', 'Vue', 'Angular', 'Svelte', 'Solid', 'Preact', 'Next.js', 'Nuxt']
+const allOptions = ['React', 'Vue', 'Angular', 'Svelte', 'Solid', 'Preact', 'Next.js', 'Nuxt'].map(o => ({ label: o, value: o }))
 
 const basicSnippet = `<AutoComplete
   v-model="val"
@@ -15,7 +15,7 @@ const basicSnippet = `<AutoComplete
 
 const customSnippet = `<AutoComplete
   v-model="val"
-  :options="allOptions.map(o => ({ label: o + ' 框架', value: o }))"
+  :options="allOptions.map(o => ({ label: o.label + ' 框架', value: o.value }))"
   placeholder="自定义选项"
 />`
 </script>
@@ -32,7 +32,7 @@ const customSnippet = `<AutoComplete
     <DemoBlock title="自定义选项" description="options 支持 {label, value} 对象" :code="customSnippet">
       <AutoComplete
         v-model="val2"
-        :options="allOptions.map(o => ({ label: o + ' 框架', value: o }))"
+        :options="allOptions.map(o => ({ label: o.label + ' 框架', value: o.value }))"
         placeholder="自定义选项" />
     </DemoBlock>
   </div>

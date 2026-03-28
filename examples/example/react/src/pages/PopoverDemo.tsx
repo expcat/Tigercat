@@ -150,8 +150,8 @@ export default function PopoverDemo() {
             </Popover>
 
             <Popover
-              visible={manualVisible}
-              onVisibleChange={setManualVisible}
+              open={manualVisible}
+              onOpenChange={setManualVisible}
               title="手动触发"
               content="手动控制显示隐藏"
               trigger="manual">
@@ -168,8 +168,8 @@ export default function PopoverDemo() {
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <Popover
-              visible={visible1}
-              onVisibleChange={setVisible1}
+              open={visible1}
+              onOpenChange={setVisible1}
               title="受控气泡卡片"
               content="通过外部状态控制显示">
               <Button>受控气泡卡片</Button>

@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ImageViewer, Button, Space } from '@expcat/tigercat-vue'
+import { ImageViewer, Button } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
 const open1 = ref(false)
 const open2 = ref(false)
-const currentIdx = ref(0)
 
 const images = [
   'https://picsum.photos/800/600?random=1',

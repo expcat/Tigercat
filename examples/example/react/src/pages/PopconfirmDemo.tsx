@@ -173,8 +173,8 @@ export default function PopconfirmDemo() {
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <Popconfirm
-              visible={visible1}
-              onVisibleChange={setVisible1}
+              open={visible1}
+              onOpenChange={setVisible1}
               title="确定要执行此操作吗？"
               onConfirm={() => {
                 handleConfirm()

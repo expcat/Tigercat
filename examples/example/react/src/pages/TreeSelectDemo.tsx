@@ -1,13 +1,14 @@
 import { useState } from 'react'
+import type { TreeSelectValue } from '@expcat/tigercat-core'
 import { TreeSelect, Space } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const treeData = [
-  { label: '研发部', value: 'dev', children: [
-    { label: '前端组', value: 'fe', children: [{ label: '张三', value: 'zs' }, { label: '李四', value: 'ls' }] },
-    { label: '后端组', value: 'be', children: [{ label: '王五', value: 'ww' }] }
+  { key: 'dev', label: '研发部', value: 'dev', children: [
+    { key: 'fe', label: '前端组', value: 'fe', children: [{ key: 'zs', label: '张三', value: 'zs' }, { key: 'ls', label: '李四', value: 'ls' }] },
+    { key: 'be', label: '后端组', value: 'be', children: [{ key: 'ww', label: '王五', value: 'ww' }] }
   ] },
-  { label: '产品部', value: 'pm', children: [{ label: '赵六', value: 'zl' }] }
+  { key: 'pm', label: '产品部', value: 'pm', children: [{ key: 'zl', label: '赵六', value: 'zl' }] }
 ]
 
 const basicSnippet = `<TreeSelect value={val} onChange={setVal} treeData={treeData} placeholder="请选择成员" />`
@@ -17,8 +18,8 @@ const sizeSnippet = `<TreeSelect treeData={treeData} size="sm" placeholder="小"
 <TreeSelect treeData={treeData} disabled placeholder="禁用" />`
 
 const TreeSelectDemo: React.FC = () => {
-  const [val, setVal] = useState<string | number | undefined>(undefined)
-  const [val2, setVal2] = useState<string | number | undefined>(undefined)
+  const [val, setVal] = useState<TreeSelectValue>(undefined as unknown as TreeSelectValue)
+  const [val2, setVal2] = useState<TreeSelectValue>(undefined as unknown as TreeSelectValue)
 
   return (
     <div className="max-w-5xl mx-auto p-8">

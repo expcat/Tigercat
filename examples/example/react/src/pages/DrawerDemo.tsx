@@ -10,7 +10,7 @@ import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Button onClick={openBasic}>打开抽屉</Button>
 <Drawer
-  visible={basicVisible}
+  open={basicVisible}
   title="基本抽屉"
   footer={getCloseFooter(() => setBasicVisible(false))}
   onClose={() => setBasicVisible(false)}>
@@ -33,7 +33,7 @@ const placementSnippet = `<Space>
   </Button>
 </Space>
 <Drawer
-  visible={placementVisible}
+  open={placementVisible}
   placement={placement}
   title={\`\${placement} 抽屉\`}
   footer={getCloseFooter(() => setPlacementVisible(false))}
@@ -59,7 +59,7 @@ const sizeSnippet = `<Space>
   </Button>
 </Space>
 <Drawer
-  visible={sizeVisible}
+  open={sizeVisible}
   size={size}
   title="不同尺寸的抽屉"
   footer={getCloseFooter(() => setSizeVisible(false))}
@@ -69,7 +69,7 @@ const sizeSnippet = `<Space>
 
 const customSnippet = `<Button onClick={openCustom}>打开自定义抽屉</Button>
 <Drawer
-  visible={customVisible}
+  open={customVisible}
   header={
     <div className="flex items-center gap-2">
       <span>⚙️</span>
@@ -107,7 +107,7 @@ const customSnippet = `<Button onClick={openCustom}>打开自定义抽屉</Butto
 
 const noMaskSnippet = `<Button onClick={openNoMask}>打开无蒙层抽屉</Button>
 <Drawer
-  visible={noMaskVisible}
+  open={noMaskVisible}
   mask={false}
   title="无蒙层抽屉"
   footer={getCloseFooter(() => setNoMaskVisible(false))}
@@ -119,7 +119,7 @@ const noMaskSnippet = `<Button onClick={openNoMask}>打开无蒙层抽屉</Butto
 
 const notClosableSnippet = `<Button onClick={openNotClosable}>打开抽屉</Button>
 <Drawer
-  visible={notClosableVisible}
+  open={notClosableVisible}
   maskClosable={false}
   title="点击蒙层不关闭"
   footer={getCloseFooter(() => setNotClosableVisible(false))}
@@ -130,7 +130,7 @@ const notClosableSnippet = `<Button onClick={openNotClosable}>打开抽屉</Butt
 
 const noCloseButtonSnippet = `<Button onClick={openNoCloseButton}>打开抽屉</Button>
 <Drawer
-  visible={noCloseButtonVisible}
+  open={noCloseButtonVisible}
   closable={false}
   title="隐藏关闭按钮"
   footer={getCloseFooter(() => setNoCloseButtonVisible(false))}
@@ -141,7 +141,7 @@ const noCloseButtonSnippet = `<Button onClick={openNoCloseButton}>打开抽屉</
 
 const destroySnippet = `<Button onClick={openDestroy}>打开抽屉</Button>
 <Drawer
-  visible={destroyVisible}
+  open={destroyVisible}
   destroyOnClose={true}
   title="关闭时销毁内容"
   footer={getCloseFooter(() => setDestroyVisible(false))}
@@ -288,7 +288,7 @@ const DrawerDemo: React.FC = () => {
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openBasic}>打开抽屉</Button>
           <Drawer
-            visible={basicVisible}
+            open={basicVisible}
             title="基本抽屉"
             footer={getCloseFooter(() => setBasicVisible(false))}
             onClose={() => setBasicVisible(false)}>
@@ -327,7 +327,7 @@ const DrawerDemo: React.FC = () => {
             </Button>
           </Space>
           <Drawer
-            visible={placementVisible}
+            open={placementVisible}
             placement={placement}
             title={`${placement} 抽屉`}
             footer={getCloseFooter(() => setPlacementVisible(false))}
@@ -368,7 +368,7 @@ const DrawerDemo: React.FC = () => {
             </Button>
           </Space>
           <Drawer
-            visible={sizeVisible}
+            open={sizeVisible}
             size={size}
             title="不同尺寸的抽屉"
             footer={getCloseFooter(() => setSizeVisible(false))}
@@ -386,7 +386,7 @@ const DrawerDemo: React.FC = () => {
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openCustom}>打开自定义抽屉</Button>
           <Drawer
-            visible={customVisible}
+            open={customVisible}
             header={
               <div className="flex items-center gap-2">
                 <span>⚙️</span>
@@ -432,7 +432,7 @@ const DrawerDemo: React.FC = () => {
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openNoMask}>打开无蒙层抽屉</Button>
           <Drawer
-            visible={noMaskVisible}
+            open={noMaskVisible}
             mask={false}
             title="无蒙层抽屉"
             footer={getCloseFooter(() => setNoMaskVisible(false))}
@@ -452,7 +452,7 @@ const DrawerDemo: React.FC = () => {
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openNotClosable}>打开抽屉</Button>
           <Drawer
-            visible={notClosableVisible}
+            open={notClosableVisible}
             maskClosable={false}
             title="点击蒙层不关闭"
             footer={getCloseFooter(() => setNotClosableVisible(false))}
@@ -471,7 +471,7 @@ const DrawerDemo: React.FC = () => {
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openNoCloseButton}>打开抽屉</Button>
           <Drawer
-            visible={noCloseButtonVisible}
+            open={noCloseButtonVisible}
             closable={false}
             title="隐藏关闭按钮"
             footer={getCloseFooter(() => setNoCloseButtonVisible(false))}
@@ -490,7 +490,7 @@ const DrawerDemo: React.FC = () => {
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openDestroy}>打开抽屉</Button>
           <Drawer
-            visible={destroyVisible}
+            open={destroyVisible}
             destroyOnClose={true}
             title="关闭时销毁内容"
             footer={getCloseFooter(() => setDestroyVisible(false))}

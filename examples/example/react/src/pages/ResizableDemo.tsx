@@ -7,7 +7,7 @@ const basicSnippet = `<Resizable defaultWidth={300} defaultHeight={150} minWidth
 </Resizable>`
 
 const constrainedSnippet = `<Resizable defaultWidth={200} defaultHeight={200} lockAspectRatio>...</Resizable>
-<Resizable defaultWidth={200} defaultHeight={100} axis="x">...</Resizable>`
+<Resizable defaultWidth={200} defaultHeight={100} axis="horizontal">...</Resizable>`
 
 const disabledSnippet = `<Resizable defaultWidth={200} defaultHeight={100} disabled>...</Resizable>`
 
@@ -36,8 +36,8 @@ const ResizableDemo: React.FC = () => {
           <Resizable defaultWidth={200} defaultHeight={200} lockAspectRatio>
             <div className="w-full h-full bg-green-50 border border-green-200 rounded flex items-center justify-center text-sm">lockAspectRatio</div>
           </Resizable>
-          <Resizable defaultWidth={200} defaultHeight={100} axis="x">
-            <div className="w-full h-full bg-amber-50 border border-amber-200 rounded flex items-center justify-center text-sm">axis="x"</div>
+          <Resizable defaultWidth={200} defaultHeight={100} axis="horizontal">
+            <div className="w-full h-full bg-amber-50 border border-amber-200 rounded flex items-center justify-center text-sm">axis="horizontal"</div>
           </Resizable>
         </div>
       </DemoBlock>

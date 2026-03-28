@@ -1,14 +1,14 @@
-import { FloatButton } from '@expcat/tigercat-react'
+import { FloatButton, FloatButtonGroup } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<FloatButton tooltip="默认" onClick={() => console.log('clicked')} />
 <FloatButton shape="square" type="default" tooltip="方形" />
 <FloatButton size="lg" tooltip="大号" />`
 
-const groupSnippet = `<FloatButton.Group trigger="hover" triggerNode={<FloatButton tooltip="菜单" />}>
+const groupSnippet = `<FloatButtonGroup trigger="hover" triggerNode={<FloatButton tooltip="菜单" />}>
   <FloatButton tooltip="操作 A" type="default" />
   <FloatButton tooltip="操作 B" type="default" />
-</FloatButton.Group>`
+</FloatButtonGroup>`
 
 const disabledSnippet = `<FloatButton disabled tooltip="不可用" />`
 
@@ -28,10 +28,10 @@ const FloatButtonDemo: React.FC = () => {
 
       <DemoBlock title="按钮组" description="FloatButton.Group 分组展开" code={groupSnippet}>
         <div className="relative h-64 border rounded-lg overflow-hidden">
-          <FloatButton.Group trigger="hover" triggerNode={<FloatButton tooltip="菜单" />} style={{ position: 'absolute', right: 24, bottom: 24 }}>
+          <FloatButtonGroup trigger="hover" triggerNode={<FloatButton tooltip="菜单" />} style={{ position: 'absolute', right: 24, bottom: 24 }}>
             <FloatButton tooltip="操作 A" type="default" />
             <FloatButton tooltip="操作 B" type="default" />
-          </FloatButton.Group>
+          </FloatButtonGroup>
         </div>
       </DemoBlock>
 

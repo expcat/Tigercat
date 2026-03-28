@@ -65,8 +65,8 @@ const groupSnippet = `{/* ImageGroup：多图关联预览 */}
 const standalonePreviewSnippet = `const [visible, setVisible] = useState(false)
 
 <button onClick={() => setVisible(true)}>打开预览</button>
-<ImagePreview visible={visible} images={photos} currentIndex={0}
-  onVisibleChange={setVisible} />`
+<ImagePreview open={visible} images={photos} currentIndex={0}
+  onOpenChange={setVisible} />`
 
 const noPreviewSnippet = `{/* 关闭预览 */}
 <Image src="${PHOTOS[0]}" width={200} height={150} preview={false} alt="无预览" />`
@@ -208,10 +208,10 @@ export default function ImageDemo() {
           打开预览
         </button>
         <ImagePreview
-          visible={previewVisible}
+          open={previewVisible}
           images={PHOTOS}
           currentIndex={0}
-          onVisibleChange={setPreviewVisible}
+          onOpenChange={setPreviewVisible}
         />
       </DemoBlock>
     </div>

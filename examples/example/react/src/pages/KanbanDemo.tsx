@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Kanban } from '@expcat/tigercat-react'
+import type { TaskBoardColumn } from '@expcat/tigercat-core'
 import DemoBlock from '../components/DemoBlock'
 
-const defaultColumns = [
+const defaultColumns: TaskBoardColumn[] = [
   {
     id: 'todo',
     title: '待办',
@@ -27,7 +28,7 @@ const defaultColumns = [
   }
 ]
 
-const wipColumns = [
+const wipColumns: TaskBoardColumn[] = [
   {
     id: 'backlog',
     title: '需求池',

@@ -173,7 +173,7 @@ export const AppSider: React.FC<AppSiderProps> = ({
               {DEMO_APP_TITLE[lang]}
             </Link>
             <Button
-              type="button"
+              htmlType="button"
               variant="outline"
               size="sm"
               onClick={onClose}

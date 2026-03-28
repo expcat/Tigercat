@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ImageViewer, Button, Space } from '@expcat/tigercat-react'
+import { ImageViewer, Button } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
 const images = [

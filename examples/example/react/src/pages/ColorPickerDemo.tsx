@@ -5,7 +5,7 @@ import DemoBlock from '../components/DemoBlock'
 const basicSnippet = `<ColorPicker value={color} onChange={setColor} />
 <Text>选中颜色: {color}</Text>`
 
-const featureSnippet = `<ColorPicker value={color} onChange={setColor} showAlpha format="rgba" />
+const featureSnippet = `<ColorPicker value={color} onChange={setColor} showAlpha format="rgb" />
 <ColorPicker value={color} onChange={setColor} presets={['#f5222d', '#fa8c16', '#52c41a', '#1677ff', '#722ed1']} />
 <ColorPicker value="#ccc" size="sm" />
 <ColorPicker value="#ccc" size="lg" />
@@ -29,7 +29,7 @@ const ColorPickerDemo: React.FC = () => {
 
       <DemoBlock title="透明度、预设与尺寸" description="showAlpha 透明度，presets 预设色板" code={featureSnippet}>
         <Space direction="vertical" size={12}>
-          <ColorPicker value={color2} onChange={setColor2} showAlpha format="rgba" />
+          <ColorPicker value={color2} onChange={setColor2} showAlpha format="rgb" />
           <ColorPicker value={color2} onChange={setColor2} presets={['#f5222d', '#fa8c16', '#52c41a', '#1677ff', '#722ed1']} />
           <Space size={12}>
             <ColorPicker value="#ccc" size="sm" />
