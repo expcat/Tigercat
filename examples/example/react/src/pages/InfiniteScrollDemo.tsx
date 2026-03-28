@@ -2,11 +2,13 @@ import { useState, useCallback } from 'react'
 import { InfiniteScroll } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
-const basicSnippet = `<InfiniteScroll hasMore={hasMore} loading={loading} onLoadMore={loadMore}>
+const basicSnippet = `<InfiniteScroll hasMore={hasMore} loading={loading} onLoadMore={loadMore}
+  className="h-[300px] border border-gray-200 rounded-lg">
   {items.map(i => <div key={i} className="px-4 py-3 border-b">项目 {i}</div>)}
 </InfiniteScroll>`
 
-const customSnippet = `<InfiniteScroll hasMore={false} loadingText="拼命加载中..." endText="— 到底了 —">
+const customSnippet = `<InfiniteScroll hasMore={false} loadingText="拼命加载中..." endText="— 到底了 —"
+  className="h-[200px] border border-gray-200 rounded-lg">
   {items.map(i => <div key={i}>项目 {i}</div>)}
 </InfiniteScroll>`
 
@@ -34,23 +36,21 @@ const InfiniteScrollDemo: React.FC = () => {
       <p className="text-gray-500 mb-8">滚动到底部自动加载更多内容。</p>
 
       <DemoBlock title="基础用法" description="滚动到底部触发 onLoadMore" code={basicSnippet}>
-        <div style={{ height: 300, overflow: 'auto', border: '1px solid #e5e7eb', borderRadius: 8 }}>
-          <InfiniteScroll hasMore={hasMore} loading={loading} onLoadMore={loadMore}>
-            {items.map((i) => (
-              <div key={i} className="px-4 py-3 border-b">项目 {i}</div>
-            ))}
-          </InfiniteScroll>
-        </div>
+        <InfiniteScroll hasMore={hasMore} loading={loading} onLoadMore={loadMore}
+          className="h-[300px] border border-gray-200 rounded-lg">
+          {items.map((i) => (
+            <div key={i} className="px-4 py-3 border-b">项目 {i}</div>
+          ))}
+        </InfiniteScroll>
       </DemoBlock>
 
       <DemoBlock title="自定义文案" description="loadingText / endText" code={customSnippet}>
-        <div style={{ height: 200, overflow: 'auto', border: '1px solid #e5e7eb', borderRadius: 8 }}>
-          <InfiniteScroll hasMore={false} loadingText="拼命加载中..." endText="— 到底了 —">
-            {Array.from({ length: 5 }, (_, i) => (
-              <div key={i} className="px-4 py-3 border-b">项目 {i + 1}</div>
-            ))}
-          </InfiniteScroll>
-        </div>
+        <InfiniteScroll hasMore={false} loadingText="拼命加载中..." endText="— 到底了 —"
+          className="h-[200px] border border-gray-200 rounded-lg">
+          {Array.from({ length: 5 }, (_, i) => (
+            <div key={i} className="px-4 py-3 border-b">项目 {i + 1}</div>
+          ))}
+        </InfiniteScroll>
       </DemoBlock>
     </div>
   )

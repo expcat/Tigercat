@@ -81,6 +81,7 @@ watch(
             <div class="mt-4">
               <Collapse :bordered="false"
                         ghost
+                        accordion
                         expand-icon-position="end"
                         :activeKey="activeGroupKeys"
                         class="space-y-2"
@@ -146,6 +147,7 @@ watch(
       <div class="mt-4">
         <Collapse :bordered="false"
                   ghost
+                  accordion
                   expand-icon-position="end"
                   :activeKey="activeGroupKeys"
                   class="space-y-2"

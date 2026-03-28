@@ -4,23 +4,21 @@
     <p class="text-gray-500 mb-8">滚动到底部自动加载更多内容。</p>
 
     <DemoBlock title="基础用法" description="滚动到底部触发 load-more" :code="basicSnippet">
-      <div style="height: 300px; overflow: auto; border: 1px solid #e5e7eb; border-radius: 8px">
-        <InfiniteScroll :has-more="hasMore" :loading="loading" @load-more="loadMore">
-          <div v-for="item in items" :key="item" class="px-4 py-3 border-b">
-            项目 {{ item }}
-          </div>
-        </InfiniteScroll>
-      </div>
+      <InfiniteScroll :has-more="hasMore" :loading="loading" @load-more="loadMore"
+        class-name="h-[300px] border border-gray-200 rounded-lg">
+        <div v-for="item in items" :key="item" class="px-4 py-3 border-b">
+          项目 {{ item }}
+        </div>
+      </InfiniteScroll>
     </DemoBlock>
 
     <DemoBlock title="自定义文案" description="loadingText / endText" :code="customSnippet">
-      <div style="height: 200px; overflow: auto; border: 1px solid #e5e7eb; border-radius: 8px">
-        <InfiniteScroll :has-more="false" loading-text="拼命加载中..." end-text="— 到底了 —">
-          <div v-for="i in 5" :key="i" class="px-4 py-3 border-b">
-            项目 {{ i }}
-          </div>
-        </InfiniteScroll>
-      </div>
+      <InfiniteScroll :has-more="false" loading-text="拼命加载中..." end-text="— 到底了 —"
+        class-name="h-[200px] border border-gray-200 rounded-lg">
+        <div v-for="i in 5" :key="i" class="px-4 py-3 border-b">
+          项目 {{ i }}
+        </div>
+      </InfiniteScroll>
     </DemoBlock>
   </div>
 </template>
@@ -45,13 +43,15 @@ const loadMore = () => {
   }, 800)
 }
 
-const basicSnippet = `<InfiniteScroll :has-more="hasMore" :loading="loading" @load-more="loadMore">
+const basicSnippet = `<InfiniteScroll :has-more="hasMore" :loading="loading" @load-more="loadMore"
+  class-name="h-[300px] border border-gray-200 rounded-lg">
   <div v-for="item in items" :key="item" class="px-4 py-3 border-b">
     项目 {{ item }}
   </div>
 </InfiniteScroll>`
 
-const customSnippet = `<InfiniteScroll :has-more="false" loading-text="拼命加载中..." end-text="— 到底了 —">
+const customSnippet = `<InfiniteScroll :has-more="false" loading-text="拼命加载中..." end-text="— 到底了 —"
+  class-name="h-[200px] border border-gray-200 rounded-lg">
   <div v-for="i in 5" :key="i">项目 {{ i }}</div>
 </InfiniteScroll>`
 </script>

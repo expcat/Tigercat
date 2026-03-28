@@ -155,6 +155,7 @@ export const Kanban = defineComponent({
       idx: number
     ) {
       if (!props.draggable || !e.dataTransfer) return
+      e.stopPropagation()
       setDragData(e.dataTransfer, createCardDragData(card.id, colId, idx))
       dragState.value = { type: 'card', id: card.id, fromColumnId: colId, fromIndex: idx }
     }

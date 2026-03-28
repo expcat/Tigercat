@@ -85,6 +85,7 @@ export const AppSider: React.FC<AppSiderProps> = ({
         <Collapse
           bordered={false}
           ghost
+          accordion
           expandIconPosition="end"
           activeKey={activeKeys}
           onChange={handleCollapseChange}

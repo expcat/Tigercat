@@ -130,6 +130,7 @@ export const Kanban: React.FC<KanbanProps> = ({
   const handleCardDragStart = useCallback(
     (e: React.DragEvent, card: TaskBoardCard, colId: string | number, idx: number) => {
       if (!draggable) return
+      e.stopPropagation()
       setDragData(e.nativeEvent.dataTransfer!, createCardDragData(card.id, colId, idx))
       setDragState({ type: 'card', id: card.id, fromColumnId: colId, fromIndex: idx })
     },

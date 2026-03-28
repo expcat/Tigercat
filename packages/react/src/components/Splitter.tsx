@@ -39,21 +39,15 @@ export const Splitter: React.FC<SplitterProps> = ({
   children
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
-  const [paneSizes, setPaneSizes] = useState<number[]>(controlledSizes || [])
+  const [paneSizes, setPaneSizes] = useState<number[]>([])
   const draggingRef = useRef<{
     index: number
     startPos: number
     startSizes: number[]
   } | null>(null)
 
-  // Sync controlled sizes
+  // Initialize / sync sizes from container dimensions
   useEffect(() => {
-    if (controlledSizes) setPaneSizes(controlledSizes)
-  }, [controlledSizes])
-
-  // Initialize sizes from container if not controlled
-  useEffect(() => {
-    if (controlledSizes && controlledSizes.length > 0) return
     const el = containerRef.current
     if (!el) return
     const paneCount = React.Children.count(children)
@@ -61,8 +55,24 @@ export const Splitter: React.FC<SplitterProps> = ({
     const totalGutter = (paneCount - 1) * gutterSize
     const total =
       direction === 'horizontal' ? el.clientWidth - totalGutter : el.clientHeight - totalGutter
-    const eachSize = total / paneCount
-    setPaneSizes(Array.from({ length: paneCount }, () => eachSize))
+
+    if (controlledSizes && controlledSizes.length > 0) {
+      if (total > 0) {
+        // Convert proportional sizes to pixels based on container dimensions
+        const sum = controlledSizes.reduce((a, b) => a + b, 0)
+        if (sum > 0) {
+          setPaneSizes(controlledSizes.map((s) => (s / sum) * total))
+        }
+      } else {
+        // No layout available (e.g. test env), use sizes as-is
+        setPaneSizes([...controlledSizes])
+      }
+    } else {
+      if (total > 0) {
+        const eachSize = total / paneCount
+        setPaneSizes(Array.from({ length: paneCount }, () => eachSize))
+      }
+    }
   }, [children, direction, gutterSize, controlledSizes])
 
   const mins = useMemo(() => paneSizes.map(() => min), [paneSizes.length, min])

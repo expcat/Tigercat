@@ -39,7 +39,7 @@ export const richTextToolbarClasses =
   'flex flex-wrap items-center gap-1 px-2 py-1.5 border-b border-[var(--tiger-border,#d1d5db)] bg-[var(--tiger-bg-secondary,#f9fafb)]'
 
 export const richTextToolbarButtonBase =
-  'inline-flex items-center justify-center w-8 h-8 rounded text-sm font-medium transition-colors duration-150 text-[var(--tiger-text-secondary,#6b7280)] hover:bg-[var(--tiger-bg-hover,#e5e7eb)] hover:text-[var(--tiger-text,#111827)]'
+  'inline-flex items-center justify-center min-w-8 h-8 px-2 rounded text-sm font-medium transition-colors duration-150 text-[var(--tiger-text-secondary,#6b7280)] hover:bg-[var(--tiger-bg-hover,#e5e7eb)] hover:text-[var(--tiger-text,#111827)]'
 
 export const richTextToolbarButtonActive =
   'bg-[var(--tiger-primary,#2563eb)]/10 text-[var(--tiger-primary,#2563eb)]'
