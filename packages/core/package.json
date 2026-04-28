@@ -26,7 +26,8 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./types": {
       "types": "./dist/types/index.d.ts",
@@ -35,6 +36,46 @@
     "./theme": {
       "types": "./dist/theme/index.d.ts",
       "import": "./dist/theme/index.js"
+    },
+    "./locales/en-US": {
+      "types": "./dist/locales/en-US.d.ts",
+      "import": "./dist/locales/en-US.js",
+      "require": "./dist/locales/en-US.cjs"
+    },
+    "./locales/zh-CN": {
+      "types": "./dist/locales/zh-CN.d.ts",
+      "import": "./dist/locales/zh-CN.js",
+      "require": "./dist/locales/zh-CN.cjs"
+    },
+    "./locales/zh-TW": {
+      "types": "./dist/locales/zh-TW.d.ts",
+      "import": "./dist/locales/zh-TW.js",
+      "require": "./dist/locales/zh-TW.cjs"
+    },
+    "./locales/ja-JP": {
+      "types": "./dist/locales/ja-JP.d.ts",
+      "import": "./dist/locales/ja-JP.js",
+      "require": "./dist/locales/ja-JP.cjs"
+    },
+    "./locales/ko-KR": {
+      "types": "./dist/locales/ko-KR.d.ts",
+      "import": "./dist/locales/ko-KR.js",
+      "require": "./dist/locales/ko-KR.cjs"
+    },
+    "./locales/th-TH": {
+      "types": "./dist/locales/th-TH.d.ts",
+      "import": "./dist/locales/th-TH.js",
+      "require": "./dist/locales/th-TH.cjs"
+    },
+    "./locales/vi-VN": {
+      "types": "./dist/locales/vi-VN.d.ts",
+      "import": "./dist/locales/vi-VN.js",
+      "require": "./dist/locales/vi-VN.cjs"
+    },
+    "./locales/id-ID": {
+      "types": "./dist/locales/id-ID.d.ts",
+      "import": "./dist/locales/id-ID.js",
+      "require": "./dist/locales/id-ID.cjs"
     }
   },
   "files": [
@@ -44,8 +85,8 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "clean": "node ../../scripts/rimraf.mjs dist"
   },
   "dependencies": {

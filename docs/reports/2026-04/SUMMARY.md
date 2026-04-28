@@ -136,7 +136,7 @@ PR-H  commander 14（CLI）
 | **PR-1**  | sideEffects 修复（vue + react package.json）                     | ✅ Done    | 2026-04-28 | 修复 esbuild `ignored-bare-import` 警告归零；4619 tests 通过；体积无回归。                                                                                |
 | PR-2      | tailwindcss core v3 → v4（重写 plugin）                          | ⬜ Pending |            |                                                                                                                                                           |
 | PR-3      | 非破坏性依赖统一升级                                             | ✅ Done    | 2026-04-28 | 14 项依赖小版本升级（vue 3.5.33 等）；4619 tests 通过；体积小幅变化（Vue +866 B 来自 vue 运行时）。                                                       |
-| PR-4      | i18n locales 子路径化 + 主入口仅 enUS                            | ⬜ Pending |            |                                                                                                                                                           |
+| PR-4      | i18n locales 子路径化 + 主入口仅 enUS                            | ✅ Done    | 2026-04-28 | 拆分 `locales.ts` → `i18n/locales/{en-US,zh-CN,zh-TW,ja-JP,ko-KR,th-TH,vi-VN,id-ID}.ts`；新增 `tsup.config.ts` 多入口构建；package.json 暴露 `@expcat/tigercat-core/locales/<bcp47>` 子路径；主入口仍 re-export 保持向后兼容；i18n.md 文档新增懒加载/子路径示例；4619 tests 通过。 |
 | PR-5      | icons 按使用方分组 + 子路径                                      | ⬜ Pending |            |                                                                                                                                                           |
 | PR-6      | 主题 token 增量（modern preset）                                 | ⬜ Pending |            |                                                                                                                                                           |
 | PR-7      | examples 加 4 件套切换器 + 共享布局                              | ⬜ Pending |            |                                                                                                                                                           |
@@ -160,6 +160,18 @@ PR-H  commander 14（CLI）
 | PR-25     | vue-router 5 / commander 14（孤立升级）                          | ⬜ Pending |            |                                                                                                                                                           |
 
 **下一步建议**：执行 PR-10（Form picker 共享层 Select/Cascader/AutoComplete/Tree/Transfer → picker-utils）或 PR-12（chart-utils 拆分 + chart 配色 token）。PR-2（Tailwind v4）需要中等回归验证。
+
+### 基线快照（PR-4 完成后）
+
+| 指标                               | 数值      | 上限      |
+| ---------------------------------- | --------- | --------- |
+| Core (full)                        | 69,850 B  | 100,000 B |
+| Vue (full)                         | 194,410 B | 250,000 B |
+| React (full)                       | 224,700 B | 250,000 B |
+| Tests                              | 4619 pass | —         |
+| esbuild WARN `ignored-bare-import` | 0         | —         |
+
+> 主入口体积无回归（向后兼容 re-export 仍包含全部 locales）。新增 8 个 locale 子路径产物，单文件约 0.9–1.7 KB（ESM）/ 1.0–1.8 KB（CJS），下游按需 `import` 即可仅打包所选语言（中文用户可省 ~3 KB 其他语言数据）。
 
 ### 基线快照（PR-13 完成后）
 
