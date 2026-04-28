@@ -1,7 +1,6 @@
 import { defineComponent, computed, h, PropType } from 'vue'
 import {
-  classNames,
-  coerceClassValue,
+  composeComponentClasses,
   mergeStyleValues,
   buttonBaseClasses,
   buttonSizeClasses,
@@ -29,20 +28,23 @@ export interface VueButtonProps {
   style?: Record<string, unknown>
 }
 
-const spinnerSvg = getSpinnerSVG('spinner')
-
-const LoadingSpinner = h(
-  'svg',
-  {
-    class: 'animate-spin h-4 w-4',
-    xmlns: 'http://www.w3.org/2000/svg',
-    fill: 'none',
-    viewBox: spinnerSvg.viewBox,
-    'aria-hidden': 'true',
-    focusable: 'false'
-  },
-  spinnerSvg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
-)
+// Factory — must NOT be hoisted to module scope. Returning a fresh vnode per call
+// avoids cross-instance vnode reuse during SSR / concurrent renders.
+const createLoadingSpinner = () => {
+  const spinnerSvg = getSpinnerSVG('spinner')
+  return h(
+    'svg',
+    {
+      class: 'animate-spin h-4 w-4',
+      xmlns: 'http://www.w3.org/2000/svg',
+      fill: 'none',
+      viewBox: spinnerSvg.viewBox,
+      'aria-hidden': 'true',
+      focusable: 'false'
+    },
+    spinnerSvg.elements.map((el) => h(el.type, normalizeSvgAttrs(el.attrs)))
+  )
+}
 
 export const Button = defineComponent({
   name: 'TigerButton',
@@ -117,14 +119,14 @@ export const Button = defineComponent({
         ? (buttonDangerClasses[props.variant] ?? buttonDangerClasses.primary)
         : getButtonVariantClasses(props.variant)
 
-      return classNames(
+      return composeComponentClasses(
         buttonBaseClasses,
         variantClasses,
         buttonSizeClasses[props.size],
         (props.disabled || props.loading) && buttonDisabledClasses,
         props.block && 'w-full',
         props.className,
-        coerceClassValue(attrs.class)
+        attrs.class
       )
     })
 
@@ -138,7 +140,7 @@ export const Button = defineComponent({
         ? h(
             'span',
             { class: iconIsRight ? 'ml-2 order-1' : 'mr-2' },
-            slots['loading-icon'] ? slots['loading-icon']() : LoadingSpinner
+            slots['loading-icon'] ? slots['loading-icon']() : createLoadingSpinner()
           )
         : null
 

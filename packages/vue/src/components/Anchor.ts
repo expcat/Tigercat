@@ -19,7 +19,7 @@ import {
   getAnchorInkContainerClasses,
   getAnchorInkActiveClasses,
   getAnchorLinkListClasses,
-  findActiveAnchor,
+  createAnchorObserver,
   scrollToAnchor,
   type AnchorDirection
 } from '@expcat/tigercat-core'
@@ -133,7 +133,6 @@ export const Anchor = defineComponent({
     const inkRef = ref<HTMLElement | null>(null)
     const isScrolling = ref(false)
 
-    let animationFrameId: number | null = null
     let scrollTimeoutId: ReturnType<typeof setTimeout> | null = null
 
     // Get current container (call fresh each time to handle lazy refs)
@@ -154,31 +153,25 @@ export const Anchor = defineComponent({
       links.value = links.value.filter((l) => l !== href)
     }
 
-    // Handle scroll events
-    const handleScroll = () => {
-      if (isScrolling.value) return
+    // Active link tracking via IntersectionObserver
+    let stopObserver: (() => void) | null = null
 
-      if (animationFrameId !== null) {
-        cancelAnimationFrame(animationFrameId)
-      }
-
-      animationFrameId = requestAnimationFrame(() => {
-        const container = getContainer()
-        const newActiveLink = findActiveAnchor(
-          links.value,
-          container,
-          props.bounds,
-          scrollOffset.value
-        )
-
-        // Apply custom getCurrentAnchor if provided
-        const finalActiveLink = props.getCurrentAnchor
-          ? props.getCurrentAnchor(newActiveLink)
-          : newActiveLink
-
-        if (finalActiveLink !== activeLink.value) {
-          activeLink.value = finalActiveLink
-          emit('change', finalActiveLink)
+    const setupObserver = () => {
+      stopObserver?.()
+      const container = getContainer()
+      const root = container === window ? null : (container as Element)
+      stopObserver = createAnchorObserver(links.value, {
+        offsetTop: scrollOffset.value,
+        root,
+        onChange: (newActiveLink) => {
+          if (isScrolling.value) return
+          const finalActiveLink = props.getCurrentAnchor
+            ? props.getCurrentAnchor(newActiveLink)
+            : newActiveLink
+          if (finalActiveLink !== activeLink.value) {
+            activeLink.value = finalActiveLink
+            emit('change', finalActiveLink)
+          }
         }
       })
     }
@@ -241,27 +234,22 @@ export const Anchor = defineComponent({
     watch(() => props.direction, updateInkPosition)
 
     // Store current container for cleanup
-    let currentContainer: HTMLElement | Window | null = null
-
     onMounted(() => {
       // Use nextTick to ensure sibling refs are ready
       nextTick(() => {
-        currentContainer = getContainer()
-        currentContainer.addEventListener('scroll', handleScroll, { passive: true })
-        handleScroll()
-
+        setupObserver()
         // Initial ink position update
         setTimeout(updateInkPosition, 0)
       })
     })
 
+    // Re-setup observer when links list or offset changes
+    watch([links, scrollOffset, () => props.getContainer], () => {
+      nextTick(() => setupObserver())
+    })
+
     onBeforeUnmount(() => {
-      if (currentContainer) {
-        currentContainer.removeEventListener('scroll', handleScroll)
-      }
-      if (animationFrameId !== null) {
-        cancelAnimationFrame(animationFrameId)
-      }
+      stopObserver?.()
       if (scrollTimeoutId !== null) {
         clearTimeout(scrollTimeoutId)
       }

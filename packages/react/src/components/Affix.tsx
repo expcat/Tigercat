@@ -3,6 +3,7 @@ import {
   classNames,
   calculateAffixState,
   resolveAffixTarget,
+  createAffixObserver,
   type AffixProps as CoreAffixProps,
   type AffixState
 } from '@expcat/tigercat-core'
@@ -25,7 +26,7 @@ export const Affix: React.FC<AffixProps> = ({
   ...props
 }) => {
   const wrapperRef = useRef<HTMLDivElement>(null)
-  const placeholderRef = useRef<HTMLDivElement>(null)
+  const sentinelRef = useRef<HTMLDivElement>(null)
   const originalRectRef = useRef<{
     top: number
     left: number
@@ -33,58 +34,106 @@ export const Affix: React.FC<AffixProps> = ({
     height: number
   } | null>(null)
   const [state, setState] = useState<AffixState>({ affixed: false, style: {} })
-  const prevAffixed = useRef(false)
+  const stateRef = useRef(state)
+  stateRef.current = state
+  const onChangeRef = useRef(onChange)
+  onChangeRef.current = onChange
 
-  const update = useCallback(() => {
-    const el =
-      prevAffixed.current && placeholderRef.current ? placeholderRef.current : wrapperRef.current
-    if (!el) return
+  const recalcStyle = useCallback(
+    (affixed: boolean) => {
+      const el = wrapperRef.current
+      if (!el) return
 
-    const rect = el.getBoundingClientRect()
-    if (!originalRectRef.current || !prevAffixed.current) {
-      originalRectRef.current = {
-        top: rect.top,
-        left: rect.left,
-        width: rect.width,
-        height: rect.height
+      if (!stateRef.current.affixed) {
+        const rect = el.getBoundingClientRect()
+        originalRectRef.current = {
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height
+        }
       }
-    }
+      if (!originalRectRef.current) return
 
-    const resolved = resolveAffixTarget(target)
-    const containerRect = resolved.getRect()
+      const resolved = resolveAffixTarget(target)
+      const containerRect = resolved.getRect()
 
-    const newState = calculateAffixState(
-      originalRectRef.current,
-      containerRect,
-      offsetBottom !== undefined ? undefined : offsetTop,
-      offsetBottom,
-      zIndex
-    )
+      if (!affixed) {
+        if (stateRef.current.affixed) {
+          setState({ affixed: false, style: {} })
+          onChangeRef.current?.(false)
+        }
+        return
+      }
 
-    if (newState.affixed !== prevAffixed.current) {
-      prevAffixed.current = newState.affixed
-      onChange?.(newState.affixed)
-    }
-    setState(newState)
-  }, [offsetTop, offsetBottom, target, zIndex, onChange])
+      const next = calculateAffixState(
+        {
+          top: -1,
+          left: originalRectRef.current.left,
+          width: originalRectRef.current.width,
+          height: originalRectRef.current.height
+        },
+        containerRect,
+        offsetBottom !== undefined ? undefined : offsetTop,
+        offsetBottom,
+        zIndex
+      )
+      if (!next.affixed) {
+        if (stateRef.current.affixed) {
+          setState({ affixed: false, style: {} })
+          onChangeRef.current?.(false)
+        }
+        return
+      }
+      const wasAffixed = stateRef.current.affixed
+      setState(next)
+      if (!wasAffixed) onChangeRef.current?.(true)
+    },
+    [offsetTop, offsetBottom, target, zIndex]
+  )
 
   useEffect(() => {
+    if (!sentinelRef.current) return undefined
     const resolved = resolveAffixTarget(target)
-    const scrollEl = resolved.element
-    scrollEl.addEventListener('scroll', update, { passive: true })
-    window.addEventListener('resize', update, { passive: true })
-    update()
-    return () => {
-      scrollEl.removeEventListener('scroll', update)
-      window.removeEventListener('resize', update)
+    const root = resolved.element === window ? null : (resolved.element as Element)
+    const stop = createAffixObserver(sentinelRef.current, {
+      offsetTop,
+      offsetBottom,
+      root,
+      onToggle: (affixed) => recalcStyle(affixed)
+    })
+
+    let resizeObs: ResizeObserver | null = null
+    const onResize = () => {
+      if (stateRef.current.affixed) recalcStyle(true)
     }
-  }, [target, update])
+    if (typeof ResizeObserver !== 'undefined' && wrapperRef.current) {
+      resizeObs = new ResizeObserver(() => onResize())
+      resizeObs.observe(wrapperRef.current)
+    }
+    window.addEventListener('resize', onResize, { passive: true })
+
+    return () => {
+      stop()
+      resizeObs?.disconnect()
+      window.removeEventListener('resize', onResize)
+    }
+  }, [offsetTop, offsetBottom, target, recalcStyle])
 
   const wrapperClasses = useMemo(() => classNames(className), [className])
 
+  const sentinel = (
+    <div
+      ref={sentinelRef}
+      aria-hidden="true"
+      style={{ display: 'block', width: 0, height: 0, pointerEvents: 'none' }}
+    />
+  )
+
   if (state.affixed) {
     return (
-      <div ref={placeholderRef}>
+      <div>
+        {sentinel}
         <div
           style={{
             width: originalRectRef.current?.width ?? 0,
@@ -103,8 +152,11 @@ export const Affix: React.FC<AffixProps> = ({
   }
 
   return (
-    <div ref={wrapperRef} className={wrapperClasses} {...props}>
-      {children}
+    <div>
+      {sentinel}
+      <div ref={wrapperRef} className={wrapperClasses} {...props}>
+        {children}
+      </div>
     </div>
   )
 }

@@ -1,10 +1,11 @@
-import { defineComponent, h, ref, onMounted, onBeforeUnmount, PropType } from 'vue'
+import { defineComponent, h, ref, onMounted, onBeforeUnmount, watch, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
   calculateAffixState,
   resolveAffixTarget,
+  createAffixObserver,
   type AffixState
 } from '@expcat/tigercat-core'
 
@@ -34,20 +35,19 @@ export const Affix = defineComponent({
   emits: ['change'],
   setup(props, { slots, emit, attrs }) {
     const wrapperRef = ref<HTMLElement | null>(null)
-    const placeholderRef = ref<HTMLElement | null>(null)
+    const sentinelRef = ref<HTMLElement | null>(null)
     const state = ref<AffixState>({ affixed: false, style: {} })
     const originalRect = ref<{ top: number; left: number; width: number; height: number } | null>(
       null
     )
 
-    const update = () => {
-      if (!wrapperRef.value) return
+    const recalcStyle = (affixed: boolean) => {
+      const el = wrapperRef.value
+      if (!el) return
 
-      const el =
-        state.value.affixed && placeholderRef.value ? placeholderRef.value : wrapperRef.value
-
-      const rect = el.getBoundingClientRect()
-      if (!originalRect.value || !state.value.affixed) {
+      // Capture original layout rect when not affixed
+      if (!state.value.affixed) {
+        const rect = el.getBoundingClientRect()
         originalRect.value = {
           top: rect.top,
           left: rect.left,
@@ -55,44 +55,103 @@ export const Affix = defineComponent({
           height: rect.height
         }
       }
+      if (!originalRect.value) return
 
       const resolved = resolveAffixTarget(props.target)
       const containerRect = resolved.getRect()
 
-      const newState = calculateAffixState(
-        originalRect.value,
+      if (!affixed) {
+        if (state.value.affixed) {
+          state.value = { affixed: false, style: {} }
+          emit('change', false)
+        }
+        return
+      }
+
+      // Force-affixed: build the fixed style using the captured rect.
+      const next = calculateAffixState(
+        // Force the calc into the affix branch by lifting the element above the threshold
+        {
+          top: -1,
+          left: originalRect.value.left,
+          width: originalRect.value.width,
+          height: originalRect.value.height
+        },
         containerRect,
         props.offsetBottom !== undefined ? undefined : props.offsetTop,
         props.offsetBottom,
         props.zIndex
       )
-
-      if (newState.affixed !== state.value.affixed) {
-        emit('change', newState.affixed)
+      if (!next.affixed) {
+        // Calc didn't think we should affix (e.g. container changed). Mirror it.
+        if (state.value.affixed) {
+          state.value = { affixed: false, style: {} }
+          emit('change', false)
+        }
+        return
       }
-      state.value = newState
+      const wasAffixed = state.value.affixed
+      state.value = next
+      if (!wasAffixed) emit('change', true)
     }
 
-    let scrollTarget: Element | Window | null = null
-    onMounted(() => {
+    let stopObserver: (() => void) | null = null
+    let resizeObserver: ResizeObserver | null = null
+
+    const setupObserver = () => {
+      stopObserver?.()
+      const sentinel = sentinelRef.value
+      if (!sentinel) return
       const resolved = resolveAffixTarget(props.target)
-      scrollTarget = resolved.element
-      scrollTarget.addEventListener('scroll', update, { passive: true })
-      window.addEventListener('resize', update, { passive: true })
-      update()
+      const root = resolved.element === window ? null : (resolved.element as Element)
+      stopObserver = createAffixObserver(sentinel, {
+        offsetTop: props.offsetTop,
+        offsetBottom: props.offsetBottom,
+        root,
+        onToggle: (affixed) => recalcStyle(affixed)
+      })
+    }
+
+    const onResize = () => {
+      if (state.value.affixed) recalcStyle(true)
+    }
+
+    onMounted(() => {
+      setupObserver()
+      if (typeof ResizeObserver !== 'undefined' && wrapperRef.value) {
+        resizeObserver = new ResizeObserver(() => onResize())
+        resizeObserver.observe(wrapperRef.value)
+      }
+      window.addEventListener('resize', onResize, { passive: true })
     })
+
+    watch(
+      () => [props.target, props.offsetTop, props.offsetBottom],
+      () => setupObserver()
+    )
+
     onBeforeUnmount(() => {
-      scrollTarget?.removeEventListener('scroll', update)
-      window.removeEventListener('resize', update)
+      stopObserver?.()
+      resizeObserver?.disconnect()
+      window.removeEventListener('resize', onResize)
     })
 
     return () => {
       const attrsRecord = attrs as Record<string, unknown>
       const children = slots.default?.()
 
+      // The sentinel is always rendered at the original DOM position so the
+      // IntersectionObserver can detect when scroll passes it.
+      const sentinel = h('div', {
+        ref: sentinelRef,
+        'aria-hidden': 'true',
+        style: { display: 'block', width: '0', height: '0', pointerEvents: 'none' }
+      })
+
       if (state.value.affixed) {
-        // Insert a placeholder to maintain layout, then render fixed content
-        return h('div', { ref: placeholderRef }, [
+        return h('div', [
+          sentinel,
+          // placeholder reserves layout space
           h('div', {
             style: {
               width: `${originalRect.value?.width ?? 0}px`,
@@ -112,16 +171,19 @@ export const Affix = defineComponent({
         ])
       }
 
-      return h(
-        'div',
-        {
-          ref: wrapperRef,
-          ...attrs,
-          class: classNames(props.className, coerceClassValue(attrsRecord.class)),
-          style: mergeStyleValues(attrsRecord.style, props.style)
-        },
-        children
-      )
+      return h('div', [
+        sentinel,
+        h(
+          'div',
+          {
+            ref: wrapperRef,
+            ...attrs,
+            class: classNames(props.className, coerceClassValue(attrsRecord.class)),
+            style: mergeStyleValues(attrsRecord.style, props.style)
+          },
+          children
+        )
+      ])
     }
   }
 })

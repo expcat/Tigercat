@@ -112,3 +112,59 @@ export function resolveAffixTarget(selector?: string): {
     }
   }
 }
+
+// ---------------------------------------------------------------------------
+// IntersectionObserver-based affix detection (preferred over scroll listeners)
+// ---------------------------------------------------------------------------
+
+export interface AffixObserverOptions {
+  /** Distance from top of root to start affixing (mutually exclusive with offsetBottom) */
+  offsetTop?: number
+  /** Distance from bottom of root to start affixing (takes priority over offsetTop) */
+  offsetBottom?: number
+  /** Scroll root. `null` = viewport. */
+  root?: Element | null
+  /** Called whenever the affixed state toggles. */
+  onToggle: (affixed: boolean) => void
+}
+
+/**
+ * Create an IntersectionObserver-based affix detector.
+ *
+ * The `sentinel` should be a zero-height marker placed at the original DOM
+ * position of the affixed content. As the viewport scrolls past the sentinel
+ * (offset by `rootMargin`), `onToggle(true)` fires; when it scrolls back,
+ * `onToggle(false)` fires.
+ *
+ * Returns a teardown function. Safe to call when `IntersectionObserver` is
+ * unavailable (returns a no-op cleanup).
+ */
+export function createAffixObserver(sentinel: Element, options: AffixObserverOptions): () => void {
+  if (typeof IntersectionObserver === 'undefined') return () => {}
+
+  const { offsetTop = 0, offsetBottom, root = null, onToggle } = options
+
+  const rootMargin =
+    offsetBottom !== undefined ? `0px 0px -${offsetBottom}px 0px` : `-${offsetTop}px 0px 0px 0px`
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const entry = entries[entries.length - 1]
+      if (!entry) return
+      const rootBoundsTop = entry.rootBounds?.top ?? 0
+      const rootBoundsBottom =
+        entry.rootBounds?.bottom ?? (typeof window !== 'undefined' ? window.innerHeight : 0)
+      let affixed: boolean
+      if (offsetBottom !== undefined) {
+        affixed = !entry.isIntersecting && entry.boundingClientRect.bottom > rootBoundsBottom
+      } else {
+        affixed = !entry.isIntersecting && entry.boundingClientRect.top < rootBoundsTop
+      }
+      onToggle(affixed)
+    },
+    { root, rootMargin, threshold: [0, 1] }
+  )
+
+  observer.observe(sentinel)
+  return () => observer.disconnect()
+}

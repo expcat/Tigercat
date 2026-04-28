@@ -13,7 +13,7 @@ import {
   getAnchorInkContainerClasses,
   getAnchorInkActiveClasses,
   getAnchorLinkListClasses,
-  findActiveAnchor,
+  createAnchorObserver,
   scrollToAnchor,
   type AnchorDirection,
   type AnchorProps as CoreAnchorProps
@@ -81,11 +81,14 @@ export const Anchor: React.FC<AnchorProps> = ({
   const anchorRef = useRef<HTMLDivElement>(null)
   const inkRef = useRef<HTMLDivElement>(null)
   const isScrollingRef = useRef(false)
-  const animationFrameRef = useRef<number | null>(null)
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Cache getContainer to avoid recreating on every render
   const getContainerRef = useRef(getContainer)
   getContainerRef.current = getContainer
+  const getCurrentAnchorRef = useRef(getCurrentAnchor)
+  getCurrentAnchorRef.current = getCurrentAnchor
+  const onChangeRef = useRef(onChange)
+  onChangeRef.current = onChange
 
   // Get scroll offset
   const scrollOffset = useMemo(() => targetOffset ?? offsetTop, [targetOffset, offsetTop])
@@ -120,7 +123,7 @@ export const Anchor: React.FC<AnchorProps> = ({
       // Note: preventDefault is called by AnchorLink before invoking this handler
       onClick?.(event, href)
 
-      // Prevent scroll handler from running during programmatic scroll
+      // Prevent observer from running during programmatic scroll
       isScrollingRef.current = true
       setActiveLink(href)
 
@@ -136,57 +139,41 @@ export const Anchor: React.FC<AnchorProps> = ({
     [onClick, scrollTo]
   )
 
-  // Handle scroll events
+  // Active link tracking via IntersectionObserver
   useEffect(() => {
-    let container: HTMLElement | Window | null = null
-    let handleScroll: (() => void) | null = null
+    let stop: (() => void) | null = null
 
-    // Small delay to ensure sibling refs are ready
+    // Small delay to ensure target sections are mounted
     const timeoutId = setTimeout(() => {
-      container = getContainerRef.current()
-
-      handleScroll = () => {
-        if (isScrollingRef.current) return
-
-        if (animationFrameRef.current !== null) {
-          cancelAnimationFrame(animationFrameRef.current)
-        }
-
-        animationFrameRef.current = requestAnimationFrame(() => {
-          // Get container fresh each time to handle dynamic refs
-          const currentContainer = getContainerRef.current()
-          const newActiveLink = findActiveAnchor(links, currentContainer, bounds, scrollOffset)
-
-          // Apply custom getCurrentAnchor if provided
-          const finalActiveLink = getCurrentAnchor ? getCurrentAnchor(newActiveLink) : newActiveLink
-
-          setActiveLink((prevActiveLink) => {
-            if (finalActiveLink !== prevActiveLink) {
-              onChange?.(finalActiveLink)
+      const container = getContainerRef.current()
+      const root = container === window ? null : (container as Element)
+      stop = createAnchorObserver(links, {
+        offsetTop: scrollOffset,
+        root,
+        onChange: (newActiveLink) => {
+          if (isScrollingRef.current) return
+          const finalActiveLink = getCurrentAnchorRef.current
+            ? getCurrentAnchorRef.current(newActiveLink)
+            : newActiveLink
+          setActiveLink((prev) => {
+            if (finalActiveLink !== prev) {
+              onChangeRef.current?.(finalActiveLink)
               return finalActiveLink
             }
-            return prevActiveLink
+            return prev
           })
-        })
-      }
-
-      container.addEventListener('scroll', handleScroll, { passive: true })
-      handleScroll()
+        }
+      })
     }, 0)
 
     return () => {
       clearTimeout(timeoutId)
-      if (container && handleScroll) {
-        container.removeEventListener('scroll', handleScroll)
-      }
-      if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current)
-      }
+      stop?.()
       if (scrollTimeoutRef.current !== null) {
         clearTimeout(scrollTimeoutRef.current)
       }
     }
-  }, [links, bounds, scrollOffset, getCurrentAnchor, onChange])
+  }, [links, scrollOffset])
 
   // Update ink position
   useEffect(() => {

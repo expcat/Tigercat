@@ -127,7 +127,89 @@ PR-H  commander 14（CLI）
 
 ---
 
-## 7. 总览统计
+## 7. 执行进度跟踪 (Execution Tracker)
+
+> 每次执行一个 PR/Phase，完成后在此更新状态。下次会话可据此继续。
+
+| PR        | 标题                                                             | 状态       | 完成日期   | 备注                                                                                                                                                      |
+| --------- | ---------------------------------------------------------------- | ---------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **PR-1**  | sideEffects 修复（vue + react package.json）                     | ✅ Done    | 2026-04-28 | 修复 esbuild `ignored-bare-import` 警告归零；4619 tests 通过；体积无回归。                                                                                |
+| PR-2      | tailwindcss core v3 → v4（重写 plugin）                          | ⬜ Pending |            |                                                                                                                                                           |
+| PR-3      | 非破坏性依赖统一升级                                             | ✅ Done    | 2026-04-28 | 14 项依赖小版本升级（vue 3.5.33 等）；4619 tests 通过；体积小幅变化（Vue +866 B 来自 vue 运行时）。                                                       |
+| PR-4      | i18n locales 子路径化 + 主入口仅 enUS                            | ⬜ Pending |            |                                                                                                                                                           |
+| PR-5      | icons 按使用方分组 + 子路径                                      | ⬜ Pending |            |                                                                                                                                                           |
+| PR-6      | 主题 token 增量（modern preset）                                 | ⬜ Pending |            |                                                                                                                                                           |
+| PR-7      | examples 加 4 件套切换器 + 共享布局                              | ⬜ Pending |            |                                                                                                                                                           |
+| PR-8      | CLI 模板升级 v4 + modern                                         | ⬜ Pending |            |                                                                                                                                                           |
+| PR-9      | Vue Button SSR + 横切 utils 优化（class composer）               | ✅ Done    | 2026-04-28 | 新增 `composeComponentClasses` (core); Vue Button 的 module-level vnode 改为 `createLoadingSpinner()` 工厂；Button 改用新 composer。4619 tests 通过。     |
+| PR-10     | Form picker 共享层 (Select/Cascader/...)                         | ⬜ Pending |            |                                                                                                                                                           |
+| PR-11     | DatePicker/TimePicker 复用 date-utils 去重                       | ⬜ Pending |            |                                                                                                                                                           |
+| PR-12     | chart-utils.ts 拆分 + chart 配色 token                           | ⬜ Pending |            |                                                                                                                                                           |
+| PR-13     | Affix/Anchor → IntersectionObserver                              | ✅ Done    | 2026-04-28 | 新增 `createAffixObserver` + `createAnchorObserver` (core)；Affix 改 IO + sentinel + ResizeObserver；Anchor 改 IO 替换 scroll listener；4619 tests 通过。 |
+| PR-14     | Tree 使用 VirtualList + ChatWindow 强制 virtual                  | ⬜ Pending |            |                                                                                                                                                           |
+| PR-15     | Composite 去重（DataTableWithToolbar / CropUpload / FormWizard） | ⬜ Pending |            |                                                                                                                                                           |
+| PR-16     | Table 单文件拆分 (~10 子文件)                                    | ⬜ Pending |            |                                                                                                                                                           |
+| PR-17     | CodeEditor / RichTextEditor engine 化                            | ⬜ Pending |            |                                                                                                                                                           |
+| PR-18     | Kanban + TaskBoard 合并方案讨论 + 实施                           | ⬜ Pending |            |                                                                                                                                                           |
+| PR-19a..k | 各组组件样式现代化（按 phase2 分组依次）                         | ⬜ Pending |            |                                                                                                                                                           |
+| PR-20     | examples 重构（按 SKILL 分类、lazy、demo 模板）                  | ⬜ Pending |            |                                                                                                                                                           |
+| PR-21     | tests 覆盖率补齐 + a11y/视觉回归                                 | ⬜ Pending |            |                                                                                                                                                           |
+| PR-22     | TypeScript 6 + vue-tsc 3 升级                                    | ⬜ Pending |            |                                                                                                                                                           |
+| PR-23     | Vite 8 + plugin-react/vue 升级                                   | ⬜ Pending |            |                                                                                                                                                           |
+| PR-24     | ESLint 10 升级                                                   | ⬜ Pending |            |                                                                                                                                                           |
+| PR-25     | vue-router 5 / commander 14（孤立升级）                          | ⬜ Pending |            |                                                                                                                                                           |
+
+**下一步建议**：执行 PR-10（Form picker 共享层 Select/Cascader/AutoComplete/Tree/Transfer → picker-utils）或 PR-12（chart-utils 拆分 + chart 配色 token）。PR-2（Tailwind v4）需要中等回归验证。
+
+### 基线快照（PR-13 完成后）
+
+| 指标                               | 数值      | 上限      |
+| ---------------------------------- | --------- | --------- |
+| Core (full)                        | 69,873 B  | 100,000 B |
+| Vue (full)                         | 194,439 B | 250,000 B |
+| React (full)                       | 224,718 B | 250,000 B |
+| Tests                              | 4619 pass | —         |
+| esbuild WARN `ignored-bare-import` | 0         | —         |
+
+> 体积变化（vs PR-3 基线）：Core +452 B（两个 IO observer 工厂）/ Vue +682 B（Affix sentinel + ResizeObserver）/ React +607 B（同上）。性能：滚动事件 → IO 回调，长列表/嵌入容器场景 CPU 占用显著降低。
+
+### 基线快照（PR-3 完成后）
+
+| 指标                               | 数值      | 上限      |
+| ---------------------------------- | --------- | --------- |
+| Core (full)                        | 69,421 B  | 100,000 B |
+| Vue (full)                         | 193,757 B | 250,000 B |
+| React (full)                       | 224,111 B | 250,000 B |
+| Tests                              | 4619 pass | —         |
+| esbuild WARN `ignored-bare-import` | 0         | —         |
+
+> 依赖升级本身带来 Vue +866 B（vue 3.5.33 运行时微增）、React/Core 微变化。
+
+### 基线快照（PR-9 完成后）
+
+| 指标                               | 数值      | 上限      |
+| ---------------------------------- | --------- | --------- |
+| Core (full)                        | 69,460 B  | 100,000 B |
+| Vue (full)                         | 192,891 B | 250,000 B |
+| React (full)                       | 224,097 B | 250,000 B |
+| Tests                              | 4619 pass | —         |
+| esbuild WARN `ignored-bare-import` | 0         | —         |
+
+> 体积变化：Core +60 B / Vue +71 B / React +46 B，源自新增 `composeComponentClasses` helper（一次性成本，后续多组件迁移不再增加）。
+
+### 基线快照（PR-1 完成后）
+
+| 指标                               | 数值      | 上限      |
+| ---------------------------------- | --------- | --------- |
+| Core (full)                        | 69,400 B  | 100,000 B |
+| Vue (full)                         | 192,820 B | 250,000 B |
+| React (full)                       | 224,051 B | 250,000 B |
+| Tests                              | 4619 pass | —         |
+| esbuild WARN `ignored-bare-import` | 0         | —         |
+
+---
+
+## 8. 总览统计
 
 - 报告文件：14 份（baseline / deps-matrix / phase1b-d / phase2.1-2.9 / SUMMARY）
 - 优化项总条数：约 120 项（P0 ≈ 22，P1 ≈ 70，P2 ≈ 30）

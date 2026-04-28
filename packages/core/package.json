@@ -49,7 +49,7 @@
     "clean": "node ../../scripts/rimraf.mjs dist"
   },
   "dependencies": {
-    "@floating-ui/dom": "^1.6.13"
+    "@floating-ui/dom": "^1.7.6"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.19",

@@ -4,6 +4,7 @@
 
 export * from '../class-names'
 export * from '../coerce-class-value'
+export * from '../compose-classes'
 export * from '../env'
 export * from '../style-values'
 export * from '../copy-text'
