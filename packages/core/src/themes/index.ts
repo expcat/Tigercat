@@ -37,6 +37,16 @@ export { vibrantTheme } from './vibrant/theme'
 export { professionalTheme } from './professional/theme'
 export { minimalTheme } from './minimal/theme'
 export { naturalTheme } from './natural/theme'
+export { modernTheme } from './modern/theme'
+
+// Re-export modern token layer (opt-in extended design tokens)
+export {
+  MODERN_BASE_TOKENS_LIGHT,
+  MODERN_BASE_TOKENS_DARK,
+  MODERN_OVERRIDE_TOKENS_LIGHT,
+  MODERN_OVERRIDE_TOKENS_DARK,
+  MODERN_REDUCED_MOTION_TOKENS
+} from './modern/tokens'
 
 // Re-export types (also available from types/theme)
 export type {
@@ -57,8 +67,16 @@ import { vibrantTheme } from './vibrant/theme'
 import { professionalTheme } from './professional/theme'
 import { minimalTheme } from './minimal/theme'
 import { naturalTheme } from './natural/theme'
+import { modernTheme } from './modern/theme'
 
-const builtInPresets = [defaultTheme, vibrantTheme, professionalTheme, minimalTheme, naturalTheme]
+const builtInPresets = [
+  defaultTheme,
+  vibrantTheme,
+  professionalTheme,
+  minimalTheme,
+  naturalTheme,
+  modernTheme
+]
 
 for (const preset of builtInPresets) {
   ThemeManager.registerTheme(preset)

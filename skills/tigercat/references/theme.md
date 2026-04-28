@@ -18,6 +18,43 @@ export default { plugins: [tigercatPlugin] }
 
 ---
 
+## Modern Style 主题（opt-in，1.1+）
+
+`tigercatPlugin` 默认会注入一组扩展 token（`--tiger-radius-*` / `--tiger-shadow-*` / `--tiger-blur-glass*` / `--tiger-gradient-*` / `--tiger-motion-*`），值与现有视觉一致，可安全引用。
+
+如需启用 **Modern** 视觉（更圆的圆角、多层阴影、毛玻璃、OKLab 渐变、refined easing），改用工厂方法并传 `modern: true`：
+
+```js
+// tailwind.config.js
+import { createTigercatPlugin, modernTheme } from '@expcat/tigercat-core'
+
+export default {
+  plugins: [createTigercatPlugin({ preset: modernTheme, modern: true })]
+}
+```
+
+然后在 `<html>`（或任意祖先）打开开关：
+
+```html
+<html data-tiger-style="modern" class="dark">
+  ...
+</html>
+```
+
+| 行为                 | 默认（无 `modern`）   | `modern: true` + `data-tiger-style="modern"` |
+| -------------------- | --------------------- | -------------------------------------------- |
+| `--tiger-radius-md`  | `0.5rem`              | `12px`                                       |
+| `--tiger-shadow-md`  | 单层（Tailwind 默认） | 多层 elevations                              |
+| `--tiger-blur-glass` | `0px`（无毛玻璃）     | `16px`                                       |
+| 渐变                 | 平铺                  | OKLab `color-mix` 渐变                       |
+| Spring easing        | `cubic-bezier`        | `linear()` 弹簧（Chrome 113+）               |
+
+`prefers-reduced-motion: reduce` 自动将所有 `--tiger-motion-duration-*` 收敛为 `0ms`。
+
+> Vue / React 用法相同——只需切换 `<html>` 上的 `data-tiger-style` 属性即可热切换。
+
+---
+
 ## CSS 变量
 
 ### 核心变量

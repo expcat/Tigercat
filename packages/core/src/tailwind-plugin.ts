@@ -1,6 +1,13 @@
 import plugin from 'tailwindcss/plugin'
 import type { ThemePreset, ThemeSemanticColors } from './types/theme'
 import { THEME_CSS_VARS } from './theme'
+import {
+  MODERN_BASE_TOKENS_LIGHT,
+  MODERN_BASE_TOKENS_DARK,
+  MODERN_OVERRIDE_TOKENS_LIGHT,
+  MODERN_OVERRIDE_TOKENS_DARK,
+  MODERN_REDUCED_MOTION_TOKENS
+} from './themes/modern/tokens'
 
 /**
  * Default theme colors for Tigercat
@@ -87,8 +94,8 @@ export const tigercatDarkTheme: Record<string, string> = {
  */
 export const tigercatPlugin = plugin(function ({ addBase }) {
   addBase({
-    ':root': tigercatTheme,
-    '.dark': tigercatDarkTheme,
+    ':root': { ...tigercatTheme, ...MODERN_BASE_TOKENS_LIGHT },
+    '.dark': { ...tigercatDarkTheme, ...MODERN_BASE_TOKENS_DARK },
     // Remove browser default focus outline on interactive SVG elements
     'svg [tabindex], svg [role="button"]': {
       outline: 'none'
@@ -114,6 +121,20 @@ function presetToVars(colors: Partial<ThemeSemanticColors>): Record<string, stri
 export interface TigercatPluginOptions {
   /** A ThemePreset object to use instead of the built-in default */
   preset?: ThemePreset
+  /**
+   * Enable the opt-in "modern" token layer.
+   *
+   * When `true`, the plugin emits `[data-tiger-style="modern"]` (and the
+   * dark counterpart) blocks that override radius / shadow / glass /
+   * gradient / motion tokens with the modern values, plus a
+   * `prefers-reduced-motion` rule that collapses motion durations.
+   *
+   * Activate it on a page by setting `data-tiger-style="modern"` on `<html>`
+   * or any ancestor element of your Tigercat tree.
+   *
+   * @default false
+   */
+  modern?: boolean
 }
 
 /**
@@ -121,11 +142,13 @@ export interface TigercatPluginOptions {
  *
  * @example
  * ```ts
- * import { createTigercatPlugin, vibrantTheme } from '@expcat/tigercat-core'
+ * import { createTigercatPlugin, vibrantTheme, modernTheme } from '@expcat/tigercat-core'
  *
  * export default {
  *   plugins: [
- *     createTigercatPlugin({ preset: vibrantTheme })
+ *     createTigercatPlugin({ preset: vibrantTheme }),
+ *     // or enable the modern visual style:
+ *     createTigercatPlugin({ preset: modernTheme, modern: true })
  *   ]
  * }
  * ```
@@ -139,12 +162,23 @@ export function createTigercatPlugin(options: TigercatPluginOptions = {}) {
     const darkVars = preset?.dark?.colors ? presetToVars(preset.dark.colors) : tigercatDarkTheme
 
     addBase({
-      ':root': lightVars,
-      '.dark': darkVars,
+      ':root': { ...lightVars, ...MODERN_BASE_TOKENS_LIGHT },
+      '.dark': { ...darkVars, ...MODERN_BASE_TOKENS_DARK },
       'svg [tabindex], svg [role="button"]': {
         outline: 'none'
       }
     })
+
+    if (options.modern) {
+      addBase({
+        '[data-tiger-style="modern"]': MODERN_OVERRIDE_TOKENS_LIGHT,
+        '.dark[data-tiger-style="modern"], [data-tiger-style="modern"].dark':
+          MODERN_OVERRIDE_TOKENS_DARK,
+        '@media (prefers-reduced-motion: reduce)': {
+          ':root, [data-tiger-style="modern"]': MODERN_REDUCED_MOTION_TOKENS
+        }
+      })
+    }
   })
 }
 
