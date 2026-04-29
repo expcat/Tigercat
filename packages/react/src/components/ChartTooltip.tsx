@@ -60,7 +60,7 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
     () =>
       classNames(
         'fixed z-[9999] pointer-events-none',
-        'px-3 py-2 rounded-md shadow-lg',
+        'px-3 py-2 rounded-[var(--tiger-radius-md,0.375rem)] shadow-[var(--tiger-shadow-glass,0_10px_15px_-3px_rgb(0_0_0_/_0.1),0_4px_6px_-4px_rgb(0_0_0_/_0.1))]',
         'bg-[color:var(--tiger-bg-elevated,#1f2937)]',
         'text-[color:var(--tiger-text-inverse,#f9fafb)]',
         'text-sm whitespace-nowrap',
