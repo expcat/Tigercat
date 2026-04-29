@@ -209,7 +209,7 @@ export const RadarChart = defineComponent({
     },
     pointBorderColor: {
       type: String,
-      default: '#fff'
+      default: 'var(--tiger-surface,#ffffff)'
     },
     pointHoverSize: {
       type: Number as PropType<number | undefined>,

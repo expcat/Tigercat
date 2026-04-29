@@ -60,7 +60,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   labelFormatter,
   labelPosition = 'inside',
   borderWidth = 0,
-  borderColor = '#ffffff',
+  borderColor = 'var(--tiger-surface,#ffffff)',
   hoverOffset = 10,
   shadow = true,
   // Interaction props

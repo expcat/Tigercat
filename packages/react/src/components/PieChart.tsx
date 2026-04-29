@@ -48,7 +48,7 @@ export const PieChart: React.FC<PieChartProps> = ({
   labelFormatter,
   labelPosition = 'inside',
   borderWidth = 2,
-  borderColor = '#ffffff',
+  borderColor = 'var(--tiger-surface,#ffffff)',
   hoverOffset = 8,
   shadow = false,
   hoverable = false,

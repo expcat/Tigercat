@@ -161,7 +161,7 @@ export const SunburstChart = defineComponent({
                       d: arc.path,
                       fill: arc.color,
                       opacity,
-                      stroke: '#ffffff',
+                      stroke: 'var(--tiger-surface,#ffffff)',
                       'stroke-width': 1,
                       class: classNames(interactive && 'cursor-pointer'),
                       style: { transition: 'opacity 0.2s ease-out' },

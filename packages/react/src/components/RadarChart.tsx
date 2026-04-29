@@ -99,7 +99,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   splitAreaOpacity = 0.06,
   splitAreaColors,
   pointBorderWidth = 2,
-  pointBorderColor = '#fff',
+  pointBorderColor = 'var(--tiger-surface,#ffffff)',
   pointHoverSize,
   labelAutoAlign = true,
   title,

@@ -152,7 +152,7 @@ export const DonutChart = defineComponent({
     },
     borderColor: {
       type: String,
-      default: '#ffffff'
+      default: 'var(--tiger-surface,#ffffff)'
     },
     hoverOffset: {
       type: Number,

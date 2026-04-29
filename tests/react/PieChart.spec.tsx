@@ -127,7 +127,7 @@ describe('PieChart', () => {
       })
 
       const slice = container.querySelector('path[data-pie-slice]')!
-      expect(slice).toHaveAttribute('stroke', '#ffffff')
+      expect(slice).toHaveAttribute('stroke', 'var(--tiger-surface,#ffffff)')
       expect(slice.getAttribute('stroke-width')).toBe('2')
     })
 
