@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   getChatMessageStatusInfo,
@@ -10,6 +10,7 @@ import { Avatar } from './Avatar'
 import { Textarea } from './Textarea'
 import { Input } from './Input'
 import { Button } from './Button'
+import { VirtualList } from './VirtualList'
 
 export interface ChatWindowProps
   extends
@@ -45,6 +46,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   allowEmpty = false,
   clearOnSend = true,
   statusVariant: _sv,
+  virtual = false,
+  virtualItemHeight = 88,
+  virtualHeight = 400,
+  autoScrollToBottom = true,
   onChange,
   onSend,
   renderMessage,
@@ -168,22 +173,53 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     [renderMessage, showAvatar, showName, showTime]
   )
 
+  const messageListRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!autoScrollToBottom) return
+    const raf = requestAnimationFrame(() => {
+      const el = messageListRef.current
+      if (!el) return
+      // In virtual mode the actual scroller is the inner VirtualList container.
+      const target = (virtual ? (el.firstElementChild as HTMLElement | null) : el) ?? el
+      target.scrollTop = target.scrollHeight
+    })
+    return () => cancelAnimationFrame(raf)
+  }, [messages.length, autoScrollToBottom, virtual])
+
   return (
     <div className={wrapperClasses} data-tiger-chat-window {...props}>
-      <div
-        className="flex-1 overflow-auto p-4 space-y-3"
-        role="log"
-        aria-live="polite"
-        aria-relevant="additions text"
-        aria-label={messageListAriaLabel ?? '消息列表'}>
-        {messages.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-[var(--tiger-text-muted,#6b7280)]">
-            {emptyText}
-          </div>
-        ) : (
-          messages.map(renderMessageItem)
-        )}
-      </div>
+      {virtual && messages.length > 0 ? (
+        <div
+          ref={messageListRef}
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions text"
+          aria-label={messageListAriaLabel ?? '消息列表'}>
+          <VirtualList
+            itemCount={messages.length}
+            itemHeight={virtualItemHeight}
+            height={virtualHeight}
+            renderItem={({ index }) => renderMessageItem(messages[index], index)}
+          />
+        </div>
+      ) : (
+        <div
+          ref={messageListRef}
+          className="flex-1 overflow-auto p-4 space-y-3"
+          role="log"
+          aria-live="polite"
+          aria-relevant="additions text"
+          aria-label={messageListAriaLabel ?? '消息列表'}>
+          {messages.length === 0 ? (
+            <div className="h-full flex items-center justify-center text-[var(--tiger-text-muted,#6b7280)]">
+              {emptyText}
+            </div>
+          ) : (
+            messages.map(renderMessageItem)
+          )}
+        </div>
+      )}
       {statusText && (
         <div className="px-4 py-1.5 border-t border-[var(--tiger-border,#e5e7eb)] text-xs italic text-[var(--tiger-text-muted,#6b7280)]">
           {statusText}

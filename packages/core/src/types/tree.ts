@@ -172,13 +172,24 @@ export interface TreeProps {
    */
   autoExpandParent?: boolean
   /**
-   * Virtual scroll configuration
+   * Enable virtualized rendering. The tree is flattened to its currently
+   * visible items and rendered through `VirtualList` with fixed item height.
+   * Recommended for large trees (> ~200 visible items).
+   * @default false
+   * @since 1.x
    */
   virtual?: boolean
   /**
-   * Height for virtual scroll
+   * Pixel height of the virtualized scroll viewport.
+   * @default 400
    */
   height?: number | string
+  /**
+   * Pixel height of each virtualized tree row.
+   * @default 32
+   * @since 1.x
+   */
+  itemHeight?: number
   /**
    * Whether nodes are draggable
    * @default false

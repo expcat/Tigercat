@@ -33,6 +33,7 @@ import {
   type TreeLoadDataFn,
   type TreeFilterFn
 } from '@expcat/tigercat-core'
+import { VirtualList } from './VirtualList'
 
 const spinnerSvg = getSpinnerSVG('spinner')
 
@@ -268,6 +269,29 @@ export const Tree = defineComponent({
     draggable: {
       type: Boolean,
       default: false
+    },
+    /**
+     * Enable virtualized rendering. The visible tree is flattened and rendered
+     * through `VirtualList` with fixed item height. Recommended for large
+     * trees (> ~200 visible items).
+     */
+    virtual: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * Pixel height of the virtualized scroll viewport.
+     */
+    height: {
+      type: Number,
+      default: 400
+    },
+    /**
+     * Pixel height of each virtualized tree row.
+     */
+    itemHeight: {
+      type: Number,
+      default: 32
     }
   },
   emits: [
@@ -595,7 +619,7 @@ export const Tree = defineComponent({
       return undefined
     }
 
-    function renderTreeNode(node: TreeNode, level: number): VNodeChild {
+    function renderTreeRow(node: TreeNode, level: number): VNodeChild {
       const hasChildren = !!(node.children && node.children.length > 0)
       const isExpanded = computedExpandedKeys.value.has(node.key)
       const isSelected = computedSelectedKeys.value.has(node.key)
@@ -618,12 +642,8 @@ export const Tree = defineComponent({
         indent.push(h('span', { key: i, class: treeNodeIndentClasses }))
       }
 
-      // Node content
       const nodeContent: VNodeChild[] = [
-        // Indentation
         ...indent,
-
-        // Expand icon
         h(
           'span',
           {
@@ -638,8 +658,6 @@ export const Tree = defineComponent({
           },
           [ExpandIcon(isExpanded, isExpandable)]
         ),
-
-        // Checkbox
         props.checkable
           ? h('input', {
               type: 'checkbox',
@@ -655,13 +673,9 @@ export const Tree = defineComponent({
               }
             })
           : null,
-
-        // Icon (if provided)
         props.showIcon && node.icon
           ? h('span', { class: treeNodeIconClasses }, node.icon as never)
           : null,
-
-        // Label
         h(
           'span',
           {
@@ -672,156 +686,164 @@ export const Tree = defineComponent({
           },
           node.label
         ),
-
-        // Loading indicator
         isLoading ? LoadingSpinner() : null
       ].filter(Boolean)
 
-      // Tree node wrapper
-      const treeNode = h(
+      return h(
+        'div',
+        {
+          class: getTreeNodeClasses(isSelected, !!node.disabled, props.blockNode),
+          'data-tiger-treeitem-key': String(node.key),
+          role: 'treeitem',
+          'aria-level': level + 1,
+          'aria-disabled': node.disabled ? true : undefined,
+          'aria-selected': effectiveSelectable.value ? (isSelected ? true : false) : undefined,
+          'aria-expanded': isExpandable ? (isExpanded ? true : false) : undefined,
+          'aria-checked': props.checkable ? (isHalfChecked ? 'mixed' : isChecked) : undefined,
+          tabIndex: isFocusable ? 0 : -1,
+          draggable: props.draggable && !node.disabled ? true : undefined,
+          onDragstart:
+            props.draggable && !node.disabled
+              ? (e: DragEvent) => {
+                  e.stopPropagation()
+                  handleTreeDragStart(node.key)
+                }
+              : undefined,
+          onDragover: props.draggable ? handleTreeDragOver : undefined,
+          onDrop: props.draggable
+            ? (e: DragEvent) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleTreeDrop(node.key)
+              }
+            : undefined,
+          onDragend: props.draggable ? handleTreeDragEnd : undefined,
+          onFocus: () => {
+            if (!node.disabled) activeKey.value = node.key
+          },
+          onKeydown: (e: KeyboardEvent) => {
+            if (node.disabled) return
+
+            const currentKey = getCurrentKey(node.key)
+            const currentIndex = getNavigationIndex(currentKey)
+            const parents = getParentKeys(props.treeData, node.key)
+            const parentKey = parents[parents.length - 1]
+
+            if (e.key === 'ArrowDown') {
+              e.preventDefault()
+              focusKey(focusableKeys.value[currentIndex + 1] ?? currentKey)
+              return
+            }
+
+            if (e.key === 'ArrowUp') {
+              e.preventDefault()
+              focusKey(focusableKeys.value[currentIndex - 1] ?? currentKey)
+              return
+            }
+
+            if (e.key === 'Home') {
+              e.preventDefault()
+              focusKey(focusableKeys.value[0] ?? currentKey)
+              return
+            }
+
+            if (e.key === 'End') {
+              e.preventDefault()
+              focusKey(focusableKeys.value[focusableKeys.value.length - 1] ?? currentKey)
+              return
+            }
+
+            if (e.key === 'ArrowRight') {
+              e.preventDefault()
+              if (isExpandable && !isExpanded) {
+                handleExpand(node.key)
+                return
+              }
+              if (isExpandable && isExpanded) {
+                focusKey(getFirstChildKey(node.key) ?? currentKey)
+              }
+              return
+            }
+
+            if (e.key === 'ArrowLeft') {
+              e.preventDefault()
+              if (isExpandable && isExpanded) {
+                handleExpand(node.key)
+                return
+              }
+              focusKey(parentKey ?? currentKey)
+              return
+            }
+
+            if (e.key === 'Escape') {
+              e.preventDefault()
+              if (isExpandable && isExpanded) {
+                handleExpand(node.key)
+                return
+              }
+              if (parentKey !== undefined) {
+                if (computedExpandedKeys.value.has(parentKey)) {
+                  handleExpand(parentKey)
+                }
+                focusKey(parentKey)
+              }
+              return
+            }
+
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              if (effectiveSelectable.value) {
+                handleSelect(node.key, e)
+                return
+              }
+              if (isExpandable) {
+                handleExpand(node.key)
+              }
+              return
+            }
+
+            if (e.key === ' ') {
+              e.preventDefault()
+              if (props.checkable) {
+                handleCheck(node.key, !isChecked)
+                return
+              }
+              if (isExpandable) {
+                handleExpand(node.key)
+              }
+            }
+          },
+          onClick: (e: MouseEvent) => {
+            activeKey.value = node.key
+            handleNodeClick(node, e)
+            if (effectiveSelectable.value && !node.disabled) {
+              handleSelect(node.key, e)
+            }
+          }
+        },
+        nodeContent
+      )
+    }
+
+    function renderTreeNode(node: TreeNode, level: number): VNodeChild {
+      const hasChildren = !!(node.children && node.children.length > 0)
+      const isExpanded = computedExpandedKeys.value.has(node.key)
+      const isFiltered = filteredNodeKeys.value.size > 0
+      const isMatched = filteredNodeKeys.value.has(node.key)
+      const isVisible = !isFiltered || isMatched
+
+      if (!isVisible) {
+        return null
+      }
+
+      return h(
         'div',
         {
           key: node.key,
           class: treeNodeWrapperClasses
         },
         [
-          // Node content
-          h(
-            'div',
-            {
-              class: getTreeNodeClasses(isSelected, !!node.disabled, props.blockNode),
-              'data-tiger-treeitem-key': String(node.key),
-              role: 'treeitem',
-              'aria-level': level + 1,
-              'aria-disabled': node.disabled ? true : undefined,
-              'aria-selected': effectiveSelectable.value ? (isSelected ? true : false) : undefined,
-              'aria-expanded': isExpandable ? (isExpanded ? true : false) : undefined,
-              'aria-checked': props.checkable ? (isHalfChecked ? 'mixed' : isChecked) : undefined,
-              tabIndex: isFocusable ? 0 : -1,
-              draggable: props.draggable && !node.disabled ? true : undefined,
-              onDragstart:
-                props.draggable && !node.disabled
-                  ? (e: DragEvent) => {
-                      e.stopPropagation()
-                      handleTreeDragStart(node.key)
-                    }
-                  : undefined,
-              onDragover: props.draggable ? handleTreeDragOver : undefined,
-              onDrop: props.draggable
-                ? (e: DragEvent) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    handleTreeDrop(node.key)
-                  }
-                : undefined,
-              onDragend: props.draggable ? handleTreeDragEnd : undefined,
-              onFocus: () => {
-                if (!node.disabled) activeKey.value = node.key
-              },
-              onKeydown: (e: KeyboardEvent) => {
-                if (node.disabled) return
-
-                const currentKey = getCurrentKey(node.key)
-                const currentIndex = getNavigationIndex(currentKey)
-                const parents = getParentKeys(props.treeData, node.key)
-                const parentKey = parents[parents.length - 1]
-
-                if (e.key === 'ArrowDown') {
-                  e.preventDefault()
-                  focusKey(focusableKeys.value[currentIndex + 1] ?? currentKey)
-                  return
-                }
-
-                if (e.key === 'ArrowUp') {
-                  e.preventDefault()
-                  focusKey(focusableKeys.value[currentIndex - 1] ?? currentKey)
-                  return
-                }
-
-                if (e.key === 'Home') {
-                  e.preventDefault()
-                  focusKey(focusableKeys.value[0] ?? currentKey)
-                  return
-                }
-
-                if (e.key === 'End') {
-                  e.preventDefault()
-                  focusKey(focusableKeys.value[focusableKeys.value.length - 1] ?? currentKey)
-                  return
-                }
-
-                if (e.key === 'ArrowRight') {
-                  e.preventDefault()
-                  if (isExpandable && !isExpanded) {
-                    handleExpand(node.key)
-                    return
-                  }
-                  if (isExpandable && isExpanded) {
-                    focusKey(getFirstChildKey(node.key) ?? currentKey)
-                  }
-                  return
-                }
-
-                if (e.key === 'ArrowLeft') {
-                  e.preventDefault()
-                  if (isExpandable && isExpanded) {
-                    handleExpand(node.key)
-                    return
-                  }
-                  focusKey(parentKey ?? currentKey)
-                  return
-                }
-
-                if (e.key === 'Escape') {
-                  e.preventDefault()
-                  if (isExpandable && isExpanded) {
-                    handleExpand(node.key)
-                    return
-                  }
-                  if (parentKey !== undefined) {
-                    if (computedExpandedKeys.value.has(parentKey)) {
-                      handleExpand(parentKey)
-                    }
-                    focusKey(parentKey)
-                  }
-                  return
-                }
-
-                if (e.key === 'Enter') {
-                  e.preventDefault()
-                  if (effectiveSelectable.value) {
-                    handleSelect(node.key, e)
-                    return
-                  }
-                  if (isExpandable) {
-                    handleExpand(node.key)
-                  }
-                  return
-                }
-
-                if (e.key === ' ') {
-                  e.preventDefault()
-                  if (props.checkable) {
-                    handleCheck(node.key, !isChecked)
-                    return
-                  }
-                  if (isExpandable) {
-                    handleExpand(node.key)
-                  }
-                }
-              },
-              onClick: (e: MouseEvent) => {
-                activeKey.value = node.key
-                handleNodeClick(node, e)
-                if (effectiveSelectable.value && !node.disabled) {
-                  handleSelect(node.key, e)
-                }
-              }
-            },
-            nodeContent
-          ),
-
-          // Children
+          renderTreeRow(node, level),
           hasChildren &&
             isExpanded &&
             h(
@@ -833,8 +855,6 @@ export const Tree = defineComponent({
             )
         ]
       )
-
-      return treeNode
     }
 
     return () => {
@@ -876,7 +896,26 @@ export const Tree = defineComponent({
           'aria-multiselectable': effectiveMultiple.value ? true : undefined,
           ref: rootEl
         },
-        [searchInput, ...props.treeData.map((node) => renderTreeNode(node, 0))]
+        [
+          searchInput,
+          props.virtual
+            ? h(
+                VirtualList,
+                {
+                  itemCount: visibleItems.value.length,
+                  itemHeight: props.itemHeight,
+                  height: props.height
+                },
+                {
+                  default: ({ index }: { index: number }) => {
+                    const item = visibleItems.value[index]
+                    if (!item) return null
+                    return renderTreeRow(item.node, item.level - 1)
+                  }
+                }
+              )
+            : props.treeData.map((node) => renderTreeNode(node, 0))
+        ]
       )
     }
   }

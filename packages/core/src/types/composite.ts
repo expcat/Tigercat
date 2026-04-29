@@ -185,6 +185,32 @@ export interface ChatWindowProps {
    */
   clearOnSend?: boolean
   /**
+   * Enable virtualized rendering for the message list. Recommended when the
+   * conversation has more than ~100 messages. When enabled, message item
+   * heights are fixed (`virtualItemHeight`) and the list scroll height is
+   * fixed (`virtualHeight`).
+   * @default false
+   * @since 1.x
+   */
+  virtual?: boolean
+  /**
+   * Pixel height of each virtualized message row.
+   * @default 88
+   */
+  virtualItemHeight?: number
+  /**
+   * Pixel height of the virtualized message list viewport.
+   * @default 400
+   */
+  virtualHeight?: number
+  /**
+   * Automatically scroll to the latest message when the list updates.
+   * Uses `requestAnimationFrame` so it runs after the DOM has been painted.
+   * @default true
+   * @since 1.x
+   */
+  autoScrollToBottom?: boolean
+  /**
    * Input change callback
    */
   onChange?: (value: string) => void

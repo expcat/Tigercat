@@ -121,4 +121,25 @@ describe('ChatWindow (Vue)', () => {
 
     expect(emitted().send).toBeFalsy()
   })
+
+  it('renders messages through VirtualList when virtual is enabled', () => {
+    const messages: ChatMessage[] = Array.from({ length: 200 }, (_, i) => ({
+      id: i,
+      content: `msg-${i}`
+    }))
+
+    const { container } = render(ChatWindow, {
+      props: {
+        messages,
+        virtual: true,
+        virtualHeight: 200,
+        virtualItemHeight: 40
+      }
+    })
+
+    const bubbles = container.querySelectorAll('[data-tiger-chat-bubble]')
+    // VirtualList must keep the rendered window much smaller than 200 rows.
+    expect(bubbles.length).toBeGreaterThan(0)
+    expect(bubbles.length).toBeLessThan(40)
+  })
 })

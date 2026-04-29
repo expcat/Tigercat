@@ -1,4 +1,4 @@
-import { defineComponent, h, computed, ref, watch, PropType } from 'vue'
+import { defineComponent, h, computed, ref, watch, onMounted, onUpdated, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -12,6 +12,7 @@ import { Avatar } from './Avatar'
 import { Textarea } from './Textarea'
 import { Input } from './Input'
 import { Button } from './Button'
+import { VirtualList } from './VirtualList'
 
 export interface VueChatWindowProps extends Omit<
   CoreChatWindowProps,
@@ -108,6 +109,22 @@ export const ChatWindow = defineComponent({
       type: Boolean,
       default: true
     },
+    virtual: {
+      type: Boolean,
+      default: false
+    },
+    virtualItemHeight: {
+      type: Number,
+      default: 88
+    },
+    virtualHeight: {
+      type: Number,
+      default: 400
+    },
+    autoScrollToBottom: {
+      type: Boolean,
+      default: true
+    },
     className: {
       type: String
     },
@@ -179,6 +196,31 @@ export const ChatWindow = defineComponent({
       event.preventDefault()
       handleSend()
     }
+
+    const messageListRef = ref<HTMLElement | null>(null)
+    const virtualWrapperRef = ref<HTMLElement | null>(null)
+
+    const scrollToBottom = () => {
+      if (!props.autoScrollToBottom) return
+      requestAnimationFrame(() => {
+        if (props.virtual) {
+          const wrapper = virtualWrapperRef.value
+          const scroller = (wrapper?.firstElementChild as HTMLElement | null) ?? wrapper
+          if (scroller) {
+            scroller.scrollTop = scroller.scrollHeight
+          }
+        } else if (messageListRef.value) {
+          messageListRef.value.scrollTop = messageListRef.value.scrollHeight
+        }
+      })
+    }
+
+    onMounted(scrollToBottom)
+    onUpdated(scrollToBottom)
+    watch(
+      () => props.messages.length,
+      () => scrollToBottom()
+    )
 
     const renderMessageItem = (message: ChatMessage, index: number) => {
       const isSelf = message.direction === 'self'
@@ -276,28 +318,54 @@ export const ChatWindow = defineComponent({
           'data-tiger-chat-window': ''
         },
         [
-          h(
-            'div',
-            {
-              class: 'flex-1 overflow-auto p-4 space-y-3',
-              role: 'log',
-              'aria-live': 'polite',
-              'aria-relevant': 'additions text',
-              'aria-label': props.messageListAriaLabel ?? '消息列表'
-            },
-            props.messages.length === 0
-              ? [
+          props.virtual && props.messages.length > 0
+            ? h(
+                'div',
+                {
+                  ref: virtualWrapperRef,
+                  role: 'log',
+                  'aria-live': 'polite',
+                  'aria-relevant': 'additions text',
+                  'aria-label': props.messageListAriaLabel ?? '消息列表'
+                },
+                [
                   h(
-                    'div',
+                    VirtualList,
                     {
-                      class:
-                        'h-full flex items-center justify-center text-[var(--tiger-text-muted,#6b7280)]'
+                      itemCount: props.messages.length,
+                      itemHeight: props.virtualItemHeight,
+                      height: props.virtualHeight
                     },
-                    props.emptyText
+                    {
+                      default: ({ index }: { index: number }) =>
+                        renderMessageItem(props.messages[index], index)
+                    }
                   )
                 ]
-              : props.messages.map((message, index) => renderMessageItem(message, index))
-          ),
+              )
+            : h(
+                'div',
+                {
+                  ref: messageListRef,
+                  class: 'flex-1 overflow-auto p-4 space-y-3',
+                  role: 'log',
+                  'aria-live': 'polite',
+                  'aria-relevant': 'additions text',
+                  'aria-label': props.messageListAriaLabel ?? '消息列表'
+                },
+                props.messages.length === 0
+                  ? [
+                      h(
+                        'div',
+                        {
+                          class:
+                            'h-full flex items-center justify-center text-[var(--tiger-text-muted,#6b7280)]'
+                        },
+                        props.emptyText
+                      )
+                    ]
+                  : props.messages.map((message, index) => renderMessageItem(message, index))
+              ),
           props.statusText
             ? h(
                 'div',

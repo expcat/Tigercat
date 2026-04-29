@@ -31,6 +31,7 @@ import {
   type TreeLoadDataFn,
   type TreeFilterFn
 } from '@expcat/tigercat-core'
+import { VirtualList } from './VirtualList'
 
 const spinnerSvg = getSpinnerSVG('spinner')
 
@@ -239,6 +240,25 @@ export interface TreeProps {
    * Drop event handler
    */
   onDrop?: (info: { dragKey: string | number; dropKey: string | number }) => void
+  /**
+   * Enable virtualized rendering. The visible tree is flattened and rendered
+   * through `VirtualList` with fixed item height. Recommended for large
+   * trees (> ~200 visible items).
+   * @default false
+   * @since 1.x
+   */
+  virtual?: boolean
+  /**
+   * Pixel height of the virtualized scroll viewport.
+   * @default 400
+   */
+  height?: number
+  /**
+   * Pixel height of each virtualized tree row.
+   * @default 32
+   * @since 1.x
+   */
+  itemHeight?: number
 }
 
 export const Tree: React.FC<TreeProps> = ({
@@ -274,7 +294,10 @@ export const Tree: React.FC<TreeProps> = ({
   onNodeCollapse,
   className,
   draggable: isDraggable = false,
-  onDrop
+  onDrop,
+  virtual = false,
+  height = 400,
+  itemHeight = 32
 }) => {
   const itemRefs = useRef(new Map<string | number, HTMLDivElement | null>())
   const dragNodeKeyRef = useRef<string | number | null>(null)
@@ -675,7 +698,7 @@ export const Tree: React.FC<TreeProps> = ({
     ]
   )
 
-  const renderTreeNode = (node: TreeNode, level: number): React.ReactNode => {
+  const renderTreeRow = (node: TreeNode, level: number): React.ReactNode => {
     const hasChildren = !!(node.children && node.children.length > 0)
     const isExpanded = computedExpandedKeys.has(node.key)
     const isSelected = computedSelectedKeys.has(node.key)
@@ -698,13 +721,67 @@ export const Tree: React.FC<TreeProps> = ({
       indent.push(<span key={i} className={treeNodeIndentClasses} />)
     }
 
-    // Node content
-    const nodeContent = (
-      <>
-        {/* Indentation */}
+    return (
+      <div
+        className={getTreeNodeClasses(isSelected, !!node.disabled, blockNode)}
+        ref={(el) => {
+          itemRefs.current.set(node.key, el)
+        }}
+        role="treeitem"
+        aria-level={level + 1}
+        aria-disabled={node.disabled || undefined}
+        aria-selected={effectiveSelectable ? isSelected : undefined}
+        aria-expanded={isExpandable ? isExpanded : undefined}
+        aria-checked={checkable ? (isHalfChecked ? 'mixed' : isChecked) : undefined}
+        tabIndex={isFocusable ? 0 : -1}
+        draggable={isDraggable && !node.disabled ? true : undefined}
+        onDragStart={
+          isDraggable && !node.disabled
+            ? (e) => {
+                e.stopPropagation()
+                dragNodeKeyRef.current = node.key
+              }
+            : undefined
+        }
+        onDragOver={
+          isDraggable
+            ? (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+              }
+            : undefined
+        }
+        onDrop={
+          isDraggable
+            ? (e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                if (dragNodeKeyRef.current !== null && dragNodeKeyRef.current !== node.key) {
+                  onDrop?.({ dragKey: dragNodeKeyRef.current, dropKey: node.key })
+                }
+                dragNodeKeyRef.current = null
+              }
+            : undefined
+        }
+        onDragEnd={
+          isDraggable
+            ? () => {
+                dragNodeKeyRef.current = null
+              }
+            : undefined
+        }
+        onFocus={() => {
+          if (!node.disabled) setActiveKey(node.key)
+        }}
+        onKeyDown={(e) => handleKeyDown(e, node, isExpanded, isChecked)}
+        onClick={(e) => {
+          setActiveKey(node.key)
+          if (!node.disabled) onNodeClick?.(node, e)
+          if (effectiveSelectable && !node.disabled) {
+            handleSelect(node.key, e)
+          }
+        }}>
         {indent}
-
-        {/* Expand icon */}
         <span
           className={isExpandable ? 'cursor-pointer' : ''}
           onClick={(e) => {
@@ -716,8 +793,6 @@ export const Tree: React.FC<TreeProps> = ({
           }}>
           <ExpandIcon expanded={isExpanded} hasChildren={isExpandable} />
         </span>
-
-        {/* Checkbox */}
         {checkable && (
           <input
             type="checkbox"
@@ -738,12 +813,9 @@ export const Tree: React.FC<TreeProps> = ({
             }}
           />
         )}
-
-        {showIcon && node.icon && (
+        {showIcon && node.icon ? (
           <span className={treeNodeIconClasses}>{node.icon as React.ReactNode}</span>
-        )}
-
-        {/* Label */}
+        ) : null}
         <span
           className={classNames(
             treeNodeLabelClasses,
@@ -751,78 +823,25 @@ export const Tree: React.FC<TreeProps> = ({
           )}>
           {node.label}
         </span>
-
-        {/* Loading indicator */}
         {isLoading && <LoadingSpinner />}
-      </>
+      </div>
     )
+  }
+
+  const renderTreeNode = (node: TreeNode, level: number): React.ReactNode => {
+    const hasChildren = !!(node.children && node.children.length > 0)
+    const isExpanded = computedExpandedKeys.has(node.key)
+    const isFiltered = filteredNodeKeys.size > 0
+    const isMatched = filteredNodeKeys.has(node.key)
+    const isVisible = !isFiltered || isMatched
+
+    if (!isVisible) {
+      return null
+    }
 
     return (
       <div key={node.key} className={treeNodeWrapperClasses}>
-        {/* Node content */}
-        <div
-          className={getTreeNodeClasses(isSelected, !!node.disabled, blockNode)}
-          ref={(el) => {
-            itemRefs.current.set(node.key, el)
-          }}
-          role="treeitem"
-          aria-level={level + 1}
-          aria-disabled={node.disabled || undefined}
-          aria-selected={effectiveSelectable ? isSelected : undefined}
-          aria-expanded={isExpandable ? isExpanded : undefined}
-          aria-checked={checkable ? (isHalfChecked ? 'mixed' : isChecked) : undefined}
-          tabIndex={isFocusable ? 0 : -1}
-          draggable={isDraggable && !node.disabled ? true : undefined}
-          onDragStart={
-            isDraggable && !node.disabled
-              ? (e) => {
-                  e.stopPropagation()
-                  dragNodeKeyRef.current = node.key
-                }
-              : undefined
-          }
-          onDragOver={
-            isDraggable
-              ? (e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                }
-              : undefined
-          }
-          onDrop={
-            isDraggable
-              ? (e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  if (dragNodeKeyRef.current !== null && dragNodeKeyRef.current !== node.key) {
-                    onDrop?.({ dragKey: dragNodeKeyRef.current, dropKey: node.key })
-                  }
-                  dragNodeKeyRef.current = null
-                }
-              : undefined
-          }
-          onDragEnd={
-            isDraggable
-              ? () => {
-                  dragNodeKeyRef.current = null
-                }
-              : undefined
-          }
-          onFocus={() => {
-            if (!node.disabled) setActiveKey(node.key)
-          }}
-          onKeyDown={(e) => handleKeyDown(e, node, isExpanded, isChecked)}
-          onClick={(e) => {
-            setActiveKey(node.key)
-            if (!node.disabled) onNodeClick?.(node, e)
-            if (effectiveSelectable && !node.disabled) {
-              handleSelect(node.key, e)
-            }
-          }}>
-          {nodeContent}
-        </div>
-
-        {/* Children */}
+        {renderTreeRow(node, level)}
         {hasChildren && isExpanded && (
           <div className={classNames(treeNodeChildrenClasses, showLine && treeLineClasses)}>
             {node.children!.map((child) => renderTreeNode(child, level + 1))}
@@ -858,7 +877,20 @@ export const Tree: React.FC<TreeProps> = ({
           onChange={(e) => setInternalSearchValue(e.target.value)}
         />
       )}
-      {treeData.map((node) => renderTreeNode(node, 0))}
+      {virtual ? (
+        <VirtualList
+          itemCount={visibleItems.length}
+          itemHeight={itemHeight}
+          height={height}
+          renderItem={({ index }) => {
+            const item = visibleItems[index]
+            if (!item) return null
+            return renderTreeRow(item.node, item.level - 1)
+          }}
+        />
+      ) : (
+        treeData.map((node) => renderTreeNode(node, 0))
+      )}
     </div>
   )
 }

@@ -716,4 +716,24 @@ describe('Tree', () => {
       expect(input.value).toBe('Child 1-1')
     })
   })
+
+  describe('Virtual scrolling', () => {
+    it('renders only a subset of items when virtual is enabled', () => {
+      const largeTree = Array.from({ length: 500 }, (_, i) => ({
+        key: `n-${i}`,
+        label: `Node ${i}`
+      }))
+
+      const { container } = renderWithProps(Tree, {
+        treeData: largeTree,
+        virtual: true,
+        height: 200,
+        itemHeight: 32
+      })
+
+      const items = container.querySelectorAll('[role="treeitem"]')
+      expect(items.length).toBeGreaterThan(0)
+      expect(items.length).toBeLessThan(50)
+    })
+  })
 })
