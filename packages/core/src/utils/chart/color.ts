@@ -77,7 +77,7 @@ export const barValueLabelInsideClasses =
 
 /** CSS transition string for animated bars */
 export const barAnimatedTransition =
-  'transition: y 600ms cubic-bezier(.4,0,.2,1), height 600ms cubic-bezier(.4,0,.2,1), opacity 200ms ease-out, filter 200ms ease-out'
+  'transition: y var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), height var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), opacity 200ms ease-out, filter 200ms ease-out'
 
 /** CSS transition for scatter point hover */
 export const scatterPointTransitionClasses = 'transition-all duration-200 ease-out'

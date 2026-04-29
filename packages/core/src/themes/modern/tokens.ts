@@ -121,6 +121,9 @@ export const MODERN_OVERRIDE_TOKENS_LIGHT: Record<string, string> = {
   '--tiger-chart-block-radius': 'var(--tiger-radius-sm, 2px)',
   '--tiger-chart-block-active-filter': 'brightness(1.08) saturate(1.1)',
 
+  // Chart bar (BarChart rect) — softer top corners (modern bumps to --tiger-radius-sm)
+  '--tiger-chart-bar-radius': 'var(--tiger-radius-sm, 4px)',
+
   // Subtle gradients via OKLab color-mix
   '--tiger-gradient-primary':
     'linear-gradient(180deg, color-mix(in oklab, var(--tiger-primary) 100%, white 8%) 0%, var(--tiger-primary) 100%)',

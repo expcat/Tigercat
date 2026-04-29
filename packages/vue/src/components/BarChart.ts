@@ -475,7 +475,9 @@ export const BarChart = defineComponent({
                           (props.hoverable || props.selectable) &&
                             'cursor-pointer hover:brightness-110'
                         ),
-                        style: props.animated ? barAnimatedTransition : undefined,
+                        style: props.animated
+                          ? `rx:var(--tiger-chart-bar-radius,${props.barRadius}px);ry:var(--tiger-chart-bar-radius,${props.barRadius}px);${barAnimatedTransition}`
+                          : `rx:var(--tiger-chart-bar-radius,${props.barRadius}px);ry:var(--tiger-chart-bar-radius,${props.barRadius}px)`,
                         tabindex: props.selectable ? 0 : undefined,
                         role: props.selectable ? 'button' : 'img',
                         'aria-label': bar.datum.label ?? String(bar.datum.x),

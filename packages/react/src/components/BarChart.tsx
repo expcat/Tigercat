@@ -309,12 +309,16 @@ export const BarChart: React.FC<BarChartProps> = ({
               (hoverable || selectable) && 'cursor-pointer hover:brightness-110'
             )}
             style={
-              animated
-                ? {
-                    transition:
-                      'y 600ms cubic-bezier(.4,0,.2,1), height 600ms cubic-bezier(.4,0,.2,1), opacity 200ms ease-out, filter 200ms ease-out'
-                  }
-                : undefined
+              {
+                rx: `var(--tiger-chart-bar-radius, ${barRadius}px)`,
+                ry: `var(--tiger-chart-bar-radius, ${barRadius}px)`,
+                ...(animated
+                  ? {
+                      transition:
+                        'y var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), height var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), opacity 200ms ease-out, filter 200ms ease-out'
+                    }
+                  : null)
+              } as React.CSSProperties
             }
             tabIndex={selectable ? 0 : undefined}
             onMouseEnter={(e) => handleMouseEnter(bar.index, e)}
