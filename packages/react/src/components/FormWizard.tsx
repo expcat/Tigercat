@@ -66,7 +66,7 @@ export const FormWizard: React.FC<FormWizardProps> = ({
   const isLast = currentIndex >= totalCount - 1
 
   const wrapperClasses = classNames(
-    'tiger-form-wizard w-full rounded-lg border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm overflow-hidden',
+    'tiger-form-wizard w-full rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm overflow-hidden',
     className
   )
 

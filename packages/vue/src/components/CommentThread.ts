@@ -351,7 +351,8 @@ export const CommentThread = defineComponent({
                 ? h(
                     'div',
                     {
-                      class: 'mt-3 space-y-2 bg-[var(--tiger-surface-muted,#f9fafb)] p-3 rounded-lg'
+                      class:
+                        'mt-3 space-y-2 bg-[var(--tiger-surface-muted,#f9fafb)] p-3 rounded-[var(--tiger-radius-md,0.5rem)]'
                     },
                     [
                       h(Textarea, {

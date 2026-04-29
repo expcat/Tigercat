@@ -303,7 +303,7 @@ export const NotificationCenter = defineComponent({
         'div',
         {
           class:
-            'inline-flex self-start rounded-md border border-[var(--tiger-border,#e5e7eb)] overflow-hidden'
+            'inline-flex self-start rounded-[var(--tiger-radius-sm,0.375rem)] border border-[var(--tiger-border,#e5e7eb)] overflow-hidden'
         },
         options.map((option) =>
           h(

@@ -152,7 +152,7 @@ export const ChatWindow = defineComponent({
 
     const wrapperClasses = computed(() =>
       classNames(
-        'tiger-chat-window flex flex-col w-full rounded-lg border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)]',
+        'tiger-chat-window flex flex-col w-full rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)]',
         props.className,
         coerceClassValue(attrs.class)
       )
@@ -265,7 +265,7 @@ export const ChatWindow = defineComponent({
               'div',
               {
                 class: classNames(
-                  'rounded-lg px-3 py-2 text-sm break-words',
+                  'rounded-[var(--tiger-radius-md,0.5rem)] px-3 py-2 text-sm break-words',
                   isSelf
                     ? 'bg-[var(--tiger-primary,#2563eb)] text-white rounded-tr-none'
                     : 'bg-[var(--tiger-surface-muted,#f3f4f6)] text-[var(--tiger-text,#111827)] rounded-tl-none'

@@ -302,7 +302,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                 {markAllReadText}
               </Button>
             </div>
-            <div className="inline-flex rounded-md border border-[var(--tiger-border,#e5e7eb)] overflow-hidden self-start">
+            <div className="inline-flex rounded-[var(--tiger-radius-sm,0.375rem)] border border-[var(--tiger-border,#e5e7eb)] overflow-hidden self-start">
               {filterButtons.map((option) => (
                 <button
                   key={option.key}

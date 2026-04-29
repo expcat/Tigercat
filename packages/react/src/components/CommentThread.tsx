@@ -240,7 +240,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
             ) : null}
 
             {replyingTo === node.id ? (
-              <div className="mt-3 space-y-2 bg-[var(--tiger-surface-muted,#f9fafb)] p-3 rounded-lg">
+              <div className="mt-3 space-y-2 bg-[var(--tiger-surface-muted,#f9fafb)] p-3 rounded-[var(--tiger-radius-md,0.5rem)]">
                 <Textarea
                   rows={2}
                   value={replyValue}

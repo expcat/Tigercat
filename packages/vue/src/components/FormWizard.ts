@@ -146,7 +146,7 @@ export const FormWizard = defineComponent({
 
     const wrapperClasses = computed(() =>
       classNames(
-        'tiger-form-wizard w-full rounded-lg border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm overflow-hidden',
+        'tiger-form-wizard w-full rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm overflow-hidden',
         props.className,
         coerceClassValue((attrs as Record<string, unknown>).class)
       )
