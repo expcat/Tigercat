@@ -24,11 +24,12 @@ function reactPackageJson(name: string): string {
         preview: 'vite preview'
       },
       dependencies: {
-        '@expcat/tigercat-react': '^0.9.0',
+        '@expcat/tigercat-react': '^1.0.0',
         react: '^19.2.3',
         'react-dom': '^19.2.3'
       },
       devDependencies: {
+        '@expcat/tigercat-core': '^1.0.0',
         '@tailwindcss/vite': '^4.1.18',
         '@types/react': '^19.2.7',
         '@types/react-dom': '^19.2.2',
@@ -135,18 +136,49 @@ createRoot(document.getElementById('root')!).render(
 }
 
 function reactApp(): string {
-  return `import { Button, Alert } from '@expcat/tigercat-react'
+  return `import { useState, useCallback, useEffect } from 'react'
+import { Button, Alert, Switch } from '@expcat/tigercat-react'
 
 export default function App() {
+  const [dark, setDark] = useState(false)
+  const [modern, setModern] = useState(true)
+
+  useEffect(() => {
+    const root = document.documentElement
+    root.classList.toggle('dark', dark)
+    if (modern) {
+      root.setAttribute('data-tiger-style', 'modern')
+    } else {
+      root.removeAttribute('data-tiger-style')
+    }
+  }, [dark, modern])
+
+  const onDark = useCallback((v: boolean) => setDark(v), [])
+  const onModern = useCallback((v: boolean) => setModern(v), [])
+
   return (
     <div className="min-h-screen bg-[var(--tiger-surface,#ffffff)] p-8">
-      <h1 className="text-2xl font-bold text-[var(--tiger-text,#111827)] mb-6">
-        Tigercat + React
-      </h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-[var(--tiger-text,#111827)]">
+          Tigercat + React
+        </h1>
+        <div className="flex items-center gap-4 text-sm text-[var(--tiger-text-muted,#6b7280)]">
+          <label className="flex items-center gap-2">
+            <span>Modern</span>
+            <Switch checked={modern} size="sm" onChange={onModern} />
+          </label>
+          <label className="flex items-center gap-2">
+            <span>Dark</span>
+            <Switch checked={dark} size="sm" onChange={onDark} />
+          </label>
+        </div>
+      </div>
 
       <div className="space-y-4">
         <Alert variant="info">
           Welcome to your Tigercat project! Edit src/App.tsx to get started.
+          Toggle <code>Modern</code> to preview the opt-in modern visual style
+          (radius / shadow / motion tokens).
         </Alert>
 
         <div className="flex gap-2">
@@ -163,31 +195,19 @@ export default function App() {
 
 function commonStyleCss(): string {
   return `@import "tailwindcss";
+@plugin "@expcat/tigercat-core/tailwind/modern";
 
-:root {
-  --tiger-primary: #2563eb;
-  --tiger-primary-hover: #1d4ed8;
-  --tiger-surface: #ffffff;
-  --tiger-surface-muted: #f9fafb;
-  --tiger-text: #111827;
-  --tiger-text-muted: #6b7280;
-  --tiger-border: #e5e7eb;
-}
+/*
+ * The tigercat tailwind plugin injects every --tiger-* design token for
+ * both light (:root) and dark (.dark) modes, plus the opt-in modern
+ * overrides activated by data-tiger-style="modern". The demo App toggles
+ * dark mode via .dark on <html> and prefers-color-scheme via the rule
+ * below. Swap the @plugin line for a tailwind.config.ts calling
+ * createTigercatPlugin({ preset }) to use a custom preset.
+ */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --tiger-primary: #3b82f6;
-    --tiger-primary-hover: #2563eb;
-    --tiger-surface: #111827;
-    --tiger-surface-muted: #1f2937;
-    --tiger-text: #f9fafb;
-    --tiger-text-muted: #9ca3af;
-    --tiger-border: #374151;
-  }
-
-  html {
-    color-scheme: dark;
-  }
+html {
+  color-scheme: light dark;
 }
 `
 }

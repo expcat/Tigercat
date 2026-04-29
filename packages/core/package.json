@@ -37,6 +37,16 @@
       "types": "./dist/theme/index.d.ts",
       "import": "./dist/theme/index.js"
     },
+    "./tailwind": {
+      "types": "./dist/tailwind.d.ts",
+      "import": "./dist/tailwind.js",
+      "require": "./dist/tailwind.cjs"
+    },
+    "./tailwind/modern": {
+      "types": "./dist/tailwind/modern.d.ts",
+      "import": "./dist/tailwind/modern.js",
+      "require": "./dist/tailwind/modern.cjs"
+    },
     "./locales/en-US": {
       "types": "./dist/locales/en-US.d.ts",
       "import": "./dist/locales/en-US.js",

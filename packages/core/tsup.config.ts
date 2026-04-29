@@ -15,6 +15,8 @@ const iconEntries = Object.fromEntries(
 export default defineConfig({
   entry: {
     index: 'src/index.ts',
+    tailwind: 'src/tailwind-entry.ts',
+    'tailwind/modern': 'src/tailwind-entry-modern.ts',
     ...localeEntries,
     ...iconEntries
   },

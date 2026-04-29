@@ -118,14 +118,17 @@ describe('CLI Templates - Vue 3', () => {
 
   it('should include CSS variables for theming', () => {
     const files = getVue3Template('test')
-    expect(files['src/style.css']).toContain('--tiger-primary')
-    expect(files['src/style.css']).toContain('--tiger-surface')
-    expect(files['src/style.css']).toContain('--tiger-text')
+    // Tigercat v1+ templates load the tailwind plugin via @plugin which
+    // injects every --tiger-* design token at build time.
+    expect(files['src/style.css']).toContain('@plugin')
+    expect(files['src/style.css']).toContain('@expcat/tigercat-core/tailwind')
   })
 
   it('should have dark mode support in styles', () => {
     const files = getVue3Template('test')
-    expect(files['src/style.css']).toContain('prefers-color-scheme: dark')
+    // Plugin emits the .dark variable block; template enables OS-level
+    // light/dark color-scheme so native form controls follow suit.
+    expect(files['src/style.css']).toContain('color-scheme: light dark')
   })
 
   it('should have proper TypeScript config', () => {
