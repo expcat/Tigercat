@@ -117,6 +117,10 @@ export const MODERN_OVERRIDE_TOKENS_LIGHT: Record<string, string> = {
   '--tiger-chart-legend-row-hover-bg': 'rgb(15 23 42 / 0.04)',
   '--tiger-chart-legend-row-radius': 'var(--tiger-radius-sm, 6px)',
 
+  // Chart block (TreeMap / Sunburst / Heatmap rect & path) — softer corners + active highlight
+  '--tiger-chart-block-radius': 'var(--tiger-radius-sm, 2px)',
+  '--tiger-chart-block-active-filter': 'brightness(1.08) saturate(1.1)',
+
   // Subtle gradients via OKLab color-mix
   '--tiger-gradient-primary':
     'linear-gradient(180deg, color-mix(in oklab, var(--tiger-primary) 100%, white 8%) 0%, var(--tiger-primary) 100%)',

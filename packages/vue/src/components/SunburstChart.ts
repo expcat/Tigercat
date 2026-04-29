@@ -164,7 +164,13 @@ export const SunburstChart = defineComponent({
                       stroke: 'var(--tiger-surface,#ffffff)',
                       'stroke-width': 1,
                       class: classNames(interactive && 'cursor-pointer'),
-                      style: { transition: 'opacity 0.2s ease-out' },
+                      style: {
+                        transition: 'opacity 0.2s ease-out, filter 0.2s ease-out',
+                        filter:
+                          activeIndex.value === arc.index
+                            ? 'var(--tiger-chart-block-active-filter, none)'
+                            : 'none'
+                      },
                       tabindex: props.selectable ? 0 : undefined,
                       role: props.selectable ? 'button' : 'img',
                       'aria-label': arc.label,

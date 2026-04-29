@@ -167,10 +167,16 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
               d={arc.path}
               fill={arc.color}
               opacity={opacity}
-              stroke="#ffffff"
+              stroke="var(--tiger-surface,#ffffff)"
               strokeWidth={1}
               className={classNames(interactive && 'cursor-pointer')}
-              style={{ transition: 'opacity 0.2s ease-out' }}
+              style={{
+                transition: 'opacity 0.2s ease-out, filter 0.2s ease-out',
+                filter:
+                  activeIndex === arc.index
+                    ? 'var(--tiger-chart-block-active-filter, none)'
+                    : 'none'
+              }}
               tabIndex={selectable ? 0 : undefined}
               role={selectable ? 'button' : 'img'}
               aria-label={arc.label}

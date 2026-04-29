@@ -157,7 +157,14 @@ export const TreeMapChart = defineComponent({
                           fill: node.color,
                           opacity,
                           class: classNames(interactive && 'cursor-pointer'),
-                          style: { transition: 'opacity 0.2s ease-out' },
+                          style: {
+                            transition: 'opacity 0.2s ease-out, filter 0.2s ease-out',
+                            rx: 'var(--tiger-chart-block-radius, 2px)',
+                            filter:
+                              activeIndex.value === node.index
+                                ? 'var(--tiger-chart-block-active-filter, none)'
+                                : 'none'
+                          },
                           onMouseenter: (e: MouseEvent) => handleMouseEnter(node.index, e),
                           onMousemove: handleMouseMove,
                           onMouseleave: handleMouseLeave,
