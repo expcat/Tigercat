@@ -8,15 +8,15 @@ import {
   richTextToolbarClasses,
   richTextPlaceholderClasses,
   defaultToolbar,
-  mapToolbarAction,
   isInlineFormat,
   findHotkeyMatch,
-  sanitizeHtml,
   isContentEmpty,
   parseHeight,
-  isValidUrl,
+  builtinRichTextEngine,
   type RichTextEditorMode,
-  type ToolbarButton
+  type ToolbarButton,
+  type RichTextEngine,
+  type RichTextEngineInstance
 } from '@expcat/tigercat-core'
 
 export interface RichTextEditorProps extends Omit<
@@ -41,6 +41,13 @@ export interface RichTextEditorProps extends Omit<
   disabled?: boolean
   /** Content change callback */
   onChange?: (html: string) => void
+  /**
+   * Optional pluggable editor engine (PR-17). Defaults to the
+   * built-in `contenteditable` + `document.execCommand` engine. Pass a
+   * custom engine to swap in Quill / TipTap / ProseMirror without
+   * touching this component.
+   */
+  engine?: RichTextEngine
 }
 
 export const RichTextEditor: React.FC<RichTextEditorProps> = ({
@@ -54,103 +61,73 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   disabled = false,
   onChange,
   className,
+  engine,
   ...restProps
 }) => {
   const editorRef = useRef<HTMLDivElement>(null)
+  const engineRef = useRef<RichTextEngineInstance | null>(null)
   const [currentContent, setInternalValue, isControlled] = useControlledState(value, defaultValue)
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set())
   const toolbarButtons = toolbar ?? defaultToolbar
   const empty = isContentEmpty(currentContent)
 
-  // Sync controlled value to editor
+  // Stable refs to keep engine callbacks fresh without recreating the
+  // engine each render.
+  const onChangeRef = useRef(onChange)
+  const setInternalValueRef = useRef(setInternalValue)
+  const isControlledRef = useRef(isControlled)
   useEffect(() => {
-    if (isControlled && editorRef.current) {
-      const sanitized = sanitizeHtml(value!)
-      if (editorRef.current.innerHTML !== sanitized) {
-        editorRef.current.innerHTML = sanitized
+    onChangeRef.current = onChange
+    setInternalValueRef.current = setInternalValue
+    isControlledRef.current = isControlled
+  }, [onChange, setInternalValue, isControlled])
+
+  // Mount engine once (per engine identity) on the host element.
+  useEffect(() => {
+    if (!editorRef.current) return
+    const factory = engine ?? builtinRichTextEngine
+    const instance = factory.create({
+      element: editorRef.current,
+      initialValue: isControlled ? value! : defaultValue,
+      readOnly,
+      disabled,
+      placeholder,
+      toolbar: toolbarButtons,
+      notifyChange(html) {
+        if (!isControlledRef.current) setInternalValueRef.current(html)
+        onChangeRef.current?.(html)
+      },
+      notifyActiveFormats(next) {
+        setActiveFormats(next)
       }
+    })
+    engineRef.current = instance
+    return () => {
+      instance.destroy()
+      engineRef.current = null
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [engine])
+
+  // Sync controlled value to engine
+  useEffect(() => {
+    if (isControlled && engineRef.current && value !== undefined) {
+      engineRef.current.setValue(value)
     }
   }, [value, isControlled])
 
-  // Initialize editor content on mount
+  // Sync readOnly/disabled changes
   useEffect(() => {
-    if (editorRef.current) {
-      const initial = sanitizeHtml(isControlled ? value! : defaultValue)
-      if (initial) {
-        editorRef.current.innerHTML = initial
-      }
-    }
-  }, [])
-
-  // Active format detection
-  const updateActiveFormats = useCallback(() => {
-    if (typeof document === 'undefined') return
-    const next = new Set<string>()
-    if (document.queryCommandState('bold')) next.add('bold')
-    if (document.queryCommandState('italic')) next.add('italic')
-    if (document.queryCommandState('underline')) next.add('underline')
-    if (document.queryCommandState('strikeThrough')) next.add('strikethrough')
-    if (document.queryCommandState('insertUnorderedList')) next.add('bulletList')
-    if (document.queryCommandState('insertOrderedList')) next.add('orderedList')
-    setActiveFormats(next)
-  }, [])
-
-  // Listen for selection changes
-  useEffect(() => {
-    if (typeof document === 'undefined') return
-    document.addEventListener('selectionchange', updateActiveFormats)
-    return () => {
-      document.removeEventListener('selectionchange', updateActiveFormats)
-    }
-  }, [updateActiveFormats])
-
-  // Input handler
-  const handleInput = useCallback(() => {
-    if (!editorRef.current) return
-    const html = editorRef.current.innerHTML
-    const sanitized = sanitizeHtml(html)
-    if (!isControlled) {
-      setInternalValue(sanitized)
-    }
-    onChange?.(sanitized)
-  }, [isControlled, onChange])
+    engineRef.current?.setReadOnly(readOnly, disabled)
+  }, [readOnly, disabled])
 
   // Toolbar action
   const execAction = useCallback(
     (actionName: string) => {
       if (readOnly || disabled) return
-      editorRef.current?.focus()
-
-      const mapping = mapToolbarAction(actionName)
-      if (mapping) {
-        document.execCommand(mapping.command, false, mapping.argument)
-        handleInput()
-        updateActiveFormats()
-        return
-      }
-
-      if (actionName === 'codeBlock') {
-        document.execCommand('formatBlock', false, 'PRE')
-        handleInput()
-        return
-      }
-      if (actionName === 'link') {
-        const url = typeof window !== 'undefined' ? window.prompt('Enter URL:') : null
-        if (url && isValidUrl(url)) {
-          document.execCommand('createLink', false, url)
-          handleInput()
-        }
-        return
-      }
-      if (actionName === 'image') {
-        const url = typeof window !== 'undefined' ? window.prompt('Enter image URL:') : null
-        if (url && isValidUrl(url)) {
-          document.execCommand('insertImage', false, url)
-          handleInput()
-        }
-      }
+      engineRef.current?.exec(actionName)
     },
-    [readOnly, disabled, handleInput, updateActiveFormats]
+    [readOnly, disabled]
   )
 
   // Keyboard handler
@@ -203,14 +180,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         <div
           ref={editorRef}
           className={editorAreaClasses}
-          contentEditable={!(readOnly || disabled)}
           role="textbox"
           aria-multiline={true}
           aria-readonly={readOnly || undefined}
           aria-disabled={disabled || undefined}
           aria-placeholder={placeholder}
           data-placeholder={placeholder}
-          onInput={handleInput}
           onKeyDown={handleKeydown}
           suppressContentEditableWarning
         />

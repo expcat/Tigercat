@@ -90,8 +90,14 @@ export * from './resizable-utils'
 // CodeEditor utilities (v0.8.0+)
 export * from './code-editor-utils'
 
+// CodeEditor highlighter engine (PR-17)
+export * from './code-highlighter'
+
 // RichTextEditor utilities (v0.8.0+)
 export * from './rich-text-editor-utils'
+
+// RichTextEditor engine (PR-17)
+export * from './rich-text-engine'
 
 // Kanban utilities (v0.8.0+)
 export * from './kanban-utils'

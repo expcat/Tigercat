@@ -11,13 +11,21 @@ import {
   codeEditorTextareaClasses,
   codeEditorHighlightClasses,
   type CodeEditorProps as CoreCodeEditorProps,
-  type Token
+  type Token,
+  type CodeHighlighter
 } from '@expcat/tigercat-core'
 
 export interface CodeEditorProps extends Omit<CoreCodeEditorProps, 'style'> {
   onChange?: (value: string) => void
   children?: React.ReactNode
   style?: React.CSSProperties
+  /**
+   * Optional pluggable highlighter (PR-17). When provided the built-in
+   * regex tokenizer is bypassed and the engine renders raw HTML for
+   * each line (or whole block via `highlightCode`). Output is treated
+   * as TRUSTED HTML — sanitise inside the engine if needed.
+   */
+  highlighter?: CodeHighlighter
 }
 
 export const CodeEditor: React.FC<CodeEditorProps> = ({
@@ -35,7 +43,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   disabled = false,
   className,
   style,
-  onChange
+  onChange,
+  highlighter
 }) => {
   const [internalValue, setInternalValue] = useState(defaultValue)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -100,6 +109,16 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   }
 
   const renderLine = (line: string, lineIndex: number) => {
+    if (highlighter?.highlightLine) {
+      const html = highlighter.highlightLine(line, language, theme) || (line === '' ? '\n' : '')
+      return (
+        <div
+          key={lineIndex}
+          className="min-h-[1.625rem]"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      )
+    }
     const tokens = tokenizeLine(line, language)
     return (
       <div key={lineIndex} className="min-h-[1.625rem]">
@@ -108,6 +127,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
       </div>
     )
   }
+
+  const blockHtml =
+    highlighter && !highlighter.highlightLine && highlighter.highlightCode
+      ? highlighter.highlightCode(code, language, theme)
+      : null
 
   return (
     <div
@@ -126,9 +150,17 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           </div>
         )}
         <div className="relative flex-1 overflow-auto">
-          <div className={classNames(codeEditorHighlightClasses, wrapClass)} aria-hidden="true">
-            {lines.map(renderLine)}
-          </div>
+          {blockHtml !== null ? (
+            <div
+              className={classNames(codeEditorHighlightClasses, wrapClass)}
+              aria-hidden="true"
+              dangerouslySetInnerHTML={{ __html: blockHtml }}
+            />
+          ) : (
+            <div className={classNames(codeEditorHighlightClasses, wrapClass)} aria-hidden="true">
+              {lines.map(renderLine)}
+            </div>
+          )}
           <textarea
             ref={textareaRef}
             className={classNames(codeEditorTextareaClasses, wrapClass)}

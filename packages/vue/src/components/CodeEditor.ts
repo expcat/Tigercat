@@ -12,7 +12,8 @@ import {
   codeEditorTextareaClasses,
   codeEditorHighlightClasses,
   type CodeLanguage,
-  type CodeEditorTheme
+  type CodeEditorTheme,
+  type CodeHighlighter
 } from '@expcat/tigercat-core'
 
 export interface VueCodeEditorProps {
@@ -31,6 +32,13 @@ export interface VueCodeEditorProps {
   disabled?: boolean
   className?: string
   style?: Record<string, string | number>
+  /**
+   * Optional pluggable highlighter (PR-17). When provided the built-in
+   * regex tokenizer is bypassed and the engine renders raw HTML for
+   * each line (or whole block via `highlightCode`). Output is treated
+   * as TRUSTED HTML — sanitise inside the engine if needed.
+   */
+  highlighter?: CodeHighlighter
 }
 
 export const CodeEditor = defineComponent({
@@ -58,6 +66,10 @@ export const CodeEditor = defineComponent({
     className: { type: String, default: undefined },
     style: {
       type: Object as PropType<Record<string, string | number>>,
+      default: undefined
+    },
+    highlighter: {
+      type: Object as PropType<CodeHighlighter>,
       default: undefined
     }
   },
@@ -123,6 +135,17 @@ export const CodeEditor = defineComponent({
     }
 
     const renderHighlightedLine = (line: string, lineIndex: number) => {
+      // Engine path: trusted HTML injected per-line.
+      const engine = props.highlighter
+      if (engine?.highlightLine) {
+        return h('div', {
+          key: lineIndex,
+          class: 'min-h-[1.625rem]',
+          innerHTML:
+            engine.highlightLine(line, props.language, props.theme) || (line === '' ? '\n' : '')
+        })
+      }
+
       const tokens = tokenizeLine(line, props.language)
       const spans = tokens.map((token, ti) => {
         const cls = getTokenClasses(token.type, props.theme)
@@ -148,11 +171,25 @@ export const CodeEditor = defineComponent({
           )
         : null
 
-      const highlightNode = h(
-        'div',
-        { class: classNames(codeEditorHighlightClasses, wrapClass), 'aria-hidden': 'true' },
-        lines.value.map((line, i) => renderHighlightedLine(line, i))
-      )
+      // Whole-block engine path: bypass per-line rendering entirely.
+      const blockEngine = props.highlighter
+      const blockHtml =
+        blockEngine && !blockEngine.highlightLine && blockEngine.highlightCode
+          ? blockEngine.highlightCode(code.value, props.language, props.theme)
+          : null
+
+      const highlightNode =
+        blockHtml !== null
+          ? h('div', {
+              class: classNames(codeEditorHighlightClasses, wrapClass),
+              'aria-hidden': 'true',
+              innerHTML: blockHtml
+            })
+          : h(
+              'div',
+              { class: classNames(codeEditorHighlightClasses, wrapClass), 'aria-hidden': 'true' },
+              lines.value.map((line, i) => renderHighlightedLine(line, i))
+            )
 
       const textareaNode = h('textarea', {
         ref: textareaRef,

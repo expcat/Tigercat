@@ -8,15 +8,16 @@ import {
   richTextToolbarClasses,
   richTextPlaceholderClasses,
   defaultToolbar,
-  mapToolbarAction,
   isInlineFormat,
   findHotkeyMatch,
   sanitizeHtml,
   isContentEmpty,
   parseHeight,
-  isValidUrl,
+  builtinRichTextEngine,
   type RichTextEditorMode,
-  type ToolbarButton
+  type ToolbarButton,
+  type RichTextEngine,
+  type RichTextEngineInstance
 } from '@expcat/tigercat-core'
 
 export interface VueRichTextEditorProps {
@@ -29,6 +30,13 @@ export interface VueRichTextEditorProps {
   readOnly?: boolean
   disabled?: boolean
   className?: string
+  /**
+   * Optional pluggable editor engine (PR-17). Defaults to the
+   * built-in `contenteditable` + `document.execCommand` engine. Pass a
+   * custom engine to swap in Quill / TipTap / ProseMirror without
+   * touching this component.
+   */
+  engine?: RichTextEngine
 }
 
 export const RichTextEditor = defineComponent({
@@ -51,13 +59,18 @@ export const RichTextEditor = defineComponent({
     },
     readOnly: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
-    className: { type: String, default: undefined }
+    className: { type: String, default: undefined },
+    engine: {
+      type: Object as PropType<RichTextEngine>,
+      default: undefined
+    }
   },
   emits: ['update:value', 'change'],
   setup(props, { emit, attrs }) {
     const editorRef = ref<HTMLDivElement | null>(null)
     const internalValue = ref(props.defaultValue || '')
     const activeFormats = ref<Set<string>>(new Set())
+    let engineInstance: RichTextEngineInstance | null = null
 
     const isControlled = computed(() => props.value !== undefined)
     const currentContent = computed(() => (isControlled.value ? props.value! : internalValue.value))
@@ -68,84 +81,50 @@ export const RichTextEditor = defineComponent({
     watch(
       () => props.value,
       (newVal) => {
-        if (newVal !== undefined && editorRef.value) {
-          const sanitized = sanitizeHtml(newVal)
-          if (editorRef.value.innerHTML !== sanitized) {
-            editorRef.value.innerHTML = sanitized
-          }
+        if (newVal !== undefined && engineInstance) {
+          engineInstance.setValue(newVal)
         }
       }
     )
 
-    onMounted(() => {
-      if (editorRef.value) {
-        const initial = sanitizeHtml(currentContent.value)
-        if (initial) {
-          editorRef.value.innerHTML = initial
-        }
+    // React to readOnly/disabled changes after mount
+    watch(
+      () => [props.readOnly, props.disabled] as const,
+      ([ro, dis]) => {
+        engineInstance?.setReadOnly(ro, dis)
       }
+    )
+
+    onMounted(() => {
+      if (!editorRef.value) return
+      const engine = props.engine ?? builtinRichTextEngine
+      engineInstance = engine.create({
+        element: editorRef.value,
+        initialValue: currentContent.value,
+        readOnly: props.readOnly,
+        disabled: props.disabled,
+        placeholder: props.placeholder,
+        toolbar: toolbarButtons.value,
+        notifyChange(html) {
+          if (!isControlled.value) internalValue.value = html
+          emit('update:value', html)
+          emit('change', html)
+        },
+        notifyActiveFormats(next) {
+          activeFormats.value = next
+        }
+      })
     })
 
-    // ── Active format detection ──
-    function updateActiveFormats() {
-      if (typeof document === 'undefined') return
-      const next = new Set<string>()
-      if (document.queryCommandState('bold')) next.add('bold')
-      if (document.queryCommandState('italic')) next.add('italic')
-      if (document.queryCommandState('underline')) next.add('underline')
-      if (document.queryCommandState('strikeThrough')) next.add('strikethrough')
-      if (document.queryCommandState('insertUnorderedList')) next.add('bulletList')
-      if (document.queryCommandState('insertOrderedList')) next.add('orderedList')
-      activeFormats.value = next
-    }
+    onBeforeUnmount(() => {
+      engineInstance?.destroy()
+      engineInstance = null
+    })
 
     // ── Toolbar action handler ──
     function execAction(actionName: string) {
       if (props.readOnly || props.disabled) return
-      // focus the editor first
-      editorRef.value?.focus()
-
-      const mapping = mapToolbarAction(actionName)
-      if (mapping) {
-        document.execCommand(mapping.command, false, mapping.argument)
-        handleInput()
-        updateActiveFormats()
-        return
-      }
-
-      // Custom actions
-      if (actionName === 'codeBlock') {
-        document.execCommand('formatBlock', false, 'PRE')
-        handleInput()
-        return
-      }
-      if (actionName === 'link') {
-        const url = typeof window !== 'undefined' ? window.prompt('Enter URL:') : null
-        if (url && isValidUrl(url)) {
-          document.execCommand('createLink', false, url)
-          handleInput()
-        }
-        return
-      }
-      if (actionName === 'image') {
-        const url = typeof window !== 'undefined' ? window.prompt('Enter image URL:') : null
-        if (url && isValidUrl(url)) {
-          document.execCommand('insertImage', false, url)
-          handleInput()
-        }
-      }
-    }
-
-    // ── Input handler ──
-    function handleInput() {
-      if (!editorRef.value) return
-      const html = editorRef.value.innerHTML
-      const sanitized = sanitizeHtml(html)
-      if (!isControlled.value) {
-        internalValue.value = sanitized
-      }
-      emit('update:value', sanitized)
-      emit('change', sanitized)
+      engineInstance?.exec(actionName)
     }
 
     // ── Keyboard handler ──
@@ -156,22 +135,6 @@ export const RichTextEditor = defineComponent({
         execAction(match)
       }
     }
-
-    // ── Selection change listener for active state ──
-    let selectionHandler: (() => void) | null = null
-
-    onMounted(() => {
-      if (typeof document !== 'undefined') {
-        selectionHandler = updateActiveFormats
-        document.addEventListener('selectionchange', selectionHandler)
-      }
-    })
-
-    onBeforeUnmount(() => {
-      if (selectionHandler && typeof document !== 'undefined') {
-        document.removeEventListener('selectionchange', selectionHandler)
-      }
-    })
 
     const containerClasses = computed(() =>
       classNames(
@@ -224,14 +187,12 @@ export const RichTextEditor = defineComponent({
       const editorEl = h('div', {
         ref: editorRef,
         class: editorAreaClasses.value,
-        contenteditable: !(props.readOnly || props.disabled),
         role: 'textbox',
         'aria-multiline': true,
         'aria-readonly': props.readOnly || undefined,
         'aria-disabled': props.disabled || undefined,
         'aria-placeholder': props.placeholder,
         'data-placeholder': props.placeholder,
-        onInput: handleInput,
         onKeydown: handleKeydown
       })
 
