@@ -163,7 +163,10 @@ export const HeatmapChart = defineComponent({
                     fill: cell.fill,
                     opacity,
                     class: classNames(interactive && 'cursor-pointer'),
-                    style: { transition: 'opacity 0.2s ease-out' },
+                    style: {
+                      transition: 'opacity 0.2s ease-out',
+                      rx: `var(--tiger-chart-block-radius, ${props.cellRadius}px)`
+                    },
                     onMouseenter: (e: MouseEvent) => handleMouseEnter(idx, e),
                     onMousemove: handleMouseMove,
                     onMouseleave: handleMouseLeave,

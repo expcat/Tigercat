@@ -157,7 +157,10 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
               fill={cell.fill}
               opacity={opacity}
               className={classNames(interactive && 'cursor-pointer')}
-              style={{ transition: 'opacity 0.2s ease-out' }}
+              style={{
+                transition: 'opacity 0.2s ease-out',
+                rx: `var(--tiger-chart-block-radius, ${cellRadius}px)`
+              } as React.CSSProperties}
               onMouseEnter={(e) => handleMouseEnter(idx, e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
