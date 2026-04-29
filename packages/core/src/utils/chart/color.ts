@@ -10,12 +10,17 @@
 
 export const chartCanvasBaseClasses = 'block'
 
-export const chartAxisLineClasses = 'stroke-[color:var(--tiger-border,#e5e7eb)]'
-export const chartAxisTickLineClasses = 'stroke-[color:var(--tiger-border,#e5e7eb)]'
-export const chartAxisTickTextClasses = 'fill-[color:var(--tiger-text-secondary,#6b7280)] text-xs'
-export const chartAxisLabelClasses = 'fill-[color:var(--tiger-text,#374151)] text-xs font-medium'
+export const chartAxisLineClasses =
+  'stroke-[color:var(--tiger-border,#e5e7eb)] [stroke-opacity:var(--tiger-chart-axis-line-opacity,1)]'
+export const chartAxisTickLineClasses =
+  'stroke-[color:var(--tiger-border,#e5e7eb)] [stroke-opacity:var(--tiger-chart-axis-tick-opacity,1)]'
+export const chartAxisTickTextClasses =
+  'fill-[color:var(--tiger-text-secondary,#6b7280)] text-xs tabular-nums'
+export const chartAxisLabelClasses =
+  'fill-[color:var(--tiger-text,#374151)] text-xs font-medium tabular-nums'
 
-export const chartGridLineClasses = 'stroke-[color:var(--tiger-border,#e5e7eb)]'
+export const chartGridLineClasses =
+  'stroke-[color:var(--tiger-border,#e5e7eb)] [stroke-opacity:var(--tiger-chart-grid-line-opacity,1)]'
 
 // ----------------------------------------------------------------------------
 // Default palette (theme tokens with hex fallback)

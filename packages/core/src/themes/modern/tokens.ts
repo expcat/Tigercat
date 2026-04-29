@@ -106,6 +106,17 @@ export const MODERN_OVERRIDE_TOKENS_LIGHT: Record<string, string> = {
   '--tiger-blur-glass': '16px',
   '--tiger-blur-glass-strong': '24px',
 
+  // Chart axis softening (modern look uses fainter axis/grid strokes)
+  '--tiger-chart-axis-line-opacity': '0.6',
+  '--tiger-chart-axis-tick-opacity': '0.55',
+  '--tiger-chart-grid-line-opacity': '0.4',
+
+  // Chart legend marker + row hover (opt-in glassy look)
+  '--tiger-chart-legend-marker-image':
+    'linear-gradient(135deg, color-mix(in oklab, var(--tiger-chart-legend-marker-color) 100%, white 18%) 0%, var(--tiger-chart-legend-marker-color) 100%)',
+  '--tiger-chart-legend-row-hover-bg': 'rgb(15 23 42 / 0.04)',
+  '--tiger-chart-legend-row-radius': 'var(--tiger-radius-sm, 6px)',
+
   // Subtle gradients via OKLab color-mix
   '--tiger-gradient-primary':
     'linear-gradient(180deg, color-mix(in oklab, var(--tiger-primary) 100%, white 8%) 0%, var(--tiger-primary) 100%)',
@@ -141,7 +152,10 @@ export const MODERN_OVERRIDE_TOKENS_DARK: Record<string, string> = {
   '--tiger-shadow-glass':
     'inset 0 1px 0 rgb(255 255 255 / 0.06), inset 0 -1px 0 rgb(0 0 0 / 0.4), 0 8px 24px -4px rgb(0 0 0 / 0.4)',
   '--tiger-shadow-glass-strong':
-    'inset 0 1px 0 rgb(255 255 255 / 0.08), inset 0 0 0 1px rgb(255 255 255 / 0.06), 0 16px 32px -8px rgb(0 0 0 / 0.55)'
+    'inset 0 1px 0 rgb(255 255 255 / 0.08), inset 0 0 0 1px rgb(255 255 255 / 0.06), 0 16px 32px -8px rgb(0 0 0 / 0.55)',
+
+  // Chart legend row hover for dark surfaces (slightly brighter)
+  '--tiger-chart-legend-row-hover-bg': 'rgb(255 255 255 / 0.06)'
 }
 
 /**

@@ -68,10 +68,10 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
             key={`legend-${item.index}`}
             type={interactive ? 'button' : undefined}
             className={classNames(
-              'flex items-center gap-2 text-sm',
+              'flex items-center gap-2 text-sm rounded-[var(--tiger-chart-legend-row-radius,0)]',
               'text-[color:var(--tiger-text-secondary,#6b7280)]',
               interactive
-                ? 'cursor-pointer hover:text-[color:var(--tiger-text,#374151)] transition-colors'
+                ? 'cursor-pointer hover:text-[color:var(--tiger-text,#374151)] hover:bg-[var(--tiger-chart-legend-row-hover-bg,transparent)] transition-colors'
                 : 'cursor-default',
               item.active === false ? 'opacity-50' : undefined
             )}
@@ -82,11 +82,14 @@ export const ChartLegend: React.FC<ChartLegendProps> = ({
             onMouseLeave={interactive ? handleLeave : undefined}>
             <span
               className="inline-block rounded-full shrink-0"
-              style={{
-                width: `${markerSize}px`,
-                height: `${markerSize}px`,
-                backgroundColor: item.color
-              }}
+              style={
+                {
+                  width: `${markerSize}px`,
+                  height: `${markerSize}px`,
+                  background: `var(--tiger-chart-legend-marker-image, ${item.color})`,
+                  '--tiger-chart-legend-marker-color': item.color
+                } as React.CSSProperties
+              }
               aria-hidden="true"
               data-legend-marker="true"
             />

@@ -83,10 +83,10 @@ export const ChartLegend = defineComponent({
               key: `legend-${item.index}`,
               type: props.interactive ? 'button' : undefined,
               class: classNames(
-                'flex items-center gap-2 text-sm',
+                'flex items-center gap-2 text-sm rounded-[var(--tiger-chart-legend-row-radius,0)]',
                 'text-[color:var(--tiger-text-secondary,#6b7280)]',
                 props.interactive
-                  ? 'cursor-pointer hover:text-[color:var(--tiger-text,#374151)] transition-colors'
+                  ? 'cursor-pointer hover:text-[color:var(--tiger-text,#374151)] hover:bg-[var(--tiger-chart-legend-row-hover-bg,transparent)] transition-colors'
                   : 'cursor-default',
                 item.active === false ? 'opacity-50' : undefined
               ),
@@ -102,8 +102,9 @@ export const ChartLegend = defineComponent({
                 style: {
                   width: `${props.markerSize}px`,
                   height: `${props.markerSize}px`,
-                  backgroundColor: item.color
-                },
+                  background: `var(--tiger-chart-legend-marker-image, ${item.color})`,
+                  '--tiger-chart-legend-marker-color': item.color
+                } as Record<string, string>,
                 'aria-hidden': 'true',
                 'data-legend-marker': 'true'
               }),
