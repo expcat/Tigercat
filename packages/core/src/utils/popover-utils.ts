@@ -27,7 +27,7 @@ export function getPopoverContentClasses(width?: string | number): string {
     'max-w-[400px]',
     'p-3',
     'bg-[var(--tiger-surface,#ffffff)]',
-    'rounded-xl',
+    'rounded-[var(--tiger-radius-lg,0.75rem)]',
     'shadow-lg',
     'border',
     'border-[var(--tiger-border,#e5e7eb)]'

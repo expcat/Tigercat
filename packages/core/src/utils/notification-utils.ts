@@ -32,7 +32,7 @@ export const notificationPositionClasses: Record<NotificationPosition, string> =
  * Base notification item classes
  */
 export const notificationBaseClasses =
-  'flex gap-3 p-4 rounded-xl shadow-lg border pointer-events-auto transition-all duration-300 ease-in-out'
+  'flex gap-3 p-4 rounded-[var(--tiger-radius-lg,0.75rem)] shadow-lg border pointer-events-auto transition-all duration-300 ease-in-out'
 
 /**
  * Notification type color schemes
@@ -119,7 +119,7 @@ export const notificationCloseIconPath = closeIconPathD
  * Notification close button classes
  */
 export const notificationCloseButtonClasses =
-  'p-1 rounded-lg hover:bg-[var(--tiger-surface-muted,#e5e7eb)] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)]/40 flex-shrink-0'
+  'p-1 rounded-[var(--tiger-radius-md,0.5rem)] hover:bg-[var(--tiger-surface-muted,#e5e7eb)] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--tiger-primary,#2563eb)]/40 flex-shrink-0'
 
 /**
  * Notification close icon classes

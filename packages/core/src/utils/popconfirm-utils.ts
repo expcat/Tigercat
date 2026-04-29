@@ -35,7 +35,7 @@ export function getPopconfirmContentClasses(): string {
     'max-w-[320px]',
     'p-4',
     'bg-[var(--tiger-surface,#ffffff)]',
-    'rounded-lg',
+    'rounded-[var(--tiger-radius-md,0.5rem)]',
     'shadow-lg',
     'border',
     'border-[var(--tiger-border,#e5e7eb)]'
@@ -154,7 +154,7 @@ export function getPopconfirmButtonBaseClasses(): string {
     'py-1.5',
     'text-xs',
     'font-medium',
-    'rounded-lg',
+    'rounded-[var(--tiger-radius-md,0.5rem)]',
     'transition-colors',
     'focus:outline-none',
     'focus:ring-2',

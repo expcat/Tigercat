@@ -30,7 +30,7 @@ export const getModalContainerClasses = (centered: boolean) => {
  * Modal content wrapper classes
  */
 export const modalContentWrapperClasses =
-  'relative transform overflow-hidden rounded-2xl bg-[var(--tiger-surface,#ffffff)] shadow-xl transition-all'
+  'relative transform overflow-hidden rounded-[var(--tiger-radius-xl,1rem)] bg-[var(--tiger-surface,#ffffff)] shadow-xl transition-all'
 
 /**
  * Modal size classes
@@ -58,7 +58,7 @@ export const modalTitleClasses = 'text-lg font-semibold text-[var(--tiger-text,#
  * Modal close button classes
  */
 export const modalCloseButtonClasses =
-  'text-[var(--tiger-text-muted,#9ca3af)] hover:text-[var(--tiger-text-muted,#6b7280)] focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/40 rounded-lg p-1 transition-colors'
+  'text-[var(--tiger-text-muted,#9ca3af)] hover:text-[var(--tiger-text-muted,#6b7280)] focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/40 rounded-[var(--tiger-radius-md,0.5rem)] p-1 transition-colors'
 
 /**
  * Modal body classes

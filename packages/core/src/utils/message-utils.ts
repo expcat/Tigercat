@@ -33,7 +33,7 @@ export const messagePositionClasses: Record<MessagePosition, string> = {
  * Base message item classes
  */
 export const messageBaseClasses =
-  'flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border pointer-events-auto transition-all duration-300 ease-in-out'
+  'flex items-center gap-3 px-4 py-3 rounded-[var(--tiger-radius-lg,0.75rem)] shadow-lg border pointer-events-auto transition-all duration-300 ease-in-out'
 
 /**
  * Message type color schemes

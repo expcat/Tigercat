@@ -96,7 +96,7 @@ export function getDrawerFooterClasses(): string {
 export function getDrawerCloseButtonClasses(): string {
   return classNames(
     'inline-flex items-center justify-center',
-    'w-8 h-8 rounded-lg',
+    'w-8 h-8 rounded-[var(--tiger-radius-md,0.5rem)]',
     'text-[var(--tiger-text-muted,#9ca3af)] hover:text-[var(--tiger-text-muted,#6b7280)] hover:bg-[var(--tiger-surface-muted,#f9fafb)]',
     'transition-colors duration-200',
     'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/40 focus:ring-offset-2'
