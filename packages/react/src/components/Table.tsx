@@ -1,181 +1,23 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react'
+import React, { useMemo } from 'react'
 import {
   classNames,
   getTableWrapperClasses,
-  getTableHeaderClasses,
-  getTableHeaderCellClasses,
-  getTableRowClasses,
-  getTableCellClasses,
-  getFixedColumnOffsets,
-  getSortIconClasses,
-  getCheckboxCellClasses,
-  getExpandIconCellClasses,
-  getExpandIconClasses,
-  getExpandedRowClasses,
-  getExpandedRowContentClasses,
   tableBaseClasses,
-  tableEmptyStateClasses,
   tableLoadingOverlayClasses,
-  getSpinnerSVG,
-  getLoadingOverlaySpinnerClasses,
-  tableSummaryRowClasses,
-  getEditableCellClasses,
-  editableCellInputClasses,
   tableExportButtonClasses,
-  // Icon constants
-  icon16ViewBox,
-  icon24ViewBox,
-  sortAscIcon16PathD,
-  sortDescIcon16PathD,
-  sortBothIcon16PathD,
-  expandChevronIcon16PathD,
-  lockClosedIcon24PathD,
-  lockOpenIcon24PathD,
-  sortData,
-  filterData,
-  paginateData,
-  calculatePagination,
-  getRowKey,
-  filterDataAdvanced,
-  groupDataByColumn,
-  tableGroupHeaderClasses,
-  getGroupHeaderCellClasses,
-  exportTableToCsv,
-  downloadCsv,
-  // Simple pagination style utilities
-  getSimplePaginationContainerClasses,
-  getSimplePaginationTotalClasses,
-  getSimplePaginationControlsClasses,
-  getSimplePaginationSelectClasses,
-  getSimplePaginationButtonClasses,
-  getSimplePaginationPageIndicatorClasses,
-  getSimplePaginationButtonsWrapperClasses,
-  type TableProps as CoreTableProps,
-  type SortState,
-  type PaginationConfig
+  type RowSelectionConfig,
+  type ExpandableConfig
 } from '@expcat/tigercat-core'
 
-const spinnerSvg = getSpinnerSVG('spinner')
+import { LoadingSpinner } from './Table/icons'
+import { useTableState } from './Table/state'
+import { renderTableHeader } from './Table/render-header'
+import { renderTableBody } from './Table/render-body'
+import { renderSummaryRow } from './Table/render-summary'
+import { renderPagination } from './Table/render-pagination'
+import type { TableProps } from './Table/types'
 
-export interface TableProps<T = Record<string, unknown>> extends CoreTableProps<T> {
-  /**
-   * Change event handler (for sort, filter, pagination changes)
-   */
-  onChange?: (params: {
-    sort: SortState
-    filters: Record<string, unknown>
-    pagination: { current: number; pageSize: number } | null
-  }) => void
-
-  /**
-   * Row click handler
-   */
-  onRowClick?: (record: T, index: number) => void
-
-  /**
-   * Selection change handler
-   */
-  onSelectionChange?: (selectedKeys: (string | number)[]) => void
-
-  /**
-   * Sort change handler
-   */
-  onSortChange?: (sort: SortState) => void
-
-  /**
-   * Filter change handler
-   */
-  onFilterChange?: (filters: Record<string, unknown>) => void
-
-  /**
-   * Page change handler
-   */
-  onPageChange?: (page: { current: number; pageSize: number }) => void
-
-  /**
-   * Expand change handler
-   */
-  onExpandChange?: (expandedKeys: (string | number)[], record: T, expanded: boolean) => void
-
-  /**
-   * Cell change handler (editable mode)
-   */
-  onCellChange?: (rowIndex: number, columnKey: string, newValue: string) => void
-
-  /**
-   * Column order change handler (column drag mode)
-   */
-  onColumnOrderChange?: (columns: CoreTableProps<T>['columns']) => void
-
-  /**
-   * Export handler
-   */
-  onExport?: (csv: string) => void
-
-  /**
-   * Additional CSS classes
-   */
-  className?: string
-}
-
-// Sort icon
-const SortIcon: React.FC<{ direction: 'asc' | 'desc' | null }> = ({ direction }) => {
-  const active = direction !== null
-  const pathD =
-    direction === 'asc'
-      ? sortAscIcon16PathD
-      : direction === 'desc'
-        ? sortDescIcon16PathD
-        : sortBothIcon16PathD
-
-  return (
-    <svg
-      className={getSortIconClasses(active)}
-      width="16"
-      height="16"
-      viewBox={icon16ViewBox}
-      fill="currentColor">
-      <path d={pathD} />
-    </svg>
-  )
-}
-
-const LockIcon: React.FC<{ locked: boolean }> = ({ locked }) => {
-  return (
-    <svg width="14" height="14" viewBox={icon24ViewBox} fill="currentColor" aria-hidden="true">
-      <path d={locked ? lockClosedIcon24PathD : lockOpenIcon24PathD} />
-    </svg>
-  )
-}
-
-const ExpandIcon: React.FC<{ expanded: boolean }> = ({ expanded }) => {
-  return (
-    <svg
-      className={getExpandIconClasses(expanded)}
-      width="16"
-      height="16"
-      viewBox={icon16ViewBox}
-      fill="currentColor"
-      aria-hidden="true">
-      <path d={expandChevronIcon16PathD} />
-    </svg>
-  )
-}
-
-// Loading spinner
-const LoadingSpinner: React.FC = () => (
-  <svg
-    className={getLoadingOverlaySpinnerClasses()}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox={spinnerSvg.viewBox}>
-    {spinnerSvg.elements.map((el, index) => {
-      if (el.type === 'circle') return <circle key={index} {...el.attrs} />
-      if (el.type === 'path') return <path key={index} {...el.attrs} />
-      return null
-    })}
-  </svg>
-)
+export type { TableProps } from './Table/types'
 
 export function Table<T extends Record<string, unknown> = Record<string, unknown>>({
   columns,
@@ -232,964 +74,51 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   className,
   ...props
 }: TableProps<T>) {
-  const isSortControlled = sort !== undefined
-  const isFiltersControlled = filters !== undefined
-
-  const paginationConfig: PaginationConfig | null =
-    pagination !== false && typeof pagination === 'object' ? pagination : null
-  const isCurrentPageControlled = paginationConfig?.current !== undefined
-  const isPageSizeControlled = paginationConfig?.pageSize !== undefined
-
-  const isSelectionControlled =
-    rowSelection?.selectedRowKeys !== undefined && Array.isArray(rowSelection.selectedRowKeys)
-
-  const isExpandControlled =
-    expandable?.expandedRowKeys !== undefined && Array.isArray(expandable.expandedRowKeys)
-
-  const [uncontrolledSortState, setUncontrolledSortState] = useState<SortState>(
-    defaultSort ?? { key: null, direction: null }
-  )
-
-  const [uncontrolledFilterState, setUncontrolledFilterState] = useState<Record<string, unknown>>(
-    defaultFilters ?? {}
-  )
-
-  const [uncontrolledCurrentPage, setUncontrolledCurrentPage] = useState(
-    () => paginationConfig?.defaultCurrent ?? paginationConfig?.current ?? 1
-  )
-
-  const [uncontrolledCurrentPageSize, setUncontrolledCurrentPageSize] = useState(
-    () => paginationConfig?.defaultPageSize ?? paginationConfig?.pageSize ?? 10
-  )
-
-  const [uncontrolledSelectedRowKeys, setUncontrolledSelectedRowKeys] = useState<
-    (string | number)[]
-  >(rowSelection?.defaultSelectedRowKeys ?? rowSelection?.selectedRowKeys ?? [])
-
-  const [uncontrolledExpandedRowKeys, setUncontrolledExpandedRowKeys] = useState<
-    (string | number)[]
-  >(expandable?.defaultExpandedRowKeys ?? expandable?.expandedRowKeys ?? [])
-
-  const sortState = isSortControlled ? (sort as SortState) : uncontrolledSortState
-  const filterState = isFiltersControlled
-    ? (filters as Record<string, unknown>)
-    : uncontrolledFilterState
-  const currentPage = isCurrentPageControlled
-    ? (paginationConfig!.current as number)
-    : uncontrolledCurrentPage
-  const currentPageSize = isPageSizeControlled
-    ? (paginationConfig!.pageSize as number)
-    : uncontrolledCurrentPageSize
-  const selectedRowKeys = isSelectionControlled
-    ? (rowSelection!.selectedRowKeys as (string | number)[])
-    : uncontrolledSelectedRowKeys
-
-  const expandedRowKeys = isExpandControlled
-    ? (expandable!.expandedRowKeys as (string | number)[])
-    : uncontrolledExpandedRowKeys
-
-  useEffect(() => {
-    if (isSortControlled && sort) {
-      setUncontrolledSortState(sort)
-    }
-  }, [isSortControlled, sort?.key, sort?.direction])
-
-  useEffect(() => {
-    if (isFiltersControlled && filters) {
-      setUncontrolledFilterState(filters)
-    }
-  }, [isFiltersControlled, filters])
-
-  useEffect(() => {
-    if (isCurrentPageControlled) {
-      setUncontrolledCurrentPage(paginationConfig!.current as number)
-    }
-  }, [isCurrentPageControlled, paginationConfig?.current])
-
-  useEffect(() => {
-    if (isPageSizeControlled) {
-      setUncontrolledCurrentPageSize(paginationConfig!.pageSize as number)
-    }
-  }, [isPageSizeControlled, paginationConfig?.pageSize])
-
-  useEffect(() => {
-    if (isSelectionControlled) {
-      setUncontrolledSelectedRowKeys((rowSelection?.selectedRowKeys as (string | number)[]) ?? [])
-    }
-  }, [isSelectionControlled, rowSelection?.selectedRowKeys])
-
-  useEffect(() => {
-    if (isExpandControlled) {
-      setUncontrolledExpandedRowKeys((expandable?.expandedRowKeys as (string | number)[]) ?? [])
-    }
-  }, [isExpandControlled, expandable?.expandedRowKeys])
-
-  const [fixedOverrides, setFixedOverrides] = useState<Record<string, 'left' | 'right' | false>>({})
-
-  const displayColumns = useMemo(() => {
-    return columns.map((column) => {
-      const hasOverride = Object.prototype.hasOwnProperty.call(fixedOverrides, column.key)
-
-      return {
-        ...column,
-        fixed: hasOverride ? fixedOverrides[column.key] : column.fixed
-      }
-    })
-  }, [columns, fixedOverrides])
-
-  const totalColumnCount = useMemo(() => {
-    let count = displayColumns.length
-    if (rowSelection && rowSelection.showCheckbox !== false) count++
-    if (expandable) count++
-    return count
-  }, [displayColumns.length, rowSelection, expandable])
-
-  const columnByKey = useMemo(() => {
-    const map: Record<string, (typeof displayColumns)[number]> = {}
-    for (const column of displayColumns) {
-      map[column.key] = column
-    }
-    return map
-  }, [displayColumns])
-
-  const fixedColumnsInfo = useMemo(() => {
-    return getFixedColumnOffsets(displayColumns)
-  }, [displayColumns])
-
-  const toggleColumnLock = useCallback(
-    (columnKey: string) => {
-      setFixedOverrides((prev) => {
-        const original = columns.find((c) => c.key === columnKey)?.fixed
-        const current = Object.prototype.hasOwnProperty.call(prev, columnKey)
-          ? prev[columnKey]
-          : original
-
-        const isLocked = current === 'left' || current === 'right'
-
-        return {
-          ...prev,
-          [columnKey]: isLocked ? false : 'left'
-        }
-      })
-    },
-    [columns]
-  )
-
-  // Process data with sorting, filtering, and pagination
-  const processedData = useMemo(() => {
-    let data = dataSource
-
-    // Apply filters (basic or advanced)
-    if (filterMode === 'advanced' && advancedFilterRules.length > 0) {
-      data = filterDataAdvanced(data, advancedFilterRules)
-    } else {
-      data = filterData(data, filterState)
-    }
-
-    // Apply sorting
-    if (sortState.key && sortState.direction) {
-      const column = columnByKey[sortState.key]
-      data = sortData(data, sortState.key, sortState.direction, column?.sortFn)
-    }
-
-    return data
-  }, [dataSource, filterState, sortState, columnByKey, filterMode, advancedFilterRules])
-
-  const paginatedData = useMemo(() => {
-    if (pagination === false) {
-      return processedData
-    }
-
-    return paginateData(processedData, currentPage, currentPageSize)
-  }, [processedData, currentPage, currentPageSize, pagination])
-
-  const pageRowKeys = useMemo(
-    () => paginatedData.map((record, index) => getRowKey(record, rowKey, index)),
-    [paginatedData, rowKey]
-  )
-
-  const selectedRowKeySet = useMemo(
-    () => new Set<string | number>(selectedRowKeys),
-    [selectedRowKeys]
-  )
-
-  const expandedRowKeySet = useMemo(
-    () => new Set<string | number>(expandedRowKeys),
-    [expandedRowKeys]
-  )
-
-  const paginationInfo = useMemo(() => {
-    if (pagination === false) {
-      return null
-    }
-
-    const total = processedData.length
-    return calculatePagination(total, currentPage, currentPageSize)
-  }, [processedData.length, currentPage, currentPageSize, pagination])
-
-  const handleSort = useCallback(
-    (columnKey: string) => {
-      const column = columnByKey[columnKey]
-      if (!column || !column.sortable) {
-        return
-      }
-
-      let newDirection: 'asc' | 'desc' | null = 'asc'
-
-      if (sortState.key === columnKey) {
-        if (sortState.direction === 'asc') {
-          newDirection = 'desc'
-        } else if (sortState.direction === 'desc') {
-          newDirection = null
-        }
-      }
-
-      const newSortState: SortState = {
-        key: newDirection ? columnKey : null,
-        direction: newDirection
-      }
-
-      if (!isSortControlled) {
-        setUncontrolledSortState(newSortState)
-      }
-      onSortChange?.(newSortState)
-      onChange?.({
-        sort: newSortState,
-        filters: filterState,
-        pagination:
-          pagination !== false
-            ? {
-                current: currentPage,
-                pageSize: currentPageSize
-              }
-            : null
-      })
-    },
-    [
-      columnByKey,
-      sortState,
-      filterState,
-      currentPage,
-      currentPageSize,
-      pagination,
-      isSortControlled,
-      onSortChange,
-      onChange
-    ]
-  )
-
-  const handleFilter = useCallback(
-    (columnKey: string, value: unknown) => {
-      const newFilterState = {
-        ...filterState,
-        [columnKey]: value
-      }
-
-      if (!isFiltersControlled) {
-        setUncontrolledFilterState(newFilterState)
-      }
-      setUncontrolledCurrentPage(1) // Keep internal state aligned
-
-      onFilterChange?.(newFilterState)
-      onChange?.({
-        sort: sortState,
-        filters: newFilterState,
-        pagination:
-          pagination !== false
-            ? {
-                current: 1,
-                pageSize: currentPageSize
-              }
-            : null
-      })
-    },
-    [
-      filterState,
-      sortState,
-      currentPageSize,
-      pagination,
-      isFiltersControlled,
-      onFilterChange,
-      onChange
-    ]
-  )
-
-  const handlePageChange = useCallback(
-    (page: number) => {
-      setUncontrolledCurrentPage(page)
-
-      onPageChange?.({ current: page, pageSize: currentPageSize })
-      onChange?.({
-        sort: sortState,
-        filters: filterState,
-        pagination: {
-          current: page,
-          pageSize: currentPageSize
-        }
-      })
-    },
-    [currentPageSize, sortState, filterState, onPageChange, onChange]
-  )
-
-  const handlePageSizeChange = useCallback(
-    (pageSize: number) => {
-      setUncontrolledCurrentPageSize(pageSize)
-      setUncontrolledCurrentPage(1)
-
-      onPageChange?.({ current: 1, pageSize })
-      onChange?.({
-        sort: sortState,
-        filters: filterState,
-        pagination: {
-          current: 1,
-          pageSize
-        }
-      })
-    },
-    [sortState, filterState, onPageChange, onChange]
-  )
-
-  const handleToggleExpand = useCallback(
-    (key: string | number, record: T) => {
-      const isExpanded = expandedRowKeySet.has(key)
-      const newKeys = isExpanded
-        ? expandedRowKeys.filter((k) => k !== key)
-        : [...expandedRowKeys, key]
-
-      if (!isExpandControlled) {
-        setUncontrolledExpandedRowKeys(newKeys)
-      }
-      onExpandChange?.(newKeys, record, !isExpanded)
-    },
-    [expandedRowKeySet, expandedRowKeys, isExpandControlled, onExpandChange]
-  )
-
-  const handleRowClick = useCallback(
-    (record: T, index: number) => {
-      onRowClick?.(record, index)
-
-      // Toggle expand on row click if expandRowByClick is enabled
-      if (expandable?.expandRowByClick) {
-        const key = getRowKey(record, rowKey, index)
-        const isExpandableRow = expandable?.rowExpandable ? expandable.rowExpandable(record) : true
-        if (isExpandableRow) {
-          handleToggleExpand(key, record)
-        }
-      }
-    },
-    [onRowClick, expandable, rowKey, handleToggleExpand]
-  )
-
-  const handleSelectRow = useCallback(
-    (key: string | number, checked: boolean) => {
-      let newKeys: (string | number)[]
-
-      if (rowSelection?.type === 'radio') {
-        newKeys = checked ? [key] : []
-      } else {
-        if (checked) {
-          newKeys = [...selectedRowKeys, key]
-        } else {
-          newKeys = selectedRowKeys.filter((k) => k !== key)
-        }
-      }
-
-      if (!isSelectionControlled) {
-        setUncontrolledSelectedRowKeys(newKeys)
-      }
-      onSelectionChange?.(newKeys)
-    },
-    [rowSelection, selectedRowKeys, isSelectionControlled, onSelectionChange]
-  )
-
-  const handleSelectAll = useCallback(
-    (checked: boolean) => {
-      if (checked) {
-        const newKeys = pageRowKeys
-        if (!isSelectionControlled) {
-          setUncontrolledSelectedRowKeys(newKeys)
-        }
-        onSelectionChange?.(newKeys)
-      } else {
-        if (!isSelectionControlled) {
-          setUncontrolledSelectedRowKeys([])
-        }
-        onSelectionChange?.([])
-      }
-    },
-    [pageRowKeys, isSelectionControlled, onSelectionChange]
-  )
-
-  const allSelected = useMemo(() => {
-    if (pageRowKeys.length === 0) {
-      return false
-    }
-
-    return pageRowKeys.every((key) => selectedRowKeySet.has(key))
-  }, [pageRowKeys, selectedRowKeySet])
-
-  const someSelected = useMemo(() => {
-    return selectedRowKeys.length > 0 && !allSelected
-  }, [selectedRowKeys.length, allSelected])
-
-  // --- v0.6.0: editable cell state ---
-  const [editingCell, setEditingCell] = useState<{ rowIndex: number; columnKey: string } | null>(
-    null
-  )
-  const [editingValue, setEditingValue] = useState('')
-
-  const isCellEditable = useCallback(
-    (columnKey: string, rowIndex: number): boolean => {
-      if (!editable) return false
-      if (!editableCells) return true
-      return !!editableCells.get(columnKey)?.has(rowIndex)
-    },
-    [editable, editableCells]
-  )
-
-  const startEditing = useCallback((rowIndex: number, columnKey: string, currentValue: unknown) => {
-    setEditingCell({ rowIndex, columnKey })
-    setEditingValue(String(currentValue ?? ''))
-  }, [])
-
-  const commitEdit = useCallback(() => {
-    if (editingCell) {
-      onCellChange?.(editingCell.rowIndex, editingCell.columnKey, editingValue)
-      setEditingCell(null)
-    }
-  }, [editingCell, editingValue, onCellChange])
-
-  const cancelEdit = useCallback(() => {
-    setEditingCell(null)
-  }, [])
-
-  // --- v0.6.0: export ---
-  const handleExport = useCallback(() => {
-    const csv = exportTableToCsv(displayColumns, processedData)
-    downloadCsv(csv, exportFilename)
-    onExport?.(csv)
-  }, [displayColumns, processedData, exportFilename, onExport])
-
-  // --- v0.6.0: column drag ---
-  const [dragColumnKey, setDragColumnKey] = useState<string | null>(null)
-
-  const handleDragStart = useCallback((columnKey: string) => {
-    setDragColumnKey(columnKey)
-  }, [])
-
-  const handleDrop = useCallback(
-    (targetKey: string) => {
-      if (!dragColumnKey || dragColumnKey === targetKey) return
-      const cols = [...displayColumns]
-      const fromIdx = cols.findIndex((c) => c.key === dragColumnKey)
-      const toIdx = cols.findIndex((c) => c.key === targetKey)
-      if (fromIdx >= 0 && toIdx >= 0) {
-        const [moved] = cols.splice(fromIdx, 1)
-        cols.splice(toIdx, 0, moved)
-        onColumnOrderChange?.(cols)
-      }
-      setDragColumnKey(null)
-    },
-    [dragColumnKey, displayColumns, onColumnOrderChange]
-  )
-
-  // --- v0.6.0: grouping ---
-  const groupedData = useMemo(() => {
-    if (!groupBy) return null
-    return groupDataByColumn(paginatedData, groupBy)
-  }, [groupBy, paginatedData])
-
-  const renderTableHeader = useCallback(() => {
-    const expandHeaderTh = expandable ? (
-      <th className={getExpandIconCellClasses(size)} aria-label="Expand" />
-    ) : null
-    const expandAtStart = expandable?.expandIconPosition !== 'end'
-
-    return (
-      <thead className={getTableHeaderClasses(stickyHeader)}>
-        <tr>
-          {/* Expand column header (start position - default) */}
-          {expandAtStart && expandHeaderTh}
-
-          {/* Selection checkbox column */}
-          {rowSelection && rowSelection.showCheckbox !== false && rowSelection.type !== 'radio' && (
-            <th className={getCheckboxCellClasses(size)}>
-              <input
-                type="checkbox"
-                className="rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]"
-                checked={allSelected}
-                ref={(el) => {
-                  if (el) el.indeterminate = someSelected
-                }}
-                onChange={(e) => handleSelectAll(e.target.checked)}
-              />
-            </th>
-          )}
-
-          {/* Column headers */}
-          {displayColumns.map((column) => {
-            const isSorted = sortState.key === column.key
-            const sortDirection = isSorted ? sortState.direction : null
-
-            const ariaSort = column.sortable
-              ? sortDirection === 'asc'
-                ? 'ascending'
-                : sortDirection === 'desc'
-                  ? 'descending'
-                  : 'none'
-              : undefined
-
-            const isFixedLeft = column.fixed === 'left'
-            const isFixedRight = column.fixed === 'right'
-            const fixedStyle = isFixedLeft
-              ? {
-                  position: 'sticky' as const,
-                  left: `${fixedColumnsInfo.leftOffsets[column.key] || 0}px`,
-                  zIndex: 15
-                }
-              : isFixedRight
-                ? {
-                    position: 'sticky' as const,
-                    right: `${fixedColumnsInfo.rightOffsets[column.key] || 0}px`,
-                    zIndex: 15
-                  }
-                : undefined
-
-            const widthStyle = column.width
-              ? {
-                  width: typeof column.width === 'number' ? `${column.width}px` : column.width
-                }
-              : undefined
-
-            const style = fixedStyle ? { ...widthStyle, ...fixedStyle } : widthStyle
-
-            return (
-              <th
-                key={column.key}
-                aria-sort={ariaSort}
-                className={classNames(
-                  getTableHeaderCellClasses(
-                    size,
-                    column.align || 'left',
-                    !!column.sortable,
-                    column.headerClassName
-                  ),
-                  (isFixedLeft || isFixedRight) && 'bg-[var(--tiger-surface-muted,#f9fafb)]'
-                )}
-                style={style}
-                draggable={columnDraggable ? true : undefined}
-                onDragStart={columnDraggable ? () => handleDragStart(column.key) : undefined}
-                onDragOver={columnDraggable ? (e) => e.preventDefault() : undefined}
-                onDrop={columnDraggable ? () => handleDrop(column.key) : undefined}
-                onClick={column.sortable ? () => handleSort(column.key) : undefined}>
-                <div className="flex items-center gap-2">
-                  {column.renderHeader ? (column.renderHeader() as React.ReactNode) : column.title}
-
-                  {columnLockable && (
-                    <button
-                      type="button"
-                      aria-label={
-                        column.fixed === 'left' || column.fixed === 'right'
-                          ? `Unlock column ${column.title}`
-                          : `Lock column ${column.title}`
-                      }
-                      className={classNames(
-                        'inline-flex items-center',
-                        column.fixed === 'left' || column.fixed === 'right'
-                          ? 'text-[var(--tiger-primary,#2563eb)]'
-                          : 'text-gray-400 hover:text-gray-700'
-                      )}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        toggleColumnLock(column.key)
-                      }}>
-                      <LockIcon locked={column.fixed === 'left' || column.fixed === 'right'} />
-                    </button>
-                  )}
-
-                  {column.sortable && <SortIcon direction={sortDirection} />}
-                </div>
-
-                {column.filter && (
-                  <div className="mt-2">
-                    {column.filter.type === 'select' && column.filter.options ? (
-                      <select
-                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                        onChange={(e) => handleFilter(column.key, e.target.value)}
-                        onClick={(e) => e.stopPropagation()}>
-                        <option value="">All</option>
-                        {column.filter.options.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <input
-                        type="text"
-                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
-                        placeholder={column.filter.placeholder || 'Filter...'}
-                        onInput={(e) =>
-                          handleFilter(column.key, (e.target as HTMLInputElement).value)
-                        }
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    )}
-                  </div>
-                )}
-              </th>
-            )
-          })}
-
-          {/* Expand column header (end position) */}
-          {!expandAtStart && expandHeaderTh}
-        </tr>
-      </thead>
-    )
-  }, [
-    displayColumns,
-    size,
-    stickyHeader,
-    sortState,
-    rowSelection,
-    expandable,
-    allSelected,
-    someSelected,
-    handleSort,
-    handleFilter,
-    handleSelectAll,
-    columnLockable,
-    toggleColumnLock,
-    fixedColumnsInfo,
-    columnDraggable,
-    handleDragStart,
-    handleDrop
-  ])
-
-  const renderTableBody = useCallback(() => {
-    if (loading) {
-      return null
-    }
-
-    if (paginatedData.length === 0) {
-      return (
-        <tbody>
-          <tr>
-            <td colSpan={totalColumnCount} className={tableEmptyStateClasses}>
-              <div role="status" aria-live="polite">
-                {emptyText}
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      )
-    }
-
-    const renderDataRow = (record: T, index: number) => {
-      const key = pageRowKeys[index]
-      const isSelected = selectedRowKeySet.has(key)
-      const isExpanded = expandedRowKeySet.has(key)
-      const isRowExpandable = expandable
-        ? expandable.rowExpandable
-          ? expandable.rowExpandable(record)
-          : true
-        : false
-      const rowClass =
-        typeof rowClassName === 'function' ? rowClassName(record, index) : rowClassName
-
-      const expandToggleCell = expandable ? (
-        <td className={getExpandIconCellClasses(size)}>
-          {isRowExpandable && (
-            <button
-              type="button"
-              className="inline-flex items-center justify-center"
-              aria-label={isExpanded ? 'Collapse row' : 'Expand row'}
-              aria-expanded={isExpanded}
-              onClick={(e) => {
-                e.stopPropagation()
-                handleToggleExpand(key, record)
-              }}>
-              <ExpandIcon expanded={isExpanded} />
-            </button>
-          )}
-        </td>
-      ) : null
-
-      const expandAtStart = expandable?.expandIconPosition !== 'end'
-
-      const rowNode = (
-        <tr
-          key={key}
-          className={classNames(
-            getTableRowClasses(hoverable, striped, index % 2 === 0, rowClass),
-            fixedColumnsInfo.hasFixedColumns && 'group'
-          )}
-          onClick={() => handleRowClick(record, index)}>
-          {/* Expand toggle cell (start position - default) */}
-          {expandAtStart && expandToggleCell}
-
-          {/* Selection checkbox cell */}
-          {rowSelection && rowSelection.showCheckbox !== false && (
-            <td className={getCheckboxCellClasses(size)}>
-              <input
-                type={rowSelection?.type === 'radio' ? 'radio' : 'checkbox'}
-                className={
-                  rowSelection?.type === 'radio'
-                    ? 'border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
-                    : 'rounded border-gray-300 text-[var(--tiger-primary,#2563eb)] focus:ring-[var(--tiger-primary,#2563eb)]'
-                }
-                checked={isSelected}
-                disabled={rowSelection?.getCheckboxProps?.(record)?.disabled}
-                onChange={(e) => handleSelectRow(key, e.target.checked)}
-                onClick={(e) => e.stopPropagation()}
-              />
-            </td>
-          )}
-
-          {/* Data cells */}
-          {displayColumns.map((column) => {
-            const dataKey = column.dataKey || column.key
-            const cellValue = record[dataKey]
-
-            const isFixedLeft = column.fixed === 'left'
-            const isFixedRight = column.fixed === 'right'
-            const fixedStyle = isFixedLeft
-              ? {
-                  position: 'sticky' as const,
-                  left: `${fixedColumnsInfo.leftOffsets[column.key] || 0}px`,
-                  zIndex: 10
-                }
-              : isFixedRight
-                ? {
-                    position: 'sticky' as const,
-                    right: `${fixedColumnsInfo.rightOffsets[column.key] || 0}px`,
-                    zIndex: 10
-                  }
-                : undefined
-
-            const widthStyle = column.width
-              ? {
-                  width: typeof column.width === 'number' ? `${column.width}px` : column.width
-                }
-              : undefined
-
-            const style = fixedStyle ? { ...widthStyle, ...fixedStyle } : widthStyle
-
-            const stickyBgClass =
-              striped && index % 2 === 0
-                ? 'bg-[var(--tiger-surface-muted,#f9fafb)]/50'
-                : 'bg-[var(--tiger-surface,#ffffff)]'
-
-            const stickyCellClass =
-              isFixedLeft || isFixedRight
-                ? classNames(
-                    stickyBgClass,
-                    hoverable && 'group-hover:bg-[var(--tiger-surface-muted,#f9fafb)]'
-                  )
-                : undefined
-
-            const isEditing =
-              editingCell?.rowIndex === index && editingCell?.columnKey === column.key
-            const cellEditable = isCellEditable(column.key, index)
-
-            return (
-              <td
-                key={column.key}
-                className={classNames(
-                  getTableCellClasses(size, column.align || 'left', column.className),
-                  stickyCellClass,
-                  cellEditable && getEditableCellClasses(!!isEditing)
-                )}
-                style={style}
-                onDoubleClick={
-                  cellEditable ? () => startEditing(index, column.key, cellValue) : undefined
-                }>
-                {isEditing ? (
-                  <input
-                    className={editableCellInputClasses}
-                    value={editingValue}
-                    onChange={(e) => setEditingValue(e.target.value)}
-                    onBlur={commitEdit}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') commitEdit()
-                      if (e.key === 'Escape') cancelEdit()
-                    }}
-                    autoFocus
-                  />
-                ) : column.render ? (
-                  (column.render(record, index) as React.ReactNode)
-                ) : (
-                  (cellValue as React.ReactNode)
-                )}
-              </td>
-            )
-          })}
-
-          {/* Expand toggle cell (end position) */}
-          {!expandAtStart && expandToggleCell}
-        </tr>
-      )
-
-      // Expanded row content
-      if (expandable && isExpanded && isRowExpandable) {
-        const expandedContent = expandable.expandedRowRender
-          ? expandable.expandedRowRender(record, index)
-          : null
-
-        return (
-          <React.Fragment key={key}>
-            {rowNode}
-            <tr key={`${key}-expanded`} className={getExpandedRowClasses()}>
-              <td colSpan={totalColumnCount} className={getExpandedRowContentClasses(size)}>
-                {expandedContent as React.ReactNode}
-              </td>
-            </tr>
-          </React.Fragment>
-        )
-      }
-
-      return rowNode
-    }
-
-    if (groupedData) {
-      return (
-        <tbody>
-          {Array.from(groupedData.entries()).map(([groupKey, groupItems]) => (
-            <React.Fragment key={`group-${groupKey}`}>
-              <tr className={tableGroupHeaderClasses}>
-                <td colSpan={totalColumnCount} className={getGroupHeaderCellClasses(size)}>
-                  {groupKey} ({groupItems.length})
-                </td>
-              </tr>
-              {groupItems.map((record, idx) => {
-                const globalIndex = paginatedData.indexOf(record)
-                return renderDataRow(record, globalIndex >= 0 ? globalIndex : idx)
-              })}
-            </React.Fragment>
-          ))}
-        </tbody>
-      )
-    }
-
-    return <tbody>{paginatedData.map((record, index) => renderDataRow(record, index))}</tbody>
-  }, [
-    loading,
-    paginatedData,
-    displayColumns,
-    rowSelection,
-    expandable,
-    emptyText,
-    pageRowKeys,
-    selectedRowKeySet,
-    expandedRowKeySet,
-    totalColumnCount,
-    rowClassName,
-    hoverable,
-    striped,
-    size,
-    handleRowClick,
-    handleSelectRow,
-    handleToggleExpand,
-    fixedColumnsInfo,
-    groupedData,
-    editingCell,
-    editingValue,
-    isCellEditable,
-    startEditing,
-    commitEdit,
-    cancelEdit
-  ])
-
-  const renderPagination = useCallback(() => {
-    if (pagination === false || !paginationInfo) {
-      return null
-    }
-
-    const { totalPages, startIndex, endIndex, hasNext, hasPrev } = paginationInfo
-    const total = processedData.length
-    const paginationConfig = pagination as PaginationConfig
-
-    return (
-      <div className={getSimplePaginationContainerClasses()}>
-        {/* Total info */}
-        {paginationConfig.showTotal !== false && (
-          <div className={getSimplePaginationTotalClasses()}>
-            {paginationConfig.totalText
-              ? paginationConfig.totalText(total, [startIndex, endIndex])
-              : `Showing ${startIndex} to ${endIndex} of ${total} results`}
-          </div>
-        )}
-
-        {/* Pagination controls */}
-        <div className={getSimplePaginationControlsClasses()}>
-          {/* Page size selector */}
-          {paginationConfig.showSizeChanger !== false && (
-            <select
-              className={getSimplePaginationSelectClasses()}
-              value={currentPageSize}
-              onChange={(e) => handlePageSizeChange(Number(e.target.value))}>
-              {(paginationConfig.pageSizeOptions || [10, 20, 50, 100]).map((size) => (
-                <option key={size} value={size}>
-                  {size} / page
-                </option>
-              ))}
-            </select>
-          )}
-
-          {/* Page buttons */}
-          <div className={getSimplePaginationButtonsWrapperClasses()}>
-            {/* Previous button */}
-            <button
-              className={getSimplePaginationButtonClasses(!hasPrev)}
-              disabled={!hasPrev}
-              onClick={() => handlePageChange(currentPage - 1)}>
-              Previous
-            </button>
-
-            {/* Current page indicator */}
-            <span className={getSimplePaginationPageIndicatorClasses()}>
-              Page {currentPage} of {totalPages}
-            </span>
-
-            {/* Next button */}
-            <button
-              className={getSimplePaginationButtonClasses(!hasNext)}
-              disabled={!hasNext}
-              onClick={() => handlePageChange(currentPage + 1)}>
-              Next
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }, [
+  const internalRowSelection = rowSelection as
+    | RowSelectionConfig<Record<string, unknown>>
+    | undefined
+  const internalExpandable = expandable as ExpandableConfig<Record<string, unknown>> | undefined
+  const internalRowClassName = rowClassName as
+    | string
+    | ((record: Record<string, unknown>, index: number) => string)
+    | undefined
+
+  const ctx = useTableState({
+    columns: columns as TableProps['columns'],
+    dataSource: dataSource as Record<string, unknown>[],
+    sort,
+    defaultSort,
+    filters,
+    defaultFilters,
     pagination,
-    paginationInfo,
-    processedData.length,
-    currentPage,
-    currentPageSize,
-    handlePageChange,
-    handlePageSizeChange
-  ])
-
-  const renderSummaryRow = useCallback(() => {
-    if (!summaryRow?.show) return null
-    return (
-      <tfoot>
-        <tr className={tableSummaryRowClasses}>
-          {rowSelection && rowSelection.showCheckbox !== false && (
-            <td className={getTableCellClasses(size, 'left')} />
-          )}
-          {expandable && <td className={getTableCellClasses(size, 'left')} />}
-          {displayColumns.map((column) => (
-            <td key={column.key} className={getTableCellClasses(size, column.align || 'left')}>
-              {(summaryRow.data[column.dataKey || column.key] as React.ReactNode) ?? ''}
-            </td>
-          ))}
-        </tr>
-      </tfoot>
-    )
-  }, [summaryRow, displayColumns, size, rowSelection, expandable])
+    rowSelection: internalRowSelection,
+    expandable: internalExpandable,
+    rowKey: rowKey as string | ((record: Record<string, unknown>) => string | number),
+    editable,
+    editableCells,
+    filterMode,
+    advancedFilterRules,
+    groupBy,
+    exportFilename,
+    onChange,
+    onRowClick: onRowClick as
+      | ((record: Record<string, unknown>, index: number) => void)
+      | undefined,
+    onSelectionChange,
+    onSortChange,
+    onFilterChange,
+    onPageChange,
+    onExpandChange: onExpandChange as
+      | ((
+          expandedKeys: (string | number)[],
+          record: Record<string, unknown>,
+          expanded: boolean
+        ) => void)
+      | undefined,
+    onCellChange,
+    onColumnOrderChange,
+    onExport
+  })
 
   const wrapperStyle = useMemo(() => {
     if (virtual) {
@@ -1213,10 +142,9 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       )}
       style={wrapperStyle}
       aria-busy={loading}>
-      {/* Export button */}
       {exportable && (
         <div className="mb-2 flex justify-end">
-          <button type="button" className={tableExportButtonClasses} onClick={handleExport}>
+          <button type="button" className={tableExportButtonClasses} onClick={ctx.handleExport}>
             Export CSV
           </button>
         </div>
@@ -1230,19 +158,39 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         )}
         {...props}
         style={
-          fixedColumnsInfo.hasFixedColumns && fixedColumnsInfo.minTableWidth
+          ctx.fixedColumnsInfo.hasFixedColumns && ctx.fixedColumnsInfo.minTableWidth
             ? {
                 ...(props as React.HTMLAttributes<HTMLTableElement>).style,
-                minWidth: `${fixedColumnsInfo.minTableWidth}px`
+                minWidth: `${ctx.fixedColumnsInfo.minTableWidth}px`
               }
             : (props as React.HTMLAttributes<HTMLTableElement>).style
         }>
-        {renderTableHeader()}
-        {renderTableBody()}
-        {renderSummaryRow()}
+        {renderTableHeader(ctx, {
+          size,
+          stickyHeader,
+          rowSelection: internalRowSelection,
+          expandable: internalExpandable,
+          columnLockable,
+          columnDraggable
+        })}
+        {renderTableBody(ctx, {
+          size,
+          hoverable,
+          striped,
+          loading,
+          emptyText,
+          rowSelection: internalRowSelection,
+          expandable: internalExpandable,
+          rowClassName: internalRowClassName
+        })}
+        {renderSummaryRow(ctx, {
+          size,
+          rowSelection: internalRowSelection,
+          expandable: internalExpandable,
+          summaryRow
+        })}
       </table>
 
-      {/* Loading overlay */}
       {loading && (
         <div
           className={tableLoadingOverlayClasses}
@@ -1254,8 +202,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
         </div>
       )}
 
-      {/* Pagination */}
-      {renderPagination()}
+      {renderPagination(ctx, { pagination })}
     </div>
   )
 }
