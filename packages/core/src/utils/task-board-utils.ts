@@ -13,7 +13,7 @@ export const taskBoardBaseClasses = 'tiger-task-board flex gap-4 overflow-x-auto
 
 /** Single column shell */
 export const taskBoardColumnClasses =
-  'tiger-task-board-column flex flex-col shrink-0 w-72 rounded-lg border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm transition-shadow'
+  'tiger-task-board-column flex flex-col shrink-0 w-72 rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] shadow-sm transition-shadow'
 
 /** Column header (sticky, never scrolls) */
 export const taskBoardColumnHeaderClasses =
@@ -24,7 +24,7 @@ export const taskBoardColumnBodyClasses = 'flex-1 overflow-y-auto p-2 space-y-2 
 
 /** Card base styles */
 export const taskBoardCardClasses =
-  'tiger-task-board-card rounded-lg border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-3 shadow-sm cursor-grab select-none transition-opacity'
+  'tiger-task-board-card rounded-[var(--tiger-radius-md,0.5rem)] border border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-surface,#ffffff)] p-3 shadow-sm cursor-grab select-none transition-opacity'
 
 /** Card while being dragged */
 export const taskBoardCardDraggingClasses = 'opacity-50 shadow-lg'

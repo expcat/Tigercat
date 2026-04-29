@@ -31,7 +31,7 @@ export const defaultToolbar: ToolbarButton[] = [
 // ─── Tailwind class constants ─────────────────────────────────────
 
 export const richTextContainerBase =
-  'flex flex-col border border-[var(--tiger-border,#d1d5db)] rounded-lg overflow-hidden bg-[var(--tiger-bg,#ffffff)]'
+  'flex flex-col border border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden bg-[var(--tiger-bg,#ffffff)]'
 
 export const richTextContainerDisabled = 'opacity-50 cursor-not-allowed pointer-events-none'
 

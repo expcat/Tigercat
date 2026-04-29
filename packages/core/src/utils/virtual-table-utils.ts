@@ -9,7 +9,7 @@ import type { VirtualTableRange } from '../types/virtual-table'
 // ─── Tailwind class constants ─────────────────────────────────────
 
 export const virtualTableContainerClasses =
-  'tiger-virtual-table relative overflow-auto border border-[var(--tiger-border,#e5e7eb)] rounded-lg bg-[var(--tiger-bg,#ffffff)]'
+  'tiger-virtual-table relative overflow-auto border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-bg,#ffffff)]'
 
 export const virtualTableHeaderClasses =
   'sticky top-0 z-10 bg-[var(--tiger-bg-secondary,#f9fafb)] border-b border-[var(--tiger-border,#e5e7eb)]'

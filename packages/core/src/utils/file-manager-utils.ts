@@ -9,7 +9,7 @@ import type { FileItem, FileSortField, FileSortOrder, FileViewMode } from '../ty
 // ─── Tailwind class constants ─────────────────────────────────────
 
 export const fileManagerContainerClasses =
-  'tiger-file-manager flex flex-col border border-[var(--tiger-border,#e5e7eb)] rounded-lg bg-[var(--tiger-bg,#ffffff)] overflow-hidden'
+  'tiger-file-manager flex flex-col border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-bg,#ffffff)] overflow-hidden'
 
 export const fileManagerToolbarClasses =
   'flex items-center gap-2 px-3 py-2 border-b border-[var(--tiger-border,#e5e7eb)] bg-[var(--tiger-bg-secondary,#f9fafb)]'
@@ -25,13 +25,13 @@ export const fileManagerBreadcrumbSeparatorClasses = 'text-[var(--tiger-text-mut
 export const fileManagerContentClasses = 'flex-1 overflow-auto p-2'
 
 export const fileManagerListItemClasses =
-  'flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors hover:bg-[var(--tiger-bg-hover,#f3f4f6)]'
+  'flex items-center gap-3 px-3 py-2 rounded-[var(--tiger-radius-md,0.5rem)] cursor-pointer transition-colors hover:bg-[var(--tiger-bg-hover,#f3f4f6)]'
 
 export const fileManagerListItemSelectedClasses =
   'bg-[var(--tiger-primary,#2563eb)]/10 hover:bg-[var(--tiger-primary,#2563eb)]/15'
 
 export const fileManagerGridItemClasses =
-  'flex flex-col items-center gap-2 p-3 rounded-lg cursor-pointer transition-colors hover:bg-[var(--tiger-bg-hover,#f3f4f6)] text-center'
+  'flex flex-col items-center gap-2 p-3 rounded-[var(--tiger-radius-md,0.5rem)] cursor-pointer transition-colors hover:bg-[var(--tiger-bg-hover,#f3f4f6)] text-center'
 
 export const fileManagerGridItemSelectedClasses =
   'bg-[var(--tiger-primary,#2563eb)]/10 hover:bg-[var(--tiger-primary,#2563eb)]/15'
@@ -50,7 +50,7 @@ export const fileManagerLoadingClasses =
   'absolute inset-0 flex items-center justify-center bg-[var(--tiger-bg,#ffffff)]/60 z-10'
 
 export const fileManagerSearchClasses =
-  'px-3 py-1.5 text-sm border border-[var(--tiger-border,#e5e7eb)] rounded-lg bg-[var(--tiger-bg,#ffffff)] focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/30'
+  'px-3 py-1.5 text-sm border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] bg-[var(--tiger-bg,#ffffff)] focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)]/30'
 
 // ─── File operations ──────────────────────────────────────────────
 
