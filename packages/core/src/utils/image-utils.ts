@@ -195,13 +195,13 @@ export const CROP_HANDLES: CropHandle[] = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw'
  * CropUpload trigger button classes
  */
 export const cropUploadTriggerClasses =
-  'inline-flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-[var(--tiger-border,#d1d5db)] rounded-lg text-[var(--tiger-text-muted,#6b7280)] hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)] transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-offset-2'
+  'inline-flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-md,0.5rem)] text-[var(--tiger-text-muted,#6b7280)] hover:border-[var(--tiger-primary,#2563eb)] hover:text-[var(--tiger-primary,#2563eb)] transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:ring-offset-2'
 
 /**
  * CropUpload disabled trigger classes
  */
 export const cropUploadTriggerDisabledClasses =
-  'inline-flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-[var(--tiger-border,#d1d5db)] rounded-lg text-[var(--tiger-text-muted,#9ca3af)] cursor-not-allowed opacity-50'
+  'inline-flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-[var(--tiger-border,#d1d5db)] rounded-[var(--tiger-radius-md,0.5rem)] text-[var(--tiger-text-muted,#9ca3af)] cursor-not-allowed opacity-50'
 
 /**
  * Upload icon path (plus sign in a frame)

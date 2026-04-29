@@ -3,12 +3,12 @@ import { classNames } from './class-names'
 export const qrcodeContainerClasses = classNames(
   'relative inline-flex items-center justify-center',
   'bg-[var(--tiger-qrcode-bg,#ffffff)]',
-  'rounded-lg'
+  'rounded-[var(--tiger-radius-md,0.5rem)]'
 )
 
 export const qrcodeOverlayClasses = classNames(
   'absolute inset-0 flex flex-col items-center justify-center',
-  'bg-white/80 rounded-lg'
+  'bg-white/80 rounded-[var(--tiger-radius-md,0.5rem)]'
 )
 
 export const qrcodeExpiredTextClasses = classNames(
