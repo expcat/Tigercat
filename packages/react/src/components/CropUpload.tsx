@@ -4,6 +4,10 @@ import {
   cropUploadTriggerClasses,
   cropUploadTriggerDisabledClasses,
   uploadPlusIconPath,
+  validateUploadFile,
+  readFileAsDataUrl,
+  getCropperResult,
+  isActivationKey,
   type ImageCropperProps as CoreImageCropperProps,
   type CropResult
 } from '@expcat/tigercat-core'
@@ -86,18 +90,19 @@ export const CropUpload: React.FC<CropUploadProps> = ({
       const file = e.target.files?.[0]
       if (!file) return
 
-      if (maxSize && file.size > maxSize) {
-        onError?.(new Error(`File size exceeds maximum of ${maxSize} bytes`))
+      const sizeError = validateUploadFile(file, maxSize)
+      if (sizeError) {
+        onError?.(sizeError)
         e.target.value = ''
         return
       }
 
-      const reader = new FileReader()
-      reader.onload = (ev) => {
-        setImageSrc(ev.target?.result as string)
-        setModalVisible(true)
-      }
-      reader.readAsDataURL(file)
+      readFileAsDataUrl(file)
+        .then((url) => {
+          setImageSrc(url)
+          setModalVisible(true)
+        })
+        .catch((err: Error) => onError?.(err))
       e.target.value = ''
     },
     [maxSize, onError]
@@ -107,9 +112,13 @@ export const CropUpload: React.FC<CropUploadProps> = ({
     if (!cropperRef.current) return
     setCropping(true)
     try {
-      const result = await cropperRef.current.getCropResult()
-      onCropComplete?.(result)
-      setModalVisible(false)
+      const result = await getCropperResult(
+        cropperRef.current as { getCropResult: () => Promise<CropResult> }
+      )
+      if (result) {
+        onCropComplete?.(result)
+        setModalVisible(false)
+      }
     } catch (err) {
       onError?.(err as Error)
     } finally {
@@ -130,7 +139,7 @@ export const CropUpload: React.FC<CropUploadProps> = ({
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') {
+      if (isActivationKey(e)) {
         e.preventDefault()
         handleTriggerClick()
       }

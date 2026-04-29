@@ -113,3 +113,7 @@ export * from './print-layout-utils'
 
 // ImageViewer utilities (v0.9.0+)
 export * from './image-viewer-utils'
+
+// Composite shared helpers (FormWizard / CropUpload navigation + file pipeline)
+export * from './form-wizard-utils'
+export * from './crop-upload-utils'

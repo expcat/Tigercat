@@ -7,6 +7,10 @@ import {
   cropUploadTriggerDisabledClasses,
   uploadPlusIconPath,
   modalFooterClasses,
+  validateUploadFile,
+  readFileAsDataUrl,
+  getCropperResult,
+  isActivationKey,
   type ImageCropperProps as CoreImageCropperProps,
   type CropResult
 } from '@expcat/tigercat-core'
@@ -62,20 +66,19 @@ export const CropUpload = defineComponent({
       const file = input.files?.[0]
       if (!file) return
 
-      // Validate max size
-      if (props.maxSize && file.size > props.maxSize) {
-        emit('error', new Error(`File size exceeds maximum of ${props.maxSize} bytes`))
+      const sizeError = validateUploadFile(file, props.maxSize)
+      if (sizeError) {
+        emit('error', sizeError)
         input.value = ''
         return
       }
 
-      // Read file as data URL
-      const reader = new FileReader()
-      reader.onload = (ev) => {
-        imageSrc.value = ev.target?.result as string
-        modalVisible.value = true
-      }
-      reader.readAsDataURL(file)
+      readFileAsDataUrl(file)
+        .then((url) => {
+          imageSrc.value = url
+          modalVisible.value = true
+        })
+        .catch((err) => emit('error', err))
 
       // Reset input so same file can be selected again
       input.value = ''
@@ -85,11 +88,13 @@ export const CropUpload = defineComponent({
       if (!cropperRef.value) return
       cropping.value = true
       try {
-        const result: CropResult = await (
+        const result = await getCropperResult(
           cropperRef.value as unknown as { getCropResult: () => Promise<CropResult> }
-        ).getCropResult()
-        emit('crop-complete', result)
-        modalVisible.value = false
+        )
+        if (result) {
+          emit('crop-complete', result)
+          modalVisible.value = false
+        }
       } catch (err) {
         emit('error', err)
       } finally {
@@ -142,7 +147,7 @@ export const CropUpload = defineComponent({
               'aria-label': 'Select image to crop and upload',
               'aria-disabled': props.disabled ? 'true' : undefined,
               onKeydown: (e: KeyboardEvent) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+                if (isActivationKey(e)) {
                   e.preventDefault()
                   handleTriggerClick()
                 }
@@ -162,7 +167,7 @@ export const CropUpload = defineComponent({
               'aria-label': 'Select image to crop and upload',
               'aria-disabled': props.disabled ? 'true' : undefined,
               onKeydown: (e: KeyboardEvent) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+                if (isActivationKey(e)) {
                   e.preventDefault()
                   handleTriggerClick()
                 }

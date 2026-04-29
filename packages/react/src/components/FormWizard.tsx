@@ -4,6 +4,9 @@ import {
   getFormWizardLabels,
   mergeTigerLocale,
   resolveLocaleText,
+  clampStepIndex,
+  findNextUnskippedStep,
+  runStepValidation,
   type FormWizardProps as CoreFormWizardProps,
   type WizardStep
 } from '@expcat/tigercat-core'
@@ -69,8 +72,7 @@ export const FormWizard: React.FC<FormWizardProps> = ({
 
   const setCurrent = useCallback(
     (next: number) => {
-      const max = Math.max(totalCount - 1, 0)
-      const clamped = Math.min(Math.max(next, 0), max)
+      const clamped = clampStepIndex(next, totalCount)
       if (current === undefined) {
         setInnerCurrent(clamped)
       }
@@ -82,27 +84,14 @@ export const FormWizard: React.FC<FormWizardProps> = ({
     [current, currentIndex, onChange, totalCount, autoSave, steps]
   )
 
-  const runBeforeNext = useCallback(async (): Promise<boolean> => {
-    if (!beforeNext || !currentStep) {
-      return true
-    }
-
-    const result = await beforeNext(currentIndex, currentStep, steps)
-    return result === true
-  }, [beforeNext, currentIndex, currentStep, steps])
+  const runBeforeNext = useCallback(
+    (): Promise<boolean> => runStepValidation(currentIndex, currentStep, steps, beforeNext),
+    [beforeNext, currentIndex, currentStep, steps]
+  )
 
   const findNextUnskipped = useCallback(
-    (from: number, dir: 1 | -1): number => {
-      let idx = from
-      while (idx >= 0 && idx < totalCount) {
-        const step = steps[idx]
-        if (!step?.disabled && !step?.skipCondition?.()) return idx
-        idx += dir
-      }
-      // No valid step found — return current index to signal "no move"
-      return currentIndex
-    },
-    [steps, totalCount, currentIndex]
+    (from: number, dir: 1 | -1): number => findNextUnskippedStep(from, dir, steps, currentIndex),
+    [steps, currentIndex]
   )
 
   const handlePrev = useCallback(() => {

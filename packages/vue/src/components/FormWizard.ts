@@ -6,6 +6,9 @@ import {
   getFormWizardLabels,
   mergeTigerLocale,
   resolveLocaleText,
+  clampStepIndex,
+  findNextUnskippedStep,
+  runStepValidation,
   type WizardStep,
   type StepsDirection,
   type StepSize,
@@ -153,13 +156,8 @@ export const FormWizard = defineComponent({
       mergeStyleValues((attrs as Record<string, unknown>).style, props.style)
     )
 
-    const clampIndex = (next: number) => {
-      const max = Math.max(totalCount.value - 1, 0)
-      return Math.min(Math.max(next, 0), max)
-    }
-
     const setCurrent = (next: number) => {
-      const clamped = clampIndex(next)
+      const clamped = clampStepIndex(next, totalCount.value)
       const prev = currentIndex.value
       if (props.current === undefined) {
         innerCurrent.value = clamped
@@ -171,28 +169,11 @@ export const FormWizard = defineComponent({
       }
     }
 
-    const runBeforeNext = async (): Promise<boolean> => {
-      if (!props.beforeNext || !currentStep.value) {
-        return true
-      }
+    const runBeforeNext = (): Promise<boolean> =>
+      runStepValidation(currentIndex.value, currentStep.value, props.steps, props.beforeNext)
 
-      const result = await props.beforeNext(currentIndex.value, currentStep.value, props.steps)
-      if (result === true) {
-        return true
-      }
-      return false
-    }
-
-    const findNextUnskipped = (from: number, direction: 1 | -1): number => {
-      let idx = from
-      while (idx >= 0 && idx < totalCount.value) {
-        const step = props.steps[idx]
-        if (!step?.disabled && !step?.skipCondition?.()) return idx
-        idx += direction
-      }
-      // No valid step found — return current index to signal "no move"
-      return currentIndex.value
-    }
+    const findNextUnskipped = (from: number, direction: 1 | -1): number =>
+      findNextUnskippedStep(from, direction, props.steps, currentIndex.value)
 
     const handlePrev = () => {
       if (currentIndex.value <= 0) return
