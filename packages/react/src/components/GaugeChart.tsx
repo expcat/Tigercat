@@ -100,7 +100,10 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
               d={valuePath}
               fill={color}
               strokeWidth={0}
-              style={{ transition: 'all 0.3s ease-out' }}
+              style={{
+                transition:
+                  'all var(--tiger-motion-duration-relaxed,0.3s) var(--tiger-motion-ease-emphasized,cubic-bezier(0.4,0,0.2,1))'
+              }}
             />
           )}
 
@@ -131,7 +134,10 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
       <path
         d={needlePath}
         fill="var(--tiger-text,#374151)"
-        style={{ transition: 'all 0.3s ease-out' }}
+        style={{
+          transition:
+            'all var(--tiger-motion-duration-relaxed,0.3s) var(--tiger-motion-ease-spring,cubic-bezier(0.4,0,0.2,1))'
+        }}
       />
 
       {/* Center dot */}
@@ -141,7 +147,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
       <text
         x={cx}
         y={cy + radius * 0.35}
-        className="fill-[color:var(--tiger-text,#374151)] text-lg font-semibold"
+        className="fill-[color:var(--tiger-text,#374151)] text-lg font-semibold tabular-nums"
         textAnchor="middle"
         dominantBaseline="middle">
         {formattedValue}
