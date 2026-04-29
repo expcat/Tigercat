@@ -3,6 +3,7 @@ import {
   parseDate,
   formatDate,
   isDateInRange,
+  isSameDay,
   normalizeDate,
   type DateFormat
 } from '@expcat/tigercat-core'
@@ -147,12 +148,7 @@ export function useDateSelection(options: UseDateSelectionOptions): UseDateSelec
 
   const isSelected = (date: Date): boolean => {
     if (!range.value) {
-      return (
-        selectedDate.value !== null &&
-        date.getFullYear() === selectedDate.value.getFullYear() &&
-        date.getMonth() === selectedDate.value.getMonth() &&
-        date.getDate() === selectedDate.value.getDate()
-      )
+      return selectedDate.value !== null && isSameDay(date, selectedDate.value)
     }
     const [start, end] = selectedRange.value
     if (start && isSameDay(date, start)) return true
@@ -192,13 +188,4 @@ export function useDateSelection(options: UseDateSelectionOptions): UseDateSelec
     isRangeStart,
     isRangeEnd
   }
-}
-
-// Helper function
-function isSameDay(a: Date, b: Date): boolean {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  )
 }

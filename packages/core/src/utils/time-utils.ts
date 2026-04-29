@@ -37,6 +37,14 @@ function clampValue(value: number, min: number, max: number): number {
 }
 
 /**
+ * Pad a non-negative integer to a 2-character zero-prefixed string.
+ * Shared helper for time / date display formatting.
+ */
+export function padTwo(value: number): string {
+  return value.toString().padStart(2, '0')
+}
+
+/**
  * Parse time string to hours, minutes, and seconds
  * @param timeString - Time string in 'HH:mm' or 'HH:mm:ss' format
  * @returns Object with hours, minutes, and seconds, or null if invalid
@@ -82,9 +90,9 @@ export function formatTime(
   showSeconds: boolean = false
 ): string {
   // Clamp values to valid ranges
-  const h = clampValue(hours, 0, 23).toString().padStart(2, '0')
-  const m = clampValue(minutes, 0, 59).toString().padStart(2, '0')
-  const s = clampValue(seconds, 0, 59).toString().padStart(2, '0')
+  const h = padTwo(clampValue(hours, 0, 23))
+  const m = padTwo(clampValue(minutes, 0, 59))
+  const s = padTwo(clampValue(seconds, 0, 59))
 
   return showSeconds ? `${h}:${m}:${s}` : `${h}:${m}`
 }
@@ -179,9 +187,9 @@ export function formatTimeDisplayWithLocale(
   }
 
   const { hours: hours12, period } = to12HourFormat(hours)
-  const h = hours12.toString().padStart(2, '0')
-  const m = clampValue(minutes, 0, 59).toString().padStart(2, '0')
-  const s = clampValue(seconds, 0, 59).toString().padStart(2, '0')
+  const h = padTwo(hours12)
+  const m = padTwo(clampValue(minutes, 0, 59))
+  const s = padTwo(clampValue(seconds, 0, 59))
   const timeStr = showSeconds ? `${h}:${m}:${s}` : `${h}:${m}`
 
   const labels = getTimePeriodLabels(locale)

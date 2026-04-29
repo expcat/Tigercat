@@ -11,6 +11,9 @@ import {
   isOptionGroup,
   filterOptions,
   flattenSelectOptions,
+  findFirstEnabledIndex as pickerFindFirstEnabledIndex,
+  findLastEnabledIndex as pickerFindLastEnabledIndex,
+  findNextEnabledIndex as pickerFindNextEnabledIndex,
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
   closeSolidIcon20PathD,
@@ -150,31 +153,12 @@ export const Select: React.FC<SelectProps> = (props) => {
 
   const getOptionId = (index: number) => `tiger-select-option-${instanceId}-${index}`
 
-  const findFirstEnabledIndex = (): number => flatFilteredOptions.findIndex((opt) => !opt.disabled)
+  const findFirstEnabledIndex = (): number => pickerFindFirstEnabledIndex(flatFilteredOptions)
 
-  const findLastEnabledIndex = (): number => {
-    for (let i = flatFilteredOptions.length - 1; i >= 0; i--) {
-      if (!flatFilteredOptions[i]?.disabled) {
-        return i
-      }
-    }
-    return -1
-  }
+  const findLastEnabledIndex = (): number => pickerFindLastEnabledIndex(flatFilteredOptions)
 
-  const findNextEnabledIndex = (current: number, direction: 1 | -1): number => {
-    if (flatFilteredOptions.length === 0) {
-      return -1
-    }
-
-    const start =
-      current < 0 ? (direction === 1 ? 0 : flatFilteredOptions.length - 1) : current + direction
-    for (let i = start; i >= 0 && i < flatFilteredOptions.length; i += direction) {
-      if (!flatFilteredOptions[i]?.disabled) {
-        return i
-      }
-    }
-    return current
-  }
+  const findNextEnabledIndex = (current: number, direction: 1 | -1): number =>
+    pickerFindNextEnabledIndex(flatFilteredOptions, current, direction)
 
   const focusOptionAt = (index: number) => {
     if (index < 0) {

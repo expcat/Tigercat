@@ -26,6 +26,7 @@ import {
   generateMinutes,
   generateSeconds,
   getCurrentTime,
+  padTwo,
   timePickerBaseClasses,
   timePickerInputWrapperClasses,
   getTimePickerInputClasses,
@@ -781,7 +782,7 @@ export const TimePicker = defineComponent({
                           ),
                           'aria-selected': isSelected
                         },
-                        hour.toString().padStart(2, '0')
+                        padTwo(hour)
                       )
                     })
                   )
@@ -813,7 +814,7 @@ export const TimePicker = defineComponent({
                           ),
                           'aria-selected': isSelected
                         },
-                        minute.toString().padStart(2, '0')
+                        padTwo(minute)
                       )
                     })
                   )
@@ -844,7 +845,7 @@ export const TimePicker = defineComponent({
                             ),
                             'aria-selected': isSelected
                           },
-                          second.toString().padStart(2, '0')
+                          padTwo(second)
                         )
                       })
                     )

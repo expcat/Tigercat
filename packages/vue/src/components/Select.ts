@@ -11,6 +11,9 @@ import {
   isOptionGroup,
   filterOptions,
   flattenSelectOptions,
+  findFirstEnabledIndex as pickerFindFirstEnabledIndex,
+  findLastEnabledIndex as pickerFindLastEnabledIndex,
+  findNextEnabledIndex as pickerFindNextEnabledIndex,
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
   closeSolidIcon20PathD,
@@ -236,35 +239,12 @@ export const Select = defineComponent({
     }
 
     const findFirstEnabledIndex = (): number =>
-      flatFilteredOptions.value.findIndex((opt) => !opt.disabled)
+      pickerFindFirstEnabledIndex(flatFilteredOptions.value)
 
-    const findLastEnabledIndex = (): number => {
-      for (let i = flatFilteredOptions.value.length - 1; i >= 0; i--) {
-        if (!flatFilteredOptions.value[i]?.disabled) {
-          return i
-        }
-      }
-      return -1
-    }
+    const findLastEnabledIndex = (): number => pickerFindLastEnabledIndex(flatFilteredOptions.value)
 
-    const findNextEnabledIndex = (current: number, direction: 1 | -1): number => {
-      if (flatFilteredOptions.value.length === 0) {
-        return -1
-      }
-
-      const start =
-        current < 0
-          ? direction === 1
-            ? 0
-            : flatFilteredOptions.value.length - 1
-          : current + direction
-      for (let i = start; i >= 0 && i < flatFilteredOptions.value.length; i += direction) {
-        if (!flatFilteredOptions.value[i]?.disabled) {
-          return i
-        }
-      }
-      return current
-    }
+    const findNextEnabledIndex = (current: number, direction: 1 | -1): number =>
+      pickerFindNextEnabledIndex(flatFilteredOptions.value, current, direction)
 
     const focusOptionAt = (index: number) => {
       if (index < 0) {

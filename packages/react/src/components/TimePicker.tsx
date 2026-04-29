@@ -15,6 +15,7 @@ import {
   generateMinutes,
   generateSeconds,
   getCurrentTime,
+  padTwo,
   timePickerBaseClasses,
   timePickerInputWrapperClasses,
   getTimePickerInputClasses,
@@ -613,7 +614,7 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
                         labelsOverrides
                       )}
                       aria-selected={isSelected}>
-                      {hour.toString().padStart(2, '0')}
+                      {padTwo(hour)}
                     </button>
                   )
                 })}
@@ -643,7 +644,7 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
                         labelsOverrides
                       )}
                       aria-selected={isSelected}>
-                      {minute.toString().padStart(2, '0')}
+                      {padTwo(minute)}
                     </button>
                   )
                 })}
@@ -672,7 +673,7 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
                           labelsOverrides
                         )}
                         aria-selected={isSelected}>
-                        {second.toString().padStart(2, '0')}
+                        {padTwo(second)}
                       </button>
                     )
                   })}
