@@ -14,7 +14,7 @@ export const floatButtonBaseClasses =
 
 export const floatButtonShapeClasses: Record<FloatButtonShape, string> = {
   circle: 'rounded-full',
-  square: 'rounded-lg'
+  square: 'rounded-[var(--tiger-radius-md,0.5rem)]'
 }
 
 export const floatButtonSizeClasses: Record<FloatButtonSize, string> = {

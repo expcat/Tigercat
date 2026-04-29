@@ -45,7 +45,7 @@ export function getDropdownMenuClasses(): string {
     'tiger-dropdown-menu',
     'min-w-[160px]',
     'py-1.5 px-1',
-    'rounded-lg',
+    'rounded-[var(--tiger-radius-md,0.5rem)]',
     'bg-[var(--tiger-surface,#ffffff)]',
     'border border-[var(--tiger-border,#e5e7eb)]',
     'shadow-[0_6px_16px_-2px_rgba(0,0,0,0.12),0_2px_6px_-1px_rgba(0,0,0,0.08)]',
@@ -60,7 +60,7 @@ export function getDropdownItemClasses(disabled: boolean, divided: boolean): str
   return classNames(
     'tiger-dropdown-item',
     'flex items-center gap-2',
-    'w-full rounded-lg',
+    'w-full rounded-[var(--tiger-radius-md,0.5rem)]',
     'px-3 py-1.5',
     'text-sm text-[var(--tiger-text,#374151)]',
     'transition-colors duration-150',

@@ -41,7 +41,7 @@ export function getVisibleTreeItems(
 /**
  * Base classes for tree container
  */
-export const treeBaseClasses = 'w-full bg-white rounded-lg'
+export const treeBaseClasses = 'w-full bg-white rounded-[var(--tiger-radius-md,0.5rem)]'
 
 /**
  * Tree node wrapper classes

@@ -128,7 +128,7 @@ export const tabItemDisabledClasses = 'opacity-50 cursor-not-allowed pointer-eve
  * Tab close button classes
  */
 export const tabCloseButtonClasses =
-  'ml-2 p-0.5 rounded-md hover:bg-gray-200 transition-colors duration-150'
+  'ml-2 p-0.5 rounded-[var(--tiger-radius-sm,0.375rem)] hover:bg-gray-200 transition-colors duration-150'
 
 /**
  * Tab content container classes

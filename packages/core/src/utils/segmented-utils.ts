@@ -13,7 +13,7 @@ export function getSegmentedContainerClasses(size: SegmentedSize, block: boolean
   }
 
   return classNames(
-    'inline-flex rounded-lg',
+    'inline-flex rounded-[var(--tiger-radius-md,0.5rem)]',
     'bg-[var(--tiger-segmented-bg,var(--tiger-fill,#f3f4f6))]',
     sizeClasses[size],
     block ? 'w-full' : ''
@@ -32,7 +32,7 @@ export function getSegmentedOptionClasses(
   }
 
   return classNames(
-    'inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200',
+    'inline-flex items-center justify-center rounded-[var(--tiger-radius-md,0.5rem)] font-medium transition-all duration-200',
     sizePad[size],
     isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
     isSelected
