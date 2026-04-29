@@ -84,8 +84,8 @@ describe('DonutChart', () => {
     })
 
     const slices = container.querySelectorAll('path[data-pie-slice]')
-    // First color in DONUT_PALETTE is #5470c6
-    expect(slices[0]).toHaveAttribute('fill', '#5470c6')
+    // First color in DONUT_PALETTE is theme token chart-1 (ECharts-inspired #5470c6 fallback)
+    expect(slices[0]).toHaveAttribute('fill', 'var(--tiger-chart-1,#5470c6)')
   })
 
   it('applies shadow by default', () => {

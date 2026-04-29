@@ -25,17 +25,23 @@ export interface DonutChartProps extends CoreDonutChartProps {
   onSliceHover?: (index: number | null, datum: DonutChartDatum | null) => void
 }
 
-/** ECharts-inspired vibrant palette for donut charts */
+/**
+ * Default palette for donut charts.
+ *
+ * Uses theme tokens (`--tiger-chart-1..6`) with ECharts-inspired hex fallbacks
+ * so the palette tracks light/dark theme switches and modern preset overrides
+ * (PR-12, 2026-04). Slots 7–9 reuse tokens 1–3 to keep nine distinct positions.
+ */
 const DONUT_PALETTE = [
-  '#5470c6',
-  '#91cc75',
-  '#fac858',
-  '#ee6666',
-  '#73c0de',
-  '#3ba272',
-  '#fc8452',
-  '#9a60b4',
-  '#ea7ccc'
+  'var(--tiger-chart-1,#5470c6)',
+  'var(--tiger-chart-2,#91cc75)',
+  'var(--tiger-chart-3,#fac858)',
+  'var(--tiger-chart-4,#ee6666)',
+  'var(--tiger-chart-5,#73c0de)',
+  'var(--tiger-chart-6,#3ba272)',
+  'var(--tiger-chart-1,#fc8452)',
+  'var(--tiger-chart-2,#9a60b4)',
+  'var(--tiger-chart-3,#ea7ccc)'
 ]
 
 export const DonutChart: React.FC<DonutChartProps> = ({
