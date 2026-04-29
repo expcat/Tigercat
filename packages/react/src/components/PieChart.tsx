@@ -211,7 +211,7 @@ export const PieChart: React.FC<PieChartProps> = ({
                   : `translate(${dx}px, ${dy}px)`,
                 transformOrigin: `${cx}px ${cy}px`,
                 transition:
-                  'transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease-out, filter 0.3s ease-out',
+                  'transform var(--tiger-motion-duration-relaxed,0.3s) var(--tiger-motion-ease-spring,cubic-bezier(0.4,0,0.2,1)), opacity 0.2s ease-out, filter 0.3s ease-out',
                 filter: shadow ? (isEmphasized ? PIE_EMPHASIS_SHADOW : PIE_BASE_SHADOW) : undefined
               }}
               tabIndex={selectable ? 0 : undefined}
