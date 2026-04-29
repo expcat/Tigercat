@@ -76,6 +76,26 @@
       "types": "./dist/locales/id-ID.d.ts",
       "import": "./dist/locales/id-ID.js",
       "require": "./dist/locales/id-ID.cjs"
+    },
+    "./icons/common": {
+      "types": "./dist/icons/common.d.ts",
+      "import": "./dist/icons/common.js",
+      "require": "./dist/icons/common.cjs"
+    },
+    "./icons/picker": {
+      "types": "./dist/icons/picker.d.ts",
+      "import": "./dist/icons/picker.js",
+      "require": "./dist/icons/picker.cjs"
+    },
+    "./icons/status": {
+      "types": "./dist/icons/status.d.ts",
+      "import": "./dist/icons/status.js",
+      "require": "./dist/icons/status.cjs"
+    },
+    "./icons/table": {
+      "types": "./dist/icons/table.d.ts",
+      "import": "./dist/icons/table.js",
+      "require": "./dist/icons/table.cjs"
     }
   },
   "files": [

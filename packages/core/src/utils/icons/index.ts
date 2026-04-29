@@ -5,5 +5,8 @@
  * All icons are framework-agnostic path data (d attributes) and viewBox constants.
  */
 
-export * from '../common-icons'
+export * from './common'
+export * from './picker'
+export * from './status'
+export * from './table'
 export * from '../svg-attrs'
