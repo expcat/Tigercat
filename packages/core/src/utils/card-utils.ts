@@ -1,7 +1,7 @@
 import type { CardSize, CardVariant, CardDirection } from '../types/card'
 
 export const cardBaseClasses =
-  'rounded-xl bg-[var(--tiger-surface,#ffffff)] overflow-hidden transition-all duration-200 ease-out'
+  'rounded-[var(--tiger-radius-lg,0.75rem)] bg-[var(--tiger-surface,#ffffff)] overflow-hidden transition-all duration-200 ease-out'
 
 export const cardSizeClasses: Record<CardSize, string> = {
   sm: 'p-3',

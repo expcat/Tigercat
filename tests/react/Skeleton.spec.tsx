@@ -63,7 +63,7 @@ describe('Skeleton', () => {
       })
 
       const skeleton = getSkeletonElements(container)[0]
-      expect(skeleton.className).toContain('rounded-md')
+      expect(skeleton.className).toContain('rounded-[var(--tiger-radius-md,0.5rem)]')
     })
   })
 
@@ -199,7 +199,7 @@ describe('Skeleton', () => {
       if (shape === 'circle') {
         expect(skeleton?.className).toContain('rounded-full')
       } else {
-        expect(skeleton?.className).toContain('rounded-md')
+        expect(skeleton?.className).toContain('rounded-[var(--tiger-radius-md,0.5rem)]')
       }
     })
   })

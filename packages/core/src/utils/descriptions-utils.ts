@@ -3,7 +3,7 @@ import type { DescriptionsSize, DescriptionsLayout } from '../types/descriptions
 export const descriptionsBaseClasses = 'w-full'
 
 export const descriptionsWrapperClasses =
-  'rounded-lg overflow-hidden bg-[var(--tiger-surface,#fff)]'
+  'rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden bg-[var(--tiger-surface,#fff)]'
 
 export const descriptionsHeaderClasses = 'flex items-center justify-between mb-4'
 

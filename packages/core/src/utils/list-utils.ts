@@ -8,7 +8,8 @@ import type { ListSize, ListBorderStyle, ListItemLayout } from '../types/list'
 /**
  * Base classes for list container
  */
-export const listBaseClasses = 'bg-[var(--tiger-surface,#ffffff)] rounded-lg overflow-hidden'
+export const listBaseClasses =
+  'bg-[var(--tiger-surface,#ffffff)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden'
 
 /**
  * List wrapper classes
