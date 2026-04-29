@@ -21,7 +21,7 @@ const SELECT_TRIGGER_BASE_CLASSES = [
   'border',
   'border-[var(--tiger-select-trigger-border,var(--tiger-border,#d1d5db))]',
   'text-[var(--tiger-select-trigger-text,var(--tiger-text,#111827))]',
-  'rounded-lg',
+  'rounded-[var(--tiger-radius-md,0.5rem)]',
   'cursor-pointer',
   'transition-all',
   'duration-200',
@@ -46,7 +46,7 @@ const SELECT_TRIGGER_DISABLED_CLASSES_STRING = [
  * Select dropdown base classes
  */
 export const selectDropdownBaseClasses =
-  'absolute z-50 w-full mt-1 bg-[var(--tiger-select-dropdown-bg,var(--tiger-surface,#ffffff))] border border-[var(--tiger-select-dropdown-border,var(--tiger-border,#e5e7eb))] rounded-xl shadow-lg max-h-60 overflow-auto'
+  'absolute z-50 w-full mt-1 bg-[var(--tiger-select-dropdown-bg,var(--tiger-surface,#ffffff))] border border-[var(--tiger-select-dropdown-border,var(--tiger-border,#e5e7eb))] rounded-[var(--tiger-radius-lg,0.75rem)] shadow-lg max-h-60 overflow-auto'
 
 /**
  * Select option base classes

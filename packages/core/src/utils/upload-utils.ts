@@ -247,7 +247,7 @@ export function getUploadButtonClasses(disabled: boolean): string {
     'py-2',
     'border',
     'border-gray-300',
-    'rounded-lg',
+    'rounded-[var(--tiger-radius-md,0.5rem)]',
     'text-sm',
     'font-medium',
     'transition-colors',
@@ -287,7 +287,7 @@ export function getDragAreaClasses(isDragging: boolean, disabled: boolean): stri
     'py-8',
     'border-2',
     'border-dashed',
-    'rounded-lg',
+    'rounded-[var(--tiger-radius-md,0.5rem)]',
     'transition-all',
     'duration-200'
   ]
@@ -378,7 +378,7 @@ export function getPictureCardClasses(status?: UploadFileStatus): string {
     'w-32',
     'h-32',
     'border',
-    'rounded-lg',
+    'rounded-[var(--tiger-radius-md,0.5rem)]',
     'overflow-hidden',
     'transition-all',
     'duration-200'

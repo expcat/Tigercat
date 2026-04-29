@@ -11,7 +11,7 @@ import { classNames } from './class-names'
 const BASE_INPUT_CLASSES = [
   'w-full',
   'border',
-  'rounded-lg',
+  'rounded-[var(--tiger-radius-md,0.5rem)]',
   'bg-[var(--tiger-surface,#ffffff)]',
   'text-[var(--tiger-text,#111827)]',
   'focus:outline-none',

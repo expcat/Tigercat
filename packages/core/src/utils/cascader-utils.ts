@@ -30,7 +30,7 @@ const CASCADER_TRIGGER_BASE_CLASSES = [
   'border',
   'border-[var(--tiger-cascader-trigger-border,var(--tiger-border,#d1d5db))]',
   'text-[var(--tiger-cascader-trigger-text,var(--tiger-text,#111827))]',
-  'rounded-lg',
+  'rounded-[var(--tiger-radius-md,0.5rem)]',
   'shadow-sm',
   'cursor-pointer',
   'transition-all',
@@ -49,7 +49,7 @@ const CASCADER_TRIGGER_DISABLED_CLASSES =
  * Cascader dropdown panel classes
  */
 export const cascaderDropdownClasses =
-  'absolute z-50 mt-1 flex bg-[var(--tiger-cascader-dropdown-bg,var(--tiger-surface,#ffffff))] border border-[var(--tiger-cascader-dropdown-border,var(--tiger-border,#e5e7eb))] rounded-xl shadow-lg'
+  'absolute z-50 mt-1 flex bg-[var(--tiger-cascader-dropdown-bg,var(--tiger-surface,#ffffff))] border border-[var(--tiger-cascader-dropdown-border,var(--tiger-border,#e5e7eb))] rounded-[var(--tiger-radius-lg,0.75rem)] shadow-lg'
 
 /**
  * Cascader column (single level) classes

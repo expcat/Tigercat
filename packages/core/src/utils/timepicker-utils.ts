@@ -117,7 +117,7 @@ export const timePickerInputWrapperClasses = 'relative flex items-center'
  */
 export function getTimePickerInputClasses(size: 'sm' | 'md' | 'lg', disabled: boolean): string {
   const baseClasses = [
-    'w-full rounded-lg border border-gray-300',
+    'w-full rounded-[var(--tiger-radius-md,0.5rem)] border border-gray-300',
     'focus:outline-none focus:ring-2 focus:ring-[var(--tiger-primary,#2563eb)] focus:border-transparent',
     'transition-colors duration-200',
     'pr-16' // Space for clear + clock buttons
@@ -171,7 +171,7 @@ export const timePickerClearButtonClasses = [
  * Dropdown panel classes
  */
 export const timePickerPanelClasses = [
-  'absolute z-10 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg',
+  'absolute z-10 mt-1 bg-white border border-gray-200 rounded-[var(--tiger-radius-md,0.5rem)] shadow-lg',
   'w-max'
 ].join(' ')
 

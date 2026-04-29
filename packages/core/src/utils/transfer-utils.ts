@@ -8,7 +8,7 @@ import { classNames } from './class-names'
 export const transferBaseClasses = 'flex items-stretch gap-4'
 
 export const transferPanelClasses =
-  'flex-1 min-w-0 border border-[var(--tiger-transfer-border,var(--tiger-border,#d1d5db))] rounded-lg overflow-hidden flex flex-col bg-[var(--tiger-transfer-bg,var(--tiger-surface,#ffffff))]'
+  'flex-1 min-w-0 border border-[var(--tiger-transfer-border,var(--tiger-border,#d1d5db))] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden flex flex-col bg-[var(--tiger-transfer-bg,var(--tiger-surface,#ffffff))]'
 
 export const transferPanelHeaderClasses =
   'flex items-center justify-between px-3 py-2 border-b border-[var(--tiger-transfer-border,var(--tiger-border,#d1d5db))] bg-[var(--tiger-transfer-header-bg,var(--tiger-surface-muted,#f9fafb))]'

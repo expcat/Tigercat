@@ -9,7 +9,7 @@ const sizeMap: Record<MentionsSize, string> = {
 
 export function getMentionsInputClasses(size: MentionsSize, disabled: boolean): string {
   return classNames(
-    'w-full rounded-lg border transition-colors resize-none',
+    'w-full rounded-[var(--tiger-radius-md,0.5rem)] border transition-colors resize-none',
     'bg-[var(--tiger-mentions-bg,var(--tiger-surface,#ffffff))]',
     'border-[var(--tiger-mentions-border,var(--tiger-border,#d1d5db))]',
     'text-[var(--tiger-mentions-text,var(--tiger-text,#111827))]',
@@ -22,7 +22,7 @@ export function getMentionsInputClasses(size: MentionsSize, disabled: boolean): 
 }
 
 export const mentionsDropdownClasses = classNames(
-  'absolute z-50 mt-1 w-48 max-h-48 overflow-auto rounded-lg border shadow-lg',
+  'absolute z-50 mt-1 w-48 max-h-48 overflow-auto rounded-[var(--tiger-radius-md,0.5rem)] border shadow-lg',
   'bg-[var(--tiger-mentions-dropdown-bg,var(--tiger-surface,#ffffff))]',
   'border-[var(--tiger-mentions-dropdown-border,var(--tiger-border,#d1d5db))]'
 )

@@ -14,7 +14,7 @@ export const autoCompleteBaseClasses = 'relative inline-block w-full'
  * AutoComplete dropdown panel classes
  */
 export const autoCompleteDropdownClasses =
-  'absolute z-50 w-full mt-1 bg-[var(--tiger-autocomplete-dropdown-bg,var(--tiger-surface,#ffffff))] border border-[var(--tiger-autocomplete-dropdown-border,var(--tiger-border,#d1d5db))] rounded-lg shadow-lg max-h-60 overflow-auto'
+  'absolute z-50 w-full mt-1 bg-[var(--tiger-autocomplete-dropdown-bg,var(--tiger-surface,#ffffff))] border border-[var(--tiger-autocomplete-dropdown-border,var(--tiger-border,#d1d5db))] rounded-[var(--tiger-radius-md,0.5rem)] shadow-lg max-h-60 overflow-auto'
 
 /**
  * AutoComplete option base classes
@@ -56,7 +56,8 @@ export function getAutoCompleteInputClasses(
   disabled: boolean = false,
   isOpen: boolean = false
 ): string {
-  const base = 'w-full rounded-lg border outline-none transition-all duration-200'
+  const base =
+    'w-full rounded-[var(--tiger-radius-md,0.5rem)] border outline-none transition-all duration-200'
 
   const sizeClass = classNames(sizeClasses[size], inputPaddingClasses[size])
 
