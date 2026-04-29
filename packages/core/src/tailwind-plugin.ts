@@ -1,4 +1,5 @@
 import plugin from 'tailwindcss/plugin'
+import type { PluginAPI } from 'tailwindcss/plugin'
 import type { ThemePreset, ThemeSemanticColors } from './types/theme'
 import { THEME_CSS_VARS } from './theme'
 import {
@@ -92,7 +93,7 @@ export const tigercatDarkTheme: Record<string, string> = {
  * Tailwind CSS plugin for Tigercat
  * Injects the default CSS variables into the root scope
  */
-export const tigercatPlugin = plugin(function ({ addBase }) {
+export const tigercatPlugin = plugin(function ({ addBase }: PluginAPI) {
   addBase({
     ':root': { ...tigercatTheme, ...MODERN_BASE_TOKENS_LIGHT },
     '.dark': { ...tigercatDarkTheme, ...MODERN_BASE_TOKENS_DARK },
@@ -154,7 +155,7 @@ export interface TigercatPluginOptions {
  * ```
  */
 export function createTigercatPlugin(options: TigercatPluginOptions = {}) {
-  return plugin(function ({ addBase }) {
+  return plugin(function ({ addBase }: PluginAPI) {
     const preset = options.preset
 
     const lightVars = preset?.light?.colors ? presetToVars(preset.light.colors) : tigercatTheme

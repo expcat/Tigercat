@@ -122,8 +122,16 @@
   "dependencies": {
     "@floating-ui/dom": "^1.7.6"
   },
+  "peerDependencies": {
+    "tailwindcss": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "tailwindcss": {
+      "optional": true
+    }
+  },
   "devDependencies": {
-    "tailwindcss": "^3.4.19",
+    "tailwindcss": "^4.2.4",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   }
