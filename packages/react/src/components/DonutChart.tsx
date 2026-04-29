@@ -174,15 +174,23 @@ export const DonutChart: React.FC<DonutChartProps> = ({
       {hasCenterContent && (
         <div
           data-donut-center="true"
-          style={{
-            position: 'absolute',
-            left: `${centerX}px`,
-            top: `${centerY}px`,
-            transform: 'translate(-50%, -50%)',
-            textAlign: 'center',
-            pointerEvents: 'none',
-            lineHeight: '1.3'
-          }}>
+          style={
+            {
+              position: 'absolute',
+              left: `${centerX}px`,
+              top: `${centerY}px`,
+              transform: 'translate(-50%, -50%)',
+              textAlign: 'center',
+              pointerEvents: 'none',
+              lineHeight: '1.3',
+              padding: 'var(--tiger-chart-donut-center-padding, 0)',
+              borderRadius: 'var(--tiger-radius-pill, 9999px)',
+              background: 'var(--tiger-chart-donut-center-bg, transparent)',
+              boxShadow: 'var(--tiger-chart-donut-center-shadow, none)',
+              backdropFilter: 'var(--tiger-chart-donut-center-backdrop, none)',
+              WebkitBackdropFilter: 'var(--tiger-chart-donut-center-backdrop, none)'
+            } as React.CSSProperties
+          }>
           {centerValue !== undefined && (
             <div
               className="text-xl font-semibold text-[color:var(--tiger-text,#1f2937)]"

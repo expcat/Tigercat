@@ -283,7 +283,13 @@ export const DonutChart = defineComponent({
                 transform: 'translate(-50%, -50%)',
                 textAlign: 'center',
                 pointerEvents: 'none',
-                lineHeight: '1.3'
+                lineHeight: '1.3',
+                padding: 'var(--tiger-chart-donut-center-padding, 0)',
+                borderRadius: 'var(--tiger-radius-pill, 9999px)',
+                background: 'var(--tiger-chart-donut-center-bg, transparent)',
+                boxShadow: 'var(--tiger-chart-donut-center-shadow, none)',
+                backdropFilter: 'var(--tiger-chart-donut-center-backdrop, none)',
+                WebkitBackdropFilter: 'var(--tiger-chart-donut-center-backdrop, none)'
               },
               'data-donut-center': 'true'
             },

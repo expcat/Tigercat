@@ -124,6 +124,13 @@ export const MODERN_OVERRIDE_TOKENS_LIGHT: Record<string, string> = {
   // Chart bar (BarChart rect) — softer top corners (modern bumps to --tiger-radius-sm)
   '--tiger-chart-bar-radius': 'var(--tiger-radius-sm, 4px)',
 
+  // Chart donut center hole — opt-in glass panel behind centerValue / centerLabel
+  '--tiger-chart-donut-center-padding': '10px 14px',
+  '--tiger-chart-donut-center-bg':
+    'color-mix(in oklab, var(--tiger-surface, #ffffff) 78%, transparent)',
+  '--tiger-chart-donut-center-shadow': 'var(--tiger-shadow-glass)',
+  '--tiger-chart-donut-center-backdrop': 'blur(var(--tiger-blur-glass, 16px)) saturate(1.05)',
+
   // Subtle gradients via OKLab color-mix
   '--tiger-gradient-primary':
     'linear-gradient(180deg, color-mix(in oklab, var(--tiger-primary) 100%, white 8%) 0%, var(--tiger-primary) 100%)',
@@ -162,7 +169,11 @@ export const MODERN_OVERRIDE_TOKENS_DARK: Record<string, string> = {
     'inset 0 1px 0 rgb(255 255 255 / 0.08), inset 0 0 0 1px rgb(255 255 255 / 0.06), 0 16px 32px -8px rgb(0 0 0 / 0.55)',
 
   // Chart legend row hover for dark surfaces (slightly brighter)
-  '--tiger-chart-legend-row-hover-bg': 'rgb(255 255 255 / 0.06)'
+  '--tiger-chart-legend-row-hover-bg': 'rgb(255 255 255 / 0.06)',
+
+  // Donut center glass panel for dark surfaces (slightly more opaque to read on dark)
+  '--tiger-chart-donut-center-bg':
+    'color-mix(in oklab, var(--tiger-surface, #0f172a) 70%, transparent)'
 }
 
 /**
