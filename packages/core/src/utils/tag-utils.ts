@@ -7,9 +7,20 @@ import { closeIconPathD } from './common-icons'
 
 /**
  * Base classes for all tag variants
+ *
+ * Radius is token-driven (PR-19a). Defaults to `0.375rem` so the visual
+ * matches the previous `rounded-lg`-via-`--tiger-radius-md` look at small
+ * sizes; users on the modern theme inherit the rounder modern radii.
  */
 export const tagBaseClasses =
-  'inline-flex items-center gap-1 rounded-lg border font-medium transition-colors'
+  'inline-flex items-center gap-1 rounded-[var(--tiger-radius-sm,0.375rem)] border font-medium transition-colors'
+
+/**
+ * Pill-shape modifier (opt-in). Apply when callers want a fully rounded
+ * tag (e.g. status chips). Composes with {@link tagBaseClasses}.
+ * @since 1.1.0
+ */
+export const tagPillClasses = 'rounded-[var(--tiger-radius-pill,9999px)]'
 
 /**
  * Size classes for tag variants

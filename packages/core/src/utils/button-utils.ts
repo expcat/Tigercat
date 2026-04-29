@@ -4,10 +4,14 @@ import { type ButtonSize } from '../types/button'
  * Button base classes with improved interaction feedback
  * - Uses focus-visible for keyboard navigation only (no distracting rings on click)
  * - Adds active:scale for natural press feedback
+ * - Radius and transition are token-driven (PR-19a) so the modern theme can
+ *   override `--tiger-radius-md` / `--tiger-transition-base` / spring easing
+ *   without recompiling the component. Fallbacks match the previous
+ *   `rounded-lg` + `transition-all duration-200 ease-out` exactly.
  * @since 0.2.0 - Improved interaction effects
  */
 export const buttonBaseClasses =
-  'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 active:scale-[0.98]'
+  'inline-flex items-center justify-center font-medium rounded-[var(--tiger-radius-md,0.5rem)] [transition:var(--tiger-transition-base,all_200ms_cubic-bezier(0.4,0,0.2,1))] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 active:scale-[0.98]'
 
 export const buttonSizeClasses: Record<ButtonSize, string> = {
   xs: 'px-2 py-1 text-xs',

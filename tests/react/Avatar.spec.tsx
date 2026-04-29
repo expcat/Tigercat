@@ -93,10 +93,17 @@ describe('Avatar', () => {
 
   it('applies shape classes', () => {
     const { container: circleContainer } = render(<Avatar text="C" shape="circle" />)
-    expect(circleContainer.querySelector('[role="img"]')?.className).toContain('rounded-full')
+    expect(circleContainer.querySelector('[role="img"]')?.className).toContain(
+      'rounded-[var(--tiger-radius-pill,9999px)]'
+    )
 
     const { container: squareContainer } = render(<Avatar text="S" shape="square" />)
-    expect(squareContainer.querySelector('[role="img"]')?.className).toContain('rounded-lg')
+    expect(squareContainer.querySelector('[role="img"]')?.className).toContain(
+      'rounded-[var(--tiger-radius-md,0.5rem)]'
+    )
+
+    const { container: squircleContainer } = render(<Avatar text="Q" shape="squircle" />)
+    expect(squircleContainer.querySelector('[role="img"]')?.className).toContain('rounded-[30%]')
   })
 
   it('applies custom bgColor and textColor', () => {

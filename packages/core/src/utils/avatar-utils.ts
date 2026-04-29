@@ -23,10 +23,15 @@ export const avatarSizeClasses: Record<AvatarSize, string> = {
 
 /**
  * Shape classes for avatar
+ *
+ * - `circle` / `square` keep the original visual (token-driven so the modern
+ *   theme can soften the square corners).
+ * - `squircle` is a modern iOS-style intermediate shape (PR-19a).
  */
 export const avatarShapeClasses: Record<AvatarShape, string> = {
-  circle: 'rounded-full',
-  square: 'rounded-lg'
+  circle: 'rounded-[var(--tiger-radius-pill,9999px)]',
+  square: 'rounded-[var(--tiger-radius-md,0.5rem)]',
+  squircle: 'rounded-[30%]'
 }
 
 /**

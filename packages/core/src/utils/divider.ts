@@ -23,7 +23,11 @@ const SPACING_V: Record<DividerSpacing, string> = {
 const LINE_STYLE_MAP: Record<DividerLineStyle, string> = {
   solid: 'border-solid',
   dashed: 'border-dashed',
-  dotted: 'border-dotted'
+  dotted: 'border-dotted',
+  // Gradient mode renders the line via background-image instead of border-style;
+  // we strip the border in `getDividerClasses` below so this entry is only a
+  // marker for switch-style consumers.
+  gradient: 'border-none'
 } as const
 
 /**
@@ -35,8 +39,17 @@ export function getDividerClasses(
   spacing: DividerSpacing
 ): string {
   const isH = orientation === 'horizontal'
-  const base = isH ? `w-full border-t ${BORDER_COLOR}` : `h-full border-l ${BORDER_COLOR}`
   const sp = (isH ? SPACING_H : SPACING_V)[spacing]
+  if (lineStyle === 'gradient') {
+    // Background-gradient line: 1px tall (or wide for vertical) with soft
+    // fade-in/out. Falls back to `--tiger-border` when the gradient token is
+    // missing so the visual stays consistent on default theme.
+    const base = isH
+      ? 'w-full h-px bg-[var(--tiger-divider-gradient,linear-gradient(90deg,transparent,var(--tiger-border,#e5e7eb),transparent))] border-0'
+      : 'h-full w-px bg-[var(--tiger-divider-gradient-vertical,linear-gradient(180deg,transparent,var(--tiger-border,#e5e7eb),transparent))] border-0'
+    return sp ? `${base} ${sp}` : base
+  }
+  const base = isH ? `w-full border-t ${BORDER_COLOR}` : `h-full border-l ${BORDER_COLOR}`
   return sp ? `${base} ${LINE_STYLE_MAP[lineStyle]} ${sp}` : `${base} ${LINE_STYLE_MAP[lineStyle]}`
 }
 

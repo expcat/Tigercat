@@ -24,9 +24,9 @@ export const dotSizeClasses: Record<BadgeSize, string> = {
 
 /** Shape classes per badge type */
 export const badgeTypeClasses: Record<BadgeType, string> = {
-  dot: 'rounded-full',
-  number: 'rounded-full',
-  text: 'rounded-lg'
+  dot: 'rounded-[var(--tiger-radius-pill,9999px)]',
+  number: 'rounded-[var(--tiger-radius-pill,9999px)]',
+  text: 'rounded-[var(--tiger-radius-md,0.5rem)]'
 } as const
 
 /** Wrapper classes for non-standalone badge */

@@ -15,8 +15,12 @@ import type { AlertSize, AlertType } from '../types/alert'
 
 /**
  * Base classes for all alert variants
+ *
+ * Radius and transition are token-driven (PR-19a) so the modern theme can
+ * apply rounder corners and refined easing without component-level changes.
  */
-export const alertBaseClasses = 'flex items-start rounded-lg border transition-all duration-200'
+export const alertBaseClasses =
+  'flex items-start rounded-[var(--tiger-radius-md,0.5rem)] border [transition:var(--tiger-transition-base,all_200ms_cubic-bezier(0.4,0,0.2,1))]'
 
 /**
  * Size classes for alert variants

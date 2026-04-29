@@ -49,10 +49,10 @@ describe('Badge', () => {
     expect(badge).toHaveAttribute('aria-label', 'notification')
   })
 
-  it('renders text type with rounded-lg', () => {
+  it('renders text type with token-driven md radius', () => {
     const { container } = render(<Badge type="text" content="HOT" />)
     const badge = container.querySelector('[role="status"]')
-    expect(badge?.className).toContain('rounded-lg')
+    expect(badge?.className).toContain('rounded-[var(--tiger-radius-md,0.5rem)]')
     expect(badge?.textContent).toBe('HOT')
   })
 

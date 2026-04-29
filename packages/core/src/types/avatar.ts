@@ -10,7 +10,7 @@ export type AvatarSize = 'sm' | 'md' | 'lg' | 'xl'
 /**
  * Avatar shape types
  */
-export type AvatarShape = 'circle' | 'square'
+export type AvatarShape = 'circle' | 'square' | 'squircle'
 
 /**
  * Base avatar props interface
