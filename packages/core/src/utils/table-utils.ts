@@ -83,7 +83,8 @@ export function getTableWrapperClasses(bordered: boolean, maxHeight?: string | n
   return classNames(
     'relative',
     tableContainerClasses,
-    bordered && 'border border-[var(--tiger-border,#e5e7eb)] rounded-lg overflow-hidden',
+    bordered &&
+      'border border-[var(--tiger-border,#e5e7eb)] rounded-[var(--tiger-radius-md,0.5rem)] overflow-hidden',
     maxHeight && 'overflow-y-auto'
   )
 }

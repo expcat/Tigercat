@@ -9,7 +9,7 @@ export function getCalendarContainerClasses(fullscreen: boolean): string {
     'bg-[var(--tiger-calendar-bg,var(--tiger-surface,#ffffff))]',
     'border border-[var(--tiger-calendar-border,var(--tiger-border,#d1d5db))]',
     fullscreen ? 'w-full p-4' : 'w-72 p-3',
-    'rounded-lg'
+    'rounded-[var(--tiger-radius-md,0.5rem)]'
   )
 }
 
@@ -53,7 +53,7 @@ export function getCalendarDayClasses(
 
 export function getCalendarMonthClasses(isSelected: boolean): string {
   return classNames(
-    'inline-flex items-center justify-center rounded-lg py-2 px-3 text-sm transition-colors cursor-pointer',
+    'inline-flex items-center justify-center rounded-[var(--tiger-radius-md,0.5rem)] py-2 px-3 text-sm transition-colors cursor-pointer',
     isSelected
       ? 'bg-[var(--tiger-calendar-selected-bg,var(--tiger-primary,#2563eb))] text-white'
       : 'text-[var(--tiger-calendar-day,var(--tiger-text,#111827))] hover:bg-[var(--tiger-calendar-day-hover,var(--tiger-fill-hover,#e5e7eb))]'
