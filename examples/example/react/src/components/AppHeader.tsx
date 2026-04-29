@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { Button } from '@expcat/tigercat-react'
 import { DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
 import ThemeSwitch from './ThemeSwitch'
+import DarkModeSwitch from './DarkModeSwitch'
+import ModernStyleSwitch from './ModernStyleSwitch'
 import LanguageSwitch from './LanguageSwitch'
 
 export interface AppHeaderProps {
@@ -63,6 +65,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         <div className="flex items-center gap-3">
           <LanguageSwitch value={lang} onChange={onLangChange} />
           <ThemeSwitch lang={lang} />
+          <ModernStyleSwitch lang={lang} />
+          <DarkModeSwitch lang={lang} />
         </div>
       </div>
     </header>

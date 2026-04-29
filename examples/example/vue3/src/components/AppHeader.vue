@@ -3,6 +3,8 @@ import { computed } from 'vue'
 import { DEMO_APP_TITLE, type DemoLang } from '@demo-shared/app-config'
 import { Button } from '@expcat/tigercat-vue'
 import ThemeSwitch from './ThemeSwitch.vue'
+import DarkModeSwitch from './DarkModeSwitch.vue'
+import ModernStyleSwitch from './ModernStyleSwitch.vue'
 import LanguageSwitch from './LanguageSwitch.vue'
 
 const props = defineProps<{ lang: DemoLang; isSiderCollapsed: boolean; isMobile: boolean; rightHint?: string }>()
@@ -59,6 +61,8 @@ const handleLangChange = (v: DemoLang) => {
         <LanguageSwitch :model-value="props.lang"
                         @update:model-value="handleLangChange" />
         <ThemeSwitch :lang="props.lang" />
+        <ModernStyleSwitch :lang="props.lang" />
+        <DarkModeSwitch :lang="props.lang" />
       </div>
     </div>
   </header>

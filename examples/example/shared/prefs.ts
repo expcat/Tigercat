@@ -4,6 +4,8 @@ export const DEMO_LANG_STORAGE_KEY = 'tigercat-example-lang'
 export const DEMO_THEME_STORAGE_KEY = 'tigercat-example-theme'
 export const DEMO_SIDER_COLLAPSED_STORAGE_KEY = 'tigercat-example-sider-collapsed'
 export const DEMO_NAV_GROUPS_COLLAPSED_STORAGE_KEY = 'tigercat-example-nav-groups-collapsed'
+export const DEMO_DARK_MODE_STORAGE_KEY = 'tigercat-example-dark'
+export const DEMO_MODERN_STYLE_STORAGE_KEY = 'tigercat-example-modern'
 
 export function getStoredLang(): DemoLang {
   if (typeof window === 'undefined') return 'zh-CN'
@@ -64,4 +66,41 @@ export function getStoredCollapsedNavGroups(): Record<string, boolean> {
 export function setStoredCollapsedNavGroups(groups: Record<string, boolean>) {
   if (typeof window === 'undefined') return
   window.localStorage.setItem(DEMO_NAV_GROUPS_COLLAPSED_STORAGE_KEY, JSON.stringify(groups))
+}
+
+export function getStoredDarkMode(): boolean {
+  if (typeof window === 'undefined') return false
+  const raw = window.localStorage.getItem(DEMO_DARK_MODE_STORAGE_KEY)
+  if (raw === '1') return true
+  if (raw === '0') return false
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
+}
+
+export function setStoredDarkMode(enabled: boolean) {
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(DEMO_DARK_MODE_STORAGE_KEY, enabled ? '1' : '0')
+}
+
+export function applyDarkMode(enabled: boolean) {
+  if (typeof document === 'undefined') return
+  document.documentElement.classList.toggle('dark', enabled)
+}
+
+export function getStoredModernStyle(): boolean {
+  if (typeof window === 'undefined') return false
+  return window.localStorage.getItem(DEMO_MODERN_STYLE_STORAGE_KEY) === '1'
+}
+
+export function setStoredModernStyle(enabled: boolean) {
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(DEMO_MODERN_STYLE_STORAGE_KEY, enabled ? '1' : '0')
+}
+
+export function applyModernStyle(enabled: boolean) {
+  if (typeof document === 'undefined') return
+  if (enabled) {
+    document.documentElement.setAttribute('data-tiger-style', 'modern')
+  } else {
+    document.documentElement.removeAttribute('data-tiger-style')
+  }
 }
