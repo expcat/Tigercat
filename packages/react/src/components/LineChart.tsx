@@ -94,6 +94,7 @@ export const LineChart: React.FC<LineChartProps> = ({
   areaOpacity = 0.15,
   pointHollow = false,
   animated = false,
+  strokeGradient = false,
   tooltipFormatter,
   legendFormatter,
   title,
@@ -310,7 +311,7 @@ export const LineChart: React.FC<LineChartProps> = ({
       desc={desc}
       className={classNames(className)}>
       {/* Gradient defs and animation styles */}
-      {(seriesData.some((sd) => sd.showArea) || animated) && (
+      {(seriesData.some((sd) => sd.showArea) || animated || strokeGradient) && (
         <defs>
           {animated && (
             <style>{`
@@ -335,6 +336,26 @@ export const LineChart: React.FC<LineChartProps> = ({
                 y2="1">
                 <stop offset="0%" stopColor={sd.color} stopOpacity={sd.areaOpacity} />
                 <stop offset="100%" stopColor={sd.color} stopOpacity={0.02} />
+              </linearGradient>
+            ))}
+          {strokeGradient &&
+            seriesData.map((sd) => (
+              <linearGradient
+                key={`stroke-grad-${sd.seriesIndex}`}
+                id={`${gradientPrefix}-stroke-${sd.seriesIndex}`}
+                x1="0"
+                y1="0"
+                x2="1"
+                y2="0">
+                <stop
+                  offset="0%"
+                  stopColor={`color-mix(in oklab, ${sd.color} 100%, white 12%)`}
+                />
+                <stop offset="50%" stopColor={sd.color} />
+                <stop
+                  offset="100%"
+                  stopColor={`color-mix(in oklab, ${sd.color} 100%, black 8%)`}
+                />
               </linearGradient>
             ))}
         </defs>
@@ -399,7 +420,11 @@ export const LineChart: React.FC<LineChartProps> = ({
           <path
             d={sd.linePath}
             fill="none"
-            stroke={sd.color}
+            stroke={
+              strokeGradient
+                ? `url(#${gradientPrefix}-stroke-${sd.seriesIndex})`
+                : sd.color
+            }
             strokeWidth={sd.strokeWidth}
             strokeDasharray={animated ? (sd.strokeDasharray ?? '1') : sd.strokeDasharray}
             strokeDashoffset={animated ? '1' : undefined}

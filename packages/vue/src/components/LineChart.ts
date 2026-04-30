@@ -210,6 +210,11 @@ export const LineChart = defineComponent({
       type: Boolean,
       default: false
     },
+    // Stroke gradient (modern look — opt-in)
+    strokeGradient: {
+      type: Boolean,
+      default: false
+    },
     // Tooltip props
     showTooltip: {
       type: Boolean,
@@ -466,7 +471,7 @@ export const LineChart = defineComponent({
                   })
                 : null,
               // Gradient defs and animation styles
-              seriesData.value.some((sd) => sd.showArea) || props.animated
+              seriesData.value.some((sd) => sd.showArea) || props.animated || props.strokeGradient
                 ? h('defs', null, [
                     // Animation keyframes
                     props.animated
@@ -511,7 +516,37 @@ export const LineChart = defineComponent({
                             })
                           ]
                         )
-                      )
+                      ),
+                    // Stroke gradients (3-stop horizontal lighter→base→darker)
+                    ...(props.strokeGradient
+                      ? seriesData.value.map((sd) =>
+                          h(
+                            'linearGradient',
+                            {
+                              key: `stroke-grad-${sd.seriesIndex}`,
+                              id: `${gradientPrefix}-stroke-${sd.seriesIndex}`,
+                              x1: '0',
+                              y1: '0',
+                              x2: '1',
+                              y2: '0'
+                            },
+                            [
+                              h('stop', {
+                                offset: '0%',
+                                'stop-color': `color-mix(in oklab, ${sd.color} 100%, white 12%)`
+                              }),
+                              h('stop', {
+                                offset: '50%',
+                                'stop-color': sd.color
+                              }),
+                              h('stop', {
+                                offset: '100%',
+                                'stop-color': `color-mix(in oklab, ${sd.color} 100%, black 8%)`
+                              })
+                            ]
+                          )
+                        )
+                      : [])
                   ])
                 : null,
               // Render each series
@@ -550,7 +585,9 @@ export const LineChart = defineComponent({
                       h('path', {
                         d: sd.linePath,
                         fill: 'none',
-                        stroke: sd.color,
+                        stroke: props.strokeGradient
+                          ? `url(#${gradientPrefix}-stroke-${sd.seriesIndex})`
+                          : sd.color,
                         'stroke-width': sd.strokeWidth,
                         'stroke-dasharray': props.animated
                           ? (sd.strokeDasharray ?? '1')
