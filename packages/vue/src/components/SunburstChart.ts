@@ -4,6 +4,7 @@ import {
   computeSunburstArcs,
   getChartElementOpacity,
   getChartInnerRect,
+  getSunburstGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
@@ -34,6 +35,7 @@ export const SunburstChart = defineComponent({
     innerRadiusRatio: { type: Number, default: 0 },
     showLabels: { type: Boolean, default: true },
     colors: { type: Array as PropType<string[]> },
+    gradient: { type: Boolean, default: false },
     // Interaction
     hoverable: { type: Boolean, default: false },
     hoveredIndex: { type: Number as PropType<number | null>, default: undefined },
@@ -90,6 +92,7 @@ export const SunburstChart = defineComponent({
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
     const palette = computed(() => resolveChartPalette(props.colors))
+    const gradientPrefix = getSunburstGradientPrefix()
 
     const outerRadius = computed(() => Math.min(innerRect.value.width, innerRect.value.height) / 2)
     const innerRadius = computed(
@@ -145,13 +148,45 @@ export const SunburstChart = defineComponent({
           className: classNames(props.className)
         },
         {
-          default: () =>
-            h(
+          default: () => {
+            const gradientDefs = props.gradient
+              ? h(
+                  'defs',
+                  null,
+                  arcs.value.map((arc) =>
+                    h(
+                      'linearGradient',
+                      {
+                        id: `${gradientPrefix}-${arc.index}`,
+                        x1: '0',
+                        y1: '0',
+                        x2: '0',
+                        y2: '1'
+                      },
+                      [
+                        h('stop', {
+                          offset: '0%',
+                          'stop-color': arc.color,
+                          'stop-opacity': '1'
+                        }),
+                        h('stop', {
+                          offset: '100%',
+                          'stop-color': arc.color,
+                          'stop-opacity': '0.7'
+                        })
+                      ]
+                    )
+                  )
+                )
+              : null
+
+            return h(
               ChartSeries,
               { data: arcs.value, type: 'sunburst' },
               {
-                default: () =>
-                  arcs.value.map((arc) => {
+                default: () => [
+                  gradientDefs,
+                  ...arcs.value.map((arc) => {
                     const opacity = getChartElementOpacity(arc.index, activeIndex.value, {
                       activeOpacity: props.activeOpacity,
                       inactiveOpacity: props.inactiveOpacity
@@ -159,7 +194,7 @@ export const SunburstChart = defineComponent({
                     return h('path', {
                       key: `arc-${arc.index}`,
                       d: arc.path,
-                      fill: arc.color,
+                      fill: props.gradient ? `url(#${gradientPrefix}-${arc.index})` : arc.color,
                       opacity,
                       stroke: 'var(--tiger-surface,#ffffff)',
                       'stroke-width': 1,
@@ -180,8 +215,10 @@ export const SunburstChart = defineComponent({
                       onClick: () => handleClick(arc.index)
                     })
                   })
+                ]
               }
             )
+          }
         }
       )
 

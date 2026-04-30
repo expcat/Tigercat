@@ -4,6 +4,7 @@ import {
   computeSunburstArcs,
   getChartElementOpacity,
   getChartInnerRect,
+  getSunburstGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
@@ -35,6 +36,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
   innerRadiusRatio = 0,
   showLabels: _showLabels = true,
   colors,
+  gradient = false,
   hoverable = false,
   hoveredIndex: hoveredIndexProp,
   activeOpacity = 1,
@@ -60,6 +62,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
     [width, height, padding]
   )
   const palette = useMemo(() => resolveChartPalette(colors), [colors])
+  const gradientPrefix = useMemo(() => getSunburstGradientPrefix(), [])
 
   const outerRadius = useMemo(
     () => Math.min(innerRect.width, innerRect.height) / 2,
@@ -156,6 +159,22 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
       desc={desc}
       className={classNames(className)}>
       <g data-series-type="sunburst">
+        {gradient && (
+          <defs>
+            {arcs.map((arc) => (
+              <linearGradient
+                key={`grad-${arc.index}`}
+                id={`${gradientPrefix}-${arc.index}`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1">
+                <stop offset="0%" stopColor={arc.color} stopOpacity="1" />
+                <stop offset="100%" stopColor={arc.color} stopOpacity="0.7" />
+              </linearGradient>
+            ))}
+          </defs>
+        )}
         {arcs.map((arc) => {
           const opacity = getChartElementOpacity(arc.index, activeIndex, {
             activeOpacity,
@@ -165,7 +184,7 @@ export const SunburstChart: React.FC<SunburstChartProps> = ({
             <path
               key={`arc-${arc.index}`}
               d={arc.path}
-              fill={arc.color}
+              fill={gradient ? `url(#${gradientPrefix}-${arc.index})` : arc.color}
               opacity={opacity}
               stroke="var(--tiger-surface,#ffffff)"
               strokeWidth={1}

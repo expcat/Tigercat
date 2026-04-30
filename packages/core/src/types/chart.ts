@@ -2034,4 +2034,11 @@ export interface SunburstChartProps
    * Palette of colors
    */
   colors?: string[]
+
+  /**
+   * Whether to apply a top-to-bottom alpha gradient to each arc fill
+   * for a subtle "lit from above" depth effect (opt-in, default `false`).
+   * @default false
+   */
+  gradient?: boolean
 }
