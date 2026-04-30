@@ -207,7 +207,7 @@ export const AreaChart = defineComponent({
     },
     gradient: {
       type: Boolean,
-      default: false
+      default: true
     },
     animated: {
       type: Boolean,

@@ -103,6 +103,7 @@ describe('AreaChart', () => {
     const { container } = renderWithProps(AreaChart, {
       data: basicData,
       fillOpacity: 0.5,
+      gradient: false,
       width: 300,
       height: 200
     })

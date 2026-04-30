@@ -96,7 +96,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   legendMarkerSize = 10,
   legendGap = 8,
   showTooltip = true,
-  gradient = false,
+  gradient = true,
   animated = false,
   pointHollow = false,
   tooltipFormatter,
