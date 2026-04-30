@@ -12,7 +12,7 @@
   "dependencies": {
     "@expcat/tigercat-vue": "workspace:*",
     "vue": "^3.5.33",
-    "vue-router": "^4.6.4"
+    "vue-router": "^5.0.6"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.4",
