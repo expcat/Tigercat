@@ -123,6 +123,11 @@ const NotificationCenterDemo = lazy(() => import('./pages/NotificationCenterDemo
 const CropUploadDemo = lazy(() => import('./pages/CropUploadDemo'))
 const TaskBoardDemo = lazy(() => import('./pages/TaskBoardDemo'))
 
+// Hooks
+const UseDragDemo = lazy(() => import('./pages/UseDragDemo'))
+const UseControlledStateDemo = lazy(() => import('./pages/UseControlledStateDemo'))
+const UseChartInteractionDemo = lazy(() => import('./pages/UseChartInteractionDemo'))
+
 const router = createBrowserRouter(
   [
     {
@@ -240,7 +245,11 @@ const router = createBrowserRouter(
         { path: 'activity-feed', element: <ActivityFeedDemo /> },
         { path: 'notification-center', element: <NotificationCenterDemo /> },
         { path: 'crop-upload', element: <CropUploadDemo /> },
-        { path: 'task-board', element: <TaskBoardDemo /> }
+        { path: 'task-board', element: <TaskBoardDemo /> },
+        // Hooks
+        { path: 'use-drag', element: <UseDragDemo /> },
+        { path: 'use-controlled-state', element: <UseControlledStateDemo /> },
+        { path: 'use-chart-interaction', element: <UseChartInteractionDemo /> }
       ]
     }
   ],

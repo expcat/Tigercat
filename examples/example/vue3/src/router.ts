@@ -113,14 +113,30 @@ const router = createRouter({
         { path: 'kanban', component: () => import('./pages/KanbanDemo.vue') },
         { path: 'file-manager', component: () => import('./pages/FileManagerDemo.vue') },
         // Composite
-        { path: 'data-table-with-toolbar', component: () => import('./pages/DataTableWithToolbarDemo.vue') },
+        {
+          path: 'data-table-with-toolbar',
+          component: () => import('./pages/DataTableWithToolbarDemo.vue')
+        },
         { path: 'form-wizard', component: () => import('./pages/FormWizardDemo.vue') },
         { path: 'chat-window', component: () => import('./pages/ChatWindowDemo.vue') },
         { path: 'comment-thread', component: () => import('./pages/CommentThreadDemo.vue') },
         { path: 'activity-feed', component: () => import('./pages/ActivityFeedDemo.vue') },
-        { path: 'notification-center', component: () => import('./pages/NotificationCenterDemo.vue') },
+        {
+          path: 'notification-center',
+          component: () => import('./pages/NotificationCenterDemo.vue')
+        },
         { path: 'crop-upload', component: () => import('./pages/CropUploadDemo.vue') },
-        { path: 'task-board', component: () => import('./pages/TaskBoardDemo.vue') }
+        { path: 'task-board', component: () => import('./pages/TaskBoardDemo.vue') },
+        // Hooks
+        { path: 'use-drag', component: () => import('./pages/UseDragDemo.vue') },
+        {
+          path: 'use-controlled-state',
+          component: () => import('./pages/UseControlledStateDemo.vue')
+        },
+        {
+          path: 'use-chart-interaction',
+          component: () => import('./pages/UseChartInteractionDemo.vue')
+        }
       ]
     }
   ]
