@@ -325,8 +325,7 @@ export const SubMenu = defineComponent({
 
         if (!isTarget) return node
 
-        const existingProps =
-          ((node.props ?? {}) as Record<string, unknown>) ?? ({} as Record<string, unknown>)
+        const existingProps = (node.props ?? {}) as Record<string, unknown>
 
         const nextProps: Record<string, unknown> = {
           level: existingProps.level ?? nextLevel

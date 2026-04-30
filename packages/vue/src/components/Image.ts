@@ -22,6 +22,7 @@ import {
   type ImageFit
 } from '@expcat/tigercat-core'
 import type { ImageGroupContext } from './ImageGroup'
+import { ImagePreview } from './ImagePreview'
 
 export interface VueImageProps {
   src?: string
@@ -212,20 +213,16 @@ export const Image = defineComponent({
       // Standalone preview (only when not in group)
       const previewEl =
         !group && previewVisible.value && props.src
-          ? (() => {
-              // eslint-disable-next-line @typescript-eslint/no-require-imports
-              const { ImagePreview } = require('./ImagePreview')
-              return h(ImagePreview, {
-                open: previewVisible.value,
-                images: [props.src!],
-                currentIndex: 0,
-                'onUpdate:open': (val: boolean) => {
-                  previewVisible.value = val
-                  emit('preview-open-change', val)
-                  emit('preview-visible-change', val)
-                }
-              })
-            })()
+          ? h(ImagePreview, {
+              open: previewVisible.value,
+              images: [props.src!],
+              currentIndex: 0,
+              'onUpdate:open': (val: boolean) => {
+                previewVisible.value = val
+                emit('preview-open-change', val)
+                emit('preview-visible-change', val)
+              }
+            })
           : null
 
       return h(

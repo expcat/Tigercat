@@ -41,7 +41,10 @@ type HArrayChildren = Extract<NonNullable<Parameters<typeof h>[2]>, unknown[]>
 const NOTIFICATION_CONTAINER_ID_PREFIX = 'tiger-notification-container'
 const NOTIFICATION_CLOSE_ARIA_LABEL = 'Close notification'
 
-const IS_TEST_ENV = typeof process !== 'undefined' && process.env?.NODE_ENV === 'test'
+const IS_TEST_ENV = (() => {
+  const proc = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process
+  return typeof proc !== 'undefined' && proc.env?.NODE_ENV === 'test'
+})()
 
 /**
  * Notification instance storage per position
@@ -166,7 +169,10 @@ export const NotificationContainer = defineComponent({
               'aria-label': NOTIFICATION_CLOSE_ARIA_LABEL,
               type: 'button'
             },
-            createStatusIcon(notificationCloseIconPath, notificationCloseIconClasses, { 'aria-hidden': 'true', focusable: 'false' })
+            createStatusIcon(notificationCloseIconPath, notificationCloseIconClasses, {
+              'aria-hidden': 'true',
+              focusable: 'false'
+            })
           )
         )
       }

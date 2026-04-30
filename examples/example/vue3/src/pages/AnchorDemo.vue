@@ -58,7 +58,6 @@ const targetSnippet = `<div ref="scrollContainerRef" class="scroll-container">
   <AnchorLink href="#target-section2" title="Section 2" />
 </Anchor>`
 
-const scrollContainerRef = ref<HTMLElement>()
 const getScrollContainer = () => {
   // Use getElementById to always get fresh DOM reference (handles HMR)
   return document.getElementById('custom-scroll-container') || window

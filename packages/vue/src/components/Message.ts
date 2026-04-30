@@ -48,7 +48,10 @@ const MESSAGE_CONTAINER_ROOT_ID = `${MESSAGE_CONTAINER_ID}-root`
 const messageInstances = ref<MessageInstance[]>([])
 let instanceIdCounter = 0
 
-const IS_TEST_ENV = typeof process !== 'undefined' && process.env?.NODE_ENV === 'test'
+const IS_TEST_ENV = (() => {
+  const proc = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process
+  return typeof proc !== 'undefined' && proc.env?.NODE_ENV === 'test'
+})()
 
 let containerApp: App<Element> | null = null
 
