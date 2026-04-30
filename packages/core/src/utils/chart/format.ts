@@ -21,6 +21,7 @@ const lineGradient = createGradientIdFactory('line')
 const areaGradient = createGradientIdFactory('area')
 const barGradient = createGradientIdFactory('bar')
 const scatterGradient = createGradientIdFactory('scatter')
+const radarGradient = createGradientIdFactory('radar')
 
 /** Generate a unique gradient ID prefix for a LineChart instance. */
 export function getLineGradientPrefix(): string {
@@ -63,6 +64,16 @@ export function getScatterGradientPrefix(): string {
 /** Reset the scatter gradient counter (for testing only) */
 export function resetScatterGradientCounter(): void {
   scatterGradient.reset()
+}
+
+/** Generate a unique gradient ID prefix for a RadarChart instance. */
+export function getRadarGradientPrefix(): string {
+  return radarGradient.getPrefix()
+}
+
+/** Reset the radar gradient counter (for testing only) */
+export function resetRadarGradientCounter(): void {
+  radarGradient.reset()
 }
 
 /**

@@ -7,6 +7,7 @@ import {
   getChartGridLineDasharray,
   getChartInnerRect,
   getRadarAngles,
+  getRadarGradientPrefix,
   getRadarLabelAlign,
   getRadarPoints,
   polarToCartesian,
@@ -196,6 +197,10 @@ export const RadarChart = defineComponent({
       type: Boolean,
       default: false
     },
+    gradient: {
+      type: Boolean,
+      default: false
+    },
     splitAreaOpacity: {
       type: Number,
       default: 0.06
@@ -231,6 +236,9 @@ export const RadarChart = defineComponent({
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'series-click', 'series-hover'],
   setup(props, { emit }) {
+    // Unique gradient prefix for radar area fills (avoid id collision across instances)
+    const gradientPrefix = getRadarGradientPrefix()
+
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
 
     const radius = computed(() =>
@@ -478,6 +486,43 @@ export const RadarChart = defineComponent({
         {
           default: () =>
             [
+              // Gradient defs for area fills
+              props.gradient
+                ? h(
+                    'defs',
+                    null,
+                    seriesPoints.value.map((item, seriesIndex) => {
+                      const seriesColor =
+                        item.series.color ?? palette.value[seriesIndex % palette.value.length]
+                      const resolvedFillColor =
+                        item.series.fillColor ?? seriesColor ?? props.fillColor ?? palette.value[0]
+                      const resolvedFillOpacity = item.series.fillOpacity ?? props.fillOpacity
+                      return h(
+                        'linearGradient',
+                        {
+                          key: `radar-grad-${seriesIndex}`,
+                          id: `${gradientPrefix}-${seriesIndex}`,
+                          x1: '0',
+                          y1: '0',
+                          x2: '0',
+                          y2: '1'
+                        },
+                        [
+                          h('stop', {
+                            offset: '0%',
+                            'stop-color': resolvedFillColor,
+                            'stop-opacity': resolvedFillOpacity
+                          }),
+                          h('stop', {
+                            offset: '100%',
+                            'stop-color': resolvedFillColor,
+                            'stop-opacity': 0.02
+                          })
+                        ]
+                      )
+                    })
+                  )
+                : null,
               // Split area (alternating fills – ECharts splitArea style)
               ...splitAreaPaths.value.map((area, index) => {
                 if (area.type === 'circle-ring') {
@@ -611,8 +656,10 @@ export const RadarChart = defineComponent({
                       areaPath
                         ? h('path', {
                             d: areaPath,
-                            fill: resolvedFillColor,
-                            'fill-opacity': resolvedFillOpacity,
+                            fill: props.gradient
+                              ? `url(#${gradientPrefix}-${seriesIndex})`
+                              : resolvedFillColor,
+                            'fill-opacity': props.gradient ? 1 : resolvedFillOpacity,
                             stroke: resolvedStrokeColor,
                             'stroke-width': resolvedStrokeWidth,
                             'stroke-linejoin': 'round',

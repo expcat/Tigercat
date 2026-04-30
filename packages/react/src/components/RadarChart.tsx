@@ -7,6 +7,7 @@ import {
   getChartGridLineDasharray,
   getChartInnerRect,
   getRadarAngles,
+  getRadarGradientPrefix,
   getRadarLabelAlign,
   getRadarPoints,
   polarToCartesian,
@@ -38,6 +39,7 @@ export interface RadarChartProps extends CoreRadarChartProps {
   showSplitArea?: boolean
   splitAreaOpacity?: number
   splitAreaColors?: string[]
+  gradient?: boolean
   pointBorderWidth?: number
   pointBorderColor?: string
   pointHoverSize?: number
@@ -98,6 +100,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   showSplitArea = false,
   splitAreaOpacity = 0.06,
   splitAreaColors,
+  gradient = false,
   pointBorderWidth = 2,
   pointBorderColor = 'var(--tiger-surface,#ffffff)',
   pointHoverSize,
@@ -324,6 +327,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
 
   const dasharray = getChartGridLineDasharray(gridLineStyle)
   const palette = useMemo(() => resolveChartPalette(colors), [colors])
+  const gradientPrefix = useMemo(() => getRadarGradientPrefix(), [])
 
   const tooltipContent = useMemo(
     () =>
@@ -357,6 +361,29 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       title={title}
       desc={desc}
       className={classNames(className)}>
+      {/* Gradient defs for area fills */}
+      {gradient && (
+        <defs>
+          {seriesPoints.map((item, seriesIndex) => {
+            const seriesColor = item.series.color ?? palette[seriesIndex % palette.length]
+            const resolvedFillColor =
+              item.series.fillColor ?? seriesColor ?? fillColor ?? palette[0]
+            const resolvedFillOpacity = item.series.fillOpacity ?? fillOpacity
+            return (
+              <linearGradient
+                key={`radar-grad-${seriesIndex}`}
+                id={`${gradientPrefix}-${seriesIndex}`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1">
+                <stop offset="0%" stopColor={resolvedFillColor} stopOpacity={resolvedFillOpacity} />
+                <stop offset="100%" stopColor={resolvedFillColor} stopOpacity={0.02} />
+              </linearGradient>
+            )
+          })}
+        </defs>
+      )}
       {/* Split areas */}
       {splitAreaPaths.map((area, index) => {
         if (area.type === 'circle-ring') {
@@ -483,8 +510,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             {areaPath ? (
               <path
                 d={areaPath}
-                fill={resolvedFillColor}
-                fillOpacity={resolvedFillOpacity}
+                fill={gradient ? `url(#${gradientPrefix}-${seriesIndex})` : resolvedFillColor}
+                fillOpacity={gradient ? 1 : resolvedFillOpacity}
                 stroke={resolvedStrokeColor}
                 strokeWidth={resolvedStrokeWidth}
                 strokeLinejoin="round"
