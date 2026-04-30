@@ -1746,6 +1746,14 @@ export interface RadarChartProps extends BaseChartProps, ChartLegendProps, Chart
    * @default false
    */
   strokeGradient?: boolean
+
+  /**
+   * Render data point fill as a per-series `<radialGradient>` (bright center
+   * → series color edge) for a 3D-sphere look. Only applies when `showPoints`
+   * is true (default).
+   * @default false
+   */
+  pointGradient?: boolean
 }
 
 // -------------------------------------------------------------------

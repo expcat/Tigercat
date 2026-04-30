@@ -41,6 +41,7 @@ export interface RadarChartProps extends CoreRadarChartProps {
   splitAreaColors?: string[]
   gradient?: boolean
   strokeGradient?: boolean
+  pointGradient?: boolean
   pointBorderWidth?: number
   pointBorderColor?: string
   pointHoverSize?: number
@@ -103,6 +104,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   splitAreaColors,
   gradient = false,
   strokeGradient = false,
+  pointGradient = false,
   pointBorderWidth = 2,
   pointBorderColor = 'var(--tiger-surface,#ffffff)',
   pointHoverSize,
@@ -364,7 +366,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       desc={desc}
       className={classNames(className)}>
       {/* Gradient defs for area fills */}
-      {(gradient || strokeGradient) && (
+      {(gradient || strokeGradient || pointGradient) && (
         <defs>
           {gradient &&
             seriesPoints.map((item, seriesIndex) => {
@@ -412,6 +414,30 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                     stopColor={`color-mix(in oklab, ${resolvedStrokeColor} 100%, black 8%)`}
                   />
                 </linearGradient>
+              )
+            })}
+          {pointGradient &&
+            seriesPoints.map((item, seriesIndex) => {
+              const seriesColor = item.series.color ?? palette[seriesIndex % palette.length]
+              const resolvedPointColor =
+                item.series.pointColor ?? seriesColor ?? pointColor ?? palette[0]
+              return (
+                <radialGradient
+                  key={`radar-point-grad-${seriesIndex}`}
+                  id={`${gradientPrefix}-point-${seriesIndex}`}
+                  cx="0.5"
+                  cy="0.5"
+                  r="0.5">
+                  <stop
+                    offset="0%"
+                    stopColor={`color-mix(in oklab, ${resolvedPointColor} 100%, white 30%)`}
+                  />
+                  <stop offset="70%" stopColor={resolvedPointColor} />
+                  <stop
+                    offset="100%"
+                    stopColor={`color-mix(in oklab, ${resolvedPointColor} 100%, black 12%)`}
+                  />
+                </radialGradient>
               )
             })}
         </defs>
@@ -578,7 +604,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                       cx={point.x}
                       cy={point.y}
                       r={currentSize}
-                      fill={point.data.color ?? resolvedPointColor ?? resolvedStrokeColor}
+                      fill={
+                        pointGradient
+                          ? `url(#${gradientPrefix}-point-${seriesIndex})`
+                          : (point.data.color ?? resolvedPointColor ?? resolvedStrokeColor)
+                      }
                       stroke={resolvedBorderColor}
                       strokeWidth={resolvedBorderWidth}
                       className={classNames(

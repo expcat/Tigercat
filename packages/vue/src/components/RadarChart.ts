@@ -205,6 +205,10 @@ export const RadarChart = defineComponent({
       type: Boolean,
       default: false
     },
+    pointGradient: {
+      type: Boolean,
+      default: false
+    },
     splitAreaOpacity: {
       type: Number,
       default: 0.06
@@ -491,7 +495,7 @@ export const RadarChart = defineComponent({
           default: () =>
             [
               // Gradient defs for area fills
-              props.gradient || props.strokeGradient
+              props.gradient || props.strokeGradient || props.pointGradient
                 ? h('defs', null, [
                     ...(props.gradient
                       ? seriesPoints.value.map((item, seriesIndex) => {
@@ -559,6 +563,41 @@ export const RadarChart = defineComponent({
                               h('stop', {
                                 offset: '100%',
                                 'stop-color': `color-mix(in oklab, ${resolvedStrokeColor} 100%, black 8%)`
+                              })
+                            ]
+                          )
+                        })
+                      : []),
+                    ...(props.pointGradient
+                      ? seriesPoints.value.map((item, seriesIndex) => {
+                          const seriesColor =
+                            item.series.color ?? palette.value[seriesIndex % palette.value.length]
+                          const resolvedPointColor =
+                            item.series.pointColor ??
+                            seriesColor ??
+                            props.pointColor ??
+                            palette.value[0]
+                          return h(
+                            'radialGradient',
+                            {
+                              key: `radar-point-grad-${seriesIndex}`,
+                              id: `${gradientPrefix}-point-${seriesIndex}`,
+                              cx: '0.5',
+                              cy: '0.5',
+                              r: '0.5'
+                            },
+                            [
+                              h('stop', {
+                                offset: '0%',
+                                'stop-color': `color-mix(in oklab, ${resolvedPointColor} 100%, white 30%)`
+                              }),
+                              h('stop', {
+                                offset: '70%',
+                                'stop-color': resolvedPointColor
+                              }),
+                              h('stop', {
+                                offset: '100%',
+                                'stop-color': `color-mix(in oklab, ${resolvedPointColor} 100%, black 12%)`
                               })
                             ]
                           )
@@ -735,7 +774,9 @@ export const RadarChart = defineComponent({
                               cx: point.x,
                               cy: point.y,
                               r: currentSize,
-                              fill: point.data.color ?? resolvedPointColor ?? resolvedStrokeColor,
+                              fill: props.pointGradient
+                                ? `url(#${gradientPrefix}-point-${seriesIndex})`
+                                : (point.data.color ?? resolvedPointColor ?? resolvedStrokeColor),
                               stroke: resolvedBorderColor,
                               'stroke-width': resolvedBorderWidth,
                               class: classNames(
