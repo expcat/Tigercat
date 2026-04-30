@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
 import { Tabs, TabPane, Code } from '@expcat/tigercat-vue'
+import { copyTextToClipboard } from '@expcat/tigercat-core'
 
 const props = defineProps<{
     title: string
@@ -9,13 +10,32 @@ const props = defineProps<{
 }>()
 
 const activeKey = ref('preview')
+const copied = ref(false)
+let resetTimer: ReturnType<typeof setTimeout> | null = null
+
+const handleCopy = async () => {
+    const ok = await copyTextToClipboard(props.code)
+    if (!ok) return
+    copied.value = true
+    if (resetTimer) clearTimeout(resetTimer)
+    resetTimer = setTimeout(() => {
+        copied.value = false
+        resetTimer = null
+    }, 1600)
+}
+
+onBeforeUnmount(() => {
+    if (resetTimer) clearTimeout(resetTimer)
+})
 
 const panelBaseClasses =
     'rounded-b-lg border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950/40'
 const previewPanelClasses = `p-6 ${panelBaseClasses}`
-const codePanelClasses = `p-4 ${panelBaseClasses}`
+const codePanelClasses = `relative p-4 ${panelBaseClasses}`
 const exampleBoxClasses =
     'rounded-md border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900'
+const copyButtonClasses =
+    'absolute top-2 right-2 z-10 inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white/90 px-2 py-1 text-xs text-gray-600 shadow-sm backdrop-blur transition hover:bg-white hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900/80 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-gray-100'
 </script>
 
 <template>
@@ -37,6 +57,13 @@ const exampleBoxClasses =
                 <slot />
             </div>
             <div v-else-if="activeKey === 'code'" :class="codePanelClasses">
+                <button type="button"
+                        :class="copyButtonClasses"
+                        :aria-label="copied ? '已复制' : '复制代码'"
+                        @click="handleCopy">
+                    <span aria-hidden="true">{{ copied ? '✓' : '⧉' }}</span>
+                    <span>{{ copied ? '已复制' : '复制' }}</span>
+                </button>
                 <Code :code="props.code" />
             </div>
             <div v-else :class="previewPanelClasses">
@@ -49,7 +76,16 @@ const exampleBoxClasses =
                     </div>
                     <div class="w-full">
                         <div class="text-xs text-gray-500 mb-2">代码</div>
-                        <Code :code="props.code" />
+                        <div class="relative">
+                            <button type="button"
+                                    :class="copyButtonClasses"
+                                    :aria-label="copied ? '已复制' : '复制代码'"
+                                    @click="handleCopy">
+                                <span aria-hidden="true">{{ copied ? '✓' : '⧉' }}</span>
+                                <span>{{ copied ? '已复制' : '复制' }}</span>
+                            </button>
+                            <Code :code="props.code" />
+                        </div>
                     </div>
                 </div>
             </div>

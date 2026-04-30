@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Tabs, TabPane, Code } from '@expcat/tigercat-react'
+import { copyTextToClipboard } from '@expcat/tigercat-core'
 
 interface DemoBlockProps {
   title: string
@@ -12,9 +13,49 @@ interface DemoBlockProps {
 const panelBaseClasses =
   'rounded-b-lg border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950/40'
 const previewPanelClasses = `p-6 ${panelBaseClasses}`
-const codePanelClasses = `p-4 ${panelBaseClasses}`
+const codePanelClasses = `relative p-4 ${panelBaseClasses}`
 const exampleBoxClasses =
   'rounded-md border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900'
+const copyButtonClasses =
+  'absolute top-2 right-2 z-10 inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white/90 px-2 py-1 text-xs text-gray-600 shadow-sm backdrop-blur transition hover:bg-white hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900/80 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-gray-100'
+
+interface CopyButtonProps {
+  code: string
+}
+
+const CopyButton: React.FC<CopyButtonProps> = ({ code }) => {
+  const [copied, setCopied] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(
+    () => () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
+    },
+    []
+  )
+
+  const handleCopy = useCallback(async () => {
+    const ok = await copyTextToClipboard(code)
+    if (!ok) return
+    setCopied(true)
+    if (timerRef.current) clearTimeout(timerRef.current)
+    timerRef.current = setTimeout(() => {
+      setCopied(false)
+      timerRef.current = null
+    }, 1600)
+  }, [code])
+
+  return (
+    <button
+      type="button"
+      className={copyButtonClasses}
+      aria-label={copied ? '已复制' : '复制代码'}
+      onClick={handleCopy}>
+      <span aria-hidden="true">{copied ? '✓' : '⧉'}</span>
+      <span>{copied ? '已复制' : '复制'}</span>
+    </button>
+  )
+}
 
 const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, children, className }) => {
   const [activeKey, setActiveKey] = useState('preview')
@@ -36,6 +77,7 @@ const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, childre
         {activeKey === 'preview' && <div className={previewPanelClasses}>{children}</div>}
         {activeKey === 'code' && (
           <div className={codePanelClasses}>
+            <CopyButton code={code} />
             <Code code={code} />
           </div>
         )}
@@ -48,7 +90,10 @@ const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, childre
               </div>
               <div className="w-full">
                 <div className="text-xs text-gray-500 mb-2">代码</div>
-                <Code code={code} />
+                <div className="relative">
+                  <CopyButton code={code} />
+                  <Code code={code} />
+                </div>
               </div>
             </div>
           </div>
