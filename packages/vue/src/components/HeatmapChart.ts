@@ -29,6 +29,7 @@ export const HeatmapChart = defineComponent({
     yLabels: { type: Array as PropType<string[]>, required: true },
     minColor: { type: String, default: '#f0f9ff' },
     maxColor: { type: String, default: '#2563eb' },
+    colorSpace: { type: String as PropType<'rgb' | 'oklch'>, default: 'rgb' as const },
     cellRadius: { type: Number, default: 2 },
     cellGap: { type: Number, default: 1 },
     showValues: { type: Boolean, default: false },
@@ -83,7 +84,8 @@ export const HeatmapChart = defineComponent({
         height: innerRect.value.height,
         cellGap: props.cellGap,
         minColor: props.minColor,
-        maxColor: props.maxColor
+        maxColor: props.maxColor,
+        colorSpace: props.colorSpace
       })
     )
 

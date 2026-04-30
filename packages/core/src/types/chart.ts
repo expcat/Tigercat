@@ -1941,6 +1941,17 @@ export interface HeatmapChartProps
    * Palette of colors
    */
   colors?: string[]
+
+  /**
+   * Colour interpolation space for cell fills.
+   * - `'rgb'` (default): legacy linear hex interpolation between
+   *   `minColor` and `maxColor`.
+   * - `'oklch'`: emit a CSS `color-mix(in oklch, ...)` expression so the
+   *   browser performs perceptually-uniform shading. Recommended when
+   *   `minColor`/`maxColor` are CSS colour functions or theme tokens.
+   * @default 'rgb'
+   */
+  colorSpace?: 'rgb' | 'oklch'
 }
 
 // -------------------------------------------------------------------

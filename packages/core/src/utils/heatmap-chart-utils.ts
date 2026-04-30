@@ -47,12 +47,31 @@ function rgbToHex(r: number, g: number, b: number): string {
 }
 
 /**
+ * Colour interpolation space. `'rgb'` (default) keeps backwards compatible
+ * linear hex interpolation; `'oklch'` emits a CSS `color-mix(in oklch, ...)`
+ * expression for perceptually uniform shading (delegated to the browser).
+ */
+export type HeatmapColorSpace = 'rgb' | 'oklch'
+
+/**
  * Linearly interpolate between two hex colours.
  */
 export function interpolateColor(minColor: string, maxColor: string, t: number): string {
   const [r1, g1, b1] = hexToRgb(minColor)
   const [r2, g2, b2] = hexToRgb(maxColor)
   return rgbToHex(r1 + (r2 - r1) * t, g1 + (g2 - g1) * t, b1 + (b2 - b1) * t)
+}
+
+/**
+ * Emit a CSS `color-mix(in oklch, ...)` expression that blends `maxColor`
+ * (at `t * 100`%) with `minColor` (at `(1 - t) * 100`%). The browser performs
+ * the actual perceptually-uniform interpolation at paint time. Accepts any
+ * CSS colour string for both endpoints (hex, var(), color-mix(), etc.).
+ */
+export function interpolateColorOklch(minColor: string, maxColor: string, t: number): string {
+  const clamped = Math.max(0, Math.min(1, t))
+  const pct = Math.round(clamped * 10000) / 100
+  return `color-mix(in oklch, ${maxColor} ${pct}%, ${minColor})`
 }
 
 /**
@@ -68,6 +87,13 @@ export function computeHeatmapCells(
     cellGap?: number
     minColor?: string
     maxColor?: string
+    /**
+     * Colour interpolation space. `'rgb'` (default) keeps the legacy hex
+     * lerp; `'oklch'` emits CSS `color-mix(in oklch, ...)` for perceptually
+     * uniform shading. Opt-in to avoid changing the default visual.
+     * @default 'rgb'
+     */
+    colorSpace?: HeatmapColorSpace
   }
 ): HeatmapCell[] {
   const {
@@ -77,7 +103,8 @@ export function computeHeatmapCells(
     height,
     cellGap = 1,
     minColor = '#f0f9ff',
-    maxColor = '#2563eb'
+    maxColor = '#2563eb',
+    colorSpace = 'rgb'
   } = opts
 
   const cols = xLabels.length
@@ -114,7 +141,10 @@ export function computeHeatmapCells(
         w: cellW,
         h: cellH,
         heat,
-        fill: interpolateColor(minColor, maxColor, heat),
+        fill:
+          colorSpace === 'oklch'
+            ? interpolateColorOklch(minColor, maxColor, heat)
+            : interpolateColor(minColor, maxColor, heat),
         value: val,
         xLabel: xLabels[c],
         yLabel: yLabels[r]

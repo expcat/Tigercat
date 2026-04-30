@@ -31,6 +31,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   yLabels,
   minColor = '#f0f9ff',
   maxColor = '#2563eb',
+  colorSpace = 'rgb',
   cellRadius = 2,
   cellGap = 1,
   showValues = false,
@@ -88,9 +89,20 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
         height: innerRect.height,
         cellGap,
         minColor,
-        maxColor
+        maxColor,
+        colorSpace
       }),
-    [data, xLabels, yLabels, innerRect.width, innerRect.height, cellGap, minColor, maxColor]
+    [
+      data,
+      xLabels,
+      yLabels,
+      innerRect.width,
+      innerRect.height,
+      cellGap,
+      minColor,
+      maxColor,
+      colorSpace
+    ]
   )
 
   const tooltipContent = useMemo(
@@ -157,10 +169,12 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
               fill={cell.fill}
               opacity={opacity}
               className={classNames(interactive && 'cursor-pointer')}
-              style={{
-                transition: 'opacity 0.2s ease-out',
-                rx: `var(--tiger-chart-block-radius, ${cellRadius}px)`
-              } as React.CSSProperties}
+              style={
+                {
+                  transition: 'opacity 0.2s ease-out',
+                  rx: `var(--tiger-chart-block-radius, ${cellRadius}px)`
+                } as React.CSSProperties
+              }
               onMouseEnter={(e) => handleMouseEnter(idx, e)}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
