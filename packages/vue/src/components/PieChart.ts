@@ -8,6 +8,7 @@ import {
   getChartElementOpacity,
   getChartInnerRect,
   getPieArcs,
+  getPieGradientPrefix,
   PIE_BASE_SHADOW,
   PIE_EMPHASIS_SHADOW,
   polarToCartesian,
@@ -159,6 +160,10 @@ export const PieChart = defineComponent({
     shadow: {
       type: Boolean,
       default: false
+    },
+    gradient: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'slice-click', 'slice-hover'],
@@ -212,6 +217,8 @@ export const PieChart = defineComponent({
 
     const palette = computed(() => resolveChartPalette(props.colors))
 
+    const gradientPrefix = getPieGradientPrefix()
+
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({
         data: props.data,
@@ -260,6 +267,40 @@ export const PieChart = defineComponent({
         },
         {
           default: () => {
+            // Optional gradient defs (one per arc, top→bottom 1.0 → 0.7 alpha)
+            const gradientDefs = props.gradient
+              ? h(
+                  'defs',
+                  null,
+                  arcs.value.map((arc) => {
+                    const color = arc.data.color ?? palette.value[arc.index % palette.value.length]
+                    return h(
+                      'linearGradient',
+                      {
+                        key: `pie-grad-${arc.index}`,
+                        id: `${gradientPrefix}-${arc.index}`,
+                        x1: '0',
+                        y1: '0',
+                        x2: '0',
+                        y2: '1'
+                      },
+                      [
+                        h('stop', {
+                          offset: '0%',
+                          'stop-color': color,
+                          'stop-opacity': '1'
+                        }),
+                        h('stop', {
+                          offset: '100%',
+                          'stop-color': color,
+                          'stop-opacity': '0.7'
+                        })
+                      ]
+                    )
+                  })
+                )
+              : null
+
             // Slices
             const slices = h(
               ChartSeries,
@@ -289,7 +330,7 @@ export const PieChart = defineComponent({
                     return h('path', {
                       key: `slice-${arc.index}`,
                       d: path,
-                      fill: color,
+                      fill: props.gradient ? `url(#${gradientPrefix}-${arc.index})` : color,
                       opacity,
                       stroke: props.borderColor,
                       'stroke-width': props.borderWidth,
@@ -323,7 +364,7 @@ export const PieChart = defineComponent({
               }
             )
 
-            if (!props.showLabels) return [slices]
+            if (!props.showLabels) return [gradientDefs, slices]
 
             // Outside labels with leader lines
             if (props.labelPosition === 'outside') {
@@ -360,7 +401,7 @@ export const PieChart = defineComponent({
                   ]
                 })
                 .flat()
-              return [slices, ...labelNodes]
+              return [gradientDefs, slices, ...labelNodes]
             }
 
             // Inside labels
@@ -382,7 +423,7 @@ export const PieChart = defineComponent({
                 label
               )
             })
-            return [slices, ...insideLabels]
+            return [gradientDefs, slices, ...insideLabels]
           }
         }
       )

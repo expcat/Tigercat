@@ -8,6 +8,7 @@ import {
   getChartElementOpacity,
   getChartInnerRect,
   getPieArcs,
+  getPieGradientPrefix,
   PIE_BASE_SHADOW,
   PIE_EMPHASIS_SHADOW,
   polarToCartesian,
@@ -51,6 +52,7 @@ export const PieChart: React.FC<PieChartProps> = ({
   borderColor = 'var(--tiger-surface,#ffffff)',
   hoverOffset = 8,
   shadow = false,
+  gradient = false,
   hoverable = false,
   hoveredIndex: hoveredIndexProp,
   activeOpacity = 1,
@@ -133,6 +135,8 @@ export const PieChart: React.FC<PieChartProps> = ({
 
   const palette = useMemo(() => resolveChartPalette(colors), [colors])
 
+  const gradientPrefix = useMemo(() => getPieGradientPrefix(), [])
+
   const cx = innerRect.width / 2
   const cy = innerRect.height / 2
   const labelRadius = resolvedInnerRadius + (resolvedOuterRadius - resolvedInnerRadius) / 2
@@ -175,6 +179,25 @@ export const PieChart: React.FC<PieChartProps> = ({
       desc={desc}
       className={classNames(className)}>
       <g data-series-type="pie">
+        {gradient && (
+          <defs>
+            {arcs.map((arc) => {
+              const color = arc.data.color ?? palette[arc.index % palette.length]
+              return (
+                <linearGradient
+                  key={`pie-grad-${arc.index}`}
+                  id={`${gradientPrefix}-${arc.index}`}
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1">
+                  <stop offset="0%" stopColor={color} stopOpacity={1} />
+                  <stop offset="100%" stopColor={color} stopOpacity={0.7} />
+                </linearGradient>
+              )
+            })}
+          </defs>
+        )}
         {arcs.map((arc) => {
           const color = arc.data.color ?? palette[arc.index % palette.length]
           const path = createPieArcPath({
@@ -199,7 +222,7 @@ export const PieChart: React.FC<PieChartProps> = ({
             <path
               key={`slice-${arc.index}`}
               d={path}
-              fill={color}
+              fill={gradient ? `url(#${gradientPrefix}-${arc.index})` : color}
               opacity={opacity}
               stroke={borderColor}
               strokeWidth={borderWidth}

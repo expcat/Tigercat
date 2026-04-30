@@ -896,6 +896,13 @@ export interface PieChartProps
    * @default false
    */
   shadow?: boolean
+
+  /**
+   * Enable per-slice top→bottom alpha gradient fill (1.0 → 0.7).
+   * Opt-in; default `false` keeps the original solid `arc.color` fill.
+   * @default false
+   */
+  gradient?: boolean
 }
 
 export interface DonutChartDatum extends PieChartDatum {}

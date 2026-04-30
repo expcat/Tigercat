@@ -26,6 +26,7 @@ const gaugeGradient = createGradientIdFactory('gauge')
 const funnelGradient = createGradientIdFactory('funnel')
 const treemapGradient = createGradientIdFactory('treemap')
 const sunburstGradient = createGradientIdFactory('sunburst')
+const pieGradient = createGradientIdFactory('pie')
 
 /** Generate a unique gradient ID prefix for a LineChart instance. */
 export function getLineGradientPrefix(): string {
@@ -118,6 +119,16 @@ export function getSunburstGradientPrefix(): string {
 /** Reset the sunburst gradient counter (for testing only) */
 export function resetSunburstGradientCounter(): void {
   sunburstGradient.reset()
+}
+
+/** Generate a unique gradient ID prefix for a PieChart instance. */
+export function getPieGradientPrefix(): string {
+  return pieGradient.getPrefix()
+}
+
+/** Reset the pie gradient counter (for testing only) */
+export function resetPieGradientCounter(): void {
+  pieGradient.reset()
 }
 
 /**
