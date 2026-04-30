@@ -176,6 +176,11 @@ export const DonutChart = defineComponent({
     animated: {
       type: Boolean,
       default: false
+    },
+    // Visual modes (forwarded to PieChart, opt-in per PR-19k(b6/b7))
+    gradient: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'slice-click', 'slice-hover'],
@@ -251,6 +256,7 @@ export const DonutChart = defineComponent({
         borderColor: props.borderColor,
         hoverOffset: props.hoverOffset,
         shadow: props.shadow,
+        gradient: props.gradient,
         hoverable: props.hoverable,
         hoveredIndex: props.hoveredIndex,
         activeOpacity: props.activeOpacity,

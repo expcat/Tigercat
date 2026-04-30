@@ -86,6 +86,8 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   centerValue,
   centerLabel,
   animated: _animated = false,
+  // Visual modes (forwarded to PieChart, opt-in per PR-19k(b6/b7))
+  gradient = false,
   // Callbacks
   onHoveredIndexChange,
   onSelectedIndexChange,
@@ -151,6 +153,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
         borderColor={borderColor}
         hoverOffset={hoverOffset}
         shadow={shadow}
+        gradient={gradient}
         hoverable={hoverable}
         hoveredIndex={hoveredIndex}
         activeOpacity={activeOpacity}
