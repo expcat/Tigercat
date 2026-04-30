@@ -4,6 +4,7 @@ import {
   computeTreeMapNodes,
   getChartElementOpacity,
   getChartInnerRect,
+  getTreeMapGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
@@ -35,6 +36,7 @@ export const TreeMapChart = defineComponent({
     showLabels: { type: Boolean, default: true },
     minLabelSize: { type: Number, default: 10 },
     colors: { type: Array as PropType<string[]> },
+    gradient: { type: Boolean, default: false },
     // Interaction
     hoverable: { type: Boolean, default: false },
     hoveredIndex: { type: Number as PropType<number | null>, default: undefined },
@@ -91,6 +93,7 @@ export const TreeMapChart = defineComponent({
 
     const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
     const palette = computed(() => resolveChartPalette(props.colors))
+    const gradientPrefix = getTreeMapGradientPrefix()
 
     const nodes = computed(() =>
       computeTreeMapNodes(props.data, {
@@ -135,12 +138,44 @@ export const TreeMapChart = defineComponent({
         },
         {
           default: () => {
+            const gradientDefs = props.gradient
+              ? h(
+                  'defs',
+                  null,
+                  nodes.value.map((node) =>
+                    h(
+                      'linearGradient',
+                      {
+                        id: `${gradientPrefix}-${node.index}`,
+                        x1: '0',
+                        y1: '0',
+                        x2: '0',
+                        y2: '1'
+                      },
+                      [
+                        h('stop', {
+                          offset: '0%',
+                          'stop-color': node.color,
+                          'stop-opacity': '1'
+                        }),
+                        h('stop', {
+                          offset: '100%',
+                          'stop-color': node.color,
+                          'stop-opacity': '0.7'
+                        })
+                      ]
+                    )
+                  )
+                )
+              : null
+
             return h(
               ChartSeries,
               { data: nodes.value, type: 'treemap' },
               {
-                default: () =>
-                  nodes.value
+                default: () => [
+                  gradientDefs,
+                  ...nodes.value
                     .map((node) => {
                       const opacity = getChartElementOpacity(node.index, activeIndex.value, {
                         activeOpacity: props.activeOpacity,
@@ -154,7 +189,9 @@ export const TreeMapChart = defineComponent({
                           width: node.w,
                           height: node.h,
                           rx: 2,
-                          fill: node.color,
+                          fill: props.gradient
+                            ? `url(#${gradientPrefix}-${node.index})`
+                            : node.color,
                           opacity,
                           class: classNames(interactive && 'cursor-pointer'),
                           style: {
@@ -196,6 +233,7 @@ export const TreeMapChart = defineComponent({
                       return elems
                     })
                     .flat()
+                ]
               }
             )
           }

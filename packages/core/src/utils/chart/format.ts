@@ -24,6 +24,7 @@ const scatterGradient = createGradientIdFactory('scatter')
 const radarGradient = createGradientIdFactory('radar')
 const gaugeGradient = createGradientIdFactory('gauge')
 const funnelGradient = createGradientIdFactory('funnel')
+const treemapGradient = createGradientIdFactory('treemap')
 
 /** Generate a unique gradient ID prefix for a LineChart instance. */
 export function getLineGradientPrefix(): string {
@@ -96,6 +97,16 @@ export function getFunnelGradientPrefix(): string {
 /** Reset the funnel gradient counter (for testing only) */
 export function resetFunnelGradientCounter(): void {
   funnelGradient.reset()
+}
+
+/** Generate a unique gradient ID prefix for a TreeMapChart instance. */
+export function getTreeMapGradientPrefix(): string {
+  return treemapGradient.getPrefix()
+}
+
+/** Reset the treemap gradient counter (for testing only) */
+export function resetTreeMapGradientCounter(): void {
+  treemapGradient.reset()
 }
 
 /**

@@ -4,6 +4,7 @@ import {
   computeTreeMapNodes,
   getChartElementOpacity,
   getChartInnerRect,
+  getTreeMapGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
@@ -36,6 +37,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
   showLabels = true,
   minLabelSize = 10,
   colors,
+  gradient = false,
   hoverable = false,
   hoveredIndex: hoveredIndexProp,
   activeOpacity = 1,
@@ -61,6 +63,7 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
     [width, height, padding]
   )
   const palette = useMemo(() => resolveChartPalette(colors), [colors])
+  const gradientPrefix = useMemo(() => getTreeMapGradientPrefix(), [])
 
   const nodes = useMemo(
     () =>
@@ -145,6 +148,22 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
       desc={desc}
       className={classNames(className)}>
       <g data-series-type="treemap">
+        {gradient && (
+          <defs>
+            {nodes.map((node) => (
+              <linearGradient
+                key={`grad-${node.index}`}
+                id={`${gradientPrefix}-${node.index}`}
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="1">
+                <stop offset="0%" stopColor={node.color} stopOpacity={1} />
+                <stop offset="100%" stopColor={node.color} stopOpacity={0.7} />
+              </linearGradient>
+            ))}
+          </defs>
+        )}
         {nodes.map((node) => {
           const opacity = getChartElementOpacity(node.index, activeIndex, {
             activeOpacity,
@@ -158,17 +177,19 @@ export const TreeMapChart: React.FC<TreeMapChartProps> = ({
                 width={node.w}
                 height={node.h}
                 rx={2}
-                fill={node.color}
+                fill={gradient ? `url(#${gradientPrefix}-${node.index})` : node.color}
                 opacity={opacity}
                 className={classNames(interactive && 'cursor-pointer')}
-                style={{
-                  transition: 'opacity 0.2s ease-out, filter 0.2s ease-out',
-                  rx: 'var(--tiger-chart-block-radius, 2px)',
-                  filter:
-                    activeIndex === node.index
-                      ? 'var(--tiger-chart-block-active-filter, none)'
-                      : 'none'
-                } as React.CSSProperties}
+                style={
+                  {
+                    transition: 'opacity 0.2s ease-out, filter 0.2s ease-out',
+                    rx: 'var(--tiger-chart-block-radius, 2px)',
+                    filter:
+                      activeIndex === node.index
+                        ? 'var(--tiger-chart-block-active-filter, none)'
+                        : 'none'
+                  } as React.CSSProperties
+                }
                 onMouseEnter={(e) => handleMouseEnter(node.index, e)}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
