@@ -201,6 +201,10 @@ export const RadarChart = defineComponent({
       type: Boolean,
       default: false
     },
+    strokeGradient: {
+      type: Boolean,
+      default: false
+    },
     splitAreaOpacity: {
       type: Number,
       default: 0.06
@@ -487,41 +491,80 @@ export const RadarChart = defineComponent({
           default: () =>
             [
               // Gradient defs for area fills
-              props.gradient
-                ? h(
-                    'defs',
-                    null,
-                    seriesPoints.value.map((item, seriesIndex) => {
-                      const seriesColor =
-                        item.series.color ?? palette.value[seriesIndex % palette.value.length]
-                      const resolvedFillColor =
-                        item.series.fillColor ?? seriesColor ?? props.fillColor ?? palette.value[0]
-                      const resolvedFillOpacity = item.series.fillOpacity ?? props.fillOpacity
-                      return h(
-                        'linearGradient',
-                        {
-                          key: `radar-grad-${seriesIndex}`,
-                          id: `${gradientPrefix}-${seriesIndex}`,
-                          x1: '0',
-                          y1: '0',
-                          x2: '0',
-                          y2: '1'
-                        },
-                        [
-                          h('stop', {
-                            offset: '0%',
-                            'stop-color': resolvedFillColor,
-                            'stop-opacity': resolvedFillOpacity
-                          }),
-                          h('stop', {
-                            offset: '100%',
-                            'stop-color': resolvedFillColor,
-                            'stop-opacity': 0.02
-                          })
-                        ]
-                      )
-                    })
-                  )
+              props.gradient || props.strokeGradient
+                ? h('defs', null, [
+                    ...(props.gradient
+                      ? seriesPoints.value.map((item, seriesIndex) => {
+                          const seriesColor =
+                            item.series.color ?? palette.value[seriesIndex % palette.value.length]
+                          const resolvedFillColor =
+                            item.series.fillColor ??
+                            seriesColor ??
+                            props.fillColor ??
+                            palette.value[0]
+                          const resolvedFillOpacity = item.series.fillOpacity ?? props.fillOpacity
+                          return h(
+                            'linearGradient',
+                            {
+                              key: `radar-grad-${seriesIndex}`,
+                              id: `${gradientPrefix}-${seriesIndex}`,
+                              x1: '0',
+                              y1: '0',
+                              x2: '0',
+                              y2: '1'
+                            },
+                            [
+                              h('stop', {
+                                offset: '0%',
+                                'stop-color': resolvedFillColor,
+                                'stop-opacity': resolvedFillOpacity
+                              }),
+                              h('stop', {
+                                offset: '100%',
+                                'stop-color': resolvedFillColor,
+                                'stop-opacity': 0.02
+                              })
+                            ]
+                          )
+                        })
+                      : []),
+                    ...(props.strokeGradient
+                      ? seriesPoints.value.map((item, seriesIndex) => {
+                          const seriesColor =
+                            item.series.color ?? palette.value[seriesIndex % palette.value.length]
+                          const resolvedStrokeColor =
+                            item.series.strokeColor ??
+                            seriesColor ??
+                            props.strokeColor ??
+                            palette.value[0]
+                          return h(
+                            'linearGradient',
+                            {
+                              key: `radar-stroke-grad-${seriesIndex}`,
+                              id: `${gradientPrefix}-stroke-${seriesIndex}`,
+                              x1: '0',
+                              y1: '0',
+                              x2: '0',
+                              y2: '1'
+                            },
+                            [
+                              h('stop', {
+                                offset: '0%',
+                                'stop-color': `color-mix(in oklab, ${resolvedStrokeColor} 100%, white 12%)`
+                              }),
+                              h('stop', {
+                                offset: '50%',
+                                'stop-color': resolvedStrokeColor
+                              }),
+                              h('stop', {
+                                offset: '100%',
+                                'stop-color': `color-mix(in oklab, ${resolvedStrokeColor} 100%, black 8%)`
+                              })
+                            ]
+                          )
+                        })
+                      : [])
+                  ])
                 : null,
               // Split area (alternating fills – ECharts splitArea style)
               ...splitAreaPaths.value.map((area, index) => {
@@ -660,7 +703,9 @@ export const RadarChart = defineComponent({
                               ? `url(#${gradientPrefix}-${seriesIndex})`
                               : resolvedFillColor,
                             'fill-opacity': props.gradient ? 1 : resolvedFillOpacity,
-                            stroke: resolvedStrokeColor,
+                            stroke: props.strokeGradient
+                              ? `url(#${gradientPrefix}-stroke-${seriesIndex})`
+                              : resolvedStrokeColor,
                             'stroke-width': resolvedStrokeWidth,
                             'stroke-linejoin': 'round',
                             class: 'transition-[fill-opacity,filter] duration-200 ease-out',

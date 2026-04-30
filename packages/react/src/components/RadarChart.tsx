@@ -40,6 +40,7 @@ export interface RadarChartProps extends CoreRadarChartProps {
   splitAreaOpacity?: number
   splitAreaColors?: string[]
   gradient?: boolean
+  strokeGradient?: boolean
   pointBorderWidth?: number
   pointBorderColor?: string
   pointHoverSize?: number
@@ -101,6 +102,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
   splitAreaOpacity = 0.06,
   splitAreaColors,
   gradient = false,
+  strokeGradient = false,
   pointBorderWidth = 2,
   pointBorderColor = 'var(--tiger-surface,#ffffff)',
   pointHoverSize,
@@ -362,26 +364,56 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       desc={desc}
       className={classNames(className)}>
       {/* Gradient defs for area fills */}
-      {gradient && (
+      {(gradient || strokeGradient) && (
         <defs>
-          {seriesPoints.map((item, seriesIndex) => {
-            const seriesColor = item.series.color ?? palette[seriesIndex % palette.length]
-            const resolvedFillColor =
-              item.series.fillColor ?? seriesColor ?? fillColor ?? palette[0]
-            const resolvedFillOpacity = item.series.fillOpacity ?? fillOpacity
-            return (
-              <linearGradient
-                key={`radar-grad-${seriesIndex}`}
-                id={`${gradientPrefix}-${seriesIndex}`}
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="1">
-                <stop offset="0%" stopColor={resolvedFillColor} stopOpacity={resolvedFillOpacity} />
-                <stop offset="100%" stopColor={resolvedFillColor} stopOpacity={0.02} />
-              </linearGradient>
-            )
-          })}
+          {gradient &&
+            seriesPoints.map((item, seriesIndex) => {
+              const seriesColor = item.series.color ?? palette[seriesIndex % palette.length]
+              const resolvedFillColor =
+                item.series.fillColor ?? seriesColor ?? fillColor ?? palette[0]
+              const resolvedFillOpacity = item.series.fillOpacity ?? fillOpacity
+              return (
+                <linearGradient
+                  key={`radar-grad-${seriesIndex}`}
+                  id={`${gradientPrefix}-${seriesIndex}`}
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1">
+                  <stop
+                    offset="0%"
+                    stopColor={resolvedFillColor}
+                    stopOpacity={resolvedFillOpacity}
+                  />
+                  <stop offset="100%" stopColor={resolvedFillColor} stopOpacity={0.02} />
+                </linearGradient>
+              )
+            })}
+          {strokeGradient &&
+            seriesPoints.map((item, seriesIndex) => {
+              const seriesColor = item.series.color ?? palette[seriesIndex % palette.length]
+              const resolvedStrokeColor =
+                item.series.strokeColor ?? seriesColor ?? strokeColor ?? palette[0]
+              return (
+                <linearGradient
+                  key={`radar-stroke-grad-${seriesIndex}`}
+                  id={`${gradientPrefix}-stroke-${seriesIndex}`}
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1">
+                  <stop
+                    offset="0%"
+                    stopColor={`color-mix(in oklab, ${resolvedStrokeColor} 100%, white 12%)`}
+                  />
+                  <stop offset="50%" stopColor={resolvedStrokeColor} />
+                  <stop
+                    offset="100%"
+                    stopColor={`color-mix(in oklab, ${resolvedStrokeColor} 100%, black 8%)`}
+                  />
+                </linearGradient>
+              )
+            })}
         </defs>
       )}
       {/* Split areas */}
@@ -512,7 +544,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                 d={areaPath}
                 fill={gradient ? `url(#${gradientPrefix}-${seriesIndex})` : resolvedFillColor}
                 fillOpacity={gradient ? 1 : resolvedFillOpacity}
-                stroke={resolvedStrokeColor}
+                stroke={
+                  strokeGradient
+                    ? `url(#${gradientPrefix}-stroke-${seriesIndex})`
+                    : resolvedStrokeColor
+                }
                 strokeWidth={resolvedStrokeWidth}
                 strokeLinejoin="round"
                 className="transition-[fill-opacity,filter] duration-200 ease-out"

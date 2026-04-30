@@ -1714,6 +1714,15 @@ export interface RadarChartProps extends BaseChartProps, ChartLegendProps, Chart
    * @default true
    */
   labelAutoAlign?: boolean
+
+  /**
+   * Render each series polygon stroke as a 3-stop vertical gradient
+   * (lighter → base → darker) derived from the series color via
+   * `color-mix(in oklab, …)`. Provides a subtle modern brightness ramp
+   * without requiring palette knowledge. Opt-in; defaults to flat stroke.
+   * @default false
+   */
+  strokeGradient?: boolean
 }
 
 // -------------------------------------------------------------------
