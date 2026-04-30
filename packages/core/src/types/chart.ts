@@ -1468,6 +1468,14 @@ export interface AreaChartProps
   animated?: boolean
 
   /**
+   * Render line stroke as a 3-stop horizontal gradient (lighter → base → darker)
+   * derived from each series color via `color-mix(in oklab, …)`. Provides a
+   * subtle modern brightness ramp without requiring palette knowledge.
+   * @default false
+   */
+  strokeGradient?: boolean
+
+  /**
    * Tooltip formatter
    */
   tooltipFormatter?: (

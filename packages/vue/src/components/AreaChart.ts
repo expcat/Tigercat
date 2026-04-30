@@ -217,6 +217,10 @@ export const AreaChart = defineComponent({
       type: Boolean,
       default: false
     },
+    strokeGradient: {
+      type: Boolean,
+      default: false
+    },
     tooltipFormatter: {
       type: Function as PropType<
         (
@@ -483,7 +487,7 @@ export const AreaChart = defineComponent({
           default: () =>
             [
               // Gradient defs and animation styles
-              props.gradient || props.animated
+              props.gradient || props.animated || props.strokeGradient
                 ? h('defs', null, [
                     // Animation keyframes
                     props.animated
@@ -524,6 +528,36 @@ export const AreaChart = defineComponent({
                                 offset: '100%',
                                 'stop-color': sd.fillColor,
                                 'stop-opacity': 0.02
+                              })
+                            ]
+                          )
+                        )
+                      : []),
+                    // Stroke gradients (3-stop horizontal brightness ramp)
+                    ...(props.strokeGradient
+                      ? reversedSeriesData.map((sd) =>
+                          h(
+                            'linearGradient',
+                            {
+                              key: `stroke-grad-${sd.seriesIndex}`,
+                              id: `${gradientPrefix}-stroke-${sd.seriesIndex}`,
+                              x1: '0',
+                              y1: '0',
+                              x2: '1',
+                              y2: '0'
+                            },
+                            [
+                              h('stop', {
+                                offset: '0%',
+                                'stop-color': `color-mix(in oklab, ${sd.color} 100%, white 12%)`
+                              }),
+                              h('stop', {
+                                offset: '50%',
+                                'stop-color': sd.color
+                              }),
+                              h('stop', {
+                                offset: '100%',
+                                'stop-color': `color-mix(in oklab, ${sd.color} 100%, black 8%)`
                               })
                             ]
                           )
@@ -603,7 +637,9 @@ export const AreaChart = defineComponent({
                       h('path', {
                         d: sd.linePath,
                         fill: 'none',
-                        stroke: sd.color,
+                        stroke: props.strokeGradient
+                          ? `url(#${gradientPrefix}-stroke-${sd.seriesIndex})`
+                          : sd.color,
                         'stroke-width': sd.strokeWidth,
                         'stroke-dasharray': props.animated
                           ? (sd.strokeDasharray ?? '1')
