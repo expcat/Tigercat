@@ -81,11 +81,6 @@ export const Pagination: React.FC<PaginationProps> = ({
   // Calculate current page range
   const pageRange = getPageRange(validatedCurrentPage, currentPageSize, total)
 
-  // Check if should hide on single page
-  if (hideOnSinglePage && totalPages <= 1) {
-    return null
-  }
-
   // Handle page change
   const handlePageChange = useCallback(
     (page: number) => {
@@ -307,6 +302,11 @@ export const Pagination: React.FC<PaginationProps> = ({
         {labels.pageText}
       </span>
     )
+  }
+
+  // Check if should hide on single page (after all hooks to satisfy rules-of-hooks)
+  if (hideOnSinglePage && totalPages <= 1) {
+    return null
   }
 
   return (

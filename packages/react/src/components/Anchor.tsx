@@ -63,7 +63,7 @@ export interface AnchorProps extends Omit<CoreAnchorProps, 'style'> {
 
 export const Anchor: React.FC<AnchorProps> = ({
   affix = true,
-  bounds = 5,
+  bounds: _bounds = 5,
   offsetTop = 0,
   showInkInFixed = false,
   targetOffset,

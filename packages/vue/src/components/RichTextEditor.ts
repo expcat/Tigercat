@@ -10,7 +10,6 @@ import {
   defaultToolbar,
   isInlineFormat,
   findHotkeyMatch,
-  sanitizeHtml,
   isContentEmpty,
   parseHeight,
   builtinRichTextEngine,
