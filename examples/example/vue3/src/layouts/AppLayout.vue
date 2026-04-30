@@ -7,6 +7,9 @@ import { Anchor, AnchorLink, Breadcrumb, BreadcrumbItem, ConfigProvider } from '
 import { getStoredLang, getStoredSiderCollapsed, setStoredLang, setStoredSiderCollapsed } from '@demo-shared/prefs'
 import AppHeader from '../components/AppHeader.vue'
 import AppSider from '../components/AppSider.vue'
+import A11yDebugPanel from '../components/A11yDebugPanel.vue'
+
+const isDev = import.meta.env.DEV
 
 interface DemoSection {
   id: string
@@ -208,6 +211,7 @@ watch(
           </div>
         </main>
       </div>
+      <A11yDebugPanel v-if="isDev" :lang="lang" />
     </div>
   </ConfigProvider>
 </template>

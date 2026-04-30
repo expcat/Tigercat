@@ -20,6 +20,9 @@ import { applyTheme } from '@demo-shared/themes'
 import { LangContext } from '../context/lang'
 import AppHeader from '../components/AppHeader'
 import AppSider from '../components/AppSider'
+import A11yDebugPanel from '../components/A11yDebugPanel'
+
+const isDev = import.meta.env.DEV
 
 interface DemoSection {
   id: string
@@ -195,6 +198,7 @@ export const AppLayout: React.FC = () => {
               </div>
             </main>
           </div>
+          {isDev && <A11yDebugPanel lang={lang} />}
         </div>
       </ConfigProvider>
     </LangContext.Provider>
