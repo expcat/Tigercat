@@ -124,6 +124,9 @@ export const MODERN_OVERRIDE_TOKENS_LIGHT: Record<string, string> = {
   // Chart bar (BarChart rect) — softer top corners (modern bumps to --tiger-radius-sm)
   '--tiger-chart-bar-radius': 'var(--tiger-radius-sm, 4px)',
 
+  // Chart scatter point — slightly stronger halo on hover under modern preset
+  '--tiger-chart-scatter-halo-radius': '6px',
+
   // Chart donut center hole — opt-in glass panel behind centerValue / centerLabel
   '--tiger-chart-donut-center-padding': '10px 14px',
   '--tiger-chart-donut-center-bg':

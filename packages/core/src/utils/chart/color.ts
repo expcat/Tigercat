@@ -79,12 +79,25 @@ export const barValueLabelInsideClasses =
 export const barAnimatedTransition =
   'transition: y var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), height var(--tiger-motion-duration-slow,600ms) var(--tiger-motion-ease-emphasized,cubic-bezier(.4,0,.2,1)), opacity 200ms ease-out, filter 200ms ease-out'
 
-/** CSS transition for scatter point hover */
-export const scatterPointTransitionClasses = 'transition-all duration-200 ease-out'
+/**
+ * CSS transition for scatter point hover.
+ *
+ * Default fallback `cubic-bezier(0,0,0.2,1)` mirrors Tailwind `ease-out` so
+ * visual is unchanged. With `<html data-tiger-style="modern">` the timing
+ * function switches to `--tiger-motion-ease-spring` for a subtle overshoot
+ * on hover scaling (matches phase2.7 §3 ScatterChart "spring 缩放").
+ */
+export const scatterPointTransitionClasses =
+  'transition-all duration-200 [transition-timing-function:var(--tiger-motion-ease-spring,cubic-bezier(0,0,0.2,1))]'
 
-/** Drop shadow filter for hovered scatter points */
+/**
+ * Drop shadow filter for hovered scatter points.
+ *
+ * Halo radius is token-driven (`--tiger-chart-scatter-halo-radius`, fallback
+ * `4px`) so modern preset can amplify slightly without changing default visual.
+ */
 export function getScatterHoverShadow(color: string): string {
-  return `drop-shadow(0 0 4px ${color})`
+  return `drop-shadow(0 0 var(--tiger-chart-scatter-halo-radius,4px) ${color})`
 }
 
 /** Compute the hovered size for a scatter point. */
