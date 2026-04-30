@@ -9,6 +9,7 @@ import {
   getChartInnerRect,
   getAreaGradientPrefix,
   getNumberExtent,
+  linePointTransitionClasses,
   stackSeriesData,
   resolveChartPalette,
   buildChartLegendItems,
@@ -480,7 +481,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
                     fill={sd.pointHollow ? 'white' : sd.pointColor}
                     stroke={sd.pointHollow ? sd.pointColor : 'none'}
                     strokeWidth={sd.pointHollow ? 2 : 0}
-                    className="transition-all duration-200 ease-out"
+                    className={linePointTransitionClasses}
                     style={isHovered ? { filter: `drop-shadow(0 0 4px ${sd.color})` } : undefined}
                     data-point-index={point.pointIndex}
                     onMouseEnter={(e) => handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)}

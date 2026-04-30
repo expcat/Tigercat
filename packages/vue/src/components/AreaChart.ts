@@ -9,6 +9,7 @@ import {
   getChartElementOpacity,
   getChartInnerRect,
   getNumberExtent,
+  linePointTransitionClasses,
   stackSeriesData,
   resolveChartPalette,
   buildChartLegendItems,
@@ -640,7 +641,7 @@ export const AreaChart = defineComponent({
                         fill: sd.pointHollow ? 'white' : sd.pointColor,
                         stroke: sd.pointHollow ? sd.pointColor : 'none',
                         'stroke-width': sd.pointHollow ? 2 : 0,
-                        class: 'transition-all duration-200 ease-out',
+                        class: linePointTransitionClasses,
                         style: isHovered ? `filter: drop-shadow(0 0 4px ${sd.color})` : undefined,
                         'data-point-index': point.pointIndex,
                         onMouseenter: (e: MouseEvent) =>

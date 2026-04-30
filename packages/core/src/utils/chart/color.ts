@@ -64,8 +64,17 @@ export const DONUT_BASE_SHADOW = 'drop-shadow(0 2px 8px rgba(0,0,0,0.10))'
 // Line / area / bar / scatter visual constants
 // ----------------------------------------------------------------------------
 
-/** CSS transition classes for line chart point hover */
-export const linePointTransitionClasses = 'transition-all duration-200 ease-out'
+/**
+ * CSS transition classes for line/area chart point hover.
+ *
+ * Default fallback `cubic-bezier(0,0,0.2,1)` mirrors Tailwind `ease-out` so
+ * visual is unchanged. With `<html data-tiger-style="modern">` the timing
+ * function switches to `--tiger-motion-ease-spring` for a subtle overshoot
+ * on hover scaling (matches phase2.7 §3 LineChart/AreaChart "spring 缩放",
+ * mirrors `scatterPointTransitionClasses` from PR-19k(f)).
+ */
+export const linePointTransitionClasses =
+  'transition-all duration-200 [transition-timing-function:var(--tiger-motion-ease-spring,cubic-bezier(0,0,0.2,1))]'
 
 /** CSS classes for value labels displayed on bars */
 export const barValueLabelClasses =
