@@ -7,6 +7,7 @@ import {
   computeGaugeTicks,
   getChartInnerRect,
   chartAxisTickTextClasses,
+  getGaugeGradientPrefix,
   type ChartPadding,
   type GaugeChartProps as CoreGaugeChartProps
 } from '@expcat/tigercat-core'
@@ -37,6 +38,7 @@ export const GaugeChart = defineComponent({
     },
     trackColor: { type: String, default: 'var(--tiger-border,#e5e7eb)' },
     color: { type: String, default: 'var(--tiger-primary,#2563eb)' },
+    gradient: { type: Boolean, default: false },
     // a11y
     title: { type: String },
     desc: { type: String },
@@ -49,6 +51,10 @@ export const GaugeChart = defineComponent({
 
     const cx = computed(() => innerRect.value.width / 2)
     const cy = computed(() => innerRect.value.height / 2)
+
+    // Per-instance gradient ID prefix (only used when props.gradient is true)
+    const gradientPrefix = getGaugeGradientPrefix()
+    const valueGradientId = `${gradientPrefix}-value`
 
     const needleAngle = computed(() =>
       valueToGaugeAngle(props.value, props.min, props.max, props.startAngle, props.endAngle)
@@ -128,6 +134,25 @@ export const GaugeChart = defineComponent({
         },
         {
           default: () => [
+            // Gradient defs (opt-in, only when gradient mode is on and value arc renders)
+            props.gradient && !props.segments && valuePath
+              ? h('defs', {}, [
+                  h(
+                    'linearGradient',
+                    {
+                      id: valueGradientId,
+                      x1: 0,
+                      y1: 0,
+                      x2: 0,
+                      y2: 1
+                    },
+                    [
+                      h('stop', { offset: '0%', 'stop-color': props.color, 'stop-opacity': 1 }),
+                      h('stop', { offset: '100%', 'stop-color': props.color, 'stop-opacity': 0.55 })
+                    ]
+                  )
+                ])
+              : null,
             // Track
             h('path', {
               d: trackPath,
@@ -141,7 +166,7 @@ export const GaugeChart = defineComponent({
                 ? [
                     h('path', {
                       d: valuePath,
-                      fill: props.color,
+                      fill: props.gradient ? `url(#${valueGradientId})` : props.color,
                       'stroke-width': 0,
                       style: {
                         transition:

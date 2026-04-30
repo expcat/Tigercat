@@ -1830,6 +1830,14 @@ export interface GaugeChartProps extends BaseChartProps, ChartTooltipProps {
    * Palette of colors
    */
   colors?: string[]
+
+  /**
+   * When true, the value arc is rendered with a vertical alpha gradient
+   * (top: full opacity → bottom: low opacity) using a per-instance
+   * `<linearGradient>` definition. Opt-in; default keeps the solid arc fill.
+   * @default false
+   */
+  gradient?: boolean
 }
 
 // -------------------------------------------------------------------

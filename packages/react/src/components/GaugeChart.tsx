@@ -7,6 +7,7 @@ import {
   computeGaugeTicks,
   getChartInnerRect,
   chartAxisTickTextClasses,
+  getGaugeGradientPrefix,
   type ChartPadding,
   type GaugeChartProps as CoreGaugeChartProps
 } from '@expcat/tigercat-core'
@@ -33,6 +34,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
   segments,
   trackColor = 'var(--tiger-border,#e5e7eb)',
   color = 'var(--tiger-primary,#2563eb)',
+  gradient = false,
   title: chartTitle,
   desc,
   className
@@ -70,6 +72,10 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
 
   const formattedValue = valueFormatter ? valueFormatter(value) : `${value}`
 
+  // Per-instance gradient ID (only used when gradient prop is on)
+  const gradientPrefix = useMemo(() => getGaugeGradientPrefix(), [])
+  const valueGradientId = `${gradientPrefix}-value`
+
   return (
     <ChartCanvas
       width={width}
@@ -78,6 +84,16 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
       title={chartTitle}
       desc={desc}
       className={classNames(className)}>
+      {/* Gradient defs (opt-in, only when gradient mode is on and value arc renders) */}
+      {gradient && !segments && valuePath && (
+        <defs>
+          <linearGradient id={valueGradientId} x1={0} y1={0} x2={0} y2={1}>
+            <stop offset="0%" stopColor={color} stopOpacity={1} />
+            <stop offset="100%" stopColor={color} stopOpacity={0.55} />
+          </linearGradient>
+        </defs>
+      )}
+
       {/* Track */}
       <path d={trackPath} fill={trackColor} strokeWidth={0} />
 
@@ -98,7 +114,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
         : valuePath && (
             <path
               d={valuePath}
-              fill={color}
+              fill={gradient ? `url(#${valueGradientId})` : color}
               strokeWidth={0}
               style={{
                 transition:
