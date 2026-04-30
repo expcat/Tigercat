@@ -4,6 +4,7 @@ import {
   computeFunnelSegments,
   getChartElementOpacity,
   getChartInnerRect,
+  getFunnelGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
@@ -36,6 +37,7 @@ export const FunnelChart = defineComponent({
     gap: { type: Number, default: 2 },
     pinch: { type: Boolean, default: false },
     colors: { type: Array as PropType<string[]> },
+    gradient: { type: Boolean, default: false },
     // Interaction
     hoverable: { type: Boolean, default: false },
     hoveredIndex: { type: Number as PropType<number | null>, default: undefined },
@@ -101,6 +103,9 @@ export const FunnelChart = defineComponent({
 
     const total = computed(() => props.data.reduce((s, d) => s + d.value, 0))
 
+    // Stable gradient ID prefix per FunnelChart instance
+    const gradientPrefix = getFunnelGradientPrefix()
+
     const legendItems = computed<ChartLegendItem[]>(() =>
       buildChartLegendItems({
         data: props.data,
@@ -139,6 +144,34 @@ export const FunnelChart = defineComponent({
         },
         {
           default: () => {
+            const defs = props.gradient
+              ? h(
+                  'defs',
+                  {},
+                  segments.value.map((seg) =>
+                    h(
+                      'linearGradient',
+                      {
+                        key: `grad-${seg.index}`,
+                        id: `${gradientPrefix}-${seg.index}`,
+                        x1: 0,
+                        y1: 0,
+                        x2: 0,
+                        y2: 1
+                      },
+                      [
+                        h('stop', { offset: '0%', 'stop-color': seg.color, 'stop-opacity': 1 }),
+                        h('stop', {
+                          offset: '100%',
+                          'stop-color': seg.color,
+                          'stop-opacity': 0.55
+                        })
+                      ]
+                    )
+                  )
+                )
+              : null
+
             const paths = h(
               ChartSeries,
               { data: props.data, type: 'funnel' },
@@ -152,7 +185,7 @@ export const FunnelChart = defineComponent({
                     return h('path', {
                       key: `seg-${seg.index}`,
                       d: seg.path,
-                      fill: seg.color,
+                      fill: props.gradient ? `url(#${gradientPrefix}-${seg.index})` : seg.color,
                       opacity,
                       class: classNames(interactive && 'cursor-pointer'),
                       style: {
@@ -186,7 +219,7 @@ export const FunnelChart = defineComponent({
               )
             )
 
-            return [paths, ...labels]
+            return [defs, paths, ...labels].filter(Boolean)
           }
         }
       )

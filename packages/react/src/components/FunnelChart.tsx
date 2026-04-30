@@ -4,6 +4,7 @@ import {
   computeFunnelSegments,
   getChartElementOpacity,
   getChartInnerRect,
+  getFunnelGradientPrefix,
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
@@ -37,6 +38,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
   gap = 2,
   pinch = false,
   colors,
+  gradient = false,
   hoverable = false,
   hoveredIndex: hoveredIndexProp,
   activeOpacity = 1,
@@ -107,6 +109,9 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
 
   const total = useMemo(() => data.reduce((s, d) => s + d.value, 0), [data])
 
+  // Stable gradient ID prefix per FunnelChart instance
+  const gradientPrefix = useMemo(() => getFunnelGradientPrefix(), [])
+
   const legendItems = useMemo<ChartLegendItem[]>(
     () =>
       buildChartLegendItems({
@@ -139,6 +144,22 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
       title={title}
       desc={desc}
       className={classNames(className)}>
+      {gradient && (
+        <defs>
+          {segments.map((seg) => (
+            <linearGradient
+              key={`grad-${seg.index}`}
+              id={`${gradientPrefix}-${seg.index}`}
+              x1={0}
+              y1={0}
+              x2={0}
+              y2={1}>
+              <stop offset="0%" stopColor={seg.color} stopOpacity={1} />
+              <stop offset="100%" stopColor={seg.color} stopOpacity={0.55} />
+            </linearGradient>
+          ))}
+        </defs>
+      )}
       <g data-series-type="funnel">
         {segments.map((seg) => {
           const opacity = getChartElementOpacity(seg.index, activeIndex, {
@@ -149,7 +170,7 @@ export const FunnelChart: React.FC<FunnelChartProps> = ({
             <path
               key={`seg-${seg.index}`}
               d={seg.path}
-              fill={seg.color}
+              fill={gradient ? `url(#${gradientPrefix}-${seg.index})` : seg.color}
               opacity={opacity}
               className={classNames(interactive && 'cursor-pointer')}
               style={{ transition: 'opacity 0.2s ease-out' }}

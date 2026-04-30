@@ -23,6 +23,7 @@ const barGradient = createGradientIdFactory('bar')
 const scatterGradient = createGradientIdFactory('scatter')
 const radarGradient = createGradientIdFactory('radar')
 const gaugeGradient = createGradientIdFactory('gauge')
+const funnelGradient = createGradientIdFactory('funnel')
 
 /** Generate a unique gradient ID prefix for a LineChart instance. */
 export function getLineGradientPrefix(): string {
@@ -85,6 +86,16 @@ export function getGaugeGradientPrefix(): string {
 /** Reset the gauge gradient counter (for testing only) */
 export function resetGaugeGradientCounter(): void {
   gaugeGradient.reset()
+}
+
+/** Generate a unique gradient ID prefix for a FunnelChart instance. */
+export function getFunnelGradientPrefix(): string {
+  return funnelGradient.getPrefix()
+}
+
+/** Reset the funnel gradient counter (for testing only) */
+export function resetFunnelGradientCounter(): void {
+  funnelGradient.reset()
 }
 
 /**

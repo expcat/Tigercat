@@ -1742,6 +1742,13 @@ export interface FunnelChartProps
    * Palette of colors
    */
   colors?: string[]
+
+  /**
+   * Render each segment with a vertical alpha gradient (top opaque → bottom faded).
+   * Opt-in; defaults to flat fill so existing visuals stay 1:1.
+   * @default false
+   */
+  gradient?: boolean
 }
 
 // -------------------------------------------------------------------
