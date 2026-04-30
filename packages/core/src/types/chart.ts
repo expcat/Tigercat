@@ -1491,6 +1491,14 @@ export interface AreaChartProps
   strokeGradient?: boolean
 
   /**
+   * Render data point fill as a per-series `<radialGradient>` (bright center
+   * → series color edge) for a hollow / 3D-sphere look. Has no effect on
+   * points where `pointHollow` is true (those keep the white-fill + colored-stroke style).
+   * @default false
+   */
+  pointGradient?: boolean
+
+  /**
    * Tooltip formatter
    */
   tooltipFormatter?: (
