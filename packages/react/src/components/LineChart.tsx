@@ -95,6 +95,7 @@ export const LineChart: React.FC<LineChartProps> = ({
   pointHollow = false,
   animated = false,
   strokeGradient = false,
+  pointGradient = false,
   tooltipFormatter,
   legendFormatter,
   title,
@@ -311,7 +312,7 @@ export const LineChart: React.FC<LineChartProps> = ({
       desc={desc}
       className={classNames(className)}>
       {/* Gradient defs and animation styles */}
-      {(seriesData.some((sd) => sd.showArea) || animated || strokeGradient) && (
+      {(seriesData.some((sd) => sd.showArea) || animated || strokeGradient || pointGradient) && (
         <defs>
           {animated && (
             <style>{`
@@ -337,6 +338,22 @@ export const LineChart: React.FC<LineChartProps> = ({
                 <stop offset="0%" stopColor={sd.color} stopOpacity={sd.areaOpacity} />
                 <stop offset="100%" stopColor={sd.color} stopOpacity={0.02} />
               </linearGradient>
+            ))}
+          {pointGradient &&
+            seriesData.map((sd) => (
+              <radialGradient
+                key={`point-grad-${sd.seriesIndex}`}
+                id={`${gradientPrefix}-point-${sd.seriesIndex}`}
+                cx="0.5"
+                cy="0.5"
+                r="0.5">
+                <stop offset="0%" stopColor={`color-mix(in oklab, ${sd.color} 100%, white 30%)`} />
+                <stop offset="70%" stopColor={sd.color} />
+                <stop
+                  offset="100%"
+                  stopColor={`color-mix(in oklab, ${sd.color} 100%, black 12%)`}
+                />
+              </radialGradient>
             ))}
           {strokeGradient &&
             seriesData.map((sd) => (
@@ -439,7 +456,13 @@ export const LineChart: React.FC<LineChartProps> = ({
                   cx={point.x}
                   cy={point.y}
                   r={isHovered ? hoverSize : sd.pointSize}
-                  fill={sd.pointHollow ? 'white' : sd.pointColor}
+                  fill={
+                    sd.pointHollow
+                      ? 'white'
+                      : pointGradient
+                        ? `url(#${gradientPrefix}-point-${sd.seriesIndex})`
+                        : sd.pointColor
+                  }
                   stroke={sd.pointHollow ? sd.pointColor : 'none'}
                   strokeWidth={sd.pointHollow ? 2 : 0}
                   className={linePointTransitionClasses}
