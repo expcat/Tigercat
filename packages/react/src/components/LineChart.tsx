@@ -347,15 +347,9 @@ export const LineChart: React.FC<LineChartProps> = ({
                 y1="0"
                 x2="1"
                 y2="0">
-                <stop
-                  offset="0%"
-                  stopColor={`color-mix(in oklab, ${sd.color} 100%, white 12%)`}
-                />
+                <stop offset="0%" stopColor={`color-mix(in oklab, ${sd.color} 100%, white 12%)`} />
                 <stop offset="50%" stopColor={sd.color} />
-                <stop
-                  offset="100%"
-                  stopColor={`color-mix(in oklab, ${sd.color} 100%, black 8%)`}
-                />
+                <stop offset="100%" stopColor={`color-mix(in oklab, ${sd.color} 100%, black 8%)`} />
               </linearGradient>
             ))}
         </defs>
@@ -420,11 +414,7 @@ export const LineChart: React.FC<LineChartProps> = ({
           <path
             d={sd.linePath}
             fill="none"
-            stroke={
-              strokeGradient
-                ? `url(#${gradientPrefix}-stroke-${sd.seriesIndex})`
-                : sd.color
-            }
+            stroke={strokeGradient ? `url(#${gradientPrefix}-stroke-${sd.seriesIndex})` : sd.color}
             strokeWidth={sd.strokeWidth}
             strokeDasharray={animated ? (sd.strokeDasharray ?? '1') : sd.strokeDasharray}
             strokeDashoffset={animated ? '1' : undefined}
