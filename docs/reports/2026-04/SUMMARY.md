@@ -24,7 +24,7 @@
 | [phase2.3-feedback.md](phase2.3-feedback.md)                             | Feedback 组件                  | sideEffects 完成；overlay 共享层与 a11y 回归仍待做                            |
 | [phase2.4-layout.md](phase2.4-layout.md)                                 | Layout 组件                    | radius token 迁移完成；Carousel/Splitter 等性能项待评估                       |
 | [phase2.5-navigation.md](phase2.5-navigation.md)                         | Navigation 组件                | Tree virtual、Affix/Anchor IO 完成；父子组件文件合并待做                      |
-| [phase2.6-data.md](phase2.6-data.md)                                     | Data 组件                      | Table 拆分完成；Table 性能细项、Calendar/Collapse 优化待做                    |
+| [phase2.6-data.md](phase2.6-data.md)                                     | Data 组件                      | Table 拆分与 rowKey 缓存完成；ResizeObserver/Calendar/Collapse 优化待做       |
 | [phase2.7-charts.md](phase2.7-charts.md)                                 | Charts 组件                    | chart-utils 拆分、配色 token、PR-19k 视觉增强已完成                           |
 | [phase2.8-composite.md](phase2.8-composite.md)                           | Composite 组件                 | ChatWindow virtual、部分 core utils 下沉完成；Kanban/TaskBoard 与配方化待讨论 |
 | [phase2.9-advanced.md](phase2.9-advanced.md)                             | Advanced 组件                  | Code/RichText engine 化完成；Virtual/File/Image/Kanban 仍有 P1/P2             |
@@ -50,6 +50,7 @@
 | PR-14 Tree/ChatWindow virtual     | Done         | Tree 与 ChatWindow 增加 virtual 路径和测试                                                             |
 | PR-15 Composite 去重              | Partial Done | FormWizard/CropUpload 下沉核心工具；DataTableWithToolbar 保持现状，留待 Table 后续评估                 |
 | PR-16 Table 拆分                  | Done         | Vue/React Table 拆出 state + render 子模块，体积小幅下降                                               |
+| PR-26 Table rowKey 缓存           | Done         | core 增加局部 rowKey cache，Vue/React Table 复用 page row keys 并补回归测试                            |
 | PR-17 Code/RichText engine 化     | Done         | 提供 highlighter/engine opt-in，不打包重型编辑器引擎                                                   |
 | PR-18 Kanban + TaskBoard 合并     | Pending      | 需先做 API/兼容性方案讨论，可能属于 v2 级变更                                                          |
 | PR-19a..j radius token 迁移       | Done         | Basic/Form/Feedback/Layout/Navigation/Data/Composite/Advanced 与横切剩余项已完成                       |
@@ -80,7 +81,7 @@
 
 - Affix/Anchor 使用 IntersectionObserver。
 - Tree/ChatWindow 支持 virtual 路径。
-- Table 拆分后更利于后续局部性能优化。
+- Table 拆分后更利于后续局部性能优化；rowKey 已改为单页派生缓存并被两端渲染/点击路径复用。
 - Chart 系列增加多项渐变、hover、oklch、tabular-nums 等现代化能力。
 
 ### 测试进展
@@ -111,7 +112,7 @@
 | Overlay 共享层                             | P1     | Modal/Drawer/Popover/Tooltip/Popconfirm/Loading 统一 portal、lock-scroll、focus-trap、Esc 行为               |
 | Picker 共享层二期                          | P1     | AutoComplete、Cascader、TreeSelect、Transfer 按各自键盘/ARIA 语义扩展 picker-utils，不强行统一到 Select 语义 |
 | Navigation 父子文件合并                    | P1     | Menu、Dropdown、Anchor、Breadcrumb、Steps、Tabs 建立父子组件同文件约定，减少 chunk 与导出链路                |
-| Table 性能二期                             | P1     | rowKey 缓存、sticky/virtual 组合压测、export-utils 子路径化、ResizeObserver/rAF 批量更新                     |
+| Table 性能二期                             | P1     | sticky/virtual 组合压测、export-utils 子路径化、ResizeObserver/rAF 批量更新                                  |
 | Virtual / Infinite / File / Image 工具抽离 | P1     | VirtualList 策略化、InfiniteScroll sentinel、FileManager 共享 model、ImageViewer 手势 core util              |
 
 ### 4.3 依赖与基础设施

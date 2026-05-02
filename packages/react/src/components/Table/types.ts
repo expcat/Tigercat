@@ -66,7 +66,7 @@ export interface TableContext {
   handleFilter: (columnKey: string, value: unknown) => void
   handlePageChange: (page: number) => void
   handlePageSizeChange: (size: number) => void
-  handleRowClick: (record: Record<string, unknown>, index: number) => void
+  handleRowClick: (record: Record<string, unknown>, index: number, key: string | number) => void
   handleToggleExpand: (key: string | number, record: Record<string, unknown>) => void
   handleSelectRow: (key: string | number, checked: boolean) => void
   handleSelectAll: (checked: boolean) => void

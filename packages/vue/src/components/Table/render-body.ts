@@ -11,8 +11,7 @@ import {
   getEditableCellClasses,
   editableCellInputClasses,
   tableGroupHeaderClasses,
-  getGroupHeaderCellClasses,
-  getRowKey
+  getGroupHeaderCellClasses
 } from '@expcat/tigercat-core'
 import { ExpandIcon } from './icons'
 import type { TableContext, TableInternalProps } from './types'
@@ -51,7 +50,7 @@ export function renderTableBody(
   }
 
   function renderDataRow(record: Record<string, unknown>, index: number): VNodeChild {
-    const key = getRowKey(record, props.rowKey, index)
+    const key = ctx.paginatedRowKeys.value[index]
     const isSelected = ctx.selectedRowKeySet.value.has(key)
     const isExpanded = ctx.expandedRowKeySet.value.has(key)
     const isRowExpandable = props.expandable
@@ -220,7 +219,7 @@ export function renderTableBody(
           getTableRowClasses(props.hoverable, props.striped, index % 2 === 0, rowClass),
           ctx.fixedColumnsInfo.value.hasFixedColumns && 'group'
         ),
-        onClick: () => ctx.handleRowClick(record, index)
+        onClick: () => ctx.handleRowClick(record, index, key)
       },
       cells
     )

@@ -51,11 +51,14 @@ export function getFixedColumnOffsets<T = Record<string, unknown>>(
 } {
   const leftOffsets: Record<string, number> = {}
   const rightOffsets: Record<string, number> = {}
+  let hasLeftFixedColumns = false
+  let hasRightFixedColumns = false
 
   let left = 0
   for (const column of columns) {
     if (column.fixed === 'left') {
       leftOffsets[column.key] = left
+      hasLeftFixedColumns = true
     }
     left += parseWidthToPx(column.width)
   }
@@ -65,13 +68,13 @@ export function getFixedColumnOffsets<T = Record<string, unknown>>(
     const column = columns[i]
     if (column.fixed === 'right') {
       rightOffsets[column.key] = right
+      hasRightFixedColumns = true
     }
     right += parseWidthToPx(column.width)
   }
 
   const minTableWidth = columns.reduce((sum, col) => sum + parseWidthToPx(col.width), 0)
-  const hasFixedColumns =
-    Object.keys(leftOffsets).length > 0 || Object.keys(rightOffsets).length > 0
+  const hasFixedColumns = hasLeftFixedColumns || hasRightFixedColumns
 
   return { leftOffsets, rightOffsets, minTableWidth, hasFixedColumns }
 }
@@ -374,6 +377,49 @@ export function getRowKey<T>(
   }
 
   return index
+}
+
+export interface TableRowKeyCache<T> {
+  get: (record: T, index: number) => string | number
+  getMany: (records: T[], indexOffset?: number) => (string | number)[]
+}
+
+/**
+ * Create a scoped row-key resolver for one Table derivation pass.
+ */
+export function createTableRowKeyCache<T>(
+  rowKey: string | ((record: T) => string | number)
+): TableRowKeyCache<T> {
+  const explicitKeyCache = new WeakMap<object, string | number>()
+
+  function get(record: T, index: number): string | number {
+    const objectRecord =
+      typeof record === 'object' && record !== null ? (record as object) : undefined
+
+    if (objectRecord && explicitKeyCache.has(objectRecord)) {
+      return explicitKeyCache.get(objectRecord)!
+    }
+
+    const key =
+      typeof rowKey === 'function'
+        ? rowKey(record)
+        : ((record as Record<string, unknown>)[rowKey] as string | number | null | undefined)
+
+    if (key !== undefined && key !== null) {
+      if (objectRecord) {
+        explicitKeyCache.set(objectRecord, key)
+      }
+      return key
+    }
+
+    return index
+  }
+
+  function getMany(records: T[], indexOffset = 0): (string | number)[] {
+    return records.map((record, index) => get(record, indexOffset + index))
+  }
+
+  return { get, getMany }
 }
 
 // --- v0.6.0 additions ---

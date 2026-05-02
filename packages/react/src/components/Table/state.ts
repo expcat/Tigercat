@@ -4,7 +4,7 @@ import {
   filterData,
   paginateData,
   calculatePagination,
-  getRowKey,
+  createTableRowKeyCache,
   filterDataAdvanced,
   groupDataByColumn,
   getFixedColumnOffsets,
@@ -34,7 +34,7 @@ export interface UseTableStateInput {
   pagination: PaginationConfig | false
   rowSelection?: RowSelectionConfig
   expandable?: ExpandableConfig
-  rowKey: TableProps['rowKey']
+  rowKey: string | ((record: Record<string, unknown>) => string | number)
   editable: boolean
   editableCells?: Map<string, Set<number>>
   filterMode: 'basic' | 'advanced'
@@ -248,7 +248,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
   }, [processedData, currentPage, currentPageSize, pagination])
 
   const pageRowKeys = useMemo(
-    () => paginatedData.map((record, index) => getRowKey(record, rowKey, index)),
+    () => createTableRowKeyCache<Record<string, unknown>>(rowKey).getMany(paginatedData),
     [paginatedData, rowKey]
   )
 
@@ -345,10 +345,9 @@ export function useTableState(input: UseTableStateInput): TableContext {
     onExpandChange?.(newKeys, record, !isExpanded)
   }
 
-  function handleRowClick(record: Record<string, unknown>, index: number) {
+  function handleRowClick(record: Record<string, unknown>, index: number, key: string | number) {
     onRowClick?.(record, index)
     if (expandable?.expandRowByClick) {
-      const key = getRowKey(record, rowKey, index)
       const isExpandableRow = expandable?.rowExpandable ? expandable.rowExpandable(record) : true
       if (isExpandableRow) {
         handleToggleExpand(key, record)

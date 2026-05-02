@@ -4,7 +4,7 @@ import {
   filterData,
   paginateData,
   calculatePagination,
-  getRowKey,
+  createTableRowKeyCache,
   filterDataAdvanced,
   groupDataByColumn,
   exportTableToCsv,
@@ -182,7 +182,9 @@ export function useTableState(props: TableInternalProps, emit: TableEmitFn): Tab
   })
 
   const paginatedRowKeys = computed(() => {
-    return paginatedData.value.map((record, index) => getRowKey(record, props.rowKey, index))
+    return createTableRowKeyCache<Record<string, unknown>>(props.rowKey).getMany(
+      paginatedData.value
+    )
   })
 
   const selectedRowKeySet = computed(() => {
@@ -314,11 +316,10 @@ export function useTableState(props: TableInternalProps, emit: TableEmitFn): Tab
     emit('expand-change', newKeys, record, !isExpanded)
   }
 
-  function handleRowClick(record: Record<string, unknown>, index: number) {
+  function handleRowClick(record: Record<string, unknown>, index: number, key: string | number) {
     emit('row-click', record, index)
 
     if (props.expandable?.expandRowByClick) {
-      const key = getRowKey(record, props.rowKey, index)
       const isExpandable = props.expandable?.rowExpandable
         ? props.expandable.rowExpandable(record)
         : true

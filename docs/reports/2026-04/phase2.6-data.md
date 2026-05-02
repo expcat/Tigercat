@@ -27,7 +27,7 @@
 | D8  | **Calendar**：cell 渲染应支持 `useMemo` / `computed` 缓存，月切换时仅重算受影响周                                                                                                                                              | P1     |
 | D9  | **Collapse**：高度过渡应用 `requestAnimationFrame` + CSS transition（不要 setInterval）                                                                                                                                        | P1     |
 | D10 | **Timeline**：节点定位用 CSS pseudo-element，避免 `<div class="dot">` 额外节点                                                                                                                                                 | P2     |
-| D11 | **Table**：rowKey 计算缓存（避免重复 stringify object key）                                                                                                                                                                    | P1     |
+| D11 | **Table**：rowKey 计算缓存（避免重复计算；Vue/React 渲染与点击路径复用 page row keys）                                                                                                                                         | Done   |
 
 ## 3. 样式现代化清单
 

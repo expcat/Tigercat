@@ -90,7 +90,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
           getTableRowClasses(hoverable, striped, index % 2 === 0, rowClass),
           ctx.fixedColumnsInfo.hasFixedColumns && 'group'
         )}
-        onClick={() => ctx.handleRowClick(record, index)}>
+        onClick={() => ctx.handleRowClick(record, index, key)}>
         {expandAtStart && expandToggleCell}
 
         {rowSelection && rowSelection.showCheckbox !== false && (

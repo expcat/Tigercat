@@ -684,6 +684,30 @@ describe('Table', () => {
       expect(getByText('Details for John Doe')).toBeInTheDocument()
     })
 
+    it('should reuse cached row keys when expanding by row click', async () => {
+      const rowKey = vi.fn((record: Record<string, unknown>) => record.id as number)
+
+      const { getByText } = render(
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          rowKey={rowKey}
+          pagination={false}
+          expandable={{
+            ...expandableConfig,
+            expandRowByClick: true
+          }}
+        />
+      )
+
+      expect(rowKey).toHaveBeenCalledTimes(dataSource.length)
+
+      await fireEvent.click(getByText('John Doe'))
+
+      expect(getByText('Details for John Doe')).toBeInTheDocument()
+      expect(rowKey).toHaveBeenCalledTimes(dataSource.length)
+    })
+
     it('should set correct colspan on expanded row td', async () => {
       const { getAllByRole, container } = render(
         <Table columns={columns} dataSource={dataSource} expandable={expandableConfig} />
