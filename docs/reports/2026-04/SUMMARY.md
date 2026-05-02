@@ -32,35 +32,35 @@
 
 ## 2. 执行状态看板
 
-| 范围                              | 状态         | 说明                                                                                                   |
-| --------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------ |
-| PR-1 sideEffects                  | Done         | 修复 chunk 被忽略风险，esbuild ignored-bare-import 归零                                                |
-| PR-2 Tailwind core v4             | Done         | core 与 examples 统一到 Tailwind v4；plugin 经 v4 路径验证                                             |
-| PR-3 非破坏性依赖升级             | Done         | 小版本依赖合包完成                                                                                     |
-| PR-4 i18n locales 子路径化        | Done         | locales 拆分并保留向后兼容 re-export                                                                   |
-| PR-5 icons 分组子路径             | Done         | common/picker/status/table 图标子路径完成                                                              |
-| PR-6 modern theme token           | Done         | modern preset、radius、shadow、motion、glass 等 token 完成                                             |
-| PR-7 examples 四件套开关          | Done         | theme、dark、modern、locale 顶部控制完成                                                               |
-| PR-8 CLI 模板 v4 + modern         | Done         | 模板改用 Tailwind v4 CSS-first 与 modern plugin                                                        |
-| PR-9 Button SSR + class composer  | Done         | Vue Button vnode 复用问题修复，class composer 下沉到 core                                              |
-| PR-10 picker-utils                | Partial Done | Select 两端已复用；AutoComplete/Cascader/TreeSelect/Transfer 仍需按交互语义继续收敛                    |
-| PR-11 DatePicker/TimePicker 去重  | Done         | padTwo/isSameDay 等轻量重复逻辑下沉                                                                    |
-| PR-12 chart-utils 拆分            | Done         | 28 KB 单文件拆为 chart 子模块，旧入口薄 re-export                                                      |
-| PR-13 Affix/Anchor IO             | Done         | 滚动检测切到 IntersectionObserver                                                                      |
-| PR-14 Tree/ChatWindow virtual     | Done         | Tree 与 ChatWindow 增加 virtual 路径和测试                                                             |
-| PR-15 Composite 去重              | Partial Done | FormWizard/CropUpload 下沉核心工具；DataTableWithToolbar 保持现状，留待 Table 后续评估                 |
-| PR-16 Table 拆分                  | Done         | Vue/React Table 拆出 state + render 子模块，体积小幅下降                                               |
-| PR-26 Table rowKey 缓存           | Done         | core 增加局部 rowKey cache，Vue/React Table 复用 page row keys 并补回归测试                            |
-| PR-17 Code/RichText engine 化     | Done         | 提供 highlighter/engine opt-in，不打包重型编辑器引擎                                                   |
-| PR-18 Kanban + TaskBoard 合并     | Pending      | 需先做 API/兼容性方案讨论，可能属于 v2 级变更                                                          |
-| PR-19a..j radius token 迁移       | Done         | Basic/Form/Feedback/Layout/Navigation/Data/Composite/Advanced 与横切剩余项已完成                       |
-| PR-19k chart 视觉增强             | Done         | tooltip/axis/legend/blocks/gradient/pointGradient/oklch 等 opt-in 项已收尾                             |
-| PR-20 examples 重构               | Done         | 复制代码、hooks demo、a11y debug panel、跨框架 Home 对比完成                                           |
-| PR-21 tests 覆盖率 + a11y/视觉    | In Progress  | G1 完成；G2 已补 Tour、themes-manager、image-utils、color-picker-utils、rich-text-engine、React Slider |
-| PR-22 TypeScript 6 + vue-tsc 3    | Done         | 全包构建与测试通过；保留 TS 7 前的 baseUrl 弃用临时缓解                                                |
-| PR-23 Vite 8 + plugin-react 6     | Done         | examples Vue/React build 通过                                                                          |
-| PR-24 ESLint 10                   | Done         | rules-of-hooks error 清零，保留若干 exhaustive-deps warning 后续审视                                   |
-| PR-25 vue-router 5 / commander 14 | Partial Done | vue-router 5 完成；commander 14 因 Node 20+ 要求延期                                                   |
+| 范围                              | 状态         | 说明                                                                                                                    |
+| --------------------------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| PR-1 sideEffects                  | Done         | 修复 chunk 被忽略风险，esbuild ignored-bare-import 归零                                                                 |
+| PR-2 Tailwind core v4             | Done         | core 与 examples 统一到 Tailwind v4；plugin 经 v4 路径验证                                                              |
+| PR-3 非破坏性依赖升级             | Done         | 小版本依赖合包完成                                                                                                      |
+| PR-4 i18n locales 子路径化        | Done         | locales 拆分并保留向后兼容 re-export                                                                                    |
+| PR-5 icons 分组子路径             | Done         | common/picker/status/table 图标子路径完成                                                                               |
+| PR-6 modern theme token           | Done         | modern preset、radius、shadow、motion、glass 等 token 完成                                                              |
+| PR-7 examples 四件套开关          | Done         | theme、dark、modern、locale 顶部控制完成                                                                                |
+| PR-8 CLI 模板 v4 + modern         | Done         | 模板改用 Tailwind v4 CSS-first 与 modern plugin                                                                         |
+| PR-9 Button SSR + class composer  | Done         | Vue Button vnode 复用问题修复，class composer 下沉到 core                                                               |
+| PR-10 picker-utils                | Partial Done | Select 两端已复用；AutoComplete/Cascader/TreeSelect/Transfer 仍需按交互语义继续收敛                                     |
+| PR-11 DatePicker/TimePicker 去重  | Done         | padTwo/isSameDay 等轻量重复逻辑下沉                                                                                     |
+| PR-12 chart-utils 拆分            | Done         | 28 KB 单文件拆为 chart 子模块，旧入口薄 re-export                                                                       |
+| PR-13 Affix/Anchor IO             | Done         | 滚动检测切到 IntersectionObserver                                                                                       |
+| PR-14 Tree/ChatWindow virtual     | Done         | Tree 与 ChatWindow 增加 virtual 路径和测试                                                                              |
+| PR-15 Composite 去重              | Partial Done | FormWizard/CropUpload 下沉核心工具；DataTableWithToolbar 保持现状，留待 Table 后续评估                                  |
+| PR-16 Table 拆分                  | Done         | Vue/React Table 拆出 state + render 子模块，体积小幅下降                                                                |
+| PR-26 Table rowKey 缓存           | Done         | core 增加局部 rowKey cache，Vue/React Table 复用 page row keys 并补回归测试                                             |
+| PR-17 Code/RichText engine 化     | Done         | 提供 highlighter/engine opt-in，不打包重型编辑器引擎                                                                    |
+| PR-18 Kanban + TaskBoard 合并     | Pending      | 需先做 API/兼容性方案讨论，可能属于 v2 级变更                                                                           |
+| PR-19a..j radius token 迁移       | Done         | Basic/Form/Feedback/Layout/Navigation/Data/Composite/Advanced 与横切剩余项已完成                                        |
+| PR-19k chart 视觉增强             | Done         | tooltip/axis/legend/blocks/gradient/pointGradient/oklch 等 opt-in 项已收尾                                              |
+| PR-20 examples 重构               | Done         | 复制代码、hooks demo、a11y debug panel、跨框架 Home 对比完成                                                            |
+| PR-21 tests 覆盖率 + a11y/视觉    | In Progress  | G1 完成；G2 已补 Tour、themes-manager、image-utils、color-picker-utils、rich-text-engine、React Slider、Vue/React Affix |
+| PR-22 TypeScript 6 + vue-tsc 3    | Done         | 全包构建与测试通过；保留 TS 7 前的 baseUrl 弃用临时缓解                                                                 |
+| PR-23 Vite 8 + plugin-react 6     | Done         | examples Vue/React build 通过                                                                                           |
+| PR-24 ESLint 10                   | Done         | rules-of-hooks error 清零，保留若干 exhaustive-deps warning 后续审视                                                    |
+| PR-25 vue-router 5 / commander 14 | Partial Done | vue-router 5 完成；commander 14 因 Node 20+ 要求延期                                                                    |
 
 ## 3. 已完成收益归纳
 
@@ -87,21 +87,20 @@
 ### 测试进展
 
 - PR-21 G1 已归档初始覆盖率基线：lines 78.05%，branches 71.24%。
-- 已补齐或显著提升：Tour Vue/React、themes-manager、image-utils、color-picker-utils、rich-text-engine、React Slider。
+- 已补齐或显著提升：Tour Vue/React、themes-manager、image-utils、color-picker-utils、rich-text-engine、React Slider、Vue/React Affix。
 - Test-only 子项不影响 core/vue/react 包体积。
 
 ## 4. 未完成任务规划
 
 ### 4.1 近期优先级
 
-| 顺序 | 任务                              | 来源                                                                     | 完成标准                                                                  |
-| ---- | --------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
-| 1    | 刷新 PR-21 覆盖率现状             | [coverage-baseline.json](coverage-baseline.json)                         | 重新运行 coverage，生成当前覆盖率摘要，避免继续引用已过期 baseline        |
-| 2    | 补 TaskBoard Vue/React 测试       | [phase2.9-advanced.md](phase2.9-advanced.md) / PR-21                     | 覆盖列增删、卡片移动、拖拽边界、空态、禁用态，lines 至少 80%              |
-| 3    | 补 ImageCropper Vue/React 测试    | [phase2.1-basic.md](phase2.1-basic.md) / PR-21                           | 覆盖裁剪框移动、缩放、aspect ratio、键盘/触控边界                         |
-| 4    | 补 ImagePreview Vue/React 测试    | [phase2.1-basic.md](phase2.1-basic.md) / PR-21                           | 覆盖 open/close、prev/next、zoom/rotate、键盘导航                         |
-| 5    | 补 Affix Vue 测试并核对覆盖率差异 | [phase2.5-navigation.md](phase2.5-navigation.md) / PR-21                 | 以最新 coverage 为准，覆盖 sentinel、offset、ResizeObserver、cleanup      |
-| 6    | 完成 PR-21 G3/G5/G6               | [phase1d-i18n-cli-examples-tests.md](phase1d-i18n-cli-examples-tests.md) | a11y 扫描、modern 主题测试、Message/Notification sideEffects 回归测试落地 |
+| 顺序 | 任务                           | 来源                                                                     | 完成标准                                                                  |
+| ---- | ------------------------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| 1    | 刷新 PR-21 覆盖率现状          | [coverage-baseline.json](coverage-baseline.json)                         | 重新运行 coverage，生成当前覆盖率摘要，避免继续引用已过期 baseline        |
+| 2    | 补 TaskBoard Vue/React 测试    | [phase2.9-advanced.md](phase2.9-advanced.md) / PR-21                     | 覆盖列增删、卡片移动、拖拽边界、空态、禁用态，lines 至少 80%              |
+| 3    | 补 ImageCropper Vue/React 测试 | [phase2.1-basic.md](phase2.1-basic.md) / PR-21                           | 覆盖裁剪框移动、缩放、aspect ratio、键盘/触控边界                         |
+| 4    | 补 ImagePreview Vue/React 测试 | [phase2.1-basic.md](phase2.1-basic.md) / PR-21                           | 覆盖 open/close、prev/next、zoom/rotate、键盘导航                         |
+| 5    | 完成 PR-21 G3/G5/G6            | [phase1d-i18n-cli-examples-tests.md](phase1d-i18n-cli-examples-tests.md) | a11y 扫描、modern 主题测试、Message/Notification sideEffects 回归测试落地 |
 
 ### 4.2 中期架构任务
 

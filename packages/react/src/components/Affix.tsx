@@ -21,6 +21,7 @@ export const Affix: React.FC<AffixProps> = ({
   target,
   zIndex = 10,
   className,
+  style,
   children,
   onChange,
   ...props
@@ -121,6 +122,10 @@ export const Affix: React.FC<AffixProps> = ({
   }, [offsetTop, offsetBottom, target, recalcStyle])
 
   const wrapperClasses = useMemo(() => classNames(className), [className])
+  const wrapperStyle = useMemo(
+    () => (state.affixed ? { ...(state.style as React.CSSProperties), ...style } : style),
+    [state.affixed, state.style, style]
+  )
 
   const sentinel = (
     <div
@@ -140,11 +145,7 @@ export const Affix: React.FC<AffixProps> = ({
             height: originalRectRef.current?.height ?? 0
           }}
         />
-        <div
-          ref={wrapperRef}
-          className={wrapperClasses}
-          style={state.style as React.CSSProperties}
-          {...props}>
+        <div ref={wrapperRef} className={wrapperClasses} style={wrapperStyle} {...props}>
           {children}
         </div>
       </div>
@@ -154,7 +155,7 @@ export const Affix: React.FC<AffixProps> = ({
   return (
     <div>
       {sentinel}
-      <div ref={wrapperRef} className={wrapperClasses} {...props}>
+      <div ref={wrapperRef} className={wrapperClasses} style={wrapperStyle} {...props}>
         {children}
       </div>
     </div>
