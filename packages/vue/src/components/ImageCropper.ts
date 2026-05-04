@@ -209,6 +209,57 @@ export const ImageCropper = defineComponent({
       document.addEventListener('touchend', onTouchEnd)
     }
 
+    const updateCropRect = (nextRect: CropRect) => {
+      cropRect.value = nextRect
+      emit('crop-change', cropRect.value)
+    }
+
+    const getKeyboardDelta = (e: KeyboardEvent): { dx: number; dy: number } | null => {
+      const step = e.shiftKey ? 10 : 1
+      switch (e.key) {
+        case 'ArrowLeft':
+          return { dx: -step, dy: 0 }
+        case 'ArrowRight':
+          return { dx: step, dy: 0 }
+        case 'ArrowUp':
+          return { dx: 0, dy: -step }
+        case 'ArrowDown':
+          return { dx: 0, dy: step }
+        default:
+          return null
+      }
+    }
+
+    const handleMoveKeyDown = (e: KeyboardEvent) => {
+      const delta = getKeyboardDelta(e)
+      if (!delta) return
+
+      e.preventDefault()
+      updateCropRect(
+        moveCropRect(cropRect.value, delta.dx, delta.dy, displayWidth.value, displayHeight.value)
+      )
+    }
+
+    const handleResizeKeyDown = (e: KeyboardEvent, handle: CropHandle) => {
+      const delta = getKeyboardDelta(e)
+      if (!delta) return
+
+      e.preventDefault()
+      updateCropRect(
+        resizeCropRect(
+          cropRect.value,
+          handle,
+          delta.dx,
+          delta.dy,
+          displayWidth.value,
+          displayHeight.value,
+          props.aspectRatio,
+          props.minWidth,
+          props.minHeight
+        )
+      )
+    }
+
     // Expose getCropResult method
     const getCropResult = (): Promise<CropResult> => {
       return new Promise((resolve, reject) => {
@@ -349,8 +400,12 @@ export const ImageCropper = defineComponent({
           width: `${cr.width}px`,
           height: `${cr.height}px`
         },
+        role: 'button',
+        tabindex: 0,
+        'aria-label': 'Move crop area',
         onMousedown: (e: MouseEvent) => handleMouseDown(e, 'move'),
-        onTouchstart: (e: TouchEvent) => handleTouchStart(e, 'move')
+        onTouchstart: (e: TouchEvent) => handleTouchStart(e, 'move'),
+        onKeydown: handleMoveKeyDown
       })
 
       // Guide lines (rule of thirds)
@@ -420,8 +475,12 @@ export const ImageCropper = defineComponent({
         return h('div', {
           class: getCropperHandleClasses(handle),
           style: pos,
+          role: 'button',
+          tabindex: 0,
+          'aria-label': `Resize crop area ${handle}`,
           onMousedown: (e: MouseEvent) => handleMouseDown(e, 'resize', handle),
-          onTouchstart: (e: TouchEvent) => handleTouchStart(e, 'resize', handle)
+          onTouchstart: (e: TouchEvent) => handleTouchStart(e, 'resize', handle),
+          onKeydown: (e: KeyboardEvent) => handleResizeKeyDown(e, handle)
         })
       })
 

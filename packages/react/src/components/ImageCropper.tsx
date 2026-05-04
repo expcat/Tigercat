@@ -240,6 +240,70 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
       [cropRect, aspectRatio, minWidth, minHeight, onCropChange]
     )
 
+    const updateCropRect = useCallback(
+      (nextRect: CropRect) => {
+        setCropRect(nextRect)
+        onCropChange?.(nextRect)
+      },
+      [onCropChange]
+    )
+
+    const handleMoveKeyDown = useCallback(
+      (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const step = e.shiftKey ? 10 : 1
+        const deltas: Record<string, { dx: number; dy: number } | undefined> = {
+          ArrowLeft: { dx: -step, dy: 0 },
+          ArrowRight: { dx: step, dy: 0 },
+          ArrowUp: { dx: 0, dy: -step },
+          ArrowDown: { dx: 0, dy: step }
+        }
+        const delta = deltas[e.key]
+        if (!delta) return
+
+        e.preventDefault()
+        updateCropRect(
+          moveCropRect(
+            cropRect,
+            delta.dx,
+            delta.dy,
+            displayDimsRef.current.w,
+            displayDimsRef.current.h
+          )
+        )
+      },
+      [cropRect, updateCropRect]
+    )
+
+    const handleResizeKeyDown = useCallback(
+      (e: React.KeyboardEvent<HTMLDivElement>, handle: CropHandle) => {
+        const step = e.shiftKey ? 10 : 1
+        const deltas: Record<string, { dx: number; dy: number } | undefined> = {
+          ArrowLeft: { dx: -step, dy: 0 },
+          ArrowRight: { dx: step, dy: 0 },
+          ArrowUp: { dx: 0, dy: -step },
+          ArrowDown: { dx: 0, dy: step }
+        }
+        const delta = deltas[e.key]
+        if (!delta) return
+
+        e.preventDefault()
+        updateCropRect(
+          resizeCropRect(
+            cropRect,
+            handle,
+            delta.dx,
+            delta.dy,
+            displayDimsRef.current.w,
+            displayDimsRef.current.h,
+            aspectRatio,
+            minWidth,
+            minHeight
+          )
+        )
+      },
+      [cropRect, aspectRatio, minWidth, minHeight, updateCropRect]
+    )
+
     const containerClasses = useMemo(
       () => classNames(imageCropperContainerClasses, className),
       [className]
@@ -321,8 +385,12 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
             width: `${cr.width}px`,
             height: `${cr.height}px`
           }}
+          role="button"
+          tabIndex={0}
+          aria-label="Move crop area"
           onMouseDown={(e) => handleMouseDown(e, 'move')}
           onTouchStart={(e) => handleTouchStart(e, 'move')}
+          onKeyDown={handleMoveKeyDown}
         />
 
         {/* Guide lines */}
@@ -390,8 +458,12 @@ export const ImageCropper = forwardRef<ImageCropperRef, ImageCropperProps>(
               key={handle}
               className={getCropperHandleClasses(handle)}
               style={pos}
+              role="button"
+              tabIndex={0}
+              aria-label={`Resize crop area ${handle}`}
               onMouseDown={(e) => handleMouseDown(e, 'resize', handle)}
               onTouchStart={(e) => handleTouchStart(e, 'resize', handle)}
+              onKeyDown={(e) => handleResizeKeyDown(e, handle)}
             />
           )
         })}
