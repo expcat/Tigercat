@@ -299,7 +299,6 @@ export const FormItem: React.FC<FormItemProps> = ({
           aria-labelledby={label ? labelId : undefined}
           aria-describedby={describedById}
           aria-invalid={hasError ? true : undefined}
-          aria-required={isRequired ? true : undefined}
           onBlur={isClonableChild ? undefined : handleBlur}
           onChange={isClonableChild ? undefined : handleChange}>
           {enhancedChild}

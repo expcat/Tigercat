@@ -377,7 +377,6 @@ export const FormItem = defineComponent({
               'aria-labelledby': props.label ? labelId : undefined,
               'aria-describedby': describedById.value,
               'aria-invalid': hasError.value ? 'true' : undefined,
-              'aria-required': isRequired.value ? 'true' : undefined,
               onFocusout: isSingleVNode ? undefined : handleBlur,
               onInput: isSingleVNode ? undefined : handleChange
             },
