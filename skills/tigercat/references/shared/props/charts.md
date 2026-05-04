@@ -32,18 +32,19 @@ description: Shared charts props and concepts
 
 ## 通用 Props
 
-| Prop        | Type                                         | Default  | Description   |
-| ----------- | -------------------------------------------- | -------- | ------------- |
-| width       | `number`                                     | `320`    | 宽度 (px)     |
-| height      | `number`                                     | `200`    | 高度 (px)     |
-| padding     | `number \| { top?, right?, bottom?, left? }` | `24`     | 内边距        |
-| colors      | `string[]`                                   | 主题色板 | 系列/扇形颜色 |
-| showGrid    | `boolean`                                    | `true`   | 显示网格      |
-| showAxis    | `boolean`                                    | `true`   | 显示坐标轴    |
-| showLegend  | `boolean`                                    | `false`  | 显示图例      |
-| showTooltip | `boolean`                                    | `true`   | 显示提示      |
-| hoverable   | `boolean`                                    | `false`  | 悬停交互      |
-| selectable  | `boolean`                                    | `false`  | 点击选择      |
+| Prop        | Type                                         | Default  | Description    |
+| ----------- | -------------------------------------------- | -------- | -------------- |
+| width       | `number`                                     | `320`    | 宽度 (px)      |
+| height      | `number`                                     | `200`    | 高度 (px)      |
+| responsive  | `boolean`                                    | `false`  | 跟随父容器尺寸 |
+| padding     | `number \| { top?, right?, bottom?, left? }` | `24`     | 内边距         |
+| colors      | `string[]`                                   | 主题色板 | 系列/扇形颜色  |
+| showGrid    | `boolean`                                    | `true`   | 显示网格       |
+| showAxis    | `boolean`                                    | `true`   | 显示坐标轴     |
+| showLegend  | `boolean`                                    | `false`  | 显示图例       |
+| showTooltip | `boolean`                                    | `true`   | 显示提示       |
+| hoverable   | `boolean`                                    | `false`  | 悬停交互       |
+| selectable  | `boolean`                                    | `false`  | 点击选择       |
 
 ## 数据格式
 

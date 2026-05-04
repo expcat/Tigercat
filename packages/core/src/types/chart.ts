@@ -276,6 +276,12 @@ export interface ChartCanvasProps {
   height?: number
 
   /**
+   * Resize the SVG to its parent container using ResizeObserver
+   * @default false
+   */
+  responsive?: boolean
+
+  /**
    * Inner padding for chart drawing area
    * @default 24
    */

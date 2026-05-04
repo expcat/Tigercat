@@ -1,10 +1,13 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, onBeforeUnmount, onMounted, PropType, ref, watch } from 'vue'
 import {
   chartCanvasBaseClasses,
   classNames,
   coerceClassValue,
+  createChartResizeObserverController,
   getChartInnerRect,
+  resolveResponsiveChartSize,
   type ChartCanvasProps,
+  type ChartCanvasSize,
   type ChartPadding
 } from '@expcat/tigercat-core'
 
@@ -24,6 +27,10 @@ export const ChartCanvas = defineComponent({
       type: Number,
       default: 200
     },
+    responsive: {
+      type: Boolean,
+      default: false
+    },
     padding: {
       type: [Number, Object] as PropType<ChartPadding>,
       default: 24
@@ -39,7 +46,22 @@ export const ChartCanvas = defineComponent({
     }
   },
   setup(props, { slots, attrs }) {
-    const innerRect = computed(() => getChartInnerRect(props.width, props.height, props.padding))
+    const svgRef = ref<SVGSVGElement | null>(null)
+    const observedSize = ref<ChartCanvasSize | null>(null)
+    const resizeController = createChartResizeObserverController({
+      onSizeChange: (size) => {
+        observedSize.value = size
+      }
+    })
+    const resolvedSize = computed(() =>
+      resolveResponsiveChartSize(
+        { width: props.width, height: props.height },
+        props.responsive ? observedSize.value : null
+      )
+    )
+    const innerRect = computed(() =>
+      getChartInnerRect(resolvedSize.value.width, resolvedSize.value.height, props.padding)
+    )
     const svgClasses = computed(() =>
       classNames(chartCanvasBaseClasses, coerceClassValue(attrs.class), props.className)
     )
@@ -48,15 +70,34 @@ export const ChartCanvas = defineComponent({
       ...(attrs.style as Record<string, unknown> | undefined)
     }))
 
+    const syncResponsiveObserver = () => {
+      if (!props.responsive) {
+        resizeController.disconnect()
+        observedSize.value = null
+        return
+      }
+
+      const target = svgRef.value?.parentElement
+      if (target) {
+        resizeController.observe(target)
+      }
+    }
+
+    onMounted(syncResponsiveObserver)
+    watch(() => props.responsive, syncResponsiveObserver)
+    onBeforeUnmount(() => resizeController.disconnect())
+
     return () => {
       const rect = innerRect.value
+      const size = resolvedSize.value
       return h(
         'svg',
         {
           ...attrs,
-          width: props.width,
-          height: props.height,
-          viewBox: `0 0 ${props.width} ${props.height}`,
+          ref: svgRef,
+          width: size.width,
+          height: size.height,
+          viewBox: `0 0 ${size.width} ${size.height}`,
           class: svgClasses.value,
           style: svgStyle.value
         },

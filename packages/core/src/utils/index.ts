@@ -121,6 +121,9 @@ export * from './repeat-action-utils'
 // Group component utilities (v0.9.0+)
 export * from './group-utils'
 
+// Chart resize utilities (v0.9.0+)
+export * from './chart-resize-utils'
+
 // PrintLayout utilities (v0.9.0+)
 export * from './print-layout-utils'
 
