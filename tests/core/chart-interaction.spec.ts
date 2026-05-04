@@ -1,14 +1,41 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
   createChartInteractionHandlers,
+  createChartPointerMoveScheduler,
   getActiveIndex,
   getChartElementOpacity,
   defaultTooltipFormatter,
   getChartAnimationStyle,
   getChartEntranceTransform,
   chartInteractiveClasses,
+  type ChartFrameCallback,
   type ChartInteractionState
 } from '@expcat/tigercat-core'
+
+function createFrameScheduler() {
+  let nextHandle = 1
+  const callbacks = new Map<number, ChartFrameCallback>()
+
+  return {
+    requestFrame(callback: ChartFrameCallback) {
+      const handle = nextHandle
+      nextHandle += 1
+      callbacks.set(handle, callback)
+      return handle
+    },
+    cancelFrame(handle: number) {
+      callbacks.delete(handle)
+    },
+    flush(timestamp = 0) {
+      const frameCallbacks = [...callbacks.values()]
+      callbacks.clear()
+      frameCallbacks.forEach((callback) => callback(timestamp))
+    },
+    pendingCount() {
+      return callbacks.size
+    }
+  }
+}
 
 describe('chart-interaction', () => {
   // ==========================================================================
@@ -302,6 +329,66 @@ describe('chart-interaction', () => {
 
     it('has active class', () => {
       expect(chartInteractiveClasses.active).toContain('ring')
+    })
+  })
+
+  describe('createChartPointerMoveScheduler', () => {
+    it('batches pointer positions to one animation frame', () => {
+      const scheduler = createFrameScheduler()
+      const onPositionChange = vi.fn()
+      const controller = createChartPointerMoveScheduler({
+        onPositionChange,
+        requestFrame: scheduler.requestFrame,
+        cancelFrame: scheduler.cancelFrame
+      })
+
+      controller.schedule({ x: 10, y: 20 })
+      controller.schedule({ x: 30, y: 40 })
+      controller.schedule({ x: 50, y: 60 })
+
+      expect(controller.isPending()).toBe(true)
+      expect(scheduler.pendingCount()).toBe(1)
+      expect(onPositionChange).not.toHaveBeenCalled()
+
+      scheduler.flush()
+
+      expect(controller.isPending()).toBe(false)
+      expect(onPositionChange).toHaveBeenCalledTimes(1)
+      expect(onPositionChange).toHaveBeenCalledWith({ x: 50, y: 60 })
+    })
+
+    it('cancels queued pointer updates', () => {
+      const scheduler = createFrameScheduler()
+      const onPositionChange = vi.fn()
+      const controller = createChartPointerMoveScheduler({
+        onPositionChange,
+        requestFrame: scheduler.requestFrame,
+        cancelFrame: scheduler.cancelFrame
+      })
+
+      controller.schedule({ x: 10, y: 20 })
+      controller.cancel()
+      scheduler.flush()
+
+      expect(controller.isPending()).toBe(false)
+      expect(onPositionChange).not.toHaveBeenCalled()
+    })
+
+    it('flushes queued pointer updates immediately', () => {
+      const scheduler = createFrameScheduler()
+      const onPositionChange = vi.fn()
+      const controller = createChartPointerMoveScheduler({
+        onPositionChange,
+        requestFrame: scheduler.requestFrame,
+        cancelFrame: scheduler.cancelFrame
+      })
+
+      controller.schedule({ x: 15, y: 25 })
+      controller.flush()
+
+      expect(controller.isPending()).toBe(false)
+      expect(scheduler.pendingCount()).toBe(0)
+      expect(onPositionChange).toHaveBeenCalledWith({ x: 15, y: 25 })
     })
   })
 })

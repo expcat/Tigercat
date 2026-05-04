@@ -1,6 +1,7 @@
-import { ref, computed, type Ref, type ComputedRef } from 'vue'
+import { ref, computed, onScopeDispose, type Ref, type ComputedRef } from 'vue'
 import {
   classNames,
+  createChartPointerMoveScheduler,
   getChartElementOpacity,
   type ChartLegendItem,
   type ChartLegendPosition
@@ -100,6 +101,13 @@ export function useChartInteraction<T = unknown>(
   const localHoveredIndex = ref<number | null>(null)
   const localSelectedIndex = ref<number | null>(null)
   const tooltipPosition = ref({ x: 0, y: 0 })
+  const tooltipScheduler = createChartPointerMoveScheduler({
+    onPositionChange: (position) => {
+      tooltipPosition.value = position
+    }
+  })
+
+  onScopeDispose(() => tooltipScheduler.cancel())
 
   // Resolved indices (controlled vs uncontrolled)
   const resolvedHoveredIndex = computed(() => {
@@ -143,10 +151,11 @@ export function useChartInteraction<T = unknown>(
   }
 
   const handleMouseMove = (event: MouseEvent) => {
-    tooltipPosition.value = { x: event.clientX, y: event.clientY }
+    tooltipScheduler.schedule({ x: event.clientX, y: event.clientY })
   }
 
   const handleMouseLeave = () => {
+    tooltipScheduler.cancel()
     if (!unref(options.hoverable)) return
     if (options.hoveredIndexProp?.() === undefined) {
       localHoveredIndex.value = null

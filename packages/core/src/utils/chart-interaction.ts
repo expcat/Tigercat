@@ -23,6 +23,30 @@ export interface ChartInteractionHandlers<T = unknown> {
   onKeyDown: (event: KeyboardEvent, index: number, datum: T) => void
 }
 
+export type ChartFrameCallback = (timestamp: number) => void
+
+export type ChartFrameRequest = (callback: ChartFrameCallback) => number
+
+export type ChartFrameCancel = (handle: number) => void
+
+export interface ChartTooltipPosition {
+  x: number
+  y: number
+}
+
+export interface ChartPointerMoveSchedulerOptions {
+  onPositionChange: (position: ChartTooltipPosition) => void
+  requestFrame?: ChartFrameRequest
+  cancelFrame?: ChartFrameCancel
+}
+
+export interface ChartPointerMoveScheduler {
+  schedule: (position: ChartTooltipPosition) => void
+  flush: () => void
+  cancel: () => void
+  isPending: () => boolean
+}
+
 /**
  * Options for chart interaction behavior
  */
@@ -189,6 +213,72 @@ export const chartInteractiveClasses = {
   hoverable: 'cursor-pointer transition-opacity duration-150',
   selectable: 'cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
   active: 'ring-2 ring-[color:var(--tiger-primary,#2563eb)] ring-offset-1'
+}
+
+function requestDefaultFrame(callback: ChartFrameCallback): number {
+  if (globalThis.requestAnimationFrame) {
+    return globalThis.requestAnimationFrame(callback)
+  }
+
+  return globalThis.setTimeout(() => callback(globalThis.performance?.now?.() ?? Date.now()), 16)
+}
+
+function cancelDefaultFrame(handle: number): void {
+  if (globalThis.cancelAnimationFrame) {
+    globalThis.cancelAnimationFrame(handle)
+    return
+  }
+
+  globalThis.clearTimeout(handle)
+}
+
+export function createChartPointerMoveScheduler(
+  options: ChartPointerMoveSchedulerOptions
+): ChartPointerMoveScheduler {
+  const requestFrame = options.requestFrame ?? requestDefaultFrame
+  const cancelFrame = options.cancelFrame ?? cancelDefaultFrame
+  let frameHandle: number | undefined
+  let pendingPosition: ChartTooltipPosition | undefined
+
+  function applyPending(): void {
+    frameHandle = undefined
+    if (!pendingPosition) return
+
+    const nextPosition = pendingPosition
+    pendingPosition = undefined
+    options.onPositionChange(nextPosition)
+  }
+
+  function cancel(): void {
+    if (frameHandle !== undefined) {
+      cancelFrame(frameHandle)
+      frameHandle = undefined
+    }
+
+    pendingPosition = undefined
+  }
+
+  function flush(): void {
+    if (frameHandle !== undefined) {
+      cancelFrame(frameHandle)
+    }
+
+    applyPending()
+  }
+
+  function schedule(position: ChartTooltipPosition): void {
+    pendingPosition = position
+    if (frameHandle !== undefined) return
+
+    frameHandle = requestFrame(applyPending)
+  }
+
+  return {
+    schedule,
+    flush,
+    cancel,
+    isPending: () => frameHandle !== undefined
+  }
 }
 
 /**

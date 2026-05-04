@@ -4,7 +4,6 @@
 
 | 任务                       | 优先级 | 完成标准                                                                            |
 | -------------------------- | ------ | ----------------------------------------------------------------------------------- |
-| chart interaction rAF      | P1     | mousemove / hover 更新 throttle 到 `requestAnimationFrame`，并补高频事件测试        |
 | ChartCanvas ResizeObserver | P1     | 容器 resize 使用 ResizeObserver + rAF debounce；多个 chart 复用 observer 或共享策略 |
 | 数值轴 tick 缓存           | P1     | nice/tick 计算按 scale 输入缓存，避免每帧重复计算                                   |
 | Tooltip transform 定位     | P1     | tooltip 跟随使用 transform translate，避免 left/top reflow                          |

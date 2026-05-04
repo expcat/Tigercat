@@ -1,7 +1,37 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useChartInteraction } from '@expcat/tigercat-react'
 import type { UseChartInteractionOptions } from '@expcat/tigercat-react'
+
+function installFrameScheduler() {
+  let nextHandle = 1
+  const callbacks = new Map<number, FrameRequestCallback>()
+  const requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
+    const handle = nextHandle
+    nextHandle += 1
+    callbacks.set(handle, callback)
+    return handle
+  })
+  const cancelAnimationFrame = vi.fn((handle: number) => {
+    callbacks.delete(handle)
+  })
+
+  vi.stubGlobal('requestAnimationFrame', requestAnimationFrame)
+  vi.stubGlobal('cancelAnimationFrame', cancelAnimationFrame)
+
+  return {
+    requestAnimationFrame,
+    cancelAnimationFrame,
+    flush(timestamp = 0) {
+      const frameCallbacks = [...callbacks.values()]
+      callbacks.clear()
+      frameCallbacks.forEach((callback) => callback(timestamp))
+    },
+    pendingCount() {
+      return callbacks.size
+    }
+  }
+}
 
 describe('useChartInteraction (React)', () => {
   const mockData = [
@@ -34,6 +64,11 @@ describe('useChartInteraction (React)', () => {
     },
     getData: (index: number) => mockData[index],
     ...overrides
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
   })
 
   describe('initialization', () => {
@@ -84,7 +119,8 @@ describe('useChartInteraction (React)', () => {
       expect(result.current.tooltipPosition).toEqual({ x: 150, y: 250 })
     })
 
-    it('should update tooltip position on mouse move', () => {
+    it('should batch tooltip position updates on mouse move', () => {
+      const scheduler = installFrameScheduler()
       const { result } = renderHook(() => useChartInteraction(createTestOptions()))
 
       act(() => {
@@ -93,9 +129,48 @@ describe('useChartInteraction (React)', () => {
           clientY: 400
         }) as unknown as React.MouseEvent
         result.current.handleMouseMove(mockEvent)
+        const nextEvent = new MouseEvent('mousemove', {
+          clientX: 350,
+          clientY: 450
+        }) as unknown as React.MouseEvent
+        result.current.handleMouseMove(nextEvent)
       })
 
-      expect(result.current.tooltipPosition).toEqual({ x: 300, y: 400 })
+      expect(result.current.tooltipPosition).toEqual({ x: 0, y: 0 })
+      expect(scheduler.pendingCount()).toBe(1)
+      expect(scheduler.requestAnimationFrame).toHaveBeenCalledTimes(1)
+
+      act(() => {
+        scheduler.flush()
+      })
+
+      expect(result.current.tooltipPosition).toEqual({ x: 350, y: 450 })
+    })
+
+    it('should cancel queued tooltip updates on mouse leave', () => {
+      const scheduler = installFrameScheduler()
+      const { result } = renderHook(() => useChartInteraction(createTestOptions()))
+
+      act(() => {
+        const enterEvent = new MouseEvent('mouseenter', {
+          clientX: 100,
+          clientY: 200
+        }) as unknown as React.MouseEvent
+        result.current.handleMouseEnter(0, enterEvent)
+        const moveEvent = new MouseEvent('mousemove', {
+          clientX: 300,
+          clientY: 400
+        }) as unknown as React.MouseEvent
+        result.current.handleMouseMove(moveEvent)
+        result.current.handleMouseLeave()
+      })
+
+      act(() => {
+        scheduler.flush()
+      })
+
+      expect(result.current.tooltipPosition).toEqual({ x: 100, y: 200 })
+      expect(scheduler.cancelAnimationFrame).toHaveBeenCalledTimes(1)
     })
 
     it('should clear hovered index on mouse leave', () => {

@@ -1,9 +1,11 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import {
   classNames,
+  createChartPointerMoveScheduler,
   getChartElementOpacity,
   type ChartLegendItem,
-  type ChartLegendPosition
+  type ChartLegendPosition,
+  type ChartPointerMoveScheduler
 } from '@expcat/tigercat-core'
 
 /**
@@ -106,6 +108,19 @@ export function useChartInteraction<T = unknown>(
   const [localHoveredIndex, setLocalHoveredIndex] = useState<number | null>(null)
   const [localSelectedIndex, setLocalSelectedIndex] = useState<number | null>(null)
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+  const tooltipSchedulerRef = useRef<ChartPointerMoveScheduler | null>(null)
+
+  if (tooltipSchedulerRef.current === null) {
+    tooltipSchedulerRef.current = createChartPointerMoveScheduler({
+      onPositionChange: setTooltipPosition
+    })
+  }
+
+  const tooltipScheduler = tooltipSchedulerRef.current
+
+  useEffect(() => {
+    return () => tooltipScheduler.cancel()
+  }, [tooltipScheduler])
 
   // Resolved indices (controlled vs uncontrolled)
   const resolvedHoveredIndex = hoveredIndexProp !== undefined ? hoveredIndexProp : localHoveredIndex
@@ -146,18 +161,22 @@ export function useChartInteraction<T = unknown>(
     [hoverable, hoveredIndexProp, onHoveredIndexChange, callbacks, getData]
   )
 
-  const handleMouseMove = useCallback((event: React.MouseEvent) => {
-    setTooltipPosition({ x: event.clientX, y: event.clientY })
-  }, [])
+  const handleMouseMove = useCallback(
+    (event: React.MouseEvent) => {
+      tooltipScheduler.schedule({ x: event.clientX, y: event.clientY })
+    },
+    [tooltipScheduler]
+  )
 
   const handleMouseLeave = useCallback(() => {
+    tooltipScheduler.cancel()
     if (!hoverable) return
     if (hoveredIndexProp === undefined) {
       setLocalHoveredIndex(null)
     }
     onHoveredIndexChange?.(null)
     callbacks?.onHover?.(null, null)
-  }, [hoverable, hoveredIndexProp, onHoveredIndexChange, callbacks])
+  }, [hoverable, tooltipScheduler, hoveredIndexProp, onHoveredIndexChange, callbacks])
 
   const handleClick = useCallback(
     (index: number) => {
