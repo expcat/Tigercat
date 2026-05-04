@@ -1,9 +1,21 @@
-import { defineComponent, computed, inject, PropType, h } from 'vue'
+import {
+  defineComponent,
+  computed,
+  inject,
+  PropType,
+  h,
+  ref,
+  onMounted,
+  onBeforeUnmount,
+  watch
+} from 'vue'
 import {
   classNames,
   getCollapsePanelClasses,
   getCollapsePanelHeaderClasses,
   getCollapseIconClasses,
+  createCollapseTransitionController,
+  getInitialCollapseContentStyle,
   collapseHeaderTextClasses,
   collapsePanelContentWrapperClasses,
   collapsePanelContentBaseClasses,
@@ -82,6 +94,10 @@ export const CollapsePanel = defineComponent({
       return isPanelActive(props.panelKey, collapseContext.activeKeys)
     })
 
+    const contentRef = ref<HTMLElement>()
+    const initialContentStyle = getInitialCollapseContentStyle(isActive.value)
+    let transitionController: ReturnType<typeof createCollapseTransitionController> | undefined
+
     // Panel classes
     const panelClasses = computed(() => {
       return classNames(
@@ -118,6 +134,27 @@ export const CollapsePanel = defineComponent({
         collapseContext.handlePanelClick(props.panelKey)
       }
     }
+
+    onMounted(() => {
+      if (!contentRef.value) return
+
+      transitionController = createCollapseTransitionController(contentRef.value, {
+        expanded: isActive.value
+      })
+    })
+
+    watch(
+      isActive,
+      (expanded) => {
+        transitionController?.update(expanded)
+      },
+      { flush: 'post' }
+    )
+
+    onBeforeUnmount(() => {
+      transitionController?.dispose()
+      transitionController = undefined
+    })
 
     return () => {
       const headerSlot = slots.header?.()
@@ -191,11 +228,10 @@ export const CollapsePanel = defineComponent({
       const content = h(
         'div',
         {
+          ref: contentRef,
+          'data-tiger-collapse-content': '',
           class: collapsePanelContentWrapperClasses,
-          style: {
-            maxHeight: isActive.value ? 'none' : '0',
-            opacity: isActive.value ? '1' : '0'
-          }
+          style: initialContentStyle
         },
         [
           h(

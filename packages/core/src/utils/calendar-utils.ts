@@ -1,4 +1,5 @@
 import { classNames } from './class-names'
+import { getCalendarDays } from './date-utils'
 
 /* ------------------------------------------------------------------ */
 /*  Style constants                                                    */
@@ -82,27 +83,5 @@ export const MONTHS = [
 ]
 
 export function getMonthDays(year: number, month: number): Date[] {
-  const firstDay = new Date(year, month, 1)
-  const startOffset = firstDay.getDay() // 0=Sun
-
-  const days: Date[] = []
-
-  // Previous month fill
-  for (let i = startOffset - 1; i >= 0; i--) {
-    days.push(new Date(year, month, -i))
-  }
-
-  // Current month
-  const daysInMonth = new Date(year, month + 1, 0).getDate()
-  for (let d = 1; d <= daysInMonth; d++) {
-    days.push(new Date(year, month, d))
-  }
-
-  // Next month fill to 42 cells (6 rows)
-  while (days.length < 42) {
-    const last = days[days.length - 1]
-    days.push(new Date(last.getFullYear(), last.getMonth(), last.getDate() + 1))
-  }
-
-  return days
+  return getCalendarDays(year, month) as Date[]
 }

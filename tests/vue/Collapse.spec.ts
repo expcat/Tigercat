@@ -2,10 +2,41 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { h } from 'vue'
 import { Collapse, CollapsePanel } from '@expcat/tigercat-vue'
+
+function createFrameScheduler() {
+  let nextFrame = 1
+  const callbacks = new Map<number, FrameRequestCallback>()
+  const requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
+    const frame = nextFrame++
+    callbacks.set(frame, callback)
+    return frame
+  })
+  const cancelAnimationFrame = vi.fn((frame: number) => {
+    callbacks.delete(frame)
+  })
+
+  return {
+    requestAnimationFrame,
+    cancelAnimationFrame,
+    flush(frame = [...callbacks.keys()][0]) {
+      const callback = callbacks.get(frame)
+      callbacks.delete(frame)
+      callback?.(16)
+    }
+  }
+}
+
+function getContentWrapper(text: string): HTMLElement {
+  return screen.getByText(text).closest('[data-tiger-collapse-content]') as HTMLElement
+}
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
 
 describe('Collapse', () => {
   describe('Rendering', () => {
@@ -217,7 +248,11 @@ describe('Collapse', () => {
       render(Collapse, {
         slots: {
           default: () => [
-            h(CollapsePanel, { panelKey: '1', header: 'Panel 1', disabled: true }, () => 'Content 1')
+            h(
+              CollapsePanel,
+              { panelKey: '1', header: 'Panel 1', disabled: true },
+              () => 'Content 1'
+            )
           ]
         }
       })
@@ -261,6 +296,53 @@ describe('Collapse', () => {
       panelHeader!.focus()
       await fireEvent.keyDown(panelHeader!, { key: ' ' })
       expect(panelHeader).toHaveAttribute('aria-expanded', 'true')
+    })
+
+    it('should expand content height on the next animation frame', async () => {
+      const scheduler = createFrameScheduler()
+      vi.stubGlobal('requestAnimationFrame', scheduler.requestAnimationFrame)
+      vi.stubGlobal('cancelAnimationFrame', scheduler.cancelAnimationFrame)
+
+      render(Collapse, {
+        slots: {
+          default: () => [h(CollapsePanel, { panelKey: '1', header: 'Panel 1' }, () => 'Content 1')]
+        }
+      })
+
+      const wrapper = getContentWrapper('Content 1')
+      Object.defineProperty(wrapper, 'scrollHeight', { value: 80, configurable: true })
+
+      await fireEvent.click(screen.getByText('Panel 1').closest('[role="button"]')!)
+
+      expect(scheduler.requestAnimationFrame).toHaveBeenCalledTimes(1)
+      expect(wrapper.style.maxHeight).toBe('0px')
+
+      scheduler.flush()
+      expect(wrapper.style.maxHeight).toBe('80px')
+      expect(wrapper.style.opacity).toBe('1')
+    })
+
+    it('should collapse content height on the next animation frame', async () => {
+      const scheduler = createFrameScheduler()
+      vi.stubGlobal('requestAnimationFrame', scheduler.requestAnimationFrame)
+      vi.stubGlobal('cancelAnimationFrame', scheduler.cancelAnimationFrame)
+
+      render(Collapse, {
+        props: { defaultActiveKey: '1' },
+        slots: {
+          default: () => [h(CollapsePanel, { panelKey: '1', header: 'Panel 1' }, () => 'Content 1')]
+        }
+      })
+
+      const wrapper = getContentWrapper('Content 1')
+      Object.defineProperty(wrapper, 'scrollHeight', { value: 64, configurable: true })
+
+      await fireEvent.click(screen.getByText('Panel 1').closest('[role="button"]')!)
+
+      expect(wrapper.style.maxHeight).toBe('64px')
+      scheduler.flush()
+      expect(wrapper.style.maxHeight).toBe('0px')
+      expect(wrapper.style.opacity).toBe('0')
     })
   })
 
@@ -340,7 +422,11 @@ describe('Collapse', () => {
       const { container } = render(Collapse, {
         slots: {
           default: () => [
-            h(CollapsePanel, { panelKey: '1', header: 'Panel 1', showArrow: false }, () => 'Content 1')
+            h(
+              CollapsePanel,
+              { panelKey: '1', header: 'Panel 1', showArrow: false },
+              () => 'Content 1'
+            )
           ]
         }
       })
@@ -419,7 +505,11 @@ describe('Collapse', () => {
       render(Collapse, {
         slots: {
           default: () => [
-            h(CollapsePanel, { panelKey: '1', header: 'Panel 1', disabled: true }, () => 'Content 1')
+            h(
+              CollapsePanel,
+              { panelKey: '1', header: 'Panel 1', disabled: true },
+              () => 'Content 1'
+            )
           ]
         }
       })

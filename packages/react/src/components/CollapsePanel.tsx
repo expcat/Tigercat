@@ -1,9 +1,11 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useLayoutEffect, useRef } from 'react'
 import {
   classNames,
   getCollapsePanelClasses,
   getCollapsePanelHeaderClasses,
   getCollapseIconClasses,
+  createCollapseTransitionController,
+  getInitialCollapseContentStyle,
   collapseHeaderTextClasses,
   collapsePanelContentWrapperClasses,
   collapsePanelContentBaseClasses,
@@ -46,6 +48,11 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
 }) => {
   // Get collapse context
   const collapseContext = useCollapseContext()
+  const contentRef = useRef<HTMLDivElement>(null)
+  const transitionControllerRef = useRef<ReturnType<
+    typeof createCollapseTransitionController
+  > | null>(null)
+  const initialContentStyleRef = useRef<React.CSSProperties>(getInitialCollapseContentStyle(false))
 
   if (!collapseContext) {
     throw new Error('CollapsePanel must be used within a Collapse component')
@@ -55,6 +62,10 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
   const isActive = useMemo(() => {
     return isPanelActive(panelKey, collapseContext.activeKeys)
   }, [panelKey, collapseContext.activeKeys])
+
+  if (!transitionControllerRef.current) {
+    initialContentStyleRef.current = getInitialCollapseContentStyle(isActive)
+  }
 
   // Panel classes
   const panelClasses = useMemo(() => {
@@ -93,6 +104,24 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
     [disabled, collapseContext.handlePanelClick, panelKey]
   )
 
+  useLayoutEffect(() => {
+    if (!contentRef.current) return undefined
+
+    const controller = createCollapseTransitionController(contentRef.current, {
+      expanded: isActive
+    })
+    transitionControllerRef.current = controller
+
+    return () => {
+      transitionControllerRef.current = null
+      controller.dispose()
+    }
+  }, [])
+
+  useLayoutEffect(() => {
+    transitionControllerRef.current?.update(isActive)
+  }, [isActive])
+
   // Arrow icon
   const arrowIcon = (
     <svg
@@ -101,8 +130,7 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
       height="16"
       viewBox="0 0 16 16"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+      xmlns="http://www.w3.org/2000/svg">
       <path
         d="M6 12L10 8L6 4"
         stroke="currentColor"
@@ -123,8 +151,7 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
         aria-expanded={isActive}
         aria-disabled={disabled}
         onClick={handleClick}
-        onKeyDown={handleKeyDown}
-      >
+        onKeyDown={handleKeyDown}>
         {/* Arrow icon at start */}
         {showArrow && collapseContext.expandIconPosition === 'start' && arrowIcon}
 
@@ -140,12 +167,10 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
 
       {/* Content with animation wrapper */}
       <div
+        ref={contentRef}
+        data-tiger-collapse-content=""
         className={collapsePanelContentWrapperClasses}
-        style={{
-          maxHeight: isActive ? 'none' : '0',
-          opacity: isActive ? '1' : '0'
-        }}
-      >
+        style={initialContentStyleRef.current}>
         <div className={collapsePanelContentBaseClasses}>{children}</div>
       </div>
     </div>

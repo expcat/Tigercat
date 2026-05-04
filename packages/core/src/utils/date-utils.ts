@@ -117,34 +117,72 @@ export function getFirstDayOfMonth(year: number, month: number): number {
   return new Date(year, month, 1).getDay()
 }
 
+const calendarMonthDaysCache = new Map<string, readonly number[]>()
+const maxCalendarMonthDaysCacheSize = 48
+
+function getNormalizedMonth(year: number, month: number): { year: number; month: number } {
+  const date = new Date(year, month, 1)
+  return {
+    year: date.getFullYear(),
+    month: date.getMonth()
+  }
+}
+
+function getCalendarMonthDaysCacheKey(year: number, month: number): string {
+  return `${year}:${month}`
+}
+
+export function clearCalendarMonthDaysCache(): void {
+  calendarMonthDaysCache.clear()
+}
+
+export function getCalendarMonthDaysCacheSize(): number {
+  return calendarMonthDaysCache.size
+}
+
+function getCalendarDayTimeValues(year: number, month: number): readonly number[] {
+  const normalized = getNormalizedMonth(year, month)
+  const cacheKey = getCalendarMonthDaysCacheKey(normalized.year, normalized.month)
+  const cachedDays = calendarMonthDaysCache.get(cacheKey)
+  if (cachedDays) return cachedDays
+
+  const firstDay = getFirstDayOfMonth(normalized.year, normalized.month)
+  const daysInMonth = getDaysInMonth(normalized.year, normalized.month)
+  const daysInPrevMonth = getDaysInMonth(normalized.year, normalized.month - 1)
+
+  const days: number[] = []
+
+  for (let i = firstDay - 1; i >= 0; i--) {
+    days.push(new Date(normalized.year, normalized.month - 1, daysInPrevMonth - i).getTime())
+  }
+
+  for (let i = 1; i <= daysInMonth; i++) {
+    days.push(new Date(normalized.year, normalized.month, i).getTime())
+  }
+
+  const remainingDays = 42 - days.length
+  for (let i = 1; i <= remainingDays; i++) {
+    days.push(new Date(normalized.year, normalized.month + 1, i).getTime())
+  }
+
+  if (calendarMonthDaysCache.size >= maxCalendarMonthDaysCacheSize) {
+    const firstKey = calendarMonthDaysCache.keys().next().value
+    if (firstKey) {
+      calendarMonthDaysCache.delete(firstKey)
+    }
+  }
+
+  const frozenDays = Object.freeze(days)
+  calendarMonthDaysCache.set(cacheKey, frozenDays)
+  return frozenDays
+}
+
 /**
  * Get calendar days for a given month
  * Returns array of dates including padding days from previous/next months
  */
 export function getCalendarDays(year: number, month: number): (Date | null)[] {
-  const firstDay = getFirstDayOfMonth(year, month)
-  const daysInMonth = getDaysInMonth(year, month)
-  const daysInPrevMonth = getDaysInMonth(year, month - 1)
-
-  const days: (Date | null)[] = []
-
-  // Previous month's days
-  for (let i = firstDay - 1; i >= 0; i--) {
-    days.push(new Date(year, month - 1, daysInPrevMonth - i))
-  }
-
-  // Current month's days
-  for (let i = 1; i <= daysInMonth; i++) {
-    days.push(new Date(year, month, i))
-  }
-
-  // Next month's days (to fill the grid)
-  const remainingDays = 42 - days.length // 6 rows × 7 days
-  for (let i = 1; i <= remainingDays; i++) {
-    days.push(new Date(year, month + 1, i))
-  }
-
-  return days
+  return getCalendarDayTimeValues(year, month).map((time) => new Date(time))
 }
 
 const intlCache = new Map<string, Intl.DateTimeFormat>()
