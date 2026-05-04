@@ -335,6 +335,7 @@ const value = ref('male')
   <DatePicker v-model="date" disabled />
   <DatePicker v-model="date" clearable @clear="onClear" />
   <DatePicker v-model="date" locale="zh-CN" :labels="{ today: '今日' }" />
+  <DatePicker v-model="date" :locale="ZH_CN_DATEPICKER_LOCALE" />
 </template>
 ```
 

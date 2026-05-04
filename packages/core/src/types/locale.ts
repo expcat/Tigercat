@@ -1,3 +1,5 @@
+import type { DatePickerLocalePreset } from './datepicker'
+
 export interface TigerLocaleCommon {
   okText?: string
   cancelText?: string
@@ -90,6 +92,7 @@ export interface TigerLocale {
   drawer?: TigerLocaleDrawer
   upload?: TigerLocaleUpload
   pagination?: TigerLocalePagination
+  datePicker?: Partial<DatePickerLocalePreset>
   formWizard?: TigerLocaleFormWizard
   taskBoard?: TigerLocaleTaskBoard
 }

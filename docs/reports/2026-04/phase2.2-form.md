@@ -4,7 +4,6 @@
 
 | 任务                       | 优先级 | 完成标准                                                                                    |
 | -------------------------- | ------ | ------------------------------------------------------------------------------------------- |
-| DatePicker locale 子路径   | P1     | 日期面板文案支持按需 locale 导入，不通过主入口拉取全部语言                                  |
 | Form 校验复杂度            | P1     | 验证 item validate 不触发 O(N²) 全量遍历；必要时加入索引或依赖图缓存                        |
 | picker-utils 二期          | P1     | AutoComplete / Cascader / TreeSelect / Transfer 按各自交互语义复用键盘、过滤、ARIA 公共逻辑 |
 | Radio / Checkbox icon 体积 | P2     | 评估 CSS mask 替代 inline SVG 的收益和兼容性                                                |

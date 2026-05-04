@@ -19,7 +19,7 @@
 | Core utils            | `BaseInteractiveProps` / `BaseFormControlProps` / `BaseLayoutProps` 未落地；`animation.ts` / `transition.ts` 仍未合并为 `motion/`；`helpers/` 目录未按 dom/class/motion 细分；死代码扫描未执行                                                      |
 | i18n / CLI / examples | `defineLocale`、ConfigProvider 异步 locale、根入口 locale tree-shaking 方案仍未完成；commander 14 等 Node 20+；workspace catalog/overrides 未配置；CLI Windows shim 与 `doctor` 命令仍待做                                                          |
 | Basic                 | Empty 默认插画体积、Divider 文件合并评估仍待做                                                                                                                                                                                                      |
-| Form                  | DatePicker locale 子路径、Form O(N²) 校验、picker-utils 二期、Radio/Checkbox icon 体积、命令式 Form API 仍待评估或实现                                                                                                                              |
+| Form                  | Form O(N²) 校验、picker-utils 二期、Radio/Checkbox icon 体积、命令式 Form API 仍待评估或实现                                                                                                                                                        |
 | Feedback              | Watermark OffscreenCanvas/ResizeObserver、Notification stack rAF、Floating middleware 缓存、Loading overlay 复用仍待做                                                                                                                              |
 | Layout                | Splitter/Resizable 仍是组件内 mousemove；Carousel autoplay 仍用 `setInterval`；List 未复用 VirtualList；Row/Col 与 Descriptions 性能项未完成                                                                                                        |
 | Navigation            | Menu/Dropdown/Anchor/Breadcrumb/Steps/Tabs 父子组件同文件约定未落地；Pagination lazy locale / idle 校验、BackTop rAF、Menu 动画、Segmented transform 等仍待做                                                                                       |
@@ -49,3 +49,4 @@
 | 2026-05-04 | Upload 拖拽复用 PR           | Done | Upload drag over/leave/drop 复用 core helper；core/React/Vue Upload 聚焦测试 90 个通过；三端包构建通过                |
 | 2026-05-04 | Switch class composer PR     | Done | Switch 外层 class 合并收敛到 core `composeComponentClasses`；core/React/Vue Switch 聚焦测试 58 个通过；三端包构建通过 |
 | 2026-05-04 | Mentions 定位复核 PR         | Done | Mentions 下拉定位复用 core floating helper；core/React/Vue Mentions 聚焦测试 25 个通过；三端包构建通过                |
+| 2026-05-04 | DatePicker locale 子路径 PR  | Done | DatePicker 专用 locale preset 支持按子路径导入；core/React/Vue DatePicker 聚焦测试 65 个通过；三端包构建通过          |

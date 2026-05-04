@@ -415,26 +415,26 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Props
 
-| Prop         | Type                               | Default         | Vue | React | Description   |
-| ------------ | ---------------------------------- | --------------- | :-: | :---: | ------------- |
-| modelValue   | `Date \| string \| null \| [*, *]` | `null`          |  ✓  |   -   | 绑定值        |
-| value        | `Date \| string \| null \| [*, *]` | -               |  -  |   ✓   | 受控值        |
-| defaultValue | `Date \| string \| null \| [*, *]` | -               |  -  |   ✓   | 非受控默认值  |
-| range        | `boolean`                          | `false`         |  ✓  |   ✓   | 范围选择      |
-| size         | `'sm' \| 'md' \| 'lg'`             | `'md'`          |  ✓  |   ✓   | 尺寸          |
-| format       | `DateFormat`                       | `'yyyy-MM-dd'`  |  ✓  |   ✓   | 日期格式      |
-| placeholder  | `string`                           | `'Select date'` |  ✓  |   ✓   | 占位符        |
-| disabled     | `boolean`                          | `false`         |  ✓  |   ✓   | 禁用          |
-| readonly     | `boolean`                          | `false`         |  ✓  |   ✓   | 只读          |
-| required     | `boolean`                          | `false`         |  ✓  |   ✓   | 必填          |
-| minDate      | `Date \| string \| null`           | -               |  ✓  |   ✓   | 最小可选日期  |
-| maxDate      | `Date \| string \| null`           | -               |  ✓  |   ✓   | 最大可选日期  |
-| clearable    | `boolean`                          | `true`          |  ✓  |   ✓   | 显示清除按钮  |
-| locale       | `string`                           | -               |  ✓  |   ✓   | 国际化 locale |
-| labels       | `Partial<DatePickerLabels>`        | -               |  ✓  |   ✓   | 自定义文案    |
-| shortcuts    | `DatePickerShortcut[]`             | -               |  ✓  |   ✓   | 快捷选项列表  |
-| name         | `string`                           | -               |  ✓  |   ✓   | input name    |
-| id           | `string`                           | -               |  ✓  |   ✓   | input id      |
+| Prop         | Type                                                                          | Default         | Vue | React | Description   |
+| ------------ | ----------------------------------------------------------------------------- | --------------- | :-: | :---: | ------------- |
+| modelValue   | `Date \| string \| null \| [*, *]`                                            | `null`          |  ✓  |   -   | 绑定值        |
+| value        | `Date \| string \| null \| [*, *]`                                            | -               |  -  |   ✓   | 受控值        |
+| defaultValue | `Date \| string \| null \| [*, *]`                                            | -               |  -  |   ✓   | 非受控默认值  |
+| range        | `boolean`                                                                     | `false`         |  ✓  |   ✓   | 范围选择      |
+| size         | `'sm' \| 'md' \| 'lg'`                                                        | `'md'`          |  ✓  |   ✓   | 尺寸          |
+| format       | `DateFormat`                                                                  | `'yyyy-MM-dd'`  |  ✓  |   ✓   | 日期格式      |
+| placeholder  | `string`                                                                      | `'Select date'` |  ✓  |   ✓   | 占位符        |
+| disabled     | `boolean`                                                                     | `false`         |  ✓  |   ✓   | 禁用          |
+| readonly     | `boolean`                                                                     | `false`         |  ✓  |   ✓   | 只读          |
+| required     | `boolean`                                                                     | `false`         |  ✓  |   ✓   | 必填          |
+| minDate      | `Date \| string \| null`                                                      | -               |  ✓  |   ✓   | 最小可选日期  |
+| maxDate      | `Date \| string \| null`                                                      | -               |  ✓  |   ✓   | 最大可选日期  |
+| clearable    | `boolean`                                                                     | `true`          |  ✓  |   ✓   | 显示清除按钮  |
+| locale       | `string \| DatePickerLocalePreset \| { datePicker?: DatePickerLocalePreset }` | -               |  ✓  |   ✓   | 国际化 locale |
+| labels       | `Partial<DatePickerLabels>`                                                   | -               |  ✓  |   ✓   | 自定义文案    |
+| shortcuts    | `DatePickerShortcut[]`                                                        | -               |  ✓  |   ✓   | 快捷选项列表  |
+| name         | `string`                                                                      | -               |  ✓  |   ✓   | input name    |
+| id           | `string`                                                                      | -               |  ✓  |   ✓   | input id      |
 
 > `DatePickerShortcut = { label: string, value: Date | [Date, Date] | (() => Date | [Date, Date]) }`
 
@@ -529,26 +529,26 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Props
 
-| Prop                     | Type                                                      | Default | Vue | React | Description              |
-| ------------------------ | --------------------------------------------------------- | ------- | :-: | :---: | ------------------------ |
-| options                  | `AutoCompleteOption[]`                                    | `[]`    |  ✓  |   ✓   | 候选项列表               |
-| placeholder              | `string`                                                  | -       |  ✓  |   ✓   | 输入框占位符             |
-| size                     | `'sm' \| 'md' \| 'lg'`                                    | `'md'`  |  ✓  |   ✓   | 尺寸                     |
-| disabled                 | `boolean`                                                 | `false` |  ✓  |   ✓   | 禁用状态                 |
-| clearable                | `boolean`                                                 | `false` |  ✓  |   ✓   | 可清除                   |
-| notFoundText             | `string`                                                  | -       |  ✓  |   ✓   | 无匹配时文案             |
-| filterOption             | `boolean \| (input: string, option: AutoCompleteOption) => boolean` | `true`  |  ✓  |   ✓   | 筛选函数（false 禁用过滤）|
-| defaultActiveFirstOption | `boolean`                                                 | `true`  |  ✓  |   ✓   | 默认高亮第一项           |
-| allowFreeInput           | `boolean`                                                 | `true`  |  ✓  |   ✓   | 允许自由输入非候选值     |
-| className                | `string`                                                  | -       |  -  |   ✓   | 自定义类名               |
+| Prop                     | Type                                                                | Default | Vue | React | Description                |
+| ------------------------ | ------------------------------------------------------------------- | ------- | :-: | :---: | -------------------------- |
+| options                  | `AutoCompleteOption[]`                                              | `[]`    |  ✓  |   ✓   | 候选项列表                 |
+| placeholder              | `string`                                                            | -       |  ✓  |   ✓   | 输入框占位符               |
+| size                     | `'sm' \| 'md' \| 'lg'`                                              | `'md'`  |  ✓  |   ✓   | 尺寸                       |
+| disabled                 | `boolean`                                                           | `false` |  ✓  |   ✓   | 禁用状态                   |
+| clearable                | `boolean`                                                           | `false` |  ✓  |   ✓   | 可清除                     |
+| notFoundText             | `string`                                                            | -       |  ✓  |   ✓   | 无匹配时文案               |
+| filterOption             | `boolean \| (input: string, option: AutoCompleteOption) => boolean` | `true`  |  ✓  |   ✓   | 筛选函数（false 禁用过滤） |
+| defaultActiveFirstOption | `boolean`                                                           | `true`  |  ✓  |   ✓   | 默认高亮第一项             |
+| allowFreeInput           | `boolean`                                                           | `true`  |  ✓  |   ✓   | 允许自由输入非候选值       |
+| className                | `string`                                                            | -       |  -  |   ✓   | 自定义类名                 |
 
 ### Events
 
-| Vue Event   | React Prop | Payload                | Description  |
-| ----------- | ---------- | ---------------------- | ------------ |
-| `@change`   | `onChange`  | `(value: string)`      | 值变更       |
-| `@select`   | `onSelect`  | `(option: AutoCompleteOption)` | 选中候选项  |
-| `@search`   | `onSearch`  | `(value: string)`      | 搜索输入变更 |
+| Vue Event | React Prop | Payload                        | Description  |
+| --------- | ---------- | ------------------------------ | ------------ |
+| `@change` | `onChange` | `(value: string)`              | 值变更       |
+| `@select` | `onSelect` | `(option: AutoCompleteOption)` | 选中候选项   |
+| `@search` | `onSearch` | `(value: string)`              | 搜索输入变更 |
 
 ---
 
@@ -556,25 +556,25 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Props
 
-| Prop           | Type                              | Default   | Vue | React | Description                   |
-| -------------- | --------------------------------- | --------- | :-: | :---: | ----------------------------- |
-| options        | `CascaderOption[]`                | `[]`      |  ✓  |   ✓   | 层级选项数据                  |
-| placeholder    | `string`                          | -         |  ✓  |   ✓   | 占位符                        |
-| size           | `'sm' \| 'md' \| 'lg'`            | `'md'`    |  ✓  |   ✓   | 尺寸                          |
-| disabled       | `boolean`                         | `false`   |  ✓  |   ✓   | 禁用状态                      |
-| clearable      | `boolean`                         | `false`   |  ✓  |   ✓   | 可清除                        |
-| showSearch     | `boolean`                         | `false`   |  ✓  |   ✓   | 显示搜索框                    |
-| expandTrigger  | `'click' \| 'hover'`              | `'click'` |  ✓  |   ✓   | 子级展开触发方式              |
-| changeOnSelect | `boolean`                         | `false`   |  ✓  |   ✓   | 选择即改变（非叶子节点可选）  |
-| separator      | `string`                          | `' / '`   |  ✓  |   ✓   | 显示值分隔符                  |
-| notFoundText   | `string`                          | -         |  ✓  |   ✓   | 空数据文案                    |
-| className      | `string`                          | -         |  -  |   ✓   | 自定义类名                    |
+| Prop           | Type                   | Default   | Vue | React | Description                  |
+| -------------- | ---------------------- | --------- | :-: | :---: | ---------------------------- |
+| options        | `CascaderOption[]`     | `[]`      |  ✓  |   ✓   | 层级选项数据                 |
+| placeholder    | `string`               | -         |  ✓  |   ✓   | 占位符                       |
+| size           | `'sm' \| 'md' \| 'lg'` | `'md'`    |  ✓  |   ✓   | 尺寸                         |
+| disabled       | `boolean`              | `false`   |  ✓  |   ✓   | 禁用状态                     |
+| clearable      | `boolean`              | `false`   |  ✓  |   ✓   | 可清除                       |
+| showSearch     | `boolean`              | `false`   |  ✓  |   ✓   | 显示搜索框                   |
+| expandTrigger  | `'click' \| 'hover'`   | `'click'` |  ✓  |   ✓   | 子级展开触发方式             |
+| changeOnSelect | `boolean`              | `false`   |  ✓  |   ✓   | 选择即改变（非叶子节点可选） |
+| separator      | `string`               | `' / '`   |  ✓  |   ✓   | 显示值分隔符                 |
+| notFoundText   | `string`               | -         |  ✓  |   ✓   | 空数据文案                   |
+| className      | `string`               | -         |  -  |   ✓   | 自定义类名                   |
 
 ### Events
 
-| Vue Event  | React Prop | Payload                     | Description |
-| ---------- | ---------- | --------------------------- | ----------- |
-| `@change`  | `onChange`  | `(value: CascaderValue)`    | 值变更      |
+| Vue Event | React Prop | Payload                  | Description |
+| --------- | ---------- | ------------------------ | ----------- |
+| `@change` | `onChange` | `(value: CascaderValue)` | 值变更      |
 
 ---
 
@@ -582,20 +582,20 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Props
 
-| Prop      | Type                             | Default   | Vue | React | Description          |
-| --------- | -------------------------------- | --------- | :-: | :---: | -------------------- |
-| disabled  | `boolean`                        | `false`   |  ✓  |   ✓   | 禁用状态             |
-| size      | `'sm' \| 'md' \| 'lg'`           | `'md'`    |  ✓  |   ✓   | 尺寸                 |
-| showAlpha | `boolean`                        | `false`   |  ✓  |   ✓   | 显示透明度调节       |
-| format    | `'hex' \| 'rgb' \| 'hsl'`        | `'hex'`   |  ✓  |   ✓   | 颜色值输出格式       |
-| presets   | `string[]`                       | -         |  ✓  |   ✓   | 预设色板             |
-| className | `string`                         | -         |  -  |   ✓   | 自定义类名           |
+| Prop      | Type                      | Default | Vue | React | Description    |
+| --------- | ------------------------- | ------- | :-: | :---: | -------------- |
+| disabled  | `boolean`                 | `false` |  ✓  |   ✓   | 禁用状态       |
+| size      | `'sm' \| 'md' \| 'lg'`    | `'md'`  |  ✓  |   ✓   | 尺寸           |
+| showAlpha | `boolean`                 | `false` |  ✓  |   ✓   | 显示透明度调节 |
+| format    | `'hex' \| 'rgb' \| 'hsl'` | `'hex'` |  ✓  |   ✓   | 颜色值输出格式 |
+| presets   | `string[]`                | -       |  ✓  |   ✓   | 预设色板       |
+| className | `string`                  | -       |  -  |   ✓   | 自定义类名     |
 
 ### Events
 
-| Vue Event  | React Prop | Payload              | Description |
-| ---------- | ---------- | -------------------- | ----------- |
-| `@change`  | `onChange`  | `(color: string)`    | 颜色值变更  |
+| Vue Event | React Prop | Payload           | Description |
+| --------- | ---------- | ----------------- | ----------- |
+| `@change` | `onChange` | `(color: string)` | 颜色值变更  |
 
 ---
 
@@ -603,22 +603,22 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Props
 
-| Prop        | Type                         | Default | Vue | React | Description       |
-| ----------- | ---------------------------- | ------- | :-: | :---: | ----------------- |
-| prefix      | `string \| string[]`         | `'@'`   |  ✓  |   ✓   | 触发字符          |
-| options     | `MentionOption[]`            | `[]`    |  ✓  |   ✓   | 候选项列表        |
-| placeholder | `string`                     | -       |  ✓  |   ✓   | 占位符            |
-| disabled    | `boolean`                    | `false` |  ✓  |   ✓   | 禁用状态          |
-| size        | `'sm' \| 'md' \| 'lg'`       | `'md'`  |  ✓  |   ✓   | 尺寸              |
-| rows        | `number`                     | `1`     |  ✓  |   ✓   | 文本框行数        |
-| className   | `string`                     | -       |  -  |   ✓   | 自定义类名        |
+| Prop        | Type                   | Default | Vue | React | Description |
+| ----------- | ---------------------- | ------- | :-: | :---: | ----------- |
+| prefix      | `string \| string[]`   | `'@'`   |  ✓  |   ✓   | 触发字符    |
+| options     | `MentionOption[]`      | `[]`    |  ✓  |   ✓   | 候选项列表  |
+| placeholder | `string`               | -       |  ✓  |   ✓   | 占位符      |
+| disabled    | `boolean`              | `false` |  ✓  |   ✓   | 禁用状态    |
+| size        | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸        |
+| rows        | `number`               | `1`     |  ✓  |   ✓   | 文本框行数  |
+| className   | `string`               | -       |  -  |   ✓   | 自定义类名  |
 
 ### Events
 
-| Vue Event   | React Prop | Payload                   | Description     |
-| ----------- | ---------- | ------------------------- | --------------- |
-| `@change`   | `onChange`  | `(value: string)`         | 值变更          |
-| `@select`   | `onSelect`  | `(option: MentionOption)` | 选中提及候选项  |
+| Vue Event | React Prop | Payload                   | Description    |
+| --------- | ---------- | ------------------------- | -------------- |
+| `@change` | `onChange` | `(value: string)`         | 值变更         |
+| `@select` | `onSelect` | `(option: MentionOption)` | 选中提及候选项 |
 
 ---
 
@@ -626,21 +626,21 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Props
 
-| Prop       | Type                  | Default | Vue | React | Description          |
-| ---------- | --------------------- | ------- | :-: | :---: | -------------------- |
-| count      | `number`              | `5`     |  ✓  |   ✓   | 星星总数             |
-| allowHalf  | `boolean`             | `false` |  ✓  |   ✓   | 允许半选             |
-| disabled   | `boolean`             | `false` |  ✓  |   ✓   | 禁用状态             |
-| size       | `'sm' \| 'md' \| 'lg'` | `'md'` |  ✓  |   ✓   | 尺寸                 |
-| allowClear | `boolean`             | `true`  |  ✓  |   ✓   | 允许清除（再次点击） |
-| character  | `string`              | -       |  ✓  |   ✓   | 自定义字符           |
-| className  | `string`              | -       |  -  |   ✓   | 自定义类名           |
+| Prop       | Type                   | Default | Vue | React | Description          |
+| ---------- | ---------------------- | ------- | :-: | :---: | -------------------- |
+| count      | `number`               | `5`     |  ✓  |   ✓   | 星星总数             |
+| allowHalf  | `boolean`              | `false` |  ✓  |   ✓   | 允许半选             |
+| disabled   | `boolean`              | `false` |  ✓  |   ✓   | 禁用状态             |
+| size       | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸                 |
+| allowClear | `boolean`              | `true`  |  ✓  |   ✓   | 允许清除（再次点击） |
+| character  | `string`               | -       |  ✓  |   ✓   | 自定义字符           |
+| className  | `string`               | -       |  -  |   ✓   | 自定义类名           |
 
 ### Events
 
-| Vue Event  | React Prop | Payload            | Description |
-| ---------- | ---------- | ------------------ | ----------- |
-| `@change`  | `onChange`  | `(value: number)`  | 评分变更    |
+| Vue Event | React Prop | Payload           | Description |
+| --------- | ---------- | ----------------- | ----------- |
+| `@change` | `onChange` | `(value: number)` | 评分变更    |
 
 ---
 
@@ -648,21 +648,21 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Props
 
-| Prop      | Type                  | Default | Vue | React | Description        |
-| --------- | --------------------- | ------- | :-: | :---: | ------------------ |
-| min       | `number`              | -       |  ✓  |   ✓   | 最小值             |
-| max       | `number`              | -       |  ✓  |   ✓   | 最大值             |
-| step      | `number`              | `1`     |  ✓  |   ✓   | 步长               |
-| disabled  | `boolean`             | `false` |  ✓  |   ✓   | 禁用状态           |
-| size      | `'sm' \| 'md' \| 'lg'` | `'md'` |  ✓  |   ✓   | 尺寸               |
-| precision | `number`              | -       |  ✓  |   ✓   | 数值精度（小数位） |
-| className | `string`              | -       |  -  |   ✓   | 自定义类名         |
+| Prop      | Type                   | Default | Vue | React | Description        |
+| --------- | ---------------------- | ------- | :-: | :---: | ------------------ |
+| min       | `number`               | -       |  ✓  |   ✓   | 最小值             |
+| max       | `number`               | -       |  ✓  |   ✓   | 最大值             |
+| step      | `number`               | `1`     |  ✓  |   ✓   | 步长               |
+| disabled  | `boolean`              | `false` |  ✓  |   ✓   | 禁用状态           |
+| size      | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸               |
+| precision | `number`               | -       |  ✓  |   ✓   | 数值精度（小数位） |
+| className | `string`               | -       |  -  |   ✓   | 自定义类名         |
 
 ### Events
 
-| Vue Event  | React Prop | Payload            | Description |
-| ---------- | ---------- | ------------------ | ----------- |
-| `@change`  | `onChange`  | `(value: number)`  | 值变更      |
+| Vue Event | React Prop | Payload           | Description |
+| --------- | ---------- | ----------------- | ----------- |
+| `@change` | `onChange` | `(value: number)` | 值变更      |
 
 ---
 
@@ -670,24 +670,24 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Props
 
-| Prop         | Type                                                                 | Default       | Vue | React | Description              |
-| ------------ | -------------------------------------------------------------------- | ------------- | :-: | :---: | ------------------------ |
-| dataSource   | `TransferItem[]`                                                     | `[]`          |  ✓  |   ✓   | 数据源                   |
-| targetKeys   | `(string \| number)[]`                                               | `[]`          |  ✓  |   ✓   | 目标框选中项 key 列表    |
-| size         | `'sm' \| 'md' \| 'lg'`                                               | `'md'`        |  ✓  |   ✓   | 尺寸                     |
-| disabled     | `boolean`                                                            | `false`       |  ✓  |   ✓   | 禁用状态                 |
-| showSearch   | `boolean`                                                            | `false`       |  ✓  |   ✓   | 显示搜索框               |
-| sourceTitle  | `string`                                                             | `'Source'`    |  ✓  |   ✓   | 左侧标题                 |
-| targetTitle  | `string`                                                             | `'Target'`    |  ✓  |   ✓   | 右侧标题                 |
-| notFoundText | `string`                                                             | -             |  ✓  |   ✓   | 空数据文案               |
-| filterOption | `(input: string, item: TransferItem) => boolean`                     | -             |  ✓  |   ✓   | 自定义搜索过滤           |
-| className    | `string`                                                             | -             |  -  |   ✓   | 自定义类名               |
+| Prop         | Type                                             | Default    | Vue | React | Description           |
+| ------------ | ------------------------------------------------ | ---------- | :-: | :---: | --------------------- |
+| dataSource   | `TransferItem[]`                                 | `[]`       |  ✓  |   ✓   | 数据源                |
+| targetKeys   | `(string \| number)[]`                           | `[]`       |  ✓  |   ✓   | 目标框选中项 key 列表 |
+| size         | `'sm' \| 'md' \| 'lg'`                           | `'md'`     |  ✓  |   ✓   | 尺寸                  |
+| disabled     | `boolean`                                        | `false`    |  ✓  |   ✓   | 禁用状态              |
+| showSearch   | `boolean`                                        | `false`    |  ✓  |   ✓   | 显示搜索框            |
+| sourceTitle  | `string`                                         | `'Source'` |  ✓  |   ✓   | 左侧标题              |
+| targetTitle  | `string`                                         | `'Target'` |  ✓  |   ✓   | 右侧标题              |
+| notFoundText | `string`                                         | -          |  ✓  |   ✓   | 空数据文案            |
+| filterOption | `(input: string, item: TransferItem) => boolean` | -          |  ✓  |   ✓   | 自定义搜索过滤        |
+| className    | `string`                                         | -          |  -  |   ✓   | 自定义类名            |
 
 ### Events
 
-| Vue Event  | React Prop | Payload                                           | Description     |
-| ---------- | ---------- | ------------------------------------------------- | --------------- |
-| `@change`  | `onChange`  | `(targetKeys: (string \| number)[], direction: TransferDirection, moveKeys: (string \| number)[])` | 选项移动 |
+| Vue Event | React Prop | Payload                                                                                            | Description |
+| --------- | ---------- | -------------------------------------------------------------------------------------------------- | ----------- |
+| `@change` | `onChange` | `(targetKeys: (string \| number)[], direction: TransferDirection, moveKeys: (string \| number)[])` | 选项移动    |
 
 ---
 
@@ -695,23 +695,23 @@ description: Shared props definitions for form components - AutoComplete, Cascad
 
 ### Props
 
-| Prop             | Type                  | Default | Vue | React | Description            |
-| ---------------- | --------------------- | ------- | :-: | :---: | ---------------------- |
-| treeData         | `TreeSelectNode[]`    | `[]`    |  ✓  |   ✓   | 树形数据               |
-| placeholder      | `string`              | -       |  ✓  |   ✓   | 占位符                 |
-| size             | `'sm' \| 'md' \| 'lg'` | `'md'` |  ✓  |   ✓   | 尺寸                   |
-| disabled         | `boolean`             | `false` |  ✓  |   ✓   | 禁用状态               |
-| clearable        | `boolean`             | `false` |  ✓  |   ✓   | 可清除                 |
-| multiple         | `boolean`             | `false` |  ✓  |   ✓   | 多选                   |
-| showSearch       | `boolean`             | `false` |  ✓  |   ✓   | 显示搜索框             |
-| notFoundText     | `string`              | -       |  ✓  |   ✓   | 空数据文案             |
-| defaultExpandAll | `boolean`             | `false` |  ✓  |   ✓   | 默认展开所有节点       |
-| className        | `string`              | -       |  -  |   ✓   | 自定义类名             |
+| Prop             | Type                   | Default | Vue | React | Description      |
+| ---------------- | ---------------------- | ------- | :-: | :---: | ---------------- |
+| treeData         | `TreeSelectNode[]`     | `[]`    |  ✓  |   ✓   | 树形数据         |
+| placeholder      | `string`               | -       |  ✓  |   ✓   | 占位符           |
+| size             | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸             |
+| disabled         | `boolean`              | `false` |  ✓  |   ✓   | 禁用状态         |
+| clearable        | `boolean`              | `false` |  ✓  |   ✓   | 可清除           |
+| multiple         | `boolean`              | `false` |  ✓  |   ✓   | 多选             |
+| showSearch       | `boolean`              | `false` |  ✓  |   ✓   | 显示搜索框       |
+| notFoundText     | `string`               | -       |  ✓  |   ✓   | 空数据文案       |
+| defaultExpandAll | `boolean`              | `false` |  ✓  |   ✓   | 默认展开所有节点 |
+| className        | `string`               | -       |  -  |   ✓   | 自定义类名       |
 
 ### Events
 
-| Vue Event  | React Prop | Payload                     | Description |
-| ---------- | ---------- | --------------------------- | ----------- |
-| `@change`  | `onChange`  | `(value: TreeSelectValue)`  | 值变更      |
+| Vue Event | React Prop | Payload                    | Description |
+| --------- | ---------- | -------------------------- | ----------- |
+| `@change` | `onChange` | `(value: TreeSelectValue)` | 值变更      |
 
 > **See also**: [Vue examples](../vue/form.md) · [React examples](../react/form.md)

@@ -30,10 +30,12 @@ import {
   CloseIconPath,
   ChevronLeftIconPath,
   ChevronRightIconPath,
+  getDatePickerLocaleCode,
   getDatePickerLabels,
   type DatePickerSize,
   type DateFormat,
   type DatePickerModelValue,
+  type DatePickerLocaleInput,
   type DatePickerLabels,
   type DatePickerShortcut
 } from '@expcat/tigercat-core'
@@ -50,7 +52,7 @@ export type VueDatePickerModelValue = DatePickerModelValue
 
 export interface VueDatePickerProps {
   range?: boolean
-  locale?: string
+  locale?: DatePickerLocaleInput
   labels?: Partial<DatePickerLabels>
   modelValue?: VueDatePickerModelValue
   size?: DatePickerSize
@@ -97,7 +99,7 @@ export const DatePicker = defineComponent({
      * Example: 'zh-CN', 'en-US'
      */
     locale: {
-      type: String
+      type: [String, Object] as PropType<DatePickerLocaleInput>
     },
     /**
      * UI labels for i18n.
@@ -301,7 +303,9 @@ export const DatePicker = defineComponent({
       return getCalendarDays(viewingYear.value, viewingMonth.value)
     })
 
-    const dayNames = computed(() => getShortDayNames(props.locale))
+    const localeCode = computed(() => getDatePickerLocaleCode(props.locale))
+
+    const dayNames = computed(() => getShortDayNames(localeCode.value))
 
     const labels = computed(() => getDatePickerLabels(props.locale, props.labels))
 
@@ -673,7 +677,7 @@ export const DatePicker = defineComponent({
                   h(
                     'div',
                     { class: datePickerMonthYearClasses },
-                    formatMonthYear(viewingYear.value, viewingMonth.value, props.locale)
+                    formatMonthYear(viewingYear.value, viewingMonth.value, localeCode.value)
                   ),
                   h(
                     'button',

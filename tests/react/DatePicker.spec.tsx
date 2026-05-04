@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { DatePicker } from '@expcat/tigercat-react'
 import { expectNoA11yViolations, componentSizes } from '../utils/react'
+import { ZH_CN_DATEPICKER_LOCALE } from '../../packages/core/src/utils/i18n/datepicker-locales/zh-CN'
 
 describe('DatePicker', () => {
   describe('Rendering', () => {
@@ -238,6 +239,25 @@ describe('DatePicker', () => {
       expect(screen.getByRole('button', { name: 'Confirm' })).toBeInTheDocument()
 
       expect(screen.getByRole('button', { name: 'Clear selection' })).toBeInTheDocument()
+    })
+
+    it('should support datepicker locale presets', async () => {
+      const user = userEvent.setup()
+      render(
+        <DatePicker
+          range
+          defaultValue={[new Date('2024-03-10'), null]}
+          locale={ZH_CN_DATEPICKER_LOCALE}
+        />
+      )
+
+      await user.click(screen.getByRole('button', { name: '打开日历' }))
+
+      expect(screen.getByRole('dialog', { name: '日历' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '上个月' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '下个月' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '今天' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: '确定' })).toBeInTheDocument()
     })
   })
 

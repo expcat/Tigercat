@@ -29,6 +29,7 @@ import {
   CloseIconPath,
   ChevronLeftIconPath,
   ChevronRightIconPath,
+  getDatePickerLocaleCode,
   getDatePickerLabels,
   type DatePickerProps as CoreDatePickerProps,
   type DatePickerSingleModelValue,
@@ -189,7 +190,9 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     () => getCalendarDays(viewingYear, viewingMonth),
     [viewingYear, viewingMonth]
   )
-  const dayNames = useMemo(() => getShortDayNames(props.locale), [props.locale])
+  const localeCode = useMemo(() => getDatePickerLocaleCode(props.locale), [props.locale])
+
+  const dayNames = useMemo(() => getShortDayNames(localeCode), [localeCode])
 
   const labels = useMemo(
     () => getDatePickerLabels(props.locale, props.labels),
@@ -566,7 +569,7 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
               <Icon path={ChevronLeftIconPath} className="w-5 h-5" />
             </button>
             <div className={datePickerMonthYearClasses}>
-              {formatMonthYear(viewingYear, viewingMonth, props.locale)}
+              {formatMonthYear(viewingYear, viewingMonth, localeCode)}
             </div>
             <button
               type="button"

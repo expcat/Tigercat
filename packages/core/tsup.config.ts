@@ -6,6 +6,10 @@ const localeEntries = Object.fromEntries(
   localeIds.map((id) => [`locales/${id}`, `src/utils/i18n/locales/${id}.ts`])
 )
 
+const datePickerLocaleEntries = Object.fromEntries(
+  localeIds.map((id) => [`datepicker-locales/${id}`, `src/utils/i18n/datepicker-locales/${id}.ts`])
+)
+
 const iconGroups = ['common', 'picker', 'status', 'table']
 
 const iconEntries = Object.fromEntries(
@@ -18,6 +22,7 @@ export default defineConfig({
     tailwind: 'src/tailwind-entry.ts',
     'tailwind/modern': 'src/tailwind-entry-modern.ts',
     ...localeEntries,
+    ...datePickerLocaleEntries,
     ...iconEntries
   },
   format: ['cjs', 'esm'],

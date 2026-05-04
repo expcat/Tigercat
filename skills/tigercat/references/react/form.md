@@ -357,6 +357,7 @@ const [value, setValue] = useState('male')
 <DatePicker value={date} onChange={setDate} clearable onClear={onClear} />
 <DatePicker defaultValue={new Date()} />
 <DatePicker value={date} onChange={setDate} locale="zh-CN" labels={{ today: '今日' }} />
+<DatePicker value={date} onChange={setDate} locale={ZH_CN_DATEPICKER_LOCALE} />
 ```
 
 ---

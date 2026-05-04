@@ -24,6 +24,20 @@ export interface DatePickerLabels {
   nextMonth: string
 }
 
+export interface DatePickerLocalePreset {
+  locale: string
+  labels: DatePickerLabels
+}
+
+export interface DatePickerLocaleConfig {
+  datePicker?: Partial<DatePickerLocalePreset>
+}
+
+export type DatePickerLocaleInput =
+  | string
+  | Partial<DatePickerLocalePreset>
+  | DatePickerLocaleConfig
+
 /**
  * DatePicker size types
  */
@@ -42,7 +56,7 @@ export interface DatePickerProps {
    * Locale used for month/day names in the calendar UI.
    * Example: 'zh-CN', 'en-US'
    */
-  locale?: string
+  locale?: DatePickerLocaleInput
 
   /**
    * UI labels for i18n.

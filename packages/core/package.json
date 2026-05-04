@@ -87,6 +87,46 @@
       "import": "./dist/locales/id-ID.js",
       "require": "./dist/locales/id-ID.cjs"
     },
+    "./datepicker-locales/en-US": {
+      "types": "./dist/datepicker-locales/en-US.d.ts",
+      "import": "./dist/datepicker-locales/en-US.js",
+      "require": "./dist/datepicker-locales/en-US.cjs"
+    },
+    "./datepicker-locales/zh-CN": {
+      "types": "./dist/datepicker-locales/zh-CN.d.ts",
+      "import": "./dist/datepicker-locales/zh-CN.js",
+      "require": "./dist/datepicker-locales/zh-CN.cjs"
+    },
+    "./datepicker-locales/zh-TW": {
+      "types": "./dist/datepicker-locales/zh-TW.d.ts",
+      "import": "./dist/datepicker-locales/zh-TW.js",
+      "require": "./dist/datepicker-locales/zh-TW.cjs"
+    },
+    "./datepicker-locales/ja-JP": {
+      "types": "./dist/datepicker-locales/ja-JP.d.ts",
+      "import": "./dist/datepicker-locales/ja-JP.js",
+      "require": "./dist/datepicker-locales/ja-JP.cjs"
+    },
+    "./datepicker-locales/ko-KR": {
+      "types": "./dist/datepicker-locales/ko-KR.d.ts",
+      "import": "./dist/datepicker-locales/ko-KR.js",
+      "require": "./dist/datepicker-locales/ko-KR.cjs"
+    },
+    "./datepicker-locales/th-TH": {
+      "types": "./dist/datepicker-locales/th-TH.d.ts",
+      "import": "./dist/datepicker-locales/th-TH.js",
+      "require": "./dist/datepicker-locales/th-TH.cjs"
+    },
+    "./datepicker-locales/vi-VN": {
+      "types": "./dist/datepicker-locales/vi-VN.d.ts",
+      "import": "./dist/datepicker-locales/vi-VN.js",
+      "require": "./dist/datepicker-locales/vi-VN.cjs"
+    },
+    "./datepicker-locales/id-ID": {
+      "types": "./dist/datepicker-locales/id-ID.d.ts",
+      "import": "./dist/datepicker-locales/id-ID.js",
+      "require": "./dist/datepicker-locales/id-ID.cjs"
+    },
     "./icons/common": {
       "types": "./dist/icons/common.d.ts",
       "import": "./dist/icons/common.js",
