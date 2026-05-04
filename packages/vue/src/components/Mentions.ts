@@ -1,11 +1,12 @@
-import { defineComponent, h, ref, computed, watch, onBeforeUnmount, PropType } from 'vue'
+import { defineComponent, h, ref, computed, watch, nextTick, onBeforeUnmount, PropType } from 'vue'
 import { classNames, coerceClassValue } from '@expcat/tigercat-core'
 import type { MentionsSize, MentionOption } from '@expcat/tigercat-core'
 import {
   getMentionsInputClasses,
   mentionsDropdownClasses,
   getMentionsOptionClasses,
-  extractMentionQuery
+  extractMentionQuery,
+  positionMentionsDropdown
 } from '@expcat/tigercat-core'
 
 export interface VueMentionsProps {
@@ -36,6 +37,7 @@ export const Mentions = defineComponent({
     const mentionStartPos = ref(-1)
     const query = ref('')
     const textareaRef = ref<HTMLTextAreaElement | null>(null)
+    const dropdownRef = ref<HTMLDivElement | null>(null)
     const containerRef = ref<HTMLDivElement | null>(null)
 
     const filteredOptions = computed(() => {
@@ -104,6 +106,17 @@ export const Mentions = defineComponent({
       else document.removeEventListener('mousedown', onClickOutside)
     })
 
+    watch(
+      [isOpen, filteredOptions],
+      async () => {
+        if (!isOpen.value || filteredOptions.value.length === 0) return
+        await nextTick()
+        if (!textareaRef.value || !dropdownRef.value) return
+        await positionMentionsDropdown(textareaRef.value, dropdownRef.value)
+      },
+      { flush: 'post' }
+    )
+
     onBeforeUnmount(() => {
       document.removeEventListener('mousedown', onClickOutside)
     })
@@ -125,7 +138,7 @@ export const Mentions = defineComponent({
         isOpen.value && filteredOptions.value.length > 0
           ? h(
               'div',
-              { class: mentionsDropdownClasses, role: 'listbox' },
+              { ref: dropdownRef, class: mentionsDropdownClasses, role: 'listbox' },
               filteredOptions.value.map((opt, i) =>
                 h(
                   'div',

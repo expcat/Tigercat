@@ -1,5 +1,11 @@
 import { classNames } from './class-names'
 import type { MentionsSize } from '../types/mentions'
+import {
+  applyFloatingStyles,
+  computeFloatingPosition,
+  type FloatingOptions,
+  type FloatingResult
+} from './floating'
 
 const sizeMap: Record<MentionsSize, string> = {
   sm: 'text-sm py-1 px-2',
@@ -22,10 +28,34 @@ export function getMentionsInputClasses(size: MentionsSize, disabled: boolean): 
 }
 
 export const mentionsDropdownClasses = classNames(
-  'absolute z-50 mt-1 w-48 max-h-48 overflow-auto rounded-[var(--tiger-radius-md,0.5rem)] border shadow-lg',
+  'absolute z-50 w-48 max-h-48 overflow-auto rounded-[var(--tiger-radius-md,0.5rem)] border shadow-lg',
   'bg-[var(--tiger-mentions-dropdown-bg,var(--tiger-surface,#ffffff))]',
   'border-[var(--tiger-mentions-dropdown-border,var(--tiger-border,#d1d5db))]'
 )
+
+export interface PositionMentionsDropdownOptions extends FloatingOptions {
+  matchReferenceWidth?: boolean
+}
+
+export async function positionMentionsDropdown(
+  reference: HTMLElement,
+  dropdown: HTMLElement,
+  options: PositionMentionsDropdownOptions = {}
+): Promise<FloatingResult> {
+  const { matchReferenceWidth = false, ...floatingOptions } = options
+
+  if (matchReferenceWidth) {
+    dropdown.style.minWidth = `${reference.offsetWidth}px`
+  }
+
+  const result = await computeFloatingPosition(reference, dropdown, {
+    placement: 'bottom-start',
+    offset: 4,
+    ...floatingOptions
+  })
+  applyFloatingStyles(dropdown, result)
+  return result
+}
 
 export function getMentionsOptionClasses(isActive: boolean, isDisabled: boolean): string {
   return classNames(

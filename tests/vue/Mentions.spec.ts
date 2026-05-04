@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { Mentions } from '@expcat/tigercat-vue'
 import { renderWithProps } from '../utils'
 
@@ -30,7 +30,10 @@ describe('Mentions', () => {
   })
 
   it('applies className prop', () => {
-    const { container } = renderWithProps(Mentions, { options: defaultOptions, className: 'my-mentions' })
+    const { container } = renderWithProps(Mentions, {
+      options: defaultOptions,
+      className: 'my-mentions'
+    })
     expect(container.querySelector('.my-mentions')).toBeInTheDocument()
   })
 
@@ -67,5 +70,24 @@ describe('Mentions', () => {
   it('does not show dropdown initially', () => {
     const { container } = renderWithProps(Mentions, { options: defaultOptions })
     expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
+  })
+
+  it('positions dropdown with floating styles when mention query opens', async () => {
+    const { container } = render(Mentions, {
+      props: {
+        options: defaultOptions,
+        modelValue: ''
+      }
+    })
+    const textarea = container.querySelector('textarea')!
+
+    await fireEvent.update(textarea, '@a')
+
+    const dropdown = await screen.findByRole('listbox')
+
+    await waitFor(() => {
+      expect(dropdown.style.left).not.toBe('')
+      expect(dropdown.style.top).not.toBe('')
+    })
   })
 })

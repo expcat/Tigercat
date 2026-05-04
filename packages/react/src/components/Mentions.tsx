@@ -5,7 +5,8 @@ import {
   getMentionsInputClasses,
   mentionsDropdownClasses,
   getMentionsOptionClasses,
-  extractMentionQuery
+  extractMentionQuery,
+  positionMentionsDropdown
 } from '@expcat/tigercat-core'
 
 export interface MentionsProps {
@@ -38,6 +39,7 @@ export const Mentions: React.FC<MentionsProps> = ({
   const [query, setQuery] = useState('')
   const mentionStartRef = useRef(-1)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   const filteredOptions = useMemo(() => {
@@ -111,6 +113,13 @@ export const Mentions: React.FC<MentionsProps> = ({
     return () => document.removeEventListener('mousedown', handler)
   }, [isOpen])
 
+  useEffect(() => {
+    if (!isOpen || filteredOptions.length === 0) return
+    if (!textareaRef.current || !dropdownRef.current) return
+
+    void positionMentionsDropdown(textareaRef.current, dropdownRef.current)
+  }, [isOpen, filteredOptions.length, size, rows, value])
+
   const wrapperClass = classNames('relative', className)
 
   return (
@@ -126,7 +135,7 @@ export const Mentions: React.FC<MentionsProps> = ({
         onKeyDown={handleKeydown}
       />
       {isOpen && filteredOptions.length > 0 && (
-        <div className={mentionsDropdownClasses} role="listbox">
+        <div ref={dropdownRef} className={mentionsDropdownClasses} role="listbox">
           {filteredOptions.map((opt, i) => (
             <div
               key={opt.value}

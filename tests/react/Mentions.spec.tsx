@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
 import { Mentions } from '@expcat/tigercat-react'
 
@@ -63,5 +63,24 @@ describe('Mentions', () => {
   it('does not show dropdown initially', () => {
     const { container } = render(<Mentions options={defaultOptions} />)
     expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
+  })
+
+  it('positions dropdown with floating styles when mention query opens', async () => {
+    const { container } = render(<Mentions options={defaultOptions} value="" onChange={vi.fn()} />)
+    const textarea = container.querySelector('textarea')!
+
+    fireEvent.change(textarea, {
+      target: {
+        value: '@a',
+        selectionStart: 2
+      }
+    })
+
+    const dropdown = await screen.findByRole('listbox')
+
+    await waitFor(() => {
+      expect(dropdown.style.left).not.toBe('')
+      expect(dropdown.style.top).not.toBe('')
+    })
   })
 })
