@@ -11,6 +11,9 @@ import type {
   ChartScaleValue
 } from '../../types/chart'
 
+const linearTickValuesCache = new Map<string, readonly number[]>()
+const maxLinearTickValuesCacheSize = 128
+
 export function getChartAxisTicks(
   scale: ChartScale,
   options: {
@@ -24,7 +27,9 @@ export function getChartAxisTicks(
 
   const resolvedTickValues =
     tickValues ??
-    (scale.type === 'linear' ? getLinearTicks(scale.domain as number[], tickCount) : scale.domain)
+    (scale.type === 'linear'
+      ? getLinearChartTickValues(scale.domain as number[], tickCount)
+      : scale.domain)
 
   return resolvedTickValues.map((value) => {
     const basePosition = scale.map(value)
@@ -41,12 +46,28 @@ export function getChartAxisTicks(
   })
 }
 
-function getLinearTicks(domain: number[], count: number): number[] {
+function getLinearTickCacheKey(min: number, max: number, count: number): string {
+  return `${min}:${max}:${count}`
+}
+
+export function clearChartAxisTickCache(): void {
+  linearTickValuesCache.clear()
+}
+
+export function getChartAxisTickCacheSize(): number {
+  return linearTickValuesCache.size
+}
+
+export function getLinearChartTickValues(domain: number[], count: number): readonly number[] {
   const min = Math.min(domain[0], domain[1])
   const max = Math.max(domain[0], domain[1])
   if (min === max || !Number.isFinite(min) || !Number.isFinite(max)) {
     return [min]
   }
+
+  const cacheKey = getLinearTickCacheKey(min, max, count)
+  const cachedTicks = linearTickValuesCache.get(cacheKey)
+  if (cachedTicks) return cachedTicks
 
   const step = getNiceStep((max - min) / Math.max(1, count))
   const start = Math.ceil(min / step) * step
@@ -57,7 +78,16 @@ function getLinearTicks(domain: number[], count: number): number[] {
     ticks.push(roundTick(value, step))
   }
 
-  return ticks
+  if (linearTickValuesCache.size >= maxLinearTickValuesCacheSize) {
+    const firstKey = linearTickValuesCache.keys().next().value
+    if (firstKey) {
+      linearTickValuesCache.delete(firstKey)
+    }
+  }
+
+  const frozenTicks = Object.freeze(ticks)
+  linearTickValuesCache.set(cacheKey, frozenTicks)
+  return frozenTicks
 }
 
 function getNiceStep(step: number): number {

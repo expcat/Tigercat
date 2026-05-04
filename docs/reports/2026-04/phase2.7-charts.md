@@ -4,7 +4,6 @@
 
 | 任务                    | 优先级 | 完成标准                                                      |
 | ----------------------- | ------ | ------------------------------------------------------------- |
-| 数值轴 tick 缓存        | P1     | nice/tick 计算按 scale 输入缓存，避免每帧重复计算             |
 | Tooltip transform 定位  | P1     | tooltip 跟随使用 transform translate，避免 left/top reflow    |
 | SVG 节点复用            | P1     | series 数量变化时 key 稳定，避免全量重渲；补快照或交互测试    |
 | Pie / Donut 扇区缓存    | P2     | 数据不变时角度计算 memo 化                                    |

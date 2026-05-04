@@ -1,12 +1,15 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import {
   normalizeChartPadding,
   getChartInnerRect,
   createLinearScale,
   createPointScale,
   createBandScale,
+  clearChartAxisTickCache,
   getChartAxisTicks,
+  getChartAxisTickCacheSize,
   getChartGridLineDasharray,
+  getLinearChartTickValues,
   getNumberExtent,
   getPieArcs,
   polarToCartesian,
@@ -31,6 +34,10 @@ import {
 } from '@expcat/tigercat-core'
 
 describe('chart-utils', () => {
+  beforeEach(() => {
+    clearChartAxisTickCache()
+  })
+
   // ==========================================================================
   // Padding & Layout
   // ==========================================================================
@@ -177,6 +184,29 @@ describe('chart-utils', () => {
       expect(ticks[0]).toHaveProperty('value')
       expect(ticks[0]).toHaveProperty('position')
       expect(ticks[0]).toHaveProperty('label')
+    })
+
+    it('caches linear tick values by domain and tick count', () => {
+      const first = getLinearChartTickValues([0, 100], 5)
+      const second = getLinearChartTickValues([0, 100], 5)
+      const inverted = getLinearChartTickValues([100, 0], 5)
+
+      expect(second).toBe(first)
+      expect(inverted).toBe(first)
+      expect(Object.isFrozen(first)).toBe(true)
+      expect(getChartAxisTickCacheSize()).toBe(1)
+    })
+
+    it('reuses cached tick values while recalculating scale positions', () => {
+      const firstScale = createLinearScale([0, 100], [0, 200])
+      const secondScale = createLinearScale([0, 100], [0, 400])
+
+      const firstTicks = getChartAxisTicks(firstScale, { tickCount: 5 })
+      const secondTicks = getChartAxisTicks(secondScale, { tickCount: 5 })
+
+      expect(getChartAxisTickCacheSize()).toBe(1)
+      expect(secondTicks.map((tick) => tick.value)).toEqual(firstTicks.map((tick) => tick.value))
+      expect(secondTicks[1].position).toBe(firstTicks[1].position * 2)
     })
 
     it('uses provided tickValues', () => {

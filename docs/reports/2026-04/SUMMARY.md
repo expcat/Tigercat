@@ -55,3 +55,4 @@
 | 2026-05-04 | Tabs indicator transform PR   | Done | 新增 core Tabs indicator/grid style；React/Vue line tabs 指示条位置改用 transform；core/React/Vue Tabs 聚焦测试 81 个通过；三端包构建通过                                              |
 | 2026-05-04 | Chart interaction rAF PR      | Done | 新增 core chart pointer rAF scheduler；React/Vue `useChartInteraction` mousemove 坐标合帧并在 leave/dispose 取消；core/React/Vue chart interaction 聚焦测试 105 个通过；三端包构建通过 |
 | 2026-05-04 | ChartCanvas ResizeObserver PR | Done | 新增 core chart resize observer controller；React/Vue ChartCanvas 支持 `responsive` 父容器 ResizeObserver+rAF 合帧；core/React/Vue ChartCanvas 聚焦测试 9 个通过；三端包构建通过       |
+| 2026-05-04 | Chart numeric tick cache PR   | Done | 新增 core 线性 tick value 缓存，按 domain + tickCount 复用 nice/tick 计算；`chart-utils.spec.ts` 98 个通过；三端包构建通过                                                             |
