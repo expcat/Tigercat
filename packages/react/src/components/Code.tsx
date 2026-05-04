@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import {
-  classNames,
-  codeBlockContainerClasses,
-  codeBlockCopyButtonBaseClasses,
-  codeBlockCopyButtonCopiedClasses,
   codeBlockPreClasses,
   copyTextToClipboard,
+  getCodeBlockContainerClasses,
+  getCodeBlockCopyButtonClasses,
   type CodeProps as CoreCodeProps
 } from '@expcat/tigercat-core'
 
@@ -43,11 +41,8 @@ export const Code: React.FC<CodeProps> = ({
     onCopy?.(code)
   }
 
-  const containerClasses = classNames(codeBlockContainerClasses, className)
-  const copyButtonClasses = classNames(
-    codeBlockCopyButtonBaseClasses,
-    isCopied && codeBlockCopyButtonCopiedClasses
-  )
+  const containerClasses = getCodeBlockContainerClasses(className)
+  const copyButtonClasses = getCodeBlockCopyButtonClasses(isCopied)
 
   return (
     <div className={containerClasses} {...props}>

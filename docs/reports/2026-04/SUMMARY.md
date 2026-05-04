@@ -18,7 +18,7 @@
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Core utils            | `BaseInteractiveProps` / `BaseFormControlProps` / `BaseLayoutProps` 未落地；`animation.ts` / `transition.ts` 仍未合并为 `motion/`；`helpers/` 目录未按 dom/class/motion 细分；死代码扫描未执行                                                      |
 | i18n / CLI / examples | `defineLocale`、ConfigProvider 异步 locale、根入口 locale tree-shaking 方案仍未完成；commander 14 等 Node 20+；workspace catalog/overrides 未配置；CLI Windows shim 与 `doctor` 命令仍待做                                                          |
-| Basic                 | Typography 合并评估、Empty 默认插画体积、Divider 文件合并评估仍待做                                                                                                                                                                                 |
+| Basic                 | Empty 默认插画体积、Divider 文件合并评估仍待做                                                                                                                                                                                                      |
 | Form                  | Upload 拖拽、InputNumber/Stepper 长按、Form O(N²) 校验、Switch class composer、命令式 Form API 仍待评估或实现                                                                                                                                       |
 | Feedback              | Watermark OffscreenCanvas/ResizeObserver、Notification stack rAF、Floating middleware 缓存、Loading overlay 复用仍待做                                                                                                                              |
 | Layout                | Splitter/Resizable 仍是组件内 mousemove；Carousel autoplay 仍用 `setInterval`；List 未复用 VirtualList；Row/Col 与 Descriptions 性能项未完成                                                                                                        |
@@ -44,3 +44,4 @@
 | 2026-05-04 | Group 类组件共享 util PR     | Done | Group 聚焦测试 62 个通过；`core` / `react` / `vue` 三端包构建通过                                        |
 | 2026-05-04 | ImagePreview 交互测试 PR     | Done | React/Vue ImagePreview 聚焦测试 30 个通过；补齐 rotate 交互；`core` / `react` / `vue` 三端包构建通过     |
 | 2026-05-04 | ImageCropper 交互测试 PR     | Done | React/Vue ImageCropper 聚焦测试 22 个通过；补齐键盘移动/缩放；`react` / `vue` 两端包构建通过             |
+| 2026-05-04 | Typography 合并评估 PR       | Done | Text/Code 保持独立公开 API；Code class composer 收敛到 core；Text/Code 聚焦测试 28 个通过，三端构建通过  |

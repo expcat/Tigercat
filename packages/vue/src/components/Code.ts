@@ -1,12 +1,10 @@
 import { computed, defineComponent, h, onBeforeUnmount, PropType, ref } from 'vue'
 import {
-  classNames,
   coerceClassValue,
-  codeBlockContainerClasses,
-  codeBlockCopyButtonBaseClasses,
-  codeBlockCopyButtonCopiedClasses,
   codeBlockPreClasses,
   copyTextToClipboard,
+  getCodeBlockContainerClasses,
+  getCodeBlockCopyButtonClasses,
   type CodeProps as CoreCodeProps
 } from '@expcat/tigercat-core'
 
@@ -51,18 +49,11 @@ export const Code = defineComponent({
 
     const containerClasses = computed(() => {
       const attrsRecord = attrs as Record<string, unknown>
-      return classNames(
-        codeBlockContainerClasses,
-        props.className,
-        coerceClassValue(attrsRecord.class)
-      )
+      return getCodeBlockContainerClasses(props.className, coerceClassValue(attrsRecord.class))
     })
 
     const copyButtonClasses = computed(() => {
-      return classNames(
-        codeBlockCopyButtonBaseClasses,
-        isCopied.value && codeBlockCopyButtonCopiedClasses
-      )
+      return getCodeBlockCopyButtonClasses(isCopied.value)
     })
 
     const clearTimer = () => {

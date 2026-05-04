@@ -1,3 +1,5 @@
+import { type ClassValue, classNames } from './class-names'
+
 export const codeBlockContainerClasses =
   'relative rounded-[var(--tiger-radius-md,0.5rem)] border border-gray-200 bg-gray-50 text-gray-800 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-100'
 
@@ -9,3 +11,15 @@ export const codeBlockCopyButtonBaseClasses =
 
 export const codeBlockCopyButtonCopiedClasses =
   'border-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary,#2563eb)]'
+
+export function getCodeBlockContainerClasses(...classes: ClassValue[]): string {
+  return classNames(codeBlockContainerClasses, ...classes)
+}
+
+export function getCodeBlockCopyButtonClasses(isCopied: boolean, ...classes: ClassValue[]): string {
+  return classNames(
+    codeBlockCopyButtonBaseClasses,
+    isCopied && codeBlockCopyButtonCopiedClasses,
+    ...classes
+  )
+}
