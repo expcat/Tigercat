@@ -61,6 +61,21 @@ export interface PrepareUploadFilesResult {
   rejectedExceedFiles: File[]
 }
 
+export interface UploadDataTransferLike {
+  files?: ArrayLike<File> | null
+}
+
+export interface UploadDragEventLike {
+  preventDefault: () => void
+  dataTransfer?: UploadDataTransferLike | null
+}
+
+export interface UploadDragResult {
+  handled: boolean
+  isDragging: boolean
+  files: File[]
+}
+
 function coerceToError(error: unknown): Error {
   if (error instanceof Error) return error
   if (typeof error === 'string') return new Error(error)
@@ -141,6 +156,50 @@ export async function prepareUploadFiles(
     acceptedFiles,
     rejectedFiles,
     rejectedExceedFiles
+  }
+}
+
+export function getUploadDataTransferFiles(dataTransfer?: UploadDataTransferLike | null): File[] {
+  return Array.from(dataTransfer?.files ?? [])
+}
+
+export function handleUploadDragOver(
+  event: UploadDragEventLike,
+  disabled: boolean = false
+): UploadDragResult {
+  if (disabled) {
+    return { handled: false, isDragging: false, files: [] }
+  }
+
+  event.preventDefault()
+  return { handled: true, isDragging: true, files: [] }
+}
+
+export function handleUploadDragLeave(
+  event: UploadDragEventLike,
+  disabled: boolean = false
+): UploadDragResult {
+  if (disabled) {
+    return { handled: false, isDragging: false, files: [] }
+  }
+
+  event.preventDefault()
+  return { handled: true, isDragging: false, files: [] }
+}
+
+export function handleUploadDrop(
+  event: UploadDragEventLike,
+  disabled: boolean = false
+): UploadDragResult {
+  if (disabled) {
+    return { handled: false, isDragging: false, files: [] }
+  }
+
+  event.preventDefault()
+  return {
+    handled: true,
+    isDragging: false,
+    files: getUploadDataTransferFiles(event.dataTransfer)
   }
 }
 

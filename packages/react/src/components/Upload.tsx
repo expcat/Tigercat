@@ -14,6 +14,9 @@ import {
   mergeTigerLocale,
   prepareUploadFiles,
   fileToUploadFile,
+  handleUploadDragOver,
+  handleUploadDragLeave,
+  handleUploadDrop,
   formatFileSize,
   getUploadButtonClasses,
   getDragAreaClasses,
@@ -191,9 +194,9 @@ export const Upload: React.FC<UploadProps> = ({
   }
 
   const handleDragOver = (event: React.DragEvent) => {
-    if (disabled) return
-    event.preventDefault()
-    setIsDragging(true)
+    const result = handleUploadDragOver(event, disabled)
+    if (!result.handled) return
+    setIsDragging(result.isDragging)
   }
 
   const handleDragKeyDown = (event: React.KeyboardEvent) => {
@@ -206,18 +209,17 @@ export const Upload: React.FC<UploadProps> = ({
   }
 
   const handleDragLeave = (event: React.DragEvent) => {
-    if (disabled) return
-    event.preventDefault()
-    setIsDragging(false)
+    const result = handleUploadDragLeave(event, disabled)
+    if (!result.handled) return
+    setIsDragging(result.isDragging)
   }
 
   const handleDrop = async (event: React.DragEvent) => {
-    if (disabled) return
-    event.preventDefault()
-    setIsDragging(false)
+    const result = handleUploadDrop(event, disabled)
+    if (!result.handled) return
+    setIsDragging(result.isDragging)
 
-    const files = Array.from(event.dataTransfer?.files || [])
-    await processFiles(files)
+    await processFiles(result.files)
   }
 
   const renderUploadButton = () => {

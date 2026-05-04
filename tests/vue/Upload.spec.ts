@@ -516,6 +516,20 @@ describe('Upload', () => {
       expect(dragArea.className).toContain('cursor-copy')
     })
 
+    it('should clear dragging state on drag leave', async () => {
+      const { container } = renderWithProps(Upload, {
+        drag: true
+      })
+
+      const dragArea = container.querySelector('[role="button"]') as HTMLElement
+
+      await fireEvent.dragOver(dragArea)
+      expect(dragArea.className).toContain('cursor-copy')
+
+      await fireEvent.dragLeave(dragArea)
+      expect(dragArea.className).not.toContain('cursor-copy')
+    })
+
     it('should handle drop event', async () => {
       const onChange = vi.fn()
       const { container } = render(Upload, {
@@ -551,6 +565,24 @@ describe('Upload', () => {
       await fireEvent.dragOver(dragArea)
 
       expect(dragArea.className).toBe(initialClassName)
+    })
+
+    it('should not process dropped files when disabled', async () => {
+      const onChange = vi.fn()
+      const { container } = render(Upload, {
+        props: {
+          drag: true,
+          disabled: true,
+          onChange
+        }
+      })
+
+      const dragArea = container.querySelector('[role="button"]') as HTMLElement
+      const file = new File(['content'], 'test.txt', { type: 'text/plain' })
+
+      await fireEvent.drop(dragArea, { dataTransfer: { files: [file] } })
+
+      expect(onChange).not.toHaveBeenCalled()
     })
   })
 

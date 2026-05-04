@@ -19,6 +19,9 @@ import {
   type UploadLabels,
   prepareUploadFiles,
   fileToUploadFile,
+  handleUploadDragOver,
+  handleUploadDragLeave,
+  handleUploadDrop,
   formatFileSize,
   getUploadButtonClasses,
   getDragAreaClasses,
@@ -327,24 +330,23 @@ export const Upload = defineComponent({
     }
 
     const handleDragOver = (event: DragEvent) => {
-      if (props.disabled) return
-      event.preventDefault()
-      isDragging.value = true
+      const result = handleUploadDragOver(event, props.disabled)
+      if (!result.handled) return
+      isDragging.value = result.isDragging
     }
 
     const handleDragLeave = (event: DragEvent) => {
-      if (props.disabled) return
-      event.preventDefault()
-      isDragging.value = false
+      const result = handleUploadDragLeave(event, props.disabled)
+      if (!result.handled) return
+      isDragging.value = result.isDragging
     }
 
     const handleDrop = async (event: DragEvent) => {
-      if (props.disabled) return
-      event.preventDefault()
-      isDragging.value = false
+      const result = handleUploadDrop(event, props.disabled)
+      if (!result.handled) return
+      isDragging.value = result.isDragging
 
-      const files = Array.from(event.dataTransfer?.files || [])
-      await processFiles(files)
+      await processFiles(result.files)
     }
 
     const handleDragKeydown = (event: KeyboardEvent) => {
