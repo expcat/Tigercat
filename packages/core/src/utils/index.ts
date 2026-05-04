@@ -2,8 +2,21 @@
  * Core Utils - Re-export organized modules
  *
  * This barrel file provides both:
- * 1. Grouped exports via sub-modules (helpers/, icons/, a11y/, i18n/, styles/)
+ * 1. Grouped exports via sub-modules (helpers/, icons/, a11y/, i18n/, styles/, motion/)
  * 2. Flat exports for backward compatibility
+ *
+ * **Recommended import patterns (for better tree-shaking):**
+ *
+ * ```ts
+ * // ✅ Prefer: sub-path group imports
+ * import { classNames, coerceClassValue } from '@expcat/tigercat-core' // helpers
+ * import { getButtonClasses } from '@expcat/tigercat-core'             // styles
+ * import { ANIMATION_DURATION_MS } from '@expcat/tigercat-core'        // motion
+ * import { trapFocus } from '@expcat/tigercat-core'                    // a11y
+ *
+ * // ❌ Avoid: importing everything when you only need a few symbols
+ * import * as core from '@expcat/tigercat-core'
+ * ```
  */
 
 // Re-export all from organized sub-modules
@@ -13,14 +26,11 @@ export * from './a11y'
 export * from './i18n'
 export * from './styles'
 
+// Motion utilities (animation + transition, consolidated)
+export * from './motion'
+
 // Floating UI positioning utilities
 export * from './floating'
-
-// Animation constants and utilities
-export * from './animation'
-
-// Transition system (enter/leave presets)
-export * from './transition'
 
 // ChatWindow utilities
 export * from './chat-window-utils'

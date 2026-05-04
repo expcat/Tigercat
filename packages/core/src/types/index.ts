@@ -10,6 +10,9 @@
  * - Other: link, text, icon, code, chart, locale
  */
 
+// Base shared interfaces (v1.0+)
+export * from './base'
+
 // Form components
 export * from './button'
 export * from './input'

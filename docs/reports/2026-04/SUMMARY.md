@@ -16,7 +16,7 @@
 
 | 分组                  | 剩余内容                                                                                                                                                                                                                                            |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Core utils            | `BaseInteractiveProps` / `BaseFormControlProps` / `BaseLayoutProps` 未落地；`animation.ts` / `transition.ts` 仍未合并为 `motion/`；`helpers/` 目录未按 dom/class/motion 细分；死代码扫描未执行                                                      |
+| Core utils            | ✅ 已完成 — `BaseInteractiveProps` 等基础类型已落地；`motion/` 合并完成；`helpers/` 已分类；knip 扫描无需清理                                                                                                                                        |
 | i18n / CLI / examples | `defineLocale`、ConfigProvider 异步 locale、根入口 locale tree-shaking 方案仍未完成；commander 14 等 Node 20+；workspace catalog/overrides 未配置；CLI Windows shim 与 `doctor` 命令仍待做                                                          |
 | Basic                 | Empty 默认插画体积、Divider 文件合并评估仍待做                                                                                                                                                                                                      |
 | Form                  | Form O(N²) 校验、picker-utils 二期、Radio/Checkbox icon 体积、命令式 Form API 仍待评估或实现                                                                                                                                                        |
@@ -65,3 +65,6 @@
 | 2026-05-04 | Phase 0: 覆盖率基线刷新       | Done | 267 files / 4998 tests 全通过；Stmts 80.51% / Branch 74.17% / Funcs 81.20% / Lines 82.59%（较 04-30 基线 +3~5pp）；旧基线已归档为 `coverage-baseline-2026-04-30.json`                  |
 | 2026-05-04 | Phase 0: 体积基线刷新         | Done | Core 72.3KB(limit 100KB) / Vue 198.8KB(limit 250KB) / React 229.3KB(limit 250KB)，全部在限额内                                                                                        |
 | 2026-05-04 | Phase 0: lint/bench 基线      | Done | lint: 0 errors / 16 warnings (exhaustive-deps)；bench: classNames 6.2M ops/s、chartPadding 5.9M、pieArcs 773K；修复 BackTop.spec.tsx 缺失 async                                       |
+| 2026-05-04 | Phase 1B: barrel 治理          | Done | `utils/index.ts` 文档化推荐导入；animation/transition 收敛到 `motion/`；helpers 按职责分组；三端构建通过                                                                               |
+| 2026-05-04 | Phase 1B: 基础 Props 类型      | Done | 新增 `types/base.ts`：`ComponentSize`、`BaseInteractiveProps`、`BaseFormControlProps<T>`、`BaseLayoutProps`；267 tests 全通过                                                          |
+| 2026-05-04 | Phase 1B: 死代码扫描           | Done | knip 扫描仅 5 个未消费导出（均为公共 API 有意保留）；无需移除                                                                                                                          |
