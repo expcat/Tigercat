@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/vue'
 import { InputNumber } from '@expcat/tigercat-vue'
 
@@ -113,6 +113,28 @@ describe('InputNumber (Vue)', () => {
 
     await fireEvent.click(screen.getByLabelText('Increase'))
     expect(emitted()['update:modelValue'][0]).toEqual([1.1])
+  })
+
+  it('repeats increment while the Increase button is held', async () => {
+    vi.useFakeTimers()
+    try {
+      const { emitted } = render(InputNumber, {
+        props: { modelValue: 0 }
+      })
+      const increase = screen.getByLabelText('Increase')
+
+      await fireEvent.pointerDown(increase)
+      expect(emitted()['update:modelValue'][0]).toEqual([1])
+
+      vi.advanceTimersByTime(450)
+      expect(emitted()['update:modelValue'].map(([value]) => value)).toEqual([1, 2, 3])
+
+      await fireEvent.pointerUp(increase)
+      vi.advanceTimersByTime(200)
+      expect(emitted()['update:modelValue'].map(([value]) => value)).toEqual([1, 2, 3])
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('formats display value with precision', () => {

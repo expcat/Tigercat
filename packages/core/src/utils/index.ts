@@ -115,6 +115,9 @@ export * from './file-manager-utils'
 // InputGroup utilities (v0.9.0+)
 export * from './input-group-utils'
 
+// Repeated press utilities (v0.9.0+)
+export * from './repeat-action-utils'
+
 // Group component utilities (v0.9.0+)
 export * from './group-utils'
 

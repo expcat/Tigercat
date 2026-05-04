@@ -1,4 +1,4 @@
-import { defineComponent, h, type PropType } from 'vue'
+import { defineComponent, h, onBeforeUnmount, type PropType } from 'vue'
 import type { StepperSize } from '@expcat/tigercat-core'
 import {
   stepperBaseClasses,
@@ -9,7 +9,8 @@ import {
   stepperIconViewBox,
   clampStepperValue,
   classNames,
-  coerceClassValue
+  coerceClassValue,
+  createRafRepeatActionController
 } from '@expcat/tigercat-core'
 
 export type VueStepperProps = InstanceType<typeof Stepper>['$props']
@@ -27,20 +28,64 @@ export const Stepper = defineComponent({
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit, attrs }) {
-    function setValue(v: number) {
+    const repeatController = createRafRepeatActionController()
+    let repeatValue = props.modelValue
+    let suppressNextClick = false
+
+    onBeforeUnmount(() => repeatController.stop())
+
+    function setValue(v: number): number {
       const clamped = clampStepperValue(v, props.min, props.max, props.precision)
       emit('update:modelValue', clamped)
       emit('change', clamped)
+      return clamped
+    }
+
+    function stepBy(direction: 'up' | 'down', baseValue: number = props.modelValue): number {
+      return setValue(direction === 'up' ? baseValue + props.step : baseValue - props.step)
     }
 
     function decrement() {
+      if (suppressNextClick) {
+        suppressNextClick = false
+        return
+      }
       if (props.disabled) return
-      setValue(props.modelValue - props.step)
+      stepBy('down')
     }
 
     function increment() {
+      if (suppressNextClick) {
+        suppressNextClick = false
+        return
+      }
       if (props.disabled) return
-      setValue(props.modelValue + props.step)
+      stepBy('up')
+    }
+
+    function startStepRepeat(direction: 'up' | 'down') {
+      return (event: PointerEvent) => {
+        event.preventDefault()
+        if (props.disabled) return
+        if (direction === 'down' && props.modelValue <= props.min) return
+        if (direction === 'up' && props.modelValue >= props.max) return
+
+        suppressNextClick = true
+        repeatValue = props.modelValue
+        repeatController.start(() => {
+          const baseValue = repeatValue
+          const nextValue = stepBy(direction, baseValue)
+          repeatValue = nextValue
+
+          if (nextValue === baseValue) {
+            repeatController.stop()
+          }
+        })
+      }
+    }
+
+    function stopStepRepeat() {
+      repeatController.stop()
     }
 
     function handleInput(e: Event) {
@@ -78,6 +123,10 @@ export const Stepper = defineComponent({
               class: getStepperButtonClasses(props.size, props.disabled || atMin, 'left'),
               disabled: props.disabled || atMin,
               'aria-label': 'Decrease',
+              onPointerdown: startStepRepeat('down'),
+              onPointerup: stopStepRepeat,
+              onPointerleave: stopStepRepeat,
+              onPointercancel: stopStepRepeat,
               onClick: decrement
             },
             [icon(minusPathD)]
@@ -100,6 +149,10 @@ export const Stepper = defineComponent({
               class: getStepperButtonClasses(props.size, props.disabled || atMax, 'right'),
               disabled: props.disabled || atMax,
               'aria-label': 'Increase',
+              onPointerdown: startStepRepeat('up'),
+              onPointerup: stopStepRepeat,
+              onPointerleave: stopStepRepeat,
+              onPointercancel: stopStepRepeat,
               onClick: increment
             },
             [icon(plusPathD)]

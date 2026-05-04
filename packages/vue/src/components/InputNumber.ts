@@ -1,4 +1,4 @@
-import { defineComponent, computed, ref, watch, h, onMounted, PropType } from 'vue'
+import { defineComponent, computed, ref, watch, h, onMounted, onBeforeUnmount, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -19,6 +19,7 @@ import {
   formatPrecision,
   isAtMin,
   isAtMax,
+  createRafRepeatActionController,
   type InputSize,
   type InputStatus
 } from '@expcat/tigercat-core'
@@ -115,6 +116,9 @@ export const InputNumber = defineComponent({
   setup(props, { emit, attrs }) {
     const inputRef = ref<HTMLInputElement | null>(null)
     const focused = ref(false)
+    const repeatController = createRafRepeatActionController()
+    let repeatValue: number | null = null
+    let suppressNextClick = false
 
     // Internal display value
     const displayValue = ref('')
@@ -169,10 +173,13 @@ export const InputNumber = defineComponent({
       displayValue.value = toDisplayValue(finalVal)
     }
 
-    function handleStep(direction: 'up' | 'down') {
-      if (props.disabled || props.readonly) return
+    function handleStep(
+      direction: 'up' | 'down',
+      baseValue: number | null | undefined = currentValue.value
+    ): number | null {
+      if (props.disabled || props.readonly) return baseValue ?? null
       const next = stepValue(
-        currentValue.value,
+        baseValue,
         props.step,
         direction,
         props.min,
@@ -180,6 +187,41 @@ export const InputNumber = defineComponent({
         props.precision
       )
       commitValue(next)
+      return next
+    }
+
+    function handleStepClick(direction: 'up' | 'down') {
+      if (suppressNextClick) {
+        suppressNextClick = false
+        return
+      }
+
+      handleStep(direction)
+    }
+
+    function startStepRepeat(direction: 'up' | 'down') {
+      return (event: PointerEvent) => {
+        event.preventDefault()
+        if (props.disabled || props.readonly) return
+        if (direction === 'down' && isAtMin(currentValue.value, props.min)) return
+        if (direction === 'up' && isAtMax(currentValue.value, props.max)) return
+
+        suppressNextClick = true
+        repeatValue = currentValue.value
+        repeatController.start(() => {
+          const baseValue = repeatValue
+          const nextValue = handleStep(direction, baseValue)
+          repeatValue = nextValue
+
+          if (nextValue === baseValue) {
+            repeatController.stop()
+          }
+        })
+      }
+    }
+
+    function stopStepRepeat() {
+      repeatController.stop()
     }
 
     function handleInput(e: Event) {
@@ -244,6 +286,8 @@ export const InputNumber = defineComponent({
       }
     })
 
+    onBeforeUnmount(() => repeatController.stop())
+
     return () => {
       const children: ReturnType<typeof h>[] = []
 
@@ -258,8 +302,11 @@ export const InputNumber = defineComponent({
               'aria-label': 'Decrease',
               class: getInputNumberSideButtonClasses('left', props.disabled || atMin.value),
               disabled: props.disabled || atMin.value,
-              onMousedown: (e: MouseEvent) => e.preventDefault(),
-              onClick: () => handleStep('down')
+              onPointerdown: startStepRepeat('down'),
+              onPointerup: stopStepRepeat,
+              onPointerleave: stopStepRepeat,
+              onPointercancel: stopStepRepeat,
+              onClick: () => handleStepClick('down')
             },
             [
               h(
@@ -314,8 +361,11 @@ export const InputNumber = defineComponent({
               'aria-label': 'Increase',
               class: getInputNumberSideButtonClasses('right', props.disabled || atMax.value),
               disabled: props.disabled || atMax.value,
-              onMousedown: (e: MouseEvent) => e.preventDefault(),
-              onClick: () => handleStep('up')
+              onPointerdown: startStepRepeat('up'),
+              onPointerup: stopStepRepeat,
+              onPointerleave: stopStepRepeat,
+              onPointercancel: stopStepRepeat,
+              onClick: () => handleStepClick('up')
             },
             [
               h(
@@ -347,8 +397,11 @@ export const InputNumber = defineComponent({
                 'aria-label': 'Increase',
                 class: getInputNumberStepButtonClasses('up', props.disabled || atMax.value),
                 disabled: props.disabled || atMax.value,
-                onMousedown: (e: MouseEvent) => e.preventDefault(),
-                onClick: () => handleStep('up')
+                onPointerdown: startStepRepeat('up'),
+                onPointerup: stopStepRepeat,
+                onPointerleave: stopStepRepeat,
+                onPointercancel: stopStepRepeat,
+                onClick: () => handleStepClick('up')
               },
               [
                 h(
@@ -371,8 +424,11 @@ export const InputNumber = defineComponent({
                 'aria-label': 'Decrease',
                 class: getInputNumberStepButtonClasses('down', props.disabled || atMin.value),
                 disabled: props.disabled || atMin.value,
-                onMousedown: (e: MouseEvent) => e.preventDefault(),
-                onClick: () => handleStep('down')
+                onPointerdown: startStepRepeat('down'),
+                onPointerup: stopStepRepeat,
+                onPointerleave: stopStepRepeat,
+                onPointercancel: stopStepRepeat,
+                onClick: () => handleStepClick('down')
               },
               [
                 h(

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import React from 'react'
 import { Stepper } from '@expcat/tigercat-react'
 
@@ -83,6 +83,31 @@ describe('Stepper', () => {
     const plus = container.querySelectorAll('button')[1]
     fireEvent.click(plus)
     expect(onChange).toHaveBeenCalledWith(5)
+  })
+
+  it('repeats increment while the plus button is held', () => {
+    vi.useFakeTimers()
+    try {
+      const onChange = vi.fn()
+      const { container } = render(<Stepper value={5} onChange={onChange} />)
+      const plus = container.querySelectorAll('button')[1]
+
+      fireEvent.pointerDown(plus)
+      expect(onChange).toHaveBeenCalledWith(6)
+
+      act(() => {
+        vi.advanceTimersByTime(450)
+      })
+      expect(onChange.mock.calls.map(([value]) => value)).toEqual([6, 7, 8])
+
+      fireEvent.pointerUp(plus)
+      act(() => {
+        vi.advanceTimersByTime(200)
+      })
+      expect(onChange.mock.calls.map(([value]) => value)).toEqual([6, 7, 8])
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   // --- Disabled ---

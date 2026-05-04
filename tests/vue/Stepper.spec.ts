@@ -93,11 +93,34 @@ describe('Stepper', () => {
     expect(onChange).toHaveBeenCalledWith(5)
   })
 
+  it('repeats increment while the plus button is held', async () => {
+    vi.useFakeTimers()
+    try {
+      const onChange = vi.fn()
+      const { container } = render(Stepper, {
+        props: { modelValue: 5, 'onUpdate:modelValue': onChange }
+      })
+      const plus = container.querySelectorAll('button')[1]
+
+      await fireEvent.pointerDown(plus)
+      expect(onChange).toHaveBeenCalledWith(6)
+
+      vi.advanceTimersByTime(450)
+      expect(onChange.mock.calls.map(([value]) => value)).toEqual([6, 7, 8])
+
+      await fireEvent.pointerUp(plus)
+      vi.advanceTimersByTime(200)
+      expect(onChange.mock.calls.map(([value]) => value)).toEqual([6, 7, 8])
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   // --- Disabled ---
   it('disables all controls when disabled', () => {
     const { container } = renderWithProps(Stepper, { disabled: true })
     const buttons = container.querySelectorAll('button')
-    buttons.forEach(b => expect(b).toBeDisabled())
+    buttons.forEach((b) => expect(b).toBeDisabled())
     expect(container.querySelector('input')).toBeDisabled()
   })
 

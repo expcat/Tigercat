@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import type { StepperProps as CoreStepperProps } from '@expcat/tigercat-core'
 import {
   stepperBaseClasses,
@@ -8,7 +8,8 @@ import {
   plusPathD,
   stepperIconViewBox,
   clampStepperValue,
-  classNames
+  classNames,
+  createRafRepeatActionController
 } from '@expcat/tigercat-core'
 
 export interface StepperProps extends CoreStepperProps {
@@ -29,9 +30,54 @@ export const Stepper: React.FC<StepperProps> = ({
   className,
   onChange
 }) => {
-  function setValue(v: number) {
+  const repeatControllerRef = useRef(createRafRepeatActionController())
+  const repeatValueRef = useRef(value)
+  const suppressNextClickRef = useRef(false)
+
+  useEffect(() => () => repeatControllerRef.current.stop(), [])
+
+  function setValue(v: number): number {
     const clamped = clampStepperValue(v, min, max, precision)
     onChange?.(clamped)
+    return clamped
+  }
+
+  function stepBy(direction: 'up' | 'down', baseValue: number = value): number {
+    return setValue(direction === 'up' ? baseValue + step : baseValue - step)
+  }
+
+  function handleStepClick(direction: 'up' | 'down') {
+    if (suppressNextClickRef.current) {
+      suppressNextClickRef.current = false
+      return
+    }
+
+    stepBy(direction)
+  }
+
+  function startStepRepeat(direction: 'up' | 'down') {
+    return (event: React.PointerEvent<HTMLButtonElement>) => {
+      event.preventDefault()
+      if (disabled) return
+      if (direction === 'down' && value <= min) return
+      if (direction === 'up' && value >= max) return
+
+      suppressNextClickRef.current = true
+      repeatValueRef.current = value
+      repeatControllerRef.current.start(() => {
+        const baseValue = repeatValueRef.current
+        const nextValue = stepBy(direction, baseValue)
+        repeatValueRef.current = nextValue
+
+        if (nextValue === baseValue) {
+          repeatControllerRef.current.stop()
+        }
+      })
+    }
+  }
+
+  function stopStepRepeat() {
+    repeatControllerRef.current.stop()
   }
 
   const atMin = value <= min
@@ -50,7 +96,11 @@ export const Stepper: React.FC<StepperProps> = ({
         className={getStepperButtonClasses(size, disabled || atMin, 'left')}
         disabled={disabled || atMin}
         aria-label="Decrease"
-        onClick={() => setValue(value - step)}>
+        onPointerDown={startStepRepeat('down')}
+        onPointerUp={stopStepRepeat}
+        onPointerLeave={stopStepRepeat}
+        onPointerCancel={stopStepRepeat}
+        onClick={() => handleStepClick('down')}>
         {icon(minusPathD)}
       </button>
       <input
@@ -69,7 +119,11 @@ export const Stepper: React.FC<StepperProps> = ({
         className={getStepperButtonClasses(size, disabled || atMax, 'right')}
         disabled={disabled || atMax}
         aria-label="Increase"
-        onClick={() => setValue(value + step)}>
+        onPointerDown={startStepRepeat('up')}
+        onPointerUp={stopStepRepeat}
+        onPointerLeave={stopStepRepeat}
+        onPointerCancel={stopStepRepeat}
+        onClick={() => handleStepClick('up')}>
         {icon(plusPathD)}
       </button>
     </div>

@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { InputNumber } from '@expcat/tigercat-react'
@@ -105,6 +105,31 @@ describe('InputNumber (React)', () => {
 
     await userEvent.click(screen.getByLabelText('Increase'))
     expect(onChange).toHaveBeenCalledWith(1.1)
+  })
+
+  it('repeats increment while the Increase button is held', () => {
+    vi.useFakeTimers()
+    try {
+      const onChange = vi.fn()
+      render(<InputNumber defaultValue={0} onChange={onChange} />)
+      const increase = screen.getByLabelText('Increase')
+
+      fireEvent.pointerDown(increase)
+      expect(onChange).toHaveBeenCalledWith(1)
+
+      act(() => {
+        vi.advanceTimersByTime(450)
+      })
+      expect(onChange.mock.calls.map(([value]) => value)).toEqual([1, 2, 3])
+
+      fireEvent.pointerUp(increase)
+      act(() => {
+        vi.advanceTimersByTime(200)
+      })
+      expect(onChange.mock.calls.map(([value]) => value)).toEqual([1, 2, 3])
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('formats display value with precision', () => {

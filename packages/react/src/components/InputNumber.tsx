@@ -18,6 +18,7 @@ import {
   formatPrecision,
   isAtMin,
   isAtMax,
+  createRafRepeatActionController,
   type InputNumberProps as CoreInputNumberProps
 } from '@expcat/tigercat-core'
 
@@ -70,6 +71,9 @@ export const InputNumber: React.FC<InputNumberProps> = ({
 }) => {
   const isControlled = controlledValue !== undefined
   const inputRef = useRef<HTMLInputElement>(null)
+  const repeatControllerRef = useRef(createRafRepeatActionController())
+  const repeatValueRef = useRef<number | null>(null)
+  const suppressNextClickRef = useRef(false)
   const [focused, setFocused] = useState(false)
   const [internalValue, setInternalValue] = useState<number | null>(
     defaultValue ?? controlledValue ?? null
@@ -108,6 +112,8 @@ export const InputNumber: React.FC<InputNumberProps> = ({
     }
   }, [autoFocus])
 
+  useEffect(() => () => repeatControllerRef.current.stop(), [])
+
   const commitValue = (val: number | null) => {
     let finalVal = val
     if (finalVal !== null) {
@@ -124,10 +130,48 @@ export const InputNumber: React.FC<InputNumberProps> = ({
     setDisplayValue(toDisplayValue(finalVal))
   }
 
-  const handleStep = (direction: 'up' | 'down') => {
-    if (disabled || readonly) return
-    const next = stepValue(currentValue, step, direction, min, max, precision)
+  const handleStep = (
+    direction: 'up' | 'down',
+    baseValue: number | null | undefined = currentValue
+  ): number | null => {
+    if (disabled || readonly) return baseValue ?? null
+    const next = stepValue(baseValue, step, direction, min, max, precision)
     commitValue(next)
+    return next
+  }
+
+  const handleStepClick = (direction: 'up' | 'down') => {
+    if (suppressNextClickRef.current) {
+      suppressNextClickRef.current = false
+      return
+    }
+
+    handleStep(direction)
+  }
+
+  const startStepRepeat = (direction: 'up' | 'down') => {
+    return (event: React.PointerEvent<HTMLButtonElement>) => {
+      event.preventDefault()
+      if (disabled || readonly) return
+      if (direction === 'down' && isAtMin(currentValue, min)) return
+      if (direction === 'up' && isAtMax(currentValue, max)) return
+
+      suppressNextClickRef.current = true
+      repeatValueRef.current = currentValue
+      repeatControllerRef.current.start(() => {
+        const baseValue = repeatValueRef.current
+        const nextValue = handleStep(direction, baseValue)
+        repeatValueRef.current = nextValue
+
+        if (nextValue === baseValue) {
+          repeatControllerRef.current.stop()
+        }
+      })
+    }
+  }
+
+  const stopStepRepeat = () => {
+    repeatControllerRef.current.stop()
   }
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -198,8 +242,11 @@ export const InputNumber: React.FC<InputNumberProps> = ({
           aria-label="Decrease"
           className={getInputNumberSideButtonClasses('left', disabled || atMin)}
           disabled={disabled || atMin}
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => handleStep('down')}>
+          onPointerDown={startStepRepeat('down')}
+          onPointerUp={stopStepRepeat}
+          onPointerLeave={stopStepRepeat}
+          onPointerCancel={stopStepRepeat}
+          onClick={() => handleStepClick('down')}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -242,8 +289,11 @@ export const InputNumber: React.FC<InputNumberProps> = ({
           aria-label="Increase"
           className={getInputNumberSideButtonClasses('right', disabled || atMax)}
           disabled={disabled || atMax}
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => handleStep('up')}>
+          onPointerDown={startStepRepeat('up')}
+          onPointerUp={stopStepRepeat}
+          onPointerLeave={stopStepRepeat}
+          onPointerCancel={stopStepRepeat}
+          onClick={() => handleStepClick('up')}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -265,8 +315,11 @@ export const InputNumber: React.FC<InputNumberProps> = ({
             aria-label="Increase"
             className={getInputNumberStepButtonClasses('up', disabled || atMax)}
             disabled={disabled || atMax}
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => handleStep('up')}>
+            onPointerDown={startStepRepeat('up')}
+            onPointerUp={stopStepRepeat}
+            onPointerLeave={stopStepRepeat}
+            onPointerCancel={stopStepRepeat}
+            onClick={() => handleStepClick('up')}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -281,8 +334,11 @@ export const InputNumber: React.FC<InputNumberProps> = ({
             aria-label="Decrease"
             className={getInputNumberStepButtonClasses('down', disabled || atMin)}
             disabled={disabled || atMin}
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => handleStep('down')}>
+            onPointerDown={startStepRepeat('down')}
+            onPointerUp={stopStepRepeat}
+            onPointerLeave={stopStepRepeat}
+            onPointerCancel={stopStepRepeat}
+            onClick={() => handleStepClick('down')}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
