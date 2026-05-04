@@ -29,14 +29,13 @@ import {
   modalBodyClasses,
   modalFooterClasses,
   resolveLocaleText,
-  lockBodyScroll,
-  getFocusableElements,
-  getFocusTrapNavigation,
+  shouldCloseOnMaskClick,
   type TigerLocale,
   type ModalSize
 } from '@expcat/tigercat-core'
 
 import { Button } from './Button'
+import { useVueBodyScrollLock, useVueEscapeKey, useVueFocusTrap } from '../utils/overlay'
 
 let modalIdCounter = 0
 const createModalId = () => `tiger-modal-${++modalIdCounter}`
@@ -226,7 +225,6 @@ export const Modal = defineComponent({
     const dialogRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
     const previousActiveElement = ref<HTMLElement | null>(null)
-    let unlockBodyScroll: (() => void) | undefined
 
     // Drag state
     const dragOffset = ref({ x: 0, y: 0 })
@@ -268,40 +266,23 @@ export const Modal = defineComponent({
     }
 
     const handleMaskClick = (event: MouseEvent) => {
-      if (props.maskClosable && event.target === event.currentTarget) {
+      if (shouldCloseOnMaskClick(event, props.maskClosable)) {
         handleClose()
       }
     }
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Handle Escape key
-      if (event.key === 'Escape' && props.open) {
-        handleClose()
-        return
-      }
+    const overlayOpen = computed(() => props.open)
+    let cleanupEscape: (() => void) | undefined
 
-      // Handle Tab key for focus trap
-      if (event.key === 'Tab' && props.open && dialogRef.value) {
-        const focusables = getFocusableElements(dialogRef.value)
-        const result = getFocusTrapNavigation(event, focusables, document.activeElement)
-
-        if (result.shouldHandle && result.next) {
-          event.preventDefault()
-          result.next.focus()
-        }
-      }
-    }
+    useVueBodyScrollLock(overlayOpen)
+    useVueFocusTrap({ enabled: overlayOpen, containerRef: dialogRef })
 
     onMounted(() => {
-      document.addEventListener('keydown', handleKeyDown)
-      if (props.open) {
-        unlockBodyScroll = lockBodyScroll()
-      }
+      cleanupEscape = useVueEscapeKey({ enabled: overlayOpen, onEscape: handleClose })
     })
 
     onBeforeUnmount(() => {
-      document.removeEventListener('keydown', handleKeyDown)
-      unlockBodyScroll?.()
+      cleanupEscape?.()
     })
 
     watch(
@@ -309,8 +290,6 @@ export const Modal = defineComponent({
       async (nextVisible) => {
         if (nextVisible) {
           hasBeenOpened.value = true
-          unlockBodyScroll?.()
-          unlockBodyScroll = lockBodyScroll()
 
           const active = document.activeElement
           previousActiveElement.value = active instanceof HTMLElement ? active : null
@@ -320,8 +299,6 @@ export const Modal = defineComponent({
           el?.focus?.()
         } else {
           emit('close')
-          unlockBodyScroll?.()
-          unlockBodyScroll = undefined
           previousActiveElement.value?.focus?.()
           dragOffset.value = { x: 0, y: 0 }
         }

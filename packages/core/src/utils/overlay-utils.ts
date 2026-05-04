@@ -27,6 +27,15 @@ export interface IsEventOutsideOptions {
   ignore?: Array<ElementLike | null | undefined>
 }
 
+export type MaskClickLikeEvent = {
+  target: EventTarget | null
+  currentTarget: EventTarget | null
+}
+
+export function shouldCloseOnMaskClick(event: MaskClickLikeEvent, maskClosable: boolean): boolean {
+  return maskClosable && event.target === event.currentTarget
+}
+
 export function isEventOutside(
   event: Event,
   containers: Array<ElementLike | null | undefined>,

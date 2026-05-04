@@ -12,7 +12,6 @@ import {
   loadingContainerBaseClasses,
   loadingFullscreenBaseClasses,
   loadingColorClasses,
-  lockBodyScroll,
   mergeStyleValues,
   normalizeSvgAttrs,
   injectLoadingAnimationStyles,
@@ -21,6 +20,7 @@ import {
   type LoadingSize,
   type LoadingColor
 } from '@expcat/tigercat-core'
+import { useVueBodyScrollLock } from '../utils/overlay'
 
 export interface VueLoadingProps extends LoadingProps {
   style?: Record<string, string | number>
@@ -84,7 +84,11 @@ export const Loading = defineComponent({
 
     const visible = ref(false)
     let timer: ReturnType<typeof setTimeout> | null = null
-    let unlockBodyScroll: (() => void) | undefined
+    const shouldLockBodyScroll = computed(
+      () => props.fullscreen && visible.value && props.lockScroll
+    )
+
+    useVueBodyScrollLock(shouldLockBodyScroll)
 
     const clearTimer = () => {
       if (timer) {
@@ -113,22 +117,7 @@ export const Loading = defineComponent({
 
     onUnmounted(() => {
       clearTimer()
-      unlockBodyScroll?.()
-      unlockBodyScroll = undefined
     })
-
-    watch(
-      () => [props.fullscreen, visible.value, props.lockScroll] as const,
-      ([fullscreen, isVisible, lockScrollEnabled]) => {
-        unlockBodyScroll?.()
-        unlockBodyScroll = undefined
-
-        if (fullscreen && isVisible && lockScrollEnabled) {
-          unlockBodyScroll = lockBodyScroll()
-        }
-      },
-      { immediate: true }
-    )
 
     const spinnerClasses = computed(() => {
       return getLoadingClasses(props.variant, props.size, props.color, props.customColor)

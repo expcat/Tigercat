@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
@@ -10,6 +10,10 @@ import { Drawer } from '@expcat/tigercat-react'
 import { expectNoA11yViolations } from '../utils/react'
 
 describe('Drawer', () => {
+  afterEach(() => {
+    document.body.style.overflow = ''
+  })
+
   it('should not render when open is false (initial)', () => {
     render(<Drawer open={false} title="Test Drawer" />)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
@@ -110,6 +114,43 @@ describe('Drawer', () => {
       const root = document.querySelector('[data-tiger-drawer-root]')
       expect(root).toHaveStyle({ zIndex: '2000' })
     })
+  })
+
+  it('should lock body scroll while open and restore it when closed', async () => {
+    const { rerender } = render(<Drawer open={true} title="Test Drawer" />)
+
+    await waitFor(() => {
+      expect(document.body.style.overflow).toBe('hidden')
+    })
+
+    rerender(<Drawer open={false} title="Test Drawer" />)
+
+    await waitFor(() => {
+      expect(document.body.style.overflow).toBe('')
+    })
+  })
+
+  it('should trap focus inside the drawer', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <Drawer open={true} title="Focus Drawer">
+        <button type="button">First action</button>
+        <button type="button">Last action</button>
+      </Drawer>
+    )
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Close drawer')).toBeInTheDocument()
+      expect(screen.getByText('Last action')).toBeInTheDocument()
+    })
+
+    const closeButton = screen.getByLabelText('Close drawer')
+    const lastButton = screen.getByText('Last action')
+
+    lastButton.focus()
+    await user.tab()
+    expect(closeButton).toHaveFocus()
   })
 
   it('should keep content mounted (hidden) when destroyOnClose is false', async () => {

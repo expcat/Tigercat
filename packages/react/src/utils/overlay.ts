@@ -4,6 +4,7 @@ import {
   getFocusableElements,
   isEscapeKey,
   isEventOutside,
+  lockBodyScroll,
   computeFloatingPosition,
   autoUpdateFloating,
   type FloatingPlacement,
@@ -70,6 +71,18 @@ export function useEscapeKey({ enabled, onEscape }: UseEscapeKeyOptions): void {
   }, [enabled, onEscape])
 }
 
+export interface UseBodyScrollLockOptions {
+  enabled: boolean
+}
+
+export function useBodyScrollLock({ enabled }: UseBodyScrollLockOptions): void {
+  useEffect(() => {
+    if (!enabled) return
+
+    return lockBodyScroll()
+  }, [enabled])
+}
+
 export interface UseFocusTrapOptions {
   enabled: boolean
   containerRef: React.RefObject<HTMLElement | null>
@@ -82,7 +95,8 @@ export function useFocusTrap({ enabled, containerRef }: UseFocusTrapOptions): vo
 
     const handler = (event: KeyboardEvent) => {
       const focusables = getFocusableElements(container)
-      const nav = getFocusTrapNavigation(event, focusables, document.activeElement)
+      const activeElement = container.ownerDocument?.activeElement ?? document.activeElement
+      const nav = getFocusTrapNavigation(event, focusables, activeElement)
       if (!nav.shouldHandle || !nav.next) return
 
       event.preventDefault()

@@ -2,8 +2,9 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
+import userEvent from '@testing-library/user-event'
 import { Drawer } from '@expcat/tigercat-vue'
 import { h } from 'vue'
 import { renderWithProps, renderWithSlots, expectNoA11yViolations } from '../utils'
@@ -11,6 +12,7 @@ import { renderWithProps, renderWithSlots, expectNoA11yViolations } from '../uti
 describe('Drawer', () => {
   afterEach(() => {
     document.body.innerHTML = ''
+    document.body.style.overflow = ''
   })
 
   it('should not render when open is false (initial)', () => {
@@ -159,6 +161,49 @@ describe('Drawer', () => {
       const root = document.querySelector('[data-tiger-drawer-root]') as HTMLElement
       expect(root).toHaveStyle({ zIndex: '2000' })
     })
+  })
+
+  it('should lock body scroll while open and restore it when closed', async () => {
+    const { rerender } = render(Drawer, {
+      props: { open: true, title: 'Test Drawer' }
+    })
+
+    await waitFor(() => {
+      expect(document.body.style.overflow).toBe('hidden')
+    })
+
+    await rerender({ open: false, title: 'Test Drawer' })
+
+    await waitFor(() => {
+      expect(document.body.style.overflow).toBe('')
+    })
+  })
+
+  it('should trap focus inside the drawer', async () => {
+    const user = userEvent.setup()
+
+    render(Drawer, {
+      props: { open: true, title: 'Focus Drawer' },
+      slots: {
+        default: () =>
+          h('div', [
+            h('button', { type: 'button' }, 'First action'),
+            h('button', { type: 'button' }, 'Last action')
+          ])
+      }
+    })
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Close drawer')).toBeInTheDocument()
+      expect(screen.getByText('Last action')).toBeInTheDocument()
+    })
+
+    const closeButton = screen.getByLabelText('Close drawer')
+    const lastButton = screen.getByText('Last action')
+
+    lastButton.focus()
+    await user.tab()
+    expect(closeButton).toHaveFocus()
   })
 
   it('should keep content mounted (hidden) when destroyOnClose is false', async () => {

@@ -3,7 +3,12 @@
  */
 
 import { describe, expect, it } from 'vitest'
-import { getFocusableElements, getFocusTrapNavigation, isEventOutside } from '@expcat/tigercat-core'
+import {
+  getFocusableElements,
+  getFocusTrapNavigation,
+  isEventOutside,
+  shouldCloseOnMaskClick
+} from '@expcat/tigercat-core'
 
 describe('overlay-utils (core)', () => {
   it('isEventOutside should return false when target is inside container', () => {
@@ -51,6 +56,15 @@ describe('overlay-utils (core)', () => {
     })
 
     expect(isEventOutside(event, [container], { ignore: [trigger] })).toBe(false)
+  })
+
+  it('shouldCloseOnMaskClick should only close for direct mask clicks when enabled', () => {
+    const mask = document.createElement('div')
+    const content = document.createElement('div')
+
+    expect(shouldCloseOnMaskClick({ target: mask, currentTarget: mask }, true)).toBe(true)
+    expect(shouldCloseOnMaskClick({ target: content, currentTarget: mask }, true)).toBe(false)
+    expect(shouldCloseOnMaskClick({ target: mask, currentTarget: mask }, false)).toBe(false)
   })
 
   it('getFocusableElements should filter disabled and tabindex=-1', () => {

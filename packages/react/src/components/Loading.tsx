@@ -12,10 +12,10 @@ import {
   loadingContainerBaseClasses,
   loadingFullscreenBaseClasses,
   loadingColorClasses,
-  lockBodyScroll,
   injectLoadingAnimationStyles,
   type LoadingProps as CoreLoadingProps
 } from '@expcat/tigercat-core'
+import { useBodyScrollLock } from '../utils/overlay'
 
 export interface LoadingProps
   extends CoreLoadingProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreLoadingProps> {}
@@ -40,10 +40,7 @@ export const Loading: React.FC<LoadingProps> = ({
     injectLoadingAnimationStyles()
   }, [])
 
-  useEffect(() => {
-    if (!fullscreen || !visible || !lockScroll) return
-    return lockBodyScroll()
-  }, [fullscreen, visible, lockScroll])
+  useBodyScrollLock({ enabled: fullscreen && visible && lockScroll })
 
   useEffect(() => {
     if (delay <= 0) {

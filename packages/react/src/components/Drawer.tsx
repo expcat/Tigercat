@@ -18,14 +18,12 @@ import {
   getDrawerFooterClasses,
   getDrawerCloseButtonClasses,
   getDrawerTitleClasses,
-  lockBodyScroll,
   resolveLocaleText,
   restoreFocus,
-  getFocusableElements,
-  getFocusTrapNavigation,
+  shouldCloseOnMaskClick,
   type DrawerProps as CoreDrawerProps
 } from '@expcat/tigercat-core'
-import { useEscapeKey } from '../utils/overlay'
+import { useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
 
 export interface DrawerProps
   extends CoreDrawerProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
@@ -97,8 +95,7 @@ export const Drawer: React.FC<DrawerProps> = ({
 
   const handleMaskClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      if (!maskClosable) return
-      if (event.target === event.currentTarget) {
+      if (shouldCloseOnMaskClick(event, maskClosable)) {
         handleClose()
       }
     },
@@ -106,11 +103,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   )
 
   useEscapeKey({ enabled: open, onEscape: handleClose })
-
-  useEffect(() => {
-    if (!open) return
-    return lockBodyScroll()
-  }, [open])
+  useBodyScrollLock({ enabled: open })
 
   const previousVisible = useRef(false)
   useEffect(() => {
@@ -166,18 +159,7 @@ export const Drawer: React.FC<DrawerProps> = ({
     restoreFocus(previousActiveElementRef.current)
   }, [open])
 
-  // Focus trap handler
-  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
-    if (event.key === 'Tab' && dialogRef.current) {
-      const focusables = getFocusableElements(dialogRef.current)
-      const result = getFocusTrapNavigation(event.nativeEvent, focusables, document.activeElement)
-
-      if (result.shouldHandle && result.next) {
-        event.preventDefault()
-        result.next.focus()
-      }
-    }
-  }, [])
+  useFocusTrap({ enabled: open, containerRef: dialogRef })
 
   const containerClasses = classNames(getDrawerContainerClasses(), !open && 'pointer-events-none')
 
@@ -231,7 +213,6 @@ export const Drawer: React.FC<DrawerProps> = ({
         aria-labelledby={ariaLabelledby}
         tabIndex={-1}
         ref={dialogRef}
-        onKeyDown={handleKeyDown}
         data-tiger-drawer="">
         {(title || header || closable) && (
           <div className={headerClasses}>

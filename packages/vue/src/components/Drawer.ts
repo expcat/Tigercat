@@ -33,13 +33,11 @@ import {
   getDrawerCloseButtonClasses,
   getDrawerTitleClasses,
   restoreFocus,
-  lockBodyScroll,
-  getFocusableElements,
-  getFocusTrapNavigation,
+  shouldCloseOnMaskClick,
   type DrawerPlacement,
   type DrawerSize
 } from '@expcat/tigercat-core'
-import { useVueEscapeKey } from '../utils/overlay'
+import { useVueBodyScrollLock, useVueEscapeKey, useVueFocusTrap } from '../utils/overlay'
 
 let drawerIdCounter = 0
 const createDrawerId = () => `tiger-drawer-${++drawerIdCounter}`
@@ -201,7 +199,6 @@ export const Drawer = defineComponent({
     const dialogRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
     const previousActiveElement = ref<HTMLElement | null>(null)
-    let unlockBodyScroll: (() => void) | undefined
 
     const titleId = computed(() => `${instanceId.value}-title`)
 
@@ -221,8 +218,7 @@ export const Drawer = defineComponent({
     }
 
     const handleMaskClick = (event: MouseEvent) => {
-      if (!props.maskClosable) return
-      if (event.target === event.currentTarget) {
+      if (shouldCloseOnMaskClick(event, props.maskClosable)) {
         handleClose()
       }
     }
@@ -230,42 +226,24 @@ export const Drawer = defineComponent({
     const escapeEnabled = computed(() => props.open)
     let cleanupEscape: (() => void) | undefined
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Handle Tab key for focus trap
-      if (event.key === 'Tab' && props.open && dialogRef.value) {
-        const focusables = getFocusableElements(dialogRef.value)
-        const result = getFocusTrapNavigation(event, focusables, document.activeElement)
-
-        if (result.shouldHandle && result.next) {
-          event.preventDefault()
-          result.next.focus()
-        }
-      }
-    }
+    useVueBodyScrollLock(escapeEnabled)
+    useVueFocusTrap({ enabled: escapeEnabled, containerRef: dialogRef })
 
     onMounted(() => {
       cleanupEscape = useVueEscapeKey({
         enabled: escapeEnabled,
         onEscape: handleClose
       })
-      document.addEventListener('keydown', handleKeyDown)
-      if (props.open) {
-        unlockBodyScroll = lockBodyScroll()
-      }
     })
 
     onBeforeUnmount(() => {
       cleanupEscape?.()
-      document.removeEventListener('keydown', handleKeyDown)
-      unlockBodyScroll?.()
     })
 
     watch(
       () => props.open,
       async (nextVisible) => {
         if (nextVisible) {
-          unlockBodyScroll?.()
-          unlockBodyScroll = lockBodyScroll()
           previousActiveElement.value = captureActiveElement()
 
           await nextTick()
@@ -273,8 +251,6 @@ export const Drawer = defineComponent({
           return
         }
 
-        unlockBodyScroll?.()
-        unlockBodyScroll = undefined
         restoreFocus(previousActiveElement.value)
       }
     )

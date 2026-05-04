@@ -1,6 +1,9 @@
 import {
+  getFocusTrapNavigation,
+  getFocusableElements,
   isEscapeKey,
   isEventOutside,
+  lockBodyScroll,
   computeFloatingPosition,
   autoUpdateFloating,
   type FloatingPlacement,
@@ -65,6 +68,48 @@ export function useVueEscapeKey({ enabled, onEscape }: UseVueEscapeKeyOptions): 
 
   document.addEventListener('keydown', handler)
   return () => document.removeEventListener('keydown', handler)
+}
+
+export function useVueBodyScrollLock(enabled: Ref<boolean>): void {
+  watch(
+    enabled,
+    (isEnabled, _prevEnabled, onCleanup) => {
+      if (!isEnabled) return
+
+      const unlock = lockBodyScroll()
+      onCleanup(() => unlock())
+    },
+    { immediate: true }
+  )
+}
+
+export interface UseVueFocusTrapOptions {
+  enabled: Ref<boolean>
+  containerRef: Ref<HTMLElement | null>
+}
+
+export function useVueFocusTrap({ enabled, containerRef }: UseVueFocusTrapOptions): void {
+  watch(
+    [enabled, containerRef],
+    ([isEnabled, container], _previous, onCleanup) => {
+      if (!isEnabled || !container) return
+
+      const handler = (event: KeyboardEvent) => {
+        const focusables = getFocusableElements(container)
+        const activeElement = container.ownerDocument?.activeElement ?? document.activeElement
+        const navigation = getFocusTrapNavigation(event, focusables, activeElement)
+
+        if (!navigation.shouldHandle || !navigation.next) return
+
+        event.preventDefault()
+        navigation.next.focus()
+      }
+
+      container.addEventListener('keydown', handler)
+      onCleanup(() => container.removeEventListener('keydown', handler))
+    },
+    { immediate: true, flush: 'post' }
+  )
 }
 
 // ============================================================================

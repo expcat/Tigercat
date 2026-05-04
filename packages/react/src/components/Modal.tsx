@@ -10,7 +10,6 @@ import {
   closeIconPathStrokeLinejoin,
   closeIconPathStrokeWidth,
   getModalContentClasses,
-  lockBodyScroll,
   resolveLocaleText,
   modalWrapperClasses,
   modalMaskClasses,
@@ -21,11 +20,10 @@ import {
   modalBodyClasses,
   modalFooterClasses,
   restoreFocus,
-  getFocusableElements,
-  getFocusTrapNavigation,
+  shouldCloseOnMaskClick,
   type ModalProps as CoreModalProps
 } from '@expcat/tigercat-core'
-import { useEscapeKey } from '../utils/overlay'
+import { useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
 import { Button } from './Button'
 
 export interface ModalProps
@@ -175,7 +173,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   const handleMaskClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      if (maskClosable && event.target === event.currentTarget) {
+      if (shouldCloseOnMaskClick(event, maskClosable)) {
         handleClose()
       }
     },
@@ -242,24 +240,8 @@ export const Modal: React.FC<ModalProps> = ({
   }, [open])
 
   useEscapeKey({ enabled: open, onEscape: handleClose })
-
-  useEffect(() => {
-    if (!open) return
-    return lockBodyScroll()
-  }, [open])
-
-  // Focus trap handler
-  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
-    if (event.key === 'Tab' && dialogRef.current) {
-      const focusables = getFocusableElements(dialogRef.current)
-      const result = getFocusTrapNavigation(event.nativeEvent, focusables, document.activeElement)
-
-      if (result.shouldHandle && result.next) {
-        event.preventDefault()
-        result.next.focus()
-      }
-    }
-  }, [])
+  useBodyScrollLock({ enabled: open })
+  useFocusTrap({ enabled: open, containerRef: dialogRef })
 
   // Close icon component
   const CloseIcon = (
@@ -317,7 +299,6 @@ export const Modal: React.FC<ModalProps> = ({
           aria-labelledby={ariaLabelledby}
           tabIndex={-1}
           ref={dialogRef}
-          onKeyDown={handleKeyDown}
           data-tiger-modal="">
           {/* Header */}
           {(title || titleContent || closable) && (

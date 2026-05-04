@@ -10,6 +10,10 @@
 
 > 2026-05-04 执行：完成 Feedback / Loading overlay 复用。Fullscreen Loading 现在与 Modal / Drawer 一样挂载到 body，并共用 core body scroll lock 计数器；Modal / Drawer 也接入同一锁，新增 core 与 Vue/React Loading 测试覆盖 portal/teleport 与滚动锁行为。
 
+> 2026-05-04 执行：完成 Feedback / overlay hooks 收敛。Vue / React 内部 overlay 工具新增 body scroll lock 与 focus trap 封装，Modal / Drawer / Loading 接入共享 hooks/composables，Vue Modal 的 Esc 处理对齐 Drawer，并新增 Vue/React Drawer 滚动锁与焦点循环回归测试。更大的 overlay 共享层总项仍保留，用于后续继续收敛 portal/teleport 与跨 overlay 策略。
+
+> 2026-05-04 执行：完成 Feedback / mask close 语义收敛。core overlay utils 新增 `shouldCloseOnMaskClick`，Vue / React 的 Modal 与 Drawer 共用同一 maskClosable 判断，并新增 core 单测覆盖直接 mask 点击、内容点击与禁用关闭场景。更大的 overlay 共享层总项仍保留，用于后续继续收敛 portal/teleport。
+
 ## 1. 最高优先级
 
 | 任务                   | 对应组件 / 范围                                           | 来源                                                                     | 完成标准                                                           |
