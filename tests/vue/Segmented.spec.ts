@@ -65,6 +65,20 @@ describe('Segmented', () => {
     expect(radios[0].getAttribute('aria-checked')).toBe('false')
   })
 
+  it('moves the active indicator with transform when value changes', async () => {
+    const { container, rerender } = renderWithProps(Segmented, {
+      options: defaultOptions,
+      modelValue: 'b'
+    })
+    const indicator = container.querySelector('[data-tiger-segmented-indicator]')
+
+    expect(indicator).toHaveStyle({ transform: 'translateX(100%)' })
+    expect(indicator).toHaveStyle({ width: 'calc((100% - (0.25rem * 2)) / 3)' })
+
+    await rerender({ options: defaultOptions, modelValue: 'c' })
+    expect(indicator).toHaveStyle({ transform: 'translateX(200%)' })
+  })
+
   // --- Disabled ---
   it('disables all options when disabled', () => {
     const { container } = renderWithProps(Segmented, { options: defaultOptions, disabled: true })

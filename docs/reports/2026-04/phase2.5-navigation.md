@@ -9,6 +9,5 @@
 | Tabs indicator transform      | P1     | 滑动指示条用 transform 驱动，避免 left/width reflow                                         |
 | Tree key 缓存复核             | P1     | 节点 key 与可见节点派生缓存有回归测试，避免每 render 重算                                   |
 | Menu 展开动画                 | P1     | 使用 CSS height transition + rAF 测高，避免硬编码 max-height                                |
-| Segmented transform           | P1     | 滑块位置使用 transform，并补切换测试                                                        |
 | FloatButton group memo        | P2     | 子按钮列表缓存，避免不必要重建                                                              |
 | Steps vertical pseudo-element | P2     | vertical 连接线改用 CSS pseudo-element 或确认保留 inline div 的理由                         |

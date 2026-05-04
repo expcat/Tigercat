@@ -2,6 +2,9 @@ import React from 'react'
 import type { SegmentedProps as CoreSegmentedProps, SegmentedOption } from '@expcat/tigercat-core'
 import {
   getSegmentedContainerClasses,
+  getSegmentedContainerStyle,
+  getSegmentedIndicatorClasses,
+  getSegmentedIndicatorStyle,
   getSegmentedOptionClasses,
   classNames
 } from '@expcat/tigercat-core'
@@ -28,10 +31,19 @@ export const Segmented: React.FC<SegmentedProps> = ({
     onChange?.(opt.value)
   }
 
+  const selectedIndex = options.findIndex((opt) => opt.value === value)
+
   return (
     <div
       className={classNames(getSegmentedContainerClasses(size, block), className)}
+      style={getSegmentedContainerStyle(options.length)}
       role="radiogroup">
+      <div
+        data-tiger-segmented-indicator="true"
+        aria-hidden="true"
+        className={getSegmentedIndicatorClasses(size)}
+        style={getSegmentedIndicatorStyle(selectedIndex, options.length, size)}
+      />
       {options.map((opt) => {
         const selected = opt.value === value
         const isDisabled = !!opt.disabled || disabled

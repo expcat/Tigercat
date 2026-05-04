@@ -2,6 +2,9 @@ import { defineComponent, h, type PropType } from 'vue'
 import type { SegmentedSize, SegmentedOption } from '@expcat/tigercat-core'
 import {
   getSegmentedContainerClasses,
+  getSegmentedContainerStyle,
+  getSegmentedIndicatorClasses,
+  getSegmentedIndicatorStyle,
   getSegmentedOptionClasses,
   classNames,
   coerceClassValue
@@ -41,27 +44,40 @@ export const Segmented = defineComponent({
             getSegmentedContainerClasses(props.size, props.block),
             coerceClassValue(attrs.class)
           ),
+          style: getSegmentedContainerStyle(props.options.length),
           role: 'radiogroup'
         },
-        props.options.map((opt) => {
-          const selected = opt.value === props.modelValue
-          const isDisabled = !!opt.disabled || props.disabled
-          return h(
-            'label',
-            {
-              key: opt.value,
-              class: classNames(
-                getSegmentedOptionClasses(props.size, selected, isDisabled),
-                props.block ? 'flex-1 text-center' : ''
-              ),
-              role: 'radio',
-              'aria-checked': selected,
-              'aria-disabled': isDisabled,
-              onClick: () => handleSelect(opt)
-            },
-            [h('span', null, opt.label)]
-          )
-        })
+        [
+          h('div', {
+            'data-tiger-segmented-indicator': 'true',
+            'aria-hidden': 'true',
+            class: getSegmentedIndicatorClasses(props.size),
+            style: getSegmentedIndicatorStyle(
+              props.options.findIndex((opt) => opt.value === props.modelValue),
+              props.options.length,
+              props.size
+            )
+          }),
+          ...props.options.map((opt) => {
+            const selected = opt.value === props.modelValue
+            const isDisabled = !!opt.disabled || props.disabled
+            return h(
+              'label',
+              {
+                key: opt.value,
+                class: classNames(
+                  getSegmentedOptionClasses(props.size, selected, isDisabled),
+                  props.block ? 'flex-1 text-center' : ''
+                ),
+                role: 'radio',
+                'aria-checked': selected,
+                'aria-disabled': isDisabled,
+                onClick: () => handleSelect(opt)
+              },
+              [h('span', null, opt.label)]
+            )
+          })
+        ]
       )
   }
 })
