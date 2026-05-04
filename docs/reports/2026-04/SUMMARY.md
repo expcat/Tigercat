@@ -18,7 +18,7 @@
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Core utils            | `BaseInteractiveProps` / `BaseFormControlProps` / `BaseLayoutProps` 未落地；`animation.ts` / `transition.ts` 仍未合并为 `motion/`；`helpers/` 目录未按 dom/class/motion 细分；死代码扫描未执行                                                      |
 | i18n / CLI / examples | `defineLocale`、ConfigProvider 异步 locale、根入口 locale tree-shaking 方案仍未完成；commander 14 等 Node 20+；workspace catalog/overrides 未配置；CLI Windows shim 与 `doctor` 命令仍待做                                                          |
-| Basic                 | React Button 仍有 module-level spinner；Group 类组件共享 `group-utils` 未落地；ImageCropper/ImagePreview 仍需更强交互测试                                                                                                                           |
+| Basic                 | Group 类组件共享 `group-utils` 未落地；ImageCropper/ImagePreview 仍需更强交互测试                                                                                                                                                                   |
 | Form                  | Upload 拖拽、InputNumber/Stepper 长按、Form O(N²) 校验、Switch class composer、命令式 Form API 仍待评估或实现                                                                                                                                       |
 | Feedback              | Watermark OffscreenCanvas/ResizeObserver、Notification stack rAF、Floating middleware 缓存、Loading overlay 复用仍待做                                                                                                                              |
 | Layout                | Splitter/Resizable 仍是组件内 mousemove；Carousel autoplay 仍用 `setInterval`；List 未复用 VirtualList；Row/Col 与 Descriptions 性能项未完成                                                                                                        |
@@ -35,3 +35,9 @@
 | Node engines bump           | Pending    | 需单独评估 CI、发布 workflow 与 devDependency 要求                  |
 | workspace catalog/overrides | Pending    | `pnpm-workspace.yaml` 仍未使用 catalog/overrides 固定核心工具链版本 |
 | Kanban / TaskBoard v2 API   | Discussion | 需评估公开 API、兼容策略与迁移成本                                  |
+
+## 4. 本轮完成记录
+
+| 日期       | 任务                         | 状态 | 验证                                                                                                     |
+| ---------- | ---------------------------- | ---- | -------------------------------------------------------------------------------------------------------- |
+| 2026-05-04 | React Button spinner lazy PR | Done | `Button.spec.tsx` + `ButtonSpinnerLazy.spec.tsx` 通过；`pnpm --filter @expcat/tigercat-react build` 通过 |

@@ -18,21 +18,23 @@ export interface ButtonProps
   icon?: React.ReactNode
 }
 
-const spinnerSvg = getSpinnerSVG('spinner')
+const createDefaultSpinner = (): React.ReactNode => {
+  const spinnerSvg = getSpinnerSVG('spinner')
 
-const DefaultSpinner = (
-  <svg
-    className="animate-spin h-4 w-4"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox={spinnerSvg.viewBox}
-    aria-hidden="true"
-    focusable="false">
-    {spinnerSvg.elements.map((el, index) =>
-      React.createElement(el.type, { key: index, ...el.attrs })
-    )}
-  </svg>
-)
+  return (
+    <svg
+      className="animate-spin h-4 w-4"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox={spinnerSvg.viewBox}
+      aria-hidden="true"
+      focusable="false">
+      {spinnerSvg.elements.map((el, index) =>
+        React.createElement(el.type, { key: index, ...el.attrs })
+      )}
+    </svg>
+  )
+}
 
 export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
@@ -84,7 +86,7 @@ export const Button: React.FC<ButtonProps> = ({
       type={htmlType}>
       {loading && (
         <span className={iconIsRight ? 'ml-2 order-1' : 'mr-2'}>
-          {loadingIcon ?? DefaultSpinner}
+          {loadingIcon ?? createDefaultSpinner()}
         </span>
       )}
       {!loading && icon && <span className={iconIsRight ? 'ml-2 order-1' : 'mr-2'}>{icon}</span>}
