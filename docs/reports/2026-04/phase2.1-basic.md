@@ -5,7 +5,6 @@
 | 任务                  | 优先级 | 完成标准                                                            |
 | --------------------- | ------ | ------------------------------------------------------------------- |
 | ImageCropper 交互测试 | P1     | 覆盖裁剪框移动、缩放、aspect ratio、键盘/触控边界，而不仅是基础渲染 |
-| ImagePreview 交互测试 | P1     | 覆盖 open/close、prev/next、zoom/rotate、键盘导航的实际交互         |
 | Typography 合并评估   | P2     | 评估 Text / Code 是否需要合并为 Typography，不改变现有公开 API      |
 | Empty 默认插画体积    | P2     | 评估 CSS-only、可替换外部插画或按需插画策略                         |
 | Divider 文件合并评估  | P2     | 评估是否与 Space 或 layout util 合并，保持子路径兼容                |

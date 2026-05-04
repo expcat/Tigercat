@@ -25,9 +25,11 @@ import {
   prevIconPath,
   nextIconPath,
   previewCloseIconPath,
+  imageViewerIcons,
   clampScale,
   calculateTransform,
-  getPreviewNavState
+  getPreviewNavState,
+  normalizeRotation
 } from '@expcat/tigercat-core'
 
 export interface VueImagePreviewProps {
@@ -77,6 +79,7 @@ export const ImagePreview = defineComponent({
   emits: ['update:open', 'update:currentIndex', 'scale-change'],
   setup(props, { emit }) {
     const scale = ref(1)
+    const rotation = ref(0)
     const offsetX = ref(0)
     const offsetY = ref(0)
     const index = ref(props.currentIndex)
@@ -85,6 +88,7 @@ export const ImagePreview = defineComponent({
 
     const resetTransform = () => {
       scale.value = 1
+      rotation.value = 0
       offsetX.value = 0
       offsetY.value = 0
     }
@@ -131,6 +135,14 @@ export const ImagePreview = defineComponent({
     const handleReset = () => {
       resetTransform()
       emit('scale-change', 1)
+    }
+
+    const handleRotateLeft = () => {
+      rotation.value = normalizeRotation(rotation.value - 90)
+    }
+
+    const handleRotateRight = () => {
+      rotation.value = normalizeRotation(rotation.value + 90)
     }
 
     const handlePrev = () => {
@@ -208,7 +220,10 @@ export const ImagePreview = defineComponent({
       document.body.style.overflow = ''
     })
 
-    const transform = computed(() => calculateTransform(scale.value, offsetX.value, offsetY.value))
+    const transform = computed(
+      () =>
+        `${calculateTransform(scale.value, offsetX.value, offsetY.value)} rotate(${rotation.value}deg)`
+    )
 
     return () => {
       if (!isOpen.value || !props.images.length) return null
@@ -273,6 +288,26 @@ export const ImagePreview = defineComponent({
             type: 'button'
           },
           [svgIcon(zoomInIconPath)]
+        ),
+        h(
+          'button',
+          {
+            class: imagePreviewToolbarBtnClasses,
+            onClick: handleRotateLeft,
+            'aria-label': 'Rotate left',
+            type: 'button'
+          },
+          [svgIcon(imageViewerIcons.rotateLeft)]
+        ),
+        h(
+          'button',
+          {
+            class: imagePreviewToolbarBtnClasses,
+            onClick: handleRotateRight,
+            'aria-label': 'Rotate right',
+            type: 'button'
+          },
+          [svgIcon(imageViewerIcons.rotateRight)]
         ),
         navState.value.counter
           ? h('span', { class: imagePreviewCounterClasses }, navState.value.counter)

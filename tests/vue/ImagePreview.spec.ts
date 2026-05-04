@@ -98,6 +98,8 @@ describe('ImagePreview', () => {
 
     expect(document.querySelector('[aria-label="Zoom in"]')).toBeInTheDocument()
     expect(document.querySelector('[aria-label="Zoom out"]')).toBeInTheDocument()
+    expect(document.querySelector('[aria-label="Rotate left"]')).toBeInTheDocument()
+    expect(document.querySelector('[aria-label="Rotate right"]')).toBeInTheDocument()
     expect(document.querySelector('[aria-label="Reset"]')).toBeInTheDocument()
   })
 
@@ -125,6 +127,86 @@ describe('ImagePreview', () => {
 
     expect(emitted()['update:open']).toBeTruthy()
     expect(emitted()['update:open'][0]).toEqual([false])
+  })
+
+  it('emits update:open when Escape is pressed', async () => {
+    const { emitted } = render(ImagePreview, {
+      props: {
+        open: true,
+        images
+      }
+    })
+
+    await fireEvent.keyDown(document, { key: 'Escape' })
+
+    expect(emitted()['update:open']).toBeTruthy()
+    expect(emitted()['update:open'][0]).toEqual([false])
+  })
+
+  it('updates current image from navigation button clicks', async () => {
+    const { emitted } = render(ImagePreview, {
+      props: {
+        open: true,
+        images,
+        currentIndex: 1
+      }
+    })
+
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    await fireEvent.click(document.querySelector('[aria-label="Next image"]') as HTMLElement)
+
+    expect(emitted()['update:currentIndex'][0]).toEqual([2])
+    expect(img).toHaveAttribute('src', '/img3.jpg')
+
+    await fireEvent.click(document.querySelector('[aria-label="Previous image"]') as HTMLElement)
+
+    expect(emitted()['update:currentIndex'][1]).toEqual([1])
+    expect(img).toHaveAttribute('src', '/img2.jpg')
+  })
+
+  it('updates current image from keyboard navigation', async () => {
+    const { emitted } = render(ImagePreview, {
+      props: {
+        open: true,
+        images
+      }
+    })
+
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+    await fireEvent.keyDown(document, { key: 'ArrowRight' })
+
+    expect(emitted()['update:currentIndex'][0]).toEqual([1])
+    expect(img).toHaveAttribute('src', '/img2.jpg')
+
+    await fireEvent.keyDown(document, { key: 'ArrowLeft' })
+
+    expect(emitted()['update:currentIndex'][1]).toEqual([0])
+    expect(img).toHaveAttribute('src', '/img1.jpg')
+  })
+
+  it('updates zoom and rotation from toolbar actions and reset', async () => {
+    const { emitted } = render(ImagePreview, {
+      props: {
+        open: true,
+        images
+      }
+    })
+
+    const img = document.querySelector('[role="dialog"] img') as HTMLImageElement
+
+    await fireEvent.click(document.querySelector('[aria-label="Zoom in"]') as HTMLElement)
+    expect(emitted()['scale-change'][0]).toEqual([1.5])
+    expect(img.style.transform).toContain('scale(1.5)')
+
+    await fireEvent.click(document.querySelector('[aria-label="Rotate right"]') as HTMLElement)
+    expect(img.style.transform).toContain('rotate(90deg)')
+
+    await fireEvent.click(document.querySelector('[aria-label="Rotate left"]') as HTMLElement)
+    expect(img.style.transform).toContain('rotate(0deg)')
+
+    await fireEvent.click(document.querySelector('[aria-label="Reset"]') as HTMLElement)
+    expect(emitted()['scale-change'][1]).toEqual([1])
+    expect(img.style.transform).toContain('translate(0px, 0px) scale(1) rotate(0deg)')
   })
 
   it('shows image counter for multiple images', () => {

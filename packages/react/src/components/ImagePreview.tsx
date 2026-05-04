@@ -16,9 +16,11 @@ import {
   prevIconPath,
   nextIconPath,
   previewCloseIconPath,
+  imageViewerIcons,
   clampScale,
   calculateTransform,
   getPreviewNavState,
+  normalizeRotation,
   type ImagePreviewProps as CoreImagePreviewProps
 } from '@expcat/tigercat-core'
 import { useEscapeKey } from '../utils/overlay'
@@ -68,6 +70,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 }) => {
   const isOpen = open
   const [scale, setScale] = useState(1)
+  const [rotation, setRotation] = useState(0)
   const [offsetX, setOffsetX] = useState(0)
   const [offsetY, setOffsetY] = useState(0)
   const [index, setIndex] = useState(currentIndex)
@@ -76,6 +79,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
 
   const resetTransform = useCallback(() => {
     setScale(1)
+    setRotation(0)
     setOffsetX(0)
     setOffsetY(0)
   }, [])
@@ -126,6 +130,14 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
     resetTransform()
     onScaleChange?.(1)
   }, [resetTransform, onScaleChange])
+
+  const handleRotateLeft = useCallback(() => {
+    setRotation((value) => normalizeRotation(value - 90))
+  }, [])
+
+  const handleRotateRight = useCallback(() => {
+    setRotation((value) => normalizeRotation(value + 90))
+  }, [])
 
   const handlePrev = useCallback(() => {
     if (index > 0) {
@@ -199,8 +211,8 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   )
 
   const transform = useMemo(
-    () => calculateTransform(scale, offsetX, offsetY),
-    [scale, offsetX, offsetY]
+    () => `${calculateTransform(scale, offsetX, offsetY)} rotate(${rotation}deg)`,
+    [scale, offsetX, offsetY, rotation]
   )
 
   if (!isOpen || !images.length) return null
@@ -276,6 +288,20 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
           aria-label="Zoom in"
           type="button">
           <SvgIcon d={zoomInIconPath} />
+        </button>
+        <button
+          className={imagePreviewToolbarBtnClasses}
+          onClick={handleRotateLeft}
+          aria-label="Rotate left"
+          type="button">
+          <SvgIcon d={imageViewerIcons.rotateLeft} />
+        </button>
+        <button
+          className={imagePreviewToolbarBtnClasses}
+          onClick={handleRotateRight}
+          aria-label="Rotate right"
+          type="button">
+          <SvgIcon d={imageViewerIcons.rotateRight} />
         </button>
         {navState.counter && <span className={imagePreviewCounterClasses}>{navState.counter}</span>}
       </div>
