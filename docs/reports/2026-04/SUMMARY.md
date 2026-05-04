@@ -1,6 +1,6 @@
 # Tigercat 2026-04 剩余优化清单
 
-> 2026-05-04 更新：Phase 0 / Phase 1B 已完成；Phase 1C 已完成 modern 交互测试 + a11y 对比度验证 + reduced motion 验证；Phase 1D 已完成 `defineLocale`；后续从 Phase 1D 其他 i18n / CLI / examples 项继续。
+> 2026-05-04 更新：Phase 0 / Phase 1B 已完成；Phase 1C 已完成 modern 交互测试 + a11y 对比度验证 + reduced motion 验证；Phase 1D 已完成 `defineLocale` 与 `tigercat doctor`；后续从 Phase 1D 其他 i18n / CLI / examples 项继续。
 
 ## 1. 最高优先级
 
@@ -17,7 +17,7 @@
 | 分组                  | 剩余内容                                                                                                                                                                                                                                            |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Core utils            | ✅ 已完成 — `BaseInteractiveProps` 等基础类型已落地；`motion/` 合并完成；`helpers/` 已分类；knip 扫描无需清理                                                                                                                                       |
-| i18n / CLI / examples | `defineLocale`、ConfigProvider 异步 locale、根入口 locale tree-shaking 方案仍未完成；commander 14 等 Node 20+；workspace catalog/overrides 未配置；CLI Windows shim 与 `doctor` 命令仍待做                                                          |
+| i18n / CLI / examples | ConfigProvider 异步 locale、根入口 locale tree-shaking 方案仍未完成；commander 14 等 Node 20+；workspace catalog/overrides 未配置；CLI Windows shim/路径测试、模板版本策略仍待做                                                                    |
 | Basic                 | Empty 默认插画体积、Divider 文件合并评估仍待做                                                                                                                                                                                                      |
 | Form                  | Form O(N²) 校验、picker-utils 二期、Radio/Checkbox icon 体积、命令式 Form API 仍待评估或实现                                                                                                                                                        |
 | Feedback              | Watermark OffscreenCanvas/ResizeObserver、Notification stack rAF、Floating middleware 缓存、Loading overlay 复用仍待做                                                                                                                              |
@@ -72,3 +72,4 @@
 | 2026-05-04 | Phase 1C: a11y 对比度验证     | Done | 新增 `tests/core/theme-contrast.spec.ts` 37 用例：覆盖 default/modern/vibrant/professional/minimal/natural 六套 preset 的 light+dark scheme；正文 `text` / `textSecondary ↔ surface*` 严格 ≥ 4.5:1，`focusRing` / `primary` / `error` ≥ 3:1，`success` / `warning` / `info` ≥ 2.0:1 作为退化护栏；与其他 4 份 theme 测试共 78 用例全通过                                                                  |
 | 2026-05-04 | Phase 1C: reduced motion 验证 | Done | 新增 `tests/core/reduced-motion.spec.ts` 10 用例：mock matchMedia 后 `prefersReducedMotion()` true/false 切换；`getAccessibleTransitionClasses()` 退化为 `duration-0` opacity-only fade；`createTigercatPlugin({ modern: true })` 输出的 `@media (prefers-reduced-motion: reduce)` 块所有 `--tiger-motion-duration-*` 均为 0ms；非 modern 时不输出该块；与 transition / modern-theme 系列共 76 用例全通过 |
 | 2026-05-04 | Phase 1D: `defineLocale`      | Done | 新增 `packages/core/src/utils/i18n/define-locale.ts`：`defineLocale(partial)` 在 `enUS` 基线上深度合并，跳过 `undefined`、保留 `null`、不变更源；从 `@expcat/tigercat-core` 导出；新增 8 用例全通过；core CJS/ESM/DTS 构建均通过                                                                                                                                                                          |
+| 2026-05-04 | Phase 1D: `tigercat doctor`   | Done | 新增 CLI `doctor` 命令：检查 `package.json`、Node >=18、pnpm >=8、Tailwind CSS 4、Tigercat Vue/React peer deps 与当前模板依赖；修正 CLI package `bin`/`main`/`module`/`types` 指向实际 tsup 产物；`tests/core/cli.spec.ts` 41 个通过，`pnpm --filter @expcat/tigercat-cli build` 通过，临时 React 模板执行 `node packages/cli/dist/index.js doctor` 全通过                                                |

@@ -18,6 +18,7 @@ import {
 
 // Test utils
 import { ensureDir, writeFileSafe, isDirEmpty, readFileSafe } from '@expcat/tigercat-cli/utils/fs'
+import { collectDoctorChecks } from '@expcat/tigercat-cli/commands/doctor'
 
 describe('CLI Constants', () => {
   it('should export correct CLI name and version', () => {
@@ -54,6 +55,17 @@ describe('CLI Constants', () => {
   it('should not have duplicate components', () => {
     const unique = new Set(ALL_COMPONENTS)
     expect(unique.size).toBe(ALL_COMPONENTS.length)
+  })
+
+  it('should point package entry fields at the tsup output files', () => {
+    const packageJson = JSON.parse(
+      readFileSync(resolve(process.cwd(), 'packages/cli/package.json'), 'utf-8')
+    )
+
+    expect(packageJson.bin.tigercat).toBe('./dist/index.js')
+    expect(packageJson.main).toBe('./dist/index.js')
+    expect(packageJson.module).toBe('./dist/index.js')
+    expect(packageJson.types).toBe('./dist/index.d.ts')
   })
 })
 
@@ -252,6 +264,124 @@ describe('CLI Utils - File System', () => {
   it('readFileSafe should return file content', () => {
     writeFileSafe(join(testDir, 'read.txt'), 'read me')
     expect(readFileSafe(join(testDir, 'read.txt'))).toBe('read me')
+  })
+})
+
+describe('CLI Doctor', () => {
+  const testDir = join(tmpdir(), `tigercat-doctor-test-${Date.now()}`)
+
+  afterEach(() => {
+    if (existsSync(testDir)) {
+      rmSync(testDir, { recursive: true, force: true })
+    }
+  })
+
+  function writePackage(projectName: string, pkg: Record<string, unknown>) {
+    const projectDir = join(testDir, projectName)
+    ensureDir(projectDir)
+    writeFileSafe(join(projectDir, 'package.json'), JSON.stringify(pkg, null, 2))
+    return projectDir
+  }
+
+  it('passes for a current React template-style project', () => {
+    const projectDir = writePackage('react-pass', {
+      packageManager: 'pnpm@10.26.2',
+      dependencies: {
+        '@expcat/tigercat-react': '^1.0.0',
+        react: '^19.2.3',
+        'react-dom': '^19.2.3'
+      },
+      devDependencies: {
+        '@expcat/tigercat-core': '^1.0.0',
+        '@tailwindcss/vite': '^4.1.18',
+        '@vitejs/plugin-react': '^4.3.4',
+        tailwindcss: '^4.1.18',
+        typescript: '^5.9.3',
+        vite: '^7.3.0'
+      }
+    })
+
+    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '20.0.0', env: {} })
+
+    expect(checks.every((check) => check.status === 'pass')).toBe(true)
+  })
+
+  it('fails when Node, pnpm, and Tailwind are too old', () => {
+    const projectDir = writePackage('old-toolchain', {
+      packageManager: 'pnpm@7.33.0',
+      dependencies: {
+        '@expcat/tigercat-vue': '^1.0.0',
+        vue: '^3.5.26'
+      },
+      devDependencies: {
+        '@expcat/tigercat-core': '^1.0.0',
+        '@tailwindcss/vite': '^3.4.0',
+        '@vitejs/plugin-vue': '^6.0.3',
+        tailwindcss: '^3.4.17',
+        typescript: '^5.9.3',
+        vite: '^7.3.0',
+        'vue-tsc': '^2.2.0'
+      }
+    })
+
+    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '16.20.2', env: {} })
+    const failedNames = checks.filter((check) => check.status === 'fail').map((check) => check.name)
+
+    expect(failedNames).toEqual(expect.arrayContaining(['Node.js', 'pnpm', 'Tailwind CSS']))
+  })
+
+  it('warns when a supported framework is not detected', () => {
+    const projectDir = writePackage('plain-vite', {
+      packageManager: 'pnpm@10.26.2',
+      devDependencies: {
+        '@tailwindcss/vite': '^4.1.18',
+        tailwindcss: '^4.1.18',
+        typescript: '^5.9.3',
+        vite: '^7.3.0'
+      }
+    })
+
+    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '20.0.0', env: {} })
+
+    expect(checks.find((check) => check.name === 'Peer dependencies')?.status).toBe('warn')
+    expect(checks.find((check) => check.name === 'Template compatibility')?.status).toBe('warn')
+  })
+
+  it('detects pnpm from the npm user agent when packageManager is absent', () => {
+    const projectDir = writePackage('pnpm-agent', {
+      dependencies: {
+        '@expcat/tigercat-vue': '^1.0.0',
+        vue: '^3.5.26'
+      },
+      devDependencies: {
+        '@expcat/tigercat-core': '^1.0.0',
+        '@tailwindcss/vite': '^4.1.18',
+        '@vitejs/plugin-vue': '^6.0.3',
+        tailwindcss: '^4.1.18',
+        typescript: '^5.9.3',
+        vite: '^7.3.0',
+        'vue-tsc': '^2.2.0'
+      }
+    })
+
+    const checks = collectDoctorChecks({
+      cwd: projectDir,
+      nodeVersion: '20.0.0',
+      env: { npm_config_user_agent: 'pnpm/10.26.2 npm/? node/v20.0.0 darwin arm64' }
+    })
+
+    expect(checks.find((check) => check.name === 'pnpm')?.status).toBe('pass')
+  })
+
+  it('fails when package.json is invalid', () => {
+    const projectDir = join(testDir, 'invalid-package')
+    ensureDir(projectDir)
+    writeFileSafe(join(projectDir, 'package.json'), '{ nope')
+
+    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '20.0.0', env: {} })
+
+    expect(checks.find((check) => check.name === 'Project package')?.status).toBe('fail')
+    expect(checks.some((check) => check.name === 'Tailwind CSS')).toBe(false)
   })
 })
 

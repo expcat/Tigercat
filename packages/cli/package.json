@@ -22,11 +22,11 @@
     "code-generator"
   ],
   "bin": {
-    "tigercat": "./dist/index.mjs"
+    "tigercat": "./dist/index.js"
   },
-  "main": "./dist/index.mjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
     "templates"

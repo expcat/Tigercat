@@ -12,13 +12,13 @@
 
 ## CLI
 
-| 任务                     | 优先级   | 完成标准                                                    |
-| ------------------------ | -------- | ----------------------------------------------------------- |
-| commander 14             | Deferred | Node 20+ 工具链就绪后升级并补 CLI 回归                      |
-| Windows `.cmd` shim 验证 | P1       | 在 README 或测试中覆盖 pnpm/npm/bun 的 Windows bin 路径行为 |
-| 模板版本策略             | P1       | 模板依赖范围改为 catalog/lockfile 对齐策略，避免长期漂移    |
-| `tigercat doctor`        | P2       | 检查 Tailwind 版本、peer deps、Node/pnpm 与模板兼容性       |
-| CLI Windows 路径测试     | P1       | `tests/core/cli.spec.ts` 覆盖路径分隔符和 bin 调用边界      |
+| 任务                     | 优先级   | 状态               | 完成标准 / 结果                                                                                                                                                                         |
+| ------------------------ | -------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| commander 14             | Deferred | Deferred           | Node 20+ 工具链就绪后升级并补 CLI 回归                                                                                                                                                  |
+| Windows `.cmd` shim 验证 | P1       | Pending            | 在 README 或测试中覆盖 pnpm/npm/bun 的 Windows bin 路径行为                                                                                                                             |
+| 模板版本策略             | P1       | Pending            | 模板依赖范围改为 catalog/lockfile 对齐策略，避免长期漂移                                                                                                                                |
+| `tigercat doctor`        | P2       | ✅ Done 2026-05-04 | 新增 `packages/cli/src/commands/doctor.ts`，检查 `package.json`、Node、pnpm、Tailwind 4、Tigercat peer deps 与模板依赖；修正 CLI package 入口指向实际 tsup 产物；CLI 聚焦测试与构建通过 |
+| CLI Windows 路径测试     | P1       | Pending            | `tests/core/cli.spec.ts` 覆盖路径分隔符和 bin 调用边界                                                                                                                                  |
 
 ## Examples / Tests
 

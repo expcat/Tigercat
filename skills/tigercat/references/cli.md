@@ -1,6 +1,6 @@
 # CLI 工具 — @expcat/tigercat-cli
 
-Tigercat CLI 脚手架工具，提供项目创建、组件添加、Playground 启动和 API 文档生成等开发者工具。
+Tigercat CLI 脚手架工具，提供项目创建、组件添加、Playground 启动、API 文档生成和项目健康检查等开发者工具。
 
 ## 安装
 
@@ -18,6 +18,7 @@ npx @expcat/tigercat-cli <command>
 | `tigercat add <comp...>` | 向现有项目添加组件（支持多个） | 自动检测框架（Vue/React） |
 | `tigercat playground`    | 启动交互式开发预览             | `--template`, `--port`    |
 | `tigercat generate docs` | 从 Props 类型生成 API 文档     | `--input`, `--output`     |
+| `tigercat doctor`        | 检查项目工具链与依赖兼容性     | 无                        |
 
 ---
 
@@ -102,6 +103,25 @@ tigercat generate docs --input ./packages/core/src/types --output ./docs/api
 
 ---
 
+## `tigercat doctor`
+
+检查当前项目是否符合 Tigercat 模板和运行时依赖要求。
+
+```bash
+tigercat doctor
+```
+
+**检查内容：**
+
+- `package.json` 是否可读取
+- Node.js 是否满足 `>=18`
+- pnpm 是否满足 `>=8`
+- Tailwind CSS 是否为 v4 兼容版本
+- Vue/React Tigercat peer dependencies 是否齐全
+- 当前项目依赖是否接近 CLI 模板要求
+
+---
+
 ## 源码位置
 
 | 文件                                      | 说明               |
@@ -112,6 +132,7 @@ tigercat generate docs --input ./packages/core/src/types --output ./docs/api
 | `packages/cli/src/commands/add.ts`        | add 命令           |
 | `packages/cli/src/commands/playground.ts` | playground 命令    |
 | `packages/cli/src/commands/generate.ts`   | generate 命令      |
+| `packages/cli/src/commands/doctor.ts`     | doctor 命令        |
 | `packages/cli/src/templates/vue3.ts`      | Vue 3 项目模板     |
 | `packages/cli/src/templates/react.ts`     | React 项目模板     |
 | `packages/cli/src/utils/logger.ts`        | 日志工具           |

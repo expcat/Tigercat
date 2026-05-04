@@ -48,6 +48,14 @@ tigercat generate docs
 tigercat generate docs --output ./docs/api
 ```
 
+### `tigercat doctor`
+
+Check whether the current project has compatible Node, pnpm, Tailwind CSS, Tigercat peer dependencies, and template tooling.
+
+```bash
+tigercat doctor
+```
+
 ## License
 
 MIT
