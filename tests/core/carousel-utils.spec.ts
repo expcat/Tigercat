@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import {
   createCarouselAutoplayController,
+  getCarouselTouchPoint,
+  resolveCarouselSwipeDirection,
   type CarouselFrameCallback,
   type CarouselVisibilityDocument
 } from '@expcat/tigercat-core'
@@ -140,5 +142,46 @@ describe('carousel-utils autoplay controller', () => {
 
     scheduler.flush(1000)
     expect(onAdvance).not.toHaveBeenCalled()
+  })
+})
+
+describe('carousel-utils swipe helpers', () => {
+  it('reads the first touch point from a touch list', () => {
+    expect(
+      getCarouselTouchPoint([
+        { clientX: 24, clientY: 36 },
+        { clientX: 48, clientY: 60 }
+      ])
+    ).toEqual({ x: 24, y: 36 })
+  })
+
+  it('returns next for a left swipe that clears the threshold', () => {
+    expect(
+      resolveCarouselSwipeDirection({ x: 120, y: 40 }, { x: 80, y: 46 }, { minSwipeDistance: 24 })
+    ).toBe('next')
+  })
+
+  it('returns prev for a right swipe that clears the threshold', () => {
+    expect(
+      resolveCarouselSwipeDirection({ x: 80, y: 40 }, { x: 124, y: 44 }, { minSwipeDistance: 24 })
+    ).toBe('prev')
+  })
+
+  it('ignores short or vertical gestures', () => {
+    expect(
+      resolveCarouselSwipeDirection(
+        { x: 100, y: 100 },
+        { x: 118, y: 104 },
+        { minSwipeDistance: 24 }
+      )
+    ).toBeNull()
+
+    expect(
+      resolveCarouselSwipeDirection(
+        { x: 100, y: 100 },
+        { x: 132, y: 156 },
+        { minSwipeDistance: 24 }
+      )
+    ).toBeNull()
   })
 })

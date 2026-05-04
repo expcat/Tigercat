@@ -22,9 +22,13 @@ import {
   isPrevDisabled,
   clampSlideIndex,
   getScrollTransform,
+  getCarouselTouchPoint,
+  resolveCarouselSwipeDirection,
   createCarouselAutoplayController,
   carouselPrevArrowPath,
   carouselNextArrowPath,
+  type CarouselTouchPoint,
+  type CarouselSwipeDirection,
   type CarouselProps as CoreCarouselProps,
   type CarouselMethods
 } from '@expcat/tigercat-core'
@@ -74,6 +78,9 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
   ) => {
     const [currentIndex, setCurrentIndex] = useState(initialSlide)
     const [isPaused, setIsPaused] = useState(false)
+    const containerRef = useRef<HTMLDivElement | null>(null)
+    const touchStartRef = useRef<CarouselTouchPoint | null>(null)
+    const touchCurrentRef = useRef<CarouselTouchPoint | null>(null)
 
     // Stable refs for callbacks (avoid restarting autoplay timer on callback changes)
     const onChangeRef = useRef(onChange)
@@ -90,6 +97,23 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     }, [children])
 
     const slideCount = slides.length
+
+    const navigateByDirection = useCallback(
+      (direction: CarouselSwipeDirection) => {
+        const current = currentIndexRef.current
+        const targetIndex =
+          direction === 'next'
+            ? getNextSlideIndex(current, slideCount, infinite)
+            : getPrevSlideIndex(current, slideCount, infinite)
+
+        if (targetIndex === current) return
+
+        onBeforeChangeRef.current?.(current, targetIndex)
+        setCurrentIndex(targetIndex)
+        onChangeRef.current?.(targetIndex, current)
+      },
+      [slideCount, infinite]
+    )
 
     // Container classes
     const containerClasses = useMemo(
@@ -195,6 +219,61 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
 
       return () => controller.stop()
     }, [autoplay, autoplaySpeed, isPaused, slideCount, infinite])
+
+    useEffect(() => {
+      const container = containerRef.current
+      if (!container || slideCount <= 1) return
+
+      const resetTouchGesture = () => {
+        touchStartRef.current = null
+        touchCurrentRef.current = null
+      }
+
+      const handleTouchStart = (event: TouchEvent) => {
+        const point = getCarouselTouchPoint(event.touches)
+        touchStartRef.current = point
+        touchCurrentRef.current = point
+      }
+
+      const handleTouchMove = (event: TouchEvent) => {
+        if (!touchStartRef.current) return
+
+        const point = getCarouselTouchPoint(event.touches)
+        if (point) {
+          touchCurrentRef.current = point
+        }
+      }
+
+      const handleTouchEnd = (event: TouchEvent) => {
+        const direction = resolveCarouselSwipeDirection(
+          touchStartRef.current,
+          getCarouselTouchPoint(event.changedTouches) ?? touchCurrentRef.current
+        )
+
+        resetTouchGesture()
+
+        if (direction) {
+          navigateByDirection(direction)
+        }
+      }
+
+      const handleTouchCancel = () => {
+        resetTouchGesture()
+      }
+
+      container.addEventListener('touchstart', handleTouchStart, { passive: true })
+      container.addEventListener('touchmove', handleTouchMove, { passive: true })
+      container.addEventListener('touchend', handleTouchEnd, { passive: true })
+      container.addEventListener('touchcancel', handleTouchCancel, { passive: true })
+
+      return () => {
+        resetTouchGesture()
+        container.removeEventListener('touchstart', handleTouchStart)
+        container.removeEventListener('touchmove', handleTouchMove)
+        container.removeEventListener('touchend', handleTouchEnd)
+        container.removeEventListener('touchcancel', handleTouchCancel)
+      }
+    }, [navigateByDirection, slideCount])
 
     // Pause/Resume handlers
     const handleMouseEnter = useCallback(() => {
@@ -320,6 +399,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
 
     return (
       <div
+        ref={containerRef}
         className={containerClasses}
         style={style}
         role="region"

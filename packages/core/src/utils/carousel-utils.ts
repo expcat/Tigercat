@@ -11,6 +11,17 @@ export type CarouselFrameRequest = (callback: CarouselFrameCallback) => number
 
 export type CarouselFrameCancel = (handle: number) => void
 
+export type CarouselSwipeDirection = 'prev' | 'next'
+
+export interface CarouselTouchPoint {
+  x: number
+  y: number
+}
+
+export interface CarouselSwipeOptions {
+  minSwipeDistance?: number
+}
+
 export interface CarouselVisibilityDocument {
   readonly hidden: boolean
   addEventListener: Document['addEventListener']
@@ -60,6 +71,10 @@ function getDefaultVisibilityDocument(): CarouselVisibilityDocument | undefined 
 
 function normalizeAutoplayInterval(interval: number): number {
   return Number.isFinite(interval) && interval > 0 ? interval : 0
+}
+
+function normalizeMinSwipeDistance(distance: number | undefined): number {
+  return Number.isFinite(distance) && (distance ?? 0) > 0 ? (distance as number) : 24
 }
 
 /**
@@ -231,6 +246,38 @@ export function clampSlideIndex(index: number, totalSlides: number): number {
  */
 export function getScrollTransform(currentIndex: number): string {
   return `translateX(-${currentIndex * 100}%)`
+}
+
+export function getCarouselTouchPoint(
+  touches: ArrayLike<{ clientX: number; clientY: number }> | null | undefined
+): CarouselTouchPoint | null {
+  if (!touches || touches.length === 0) return null
+
+  const touch = touches[0]
+  return {
+    x: touch.clientX,
+    y: touch.clientY
+  }
+}
+
+export function resolveCarouselSwipeDirection(
+  startPoint: CarouselTouchPoint | null,
+  endPoint: CarouselTouchPoint | null,
+  options: CarouselSwipeOptions = {}
+): CarouselSwipeDirection | null {
+  if (!startPoint || !endPoint) return null
+
+  const deltaX = endPoint.x - startPoint.x
+  const deltaY = endPoint.y - startPoint.y
+  const absX = Math.abs(deltaX)
+  const absY = Math.abs(deltaY)
+  const minSwipeDistance = normalizeMinSwipeDistance(options.minSwipeDistance)
+
+  if (absX < minSwipeDistance || absX <= absY) {
+    return null
+  }
+
+  return deltaX < 0 ? 'next' : 'prev'
 }
 
 export function createCarouselAutoplayController(

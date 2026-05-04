@@ -244,6 +244,63 @@ describe('Carousel', () => {
       await fireEvent.click(nextButton)
       expect(onChange).not.toHaveBeenCalled()
     })
+
+    it('should navigate to the next slide on horizontal touch swipe', async () => {
+      const onChange = vi.fn()
+
+      const { container } = render(
+        <Carousel onChange={onChange}>
+          <div>Slide 1</div>
+          <div>Slide 2</div>
+          <div>Slide 3</div>
+        </Carousel>
+      )
+
+      const carousel = container.querySelector('[role="region"]') as HTMLElement
+      await fireEvent.touchStart(carousel, { touches: [{ clientX: 180, clientY: 60 }] })
+      await fireEvent.touchMove(carousel, { touches: [{ clientX: 120, clientY: 66 }] })
+      await fireEvent.touchEnd(carousel, { changedTouches: [{ clientX: 120, clientY: 66 }] })
+
+      expect(onChange).toHaveBeenCalledWith(1, 0)
+    })
+
+    it('should ignore mostly vertical touch gestures', async () => {
+      const onChange = vi.fn()
+
+      const { container } = render(
+        <Carousel onChange={onChange}>
+          <div>Slide 1</div>
+          <div>Slide 2</div>
+          <div>Slide 3</div>
+        </Carousel>
+      )
+
+      const carousel = container.querySelector('[role="region"]') as HTMLElement
+      await fireEvent.touchStart(carousel, { touches: [{ clientX: 180, clientY: 60 }] })
+      await fireEvent.touchMove(carousel, { touches: [{ clientX: 150, clientY: 140 }] })
+      await fireEvent.touchEnd(carousel, { changedTouches: [{ clientX: 150, clientY: 140 }] })
+
+      expect(onChange).not.toHaveBeenCalled()
+    })
+
+    it('registers passive touch listeners on the carousel root', () => {
+      const addEventListenerSpy = vi.spyOn(HTMLElement.prototype, 'addEventListener')
+
+      render(
+        <Carousel>
+          <div>Slide 1</div>
+          <div>Slide 2</div>
+        </Carousel>
+      )
+      ;(['touchstart', 'touchmove', 'touchend', 'touchcancel'] as const).forEach((eventName) => {
+        expect(
+          addEventListenerSpy.mock.calls.some(
+            ([type, , options]) =>
+              type === eventName && JSON.stringify(options) === '{"passive":true}'
+          )
+        ).toBe(true)
+      })
+    })
   })
 
   describe('Events', () => {

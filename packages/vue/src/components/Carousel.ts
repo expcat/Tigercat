@@ -27,9 +27,12 @@ import {
   isPrevDisabled,
   clampSlideIndex,
   getScrollTransform,
+  getCarouselTouchPoint,
+  resolveCarouselSwipeDirection,
   createCarouselAutoplayController,
   carouselPrevArrowPath,
   carouselNextArrowPath,
+  type CarouselTouchPoint,
   type CarouselDotPosition,
   type CarouselEffect,
   type CarouselAutoplayController
@@ -162,7 +165,10 @@ export const Carousel = defineComponent({
     const currentIndex = ref(props.initialSlide)
     const isPaused = ref(false)
     const slideCount = ref(0)
+    const containerRef = ref<HTMLElement | null>(null)
     let autoplayController: CarouselAutoplayController | null = null
+    let touchStartPoint: CarouselTouchPoint | null = null
+    let touchCurrentPoint: CarouselTouchPoint | null = null
 
     // Container classes
     const containerClasses = computed(() => {
@@ -260,6 +266,45 @@ export const Carousel = defineComponent({
       startAutoplay()
     }
 
+    const resetTouchGesture = () => {
+      touchStartPoint = null
+      touchCurrentPoint = null
+    }
+
+    const handleTouchStart = (event: TouchEvent) => {
+      const point = getCarouselTouchPoint(event.touches)
+      touchStartPoint = point
+      touchCurrentPoint = point
+    }
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (!touchStartPoint) return
+
+      const point = getCarouselTouchPoint(event.touches)
+      if (point) {
+        touchCurrentPoint = point
+      }
+    }
+
+    const handleTouchEnd = (event: TouchEvent) => {
+      const direction = resolveCarouselSwipeDirection(
+        touchStartPoint,
+        getCarouselTouchPoint(event.changedTouches) ?? touchCurrentPoint
+      )
+
+      resetTouchGesture()
+
+      if (direction === 'next') {
+        next()
+      } else if (direction === 'prev') {
+        prev()
+      }
+    }
+
+    const handleTouchCancel = () => {
+      resetTouchGesture()
+    }
+
     // Pause/Resume handlers
     const handleMouseEnter = () => {
       if (props.pauseOnHover && props.autoplay) {
@@ -302,10 +347,20 @@ export const Carousel = defineComponent({
       if (props.autoplay) {
         startAutoplay()
       }
+
+      containerRef.value?.addEventListener('touchstart', handleTouchStart, { passive: true })
+      containerRef.value?.addEventListener('touchmove', handleTouchMove, { passive: true })
+      containerRef.value?.addEventListener('touchend', handleTouchEnd, { passive: true })
+      containerRef.value?.addEventListener('touchcancel', handleTouchCancel, { passive: true })
     })
 
     onUnmounted(() => {
       stopAutoplay()
+      resetTouchGesture()
+      containerRef.value?.removeEventListener('touchstart', handleTouchStart)
+      containerRef.value?.removeEventListener('touchmove', handleTouchMove)
+      containerRef.value?.removeEventListener('touchend', handleTouchEnd)
+      containerRef.value?.removeEventListener('touchcancel', handleTouchCancel)
     })
 
     // Expose methods for external use
@@ -439,6 +494,7 @@ export const Carousel = defineComponent({
       return h(
         'div',
         {
+          ref: containerRef,
           class: containerClasses.value,
           style: props.style,
           role: 'region',
