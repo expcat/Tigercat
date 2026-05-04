@@ -3,6 +3,7 @@ import {
   resolveChartPalette,
   buildChartLegendItems,
   resolveChartTooltipContent,
+  getChartTooltipTransform,
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
   defaultXYTooltipFormatter,
@@ -110,6 +111,12 @@ describe('resolveChartTooltipContent', () => {
   it('uses custom formatter over default', () => {
     const custom = (d: (typeof data)[0]) => `custom-${d.label}`
     expect(resolveChartTooltipContent(1, data, custom, () => 'default')).toBe('custom-B')
+  })
+})
+
+describe('getChartTooltipTransform', () => {
+  it('returns a compositor-friendly translate3d transform', () => {
+    expect(getChartTooltipTransform({ x: 112, y: 92 })).toBe('translate3d(112px, 92px, 0)')
   })
 })
 

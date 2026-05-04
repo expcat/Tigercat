@@ -49,4 +49,15 @@ describe('ChartTooltip', () => {
 
     expect(document.querySelector('[data-chart-tooltip]')?.className).toContain('custom-tooltip')
   })
+
+  it('positions with transform instead of dynamic left/top', () => {
+    renderWithProps(ChartTooltip, { content: 'Tooltip text', visible: true, x: 100, y: 100 })
+
+    const tooltip = document.querySelector('[data-chart-tooltip]') as HTMLElement
+    expect(tooltip.style.transform).toBe('translate3d(112px, 92px, 0)')
+    expect(tooltip.style.left).toBe('')
+    expect(tooltip.style.top).toBe('')
+    expect(tooltip.className).toContain('left-0')
+    expect(tooltip.className).toContain('top-0')
+  })
 })

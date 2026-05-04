@@ -49,6 +49,10 @@ export function resolveChartTooltipContent<T>(
   return fmt(datum, hoveredIndex)
 }
 
+export function getChartTooltipTransform(position: { x: number; y: number }): string {
+  return `translate3d(${position.x}px, ${position.y}px, 0)`
+}
+
 /** Resolve tooltip content for multi-series charts (Line, Area, Radar). */
 export function resolveMultiSeriesTooltipContent<TDatum, TSeries extends { data: TDatum[] }>(
   hoveredPoint: { seriesIndex: number; pointIndex: number } | null,
