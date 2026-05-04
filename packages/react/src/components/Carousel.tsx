@@ -22,6 +22,7 @@ import {
   isPrevDisabled,
   clampSlideIndex,
   getScrollTransform,
+  createCarouselAutoplayController,
   carouselPrevArrowPath,
   carouselNextArrowPath,
   type CarouselProps as CoreCarouselProps,
@@ -177,17 +178,22 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     useEffect(() => {
       if (!autoplay || isPaused) return
 
-      const timer = setInterval(() => {
-        const curr = currentIndexRef.current
-        const nextIdx = getNextSlideIndex(curr, slideCount, infinite)
-        if (nextIdx !== curr) {
-          onBeforeChangeRef.current?.(curr, nextIdx)
-          setCurrentIndex(nextIdx)
-          onChangeRef.current?.(nextIdx, curr)
+      const controller = createCarouselAutoplayController({
+        interval: autoplaySpeed,
+        onAdvance: () => {
+          const curr = currentIndexRef.current
+          const nextIdx = getNextSlideIndex(curr, slideCount, infinite)
+          if (nextIdx !== curr) {
+            onBeforeChangeRef.current?.(curr, nextIdx)
+            setCurrentIndex(nextIdx)
+            onChangeRef.current?.(nextIdx, curr)
+          }
         }
-      }, autoplaySpeed)
+      })
 
-      return () => clearInterval(timer)
+      controller.start()
+
+      return () => controller.stop()
     }, [autoplay, autoplaySpeed, isPaused, slideCount, infinite])
 
     // Pause/Resume handlers

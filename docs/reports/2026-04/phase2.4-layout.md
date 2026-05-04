@@ -6,7 +6,6 @@
 | ------------------------------ | ------ | ---------------------------------------------------------------- |
 | Row / Col 样式计算优化         | P1     | 减少每个 Col 的 inline style 计算，评估 CSS grid / CSS vars 方案 |
 | Splitter / Resizable drag 复用 | P1     | 组件内 mousemove 逻辑收敛到 `useDrag` 或 core drag helper        |
-| Carousel autoplay              | P1     | 从 `setInterval` 迁移到更省电的 rAF/visibility-aware 调度        |
 | Carousel passive touch         | P1     | 触摸监听明确使用 `{ passive: true }`，避免滚动 jank              |
 | List virtual mode              | P0     | List 复用 VirtualList，而不是保留独立虚拟逻辑或缺失虚拟路径      |
 | Statistic 动画                 | P1     | 数字滚动动画使用 rAF + easing，并有测试覆盖                      |

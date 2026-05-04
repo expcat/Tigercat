@@ -27,10 +27,12 @@ import {
   isPrevDisabled,
   clampSlideIndex,
   getScrollTransform,
+  createCarouselAutoplayController,
   carouselPrevArrowPath,
   carouselNextArrowPath,
   type CarouselDotPosition,
-  type CarouselEffect
+  type CarouselEffect,
+  type CarouselAutoplayController
 } from '@expcat/tigercat-core'
 
 export interface VueCarouselProps {
@@ -160,7 +162,7 @@ export const Carousel = defineComponent({
     const currentIndex = ref(props.initialSlide)
     const isPaused = ref(false)
     const slideCount = ref(0)
-    let autoplayTimer: ReturnType<typeof setInterval> | null = null
+    let autoplayController: CarouselAutoplayController | null = null
 
     // Container classes
     const containerClasses = computed(() => {
@@ -240,19 +242,22 @@ export const Carousel = defineComponent({
 
     // Autoplay control
     const startAutoplay = () => {
-      if (!props.autoplay || autoplayTimer) return
-      autoplayTimer = setInterval(() => {
-        if (!isPaused.value) {
-          next()
-        }
-      }, props.autoplaySpeed)
+      if (!props.autoplay || isPaused.value || autoplayController) return
+      autoplayController = createCarouselAutoplayController({
+        interval: props.autoplaySpeed,
+        onAdvance: next
+      })
+      autoplayController.start()
     }
 
     const stopAutoplay = () => {
-      if (autoplayTimer) {
-        clearInterval(autoplayTimer)
-        autoplayTimer = null
-      }
+      autoplayController?.stop()
+      autoplayController = null
+    }
+
+    const syncAutoplay = () => {
+      stopAutoplay()
+      startAutoplay()
     }
 
     // Pause/Resume handlers
@@ -290,16 +295,7 @@ export const Carousel = defineComponent({
     )
 
     // Watch for autoplay changes
-    watch(
-      () => props.autoplay,
-      (newVal) => {
-        if (newVal) {
-          startAutoplay()
-        } else {
-          stopAutoplay()
-        }
-      }
-    )
+    watch([() => props.autoplay, () => props.autoplaySpeed, isPaused], syncAutoplay)
 
     // Lifecycle
     onMounted(() => {

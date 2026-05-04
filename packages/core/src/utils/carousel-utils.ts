@@ -5,6 +5,63 @@
 
 import type { CarouselDotPosition } from '../types/carousel'
 
+export type CarouselFrameCallback = (timestamp: number) => void
+
+export type CarouselFrameRequest = (callback: CarouselFrameCallback) => number
+
+export type CarouselFrameCancel = (handle: number) => void
+
+export interface CarouselVisibilityDocument {
+  readonly hidden: boolean
+  addEventListener: Document['addEventListener']
+  removeEventListener: Document['removeEventListener']
+}
+
+export interface CarouselAutoplayControllerOptions {
+  interval: number
+  onAdvance: () => void
+  requestFrame?: CarouselFrameRequest
+  cancelFrame?: CarouselFrameCancel
+  getCurrentTime?: () => number
+  getDocument?: () => CarouselVisibilityDocument | undefined
+}
+
+export interface CarouselAutoplayController {
+  start: () => void
+  stop: () => void
+  restart: () => void
+  isRunning: () => boolean
+}
+
+function requestDefaultFrame(callback: CarouselFrameCallback): number {
+  if (globalThis.requestAnimationFrame) {
+    return globalThis.requestAnimationFrame(callback)
+  }
+
+  return globalThis.setTimeout(() => callback(getDefaultCurrentTime()), 16)
+}
+
+function cancelDefaultFrame(handle: number): void {
+  if (globalThis.cancelAnimationFrame) {
+    globalThis.cancelAnimationFrame(handle)
+    return
+  }
+
+  globalThis.clearTimeout(handle)
+}
+
+function getDefaultCurrentTime(): number {
+  return globalThis.performance?.now?.() ?? Date.now()
+}
+
+function getDefaultVisibilityDocument(): CarouselVisibilityDocument | undefined {
+  return typeof document === 'undefined' ? undefined : document
+}
+
+function normalizeAutoplayInterval(interval: number): number {
+  return Number.isFinite(interval) && interval > 0 ? interval : 0
+}
+
 /**
  * Base carousel container classes
  */
@@ -174,6 +231,100 @@ export function clampSlideIndex(index: number, totalSlides: number): number {
  */
 export function getScrollTransform(currentIndex: number): string {
   return `translateX(-${currentIndex * 100}%)`
+}
+
+export function createCarouselAutoplayController(
+  options: CarouselAutoplayControllerOptions
+): CarouselAutoplayController {
+  const requestFrame = options.requestFrame ?? requestDefaultFrame
+  const cancelFrame = options.cancelFrame ?? cancelDefaultFrame
+  const getCurrentTime = options.getCurrentTime ?? getDefaultCurrentTime
+  const getDocument = options.getDocument ?? getDefaultVisibilityDocument
+
+  let running = false
+  let frameHandle: number | undefined
+  let lastTimestamp = 0
+  let visibilityDocument: CarouselVisibilityDocument | undefined
+  let listeningForVisibility = false
+
+  const cancelPendingFrame = (): void => {
+    if (frameHandle === undefined) return
+    cancelFrame(frameHandle)
+    frameHandle = undefined
+  }
+
+  const isDocumentHidden = (): boolean => Boolean(visibilityDocument?.hidden)
+
+  const scheduleFrame = (): void => {
+    if (!running || frameHandle !== undefined || isDocumentHidden()) return
+    frameHandle = requestFrame(tick)
+  }
+
+  const handleVisibilityChange = (): void => {
+    if (!running) return
+    lastTimestamp = getCurrentTime()
+
+    if (isDocumentHidden()) {
+      cancelPendingFrame()
+      return
+    }
+
+    scheduleFrame()
+  }
+
+  const attachVisibilityListener = (): void => {
+    visibilityDocument = getDocument()
+    if (!visibilityDocument || listeningForVisibility) return
+    visibilityDocument.addEventListener('visibilitychange', handleVisibilityChange)
+    listeningForVisibility = true
+  }
+
+  const detachVisibilityListener = (): void => {
+    if (!visibilityDocument || !listeningForVisibility) return
+    visibilityDocument.removeEventListener('visibilitychange', handleVisibilityChange)
+    listeningForVisibility = false
+    visibilityDocument = undefined
+  }
+
+  const tick = (timestamp: number): void => {
+    frameHandle = undefined
+    if (!running || isDocumentHidden()) return
+
+    const interval = normalizeAutoplayInterval(options.interval)
+    if (timestamp - lastTimestamp >= interval) {
+      lastTimestamp = timestamp
+      options.onAdvance()
+    }
+
+    scheduleFrame()
+  }
+
+  const start = (): void => {
+    if (running) return
+    running = true
+    lastTimestamp = getCurrentTime()
+    attachVisibilityListener()
+    scheduleFrame()
+  }
+
+  const stop = (): void => {
+    if (!running) return
+    running = false
+    cancelPendingFrame()
+    detachVisibilityListener()
+  }
+
+  const restart = (): void => {
+    stop()
+    start()
+  }
+
+  return {
+    start,
+    stop,
+    restart,
+    isRunning: () => running
+  }
 }
 
 /**

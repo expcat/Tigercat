@@ -10,9 +10,22 @@ import { Carousel, type CarouselRef } from '@expcat/tigercat-react'
 describe('Carousel', () => {
   beforeEach(() => {
     vi.useFakeTimers()
+    vi.stubGlobal(
+      'requestAnimationFrame',
+      vi.fn((callback: FrameRequestCallback) => {
+        return globalThis.setTimeout(() => callback(globalThis.performance.now()), 16)
+      })
+    )
+    vi.stubGlobal(
+      'cancelAnimationFrame',
+      vi.fn((handle: number) => {
+        globalThis.clearTimeout(handle)
+      })
+    )
   })
 
   afterEach(() => {
+    vi.unstubAllGlobals()
     vi.restoreAllMocks()
     vi.useRealTimers()
   })
@@ -281,7 +294,7 @@ describe('Carousel', () => {
 
       // Advance timer
       act(() => {
-        vi.advanceTimersByTime(1000)
+        vi.advanceTimersByTime(1100)
       })
 
       expect(onChange).toHaveBeenCalledWith(1, 0)
@@ -329,7 +342,7 @@ describe('Carousel', () => {
 
       // Advance timer
       act(() => {
-        vi.advanceTimersByTime(1000)
+        vi.advanceTimersByTime(1100)
       })
 
       expect(onChange).toHaveBeenCalled()

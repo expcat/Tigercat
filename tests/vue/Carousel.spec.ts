@@ -10,9 +10,22 @@ import { Carousel } from '@expcat/tigercat-vue'
 describe('Carousel', () => {
   beforeEach(() => {
     vi.useFakeTimers()
+    vi.stubGlobal(
+      'requestAnimationFrame',
+      vi.fn((callback: FrameRequestCallback) => {
+        return globalThis.setTimeout(() => callback(globalThis.performance.now()), 16)
+      })
+    )
+    vi.stubGlobal(
+      'cancelAnimationFrame',
+      vi.fn((handle: number) => {
+        globalThis.clearTimeout(handle)
+      })
+    )
   })
 
   afterEach(() => {
+    vi.unstubAllGlobals()
     vi.restoreAllMocks()
     vi.useRealTimers()
   })
@@ -38,10 +51,7 @@ describe('Carousel', () => {
     it('should render with navigation dots by default', () => {
       const { container } = render(Carousel, {
         slots: {
-          default: () => [
-            h('div', { key: '1' }, 'Slide 1'),
-            h('div', { key: '2' }, 'Slide 2')
-          ]
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
         }
       })
 
@@ -53,10 +63,7 @@ describe('Carousel', () => {
       const { container } = render(Carousel, {
         props: { dots: false },
         slots: {
-          default: () => [
-            h('div', { key: '1' }, 'Slide 1'),
-            h('div', { key: '2' }, 'Slide 2')
-          ]
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
         }
       })
 
@@ -68,10 +75,7 @@ describe('Carousel', () => {
       render(Carousel, {
         props: { arrows: true },
         slots: {
-          default: () => [
-            h('div', { key: '1' }, 'Slide 1'),
-            h('div', { key: '2' }, 'Slide 2')
-          ]
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
         }
       })
 
@@ -82,10 +86,7 @@ describe('Carousel', () => {
     it('should not render arrows by default', () => {
       render(Carousel, {
         slots: {
-          default: () => [
-            h('div', { key: '1' }, 'Slide 1'),
-            h('div', { key: '2' }, 'Slide 2')
-          ]
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
         }
       })
 
@@ -118,10 +119,7 @@ describe('Carousel', () => {
         const { container, unmount } = render(Carousel, {
           props: { dotPosition: position },
           slots: {
-            default: () => [
-              h('div', { key: '1' }, 'Slide 1'),
-              h('div', { key: '2' }, 'Slide 2')
-            ]
+            default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
           }
         })
 
@@ -134,10 +132,7 @@ describe('Carousel', () => {
     it('should apply scroll effect by default', () => {
       const { container } = render(Carousel, {
         slots: {
-          default: () => [
-            h('div', { key: '1' }, 'Slide 1'),
-            h('div', { key: '2' }, 'Slide 2')
-          ]
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
         }
       })
 
@@ -149,10 +144,7 @@ describe('Carousel', () => {
       const { container } = render(Carousel, {
         props: { effect: 'fade' },
         slots: {
-          default: () => [
-            h('div', { key: '1' }, 'Slide 1'),
-            h('div', { key: '2' }, 'Slide 2')
-          ]
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
         }
       })
 
@@ -298,10 +290,7 @@ describe('Carousel', () => {
           'onBefore-change': onBeforeChange
         },
         slots: {
-          default: () => [
-            h('div', { key: '1' }, 'Slide 1'),
-            h('div', { key: '2' }, 'Slide 2')
-          ]
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
         }
       })
 
@@ -320,10 +309,7 @@ describe('Carousel', () => {
           onChange
         },
         slots: {
-          default: () => [
-            h('div', { key: '1' }, 'Slide 1'),
-            h('div', { key: '2' }, 'Slide 2')
-          ]
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
         }
       })
 
@@ -354,7 +340,7 @@ describe('Carousel', () => {
       })
 
       // Advance timer
-      vi.advanceTimersByTime(1000)
+      vi.advanceTimersByTime(1100)
 
       expect(onChange).toHaveBeenCalledWith(1, 0)
     })
@@ -370,10 +356,7 @@ describe('Carousel', () => {
           onChange
         },
         slots: {
-          default: () => [
-            h('div', { key: '1' }, 'Slide 1'),
-            h('div', { key: '2' }, 'Slide 2')
-          ]
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
         }
       })
 
@@ -398,10 +381,7 @@ describe('Carousel', () => {
           onChange
         },
         slots: {
-          default: () => [
-            h('div', { key: '1' }, 'Slide 1'),
-            h('div', { key: '2' }, 'Slide 2')
-          ]
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
         }
       })
 
@@ -414,7 +394,7 @@ describe('Carousel', () => {
       await fireEvent.mouseLeave(carousel)
 
       // Advance timer
-      vi.advanceTimersByTime(1000)
+      vi.advanceTimersByTime(1100)
 
       expect(onChange).toHaveBeenCalled()
     })
@@ -424,10 +404,7 @@ describe('Carousel', () => {
     it('should have proper ARIA attributes on container', () => {
       const { container } = render(Carousel, {
         slots: {
-          default: () => [
-            h('div', { key: '1' }, 'Slide 1'),
-            h('div', { key: '2' }, 'Slide 2')
-          ]
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
         }
       })
 
@@ -439,10 +416,7 @@ describe('Carousel', () => {
     it('should have proper ARIA attributes on slides', () => {
       const { container } = render(Carousel, {
         slots: {
-          default: () => [
-            h('div', { key: '1' }, 'Slide 1'),
-            h('div', { key: '2' }, 'Slide 2')
-          ]
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
         }
       })
 
@@ -458,10 +432,7 @@ describe('Carousel', () => {
       render(Carousel, {
         props: { arrows: true },
         slots: {
-          default: () => [
-            h('div', { key: '1' }, 'Slide 1'),
-            h('div', { key: '2' }, 'Slide 2')
-          ]
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
         }
       })
 
@@ -475,10 +446,7 @@ describe('Carousel', () => {
     it('should have proper ARIA attributes on dots', () => {
       const { container } = render(Carousel, {
         slots: {
-          default: () => [
-            h('div', { key: '1' }, 'Slide 1'),
-            h('div', { key: '2' }, 'Slide 2')
-          ]
+          default: () => [h('div', { key: '1' }, 'Slide 1'), h('div', { key: '2' }, 'Slide 2')]
         }
       })
 
@@ -494,7 +462,11 @@ describe('Carousel', () => {
   describe('Imperative API', () => {
     it('should expose next method via ref', async () => {
       const onChange = vi.fn()
-      const carouselRef = ref<{ next: () => void; prev: () => void; goTo: (index: number) => void }>()
+      const carouselRef = ref<{
+        next: () => void
+        prev: () => void
+        goTo: (index: number) => void
+      }>()
 
       render({
         setup() {
@@ -524,7 +496,11 @@ describe('Carousel', () => {
 
     it('should expose prev method via ref', async () => {
       const onChange = vi.fn()
-      const carouselRef = ref<{ next: () => void; prev: () => void; goTo: (index: number) => void }>()
+      const carouselRef = ref<{
+        next: () => void
+        prev: () => void
+        goTo: (index: number) => void
+      }>()
 
       render({
         setup() {
@@ -555,7 +531,11 @@ describe('Carousel', () => {
 
     it('should expose goTo method via ref', async () => {
       const onChange = vi.fn()
-      const carouselRef = ref<{ next: () => void; prev: () => void; goTo: (index: number) => void }>()
+      const carouselRef = ref<{
+        next: () => void
+        prev: () => void
+        goTo: (index: number) => void
+      }>()
 
       render({
         setup() {
