@@ -22,7 +22,7 @@
 | Form                  | Form O(N²) 校验、picker-utils 二期、Radio/Checkbox icon 体积、命令式 Form API 仍待评估或实现                                                                                                                                                        |
 | Feedback              | Watermark OffscreenCanvas/ResizeObserver、Notification stack rAF、Floating middleware 缓存、Loading overlay 复用仍待做                                                                                                                              |
 | Layout                | Splitter/Resizable 仍是组件内 mousemove；Carousel autoplay 仍用 `setInterval`；List 未复用 VirtualList；Row/Col 与 Descriptions 性能项未完成                                                                                                        |
-| Navigation            | Menu/Dropdown/Anchor/Breadcrumb/Steps/Tabs 父子组件同文件约定未落地；Pagination lazy locale / idle 校验、BackTop rAF、Menu 动画、Segmented transform 等仍待做                                                                                       |
+| Navigation            | Menu/Dropdown/Anchor/Breadcrumb/Steps/Tabs 父子组件同文件约定未落地；Pagination lazy locale / idle 校验、Menu 动画、Segmented transform 等仍待做                                                                                                    |
 | Data                  | Calendar memo、Collapse rAF transition、Timeline pseudo-element 仍待做；Table virtual 默认策略仍待确认                                                                                                                                              |
 | Charts                | ChartCanvas ResizeObserver+rAF、chart interaction rAF throttle、Heatmap canvas fallback、TreeMap/Sunburst memo、Gauge rAF 动画等性能项仍待做                                                                                                        |
 | Composite / Advanced  | Composite 配方化文档、DataTableWithToolbar/Table 边界、CommentThread 深度限制、ActivityFeed/Timeline 复用、InfiniteScroll IO、FileManager 共享 model、ImageViewer 手势 util、VirtualList 策略化、VirtualTable 压测、PrintLayout stylesheet 化仍待做 |
@@ -38,15 +38,16 @@
 
 ## 4. 本轮完成记录
 
-| 日期       | 任务                         | 状态 | 验证                                                                                                                  |
-| ---------- | ---------------------------- | ---- | --------------------------------------------------------------------------------------------------------------------- |
-| 2026-05-04 | React Button spinner lazy PR | Done | `Button.spec.tsx` + `ButtonSpinnerLazy.spec.tsx` 通过；`pnpm --filter @expcat/tigercat-react build` 通过              |
-| 2026-05-04 | Group 类组件共享 util PR     | Done | Group 聚焦测试 62 个通过；`core` / `react` / `vue` 三端包构建通过                                                     |
-| 2026-05-04 | ImagePreview 交互测试 PR     | Done | React/Vue ImagePreview 聚焦测试 30 个通过；补齐 rotate 交互；`core` / `react` / `vue` 三端包构建通过                  |
-| 2026-05-04 | ImageCropper 交互测试 PR     | Done | React/Vue ImageCropper 聚焦测试 22 个通过；补齐键盘移动/缩放；`react` / `vue` 两端包构建通过                          |
-| 2026-05-04 | Typography 合并评估 PR       | Done | Text/Code 保持独立公开 API；Code class composer 收敛到 core；Text/Code 聚焦测试 28 个通过，三端构建通过               |
-| 2026-05-04 | InputNumber/Stepper 长按 PR  | Done | 新增 core rAF repeat controller；React/Vue 长按步进测试与 core 调度测试 92 个通过；三端包构建通过                     |
-| 2026-05-04 | Upload 拖拽复用 PR           | Done | Upload drag over/leave/drop 复用 core helper；core/React/Vue Upload 聚焦测试 90 个通过；三端包构建通过                |
-| 2026-05-04 | Switch class composer PR     | Done | Switch 外层 class 合并收敛到 core `composeComponentClasses`；core/React/Vue Switch 聚焦测试 58 个通过；三端包构建通过 |
-| 2026-05-04 | Mentions 定位复核 PR         | Done | Mentions 下拉定位复用 core floating helper；core/React/Vue Mentions 聚焦测试 25 个通过；三端包构建通过                |
-| 2026-05-04 | DatePicker locale 子路径 PR  | Done | DatePicker 专用 locale preset 支持按子路径导入；core/React/Vue DatePicker 聚焦测试 65 个通过；三端包构建通过          |
+| 日期       | 任务                         | 状态 | 验证                                                                                                                                                                 |
+| ---------- | ---------------------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-05-04 | React Button spinner lazy PR | Done | `Button.spec.tsx` + `ButtonSpinnerLazy.spec.tsx` 通过；`pnpm --filter @expcat/tigercat-react build` 通过                                                             |
+| 2026-05-04 | Group 类组件共享 util PR     | Done | Group 聚焦测试 62 个通过；`core` / `react` / `vue` 三端包构建通过                                                                                                    |
+| 2026-05-04 | ImagePreview 交互测试 PR     | Done | React/Vue ImagePreview 聚焦测试 30 个通过；补齐 rotate 交互；`core` / `react` / `vue` 三端包构建通过                                                                 |
+| 2026-05-04 | ImageCropper 交互测试 PR     | Done | React/Vue ImageCropper 聚焦测试 22 个通过；补齐键盘移动/缩放；`react` / `vue` 两端包构建通过                                                                         |
+| 2026-05-04 | Typography 合并评估 PR       | Done | Text/Code 保持独立公开 API；Code class composer 收敛到 core；Text/Code 聚焦测试 28 个通过，三端构建通过                                                              |
+| 2026-05-04 | InputNumber/Stepper 长按 PR  | Done | 新增 core rAF repeat controller；React/Vue 长按步进测试与 core 调度测试 92 个通过；三端包构建通过                                                                    |
+| 2026-05-04 | Upload 拖拽复用 PR           | Done | Upload drag over/leave/drop 复用 core helper；core/React/Vue Upload 聚焦测试 90 个通过；三端包构建通过                                                               |
+| 2026-05-04 | Switch class composer PR     | Done | Switch 外层 class 合并收敛到 core `composeComponentClasses`；core/React/Vue Switch 聚焦测试 58 个通过；三端包构建通过                                                |
+| 2026-05-04 | Mentions 定位复核 PR         | Done | Mentions 下拉定位复用 core floating helper；core/React/Vue Mentions 聚焦测试 25 个通过；三端包构建通过                                                               |
+| 2026-05-04 | DatePicker locale 子路径 PR  | Done | DatePicker 专用 locale preset 支持按子路径导入；core/React/Vue DatePicker 聚焦测试 65 个通过；三端包构建通过                                                         |
+| 2026-05-04 | BackTop rAF throttle PR      | Done | 新增 core BackTop visibility controller；React/Vue scroll 监听 rAF throttle；点击滚动改用原生 smooth/auto；core/React/Vue BackTop 聚焦测试 15 个通过；三端包构建通过 |

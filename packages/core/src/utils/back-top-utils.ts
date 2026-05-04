@@ -2,58 +2,114 @@
  * BackTop component utilities
  */
 
+export type BackTopFrameCallback = (timestamp: number) => void
+
+export type BackTopFrameRequest = (callback: BackTopFrameCallback) => number
+
+export type BackTopFrameCancel = (handle: number) => void
+
+export interface BackTopVisibilityControllerOptions {
+  target: HTMLElement | Window
+  getVisibilityHeight: () => number
+  onChange: (visible: boolean) => void
+  requestFrame?: BackTopFrameRequest
+  cancelFrame?: BackTopFrameCancel
+}
+
+export interface BackTopVisibilityController {
+  schedule: () => void
+  update: () => void
+  cancel: () => void
+}
+
+function isWindowTarget(target: HTMLElement | Window): target is Window {
+  return typeof window !== 'undefined' && target === window
+}
+
+function requestDefaultFrame(callback: BackTopFrameCallback): number {
+  if (globalThis.requestAnimationFrame) {
+    return globalThis.requestAnimationFrame(callback)
+  }
+
+  return globalThis.setTimeout(() => callback(globalThis.performance?.now?.() ?? Date.now()), 16)
+}
+
+function cancelDefaultFrame(handle: number): void {
+  if (globalThis.cancelAnimationFrame) {
+    globalThis.cancelAnimationFrame(handle)
+    return
+  }
+
+  globalThis.clearTimeout(handle)
+}
+
 /**
  * Get the current scroll position of an element or window
  */
 export function getScrollTop(target: HTMLElement | Window): number {
-  if (target === window) {
-    return window.scrollY || 0
+  if (isWindowTarget(target)) {
+    return target.scrollY || 0
   }
   return (target as HTMLElement).scrollTop
 }
 
+export function shouldShowBackTop(target: HTMLElement | Window, visibilityHeight: number): boolean {
+  return getScrollTop(target) >= visibilityHeight
+}
+
 /**
- * Smooth scroll to top using requestAnimationFrame
- * Uses easeInOutCubic easing function for natural feel
+ * Scroll to top using native browser smooth scrolling when enabled.
  */
 export function scrollToTop(
   target: HTMLElement | Window,
   duration: number,
   callback?: () => void
 ): void {
-  const startTime = performance.now()
-  const startScrollTop = getScrollTop(target)
+  const behavior: ScrollBehavior = Number.isFinite(duration) && duration <= 0 ? 'auto' : 'smooth'
 
-  if (startScrollTop === 0) {
+  if (isWindowTarget(target)) {
+    target.scrollTo({ top: 0, behavior })
     callback?.()
     return
   }
 
-  // easeInOutCubic easing function
-  const easeInOutCubic = (t: number): number => {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+  if (typeof target.scrollTo === 'function') {
+    target.scrollTo({ top: 0, behavior })
+  } else {
+    target.scrollTop = 0
   }
 
-  const animateScroll = (currentTime: number): void => {
-    const elapsed = currentTime - startTime
-    const progress = Math.min(elapsed / duration, 1)
-    const easedProgress = easeInOutCubic(progress)
-    const newScrollTop = startScrollTop * (1 - easedProgress)
+  callback?.()
+}
 
-    if (target === window) {
-      window.scrollTo(0, newScrollTop)
-    } else {
-      ;(target as HTMLElement).scrollTop = newScrollTop
-    }
+export function createBackTopVisibilityController(
+  options: BackTopVisibilityControllerOptions
+): BackTopVisibilityController {
+  const requestFrame = options.requestFrame ?? requestDefaultFrame
+  const cancelFrame = options.cancelFrame ?? cancelDefaultFrame
+  let frameHandle: number | undefined
 
-    if (progress < 1) {
-      requestAnimationFrame(animateScroll)
-    } else {
-      callback?.()
-    }
+  const update = (): void => {
+    frameHandle = undefined
+    options.onChange(shouldShowBackTop(options.target, options.getVisibilityHeight()))
   }
 
-  requestAnimationFrame(animateScroll)
+  const schedule = (): void => {
+    if (frameHandle !== undefined) return
+    frameHandle = requestFrame(update)
+  }
+
+  const cancel = (): void => {
+    if (frameHandle === undefined) return
+    cancelFrame(frameHandle)
+    frameHandle = undefined
+  }
+
+  return {
+    schedule,
+    update,
+    cancel
+  }
 }
 
 /**

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/vue'
+import { render, screen, fireEvent, waitFor } from '@testing-library/vue'
 import { BackTop } from '@expcat/tigercat-vue'
 import { expectNoA11yViolations } from '../utils'
 
@@ -60,7 +60,7 @@ describe('BackTop', () => {
     await fireEvent.scroll(scrollContainer)
 
     const button = container.querySelector('button')
-    expect(button).toHaveClass('opacity-0')
+    await waitFor(() => expect(button).toHaveClass('opacity-0'))
   })
 
   it('becomes visible when scroll position exceeds visibilityHeight', async () => {
@@ -75,7 +75,7 @@ describe('BackTop', () => {
     await fireEvent.scroll(scrollContainer)
 
     const button = container.querySelector('button')
-    expect(button).toHaveClass('opacity-100')
+    await waitFor(() => expect(button).toHaveClass('opacity-100'))
   })
 
   it('emits click event when clicked', async () => {

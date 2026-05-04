@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import {
   classNames,
-  getScrollTop,
+  createBackTopVisibilityController,
   scrollToTop,
   backTopButtonClasses,
   backTopContainerClasses,
@@ -41,9 +41,11 @@ const DefaultIcon: React.FC = () => (
   </svg>
 )
 
+const getDefaultTarget = () => window
+
 export const BackTop: React.FC<BackTopProps> = ({
   visibilityHeight = 400,
-  target = () => window,
+  target = getDefaultTarget,
   duration = 450,
   onClick,
   children,
@@ -57,15 +59,18 @@ export const BackTop: React.FC<BackTopProps> = ({
     const el = target()
     if (!el) return
 
-    const onScroll = () => {
-      setVisible(getScrollTop(el) >= visibilityHeight)
-    }
+    const visibilityController = createBackTopVisibilityController({
+      target: el,
+      getVisibilityHeight: () => visibilityHeight,
+      onChange: setVisible
+    })
 
-    el.addEventListener('scroll', onScroll, { passive: true })
-    onScroll()
+    el.addEventListener('scroll', visibilityController.schedule, { passive: true })
+    visibilityController.update()
 
     return () => {
-      el.removeEventListener('scroll', onScroll)
+      el.removeEventListener('scroll', visibilityController.schedule)
+      visibilityController.cancel()
     }
   }, [target, visibilityHeight])
 
@@ -80,8 +85,7 @@ export const BackTop: React.FC<BackTopProps> = ({
 
   const buttonClasses = useMemo(() => {
     const el = target()
-    const positionClasses =
-      !el || el === window ? backTopButtonClasses : backTopContainerClasses
+    const positionClasses = !el || el === window ? backTopButtonClasses : backTopContainerClasses
     return classNames(
       positionClasses,
       visible ? backTopVisibleClasses : backTopHiddenClasses,

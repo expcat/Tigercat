@@ -424,8 +424,8 @@ const treeData = [
   <!-- 自定义显示高度 -->
   <BackTop :visibility-height="200" />
 
-  <!-- 自定义动画时长 -->
-  <BackTop :duration="800" />
+  <!-- 立即滚动（默认使用原生 smooth） -->
+  <BackTop :duration="0" />
 
   <!-- 自定义滚动目标 -->
   <BackTop :target="() => $refs.scrollContainer" />

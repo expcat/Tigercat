@@ -11,15 +11,16 @@ import {
 import {
   classNames,
   coerceClassValue,
+  createBackTopVisibilityController,
   mergeStyleValues,
-  getScrollTop,
   scrollToTop,
   backTopButtonClasses,
   backTopContainerClasses,
   backTopHiddenClasses,
   backTopVisibleClasses,
   backTopIconPath,
-  type BackTopProps
+  type BackTopProps,
+  type BackTopVisibilityController
 } from '@expcat/tigercat-core'
 
 export interface VueBackTopProps extends BackTopProps {
@@ -63,7 +64,7 @@ export const BackTop = defineComponent({
       default: () => window
     },
     /**
-     * Duration of scroll animation in milliseconds
+     * Use immediate scroll when set to 0; positive values use native smooth scrolling
      * @default 450
      */
     duration: {
@@ -83,12 +84,7 @@ export const BackTop = defineComponent({
   setup(props, { slots, emit, attrs }) {
     const visible = ref(false)
     const targetElement = shallowRef<HTMLElement | Window | null>(null)
-
-    const handleScroll = () => {
-      if (!targetElement.value) return
-      const scrollTop = getScrollTop(targetElement.value)
-      visible.value = scrollTop >= props.visibilityHeight
-    }
+    let visibilityController: BackTopVisibilityController | undefined
 
     const handleClick = (event: MouseEvent) => {
       if (!targetElement.value) return
@@ -98,14 +94,24 @@ export const BackTop = defineComponent({
 
     onMounted(() => {
       targetElement.value = props.target() ?? window
-      targetElement.value.addEventListener('scroll', handleScroll, { passive: true })
-      handleScroll()
+      visibilityController = createBackTopVisibilityController({
+        target: targetElement.value,
+        getVisibilityHeight: () => props.visibilityHeight,
+        onChange: (nextVisible) => {
+          visible.value = nextVisible
+        }
+      })
+      targetElement.value.addEventListener('scroll', visibilityController.schedule, {
+        passive: true
+      })
+      visibilityController.update()
     })
 
     onBeforeUnmount(() => {
-      if (targetElement.value) {
-        targetElement.value.removeEventListener('scroll', handleScroll)
+      if (targetElement.value && visibilityController) {
+        targetElement.value.removeEventListener('scroll', visibilityController.schedule)
       }
+      visibilityController?.cancel()
     })
 
     const buttonClasses = computed(() => {

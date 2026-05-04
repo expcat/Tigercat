@@ -13,7 +13,7 @@ export interface BackTopProps {
   visibilityHeight?: number
 
   /**
-   * Duration of scroll animation in milliseconds
+   * Use immediate scroll when set to 0; positive values use native smooth scrolling
    * @default 450
    */
   duration?: number

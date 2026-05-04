@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { BackTop } from '@expcat/tigercat-react'
@@ -52,7 +52,7 @@ describe('BackTop', () => {
     fireEvent.scroll(scrollContainer)
 
     const button = container.querySelector('button')
-    expect(button).toHaveClass('opacity-0')
+    await waitFor(() => expect(button).toHaveClass('opacity-0'))
   })
 
   it('becomes visible when scroll position exceeds visibilityHeight', async () => {
@@ -62,7 +62,7 @@ describe('BackTop', () => {
     fireEvent.scroll(scrollContainer)
 
     const button = container.querySelector('button')
-    expect(button).toHaveClass('opacity-100')
+    await waitFor(() => expect(button).toHaveClass('opacity-100'))
   })
 
   it('calls onClick when clicked', async () => {

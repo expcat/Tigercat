@@ -7,7 +7,6 @@
 | 父子组件同文件约定            | P1     | Menu、Dropdown、Anchor、Breadcrumb、Steps、Tabs 建立父子组件同文件模式，减少 chunk 与导出链 |
 | Pagination idle / locale      | P1     | jumper 校验延迟到 idle 或稳定节流；locale 文案支持懒加载路径                                |
 | Tabs indicator transform      | P1     | 滑动指示条用 transform 驱动，避免 left/width reflow                                         |
-| BackTop rAF throttle          | P1     | scroll 监听用 rAF throttle；点击滚动使用原生 smooth                                         |
 | Tree key 缓存复核             | P1     | 节点 key 与可见节点派生缓存有回归测试，避免每 render 重算                                   |
 | Menu 展开动画                 | P1     | 使用 CSS height transition + rAF 测高，避免硬编码 max-height                                |
 | Segmented transform           | P1     | 滑块位置使用 transform，并补切换测试                                                        |

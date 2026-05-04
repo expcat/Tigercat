@@ -340,11 +340,11 @@ description: Shared props definitions for navigation components - Affix, Breadcr
 
 ### Props
 
-| Prop             | Type                          | Default        | Vue | React | Description                |
-| ---------------- | ----------------------------- | -------------- | :-: | :---: | -------------------------- |
-| visibilityHeight | `number`                      | `400`          |  ✓  |   ✓   | 滚动高度达到此值显示       |
-| target           | `() => HTMLElement \| Window` | `() => window` |  ✓  |   ✓   | 监听滚动的目标元素         |
-| duration         | `number`                      | `450`          |  ✓  |   ✓   | 滚动到顶部的动画时长（ms） |
+| Prop             | Type                          | Default        | Vue | React | Description                            |
+| ---------------- | ----------------------------- | -------------- | :-: | :---: | -------------------------------------- |
+| visibilityHeight | `number`                      | `400`          |  ✓  |   ✓   | 滚动高度达到此值显示                   |
+| target           | `() => HTMLElement \| Window` | `() => window` |  ✓  |   ✓   | 监听滚动的目标元素                     |
+| duration         | `number`                      | `450`          |  ✓  |   ✓   | `0` 立即滚动；正数使用原生 smooth 滚动 |
 
 ### Events
 
@@ -402,19 +402,19 @@ description: Shared props definitions for navigation components - Affix, Breadcr
 
 ### Props
 
-| Prop         | Type     | Default | Vue | React | Description                            |
-| ------------ | -------- | ------- | :-: | :---: | -------------------------------------- |
-| offsetTop    | `number` | `0`     |  ✓  |   ✓   | 距顶部触发固定距离（px，与 offsetBottom 互斥）|
-| offsetBottom | `number` | -       |  ✓  |   ✓   | 距底部触发固定距离（px）               |
-| target       | `string` | -       |  ✓  |   ✓   | 滚动容器 CSS 选择器（默认 window）     |
-| zIndex       | `number` | `10`    |  ✓  |   ✓   | 固定元素 z-index                       |
-| className    | `string` | -       |  -  |   ✓   | 自定义类名                             |
+| Prop         | Type     | Default | Vue | React | Description                                    |
+| ------------ | -------- | ------- | :-: | :---: | ---------------------------------------------- |
+| offsetTop    | `number` | `0`     |  ✓  |   ✓   | 距顶部触发固定距离（px，与 offsetBottom 互斥） |
+| offsetBottom | `number` | -       |  ✓  |   ✓   | 距底部触发固定距离（px）                       |
+| target       | `string` | -       |  ✓  |   ✓   | 滚动容器 CSS 选择器（默认 window）             |
+| zIndex       | `number` | `10`    |  ✓  |   ✓   | 固定元素 z-index                               |
+| className    | `string` | -       |  -  |   ✓   | 自定义类名                                     |
 
 ### Events
 
-| Vue Event  | React Prop | Payload              | Description          |
-| ---------- | ---------- | -------------------- | -------------------- |
-| `@change`  | `onChange`  | `(affixed: boolean)` | 固定状态变更         |
+| Vue Event | React Prop | Payload              | Description  |
+| --------- | ---------- | -------------------- | ------------ |
+| `@change` | `onChange` | `(affixed: boolean)` | 固定状态变更 |
 
 ---
 
@@ -422,30 +422,30 @@ description: Shared props definitions for navigation components - Affix, Breadcr
 
 ### FloatButton Props
 
-| Prop      | Type                        | Default      | Vue | React | Description    |
-| --------- | --------------------------- | ------------ | :-: | :---: | -------------- |
-| shape     | `'circle' \| 'square'`      | `'circle'`   |  ✓  |   ✓   | 按钮形状       |
-| size      | `'sm' \| 'md' \| 'lg'`      | `'md'`       |  ✓  |   ✓   | 按钮尺寸       |
-| tooltip   | `string`                    | -            |  ✓  |   ✓   | 悬停提示文案   |
-| type      | `'primary' \| 'default'`    | `'primary'`  |  ✓  |   ✓   | 按钮样式       |
-| disabled  | `boolean`                   | `false`      |  ✓  |   ✓   | 禁用状态       |
-| ariaLabel | `string`                    | -            |  ✓  |   ✓   | 无障碍标签     |
-| className | `string`                    | -            |  -  |   ✓   | 自定义类名     |
+| Prop      | Type                     | Default     | Vue | React | Description  |
+| --------- | ------------------------ | ----------- | :-: | :---: | ------------ |
+| shape     | `'circle' \| 'square'`   | `'circle'`  |  ✓  |   ✓   | 按钮形状     |
+| size      | `'sm' \| 'md' \| 'lg'`   | `'md'`      |  ✓  |   ✓   | 按钮尺寸     |
+| tooltip   | `string`                 | -           |  ✓  |   ✓   | 悬停提示文案 |
+| type      | `'primary' \| 'default'` | `'primary'` |  ✓  |   ✓   | 按钮样式     |
+| disabled  | `boolean`                | `false`     |  ✓  |   ✓   | 禁用状态     |
+| ariaLabel | `string`                 | -           |  ✓  |   ✓   | 无障碍标签   |
+| className | `string`                 | -           |  -  |   ✓   | 自定义类名   |
 
 ### FloatButtonGroup Props
 
-| Prop      | Type                        | Default    | Vue | React | Description                |
-| --------- | --------------------------- | ---------- | :-: | :---: | -------------------------- |
-| shape     | `'circle' \| 'square'`      | `'circle'` |  ✓  |   ✓   | 子按钮统一形状             |
-| trigger   | `'click' \| 'hover'`        | `'click'`  |  ✓  |   ✓   | 展开触发方式               |
-| open      | `boolean`                   | -          |  ✓  |   ✓   | 受控展开状态               |
-| className | `string`                    | -          |  -  |   ✓   | 自定义类名                 |
+| Prop      | Type                   | Default    | Vue | React | Description    |
+| --------- | ---------------------- | ---------- | :-: | :---: | -------------- |
+| shape     | `'circle' \| 'square'` | `'circle'` |  ✓  |   ✓   | 子按钮统一形状 |
+| trigger   | `'click' \| 'hover'`   | `'click'`  |  ✓  |   ✓   | 展开触发方式   |
+| open      | `boolean`              | -          |  ✓  |   ✓   | 受控展开状态   |
+| className | `string`               | -          |  -  |   ✓   | 自定义类名     |
 
 ### Events
 
-| Vue Event      | React Prop    | Payload            | Description    |
-| -------------- | ------------- | ------------------ | -------------- |
-| `@click`       | `onClick`     | -                  | 点击按钮       |
+| Vue Event      | React Prop     | Payload           | Description    |
+| -------------- | -------------- | ----------------- | -------------- |
+| `@click`       | `onClick`      | -                 | 点击按钮       |
 | `@open-change` | `onOpenChange` | `(open: boolean)` | 组展开状态变更 |
 
 ---
@@ -454,28 +454,28 @@ description: Shared props definitions for navigation components - Affix, Breadcr
 
 ### SegmentedOption 选项配置
 
-| Prop     | Type               | Default | Description  |
-| -------- | ------------------ | ------- | ------------ |
-| value    | `string \| number` | -       | 选项值       |
-| label    | `string`           | -       | 显示文本     |
-| disabled | `boolean`          | `false` | 是否禁用     |
-| icon     | `string`           | -       | 图标（SVG path d）|
+| Prop     | Type               | Default | Description        |
+| -------- | ------------------ | ------- | ------------------ |
+| value    | `string \| number` | -       | 选项值             |
+| label    | `string`           | -       | 显示文本           |
+| disabled | `boolean`          | `false` | 是否禁用           |
+| icon     | `string`           | -       | 图标（SVG path d） |
 
 ### Props
 
-| Prop      | Type                  | Default | Vue | React | Description        |
-| --------- | --------------------- | ------- | :-: | :---: | ------------------ |
-| options   | `SegmentedOption[]`   | `[]`    |  ✓  |   ✓   | 分段选项配置       |
-| disabled  | `boolean`             | `false` |  ✓  |   ✓   | 整体禁用           |
-| size      | `'sm' \| 'md' \| 'lg'` | `'md'` |  ✓  |   ✓   | 尺寸               |
-| block     | `boolean`             | `false` |  ✓  |   ✓   | 撑满容器宽度       |
-| className | `string`              | -       |  -  |   ✓   | 自定义类名         |
+| Prop      | Type                   | Default | Vue | React | Description  |
+| --------- | ---------------------- | ------- | :-: | :---: | ------------ |
+| options   | `SegmentedOption[]`    | `[]`    |  ✓  |   ✓   | 分段选项配置 |
+| disabled  | `boolean`              | `false` |  ✓  |   ✓   | 整体禁用     |
+| size      | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸         |
+| block     | `boolean`              | `false` |  ✓  |   ✓   | 撑满容器宽度 |
+| className | `string`               | -       |  -  |   ✓   | 自定义类名   |
 
 ### Events
 
-| Vue Event  | React Prop | Payload                       | Description |
-| ---------- | ---------- | ----------------------------- | ----------- |
-| `@change`  | `onChange`  | `(value: string \| number)`   | 选中项变更  |
+| Vue Event | React Prop | Payload                     | Description |
+| --------- | ---------- | --------------------------- | ----------- |
+| `@change` | `onChange` | `(value: string \| number)` | 选中项变更  |
 
 ---
 
