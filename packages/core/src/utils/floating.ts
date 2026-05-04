@@ -75,6 +75,121 @@ export interface FloatingOptions {
 }
 
 /**
+ * Options used to build the Floating UI middleware chain.
+ */
+export interface FloatingMiddlewareOptions {
+  /**
+   * Distance (in pixels) between reference and floating element.
+   * @default 8
+   */
+  offset?: number
+  /**
+   * Whether to flip placement when there's not enough space.
+   * @default true
+   */
+  flip?: boolean
+  /**
+   * Whether to shift the floating element to stay within viewport.
+   * @default true
+   */
+  shift?: boolean
+  /**
+   * Padding from viewport edges when shifting/flipping.
+   * @default 8
+   */
+  shiftPadding?: number
+  /**
+   * Arrow element for positioning the arrow indicator.
+   */
+  arrowElement?: HTMLElement | null
+  /**
+   * Arrow padding from edges.
+   * @default 8
+   */
+  arrowPadding?: number
+}
+
+const floatingMiddlewareCache = new Map<string, Middleware[]>()
+const floatingArrowMiddlewareCache = new WeakMap<HTMLElement, Map<string, Middleware[]>>()
+
+function createFloatingMiddleware({
+  offset: offsetDistance,
+  flip: enableFlip,
+  shift: enableShift,
+  shiftPadding,
+  arrowElement,
+  arrowPadding
+}: Required<FloatingMiddlewareOptions>): Middleware[] {
+  const middleware: Middleware[] = [offset(offsetDistance)]
+
+  if (enableFlip) {
+    middleware.push(flip({ padding: shiftPadding }))
+  }
+
+  if (enableShift) {
+    middleware.push(shift({ padding: shiftPadding }))
+  }
+
+  if (arrowElement) {
+    middleware.push(arrow({ element: arrowElement, padding: arrowPadding }))
+  }
+
+  return middleware
+}
+
+function getFloatingMiddlewareCacheKey({
+  offset: offsetDistance,
+  flip: enableFlip,
+  shift: enableShift,
+  shiftPadding,
+  arrowPadding
+}: Required<FloatingMiddlewareOptions>): string {
+  return [offsetDistance, enableFlip ? 1 : 0, enableShift ? 1 : 0, shiftPadding, arrowPadding].join(
+    '|'
+  )
+}
+
+/**
+ * Get a stable Floating UI middleware chain for matching positioning options.
+ * Middleware with arrows is cached per arrow element so component instances do
+ * not share DOM-bound arrow middleware.
+ */
+export function getFloatingMiddleware(options: FloatingMiddlewareOptions = {}): Middleware[] {
+  const normalizedOptions: Required<FloatingMiddlewareOptions> = {
+    offset: options.offset ?? 8,
+    flip: options.flip ?? true,
+    shift: options.shift ?? true,
+    shiftPadding: options.shiftPadding ?? 8,
+    arrowElement: options.arrowElement ?? null,
+    arrowPadding: options.arrowPadding ?? 8
+  }
+  const cacheKey = getFloatingMiddlewareCacheKey(normalizedOptions)
+  const { arrowElement } = normalizedOptions
+
+  if (!arrowElement) {
+    const cachedMiddleware = floatingMiddlewareCache.get(cacheKey)
+    if (cachedMiddleware) return cachedMiddleware
+
+    const middleware = createFloatingMiddleware(normalizedOptions)
+    floatingMiddlewareCache.set(cacheKey, middleware)
+    return middleware
+  }
+
+  let arrowCache = floatingArrowMiddlewareCache.get(arrowElement)
+  if (!arrowCache) {
+    arrowCache = new Map<string, Middleware[]>()
+    floatingArrowMiddlewareCache.set(arrowElement, arrowCache)
+  }
+
+  const cachedMiddleware = arrowCache.get(cacheKey)
+  if (cachedMiddleware) return cachedMiddleware
+
+  const middleware = createFloatingMiddleware(normalizedOptions)
+  arrowCache.set(cacheKey, middleware)
+  return middleware
+}
+
+/**
  * Result of computing floating position.
  */
 export interface FloatingResult {
@@ -138,19 +253,14 @@ export async function computeFloatingPosition(
     arrowPadding = 8
   } = options
 
-  const middleware: Middleware[] = [offset(offsetDistance)]
-
-  if (enableFlip) {
-    middleware.push(flip({ padding: shiftPadding }))
-  }
-
-  if (enableShift) {
-    middleware.push(shift({ padding: shiftPadding }))
-  }
-
-  if (arrowElement) {
-    middleware.push(arrow({ element: arrowElement, padding: arrowPadding }))
-  }
+  const middleware = getFloatingMiddleware({
+    offset: offsetDistance,
+    flip: enableFlip,
+    shift: enableShift,
+    shiftPadding,
+    arrowElement,
+    arrowPadding
+  })
 
   const result: ComputePositionReturn = await computePosition(reference, floating, {
     placement: placement as Placement,

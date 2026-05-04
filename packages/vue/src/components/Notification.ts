@@ -24,6 +24,7 @@ import {
   notificationIconClasses,
   notificationPositionClasses,
   notificationTitleClasses,
+  createNotificationStackUpdateScheduler,
   normalizeStringOption,
   type NotificationConfig,
   type NotificationInstance,
@@ -70,6 +71,14 @@ const updateCallbacks: Record<NotificationPosition, (() => void) | null> = {
   'top-right': null,
   'bottom-left': null,
   'bottom-right': null
+}
+const stackUpdateScheduler = createNotificationStackUpdateScheduler()
+
+function scheduleNotificationStackUpdate(position: NotificationPosition): void {
+  const callback = updateCallbacks[position]
+  if (!callback) return
+
+  stackUpdateScheduler.schedule(position, callback)
 }
 
 /**
@@ -247,6 +256,7 @@ function ensureContainer(position: NotificationPosition) {
   if (containerApps[position] && !existingRootEl) {
     containerApps[position] = null
     updateCallbacks[position] = null
+    stackUpdateScheduler.cancel(position)
   }
 
   if (containerApps[position]) {
@@ -273,6 +283,7 @@ function destroyContainer(position: NotificationPosition) {
   }
 
   updateCallbacks[position] = null
+  stackUpdateScheduler.cancel(position)
 
   if (isBrowser()) {
     document.getElementById(rootId)?.remove()
@@ -304,7 +315,7 @@ function addNotification(config: NotificationConfig): () => void {
 
   notificationInstancesByPosition[position].push(instance)
 
-  updateCallbacks[position]?.()
+  scheduleNotificationStackUpdate(position)
 
   // Auto close after duration
   if (instance.duration > 0) {
@@ -327,9 +338,11 @@ function removeNotification(id: string | number, position: NotificationPosition)
     const instance = instances[index]
     instances.splice(index, 1)
     instance.onClose?.()
-  }
 
-  updateCallbacks[position]?.()
+    if (notificationInstancesByPosition[position].length > 0) {
+      scheduleNotificationStackUpdate(position)
+    }
+  }
 
   if (notificationInstancesByPosition[position].length === 0) {
     destroyContainer(position)

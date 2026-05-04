@@ -2,6 +2,12 @@
 
 > 2026-05-04 核对：并非全部完成。本文只保留源码、测试或文档中仍未完成、部分完成、待评估的优化项。
 
+> 2026-05-04 执行：完成 Feedback / Floating middleware 缓存。`Tooltip` / `Popover` / `Popconfirm` 共用的 core floating middleware 现在按参数与 arrow 元素缓存，并新增 core 单测覆盖复用与隔离行为。
+
+> 2026-05-04 执行：完成 Feedback / Notification stack rAF。全局 Notification 的堆叠刷新现在通过 core rAF scheduler 按 position 批量到下一帧，并新增 core 调度器测试与 Vue/React 行为验证。
+
+> 2026-05-04 执行：完成 Feedback / Watermark 绘制优化。Watermark 绘制现在通过 core controller 统一 rAF 批量与 ResizeObserver 重绘，文本水印优先使用 OffscreenCanvas，图片与兼容场景保留 DOM canvas fallback，并新增 core 与 Vue/React 测试。
+
 ## 1. 最高优先级
 
 | 任务                   | 对应组件 / 范围                                           | 来源                                                                     | 完成标准                                                           |
@@ -21,7 +27,7 @@
 | i18n / CLI / examples | [phase1d-i18n-cli-examples-tests.md](phase1d-i18n-cli-examples-tests.md) | ConfigProvider / locale barrel / CLI bin / Modal / Drawer / Popover                                                |
 | Basic                 | [phase2.1-basic.md](phase2.1-basic.md)                                   | Empty / Divider                                                                                                    |
 | Form                  | [phase2.2-form.md](phase2.2-form.md)                                     | Form / AutoComplete / Cascader / TreeSelect / Transfer / Radio / Checkbox                                          |
-| Feedback              | [phase2.3-feedback.md](phase2.3-feedback.md)                             | Modal / Drawer / Popover / Tooltip / Popconfirm / Loading / Notification / Watermark                               |
+| Feedback              | [phase2.3-feedback.md](phase2.3-feedback.md)                             | Modal / Drawer / Popover / Tooltip / Popconfirm / Loading                                                          |
 | Layout                | [phase2.4-layout.md](phase2.4-layout.md)                                 | Row / Col / Splitter / Resizable / List / Statistic / Descriptions / Container                                     |
 | Navigation            | [phase2.5-navigation.md](phase2.5-navigation.md)                         | Menu / Dropdown / Anchor / Breadcrumb / Steps / Tabs / Pagination / FloatButton                                    |
 | Data                  | [phase2.6-data.md](phase2.6-data.md)                                     | Table / Timeline                                                                                                   |

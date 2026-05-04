@@ -6,8 +6,9 @@ import {
   watermarkDefaults,
   watermarkWrapperClasses,
   resolveWatermarkFont,
-  renderWatermarkCanvas,
+  createWatermarkRenderController,
   getWatermarkOverlayStyle,
+  type WatermarkRenderController,
   type WatermarkFont
 } from '@expcat/tigercat-core'
 
@@ -59,48 +60,41 @@ export const Watermark = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const base64 = ref<string | undefined>()
+    const wrapperRef = ref<HTMLElement | null>(null)
+    let renderController: WatermarkRenderController | undefined
 
     const resolvedFont = computed(() => resolveWatermarkFont(props.font))
 
     const generate = () => {
-      if (props.image) {
-        // For image watermarks, load the image onto canvas
-        const img = new Image()
-        img.crossOrigin = 'anonymous'
-        img.onload = () => {
-          const canvas = document.createElement('canvas')
-          const dpr = window.devicePixelRatio || 1
-          canvas.width = props.width * dpr
-          canvas.height = props.height * dpr
-          const ctx = canvas.getContext('2d')
-          if (!ctx) return
-          ctx.scale(dpr, dpr)
-          ctx.translate(props.width / 2, props.height / 2)
-          ctx.rotate((props.rotate * Math.PI) / 180)
-          ctx.translate(-props.width / 2, -props.height / 2)
-          ctx.drawImage(img, 0, 0, props.width, props.height)
-          base64.value = canvas.toDataURL()
-        }
-        img.src = props.image
-      } else {
-        base64.value = renderWatermarkCanvas({
+      renderController?.render()
+    }
+
+    onMounted(() => {
+      if (!wrapperRef.value) return
+
+      renderController = createWatermarkRenderController({
+        getRenderOptions: () => ({
           content: props.content,
+          image: props.image,
           width: props.width,
           height: props.height,
           rotate: props.rotate,
           font: resolvedFont.value
-        })
-      }
-    }
+        }),
+        onRender: (base64Url) => {
+          base64.value = base64Url
+        }
+      })
+      renderController.observe(wrapperRef.value)
+      renderController.render()
+    })
 
-    onMounted(generate)
     watch(
       () => [props.content, props.image, props.width, props.height, props.rotate, props.font],
       generate
     )
 
     // MutationObserver: re-apply if the overlay is removed externally
-    const wrapperRef = ref<HTMLElement | null>(null)
     let observer: MutationObserver | undefined
     onMounted(() => {
       if (typeof MutationObserver === 'undefined' || !wrapperRef.value) return
@@ -116,7 +110,11 @@ export const Watermark = defineComponent({
       })
       observer.observe(wrapperRef.value, { childList: true })
     })
-    onBeforeUnmount(() => observer?.disconnect())
+    onBeforeUnmount(() => {
+      observer?.disconnect()
+      renderController?.disconnect()
+      renderController = undefined
+    })
 
     const overlayStyle = computed(() =>
       getWatermarkOverlayStyle({

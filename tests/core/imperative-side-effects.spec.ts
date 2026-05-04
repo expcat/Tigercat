@@ -24,6 +24,9 @@ async function flushMicrotasks() {
 async function flushVueDom() {
   await nextTick()
   await flushMicrotasks()
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  await nextTick()
+  await flushMicrotasks()
 }
 
 function clearImperativeDom() {
@@ -81,11 +84,13 @@ describe('imperative API sideEffects regression', () => {
     vueNotification.info({ title: 'Vue root notification', duration: 0 })
     await flushVueDom()
 
-    expect(document.querySelector('[data-tiger-message]')?.textContent).toContain(
-      'Vue root message'
-    )
-    expect(document.querySelector('[data-tiger-notification]')?.textContent).toContain(
-      'Vue root notification'
-    )
+    await waitFor(() => {
+      expect(document.querySelector('[data-tiger-message]')?.textContent).toContain(
+        'Vue root message'
+      )
+      expect(document.querySelector('[data-tiger-notification]')?.textContent).toContain(
+        'Vue root notification'
+      )
+    })
   })
 })

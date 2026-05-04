@@ -146,3 +146,96 @@ export const notificationDescriptionClasses = 'text-sm mt-1'
  * Notification content wrapper classes
  */
 export const notificationContentClasses = 'flex-1 min-w-0'
+
+export type NotificationStackFrameCallback = (timestamp: number) => void
+
+export type NotificationStackFrameRequest = (callback: NotificationStackFrameCallback) => number
+
+export type NotificationStackFrameCancel = (handle: number) => void
+
+export type NotificationStackUpdateCallback = () => void
+
+export interface NotificationStackUpdateSchedulerOptions {
+  requestFrame?: NotificationStackFrameRequest
+  cancelFrame?: NotificationStackFrameCancel
+}
+
+export interface NotificationStackUpdateScheduler {
+  schedule: (position: NotificationPosition, callback: NotificationStackUpdateCallback) => void
+  flush: () => void
+  cancel: (position?: NotificationPosition) => void
+  isPending: () => boolean
+}
+
+function requestDefaultNotificationFrame(callback: NotificationStackFrameCallback): number {
+  if (globalThis.requestAnimationFrame) {
+    return globalThis.requestAnimationFrame(callback)
+  }
+
+  return globalThis.setTimeout(() => callback(globalThis.performance?.now?.() ?? Date.now()), 16)
+}
+
+function cancelDefaultNotificationFrame(handle: number): void {
+  if (globalThis.cancelAnimationFrame) {
+    globalThis.cancelAnimationFrame(handle)
+    return
+  }
+
+  globalThis.clearTimeout(handle)
+}
+
+export function createNotificationStackUpdateScheduler(
+  options: NotificationStackUpdateSchedulerOptions = {}
+): NotificationStackUpdateScheduler {
+  const requestFrame = options.requestFrame ?? requestDefaultNotificationFrame
+  const cancelFrame = options.cancelFrame ?? cancelDefaultNotificationFrame
+  const pendingCallbacks = new Map<NotificationPosition, NotificationStackUpdateCallback>()
+  let frameHandle: number | undefined
+
+  function applyPending(): void {
+    frameHandle = undefined
+    if (pendingCallbacks.size === 0) return
+
+    const callbacks = [...pendingCallbacks.values()]
+    pendingCallbacks.clear()
+    callbacks.forEach((callback) => callback())
+  }
+
+  function schedule(
+    position: NotificationPosition,
+    callback: NotificationStackUpdateCallback
+  ): void {
+    pendingCallbacks.set(position, callback)
+    if (frameHandle !== undefined) return
+
+    frameHandle = requestFrame(applyPending)
+  }
+
+  function flush(): void {
+    if (frameHandle !== undefined) {
+      cancelFrame(frameHandle)
+    }
+
+    applyPending()
+  }
+
+  function cancel(position?: NotificationPosition): void {
+    if (position) {
+      pendingCallbacks.delete(position)
+    } else {
+      pendingCallbacks.clear()
+    }
+
+    if (pendingCallbacks.size > 0 || frameHandle === undefined) return
+
+    cancelFrame(frameHandle)
+    frameHandle = undefined
+  }
+
+  return {
+    schedule,
+    flush,
+    cancel,
+    isPending: () => frameHandle !== undefined
+  }
+}

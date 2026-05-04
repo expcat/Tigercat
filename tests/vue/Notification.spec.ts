@@ -6,10 +6,16 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { nextTick } from 'vue'
 import { notification } from '@expcat/tigercat-vue'
 
-async function flush() {
+async function flushMicrotasks() {
   await nextTick()
   await Promise.resolve()
   await Promise.resolve()
+}
+
+async function flush() {
+  await flushMicrotasks()
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  await flushMicrotasks()
 }
 
 describe('Notification (Vue)', () => {
@@ -24,6 +30,7 @@ describe('Notification (Vue)', () => {
     // Clean up after each test
     notification.clear()
     document.body.innerHTML = ''
+    vi.useRealTimers()
   })
 
   it('shows a notification for string options', async () => {
@@ -76,14 +83,15 @@ describe('Notification (Vue)', () => {
     vi.useFakeTimers()
 
     notification.info({ title: 'Auto-close', duration: 100 })
-    await flush()
+    await flushMicrotasks()
+    vi.advanceTimersByTime(16)
+    await flushMicrotasks()
     expect(document.querySelector('[data-tiger-notification]')).toBeTruthy()
 
     vi.advanceTimersByTime(150)
-    await flush()
+    vi.advanceTimersByTime(16)
+    await flushMicrotasks()
     expect(document.querySelector('[data-tiger-notification]')).toBeFalsy()
-
-    vi.useRealTimers()
   })
 
   it('hides close button when closable is false', async () => {
