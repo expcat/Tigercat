@@ -10,6 +10,7 @@ import {
   closeIconPathStrokeLinejoin,
   closeIconPathStrokeWidth,
   getModalContentClasses,
+  lockBodyScroll,
   resolveLocaleText,
   modalWrapperClasses,
   modalMaskClasses,
@@ -241,6 +242,11 @@ export const Modal: React.FC<ModalProps> = ({
   }, [open])
 
   useEscapeKey({ enabled: open, onEscape: handleClose })
+
+  useEffect(() => {
+    if (!open) return
+    return lockBodyScroll()
+  }, [open])
 
   // Focus trap handler
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {

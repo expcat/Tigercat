@@ -76,6 +76,12 @@ export interface LoadingProps {
   customColor?: string
 
   /**
+   * Whether fullscreen loading locks document scrolling
+   * @default true
+   */
+  lockScroll?: boolean
+
+  /**
    * Additional CSS classes
    */
   className?: string

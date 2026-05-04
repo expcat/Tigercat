@@ -8,6 +8,8 @@
 
 > 2026-05-04 执行：完成 Feedback / Watermark 绘制优化。Watermark 绘制现在通过 core controller 统一 rAF 批量与 ResizeObserver 重绘，文本水印优先使用 OffscreenCanvas，图片与兼容场景保留 DOM canvas fallback，并新增 core 与 Vue/React 测试。
 
+> 2026-05-04 执行：完成 Feedback / Loading overlay 复用。Fullscreen Loading 现在与 Modal / Drawer 一样挂载到 body，并共用 core body scroll lock 计数器；Modal / Drawer 也接入同一锁，新增 core 与 Vue/React Loading 测试覆盖 portal/teleport 与滚动锁行为。
+
 ## 1. 最高优先级
 
 | 任务                   | 对应组件 / 范围                                           | 来源                                                                     | 完成标准                                                           |
@@ -27,7 +29,7 @@
 | i18n / CLI / examples | [phase1d-i18n-cli-examples-tests.md](phase1d-i18n-cli-examples-tests.md) | ConfigProvider / locale barrel / CLI bin / Modal / Drawer / Popover                                                |
 | Basic                 | [phase2.1-basic.md](phase2.1-basic.md)                                   | Empty / Divider                                                                                                    |
 | Form                  | [phase2.2-form.md](phase2.2-form.md)                                     | Form / AutoComplete / Cascader / TreeSelect / Transfer / Radio / Checkbox                                          |
-| Feedback              | [phase2.3-feedback.md](phase2.3-feedback.md)                             | Modal / Drawer / Popover / Tooltip / Popconfirm / Loading                                                          |
+| Feedback              | [phase2.3-feedback.md](phase2.3-feedback.md)                             | Modal / Drawer / Popover / Tooltip / Popconfirm                                                                    |
 | Layout                | [phase2.4-layout.md](phase2.4-layout.md)                                 | Row / Col / Splitter / Resizable / List / Statistic / Descriptions / Container                                     |
 | Navigation            | [phase2.5-navigation.md](phase2.5-navigation.md)                         | Menu / Dropdown / Anchor / Breadcrumb / Steps / Tabs / Pagination / FloatButton                                    |
 | Data                  | [phase2.6-data.md](phase2.6-data.md)                                     | Table / Timeline                                                                                                   |

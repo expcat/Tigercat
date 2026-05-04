@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, ref, watch, onUnmounted } from 'vue'
+import { defineComponent, computed, h, PropType, ref, watch, onUnmounted, Teleport } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -12,6 +12,7 @@ import {
   loadingContainerBaseClasses,
   loadingFullscreenBaseClasses,
   loadingColorClasses,
+  lockBodyScroll,
   mergeStyleValues,
   normalizeSvgAttrs,
   injectLoadingAnimationStyles,
@@ -61,6 +62,14 @@ export const Loading = defineComponent({
       type: String,
       default: undefined
     },
+    lockScroll: {
+      type: Boolean,
+      default: true
+    },
+    disableTeleport: {
+      type: Boolean,
+      default: false
+    },
     className: {
       type: String,
       default: undefined
@@ -75,6 +84,7 @@ export const Loading = defineComponent({
 
     const visible = ref(false)
     let timer: ReturnType<typeof setTimeout> | null = null
+    let unlockBodyScroll: (() => void) | undefined
 
     const clearTimer = () => {
       if (timer) {
@@ -103,7 +113,22 @@ export const Loading = defineComponent({
 
     onUnmounted(() => {
       clearTimer()
+      unlockBodyScroll?.()
+      unlockBodyScroll = undefined
     })
+
+    watch(
+      () => [props.fullscreen, visible.value, props.lockScroll] as const,
+      ([fullscreen, isVisible, lockScrollEnabled]) => {
+        unlockBodyScroll?.()
+        unlockBodyScroll = undefined
+
+        if (fullscreen && isVisible && lockScrollEnabled) {
+          unlockBodyScroll = lockBodyScroll()
+        }
+      },
+      { immediate: true }
+    )
 
     const spinnerClasses = computed(() => {
       return getLoadingClasses(props.variant, props.size, props.color, props.customColor)
@@ -209,7 +234,7 @@ export const Loading = defineComponent({
         children.push(h('div', { class: textClasses.value }, props.text))
       }
 
-      return h(
+      const loadingNode = h(
         'div',
         {
           role: 'status',
@@ -222,6 +247,12 @@ export const Loading = defineComponent({
         },
         children
       )
+
+      if (props.fullscreen) {
+        return h(Teleport, { to: 'body', disabled: props.disableTeleport }, [loadingNode])
+      }
+
+      return loadingNode
     }
   }
 })

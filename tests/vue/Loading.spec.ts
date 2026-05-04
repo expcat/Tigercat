@@ -1,8 +1,13 @@
-import { describe, it, expect, vi } from 'vitest'
+import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { Loading } from '../../packages/vue/src/components/Loading'
 
 describe('Loading (Vue)', () => {
+  afterEach(() => {
+    document.body.style.overflow = ''
+    vi.useRealTimers()
+  })
+
   it('renders with a11y defaults', () => {
     render(Loading)
     const status = screen.getByRole('status')
@@ -76,11 +81,25 @@ describe('Loading (Vue)', () => {
   })
 
   it('supports fullscreen background', () => {
-    const { container } = render(Loading, {
+    const { container, unmount } = render(Loading, {
       props: { fullscreen: true, background: 'rgba(0, 0, 0, 0.8)' }
     })
-    const wrapper = container.firstChild as HTMLElement
+    const wrapper = screen.getByRole('status')
+
+    expect(container.querySelector('[role="status"]')).toBeNull()
     expect(wrapper).toHaveStyle({ backgroundColor: 'rgba(0, 0, 0, 0.8)' })
+    expect(document.body.style.overflow).toBe('hidden')
+
+    unmount()
+
+    expect(document.body.style.overflow).toBe('')
+  })
+
+  it('allows fullscreen loading without scroll lock', () => {
+    render(Loading, { props: { fullscreen: true, lockScroll: false } })
+
+    expect(screen.getByRole('status')).toBeInTheDocument()
+    expect(document.body.style.overflow).toBe('')
   })
 
   it('respects delay', async () => {
@@ -91,8 +110,6 @@ describe('Loading (Vue)', () => {
 
     vi.advanceTimersByTime(100)
     await vi.runAllTimersAsync()
-
     expect(screen.getByRole('status')).toBeInTheDocument()
-    vi.useRealTimers()
   })
 })

@@ -29,6 +29,7 @@ import {
   modalBodyClasses,
   modalFooterClasses,
   resolveLocaleText,
+  lockBodyScroll,
   getFocusableElements,
   getFocusTrapNavigation,
   type TigerLocale,
@@ -225,6 +226,7 @@ export const Modal = defineComponent({
     const dialogRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
     const previousActiveElement = ref<HTMLElement | null>(null)
+    let unlockBodyScroll: (() => void) | undefined
 
     // Drag state
     const dragOffset = ref({ x: 0, y: 0 })
@@ -292,10 +294,14 @@ export const Modal = defineComponent({
 
     onMounted(() => {
       document.addEventListener('keydown', handleKeyDown)
+      if (props.open) {
+        unlockBodyScroll = lockBodyScroll()
+      }
     })
 
     onBeforeUnmount(() => {
       document.removeEventListener('keydown', handleKeyDown)
+      unlockBodyScroll?.()
     })
 
     watch(
@@ -303,6 +309,8 @@ export const Modal = defineComponent({
       async (nextVisible) => {
         if (nextVisible) {
           hasBeenOpened.value = true
+          unlockBodyScroll?.()
+          unlockBodyScroll = lockBodyScroll()
 
           const active = document.activeElement
           previousActiveElement.value = active instanceof HTMLElement ? active : null
@@ -312,6 +320,8 @@ export const Modal = defineComponent({
           el?.focus?.()
         } else {
           emit('close')
+          unlockBodyScroll?.()
+          unlockBodyScroll = undefined
           previousActiveElement.value?.focus?.()
           dragOffset.value = { x: 0, y: 0 }
         }

@@ -1,9 +1,14 @@
-import { describe, it, expect, vi } from 'vitest'
+import { afterEach, describe, it, expect, vi } from 'vitest'
 import { render, screen, act } from '@testing-library/react'
 import React from 'react'
 import { Loading } from '../../packages/react/src/components/Loading'
 
 describe('Loading (React)', () => {
+  afterEach(() => {
+    document.body.style.overflow = ''
+    vi.useRealTimers()
+  })
+
   it('renders with a11y defaults', () => {
     render(<Loading />)
     const status = screen.getByRole('status')
@@ -63,9 +68,23 @@ describe('Loading (React)', () => {
   })
 
   it('supports fullscreen background', () => {
-    const { container } = render(<Loading fullscreen background="rgba(0, 0, 0, 0.8)" />)
-    const wrapper = container.firstChild as HTMLElement
+    const { container, unmount } = render(<Loading fullscreen background="rgba(0, 0, 0, 0.8)" />)
+    const wrapper = screen.getByRole('status')
+
+    expect(container.firstChild).toBeNull()
     expect(wrapper).toHaveStyle({ backgroundColor: 'rgba(0, 0, 0, 0.8)' })
+    expect(document.body.style.overflow).toBe('hidden')
+
+    unmount()
+
+    expect(document.body.style.overflow).toBe('')
+  })
+
+  it('allows fullscreen loading without scroll lock', () => {
+    render(<Loading fullscreen lockScroll={false} />)
+
+    expect(screen.getByRole('status')).toBeInTheDocument()
+    expect(document.body.style.overflow).toBe('')
   })
 
   it('respects delay', async () => {
@@ -77,8 +96,6 @@ describe('Loading (React)', () => {
     await act(async () => {
       vi.advanceTimersByTime(100)
     })
-
     expect(screen.getByRole('status')).toBeInTheDocument()
-    vi.useRealTimers()
   })
 })

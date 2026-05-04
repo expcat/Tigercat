@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import {
   classNames,
   getLoadingBarClasses,
@@ -11,6 +12,7 @@ import {
   loadingContainerBaseClasses,
   loadingFullscreenBaseClasses,
   loadingColorClasses,
+  lockBodyScroll,
   injectLoadingAnimationStyles,
   type LoadingProps as CoreLoadingProps
 } from '@expcat/tigercat-core'
@@ -27,15 +29,21 @@ export const Loading: React.FC<LoadingProps> = ({
   delay = 0,
   background = 'rgba(255, 255, 255, 0.9)',
   customColor,
+  lockScroll = true,
   className,
   style,
   ...props
 }) => {
+  const [visible, setVisible] = useState(delay <= 0)
+
   useEffect(() => {
     injectLoadingAnimationStyles()
   }, [])
 
-  const [visible, setVisible] = useState(delay <= 0)
+  useEffect(() => {
+    if (!fullscreen || !visible || !lockScroll) return
+    return lockBodyScroll()
+  }, [fullscreen, visible, lockScroll])
 
   useEffect(() => {
     if (delay <= 0) {
@@ -131,7 +139,7 @@ export const Loading: React.FC<LoadingProps> = ({
     return null
   }
 
-  return (
+  const loadingNode = (
     <div
       className={containerClasses}
       style={mergedStyle}
@@ -144,4 +152,10 @@ export const Loading: React.FC<LoadingProps> = ({
       {text && <div className={getLoadingTextClasses(size, color, customColor)}>{text}</div>}
     </div>
   )
+
+  if (fullscreen && typeof document !== 'undefined') {
+    return createPortal(loadingNode, document.body)
+  }
+
+  return loadingNode
 }

@@ -33,6 +33,7 @@ import {
   getDrawerCloseButtonClasses,
   getDrawerTitleClasses,
   restoreFocus,
+  lockBodyScroll,
   getFocusableElements,
   getFocusTrapNavigation,
   type DrawerPlacement,
@@ -200,6 +201,7 @@ export const Drawer = defineComponent({
     const dialogRef = ref<HTMLElement | null>(null)
     const closeButtonRef = ref<HTMLButtonElement | null>(null)
     const previousActiveElement = ref<HTMLElement | null>(null)
+    let unlockBodyScroll: (() => void) | undefined
 
     const titleId = computed(() => `${instanceId.value}-title`)
 
@@ -247,17 +249,23 @@ export const Drawer = defineComponent({
         onEscape: handleClose
       })
       document.addEventListener('keydown', handleKeyDown)
+      if (props.open) {
+        unlockBodyScroll = lockBodyScroll()
+      }
     })
 
     onBeforeUnmount(() => {
       cleanupEscape?.()
       document.removeEventListener('keydown', handleKeyDown)
+      unlockBodyScroll?.()
     })
 
     watch(
       () => props.open,
       async (nextVisible) => {
         if (nextVisible) {
+          unlockBodyScroll?.()
+          unlockBodyScroll = lockBodyScroll()
           previousActiveElement.value = captureActiveElement()
 
           await nextTick()
@@ -265,6 +273,8 @@ export const Drawer = defineComponent({
           return
         }
 
+        unlockBodyScroll?.()
+        unlockBodyScroll = undefined
         restoreFocus(previousActiveElement.value)
       }
     )

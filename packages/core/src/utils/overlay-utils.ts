@@ -1,5 +1,8 @@
 import { isTabKey, type KeyLikeEvent } from './a11y-utils'
 
+let bodyScrollLockCount = 0
+let previousBodyOverflow = ''
+
 type ComposedPathEvent = Event & {
   composedPath?: () => EventTarget[]
 }
@@ -108,4 +111,35 @@ export function getFocusTrapNavigation(
   }
 
   return { shouldHandle: false }
+}
+
+export function lockBodyScroll(targetDocument?: Document): () => void {
+  const resolvedDocument =
+    targetDocument ?? (typeof document === 'undefined' ? undefined : document)
+  const body = resolvedDocument?.body
+  if (!body) return () => undefined
+
+  let active = true
+
+  if (bodyScrollLockCount === 0) {
+    previousBodyOverflow = body.style.overflow
+    body.style.overflow = 'hidden'
+  }
+
+  bodyScrollLockCount += 1
+
+  return () => {
+    if (!active) return
+    active = false
+    bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1)
+
+    if (bodyScrollLockCount === 0) {
+      body.style.overflow = previousBodyOverflow
+      previousBodyOverflow = ''
+    }
+  }
+}
+
+export function getBodyScrollLockCount(): number {
+  return bodyScrollLockCount
 }

@@ -18,6 +18,7 @@ import {
   getDrawerFooterClasses,
   getDrawerCloseButtonClasses,
   getDrawerTitleClasses,
+  lockBodyScroll,
   resolveLocaleText,
   restoreFocus,
   getFocusableElements,
@@ -105,6 +106,11 @@ export const Drawer: React.FC<DrawerProps> = ({
   )
 
   useEscapeKey({ enabled: open, onEscape: handleClose })
+
+  useEffect(() => {
+    if (!open) return
+    return lockBodyScroll()
+  }, [open])
 
   const previousVisible = useRef(false)
   useEffect(() => {
