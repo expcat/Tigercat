@@ -1,12 +1,12 @@
 # Tigercat 2026-04 剩余优化清单
 
-> 2026-05-04 复核：本目录仅保留仍未完成或仍需验证的优化内容。
+> 2026-05-04 更新：Phase 0 基线刷新已完成；后续从 Phase 1B 开始。
 
 ## 1. 最高优先级
 
 | 任务                   | 来源                                                                     | 完成标准                                                                                                |
 | ---------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| 刷新当前覆盖率         | [coverage-baseline.json](coverage-baseline.json) / PR-21                 | 重新运行 `pnpm test:coverage`，生成当前覆盖率摘要；避免继续引用 2026-04 baseline                        |
+| ~~刷新当前覆盖率~~     | ~~[coverage-baseline.json](coverage-baseline.json)~~                     | ✅ Done 2026-05-04 — Stmts 80.51% / Branch 74.17% / Funcs 81.20% / Lines 82.59%                        |
 | 完成 PR-21 剩余回归    | [phase1d-i18n-cli-examples-tests.md](phase1d-i18n-cli-examples-tests.md) | 补齐 a11y 扫描、modern 样式触发、Message/Notification sideEffects、Playwright 视觉回归、bench 场景      |
 | 收敛 overlay 共享层    | [phase2.3-feedback.md](phase2.3-feedback.md)                             | Modal/Drawer/Popover/Tooltip/Popconfirm/Loading 统一 portal/teleport、lock-scroll、focus trap、Esc 行为 |
 | 推进 picker-utils 二期 | [phase2.2-form.md](phase2.2-form.md)                                     | AutoComplete/Cascader/TreeSelect/Transfer 按各自键盘与 ARIA 语义复用共享 picker 行为                    |
@@ -62,3 +62,6 @@
 | 2026-05-04 | Heatmap canvas fallback PR    | Done | 新增 core Heatmap render mode 与 canvas 命中 helper；React/Vue HeatmapChart 在 auto 模式超过阈值时用 canvas cell 层并保留 SVG 轴标签；Heatmap 聚焦测试 10 个通过；三端包构建通过       |
 | 2026-05-04 | Carousel autoplay rAF PR      | Done | 新增 core rAF/visibility-aware autoplay controller；React/Vue Carousel 移除 `setInterval` 并复用共享调度；core/React/Vue Carousel 聚焦测试 55 个通过；三端包构建通过                   |
 | 2026-05-04 | Carousel passive touch PR     | Done | 新增 core Carousel swipe helper；React/Vue Carousel 补齐被动 touch 监听与水平滑动切换；core/React/Vue Carousel 聚焦测试 65 个通过；三端包构建通过                                      |
+| 2026-05-04 | Phase 0: 覆盖率基线刷新       | Done | 267 files / 4998 tests 全通过；Stmts 80.51% / Branch 74.17% / Funcs 81.20% / Lines 82.59%（较 04-30 基线 +3~5pp）；旧基线已归档为 `coverage-baseline-2026-04-30.json`                  |
+| 2026-05-04 | Phase 0: 体积基线刷新         | Done | Core 72.3KB(limit 100KB) / Vue 198.8KB(limit 250KB) / React 229.3KB(limit 250KB)，全部在限额内                                                                                        |
+| 2026-05-04 | Phase 0: lint/bench 基线      | Done | lint: 0 errors / 16 warnings (exhaustive-deps)；bench: classNames 6.2M ops/s、chartPadding 5.9M、pieArcs 773K；修复 BackTop.spec.tsx 缺失 async                                       |

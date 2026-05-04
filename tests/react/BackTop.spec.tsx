@@ -45,7 +45,7 @@ describe('BackTop', () => {
     expect(custom).toHaveTextContent('Custom')
   })
 
-  it('is hidden when scroll position is below visibilityHeight', () => {
+  it('is hidden when scroll position is below visibilityHeight', async () => {
     const { container } = render(<BackTop visibilityHeight={400} target={() => scrollContainer} />)
 
     scrollContainer.scrollTop = 100
