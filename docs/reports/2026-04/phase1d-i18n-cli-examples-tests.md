@@ -22,12 +22,12 @@
 
 ## Examples / Tests
 
-| 任务             | 优先级 | 完成标准                                                                         |
-| ---------------- | ------ | -------------------------------------------------------------------------------- |
-| lazy route       | P1     | Vue 使用 `defineAsyncComponent`、React 使用 `React.lazy`，降低 examples 首屏负担 |
-| 刷新覆盖率       | P0     | 重新生成当前覆盖率报告，替换旧 baseline 的执行判断                               |
-| a11y 扫描扩展    | P1     | 交互组件至少有一条 axe 回归；overlay 与 form 类优先                              |
-| modern 样式测试  | P1     | 覆盖 `data-tiger-style="modern"` 对关键组件的 token/class 触发                   |
-| sideEffects 回归 | P1     | Message/Notification imperative API mount 后 DOM 结果不被 tree-shaking 破坏      |
-| 视觉回归         | P2     | Playwright 对 Modal/Drawer/Popover 做跨浏览器截图对比                            |
-| benchmark 场景   | P2     | `benchmarks/core-utils.bench.ts` 增加 chart-utils 与 virtual-list-utils 场景     |
+| 任务             | 优先级 | 状态               | 完成标准 / 结果                                                                                                                                               |
+| ---------------- | ------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| lazy route       | P1     | ✅ Done 2026-05-04 | React `Home` 与所有 demo 页均使用 `React.lazy`；Vue `Home` 与所有 demo 页均通过 `defineAsyncComponent` 懒加载；新增静态回归测试；React/Vue example build 通过 |
+| 刷新覆盖率       | P0     | ✅ Done 2026-05-04 | 重新生成当前覆盖率报告，替换旧 baseline 的执行判断                                                                                                            |
+| a11y 扫描扩展    | P1     | Pending            | 交互组件至少有一条 axe 回归；overlay 与 form 类优先                                                                                                           |
+| modern 样式测试  | P1     | Pending            | 覆盖 `data-tiger-style="modern"` 对关键组件的 token/class 触发                                                                                                |
+| sideEffects 回归 | P1     | Pending            | Message/Notification imperative API mount 后 DOM 结果不被 tree-shaking 破坏                                                                                   |
+| 视觉回归         | P2     | Pending            | Playwright 对 Modal/Drawer/Popover 做跨浏览器截图对比                                                                                                         |
+| benchmark 场景   | P2     | Pending            | `benchmarks/core-utils.bench.ts` 增加 chart-utils 与 virtual-list-utils 场景                                                                                  |
