@@ -1,14 +1,5 @@
 import { defineComponent, h, PropType, provide } from 'vue'
-import {
-  classNames,
-  coerceClassValue,
-  buttonGroupBaseClasses,
-  buttonGroupHorizontalClasses,
-  buttonGroupVerticalClasses,
-  buttonGroupItemClasses,
-  buttonGroupItemVerticalClasses,
-  type ButtonSize
-} from '@expcat/tigercat-core'
+import { coerceClassValue, getButtonGroupClasses, type ButtonSize } from '@expcat/tigercat-core'
 
 export const BUTTON_GROUP_INJECTION_KEY = Symbol('TigerButtonGroup')
 
@@ -44,10 +35,8 @@ export const ButtonGroup = defineComponent({
     })
 
     return () => {
-      const classes = classNames(
-        buttonGroupBaseClasses,
-        props.vertical ? buttonGroupVerticalClasses : buttonGroupHorizontalClasses,
-        props.vertical ? buttonGroupItemVerticalClasses : buttonGroupItemClasses,
+      const classes = getButtonGroupClasses(
+        props.vertical,
         props.className,
         coerceClassValue(attrs.class)
       )

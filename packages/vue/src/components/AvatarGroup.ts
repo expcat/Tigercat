@@ -1,11 +1,12 @@
-import { defineComponent, computed, h, provide, PropType } from 'vue'
+import { defineComponent, h, provide, PropType } from 'vue'
 import {
-  classNames,
   coerceClassValue,
-  avatarGroupBaseClasses,
-  avatarGroupItemClasses,
-  avatarGroupOverflowClasses,
-  avatarSizeClasses,
+  getAvatarGroupClasses,
+  getAvatarGroupItemClasses,
+  getAvatarGroupOverflowClasses,
+  getAvatarGroupOverflowLabel,
+  getAvatarGroupOverflowText,
+  getVisibleGroupItems,
   type AvatarSize
 } from '@expcat/tigercat-core'
 
@@ -42,10 +43,8 @@ export const AvatarGroup = defineComponent({
   setup(props, { slots, attrs }) {
     provide<AvatarGroupContext>(AVATAR_GROUP_INJECTION_KEY, {
       size: props.size,
-      itemClass: avatarGroupItemClasses
+      itemClass: getAvatarGroupItemClasses()
     })
-
-    const overflowSizeClass = computed(() => avatarSizeClasses[props.size ?? 'md'])
 
     return () => {
       const children = slots.default?.() ?? []
@@ -56,30 +55,26 @@ export const AvatarGroup = defineComponent({
       const attrsRecord = attrs as Record<string, unknown>
       const attrsClass = attrsRecord.class
 
-      const total = flatChildren.length
-      const visibleCount = props.max != null && props.max < total ? props.max : total
-      const overflow = total - visibleCount
-
-      const visible = flatChildren.slice(0, visibleCount)
+      const { visibleItems, overflowCount } = getVisibleGroupItems(flatChildren, props.max)
 
       return h(
         'div',
         {
           ...attrs,
-          class: classNames(avatarGroupBaseClasses, props.className, coerceClassValue(attrsClass)),
+          class: getAvatarGroupClasses(props.className, coerceClassValue(attrsClass)),
           role: 'group',
           'aria-label': 'Avatar group'
         },
         [
-          ...visible,
-          overflow > 0
+          ...visibleItems,
+          overflowCount > 0
             ? h(
                 'span',
                 {
-                  class: classNames(avatarGroupOverflowClasses, overflowSizeClass.value),
-                  'aria-label': `${overflow} more`
+                  class: getAvatarGroupOverflowClasses(props.size ?? 'md'),
+                  'aria-label': getAvatarGroupOverflowLabel(overflowCount)
                 },
-                `+${overflow}`
+                getAvatarGroupOverflowText(overflowCount)
               )
             : null
         ]

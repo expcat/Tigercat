@@ -1,13 +1,5 @@
 import React, { createContext, useContext, useMemo } from 'react'
-import {
-  classNames,
-  buttonGroupBaseClasses,
-  buttonGroupHorizontalClasses,
-  buttonGroupVerticalClasses,
-  buttonGroupItemClasses,
-  buttonGroupItemVerticalClasses,
-  type ButtonSize
-} from '@expcat/tigercat-core'
+import { getButtonGroupClasses, type ButtonSize } from '@expcat/tigercat-core'
 
 export interface ButtonGroupContextValue {
   size?: ButtonSize
@@ -34,13 +26,7 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   const contextValue = useMemo(() => ({ size }), [size])
 
   const groupClasses = useMemo(
-    () =>
-      classNames(
-        buttonGroupBaseClasses,
-        vertical ? buttonGroupVerticalClasses : buttonGroupHorizontalClasses,
-        vertical ? buttonGroupItemVerticalClasses : buttonGroupItemClasses,
-        className
-      ),
+    () => getButtonGroupClasses(vertical, className),
     [vertical, className]
   )
 

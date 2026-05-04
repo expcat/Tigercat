@@ -1,4 +1,9 @@
 import React, { useState, useCallback, useMemo, createContext, useRef } from 'react'
+import {
+  getImageGroupClasses,
+  registerImageGroupItem,
+  unregisterImageGroupItem
+} from '@expcat/tigercat-core'
 import { ImagePreview } from './ImagePreview'
 
 export interface ImageGroupContextValue {
@@ -40,13 +45,13 @@ export const ImageGroup: React.FC<ImageGroupProps> = ({
   const imagesRef = useRef<string[]>([])
 
   const register = useCallback((src: string): number => {
-    const idx = imagesRef.current.length
-    imagesRef.current = [...imagesRef.current, src]
-    return idx
+    const result = registerImageGroupItem(imagesRef.current, src)
+    imagesRef.current = result.items
+    return result.index
   }, [])
 
   const unregister = useCallback((src: string) => {
-    imagesRef.current = imagesRef.current.filter((s) => s !== src)
+    imagesRef.current = unregisterImageGroupItem(imagesRef.current, src)
   }, [])
 
   const openPreview = useCallback(
@@ -66,7 +71,7 @@ export const ImageGroup: React.FC<ImageGroupProps> = ({
 
   return (
     <ImageGroupContext.Provider value={contextValue}>
-      <div className={className || 'tiger-image-group'} role="group">
+      <div className={getImageGroupClasses(className)} role="group">
         {children}
         {preview && (
           <ImagePreview

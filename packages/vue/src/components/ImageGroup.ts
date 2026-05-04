@@ -1,4 +1,9 @@
 import { defineComponent, h, ref, provide, onBeforeUnmount } from 'vue'
+import {
+  getImageGroupClasses,
+  registerImageGroupItem,
+  unregisterImageGroupItem
+} from '@expcat/tigercat-core'
 import { ImagePreview } from './ImagePreview'
 
 export interface ImageGroupContext {
@@ -26,15 +31,12 @@ export const ImageGroup = defineComponent({
 
     const context: ImageGroupContext = {
       register(src: string): number {
-        const idx = images.value.length
-        images.value.push(src)
-        return idx
+        const result = registerImageGroupItem(images.value, src)
+        images.value = result.items
+        return result.index
       },
       unregister(src: string) {
-        const idx = images.value.indexOf(src)
-        if (idx > -1) {
-          images.value.splice(idx, 1)
-        }
+        images.value = unregisterImageGroupItem(images.value, src)
       },
       openPreview(index: number) {
         if (!props.preview) return
@@ -68,7 +70,7 @@ export const ImageGroup = defineComponent({
           })
         : null
 
-      return h('div', { class: 'tiger-image-group', role: 'group' }, [children, preview])
+      return h('div', { class: getImageGroupClasses(), role: 'group' }, [children, preview])
     }
   }
 })

@@ -1,10 +1,11 @@
 import React, { createContext, useMemo } from 'react'
 import {
-  classNames,
-  avatarGroupBaseClasses,
-  avatarGroupItemClasses,
-  avatarGroupOverflowClasses,
-  avatarSizeClasses,
+  getAvatarGroupClasses,
+  getAvatarGroupItemClasses,
+  getAvatarGroupOverflowClasses,
+  getAvatarGroupOverflowLabel,
+  getAvatarGroupOverflowText,
+  getVisibleGroupItems,
   type AvatarSize,
   type AvatarGroupProps as CoreAvatarGroupProps
 } from '@expcat/tigercat-core'
@@ -28,31 +29,26 @@ export const AvatarGroup: React.FC<AvatarGroupProps> = ({
   ...props
 }) => {
   const contextValue = useMemo<AvatarGroupContextValue>(
-    () => ({ size, itemClass: avatarGroupItemClasses }),
+    () => ({ size, itemClass: getAvatarGroupItemClasses() }),
     [size]
   )
 
   const childArray = React.Children.toArray(children)
-  const total = childArray.length
-  const visibleCount = max != null && max < total ? max : total
-  const overflow = total - visibleCount
-  const visible = childArray.slice(0, visibleCount)
-
-  const overflowSizeClass = avatarSizeClasses[size ?? 'md']
+  const { visibleItems, overflowCount } = getVisibleGroupItems(childArray, max)
 
   return (
     <AvatarGroupContext.Provider value={contextValue}>
       <div
-        className={classNames(avatarGroupBaseClasses, className)}
+        className={getAvatarGroupClasses(className)}
         role="group"
         aria-label="Avatar group"
         {...props}>
-        {visible}
-        {overflow > 0 && (
+        {visibleItems}
+        {overflowCount > 0 && (
           <span
-            className={classNames(avatarGroupOverflowClasses, overflowSizeClass)}
-            aria-label={`${overflow} more`}>
-            +{overflow}
+            className={getAvatarGroupOverflowClasses(size ?? 'md')}
+            aria-label={getAvatarGroupOverflowLabel(overflowCount)}>
+            {getAvatarGroupOverflowText(overflowCount)}
           </span>
         )}
       </div>
