@@ -4,11 +4,11 @@
 
 ## i18n
 
-| 任务                            | 优先级 | 完成标准                                                                                                              |
-| ------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------- |
-| 根入口 locale tree-shaking 方案 | P1     | 当前根入口仍会经 `utils/i18n` re-export 全部 locale；需决定是否保留兼容 barrel，或引入更轻的 locale-only 默认导出策略 |
-| `defineLocale`                  | P2     | 提供 `defineLocale(partial)` 并深度合并到默认 locale，补类型与单测                                                    |
-| ConfigProvider 异步 locale      | P2     | Vue/React 支持 `locale={() => import(...)}` 或等价 loader，并处理 loading/error/fallback                              |
+| 任务                            | 优先级 | 状态               | 完成标准 / 结果                                                                                                                                                                                                                  |
+| ------------------------------- | ------ | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 根入口 locale tree-shaking 方案 | P1     | Pending            | 当前根入口仍会经 `utils/i18n` re-export 全部 locale；需决定是否保留兼容 barrel，或引入更轻的 locale-only 默认导出策略                                                                                                            |
+| `defineLocale`                  | P2     | ✅ Done 2026-05-04 | 新增 `packages/core/src/utils/i18n/define-locale.ts`：`defineLocale(partial)` 在 `enUS` 基线上深度合并，跳过 `undefined`、保留 `null`、不变更源；从 `@expcat/tigercat-core` 导出；新增 8 用例全通过；core CJS/ESM/DTS 构建均通过 |
+| ConfigProvider 异步 locale      | P2     | Pending            | Vue/React 支持 `locale={() => import(...)}` 或等价 loader，并处理 loading/error/fallback                                                                                                                                         |
 
 ## CLI
 

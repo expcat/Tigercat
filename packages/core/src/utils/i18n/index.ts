@@ -13,3 +13,4 @@ export {
 } from '../timepicker-utils'
 export * from '../upload-labels'
 export * from './locales/index'
+export { defineLocale } from './define-locale'

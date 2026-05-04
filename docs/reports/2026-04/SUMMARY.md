@@ -1,6 +1,6 @@
 # Tigercat 2026-04 剩余优化清单
 
-> 2026-05-04 更新：Phase 0 / Phase 1B 已完成；Phase 1C 已完成 modern 交互测试 + a11y 对比度验证 + reduced motion 验证；后续从 Phase 1C 剩余项（默认主题像素回归 — 需 Playwright 视觉回归）继续。
+> 2026-05-04 更新：Phase 0 / Phase 1B 已完成；Phase 1C 已完成 modern 交互测试 + a11y 对比度验证 + reduced motion 验证；Phase 1D 已完成 `defineLocale`；后续从 Phase 1D 其他 i18n / CLI / examples 项继续。
 
 ## 1. 最高优先级
 
@@ -71,3 +71,4 @@
 | 2026-05-04 | Phase 1C: modern 主题交互测试 | Done | 新增 `tests/core/modern-theme-interaction.spec.ts` 6 用例：注入 plugin CSS 后验证 `data-tiger-style="modern"` 在 `<html>` / 子树的 token 翻转、`.dark` 叠加、round-trip，以及组件 className 路径稳定；与 `modern-theme.spec.ts` / `themes-manager.spec.ts` / `switch-theme.spec.ts` 共 41 用例全通过                                                                                                      |
 | 2026-05-04 | Phase 1C: a11y 对比度验证     | Done | 新增 `tests/core/theme-contrast.spec.ts` 37 用例：覆盖 default/modern/vibrant/professional/minimal/natural 六套 preset 的 light+dark scheme；正文 `text` / `textSecondary ↔ surface*` 严格 ≥ 4.5:1，`focusRing` / `primary` / `error` ≥ 3:1，`success` / `warning` / `info` ≥ 2.0:1 作为退化护栏；与其他 4 份 theme 测试共 78 用例全通过                                                                  |
 | 2026-05-04 | Phase 1C: reduced motion 验证 | Done | 新增 `tests/core/reduced-motion.spec.ts` 10 用例：mock matchMedia 后 `prefersReducedMotion()` true/false 切换；`getAccessibleTransitionClasses()` 退化为 `duration-0` opacity-only fade；`createTigercatPlugin({ modern: true })` 输出的 `@media (prefers-reduced-motion: reduce)` 块所有 `--tiger-motion-duration-*` 均为 0ms；非 modern 时不输出该块；与 transition / modern-theme 系列共 76 用例全通过 |
+| 2026-05-04 | Phase 1D: `defineLocale`      | Done | 新增 `packages/core/src/utils/i18n/define-locale.ts`：`defineLocale(partial)` 在 `enUS` 基线上深度合并，跳过 `undefined`、保留 `null`、不变更源；从 `@expcat/tigercat-core` 导出；新增 8 用例全通过；core CJS/ESM/DTS 构建均通过                                                                                                                                                                          |
