@@ -240,6 +240,33 @@ const series = [
 
 ---
 
+## HeatmapChart
+
+```vue
+<script setup>
+const heatmapData = [
+  { x: 'Mon', y: 'AM', value: 12 },
+  { x: 'Tue', y: 'AM', value: 18 },
+  { x: 'Mon', y: 'PM', value: 28 },
+  { x: 'Tue', y: 'PM', value: 24 }
+]
+</script>
+
+<template>
+  <HeatmapChart :data="heatmapData" :x-labels="['Mon', 'Tue']" :y-labels="['AM', 'PM']" hoverable />
+
+  <!-- 大矩阵自动切到 canvas cell 层；小矩阵仍用 SVG rect -->
+  <HeatmapChart
+    :data="largeData"
+    :x-labels="xLabels"
+    :y-labels="yLabels"
+    :canvas-threshold="1000" />
+  <HeatmapChart :data="largeData" :x-labels="xLabels" :y-labels="yLabels" render-mode="canvas" />
+</template>
+```
+
+---
+
 ## 底层组件
 
 ```vue

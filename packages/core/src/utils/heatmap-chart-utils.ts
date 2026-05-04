@@ -52,6 +52,35 @@ function rgbToHex(r: number, g: number, b: number): string {
  * expression for perceptually uniform shading (delegated to the browser).
  */
 export type HeatmapColorSpace = 'rgb' | 'oklch'
+export type HeatmapRenderMode = 'svg' | 'canvas' | 'auto'
+
+export const DEFAULT_HEATMAP_CANVAS_THRESHOLD = 1000
+
+export function resolveHeatmapRenderMode(
+  cellCount: number,
+  options: {
+    renderMode?: HeatmapRenderMode
+    canvasThreshold?: number
+  } = {}
+): Exclude<HeatmapRenderMode, 'auto'> {
+  const renderMode = options.renderMode ?? 'auto'
+  if (renderMode === 'svg' || renderMode === 'canvas') return renderMode
+
+  const threshold = Math.max(0, options.canvasThreshold ?? DEFAULT_HEATMAP_CANVAS_THRESHOLD)
+  return cellCount > threshold ? 'canvas' : 'svg'
+}
+
+export function getHeatmapCellIndexAtPoint(
+  cells: readonly HeatmapCell[],
+  x: number,
+  y: number
+): number | null {
+  const index = cells.findIndex(
+    (cell) => x >= cell.x && x <= cell.x + cell.w && y >= cell.y && y <= cell.y + cell.h
+  )
+
+  return index >= 0 ? index : null
+}
 
 /**
  * Linearly interpolate between two hex colours.

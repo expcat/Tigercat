@@ -1989,6 +1989,21 @@ export interface HeatmapChartProps
    * @default 'rgb'
    */
   colorSpace?: 'rgb' | 'oklch'
+
+  /**
+   * Rendering backend for heatmap cells.
+   * - `'svg'`: render one `<rect>` per cell.
+   * - `'canvas'`: draw cells into a canvas layer for large matrices.
+   * - `'auto'`: switch to canvas when cell count exceeds `canvasThreshold`.
+   * @default 'auto'
+   */
+  renderMode?: 'svg' | 'canvas' | 'auto'
+
+  /**
+   * Cell count threshold used when `renderMode` is `'auto'`.
+   * @default 1000
+   */
+  canvasThreshold?: number
 }
 
 // -------------------------------------------------------------------

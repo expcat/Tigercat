@@ -1,9 +1,11 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   classNames,
   computeHeatmapCells,
+  getHeatmapCellIndexAtPoint,
   getChartElementOpacity,
   getChartInnerRect,
+  resolveHeatmapRenderMode,
   resolveChartTooltipContent,
   chartAxisTickTextClasses,
   type ChartPadding,
@@ -36,6 +38,8 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   cellGap = 1,
   showValues = false,
   valueFormatter,
+  renderMode = 'auto',
+  canvasThreshold,
   hoverable = false,
   hoveredIndex: hoveredIndexProp,
   activeOpacity = 1,
@@ -51,6 +55,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   onCellClick,
   onCellHover
 }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const {
     tooltipPosition,
     resolvedHoveredIndex,
@@ -118,6 +123,123 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   const rect = innerRect
   const cellW = (rect.width - cellGap * (xLabels.length - 1)) / xLabels.length
   const cellH = (rect.height - cellGap * (yLabels.length - 1)) / yLabels.length
+  const resolvedRenderMode = resolveHeatmapRenderMode(cells.length, {
+    renderMode,
+    canvasThreshold
+  })
+  const shouldRenderCanvas = resolvedRenderMode === 'canvas'
+
+  useEffect(() => {
+    if (!shouldRenderCanvas) return
+
+    const canvas = canvasRef.current
+    const context = canvas?.getContext('2d')
+    if (!canvas || !context) return
+
+    context.clearRect(0, 0, rect.width, rect.height)
+    context.textAlign = 'center'
+    context.textBaseline = 'middle'
+    context.font = '10px sans-serif'
+
+    cells.forEach((cell, idx) => {
+      context.globalAlpha =
+        getChartElementOpacity(idx, activeIndex, {
+          activeOpacity,
+          inactiveOpacity
+        }) ?? 1
+      context.fillStyle = cell.fill
+
+      const radius = Math.max(0, Math.min(cellRadius, cell.w / 2, cell.h / 2))
+      if (radius > 0) {
+        context.beginPath()
+        context.moveTo(cell.x + radius, cell.y)
+        context.lineTo(cell.x + cell.w - radius, cell.y)
+        context.quadraticCurveTo(cell.x + cell.w, cell.y, cell.x + cell.w, cell.y + radius)
+        context.lineTo(cell.x + cell.w, cell.y + cell.h - radius)
+        context.quadraticCurveTo(
+          cell.x + cell.w,
+          cell.y + cell.h,
+          cell.x + cell.w - radius,
+          cell.y + cell.h
+        )
+        context.lineTo(cell.x + radius, cell.y + cell.h)
+        context.quadraticCurveTo(cell.x, cell.y + cell.h, cell.x, cell.y + cell.h - radius)
+        context.lineTo(cell.x, cell.y + radius)
+        context.quadraticCurveTo(cell.x, cell.y, cell.x + radius, cell.y)
+        context.closePath()
+        context.fill()
+      } else {
+        context.fillRect(cell.x, cell.y, cell.w, cell.h)
+      }
+
+      if (showValues) {
+        context.globalAlpha = 1
+        context.fillStyle = 'var(--tiger-text,#374151)'
+        context.fillText(
+          valueFormatter ? valueFormatter(cell.value) : `${cell.value}`,
+          cell.x + cell.w / 2,
+          cell.y + cell.h / 2
+        )
+      }
+    })
+
+    context.globalAlpha = 1
+  }, [
+    shouldRenderCanvas,
+    cells,
+    rect.width,
+    rect.height,
+    activeIndex,
+    activeOpacity,
+    inactiveOpacity,
+    cellRadius,
+    showValues,
+    valueFormatter
+  ])
+
+  const getCanvasPoint = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = event.currentTarget
+    const bounds = canvas.getBoundingClientRect()
+    const nativeEvent = event.nativeEvent
+    const offsetX =
+      typeof nativeEvent.offsetX === 'number' && Number.isFinite(nativeEvent.offsetX)
+        ? nativeEvent.offsetX
+        : event.clientX - bounds.left
+    const offsetY =
+      typeof nativeEvent.offsetY === 'number' && Number.isFinite(nativeEvent.offsetY)
+        ? nativeEvent.offsetY
+        : event.clientY - bounds.top
+    const scaleX = bounds.width > 0 ? canvas.width / bounds.width : 1
+    const scaleY = bounds.height > 0 ? canvas.height / bounds.height : 1
+
+    return { x: offsetX * scaleX, y: offsetY * scaleY }
+  }, [])
+
+  const handleCanvasMouseMove = useCallback(
+    (event: React.MouseEvent<HTMLCanvasElement>) => {
+      const point = getCanvasPoint(event)
+      const index = getHeatmapCellIndexAtPoint(cells, point.x, point.y)
+      if (index === null) {
+        handleMouseLeave()
+        return
+      }
+
+      handleMouseEnter(index, event)
+      handleMouseMove(event)
+    },
+    [cells, getCanvasPoint, handleMouseEnter, handleMouseLeave, handleMouseMove]
+  )
+
+  const handleCanvasClick = useCallback(
+    (event: React.MouseEvent<HTMLCanvasElement>) => {
+      const point = getCanvasPoint(event)
+      const index = getHeatmapCellIndexAtPoint(cells, point.x, point.y)
+      if (index !== null) {
+        handleClick(index)
+      }
+    },
+    [cells, getCanvasPoint, handleClick]
+  )
 
   const chart = (
     <ChartCanvas
@@ -153,46 +275,47 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
       ))}
 
       {/* Cells */}
-      {cells.map((cell, idx) => {
-        const opacity = getChartElementOpacity(idx, activeIndex, {
-          activeOpacity,
-          inactiveOpacity
-        })
-        return (
-          <React.Fragment key={`cell-${idx}`}>
-            <rect
-              x={cell.x}
-              y={cell.y}
-              width={cell.w}
-              height={cell.h}
-              rx={cellRadius}
-              fill={cell.fill}
-              opacity={opacity}
-              className={classNames(interactive && 'cursor-pointer')}
-              style={
-                {
-                  transition: 'opacity 0.2s ease-out',
-                  rx: `var(--tiger-chart-block-radius, ${cellRadius}px)`
-                } as React.CSSProperties
-              }
-              onMouseEnter={(e) => handleMouseEnter(idx, e)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              onClick={() => handleClick(idx)}
-            />
-            {showValues && (
-              <text
-                x={cell.x + cell.w / 2}
-                y={cell.y + cell.h / 2}
-                className="fill-[color:var(--tiger-text,#374151)] text-[10px]"
-                textAnchor="middle"
-                dominantBaseline="middle">
-                {valueFormatter ? valueFormatter(cell.value) : `${cell.value}`}
-              </text>
-            )}
-          </React.Fragment>
-        )
-      })}
+      {!shouldRenderCanvas &&
+        cells.map((cell, idx) => {
+          const opacity = getChartElementOpacity(idx, activeIndex, {
+            activeOpacity,
+            inactiveOpacity
+          })
+          return (
+            <React.Fragment key={`cell-${idx}`}>
+              <rect
+                x={cell.x}
+                y={cell.y}
+                width={cell.w}
+                height={cell.h}
+                rx={cellRadius}
+                fill={cell.fill}
+                opacity={opacity}
+                className={classNames(interactive && 'cursor-pointer')}
+                style={
+                  {
+                    transition: 'opacity 0.2s ease-out',
+                    rx: `var(--tiger-chart-block-radius, ${cellRadius}px)`
+                  } as React.CSSProperties
+                }
+                onMouseEnter={(e) => handleMouseEnter(idx, e)}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                onClick={() => handleClick(idx)}
+              />
+              {showValues && (
+                <text
+                  x={cell.x + cell.w / 2}
+                  y={cell.y + cell.h / 2}
+                  className="fill-[color:var(--tiger-text,#374151)] text-[10px]"
+                  textAnchor="middle"
+                  dominantBaseline="middle">
+                  {valueFormatter ? valueFormatter(cell.value) : `${cell.value}`}
+                </text>
+              )}
+            </React.Fragment>
+          )
+        })}
     </ChartCanvas>
   )
 
@@ -209,6 +332,27 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({
   return (
     <div className="inline-block relative">
       {chart}
+      {shouldRenderCanvas && (
+        <canvas
+          ref={canvasRef}
+          width={rect.width}
+          height={rect.height}
+          data-heatmap-canvas="true"
+          data-heatmap-render-mode={resolvedRenderMode}
+          className={classNames(interactive && 'cursor-pointer')}
+          style={{
+            position: 'absolute',
+            left: `${rect.x}px`,
+            top: `${rect.y}px`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`,
+            pointerEvents: interactive ? 'auto' : 'none'
+          }}
+          onMouseMove={interactive ? handleCanvasMouseMove : undefined}
+          onMouseLeave={interactive ? handleMouseLeave : undefined}
+          onClick={interactive ? handleCanvasClick : undefined}
+        />
+      )}
       {tooltip}
     </div>
   )

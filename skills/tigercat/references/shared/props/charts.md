@@ -7,11 +7,11 @@ description: Shared charts props and concepts
 
 ## 技术选型
 
-| 决策     | 选择         | 理由                                             |
-| -------- | ------------ | ------------------------------------------------ |
-| 渲染方式 | **纯 SVG**   | CSS 变量原生支持、Tailwind 兼容、零依赖          |
-| 共享层   | Core 抽象    | types/chart.ts + utils/chart-utils.ts (~2400 行) |
-| 框架层   | 仅 rendering | Vue/React 各自负责 h()/JSX 渲染                  |
+| 决策     | 选择         | 理由                                              |
+| -------- | ------------ | ------------------------------------------------- |
+| 渲染方式 | **SVG 优先** | 默认 SVG；Heatmap 大矩阵可自动切换 canvas cell 层 |
+| 共享层   | Core 抽象    | types/chart.ts + utils/chart-utils.ts (~2400 行)  |
+| 框架层   | 仅 rendering | Vue/React 各自负责 h()/JSX 渲染                   |
 
 ## 组件列表
 
@@ -159,6 +159,24 @@ description: Shared charts props and concepts
 | pointBorderColor | `string`                | `'#fff'`    | ✓   | ✓     |
 | pointHoverSize   | `number`                | pointSize+2 | ✓   | ✓     |
 | labelAutoAlign   | `boolean`               | `true`      | ✓   | ✓     |
+
+### HeatmapChart
+
+| Prop            | Type                          | Default   | Vue | React |
+| --------------- | ----------------------------- | --------- | --- | ----- |
+| xLabels         | `string[]`                    | -         | ✓   | ✓     |
+| yLabels         | `string[]`                    | -         | ✓   | ✓     |
+| minColor        | `string`                      | `#f0f9ff` | ✓   | ✓     |
+| maxColor        | `string`                      | `#2563eb` | ✓   | ✓     |
+| colorSpace      | `'rgb' \| 'oklch'`            | `'rgb'`   | ✓   | ✓     |
+| cellRadius      | `number`                      | `2`       | ✓   | ✓     |
+| cellGap         | `number`                      | `1`       | ✓   | ✓     |
+| showValues      | `boolean`                     | `false`   | ✓   | ✓     |
+| valueFormatter  | `(value) => string`           | -         | ✓   | ✓     |
+| renderMode      | `'svg' \| 'canvas' \| 'auto'` | `'auto'`  | ✓   | ✓     |
+| canvasThreshold | `number`                      | `1000`    | ✓   | ✓     |
+
+`renderMode="auto"` 会在 cell 数量超过 `canvasThreshold` 时把 cell 层绘制到 canvas，轴标签和无障碍 SVG 容器仍保留；小矩阵默认继续使用 SVG rect，方便 CSS 和 DOM 级交互检查。
 
 ---
 

@@ -24,7 +24,7 @@
 | Layout                | Splitter/Resizable 仍是组件内 mousemove；Carousel autoplay 仍用 `setInterval`；List 未复用 VirtualList；Row/Col 与 Descriptions 性能项未完成                                                                                                        |
 | Navigation            | Menu/Dropdown/Anchor/Breadcrumb/Steps/Tabs 父子组件同文件约定未落地；Pagination lazy locale / idle 校验、Menu 动画等仍待做                                                                                                                          |
 | Data                  | Calendar memo、Collapse rAF transition、Timeline pseudo-element 仍待做；Table virtual 默认策略仍待确认                                                                                                                                              |
-| Charts                | Heatmap canvas fallback、TreeMap/Sunburst memo、Gauge rAF 动画等性能项仍待做                                                                                                                                                                        |
+| Charts                | TreeMap/Sunburst memo、Gauge rAF 动画等性能项仍待做                                                                                                                                                                                                 |
 | Composite / Advanced  | Composite 配方化文档、DataTableWithToolbar/Table 边界、CommentThread 深度限制、ActivityFeed/Timeline 复用、InfiniteScroll IO、FileManager 共享 model、ImageViewer 手势 util、VirtualList 策略化、VirtualTable 压测、PrintLayout stylesheet 化仍待做 |
 
 ## 3. 延期边界
@@ -59,3 +59,4 @@
 | 2026-05-04 | ChartTooltip transform PR     | Done | 新增 core tooltip transform helper；React/Vue ChartTooltip 改用 `translate3d` 跟随定位，不再动态写入 left/top；core/React/Vue ChartTooltip 聚焦测试 31 个通过；三端包构建通过          |
 | 2026-05-04 | Chart SVG stable keys PR      | Done | 新增 core series key helper；React/Vue Line/Area/Radar 多系列 SVG defs、series group 与 points 改用稳定 seriesKey；Charts 聚焦测试 107 个通过；三端包构建通过                          |
 | 2026-05-04 | Pie/Donut arc cache PR        | Done | 新增 core Pie arc 几何缓存，按 value 序列与角度参数复用扇区角度计算，同时保留当前 datum 引用；Pie/Donut 聚焦测试 149 个通过；三端包构建通过                                            |
+| 2026-05-04 | Heatmap canvas fallback PR    | Done | 新增 core Heatmap render mode 与 canvas 命中 helper；React/Vue HeatmapChart 在 auto 模式超过阈值时用 canvas cell 层并保留 SVG 轴标签；Heatmap 聚焦测试 10 个通过；三端包构建通过       |

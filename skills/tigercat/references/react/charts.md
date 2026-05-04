@@ -240,6 +240,30 @@ const series = [
 
 ---
 
+## HeatmapChart
+
+```tsx
+const heatmapData = [
+  { x: 'Mon', y: 'AM', value: 12 },
+  { x: 'Tue', y: 'AM', value: 18 },
+  { x: 'Mon', y: 'PM', value: 28 },
+  { x: 'Tue', y: 'PM', value: 24 }
+]
+
+<HeatmapChart
+  data={heatmapData}
+  xLabels={['Mon', 'Tue']}
+  yLabels={['AM', 'PM']}
+  hoverable
+/>
+
+{/* 大矩阵自动切到 canvas cell 层；小矩阵仍用 SVG rect */}
+<HeatmapChart data={largeData} xLabels={xLabels} yLabels={yLabels} canvasThreshold={1000} />
+<HeatmapChart data={largeData} xLabels={xLabels} yLabels={yLabels} renderMode="canvas" />
+```
+
+---
+
 ## 底层组件
 
 ```tsx

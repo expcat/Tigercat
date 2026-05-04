@@ -1,9 +1,11 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, nextTick, PropType, ref, watchEffect } from 'vue'
 import {
   classNames,
   computeHeatmapCells,
+  getHeatmapCellIndexAtPoint,
   getChartElementOpacity,
   getChartInnerRect,
+  resolveHeatmapRenderMode,
   resolveChartTooltipContent,
   chartAxisTickTextClasses,
   type ChartPadding,
@@ -33,6 +35,8 @@ export const HeatmapChart = defineComponent({
     cellRadius: { type: Number, default: 2 },
     cellGap: { type: Number, default: 1 },
     showValues: { type: Boolean, default: false },
+    renderMode: { type: String as PropType<'svg' | 'canvas' | 'auto'>, default: 'auto' },
+    canvasThreshold: { type: Number },
     valueFormatter: { type: Function as PropType<(value: number) => string> },
     // Interaction
     hoverable: { type: Boolean, default: false },
@@ -53,6 +57,7 @@ export const HeatmapChart = defineComponent({
   },
   emits: ['update:hoveredIndex', 'update:selectedIndex', 'cell-click', 'cell-hover'],
   setup(props, { emit }) {
+    const canvasRef = ref<HTMLCanvasElement | null>(null)
     const {
       tooltipPosition,
       resolvedHoveredIndex,
@@ -95,6 +100,115 @@ export const HeatmapChart = defineComponent({
         return `${cell.xLabel} × ${cell.yLabel}: ${val}`
       })
     )
+
+    const resolvedRenderMode = computed(() =>
+      resolveHeatmapRenderMode(cells.value.length, {
+        renderMode: props.renderMode,
+        canvasThreshold: props.canvasThreshold
+      })
+    )
+
+    const shouldRenderCanvas = computed(() => resolvedRenderMode.value === 'canvas')
+
+    watchEffect(() => {
+      if (!shouldRenderCanvas.value) return
+
+      const rect = innerRect.value
+      const cellList = cells.value
+      const currentActiveIndex = activeIndex.value
+      const currentActiveOpacity = props.activeOpacity
+      const currentInactiveOpacity = props.inactiveOpacity
+      const currentCellRadius = props.cellRadius
+      const currentShowValues = props.showValues
+      const formatter = props.valueFormatter
+
+      nextTick(() => {
+        const canvas = canvasRef.value
+        const context = canvas?.getContext('2d')
+        if (!canvas || !context) return
+
+        context.clearRect(0, 0, rect.width, rect.height)
+        context.textAlign = 'center'
+        context.textBaseline = 'middle'
+        context.font = '10px sans-serif'
+
+        cellList.forEach((cell, idx) => {
+          context.globalAlpha =
+            getChartElementOpacity(idx, currentActiveIndex, {
+              activeOpacity: currentActiveOpacity,
+              inactiveOpacity: currentInactiveOpacity
+            }) ?? 1
+          context.fillStyle = cell.fill
+
+          const radius = Math.max(0, Math.min(currentCellRadius, cell.w / 2, cell.h / 2))
+          if (radius > 0) {
+            context.beginPath()
+            context.moveTo(cell.x + radius, cell.y)
+            context.lineTo(cell.x + cell.w - radius, cell.y)
+            context.quadraticCurveTo(cell.x + cell.w, cell.y, cell.x + cell.w, cell.y + radius)
+            context.lineTo(cell.x + cell.w, cell.y + cell.h - radius)
+            context.quadraticCurveTo(
+              cell.x + cell.w,
+              cell.y + cell.h,
+              cell.x + cell.w - radius,
+              cell.y + cell.h
+            )
+            context.lineTo(cell.x + radius, cell.y + cell.h)
+            context.quadraticCurveTo(cell.x, cell.y + cell.h, cell.x, cell.y + cell.h - radius)
+            context.lineTo(cell.x, cell.y + radius)
+            context.quadraticCurveTo(cell.x, cell.y, cell.x + radius, cell.y)
+            context.closePath()
+            context.fill()
+          } else {
+            context.fillRect(cell.x, cell.y, cell.w, cell.h)
+          }
+
+          if (currentShowValues) {
+            context.globalAlpha = 1
+            context.fillStyle = 'var(--tiger-text,#374151)'
+            context.fillText(
+              formatter ? formatter(cell.value) : `${cell.value}`,
+              cell.x + cell.w / 2,
+              cell.y + cell.h / 2
+            )
+          }
+        })
+
+        context.globalAlpha = 1
+      })
+    })
+
+    const getCanvasPoint = (event: MouseEvent) => {
+      const canvas = event.currentTarget as HTMLCanvasElement
+      const bounds = canvas.getBoundingClientRect()
+      const scaleX = bounds.width > 0 ? canvas.width / bounds.width : 1
+      const scaleY = bounds.height > 0 ? canvas.height / bounds.height : 1
+
+      return {
+        x: event.offsetX * scaleX,
+        y: event.offsetY * scaleY
+      }
+    }
+
+    const handleCanvasMouseMove = (event: MouseEvent) => {
+      const point = getCanvasPoint(event)
+      const index = getHeatmapCellIndexAtPoint(cells.value, point.x, point.y)
+      if (index === null) {
+        handleMouseLeave()
+        return
+      }
+
+      handleMouseEnter(index, event)
+      handleMouseMove(event)
+    }
+
+    const handleCanvasClick = (event: MouseEvent) => {
+      const point = getCanvasPoint(event)
+      const index = getHeatmapCellIndexAtPoint(cells.value, point.x, point.y)
+      if (index !== null) {
+        handleClick(index)
+      }
+    }
 
     return () => {
       const interactive = props.hoverable || props.selectable
@@ -148,55 +262,57 @@ export const HeatmapChart = defineComponent({
             })
 
             // Cells
-            const cellElems = cells.value
-              .map((cell, idx) => {
-                const opacity = getChartElementOpacity(idx, activeIndex.value, {
-                  activeOpacity: props.activeOpacity,
-                  inactiveOpacity: props.inactiveOpacity
-                })
-                const elems = [
-                  h('rect', {
-                    key: `cell-${idx}`,
-                    x: cell.x,
-                    y: cell.y,
-                    width: cell.w,
-                    height: cell.h,
-                    rx: props.cellRadius,
-                    fill: cell.fill,
-                    opacity,
-                    class: classNames(interactive && 'cursor-pointer'),
-                    style: {
-                      transition: 'opacity 0.2s ease-out',
-                      rx: `var(--tiger-chart-block-radius, ${props.cellRadius}px)`
-                    },
-                    onMouseenter: (e: MouseEvent) => handleMouseEnter(idx, e),
-                    onMousemove: handleMouseMove,
-                    onMouseleave: handleMouseLeave,
-                    onClick: () => handleClick(idx)
+            const cellElems = shouldRenderCanvas.value
+              ? []
+              : cells.value
+                  .map((cell, idx) => {
+                    const opacity = getChartElementOpacity(idx, activeIndex.value, {
+                      activeOpacity: props.activeOpacity,
+                      inactiveOpacity: props.inactiveOpacity
+                    })
+                    const elems = [
+                      h('rect', {
+                        key: `cell-${idx}`,
+                        x: cell.x,
+                        y: cell.y,
+                        width: cell.w,
+                        height: cell.h,
+                        rx: props.cellRadius,
+                        fill: cell.fill,
+                        opacity,
+                        class: classNames(interactive && 'cursor-pointer'),
+                        style: {
+                          transition: 'opacity 0.2s ease-out',
+                          rx: `var(--tiger-chart-block-radius, ${props.cellRadius}px)`
+                        },
+                        onMouseenter: (e: MouseEvent) => handleMouseEnter(idx, e),
+                        onMousemove: handleMouseMove,
+                        onMouseleave: handleMouseLeave,
+                        onClick: () => handleClick(idx)
+                      })
+                    ]
+                    if (props.showValues) {
+                      const val = props.valueFormatter
+                        ? props.valueFormatter(cell.value)
+                        : `${cell.value}`
+                      elems.push(
+                        h(
+                          'text',
+                          {
+                            key: `val-${idx}`,
+                            x: cell.x + cell.w / 2,
+                            y: cell.y + cell.h / 2,
+                            class: 'fill-[color:var(--tiger-text,#374151)] text-[10px]',
+                            'text-anchor': 'middle',
+                            'dominant-baseline': 'middle'
+                          },
+                          val
+                        )
+                      )
+                    }
+                    return elems
                   })
-                ]
-                if (props.showValues) {
-                  const val = props.valueFormatter
-                    ? props.valueFormatter(cell.value)
-                    : `${cell.value}`
-                  elems.push(
-                    h(
-                      'text',
-                      {
-                        key: `val-${idx}`,
-                        x: cell.x + cell.w / 2,
-                        y: cell.y + cell.h / 2,
-                        class: 'fill-[color:var(--tiger-text,#374151)] text-[10px]',
-                        'text-anchor': 'middle',
-                        'dominant-baseline': 'middle'
-                      },
-                      val
-                    )
-                  )
-                }
-                return elems
-              })
-              .flat()
+                  .flat()
 
             return [...xAxisLabels, ...yAxisLabels, ...cellElems]
           }
@@ -213,7 +329,29 @@ export const HeatmapChart = defineComponent({
             })
           : null
 
-      return h('div', { class: 'inline-block relative' }, [chart, tooltip])
+      const canvas = shouldRenderCanvas.value
+        ? h('canvas', {
+            ref: canvasRef,
+            width: rect.width,
+            height: rect.height,
+            class: classNames(interactive && 'cursor-pointer'),
+            style: {
+              position: 'absolute',
+              left: `${rect.x}px`,
+              top: `${rect.y}px`,
+              width: `${rect.width}px`,
+              height: `${rect.height}px`,
+              pointerEvents: interactive ? 'auto' : 'none'
+            },
+            'data-heatmap-canvas': 'true',
+            'data-heatmap-render-mode': resolvedRenderMode.value,
+            onMousemove: interactive ? handleCanvasMouseMove : undefined,
+            onMouseleave: interactive ? handleMouseLeave : undefined,
+            onClick: interactive ? handleCanvasClick : undefined
+          })
+        : null
+
+      return h('div', { class: 'inline-block relative' }, [chart, canvas, tooltip])
     }
   }
 })
