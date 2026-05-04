@@ -58,3 +58,4 @@
 | 2026-05-04 | Chart numeric tick cache PR   | Done | 新增 core 线性 tick value 缓存，按 domain + tickCount 复用 nice/tick 计算；`chart-utils.spec.ts` 98 个通过；三端包构建通过                                                             |
 | 2026-05-04 | ChartTooltip transform PR     | Done | 新增 core tooltip transform helper；React/Vue ChartTooltip 改用 `translate3d` 跟随定位，不再动态写入 left/top；core/React/Vue ChartTooltip 聚焦测试 31 个通过；三端包构建通过          |
 | 2026-05-04 | Chart SVG stable keys PR      | Done | 新增 core series key helper；React/Vue Line/Area/Radar 多系列 SVG defs、series group 与 points 改用稳定 seriesKey；Charts 聚焦测试 107 个通过；三端包构建通过                          |
+| 2026-05-04 | Pie/Donut arc cache PR        | Done | 新增 core Pie arc 几何缓存，按 value 序列与角度参数复用扇区角度计算，同时保留当前 datum 引用；Pie/Donut 聚焦测试 149 个通过；三端包构建通过                                            |

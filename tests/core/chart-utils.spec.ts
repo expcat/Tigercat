@@ -6,8 +6,10 @@ import {
   createPointScale,
   createBandScale,
   clearChartAxisTickCache,
+  clearPieArcCache,
   getChartAxisTicks,
   getChartAxisTickCacheSize,
+  getPieArcCacheSize,
   getChartGridLineDasharray,
   getLinearChartTickValues,
   getNumberExtent,
@@ -36,6 +38,7 @@ import {
 describe('chart-utils', () => {
   beforeEach(() => {
     clearChartAxisTickCache()
+    clearPieArcCache()
   })
 
   // ==========================================================================
@@ -327,6 +330,36 @@ describe('chart-utils', () => {
       const arcs = getPieArcs([{ value: -5 }, { value: 10 }])
       expect(arcs[0].value).toBe(0)
       expect(arcs[1].value).toBe(10)
+    })
+
+    it('caches arc geometry by values and angle options', () => {
+      const first = getPieArcs(
+        [
+          { value: 1, label: 'A' },
+          { value: 2, label: 'B' }
+        ],
+        { startAngle: 0, endAngle: Math.PI, padAngle: 0.05 }
+      )
+      const second = getPieArcs(
+        [
+          { value: 1, label: 'Updated A' },
+          { value: 2, label: 'Updated B' }
+        ],
+        { startAngle: 0, endAngle: Math.PI, padAngle: 0.05 }
+      )
+
+      expect(getPieArcCacheSize()).toBe(1)
+      expect(second.map((arc) => [arc.startAngle, arc.endAngle, arc.padAngle])).toEqual(
+        first.map((arc) => [arc.startAngle, arc.endAngle, arc.padAngle])
+      )
+      expect(second[0].data.label).toBe('Updated A')
+    })
+
+    it('separates cached arc geometry when values change', () => {
+      getPieArcs([{ value: 1 }, { value: 2 }])
+      getPieArcs([{ value: 1 }, { value: 3 }])
+
+      expect(getPieArcCacheSize()).toBe(2)
     })
   })
 

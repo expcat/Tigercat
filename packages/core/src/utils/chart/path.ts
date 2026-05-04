@@ -37,6 +37,34 @@ export interface PieArcDatum<T> {
   index: number
 }
 
+interface PieArcGeometry {
+  value: number
+  startAngle: number
+  endAngle: number
+  padAngle: number
+  index: number
+}
+
+const pieArcGeometryCache = new Map<string, readonly PieArcGeometry[]>()
+const maxPieArcGeometryCacheSize = 128
+
+function getPieArcGeometryCacheKey(
+  values: readonly number[],
+  startAngle: number,
+  endAngle: number,
+  padAngle: number
+): string {
+  return `${startAngle}:${endAngle}:${padAngle}:${values.join(',')}`
+}
+
+export function clearPieArcCache(): void {
+  pieArcGeometryCache.clear()
+}
+
+export function getPieArcCacheSize(): number {
+  return pieArcGeometryCache.size
+}
+
 export function getPieArcs<T extends { value: number }>(
   data: T[],
   options: {
@@ -52,12 +80,25 @@ export function getPieArcs<T extends { value: number }>(
   const total = values.reduce((sum, value) => sum + value, 0)
   if (total <= 0) return []
 
+  const cacheKey = getPieArcGeometryCacheKey(values, startAngle, endAngle, padAngle)
+  const cachedGeometry = pieArcGeometryCache.get(cacheKey)
+  if (cachedGeometry) {
+    return cachedGeometry.map((geometry, index) => ({
+      data: data[index],
+      value: geometry.value,
+      startAngle: geometry.startAngle,
+      endAngle: geometry.endAngle,
+      padAngle: geometry.padAngle,
+      index: geometry.index
+    }))
+  }
+
   const totalAngle = endAngle - startAngle
   const totalPadding = padAngle * data.length
   const availableAngle = Math.max(0, totalAngle - totalPadding)
 
   let current = startAngle
-  return data.map((item, index) => {
+  const geometry = data.map((_item, index) => {
     const value = values[index]
     const sliceAngle = availableAngle * (value / total)
     const sliceStart = current
@@ -65,7 +106,6 @@ export function getPieArcs<T extends { value: number }>(
     current = sliceEnd + padAngle
 
     return {
-      data: item,
       value,
       startAngle: sliceStart,
       endAngle: sliceEnd,
@@ -73,6 +113,25 @@ export function getPieArcs<T extends { value: number }>(
       index
     }
   })
+
+  if (pieArcGeometryCache.size >= maxPieArcGeometryCacheSize) {
+    const firstKey = pieArcGeometryCache.keys().next().value
+    if (firstKey) {
+      pieArcGeometryCache.delete(firstKey)
+    }
+  }
+
+  const frozenGeometry = Object.freeze(geometry.map((item) => Object.freeze(item)))
+  pieArcGeometryCache.set(cacheKey, frozenGeometry)
+
+  return frozenGeometry.map((item, index) => ({
+    data: data[index],
+    value: item.value,
+    startAngle: item.startAngle,
+    endAngle: item.endAngle,
+    padAngle: item.padAngle,
+    index: item.index
+  }))
 }
 
 export function createPieArcPath(options: {
