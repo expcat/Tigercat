@@ -14,6 +14,7 @@ import {
   RADAR_SPLIT_AREA_COLORS,
   resolveChartPalette,
   buildChartLegendItems,
+  buildChartSeriesKeys,
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
   defaultRadarTooltipFormatter,
@@ -261,6 +262,9 @@ export const RadarChart = defineComponent({
         data: [] as RadarChartDatum[]
       } as Partial<Omit<RadarChartSeries, 'data'>>)
     )
+    const seriesKeys = computed(() =>
+      buildChartSeriesKeys(resolvedSeries.value, { prefix: 'radar-' })
+    )
 
     // Use shared interaction composable
     const {
@@ -325,8 +329,9 @@ export const RadarChart = defineComponent({
     const angles = computed(() => getRadarAngles(axisData.value.length, props.startAngle))
 
     const seriesPoints = computed(() =>
-      resolvedSeries.value.map((item) => ({
+      resolvedSeries.value.map((item, seriesIndex) => ({
         series: item,
+        seriesKey: seriesKeys.value[seriesIndex],
         points: getRadarPoints(item.data, {
           cx: cx.value,
           cy: cy.value,
@@ -510,8 +515,8 @@ export const RadarChart = defineComponent({
                           return h(
                             'linearGradient',
                             {
-                              key: `radar-grad-${seriesIndex}`,
-                              id: `${gradientPrefix}-${seriesIndex}`,
+                              key: `radar-grad-${item.seriesKey}`,
+                              id: `${gradientPrefix}-${item.seriesKey}`,
                               x1: '0',
                               y1: '0',
                               x2: '0',
@@ -544,8 +549,8 @@ export const RadarChart = defineComponent({
                           return h(
                             'linearGradient',
                             {
-                              key: `radar-stroke-grad-${seriesIndex}`,
-                              id: `${gradientPrefix}-stroke-${seriesIndex}`,
+                              key: `radar-stroke-grad-${item.seriesKey}`,
+                              id: `${gradientPrefix}-stroke-${item.seriesKey}`,
                               x1: '0',
                               y1: '0',
                               x2: '0',
@@ -580,8 +585,8 @@ export const RadarChart = defineComponent({
                           return h(
                             'radialGradient',
                             {
-                              key: `radar-point-grad-${seriesIndex}`,
-                              id: `${gradientPrefix}-point-${seriesIndex}`,
+                              key: `radar-point-grad-${item.seriesKey}`,
+                              id: `${gradientPrefix}-point-${item.seriesKey}`,
                               cx: '0.5',
                               cy: '0.5',
                               r: '0.5'
@@ -711,10 +716,11 @@ export const RadarChart = defineComponent({
                 return h(
                   ChartSeries,
                   {
-                    key: `series-${seriesIndex}`,
+                    key: item.seriesKey,
                     data: item.series.data,
                     name: item.series.name,
                     type: 'radar',
+                    'data-series-key': item.seriesKey,
                     class: classNames(
                       item.series.className,
                       props.hoverable || props.selectable ? 'cursor-pointer' : null
@@ -739,11 +745,11 @@ export const RadarChart = defineComponent({
                         ? h('path', {
                             d: areaPath,
                             fill: props.gradient
-                              ? `url(#${gradientPrefix}-${seriesIndex})`
+                              ? `url(#${gradientPrefix}-${item.seriesKey})`
                               : resolvedFillColor,
                             'fill-opacity': props.gradient ? 1 : resolvedFillOpacity,
                             stroke: props.strokeGradient
-                              ? `url(#${gradientPrefix}-stroke-${seriesIndex})`
+                              ? `url(#${gradientPrefix}-stroke-${item.seriesKey})`
                               : resolvedStrokeColor,
                             'stroke-width': resolvedStrokeWidth,
                             'stroke-linejoin': 'round',
@@ -753,7 +759,8 @@ export const RadarChart = defineComponent({
                                 ? { filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.15))' }
                                 : undefined,
                             'data-radar-area': 'true',
-                            'data-series-index': seriesIndex
+                            'data-series-index': seriesIndex,
+                            'data-series-key': item.seriesKey
                           })
                         : null,
                       resolvedShowPoints
@@ -770,12 +777,12 @@ export const RadarChart = defineComponent({
                             const resolvedBorderColor =
                               item.series.pointBorderColor ?? props.pointBorderColor
                             return h('circle', {
-                              key: `point-${seriesIndex}-${point.index}`,
+                              key: `point-${item.seriesKey}-${point.index}`,
                               cx: point.x,
                               cy: point.y,
                               r: currentSize,
                               fill: props.pointGradient
-                                ? `url(#${gradientPrefix}-point-${seriesIndex})`
+                                ? `url(#${gradientPrefix}-point-${item.seriesKey})`
                                 : (point.data.color ?? resolvedPointColor ?? resolvedStrokeColor),
                               stroke: resolvedBorderColor,
                               'stroke-width': resolvedBorderWidth,
@@ -785,6 +792,7 @@ export const RadarChart = defineComponent({
                               ),
                               'data-radar-point': 'true',
                               'data-series-index': seriesIndex,
+                              'data-series-key': item.seriesKey,
                               'data-point-index': point.index,
                               onMouseenter:
                                 props.showTooltip && props.hoverable

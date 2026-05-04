@@ -13,6 +13,7 @@ import {
   stackSeriesData,
   resolveChartPalette,
   buildChartLegendItems,
+  buildChartSeriesKeys,
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
   defaultSeriesXYTooltipFormatter,
@@ -202,11 +203,16 @@ export const AreaChart: React.FC<AreaChartProps> = ({
   const shouldShowYAxis = showAxis && showYAxis
 
   const palette = useMemo(() => resolveChartPalette(colors), [colors])
+  const seriesKeys = useMemo(
+    () => buildChartSeriesKeys(resolvedSeries, { prefix: 'area-' }),
+    [resolvedSeries]
+  )
 
   const seriesData = useMemo(() => {
     const stackedData = stacked ? stackSeriesData(resolvedSeries.map((s) => s.data)) : null
 
     return resolvedSeries.map((s, seriesIndex) => {
+      const seriesKey = seriesKeys[seriesIndex]
       const color = s.color ?? palette[seriesIndex % palette.length]
       const seriesFillColor = s.fillColor ?? color
       const seriesFillOpacity = s.fillOpacity ?? fillOpacity
@@ -256,6 +262,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
       return {
         series: s,
         seriesIndex,
+        seriesKey,
         color,
         fillColor: seriesFillColor,
         fillOpacity: seriesFillOpacity,
@@ -273,6 +280,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
     })
   }, [
     resolvedSeries,
+    seriesKeys,
     palette,
     resolvedXScale,
     resolvedYScale,
@@ -377,8 +385,8 @@ export const AreaChart: React.FC<AreaChartProps> = ({
           {gradient &&
             reversedSeriesData.map((sd) => (
               <linearGradient
-                key={`area-grad-${sd.seriesIndex}`}
-                id={`${gradientPrefix}-${sd.seriesIndex}`}
+                key={`area-grad-${sd.seriesKey}`}
+                id={`${gradientPrefix}-${sd.seriesKey}`}
                 x1="0"
                 y1="0"
                 x2="0"
@@ -390,8 +398,8 @@ export const AreaChart: React.FC<AreaChartProps> = ({
           {pointGradient &&
             reversedSeriesData.map((sd) => (
               <radialGradient
-                key={`point-grad-${sd.seriesIndex}`}
-                id={`${gradientPrefix}-point-${sd.seriesIndex}`}
+                key={`point-grad-${sd.seriesKey}`}
+                id={`${gradientPrefix}-point-${sd.seriesKey}`}
                 cx="0.5"
                 cy="0.5"
                 r="0.5">
@@ -406,8 +414,8 @@ export const AreaChart: React.FC<AreaChartProps> = ({
           {strokeGradient &&
             reversedSeriesData.map((sd) => (
               <linearGradient
-                key={`stroke-grad-${sd.seriesIndex}`}
-                id={`${gradientPrefix}-stroke-${sd.seriesIndex}`}
+                key={`stroke-grad-${sd.seriesKey}`}
+                id={`${gradientPrefix}-stroke-${sd.seriesKey}`}
                 x1="0"
                 y1="0"
                 x2="1"
@@ -456,11 +464,12 @@ export const AreaChart: React.FC<AreaChartProps> = ({
       {/* Layer 1: area fills + line strokes (back to front) */}
       {reversedSeriesData.map((sd) => (
         <ChartSeries
-          key={`series-${sd.seriesIndex}`}
+          key={sd.seriesKey}
           data={sd.series.data}
           name={sd.series.name}
           type="area"
           opacity={sd.opacity}
+          data-series-key={sd.seriesKey}
           className={classNames(
             sd.series.className,
             (hoverable || selectable) && 'cursor-pointer',
@@ -473,16 +482,17 @@ export const AreaChart: React.FC<AreaChartProps> = ({
           onKeyDown={(e: React.KeyboardEvent) => handleKeyDown(e, sd.seriesIndex)}>
           <path
             d={sd.areaPath}
-            fill={gradient ? `url(#${gradientPrefix}-${sd.seriesIndex})` : sd.fillColor}
+            fill={gradient ? `url(#${gradientPrefix}-${sd.seriesKey})` : sd.fillColor}
             fillOpacity={gradient ? 1 : sd.fillOpacity}
             stroke="none"
             className="transition-opacity duration-300"
             data-area-series={sd.seriesIndex}
+            data-series-key={sd.seriesKey}
           />
           <path
             d={sd.linePath}
             fill="none"
-            stroke={strokeGradient ? `url(#${gradientPrefix}-stroke-${sd.seriesIndex})` : sd.color}
+            stroke={strokeGradient ? `url(#${gradientPrefix}-stroke-${sd.seriesKey})` : sd.color}
             strokeWidth={sd.strokeWidth}
             strokeDasharray={animated ? (sd.strokeDasharray ?? '1') : sd.strokeDasharray}
             strokeDashoffset={animated ? '1' : undefined}
@@ -500,7 +510,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
       {seriesData.map(
         (sd) =>
           sd.showPoints && (
-            <g key={`points-${sd.seriesIndex}`} opacity={sd.opacity}>
+            <g key={`points-${sd.seriesKey}`} opacity={sd.opacity} data-series-key={sd.seriesKey}>
               {sd.points.map((point) => {
                 const isHovered =
                   hoveredPointInfo?.seriesIndex === sd.seriesIndex &&
@@ -508,7 +518,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
                 const hoverSize = sd.pointSize + 2
                 return (
                   <circle
-                    key={`point-${sd.seriesIndex}-${point.pointIndex}`}
+                    key={`point-${sd.seriesKey}-${point.pointIndex}`}
                     cx={point.x}
                     cy={point.y}
                     r={isHovered ? hoverSize : sd.pointSize}
@@ -516,7 +526,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
                       sd.pointHollow
                         ? 'white'
                         : pointGradient
-                          ? `url(#${gradientPrefix}-point-${sd.seriesIndex})`
+                          ? `url(#${gradientPrefix}-point-${sd.seriesKey})`
                           : sd.pointColor
                     }
                     stroke={sd.pointHollow ? sd.pointColor : 'none'}
@@ -524,6 +534,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
                     className={linePointTransitionClasses}
                     style={isHovered ? { filter: `drop-shadow(0 0 4px ${sd.color})` } : undefined}
                     data-point-index={point.pointIndex}
+                    data-series-key={sd.seriesKey}
                     onMouseEnter={(e) => handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)}
                     onMouseMove={handlePointMouseMove}
                     onMouseLeave={handlePointMouseLeave}

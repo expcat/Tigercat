@@ -4,7 +4,6 @@
 
 | 任务                    | 优先级 | 完成标准                                                      |
 | ----------------------- | ------ | ------------------------------------------------------------- |
-| SVG 节点复用            | P1     | series 数量变化时 key 稳定，避免全量重渲；补快照或交互测试    |
 | Pie / Donut 扇区缓存    | P2     | 数据不变时角度计算 memo 化                                    |
 | Heatmap canvas fallback | P2     | cell 数量过大时提供 canvas fallback 或明确 SVG 上限与文档提示 |
 | TreeMap / Sunburst memo | P1     | squarify / partition 递归布局 memo 化，并有大数据 benchmark   |

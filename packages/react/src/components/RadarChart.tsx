@@ -14,6 +14,7 @@ import {
   RADAR_SPLIT_AREA_COLORS,
   resolveChartPalette,
   buildChartLegendItems,
+  buildChartSeriesKeys,
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
   defaultRadarTooltipFormatter,
@@ -121,6 +122,10 @@ export const RadarChart: React.FC<RadarChartProps> = ({
       } as Partial<Omit<RadarChartSeries, 'data'>>),
     [series, data]
   )
+  const seriesKeys = useMemo(
+    () => buildChartSeriesKeys(resolvedSeries, { prefix: 'radar-' }),
+    [resolvedSeries]
+  )
 
   // Use shared interaction hook for series-based interaction
   const {
@@ -216,8 +221,9 @@ export const RadarChart: React.FC<RadarChartProps> = ({
 
   const seriesPoints = useMemo(
     () =>
-      resolvedSeries.map((item) => ({
+      resolvedSeries.map((item, seriesIndex) => ({
         series: item,
+        seriesKey: seriesKeys[seriesIndex],
         points: getRadarPoints(item.data, {
           cx,
           cy,
@@ -226,7 +232,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
           maxValue: resolvedMaxValue
         })
       })),
-    [resolvedSeries, cx, cy, radius, startAngle, resolvedMaxValue]
+    [resolvedSeries, seriesKeys, cx, cy, radius, startAngle, resolvedMaxValue]
   )
 
   const gridPaths = useMemo(() => {
@@ -376,8 +382,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
               const resolvedFillOpacity = item.series.fillOpacity ?? fillOpacity
               return (
                 <linearGradient
-                  key={`radar-grad-${seriesIndex}`}
-                  id={`${gradientPrefix}-${seriesIndex}`}
+                  key={`radar-grad-${item.seriesKey}`}
+                  id={`${gradientPrefix}-${item.seriesKey}`}
                   x1="0"
                   y1="0"
                   x2="0"
@@ -398,8 +404,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                 item.series.strokeColor ?? seriesColor ?? strokeColor ?? palette[0]
               return (
                 <linearGradient
-                  key={`radar-stroke-grad-${seriesIndex}`}
-                  id={`${gradientPrefix}-stroke-${seriesIndex}`}
+                  key={`radar-stroke-grad-${item.seriesKey}`}
+                  id={`${gradientPrefix}-stroke-${item.seriesKey}`}
                   x1="0"
                   y1="0"
                   x2="0"
@@ -423,8 +429,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                 item.series.pointColor ?? seriesColor ?? pointColor ?? palette[0]
               return (
                 <radialGradient
-                  key={`radar-point-grad-${seriesIndex}`}
-                  id={`${gradientPrefix}-point-${seriesIndex}`}
+                  key={`radar-point-grad-${item.seriesKey}`}
+                  id={`${gradientPrefix}-point-${item.seriesKey}`}
                   cx="0.5"
                   cy="0.5"
                   r="0.5">
@@ -546,7 +552,8 @@ export const RadarChart: React.FC<RadarChartProps> = ({
 
         return (
           <ChartSeries
-            key={`series-${seriesIndex}`}
+            key={item.seriesKey}
+            data-series-key={item.seriesKey}
             data={item.series.data}
             name={item.series.name}
             type="radar"
@@ -568,11 +575,11 @@ export const RadarChart: React.FC<RadarChartProps> = ({
             {areaPath ? (
               <path
                 d={areaPath}
-                fill={gradient ? `url(#${gradientPrefix}-${seriesIndex})` : resolvedFillColor}
+                fill={gradient ? `url(#${gradientPrefix}-${item.seriesKey})` : resolvedFillColor}
                 fillOpacity={gradient ? 1 : resolvedFillOpacity}
                 stroke={
                   strokeGradient
-                    ? `url(#${gradientPrefix}-stroke-${seriesIndex})`
+                    ? `url(#${gradientPrefix}-stroke-${item.seriesKey})`
                     : resolvedStrokeColor
                 }
                 strokeWidth={resolvedStrokeWidth}
@@ -585,6 +592,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                 }
                 data-radar-area="true"
                 data-series-index={seriesIndex}
+                data-series-key={item.seriesKey}
               />
             ) : null}
             {resolvedShowPoints
@@ -600,13 +608,13 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                   const resolvedBorderColor = item.series.pointBorderColor ?? pointBorderColor
                   return (
                     <circle
-                      key={`point-${seriesIndex}-${point.index}`}
+                      key={`point-${item.seriesKey}-${point.index}`}
                       cx={point.x}
                       cy={point.y}
                       r={currentSize}
                       fill={
                         pointGradient
-                          ? `url(#${gradientPrefix}-point-${seriesIndex})`
+                          ? `url(#${gradientPrefix}-point-${item.seriesKey})`
                           : (point.data.color ?? resolvedPointColor ?? resolvedStrokeColor)
                       }
                       stroke={resolvedBorderColor}
@@ -617,6 +625,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
                       )}
                       data-radar-point="true"
                       data-series-index={seriesIndex}
+                      data-series-key={item.seriesKey}
                       data-point-index={point.index}
                       onMouseEnter={
                         showTooltip && hoverable

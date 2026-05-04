@@ -5,6 +5,59 @@
 import type { ChartLegendItem, ChartScaleValue } from '../types/chart'
 import { DEFAULT_CHART_COLORS } from './chart-utils'
 
+export interface BuildChartSeriesKeysOptions<T> {
+  prefix?: string
+  getIdentity?: (series: T, index: number) => string | number | undefined
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function getDefaultChartSeriesIdentity(value: unknown): string | number | undefined {
+  if (!isRecord(value)) return undefined
+
+  const id = value.id
+  if (typeof id === 'string' && id.trim()) return id
+  if (typeof id === 'number' && Number.isFinite(id)) return id
+
+  const key = value.key
+  if (typeof key === 'string' && key.trim()) return key
+  if (typeof key === 'number' && Number.isFinite(key)) return key
+
+  const name = value.name
+  if (typeof name === 'string' && name.trim()) return name
+  return undefined
+}
+
+function normalizeChartSeriesKeyPart(value: string | number): string {
+  const normalized = String(value)
+    .trim()
+    .replace(/[^a-zA-Z0-9_-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase()
+
+  return normalized || 'series'
+}
+
+export function buildChartSeriesKeys<T>(
+  series: readonly T[],
+  options: BuildChartSeriesKeysOptions<T> = {}
+): string[] {
+  const { prefix = 'series-', getIdentity } = options
+  const seen = new Map<string, number>()
+
+  return series.map((item, index) => {
+    const identity = getIdentity?.(item, index) ?? getDefaultChartSeriesIdentity(item)
+    const base = normalizeChartSeriesKeyPart(identity ?? `index-${index}`)
+    const duplicateIndex = seen.get(base) ?? 0
+    seen.set(base, duplicateIndex + 1)
+    const uniqueBase = duplicateIndex === 0 ? base : `${base}-${duplicateIndex + 1}`
+
+    return `${prefix}${uniqueBase}`
+  })
+}
+
 /** Resolve palette: `colors` → `fallbackColor` → DEFAULT_CHART_COLORS. */
 export function resolveChartPalette(
   colors: string[] | undefined,

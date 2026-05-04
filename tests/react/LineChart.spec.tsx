@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest'
+import React from 'react'
 import { LineChart } from '@expcat/tigercat-react'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
 
@@ -181,5 +182,46 @@ describe('LineChart', () => {
 
     const areaPaths = container.querySelectorAll('path[data-area-series]')
     expect(areaPaths.length).toBe(1)
+  })
+
+  it('keeps named series SVG identities stable when series are inserted', () => {
+    const alpha = { name: 'Alpha Series', data: basicData, showArea: true }
+    const beta = { name: 'Beta Series', data: basicData, showArea: true }
+    const inserted = { name: 'Inserted Series', data: basicData, showArea: true }
+
+    const props = {
+      series: [alpha, beta],
+      showArea: true,
+      strokeGradient: true,
+      pointGradient: true,
+      showPoints: true,
+      width: 300,
+      height: 200
+    }
+    const { container, rerender } = renderWithProps(LineChart, props)
+
+    const alphaArea = container.querySelector(
+      'path[data-area-series="0"][data-series-key="line-alpha-series"]'
+    )
+    const alphaLine = container.querySelector(
+      'path[data-line-series="0"][data-series-key="line-alpha-series"]'
+    )
+    const alphaAreaFill = alphaArea?.getAttribute('fill')
+    const alphaLineStroke = alphaLine?.getAttribute('stroke')
+
+    expect(alphaAreaFill).toContain('line-alpha-series')
+    expect(alphaLineStroke).toContain('line-alpha-series')
+
+    rerender(React.createElement(LineChart, { ...props, series: [inserted, alpha, beta] }))
+
+    const movedAlphaArea = container.querySelector(
+      'path[data-area-series="1"][data-series-key="line-alpha-series"]'
+    )
+    const movedAlphaLine = container.querySelector(
+      'path[data-line-series="1"][data-series-key="line-alpha-series"]'
+    )
+
+    expect(movedAlphaArea?.getAttribute('fill')).toBe(alphaAreaFill)
+    expect(movedAlphaLine?.getAttribute('stroke')).toBe(alphaLineStroke)
   })
 })

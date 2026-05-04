@@ -12,6 +12,7 @@ import {
   linePointTransitionClasses,
   resolveChartPalette,
   buildChartLegendItems,
+  buildChartSeriesKeys,
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
   defaultSeriesXYTooltipFormatter,
@@ -329,10 +330,14 @@ export const LineChart = defineComponent({
     const shouldShowYAxis = computed(() => props.showAxis && props.showYAxis)
 
     const palette = computed(() => resolveChartPalette(props.colors))
+    const seriesKeys = computed(() =>
+      buildChartSeriesKeys(resolvedSeries.value, { prefix: 'line-' })
+    )
 
     // Calculate line paths and points for each series
     const seriesData = computed(() =>
       resolvedSeries.value.map((series, seriesIndex) => {
+        const seriesKey = seriesKeys.value[seriesIndex]
         const color = series.color ?? palette.value[seriesIndex % palette.value.length]
         const points = series.data.map((datum, pointIndex) => ({
           x: resolvedXScale.value.map(datum.x),
@@ -353,6 +358,7 @@ export const LineChart = defineComponent({
         return {
           series,
           seriesIndex,
+          seriesKey,
           color,
           linePath,
           areaPath,
@@ -504,8 +510,8 @@ export const LineChart = defineComponent({
                         h(
                           'linearGradient',
                           {
-                            key: `area-grad-${sd.seriesIndex}`,
-                            id: `${gradientPrefix}-${sd.seriesIndex}`,
+                            key: `area-grad-${sd.seriesKey}`,
+                            id: `${gradientPrefix}-${sd.seriesKey}`,
                             x1: '0',
                             y1: '0',
                             x2: '0',
@@ -531,8 +537,8 @@ export const LineChart = defineComponent({
                           h(
                             'radialGradient',
                             {
-                              key: `point-grad-${sd.seriesIndex}`,
-                              id: `${gradientPrefix}-point-${sd.seriesIndex}`,
+                              key: `point-grad-${sd.seriesKey}`,
+                              id: `${gradientPrefix}-point-${sd.seriesKey}`,
                               cx: '0.5',
                               cy: '0.5',
                               r: '0.5'
@@ -560,8 +566,8 @@ export const LineChart = defineComponent({
                           h(
                             'linearGradient',
                             {
-                              key: `stroke-grad-${sd.seriesIndex}`,
-                              id: `${gradientPrefix}-stroke-${sd.seriesIndex}`,
+                              key: `stroke-grad-${sd.seriesKey}`,
+                              id: `${gradientPrefix}-stroke-${sd.seriesKey}`,
                               x1: '0',
                               y1: '0',
                               x2: '1',
@@ -591,11 +597,12 @@ export const LineChart = defineComponent({
                 h(
                   ChartSeries,
                   {
-                    key: `series-${sd.seriesIndex}`,
+                    key: sd.seriesKey,
                     data: sd.series.data,
                     name: sd.series.name,
                     type: 'line',
                     opacity: sd.opacity,
+                    'data-series-key': sd.seriesKey,
                     class: classNames(
                       sd.series.className,
                       (props.hoverable || props.selectable) && 'cursor-pointer'
@@ -612,10 +619,11 @@ export const LineChart = defineComponent({
                       sd.showArea && sd.areaPath
                         ? h('path', {
                             d: sd.areaPath,
-                            fill: `url(#${gradientPrefix}-${sd.seriesIndex})`,
+                            fill: `url(#${gradientPrefix}-${sd.seriesKey})`,
                             stroke: 'none',
                             class: 'transition-opacity duration-300',
-                            'data-area-series': sd.seriesIndex
+                            'data-area-series': sd.seriesIndex,
+                            'data-series-key': sd.seriesKey
                           })
                         : null,
                       // Line path
@@ -623,7 +631,7 @@ export const LineChart = defineComponent({
                         d: sd.linePath,
                         fill: 'none',
                         stroke: props.strokeGradient
-                          ? `url(#${gradientPrefix}-stroke-${sd.seriesIndex})`
+                          ? `url(#${gradientPrefix}-stroke-${sd.seriesKey})`
                           : sd.color,
                         'stroke-width': sd.strokeWidth,
                         'stroke-dasharray': props.animated
@@ -637,7 +645,8 @@ export const LineChart = defineComponent({
                           'transition-opacity duration-200',
                           props.animated && 'tiger-line-animated'
                         ),
-                        'data-line-series': sd.seriesIndex
+                        'data-line-series': sd.seriesIndex,
+                        'data-series-key': sd.seriesKey
                       }),
                       // Data points
                       sd.showPoints
@@ -647,14 +656,14 @@ export const LineChart = defineComponent({
                               hoveredPointInfo.value?.pointIndex === point.pointIndex
                             const hoverSize = sd.pointSize + 2
                             return h('circle', {
-                              key: `point-${sd.seriesIndex}-${point.pointIndex}`,
+                              key: `point-${sd.seriesKey}-${point.pointIndex}`,
                               cx: point.x,
                               cy: point.y,
                               r: isHovered ? hoverSize : sd.pointSize,
                               fill: sd.pointHollow
                                 ? 'white'
                                 : props.pointGradient
-                                  ? `url(#${gradientPrefix}-point-${sd.seriesIndex})`
+                                  ? `url(#${gradientPrefix}-point-${sd.seriesKey})`
                                   : sd.pointColor,
                               stroke: sd.pointHollow ? sd.pointColor : 'none',
                               'stroke-width': sd.pointHollow ? 2 : 0,
@@ -663,6 +672,7 @@ export const LineChart = defineComponent({
                                 ? `filter: drop-shadow(0 0 4px ${sd.color})`
                                 : undefined,
                               'data-point-index': point.pointIndex,
+                              'data-series-key': sd.seriesKey,
                               onMouseenter: (e: MouseEvent) =>
                                 handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e),
                               onMousemove: handlePointMouseMove,

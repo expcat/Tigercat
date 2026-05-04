@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   resolveChartPalette,
   buildChartLegendItems,
+  buildChartSeriesKeys,
   resolveChartTooltipContent,
   getChartTooltipTransform,
   resolveMultiSeriesTooltipContent,
@@ -81,6 +82,41 @@ describe('buildChartLegendItems', () => {
     })
 
     expect(items[0].color).toBe('#custom')
+  })
+})
+
+// ============================================================================
+// buildChartSeriesKeys
+// ============================================================================
+
+describe('buildChartSeriesKeys', () => {
+  it('uses stable series names before falling back to index', () => {
+    expect(
+      buildChartSeriesKeys([{ name: 'Revenue 2026' }, { name: 'Cost' }, { data: [] }])
+    ).toEqual(['series-revenue-2026', 'series-cost', 'series-index-2'])
+  })
+
+  it('prefers id and key over name', () => {
+    expect(
+      buildChartSeriesKeys([
+        { id: 'north', key: 'ignored', name: 'Ignored' },
+        { key: 'south', name: 'Also ignored' }
+      ])
+    ).toEqual(['series-north', 'series-south'])
+  })
+
+  it('deduplicates repeated identities', () => {
+    expect(buildChartSeriesKeys([{ name: 'Same' }, { name: 'Same' }])).toEqual([
+      'series-same',
+      'series-same-2'
+    ])
+  })
+
+  it('keeps existing identity keys stable when a new series is inserted before them', () => {
+    const current = buildChartSeriesKeys([{ name: 'Alpha' }, { name: 'Beta' }])
+    const next = buildChartSeriesKeys([{ name: 'Inserted' }, { name: 'Alpha' }, { name: 'Beta' }])
+
+    expect(next.slice(1)).toEqual(current)
   })
 })
 

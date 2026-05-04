@@ -12,6 +12,7 @@ import {
   linePointTransitionClasses,
   resolveChartPalette,
   buildChartLegendItems,
+  buildChartSeriesKeys,
   resolveMultiSeriesTooltipContent,
   resolveSeriesData,
   defaultSeriesXYTooltipFormatter,
@@ -185,10 +186,15 @@ export const LineChart: React.FC<LineChartProps> = ({
   const shouldShowYAxis = showAxis && showYAxis
 
   const palette = useMemo(() => resolveChartPalette(colors), [colors])
+  const seriesKeys = useMemo(
+    () => buildChartSeriesKeys(resolvedSeries, { prefix: 'line-' }),
+    [resolvedSeries]
+  )
 
   const seriesData = useMemo(
     () =>
       resolvedSeries.map((s, seriesIndex) => {
+        const seriesKey = seriesKeys[seriesIndex]
         const color = s.color ?? palette[seriesIndex % palette.length]
         const points = s.data.map((datum, pointIndex) => ({
           x: resolvedXScale.map(datum.x),
@@ -209,6 +215,7 @@ export const LineChart: React.FC<LineChartProps> = ({
         return {
           series: s,
           seriesIndex,
+          seriesKey,
           color,
           linePath,
           areaPath,
@@ -226,6 +233,7 @@ export const LineChart: React.FC<LineChartProps> = ({
       }),
     [
       resolvedSeries,
+      seriesKeys,
       palette,
       resolvedXScale,
       resolvedYScale,
@@ -329,8 +337,8 @@ export const LineChart: React.FC<LineChartProps> = ({
             .filter((sd) => sd.showArea)
             .map((sd) => (
               <linearGradient
-                key={`area-grad-${sd.seriesIndex}`}
-                id={`${gradientPrefix}-${sd.seriesIndex}`}
+                key={`area-grad-${sd.seriesKey}`}
+                id={`${gradientPrefix}-${sd.seriesKey}`}
                 x1="0"
                 y1="0"
                 x2="0"
@@ -342,8 +350,8 @@ export const LineChart: React.FC<LineChartProps> = ({
           {pointGradient &&
             seriesData.map((sd) => (
               <radialGradient
-                key={`point-grad-${sd.seriesIndex}`}
-                id={`${gradientPrefix}-point-${sd.seriesIndex}`}
+                key={`point-grad-${sd.seriesKey}`}
+                id={`${gradientPrefix}-point-${sd.seriesKey}`}
                 cx="0.5"
                 cy="0.5"
                 r="0.5">
@@ -358,8 +366,8 @@ export const LineChart: React.FC<LineChartProps> = ({
           {strokeGradient &&
             seriesData.map((sd) => (
               <linearGradient
-                key={`stroke-grad-${sd.seriesIndex}`}
-                id={`${gradientPrefix}-stroke-${sd.seriesIndex}`}
+                key={`stroke-grad-${sd.seriesKey}`}
+                id={`${gradientPrefix}-stroke-${sd.seriesKey}`}
                 x1="0"
                 y1="0"
                 x2="1"
@@ -407,11 +415,12 @@ export const LineChart: React.FC<LineChartProps> = ({
       )}
       {seriesData.map((sd) => (
         <ChartSeries
-          key={`series-${sd.seriesIndex}`}
+          key={sd.seriesKey}
           data={sd.series.data}
           name={sd.series.name}
           type="line"
           opacity={sd.opacity}
+          data-series-key={sd.seriesKey}
           className={classNames(sd.series.className, (hoverable || selectable) && 'cursor-pointer')}
           onMouseEnter={(e: React.MouseEvent) => handleSeriesHoverEnter(sd.seriesIndex, e)}
           onMouseLeave={handleSeriesHoverLeave}
@@ -422,16 +431,17 @@ export const LineChart: React.FC<LineChartProps> = ({
           {sd.showArea && sd.areaPath && (
             <path
               d={sd.areaPath}
-              fill={`url(#${gradientPrefix}-${sd.seriesIndex})`}
+              fill={`url(#${gradientPrefix}-${sd.seriesKey})`}
               stroke="none"
               className="transition-opacity duration-300"
               data-area-series={sd.seriesIndex}
+              data-series-key={sd.seriesKey}
             />
           )}
           <path
             d={sd.linePath}
             fill="none"
-            stroke={strokeGradient ? `url(#${gradientPrefix}-stroke-${sd.seriesIndex})` : sd.color}
+            stroke={strokeGradient ? `url(#${gradientPrefix}-stroke-${sd.seriesKey})` : sd.color}
             strokeWidth={sd.strokeWidth}
             strokeDasharray={animated ? (sd.strokeDasharray ?? '1') : sd.strokeDasharray}
             strokeDashoffset={animated ? '1' : undefined}
@@ -443,6 +453,7 @@ export const LineChart: React.FC<LineChartProps> = ({
               animated && 'tiger-line-animated'
             )}
             data-line-series={sd.seriesIndex}
+            data-series-key={sd.seriesKey}
           />
           {sd.showPoints &&
             sd.points.map((point) => {
@@ -452,7 +463,7 @@ export const LineChart: React.FC<LineChartProps> = ({
               const hoverSize = sd.pointSize + 2
               return (
                 <circle
-                  key={`point-${sd.seriesIndex}-${point.pointIndex}`}
+                  key={`point-${sd.seriesKey}-${point.pointIndex}`}
                   cx={point.x}
                   cy={point.y}
                   r={isHovered ? hoverSize : sd.pointSize}
@@ -460,7 +471,7 @@ export const LineChart: React.FC<LineChartProps> = ({
                     sd.pointHollow
                       ? 'white'
                       : pointGradient
-                        ? `url(#${gradientPrefix}-point-${sd.seriesIndex})`
+                        ? `url(#${gradientPrefix}-point-${sd.seriesKey})`
                         : sd.pointColor
                   }
                   stroke={sd.pointHollow ? sd.pointColor : 'none'}
@@ -468,6 +479,7 @@ export const LineChart: React.FC<LineChartProps> = ({
                   className={linePointTransitionClasses}
                   style={isHovered ? { filter: `drop-shadow(0 0 4px ${sd.color})` } : undefined}
                   data-point-index={point.pointIndex}
+                  data-series-key={sd.seriesKey}
                   onMouseEnter={(e) => handlePointMouseEnter(sd.seriesIndex, point.pointIndex, e)}
                   onMouseMove={handlePointMouseMove}
                   onMouseLeave={handlePointMouseLeave}
