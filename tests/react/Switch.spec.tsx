@@ -42,6 +42,15 @@ describe('Switch', () => {
 
       expect(container.querySelector('.custom-class')).toBeInTheDocument()
     })
+
+    it('should compose custom className with state classes', () => {
+      const { container } = render(<Switch className="custom-class" checked disabled />)
+
+      const switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toHaveClass('custom-class')
+      expect(switchButton).toHaveClass('cursor-not-allowed')
+      expect(switchButton?.className).toContain('bg-[var(--tiger-primary,#2563eb)]')
+    })
   })
 
   describe('Props', () => {

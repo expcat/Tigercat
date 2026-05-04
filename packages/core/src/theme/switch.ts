@@ -3,6 +3,7 @@
  */
 
 import { classNames } from '../utils/class-names'
+import { composeComponentClasses, type ComposableClassInput } from '../utils/compose-classes'
 import type { SwitchSize } from '../types/switch'
 
 /**
@@ -45,17 +46,19 @@ export const switchThumbTranslateClasses: Record<SwitchSize, string> = {
 export function getSwitchClasses(
   size: SwitchSize = 'md',
   checked: boolean = false,
-  disabled: boolean = false
+  disabled: boolean = false,
+  ...classes: ComposableClassInput[]
 ): string {
   const sizeClass = switchSizeClasses[size]
 
   const bgColor = checked ? 'bg-[var(--tiger-primary,#2563eb)]' : 'bg-[var(--tiger-border,#e5e7eb)]'
 
-  return classNames(
+  return composeComponentClasses(
     switchBaseClasses,
     sizeClass,
     bgColor,
-    disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+    disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+    ...classes
   )
 }
 

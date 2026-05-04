@@ -1,6 +1,5 @@
 import React from 'react'
 import {
-  classNames,
   type SwitchProps as CoreSwitchProps,
   getSwitchClasses,
   getSwitchThumbClasses
@@ -27,7 +26,7 @@ export const Switch: React.FC<SwitchProps> = ({
   tabIndex,
   ...props
 }) => {
-  const switchClasses = classNames(getSwitchClasses(size, checked, disabled), className)
+  const switchClasses = getSwitchClasses(size, checked, disabled, className)
 
   const thumbClasses = getSwitchThumbClasses(size, checked)
 

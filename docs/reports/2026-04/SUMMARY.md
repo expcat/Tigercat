@@ -19,7 +19,7 @@
 | Core utils            | `BaseInteractiveProps` / `BaseFormControlProps` / `BaseLayoutProps` 未落地；`animation.ts` / `transition.ts` 仍未合并为 `motion/`；`helpers/` 目录未按 dom/class/motion 细分；死代码扫描未执行                                                      |
 | i18n / CLI / examples | `defineLocale`、ConfigProvider 异步 locale、根入口 locale tree-shaking 方案仍未完成；commander 14 等 Node 20+；workspace catalog/overrides 未配置；CLI Windows shim 与 `doctor` 命令仍待做                                                          |
 | Basic                 | Empty 默认插画体积、Divider 文件合并评估仍待做                                                                                                                                                                                                      |
-| Form                  | Form O(N²) 校验、Switch class composer、命令式 Form API 仍待评估或实现                                                                                                                                                                              |
+| Form                  | Form O(N²) 校验、命令式 Form API 仍待评估或实现                                                                                                                                                                                                     |
 | Feedback              | Watermark OffscreenCanvas/ResizeObserver、Notification stack rAF、Floating middleware 缓存、Loading overlay 复用仍待做                                                                                                                              |
 | Layout                | Splitter/Resizable 仍是组件内 mousemove；Carousel autoplay 仍用 `setInterval`；List 未复用 VirtualList；Row/Col 与 Descriptions 性能项未完成                                                                                                        |
 | Navigation            | Menu/Dropdown/Anchor/Breadcrumb/Steps/Tabs 父子组件同文件约定未落地；Pagination lazy locale / idle 校验、BackTop rAF、Menu 动画、Segmented transform 等仍待做                                                                                       |
@@ -38,12 +38,13 @@
 
 ## 4. 本轮完成记录
 
-| 日期       | 任务                         | 状态 | 验证                                                                                                     |
-| ---------- | ---------------------------- | ---- | -------------------------------------------------------------------------------------------------------- |
-| 2026-05-04 | React Button spinner lazy PR | Done | `Button.spec.tsx` + `ButtonSpinnerLazy.spec.tsx` 通过；`pnpm --filter @expcat/tigercat-react build` 通过 |
-| 2026-05-04 | Group 类组件共享 util PR     | Done | Group 聚焦测试 62 个通过；`core` / `react` / `vue` 三端包构建通过                                        |
-| 2026-05-04 | ImagePreview 交互测试 PR     | Done | React/Vue ImagePreview 聚焦测试 30 个通过；补齐 rotate 交互；`core` / `react` / `vue` 三端包构建通过     |
-| 2026-05-04 | ImageCropper 交互测试 PR     | Done | React/Vue ImageCropper 聚焦测试 22 个通过；补齐键盘移动/缩放；`react` / `vue` 两端包构建通过             |
-| 2026-05-04 | Typography 合并评估 PR       | Done | Text/Code 保持独立公开 API；Code class composer 收敛到 core；Text/Code 聚焦测试 28 个通过，三端构建通过  |
-| 2026-05-04 | InputNumber/Stepper 长按 PR  | Done | 新增 core rAF repeat controller；React/Vue 长按步进测试与 core 调度测试 92 个通过；三端包构建通过        |
-| 2026-05-04 | Upload 拖拽复用 PR           | Done | Upload drag over/leave/drop 复用 core helper；core/React/Vue Upload 聚焦测试 90 个通过；三端包构建通过   |
+| 日期       | 任务                         | 状态 | 验证                                                                                                                  |
+| ---------- | ---------------------------- | ---- | --------------------------------------------------------------------------------------------------------------------- |
+| 2026-05-04 | React Button spinner lazy PR | Done | `Button.spec.tsx` + `ButtonSpinnerLazy.spec.tsx` 通过；`pnpm --filter @expcat/tigercat-react build` 通过              |
+| 2026-05-04 | Group 类组件共享 util PR     | Done | Group 聚焦测试 62 个通过；`core` / `react` / `vue` 三端包构建通过                                                     |
+| 2026-05-04 | ImagePreview 交互测试 PR     | Done | React/Vue ImagePreview 聚焦测试 30 个通过；补齐 rotate 交互；`core` / `react` / `vue` 三端包构建通过                  |
+| 2026-05-04 | ImageCropper 交互测试 PR     | Done | React/Vue ImageCropper 聚焦测试 22 个通过；补齐键盘移动/缩放；`react` / `vue` 两端包构建通过                          |
+| 2026-05-04 | Typography 合并评估 PR       | Done | Text/Code 保持独立公开 API；Code class composer 收敛到 core；Text/Code 聚焦测试 28 个通过，三端构建通过               |
+| 2026-05-04 | InputNumber/Stepper 长按 PR  | Done | 新增 core rAF repeat controller；React/Vue 长按步进测试与 core 调度测试 92 个通过；三端包构建通过                     |
+| 2026-05-04 | Upload 拖拽复用 PR           | Done | Upload drag over/leave/drop 复用 core helper；core/React/Vue Upload 聚焦测试 90 个通过；三端包构建通过                |
+| 2026-05-04 | Switch class composer PR     | Done | Switch 外层 class 合并收敛到 core `composeComponentClasses`；core/React/Vue Switch 聚焦测试 58 个通过；三端包构建通过 |

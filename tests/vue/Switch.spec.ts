@@ -35,6 +35,26 @@ describe('Switch', () => {
       const switchButton = container.querySelector('[role="switch"]')
       expect(switchButton).toHaveAttribute('aria-checked', 'true')
     })
+
+    it('should compose className prop and attrs class with state classes', () => {
+      const { container } = render(Switch, {
+        props: {
+          checked: true,
+          disabled: true,
+          className: 'prop-class'
+        },
+        attrs: {
+          class: ['attrs-class', { active: true }]
+        }
+      })
+
+      const switchButton = container.querySelector('[role="switch"]')
+      expect(switchButton).toHaveClass('prop-class')
+      expect(switchButton).toHaveClass('attrs-class')
+      expect(switchButton).toHaveClass('active')
+      expect(switchButton).toHaveClass('cursor-not-allowed')
+      expect(switchButton?.className).toContain('bg-[var(--tiger-primary,#2563eb)]')
+    })
   })
 
   describe('Props', () => {
