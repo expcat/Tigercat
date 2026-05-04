@@ -52,3 +52,4 @@
 | 2026-05-04 | DatePicker locale 子路径 PR  | Done | DatePicker 专用 locale preset 支持按子路径导入；core/React/Vue DatePicker 聚焦测试 65 个通过；三端包构建通过                                                         |
 | 2026-05-04 | BackTop rAF throttle PR      | Done | 新增 core BackTop visibility controller；React/Vue scroll 监听 rAF throttle；点击滚动改用原生 smooth/auto；core/React/Vue BackTop 聚焦测试 15 个通过；三端包构建通过 |
 | 2026-05-04 | Segmented transform PR       | Done | 新增 core Segmented indicator style；React/Vue 滑块位置改用 transform；core/React/Vue Segmented 聚焦测试 29 个通过；三端包构建通过                                   |
+| 2026-05-04 | Tabs indicator transform PR  | Done | 新增 core Tabs indicator/grid style；React/Vue line tabs 指示条位置改用 transform；core/React/Vue Tabs 聚焦测试 81 个通过；三端包构建通过                            |

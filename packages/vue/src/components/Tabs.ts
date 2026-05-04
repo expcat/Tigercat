@@ -15,6 +15,9 @@ import {
   getTabsContainerClasses,
   getTabNavClasses,
   getTabNavListClasses,
+  getTabNavListStyle,
+  getTabIndicatorClasses,
+  getTabIndicatorStyle,
   tabAddButtonClasses,
   tabContentBaseClasses,
   type TabType,
@@ -238,6 +241,7 @@ export const Tabs = defineComponent({
       // Extract tab items (for nav) and tab panes (for content)
       const tabItems: VNode[] = []
       const tabPanes: VNode[] = []
+      const tabKeys: Array<string | number> = []
       let firstTabKey: string | number | undefined
 
       // First pass: collect valid TabPane children and determine firstTabKey
@@ -262,6 +266,9 @@ export const Tabs = defineComponent({
         if (firstTabKey === undefined && (typeof k === 'string' || typeof k === 'number')) {
           firstTabKey = k
         }
+        if (typeof k === 'string' || typeof k === 'number') {
+          tabKeys.push(k)
+        }
 
         const tabPaneType =
           typeof child.type === 'string' || typeof child.type === 'object'
@@ -282,6 +289,7 @@ export const Tabs = defineComponent({
 
       // Compute resolvedActiveKey once for roving tabindex
       const resolvedActiveKey = currentActiveKey.value ?? firstTabKey
+      const activeTabIndex = tabKeys.indexOf(resolvedActiveKey ?? '')
 
       // Second pass: build tab items and panes
       for (const { type, props: childProps, children: childChildren } of validChildren) {
@@ -318,21 +326,36 @@ export const Tabs = defineComponent({
               : 'horizontal'
         },
         [
-          h('div', { class: tabNavListClasses.value }, [
-            ...tabItems,
-            props.type === 'editable-card'
-              ? h(
-                  'button',
-                  {
-                    type: 'button',
-                    class: tabAddButtonClasses,
-                    onClick: () => emit('edit', { targetKey: undefined, action: 'add' }),
-                    'aria-label': 'Add tab'
-                  },
-                  '+'
-                )
-              : null
-          ])
+          h(
+            'div',
+            {
+              class: tabNavListClasses.value,
+              style: getTabNavListStyle(props.type, props.tabPosition, tabKeys.length)
+            },
+            [
+              props.type === 'line'
+                ? h('div', {
+                    'data-tiger-tabs-indicator': 'true',
+                    'aria-hidden': 'true',
+                    class: getTabIndicatorClasses(props.type, props.tabPosition),
+                    style: getTabIndicatorStyle(activeTabIndex, tabKeys.length, props.tabPosition)
+                  })
+                : null,
+              ...tabItems,
+              props.type === 'editable-card'
+                ? h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: tabAddButtonClasses,
+                      onClick: () => emit('edit', { targetKey: undefined, action: 'add' }),
+                      'aria-label': 'Add tab'
+                    },
+                    '+'
+                  )
+                : null
+            ]
+          )
         ]
       )
 

@@ -89,6 +89,59 @@ describe('Tabs', () => {
       expect(screen.getByText('Content 2')).toBeVisible()
     })
 
+    it('should move the line indicator with transform when activeKey changes', () => {
+      const { container, rerender } = render(
+        <Tabs activeKey="1">
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+          <TabPane tabKey="2" label="Tab 2">
+            Content 2
+          </TabPane>
+          <TabPane tabKey="3" label="Tab 3">
+            Content 3
+          </TabPane>
+        </Tabs>
+      )
+      const indicator = container.querySelector('[data-tiger-tabs-indicator]')
+
+      expect(indicator).toHaveStyle({ transform: 'translateX(0%)' })
+      expect(indicator).toHaveStyle({ width: 'calc(100% / 3)' })
+
+      rerender(
+        <Tabs activeKey="3">
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+          <TabPane tabKey="2" label="Tab 2">
+            Content 2
+          </TabPane>
+          <TabPane tabKey="3" label="Tab 3">
+            Content 3
+          </TabPane>
+        </Tabs>
+      )
+
+      expect(indicator).toHaveStyle({ transform: 'translateX(200%)' })
+    })
+
+    it('should use translateY for vertical line indicators', () => {
+      const { container } = render(
+        <Tabs activeKey="2" tabPosition="left">
+          <TabPane tabKey="1" label="Tab 1">
+            Content 1
+          </TabPane>
+          <TabPane tabKey="2" label="Tab 2">
+            Content 2
+          </TabPane>
+        </Tabs>
+      )
+
+      const indicator = container.querySelector('[data-tiger-tabs-indicator]')
+      expect(indicator).toHaveStyle({ transform: 'translateY(100%)' })
+      expect(indicator).toHaveStyle({ height: 'calc(100% / 2)' })
+    })
+
     it('should respect defaultActiveKey prop in uncontrolled mode', () => {
       render(
         <Tabs defaultActiveKey="2">

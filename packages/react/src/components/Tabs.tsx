@@ -12,6 +12,9 @@ import {
   getTabsContainerClasses,
   getTabNavClasses,
   getTabNavListClasses,
+  getTabNavListStyle,
+  getTabIndicatorClasses,
+  getTabIndicatorStyle,
   tabAddButtonClasses,
   tabContentBaseClasses,
   type TabType,
@@ -154,9 +157,10 @@ export const Tabs: React.FC<TabsProps> = ({
   }, [tabPosition, centered])
 
   // Extract tab items and tab panes from children (single pass)
-  const { tabItems, tabPanes, firstTabKey } = useMemo(() => {
+  const { tabItems, tabPanes, firstTabKey, tabKeys } = useMemo(() => {
     const items: ReactElement[] = []
     const panes: ReactElement[] = []
+    const keys: Array<string | number> = []
     let firstKey: string | number | undefined
 
     React.Children.forEach(children, (child) => {
@@ -164,6 +168,7 @@ export const Tabs: React.FC<TabsProps> = ({
 
       const key = child.props.tabKey
       if (firstKey === undefined) firstKey = key
+      keys.push(key)
 
       const resolvedActiveKey = controlledActiveKey ?? defaultActiveKey ?? firstKey
       const tabId = `${idBase}-tab-${String(key)}`
@@ -180,7 +185,7 @@ export const Tabs: React.FC<TabsProps> = ({
       panes.push(React.cloneElement(child, { renderMode: 'pane', tabId, panelId }))
     })
 
-    return { tabItems: items, tabPanes: panes, firstTabKey: firstKey }
+    return { tabItems: items, tabPanes: panes, firstTabKey: firstKey, tabKeys: keys }
   }, [children, controlledActiveKey, defaultActiveKey, idBase])
 
   // Use controlled or uncontrolled state, defaulting to the first tab if none is specified
@@ -190,6 +195,8 @@ export const Tabs: React.FC<TabsProps> = ({
       : internalActiveKey !== undefined
         ? internalActiveKey
         : firstTabKey
+
+  const activeTabIndex = useMemo(() => tabKeys.indexOf(activeKey ?? ''), [tabKeys, activeKey])
 
   // Handle tab click
   const handleTabClick = useCallback(
@@ -260,7 +267,17 @@ export const Tabs: React.FC<TabsProps> = ({
       aria-orientation={
         tabPosition === 'left' || tabPosition === 'right' ? 'vertical' : 'horizontal'
       }>
-      <div className={tabNavListClasses}>
+      <div
+        className={tabNavListClasses}
+        style={getTabNavListStyle(type, tabPosition, tabKeys.length)}>
+        {type === 'line' && (
+          <div
+            data-tiger-tabs-indicator="true"
+            aria-hidden="true"
+            className={getTabIndicatorClasses(type, tabPosition)}
+            style={getTabIndicatorStyle(activeTabIndex, tabKeys.length, tabPosition)}
+          />
+        )}
         {tabItems}
         {type === 'editable-card' && (
           <button

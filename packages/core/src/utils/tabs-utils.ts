@@ -5,6 +5,20 @@
 
 import type { TabType, TabPosition, TabSize } from '../types/tabs'
 
+export interface TabNavListStyle {
+  display?: string
+  gridTemplateColumns?: string
+  gridTemplateRows?: string
+  gap?: string
+}
+
+export interface TabIndicatorStyle {
+  width?: string
+  height?: string
+  transform: string
+  opacity: string
+}
+
 /**
  * Base tabs container classes
  */
@@ -60,7 +74,7 @@ export const tabNavListCenteredClasses = 'justify-center'
  * @since 0.2.0 - Added focus-visible ring for keyboard navigation
  */
 export const tabItemBaseClasses =
-  'relative cursor-pointer transition-all duration-200 select-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:ring-offset-2 active:opacity-90'
+  'relative z-10 cursor-pointer transition-all duration-200 select-none flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--tiger-focus-ring,var(--tiger-primary,#2563eb))]/40 focus-visible:ring-offset-2 active:opacity-90'
 
 /**
  * Tab item size classes
@@ -80,8 +94,17 @@ export const tabItemLineClasses =
 /**
  * Tab item type classes - line active
  */
-export const tabItemLineActiveClasses =
-  'border-[var(--tiger-primary,#2563eb)] text-[var(--tiger-primary,#2563eb)] font-medium'
+export const tabItemLineActiveClasses = 'text-[var(--tiger-primary,#2563eb)] font-medium'
+
+export const tabIndicatorBaseClasses =
+  'pointer-events-none absolute z-0 rounded-full bg-[var(--tiger-primary,#2563eb)] transition-transform duration-200 ease-out will-change-transform'
+
+export const tabIndicatorPositionClasses: Record<TabPosition, string> = {
+  top: 'bottom-0 left-0 h-0.5',
+  bottom: 'top-0 left-0 h-0.5',
+  left: 'right-0 top-0 w-0.5',
+  right: 'left-0 top-0 w-0.5'
+}
 
 /**
  * Tab item type classes - card
@@ -172,10 +195,73 @@ export function getTabNavClasses(position: TabPosition, type: TabType): string {
  * Get tab nav list classes
  */
 export function getTabNavListClasses(position: TabPosition, centered: boolean): string {
-  const base = `${tabNavListBaseClasses} ${tabNavListPositionClasses[position]}`
+  const base = `relative ${tabNavListBaseClasses} ${tabNavListPositionClasses[position]}`
   return centered && (position === 'top' || position === 'bottom')
     ? `${base} ${tabNavListCenteredClasses}`
     : base
+}
+
+export function getTabNavListStyle(
+  type: TabType,
+  position: TabPosition,
+  tabCount: number
+): TabNavListStyle {
+  if (type !== 'line' || tabCount <= 0) {
+    return {}
+  }
+
+  const template = `repeat(${tabCount}, minmax(0, 1fr))`
+
+  if (position === 'left' || position === 'right') {
+    return {
+      display: 'grid',
+      gridTemplateRows: template,
+      gap: '0'
+    }
+  }
+
+  return {
+    display: 'grid',
+    gridTemplateColumns: template,
+    gap: '0'
+  }
+}
+
+export function getTabIndicatorClasses(type: TabType, position: TabPosition): string {
+  return type === 'line'
+    ? `${tabIndicatorBaseClasses} ${tabIndicatorPositionClasses[position]}`
+    : 'hidden'
+}
+
+export function getTabIndicatorStyle(
+  activeIndex: number,
+  tabCount: number,
+  position: TabPosition
+): TabIndicatorStyle {
+  if (activeIndex < 0 || tabCount <= 0) {
+    return {
+      transform: position === 'left' || position === 'right' ? 'translateY(0%)' : 'translateX(0%)',
+      opacity: '0'
+    }
+  }
+
+  const safeTabCount = Math.max(1, tabCount)
+  const safeActiveIndex = Math.min(Math.max(0, activeIndex), safeTabCount - 1)
+  const size = `calc(100% / ${safeTabCount})`
+
+  if (position === 'left' || position === 'right') {
+    return {
+      height: size,
+      transform: `translateY(${safeActiveIndex * 100}%)`,
+      opacity: '1'
+    }
+  }
+
+  return {
+    width: size,
+    transform: `translateX(${safeActiveIndex * 100}%)`,
+    opacity: '1'
+  }
 }
 
 /**
