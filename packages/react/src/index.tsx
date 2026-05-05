@@ -146,14 +146,14 @@ export type { CollapsePanelProps } from './components/CollapsePanel'
 export { Menu, useMenuContext } from './components/Menu'
 export type { MenuProps, MenuContextValue } from './components/Menu'
 
-export { MenuItem } from './components/MenuItem'
-export type { MenuItemProps } from './components/MenuItem'
+export { MenuItem } from './components/Menu'
+export type { MenuItemProps } from './components/Menu'
 
-export { SubMenu } from './components/SubMenu'
-export type { SubMenuProps } from './components/SubMenu'
+export { SubMenu } from './components/Menu'
+export type { SubMenuProps } from './components/Menu'
 
-export { MenuItemGroup } from './components/MenuItemGroup'
-export type { MenuItemGroupProps } from './components/MenuItemGroup'
+export { MenuItemGroup } from './components/Menu'
+export type { MenuItemGroupProps } from './components/Menu'
 
 export { Tabs, TabPane, useTabsContext } from './components/Tabs'
 export type { TabsProps, TabPaneProps, TabsContextValue } from './components/Tabs'
