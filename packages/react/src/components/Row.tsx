@@ -3,7 +3,8 @@ import {
   classNames,
   getAlignClasses,
   getJustifyClasses,
-  getGutterStyles,
+  getRowGutterClasses,
+  getRowGutterStyleVars,
   type RowProps as CoreRowProps
 } from '@expcat/tigercat-core'
 
@@ -31,15 +32,16 @@ export const Row: React.FC<RowProps> = ({
         'flex',
         'w-full',
         wrap && 'flex-wrap',
+        getRowGutterClasses(gutter),
         getAlignClasses(align),
         getJustifyClasses(justify),
         className
       ),
-    [wrap, align, justify, className]
+    [gutter, wrap, align, justify, className]
   )
 
   const mergedStyle = useMemo<React.CSSProperties>(
-    () => ({ ...getGutterStyles(gutter).rowStyle, ...style }),
+    () => ({ ...getRowGutterStyleVars(gutter), ...style }),
     [gutter, style]
   )
 

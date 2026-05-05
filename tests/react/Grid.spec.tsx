@@ -33,8 +33,12 @@ describe('Grid (React)', () => {
     const row = screen.getByTestId('row')
     const col = screen.getByTestId('col')
 
-    expect(row).toHaveStyle({ marginLeft: '-8px', marginRight: '-8px' })
-    expect(col).toHaveStyle({ paddingLeft: '8px', paddingRight: '8px' })
+    expect(row.className).toContain('mx-[calc(var(--tiger-row-gutter-x-half)*-1)]')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x-half')).toBe('8px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-y-half')).toBe('8px')
+    expect(col.className).toContain('px-[var(--tiger-row-gutter-x-half)]')
+    expect(col.style.paddingLeft).toBe('')
+    expect(col.style.paddingRight).toBe('')
   })
 
   it('applies span/offset classes', () => {
@@ -84,18 +88,13 @@ describe('Grid (React)', () => {
     const row = screen.getByTestId('row')
     const col = screen.getByTestId('col')
 
-    expect(row).toHaveStyle({
-      marginLeft: '-8px',
-      marginRight: '-8px',
-      marginTop: '-12px',
-      marginBottom: '-12px'
-    })
-    expect(col).toHaveStyle({
-      paddingLeft: '8px',
-      paddingRight: '8px',
-      paddingTop: '12px',
-      paddingBottom: '12px'
-    })
+    expect(row.className).toContain('my-[calc(var(--tiger-row-gutter-y-half)*-1)]')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x-half')).toBe('8px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-y-half')).toBe('12px')
+    expect(col.className).toContain('px-[var(--tiger-row-gutter-x-half)]')
+    expect(col.className).toContain('py-[var(--tiger-row-gutter-y-half)]')
+    expect(col.style.paddingTop).toBe('')
+    expect(col.style.paddingBottom).toBe('')
   })
 
   it('applies responsive span CSS variables', () => {

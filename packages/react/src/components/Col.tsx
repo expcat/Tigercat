@@ -6,7 +6,7 @@ import {
   getOffsetClasses,
   getOrderClasses,
   getFlexClasses,
-  getGutterStyles,
+  getColGutterClasses,
   type ColProps as CoreColProps
 } from '@expcat/tigercat-core'
 import { RowContext } from './Row'
@@ -33,18 +33,18 @@ export const Col: React.FC<ColProps> = ({
         getOffsetClasses(offset),
         getOrderClasses(order),
         getFlexClasses(flex),
+        getColGutterClasses(gutter || 0),
         className
       ),
-    [isFlexSpanMode, span, offset, order, flex, className]
+    [gutter, isFlexSpanMode, span, offset, order, flex, className]
   )
 
   const mergedStyle = useMemo<React.CSSProperties>(
     () => ({
-      ...getGutterStyles(gutter || 0).colStyle,
       ...getColMergedStyleVars(isFlexSpanMode ? undefined : span, offset, order, flex),
       ...style
     }),
-    [gutter, isFlexSpanMode, span, offset, order, flex, style]
+    [isFlexSpanMode, span, offset, order, flex, style]
   )
 
   return (

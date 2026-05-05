@@ -4,7 +4,8 @@ import {
   classNames,
   getAlignClasses,
   getJustifyClasses,
-  getGutterStyles,
+  getRowGutterClasses,
+  getRowGutterStyleVars,
   type Align,
   type Justify,
   type GutterSize
@@ -61,13 +62,14 @@ export const Row = defineComponent({
   },
   setup(props, { slots, attrs }) {
     const gutter = computed(() => props.gutter)
-    const rowStyle = computed(() => getGutterStyles(gutter.value).rowStyle)
+    const rowStyle = computed(() => getRowGutterStyleVars(gutter.value))
 
     const rowClasses = computed(() => {
       return classNames(
         'flex',
         'w-full',
         props.wrap && 'flex-wrap',
+        getRowGutterClasses(gutter.value),
         getAlignClasses(props.align),
         getJustifyClasses(props.justify)
       )

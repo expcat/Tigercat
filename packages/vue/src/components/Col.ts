@@ -6,7 +6,7 @@ import {
   getOffsetClasses,
   getOrderClasses,
   getFlexClasses,
-  getGutterStyles,
+  getColGutterClasses,
   type ColSpan,
   type Breakpoint,
   type ColProps as CoreColProps
@@ -48,12 +48,12 @@ export const Col = defineComponent({
         isFlexSpanMode.value ? '' : getSpanClasses(props.span),
         getOffsetClasses(props.offset),
         getOrderClasses(props.order),
-        getFlexClasses(props.flex)
+        getFlexClasses(props.flex),
+        getColGutterClasses(gutter.value)
       )
     )
 
     const colMergedStyle = computed(() => ({
-      ...getGutterStyles(gutter.value).colStyle,
       ...getColMergedStyleVars(
         isFlexSpanMode.value ? undefined : props.span,
         props.offset,

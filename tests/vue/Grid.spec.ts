@@ -38,10 +38,12 @@ describe('Grid (Vue)', () => {
     const row = screen.getByTestId('row') as HTMLElement
     const col = screen.getByTestId('col') as HTMLElement
 
-    expect(row.style.marginLeft).toBe('-8px')
-    expect(row.style.marginRight).toBe('-8px')
-    expect(col.style.paddingLeft).toBe('8px')
-    expect(col.style.paddingRight).toBe('8px')
+    expect(row.className).toContain('mx-[calc(var(--tiger-row-gutter-x-half)*-1)]')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x-half')).toBe('8px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-y-half')).toBe('8px')
+    expect(col.className).toContain('px-[var(--tiger-row-gutter-x-half)]')
+    expect(col.style.paddingLeft).toBe('')
+    expect(col.style.paddingRight).toBe('')
   })
 
   it('applies span/offset classes', () => {
@@ -105,14 +107,13 @@ describe('Grid (Vue)', () => {
     const row = screen.getByTestId('row') as HTMLElement
     const col = screen.getByTestId('col') as HTMLElement
 
-    expect(row.style.marginLeft).toBe('-8px')
-    expect(row.style.marginRight).toBe('-8px')
-    expect(row.style.marginTop).toBe('-12px')
-    expect(row.style.marginBottom).toBe('-12px')
-    expect(col.style.paddingLeft).toBe('8px')
-    expect(col.style.paddingRight).toBe('8px')
-    expect(col.style.paddingTop).toBe('12px')
-    expect(col.style.paddingBottom).toBe('12px')
+    expect(row.className).toContain('my-[calc(var(--tiger-row-gutter-y-half)*-1)]')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-x-half')).toBe('8px')
+    expect(row.style.getPropertyValue('--tiger-row-gutter-y-half')).toBe('12px')
+    expect(col.className).toContain('px-[var(--tiger-row-gutter-x-half)]')
+    expect(col.className).toContain('py-[var(--tiger-row-gutter-y-half)]')
+    expect(col.style.paddingTop).toBe('')
+    expect(col.style.paddingBottom).toBe('')
   })
 
   it('applies responsive span CSS variables', () => {

@@ -70,6 +70,12 @@ const colFlexClasses = 'flex-[var(--tiger-col-flex)]'
 const colOrderClasses =
   'order-[var(--tiger-col-order)] sm:order-[var(--tiger-col-order-sm,var(--tiger-col-order))] md:order-[var(--tiger-col-order-md,var(--tiger-col-order))] lg:order-[var(--tiger-col-order-lg,var(--tiger-col-order))] xl:order-[var(--tiger-col-order-xl,var(--tiger-col-order))] 2xl:order-[var(--tiger-col-order-2xl,var(--tiger-col-order))]'
 
+export const rowGutterClasses =
+  'mx-[calc(var(--tiger-row-gutter-x-half)*-1)] my-[calc(var(--tiger-row-gutter-y-half)*-1)]'
+
+export const colGutterClasses =
+  'px-[var(--tiger-row-gutter-x-half)] py-[var(--tiger-row-gutter-y-half)]'
+
 function hasNonZeroOffset(offset: ColOffset): boolean {
   if (typeof offset === 'number') return offset !== 0
   return BREAKPOINT_ORDER.some((bp) => (offset[bp] ?? 0) !== 0)
@@ -225,6 +231,33 @@ export function getGutterStyles(gutter: GutterSize): {
   }
 
   return { rowStyle, colStyle }
+}
+
+export function hasGutter(gutter: GutterSize): boolean {
+  if (gutter === undefined || gutter === null || gutter === 0) return false
+  if (!Array.isArray(gutter)) return gutter > 0
+
+  const [horizontal, vertical] = gutter
+  return horizontal > 0 || vertical > 0
+}
+
+export function getRowGutterStyleVars(gutter: GutterSize): Record<string, string> {
+  if (!hasGutter(gutter)) return {}
+
+  const [horizontal, vertical] = Array.isArray(gutter) ? gutter : [gutter, gutter]
+
+  return {
+    '--tiger-row-gutter-x-half': `${Math.max(0, horizontal) / 2}px`,
+    '--tiger-row-gutter-y-half': `${Math.max(0, vertical) / 2}px`
+  }
+}
+
+export function getRowGutterClasses(gutter: GutterSize): string {
+  return hasGutter(gutter) ? rowGutterClasses : ''
+}
+
+export function getColGutterClasses(gutter: GutterSize): string {
+  return hasGutter(gutter) ? colGutterClasses : ''
 }
 
 /**
