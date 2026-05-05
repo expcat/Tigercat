@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 父子组件同文件约定继续落地 Anchor / AnchorLink，父子实现合并到 Anchor 文件，旧 AnchorLink 文件保留 re-export 兼容层，并更新包入口与模式文档；相关 React、Vue 测试与完整构建通过。
-- 推荐下一步：继续 P1 父子组件同文件约定，按已落地模式处理 Dropdown / DropdownMenu。
+- 上一步完成：P1 父子组件同文件约定继续落地 Dropdown / DropdownMenu，父子实现合并到 Dropdown 文件，旧 DropdownMenu 文件保留 re-export 兼容层，并更新包入口；相关 React、Vue 测试与完整构建通过。
+- 推荐下一步：继续 P1 父子组件同文件约定，按已落地模式处理 Menu 系列父子组件。
 
 ## 实现核对口径
 
@@ -57,7 +57,7 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 | 优先级 | 项目                          | 范围            | 完成标准                                                            |
 | ------ | ----------------------------- | --------------- | ------------------------------------------------------------------- |
-| P1     | 父子组件同文件约定            | Menu / Dropdown | 沿用已落地模式，继续减少父子组件 chunk 与导出链                     |
+| P1     | 父子组件同文件约定            | Menu            | 沿用已落地模式，继续减少父子组件 chunk 与导出链                     |
 | P2     | Descriptions 大列表性能       | Descriptions    | 对 100+ items columns / rows 合并算法做复杂度测试或 benchmark       |
 | P2     | Container 组件必要性          | Container       | 评估是否改为 class util；若保留组件，说明体积与 API 理由            |
 | P2     | FloatButton group memo        | FloatButton     | 子按钮列表缓存，避免不必要重建                                      |

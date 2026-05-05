@@ -172,8 +172,8 @@ export type { PaginationProps } from './components/Pagination'
 export { Dropdown } from './components/Dropdown'
 export type { DropdownProps, DropdownContextValue } from './components/Dropdown'
 
-export { DropdownMenu } from './components/DropdownMenu'
-export type { DropdownMenuProps } from './components/DropdownMenu'
+export { DropdownMenu } from './components/Dropdown'
+export type { DropdownMenuProps } from './components/Dropdown'
 
 export { DropdownItem } from './components/DropdownItem'
 export type { DropdownItemProps } from './components/DropdownItem'

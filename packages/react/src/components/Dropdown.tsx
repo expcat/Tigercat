@@ -12,6 +12,7 @@ import {
   getDropdownContainerClasses,
   getDropdownTriggerClasses,
   getDropdownChevronClasses,
+  getDropdownMenuClasses,
   getTransformOrigin,
   injectDropdownStyles,
   DROPDOWN_CHEVRON_PATH,
@@ -21,9 +22,9 @@ import {
   captureActiveElement,
   restoreFocus,
   type DropdownProps as CoreDropdownProps,
+  type DropdownMenuProps as CoreDropdownMenuProps,
   type FloatingPlacement
 } from '@expcat/tigercat-core'
-import { DropdownMenu } from './DropdownMenu'
 import { useClickOutside, useEscapeKey, useFloating } from '../utils/overlay'
 
 // Dropdown context interface
@@ -34,6 +35,38 @@ export interface DropdownContextValue {
 
 // Create dropdown context
 export const DropdownContext = createContext<DropdownContextValue | null>(null)
+
+// --- DropdownMenu (child component) ---
+
+export interface DropdownMenuProps
+  extends
+    Omit<CoreDropdownMenuProps, 'style'>,
+    Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
+  style?: React.CSSProperties
+
+  /**
+   * Menu content
+   */
+  children?: React.ReactNode
+}
+
+export const DropdownMenu: React.FC<DropdownMenuProps> = ({
+  className,
+  style,
+  children,
+  role,
+  ...divProps
+}) => {
+  const menuClasses = classNames(getDropdownMenuClasses(), className)
+
+  return (
+    <div className={menuClasses} style={style} role={role ?? 'menu'} {...divProps}>
+      {children}
+    </div>
+  )
+}
+
+// --- Dropdown (parent component) ---
 
 export interface DropdownProps
   extends Omit<CoreDropdownProps, 'style'>, Omit<React.HTMLAttributes<HTMLDivElement>, 'style'> {
