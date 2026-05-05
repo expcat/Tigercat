@@ -1,5 +1,6 @@
 import React, { useMemo, useRef } from 'react'
 import { usePopup } from '../utils/use-popup'
+import { renderBodyPortal } from '../utils/overlay'
 import {
   classNames,
   createFloatingIdFactory,
@@ -78,28 +79,29 @@ export const Popover: React.FC<PopoverProps> = ({
         {children}
       </div>
 
-      {currentVisible && (
-        <div ref={floatingRef} style={floatingStyles} aria-hidden={false}>
-          <div
-            id={popoverId}
-            role="dialog"
-            aria-modal="false"
-            aria-labelledby={hasTitle ? titleId : undefined}
-            aria-describedby={hasContent ? contentId : undefined}
-            className={contentClasses}>
-            {hasTitle && (
-              <div id={titleId} className={POPOVER_TITLE_CLASSES}>
-                {titleContent || title}
-              </div>
-            )}
-            {hasContent && (
-              <div id={contentId} className={POPOVER_TEXT_CLASSES}>
-                {contentContent || content}
-              </div>
-            )}
+      {currentVisible &&
+        renderBodyPortal(
+          <div ref={floatingRef} style={floatingStyles} aria-hidden={false}>
+            <div
+              id={popoverId}
+              role="dialog"
+              aria-modal="false"
+              aria-labelledby={hasTitle ? titleId : undefined}
+              aria-describedby={hasContent ? contentId : undefined}
+              className={contentClasses}>
+              {hasTitle && (
+                <div id={titleId} className={POPOVER_TITLE_CLASSES}>
+                  {titleContent || title}
+                </div>
+              )}
+              {hasContent && (
+                <div id={contentId} className={POPOVER_TEXT_CLASSES}>
+                  {contentContent || content}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   )
 }

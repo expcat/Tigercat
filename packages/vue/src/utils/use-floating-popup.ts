@@ -139,7 +139,7 @@ export function useFloatingPopup(options: UseFloatingPopupOptions): UseFloatingP
       if (visible && trigger === 'click') {
         outsideClickCleanup = useVueClickOutside({
           enabled: currentVisible,
-          containerRef,
+          refs: [containerRef, floatingRef],
           onOutsideClick: () => setVisible(false),
           defer: true
         })

@@ -136,6 +136,28 @@ describe.sequential('Popconfirm', () => {
     await waitFor(() => expect(queryByText('Confirm?')).not.toBeVisible())
   })
 
+  it('renders floating content through body teleport', async () => {
+    const user = userEvent.setup()
+    const { container, getByText } = renderWithSlots(
+      Popconfirm,
+      {
+        default: '<button>Action</button>'
+      },
+      {
+        title: 'Confirm?'
+      }
+    )
+
+    await user.click(getByText('Action'))
+
+    await waitFor(() => {
+      const contentElement = document.querySelector('.tiger-popconfirm-content') as HTMLElement
+      expect(contentElement).toBeTruthy()
+      expect(document.body.contains(contentElement)).toBe(true)
+      expect(container.contains(contentElement)).toBe(false)
+    })
+  })
+
   it('uses theme vars for ok button and danger hover vars', async () => {
     const user = userEvent.setup()
     const { getByText } = renderWithSlots(
@@ -191,7 +213,8 @@ describe.sequential('Popconfirm', () => {
 
     await user.click(getByText('Action'))
     await waitFor(() => expect(getByText('Confirm?')).toBeVisible())
-    expect(container.querySelector('.tiger-popconfirm-icon')).not.toBeInTheDocument()
+    const dialog = getByText('Confirm?').closest('[role="dialog"]')
+    expect(dialog?.querySelector('.tiger-popconfirm-icon')).not.toBeInTheDocument()
   })
 
   describe('Accessibility', () => {

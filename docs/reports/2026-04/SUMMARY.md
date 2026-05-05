@@ -20,13 +20,14 @@
 
 > 2026-05-05 执行：完成 Theme / 默认主题像素回归。新增 Playwright default-theme visual spec，覆盖 Vue 与 React 的 Button / Input / Card / Form 默认主题截图基线；Modal / Drawer / Popover 继续由已有 overlay visual spec 覆盖。本次在 Chromium 下生成基线并复跑通过。
 
+> 2026-05-05 执行：完成 Feedback / overlay 共享层收敛。Tooltip / Popover / Popconfirm 的浮层内容现在分别通过 Vue `renderVueBodyTeleport` 与 React `renderBodyPortal` 挂载到 body，outside-click 同时识别触发器容器与浮层节点；Modal / Drawer / Loading 已在前置步骤共用 portal/teleport、滚动锁与焦点陷阱，本轮补齐 floating popup 后总项标记完成。
+
 ## 1. 最高优先级
 
-| 任务                   | 对应组件 / 范围                                           | 来源                                         | 完成标准                                                           |
-| ---------------------- | --------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------ |
-| 收敛 overlay 共享层    | Modal / Drawer / Popover / Tooltip / Popconfirm / Loading | [phase2.3-feedback.md](phase2.3-feedback.md) | 统一 portal/teleport、lock-scroll、focus trap、Esc 与 mask 行为    |
-| 推进 picker-utils 二期 | AutoComplete / Cascader / TreeSelect / Transfer           | [phase2.2-form.md](phase2.2-form.md)         | 按各自键盘与 ARIA 语义复用共享 picker 行为                         |
-| 处理 Table 性能二期    | Table                                                     | [phase2.6-data.md](phase2.6-data.md)         | ResizeObserver + rAF 批量、virtual 默认策略、export-utils 子路径化 |
+| 任务                   | 对应组件 / 范围                                 | 来源                                 | 完成标准                                                           |
+| ---------------------- | ----------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------ |
+| 推进 picker-utils 二期 | AutoComplete / Cascader / TreeSelect / Transfer | [phase2.2-form.md](phase2.2-form.md) | 按各自键盘与 ARIA 语义复用共享 picker 行为                         |
+| 处理 Table 性能二期    | Table                                           | [phase2.6-data.md](phase2.6-data.md) | ResizeObserver + rAF 批量、virtual 默认策略、export-utils 子路径化 |
 
 ## 2. 分组索引
 
@@ -37,7 +38,7 @@
 | i18n / CLI / examples | [phase1d-i18n-cli-examples-tests.md](phase1d-i18n-cli-examples-tests.md) | ConfigProvider / locale barrel / CLI bin                                                                           |
 | Basic                 | [phase2.1-basic.md](phase2.1-basic.md)                                   | Empty / Divider                                                                                                    |
 | Form                  | [phase2.2-form.md](phase2.2-form.md)                                     | Form / AutoComplete / Cascader / TreeSelect / Transfer / Radio / Checkbox                                          |
-| Feedback              | [phase2.3-feedback.md](phase2.3-feedback.md)                             | Modal / Drawer / Popover / Tooltip / Popconfirm                                                                    |
+| Feedback              | [phase2.3-feedback.md](phase2.3-feedback.md)                             | 已完成 overlay 共享层                                                                                              |
 | Layout                | [phase2.4-layout.md](phase2.4-layout.md)                                 | Row / Col / Splitter / Resizable / List / Statistic / Descriptions / Container                                     |
 | Navigation            | [phase2.5-navigation.md](phase2.5-navigation.md)                         | Menu / Dropdown / Anchor / Breadcrumb / Steps / Tabs / Pagination / FloatButton                                    |
 | Data                  | [phase2.6-data.md](phase2.6-data.md)                                     | Table / Timeline                                                                                                   |

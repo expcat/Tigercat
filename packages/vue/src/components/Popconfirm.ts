@@ -1,5 +1,6 @@
 import { defineComponent, computed, h, cloneVNode, isVNode, PropType } from 'vue'
 import { useFloatingPopup } from '../utils/use-floating-popup'
+import { renderVueBodyTeleport } from '../utils/overlay'
 import {
   classNames,
   coerceClassValue,
@@ -305,7 +306,7 @@ export const Popconfirm = defineComponent({
           class: containerClasses.value,
           style: mergeStyleValues((attrs as Record<string, unknown>).style, props.style)
         },
-        [trigger, content]
+        [trigger, renderVueBodyTeleport(content)]
       )
     }
   }

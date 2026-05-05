@@ -15,7 +15,8 @@ import { h, ref, Teleport, watch, onBeforeUnmount, type Ref, type VNodeChild } f
 
 export interface UseVueClickOutsideOptions {
   enabled: Ref<boolean>
-  containerRef: Ref<HTMLElement | null>
+  containerRef?: Ref<HTMLElement | null>
+  refs?: Array<Ref<HTMLElement | null> | undefined>
   onOutsideClick: () => void
   defer?: boolean
 }
@@ -23,6 +24,7 @@ export interface UseVueClickOutsideOptions {
 export function useVueClickOutside({
   enabled,
   containerRef,
+  refs,
   onOutsideClick,
   defer = false
 }: UseVueClickOutsideOptions): () => void {
@@ -30,10 +32,10 @@ export function useVueClickOutside({
 
   const handler = (event: MouseEvent) => {
     if (!enabled.value) return
-    const container = containerRef.value
-    if (!container) return
+    const elements = refs?.length ? refs.map((ref) => ref?.value) : [containerRef?.value]
+    if (!elements.some(Boolean)) return
 
-    if (isEventOutside(event, [container])) {
+    if (isEventOutside(event, elements)) {
       onOutsideClick()
     }
   }

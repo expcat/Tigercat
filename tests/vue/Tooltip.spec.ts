@@ -206,9 +206,27 @@ describe('Tooltip', () => {
     // Show tooltip and verify role
     await user.hover(triggerWrapper)
     await waitFor(() => {
-      const tooltipEl = container.querySelector('[role="tooltip"]') as HTMLElement
+      const tooltipEl = document.querySelector('[role="tooltip"]') as HTMLElement
       expect(tooltipEl).toBeTruthy()
       expect(triggerWrapper.getAttribute('aria-describedby')).toBe(tooltipEl.id)
+    })
+  })
+
+  it('renders floating content through body teleport', async () => {
+    const user = userEvent.setup()
+    const { container, getByText } = renderWithSlots(
+      Tooltip,
+      { default: '<button>Trigger</button>' },
+      { content: 'Teleported tooltip', trigger: 'click' }
+    )
+
+    await user.click(getByText('Trigger'))
+
+    await waitFor(() => {
+      const tooltipEl = document.querySelector('[role="tooltip"]') as HTMLElement
+      expect(tooltipEl).toBeTruthy()
+      expect(document.body.contains(tooltipEl)).toBe(true)
+      expect(container.contains(tooltipEl)).toBe(false)
     })
   })
 

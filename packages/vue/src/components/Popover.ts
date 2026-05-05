@@ -1,5 +1,6 @@
 import { defineComponent, computed, h, PropType } from 'vue'
 import { useFloatingPopup } from '../utils/use-floating-popup'
+import { renderVueBodyTeleport } from '../utils/overlay'
 import {
   classNames,
   coerceClassValue,
@@ -108,33 +109,35 @@ export const Popover = defineComponent({
           ),
           // Floating content
           currentVisible.value
-            ? h('div', { ref: floatingRef, style: floatingStyles.value, 'aria-hidden': false }, [
-                h(
-                  'div',
-                  {
-                    id: popoverId,
-                    role: 'dialog',
-                    'aria-modal': 'false',
-                    'aria-labelledby': hasTitle ? titleId : undefined,
-                    'aria-describedby': hasContent ? contentId : undefined,
-                    class: contentClasses.value
-                  },
-                  [
-                    hasTitle &&
-                      h(
-                        'div',
-                        { id: titleId, class: POPOVER_TITLE_CLASSES },
-                        slots.title ? slots.title() : props.title
-                      ),
-                    hasContent &&
-                      h(
-                        'div',
-                        { id: contentId, class: POPOVER_TEXT_CLASSES },
-                        slots.content ? slots.content() : props.content
-                      )
-                  ].filter(Boolean)
-                )
-              ])
+            ? renderVueBodyTeleport(
+                h('div', { ref: floatingRef, style: floatingStyles.value, 'aria-hidden': false }, [
+                  h(
+                    'div',
+                    {
+                      id: popoverId,
+                      role: 'dialog',
+                      'aria-modal': 'false',
+                      'aria-labelledby': hasTitle ? titleId : undefined,
+                      'aria-describedby': hasContent ? contentId : undefined,
+                      class: contentClasses.value
+                    },
+                    [
+                      hasTitle &&
+                        h(
+                          'div',
+                          { id: titleId, class: POPOVER_TITLE_CLASSES },
+                          slots.title ? slots.title() : props.title
+                        ),
+                      hasContent &&
+                        h(
+                          'div',
+                          { id: contentId, class: POPOVER_TEXT_CLASSES },
+                          slots.content ? slots.content() : props.content
+                        )
+                    ].filter(Boolean)
+                  )
+                ])
+              )
             : null
         ]
       )

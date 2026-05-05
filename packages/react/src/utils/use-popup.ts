@@ -115,7 +115,7 @@ export function usePopup(options: UsePopupOptions): UsePopupReturn {
   // ─── Overlay dismiss ─────────────────────────────────────────────────
   useClickOutside({
     enabled: currentVisible && effectiveTrigger === 'click',
-    refs: [containerRef],
+    refs: [containerRef, floatingRef],
     onOutsideClick: () => setVisible(false),
     defer: true
   })

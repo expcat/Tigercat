@@ -89,6 +89,23 @@ describe('Popover', () => {
         expect(getByText('Content')).toBeVisible()
       })
     })
+
+    it('should render floating content through body portal', async () => {
+      const user = userEvent.setup()
+      const { container, getByText } = renderWithChildren(Popover, <button>Trigger</button>, {
+        content: 'Portaled content',
+        trigger: 'click'
+      })
+
+      await user.click(getByText('Trigger'))
+
+      await waitFor(() => {
+        const contentElement = document.querySelector('.tiger-popover-content') as HTMLElement
+        expect(contentElement).toBeTruthy()
+        expect(document.body.contains(contentElement)).toBe(true)
+        expect(container.contains(contentElement)).toBe(false)
+      })
+    })
   })
 
   describe('Props', () => {
@@ -146,7 +163,7 @@ describe('Popover', () => {
       await user.click(getByText('Trigger'))
 
       await waitFor(() => {
-        const contentElement = container.querySelector('.tiger-popover-content')
+        const contentElement = document.querySelector('.tiger-popover-content')
         expect(contentElement).toHaveClass('w-[300px]')
       })
     })
@@ -360,7 +377,7 @@ describe('Popover', () => {
       await user.click(getByText('Trigger'))
 
       await waitFor(() => {
-        const contentEl = container.querySelector('.tiger-popover-content')
+        const contentEl = document.querySelector('.tiger-popover-content')
         expect(contentEl).toHaveClass('bg-[var(--tiger-surface,#ffffff)]')
         expect(contentEl).toHaveClass('border-[var(--tiger-border,#e5e7eb)]')
       })

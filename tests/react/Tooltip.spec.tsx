@@ -172,9 +172,27 @@ describe('Tooltip', () => {
     // Show tooltip and verify role
     await user.hover(triggerWrapper)
     await waitFor(() => {
-      const tooltipEl = container.querySelector('[role="tooltip"]')
+      const tooltipEl = document.querySelector('[role="tooltip"]')
       expect(tooltipEl).toBeTruthy()
       expect(triggerWrapper.getAttribute('aria-describedby')).toBe((tooltipEl as HTMLElement).id)
+    })
+  })
+
+  it('renders floating content through body portal', async () => {
+    const user = userEvent.setup()
+    const { container, getByText } = renderWithChildren(
+      Tooltip,
+      { content: 'Portaled tooltip', trigger: 'click' },
+      <button>Trigger</button>
+    )
+
+    await user.click(getByText('Trigger'))
+
+    await waitFor(() => {
+      const tooltipEl = document.querySelector('[role="tooltip"]') as HTMLElement
+      expect(tooltipEl).toBeTruthy()
+      expect(document.body.contains(tooltipEl)).toBe(true)
+      expect(container.contains(tooltipEl)).toBe(false)
     })
   })
 

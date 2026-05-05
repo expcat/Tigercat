@@ -23,6 +23,7 @@ import {
   type FloatingPlacement
 } from '@expcat/tigercat-core'
 import { usePopup } from '../utils/use-popup'
+import { renderBodyPortal } from '../utils/overlay'
 
 const createPopconfirmId = createFloatingIdFactory('popconfirm')
 
@@ -197,49 +198,51 @@ export const Popconfirm: React.FC<PopconfirmProps> = ({
     <div ref={containerRef} className={containerClasses} style={mergedStyle} {...divProps}>
       <div ref={triggerRef}>{triggerNode}</div>
 
-      <div
-        ref={floatingRef}
-        className={contentWrapperClasses}
-        style={contentWrapperStyles}
-        hidden={!currentVisible}
-        aria-hidden={!currentVisible}>
-        <div className="relative">
-          <div className={arrowClasses} aria-hidden="true" />
-          <div
-            id={popconfirmId}
-            role="dialog"
-            aria-modal="false"
-            aria-labelledby={titleId}
-            aria-describedby={describedBy}
-            className={contentClasses}>
-            <div className="flex items-start">
-              {showIcon && (
-                <div className={iconClasses} aria-hidden="true">
-                  <PopconfirmIcon type={icon} />
-                </div>
-              )}
-              <div className="flex-1">
-                <div id={titleId} className={titleClasses}>
-                  {titleContent || title}
-                </div>
-                {(description || descriptionContent) && (
-                  <div id={descriptionId} className={descriptionClasses}>
-                    {descriptionContent || description}
+      {renderBodyPortal(
+        <div
+          ref={floatingRef}
+          className={contentWrapperClasses}
+          style={contentWrapperStyles}
+          hidden={!currentVisible}
+          aria-hidden={!currentVisible}>
+          <div className="relative">
+            <div className={arrowClasses} aria-hidden="true" />
+            <div
+              id={popconfirmId}
+              role="dialog"
+              aria-modal="false"
+              aria-labelledby={titleId}
+              aria-describedby={describedBy}
+              className={contentClasses}>
+              <div className="flex items-start">
+                {showIcon && (
+                  <div className={iconClasses} aria-hidden="true">
+                    <PopconfirmIcon type={icon} />
                   </div>
                 )}
+                <div className="flex-1">
+                  <div id={titleId} className={titleClasses}>
+                    {titleContent || title}
+                  </div>
+                  {(description || descriptionContent) && (
+                    <div id={descriptionId} className={descriptionClasses}>
+                      {descriptionContent || description}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className={buttonsClasses}>
-              <button type="button" className={cancelButtonClasses} onClick={handleCancel}>
-                {cancelText}
-              </button>
-              <button type="button" className={okButtonClasses} onClick={handleConfirm}>
-                {okText}
-              </button>
+              <div className={buttonsClasses}>
+                <button type="button" className={cancelButtonClasses} onClick={handleCancel}>
+                  {cancelText}
+                </button>
+                <button type="button" className={okButtonClasses} onClick={handleConfirm}>
+                  {okText}
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

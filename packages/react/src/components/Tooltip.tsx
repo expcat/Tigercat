@@ -1,5 +1,6 @@
 import React, { useMemo, useRef } from 'react'
 import { usePopup } from '../utils/use-popup'
+import { renderBodyPortal } from '../utils/overlay'
 import {
   classNames,
   createFloatingIdFactory,
@@ -66,13 +67,14 @@ export const Tooltip: React.FC<TooltipProps> = ({
         {children}
       </div>
 
-      {currentVisible && (
-        <div ref={floatingRef} style={floatingStyles} aria-hidden={false}>
-          <div id={tooltipId} role="tooltip" className={contentClasses}>
-            {content}
+      {currentVisible &&
+        renderBodyPortal(
+          <div ref={floatingRef} style={floatingStyles} aria-hidden={false}>
+            <div id={tooltipId} role="tooltip" className={contentClasses}>
+              {content}
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   )
 }

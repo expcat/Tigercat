@@ -1,5 +1,6 @@
 import { defineComponent, computed, h, PropType } from 'vue'
 import { useFloatingPopup } from '../utils/use-floating-popup'
+import { renderVueBodyTeleport } from '../utils/overlay'
 import {
   classNames,
   coerceClassValue,
@@ -98,24 +99,26 @@ export const Tooltip = defineComponent({
           ),
           // Tooltip content (positioned with Floating UI)
           currentVisible.value
-            ? h(
-                'div',
-                {
-                  ref: floatingRef,
-                  style: floatingStyles.value,
-                  'aria-hidden': false
-                },
-                [
-                  h(
-                    'div',
-                    {
-                      id: tooltipId,
-                      role: 'tooltip',
-                      class: contentClasses.value
-                    },
-                    slots.content ? slots.content() : props.content
-                  )
-                ]
+            ? renderVueBodyTeleport(
+                h(
+                  'div',
+                  {
+                    ref: floatingRef,
+                    style: floatingStyles.value,
+                    'aria-hidden': false
+                  },
+                  [
+                    h(
+                      'div',
+                      {
+                        id: tooltipId,
+                        role: 'tooltip',
+                        class: contentClasses.value
+                      },
+                      slots.content ? slots.content() : props.content
+                    )
+                  ]
+                )
               )
             : null
         ]

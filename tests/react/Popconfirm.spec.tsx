@@ -100,6 +100,22 @@ describe('Popconfirm', () => {
     await waitFor(() => expect(queryByText('Confirm?')).not.toBeVisible())
   })
 
+  it('renders floating content through body portal', async () => {
+    const user = userEvent.setup()
+    const { container, getByText } = renderWithChildren(Popconfirm, <button>Action</button>, {
+      title: 'Confirm?'
+    })
+
+    await user.click(getByText('Action'))
+
+    await waitFor(() => {
+      const contentElement = document.querySelector('.tiger-popconfirm-content') as HTMLElement
+      expect(contentElement).toBeTruthy()
+      expect(document.body.contains(contentElement)).toBe(true)
+      expect(container.contains(contentElement)).toBe(false)
+    })
+  })
+
   it('uses theme vars for ok button and danger hover vars', async () => {
     const user = userEvent.setup()
     const { getByText } = renderWithChildren(Popconfirm, <button>Action</button>, {
@@ -154,7 +170,8 @@ describe('Popconfirm', () => {
 
     await user.click(getByText('Action'))
     await waitFor(() => expect(getByText('Confirm?')).toBeVisible())
-    expect(container.querySelector('.tiger-popconfirm-icon')).not.toBeInTheDocument()
+    const dialog = getByText('Confirm?').closest('[role="dialog"]')
+    expect(dialog?.querySelector('.tiger-popconfirm-icon')).not.toBeInTheDocument()
   })
 
   it('renders descriptionContent', async () => {
