@@ -406,7 +406,11 @@ export const DataTableWithToolbar = defineComponent({
 
       return h(
         'div',
-        { class: 'tiger-data-table-toolbar flex flex-wrap items-center gap-2 pb-3' },
+        {
+          class: 'tiger-data-table-toolbar flex flex-wrap items-center gap-2 pb-3',
+          role: 'toolbar',
+          'aria-label': '数据表格工具栏'
+        },
         [
           h('div', { class: 'flex items-center gap-2 flex-wrap flex-1 min-w-0' }, leftNodes),
           hasBulkActions.value

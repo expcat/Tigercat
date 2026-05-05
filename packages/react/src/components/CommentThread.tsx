@@ -304,6 +304,7 @@ export const CommentThread: React.FC<CommentThreadProps> = ({
   return (
     <div
       className={classNames('tiger-comment-thread flex flex-col', className)}
+      role={divProps.role ?? 'feed'}
       data-tiger-comment-thread
       aria-label={divProps['aria-label'] ?? (divProps['aria-labelledby'] ? undefined : '评论线程')}
       {...divProps}>

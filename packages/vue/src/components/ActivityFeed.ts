@@ -211,6 +211,15 @@ export const ActivityFeed = defineComponent({
       )
     }
 
+    const feedRole = computed(() => (attrs.role as string | undefined) ?? 'feed')
+    const feedAriaLabel = computed(() =>
+      (attrs['aria-label'] as string | undefined) ??
+      (attrs['aria-labelledby'] ? undefined : '动态')
+    )
+    const feedAriaBusy = computed(() =>
+      attrs['aria-busy'] ?? (props.loading ? 'true' : undefined)
+    )
+
     return () => {
       if (props.loading) {
         const loadingNode = slots.loading
@@ -223,6 +232,9 @@ export const ActivityFeed = defineComponent({
             ...attrs,
             class: wrapperClasses.value,
             style: wrapperStyle.value,
+            role: feedRole.value,
+            'aria-label': feedAriaLabel.value,
+            'aria-busy': feedAriaBusy.value,
             'data-tiger-activity-feed': true
           },
           [
@@ -249,6 +261,8 @@ export const ActivityFeed = defineComponent({
             ...attrs,
             class: wrapperClasses.value,
             style: wrapperStyle.value,
+            role: feedRole.value,
+            'aria-label': feedAriaLabel.value,
             'data-tiger-activity-feed': true
           },
           [
@@ -270,6 +284,8 @@ export const ActivityFeed = defineComponent({
           ...attrs,
           class: wrapperClasses.value,
           style: wrapperStyle.value,
+          role: feedRole.value,
+          'aria-label': feedAriaLabel.value,
           'data-tiger-activity-feed': true
         },
         resolvedGroups.value.map((group, groupIndex) => {

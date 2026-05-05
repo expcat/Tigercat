@@ -490,12 +490,18 @@ export const NotificationCenter = defineComponent({
               renderList(filteredFlatItems.value)
             ])
 
+      const ariaLabel =
+        (attrs['aria-label'] as string | undefined) ??
+        (attrs['aria-labelledby'] ? undefined : props.title)
+
       return h(
         'div',
         {
           ...attrs,
           class: wrapperClasses.value,
           style: wrapperStyle.value,
+          role: (attrs.role as string | undefined) ?? 'region',
+          'aria-label': ariaLabel,
           'data-tiger-notification-center': true
         },
         [

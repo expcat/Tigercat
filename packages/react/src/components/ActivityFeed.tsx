@@ -140,7 +140,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
   if (loading) {
     return (
-      <div className={wrapperClasses} {...props} data-tiger-activity-feed>
+      <div className={wrapperClasses} role="feed" aria-label="动态" aria-busy {...props} data-tiger-activity-feed>
         <Card variant="bordered" size="sm" className="tiger-activity-feed-loading">
           <div className="flex items-center justify-center py-4">
             <Loading text={loadingText} />
@@ -152,7 +152,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
   if (resolvedGroups.length === 0) {
     return (
-      <div className={wrapperClasses} {...props} data-tiger-activity-feed>
+      <div className={wrapperClasses} role="feed" aria-label="动态" {...props} data-tiger-activity-feed>
         <Card variant="bordered" size="sm" className="tiger-activity-feed-empty">
           <div className="flex items-center justify-center py-6">
             <Text tag="div" size="sm" color="muted">
@@ -165,7 +165,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
   }
 
   return (
-    <div className={wrapperClasses} {...props} data-tiger-activity-feed>
+    <div className={wrapperClasses} role="feed" aria-label="动态" {...props} data-tiger-activity-feed>
       {resolvedGroups.map((group, groupIndex) => {
         const headerNode = renderGroupHeader?.(group)
         const groupTitle = group.title

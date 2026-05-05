@@ -298,7 +298,12 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   )
 
   return (
-    <div className={wrapperClasses} {...props} data-tiger-notification-center>
+    <div
+      className={wrapperClasses}
+      role={props.role ?? 'region'}
+      aria-label={props['aria-label'] ?? (props['aria-labelledby'] ? undefined : title)}
+      {...props}
+      data-tiger-notification-center>
       <Card
         variant="bordered"
         className="w-full"

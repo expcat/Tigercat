@@ -464,6 +464,7 @@ export const CommentThread = defineComponent({
           ...attrs,
           class: wrapperClasses.value,
           style: wrapperStyle.value,
+          role: (attrs.role as string | undefined) ?? 'feed',
           'data-tiger-comment-thread': true,
           'aria-label': ariaLabel
         },
