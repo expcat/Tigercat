@@ -5,8 +5,9 @@ import {
   ref,
   h,
   PropType,
-  Transition,
   nextTick,
+  watch,
+  onBeforeUnmount,
   cloneVNode,
   isVNode,
   type VNode
@@ -26,9 +27,13 @@ import {
   submenuContentPopupClasses,
   submenuContentVerticalClasses,
   submenuContentInlineClasses,
+  submenuHeightTransitionClasses,
+  getInitialSubmenuHeightTransitionStyle,
+  createSubmenuHeightTransitionController,
   moveFocusInMenu,
   focusMenuEdge,
-  focusFirstChildItem
+  focusFirstChildItem,
+  type SubmenuHeightTransitionController
 } from '@expcat/tigercat-core'
 import { MenuContextKey, type MenuContext } from './Menu'
 
@@ -131,6 +136,8 @@ export const SubMenu = defineComponent({
     const isHovered = ref(false)
 
     const isOpenByKeyboard = ref(false)
+    const submenuContentEl = ref<HTMLElement | null>(null)
+    let heightTransitionController: SubmenuHeightTransitionController | null = null
 
     const effectiveCollapsed = computed(() => {
       return props.collapsed ?? (menuContext ? menuContext.collapsed.value : false)
@@ -149,6 +156,49 @@ export const SubMenu = defineComponent({
       }
       return isOpen.value
     })
+
+    const hasRenderedInline = ref(!isPopup.value && isExpanded.value)
+
+    const disposeHeightTransition = () => {
+      heightTransitionController?.dispose()
+      heightTransitionController = null
+    }
+
+    const syncHeightTransition = async () => {
+      await nextTick()
+
+      if (isPopup.value || !hasRenderedInline.value || !submenuContentEl.value) {
+        disposeHeightTransition()
+        return
+      }
+
+      if (!heightTransitionController) {
+        heightTransitionController = createSubmenuHeightTransitionController(
+          submenuContentEl.value,
+          { expanded: isExpanded.value }
+        )
+        return
+      }
+
+      heightTransitionController.update(isExpanded.value)
+    }
+
+    watch(
+      [isPopup, isExpanded],
+      () => {
+        if (!isPopup.value && isExpanded.value) {
+          hasRenderedInline.value = true
+        }
+        void syncHeightTransition()
+      },
+      { immediate: true }
+    )
+
+    watch(hasRenderedInline, () => {
+      void syncHeightTransition()
+    })
+
+    onBeforeUnmount(disposeHeightTransition)
 
     // Submenu title classes
     const titleClasses = computed(() => {
@@ -199,6 +249,9 @@ export const SubMenu = defineComponent({
         return
       }
 
+      if (!isOpen.value) {
+        hasRenderedInline.value = true
+      }
       menuContext.handleOpenChange(props.itemKey)
     }
 
@@ -264,6 +317,7 @@ export const SubMenu = defineComponent({
           isOpenByKeyboard.value = true
           return
         }
+        hasRenderedInline.value = true
         menuContext.handleOpenChange(props.itemKey)
         await focusFirstChild()
         return
@@ -278,6 +332,7 @@ export const SubMenu = defineComponent({
 
         if (!isOpen.value) {
           event.preventDefault()
+          hasRenderedInline.value = true
           menuContext.handleOpenChange(props.itemKey)
           await focusFirstChild()
         }
@@ -410,45 +465,31 @@ export const SubMenu = defineComponent({
             },
             withChildLevel(slots.default?.() as VNode[] | undefined)
           )
-        : h(
-            Transition,
-            {
-              name: 'submenu-collapse',
-              onEnter: (el: Element) => {
-                const element = el as HTMLElement
-                element.style.height = '0'
-                void element.offsetHeight // Force reflow
-                element.style.height = element.scrollHeight + 'px'
+        : hasRenderedInline.value
+          ? h(
+              'div',
+              {
+                ref: submenuContentEl,
+                class: submenuHeightTransitionClasses,
+                style: heightTransitionController
+                  ? undefined
+                  : getInitialSubmenuHeightTransitionStyle(isExpanded.value),
+                'aria-hidden': isExpanded.value ? undefined : 'true',
+                'data-tiger-menu-hidden': isExpanded.value ? undefined : 'true',
+                'data-tiger-submenu-motion': 'height'
               },
-              onAfterEnter: (el: Element) => {
-                const element = el as HTMLElement
-                element.style.height = ''
-              },
-              onLeave: (el: Element) => {
-                const element = el as HTMLElement
-                element.style.height = element.scrollHeight + 'px'
-                void element.offsetHeight // Force reflow
-                element.style.height = '0'
-              },
-              onAfterLeave: (el: Element) => {
-                const element = el as HTMLElement
-                element.style.height = ''
-              }
-            },
-            {
-              default: () =>
-                isExpanded.value
-                  ? h(
-                      'ul',
-                      {
-                        class: contentClasses.value,
-                        role: 'menu'
-                      },
-                      withChildLevel(slots.default?.() as VNode[] | undefined)
-                    )
-                  : null
-            }
-          )
+              [
+                h(
+                  'ul',
+                  {
+                    class: contentClasses.value,
+                    role: 'menu'
+                  },
+                  withChildLevel(slots.default?.() as VNode[] | undefined)
+                )
+              ]
+            )
+          : null
 
       return h(
         'li',

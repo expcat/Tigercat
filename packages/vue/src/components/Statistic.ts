@@ -1,4 +1,4 @@
-import { defineComponent, h, computed, type PropType } from 'vue'
+import { defineComponent, h, ref, computed, watch, onBeforeUnmount, type PropType } from 'vue'
 import type { StatisticSize } from '@expcat/tigercat-core'
 import {
   statisticBaseClasses,
@@ -7,6 +7,9 @@ import {
   statisticPrefixClasses,
   statisticSuffixClasses,
   formatStatisticValue,
+  canAnimateStatisticValue,
+  createStatisticNumberAnimation,
+  type StatisticNumberAnimationController,
   classNames,
   coerceClassValue
 } from '@expcat/tigercat-core'
@@ -22,11 +25,54 @@ export const Statistic = defineComponent({
     prefix: { type: String, default: undefined },
     suffix: { type: String, default: undefined },
     groupSeparator: { type: Boolean, default: false },
+    animated: { type: Boolean, default: false },
+    animationDuration: { type: Number, default: undefined },
     size: { type: String as PropType<StatisticSize>, default: 'md' }
   },
   setup(props, { attrs }) {
+    const initialValue = props.animated && canAnimateStatisticValue(props.value) ? 0 : props.value
+    const displayValue = ref<string | number | undefined>(initialValue)
+    const currentNumber = ref(canAnimateStatisticValue(initialValue) ? initialValue : 0)
+    let controller: StatisticNumberAnimationController | null = null
+
+    const stopAnimation = () => {
+      controller?.stop()
+      controller = null
+    }
+
+    watch(
+      () => [props.value, props.animated, props.animationDuration] as const,
+      () => {
+        stopAnimation()
+
+        if (!props.animated || !canAnimateStatisticValue(props.value)) {
+          displayValue.value = props.value
+          if (canAnimateStatisticValue(props.value)) currentNumber.value = props.value
+          return
+        }
+
+        controller = createStatisticNumberAnimation({
+          from: currentNumber.value,
+          to: props.value,
+          duration: props.animationDuration,
+          onUpdate: (next) => {
+            currentNumber.value = next
+            displayValue.value = next
+          },
+          onComplete: () => {
+            currentNumber.value = props.value as number
+            displayValue.value = props.value
+            controller = null
+          }
+        })
+      },
+      { immediate: true }
+    )
+
+    onBeforeUnmount(stopAnimation)
+
     const formatted = computed(() =>
-      formatStatisticValue(props.value, props.precision, props.groupSeparator)
+      formatStatisticValue(displayValue.value, props.precision, props.groupSeparator)
     )
 
     return () =>

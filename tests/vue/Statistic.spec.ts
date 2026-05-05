@@ -2,10 +2,33 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen } from '@testing-library/vue'
 import { Statistic } from '@expcat/tigercat-vue'
 import { renderWithProps } from '../utils'
+
+function createFrameScheduler() {
+  let nextFrame = 1
+  const callbacks = new Map<number, FrameRequestCallback>()
+  const requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
+    const frame = nextFrame++
+    callbacks.set(frame, callback)
+    return frame
+  })
+
+  return {
+    requestAnimationFrame,
+    flush(timestamp: number, frame = [...callbacks.keys()][0]) {
+      const callback = callbacks.get(frame)
+      callbacks.delete(frame)
+      callback?.(timestamp)
+    }
+  }
+}
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
 
 describe('Statistic', () => {
   // --- Basic rendering ---
@@ -64,5 +87,34 @@ describe('Statistic', () => {
     expect(screen.getByText('$')).toBeInTheDocument()
     expect(screen.getByText('USD')).toBeInTheDocument()
     expect(screen.getByText('99')).toBeInTheDocument()
+  })
+
+  // --- Animation ---
+  it('supports animated numeric values', async () => {
+    const scheduler = createFrameScheduler()
+    vi.stubGlobal('requestAnimationFrame', scheduler.requestAnimationFrame)
+    vi.stubGlobal('cancelAnimationFrame', vi.fn())
+
+    renderWithProps(Statistic, {
+      title: 'Animated',
+      value: 100,
+      animated: true,
+      animationDuration: 100
+    })
+
+    expect(scheduler.requestAnimationFrame).toHaveBeenCalled()
+    scheduler.flush(0)
+    scheduler.flush(100)
+    expect(await screen.findByText('100')).toBeInTheDocument()
+  })
+
+  it('does not animate string values', () => {
+    const requestAnimationFrame = vi.fn()
+    vi.stubGlobal('requestAnimationFrame', requestAnimationFrame)
+
+    renderWithProps(Statistic, { title: 'Status', value: 'Active', animated: true })
+
+    expect(requestAnimationFrame).not.toHaveBeenCalled()
+    expect(screen.getByText('Active')).toBeInTheDocument()
   })
 })

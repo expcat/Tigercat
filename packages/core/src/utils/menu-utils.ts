@@ -117,6 +117,12 @@ export const submenuContentVerticalClasses = 'overflow-hidden pl-2'
 export const submenuContentInlineClasses = 'overflow-hidden'
 
 /**
+ * Submenu inline/vertical motion wrapper classes.
+ */
+export const submenuHeightTransitionClasses =
+  'overflow-hidden transition-[height,opacity] duration-200 ease-in-out'
+
+/**
  * Menu item group title classes
  */
 export const menuItemGroupTitleClasses =
@@ -263,6 +269,142 @@ export function replaceKeys(key: string | number, keys: (string | number)[]): (s
     return keys
   }
   return [key]
+}
+
+// ============================================================================
+// Submenu height transition controller
+// ============================================================================
+
+export interface SubmenuHeightTransitionElement {
+  scrollHeight: number
+  style: Pick<CSSStyleDeclaration, 'height' | 'opacity' | 'overflow'>
+  addEventListener: HTMLElement['addEventListener']
+  removeEventListener: HTMLElement['removeEventListener']
+}
+
+export interface SubmenuHeightTransitionController {
+  update(expanded: boolean): void
+  dispose(): void
+}
+
+export interface SubmenuHeightTransitionControllerOptions {
+  expanded: boolean
+  requestAnimationFrame?: typeof globalThis.requestAnimationFrame
+  cancelAnimationFrame?: typeof globalThis.cancelAnimationFrame
+}
+
+function requestSubmenuFrame(
+  callback: FrameRequestCallback,
+  requestFrame: typeof globalThis.requestAnimationFrame | undefined
+): number {
+  if (typeof requestFrame === 'function') {
+    return requestFrame(callback)
+  }
+
+  callback(0)
+  return 0
+}
+
+function cancelSubmenuFrame(
+  frame: number,
+  cancelFrame: typeof globalThis.cancelAnimationFrame | undefined
+): void {
+  if (frame && typeof cancelFrame === 'function') {
+    cancelFrame(frame)
+  }
+}
+
+function setSubmenuCollapsedStyle(element: SubmenuHeightTransitionElement): void {
+  element.style.overflow = 'hidden'
+  element.style.height = '0px'
+  element.style.opacity = '0'
+}
+
+function setSubmenuExpandedStyle(element: SubmenuHeightTransitionElement): void {
+  element.style.overflow = 'hidden'
+  element.style.height = 'auto'
+  element.style.opacity = '1'
+}
+
+export function getInitialSubmenuHeightTransitionStyle(expanded: boolean): {
+  height: string
+  opacity: string
+  overflow: string
+}
+export function getInitialSubmenuHeightTransitionStyle(
+  expanded: boolean
+): Pick<CSSStyleDeclaration, 'height' | 'opacity' | 'overflow'> {
+  return {
+    height: expanded ? 'auto' : '0px',
+    opacity: expanded ? '1' : '0',
+    overflow: 'hidden'
+  }
+}
+
+export function createSubmenuHeightTransitionController(
+  element: SubmenuHeightTransitionElement,
+  options: SubmenuHeightTransitionControllerOptions
+): SubmenuHeightTransitionController {
+  const requestFrame = options.requestAnimationFrame ?? globalThis.requestAnimationFrame
+  const cancelFrame = options.cancelAnimationFrame ?? globalThis.cancelAnimationFrame
+  let frame = 0
+  let expanded = options.expanded
+
+  if (expanded) {
+    setSubmenuExpandedStyle(element)
+  } else {
+    setSubmenuCollapsedStyle(element)
+  }
+
+  const clearFrame = () => {
+    cancelSubmenuFrame(frame, cancelFrame)
+    frame = 0
+  }
+
+  const handleTransitionEnd = (event: Event) => {
+    const transitionEvent = event as TransitionEvent
+    if ((event.target as unknown) !== element || transitionEvent.propertyName !== 'height') {
+      return
+    }
+
+    if (expanded) {
+      element.style.height = 'auto'
+    }
+  }
+
+  element.addEventListener('transitionend', handleTransitionEnd)
+
+  return {
+    update(nextExpanded: boolean) {
+      if (nextExpanded === expanded) return
+
+      clearFrame()
+      expanded = nextExpanded
+
+      if (nextExpanded) {
+        element.style.overflow = 'hidden'
+        element.style.height = '0px'
+        element.style.opacity = '1'
+        frame = requestSubmenuFrame(() => {
+          frame = 0
+          element.style.height = `${element.scrollHeight}px`
+        }, requestFrame)
+      } else {
+        element.style.overflow = 'hidden'
+        element.style.height = `${element.scrollHeight}px`
+        element.style.opacity = '1'
+        frame = requestSubmenuFrame(() => {
+          frame = 0
+          element.style.height = '0px'
+          element.style.opacity = '0'
+        }, requestFrame)
+      }
+    },
+    dispose() {
+      clearFrame()
+      element.removeEventListener('transitionend', handleTransitionEnd)
+    }
+  }
 }
 
 // ============================================================================

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   getSubMenuTitleClasses,
@@ -12,9 +12,13 @@ import {
   submenuContentPopupClasses,
   submenuContentVerticalClasses,
   submenuContentInlineClasses,
+  submenuHeightTransitionClasses,
+  getInitialSubmenuHeightTransitionStyle,
+  createSubmenuHeightTransitionController,
   moveFocusInMenu,
   focusMenuEdge,
   focusFirstChildItem,
+  type SubmenuHeightTransitionController,
   type SubMenuProps as CoreSubMenuProps
 } from '@expcat/tigercat-core'
 import { useMenuContext } from './Menu'
@@ -67,6 +71,8 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
   const [isHovered, setIsHovered] = useState(false)
   const [isOpenByKeyboard, setIsOpenByKeyboard] = useState(false)
+  const submenuContentRef = useRef<HTMLDivElement | null>(null)
+  const heightTransitionRef = useRef<SubmenuHeightTransitionController | null>(null)
 
   const effectiveCollapsed = collapsedOverride ?? (menuContext ? menuContext.collapsed : false)
 
@@ -87,6 +93,30 @@ export const SubMenu: React.FC<SubMenuProps> = ({
     if (!isInlineOrVertical || !isExpanded || hasRenderedInline) return
     setHasRenderedInline(true)
   }, [hasRenderedInline, isExpanded, isInlineOrVertical])
+
+  const disposeHeightTransition = useCallback(() => {
+    heightTransitionRef.current?.dispose()
+    heightTransitionRef.current = null
+  }, [])
+
+  useEffect(() => disposeHeightTransition, [disposeHeightTransition])
+
+  useLayoutEffect(() => {
+    if (!isInlineOrVertical || !hasRenderedInline || !submenuContentRef.current) {
+      disposeHeightTransition()
+      return
+    }
+
+    if (!heightTransitionRef.current) {
+      heightTransitionRef.current = createSubmenuHeightTransitionController(
+        submenuContentRef.current,
+        { expanded: isExpanded }
+      )
+      return
+    }
+
+    heightTransitionRef.current.update(isExpanded)
+  }, [disposeHeightTransition, hasRenderedInline, isExpanded, isInlineOrVertical])
 
   const titleClasses = useMemo(() => {
     if (!menuContext) return ''
@@ -289,13 +319,17 @@ export const SubMenu: React.FC<SubMenuProps> = ({
 
     return (
       <div
-        className={classNames(
-          'grid overflow-hidden transition-[grid-template-rows,opacity] duration-200 ease-in-out',
-          isHidden ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100'
-        )}
+        ref={submenuContentRef}
+        className={submenuHeightTransitionClasses}
+        style={
+          heightTransitionRef.current
+            ? undefined
+            : getInitialSubmenuHeightTransitionStyle(isExpanded)
+        }
         aria-hidden={isHidden ? 'true' : undefined}
-        data-tiger-menu-hidden={isHidden ? 'true' : undefined}>
-        <ul className={classNames(contentClasses, 'min-h-0')} role="menu">
+        data-tiger-menu-hidden={isHidden ? 'true' : undefined}
+        data-tiger-submenu-motion="height">
+        <ul className={contentClasses} role="menu">
           {enhancedChildren}
         </ul>
       </div>

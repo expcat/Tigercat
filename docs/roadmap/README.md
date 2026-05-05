@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 Splitter / Resizable drag 复用，新增 core document drag session helper，并接入 React / Vue Splitter、Resizable；相关 core、React、Vue 测试通过。
-- 推荐下一步：执行 P1 Statistic 动画，改为 rAF + easing，并补齐测试覆盖。
+- 上一步完成：P1 Menu 展开动画，新增 core height transition + rAF 测高控制器，并接入 React / Vue SubMenu；相关 core、React、Vue 测试通过。
+- 推荐下一步：执行 P1 Row / Col 样式计算优化，评估并落地 CSS vars 或 grid 方案，减少每个 Col 的 inline style 计算。
 
 ## 实现核对口径
 
@@ -58,10 +58,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | 优先级 | 项目                          | 范围                                                 | 完成标准                                                            |
 | ------ | ----------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------- |
 | P1     | Row / Col 样式计算优化        | Row / Col                                            | 减少每个 Col 的 inline style 计算，评估 CSS grid / CSS vars 方案    |
-| P1     | Statistic 动画                | Statistic                                            | 数字滚动动画使用 rAF + easing，并有测试覆盖                         |
 | P1     | 父子组件同文件约定            | Menu / Dropdown / Anchor / Breadcrumb / Steps / Tabs | 建立父子组件同文件模式，减少 chunk 与导出链                         |
 | P1     | Pagination idle / locale      | Pagination                                           | jumper 校验延迟到 idle 或稳定节流；locale 文案支持懒加载路径        |
-| P1     | Menu 展开动画                 | Menu / SubMenu                                       | 使用 CSS height transition + rAF 测高，避免硬编码 max-height        |
 | P2     | Descriptions 大列表性能       | Descriptions                                         | 对 100+ items columns / rows 合并算法做复杂度测试或 benchmark       |
 | P2     | Container 组件必要性          | Container                                            | 评估是否改为 class util；若保留组件，说明体积与 API 理由            |
 | P2     | FloatButton group memo        | FloatButton                                          | 子按钮列表缓存，避免不必要重建                                      |

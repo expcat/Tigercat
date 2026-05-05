@@ -464,9 +464,7 @@ describe('Menu', () => {
       expect(trigger).toHaveAttribute('aria-expanded', 'true')
 
       await waitFor(() => {
-        expect(
-          screen.getByRole('menuitem', { name: 'Sub Item 1' })
-        ).toHaveFocus()
+        expect(screen.getByRole('menuitem', { name: 'Sub Item 1' })).toHaveFocus()
       })
     })
 
@@ -549,6 +547,26 @@ describe('Menu', () => {
 
       const updates = emitted()['update:openKeys'] as unknown as Array<[unknown]>
       expect(updates[0][0]).toEqual(['sub2'])
+    })
+
+    it('uses height transition wrapper for inline submenu motion', async () => {
+      const { container } = render(Menu, {
+        props: { mode: 'inline' },
+        slots: {
+          default: () => [
+            h(SubMenu, { itemKey: 'sub1', title: 'Submenu' }, () => [
+              h(MenuItem, { itemKey: '1' }, () => 'Sub Item 1')
+            ])
+          ]
+        }
+      })
+
+      await fireEvent.click(screen.getByRole('menuitem', { name: 'Submenu' }))
+
+      const wrapper = container.querySelector('[data-tiger-submenu-motion="height"]')
+      expect(wrapper).toBeInTheDocument()
+      expect(wrapper?.className).toContain('transition-[height,opacity]')
+      expect(wrapper?.className).not.toContain('grid-rows')
     })
   })
 

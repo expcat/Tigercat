@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import type { StatisticProps as CoreStatisticProps } from '@expcat/tigercat-core'
 import {
   statisticBaseClasses,
@@ -7,6 +7,8 @@ import {
   statisticPrefixClasses,
   statisticSuffixClasses,
   formatStatisticValue,
+  canAnimateStatisticValue,
+  createStatisticNumberAnimation,
   classNames
 } from '@expcat/tigercat-core'
 
@@ -19,12 +21,42 @@ export const Statistic: React.FC<StatisticProps> = ({
   prefix,
   suffix,
   groupSeparator = false,
+  animated = false,
+  animationDuration,
   size = 'md',
   className
 }) => {
+  const initialValue = animated && canAnimateStatisticValue(value) ? 0 : value
+  const [displayValue, setDisplayValue] = useState<string | number | undefined>(initialValue)
+  const currentNumberRef = useRef(canAnimateStatisticValue(initialValue) ? initialValue : 0)
+
+  useEffect(() => {
+    if (!animated || !canAnimateStatisticValue(value)) {
+      setDisplayValue(value)
+      if (canAnimateStatisticValue(value)) currentNumberRef.current = value
+      return undefined
+    }
+
+    const controller = createStatisticNumberAnimation({
+      from: currentNumberRef.current,
+      to: value,
+      duration: animationDuration,
+      onUpdate: (next) => {
+        currentNumberRef.current = next
+        setDisplayValue(next)
+      },
+      onComplete: () => {
+        currentNumberRef.current = value
+        setDisplayValue(value)
+      }
+    })
+
+    return controller.stop
+  }, [value, animated, animationDuration])
+
   const formatted = useMemo(
-    () => formatStatisticValue(value, precision, groupSeparator),
-    [value, precision, groupSeparator]
+    () => formatStatisticValue(displayValue, precision, groupSeparator),
+    [displayValue, precision, groupSeparator]
   )
 
   return (

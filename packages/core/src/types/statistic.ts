@@ -19,6 +19,10 @@ export interface StatisticProps {
   suffix?: string
   /** Whether to show grouping separator (e.g. 1,000) */
   groupSeparator?: boolean
+  /** Whether to animate numeric values */
+  animated?: boolean
+  /** Numeric animation duration in milliseconds */
+  animationDuration?: number
   /** Component size */
   size?: StatisticSize
   /** Custom class name */

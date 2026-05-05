@@ -270,16 +270,18 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Props
 
-| Prop           | Type                   | Default | Vue | React | Description              |
-| -------------- | ---------------------- | ------- | :-: | :---: | ------------------------ |
-| title          | `string`               | -       |  ✓  |   ✓   | 标题/标签                |
-| value          | `string \| number`     | -       |  ✓  |   ✓   | 数值或文本               |
-| precision      | `number`               | -       |  ✓  |   ✓   | 数值精度（小数位数）     |
-| prefix         | `string`               | -       |  ✓  |   ✓   | 值前缀（如 ¥、$）        |
-| suffix         | `string`               | -       |  ✓  |   ✓   | 值后缀（如 %、元）       |
-| groupSeparator | `boolean`              | -       |  ✓  |   ✓   | 千分位分隔符（如 1,000） |
-| size           | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸                     |
-| className      | `string`               | -       |  -  |   ✓   | 自定义类名               |
+| Prop              | Type                   | Default | Vue | React | Description              |
+| ----------------- | ---------------------- | ------- | :-: | :---: | ------------------------ |
+| title             | `string`               | -       |  ✓  |   ✓   | 标题/标签                |
+| value             | `string \| number`     | -       |  ✓  |   ✓   | 数值或文本               |
+| precision         | `number`               | -       |  ✓  |   ✓   | 数值精度（小数位数）     |
+| prefix            | `string`               | -       |  ✓  |   ✓   | 值前缀（如 ¥、$）        |
+| suffix            | `string`               | -       |  ✓  |   ✓   | 值后缀（如 %、元）       |
+| groupSeparator    | `boolean`              | -       |  ✓  |   ✓   | 千分位分隔符（如 1,000） |
+| animated          | `boolean`              | `false` |  ✓  |   ✓   | 是否启用数字滚动动画     |
+| animationDuration | `number`               | `800`   |  ✓  |   ✓   | 数字动画时长（毫秒）     |
+| size              | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸                     |
+| className         | `string`               | -       |  -  |   ✓   | 自定义类名               |
 
 ### Slots / Children
 

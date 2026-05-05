@@ -519,6 +519,24 @@ describe('Menu', () => {
       expect(trigger1).toHaveAttribute('aria-expanded', 'false')
       expect(trigger2).toHaveAttribute('aria-expanded', 'true')
     })
+
+    it('uses height transition wrapper for inline submenu motion', async () => {
+      const user = userEvent.setup()
+      const { container } = render(
+        <Menu mode="inline">
+          <SubMenu itemKey="sub1" title="Submenu">
+            <MenuItem itemKey="1">Sub Item 1</MenuItem>
+          </SubMenu>
+        </Menu>
+      )
+
+      await user.click(screen.getByRole('menuitem', { name: 'Submenu' }))
+
+      const wrapper = container.querySelector('[data-tiger-submenu-motion="height"]')
+      expect(wrapper).toBeInTheDocument()
+      expect(wrapper?.className).toContain('transition-[height,opacity]')
+      expect(wrapper?.className).not.toContain('grid-rows')
+    })
   })
 
   describe('MenuItemGroup', () => {
