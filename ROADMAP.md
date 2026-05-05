@@ -60,7 +60,7 @@
 | Phase 7 | 测试覆盖率 & a11y 合规                           | ✅   |
 | Phase 8 | 文档 & Skills 更新                               | ✅   |
 
-详见 [docs/roadmap/04-v0.8.0-SPEC.md](docs/roadmap/04-v0.8.0-SPEC.md)
+未完成项见 [docs/roadmap/README.md](docs/roadmap/README.md)
 
 ## v0.9.0 生态完善与质量冲刺 (Ecosystem & Quality Sprint)
 
@@ -78,7 +78,7 @@
 新增组件: `InputGroup`, `PrintLayout`, `ImageViewer`
 新增 a11y 工具: `createFocusTrap`, `announceToScreenReader`, `manageLiveRegion`
 测试覆盖率: 4619 tests (237 test files)
-详见 [MIGRATION_v0.9.0.md](MIGRATION_v0.9.0.md) | [docs/roadmap/05-v0.9.0-SPEC.md](docs/roadmap/05-v0.9.0-SPEC.md)
+详见 [MIGRATION_v0.9.0.md](MIGRATION_v0.9.0.md) | 未完成项见 [docs/roadmap/README.md](docs/roadmap/README.md)
 
 ## v1.0.0 正式发布 (Stable Release)
 
@@ -95,7 +95,7 @@
 
 版本: v0.9.0 功能合并进 v1.0.0，跳过 v0.9.0 直接发布稳定版
 133+ 组件 | 4619+ 测试 | WCAG 2.1 AA | 8 语言 | 5 主题
-详见 [MIGRATION_v1.0.0.md](MIGRATION_v1.0.0.md) | [docs/roadmap/06-v1.0.0-SPEC.md](docs/roadmap/06-v1.0.0-SPEC.md)
+详见 [MIGRATION_v1.0.0.md](MIGRATION_v1.0.0.md) | 未完成项见 [docs/roadmap/README.md](docs/roadmap/README.md)
 
 ## 进度说明
 
