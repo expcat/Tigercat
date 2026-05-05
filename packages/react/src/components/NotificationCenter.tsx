@@ -99,8 +99,6 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     return index >= 0 ? resolvedGroups[index] : resolvedGroups[0]
   }, [currentGroupKey, resolvedGroups])
 
-  const _currentGroupItems = currentGroup?.items ?? []
-
   // --- Internal read-state management ---
   const [readStateOverrides, setReadStateOverrides] = useState(
     () => new Map<string | number, boolean>()
@@ -137,10 +135,16 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     return index >= 0 ? effectiveGroups[index] : effectiveGroups[0]
   }, [currentGroupKey, effectiveGroups])
 
-  const effectiveCurrentGroupItems = effectiveCurrentGroup?.items ?? []
+  const effectiveCurrentGroupItems = useMemo(
+    () => effectiveCurrentGroup?.items ?? [],
+    [effectiveCurrentGroup]
+  )
   const effectiveItems = useMemo(() => applyReadOverrides(items), [items, readStateOverrides])
 
-  const hasUnread = effectiveCurrentGroupItems.some((item) => !item.read)
+  const hasUnread = useMemo(
+    () => effectiveCurrentGroupItems.some((item) => !item.read),
+    [effectiveCurrentGroupItems]
+  )
 
   const totalUnread = useMemo(() => {
     const allItems = effectiveGroups.flatMap((group) => group.items)
@@ -151,6 +155,36 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   const wrapperClasses = useMemo(
     () => classNames('tiger-notification-center', 'w-full', 'flex', 'flex-col', className),
     [className]
+  )
+
+  const filterButtons = useMemo<Array<{ key: NotificationReadFilter; label: string }>>(
+    () => [
+      { key: 'all', label: allLabel },
+      { key: 'unread', label: unreadLabel },
+      { key: 'read', label: readLabel }
+    ],
+    [allLabel, unreadLabel, readLabel]
+  )
+
+  const groupTabData = useMemo(
+    () =>
+      resolvedGroups.map((group, index) => {
+        const effectiveGroup = effectiveGroups.find(
+          (eg, ei) => getGroupKey(eg, ei) === getGroupKey(group, index)
+        )
+        const groupItems = effectiveGroup?.items ?? group.items
+        const unreadCount = groupItems.filter((item) => !item.read).length
+        const labelBase = group.title || String(group.key ?? index)
+        const label = unreadCount > 0 ? `${labelBase} (${unreadCount})` : labelBase
+        const filteredItems = filterItems(groupItems, currentReadFilter)
+        return { key: getGroupKey(group, index), label, filteredItems }
+      }),
+    [resolvedGroups, effectiveGroups, currentReadFilter]
+  )
+
+  const filteredFlatItems = useMemo(
+    () => filterItems(effectiveItems, currentReadFilter),
+    [effectiveItems, currentReadFilter]
   )
 
   const handleGroupChange = (key: string | number) => {
@@ -238,12 +272,6 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     />
   )
 
-  const filterButtons: Array<{ key: NotificationReadFilter; label: string }> = [
-    { key: 'all', label: allLabel },
-    { key: 'unread', label: unreadLabel },
-    { key: 'read', label: readLabel }
-  ]
-
   const content = loading ? (
     <div className="flex items-center justify-center py-12">
       <Loading text={loadingText} />
@@ -251,31 +279,21 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
   ) : resolvedGroups.length > 0 ? (
     <div className="-mx-4 -mb-4">
       <Tabs type="line" size="small" activeKey={currentGroupKey} onChange={handleGroupChange}>
-        {resolvedGroups.map((group, index) => {
-          const effectiveGroup = effectiveGroups.find(
-            (eg, ei) => getGroupKey(eg, ei) === getGroupKey(group, index)
-          )
-          const groupItems = effectiveGroup?.items ?? group.items
-          const unreadCount = groupItems.filter((item) => !item.read).length
-          const labelBase = group.title || String(group.key ?? index)
-          const label = unreadCount > 0 ? `${labelBase} (${unreadCount})` : labelBase
-
-          return (
-            <TabPane
-              key={String(getGroupKey(group, index))}
-              tabKey={getGroupKey(group, index)}
-              label={label}>
-              <div className="max-h-[380px] overflow-y-auto">
-                {renderList(filterItems(groupItems, currentReadFilter))}
-              </div>
-            </TabPane>
-          )
-        })}
+        {groupTabData.map((tab) => (
+          <TabPane
+            key={String(tab.key)}
+            tabKey={tab.key}
+            label={tab.label}>
+            <div className="max-h-[380px] overflow-y-auto">
+              {renderList(tab.filteredItems)}
+            </div>
+          </TabPane>
+        ))}
       </Tabs>
     </div>
   ) : (
     <div className="-mx-4 -mb-4 max-h-[380px] overflow-y-auto">
-      {renderList(filterItems(effectiveItems, currentReadFilter))}
+      {renderList(filteredFlatItems)}
     </div>
   )
 

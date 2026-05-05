@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 Gauge rAF 动画 — Core 新增 `createGaugeAnimation` (rAF + easeOutCubic)，Vue/React GaugeChart 移除 CSS transition 改用 rAF 驱动的角度插值动画，构建与测试通过。
-- 推荐下一步：P1 NotificationCenter 缓存 — 分组、标签、已读未读派生数据使用 useMemo / computed。
+- 上一步完成：P1 ActivityFeed / Timeline 复用 — Core 新增 `ActivityTimelineItem` 类型桥接与 7 个 activity item 布局 class 常量，Vue/React ActivityFeed 统一消费共享 token，消除重复样式字符串与不安全类型断言，构建与测试通过。
+- 推荐下一步：P1 Composite a11y 角色 — DataTableWithToolbar / NotificationCenter / ActivityFeed / CommentThread 的 feed、group、dialog、list 等整体 ARIA 角色明确，并补回归测试。
 
 ## 未实现组件
 
@@ -57,8 +57,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 | 优先级 | 项目                         | 范围                                                                     | 完成标准                                                                                  |
 | ------ | ---------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| P1     | NotificationCenter 缓存      | NotificationCenter                                                       | 分组、标签、已读未读派生数据使用 useMemo / computed，并有测试覆盖                         |
-| P1     | ActivityFeed / Timeline 复用 | ActivityFeed / Timeline                                                  | ActivityFeed 与 Timeline 共用渲染或样式逻辑，避免重复实现                                 |
+| P1     | ~~NotificationCenter 缓存~~  | ~~NotificationCenter~~                                                       | ~~已完成：分组、标签、已读未读派生数据使用 useMemo / computed，移除死代码~~ |
+| P1     | ~~ActivityFeed / Timeline 复用~~ | ~~ActivityFeed / Timeline~~                                                  | ~~已完成：Core 新增 ActivityTimelineItem 类型与共享布局 class 常量，Vue/React 消除重复~~ |
 | P1     | Composite a11y 角色          | DataTableWithToolbar / NotificationCenter / ActivityFeed / CommentThread | feed、group、dialog、list 等整体 ARIA 角色明确，并补回归测试                              |
 | P1     | VirtualList 策略化           | VirtualList                                                              | fixed / variable / dynamic size 通过策略模式扩展，而不是在组件中继续增加分支              |
 | P1     | InfiniteScroll IO            | InfiniteScroll                                                           | 使用 IntersectionObserver sentinel，替代 scroll 事件方案或提供兼容 fallback               |

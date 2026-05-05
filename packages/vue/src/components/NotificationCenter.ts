@@ -178,8 +178,6 @@ export const NotificationCenter = defineComponent({
       return matchedIndex >= 0 ? groups[matchedIndex] : groups[0]
     })
 
-    const _currentGroupItems = computed(() => currentGroup.value?.items ?? [])
-
     // --- Internal read-state management ---
     const readStateOverrides = ref(new Map<string | number, boolean>())
 
@@ -238,6 +236,22 @@ export const NotificationCenter = defineComponent({
     }
 
     const hasUnread = computed(() => effectiveCurrentGroupItems.value.some((item) => !item.read))
+
+    const groupTabData = computed(() =>
+      resolvedGroups.value.map((group, index) => {
+        const effectiveGroup = effectiveGroups.value.find(
+          (eg, ei) => getGroupKey(eg, ei) === getGroupKey(group, index)
+        )
+        const groupItems = effectiveGroup?.items ?? group.items
+        const unreadCount = groupItems.filter((item) => !item.read).length
+        const labelBase = group.title || String(group.key ?? index)
+        const label = unreadCount > 0 ? `${labelBase} (${unreadCount})` : labelBase
+        const filteredItems = filterItems(groupItems)
+        return { key: getGroupKey(group, index), label, filteredItems }
+      })
+    )
+
+    const filteredFlatItems = computed(() => filterItems(effectiveItems.value))
 
     const wrapperClasses = computed(() =>
       classNames(
@@ -415,32 +429,24 @@ export const NotificationCenter = defineComponent({
         },
         {
           default: () =>
-            resolvedGroups.value.map((group, index) => {
-              const effectiveGroup = effectiveGroups.value.find(
-                (eg, ei) => getGroupKey(eg, ei) === getGroupKey(group, index)
-              )
-              const groupItems = effectiveGroup?.items ?? group.items
-              const unreadCount = groupItems.filter((item) => !item.read).length
-              const labelBase = group.title || String(group.key ?? index)
-              const label = unreadCount > 0 ? `${labelBase} (${unreadCount})` : labelBase
-
-              return h(
+            groupTabData.value.map((tab) =>
+              h(
                 TabPane,
                 {
-                  key: getGroupKey(group, index),
-                  tabKey: getGroupKey(group, index),
-                  label
+                  key: tab.key,
+                  tabKey: tab.key,
+                  label: tab.label
                 },
                 {
                   default: () =>
                     h(
                       'div',
                       { class: 'max-h-[380px] overflow-y-auto' },
-                      renderList(filterItems(groupItems))
+                      renderList(tab.filteredItems)
                     )
                 }
               )
-            })
+            )
         }
       )
 
@@ -481,7 +487,7 @@ export const NotificationCenter = defineComponent({
         : resolvedGroups.value.length > 0
           ? h('div', { class: '-mx-4 -mb-4' }, [renderTabs()])
           : h('div', { class: '-mx-4 -mb-4 max-h-[380px] overflow-y-auto' }, [
-              renderList(filterItems(effectiveItems.value))
+              renderList(filteredFlatItems.value)
             ])
 
       return h(

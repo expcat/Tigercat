@@ -6,11 +6,18 @@ import {
   formatActivityTime,
   mergeStyleValues,
   toActivityTimelineItems,
+  activityItemClasses,
+  activityItemLayoutClasses,
+  activityItemBodyClasses,
+  activityItemHeaderClasses,
+  activityItemTitleGroupClasses,
+  activityItemDescriptionClasses,
+  activityItemActionsClasses,
   type ActivityFeedProps as CoreActivityFeedProps,
   type ActivityGroup,
   type ActivityItem,
   type ActivityAction,
-  type TimelineItem
+  type ActivityTimelineItem
 } from '@expcat/tigercat-core'
 import { Timeline } from './Timeline'
 import { Avatar } from './Avatar'
@@ -141,10 +148,10 @@ export const ActivityFeed = defineComponent({
       return h(
         'div',
         {
-          class: 'tiger-activity-item'
+          class: activityItemClasses
         },
         [
-          h('div', { class: 'flex gap-3 items-start' }, [
+          h('div', { class: activityItemLayoutClasses }, [
             props.showAvatar && item.user
               ? h(Avatar, {
                   size: 'sm',
@@ -153,9 +160,9 @@ export const ActivityFeed = defineComponent({
                   className: 'shrink-0'
                 })
               : null,
-            h('div', { class: 'flex-1 min-w-0' }, [
-              h('div', { class: 'flex items-center justify-between gap-2 mb-1' }, [
-                h('div', { class: 'flex items-center gap-2 min-w-0' }, [
+            h('div', { class: activityItemBodyClasses }, [
+              h('div', { class: activityItemHeaderClasses }, [
+                h('div', { class: activityItemTitleGroupClasses }, [
                   titleText
                     ? h(
                         Text,
@@ -191,12 +198,12 @@ export const ActivityFeed = defineComponent({
               descriptionText
                 ? h(
                     Text,
-                    { tag: 'div', size: 'sm', color: 'muted', class: 'mb-2 break-words' },
+                    { tag: 'div', size: 'sm', color: 'muted', class: activityItemDescriptionClasses },
                     { default: () => descriptionText }
                   )
                 : null,
               actionNodes?.length
-                ? h('div', { class: 'flex flex-wrap gap-2' }, actionNodes as HChildren)
+                ? h('div', { class: activityItemActionsClasses }, actionNodes as HChildren)
                 : null
             ])
           ])
@@ -283,8 +290,8 @@ export const ActivityFeed = defineComponent({
               Timeline,
               { items: timelineItems },
               {
-                item: ({ item, index }: { item: TimelineItem; index: number }) => {
-                  const activity = (item as TimelineItem & { activity?: ActivityItem }).activity
+                item: ({ item, index }: { item: ActivityTimelineItem; index: number }) => {
+                  const activity = item.activity
                   if (!activity) return null
                   return renderDefaultItem(activity, index, group)
                 }

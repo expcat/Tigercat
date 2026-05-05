@@ -1,6 +1,24 @@
 import type { ActivityGroup, ActivityItem } from '../types/composite'
 import type { TimelineItem } from '../types/timeline'
 
+// ── Typed bridge ─────────────────────────────────────────────────
+/**
+ * A TimelineItem that carries the source ActivityItem,
+ * eliminating the need for unsafe casts in Vue/React renderers.
+ */
+export interface ActivityTimelineItem extends TimelineItem {
+  activity: ActivityItem
+}
+
+// ── Activity item layout class tokens (shared by Vue & React) ───
+export const activityItemClasses = 'tiger-activity-item'
+export const activityItemLayoutClasses = 'flex gap-3 items-start'
+export const activityItemBodyClasses = 'flex-1 min-w-0'
+export const activityItemHeaderClasses = 'flex items-center justify-between gap-2 mb-1'
+export const activityItemTitleGroupClasses = 'flex items-center gap-2 min-w-0'
+export const activityItemDescriptionClasses = 'mb-2 break-words'
+export const activityItemActionsClasses = 'flex flex-wrap gap-2'
+
 export const formatActivityTime = (value?: string | number | Date): string => {
   if (value == null || value === '') return ''
   if (value instanceof Date) return value.toLocaleString()
@@ -56,7 +74,7 @@ export const buildActivityGroups = (
 
 export const toActivityTimelineItems = (
   items: ActivityItem[]
-): (TimelineItem & { activity: ActivityItem })[] => {
+): ActivityTimelineItem[] => {
   return items.map((item, index) => ({
     key: item.id ?? index,
     activity: item

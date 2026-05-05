@@ -4,11 +4,18 @@ import {
   buildActivityGroups,
   formatActivityTime,
   toActivityTimelineItems,
+  activityItemClasses,
+  activityItemLayoutClasses,
+  activityItemBodyClasses,
+  activityItemHeaderClasses,
+  activityItemTitleGroupClasses,
+  activityItemDescriptionClasses,
+  activityItemActionsClasses,
   type ActivityFeedProps as CoreActivityFeedProps,
   type ActivityGroup,
   type ActivityItem,
   type ActivityAction,
-  type TimelineItem
+  type ActivityTimelineItem
 } from '@expcat/tigercat-core'
 import { Timeline } from './Timeline'
 import { Avatar } from './Avatar'
@@ -94,14 +101,14 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
     )
 
     return (
-      <div className="tiger-activity-item">
-        <div className="flex gap-3 items-start">
+      <div className={activityItemClasses}>
+        <div className={activityItemLayoutClasses}>
           {showAvatar && item.user ? (
             <Avatar size="sm" src={item.user.avatar} text={item.user.name} className="shrink-0" />
           ) : null}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2 mb-1">
-              <div className="flex items-center gap-2 min-w-0">
+          <div className={activityItemBodyClasses}>
+            <div className={activityItemHeaderClasses}>
+              <div className={activityItemTitleGroupClasses}>
                 {titleText ? (
                   <Text tag="div" size="sm" weight="medium" className="truncate">
                     {titleText}
@@ -120,11 +127,11 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
               ) : null}
             </div>
             {descriptionText ? (
-              <Text tag="div" size="sm" color="muted" className="mb-2 break-words">
+              <Text tag="div" size="sm" color="muted" className={activityItemDescriptionClasses}>
                 {descriptionText}
               </Text>
             ) : null}
-            {actionNodes?.length ? <div className="flex flex-wrap gap-2">{actionNodes}</div> : null}
+            {actionNodes?.length ? <div className={activityItemActionsClasses}>{actionNodes}</div> : null}
           </div>
         </div>
       </div>
@@ -176,8 +183,7 @@ export const ActivityFeed: React.FC<ActivityFeedProps> = ({
             <Timeline
               items={timelineItems}
               renderItem={(timelineItem, index) => {
-                const activity = (timelineItem as TimelineItem & { activity?: ActivityItem })
-                  .activity
+                const activity = (timelineItem as ActivityTimelineItem).activity
                 if (!activity) return null
                 return renderDefaultItem(activity, index, group)
               }}
