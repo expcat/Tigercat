@@ -155,11 +155,8 @@ export type { SubMenuProps } from './components/SubMenu'
 export { MenuItemGroup } from './components/MenuItemGroup'
 export type { MenuItemGroupProps } from './components/MenuItemGroup'
 
-export { Tabs, useTabsContext } from './components/Tabs'
-export type { TabsProps, TabsContextValue } from './components/Tabs'
-
-export { TabPane } from './components/TabPane'
-export type { TabPaneProps } from './components/TabPane'
+export { Tabs, TabPane, useTabsContext } from './components/Tabs'
+export type { TabsProps, TabPaneProps, TabsContextValue } from './components/Tabs'
 
 export { Breadcrumb, BreadcrumbItem, useBreadcrumbContext } from './components/Breadcrumb'
 export type {

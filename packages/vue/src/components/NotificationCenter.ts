@@ -11,8 +11,7 @@ import {
   type NotificationReadFilter
 } from '@expcat/tigercat-core'
 import { Card } from './Card'
-import { Tabs } from './Tabs'
-import { TabPane } from './TabPane'
+import { Tabs, TabPane } from './Tabs'
 import { List } from './List'
 import { Text } from './Text'
 import { Button } from './Button'
