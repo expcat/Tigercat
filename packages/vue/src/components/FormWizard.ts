@@ -15,8 +15,7 @@ import {
   type FormWizardValidator,
   type TigerLocale
 } from '@expcat/tigercat-core'
-import { Steps } from './Steps'
-import { StepsItem } from './StepsItem'
+import { Steps, StepsItem } from './Steps'
 import { Button } from './Button'
 import { useTigerConfig } from './ConfigProvider'
 

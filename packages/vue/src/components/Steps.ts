@@ -1,6 +1,7 @@
 import {
   defineComponent,
   computed,
+  inject,
   provide,
   PropType,
   h,
@@ -13,7 +14,15 @@ import {
   classNames,
   coerceClassValue,
   mergeStyleValues,
+  getStepItemClasses,
+  getStepIconClasses,
+  getStepTailClasses,
+  getStepContentClasses,
+  getStepTitleClasses,
+  getStepDescriptionClasses,
   getStepsContainerClasses,
+  calculateStepStatus,
+  stepFinishChar,
   type StepsDirection,
   type StepStatus,
   type StepSize
@@ -46,6 +55,235 @@ export interface VueStepsProps {
   className?: string
   style?: Record<string, unknown>
 }
+
+export interface VueStepsItemProps {
+  title: string
+  description?: string
+  icon?: unknown
+  status?: StepStatus
+  disabled?: boolean
+  className?: string
+  style?: Record<string, unknown>
+}
+
+export const StepsItem = defineComponent({
+  name: 'TigerStepsItem',
+  inheritAttrs: false,
+  props: {
+    /**
+     * Step title
+     */
+    title: {
+      type: String,
+      required: true
+    },
+    /**
+     * Step description
+     */
+    description: {
+      type: String,
+      default: undefined
+    },
+    /**
+     * Step icon (slot content or custom icon)
+     */
+    icon: {
+      type: [String, Object] as PropType<unknown>,
+      default: undefined
+    },
+    /**
+     * Step status (overrides automatic status)
+     */
+    status: {
+      type: String as PropType<StepStatus>,
+      default: undefined
+    },
+    /**
+     * Whether the step is disabled
+     */
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    className: {
+      type: String,
+      default: undefined
+    },
+    style: {
+      type: Object as PropType<Record<string, unknown>>,
+      default: undefined
+    },
+    /**
+     * Internal prop: step index (automatically set by parent)
+     */
+    stepIndex: {
+      type: Number,
+      default: 0
+    },
+    /**
+     * Internal prop: is last step (automatically set by parent)
+     */
+    isLast: {
+      type: Boolean,
+      default: false
+    }
+  },
+  setup(props, { slots, attrs }) {
+    const stepsContext = inject<StepsContext>(StepsContextKey, {
+      current: 0,
+      status: 'process',
+      direction: 'horizontal',
+      size: 'default',
+      simple: false,
+      clickable: false
+    })
+
+    const stepStatus = computed(() => {
+      return calculateStepStatus(
+        props.stepIndex,
+        stepsContext.current,
+        stepsContext.status,
+        props.status
+      )
+    })
+
+    const itemClasses = computed(() => {
+      return classNames(
+        getStepItemClasses(stepsContext.direction, props.isLast),
+        props.className,
+        coerceClassValue(attrs.class)
+      )
+    })
+
+    const iconClasses = computed(() => {
+      const hasCustomIcon = !!(props.icon || slots.icon)
+      return getStepIconClasses(
+        stepStatus.value,
+        stepsContext.size,
+        stepsContext.simple,
+        hasCustomIcon
+      )
+    })
+
+    const tailClasses = computed(() => {
+      return getStepTailClasses(
+        stepsContext.direction,
+        stepStatus.value,
+        props.isLast,
+        stepsContext.size,
+        stepsContext.simple
+      )
+    })
+
+    const contentClasses = computed(() => {
+      return getStepContentClasses(stepsContext.direction)
+    })
+
+    const titleClasses = computed(() => {
+      return getStepTitleClasses(
+        stepStatus.value,
+        stepsContext.size,
+        stepsContext.clickable && !props.disabled
+      )
+    })
+
+    const descriptionClasses = computed(() => {
+      return getStepDescriptionClasses(stepStatus.value, stepsContext.size)
+    })
+
+    const handleClick = () => {
+      if (props.disabled || !stepsContext.handleStepClick) {
+        return
+      }
+      stepsContext.handleStepClick(props.stepIndex)
+    }
+
+    const renderIcon = () => {
+      if (slots.icon) {
+        return h('div', { class: iconClasses.value }, slots.icon())
+      }
+
+      if (props.icon) {
+        return h('div', { class: iconClasses.value }, props.icon as unknown as RawChildren)
+      }
+
+      if (stepStatus.value === 'finish') {
+        return h('div', { class: iconClasses.value, 'aria-hidden': 'true' }, stepFinishChar)
+      }
+
+      return h('div', { class: iconClasses.value }, String(props.stepIndex + 1))
+    }
+
+    const renderContent = () => {
+      const children = []
+
+      if (stepsContext.clickable) {
+        children.push(
+          h(
+            'button',
+            {
+              type: 'button',
+              class: titleClasses.value,
+              onClick: handleClick,
+              disabled: props.disabled,
+              'aria-disabled': props.disabled || undefined
+            },
+            props.title
+          )
+        )
+      } else {
+        children.push(h('div', { class: titleClasses.value }, props.title))
+      }
+
+      if (!stepsContext.simple && (props.description || slots.description)) {
+        children.push(
+          h(
+            'div',
+            { class: descriptionClasses.value },
+            slots.description ? slots.description() : props.description
+          )
+        )
+      }
+
+      return h('div', { class: contentClasses.value }, children)
+    }
+
+    const mergedStyle = computed(() => mergeStyleValues(attrs.style, props.style))
+
+    return () => {
+      const { class: _class, style: _style, ...restAttrs } = attrs as Record<string, unknown>
+
+      if (stepsContext.direction === 'vertical') {
+        return h(
+          'li',
+          {
+            class: itemClasses.value,
+            style: mergedStyle.value,
+            'aria-current': props.stepIndex === stepsContext.current ? 'step' : undefined,
+            'aria-disabled': props.disabled || undefined,
+            ...restAttrs
+          },
+          [
+            h('div', { class: 'relative' }, [renderIcon(), h('div', { class: tailClasses.value })]),
+            renderContent()
+          ]
+        )
+      }
+
+      return h(
+        'li',
+        {
+          class: itemClasses.value,
+          style: mergedStyle.value,
+          'aria-current': props.stepIndex === stepsContext.current ? 'step' : undefined,
+          'aria-disabled': props.disabled || undefined,
+          ...restAttrs
+        },
+        [renderIcon(), h('div', { class: tailClasses.value }), renderContent()]
+      )
+    }
+  }
+})
 
 export const Steps = defineComponent({
   name: 'TigerSteps',
@@ -143,18 +381,14 @@ export const Steps = defineComponent({
         size: computed(() => props.size),
         simple: computed(() => props.simple),
         clickable: computed(() => props.clickable),
-        handleStepClick: computed(() => props.clickable ? handleStepClick : undefined)
+        handleStepClick: computed(() => (props.clickable ? handleStepClick : undefined))
       }) as StepsContext
     )
 
     return () => {
       const children = (slots.default?.() || []) as VNode[]
 
-      const {
-        class: _class,
-        style: _style,
-        ...restAttrs
-      } = attrs as Record<string, unknown>
+      const { class: _class, style: _style, ...restAttrs } = attrs as Record<string, unknown>
 
       // Add step index and isLast props to each step item
       const stepsWithProps = children.map((child, index: number) => {

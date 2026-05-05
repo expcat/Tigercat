@@ -125,6 +125,8 @@ skills/tigercat/
 
 3. 仅 React 特有（hooks、refs、context、受控/非受控）→ 放 `packages/react/src/components/*`
 
+4. 父子组合组件（如 `Steps` + `StepsItem`）→ 优先将父组件、子组件、context 放在父组件文件中统一导出；旧子组件文件保留为 re-export 兼容层，`packages/*/src/index.*` 从父组件文件导出，避免新的循环依赖和额外导出链。
+
 ## 变更完成标准（Definition of Done）
 
 对“新增组件”或“显著功能”默认满足：
