@@ -293,6 +293,17 @@ const data = [
   bordered="none"
   renderItem={(item) => <Card>{item.title}</Card>}
 />
+
+{
+  /* 大列表：复用 VirtualList，固定项高度 */
+}
+;<List
+  dataSource={largeData}
+  virtual
+  virtualHeight={480}
+  virtualItemHeight={56}
+  virtualOverscan={6}
+/>
 ```
 
 ---

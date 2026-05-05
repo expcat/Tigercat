@@ -132,6 +132,29 @@ describe('List', () => {
     expect(grid?.style.gap).toBe('12px')
   })
 
+  it('uses VirtualList when virtual mode is enabled', () => {
+    const largeDataSource = Array.from({ length: 100 }, (_, index) => ({
+      key: index,
+      title: `Item ${index}`
+    }))
+
+    render(List, {
+      props: {
+        dataSource: largeDataSource,
+        pagination: false,
+        virtual: true,
+        virtualHeight: 80,
+        virtualItemHeight: 20,
+        virtualOverscan: 0
+      }
+    })
+
+    const renderedItems = screen.getAllByRole('listitem')
+    expect(renderedItems.length).toBeLessThan(largeDataSource.length)
+    expect(screen.getByText('Item 0')).toBeInTheDocument()
+    expect(screen.queryByText('Item 50')).not.toBeInTheDocument()
+  })
+
   it('has no accessibility violations', async () => {
     const { container } = render(List, {
       props: {

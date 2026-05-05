@@ -128,6 +128,27 @@ export interface ListProps {
    */
   pagination?: ListPaginationConfig | false
   /**
+   * Enable fixed-height virtual rendering via VirtualList.
+   * Recommended for large non-grid lists.
+   * @default false
+   */
+  virtual?: boolean
+  /**
+   * Virtual viewport height in pixels.
+   * @default 400
+   */
+  virtualHeight?: number
+  /**
+   * Fixed virtual item height in pixels.
+   * @default 40
+   */
+  virtualItemHeight?: number
+  /**
+   * Number of extra virtual items to render above/below the viewport.
+   * @default 5
+   */
+  virtualOverscan?: number
+  /**
    * Grid configuration for grid layout
    */
   grid?: {

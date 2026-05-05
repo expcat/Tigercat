@@ -33,6 +33,7 @@ import {
   type ListItem,
   type ListPaginationConfig
 } from '@expcat/tigercat-core'
+import { VirtualList } from './VirtualList'
 
 const spinnerSvg = getSpinnerSVG('spinner')
 
@@ -115,6 +116,27 @@ export interface ListProps<
     xxl?: number
   }
   /**
+   * Enable fixed-height virtual rendering via VirtualList.
+   * Virtual mode applies to the current paginated data window and is ignored for grid lists.
+   * @default false
+   */
+  virtual?: boolean
+  /**
+   * Virtual viewport height in pixels.
+   * @default 400
+   */
+  virtualHeight?: number
+  /**
+   * Fixed virtual item height in pixels.
+   * @default 40
+   */
+  virtualItemHeight?: number
+  /**
+   * Number of extra virtual items to render above/below the viewport.
+   * @default 5
+   */
+  virtualOverscan?: number
+  /**
    * Function to get item key
    */
   rowKey?: string | ((item: T, index: number) => string | number)
@@ -158,6 +180,10 @@ export const List = <T extends ListItem = ListItem>({
   footer,
   pagination = false,
   grid,
+  virtual = false,
+  virtualHeight = 400,
+  virtualItemHeight = 40,
+  virtualOverscan = 5,
   rowKey = 'key',
   hoverable = false,
   renderItem,
@@ -404,6 +430,18 @@ export const List = <T extends ListItem = ListItem>({
           style={gutter ? ({ gap: `${gutter}px` } as React.CSSProperties) : undefined}>
           {items}
         </div>
+      )
+    }
+
+    if (virtual) {
+      return (
+        <VirtualList
+          itemCount={paginatedData.length}
+          itemHeight={virtualItemHeight}
+          height={virtualHeight}
+          overscan={virtualOverscan}
+          renderItem={({ index }) => renderListItem(paginatedData[index], index)}
+        />
       )
     }
 

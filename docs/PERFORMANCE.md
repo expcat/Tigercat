@@ -33,6 +33,12 @@ import { Button } from '@expcat/tigercat-vue/Button'
 </VirtualList>
 ```
 
+`List` 也可以在固定高度、非 grid 场景直接启用 VirtualList 路径：
+
+```tsx
+<List dataSource={items} virtual virtualHeight={480} virtualItemHeight={56} />
+```
+
 ## Table 导出工具
 
 CSV 导出工具位于 core 子路径，避免进入主入口常用路径：

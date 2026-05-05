@@ -28,11 +28,12 @@
 
 > 2026-05-05 执行：完成 Data / Table 性能二期。Table 新增 ResizeObserver + rAF 批量测量工具，Vue / React Table 用测得列宽更新 fixed column offset，并记录 row height 快照；virtual 策略明确为不自动启用，超过 `virtualThreshold` 时提供 `data-tiger-virtual-recommended="true"` 建议信号；CSV export 工具剥离到 `@expcat/tigercat-core/utils/table-export` 子路径。
 
+> 2026-05-05 执行：完成 Layout / List virtual mode。Vue / React List 在 virtual 模式下复用现有 VirtualList 渲染固定高度窗口，新增 virtualHeight / virtualItemHeight / virtualOverscan 配置；grid 列表继续保留原 grid 渲染路径，避免混用布局策略。
+
 ## 1. 最高优先级
 
 | 任务                      | 对应组件 / 范围              | 来源                                           | 完成标准                                                                 |
 | ------------------------- | ---------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------ |
-| List virtual mode         | List / VirtualList           | [phase2.4-layout.md](phase2.4-layout.md)       | List 复用 VirtualList，而不是保留独立虚拟逻辑或缺失虚拟路径              |
 | DataTableWithToolbar 边界 | DataTableWithToolbar / Table | [phase2.8-composite.md](phase2.8-composite.md) | 确认内部完全代理 Table 行为，只保留 toolbar 编排；必要时删掉重复状态逻辑 |
 
 ## 2. 分组索引
@@ -45,7 +46,7 @@
 | Basic                 | [phase2.1-basic.md](phase2.1-basic.md)                                   | Empty / Divider                                                                                                    |
 | Form                  | [phase2.2-form.md](phase2.2-form.md)                                     | Radio / Checkbox / Form 命令式 API；Form 校验复杂度与 picker-utils 二期已完成                                      |
 | Feedback              | [phase2.3-feedback.md](phase2.3-feedback.md)                             | 已完成 overlay 共享层                                                                                              |
-| Layout                | [phase2.4-layout.md](phase2.4-layout.md)                                 | Row / Col / Splitter / Resizable / List / Statistic / Descriptions / Container                                     |
+| Layout                | [phase2.4-layout.md](phase2.4-layout.md)                                 | Row / Col / Splitter / Resizable / Statistic / Descriptions / Container；List virtual mode 已完成                  |
 | Navigation            | [phase2.5-navigation.md](phase2.5-navigation.md)                         | Menu / Dropdown / Anchor / Breadcrumb / Steps / Tabs / Pagination / FloatButton                                    |
 | Data                  | [phase2.6-data.md](phase2.6-data.md)                                     | Timeline；Table 性能二期已完成                                                                                     |
 | Charts                | [phase2.7-charts.md](phase2.7-charts.md)                                 | TreeMap / Sunburst / Gauge / chart interaction hot paths                                                           |

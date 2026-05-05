@@ -141,21 +141,27 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Props
 
-| Prop       | Type                                                  | Default        | Vue  | React | Description    |
-| ---------- | ----------------------------------------------------- | -------------- | :--: | :---: | -------------- |
-| dataSource | `ListItem[]`                                          | `[]`           |  ✓   |   ✓   | 数据源         |
-| size       | `'sm' \| 'md' \| 'lg'`                                | `'md'`         |  ✓   |   ✓   | 列表尺寸       |
-| bordered   | `'none' \| 'divided' \| 'bordered'`                   | `'divided'`    |  ✓   |   ✓   | 边框样式       |
-| split      | `boolean`                                             | `true`         |  ✓   |   ✓   | 是否显示分割线 |
-| itemLayout | `'horizontal' \| 'vertical'`                          | `'horizontal'` |  ✓   |   ✓   | 列表项布局     |
-| loading    | `boolean`                                             | `false`        |  ✓   |   ✓   | 加载状态       |
-| emptyText  | `string`                                              | `'No data'`    |  ✓   |   ✓   | 空状态文案     |
-| hoverable  | `boolean`                                             | `false`        |  ✓   |   ✓   | 鼠标悬停效果   |
-| rowKey     | `string \| ((item, index) => string \| number)`       | `'key'`        |  ✓   |   ✓   | 行键           |
-| pagination | `ListPaginationConfig \| false`                       | `false`        |  ✓   |   ✓   | 分页配置       |
-| grid       | `{ gutter?, column?, xs?, sm?, md?, lg?, xl?, xxl? }` | -              |  ✓   |   ✓   | 网格布局       |
-| header     | -                                                     | -              | slot | prop  | 头部内容       |
-| footer     | -                                                     | -              | slot | prop  | 底部内容       |
+| Prop              | Type                                                  | Default        | Vue  | React | Description                       |
+| ----------------- | ----------------------------------------------------- | -------------- | :--: | :---: | --------------------------------- |
+| dataSource        | `ListItem[]`                                          | `[]`           |  ✓   |   ✓   | 数据源                            |
+| size              | `'sm' \| 'md' \| 'lg'`                                | `'md'`         |  ✓   |   ✓   | 列表尺寸                          |
+| bordered          | `'none' \| 'divided' \| 'bordered'`                   | `'divided'`    |  ✓   |   ✓   | 边框样式                          |
+| split             | `boolean`                                             | `true`         |  ✓   |   ✓   | 是否显示分割线                    |
+| itemLayout        | `'horizontal' \| 'vertical'`                          | `'horizontal'` |  ✓   |   ✓   | 列表项布局                        |
+| loading           | `boolean`                                             | `false`        |  ✓   |   ✓   | 加载状态                          |
+| emptyText         | `string`                                              | `'No data'`    |  ✓   |   ✓   | 空状态文案                        |
+| hoverable         | `boolean`                                             | `false`        |  ✓   |   ✓   | 鼠标悬停效果                      |
+| rowKey            | `string \| ((item, index) => string \| number)`       | `'key'`        |  ✓   |   ✓   | 行键                              |
+| pagination        | `ListPaginationConfig \| false`                       | `false`        |  ✓   |   ✓   | 分页配置                          |
+| virtual           | `boolean`                                             | `false`        |  ✓   |   ✓   | 启用 VirtualList 固定高度虚拟渲染 |
+| virtualHeight     | `number`                                              | `400`          |  ✓   |   ✓   | virtual 视口高度                  |
+| virtualItemHeight | `number`                                              | `40`           |  ✓   |   ✓   | virtual 固定项高度                |
+| virtualOverscan   | `number`                                              | `5`            |  ✓   |   ✓   | virtual 额外渲染项数              |
+| grid              | `{ gutter?, column?, xs?, sm?, md?, lg?, xl?, xxl? }` | -              |  ✓   |   ✓   | 网格布局                          |
+| header            | -                                                     | -              | slot | prop  | 头部内容                          |
+| footer            | -                                                     | -              | slot | prop  | 底部内容                          |
+
+> `virtual` 复用 VirtualList，仅适用于固定高度的非 grid 列表；开启分页时虚拟化当前页数据窗口。
 
 ### Slots / Children
 
@@ -264,23 +270,23 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Props
 
-| Prop           | Type                  | Default | Vue | React | Description                     |
-| -------------- | --------------------- | ------- | :-: | :---: | ------------------------------- |
-| title          | `string`              | -       |  ✓  |   ✓   | 标题/标签                       |
-| value          | `string \| number`    | -       |  ✓  |   ✓   | 数值或文本                      |
-| precision      | `number`              | -       |  ✓  |   ✓   | 数值精度（小数位数）            |
-| prefix         | `string`              | -       |  ✓  |   ✓   | 值前缀（如 ¥、$）              |
-| suffix         | `string`              | -       |  ✓  |   ✓   | 值后缀（如 %、元）             |
-| groupSeparator | `boolean`             | -       |  ✓  |   ✓   | 千分位分隔符（如 1,000）        |
-| size           | `'sm' \| 'md' \| 'lg'` | `'md'` |  ✓  |   ✓   | 尺寸                            |
-| className      | `string`              | -       |  -  |   ✓   | 自定义类名                      |
+| Prop           | Type                   | Default | Vue | React | Description              |
+| -------------- | ---------------------- | ------- | :-: | :---: | ------------------------ |
+| title          | `string`               | -       |  ✓  |   ✓   | 标题/标签                |
+| value          | `string \| number`     | -       |  ✓  |   ✓   | 数值或文本               |
+| precision      | `number`               | -       |  ✓  |   ✓   | 数值精度（小数位数）     |
+| prefix         | `string`               | -       |  ✓  |   ✓   | 值前缀（如 ¥、$）        |
+| suffix         | `string`               | -       |  ✓  |   ✓   | 值后缀（如 %、元）       |
+| groupSeparator | `boolean`              | -       |  ✓  |   ✓   | 千分位分隔符（如 1,000） |
+| size           | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸                     |
+| className      | `string`               | -       |  -  |   ✓   | 自定义类名               |
 
 ### Slots / Children
 
-| Vue Slot  | React Prop | Description      |
-| --------- | ---------- | ---------------- |
-| `prefix`  | `prefix`   | 自定义前缀内容   |
-| `suffix`  | `suffix`   | 自定义后缀内容   |
+| Vue Slot | React Prop | Description    |
+| -------- | ---------- | -------------- |
+| `prefix` | `prefix`   | 自定义前缀内容 |
+| `suffix` | `suffix`   | 自定义后缀内容 |
 
 ---
 

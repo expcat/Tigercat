@@ -46,6 +46,7 @@ import {
   type ListItem,
   type ListPaginationConfig
 } from '@expcat/tigercat-core'
+import { VirtualList } from './VirtualList'
 
 const spinnerSvg = getSpinnerSVG('spinner')
 
@@ -139,6 +140,35 @@ export const List = defineComponent({
         xl?: number
         xxl?: number
       }>
+    },
+    /**
+     * Enable fixed-height virtual rendering via VirtualList.
+     * Virtual mode applies to the current paginated data window and is ignored for grid lists.
+     */
+    virtual: {
+      type: Boolean,
+      default: false
+    },
+    /**
+     * Virtual viewport height in pixels.
+     */
+    virtualHeight: {
+      type: Number,
+      default: 400
+    },
+    /**
+     * Fixed virtual item height in pixels.
+     */
+    virtualItemHeight: {
+      type: Number,
+      default: 40
+    },
+    /**
+     * Number of extra virtual items to render above/below the viewport.
+     */
+    virtualOverscan: {
+      type: Number,
+      default: 5
     },
     /**
      * Function to get item key
@@ -441,6 +471,24 @@ export const List = defineComponent({
             style: gutter ? { gap: `${gutter}px` } : undefined
           },
           items
+        )
+      }
+
+      if (props.virtual) {
+        return h(
+          VirtualList,
+          {
+            itemCount: paginatedData.value.length,
+            itemHeight: props.virtualItemHeight,
+            height: props.virtualHeight,
+            overscan: props.virtualOverscan
+          },
+          {
+            default: ({ index }: { index: number }) => {
+              const item = paginatedData.value[index]
+              return item ? renderListItem(item, index) : null
+            }
+          }
         )
       }
 
