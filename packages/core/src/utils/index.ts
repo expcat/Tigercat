@@ -50,6 +50,9 @@ export * from './composite-time-utils'
 // TaskBoard utilities
 export * from './task-board-utils'
 
+// TaskBoard drag controller (unified DnD + touch + keyboard)
+export * from './task-board-drag'
+
 // Cascader utilities
 export * from './cascader-utils'
 

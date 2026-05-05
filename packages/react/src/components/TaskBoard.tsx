@@ -23,19 +23,13 @@ import {
   moveCard,
   reorderColumns,
   isWipExceeded,
-  getDropIndex,
-  getColumnDropIndex,
-  createCardDragData,
-  createColumnDragData,
-  parseDragData,
-  setDragData,
-  createTouchDragTracker,
-  findColumnFromPoint,
+  createTaskBoardDragController,
+  createDefaultDragSnapshot,
   type TaskBoardProps as CoreTaskBoardProps,
   type TaskBoardColumn,
   type TaskBoardCard,
-  type TaskBoardDragState,
-  type TouchDragTracker
+  type TaskBoardDragSnapshot,
+  type TaskBoardDragController
 } from '@expcat/tigercat-core'
 import { useTigerConfig } from './ConfigProvider'
 
@@ -51,12 +45,7 @@ interface CardItemProps {
   draggable: boolean
   dragHintText: string
   renderCard?: (card: TaskBoardCard, columnId: string | number) => React.ReactNode
-  onDragStart: (e: React.DragEvent, card: TaskBoardCard, column: TaskBoardColumn) => void
-  onDragEnd: () => void
-  onTouchStart: (e: React.TouchEvent, card: TaskBoardCard, column: TaskBoardColumn) => void
-  onTouchMove: (e: React.TouchEvent) => void
-  onTouchEnd: () => void
-  onKeyDown: (e: React.KeyboardEvent, card: TaskBoardCard, column: TaskBoardColumn) => void
+  dragCtrl: TaskBoardDragController
 }
 
 const CardItem = React.memo<CardItemProps>(
@@ -68,12 +57,7 @@ const CardItem = React.memo<CardItemProps>(
     draggable,
     dragHintText,
     renderCard,
-    onDragStart,
-    onDragEnd,
-    onTouchStart,
-    onTouchMove,
-    onTouchEnd,
-    onKeyDown
+    dragCtrl
   }) => {
     const cardClasses = classNames(
       taskBoardCardClasses,
@@ -91,12 +75,12 @@ const CardItem = React.memo<CardItemProps>(
         aria-grabbed={isKbGrabbed ? 'true' : undefined}
         data-tiger-taskboard-card=""
         data-tiger-taskboard-card-id={String(card.id)}
-        onDragStart={(e) => onDragStart(e, card, column)}
-        onDragEnd={onDragEnd}
-        onTouchStart={(e) => onTouchStart(e, card, column)}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-        onKeyDown={(e) => onKeyDown(e, card, column)}>
+        onDragStart={(e) => { if (e.dataTransfer) dragCtrl.cardDragStart(e.dataTransfer, card, column) }}
+        onDragEnd={() => dragCtrl.dragEnd()}
+        onTouchStart={(e) => dragCtrl.cardTouchStart(e.nativeEvent, e.currentTarget as HTMLElement, card, column)}
+        onTouchMove={(e) => dragCtrl.cardTouchMove(e.nativeEvent)}
+        onTouchEnd={() => dragCtrl.cardTouchEnd()}
+        onKeyDown={(e) => { if (dragCtrl.cardKeyDown(e.key, card, column)) e.preventDefault() }}>
         {renderCard ? (
           renderCard(card, column.id)
         ) : (
@@ -136,21 +120,7 @@ interface ColumnItemProps {
   renderEmptyColumn?: (column: TaskBoardColumn) => React.ReactNode
   onCardAdd?: (columnId: string | number) => void
   dragType: 'card' | 'column' | null
-  onCardDragStart: (e: React.DragEvent, card: TaskBoardCard, column: TaskBoardColumn) => void
-  onCardDragOver: (e: React.DragEvent, column: TaskBoardColumn) => void
-  onCardDrop: (e: React.DragEvent, column: TaskBoardColumn) => void
-  onDragEnd: () => void
-  onDragLeave: (e: React.DragEvent) => void
-  onColumnDragStart: (e: React.DragEvent, col: TaskBoardColumn, idx: number) => void
-  onColumnDragOver: (e: React.DragEvent) => void
-  onColumnDrop: (e: React.DragEvent) => void
-  onCardTouchStart: (e: React.TouchEvent, card: TaskBoardCard, column: TaskBoardColumn) => void
-  onCardTouchMove: (e: React.TouchEvent) => void
-  onCardTouchEnd: () => void
-  onColumnTouchStart: (e: React.TouchEvent, col: TaskBoardColumn, idx: number) => void
-  onColumnTouchMove: (e: React.TouchEvent) => void
-  onColumnTouchEnd: () => void
-  onCardKeyDown: (e: React.KeyboardEvent, card: TaskBoardCard, column: TaskBoardColumn) => void
+  dragCtrl: TaskBoardDragController
   dragStateId: string | number | null
   kbDragStateId: string | number | null
   showCardCount: boolean
@@ -173,21 +143,7 @@ const ColumnItem = React.memo<ColumnItemProps>(
     renderEmptyColumn,
     onCardAdd,
     dragType,
-    onCardDragStart,
-    onCardDragOver,
-    onCardDrop,
-    onDragEnd,
-    onDragLeave,
-    onColumnDragStart,
-    onColumnDragOver,
-    onColumnDrop,
-    onCardTouchStart,
-    onCardTouchMove,
-    onCardTouchEnd,
-    onColumnTouchStart,
-    onColumnTouchMove,
-    onColumnTouchEnd,
-    onCardKeyDown,
+    dragCtrl,
     dragStateId,
     kbDragStateId,
     showCardCount,
@@ -222,12 +178,7 @@ const ColumnItem = React.memo<ColumnItemProps>(
             draggable={draggable}
             dragHintText={labels.dragHintText}
             renderCard={renderCardProp}
-            onDragStart={onCardDragStart}
-            onDragEnd={onDragEnd}
-            onTouchStart={onCardTouchStart}
-            onTouchMove={onCardTouchMove}
-            onTouchEnd={onCardTouchEnd}
-            onKeyDown={onCardKeyDown}
+            dragCtrl={dragCtrl}
           />
         )
       })
@@ -255,17 +206,17 @@ const ColumnItem = React.memo<ColumnItemProps>(
         className={colClasses}
         data-tiger-taskboard-column=""
         data-tiger-taskboard-column-id={String(column.id)}
-        onDragOver={dragType === 'column' ? onColumnDragOver : undefined}
-        onDrop={dragType === 'column' ? onColumnDrop : undefined}>
+        onDragOver={dragType === 'column' ? (e: React.DragEvent) => { e.preventDefault(); dragCtrl.columnDragOver() } : undefined}
+        onDrop={dragType === 'column' ? (e: React.DragEvent) => { e.preventDefault(); if (e.dataTransfer) dragCtrl.columnDrop(e.dataTransfer, e.clientX) } : undefined}>
         {/* Column header */}
         <div
           className={taskBoardColumnHeaderClasses}
           draggable={columnDraggable}
-          onDragStart={(e) => onColumnDragStart(e, column, colIndex)}
-          onDragEnd={onDragEnd}
-          onTouchStart={(e) => onColumnTouchStart(e, column, colIndex)}
-          onTouchMove={onColumnTouchMove}
-          onTouchEnd={onColumnTouchEnd}
+          onDragStart={(e) => { if (e.dataTransfer) dragCtrl.columnDragStart(e.dataTransfer, column, colIndex) }}
+          onDragEnd={() => dragCtrl.dragEnd()}
+          onTouchStart={(e) => dragCtrl.columnTouchStart(e.nativeEvent, e.currentTarget as HTMLElement, column, colIndex)}
+          onTouchMove={(e) => dragCtrl.columnTouchMove(e.nativeEvent)}
+          onTouchEnd={() => dragCtrl.columnTouchEnd()}
           style={columnDraggable ? { cursor: 'grab' } : undefined}>
           {renderColumnHeader ? (
             renderColumnHeader(column)
@@ -308,9 +259,9 @@ const ColumnItem = React.memo<ColumnItemProps>(
           className={taskBoardColumnBodyClasses}
           role="list"
           aria-label={column.title}
-          onDragOver={(e) => onCardDragOver(e, column)}
-          onDrop={(e) => onCardDrop(e, column)}
-          onDragLeave={onDragLeave}>
+          onDragOver={(e) => { e.preventDefault(); dragCtrl.cardDragOver(e.clientY, e.currentTarget as HTMLElement, column) }}
+          onDrop={(e) => { e.preventDefault(); if (e.dataTransfer) dragCtrl.cardDrop(e.dataTransfer, column) }}
+          onDragLeave={(e) => dragCtrl.dragLeave(e.currentTarget as HTMLElement, e.relatedTarget as Element | null)}>
           {cardsContent}
         </div>
 
@@ -437,15 +388,10 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
     [onColumnsChange]
   )
 
-  // ---- drag state ----
-  const [dragState, setDragState] = useState<TaskBoardDragState | null>(null)
-  const [dropTargetColumnId, setDropTargetColumnId] = useState<string | number | null>(null)
-  const [dropIdx, setDropIdx] = useState(-1)
-  const [kbDragState, setKbDragState] = useState<TaskBoardDragState | null>(null)
+  // ---- drag controller (unified DnD + touch + keyboard) ----
+  const [dragSnap, setDragSnap] = useState<TaskBoardDragSnapshot>(createDefaultDragSnapshot)
 
   const boardRef = useRef<HTMLDivElement>(null)
-  const touchTrackerRef = useRef<TouchDragTracker | null>(null)
-  const touchRafRef = useRef(0)
 
   // Stable refs for async validation callbacks
   const beforeCardMoveRef = useRef(beforeCardMove)
@@ -458,26 +404,6 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
   onColumnMoveRef.current = onColumnMove
   const enforceWipLimitRef = useRef(enforceWipLimit)
   enforceWipLimitRef.current = enforceWipLimit
-
-  useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      ('ontouchstart' in window || navigator.maxTouchPoints > 0)
-    ) {
-      touchTrackerRef.current = createTouchDragTracker()
-    }
-    return () => cancelAnimationFrame(touchRafRef.current)
-  }, [])
-
-  const resetDrag = useCallback(() => {
-    setDragState(null)
-    setDropTargetColumnId(null)
-    setDropIdx(-1)
-  }, [])
-
-  // ===================================================================
-  // Unified apply helpers — validation + WIP + commit
-  // ===================================================================
 
   const applyCardMove = useCallback(
     async (
@@ -519,219 +445,43 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
     [updateColumns]
   )
 
-  // ---- HTML5 DnD: cards ----
-  const handleCardDragStart = useCallback(
-    (e: React.DragEvent, card: TaskBoardCard, column: TaskBoardColumn) => {
-      if (!draggable) return
-      const idx = column.cards.findIndex((c) => c.id === card.id)
-      setDragData(e.dataTransfer, createCardDragData(card.id, column.id, idx))
-      setDragState({ type: 'card', id: card.id, fromColumnId: column.id, fromIndex: idx })
-    },
-    [draggable]
-  )
+  const dragCtrlRef = useRef<TaskBoardDragController | null>(null)
+  if (!dragCtrlRef.current) {
+    dragCtrlRef.current = createTaskBoardDragController(
+      {
+        onStateChange: setDragSnap,
+        applyCardMove: (...args) => applyCardMoveRef.current(...args),
+        applyColumnMove: (...args) => applyColumnMoveRef.current(...args),
+        getBoardEl: () => boardRef.current,
+        getColumnCount: () => columnsRef.current.length
+      },
+      { draggable, columnDraggable }
+    )
+  }
+  const dragCtrl = dragCtrlRef.current
 
-  const handleCardDragOver = useCallback(
-    (e: React.DragEvent, column: TaskBoardColumn) => {
-      e.preventDefault()
-      if (!dragState || dragState.type !== 'card') return
-      setDropTargetColumnId(column.id)
+  // Stable refs for apply callbacks (avoids stale closures in controller)
+  const applyCardMoveRef = useRef(applyCardMove)
+  applyCardMoveRef.current = applyCardMove
+  const applyColumnMoveRef = useRef(applyColumnMove)
+  applyColumnMoveRef.current = applyColumnMove
 
-      const target = e.currentTarget as HTMLElement
-      const cardEls = target.querySelectorAll('[data-tiger-taskboard-card]')
-      const rects: DOMRect[] = []
-      cardEls.forEach((el) => rects.push(el.getBoundingClientRect()))
-      setDropIdx(getDropIndex(e.clientY, rects))
-    },
-    [dragState]
-  )
+  // Keep controller options in sync with props
+  useEffect(() => {
+    dragCtrl.setOptions({ draggable, columnDraggable })
+  }, [draggable, columnDraggable, dragCtrl])
 
-  const handleCardDrop = useCallback(
-    (e: React.DragEvent, column: TaskBoardColumn) => {
-      e.preventDefault()
-      const data = parseDragData(e.dataTransfer)
-      if (!data || data.type !== 'card') return
-
-      applyCardMove(
-        data.cardId,
-        data.columnId,
-        column.id,
-        dropIdx >= 0 ? dropIdx : column.cards.length
-      )
-      resetDrag()
-    },
-    [dropIdx, applyCardMove, resetDrag]
-  )
-
-  // ---- HTML5 DnD: columns ----
-  const handleColumnDragStart = useCallback(
-    (e: React.DragEvent, column: TaskBoardColumn, index: number) => {
-      if (!columnDraggable) return
-      setDragData(e.dataTransfer, createColumnDragData(column.id, index))
-      setDragState({ type: 'column', id: column.id, fromIndex: index })
-    },
-    [columnDraggable]
-  )
-
-  const handleColumnDragOver = useCallback(
-    (e: React.DragEvent) => {
-      if (!dragState || dragState.type !== 'column') return
-      e.preventDefault()
-    },
-    [dragState]
-  )
-
-  const handleColumnDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault()
-      const data = parseDragData(e.dataTransfer)
-      if (!data || data.type !== 'column') return
-
-      const colEls = boardRef.current?.querySelectorAll('[data-tiger-taskboard-column]')
-      if (!colEls) return
-      const rects: DOMRect[] = []
-      colEls.forEach((el) => rects.push(el.getBoundingClientRect()))
-      const toIdx = getColumnDropIndex(e.clientX, rects)
-
-      applyColumnMove(data.index, toIdx)
-      resetDrag()
-    },
-    [applyColumnMove, resetDrag]
-  )
-
-  const handleDragEnd = useCallback(() => resetDrag(), [resetDrag])
-
-  const handleDragLeave = useCallback(
-    (e: React.DragEvent) => {
-      const related = e.relatedTarget as HTMLElement | null
-      if (!related || !(e.currentTarget as HTMLElement).contains(related)) {
-        if (dragState?.type === 'card') {
-          setDropTargetColumnId(null)
-          setDropIdx(-1)
-        }
-      }
-    },
-    [dragState]
-  )
-
-  // ---- Touch fallback: cards ----
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent, card: TaskBoardCard, column: TaskBoardColumn) => {
-      if (!draggable || !touchTrackerRef.current) return
-      const idx = column.cards.findIndex((c) => c.id === card.id)
-      touchTrackerRef.current.onTouchStart(e.nativeEvent, e.currentTarget as HTMLElement)
-      setDragState({ type: 'card', id: card.id, fromColumnId: column.id, fromIndex: idx })
-    },
-    [draggable]
-  )
-
-  const handleTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (!touchTrackerRef.current || !dragState) return
-      touchTrackerRef.current.onTouchMove(e.nativeEvent)
-
-      cancelAnimationFrame(touchRafRef.current)
-      touchRafRef.current = requestAnimationFrame(() => {
-        const st = touchTrackerRef.current!.getState()
-        if (dragState?.type === 'card') {
-          const colEl = findColumnFromPoint(st.currentX, st.currentY, boardRef.current)
-          if (colEl) {
-            const colId = colEl.getAttribute('data-tiger-taskboard-column-id')
-            setDropTargetColumnId(colId ?? null)
-            const cardEls = colEl.querySelectorAll('[data-tiger-taskboard-card]')
-            const rects: DOMRect[] = []
-            cardEls.forEach((el) => rects.push(el.getBoundingClientRect()))
-            setDropIdx(getDropIndex(st.currentY, rects))
-          }
-        }
-      })
-    },
-    [dragState]
-  )
-
-  const handleTouchEnd = useCallback(() => {
-    if (!touchTrackerRef.current || !dragState) return
-    touchTrackerRef.current.onTouchEnd()
-
-    if (dragState.type === 'card' && dropTargetColumnId != null) {
-      applyCardMove(
-        dragState.id,
-        dragState.fromColumnId!,
-        dropTargetColumnId,
-        dropIdx >= 0 ? dropIdx : 0
-      )
-    }
-    resetDrag()
-  }, [dragState, dropIdx, dropTargetColumnId, applyCardMove, resetDrag])
-
-  // ---- Touch fallback: columns ----
-  const handleColumnTouchStart = useCallback(
-    (e: React.TouchEvent, column: TaskBoardColumn, index: number) => {
-      if (!columnDraggable || !touchTrackerRef.current) return
-      touchTrackerRef.current.onTouchStart(e.nativeEvent, e.currentTarget as HTMLElement)
-      setDragState({ type: 'column', id: column.id, fromIndex: index })
-    },
-    [columnDraggable]
-  )
-
-  const handleColumnTouchMove = useCallback(
-    (e: React.TouchEvent) => {
-      if (!touchTrackerRef.current || !dragState || dragState.type !== 'column') return
-      touchTrackerRef.current.onTouchMove(e.nativeEvent)
-    },
-    [dragState]
-  )
-
-  const handleColumnTouchEnd = useCallback(() => {
-    if (!touchTrackerRef.current || !dragState || dragState.type !== 'column') return
-    const st = touchTrackerRef.current.onTouchEnd()
-
-    const colEls = boardRef.current?.querySelectorAll('[data-tiger-taskboard-column]')
-    if (!colEls) {
-      resetDrag()
-      return
-    }
-    const rects: DOMRect[] = []
-    colEls.forEach((el) => rects.push(el.getBoundingClientRect()))
-    const toIdx = getColumnDropIndex(st.currentX, rects)
-
-    applyColumnMove(dragState.fromIndex, Math.min(toIdx, columnsRef.current.length - 1))
-    resetDrag()
-  }, [dragState, applyColumnMove, resetDrag])
-
-  // ---- Keyboard DnD ----
-  const handleCardKeyDown = useCallback(
-    (e: React.KeyboardEvent, card: TaskBoardCard, column: TaskBoardColumn) => {
-      if (!draggable) return
-
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault()
-        if (!kbDragState) {
-          const idx = column.cards.findIndex((c) => c.id === card.id)
-          setKbDragState({ type: 'card', id: card.id, fromColumnId: column.id, fromIndex: idx })
-        } else {
-          const cardIdx = column.cards.findIndex((c) => c.id === card.id)
-          if (kbDragState.fromColumnId !== undefined) {
-            applyCardMove(kbDragState.id, kbDragState.fromColumnId, column.id, cardIdx)
-          }
-          setKbDragState(null)
-        }
-        return
-      }
-
-      if (e.key === 'Escape' && kbDragState) {
-        e.preventDefault()
-        setKbDragState(null)
-      }
-    },
-    [draggable, kbDragState, applyCardMove]
-  )
+  useEffect(() => {
+    dragCtrl.init()
+    return () => dragCtrl.dispose()
+  }, [dragCtrl])
 
   // ---- render ----
   const wrapperClasses = useMemo(() => classNames(taskBoardBaseClasses, className), [className])
 
-  const dragType = dragState?.type ?? null
-  const dragStateId = (dragState?.type === 'card' ? dragState.id : null) as string | number | null
-  const kbDragStateId = (kbDragState?.id ?? null) as string | number | null
+  const dragType = dragSnap.drag?.type ?? null
+  const dragStateId = (dragSnap.drag?.type === 'card' ? dragSnap.drag.id : null) as string | number | null
+  const kbDragStateId = (dragSnap.kbDrag?.id ?? null) as string | number | null
 
   return (
     <div
@@ -743,8 +493,8 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
       data-tiger-task-board=""
       {...rest}>
       {visibleColumns.map((col, i) => {
-        const isDropTarget = dragState?.type === 'card' && dropTargetColumnId === col.id
-        const isColDragging = dragState?.type === 'column' && dragState.id === col.id
+        const isDropTarget = dragSnap.drag?.type === 'card' && dragSnap.dropTargetColumnId === col.id
+        const isColDragging = dragSnap.drag?.type === 'column' && dragSnap.drag.id === col.id
 
         return (
           <ColumnItem
@@ -753,7 +503,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
             colIndex={i}
             isDropTarget={isDropTarget}
             isColDragging={isColDragging}
-            dropIdx={isDropTarget ? dropIdx : -1}
+            dropIdx={isDropTarget ? dragSnap.dropIndex : -1}
             draggable={draggable}
             columnDraggable={columnDraggable}
             labels={labels}
@@ -763,21 +513,7 @@ export const TaskBoard: React.FC<TaskBoardProps> = ({
             renderEmptyColumn={renderEmptyColumn}
             onCardAdd={onCardAdd}
             dragType={dragType}
-            onCardDragStart={handleCardDragStart}
-            onCardDragOver={handleCardDragOver}
-            onCardDrop={handleCardDrop}
-            onDragEnd={handleDragEnd}
-            onDragLeave={handleDragLeave}
-            onColumnDragStart={handleColumnDragStart}
-            onColumnDragOver={handleColumnDragOver}
-            onColumnDrop={handleColumnDrop}
-            onCardTouchStart={handleTouchStart}
-            onCardTouchMove={handleTouchMove}
-            onCardTouchEnd={handleTouchEnd}
-            onColumnTouchStart={handleColumnTouchStart}
-            onColumnTouchMove={handleColumnTouchMove}
-            onColumnTouchEnd={handleColumnTouchEnd}
-            onCardKeyDown={handleCardKeyDown}
+            dragCtrl={dragCtrl}
             dragStateId={dragStateId}
             kbDragStateId={kbDragStateId}
             showCardCount={showCardCount}
