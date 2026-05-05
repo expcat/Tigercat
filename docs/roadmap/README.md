@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 父子组件同文件约定先落地 Steps / StepsItem，父子实现合并到 Steps 文件，旧 StepsItem 文件保留 re-export 兼容层，并更新内部导入、包入口与模式文档；相关 React、Vue 测试通过。
-- 推荐下一步：继续 P1 父子组件同文件约定，按 Steps 模式处理 Breadcrumb / BreadcrumbItem 或 Tabs / TabPane。
+- 上一步完成：P1 父子组件同文件约定继续落地 Breadcrumb / BreadcrumbItem，父子实现合并到 Breadcrumb 文件，旧 BreadcrumbItem 文件保留 re-export 兼容层，并更新包入口与模式文档；相关 React、Vue 测试通过。
+- 推荐下一步：继续 P1 父子组件同文件约定，按已落地模式处理 Tabs / TabPane。
 
 ## 实现核对口径
 
@@ -55,14 +55,14 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ### Layout / Navigation / Data
 
-| 优先级 | 项目                          | 范围                                         | 完成标准                                                            |
-| ------ | ----------------------------- | -------------------------------------------- | ------------------------------------------------------------------- |
-| P1     | 父子组件同文件约定            | Menu / Dropdown / Anchor / Breadcrumb / Tabs | 沿用 Steps 已落地模式，继续减少父子组件 chunk 与导出链              |
-| P2     | Descriptions 大列表性能       | Descriptions                                 | 对 100+ items columns / rows 合并算法做复杂度测试或 benchmark       |
-| P2     | Container 组件必要性          | Container                                    | 评估是否改为 class util；若保留组件，说明体积与 API 理由            |
-| P2     | FloatButton group memo        | FloatButton                                  | 子按钮列表缓存，避免不必要重建                                      |
-| P2     | Steps vertical pseudo-element | Steps                                        | vertical 连接线改用 CSS pseudo-element 或确认保留 inline div 的理由 |
-| P2     | Timeline pseudo-element       | Timeline                                     | 节点/连接线减少额外 DOM，改用 CSS pseudo-element 或说明保留原因     |
+| 优先级 | 项目                          | 范围                            | 完成标准                                                            |
+| ------ | ----------------------------- | ------------------------------- | ------------------------------------------------------------------- |
+| P1     | 父子组件同文件约定            | Menu / Dropdown / Anchor / Tabs | 沿用已落地模式，继续减少父子组件 chunk 与导出链                     |
+| P2     | Descriptions 大列表性能       | Descriptions                    | 对 100+ items columns / rows 合并算法做复杂度测试或 benchmark       |
+| P2     | Container 组件必要性          | Container                       | 评估是否改为 class util；若保留组件，说明体积与 API 理由            |
+| P2     | FloatButton group memo        | FloatButton                     | 子按钮列表缓存，避免不必要重建                                      |
+| P2     | Steps vertical pseudo-element | Steps                           | vertical 连接线改用 CSS pseudo-element 或确认保留 inline div 的理由 |
+| P2     | Timeline pseudo-element       | Timeline                        | 节点/连接线减少额外 DOM，改用 CSS pseudo-element 或说明保留原因     |
 
 ### Charts / Composite / Advanced
 

@@ -1,7 +1,12 @@
-import React, { createContext, useContext } from 'react'
+import React, { createContext, useCallback, useContext, useMemo } from 'react'
 import {
   classNames,
   breadcrumbContainerClasses,
+  getBreadcrumbItemClasses,
+  getBreadcrumbLinkClasses,
+  getBreadcrumbSeparatorClasses,
+  getSeparatorContent,
+  type BreadcrumbItemProps as CoreBreadcrumbItemProps,
   type BreadcrumbProps as CoreBreadcrumbProps,
   type BreadcrumbSeparator
 } from '@expcat/tigercat-core'
@@ -17,6 +22,109 @@ const BreadcrumbContext = createContext<BreadcrumbContextValue | null>(null)
 // Hook to use breadcrumb context
 export function useBreadcrumbContext(): BreadcrumbContextValue | null {
   return useContext(BreadcrumbContext)
+}
+
+export interface BreadcrumbItemProps
+  extends
+    Omit<CoreBreadcrumbItemProps, 'style'>,
+    Omit<React.LiHTMLAttributes<HTMLLIElement>, 'onClick' | 'children'> {
+  /**
+   * Click event handler
+   */
+  onClick?: (event: React.MouseEvent<HTMLAnchorElement | HTMLSpanElement>) => void
+
+  style?: React.CSSProperties
+
+  /**
+   * Item content
+   */
+  children?: React.ReactNode
+
+  /**
+   * Icon to display before the item content
+   */
+  icon?: React.ReactNode
+}
+
+export const BreadcrumbItem: React.FC<BreadcrumbItemProps> = ({
+  href,
+  target,
+  current = false,
+  separator: customSeparator,
+  className,
+  style,
+  onClick,
+  children,
+  icon,
+  ...props
+}) => {
+  const breadcrumbContext = useBreadcrumbContext()
+
+  const itemClasses = useMemo(() => getBreadcrumbItemClasses(className), [className])
+
+  const linkClasses = useMemo(() => getBreadcrumbLinkClasses(current), [current])
+
+  const separatorClasses = useMemo(() => getBreadcrumbSeparatorClasses(), [])
+
+  const separatorContent = useMemo(() => {
+    const separator =
+      customSeparator !== undefined ? customSeparator : breadcrumbContext?.separator || '/'
+    return getSeparatorContent(separator)
+  }, [customSeparator, breadcrumbContext])
+
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement | HTMLSpanElement>) => {
+      if (!current) {
+        onClick?.(event)
+      }
+    },
+    [current, onClick]
+  )
+
+  const computedRel = useMemo(() => {
+    if (target === '_blank') {
+      return 'noopener noreferrer'
+    }
+    return undefined
+  }, [target])
+
+  const contentElements = icon ? (
+    <>
+      <span className="inline-flex">{icon}</span>
+      {children}
+    </>
+  ) : (
+    children
+  )
+
+  const linkElement =
+    href && !current ? (
+      <a
+        className={linkClasses}
+        href={href}
+        target={target}
+        rel={computedRel}
+        onClick={handleClick}>
+        {contentElements}
+      </a>
+    ) : (
+      <span className={linkClasses} aria-current={current ? 'page' : undefined}>
+        {contentElements}
+      </span>
+    )
+
+  const separatorElement = !current ? (
+    <span className={separatorClasses} aria-hidden="true">
+      {separatorContent}
+    </span>
+  ) : null
+
+  return (
+    <li className={itemClasses} style={style} {...props}>
+      {linkElement}
+      {separatorElement}
+    </li>
+  )
 }
 
 export interface BreadcrumbProps

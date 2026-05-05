@@ -161,11 +161,12 @@ export type { TabsProps, TabsContextValue } from './components/Tabs'
 export { TabPane } from './components/TabPane'
 export type { TabPaneProps } from './components/TabPane'
 
-export { Breadcrumb, useBreadcrumbContext } from './components/Breadcrumb'
-export type { BreadcrumbProps, BreadcrumbContextValue } from './components/Breadcrumb'
-
-export { BreadcrumbItem } from './components/BreadcrumbItem'
-export type { BreadcrumbItemProps } from './components/BreadcrumbItem'
+export { Breadcrumb, BreadcrumbItem, useBreadcrumbContext } from './components/Breadcrumb'
+export type {
+  BreadcrumbProps,
+  BreadcrumbItemProps,
+  BreadcrumbContextValue
+} from './components/Breadcrumb'
 
 export { Steps, StepsItem, useStepsContext } from './components/Steps'
 export type { StepsProps, StepsItemProps, StepsContextValue } from './components/Steps'
