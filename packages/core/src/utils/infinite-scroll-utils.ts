@@ -14,14 +14,15 @@ export const infiniteScrollLoaderClasses =
 export const infiniteScrollEndClasses =
   'flex items-center justify-center py-4 text-sm text-[var(--tiger-text-muted,#9ca3af)]'
 
-// ─── Scroll detection ─────────────────────────────────────────────
+export const infiniteScrollSentinelClasses = 'tiger-infinite-scroll-sentinel'
+
+// ─── Scroll detection (legacy, kept for backward compat) ──────────
 
 /**
  * Check whether the scroll position is within the threshold of the end.
  *
- * For vertical scroll: checks distance from the bottom.
- * For horizontal scroll: checks distance from the right.
- * For inverse: checks distance from the top/left.
+ * @deprecated Prefer `createInfiniteScrollObserver` which uses
+ * IntersectionObserver and avoids scroll event overhead.
  */
 export function shouldLoadMore(
   el: {
@@ -50,6 +51,63 @@ export function shouldLoadMore(
     return el.scrollTop <= threshold
   }
   return el.scrollHeight - el.scrollTop - el.clientHeight <= threshold
+}
+
+// ─── IntersectionObserver sentinel ────────────────────────────────
+
+export interface InfiniteScrollObserverOptions {
+  /** Distance (px) before the sentinel enters the viewport to trigger load */
+  threshold?: number
+  /** Scroll direction */
+  direction?: 'vertical' | 'horizontal'
+  /** Scroll root element. `null` = the sentinel's nearest scrollable ancestor is determined by IO */
+  root?: Element | null
+  /** Called when the sentinel becomes visible (should load more) */
+  onLoadMore: () => void
+}
+
+/**
+ * Create an IntersectionObserver that watches a sentinel element and calls
+ * `onLoadMore` when it enters (or is about to enter) the viewport.
+ *
+ * The `sentinel` should be a zero-height element placed at the boundary
+ * where new content would appear (end of list for normal, start for inverse).
+ *
+ * `threshold` controls how early the callback fires via `rootMargin`.
+ *
+ * Returns a teardown function. If `IntersectionObserver` is unavailable,
+ * returns `null` so callers can fall back to scroll events.
+ */
+export function createInfiniteScrollObserver(
+  sentinel: Element,
+  options: InfiniteScrollObserverOptions
+): (() => void) | null {
+  if (typeof IntersectionObserver === 'undefined') return null
+
+  const {
+    threshold = 100,
+    direction = 'vertical',
+    root = null,
+    onLoadMore
+  } = options
+
+  const rootMargin =
+    direction === 'horizontal'
+      ? `0px ${threshold}px 0px 0px`
+      : `0px 0px ${threshold}px 0px`
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const entry = entries[entries.length - 1]
+      if (entry && entry.isIntersecting) {
+        onLoadMore()
+      }
+    },
+    { root, rootMargin, threshold: 0 }
+  )
+
+  observer.observe(sentinel)
+  return () => observer.disconnect()
 }
 
 // ─── Class generators ─────────────────────────────────────────────

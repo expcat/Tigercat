@@ -2,9 +2,11 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   classNames,
   shouldLoadMore,
+  createInfiniteScrollObserver,
   getInfiniteScrollContainerClasses,
   infiniteScrollLoaderClasses,
-  infiniteScrollEndClasses
+  infiniteScrollEndClasses,
+  infiniteScrollSentinelClasses
 } from '@expcat/tigercat-core'
 
 export interface InfiniteScrollProps {
@@ -40,28 +42,64 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
   ...rest
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
+  const sentinelRef = useRef<HTMLDivElement>(null)
 
   const containerClasses = useMemo(
     () => getInfiniteScrollContainerClasses(direction, className),
     [direction, className]
   )
 
+  // Stable callback ref to avoid re-creating observer on every render
+  const onLoadMoreRef = useRef(onLoadMore)
+  onLoadMoreRef.current = onLoadMore
+
+  // Fallback scroll handler (when IO unavailable)
   const checkScroll = useCallback(() => {
     if (disabled || loading || !hasMore) return
     const el = containerRef.current
     if (!el) return
-
     if (shouldLoadMore(el, threshold, direction, inverse)) {
-      onLoadMore?.()
+      onLoadMoreRef.current?.()
     }
-  }, [disabled, loading, hasMore, threshold, direction, inverse, onLoadMore])
+  }, [disabled, loading, hasMore, threshold, direction, inverse])
 
   useEffect(() => {
+    if (disabled || !hasMore) return
+
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+
+    const teardown = createInfiniteScrollObserver(sentinel, {
+      threshold,
+      direction,
+      root: containerRef.current,
+      onLoadMore: () => {
+        if (!disabled && !loading && hasMore) {
+          onLoadMoreRef.current?.()
+        }
+      }
+    })
+
+    if (teardown) {
+      return teardown
+    }
+
+    // IO unavailable — fall back to scroll events
     const el = containerRef.current
-    if (!el) return
-    el.addEventListener('scroll', checkScroll, { passive: true })
-    return () => el.removeEventListener('scroll', checkScroll)
-  }, [checkScroll])
+    if (el) {
+      el.addEventListener('scroll', checkScroll, { passive: true })
+      return () => el.removeEventListener('scroll', checkScroll)
+    }
+  }, [disabled, loading, hasMore, threshold, direction, inverse, checkScroll])
+
+  const sentinelEl = hasMore ? (
+    <div
+      ref={sentinelRef}
+      className={infiniteScrollSentinelClasses}
+      aria-hidden="true"
+      style={{ height: 0, overflow: 'hidden' }}
+    />
+  ) : null
 
   const loaderEl = loading ? (
     <div className={infiniteScrollLoaderClasses} role="status" aria-live="polite">
@@ -76,6 +114,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
     <div ref={containerRef} className={classNames(containerClasses)} {...rest}>
       {inverse ? (
         <>
+          {sentinelEl}
           {loaderEl}
           {children}
           {endEl}
@@ -83,6 +122,7 @@ export const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
       ) : (
         <>
           {children}
+          {sentinelEl}
           {loaderEl}
           {endEl}
         </>

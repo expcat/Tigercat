@@ -1,11 +1,13 @@
-import { defineComponent, h, ref, computed, onMounted, onBeforeUnmount, PropType } from 'vue'
+import { defineComponent, h, ref, computed, watch, onMounted, onBeforeUnmount, PropType } from 'vue'
 import {
   classNames,
   coerceClassValue,
   shouldLoadMore,
+  createInfiniteScrollObserver,
   getInfiniteScrollContainerClasses,
   infiniteScrollLoaderClasses,
-  infiniteScrollEndClasses
+  infiniteScrollEndClasses,
+  infiniteScrollSentinelClasses
 } from '@expcat/tigercat-core'
 
 export interface VueInfiniteScrollProps {
@@ -40,6 +42,9 @@ export const InfiniteScroll = defineComponent({
   emits: ['load-more'],
   setup(props, { emit, slots, attrs }) {
     const containerRef = ref<HTMLElement | null>(null)
+    const sentinelRef = ref<HTMLElement | null>(null)
+    let cleanupObserver: (() => void) | null = null
+    let usingFallback = false
 
     const containerClasses = computed(() =>
       classNames(
@@ -48,28 +53,72 @@ export const InfiniteScroll = defineComponent({
       )
     )
 
+    function handleLoadMore() {
+      if (props.disabled || props.loading || !props.hasMore) return
+      emit('load-more')
+    }
+
+    // Fallback: scroll event (when IO unavailable)
     function checkScroll() {
       if (props.disabled || props.loading || !props.hasMore) return
       const el = containerRef.value
       if (!el) return
-
       if (shouldLoadMore(el, props.threshold, props.direction, props.inverse)) {
         emit('load-more')
       }
     }
 
-    onMounted(() => {
-      containerRef.value?.addEventListener('scroll', checkScroll, {
-        passive: true
+    function setupObserver() {
+      cleanupObserver?.()
+      cleanupObserver = null
+      usingFallback = false
+
+      if (props.disabled || !props.hasMore) return
+
+      const sentinel = sentinelRef.value
+      if (!sentinel) return
+
+      const teardown = createInfiniteScrollObserver(sentinel, {
+        threshold: props.threshold,
+        direction: props.direction,
+        root: containerRef.value,
+        onLoadMore: handleLoadMore
       })
-    })
+
+      if (teardown) {
+        cleanupObserver = teardown
+      } else {
+        // IO unavailable — fall back to scroll events
+        usingFallback = true
+        containerRef.value?.addEventListener('scroll', checkScroll, { passive: true })
+        cleanupObserver = () => {
+          containerRef.value?.removeEventListener('scroll', checkScroll)
+        }
+      }
+    }
+
+    onMounted(setupObserver)
+
+    watch(
+      () => [props.hasMore, props.disabled, props.threshold, props.direction, props.inverse],
+      setupObserver
+    )
 
     onBeforeUnmount(() => {
-      containerRef.value?.removeEventListener('scroll', checkScroll)
+      cleanupObserver?.()
     })
 
     return () => {
       const content = slots.default?.()
+
+      const sentinel = props.hasMore
+        ? h('div', {
+            ref: sentinelRef,
+            class: infiniteScrollSentinelClasses,
+            'aria-hidden': 'true',
+            style: 'height:0;overflow:hidden'
+          })
+        : null
 
       const loader = props.loading
         ? h(
@@ -88,7 +137,9 @@ export const InfiniteScroll = defineComponent({
           ? h('div', { class: infiniteScrollEndClasses }, slots.end?.() ?? props.endText)
           : null
 
-      const children = props.inverse ? [loader, content, end] : [content, loader, end]
+      const children = props.inverse
+        ? [sentinel, loader, content, end]
+        : [content, sentinel, loader, end]
 
       return h(
         'div',

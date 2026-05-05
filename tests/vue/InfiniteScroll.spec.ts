@@ -94,4 +94,21 @@ describe('InfiniteScroll (Vue)', () => {
     const contentIdx = children.findIndex((c) => c.getAttribute('data-testid') === 'content')
     expect(loaderIdx).toBeLessThan(contentIdx)
   })
+
+  it('renders a sentinel element when hasMore', () => {
+    const { container } = render(InfiniteScroll, {
+      props: { hasMore: true }
+    })
+    const sentinel = container.querySelector('.tiger-infinite-scroll-sentinel')
+    expect(sentinel).toBeTruthy()
+    expect(sentinel?.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  it('does not render sentinel when hasMore is false', () => {
+    const { container } = render(InfiniteScroll, {
+      props: { hasMore: false, loading: false }
+    })
+    const sentinel = container.querySelector('.tiger-infinite-scroll-sentinel')
+    expect(sentinel).toBeNull()
+  })
 })
