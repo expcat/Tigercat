@@ -3,7 +3,6 @@ import {
   computed,
   ref,
   watch,
-  Teleport,
   PropType,
   h,
   onMounted,
@@ -37,7 +36,12 @@ import {
   type DrawerPlacement,
   type DrawerSize
 } from '@expcat/tigercat-core'
-import { useVueBodyScrollLock, useVueEscapeKey, useVueFocusTrap } from '../utils/overlay'
+import {
+  renderVueBodyTeleport,
+  useVueBodyScrollLock,
+  useVueEscapeKey,
+  useVueFocusTrap
+} from '../utils/overlay'
 
 let drawerIdCounter = 0
 const createDrawerId = () => `tiger-drawer-${++drawerIdCounter}`
@@ -411,7 +415,7 @@ export const Drawer = defineComponent({
         [mask, panel]
       )
 
-      return h(Teleport, { to: 'body', disabled: props.disableTeleport }, [root])
+      return renderVueBodyTeleport([root], props.disableTeleport)
     }
   }
 })

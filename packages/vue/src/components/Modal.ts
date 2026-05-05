@@ -1,7 +1,6 @@
 import {
   defineComponent,
   h,
-  Teleport,
   ref,
   PropType,
   computed,
@@ -35,7 +34,12 @@ import {
 } from '@expcat/tigercat-core'
 
 import { Button } from './Button'
-import { useVueBodyScrollLock, useVueEscapeKey, useVueFocusTrap } from '../utils/overlay'
+import {
+  renderVueBodyTeleport,
+  useVueBodyScrollLock,
+  useVueEscapeKey,
+  useVueFocusTrap
+} from '../utils/overlay'
 
 let modalIdCounter = 0
 const createModalId = () => `tiger-modal-${++modalIdCounter}`
@@ -488,7 +492,7 @@ export const Modal = defineComponent({
         ]
       )
 
-      return h(Teleport, { to: 'body', disabled: props.disableTeleport }, [renderedWrapper])
+      return renderVueBodyTeleport([renderedWrapper], props.disableTeleport)
     }
   }
 })

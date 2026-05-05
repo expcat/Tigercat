@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useCallback, useRef, useId } from 'react'
-import { createPortal } from 'react-dom'
 import {
   captureActiveElement,
   classNames,
@@ -23,7 +22,7 @@ import {
   shouldCloseOnMaskClick,
   type ModalProps as CoreModalProps
 } from '@expcat/tigercat-core'
-import { useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
+import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
 import { Button } from './Button'
 
 export interface ModalProps
@@ -347,5 +346,5 @@ export const Modal: React.FC<ModalProps> = ({
     </div>
   )
 
-  return createPortal(modalContent, document.body)
+  return renderBodyPortal(modalContent)
 }

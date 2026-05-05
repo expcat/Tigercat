@@ -17,9 +17,3 @@
 | Windows `.cmd` shim 验证 | CLI bin / package manager shims    | P1       | Pending  | 在 README 或测试中覆盖 pnpm/npm/bun 的 Windows bin 路径行为 |
 | 模板版本策略             | CLI React/Vue 模板                 | P1       | Pending  | 模板依赖范围改为 catalog/lockfile 对齐策略，避免长期漂移    |
 | CLI Windows 路径测试     | CLI bin / `tests/core/cli.spec.ts` | P1       | Pending  | `tests/core/cli.spec.ts` 覆盖路径分隔符和 bin 调用边界      |
-
-## Examples / Tests
-
-| 任务     | 对应组件 / 范围          | 优先级 | 状态    | 完成标准                                              |
-| -------- | ------------------------ | ------ | ------- | ----------------------------------------------------- |
-| 视觉回归 | Modal / Drawer / Popover | P2     | Pending | Playwright 对 Modal/Drawer/Popover 做跨浏览器截图对比 |

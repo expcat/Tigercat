@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useId, useMemo, useRef } from 'react'
-import { createPortal } from 'react-dom'
 import {
   ANIMATION_DURATION_MS,
   captureActiveElement,
@@ -23,7 +22,7 @@ import {
   shouldCloseOnMaskClick,
   type DrawerProps as CoreDrawerProps
 } from '@expcat/tigercat-core'
-import { useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
+import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from '../utils/overlay'
 
 export interface DrawerProps
   extends CoreDrawerProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
@@ -240,9 +239,5 @@ export const Drawer: React.FC<DrawerProps> = ({
     </div>
   )
 
-  if (typeof document === 'undefined') {
-    return null
-  }
-
-  return createPortal(drawerContent, document.body)
+  return renderBodyPortal(drawerContent)
 }

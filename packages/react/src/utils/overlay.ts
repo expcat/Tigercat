@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import {
   getFocusTrapNavigation,
   getFocusableElements,
@@ -81,6 +82,11 @@ export function useBodyScrollLock({ enabled }: UseBodyScrollLockOptions): void {
 
     return lockBodyScroll()
   }, [enabled])
+}
+
+export function renderBodyPortal(node: React.ReactNode): React.ReactPortal | null {
+  if (typeof document === 'undefined') return null
+  return createPortal(node, document.body)
 }
 
 export interface UseFocusTrapOptions {

@@ -11,7 +11,7 @@ import {
   type FloatingResult,
   type FloatingCleanup
 } from '@expcat/tigercat-core'
-import { ref, watch, onBeforeUnmount, type Ref } from 'vue'
+import { h, ref, Teleport, watch, onBeforeUnmount, type Ref, type VNodeChild } from 'vue'
 
 export interface UseVueClickOutsideOptions {
   enabled: Ref<boolean>
@@ -81,6 +81,10 @@ export function useVueBodyScrollLock(enabled: Ref<boolean>): void {
     },
     { immediate: true }
   )
+}
+
+export function renderVueBodyTeleport(children: VNodeChild, disabled = false): VNodeChild {
+  return h(Teleport, { to: 'body', disabled }, children)
 }
 
 export interface UseVueFocusTrapOptions {

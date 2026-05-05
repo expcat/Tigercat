@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo } from 'react'
-import { createPortal } from 'react-dom'
 import {
   classNames,
   getLoadingBarClasses,
@@ -15,7 +14,7 @@ import {
   injectLoadingAnimationStyles,
   type LoadingProps as CoreLoadingProps
 } from '@expcat/tigercat-core'
-import { useBodyScrollLock } from '../utils/overlay'
+import { renderBodyPortal, useBodyScrollLock } from '../utils/overlay'
 
 export interface LoadingProps
   extends CoreLoadingProps, Omit<React.HTMLAttributes<HTMLDivElement>, keyof CoreLoadingProps> {}
@@ -150,8 +149,8 @@ export const Loading: React.FC<LoadingProps> = ({
     </div>
   )
 
-  if (fullscreen && typeof document !== 'undefined') {
-    return createPortal(loadingNode, document.body)
+  if (fullscreen) {
+    return renderBodyPortal(loadingNode)
   }
 
   return loadingNode

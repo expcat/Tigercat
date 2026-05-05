@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType, ref, watch, onUnmounted, Teleport } from 'vue'
+import { defineComponent, computed, h, PropType, ref, watch, onUnmounted } from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -20,7 +20,7 @@ import {
   type LoadingSize,
   type LoadingColor
 } from '@expcat/tigercat-core'
-import { useVueBodyScrollLock } from '../utils/overlay'
+import { renderVueBodyTeleport, useVueBodyScrollLock } from '../utils/overlay'
 
 export interface VueLoadingProps extends LoadingProps {
   style?: Record<string, string | number>
@@ -238,7 +238,7 @@ export const Loading = defineComponent({
       )
 
       if (props.fullscreen) {
-        return h(Teleport, { to: 'body', disabled: props.disableTeleport }, [loadingNode])
+        return renderVueBodyTeleport([loadingNode], props.disableTeleport)
       }
 
       return loadingNode

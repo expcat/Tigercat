@@ -89,7 +89,7 @@ const openDestroy = () => {
 }
 
 const basicSnippet = `<Button @click="openBasic">打开抽屉</Button>
-<Drawer v-model:visible="basicVisible" title="基本抽屉">
+<Drawer v-model:open="basicVisible" title="基本抽屉">
   <p>这是抽屉的内容</p>
   <p>你可以在这里放置任何内容</p>
   <template #footer>
@@ -105,7 +105,7 @@ const placementSnippet = `<Space>
   <Button :variant="placement === 'top' ? 'primary' : 'secondary'" @click="showPlacementDrawer('top')">顶部</Button>
   <Button :variant="placement === 'bottom' ? 'primary' : 'secondary'" @click="showPlacementDrawer('bottom')">底部</Button>
 </Space>
-<Drawer v-model:visible="placementVisible" :placement="placement" :title="\`\${placement} 抽屉\`">
+<Drawer v-model:open="placementVisible" :placement="placement" :title="\`\${placement} 抽屉\`">
   <p>从 {{ placement }} 弹出的抽屉</p>
   <template #footer>
     <Space>
@@ -121,7 +121,7 @@ const sizeSnippet = `<Space>
   <Button :variant="size === 'xl' ? 'primary' : 'secondary'" @click="showSizeDrawer('xl')">超大 (xl)</Button>
   <Button :variant="size === 'full' ? 'primary' : 'secondary'" @click="showSizeDrawer('full')">全屏 (full)</Button>
 </Space>
-<Drawer v-model:visible="sizeVisible" :size="size" title="不同尺寸的抽屉">
+<Drawer v-model:open="sizeVisible" :size="size" title="不同尺寸的抽屉">
   <p>尺寸: {{ size }}</p>
   <template #footer>
     <Space>
@@ -131,7 +131,7 @@ const sizeSnippet = `<Space>
 </Drawer>`
 
 const customSnippet = `<Button @click="openCustom">打开自定义抽屉</Button>
-<Drawer v-model:visible="customVisible">
+<Drawer v-model:open="customVisible">
   <template #header>
     <div class="flex items-center gap-2">
       <span>⚙️</span>
@@ -159,7 +159,7 @@ const customSnippet = `<Button @click="openCustom">打开自定义抽屉</Button
 </Drawer>`
 
 const noMaskSnippet = `<Button @click="openNoMask">打开无蒙层抽屉</Button>
-<Drawer v-model:visible="noMaskVisible" :mask="false" title="无蒙层抽屉">
+<Drawer v-model:open="noMaskVisible" :mask="false" title="无蒙层抽屉">
   <p>这个抽屉没有蒙层</p>
   <p>你可以与页面其他部分交互</p>
   <p class="mt-2 text-sm text-gray-500">建议仍保留明确的关闭入口（关闭按钮/ESC）。</p>
@@ -171,7 +171,7 @@ const noMaskSnippet = `<Button @click="openNoMask">打开无蒙层抽屉</Button
 </Drawer>`
 
 const notClosableSnippet = `<Button @click="openNotClosable">打开抽屉</Button>
-<Drawer v-model:visible="notClosableVisible" :mask-closable="false" title="点击蒙层不关闭">
+<Drawer v-model:open="notClosableVisible" :mask-closable="false" title="点击蒙层不关闭">
   <p>点击蒙层不会关闭</p>
   <p class="mt-2">仍可使用关闭按钮或按 ESC 关闭</p>
   <template #footer>
@@ -182,7 +182,7 @@ const notClosableSnippet = `<Button @click="openNotClosable">打开抽屉</Butto
 </Drawer>`
 
 const noCloseButtonSnippet = `<Button @click="openNoCloseButton">打开抽屉</Button>
-<Drawer v-model:visible="noCloseButtonVisible" :closable="false" title="隐藏关闭按钮">
+<Drawer v-model:open="noCloseButtonVisible" :closable="false" title="隐藏关闭按钮">
   <p>这个抽屉没有关闭按钮</p>
   <p class="mt-2">仍可使用 ESC 或底部按钮关闭</p>
   <template #footer>
@@ -193,7 +193,7 @@ const noCloseButtonSnippet = `<Button @click="openNoCloseButton">打开抽屉</B
 </Drawer>`
 
 const destroySnippet = `<Button @click="openDestroy">打开抽屉</Button>
-<Drawer v-model:visible="destroyVisible" :destroy-on-close="true" title="关闭时销毁内容">
+<Drawer v-model:open="destroyVisible" :destroy-on-close="true" title="关闭时销毁内容">
   <DestroyOnCloseContent />
   <template #footer>
     <Space>
@@ -277,7 +277,7 @@ const DestroyOnCloseContent = defineComponent({
                :code="basicSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Button @click="openBasic">打开抽屉</Button>
-        <Drawer v-model:visible="basicVisible"
+        <Drawer v-model:open="basicVisible"
                 title="基本抽屉">
           <p>这是抽屉的内容</p>
           <p>你可以在这里放置任何内容</p>
@@ -306,7 +306,7 @@ const DestroyOnCloseContent = defineComponent({
           <Button :variant="placement === 'bottom' ? 'primary' : 'secondary'"
                   @click="showPlacementDrawer('bottom')">底部</Button>
         </Space>
-        <Drawer v-model:visible="placementVisible"
+        <Drawer v-model:open="placementVisible"
                 :placement="placement"
                 :title="`${placement} 抽屉`">
           <p>从 {{ placement }} 弹出的抽屉</p>
@@ -337,7 +337,7 @@ const DestroyOnCloseContent = defineComponent({
           <Button :variant="size === 'full' ? 'primary' : 'secondary'"
                   @click="showSizeDrawer('full')">全屏 (full)</Button>
         </Space>
-        <Drawer v-model:visible="sizeVisible"
+        <Drawer v-model:open="sizeVisible"
                 :size="size"
                 title="不同尺寸的抽屉">
           <p>尺寸: {{ size }}</p>
@@ -357,7 +357,7 @@ const DestroyOnCloseContent = defineComponent({
                :code="customSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Button @click="openCustom">打开自定义抽屉</Button>
-        <Drawer v-model:visible="customVisible">
+        <Drawer v-model:open="customVisible">
           <template #header>
             <div class="flex items-center gap-2">
               <span>⚙️</span>
@@ -397,7 +397,7 @@ const DestroyOnCloseContent = defineComponent({
                :code="noMaskSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Button @click="openNoMask">打开无蒙层抽屉</Button>
-        <Drawer v-model:visible="noMaskVisible"
+        <Drawer v-model:open="noMaskVisible"
                 :mask="false"
                 title="无蒙层抽屉">
           <p>这个抽屉没有蒙层</p>
@@ -419,7 +419,7 @@ const DestroyOnCloseContent = defineComponent({
                :code="notClosableSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Button @click="openNotClosable">打开抽屉</Button>
-        <Drawer v-model:visible="notClosableVisible"
+        <Drawer v-model:open="notClosableVisible"
                 :mask-closable="false"
                 title="点击蒙层不关闭">
           <p>点击蒙层不会关闭</p>
@@ -440,7 +440,7 @@ const DestroyOnCloseContent = defineComponent({
                :code="noCloseButtonSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Button @click="openNoCloseButton">打开抽屉</Button>
-        <Drawer v-model:visible="noCloseButtonVisible"
+        <Drawer v-model:open="noCloseButtonVisible"
                 :closable="false"
                 title="隐藏关闭按钮">
           <p>这个抽屉没有关闭按钮</p>
@@ -461,7 +461,7 @@ const DestroyOnCloseContent = defineComponent({
                :code="destroySnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Button @click="openDestroy">打开抽屉</Button>
-        <Drawer v-model:visible="destroyVisible"
+        <Drawer v-model:open="destroyVisible"
                 :destroy-on-close="true"
                 title="关闭时销毁内容">
           <DestroyOnCloseContent />

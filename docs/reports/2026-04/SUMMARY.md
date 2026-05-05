@@ -14,15 +14,18 @@
 
 > 2026-05-04 执行：完成 Feedback / mask close 语义收敛。core overlay utils 新增 `shouldCloseOnMaskClick`，Vue / React 的 Modal 与 Drawer 共用同一 maskClosable 判断，并新增 core 单测覆盖直接 mask 点击、内容点击与禁用关闭场景。更大的 overlay 共享层总项仍保留，用于后续继续收敛 portal/teleport。
 
+> 2026-05-04 执行：完成 Feedback / portal 入口收敛。React overlay utils 新增 `renderBodyPortal`，Vue overlay utils 新增 `renderVueBodyTeleport`，Modal / Drawer / Loading 不再各自直连 `document.body` portal 或 `Teleport to="body"`，后续如需调整 overlay 挂载策略可从框架内部共享入口继续推进。
+
+> 2026-05-04 执行：完成 PR-21 视觉回归。新增 Playwright overlay visual spec，跨 Chromium / Firefox / WebKit 覆盖 Vue 与 React 的 Modal / Drawer / Popover 打开态截图基线；同时修复 Vue Drawer demo 仍使用旧 `v-model:visible` 导致抽屉无法打开的问题。
+
 ## 1. 最高优先级
 
-| 任务                   | 对应组件 / 范围                                           | 来源                                                                     | 完成标准                                                           |
-| ---------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------ |
-| 默认主题像素回归       | Button / Input / Card / Form / Overlay 等核心默认主题组件 | [phase1c-theme-modernization.md](phase1c-theme-modernization.md)         | 默认配置与 v1.0.x 视觉保持一致，完成核心组件截图/像素差验证        |
-| 完成 PR-21 视觉回归    | Modal / Drawer / Popover                                  | [phase1d-i18n-cli-examples-tests.md](phase1d-i18n-cli-examples-tests.md) | Playwright 跨浏览器截图对比覆盖主要 overlay 打开态                 |
-| 收敛 overlay 共享层    | Modal / Drawer / Popover / Tooltip / Popconfirm / Loading | [phase2.3-feedback.md](phase2.3-feedback.md)                             | 统一 portal/teleport、lock-scroll、focus trap、Esc 与 mask 行为    |
-| 推进 picker-utils 二期 | AutoComplete / Cascader / TreeSelect / Transfer           | [phase2.2-form.md](phase2.2-form.md)                                     | 按各自键盘与 ARIA 语义复用共享 picker 行为                         |
-| 处理 Table 性能二期    | Table                                                     | [phase2.6-data.md](phase2.6-data.md)                                     | ResizeObserver + rAF 批量、virtual 默认策略、export-utils 子路径化 |
+| 任务                   | 对应组件 / 范围                                           | 来源                                                             | 完成标准                                                           |
+| ---------------------- | --------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------ |
+| 默认主题像素回归       | Button / Input / Card / Form / Overlay 等核心默认主题组件 | [phase1c-theme-modernization.md](phase1c-theme-modernization.md) | 默认配置与 v1.0.x 视觉保持一致，完成核心组件截图/像素差验证        |
+| 收敛 overlay 共享层    | Modal / Drawer / Popover / Tooltip / Popconfirm / Loading | [phase2.3-feedback.md](phase2.3-feedback.md)                     | 统一 portal/teleport、lock-scroll、focus trap、Esc 与 mask 行为    |
+| 推进 picker-utils 二期 | AutoComplete / Cascader / TreeSelect / Transfer           | [phase2.2-form.md](phase2.2-form.md)                             | 按各自键盘与 ARIA 语义复用共享 picker 行为                         |
+| 处理 Table 性能二期    | Table                                                     | [phase2.6-data.md](phase2.6-data.md)                             | ResizeObserver + rAF 批量、virtual 默认策略、export-utils 子路径化 |
 
 ## 2. 分组索引
 
@@ -30,7 +33,7 @@
 | --------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
 | 依赖与工具链          | [deps-matrix.md](deps-matrix.md)                                         | CLI / workspace / 模板依赖                                                                                         |
 | 主题现代化            | [phase1c-theme-modernization.md](phase1c-theme-modernization.md)         | 默认主题核心组件                                                                                                   |
-| i18n / CLI / examples | [phase1d-i18n-cli-examples-tests.md](phase1d-i18n-cli-examples-tests.md) | ConfigProvider / locale barrel / CLI bin / Modal / Drawer / Popover                                                |
+| i18n / CLI / examples | [phase1d-i18n-cli-examples-tests.md](phase1d-i18n-cli-examples-tests.md) | ConfigProvider / locale barrel / CLI bin                                                                           |
 | Basic                 | [phase2.1-basic.md](phase2.1-basic.md)                                   | Empty / Divider                                                                                                    |
 | Form                  | [phase2.2-form.md](phase2.2-form.md)                                     | Form / AutoComplete / Cascader / TreeSelect / Transfer / Radio / Checkbox                                          |
 | Feedback              | [phase2.3-feedback.md](phase2.3-feedback.md)                             | Modal / Drawer / Popover / Tooltip / Popconfirm                                                                    |
