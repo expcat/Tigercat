@@ -3,7 +3,9 @@ import type { VirtualListProps as CoreVirtualListProps } from '@expcat/tigercat-
 import {
   virtualListContainerClasses,
   virtualListInnerClasses,
-  getFixedVirtualRange,
+  fixedSizeStrategy,
+  variableSizeStrategy,
+  dynamicSizeStrategy,
   classNames
 } from '@expcat/tigercat-core'
 
@@ -17,6 +19,9 @@ export interface VirtualListProps extends CoreVirtualListProps {
 export const VirtualList: React.FC<VirtualListProps> = ({
   itemCount = 0,
   itemHeight = 40,
+  estimatedItemHeight,
+  getItemHeight,
+  sizeStrategy: customStrategy,
   height = 400,
   overscan = 5,
   className,
@@ -26,9 +31,16 @@ export const VirtualList: React.FC<VirtualListProps> = ({
   const [scrollTop, setScrollTop] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  const strategy = useMemo(() => {
+    if (customStrategy) return customStrategy
+    if (getItemHeight) return variableSizeStrategy(getItemHeight, itemCount)
+    if (estimatedItemHeight !== undefined) return dynamicSizeStrategy(estimatedItemHeight, itemCount)
+    return fixedSizeStrategy(itemHeight)
+  }, [customStrategy, getItemHeight, estimatedItemHeight, itemHeight, itemCount])
+
   const range = useMemo(
-    () => getFixedVirtualRange(scrollTop, height, itemHeight, itemCount, overscan),
-    [scrollTop, height, itemHeight, itemCount, overscan]
+    () => strategy.getRange(scrollTop, height, itemCount, overscan),
+    [scrollTop, height, itemCount, overscan, strategy]
   )
 
   const handleScroll = useCallback(() => {
@@ -39,16 +51,19 @@ export const VirtualList: React.FC<VirtualListProps> = ({
     }
   }, [onScroll])
 
-  const { startIndex, endIndex, offsetTop, totalHeight } = range
+  const { startIndex, endIndex, totalHeight } = range
 
   const items: React.ReactNode[] = []
   for (let i = startIndex; i <= endIndex; i++) {
+    const itemH = strategy.getItemHeight(i)
     items.push(
-      <div key={i} style={{ height: `${itemHeight}px`, width: '100%' }}>
+      <div key={i} style={{ height: `${itemH}px`, width: '100%' }}>
         {renderItem({ index: i })}
       </div>
     )
   }
+
+  const offsetTop = startIndex >= 0 ? strategy.getItemOffset(startIndex) : 0
 
   return (
     <div

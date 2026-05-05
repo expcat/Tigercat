@@ -68,4 +68,48 @@ describe('VirtualList', () => {
     fireEvent.scroll(outer)
     expect(onScroll).toHaveBeenCalled()
   })
+
+  // --- Variable size via getItemHeight ---
+  it('renders variable-height items via getItemHeight prop', () => {
+    const getItemHeight = (index: number) => (index % 2 === 0 ? 30 : 60)
+    const { container } = render(
+      <VirtualList
+        itemCount={100}
+        getItemHeight={getItemHeight}
+        height={400}
+        overscan={2}
+        renderItem={({ index }) => <div>Item {index}</div>}
+      />
+    )
+    const outer = container.firstElementChild as HTMLElement
+    const inner = outer.firstElementChild as HTMLElement
+    // total: 50*30 + 50*60 = 1500 + 3000 = 4500
+    expect(inner.style.height).toBe('4500px')
+
+    const itemContainer = inner.firstElementChild as HTMLElement
+    const firstItem = itemContainer.firstElementChild as HTMLElement
+    expect(firstItem.style.height).toBe('30px')
+  })
+
+  // --- Custom sizeStrategy ---
+  it('uses custom sizeStrategy prop', () => {
+    const customStrategy = {
+      getRange: () => ({ startIndex: 0, endIndex: 2, offsetTop: 0, totalHeight: 300 }),
+      getItemHeight: () => 100,
+      getItemOffset: (i: number) => i * 100
+    }
+    const { container } = render(
+      <VirtualList
+        itemCount={3}
+        sizeStrategy={customStrategy}
+        height={200}
+        renderItem={({ index }) => <div>Item {index}</div>}
+      />
+    )
+    const outer = container.firstElementChild as HTMLElement
+    const inner = outer.firstElementChild as HTMLElement
+    expect(inner.style.height).toBe('300px')
+    const itemContainer = inner.firstElementChild as HTMLElement
+    expect(itemContainer.children.length).toBe(3)
+  })
 })

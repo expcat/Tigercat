@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 Composite a11y 角色 — NotificationCenter 加 `role="region"` + `aria-label`，ActivityFeed 加 `role="feed"` + `aria-label` + `aria-busy`，CommentThread 加 `role="feed"`，DataTableWithToolbar toolbar 加 `role="toolbar"` + `aria-label`；Vue/React 各 4 组件同步，新增 12 条 a11y 回归测试，构建与测试通过。
-- 推荐下一步：P1 VirtualList 策略化 — fixed / variable / dynamic size 通过策略模式扩展。
+- 上一步完成：P1 VirtualList 策略化 — Core 新增 `VirtualListSizeStrategy` 接口与三个内置工厂（`fixedSizeStrategy`、`variableSizeStrategy`、`dynamicSizeStrategy`），Vue/React VirtualList 通过 `sizeStrategy` / `getItemHeight` / `estimatedItemHeight` props 自动选择策略，既有固定高度行为完全兼容，新增 17 条测试，构建与测试通过。
+- 推荐下一步：P1 InfiniteScroll IO — 使用 IntersectionObserver sentinel 替代 scroll 事件方案。
 
 ## 未实现组件
 
@@ -60,7 +60,7 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | P1     | ~~NotificationCenter 缓存~~  | ~~NotificationCenter~~                                                       | ~~已完成：分组、标签、已读未读派生数据使用 useMemo / computed，移除死代码~~ |
 | P1     | ~~ActivityFeed / Timeline 复用~~ | ~~ActivityFeed / Timeline~~                                                  | ~~已完成：Core 新增 ActivityTimelineItem 类型与共享布局 class 常量，Vue/React 消除重复~~ |
 | P1     | ~~Composite a11y 角色~~      | ~~DataTableWithToolbar / NotificationCenter / ActivityFeed / CommentThread~~ | ~~已完成：feed、region、toolbar 等 ARIA 角色明确，并补 12 条回归测试~~ |
-| P1     | VirtualList 策略化           | VirtualList                                                              | fixed / variable / dynamic size 通过策略模式扩展，而不是在组件中继续增加分支              |
+| P1     | ~~VirtualList 策略化~~       | ~~VirtualList~~                                                              | ~~已完成：Core 新增 VirtualListSizeStrategy 接口与 fixed/variable/dynamic 三策略，Vue/React 统一消费~~ |
 | P1     | InfiniteScroll IO            | InfiniteScroll                                                           | 使用 IntersectionObserver sentinel，替代 scroll 事件方案或提供兼容 fallback               |
 | P1     | FileManager 共享 model       | FileManager                                                              | tree、grid、breadcrumb 视图复用同一 core model，拖拽逻辑接入共享 drag util                |
 | P1     | ImageViewer 手势 util        | ImageViewer                                                              | pinch / pan / zoom 手势抽到 core util，并补触控边界测试                                   |

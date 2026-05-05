@@ -1,10 +1,13 @@
-import { defineComponent, h, ref, computed } from 'vue'
+import { defineComponent, h, ref, computed, PropType, watch } from 'vue'
 import {
   virtualListContainerClasses,
   virtualListInnerClasses,
-  getFixedVirtualRange,
+  fixedSizeStrategy,
+  variableSizeStrategy,
+  dynamicSizeStrategy,
   classNames,
-  coerceClassValue
+  coerceClassValue,
+  type VirtualListSizeStrategy
 } from '@expcat/tigercat-core'
 
 export type VueVirtualListProps = InstanceType<typeof VirtualList>['$props']
@@ -14,6 +17,15 @@ export const VirtualList = defineComponent({
   props: {
     itemCount: { type: Number, default: 0 },
     itemHeight: { type: Number, default: 40 },
+    estimatedItemHeight: { type: Number, default: undefined },
+    getItemHeight: {
+      type: Function as PropType<(index: number) => number>,
+      default: undefined
+    },
+    sizeStrategy: {
+      type: Object as PropType<VirtualListSizeStrategy>,
+      default: undefined
+    },
     height: { type: Number, default: 400 },
     overscan: { type: Number, default: 5 }
   },
@@ -22,11 +34,21 @@ export const VirtualList = defineComponent({
     const scrollTop = ref(0)
     const containerRef = ref<HTMLElement | null>(null)
 
+    const strategy = computed<VirtualListSizeStrategy>(() => {
+      if (props.sizeStrategy) return props.sizeStrategy
+      if (props.getItemHeight) {
+        return variableSizeStrategy(props.getItemHeight, props.itemCount)
+      }
+      if (props.estimatedItemHeight !== undefined) {
+        return dynamicSizeStrategy(props.estimatedItemHeight, props.itemCount)
+      }
+      return fixedSizeStrategy(props.itemHeight)
+    })
+
     const range = computed(() =>
-      getFixedVirtualRange(
+      strategy.value.getRange(
         scrollTop.value,
         props.height,
-        props.itemHeight,
         props.itemCount,
         props.overscan
       )
@@ -40,10 +62,12 @@ export const VirtualList = defineComponent({
     }
 
     return () => {
-      const { startIndex, endIndex, offsetTop, totalHeight } = range.value
+      const { startIndex, endIndex, totalHeight } = range.value
+      const currentStrategy = strategy.value
       const items: ReturnType<typeof h>[] = []
 
       for (let i = startIndex; i <= endIndex; i++) {
+        const itemH = currentStrategy.getItemHeight(i)
         const slotContent = slots.default?.({ index: i })
         items.push(
           h(
@@ -51,7 +75,7 @@ export const VirtualList = defineComponent({
             {
               key: i,
               style: {
-                height: `${props.itemHeight}px`,
+                height: `${itemH}px`,
                 width: '100%'
               }
             },
@@ -59,6 +83,8 @@ export const VirtualList = defineComponent({
           )
         )
       }
+
+      const offsetTop = startIndex >= 0 ? currentStrategy.getItemOffset(startIndex) : 0
 
       return h(
         'div',
