@@ -213,6 +213,24 @@ describe('AutoComplete', () => {
 
       expect(emitted()['select']).toBeTruthy()
     })
+
+    it('should select first enabled option when the first option is disabled', async () => {
+      const disabledFirstOptions = [
+        { label: 'Apple', value: 'apple', disabled: true },
+        { label: 'Banana', value: 'banana' }
+      ]
+      const { container, emitted } = render(AutoComplete, {
+        props: { options: disabledFirstOptions, defaultActiveFirstOption: true }
+      })
+
+      const input = container.querySelector('input')!
+      await fireEvent.focus(input)
+
+      expect(input.getAttribute('aria-activedescendant')).toContain('option-1')
+
+      await fireEvent.keyDown(input, { key: 'Enter' })
+      expect(emitted()['select']).toEqual([['banana', disabledFirstOptions[1]]])
+    })
   })
 
   describe('Accessibility', () => {

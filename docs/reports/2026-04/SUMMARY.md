@@ -22,12 +22,14 @@
 
 > 2026-05-05 执行：完成 Feedback / overlay 共享层收敛。Tooltip / Popover / Popconfirm 的浮层内容现在分别通过 Vue `renderVueBodyTeleport` 与 React `renderBodyPortal` 挂载到 body，outside-click 同时识别触发器容器与浮层节点；Modal / Drawer / Loading 已在前置步骤共用 portal/teleport、滚动锁与焦点陷阱，本轮补齐 floating popup 后总项标记完成。
 
+> 2026-05-05 执行：完成 Form / picker-utils 二期。core `picker-utils` 补齐启用项导航、combobox/listbox/option ARIA props 与触发器按键动作归一化，Vue / React 的 AutoComplete、Cascader、TreeSelect、Transfer 已接入共享键盘与 ARIA 基础逻辑，并新增 AutoComplete 禁用首项键盘选择回归测试。
+
 ## 1. 最高优先级
 
-| 任务                   | 对应组件 / 范围                                 | 来源                                 | 完成标准                                                           |
-| ---------------------- | ----------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------ |
-| 推进 picker-utils 二期 | AutoComplete / Cascader / TreeSelect / Transfer | [phase2.2-form.md](phase2.2-form.md) | 按各自键盘与 ARIA 语义复用共享 picker 行为                         |
-| 处理 Table 性能二期    | Table                                           | [phase2.6-data.md](phase2.6-data.md) | ResizeObserver + rAF 批量、virtual 默认策略、export-utils 子路径化 |
+| 任务                | 对应组件 / 范围 | 来源                                 | 完成标准                                                             |
+| ------------------- | --------------- | ------------------------------------ | -------------------------------------------------------------------- |
+| Form 校验复杂度     | Form / FormItem | [phase2.2-form.md](phase2.2-form.md) | 验证 item validate 不触发 O(N²) 全量遍历；必要时加入索引或依赖图缓存 |
+| 处理 Table 性能二期 | Table           | [phase2.6-data.md](phase2.6-data.md) | ResizeObserver + rAF 批量、virtual 默认策略、export-utils 子路径化   |
 
 ## 2. 分组索引
 
@@ -37,7 +39,7 @@
 | 主题现代化            | [phase1c-theme-modernization.md](phase1c-theme-modernization.md)         | 已完成默认主题像素回归                                                                                             |
 | i18n / CLI / examples | [phase1d-i18n-cli-examples-tests.md](phase1d-i18n-cli-examples-tests.md) | ConfigProvider / locale barrel / CLI bin                                                                           |
 | Basic                 | [phase2.1-basic.md](phase2.1-basic.md)                                   | Empty / Divider                                                                                                    |
-| Form                  | [phase2.2-form.md](phase2.2-form.md)                                     | Form / AutoComplete / Cascader / TreeSelect / Transfer / Radio / Checkbox                                          |
+| Form                  | [phase2.2-form.md](phase2.2-form.md)                                     | Form / FormItem / Radio / Checkbox；picker-utils 二期已完成                                                        |
 | Feedback              | [phase2.3-feedback.md](phase2.3-feedback.md)                             | 已完成 overlay 共享层                                                                                              |
 | Layout                | [phase2.4-layout.md](phase2.4-layout.md)                                 | Row / Col / Splitter / Resizable / List / Statistic / Descriptions / Container                                     |
 | Navigation            | [phase2.5-navigation.md](phase2.5-navigation.md)                         | Menu / Dropdown / Anchor / Breadcrumb / Steps / Tabs / Pagination / FloatButton                                    |

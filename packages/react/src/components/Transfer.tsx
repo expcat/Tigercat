@@ -13,6 +13,8 @@ import {
   getTransferButtonClasses,
   splitTransferData,
   filterTransferItems,
+  getPickerListboxAria,
+  getPickerOptionAria,
   classNames,
   icon20ViewBox,
   chevronLeftSolidIcon20PathD,
@@ -170,7 +172,9 @@ export const Transfer: React.FC<TransferProps> = (props) => {
           />
         )}
 
-        <div className={transferPanelBodyClasses} role="listbox">
+        <div
+          className={transferPanelBodyClasses}
+          {...getPickerListboxAria({ label: `${title} items` })}>
           {items.length > 0 ? (
             items.map((item) => {
               const isSelected = selectedKeys.has(item.key)
@@ -179,9 +183,7 @@ export const Transfer: React.FC<TransferProps> = (props) => {
                 <label
                   key={String(item.key)}
                   className={getTransferItemClasses(isSelected, isDisabled, size)}
-                  role="option"
-                  aria-selected={isSelected}
-                  aria-disabled={isDisabled}>
+                  {...getPickerOptionAria({ selected: isSelected, disabled: isDisabled })}>
                   <input
                     type="checkbox"
                     className={getTransferCheckboxClasses(size)}

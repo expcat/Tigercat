@@ -2,7 +2,14 @@ import { describe, it, expect } from 'vitest'
 import {
   findFirstEnabledIndex,
   findLastEnabledIndex,
-  findNextEnabledIndex
+  findNextEnabledIndex,
+  getInitialPickerActiveIndex,
+  getPickerComboboxAria,
+  getPickerListboxAria,
+  getPickerNavigationIndex,
+  getPickerOptionAria,
+  getPickerOptionId,
+  getPickerTriggerKeyAction
 } from '@expcat/tigercat-core'
 
 interface Item {
@@ -72,6 +79,74 @@ describe('picker-utils', () => {
 
     it('returns -1 for empty list', () => {
       expect(findNextEnabledIndex([], 0, 1)).toBe(-1)
+    })
+  })
+
+  describe('getInitialPickerActiveIndex', () => {
+    it('returns first enabled index only when active-first is enabled', () => {
+      expect(getInitialPickerActiveIndex(items, true)).toBe(1)
+      expect(getInitialPickerActiveIndex(items, false)).toBe(-1)
+    })
+  })
+
+  describe('getPickerNavigationIndex', () => {
+    it('maps arrow and boundary keys to enabled indexes', () => {
+      expect(getPickerNavigationIndex(items, 1, 'ArrowDown')).toBe(3)
+      expect(getPickerNavigationIndex(items, 3, 'ArrowUp')).toBe(1)
+      expect(getPickerNavigationIndex(items, 3, 'Home')).toBe(1)
+      expect(getPickerNavigationIndex(items, 1, 'End')).toBe(3)
+      expect(getPickerNavigationIndex(items, 1, 'Enter')).toBe(1)
+    })
+  })
+
+  describe('picker aria helpers', () => {
+    it('builds combobox aria props with active descendant only while expanded', () => {
+      expect(getPickerOptionId('list', 2)).toBe('list-option-2')
+      expect(getPickerComboboxAria({ expanded: true, listboxId: 'list', activeIndex: 2 })).toEqual({
+        role: 'combobox',
+        'aria-expanded': true,
+        'aria-haspopup': 'listbox',
+        'aria-controls': 'list',
+        'aria-activedescendant': 'list-option-2'
+      })
+      expect(getPickerComboboxAria({ expanded: false, listboxId: 'list', activeIndex: 2 })).toEqual(
+        {
+          role: 'combobox',
+          'aria-expanded': false,
+          'aria-haspopup': 'listbox',
+          'aria-controls': undefined,
+          'aria-activedescendant': undefined
+        }
+      )
+    })
+
+    it('builds listbox and option aria props', () => {
+      expect(getPickerListboxAria({ id: 'list', label: 'Choices' })).toEqual({
+        id: 'list',
+        role: 'listbox',
+        'aria-label': 'Choices'
+      })
+      expect(getPickerOptionAria({ selected: true, disabled: true })).toEqual({
+        role: 'option',
+        'aria-selected': true,
+        'aria-disabled': true
+      })
+      expect(getPickerOptionAria({})).toEqual({
+        role: 'option',
+        'aria-selected': false,
+        'aria-disabled': undefined
+      })
+    })
+  })
+
+  describe('getPickerTriggerKeyAction', () => {
+    it('normalizes trigger key actions', () => {
+      expect(getPickerTriggerKeyAction('Enter', false)).toBe('toggle')
+      expect(getPickerTriggerKeyAction(' ', true)).toBe('toggle')
+      expect(getPickerTriggerKeyAction('ArrowDown', false)).toBe('open')
+      expect(getPickerTriggerKeyAction('ArrowDown', true)).toBe('none')
+      expect(getPickerTriggerKeyAction('Escape', true)).toBe('close')
+      expect(getPickerTriggerKeyAction('Escape', false)).toBe('none')
     })
   })
 })

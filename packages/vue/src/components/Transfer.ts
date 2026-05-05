@@ -13,6 +13,8 @@ import {
   getTransferButtonClasses,
   splitTransferData,
   filterTransferItems,
+  getPickerListboxAria,
+  getPickerOptionAria,
   coerceClassValue,
   classNames,
   icon20ViewBox,
@@ -199,7 +201,10 @@ export const Transfer = defineComponent({
         // Body
         h(
           'div',
-          { class: transferPanelBodyClasses, role: 'listbox' },
+          {
+            class: transferPanelBodyClasses,
+            ...getPickerListboxAria({ label: `${title} items` })
+          },
           items.length > 0
             ? items.map((item) => {
                 const isSelected = selectedKeys.has(item.key)
@@ -209,9 +214,7 @@ export const Transfer = defineComponent({
                   {
                     key: item.key,
                     class: getTransferItemClasses(isSelected, isDisabled, props.size),
-                    role: 'option',
-                    'aria-selected': isSelected,
-                    'aria-disabled': isDisabled
+                    ...getPickerOptionAria({ selected: isSelected, disabled: isDisabled })
                   },
                   [
                     h('input', {

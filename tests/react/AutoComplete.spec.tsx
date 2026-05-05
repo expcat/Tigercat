@@ -193,6 +193,26 @@ describe('AutoComplete', () => {
 
       expect(onSelect).toHaveBeenCalled()
     })
+
+    it('should select first enabled option when the first option is disabled', async () => {
+      const user = userEvent.setup()
+      const onSelect = vi.fn()
+      const disabledFirstOptions = [
+        { label: 'Apple', value: 'apple', disabled: true },
+        { label: 'Banana', value: 'banana' }
+      ]
+      const { container } = render(
+        <AutoComplete options={disabledFirstOptions} onSelect={onSelect} />
+      )
+
+      const input = container.querySelector('input')!
+      await user.click(input)
+
+      expect(input.getAttribute('aria-activedescendant')).toContain('option-1')
+
+      await user.keyboard('{Enter}')
+      expect(onSelect).toHaveBeenCalledWith('banana', disabledFirstOptions[1])
+    })
   })
 
   describe('Accessibility', () => {

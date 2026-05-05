@@ -16,6 +16,12 @@ import {
   getAutoCompleteInputClasses,
   getAutoCompleteOptionClasses,
   filterAutoCompleteOptions,
+  getInitialPickerActiveIndex,
+  getPickerComboboxAria,
+  getPickerListboxAria,
+  getPickerNavigationIndex,
+  getPickerOptionAria,
+  getPickerOptionId,
   coerceClassValue,
   classNames,
   icon20ViewBox,
@@ -119,9 +125,10 @@ export const AutoComplete = defineComponent({
     function openDropdown() {
       if (props.disabled) return
       isOpen.value = true
-      if (props.defaultActiveFirstOption && filteredOptions.value.length > 0) {
-        activeIndex.value = 0
-      }
+      activeIndex.value = getInitialPickerActiveIndex(
+        filteredOptions.value,
+        props.defaultActiveFirstOption
+      )
     }
 
     function closeDropdown() {
@@ -137,7 +144,7 @@ export const AutoComplete = defineComponent({
       emit('change', val)
       if (!isOpen.value) openDropdown()
       if (props.defaultActiveFirstOption) {
-        activeIndex.value = filteredOptions.value.length > 0 ? 0 : -1
+        activeIndex.value = getInitialPickerActiveIndex(filteredOptions.value, true)
       }
     }
 
@@ -170,20 +177,11 @@ export const AutoComplete = defineComponent({
       const options = filteredOptions.value
       switch (e.key) {
         case 'ArrowDown':
-          e.preventDefault()
-          if (options.length > 0) {
-            let next = activeIndex.value + 1
-            while (next < options.length && options[next].disabled) next++
-            if (next < options.length) activeIndex.value = next
-          }
-          break
         case 'ArrowUp':
+        case 'Home':
+        case 'End':
           e.preventDefault()
-          if (options.length > 0) {
-            let prev = activeIndex.value - 1
-            while (prev >= 0 && options[prev].disabled) prev--
-            if (prev >= 0) activeIndex.value = prev
-          }
+          activeIndex.value = getPickerNavigationIndex(options, activeIndex.value, e.key)
           break
         case 'Enter':
           e.preventDefault()
@@ -237,14 +235,11 @@ export const AutoComplete = defineComponent({
             value: inputValue.value,
             placeholder: props.placeholder,
             disabled: props.disabled,
-            role: 'combobox',
-            'aria-expanded': String(isOpen.value),
-            'aria-haspopup': 'listbox',
-            'aria-controls': isOpen.value ? listboxId : undefined,
-            'aria-activedescendant':
-              isOpen.value && activeIndex.value >= 0
-                ? `${listboxId}-option-${activeIndex.value}`
-                : undefined,
+            ...getPickerComboboxAria({
+              expanded: isOpen.value,
+              listboxId,
+              activeIndex: activeIndex.value
+            }),
             autocomplete: 'off',
             onInput: handleInput,
             onFocus: openDropdown,
@@ -271,18 +266,18 @@ export const AutoComplete = defineComponent({
             ? h(
                 'div',
                 {
-                  id: listboxId,
-                  role: 'listbox',
+                  ...getPickerListboxAria({ id: listboxId }),
                   class: autoCompleteDropdownClasses
                 },
                 options.map((option, index) =>
                   h(
                     'div',
                     {
-                      id: `${listboxId}-option-${index}`,
-                      role: 'option',
-                      'aria-selected': String(option.value) === String(props.modelValue),
-                      'aria-disabled': option.disabled,
+                      id: getPickerOptionId(listboxId, index),
+                      ...getPickerOptionAria({
+                        selected: String(option.value) === String(props.modelValue),
+                        disabled: !!option.disabled
+                      }),
                       class: getAutoCompleteOptionClasses(
                         String(option.value) === String(props.modelValue),
                         !!option.disabled,

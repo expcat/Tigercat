@@ -14,6 +14,10 @@ import {
   flattenCascaderOptions,
   filterCascaderOptions,
   isCascaderOptionExpandable,
+  getPickerComboboxAria,
+  getPickerListboxAria,
+  getPickerOptionAria,
+  getPickerTriggerKeyAction,
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
   closeSolidIcon20PathD,
@@ -188,20 +192,16 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
 
   const handleTriggerKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      switch (e.key) {
-        case 'Enter':
-        case ' ':
-          e.preventDefault()
-          toggleOpen()
-          break
-        case 'Escape':
-          e.preventDefault()
-          setIsOpen(false)
-          break
-        case 'ArrowDown':
-          e.preventDefault()
-          if (!isOpen) setIsOpen(true)
-          break
+      const action = getPickerTriggerKeyAction(e.key, isOpen)
+      if (action === 'none') return
+
+      e.preventDefault()
+      if (action === 'toggle') {
+        toggleOpen()
+      } else if (action === 'open') {
+        setIsOpen(true)
+      } else if (action === 'close') {
+        setIsOpen(false)
       }
     },
     [toggleOpen, isOpen]
@@ -218,10 +218,7 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
         type="button"
         className={triggerClasses}
         disabled={disabled}
-        role="combobox"
-        aria-expanded={isOpen}
-        aria-haspopup="listbox"
-        aria-controls={isOpen ? listboxId : undefined}
+        {...getPickerComboboxAria({ expanded: isOpen, listboxId })}
         onClick={toggleOpen}
         onKeyDown={handleTriggerKeyDown}>
         <span
@@ -282,7 +279,7 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
             searchResults.length === 0 ? (
               <div className={cascaderEmptyStateClasses}>{notFoundText}</div>
             ) : (
-              <div className="max-h-64 overflow-auto" role="listbox" id={listboxId}>
+              <div className="max-h-64 overflow-auto" {...getPickerListboxAria({ id: listboxId })}>
                 {searchResults.map((item) => (
                   <div
                     key={item.valuePath.join(',')}
@@ -290,9 +287,10 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
                       cascaderSearchResultClasses,
                       item.disabled && 'opacity-50 cursor-not-allowed'
                     )}
-                    role="option"
-                    aria-selected={value?.join(',') === item.valuePath.join(',')}
-                    aria-disabled={item.disabled}
+                    {...getPickerOptionAria({
+                      selected: value?.join(',') === item.valuePath.join(','),
+                      disabled: item.disabled
+                    })}
                     onClick={() => handleSearchResultClick(item.valuePath, item.disabled)}>
                     {item.label}
                   </div>
@@ -306,8 +304,10 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
                 <div
                   key={colIndex}
                   className={cascaderColumnClasses}
-                  role="listbox"
-                  id={colIndex === 0 ? listboxId : undefined}
+                  {...getPickerListboxAria({
+                    id: colIndex === 0 ? listboxId : undefined,
+                    label: `Level ${colIndex + 1}`
+                  })}
                   aria-label={`Level ${colIndex + 1}`}>
                   {col.options.map((option) => {
                     const isSelected = col.selectedValue === option.value
@@ -317,9 +317,10 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
                       <div
                         key={option.value}
                         className={getCascaderOptionClasses(isSelected, !!option.disabled, size)}
-                        role="option"
-                        aria-selected={isSelected}
-                        aria-disabled={option.disabled}
+                        {...getPickerOptionAria({
+                          selected: isSelected,
+                          disabled: !!option.disabled
+                        })}
                         onClick={() => handleOptionClick(option, colIndex)}
                         onMouseEnter={() => handleOptionHover(option, colIndex)}>
                         <span className="flex-1 truncate">{option.label}</span>

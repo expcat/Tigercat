@@ -12,6 +12,10 @@ import {
   getAllTreeSelectKeys,
   flattenTreeSelectNodes,
   filterTreeSelectNodes,
+  getPickerComboboxAria,
+  getPickerListboxAria,
+  getPickerOptionAria,
+  getPickerTriggerKeyAction,
   coerceClassValue,
   classNames,
   icon20ViewBox,
@@ -203,12 +207,17 @@ export const TreeSelect = defineComponent({
     }
 
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        e.preventDefault()
-        closeDropdown()
-      } else if ((e.key === 'Enter' || e.key === ' ') && !isOpen.value) {
-        e.preventDefault()
+      const action = getPickerTriggerKeyAction(e.key, isOpen.value)
+      if (action === 'none') return
+
+      e.preventDefault()
+      if (action === 'toggle') {
+        if (isOpen.value) closeDropdown()
+        else openDropdown()
+      } else if (action === 'open') {
         openDropdown()
+      } else if (action === 'close') {
+        closeDropdown()
       }
     }
 
@@ -241,10 +250,7 @@ export const TreeSelect = defineComponent({
           {
             type: 'button',
             class: getTreeSelectTriggerClasses(props.size, props.disabled, isOpen.value),
-            role: 'combobox',
-            'aria-expanded': String(isOpen.value),
-            'aria-haspopup': 'listbox',
-            'aria-controls': isOpen.value ? listboxId : undefined,
+            ...getPickerComboboxAria({ expanded: isOpen.value, listboxId }),
             disabled: props.disabled,
             onClick: toggleDropdown,
             onKeydown: handleKeyDown
@@ -291,8 +297,7 @@ export const TreeSelect = defineComponent({
           ? h(
               'div',
               {
-                id: listboxId,
-                role: 'listbox',
+                ...getPickerListboxAria({ id: listboxId }),
                 class: treeSelectDropdownClasses
               },
               [
@@ -321,9 +326,7 @@ export const TreeSelect = defineComponent({
                         'div',
                         {
                           key: node.key,
-                          role: 'option',
-                          'aria-selected': selected,
-                          'aria-disabled': node.disabled,
+                          ...getPickerOptionAria({ selected, disabled: !!node.disabled }),
                           class: getTreeSelectNodeClasses(selected, !!node.disabled, props.size),
                           style: { paddingLeft: `${indent + 8}px` },
                           onClick: (e: MouseEvent) => {

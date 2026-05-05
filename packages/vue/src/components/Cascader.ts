@@ -14,6 +14,10 @@ import {
   flattenCascaderOptions,
   filterCascaderOptions,
   isCascaderOptionExpandable,
+  getPickerComboboxAria,
+  getPickerListboxAria,
+  getPickerOptionAria,
+  getPickerTriggerKeyAction,
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
   closeSolidIcon20PathD,
@@ -219,22 +223,16 @@ export const Cascader = defineComponent({
 
     // Keyboard navigation
     function handleTriggerKeyDown(e: KeyboardEvent) {
-      switch (e.key) {
-        case 'Enter':
-        case ' ':
-          e.preventDefault()
-          toggleOpen()
-          break
-        case 'Escape':
-          e.preventDefault()
-          closeDropdown()
-          break
-        case 'ArrowDown':
-          e.preventDefault()
-          if (!isOpen.value) {
-            isOpen.value = true
-          }
-          break
+      const action = getPickerTriggerKeyAction(e.key, isOpen.value)
+      if (action === 'none') return
+
+      e.preventDefault()
+      if (action === 'toggle') {
+        toggleOpen()
+      } else if (action === 'open') {
+        isOpen.value = true
+      } else if (action === 'close') {
+        closeDropdown()
       }
     }
 
@@ -329,10 +327,7 @@ export const Cascader = defineComponent({
           type: 'button',
           class: triggerClasses.value,
           disabled: props.disabled,
-          role: 'combobox',
-          'aria-expanded': isOpen.value,
-          'aria-haspopup': 'listbox',
-          'aria-controls': isOpen.value ? listboxId : undefined,
+          ...getPickerComboboxAria({ expanded: isOpen.value, listboxId }),
           onClick: toggleOpen,
           onKeydown: handleTriggerKeyDown
         },
@@ -380,7 +375,7 @@ export const Cascader = defineComponent({
           } else {
             const searchList = h(
               'div',
-              { class: 'max-h-64 overflow-auto', role: 'listbox', id: listboxId },
+              { class: 'max-h-64 overflow-auto', ...getPickerListboxAria({ id: listboxId }) },
               searchResults.value.map((item) =>
                 h(
                   'div',
@@ -389,9 +384,10 @@ export const Cascader = defineComponent({
                       cascaderSearchResultClasses,
                       item.disabled && 'opacity-50 cursor-not-allowed'
                     ),
-                    role: 'option',
-                    'aria-selected': props.modelValue?.join(',') === item.valuePath.join(','),
-                    'aria-disabled': item.disabled,
+                    ...getPickerOptionAria({
+                      selected: props.modelValue?.join(',') === item.valuePath.join(','),
+                      disabled: item.disabled
+                    }),
                     onClick: () => handleSearchResultClick(item.valuePath, item.disabled)
                   },
                   item.label
@@ -407,9 +403,10 @@ export const Cascader = defineComponent({
               'div',
               {
                 class: cascaderColumnClasses,
-                role: 'listbox',
-                id: colIndex === 0 ? listboxId : undefined,
-                'aria-label': `Level ${colIndex + 1}`
+                ...getPickerListboxAria({
+                  id: colIndex === 0 ? listboxId : undefined,
+                  label: `Level ${colIndex + 1}`
+                })
               },
               col.options.map((option) => {
                 const isSelected = col.selectedValue === option.value
@@ -419,9 +416,7 @@ export const Cascader = defineComponent({
                   'div',
                   {
                     class: getCascaderOptionClasses(isSelected, !!option.disabled, props.size),
-                    role: 'option',
-                    'aria-selected': isSelected,
-                    'aria-disabled': option.disabled,
+                    ...getPickerOptionAria({ selected: isSelected, disabled: !!option.disabled }),
                     onClick: () => handleOptionClick(option, colIndex),
                     onMouseenter: () => handleOptionHover(option, colIndex)
                   },

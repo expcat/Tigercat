@@ -12,6 +12,10 @@ import {
   getAllTreeSelectKeys,
   flattenTreeSelectNodes,
   filterTreeSelectNodes,
+  getPickerComboboxAria,
+  getPickerListboxAria,
+  getPickerOptionAria,
+  getPickerTriggerKeyAction,
   classNames,
   icon20ViewBox,
   chevronDownSolidIcon20PathD,
@@ -153,12 +157,17 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === 'Escape') {
-      e.preventDefault()
-      closeDropdown()
-    } else if ((e.key === 'Enter' || e.key === ' ') && !isOpen) {
-      e.preventDefault()
+    const action = getPickerTriggerKeyAction(e.key, isOpen)
+    if (action === 'none') return
+
+    e.preventDefault()
+    if (action === 'toggle') {
+      if (isOpen) closeDropdown()
+      else openDropdown()
+    } else if (action === 'open') {
       openDropdown()
+    } else if (action === 'close') {
+      closeDropdown()
     }
   }
 
@@ -180,10 +189,7 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
       <button
         type="button"
         className={getTreeSelectTriggerClasses(size, disabled, isOpen)}
-        role="combobox"
-        aria-expanded={isOpen}
-        aria-haspopup="listbox"
-        aria-controls={isOpen ? listboxId : undefined}
+        {...getPickerComboboxAria({ expanded: isOpen, listboxId })}
         disabled={disabled}
         onClick={toggleDropdown}
         onKeyDown={handleKeyDown}>
@@ -225,7 +231,7 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
 
       {/* Dropdown */}
       {isOpen && (
-        <div id={listboxId} role="listbox" className={treeSelectDropdownClasses}>
+        <div {...getPickerListboxAria({ id: listboxId })} className={treeSelectDropdownClasses}>
           {showSearch && (
             <input
               type="text"
@@ -246,9 +252,7 @@ export const TreeSelect: React.FC<TreeSelectProps> = (props) => {
               return (
                 <div
                   key={String(node.key)}
-                  role="option"
-                  aria-selected={selected}
-                  aria-disabled={node.disabled}
+                  {...getPickerOptionAria({ selected, disabled: !!node.disabled })}
                   className={getTreeSelectNodeClasses(selected, !!node.disabled, size)}
                   style={{ paddingLeft: `${indent + 8}px` }}
                   onClick={(e) => {

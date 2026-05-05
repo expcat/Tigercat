@@ -10,6 +10,12 @@ import {
   getAutoCompleteInputClasses,
   getAutoCompleteOptionClasses,
   filterAutoCompleteOptions,
+  getInitialPickerActiveIndex,
+  getPickerComboboxAria,
+  getPickerListboxAria,
+  getPickerNavigationIndex,
+  getPickerOptionAria,
+  getPickerOptionId,
   classNames,
   icon20ViewBox,
   closeSolidIcon20PathD
@@ -95,9 +101,7 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
   function openDropdown() {
     if (disabled) return
     setIsOpen(true)
-    if (defaultActiveFirstOption && filteredOptions.length > 0) {
-      setActiveIndex(0)
-    }
+    setActiveIndex(getInitialPickerActiveIndex(filteredOptions, defaultActiveFirstOption))
   }
 
   function closeDropdown() {
@@ -115,7 +119,7 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
     }
     if (defaultActiveFirstOption) {
       const newFiltered = filterAutoCompleteOptions(options, val, filterOption)
-      setActiveIndex(newFiltered.length > 0 ? 0 : -1)
+      setActiveIndex(getInitialPickerActiveIndex(newFiltered, true))
     }
   }
 
@@ -145,24 +149,11 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
 
     switch (e.key) {
       case 'ArrowDown':
-        e.preventDefault()
-        if (filteredOptions.length > 0) {
-          setActiveIndex((prev) => {
-            let next = prev + 1
-            while (next < filteredOptions.length && filteredOptions[next].disabled) next++
-            return next < filteredOptions.length ? next : prev
-          })
-        }
-        break
       case 'ArrowUp':
+      case 'Home':
+      case 'End':
         e.preventDefault()
-        if (filteredOptions.length > 0) {
-          setActiveIndex((prev) => {
-            let p = prev - 1
-            while (p >= 0 && filteredOptions[p].disabled) p--
-            return p >= 0 ? p : prev
-          })
-        }
+        setActiveIndex((prev) => getPickerNavigationIndex(filteredOptions, prev, e.key))
         break
       case 'Enter':
         e.preventDefault()
@@ -200,13 +191,7 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
         value={inputValue}
         placeholder={placeholder}
         disabled={disabled}
-        role="combobox"
-        aria-expanded={isOpen}
-        aria-haspopup="listbox"
-        aria-controls={isOpen ? listboxId : undefined}
-        aria-activedescendant={
-          isOpen && activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined
-        }
+        {...getPickerComboboxAria({ expanded: isOpen, listboxId, activeIndex })}
         autoComplete="off"
         onChange={handleInput}
         onFocus={openDropdown}
@@ -230,14 +215,15 @@ export const AutoComplete: React.FC<AutoCompleteProps> = (props) => {
       )}
 
       {isOpen && filteredOptions.length > 0 && (
-        <div id={listboxId} role="listbox" className={autoCompleteDropdownClasses}>
+        <div {...getPickerListboxAria({ id: listboxId })} className={autoCompleteDropdownClasses}>
           {filteredOptions.map((option, index) => (
             <div
               key={String(option.value)}
-              id={`${listboxId}-option-${index}`}
-              role="option"
-              aria-selected={String(option.value) === String(value)}
-              aria-disabled={option.disabled}
+              id={getPickerOptionId(listboxId, index)}
+              {...getPickerOptionAria({
+                selected: String(option.value) === String(value),
+                disabled: !!option.disabled
+              })}
               className={getAutoCompleteOptionClasses(
                 String(option.value) === String(value),
                 !!option.disabled,

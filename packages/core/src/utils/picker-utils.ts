@@ -8,6 +8,25 @@
 
 export type IsItemDisabled<T> = (item: T) => boolean
 
+export interface PickerComboboxAriaOptions {
+  expanded: boolean
+  listboxId: string
+  activeIndex?: number
+  activeOptionId?: string
+}
+
+export interface PickerListboxAriaOptions {
+  id?: string
+  label?: string
+}
+
+export interface PickerOptionAriaOptions {
+  selected?: boolean
+  disabled?: boolean
+}
+
+export type PickerTriggerKeyAction = 'open' | 'close' | 'toggle' | 'none'
+
 const defaultIsDisabled = <T>(item: T): boolean =>
   !!(item as { disabled?: boolean } | null | undefined)?.disabled
 
@@ -62,4 +81,101 @@ export function findNextEnabledIndex<T>(
     if (!isDisabled(items[i])) return i
   }
   return current
+}
+
+export function getInitialPickerActiveIndex<T>(
+  items: readonly T[],
+  activeFirst: boolean,
+  isDisabled: IsItemDisabled<T> = defaultIsDisabled
+): number {
+  return activeFirst ? findFirstEnabledIndex(items, isDisabled) : -1
+}
+
+export function getPickerNavigationIndex<T>(
+  items: readonly T[],
+  current: number,
+  key: string,
+  isDisabled: IsItemDisabled<T> = defaultIsDisabled
+): number {
+  switch (key) {
+    case 'ArrowDown':
+      return findNextEnabledIndex(items, current, 1, isDisabled)
+    case 'ArrowUp':
+      return findNextEnabledIndex(items, current, -1, isDisabled)
+    case 'Home':
+      return findFirstEnabledIndex(items, isDisabled)
+    case 'End':
+      return findLastEnabledIndex(items, isDisabled)
+    default:
+      return current
+  }
+}
+
+export function getPickerOptionId(listboxId: string, index: number): string {
+  return `${listboxId}-option-${index}`
+}
+
+export function getPickerComboboxAria({
+  expanded,
+  listboxId,
+  activeIndex = -1,
+  activeOptionId
+}: PickerComboboxAriaOptions): {
+  role: 'combobox'
+  'aria-expanded': boolean
+  'aria-haspopup': 'listbox'
+  'aria-controls': string | undefined
+  'aria-activedescendant': string | undefined
+} {
+  return {
+    role: 'combobox',
+    'aria-expanded': expanded,
+    'aria-haspopup': 'listbox',
+    'aria-controls': expanded ? listboxId : undefined,
+    'aria-activedescendant': expanded
+      ? (activeOptionId ??
+        (activeIndex >= 0 ? getPickerOptionId(listboxId, activeIndex) : undefined))
+      : undefined
+  }
+}
+
+export function getPickerListboxAria({ id, label }: PickerListboxAriaOptions = {}): {
+  id: string | undefined
+  role: 'listbox'
+  'aria-label': string | undefined
+} {
+  return {
+    id,
+    role: 'listbox',
+    'aria-label': label
+  }
+}
+
+export function getPickerOptionAria({
+  selected = false,
+  disabled = false
+}: PickerOptionAriaOptions): {
+  role: 'option'
+  'aria-selected': boolean
+  'aria-disabled': boolean | undefined
+} {
+  return {
+    role: 'option',
+    'aria-selected': selected,
+    'aria-disabled': disabled || undefined
+  }
+}
+
+export function getPickerTriggerKeyAction(key: string, expanded: boolean): PickerTriggerKeyAction {
+  switch (key) {
+    case 'Enter':
+    case ' ':
+      return 'toggle'
+    case 'ArrowDown':
+      return expanded ? 'none' : 'open'
+    case 'Escape':
+      return expanded ? 'close' : 'none'
+    default:
+      return 'none'
+  }
 }
