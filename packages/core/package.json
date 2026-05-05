@@ -146,6 +146,11 @@
       "types": "./dist/icons/table.d.ts",
       "import": "./dist/icons/table.js",
       "require": "./dist/icons/table.cjs"
+    },
+    "./utils/table-export": {
+      "types": "./dist/utils/table-export.d.ts",
+      "import": "./dist/utils/table-export.js",
+      "require": "./dist/utils/table-export.cjs"
     }
   },
   "files": [

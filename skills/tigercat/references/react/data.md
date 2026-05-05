@@ -148,6 +148,19 @@ const tableData = [
 <Table columns={columns} dataSource={tableData} pagination={false} />
 ```
 
+### 性能与导出
+
+```tsx
+import { exportTableToCsv } from '@expcat/tigercat-core/utils/table-export'
+
+// Table 不会自动打开 virtual；超过阈值时根节点会暴露 data-tiger-virtual-recommended="true"。
+;<Table columns={columns} dataSource={largeRows} pagination={false} virtualThreshold={1000} />
+
+// 需要真正的大数据表格虚拟化时，优先使用 VirtualTable。
+// CSV 工具从 core 子路径导入，避免进入主入口常用路径。
+const csv = exportTableToCsv(columns, tableData)
+```
+
 ### 行选择、分页、自定义渲染
 
 ```tsx

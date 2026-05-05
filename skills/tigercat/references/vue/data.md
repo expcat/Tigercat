@@ -133,6 +133,21 @@ const tableData = [
 </script>
 ```
 
+### 性能与导出
+
+```vue
+<script setup>
+import { exportTableToCsv } from '@expcat/tigercat-core/utils/table-export'
+
+// Table 不会自动打开 virtual；超过阈值时根节点会暴露 data-tiger-virtual-recommended="true"。
+const csv = exportTableToCsv(columns, tableData)
+</script>
+
+<template>
+  <Table :columns="columns" :dataSource="largeRows" :pagination="false" :virtualThreshold="1000" />
+</template>
+```
+
 ### 行选择、分页、自定义渲染
 
 ```vue

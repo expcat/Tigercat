@@ -123,6 +123,27 @@ describe('Table', () => {
       const pagination = container.querySelector('.flex.items-center.justify-between')
       expect(pagination).not.toBeInTheDocument()
     })
+
+    it('marks large non-virtual data sets with a virtual recommendation', () => {
+      const largeData = Array.from({ length: 4 }, (_, index) => ({
+        id: index,
+        name: `User ${index}`,
+        age: index,
+        email: `user${index}@example.com`
+      }))
+
+      const { container } = renderWithProps(Table, {
+        columns,
+        dataSource: largeData,
+        pagination: false,
+        virtualThreshold: 4
+      })
+
+      expect(container.querySelector('[data-tiger-virtual-recommended="true"]')).toHaveAttribute(
+        'data-tiger-virtual-threshold',
+        '4'
+      )
+    })
   })
 
   describe('Sorting', () => {

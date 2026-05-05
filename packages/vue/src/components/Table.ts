@@ -1,11 +1,13 @@
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   classNames,
+  createTableResizeObserverController,
   getTableWrapperClasses,
+  getTableVirtualRecommendation,
   tableBaseClasses,
-  tableLoadingOverlayClasses,
-  tableExportButtonClasses
+  tableLoadingOverlayClasses
 } from '@expcat/tigercat-core'
+import { tableExportButtonClasses } from '@expcat/tigercat-core/utils/table-export'
 
 import { tableEmits, tableProps, type VueTableProps } from './Table/props'
 import { useTableState } from './Table/state'
@@ -23,10 +25,38 @@ export const Table = defineComponent({
   props: tableProps,
   emits: tableEmits as unknown as string[],
   setup(props, { emit, slots }) {
-    const ctx = useTableState(props as TableInternalProps, emit)
+    const wrapperRef = ref<HTMLElement | null>(null)
+    const tableRef = ref<HTMLTableElement | null>(null)
+    const measuredColumnWidths = ref<Record<string, number>>({})
+    const measuredRowHeights = ref<number[]>([])
+    const ctx = useTableState(props as TableInternalProps, emit, measuredColumnWidths)
+
+    const resizeController = createTableResizeObserverController({
+      onResize: (snapshot) => {
+        if (!areNumberRecordsEqual(measuredColumnWidths.value, snapshot.columnWidths)) {
+          measuredColumnWidths.value = snapshot.columnWidths
+        }
+        if (!areNumberArraysEqual(measuredRowHeights.value, snapshot.rowHeights)) {
+          measuredRowHeights.value = snapshot.rowHeights
+        }
+      }
+    })
+
+    onMounted(() => {
+      if (wrapperRef.value) {
+        resizeController.observe(wrapperRef.value, tableRef.value)
+      }
+    })
+
+    onBeforeUnmount(() => resizeController.disconnect())
 
     return () => {
       const resolvedProps = props as TableInternalProps
+      const virtualRecommendation = getTableVirtualRecommendation({
+        virtual: resolvedProps.virtual,
+        dataLength: resolvedProps.dataSource.length,
+        threshold: resolvedProps.virtualThreshold
+      })
       const wrapperStyle = resolvedProps.maxHeight
         ? {
             maxHeight:
@@ -45,13 +75,13 @@ export const Table = defineComponent({
       const tableInner = h(
         'table',
         {
+          ref: tableRef,
           class: classNames(
             tableBaseClasses,
             resolvedProps.tableLayout === 'fixed' ? 'table-fixed' : 'table-auto'
           ),
           style:
-            ctx.fixedColumnsInfo.value.hasFixedColumns &&
-            ctx.fixedColumnsInfo.value.minTableWidth
+            ctx.fixedColumnsInfo.value.hasFixedColumns && ctx.fixedColumnsInfo.value.minTableWidth
               ? { minWidth: `${ctx.fixedColumnsInfo.value.minTableWidth}px` }
               : undefined
         },
@@ -74,8 +104,15 @@ export const Table = defineComponent({
       return h(
         'div',
         {
+          ref: wrapperRef,
           class: getTableWrapperClasses(resolvedProps.bordered, resolvedProps.maxHeight),
           style: wrapperStyle,
+          'data-tiger-virtual': virtualRecommendation.enabled ? 'enabled' : undefined,
+          'data-tiger-virtual-recommended': virtualRecommendation.recommended ? 'true' : undefined,
+          'data-tiger-virtual-threshold': virtualRecommendation.recommended
+            ? virtualRecommendation.threshold
+            : undefined,
+          'data-tiger-measured-row-height': measuredRowHeights.value[0] || undefined,
           'aria-busy': resolvedProps.loading
         },
         [
@@ -115,3 +152,18 @@ export const Table = defineComponent({
 })
 
 export default Table
+
+function areNumberRecordsEqual(
+  current: Record<string, number>,
+  next: Record<string, number>
+): boolean {
+  const currentKeys = Object.keys(current)
+  const nextKeys = Object.keys(next)
+  return (
+    currentKeys.length === nextKeys.length && nextKeys.every((key) => current[key] === next[key])
+  )
+}
+
+function areNumberArraysEqual(current: number[], next: number[]): boolean {
+  return current.length === next.length && next.every((value, index) => current[index] === value)
+}

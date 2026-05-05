@@ -86,6 +86,7 @@ export function renderTableBody(ctx: TableContext, view: RenderBodyViewProps): R
     const rowNode = (
       <tr
         key={key}
+        data-tiger-table-row-index={index}
         className={classNames(
           getTableRowClasses(hoverable, striped, index % 2 === 0, rowClass),
           ctx.fixedColumnsInfo.hasFixedColumns && 'group'

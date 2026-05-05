@@ -86,6 +86,7 @@ export function renderTableHeader(ctx: TableContext, view: RenderHeaderViewProps
           return (
             <th
               key={column.key}
+              data-tiger-table-column-key={column.key}
               aria-sort={ariaSort}
               className={classNames(
                 getTableHeaderCellClasses(

@@ -37,6 +37,7 @@ export interface VueTableProps {
   virtual?: boolean
   virtualHeight?: number
   virtualItemHeight?: number
+  virtualThreshold?: number
   editable?: boolean
   editableCells?: Map<string, Set<number>>
   filterMode?: 'basic' | 'advanced'
@@ -151,6 +152,7 @@ export const tableProps = {
   virtual: { type: Boolean, default: false },
   virtualHeight: { type: Number, default: 400 },
   virtualItemHeight: { type: Number, default: 40 },
+  virtualThreshold: { type: Number, default: 1000 },
   editable: { type: Boolean, default: false },
   editableCells: { type: Object as PropType<Map<string, Set<number>>> },
   filterMode: { type: String as PropType<'basic' | 'advanced'>, default: 'basic' },

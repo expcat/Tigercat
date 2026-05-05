@@ -26,11 +26,14 @@
 
 > 2026-05-05 执行：完成 Form / 校验复杂度。Form context 现在提供按字段索引的错误 map，Vue / React FormItem 读取自身错误为 O(1)，避免字段数和错误数同时增长时每个 FormItem 都扫描 errors；新增 Vue / React 多字段 validateField 回归测试，确认单字段校验不会执行其它字段规则。
 
+> 2026-05-05 执行：完成 Data / Table 性能二期。Table 新增 ResizeObserver + rAF 批量测量工具，Vue / React Table 用测得列宽更新 fixed column offset，并记录 row height 快照；virtual 策略明确为不自动启用，超过 `virtualThreshold` 时提供 `data-tiger-virtual-recommended="true"` 建议信号；CSV export 工具剥离到 `@expcat/tigercat-core/utils/table-export` 子路径。
+
 ## 1. 最高优先级
 
-| 任务                | 对应组件 / 范围 | 来源                                 | 完成标准                                                           |
-| ------------------- | --------------- | ------------------------------------ | ------------------------------------------------------------------ |
-| 处理 Table 性能二期 | Table           | [phase2.6-data.md](phase2.6-data.md) | ResizeObserver + rAF 批量、virtual 默认策略、export-utils 子路径化 |
+| 任务                      | 对应组件 / 范围              | 来源                                           | 完成标准                                                                 |
+| ------------------------- | ---------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------ |
+| List virtual mode         | List / VirtualList           | [phase2.4-layout.md](phase2.4-layout.md)       | List 复用 VirtualList，而不是保留独立虚拟逻辑或缺失虚拟路径              |
+| DataTableWithToolbar 边界 | DataTableWithToolbar / Table | [phase2.8-composite.md](phase2.8-composite.md) | 确认内部完全代理 Table 行为，只保留 toolbar 编排；必要时删掉重复状态逻辑 |
 
 ## 2. 分组索引
 
@@ -44,7 +47,7 @@
 | Feedback              | [phase2.3-feedback.md](phase2.3-feedback.md)                             | 已完成 overlay 共享层                                                                                              |
 | Layout                | [phase2.4-layout.md](phase2.4-layout.md)                                 | Row / Col / Splitter / Resizable / List / Statistic / Descriptions / Container                                     |
 | Navigation            | [phase2.5-navigation.md](phase2.5-navigation.md)                         | Menu / Dropdown / Anchor / Breadcrumb / Steps / Tabs / Pagination / FloatButton                                    |
-| Data                  | [phase2.6-data.md](phase2.6-data.md)                                     | Table / Timeline                                                                                                   |
+| Data                  | [phase2.6-data.md](phase2.6-data.md)                                     | Timeline；Table 性能二期已完成                                                                                     |
 | Charts                | [phase2.7-charts.md](phase2.7-charts.md)                                 | TreeMap / Sunburst / Gauge / chart interaction hot paths                                                           |
 | Composite             | [phase2.8-composite.md](phase2.8-composite.md)                           | DataTableWithToolbar / NotificationCenter / ActivityFeed / Timeline / CropUpload / FormWizard                      |
 | Advanced              | [phase2.9-advanced.md](phase2.9-advanced.md)                             | VirtualList / InfiniteScroll / FileManager / ImageViewer / TaskBoard / VirtualTable / PrintLayout / RichTextEditor |

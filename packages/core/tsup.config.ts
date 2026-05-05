@@ -21,6 +21,7 @@ export default defineConfig({
     index: 'src/index.ts',
     tailwind: 'src/tailwind-entry.ts',
     'tailwind/modern': 'src/tailwind-entry-modern.ts',
+    'utils/table-export': 'src/utils/table-export.ts',
     ...localeEntries,
     ...datePickerLocaleEntries,
     ...iconEntries

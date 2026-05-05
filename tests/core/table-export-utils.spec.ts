@@ -3,7 +3,11 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { exportTableToCsv, downloadCsv, tableExportButtonClasses } from '@expcat/tigercat-core'
+import {
+  exportTableToCsv,
+  downloadCsv,
+  tableExportButtonClasses
+} from '@expcat/tigercat-core/utils/table-export'
 
 const columns = [
   { key: 'name', title: 'Name' },

@@ -215,6 +215,7 @@ export function renderTableBody(
       'tr',
       {
         key,
+        'data-tiger-table-row-index': index,
         class: classNames(
           getTableRowClasses(props.hoverable, props.striped, index % 2 === 0, rowClass),
           ctx.fixedColumnsInfo.value.hasFixedColumns && 'group'

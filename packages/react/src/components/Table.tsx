@@ -1,13 +1,15 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
+  createTableResizeObserverController,
   getTableWrapperClasses,
+  getTableVirtualRecommendation,
   tableBaseClasses,
   tableLoadingOverlayClasses,
-  tableExportButtonClasses,
   type RowSelectionConfig,
   type ExpandableConfig
 } from '@expcat/tigercat-core'
+import { tableExportButtonClasses } from '@expcat/tigercat-core/utils/table-export'
 
 import { LoadingSpinner } from './Table/icons'
 import { useTableState } from './Table/state'
@@ -52,6 +54,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   virtual = false,
   virtualHeight = 400,
   virtualItemHeight: _virtualItemHeight = 40,
+  virtualThreshold = 1000,
   editable = false,
   editableCells,
   filterMode = 'basic',
@@ -74,6 +77,10 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
   className,
   ...props
 }: TableProps<T>) {
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
+  const tableRef = useRef<HTMLTableElement | null>(null)
+  const [measuredColumnWidths, setMeasuredColumnWidths] = useState<Record<string, number>>({})
+  const [measuredRowHeights, setMeasuredRowHeights] = useState<number[]>([])
   const internalRowSelection = rowSelection as
     | RowSelectionConfig<Record<string, unknown>>
     | undefined
@@ -100,6 +107,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
     advancedFilterRules,
     groupBy,
     exportFilename,
+    measuredColumnWidths,
     onChange,
     onRowClick: onRowClick as
       | ((record: Record<string, unknown>, index: number) => void)
@@ -134,13 +142,51 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       : undefined
   }, [maxHeight, virtual, virtualHeight])
 
+  const virtualRecommendation = useMemo(
+    () =>
+      getTableVirtualRecommendation({
+        virtual,
+        dataLength: dataSource.length,
+        threshold: virtualThreshold
+      }),
+    [dataSource.length, virtual, virtualThreshold]
+  )
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current
+    if (!wrapper) {
+      return undefined
+    }
+
+    const controller = createTableResizeObserverController({
+      onResize: (snapshot) => {
+        setMeasuredColumnWidths((prev) =>
+          areNumberRecordsEqual(prev, snapshot.columnWidths) ? prev : snapshot.columnWidths
+        )
+        setMeasuredRowHeights((prev) =>
+          areNumberArraysEqual(prev, snapshot.rowHeights) ? prev : snapshot.rowHeights
+        )
+      }
+    })
+
+    controller.observe(wrapper, tableRef.current)
+    return () => controller.disconnect()
+  }, [ctx.displayColumns.length, ctx.paginatedData.length])
+
   return (
     <div
+      ref={wrapperRef}
       className={getTableWrapperClasses(
         bordered,
         maxHeight || (virtual ? virtualHeight : undefined)
       )}
       style={wrapperStyle}
+      data-tiger-virtual={virtualRecommendation.enabled ? 'enabled' : undefined}
+      data-tiger-virtual-recommended={virtualRecommendation.recommended ? 'true' : undefined}
+      data-tiger-virtual-threshold={
+        virtualRecommendation.recommended ? virtualRecommendation.threshold : undefined
+      }
+      data-tiger-measured-row-height={measuredRowHeights[0] || undefined}
       aria-busy={loading}>
       {exportable && (
         <div className="mb-2 flex justify-end">
@@ -151,6 +197,7 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       )}
 
       <table
+        ref={tableRef}
         className={classNames(
           tableBaseClasses,
           tableLayout === 'fixed' ? 'table-fixed' : 'table-auto',
@@ -205,4 +252,19 @@ export function Table<T extends Record<string, unknown> = Record<string, unknown
       {renderPagination(ctx, { pagination })}
     </div>
   )
+}
+
+function areNumberRecordsEqual(
+  current: Record<string, number>,
+  next: Record<string, number>
+): boolean {
+  const currentKeys = Object.keys(current)
+  const nextKeys = Object.keys(next)
+  return (
+    currentKeys.length === nextKeys.length && nextKeys.every((key) => current[key] === next[key])
+  )
+}
+
+function areNumberArraysEqual(current: number[], next: number[]): boolean {
+  return current.length === next.length && next.every((value, index) => current[index] === value)
 }

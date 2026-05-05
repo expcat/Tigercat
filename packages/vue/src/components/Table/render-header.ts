@@ -135,6 +135,7 @@ export function renderTableHeader(
         'th',
         {
           key: column.key,
+          'data-tiger-table-column-key': column.key,
           'aria-sort': ariaSort,
           class: classNames(
             getTableHeaderCellClasses(

@@ -42,7 +42,8 @@ export function parseWidthToPx(width?: string | number): number {
  * Calculate sticky offsets for fixed columns.
  */
 export function getFixedColumnOffsets<T = Record<string, unknown>>(
-  columns: TableColumn<T>[]
+  columns: TableColumn<T>[],
+  measuredColumnWidths: Record<string, number> = {}
 ): {
   leftOffsets: Record<string, number>
   rightOffsets: Record<string, number>
@@ -60,7 +61,7 @@ export function getFixedColumnOffsets<T = Record<string, unknown>>(
       leftOffsets[column.key] = left
       hasLeftFixedColumns = true
     }
-    left += parseWidthToPx(column.width)
+    left += measuredColumnWidths[column.key] || parseWidthToPx(column.width)
   }
 
   let right = 0
@@ -70,13 +71,52 @@ export function getFixedColumnOffsets<T = Record<string, unknown>>(
       rightOffsets[column.key] = right
       hasRightFixedColumns = true
     }
-    right += parseWidthToPx(column.width)
+    right += measuredColumnWidths[column.key] || parseWidthToPx(column.width)
   }
 
-  const minTableWidth = columns.reduce((sum, col) => sum + parseWidthToPx(col.width), 0)
+  const minTableWidth = columns.reduce(
+    (sum, col) => sum + (measuredColumnWidths[col.key] || parseWidthToPx(col.width)),
+    0
+  )
   const hasFixedColumns = hasLeftFixedColumns || hasRightFixedColumns
 
   return { leftOffsets, rightOffsets, minTableWidth, hasFixedColumns }
+}
+
+export const TABLE_VIRTUAL_RECOMMENDATION_THRESHOLD = 1000
+
+export interface TableVirtualRecommendationOptions {
+  virtual?: boolean
+  dataLength: number
+  threshold?: number
+}
+
+export interface TableVirtualRecommendation {
+  enabled: boolean
+  recommended: boolean
+  threshold: number
+  dataLength: number
+}
+
+/**
+ * Resolve the public Table virtual strategy.
+ *
+ * Table stays opt-in for virtualization to avoid surprising layout changes.
+ * Large data sets surface a recommendation that consumers can inspect and use
+ * to switch to `virtual` or the dedicated `VirtualTable` component.
+ */
+export function getTableVirtualRecommendation(
+  options: TableVirtualRecommendationOptions
+): TableVirtualRecommendation {
+  const threshold = options.threshold ?? TABLE_VIRTUAL_RECOMMENDATION_THRESHOLD
+  const enabled = options.virtual === true
+
+  return {
+    enabled,
+    recommended: !enabled && options.dataLength >= threshold,
+    threshold,
+    dataLength: options.dataLength
+  }
 }
 
 /**

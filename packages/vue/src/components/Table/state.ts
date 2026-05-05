@@ -7,8 +7,6 @@ import {
   createTableRowKeyCache,
   filterDataAdvanced,
   groupDataByColumn,
-  exportTableToCsv,
-  downloadCsv,
   getFixedColumnOffsets,
   getFixedVirtualRange,
   type TableColumn,
@@ -16,6 +14,7 @@ import {
   type SortDirection,
   type PaginationConfig
 } from '@expcat/tigercat-core'
+import { exportTableToCsv, downloadCsv } from '@expcat/tigercat-core/utils/table-export'
 import type { TableContext, TableEmitFn, TableInternalProps } from './types'
 
 /**
@@ -25,7 +24,11 @@ import type { TableContext, TableEmitFn, TableInternalProps } from './types'
  * Behavior is intentionally identical to the original monolithic Table setup —
  * this is a structural extraction only.
  */
-export function useTableState(props: TableInternalProps, emit: TableEmitFn): TableContext {
+export function useTableState(
+  props: TableInternalProps,
+  emit: TableEmitFn,
+  measuredColumnWidths: { value: Record<string, number> }
+): TableContext {
   const paginationConfig = computed(() => {
     return props.pagination !== false && typeof props.pagination === 'object'
       ? (props.pagination as PaginationConfig)
@@ -138,7 +141,7 @@ export function useTableState(props: TableInternalProps, emit: TableEmitFn): Tab
   })
 
   const fixedColumnsInfo = computed(() => {
-    return getFixedColumnOffsets(displayColumns.value)
+    return getFixedColumnOffsets(displayColumns.value, measuredColumnWidths.value)
   })
 
   const columnByKey = computed<Record<string, TableColumn>>(() => {

@@ -8,8 +8,6 @@ import {
   filterDataAdvanced,
   groupDataByColumn,
   getFixedColumnOffsets,
-  exportTableToCsv,
-  downloadCsv,
   type SortState,
   type PaginationConfig,
   type TableColumn,
@@ -17,6 +15,7 @@ import {
   type RowSelectionConfig,
   type ExpandableConfig
 } from '@expcat/tigercat-core'
+import { exportTableToCsv, downloadCsv } from '@expcat/tigercat-core/utils/table-export'
 import type { TableContext, TableProps } from './types'
 
 /**
@@ -41,6 +40,7 @@ export interface UseTableStateInput {
   advancedFilterRules: FilterRule[]
   groupBy?: string
   exportFilename: string
+  measuredColumnWidths?: Record<string, number>
 
   // event callbacks
   onChange?: TableProps['onChange']
@@ -77,6 +77,7 @@ export function useTableState(input: UseTableStateInput): TableContext {
     advancedFilterRules,
     groupBy,
     exportFilename,
+    measuredColumnWidths,
     onChange,
     onRowClick,
     onSelectionChange,
@@ -210,7 +211,10 @@ export function useTableState(input: UseTableStateInput): TableContext {
     return map
   }, [displayColumns])
 
-  const fixedColumnsInfo = useMemo(() => getFixedColumnOffsets(displayColumns), [displayColumns])
+  const fixedColumnsInfo = useMemo(
+    () => getFixedColumnOffsets(displayColumns, measuredColumnWidths),
+    [displayColumns, measuredColumnWidths]
+  )
 
   function toggleColumnLock(columnKey: string) {
     setFixedOverrides((prev) => {

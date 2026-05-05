@@ -24,11 +24,21 @@ import { Button } from '@expcat/tigercat-vue/Button'
 | 表格     | `VirtualTable`   | 1000+ 行   |
 | 无限加载 | `InfiniteScroll` | 分页加载   |
 
+`Table` 默认不自动启用 virtual，避免在数据量变化时改变布局行为；当 `dataSource.length >= virtualThreshold` 且未启用 `virtual` 时，根节点会暴露 `data-tiger-virtual-recommended="true"` 供应用侧监控或自动切换。需要真正的大数据表格虚拟化时优先使用 `VirtualTable`。
+
 ```tsx
 // React
 <VirtualList items={data} itemHeight={40} overscan={5}>
   {(item) => <div>{item.name}</div>}
 </VirtualList>
+```
+
+## Table 导出工具
+
+CSV 导出工具位于 core 子路径，避免进入主入口常用路径：
+
+```ts
+import { exportTableToCsv, downloadCsv } from '@expcat/tigercat-core/utils/table-export'
 ```
 
 ## 图表性能

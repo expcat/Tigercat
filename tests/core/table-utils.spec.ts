@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   createTableRowKeyCache,
   getFixedColumnOffsets,
+  getTableVirtualRecommendation,
   getRowKey,
   type TableColumn
 } from '@expcat/tigercat-core'
@@ -77,6 +78,41 @@ describe('table-utils', () => {
       ]
 
       expect(getFixedColumnOffsets(columns).hasFixedColumns).toBe(false)
+    })
+
+    it('uses measured column widths before declared widths for fixed offsets', () => {
+      const columns: TableColumn[] = [
+        { key: 'name', title: 'Name', width: 120, fixed: 'left' },
+        { key: 'age', title: 'Age', width: 80 },
+        { key: 'actions', title: 'Actions', width: 100, fixed: 'right' }
+      ]
+
+      expect(getFixedColumnOffsets(columns, { name: 150, age: 90, actions: 110 })).toEqual({
+        leftOffsets: { name: 0 },
+        rightOffsets: { actions: 0 },
+        minTableWidth: 350,
+        hasFixedColumns: true
+      })
+    })
+  })
+
+  describe('getTableVirtualRecommendation', () => {
+    it('recommends virtual mode at or above the threshold without enabling it', () => {
+      expect(getTableVirtualRecommendation({ dataLength: 1000 })).toEqual({
+        enabled: false,
+        recommended: true,
+        threshold: 1000,
+        dataLength: 1000
+      })
+    })
+
+    it('does not recommend when virtual mode is already enabled', () => {
+      expect(getTableVirtualRecommendation({ virtual: true, dataLength: 2000 })).toEqual({
+        enabled: true,
+        recommended: false,
+        threshold: 1000,
+        dataLength: 2000
+      })
     })
   })
 })

@@ -446,6 +446,14 @@ export interface TableProps<T = Record<string, unknown>> {
   virtualItemHeight?: number
 
   /**
+   * Row count at which Table marks virtual rendering as recommended.
+   * Table does not enable virtualization automatically; use this signal to
+   * switch to `virtual` or the dedicated `VirtualTable` component.
+   * @default 1000
+   */
+  virtualThreshold?: number
+
+  /**
    * Enable cell editing
    * @default false
    */
