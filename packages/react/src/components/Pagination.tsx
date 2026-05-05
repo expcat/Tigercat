@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   classNames,
   getTotalPages,
@@ -16,9 +16,17 @@ import {
   getSizeTextClasses,
   getPaginationLabels,
   formatPageAriaLabel,
+  createPaginationIdleValidationScheduler,
+  getImmediateTigerLocale,
+  getPaginationJumperPage,
+  getValidatedPaginationJumperValue,
+  isLazyTigerLocale,
+  resolveTigerLocale,
   type PaginationProps as CorePaginationProps,
   type PaginationPageSizeOptionItem,
-  type TigerLocale
+  type PaginationIdleValidationScheduler,
+  type TigerLocale,
+  type TigerLocaleInput
 } from '@expcat/tigercat-core'
 
 export interface PaginationProps
@@ -31,7 +39,7 @@ export interface PaginationProps
   /**
    * Locale configuration for i18n support
    */
-  locale?: Partial<TigerLocale>
+  locale?: TigerLocaleInput
 }
 
 export const Pagination: React.FC<PaginationProps> = ({
@@ -51,6 +59,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   disabled = false,
   hideOnSinglePage = false,
   showLessItems = false,
+  quickJumperValidation,
   className,
   style,
   onChange,
@@ -60,13 +69,54 @@ export const Pagination: React.FC<PaginationProps> = ({
 }) => {
   const { 'aria-label': ariaLabelProp, ...navProps } = props
 
+  const immediateLocale = useMemo(() => getImmediateTigerLocale(locale), [locale])
+  const [loadedLocale, setLoadedLocale] = useState<Partial<TigerLocale> | undefined>(
+    immediateLocale
+  )
+
+  useEffect(() => {
+    let active = true
+    setLoadedLocale(immediateLocale)
+
+    if (isLazyTigerLocale(locale)) {
+      resolveTigerLocale(locale)
+        .then((nextLocale) => {
+          if (active) setLoadedLocale(nextLocale)
+        })
+        .catch(() => {
+          if (active) setLoadedLocale(immediateLocale)
+        })
+    }
+
+    return () => {
+      active = false
+    }
+  }, [locale, immediateLocale])
+
+  const resolvedLocale = isLazyTigerLocale(locale) ? loadedLocale : immediateLocale
+
   // Get resolved locale labels
-  const labels = useMemo(() => getPaginationLabels(locale), [locale])
+  const labels = useMemo(() => getPaginationLabels(resolvedLocale), [resolvedLocale])
 
   // Internal state for uncontrolled mode
   const [internalCurrent, setInternalCurrent] = useState<number>(defaultCurrent)
   const [internalPageSize, setInternalPageSize] = useState<number>(defaultPageSize)
   const [quickJumperValue, setQuickJumperValue] = useState<string>('')
+  const quickJumperValidationSchedulerRef = useRef<PaginationIdleValidationScheduler | null>(null)
+
+  if (quickJumperValidationSchedulerRef.current === null) {
+    quickJumperValidationSchedulerRef.current =
+      createPaginationIdleValidationScheduler(quickJumperValidation)
+  }
+
+  useEffect(() => {
+    quickJumperValidationSchedulerRef.current =
+      createPaginationIdleValidationScheduler(quickJumperValidation)
+
+    return () => {
+      quickJumperValidationSchedulerRef.current?.cancel()
+    }
+  }, [quickJumperValidation])
 
   // Use controlled or uncontrolled values
   const currentPage = controlledCurrent !== undefined ? controlledCurrent : internalCurrent
@@ -141,12 +191,23 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   // Handle quick jumper submit
   const handleQuickJumperSubmit = useCallback(() => {
-    const page = parseInt(quickJumperValue, 10)
-    if (!isNaN(page)) {
+    quickJumperValidationSchedulerRef.current?.cancel()
+    const page = getPaginationJumperPage(quickJumperValue, totalPages)
+    if (page !== null) {
       handlePageChange(page)
     }
     setQuickJumperValue('')
-  }, [quickJumperValue, handlePageChange])
+  }, [quickJumperValue, totalPages, handlePageChange])
+
+  const handleQuickJumperChange = useCallback(
+    (value: string) => {
+      setQuickJumperValue(value)
+      quickJumperValidationSchedulerRef.current?.schedule(() => {
+        setQuickJumperValue(getValidatedPaginationJumperValue(value, totalPages))
+      })
+    },
+    [totalPages]
+  )
 
   // Handle quick jumper keypress
   const handleQuickJumperKeyPress = useCallback(
@@ -290,7 +351,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         className={classNames(getQuickJumperInputClasses(size), 'mx-2')}
         disabled={disabled}
         value={quickJumperValue}
-        onChange={(e) => setQuickJumperValue(e.target.value)}
+        onChange={(e) => handleQuickJumperChange(e.target.value)}
         onKeyDown={handleQuickJumperKeyPress}
         min={1}
         max={totalPages}

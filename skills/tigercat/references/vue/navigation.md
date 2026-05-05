@@ -317,6 +317,13 @@ const collapsed = ref(false)
     :locale="{ pagination: customLabels }"
     showQuickJumper
     showSizeChanger />
+
+  <!-- 分页文案懒加载 -->
+  <Pagination
+    v-model:current="page"
+    :total="500"
+    :locale="() => import('@expcat/tigercat-core/locales/zh-CN')"
+    showQuickJumper />
 </template>
 ```
 

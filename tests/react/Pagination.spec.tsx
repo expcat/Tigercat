@@ -3,12 +3,16 @@
  */
 
 import React from 'react'
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { afterEach, describe, it, expect, vi } from 'vitest'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Pagination } from '@expcat/tigercat-react'
 
 describe('Pagination', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('renders navigation with default aria-label', () => {
     const { container } = render(<Pagination total={100} />)
     const nav = container.querySelector('nav')
@@ -65,6 +69,47 @@ describe('Pagination', () => {
 
     expect(onChange).toHaveBeenCalledWith(5, 10)
     expect(input.value).toBe('')
+  })
+
+  it('normalizes quick jumper input after idle validation', () => {
+    vi.useFakeTimers()
+
+    render(<Pagination total={100} pageSize={10} showQuickJumper />)
+
+    const input = screen.getByLabelText('Go to') as HTMLInputElement
+    fireEvent.change(input, { target: { value: '99' } })
+
+    expect(input.value).toBe('99')
+
+    act(() => {
+      vi.advanceTimersByTime(120)
+    })
+
+    expect(input.value).toBe('10')
+  })
+
+  it('loads pagination locale lazily', async () => {
+    render(
+      <Pagination
+        total={100}
+        pageSize={10}
+        showQuickJumper
+        locale={() =>
+          Promise.resolve({
+            zhCN: {
+              pagination: {
+                jumpToText: '跳至',
+                pageText: '页'
+              }
+            }
+          })
+        }
+      />
+    )
+
+    expect(screen.getByLabelText('Go to')).toBeInTheDocument()
+    expect(await screen.findByLabelText('跳至')).toBeInTheDocument()
+    expect(screen.getByText('页')).toBeInTheDocument()
   })
 
   it('calls onPageSizeChange and adjusts page when needed', async () => {

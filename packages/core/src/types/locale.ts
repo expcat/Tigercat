@@ -96,3 +96,15 @@ export interface TigerLocale {
   formWizard?: TigerLocaleFormWizard
   taskBoard?: TigerLocaleTaskBoard
 }
+
+export type TigerLocaleLazyModule =
+  | Partial<TigerLocale>
+  | { default?: Partial<TigerLocale> }
+  | Record<string, unknown>
+
+export type TigerLocaleLoader = () => PromiseLike<TigerLocaleLazyModule>
+
+export type TigerLocaleInput =
+  | Partial<TigerLocale>
+  | PromiseLike<TigerLocaleLazyModule>
+  | TigerLocaleLoader

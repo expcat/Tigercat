@@ -2,6 +2,8 @@
  * Pagination component types and interfaces
  */
 
+import type { TigerLocaleInput } from './locale'
+
 /**
  * Pagination size type
  */
@@ -21,6 +23,23 @@ export interface PaginationPageSizeOption {
 }
 
 export type PaginationPageSizeOptionItem = number | PaginationPageSizeOption
+
+/**
+ * Quick jumper validation scheduling strategy.
+ */
+export interface PaginationQuickJumperValidationOptions {
+  /**
+   * Debounce delay before validation is scheduled during idle time.
+   * @default 120
+   */
+  delay?: number
+
+  /**
+   * Maximum time to wait for requestIdleCallback before running validation.
+   * @default 250
+   */
+  timeout?: number
+}
 
 /**
  * Base pagination props interface
@@ -67,6 +86,11 @@ export interface PaginationProps {
    * @default false
    */
   showQuickJumper?: boolean
+
+  /**
+   * Quick jumper delayed validation timing.
+   */
+  quickJumperValidation?: PaginationQuickJumperValidationOptions
 
   /**
    * Whether to show page size selector
@@ -133,6 +157,11 @@ export interface PaginationProps {
    * Custom styles
    */
   style?: Record<string, string | number>
+
+  /**
+   * Locale configuration. Accepts a sync locale, promise, or lazy loader.
+   */
+  locale?: TigerLocaleInput
 }
 
 /**

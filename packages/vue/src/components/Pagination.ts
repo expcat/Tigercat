@@ -1,4 +1,13 @@
-import { defineComponent, computed, ref, PropType, h, type VNodeChild } from 'vue'
+import {
+  defineComponent,
+  computed,
+  ref,
+  watch,
+  onBeforeUnmount,
+  PropType,
+  h,
+  type VNodeChild
+} from 'vue'
 import {
   classNames,
   coerceClassValue,
@@ -18,10 +27,18 @@ import {
   getSizeTextClasses,
   getPaginationLabels,
   formatPageAriaLabel,
+  createPaginationIdleValidationScheduler,
+  getImmediateTigerLocale,
+  getPaginationJumperPage,
+  getValidatedPaginationJumperValue,
+  isLazyTigerLocale,
+  resolveTigerLocale,
   type PaginationSize,
   type PaginationAlign,
   type PaginationPageSizeOptionItem,
-  type TigerLocale
+  type PaginationIdleValidationScheduler,
+  type TigerLocale,
+  type TigerLocaleInput
 } from '@expcat/tigercat-core'
 
 export interface VuePaginationProps {
@@ -32,6 +49,10 @@ export interface VuePaginationProps {
   defaultPageSize?: number
   pageSizeOptions?: PaginationPageSizeOptionItem[]
   showQuickJumper?: boolean
+  quickJumperValidation?: {
+    delay?: number
+    timeout?: number
+  }
   showSizeChanger?: boolean
   showTotal?: boolean
   totalText?: (total: number, range: [number, number]) => string
@@ -46,7 +67,7 @@ export interface VuePaginationProps {
   /**
    * Locale configuration for i18n support
    */
-  locale?: Partial<TigerLocale>
+  locale?: TigerLocaleInput
 }
 
 export const Pagination = defineComponent({
@@ -195,7 +216,14 @@ export const Pagination = defineComponent({
      * Locale configuration for i18n support
      */
     locale: {
-      type: Object as PropType<Partial<TigerLocale>>,
+      type: [Object, Function] as PropType<TigerLocaleInput>,
+      default: undefined
+    },
+    quickJumperValidation: {
+      type: Object as PropType<{
+        delay?: number
+        timeout?: number
+      }>,
       default: undefined
     }
   },
@@ -205,8 +233,38 @@ export const Pagination = defineComponent({
     const attrsClass = (attrsRecord as { class?: unknown }).class
     const attrsStyle = (attrsRecord as { style?: unknown }).style
 
+    const resolvedLocale = ref<Partial<TigerLocale> | undefined>(
+      getImmediateTigerLocale(props.locale)
+    )
+    let localeResolveId = 0
+    let disposed = false
+
+    watch(
+      () => props.locale,
+      (locale) => {
+        const resolveId = ++localeResolveId
+        const immediateLocale = getImmediateTigerLocale(locale)
+        resolvedLocale.value = immediateLocale
+
+        if (!isLazyTigerLocale(locale)) return
+
+        resolveTigerLocale(locale)
+          .then((nextLocale) => {
+            if (!disposed && resolveId === localeResolveId) {
+              resolvedLocale.value = nextLocale
+            }
+          })
+          .catch(() => {
+            if (!disposed && resolveId === localeResolveId) {
+              resolvedLocale.value = immediateLocale
+            }
+          })
+      },
+      { immediate: true }
+    )
+
     // Get resolved locale labels
-    const labels = computed(() => getPaginationLabels(props.locale))
+    const labels = computed(() => getPaginationLabels(resolvedLocale.value))
 
     // Internal state for uncontrolled mode
     const internalCurrent = ref<number>(props.defaultCurrent)
@@ -214,6 +272,21 @@ export const Pagination = defineComponent({
 
     // Quick jumper input value
     const quickJumperValue = ref<string>('')
+    let quickJumperValidationScheduler: PaginationIdleValidationScheduler =
+      createPaginationIdleValidationScheduler(props.quickJumperValidation)
+
+    watch(
+      () => props.quickJumperValidation,
+      (options) => {
+        quickJumperValidationScheduler.cancel()
+        quickJumperValidationScheduler = createPaginationIdleValidationScheduler(options)
+      }
+    )
+
+    onBeforeUnmount(() => {
+      disposed = true
+      quickJumperValidationScheduler.cancel()
+    })
 
     // Computed current page (controlled or uncontrolled)
     const currentPage = computed(() => {
@@ -294,11 +367,19 @@ export const Pagination = defineComponent({
 
     // Handle quick jumper submit
     const handleQuickJumperSubmit = () => {
-      const page = parseInt(quickJumperValue.value, 10)
-      if (!isNaN(page)) {
+      quickJumperValidationScheduler.cancel()
+      const page = getPaginationJumperPage(quickJumperValue.value, totalPages.value)
+      if (page !== null) {
         handlePageChange(page)
       }
       quickJumperValue.value = ''
+    }
+
+    const handleQuickJumperInput = (value: string) => {
+      quickJumperValue.value = value
+      quickJumperValidationScheduler.schedule(() => {
+        quickJumperValue.value = getValidatedPaginationJumperValue(value, totalPages.value)
+      })
     }
 
     // Handle quick jumper keypress
@@ -378,11 +459,7 @@ export const Pagination = defineComponent({
         getPageNumbers(page, pages, props.showLessItems).forEach((pageNum) => {
           if (pageNum === '...') {
             elements.push(
-              h(
-                'span',
-                { class: getPaginationEllipsisClasses(size), 'aria-hidden': 'true' },
-                '...'
-              )
+              h('span', { class: getPaginationEllipsisClasses(size), 'aria-hidden': 'true' }, '...')
             )
           } else {
             const isActive = pageNum === page
@@ -446,9 +523,7 @@ export const Pagination = defineComponent({
       // Quick jumper
       if (props.showQuickJumper) {
         const sizeText = getSizeTextClasses(size)
-        elements.push(
-          h('span', { class: classNames('ml-2', sizeText) }, labels.value.jumpToText)
-        )
+        elements.push(h('span', { class: classNames('ml-2', sizeText) }, labels.value.jumpToText))
         elements.push(
           h('input', {
             type: 'number',
@@ -456,7 +531,7 @@ export const Pagination = defineComponent({
             disabled: props.disabled,
             value: quickJumperValue.value,
             onInput: (e: Event) => {
-              quickJumperValue.value = (e.target as HTMLInputElement).value
+              handleQuickJumperInput((e.target as HTMLInputElement).value)
             },
             onKeydown: handleQuickJumperKeypress,
             min: 1,

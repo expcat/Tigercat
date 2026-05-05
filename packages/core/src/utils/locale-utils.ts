@@ -13,10 +13,74 @@ export function resolveLocaleText(
 
 import type {
   TigerLocale,
+  TigerLocaleInput,
+  TigerLocaleLoader,
+  TigerLocaleLazyModule,
   TigerLocalePagination,
   TigerLocaleFormWizard,
   TigerLocaleTaskBoard
 } from '../types/locale'
+
+const TIGER_LOCALE_KEYS = [
+  'common',
+  'modal',
+  'drawer',
+  'upload',
+  'pagination',
+  'datePicker',
+  'formWizard',
+  'taskBoard'
+]
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isPromiseLike(value: unknown): value is PromiseLike<TigerLocaleLazyModule> {
+  return isRecord(value) && typeof value.then === 'function'
+}
+
+function hasTigerLocaleShape(value: unknown): value is Partial<TigerLocale> {
+  if (!isRecord(value)) return false
+  return TIGER_LOCALE_KEYS.some((key) => key in value)
+}
+
+function resolveTigerLocaleModule(module: TigerLocaleLazyModule): Partial<TigerLocale> | undefined {
+  if (!isRecord(module)) return undefined
+
+  const moduleRecord = module as Record<string, unknown>
+  const defaultExport = moduleRecord.default
+  if (hasTigerLocaleShape(defaultExport)) return defaultExport
+
+  for (const value of Object.values(moduleRecord)) {
+    if (hasTigerLocaleShape(value)) return value
+  }
+
+  return module as Partial<TigerLocale>
+}
+
+export function isLazyTigerLocale(
+  locale?: TigerLocaleInput
+): locale is PromiseLike<TigerLocaleLazyModule> | TigerLocaleLoader {
+  return typeof locale === 'function' || isPromiseLike(locale)
+}
+
+export function getImmediateTigerLocale(
+  locale?: TigerLocaleInput
+): Partial<TigerLocale> | undefined {
+  if (!locale || isLazyTigerLocale(locale)) return undefined
+  return locale
+}
+
+export async function resolveTigerLocale(
+  locale?: TigerLocaleInput
+): Promise<Partial<TigerLocale> | undefined> {
+  if (!locale) return undefined
+
+  const loaded =
+    typeof locale === 'function' ? await locale() : isPromiseLike(locale) ? await locale : locale
+  return resolveTigerLocaleModule(loaded)
+}
 
 export function mergeTigerLocale(
   base?: Partial<TigerLocale>,
@@ -30,6 +94,7 @@ export function mergeTigerLocale(
     drawer: { ...base?.drawer, ...override?.drawer },
     upload: { ...base?.upload, ...override?.upload },
     pagination: { ...base?.pagination, ...override?.pagination },
+    datePicker: { ...base?.datePicker, ...override?.datePicker },
     formWizard: { ...base?.formWizard, ...override?.formWizard },
     taskBoard: { ...base?.taskBoard, ...override?.taskBoard }
   }

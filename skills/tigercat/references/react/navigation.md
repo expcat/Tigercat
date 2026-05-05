@@ -287,6 +287,9 @@ const [pageSize, setPageSize] = useState(10)
 
 {/* 国际化 */}
 <Pagination current={page} total={500} locale={{ pagination: customLabels }} showQuickJumper showSizeChanger onChange={(p) => setPage(p)} />
+
+{/* 分页文案懒加载 */}
+<Pagination current={page} total={500} locale={() => import('@expcat/tigercat-core/locales/zh-CN')} showQuickJumper onChange={(p) => setPage(p)} />
 ```
 
 ---

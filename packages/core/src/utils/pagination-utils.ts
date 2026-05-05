@@ -1,5 +1,124 @@
-import type { PaginationSize, PaginationAlign } from '../types/pagination'
+import type {
+  PaginationSize,
+  PaginationAlign,
+  PaginationQuickJumperValidationOptions
+} from '../types/pagination'
 import { classNames } from './class-names'
+
+type IdleCallbackHandle = number
+type IdleCallbackScheduler = (
+  callback: () => void,
+  options?: { timeout?: number }
+) => IdleCallbackHandle
+type IdleCallbackCanceller = (handle: IdleCallbackHandle) => void
+type TimeoutHandle = ReturnType<typeof setTimeout>
+type TimeoutScheduler = (callback: () => void, delay: number) => TimeoutHandle
+type TimeoutCanceller = (handle: TimeoutHandle) => void
+
+export interface PaginationIdleValidationSchedulerOptions extends PaginationQuickJumperValidationOptions {
+  requestIdleCallback?: IdleCallbackScheduler
+  cancelIdleCallback?: IdleCallbackCanceller
+  setTimeout?: TimeoutScheduler
+  clearTimeout?: TimeoutCanceller
+}
+
+export interface PaginationIdleValidationScheduler {
+  schedule: (callback: () => void) => void
+  cancel: () => void
+  flush: () => void
+}
+
+const DEFAULT_JUMPER_VALIDATION_DELAY = 120
+const DEFAULT_JUMPER_VALIDATION_TIMEOUT = 250
+
+function getGlobalRequestIdleCallback(): IdleCallbackScheduler | undefined {
+  return typeof globalThis === 'undefined'
+    ? undefined
+    : (globalThis as { requestIdleCallback?: IdleCallbackScheduler }).requestIdleCallback
+}
+
+function getGlobalCancelIdleCallback(): IdleCallbackCanceller | undefined {
+  return typeof globalThis === 'undefined'
+    ? undefined
+    : (globalThis as { cancelIdleCallback?: IdleCallbackCanceller }).cancelIdleCallback
+}
+
+export function getPaginationJumperPage(value: string, totalPages: number): number | null {
+  if (totalPages <= 0) return null
+
+  const page = parseInt(value, 10)
+  if (Number.isNaN(page)) return null
+
+  return validateCurrentPage(page, totalPages)
+}
+
+export function getValidatedPaginationJumperValue(value: string, totalPages: number): string {
+  if (value.trim().length === 0) return ''
+
+  const page = getPaginationJumperPage(value, totalPages)
+  return page === null ? '' : String(page)
+}
+
+export function createPaginationIdleValidationScheduler(
+  options: PaginationIdleValidationSchedulerOptions = {}
+): PaginationIdleValidationScheduler {
+  const delay = options.delay ?? DEFAULT_JUMPER_VALIDATION_DELAY
+  const timeout = options.timeout ?? DEFAULT_JUMPER_VALIDATION_TIMEOUT
+  const requestIdleCallback = options.requestIdleCallback ?? getGlobalRequestIdleCallback()
+  const cancelIdleCallback = options.cancelIdleCallback ?? getGlobalCancelIdleCallback()
+  const scheduleTimeout = options.setTimeout ?? setTimeout
+  const cancelTimeout = options.clearTimeout ?? clearTimeout
+
+  let pendingCallback: (() => void) | null = null
+  let timeoutHandle: TimeoutHandle | null = null
+  let idleHandle: IdleCallbackHandle | null = null
+
+  const clearScheduled = () => {
+    if (timeoutHandle !== null) {
+      cancelTimeout(timeoutHandle)
+      timeoutHandle = null
+    }
+
+    if (idleHandle !== null && cancelIdleCallback) {
+      cancelIdleCallback(idleHandle)
+      idleHandle = null
+    }
+  }
+
+  const run = () => {
+    const callback = pendingCallback
+    pendingCallback = null
+    timeoutHandle = null
+    idleHandle = null
+    callback?.()
+  }
+
+  return {
+    schedule(callback) {
+      pendingCallback = callback
+      clearScheduled()
+
+      timeoutHandle = scheduleTimeout(() => {
+        timeoutHandle = null
+
+        if (requestIdleCallback) {
+          idleHandle = requestIdleCallback(run, { timeout })
+          return
+        }
+
+        run()
+      }, delay)
+    },
+    cancel() {
+      pendingCallback = null
+      clearScheduled()
+    },
+    flush() {
+      clearScheduled()
+      run()
+    }
+  }
+}
 
 /**
  * Calculate total number of pages

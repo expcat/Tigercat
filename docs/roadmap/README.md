@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 Row / Col 样式计算优化，改为 Row 统一设置 gutter CSS vars、Col 使用静态 padding classes，减少每个 Col 的 inline style 计算；相关 core、React、Vue 测试通过。
-- 推荐下一步：执行 P1 Pagination idle / locale，延迟 jumper 校验并评估 locale 懒加载路径。
+- 上一步完成：P1 Pagination idle / locale，新增 jumper idle/debounce 延迟校验、Pagination lazy locale 解析路径，并补齐 core、React、Vue 测试与 i18n 文档；focused 测试和完整构建通过。
+- 推荐下一步：执行 P1 父子组件同文件约定，先从 Menu / Dropdown / Anchor / Breadcrumb / Steps / Tabs 中选择一个组件族建立模式。
 
 ## 实现核对口径
 
@@ -58,7 +58,6 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | 优先级 | 项目                          | 范围                                                 | 完成标准                                                            |
 | ------ | ----------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------- |
 | P1     | 父子组件同文件约定            | Menu / Dropdown / Anchor / Breadcrumb / Steps / Tabs | 建立父子组件同文件模式，减少 chunk 与导出链                         |
-| P1     | Pagination idle / locale      | Pagination                                           | jumper 校验延迟到 idle 或稳定节流；locale 文案支持懒加载路径        |
 | P2     | Descriptions 大列表性能       | Descriptions                                         | 对 100+ items columns / rows 合并算法做复杂度测试或 benchmark       |
 | P2     | Container 组件必要性          | Container                                            | 评估是否改为 class util；若保留组件，说明体积与 API 理由            |
 | P2     | FloatButton group memo        | FloatButton                                          | 子按钮列表缓存，避免不必要重建                                      |
