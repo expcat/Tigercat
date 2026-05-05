@@ -4,6 +4,7 @@ import {
   ref,
   computed,
   provide,
+  inject,
   onMounted,
   onBeforeUnmount,
   watch,
@@ -18,6 +19,7 @@ import {
   getAnchorWrapperClasses,
   getAnchorInkContainerClasses,
   getAnchorInkActiveClasses,
+  getAnchorLinkClasses,
   getAnchorLinkListClasses,
   createAnchorObserver,
   scrollToAnchor,
@@ -49,6 +51,112 @@ export interface VueAnchorProps {
   className?: string
   style?: Record<string, unknown>
 }
+
+export interface VueAnchorLinkProps {
+  href: string
+  title?: string
+  target?: string
+  className?: string
+}
+
+export const AnchorLink = defineComponent({
+  name: 'TigerAnchorLink',
+  inheritAttrs: false,
+  props: {
+    /**
+     * Target anchor ID (with #)
+     */
+    href: {
+      type: String,
+      required: true
+    },
+    /**
+     * Link title/text
+     */
+    title: {
+      type: String,
+      default: undefined
+    },
+    /**
+     * Link target attribute
+     */
+    target: {
+      type: String,
+      default: undefined
+    },
+    className: {
+      type: String,
+      default: undefined
+    }
+  },
+  setup(props, { slots, attrs }) {
+    const anchorContext = inject<AnchorContext | null>(AnchorContextKey, null)
+
+    onMounted(() => {
+      anchorContext?.registerLink(props.href)
+    })
+
+    onBeforeUnmount(() => {
+      anchorContext?.unregisterLink(props.href)
+    })
+
+    const handleClick = (event: Event) => {
+      event.preventDefault()
+      anchorContext?.handleLinkClick(props.href, event)
+    }
+
+    const linkClasses = computed(() => {
+      const isActive = anchorContext?.activeLink === props.href
+      return classNames(
+        getAnchorLinkClasses(isActive, props.className),
+        coerceClassValue(attrs.class)
+      )
+    })
+
+    return () => {
+      const slotContent = slots.default?.()
+      const hasNestedLinks =
+        slotContent &&
+        Array.isArray(slotContent) &&
+        slotContent.some(
+          (vnode) => vnode.type && (vnode.type as { name?: string }).name === 'TigerAnchorLink'
+        )
+
+      if (hasNestedLinks) {
+        return h('div', { class: 'anchor-link-wrapper' }, [
+          h(
+            'a',
+            {
+              ...attrs,
+              href: props.href,
+              target: props.target,
+              class: linkClasses.value,
+              'data-anchor-href': props.href,
+              onClick: handleClick
+            },
+            props.title
+          ),
+          h('div', { class: 'pl-3 mt-1 space-y-1' }, slotContent)
+        ])
+      }
+
+      const content = slotContent ?? props.title
+
+      return h(
+        'a',
+        {
+          ...attrs,
+          href: props.href,
+          target: props.target,
+          class: linkClasses.value,
+          'data-anchor-href': props.href,
+          onClick: handleClick
+        },
+        content
+      )
+    }
+  }
+})
 
 export const Anchor = defineComponent({
   name: 'TigerAnchor',

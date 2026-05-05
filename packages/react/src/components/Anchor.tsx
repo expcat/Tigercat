@@ -12,6 +12,7 @@ import {
   getAnchorWrapperClasses,
   getAnchorInkContainerClasses,
   getAnchorInkActiveClasses,
+  getAnchorLinkClasses,
   getAnchorLinkListClasses,
   createAnchorObserver,
   scrollToAnchor,
@@ -35,6 +36,92 @@ const AnchorContext = createContext<AnchorContextValue | null>(null)
 // Hook to use anchor context
 export function useAnchorContext(): AnchorContextValue | null {
   return useContext(AnchorContext)
+}
+
+export interface AnchorLinkProps extends Omit<
+  React.AnchorHTMLAttributes<HTMLAnchorElement>,
+  'href'
+> {
+  /**
+   * Target anchor ID (with #)
+   */
+  href: string
+  /**
+   * Link title/text
+   */
+  title?: string
+  /**
+   * Link target attribute
+   */
+  target?: string
+  /**
+   * Children content
+   */
+  children?: React.ReactNode
+}
+
+export const AnchorLink: React.FC<AnchorLinkProps> = ({
+  href,
+  title,
+  target,
+  className,
+  children,
+  ...props
+}) => {
+  const anchorContext = useAnchorContext()
+
+  useEffect(() => {
+    anchorContext?.registerLink(href)
+
+    return () => {
+      anchorContext?.unregisterLink(href)
+    }
+  }, [href, anchorContext])
+
+  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+    anchorContext?.handleLinkClick(href, event)
+  }
+
+  const linkClasses = useMemo(() => {
+    const isActive = anchorContext?.activeLink === href
+    return classNames(getAnchorLinkClasses(isActive, className))
+  }, [anchorContext?.activeLink, href, className])
+
+  const hasNestedLinks = React.Children.toArray(children).some(
+    (child) => React.isValidElement(child) && child.type === AnchorLink
+  )
+
+  if (hasNestedLinks) {
+    return (
+      <div className="anchor-link-wrapper">
+        <a
+          href={href}
+          target={target}
+          className={linkClasses}
+          data-anchor-href={href}
+          onClick={handleClick}
+          {...props}>
+          {title}
+        </a>
+        <div className="pl-3 mt-1 space-y-1">{children}</div>
+      </div>
+    )
+  }
+
+  const content = children ?? title
+
+  return (
+    <a
+      href={href}
+      target={target}
+      className={linkClasses}
+      data-anchor-href={href}
+      onClick={handleClick}
+      {...props}>
+      {content}
+    </a>
+  )
 }
 
 export interface AnchorProps extends Omit<CoreAnchorProps, 'style'> {
