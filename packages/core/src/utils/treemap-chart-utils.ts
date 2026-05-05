@@ -24,14 +24,24 @@ export interface TreeMapNode {
   color: string
 }
 
+type FlatItem = { label: string; value: number; depth: number; color?: string }
+
+/** WeakMap cache: data array → flattened leaf list */
+const flattenCache = new WeakMap<readonly TreeMapChartDatum[], FlatItem[]>()
+
 /**
  * Flatten hierarchical data to a single level (sum children values).
+ * Results are cached per data array reference.
  */
 function flattenData(
-  data: TreeMapChartDatum[],
+  data: readonly TreeMapChartDatum[],
   depth: number = 0
-): Array<{ label: string; value: number; depth: number; color?: string }> {
-  const result: Array<{ label: string; value: number; depth: number; color?: string }> = []
+): FlatItem[] {
+  if (depth === 0) {
+    const cached = flattenCache.get(data)
+    if (cached) return cached
+  }
+  const result: FlatItem[] = []
   for (const d of data) {
     if (d.children && d.children.length > 0) {
       result.push(...flattenData(d.children, depth + 1))
@@ -39,13 +49,26 @@ function flattenData(
       result.push({ label: d.label, value: d.value, depth, color: d.color })
     }
   }
+  if (depth === 0) {
+    flattenCache.set(data, result)
+  }
   return result
 }
+
+/** Last-result memo cache for computeTreeMapNodes */
+let _tmLastData: readonly TreeMapChartDatum[] | null = null
+let _tmLastW = 0
+let _tmLastH = 0
+let _tmLastGap = 0
+let _tmLastColors: readonly string[] | null = null
+let _tmLastResult: TreeMapNode[] = []
 
 /**
  * Compute squarified treemap layout.
  *
  * Uses a simplified slice-and-dice approach for reliable results.
+ * Layout is memoized: identical inputs (by reference for data/colors,
+ * by value for scalars) return the cached result.
  */
 export function computeTreeMapNodes(
   data: TreeMapChartDatum[],
@@ -58,17 +81,52 @@ export function computeTreeMapNodes(
 ): TreeMapNode[] {
   const { width, height, gap = 2, colors } = opts
   const palette = colors ?? DEFAULT_CHART_COLORS
+
+  // Return cached result when inputs are unchanged
+  if (
+    data === _tmLastData &&
+    width === _tmLastW &&
+    height === _tmLastH &&
+    gap === _tmLastGap &&
+    palette === _tmLastColors
+  ) {
+    return _tmLastResult
+  }
+
   const flat = flattenData(data)
-  if (flat.length === 0) return []
+  if (flat.length === 0) {
+    _tmLastData = data
+    _tmLastW = width
+    _tmLastH = height
+    _tmLastGap = gap
+    _tmLastColors = palette
+    _tmLastResult = []
+    return _tmLastResult
+  }
 
   const totalValue = flat.reduce((s, d) => s + d.value, 0)
-  if (totalValue === 0) return []
+  if (totalValue === 0) {
+    _tmLastData = data
+    _tmLastW = width
+    _tmLastH = height
+    _tmLastGap = gap
+    _tmLastColors = palette
+    _tmLastResult = []
+    return _tmLastResult
+  }
 
   // Sort descending
   const sorted = flat.map((d, i) => ({ ...d, originalIndex: i })).sort((a, b) => b.value - a.value)
 
   const nodes: TreeMapNode[] = []
   layoutRect(sorted, 0, 0, width, height, gap, palette, nodes)
+
+  _tmLastData = data
+  _tmLastW = width
+  _tmLastH = height
+  _tmLastGap = gap
+  _tmLastColors = palette
+  _tmLastResult = nodes
   return nodes
 }
 

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useRef, useEffect } from 'react'
 import {
   classNames,
   createGaugeArcPath,
@@ -8,6 +8,7 @@ import {
   getChartInnerRect,
   chartAxisTickTextClasses,
   getGaugeGradientPrefix,
+  createGaugeAnimation,
   type ChartPadding,
   type GaugeChartProps as CoreGaugeChartProps
 } from '@expcat/tigercat-core'
@@ -57,6 +58,23 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
     [value, min, max, startAngle, endAngle]
   )
 
+  // rAF-driven animated angle
+  const [animatedAngle, setAnimatedAngle] = useState(needleAngle)
+  const prevAngleRef = useRef(needleAngle)
+
+  useEffect(() => {
+    const from = prevAngleRef.current
+    const to = needleAngle
+    prevAngleRef.current = to
+    if (from === to) return
+    const ctrl = createGaugeAnimation({
+      from,
+      to,
+      onUpdate: (v) => setAnimatedAngle(v)
+    })
+    return () => ctrl.stop()
+  }, [needleAngle])
+
   const ticks = useMemo(
     () =>
       showTicks ? computeGaugeTicks(cx, cy, radius, min, max, startAngle, endAngle, tickCount) : [],
@@ -65,10 +83,10 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
 
   const trackPath = createGaugeArcPath(cx, cy, radius, startAngle, endAngle, arcWidth)
   const valuePath =
-    needleAngle > startAngle
-      ? createGaugeArcPath(cx, cy, radius, startAngle, needleAngle, arcWidth)
+    animatedAngle > startAngle
+      ? createGaugeArcPath(cx, cy, radius, startAngle, animatedAngle, arcWidth)
       : null
-  const needlePath = createGaugeNeedlePath(cx, cy, radius - arcWidth - 6, needleAngle)
+  const needlePath = createGaugeNeedlePath(cx, cy, radius - arcWidth - 6, animatedAngle)
 
   const formattedValue = valueFormatter ? valueFormatter(value) : `${value}`
 
@@ -116,10 +134,6 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
               d={valuePath}
               fill={gradient ? `url(#${valueGradientId})` : color}
               strokeWidth={0}
-              style={{
-                transition:
-                  'all var(--tiger-motion-duration-relaxed,0.3s) var(--tiger-motion-ease-emphasized,cubic-bezier(0.4,0,0.2,1))'
-              }}
             />
           )}
 
@@ -150,10 +164,6 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({
       <path
         d={needlePath}
         fill="var(--tiger-text,#374151)"
-        style={{
-          transition:
-            'all var(--tiger-motion-duration-relaxed,0.3s) var(--tiger-motion-ease-spring,cubic-bezier(0.4,0,0.2,1))'
-        }}
       />
 
       {/* Center dot */}

@@ -15,7 +15,11 @@ import {
   createLinePath,
   createAreaPath,
   createPolygonPath,
-  getFixedVirtualRange
+  getFixedVirtualRange,
+  computeTreeMapNodes,
+  computeSunburstArcs,
+  type TreeMapChartDatum,
+  type SunburstChartDatum
 } from '@expcat/tigercat-core'
 
 describe('classNames', () => {
@@ -181,5 +185,110 @@ describe('Virtual List', () => {
     for (const scrollTop of scrollPositions) {
       getFixedVirtualRange(scrollTop, 720, 40, 250_000, 8)
     }
+  })
+})
+
+// --- Helpers for generating hierarchical data ---
+
+function generateTreeMapData(count: number, depth: number = 1): TreeMapChartDatum[] {
+  if (depth <= 0 || count <= 0) return []
+  const perGroup = Math.max(1, Math.ceil(count / 10))
+  const items: TreeMapChartDatum[] = []
+  let remaining = count
+  let groupIdx = 0
+  while (remaining > 0 && groupIdx < 10) {
+    const childCount = Math.min(perGroup, remaining)
+    if (depth > 1) {
+      items.push({
+        label: `G${groupIdx}`,
+        value: 0,
+        children: generateTreeMapData(childCount, depth - 1)
+      })
+    } else {
+      for (let i = 0; i < childCount; i++) {
+        items.push({ label: `L${groupIdx}-${i}`, value: Math.floor(Math.random() * 1000) + 1 })
+      }
+    }
+    remaining -= childCount
+    groupIdx++
+  }
+  return items
+}
+
+function generateSunburstData(count: number, depth: number = 2): SunburstChartDatum[] {
+  if (depth <= 0 || count <= 0) return []
+  const groups = Math.min(count, 8)
+  const perGroup = Math.max(1, Math.ceil(count / groups))
+  const items: SunburstChartDatum[] = []
+  let remaining = count
+  for (let g = 0; g < groups && remaining > 0; g++) {
+    const childCount = Math.min(perGroup, remaining)
+    if (depth > 1) {
+      items.push({
+        label: `Ring${g}`,
+        value: 0,
+        children: generateSunburstData(childCount, depth - 1)
+      })
+    } else {
+      items.push({ label: `Leaf${g}`, value: Math.floor(Math.random() * 500) + 1 })
+    }
+    remaining -= childCount
+  }
+  return items
+}
+
+describe('TreeMap Layout', () => {
+  const small = generateTreeMapData(50)
+  const medium = generateTreeMapData(500, 2)
+  const large = generateTreeMapData(2000, 3)
+
+  bench('computeTreeMapNodes (50 leaves, flat)', () => {
+    computeTreeMapNodes(small, { width: 800, height: 600 })
+  })
+
+  bench('computeTreeMapNodes (500 leaves, 2-level)', () => {
+    computeTreeMapNodes(medium, { width: 800, height: 600 })
+  })
+
+  bench('computeTreeMapNodes (2000 leaves, 3-level)', () => {
+    computeTreeMapNodes(large, { width: 1200, height: 900 })
+  })
+
+  bench('computeTreeMapNodes (2000 leaves, memo hit)', () => {
+    // Same reference → should return cached result
+    computeTreeMapNodes(large, { width: 1200, height: 900 })
+  })
+
+  bench('computeTreeMapNodes (2000 leaves, new allocation)', () => {
+    // Fresh data each iteration to bypass memo
+    const fresh = generateTreeMapData(2000, 3)
+    computeTreeMapNodes(fresh, { width: 1200, height: 900 })
+  })
+})
+
+describe('Sunburst Layout', () => {
+  const small = generateSunburstData(30, 2)
+  const medium = generateSunburstData(200, 3)
+  const large = generateSunburstData(1000, 4)
+
+  bench('computeSunburstArcs (30 nodes, 2-level)', () => {
+    computeSunburstArcs(small, { cx: 200, cy: 200, innerRadius: 40, outerRadius: 180 })
+  })
+
+  bench('computeSunburstArcs (200 nodes, 3-level)', () => {
+    computeSunburstArcs(medium, { cx: 300, cy: 300, innerRadius: 50, outerRadius: 250 })
+  })
+
+  bench('computeSunburstArcs (1000 nodes, 4-level)', () => {
+    computeSunburstArcs(large, { cx: 400, cy: 400, innerRadius: 60, outerRadius: 350 })
+  })
+
+  bench('computeSunburstArcs (1000 nodes, memo hit)', () => {
+    computeSunburstArcs(large, { cx: 400, cy: 400, innerRadius: 60, outerRadius: 350 })
+  })
+
+  bench('computeSunburstArcs (1000 nodes, new allocation)', () => {
+    const fresh = generateSunburstData(1000, 4)
+    computeSunburstArcs(fresh, { cx: 400, cy: 400, innerRadius: 60, outerRadius: 350 })
   })
 })

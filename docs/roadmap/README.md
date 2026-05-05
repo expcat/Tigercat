@@ -11,18 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 父子组件同文件约定继续落地 Menu / MenuItem / MenuItemGroup / SubMenu，四个子组件实现合并到 Menu 文件，旧 MenuItem、MenuItemGroup、SubMenu 文件保留 re-export 兼容层，并更新包入口；相关 React（40）、Vue（41）共 81 个测试与完整构建通过。
-- 推荐下一步：P1 TreeMap / Sunburst memo — squarify / partition 递归布局 memo 化，并补大数据 benchmark。
-
-## 实现核对口径
-
-核对来源：`packages/react/src/index.tsx`、`packages/vue/src/index.ts`、`packages/*/src/components/`、`packages/core/src/`、`packages/cli/src/`。
-
-旧 `v0.6.0` 到 `v0.9.0` 规划中的新增组件，除 `PDFViewer` 外均已找到 Vue / React 实现与导出，包括 Cascader、TreeSelect、AutoComplete、Transfer、ColorPicker、Rate、VirtualList、Calendar、Statistic、Segmented、Mentions、QRCode、Result、Empty、Watermark、Tour、FloatButton、Affix、TreeMapChart、HeatmapChart、FunnelChart、GaugeChart、SunburstChart、RichTextEditor、CodeEditor、Splitter、Resizable、Kanban、VirtualTable、InfiniteScroll、FileManager、InputGroup、PrintLayout、ImageViewer 等。
-
-同时，旧规格中的主题、Token、拖拽、CLI、locale subpath exports 等系统能力已在仓库中找到对应实现痕迹，因此不再保留历史设计稿式说明。
-
-2026-04 报告中已完成的默认主题像素回归、Feedback overlay 共享层、Form 校验复杂度、picker-utils 二期、Table 性能二期、List virtual mode、DataTableWithToolbar 边界等事项已从待办中移除。
+- 上一步完成：P1 Gauge rAF 动画 — Core 新增 `createGaugeAnimation` (rAF + easeOutCubic)，Vue/React GaugeChart 移除 CSS transition 改用 rAF 驱动的角度插值动画，构建与测试通过。
+- 推荐下一步：P1 NotificationCenter 缓存 — 分组、标签、已读未读派生数据使用 useMemo / computed。
 
 ## 未实现组件
 
@@ -67,8 +57,6 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 | 优先级 | 项目                         | 范围                                                                     | 完成标准                                                                                  |
 | ------ | ---------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| P1     | TreeMap / Sunburst memo      | TreeMapChart / SunburstChart                                             | squarify / partition 递归布局 memo 化，并有大数据 benchmark                               |
-| P1     | Gauge rAF 动画               | GaugeChart                                                               | 动画使用 rAF + easing，避免 setInterval                                                   |
 | P1     | NotificationCenter 缓存      | NotificationCenter                                                       | 分组、标签、已读未读派生数据使用 useMemo / computed，并有测试覆盖                         |
 | P1     | ActivityFeed / Timeline 复用 | ActivityFeed / Timeline                                                  | ActivityFeed 与 Timeline 共用渲染或样式逻辑，避免重复实现                                 |
 | P1     | Composite a11y 角色          | DataTableWithToolbar / NotificationCenter / ActivityFeed / CommentThread | feed、group、dialog、list 等整体 ARIA 角色明确，并补回归测试                              |
@@ -79,7 +67,7 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | P1     | TaskBoard 拖拽技术债         | TaskBoard                                                                | 当前仍包含 HTML5 DnD + touch + keyboard；若要统一 pointer / useDrag，需单独方案与兼容测试 |
 | P1     | VirtualTable 压测            | VirtualTable                                                             | sticky header + sticky column 同时启用时测试 1000 列 / 10k 行性能                         |
 | P1     | Advanced 交互测试补强        | FileManager / ImageViewer / InfiniteScroll / VirtualList / VirtualTable  | 增加边界与性能回归                                                                        |
-| P2     | Chart benchmark 补齐         | TreeMapChart / SunburstChart / GaugeChart / chart interaction            | benchmark 覆盖 TreeMap / Sunburst layout、Gauge 计算与 interaction 热路径                 |
+| P2     | Chart benchmark 补齐         | GaugeChart / chart interaction                                           | benchmark 覆盖 Gauge 计算与 interaction 热路径                                           |
 | P2     | Composite 配方化             | DataTableWithToolbar / CropUpload / FormWizard                           | 评估是否转 cookbook 配方；若保留组件，说明体积边界                                        |
 | P2     | PrintLayout stylesheet 化    | PrintLayout                                                              | 评估改为 stylesheet + class util，若保留组件需说明收益                                    |
 | P2     | RichText toolbar 插件化      | RichTextEditor                                                           | toolbar 命令注册支持插件配置，并保持默认轻量 engine                                       |

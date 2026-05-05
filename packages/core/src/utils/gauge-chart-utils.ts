@@ -8,6 +8,93 @@ export interface GaugeArc {
   path: string
 }
 
+/* ------------------------------------------------------------------ */
+/*  Easing                                                             */
+/* ------------------------------------------------------------------ */
+
+function easeOutCubic(t: number): number {
+  const c = Math.min(1, Math.max(0, t))
+  return 1 - (1 - c) ** 3
+}
+
+/* ------------------------------------------------------------------ */
+/*  rAF Animation                                                      */
+/* ------------------------------------------------------------------ */
+
+export interface GaugeAnimationOptions {
+  from: number
+  to: number
+  duration?: number
+  onUpdate: (angle: number) => void
+  onComplete?: () => void
+  requestAnimationFrame?: (cb: FrameRequestCallback) => number
+  cancelAnimationFrame?: (id: number) => void
+}
+
+export interface GaugeAnimationController {
+  stop: () => void
+}
+
+export const GAUGE_ANIMATION_DURATION_MS = 600
+
+/**
+ * Animate a gauge value (angle) from `from` to `to` using rAF + easeOutCubic.
+ * Returns a controller with a `stop()` method to cancel the animation.
+ */
+export function createGaugeAnimation(
+  options: GaugeAnimationOptions
+): GaugeAnimationController {
+  const duration = options.duration ?? GAUGE_ANIMATION_DURATION_MS
+  const requestFrame =
+    options.requestAnimationFrame ??
+    (typeof globalThis.requestAnimationFrame === 'function'
+      ? globalThis.requestAnimationFrame.bind(globalThis)
+      : undefined)
+  const cancelFrame =
+    options.cancelAnimationFrame ??
+    (typeof globalThis.cancelAnimationFrame === 'function'
+      ? globalThis.cancelAnimationFrame.bind(globalThis)
+      : undefined)
+
+  if (!requestFrame || duration <= 0 || options.from === options.to) {
+    options.onUpdate(options.to)
+    options.onComplete?.()
+    return { stop: () => undefined }
+  }
+
+  let frameId: number | null = null
+  let startTime: number | null = null
+  let stopped = false
+
+  const stop = () => {
+    if (stopped) return
+    stopped = true
+    if (frameId !== null && cancelFrame) cancelFrame(frameId)
+    frameId = null
+  }
+
+  const tick = (timestamp: number) => {
+    if (stopped) return
+    if (startTime === null) startTime = timestamp
+
+    const elapsed = timestamp - startTime
+    const progress = Math.min(1, elapsed / duration)
+    const eased = easeOutCubic(progress)
+    options.onUpdate(options.from + (options.to - options.from) * eased)
+
+    if (progress < 1) {
+      frameId = requestFrame(tick)
+      return
+    }
+
+    frameId = null
+    options.onComplete?.()
+  }
+
+  frameId = requestFrame(tick)
+  return { stop }
+}
+
 /**
  * Convert degrees to radians.
  */

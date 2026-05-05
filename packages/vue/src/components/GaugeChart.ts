@@ -1,4 +1,4 @@
-import { defineComponent, computed, h, PropType } from 'vue'
+import { defineComponent, computed, h, ref, watch, onBeforeUnmount, PropType } from 'vue'
 import {
   classNames,
   createGaugeArcPath,
@@ -8,6 +8,8 @@ import {
   getChartInnerRect,
   chartAxisTickTextClasses,
   getGaugeGradientPrefix,
+  createGaugeAnimation,
+  type GaugeAnimationController,
   type ChartPadding,
   type GaugeChartProps as CoreGaugeChartProps
 } from '@expcat/tigercat-core'
@@ -56,9 +58,28 @@ export const GaugeChart = defineComponent({
     const gradientPrefix = getGaugeGradientPrefix()
     const valueGradientId = `${gradientPrefix}-value`
 
-    const needleAngle = computed(() =>
+    const targetAngle = computed(() =>
       valueToGaugeAngle(props.value, props.min, props.max, props.startAngle, props.endAngle)
     )
+
+    // Animated needle angle — driven by rAF
+    const animatedAngle = ref(targetAngle.value)
+    let animCtrl: GaugeAnimationController | null = null
+
+    watch(targetAngle, (to, from) => {
+      animCtrl?.stop()
+      animCtrl = createGaugeAnimation({
+        from,
+        to,
+        onUpdate: (v) => {
+          animatedAngle.value = v
+        }
+      })
+    })
+
+    onBeforeUnmount(() => {
+      animCtrl?.stop()
+    })
 
     const ticks = computed(() =>
       props.showTicks
@@ -86,8 +107,8 @@ export const GaugeChart = defineComponent({
 
       // Value arc
       const valuePath =
-        needleAngle.value > props.startAngle
-          ? createGaugeArcPath(c, cY, r, props.startAngle, needleAngle.value, aw)
+        animatedAngle.value > props.startAngle
+          ? createGaugeArcPath(c, cY, r, props.startAngle, animatedAngle.value, aw)
           : null
 
       // Segment arcs
@@ -116,7 +137,7 @@ export const GaugeChart = defineComponent({
         }) ?? []
 
       // Needle
-      const needlePath = createGaugeNeedlePath(c, cY, r - aw - 6, needleAngle.value)
+      const needlePath = createGaugeNeedlePath(c, cY, r - aw - 6, animatedAngle.value)
 
       const formattedValue = props.valueFormatter
         ? props.valueFormatter(props.value)
@@ -167,11 +188,7 @@ export const GaugeChart = defineComponent({
                     h('path', {
                       d: valuePath,
                       fill: props.gradient ? `url(#${valueGradientId})` : props.color,
-                      'stroke-width': 0,
-                      style: {
-                        transition:
-                          'all var(--tiger-motion-duration-relaxed,0.3s) var(--tiger-motion-ease-emphasized,cubic-bezier(0.4,0,0.2,1))'
-                      }
+                      'stroke-width': 0
                     })
                   ]
                 : []),
@@ -205,11 +222,7 @@ export const GaugeChart = defineComponent({
             // Needle
             h('path', {
               d: needlePath,
-              fill: 'var(--tiger-text,#374151)',
-              style: {
-                transition:
-                  'all var(--tiger-motion-duration-relaxed,0.3s) var(--tiger-motion-ease-spring,cubic-bezier(0.4,0,0.2,1))'
-              }
+              fill: 'var(--tiger-text,#374151)'
             }),
             // Center dot
             h('circle', {

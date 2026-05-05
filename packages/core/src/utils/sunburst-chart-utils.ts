@@ -28,8 +28,44 @@ export interface SunburstArc {
   midAngle: number
 }
 
+/** WeakMap cache for sumValue — avoids O(n·d) redundant traversals */
+const sumCache = new WeakMap<SunburstChartDatum, number>()
+
+function sumValue(d: SunburstChartDatum): number {
+  const cached = sumCache.get(d)
+  if (cached !== undefined) return cached
+  let v: number
+  if (d.children && d.children.length > 0) {
+    v = d.children.reduce((s, c) => s + sumValue(c), 0)
+  } else {
+    v = d.value
+  }
+  sumCache.set(d, v)
+  return v
+}
+
+/** Pre-warm the sumValue cache for the entire tree in O(n) */
+function precomputeSums(items: readonly SunburstChartDatum[]): void {
+  for (const item of items) {
+    if (item.children && item.children.length > 0) {
+      precomputeSums(item.children)
+    }
+    sumValue(item)
+  }
+}
+
+/** Last-result memo cache for computeSunburstArcs */
+let _sbLastData: readonly SunburstChartDatum[] | null = null
+let _sbLastCx = 0
+let _sbLastCy = 0
+let _sbLastIR = 0
+let _sbLastOR = 0
+let _sbLastColors: readonly string[] | null = null
+let _sbLastResult: SunburstArc[] = []
+
 /**
  * Flatten hierarchical data into arc descriptors with depth levels.
+ * Layout is memoized: identical inputs return the cached result.
  */
 export function computeSunburstArcs(
   data: SunburstChartDatum[],
@@ -43,6 +79,21 @@ export function computeSunburstArcs(
 ): SunburstArc[] {
   const { cx, cy, innerRadius, outerRadius, colors } = opts
   const palette = colors ?? DEFAULT_CHART_COLORS
+
+  // Return cached result when inputs are unchanged
+  if (
+    data === _sbLastData &&
+    cx === _sbLastCx &&
+    cy === _sbLastCy &&
+    innerRadius === _sbLastIR &&
+    outerRadius === _sbLastOR &&
+    palette === _sbLastColors
+  ) {
+    return _sbLastResult
+  }
+
+  // Pre-warm sum cache for the entire tree (O(n) single pass)
+  precomputeSums(data)
 
   // Determine max depth
   function maxDepth(items: SunburstChartDatum[], d: number): number {
@@ -116,12 +167,12 @@ export function computeSunburstArcs(
 
   layoutLevel(data, -Math.PI / 2, (3 * Math.PI) / 2, 0, 0)
 
+  _sbLastData = data
+  _sbLastCx = cx
+  _sbLastCy = cy
+  _sbLastIR = innerRadius
+  _sbLastOR = outerRadius
+  _sbLastColors = palette
+  _sbLastResult = arcs
   return arcs
-}
-
-function sumValue(d: SunburstChartDatum): number {
-  if (d.children && d.children.length > 0) {
-    return d.children.reduce((s, c) => s + sumValue(c), 0)
-  }
-  return d.value
 }
