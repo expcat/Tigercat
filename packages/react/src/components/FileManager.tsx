@@ -3,10 +3,11 @@ import {
   classNames,
   getFileManagerContainerClasses,
   getFileItemClasses,
-  sortFileItems,
-  filterFileItems,
-  filterHiddenFiles,
-  navigateToFolder,
+  deriveFileManagerModel,
+  toggleFileSelection,
+  resolveFileOpen,
+  sliceBreadcrumbPath,
+  toFileDragItem,
   formatFileSizeLabel,
   fileManagerToolbarClasses,
   fileManagerBreadcrumbClasses,
@@ -74,18 +75,19 @@ export const FileManager: React.FC<FileManagerProps> = ({
 }) => {
   const [localSearch, setLocalSearch] = useState(searchText)
 
-  const currentItems = useMemo(() => navigateToFolder(files, currentPath), [files, currentPath])
-
-  const processedItems = useMemo(() => {
-    let items = filterHiddenFiles(currentItems, showHidden)
-    const search = localSearch || searchText
-    if (search) {
-      items = filterFileItems(items, search)
-    }
-    return sortFileItems(items, sortField, sortOrder)
-  }, [currentItems, showHidden, localSearch, searchText, sortField, sortOrder])
-
-  const selectedSet = useMemo(() => new Set(selectedKeys), [selectedKeys])
+  const model = useMemo(
+    () =>
+      deriveFileManagerModel({
+        files,
+        currentPath,
+        selectedKeys,
+        sortField,
+        sortOrder,
+        showHidden,
+        searchText: localSearch || searchText
+      }),
+    [files, currentPath, selectedKeys, sortField, sortOrder, showHidden, localSearch, searchText]
+  )
 
   const containerClasses = useMemo(() => getFileManagerContainerClasses(className), [className])
 
@@ -93,14 +95,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
     (item: FileItem) => {
       if (item.disabled) return
       onSelect?.(item)
-      const keys = [...selectedKeys]
-      const idx = keys.indexOf(item.key)
-      if (idx >= 0) {
-        keys.splice(idx, 1)
-      } else {
-        if (!multiple) keys.length = 0
-        keys.push(item.key)
-      }
+      const keys = toggleFileSelection(selectedKeys, item.key, multiple)
       onSelectedKeysChange?.(keys)
     },
     [selectedKeys, multiple, onSelect, onSelectedKeysChange]
@@ -108,13 +103,13 @@ export const FileManager: React.FC<FileManagerProps> = ({
 
   const handleOpen = useCallback(
     (item: FileItem) => {
-      if (item.disabled) return
-      if (item.type === 'folder') {
-        const newPath = [...currentPath, item.name]
-        onCurrentPathChange?.(newPath)
-        onNavigate?.(newPath)
+      const result = resolveFileOpen(item, currentPath)
+      if (!result) return
+      if (result.type === 'navigate') {
+        onCurrentPathChange?.(result.path!)
+        onNavigate?.(result.path!)
       } else {
-        onOpen?.(item)
+        onOpen?.(result.item!)
       }
     },
     [currentPath, onOpen, onNavigate, onCurrentPathChange]
@@ -122,7 +117,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
 
   const navigateToBreadcrumb = useCallback(
     (index: number) => {
-      const newPath = currentPath.slice(0, index)
+      const newPath = sliceBreadcrumbPath(currentPath, index)
       onCurrentPathChange?.(newPath)
       onNavigate?.(newPath)
     },
@@ -175,11 +170,14 @@ export const FileManager: React.FC<FileManagerProps> = ({
         )}
       </div>
 
-      {processedItems.length > 0 ? (
+      {model.processedItems.length > 0 ? (
         <div className={contentClass} role="listbox" aria-multiselectable={multiple}>
-          {processedItems.map((item) => {
-            const isSelected = selectedSet.has(item.key)
+          {model.processedItems.map((item, index) => {
+            const isSelected = model.selectedSet.has(item.key)
             const itemClass = getFileItemClasses(viewMode, isSelected)
+            const dragItem = draggable && !item.disabled
+              ? toFileDragItem(item, index)
+              : undefined
 
             return (
               <div
@@ -188,6 +186,7 @@ export const FileManager: React.FC<FileManagerProps> = ({
                 role="option"
                 aria-selected={isSelected}
                 data-disabled={item.disabled || undefined}
+                data-drag-id={dragItem?.id}
                 onClick={() => handleSelect(item)}
                 onDoubleClick={() => handleOpen(item)}
                 draggable={draggable && !item.disabled}>

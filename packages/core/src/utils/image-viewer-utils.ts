@@ -13,7 +13,7 @@ export const imageViewerBackdropClasses =
  * ImageViewer image classes
  */
 export const imageViewerImgClasses =
-  'max-h-[90vh] max-w-[90vw] select-none transition-transform duration-200 ease-out cursor-grab active:cursor-grabbing'
+  'max-h-[90vh] max-w-[90vw] select-none transition-transform duration-200 ease-out cursor-grab active:cursor-grabbing touch-none'
 
 /**
  * ImageViewer toolbar classes
@@ -70,4 +70,158 @@ export function clampZoom(zoom: number, min: number, max: number): number {
  */
 export function normalizeRotation(rotation: number): number {
   return ((rotation % 360) + 360) % 360
+}
+
+// ─── Gesture types ────────────────────────────────────────────────
+
+export interface GestureTransform {
+  scale: number
+  translateX: number
+  translateY: number
+  rotation: number
+}
+
+/**
+ * Create a default gesture transform (1x scale, centered, no rotation).
+ */
+export function createDefaultTransform(): GestureTransform {
+  return { scale: 1, translateX: 0, translateY: 0, rotation: 0 }
+}
+
+/**
+ * Build a CSS transform string from a GestureTransform.
+ */
+export function getImageTransformStyle(t: GestureTransform): string {
+  return `translate(${t.translateX}px, ${t.translateY}px) scale(${t.scale}) rotate(${t.rotation}deg)`
+}
+
+// ─── Wheel zoom ───────────────────────────────────────────────────
+
+export interface WheelZoomOptions {
+  minZoom: number
+  maxZoom: number
+  /** Zoom step per wheel delta (default 0.001) */
+  step?: number
+}
+
+/**
+ * Compute the new scale after a wheel event.
+ */
+export function applyWheelZoom(
+  currentScale: number,
+  deltaY: number,
+  options: WheelZoomOptions
+): number {
+  const step = options.step ?? 0.001
+  const delta = -deltaY * step
+  return clampZoom(currentScale + delta, options.minZoom, options.maxZoom)
+}
+
+// ─── Pan (mouse drag) ─────────────────────────────────────────────
+
+export interface PanState {
+  isPanning: boolean
+  startX: number
+  startY: number
+  startTranslateX: number
+  startTranslateY: number
+}
+
+/**
+ * Create a fresh pan state.
+ */
+export function createPanState(): PanState {
+  return { isPanning: false, startX: 0, startY: 0, startTranslateX: 0, startTranslateY: 0 }
+}
+
+/**
+ * Begin panning. Returns new PanState (isPanning = true).
+ */
+export function startPan(
+  clientX: number,
+  clientY: number,
+  currentTranslateX: number,
+  currentTranslateY: number
+): PanState {
+  return {
+    isPanning: true,
+    startX: clientX,
+    startY: clientY,
+    startTranslateX: currentTranslateX,
+    startTranslateY: currentTranslateY
+  }
+}
+
+export interface PanResult {
+  translateX: number
+  translateY: number
+}
+
+/**
+ * Compute translate during a pan move.
+ */
+export function movePan(pan: PanState, clientX: number, clientY: number): PanResult {
+  return {
+    translateX: pan.startTranslateX + (clientX - pan.startX),
+    translateY: pan.startTranslateY + (clientY - pan.startY)
+  }
+}
+
+// ─── Pinch zoom (two-finger touch) ───────────────────────────────
+
+// Note: image-utils.ts exports getTouchDistance(Touch, Touch).
+// We use the same formula here but with a broader signature accepting
+// any object with clientX/clientY (works for Touch, PointerEvent, etc.)
+
+function touchDistance(
+  t1: { clientX: number; clientY: number },
+  t2: { clientX: number; clientY: number }
+): number {
+  const dx = t1.clientX - t2.clientX
+  const dy = t1.clientY - t2.clientY
+  return Math.sqrt(dx * dx + dy * dy)
+}
+
+export interface PinchState {
+  isPinching: boolean
+  initialDistance: number
+  initialScale: number
+}
+
+/**
+ * Create a fresh pinch state.
+ */
+export function createPinchState(): PinchState {
+  return { isPinching: false, initialDistance: 0, initialScale: 1 }
+}
+
+/**
+ * Begin a pinch gesture.
+ */
+export function startPinch(
+  t1: { clientX: number; clientY: number },
+  t2: { clientX: number; clientY: number },
+  currentScale: number
+): PinchState {
+  return {
+    isPinching: true,
+    initialDistance: touchDistance(t1, t2),
+    initialScale: currentScale
+  }
+}
+
+/**
+ * Compute the new scale during a pinch move.
+ */
+export function movePinch(
+  pinch: PinchState,
+  t1: { clientX: number; clientY: number },
+  t2: { clientX: number; clientY: number },
+  minZoom: number,
+  maxZoom: number
+): number {
+  if (pinch.initialDistance === 0) return pinch.initialScale
+  const currentDistance = touchDistance(t1, t2)
+  const ratio = currentDistance / pinch.initialDistance
+  return clampZoom(pinch.initialScale * ratio, minZoom, maxZoom)
 }

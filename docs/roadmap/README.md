@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 InfiniteScroll IO — Core 新增 `createInfiniteScrollObserver` 工具函数（IntersectionObserver sentinel 方案），Vue/React InfiniteScroll 重构为 sentinel + IO 优先、scroll 事件回退；新增 12 条测试（core 8 + 组件 4），构建与测试通过。
-- 推荐下一步：P1 FileManager 共享 model — tree、grid、breadcrumb 视图复用同一 core model，拖拽逻辑接入共享 drag util。
+- 上一步完成：P1 ImageViewer 手势 util — Core 新增 `GestureTransform` 类型、`applyWheelZoom`、`startPan`/`movePan`、`startPinch`/`movePinch` 等手势工具函数；Vue/React ImageViewer 集成 wheel 缩放、鼠标拖拽平移、触控 pinch 缩放；新增 19 条手势单元测试，构建与测试通过。
+- 推荐下一步：P1 TaskBoard 拖拽技术债 — 统一 HTML5 DnD + touch + keyboard 为共享 pointer/useDrag 方案。
 
 ## 未实现组件
 
@@ -62,8 +62,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | P1     | ~~Composite a11y 角色~~      | ~~DataTableWithToolbar / NotificationCenter / ActivityFeed / CommentThread~~ | ~~已完成：feed、region、toolbar 等 ARIA 角色明确，并补 12 条回归测试~~ |
 | P1     | ~~VirtualList 策略化~~       | ~~VirtualList~~                                                              | ~~已完成：Core 新增 VirtualListSizeStrategy 接口与 fixed/variable/dynamic 三策略，Vue/React 统一消费~~ |
 | P1     | ~~InfiniteScroll IO~~        | ~~InfiniteScroll~~                                                       | ~~已完成：Core 新增 createInfiniteScrollObserver，Vue/React 重构为 IO sentinel + scroll fallback~~ |
-| P1     | FileManager 共享 model       | FileManager                                                              | tree、grid、breadcrumb 视图复用同一 core model，拖拽逻辑接入共享 drag util                |
-| P1     | ImageViewer 手势 util        | ImageViewer                                                              | pinch / pan / zoom 手势抽到 core util，并补触控边界测试                                   |
+| P1     | ~~FileManager 共享 model~~   | ~~FileManager~~                                                          | ~~已完成：Core 新增 deriveFileManagerModel 等共享函数 + drag 集成，Vue/React 统一消费~~ |
+| P1     | ~~ImageViewer 手势 util~~    | ~~ImageViewer~~                                                          | ~~已完成：Core 新增 GestureTransform + wheel/pan/pinch 工具，Vue/React 集成触控手势~~ |
 | P1     | TaskBoard 拖拽技术债         | TaskBoard                                                                | 当前仍包含 HTML5 DnD + touch + keyboard；若要统一 pointer / useDrag，需单独方案与兼容测试 |
 | P1     | VirtualTable 压测            | VirtualTable                                                             | sticky header + sticky column 同时启用时测试 1000 列 / 10k 行性能                         |
 | P1     | Advanced 交互测试补强        | FileManager / ImageViewer / InfiniteScroll / VirtualList / VirtualTable  | 增加边界与性能回归                                                                        |

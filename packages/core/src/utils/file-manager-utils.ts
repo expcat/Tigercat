@@ -1,10 +1,12 @@
 /**
  * FileManager utility functions
  *
- * Pure functions for file operations, sorting, filtering, and styling.
+ * Pure functions for file operations, sorting, filtering, styling,
+ * shared model derivation, and drag integration.
  */
 
 import type { FileItem, FileSortField, FileSortOrder, FileViewMode } from '../types/file-manager'
+import type { DragItem, DragDropEvent } from '../types/drag'
 
 // ─── Tailwind class constants ─────────────────────────────────────
 
@@ -160,4 +162,127 @@ export function getFileItemClasses(viewMode: FileViewMode, selected: boolean): s
   return selected
     ? `${fileManagerListItemClasses} ${fileManagerListItemSelectedClasses}`
     : fileManagerListItemClasses
+}
+
+// ─── Shared model ─────────────────────────────────────────────────
+
+export interface FileManagerModelInput {
+  files: FileItem[]
+  currentPath: string[]
+  selectedKeys: (string | number)[]
+  sortField: FileSortField
+  sortOrder: FileSortOrder
+  showHidden: boolean
+  searchText: string
+}
+
+export interface FileManagerModelDerived {
+  /** Items at the current directory level */
+  currentItems: FileItem[]
+  /** Items after filter + sort, ready for rendering */
+  processedItems: FileItem[]
+  /** Fast lookup set for selected keys */
+  selectedSet: Set<string | number>
+}
+
+/**
+ * Derive the file manager view-model from inputs.
+ * Both Vue and React should call this in a computed / useMemo.
+ */
+export function deriveFileManagerModel(input: FileManagerModelInput): FileManagerModelDerived {
+  const currentItems = navigateToFolder(input.files, input.currentPath)
+  let items = filterHiddenFiles(currentItems, input.showHidden)
+  if (input.searchText) {
+    items = filterFileItems(items, input.searchText)
+  }
+  const processedItems = sortFileItems(items, input.sortField, input.sortOrder)
+  const selectedSet = new Set(input.selectedKeys)
+  return { currentItems, processedItems, selectedSet }
+}
+
+/**
+ * Toggle a file's selection state, respecting single / multi mode.
+ * Returns the new selectedKeys array.
+ */
+export function toggleFileSelection(
+  selectedKeys: (string | number)[],
+  key: string | number,
+  multiple: boolean
+): (string | number)[] {
+  const keys = [...selectedKeys]
+  const idx = keys.indexOf(key)
+  if (idx >= 0) {
+    keys.splice(idx, 1)
+  } else {
+    if (!multiple) keys.length = 0
+    keys.push(key)
+  }
+  return keys
+}
+
+export interface FileOpenResult {
+  type: 'navigate' | 'open'
+  /** New path (when type === 'navigate') */
+  path?: string[]
+  /** The opened file item (when type === 'open') */
+  item?: FileItem
+}
+
+/**
+ * Determine the action when a file item is activated (double-click / Enter).
+ * Returns `null` if the item is disabled.
+ */
+export function resolveFileOpen(
+  item: FileItem,
+  currentPath: string[]
+): FileOpenResult | null {
+  if (item.disabled) return null
+  if (item.type === 'folder') {
+    return { type: 'navigate', path: [...currentPath, item.name] }
+  }
+  return { type: 'open', item }
+}
+
+/**
+ * Compute breadcrumb path after clicking an ancestor segment.
+ */
+export function sliceBreadcrumbPath(
+  currentPath: string[],
+  index: number
+): string[] {
+  return currentPath.slice(0, index)
+}
+
+// ─── Drag integration ─────────────────────────────────────────────
+
+/**
+ * Convert a FileItem to the generic DragItem interface used by drag utils.
+ */
+export function toFileDragItem(
+  item: FileItem,
+  index: number,
+  containerId?: string
+): DragItem {
+  return {
+    id: item.key,
+    index,
+    containerId,
+    data: { name: item.name, type: item.type }
+  }
+}
+
+/**
+ * Apply a drag-drop reorder to a flat list of file items.
+ * Returns the new array with the moved item in its new position.
+ */
+export function applyFileDragReorder(
+  items: FileItem[],
+  event: DragDropEvent
+): FileItem[] {
+  const { fromIndex, toIndex } = event
+  if (fromIndex === toIndex) return items
+  const result = [...items]
+  const [moved] = result.splice(fromIndex, 1)
+  result.splice(toIndex, 0, moved)
+  return result
 }

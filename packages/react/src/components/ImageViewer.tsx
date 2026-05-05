@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react'
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   classNames,
   imageViewerBackdropClasses,
@@ -10,7 +10,17 @@ import {
   imageViewerCounterClasses,
   imageViewerIcons,
   clampZoom,
-  normalizeRotation
+  normalizeRotation,
+  createDefaultTransform,
+  getImageTransformStyle,
+  applyWheelZoom,
+  createPanState,
+  startPan,
+  movePan,
+  createPinchState,
+  startPinch,
+  movePinch,
+  type GestureTransform
 } from '@expcat/tigercat-core'
 
 export interface ImageViewerProps {
@@ -61,12 +71,19 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
   onIndexChange
 }) => {
   const [index, setIndex] = useState(currentIndex)
-  const [zoom, setZoom] = useState(1)
-  const [rotation, setRotation] = useState(0)
+  const [transform, setTransform] = useState<GestureTransform>(createDefaultTransform)
+  const panRef = useRef(createPanState())
+  const pinchRef = useRef(createPinchState())
 
   useEffect(() => {
     setIndex(currentIndex)
   }, [currentIndex])
+
+  const resetTransform = useCallback(() => {
+    setTransform(createDefaultTransform())
+    panRef.current = createPanState()
+    pinchRef.current = createPinchState()
+  }, [])
 
   const handleClose = useCallback(() => {
     onClose?.()
@@ -75,18 +92,16 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
   const handlePrev = useCallback(() => {
     const newIndex = (index - 1 + images.length) % images.length
     setIndex(newIndex)
-    setZoom(1)
-    setRotation(0)
+    resetTransform()
     onIndexChange?.(newIndex)
-  }, [index, images.length, onIndexChange])
+  }, [index, images.length, onIndexChange, resetTransform])
 
   const handleNext = useCallback(() => {
     const newIndex = (index + 1) % images.length
     setIndex(newIndex)
-    setZoom(1)
-    setRotation(0)
+    resetTransform()
     onIndexChange?.(newIndex)
-  }, [index, images.length, onIndexChange])
+  }, [index, images.length, onIndexChange, resetTransform])
 
   useEffect(() => {
     if (!open) return
@@ -160,8 +175,57 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
         className={imageViewerImgClasses}
         src={images[index]}
         alt={`Image ${index + 1}`}
-        style={{ transform: `scale(${zoom}) rotate(${rotation}deg)` }}
+        style={{ transform: getImageTransformStyle(transform), touchAction: 'none' }}
         draggable={false}
+        onWheel={(e) => {
+          if (!zoomable) return
+          e.preventDefault()
+          const newScale = applyWheelZoom(transform.scale, e.deltaY, { minZoom, maxZoom })
+          setTransform((t) => ({ ...t, scale: newScale }))
+        }}
+        onMouseDown={(e) => {
+          if (e.button !== 0) return
+          e.preventDefault()
+          panRef.current = startPan(e.clientX, e.clientY, transform.translateX, transform.translateY)
+        }}
+        onMouseMove={(e) => {
+          if (!panRef.current.isPanning) return
+          const result = movePan(panRef.current, e.clientX, e.clientY)
+          setTransform((t) => ({ ...t, ...result }))
+        }}
+        onMouseUp={() => { panRef.current = createPanState() }}
+        onMouseLeave={() => { panRef.current = createPanState() }}
+        onTouchStart={(e) => {
+          if (e.touches.length === 2 && zoomable) {
+            e.preventDefault()
+            pinchRef.current = startPinch(e.touches[0], e.touches[1], transform.scale)
+          } else if (e.touches.length === 1) {
+            panRef.current = startPan(
+              e.touches[0].clientX,
+              e.touches[0].clientY,
+              transform.translateX,
+              transform.translateY
+            )
+          }
+        }}
+        onTouchMove={(e) => {
+          if (e.touches.length === 2 && pinchRef.current.isPinching) {
+            e.preventDefault()
+            const newScale = movePinch(pinchRef.current, e.touches[0], e.touches[1], minZoom, maxZoom)
+            setTransform((t) => ({ ...t, scale: newScale }))
+          } else if (e.touches.length === 1 && panRef.current.isPanning) {
+            const result = movePan(panRef.current, e.touches[0].clientX, e.touches[0].clientY)
+            setTransform((t) => ({ ...t, ...result }))
+          }
+        }}
+        onTouchEnd={() => {
+          pinchRef.current = createPinchState()
+          panRef.current = createPanState()
+        }}
+        onTouchCancel={() => {
+          pinchRef.current = createPinchState()
+          panRef.current = createPanState()
+        }}
       />
 
       {(zoomable || rotatable) && (
@@ -170,14 +234,14 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
             <>
               <button
                 className={imageViewerToolbarBtnClasses}
-                onClick={() => setZoom(clampZoom(zoom - 0.25, minZoom, maxZoom))}
+                onClick={() => setTransform((t) => ({ ...t, scale: clampZoom(t.scale - 0.25, minZoom, maxZoom) }))}
                 aria-label="Zoom out"
                 type="button">
                 <SvgIcon pathD={imageViewerIcons.zoomOut} label="Zoom out" />
               </button>
               <button
                 className={imageViewerToolbarBtnClasses}
-                onClick={() => setZoom(clampZoom(zoom + 0.25, minZoom, maxZoom))}
+                onClick={() => setTransform((t) => ({ ...t, scale: clampZoom(t.scale + 0.25, minZoom, maxZoom) }))}
                 aria-label="Zoom in"
                 type="button">
                 <SvgIcon pathD={imageViewerIcons.zoomIn} label="Zoom in" />
@@ -188,14 +252,14 @@ export const ImageViewer: React.FC<ImageViewerProps> = ({
             <>
               <button
                 className={imageViewerToolbarBtnClasses}
-                onClick={() => setRotation(normalizeRotation(rotation - 90))}
+                onClick={() => setTransform((t) => ({ ...t, rotation: normalizeRotation(t.rotation - 90) }))}
                 aria-label="Rotate left"
                 type="button">
                 <SvgIcon pathD={imageViewerIcons.rotateLeft} label="Rotate left" />
               </button>
               <button
                 className={imageViewerToolbarBtnClasses}
-                onClick={() => setRotation(normalizeRotation(rotation + 90))}
+                onClick={() => setTransform((t) => ({ ...t, rotation: normalizeRotation(t.rotation + 90) }))}
                 aria-label="Rotate right"
                 type="button">
                 <SvgIcon pathD={imageViewerIcons.rotateRight} label="Rotate right" />

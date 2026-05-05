@@ -8,6 +8,12 @@ import {
   navigateToFolder,
   getFileManagerContainerClasses,
   getFileItemClasses,
+  deriveFileManagerModel,
+  toggleFileSelection,
+  resolveFileOpen,
+  sliceBreadcrumbPath,
+  toFileDragItem,
+  applyFileDragReorder,
   fileManagerContainerClasses,
   fileManagerListItemClasses,
   fileManagerListItemSelectedClasses,
@@ -221,6 +227,178 @@ describe('file-manager-utils', () => {
     it('grid mode - selected', () => {
       const cls = getFileItemClasses('grid', true)
       expect(cls).toContain(fileManagerGridItemSelectedClasses)
+    })
+  })
+
+  // ─── deriveFileManagerModel ───────────────────────────────
+
+  describe('deriveFileManagerModel', () => {
+    const tree: FileItem[] = [
+      makeFolder('src', [makeFile('index.ts'), makeFile('utils.ts')]),
+      makeFile('README.md', { size: 2048 }),
+      makeFile('.env', { size: 64 })
+    ]
+
+    it('returns root items when path is empty', () => {
+      const m = deriveFileManagerModel({
+        files: tree,
+        currentPath: [],
+        selectedKeys: [],
+        sortField: 'name',
+        sortOrder: 'asc',
+        showHidden: true,
+        searchText: ''
+      })
+      // folders first, then files sorted: .env, README.md
+      expect(m.processedItems.length).toBe(3)
+      expect(m.processedItems[0].name).toBe('src')
+    })
+
+    it('navigates into folder', () => {
+      const m = deriveFileManagerModel({
+        files: tree,
+        currentPath: ['src'],
+        selectedKeys: [],
+        sortField: 'name',
+        sortOrder: 'asc',
+        showHidden: false,
+        searchText: ''
+      })
+      expect(m.processedItems.map((i) => i.name)).toEqual(['index.ts', 'utils.ts'])
+    })
+
+    it('filters hidden files', () => {
+      const m = deriveFileManagerModel({
+        files: tree,
+        currentPath: [],
+        selectedKeys: [],
+        sortField: 'name',
+        sortOrder: 'asc',
+        showHidden: false,
+        searchText: ''
+      })
+      expect(m.processedItems.find((i) => i.name === '.env')).toBeUndefined()
+    })
+
+    it('filters by search text', () => {
+      const m = deriveFileManagerModel({
+        files: tree,
+        currentPath: [],
+        selectedKeys: [],
+        sortField: 'name',
+        sortOrder: 'asc',
+        showHidden: true,
+        searchText: 'READ'
+      })
+      expect(m.processedItems.length).toBe(1)
+      expect(m.processedItems[0].name).toBe('README.md')
+    })
+
+    it('builds selectedSet', () => {
+      const m = deriveFileManagerModel({
+        files: tree,
+        currentPath: [],
+        selectedKeys: ['src', 'readme'],
+        sortField: 'name',
+        sortOrder: 'asc',
+        showHidden: false,
+        searchText: ''
+      })
+      expect(m.selectedSet.has('src')).toBe(true)
+      expect(m.selectedSet.has('readme')).toBe(true)
+      expect(m.selectedSet.has('.env')).toBe(false)
+    })
+  })
+
+  // ─── toggleFileSelection ──────────────────────────────────
+
+  describe('toggleFileSelection', () => {
+    it('adds key in single mode (clears others)', () => {
+      const result = toggleFileSelection(['a'], 'b', false)
+      expect(result).toEqual(['b'])
+    })
+
+    it('adds key in multi mode (keeps others)', () => {
+      const result = toggleFileSelection(['a'], 'b', true)
+      expect(result).toEqual(['a', 'b'])
+    })
+
+    it('removes key if already selected', () => {
+      const result = toggleFileSelection(['a', 'b'], 'a', true)
+      expect(result).toEqual(['b'])
+    })
+  })
+
+  // ─── resolveFileOpen ──────────────────────────────────────
+
+  describe('resolveFileOpen', () => {
+    it('returns navigate for folder', () => {
+      const result = resolveFileOpen(makeFolder('src'), ['root'])
+      expect(result).toEqual({ type: 'navigate', path: ['root', 'src'] })
+    })
+
+    it('returns open for file', () => {
+      const file = makeFile('index.ts')
+      const result = resolveFileOpen(file, [])
+      expect(result).toEqual({ type: 'open', item: file })
+    })
+
+    it('returns null for disabled item', () => {
+      const result = resolveFileOpen(makeFile('x', { disabled: true }), [])
+      expect(result).toBeNull()
+    })
+  })
+
+  // ─── sliceBreadcrumbPath ──────────────────────────────────
+
+  describe('sliceBreadcrumbPath', () => {
+    it('returns empty for index 0', () => {
+      expect(sliceBreadcrumbPath(['a', 'b', 'c'], 0)).toEqual([])
+    })
+
+    it('slices to index', () => {
+      expect(sliceBreadcrumbPath(['a', 'b', 'c'], 2)).toEqual(['a', 'b'])
+    })
+  })
+
+  // ─── toFileDragItem ───────────────────────────────────────
+
+  describe('toFileDragItem', () => {
+    it('converts FileItem to DragItem', () => {
+      const item = makeFile('index.ts')
+      const drag = toFileDragItem(item, 3, 'container-1')
+      expect(drag.id).toBe('index.ts')
+      expect(drag.index).toBe(3)
+      expect(drag.containerId).toBe('container-1')
+      expect(drag.data).toEqual({ name: 'index.ts', type: 'file' })
+    })
+  })
+
+  // ─── applyFileDragReorder ─────────────────────────────────
+
+  describe('applyFileDragReorder', () => {
+    it('reorders items', () => {
+      const items = [makeFile('a'), makeFile('b'), makeFile('c')]
+      const result = applyFileDragReorder(items, {
+        item: { id: 'a', index: 0 },
+        fromIndex: 0,
+        toIndex: 2,
+        fromContainerId: 'x',
+        toContainerId: 'x'
+      })
+      expect(result.map((i) => i.name)).toEqual(['b', 'c', 'a'])
+    })
+
+    it('returns same array for same index', () => {
+      const items = [makeFile('a'), makeFile('b')]
+      const result = applyFileDragReorder(items, {
+        item: { id: 'a', index: 0 },
+        fromIndex: 1,
+        toIndex: 1,
+        fromContainerId: 'x',
+        toContainerId: 'x'
+      })
+      expect(result).toBe(items)
     })
   })
 })

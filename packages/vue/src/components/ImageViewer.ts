@@ -11,7 +11,17 @@ import {
   imageViewerCounterClasses,
   imageViewerIcons,
   clampZoom,
-  normalizeRotation
+  normalizeRotation,
+  createDefaultTransform,
+  getImageTransformStyle,
+  applyWheelZoom,
+  createPanState,
+  startPan,
+  movePan,
+  createPinchState,
+  startPinch,
+  movePinch,
+  type GestureTransform
 } from '@expcat/tigercat-core'
 
 export interface VueImageViewerProps {
@@ -97,8 +107,9 @@ export const ImageViewer = defineComponent({
   emits: ['update:open', 'update:currentIndex', 'close'],
   setup(props, { emit, attrs }) {
     const index = ref(props.currentIndex)
-    const zoom = ref(1)
-    const rotation = ref(0)
+    const transform = ref<GestureTransform>(createDefaultTransform())
+    let panState = createPanState()
+    let pinchState = createPinchState()
 
     watch(
       () => props.currentIndex,
@@ -107,6 +118,12 @@ export const ImageViewer = defineComponent({
       }
     )
 
+    function resetTransform() {
+      transform.value = createDefaultTransform()
+      panState = createPanState()
+      pinchState = createPinchState()
+    }
+
     const handleClose = () => {
       emit('update:open', false)
       emit('close')
@@ -114,32 +131,107 @@ export const ImageViewer = defineComponent({
 
     const handlePrev = () => {
       index.value = (index.value - 1 + props.images.length) % props.images.length
-      zoom.value = 1
-      rotation.value = 0
+      resetTransform()
       emit('update:currentIndex', index.value)
     }
 
     const handleNext = () => {
       index.value = (index.value + 1) % props.images.length
-      zoom.value = 1
-      rotation.value = 0
+      resetTransform()
       emit('update:currentIndex', index.value)
     }
 
     const handleZoomIn = () => {
-      zoom.value = clampZoom(zoom.value + 0.25, props.minZoom, props.maxZoom)
+      transform.value = {
+        ...transform.value,
+        scale: clampZoom(transform.value.scale + 0.25, props.minZoom, props.maxZoom)
+      }
     }
 
     const handleZoomOut = () => {
-      zoom.value = clampZoom(zoom.value - 0.25, props.minZoom, props.maxZoom)
+      transform.value = {
+        ...transform.value,
+        scale: clampZoom(transform.value.scale - 0.25, props.minZoom, props.maxZoom)
+      }
     }
 
     const handleRotateLeft = () => {
-      rotation.value = normalizeRotation(rotation.value - 90)
+      transform.value = {
+        ...transform.value,
+        rotation: normalizeRotation(transform.value.rotation - 90)
+      }
     }
 
     const handleRotateRight = () => {
-      rotation.value = normalizeRotation(rotation.value + 90)
+      transform.value = {
+        ...transform.value,
+        rotation: normalizeRotation(transform.value.rotation + 90)
+      }
+    }
+
+    // Wheel zoom
+    const handleWheel = (e: WheelEvent) => {
+      if (!props.zoomable) return
+      e.preventDefault()
+      const newScale = applyWheelZoom(transform.value.scale, e.deltaY, {
+        minZoom: props.minZoom,
+        maxZoom: props.maxZoom
+      })
+      transform.value = { ...transform.value, scale: newScale }
+    }
+
+    // Mouse pan
+    const handleMouseDown = (e: MouseEvent) => {
+      if (e.button !== 0) return
+      e.preventDefault()
+      panState = startPan(e.clientX, e.clientY, transform.value.translateX, transform.value.translateY)
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!panState.isPanning) return
+      const result = movePan(panState, e.clientX, e.clientY)
+      transform.value = { ...transform.value, ...result }
+    }
+
+    const handleMouseUp = () => {
+      panState = createPanState()
+    }
+
+    // Touch pinch + pan
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2 && props.zoomable) {
+        e.preventDefault()
+        pinchState = startPinch(e.touches[0], e.touches[1], transform.value.scale)
+      } else if (e.touches.length === 1) {
+        panState = startPan(
+          e.touches[0].clientX,
+          e.touches[0].clientY,
+          transform.value.translateX,
+          transform.value.translateY
+        )
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 2 && pinchState.isPinching) {
+        e.preventDefault()
+        const newScale = movePinch(
+          pinchState,
+          e.touches[0],
+          e.touches[1],
+          props.minZoom,
+          props.maxZoom
+        )
+        transform.value = { ...transform.value, scale: newScale }
+      } else if (e.touches.length === 1 && panState.isPanning) {
+        const result = movePan(panState, e.touches[0].clientX, e.touches[0].clientY)
+        transform.value = { ...transform.value, ...result }
+      }
+    }
+
+    const handleTouchEnd = () => {
+      pinchState = createPinchState()
+      panState = createPanState()
     }
 
     const handleKeydown = (e: KeyboardEvent) => {
@@ -228,9 +320,18 @@ export const ImageViewer = defineComponent({
           src: props.images[index.value],
           alt: `Image ${index.value + 1}`,
           style: {
-            transform: `scale(${zoom.value}) rotate(${rotation.value}deg)`
+            transform: getImageTransformStyle(transform.value)
           },
-          draggable: false
+          draggable: false,
+          onWheel: handleWheel,
+          onMousedown: handleMouseDown,
+          onMousemove: handleMouseMove,
+          onMouseup: handleMouseUp,
+          onMouseleave: handleMouseUp,
+          onTouchstart: handleTouchStart,
+          onTouchmove: handleTouchMove,
+          onTouchend: handleTouchEnd,
+          onTouchcancel: handleTouchEnd
         })
       )
 

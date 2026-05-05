@@ -4,10 +4,11 @@ import {
   coerceClassValue,
   getFileManagerContainerClasses,
   getFileItemClasses,
-  sortFileItems,
-  filterFileItems,
-  filterHiddenFiles,
-  navigateToFolder,
+  deriveFileManagerModel,
+  toggleFileSelection,
+  resolveFileOpen,
+  sliceBreadcrumbPath,
+  toFileDragItem,
   formatFileSizeLabel,
   fileManagerToolbarClasses,
   fileManagerBreadcrumbClasses,
@@ -88,17 +89,17 @@ export const FileManager = defineComponent({
   setup(props, { emit, attrs }) {
     const localSearch = ref(props.searchText)
 
-    const currentItems = computed(() => navigateToFolder(props.files, props.currentPath))
-
-    const processedItems = computed(() => {
-      let items = filterHiddenFiles(currentItems.value, props.showHidden)
-      if (localSearch.value || props.searchText) {
-        items = filterFileItems(items, localSearch.value || props.searchText)
-      }
-      return sortFileItems(items, props.sortField, props.sortOrder)
-    })
-
-    const selectedSet = computed(() => new Set(props.selectedKeys))
+    const model = computed(() =>
+      deriveFileManagerModel({
+        files: props.files,
+        currentPath: props.currentPath,
+        selectedKeys: props.selectedKeys,
+        sortField: props.sortField,
+        sortOrder: props.sortOrder,
+        showHidden: props.showHidden,
+        searchText: localSearch.value || props.searchText
+      })
+    )
 
     const containerClasses = computed(() =>
       classNames(getFileManagerContainerClasses(props.className), coerceClassValue(attrs.class))
@@ -107,31 +108,23 @@ export const FileManager = defineComponent({
     function handleSelect(item: FileItem) {
       if (item.disabled) return
       emit('select', item)
-      // Toggle selection
-      const keys = [...props.selectedKeys]
-      const idx = keys.indexOf(item.key)
-      if (idx >= 0) {
-        keys.splice(idx, 1)
-      } else {
-        if (!props.multiple) keys.length = 0
-        keys.push(item.key)
-      }
+      const keys = toggleFileSelection(props.selectedKeys, item.key, props.multiple)
       emit('update:selectedKeys', keys)
     }
 
     function handleOpen(item: FileItem) {
-      if (item.disabled) return
-      if (item.type === 'folder') {
-        const newPath = [...props.currentPath, item.name]
-        emit('update:currentPath', newPath)
-        emit('navigate', newPath)
+      const result = resolveFileOpen(item, props.currentPath)
+      if (!result) return
+      if (result.type === 'navigate') {
+        emit('update:currentPath', result.path)
+        emit('navigate', result.path)
       } else {
-        emit('open', item)
+        emit('open', result.item)
       }
     }
 
     function navigateToBreadcrumb(index: number) {
-      const newPath = props.currentPath.slice(0, index)
+      const newPath = sliceBreadcrumbPath(props.currentPath, index)
       emit('update:currentPath', newPath)
       emit('navigate', newPath)
     }
@@ -196,8 +189,8 @@ export const FileManager = defineComponent({
         )
 
       // File items
-      const renderItem = (item: FileItem) => {
-        const isSelected = selectedSet.value.has(item.key)
+      const renderItem = (item: FileItem, index: number) => {
+        const isSelected = model.value.selectedSet.has(item.key)
         const itemClass = getFileItemClasses(props.viewMode, isSelected)
 
         const nameEl = h('span', { class: fileManagerItemNameClasses }, item.name)
@@ -214,6 +207,10 @@ export const FileManager = defineComponent({
               ]
             : []
 
+        const dragItem = props.draggable && !item.disabled
+          ? toFileDragItem(item, index)
+          : undefined
+
         return h(
           'div',
           {
@@ -224,7 +221,8 @@ export const FileManager = defineComponent({
             'data-disabled': item.disabled || undefined,
             onClick: () => handleSelect(item),
             onDblclick: () => handleOpen(item),
-            draggable: props.draggable && !item.disabled
+            draggable: props.draggable && !item.disabled,
+            'data-drag-id': dragItem?.id
           },
           [fileIcon(item), nameEl, ...metaEls]
         )
@@ -236,11 +234,11 @@ export const FileManager = defineComponent({
           : fileManagerContentClasses
 
       const content =
-        processedItems.value.length > 0
+        model.value.processedItems.length > 0
           ? h(
               'div',
               { class: contentClass, role: 'listbox', 'aria-multiselectable': props.multiple },
-              processedItems.value.map(renderItem)
+              model.value.processedItems.map(renderItem)
             )
           : h('div', { class: fileManagerEmptyClasses }, props.emptyText)
 
