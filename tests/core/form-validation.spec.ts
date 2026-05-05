@@ -5,6 +5,7 @@ import {
   validateField,
   validateForm,
   getFieldError,
+  createFormErrorMap,
   clearFieldErrors,
   hasErrors,
   getErrorFields
@@ -326,6 +327,25 @@ describe('form-validation', () => {
 
       it('returns undefined for non-existent field', () => {
         expect(getFieldError('password', sampleErrors)).toBe(undefined)
+      })
+    })
+
+    describe('createFormErrorMap', () => {
+      it('creates an indexed error lookup for O(1) field reads', () => {
+        expect(createFormErrorMap(sampleErrors)).toEqual({
+          name: 'Name is required',
+          email: 'Invalid email',
+          age: 'Must be a number'
+        })
+      })
+
+      it('keeps the latest message when a field appears more than once', () => {
+        expect(
+          createFormErrorMap([
+            { field: 'email', message: 'Invalid email' },
+            { field: 'email', message: 'Email is required' }
+          ])
+        ).toEqual({ email: 'Email is required' })
       })
     })
 

@@ -311,6 +311,19 @@ export function getFieldError(fieldName: string, errors: FormError[]): string | 
 }
 
 /**
+ * Build an O(1) lookup table for field errors.
+ */
+export function createFormErrorMap(errors: readonly FormError[]): Record<string, string> {
+  const errorMap: Record<string, string> = {}
+
+  for (const error of errors) {
+    errorMap[error.field] = error.message
+  }
+
+  return errorMap
+}
+
+/**
  * Clear errors for specific fields
  */
 export function clearFieldErrors(fieldNames: string | string[], errors: FormError[]): FormError[] {

@@ -4,7 +4,6 @@ import {
   type FormSize,
   type FormRule,
   type FormItemProps as CoreFormItemProps,
-  getFieldError,
   getFormItemClasses,
   getFormItemLabelClasses,
   getFormItemContentClasses,
@@ -127,8 +126,8 @@ export const FormItem: React.FC<FormItemProps> = ({
 
   // Watch for errors in form context
   useEffect(() => {
-    if (name && formContext?.errors) {
-      const error = getFieldError(name, formContext.errors) || ''
+    if (name && formContext?.errorsByField) {
+      const error = formContext.errorsByField[name] || ''
       setErrorMessage(error)
       // Only trigger shake when error is newly set (transition from no-error to error,
       // or error message changes). Prevents re-shaking unrelated fields when another
@@ -138,7 +137,7 @@ export const FormItem: React.FC<FormItemProps> = ({
       }
       prevFormErrorRef.current = error
     }
-  }, [name, formContext?.errors])
+  }, [name, formContext?.errorsByField])
 
   // Watch for controlled error prop
   useEffect(() => {

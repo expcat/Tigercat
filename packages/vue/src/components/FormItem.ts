@@ -17,7 +17,6 @@ import {
   type FormRule,
   type FormSize,
   type FormErrorDisplayMode,
-  getFieldError,
   getFormItemClasses,
   getFormItemLabelClasses,
   getFormItemContentClasses,
@@ -182,21 +181,19 @@ export const FormItem = defineComponent({
 
     // Watch for errors in form context
     watch(
-      () => formContext.value?.errors,
-      (errors) => {
-        if (props.name && errors) {
-          const error = getFieldError(props.name, errors) || ''
-          errorMessage.value = error
-          // Only trigger shake when error is newly set (transition from no-error
-          // to error, or error message changes). Prevents re-shaking unrelated
-          // fields when another field's validation mutates the shared errors array.
-          if (error && error !== prevFormError.value) {
-            shakeTrigger.value++
-          }
-          prevFormError.value = error
+      () => (props.name ? formContext.value?.errorsByField[props.name] : undefined),
+      (error) => {
+        const nextError = error || ''
+        errorMessage.value = nextError
+        // Only trigger shake when error is newly set (transition from no-error
+        // to error, or error message changes). Prevents re-shaking unrelated
+        // fields when another field's validation mutates the shared errors map.
+        if (nextError && nextError !== prevFormError.value) {
+          shakeTrigger.value++
         }
+        prevFormError.value = nextError
       },
-      { deep: true, immediate: true }
+      { immediate: true }
     )
 
     // Watch for controlled error prop

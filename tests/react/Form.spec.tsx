@@ -879,6 +879,35 @@ describe('Form', () => {
         expect(onValidate).toHaveBeenCalledWith('username', false, 'Username required')
       })
     })
+
+    it('validates only the requested field when validateField is called', async () => {
+      const formRef = React.createRef<FormHandle>()
+      const fieldNames = Array.from({ length: 24 }, (_, index) => `field${index}`)
+      const validators = Object.fromEntries(fieldNames.map((field) => [field, vi.fn(() => null)]))
+      const model = Object.fromEntries(fieldNames.map((field) => [field, 'value']))
+      const rules = Object.fromEntries(
+        fieldNames.map((field) => [field, { validator: validators[field] }])
+      ) as FormRules
+
+      render(
+        <Form ref={formRef} model={model} rules={rules}>
+          {fieldNames.map((field) => (
+            <FormItem key={field} label={field} name={field}>
+              <input aria-label={field} />
+            </FormItem>
+          ))}
+        </Form>
+      )
+
+      await act(async () => {
+        await formRef.current?.validateField('field12')
+      })
+
+      expect(validators.field12).toHaveBeenCalledTimes(1)
+      for (const field of fieldNames.filter((field) => field !== 'field12')) {
+        expect(validators[field]).not.toHaveBeenCalled()
+      }
+    })
   })
 
   // ==================== Edge Cases ====================

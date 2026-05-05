@@ -21,6 +21,7 @@ import {
   validateForm,
   validateField as validateFieldUtil,
   getValueByPath,
+  createFormErrorMap,
   getDependentFields,
   createFormHistory,
   pushFormHistory,
@@ -47,6 +48,7 @@ export interface FormContext {
   disabled: boolean
   loading: boolean
   errors: FormError[]
+  errorsByField: Record<string, string | undefined>
   registerFieldRules: (fieldName: string, rules?: FormRule | FormRule[]) => void
   validateField: (
     fieldName: string,
@@ -163,6 +165,7 @@ export const Form = defineComponent({
   setup(props, { slots, emit, expose }) {
     const errors = reactive<FormError[]>([])
     const fieldRules = reactive<Record<string, FormRule | FormRule[]>>({})
+    const errorsByField = computed(() => createFormErrorMap(errors))
 
     // v0.6.0: undo/redo history
     const history = ref<FormHistoryState>(
@@ -381,6 +384,7 @@ export const Form = defineComponent({
       disabled: props.disabled,
       loading: props.loading,
       errors,
+      errorsByField: errorsByField.value,
       registerFieldRules,
       validateField,
       clearValidate

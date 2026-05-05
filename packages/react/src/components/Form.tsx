@@ -21,6 +21,7 @@ import {
   validateForm,
   validateField as validateFieldUtil,
   getValueByPath,
+  createFormErrorMap,
   getDependentFields,
   createFormHistory,
   pushFormHistory,
@@ -43,6 +44,7 @@ export interface FormContextValue {
   disabled: boolean
   loading: boolean
   errors: FormError[]
+  errorsByField: Record<string, string | undefined>
   registerFieldRules: (fieldName: string, rules?: FormRule | FormRule[]) => void
   validateField: (
     fieldName: string,
@@ -164,6 +166,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
     const [formValues, setFormValues] = useState<FormValues>(model)
     const fieldRulesRef = React.useRef<FormRules>({})
     const formValuesRef = React.useRef<FormValues>(model)
+    const errorsByField = useMemo(() => createFormErrorMap(errors), [errors])
 
     // v0.6.0: undo/redo history
     const [historyState, setHistoryState] = useState(() => createFormHistory(model, maxHistorySize))
@@ -499,6 +502,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
         disabled,
         loading,
         errors,
+        errorsByField,
         registerFieldRules,
         validateField,
         clearValidate,
@@ -516,6 +520,7 @@ export const Form = forwardRef<FormHandle, FormProps>(
         disabled,
         loading,
         errors,
+        errorsByField,
         registerFieldRules,
         validateField,
         clearValidate,

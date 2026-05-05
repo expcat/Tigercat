@@ -994,6 +994,50 @@ describe('Form', () => {
       expect(await screen.findByText('Username required')).toBeInTheDocument()
     })
 
+    it('validates only the requested field when validateField is called', async () => {
+      let formApi: { validateField: (name: string) => Promise<void> } | undefined
+      const fieldNames = Array.from({ length: 24 }, (_, index) => `field${index}`)
+      const validators = Object.fromEntries(fieldNames.map((field) => [field, vi.fn(() => null)]))
+
+      const Demo = defineComponent({
+        setup() {
+          const model = reactive(Object.fromEntries(fieldNames.map((field) => [field, 'value'])))
+          const rules = Object.fromEntries(
+            fieldNames.map((field) => [field, { validator: validators[field] }])
+          ) as FormRules
+
+          return () =>
+            h(
+              Form,
+              {
+                model,
+                rules,
+                ref: (el) => {
+                  formApi = (el as typeof formApi) ?? undefined
+                }
+              },
+              {
+                default: () =>
+                  fieldNames.map((field) =>
+                    h(FormItem, { key: field, label: field, name: field }, () =>
+                      h('input', { 'aria-label': field })
+                    )
+                  )
+              }
+            )
+        }
+      })
+
+      render(Demo)
+
+      await formApi?.validateField('field12')
+
+      expect(validators.field12).toHaveBeenCalledTimes(1)
+      for (const field of fieldNames.filter((field) => field !== 'field12')) {
+        expect(validators[field]).not.toHaveBeenCalled()
+      }
+    })
+
     it('clearValidate clears all errors when called without args', async () => {
       let formApi:
         | {
