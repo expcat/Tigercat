@@ -25,8 +25,11 @@ export function renderPagination(
   }
 
   const { totalPages, startIndex, endIndex, hasNext, hasPrev } = ctx.paginationInfo
-  const total = ctx.processedData.length
   const paginationConfig = pagination as PaginationConfig
+  const total =
+    paginationConfig.total !== undefined && paginationConfig.total > 0
+      ? paginationConfig.total
+      : ctx.processedData.length
 
   return (
     <div className={getSimplePaginationContainerClasses()}>

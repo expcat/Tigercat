@@ -15,18 +15,17 @@ import {
   type TableColumn,
   type TableSize,
   type SortState,
+  type PaginationConfig,
   type RowSelectionConfig,
   type TableToolbarProps as CoreTableToolbarProps,
   type TableToolbarFilter,
   type TableToolbarFilterValue,
-  type TableToolbarAction,
-  type PaginationProps
+  type TableToolbarAction
 } from '@expcat/tigercat-core'
 import { Table } from './Table'
 import { Input } from './Input'
 import { Select } from './Select'
 import { Button } from './Button'
-import { Pagination } from './Pagination'
 
 export interface VueTableToolbarProps extends Omit<
   CoreTableToolbarProps,
@@ -53,7 +52,7 @@ export interface VueDataTableWithToolbarProps {
   stickyHeader?: boolean
   maxHeight?: string | number
   toolbar?: VueTableToolbarProps
-  pagination?: PaginationProps | false
+  pagination?: PaginationConfig | false
   className?: string
   style?: Record<string, string | number>
 }
@@ -143,7 +142,7 @@ export const DataTableWithToolbar = defineComponent({
       default: undefined
     },
     pagination: {
-      type: [Object, Boolean] as PropType<PaginationProps | false>,
+      type: [Object, Boolean] as PropType<PaginationConfig | false>,
       default: false
     },
     tableLayout: {
@@ -171,6 +170,11 @@ export const DataTableWithToolbar = defineComponent({
   setup(props, { attrs, emit }) {
     const internalSearch = ref<string>(props.toolbar?.defaultSearchValue ?? '')
     const internalFilters = ref<Record<string, TableToolbarFilterValue>>({})
+    const previousPageSize = ref(
+      props.pagination && typeof props.pagination === 'object'
+        ? (props.pagination.pageSize ?? props.pagination.defaultPageSize ?? 10)
+        : undefined
+    )
     const vnodeProps = (getCurrentInstance()?.vnode.props ?? {}) as Record<string, unknown>
     const hasSearchListener = Boolean(vnodeProps.onSearch || vnodeProps.onSearchChange)
 
@@ -179,6 +183,15 @@ export const DataTableWithToolbar = defineComponent({
       (nextValue) => {
         if (nextValue !== undefined) {
           internalSearch.value = nextValue ?? ''
+        }
+      }
+    )
+
+    watch(
+      () => props.pagination,
+      (nextValue) => {
+        if (nextValue && typeof nextValue === 'object') {
+          previousPageSize.value = nextValue.pageSize ?? nextValue.defaultPageSize ?? 10
         }
       }
     )
@@ -279,6 +292,20 @@ export const DataTableWithToolbar = defineComponent({
       const keys = selectedKeys.value ?? []
       action.onClick?.(keys)
       emit('bulk-action', action, keys)
+    }
+
+    const handleTablePageChange = ({
+      current,
+      pageSize
+    }: {
+      current: number
+      pageSize: number
+    }) => {
+      emit('page-change', current, pageSize)
+      if (previousPageSize.value !== undefined && previousPageSize.value !== pageSize) {
+        emit('page-size-change', current, pageSize)
+      }
+      previousPageSize.value = pageSize
     }
 
     const renderToolbar = () => {
@@ -395,7 +422,6 @@ export const DataTableWithToolbar = defineComponent({
 
     return () => {
       const { class: _class, style: _style, ...restAttrs } = attrs
-      const showPagination = props.pagination && typeof props.pagination === 'object'
       const tableProps = {
         ...(restAttrs as Record<string, unknown>),
         columns: props.columns,
@@ -411,14 +437,15 @@ export const DataTableWithToolbar = defineComponent({
         hoverable: props.hoverable,
         loading: props.loading,
         emptyText: props.emptyText,
-        pagination: false,
+        pagination: props.pagination,
         rowSelection: props.rowSelection,
         rowKey: props.rowKey,
         rowClassName: props.rowClassName,
         stickyHeader: props.stickyHeader,
         maxHeight: props.maxHeight,
         tableLayout: props.tableLayout,
-        onSelectionChange: (keys: (string | number)[]) => emit('selection-change', keys)
+        onSelectionChange: (keys: (string | number)[]) => emit('selection-change', keys),
+        onPageChange: handleTablePageChange
       }
 
       return h(
@@ -431,16 +458,7 @@ export const DataTableWithToolbar = defineComponent({
         [
           renderToolbar(),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          h(Table as unknown as any, tableProps),
-          showPagination
-            ? h(Pagination, {
-                ...(props.pagination as PaginationProps),
-                onChange: (current: number, pageSize: number) =>
-                  emit('page-change', current, pageSize),
-                onPageSizeChange: (current: number, pageSize: number) =>
-                  emit('page-size-change', current, pageSize)
-              })
-            : null
+          h(Table as unknown as any, tableProps)
         ]
       )
     }

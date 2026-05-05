@@ -19,6 +19,7 @@ describe('DataTableWithToolbar (Vue)', () => {
   it('emits filter and pagination changes', async () => {
     const onFiltersChange = vi.fn()
     const onPageChange = vi.fn()
+    const onPageSizeChange = vi.fn()
 
     render(DataTableWithToolbar, {
       props: {
@@ -40,7 +41,8 @@ describe('DataTableWithToolbar (Vue)', () => {
       },
       attrs: {
         onFiltersChange,
-        onPageChange
+        onPageChange,
+        onPageSizeChange
       }
     })
 
@@ -49,7 +51,30 @@ describe('DataTableWithToolbar (Vue)', () => {
 
     expect(onFiltersChange).toHaveBeenCalledWith({ status: 'active' })
 
-    await userEvent.click(screen.getByLabelText('Page 2'))
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }))
+    expect(onPageChange).toHaveBeenCalledWith(2, 10)
+
+    await userEvent.selectOptions(screen.getByRole('combobox'), '20')
+    expect(onPageSizeChange).toHaveBeenCalledWith(1, 20)
+  })
+
+  it('delegates pagination rendering to Table', async () => {
+    const onPageChange = vi.fn()
+
+    render(DataTableWithToolbar, {
+      props: {
+        columns,
+        dataSource: [{ id: 1, name: 'A' }],
+        pagination: { current: 1, pageSize: 10, total: 20, showTotal: true }
+      },
+      attrs: {
+        onPageChange
+      }
+    })
+
+    expect(screen.getByText('Showing 1 to 10 of 20 results')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }))
     expect(onPageChange).toHaveBeenCalledWith(2, 10)
   })
 

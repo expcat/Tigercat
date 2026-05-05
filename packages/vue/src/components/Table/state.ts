@@ -209,7 +209,10 @@ export function useTableState(
     if (props.pagination === false) {
       return null
     }
-    const total = processedData.value.length
+    const total =
+      paginationConfig.value?.total !== undefined && paginationConfig.value.total > 0
+        ? paginationConfig.value.total
+        : processedData.value.length
     return calculatePagination(total, currentPage.value, currentPageSize.value)
   })
 

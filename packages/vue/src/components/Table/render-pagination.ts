@@ -17,8 +17,11 @@ export function renderPagination(ctx: TableContext, props: TableInternalProps): 
   }
 
   const { totalPages, startIndex, endIndex, hasNext, hasPrev } = ctx.paginationInfo.value
-  const total = ctx.processedData.value.length
   const paginationConfig = props.pagination as PaginationConfig
+  const total =
+    paginationConfig.total !== undefined && paginationConfig.total > 0
+      ? paginationConfig.total
+      : ctx.processedData.value.length
 
   return h('div', { class: getSimplePaginationContainerClasses() }, [
     paginationConfig.showTotal !== false &&

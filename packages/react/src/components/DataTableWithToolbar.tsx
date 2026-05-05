@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   type TableToolbarProps,
@@ -10,11 +10,10 @@ import { Table, type TableProps } from './Table'
 import { Input } from './Input'
 import { Select } from './Select'
 import { Button } from './Button'
-import { Pagination, type PaginationProps } from './Pagination'
 
 export interface DataTableWithToolbarProps<T = Record<string, unknown>>
   extends
-    Omit<TableProps<T>, 'pagination' | 'className' | 'onPageChange'>,
+    Omit<TableProps<T>, 'className' | 'onPageChange'>,
     Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   /**
    * Toolbar configuration
@@ -36,10 +35,6 @@ export interface DataTableWithToolbarProps<T = Record<string, unknown>>
    * Bulk action handler
    */
   onBulkAction?: (action: TableToolbarAction, selectedKeys: (string | number)[]) => void
-  /**
-   * Pagination configuration
-   */
-  pagination?: PaginationProps | false
   /**
    * Page change handler
    */
@@ -71,6 +66,11 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
   tableClassName,
   ...tableProps
 }: DataTableWithToolbarProps<T>) => {
+  const previousPageSizeRef = useRef(
+    pagination && typeof pagination === 'object'
+      ? (pagination.pageSize ?? pagination.defaultPageSize ?? 10)
+      : undefined
+  )
   const [internalSearch, setInternalSearch] = useState<string>(toolbar?.defaultSearchValue ?? '')
   const [internalFilters, setInternalFilters] = useState<Record<string, TableToolbarFilterValue>>(
     () => {
@@ -89,6 +89,12 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
       setInternalSearch(toolbar.searchValue ?? '')
     }
   }, [toolbar?.searchValue])
+
+  useEffect(() => {
+    if (pagination && typeof pagination === 'object') {
+      previousPageSizeRef.current = pagination.pageSize ?? pagination.defaultPageSize ?? 10
+    }
+  }, [pagination])
 
   useEffect(() => {
     const filters = toolbar?.filters
@@ -177,6 +183,14 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     toolbar?.onBulkAction?.(action, keys)
   }
 
+  const handleTablePageChange = ({ current, pageSize }: { current: number; pageSize: number }) => {
+    onPageChange?.(current, pageSize)
+    if (previousPageSizeRef.current !== undefined && previousPageSizeRef.current !== pageSize) {
+      onPageSizeChange?.(current, pageSize)
+    }
+    previousPageSizeRef.current = pageSize
+  }
+
   const renderToolbar = () => {
     if (!hasSearch && !hasFilters && !hasBulkActions) return null
 
@@ -261,15 +275,15 @@ export const DataTableWithToolbar = <T extends Record<string, unknown> = Record<
     )
   }
 
-  const showPagination = pagination && typeof pagination === 'object'
-
   return (
     <div className={wrapperClasses} data-tiger-data-table-with-toolbar>
       {renderToolbar()}
-      <Table {...tableProps} pagination={false} className={tableClassName} />
-      {showPagination ? (
-        <Pagination {...pagination} onChange={onPageChange} onPageSizeChange={onPageSizeChange} />
-      ) : null}
+      <Table
+        {...tableProps}
+        pagination={pagination}
+        className={tableClassName}
+        onPageChange={handleTablePageChange}
+      />
     </div>
   )
 }

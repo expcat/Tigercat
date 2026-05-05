@@ -30,11 +30,13 @@
 
 > 2026-05-05 执行：完成 Layout / List virtual mode。Vue / React List 在 virtual 模式下复用现有 VirtualList 渲染固定高度窗口，新增 virtualHeight / virtualItemHeight / virtualOverscan 配置；grid 列表继续保留原 grid 渲染路径，避免混用布局策略。
 
+> 2026-05-05 执行：完成 Composite / DataTableWithToolbar 边界。Vue / React DataTableWithToolbar 不再自行渲染 Pagination，而是将 pagination 回交内部 Table；Table 分页总数现在尊重显式 `pagination.total`，DataTableWithToolbar 只保留 toolbar 搜索、筛选与批量操作编排。
+
 ## 1. 最高优先级
 
-| 任务                      | 对应组件 / 范围              | 来源                                           | 完成标准                                                                 |
-| ------------------------- | ---------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------ |
-| DataTableWithToolbar 边界 | DataTableWithToolbar / Table | [phase2.8-composite.md](phase2.8-composite.md) | 确认内部完全代理 Table 行为，只保留 toolbar 编排；必要时删掉重复状态逻辑 |
+| 任务                            | 对应组件 / 范围                   | 来源                                                                     | 完成标准                                                                                                              |
+| ------------------------------- | --------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| 根入口 locale tree-shaking 方案 | Core i18n barrel / locale presets | [phase1d-i18n-cli-examples-tests.md](phase1d-i18n-cli-examples-tests.md) | 当前根入口仍会经 `utils/i18n` re-export 全部 locale；需决定是否保留兼容 barrel，或引入更轻的 locale-only 默认导出策略 |
 
 ## 2. 分组索引
 
@@ -50,5 +52,5 @@
 | Navigation            | [phase2.5-navigation.md](phase2.5-navigation.md)                         | Menu / Dropdown / Anchor / Breadcrumb / Steps / Tabs / Pagination / FloatButton                                    |
 | Data                  | [phase2.6-data.md](phase2.6-data.md)                                     | Timeline；Table 性能二期已完成                                                                                     |
 | Charts                | [phase2.7-charts.md](phase2.7-charts.md)                                 | TreeMap / Sunburst / Gauge / chart interaction hot paths                                                           |
-| Composite             | [phase2.8-composite.md](phase2.8-composite.md)                           | DataTableWithToolbar / NotificationCenter / ActivityFeed / Timeline / CropUpload / FormWizard                      |
+| Composite             | [phase2.8-composite.md](phase2.8-composite.md)                           | NotificationCenter / ActivityFeed / Timeline / CropUpload / FormWizard；DataTableWithToolbar 边界已完成            |
 | Advanced              | [phase2.9-advanced.md](phase2.9-advanced.md)                             | VirtualList / InfiniteScroll / FileManager / ImageViewer / TaskBoard / VirtualTable / PrintLayout / RichTextEditor |

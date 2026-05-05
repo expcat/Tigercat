@@ -375,7 +375,7 @@ description: Shared props definitions for composite components - ChatWindow / Ac
 
 ## DataTableWithToolbar 表格工具栏
 
-> 组合 Table + Toolbar + Pagination 的统一容器。
+> 组合 Table + Toolbar 的容器。Table 相关行为（分页、排序、筛选、选择、导出等）由内部 Table 代理，DataTableWithToolbar 只负责编排 toolbar 搜索、筛选与批量操作入口。
 
 ### Props
 
@@ -387,7 +387,7 @@ description: Shared props definitions for composite components - ChatWindow / Ac
 | rowKey           | `string \| ((row) => string)` | `'id'`  |  ✓  |   ✓   | 行唯一键                |
 | loading          | `boolean`                     | `false` |  ✓  |   ✓   | 加载状态                |
 | toolbar          | `TableToolbarProps`           | -       |  ✓  |   ✓   | 工具栏配置              |
-| pagination       | `PaginationProps \| false`    | `false` |  ✓  |   ✓   | 分页配置                |
+| pagination       | `PaginationConfig \| false`   | `false` |  ✓  |   ✓   | 透传给 Table 的分页配置 |
 | onPageChange     | `(current, pageSize) => void` | -       |  -  |   ✓   | 分页变化回调（React）   |
 | onPageSizeChange | `(current, pageSize) => void` | -       |  -  |   ✓   | 页大小变化回调（React） |
 

@@ -270,9 +270,12 @@ export function useTableState(input: UseTableStateInput): TableContext {
     if (pagination === false) {
       return null
     }
-    const total = processedData.length
+    const total =
+      paginationConfig?.total !== undefined && paginationConfig.total > 0
+        ? paginationConfig.total
+        : processedData.length
     return calculatePagination(total, currentPage, currentPageSize)
-  }, [processedData.length, currentPage, currentPageSize, pagination])
+  }, [processedData.length, currentPage, currentPageSize, pagination, paginationConfig?.total])
 
   function handleSort(columnKey: string) {
     const column = columnByKey[columnKey]

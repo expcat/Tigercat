@@ -5,8 +5,7 @@
 import type { BadgeVariant } from './badge'
 import type { TagVariant } from './tag'
 import type { ButtonVariant } from './button'
-import type { FilterOption, TableProps } from './table'
-import type { PaginationProps } from './pagination'
+import type { FilterOption, PaginationConfig, TableProps } from './table'
 import type { StepStatus, StepsDirection, StepSize } from './steps'
 import type { TigerLocale } from './locale'
 
@@ -969,7 +968,7 @@ export interface DataTableWithToolbarProps<T = Record<string, unknown>> extends 
    * Pagination configuration
    * Set to false to disable
    */
-  pagination?: PaginationProps | false
+  pagination?: PaginationConfig | false
   /**
    * Page change callback
    */
