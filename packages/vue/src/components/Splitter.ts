@@ -7,6 +7,8 @@ import {
   getSplitterGutterHandleClasses,
   getPaneStyle,
   resizePanes,
+  createDocumentDragSession,
+  type DocumentDragSession,
   type SplitDirection
 } from '@expcat/tigercat-core'
 
@@ -64,6 +66,7 @@ export const Splitter = defineComponent({
     const draggingIndex = ref<number>(-1)
     const startPos = ref(0)
     const startSizes = ref<number[]>([])
+    let dragSession: DocumentDragSession | null = null
 
     // Sync controlled sizes
     watch(
@@ -106,20 +109,44 @@ export const Splitter = defineComponent({
     const getMins = () => paneSizes.value.map(() => props.min)
     const getMaxes = () => paneSizes.value.map(() => props.max)
 
+    const cleanupDragSession = () => {
+      dragSession?.dispose()
+      dragSession = null
+    }
+
     const onMouseDown = (index: number, e: MouseEvent) => {
       if (props.disabled) return
       e.preventDefault()
+      cleanupDragSession()
       draggingIndex.value = index
       startPos.value = props.direction === 'horizontal' ? e.clientX : e.clientY
       startSizes.value = [...paneSizes.value]
       emit('resize-start', { index, sizes: [...paneSizes.value] })
-      document.addEventListener('mousemove', onMouseMove)
-      document.addEventListener('mouseup', onMouseUp)
+
+      dragSession = createDocumentDragSession({
+        startX: e.clientX,
+        startY: e.clientY,
+        ownerDocument: (e.currentTarget as HTMLElement | null)?.ownerDocument,
+        onMove: ({ currentX, currentY }) => {
+          applyDragResize(currentX, currentY)
+        },
+        onEnd: ({ currentX, currentY }) => {
+          applyDragResize(currentX, currentY)
+          if (draggingIndex.value >= 0) {
+            emit('resize-end', {
+              index: draggingIndex.value,
+              sizes: [...paneSizes.value]
+            })
+          }
+          draggingIndex.value = -1
+          dragSession = null
+        }
+      })
     }
 
-    const onMouseMove = (e: MouseEvent) => {
+    const applyDragResize = (currentX: number, currentY: number) => {
       if (draggingIndex.value < 0) return
-      const currentPos = props.direction === 'horizontal' ? e.clientX : e.clientY
+      const currentPos = props.direction === 'horizontal' ? currentX : currentY
       const delta = currentPos - startPos.value
       const newSizes = resizePanes(
         startSizes.value,
@@ -135,21 +162,8 @@ export const Splitter = defineComponent({
       }
     }
 
-    const onMouseUp = () => {
-      if (draggingIndex.value >= 0) {
-        emit('resize-end', {
-          index: draggingIndex.value,
-          sizes: [...paneSizes.value]
-        })
-      }
-      draggingIndex.value = -1
-      document.removeEventListener('mousemove', onMouseMove)
-      document.removeEventListener('mouseup', onMouseUp)
-    }
-
     onBeforeUnmount(() => {
-      document.removeEventListener('mousemove', onMouseMove)
-      document.removeEventListener('mouseup', onMouseUp)
+      cleanupDragSession()
     })
 
     return () => {

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useMemo } from 'react'
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import {
   classNames,
   resizableBaseClasses,
@@ -7,6 +7,8 @@ import {
   clampDimensions,
   applyAspectRatio,
   defaultResizeHandles,
+  createDocumentDragSession,
+  type DocumentDragSession,
   type ResizableProps as CoreResizableProps,
   type ResizeHandlePosition,
   type ResizeEvent
@@ -41,6 +43,7 @@ export const Resizable: React.FC<ResizableProps> = ({
   const [width, setWidth] = useState(defaultWidth)
   const [height, setHeight] = useState(defaultHeight)
   const [draggingHandle, setDraggingHandle] = useState<ResizeHandlePosition | null>(null)
+  const dragSessionRef = useRef<DocumentDragSession | null>(null)
   const dragRef = useRef<{
     handle: ResizeHandlePosition
     startX: number
@@ -49,10 +52,18 @@ export const Resizable: React.FC<ResizableProps> = ({
     startH: number
   } | null>(null)
 
+  const cleanupDragSession = useCallback(() => {
+    dragSessionRef.current?.dispose()
+    dragSessionRef.current = null
+  }, [])
+
+  useEffect(() => cleanupDragSession, [cleanupDragSession])
+
   const handleMouseDown = useCallback(
     (handle: ResizeHandlePosition, e: React.MouseEvent) => {
       if (disabled) return
       e.preventDefault()
+      cleanupDragSession()
       const sw = width ?? 0
       const sh = height ?? 0
       dragRef.current = {
@@ -65,11 +76,11 @@ export const Resizable: React.FC<ResizableProps> = ({
       setDraggingHandle(handle)
       onResizeStart?.({ width: sw, height: sh, handle, deltaX: 0, deltaY: 0 })
 
-      const onMouseMove = (ev: MouseEvent) => {
+      const calculateResize = (currentX: number, currentY: number) => {
         const drag = dragRef.current
-        if (!drag) return
-        const mouseDeltaX = ev.clientX - drag.startX
-        const mouseDeltaY = ev.clientY - drag.startY
+        if (!drag) return null
+        const mouseDeltaX = currentX - drag.startX
+        const mouseDeltaY = currentY - drag.startY
         const { deltaWidth, deltaHeight } = calculateResizeDelta(
           drag.handle,
           mouseDeltaX,
@@ -86,54 +97,34 @@ export const Resizable: React.FC<ResizableProps> = ({
         }
 
         const clamped = clampDimensions(newW, newH, minWidth, minHeight, maxWidth, maxHeight)
-        setWidth(clamped.width)
-        setHeight(clamped.height)
-        onResize?.({
+        return {
           width: clamped.width,
           height: clamped.height,
           handle: drag.handle,
           deltaX: clamped.width - drag.startW,
           deltaY: clamped.height - drag.startH
-        })
-      }
-
-      const onMouseUp = (ev: MouseEvent) => {
-        const drag = dragRef.current
-        if (drag) {
-          const mouseDeltaX = ev.clientX - drag.startX
-          const mouseDeltaY = ev.clientY - drag.startY
-          const { deltaWidth, deltaHeight } = calculateResizeDelta(
-            drag.handle,
-            mouseDeltaX,
-            mouseDeltaY,
-            axis
-          )
-          let newW = drag.startW + deltaWidth
-          let newH = drag.startH + deltaHeight
-
-          if (lockAspectRatio) {
-            const ar = applyAspectRatio(newW, newH, drag.startW, drag.startH)
-            newW = ar.width
-            newH = ar.height
-          }
-
-          const clamped = clampDimensions(newW, newH, minWidth, minHeight, maxWidth, maxHeight)
-          onResizeEnd?.({
-            width: clamped.width,
-            height: clamped.height,
-            handle: drag.handle,
-            deltaX: clamped.width - drag.startW,
-            deltaY: clamped.height - drag.startH
-          })
         }
-        dragRef.current = null
-        setDraggingHandle(null)
-        document.removeEventListener('mousemove', onMouseMove)
-        document.removeEventListener('mouseup', onMouseUp)
       }
 
-      document.addEventListener('mousemove', onMouseMove)
-      document.addEventListener('mouseup', onMouseUp)
+      dragSessionRef.current = createDocumentDragSession({
+        startX: e.clientX,
+        startY: e.clientY,
+        ownerDocument: e.currentTarget.ownerDocument,
+        onMove: ({ currentX, currentY }) => {
+          const next = calculateResize(currentX, currentY)
+          if (!next) return
+          setWidth(next.width)
+          setHeight(next.height)
+          onResize?.(next)
+        },
+        onEnd: ({ currentX, currentY }) => {
+          const next = calculateResize(currentX, currentY)
+          if (next) onResizeEnd?.(next)
+          dragRef.current = null
+          dragSessionRef.current = null
+          setDraggingHandle(null)
+        }
+      })
     },
     [
       disabled,
@@ -145,6 +136,7 @@ export const Resizable: React.FC<ResizableProps> = ({
       minHeight,
       maxWidth,
       maxHeight,
+      cleanupDragSession,
       onResizeStart,
       onResize,
       onResizeEnd

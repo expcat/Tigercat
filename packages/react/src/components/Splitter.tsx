@@ -6,6 +6,8 @@ import {
   getSplitterGutterHandleClasses,
   getPaneStyle,
   resizePanes,
+  createDocumentDragSession,
+  type DocumentDragSession,
   type SplitterProps as CoreSplitterProps
 } from '@expcat/tigercat-core'
 
@@ -39,12 +41,20 @@ export const Splitter: React.FC<SplitterProps> = ({
   children
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
+  const dragSessionRef = useRef<DocumentDragSession | null>(null)
   const [paneSizes, setPaneSizes] = useState<number[]>([])
   const draggingRef = useRef<{
     index: number
     startPos: number
     startSizes: number[]
   } | null>(null)
+
+  const cleanupDragSession = useCallback(() => {
+    dragSessionRef.current?.dispose()
+    dragSessionRef.current = null
+  }, [])
+
+  useEffect(() => cleanupDragSession, [cleanupDragSession])
 
   // Initialize / sync sizes from container dimensions
   useEffect(() => {
@@ -82,6 +92,7 @@ export const Splitter: React.FC<SplitterProps> = ({
     (index: number, e: React.MouseEvent) => {
       if (disabled) return
       e.preventDefault()
+      cleanupDragSession()
       draggingRef.current = {
         index,
         startPos: direction === 'horizontal' ? e.clientX : e.clientY,
@@ -89,35 +100,35 @@ export const Splitter: React.FC<SplitterProps> = ({
       }
       onResizeStart?.({ index, sizes: [...paneSizes] })
 
-      const onMouseMove = (ev: MouseEvent) => {
-        const drag = draggingRef.current
-        if (!drag) return
-        const currentPos = direction === 'horizontal' ? ev.clientX : ev.clientY
-        const delta = currentPos - drag.startPos
-        const newSizes = resizePanes(drag.startSizes, drag.index, delta, mins, maxes)
-        if (newSizes) {
-          setPaneSizes(newSizes)
-          onSizesChange?.(newSizes)
-          onResize?.({ index: drag.index, sizes: newSizes })
-        }
-      }
-
-      const onMouseUp = (ev: MouseEvent) => {
-        const drag = draggingRef.current
-        if (drag) {
-          const currentPos = direction === 'horizontal' ? ev.clientX : ev.clientY
+      dragSessionRef.current = createDocumentDragSession({
+        startX: e.clientX,
+        startY: e.clientY,
+        ownerDocument: e.currentTarget.ownerDocument,
+        onMove: ({ currentX, currentY }) => {
+          const drag = draggingRef.current
+          if (!drag) return
+          const currentPos = direction === 'horizontal' ? currentX : currentY
           const delta = currentPos - drag.startPos
-          const finalSizes =
-            resizePanes(drag.startSizes, drag.index, delta, mins, maxes) ?? drag.startSizes
-          onResizeEnd?.({ index: drag.index, sizes: finalSizes })
+          const newSizes = resizePanes(drag.startSizes, drag.index, delta, mins, maxes)
+          if (newSizes) {
+            setPaneSizes(newSizes)
+            onSizesChange?.(newSizes)
+            onResize?.({ index: drag.index, sizes: newSizes })
+          }
+        },
+        onEnd: ({ currentX, currentY }) => {
+          const drag = draggingRef.current
+          if (drag) {
+            const currentPos = direction === 'horizontal' ? currentX : currentY
+            const delta = currentPos - drag.startPos
+            const finalSizes =
+              resizePanes(drag.startSizes, drag.index, delta, mins, maxes) ?? drag.startSizes
+            onResizeEnd?.({ index: drag.index, sizes: finalSizes })
+          }
+          draggingRef.current = null
+          dragSessionRef.current = null
         }
-        draggingRef.current = null
-        document.removeEventListener('mousemove', onMouseMove)
-        document.removeEventListener('mouseup', onMouseUp)
-      }
-
-      document.addEventListener('mousemove', onMouseMove)
-      document.addEventListener('mouseup', onMouseUp)
+      })
     },
     [
       disabled,
@@ -125,6 +136,7 @@ export const Splitter: React.FC<SplitterProps> = ({
       paneSizes,
       mins,
       maxes,
+      cleanupDragSession,
       onResizeStart,
       onResize,
       onResizeEnd,

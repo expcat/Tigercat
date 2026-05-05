@@ -15,7 +15,10 @@ import type {
   DragOverEvent,
   DragDropEvent,
   DragEndEvent,
-  DragCallbacks
+  DragCallbacks,
+  DocumentDragSession,
+  DocumentDragSessionEvent,
+  DocumentDragSessionOptions
 } from '../types/drag'
 
 // ---------------------------------------------------------------------------
@@ -287,6 +290,59 @@ export function getDefaultDragConfig(): Required<DragConfig> {
  */
 export function resolveDragConfig(config?: DragConfig): Required<DragConfig> {
   return { ...getDefaultDragConfig(), ...config }
+}
+
+// ---------------------------------------------------------------------------
+// Document Pointer Session
+// ---------------------------------------------------------------------------
+
+/**
+ * Create a document-level mouse drag session with shared cleanup semantics.
+ */
+export function createDocumentDragSession(
+  options: DocumentDragSessionOptions
+): DocumentDragSession {
+  const ownerDocument =
+    options.ownerDocument ?? (typeof document === 'undefined' ? undefined : document)
+
+  if (!ownerDocument) {
+    return { dispose: () => undefined }
+  }
+
+  let disposed = false
+
+  const createPayload = (event: MouseEvent): DocumentDragSessionEvent => ({
+    startX: options.startX,
+    startY: options.startY,
+    currentX: event.clientX,
+    currentY: event.clientY,
+    deltaX: event.clientX - options.startX,
+    deltaY: event.clientY - options.startY,
+    event
+  })
+
+  const dispose = () => {
+    if (disposed) return
+    disposed = true
+    ownerDocument.removeEventListener('mousemove', handleMouseMove)
+    ownerDocument.removeEventListener('mouseup', handleMouseUp)
+  }
+
+  const handleMouseMove = (event: MouseEvent) => {
+    if (disposed) return
+    options.onMove(createPayload(event))
+  }
+
+  const handleMouseUp = (event: MouseEvent) => {
+    if (disposed) return
+    options.onEnd?.(createPayload(event))
+    dispose()
+  }
+
+  ownerDocument.addEventListener('mousemove', handleMouseMove)
+  ownerDocument.addEventListener('mouseup', handleMouseUp)
+
+  return { dispose }
 }
 
 // ---------------------------------------------------------------------------

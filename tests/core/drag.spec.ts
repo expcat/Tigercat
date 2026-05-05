@@ -14,7 +14,8 @@ import {
   isDragEnabled,
   toDragItems,
   getDefaultDragConfig,
-  resolveDragConfig
+  resolveDragConfig,
+  createDocumentDragSession
 } from '@expcat/tigercat-core'
 import type { DragItem, DragState, DragCallbacks, DragConfig } from '@expcat/tigercat-core'
 
@@ -475,6 +476,81 @@ describe('resolveDragConfig', () => {
   it('returns defaults when no config provided', () => {
     const config = resolveDragConfig()
     expect(config).toEqual(getDefaultDragConfig())
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Document Pointer Session
+// ---------------------------------------------------------------------------
+
+describe('createDocumentDragSession', () => {
+  it('emits movement payloads with deltas from the start point', () => {
+    const onMove = vi.fn()
+    const session = createDocumentDragSession({
+      startX: 10,
+      startY: 20,
+      ownerDocument: document,
+      onMove
+    })
+
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 35, clientY: 50 }))
+
+    expect(onMove).toHaveBeenCalledWith(
+      expect.objectContaining({
+        startX: 10,
+        startY: 20,
+        currentX: 35,
+        currentY: 50,
+        deltaX: 25,
+        deltaY: 30
+      })
+    )
+
+    session.dispose()
+  })
+
+  it('emits end payloads and disposes itself on mouseup', () => {
+    const onMove = vi.fn()
+    const onEnd = vi.fn()
+    createDocumentDragSession({
+      startX: 10,
+      startY: 20,
+      ownerDocument: document,
+      onMove,
+      onEnd
+    })
+
+    document.dispatchEvent(new MouseEvent('mouseup', { clientX: 15, clientY: 25 }))
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 50, clientY: 50 }))
+
+    expect(onEnd).toHaveBeenCalledWith(
+      expect.objectContaining({
+        currentX: 15,
+        currentY: 25,
+        deltaX: 5,
+        deltaY: 5
+      })
+    )
+    expect(onMove).not.toHaveBeenCalled()
+  })
+
+  it('removes listeners when disposed manually', () => {
+    const onMove = vi.fn()
+    const onEnd = vi.fn()
+    const session = createDocumentDragSession({
+      startX: 0,
+      startY: 0,
+      ownerDocument: document,
+      onMove,
+      onEnd
+    })
+
+    session.dispose()
+    document.dispatchEvent(new MouseEvent('mousemove', { clientX: 10, clientY: 10 }))
+    document.dispatchEvent(new MouseEvent('mouseup', { clientX: 10, clientY: 10 }))
+
+    expect(onMove).not.toHaveBeenCalled()
+    expect(onEnd).not.toHaveBeenCalled()
   })
 })
 

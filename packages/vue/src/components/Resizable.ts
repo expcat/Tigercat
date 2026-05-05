@@ -8,6 +8,8 @@ import {
   clampDimensions,
   applyAspectRatio,
   defaultResizeHandles,
+  createDocumentDragSession,
+  type DocumentDragSession,
   type ResizeHandlePosition,
   type ResizeAxis
 } from '@expcat/tigercat-core'
@@ -61,6 +63,7 @@ export const Resizable = defineComponent({
     const startMouseY = ref(0)
     const startWidth = ref(0)
     const startHeight = ref(0)
+    let dragSession: DocumentDragSession | null = null
 
     const containerClasses = computed(() =>
       classNames(
@@ -78,9 +81,15 @@ export const Resizable = defineComponent({
       return s
     })
 
+    const cleanupDragSession = () => {
+      dragSession?.dispose()
+      dragSession = null
+    }
+
     const onMouseDown = (handle: ResizeHandlePosition, e: MouseEvent) => {
       if (props.disabled) return
       e.preventDefault()
+      cleanupDragSession()
       draggingHandle.value = handle
       startMouseX.value = e.clientX
       startMouseY.value = e.clientY
@@ -93,16 +102,39 @@ export const Resizable = defineComponent({
         deltaX: 0,
         deltaY: 0
       })
-      document.addEventListener('mousemove', onMouseMove)
-      document.addEventListener('mouseup', onMouseUp)
+
+      dragSession = createDocumentDragSession({
+        startX: e.clientX,
+        startY: e.clientY,
+        ownerDocument: (e.currentTarget as HTMLElement | null)?.ownerDocument,
+        onMove: ({ currentX, currentY }) => {
+          applyResize(currentX, currentY, (event) => emit('resize', event))
+        },
+        onEnd: ({ currentX, currentY }) => {
+          applyResize(currentX, currentY, (event) => emit('resize-end', event))
+          draggingHandle.value = null
+          dragSession = null
+        }
+      })
     }
 
-    const onMouseMove = (e: MouseEvent) => {
-      if (!draggingHandle.value) return
-      const mouseDeltaX = e.clientX - startMouseX.value
-      const mouseDeltaY = e.clientY - startMouseY.value
+    const applyResize = (
+      currentX: number,
+      currentY: number,
+      notify: (event: {
+        width: number
+        height: number
+        handle: ResizeHandlePosition
+        deltaX: number
+        deltaY: number
+      }) => void
+    ) => {
+      const handle = draggingHandle.value
+      if (!handle) return
+      const mouseDeltaX = currentX - startMouseX.value
+      const mouseDeltaY = currentY - startMouseY.value
       const { deltaWidth, deltaHeight } = calculateResizeDelta(
-        draggingHandle.value,
+        handle,
         mouseDeltaX,
         mouseDeltaY,
         props.axis
@@ -126,33 +158,17 @@ export const Resizable = defineComponent({
       )
       width.value = clamped.width
       height.value = clamped.height
-      emit('resize', {
+      notify({
         width: clamped.width,
         height: clamped.height,
-        handle: draggingHandle.value,
+        handle,
         deltaX: clamped.width - startWidth.value,
         deltaY: clamped.height - startHeight.value
       })
     }
 
-    const onMouseUp = () => {
-      if (draggingHandle.value) {
-        emit('resize-end', {
-          width: width.value ?? 0,
-          height: height.value ?? 0,
-          handle: draggingHandle.value,
-          deltaX: (width.value ?? 0) - startWidth.value,
-          deltaY: (height.value ?? 0) - startHeight.value
-        })
-      }
-      draggingHandle.value = null
-      document.removeEventListener('mousemove', onMouseMove)
-      document.removeEventListener('mouseup', onMouseUp)
-    }
-
     onBeforeUnmount(() => {
-      document.removeEventListener('mousemove', onMouseMove)
-      document.removeEventListener('mouseup', onMouseUp)
+      cleanupDragSession()
     })
 
     return () => {

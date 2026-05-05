@@ -133,6 +133,35 @@ export interface DragCallbacks {
 }
 
 // ---------------------------------------------------------------------------
+// Document Pointer Session
+// ---------------------------------------------------------------------------
+
+/** Payload emitted by document-level pointer drag sessions */
+export interface DocumentDragSessionEvent {
+  startX: number
+  startY: number
+  currentX: number
+  currentY: number
+  deltaX: number
+  deltaY: number
+  event: MouseEvent
+}
+
+/** Configuration for a document-level mouse drag session */
+export interface DocumentDragSessionOptions {
+  startX: number
+  startY: number
+  ownerDocument?: Document
+  onMove: (event: DocumentDragSessionEvent) => void
+  onEnd?: (event: DocumentDragSessionEvent) => void
+}
+
+/** Handle returned by a document-level drag session */
+export interface DocumentDragSession {
+  dispose: () => void
+}
+
+// ---------------------------------------------------------------------------
 // Drag Result
 // ---------------------------------------------------------------------------
 

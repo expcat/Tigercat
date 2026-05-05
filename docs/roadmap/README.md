@@ -9,6 +9,11 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 本文档只保留旧路线图与 `docs/reports/2026-04` 中尚未实现、仍需后续设计或仍需复核的内容。已经完成、已有 Vue / React 源码与公开导出的组件，或只属于阶段执行记录的报告，不再在这里重复跟踪。
 
+## 执行状态
+
+- 上一步完成：P1 Splitter / Resizable drag 复用，新增 core document drag session helper，并接入 React / Vue Splitter、Resizable；相关 core、React、Vue 测试通过。
+- 推荐下一步：执行 P1 Statistic 动画，改为 rAF + easing，并补齐测试覆盖。
+
 ## 实现核对口径
 
 核对来源：`packages/react/src/index.tsx`、`packages/vue/src/index.ts`、`packages/*/src/components/`、`packages/core/src/`、`packages/cli/src/`。
@@ -50,19 +55,18 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ### Layout / Navigation / Data
 
-| 优先级 | 项目                           | 范围                                                 | 完成标准                                                            |
-| ------ | ------------------------------ | ---------------------------------------------------- | ------------------------------------------------------------------- |
-| P1     | Row / Col 样式计算优化         | Row / Col                                            | 减少每个 Col 的 inline style 计算，评估 CSS grid / CSS vars 方案    |
-| P1     | Splitter / Resizable drag 复用 | Splitter / Resizable                                 | 组件内 mousemove 逻辑收敛到 `useDrag` 或 core drag helper           |
-| P1     | Statistic 动画                 | Statistic                                            | 数字滚动动画使用 rAF + easing，并有测试覆盖                         |
-| P1     | 父子组件同文件约定             | Menu / Dropdown / Anchor / Breadcrumb / Steps / Tabs | 建立父子组件同文件模式，减少 chunk 与导出链                         |
-| P1     | Pagination idle / locale       | Pagination                                           | jumper 校验延迟到 idle 或稳定节流；locale 文案支持懒加载路径        |
-| P1     | Menu 展开动画                  | Menu / SubMenu                                       | 使用 CSS height transition + rAF 测高，避免硬编码 max-height        |
-| P2     | Descriptions 大列表性能        | Descriptions                                         | 对 100+ items columns / rows 合并算法做复杂度测试或 benchmark       |
-| P2     | Container 组件必要性           | Container                                            | 评估是否改为 class util；若保留组件，说明体积与 API 理由            |
-| P2     | FloatButton group memo         | FloatButton                                          | 子按钮列表缓存，避免不必要重建                                      |
-| P2     | Steps vertical pseudo-element  | Steps                                                | vertical 连接线改用 CSS pseudo-element 或确认保留 inline div 的理由 |
-| P2     | Timeline pseudo-element        | Timeline                                             | 节点/连接线减少额外 DOM，改用 CSS pseudo-element 或说明保留原因     |
+| 优先级 | 项目                          | 范围                                                 | 完成标准                                                            |
+| ------ | ----------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------- |
+| P1     | Row / Col 样式计算优化        | Row / Col                                            | 减少每个 Col 的 inline style 计算，评估 CSS grid / CSS vars 方案    |
+| P1     | Statistic 动画                | Statistic                                            | 数字滚动动画使用 rAF + easing，并有测试覆盖                         |
+| P1     | 父子组件同文件约定            | Menu / Dropdown / Anchor / Breadcrumb / Steps / Tabs | 建立父子组件同文件模式，减少 chunk 与导出链                         |
+| P1     | Pagination idle / locale      | Pagination                                           | jumper 校验延迟到 idle 或稳定节流；locale 文案支持懒加载路径        |
+| P1     | Menu 展开动画                 | Menu / SubMenu                                       | 使用 CSS height transition + rAF 测高，避免硬编码 max-height        |
+| P2     | Descriptions 大列表性能       | Descriptions                                         | 对 100+ items columns / rows 合并算法做复杂度测试或 benchmark       |
+| P2     | Container 组件必要性          | Container                                            | 评估是否改为 class util；若保留组件，说明体积与 API 理由            |
+| P2     | FloatButton group memo        | FloatButton                                          | 子按钮列表缓存，避免不必要重建                                      |
+| P2     | Steps vertical pseudo-element | Steps                                                | vertical 连接线改用 CSS pseudo-element 或确认保留 inline div 的理由 |
+| P2     | Timeline pseudo-element       | Timeline                                             | 节点/连接线减少额外 DOM，改用 CSS pseudo-element 或说明保留原因     |
 
 ### Charts / Composite / Advanced
 
