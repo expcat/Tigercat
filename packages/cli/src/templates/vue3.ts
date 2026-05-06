@@ -11,6 +11,8 @@ export function getVue3Template(projectName: string): Record<string, string> {
   }
 }
 
+import { TEMPLATE_VERSIONS as V } from '../constants'
+
 function vue3PackageJson(name: string): string {
   return JSON.stringify(
     {
@@ -24,18 +26,18 @@ function vue3PackageJson(name: string): string {
         preview: 'vite preview'
       },
       dependencies: {
-        '@expcat/tigercat-vue': '^1.0.0',
-        vue: '^3.5.26'
+        '@expcat/tigercat-vue': V.tigercat,
+        vue: V.vue
       },
       devDependencies: {
-        '@expcat/tigercat-core': '^1.0.0',
-        '@tailwindcss/vite': '^4.1.18',
-        '@vitejs/plugin-vue': '^6.0.3',
-        '@vue/tsconfig': '^0.7.0',
-        tailwindcss: '^4.1.18',
-        typescript: '^5.9.3',
-        vite: '^7.3.0',
-        'vue-tsc': '^2.2.0'
+        '@expcat/tigercat-core': V.tigercat,
+        '@tailwindcss/vite': V.tailwindcssVite,
+        '@vitejs/plugin-vue': V.vitejsPluginVue,
+        '@vue/tsconfig': V.vueTsconfig,
+        tailwindcss: V.tailwindcss,
+        typescript: V.typescript,
+        vite: V.vite,
+        'vue-tsc': V.vueTsc
       }
     },
     null,
@@ -48,9 +50,9 @@ function vue3Tsconfig(): string {
     {
       extends: '@vue/tsconfig/tsconfig.dom.json',
       compilerOptions: {
-        target: 'ES2020',
+        target: 'ES2022',
         module: 'ESNext',
-        lib: ['ES2020', 'DOM', 'DOM.Iterable'],
+        lib: ['ES2022', 'DOM', 'DOM.Iterable'],
         skipLibCheck: true,
         moduleResolution: 'bundler',
         resolveJsonModule: true,

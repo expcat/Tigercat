@@ -11,6 +11,8 @@ export function getReactTemplate(projectName: string): Record<string, string> {
   }
 }
 
+import { TEMPLATE_VERSIONS as V } from '../constants'
+
 function reactPackageJson(name: string): string {
   return JSON.stringify(
     {
@@ -24,19 +26,19 @@ function reactPackageJson(name: string): string {
         preview: 'vite preview'
       },
       dependencies: {
-        '@expcat/tigercat-react': '^1.0.0',
-        react: '^19.2.3',
-        'react-dom': '^19.2.3'
+        '@expcat/tigercat-react': V.tigercat,
+        react: V.react,
+        'react-dom': V.reactDom
       },
       devDependencies: {
-        '@expcat/tigercat-core': '^1.0.0',
-        '@tailwindcss/vite': '^4.1.18',
-        '@types/react': '^19.2.7',
-        '@types/react-dom': '^19.2.2',
-        '@vitejs/plugin-react': '^4.3.4',
-        tailwindcss: '^4.1.18',
-        typescript: '^5.9.3',
-        vite: '^7.3.0'
+        '@expcat/tigercat-core': V.tigercat,
+        '@tailwindcss/vite': V.tailwindcssVite,
+        '@types/react': V.typesReact,
+        '@types/react-dom': V.typesReactDom,
+        '@vitejs/plugin-react': V.vitejsPluginReact,
+        tailwindcss: V.tailwindcss,
+        typescript: V.typescript,
+        vite: V.vite
       }
     },
     null,
@@ -48,9 +50,9 @@ function reactTsconfig(): string {
   return JSON.stringify(
     {
       compilerOptions: {
-        target: 'ES2020',
+        target: 'ES2022',
         useDefineForClassFields: true,
-        lib: ['ES2020', 'DOM', 'DOM.Iterable'],
+        lib: ['ES2022', 'DOM', 'DOM.Iterable'],
         module: 'ESNext',
         skipLibCheck: true,
         moduleResolution: 'bundler',

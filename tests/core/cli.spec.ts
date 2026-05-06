@@ -288,16 +288,16 @@ describe('CLI Doctor', () => {
       packageManager: 'pnpm@10.26.2',
       dependencies: {
         '@expcat/tigercat-react': '^1.0.0',
-        react: '^19.2.3',
-        'react-dom': '^19.2.3'
+        react: '^19.2.5',
+        'react-dom': '^19.2.5'
       },
       devDependencies: {
         '@expcat/tigercat-core': '^1.0.0',
-        '@tailwindcss/vite': '^4.1.18',
-        '@vitejs/plugin-react': '^4.3.4',
-        tailwindcss: '^4.1.18',
-        typescript: '^5.9.3',
-        vite: '^7.3.0'
+        '@tailwindcss/vite': '^4.2.4',
+        '@vitejs/plugin-react': '^6.0.1',
+        tailwindcss: '^4.2.4',
+        typescript: '^6.0.3',
+        vite: '^8.0.10'
       }
     })
 
@@ -438,5 +438,91 @@ describe('CLI Integration - Create Project', () => {
     expect(pkg.name).toBe('test-react')
     expect(pkg.dependencies['@expcat/tigercat-react']).toBeDefined()
     expect(pkg.dependencies.react).toBeDefined()
+  })
+})
+
+describe('CLI Cross-Platform Paths', () => {
+  const testDir = join(tmpdir(), `tigercat-path-test-${Date.now()}`)
+
+  afterEach(() => {
+    if (existsSync(testDir)) {
+      rmSync(testDir, { recursive: true, force: true })
+    }
+  })
+
+  it('template file keys use forward slashes only (portable)', () => {
+    const vue3 = Object.keys(getVue3Template('app'))
+    const react = Object.keys(getReactTemplate('app'))
+
+    for (const key of [...vue3, ...react]) {
+      expect(key).not.toContain('\\')
+    }
+  })
+
+  it('writeFileSafe resolves forward-slash paths on current platform', () => {
+    const projectDir = join(testDir, 'fwd-slash')
+    ensureDir(projectDir)
+
+    writeFileSafe(resolve(projectDir, 'src/components/App.tsx'), 'export default {}')
+    expect(existsSync(join(projectDir, 'src', 'components', 'App.tsx'))).toBe(true)
+    expect(readFileSync(join(projectDir, 'src', 'components', 'App.tsx'), 'utf-8')).toBe(
+      'export default {}'
+    )
+  })
+
+  it('handles project names with spaces', () => {
+    const projectDir = join(testDir, 'my project')
+    const files = getVue3Template('my project')
+    ensureDir(projectDir)
+
+    for (const [filePath, content] of Object.entries(files)) {
+      writeFileSafe(resolve(projectDir, filePath), content)
+    }
+
+    expect(existsSync(join(projectDir, 'package.json'))).toBe(true)
+    expect(existsSync(join(projectDir, 'src', 'main.ts'))).toBe(true)
+
+    const pkg = JSON.parse(readFileSync(join(projectDir, 'package.json'), 'utf-8'))
+    expect(pkg.name).toBe('my project')
+  })
+
+  it('doctor works with paths containing spaces', () => {
+    const projectDir = join(testDir, 'my project')
+    ensureDir(projectDir)
+    writeFileSafe(
+      join(projectDir, 'package.json'),
+      JSON.stringify({
+        packageManager: 'pnpm@10.26.2',
+        dependencies: { '@expcat/tigercat-vue': '^1.0.0', vue: '^3.5.33' },
+        devDependencies: {
+          '@expcat/tigercat-core': '^1.0.0',
+          '@tailwindcss/vite': '^4.2.4',
+          tailwindcss: '^4.2.4',
+          typescript: '^6.0.3',
+          vite: '^8.0.10'
+        }
+      })
+    )
+
+    const checks = collectDoctorChecks({ cwd: projectDir, nodeVersion: '22.0.0', env: {} })
+
+    expect(checks.find((c) => c.name === 'Project package')?.status).toBe('pass')
+    expect(checks.find((c) => c.name === 'Node.js')?.status).toBe('pass')
+  })
+
+  it('writeFileSafe creates deeply nested directories from template paths', () => {
+    const projectDir = join(testDir, 'deep')
+    ensureDir(projectDir)
+
+    writeFileSafe(resolve(projectDir, 'src/a/b/c/d.ts'), 'deep')
+    expect(readFileSync(join(projectDir, 'src', 'a', 'b', 'c', 'd.ts'), 'utf-8')).toBe('deep')
+  })
+
+  it('bin entry uses forward-slash relative path', () => {
+    const packageJson = JSON.parse(
+      readFileSync(resolve(process.cwd(), 'packages/cli/package.json'), 'utf-8')
+    )
+    expect(packageJson.bin.tigercat).toBe('./dist/index.js')
+    expect(packageJson.bin.tigercat).not.toContain('\\')
   })
 })

@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 根入口 locale tree-shaking 方案 — 从 `packages/core/src/utils/i18n/index.ts` 移除 `export * from './locales/index'`，根入口不再 re-export 全部 8 个 locale 预设（enUS/zhCN/zhTW/jaJP/koKR/thTH/viVN/idID）。用户应通过子路径按需引入（`@expcat/tigercat-core/locales/zh-CN`），这些子路径 entry 已由 tsup 独立构建。同步更新：`vitest.config.ts` 新增 `locales/` 和 `datepicker-locales/` alias 使测试能解析子路径；2 个测试文件改用子路径 import；`skills/tigercat/references/i18n.md` 文档更新。307 文件 5570 测试全部通过。
-- 推荐下一步：P1 CLI 模板版本策略 — 模板依赖范围改为与 catalog 或根 lockfile 对齐。
+- 上一步完成：P1 CLI Windows bin 验证 — 新增 6 条跨平台路径测试（模板路径全部前斜杠、forward-slash 路径写入、含空格项目名、doctor 含空格路径、深层嵌套目录、bin 入口格式），验证 `writeFileSafe` 和 `resolve()` 在 Windows 下正确处理。CLI README 新增 Windows Support 章节，文档化 pnpm / npm / bun 在 Windows 下的 `.cmd` shim 创建行为与 Corepack 注意事项。47 条 CLI 测试全部通过。
+- 推荐下一步：P2 ConfigProvider 异步 locale — Vue / React 支持 `locale={() => import(...)}` 或等价 loader，处理 loading / error / fallback。
 
 ## 未实现组件
 
@@ -29,8 +29,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | P1       | ~~Node engines bump~~               | ~~workspace / CI / release workflow~~         | ~~已完成：engines >=20.11.0、tsconfig ES2022、CI node-version 22、CLI doctor MIN_NODE_MAJOR=20~~ |
 | P1       | ~~workspace catalog / overrides~~   | ~~pnpm workspace / 核心工具链依赖~~           | ~~已完成：13 个 catalog 条目，41 处 package.json 统一为 catalog: 引用~~ |
 | P1       | ~~根入口 locale tree-shaking 方案~~ | ~~Core i18n barrel / locale presets~~         | ~~已完成：根入口移除 locale re-export，保留子路径按需引入，vitest alias 补齐~~ |
-| P1       | CLI 模板版本策略                | CLI React / Vue 模板                      | 模板依赖范围改为 catalog、overrides 或与根 lockfile 对齐的版本策略，避免长期漂移                                  |
-| P1       | CLI Windows bin 验证            | CLI bin / package manager shims           | README 或测试覆盖 pnpm、npm、bun 在 Windows 下的 `.cmd` shim 与路径分隔符行为                                     |
+| P1       | ~~CLI 模板版本策略~~                | ~~CLI React / Vue 模板~~                      | ~~已完成：TEMPLATE_VERSIONS 常量集中管理 13 个依赖版本，与 catalog 对齐~~ |
+| P1       | ~~CLI Windows bin 验证~~            | ~~CLI bin / package manager shims~~           | ~~已完成：6 条跨平台路径测试 + README Windows Support 章节，覆盖 .cmd shim 与路径行为~~ |
 | P2       | ConfigProvider 异步 locale      | React ConfigProvider / Vue ConfigProvider | Vue / React 支持 `locale={() => import(...)}` 或等价 loader，并处理 loading、error、fallback                      |
 | Deferred | commander 14                    | CLI                                       | 根 `engines.node` 提升到 Node 20+ 后再升级 commander，并跑模板生成回归                                            |
 

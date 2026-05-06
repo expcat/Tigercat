@@ -56,6 +56,31 @@ Check whether the current project has compatible Node, pnpm, Tailwind CSS, Tiger
 tigercat doctor
 ```
 
+## Windows Support
+
+The CLI is fully cross-platform. All template file paths use forward slashes and are
+resolved via Node.js `path.resolve()` at write time, so they work correctly on Windows
+with backslash paths, paths containing spaces, and UNC paths.
+
+### Package Manager `.cmd` Shims
+
+When installed globally or locally, each package manager creates platform-specific shims
+so that `tigercat` can be invoked directly from PowerShell, CMD, or Git Bash:
+
+| Package manager | Global install                        | Shim files created               |
+| --------------- | ------------------------------------- | -------------------------------- |
+| **pnpm**        | `pnpm add -g @expcat/tigercat-cli`    | `tigercat.cmd`, `tigercat` (sh)  |
+| **npm**         | `npm i -g @expcat/tigercat-cli`       | `tigercat.cmd`, `tigercat` (sh), `tigercat.ps1` |
+| **bun**         | `bun add -g @expcat/tigercat-cli`     | `tigercat.cmd`, `tigercat` (sh)  |
+
+For local (non-global) installs, run via `npx tigercat`, `pnpm exec tigercat`, or
+`bunx tigercat`. The `#!/usr/bin/env node` shebang in the built output is used by all
+three package managers to locate the Node.js runtime.
+
+> **Note:** If you use Corepack with pnpm on Windows, ensure `shell: true` is passed
+> when spawning pnpm programmatically (the project scripts already handle this via
+> `scripts/utils/pnpm.mjs`).
+
 ## License
 
 MIT
