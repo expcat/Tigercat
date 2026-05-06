@@ -5,6 +5,8 @@ import {
   getVirtualTableContainerClasses,
   getVirtualTableRowClasses,
   getVirtualRowKey,
+  getVirtualTableFixedInfo,
+  getVirtualTableFixedCellStyle,
   virtualTableHeaderClasses,
   virtualTableHeaderCellClasses,
   virtualTableCellClasses,
@@ -79,6 +81,11 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
     [bordered, className]
   )
 
+  const fixedInfo = useMemo(
+    () => getVirtualTableFixedInfo(columns),
+    [columns]
+  )
+
   const bottomHeight = Math.max(0, range.totalHeight - range.end * rowHeight)
 
   return (
@@ -95,18 +102,20 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
       <table className="w-full table-fixed">
         <thead className={stickyHeader ? virtualTableHeaderClasses : undefined}>
           <tr>
-            {columns.map((col) => (
-              <th
-                key={col.key as string}
-                className={virtualTableHeaderCellClasses}
-                style={
-                  col.width
-                    ? { width: typeof col.width === 'number' ? `${col.width}px` : col.width }
-                    : undefined
-                }>
-                {col.title ?? ''}
-              </th>
-            ))}
+            {columns.map((col) => {
+              const widthStyle = col.width
+                ? { width: typeof col.width === 'number' ? `${col.width}px` : col.width }
+                : {}
+              const stickyStyle = getVirtualTableFixedCellStyle(col.key, fixedInfo)
+              return (
+                <th
+                  key={col.key as string}
+                  className={virtualTableHeaderCellClasses}
+                  style={{ ...widthStyle, ...stickyStyle }}>
+                  {col.title ?? ''}
+                </th>
+              )
+            })}
           </tr>
         </thead>
         <tbody>
@@ -125,7 +134,10 @@ export const VirtualTable = <T extends Record<string, unknown> = Record<string, 
                   if (selectable) onSelect?.(key, row, globalIdx)
                 }}>
                 {columns.map((col) => (
-                  <td key={col.key as string} className={virtualTableCellClasses}>
+                  <td
+                    key={col.key as string}
+                    className={virtualTableCellClasses}
+                    style={getVirtualTableFixedCellStyle(col.key, fixedInfo)}>
                     {renderCell
                       ? renderCell(row[col.key as keyof T], row, col)
                       : String(row[col.key as keyof T] ?? '')}

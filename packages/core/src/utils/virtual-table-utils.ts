@@ -5,6 +5,8 @@
  */
 
 import type { VirtualTableRange } from '../types/virtual-table'
+import type { TableColumn } from '../types/table'
+import { getFixedColumnOffsets } from './table-utils'
 
 // ─── Tailwind class constants ─────────────────────────────────────
 
@@ -98,4 +100,48 @@ export function getVirtualTableRowClasses(
   if (striped && index % 2 === 1) parts.push(virtualTableRowStripedClasses)
   if (selected) parts.push(virtualTableRowSelectedClasses)
   return parts.join(' ')
+}
+
+// ─── Sticky column helpers ────────────────────────────────────────
+
+export interface VirtualTableFixedInfo {
+  leftOffsets: Record<string, number>
+  rightOffsets: Record<string, number>
+  hasFixedColumns: boolean
+}
+
+/**
+ * Compute fixed column offsets for VirtualTable.
+ * Thin wrapper around Table's `getFixedColumnOffsets`.
+ */
+export function getVirtualTableFixedInfo<T = Record<string, unknown>>(
+  columns: TableColumn<T>[]
+): VirtualTableFixedInfo {
+  const { leftOffsets, rightOffsets, hasFixedColumns } = getFixedColumnOffsets(columns)
+  return { leftOffsets, rightOffsets, hasFixedColumns }
+}
+
+/**
+ * Get inline style for a fixed column cell (th or td).
+ * Returns `undefined` when the column is not fixed.
+ */
+export function getVirtualTableFixedCellStyle(
+  columnKey: string,
+  fixedInfo: VirtualTableFixedInfo
+): { position: 'sticky'; left?: string; right?: string; zIndex: number } | undefined {
+  if (columnKey in fixedInfo.leftOffsets) {
+    return {
+      position: 'sticky' as const,
+      left: `${fixedInfo.leftOffsets[columnKey]}px`,
+      zIndex: 1
+    }
+  }
+  if (columnKey in fixedInfo.rightOffsets) {
+    return {
+      position: 'sticky' as const,
+      right: `${fixedInfo.rightOffsets[columnKey]}px`,
+      zIndex: 1
+    }
+  }
+  return undefined
 }

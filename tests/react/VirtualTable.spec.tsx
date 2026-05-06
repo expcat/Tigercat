@@ -169,4 +169,93 @@ describe('VirtualTable (React)', () => {
     expect(ths[0].style.width).toBe('120px')
     expect(ths[1].style.width).toBe('250px')
   })
+
+  describe('Sticky Columns', () => {
+    const fixedColumns = [
+      { key: 'id', title: 'ID', width: 80, fixed: 'left' as const },
+      { key: 'name', title: 'Name', width: 150 },
+      { key: 'action', title: 'Action', width: 100, fixed: 'right' as const }
+    ]
+
+    function makeFixedData(count: number) {
+      return Array.from({ length: count }, (_, i) => ({
+        id: i + 1,
+        name: `Row ${i + 1}`,
+        action: 'Edit'
+      }))
+    }
+
+    it('applies sticky left style to fixed-left header cell', () => {
+      const { getByText } = render(
+        <VirtualTable data={makeFixedData(5)} columns={fixedColumns} />
+      )
+      const th = getByText('ID').closest('th')!
+      expect(th.style.position).toBe('sticky')
+      expect(th.style.left).toBe('0px')
+    })
+
+    it('applies sticky right style to fixed-right header cell', () => {
+      const { getByText } = render(
+        <VirtualTable data={makeFixedData(5)} columns={fixedColumns} />
+      )
+      const th = getByText('Action').closest('th')!
+      expect(th.style.position).toBe('sticky')
+      expect(th.style.right).toBe('0px')
+    })
+
+    it('does not apply sticky style to non-fixed header cell', () => {
+      const { getByText } = render(
+        <VirtualTable data={makeFixedData(5)} columns={fixedColumns} />
+      )
+      const th = getByText('Name').closest('th')!
+      expect(th.style.position).not.toBe('sticky')
+    })
+
+    it('applies sticky left style to fixed-left body cell', () => {
+      const { getAllByRole } = render(
+        <VirtualTable data={makeFixedData(3)} columns={fixedColumns} rowHeight={40} height={400} />
+      )
+      const rows = getAllByRole('row')
+      const dataRows = rows.filter(
+        (r) =>
+          !r.querySelector('th') &&
+          r.getAttribute('aria-hidden') !== 'true' &&
+          r.getAttribute('aria-hidden') !== ''
+      )
+      if (dataRows.length > 0) {
+        const firstCell = dataRows[0].querySelectorAll('td')[0]
+        expect(firstCell.style.position).toBe('sticky')
+        expect(firstCell.style.left).toBe('0px')
+      }
+    })
+
+    it('applies sticky right style to fixed-right body cell', () => {
+      const { getAllByRole } = render(
+        <VirtualTable data={makeFixedData(3)} columns={fixedColumns} rowHeight={40} height={400} />
+      )
+      const rows = getAllByRole('row')
+      const dataRows = rows.filter(
+        (r) =>
+          !r.querySelector('th') &&
+          r.getAttribute('aria-hidden') !== 'true' &&
+          r.getAttribute('aria-hidden') !== ''
+      )
+      if (dataRows.length > 0) {
+        const lastCell = dataRows[0].querySelectorAll('td')[2]
+        expect(lastCell.style.position).toBe('sticky')
+        expect(lastCell.style.right).toBe('0px')
+      }
+    })
+
+    it('supports sticky header + sticky columns simultaneously', () => {
+      const { getByText } = render(
+        <VirtualTable data={makeFixedData(5)} columns={fixedColumns} stickyHeader />
+      )
+      const thead = getByText('ID').closest('thead')!
+      expect(thead.className).toContain('sticky')
+      const th = getByText('ID').closest('th')!
+      expect(th.style.position).toBe('sticky')
+      expect(th.style.left).toBe('0px')
+    })
+  })
 })

@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 TaskBoard 拖拽技术债 — Core 新增 `createTaskBoardDragController` 统一 HTML5 DnD + touch + keyboard 三套拖拽逻辑为共享 headless controller；Vue/React TaskBoard 消除 ~250 行/框架的重复 handler 代码，改为委托 controller；新增 22 条 controller 单元测试，构建与全部 151 条相关测试通过。
-- 推荐下一步：P1 VirtualTable 压测 — sticky header + sticky column 同时启用时测试 1000 列 / 10k 行性能。
+- 上一步完成：P1 VirtualTable 压测 — Core 新增 `getVirtualTableFixedInfo` / `getVirtualTableFixedCellStyle` sticky column helpers；Vue/React VirtualTable 支持 `column.fixed: 'left' | 'right'` sticky 列，与 stickyHeader 可同时启用；新增 12 条 sticky column 单元测试全部通过；新增 `benchmarks/virtual-table.bench.ts` 覆盖 1000 列 × 10k 行场景，render prep ~1.8ms/帧无瓶颈。
+- 推荐下一步：P1 Advanced 交互测试补强 — FileManager / ImageViewer / InfiniteScroll / VirtualList / VirtualTable 增加边界与性能回归测试。
 
 ## 未实现组件
 
@@ -65,7 +65,7 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | P1     | ~~FileManager 共享 model~~   | ~~FileManager~~                                                          | ~~已完成：Core 新增 deriveFileManagerModel 等共享函数 + drag 集成，Vue/React 统一消费~~ |
 | P1     | ~~ImageViewer 手势 util~~    | ~~ImageViewer~~                                                          | ~~已完成：Core 新增 GestureTransform + wheel/pan/pinch 工具，Vue/React 集成触控手势~~ |
 | P1     | ~~TaskBoard 拖拽技术债~~     | ~~TaskBoard~~                                                            | ~~已完成：Core 新增 TaskBoardDragController 统一三套拖拽，Vue/React 消除重复 handler~~ |
-| P1     | VirtualTable 压测            | VirtualTable                                                             | sticky header + sticky column 同时启用时测试 1000 列 / 10k 行性能                         |
+| P1     | ~~VirtualTable 压测~~          | ~~VirtualTable~~                                                             | ~~已完成：sticky header + sticky column 同时启用，benchmark 覆盖 1000 列 × 10k 行，render prep ~1.8ms/帧~~ |
 | P1     | Advanced 交互测试补强        | FileManager / ImageViewer / InfiniteScroll / VirtualList / VirtualTable  | 增加边界与性能回归                                                                        |
 | P2     | Chart benchmark 补齐         | GaugeChart / chart interaction                                           | benchmark 覆盖 Gauge 计算与 interaction 热路径                                           |
 | P2     | Composite 配方化             | DataTableWithToolbar / CropUpload / FormWizard                           | 评估是否转 cookbook 配方；若保留组件，说明体积边界                                        |

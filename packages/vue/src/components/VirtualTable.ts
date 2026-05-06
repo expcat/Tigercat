@@ -6,6 +6,8 @@ import {
   getVirtualTableContainerClasses,
   getVirtualTableRowClasses,
   getVirtualRowKey,
+  getVirtualTableFixedInfo,
+  getVirtualTableFixedCellStyle,
   virtualTableHeaderClasses,
   virtualTableHeaderCellClasses,
   virtualTableCellClasses,
@@ -97,20 +99,25 @@ export const VirtualTable = defineComponent({
 
     const selectedSet = computed(() => new Set(props.selectedKeys))
 
+    const fixedInfo = computed(() => getVirtualTableFixedInfo(props.columns))
+
     return () => {
-      const headerCells = props.columns.map((col) =>
-        h(
+      const fi = fixedInfo.value
+      const headerCells = props.columns.map((col) => {
+        const widthStyle = col.width
+          ? { width: typeof col.width === 'number' ? `${col.width}px` : col.width }
+          : {}
+        const stickyStyle = getVirtualTableFixedCellStyle(col.key, fi)
+        return h(
           'th',
           {
             key: col.key as string,
             class: virtualTableHeaderCellClasses,
-            style: col.width
-              ? { width: typeof col.width === 'number' ? `${col.width}px` : col.width }
-              : undefined
+            style: { ...widthStyle, ...stickyStyle }
           },
           col.title ?? ''
         )
-      )
+      })
 
       const headerRow = h('tr', {}, headerCells)
       const thead = h(
@@ -134,7 +141,8 @@ export const VirtualTable = defineComponent({
             'td',
             {
               key: col.key as string,
-              class: virtualTableCellClasses
+              class: virtualTableCellClasses,
+              style: getVirtualTableFixedCellStyle(col.key, fi)
             },
             String((row as Record<string, unknown>)[col.key as string] ?? '')
           )
