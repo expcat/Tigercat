@@ -10,6 +10,16 @@ import {
   type LinkSize
 } from '@expcat/tigercat-core'
 
+export interface VueLinkProps {
+  variant?: LinkVariant
+  size?: LinkSize
+  disabled?: boolean
+  href?: string
+  target?: '_blank' | '_self' | '_parent' | '_top'
+  rel?: string
+  underline?: boolean
+}
+
 export const Link = defineComponent({
   name: 'TigerLink',
   props: {

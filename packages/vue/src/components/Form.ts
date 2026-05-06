@@ -58,6 +58,22 @@ export interface FormContext {
   clearValidate: (fieldNames?: string | string[]) => void
 }
 
+export interface VueFormProps {
+  model?: FormValues
+  rules?: FormRules
+  labelWidth?: string | number
+  labelPosition?: FormLabelPosition
+  labelAlign?: FormLabelAlign
+  size?: FormSize
+  inlineMessage?: boolean
+  showRequiredAsterisk?: boolean
+  disabled?: boolean
+  loading?: boolean
+  fieldDependencies?: Map<string, string[]>
+  undoable?: boolean
+  maxHistorySize?: number
+}
+
 export const Form = defineComponent({
   name: 'TigerForm',
   props: {

@@ -62,6 +62,10 @@ function getNextInstanceId(): number {
   return ++instanceIdCounter
 }
 
+export interface VueMessageContainerProps {
+  position?: MessagePosition
+}
+
 /**
  * Message container component
  */

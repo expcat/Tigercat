@@ -1,6 +1,13 @@
 import { defineComponent, computed, h, PropType, Component, resolveDynamicComponent } from 'vue'
 import { getContainerClasses, type ContainerMaxWidth } from '@expcat/tigercat-core'
 
+export interface VueContainerProps {
+  as?: string | Component
+  maxWidth?: ContainerMaxWidth
+  center?: boolean
+  padding?: boolean
+}
+
 export const Container = defineComponent({
   name: 'TigerContainer',
   inheritAttrs: false,

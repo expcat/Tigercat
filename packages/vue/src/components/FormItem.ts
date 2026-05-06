@@ -43,6 +43,18 @@ function mergeAriaDescribedBy(
 
 let formItemIdCounter = 0
 
+export interface VueFormItemProps {
+  name?: string
+  label?: string
+  labelWidth?: string | number
+  required?: boolean
+  rules?: FormRule | FormRule[]
+  error?: string
+  showMessage?: boolean
+  size?: FormSize
+  errorDisplayMode?: FormErrorDisplayMode
+}
+
 export const FormItem = defineComponent({
   name: 'TigerFormItem',
   props: {

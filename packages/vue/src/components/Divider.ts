@@ -7,6 +7,14 @@ import {
   type DividerSpacing
 } from '@expcat/tigercat-core'
 
+export interface VueDividerProps {
+  orientation?: DividerOrientation
+  lineStyle?: DividerLineStyle
+  spacing?: DividerSpacing
+  color?: string
+  thickness?: string
+}
+
 export const Divider = defineComponent({
   name: 'TigerDivider',
   props: {

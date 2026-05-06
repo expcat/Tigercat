@@ -82,6 +82,22 @@ const CheckIcon = h(
   ]
 )
 
+export interface VueSelectProps {
+  modelValue?: SelectModelValue
+  options?: SelectOptions
+  size?: SelectSize
+  disabled?: boolean
+  placeholder?: string
+  searchable?: boolean
+  multiple?: boolean
+  clearable?: boolean
+  noOptionsText?: string
+  noDataText?: string
+  maxTagCount?: number
+  virtual?: boolean
+  listHeight?: number
+}
+
 export const Select = defineComponent({
   name: 'TigerSelect',
   props: {

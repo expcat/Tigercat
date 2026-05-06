@@ -92,6 +92,10 @@ function getContainerRootId(position: NotificationPosition) {
   return `${NOTIFICATION_CONTAINER_ID_PREFIX}-${position}-root`
 }
 
+export interface VueNotificationContainerProps {
+  position?: NotificationPosition
+}
+
 /**
  * Notification container component for a specific position
  */
