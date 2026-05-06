@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 CLI Windows bin 验证 — 新增 6 条跨平台路径测试（模板路径全部前斜杠、forward-slash 路径写入、含空格项目名、doctor 含空格路径、深层嵌套目录、bin 入口格式），验证 `writeFileSafe` 和 `resolve()` 在 Windows 下正确处理。CLI README 新增 Windows Support 章节，文档化 pnpm / npm / bun 在 Windows 下的 `.cmd` shim 创建行为与 Corepack 注意事项。47 条 CLI 测试全部通过。
-- 推荐下一步：P2 ConfigProvider 异步 locale — Vue / React 支持 `locale={() => import(...)}` 或等价 loader，处理 loading / error / fallback。
+- 上一步完成：P2 Empty 默认插画体积评估 — 内置 SVG 插画仅 ~687 bytes（占 core bundle 0.13%），已使用 CSS 变量支持主题。评估结论：CSS-only 方案字节量相近但更难维护；外部懒加载省 687B 但增加 HTTP 请求和闪烁；当前 inline SVG + `image` slot/prop 自定义 + `showImage={false}` 隐藏 三重策略已覆盖所有场景，无需改动。
+- 推荐下一步：P2 Divider 文件合并评估 — 评估 Divider 是否与 Space 或 layout util 合并。
 
 ## 未实现组件
 
@@ -31,14 +31,14 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | P1       | ~~根入口 locale tree-shaking 方案~~ | ~~Core i18n barrel / locale presets~~         | ~~已完成：根入口移除 locale re-export，保留子路径按需引入，vitest alias 补齐~~ |
 | P1       | ~~CLI 模板版本策略~~                | ~~CLI React / Vue 模板~~                      | ~~已完成：TEMPLATE_VERSIONS 常量集中管理 13 个依赖版本，与 catalog 对齐~~ |
 | P1       | ~~CLI Windows bin 验证~~            | ~~CLI bin / package manager shims~~           | ~~已完成：6 条跨平台路径测试 + README Windows Support 章节，覆盖 .cmd shim 与路径行为~~ |
-| P2       | ConfigProvider 异步 locale      | React ConfigProvider / Vue ConfigProvider | Vue / React 支持 `locale={() => import(...)}` 或等价 loader，并处理 loading、error、fallback                      |
+| P2       | ~~ConfigProvider 异步 locale~~      | ~~React ConfigProvider / Vue ConfigProvider~~ | ~~已完成：locale prop 支持 loader/Promise/静态对象，localeLoading 自动传播，16 条测试通过~~ |
 | Deferred | commander 14                    | CLI                                       | 根 `engines.node` 提升到 Node 20+ 后再升级 commander，并跑模板生成回归                                            |
 
 ### Basic / Form
 
 | 优先级 | 项目                       | 范围                          | 完成标准                                                                  |
 | ------ | -------------------------- | ----------------------------- | ------------------------------------------------------------------------- |
-| P2     | Empty 默认插画体积         | Empty                         | 评估 CSS-only、可替换外部插画或按需插画策略                               |
+| P2     | ~~Empty 默认插画体积~~         | ~~Empty~~                         | ~~已评估：inline SVG ~687B，CSS-only 无明显收益，保留现有方案（slot/prop 已支持自定义）~~ |
 | P2     | Divider 文件合并评估       | Divider / Space / layout util | 评估是否与 Space 或 layout util 合并，保持子路径兼容                      |
 | P2     | Radio / Checkbox icon 体积 | Radio / Checkbox              | 评估 CSS mask 替代 inline SVG 的收益和兼容性                              |
 | P2     | Form 命令式 API            | Form                          | 设计 `useFormController` / `useTigerForm`，明确与现有 Form API 的兼容关系 |
