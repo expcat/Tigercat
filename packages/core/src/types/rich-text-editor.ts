@@ -12,7 +12,21 @@ export interface ToolbarButton {
   icon?: string
   tooltip?: string
   hotkey?: string
+  /**
+   * Custom action handler. When provided, clicking this button calls
+   * `action(element)` instead of the built-in execCommand mapping.
+   * `element` is the contentEditable host element.
+   */
+  action?: (element: HTMLElement) => void
 }
+
+/** Toolbar separator — renders a visual divider between button groups */
+export interface ToolbarSeparator {
+  type: 'separator'
+}
+
+/** Union type for toolbar items: buttons or separators */
+export type ToolbarItem = ToolbarButton | ToolbarSeparator
 
 /** Built-in toolbar action names */
 export type ToolbarAction =
@@ -44,8 +58,8 @@ export interface RichTextEditorProps {
   placeholder?: string
   /** Editing mode */
   mode?: RichTextEditorMode
-  /** Toolbar buttons configuration */
-  toolbar?: ToolbarButton[]
+  /** Toolbar items configuration (buttons and separators) */
+  toolbar?: ToolbarItem[]
   /** Editor height */
   height?: number | string
   /** Read-only mode */

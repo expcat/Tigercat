@@ -6,6 +6,7 @@ import {
   getToolbarButtonClasses,
   getEditorAreaClasses,
   richTextToolbarClasses,
+  richTextToolbarSeparatorClasses,
   richTextPlaceholderClasses,
   defaultToolbar,
   isInlineFormat,
@@ -13,8 +14,10 @@ import {
   isContentEmpty,
   parseHeight,
   builtinRichTextEngine,
+  isToolbarSeparator,
   type RichTextEditorMode,
   type ToolbarButton,
+  type ToolbarItem,
   type RichTextEngine,
   type RichTextEngineInstance
 } from '@expcat/tigercat-core'
@@ -31,8 +34,8 @@ export interface RichTextEditorProps extends Omit<
   placeholder?: string
   /** Editing mode */
   mode?: RichTextEditorMode
-  /** Toolbar buttons configuration */
-  toolbar?: ToolbarButton[]
+  /** Toolbar items configuration (buttons and separators) */
+  toolbar?: ToolbarItem[]
   /** Editor height */
   height?: number | string
   /** Read-only mode */
@@ -68,7 +71,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const engineRef = useRef<RichTextEngineInstance | null>(null)
   const [currentContent, setInternalValue, isControlled] = useControlledState(value, defaultValue)
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set())
-  const toolbarButtons = toolbar ?? defaultToolbar
+  const toolbarItems = toolbar ?? defaultToolbar
   const empty = isContentEmpty(currentContent)
 
   // Stable refs to keep engine callbacks fresh without recreating the
@@ -92,7 +95,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       readOnly,
       disabled,
       placeholder,
-      toolbar: toolbarButtons,
+      toolbar: toolbarItems,
       notifyChange(html) {
         if (!isControlledRef.current) setInternalValueRef.current(html)
         onChangeRef.current?.(html)
@@ -121,11 +124,15 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     engineRef.current?.setReadOnly(readOnly, disabled)
   }, [readOnly, disabled])
 
-  // Toolbar action
-  const execAction = useCallback(
-    (actionName: string) => {
+  // Toolbar action for a specific button (supports custom action)
+  const execButtonAction = useCallback(
+    (btn: ToolbarButton) => {
       if (readOnly || disabled) return
-      engineRef.current?.exec(actionName)
+      if (btn.action && editorRef.current) {
+        btn.action(editorRef.current)
+        return
+      }
+      engineRef.current?.exec(btn.name)
     },
     [readOnly, disabled]
   )
@@ -133,13 +140,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   // Keyboard handler
   const handleKeydown = useCallback(
     (e: React.KeyboardEvent) => {
-      const match = findHotkeyMatch(toolbarButtons, e.nativeEvent)
+      const match = findHotkeyMatch(toolbarItems, e.nativeEvent)
       if (match) {
         e.preventDefault()
-        execAction(match)
+        execButtonAction(match)
       }
     },
-    [toolbarButtons, execAction]
+    [toolbarItems, execButtonAction]
   )
 
   const containerClasses = useMemo(
@@ -159,20 +166,33 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     <div className={containerClasses} style={containerStyle} {...restProps}>
       {/* Toolbar */}
       <div className={richTextToolbarClasses} role="toolbar" aria-label="Text formatting">
-        {toolbarButtons.map((btn) => (
-          <button
-            key={btn.name}
-            type="button"
-            className={getToolbarButtonClasses(activeFormats.has(btn.name))}
-            title={btn.tooltip ?? btn.label}
-            aria-label={btn.label}
-            aria-pressed={isInlineFormat(btn.name) ? activeFormats.has(btn.name) : undefined}
-            disabled={disabled || readOnly}
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => execAction(btn.name)}>
-            {btn.label}
-          </button>
-        ))}
+        {toolbarItems.map((item, idx) => {
+          if (isToolbarSeparator(item)) {
+            return (
+              <div
+                key={`sep-${idx}`}
+                className={richTextToolbarSeparatorClasses}
+                role="separator"
+                aria-orientation="vertical"
+              />
+            )
+          }
+          const btn = item
+          return (
+            <button
+              key={btn.name}
+              type="button"
+              className={getToolbarButtonClasses(activeFormats.has(btn.name))}
+              title={btn.tooltip ?? btn.label}
+              aria-label={btn.label}
+              aria-pressed={isInlineFormat(btn.name) ? activeFormats.has(btn.name) : undefined}
+              disabled={disabled || readOnly}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => execButtonAction(btn)}>
+              {btn.icon ? <span dangerouslySetInnerHTML={{ __html: btn.icon }} /> : btn.label}
+            </button>
+          )
+        })}
       </div>
 
       {/* Editor wrapper */}

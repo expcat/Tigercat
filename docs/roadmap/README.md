@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P2 Form 命令式 API — 新增 `FormController` 接口（core types）和 `useFormController` 组合式 / hook（Vue + React）。提供 headless 表单状态管理：values / errors / errorsByField / hasErrors + setFieldValue / setValues / getFieldValue / validate / validateField / validateFields / clearValidate / reset / undo / redo。与现有 `<Form>` 组件完全兼容（共享同一套 core 验证引擎）。新增 28 条测试（Vue 14 + React 14）覆盖 values、validation、reset、undo/redo，全部通过。现有 112 条 Form 测试不受影响。
-- 推荐下一步：P2 Descriptions 大列表性能 — 对 100+ items columns / rows 合并算法做复杂度测试或 benchmark。
+- 上一步完成：P2 RichText toolbar 插件化 — 已实现。ToolbarButton 新增 `action?: (element: HTMLElement) => void` 自定义回调，新增 ToolbarSeparator 分隔符类型与 ToolbarItem 联合类型，icon 字段可渲染，findHotkeyMatch 返回完整 button 对象以支持自定义动作。Core/Vue/React 三层同步，128 测试全通过（含 7 条新增）。默认行为保持 100% 向后兼容。
+- 推荐下一步：P1 组件 API 一致性 — Vue 事件 kebab-case、React 事件 camelCase、Props 默认值与类型导出扫描审查。
 
 ## 未实现组件
 
@@ -47,11 +47,11 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 | 优先级 | 项目                          | 范围            | 完成标准                                                            |
 | ------ | ----------------------------- | --------------- | ------------------------------------------------------------------- |
-| P2     | Descriptions 大列表性能       | Descriptions    | 对 100+ items columns / rows 合并算法做复杂度测试或 benchmark       |
-| P2     | Container 组件必要性          | Container       | 评估是否改为 class util；若保留组件，说明体积与 API 理由            |
-| P2     | FloatButton group memo        | FloatButton     | 子按钮列表缓存，避免不必要重建                                      |
-| P2     | Steps vertical pseudo-element | Steps           | vertical 连接线改用 CSS pseudo-element 或确认保留 inline div 的理由 |
-| P2     | Timeline pseudo-element       | Timeline        | 节点/连接线减少额外 DOM，改用 CSS pseudo-element 或说明保留原因     |
+| P2     | ~~Descriptions 大列表性能~~       | ~~Descriptions~~    | ~~已验证：O(n) 线性算法，1000 items ~10–30μs，benchmark 7 项全通过，无瓶颈~~ |
+| P2     | ~~Container 组件必要性~~          | ~~Container~~       | ~~已评估：保留组件。getContainerClasses 已导出供 class-only 用法；组件族一致性 + as 多态 + 体积极小~~ |
+| P2     | ~~FloatButton group memo~~        | ~~FloatButton~~     | ~~已评估：无需改动。children/slots 外部传入仅条件渲染，React useMemo/useCallback + Vue computed 已缓存派生值~~ |
+| P2     | ~~Steps vertical pseudo-element~~ | ~~Steps~~           | ~~已评估：保留 inline div。动态状态颜色 + 6 种 size 组合 + DOM 极小 + 测试可查询，pseudo 无优势~~ |
+| P2     | ~~Timeline pseudo-element~~       | ~~Timeline~~        | ~~已评估：保留 inline div。dot 支持自定义子元素/slot + 动态 color inline style + 3 种 mode 定位 + pending animate，pseudo 无法实现~~ |
 
 ### Charts / Composite / Advanced
 
@@ -68,9 +68,9 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | P1     | ~~VirtualTable 压测~~          | ~~VirtualTable~~                                                             | ~~已完成：sticky header + sticky column 同时启用，benchmark 覆盖 1000 列 × 10k 行，render prep ~1.8ms/帧~~ |
 | P1     | ~~Advanced 交互测试补强~~        | ~~FileManager / ImageViewer / InfiniteScroll / VirtualList / VirtualTable~~  | ~~已完成：新增 48 条边界与交互测试，覆盖零项/disabled/极值/变换重置等场景，全部通过~~ |
 | P2     | ~~Chart benchmark 补齐~~         | ~~GaugeChart / chart interaction~~                                           | ~~已完成：新增 21 项 benchmark 覆盖 Gauge 计算与 interaction 热路径，全部通过无瓶颈~~ |
-| P2     | Composite 配方化             | DataTableWithToolbar / CropUpload / FormWizard                           | 评估是否转 cookbook 配方；若保留组件，说明体积边界                                        |
-| P2     | PrintLayout stylesheet 化    | PrintLayout                                                              | 评估改为 stylesheet + class util，若保留组件需说明收益                                    |
-| P2     | RichText toolbar 插件化      | RichTextEditor                                                           | toolbar 命令注册支持插件配置，并保持默认轻量 engine                                       |
+| P2     | ~~Composite 配方化~~             | ~~DataTableWithToolbar / CropUpload / FormWizard~~                           | ~~已评估：均保留。独有逻辑复杂度高，已完整交付，tree-shaking 可裁剪，配方化收益极低~~ |
+| P2     | ~~PrintLayout stylesheet 化~~    | ~~PrintLayout~~                                                              | ~~已评估：保留组件。零逻辑但体积极小 (169 行)，class util 已可用，组件提供 a11y 属性便利性~~ |
+| P2     | ~~RichText toolbar 插件化~~   | ~~RichTextEditor~~                                                       | ~~已完成：ToolbarButton.action 自定义回调 + ToolbarSeparator 分隔符 + ToolbarItem 联合类型 + icon 渲染，向后兼容~~ |
 
 ## 待复核质量项
 

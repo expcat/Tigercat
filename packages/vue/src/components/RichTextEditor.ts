@@ -6,6 +6,7 @@ import {
   getToolbarButtonClasses,
   getEditorAreaClasses,
   richTextToolbarClasses,
+  richTextToolbarSeparatorClasses,
   richTextPlaceholderClasses,
   defaultToolbar,
   isInlineFormat,
@@ -13,8 +14,10 @@ import {
   isContentEmpty,
   parseHeight,
   builtinRichTextEngine,
+  isToolbarSeparator,
   type RichTextEditorMode,
   type ToolbarButton,
+  type ToolbarItem,
   type RichTextEngine,
   type RichTextEngineInstance
 } from '@expcat/tigercat-core'
@@ -24,7 +27,7 @@ export interface VueRichTextEditorProps {
   defaultValue?: string
   placeholder?: string
   mode?: RichTextEditorMode
-  toolbar?: ToolbarButton[]
+  toolbar?: ToolbarItem[]
   height?: number | string
   readOnly?: boolean
   disabled?: boolean
@@ -49,7 +52,7 @@ export const RichTextEditor = defineComponent({
       default: 'html' as RichTextEditorMode
     },
     toolbar: {
-      type: Array as PropType<ToolbarButton[]>,
+      type: Array as PropType<ToolbarItem[]>,
       default: undefined
     },
     height: {
@@ -73,7 +76,7 @@ export const RichTextEditor = defineComponent({
 
     const isControlled = computed(() => props.value !== undefined)
     const currentContent = computed(() => (isControlled.value ? props.value! : internalValue.value))
-    const toolbarButtons = computed(() => props.toolbar ?? defaultToolbar)
+    const toolbarItems = computed(() => props.toolbar ?? defaultToolbar)
     const isEmpty = computed(() => isContentEmpty(currentContent.value))
 
     // Sync editor content when controlled value changes
@@ -103,7 +106,7 @@ export const RichTextEditor = defineComponent({
         readOnly: props.readOnly,
         disabled: props.disabled,
         placeholder: props.placeholder,
-        toolbar: toolbarButtons.value,
+        toolbar: toolbarItems.value,
         notifyChange(html) {
           if (!isControlled.value) internalValue.value = html
           emit('update:value', html)
@@ -121,17 +124,23 @@ export const RichTextEditor = defineComponent({
     })
 
     // ── Toolbar action handler ──
-    function execAction(actionName: string) {
+
+    /** Execute action for a specific button (supports custom action) */
+    function execButtonAction(btn: ToolbarButton) {
       if (props.readOnly || props.disabled) return
-      engineInstance?.exec(actionName)
+      if (btn.action && editorRef.value) {
+        btn.action(editorRef.value)
+        return
+      }
+      engineInstance?.exec(btn.name)
     }
 
     // ── Keyboard handler ──
     function handleKeydown(e: KeyboardEvent) {
-      const match = findHotkeyMatch(toolbarButtons.value, e)
+      const match = findHotkeyMatch(toolbarItems.value, e)
       if (match) {
         e.preventDefault()
-        execAction(match)
+        execButtonAction(match)
       }
     }
 
@@ -159,8 +168,17 @@ export const RichTextEditor = defineComponent({
           role: 'toolbar',
           'aria-label': 'Text formatting'
         },
-        toolbarButtons.value.map((btn) =>
-          h(
+        toolbarItems.value.map((item, idx) => {
+          if (isToolbarSeparator(item)) {
+            return h('div', {
+              key: `sep-${idx}`,
+              class: richTextToolbarSeparatorClasses,
+              role: 'separator',
+              'aria-orientation': 'vertical'
+            })
+          }
+          const btn = item
+          return h(
             'button',
             {
               key: btn.name,
@@ -174,12 +192,12 @@ export const RichTextEditor = defineComponent({
               disabled: props.disabled || props.readOnly,
               onClick: (e: Event) => {
                 e.preventDefault()
-                execAction(btn.name)
+                execButtonAction(btn)
               }
             },
-            btn.label
+            btn.icon ? h('span', { innerHTML: btn.icon }) : btn.label
           )
-        )
+        })
       )
 
       // Editable area

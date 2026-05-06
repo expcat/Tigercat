@@ -25,9 +25,10 @@ import {
   defaultToolbar,
   mapToolbarAction,
   sanitizeHtml,
-  isValidUrl
+  isValidUrl,
+  getToolbarButtons
 } from './rich-text-editor-utils'
-import type { ToolbarButton } from '../types/rich-text-editor'
+import type { ToolbarButton, ToolbarItem } from '../types/rich-text-editor'
 
 export interface RichTextEngineMountContext {
   /** Host element the engine should mount into. */
@@ -41,7 +42,7 @@ export interface RichTextEngineMountContext {
   /** Placeholder text the engine may render natively (optional). */
   placeholder?: string
   /** Toolbar definition the component will display. */
-  toolbar: ToolbarButton[]
+  toolbar: ToolbarItem[]
   /** Called by the engine whenever content changes. */
   notifyChange(html: string): void
   /** Called by the engine when active inline formats may have changed. */
@@ -120,6 +121,16 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
       const exec = (actionName: string) => {
         if (readOnly || disabled) return
         element.focus()
+
+        // Check for custom action on the toolbar button first
+        const buttons = getToolbarButtons(ctx.toolbar)
+        const btn = buttons.find((b) => b.name === actionName)
+        if (btn?.action) {
+          btn.action(element)
+          handleInput()
+          refreshActiveFormats()
+          return
+        }
 
         const mapping = mapToolbarAction(actionName)
         if (mapping) {

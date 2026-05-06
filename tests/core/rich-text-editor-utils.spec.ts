@@ -8,6 +8,7 @@ import {
   richTextContainerDisabled,
   richTextToolbarButtonBase,
   richTextToolbarButtonActive,
+  richTextToolbarSeparatorClasses,
   richTextEditorAreaBase,
   richTextEditorAreaReadOnly,
   mapToolbarAction,
@@ -18,8 +19,11 @@ import {
   sanitizeHtml,
   isContentEmpty,
   parseHeight,
-  isValidUrl
+  isValidUrl,
+  isToolbarSeparator,
+  getToolbarButtons
 } from '@expcat/tigercat-core'
+import type { ToolbarButton, ToolbarSeparator, ToolbarItem } from '@expcat/tigercat-core'
 
 // ─── defaultToolbar ───────────────────────────────────────────────
 
@@ -185,9 +189,9 @@ describe('findHotkeyMatch', () => {
     { name: 'italic', label: 'Italic', hotkey: 'Ctrl+I' }
   ]
 
-  it('returns action name when hotkey matches', () => {
+  it('returns matching button when hotkey matches', () => {
     const event = { ctrlKey: true, shiftKey: false, altKey: false, metaKey: false, key: 'b' }
-    expect(findHotkeyMatch(toolbar, event)).toBe('bold')
+    expect(findHotkeyMatch(toolbar, event)).toEqual(toolbar[0])
   })
 
   it('returns null when no match', () => {
@@ -196,9 +200,68 @@ describe('findHotkeyMatch', () => {
   })
 
   it('handles buttons without hotkeys', () => {
-    const tb = [{ name: 'link', label: 'Link' }]
+    const tb: ToolbarItem[] = [{ name: 'link', label: 'Link' }]
     const event = { ctrlKey: true, shiftKey: false, altKey: false, metaKey: false, key: 'k' }
     expect(findHotkeyMatch(tb, event)).toBeNull()
+  })
+
+  it('skips separators when matching', () => {
+    const tb: ToolbarItem[] = [
+      { type: 'separator' },
+      { name: 'bold', label: 'Bold', hotkey: 'Ctrl+B' },
+      { type: 'separator' }
+    ]
+    const event = { ctrlKey: true, shiftKey: false, altKey: false, metaKey: false, key: 'b' }
+    expect(findHotkeyMatch(tb, event)).toEqual(tb[1])
+  })
+})
+
+// ─── Toolbar item helpers ─────────────────────────────────────────
+
+describe('isToolbarSeparator', () => {
+  it('returns true for separator items', () => {
+    expect(isToolbarSeparator({ type: 'separator' })).toBe(true)
+  })
+
+  it('returns false for button items', () => {
+    expect(isToolbarSeparator({ name: 'bold', label: 'Bold' })).toBe(false)
+  })
+})
+
+describe('getToolbarButtons', () => {
+  it('filters out separators', () => {
+    const items: ToolbarItem[] = [
+      { name: 'bold', label: 'Bold' },
+      { type: 'separator' },
+      { name: 'italic', label: 'Italic' }
+    ]
+    const buttons = getToolbarButtons(items)
+    expect(buttons).toHaveLength(2)
+    expect(buttons[0].name).toBe('bold')
+    expect(buttons[1].name).toBe('italic')
+  })
+
+  it('returns empty array for all separators', () => {
+    const items: ToolbarItem[] = [{ type: 'separator' }, { type: 'separator' }]
+    expect(getToolbarButtons(items)).toHaveLength(0)
+  })
+})
+
+describe('richTextToolbarSeparatorClasses', () => {
+  it('is a non-empty string', () => {
+    expect(richTextToolbarSeparatorClasses).toBeTruthy()
+    expect(typeof richTextToolbarSeparatorClasses).toBe('string')
+  })
+})
+
+describe('ToolbarButton.action', () => {
+  it('action field is optional and can be a function', () => {
+    const btn: ToolbarButton = {
+      name: 'custom',
+      label: 'Custom',
+      action: (_el: HTMLElement) => {}
+    }
+    expect(typeof btn.action).toBe('function')
   })
 })
 

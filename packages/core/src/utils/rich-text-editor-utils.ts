@@ -5,7 +5,19 @@
  * for basic rich-text editing support.
  */
 
-import type { ToolbarButton } from '../types/rich-text-editor'
+import type { ToolbarButton, ToolbarItem, ToolbarSeparator } from '../types/rich-text-editor'
+
+// ─── Toolbar item helpers ─────────────────────────────────────────
+
+/** Type guard: check if a toolbar item is a separator */
+export function isToolbarSeparator(item: ToolbarItem): item is ToolbarSeparator {
+  return (item as ToolbarSeparator).type === 'separator'
+}
+
+/** Extract only ToolbarButton items (for hotkey matching, etc.) */
+export function getToolbarButtons(items: ToolbarItem[]): ToolbarButton[] {
+  return items.filter((item): item is ToolbarButton => !isToolbarSeparator(item))
+}
 
 // ─── Default toolbar ──────────────────────────────────────────────
 
@@ -43,6 +55,9 @@ export const richTextToolbarButtonBase =
 
 export const richTextToolbarButtonActive =
   'bg-[var(--tiger-primary,#2563eb)]/10 text-[var(--tiger-primary,#2563eb)]'
+
+export const richTextToolbarSeparatorClasses =
+  'w-px h-5 mx-1 bg-[var(--tiger-border,#d1d5db)]'
 
 export const richTextEditorAreaBase =
   'flex-1 p-4 outline-none text-[var(--tiger-text,#111827)] text-sm leading-relaxed overflow-y-auto'
@@ -147,16 +162,18 @@ export function matchesHotkey(
 
 /**
  * Find a toolbar button whose hotkey matches the keyboard event.
- * Returns the button name or null.
+ * Returns the button (with its action callback if any) or null.
+ * Accepts ToolbarItem[] and skips separators.
  */
 export function findHotkeyMatch(
-  toolbar: ToolbarButton[],
+  toolbar: ToolbarItem[],
   event: { ctrlKey: boolean; shiftKey: boolean; altKey: boolean; metaKey: boolean; key: string }
-): string | null {
-  for (const btn of toolbar) {
-    if (btn.hotkey) {
-      const parsed = parseHotkey(btn.hotkey)
-      if (matchesHotkey(event, parsed)) return btn.name
+): ToolbarButton | null {
+  for (const item of toolbar) {
+    if (isToolbarSeparator(item)) continue
+    if (item.hotkey) {
+      const parsed = parseHotkey(item.hotkey)
+      if (matchesHotkey(event, parsed)) return item
     }
   }
   return null
