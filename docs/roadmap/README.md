@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P2 RichText toolbar 插件化 — 已实现。ToolbarButton 新增 `action?: (element: HTMLElement) => void` 自定义回调，新增 ToolbarSeparator 分隔符类型与 ToolbarItem 联合类型，icon 字段可渲染，findHotkeyMatch 返回完整 button 对象以支持自定义动作。Core/Vue/React 三层同步，128 测试全通过（含 7 条新增）。默认行为保持 100% 向后兼容。
-- 推荐下一步：P1 组件 API 一致性 — Vue 事件 kebab-case、React 事件 camelCase、Props 默认值与类型导出扫描审查。
+- 上一步完成：P1 低覆盖热点补强 — 新增 8 个 core 测试文件共 114 条测试。覆盖 FunnelChart (16)、GaugeChart (24)、SunburstChart (13)、TreeMapChart (15)、Watermark (+5→10)、FloatButton (7)、Empty (11)、Result (18) 的 core utils 层，含布局算法、弧形计算、动画控制器、边界值、缓存逻辑。全部通过。
+- 推荐下一步：P2 Bundle 与 tree-shaking — advanced components、locales、charts 是否可按需裁剪。
 
 ## 未实现组件
 
@@ -78,10 +78,10 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 | 优先级 | 项目                   | 复核重点                                                                                                           | 完成标准                                                                                                    |
 | ------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| P1     | 组件 API 一致性        | Vue 事件 kebab-case、React 事件 camelCase、Props 默认值与类型导出                                                  | API 扫描或人工审查无阻塞项；差异记录到迁移指南或 skills 文档                                                |
+| P1     | ~~组件 API 一致性~~    | ~~Vue 事件 kebab-case、React 事件 camelCase、Props 默认值与类型导出~~                                              | ~~已完成：全量扫描无阻塞项，69 Vue emits 均 kebab-case，React camelCase 无异常，~30 组件 Props 默认值一致，补导出 ConfigProviderProps~~ |
 | P1     | ~~a11y AA 回归~~           | ~~overlay、picker、table、form、advanced components 的键盘与 ARIA 行为~~                                               | ~~已完成：27 条跨框架 a11y 回归测试 + 原有 34 条，合计 61 条通过~~ |
 | P1     | ~~测试与覆盖率门槛~~       | ~~单元、集成、e2e、视觉回归是否仍符合当前发布目标~~                                                                    | ~~已完成（2026-05-06）：307 文件 5570 测试全通过；Stmts 83.82% / Br 77.05% / Fn 85.42% / Lines 85.86%，四项均超基线~~ |
-| P1     | 低覆盖热点补强         | TaskBoard、Watermark、CropUpload、FloatButton、Empty、Result、FunnelChart、GaugeChart、SunburstChart、TreeMapChart | 优先补边界、交互、渲染分支与性能回归，逐步关闭覆盖率热点                                                    |
+| P1     | ~~低覆盖热点补强~~   | ~~TaskBoard、Watermark、CropUpload、FloatButton、Empty、Result、FunnelChart、GaugeChart、SunburstChart、TreeMapChart~~ | ~~已完成：新增 8 个 core utils 测试文件 114 条测试，覆盖布局算法/弧形计算/动画/边界值/缓存，全部通过~~ |
 | P2     | Bundle 与 tree-shaking | advanced components、locales、charts 是否可按需裁剪                                                                | size/bundle 检查无异常增长；locale 按需入口可用                                                             |
 | P2     | 文档完整性             | 组件 API、主题、i18n、迁移指南、示例入口                                                                           | 新增或变更组件均有 props 文档、Vue/React 示例和迁移说明                                                     |
 
