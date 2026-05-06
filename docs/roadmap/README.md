@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 低覆盖热点补强（第一批） — 新增 6 个测试文件（Vue: FloatButton 22 tests、Empty 11 tests、Result 16 tests；React: FloatButton 20 tests、Empty 9 tests、Result 14 tests），扩展 Watermark 测试（Vue 1→7、React 1→7），共计 106 条新测试全部通过。覆盖渲染、交互、disabled、slot/props、className 合并、shape/status variants、Teleport/Portal 等边界。
-- 推荐下一步：P1 低覆盖热点补强（第二批） — 继续为 FunnelChart、GaugeChart、SunburstChart、TreeMapChart 补基础渲染与 props 测试（当前零测试），或进入 P1 组件 API 一致性审查。
+- 上一步完成：P1 低覆盖热点补强（第二批） — 新增 8 个测试文件（Vue + React 各 4 个：FunnelChart 11 tests、GaugeChart 12 tests、SunburstChart 11 tests、TreeMapChart 11 tests），共计 90 条新测试全部通过。覆盖渲染、空数据、自定义颜色、gradient、legend、hover/click 交互、className、a11y title/desc、组件特有 props（direction/gap/segments/innerRadiusRatio 等）。至此低覆盖热点 10 个组件（FloatButton、Empty、Result、Watermark、FunnelChart、GaugeChart、SunburstChart、TreeMapChart）已全部补齐基础测试。
+- 推荐下一步：P1 组件 API 一致性审查 — Vue 事件 kebab-case、React 事件 camelCase、Props 默认值与类型导出的一致性扫描。
 
 ## 未实现组件
 
