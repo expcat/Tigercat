@@ -199,4 +199,61 @@ describe('ImageViewer', () => {
       await expectNoA11yViolations(container)
     })
   })
+
+  describe('Edge cases', () => {
+    it('handles out-of-bounds currentIndex gracefully', () => {
+      const { container } = render(
+        <ImageViewer images={images} open currentIndex={10} />
+      )
+      expect(container.querySelector('[role="dialog"]')).toBeInTheDocument()
+    })
+
+    it('does not close on backdrop click when maskClosable=false', () => {
+      const onClose = vi.fn()
+      const { getByRole } = render(
+        <ImageViewer images={images} open maskClosable={false} onClose={onClose} />
+      )
+      fireEvent.click(getByRole('dialog'))
+      expect(onClose).not.toHaveBeenCalled()
+    })
+
+    it('does not navigate when closed', () => {
+      const onIndexChange = vi.fn()
+      render(
+        <ImageViewer images={images} open={false} onIndexChange={onIndexChange} />
+      )
+      fireEvent.keyDown(document, { key: 'ArrowRight' })
+      expect(onIndexChange).not.toHaveBeenCalled()
+    })
+
+    it('zoom in button changes transform', () => {
+      render(<ImageViewer images={images} open zoomable />)
+      const zoomIn = screen.getAllByLabelText('Zoom in').find((el) => el.tagName === 'BUTTON')!
+      const img = screen.getByAltText('Image 1') as HTMLImageElement
+      const styleBefore = img.style.transform
+      fireEvent.click(zoomIn)
+      expect(img.style.transform).not.toBe(styleBefore)
+    })
+
+    it('rotate right button changes transform', () => {
+      render(<ImageViewer images={images} open rotatable />)
+      const rotateRight = screen.getAllByLabelText('Rotate right').find((el) => el.tagName === 'BUTTON')!
+      const img = screen.getByAltText('Image 1') as HTMLImageElement
+      const styleBefore = img.style.transform
+      fireEvent.click(rotateRight)
+      expect(img.style.transform).not.toBe(styleBefore)
+    })
+
+    it('resets transform when navigating to next image', () => {
+      render(
+        <ImageViewer images={images} open currentIndex={0} zoomable />
+      )
+      const zoomIn = screen.getAllByLabelText('Zoom in').find((el) => el.tagName === 'BUTTON')!
+      fireEvent.click(zoomIn)
+      const next = screen.getAllByLabelText('Next image').find((el) => el.tagName === 'BUTTON')!
+      fireEvent.click(next)
+      const img = screen.getByAltText('Image 2') as HTMLImageElement
+      expect(img.style.transform).toContain('scale(1)')
+    })
+  })
 })

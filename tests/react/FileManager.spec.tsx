@@ -157,4 +157,86 @@ describe('FileManager (React)', () => {
     )
     expect(getByText('DIR')).toBeTruthy()
   })
+
+  // --- Edge cases ---
+  it('shows default empty text for empty folder', () => {
+    const { getByText } = render(<FileManager files={[]} />)
+    expect(getByText('Empty folder')).toBeTruthy()
+  })
+
+  it('navigates to invalid path gracefully (empty result)', () => {
+    const { getByText } = render(
+      <FileManager files={files} currentPath={['nonexistent']} emptyText="Nothing" />
+    )
+    expect(getByText('Nothing')).toBeTruthy()
+  })
+
+  it('does not call onSelect for disabled item', () => {
+    const disabledFiles: FileItem[] = [
+      { key: 'locked', name: 'locked.txt', type: 'file', disabled: true }
+    ]
+    const onSelect = vi.fn()
+    const { getByText } = render(
+      <FileManager files={disabledFiles} onSelect={onSelect} />
+    )
+    fireEvent.click(getByText('locked.txt'))
+    expect(onSelect).not.toHaveBeenCalled()
+  })
+
+  it('supports multi-select', () => {
+    const onSelectedKeysChange = vi.fn()
+    const { getByText } = render(
+      <FileManager files={files} multiple showHidden onSelectedKeysChange={onSelectedKeysChange} />
+    )
+    fireEvent.click(getByText('README.md'))
+    expect(onSelectedKeysChange).toHaveBeenCalledOnce()
+    const keys = onSelectedKeysChange.mock.calls[0][0] as string[]
+    expect(keys).toContain('readme')
+  })
+
+  it('deep nested path navigation', () => {
+    const deepFiles: FileItem[] = [
+      {
+        key: 'a',
+        name: 'a',
+        type: 'folder',
+        children: [
+          {
+            key: 'b',
+            name: 'b',
+            type: 'folder',
+            children: [{ key: 'c', name: 'c.txt', type: 'file' }]
+          }
+        ]
+      }
+    ]
+    const { getByText } = render(
+      <FileManager files={deepFiles} currentPath={['a', 'b']} />
+    )
+    expect(getByText('c.txt')).toBeTruthy()
+  })
+
+  it('breadcrumb shows all segments for deep path', () => {
+    const deepFiles: FileItem[] = [
+      {
+        key: 'a',
+        name: 'a',
+        type: 'folder',
+        children: [
+          {
+            key: 'b',
+            name: 'b',
+            type: 'folder',
+            children: [{ key: 'c', name: 'c.txt', type: 'file' }]
+          }
+        ]
+      }
+    ]
+    const { getByText } = render(
+      <FileManager files={deepFiles} currentPath={['a', 'b']} />
+    )
+    expect(getByText('Root')).toBeTruthy()
+    expect(getByText('a')).toBeTruthy()
+    expect(getByText('b')).toBeTruthy()
+  })
 })

@@ -121,4 +121,77 @@ describe('VirtualList', () => {
     const itemContainer = inner.firstElementChild as HTMLElement
     expect(itemContainer.children.length).toBe(3)
   })
+
+  // --- Edge cases ---
+  it('renders with zero items', () => {
+    const { container } = renderWithProps(VirtualList, {
+      itemCount: 0,
+      itemHeight: 40,
+      height: 400
+    })
+    const outer = container.firstElementChild as HTMLElement
+    const inner = outer.firstElementChild as HTMLElement
+    expect(inner.style.height).toBe('0px')
+  })
+
+  it('renders with single item', () => {
+    const { container } = render(VirtualList, {
+      props: { itemCount: 1, itemHeight: 40, height: 400 },
+      slots: { default: ({ index }: { index: number }) => `Item ${index}` }
+    })
+    const outer = container.firstElementChild as HTMLElement
+    const inner = outer.firstElementChild as HTMLElement
+    expect(inner.style.height).toBe('40px')
+    const itemContainer = inner.firstElementChild as HTMLElement
+    expect(itemContainer.children.length).toBe(1)
+  })
+
+  it('renders with very large itemCount', () => {
+    const { container } = renderWithProps(VirtualList, {
+      itemCount: 100_000,
+      itemHeight: 40,
+      height: 400
+    })
+    const outer = container.firstElementChild as HTMLElement
+    const inner = outer.firstElementChild as HTMLElement
+    expect(inner.style.height).toBe('4000000px')
+    const itemContainer = inner.firstElementChild as HTMLElement
+    // Only visible + overscan should render, not all 100k
+    expect(itemContainer.children.length).toBeLessThan(30)
+  })
+
+  it('renders with overscan=0', () => {
+    const { container } = render(VirtualList, {
+      props: { itemCount: 100, itemHeight: 40, height: 200, overscan: 0 },
+      slots: { default: ({ index }: { index: number }) => `Item ${index}` }
+    })
+    const outer = container.firstElementChild as HTMLElement
+    const inner = outer.firstElementChild as HTMLElement
+    const itemContainer = inner.firstElementChild as HTMLElement
+    // 200/40 = 5 visible, overscan 0, endIndex inclusive → 6 items
+    expect(itemContainer.children.length).toBeLessThanOrEqual(6)
+    expect(itemContainer.children.length).toBeGreaterThanOrEqual(5)
+  })
+
+  it('renders with estimatedItemHeight (dynamic strategy)', () => {
+    const { container } = renderWithProps(VirtualList, {
+      itemCount: 50,
+      estimatedItemHeight: 60,
+      height: 300
+    })
+    const outer = container.firstElementChild as HTMLElement
+    const inner = outer.firstElementChild as HTMLElement
+    // 50 * 60 = 3000
+    expect(inner.style.height).toBe('3000px')
+  })
+
+  it('applies height=0 gracefully', () => {
+    const { container } = renderWithProps(VirtualList, {
+      itemCount: 10,
+      itemHeight: 40,
+      height: 0
+    })
+    const outer = container.firstElementChild as HTMLElement
+    expect(outer.style.height).toBe('0px')
+  })
 })

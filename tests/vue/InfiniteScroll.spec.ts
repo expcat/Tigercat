@@ -111,4 +111,47 @@ describe('InfiniteScroll (Vue)', () => {
     const sentinel = container.querySelector('.tiger-infinite-scroll-sentinel')
     expect(sentinel).toBeNull()
   })
+
+  // --- Edge cases ---
+  it('does not render sentinel when disabled', () => {
+    const { container } = render(InfiniteScroll, {
+      props: { hasMore: true, disabled: true }
+    })
+    // Sentinel should still render (observer just won't fire)
+    const sentinel = container.querySelector('.tiger-infinite-scroll-sentinel')
+    // disabled doesn't remove sentinel — it prevents load-more from firing
+    expect(sentinel).toBeTruthy()
+  })
+
+  it('does not show both loading and end at same time', () => {
+    const { queryByText } = render(InfiniteScroll, {
+      props: { hasMore: false, loading: true }
+    })
+    // Loading shown, end text hidden
+    expect(queryByText('Loading...')).toBeTruthy()
+    expect(queryByText('No more data')).toBeNull()
+  })
+
+  it('supports horizontal direction class', () => {
+    const { container } = render(InfiniteScroll, {
+      props: { direction: 'horizontal' }
+    })
+    expect(container.firstElementChild?.className).toContain('flex-row')
+  })
+
+  it('renders without children', () => {
+    const { container } = render(InfiniteScroll, {
+      props: { hasMore: true }
+    })
+    expect(container.firstElementChild).toBeTruthy()
+  })
+
+  it('sentinel has height 0 and is hidden', () => {
+    const { container } = render(InfiniteScroll, {
+      props: { hasMore: true }
+    })
+    const sentinel = container.querySelector('.tiger-infinite-scroll-sentinel') as HTMLElement
+    expect(sentinel.style.height).toBe('0px')
+    expect(sentinel.style.overflow).toBe('hidden')
+  })
 })

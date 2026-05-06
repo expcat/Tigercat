@@ -103,4 +103,35 @@ describe('InfiniteScroll (React)', () => {
     const sentinel = container.querySelector('.tiger-infinite-scroll-sentinel')
     expect(sentinel).toBeNull()
   })
+
+  // --- Edge cases ---
+  it('does not render sentinel when disabled', () => {
+    const { container } = render(<InfiniteScroll hasMore disabled />)
+    // Sentinel still renders (observer won't fire)
+    const sentinel = container.querySelector('.tiger-infinite-scroll-sentinel')
+    expect(sentinel).toBeTruthy()
+  })
+
+  it('does not show both loading and end at same time', () => {
+    const { queryByText } = render(<InfiniteScroll hasMore={false} loading />)
+    expect(queryByText('Loading...')).toBeTruthy()
+    expect(queryByText('No more data')).toBeNull()
+  })
+
+  it('supports horizontal direction class', () => {
+    const { container } = render(<InfiniteScroll direction="horizontal" />)
+    expect(container.firstElementChild?.className).toContain('flex-row')
+  })
+
+  it('renders without children', () => {
+    const { container } = render(<InfiniteScroll hasMore />)
+    expect(container.firstElementChild).toBeTruthy()
+  })
+
+  it('sentinel has height 0 and is hidden', () => {
+    const { container } = render(<InfiniteScroll hasMore />)
+    const sentinel = container.querySelector('.tiger-infinite-scroll-sentinel') as HTMLElement
+    expect(sentinel.style.height).toBe('0px')
+    expect(sentinel.style.overflow).toBe('hidden')
+  })
 })

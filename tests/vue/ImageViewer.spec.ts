@@ -245,4 +245,69 @@ describe('ImageViewer', () => {
       await expectNoA11yViolations(container)
     })
   })
+
+  describe('Edge cases', () => {
+    it('handles out-of-bounds currentIndex gracefully', () => {
+      // currentIndex=10 with only 3 images — should not crash
+      const { container } = render(ImageViewer, {
+        props: { images, open: true, currentIndex: 10 }
+      })
+      expect(container.querySelector('[role="dialog"]')).toBeInTheDocument()
+    })
+
+    it('does not close on backdrop click when maskClosable=false', async () => {
+      const { emitted, getByRole } = render(ImageViewer, {
+        props: { images, open: true, maskClosable: false }
+      })
+      const dialog = getByRole('dialog')
+      await fireEvent.click(dialog)
+      expect(emitted().close).toBeUndefined()
+    })
+
+    it('does not navigate when closed', async () => {
+      const { emitted } = render(ImageViewer, {
+        props: { images, open: false }
+      })
+      await fireEvent.keyDown(document, { key: 'ArrowRight' })
+      expect(emitted()['update:currentIndex']).toBeUndefined()
+    })
+
+    it('zoom in button changes transform', async () => {
+      render(ImageViewer, {
+        props: { images, open: true, zoomable: true }
+      })
+      const zoomIn = screen.getAllByLabelText('Zoom in').find((el) => el.tagName === 'BUTTON')!
+      const img = screen.getByAltText('Image 1') as HTMLImageElement
+      const styleBefore = img.style.transform
+      await fireEvent.click(zoomIn)
+      // Transform should change after zoom in
+      expect(img.style.transform).not.toBe(styleBefore)
+    })
+
+    it('rotate right button changes transform', async () => {
+      render(ImageViewer, {
+        props: { images, open: true, rotatable: true }
+      })
+      const rotateRight = screen.getAllByLabelText('Rotate right').find((el) => el.tagName === 'BUTTON')!
+      const img = screen.getByAltText('Image 1') as HTMLImageElement
+      const styleBefore = img.style.transform
+      await fireEvent.click(rotateRight)
+      expect(img.style.transform).not.toBe(styleBefore)
+    })
+
+    it('resets transform when navigating to next image', async () => {
+      render(ImageViewer, {
+        props: { images, open: true, currentIndex: 0, zoomable: true }
+      })
+      // Zoom in first
+      const zoomIn = screen.getAllByLabelText('Zoom in').find((el) => el.tagName === 'BUTTON')!
+      await fireEvent.click(zoomIn)
+      // Navigate next
+      const next = screen.getAllByLabelText('Next image').find((el) => el.tagName === 'BUTTON')!
+      await fireEvent.click(next)
+      // New image should have default transform (scale 1)
+      const img = screen.getByAltText('Image 2') as HTMLImageElement
+      expect(img.style.transform).toContain('scale(1)')
+    })
+  })
 })

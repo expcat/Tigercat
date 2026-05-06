@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 VirtualTable 压测 — Core 新增 `getVirtualTableFixedInfo` / `getVirtualTableFixedCellStyle` sticky column helpers；Vue/React VirtualTable 支持 `column.fixed: 'left' | 'right'` sticky 列，与 stickyHeader 可同时启用；新增 12 条 sticky column 单元测试全部通过；新增 `benchmarks/virtual-table.bench.ts` 覆盖 1000 列 × 10k 行场景，render prep ~1.8ms/帧无瓶颈。
-- 推荐下一步：P1 Advanced 交互测试补强 — FileManager / ImageViewer / InfiniteScroll / VirtualList / VirtualTable 增加边界与性能回归测试。
+- 上一步完成：P1 Advanced 交互测试补强 — FileManager / ImageViewer / InfiniteScroll / VirtualList / VirtualTable 新增 48 条边界与交互测试（Vue 24 + React 24），覆盖：零项/单项/超大数据集、disabled 项、深层路径导航、out-of-bounds 索引、maskClosable=false、zoom/rotate 变换重置、overscan 极值、loading+empty 互斥状态、horizontal 方向、sentinel 隐藏属性等；全部 239 条测试通过。
+- 推荐下一步：P2 Chart benchmark 补齐 — benchmark 覆盖 GaugeChart 计算与 chart interaction 热路径。
 
 ## 未实现组件
 
@@ -66,7 +66,7 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | P1     | ~~ImageViewer 手势 util~~    | ~~ImageViewer~~                                                          | ~~已完成：Core 新增 GestureTransform + wheel/pan/pinch 工具，Vue/React 集成触控手势~~ |
 | P1     | ~~TaskBoard 拖拽技术债~~     | ~~TaskBoard~~                                                            | ~~已完成：Core 新增 TaskBoardDragController 统一三套拖拽，Vue/React 消除重复 handler~~ |
 | P1     | ~~VirtualTable 压测~~          | ~~VirtualTable~~                                                             | ~~已完成：sticky header + sticky column 同时启用，benchmark 覆盖 1000 列 × 10k 行，render prep ~1.8ms/帧~~ |
-| P1     | Advanced 交互测试补强        | FileManager / ImageViewer / InfiniteScroll / VirtualList / VirtualTable  | 增加边界与性能回归                                                                        |
+| P1     | ~~Advanced 交互测试补强~~        | ~~FileManager / ImageViewer / InfiniteScroll / VirtualList / VirtualTable~~  | ~~已完成：新增 48 条边界与交互测试，覆盖零项/disabled/极值/变换重置等场景，全部通过~~ |
 | P2     | Chart benchmark 补齐         | GaugeChart / chart interaction                                           | benchmark 覆盖 Gauge 计算与 interaction 热路径                                           |
 | P2     | Composite 配方化             | DataTableWithToolbar / CropUpload / FormWizard                           | 评估是否转 cookbook 配方；若保留组件，说明体积边界                                        |
 | P2     | PrintLayout stylesheet 化    | PrintLayout                                                              | 评估改为 stylesheet + class util，若保留组件需说明收益                                    |

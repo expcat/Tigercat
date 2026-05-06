@@ -258,4 +258,94 @@ describe('VirtualTable (React)', () => {
       expect(th.style.left).toBe('0px')
     })
   })
+
+  describe('Edge cases', () => {
+    it('renders with empty data and columns', () => {
+      const { getByRole, getByText } = render(
+        <VirtualTable data={[]} columns={[]} />
+      )
+      expect(getByRole('grid')).toBeTruthy()
+      expect(getByText('No data')).toBeTruthy()
+    })
+
+    it('renders with single column', () => {
+      const singleCol = [{ key: 'id', title: 'ID' }]
+      const { getAllByRole } = render(
+        <VirtualTable data={makeData(3)} columns={singleCol} />
+      )
+      expect(getAllByRole('columnheader').length).toBe(1)
+    })
+
+    it('renders striped rows correctly', () => {
+      const { getAllByRole } = render(
+        <VirtualTable data={makeData(5)} columns={columns} striped rowHeight={40} height={400} />
+      )
+      const rows = getAllByRole('row')
+      const dataRows = rows.filter(
+        (r) =>
+          !r.querySelector('th') &&
+          r.getAttribute('aria-hidden') !== 'true' &&
+          r.getAttribute('aria-hidden') !== ''
+      )
+      if (dataRows.length > 1) {
+        expect(dataRows[1].className).toContain('bg-')
+      }
+    })
+
+    it('renders selected row with highlight', () => {
+      const { getAllByRole } = render(
+        <VirtualTable
+          data={makeData(3)}
+          columns={columns}
+          rowHeight={40}
+          height={400}
+          selectedKeys={[0]}
+        />
+      )
+      const rows = getAllByRole('row')
+      const dataRows = rows.filter(
+        (r) =>
+          !r.querySelector('th') &&
+          r.getAttribute('aria-hidden') !== 'true' &&
+          r.getAttribute('aria-hidden') !== ''
+      )
+      if (dataRows.length > 0) {
+        expect(dataRows[0].className).toContain('bg-')
+      }
+    })
+
+    it('handles function rowKey', () => {
+      const data = makeData(3)
+      const { getByText } = render(
+        <VirtualTable
+          data={data}
+          columns={columns}
+          rowKey={(row: Record<string, unknown>) => `key-${row.id}`}
+        />
+      )
+      expect(getByText('Row 1')).toBeTruthy()
+    })
+
+    it('renders with loading and empty data simultaneously', () => {
+      const { getByText, queryByText } = render(
+        <VirtualTable data={[]} columns={columns} loading />
+      )
+      expect(getByText('Loading...')).toBeTruthy()
+      expect(queryByText('No data')).toBeNull()
+    })
+
+    it('handles large overscan value', () => {
+      const { getAllByRole } = render(
+        <VirtualTable data={makeData(10)} columns={columns} rowHeight={40} height={200} overscan={100} />
+      )
+      const rows = getAllByRole('row')
+      const dataRows = rows.filter(
+        (r) =>
+          !r.querySelector('th') &&
+          r.getAttribute('aria-hidden') !== 'true' &&
+          r.getAttribute('aria-hidden') !== ''
+      )
+      expect(dataRows.length).toBe(10)
+    })
+  })
 })
