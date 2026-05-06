@@ -29,6 +29,8 @@ const customSnippet = `<Tour
   showIndicators
   onClose={() => setOpen(false)} />`
 
+const basicScriptSnippet = `const [open, setOpen] = useState(false)`
+
 const TourDemo: React.FC = () => {
   const [open, setOpen] = useState(false)
   const [open2, setOpen2] = useState(false)
@@ -38,7 +40,7 @@ const TourDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Tour 漫游式引导</h1>
       <p className="text-gray-500 mb-8">分步引导用户了解页面功能。</p>
 
-      <DemoBlock title="基础用法" description="点击按钮开始引导" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="点击按钮开始引导" code={basicSnippet} script={basicScriptSnippet}>
         <div className="flex gap-4 items-center">
           <button id="tour-r-btn-1" className="px-4 py-2 bg-blue-500 text-white rounded" onClick={() => setOpen(true)}>
             开始引导

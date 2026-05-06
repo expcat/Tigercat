@@ -44,6 +44,14 @@ const basicSnippet = `<DataTableWithToolbar
   onSelectionChange={setSelectedRowKeys}
 />`
 
+const basicScriptSnippet = `const [keyword, setKeyword] = useState('')
+const [filters, setFilters] = useState<Record<string, TableToolbarFilterValue>>({
+  status: null,
+  role: null
+})
+const [pagination, setPagination] = useState({ current: 1, pageSize: 6 })
+const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([])`
+
 const columns: TableColumn<UserRow>[] = [
   { key: 'name', title: '姓名', width: '25%' },
   { key: 'email', title: '邮箱', width: '35%' },
@@ -127,7 +135,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
         <p className="text-gray-600">搜索、筛选、批量操作与分页联动的组合组件。</p>
       </div>
 
-      <DemoBlock title="基础用法" description="搜索/筛选/批量操作 + 分页联动" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="搜索/筛选/批量操作 + 分页联动" code={basicSnippet} script={basicScriptSnippet}>
         <DataTableWithToolbar<UserRow>
           columns={columns}
           dataSource={pagedData}

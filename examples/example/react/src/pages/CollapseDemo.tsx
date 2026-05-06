@@ -55,6 +55,8 @@ const hideArrowSnippet = `<Collapse>
   </CollapsePanel>
 </Collapse>`
 
+const basicScriptSnippet = `const [activeKey1, setActiveKey1] = useState<string[]>(['1'])`
+
 export default function CollapseDemo() {
   const [activeKey1, setActiveKey1] = useState<string[]>(['1'])
   const [activeKey2, setActiveKey2] = useState<string | undefined>('1')
@@ -97,7 +99,7 @@ export default function CollapseDemo() {
         <p className="text-gray-600">可以折叠/展开的内容区域，用于将复杂的区域折叠起来。</p>
       </div>
 
-      <DemoBlock title="基本用法" description="可以同时展开多个面板。" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="可以同时展开多个面板。" code={basicSnippet} script={basicScriptSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Collapse
             activeKey={activeKey1}

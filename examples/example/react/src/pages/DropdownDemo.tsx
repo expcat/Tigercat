@@ -190,6 +190,8 @@ const defaultVisibleSnippet = `<Dropdown defaultOpen trigger="click">
   </DropdownMenu>
 </Dropdown>`
 
+const controlledScriptSnippet = `const [visible1, setVisible1] = useState(false)`
+
 export default function DropdownDemo() {
   const [visible1, setVisible1] = useState(false)
 
@@ -361,7 +363,8 @@ export default function DropdownDemo() {
       <DemoBlock
         title="受控模式"
         description="通过 open 和 onOpenChange 控制下拉菜单的显示隐藏。"
-        code={controlledSnippet}>
+        code={controlledSnippet}
+        script={controlledScriptSnippet}>
         <div className="flex gap-4 items-center">
           <Dropdown open={visible1} onOpenChange={setVisible1}>
             <Button>受控下拉菜单</Button>

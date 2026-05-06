@@ -6,6 +6,10 @@ import DemoBlock from '../components/DemoBlock.vue'
 const basicSnippet = `<Button>打开对话框</Button>
 <Modal v-model:open="visible1" title="基本对话框">...</Modal>`
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const visible1 = ref(false)`
+
 const sizeSnippet = `<Button>小尺寸</Button>
 <Modal size="sm">...</Modal>
 <Modal size="md">...</Modal>
@@ -134,7 +138,8 @@ const handleFormSubmit = async () => {
 
     <DemoBlock title="基本用法"
                description="最简单的用法，点击按钮打开对话框。"
-               :code="basicSnippet">
+               :code="basicSnippet"
+               :script="basicScriptSnippet">
       <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
         <Button @click="visible1 = true">打开对话框</Button>
         <Modal v-model:open="visible1"

@@ -122,6 +122,8 @@ const singleOpenSnippet = `<Menu
   </SubMenu>
 </Menu>`
 
+const basicScriptSnippet = `const [selectedKeys1, setSelectedKeys1] = useState<(string | number)[]>(['1'])`
+
 const MenuDemo: React.FC = () => {
   const [selectedKeys1, setSelectedKeys1] = useState<(string | number)[]>(['1'])
   const [selectedKeys2, setSelectedKeys2] = useState<(string | number)[]>(['home'])
@@ -151,7 +153,7 @@ const MenuDemo: React.FC = () => {
       </div>
 
       {/* 基本用法 */}
-      <DemoBlock title="基本用法" description="垂直菜单，默认模式。" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="垂直菜单，默认模式。" code={basicSnippet} script={basicScriptSnippet}>
         <div className="bg-gray-50 p-6 rounded-lg">
           <div className="bg-white inline-block">
             <Menu selectedKeys={selectedKeys1} onSelect={(key) => setSelectedKeys1([key])}>

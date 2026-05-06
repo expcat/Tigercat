@@ -12,6 +12,10 @@ const sizeSm = ref(false)
 const sizeMd = ref(true)
 const sizeLg = ref(false)
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const basicEnabled = ref(true)`
+
 const basicSnippet = `<Space direction="vertical">
   <div class="flex items-center gap-3">
     <Switch v-model:checked="basicEnabled" />
@@ -41,7 +45,8 @@ const sizeSnippet = `<Space align="center">
     <!-- 基础用法 -->
     <DemoBlock title="基础用法"
                description="绑定 v-model 到一个 Boolean 类型的变量。"
-               :code="basicSnippet">
+               :code="basicSnippet"
+               :script="basicScriptSnippet">
       <Space direction="vertical">
         <div class="flex items-center gap-3">
           <Switch v-model:checked="basicEnabled" />

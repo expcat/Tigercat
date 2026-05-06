@@ -15,6 +15,8 @@ const customContentSnippet = `<BackTop>
 const customDurationSnippet = `<BackTop duration={800} />
 {/* 滚动动画持续 800ms */}`
 
+const customTargetScriptSnippet = `const scrollRef = useRef<HTMLDivElement>(null)`
+
 const customTargetSnippet = `const scrollRef = useRef<HTMLDivElement>(null)
 
 <div ref={scrollRef} className="h-64 overflow-auto">
@@ -102,7 +104,8 @@ export default function BackTopDemo() {
       <DemoBlock
         title="自定义滚动容器"
         description="指定 target 监听自定义容器的滚动。"
-        code={customTargetSnippet}>
+        code={customTargetSnippet}
+        script={customTargetScriptSnippet}>
         <div
           ref={innerContainerRef}
           className="h-64 overflow-auto rounded-lg border border-gray-200 relative">

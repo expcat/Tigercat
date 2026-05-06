@@ -92,6 +92,20 @@ const zeroSnippet = `<Space>
   </div>
 </Space>`
 
+const usageScriptSnippet = `import { useState } from 'react'
+
+const [notificationCount, setNotificationCount] = useState(5)
+const [messageCount] = useState(99)
+const [cartItems] = useState(3)
+
+const incrementNotifications = () => {
+  setNotificationCount(prev => prev + 1)
+}
+
+const clearNotifications = () => {
+  setNotificationCount(0)
+}`
+
 const usageSnippet = `<div>
   <div className="mb-6">
     <h3 className="text-lg font-semibold mb-3">通知中心</h3>
@@ -322,7 +336,7 @@ export default function BadgeDemo() {
       </DemoBlock>
 
       {/* 实际应用示例 */}
-      <DemoBlock title="实际应用示例" description="模拟真实的使用场景。" code={usageSnippet}>
+      <DemoBlock title="实际应用示例" description="模拟真实的使用场景。" code={usageSnippet} script={usageScriptSnippet}>
         <div>
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3">通知中心</h3>

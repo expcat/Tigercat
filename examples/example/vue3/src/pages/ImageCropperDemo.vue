@@ -29,6 +29,18 @@ const basicSnippet = `<ImageCropper
 <button @click="handleCrop">裁剪</button>
 <img v-if="resultUrl" :src="resultUrl" />`
 
+const basicScriptSnippet = `import { ref } from 'vue'
+import type { CropRect, CropResult } from '@expcat/tigercat-core'
+
+const cropperRef = ref()
+const resultUrl = ref('')
+const cropRect = ref<CropRect | null>(null)
+
+const handleCrop = async () => {
+  const result: CropResult = await cropperRef.value.getCropResult()
+  resultUrl.value = result.dataUrl
+}`
+
 const aspectRatioSnippet = `<!-- 1:1 正方形裁剪 -->
 <ImageCropper
   ref="cropperSquareRef"
@@ -50,7 +62,7 @@ const jpegSnippet = `<!-- 输出 JPEG 格式，质量 0.8 -->
       交互式图片裁剪组件，支持自由裁剪、固定宽高比、辅助线、Canvas 输出。
     </p>
 
-    <DemoBlock title="基本用法" description="自由裁剪，拖拽和缩放裁剪区域" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="自由裁剪，拖拽和缩放裁剪区域" :code="basicSnippet" :script="basicScriptSnippet">
       <div class="space-y-4">
         <ImageCropper
           ref="cropperRef"

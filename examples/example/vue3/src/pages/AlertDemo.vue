@@ -23,6 +23,12 @@ const iconSnippet = `<Alert type="success" title="带图标的成功提示" show
 const closableSnippet = `<Alert closable title="可关闭的提示" />
 <Alert closable close-aria-label="关闭" title="自定义关闭标签" />`
 
+const closableScriptSnippet = `import { ref } from 'vue'
+
+const showAlert1 = ref(true)
+const showAlert2 = ref(true)
+const showAlert3 = ref(true)`
+
 const descriptionSnippet = `<Alert type="success" title="操作成功" description="您的订单已成功提交..." />`
 
 const customSnippet = `<Alert>
@@ -125,7 +131,8 @@ const customContentItems = [
 
     <DemoBlock title="可关闭"
                description="通过设置 closable 属性可以让 Alert 显示关闭按钮。"
-               :code="closableSnippet">
+               :code="closableSnippet"
+               :script="closableScriptSnippet">
       <div
            class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm space-y-4 dark:border-gray-800 dark:bg-gray-900/40">
         <Alert v-if="showAlert1"

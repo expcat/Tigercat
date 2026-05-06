@@ -40,6 +40,8 @@ const inkSnippet = `<Anchor showInkInFixed offsetTop={80}>
   <AnchorLink href="#part1" title="Part 1" />
 </Anchor>`
 
+const eventsScriptSnippet = `const [lastEvent, setLastEvent] = useState('')`
+
 const eventsSnippet = `<Anchor
   onClick={(e, href) => console.log('Clicked:', href)}
   onChange={(activeLink) => console.log('Active:', activeLink)}
@@ -218,7 +220,8 @@ export default function AnchorDemo() {
             <DemoBlock
               title="事件处理"
               description="监听 onClick 和 onChange 事件，可配合 targetOffset 使用。"
-              code={eventsSnippet}>
+              code={eventsSnippet}
+              script={eventsScriptSnippet}>
               <div className="p-6 bg-gray-50 rounded-lg">
                 <div className="flex gap-8 items-start">
                   <div className="flex-1">

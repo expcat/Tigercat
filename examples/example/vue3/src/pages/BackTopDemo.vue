@@ -6,6 +6,14 @@ import DemoBlock from '../components/DemoBlock.vue'
 const basicSnippet = `<BackTop />
 <!-- 滚动页面超过 400px 后显示 -->`
 
+const basicScriptSnippet = `import { ref, onMounted } from 'vue'
+
+const pageScrollContainer = ref<HTMLElement | null>(null)
+
+onMounted(() => {
+  pageScrollContainer.value = document.querySelector('main > div.overflow-y-auto') as HTMLElement
+})`
+
 const customHeightSnippet = `<BackTop :visibility-height="200" />
 <!-- 滚动 200px 后即显示 -->`
 
@@ -44,7 +52,8 @@ const handleClick = () => {
 
     <DemoBlock title="基本用法"
                description="滚动页面，右下角会出现回到顶部按钮。"
-               :code="basicSnippet">
+               :code="basicSnippet"
+               :script="basicScriptSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <p class="text-gray-600 mb-4">向下滚动页面超过 400px 后，右下角会出现回到顶部按钮。</p>
         <p class="text-sm text-gray-500">

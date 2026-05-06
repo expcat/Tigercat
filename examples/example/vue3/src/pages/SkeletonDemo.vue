@@ -138,6 +138,10 @@ const loadingSnippet = `<div class="bg-white p-6 rounded-lg">
       这是加载完成后显示的内容。骨架屏在内容加载时显示，
       提供更好的用户体验，避免页面空白或突然跳动。
     </p>
+
+const loadingScriptSnippet = `import { ref } from 'vue'
+
+const loading = ref(true)`
   </div>
 </div>`
 
@@ -354,7 +358,8 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <!-- 加载状态控制 -->
     <DemoBlock title="加载状态控制"
                description="结合加载状态使用骨架屏（3秒后显示内容）。"
-               :code="loadingSnippet">
+               :code="loadingSnippet"
+               :script="loadingScriptSnippet">
       <div class="bg-white p-6 rounded-lg">
         <div v-if="loading">
           <Skeleton variant="text"

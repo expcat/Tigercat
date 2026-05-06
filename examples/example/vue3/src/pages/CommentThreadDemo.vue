@@ -182,6 +182,11 @@ const basicSnippet = `<CommentThread
   @like="handleLike"
 />`
 
+const basicScriptSnippet = `import { ref } from 'vue'
+import type { CommentNode } from '@expcat/tigercat-core'
+
+const comments = ref<CommentNode[]>([...])`
+
 const flatSnippet = `<CommentThread :items="flatItems" :default-expanded-keys="[100]" />`
 
 const emptySnippet = `<CommentThread :items="[]" empty-text="暂无评论" />`
@@ -205,7 +210,8 @@ const minimalSnippet = `<CommentThread
 
     <DemoBlock title="嵌套回复"
                description="支持多层嵌套、展开/收起、加载更多和实时回复。点击回复按钮试试。"
-               :code="basicSnippet">
+               :code="basicSnippet"
+               :script="basicScriptSnippet">
       <CommentThread
         :nodes="comments"
         :default-expanded-keys="[1]"

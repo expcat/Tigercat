@@ -3,7 +3,7 @@
     <h1 class="text-3xl font-bold mb-2">Kanban 看板</h1>
     <p class="text-gray-500 mb-8">可拖拽的看板面板，支持卡片和列拖拽排序。</p>
 
-    <DemoBlock title="基础用法" description="columns 定义列和卡片，支持拖拽" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="columns 定义列和卡片，支持拖拽" :code="basicSnippet" :script="basicScriptSnippet">
       <Kanban v-model:columns="columns" allow-add-card :style="{ height: '400px' }" />
     </DemoBlock>
 
@@ -77,6 +77,14 @@ const basicSnippet = `const columns = ref([
 ])
 
 <Kanban v-model:columns="columns" allow-add-card />`
+
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const columns = ref([
+  { id: 'todo', title: '待办', cards: [...] },
+  { id: 'doing', title: '进行中', cards: [...] },
+  { id: 'done', title: '已完成', cards: [...] }
+])`
 
 const wipSnippet = `<Kanban :default-columns="columns" :draggable="false" enforce-wip-limit :show-card-count="true" />`
 </script>

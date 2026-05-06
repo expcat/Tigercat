@@ -30,6 +30,10 @@ const sizeSm = ref(30)
 const sizeMd = ref(50)
 const sizeLg = ref(70)
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const basicValue = ref(50)`
+
 const basicSnippet = `<Space direction="vertical" class="w-full max-w-md">
   <div class="flex items-center gap-4 w-full">
     <Slider v-model:value="basicValue" :min="0" :max="100" class="flex-1" />
@@ -138,7 +142,7 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="基础的滑块用法，显示当前值。" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="基础的滑块用法，显示当前值。" :code="basicSnippet" :script="basicScriptSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <div class="flex items-center gap-4 w-full">
           <Slider v-model:value="basicValue" :min="0" :max="100" class="flex-1" />

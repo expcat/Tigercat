@@ -59,6 +59,9 @@ const inputSnippet = `<ChatWindow
   sendOnEnter
 />`
 
+const basicScriptSnippet = `const [messages, setMessages] = useState<ChatMessage[]>(baseMessages)
+const [value, setValue] = useState('')`
+
 export default function ChatWindowDemo() {
   const [messages, setMessages] = useState<ChatMessage[]>(baseMessages)
   const [value, setValue] = useState('')
@@ -116,7 +119,8 @@ export default function ChatWindowDemo() {
       <DemoBlock
         title="基础用法"
         description="默认 textarea 输入，支持 Shift+Enter 换行。"
-        code={basicSnippet}>
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <ChatWindow
           className="h-[480px]"
           messages={messages}

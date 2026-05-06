@@ -9,6 +9,10 @@ const basicSnippet = `<Space direction="vertical">
   </div>
 </Space>`
 
+const basicScriptSnippet = `import { useState } from 'react'
+
+const [basicEnabled, setBasicEnabled] = useState(true)`
+
 const disabledSnippet = `<Space>
   <Switch checked={disabledOn} disabled />
   <Switch checked={disabledOff} disabled />
@@ -38,7 +42,7 @@ const SwitchDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock title="基础用法" description="绑定到一个 Boolean 类型的变量。" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="绑定到一个 Boolean 类型的变量。" code={basicSnippet} script={basicScriptSnippet}>
         <Space direction="vertical">
           <div className="flex items-center gap-3">
             <Switch checked={basicEnabled} onChange={setBasicEnabled} />

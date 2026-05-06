@@ -32,6 +32,14 @@ const closableSnippet = `<Space wrap>
   {tags.length === 0 && <p className="text-gray-500">所有标签已被移除</p>}
 </Space>`
 
+const closableScriptSnippet = `import { useState } from 'react'
+
+const [tags, setTags] = useState(['标签一', '标签二', '标签三'])
+
+const handleClose = (index: number) => {
+  setTags(tags.filter((_, i) => i !== index))
+}`
+
 const closeAriaSnippet = `<Space wrap>
   <Tag variant="info" closable closeAriaLabel="移除标签：JavaScript">JavaScript</Tag>
   <Tag variant="success" closable closeAriaLabel="移除标签：已完成">已完成</Tag>
@@ -142,7 +150,8 @@ const TagDemo: React.FC = () => {
       <DemoBlock
         title="可关闭标签"
         description="设置 closable 属性可以定义一个标签是否可移除。"
-        code={closableSnippet}>
+        code={closableSnippet}
+        script={closableScriptSnippet}>
         <Space wrap>
           {tags.map((tag, index) => (
             <Tag key={tag} variant="primary" closable onClose={() => handleClose(index)}>

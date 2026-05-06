@@ -67,6 +67,16 @@ const groupedOptions = [
   }
 ]
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const basicValue = ref('')
+const options = [
+  { label: '选项 1', value: 'option1' },
+  { label: '选项 2', value: 'option2' },
+  { label: '选项 3', value: 'option3' },
+  { label: '选项 4', value: 'option4' }
+]`
+
 const basicSnippet = `<Space direction="vertical" class="w-full max-w-md">
   <Select v-model="basicValue" :options="options" placeholder="请选择" />
   <p class="text-sm text-gray-600">选中的值：{{ basicValue || '未选择' }}</p>
@@ -154,7 +164,7 @@ const emptySnippet = `<Space direction="vertical" class="w-full max-w-md">
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="适用广泛的基础选择器。" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="适用广泛的基础选择器。" :code="basicSnippet" :script="basicScriptSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Select v-model="basicValue" :options="options" placeholder="请选择" />
         <p class="text-sm text-gray-600">选中的值：{{ basicValue || '未选择' }}</p>

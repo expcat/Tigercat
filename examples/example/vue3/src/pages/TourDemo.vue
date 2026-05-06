@@ -3,7 +3,7 @@
     <h1 class="text-3xl font-bold mb-2">Tour 漫游式引导</h1>
     <p class="text-gray-500 mb-8">分步引导用户了解页面功能。</p>
 
-    <DemoBlock title="基础用法" description="点击按钮开始引导" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="点击按钮开始引导" :code="basicSnippet" :script="basicScriptSnippet">
       <div class="flex gap-4 items-center">
         <button id="tour-btn-1" class="px-4 py-2 bg-blue-500 text-white rounded" @click="open = true">
           开始引导
@@ -56,6 +56,10 @@ const steps = [
   { target: '#btn-1', title: '步骤一', description: '说明文字' },
   { target: '#btn-2', title: '步骤二', description: '说明文字' }
 ]`
+
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const open = ref(false)`
 
 const customSnippet = `<Tour
   v-model:open="open"

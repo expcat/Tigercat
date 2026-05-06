@@ -115,6 +115,8 @@ const gradientSnippet = `<AreaChart
   animated
 />`
 
+const basicScriptSnippet = `const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)`
+
 const AreaChartDemo: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
@@ -174,7 +176,8 @@ const AreaChartDemo: React.FC = () => {
       <DemoBlock
         title="交互功能"
         description="悬停高亮、点击选择、曲线平滑。"
-        code={interactiveSnippet}>
+        code={interactiveSnippet}
+        script={basicScriptSnippet}>
         <div className="space-y-4">
           <AreaChart
             series={multiSeries}

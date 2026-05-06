@@ -6,9 +6,31 @@ import DemoBlock from '../components/DemoBlock'
 
 const PHOTO = 'https://picsum.photos/seed/cropper/800/600'
 
-const basicSnippet = `const cropperRef = useRef<ImageCropperRef>(null)
+const basicScriptSnippet = `import { useRef, useState } from 'react'
+import type { ImageCropperRef } from '@expcat/tigercat-react'
+import type { CropRect, CropResult } from '@expcat/tigercat-core'
 
-<ImageCropper
+const cropperRef = useRef<ImageCropperRef>(null)
+const [resultUrl, setResultUrl] = useState('')
+const [cropRect, setCropRect] = useState<CropRect | null>(null)
+
+const handleCrop = async () => {
+  const result = await cropperRef.current?.getCropResult()
+  if (result) setResultUrl(result.dataUrl)
+}`
+
+const aspectRatioScriptSnippet = `import { useRef, useState } from 'react'
+import type { ImageCropperRef } from '@expcat/tigercat-react'
+
+const squareRef = useRef<ImageCropperRef>(null)
+const [squareResultUrl, setSquareResultUrl] = useState('')
+
+const handleSquareCrop = async () => {
+  const result = await squareRef.current?.getCropResult()
+  if (result) setSquareResultUrl(result.dataUrl)
+}`
+
+const basicSnippet = `<ImageCropper
   ref={cropperRef}
   src={photo}
   onCropChange={(rect) => setCropRect(rect)} />
@@ -55,7 +77,7 @@ export default function ImageCropperDemo() {
         交互式图片裁剪组件，支持自由裁剪、固定宽高比、辅助线、Canvas 输出。
       </p>
 
-      <DemoBlock title="基本用法" description="自由裁剪，拖拽和缩放裁剪区域" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="自由裁剪，拖拽和缩放裁剪区域" code={basicSnippet} script={basicScriptSnippet}>
         <div className="space-y-4">
           <ImageCropper ref={cropperRef} src={PHOTO} onCropChange={(rect) => setCropRect(rect)} />
           <div className="flex items-center gap-4">
@@ -87,7 +109,8 @@ export default function ImageCropperDemo() {
       <DemoBlock
         title="固定宽高比"
         description="设置 aspectRatio 为 1 实现正方形裁剪"
-        code={aspectRatioSnippet}>
+        code={aspectRatioSnippet}
+        script={aspectRatioScriptSnippet}>
         <div className="space-y-4">
           <ImageCropper ref={squareRef} src={PHOTO} aspectRatio={1} />
           <button

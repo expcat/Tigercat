@@ -82,6 +82,9 @@ const customSnippet = `<DonutChart
   centerLabel="总量"
 />`
 
+const basicScriptSnippet = `const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+const [selectedIndex, setSelectedIndex] = useState<number | null>(null)`
+
 const DonutChartDemo: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -113,7 +116,8 @@ const DonutChartDemo: React.FC = () => {
       <DemoBlock
         title="悬停高亮"
         description="启用 hoverable，悬停时扇区外移并放大，配合中心显示实时数据。"
-        code={hoverableSnippet}>
+        code={hoverableSnippet}
+        script={basicScriptSnippet}>
         <div className="space-y-4">
           <DonutChart
             data={interactiveData}

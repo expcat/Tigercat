@@ -125,6 +125,10 @@ const constraintSnippet = `<BarChart
   showValueLabels
 />`
 
+const basicScriptSnippet = `const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
+const [clickedBar, setClickedBar] = useState('')`
+
 const BarChartDemo: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -214,7 +218,8 @@ const BarChartDemo: React.FC = () => {
       <DemoBlock
         title="悬停高亮"
         description="启用 hoverable 后，鼠标悬停时高亮柱子，其余淡出。"
-        code={hoverableSnippet}>
+        code={hoverableSnippet}
+        script={basicScriptSnippet}>
         <div className="space-y-4">
           <BarChart
             data={interactiveData}

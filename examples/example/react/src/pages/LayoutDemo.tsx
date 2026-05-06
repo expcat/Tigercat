@@ -48,6 +48,8 @@ const miniSnippet = `<Layout>
   </div>
 </Layout>`
 
+const collapsedScriptSnippet = `const [collapsed, setCollapsed] = useState(false)`
+
 const complexSnippet = `<Layout>
   <Header>Header</Header>
   <div className="flex flex-1">
@@ -131,7 +133,8 @@ const LayoutDemo: React.FC = () => {
       <DemoBlock
         title="Sidebar 折叠"
         description="可折叠的侧边栏，通过 collapsedWidth 设置折叠后的宽度（默认 64px）。"
-        code={collapsedSnippet}>
+        code={collapsedSnippet}
+        script={collapsedScriptSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <button
             className="mb-4 px-3 py-1 rounded bg-blue-500 text-white text-sm"

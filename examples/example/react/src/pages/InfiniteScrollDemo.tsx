@@ -12,6 +12,10 @@ const customSnippet = `<InfiniteScroll hasMore={false} loadingText="拼命加载
   {items.map(i => <div key={i}>项目 {i}</div>)}
 </InfiniteScroll>`
 
+const basicScriptSnippet = `const [items, setItems] = useState(() => Array.from({ length: 20 }, (_, i) => i + 1))
+const [loading, setLoading] = useState(false)
+const [hasMore, setHasMore] = useState(true)`
+
 const InfiniteScrollDemo: React.FC = () => {
   const [items, setItems] = useState(() => Array.from({ length: 20 }, (_, i) => i + 1))
   const [loading, setLoading] = useState(false)
@@ -35,7 +39,7 @@ const InfiniteScrollDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">InfiniteScroll 无限滚动</h1>
       <p className="text-gray-500 mb-8">滚动到底部自动加载更多内容。</p>
 
-      <DemoBlock title="基础用法" description="滚动到底部触发 onLoadMore" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="滚动到底部触发 onLoadMore" code={basicSnippet} script={basicScriptSnippet}>
         <InfiniteScroll hasMore={hasMore} loading={loading} onLoadMore={loadMore}
           className="h-[300px] border border-gray-200 rounded-lg">
           {items.map((i) => (

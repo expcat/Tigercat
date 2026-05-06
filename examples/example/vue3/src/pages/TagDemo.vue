@@ -42,6 +42,14 @@ const closableSnippet = `<Space wrap>
   <p v-if="tags.length === 0" class="text-gray-500">所有标签已被移除</p>
 </Space>`
 
+const closableScriptSnippet = `import { ref } from 'vue'
+
+const tags = ref(['标签一', '标签二', '标签三'])
+
+const handleClose = (index: number) => {
+  tags.value.splice(index, 1)
+}`
+
 const closeAriaSnippet = `<Space wrap>
   <Tag variant="info" closable closeAriaLabel="移除标签：JavaScript">JavaScript</Tag>
   <Tag variant="success" closable closeAriaLabel="移除标签：已完成">已完成</Tag>
@@ -145,7 +153,8 @@ const usageSnippet = `<Space direction="vertical" class="w-full">
     <!-- 可关闭标签 -->
     <DemoBlock title="可关闭标签"
                description="设置 closable 属性可以定义一个标签是否可移除。"
-               :code="closableSnippet">
+               :code="closableSnippet"
+               :script="closableScriptSnippet">
       <Space wrap>
         <Tag v-for="(tag, index) in tags"
              :key="tag"

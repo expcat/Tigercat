@@ -21,6 +21,10 @@ const options = [
   }
 ]
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const val = ref([])`
+
 const basicSnippet = `<Cascader v-model="val" :options="options" placeholder="请选择地区" />`
 
 const searchSnippet = `<Cascader v-model="val" :options="options" placeholder="搜索地区" show-search />`
@@ -38,7 +42,7 @@ const sizeSnippet = `<Space direction="vertical" :size="12">
     <h1 class="text-3xl font-bold mb-2">Cascader 级联选择</h1>
     <p class="text-gray-500 mb-8">多级联动选择器，适用于省市区等层级数据。</p>
 
-    <DemoBlock title="基本用法" description="逐级选择，v-model 绑定选中路径" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="逐级选择，v-model 绑定选中路径" :code="basicSnippet" :script="basicScriptSnippet">
       <Cascader v-model="val" :options="options" placeholder="请选择地区" />
     </DemoBlock>
 

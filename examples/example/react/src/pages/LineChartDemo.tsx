@@ -96,6 +96,8 @@ const interactiveSnippet = `<LineChart
   onHoveredIndexChange={setHoveredIndex}
 />`
 
+const basicScriptSnippet = `const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)`
+
 const LineChartDemo: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
@@ -167,7 +169,8 @@ const LineChartDemo: React.FC = () => {
       <DemoBlock
         title="交互功能"
         description="悬停高亮、点击选择、图例联动。"
-        code={interactiveSnippet}>
+        code={interactiveSnippet}
+        script={basicScriptSnippet}>
         <div className="space-y-4">
           <LineChart
             series={multiSeries}

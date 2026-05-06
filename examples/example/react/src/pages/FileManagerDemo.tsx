@@ -29,6 +29,8 @@ const multiSnippet = `<FileManager
   files={files} viewMode="list" multiple searchable
   currentPath={path} onNavigate={setPath} />`
 
+const basicScriptSnippet = `const [currentPath, setCurrentPath] = useState<string[]>([])`
+
 const FileManagerDemo: React.FC = () => {
   const [currentPath, setCurrentPath] = useState<string[]>([])
 
@@ -53,7 +55,7 @@ const FileManagerDemo: React.FC = () => {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="多选 & 面包屑导航" description="multiple 多选" code={multiSnippet}>
+      <DemoBlock title="多选 & 面包屑导航" description="multiple 多选" code={multiSnippet} script={basicScriptSnippet}>
         <div style={{ height: 350, border: '1px solid #e5e7eb', borderRadius: 8 }}>
           <FileManager
             files={nestedFiles}

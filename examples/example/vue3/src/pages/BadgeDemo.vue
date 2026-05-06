@@ -168,6 +168,20 @@ const usageSnippet = `<div>
     </div>
   </div>
 </div>`
+
+const usageScriptSnippet = `import { ref } from 'vue'
+
+const notificationCount = ref(5)
+const messageCount = ref(99)
+const cartItems = ref(3)
+
+const incrementNotifications = () => {
+  notificationCount.value++
+}
+
+const clearNotifications = () => {
+  notificationCount.value = 0
+}`
 </script>
 
 <template>
@@ -354,7 +368,8 @@ const usageSnippet = `<div>
     <!-- 实际应用示例 -->
     <DemoBlock title="实际应用示例"
                description="模拟真实的使用场景。"
-               :code="usageSnippet">
+               :code="usageSnippet"
+               :script="usageScriptSnippet">
       <div>
         <div class="mb-6">
           <h3 class="text-lg font-semibold mb-3">通知中心</h3>

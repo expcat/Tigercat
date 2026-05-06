@@ -39,6 +39,10 @@ const basicSnippet = `<Steps :current="current1">
   <Button @click="next(0)" :disabled="current1 === 2" variant="primary">下一步</Button>
 </div>`
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const current1 = ref(1)`
+
 const miniSnippet = `<Steps :current="current2" simple>
   <StepsItem title="已完成" />
   <StepsItem title="进行中" />
@@ -142,7 +146,8 @@ const customStatusSnippet = `<Steps :current="2">
     <!-- 基本用法 -->
     <DemoBlock title="基本用法"
                description="简单的步骤条，展示流程进度。"
-               :code="basicSnippet">
+               :code="basicSnippet"
+               :script="basicScriptSnippet">
       <Steps :current="current1">
         <StepsItem title="已完成"
                    description="这是步骤的描述信息" />

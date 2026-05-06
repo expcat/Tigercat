@@ -97,6 +97,8 @@ const slotSnippet = `<TaskBoard
   )}
 />`
 
+const basicScriptSnippet = `const [columns, setColumns] = useState<TaskBoardColumn[]>(initialColumns)`
+
 const TaskBoardDemo: React.FC = () => {
   const [columns, setColumns] = useState<TaskBoardColumn[]>(initialColumns)
   const [slotColumns, setSlotColumns] = useState<TaskBoardColumn[]>(initialSlotColumns)
@@ -132,7 +134,8 @@ const TaskBoardDemo: React.FC = () => {
       <DemoBlock
         title="基础用法"
         description="受控模式 + 卡片拖拽 + 列拖拽 + 新增卡片"
-        code={basicSnippet}>
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <TaskBoard
           columns={columns}
           onColumnsChange={setColumns}

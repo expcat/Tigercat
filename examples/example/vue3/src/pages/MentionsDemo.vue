@@ -12,6 +12,10 @@ const users = [
   { label: '赵六', value: 'zhaoliu' }
 ]
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const val = ref('')`
+
 const basicSnippet = `<Mentions v-model="val" :options="users" placeholder="输入 @ 提及用户" />`
 const customSnippet = `<Mentions v-model="val" :options="users" prefix="#" placeholder="输入 # 提及话题" />`
 const stateSnippet = `<Mentions :options="users" size="sm" placeholder="小尺寸" />
@@ -24,7 +28,7 @@ const stateSnippet = `<Mentions :options="users" size="sm" placeholder="小尺�
     <h1 class="text-3xl font-bold mb-2">Mentions 提及</h1>
     <p class="text-gray-500 mb-8">输入框中 @提及 用户，支持自定义触发字符。</p>
 
-    <DemoBlock title="基本用法" description="输入 @ 触发用户列表" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="输入 @ 触发用户列表" :code="basicSnippet" :script="basicScriptSnippet">
       <Mentions v-model="val" :options="users" placeholder="输入 @ 提及用户" />
     </DemoBlock>
 

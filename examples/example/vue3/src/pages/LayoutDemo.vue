@@ -40,6 +40,10 @@ const collapsedSnippet = `<Layout>
   <Footer>Footer</Footer>
 </Layout>`
 
+const collapsedScriptSnippet = `import { ref } from 'vue'
+
+const collapsed = ref(false)`
+
 const miniSnippet = `<Layout>
   <Header>Header</Header>
   <div class="flex flex-1">
@@ -128,7 +132,8 @@ const complexSnippet = `<Layout>
 
     <DemoBlock title="Sidebar 折叠"
                description="可折叠的侧边栏，通过 collapsed-width 设置折叠后的宽度（默认 64px）。"
-               :code="collapsedSnippet">
+               :code="collapsedSnippet"
+               :script="collapsedScriptSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <button class="mb-4 px-3 py-1 rounded bg-blue-500 text-white text-sm"
                 @click="collapsed = !collapsed">

@@ -24,6 +24,8 @@ const iconSnippet = `<TabPane tabKey="1" label="首页" icon={<span>🏠</span>}
 
 const destroySnippet = `<Tabs destroyInactiveTabPane>...</Tabs>`
 
+const basicScriptSnippet = `const [activeKey1, setActiveKey1] = useState('1')`
+
 export default function TabsDemo() {
   const [activeKey1, setActiveKey1] = useState('1')
   const [activeKey2, setActiveKey2] = useState('1')
@@ -82,7 +84,7 @@ export default function TabsDemo() {
         <p className="text-gray-600">用于内容的分类与切换。</p>
       </div>
 
-      <DemoBlock title="基本用法" description="基础的、简洁的标签页。" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="基础的、简洁的标签页。" code={basicSnippet} script={basicScriptSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Tabs activeKey={activeKey1} onChange={(key) => setActiveKey1(String(key))}>
             <TabPane tabKey="1" label="标签页 1">

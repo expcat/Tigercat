@@ -27,6 +27,10 @@ const customLabels = computed(() => {
   }
 })
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const date = ref(null)`
+
 const basicSnippet = `<Space direction="vertical" class="w-full max-w-md">
   <DatePicker
     v-model="date"
@@ -173,7 +177,8 @@ const clearableSnippet = `<Space direction="vertical" class="w-full max-w-md">
     <!-- 基础用法 -->
     <DemoBlock title="基础用法"
                description="基础的日期选择器组件。"
-               :code="basicSnippet">
+               :code="basicSnippet"
+               :script="basicScriptSnippet">
       <Space direction="vertical"
              class="w-full max-w-md">
         <DatePicker v-model="date"

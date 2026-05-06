@@ -3,7 +3,7 @@
     <h1 class="text-3xl font-bold mb-2">RichTextEditor 富文本编辑器</h1>
     <p class="text-gray-500 mb-8">所见即所得的富文本编辑器，带工具栏。</p>
 
-    <DemoBlock title="基础用法" description="v-model 绑定 HTML 内容" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="v-model 绑定 HTML 内容" :code="basicSnippet" :script="basicScriptSnippet">
       <RichTextEditor v-model:value="content" :height="250" placeholder="在这里编辑..." />
     </DemoBlock>
 
@@ -31,6 +31,10 @@ const content = ref('<p>Hello <strong>Tigercat</strong>!</p>')
 const sampleHtml = '<p>这是一段<em>只读</em>的富文本内容。</p>'
 
 const basicSnippet = `<RichTextEditor v-model:value="content" :height="250" placeholder="在这里编辑..." />`
+
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const content = ref('<p>Hello <strong>Tigercat</strong>!</p>')`
 
 const readOnlySnippet = `<RichTextEditor :value="html" :height="150" read-only />
 <RichTextEditor :value="html" :height="150" disabled />`

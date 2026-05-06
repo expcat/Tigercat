@@ -91,6 +91,10 @@ const controlledSnippet = `<Space :size="16">
   <Button @click="visible1 = !visible1">{{ visible1 ? '隐藏' : '显示' }}</Button>
 </Space>`
 
+const controlledScriptSnippet = `import { ref } from 'vue'
+
+const visible1 = ref(false)`
+
 const disabledSnippet = `<Space :size="16">
   <Tooltip content="正常提示">
     <Button>正常</Button>
@@ -243,7 +247,8 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
     <!-- 受控模式 -->
     <DemoBlock title="受控模式"
                description="可以通过 visible 属性控制气泡提示的显示和隐藏。"
-               :code="controlledSnippet">
+               :code="controlledSnippet"
+               :script="controlledScriptSnippet">
       <Space :size="16">
         <Tooltip v-model:visible="visible1"
                  content="受控的气泡提示">

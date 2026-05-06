@@ -15,6 +15,8 @@ const disabledSnippet = `const isWeekend = (date: Date) => {
 
 <Calendar value={date} onChange={setDate} disabledDate={isWeekend} />`
 
+const basicScriptSnippet = `const [date, setDate] = useState<Date | undefined>(new Date())`
+
 const CalendarDemo: React.FC = () => {
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [date2, setDate2] = useState<Date | undefined>(new Date())
@@ -29,7 +31,7 @@ const CalendarDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Calendar 日历</h1>
       <p className="text-gray-500 mb-8">按月/年展示日期的日历面板，支持日期选择和禁用。</p>
 
-      <DemoBlock title="基础用法" description="默认月视图" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="默认月视图" code={basicSnippet} script={basicScriptSnippet}>
         <Calendar value={date} onChange={setDate} />
         <p className="mt-2 text-sm text-gray-500">选中日期: {date?.toLocaleDateString() ?? '无'}</p>
       </DemoBlock>

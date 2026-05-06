@@ -19,6 +19,10 @@ const handleCheckAllChange = (value: boolean) => {
   fruitsIndeterminate.value = value ? [...options] : []
 }
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const checked = ref(false)`
+
 const basicSnippet = `<Space direction="vertical">
   <Checkbox v-model="checked">复选框</Checkbox>
   <p class="text-sm text-gray-600">选中状态：{{ checked }}</p>
@@ -92,7 +96,7 @@ const groupSizeSnippet = `<Space direction="vertical">
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="单独使用可以表示两种状态之间的切换。" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="单独使用可以表示两种状态之间的切换。" :code="basicSnippet" :script="basicScriptSnippet">
       <Space direction="vertical">
         <Checkbox v-model="checked">复选框</Checkbox>
         <p class="text-sm text-gray-600">选中状态：{{ checked }}</p>

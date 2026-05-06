@@ -46,6 +46,10 @@ const customLabels = computed<Partial<TigerLocalePagination>>(() => {
 
 const basicSnippet = `<Pagination v-model:current="current1" :total="100" :pageSize="10" />`
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const current1 = ref(1)`
+
 const quickSnippet = `<Pagination v-model:current="current2" :total="500" :pageSize="10" showQuickJumper />`
 
 const sizeChangeSnippet = `<Pagination
@@ -129,7 +133,8 @@ const fullSnippet = `<Pagination
     <!-- 基本用法 -->
     <DemoBlock title="基本用法"
                description="最简单的分页组件。"
-               :code="basicSnippet">
+               :code="basicSnippet"
+               :script="basicScriptSnippet">
       <Pagination v-model:current="current1"
                   :total="100"
                   :pageSize="10" />

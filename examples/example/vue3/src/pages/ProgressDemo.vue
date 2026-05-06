@@ -82,6 +82,18 @@ const uploadSnippet = `<Space direction="vertical" class="w-full">
   <Button variant="primary" @click="startUpload">开始上传</Button>
 </Space>`
 
+const uploadScriptSnippet = `import { ref } from 'vue'
+
+const uploadProgress = ref(0)
+
+const startUpload = () => {
+  uploadProgress.value = 0
+  const interval = setInterval(() => {
+    uploadProgress.value += 10
+    if (uploadProgress.value >= 100) clearInterval(interval)
+  }, 500)
+}`
+
 const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
   <div class="text-center">
     <h4 class="mb-4 text-sm font-medium">CPU 使用率</h4>
@@ -275,7 +287,8 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
     <!-- 文件上传示例 -->
     <DemoBlock title="文件上传示例"
                description="模拟文件上传进度。"
-               :code="uploadSnippet">
+               :code="uploadSnippet"
+               :script="uploadScriptSnippet">
       <Space direction="vertical"
              class="w-full">
         <Progress :percentage="uploadProgress" />

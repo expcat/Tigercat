@@ -61,6 +61,8 @@ const basicSnippet = `const [columns, setColumns] = useState([
 
 const wipSnippet = `<Kanban defaultColumns={columns} draggable={false} enforceWipLimit showCardCount />`
 
+const basicScriptSnippet = `const [columns, setColumns] = useState(defaultColumns)`
+
 const KanbanDemo: React.FC = () => {
   const [columns, setColumns] = useState(defaultColumns)
 
@@ -69,7 +71,7 @@ const KanbanDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Kanban 看板</h1>
       <p className="text-gray-500 mb-8">可拖拽的看板面板，支持卡片和列拖拽排序。</p>
 
-      <DemoBlock title="基础用法" description="columns 定义列和卡片" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="columns 定义列和卡片" code={basicSnippet} script={basicScriptSnippet}>
         <Kanban columns={columns} onColumnsChange={setColumns} allowAddCard style={{ height: 400 }} />
       </DemoBlock>
 

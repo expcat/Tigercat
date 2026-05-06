@@ -88,6 +88,8 @@ const dashboardSnippet = `<div className="grid grid-cols-2 md:grid-cols-4 gap-8"
   </div>
 </div>`
 
+const uploadScriptSnippet = `const [uploadProgress, setUploadProgress] = useState(0)`
+
 export default function ProgressDemo() {
   const [uploadProgress, setUploadProgress] = useState(0)
 
@@ -222,7 +224,7 @@ export default function ProgressDemo() {
       </DemoBlock>
 
       {/* 文件上传示例 */}
-      <DemoBlock title="文件上传示例" description="模拟文件上传进度。" code={uploadSnippet}>
+      <DemoBlock title="文件上传示例" description="模拟文件上传进度。" code={uploadSnippet} script={uploadScriptSnippet}>
         <Space direction="vertical" className="w-full">
           <Progress percentage={uploadProgress} />
           <Button variant="primary" onClick={startUpload}>

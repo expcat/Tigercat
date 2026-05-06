@@ -7,6 +7,10 @@ const basicSnippet = `<Space direction="vertical" className="w-full max-w-md">
   <p className="text-sm text-gray-600">选中的值：{basicValue || '未选择'}</p>
 </Space>`
 
+const basicScriptSnippet = `import { useState } from 'react'
+
+const [basicValue, setBasicValue] = useState('')`
+
 const defaultSnippet = `<Space direction="vertical" className="w-full max-w-md">
   <Select value={defaultValue} onChange={(v) => setDefaultValue(v ?? '')} options={countries} />
   <p className="text-sm text-gray-600">选中的国家：{defaultValue}</p>
@@ -151,7 +155,7 @@ const SelectDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock title="基础用法" description="适用广泛的基础选择器。" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="适用广泛的基础选择器。" code={basicSnippet} script={basicScriptSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Select
             value={basicValue}

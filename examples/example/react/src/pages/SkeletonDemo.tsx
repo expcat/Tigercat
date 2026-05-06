@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Skeleton, Space, Card, Avatar } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
+const basicScriptSnippet = `const [loading, setLoading] = useState(true)`
+
 const basicSnippet = `<Skeleton />`
 
 const variantsSnippet = `<div className="space-y-6">
@@ -192,7 +194,8 @@ export default function SkeletonDemo() {
       <DemoBlock
         title="基本用法"
         description="最简单的使用方式，默认为文本占位符。"
-        code={basicSnippet}>
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <Skeleton />
       </DemoBlock>
 

@@ -156,6 +156,9 @@ export default function MessageDemo() {
   </div>
 </div>`
 
+  const basicScriptSnippet = `const manualLoadingCloseFnsRef = useRef<Array<() => void>>([])
+const [manualLoadingCount, setManualLoadingCount] = useState(0)`
+
   const showInfo = () => {
     Message.info('这是一条信息提示')
   }
@@ -339,7 +342,8 @@ export default function MessageDemo() {
       <DemoBlock
         title="手动关闭"
         description="设置 closable 为 true 显示关闭按钮，或使用返回的关闭函数。此示例支持同时打开多条 loading，并提供逐条/一键关闭。"
-        code={manualSnippet}>
+        code={manualSnippet}
+        script={basicScriptSnippet}>
         <div className={demoCardClassName}>
           <div className="flex flex-wrap gap-2 mb-4">
             <Button className={primaryButtonClassName} onClick={showClosableMessage}>

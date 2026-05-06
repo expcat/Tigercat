@@ -67,6 +67,9 @@ const productData: DemoItem[] = [
   { key: 3, name: 'Product C', price: '¥199', stock: 22 }
 ]
 
+const basicScriptSnippet = `const [loading, setLoading] = useState(false)
+const [pageInfo, setPageInfo] = useState({ current: 1, pageSize: 10 })`
+
 const basicSnippet = `<List dataSource={basicData} />`
 
 const sizeSnippet = `<List dataSource={basicData.slice(0, 2)} size="sm" />
@@ -141,7 +144,7 @@ export default function ListDemo() {
         <p className="text-gray-600">通用列表组件，用于展示一系列相似的数据项。</p>
       </div>
 
-      <DemoBlock title="基本用法" description="最简单的列表展示。" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="最简单的列表展示。" code={basicSnippet} script={basicScriptSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <List dataSource={basicData} />
         </div>

@@ -17,6 +17,10 @@ const basicSnippet = `<DatePicker
   选中的日期：{date ? date.toLocaleDateString(locale) : '未选择'}
 </p>`
 
+const basicScriptSnippet = `import { useState } from 'react'
+
+const [date, setDate] = useState(null)`
+
 const rangeSnippet = `<DatePicker
   range
   className={RANGE_PICKER_WIDTH}
@@ -120,7 +124,7 @@ const DatePickerDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock title="基础用法" description="基础的日期选择器组件。" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="基础的日期选择器组件。" code={basicSnippet} script={basicScriptSnippet}>
         <div className="max-w-md space-y-4">
           <DatePicker
             className={PICKER_WIDTH}

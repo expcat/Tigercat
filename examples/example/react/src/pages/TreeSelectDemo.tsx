@@ -12,6 +12,11 @@ const treeData = [
 ]
 
 const basicSnippet = `<TreeSelect value={val} onChange={setVal} treeData={treeData} placeholder="请选择成员" />`
+
+const basicScriptSnippet = `import { useState } from 'react'
+
+const [val, setVal] = useState(undefined)`
+
 const searchSnippet = `<TreeSelect value={val} onChange={setVal} treeData={treeData} placeholder="搜索成员" showSearch />`
 const sizeSnippet = `<TreeSelect treeData={treeData} size="sm" placeholder="小" />
 <TreeSelect treeData={treeData} size="lg" placeholder="大" />
@@ -26,7 +31,7 @@ const TreeSelectDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">TreeSelect 树选择</h1>
       <p className="text-gray-500 mb-8">树形结构选择器，适用于组织架构等层级数据。</p>
 
-      <DemoBlock title="基本用法" code={basicSnippet}>
+      <DemoBlock title="基本用法" code={basicSnippet} script={basicScriptSnippet}>
         <TreeSelect value={val} onChange={setVal} treeData={treeData} placeholder="请选择成员" />
       </DemoBlock>
 

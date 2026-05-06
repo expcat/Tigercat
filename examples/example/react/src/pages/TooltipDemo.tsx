@@ -120,6 +120,8 @@ const flipSnippet = `<div className="p-4 bg-gray-100 rounded overflow-auto h-32"
   </div>
 </div>`
 
+const basicScriptSnippet = `const [visible1, setVisible1] = useState(false)`
+
 export default function TooltipDemo() {
   const [visible1, setVisible1] = useState(false)
 
@@ -233,7 +235,8 @@ export default function TooltipDemo() {
       <DemoBlock
         title="受控模式"
         description="可以通过 visible 属性控制气泡提示的显示和隐藏。"
-        code={controlledSnippet}>
+        code={controlledSnippet}
+        script={basicScriptSnippet}>
         <Space size={16}>
           <Tooltip open={visible1} content="受控的气泡提示" onOpenChange={setVisible1}>
             <Button>受控提示</Button>

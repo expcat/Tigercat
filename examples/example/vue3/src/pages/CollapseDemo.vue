@@ -8,6 +8,10 @@ const basicSnippet = `<Collapse v-model:activeKey="activeKey">
   <CollapsePanel panelKey="2" header="面板 2">内容 2</CollapsePanel>
 </Collapse>`
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const activeKey1 = ref<string[]>(['1'])`
+
 const accordionSnippet = `<Collapse accordion v-model:activeKey="activeKey">
   <CollapsePanel panelKey="1" header="面板 1">内容 1</CollapsePanel>
   <CollapsePanel panelKey="2" header="面板 2">内容 2</CollapsePanel>
@@ -77,7 +81,7 @@ const activeKey9 = ref<string[]>([])
       <p class="text-gray-600">可以折叠/展开的内容区域，用于将复杂的区域折叠起来。</p>
     </div>
 
-    <DemoBlock title="基本用法" description="可以同时展开多个面板。" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="可以同时展开多个面板。" :code="basicSnippet" :script="basicScriptSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Collapse v-model:activeKey="activeKey1">
           <CollapsePanel panelKey="1" header="面板标题 1">

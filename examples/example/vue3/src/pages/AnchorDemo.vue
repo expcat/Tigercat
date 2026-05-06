@@ -68,6 +68,10 @@ const handleChange = (href: string) => {
 }
 
 const lastEvent = ref('')
+
+const eventsScriptSnippet = `import { ref } from 'vue'
+
+const lastEvent = ref('')`
 const handleDemoClick = (_e: MouseEvent, href: string) => {
   lastEvent.value = `点击: ${href}`
 }
@@ -246,7 +250,8 @@ const handleDemoChange = (activeLink: string) => {
         <div id="demo-events" class="scroll-mt-20">
           <DemoBlock title="事件处理"
                      description="监听 @click 和 @change 事件，可配合 targetOffset 使用。"
-                     :code="eventsSnippet">
+                     :code="eventsSnippet"
+                     :script="eventsScriptSnippet">
             <div class="p-6 bg-gray-50 rounded-lg">
               <div class="flex gap-8 items-start">
                 <div class="flex-1">

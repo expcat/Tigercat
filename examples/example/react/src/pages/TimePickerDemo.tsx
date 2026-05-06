@@ -15,6 +15,10 @@ const basicSnippet = `<TimePicker
 />
 <p className="text-sm text-gray-600">选中的时间：{time || '未选择'}</p>`
 
+const basicScriptSnippet = `import { useState } from 'react'
+
+const [time, setTime] = useState(null)`
+
 const rangeSnippet = `<TimePicker
   range
   className={RANGE_PICKER_WIDTH}
@@ -117,7 +121,7 @@ const TimePickerDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock title="基础用法" description="基础的时间选择器组件。" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="基础的时间选择器组件。" code={basicSnippet} script={basicScriptSnippet}>
         <div className="max-w-md space-y-4">
           <TimePicker
             className={PICKER_WIDTH}

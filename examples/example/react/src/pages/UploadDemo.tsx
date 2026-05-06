@@ -5,6 +5,15 @@ import DemoBlock from '../components/DemoBlock'
 
 const basicSnippet = `<Upload fileList={fileList} onChange={handleChange}>选择文件</Upload>`
 
+const basicScriptSnippet = `import { useState } from 'react'
+import type { UploadFile } from '@expcat/tigercat-react'
+
+const [fileList, setFileList] = useState([])
+
+const handleChange = (file, list) => {
+  setFileList(list)
+}`
+
 const dragSnippet = `<Upload fileList={fileList2} onChange={handleChange2} drag />`
 
 const multipleSnippet = `<Upload fileList={fileList3} onChange={handleChange3} multiple>选择多个文件</Upload>`
@@ -137,7 +146,7 @@ const UploadDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock title="基础用法" description="基础的文件上传组件。" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="基础的文件上传组件。" code={basicSnippet} script={basicScriptSnippet}>
         <div className="max-w-md space-y-4">
           <Upload fileList={fileList} onChange={handleChange}>
             选择文件

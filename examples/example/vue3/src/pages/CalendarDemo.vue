@@ -3,7 +3,7 @@
     <h1 class="text-3xl font-bold mb-2">Calendar 日历</h1>
     <p class="text-gray-500 mb-8">按月/年展示日期的日历面板，支持日期选择和禁用。</p>
 
-    <DemoBlock title="基础用法" description="默认月视图，v-model 绑定选中日期" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="默认月视图，v-model 绑定选中日期" :code="basicSnippet" :script="basicScriptSnippet">
       <Calendar v-model="selectedDate" />
       <p class="mt-2 text-sm text-gray-500">选中日期: {{ selectedDate?.toLocaleDateString() ?? '无' }}</p>
     </DemoBlock>
@@ -36,6 +36,10 @@ const basicSnippet = `<Calendar v-model="selectedDate" />
 <script setup>
 const selectedDate = ref(new Date())
 <\/script>`
+
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const selectedDate = ref<Date | undefined>(new Date())`
 
 const yearSnippet = `<Calendar mode="year" fullscreen />`
 

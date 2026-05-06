@@ -34,6 +34,15 @@ const externalSnippet = `<Link href="https://github.com" target="_blank">
 
 const eventSnippet = `<Link href="#" onClick={handleClick}>点击计数：{count}</Link>`
 
+const eventScriptSnippet = `import { useState } from 'react'
+
+const [clickCount, setClickCount] = useState(0)
+
+const handleClick = (e: React.MouseEvent) => {
+  e.preventDefault()
+  setClickCount(c => c + 1)
+}`
+
 const LinkDemo: React.FC = () => {
   const [clickCount, setClickCount] = useState(0)
 
@@ -130,7 +139,7 @@ const LinkDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 点击事件 */}
-      <DemoBlock title="点击事件" description="通过 onClick 回调处理交互逻辑。" code={eventSnippet}>
+      <DemoBlock title="点击事件" description="通过 onClick 回调处理交互逻辑。" code={eventSnippet} script={eventScriptSnippet}>
         <Link
           href="#"
           onClick={(e) => {

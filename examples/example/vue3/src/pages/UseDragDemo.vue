@@ -58,6 +58,19 @@ const drag = useDrag({
     {{ item.title }}
   </div>
 </div>`
+
+const reorderScriptSnippet = `import { ref } from 'vue'
+import { useDrag } from '@expcat/tigercat-vue'
+import type { DragItem } from '@expcat/tigercat-core'
+
+interface TodoItem extends DragItem {
+  title: string
+}
+
+const items = ref<TodoItem[]>([
+  { id: '1', index: 0, title: '编写需求文档' },
+  { id: '2', index: 1, title: '完成接口联调' }
+])`
 </script>
 
 <template>
@@ -72,7 +85,8 @@ const drag = useDrag({
 
     <DemoBlock title="基础列表排序"
                description="拖动条目即可重新排序，松开时通过 reorder() 计算新顺序。"
-               :code="reorderSnippet">
+               :code="reorderSnippet"
+               :script="reorderScriptSnippet">
       <div class="space-y-3"
            v-bind="drag.getDropZoneAttrs()">
         <Card v-for="item in items"

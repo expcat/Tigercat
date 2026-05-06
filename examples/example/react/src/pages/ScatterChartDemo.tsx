@@ -86,6 +86,9 @@ const flatSnippet = `<ScatterChart
   showTooltip
 />`
 
+const basicScriptSnippet = `const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+const [selectedIndex, setSelectedIndex] = useState<number | null>(null)`
+
 const ScatterChartDemo: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -127,7 +130,8 @@ const ScatterChartDemo: React.FC = () => {
       <DemoBlock
         title="悬停 + 选中"
         description="悬停时数据点放大高亮，支持点击选中。"
-        code={hoverableSnippet}>
+        code={hoverableSnippet}
+        script={basicScriptSnippet}>
         <div className="space-y-4">
           <ScatterChart
             data={interactiveData}

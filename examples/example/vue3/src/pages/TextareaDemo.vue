@@ -8,6 +8,10 @@ const autoResizeText = ref('')
 const limited = ref('')
 const combined = ref('')
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const text = ref('')`
+
 const basicSnippet = `<Space direction="vertical" class="w-full max-w-md">
   <Textarea v-model="text" placeholder="请输入内容" :rows="4" />
   <p class="text-sm text-gray-600">输入的内容：{{ text }}</p>
@@ -88,7 +92,7 @@ const combinedSnippet = `<Space direction="vertical" class="w-full max-w-md">
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="基础的文本域组件。" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="基础的文本域组件。" :code="basicSnippet" :script="basicScriptSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Textarea v-model="text" placeholder="请输入内容" :rows="4" />
         <p class="text-sm text-gray-600">输入的内容：{{ text }}</p>

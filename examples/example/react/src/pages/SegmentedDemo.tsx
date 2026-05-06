@@ -8,8 +8,7 @@ const simpleOpts = [
   { label: '选项 C', value: 'c' }
 ]
 
-const basicSnippet = `const [selected, setSelected] = useState('daily')
-<Segmented
+const basicSnippet = `<Segmented
   value={selected}
   onChange={setSelected}
   options={[
@@ -19,6 +18,10 @@ const basicSnippet = `const [selected, setSelected] = useState('daily')
     { label: '年', value: 'yearly' }
   ]}
 />`
+
+const basicScriptSnippet = `import { useState } from 'react'
+
+const [selected, setSelected] = useState('daily')`
 
 const sizeSnippet = `<Segmented size="sm" options={options} value="a" />
 <Segmented size="md" options={options} value="a" />
@@ -43,7 +46,7 @@ const SegmentedDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Segmented 分段控制器</h1>
       <p className="text-gray-500 mb-8">分段选择器，类似 iOS UISegmentedControl。</p>
 
-      <DemoBlock title="基本用法" description="value + onChange 受控" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="value + onChange 受控" code={basicSnippet} script={basicScriptSnippet}>
         <Space direction="vertical" size={12}>
           <Segmented
             value={selected}

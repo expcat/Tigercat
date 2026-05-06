@@ -77,6 +77,11 @@ const basicSnippet = `<TaskBoard
   :on-card-add="handleCardAdd"
 />`
 
+const basicScriptSnippet = `import { ref } from 'vue'
+import type { TaskBoardColumn } from '@expcat/tigercat-core'
+
+const columns = ref<TaskBoardColumn[]>([...])`
+
 const slotSnippet = `<TaskBoard v-model:columns="slotColumns">
   <template #card="{ card }">
     <div class="flex flex-col gap-1">
@@ -104,7 +109,8 @@ const slotSnippet = `<TaskBoard v-model:columns="slotColumns">
     <DemoBlock
       title="基础用法"
       description="受控模式 + 卡片拖拽 + 列拖拽 + 新增卡片"
-      :code="basicSnippet">
+      :code="basicSnippet"
+      :script="basicScriptSnippet">
       <TaskBoard
         v-model:columns="columns"
         @card-move="handleCardMove"

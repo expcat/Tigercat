@@ -166,6 +166,11 @@ const durationSnippet = `<div class="flex flex-wrap gap-2">
   </Button>
 </div>`
 
+const manualScriptSnippet = `import { ref } from 'vue'
+import { Message } from '@expcat/tigercat-vue'
+
+const manualLoadingCloseFns = ref<Array<() => void>>([])`
+
 const manualSnippet = `<div class="flex flex-wrap gap-2 mb-4">
   <Button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950" @click="showClosableMessage">
     显示可关闭消息
@@ -304,7 +309,8 @@ const sceneSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- 手动关闭 -->
     <DemoBlock title="手动关闭"
                description="设置 closable 为 true 显示关闭按钮，或使用返回的关闭函数。此示例支持同时打开多条 loading，并提供逐条/一键关闭。"
-               :code="manualSnippet">
+               :code="manualSnippet"
+               :script="manualScriptSnippet">
       <div class="p-6 rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900/40">
         <div class="flex flex-wrap gap-2 mb-4">
           <Button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-950"

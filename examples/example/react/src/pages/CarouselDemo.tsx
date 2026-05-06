@@ -54,6 +54,8 @@ const slideColors = [
   'bg-gradient-to-r from-orange-500 to-orange-600'
 ]
 
+const dotPositionScriptSnippet = `const [dotPosition, setDotPosition] = useState<'top' | 'bottom' | 'left' | 'right'>('bottom')`
+
 export default function CarouselDemo() {
   const [dotPosition, setDotPosition] = useState<'top' | 'bottom' | 'left' | 'right'>('bottom')
   const carouselRef = useRef<CarouselRef>(null)
@@ -125,7 +127,7 @@ export default function CarouselDemo() {
         </div>
       </DemoBlock>
 
-      <DemoBlock title="导航点位置" description="可以调整导航点的位置。" code={dotPositionSnippet}>
+      <DemoBlock title="导航点位置" description="可以调整导航点的位置。" code={dotPositionSnippet} script={dotPositionScriptSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="mb-4">
             <Space>

@@ -6,6 +6,10 @@ import DemoBlock from '../components/DemoBlock.vue'
 const color = ref('#2563eb')
 const color2 = ref('#2563eb')
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const color = ref('#2563eb')`
+
 const basicSnippet = `<ColorPicker v-model="color" />
 <Text>选中颜色: {{ color }}</Text>`
 
@@ -23,7 +27,7 @@ const featureSnippet = `<Space direction="vertical" :size="12">
     <h1 class="text-3xl font-bold mb-2">ColorPicker 颜色选择器</h1>
     <p class="text-gray-500 mb-8">用于选择颜色，支持透明度、预设颜色和多种格式。</p>
 
-    <DemoBlock title="基本用法" :code="basicSnippet">
+    <DemoBlock title="基本用法" :code="basicSnippet" :script="basicScriptSnippet">
       <Space :size="16" align="center">
         <ColorPicker v-model="color" />
         <Text>选中颜色: {{ color }}</Text>

@@ -30,6 +30,9 @@ const fullSnippet = `<Alert type="warning" size="lg" title="重要提示" showIc
 
 const scenarioSnippet = `<Alert type="success" title="提交成功" description="您的申请已成功提交..." />`
 
+const basicScriptSnippet = `const [showAlert1, setShowAlert1] = useState(true)
+const [showAlert2, setShowAlert2] = useState(true)`
+
 export default function AlertDemo() {
   const [showAlert1, setShowAlert1] = useState(true)
   const [showAlert2, setShowAlert2] = useState(true)
@@ -102,7 +105,8 @@ export default function AlertDemo() {
       <DemoBlock
         title="可关闭"
         description="通过设置 closable 属性可以让 Alert 显示关闭按钮。"
-        code={closableSnippet}>
+        code={closableSnippet}
+        script={basicScriptSnippet}>
         <div className={demoCardClassName}>
           {showAlert1 && (
             <Alert

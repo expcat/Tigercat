@@ -42,6 +42,8 @@ const scenarioSnippet = `<Button variant="outline">删除确认</Button>
 <Button>查看详情</Button>
 <Button>编辑资料</Button>`
 
+const basicScriptSnippet = `const [visible1, setVisible1] = useState(false)`
+
 const infoParagraphs = Array.from({ length: 14 }).map((_, index) => (
   <p key={index} className={index === 0 ? '' : 'mt-2'}>
     这是一段用于演示滚动内容的示例文本（第 {index + 1} 段）。当内容较长时，Modal
@@ -135,7 +137,8 @@ export default function ModalDemo() {
       <DemoBlock
         title="基本用法"
         description="最简单的用法，点击按钮打开对话框。"
-        code={basicSnippet}>
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <div className="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
           <Button onClick={() => setVisible1(true)}>打开对话框</Button>
           <Modal

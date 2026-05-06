@@ -11,6 +11,10 @@ const basicSnippet = `<AutoComplete
   placeholder="请输入搜索内容"
 />`
 
+const basicScriptSnippet = `import { useState } from 'react'
+
+const [val, setVal] = useState('')`
+
 const customSnippet = `<AutoComplete
   value={val}
   onChange={(v) => setVal(String(v))}
@@ -27,7 +31,7 @@ const AutoCompleteDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">AutoComplete 自动补全</h1>
       <p className="text-gray-500 mb-8">输入框自动完成，根据输入内容过滤候选项。</p>
 
-      <DemoBlock title="基本用法" description="输入时自动过滤匹配选项" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="输入时自动过滤匹配选项" code={basicSnippet} script={basicScriptSnippet}>
         <AutoComplete value={val} onChange={(v) => setVal(String(v))} options={allOptions} placeholder="请输入搜索内容" />
       </DemoBlock>
 

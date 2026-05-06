@@ -45,6 +45,11 @@ const basicSnippet = `<DataTableWithToolbar
   @selection-change="handleSelectionChange"
 />`
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const keyword = ref('')
+const filters = ref<Record<string, unknown>>({ status: null, role: null })`
+
 const columns: TableColumn<Record<string, unknown>>[] = [
   { key: 'name', title: '姓名', width: '25%' },
   { key: 'email', title: '邮箱', width: '35%' },
@@ -147,7 +152,7 @@ const handleBulkAction = (actionKey: string) => {
       <p class="text-gray-600">搜索、筛选、批量操作与分页联动的组合组件。</p>
     </div>
 
-    <DemoBlock title="基础用法" description="搜索/筛选/批量操作 + 分页联动" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="搜索/筛选/批量操作 + 分页联动" :code="basicSnippet" :script="basicScriptSnippet">
       <DataTableWithToolbar :columns="columns" :dataSource="pagedData" table-layout="fixed"
         :rowSelection="{ selectedRowKeys, type: 'checkbox' }" :toolbar="toolbar" :pagination="{
           current: pagination.current,

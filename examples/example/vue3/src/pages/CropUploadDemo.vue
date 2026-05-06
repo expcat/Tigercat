@@ -25,6 +25,11 @@ const handleError = (err: Error) => {
 const basicSnippet = `<CropUpload @crop-complete="handleCropComplete" @error="handleError" />
 <img v-if="result" :src="result.dataUrl" />`
 
+const basicScriptSnippet = `import { ref } from 'vue'
+import type { CropResult } from '@expcat/tigercat-core'
+
+const result1 = ref<CropResult | null>(null)`
+
 const aspectRatioSnippet = `<!-- 强制正方形裁剪 -->
 <CropUpload :cropper-props="{ aspectRatio: 1 }" @crop-complete="handleSquareCrop" />`
 
@@ -52,7 +57,7 @@ const maxSizeSnippet = `<!-- 限制文件大小 2MB -->
       {{ errorMsg }}
     </div>
 
-    <DemoBlock title="基本用法" description="点击按钮选择图片，弹窗中裁剪后获取结果" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="点击按钮选择图片，弹窗中裁剪后获取结果" :code="basicSnippet" :script="basicScriptSnippet">
       <div class="space-y-4">
         <CropUpload @crop-complete="handleCropComplete" @error="handleError" />
         <div v-if="result1" class="mt-4">

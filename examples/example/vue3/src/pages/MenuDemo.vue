@@ -30,6 +30,10 @@ const basicSnippet = `<Menu v-model:selectedKeys="selectedKeys1">
   <MenuItem itemKey="4" disabled>禁用菜单项</MenuItem>
 </Menu>`
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const selectedKeys1 = ref(['1'])`
+
 const horizontalSnippet = `<Menu mode="horizontal" v-model:selectedKeys="selectedKeys2">
   <MenuItem itemKey="home">首页</MenuItem>
   <SubMenu itemKey="products" title="产品">
@@ -136,7 +140,8 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
     <!-- 基本用法 -->
     <DemoBlock title="基本用法"
                description="垂直菜单，默认模式。"
-               :code="basicSnippet">
+               :code="basicSnippet"
+               :script="basicScriptSnippet">
       <div class="bg-gray-50 p-6 rounded-lg">
         <div class="bg-white inline-block">
           <Menu v-model:selectedKeys="selectedKeys1">

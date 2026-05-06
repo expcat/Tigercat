@@ -121,6 +121,8 @@ const customStatusSnippet = `<Steps current={2}>
   <StepsItem title="处理中" description="当前步骤" />
 </Steps>`
 
+const basicScriptSnippet = `const [current1, setCurrent1] = useState(1)`
+
 const StepsDemo: React.FC = () => {
   const [current1, setCurrent1] = useState(1)
   const [current2, setCurrent2] = useState(1)
@@ -150,7 +152,7 @@ const StepsDemo: React.FC = () => {
       </div>
 
       {/* 基本用法 */}
-      <DemoBlock title="基本用法" description="简单的步骤条，展示流程进度。" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="简单的步骤条，展示流程进度。" code={basicSnippet} script={basicScriptSnippet}>
         <Steps current={current1}>
           <StepsItem title="已完成" description="这是步骤的描述信息" />
           <StepsItem title="进行中" description="这是步骤的描述信息" />

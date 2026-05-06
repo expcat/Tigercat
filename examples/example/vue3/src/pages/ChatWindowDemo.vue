@@ -95,6 +95,12 @@ const basicSnippet = `<ChatWindow
   @send="handleSend"
 />`
 
+const basicScriptSnippet = `import { ref } from 'vue'
+import type { ChatMessage } from '@expcat/tigercat-core'
+
+const messages = ref<ChatMessage[]>([...])
+const input = ref('')`
+
 const inputSnippet = `<ChatWindow
   v-model="quickInput"
   input-type="input"
@@ -112,7 +118,7 @@ const inputSnippet = `<ChatWindow
       <p class="text-gray-600">组合组件，用于构建完整聊天交互区域。</p>
     </div>
 
-    <DemoBlock title="基础用法" description="默认 textarea 输入，支持 Shift+Enter 换行。" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="默认 textarea 输入，支持 Shift+Enter 换行。" :code="basicSnippet" :script="basicScriptSnippet">
       <ChatWindow v-model="input" class="h-[480px]" :messages="messages" show-time allow-shift-enter
         status-text="对方正在输入..." @send="handleSend" />
     </DemoBlock>

@@ -20,6 +20,10 @@ const handleUncontrolledChange = (value: string | number) => {
   uncontrolledValue.value = value
 }
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const basicValue = ref('male')`
+
 const basicSnippet = `<Space direction="vertical">
   <RadioGroup v-model:value="basicValue" class="flex flex-wrap items-center gap-4">
     <Radio value="male">男</Radio>
@@ -114,7 +118,7 @@ const customSnippet = `<RadioGroup v-model:value="customValue"
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="单选框组合使用时，需要通过 RadioGroup 组件进行包裹。" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="单选框组合使用时，需要通过 RadioGroup 组件进行包裹。" :code="basicSnippet" :script="basicScriptSnippet">
       <Space direction="vertical">
         <RadioGroup v-model:value="basicValue" class="flex flex-wrap items-center gap-4">
           <Radio value="male">男</Radio>

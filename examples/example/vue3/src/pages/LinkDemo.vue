@@ -40,6 +40,10 @@ const externalSnippet = `<Link href="https://github.com" target="_blank">
 </Link>`
 
 const eventSnippet = `<Link href="#" @click="handleClick">点击计数：{{ count }}</Link>`
+
+const eventScriptSnippet = `import { ref } from 'vue'
+
+const clickCount = ref(0)`
 </script>
 
 <template>
@@ -95,7 +99,7 @@ const eventSnippet = `<Link href="#" @click="handleClick">点击计数：{{ coun
     </DemoBlock>
 
     <!-- 点击事件 -->
-    <DemoBlock title="点击事件" description="监听 @click 事件处理交互逻辑。" :code="eventSnippet">
+    <DemoBlock title="点击事件" description="监听 @click 事件处理交互逻辑。" :code="eventSnippet" :script="eventScriptSnippet">
       <Link href="#" @click="(e: MouseEvent) => { e.preventDefault(); clickCount++ }">
         点击计数：{{ clickCount }}
       </Link>

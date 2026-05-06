@@ -40,6 +40,10 @@ const handleUncontrolledInput = (event: Event) => {
   uncontrolled.value = (event.target as HTMLInputElement).value
 }
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const basicText = ref('')`
+
 const basicSnippet = `<Space direction="vertical" class="w-full max-w-md">
   <Input v-model="basicText" placeholder="请输入内容" />
   <p class="text-sm text-gray-600">输入的内容：{{ basicText }}</p>
@@ -178,7 +182,7 @@ const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full ma
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="基础的输入框组件。" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="基础的输入框组件。" :code="basicSnippet" :script="basicScriptSnippet">
       <Space direction="vertical" class="w-full max-w-md">
         <Input v-model="basicText" placeholder="请输入内容" />
         <p class="text-sm text-gray-600">输入的内容：{{ basicText }}</p>

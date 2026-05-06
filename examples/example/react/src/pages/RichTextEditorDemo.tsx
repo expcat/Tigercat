@@ -9,6 +9,8 @@ const basicSnippet = `<RichTextEditor value={content} onChange={setContent} heig
 const readOnlySnippet = `<RichTextEditor value={html} height={150} readOnly />
 <RichTextEditor value={html} height={150} disabled />`
 
+const basicScriptSnippet = `const [content, setContent] = useState('<p>Hello <strong>Tigercat</strong>!</p>')`
+
 const RichTextEditorDemo: React.FC = () => {
   const [content, setContent] = useState('<p>Hello <strong>Tigercat</strong>!</p>')
 
@@ -17,7 +19,7 @@ const RichTextEditorDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">RichTextEditor 富文本编辑器</h1>
       <p className="text-gray-500 mb-8">所见即所得的富文本编辑器，带工具栏。</p>
 
-      <DemoBlock title="基础用法" description="value + onChange 绑定 HTML" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="value + onChange 绑定 HTML" code={basicSnippet} script={basicScriptSnippet}>
         <RichTextEditor value={content} onChange={setContent} height={250} placeholder="在这里编辑..." />
       </DemoBlock>
 

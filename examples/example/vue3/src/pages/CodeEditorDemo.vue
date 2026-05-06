@@ -3,7 +3,7 @@
     <h1 class="text-3xl font-bold mb-2">CodeEditor 代码编辑器</h1>
     <p class="text-gray-500 mb-8">轻量级代码编辑器，支持语法高亮、行号和主题切换。</p>
 
-    <DemoBlock title="基础用法" description="language 设置语言，v-model 绑定代码" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="language 设置语言，v-model 绑定代码" :code="basicSnippet" :script="basicScriptSnippet">
       <CodeEditor v-model:value="jsCode" language="javascript" :min-lines="5" />
     </DemoBlock>
 
@@ -40,6 +40,14 @@ const htmlCode = `<div class="container">
 </div>`
 
 const basicSnippet = `<CodeEditor v-model:value="code" language="javascript" :min-lines="5" />`
+
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const jsCode = ref(\`function greet(name) {
+  console.log('Hello, ' + name)
+}
+
+greet('Tigercat')\`)`
 
 const themeSnippet = `<CodeEditor :value="code" language="html" theme="dark" read-only :min-lines="5" />`
 

@@ -44,6 +44,8 @@ const flipSnippet = `<div className="p-6 bg-gray-100 rounded overflow-auto h-32"
   </div>
 </div>`
 
+const basicScriptSnippet = `const [visible1, setVisible1] = useState(false)`
+
 export default function PopoverDemo() {
   const [visible1, setVisible1] = useState(false)
   const [manualVisible, setManualVisible] = useState(false)
@@ -164,7 +166,8 @@ export default function PopoverDemo() {
       <DemoBlock
         title="受控模式"
         description="通过 visible 和 onVisibleChange 控制气泡卡片的显示状态。"
-        code={controlledSnippet}>
+        code={controlledSnippet}
+        script={basicScriptSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <Popover

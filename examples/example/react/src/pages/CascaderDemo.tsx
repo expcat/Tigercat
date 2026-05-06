@@ -18,6 +18,11 @@ const options = [
 ]
 
 const basicSnippet = `<Cascader value={val} onChange={setVal} options={options} placeholder="请选择地区" />`
+
+const basicScriptSnippet = `import { useState } from 'react'
+
+const [val, setVal] = useState([])`
+
 const searchSnippet = `<Cascader value={val} onChange={setVal} options={options} placeholder="搜索地区" showSearch />`
 const sizeSnippet = `<Cascader options={options} placeholder="小" size="sm" />
 <Cascader options={options} placeholder="中" size="md" />
@@ -33,7 +38,7 @@ const CascaderDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">Cascader 级联选择</h1>
       <p className="text-gray-500 mb-8">多级联动选择器，适用于省市区等层级数据。</p>
 
-      <DemoBlock title="基本用法" description="逐级选择" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="逐级选择" code={basicSnippet} script={basicScriptSnippet}>
         <Cascader value={val} onChange={setVal} options={options} placeholder="请选择地区" />
       </DemoBlock>
 

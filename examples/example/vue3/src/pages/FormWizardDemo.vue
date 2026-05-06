@@ -12,6 +12,11 @@ const steps: WizardStep[] = [
 
 const current = ref(0)
 const finished = ref(false)
+
+const basicScriptSnippet = `import { reactive, ref } from 'vue'
+
+const current = ref(0)
+const model = reactive({ name: '', email: '', phone: '' })`
 type FormExpose = {
   validate: () => Promise<boolean>
   validateFields: (fieldNames: string[]) => Promise<boolean>
@@ -72,7 +77,7 @@ const basicSnippet = `<FormWizard
       <p class="text-gray-600">多步表单流，支持校验阻断与完成态。</p>
     </div>
 
-    <DemoBlock title="基础用法" description="多步校验阻断 + 完成态" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="多步校验阻断 + 完成态" :code="basicSnippet" :script="basicScriptSnippet">
       <FormWizard v-model:current="current" :steps="steps" :before-next="handleBeforeNext" @change="handleChange"
         @finish="handleFinish">
         <template #step="{ index }">

@@ -26,6 +26,10 @@ const descriptionSnippet = `<Popconfirm title="确定要发布这篇文章吗？
 
 const controlledSnippet = `<Popconfirm v-model:visible="visible1" title="确定要执行此操作吗？">...</Popconfirm>`
 
+const controlledScriptSnippet = `import { ref } from 'vue'
+
+const visible1 = ref(false)`
+
 const noIconSnippet = `<Popconfirm :show-icon="false" title="确定要继续吗？">...</Popconfirm>`
 
 const disabledSnippet = `<Popconfirm title="此操作已禁用" :disabled="true">
@@ -168,7 +172,8 @@ const handleCancel = () => {
 
     <DemoBlock title="受控模式"
                description="通过 v-model:visible 控制 Popconfirm 的显示状态。"
-               :code="controlledSnippet">
+               :code="controlledSnippet"
+               :script="controlledScriptSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Space>
           <Popconfirm v-model:visible="visible1"

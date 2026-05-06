@@ -5,6 +5,10 @@ import DemoBlock from '../components/DemoBlock'
 const basicSnippet = `<ColorPicker value={color} onChange={setColor} />
 <Text>选中颜色: {color}</Text>`
 
+const basicScriptSnippet = `import { useState } from 'react'
+
+const [color, setColor] = useState('#2563eb')`
+
 const featureSnippet = `<ColorPicker value={color} onChange={setColor} showAlpha format="rgb" />
 <ColorPicker value={color} onChange={setColor} presets={['#f5222d', '#fa8c16', '#52c41a', '#1677ff', '#722ed1']} />
 <ColorPicker value="#ccc" size="sm" />
@@ -20,7 +24,7 @@ const ColorPickerDemo: React.FC = () => {
       <h1 className="text-3xl font-bold mb-2">ColorPicker 颜色选择器</h1>
       <p className="text-gray-500 mb-8">用于选择颜色，支持透明度、预设颜色和多种格式。</p>
 
-      <DemoBlock title="基本用法" code={basicSnippet}>
+      <DemoBlock title="基本用法" code={basicSnippet} script={basicScriptSnippet}>
         <Space size={16} align="center">
           <ColorPicker value={color} onChange={setColor} />
           <Text>选中颜色: {color}</Text>

@@ -11,6 +11,10 @@ const basicSnippet = `<Space direction="vertical">
   <p className="text-sm text-gray-600">当前选中：{String(basicValue)}</p>
 </Space>`
 
+const basicScriptSnippet = `import { useState } from 'react'
+
+const [basicValue, setBasicValue] = useState('male')`
+
 const standaloneSnippet = `<Space direction="vertical">
   <Radio value="agree" checked={agreed} onChange={() => setAgreed(true)}>同意用户协议</Radio>
   <Radio value="standalone" defaultChecked>默认选中的独立选项</Radio>
@@ -101,7 +105,8 @@ const RadioDemo: React.FC = () => {
       <DemoBlock
         title="基础用法"
         description="单选框组合使用时，需要通过 RadioGroup 组件进行包裹。"
-        code={basicSnippet}>
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <Space direction="vertical">
           <RadioGroup
             value={basicValue}

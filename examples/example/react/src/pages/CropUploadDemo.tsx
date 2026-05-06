@@ -21,6 +21,9 @@ const disabledSnippet = `<CropUpload disabled />`
 const maxSizeSnippet = `{/* 限制文件大小 2MB */}
 <CropUpload maxSize={2 * 1024 * 1024} onError={handleError} />`
 
+const basicScriptSnippet = `const [result1, setResult1] = useState<CropResult | null>(null)
+const [errorMsg, setErrorMsg] = useState('')`
+
 export default function CropUploadDemo() {
   const [result1, setResult1] = useState<CropResult | null>(null)
   const [result2, setResult2] = useState<CropResult | null>(null)
@@ -54,7 +57,8 @@ export default function CropUploadDemo() {
       <DemoBlock
         title="基本用法"
         description="点击按钮选择图片，弹窗中裁剪后获取结果"
-        code={basicSnippet}>
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <div className="space-y-4">
           <CropUpload onCropComplete={handleCropComplete} onError={handleError} />
           {result1 && (

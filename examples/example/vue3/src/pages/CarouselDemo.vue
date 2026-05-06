@@ -29,6 +29,10 @@ const dotPositionSnippet = `<Carousel :dotPosition="position">
   <div class="slide">Slide 2</div>
 </Carousel>`
 
+const dotPositionScriptSnippet = `import { ref } from 'vue'
+
+const dotPosition = ref<'top' | 'bottom' | 'left' | 'right'>('bottom')`
+
 const nonInfiniteSnippet = `<Carousel :infinite="false" arrows>
   <div class="slide">Slide 1</div>
   <div class="slide">Slide 2</div>
@@ -127,7 +131,8 @@ const slideColors = [
 
         <DemoBlock title="导航点位置"
                    description="可以调整导航点的位置。"
-                   :code="dotPositionSnippet">
+                   :code="dotPositionSnippet"
+                   :script="dotPositionScriptSnippet">
             <div class="p-6 bg-gray-50 rounded-lg">
                 <div class="mb-4">
                     <Space>

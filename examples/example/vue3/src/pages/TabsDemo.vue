@@ -7,6 +7,10 @@ const basicSnippet = `<Tabs v-model:activeKey="activeKey1">
   <TabPane tabKey="1" label="标签页 1">...</TabPane>
 </Tabs>`
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const activeKey1 = ref('1')`
+
 const cardSnippet = `<Tabs v-model:activeKey="activeKey2" type="card">...</Tabs>`
 
 const editableSnippet = `<Tabs v-model:activeKey="activeEditableKey" type="editable-card" closable @edit="handleEdit">...</Tabs>`
@@ -87,7 +91,8 @@ const handleEdit = ({
 
     <DemoBlock title="基本用法"
                description="基础的、简洁的标签页。"
-               :code="basicSnippet">
+               :code="basicSnippet"
+               :script="basicScriptSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Tabs v-model:activeKey="activeKey1">
           <TabPane tabKey="1"

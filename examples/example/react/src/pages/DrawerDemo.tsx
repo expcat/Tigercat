@@ -149,6 +149,8 @@ const destroySnippet = `<Button onClick={openDestroy}>打开抽屉</Button>
   <DestroyOnCloseContent />
 </Drawer>`
 
+const basicScriptSnippet = `const [basicVisible, setBasicVisible] = useState(false)`
+
 const DestroyOnCloseContent: React.FC = () => {
   const [value, setValue] = useState('')
   const [count, setCount] = useState(0)
@@ -284,7 +286,7 @@ const DrawerDemo: React.FC = () => {
       </div>
 
       {/* 基本使用 */}
-      <DemoBlock title="基本使用" description="最基本的抽屉使用示例。" code={basicSnippet}>
+      <DemoBlock title="基本使用" description="最基本的抽屉使用示例。" code={basicSnippet} script={basicScriptSnippet}>
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <Button onClick={openBasic}>打开抽屉</Button>
           <Drawer

@@ -72,6 +72,10 @@ const groupSnippet = `<!-- ImageGroup：多图关联预览 -->
 const standalonePreviewSnippet = `<button @click="previewVisible = true">打开预览</button>
 <ImagePreview v-model:visible="previewVisible" :images="photos" :current-index="0" />`
 
+const standalonePreviewScriptSnippet = `import { ref } from 'vue'
+
+const previewVisible = ref(false)`
+
 const noPreviewSnippet = `<!-- 关闭预览 -->
 <Image src="${PHOTOS[0]}" :width="200" :height="150" :preview="false" alt="无预览" />`
 </script>
@@ -173,7 +177,8 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
     <DemoBlock
       title="独立 ImagePreview"
       description="直接使用 ImagePreview 组件，可编程控制预览"
-      :code="standalonePreviewSnippet">
+      :code="standalonePreviewSnippet"
+      :script="standalonePreviewScriptSnippet">
       <button
         class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
         @click="previewVisible = true">

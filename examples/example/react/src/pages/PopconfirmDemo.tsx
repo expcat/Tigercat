@@ -34,6 +34,8 @@ const disabledSnippet = `<Popconfirm title="此操作已禁用" disabled>
   <Button>按钮未禁用</Button>
 </Popconfirm>`
 
+const basicScriptSnippet = `const [visible1, setVisible1] = useState(false)`
+
 export default function PopconfirmDemo() {
   const [visible1, setVisible1] = useState(false)
 
@@ -169,7 +171,8 @@ export default function PopconfirmDemo() {
       <DemoBlock
         title="受控模式"
         description="通过 visible 和 onVisibleChange 控制 Popconfirm 的显示状态。"
-        code={controlledSnippet}>
+        code={controlledSnippet}
+        script={basicScriptSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Space>
             <Popconfirm

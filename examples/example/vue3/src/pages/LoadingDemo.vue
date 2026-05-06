@@ -29,6 +29,15 @@ const colorSnippet = `<Loading color="primary" />
 const fullscreenSnippet = `<Button @click="showPageLoading">显示全屏加载</Button>
 <Loading v-if="pageLoading" fullscreen text="页面加载中..." />`
 
+const fullscreenScriptSnippet = `import { ref } from 'vue'
+
+const pageLoading = ref(false)
+
+const showPageLoading = () => {
+  pageLoading.value = true
+  setTimeout(() => { pageLoading.value = false }, 2000)
+}`
+
 const cardSnippet = `<Card title="数据统计">...</Card>`
 
 const buttonSnippet = `<Button :loading="buttonLoading">提交</Button>
@@ -180,7 +189,8 @@ const handleSubmit = () => {
 
     <DemoBlock title="全屏加载"
                description="使用 fullscreen 属性可以创建全屏加载遮罩层。"
-               :code="fullscreenSnippet">
+               :code="fullscreenSnippet"
+               :script="fullscreenScriptSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <Button @click="showPageLoading">显示全屏加载</Button>
         <Loading v-if="pageLoading"

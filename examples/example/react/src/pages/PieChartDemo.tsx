@@ -72,6 +72,10 @@ const fullSnippet = `<PieChart
   showTooltip
 />`
 
+const basicScriptSnippet = `const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
+const [clickedSlice, setClickedSlice] = useState('')`
+
 const PieChartDemo: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
@@ -100,7 +104,8 @@ const PieChartDemo: React.FC = () => {
       <DemoBlock
         title="悬停偏移 + 阴影"
         description="hoverable + shadow 模拟 ECharts emphasis 效果：悬停时扇区向外偏移并附带阴影。"
-        code={hoverSnippet}>
+        code={hoverSnippet}
+        script={basicScriptSnippet}>
         <div className="space-y-4">
           <PieChart
             data={colorfulData}

@@ -7,6 +7,10 @@ const basicSnippet = `<Space direction="vertical" className="w-full max-w-md">
   <p className="text-sm text-gray-600">输入的内容：{text}</p>
 </Space>`
 
+const basicScriptSnippet = `import { useState } from 'react'
+
+const [text, setText] = useState('')`
+
 const sizeSnippet = `<Space direction="vertical" className="w-full max-w-md">
   <FormItem label="Small">
     <Textarea size="sm" placeholder="Small textarea" />
@@ -88,7 +92,7 @@ const TextareaDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock title="基础用法" description="基础的文本域组件。" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="基础的文本域组件。" code={basicSnippet} script={basicScriptSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Textarea
             value={text}

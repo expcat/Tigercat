@@ -183,6 +183,9 @@ export default function TreeDemo() {
   const blockSnippet = `<p className="text-sm text-gray-600 mb-4">节点占据整行宽度</p>
 <Tree treeData={basicTreeData} blockNode defaultExpandAll />`
 
+  const basicScriptSnippet = `const [checkedKeys, setCheckedKeys] = useState<(string | number)[]>(['1-1'])
+const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(['1-1'])`
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Tree 树形控件</h1>
@@ -202,7 +205,8 @@ export default function TreeDemo() {
       <DemoBlock
         title="可选择的树"
         description="支持选择节点并回显选中结果。"
-        code={selectableSnippet}>
+        code={selectableSnippet}
+        script={basicScriptSnippet}>
         <p className="text-sm text-gray-600 mb-4">已选择: {selectedKeys.join(', ')}</p>
         <Tree
           treeData={basicTreeData}

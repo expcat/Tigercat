@@ -40,6 +40,11 @@ const paginationSnippet = `<List :dataSource="pagedListData" />
   @change="handlePageChange"
   @page-size-change="handlePageChange" />`
 
+const paginationScriptSnippet = `import { ref } from 'vue'
+
+const loading = ref(false)
+const pageInfo = ref({ current: 1, pageSize: 10 })`
+
 const gridSnippet = `<List
   :dataSource="gridData"
   :grid="{ gutter: 16, column: 3, xs: 1, sm: 2, md: 3 }"
@@ -297,7 +302,8 @@ function handlePageChange(current: number, pageSize: number) {
 
     <DemoBlock title="分页列表"
                description="当数据较多时，可以使用分页功能。"
-               :code="paginationSnippet">
+               :code="paginationSnippet"
+               :script="paginationScriptSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="space-y-3">
           <List :dataSource="pagedListData" />

@@ -13,6 +13,10 @@ const treeData = [
   { key: 'pm', label: '产品部', value: 'pm', children: [{ key: 'zl', label: '赵六', value: 'zl' }] }
 ]
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const val = ref(undefined)`
+
 const basicSnippet = `<TreeSelect v-model="val" :tree-data="treeData" placeholder="请选择成员" />`
 const searchSnippet = `<TreeSelect v-model="val" :tree-data="treeData" placeholder="搜索成员" show-search />`
 const sizeSnippet = `<TreeSelect :tree-data="treeData" size="sm" placeholder="小" />
@@ -25,7 +29,7 @@ const sizeSnippet = `<TreeSelect :tree-data="treeData" size="sm" placeholder="�
     <h1 class="text-3xl font-bold mb-2">TreeSelect 树选择</h1>
     <p class="text-gray-500 mb-8">树形结构选择器，适用于组织架构等层级数据。</p>
 
-    <DemoBlock title="基本用法" :code="basicSnippet">
+    <DemoBlock title="基本用法" :code="basicSnippet" :script="basicScriptSnippet">
       <TreeSelect v-model="val" :tree-data="treeData" placeholder="请选择成员" />
     </DemoBlock>
 

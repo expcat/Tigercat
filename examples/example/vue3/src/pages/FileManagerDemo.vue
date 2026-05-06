@@ -11,7 +11,7 @@
       <FileManager :files="files" view-mode="grid" style="height: 350px; border: 1px solid #e5e7eb; border-radius: 8px" />
     </DemoBlock>
 
-    <DemoBlock title="多选 & 面包屑导航" description="multiple 多选，currentPath 面包屑" :code="multiSnippet">
+    <DemoBlock title="多选 & 面包屑导航" description="multiple 多选，currentPath 面包屑" :code="multiSnippet" :script="multiScriptSnippet">
       <FileManager
         :files="nestedFiles"
         view-mode="list"
@@ -61,4 +61,12 @@ const gridSnippet = `<FileManager :files="files" view-mode="grid" />`
 const multiSnippet = `<FileManager
   :files="files" view-mode="list" multiple searchable
   :current-path="currentPath" @navigate="onNavigate" />`
+
+const multiScriptSnippet = `import { ref } from 'vue'
+
+const currentPath = ref<string[]>([])
+
+const onNavigate = (path: string[]) => {
+  currentPath.value = path
+}`
 </script>

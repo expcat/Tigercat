@@ -47,6 +47,8 @@ const Counter: React.FC<CounterProps> = ({ value, defaultValue = 0, onChange }) 
   )
 }`
 
+const controlledScriptSnippet = `const [external, setExternal] = useState(10)`
+
 const UseControlledStateDemo: React.FC = () => {
   const [external, setExternal] = useState(10)
 
@@ -71,7 +73,8 @@ const UseControlledStateDemo: React.FC = () => {
       <DemoBlock
         title="受控模式"
         description="传入 value 与 onChange，由父组件控制状态。"
-        code={snippet}>
+        code={snippet}
+        script={controlledScriptSnippet}>
         <Card>
           <Counter value={external} onChange={setExternal} />
           <div className="mt-3 text-sm text-gray-500">

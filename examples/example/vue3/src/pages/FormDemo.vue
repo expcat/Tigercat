@@ -99,6 +99,17 @@ const resetValidateForm = () => {
   lastValidateResult.value = ''
 }
 
+const basicScriptSnippet = `import { reactive } from 'vue'
+
+const basicForm = reactive({
+  username: '',
+  email: '',
+  gender: 'male',
+  country: 'china',
+  bio: '',
+  agreement: false
+})`
+
 const basicSnippet = `<Form :model="basicForm" @submit="handleBasicSubmit" class="max-w-md">
   <FormItem label="用户名" name="username" required>
     <Input v-model="basicForm.username" placeholder="请输入用户名" />
@@ -267,7 +278,7 @@ const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 
     </div>
 
     <!-- 基础用法 -->
-    <DemoBlock title="基础用法" description="完整的表单示例，包含多种表单控件。" :code="basicSnippet">
+    <DemoBlock title="基础用法" description="完整的表单示例，包含多种表单控件。" :code="basicSnippet" :script="basicScriptSnippet">
       <Form :model="basicForm" @submit="handleBasicSubmit" class="max-w-md">
         <FormItem label="用户名" name="username" required>
           <Input v-model="basicForm.username" placeholder="请输入用户名" />

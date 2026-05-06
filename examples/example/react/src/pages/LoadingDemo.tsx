@@ -36,6 +36,10 @@ const buttonSnippet = `<Button loading={buttonLoading}>提交</Button>
 const delaySnippet = `<Loading delay={0} text="无延迟" />
 <Loading delay={300} text="延迟 300ms" />`
 
+const basicScriptSnippet = `const [pageLoading, setPageLoading] = useState(false)
+const [cardLoading, setCardLoading] = useState(false)
+const [buttonLoading, setButtonLoading] = useState(false)`
+
 export default function LoadingDemo() {
   const [pageLoading, setPageLoading] = useState(false)
   const [cardLoading, setCardLoading] = useState(false)
@@ -181,7 +185,8 @@ export default function LoadingDemo() {
       <DemoBlock
         title="全屏加载"
         description="使用 fullscreen 属性可以创建全屏加载遮罩层。"
-        code={fullscreenSnippet}>
+        code={fullscreenSnippet}
+        script={basicScriptSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <Button onClick={showPageLoading}>显示全屏加载</Button>
           {pageLoading && <Loading fullscreen text="页面加载中..." />}

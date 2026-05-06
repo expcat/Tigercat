@@ -11,6 +11,10 @@ const dataSource = Array.from({ length: 10 }, (_, i) => ({
   description: `描述 ${i + 1}`
 }))
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const targetKeys1 = ref(['3', '4'])`
+
 const basicSnippet = `<Transfer
   v-model="targetKeys"
   :data-source="dataSource"
@@ -29,7 +33,7 @@ const searchSnippet = `<Transfer
     <h1 class="text-3xl font-bold mb-2">Transfer 穿梭框</h1>
     <p class="text-gray-500 mb-8">双栏穿梭选择，将数据在两栏之间移动。</p>
 
-    <DemoBlock title="基本用法" description="双向穿梭选择" :code="basicSnippet">
+    <DemoBlock title="基本用法" description="双向穿梭选择" :code="basicSnippet" :script="basicScriptSnippet">
       <Transfer v-model="targetKeys1" :data-source="dataSource" />
     </DemoBlock>
 

@@ -83,6 +83,11 @@ const hoverableSnippet = `<BarChart
   v-model:hoveredIndex="hoveredIndex"
 />`
 
+const hoverableScriptSnippet = `import { ref } from 'vue'
+
+const hoveredIndex = ref<number | null>(null)
+const selectedIndex = ref<number | null>(null)`
+
 const selectableSnippet = `<BarChart
   :data="data"
   :width="420"
@@ -203,7 +208,8 @@ const constraintSnippet = `<BarChart
 
     <DemoBlock title="悬停高亮"
                description="启用 hoverable 后，鼠标悬停时高亮柱子，其余淡出。"
-               :code="hoverableSnippet">
+               :code="hoverableSnippet"
+               :script="hoverableScriptSnippet">
       <div class="space-y-4">
         <BarChart :data="interactiveData"
                   :width="420"

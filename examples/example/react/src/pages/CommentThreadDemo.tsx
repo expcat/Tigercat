@@ -139,6 +139,8 @@ const minimalNodes: CommentNode[] = [
   }
 ]
 
+const basicScriptSnippet = `const [nodes, setNodes] = useState<CommentNode[]>(initialNodes)`
+
 export default function CommentThreadDemo() {
   const [nodes, setNodes] = useState<CommentNode[]>(initialNodes)
 
@@ -214,7 +216,8 @@ export default function CommentThreadDemo() {
       <DemoBlock
         title="嵌套回复"
         description="支持多层嵌套、展开/收起、加载更多和实时回复。点击回复按钮试试。"
-        code={basicSnippet}>
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <CommentThread
           nodes={nodes}
           defaultExpandedKeys={[1]}

@@ -49,6 +49,8 @@ const PaginationDemo: React.FC = () => {
         }
   }, [demoLang])
 
+  const basicScriptSnippet = `const [current1, setCurrent1] = useState(1)`
+
   const basicSnippet = `<Pagination current={current1} onChange={setCurrent1} total={100} pageSize={10} />`
 
   const quickSnippet = `<Pagination
@@ -158,7 +160,7 @@ const customLabels: Partial<TigerLocalePagination> = {
       </div>
 
       {/* 基本用法 */}
-      <DemoBlock title="基本用法" description="最简单的分页组件。" code={basicSnippet}>
+      <DemoBlock title="基本用法" description="最简单的分页组件。" code={basicSnippet} script={basicScriptSnippet}>
         <Pagination current={current1} onChange={setCurrent1} total={100} pageSize={10} />
       </DemoBlock>
 

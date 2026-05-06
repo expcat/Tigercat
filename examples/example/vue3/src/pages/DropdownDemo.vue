@@ -5,6 +5,10 @@ import DemoBlock from '../components/DemoBlock.vue'
 
 const visible1 = ref(false)
 
+const controlledScriptSnippet = `import { ref } from 'vue'
+
+const visible1 = ref(false)`
+
 const handleCommand = (command: string) => {
   console.log('点击了：', command)
 }
@@ -360,7 +364,8 @@ const defaultVisibleSnippet = `<Dropdown :default-visible="true" trigger="click"
     <!-- 受控模式 -->
     <DemoBlock title="受控模式"
                description="通过 v-model:visible 控制下拉菜单的显示隐藏。"
-               :code="controlledSnippet">
+               :code="controlledSnippet"
+               :script="controlledScriptSnippet">
       <div class="flex gap-4 items-center">
         <Dropdown v-model:visible="visible1">
           <Button>受控下拉菜单</Button>

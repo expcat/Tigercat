@@ -18,6 +18,11 @@ const customLabelSnippet = '<Code code={usageSnippet} copyLabel="复制代码" c
 const disabledSnippet = '<Code code={themeSnippet} copyable={false} />'
 const eventSnippet = '<Code code={installSnippet} onCopy={handleCopy} />'
 
+const eventScriptSnippet = `import { useState } from 'react'
+
+const [lastCopied, setLastCopied] = useState('')
+const handleCopy = (text: string) => setLastCopied(text)`
+
 export default function CodeDemo() {
   const [lastCopied, setLastCopied] = useState('')
 
@@ -52,7 +57,8 @@ export default function CodeDemo() {
       <DemoBlock
         title="复制事件回调"
         description="通过 onCopy 监听复制事件，获取被复制的代码内容。"
-        code={eventSnippet}>
+        code={eventSnippet}
+        script={eventScriptSnippet}>
         <Code code={installSnippet} onCopy={setLastCopied} />
         {lastCopied && <p className="mt-2 text-sm text-gray-500">上次复制: {lastCopied}</p>}
       </DemoBlock>

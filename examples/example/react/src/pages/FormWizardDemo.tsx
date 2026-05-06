@@ -45,6 +45,10 @@ const basicSnippet = `<FormWizard
   )}
 />`
 
+const basicScriptSnippet = `const [current, setCurrent] = useState(0)
+const [model, setModel] = useState({ name: '', email: '', phone: '' })
+const [finished, setFinished] = useState(false)`
+
 const FormWizardDemo: React.FC = () => {
   const steps = useMemo<WizardStep[]>(
     () => [
@@ -80,7 +84,7 @@ const FormWizardDemo: React.FC = () => {
         <p className="text-gray-600">多步表单流，支持校验阻断与完成态。</p>
       </div>
 
-      <DemoBlock title="基础用法" description="多步校验阻断 + 完成态" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="多步校验阻断 + 完成态" code={basicSnippet} script={basicScriptSnippet}>
         <FormWizard
           steps={steps}
           current={current}

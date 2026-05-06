@@ -99,6 +99,10 @@ const basicSnippet = `<Button @click="openBasic">打开抽屉</Button>
   </template>
 </Drawer>`
 
+const basicScriptSnippet = `import { ref } from 'vue'
+
+const basicVisible = ref(false)`
+
 const placementSnippet = `<Space>
   <Button :variant="placement === 'left' ? 'primary' : 'secondary'" @click="showPlacementDrawer('left')">左侧</Button>
   <Button :variant="placement === 'right' ? 'primary' : 'secondary'" @click="showPlacementDrawer('right')">右侧</Button>
@@ -274,7 +278,8 @@ const DestroyOnCloseContent = defineComponent({
     <!-- 基本使用 -->
     <DemoBlock title="基本使用"
                description="最基本的抽屉使用示例。"
-               :code="basicSnippet">
+               :code="basicSnippet"
+               :script="basicScriptSnippet">
       <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <Button @click="openBasic">打开抽屉</Button>
         <Drawer v-model:open="basicVisible"

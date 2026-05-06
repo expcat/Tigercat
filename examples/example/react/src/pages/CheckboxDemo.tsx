@@ -7,6 +7,10 @@ const basicSnippet = `<Space direction="vertical">
   <p className="text-sm text-gray-600">选中状态：{checked.toString()}</p>
 </Space>`
 
+const basicScriptSnippet = `import { useState } from 'react'
+
+const [checked, setChecked] = useState(false)`
+
 const uncontrolledSnippet = `<Space>
   <Checkbox defaultChecked>默认选中</Checkbox>
   <Checkbox>默认未选中</Checkbox>
@@ -28,6 +32,21 @@ const indeterminateSnippet = `<Space direction="vertical">
   </CheckboxGroup>
   <p className="text-sm text-gray-600">已选择：{indeterminateValues.join(', ')}</p>
 </Space>`
+
+const indeterminateScriptSnippet = `import { useState } from 'react'
+
+const options = ['apple', 'banana', 'orange']
+const [indeterminateValues, setIndeterminateValues] = useState(['apple'])
+
+const allChecked = indeterminateValues.length === options.length
+const indeterminate = indeterminateValues.length > 0 && !allChecked
+
+const handleCheckAllChange = (nextChecked) => {
+  setIndeterminateValues(nextChecked ? [...options] : [])
+}
+const handleIndeterminateValuesChange = (value) => {
+  setIndeterminateValues(value)
+}`
 
 const groupSnippet = `<Space direction="vertical">
   <CheckboxGroup value={fruits} onChange={handleFruitsChange}>
@@ -99,7 +118,8 @@ const CheckboxDemo: React.FC = () => {
       <DemoBlock
         title="基础用法"
         description="单独使用可以表示两种状态之间的切换。"
-        code={basicSnippet}>
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <Space direction="vertical">
           <Checkbox checked={checked} onChange={setChecked}>
             复选框
@@ -133,7 +153,8 @@ const CheckboxDemo: React.FC = () => {
       <DemoBlock
         title="不确定状态"
         description="通过 indeterminate 实现“全选/半选”效果。"
-        code={indeterminateSnippet}>
+        code={indeterminateSnippet}
+        script={indeterminateScriptSnippet}>
         <Space direction="vertical">
           <Checkbox
             checked={allChecked}

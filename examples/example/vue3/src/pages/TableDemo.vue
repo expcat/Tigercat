@@ -15,6 +15,19 @@ interface UserData extends Record<string, unknown> {
 
 const basicSnippet = `<Table :columns="basicColumns" :dataSource="basicData" :pagination="false" />`
 
+const basicScriptSnippet = `import { ref } from 'vue'
+import type { TableColumn } from '@expcat/tigercat-vue'
+
+const basicColumns: TableColumn[] = [
+  { key: 'name', title: 'Name', width: 150 },
+  { key: 'age', title: 'Age', width: 100 },
+  { key: 'email', title: 'Email', width: 200 }
+]
+
+const basicData = ref([
+  { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' }
+])`
+
 const borderedSnippet = `<Table
   :columns="basicColumns"
   :dataSource="basicData"
@@ -355,7 +368,8 @@ const pagedData = computed(() => {
     <!-- 基础用法 -->
     <DemoBlock title="基础用法"
                description="基础的表格展示用法。"
-               :code="basicSnippet">
+               :code="basicSnippet"
+               :script="basicScriptSnippet">
       <Table :columns="basicColumns"
              :dataSource="basicData"
              :pagination="false" />

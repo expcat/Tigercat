@@ -52,6 +52,40 @@ const basicSnippet = `<Form model={basicForm} onSubmit={handleBasicSubmit} class
   </FormItem>
 </Form>`
 
+const basicScriptSnippet = `import { useState } from 'react'
+
+const [basicForm, setBasicForm] = useState({
+  username: '',
+  email: '',
+  gender: 'male',
+  country: 'china',
+  bio: '',
+  agreement: false
+})
+
+const handleBasicSubmit = ({ valid, values }) => {
+  console.log('表单提交:', { valid, values })
+  alert(valid ? '表单提交成功！' : '表单验证失败')
+}
+
+const handleGenderChange = (value) => {
+  setBasicForm((prev) => ({ ...prev, gender: String(value) }))
+}
+
+const handleCountryChange = (value) => {
+  setBasicForm((prev) => ({
+    ...prev,
+    country: String(Array.isArray(value) ? (value[0] ?? '') : (value ?? ''))
+  }))
+}
+
+const resetBasic = () => {
+  setBasicForm({
+    username: '', email: '', gender: 'male',
+    country: 'china', bio: '', agreement: false
+  })
+}`
+
 const validateSnippet = `<Space direction="vertical" className="w-full">
   <Form ref={validateFormRef} model={validateForm} rules={validateRules} onSubmit={handleValidateSubmit} className="max-w-md">
     <FormItem label="用户名" name="username">
@@ -266,7 +300,8 @@ const FormDemo: React.FC = () => {
       <DemoBlock
         title="基础用法"
         description="完整的表单示例，包含多种表单控件。"
-        code={basicSnippet}>
+        code={basicSnippet}
+        script={basicScriptSnippet}>
         <Form model={basicForm} onSubmit={handleBasicSubmit} className="max-w-md">
           <FormItem label="用户名" required>
             <Input

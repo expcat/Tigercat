@@ -66,6 +66,12 @@ const selectableSnippet = `<PieChart
   @slice-click="handleSliceClick"
 />`
 
+const selectableScriptSnippet = `import { ref } from 'vue'
+
+const hoveredIndex = ref<number | null>(null)
+const selectedIndex = ref<number | null>(null)
+const clickedSlice = ref<string>('')`
+
 const fullSnippet = `<PieChart
   :data="data"
   :width="480"
@@ -126,7 +132,8 @@ const fullSnippet = `<PieChart
 
     <DemoBlock title="点击选中 + 图例"
                description="selectable 支持点击选中；配合图例实现完整交互。"
-               :code="selectableSnippet">
+               :code="selectableSnippet"
+               :script="selectableScriptSnippet">
       <div class="space-y-4">
         <PieChart :data="colorfulData"
                   :width="380"

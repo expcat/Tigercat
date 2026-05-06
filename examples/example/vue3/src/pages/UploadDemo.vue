@@ -55,6 +55,11 @@ const simulateUpload = (options: UploadRequestOptions) => {
   }, 500)
 }
 
+const basicScriptSnippet = `import { ref } from 'vue'
+import type { UploadFile } from '@expcat/tigercat-vue'
+
+const fileList = ref<UploadFile[]>([])`
+
 const basicSnippet = `<div class="max-w-md space-y-4">
   <Upload v-model:file-list="fileList" @change="handleChange">
     <template #default> 选择文件 </template>
@@ -129,7 +134,8 @@ const customRequestSnippet = `<div class="max-w-md">
     <!-- 基础用法 -->
     <DemoBlock title="基础用法"
                description="基础的文件上传组件。"
-               :code="basicSnippet">
+               :code="basicSnippet"
+               :script="basicScriptSnippet">
       <div class="max-w-md space-y-4">
         <Upload v-model:file-list="fileList"
                 @change="handleChange">

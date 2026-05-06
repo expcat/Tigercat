@@ -126,6 +126,10 @@ const checkableSnippet = `<p class="text-sm text-gray-600 mb-4">已勾选: {{ ch
   defaultExpandAll
   v-model:checkedKeys="checkedKeys" />`
 
+const checkableScriptSnippet = `import { ref } from 'vue'
+
+const checkedKeys = ref<(string | number)[]>(['1-1'])`
+
 const checkStrictlySnippet = `<p class="text-sm text-gray-600 mb-4">已勾选: {{ checkedKeysStrictly.join(', ') }}</p>
 <Tree
   :treeData="basicTreeData"
@@ -196,7 +200,8 @@ const blockSnippet = `<p class="text-sm text-gray-600 mb-4">节点占据整行�
 
     <DemoBlock title="多选树（级联）"
                description="勾选节点时父子联动。"
-               :code="checkableSnippet">
+               :code="checkableSnippet"
+               :script="checkableScriptSnippet">
       <p class="text-sm text-gray-600 mb-4">已勾选: {{ checkedKeys.join(', ') }}</p>
       <Tree :treeData="basicTreeData"
             checkable
