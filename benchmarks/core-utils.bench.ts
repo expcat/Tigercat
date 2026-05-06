@@ -18,8 +18,20 @@ import {
   getFixedVirtualRange,
   computeTreeMapNodes,
   computeSunburstArcs,
+  createGaugeArcPath,
+  createGaugeNeedlePath,
+  valueToGaugeAngle,
+  computeGaugeTicks,
+  createChartInteractionHandlers,
+  createChartPointerMoveScheduler,
+  getActiveIndex,
+  getChartElementOpacity,
+  getChartAnimationStyle,
+  getChartEntranceTransform,
+  defaultTooltipFormatter,
   type TreeMapChartDatum,
-  type SunburstChartDatum
+  type SunburstChartDatum,
+  type ChartInteractionState
 } from '@expcat/tigercat-core'
 
 describe('classNames', () => {
@@ -290,5 +302,190 @@ describe('Sunburst Layout', () => {
   bench('computeSunburstArcs (1000 nodes, new allocation)', () => {
     const fresh = generateSunburstData(1000, 4)
     computeSunburstArcs(fresh, { cx: 400, cy: 400, innerRadius: 60, outerRadius: 350 })
+  })
+})
+
+// ==========================================================================
+// Gauge Chart Computation
+// ==========================================================================
+
+describe('Gauge Chart', () => {
+  bench('createGaugeArcPath (track arc, 270°)', () => {
+    createGaugeArcPath(140, 100, 80, 135, 405, 20)
+  })
+
+  bench('createGaugeArcPath (value arc, 180°)', () => {
+    createGaugeArcPath(140, 100, 80, 135, 315, 20)
+  })
+
+  bench('createGaugeNeedlePath', () => {
+    createGaugeNeedlePath(140, 100, 54, 270, 4)
+  })
+
+  bench('valueToGaugeAngle (single value)', () => {
+    valueToGaugeAngle(72, 0, 100, 135, 405)
+  })
+
+  bench('valueToGaugeAngle (500 values sweep)', () => {
+    for (let i = 0; i < 500; i++) {
+      valueToGaugeAngle(i * 0.2, 0, 100, 135, 405)
+    }
+  })
+
+  bench('computeGaugeTicks (5 ticks)', () => {
+    computeGaugeTicks(140, 100, 80, 0, 100, 135, 405, 5)
+  })
+
+  bench('computeGaugeTicks (10 ticks)', () => {
+    computeGaugeTicks(140, 100, 80, 0, 100, 135, 405, 10)
+  })
+
+  bench('computeGaugeTicks (20 ticks, high precision)', () => {
+    computeGaugeTicks(200, 150, 120, -50, 250, 135, 405, 20)
+  })
+
+  bench('full gauge render prep (arc + needle + 5 ticks)', () => {
+    const cx = 140
+    const cy = 100
+    const r = 80
+    const aw = 20
+    const startAngle = 135
+    const endAngle = 405
+    const value = 72
+    const min = 0
+    const max = 100
+
+    const angle = valueToGaugeAngle(value, min, max, startAngle, endAngle)
+    createGaugeArcPath(cx, cy, r, startAngle, endAngle, aw)
+    createGaugeArcPath(cx, cy, r, startAngle, angle, aw)
+    createGaugeNeedlePath(cx, cy, r - aw - 6, angle, 4)
+    computeGaugeTicks(cx, cy, r, min, max, startAngle, endAngle, 5)
+  })
+
+  bench('full gauge render prep with 3 segments', () => {
+    const cx = 160
+    const cy = 110
+    const r = 90
+    const aw = 20
+    const startAngle = 135
+    const endAngle = 405
+    const min = 0
+    const max = 100
+    const segments = [
+      { range: [0, 40] as [number, number], color: '#ef4444' },
+      { range: [40, 70] as [number, number], color: '#f59e0b' },
+      { range: [70, 100] as [number, number], color: '#10b981' }
+    ]
+
+    createGaugeArcPath(cx, cy, r, startAngle, endAngle, aw)
+    for (const seg of segments) {
+      const sStart = valueToGaugeAngle(seg.range[0], min, max, startAngle, endAngle)
+      const sEnd = valueToGaugeAngle(seg.range[1], min, max, startAngle, endAngle)
+      createGaugeArcPath(cx, cy, r, sStart, sEnd, aw)
+    }
+    const angle = valueToGaugeAngle(72, min, max, startAngle, endAngle)
+    createGaugeNeedlePath(cx, cy, r - aw - 6, angle, 4)
+    computeGaugeTicks(cx, cy, r, min, max, startAngle, endAngle, 5)
+  })
+})
+
+// ==========================================================================
+// Chart Interaction Hot Paths
+// ==========================================================================
+
+describe('Chart Interaction', () => {
+  const data = Array.from({ length: 50 }, (_, i) => ({ label: `Item ${i}`, value: i * 10 }))
+
+  bench('createChartInteractionHandlers (setup)', () => {
+    const state: ChartInteractionState = { hoveredIndex: null, selectedIndex: null }
+    createChartInteractionHandlers(data, state, {
+      hoverable: true,
+      selectable: true
+    })
+  })
+
+  bench('interaction handler: 100 sequential hover enter/leave', () => {
+    const state: ChartInteractionState = { hoveredIndex: null, selectedIndex: null }
+    const handlers = createChartInteractionHandlers(data, state, {
+      hoverable: true,
+      selectable: true,
+      onHoverChange: () => {},
+      onSelectChange: () => {}
+    })
+    for (let i = 0; i < 100; i++) {
+      handlers.onMouseEnter(i % 50, data[i % 50])
+      handlers.onMouseLeave()
+    }
+  })
+
+  bench('interaction handler: 100 sequential click toggles', () => {
+    const state: ChartInteractionState = { hoveredIndex: null, selectedIndex: null }
+    const handlers = createChartInteractionHandlers(data, state, {
+      hoverable: true,
+      selectable: true,
+      onSelectChange: () => {}
+    })
+    for (let i = 0; i < 100; i++) {
+      handlers.onClick(i % 50, data[i % 50])
+    }
+  })
+
+  bench('getActiveIndex (all 4 sources)', () => {
+    getActiveIndex(1, 2, 3, 4)
+  })
+
+  bench('getActiveIndex (500 lookups, mixed scenarios)', () => {
+    for (let i = 0; i < 500; i++) {
+      const mod = i % 4
+      if (mod === 0) getActiveIndex(i, null, null, null)
+      else if (mod === 1) getActiveIndex(null, i, null, null)
+      else if (mod === 2) getActiveIndex(null, null, i, null)
+      else getActiveIndex(null, null, null, i)
+    }
+  })
+
+  bench('getChartElementOpacity (single)', () => {
+    getChartElementOpacity(3, 5, { activeOpacity: 1, inactiveOpacity: 0.25 })
+  })
+
+  bench('getChartElementOpacity (50 elements batch)', () => {
+    for (let i = 0; i < 50; i++) {
+      getChartElementOpacity(i, 25, { activeOpacity: 1, inactiveOpacity: 0.25 })
+    }
+  })
+
+  bench('getChartAnimationStyle (50 elements with stagger)', () => {
+    const config = { animated: true, duration: 300, easing: 'ease-out' as const, stagger: 50 }
+    for (let i = 0; i < 50; i++) {
+      getChartAnimationStyle(config, i)
+    }
+  })
+
+  bench('getChartEntranceTransform (scale, 100 frames)', () => {
+    for (let i = 0; i <= 100; i++) {
+      getChartEntranceTransform('scale', i / 100, { originX: 200, originY: 200 })
+    }
+  })
+
+  bench('getChartEntranceTransform (slide-up, 100 frames)', () => {
+    for (let i = 0; i <= 100; i++) {
+      getChartEntranceTransform('slide-up', i / 100)
+    }
+  })
+
+  bench('defaultTooltipFormatter (500 calls)', () => {
+    for (let i = 0; i < 500; i++) {
+      defaultTooltipFormatter(`Label ${i}`, i * 3.14, 'Series A', i)
+    }
+  })
+
+  bench('createChartPointerMoveScheduler (setup + schedule + cancel)', () => {
+    const scheduler = createChartPointerMoveScheduler({
+      onPositionChange: () => {},
+      requestFrame: () => 1,
+      cancelFrame: () => {}
+    })
+    scheduler.schedule({ x: 100, y: 200 })
+    scheduler.cancel()
   })
 })

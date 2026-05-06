@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 Advanced 交互测试补强 — FileManager / ImageViewer / InfiniteScroll / VirtualList / VirtualTable 新增 48 条边界与交互测试（Vue 24 + React 24），覆盖：零项/单项/超大数据集、disabled 项、深层路径导航、out-of-bounds 索引、maskClosable=false、zoom/rotate 变换重置、overscan 极值、loading+empty 互斥状态、horizontal 方向、sentinel 隐藏属性等；全部 239 条测试通过。
-- 推荐下一步：P2 Chart benchmark 补齐 — benchmark 覆盖 GaugeChart 计算与 chart interaction 热路径。
+- 上一步完成：P1 低覆盖热点补强（第一批） — 新增 6 个测试文件（Vue: FloatButton 22 tests、Empty 11 tests、Result 16 tests；React: FloatButton 20 tests、Empty 9 tests、Result 14 tests），扩展 Watermark 测试（Vue 1→7、React 1→7），共计 106 条新测试全部通过。覆盖渲染、交互、disabled、slot/props、className 合并、shape/status variants、Teleport/Portal 等边界。
+- 推荐下一步：P1 低覆盖热点补强（第二批） — 继续为 FunnelChart、GaugeChart、SunburstChart、TreeMapChart 补基础渲染与 props 测试（当前零测试），或进入 P1 组件 API 一致性审查。
 
 ## 未实现组件
 
@@ -67,7 +67,7 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | P1     | ~~TaskBoard 拖拽技术债~~     | ~~TaskBoard~~                                                            | ~~已完成：Core 新增 TaskBoardDragController 统一三套拖拽，Vue/React 消除重复 handler~~ |
 | P1     | ~~VirtualTable 压测~~          | ~~VirtualTable~~                                                             | ~~已完成：sticky header + sticky column 同时启用，benchmark 覆盖 1000 列 × 10k 行，render prep ~1.8ms/帧~~ |
 | P1     | ~~Advanced 交互测试补强~~        | ~~FileManager / ImageViewer / InfiniteScroll / VirtualList / VirtualTable~~  | ~~已完成：新增 48 条边界与交互测试，覆盖零项/disabled/极值/变换重置等场景，全部通过~~ |
-| P2     | Chart benchmark 补齐         | GaugeChart / chart interaction                                           | benchmark 覆盖 Gauge 计算与 interaction 热路径                                           |
+| P2     | ~~Chart benchmark 补齐~~         | ~~GaugeChart / chart interaction~~                                           | ~~已完成：新增 21 项 benchmark 覆盖 Gauge 计算与 interaction 热路径，全部通过无瓶颈~~ |
 | P2     | Composite 配方化             | DataTableWithToolbar / CropUpload / FormWizard                           | 评估是否转 cookbook 配方；若保留组件，说明体积边界                                        |
 | P2     | PrintLayout stylesheet 化    | PrintLayout                                                              | 评估改为 stylesheet + class util，若保留组件需说明收益                                    |
 | P2     | RichText toolbar 插件化      | RichTextEditor                                                           | toolbar 命令注册支持插件配置，并保持默认轻量 engine                                       |

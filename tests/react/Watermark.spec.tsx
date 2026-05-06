@@ -32,4 +32,61 @@ describe('Watermark', () => {
       backgroundRepeat: 'repeat'
     })
   })
+
+  it('renders overlay even without content', () => {
+    const { container } = render(
+      <Watermark>
+        <span>Content</span>
+      </Watermark>
+    )
+    const overlay = container.querySelector('[data-watermark="true"]')
+    expect(overlay).toBeInTheDocument()
+  })
+
+  it('renders with array content', () => {
+    const { container } = render(
+      <Watermark content={['Line 1', 'Line 2']}>
+        <span>Body</span>
+      </Watermark>
+    )
+    const overlay = container.querySelector('[data-watermark="true"]')
+    expect(overlay).toBeInTheDocument()
+    expect(screen.getByText('Body')).toBeInTheDocument()
+  })
+
+  it('overlay has pointer-events none', () => {
+    render(
+      <Watermark content="Secret" data-testid="wm">
+        <span>Content</span>
+      </Watermark>
+    )
+    const overlay = screen.getByTestId('wm').querySelector('[data-watermark="true"]') as HTMLElement
+    expect(overlay.style.pointerEvents).toBe('none')
+  })
+
+  it('applies custom zIndex via overlay style', () => {
+    render(
+      <Watermark content="Z" zIndex={999} data-testid="wm">
+        <span>Content</span>
+      </Watermark>
+    )
+    const overlay = screen.getByTestId('wm').querySelector('[data-watermark="true"]') as HTMLElement
+    expect(overlay.style.zIndex).toBe('999')
+  })
+
+  it('merges className prop', () => {
+    const { container } = render(
+      <Watermark className="prop-cls">
+        <span>Content</span>
+      </Watermark>
+    )
+    const wrapper = container.firstElementChild as HTMLElement
+    expect(wrapper).toHaveClass('prop-cls')
+  })
+
+  it('renders without children', () => {
+    const { container } = render(<Watermark content="Empty" />)
+    const overlay = container.querySelector('[data-watermark="true"]')
+    expect(overlay).toBeInTheDocument()
+  })
 })
