@@ -38,10 +38,12 @@ description: Shared props definitions for layout components - Card, Container, D
 
 ### Props
 
-| Prop    | Type               | Default | Vue | React | Description |
-| ------- | ------------------ | ------- | :-: | :---: | ----------- |
-| width   | `string \| number` | -       |  ✓  |   ✓   | 最大宽度    |
-| padding | `string \| number` | -       |  ✓  |   ✓   | 内边距      |
+| Prop     | Type                                                         | Default | Vue | React | Description              |
+| -------- | ------------------------------------------------------------ | ------- | :-: | :---: | ------------------------ |
+| as       | `string \| Component`                                       | `'div'` |  ✓  |   ✓   | 渲染的 HTML 标签或组件    |
+| maxWidth | `'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| 'full' \| false` | `false` |  ✓  |   ✓   | 最大宽度约束             |
+| center   | `boolean`                                                    | `true`  |  ✓  |   ✓   | 水平居中                 |
+| padding  | `boolean`                                                    | `true`  |  ✓  |   ✓   | 响应式水平内边距         |
 
 ---
 
@@ -52,7 +54,7 @@ description: Shared props definitions for layout components - Card, Container, D
 | Prop        | Type                                             | Default        | Vue | React | Description                |
 | ----------- | ------------------------------------------------ | -------------- | :-: | :---: | -------------------------- |
 | orientation | `'horizontal' \| 'vertical'`                     | `'horizontal'` |  ✓  |   ✓   | 方向                       |
-| lineStyle   | `'solid' \| 'dashed' \| 'dotted'`                | `'solid'`      |  ✓  |   ✓   | 线条样式                   |
+| lineStyle   | `'solid' \| 'dashed' \| 'dotted' \| 'gradient'`  | `'solid'`      |  ✓  |   ✓   | 线条样式                   |
 | spacing     | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`         |  ✓  |   ✓   | 周围间距                   |
 | color       | `string`                                         | -              |  ✓  |   ✓   | 自定义颜色（CSS 值或变量） |
 | thickness   | `string`                                         | -              |  ✓  |   ✓   | 自定义线条粗细             |
@@ -151,6 +153,7 @@ description: Shared props definitions for layout components - Card, Container, D
 | loading           | `boolean`                                             | `false`        |  ✓   |   ✓   | 加载状态                          |
 | emptyText         | `string`                                              | `'No data'`    |  ✓   |   ✓   | 空状态文案                        |
 | hoverable         | `boolean`                                             | `false`        |  ✓   |   ✓   | 鼠标悬停效果                      |
+| draggable         | `boolean`                                             | `false`        |  ✓   |   ✓   | 启用拖拽排序                      |
 | rowKey            | `string \| ((item, index) => string \| number)`       | `'key'`        |  ✓   |   ✓   | 行键                              |
 | pagination        | `ListPaginationConfig \| false`                       | `false`        |  ✓   |   ✓   | 分页配置                          |
 | virtual           | `boolean`                                             | `false`        |  ✓   |   ✓   | 启用 VirtualList 固定高度虚拟渲染 |
@@ -177,6 +180,7 @@ description: Shared props definitions for layout components - Card, Container, D
 | ------------- | -------------- | --------------------------------------- | ----------- |
 | `item-click`  | `onItemClick`  | `(item: ListItem, index: number)`       | 点击列表项  |
 | `page-change` | `onPageChange` | `{ current: number, pageSize: number }` | 分页变化    |
+| `reorder`     | `onReorder`    | `(items, fromIndex, toIndex)`           | 拖拽排序完成 |
 
 ---
 
@@ -189,7 +193,7 @@ description: Shared props definitions for layout components - Card, Container, D
 | title        | `string` / `ReactNode`       | -              |  ✓  |   ✓   | 标题             |
 | extra        | `unknown` / `ReactNode`      | -              |  ✓  |   ✓   | 标题右侧额外内容 |
 | bordered     | `boolean`                    | `false`        |  ✓  |   ✓   | 显示边框         |
-| column       | `number`                     | `3`            |  ✓  |   ✓   | 每行列数         |
+| column       | `number \| Partial<Record<Breakpoint, number>>` | `3`            |  ✓  |   ✓   | 每行列数（支持响应式对象） |
 | size         | `'sm' \| 'md' \| 'lg'`       | `'md'`         |  ✓  |   ✓   | 尺寸             |
 | layout       | `'horizontal' \| 'vertical'` | `'horizontal'` |  ✓  |   ✓   | 布局方向         |
 | colon        | `boolean`                    | `true`         |  ✓  |   ✓   | 标签后显示冒号   |
@@ -277,7 +281,7 @@ description: Shared props definitions for layout components - Card, Container, D
 | precision         | `number`               | -       |  ✓  |   ✓   | 数值精度（小数位数）     |
 | prefix            | `string`               | -       |  ✓  |   ✓   | 值前缀（如 ¥、$）        |
 | suffix            | `string`               | -       |  ✓  |   ✓   | 值后缀（如 %、元）       |
-| groupSeparator    | `boolean`              | -       |  ✓  |   ✓   | 千分位分隔符（如 1,000） |
+| groupSeparator    | `boolean`              | `false` |  ✓  |   ✓   | 千分位分隔符（如 1,000） |
 | animated          | `boolean`              | `false` |  ✓  |   ✓   | 是否启用数字滚动动画     |
 | animationDuration | `number`               | `800`   |  ✓  |   ✓   | 数字动画时长（毫秒）     |
 | size              | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸                     |
@@ -287,8 +291,10 @@ description: Shared props definitions for layout components - Card, Container, D
 
 | Vue Slot | React Prop | Description    |
 | -------- | ---------- | -------------- |
-| `prefix` | `prefix`   | 自定义前缀内容 |
-| `suffix` | `suffix`   | 自定义后缀内容 |
+| `prefix` | -          | 自定义前缀内容（Vue slot）|
+| `suffix` | -          | 自定义后缀内容（Vue slot）|
+
+> `prefix` 和 `suffix` 在 core 类型中为 `string` 类型 prop，Vue 也支持同名 slot 覆盖
 
 ---
 

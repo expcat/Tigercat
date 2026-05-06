@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-basic
-description: Shared props definitions for basic components - Alert, Avatar, Badge, Button, Code, ConfigProvider, Divider, Empty, Icon, Image, ImagePreview, ImageGroup, ImageCropper, Link, QRCode, Tag, Text
+description: Shared props definitions for basic components - Alert, Avatar, AvatarGroup, Badge, Button, ButtonGroup, Code, ConfigProvider, Empty, Icon, Image, ImageCropper, ImageGroup, ImagePreview, ImageViewer, Link, QRCode, Rate, Result, Segmented, Statistic, Tag, Text, Watermark
 ---
 
 # Basic Components - Props Reference
@@ -36,28 +36,16 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop | Type                                   | Default | Vue | React | Description |
-| ---- | -------------------------------------- | ------- | :-: | :---: | ----------- |
-| size | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | -       |  ✓  |   ✓   | 统一尺寸    |
+| Prop     | Type                                   | Default | Vue | React | Description    |
+| -------- | -------------------------------------- | ------- | :-: | :---: | -------------- |
+| size     | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | -       |  ✓  |   ✓   | 统一尺寸       |
+| vertical | `boolean`                              | `false` |  ✓  |   ✓   | 垂直排列按钮组 |
 
 ### Slots / Children
 
 | Vue Slot  | React Prop | Description |
 | --------- | ---------- | ----------- |
 | `default` | `children` | Button 列表 |
-
-### Events
-
-| Vue Event | React Callback | Payload      | Description |
-| --------- | -------------- | ------------ | ----------- |
-| `@click`  | `onClick`      | `MouseEvent` | 点击事件    |
-
-### Slots / Children
-
-| Vue Slot       | React Prop    | Description    |
-| -------------- | ------------- | -------------- |
-| `default`      | `children`    | 按钮内容       |
-| `loading-icon` | `loadingIcon` | 自定义加载图标 |
 
 ---
 
@@ -104,7 +92,7 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 | src       | `string`                       | -          |  ✓  |   ✓   | 图片地址                             |
 | alt       | `string`                       | `''`       |  ✓  |   ✓   | 图片替代文字                         |
 | size      | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`     |  ✓  |   ✓   | 尺寸                                 |
-| shape     | `'circle' \| 'square'`         | `'circle'` |  ✓  |   ✓   | 形状                                 |
+| shape     | `'circle' \| 'square' \| 'squircle'` | `'circle'` |  ✓  |   ✓   | 形状                                 |
 | text      | `string`                       | -          |  ✓  |   ✓   | 文字（无图片时显示首字母缩写）       |
 | bgColor   | `string`                       | 主题变量   |  ✓  |   ✓   | 文字/图标头像背景色（Tailwind 类名） |
 | textColor | `string`                       | 主题变量   |  ✓  |   ✓   | 文字/图标头像文字色（Tailwind 类名） |
@@ -312,8 +300,8 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 | width     | `string \| number`                                         | -         |  ✓  |   ✓   | 宽度                 |
 | height    | `string \| number`                                         | -         |  ✓  |   ✓   | 高度                 |
 | lazy      | `boolean`                                                  | `false`   |  ✓  |   ✓   | 懒加载               |
-| preview   | `boolean`                                                  | `false`   |  ✓  |   ✓   | 点击预览             |
-| fallback  | `string`                                                   | -         |  ✓  |   ✓   | 加载失败时的回退图片 |
+| preview     | `boolean`                                                  | `true`    |  ✓  |   ✓   | 点击预览             |
+| fallbackSrc | `string`                                                   | -         |  ✓  |   ✓   | 加载失败时的回退图片 |
 | className | `string`                                                   | -         |  -  |   ✓   | 自定义类名           |
 
 ### Events
@@ -337,24 +325,24 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop         | Type       | Default | Vue | React | Description                 |
-| ------------ | ---------- | ------- | :-: | :---: | --------------------------- |
-| open         | `boolean`  | `false` |  ✓  |   ✓   | 是否可见 (v0.9.0+)          |
-| visible      | `boolean`  | `false` |  ✓  |   ✓   | ~~已废弃~~ 使用 `open` 代替 |
-| src          | `string`   | -       |  ✓  |   ✓   | 单张预览图片地址            |
-| srcList      | `string[]` | -       |  ✓  |   ✓   | 多张预览图片列表            |
-| currentIndex | `number`   | `0`     |  ✓  |   ✓   | 当前显示索引                |
-| maskClosable | `boolean`  | `true`  |  ✓  |   ✓   | 点击遮罩关闭                |
-| className    | `string`   | -       |  -  |   ✓   | 自定义类名                  |
+| Prop         | Type       | Default | Vue | React | Description    |
+| ------------ | ---------- | ------- | :-: | :---: | -------------- |
+| open         | `boolean`  | `false` |  ✓  |   ✓   | 是否可见       |
+| images       | `string[]` | -       |  ✓  |   ✓   | 预览图片列表   |
+| currentIndex | `number`   | `0`     |  ✓  |   ✓   | 当前显示索引   |
+| zIndex       | `number`   | `1050`  |  ✓  |   ✓   | 层级           |
+| maskClosable | `boolean`  | `true`  |  ✓  |   ✓   | 点击遮罩关闭   |
+| scaleStep    | `number`   | `0.5`   |  ✓  |   ✓   | 每次缩放步长   |
+| minScale     | `number`   | `0.25`  |  ✓  |   ✓   | 最小缩放倍率   |
+| maxScale     | `number`   | `5`     |  ✓  |   ✓   | 最大缩放倍率   |
 
 ### Events
 
-| Vue Event              | React Callback         | Payload   | Description             |
-| ---------------------- | ---------------------- | --------- | ----------------------- |
-| `@update:open`         | `onOpenChange`         | `boolean` | 可见性变化 (v0.9.0+)    |
-| `@update:visible`      | `onVisibleChange`      | `boolean` | ~~已废弃~~ 使用上方代替 |
-| `@update:currentIndex` | `onCurrentIndexChange` | `number`  | 当前索引变化            |
-| `@scale-change`        | `onScaleChange`        | `number`  | 缩放倍率变化            |
+| Vue Event              | React Callback         | Payload   | Description  |
+| ---------------------- | ---------------------- | --------- | ------------ |
+| `@update:open`         | `onOpenChange`         | `boolean` | 可见性变化   |
+| `@update:currentIndex` | `onCurrentIndexChange` | `number`  | 当前索引变化 |
+| `@scale-change`        | `onScaleChange`        | `number`  | 缩放倍率变化 |
 
 ---
 
@@ -362,9 +350,10 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 ### Props
 
-| Prop      | Type     | Default | Vue | React | Description |
-| --------- | -------- | ------- | :-: | :---: | ----------- |
-| className | `string` | -       |  -  |   ✓   | 自定义类名  |
+| Prop      | Type      | Default | Vue | React | Description            |
+| --------- | --------- | ------- | :-: | :---: | ---------------------- |
+| preview   | `boolean` | `true`  |  ✓  |   ✓   | 是否启用点击预览       |
+| className | `string`  | -       |  -  |   ✓   | 自定义类名             |
 
 ### Behavior
 
@@ -415,7 +404,7 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 
 | Prop        | Type                                                    | Default     | Vue | React | Description                |
 | ----------- | ------------------------------------------------------- | ----------- | :-: | :---: | -------------------------- |
-| preset      | `'default' \| 'simple' \| 'search' \| 'error' \| 'network'` | `'default'` |  ✓  |   ✓   | 预设空状态类型             |
+| preset      | `'default' \| 'simple' \| 'no-data' \| 'no-results' \| 'error'` | `'default'` |  ✓  |   ✓   | 预设空状态类型             |
 | description | `string`                                                | -           |  ✓  |   ✓   | 描述文字                   |
 | showImage   | `boolean`                                               | `true`      |  ✓  |   ✓   | 是否显示空状态图片         |
 | className   | `string`                                                | -           |  -  |   ✓   | 自定义类名                 |
@@ -427,6 +416,7 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 | `default`     | `children` | 底部额外操作区     |
 | `image`       | `image`    | 自定义图片内容     |
 | `description` | -          | 自定义描述内容     |
+| `extra`       | `extra`    | 底部额外内容       |
 
 ---
 
@@ -443,6 +433,178 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 | level     | `'L' \| 'M' \| 'Q' \| 'H'`              | `'M'`       |  ✓  |   ✓   | 纠错等级         |
 | status    | `'active' \| 'expired' \| 'loading'`     | `'active'`  |  ✓  |   ✓   | 二维码状态       |
 | className | `string`                                 | -           |  -  |   ✓   | 自定义类名       |
+
+### Events
+
+| Vue Event  | React Callback | Payload | Description            |
+| ---------- | -------------- | ------- | ---------------------- |
+| `@refresh` | `onRefresh`    | -       | 点击刷新按钮（过期态） |
+
+---
+
+## Result 结果页
+
+### Props
+
+| Prop      | Type                                                                             | Default  | Vue | React | Description |
+| --------- | -------------------------------------------------------------------------------- | -------- | :-: | :---: | ----------- |
+| status    | `'success' \| 'error' \| 'warning' \| 'info' \| '404' \| '403' \| '500'` | `'info'` |  ✓  |   ✓   | 结果状态    |
+| title     | `string`                                                                         | -        |  ✓  |   ✓   | 标题        |
+| subTitle  | `string`                                                                         | -        |  ✓  |   ✓   | 副标题      |
+| className | `string`                                                                         | -        |  -  |   ✓   | 自定义类名  |
+
+### Slots / Children
+
+| Vue Slot   | React Prop | Description      |
+| ---------- | ---------- | ---------------- |
+| `icon`     | `icon`     | 自定义图标       |
+| `title`    | -          | 自定义标题内容   |
+| `subTitle` | -          | 自定义副标题内容 |
+| `extra`    | `extra`    | 额外操作区       |
+| `default`  | `children` | 默认内容         |
+
+---
+
+## Statistic 统计数值
+
+### Props
+
+| Prop              | Type                    | Default | Vue | React | Description        |
+| ----------------- | ----------------------- | ------- | :-: | :---: | ------------------ |
+| title             | `string`                | -       |  ✓  |   ✓   | 标题               |
+| value             | `string \| number`     | -       |  ✓  |   ✓   | 数值               |
+| precision         | `number`                | -       |  ✓  |   ✓   | 小数精度           |
+| prefix            | `string`                | -       |  ✓  |   ✓   | 前缀               |
+| suffix            | `string`                | -       |  ✓  |   ✓   | 后缀               |
+| groupSeparator    | `boolean`               | `false` |  ✓  |   ✓   | 千分位分隔符       |
+| animated          | `boolean`               | `false` |  ✓  |   ✓   | 数值动画           |
+| animationDuration | `number`                | -       |  ✓  |   ✓   | 动画时长（ms）     |
+| size              | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸               |
+| className         | `string`                | -       |  -  |   ✓   | 自定义类名         |
+
+---
+
+## Rate 评分
+
+### Props
+
+| Prop       | Type                    | Default | Vue | React | Description              |
+| ---------- | ----------------------- | ------- | :-: | :---: | ------------------------ |
+| count      | `number`                | `5`     |  ✓  |   ✓   | 星星总数                 |
+| allowHalf  | `boolean`               | `false` |  ✓  |   ✓   | 允许半选                 |
+| disabled   | `boolean`               | `false` |  ✓  |   ✓   | 禁用状态                 |
+| size       | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸                     |
+| allowClear | `boolean`               | `true`  |  ✓  |   ✓   | 允许再次点击清除         |
+| character  | `string`                | -       |  ✓  |   ✓   | 自定义字符（替代星星）   |
+| className  | `string`                | -       |  -  |   ✓   | 自定义类名               |
+
+### Events
+
+| Vue Event       | React Callback | Payload  | Description  |
+| --------------- | -------------- | -------- | ------------ |
+| `@change`       | `onChange`     | `number` | 选中值变化   |
+| `@hover-change` | `onHoverChange`| `number` | 悬停值变化   |
+
+> **Vue**: 支持 `v-model` 双向绑定（`modelValue` / `@update:modelValue`）
+
+---
+
+## Segmented 分段控制
+
+### Props
+
+| Prop      | Type                    | Default | Vue | React | Description |
+| --------- | ----------------------- | ------- | :-: | :---: | ----------- |
+| options   | `SegmentedOption[]`     | `[]`    |  ✓  |   ✓   | 选项列表    |
+| disabled  | `boolean`               | `false` |  ✓  |   ✓   | 禁用状态    |
+| size      | `'sm' \| 'md' \| 'lg'` | `'md'`  |  ✓  |   ✓   | 尺寸        |
+| block     | `boolean`               | `false` |  ✓  |   ✓   | 撑满容器    |
+| className | `string`                | -       |  -  |   ✓   | 自定义类名  |
+
+### SegmentedOption
+
+| Field    | Type               | Description |
+| -------- | ------------------ | ----------- |
+| value    | `string \| number` | 选项值      |
+| label    | `string`           | 显示文本    |
+| disabled | `boolean`          | 是否禁用    |
+| icon     | `string`           | 图标        |
+
+### Events
+
+| Vue Event | React Callback | Payload            | Description |
+| --------- | -------------- | ------------------ | ----------- |
+| `@change` | `onChange`     | `string \| number` | 选中值变化  |
+
+> **Vue**: 支持 `v-model` 双向绑定（`modelValue` / `@update:modelValue`）
+
+---
+
+## Watermark 水印
+
+### Props
+
+| Prop      | Type                | Default | Vue | React | Description            |
+| --------- | ------------------- | ------- | :-: | :---: | ---------------------- |
+| content   | `string \| string[]`| -       |  ✓  |   ✓   | 水印文字（多行传数组） |
+| image     | `string`            | -       |  ✓  |   ✓   | 水印图片地址           |
+| width     | `number`            | `120`   |  ✓  |   ✓   | 水印宽度               |
+| height    | `number`            | `64`    |  ✓  |   ✓   | 水印高度               |
+| rotate    | `number`            | `-22`   |  ✓  |   ✓   | 旋转角度               |
+| zIndex    | `number`            | `9`     |  ✓  |   ✓   | 层级                   |
+| gapX      | `number`            | `100`   |  ✓  |   ✓   | 水平间距               |
+| gapY      | `number`            | `100`   |  ✓  |   ✓   | 垂直间距               |
+| offsetX   | `number`            | `0`     |  ✓  |   ✓   | 水平偏移               |
+| offsetY   | `number`            | `0`     |  ✓  |   ✓   | 垂直偏移               |
+| font      | `WatermarkFont`     | -       |  ✓  |   ✓   | 字体配置               |
+| className | `string`            | -       |  -  |   ✓   | 自定义类名             |
+
+### WatermarkFont
+
+| Field      | Type                                               | Default            | Description |
+| ---------- | -------------------------------------------------- | ------------------ | ----------- |
+| fontSize   | `number`                                           | `16`               | 字号        |
+| fontFamily | `string`                                           | `'sans-serif'`     | 字体        |
+| fontWeight | `'normal' \| 'bold' \| 'lighter' \| number`      | `'normal'`         | 字重        |
+| color      | `string`                                           | `'rgba(0,0,0,0.15)'` | 颜色     |
+
+### Slots / Children
+
+| Vue Slot  | React Prop | Description |
+| --------- | ---------- | ----------- |
+| `default` | `children` | 被水印覆盖的内容 |
+
+---
+
+## ImageViewer 图片查看器
+
+独立的全屏图片查看器组件，支持缩放、旋转、多图导航。
+
+### Props
+
+| Prop         | Type       | Default | Vue | React | Description      |
+| ------------ | ---------- | ------- | :-: | :---: | ---------------- |
+| images       | `string[]` | -       |  ✓  |   ✓   | 图片列表         |
+| open         | `boolean`  | `false` |  ✓  |   ✓   | 是否显示         |
+| currentIndex | `number`   | `0`     |  ✓  |   ✓   | 当前图片索引     |
+| zoomable     | `boolean`  | `true`  |  ✓  |   ✓   | 是否可缩放       |
+| rotatable    | `boolean`  | `true`  |  ✓  |   ✓   | 是否可旋转       |
+| showNav      | `boolean`  | `true`  |  ✓  |   ✓   | 显示导航箭头     |
+| showCounter  | `boolean`  | `true`  |  ✓  |   ✓   | 显示图片计数器   |
+| maskClosable | `boolean`  | `true`  |  ✓  |   ✓   | 点击遮罩关闭     |
+| minZoom      | `number`   | `0.5`   |  ✓  |   ✓   | 最小缩放倍率     |
+| maxZoom      | `number`   | `3`     |  ✓  |   ✓   | 最大缩放倍率     |
+| className    | `string`   | -       |  -  |   ✓   | 自定义类名       |
+
+### Events
+
+| Vue Event              | React Callback  | Payload  | Description    |
+| ---------------------- | --------------- | -------- | -------------- |
+| `@update:open`         | -               | `boolean`| 可见性变化     |
+| `@update:currentIndex` | `onIndexChange` | `number` | 当前索引变化   |
+| `@close`               | `onClose`       | -        | 关闭事件       |
+
+> **Vue**: 支持 `v-model:open` 和 `v-model:currentIndex` 双向绑定
 
 ---
 

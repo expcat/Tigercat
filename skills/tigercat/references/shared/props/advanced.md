@@ -17,11 +17,23 @@ description: Shared props definitions for advanced interaction components - Spli
 | ------------ | -------------------------- | -------------- | :-: | :---: | ----------------------- |
 | direction    | `'horizontal' \| 'vertical'` | `'horizontal'` |  ✓  |   ✓   | 分割方向               |
 | sizes        | `number[]`                 | -              |  ✓  |   ✓   | 面板尺寸比例           |
-| minSizes     | `number[]`                 | -              |  ✓  |   ✓   | 面板最小尺寸           |
-| maxSizes     | `number[]`                 | -              |  ✓  |   ✓   | 面板最大尺寸           |
-| collapsible  | `boolean \| boolean[]`     | `false`        |  ✓  |   ✓   | 面板是否可折叠         |
-| gutterSize   | `number`                   | `8`            |  ✓  |   ✓   | 分割条宽度 (px)        |
+| min          | `number`                   | -              |  ✓  |   ✓   | 面板最小尺寸           |
+| max          | `number`                   | -              |  ✓  |   ✓   | 面板最大尺寸           |
+| gutterSize   | `number`                   | `4`            |  ✓  |   ✓   | 分割条宽度 (px)        |
+| disabled     | `boolean`                  | `false`        |  ✓  |   ✓   | 禁用交互               |
 | className    | `string`                   | -              |  ✓  |   ✓   | 自定义类名             |
+| style        | `Record<string, string \| number>` | -       |  ✓  |   ✓   | 内联样式               |
+
+### SplitterPaneConfig
+
+| Prop         | Type       | Default | Description            |
+| ------------ | ---------- | ------- | ---------------------- |
+| key          | `string`   | -       | 面板唯一标识           |
+| defaultSize  | `number`   | -       | 默认尺寸               |
+| min          | `number`   | -       | 面板级最小尺寸         |
+| max          | `number`   | -       | 面板级最大尺寸         |
+| collapsible  | `boolean`  | `false` | 是否可折叠             |
+| collapsed    | `boolean`  | `false` | 是否折叠               |
 
 ### Events
 
@@ -36,18 +48,19 @@ description: Shared props definitions for advanced interaction components - Spli
 
 ### Props
 
-| Prop         | Type                                          | Default     | Vue | React | Description          |
-| ------------ | --------------------------------------------- | ----------- | :-: | :---: | -------------------- |
-| width        | `number`                                      | `200`       |  ✓  |   ✓   | 初始宽度             |
-| height       | `number`                                      | `200`       |  ✓  |   ✓   | 初始高度             |
-| minWidth     | `number`                                      | `0`         |  ✓  |   ✓   | 最小宽度             |
-| minHeight    | `number`                                      | `0`         |  ✓  |   ✓   | 最小高度             |
-| maxWidth     | `number`                                      | `Infinity`  |  ✓  |   ✓   | 最大宽度             |
-| maxHeight    | `number`                                      | `Infinity`  |  ✓  |   ✓   | 最大高度             |
-| handles      | `ResizeHandle[]`                              | `['se']`    |  ✓  |   ✓   | 拖拽手柄位置         |
-| lockAspectRatio | `boolean`                                  | `false`     |  ✓  |   ✓   | 锁定宽高比           |
-| disabled     | `boolean`                                     | `false`     |  ✓  |   ✓   | 禁用调整             |
-| className    | `string`                                      | -           |  ✓  |   ✓   | 自定义类名           |
+| Prop         | Type                                          | Default                               | Vue | React | Description          |
+| ------------ | --------------------------------------------- | ------------------------------------- | :-: | :---: | -------------------- |
+| defaultWidth | `number`                                      | `200`                                 |  ✓  |   ✓   | 初始宽度             |
+| defaultHeight| `number`                                      | `200`                                 |  ✓  |   ✓   | 初始高度             |
+| minWidth     | `number`                                      | `0`                                   |  ✓  |   ✓   | 最小宽度             |
+| minHeight    | `number`                                      | `0`                                   |  ✓  |   ✓   | 最小高度             |
+| maxWidth     | `number`                                      | -                                     |  ✓  |   ✓   | 最大宽度             |
+| maxHeight    | `number`                                      | -                                     |  ✓  |   ✓   | 最大高度             |
+| handles      | `ResizeHandlePosition[]`                      | `['right', 'bottom', 'bottom-right']` |  ✓  |   ✓   | 拖拽手柄位置         |
+| axis         | `ResizeAxis`                                  | `'both'`                              |  ✓  |   ✓   | 调整轴向             |
+| lockAspectRatio | `boolean`                                  | `false`                               |  ✓  |   ✓   | 锁定宽高比           |
+| disabled     | `boolean`                                     | `false`                               |  ✓  |   ✓   | 禁用调整             |
+| className    | `string`                                      | -                                     |  ✓  |   ✓   | 自定义类名           |
 
 ### Events
 
@@ -63,17 +76,22 @@ description: Shared props definitions for advanced interaction components - Spli
 
 ### Props
 
-| Prop          | Type                            | Default   | Vue | React | Description        |
-| ------------- | ------------------------------- | --------- | :-: | :---: | ------------------ |
-| value / modelValue | `string`                   | `''`      |  ✓  |   ✓   | 代码内容           |
-| language      | `CodeLanguage`                  | `'text'`  |  ✓  |   ✓   | 编程语言           |
-| theme         | `'light' \| 'dark'`            | `'light'` |  ✓  |   ✓   | 编辑器主题         |
-| readOnly      | `boolean`                       | `false`   |  ✓  |   ✓   | 只读模式           |
-| lineNumbers   | `boolean`                       | `true`    |  ✓  |   ✓   | 显示行号           |
-| tabSize       | `number`                        | `2`       |  ✓  |   ✓   | Tab 缩进空格数     |
-| placeholder   | `string`                        | -         |  ✓  |   ✓   | 占位文本           |
-| height        | `string \| number`              | -         |  ✓  |   ✓   | 编辑器高度         |
-| className     | `string`                        | -         |  ✓  |   ✓   | 自定义类名         |
+| Prop               | Type                            | Default   | Vue | React | Description          |
+| ------------------ | ------------------------------- | --------- | :-: | :---: | -------------------- |
+| value / modelValue | `string`                        | `''`      |  ✓  |   ✓   | 代码内容             |
+| defaultValue       | `string`                        | -         |  ✓  |   ✓   | 初始代码内容（非受控）|
+| language           | `CodeLanguage`                  | `'plain'` |  ✓  |   ✓   | 编程语言             |
+| theme              | `'light' \| 'dark'`            | `'light'` |  ✓  |   ✓   | 编辑器主题           |
+| readOnly           | `boolean`                       | `false`   |  ✓  |   ✓   | 只读模式             |
+| disabled           | `boolean`                       | `false`   |  ✓  |   ✓   | 禁用编辑             |
+| lineNumbers        | `boolean`                       | `true`    |  ✓  |   ✓   | 显示行号             |
+| tabSize            | `number`                        | `2`       |  ✓  |   ✓   | Tab 缩进空格数       |
+| placeholder        | `string`                        | -         |  ✓  |   ✓   | 占位文本             |
+| highlightActiveLine| `boolean`                       | `true`    |  ✓  |   ✓   | 高亮当前行           |
+| wordWrap           | `boolean`                       | `false`   |  ✓  |   ✓   | 自动换行             |
+| minLines           | `number`                        | `3`       |  ✓  |   ✓   | 最小行数             |
+| maxLines           | `number`                        | `0`       |  ✓  |   ✓   | 最大行数（0=无限）   |
+| className          | `string`                        | -         |  ✓  |   ✓   | 自定义类名           |
 
 ---
 
@@ -81,15 +99,19 @@ description: Shared props definitions for advanced interaction components - Spli
 
 ### Props
 
-| Prop          | Type                            | Default   | Vue | React | Description        |
-| ------------- | ------------------------------- | --------- | :-: | :---: | ------------------ |
-| value / modelValue | `string`                   | `''`      |  ✓  |   ✓   | HTML 内容          |
-| mode          | `'default' \| 'simple' \| 'full'` | `'default'` | ✓ |  ✓   | 工具栏模式         |
-| toolbar       | `ToolbarButton[]`               | -         |  ✓  |   ✓   | 自定义工具栏       |
-| readOnly      | `boolean`                       | `false`   |  ✓  |   ✓   | 只读模式           |
-| placeholder   | `string`                        | -         |  ✓  |   ✓   | 占位文本           |
-| height        | `string \| number`              | -         |  ✓  |   ✓   | 编辑器高度         |
-| className     | `string`                        | -         |  ✓  |   ✓   | 自定义类名         |
+| Prop               | Type                                  | Default   | Vue | React | Description        |
+| ------------------ | ------------------------------------- | --------- | :-: | :---: | ------------------ |
+| value / modelValue | `string`                              | `''`      |  ✓  |   ✓   | 内容               |
+| defaultValue       | `string`                              | -         |  ✓  |   ✓   | 初始内容（非受控） |
+| mode               | `'html' \| 'markdown' \| 'plain'`    | -         |  ✓  |   ✓   | 编辑格式模式       |
+| toolbar            | `ToolbarItem[]`                       | -         |  ✓  |   ✓   | 自定义工具栏       |
+| readOnly           | `boolean`                             | `false`   |  ✓  |   ✓   | 只读模式           |
+| disabled           | `boolean`                             | `false`   |  ✓  |   ✓   | 禁用编辑           |
+| placeholder        | `string`                              | -         |  ✓  |   ✓   | 占位文本           |
+| height             | `string \| number`                    | -         |  ✓  |   ✓   | 编辑器高度         |
+| className          | `string`                              | -         |  ✓  |   ✓   | 自定义类名         |
+
+> `ToolbarItem` = `ToolbarButton | ToolbarSeparator`，支持按钮和分隔符
 
 ---
 
@@ -163,10 +185,17 @@ description: Shared props definitions for advanced interaction components - Spli
 | ------------ | ------------------------------ | ---------- | :-: | :---: | ------------------ |
 | files        | `FileItem[]`                   | `[]`       |  ✓  |   ✓   | 文件列表           |
 | viewMode     | `'list' \| 'grid'`            | `'list'`   |  ✓  |   ✓   | 显示模式           |
-| currentPath  | `string`                       | `'/'`      |  ✓  |   ✓   | 当前目录路径       |
+| currentPath  | `string[]`                     | `[]`       |  ✓  |   ✓   | 当前目录路径段数组 |
 | selectedKeys | `(string \| number)[]`         | `[]`       |  ✓  |   ✓   | 选中文件 key 数组  |
 | showHidden   | `boolean`                      | `false`    |  ✓  |   ✓   | 显示隐藏文件       |
-| searchable   | `boolean`                      | `true`     |  ✓  |   ✓   | 显示搜索栏         |
+| searchable   | `boolean`                      | -          |  ✓  |   ✓   | 显示搜索栏         |
+| searchText   | `string`                       | -          |  ✓  |   ✓   | 搜索关键字         |
+| multiple     | `boolean`                      | -          |  ✓  |   ✓   | 允许多选           |
+| draggable    | `boolean`                      | -          |  ✓  |   ✓   | 允许拖拽           |
+| loading      | `boolean`                      | -          |  ✓  |   ✓   | 加载状态           |
+| emptyText    | `string`                       | -          |  ✓  |   ✓   | 空数据提示         |
+| sortField    | `FileSortField`                | -          |  ✓  |   ✓   | 排序字段           |
+| sortOrder    | `FileSortOrder`                | -          |  ✓  |   ✓   | 排序方向           |
 | className    | `string`                       | -          |  ✓  |   ✓   | 自定义类名         |
 
 ### Events

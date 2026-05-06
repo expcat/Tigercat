@@ -1,11 +1,11 @@
 ﻿---
 name: tigercat-react-basic
-description: React basic components usage - Alert, Avatar, Badge, Button, Code, Divider, Icon, Image, ImagePreview, ImageGroup, ImageCropper, Link, Tag, Text
+description: React basic components usage - Alert, Avatar, Badge, Button, Code, Divider, Empty, Icon, Image, ImagePreview, ImageGroup, ImageCropper, ImageViewer, Link, QRCode, Rate, Result, Segmented, Statistic, Tag, Text, Watermark
 ---
 
 # Basic Components (React)
 
-基础组件：Alert, Avatar, Badge, Button, Code, Divider, Icon, Image, ImagePreview, ImageGroup, ImageCropper, Link, Tag, Text
+基础组件：Alert, Avatar, Badge, Button, Code, Divider, Empty, Icon, Image, ImagePreview, ImageGroup, ImageCropper, ImageViewer, Link, QRCode, Rate, Result, Segmented, Statistic, Tag, Text, Watermark
 
 > **Props Reference**: [shared/props/basic.md](../shared/props/basic.md) | **Patterns**: [shared/patterns/common.md](../shared/patterns/common.md)
 
@@ -266,11 +266,11 @@ const images = ['/a.jpg', '/b.jpg', '/c.jpg']
 
 <button onClick={() => setShow(true)}>预览</button>
 
-{/* 单张预览 (v0.9.0: 使用 open/onOpenChange 代替 visible/onVisibleChange) */}
-<ImagePreview open={show} src="/photo.jpg" onOpenChange={setShow} />
+{/* 单张预览 */}
+<ImagePreview open={show} images={['/photo.jpg']} onOpenChange={setShow} />
 
 {/* 多张预览 */}
-<ImagePreview open={show} srcList={images} currentIndex={0} onOpenChange={setShow} />
+<ImagePreview open={show} images={images} currentIndex={0} onOpenChange={setShow} />
 ```
 
 ---
@@ -311,4 +311,197 @@ async function handleCrop() {
   onReady={() => console.log('ready')}
 />
 <button onClick={handleCrop}>裁剪</button>
+```
+
+---
+
+## Empty 空状态
+
+```tsx
+import { Empty, Button } from '@expcat/tigercat-react'
+
+{/* 默认空状态 */}
+<Empty description="暂无数据" />
+
+{/* 预设类型 */}
+<Empty preset="no-data" description="没有找到数据" />
+<Empty preset="no-results" description="搜索无结果" />
+<Empty preset="error" description="加载失败" />
+
+{/* 带操作按钮 */}
+<Empty description="暂无内容" extra={<Button variant="primary">立即创建</Button>} />
+
+{/* 隐藏图片 */}
+<Empty description="无数据" showImage={false} />
+```
+
+---
+
+## Result 结果页
+
+```tsx
+import { Result, Button } from '@expcat/tigercat-react'
+
+{/* 成功 */}
+<Result
+  status="success"
+  title="操作成功"
+  subTitle="订单已提交"
+  extra={<Button variant="primary">返回首页</Button>}
+/>
+
+{/* 错误 */}
+<Result status="error" title="提交失败" subTitle="请检查输入内容" />
+
+{/* 404 */}
+<Result status="404" title="404" subTitle="页面不存在" />
+
+{/* 自定义图标 */}
+<Result status="info" title="提示" icon={<span>💡</span>} />
+```
+
+---
+
+## QRCode 二维码
+
+```tsx
+import { QRCode } from '@expcat/tigercat-react'
+
+{/* 基本用法 */}
+<QRCode value="https://example.com" />
+
+{/* 自定义尺寸与颜色 */}
+<QRCode value="hello" size={200} color="#1677ff" />
+
+{/* 过期状态 + 刷新 */}
+<QRCode value="expired" status="expired" onRefresh={handleRefresh} />
+```
+
+---
+
+## Statistic 统计数值
+
+```tsx
+import { Statistic } from '@expcat/tigercat-react'
+
+{/* 基本用法 */}
+<Statistic title="活跃用户" value={112893} />
+
+{/* 千分位 + 精度 */}
+<Statistic title="账户余额" value={112893.12} precision={2} groupSeparator prefix="￥" />
+
+{/* 数值动画 */}
+<Statistic title="总订单" value={9280} animated animationDuration={2000} />
+
+{/* 尺寸 */}
+<Statistic title="小号" value={99} size="sm" />
+<Statistic title="大号" value={99} size="lg" />
+```
+
+---
+
+## Rate 评分
+
+```tsx
+import { useState } from 'react'
+import { Rate } from '@expcat/tigercat-react'
+
+const [score, setScore] = useState(3)
+
+{/* 基本用法 */}
+<Rate value={score} onChange={setScore} />
+
+{/* 半选 */}
+<Rate value={score} onChange={setScore} allowHalf />
+
+{/* 自定义字符 */}
+<Rate value={score} onChange={setScore} character="❤" />
+
+{/* 尺寸 */}
+<Rate value={score} onChange={setScore} size="lg" />
+
+{/* 禁用 */}
+<Rate value={4} disabled />
+
+{/* 事件 */}
+<Rate value={score} onChange={setScore} onHoverChange={handleHover} />
+```
+
+---
+
+## Segmented 分段控制
+
+```tsx
+import { useState } from 'react'
+import { Segmented } from '@expcat/tigercat-react'
+
+const [selected, setSelected] = useState<string | number>('daily')
+const options = [
+  { value: 'daily', label: '日' },
+  { value: 'weekly', label: '周' },
+  { value: 'monthly', label: '月' }
+]
+
+{/* 基本用法 */}
+<Segmented value={selected} onChange={setSelected} options={options} />
+
+{/* 尺寸 */}
+<Segmented value={selected} onChange={setSelected} options={options} size="sm" />
+
+{/* 撑满容器 */}
+<Segmented value={selected} onChange={setSelected} options={options} block />
+
+{/* 禁用 */}
+<Segmented value={selected} onChange={setSelected} options={options} disabled />
+```
+
+---
+
+## Watermark 水印
+
+```tsx
+import { Watermark } from '@expcat/tigercat-react'
+
+{/* 文字水印 */}
+<Watermark content="Tigercat">
+  <div style={{ height: 300 }}>内容区域</div>
+</Watermark>
+
+{/* 多行文字 */}
+<Watermark content={['Tigercat', '2026-05-06']}>
+  <div style={{ height: 300 }}>内容区域</div>
+</Watermark>
+
+{/* 图片水印 */}
+<Watermark image="/logo.png" width={80} height={40}>
+  <div style={{ height: 300 }}>内容区域</div>
+</Watermark>
+
+{/* 自定义字体 */}
+<Watermark content="Confidential" font={{ fontSize: 20, color: 'rgba(255,0,0,0.1)' }}>
+  <div style={{ height: 300 }}>内容区域</div>
+</Watermark>
+```
+
+---
+
+## ImageViewer 图片查看器
+
+```tsx
+import { useState } from 'react'
+import { ImageViewer, Button } from '@expcat/tigercat-react'
+
+const [visible, setVisible] = useState(false)
+const images = ['/a.jpg', '/b.jpg', '/c.jpg']
+
+<Button onClick={() => setVisible(true)}>打开查看器</Button>
+
+{/* 基本用法 */}
+<ImageViewer open={visible} images={images} onClose={() => setVisible(false)} />
+
+{/* 禁用旋转 */}
+<ImageViewer open={visible} images={images} rotatable={false} onClose={() => setVisible(false)} />
+
+{/* 自定义缩放范围 */}
+<ImageViewer open={visible} images={images} minZoom={0.2} maxZoom={5} onClose={() => setVisible(false)} />
 ```

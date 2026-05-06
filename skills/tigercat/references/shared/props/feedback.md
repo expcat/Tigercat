@@ -33,6 +33,8 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 | okText            | `string`                                 | `'确定'` |  ✓  |   ✓   | 确认按钮文案                 |
 | cancelText        | `string`                                 | `'取消'` |  ✓  |   ✓   | 取消按钮文案                 |
 | className         | `string`                                 | -        |  ✓  |   ✓   | 自定义类名                   |
+| draggable         | `boolean`                                | `false`  |  ✓  |   ✓   | 可拖拽移动                   |
+| closeAriaLabel    | `string`                                 | -        |  ✓  |   ✓   | 关闭按钮 aria-label            |
 | locale            | `{ modal: ModalLocale }`                 | -        |  ✓  |   ✓   | 国际化                       |
 
 ### Events
@@ -116,6 +118,7 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 | duration  | `number`     | `3000`  | 显示时长（ms），`0` 表示不自动关闭 |
 | closable  | `boolean`    | `false` | 是否显示关闭按钮                   |
 | onClose   | `() => void` | -       | 关闭时的回调                       |
+| position  | `'top' \| 'top-left' \| 'top-right' \| 'bottom' \| 'bottom-left' \| 'bottom-right'` | `'top'` | 显示位置 |
 | icon      | `string`     | -       | 自定义图标 SVG path d 属性         |
 | className | `string`     | -       | 额外 CSS 类名                      |
 
@@ -271,6 +274,7 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 | background  | `string`                                                                                | `'rgba(255,255,255,0.9)'` |  ✓  |   ✓   | 全屏模式背景色           |
 | customColor | `string`                                                                                | -                         |  ✓  |   ✓   | 自定义颜色（覆盖 color） |
 | className   | `string`                                                                                | -                         |  ✓  |   ✓   | 自定义类名               |
+| lockScroll  | `boolean`                                                                               | `true`                    |  ✓  |   ✓   | 全屏模式下锁定文档滚动     |
 
 ---
 
@@ -306,14 +310,17 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 | status    | `'success' \| 'error' \| 'info' \| 'warning' \| '403' \| '404' \| '500'` | `'info'`    |  ✓  |   ✓   | 结果状态     |
 | title     | `string`                                                       | -           |  ✓  |   ✓   | 标题         |
 | subTitle  | `string`                                                       | -           |  ✓  |   ✓   | 副标题       |
-| className | `string`                                                       | -           |  -  |   ✓   | 自定义类名   |
+| className | `string`                                                           | -           |  ✓  |   ✓   | 自定义类名   |
 
 ### Slots / Children
 
-| Vue Slot  | React Prop | Description            |
-| --------- | ---------- | ---------------------- |
-| `default` | `children` | 底部操作区（按钮等）   |
-| `icon`    | `icon`     | 自定义图标             |
+| Vue Slot   | React Prop | Description            |
+| ---------- | ---------- | ---------------------- |
+| `default`  | `children` | 底部操作区（按钮等）   |
+| `icon`     | `icon`     | 自定义图标             |
+| `title`    | -          | 自定义标题内容         |
+| `subTitle` | -          | 自定义副标题内容       |
+| `extra`    | `extra`    | 额外操作区             |
 
 ---
 
@@ -345,11 +352,15 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Events
 
-| Vue Event      | React Prop    | Payload            | Description       |
-| -------------- | ------------- | ------------------ | ----------------- |
-| `@open-change` | `onOpenChange` | `(open: boolean)` | 显示状态变更      |
-| `@change`      | `onChange`     | `(current: number)` | 步骤切换        |
-| `@finish`      | `onFinish`     | -                  | 引导完成          |
+| Vue Event          | React Prop    | Payload             | Description       |
+| ------------------ | ------------- | ------------------- | ----------------- |
+| `@update:open`     | -             | `boolean`           | 显示状态变更      |
+| `@update:current`  | -             | `number`            | 当前步骤索引变更    |
+| `@close`           | `onClose`     | -                   | 关闭事件          |
+| `@change`          | `onChange`    | `(current: number)` | 步骤切换          |
+| `@finish`          | `onFinish`    | -                   | 引导完成          |
+
+> **Vue**: 支持 `v-model:open` 和 `v-model:current` 双向绑定
 
 ---
 
@@ -368,7 +379,7 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 | Prop      | Type             | Default | Vue | React | Description                |
 | --------- | ---------------- | ------- | :-: | :---: | -------------------------- |
-| content   | `string`         | -       |  ✓  |   ✓   | 水印文字内容               |
+| content   | `string \| string[]` | -       |  ✓  |   ✓   | 水印文字内容（多行传数组）   |
 | image     | `string`         | -       |  ✓  |   ✓   | 水印图片 URL（优先于文字） |
 | width     | `number`         | `120`   |  ✓  |   ✓   | 水印宽度（px）             |
 | height    | `number`         | `64`    |  ✓  |   ✓   | 水印高度（px）             |

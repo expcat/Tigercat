@@ -60,8 +60,6 @@ description: Shared props definitions for navigation components - Affix, Breadcr
 | Prop         | Type                 | Default          | Vue | React | Description          |
 | ------------ | -------------------- | ---------------- | :-: | :---: | -------------------- |
 | trigger      | `'hover' \| 'click'` | `'hover'`        |  ✓  |   ✓   | 触发方式             |
-| placement    | `FloatingPlacement`  | `'bottom-start'` |  ✓  |   ✓   | 弹出位置（12 方向）  |
-| offset       | `number`             | `4`              |  ✓  |   ✓   | 与触发器的间距（px） |
 | disabled     | `boolean`            | `false`          |  ✓  |   ✓   | 禁用                 |
 | open         | `boolean`            | -                |  ✓  |   ✓   | 显示状态（受控）     |
 | defaultOpen  | `boolean`            | `false`          |  ✓  |   ✓   | 默认显示状态         |
@@ -78,11 +76,13 @@ description: Shared props definitions for navigation components - Affix, Breadcr
 
 ### DropdownItem Props
 
-| Prop     | Type               | Default | Vue | React | Description     |
-| -------- | ------------------ | ------- | :-: | :---: | --------------- |
-| disabled | `boolean`          | `false` |  ✓  |   ✓   | 禁用            |
-| divided  | `boolean`          | `false` |  ✓  |   ✓   | 与上方项分割    |
-| itemKey  | `string \| number` | -       |  ✓  |   -   | 唯一标识（Vue） |
+| Prop      | Type               | Default | Vue | React | Description     |
+| --------- | ------------------ | ------- | :-: | :---: | --------------- |
+| disabled  | `boolean`          | `false` |  ✓  |   ✓   | 禁用            |
+| divided   | `boolean`          | `false` |  ✓  |   ✓   | 与上方项分割    |
+| itemKey   | `string \| number` | -       |  ✓  |   -   | 唯一标识（Vue） |
+| icon      | `unknown`          | -       |  ✓  |   ✓   | 图标            |
+| className | `string`           | -       |  ✓  |   ✓   | 自定义类名      |
 
 ### Events
 
@@ -169,6 +169,7 @@ description: Shared props definitions for navigation components - Affix, Breadcr
 | closable               | `boolean`                                        | `false`    |  ✓  |   ✓   | 标签可关闭（仅 editable-card） |
 | centered               | `boolean`                                        | `false`    |  ✓  |   ✓   | 标签居中                       |
 | destroyInactiveTabPane | `boolean`                                        | `false`    |  ✓  |   ✓   | 销毁非激活面板                 |
+| lazy                   | `boolean`                                        | `false`    |  ✓  |   ✓   | 懒加载面板（首次激活后才渲染） |
 
 ### TabPane Props
 
@@ -309,6 +310,10 @@ description: Shared props definitions for navigation components - Affix, Breadcr
 | blockNode           | `boolean`                                    | `false`     |  ✓  |   ✓   | 节点占满整行                         |
 | emptyText           | `string`                                     | `'No data'` |  ✓  |   ✓   | 空数据文案                           |
 | ariaLabel           | `string`                                     | `'Tree'`    |  ✓  |   ✓   | 无障碍标签                           |
+| searchable          | `boolean`                                    | `false`     |  ✓  |   ✓   | 显示内置搜索输入框                   |
+| virtual             | `boolean`                                    | `false`     |  ✓  |   ✓   | 启用虚拟化渲染                       |
+| height              | `number \| string`                           | -           |  ✓  |   ✓   | 虚拟化滚动视口高度                   |
+| itemHeight          | `number`                                     | -           |  ✓  |   ✓   | 虚拟化行高                           |
 
 > **Vue**: 使用 `v-model:expandedKeys`、`v-model:checkedKeys`、`v-model:selectedKeys` 绑定
 > **React**: 使用对应 prop + `onExpand`/`onCheck`/`onSelect` 控制
@@ -344,7 +349,6 @@ description: Shared props definitions for navigation components - Affix, Breadcr
 | Prop             | Type                          | Default        | Vue | React | Description                            |
 | ---------------- | ----------------------------- | -------------- | :-: | :---: | -------------------------------------- |
 | visibilityHeight | `number`                      | `400`          |  ✓  |   ✓   | 滚动高度达到此值显示                   |
-| target           | `() => HTMLElement \| Window` | `() => window` |  ✓  |   ✓   | 监听滚动的目标元素                     |
 | duration         | `number`                      | `450`          |  ✓  |   ✓   | `0` 立即滚动；正数使用原生 smooth 滚动 |
 
 ### Events

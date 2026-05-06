@@ -38,6 +38,10 @@ description: Shared props definitions for composite components - ChatWindow / Ac
 | allowShiftEnter      | `boolean`               | `true`         |  ✓  |   ✓   | Shift+Enter 换行     |
 | allowEmpty           | `boolean`               | `false`        |  ✓  |   ✓   | 允许发送空内容       |
 | clearOnSend          | `boolean`               | `true`         |  ✓  |   ✓   | 发送后清空输入       |
+| virtual              | `boolean`               | `false`        |  ✓  |   ✓   | 启用消息列表虚拟化   |
+| virtualItemHeight    | `number`                | `88`           |  ✓  |   ✓   | 虚拟化消息行高       |
+| virtualHeight        | `number`                | `400`          |  ✓  |   ✓   | 虚拟化列表视口高度   |
+| autoScrollToBottom   | `boolean`               | `true`         |  ✓  |   ✓   | 自动滚动到最新消息   |
 
 ### Behavior
 
@@ -335,6 +339,7 @@ description: Shared props definitions for composite components - ChatWindow / Ac
 | nextText       | `string`                     | `'Next'`       |  ✓  |   ✓   | 下一步按钮文案                            |
 | finishText     | `string`                     | `'Finish'`     |  ✓  |   ✓   | 完成按钮文案                              |
 | beforeNext     | `FormWizardValidator`        | -              |  ✓  |   ✓   | 下一步校验（返回 false 或 string 阻断）   |
+| autoSave       | `(current, step) => void \| Promise<void>` | - |  ✓  |   ✓   | 步骤切换时自动保存回调                    |
 | locale         | `Partial<TigerLocale>`       | -              |  ✓  |   ✓   | 语言包覆盖（优先级低于 prev/next/finish） |
 
 ### Behavior
@@ -370,6 +375,7 @@ description: Shared props definitions for composite components - ChatWindow / Ac
 | disabled    | `boolean`                                    | `false` | 禁用步骤                     |
 | content     | `unknown`                                    | -       | 自定义内容                   |
 | fields      | `string[]`                                   | -       | 当前步骤字段（用于分步校验） |
+| skipCondition | `() => boolean`                              | -       | 条件跳过此步骤               |
 
 ---
 
@@ -449,19 +455,17 @@ description: Shared props definitions for composite components - ChatWindow / Ac
 
 ### Props
 
-| Prop        | Type      | Default       | Vue | React | Description      |
-| ----------- | --------- | ------------- | :-: | :---: | ---------------- |
-| accept      | `string`  | `'image/*'`   |  ✓  |   ✓   | 文件类型过滤     |
-| aspectRatio | `number`  | -             |  ✓  |   ✓   | 裁剪宽高比       |
-| outputType  | `string`  | `'image/png'` |  ✓  |   ✓   | 输出 MIME 类型   |
-| quality     | `number`  | `0.92`        |  ✓  |   ✓   | 输出质量（0-1）  |
-| guides      | `boolean` | `true`        |  ✓  |   ✓   | 显示裁剪辅助线   |
-| disabled    | `boolean` | `false`       |  ✓  |   ✓   | 禁用             |
-| triggerText | `string`  | `'选择图片'`  |  ✓  |   ✓   | 默认触发按钮文案 |
-| modalTitle  | `string`  | `'裁剪图片'`  |  ✓  |   ✓   | 弹窗标题         |
-| confirmText | `string`  | `'确认'`      |  ✓  |   ✓   | 确认按钮文案     |
-| cancelText  | `string`  | `'取消'`      |  ✓  |   ✓   | 取消按钮文案     |
-| className   | `string`  | -             |  -  |   ✓   | 自定义类名       |
+| Prop         | Type                                 | Default       | Vue | React | Description                       |
+| ------------ | ------------------------------------ | ------------- | :-: | :---: | --------------------------------- |
+| accept       | `string`                             | `'image/*'`   |  ✓  |   ✓   | 文件类型过滤                      |
+| disabled     | `boolean`                            | `false`       |  ✓  |   ✓   | 禁用                              |
+| maxSize      | `number`                             | -             |  ✓  |   ✓   | 最大文件大小（bytes）             |
+| cropperProps | `Partial<Omit<ImageCropperProps, 'src'>>` | -        |  ✓  |   ✓   | 透传给内部 ImageCropper 的 props  |
+| modalTitle   | `string`                             | `'裁剪图片'`  |  ✓  |   ✓   | 弹窗标题                          |
+| modalWidth   | `number`                             | `520`         |  ✓  |   ✓   | 弹窗宽度                          |
+| className    | `string`                             | -             |  ✓  |   ✓   | 自定义类名                        |
+
+> 裁剪相关配置（`aspectRatio`, `outputType`, `quality`, `guides` 等）通过 `cropperProps` 透传，不再作为顶层 prop。
 
 ### Events
 

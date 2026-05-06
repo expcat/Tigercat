@@ -45,6 +45,8 @@ description: Shared charts props and concepts
 | showTooltip | `boolean`                                    | `true`   | 显示提示       |
 | hoverable   | `boolean`                                    | `false`  | 悬停交互       |
 | selectable  | `boolean`                                    | `false`  | 点击选择       |
+| title       | `string`                                     | -        | SVG title（无障碍） |
+| desc        | `string`                                     | -        | SVG desc（无障碍）  |
 
 ## 数据格式
 
@@ -111,12 +113,12 @@ description: Shared charts props and concepts
 | showLabels       | `boolean`               | `false`     | ✓      | ✓       |
 | labelPosition    | `'inside' \| 'outside'` | `'inside'`  | ✓      | ✓       |
 | innerRadius      | `number`                | `0` / `0.6` | ✓ (px) | ✓ (0-1) |
-| innerRadiusRatio | `number`                | `0.62`      | ✓      | ✓       |
-| padAngle         | `number`                | `0.04`      | ✓      | ✓       |
-| borderWidth      | `number`                | `0`         | ✓      | ✓       |
+| innerRadiusRatio | `number`                | `0.6`       | ✓      | ✓       |
+| padAngle         | `number`                | `0`         | ✓      | ✓       |
+| borderWidth      | `number`                | `2`         | ✓      | ✓       |
 | borderColor      | `string`                | `'#ffffff'` | ✓      | ✓       |
-| hoverOffset      | `number`                | `10`        | ✓      | ✓       |
-| shadow           | `boolean`               | `true`      | ✓      | ✓       |
+| hoverOffset      | `number`                | `8`         | ✓      | ✓       |
+| shadow           | `boolean`               | `false`     | ✓      | ✓       |
 | centerValue      | `string \| number`      | -           | ✓      | ✓       |
 | centerLabel      | `string`                | -           | ✓      | ✓       |
 | animated         | `boolean`               | `false`     | ✓      | ✓       |
@@ -147,7 +149,6 @@ description: Shared charts props and concepts
 
 | Prop             | Type                    | Default     | Vue | React |
 | ---------------- | ----------------------- | ----------- | --- | ----- |
-| labels           | `string[]`              | -           | ✓   | ✓     |
 | maxValue         | `number`                | auto        | ✓   | ✓     |
 | levels           | `number`                | `5`         | ✓   | ✓     |
 | fillOpacity      | `number`                | `0.2`       | ✓   | ✓     |

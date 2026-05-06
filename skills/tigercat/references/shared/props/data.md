@@ -42,6 +42,13 @@ description: Shared props definitions for data display components - Calendar, Im
 | columnLockable    | `boolean`                                     | `false`     |  ✓  |   ✓   | 显示列锁定按钮          |
 | exportable        | `boolean`                                     | `false`     |  ✓  |   ✓   | 显示 CSV 导出按钮       |
 | exportFilename    | `string`                                      | `'export'`  |  ✓  |   ✓   | CSV 导出文件名          |
+| editable          | `boolean`                                     | `false`     |  ✓  |   ✓   | 启用单元格编辑          |
+| editableCells     | `Map<string, Set<number>>`                    | -           |  ✓  |   ✓   | 可编辑单元格集合        |
+| filterMode        | `'basic' \| 'advanced'`                       | `'basic'`   |  ✓  |   ✓   | 筛选模式                |
+| advancedFilterRules | `FilterRule[]`                              | -           |  ✓  |   ✓   | 高级筛选规则            |
+| columnDraggable   | `boolean`                                     | `false`     |  ✓  |   ✓   | 启用列拖拽排序          |
+| summaryRow        | `{ show: boolean; data: Record<string, unknown> }` | -      |  ✓  |   ✓   | 汇总行配置              |
+| groupBy           | `string`                                      | -           |  ✓  |   ✓   | 按列键分组              |
 | className         | `string`                                      | -           |  ✗  |   ✓   | 额外 CSS class（React） |
 
 > Table 不会自动打开 virtual，以避免布局行为突变；当 `dataSource.length >= virtualThreshold` 且未启用 `virtual` 时，组件会在根节点提供 `data-tiger-virtual-recommended="true"` 作为可检测建议。超大数据表优先使用 `VirtualTable`。
@@ -123,12 +130,13 @@ description: Shared props definitions for data display components - Calendar, Im
 
 | Prop       | Type                               | Default  | Vue | React | Description        |
 | ---------- | ---------------------------------- | -------- | :-: | :---: | ------------------ |
-| items      | `TimelineItem[]`                   | `[]`     |  ✓  |   ✓   | 时间线数据         |
 | mode       | `'left' \| 'right' \| 'alternate'` | `'left'` |  ✓  |   ✓   | 布局模式           |
 | pending    | `boolean`                          | `false`  |  ✓  |   ✓   | 是否显示等待中状态 |
 | pendingDot | `VNode / ReactNode`                | -        |  ✓  |   ✓   | 自定义等待节点内容 |
 | reverse    | `boolean`                          | `false`  |  ✓  |   ✓   | 是否反转时间线顺序 |
 | className  | `string`                           | -        |  ✓  |   ✓   | 额外 CSS 类名      |
+
+> Timeline 使用子组件模式（`TimelineItem`），不通过 `items` prop 传数据。
 
 > **React 专有 Props**: `pendingContent`（自定义等待内容）、`renderItem`（自定义项渲染）、`renderDot`（自定义节点渲染）
 
