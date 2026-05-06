@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@types/prompts": "^2.4.9",
-    "tsup": "^8.5.1",
-    "typescript": "^6.0.3"
+    "tsup": "catalog:",
+    "typescript": "catalog:"
   }
 }

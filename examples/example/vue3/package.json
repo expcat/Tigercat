@@ -11,17 +11,17 @@
   },
   "dependencies": {
     "@expcat/tigercat-vue": "workspace:*",
-    "vue": "^3.5.33",
+    "vue": "catalog:",
     "vue-router": "^5.0.6"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.2.4",
-    "@vitejs/plugin-vue": "^6.0.6",
+    "@tailwindcss/vite": "catalog:",
+    "@vitejs/plugin-vue": "catalog:",
     "@vue/tsconfig": "^0.9.1",
-    "axe-core": "^4.11.3",
-    "tailwindcss": "^4.2.4",
-    "typescript": "^6.0.3",
-    "vite": "^8.0.10",
+    "axe-core": "catalog:",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
     "vue-tsc": "^3.2.7"
   }
 }

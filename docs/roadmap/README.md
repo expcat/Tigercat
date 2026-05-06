@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 Node engines bump — 将 Node 最低版本从 18 提升到 20.11.0。变更点：根 `package.json` engines `>=20.11.0`、CLI doctor `MIN_NODE_MAJOR=20`、`check-env.mjs/sh` Node 检查改为 20、`tsconfig.json` target/lib `ES2020→ES2022`（Node 20 原生支持）、CI `create-release-tags.yml` node-version `18→22`（与 ci.yml/publish.yml 对齐）。理由：ESLint 10（已安装）要求 `^20.19.0 || ^22.13.0 || >=24`，Node 18 实质已不兼容当前 devDeps。选择 20.11.0 作为下限（2024-01 LTS 安全线）。构建与 41 条 CLI 测试全部通过。
-- 推荐下一步：P1 workspace catalog / overrides — 在 pnpm-workspace.yaml 增加 catalog 统一版本来源。
+- 上一步完成：P1 workspace catalog / overrides — 在 `pnpm-workspace.yaml` 新增 catalog 区块，定义 13 个共享依赖的统一版本（typescript、tsup、vite、vue、react、react-dom、tailwindcss、@tailwindcss/vite、@vitejs/plugin-vue、@types/node、@types/react、@types/react-dom、axe-core）。将 7 个 package.json 中共计 41 处版本声明替换为 `catalog:` 引用。peerDependencies 保留宽范围（`^3.0.0`、`^19.0.0`、`^4.0.0`）不受 catalog 影响。修复了 `@types/react-dom` 版本不一致（example/react `^19.2.2` → 统一为 `^19.2.3`）。pnpm install、build、307 文件 5570 条测试全部通过。
+- 推荐下一步：P1 根入口 locale tree-shaking 方案 — 决定保留兼容 barrel 或引入更轻的 locale-only 默认导出策略。
 
 ## 未实现组件
 
@@ -27,7 +27,7 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | 优先级   | 项目                            | 范围                                      | 完成标准                                                                                                          |
 | -------- | ------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | P1       | ~~Node engines bump~~               | ~~workspace / CI / release workflow~~         | ~~已完成：engines >=20.11.0、tsconfig ES2022、CI node-version 22、CLI doctor MIN_NODE_MAJOR=20~~ |
-| P1       | workspace catalog / overrides   | pnpm workspace / 核心工具链依赖           | 在 `pnpm-workspace.yaml` 增加 catalog 或 overrides，统一 Vue、React、TypeScript、Tailwind、tsup 等版本来源        |
+| P1       | ~~workspace catalog / overrides~~   | ~~pnpm workspace / 核心工具链依赖~~           | ~~已完成：13 个 catalog 条目，41 处 package.json 统一为 catalog: 引用~~ |
 | P1       | 根入口 locale tree-shaking 方案 | Core i18n barrel / locale presets         | 当前根入口仍会经 `utils/i18n` re-export 全部 locale；需决定保留兼容 barrel，或引入更轻的 locale-only 默认导出策略 |
 | P1       | CLI 模板版本策略                | CLI React / Vue 模板                      | 模板依赖范围改为 catalog、overrides 或与根 lockfile 对齐的版本策略，避免长期漂移                                  |
 | P1       | CLI Windows bin 验证            | CLI bin / package manager shims           | README 或测试覆盖 pnpm、npm、bun 在 Windows 下的 `.cmd` shim 与路径分隔符行为                                     |

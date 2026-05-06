@@ -55,12 +55,12 @@
     "@expcat/tigercat-core": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^25.6.0",
-    "@types/react": "^19.2.14",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "tsup": "^8.5.1",
-    "typescript": "^6.0.3"
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
   },
   "peerDependencies": {
     "react": "^19.0.0",
