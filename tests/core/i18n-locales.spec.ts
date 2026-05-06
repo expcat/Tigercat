@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { enUS, zhCN, zhTW, jaJP, koKR, thTH, viVN, idID } from '@expcat/tigercat-core'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
+import { zhCN } from '@expcat/tigercat-core/locales/zh-CN'
+import { zhTW } from '@expcat/tigercat-core/locales/zh-TW'
+import { jaJP } from '@expcat/tigercat-core/locales/ja-JP'
+import { koKR } from '@expcat/tigercat-core/locales/ko-KR'
+import { thTH } from '@expcat/tigercat-core/locales/th-TH'
+import { viVN } from '@expcat/tigercat-core/locales/vi-VN'
+import { idID } from '@expcat/tigercat-core/locales/id-ID'
 
 const locales = { enUS, zhCN, zhTW, jaJP, koKR, thTH, viVN, idID }
 

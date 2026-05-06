@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { defineLocale, enUS } from '@expcat/tigercat-core'
+import { defineLocale } from '@expcat/tigercat-core'
+import { enUS } from '@expcat/tigercat-core/locales/en-US'
 
 describe('defineLocale()', () => {
   it('returns the enUS baseline as-is when called without overrides', () => {
