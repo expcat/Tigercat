@@ -138,13 +138,33 @@ async function collectSections() {
   sections.value = nextSections
 }
 
+let sectionObserver: MutationObserver | null = null
+let sectionDebounceTimer: ReturnType<typeof setTimeout> | null = null
+
+function setupSectionObserver() {
+  sectionObserver?.disconnect()
+  const root = pageRootRef.value
+  if (!root) return
+  sectionObserver = new MutationObserver(() => {
+    if (sectionDebounceTimer) clearTimeout(sectionDebounceTimer)
+    sectionDebounceTimer = setTimeout(() => {
+      collectSections()
+      sectionDebounceTimer = null
+    }, 50)
+  })
+  sectionObserver.observe(root, { childList: true, subtree: true })
+}
+
 onMounted(() => {
   setupMobileDetection()
   collectSections()
+  setupSectionObserver()
 })
 
 onUnmounted(() => {
   mqlCleanup?.()
+  sectionObserver?.disconnect()
+  if (sectionDebounceTimer) clearTimeout(sectionDebounceTimer)
 })
 
 watch(
@@ -152,7 +172,11 @@ watch(
   () => {
     if (mainScrollRef.value) mainScrollRef.value.scrollTop = 0
     if (isMobile.value) isSiderCollapsed.value = true
-    collectSections()
+    sections.value = []
+    nextTick(() => {
+      collectSections()
+      setupSectionObserver()
+    })
   }
 )
 </script>

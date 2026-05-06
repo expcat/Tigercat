@@ -261,11 +261,13 @@ export function createAnchorObserver(links: string[], options: AnchorObserverOpt
     for (const href of links) {
       if (visible.has(href)) return href
     }
-    // Otherwise: the last one that has scrolled past the offset line
+    // Otherwise: the last one that has scrolled past the offset line.
+    // Use container-relative coordinates so fallback matches the observer's root.
+    const rootTop = root ? root.getBoundingClientRect().top : 0
     let fallback = ''
     for (const href of links) {
       const el = getAnchorTargetElement(href)
-      if (el && el.getBoundingClientRect().top <= offsetTop + 1) {
+      if (el && el.getBoundingClientRect().top - rootTop <= offsetTop + 1) {
         fallback = href
       }
     }

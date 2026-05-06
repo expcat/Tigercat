@@ -70,13 +70,20 @@ export const AnchorLink: React.FC<AnchorLinkProps> = ({
 }) => {
   const anchorContext = useAnchorContext()
 
+  // Extract stable function references from context to avoid re-running
+  // registration on every activeLink change (which recreates contextValue).
+  const register = anchorContext?.registerLink
+  const unregister = anchorContext?.unregisterLink
+
   useEffect(() => {
-    anchorContext?.registerLink(href)
+    if (href) {
+      register?.(href)
+    }
 
     return () => {
-      anchorContext?.unregisterLink(href)
+      unregister?.(href)
     }
-  }, [href, anchorContext])
+  }, [href, register, unregister])
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault()
