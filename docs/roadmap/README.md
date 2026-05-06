@@ -1,93 +1,51 @@
-# Tigercat 未实现路线图
+# Tigercat 后续优化路线图
 
 <!-- LLM-INDEX
 type: active-roadmap
-scope: docs/roadmap unresolved work only
-verified-date: 2026-05-05
-source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-04
+scope: docs and examples follow-up work only
+verified-date: 2026-05-06
+source: user-requested next optimization plan
 -->
 
-本文档只保留旧路线图与 `docs/reports/2026-04` 中尚未实现、仍需后续设计或仍需复核的内容。已经完成、已有 Vue / React 源码与公开导出的组件，或只属于阶段执行记录的报告，不再在这里重复跟踪。
+本文档只记录下一轮可执行规划。已完成的历史任务、阶段报告说明和旧评估结论不再保留；后续 Agent 完成条目后，应直接删除对应条目或将剩余工作合并到新的待办中。
 
-## 执行状态
+## 执行原则
 
-- 上一步完成：P2 文档完整性 — 审查并补齐文档缺口。charts.md 新增 FunnelChart/GaugeChart/SunburstChart/TreeMapChart 4 个图表组件 Props；basic.md 新增 ConfigProvider Props 表格；i18n.md 新增 TaskBoard 和 NotificationCenter locale 字段；Vue/React 各新增 advanced.md 示例文件（9 个组件）；index.md 已链接。迁移指南 4 个版本均存在。
-- 推荐下一步：Deferred commander 14 升级，或 P3 PDFViewer 新组件。
+1. 以 `packages/core/src`、`packages/vue/src`、`packages/react/src` 和公开导出入口为当前组件最新版的判断来源。
+2. 审查文档时同步覆盖 `skills/tigercat/references/shared/props`、`skills/tigercat/references/vue`、`skills/tigercat/references/react`。
+3. 审查 example 时只修改 `examples/example/shared`、`examples/example/vue3/src`、`examples/example/react/src`；不要把 `dist`、coverage、报告产物作为规划依据。
+4. 文档与 example 的改动应保持 Vue 事件 kebab-case、React 事件 camelCase，并优先沿用现有 DemoBlock、路由和分组配置。
 
-## 未实现组件
+## 后续步骤
 
-| 优先级 | 项目      | 范围                                  | 完成标准                                                                                                            |
-| ------ | --------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| P3     | PDFViewer | Vue / React / Core 类型 / 文档 / 测试 | 提供 PDF 预览组件；支持文件 URL 或二进制输入、页码导航、缩放、加载/错误状态、键盘可访问性；两端导出并补齐测试与示例 |
+| 优先级 | 项目                    | 范围                                                                                                                        | 完成标准                                                                                                                                                                              |
+| ------ | ----------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P1     | Example 展示模式改造    | `examples/example/vue3/src/components/DemoBlock.vue`、`examples/example/react/src/components/DemoBlock.tsx`、相关 demo 页面 | DemoBlock 从 `示例 / 代码 / 混合` 改为 `示例 / 代码 / 脚本`；删除混合模式布局；新增脚本模式用于展示该示例所需的 setup、state、handler、mock data 或运行脚本；React/Vue 行为和文案一致 |
+| P1     | Example 数据结构统一    | Vue / React demo 页面、可复用 demo 元数据                                                                                   | 每个 DemoBlock 至少支持 `code`，需要时支持 `script`；缺少脚本内容的 demo 不展示空脚本；复制按钮与代码展示在代码/脚本模式都可用；类型定义清晰且不使用 `any`                            |
+| P1     | Example 导航与覆盖检查  | `examples/example/shared/app-config.ts`、Vue/React router、demo pages                                                       | 组件导航分组与当前公开组件一致；每个已导出的组件都有对应 demo 页面或明确记录为无需独立 demo；Vue/React demo 覆盖项尽量对齐                                                            |
+| P1     | 组件分组文档审查        | Basic、Form、Feedback、Layout、Navigation、Data、Charts、Advanced、Composite                                                | 对每个分组逐项比对共享 Props、Vue 示例、React 示例与源码导出；补齐新增/遗漏 props、默认值、事件、slots/render props、边界状态和主题/i18n 说明                                         |
+| P1     | 组件分组 example 审查   | `examples/example/vue3/src/pages`、`examples/example/react/src/pages`                                                       | 每个组件 demo 与当前 API 一致；示例覆盖基础用法、受控/非受控或 v-model、禁用/加载/空态、尺寸/变体、关键交互；移除过时 prop、错误事件名和已废弃模式                                    |
+| P2     | 文档与 example 体验优化 | skills 文档、demo 页面文案与布局                                                                                            | 说明文字更聚焦真实使用场景；代码片段可直接复制；复杂组件补充更接近生产场景的数据；移动端和深色模式下 demo 不出现明显布局溢出                                                          |
+| P2     | 校验与回归              | build、lint、test、examples build                                                                                           | 完成每组审查后运行相关类型检查/测试；Example 模式改造完成后至少构建 Vue 和 React example，必要时补充 DemoBlock 相关单测或 e2e 检查                                                    |
 
-## 后续更新事项
+## 推荐执行顺序
 
-### 工具链 / i18n / CLI
+1. 先改造 React/Vue DemoBlock 的展示模式，确定 `script` 字段 API 与复用样式。
+2. 选择 2-3 个代表性 demo 页面迁移到 `示例 / 代码 / 脚本`，覆盖简单组件、表单组件和复杂组件。
+3. 批量迁移剩余 demo 页面，并同步清理所有 `mixed` 命名、文案和测试期望。
+4. 按 Basic -> Form -> Feedback -> Layout -> Navigation -> Data -> Charts -> Advanced -> Composite 的顺序审查文档和 example。
+5. 每完成一个分组，更新对应 skills 文档、demo 页面和必要测试，再从本文档删除已完成的分组任务。
 
-| 优先级   | 项目                            | 范围                                      | 完成标准                                                                                                          |
-| -------- | ------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| P1       | ~~Node engines bump~~               | ~~workspace / CI / release workflow~~         | ~~已完成：engines >=20.11.0、tsconfig ES2022、CI node-version 22、CLI doctor MIN_NODE_MAJOR=20~~ |
-| P1       | ~~workspace catalog / overrides~~   | ~~pnpm workspace / 核心工具链依赖~~           | ~~已完成：13 个 catalog 条目，41 处 package.json 统一为 catalog: 引用~~ |
-| P1       | ~~根入口 locale tree-shaking 方案~~ | ~~Core i18n barrel / locale presets~~         | ~~已完成：根入口移除 locale re-export，保留子路径按需引入，vitest alias 补齐~~ |
-| P1       | ~~CLI 模板版本策略~~                | ~~CLI React / Vue 模板~~                      | ~~已完成：TEMPLATE_VERSIONS 常量集中管理 13 个依赖版本，与 catalog 对齐~~ |
-| P1       | ~~CLI Windows bin 验证~~            | ~~CLI bin / package manager shims~~           | ~~已完成：6 条跨平台路径测试 + README Windows Support 章节，覆盖 .cmd shim 与路径行为~~ |
-| P2       | ~~ConfigProvider 异步 locale~~      | ~~React ConfigProvider / Vue ConfigProvider~~ | ~~已完成：locale prop 支持 loader/Promise/静态对象，localeLoading 自动传播，16 条测试通过~~ |
-| Deferred | commander 14                    | CLI                                       | 根 `engines.node` 提升到 Node 20+ 后再升级 commander，并跑模板生成回归                                            |
+## 分组审查清单
 
-### Basic / Form
-
-| 优先级 | 项目                       | 范围                          | 完成标准                                                                  |
-| ------ | -------------------------- | ----------------------------- | ------------------------------------------------------------------------- |
-| P2     | ~~Empty 默认插画体积~~         | ~~Empty~~                         | ~~已评估：inline SVG ~687B，CSS-only 无明显收益，保留现有方案（slot/prop 已支持自定义）~~ |
-| P2     | ~~Divider 文件合并评估~~       | ~~Divider / Space / layout util~~ | ~~已评估：类型/props/DOM/语义完全正交，合并会退化 tree-shaking，保持独立~~ |
-| P2     | ~~Radio / Checkbox icon 体积~~ | ~~Radio / Checkbox~~              | ~~已评估：两者均无 inline SVG（Radio 纯 CSS 圆点，Checkbox 原生 input），前提不成立~~ |
-| P2     | ~~Form 命令式 API~~            | ~~Form~~                          | ~~已完成：`useFormController` hook/composable，FormController 接口，28 条测试通过~~ |
-
-### Layout / Navigation / Data
-
-| 优先级 | 项目                          | 范围            | 完成标准                                                            |
-| ------ | ----------------------------- | --------------- | ------------------------------------------------------------------- |
-| P2     | ~~Descriptions 大列表性能~~       | ~~Descriptions~~    | ~~已验证：O(n) 线性算法，1000 items ~10–30μs，benchmark 7 项全通过，无瓶颈~~ |
-| P2     | ~~Container 组件必要性~~          | ~~Container~~       | ~~已评估：保留组件。getContainerClasses 已导出供 class-only 用法；组件族一致性 + as 多态 + 体积极小~~ |
-| P2     | ~~FloatButton group memo~~        | ~~FloatButton~~     | ~~已评估：无需改动。children/slots 外部传入仅条件渲染，React useMemo/useCallback + Vue computed 已缓存派生值~~ |
-| P2     | ~~Steps vertical pseudo-element~~ | ~~Steps~~           | ~~已评估：保留 inline div。动态状态颜色 + 6 种 size 组合 + DOM 极小 + 测试可查询，pseudo 无优势~~ |
-| P2     | ~~Timeline pseudo-element~~       | ~~Timeline~~        | ~~已评估：保留 inline div。dot 支持自定义子元素/slot + 动态 color inline style + 3 种 mode 定位 + pending animate，pseudo 无法实现~~ |
-
-### Charts / Composite / Advanced
-
-| 优先级 | 项目                         | 范围                                                                     | 完成标准                                                                                  |
-| ------ | ---------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| P1     | ~~NotificationCenter 缓存~~  | ~~NotificationCenter~~                                                       | ~~已完成：分组、标签、已读未读派生数据使用 useMemo / computed，移除死代码~~ |
-| P1     | ~~ActivityFeed / Timeline 复用~~ | ~~ActivityFeed / Timeline~~                                                  | ~~已完成：Core 新增 ActivityTimelineItem 类型与共享布局 class 常量，Vue/React 消除重复~~ |
-| P1     | ~~Composite a11y 角色~~      | ~~DataTableWithToolbar / NotificationCenter / ActivityFeed / CommentThread~~ | ~~已完成：feed、region、toolbar 等 ARIA 角色明确，并补 12 条回归测试~~ |
-| P1     | ~~VirtualList 策略化~~       | ~~VirtualList~~                                                              | ~~已完成：Core 新增 VirtualListSizeStrategy 接口与 fixed/variable/dynamic 三策略，Vue/React 统一消费~~ |
-| P1     | ~~InfiniteScroll IO~~        | ~~InfiniteScroll~~                                                       | ~~已完成：Core 新增 createInfiniteScrollObserver，Vue/React 重构为 IO sentinel + scroll fallback~~ |
-| P1     | ~~FileManager 共享 model~~   | ~~FileManager~~                                                          | ~~已完成：Core 新增 deriveFileManagerModel 等共享函数 + drag 集成，Vue/React 统一消费~~ |
-| P1     | ~~ImageViewer 手势 util~~    | ~~ImageViewer~~                                                          | ~~已完成：Core 新增 GestureTransform + wheel/pan/pinch 工具，Vue/React 集成触控手势~~ |
-| P1     | ~~TaskBoard 拖拽技术债~~     | ~~TaskBoard~~                                                            | ~~已完成：Core 新增 TaskBoardDragController 统一三套拖拽，Vue/React 消除重复 handler~~ |
-| P1     | ~~VirtualTable 压测~~          | ~~VirtualTable~~                                                             | ~~已完成：sticky header + sticky column 同时启用，benchmark 覆盖 1000 列 × 10k 行，render prep ~1.8ms/帧~~ |
-| P1     | ~~Advanced 交互测试补强~~        | ~~FileManager / ImageViewer / InfiniteScroll / VirtualList / VirtualTable~~  | ~~已完成：新增 48 条边界与交互测试，覆盖零项/disabled/极值/变换重置等场景，全部通过~~ |
-| P2     | ~~Chart benchmark 补齐~~         | ~~GaugeChart / chart interaction~~                                           | ~~已完成：新增 21 项 benchmark 覆盖 Gauge 计算与 interaction 热路径，全部通过无瓶颈~~ |
-| P2     | ~~Composite 配方化~~             | ~~DataTableWithToolbar / CropUpload / FormWizard~~                           | ~~已评估：均保留。独有逻辑复杂度高，已完整交付，tree-shaking 可裁剪，配方化收益极低~~ |
-| P2     | ~~PrintLayout stylesheet 化~~    | ~~PrintLayout~~                                                              | ~~已评估：保留组件。零逻辑但体积极小 (169 行)，class util 已可用，组件提供 a11y 属性便利性~~ |
-| P2     | ~~RichText toolbar 插件化~~   | ~~RichTextEditor~~                                                       | ~~已完成：ToolbarButton.action 自定义回调 + ToolbarSeparator 分隔符 + ToolbarItem 联合类型 + icon 渲染，向后兼容~~ |
-
-## 待复核质量项
-
-这些条目不是新组件规划，而是旧路线图中仍适合在发布前复核的质量门槛。若已有独立报告或 CI 覆盖，可在对应报告中关闭，不需要再扩写成版本规格。
-
-| 优先级 | 项目                   | 复核重点                                                                                                           | 完成标准                                                                                                    |
-| ------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| P1     | ~~组件 API 一致性~~    | ~~Vue 事件 kebab-case、React 事件 camelCase、Props 默认值与类型导出~~                                              | ~~已完成：全量扫描无阻塞项，69 Vue emits 均 kebab-case，React camelCase 无异常，~30 组件 Props 默认值一致，补导出 ConfigProviderProps~~ |
-| P1     | ~~a11y AA 回归~~           | ~~overlay、picker、table、form、advanced components 的键盘与 ARIA 行为~~                                               | ~~已完成：27 条跨框架 a11y 回归测试 + 原有 34 条，合计 61 条通过~~ |
-| P1     | ~~测试与覆盖率门槛~~       | ~~单元、集成、e2e、视觉回归是否仍符合当前发布目标~~                                                                    | ~~已完成（2026-05-06）：307 文件 5570 测试全通过；Stmts 83.82% / Br 77.05% / Fn 85.42% / Lines 85.86%，四项均超基线~~ |
-| P1     | ~~低覆盖热点补强~~   | ~~TaskBoard、Watermark、CropUpload、FloatButton、Empty、Result、FunnelChart、GaugeChart、SunburstChart、TreeMapChart~~ | ~~已完成：新增 8 个 core utils 测试文件 114 条测试，覆盖布局算法/弧形计算/动画/边界值/缓存，全部通过~~ |
-| P2     | ~~Bundle 与 tree-shaking~~ | ~~advanced components、locales、charts 是否可按需裁剪~~                                                            | ~~已审查：无异常。Core sideEffects:false + locale 独立入口；Vue/React 每组件独立 entry + splitting + wildcard exports，Button 深导入仅 3.4KB~~ |
-| P2     | ~~文档完整性~~             | ~~组件 API、主题、i18n、迁移指南、示例入口~~                                                                           | ~~已完成：charts.md +4 图表、basic.md +ConfigProvider、i18n.md +TaskBoard/NotificationCenter、Vue/React +advanced.md 示例，迁移指南 4 版本齐备~~                                                     |
-
-## 维护规则
-
-1. 新增组件或显著功能只在这里记录尚未完成的条目。
-2. 一旦 Vue / React 实现、导出、测试和文档齐全，就从本文档移除。
-3. 阶段报告中的后续 Todo 合并到本文档后，报告文件不再作为活跃规划来源保留。
-4. 历史版本叙述、竞品矩阵、长代码模板不再放入 `docs/roadmap`；组件 API 写入 `skills/tigercat/references/`，发布变更写入迁移指南或 changelog。
+| 分组       | 共享 Props                                              | Vue 文档                                       | React 文档                                       | Example                   |
+| ---------- | ------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------ | ------------------------- |
+| Basic      | `skills/tigercat/references/shared/props/basic.md`      | `skills/tigercat/references/vue/basic.md`      | `skills/tigercat/references/react/basic.md`      | basic 导航分组与页面      |
+| Form       | `skills/tigercat/references/shared/props/form.md`       | `skills/tigercat/references/vue/form.md`       | `skills/tigercat/references/react/form.md`       | form 导航分组与页面       |
+| Feedback   | `skills/tigercat/references/shared/props/feedback.md`   | `skills/tigercat/references/vue/feedback.md`   | `skills/tigercat/references/react/feedback.md`   | feedback 导航分组与页面   |
+| Layout     | `skills/tigercat/references/shared/props/layout.md`     | `skills/tigercat/references/vue/layout.md`     | `skills/tigercat/references/react/layout.md`     | layout 导航分组与页面     |
+| Navigation | `skills/tigercat/references/shared/props/navigation.md` | `skills/tigercat/references/vue/navigation.md` | `skills/tigercat/references/react/navigation.md` | navigation 导航分组与页面 |
+| Data       | `skills/tigercat/references/shared/props/data.md`       | `skills/tigercat/references/vue/data.md`       | `skills/tigercat/references/react/data.md`       | data 导航分组与页面       |
+| Charts     | `skills/tigercat/references/shared/props/charts.md`     | `skills/tigercat/references/vue/charts.md`     | `skills/tigercat/references/react/charts.md`     | charts 导航分组与页面     |
+| Advanced   | `skills/tigercat/references/shared/props/advanced.md`   | `skills/tigercat/references/vue/advanced.md`   | `skills/tigercat/references/react/advanced.md`   | advanced 导航分组与页面   |
+| Composite  | `skills/tigercat/references/shared/props/composite.md`  | `skills/tigercat/references/vue/composite.md`  | `skills/tigercat/references/react/composite.md`  | composite 导航分组与页面  |
