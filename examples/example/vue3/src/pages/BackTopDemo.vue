@@ -44,10 +44,10 @@ const handleClick = () => {
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">BackTop 回到顶部</h1>
-      <p class="text-gray-600">返回页面顶部的操作按钮。</p>
+      <p class="text-gray-600 dark:text-gray-400">返回页面顶部的操作按钮。</p>
     </div>
 
     <DemoBlock title="基本用法"
@@ -66,7 +66,7 @@ const handleClick = () => {
                description="可以设置滚动多少距离后显示按钮。"
                :code="customHeightSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <p class="text-gray-600">
+        <p class="text-gray-600 dark:text-gray-400">
           通过 <code class="bg-gray-200 px-1 rounded">visibilityHeight</code> 属性设置滚动高度阈值。
         </p>
       </div>
@@ -91,7 +91,7 @@ const handleClick = () => {
                description="通过 duration 属性控制滚动到顶部的动画时长。"
                :code="customDurationSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <p class="text-gray-600">
+        <p class="text-gray-600 dark:text-gray-400">
           通过 <code class="bg-gray-200 px-1 rounded">duration</code> 属性设置动画时长（毫秒），默认 450ms。
         </p>
       </div>
@@ -132,7 +132,7 @@ const handleClick = () => {
            :key="i"
            class="p-6 bg-white rounded-lg border border-gray-200">
         <h3 class="text-lg font-semibold mb-2">占位内容 {{ i }}</h3>
-        <p class="text-gray-600">
+        <p class="text-gray-600 dark:text-gray-400">
           这是用于演示滚动效果的占位内容。当页面滚动超过 400px 时，右下角会显示回到顶部按钮。
         </p>
       </div>

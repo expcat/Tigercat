@@ -133,7 +133,7 @@ const handleFormSubmit = async () => {
   <div class="max-w-5xl mx-auto p-6 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Modal 对话框</h1>
-      <p class="text-gray-600">用于显示重要信息或需要用户交互的浮层对话框。</p>
+      <p class="text-gray-600 dark:text-gray-400">用于显示重要信息或需要用户交互的浮层对话框。</p>
     </div>
 
     <DemoBlock title="基本用法"
@@ -334,7 +334,7 @@ const handleFormSubmit = async () => {
           <h3 class="text-lg font-semibold mb-3">确认对话框</h3>
           <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p class="text-gray-700">用于需要用户确认的操作（示例：删除）。</p>
+              <p class="text-gray-700 dark:text-gray-300">用于需要用户确认的操作（示例：删除）。</p>
               <Button variant="outline"
                       @click="visibleConfirm = true">删除确认</Button>
             </div>
@@ -370,7 +370,7 @@ const handleFormSubmit = async () => {
           <h3 class="text-lg font-semibold mb-3">信息展示</h3>
           <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p class="text-gray-700">用于展示较长内容（用户协议/隐私政策等）。</p>
+              <p class="text-gray-700 dark:text-gray-300">用于展示较长内容（用户协议/隐私政策等）。</p>
               <Button @click="visibleInfo = true">查看详情</Button>
             </div>
 
@@ -395,7 +395,7 @@ const handleFormSubmit = async () => {
           <h3 class="text-lg font-semibold mb-3">表单输入</h3>
           <div class="p-6 rounded-lg border border-gray-200 bg-white shadow-sm">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p class="text-gray-700">在对话框中嵌入表单，用于数据收集和编辑。</p>
+              <p class="text-gray-700 dark:text-gray-300">在对话框中嵌入表单，用于数据收集和编辑。</p>
               <Button @click="visibleForm = true">编辑资料</Button>
             </div>
 

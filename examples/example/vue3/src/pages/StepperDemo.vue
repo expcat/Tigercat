@@ -24,7 +24,7 @@ const precisionSnippet = `<Stepper :model-value="1.5" :step="0.1" :precision="2"
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <h1 class="text-3xl font-bold mb-2">Stepper 步进器</h1>
     <p class="text-gray-500 mb-8">数值增减控制器，支持步长、范围和精度。</p>
 

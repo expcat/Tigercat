@@ -66,10 +66,10 @@ const interaction = useChartInteraction<BarDatum>({
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">useChartInteraction 图表交互</h1>
-      <p class="text-gray-600">
+      <p class="text-gray-600 dark:text-gray-400">
         统一管理图表的悬停高亮、选中态、键盘可达性与图例联动，被内置的 BarChart / LineChart 等组件使用。
       </p>
     </div>

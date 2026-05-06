@@ -85,10 +85,10 @@ const TextareaDemo: React.FC = () => {
   const [combined, setCombined] = useState('')
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Textarea 文本域</h1>
-        <p className="text-gray-600">输入多行文本时使用。</p>
+        <p className="text-gray-600 dark:text-gray-400">输入多行文本时使用。</p>
       </div>
 
       {/* 基础用法 */}

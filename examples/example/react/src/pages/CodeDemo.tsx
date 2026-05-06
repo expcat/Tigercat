@@ -27,10 +27,10 @@ export default function CodeDemo() {
   const [lastCopied, setLastCopied] = useState('')
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Code 代码展示</h1>
-        <p className="text-gray-600">展示代码片段并支持一键复制。</p>
+        <p className="text-gray-600 dark:text-gray-400">展示代码片段并支持一键复制。</p>
       </div>
 
       <DemoBlock

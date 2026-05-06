@@ -121,7 +121,7 @@ const loadingSnippet = `<div className="bg-white p-6 rounded-lg">
   ) : (
     <>
       <h3 className="text-xl font-bold mb-4">文章标题</h3>
-      <p className="text-gray-700">
+      <p className="text-gray-700 dark:text-gray-300">
         这是加载完成后显示的内容。骨架屏在内容加载时显示，
         提供更好的用户体验，避免页面空白或突然跳动。
       </p>
@@ -184,10 +184,10 @@ export default function SkeletonDemo() {
   }, [])
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Skeleton 骨架屏</h1>
-        <p className="text-gray-600">用于在内容加载时显示占位符的骨架屏组件，提升用户体验。</p>
+        <p className="text-gray-600 dark:text-gray-400">用于在内容加载时显示占位符的骨架屏组件，提升用户体验。</p>
       </div>
 
       {/* 基本用法 */}
@@ -361,7 +361,7 @@ export default function SkeletonDemo() {
           ) : (
             <>
               <h3 className="text-xl font-bold mb-4">文章标题</h3>
-              <p className="text-gray-700">
+              <p className="text-gray-700 dark:text-gray-300">
                 这是加载完成后显示的内容。骨架屏在内容加载时显示，
                 提供更好的用户体验，避免页面空白或突然跳动。
               </p>

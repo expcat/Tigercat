@@ -74,10 +74,10 @@ const items = ref<TodoItem[]>([
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">useDrag 拖拽</h1>
-      <p class="text-gray-600">
+      <p class="text-gray-600 dark:text-gray-400">
         框架无关的拖拽逻辑封装，提供 <code>getDragItemAttrs</code> /
         <code>getDropZoneAttrs</code> 来快速绑定 HTML 拖拽事件。
       </p>

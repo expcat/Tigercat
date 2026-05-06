@@ -102,10 +102,10 @@ const LineChartDemo: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">LineChart 折线图</h1>
-        <p className="text-gray-600">用于展示数据随时间或类别变化趋势。</p>
+        <p className="text-gray-600 dark:text-gray-400">用于展示数据随时间或类别变化趋势。</p>
       </div>
 
       <DemoBlock title="基础用法" description="单系列折线图，显示数据点。" code={basicSnippet}>

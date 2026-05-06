@@ -20,7 +20,7 @@ const ColorPickerDemo: React.FC = () => {
   const [color2, setColor2] = useState('#2563eb')
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">ColorPicker 颜色选择器</h1>
       <p className="text-gray-500 mb-8">用于选择颜色，支持透明度、预设颜色和多种格式。</p>
 

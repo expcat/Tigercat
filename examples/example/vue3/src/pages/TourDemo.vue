@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <h1 class="text-3xl font-bold mb-2">Tour 漫游式引导</h1>
     <p class="text-gray-500 mb-8">分步引导用户了解页面功能。</p>
 

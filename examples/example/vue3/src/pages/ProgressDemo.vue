@@ -115,10 +115,10 @@ const dashboardSnippet = `<div class="grid grid-cols-2 md:grid-cols-4 gap-8">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Progress 进度条</h1>
-      <p class="text-gray-600">用于展示操作进度的组件，支持线形和圆形两种展示方式。</p>
+      <p class="text-gray-600 dark:text-gray-400">用于展示操作进度的组件，支持线形和圆形两种展示方式。</p>
     </div>
 
     <!-- 基本用法 -->

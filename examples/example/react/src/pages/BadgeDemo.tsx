@@ -184,10 +184,10 @@ export default function BadgeDemo() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Badge 徽章</h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">
           用于标记和通知的徽章组件，支持点状、数字、文本等多种展示方式。
         </p>
       </div>

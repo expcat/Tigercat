@@ -151,10 +151,10 @@ const customLabels: Partial<TigerLocalePagination> = {
   />`
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Pagination 分页</h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">
           用于在数据量较大时进行分页展示，支持多种模式、快速跳页、页码选择等特性。
         </p>
       </div>

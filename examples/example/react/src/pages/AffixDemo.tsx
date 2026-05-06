@@ -11,7 +11,7 @@ const bottomSnippet = `<Affix offsetBottom={20}>
 
 const AffixDemo: React.FC = () => {
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">Affix 固钉</h1>
       <p className="text-gray-500 mb-8">将元素固定在可视区域的指定位置。</p>
 

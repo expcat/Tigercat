@@ -85,7 +85,7 @@ const highlightItems = [
   <div class="max-w-6xl mx-auto p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Descriptions 描述列表</h1>
-      <p class="text-gray-600">用于展示结构化数据、详情信息的描述列表组件。</p>
+      <p class="text-gray-600 dark:text-gray-400">用于展示结构化数据、详情信息的描述列表组件。</p>
     </div>
 
     <DemoBlock title="基本用法"

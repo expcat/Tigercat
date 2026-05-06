@@ -23,7 +23,7 @@ const statusSnippet = `<Space wrap>
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <h1 class="text-3xl font-bold mb-2">QRCode 二维码</h1>
     <p class="text-gray-500 mb-8">将文本转换为二维码，支持自定义颜色、大小和纠错等级。</p>
 

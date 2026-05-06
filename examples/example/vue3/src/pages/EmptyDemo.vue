@@ -19,7 +19,7 @@ const customSnippet = `<Empty description="这里什么都没有">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <h1 class="text-3xl font-bold mb-2">Empty 空状态</h1>
     <p class="text-gray-500 mb-8">空状态时的占位提示，支持多种预设样式。</p>
 

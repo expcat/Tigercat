@@ -272,7 +272,7 @@ const DestroyOnCloseContent = defineComponent({
   <div class="max-w-5xl mx-auto p-6 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Drawer 抽屉</h1>
-      <p class="text-gray-600">从页面边缘滑出的面板，用于展示详细信息或进行操作。</p>
+      <p class="text-gray-600 dark:text-gray-400">从页面边缘滑出的面板，用于展示详细信息或进行操作。</p>
     </div>
 
     <!-- 基本使用 -->

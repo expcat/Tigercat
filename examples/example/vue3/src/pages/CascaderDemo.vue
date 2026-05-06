@@ -38,7 +38,7 @@ const sizeSnippet = `<Space direction="vertical" :size="12">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <h1 class="text-3xl font-bold mb-2">Cascader 级联选择</h1>
     <p class="text-gray-500 mb-8">多级联动选择器，适用于省市区等层级数据。</p>
 

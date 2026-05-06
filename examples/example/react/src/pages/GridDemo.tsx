@@ -80,10 +80,10 @@ const mixedSnippet = `<Row gutter={16}>
 
 const GridDemo: React.FC = () => {
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Grid 栅格</h1>
-        <p className="text-gray-600">通过基础的 24 分栏，迅速简便地创建布局。</p>
+        <p className="text-gray-600 dark:text-gray-400">通过基础的 24 分栏，迅速简便地创建布局。</p>
       </div>
 
       <DemoBlock

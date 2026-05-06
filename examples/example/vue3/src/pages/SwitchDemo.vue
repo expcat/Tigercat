@@ -36,10 +36,10 @@ const sizeSnippet = `<Space align="center">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Switch 开关</h1>
-      <p class="text-gray-600">表示两种相互对立的状态间的切换，多用于触发「开/关」。</p>
+      <p class="text-gray-600 dark:text-gray-400">表示两种相互对立的状态间的切换，多用于触发「开/关」。</p>
     </div>
 
     <!-- 基础用法 -->

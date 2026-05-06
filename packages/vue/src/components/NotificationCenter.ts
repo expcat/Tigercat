@@ -167,7 +167,7 @@ export const NotificationCenter = defineComponent({
       { immediate: true }
     )
 
-    const currentGroup = computed(() => {
+    const _currentGroup = computed(() => {
       const groups = resolvedGroups.value
       if (groups.length === 0) return undefined
       const activeKey = currentGroupKey.value

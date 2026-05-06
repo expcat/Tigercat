@@ -86,7 +86,7 @@ export default function NotificationCenterDemo() {
     <div className="max-w-6xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">NotificationCenter 通知中心</h1>
-        <p className="text-gray-600">组合组件，提供通知分组、已读筛选与批量标记。</p>
+        <p className="text-gray-600 dark:text-gray-400">组合组件，提供通知分组、已读筛选与批量标记。</p>
       </div>
 
       <DemoBlock

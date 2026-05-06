@@ -101,7 +101,7 @@ const slotSnippet = `<TaskBoard v-model:columns="slotColumns">
   <div class="max-w-6xl mx-auto p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">TaskBoard 任务看板</h1>
-      <p class="text-gray-600">
+      <p class="text-gray-600 dark:text-gray-400">
         可拖拽的任务看板，支持卡片跨列流转、列排序、WIP 限制等。
       </p>
     </div>

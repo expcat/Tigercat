@@ -34,10 +34,10 @@ const wrapSnippet = `<Space wrap size="sm" class="w-full">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Space 间距</h1>
-      <p class="text-gray-600">设置组件之间的间距。</p>
+      <p class="text-gray-600 dark:text-gray-400">设置组件之间的间距。</p>
     </div>
 
     <DemoBlock title="水平间距"

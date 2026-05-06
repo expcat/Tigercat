@@ -175,10 +175,10 @@ const inputNumberControlsSnippet = `<Space direction="vertical" class="w-full ma
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Input 输入框</h1>
-      <p class="text-gray-600">通过鼠标或键盘输入内容，是最基础的表单域的包装。</p>
+      <p class="text-gray-600 dark:text-gray-400">通过鼠标或键盘输入内容，是最基础的表单域的包装。</p>
     </div>
 
     <!-- 基础用法 -->

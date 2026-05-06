@@ -2,9 +2,9 @@ import React from 'react'
 import { Divider } from '@expcat/tigercat-react'
 import DemoBlock from '../components/DemoBlock'
 
-const basicSnippet = `<div className="text-gray-700">上方内容</div>
+const basicSnippet = `<div className="text-gray-700 dark:text-gray-300">上方内容</div>
 <Divider />
-<div className="text-gray-700">下方内容</div>`
+<div className="text-gray-700 dark:text-gray-300">下方内容</div>`
 
 const lineStyleSnippet = `<Divider lineStyle="solid" />
 <Divider lineStyle="dashed" />
@@ -30,17 +30,17 @@ const verticalSnippet = `<div className="flex items-center h-12">
 
 const DividerDemo: React.FC = () => {
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Divider 分割线</h1>
-        <p className="text-gray-600">区隔内容的分割线。</p>
+        <p className="text-gray-600 dark:text-gray-400">区隔内容的分割线。</p>
       </div>
 
       <DemoBlock title="基础用法" description="默认水平分割线。" code={basicSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="text-gray-700">上方内容</div>
+          <div className="text-gray-700 dark:text-gray-300">上方内容</div>
           <Divider />
-          <div className="text-gray-700">下方内容</div>
+          <div className="text-gray-700 dark:text-gray-300">下方内容</div>
         </div>
       </DemoBlock>
 
@@ -69,17 +69,17 @@ const DividerDemo: React.FC = () => {
         description="spacing 控制分割线周围留白（none / xs / sm / md / lg / xl）。"
         code={spacingSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="text-gray-700">none</div>
+          <div className="text-gray-700 dark:text-gray-300">none</div>
           <Divider spacing="none" />
-          <div className="text-gray-700">xs</div>
+          <div className="text-gray-700 dark:text-gray-300">xs</div>
           <Divider spacing="xs" />
-          <div className="text-gray-700">sm</div>
+          <div className="text-gray-700 dark:text-gray-300">sm</div>
           <Divider spacing="sm" />
-          <div className="text-gray-700">md (default)</div>
+          <div className="text-gray-700 dark:text-gray-300">md (default)</div>
           <Divider spacing="md" />
-          <div className="text-gray-700">lg</div>
+          <div className="text-gray-700 dark:text-gray-300">lg</div>
           <Divider spacing="lg" />
-          <div className="text-gray-700">xl</div>
+          <div className="text-gray-700 dark:text-gray-300">xl</div>
           <Divider spacing="xl" />
         </div>
       </DemoBlock>
@@ -89,9 +89,9 @@ const DividerDemo: React.FC = () => {
         description="通过 color / thickness 自定义边框颜色与宽度。"
         code={customSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
-          <div className="text-gray-700">color="#2563eb" thickness="2px"</div>
+          <div className="text-gray-700 dark:text-gray-300">color="#2563eb" thickness="2px"</div>
           <Divider color="#2563eb" thickness="2px" />
-          <div className="text-gray-700">color="#10b981" thickness="4px"（dashed）</div>
+          <div className="text-gray-700 dark:text-gray-300">color="#10b981" thickness="4px"（dashed）</div>
           <Divider color="#10b981" thickness="4px" lineStyle="dashed" />
         </div>
       </DemoBlock>
@@ -102,11 +102,11 @@ const DividerDemo: React.FC = () => {
         code={verticalSnippet}>
         <div className="p-6 bg-gray-50 rounded-lg">
           <div className="flex items-center h-12">
-            <span className="text-gray-700">Left</span>
+            <span className="text-gray-700 dark:text-gray-300">Left</span>
             <Divider orientation="vertical" className="h-6" />
-            <span className="text-gray-700">Middle</span>
+            <span className="text-gray-700 dark:text-gray-300">Middle</span>
             <Divider orientation="vertical" className="h-6" lineStyle="dashed" />
-            <span className="text-gray-700">Right</span>
+            <span className="text-gray-700 dark:text-gray-300">Right</span>
           </div>
         </div>
       </DemoBlock>

@@ -85,10 +85,10 @@ const combinedSnippet = `<Space direction="vertical" class="w-full max-w-md">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Textarea 文本域</h1>
-      <p class="text-gray-600">输入多行文本时使用。</p>
+      <p class="text-gray-600 dark:text-gray-400">输入多行文本时使用。</p>
     </div>
 
     <!-- 基础用法 -->

@@ -362,7 +362,7 @@ const pagedData = computed(() => {
   <div class="max-w-6xl mx-auto p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Table 表格</h1>
-      <p class="text-gray-600">用于展示行列数据的表格组件，支持排序、筛选、分页等功能。</p>
+      <p class="text-gray-600 dark:text-gray-400">用于展示行列数据的表格组件，支持排序、筛选、分页等功能。</p>
     </div>
 
     <!-- 基础用法 -->

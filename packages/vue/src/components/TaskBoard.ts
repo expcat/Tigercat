@@ -31,7 +31,6 @@ import {
   type TaskBoardCard,
   type TaskBoardCardMoveEvent,
   type TaskBoardColumnMoveEvent,
-  type TaskBoardDragState,
   type TaskBoardMoveValidator,
   type TigerLocale,
   type TaskBoardDragSnapshot

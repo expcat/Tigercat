@@ -84,6 +84,7 @@ export * from './table-utils'
 export * from './table-filter-utils'
 export * from './table-group-utils'
 export * from './table-resize-utils'
+export * from './table-export-utils'
 
 // Form v0.6.0 upgrades
 export * from './form-dependency-utils'

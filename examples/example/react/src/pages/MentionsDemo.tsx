@@ -25,7 +25,7 @@ const MentionsDemo: React.FC = () => {
   const [val2, setVal2] = useState('')
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">Mentions 提及</h1>
       <p className="text-gray-500 mb-8">输入框中 @提及 用户，支持自定义触发字符。</p>
 

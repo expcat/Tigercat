@@ -32,7 +32,7 @@ const HeatmapChartDemo: React.FC = () => {
   )
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">HeatmapChart 热力图</h1>
       <p className="text-gray-500 mb-8">矩阵热力图，用颜色深浅展示数据密度。</p>
 

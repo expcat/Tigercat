@@ -138,10 +138,10 @@ const toNumber = (val) => (Array.isArray(val) ? val[0] : val)`
   </Space>`
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Slider 滑块</h1>
-        <p className="text-gray-600">通过拖动滑块在一个固定区间内进行选择。</p>
+        <p className="text-gray-600 dark:text-gray-400">通过拖动滑块在一个固定区间内进行选择。</p>
       </div>
 
       {/* 基础用法 */}

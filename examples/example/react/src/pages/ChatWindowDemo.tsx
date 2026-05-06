@@ -113,7 +113,7 @@ export default function ChatWindowDemo() {
     <div className="max-w-6xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">ChatWindow 聊天窗口</h1>
-        <p className="text-gray-600">组合组件，用于构建完整聊天交互区域。</p>
+        <p className="text-gray-600 dark:text-gray-400">组合组件，用于构建完整聊天交互区域。</p>
       </div>
 
       <DemoBlock

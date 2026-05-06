@@ -36,7 +36,7 @@ const TourDemo: React.FC = () => {
   const [open2, setOpen2] = useState(false)
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">Tour 漫游式引导</h1>
       <p className="text-gray-500 mb-8">分步引导用户了解页面功能。</p>
 

@@ -269,10 +269,10 @@ const showMessageSnippet = `<!-- showMessage=true（默认）：错误显示在 
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Form 表单</h1>
-      <p class="text-gray-600">
+      <p class="text-gray-600 dark:text-gray-400">
         由输入框、选择器、单选框、多选框等控件组成，用以收集、校验、提交数据。
       </p>
     </div>

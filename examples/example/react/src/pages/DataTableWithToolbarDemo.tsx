@@ -132,7 +132,7 @@ const DataTableWithToolbarDemo: React.FC = () => {
     <div className="max-w-6xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">DataTableWithToolbar 表格工具栏</h1>
-        <p className="text-gray-600">搜索、筛选、批量操作与分页联动的组合组件。</p>
+        <p className="text-gray-600 dark:text-gray-400">搜索、筛选、批量操作与分页联动的组合组件。</p>
       </div>
 
       <DemoBlock title="基础用法" description="搜索/筛选/批量操作 + 分页联动" code={basicSnippet} script={basicScriptSnippet}>

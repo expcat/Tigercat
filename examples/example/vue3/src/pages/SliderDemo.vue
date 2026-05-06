@@ -135,10 +135,10 @@ const defaultValueSnippet = `<Space direction="vertical" class="w-full max-w-md"
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Slider 滑块</h1>
-      <p class="text-gray-600">通过拖动滑块在一个固定区间内进行选择。</p>
+      <p class="text-gray-600 dark:text-gray-400">通过拖动滑块在一个固定区间内进行选择。</p>
     </div>
 
     <!-- 基础用法 -->

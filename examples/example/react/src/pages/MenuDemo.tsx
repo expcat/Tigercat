@@ -146,10 +146,10 @@ const MenuDemo: React.FC = () => {
     '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>'
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Menu 菜单</h1>
-        <p className="text-gray-600">为页面和功能提供导航的菜单列表。</p>
+        <p className="text-gray-600 dark:text-gray-400">为页面和功能提供导航的菜单列表。</p>
       </div>
 
       {/* 基本用法 */}

@@ -126,10 +126,10 @@ export default function TooltipDemo() {
   const [visible1, setVisible1] = useState(false)
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Tooltip 气泡提示</h1>
-        <p className="text-gray-600">用于显示简洁的文本提示信息。</p>
+        <p className="text-gray-600 dark:text-gray-400">用于显示简洁的文本提示信息。</p>
       </div>
 
       {/* 基本用法 */}

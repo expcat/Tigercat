@@ -137,10 +137,10 @@ const customStatusSnippet = `<Steps :current="2">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Steps 步骤条</h1>
-      <p class="text-gray-600">引导用户按照流程完成任务的导航条。</p>
+      <p class="text-gray-600 dark:text-gray-400">引导用户按照流程完成任务的导航条。</p>
     </div>
 
     <!-- 基本用法 -->

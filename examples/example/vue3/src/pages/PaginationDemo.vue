@@ -122,10 +122,10 @@ const fullSnippet = `<Pagination
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Pagination 分页</h1>
-      <p class="text-gray-600">
+      <p class="text-gray-600 dark:text-gray-400">
         用于在数据量较大时进行分页展示，支持多种模式、快速跳页、页码选择等特性。
       </p>
     </div>

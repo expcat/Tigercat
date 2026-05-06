@@ -18,7 +18,7 @@ const landscapeSnippet = `<PrintLayout orientation="landscape" showHeader header
 
 const PrintLayoutDemo: React.FC = () => {
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">PrintLayout 打印布局</h1>
       <p className="text-gray-500 mb-8">用于预览和打印的页面布局组件，支持 A4/Letter 尺寸、页眉页脚和分页。</p>
 

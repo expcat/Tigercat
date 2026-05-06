@@ -114,10 +114,10 @@ const TimePickerDemo: React.FC = () => {
   const [timeRange, setTimeRange] = useState<[string | null, string | null]>([null, null])
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">TimePicker 时间选择器</h1>
-        <p className="text-gray-600">用于选择或输入时间。</p>
+        <p className="text-gray-600 dark:text-gray-400">用于选择或输入时间。</p>
       </div>
 
       {/* 基础用法 */}

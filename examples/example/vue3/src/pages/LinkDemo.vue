@@ -47,10 +47,10 @@ const clickCount = ref(0)`
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Link 链接</h1>
-      <p class="text-gray-600">文字超链接。</p>
+      <p class="text-gray-600 dark:text-gray-400">文字超链接。</p>
     </div>
 
     <!-- 链接变体 -->

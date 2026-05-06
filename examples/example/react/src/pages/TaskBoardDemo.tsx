@@ -128,7 +128,7 @@ const TaskBoardDemo: React.FC = () => {
     <div className="max-w-6xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">TaskBoard 任务看板</h1>
-        <p className="text-gray-600">可拖拽的任务看板，支持卡片跨列流转、列排序、WIP 限制等。</p>
+        <p className="text-gray-600 dark:text-gray-400">可拖拽的任务看板，支持卡片跨列流转、列排序、WIP 限制等。</p>
       </div>
 
       <DemoBlock

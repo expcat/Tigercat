@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <h1 class="text-3xl font-bold mb-2">HeatmapChart 热力图</h1>
     <p class="text-gray-500 mb-8">矩阵热力图，用颜色深浅展示数据密度。</p>
 

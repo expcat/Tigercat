@@ -2,9 +2,9 @@
 import { Divider } from '@expcat/tigercat-vue'
 import DemoBlock from '../components/DemoBlock.vue'
 
-const basicSnippet = `<div class="text-gray-700">上方内容</div>
+const basicSnippet = `<div class="text-gray-700 dark:text-gray-300">上方内容</div>
 <Divider />
-<div class="text-gray-700">下方内容</div>`
+<div class="text-gray-700 dark:text-gray-300">下方内容</div>`
 
 const lineStyleSnippet = `<Divider line-style="solid" />
 <Divider line-style="dashed" />
@@ -30,19 +30,19 @@ const verticalSnippet = `<div class="flex items-center h-12">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Divider 分割线</h1>
-      <p class="text-gray-600">区隔内容的分割线。</p>
+      <p class="text-gray-600 dark:text-gray-400">区隔内容的分割线。</p>
     </div>
 
     <DemoBlock title="基础用法"
                description="默认水平分割线。"
                :code="basicSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <div class="text-gray-700">上方内容</div>
+        <div class="text-gray-700 dark:text-gray-300">上方内容</div>
         <Divider />
-        <div class="text-gray-700">下方内容</div>
+        <div class="text-gray-700 dark:text-gray-300">下方内容</div>
       </div>
     </DemoBlock>
 
@@ -69,17 +69,17 @@ const verticalSnippet = `<div class="flex items-center h-12">
                description="spacing 控制分割线周围留白（none / xs / sm / md / lg / xl）。"
                :code="spacingSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <div class="text-gray-700">none</div>
+        <div class="text-gray-700 dark:text-gray-300">none</div>
         <Divider spacing="none" />
-        <div class="text-gray-700">xs</div>
+        <div class="text-gray-700 dark:text-gray-300">xs</div>
         <Divider spacing="xs" />
-        <div class="text-gray-700">sm</div>
+        <div class="text-gray-700 dark:text-gray-300">sm</div>
         <Divider spacing="sm" />
-        <div class="text-gray-700">md (default)</div>
+        <div class="text-gray-700 dark:text-gray-300">md (default)</div>
         <Divider spacing="md" />
-        <div class="text-gray-700">lg</div>
+        <div class="text-gray-700 dark:text-gray-300">lg</div>
         <Divider spacing="lg" />
-        <div class="text-gray-700">xl</div>
+        <div class="text-gray-700 dark:text-gray-300">xl</div>
         <Divider spacing="xl" />
       </div>
     </DemoBlock>
@@ -88,10 +88,10 @@ const verticalSnippet = `<div class="flex items-center h-12">
                description="通过 color / thickness 自定义边框颜色与宽度。"
                :code="customSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
-        <div class="text-gray-700">color="#2563eb" thickness="2px"</div>
+        <div class="text-gray-700 dark:text-gray-300">color="#2563eb" thickness="2px"</div>
         <Divider color="#2563eb"
                  thickness="2px" />
-        <div class="text-gray-700">color="#10b981" thickness="4px"（dashed）</div>
+        <div class="text-gray-700 dark:text-gray-300">color="#10b981" thickness="4px"（dashed）</div>
         <Divider color="#10b981"
                  thickness="4px"
                  line-style="dashed" />
@@ -103,14 +103,14 @@ const verticalSnippet = `<div class="flex items-center h-12">
                :code="verticalSnippet">
       <div class="p-6 bg-gray-50 rounded-lg">
         <div class="flex items-center h-12">
-          <span class="text-gray-700">Left</span>
+          <span class="text-gray-700 dark:text-gray-300">Left</span>
           <Divider orientation="vertical"
                    class="h-6" />
-          <span class="text-gray-700">Middle</span>
+          <span class="text-gray-700 dark:text-gray-300">Middle</span>
           <Divider orientation="vertical"
                    class="h-6"
                    line-style="dashed" />
-          <span class="text-gray-700">Right</span>
+          <span class="text-gray-700 dark:text-gray-300">Right</span>
         </div>
       </div>
     </DemoBlock>

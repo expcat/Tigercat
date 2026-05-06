@@ -134,16 +134,16 @@ const loadingSnippet = `<div class="bg-white p-6 rounded-lg">
   </div>
   <div v-else>
     <h3 class="text-xl font-bold mb-4">文章标题</h3>
-    <p class="text-gray-700">
+    <p class="text-gray-700 dark:text-gray-300">
       这是加载完成后显示的内容。骨架屏在内容加载时显示，
       提供更好的用户体验，避免页面空白或突然跳动。
     </p>
+  </div>
+</div>`
 
 const loadingScriptSnippet = `import { ref } from 'vue'
 
 const loading = ref(true)`
-  </div>
-</div>`
 
 const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
   <template v-if="cardLoading">
@@ -172,10 +172,10 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Skeleton 骨架屏</h1>
-      <p class="text-gray-600">用于在内容加载时显示占位符的骨架屏组件，提升用户体验。</p>
+      <p class="text-gray-600 dark:text-gray-400">用于在内容加载时显示占位符的骨架屏组件，提升用户体验。</p>
     </div>
 
     <!-- 基本用法 -->
@@ -371,7 +371,7 @@ const realSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         </div>
         <div v-else>
           <h3 class="text-xl font-bold mb-4">文章标题</h3>
-          <p class="text-gray-700">
+          <p class="text-gray-700 dark:text-gray-300">
             这是加载完成后显示的内容。骨架屏在内容加载时显示，
             提供更好的用户体验，避免页面空白或突然跳动。
           </p>

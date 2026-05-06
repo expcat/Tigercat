@@ -272,7 +272,7 @@ const showCustomClass = () => {
   <div class="p-6 space-y-8">
     <div>
       <h1 class="text-2xl font-bold mb-2">Notification 通知</h1>
-      <p class="text-gray-600">全局显示通知提示信息，支持多种展示位置、关闭与定时消失。</p>
+      <p class="text-gray-600 dark:text-gray-400">全局显示通知提示信息，支持多种展示位置、关闭与定时消失。</p>
     </div>
 
     <DemoBlock title="基本类型"

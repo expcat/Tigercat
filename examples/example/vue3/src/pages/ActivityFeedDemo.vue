@@ -61,7 +61,7 @@ const emptySnippet = `<ActivityFeed :items="[]" empty-text="暂无活动" />`
   <div class="max-w-6xl mx-auto p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">ActivityFeed 活动动态流</h1>
-      <p class="text-gray-600">组合组件，适配审计日志与动态信息流。</p>
+      <p class="text-gray-600 dark:text-gray-400">组合组件，适配审计日志与动态信息流。</p>
     </div>
 
     <DemoBlock title="分组展示" description="按日期分组展示动态。" :code="basicSnippet">

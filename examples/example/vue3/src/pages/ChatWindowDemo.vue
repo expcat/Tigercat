@@ -115,7 +115,7 @@ const inputSnippet = `<ChatWindow
   <div class="max-w-6xl mx-auto p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">ChatWindow 聊天窗口</h1>
-      <p class="text-gray-600">组合组件，用于构建完整聊天交互区域。</p>
+      <p class="text-gray-600 dark:text-gray-400">组合组件，用于构建完整聊天交互区域。</p>
     </div>
 
     <DemoBlock title="基础用法" description="默认 textarea 输入，支持 Shift+Enter 换行。" :code="basicSnippet" :script="basicScriptSnippet">

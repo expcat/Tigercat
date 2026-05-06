@@ -57,10 +57,10 @@ const UseChartInteractionDemo: React.FC = () => {
       : data[interaction.resolvedSelectedIndex]?.label
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">useChartInteraction 图表交互</h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">
           统一管理图表的悬停高亮、选中态、键盘可达性与图例联动，被内置的 BarChart / LineChart
           等组件使用。
         </p>

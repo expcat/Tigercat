@@ -1,4 +1,4 @@
-import { defineComponent, h, ref, computed, PropType, watch } from 'vue'
+import { defineComponent, h, ref, computed, PropType } from 'vue'
 import {
   virtualListContainerClasses,
   virtualListInnerClasses,

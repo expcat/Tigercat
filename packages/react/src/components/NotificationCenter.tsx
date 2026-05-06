@@ -90,7 +90,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     }
   }, [activeGroupKey, currentGroupKey, resolvedGroups])
 
-  const currentGroup = useMemo(() => {
+  const _currentGroup = useMemo(() => {
     if (resolvedGroups.length === 0) return undefined
     if (currentGroupKey === undefined) return resolvedGroups[0]
     const index = resolvedGroups.findIndex(

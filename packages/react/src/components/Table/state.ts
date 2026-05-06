@@ -15,7 +15,7 @@ import {
   type RowSelectionConfig,
   type ExpandableConfig
 } from '@expcat/tigercat-core'
-import { exportTableToCsv, downloadCsv } from '@expcat/tigercat-core/utils/table-export'
+import { exportTableToCsv, downloadCsv } from '@expcat/tigercat-core'
 import type { TableContext, TableProps } from './types'
 
 /**

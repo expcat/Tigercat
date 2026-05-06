@@ -93,10 +93,10 @@ export default function CollapseDemo() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Collapse 折叠面板</h1>
-        <p className="text-gray-600">可以折叠/展开的内容区域，用于将复杂的区域折叠起来。</p>
+        <p className="text-gray-600 dark:text-gray-400">可以折叠/展开的内容区域，用于将复杂的区域折叠起来。</p>
       </div>
 
       <DemoBlock title="基本用法" description="可以同时展开多个面板。" code={basicSnippet} script={basicScriptSnippet}>

@@ -180,10 +180,10 @@ const InputDemo: React.FC = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Input 输入框</h1>
-        <p className="text-gray-600">通过鼠标或键盘输入内容，是最基础的表单域的包装。</p>
+        <p className="text-gray-600 dark:text-gray-400">通过鼠标或键盘输入内容，是最基础的表单域的包装。</p>
       </div>
 
       {/* 基础用法 */}

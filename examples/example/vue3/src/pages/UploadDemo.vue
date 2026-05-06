@@ -125,10 +125,10 @@ const customRequestSnippet = `<div class="max-w-md">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Upload 文件上传</h1>
-      <p class="text-gray-600">通过点击或者拖拽上传文件。</p>
+      <p class="text-gray-600 dark:text-gray-400">通过点击或者拖拽上传文件。</p>
     </div>
 
     <!-- 基础用法 -->

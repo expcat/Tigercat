@@ -7,7 +7,7 @@ import {
   tableBaseClasses,
   tableLoadingOverlayClasses
 } from '@expcat/tigercat-core'
-import { tableExportButtonClasses } from '@expcat/tigercat-core/utils/table-export'
+import { tableExportButtonClasses } from '@expcat/tigercat-core'
 
 import { tableEmits, tableProps, type VueTableProps } from './Table/props'
 import { useTableState } from './Table/state'

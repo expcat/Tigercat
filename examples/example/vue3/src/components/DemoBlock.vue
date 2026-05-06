@@ -32,7 +32,7 @@ onBeforeUnmount(() => {
 
 const panelBaseClasses =
     'rounded-b-lg border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950/40'
-const previewPanelClasses = `p-6 ${panelBaseClasses}`
+const previewPanelClasses = `p-6 overflow-x-auto ${panelBaseClasses}`
 const codePanelClasses = `relative p-4 ${panelBaseClasses}`
 const copyButtonClasses =
     'absolute top-2 right-2 z-10 inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white/90 px-2 py-1 text-xs text-gray-600 shadow-sm backdrop-blur transition hover:bg-white hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900/80 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-gray-100'
@@ -41,8 +41,8 @@ const copyButtonClasses =
 <template>
     <section class="mb-12">
         <div class="mb-4">
-            <h2 class="text-2xl font-bold mb-2">{{ props.title }}</h2>
-            <p v-if="props.description" class="text-gray-600">
+            <h2 class="text-2xl font-bold mb-2 dark:text-gray-100">{{ props.title }}</h2>
+            <p v-if="props.description" class="text-gray-600 dark:text-gray-400">
                 {{ props.description }}
             </p>
         </div>

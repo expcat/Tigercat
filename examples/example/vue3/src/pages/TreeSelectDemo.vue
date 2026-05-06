@@ -25,7 +25,7 @@ const sizeSnippet = `<TreeSelect :tree-data="treeData" size="sm" placeholder="�
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <h1 class="text-3xl font-bold mb-2">TreeSelect 树选择</h1>
     <p class="text-gray-500 mb-8">树形结构选择器，适用于组织架构等层级数据。</p>
 

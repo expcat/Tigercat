@@ -129,10 +129,10 @@ const flipSnippet = `<div class="p-4 bg-gray-100 rounded overflow-auto h-32">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Tooltip 气泡提示</h1>
-      <p class="text-gray-600">用于显示简洁的文本提示信息。</p>
+      <p class="text-gray-600 dark:text-gray-400">用于显示简洁的文本提示信息。</p>
     </div>
 
     <!-- 基本用法 -->

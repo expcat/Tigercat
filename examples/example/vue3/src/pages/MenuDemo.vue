@@ -131,10 +131,10 @@ const singleOpenSnippet = `<Menu :multiple="false" v-model:selectedKeys="selecte
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Menu 菜单</h1>
-      <p class="text-gray-600">为页面和功能提供导航的菜单列表。</p>
+      <p class="text-gray-600 dark:text-gray-400">为页面和功能提供导航的菜单列表。</p>
     </div>
 
     <!-- 基本用法 -->

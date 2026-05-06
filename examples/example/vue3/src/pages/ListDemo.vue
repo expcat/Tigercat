@@ -160,7 +160,7 @@ function handlePageChange(current: number, pageSize: number) {
   <div class="max-w-6xl mx-auto p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">List 列表</h1>
-      <p class="text-gray-600">通用列表组件，用于展示一系列相似的数据项。</p>
+      <p class="text-gray-600 dark:text-gray-400">通用列表组件，用于展示一系列相似的数据项。</p>
     </div>
 
     <DemoBlock title="基本用法"
@@ -337,7 +337,7 @@ function handlePageChange(current: number, pageSize: number) {
           <template #renderItem="{ item }">
             <Card variant="shadow">
               <h3 class="font-semibold mb-2">{{ item.title }}</h3>
-              <p class="text-gray-600">{{ item.content }}</p>
+              <p class="text-gray-600 dark:text-gray-400">{{ item.content }}</p>
             </Card>
           </template>
         </List>

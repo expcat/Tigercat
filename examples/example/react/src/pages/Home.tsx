@@ -95,7 +95,7 @@ export default {
 function App() {
   return (
     <ConfigProvider>
-      <Button variant="solid">开始使用</Button>
+      <Button variant="primary">开始使用</Button>
     </ConfigProvider>
   )
 }

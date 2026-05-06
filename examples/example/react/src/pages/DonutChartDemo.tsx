@@ -91,10 +91,10 @@ const DonutChartDemo: React.FC = () => {
   const total = useMemo(() => interactiveData.reduce((s, d) => s + d.value, 0), [])
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">DonutChart 环形图</h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">
           ECharts 风格的环形图，支持中心内容、阴影、交互高亮等高级特性。
         </p>
       </div>

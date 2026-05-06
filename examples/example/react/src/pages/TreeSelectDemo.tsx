@@ -27,7 +27,7 @@ const TreeSelectDemo: React.FC = () => {
   const [val2, setVal2] = useState<TreeSelectValue>(undefined as unknown as TreeSelectValue)
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">TreeSelect 树选择</h1>
       <p className="text-gray-500 mb-8">树形结构选择器，适用于组织架构等层级数据。</p>
 

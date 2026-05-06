@@ -139,10 +139,10 @@ const constraintSnippet = `<BarChart
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">BarChart 柱状图</h1>
-      <p class="text-gray-600">
+      <p class="text-gray-600 dark:text-gray-400">
         用于展示分类数据的柱状图，支持渐变填充、数值标签、入场动画等 ECharts 风格特性。
       </p>
     </div>

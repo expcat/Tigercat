@@ -203,7 +203,7 @@ const minimalSnippet = `<CommentThread
   <div class="max-w-3xl mx-auto p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">CommentThread 评论线程</h1>
-      <p class="text-gray-600">
+      <p class="text-gray-600 dark:text-gray-400">
         适用于评论、讨论、代码审查等场景的组合组件，支持嵌套回复、点赞互动和动态加载。
       </p>
     </div>

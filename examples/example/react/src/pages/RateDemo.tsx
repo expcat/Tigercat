@@ -25,7 +25,7 @@ const RateDemo: React.FC = () => {
   const [customVal, setCustomVal] = useState(4)
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">Rate 评分</h1>
       <p className="text-gray-500 mb-8">评分组件，支持半星、自定义字符和禁用状态。</p>
 

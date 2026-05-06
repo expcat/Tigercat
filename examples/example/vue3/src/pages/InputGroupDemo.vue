@@ -30,7 +30,7 @@ const sizeSnippet = `<Space direction="vertical" :size="12" class="w-full">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <h1 class="text-3xl font-bold mb-2">InputGroup 输入框组</h1>
     <p class="text-gray-500 mb-8">将多个输入元素组合在一起，支持前后缀和紧凑模式。</p>
 

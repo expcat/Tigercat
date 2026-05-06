@@ -32,10 +32,10 @@ const handleCopy = (code: string) => {
 </script>
 
 <template>
-    <div class="max-w-5xl mx-auto p-8">
+    <div class="max-w-5xl mx-auto p-4 sm:p-8">
         <div class="mb-8">
             <h1 class="text-3xl font-bold mb-2">Code 代码展示</h1>
-            <p class="text-gray-600">展示代码片段并支持一键复制。</p>
+            <p class="text-gray-600 dark:text-gray-400">展示代码片段并支持一键复制。</p>
         </div>
 
         <DemoBlock title="基础用法" description="展示代码内容与默认复制按钮。" :code="basicDemoSnippet">

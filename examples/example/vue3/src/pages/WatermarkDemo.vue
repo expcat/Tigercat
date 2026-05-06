@@ -22,7 +22,7 @@ const configSnippet = `<Watermark content="Custom" :rotate="-30" :gap-x="120" :g
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <h1 class="text-3xl font-bold mb-2">Watermark 水印</h1>
     <p class="text-gray-500 mb-8">在页面上添加水印，支持文字和图片，防止信息泄露。</p>
 

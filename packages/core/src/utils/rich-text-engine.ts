@@ -28,7 +28,7 @@ import {
   isValidUrl,
   getToolbarButtons
 } from './rich-text-editor-utils'
-import type { ToolbarButton, ToolbarItem } from '../types/rich-text-editor'
+import type { ToolbarItem } from '../types/rich-text-editor'
 
 export interface RichTextEngineMountContext {
   /** Host element the engine should mount into. */

@@ -9,7 +9,7 @@ import {
   type RowSelectionConfig,
   type ExpandableConfig
 } from '@expcat/tigercat-core'
-import { tableExportButtonClasses } from '@expcat/tigercat-core/utils/table-export'
+import { tableExportButtonClasses } from '@expcat/tigercat-core'
 
 import { LoadingSpinner } from './Table/icons'
 import { useTableState } from './Table/state'

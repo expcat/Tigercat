@@ -255,10 +255,6 @@ function setExpandedStyle(element: CollapseTransitionElement): void {
   element.style.opacity = '1'
 }
 
-export function getInitialCollapseContentStyle(expanded: boolean): {
-  maxHeight: string
-  opacity: string
-}
 export function getInitialCollapseContentStyle(
   expanded: boolean
 ): Pick<CSSStyleDeclaration, 'maxHeight' | 'opacity'> {

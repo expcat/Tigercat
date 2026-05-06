@@ -3,10 +3,10 @@ import { Alert, Card } from '@expcat/tigercat-vue'
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">useControlledState 受控/非受控</h1>
-      <p class="text-gray-600">该 Hook 仅在 React 版本中提供，Vue 版本请直接使用 <code>v-model</code>。</p>
+      <p class="text-gray-600 dark:text-gray-400">该 Hook 仅在 React 版本中提供，Vue 版本请直接使用 <code>v-model</code>。</p>
     </div>
 
     <Alert type="info"

@@ -26,7 +26,7 @@ const minSnippet = `<Splitter direction="horizontal" sizes={[30, 70]} min={100}>
 
 const SplitterDemo: React.FC = () => {
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">Splitter 分割面板</h1>
       <p className="text-gray-500 mb-8">可拖拽分割面板，支持水平/垂直、嵌套和折叠。</p>
 

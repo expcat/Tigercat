@@ -26,7 +26,7 @@ const arcSnippet = `<GaugeChart
 
 const GaugeChartDemo: React.FC = () => {
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">GaugeChart 仪表盘</h1>
       <p className="text-gray-500 mb-8">环形仪表盘，展示单一指标的进度或状态。</p>
 

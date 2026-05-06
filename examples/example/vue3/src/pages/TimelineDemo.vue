@@ -155,7 +155,7 @@ const renderItemSnippet = `<Timeline :items="projectTimeline">
         {{ item.status }}
       </Tag>
     </div>
-    <div class="text-gray-600">{{ item.description }}</div>
+    <div class="text-gray-600 dark:text-gray-400">{{ item.description }}</div>
   </template>
 </Timeline>`
 
@@ -216,7 +216,7 @@ const exampleSnippet = `<div class="max-w-2xl">
           {{ item.status }}
         </Tag>
       </div>
-      <div class="text-gray-600">{{ item.description }}</div>
+      <div class="text-gray-600 dark:text-gray-400">{{ item.description }}</div>
     </template>
   </Timeline>
 </div>`
@@ -226,7 +226,7 @@ const exampleSnippet = `<div class="max-w-2xl">
   <div class="max-w-6xl mx-auto p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Timeline 时间线</h1>
-      <p class="text-gray-600">垂直展示时间流信息的时间线组件，支持多种模式与自定义渲染。</p>
+      <p class="text-gray-600 dark:text-gray-400">垂直展示时间流信息的时间线组件，支持多种模式与自定义渲染。</p>
     </div>
 
     <DemoBlock title="基本用法"
@@ -300,7 +300,7 @@ const exampleSnippet = `<div class="max-w-2xl">
               {{ item.status }}
             </Tag>
           </div>
-          <div class="text-gray-600">{{ item.description }}</div>
+          <div class="text-gray-600 dark:text-gray-400">{{ item.description }}</div>
         </template>
       </Timeline>
     </DemoBlock>
@@ -375,7 +375,7 @@ const exampleSnippet = `<div class="max-w-2xl">
                 {{ item.status }}
               </Tag>
             </div>
-            <div class="text-gray-600">{{ item.description }}</div>
+            <div class="text-gray-600 dark:text-gray-400">{{ item.description }}</div>
           </template>
         </Timeline>
       </div>

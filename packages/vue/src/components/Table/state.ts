@@ -14,7 +14,7 @@ import {
   type SortDirection,
   type PaginationConfig
 } from '@expcat/tigercat-core'
-import { exportTableToCsv, downloadCsv } from '@expcat/tigercat-core/utils/table-export'
+import { exportTableToCsv, downloadCsv } from '@expcat/tigercat-core'
 import type { TableContext, TableEmitFn, TableInternalProps } from './types'
 
 /**

@@ -15,7 +15,7 @@ const RichTextEditorDemo: React.FC = () => {
   const [content, setContent] = useState('<p>Hello <strong>Tigercat</strong>!</p>')
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">RichTextEditor 富文本编辑器</h1>
       <p className="text-gray-500 mb-8">所见即所得的富文本编辑器，带工具栏。</p>
 

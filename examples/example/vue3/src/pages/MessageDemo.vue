@@ -246,7 +246,7 @@ const sceneSnippet = `<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8 text-gray-900 dark:text-gray-100">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8 text-gray-900 dark:text-gray-100">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Message 消息提示</h1>
       <p class="text-gray-600 dark:text-gray-300">

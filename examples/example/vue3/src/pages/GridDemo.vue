@@ -83,10 +83,10 @@ const mixedSnippet = `<Row :gutter="16">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Grid 栅格</h1>
-      <p class="text-gray-600">通过基础的 24 分栏，迅速简便地创建布局。</p>
+      <p class="text-gray-600 dark:text-gray-400">通过基础的 24 分栏，迅速简便地创建布局。</p>
     </div>
 
     <DemoBlock title="基础栅格"

@@ -380,7 +380,7 @@ const TableDemo: React.FC = () => {
     <div className="max-w-6xl mx-auto p-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Table 表格</h1>
-        <p className="text-gray-600">用于展示行列数据的表格组件，支持排序、筛选、分页等功能。</p>
+        <p className="text-gray-600 dark:text-gray-400">用于展示行列数据的表格组件，支持排序、筛选、分页等功能。</p>
       </div>
 
       {/* 基础用法 */}

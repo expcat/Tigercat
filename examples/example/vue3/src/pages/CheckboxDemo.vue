@@ -89,10 +89,10 @@ const groupSizeSnippet = `<Space direction="vertical">
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Checkbox 多选框</h1>
-      <p class="text-gray-600">在一组可选项中进行多项选择。</p>
+      <p class="text-gray-600 dark:text-gray-400">在一组可选项中进行多项选择。</p>
     </div>
 
     <!-- 基础用法 -->

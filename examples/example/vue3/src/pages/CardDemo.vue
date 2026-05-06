@@ -27,10 +27,10 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto p-8">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold mb-2">Card 卡片</h1>
-      <p class="text-gray-600">用于内容展示的卡片容器组件，支持多种样式和布局选项。</p>
+      <p class="text-gray-600 dark:text-gray-400">用于内容展示的卡片容器组件，支持多种样式和布局选项。</p>
     </div>
 
     <DemoBlock title="基本用法"
@@ -50,19 +50,19 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card variant="default">
             <h3 class="font-semibold mb-2">默认卡片</h3>
-            <p class="text-gray-600">带细边框的基础卡片样式。</p>
+            <p class="text-gray-600 dark:text-gray-400">带细边框的基础卡片样式。</p>
           </Card>
           <Card variant="bordered">
             <h3 class="font-semibold mb-2">带边框卡片</h3>
-            <p class="text-gray-600">带粗边框的卡片样式。</p>
+            <p class="text-gray-600 dark:text-gray-400">带粗边框的卡片样式。</p>
           </Card>
           <Card variant="shadow">
             <h3 class="font-semibold mb-2">带阴影卡片</h3>
-            <p class="text-gray-600">带阴影效果的卡片样式。</p>
+            <p class="text-gray-600 dark:text-gray-400">带阴影效果的卡片样式。</p>
           </Card>
           <Card variant="elevated">
             <h3 class="font-semibold mb-2">浮起卡片</h3>
-            <p class="text-gray-600">带大阴影的浮起卡片样式。</p>
+            <p class="text-gray-600 dark:text-gray-400">带大阴影的浮起卡片样式。</p>
           </Card>
         </div>
       </div>
@@ -77,15 +77,15 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
                class="w-full">
           <Card size="sm">
             <h3 class="font-semibold mb-2">小尺寸卡片</h3>
-            <p class="text-gray-600">内边距较小，适合紧凑布局。</p>
+            <p class="text-gray-600 dark:text-gray-400">内边距较小，适合紧凑布局。</p>
           </Card>
           <Card size="md">
             <h3 class="font-semibold mb-2">中等尺寸卡片</h3>
-            <p class="text-gray-600">默认尺寸，适合大多数场景。</p>
+            <p class="text-gray-600 dark:text-gray-400">默认尺寸，适合大多数场景。</p>
           </Card>
           <Card size="lg">
             <h3 class="font-semibold mb-2">大尺寸卡片</h3>
-            <p class="text-gray-600">内边距较大，适合重要内容展示。</p>
+            <p class="text-gray-600 dark:text-gray-400">内边距较大，适合重要内容展示。</p>
           </Card>
         </Space>
       </div>
@@ -99,17 +99,17 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
           <Card hoverable
                 variant="shadow">
             <h3 class="font-semibold mb-2">功能卡片 1</h3>
-            <p class="text-gray-600">悬停查看效果</p>
+            <p class="text-gray-600 dark:text-gray-400">悬停查看效果</p>
           </Card>
           <Card hoverable
                 variant="shadow">
             <h3 class="font-semibold mb-2">功能卡片 2</h3>
-            <p class="text-gray-600">悬停查看效果</p>
+            <p class="text-gray-600 dark:text-gray-400">悬停查看效果</p>
           </Card>
           <Card hoverable
                 variant="shadow">
             <h3 class="font-semibold mb-2">功能卡片 3</h3>
-            <p class="text-gray-600">悬停查看效果</p>
+            <p class="text-gray-600 dark:text-gray-400">悬停查看效果</p>
           </Card>
         </div>
       </div>
@@ -123,17 +123,17 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
           <Card cover="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=250&fit=crop"
                 cover-alt="代码编辑器">
             <h3 class="font-semibold mb-2">开发工具</h3>
-            <p class="text-gray-600">现代化的开发环境</p>
+            <p class="text-gray-600 dark:text-gray-400">现代化的开发环境</p>
           </Card>
           <Card cover="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=250&fit=crop"
                 cover-alt="笔记本电脑">
             <h3 class="font-semibold mb-2">移动办公</h3>
-            <p class="text-gray-600">随时随地高效工作</p>
+            <p class="text-gray-600 dark:text-gray-400">随时随地高效工作</p>
           </Card>
           <Card cover="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop"
                 cover-alt="数据分析">
             <h3 class="font-semibold mb-2">数据分析</h3>
-            <p class="text-gray-600">洞察数据价值</p>
+            <p class="text-gray-600 dark:text-gray-400">洞察数据价值</p>
           </Card>
         </div>
       </div>
@@ -148,7 +148,7 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
             <template #header>
               <h3 class="text-lg font-semibold">卡片标题</h3>
             </template>
-            <p class="text-gray-600">这是卡片的主体内容区域，可以放置任何内容。</p>
+            <p class="text-gray-600 dark:text-gray-400">这是卡片的主体内容区域，可以放置任何内容。</p>
             <template #footer>
               <p class="text-sm text-gray-500">创建于 2024-01-01</p>
             </template>
@@ -158,7 +158,7 @@ const fullSnippet = `<Card variant="shadow" hoverable cover="...">...</Card>`
             <template #header>
               <h3 class="text-lg font-semibold">操作卡片</h3>
             </template>
-            <p class="text-gray-600">这个卡片包含操作按钮。</p>
+            <p class="text-gray-600 dark:text-gray-400">这个卡片包含操作按钮。</p>
             <template #actions>
               <Button variant="ghost"
                       size="sm">取消</Button>

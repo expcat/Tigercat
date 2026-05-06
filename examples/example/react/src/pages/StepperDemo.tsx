@@ -20,7 +20,7 @@ const StepperDemo: React.FC = () => {
   const [val, setVal] = useState(3)
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-5xl mx-auto p-4 sm:p-8">
       <h1 className="text-3xl font-bold mb-2">Stepper 步进器</h1>
       <p className="text-gray-500 mb-8">数值增减控制器，支持步长、范围和精度。</p>
 

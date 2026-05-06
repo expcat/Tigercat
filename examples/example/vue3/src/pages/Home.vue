@@ -30,7 +30,7 @@ const usageSnippet = [
   '',
   '<template>',
   '  <ConfigProvider>',
-  '    <Button variant="solid">开始使用</Button>',
+  '    <Button variant="primary">开始使用</Button>',
   '  </ConfigProvider>',
   '</template>'
 ].join('\n')

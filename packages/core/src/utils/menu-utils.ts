@@ -326,11 +326,6 @@ function setSubmenuExpandedStyle(element: SubmenuHeightTransitionElement): void 
   element.style.opacity = '1'
 }
 
-export function getInitialSubmenuHeightTransitionStyle(expanded: boolean): {
-  height: string
-  opacity: string
-  overflow: string
-}
 export function getInitialSubmenuHeightTransitionStyle(
   expanded: boolean
 ): Pick<CSSStyleDeclaration, 'height' | 'opacity' | 'overflow'> {
