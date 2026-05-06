@@ -28,7 +28,7 @@ interface ProjectPackage {
 
 type Framework = 'vue3' | 'react'
 
-const MIN_NODE_MAJOR = 18
+const MIN_NODE_MAJOR = 20
 const MIN_PNPM_MAJOR = 8
 const REQUIRED_TAILWIND_MAJOR = 4
 const REQUIRED_TIGERCAT_MAJOR = 1

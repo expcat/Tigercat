@@ -40,7 +40,7 @@ function main() {
 
   console.log('Checking Node.js...')
   const nodeVersion = process.versions.node
-  if (!checkMajorVersion('Node.js', nodeVersion, 18)) hasErrors = true
+  if (!checkMajorVersion('Node.js', nodeVersion, 20)) hasErrors = true
   console.log('')
 
   console.log('Checking pnpm...')

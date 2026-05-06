@@ -52,7 +52,7 @@ has_errors=0
 echo "Checking Node.js..."
 if command -v node &> /dev/null; then
     NODE_VERSION=$(node --version | cut -d'v' -f2)
-    if ! check_version "Node.js" "$NODE_VERSION" "18.0.0"; then
+    if ! check_version "Node.js" "$NODE_VERSION" "20.11.0"; then
         has_errors=1
     fi
 else

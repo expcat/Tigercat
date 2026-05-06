@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 组件 API 一致性审查 — 对 ~70 对 Vue/React 组件进行系统审计。事件命名（Vue kebab-case / React camelCase）和 Props 默认值全部一致，未发现违规。发现 Vue 包 8 个组件缺少 Props 类型导出（Select、Form、FormItem、Divider、Container、Link、MessageContainer、NotificationContainer），已全部补齐：在各组件文件中新增 `VueXxxProps` 接口，并在 `index.ts` 中添加 `export type` 导出。
-- 推荐下一步：P1 a11y AA 回归 — 对 overlay、picker、table、form、advanced components 进行键盘与 ARIA 行为回归测试。
+- 上一步完成：P1 Node engines bump — 将 Node 最低版本从 18 提升到 20.11.0。变更点：根 `package.json` engines `>=20.11.0`、CLI doctor `MIN_NODE_MAJOR=20`、`check-env.mjs/sh` Node 检查改为 20、`tsconfig.json` target/lib `ES2020→ES2022`（Node 20 原生支持）、CI `create-release-tags.yml` node-version `18→22`（与 ci.yml/publish.yml 对齐）。理由：ESLint 10（已安装）要求 `^20.19.0 || ^22.13.0 || >=24`，Node 18 实质已不兼容当前 devDeps。选择 20.11.0 作为下限（2024-01 LTS 安全线）。构建与 41 条 CLI 测试全部通过。
+- 推荐下一步：P1 workspace catalog / overrides — 在 pnpm-workspace.yaml 增加 catalog 统一版本来源。
 
 ## 未实现组件
 
@@ -26,7 +26,7 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 | 优先级   | 项目                            | 范围                                      | 完成标准                                                                                                          |
 | -------- | ------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| P1       | Node engines bump               | workspace / CI / release workflow         | 评估根包、packages、examples、CI、发布 workflow 的 Node 20+ 影响，并明确升级窗口                                  |
+| P1       | ~~Node engines bump~~               | ~~workspace / CI / release workflow~~         | ~~已完成：engines >=20.11.0、tsconfig ES2022、CI node-version 22、CLI doctor MIN_NODE_MAJOR=20~~ |
 | P1       | workspace catalog / overrides   | pnpm workspace / 核心工具链依赖           | 在 `pnpm-workspace.yaml` 增加 catalog 或 overrides，统一 Vue、React、TypeScript、Tailwind、tsup 等版本来源        |
 | P1       | 根入口 locale tree-shaking 方案 | Core i18n barrel / locale presets         | 当前根入口仍会经 `utils/i18n` re-export 全部 locale；需决定保留兼容 barrel，或引入更轻的 locale-only 默认导出策略 |
 | P1       | CLI 模板版本策略                | CLI React / Vue 模板                      | 模板依赖范围改为 catalog、overrides 或与根 lockfile 对齐的版本策略，避免长期漂移                                  |
@@ -79,8 +79,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | 优先级 | 项目                   | 复核重点                                                                                                           | 完成标准                                                                                                    |
 | ------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
 | P1     | 组件 API 一致性        | Vue 事件 kebab-case、React 事件 camelCase、Props 默认值与类型导出                                                  | API 扫描或人工审查无阻塞项；差异记录到迁移指南或 skills 文档                                                |
-| P1     | a11y AA 回归           | overlay、picker、table、form、advanced components 的键盘与 ARIA 行为                                               | 自动化 a11y 测试与关键手动流程通过                                                                          |
-| P1     | 测试与覆盖率门槛       | 单元、集成、e2e、视觉回归是否仍符合当前发布目标                                                                    | 不低于 2026-05-04 基线：statements 80.51%、branches 74.17%、functions 81.20%、lines 82.59%；关键 e2e 不回退 |
+| P1     | ~~a11y AA 回归~~           | ~~overlay、picker、table、form、advanced components 的键盘与 ARIA 行为~~                                               | ~~已完成：27 条跨框架 a11y 回归测试 + 原有 34 条，合计 61 条通过~~ |
+| P1     | ~~测试与覆盖率门槛~~       | ~~单元、集成、e2e、视觉回归是否仍符合当前发布目标~~                                                                    | ~~已完成（2026-05-06）：307 文件 5570 测试全通过；Stmts 83.82% / Br 77.05% / Fn 85.42% / Lines 85.86%，四项均超基线~~ |
 | P1     | 低覆盖热点补强         | TaskBoard、Watermark、CropUpload、FloatButton、Empty、Result、FunnelChart、GaugeChart、SunburstChart、TreeMapChart | 优先补边界、交互、渲染分支与性能回归，逐步关闭覆盖率热点                                                    |
 | P2     | Bundle 与 tree-shaking | advanced components、locales、charts 是否可按需裁剪                                                                | size/bundle 检查无异常增长；locale 按需入口可用                                                             |
 | P2     | 文档完整性             | 组件 API、主题、i18n、迁移指南、示例入口                                                                           | 新增或变更组件均有 props 文档、Vue/React 示例和迁移说明                                                     |
