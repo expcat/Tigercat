@@ -15,7 +15,7 @@ description: Shared charts props and concepts
 
 ## 组件列表
 
-**高级组件 (7)**: LineChart, BarChart, PieChart, DonutChart, AreaChart, ScatterChart, RadarChart
+**高级组件 (11)**: LineChart, BarChart, PieChart, DonutChart, AreaChart, ScatterChart, RadarChart, HeatmapChart, FunnelChart, GaugeChart, SunburstChart, TreeMapChart
 
 **底层组件 (6)**: ChartCanvas, ChartAxis, ChartGrid, ChartSeries, ChartLegend, ChartTooltip
 
@@ -177,6 +177,72 @@ description: Shared charts props and concepts
 | canvasThreshold | `number`                      | `1000`    | ✓   | ✓     |
 
 `renderMode="auto"` 会在 cell 数量超过 `canvasThreshold` 时把 cell 层绘制到 canvas，轴标签和无障碍 SVG 容器仍保留；小矩阵默认继续使用 SVG rect，方便 CSS 和 DOM 级交互检查。
+
+### FunnelChart
+
+漏斗图，从宽到窄展示转化过程。
+
+| Prop     | Type                             | Default      | Vue | React |
+| -------- | -------------------------------- | ------------ | --- | ----- |
+| data     | `FunnelChartDatum[]`             | *required*   | ✓   | ✓     |
+| direction| `'vertical' \| 'horizontal'`     | `'vertical'` | ✓   | ✓     |
+| gap      | `number`                         | `2`          | ✓   | ✓     |
+| pinch    | `boolean`                        | `false`      | ✓   | ✓     |
+| colors   | `string[]`                       | 主题色板     | ✓   | ✓     |
+| gradient | `boolean`                        | `false`      | ✓   | ✓     |
+
+**FunnelChartDatum**: `{ label?: string, value: number, color?: string }`
+
+### GaugeChart
+
+仪表盘图，展示单一指标在范围内的位置。
+
+| Prop           | Type                                               | Default                              | Vue | React |
+| -------------- | -------------------------------------------------- | ------------------------------------ | --- | ----- |
+| value          | `number`                                           | *required*                           | ✓   | ✓     |
+| min            | `number`                                           | `0`                                  | ✓   | ✓     |
+| max            | `number`                                           | `100`                                | ✓   | ✓     |
+| startAngle     | `number`                                           | `135`                                | ✓   | ✓     |
+| endAngle       | `number`                                           | `405`                                | ✓   | ✓     |
+| arcWidth       | `number`                                           | `20`                                 | ✓   | ✓     |
+| showTicks      | `boolean`                                          | `true`                               | ✓   | ✓     |
+| tickCount      | `number`                                           | `5`                                  | ✓   | ✓     |
+| valueFormatter | `(value: number) => string`                        | -                                    | ✓   | ✓     |
+| label          | `string`                                           | -                                    | ✓   | ✓     |
+| segments       | `Array<{ range: [number, number]; color: string }>`| -                                    | ✓   | ✓     |
+| trackColor     | `string`                                           | `'var(--tiger-border,#e5e7eb)'`      | ✓   | ✓     |
+| color          | `string`                                           | `'var(--tiger-primary,#2563eb)'`     | ✓   | ✓     |
+| colors         | `string[]`                                         | -                                    | ✓   | ✓     |
+| gradient       | `boolean`                                          | `false`                              | ✓   | ✓     |
+
+### SunburstChart
+
+旭日图，以同心环展示分层数据。
+
+| Prop             | Type                     | Default  | Vue | React |
+| ---------------- | ------------------------ | -------- | --- | ----- |
+| data             | `SunburstChartDatum[]`   | *required*| ✓   | ✓     |
+| innerRadiusRatio | `number`                 | `0`      | ✓   | ✓     |
+| showLabels       | `boolean`                | `true`   | ✓   | ✓     |
+| colors           | `string[]`               | 主题色板 | ✓   | ✓     |
+| gradient         | `boolean`                | `false`  | ✓   | ✓     |
+
+**SunburstChartDatum**: `{ label: string, value: number, color?: string, children?: SunburstChartDatum[] }`
+
+### TreeMapChart
+
+矩形树图，按面积比例展示分层数据。
+
+| Prop         | Type                   | Default  | Vue | React |
+| ------------ | ---------------------- | -------- | --- | ----- |
+| data         | `TreeMapChartDatum[]`  | *required*| ✓   | ✓     |
+| gap          | `number`               | `2`      | ✓   | ✓     |
+| showLabels   | `boolean`              | `true`   | ✓   | ✓     |
+| minLabelSize | `number`               | `10`     | ✓   | ✓     |
+| colors       | `string[]`             | 主题色板 | ✓   | ✓     |
+| gradient     | `boolean`              | `false`  | ✓   | ✓     |
+
+**TreeMapChartDatum**: `{ label: string, value: number, color?: string, children?: TreeMapChartDatum[] }`
 
 ---
 

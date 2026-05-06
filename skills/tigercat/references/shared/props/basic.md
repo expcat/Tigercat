@@ -1,6 +1,6 @@
 ---
 name: tigercat-shared-props-basic
-description: Shared props definitions for basic components - Alert, Avatar, Badge, Button, Code, Divider, Empty, Icon, Image, ImagePreview, ImageGroup, ImageCropper, Link, QRCode, Tag, Text
+description: Shared props definitions for basic components - Alert, Avatar, Badge, Button, Code, ConfigProvider, Divider, Empty, Icon, Image, ImagePreview, ImageGroup, ImageCropper, Link, QRCode, Tag, Text
 ---
 
 # Basic Components - Props Reference
@@ -443,5 +443,37 @@ description: Shared props definitions for basic components - Alert, Avatar, Badg
 | level     | `'L' \| 'M' \| 'Q' \| 'H'`              | `'M'`       |  ✓  |   ✓   | 纠错等级         |
 | status    | `'active' \| 'expired' \| 'loading'`     | `'active'`  |  ✓  |   ✓   | 二维码状态       |
 | className | `string`                                 | -           |  -  |   ✓   | 自定义类名       |
+
+---
+
+## ConfigProvider 全局配置
+
+为子组件树注入国际化、主题和颜色方案等全局配置。
+
+### Props
+
+| Prop        | Type                                                                  | Default | Vue | React | Description                                |
+| ----------- | --------------------------------------------------------------------- | ------- | :-: | :---: | ------------------------------------------ |
+| locale      | `Partial<TigerLocale> \| PromiseLike \| () => PromiseLike`           | -       |  ✓  |   ✓   | 国际化配置（同步/异步/懒加载）             |
+| theme       | `string`                                                              | -       |  ✓  |   ✓   | 主题名称                                   |
+| colorScheme | `'light' \| 'dark' \| 'auto'`                                       | -       |  ✓  |   ✓   | 颜色方案                                   |
+
+### 注入值 (TigerConfig)
+
+| 字段          | Type                    | Description          |
+| ------------- | ----------------------- | -------------------- |
+| locale        | `Partial<TigerLocale>`  | 解析后的国际化对象   |
+| localeLoading | `boolean`               | 异步 locale 加载中   |
+| theme         | `string`                | 当前主题名称         |
+| colorScheme   | `ColorScheme`           | 当前颜色方案         |
+
+### 消费方式
+
+- **Vue**: `inject(TigerConfigKey)` 获取 `ComputedRef<TigerConfig>`
+- **React**: `useTigerConfig()` hook 获取 `TigerConfig`
+
+> 详见 [i18n.md](../i18n.md) 和 [theme.md](../theme.md)
+
+---
 
 > **See also**: [Vue examples](../vue/basic.md) · [React examples](../react/basic.md)

@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P1 低覆盖热点补强 — 新增 8 个 core 测试文件共 114 条测试。覆盖 FunnelChart (16)、GaugeChart (24)、SunburstChart (13)、TreeMapChart (15)、Watermark (+5→10)、FloatButton (7)、Empty (11)、Result (18) 的 core utils 层，含布局算法、弧形计算、动画控制器、边界值、缓存逻辑。全部通过。
-- 推荐下一步：P2 Bundle 与 tree-shaking — advanced components、locales、charts 是否可按需裁剪。
+- 上一步完成：P2 文档完整性 — 审查并补齐文档缺口。charts.md 新增 FunnelChart/GaugeChart/SunburstChart/TreeMapChart 4 个图表组件 Props；basic.md 新增 ConfigProvider Props 表格；i18n.md 新增 TaskBoard 和 NotificationCenter locale 字段；Vue/React 各新增 advanced.md 示例文件（9 个组件）；index.md 已链接。迁移指南 4 个版本均存在。
+- 推荐下一步：Deferred commander 14 升级，或 P3 PDFViewer 新组件。
 
 ## 未实现组件
 
@@ -82,8 +82,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | P1     | ~~a11y AA 回归~~           | ~~overlay、picker、table、form、advanced components 的键盘与 ARIA 行为~~                                               | ~~已完成：27 条跨框架 a11y 回归测试 + 原有 34 条，合计 61 条通过~~ |
 | P1     | ~~测试与覆盖率门槛~~       | ~~单元、集成、e2e、视觉回归是否仍符合当前发布目标~~                                                                    | ~~已完成（2026-05-06）：307 文件 5570 测试全通过；Stmts 83.82% / Br 77.05% / Fn 85.42% / Lines 85.86%，四项均超基线~~ |
 | P1     | ~~低覆盖热点补强~~   | ~~TaskBoard、Watermark、CropUpload、FloatButton、Empty、Result、FunnelChart、GaugeChart、SunburstChart、TreeMapChart~~ | ~~已完成：新增 8 个 core utils 测试文件 114 条测试，覆盖布局算法/弧形计算/动画/边界值/缓存，全部通过~~ |
-| P2     | Bundle 与 tree-shaking | advanced components、locales、charts 是否可按需裁剪                                                                | size/bundle 检查无异常增长；locale 按需入口可用                                                             |
-| P2     | 文档完整性             | 组件 API、主题、i18n、迁移指南、示例入口                                                                           | 新增或变更组件均有 props 文档、Vue/React 示例和迁移说明                                                     |
+| P2     | ~~Bundle 与 tree-shaking~~ | ~~advanced components、locales、charts 是否可按需裁剪~~                                                            | ~~已审查：无异常。Core sideEffects:false + locale 独立入口；Vue/React 每组件独立 entry + splitting + wildcard exports，Button 深导入仅 3.4KB~~ |
+| P2     | ~~文档完整性~~             | ~~组件 API、主题、i18n、迁移指南、示例入口~~                                                                           | ~~已完成：charts.md +4 图表、basic.md +ConfigProvider、i18n.md +TaskBoard/NotificationCenter、Vue/React +advanced.md 示例，迁移指南 4 版本齐备~~                                                     |
 
 ## 维护规则
 

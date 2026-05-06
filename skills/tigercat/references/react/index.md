@@ -39,7 +39,7 @@ function App() {
 | Data       | [../shared/props/data.md](../shared/props/data.md)             | [data.md](data.md)             |
 | Charts     | [../shared/props/charts.md](../shared/props/charts.md)         | [charts.md](charts.md)         |
 | Composite  | [../shared/props/composite.md](../shared/props/composite.md)   | [composite.md](composite.md)   |
-| Advanced   | [../shared/props/advanced.md](../shared/props/advanced.md)     | -                              |
+| Advanced   | [../shared/props/advanced.md](../shared/props/advanced.md)     | [advanced.md](advanced.md)     |
 
 ## React-Specific Patterns
 
