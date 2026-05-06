@@ -74,6 +74,10 @@ const eventSnippet = `<Space align="center">
   </Button>
 </Space>`
 
+const eventScriptSnippet = `import { ref } from 'vue'
+
+const clickCount = ref(0)`
+
 const htmlTypeSnippet = `<form @submit.prevent="alert('已提交')">
   <Space>
     <Button type="submit" variant="primary">提交</Button>
@@ -151,7 +155,7 @@ const htmlTypeSnippet = `<form @submit.prevent="alert('已提交')">
     </DemoBlock>
 
     <!-- 事件处理 -->
-    <DemoBlock title="事件处理" description="通过 @click 监听按钮点击事件。" :code="eventSnippet">
+    <DemoBlock title="事件处理" description="通过 @click 监听按钮点击事件。" :code="eventSnippet" :script="eventScriptSnippet">
       <Space align="center">
         <Button variant="primary" @click="clickCount++">已点击 {{ clickCount }} 次</Button>
         <Button variant="secondary" @click="clickCount = 0">重置</Button>

@@ -8,6 +8,10 @@ const basicSnippet = `<Space direction="vertical" className="w-full max-w-md">
   <p className="text-sm text-gray-600">输入的内容：{basicText}</p>
 </Space>`
 
+const basicScriptSnippet = `import { useState } from 'react'
+
+const [basicText, setBasicText] = useState('')`
+
 const controlledSnippet = `<Space direction="vertical" className="w-full max-w-md">
   <FormItem label="受控输入">
     <Input value={controlledText} onChange={(e) => setControlledText(e.target.value)} placeholder="受控输入" />
@@ -17,6 +21,11 @@ const controlledSnippet = `<Space direction="vertical" className="w-full max-w-m
     <p className="text-sm text-gray-600">输入的内容：{uncontrolledText}</p>
   </FormItem>
 </Space>`
+
+const controlledScriptSnippet = `import { useState } from 'react'
+
+const [controlledText, setControlledText] = useState('')
+const [uncontrolledText, setUncontrolledText] = useState('')`
 
 const typeSnippet = `<Space direction="vertical" className="w-full max-w-md">
   <FormItem label="文本输入">
@@ -84,6 +93,26 @@ const shakeSnippet = `<Space direction="vertical" className="w-full max-w-md">
   </Space>
 </Space>`
 
+const shakeScriptSnippet = `import { useState } from 'react'
+import type { InputStatus } from '@expcat/tigercat-core'
+
+const [shakeStatus, setShakeStatus] = useState<InputStatus>('default')
+const [shakeError, setShakeError] = useState('')
+
+const triggerShake = () => {
+  setShakeStatus('default')
+  setShakeError('')
+  setTimeout(() => {
+    setShakeStatus('error')
+    setShakeError('验证失败，请重试！')
+  }, 50)
+}
+
+const resetShake = () => {
+  setShakeStatus('default')
+  setShakeError('')
+}`
+
 const inputNumberSnippet = `<Space direction="vertical" className="w-full max-w-md">
   <FormItem label="基础">
     <InputNumber value={numValue} onChange={setNumValue} />
@@ -112,6 +141,11 @@ const inputNumberControlsSnippet = `<Space direction="vertical" className="w-ful
     />
   </FormItem>
 </Space>`
+
+const inputNumberScriptSnippet = `import { useState } from 'react'
+
+const [numValue, setNumValue] = useState<number | null>(0)
+const [numFormatted, setNumFormatted] = useState<number | null>(1000)`
 
 const InputDemo: React.FC = () => {
   const [basicText, setBasicText] = useState('')
@@ -153,7 +187,7 @@ const InputDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock title="基础用法" description="基础的输入框组件。" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="基础的输入框组件。" code={basicSnippet} script={basicScriptSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Input
             value={basicText}
@@ -168,7 +202,8 @@ const InputDemo: React.FC = () => {
       <DemoBlock
         title="受控与非受控"
         description="受控模式绑定值（value/onChange）；非受控模式不绑定 value，仅监听 input 事件。"
-        code={controlledSnippet}>
+        code={controlledSnippet}
+        script={controlledScriptSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <FormItem label="受控输入">
             <Input
@@ -298,7 +333,8 @@ const InputDemo: React.FC = () => {
       <DemoBlock
         title="错误抖动"
         description="当状态变为 error 时会自动触发抖动动画。"
-        code={shakeSnippet}>
+        code={shakeSnippet}
+        script={shakeScriptSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <Input
             status={shakeStatus}
@@ -318,7 +354,8 @@ const InputDemo: React.FC = () => {
       <DemoBlock
         title="数字输入框 InputNumber"
         description="专用的数字输入组件，支持范围限制、精度、多种尺寸和状态。"
-        code={inputNumberSnippet}>
+        code={inputNumberSnippet}
+        script={inputNumberScriptSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <FormItem label="基础">
             <InputNumber value={numValue} onChange={setNumValue} />
@@ -350,7 +387,8 @@ const InputDemo: React.FC = () => {
       <DemoBlock
         title="步进按钮与格式化"
         description="InputNumber 支持不同按钮布局和自定义格式化。"
-        code={inputNumberControlsSnippet}>
+        code={inputNumberControlsSnippet}
+        script={inputNumberScriptSnippet}>
         <Space direction="vertical" className="w-full max-w-md">
           <FormItem label="右侧按钮（默认）">
             <InputNumber value={numValue} onChange={setNumValue} />

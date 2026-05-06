@@ -57,9 +57,7 @@ const customLoadingSnippet = `<Space>
   </Button>
 </Space>`
 
-const eventSnippet = `const [count, setCount] = useState(0)
-
-<Space align="center">
+const eventSnippet = `<Space align="center">
   <Button variant="primary" onClick={() => setCount(c => c + 1)}>
     已点击 {count} 次
   </Button>
@@ -67,6 +65,10 @@ const eventSnippet = `const [count, setCount] = useState(0)
     重置
   </Button>
 </Space>`
+
+const eventScriptSnippet = `import { useState } from 'react'
+
+const [count, setCount] = useState(0)`
 
 const htmlTypeSnippet = `<form onSubmit={(e) => { e.preventDefault(); alert('已提交') }}>
   <Space>
@@ -200,7 +202,7 @@ const ButtonDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 事件处理 */}
-      <DemoBlock title="事件处理" description="通过 onClick 监听按钮点击事件。" code={eventSnippet}>
+      <DemoBlock title="事件处理" description="通过 onClick 监听按钮点击事件。" code={eventSnippet} script={eventScriptSnippet}>
         <Space align="center">
           <Button variant="primary" onClick={() => setClickCount((c) => c + 1)}>
             已点击 {clickCount} 次

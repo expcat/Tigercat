@@ -17,6 +17,30 @@ const basicSnippet = `<Table<UserData>
   pagination={false}
 />`
 
+const basicScriptSnippet = `import { useState } from 'react'
+import type { TableColumn } from '@expcat/tigercat-react'
+
+interface UserData extends Record<string, unknown> {
+  id: number
+  name: string
+  age: number
+  email: string
+  status: 'active' | 'inactive'
+  address: string
+}
+
+const [basicData] = useState<UserData[]>([
+  { id: 1, name: 'John Doe', age: 28, email: 'john@example.com', status: 'active', address: 'New York' },
+  { id: 2, name: 'Jane Smith', age: 32, email: 'jane@example.com', status: 'inactive', address: 'London' },
+  { id: 3, name: 'Bob Johnson', age: 45, email: 'bob@example.com', status: 'active', address: 'Paris' }
+])
+
+const basicColumns: TableColumn<UserData>[] = [
+  { key: 'name', title: 'Name', width: 150 },
+  { key: 'age', title: 'Age', width: 100 },
+  { key: 'email', title: 'Email', width: 200 }
+]`
+
 const borderedSnippet = `<Table<UserData>
   columns={basicColumns}
   dataSource={basicData}
@@ -72,6 +96,14 @@ const selectionSnippet = `<div className="mb-4">
   pagination={false}
   onSelectionChange={handleSelectionChange}
 />`
+
+const selectionScriptSnippet = `import { useState } from 'react'
+
+const [selectedRowKeys, setSelectedRowKeys] = useState<(string | number)[]>([])
+
+const handleSelectionChange = (keys: (string | number)[]) => {
+  setSelectedRowKeys(keys)
+}`
 
 const stickySnippet = `<Table<UserData>
   columns={basicColumns}
@@ -352,7 +384,7 @@ const TableDemo: React.FC = () => {
       </div>
 
       {/* 基础用法 */}
-      <DemoBlock title="基础用法" description="基础的表格展示用法。" code={basicSnippet}>
+      <DemoBlock title="基础用法" description="基础的表格展示用法。" code={basicSnippet} script={basicScriptSnippet}>
         <Table<UserData> columns={basicColumns} dataSource={basicData} pagination={false} />
       </DemoBlock>
 
@@ -409,7 +441,7 @@ const TableDemo: React.FC = () => {
       </DemoBlock>
 
       {/* 行选择 */}
-      <DemoBlock title="行选择" description="选择单行或多行数据。" code={selectionSnippet}>
+      <DemoBlock title="行选择" description="选择单行或多行数据。" code={selectionSnippet} script={selectionScriptSnippet}>
         <div className="mb-4">
           <p className="text-sm text-gray-600">已选择: {selectedRowKeys.join(', ') || '无'}</p>
         </div>

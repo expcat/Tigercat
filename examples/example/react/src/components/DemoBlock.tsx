@@ -6,6 +6,7 @@ interface DemoBlockProps {
   title: string
   description?: string
   code: string
+  script?: string
   children: React.ReactNode
   className?: string
 }
@@ -14,8 +15,6 @@ const panelBaseClasses =
   'rounded-b-lg border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950/40'
 const previewPanelClasses = `p-6 ${panelBaseClasses}`
 const codePanelClasses = `relative p-4 ${panelBaseClasses}`
-const exampleBoxClasses =
-  'rounded-md border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900'
 const copyButtonClasses =
   'absolute top-2 right-2 z-10 inline-flex items-center gap-1 rounded-md border border-gray-200 bg-white/90 px-2 py-1 text-xs text-gray-600 shadow-sm backdrop-blur transition hover:bg-white hover:text-gray-900 dark:border-gray-700 dark:bg-gray-900/80 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-gray-100'
 
@@ -57,7 +56,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({ code }) => {
   )
 }
 
-const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, children, className }) => {
+const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, script, children, className }) => {
   const [activeKey, setActiveKey] = useState('preview')
   const sectionClasses = className ? `mb-12 ${className}` : 'mb-12'
 
@@ -72,7 +71,7 @@ const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, childre
         <Tabs activeKey={activeKey} onChange={(key) => setActiveKey(String(key))} type="card">
           <TabPane tabKey="preview" label="示例" />
           <TabPane tabKey="code" label="代码" />
-          <TabPane tabKey="mixed" label="混合" />
+          {script ? <TabPane tabKey="script" label="脚本" /> : null}
         </Tabs>
         {activeKey === 'preview' && <div className={previewPanelClasses}>{children}</div>}
         {activeKey === 'code' && (
@@ -81,21 +80,10 @@ const DemoBlock: React.FC<DemoBlockProps> = ({ title, description, code, childre
             <Code code={code} />
           </div>
         )}
-        {activeKey === 'mixed' && (
-          <div className={previewPanelClasses}>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="w-full">
-                <div className="text-xs text-gray-500 mb-2">示例</div>
-                <div className={exampleBoxClasses}>{children}</div>
-              </div>
-              <div className="w-full">
-                <div className="text-xs text-gray-500 mb-2">代码</div>
-                <div className="relative">
-                  <CopyButton code={code} />
-                  <Code code={code} />
-                </div>
-              </div>
-            </div>
+        {activeKey === 'script' && script && (
+          <div className={codePanelClasses}>
+            <CopyButton code={script} />
+            <Code code={script} />
           </div>
         )}
       </div>
