@@ -11,8 +11,8 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 
 ## 执行状态
 
-- 上一步完成：P2 Empty 默认插画体积评估 — 内置 SVG 插画仅 ~687 bytes（占 core bundle 0.13%），已使用 CSS 变量支持主题。评估结论：CSS-only 方案字节量相近但更难维护；外部懒加载省 687B 但增加 HTTP 请求和闪烁；当前 inline SVG + `image` slot/prop 自定义 + `showImage={false}` 隐藏 三重策略已覆盖所有场景，无需改动。
-- 推荐下一步：P2 Divider 文件合并评估 — 评估 Divider 是否与 Space 或 layout util 合并。
+- 上一步完成：P2 Form 命令式 API — 新增 `FormController` 接口（core types）和 `useFormController` 组合式 / hook（Vue + React）。提供 headless 表单状态管理：values / errors / errorsByField / hasErrors + setFieldValue / setValues / getFieldValue / validate / validateField / validateFields / clearValidate / reset / undo / redo。与现有 `<Form>` 组件完全兼容（共享同一套 core 验证引擎）。新增 28 条测试（Vue 14 + React 14）覆盖 values、validation、reset、undo/redo，全部通过。现有 112 条 Form 测试不受影响。
+- 推荐下一步：P2 Descriptions 大列表性能 — 对 100+ items columns / rows 合并算法做复杂度测试或 benchmark。
 
 ## 未实现组件
 
@@ -39,9 +39,9 @@ source: consolidated from old 00-06 specs, appendix docs, and docs/reports/2026-
 | 优先级 | 项目                       | 范围                          | 完成标准                                                                  |
 | ------ | -------------------------- | ----------------------------- | ------------------------------------------------------------------------- |
 | P2     | ~~Empty 默认插画体积~~         | ~~Empty~~                         | ~~已评估：inline SVG ~687B，CSS-only 无明显收益，保留现有方案（slot/prop 已支持自定义）~~ |
-| P2     | Divider 文件合并评估       | Divider / Space / layout util | 评估是否与 Space 或 layout util 合并，保持子路径兼容                      |
-| P2     | Radio / Checkbox icon 体积 | Radio / Checkbox              | 评估 CSS mask 替代 inline SVG 的收益和兼容性                              |
-| P2     | Form 命令式 API            | Form                          | 设计 `useFormController` / `useTigerForm`，明确与现有 Form API 的兼容关系 |
+| P2     | ~~Divider 文件合并评估~~       | ~~Divider / Space / layout util~~ | ~~已评估：类型/props/DOM/语义完全正交，合并会退化 tree-shaking，保持独立~~ |
+| P2     | ~~Radio / Checkbox icon 体积~~ | ~~Radio / Checkbox~~              | ~~已评估：两者均无 inline SVG（Radio 纯 CSS 圆点，Checkbox 原生 input），前提不成立~~ |
+| P2     | ~~Form 命令式 API~~            | ~~Form~~                          | ~~已完成：`useFormController` hook/composable，FormController 接口，28 条测试通过~~ |
 
 ### Layout / Navigation / Data
 

@@ -287,3 +287,64 @@ export interface FormItemProps {
    */
   errorDisplayMode?: FormErrorDisplayMode
 }
+
+// ---------------------------------------------------------------------------
+// FormController — headless imperative form API (v1.2.0)
+// ---------------------------------------------------------------------------
+
+/**
+ * Options for creating a form controller.
+ */
+export interface FormControllerOptions {
+  /** Initial form values */
+  initialValues?: FormValues
+  /** Validation rules */
+  rules?: FormRules
+  /** Field dependency map for cross-field validation */
+  fieldDependencies?: Map<string, string[]>
+  /** Enable undo/redo history */
+  undoable?: boolean
+  /** Maximum undo history size @default 50 */
+  maxHistorySize?: number
+}
+
+/**
+ * Headless form controller returned by `useFormController`.
+ *
+ * Can be used standalone or passed to `<Form controller={ctrl}>` to bind
+ * the controller to a rendered form.
+ */
+export interface FormController {
+  /** Current form values (reactive in Vue, state snapshot in React) */
+  readonly values: FormValues
+  /** Current validation errors */
+  readonly errors: FormError[]
+  /** Error lookup by field name */
+  readonly errorsByField: Record<string, string | undefined>
+  /** Whether the form has any errors */
+  readonly hasErrors: boolean
+  /** Set a single field value */
+  setFieldValue: (fieldName: string, value: unknown) => void
+  /** Set multiple field values at once */
+  setValues: (values: Partial<FormValues>) => void
+  /** Get a single field value (supports dotted path) */
+  getFieldValue: (fieldName: string) => unknown
+  /** Validate the entire form */
+  validate: () => Promise<boolean>
+  /** Validate specific fields */
+  validateFields: (fieldNames: string[]) => Promise<boolean>
+  /** Validate a single field */
+  validateField: (fieldName: string) => Promise<string | null>
+  /** Clear validation errors */
+  clearValidate: (fieldNames?: string | string[]) => void
+  /** Reset all values to initial and clear errors */
+  reset: () => void
+  /** Undo last change (if undoable) */
+  undo: () => void
+  /** Redo last undone change (if undoable) */
+  redo: () => void
+  /** Whether undo is available */
+  readonly canUndo: boolean
+  /** Whether redo is available */
+  readonly canRedo: boolean
+}
