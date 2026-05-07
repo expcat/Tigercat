@@ -1,36 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { ref, nextTick } from 'vue'
 import { useChartInteraction } from '@expcat/tigercat-vue'
-
-function installFrameScheduler() {
-  let nextHandle = 1
-  const callbacks = new Map<number, FrameRequestCallback>()
-  const requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
-    const handle = nextHandle
-    nextHandle += 1
-    callbacks.set(handle, callback)
-    return handle
-  })
-  const cancelAnimationFrame = vi.fn((handle: number) => {
-    callbacks.delete(handle)
-  })
-
-  vi.stubGlobal('requestAnimationFrame', requestAnimationFrame)
-  vi.stubGlobal('cancelAnimationFrame', cancelAnimationFrame)
-
-  return {
-    requestAnimationFrame,
-    cancelAnimationFrame,
-    flush(timestamp = 0) {
-      const frameCallbacks = [...callbacks.values()]
-      callbacks.clear()
-      frameCallbacks.forEach((callback) => callback(timestamp))
-    },
-    pendingCount() {
-      return callbacks.size
-    }
-  }
-}
+import { installFrameScheduler } from '../utils/frame-scheduler'
 
 describe('useChartInteraction (Vue)', () => {
   const createMockEmit = () => vi.fn()

@@ -7,31 +7,7 @@ import {
   type WatermarkFrameCallback,
   type WatermarkResizeObserverLike
 } from '@expcat/tigercat-core'
-
-function createFrameScheduler() {
-  let nextHandle = 1
-  const callbacks = new Map<number, WatermarkFrameCallback>()
-
-  return {
-    requestFrame(callback: WatermarkFrameCallback) {
-      const handle = nextHandle
-      nextHandle += 1
-      callbacks.set(handle, callback)
-      return handle
-    },
-    cancelFrame(handle: number) {
-      callbacks.delete(handle)
-    },
-    flush(timestamp = 0) {
-      const frameCallbacks = [...callbacks.values()]
-      callbacks.clear()
-      frameCallbacks.forEach((callback) => callback(timestamp))
-    },
-    pendingCount() {
-      return callbacks.size
-    }
-  }
-}
+import { createFrameScheduler } from '../utils/frame-scheduler'
 
 function createResizeObserverFactory() {
   let callback: ResizeObserverCallback | undefined

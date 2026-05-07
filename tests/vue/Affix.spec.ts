@@ -5,67 +5,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/vue'
 import { Affix } from '@expcat/tigercat-vue'
-
-class MockIntersectionObserver implements IntersectionObserver {
-  static instances: MockIntersectionObserver[] = []
-
-  readonly root: Element | Document | null
-  readonly rootMargin: string
-  readonly thresholds: ReadonlyArray<number>
-
-  private callback: IntersectionObserverCallback
-  private target: Element | null = null
-
-  observe = vi.fn((target: Element) => {
-    this.target = target
-  })
-  unobserve = vi.fn()
-  disconnect = vi.fn()
-  takeRecords = vi.fn(() => [])
-
-  constructor(callback: IntersectionObserverCallback, options: IntersectionObserverInit = {}) {
-    this.callback = callback
-    this.root = (options.root as Element | Document | null) ?? null
-    this.rootMargin = options.rootMargin ?? '0px'
-    this.thresholds = Array.isArray(options.threshold)
-      ? options.threshold
-      : [options.threshold ?? 0]
-    MockIntersectionObserver.instances.push(this)
-  }
-
-  trigger(entry: Partial<IntersectionObserverEntry>) {
-    const target = this.target ?? document.createElement('div')
-    const record: IntersectionObserverEntry = {
-      time: 0,
-      target,
-      rootBounds: new DOMRect(0, 0, 100, 600),
-      boundingClientRect: new DOMRect(),
-      intersectionRect: new DOMRect(),
-      isIntersecting: false,
-      intersectionRatio: 0,
-      ...entry
-    }
-
-    this.callback([record], this)
-  }
-}
-
-class MockResizeObserver implements ResizeObserver {
-  static instances: MockResizeObserver[] = []
-
-  observe = vi.fn()
-  unobserve = vi.fn()
-  disconnect = vi.fn()
-
-  constructor() {
-    MockResizeObserver.instances.push(this)
-  }
-}
+import { MockIntersectionObserver, MockResizeObserver } from '../utils/mock-observers'
 
 describe('Affix', () => {
   beforeEach(() => {
-    MockIntersectionObserver.instances = []
-    MockResizeObserver.instances = []
+    MockIntersectionObserver.reset()
+    MockResizeObserver.reset()
     vi.stubGlobal('IntersectionObserver', MockIntersectionObserver)
     vi.stubGlobal('ResizeObserver', MockResizeObserver)
     Object.defineProperty(window, 'innerHeight', { configurable: true, value: 600 })

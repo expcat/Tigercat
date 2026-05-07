@@ -18,6 +18,8 @@ import {
 import type { ChartAxisProps } from '@expcat/tigercat-react'
 import { createLinearScale } from '@expcat/tigercat-core'
 import { renderWithProps, expectNoA11yViolations } from '../utils/render-helpers-react'
+import { MockResizeObserver } from '../utils/mock-observers'
+import { installFrameScheduler } from '../utils/frame-scheduler'
 
 // ---------------------------------------------------------------------------
 // Shared fixtures
@@ -49,68 +51,6 @@ const ChartSeriesWrapper: React.FC<React.ComponentProps<typeof ChartSeries>> = (
     <ChartSeries {...props} />
   </svg>
 )
-
-// ---------------------------------------------------------------------------
-// ChartCanvas helpers
-// ---------------------------------------------------------------------------
-
-class MockResizeObserver implements ResizeObserver {
-  static instances: MockResizeObserver[] = []
-
-  private callback: ResizeObserverCallback
-  private target: Element | null = null
-
-  observe = vi.fn((target: Element) => {
-    this.target = target
-  })
-  unobserve = vi.fn()
-  disconnect = vi.fn()
-  takeRecords = vi.fn(() => [])
-
-  constructor(callback: ResizeObserverCallback) {
-    this.callback = callback
-    MockResizeObserver.instances.push(this)
-  }
-
-  trigger(width: number, height: number) {
-    const target = this.target ?? document.createElement('div')
-    this.callback(
-      [
-        {
-          target,
-          contentRect: new DOMRect(0, 0, width, height)
-        } as ResizeObserverEntry
-      ],
-      this
-    )
-  }
-}
-
-function installFrameScheduler() {
-  let nextHandle = 1
-  const callbacks = new Map<number, FrameRequestCallback>()
-  const requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
-    const handle = nextHandle
-    nextHandle += 1
-    callbacks.set(handle, callback)
-    return handle
-  })
-  const cancelAnimationFrame = vi.fn((handle: number) => {
-    callbacks.delete(handle)
-  })
-
-  vi.stubGlobal('requestAnimationFrame', requestAnimationFrame)
-  vi.stubGlobal('cancelAnimationFrame', cancelAnimationFrame)
-
-  return {
-    requestAnimationFrame,
-    flush(timestamp = 0) {
-      const frameCallbacks = [...callbacks.values()]
-      callbacks.clear()
-      frameCallbacks.forEach((callback) => callback(timestamp))
-    }
-  }
-}
 
 // ===========================================================================
 // ChartAxis
@@ -162,7 +102,7 @@ describe('ChartAxis', () => {
 
 describe('ChartCanvas', () => {
   afterEach(() => {
-    MockResizeObserver.instances = []
+    MockResizeObserver.reset()
     vi.unstubAllGlobals()
   })
 

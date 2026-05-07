@@ -1,30 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { createRafRepeatActionController, type RepeatFrameCallback } from '@expcat/tigercat-core'
-
-function createFrameScheduler() {
-  let nextHandle = 1
-  const callbacks = new Map<number, RepeatFrameCallback>()
-
-  return {
-    requestFrame(callback: RepeatFrameCallback) {
-      const handle = nextHandle
-      nextHandle += 1
-      callbacks.set(handle, callback)
-      return handle
-    },
-    cancelFrame(handle: number) {
-      callbacks.delete(handle)
-    },
-    flush(timestamp: number) {
-      const frameCallbacks = [...callbacks.values()]
-      callbacks.clear()
-      frameCallbacks.forEach((callback) => callback(timestamp))
-    },
-    pendingCount() {
-      return callbacks.size
-    }
-  }
-}
+import { createFrameScheduler } from '../utils/frame-scheduler'
 
 describe('repeat-action-utils', () => {
   it('runs immediately, then repeats after the configured delay and interval', () => {
