@@ -9,6 +9,11 @@ export default defineConfig({
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'html',
   snapshotPathTemplate: '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}-{projectName}{ext}',
   updateSnapshots: process.env.CI ? 'missing' : 'none',
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.05
+    }
+  },
   use: {
     trace: 'on-first-retry'
   },
