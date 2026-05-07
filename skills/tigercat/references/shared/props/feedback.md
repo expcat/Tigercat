@@ -7,7 +7,7 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 共享 Props 定义，框架差异在表格中标注。
 
-> **显示状态 (v0.5.0)**: 所有组件统一使用 `open` prop（原 `visible` 已废弃）。详见 [MIGRATION_v0.5.0.md](../../../../MIGRATION_v0.5.0.md) 和 [patterns/common.md](../patterns/common.md)
+> **显示状态 (v0.5.0)**: 所有组件统一使用 `open` prop（原 `visible` 已废弃）。详见 [CHANGELOG.md](../../../../CHANGELOG.md) 和 [patterns/common.md](../patterns/common.md)
 >
 > **Floating Popup 共享架构**: Tooltip、Popover、Popconfirm 共享 `useFloatingPopup` (Vue) / `usePopup` (React) hook，统一管理 visibility、定位、dismiss 与 trigger 事件。详见 [patterns/common.md](../patterns/common.md#floating-popup-共享架构)
 
@@ -34,7 +34,7 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 | cancelText        | `string`                                 | `'取消'` |  ✓  |   ✓   | 取消按钮文案                 |
 | className         | `string`                                 | -        |  ✓  |   ✓   | 自定义类名                   |
 | draggable         | `boolean`                                | `false`  |  ✓  |   ✓   | 可拖拽移动                   |
-| closeAriaLabel    | `string`                                 | -        |  ✓  |   ✓   | 关闭按钮 aria-label            |
+| closeAriaLabel    | `string`                                 | -        |  ✓  |   ✓   | 关闭按钮 aria-label          |
 | locale            | `{ modal: ModalLocale }`                 | -        |  ✓  |   ✓   | 国际化                       |
 
 ### Events
@@ -112,15 +112,15 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Options
 
-| Option    | Type         | Default | Description                        |
-| --------- | ------------ | ------- | ---------------------------------- |
-| content   | `string`     | -       | 消息内容（必填）                   |
-| duration  | `number`     | `3000`  | 显示时长（ms），`0` 表示不自动关闭 |
-| closable  | `boolean`    | `false` | 是否显示关闭按钮                   |
-| onClose   | `() => void` | -       | 关闭时的回调                       |
-| position  | `'top' \| 'top-left' \| 'top-right' \| 'bottom' \| 'bottom-left' \| 'bottom-right'` | `'top'` | 显示位置 |
-| icon      | `string`     | -       | 自定义图标 SVG path d 属性         |
-| className | `string`     | -       | 额外 CSS 类名                      |
+| Option    | Type                                                                                | Default | Description                        |
+| --------- | ----------------------------------------------------------------------------------- | ------- | ---------------------------------- |
+| content   | `string`                                                                            | -       | 消息内容（必填）                   |
+| duration  | `number`                                                                            | `3000`  | 显示时长（ms），`0` 表示不自动关闭 |
+| closable  | `boolean`                                                                           | `false` | 是否显示关闭按钮                   |
+| onClose   | `() => void`                                                                        | -       | 关闭时的回调                       |
+| position  | `'top' \| 'top-left' \| 'top-right' \| 'bottom' \| 'bottom-left' \| 'bottom-right'` | `'top'` | 显示位置                           |
+| icon      | `string`                                                                            | -       | 自定义图标 SVG path d 属性         |
+| className | `string`                                                                            | -       | 额外 CSS 类名                      |
 
 ---
 
@@ -160,28 +160,28 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Props
 
-| Prop           | Type                                                                                                      | Default     | Vue | React | Description        |
-| -------------- | --------------------------------------------------------------------------------------------------------- | ----------- | :-: | :---: | ------------------ |
-| open           | `boolean`                                                                                                 | -           |  ✓  |   ✓   | 受控显示状态       |
-| defaultOpen    | `boolean`                                                                                                 | `false`     |  ✓  |   ✓   | 默认显示状态       |
-| title          | `string`                                                                                                  | -           |  ✓  |   ✓   | 确认标题           |
-| description    | `string`                                                                                                  | -           |  ✓  |   ✓   | 描述文本           |
-| icon           | `'warning' \| 'info' \| 'error' \| 'success' \| 'question'`                                               | `'warning'` |  ✓  |   ✓   | 图标类型           |
-| showIcon       | `boolean`                                                                                                 | `true`      |  ✓  |   ✓   | 是否显示图标       |
-| okText         | `string`                                                                                                  | `'确定'`    |  ✓  |   ✓   | 确认按钮文案       |
-| cancelText     | `string`                                                                                                  | `'取消'`    |  ✓  |   ✓   | 取消按钮文案       |
-| okType         | `'primary' \| 'danger'`                                                                                   | `'primary'` |  ✓  |   ✓   | 确认按钮类型       |
-| placement      | `'top' \| 'top-start' \| 'top-end' \| 'bottom' \| ... \| 'left' \| 'left-start' \| ... \| 'right' \| ...` | `'top'`     |  ✓  |   ✓   | 弹出位置           |
-| offset         | `number`                                                                                                  | `8`         |  ✓  |   ✓   | 距触发元素偏移(px) |
-| disabled       | `boolean`                                                                                                 | `false`     |  ✓  |   ✓   | 是否禁用           |
+| Prop        | Type                                                                                                      | Default     | Vue | React | Description        |
+| ----------- | --------------------------------------------------------------------------------------------------------- | ----------- | :-: | :---: | ------------------ |
+| open        | `boolean`                                                                                                 | -           |  ✓  |   ✓   | 受控显示状态       |
+| defaultOpen | `boolean`                                                                                                 | `false`     |  ✓  |   ✓   | 默认显示状态       |
+| title       | `string`                                                                                                  | -           |  ✓  |   ✓   | 确认标题           |
+| description | `string`                                                                                                  | -           |  ✓  |   ✓   | 描述文本           |
+| icon        | `'warning' \| 'info' \| 'error' \| 'success' \| 'question'`                                               | `'warning'` |  ✓  |   ✓   | 图标类型           |
+| showIcon    | `boolean`                                                                                                 | `true`      |  ✓  |   ✓   | 是否显示图标       |
+| okText      | `string`                                                                                                  | `'确定'`    |  ✓  |   ✓   | 确认按钮文案       |
+| cancelText  | `string`                                                                                                  | `'取消'`    |  ✓  |   ✓   | 取消按钮文案       |
+| okType      | `'primary' \| 'danger'`                                                                                   | `'primary'` |  ✓  |   ✓   | 确认按钮类型       |
+| placement   | `'top' \| 'top-start' \| 'top-end' \| 'bottom' \| ... \| 'left' \| 'left-start' \| ... \| 'right' \| ...` | `'top'`     |  ✓  |   ✓   | 弹出位置           |
+| offset      | `number`                                                                                                  | `8`         |  ✓  |   ✓   | 距触发元素偏移(px) |
+| disabled    | `boolean`                                                                                                 | `false`     |  ✓  |   ✓   | 是否禁用           |
 
 ### Events
 
-| Vue Event         | React Callback    | Description      |
-| ----------------- | ----------------- | ---------------- |
-| `@confirm`        | `onConfirm`       | 确认事件         |
-| `@cancel`         | `onCancel`        | 取消事件         |
-| `@open-change`    | `onOpenChange`    | 显示状态变更事件 |
+| Vue Event      | React Callback | Description      |
+| -------------- | -------------- | ---------------- |
+| `@confirm`     | `onConfirm`    | 确认事件         |
+| `@cancel`      | `onCancel`     | 取消事件         |
+| `@open-change` | `onOpenChange` | 显示状态变更事件 |
 
 ### Slots / Children
 
@@ -197,19 +197,19 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Props
 
-| Prop           | Type                                        | Default   | Vue | React | Description          |
-| -------------- | ------------------------------------------- | --------- | :-: | :---: | -------------------- |
-| open           | `boolean`                                   | -         |  ✓  |   ✓   | 受控显示状态         |
-| defaultOpen    | `boolean`                                   | `false`   |  ✓  |   ✓   | 默认显示状态         |
-| title          | `string`                                    | -         |  ✓  |   ✓   | 标题文本             |
-| content        | `string`                                    | -         |  ✓  |   ✓   | 内容文本             |
-| trigger        | `'click' \| 'hover' \| 'focus' \| 'manual'` | `'click'` |  ✓  |   ✓   | 触发方式             |
-| placement      | `FloatingPlacement`                         | `'top'`   |  ✓  |   ✓   | 弹出位置             |
-| disabled       | `boolean`                                   | `false`   |  ✓  |   ✓   | 禁用状态             |
-| width          | `string \| number`                          | -         |  ✓  |   ✓   | 宽度（像素数或类名） |
-| offset         | `number`                                    | `8`       |  ✓  |   ✓   | 偏移距离 (px)        |
-| className      | `string`                                    | -         |  ✓  |   ✓   | 自定义 CSS 类        |
-| style          | `StyleValue` / `CSSProperties`              | -         |  ✓  |   ✓   | 自定义样式           |
+| Prop        | Type                                        | Default   | Vue | React | Description          |
+| ----------- | ------------------------------------------- | --------- | :-: | :---: | -------------------- |
+| open        | `boolean`                                   | -         |  ✓  |   ✓   | 受控显示状态         |
+| defaultOpen | `boolean`                                   | `false`   |  ✓  |   ✓   | 默认显示状态         |
+| title       | `string`                                    | -         |  ✓  |   ✓   | 标题文本             |
+| content     | `string`                                    | -         |  ✓  |   ✓   | 内容文本             |
+| trigger     | `'click' \| 'hover' \| 'focus' \| 'manual'` | `'click'` |  ✓  |   ✓   | 触发方式             |
+| placement   | `FloatingPlacement`                         | `'top'`   |  ✓  |   ✓   | 弹出位置             |
+| disabled    | `boolean`                                   | `false`   |  ✓  |   ✓   | 禁用状态             |
+| width       | `string \| number`                          | -         |  ✓  |   ✓   | 宽度（像素数或类名） |
+| offset      | `number`                                    | `8`       |  ✓  |   ✓   | 偏移距离 (px)        |
+| className   | `string`                                    | -         |  ✓  |   ✓   | 自定义 CSS 类        |
+| style       | `StyleValue` / `CSSProperties`              | -         |  ✓  |   ✓   | 自定义样式           |
 
 ### Slots / Children
 
@@ -221,10 +221,10 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Events
 
-| Vue Event        | React Prop     | Description  |
-| ---------------- | -------------- | ------------ |
-| `update:open`    | `onOpenChange` | 显示状态变化 |
-| `open-change`    | `onOpenChange` | 显示状态变化 |
+| Vue Event     | React Prop     | Description  |
+| ------------- | -------------- | ------------ |
+| `update:open` | `onOpenChange` | 显示状态变化 |
+| `open-change` | `onOpenChange` | 显示状态变化 |
 
 ---
 
@@ -232,16 +232,16 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Props
 
-| Prop           | Type                                                                                                   | Default   | Vue | React | Description        |
-| -------------- | ------------------------------------------------------------------------------------------------------ | --------- | :-: | :---: | ------------------ |
-| open           | `boolean`                                                                                              | -         |  ✓  |   ✓   | 受控显示状态       |
-| defaultOpen    | `boolean`                                                                                              | `false`   |  ✓  |   ✓   | 默认显示（非受控） |
-| content        | `string` (Vue) / `ReactNode` (React)                                                                   | -         |  ✓  |   ✓   | 提示内容           |
-| placement      | `'top' \| 'top-start' \| 'top-end' \| 'bottom' \| 'bottom-start' \| 'bottom-end' \| 'left' \| 'right'` | `'top'`   |  ✓  |   ✓   | 位置               |
-| trigger        | `'hover' \| 'click' \| 'focus' \| 'manual'`                                                            | `'hover'` |  ✓  |   ✓   | 触发方式           |
-| disabled       | `boolean`                                                                                              | `false`   |  ✓  |   ✓   | 禁用               |
-| offset         | `number`                                                                                               | `8`       |  ✓  |   ✓   | 偏移距离 (px)      |
-| className      | `string`                                                                                               | -         |  ✓  |   ✓   | 自定义 class       |
+| Prop        | Type                                                                                                   | Default   | Vue | React | Description        |
+| ----------- | ------------------------------------------------------------------------------------------------------ | --------- | :-: | :---: | ------------------ |
+| open        | `boolean`                                                                                              | -         |  ✓  |   ✓   | 受控显示状态       |
+| defaultOpen | `boolean`                                                                                              | `false`   |  ✓  |   ✓   | 默认显示（非受控） |
+| content     | `string` (Vue) / `ReactNode` (React)                                                                   | -         |  ✓  |   ✓   | 提示内容           |
+| placement   | `'top' \| 'top-start' \| 'top-end' \| 'bottom' \| 'bottom-start' \| 'bottom-end' \| 'left' \| 'right'` | `'top'`   |  ✓  |   ✓   | 位置               |
+| trigger     | `'hover' \| 'click' \| 'focus' \| 'manual'`                                                            | `'hover'` |  ✓  |   ✓   | 触发方式           |
+| disabled    | `boolean`                                                                                              | `false`   |  ✓  |   ✓   | 禁用               |
+| offset      | `number`                                                                                               | `8`       |  ✓  |   ✓   | 偏移距离 (px)      |
+| className   | `string`                                                                                               | -         |  ✓  |   ✓   | 自定义 class       |
 
 ### Slots (Vue) / Children (React)
 
@@ -252,10 +252,10 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Events
 
-| Vue Event        | React Prop     | Description  |
-| ---------------- | -------------- | ------------ |
-| `update:open`    | `onOpenChange` | 显示状态变化 |
-| `open-change`    | `onOpenChange` | 显示状态变化 |
+| Vue Event     | React Prop     | Description  |
+| ------------- | -------------- | ------------ |
+| `update:open` | `onOpenChange` | 显示状态变化 |
+| `open-change` | `onOpenChange` | 显示状态变化 |
 
 ---
 
@@ -274,7 +274,7 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 | background  | `string`                                                                                | `'rgba(255,255,255,0.9)'` |  ✓  |   ✓   | 全屏模式背景色           |
 | customColor | `string`                                                                                | -                         |  ✓  |   ✓   | 自定义颜色（覆盖 color） |
 | className   | `string`                                                                                | -                         |  ✓  |   ✓   | 自定义类名               |
-| lockScroll  | `boolean`                                                                               | `true`                    |  ✓  |   ✓   | 全屏模式下锁定文档滚动     |
+| lockScroll  | `boolean`                                                                               | `true`                    |  ✓  |   ✓   | 全屏模式下锁定文档滚动   |
 
 ---
 
@@ -305,22 +305,22 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Props
 
-| Prop      | Type                                                           | Default     | Vue | React | Description  |
-| --------- | -------------------------------------------------------------- | ----------- | :-: | :---: | ------------ |
-| status    | `'success' \| 'error' \| 'info' \| 'warning' \| '403' \| '404' \| '500'` | `'info'`    |  ✓  |   ✓   | 结果状态     |
-| title     | `string`                                                       | -           |  ✓  |   ✓   | 标题         |
-| subTitle  | `string`                                                       | -           |  ✓  |   ✓   | 副标题       |
-| className | `string`                                                           | -           |  ✓  |   ✓   | 自定义类名   |
+| Prop      | Type                                                                     | Default  | Vue | React | Description |
+| --------- | ------------------------------------------------------------------------ | -------- | :-: | :---: | ----------- |
+| status    | `'success' \| 'error' \| 'info' \| 'warning' \| '403' \| '404' \| '500'` | `'info'` |  ✓  |   ✓   | 结果状态    |
+| title     | `string`                                                                 | -        |  ✓  |   ✓   | 标题        |
+| subTitle  | `string`                                                                 | -        |  ✓  |   ✓   | 副标题      |
+| className | `string`                                                                 | -        |  ✓  |   ✓   | 自定义类名  |
 
 ### Slots / Children
 
-| Vue Slot   | React Prop | Description            |
-| ---------- | ---------- | ---------------------- |
-| `default`  | `children` | 底部操作区（按钮等）   |
-| `icon`     | `icon`     | 自定义图标             |
-| `title`    | -          | 自定义标题内容         |
-| `subTitle` | -          | 自定义副标题内容       |
-| `extra`    | `extra`    | 额外操作区             |
+| Vue Slot   | React Prop | Description          |
+| ---------- | ---------- | -------------------- |
+| `default`  | `children` | 底部操作区（按钮等） |
+| `icon`     | `icon`     | 自定义图标           |
+| `title`    | -          | 自定义标题内容       |
+| `subTitle` | -          | 自定义副标题内容     |
+| `extra`    | `extra`    | 额外操作区           |
 
 ---
 
@@ -328,37 +328,37 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### TourStep 步骤配置
 
-| Prop        | Type             | Default | Description                            |
-| ----------- | ---------------- | ------- | -------------------------------------- |
-| target      | `string`         | -       | CSS 选择器或元素引用（省略则居中展示） |
-| title       | `string`         | -       | 步骤标题                               |
-| description | `string`         | -       | 步骤描述                               |
-| placement   | `TourPlacement`  | -       | 弹窗相对目标位置                       |
-| mask        | `boolean`        | `true`  | 是否显示目标区域聚光遮罩               |
+| Prop        | Type            | Default | Description                            |
+| ----------- | --------------- | ------- | -------------------------------------- |
+| target      | `string`        | -       | CSS 选择器或元素引用（省略则居中展示） |
+| title       | `string`        | -       | 步骤标题                               |
+| description | `string`        | -       | 步骤描述                               |
+| placement   | `TourPlacement` | -       | 弹窗相对目标位置                       |
+| mask        | `boolean`       | `true`  | 是否显示目标区域聚光遮罩               |
 
 ### Props
 
-| Prop           | Type          | Default      | Vue | React | Description                  |
-| -------------- | ------------- | ------------ | :-: | :---: | ---------------------------- |
-| steps          | `TourStep[]`  | required     |  ✓  |   ✓   | 步骤数组                     |
-| open           | `boolean`     | `false`      |  ✓  |   ✓   | 显示状态 (Vue: v-model:open) |
-| current        | `number`      | -            |  ✓  |   ✓   | 受控当前步骤索引             |
-| nextText       | `string`      | `'Next'`     |  ✓  |   ✓   | "下一步"按钮文案             |
-| prevText       | `string`      | `'Previous'` |  ✓  |   ✓   | "上一步"按钮文案             |
-| finishText     | `string`      | `'Finish'`   |  ✓  |   ✓   | "完成"按钮文案（最后一步）   |
-| closable       | `boolean`     | `true`       |  ✓  |   ✓   | 显示关闭按钮                 |
-| showIndicators | `boolean`     | `true`       |  ✓  |   ✓   | 显示步骤指示器（如 1/3）     |
-| className      | `string`      | -            |  -  |   ✓   | 自定义类名                   |
+| Prop           | Type         | Default      | Vue | React | Description                  |
+| -------------- | ------------ | ------------ | :-: | :---: | ---------------------------- |
+| steps          | `TourStep[]` | required     |  ✓  |   ✓   | 步骤数组                     |
+| open           | `boolean`    | `false`      |  ✓  |   ✓   | 显示状态 (Vue: v-model:open) |
+| current        | `number`     | -            |  ✓  |   ✓   | 受控当前步骤索引             |
+| nextText       | `string`     | `'Next'`     |  ✓  |   ✓   | "下一步"按钮文案             |
+| prevText       | `string`     | `'Previous'` |  ✓  |   ✓   | "上一步"按钮文案             |
+| finishText     | `string`     | `'Finish'`   |  ✓  |   ✓   | "完成"按钮文案（最后一步）   |
+| closable       | `boolean`    | `true`       |  ✓  |   ✓   | 显示关闭按钮                 |
+| showIndicators | `boolean`    | `true`       |  ✓  |   ✓   | 显示步骤指示器（如 1/3）     |
+| className      | `string`     | -            |  -  |   ✓   | 自定义类名                   |
 
 ### Events
 
-| Vue Event          | React Prop    | Payload             | Description       |
-| ------------------ | ------------- | ------------------- | ----------------- |
-| `@update:open`     | -             | `boolean`           | 显示状态变更      |
-| `@update:current`  | -             | `number`            | 当前步骤索引变更    |
-| `@close`           | `onClose`     | -                   | 关闭事件          |
-| `@change`          | `onChange`    | `(current: number)` | 步骤切换          |
-| `@finish`          | `onFinish`    | -                   | 引导完成          |
+| Vue Event         | React Prop | Payload             | Description      |
+| ----------------- | ---------- | ------------------- | ---------------- |
+| `@update:open`    | -          | `boolean`           | 显示状态变更     |
+| `@update:current` | -          | `number`            | 当前步骤索引变更 |
+| `@close`          | `onClose`  | -                   | 关闭事件         |
+| `@change`         | `onChange` | `(current: number)` | 步骤切换         |
+| `@finish`         | `onFinish` | -                   | 引导完成         |
 
 > **Vue**: 支持 `v-model:open` 和 `v-model:current` 双向绑定
 
@@ -368,28 +368,28 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### WatermarkFont 字体配置
 
-| Prop       | Type     | Default               | Description |
-| ---------- | -------- | --------------------- | ----------- |
-| color      | `string` | `'rgba(0,0,0,0.15)'`  | 字体颜色    |
-| fontSize   | `number` | `16`                  | 字体大小    |
-| fontWeight | `string` | `'normal'`            | 字体粗细    |
-| fontFamily | `string` | `'sans-serif'`        | 字体        |
+| Prop       | Type     | Default              | Description |
+| ---------- | -------- | -------------------- | ----------- |
+| color      | `string` | `'rgba(0,0,0,0.15)'` | 字体颜色    |
+| fontSize   | `number` | `16`                 | 字体大小    |
+| fontWeight | `string` | `'normal'`           | 字体粗细    |
+| fontFamily | `string` | `'sans-serif'`       | 字体        |
 
 ### Props
 
-| Prop      | Type             | Default | Vue | React | Description                |
-| --------- | ---------------- | ------- | :-: | :---: | -------------------------- |
-| content   | `string \| string[]` | -       |  ✓  |   ✓   | 水印文字内容（多行传数组）   |
-| image     | `string`         | -       |  ✓  |   ✓   | 水印图片 URL（优先于文字） |
-| width     | `number`         | `120`   |  ✓  |   ✓   | 水印宽度（px）             |
-| height    | `number`         | `64`    |  ✓  |   ✓   | 水印高度（px）             |
-| rotate    | `number`         | `-22`   |  ✓  |   ✓   | 旋转角度                   |
-| zIndex    | `number`         | `9`     |  ✓  |   ✓   | z-index                    |
-| gapX      | `number`         | `100`   |  ✓  |   ✓   | 水平间距（px）             |
-| gapY      | `number`         | `100`   |  ✓  |   ✓   | 垂直间距（px）             |
-| offsetX   | `number`         | `0`     |  ✓  |   ✓   | X 轴偏移（px）             |
-| offsetY   | `number`         | `0`     |  ✓  |   ✓   | Y 轴偏移（px）             |
-| font      | `WatermarkFont`  | -       |  ✓  |   ✓   | 字体配置                   |
-| className | `string`         | -       |  -  |   ✓   | 自定义类名                 |
+| Prop      | Type                 | Default | Vue | React | Description                |
+| --------- | -------------------- | ------- | :-: | :---: | -------------------------- |
+| content   | `string \| string[]` | -       |  ✓  |   ✓   | 水印文字内容（多行传数组） |
+| image     | `string`             | -       |  ✓  |   ✓   | 水印图片 URL（优先于文字） |
+| width     | `number`             | `120`   |  ✓  |   ✓   | 水印宽度（px）             |
+| height    | `number`             | `64`    |  ✓  |   ✓   | 水印高度（px）             |
+| rotate    | `number`             | `-22`   |  ✓  |   ✓   | 旋转角度                   |
+| zIndex    | `number`             | `9`     |  ✓  |   ✓   | z-index                    |
+| gapX      | `number`             | `100`   |  ✓  |   ✓   | 水平间距（px）             |
+| gapY      | `number`             | `100`   |  ✓  |   ✓   | 垂直间距（px）             |
+| offsetX   | `number`             | `0`     |  ✓  |   ✓   | X 轴偏移（px）             |
+| offsetY   | `number`             | `0`     |  ✓  |   ✓   | Y 轴偏移（px）             |
+| font      | `WatermarkFont`      | -       |  ✓  |   ✓   | 字体配置                   |
+| className | `string`             | -       |  -  |   ✓   | 自定义类名                 |
 
 > **See also**: [Vue examples](../vue/feedback.md) · [React examples](../react/feedback.md)

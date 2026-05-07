@@ -52,7 +52,7 @@ function main() {
   console.log('✓ Setup complete!')
   console.log('')
   console.log('Next steps:')
-  console.log('  1. Read DEVELOPMENT.md for development guidelines')
+  console.log('  1. Read README.md and skills/tigercat/SKILL.md for development guidelines')
   console.log("  2. Run 'pnpm test' to run all tests")
   console.log("  3. Run 'pnpm example:vue' or 'pnpm example:react' to see the examples")
   console.log("  4. Run 'pnpm dev' for watch mode during development")

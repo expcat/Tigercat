@@ -1,420 +1,71 @@
 # Tigercat Examples
 
-This directory contains example projects demonstrating how to use Tigercat UI components.
+本目录保留两个 Vite 示例应用，用来验证 Tigercat Vue 与 React 组件的真实使用路径。
 
-## Example Projects
+## 结构
 
-### Vue3 Example (`example/vue3`)
-
-A comprehensive Vue 3 example showcasing Tigercat components with TypeScript and Tailwind CSS.
-
-- **Port**: 5173
-- **Framework**: Vue 3.5+
-- **Build Tool**: Vite 7.3+
-- **Features**:
-  - Component examples with interactive demos
-  - Real-time theme switching (5 preset themes)
-  - Responsive layouts
-  - TypeScript type safety
-
-[查看 Vue3 Example 文档](./example/vue3/README.md)
-
-### React Example (`example/react`)
-
-A comprehensive React example showcasing Tigercat components with TypeScript and Tailwind CSS.
-
-- **Port**: 5174
-- **Framework**: React 19.2+
-- **Build Tool**: Vite 7.3+
-- **Features**:
-  - Component examples with interactive demos
-  - Real-time theme switching (5 preset themes)
-  - Responsive layouts
-  - TypeScript type safety
-
-[查看 React Example 文档](./example/react/README.md)
-
-## 快速开始
-
-### 样式入口（必需）
-
-在引用 `@expcat/tigercat-vue` 或 `@expcat/tigercat-react` 后，需要在项目的 CSS 文件中加入以下内容（放在业务样式之前）：
-
-**Vue 3**
-
-```css
-@import 'tailwindcss';
-@source '../node_modules/@expcat/tigercat-vue/dist/**/*.{js,mjs}';
-@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
-```
-
-**React**
-
-```css
-@import 'tailwindcss';
-@source '../node_modules/@expcat/tigercat-react/dist/**/*.{js,mjs}';
-@source '../node_modules/@expcat/tigercat-core/dist/**/*.{js,mjs}';
-```
-
-### 安装依赖
-
-在项目根目录运行：
-
-```bash
-pnpm install
-```
-
-### 运行 Vue3 Example
-
-```bash
-pnpm --filter @expcat/tigercat-example-vue3 dev
-```
-
-访问 http://localhost:5173
-
-### 运行 React Example
-
-```bash
-pnpm --filter @expcat/tigercat-example-react dev
-```
-
-访问 http://localhost:5174
-
-### 同时运行两个 Example
-
-你可以在两个终端窗口中分别运行上述命令，或者使用并发工具。
-
-## 项目结构
-
-```
+```text
 examples/
 ├── example/
-│   ├── vue3/           # Vue3 示例项目
-│   │   ├── src/
-│   │   │   ├── components/    # 共享组件 (如 ThemeSwitch)
-│   │   │   ├── pages/         # 各组件演示页面
-│   │   │   ├── App.vue
-│   │   │   ├── main.ts
-│   │   │   └── router.ts
-│   │   ├── index.html
-│   │   ├── package.json
-│   │   ├── vite.config.ts
-│   │   └── README.md
-│   └── react/          # React 示例项目
-│       ├── src/
-│       │   ├── components/    # 共享组件 (如 ThemeSwitch)
-│       │   ├── pages/         # 各组件演示页面
-│       │   ├── App.tsx
-│       │   ├── main.tsx
-│       │   └── router.tsx
-│       ├── index.html
-│       ├── package.json
-│       ├── vite.config.ts
-│       └── README.md
-└── README.md          # 本文件
+│   ├── vue3/   # @expcat/tigercat-example-vue3
+│   └── react/  # @expcat/tigercat-example-react
+└── index.html  # GitHub Pages 入口
 ```
 
-## 演示的组件
+## 运行
 
-所有演示项目都包含以下组件类别：
+```bash
+pnpm example:vue    # http://localhost:5173
+pnpm example:react  # http://localhost:5174
+pnpm example:all    # 同时启动两个示例
+```
 
-### 基础组件
+首次运行或源码更新后推荐先执行：
 
-- **Button** - 按钮 (支持多种样式、尺寸和状态)
-- **Link** - 链接
-- **Icon** - 图标
-- **Text** - 文本
+```bash
+pnpm install
+pnpm build
+```
 
-### 表单组件
+## 构建
 
-- **Input** - 输入框 (支持多种类型和验证)
-- **Textarea** - 文本域
-- **Select** - 选择器 (支持单选和多选)
-- **Checkbox** - 复选框 (单独使用或组合使用)
-- **Radio** - 单选框 (与 RadioGroup 配合)
-- **Switch** - 开关 (多种尺寸)
-- **Slider** - 滑块 (可定制范围和步长)
-- **Form** - 表单容器 (完整的表单示例)
-- **FormItem** - 表单项
-- **DatePicker** - 日期选择器 (多种格式和验证)
-- **TimePicker** - 时间选择器
-- **Upload** - 文件上传
+```bash
+pnpm example:build
+```
 
-### 布局组件
+单独构建：
 
-- **Layout** - 布局容器
-- **Header** - 页头
-- **Sidebar** - 侧边栏
-- **Content** - 内容区
-- **Footer** - 页脚
-- **Row** - 行布局
-- **Col** - 列布局
-- **Grid** - 网格布局
-- **Container** - 容器
-- **Space** - 间距
-- **Divider** - 分割线
+```bash
+pnpm --filter @expcat/tigercat-example-vue3 build
+pnpm --filter @expcat/tigercat-example-react build
+```
 
-## 主题系统
+## 样式接入要点
 
-两个演示项目都集成了实时主题切换功能，可以在首页右上角切换主题：
+业务项目需要让 Tailwind 扫描 Tigercat 构建产物：
 
-### 预设主题
+```js
+export default {
+  content: [
+    './src/**/*.{vue,js,ts,jsx,tsx}',
+    './node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}'
+  ]
+}
+```
 
-1. **默认蓝色** - Tigercat 默认主题 (#2563eb)
-2. **绿色主题** - 清新自然的绿色 (#10b981)
-3. **紫色主题** - 优雅的紫色 (#8b5cf6)
-4. **橙色主题** - 活力的橙色 (#f59e0b)
-5. **粉色主题** - 温馨的粉色 (#ec4899)
-
-### 自定义主题
-
-你可以通过修改 CSS 变量来自定义主题：
+如果使用 Tailwind v4 CSS 入口，也需要在应用 CSS 中加入对应 `@source`：
 
 ```css
-:root {
-  --tiger-primary: #your-color;
-  --tiger-primary-hover: #your-hover-color;
-  --tiger-primary-disabled: #your-disabled-color;
-  --tiger-secondary: #your-secondary-color;
-  --tiger-secondary-hover: #your-secondary-hover-color;
-  --tiger-secondary-disabled: #your-secondary-disabled-color;
-}
+@import 'tailwindcss';
+@source '../node_modules/@expcat/tigercat-*/dist/**/*.{js,mjs}';
 ```
 
-或者通过 JavaScript/TypeScript：
+## 维护
 
-```typescript
-// Vue3
-import { setThemeColors } from '@expcat/tigercat-core'
+新增或修改组件 API 时，同步检查：
 
-setThemeColors({
-  primary: '#10b981',
-  primaryHover: '#059669',
-  primaryDisabled: '#6ee7b7'
-})
+1. `examples/example/shared/app-config.ts` 中的分类、描述和路径。
+2. `examples/example/vue3/src` 与 `examples/example/react/src` 中的用法是否仍可复制运行。
+3. `pnpm example:build` 是否通过。
 
-// React
-const root = document.documentElement
-root.style.setProperty('--tiger-primary', '#10b981')
-root.style.setProperty('--tiger-primary-hover', '#059669')
-```
-
-### ThemeSwitch 组件
-
-两个示例项目都包含 `ThemeSwitch` 组件，位于：
-
-- Vue3: `examples/example/vue3/src/components/ThemeSwitch.vue`
-- React: `examples/example/react/src/components/ThemeSwitch.tsx`
-
-你可以在自己的项目中复用这个组件。
-
-## 技术栈
-
-- **Vue3 Example**: Vue 3.5, TypeScript, Vite, Tailwind CSS
-- **React Example**: React 19.2, TypeScript, Vite, Tailwind CSS
-- **UI 组件**: @expcat/tigercat-vue 和 @expcat/tigercat-react
-
-## 如何扩展示例
-
-### 添加新的组件示例
-
-1. **创建演示页面**
-
-   Vue3:
-
-   ```bash
-
-   ```
-
-# 在 examples/example/vue3/src/pages/ 创建新文件
-
-# 例如: NewComponentDemo.vue
-
-````
-
-React:
-```bash
-# 在 examples/example/react/src/pages/ 创建新文件
-# 例如: NewComponentDemo.tsx
-````
-
-2. **添加路由**
-
-   Vue3 (`router.ts`):
-
-   ```typescript
-   { path: '/new-component', component: () => import('./pages/NewComponentDemo.vue') }
-   ```
-
-   React (`router.tsx`):
-
-   ```typescript
-   const NewComponentDemo = lazy(() => import('./pages/NewComponentDemo'))
-   { path: '/new-component', element: <NewComponentDemo /> }
-   ```
-
-3. **更新首页导航**
-
-   在 `Home.vue` 或 `Home.tsx` 的 `components` 数组中添加：
-
-   ```typescript
-   { name: 'NewComponent', path: '/new-component', category: '你的分类' }
-   ```
-
-### 创建自定义主题
-
-在 `ThemeSwitch` 组件的 `themes` 数组中添加新主题：
-
-```typescript
-{
-  name: '你的主题名',
-  value: 'your-theme',
-  colors: {
-    primary: '#yourColor',
-    primaryHover: '#yourHoverColor',
-    primaryDisabled: '#yourDisabledColor',
-    secondary: '#yourSecondaryColor',
-    secondaryHover: '#yourSecondaryHoverColor',
-    secondaryDisabled: '#yourSecondaryDisabledColor',
-  }
-}
-```
-
-## 故障排查
-
-### 常见问题
-
-#### 1. Example 无法启动
-
-**问题**: 运行 `pnpm example:vue` 或 `pnpm example:react` 时出现错误。
-
-**解决方案**:
-
-```bash
-# 确保已安装依赖
-pnpm install
-
-# 确保已构建核心包
-pnpm build
-
-# 再次尝试运行
-pnpm example:vue
-```
-
-#### 2. 组件样式不显示
-
-**问题**: Example 页面显示但组件样式缺失。
-
-**解决方案**:
-
-- 确保已构建所有包: `pnpm build`
-- 检查浏览器控制台是否有错误
-- 刷新浏览器缓存 (Ctrl+Shift+R 或 Cmd+Shift+R)
-
-#### 3. 端口被占用
-
-**问题**: `Error: Port 5173 is already in use` 或 `Port 5174 is already in use`
-
-**解决方案**:
-
-```bash
-# 查找占用端口的进程
-lsof -i :5173  # Vue3 example
-lsof -i :5174  # React example
-
-# 终止进程
-kill -9 <PID>
-
-# 或修改端口号
-# 编辑 example/vue3/vite.config.ts 或 example/react/vite.config.ts
-# 修改 server.port 配置
-```
-
-#### 4. 热重载不工作
-
-**问题**: 修改代码后页面不自动刷新。
-
-**解决方案**:
-
-- 确保在开发模式下运行: `pnpm example:vue` 或 `pnpm example:react`
-- 如果修改了 `@expcat` 包，需要在另一个终端运行 `pnpm dev` 来监听包变化
-- 检查 Vite 控制台是否有错误信息
-
-#### 5. TypeScript 类型错误
-
-**问题**: IDE 显示类型错误。
-
-**解决方案**:
-
-```bash
-# 重新构建类型定义
-pnpm build
-
-# 重启 TypeScript 服务器 (在 VSCode 中)
-# Cmd+Shift+P → "TypeScript: Restart TS Server"
-```
-
-#### 6. 主题切换不生效
-
-**问题**: 切换主题后组件颜色没有变化。
-
-**解决方案**:
-
-- 检查浏览器控制台是否有错误
-- 确保已正确导入 ThemeSwitch 组件
-- 刷新页面后再次尝试
-- 使用浏览器开发者工具检查 CSS 变量是否正确设置
-
-### 推荐的开发工作流
-
-1. **首次设置**:
-
-   ```bash
-   pnpm install
-   pnpm build
-   ```
-
-2. **日常开发**:
-
-   ```bash
-   # 终端 1: 监听包变化
-   pnpm dev
-
-   ```
-
-# 终端 2: 运行 example
-
-pnpm example:vue # 或 pnpm example:react
-
-```
-
-3. **调试**:
-- 使用浏览器开发者工具
-- 检查 Vite 控制台输出
-
-## 演示截图
-
-访问演示项目查看实时效果：
-- Vue3: http://localhost:5173
-- React: http://localhost:5174
-
-主要特性：
-- ✅ 完整的组件演示
-- ✅ 实时主题切换
-- ✅ 响应式布局
-- ✅ TypeScript 类型支持
-- ✅ 代码示例和说明
-
-## 获取帮助
-
-如果遇到未在此列出的问题:
-
-1. 检查 [DEVELOPMENT.md](../../DEVELOPMENT.md#troubleshooting)
-2. 搜索 [GitHub Issues](https://github.com/expcats/Tigercat/issues)
-3. 在 [GitHub Discussions](https://github.com/expcats/Tigercat/discussions) 提问
-4. 查看主 [README.md](../../README.md)
-
-## 贡献
-
-欢迎贡献新的演示示例！请参考 [CONTRIBUTING.md](../../CONTRIBUTING.md) 了解如何参与。
-```
+组件 API 文档入口见 [skills/tigercat/SKILL.md](../skills/tigercat/SKILL.md)，测试入口见 [tests/README.md](../tests/README.md)。

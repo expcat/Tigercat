@@ -79,16 +79,40 @@ v1.x.x (patch) — Bug 修复；v1.y.0 (minor) — 新特性/新组件；v2.0.0 
 
 #### 文档
 
-- 新增 `MIGRATION_v1.0.0.md` 迁移指南
+- 迁移说明合并到 Changelog，减少根目录历史文档数量
 - 文档站升级：客户端搜索、主题切换预览
 - 更新 Skills 文档（shared/props、vue/react 代码示例）
+
+### 迁移摘要
+
+从 v0.8.0 升级到 v1.0.0 时，Vue 侧需要注意两个事件名变更：
+
+```diff
+- <Calendar @panelChange="handler" />
++ <Calendar @panel-change="handler" />
+
+- <Rate @hoverChange="handler" />
++ <Rate @hover-change="handler" />
+```
+
+以下 API 仍可用但已标记为弃用，建议改用 `open` 命名：
+
+```diff
+- <ImagePreview :visible="show" />
++ <ImagePreview :open="show" />
+
+- <Image @preview-visible-change="handler" />
++ <Image @preview-open-change="handler" />
+```
+
+v0.5.0 的早期破坏性变更仍需留意：弹出层组件统一使用 `open` / `update:open`，Button 原生按钮类型使用 `htmlType` 而不是 `type`。
 
 ---
 
 ## v0.8.0 — 高级交互与业务组件
 
-详见 [MIGRATION_v0.8.0.md](MIGRATION_v0.8.0.md)
+新增统一拖拽系统、Splitter、Resizable、CodeEditor、RichTextEditor、Kanban、VirtualTable、InfiniteScroll、FileManager，以及 CLI 脚手架能力；该版本主要为增量功能，无破坏性变更。
 
 ## v0.5.0 — 架构筑基
 
-详见 [MIGRATION_v0.5.0.md](MIGRATION_v0.5.0.md)
+统一弹出层可见性 API（`visible` → `open`），Button 原生类型 API（`type` → `htmlType`），并引入泛型类型、类型安全事件/插槽、设计 Token 与菜单键盘导航等基础能力。

@@ -72,9 +72,17 @@ GitHub Pages： https://expcat.github.io/Tigercat/
 | ------------------------------------------------------ | ------------------------------------------------ |
 | [skills/tigercat/SKILL.md](./skills/tigercat/SKILL.md) | 📘 **AI Agent 入口** - 组件列表、API、主题、i18n |
 | [docs/ROADMAP.md](./docs/ROADMAP.md)                   | 开发路线图与进度                                 |
-| [MIGRATION_v1.0.0.md](./MIGRATION_v1.0.0.md)           | v0.8.0 → v1.0.0 迁移指南                         |
-| [docs/PERFORMANCE.md](./docs/PERFORMANCE.md)           | 性能优化最佳实践                                 |
-| [docs/BROWSER_SUPPORT.md](./docs/BROWSER_SUPPORT.md)   | 浏览器兼容性矩阵                                 |
+| [docs/api-summary.md](./docs/api-summary.md)           | 生成的组件 API 摘要                              |
+| [tests/README.md](./tests/README.md)                   | 测试结构、运行方式与质量标准入口                 |
+| [examples/README.md](./examples/README.md)             | Vue / React 示例应用运行说明                     |
+
+## 性能与兼容性
+
+- 所有包配置为 `sideEffects: false`，支持 tree shaking；高级组件优先使用子路径导入以减小 bundle。
+- 大数据列表/表格优先使用 `VirtualList`、`VirtualTable` 或 `InfiniteScroll`；`Table` 不会因数据量自动切换布局，只通过 `data-tiger-virtual-recommended="true"` 暴露建议状态。
+- 图表基于纯 SVG，无第三方图表运行时依赖；超过 1000 点建议启用降采样，超过 5000 点建议服务端聚合。
+- 主题基于 CSS 变量，推荐使用 `setThemeColors` 批量更新变量，减少重复重绘。
+- 浏览器支持范围为现代浏览器最新两个主要版本；当前 E2E 配置只运行 Chromium，如需恢复 Firefox/WebKit，可在 [playwright.config.ts](./playwright.config.ts) 中重新添加 project 并生成对应快照。
 
 ## 包
 
@@ -90,7 +98,7 @@ GitHub Pages： https://expcat.github.io/Tigercat/
 - **Vue:** >= 3.3.0
 - **React:** >= 18.0.0
 - **Tailwind CSS:** >= 3.4.0
-- **Node.js:** >= 18
+- **Node.js:** >= 20.11.0
 
 ## 本地开发
 
@@ -118,13 +126,7 @@ pnpm example:react  # http://localhost:5174
 
 ## 参与贡献
 
-请先阅读 [CONTRIBUTING.md](./CONTRIBUTING.md)，开发细节见 [DEVELOPMENT.md](./DEVELOPMENT.md)。
-
-### 快捷链接
-
-- [Contributing Guide](./CONTRIBUTING.md)
-- [Development Guide](./DEVELOPMENT.md)
-- [Roadmap](./docs/ROADMAP.md)
+请先运行 `pnpm setup` 完成依赖安装、构建和环境检查。组件 API、示例与维护规则以 [skills/tigercat/SKILL.md](./skills/tigercat/SKILL.md) 为准，后续规划见 [docs/ROADMAP.md](./docs/ROADMAP.md)。
 
 ## License
 

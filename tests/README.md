@@ -263,9 +263,7 @@ it('should match snapshot', () => {
 
 ### For New Contributors
 
-1. **Read the Testing Guide**:
-   - Vue: [TESTING_GUIDE.md](./TESTING_GUIDE.md) or [QUICK_START.md](./QUICK_START.md)
-   - React: [REACT_TESTING_GUIDE.md](./REACT_TESTING_GUIDE.md) or [REACT_QUICK_START.md](./REACT_QUICK_START.md)
+1. **Read the Testing Guides**: Vue uses [TESTING_GUIDE.md](./TESTING_GUIDE.md), and React uses [REACT_TESTING_GUIDE.md](./REACT_TESTING_GUIDE.md).
 
 2. **Look at Examples**:
    - Vue: `vue/Button.spec.ts`

@@ -11,20 +11,70 @@ function extractMajor(versionRange) {
   return match ? Number.parseInt(match[1], 10) : 0
 }
 
-function checkMajorVersion(name, current, requiredMajor) {
+function parseVersion(version) {
+  const match = String(version).match(/(\d+)(?:\.(\d+))?(?:\.(\d+))?/)
+  if (!match) return null
+
+  return {
+    major: Number.parseInt(match[1] ?? '0', 10),
+    minor: Number.parseInt(match[2] ?? '0', 10),
+    patch: Number.parseInt(match[3] ?? '0', 10)
+  }
+}
+
+function compareVersions(current, required) {
+  const currentVersion = parseVersion(current)
+  const requiredVersion = parseVersion(required)
+  if (!currentVersion || !requiredVersion) return -1
+
+  if (currentVersion.major !== requiredVersion.major) {
+    return currentVersion.major > requiredVersion.major ? 1 : -1
+  }
+  if (currentVersion.minor !== requiredVersion.minor) {
+    return currentVersion.minor > requiredVersion.minor ? 1 : -1
+  }
+  if (currentVersion.patch !== requiredVersion.patch) {
+    return currentVersion.patch > requiredVersion.patch ? 1 : -1
+  }
+  return 0
+}
+
+function checkVersion(name, current, required) {
   if (!current) {
     console.log(`${c('red', '✗')} ${name} is not installed`)
     return false
   }
 
-  const currentMajor = extractMajor(current)
-  if (currentMajor >= requiredMajor) {
-    console.log(`${c('green', '✓')} ${name}: ${current} (required: >= ${requiredMajor}.0.0)`)
+  if (compareVersions(current, required) >= 0) {
+    console.log(`${c('green', '✓')} ${name}: ${current} (required: >= ${required})`)
     return true
   }
 
-  console.log(`${c('red', '✗')} ${name}: ${current} (required: >= ${requiredMajor}.0.0)`)
+  console.log(`${c('red', '✗')} ${name}: ${current} (required: >= ${required})`)
   return false
+}
+
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function readCatalogRange(packageName) {
+  if (!existsSync('pnpm-workspace.yaml')) return ''
+
+  const content = readFileSync('pnpm-workspace.yaml', 'utf8')
+  const escapedName = escapeRegex(packageName)
+  const pattern = new RegExp(
+    `^[ \\t]*(?:'${escapedName}'|"${escapedName}"|${escapedName}):\\s*([^\\n#]+)`,
+    'm'
+  )
+  const match = content.match(pattern)
+  return match?.[1]?.trim().replace(/^['"]|['"]$/g, '') ?? ''
+}
+
+function resolveCatalogRange(packageName, value) {
+  if (typeof value !== 'string') return ''
+  if (value !== 'catalog:') return value
+  return readCatalogRange(packageName)
 }
 
 function safeReadJson(path) {
@@ -40,16 +90,19 @@ function main() {
 
   console.log('Checking Node.js...')
   const nodeVersion = process.versions.node
-  if (!checkMajorVersion('Node.js', nodeVersion, 20)) hasErrors = true
+  const pkg = safeReadJson('package.json')
+  const requiredNode = String(pkg?.engines?.node ?? '>=20.11.0').replace(/^>=\s*/, '')
+  if (!checkVersion('Node.js', nodeVersion, requiredNode)) hasErrors = true
   console.log('')
 
   console.log('Checking pnpm...')
   const pnpmVersion = getPnpmVersion()
+  const requiredPnpm = String(pkg?.engines?.pnpm ?? '>=8.0.0').replace(/^>=\s*/, '')
   if (!pnpmVersion) {
     console.log(`${c('red', '✗')} pnpm is not installed`)
     console.log(`${c('yellow', 'ℹ')} Install pnpm: npm install -g pnpm@10.26.2`)
     hasErrors = true
-  } else if (!checkMajorVersion('pnpm', pnpmVersion, 8)) {
+  } else if (!checkVersion('pnpm', pnpmVersion, requiredPnpm)) {
     hasErrors = true
   }
   console.log('')
@@ -66,9 +119,8 @@ function main() {
 
   console.log('Checking framework versions...')
   if (existsSync('node_modules')) {
-    const pkg = safeReadJson('package.json')
-    const reactRange = pkg?.devDependencies?.react ?? ''
-    const vueRange = pkg?.devDependencies?.vue ?? ''
+    const reactRange = resolveCatalogRange('react', pkg?.devDependencies?.react ?? '')
+    const vueRange = resolveCatalogRange('vue', pkg?.devDependencies?.vue ?? '')
 
     const require = createRequire(import.meta.url)
 
@@ -76,7 +128,7 @@ function main() {
       // Resolve from repo root node_modules
       const reactVersionInstalled = require('react/package.json').version
       const reactRequiredMajor = extractMajor(reactRange)
-      if (!checkMajorVersion('react', reactVersionInstalled, reactRequiredMajor || 0)) {
+      if (!checkVersion('react', reactVersionInstalled, `${reactRequiredMajor || 0}.0.0`)) {
         console.log(`${c('yellow', 'ℹ')} Declared range: ${reactRange}`)
         hasErrors = true
       } else {
@@ -91,7 +143,7 @@ function main() {
     try {
       const vueVersionInstalled = require('vue/package.json').version
       const vueRequiredMajor = extractMajor(vueRange)
-      if (!checkMajorVersion('vue', vueVersionInstalled, vueRequiredMajor || 0)) {
+      if (!checkVersion('vue', vueVersionInstalled, `${vueRequiredMajor || 0}.0.0`)) {
         console.log(`${c('yellow', 'ℹ')} Declared range: ${vueRange}`)
         hasErrors = true
       } else {
