@@ -14,7 +14,7 @@ const coreComponentCases = [
 
 async function preparePage(page: Page, url: string): Promise<void> {
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto(url)
+  await page.goto(url, { waitUntil: 'networkidle' })
   await page.addStyleTag({
     content: `
       *, *::before, *::after {
@@ -24,6 +24,12 @@ async function preparePage(page: Page, url: string): Promise<void> {
         transition-delay: 0s !important;
       }
     `
+  })
+
+  await page.evaluate(async () => {
+    await document.fonts.ready
+    await new Promise(requestAnimationFrame)
+    await new Promise(requestAnimationFrame)
   })
 }
 

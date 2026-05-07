@@ -7,7 +7,7 @@ const targets = [
 
 async function preparePage(page: Page, url: string): Promise<void> {
   await page.setViewportSize({ width: 1280, height: 900 })
-  await page.goto(url)
+  await page.goto(url, { waitUntil: 'networkidle' })
   await page.addStyleTag({
     content: `
       *, *::before, *::after {
@@ -17,6 +17,12 @@ async function preparePage(page: Page, url: string): Promise<void> {
         transition-delay: 0s !important;
       }
     `
+  })
+
+  await page.evaluate(async () => {
+    await document.fonts.ready
+    await new Promise(requestAnimationFrame)
+    await new Promise(requestAnimationFrame)
   })
 }
 
@@ -28,6 +34,7 @@ for (const { framework, label, baseUrl } of targets) {
 
       const modalRoot = page.locator('[data-tiger-modal-root]:not([hidden])')
       await expect(modalRoot).toBeVisible()
+      await page.waitForTimeout(100)
       await expect(modalRoot).toHaveScreenshot(`${framework}-modal-open.png`, {
         animations: 'disabled',
         caret: 'hide'
@@ -40,6 +47,7 @@ for (const { framework, label, baseUrl } of targets) {
 
       const drawerRoot = page.locator('[data-tiger-drawer-root]:not([hidden])')
       await expect(drawerRoot).toBeVisible()
+      await page.waitForTimeout(100)
       await expect(drawerRoot).toHaveScreenshot(`${framework}-drawer-open.png`, {
         animations: 'disabled',
         caret: 'hide'
@@ -52,6 +60,7 @@ for (const { framework, label, baseUrl } of targets) {
 
       const popover = page.locator('[role="dialog"][aria-modal="false"]').first()
       await expect(popover).toBeVisible()
+      await page.waitForTimeout(100)
       await expect(popover).toHaveScreenshot(`${framework}-popover-open.png`, {
         animations: 'disabled',
         caret: 'hide'
