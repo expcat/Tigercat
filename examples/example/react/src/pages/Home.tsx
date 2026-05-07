@@ -1,8 +1,6 @@
 import React from 'react'
 import { Code } from '@expcat/tigercat-react'
 
-const CROSS_FRAMEWORK_URL = import.meta.env.DEV ? '/' : '../vue/'
-
 const Home: React.FC = () => {
   return (
     <div className="max-w-5xl">
@@ -13,11 +11,11 @@ const Home: React.FC = () => {
         <p className="mt-2 text-gray-600 dark:text-gray-300">按照下面的步骤安装并使用组件库。</p>
       </div>
 
-      <div className="mb-6 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-lg border border-[var(--tiger-primary,#2563eb)]/40 bg-[var(--tiger-primary,#2563eb)]/5 p-4">
+      <div className="mb-6">
+        <div className="rounded-lg border border-(--tiger-primary,#2563eb)/40 bg-(--tiger-primary,#2563eb)/5 p-4">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-base">⚛️</span>
-            <span className="text-sm font-semibold text-[var(--tiger-primary,#2563eb)]">
+            <span className="text-sm font-semibold text-(--tiger-primary,#2563eb)">
               当前框架 · React
             </span>
           </div>
@@ -25,19 +23,6 @@ const Home: React.FC = () => {
             基于 <code>@expcat/tigercat-react</code>，与 React 19 + ConfigProvider 深度集成。
           </p>
         </div>
-        <a
-          href={CROSS_FRAMEWORK_URL}
-          className="rounded-lg border border-gray-200 p-4 transition-colors hover:border-[var(--tiger-primary,#2563eb)] hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-base">🟢</span>
-            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-              Vue 3 同款 →
-            </span>
-          </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            访问 <code>@expcat/tigercat-vue</code> 的等价示例，对比同名组件 API。
-          </p>
-        </a>
       </div>
 
       <div className="mt-6 space-y-6">
