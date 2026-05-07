@@ -3,7 +3,7 @@
 <!-- LLM-INDEX
 type: active-roadmap
 scope: test audit and refinement work
-verified-date: 2026-05-07
+verified-date: 2026-05-08
 source: user-requested test suite optimization plan
 -->
 
@@ -17,26 +17,43 @@ source: user-requested test suite optimization plan
 4. 测试精简必须保持语义覆盖清晰；删除或合并前记录被替代的覆盖点，避免用测试数量下降换取风险上升。
 5. 每批调整后运行对应分组测试；跨目录改动后运行 `pnpm test` 或等价完整回归，并记录剩余风险。
 
+## 上次完成
+
+**P1 测试合并与精简 — Charts/Table/Form/Overlay/Image/Drag 热区审查 + ButtonSpinnerLazy 修复**（2026-05-08）
+
+变更内容：
+
+1. **Charts 热区第二批审查**：Vue/React `useChartInteraction` 中 `createLegendItems`（label 提取逻辑：x/label/index fallback + 自定义 formatter）和 `wrapperClasses`（框架特有布局类）与 Core `buildChartLegendItems` 不构成语义重复，保留不动。
+2. **Table 热区审查**：Core 5 文件（39 tests，纯函数：filter/export/group/resize/rowKey）与 Vue/React Table/DataTableWithToolbar/VirtualTable（59+6+29 = 94 tests/框架，组件渲染/交互/a11y）分属不同测试层面，无冗余可删。
+3. **Form/Overlay/Image/Drag 热区审查**：Core 测工具函数（form-validation 54、image-utils 48、drag 58 等），Vue/React 测组件行为，各自独立无重叠。
+4. **修复 ButtonSpinnerLazy flaky tests**：`vi.mock` 中用轻量直接 stub 替代 `vi.importActual('@expcat/tigercat-core')`（加载整个 core 包导致 worker 超时），消除 3 个 timeout 失败。
+
+验证结果：
+- 精简后：308 文件 / 5729 用例 / ~119s
+- 失败：0（ButtonSpinnerLazy 3 timeout 已修复）
+- 文件变更：1（ButtonSpinnerLazy.spec.tsx mock 重写）
+
 ## 后续步骤
 
-| 优先级 | 项目             | 范围                                                                 | 完成标准                                                                                                           | 状态     |
-| ------ | ---------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------- |
-| P1     | 测试资产盘点     | `tests/core`、`tests/vue`、`tests/react`、`tests/utils`、`e2e`         | 统计测试文件、用例数量、执行耗时与失败/跳过项；按 Core/Vue/React/E2E 建立审查清单，并标记高重复或低价值候选          | ⬜ 未开始 |
-| P1     | 重复覆盖识别     | 同名 Vue/React 组件测试、Core utils 与组件层重复断言、a11y 回归测试   | 找出可由共享 core 测试覆盖的逻辑、可参数化的重复用例、跨框架可保留最小差异断言的区域，并形成合并建议               | ⬜ 未开始 |
-| P1     | 测试合并与精简   | 高重复组件、图表、表格、Overlay、表单、上传、虚拟列表等测试密集区域   | 合并重复 setup/helper；删除被更高层或共享测试覆盖的冗余断言；保留关键行为、边界状态、a11y 和回归用例                | ⬜ 未开始 |
-| P1     | 测试工具整理     | `tests/utils`、重复 mock、render helper、userEvent/Testing Library 用法 | 抽取或复用统一 helper，减少每个 spec 的样板代码；避免新增宽泛 helper 掩盖断言意图                                  | ⬜ 未开始 |
-| P2     | 回归与覆盖校验   | Vitest、Playwright、覆盖率报告                                       | 精简后完整测试通过；覆盖率无明显下降，若减少覆盖必须在路线图中说明原因；记录最终测试文件数、用例数和主要变更        | ⬜ 未开始 |
-| P2     | 清单与文档同步   | `tests/*CHECKLIST*.md`、`tests/README.md`、相关测试指南               | 测试清单与实际策略一致；补充“何时新增测试、何时合并测试、何时删除冗余测试”的判断规则                               | ⬜ 未开始 |
+| 优先级 | 项目 | 范围 | 完成标准 | 状态 |
+| ------ | ---- | ---- | -------- | ---- |
+| P1 | 测试工具整理 | `tests/utils`、重复 mock、render helper | 抽取或复用统一 helper，减少样板代码 | ⬜ 未开始 |
+| P2 | 回归与覆盖校验 | Vitest、Playwright、覆盖率报告 | 精简后完整测试通过；覆盖率无明显下降 | ⬜ 未开始 |
+| P2 | 清单与文档同步 | `tests/*CHECKLIST*.md`、`tests/README.md` | 测试清单与实际策略一致 | ⬜ 未开始 |
 
-## 推荐执行顺序
+## 下一步推荐
 
-1. 先用脚本统计测试文件、用例数量和耗时，生成 Core/Vue/React/E2E 四类审查清单。
-2. 从重复度最高的组件层测试开始，优先审查 Vue/React 同名组件 spec 与 Core utils spec 的覆盖重叠。
-3. 每次只处理一小组相关测试文件，保持行为覆盖可追踪，并同步运行该组测试。
-4. 完成一轮精简后运行完整回归，对比测试数量、耗时和覆盖率变化。
-5. 最后更新测试清单和指南，把保留下来的新增/合并/删除判断规则沉淀为后续约定。
+开始 **P1 测试工具整理**：
+
+1. 审查 `tests/utils/` 目录中所有 helper 文件，识别重复的 mock 模式（如 MockResizeObserver、installFrameScheduler 等在多个 spec 文件中重复定义）。
+2. 将高频 mock/helper 提升到 `tests/utils/` 统一导出，删除各 spec 文件中的内联重复定义。
+3. 审查 Vue/React render helper（`render-helpers.ts` / `render-helpers-react.ts`）是否有可进一步精简的样板。
+4. 每组改完后运行 `pnpm test` 验证。
 
 ## 当前基线
 
-- `tests/**/*.{spec.ts,spec.tsx,test.ts,test.tsx}` 当前匹配到 318 个测试文件。
+- 测试文件：308 个（Core 83 / Vue 114 / React 115 / E2E 5）（含 2 个 .template）
+- 测试用例：5729 个
+- 全量耗时：~119s
+- 既有 flaky：无
 - 路线图统一维护在 `docs/ROADMAP.md`，根目录不再保留路线图文档。

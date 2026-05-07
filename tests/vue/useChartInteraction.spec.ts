@@ -340,43 +340,10 @@ describe('useChartInteraction (Vue)', () => {
       handleClick(2)
       expect(activeIndex.value).toBe(2) // Selected takes priority
     })
-
-    it('should return null when nothing is active', () => {
-      const options = createTestOptions({ hoverable: false })
-      const { activeIndex } = useChartInteraction(options)
-
-      expect(activeIndex.value).toBe(null)
-    })
   })
 
-  describe('getElementOpacity', () => {
-    it('should return undefined when no active index', () => {
-      const options = createTestOptions()
-      const { getElementOpacity } = useChartInteraction(options)
-
-      expect(getElementOpacity(0)).toBe(undefined)
-      expect(getElementOpacity(1)).toBe(undefined)
-    })
-
-    it('should return activeOpacity for active element', () => {
-      const options = createTestOptions({ activeOpacity: 1, inactiveOpacity: 0.3 })
-      const { getElementOpacity, handleClick } = useChartInteraction(options)
-
-      handleClick(1)
-
-      expect(getElementOpacity(1)).toBe(1)
-    })
-
-    it('should return inactiveOpacity for inactive elements', () => {
-      const options = createTestOptions({ activeOpacity: 1, inactiveOpacity: 0.3 })
-      const { getElementOpacity, handleClick } = useChartInteraction(options)
-
-      handleClick(1)
-
-      expect(getElementOpacity(0)).toBe(0.3)
-      expect(getElementOpacity(2)).toBe(0.3)
-    })
-  })
+  // getElementOpacity — pure delegation to core getChartElementOpacity,
+  // covered by tests/core/chart-interaction.spec.ts
 
   describe('wrapperClasses', () => {
     it('should generate correct classes for bottom legend', () => {

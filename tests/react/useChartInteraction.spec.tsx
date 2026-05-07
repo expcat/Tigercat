@@ -410,43 +410,8 @@ describe('useChartInteraction (React)', () => {
     })
   })
 
-  describe('getElementOpacity', () => {
-    it('should return undefined when no active index', () => {
-      const { result } = renderHook(() => useChartInteraction(createTestOptions()))
-
-      expect(result.current.getElementOpacity(0)).toBe(undefined)
-      expect(result.current.getElementOpacity(1)).toBe(undefined)
-    })
-
-    it('should return activeOpacity for active element', () => {
-      const { result } = renderHook(() =>
-        useChartInteraction(
-          createTestOptions(createMockCallbacks(), { activeOpacity: 1, inactiveOpacity: 0.3 })
-        )
-      )
-
-      act(() => {
-        result.current.handleClick(1)
-      })
-
-      expect(result.current.getElementOpacity(1)).toBe(1)
-    })
-
-    it('should return inactiveOpacity for inactive elements', () => {
-      const { result } = renderHook(() =>
-        useChartInteraction(
-          createTestOptions(createMockCallbacks(), { activeOpacity: 1, inactiveOpacity: 0.3 })
-        )
-      )
-
-      act(() => {
-        result.current.handleClick(1)
-      })
-
-      expect(result.current.getElementOpacity(0)).toBe(0.3)
-      expect(result.current.getElementOpacity(2)).toBe(0.3)
-    })
-  })
+  // getElementOpacity — pure delegation to core getChartElementOpacity,
+  // covered by tests/core/chart-interaction.spec.ts
 
   describe('wrapperClasses', () => {
     it('should generate correct classes for bottom legend', () => {
