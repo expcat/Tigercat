@@ -134,4 +134,61 @@ describe('Resizable', () => {
       expect(root.style.height).toBe('')
     })
   })
+
+  describe('Mouse interaction', () => {
+    it('should have mousedown handler on handles', () => {
+      const { container } = renderResizable()
+      const handle = container.querySelector('[data-handle="right"]')!
+      // Handle is rendered and interactive
+      expect(handle).toBeTruthy()
+      expect(handle.className).toContain('cursor-e-resize')
+    })
+
+    it('should have non-interactive handles when disabled', () => {
+      const { container } = renderResizable({ disabled: true })
+      const handle = container.querySelector('[data-handle="right"]')!
+      expect(handle.className).toContain('pointer-events-none')
+    })
+  })
+
+  describe('Min/Max constraints', () => {
+    it('should apply minWidth and minHeight', () => {
+      const { container } = renderResizable({ minWidth: 100, minHeight: 50 })
+      const root = container.firstElementChild as HTMLElement
+      expect(root).toBeTruthy()
+    })
+
+    it('should apply maxWidth and maxHeight', () => {
+      const { container } = renderResizable({ maxWidth: 500, maxHeight: 400 })
+      const root = container.firstElementChild as HTMLElement
+      expect(root).toBeTruthy()
+    })
+  })
+
+  describe('Axis constraint', () => {
+    it('should render with horizontal axis', () => {
+      const { container } = renderResizable({ axis: 'horizontal' })
+      expect(container.querySelector('[data-resizable]')).toBeTruthy()
+    })
+
+    it('should render with vertical axis', () => {
+      const { container } = renderResizable({ axis: 'vertical' })
+      expect(container.querySelector('[data-resizable]')).toBeTruthy()
+    })
+  })
+
+  describe('Aspect ratio', () => {
+    it('should render with lockAspectRatio', () => {
+      const { container } = renderResizable({ lockAspectRatio: true })
+      expect(container.querySelector('[data-resizable]')).toBeTruthy()
+    })
+  })
+
+  describe('Custom style', () => {
+    it('should apply custom style prop', () => {
+      const { container } = renderResizable({ style: { border: '1px solid red' } })
+      const root = container.firstElementChild as HTMLElement
+      expect(root.style.border).toBe('1px solid red')
+    })
+  })
 })

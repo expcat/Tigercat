@@ -3,7 +3,7 @@
 <!-- LLM-INDEX
 type: active-roadmap
 scope: test audit and refinement work
-verified-date: 2026-05-08
+verified-date: 2026-05-10
 source: user-requested test suite optimization plan
 -->
 
@@ -19,45 +19,43 @@ source: user-requested test suite optimization plan
 
 ## 上次完成
 
-**P1 测试工具整理 — 共享 mock/scheduler 提取**（2026-05-08）
+**P3 低覆盖组件补充**（2026-05-10）
 
 变更内容：
 
-1. **新增 `tests/utils/mock-observers.ts`**：提取 `MockResizeObserver`（含 callback + trigger 全功能版）和 `MockIntersectionObserver`，替代 4 个文件中的 4 个 `MockResizeObserver` 内联定义 + 2 个文件中的 `MockIntersectionObserver` 内联定义。
-2. **新增 `tests/utils/frame-scheduler.ts`**：提取 `createFrameScheduler()`（DI 模式，requestFrame/cancelFrame，flush ALL）和 `installFrameScheduler()`（global stub 模式，requestAnimationFrame/cancelAnimationFrame，flush ALL），替代 11 个文件中的内联定义。
-3. **更新 `tests/utils/index.ts`**：统一导出新模块。
-4. **修改文件清单**（11 个 spec 文件）：
-   - Observers：`Affix.spec.ts`、`Affix.spec.tsx`、`ChartSubComponents.spec.ts`、`ChartSubComponents.spec.tsx`
-   - installFrameScheduler：`useChartInteraction.spec.ts`、`useChartInteraction.spec.tsx`
-   - createFrameScheduler：`back-top-utils.spec.ts`、`chart-interaction.spec.ts`、`carousel-utils.spec.ts`、`chart-resize-utils.spec.ts`、`notification-utils.spec.ts`、`watermark-utils.spec.ts`、`repeat-action-utils.spec.ts`
+1. **新增测试文件**：
+   - `tests/vue/useDrag.spec.ts`：29 个测试（从 0% 覆盖新建），覆盖 startDrag/dragOver/drop/endDrag/reorder/moveBetween/getDragItemAttrs/getDropZoneAttrs
 
-未处理：`collapse-utils`/`menu-utils`/`statistic-utils` 及 Vue/React Collapse/Statistic 中的 `createFrameScheduler` 采用 flush-ONE-by-frame-ID 语义，与共享版 flush-ALL 不兼容，保留内联。
+2. **增强现有测试**：
+   - `tests/vue/Resizable.spec.ts`：新增 mouse interaction、min/max constraints、axis、aspect ratio、custom style 测试（28 tests）
+   - `tests/react/Resizable.spec.tsx`：新增 min/max、axis、aspect ratio、custom style、resize callbacks 测试（29 tests）
+   - `tests/vue/Mentions.spec.ts`：新增 keyboard navigation（ArrowDown/Up）、Enter selection、Escape close、click selection、filtering、custom prefix 测试（17 tests）
+   - `tests/react/Mentions.spec.tsx`：新增 keyboard navigation、Enter/Escape、click selection、filtering、custom prefix、disabled options 测试（18 tests）
+   - `tests/vue/Slider.spec.ts`：新增 mouse interaction、tooltip hover、range keyboard constraints、ARIA labels、track click 测试（61 tests）
+   - `tests/vue/TaskBoard.spec.ts`：新增 filter/visibility、card count、add column、column description 测试（32 tests）
+   - `tests/react/TaskBoard.spec.tsx`：新增 filter/visibility、card count、add column、column description 测试（39 tests）
 
-验证结果：
-- 精简后：308 文件（+2 新增 helper）/ 5729 用例 / ~108s
-- 失败：0
-- 样板代码净减少：~300 行（18 个内联定义 → 2 个共享模块，其中 11 个已替换、7 个保留）
+3. **覆盖率提升**（v8 / threads pool）：
+   - **All files**: Stmts 84.07% → 84.66% (+0.59%) | Branch 77.26% → 77.68% (+0.42%) | Funcs 85.54% → 86.06% (+0.52%) | Lines 86.07% → 86.64% (+0.57%)
+   - useDrag composable: 0% → 85.36% Stmts / 96.15% Branch / 72.22% Funcs
+
+4. **回归验证**：
+   - `pnpm test`：309 文件 / 5812 用例 / 0 失败
+   - `pnpm test:validate`：226/226 通过，458 warnings
 
 ## 后续步骤
 
-| 优先级 | 项目 | 范围 | 完成标准 | 状态 |
-| ------ | ---- | ---- | -------- | ---- |
-| P2 | 回归与覆盖校验 | Vitest、Playwright、覆盖率报告 | 精简后完整测试通过；覆盖率无明显下降 | ⬜ 未开始 |
-| P2 | 清单与文档同步 | `tests/*CHECKLIST*.md`、`tests/README.md` | 测试清单与实际策略一致 | ⬜ 未开始 |
-
-## 下一步推荐
-
-开始 **P2 回归与覆盖校验**：
-
-1. 运行 `pnpm test -- --coverage` 生成覆盖率报告，与精简前基线对比。
-2. 运行 `pnpm build` + `npx playwright test` 验证 E2E 仍通过。
-3. 运行 `pnpm test:validate` 确认测试结构完整性。
-4. 如覆盖率有明显下降，定位缺失覆盖点并补充。
+| 优先级 | 项目 | 范围 | 说明 |
+| ------ | ---- | ---- | ---- |
+| P3 | E2E 视觉基准更新 | `e2e/*.spec.ts-snapshots/` | 更新本地截图基准，消除 14 个 visual diff 失败 |
 
 ## 当前基线
 
-- 测试文件：308 个（含 2 个新增 helper 和 2 个 .template）
-- 测试用例：5729 个
-- 全量耗时：~108s
+- 测试文件：309 个
+- 测试用例：5812 个
+- 全量耗时：~101s
+- 覆盖率：Stmts 84.66% / Branch 77.68% / Funcs 86.06% / Lines 86.64%
 - 既有 flaky：无
+- test:validate：226/226 通过，458 warnings（改进建议）
+- E2E visual：14 截图 diff（环境差异，非回归）
 - 路线图统一维护在 `docs/ROADMAP.md`，根目录不再保留路线图文档。

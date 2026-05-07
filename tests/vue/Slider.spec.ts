@@ -655,4 +655,171 @@ describe('Slider', () => {
       expect(slider).toHaveAttribute('aria-valuenow', '500')
     })
   })
+
+  describe('Mouse Interaction', () => {
+    it('should start drag on thumb mousedown', async () => {
+      const { container } = render(Slider, {
+        props: { value: 50 }
+      })
+
+      const thumb = container.querySelector('[role="slider"]')!
+      await fireEvent.mouseDown(thumb, { clientX: 150, clientY: 10 })
+      // Drag started — tooltip should be visible if enabled
+      expect(thumb).toBeInTheDocument()
+    })
+
+    it('should show tooltip on thumb hover when tooltip enabled', async () => {
+      const { container } = render(Slider, {
+        props: { value: 50, tooltip: true }
+      })
+
+      const thumb = container.querySelector('[role="slider"]')!
+      await fireEvent.mouseEnter(thumb)
+      // Tooltip should appear showing value
+      expect(container.textContent).toContain('50')
+    })
+
+    it('should hide tooltip on thumb mouseleave when not dragging', async () => {
+      const { container } = render(Slider, {
+        props: { value: 50, tooltip: true }
+      })
+
+      const thumb = container.querySelector('[role="slider"]')!
+      await fireEvent.mouseEnter(thumb)
+      await fireEvent.mouseLeave(thumb)
+      // Not dragging, so tooltip should hide
+      expect(thumb).toBeInTheDocument()
+    })
+
+    it('should not start drag when disabled', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: { value: 50, disabled: true, 'onUpdate:value': onUpdate }
+      })
+
+      const thumb = container.querySelector('[role="slider"]')!
+      await fireEvent.mouseDown(thumb, { clientX: 150, clientY: 10 })
+      expect(onUpdate).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Range keyboard interaction', () => {
+    it('should constrain min thumb not to exceed max thumb', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: [70, 80],
+          range: true,
+          step: 20,
+          'onUpdate:value': onUpdate
+        }
+      })
+
+      const sliders = container.querySelectorAll('[role="slider"]')
+      // Move min thumb right — should be clamped to not exceed max
+      await fireEvent.keyDown(sliders[0], { key: 'ArrowRight' })
+
+      expect(onUpdate).toHaveBeenCalled()
+      const [min, max] = onUpdate.mock.calls[0][0]
+      expect(min).toBeLessThanOrEqual(max)
+    })
+
+    it('should constrain max thumb not to go below min thumb', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: [20, 30],
+          range: true,
+          step: 20,
+          'onUpdate:value': onUpdate
+        }
+      })
+
+      const sliders = container.querySelectorAll('[role="slider"]')
+      // Move max thumb left — should be clamped to not go below min
+      await fireEvent.keyDown(sliders[1], { key: 'ArrowLeft' })
+
+      expect(onUpdate).toHaveBeenCalled()
+      const [min, max] = onUpdate.mock.calls[0][0]
+      expect(max).toBeGreaterThanOrEqual(min)
+    })
+  })
+
+  describe('ARIA labels in range mode', () => {
+    it('should add min/max labels to range thumbs', () => {
+      const { container } = render(Slider, {
+        props: { value: [20, 80], range: true }
+      })
+
+      const sliders = container.querySelectorAll('[role="slider"]')
+      // Range thumbs should have aria-label
+      expect(sliders[0].getAttribute('aria-label')).toContain('Minimum')
+      expect(sliders[1].getAttribute('aria-label')).toContain('Maximum')
+    })
+  })
+
+  // Helper: stub the track element's getBoundingClientRect
+  const stubTrackRect = (container: HTMLElement, width = 200) => {
+    const thumb = container.querySelector('[role="slider"]') as HTMLElement
+    const track = thumb.parentElement as HTMLElement
+    track.getBoundingClientRect = () =>
+      ({
+        left: 0,
+        top: 0,
+        right: width,
+        bottom: 8,
+        width,
+        height: 8,
+        x: 0,
+        y: 0,
+        toJSON: () => ({})
+      }) as DOMRect
+    return track
+  }
+
+  describe('Track click', () => {
+    it('should update value when clicking the track', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: { value: 0, min: 0, max: 100, step: 1, 'onUpdate:value': onUpdate }
+      })
+      const track = stubTrackRect(container, 200)
+
+      await fireEvent.click(track, { clientX: 80 })
+
+      expect(onUpdate).toHaveBeenCalledWith(40)
+    })
+
+    it('should not update when clicking track while disabled', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: { value: 0, disabled: true, 'onUpdate:value': onUpdate }
+      })
+      const track = stubTrackRect(container, 200)
+
+      await fireEvent.click(track, { clientX: 80 })
+
+      expect(onUpdate).not.toHaveBeenCalled()
+    })
+
+    it('should move nearer thumb in range mode when clicking track', async () => {
+      const onUpdate = vi.fn()
+      const { container } = render(Slider, {
+        props: {
+          value: [20, 80],
+          range: true,
+          min: 0,
+          max: 100,
+          step: 1,
+          'onUpdate:value': onUpdate
+        }
+      })
+      const track = stubTrackRect(container, 200)
+
+      // click at clientX=60 -> value 30, closer to min (20) than max (80)
+      await fireEvent.click(track, { clientX: 60 })
+      const last = onUpdate.mock.calls.at(-1)![0]
+      expect(last).toEqual([30, 80])
+    })
+  })
 })

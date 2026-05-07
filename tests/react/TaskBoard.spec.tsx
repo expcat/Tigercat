@@ -344,4 +344,67 @@ describe('TaskBoard (React)', () => {
       expect(container.querySelector('[data-tiger-task-board]')).toBeInTheDocument()
     })
   })
+
+  describe('Filter and visibility', () => {
+    it('filters cards by filterText', () => {
+      render(<TaskBoard columns={columns} filterText="Task 1" />)
+      expect(screen.getByText('Task 1')).toBeInTheDocument()
+      expect(screen.queryByText('Task 3')).not.toBeInTheDocument()
+    })
+
+    it('hides columns via hiddenColumns', () => {
+      render(<TaskBoard columns={columns} hiddenColumns={['done']} />)
+      expect(screen.getByText('To Do')).toBeInTheDocument()
+      expect(screen.queryByText('Done')).not.toBeInTheDocument()
+    })
+
+    it('shows all columns when filterText is empty and hiddenColumns is empty', () => {
+      render(<TaskBoard columns={columns} filterText="" hiddenColumns={[]} />)
+      expect(screen.getByText('To Do')).toBeInTheDocument()
+      expect(screen.getByText('In Progress')).toBeInTheDocument()
+      expect(screen.getByText('Done')).toBeInTheDocument()
+    })
+  })
+
+  describe('Card count', () => {
+    it('shows card count badges when showCardCount is true', () => {
+      const { container } = render(<TaskBoard columns={columns} showCardCount />)
+      expect(container.textContent).toContain('2')
+    })
+  })
+
+  describe('Add column', () => {
+    it('shows add-column button when allowAddColumn is true', () => {
+      render(<TaskBoard columns={columns} allowAddColumn />)
+      expect(screen.getByText('+ Add column')).toBeInTheDocument()
+    })
+
+    it('calls onColumnAdd when add-column is clicked', async () => {
+      const onColumnAdd = vi.fn()
+      render(<TaskBoard columns={columns} allowAddColumn onColumnAdd={onColumnAdd} />)
+      const addBtn = screen.getByText('+ Add column')
+      await fireEvent.click(addBtn)
+      expect(onColumnAdd).toHaveBeenCalled()
+    })
+
+    it('does not show add-column button by default', () => {
+      render(<TaskBoard columns={columns} />)
+      expect(screen.queryByText('+ Add column')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Column description', () => {
+    it('renders column description when provided', () => {
+      const colsWithDesc: TaskBoardColumn[] = [
+        {
+          id: 'desc',
+          title: 'With Desc',
+          description: 'Column description text',
+          cards: []
+        }
+      ]
+      render(<TaskBoard columns={colsWithDesc} />)
+      expect(screen.getByText('Column description text')).toBeInTheDocument()
+    })
+  })
 })

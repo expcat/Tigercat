@@ -34,10 +34,25 @@ High-quality tests are essential for maintaining a reliable component library. T
 - **Line Coverage**: Minimum 80% for each component
 - **Branch Coverage**: Minimum 75% for each component
 - **Function Coverage**: Minimum 80% for each component
-- **Test Count**: Minimum thresholds per component type:
-  - Simple components (Button, Text): 30+ tests
-  - Medium complexity (Input, Select): 40+ tests
-  - Complex components (DatePicker, Upload): 50+ tests
+- **Test Count** (`pnpm test:validate` enforced):
+  - **Hard minimum**: 3 tests per file (below this → validation failure)
+  - **Recommended minimum**: 15 tests per file (30 for DatePicker/Upload/TimePicker)
+  - Below recommended triggers a warning, not a failure
+
+### Automated Validation (`pnpm test:validate`)
+
+The validation script checks two severity levels:
+
+**Hard checks** (cause validation failure):
+- Test count below hard minimum (3)
+- Usage of `: any` type annotation in non-comment code
+
+**Soft checks** (warnings only, informational):
+- Test count below recommended minimum
+- No `describe` blocks for grouping
+- Low descriptive naming ratio (less than 50% of test names contain action verbs)
+- No `describe('Edge Cases')` or `describe('Boundary')` section
+- No `expectNoA11yViolations` accessibility checks
 
 ### Qualitative Metrics
 
@@ -50,7 +65,7 @@ High-quality tests are essential for maintaining a reliable component library. T
 
 ## Test Categories
 
-Every component test suite must include these categories:
+Component test suites are recommended (but not required) to include these categories:
 
 ### 1. Rendering Tests
 

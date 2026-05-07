@@ -254,4 +254,87 @@ describe('TaskBoard (Vue)', () => {
       expect(emitted()['card-add'][0]).toEqual(['todo'])
     })
   })
+
+  describe('Filter and visibility', () => {
+    it('filters cards by filterText', () => {
+      render(TaskBoard, { props: { columns, filterText: 'Task 1' } })
+      expect(screen.getByText('Task 1')).toBeInTheDocument()
+      expect(screen.queryByText('Task 3')).not.toBeInTheDocument()
+    })
+
+    it('hides columns via hiddenColumns', () => {
+      render(TaskBoard, {
+        props: { columns, hiddenColumns: ['done'] }
+      })
+      expect(screen.getByText('To Do')).toBeInTheDocument()
+      expect(screen.queryByText('Done')).not.toBeInTheDocument()
+    })
+
+    it('shows all columns when filterText is empty and hiddenColumns is empty', () => {
+      render(TaskBoard, {
+        props: { columns, filterText: '', hiddenColumns: [] }
+      })
+      expect(screen.getByText('To Do')).toBeInTheDocument()
+      expect(screen.getByText('In Progress')).toBeInTheDocument()
+      expect(screen.getByText('Done')).toBeInTheDocument()
+    })
+  })
+
+  describe('Card count', () => {
+    it('shows card count badges when showCardCount is true', () => {
+      const { container } = render(TaskBoard, {
+        props: { columns, showCardCount: true }
+      })
+      // Card count badge should show "2" for To Do column
+      expect(container.textContent).toContain('2')
+    })
+  })
+
+  describe('Add column', () => {
+    it('shows add-column button when allowAddColumn is true', () => {
+      const { container } = render(TaskBoard, { props: { columns, allowAddColumn: true } })
+      // The add-column button uses addCardText locale: "+ Add task"
+      const addColBtn = container.querySelector('[role="button"][tabindex="0"]')
+      expect(addColBtn).toBeInTheDocument()
+    })
+
+    it('emits column-add when add-column is clicked', async () => {
+      const { container, emitted } = render(TaskBoard, {
+        props: { columns, allowAddColumn: true }
+      })
+      // Find the add-column button (last role=button that's not a card)
+      const buttons = container.querySelectorAll('[role="button"][tabindex="0"]')
+      const addColBtn = buttons[buttons.length - 1]
+      await fireEvent.click(addColBtn)
+      expect(emitted()['column-add']).toBeTruthy()
+    })
+
+    it('does not render add-column button by default', () => {
+      const { container } = render(TaskBoard, { props: { columns } })
+      // Without allowAddColumn, the add-column button should not exist
+      // All buttons should be card-level, no standalone column-add button
+      const boardChildren = container.querySelector('[data-tiger-task-board]')?.children
+      // Only column elements should be direct children
+      if (boardChildren) {
+        Array.from(boardChildren).forEach((child) => {
+          expect(child.hasAttribute('data-tiger-taskboard-column')).toBe(true)
+        })
+      }
+    })
+  })
+
+  describe('Column description', () => {
+    it('renders column description when provided', () => {
+      const colsWithDesc: TaskBoardColumn[] = [
+        {
+          id: 'desc',
+          title: 'With Desc',
+          description: 'Column description text',
+          cards: []
+        }
+      ]
+      render(TaskBoard, { props: { columns: colsWithDesc } })
+      expect(screen.getByText('Column description text')).toBeInTheDocument()
+    })
+  })
 })

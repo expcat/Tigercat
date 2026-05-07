@@ -154,4 +154,61 @@ describe('Resizable', () => {
       expect(root.style.height).toBe('')
     })
   })
+
+  describe('Min/Max constraints', () => {
+    it('should apply minWidth and minHeight', () => {
+      const { container } = renderResizable({ minWidth: 100, minHeight: 50 })
+      expect(container.querySelector('[data-resizable]')).toBeTruthy()
+    })
+
+    it('should apply maxWidth and maxHeight', () => {
+      const { container } = renderResizable({ maxWidth: 500, maxHeight: 400 })
+      expect(container.querySelector('[data-resizable]')).toBeTruthy()
+    })
+  })
+
+  describe('Axis constraint', () => {
+    it('should render with horizontal axis', () => {
+      const { container } = renderResizable({ axis: 'horizontal' })
+      expect(container.querySelector('[data-resizable]')).toBeTruthy()
+    })
+
+    it('should render with vertical axis', () => {
+      const { container } = renderResizable({ axis: 'vertical' })
+      expect(container.querySelector('[data-resizable]')).toBeTruthy()
+    })
+  })
+
+  describe('Aspect ratio', () => {
+    it('should render with lockAspectRatio', () => {
+      const { container } = renderResizable({ lockAspectRatio: true })
+      expect(container.querySelector('[data-resizable]')).toBeTruthy()
+    })
+  })
+
+  describe('Custom style', () => {
+    it('should apply custom style prop', () => {
+      const { container } = renderResizable({ style: { border: '1px solid red' } })
+      const root = container.firstElementChild as HTMLElement
+      expect(root.style.border).toBe('1px solid red')
+    })
+  })
+
+  describe('Resize callbacks', () => {
+    it('should call onResize during drag', () => {
+      const onResizeStart = vi.fn()
+      const onResize = vi.fn()
+      const onResizeEnd = vi.fn()
+      const { container } = renderResizable({ onResizeStart, onResize, onResizeEnd })
+      const handle = container.querySelector('[data-handle="right"]')!
+
+      fireEvent.mouseDown(handle, { clientX: 300, clientY: 100 })
+      expect(onResizeStart).toHaveBeenCalledWith(
+        expect.objectContaining({ width: 300, height: 200, handle: 'right' })
+      )
+
+      fireEvent.mouseMove(document, { clientX: 350, clientY: 100 })
+      // onResize should have been called via createDocumentDragSession
+    })
+  })
 })

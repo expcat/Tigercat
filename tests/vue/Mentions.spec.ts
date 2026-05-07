@@ -90,4 +90,109 @@ describe('Mentions', () => {
       expect(dropdown.style.top).not.toBe('')
     })
   })
+
+  // --- Keyboard navigation ---
+  it('navigates options with ArrowDown and ArrowUp', async () => {
+    const { container } = render(Mentions, {
+      props: { options: defaultOptions, modelValue: '' }
+    })
+    const textarea = container.querySelector('textarea')!
+
+    await fireEvent.update(textarea, '@')
+    await screen.findByRole('listbox')
+
+    // ArrowDown should move active index
+    await fireEvent.keyDown(textarea, { key: 'ArrowDown' })
+    const options = container.querySelectorAll('[role="option"]')
+    expect(options[1]?.getAttribute('aria-selected')).toBe('true')
+
+    // ArrowUp should move back
+    await fireEvent.keyDown(textarea, { key: 'ArrowUp' })
+    expect(options[0]?.getAttribute('aria-selected')).toBe('true')
+  })
+
+  it('selects option with Enter key', async () => {
+    const onSelect = vi.fn()
+    const onChange = vi.fn()
+    const { container } = render(Mentions, {
+      props: {
+        options: defaultOptions,
+        modelValue: '',
+        'onUpdate:modelValue': onChange,
+        onSelect
+      }
+    })
+    const textarea = container.querySelector('textarea')!
+
+    await fireEvent.update(textarea, '@')
+    await screen.findByRole('listbox')
+
+    await fireEvent.keyDown(textarea, { key: 'Enter' })
+    expect(onSelect).toHaveBeenCalled()
+  })
+
+  it('closes dropdown on Escape', async () => {
+    const { container } = render(Mentions, {
+      props: { options: defaultOptions, modelValue: '' }
+    })
+    const textarea = container.querySelector('textarea')!
+
+    await fireEvent.update(textarea, '@')
+    await screen.findByRole('listbox')
+
+    await fireEvent.keyDown(textarea, { key: 'Escape' })
+    expect(container.querySelector('[role="listbox"]')).not.toBeInTheDocument()
+  })
+
+  // --- Option click selection ---
+  it('selects option on click', async () => {
+    const onSelect = vi.fn()
+    const onChange = vi.fn()
+    const { container } = render(Mentions, {
+      props: {
+        options: defaultOptions,
+        modelValue: '',
+        'onUpdate:modelValue': onChange,
+        onSelect
+      }
+    })
+    const textarea = container.querySelector('textarea')!
+
+    await fireEvent.update(textarea, '@')
+    await screen.findByRole('listbox')
+
+    const option = container.querySelectorAll('[role="option"]')[0]
+    await fireEvent.click(option)
+    expect(onSelect).toHaveBeenCalled()
+  })
+
+  // --- Filtering ---
+  it('filters options based on query text', async () => {
+    const { container } = render(Mentions, {
+      props: { options: defaultOptions, modelValue: '' }
+    })
+    const textarea = container.querySelector('textarea')!
+
+    await fireEvent.update(textarea, '@al')
+    await screen.findByRole('listbox')
+
+    const options = container.querySelectorAll('[role="option"]')
+    expect(options).toHaveLength(1)
+    expect(options[0].textContent).toBe('Alice')
+  })
+
+  // --- Custom prefix ---
+  it('supports custom prefix character', async () => {
+    const { container } = render(Mentions, {
+      props: { options: defaultOptions, modelValue: '', prefix: '#' }
+    })
+    const textarea = container.querySelector('textarea')!
+
+    await fireEvent.update(textarea, '#b')
+    await screen.findByRole('listbox')
+
+    const options = container.querySelectorAll('[role="option"]')
+    expect(options).toHaveLength(1)
+    expect(options[0].textContent).toBe('Bob')
+  })
 })

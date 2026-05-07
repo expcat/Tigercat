@@ -6,6 +6,10 @@ This directory contains comprehensive test suites for all Vue and React componen
 
 ```
 tests/
+├── core/               # Core utils/theme unit tests (framework-agnostic)
+│   ├── class-names.spec.ts
+│   ├── chart-utils.spec.ts
+│   └── ...
 ├── vue/                # Vue component test files
 │   ├── Button.spec.ts
 │   ├── Input.spec.ts
@@ -20,6 +24,8 @@ tests/
 │   ├── a11y-helpers.ts
 │   ├── theme-helpers.ts
 │   ├── test-fixtures.ts
+│   ├── mock-observers.ts        # Shared MockResizeObserver / MockIntersectionObserver
+│   ├── frame-scheduler.ts       # Shared requestAnimationFrame helpers
 │   └── index.ts
 ├── setup.ts            # Global test setup
 ├── TESTING_GUIDE.md    # Vue testing guide
@@ -219,6 +225,16 @@ it('should match snapshot', () => {
 - `getComputedStyles(element)` - Get computed styles
 - `expectThemeColor(element, variable, color)` - Test theme colors
 - `themeTestCases` - Common theme test cases
+
+### Mock Observers (`mock-observers.ts`)
+
+- `MockResizeObserver` - Shared ResizeObserver mock with `trigger()` and static `reset()`
+- `MockIntersectionObserver` - Shared IntersectionObserver mock with `trigger()` and static `reset()`
+
+### Frame Scheduler (`frame-scheduler.ts`)
+
+- `createFrameScheduler()` - DI-pattern scheduler (requestFrame/cancelFrame/flush) for dependency injection
+- `installFrameScheduler()` - Global stub that replaces `requestAnimationFrame`/`cancelAnimationFrame` with `vi.fn()` + `flush()`
 
 ### Test Fixtures
 

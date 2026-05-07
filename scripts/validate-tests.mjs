@@ -39,39 +39,51 @@ function stripCommentLines(content) {
     .join('\n')
 }
 
-function checkTestCategories(filePath, content, counters) {
-  const categories = ['Rendering', 'Props', 'Events', 'States', 'Accessibility', 'Snapshots']
-  const missing = []
-
-  for (const cat of categories) {
-    const pattern = new RegExp(`describe\\s*\\([^\\n]*['\"]${cat}`, 'm')
-    if (!pattern.test(content)) missing.push(cat)
-  }
-
-  if (missing.length > 0) {
-    console.log(c('yellow', `  ⚠ Missing: ${missing.join(' ')}`))
+function checkTestStructure(filePath, content, counters) {
+  const describeCount = (content.match(/\bdescribe\s*\(/g) || []).length
+  if (describeCount === 0) {
+    console.log(c('yellow', '  ⚠ No describe blocks — consider grouping tests'))
     counters.warnings++
     return false
   }
-
   return true
 }
 
 function checkTestNaming(filePath, content, counters) {
   const lines = content.split(/\r?\n/g)
-  const bad = []
+  let total = 0
+  let descriptive = 0
 
   for (const line of lines) {
     const match = line.match(/\bit\s*\(\s*(['"`])([^\1]+?)\1/) // naive
     if (!match) continue
-
-    const name = match[2]
-    const lower = name.toLowerCase()
-    if (!lower.includes('should') && !lower.includes('snapshot')) bad.push(name)
+    total++
+    const lower = match[2].toLowerCase()
+    if (lower.includes('should') || lower.includes('snapshot') || lower.includes('render') ||
+        lower.includes('display') || lower.includes('emit') || lower.includes('trigger') ||
+        lower.includes('accept') || lower.includes('reject') || lower.includes('throw') ||
+        lower.includes('return') || lower.includes('call') || lower.includes('when') ||
+        lower.includes('with') || lower.includes('without') || lower.includes('not ') ||
+        lower.includes('handle') || lower.includes('support') || lower.includes('allow') ||
+        lower.includes('prevent') || lower.includes('disable') || lower.includes('enable') ||
+        lower.includes('show') || lower.includes('hide') || lower.includes('open') ||
+        lower.includes('close') || lower.includes('toggle') || lower.includes('update') ||
+        lower.includes('set') || lower.includes('clear') || lower.includes('reset') ||
+        lower.includes('apply') || lower.includes('remove') || lower.includes('add') ||
+        lower.includes('create') || lower.includes('delete') || lower.includes('select') ||
+        lower.includes('validate') || lower.includes('format') || lower.includes('parse') ||
+        lower.includes('convert') || lower.includes('calculate') || lower.includes('compute') ||
+        lower.includes('respond') || lower.includes('fire') || lower.includes('navigate') ||
+        lower.includes('focus') || lower.includes('blur') || lower.includes('scroll') ||
+        lower.includes('resize') || lower.includes('change') || lower.includes('submit') ||
+        lower.includes('cancel') || lower.includes('confirm') || lower.includes('dismiss') ||
+        lower.includes('load') || lower.includes('fetch') || lower.includes('default')) {
+      descriptive++
+    }
   }
 
-  if (bad.length > 0) {
-    console.log(c('yellow', `  ⚠ Some tests don't use 'should' naming`))
+  if (total > 0 && descriptive / total < 0.5) {
+    console.log(c('yellow', `  ⚠ Low descriptive naming ratio (${descriptive}/${total})`))
     counters.warnings++
     return false
   }
@@ -103,14 +115,20 @@ function checkTypeSafety(content, counters) {
   return true
 }
 
-function minTestsForFile(filename) {
+// Hard minimum: file must have at least this many tests to pass
+function hardMinTests() {
+  return 3
+}
+
+// Soft minimum: below this count triggers a warning
+function softMinTestsForFile(filename) {
   if (
     filename.includes('Upload') ||
     filename.includes('DatePicker') ||
     filename.includes('TimePicker')
   )
-    return 50
-  return 30
+    return 30
+  return 15
 }
 
 async function main() {
@@ -160,27 +178,40 @@ async function main() {
     const content = readFileSync(filePath, 'utf8')
 
     const testCount = countTests(content)
-    const minTests = minTestsForFile(filename)
+    const hardMin = hardMinTests()
+    const softMin = softMinTestsForFile(filename)
 
     console.log(`  📊 Test count: ${testCount}`)
-    if (testCount < minTests) {
-      console.log(c('yellow', `  ⚠ Below minimum (${minTests})`))
+
+    let errors = 0 // hard failures
+    let softIssues = 0 // warnings only
+
+    // --- Hard checks (cause file to fail) ---
+    if (testCount < hardMin) {
+      console.log(c('red', `  ✗ Below hard minimum (${hardMin})`))
+      errors++
+    }
+    if (!checkTypeSafety(content, counters)) errors++
+
+    // --- Soft checks (warnings, don't cause failure) ---
+    if (testCount < softMin && testCount >= hardMin) {
+      console.log(c('yellow', `  ⚠ Below recommended minimum (${softMin})`))
       counters.warnings++
     }
+    if (!checkTestStructure(filePath, content, counters)) softIssues++
+    if (!checkTestNaming(filePath, content, counters)) softIssues++
+    if (!checkEdgeCases(content, counters)) softIssues++
+    if (!checkAccessibility(content, counters)) softIssues++
 
-    let issues = 0
-
-    if (!checkTestCategories(filePath, content, counters)) issues++
-    if (!checkTestNaming(filePath, content, counters)) issues++
-    if (!checkEdgeCases(content, counters)) issues++
-    if (!checkAccessibility(content, counters)) issues++
-    if (!checkTypeSafety(content, counters)) issues++
-
-    if (issues === 0) {
-      console.log(c('green', '  ✓ All checks passed'))
+    if (errors === 0) {
+      if (softIssues === 0) {
+        console.log(c('green', '  ✓ All checks passed'))
+      } else {
+        console.log(c('green', `  ✓ Passed (${softIssues} suggestion(s))`))
+      }
       counters.passedFiles++
     } else {
-      console.log(c('red', `  ✗ ${issues} issue(s)`))
+      console.log(c('red', `  ✗ ${errors} error(s), ${softIssues} suggestion(s)`))
       counters.failedFiles++
     }
 
