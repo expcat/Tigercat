@@ -71,7 +71,7 @@ GitHub Pages： https://expcat.github.io/Tigercat/
 | 文档                                                   | 说明                                             |
 | ------------------------------------------------------ | ------------------------------------------------ |
 | [skills/tigercat/SKILL.md](./skills/tigercat/SKILL.md) | 📘 **AI Agent 入口** - 组件列表、API、主题、i18n |
-| [ROADMAP.md](./ROADMAP.md)                             | 开发路线图与进度                                 |
+| [docs/ROADMAP.md](./docs/ROADMAP.md)                   | 开发路线图与进度                                 |
 | [MIGRATION_v1.0.0.md](./MIGRATION_v1.0.0.md)           | v0.8.0 → v1.0.0 迁移指南                         |
 | [docs/PERFORMANCE.md](./docs/PERFORMANCE.md)           | 性能优化最佳实践                                 |
 | [docs/BROWSER_SUPPORT.md](./docs/BROWSER_SUPPORT.md)   | 浏览器兼容性矩阵                                 |
@@ -124,7 +124,7 @@ pnpm example:react  # http://localhost:5174
 
 - [Contributing Guide](./CONTRIBUTING.md)
 - [Development Guide](./DEVELOPMENT.md)
-- [Roadmap](./ROADMAP.md)
+- [Roadmap](./docs/ROADMAP.md)
 
 ## License
 
