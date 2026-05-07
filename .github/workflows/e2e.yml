@@ -13,6 +13,8 @@ concurrency:
 jobs:
   e2e:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
     timeout-minutes: 30
     steps:
       - name: Checkout
@@ -27,19 +29,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Build packages
         run: pnpm build
 
       - name: Run E2E tests
         run: npx playwright test
+        env:
+          HOME: /root
 
       - name: Upload test results
         if: failure()
