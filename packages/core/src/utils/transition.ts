@@ -11,6 +11,7 @@ import {
   EASING_ENTER,
   EASING_LEAVE
 } from './animation'
+import { isBrowser } from './env'
 
 // ============================================================================
 // Types
@@ -189,7 +190,7 @@ export function getComponentTransition(componentName: string): TransitionClasses
  * Returns false in SSR environments.
  */
 export function prefersReducedMotion(): boolean {
-  if (typeof window === 'undefined') return false
+  if (!isBrowser()) return false
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 

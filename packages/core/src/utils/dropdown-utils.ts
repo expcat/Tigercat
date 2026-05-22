@@ -1,4 +1,5 @@
 import { classNames } from './class-names'
+import { isBrowser } from './env'
 
 /**
  * Get base dropdown container classes
@@ -105,7 +106,7 @@ let isDropdownStyleInjected = false
  * Safe to call multiple times - will only inject once.
  */
 export function injectDropdownStyles(): void {
-  if (typeof document === 'undefined' || isDropdownStyleInjected) return
+  if (!isBrowser() || isDropdownStyleInjected) return
 
   const styleId = 'tiger-ui-dropdown-styles'
   if (document.getElementById(styleId)) {

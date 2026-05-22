@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react'
 import { Anchor, AnchorLink } from '@expcat/tigercat-react'
 
@@ -208,7 +208,9 @@ describe('Anchor', () => {
       const event = new MouseEvent('click', { bubbles: true, cancelable: true })
       const preventDefaultSpy = vi.spyOn(event, 'preventDefault')
 
-      link.dispatchEvent(event)
+      await act(async () => {
+        link.dispatchEvent(event)
+      })
 
       expect(preventDefaultSpy).toHaveBeenCalled()
     })

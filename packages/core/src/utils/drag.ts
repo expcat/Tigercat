@@ -20,6 +20,7 @@ import type {
   DocumentDragSessionEvent,
   DocumentDragSessionOptions
 } from '../types/drag'
+import { isBrowser } from './env'
 
 // ---------------------------------------------------------------------------
 // State Factory
@@ -303,7 +304,7 @@ export function createDocumentDragSession(
   options: DocumentDragSessionOptions
 ): DocumentDragSession {
   const ownerDocument =
-    options.ownerDocument ?? (typeof document === 'undefined' ? undefined : document)
+    options.ownerDocument ?? (isBrowser() ? document : undefined)
 
   if (!ownerDocument) {
     return { dispose: () => undefined }

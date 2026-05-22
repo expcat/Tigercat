@@ -6,8 +6,12 @@
  */
 
 import React from 'react'
-import { render as renderReact, screen as reactScreen, waitFor } from '@testing-library/react'
-import { fireEvent as vueFireEvent, render as renderVue, screen as vueScreen } from '@testing-library/vue'
+import { act, render as renderReact, screen as reactScreen, waitFor } from '@testing-library/react'
+import {
+  fireEvent as vueFireEvent,
+  render as renderVue,
+  screen as vueScreen
+} from '@testing-library/vue'
 import { fireEvent as reactFireEvent } from '@testing-library/react'
 import { describe, expect, it, afterEach } from 'vitest'
 import { h } from 'vue'
@@ -212,9 +216,7 @@ const tableData = [
 
 describe('Table a11y regression', () => {
   it('React: renders table element with proper structure', () => {
-    const { container } = renderReact(
-      <ReactTable columns={tableColumns} dataSource={tableData} />
-    )
+    const { container } = renderReact(<ReactTable columns={tableColumns} dataSource={tableData} />)
 
     expect(container.querySelector('table')).toBeInTheDocument()
     expect(container.querySelectorAll('th')).toHaveLength(2)
@@ -222,9 +224,7 @@ describe('Table a11y regression', () => {
   })
 
   it('React: sortable column header has aria-sort', () => {
-    const { container } = renderReact(
-      <ReactTable columns={tableColumns} dataSource={tableData} />
-    )
+    const { container } = renderReact(<ReactTable columns={tableColumns} dataSource={tableData} />)
 
     const nameHeader = container.querySelector('th')
     expect(nameHeader).toHaveAttribute('aria-sort')
@@ -250,9 +250,11 @@ describe('Table a11y regression', () => {
   })
 
   it('React: table passes axe', async () => {
-    const { container } = renderReact(
-      <ReactTable columns={tableColumns} dataSource={tableData} />
-    )
+    const { container } = renderReact(<ReactTable columns={tableColumns} dataSource={tableData} />)
+
+    await act(async () => {
+      await Promise.resolve()
+    })
 
     // Table pagination select may lack label — skip select-name
     const results = await axe(container, {
@@ -278,9 +280,7 @@ describe('Table a11y regression', () => {
 
 describe('Input a11y regression', () => {
   it('React: error status sets aria-invalid', () => {
-    const { container } = renderReact(
-      <ReactInput status="error" placeholder="Email" />
-    )
+    const { container } = renderReact(<ReactInput status="error" placeholder="Email" />)
 
     const input = container.querySelector('input')
     expect(input).toHaveAttribute('aria-invalid', 'true')
@@ -296,9 +296,7 @@ describe('Input a11y regression', () => {
   })
 
   it('React: disabled input is not focusable', () => {
-    const { container } = renderReact(
-      <ReactInput disabled placeholder="Disabled" />
-    )
+    const { container } = renderReact(<ReactInput disabled placeholder="Disabled" />)
 
     const input = container.querySelector('input')
     expect(input).toBeDisabled()
@@ -314,9 +312,7 @@ describe('Input a11y regression', () => {
   })
 
   it('React: input passes axe', async () => {
-    const { container } = renderReact(
-      <ReactInput placeholder="Name" aria-label="Name" />
-    )
+    const { container } = renderReact(<ReactInput placeholder="Name" aria-label="Name" />)
 
     await expectNoA11yViolations(container)
   })

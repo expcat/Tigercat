@@ -2,6 +2,8 @@
  * BackTop component utilities
  */
 
+import { isBrowser } from './env'
+
 export type BackTopFrameCallback = (timestamp: number) => void
 
 export type BackTopFrameRequest = (callback: BackTopFrameCallback) => number
@@ -23,7 +25,7 @@ export interface BackTopVisibilityController {
 }
 
 function isWindowTarget(target: HTMLElement | Window): target is Window {
-  return typeof window !== 'undefined' && target === window
+  return isBrowser() && target === window
 }
 
 function requestDefaultFrame(callback: BackTopFrameCallback): number {

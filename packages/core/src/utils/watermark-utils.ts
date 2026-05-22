@@ -4,6 +4,7 @@
  */
 
 import type { WatermarkFont } from '../types/watermark'
+import { isBrowser } from './env'
 
 // ---------------------------------------------------------------------------
 // Defaults
@@ -50,7 +51,7 @@ export interface WatermarkRenderOptions {
 type WatermarkRenderingContext = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
 
 function getWatermarkDpr(): number {
-  return typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1
+  return isBrowser() ? window.devicePixelRatio || 1 : 1
 }
 
 function prepareWatermarkContext(
@@ -96,7 +97,7 @@ function renderWatermarkToDomCanvas(
   opts: WatermarkRenderOptions,
   image?: CanvasImageSource
 ): string | undefined {
-  if (typeof document === 'undefined') return undefined
+  if (!isBrowser()) return undefined
 
   const { content, width, height, rotate, font } = opts
   const canvas = document.createElement('canvas')

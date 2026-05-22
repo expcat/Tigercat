@@ -3,11 +3,18 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent, waitFor } from '@testing-library/react'
+import { act, render, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { Upload, ConfigProvider, type UploadFile } from '@expcat/tigercat-react'
 import { expectNoA11yViolations } from '../utils/react'
+
+async function dispatchUploadEvent(action: () => Promise<boolean>): Promise<void> {
+  await act(async () => {
+    await action()
+    await Promise.resolve()
+  })
+}
 
 describe('Upload', () => {
   describe('Rendering', () => {
@@ -165,7 +172,7 @@ describe('Upload', () => {
         writable: false
       })
 
-      await fireEvent.change(input)
+      await dispatchUploadEvent(() => fireEvent.change(input))
 
       await waitFor(() => {
         expect(onChange).toHaveBeenCalled()
@@ -227,7 +234,7 @@ describe('Upload', () => {
         writable: false
       })
 
-      await fireEvent.change(input)
+      await dispatchUploadEvent(() => fireEvent.change(input))
 
       await waitFor(() => {
         expect(onChange).toHaveBeenCalled()
@@ -258,7 +265,7 @@ describe('Upload', () => {
         writable: false
       })
 
-      await fireEvent.change(input)
+      await dispatchUploadEvent(() => fireEvent.change(input))
 
       await waitFor(() => {
         expect(onExceed).toHaveBeenCalled()
@@ -299,7 +306,7 @@ describe('Upload', () => {
         writable: false
       })
 
-      await fireEvent.change(input)
+      await dispatchUploadEvent(() => fireEvent.change(input))
 
       await waitFor(() => {
         expect(onChange).not.toHaveBeenCalled()
@@ -322,7 +329,7 @@ describe('Upload', () => {
         writable: false
       })
 
-      await fireEvent.change(input)
+      await dispatchUploadEvent(() => fireEvent.change(input))
 
       await waitFor(() => {
         expect(onChange).not.toHaveBeenCalled()
@@ -344,7 +351,7 @@ describe('Upload', () => {
         writable: false
       })
 
-      await fireEvent.change(input)
+      await dispatchUploadEvent(() => fireEvent.change(input))
 
       await waitFor(() => {
         expect(beforeUpload).toHaveBeenCalled()
@@ -367,7 +374,7 @@ describe('Upload', () => {
         writable: false
       })
 
-      await fireEvent.change(input)
+      await dispatchUploadEvent(() => fireEvent.change(input))
 
       await waitFor(() => {
         expect(beforeUpload).toHaveBeenCalled()
@@ -502,7 +509,7 @@ describe('Upload', () => {
         files: [file]
       }
 
-      await fireEvent.drop(dragArea, { dataTransfer })
+      await dispatchUploadEvent(() => fireEvent.drop(dragArea, { dataTransfer }))
 
       await waitFor(() => {
         expect(onChange).toHaveBeenCalled()
@@ -528,7 +535,7 @@ describe('Upload', () => {
       const dragArea = container.querySelector('[role="button"]') as HTMLElement
       const file = new File(['content'], 'test.txt', { type: 'text/plain' })
 
-      await fireEvent.drop(dragArea, { dataTransfer: { files: [file] } })
+      await dispatchUploadEvent(() => fireEvent.drop(dragArea, { dataTransfer: { files: [file] } }))
 
       expect(onChange).not.toHaveBeenCalled()
     })
@@ -574,7 +581,7 @@ describe('Upload', () => {
         writable: false
       })
 
-      await fireEvent.change(input)
+      await dispatchUploadEvent(() => fireEvent.change(input))
 
       await waitFor(() => {
         const fileList = container.querySelector('[role="list"]')
@@ -603,7 +610,7 @@ describe('Upload', () => {
         writable: false
       })
 
-      await fireEvent.change(input)
+      await dispatchUploadEvent(() => fireEvent.change(input))
 
       await waitFor(() => {
         const fileList = container.querySelector('[role="list"]')

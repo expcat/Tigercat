@@ -21,6 +21,13 @@ async function flushMicrotasks() {
   await Promise.resolve()
 }
 
+async function actImperativeReact(callback: () => void) {
+  act(callback)
+  await act(async () => {
+    await flushMicrotasks()
+  })
+}
+
 async function flushVueDom() {
   await nextTick()
   await flushMicrotasks()
@@ -38,12 +45,12 @@ function clearImperativeDom() {
 }
 
 describe('imperative API sideEffects regression', () => {
-  beforeEach(() => {
-    clearImperativeDom()
+  beforeEach(async () => {
+    await actImperativeReact(clearImperativeDom)
   })
 
-  afterEach(() => {
-    clearImperativeDom()
+  afterEach(async () => {
+    await actImperativeReact(clearImperativeDom)
     vi.useRealTimers()
   })
 
@@ -63,10 +70,9 @@ describe('imperative API sideEffects regression', () => {
   })
 
   it('mounts React Message and Notification from the package root entry', async () => {
-    await act(async () => {
+    await actImperativeReact(() => {
       ReactMessage.info({ content: 'React root message', duration: 0 })
       reactNotification.info({ title: 'React root notification', duration: 0 })
-      await flushMicrotasks()
     })
 
     await waitFor(() => {

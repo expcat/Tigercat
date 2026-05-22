@@ -199,10 +199,6 @@ export const FormItem: React.FC<FormItemProps> = ({
 
     const nextProps: Partial<FieldLikeProps> = {
       id: effectiveFieldId,
-      status: !isNativeElement && hasError ? 'error' : onlyChild.props.status,
-      errorMessage:
-        !isNativeElement && hasError && !showMessage ? errorMessage : onlyChild.props.errorMessage,
-      _shakeTrigger: !isNativeElement && hasError ? shakeTrigger : undefined,
       'aria-invalid': hasError ? true : onlyChild.props['aria-invalid'],
       'aria-required': isRequired ? true : onlyChild.props['aria-required'],
       'aria-describedby': mergeAriaDescribedBy(onlyChild.props['aria-describedby'], describedById),
@@ -214,6 +210,13 @@ export const FormItem: React.FC<FormItemProps> = ({
         onlyChild.props.onChange?.(event)
         handleChange()
       }
+    }
+
+    if (!isNativeElement) {
+      nextProps.status = hasError ? 'error' : onlyChild.props.status
+      nextProps.errorMessage =
+        hasError && !showMessage ? errorMessage : onlyChild.props.errorMessage
+      nextProps._shakeTrigger = hasError ? shakeTrigger : undefined
     }
 
     return React.cloneElement(onlyChild, nextProps)

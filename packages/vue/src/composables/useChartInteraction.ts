@@ -1,4 +1,4 @@
-import { ref, computed, onScopeDispose, type Ref, type ComputedRef } from 'vue'
+import { ref, computed, getCurrentScope, onScopeDispose, type Ref, type ComputedRef } from 'vue'
 import {
   classNames,
   createChartPointerMoveScheduler,
@@ -107,7 +107,9 @@ export function useChartInteraction<T = unknown>(
     }
   })
 
-  onScopeDispose(() => tooltipScheduler.cancel())
+  if (getCurrentScope()) {
+    onScopeDispose(() => tooltipScheduler.cancel())
+  }
 
   // Resolved indices (controlled vs uncontrolled)
   const resolvedHoveredIndex = computed(() => {

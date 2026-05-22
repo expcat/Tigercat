@@ -210,7 +210,7 @@ describe('Textarea', () => {
       })
 
       const textarea = getByRole('textbox')
-      await fireEvent.input(textarea, { target: { value: 'test' } })
+      await fireEvent.update(textarea, 'test')
 
       expect(onInput).toHaveBeenCalled()
     })
@@ -224,7 +224,8 @@ describe('Textarea', () => {
       })
 
       const textarea = getByRole('textbox')
-      await fireEvent.change(textarea, { target: { value: 'test' } })
+      await fireEvent.update(textarea, 'test')
+      textarea.dispatchEvent(new Event('change', { bubbles: true }))
 
       expect(onChange).toHaveBeenCalled()
     })
@@ -413,7 +414,7 @@ describe('Textarea', () => {
       })
 
       const textarea = getByRole('textbox')
-      await fireEvent.input(textarea, { target: { value: 'New content' } })
+      await fireEvent.update(textarea, 'New content')
 
       expect(onInput).toHaveBeenCalled()
     })
@@ -627,9 +628,9 @@ describe('Textarea', () => {
 
       const textarea = getByRole('textbox')
 
-      await fireEvent.input(textarea, { target: { value: 'a' } })
-      await fireEvent.input(textarea, { target: { value: 'ab' } })
-      await fireEvent.input(textarea, { target: { value: 'abc' } })
+      await fireEvent.update(textarea, 'a')
+      await fireEvent.update(textarea, 'ab')
+      await fireEvent.update(textarea, 'abc')
 
       expect(onUpdate).toHaveBeenCalledTimes(3)
     })

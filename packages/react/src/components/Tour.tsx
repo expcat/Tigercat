@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import ReactDOM from 'react-dom'
 import {
   classNames,
+  isBrowser,
   tourPopoverClasses,
   tourTitleClasses,
   tourDescriptionClasses,
@@ -96,7 +97,7 @@ export const Tour: React.FC<TourProps> = ({
   }, [onClose])
 
   if (!open || !step) return null
-  if (typeof document === 'undefined') return null
+  if (!isBrowser()) return null
 
   const placement: TourPlacement = step.placement ?? 'bottom'
   const showMask = step.mask !== false

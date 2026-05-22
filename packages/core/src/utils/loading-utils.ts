@@ -3,6 +3,7 @@
  */
 
 import { classNames } from './class-names'
+import { isBrowser } from './env'
 import type { LoadingSize, LoadingColor, LoadingVariant } from '../types/loading'
 
 /**
@@ -305,7 +306,7 @@ export const animationDelayStyles = `
  * This is a shared utility to avoid code duplication
  */
 export function injectLoadingAnimationStyles(): void {
-  if (typeof document === 'undefined') {
+  if (!isBrowser()) {
     return
   }
 

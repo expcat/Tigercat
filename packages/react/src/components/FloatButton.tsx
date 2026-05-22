@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react'
 import ReactDOM from 'react-dom'
 import {
   classNames,
+  isBrowser,
   floatButtonBaseClasses,
   floatButtonShapeClasses,
   floatButtonSizeClasses,
@@ -108,7 +109,7 @@ export const FloatButtonGroup: React.FC<FloatButtonGroupProps> = ({
 
   const groupClasses = useMemo(() => classNames(floatButtonGroupClasses, className), [className])
 
-  if (typeof document === 'undefined') return null
+  if (!isBrowser()) return null
 
   const content = (
     <div

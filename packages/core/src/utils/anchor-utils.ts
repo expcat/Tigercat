@@ -4,6 +4,7 @@
  */
 
 import type { AnchorDirection } from '../types/anchor'
+import { isBrowser } from './env'
 
 /**
  * Base anchor wrapper classes
@@ -245,7 +246,7 @@ export function createAnchorObserver(links: string[], options: AnchorObserverOpt
   if (typeof IntersectionObserver === 'undefined') return () => {}
 
   const { offsetTop = 0, root = null, onChange } = options
-  if (typeof document === 'undefined') return () => {}
+  if (!isBrowser()) return () => {}
 
   const targets = new Map<Element, string>()
   for (const href of links) {

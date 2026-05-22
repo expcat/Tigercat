@@ -4,6 +4,8 @@
  * All durations are in milliseconds unless otherwise specified.
  */
 
+import { isBrowser } from './env'
+
 // ============================================================================
 // Animation Duration Constants
 // ============================================================================
@@ -118,7 +120,7 @@ let isStyleInjected = false
  * Safe to call multiple times - will only inject once.
  */
 export function injectShakeStyle(): void {
-  if (typeof document === 'undefined' || isStyleInjected) return
+  if (!isBrowser() || isStyleInjected) return
 
   const styleId = 'tiger-ui-animation-styles'
   if (document.getElementById(styleId)) {
@@ -234,7 +236,7 @@ let isSvgStyleInjected = false
  * Safe to call multiple times - will only inject once.
  */
 export function injectSvgAnimationStyles(): void {
-  if (typeof document === 'undefined' || isSvgStyleInjected) return
+  if (!isBrowser() || isSvgStyleInjected) return
 
   const styleId = 'tiger-ui-svg-animation-styles'
   if (document.getElementById(styleId)) {

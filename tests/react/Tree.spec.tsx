@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Tree } from '@expcat/tigercat-react'
 import { expectNoA11yViolations } from '../utils/react'
@@ -133,7 +133,9 @@ describe('Tree', () => {
       render(<Tree treeData={sampleTreeData} defaultExpandAll />)
 
       const items = screen.getAllByRole('treeitem')
-      items[0].focus()
+      act(() => {
+        items[0].focus()
+      })
       expect(document.activeElement).toBe(items[0])
 
       await user.keyboard('{ArrowDown}')
@@ -150,7 +152,9 @@ describe('Tree', () => {
       expect(screen.queryByText('Child 1-1')).not.toBeInTheDocument()
 
       const items = screen.getAllByRole('treeitem')
-      items[0].focus()
+      act(() => {
+        items[0].focus()
+      })
       expect(document.activeElement).toBe(items[0])
 
       await user.keyboard('{ArrowRight}')
@@ -170,7 +174,9 @@ describe('Tree', () => {
       const items = screen.getAllByRole('treeitem')
       expect(items.length).toBeGreaterThanOrEqual(2)
 
-      items[0].focus()
+      act(() => {
+        items[0].focus()
+      })
       expect(document.activeElement).toBe(items[0])
 
       await user.keyboard('{ArrowDown}')
@@ -189,7 +195,9 @@ describe('Tree', () => {
       render(<Tree treeData={lazyTreeData} loadData={onLoadData} defaultExpandedKeys={[]} />)
 
       const parentItem = screen.getAllByRole('treeitem')[0]
-      parentItem.focus()
+      act(() => {
+        parentItem.focus()
+      })
       expect(document.activeElement).toBe(parentItem)
 
       await user.keyboard('{ArrowRight}')
@@ -208,7 +216,9 @@ describe('Tree', () => {
       render(<Tree treeData={sampleTreeData} defaultExpandAll multiple />)
 
       const items = screen.getAllByRole('treeitem')
-      items[0].focus()
+      act(() => {
+        items[0].focus()
+      })
       await user.keyboard('{Enter}')
 
       await user.keyboard('{ArrowDown}{Enter}')
@@ -234,7 +244,9 @@ describe('Tree', () => {
       )
 
       const items = screen.getAllByRole('treeitem')
-      items[0].focus()
+      act(() => {
+        items[0].focus()
+      })
       await user.keyboard(' ')
 
       await waitFor(() => {

@@ -64,7 +64,7 @@ describe('Transfer', () => {
 
       // Select item 1
       const checkbox = container.querySelector('input[type="checkbox"]')!
-      await fireEvent.change(checkbox, { target: { checked: true } })
+      await fireEvent.update(checkbox, true)
 
       // Click move right
       const moveRightBtn = getByLabelText('Move selected to target')

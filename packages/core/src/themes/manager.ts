@@ -13,6 +13,7 @@
 
 import type { ThemePreset, ThemeSemanticColors, ColorScheme } from '../types/theme'
 import { THEME_CSS_VARS } from '../theme'
+import { isBrowser } from '../utils/env'
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -34,7 +35,7 @@ function clearColors(target: HTMLElement): void {
 }
 
 function resolveSystemDark(): boolean {
-  if (typeof window === 'undefined') return false
+  if (!isBrowser()) return false
   return window.matchMedia('(prefers-color-scheme: dark)').matches
 }
 
@@ -158,7 +159,7 @@ class ThemeManagerImpl {
   // -----------------------------------------------------------------------
 
   private apply(): void {
-    if (typeof document === 'undefined') return
+    if (!isBrowser()) return
 
     const root = document.documentElement
     const preset = this.presets.get(this.currentThemeName)
@@ -194,7 +195,7 @@ class ThemeManagerImpl {
   }
 
   private startWatchingMedia(): void {
-    if (typeof window === 'undefined') return
+    if (!isBrowser()) return
     if (this.mediaQuery) return // already watching
 
     this.mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')

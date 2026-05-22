@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { DatePicker } from '@expcat/tigercat-react'
@@ -324,7 +324,9 @@ describe('DatePicker', () => {
       await user.click(input)
 
       const target = screen.getByLabelText('2024-03-16') as HTMLButtonElement
-      target.focus()
+      act(() => {
+        target.focus()
+      })
       await user.keyboard('{Enter}')
 
       expect(onChange).toHaveBeenCalled()

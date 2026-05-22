@@ -9,20 +9,22 @@ source: project audit and planning
 
 已完成条目直接删除，剩余工作合并到新待办。
 
+> **最近完成**（2026-05-21）：§1.2 统一 SSR 守卫 — 将 20 个文件中 32 处原始 `typeof window/document/navigator` 检查收敛到 `env.ts` 的 `isBrowser()`，构建 + 5812 测试全部通过。
+
 ## 基线 v1.1.0
 
-| 指标 | 数据 |
-| ---- | ---- |
-| 组件 | 133+（Vue 3 + React 双端，含 12 种 SVG 图表） |
-| 测试 | 5812 cases / 309 files |
-| 覆盖率 | Stmts 84.66% / Branch 77.68% / Funcs 86.06% / Lines 86.64% |
-| E2E | 56 passed（Chromium） |
-| validate | 226/226 通过，458 warnings |
-| i18n | 9 locale（zh-CN/en-US/zh-TW/ja/ko/th/vi/id + DatePicker 独立 locale） |
-| 主题 | 5 预设 + 暗色模式 |
-| CLI | create / add / playground / generate / doctor |
-| SSR 守卫 | 19+ 处 `typeof window/document/navigator` 检查，集中化 `isClientOnly()` |
-| Size Limit | Core < 100KB / Vue < 250KB / React < 250KB（gzip） |
+| 指标       | 数据                                                                  |
+| ---------- | --------------------------------------------------------------------- |
+| 组件       | 133+（Vue 3 + React 双端，含 12 种 SVG 图表）                         |
+| 测试       | 5812 cases / 309 files                                                |
+| 覆盖率     | Stmts 84.66% / Branch 77.68% / Funcs 86.06% / Lines 86.64%            |
+| E2E        | 56 passed（Chromium）                                                 |
+| validate   | 226/226 通过，458 warnings                                            |
+| i18n       | 9 locale（zh-CN/en-US/zh-TW/ja/ko/th/vi/id + DatePicker 独立 locale） |
+| 主题       | 5 预设 + 暗色模式                                                     |
+| CLI        | create / add / playground / generate / doctor                         |
+| SSR 守卫   | 原始 `typeof window/document/navigator` 检查已集中到 `isBrowser()`    |
+| Size Limit | Core < 100KB / Vue < 250KB / React < 250KB（gzip）                    |
 
 ---
 
@@ -32,13 +34,13 @@ source: project audit and planning
 
 458 条软警告来源于 `scripts/validate-tests.mjs` 的五类检查：
 
-| 类别 | 估计数量 | 优先级 | 影响 |
-| ---- | -------- | ------ | ---- |
-| 缺少 a11y 检查（无 `expectNoA11yViolations` 调用） | ~80 | 高 | 无障碍合规风险 |
-| 缺少 Edge Case / Boundary 描述块 | ~80 | 高 | 健壮性盲区 |
-| 测试数低于软阈值（3 ≤ n < softMin） | ~100 | 中 | 覆盖薄弱 |
-| 命名描述率 < 50% | ~100 | 低 | 可读性 |
-| 无 `describe` 结构 | ~98 | 低 | 维护成本 |
+| 类别                                               | 估计数量 | 优先级 | 影响           |
+| -------------------------------------------------- | -------- | ------ | -------------- |
+| 缺少 a11y 检查（无 `expectNoA11yViolations` 调用） | ~80      | 高     | 无障碍合规风险 |
+| 缺少 Edge Case / Boundary 描述块                   | ~80      | 高     | 健壮性盲区     |
+| 测试数低于软阈值（3 ≤ n < softMin）                | ~100     | 中     | 覆盖薄弱       |
+| 命名描述率 < 50%                                   | ~100     | 低     | 可读性         |
+| 无 `describe` 结构                                 | ~98      | 低     | 维护成本       |
 
 执行策略：
 
@@ -50,7 +52,6 @@ source: project audit and planning
 ### 1.2 代码质量扫描
 
 - [ ] 清理未使用的工具函数（`packages/core/src/utils/` 100+ 文件，审计死代码）
-- [ ] 统一 SSR 守卫：散落 19+ 处 `typeof window` 检查 → 收敛到 `env.ts` 的 `isClientOnly()`
 - [ ] 审计 `any` 残留（测试文件中 validate 已禁止，源码中再扫一轮）
 
 ---
@@ -59,11 +60,11 @@ source: project audit and planning
 
 ### 2.1 当前废弃清单
 
-| 组件 | 废弃 API | 替代 | 引入版本 | 计划移除 |
-| ---- | -------- | ---- | -------- | -------- |
-| ImagePreview | `visible` prop | `open` | v0.5.0 | v2.0 |
-| Image (Vue) | `preview-visible-change` 事件 | `preview-open-change` | v1.0.0 | v2.0 |
-| Image (React) | `onPreviewVisibleChange` prop | `onPreviewOpenChange` | v1.0.0 | v2.0 |
+| 组件          | 废弃 API                      | 替代                  | 引入版本 | 计划移除 |
+| ------------- | ----------------------------- | --------------------- | -------- | -------- |
+| ImagePreview  | `visible` prop                | `open`                | v0.5.0   | v2.0     |
+| Image (Vue)   | `preview-visible-change` 事件 | `preview-open-change` | v1.0.0   | v2.0     |
+| Image (React) | `onPreviewVisibleChange` prop | `onPreviewOpenChange` | v1.0.0   | v2.0     |
 
 ### 2.2 执行步骤
 
@@ -83,21 +84,21 @@ source: project audit and planning
 
 ### 3.1 低覆盖组件补测
 
-| 组件 | Vue 测试数 | React 测试数 | 目标 | 需补充内容 |
-| ---- | ---------- | ------------ | ---- | ---------- |
-| Menu | 7 | 7 | ≥25 | 选中态、click 事件、disabled、子菜单展开收起、键盘导航 |
-| Code | 4 | 4 | ≥20 | 语法高亮、复制、行号、主题切换 |
-| Dropdown | 10 | 14 | ≥20 | 触发方式、placement、嵌套菜单、键盘交互 |
-| CropUpload | 低（32%） | 低（48%） | ≥70% | 裁剪拖拽/缩放/旋转、上传成功/失败/取消、文件校验、a11y |
+| 组件       | Vue 测试数 | React 测试数 | 目标 | 需补充内容                                             |
+| ---------- | ---------- | ------------ | ---- | ------------------------------------------------------ |
+| Menu       | 7          | 7            | ≥25  | 选中态、click 事件、disabled、子菜单展开收起、键盘导航 |
+| Code       | 4          | 4            | ≥20  | 语法高亮、复制、行号、主题切换                         |
+| Dropdown   | 10         | 14           | ≥20  | 触发方式、placement、嵌套菜单、键盘交互                |
+| CropUpload | 低（32%）  | 低（48%）    | ≥70% | 裁剪拖拽/缩放/旋转、上传成功/失败/取消、文件校验、a11y |
 
 ### 3.2 覆盖率目标提升
 
-| 指标 | 当前 | 目标 |
-| ---- | ---- | ---- |
-| Stmts | 84.66% | ≥88% |
+| 指标   | 当前   | 目标 |
+| ------ | ------ | ---- |
+| Stmts  | 84.66% | ≥88% |
 | Branch | 77.68% | ≥82% |
-| Funcs | 86.06% | ≥90% |
-| Lines | 86.64% | ≥90% |
+| Funcs  | 86.06% | ≥90% |
+| Lines  | 86.64% | ≥90% |
 
 ### 3.3 E2E 测试扩展
 
@@ -129,12 +130,12 @@ source: project audit and planning
 
 ### 4.2 CLI 增强
 
-| 命令 | 增强方向 |
-| ---- | ---- |
-| `add` | 交互式多选组件 + 依赖自动解析 + 按需导入代码片段生成 |
-| `playground` | 热更新预览 + 自动打开浏览器 |
-| `generate` | 支持生成测试模板、文档模板 |
-| `doctor` | 结构化 JSON 输出 + 修复建议 + 版本兼容矩阵检查 |
+| 命令         | 增强方向                                             |
+| ------------ | ---------------------------------------------------- |
+| `add`        | 交互式多选组件 + 依赖自动解析 + 按需导入代码片段生成 |
+| `playground` | 热更新预览 + 自动打开浏览器                          |
+| `generate`   | 支持生成测试模板、文档模板                           |
+| `doctor`     | 结构化 JSON 输出 + 修复建议 + 版本兼容矩阵检查       |
 
 - [ ] 补充 CLI README 使用示例
 - [ ] 添加 `--dry-run` 模式（预览变更不写入文件）
@@ -201,13 +202,13 @@ source: project audit and planning
   - Pan（拖拽偏移量）
 - [ ] 手势接入组件：
 
-| 组件 | 手势 | 行为 |
-| ---- | ---- | ---- |
-| Carousel | Swipe | 已有，迁移到统一手势工具 |
-| Drawer | Swipe | 向边缘滑动关闭 |
-| ImagePreview | Pinch + Pan | 缩放 + 平移 |
-| Tabs | Swipe | 左右滑动切换 |
-| Modal | Swipe Down | 下滑关闭（移动端 Sheet 模式） |
+| 组件         | 手势        | 行为                          |
+| ------------ | ----------- | ----------------------------- |
+| Carousel     | Swipe       | 已有，迁移到统一手势工具      |
+| Drawer       | Swipe       | 向边缘滑动关闭                |
+| ImagePreview | Pinch + Pan | 缩放 + 平移                   |
+| Tabs         | Swipe       | 左右滑动切换                  |
+| Modal        | Swipe Down  | 下滑关闭（移动端 Sheet 模式） |
 
 ### 6.2 移动端布局适配
 
@@ -230,17 +231,17 @@ source: project audit and planning
 
 ### 7.1 组件功能增强
 
-| 组件 | 增强内容 | 优先级 |
-| ---- | -------- | ------ |
-| **Table** | 列拖拽排序、行拖拽排序、列固定增强、单元格编辑、导出 Excel/CSV 增强 | 高 |
-| **Form** | 内置校验预设（email/phone/url/id-card）、条件联动 DSL、表单性能优化（大表单 >50 字段） | 高 |
-| **Select** | 虚拟滚动（>1000 选项）、远程搜索防抖、创建新选项 | 高 |
-| **Tree** | 大数据虚拟化（>10000 节点）、节点拖拽排序、搜索高亮 | 中 |
-| **Upload** | 断点续传、分片上传、上传队列管理 | 中 |
-| **Menu** | 菜单搜索过滤、折叠模式增强 | 中 |
-| **Charts** | 数据缩放（brush）、导出 PNG/SVG、图表联动、自适应 resize 增强 | 中 |
-| **Tour** | 步骤条件跳过、异步步骤加载、移动端适配 | 低 |
-| **Kanban** | 泳道分组、WIP 限制可视化、卡片过滤 | 低 |
+| 组件       | 增强内容                                                                               | 优先级 |
+| ---------- | -------------------------------------------------------------------------------------- | ------ |
+| **Table**  | 列拖拽排序、行拖拽排序、列固定增强、单元格编辑、导出 Excel/CSV 增强                    | 高     |
+| **Form**   | 内置校验预设（email/phone/url/id-card）、条件联动 DSL、表单性能优化（大表单 >50 字段） | 高     |
+| **Select** | 虚拟滚动（>1000 选项）、远程搜索防抖、创建新选项                                       | 高     |
+| **Tree**   | 大数据虚拟化（>10000 节点）、节点拖拽排序、搜索高亮                                    | 中     |
+| **Upload** | 断点续传、分片上传、上传队列管理                                                       | 中     |
+| **Menu**   | 菜单搜索过滤、折叠模式增强                                                             | 中     |
+| **Charts** | 数据缩放（brush）、导出 PNG/SVG、图表联动、自适应 resize 增强                          | 中     |
+| **Tour**   | 步骤条件跳过、异步步骤加载、移动端适配                                                 | 低     |
+| **Kanban** | 泳道分组、WIP 限制可视化、卡片过滤                                                     | 低     |
 
 ### 7.2 性能优化
 
@@ -275,24 +276,24 @@ source: project audit and planning
 
 ### 8.1 近期候选（v1.3–v1.5）
 
-| 组件 | 类别 | 说明 | 复杂度 |
-| ---- | ---- | ---- | ------ |
-| **Spotlight** | Navigation | ⌘K 搜索命令面板，模糊搜索 + 键盘导航 + 分组结果 | 高 |
-| **Signature** | Form | 手写签名画板，支持笔压 + 颜色 + 导出 PNG/SVG | 中 |
-| **NumberKeyboard** | Form | 移动端数字键盘，支持身份证/金额等格式 | 低 |
-| **ScrollSpy** | Navigation | 滚动监听 + 自动高亮导航（与 Anchor 互补） | 低 |
-| **Countdown** | Data | 倒计时组件，支持天/时/分/秒格式化 | 低 |
+| 组件               | 类别       | 说明                                            | 复杂度 |
+| ------------------ | ---------- | ----------------------------------------------- | ------ |
+| **Spotlight**      | Navigation | ⌘K 搜索命令面板，模糊搜索 + 键盘导航 + 分组结果 | 高     |
+| **Signature**      | Form       | 手写签名画板，支持笔压 + 颜色 + 导出 PNG/SVG    | 中     |
+| **NumberKeyboard** | Form       | 移动端数字键盘，支持身份证/金额等格式           | 低     |
+| **ScrollSpy**      | Navigation | 滚动监听 + 自动高亮导航（与 Anchor 互补）       | 低     |
+| **Countdown**      | Data       | 倒计时组件，支持天/时/分/秒格式化               | 低     |
 
 ### 8.2 中期候选（v1.6–v2.0）
 
-| 组件 | 类别 | 说明 | 复杂度 |
-| ---- | ---- | ---- | ------ |
-| **Gantt** | Charts | 甘特图，复用 Chart SVG 基础设施 + 时间轴 + 任务依赖线 | 高 |
-| **OrgChart** | Charts | 组织结构图，复用 Tree + SVG 连线 | 高 |
-| **MarkdownEditor** | Advanced | Markdown 编辑器，实时预览 + 工具栏 + 插件化 | 高 |
-| **ImageAnnotation** | Advanced | 图片标注，矩形/圆形/多边形/自由画笔标注 | 中 |
-| **CronEditor** | Form | Cron 表达式可视化编辑器 | 中 |
-| **ColorSwatch** | Form | 色板选择器（预设色组 + 自定义色组） | 低 |
+| 组件                | 类别     | 说明                                                  | 复杂度 |
+| ------------------- | -------- | ----------------------------------------------------- | ------ |
+| **Gantt**           | Charts   | 甘特图，复用 Chart SVG 基础设施 + 时间轴 + 任务依赖线 | 高     |
+| **OrgChart**        | Charts   | 组织结构图，复用 Tree + SVG 连线                      | 高     |
+| **MarkdownEditor**  | Advanced | Markdown 编辑器，实时预览 + 工具栏 + 插件化           | 高     |
+| **ImageAnnotation** | Advanced | 图片标注，矩形/圆形/多边形/自由画笔标注               | 中     |
+| **CronEditor**      | Form     | Cron 表达式可视化编辑器                               | 中     |
+| **ColorSwatch**     | Form     | 色板选择器（预设色组 + 自定义色组）                   | 低     |
 
 ### 8.3 新增组件 DoD
 
@@ -331,13 +332,12 @@ source: project audit and planning
 
 ### 9.3 SSR 支持
 
-当前 SSR 守卫充分（19+ 处），但未经框架级验证。
+当前 SSR 守卫已集中到 `isBrowser()`，但未经框架级验证。
 
 - [ ] Nuxt 3 集成测试：创建 `examples/nuxt/` 验证 Vue 组件 SSR 渲染
 - [ ] Next.js 集成测试：创建 `examples/nextjs/` 验证 React 组件 SSR 渲染
 - [ ] hydration mismatch 修复：重点排查 DatePicker（日期格式化依赖 locale）、Chart（SVG id 唯一性）
 - [ ] SSR 文档：在 `skills/tigercat/references/` 新增 `ssr.md`
-- [ ] 统一收敛散落的 SSR 守卫到 `env.ts`
 
 ### 9.4 i18n 扩展
 

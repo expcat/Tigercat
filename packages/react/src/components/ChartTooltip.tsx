@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { classNames, getChartTooltipTransform } from '@expcat/tigercat-core'
+import { classNames, getChartTooltipTransform, isBrowser } from '@expcat/tigercat-core'
 
 export interface ChartTooltipProps {
   content: string
@@ -89,7 +89,7 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
   )
 
   // Use portal to render at body level
-  if (typeof document !== 'undefined') {
+  if (isBrowser()) {
     return createPortal(tooltip, document.body)
   }
 

@@ -6,6 +6,7 @@ import {
   isEscapeKey,
   isEventOutside,
   lockBodyScroll,
+  isBrowser,
   computeFloatingPosition,
   autoUpdateFloating,
   type FloatingPlacement,
@@ -85,7 +86,7 @@ export function useBodyScrollLock({ enabled }: UseBodyScrollLockOptions): void {
 }
 
 export function renderBodyPortal(node: React.ReactNode): React.ReactPortal | null {
-  if (typeof document === 'undefined') return null
+  if (!isBrowser()) return null
   return createPortal(node, document.body)
 }
 

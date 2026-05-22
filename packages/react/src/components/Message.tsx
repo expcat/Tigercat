@@ -130,13 +130,8 @@ export const MessageContainer: React.FC<MessageContainerProps> = ({ position = '
   useEffect(() => {
     // Register update callback
     updateCallback = () => {
-      flushSync(() => {
-        setMessages([...messageInstances])
-      })
+      setMessages([...messageInstances])
     }
-
-    // Initial sync
-    updateCallback()
 
     return () => {
       updateCallback = null
@@ -216,11 +211,15 @@ function addMessage(config: MessageConfig): () => void {
 
   messageInstances.push(instance)
 
+  const rootId = `${MESSAGE_CONTAINER_ID}-root`
+  const shouldUpdateExistingContainer =
+    isBrowser() && containerRoot !== null && document.getElementById(rootId) !== null
+
   // Ensure container exists after state is updated so it can render immediately.
   ensureContainer()
 
   // Trigger update
-  if (updateCallback) {
+  if (shouldUpdateExistingContainer && updateCallback) {
     updateCallback()
   }
 

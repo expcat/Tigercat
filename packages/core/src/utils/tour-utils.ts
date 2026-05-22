@@ -4,6 +4,7 @@
  */
 
 import type { TourPlacement } from '../types/tour'
+import { isBrowser } from './env'
 
 // ---------------------------------------------------------------------------
 // Classes
@@ -90,7 +91,7 @@ export function getTourPopoverPosition(
  * Returns undefined if not found.
  */
 export function getTourTargetRect(selector: string): TourRect | undefined {
-  if (typeof document === 'undefined') return undefined
+  if (!isBrowser()) return undefined
   const el = document.querySelector(selector)
   if (!el) return undefined
   const r = el.getBoundingClientRect()

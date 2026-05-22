@@ -1,7 +1,9 @@
+import { isBrowser } from './env'
+
 export const copyTextToClipboard = async (text: string): Promise<boolean> => {
   if (typeof text !== 'string') return false
 
-  if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+  if (isBrowser() && navigator.clipboard?.writeText) {
     try {
       await navigator.clipboard.writeText(text)
       return true
@@ -10,7 +12,7 @@ export const copyTextToClipboard = async (text: string): Promise<boolean> => {
     }
   }
 
-  if (typeof document === 'undefined') return false
+  if (!isBrowser()) return false
 
   try {
     const textarea = document.createElement('textarea')

@@ -8,6 +8,7 @@
  */
 
 import type { TaskBoardCard, TaskBoardColumn } from '../types/composite'
+import { isBrowser } from './env'
 import type { TaskBoardDragState, TouchDragTracker } from './task-board-utils'
 import {
   createCardDragData,
@@ -156,7 +157,7 @@ export function createTaskBoardDragController(
     // ---- lifecycle ----
     init() {
       if (
-        typeof window !== 'undefined' &&
+        isBrowser() &&
         ('ontouchstart' in window || navigator.maxTouchPoints > 0)
       ) {
         touchTracker = createTouchDragTracker()

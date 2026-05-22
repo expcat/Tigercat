@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, fireEvent } from '@testing-library/react'
+import { act, render, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { Table, type TableColumn } from '@expcat/tigercat-react'
 import { expectNoA11yViolations } from '../utils/react'
@@ -509,6 +509,10 @@ describe('Table', () => {
       const { container } = render(
         <Table columns={columns} dataSource={dataSource} pagination={false} />
       )
+
+      await act(async () => {
+        await Promise.resolve()
+      })
 
       await expectNoA11yViolations(container)
     })

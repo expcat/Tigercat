@@ -4,6 +4,7 @@
  */
 
 import type { CarouselDotPosition } from '../types/carousel'
+import { isBrowser } from './env'
 
 export type CarouselFrameCallback = (timestamp: number) => void
 
@@ -66,7 +67,7 @@ function getDefaultCurrentTime(): number {
 }
 
 function getDefaultVisibilityDocument(): CarouselVisibilityDocument | undefined {
-  return typeof document === 'undefined' ? undefined : document
+  return !isBrowser() ? undefined : document
 }
 
 function normalizeAutoplayInterval(interval: number): number {

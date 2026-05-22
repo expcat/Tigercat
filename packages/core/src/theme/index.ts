@@ -7,6 +7,8 @@ export * from './checkbox'
 export * from './switch'
 export * from './slider'
 
+import { isBrowser } from '../utils/env'
+
 /**
  * CSS variables for theme colors
  * These can be set on :root or any parent element to override theme colors
@@ -107,7 +109,7 @@ export function setThemeColors(
   colors: Partial<Record<keyof typeof THEME_CSS_VARS, string>>,
   element?: HTMLElement
 ): void {
-  const target = element || (typeof document !== 'undefined' ? document.documentElement : null)
+  const target = element || (isBrowser() ? document.documentElement : null)
 
   if (!target) {
     console.warn(
@@ -143,7 +145,7 @@ export function getThemeColor(
   colorKey: keyof typeof THEME_CSS_VARS,
   element?: HTMLElement
 ): string | undefined {
-  const target = element || (typeof document !== 'undefined' ? document.documentElement : null)
+  const target = element || (isBrowser() ? document.documentElement : null)
 
   if (!target) {
     return undefined

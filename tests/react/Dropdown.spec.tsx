@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { act, render, screen, fireEvent } from '@testing-library/react'
 import { Dropdown, DropdownMenu, DropdownItem } from '@expcat/tigercat-react'
 import React from 'react'
 import { expectNoA11yViolations } from '../utils/react'
@@ -274,6 +274,9 @@ describe('Dropdown', () => {
           </DropdownMenu>
         </Dropdown>
       )
+      await act(async () => {
+        await Promise.resolve()
+      })
       // Skip aria-allowed-attr: trigger div uses aria-expanded (known issue)
       const results = await axe(container, {
         rules: { 'aria-allowed-attr': { enabled: false } }

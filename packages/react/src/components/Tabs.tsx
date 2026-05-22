@@ -438,13 +438,21 @@ export const Tabs: React.FC<TabsProps> = ({
 
       items.push(
         React.cloneElement(child, {
+          key: `tab-${String(key)}`,
           renderMode: 'tab',
           tabId,
           panelId,
           tabIndex: key === resolvedActiveKey ? 0 : -1
         })
       )
-      panes.push(React.cloneElement(child, { renderMode: 'pane', tabId, panelId }))
+      panes.push(
+        React.cloneElement(child, {
+          key: `pane-${String(key)}`,
+          renderMode: 'pane',
+          tabId,
+          panelId
+        })
+      )
     })
 
     return { tabItems: items, tabPanes: panes, firstTabKey: firstKey, tabKeys: keys }

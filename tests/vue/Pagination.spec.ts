@@ -148,9 +148,7 @@ describe('Pagination', () => {
     })
 
     // Use default English label from i18n system
-    await fireEvent.change(screen.getByLabelText('/ page'), {
-      target: { value: '50' }
-    })
+    await fireEvent.update(screen.getByLabelText('/ page'), '50')
 
     expect(onPageSizeChange).toHaveBeenCalledWith(2, 50)
   })

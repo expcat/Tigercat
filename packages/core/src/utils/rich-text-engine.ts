@@ -28,6 +28,7 @@ import {
   isValidUrl,
   getToolbarButtons
 } from './rich-text-editor-utils'
+import { isBrowser } from './env'
 import type { ToolbarItem } from '../types/rich-text-editor'
 
 export interface RichTextEngineMountContext {
@@ -95,7 +96,7 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
       }
 
       const refreshActiveFormats = () => {
-        if (typeof document === 'undefined') return
+        if (!isBrowser()) return
         const next = new Set<string>()
         if (typeof document.queryCommandState !== 'function') {
           ctx.notifyActiveFormats(next)
@@ -113,7 +114,7 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
       element.addEventListener('input', handleInput)
 
       let selectionHandler: (() => void) | null = null
-      if (typeof document !== 'undefined') {
+      if (isBrowser()) {
         selectionHandler = refreshActiveFormats
         document.addEventListener('selectionchange', selectionHandler)
       }
@@ -146,7 +147,7 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
           return
         }
         if (actionName === 'link') {
-          const url = typeof window !== 'undefined' ? window.prompt('Enter URL:') : null
+          const url = isBrowser() ? window.prompt('Enter URL:') : null
           if (url && isValidUrl(url)) {
             document.execCommand('createLink', false, url)
             handleInput()
@@ -154,7 +155,7 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
           return
         }
         if (actionName === 'image') {
-          const url = typeof window !== 'undefined' ? window.prompt('Enter image URL:') : null
+          const url = isBrowser() ? window.prompt('Enter image URL:') : null
           if (url && isValidUrl(url)) {
             document.execCommand('insertImage', false, url)
             handleInput()
@@ -179,7 +180,7 @@ export function createBuiltinRichTextEngine(): RichTextEngine {
         },
         destroy() {
           element.removeEventListener('input', handleInput)
-          if (selectionHandler && typeof document !== 'undefined') {
+          if (selectionHandler && isBrowser()) {
             document.removeEventListener('selectionchange', selectionHandler)
           }
         }

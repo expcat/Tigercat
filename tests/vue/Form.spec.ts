@@ -678,7 +678,7 @@ describe('Form', () => {
       const input = screen.getByLabelText('name')
 
       // Trigger input event (which simulates change) on empty value
-      await fireEvent.input(input, { target: { value: '' } })
+      await fireEvent.update(input, '')
 
       // Change event should trigger validation
       expect(await screen.findByText('Name is required')).toBeInTheDocument()
@@ -724,7 +724,7 @@ describe('Form', () => {
       expect(await screen.findByText('Name is required')).toBeInTheDocument()
 
       // Enter valid value
-      await fireEvent.input(input, { target: { value: 'John' } })
+      await fireEvent.update(input, 'John')
       await fireEvent.focusOut(input)
 
       await waitFor(() => {
@@ -1637,7 +1637,7 @@ describe('Form', () => {
       expect(await screen.findByText('Password is required')).toBeInTheDocument()
 
       // Short password - should show min length error
-      await fireEvent.input(input, { target: { value: '123' } })
+      await fireEvent.update(input, '123')
       await fireEvent.focusOut(input)
 
       await waitFor(() => {

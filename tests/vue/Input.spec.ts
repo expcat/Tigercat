@@ -331,7 +331,7 @@ describe('Input', () => {
       })
 
       const input = getByRole('textbox')
-      await fireEvent.input(input, { target: { value: 'test' } })
+      await fireEvent.update(input, 'test')
 
       expect(onInput).toHaveBeenCalled()
     })
@@ -345,7 +345,8 @@ describe('Input', () => {
       })
 
       const input = getByRole('textbox')
-      await fireEvent.change(input, { target: { value: 'test' } })
+      await fireEvent.update(input, 'test')
+      input.dispatchEvent(new Event('change', { bubbles: true }))
 
       expect(onChange).toHaveBeenCalled()
     })
@@ -390,7 +391,7 @@ describe('Input', () => {
       })
 
       const input = getByRole('textbox')
-      await fireEvent.input(input, { target: { value: 'test' } })
+      await fireEvent.update(input, 'test')
 
       // Input is disabled, events should not fire
       expect(input).toBeDisabled()
@@ -419,7 +420,7 @@ describe('Input', () => {
       })
 
       const input = getByRole('textbox')
-      await fireEvent.input(input, { target: { value: 'a' } })
+      await fireEvent.update(input, 'a')
 
       expect(onInput).toHaveBeenCalled()
       expect(onUpdate).toHaveBeenCalled()
@@ -624,9 +625,9 @@ describe('Input', () => {
 
       const input = getByRole('textbox')
 
-      await fireEvent.input(input, { target: { value: 'a' } })
-      await fireEvent.input(input, { target: { value: 'ab' } })
-      await fireEvent.input(input, { target: { value: 'abc' } })
+      await fireEvent.update(input, 'a')
+      await fireEvent.update(input, 'ab')
+      await fireEvent.update(input, 'abc')
 
       expect(onUpdate).toHaveBeenCalledTimes(3)
     })
@@ -671,7 +672,7 @@ describe('Input', () => {
       })
 
       const input = getByRole('spinbutton')
-      await fireEvent.input(input, { target: { value: 'abc' } })
+      await fireEvent.update(input, 'abc')
 
       // Should still emit, but with string value when NaN
       expect(onUpdate).toHaveBeenCalled()

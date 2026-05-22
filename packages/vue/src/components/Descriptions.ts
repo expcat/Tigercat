@@ -15,6 +15,7 @@ import {
   descriptionsExtraClasses,
   descriptionsVerticalWrapperClasses,
   resolveResponsiveValue,
+  isBrowser,
   type DescriptionsSize,
   type DescriptionsLayout,
   type DescriptionsItem,
@@ -128,9 +129,9 @@ export const Descriptions = defineComponent({
   },
   setup(props, { slots, attrs }) {
     // Track window width for responsive column
-    const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
+    const windowWidth = ref(isBrowser() ? window.innerWidth : 1024)
     let onResize: (() => void) | undefined
-    if (typeof window !== 'undefined' && typeof props.column === 'object') {
+    if (isBrowser() && typeof props.column === 'object') {
       onResize = () => {
         windowWidth.value = window.innerWidth
       }

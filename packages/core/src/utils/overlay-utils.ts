@@ -1,4 +1,5 @@
 import { isTabKey, type KeyLikeEvent } from './a11y-utils'
+import { isBrowser } from './env'
 
 let bodyScrollLockCount = 0
 let previousBodyOverflow = ''
@@ -124,7 +125,7 @@ export function getFocusTrapNavigation(
 
 export function lockBodyScroll(targetDocument?: Document): () => void {
   const resolvedDocument =
-    targetDocument ?? (typeof document === 'undefined' ? undefined : document)
+    targetDocument ?? (isBrowser() ? document : undefined)
   const body = resolvedDocument?.body
   if (!body) return () => undefined
 

@@ -3,6 +3,8 @@
  * Shared logic for Affix components (Vue + React)
  */
 
+import { isBrowser } from './env'
+
 // ---------------------------------------------------------------------------
 // Classes
 // ---------------------------------------------------------------------------
@@ -82,7 +84,7 @@ export function resolveAffixTarget(selector?: string): {
   element: Element | Window
   getRect: () => { top: number; bottom: number }
 } {
-  if (typeof window === 'undefined') {
+  if (!isBrowser()) {
     return {
       element: null as unknown as Window,
       getRect: () => ({ top: 0, bottom: 0 })
@@ -153,7 +155,7 @@ export function createAffixObserver(sentinel: Element, options: AffixObserverOpt
       if (!entry) return
       const rootBoundsTop = entry.rootBounds?.top ?? 0
       const rootBoundsBottom =
-        entry.rootBounds?.bottom ?? (typeof window !== 'undefined' ? window.innerHeight : 0)
+        entry.rootBounds?.bottom ?? (isBrowser() ? window.innerHeight : 0)
       let affixed: boolean
       if (offsetBottom !== undefined) {
         affixed = !entry.isIntersecting && entry.boundingClientRect.bottom > rootBoundsBottom

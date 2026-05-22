@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render } from '@testing-library/react'
+import { act, render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 import { AutoComplete } from '@expcat/tigercat-react'
@@ -164,7 +164,9 @@ describe('AutoComplete', () => {
       const { container } = render(<AutoComplete options={options} />)
 
       const input = container.querySelector('input')!
-      input.focus()
+      act(() => {
+        input.focus()
+      })
       await user.keyboard('{ArrowDown}')
 
       expect(container.querySelector('[role="listbox"]')).toBeInTheDocument()
