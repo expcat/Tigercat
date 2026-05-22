@@ -590,7 +590,7 @@ export const SubMenu: React.FC<SubMenuProps> = ({
         }
       }
     },
-    [menuContext, disabled, isOpen, isPopup, openInline]
+    [menuContext, disabled, isOpen, isPopup, itemKey, openInline]
   )
 
   const indentStyle =

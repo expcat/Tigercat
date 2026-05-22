@@ -253,8 +253,7 @@ export const BarChart = defineComponent({
       activeOpacity: computed(() => props.activeOpacity),
       inactiveOpacity: computed(() => props.inactiveOpacity),
       legendPosition: computed(() => props.legendPosition),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      emit: emit as (event: string, ...args: any[]) => void,
+      emit: emit as (event: string, ...args: unknown[]) => void,
       getData: (index) => props.data[index],
       eventNames: { hover: 'bar-hover', click: 'bar-click' }
     })

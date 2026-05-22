@@ -85,8 +85,9 @@ export const Splitter: React.FC<SplitterProps> = ({
     }
   }, [children, direction, gutterSize, controlledSizes])
 
-  const mins = useMemo(() => paneSizes.map(() => min), [paneSizes.length, min])
-  const maxes = useMemo(() => paneSizes.map(() => max), [paneSizes.length, max])
+  const paneCount = paneSizes.length
+  const mins = useMemo(() => Array.from({ length: paneCount }, () => min), [paneCount, min])
+  const maxes = useMemo(() => Array.from({ length: paneCount }, () => max), [paneCount, max])
 
   const handleMouseDown = useCallback(
     (index: number, e: React.MouseEvent) => {

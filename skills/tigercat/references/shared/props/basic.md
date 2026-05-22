@@ -306,11 +306,14 @@ description: Shared props definitions for basic components - Alert, Avatar, Avat
 
 ### Events
 
-| Vue Event                 | React Callback           | Payload   | Description    |
-| ------------------------- | ------------------------ | --------- | -------------- |
-| `@load`                   | `onLoad`                 | `Event`   | 加载完成       |
-| `@error`                  | `onError`                | `Event`   | 加载失败       |
-| `@preview-visible-change` | `onPreviewVisibleChange` | `boolean` | 预览可见性变化 |
+| Vue Event                     | React Callback               | Payload   | Description              |
+| ----------------------------- | ---------------------------- | --------- | ------------------------ |
+| `@load`                       | `onLoad`                     | `Event`   | 加载完成                 |
+| `@error`                      | `onError`                    | `Event`   | 加载失败                 |
+| `@preview-open-change`        | `onPreviewOpenChange`        | `boolean` | 预览可见性变化           |
+| ~~`@preview-visible-change`~~ | ~~`onPreviewVisibleChange`~~ | `boolean` | **已废弃**，使用上方替代 |
+
+> **迁移指南**：`preview-visible-change`（Vue）/ `onPreviewVisibleChange`（React）自 v1.0 起废弃，将在 v2.0 移除。开发环境会输出 `console.warn` 提示。请迁移到 `preview-open-change` / `onPreviewOpenChange`。
 
 ### Slots / Children
 
@@ -325,16 +328,17 @@ description: Shared props definitions for basic components - Alert, Avatar, Avat
 
 ### Props
 
-| Prop         | Type       | Default | Vue | React | Description  |
-| ------------ | ---------- | ------- | :-: | :---: | ------------ |
-| open         | `boolean`  | `false` |  ✓  |   ✓   | 是否可见     |
-| images       | `string[]` | -       |  ✓  |   ✓   | 预览图片列表 |
-| currentIndex | `number`   | `0`     |  ✓  |   ✓   | 当前显示索引 |
-| zIndex       | `number`   | `1050`  |  ✓  |   ✓   | 层级         |
-| maskClosable | `boolean`  | `true`  |  ✓  |   ✓   | 点击遮罩关闭 |
-| scaleStep    | `number`   | `0.5`   |  ✓  |   ✓   | 每次缩放步长 |
-| minScale     | `number`   | `0.25`  |  ✓  |   ✓   | 最小缩放倍率 |
-| maxScale     | `number`   | `5`     |  ✓  |   ✓   | 最大缩放倍率 |
+| Prop         | Type       | Default | Vue | React | Description                  |
+| ------------ | ---------- | ------- | :-: | :---: | ---------------------------- |
+| open         | `boolean`  | `false` |  ✓  |   ✓   | 是否可见                     |
+| ~~visible~~  | `boolean`  | -       |  ✓  |   ✓   | **已废弃**，使用 `open` 替代 |
+| images       | `string[]` | -       |  ✓  |   ✓   | 预览图片列表                 |
+| currentIndex | `number`   | `0`     |  ✓  |   ✓   | 当前显示索引                 |
+| zIndex       | `number`   | `1050`  |  ✓  |   ✓   | 层级                         |
+| maskClosable | `boolean`  | `true`  |  ✓  |   ✓   | 点击遮罩关闭                 |
+| scaleStep    | `number`   | `0.5`   |  ✓  |   ✓   | 每次缩放步长                 |
+| minScale     | `number`   | `0.25`  |  ✓  |   ✓   | 最小缩放倍率                 |
+| maxScale     | `number`   | `5`     |  ✓  |   ✓   | 最大缩放倍率                 |
 
 ### Events
 
@@ -343,6 +347,8 @@ description: Shared props definitions for basic components - Alert, Avatar, Avat
 | `@update:open`         | `onOpenChange`         | `boolean` | 可见性变化   |
 | `@update:currentIndex` | `onCurrentIndexChange` | `number`  | 当前索引变化 |
 | `@scale-change`        | `onScaleChange`        | `number`  | 缩放倍率变化 |
+
+> **迁移指南**：`visible` 自 v0.5.0 起废弃，将在 v2.0 移除。开发环境会输出 `console.warn` 提示。请迁移到 `open`。
 
 ---
 
@@ -354,6 +360,14 @@ description: Shared props definitions for basic components - Alert, Avatar, Avat
 | --------- | --------- | ------- | :-: | :---: | ---------------- |
 | preview   | `boolean` | `true`  |  ✓  |   ✓   | 是否启用点击预览 |
 | className | `string`  | -       |  -  |   ✓   | 自定义类名       |
+
+### Events
+
+| Vue Event                 | React Callback           | Payload   | Description    |
+| ------------------------- | ------------------------ | --------- | -------------- |
+| `@preview-visible-change` | `onPreviewVisibleChange` | `boolean` | 预览可见性变化 |
+
+> **注意**：ImageGroup 的 `preview-visible-change` / `onPreviewVisibleChange` 尚未提供新 API 替代，后续将对齐 Image 的命名迁移到 `preview-open-change` / `onPreviewOpenChange`。
 
 ### Behavior
 

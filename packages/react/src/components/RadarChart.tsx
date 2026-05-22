@@ -269,7 +269,7 @@ export const RadarChart: React.FC<RadarChartProps> = ({
         outerIndex > 0 ? angles.map((angle) => polarToCartesian(cx, cy, innerRadius, angle)) : []
       return { type: 'polygon-ring' as const, outerPoints, innerPoints, color }
     })
-  }, [showSplitArea, levels, angles, radius, cx, cy, gridShape, splitAreaColors, splitAreaOpacity])
+  }, [showSplitArea, levels, angles, radius, cx, cy, gridShape, splitAreaColors])
 
   const axisLines = useMemo(() => {
     if (!showAxis || angles.length === 0) return []

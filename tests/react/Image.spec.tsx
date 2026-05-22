@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { Image } from '@expcat/tigercat-react'
@@ -94,6 +94,40 @@ describe('Image', () => {
     fireEvent.error(img as Element)
 
     expect(container.querySelector('[data-testid="custom-error"]')).toBeInTheDocument()
+  })
+
+  it('calls new and deprecated preview callbacks when preview opens', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const onPreviewOpenChange = vi.fn()
+    const onPreviewVisibleChange = vi.fn()
+
+    const { container } = render(
+      <Image
+        src="/test.jpg"
+        onPreviewOpenChange={onPreviewOpenChange}
+        onPreviewVisibleChange={onPreviewVisibleChange}
+      />
+    )
+
+    fireEvent.click(container.firstElementChild as Element)
+
+    expect(onPreviewOpenChange).toHaveBeenCalledWith(true)
+    expect(onPreviewVisibleChange).toHaveBeenCalledWith(true)
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(warn).toHaveBeenCalledWith(
+      '[Tigercat] Image: "onPreviewVisibleChange" prop is deprecated and will be removed in v2.0. Use "onPreviewOpenChange" instead.'
+    )
+
+    warn.mockRestore()
+  })
+
+  it('does not warn when deprecated preview callback is not used', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
+    render(<Image src="/test.jpg" onPreviewOpenChange={vi.fn()} />)
+
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
   })
 
   it('passes accessibility checks', async () => {

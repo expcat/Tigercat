@@ -62,7 +62,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
 
       onChange?.(newValue)
     },
-    [disabled, isControlled, onChange]
+    [disabled, isControlled, setInternalValue, onChange]
   )
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {

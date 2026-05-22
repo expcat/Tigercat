@@ -53,6 +53,7 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
     typeof createCollapseTransitionController
   > | null>(null)
   const initialContentStyleRef = useRef<React.CSSProperties>(getInitialCollapseContentStyle(false))
+  const initialActiveRef = useRef<boolean | null>(null)
 
   if (!collapseContext) {
     throw new Error('CollapsePanel must be used within a Collapse component')
@@ -63,8 +64,12 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
     return isPanelActive(panelKey, collapseContext.activeKeys)
   }, [panelKey, collapseContext.activeKeys])
 
+  if (initialActiveRef.current === null) {
+    initialActiveRef.current = isActive
+  }
+
   if (!transitionControllerRef.current) {
-    initialContentStyleRef.current = getInitialCollapseContentStyle(isActive)
+    initialContentStyleRef.current = getInitialCollapseContentStyle(initialActiveRef.current)
   }
 
   // Panel classes
@@ -87,7 +92,7 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
     if (!disabled) {
       collapseContext.handlePanelClick(panelKey)
     }
-  }, [disabled, collapseContext.handlePanelClick, panelKey])
+  }, [disabled, collapseContext, panelKey])
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
@@ -101,14 +106,14 @@ export const CollapsePanel: React.FC<CollapsePanelProps> = ({
         collapseContext.handlePanelClick(panelKey)
       }
     },
-    [disabled, collapseContext.handlePanelClick, panelKey]
+    [disabled, collapseContext, panelKey]
   )
 
   useLayoutEffect(() => {
     if (!contentRef.current) return undefined
 
     const controller = createCollapseTransitionController(contentRef.current, {
-      expanded: isActive
+      expanded: initialActiveRef.current ?? false
     })
     transitionControllerRef.current = controller
 

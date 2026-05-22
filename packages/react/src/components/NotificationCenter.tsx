@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react'
+import React, { useMemo, useEffect, useState, useCallback } from 'react'
 import {
   classNames,
   buildNotificationGroups,
@@ -109,13 +109,16 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     if (manageReadState) setReadStateOverrides(new Map())
   }, [items, manageReadState])
 
-  const applyReadOverrides = (list: NotificationItem[]): NotificationItem[] => {
-    if (!manageReadState || readStateOverrides.size === 0) return list
-    return list.map((item) => {
-      const override = readStateOverrides.get(item.id)
-      return override !== undefined ? { ...item, read: override } : item
-    })
-  }
+  const applyReadOverrides = useCallback(
+    (list: NotificationItem[]): NotificationItem[] => {
+      if (!manageReadState || readStateOverrides.size === 0) return list
+      return list.map((item) => {
+        const override = readStateOverrides.get(item.id)
+        return override !== undefined ? { ...item, read: override } : item
+      })
+    },
+    [manageReadState, readStateOverrides]
+  )
 
   const effectiveGroups = useMemo(
     () =>
@@ -123,7 +126,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
         ...group,
         items: applyReadOverrides(group.items)
       })),
-    [resolvedGroups, readStateOverrides]
+    [resolvedGroups, applyReadOverrides]
   )
 
   const effectiveCurrentGroup = useMemo(() => {
@@ -139,7 +142,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     () => effectiveCurrentGroup?.items ?? [],
     [effectiveCurrentGroup]
   )
-  const effectiveItems = useMemo(() => applyReadOverrides(items), [items, readStateOverrides])
+  const effectiveItems = useMemo(() => applyReadOverrides(items), [items, applyReadOverrides])
 
   const hasUnread = useMemo(
     () => effectiveCurrentGroupItems.some((item) => !item.read),
@@ -280,21 +283,14 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
     <div className="-mx-4 -mb-4">
       <Tabs type="line" size="small" activeKey={currentGroupKey} onChange={handleGroupChange}>
         {groupTabData.map((tab) => (
-          <TabPane
-            key={String(tab.key)}
-            tabKey={tab.key}
-            label={tab.label}>
-            <div className="max-h-[380px] overflow-y-auto">
-              {renderList(tab.filteredItems)}
-            </div>
+          <TabPane key={String(tab.key)} tabKey={tab.key} label={tab.label}>
+            <div className="max-h-[380px] overflow-y-auto">{renderList(tab.filteredItems)}</div>
           </TabPane>
         ))}
       </Tabs>
     </div>
   ) : (
-    <div className="-mx-4 -mb-4 max-h-[380px] overflow-y-auto">
-      {renderList(filteredFlatItems)}
-    </div>
+    <div className="-mx-4 -mb-4 max-h-[380px] overflow-y-auto">{renderList(filteredFlatItems)}</div>
   )
 
   return (

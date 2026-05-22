@@ -9,14 +9,14 @@ source: project audit and planning
 
 已完成条目直接删除，剩余工作合并到新待办。
 
-> **最近完成**（2026-05-21）：§1.2 统一 SSR 守卫 — 将 20 个文件中 32 处原始 `typeof window/document/navigator` 检查收敛到 `env.ts` 的 `isBrowser()`，构建 + 5812 测试全部通过。
+> **最近完成**（2026-05-22）：§1.2 审计 `any` 残留 — 源码中 6 处 `any` 全部消除：emit 签名改用 `unknown[]`（useChartInteraction/BarChart）、`use-floating-popup` 改用接口方法语法（bivariant）、Dropdown 改用 `cloneVNode()`、DataTableWithToolbar 改用 `Component` 类型。构建 + 5820 测试全部通过。
 
 ## 基线 v1.1.0
 
 | 指标       | 数据                                                                  |
 | ---------- | --------------------------------------------------------------------- |
 | 组件       | 133+（Vue 3 + React 双端，含 12 种 SVG 图表）                         |
-| 测试       | 5812 cases / 309 files                                                |
+| 测试       | 5820 cases / 309 files                                                |
 | 覆盖率     | Stmts 84.66% / Branch 77.68% / Funcs 86.06% / Lines 86.64%            |
 | E2E        | 56 passed（Chromium）                                                 |
 | validate   | 226/226 通过，458 warnings                                            |
@@ -52,7 +52,7 @@ source: project audit and planning
 ### 1.2 代码质量扫描
 
 - [ ] 清理未使用的工具函数（`packages/core/src/utils/` 100+ 文件，审计死代码）
-- [ ] 审计 `any` 残留（测试文件中 validate 已禁止，源码中再扫一轮）
+- [x] 审计 `any` 残留（测试文件中 validate 已禁止，源码 0 处残留）
 
 ---
 
@@ -68,9 +68,9 @@ source: project audit and planning
 
 ### 2.2 执行步骤
 
-- [ ] v1.2：开发环境 console.warn 输出 deprecation 提示，生产环境静默
-- [ ] v1.2：`skills/tigercat/references/shared/props/basic.md` Image 部分添加迁移说明
-- [ ] v1.x：Example 中所有用法迁移到新 API，旧别名仅保留兼容层
+- [x] v1.2：开发环境 console.warn 输出 deprecation 提示，生产环境静默
+- [x] v1.2：`skills/tigercat/references/shared/props/basic.md` Image 部分添加迁移说明
+- [x] v1.x：Example 中所有用法已使用新 API，旧别名仅保留为兼容层
 - [ ] v2.0：删除废弃 prop/事件、移除兼容层代码，CHANGELOG 标注 Breaking Change
 
 ### 2.3 预防机制

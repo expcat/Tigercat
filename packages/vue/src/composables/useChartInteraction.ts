@@ -26,8 +26,7 @@ export interface UseChartInteractionOptions<T = unknown> {
   /** Legend position for wrapper classes */
   legendPosition?: ChartLegendPosition | Ref<ChartLegendPosition | undefined>
   /** Emit function from setup context */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  emit: (event: string, ...args: any[]) => void
+  emit: (event: string, ...args: unknown[]) => void
   /** Get data item by index */
   getData?: (index: number) => T | undefined
   /** Custom event names */

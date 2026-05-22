@@ -6,7 +6,8 @@ import {
   PropType,
   ref,
   watch,
-  type VNodeArrayChildren
+  type VNodeArrayChildren,
+  type Component
 } from 'vue'
 import {
   classNames,
@@ -461,8 +462,7 @@ export const DataTableWithToolbar = defineComponent({
         },
         [
           renderToolbar(),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          h(Table as unknown as any, tableProps)
+          h(Table as unknown as Component, tableProps)
         ]
       )
     }

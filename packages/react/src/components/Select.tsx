@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   classNames,
   getSelectTriggerClasses,
@@ -68,8 +68,13 @@ export const Select: React.FC<SelectProps> = (props) => {
     noDataText = 'No options available',
     maxTagCount,
     onSearch,
-    className
+    className,
+    value,
+    onChange,
+    multiple
   } = props
+
+  const isMultiple = multiple === true
 
   const SELECT_KEYS = new Set([
     'options',
@@ -117,10 +122,10 @@ export const Select: React.FC<SelectProps> = (props) => {
   const allOptions = useMemo(() => flattenSelectOptions(options), [options])
 
   const displayText = useMemo(() => {
-    if (isMultipleSelect(props)) {
-      const value = props.value ?? []
-      if (value.length === 0) return placeholder
-      const labels = allOptions.filter((opt) => value.includes(opt.value)).map((opt) => opt.label)
+    if (isMultiple) {
+      const values = Array.isArray(value) ? value : []
+      if (values.length === 0) return placeholder
+      const labels = allOptions.filter((opt) => values.includes(opt.value)).map((opt) => opt.label)
       if (maxTagCount !== undefined && labels.length > maxTagCount) {
         const visible = labels.slice(0, maxTagCount)
         return `${visible.join(', ')} +${labels.length - maxTagCount}`
@@ -128,39 +133,41 @@ export const Select: React.FC<SelectProps> = (props) => {
       return labels.join(', ')
     }
 
-    const value = props.value
     if (value === undefined || value === null || value === '') return placeholder
     return allOptions.find((opt) => opt.value === value)?.label ?? placeholder
-  }, [props.multiple, props.value, allOptions, placeholder, maxTagCount])
+  }, [isMultiple, value, allOptions, placeholder, maxTagCount])
 
   const showClearButton = useMemo(
     () =>
       clearable &&
       !disabled &&
-      props.value !== undefined &&
-      props.value !== null &&
-      props.value !== '' &&
-      (!Array.isArray(props.value) || props.value.length > 0),
-    [clearable, disabled, props.value]
+      value !== undefined &&
+      value !== null &&
+      value !== '' &&
+      (!Array.isArray(value) || value.length > 0),
+    [clearable, disabled, value]
   )
 
   const isSelected = (option: SelectOption): boolean => {
-    if (isMultipleSelect(props)) {
-      return (props.value ?? []).includes(option.value)
+    if (isMultiple) {
+      return (Array.isArray(value) ? value : []).includes(option.value)
     }
-    return props.value === option.value
+    return value === option.value
   }
 
   const getOptionId = (index: number) => `tiger-select-option-${instanceId}-${index}`
 
-  const findFirstEnabledIndex = (): number => pickerFindFirstEnabledIndex(flatFilteredOptions)
+  const findFirstEnabledIndex = useCallback(
+    (): number => pickerFindFirstEnabledIndex(flatFilteredOptions),
+    [flatFilteredOptions]
+  )
 
   const findLastEnabledIndex = (): number => pickerFindLastEnabledIndex(flatFilteredOptions)
 
   const findNextEnabledIndex = (current: number, direction: 1 | -1): number =>
     pickerFindNextEnabledIndex(flatFilteredOptions, current, direction)
 
-  const focusOptionAt = (index: number) => {
+  const focusOptionAt = useCallback((index: number) => {
     if (index < 0) {
       return
     }
@@ -170,7 +177,7 @@ export const Select: React.FC<SelectProps> = (props) => {
       el?.focus()
       el?.scrollIntoView({ block: 'nearest' })
     })
-  }
+  }, [])
 
   const setActiveAndFocus = (index: number) => {
     setActiveIndex(index)
@@ -209,17 +216,17 @@ export const Select: React.FC<SelectProps> = (props) => {
       return
     }
 
-    if (isMultipleSelect(props)) {
-      const currentValue = props.value ?? []
+    if (isMultiple) {
+      const currentValue = Array.isArray(value) ? value : []
       const nextValue = currentValue.includes(option.value)
         ? currentValue.filter((v) => v !== option.value)
         : [...currentValue, option.value]
 
-      props.onChange?.(nextValue)
+      ;(onChange as ((value: SelectValues) => void) | undefined)?.(nextValue)
       return
     }
 
-    props.onChange?.(option.value)
+    ;(onChange as ((value: SelectValue | undefined) => void) | undefined)?.(option.value)
     closeDropdown()
     requestAnimationFrame(() => {
       triggerRef.current?.focus()
@@ -229,12 +236,12 @@ export const Select: React.FC<SelectProps> = (props) => {
   const clearSelection = (event: React.MouseEvent) => {
     event.stopPropagation()
 
-    if (isMultipleSelect(props)) {
-      props.onChange?.([])
+    if (isMultiple) {
+      ;(onChange as ((value: SelectValues) => void) | undefined)?.([])
       return
     }
 
-    props.onChange?.(undefined)
+    ;(onChange as ((value: SelectValue | undefined) => void) | undefined)?.(undefined)
   }
 
   const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -395,15 +402,14 @@ export const Select: React.FC<SelectProps> = (props) => {
     }
 
     const selectedIndex = (() => {
-      if (isMultipleSelect(props)) {
-        const value = props.value ?? []
-        if (value.length === 0) {
+      if (isMultiple) {
+        const values = Array.isArray(value) ? value : []
+        if (values.length === 0) {
           return -1
         }
-        return flatFilteredOptions.findIndex((opt) => value.includes(opt.value) && !opt.disabled)
+        return flatFilteredOptions.findIndex((opt) => values.includes(opt.value) && !opt.disabled)
       }
 
-      const value = props.value
       if (value === undefined || value === null || value === '') {
         return -1
       }
@@ -416,7 +422,15 @@ export const Select: React.FC<SelectProps> = (props) => {
     if (!searchable) {
       focusOptionAt(nextActive)
     }
-  }, [isOpen, searchable, flatFilteredOptions, props.multiple, props.value])
+  }, [
+    isOpen,
+    searchable,
+    flatFilteredOptions,
+    isMultiple,
+    value,
+    findFirstEnabledIndex,
+    focusOptionAt
+  ])
 
   useEffect(() => {
     if (!isOpen) {

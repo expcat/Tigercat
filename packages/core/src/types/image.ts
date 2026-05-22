@@ -126,6 +126,12 @@ export interface ImagePreviewProps {
   open?: boolean
 
   /**
+   * Whether the preview is open
+   * @deprecated Use `open` instead. This compatibility alias will be removed in v2.0.
+   */
+  visible?: boolean
+
+  /**
    * Array of image URLs to preview
    */
   images: string[]

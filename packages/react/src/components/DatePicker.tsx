@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react'
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import {
   classNames,
   icon20ViewBox,
@@ -190,6 +190,18 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     () => getCalendarDays(viewingYear, viewingMonth),
     [viewingYear, viewingMonth]
   )
+  const selectedDateRef = useRef<Date | null>(selectedDate)
+  const selectedRangeRef = useRef<DatePickerRangeValue>(selectedRange)
+  const minDateParsedRef = useRef<Date | null>(minDateParsed)
+  const maxDateParsedRef = useRef<Date | null>(maxDateParsed)
+  const calendarDaysRef = useRef<Array<Date | null>>(calendarDays)
+
+  selectedDateRef.current = selectedDate
+  selectedRangeRef.current = selectedRange
+  minDateParsedRef.current = minDateParsed
+  maxDateParsedRef.current = maxDateParsed
+  calendarDaysRef.current = calendarDays
+
   const localeCode = useMemo(() => getDatePickerLocaleCode(props.locale), [props.locale])
 
   const dayNames = useMemo(() => getShortDayNames(localeCode), [localeCode])
@@ -214,36 +226,43 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     }
   }
 
-  const closeCalendar = () => {
+  const closeCalendar = useCallback(() => {
     setIsOpen(false)
-  }
+  }, [])
 
-  const getFirstEnabledIsoInView = (): string | null => {
-    for (const date of calendarDays) {
+  const isDateDisabled = useCallback((date: Date | null): boolean => {
+    if (!date) return true
+    return !isDateInRange(date, minDateParsedRef.current, maxDateParsedRef.current)
+  }, [])
+
+  const getFirstEnabledIsoInView = useCallback((): string | null => {
+    for (const date of calendarDaysRef.current) {
       if (!date) continue
       const iso = formatDate(date, 'yyyy-MM-dd')
       const isDisabled = isDateDisabled(date)
       if (!isDisabled) return iso
     }
     return null
-  }
+  }, [isDateDisabled])
 
-  const getPreferredFocusIso = (): string | null => {
-    const focusDate = isRangeMode ? (selectedRange[0] ?? selectedRange[1]) : selectedDate
+  const getPreferredFocusIso = useCallback((): string | null => {
+    const focusDate = isRangeMode
+      ? (selectedRangeRef.current[0] ?? selectedRangeRef.current[1])
+      : selectedDateRef.current
 
     if (focusDate) {
       return formatDate(focusDate, 'yyyy-MM-dd')
     }
 
     const today = normalizeDate(new Date())
-    if (isDateInRange(today, minDateParsed, maxDateParsed)) {
+    if (isDateInRange(today, minDateParsedRef.current, maxDateParsedRef.current)) {
       return formatDate(today, 'yyyy-MM-dd')
     }
 
     return getFirstEnabledIsoInView()
-  }
+  }, [isRangeMode, getFirstEnabledIsoInView])
 
-  const focusDateButtonByIso = (iso: string): boolean => {
+  const focusDateButtonByIso = useCallback((iso: string): boolean => {
     const button = calendarRef.current?.querySelector(
       `button[data-date="${iso}"]`
     ) as HTMLButtonElement | null
@@ -252,15 +271,15 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     button.focus()
     setActiveDateIso(iso)
     return true
-  }
+  }, [])
 
-  const restoreFocus = () => {
+  const restoreFocus = useCallback(() => {
     const target = restoreFocusRef.current ?? inputRef.current
     if (!target) return
     if (typeof (target as HTMLElement).focus === 'function') {
       ;(target as HTMLElement).focus()
     }
-  }
+  }, [])
 
   const addDays = (date: Date, days: number): Date => {
     const next = new Date(date)
@@ -448,11 +467,6 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     }
   }
 
-  const isDateDisabled = (date: Date | null): boolean => {
-    if (!date) return true
-    return !isDateInRange(date, minDateParsed, maxDateParsed)
-  }
-
   const isCurrentMonth = (date: Date | null): boolean => {
     if (!date) return false
     return date.getMonth() === viewingMonth
@@ -487,7 +501,14 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
     }
 
     setTimeout(() => restoreFocus(), 0)
-  }, [isOpen])
+  }, [
+    isOpen,
+    closeCalendar,
+    focusDateButtonByIso,
+    getFirstEnabledIsoInView,
+    getPreferredFocusIso,
+    restoreFocus
+  ])
 
   useEffect(() => {
     if (!isOpen) return
@@ -500,7 +521,7 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
       const fallback = getFirstEnabledIsoInView()
       if (fallback) focusDateButtonByIso(fallback)
     }, 0)
-  }, [isOpen, viewingMonth, viewingYear])
+  }, [isOpen, focusDateButtonByIso, getFirstEnabledIsoInView])
 
   const inputClasses = useMemo(
     () => getDatePickerInputClasses(size, disabled || readonly),

@@ -24,6 +24,29 @@ describe('ImagePreview', () => {
     expect(dialog).toHaveAttribute('aria-modal', 'true')
   })
 
+  it('supports deprecated visible prop with warning', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
+    render(<ImagePreview visible images={images} />)
+
+    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument()
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(warn).toHaveBeenCalledWith(
+      '[Tigercat] ImagePreview: "visible" prop is deprecated and will be removed in v2.0. Use "open" instead.'
+    )
+
+    warn.mockRestore()
+  })
+
+  it('prefers open over deprecated visible prop', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
+    render(<ImagePreview open={false} visible images={images} />)
+
+    expect(document.querySelector('[role="dialog"]')).not.toBeInTheDocument()
+    warn.mockRestore()
+  })
+
   it('displays current image', () => {
     render(<ImagePreview open images={images} currentIndex={1} />)
 

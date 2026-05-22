@@ -72,6 +72,19 @@ export const Image: React.FC<ImageProps> = ({
   const containerRef = useRef<HTMLDivElement>(null)
   const group = useContext(ImageGroupContext)
   const registeredIndexRef = useRef(-1)
+  const deprecationWarnedRef = useRef(false)
+
+  // Deprecation warning for onPreviewVisibleChange
+  useEffect(() => {
+    const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
+      ?.env
+    if (env?.NODE_ENV !== 'production' && onPreviewVisibleChange && !deprecationWarnedRef.current) {
+      deprecationWarnedRef.current = true
+      console.warn(
+        '[Tigercat] Image: "onPreviewVisibleChange" prop is deprecated and will be removed in v2.0. Use "onPreviewOpenChange" instead.'
+      )
+    }
+  }, [onPreviewVisibleChange])
 
   // Register/unregister with group
   useEffect(() => {

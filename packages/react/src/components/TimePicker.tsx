@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react'
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import {
   classNames,
   icon20ViewBox,
@@ -166,7 +166,7 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
   const [selectedPeriod, setSelectedPeriod] = useState<'AM' | 'PM'>('AM')
 
   // Update internal state when value changes (or active part changes in range mode)
-  const syncFromActiveValue = () => {
+  const syncFromActiveValue = useCallback(() => {
     const parsed = parseTime(activeValue)
     if (!parsed) return
 
@@ -178,11 +178,11 @@ export const TimePicker: React.FC<TimePickerProps> = (allProps) => {
       const { period } = to12HourFormat(parsed.hours)
       setSelectedPeriod(period)
     }
-  }
+  }, [activeValue, format])
 
   useEffect(() => {
     syncFromActiveValue()
-  }, [activeValue, format, activePart, isRangeMode])
+  }, [syncFromActiveValue])
 
   const labels = useMemo(
     () => getTimePickerLabels(locale, labelsOverrides),

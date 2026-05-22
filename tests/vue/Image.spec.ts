@@ -149,6 +149,45 @@ describe('Image', () => {
     expect(emitted()).toHaveProperty('error')
   })
 
+  it('emits new and deprecated preview events when preview opens', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const onPreviewVisibleChange = vi.fn()
+
+    const { container, emitted } = render(Image, {
+      props: {
+        src: '/test.jpg',
+        onPreviewVisibleChange
+      }
+    })
+
+    await fireEvent.click(container.firstElementChild as Element)
+
+    expect(emitted()['preview-open-change'][0]).toEqual([true])
+    expect(emitted()['preview-visible-change'][0]).toEqual([true])
+    expect(onPreviewVisibleChange).toHaveBeenCalledWith(true)
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(warn).toHaveBeenCalledWith(
+      '[Tigercat] Image: "preview-visible-change" event is deprecated and will be removed in v2.0. Use "preview-open-change" instead.'
+    )
+
+    warn.mockRestore()
+  })
+
+  it('does not warn when deprecated preview event is not used', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
+    const { container } = render(Image, {
+      props: {
+        src: '/test.jpg'
+      }
+    })
+
+    await fireEvent.click(container.firstElementChild as Element)
+
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
+  })
+
   it('passes accessibility checks', async () => {
     const { container } = render(Image, {
       props: {

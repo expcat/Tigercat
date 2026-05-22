@@ -29,8 +29,7 @@ export interface UseFloatingPopupOptions {
     offset?: number
   }
   /** Vue emit function (accepts any overloaded emit signature) */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  emit: (...args: any[]) => void
+  emit(event: string, ...args: unknown[]): void
   /**
    * Whether the component supports multi-trigger-type (click/hover/focus/manual).
    * Popconfirm is click-only so this should be false for it.

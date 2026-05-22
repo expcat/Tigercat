@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import type { RateProps as CoreRateProps } from '@expcat/tigercat-core'
 import {
   rateBaseClasses,
@@ -37,37 +37,43 @@ export const Rate: React.FC<RateProps> = ({
   const displayValue = hoverValue > 0 ? hoverValue : value
   const isChar = !!character
 
-  function getStarValue(index: number, isHalf: boolean): number {
+  const getStarValue = useCallback((index: number, isHalf: boolean): number => {
     return isHalf ? index + 0.5 : index + 1
-  }
+  }, [])
 
-  function handleClick(index: number, e: React.MouseEvent) {
-    if (disabled) return
-    const el = e.currentTarget as HTMLElement
-    const rect = el.getBoundingClientRect()
-    const half = allowHalf && e.clientX - rect.left < rect.width / 2
-    const val = getStarValue(index, half)
-    const newVal = allowClear && val === value ? 0 : val
-    onChange?.(newVal)
-  }
+  const handleClick = useCallback(
+    (index: number, e: React.MouseEvent) => {
+      if (disabled) return
+      const el = e.currentTarget as HTMLElement
+      const rect = el.getBoundingClientRect()
+      const half = allowHalf && e.clientX - rect.left < rect.width / 2
+      const val = getStarValue(index, half)
+      const newVal = allowClear && val === value ? 0 : val
+      onChange?.(newVal)
+    },
+    [disabled, allowHalf, getStarValue, allowClear, value, onChange]
+  )
 
-  function handleMouseMove(index: number, e: React.MouseEvent) {
-    if (disabled) return
-    const el = e.currentTarget as HTMLElement
-    const rect = el.getBoundingClientRect()
-    const half = allowHalf && e.clientX - rect.left < rect.width / 2
-    const val = getStarValue(index, half)
-    if (val !== hoverValue) {
-      setHoverValue(val)
-      onHoverChange?.(val)
-    }
-  }
+  const handleMouseMove = useCallback(
+    (index: number, e: React.MouseEvent) => {
+      if (disabled) return
+      const el = e.currentTarget as HTMLElement
+      const rect = el.getBoundingClientRect()
+      const half = allowHalf && e.clientX - rect.left < rect.width / 2
+      const val = getStarValue(index, half)
+      if (val !== hoverValue) {
+        setHoverValue(val)
+        onHoverChange?.(val)
+      }
+    },
+    [disabled, allowHalf, getStarValue, hoverValue, onHoverChange]
+  )
 
-  function handleMouseLeave() {
+  const handleMouseLeave = useCallback(() => {
     if (disabled) return
     setHoverValue(0)
     onHoverChange?.(0)
-  }
+  }, [disabled, onHoverChange])
 
   const starIcon = useMemo(
     () => (
@@ -130,11 +136,10 @@ export const Rate: React.FC<RateProps> = ({
     size,
     character,
     isChar,
-    value,
-    allowClear,
-    onChange,
-    onHoverChange,
-    starIcon
+    starIcon,
+    handleClick,
+    handleMouseMove,
+    handleMouseLeave
   ])
 
   return (

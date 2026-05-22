@@ -9,6 +9,7 @@ import {
   onMounted,
   nextTick,
   VNode,
+  cloneVNode,
   watch
 } from 'vue'
 import {
@@ -428,15 +429,7 @@ export const Dropdown = defineComponent({
               onKeydown: handleMenuKeyDown,
               hidden: !currentVisible.value
             },
-            [
-              h(
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (menuNode as VNode).type as any,
-                { ...((menuNode as VNode).props || {}), id: menuId },
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (menuNode as VNode).children as any
-              )
-            ]
+            [cloneVNode(menuNode as VNode, { id: menuId })]
           )
         : null
 

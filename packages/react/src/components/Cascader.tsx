@@ -115,7 +115,7 @@ export const Cascader: React.FC<CascaderProps> = (props) => {
       setActivePath(value ? [...value] : [])
       setSearchQuery('')
     }
-  }, [isOpen])
+  }, [isOpen, value])
 
   // Click outside to close
   useEffect(() => {
