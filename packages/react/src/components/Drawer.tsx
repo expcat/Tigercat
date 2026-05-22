@@ -26,6 +26,7 @@ import { renderBodyPortal, useBodyScrollLock, useEscapeKey, useFocusTrap } from 
 
 export interface DrawerProps
   extends CoreDrawerProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'title' | 'children'> {
+  onOpenChange?: (open: boolean) => void
   onClose?: () => void
   onAfterEnter?: () => void
   onAfterLeave?: () => void
@@ -71,6 +72,7 @@ export const Drawer: React.FC<DrawerProps> = ({
   bodyClassName,
   destroyOnClose = false,
   onClose,
+  onOpenChange,
   onAfterEnter,
   onAfterLeave,
   closeAriaLabel,
@@ -89,8 +91,9 @@ export const Drawer: React.FC<DrawerProps> = ({
   const shouldRender = destroyOnClose ? open : hasBeenOpened
 
   const handleClose = useCallback(() => {
+    onOpenChange?.(false)
     onClose?.()
-  }, [onClose])
+  }, [onOpenChange, onClose])
 
   const handleMaskClick = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {

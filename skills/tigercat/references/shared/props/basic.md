@@ -614,7 +614,7 @@ description: Shared props definitions for basic components - Alert, Avatar, Avat
 
 | Vue Event              | React Callback  | Payload   | Description  |
 | ---------------------- | --------------- | --------- | ------------ |
-| `@update:open`         | -               | `boolean` | 可见性变化   |
+| `@update:open`         | `onOpenChange`  | `boolean` | 可见性变化   |
 | `@update:currentIndex` | `onIndexChange` | `number`  | 当前索引变化 |
 | `@close`               | `onClose`       | -         | 关闭事件     |
 

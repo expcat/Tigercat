@@ -54,6 +54,15 @@ describe('Drawer', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
+  it('should call onOpenChange with false when close button is clicked', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+
+    render(<Drawer open={true} title="Test Drawer" onOpenChange={onOpenChange} />)
+    await user.click(screen.getByLabelText('Close drawer'))
+    expect(onOpenChange).toHaveBeenCalledWith(false)
+  })
+
   it('should allow overriding close aria-label via locale', async () => {
     const user = userEvent.setup()
     const onClose = vi.fn()

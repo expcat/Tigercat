@@ -51,7 +51,7 @@ const [open, setOpen] = useState(false)
   placement="right"
   size="md"
   footer={<Button variant="secondary" onClick={() => setOpen(false)}>关闭</Button>}
-  onClose={() => setOpen(false)}>
+  onOpenChange={setOpen}>
   <p>Drawer content</p>
 </Drawer>
 
@@ -59,17 +59,17 @@ const [open, setOpen] = useState(false)
 <Drawer
   open={open}
   header={<span>⚙️ 设置</span>}
-  onClose={() => setOpen(false)}>
+  onOpenChange={setOpen}>
   <p>Content</p>
 </Drawer>
 
 {/* 无蒙层 / 点击蒙层不关闭 / 隐藏关闭按钮 */}
-<Drawer open={open} mask={false} title="无蒙层" onClose={() => setOpen(false)} />
-<Drawer open={open} maskClosable={false} title="蒙层不可关" onClose={() => setOpen(false)} />
-<Drawer open={open} closable={false} title="无关闭按钮" onClose={() => setOpen(false)} />
+<Drawer open={open} mask={false} title="无蒙层" onOpenChange={setOpen} />
+<Drawer open={open} maskClosable={false} title="蒙层不可关" onOpenChange={setOpen} />
+<Drawer open={open} closable={false} title="无关闭按钮" onOpenChange={setOpen} />
 
 {/* 关闭时销毁内容 */}
-<Drawer open={open} destroyOnClose title="销毁模式" onClose={() => setOpen(false)}>
+<Drawer open={open} destroyOnClose title="销毁模式" onOpenChange={setOpen}>
   <FormContent />
 </Drawer>
 
@@ -77,7 +77,7 @@ const [open, setOpen] = useState(false)
 <Drawer
   open={open}
   title="动画"
-  onClose={() => setOpen(false)}
+  onOpenChange={setOpen}
   onAfterEnter={() => console.log('opened')}
   onAfterLeave={() => console.log('closed')}>
   <p>Content</p>

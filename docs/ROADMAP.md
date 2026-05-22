@@ -9,7 +9,7 @@ source: project audit and planning
 
 已完成条目直接删除，剩余工作合并到新待办。
 
-> **最近完成**（2026-05-23）：§1.1 第一批 validate warnings 消化 — 为 226 个 Vue/React 测试文件补齐 a11y 检查和 Edge Cases 描述块。新增 `expectNoA11yViolationsIsolated` 隔离测试辅助函数（禁用 label/button-name/aria-required-children/aria-prohibited-attr/aria-input-field-name 等独立测试无法满足的规则）。122 个组件级 a11y 测试 + 210 个 Edge Cases 块添加完成；对 hook/composable 单测跳过 DOM a11y 误报。validate warnings 从 458 降至 97。全量测试 6108 cases 通过。
+> **最近完成**（2026-05-23）：§2.3 预防机制全部完成 — `scripts/validate-api.mjs` 新增 `overlay-api` 规则：自动扫描弹出层组件类型中的 `open` 属性，交叉校验 Vue 是否发射 `update:open`、React 是否有 `onOpenChange` 回调；`deprecated-in-example` 规则改为按 prop/event 使用形态扫描，避免把示例局部变量误判为废弃 API。Drawer/Tour/ImageViewer 的 React `onOpenChange` 和 Example 废弃引用已同步修复。
 
 ## 基线 v1.1.0
 
@@ -75,8 +75,8 @@ source: project audit and planning
 
 ### 2.3 预防机制
 
-- [ ] `scripts/validate-api.mjs` 新增规则：检测 `@deprecated` 标注的 API 是否仍被 Example 引用
-- [ ] 新增 API 设计审查：弹出层组件统一 `open` / `update:open`，禁止再引入 `visible`
+- [x] `scripts/validate-api.mjs` 新增规则：检测 `@deprecated` 标注的 API 是否仍被 Example 引用
+- [x] 新增 API 设计审查：弹出层组件统一 `open` / `update:open`，禁止再引入 `visible`
 
 ---
 

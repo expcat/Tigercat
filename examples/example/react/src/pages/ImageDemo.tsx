@@ -62,13 +62,13 @@ const groupSnippet = `{/* ImageGroup：多图关联预览 */}
   </div>
 </ImageGroup>`
 
-const standalonePreviewSnippet = `<button onClick={() => setVisible(true)}>打开预览</button>
-<ImagePreview open={visible} images={photos} currentIndex={0}
-  onOpenChange={setVisible} />`
+const standalonePreviewSnippet = `<button onClick={() => setPreviewOpen(true)}>打开预览</button>
+<ImagePreview open={previewOpen} images={photos} currentIndex={0}
+  onOpenChange={setPreviewOpen} />`
 
 const standalonePreviewScriptSnippet = `import { useState } from 'react'
 
-const [visible, setVisible] = useState(false)`
+const [previewOpen, setPreviewOpen] = useState(false)`
 
 const noPreviewSnippet = `{/* 关闭预览 */}
 <Image src="${PHOTOS[0]}" width={200} height={150} preview={false} alt="无预览" />`
@@ -76,7 +76,7 @@ const noPreviewSnippet = `{/* 关闭预览 */}
 const FIT_MODES = ['contain', 'cover', 'fill', 'none', 'scale-down'] as const
 
 export default function ImageDemo() {
-  const [previewVisible, setPreviewVisible] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -207,14 +207,14 @@ export default function ImageDemo() {
         script={standalonePreviewScriptSnippet}>
         <button
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-          onClick={() => setPreviewVisible(true)}>
+          onClick={() => setPreviewOpen(true)}>
           打开预览
         </button>
         <ImagePreview
-          open={previewVisible}
+          open={previewOpen}
           images={PHOTOS}
           currentIndex={0}
-          onOpenChange={setPreviewVisible}
+          onOpenChange={setPreviewOpen}
         />
       </DemoBlock>
     </div>

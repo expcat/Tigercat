@@ -85,13 +85,24 @@ describe('Tour', () => {
     const user = userEvent.setup()
     const onFinish = vi.fn()
     const onClose = vi.fn()
-    render(<Tour steps={baseSteps} open={true} current={2} onFinish={onFinish} onClose={onClose} />)
+    const onOpenChange = vi.fn()
+    render(
+      <Tour
+        steps={baseSteps}
+        open={true}
+        current={2}
+        onFinish={onFinish}
+        onClose={onClose}
+        onOpenChange={onOpenChange}
+      />
+    )
 
     await waitFor(() => expect(screen.getByText('Finish')).toBeInTheDocument())
     await user.click(screen.getByText('Finish'))
 
     expect(onFinish).toHaveBeenCalled()
     expect(onClose).toHaveBeenCalled()
+    expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
   it('should respect controlled current prop', async () => {
@@ -105,12 +116,14 @@ describe('Tour', () => {
   it('should render close button by default and emit onClose', async () => {
     const user = userEvent.setup()
     const onClose = vi.fn()
-    render(<Tour steps={baseSteps} open={true} onClose={onClose} />)
+    const onOpenChange = vi.fn()
+    render(<Tour steps={baseSteps} open={true} onClose={onClose} onOpenChange={onOpenChange} />)
 
     await waitFor(() => expect(screen.getByLabelText('Close tour')).toBeInTheDocument())
     await user.click(screen.getByLabelText('Close tour'))
 
     expect(onClose).toHaveBeenCalled()
+    expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
   it('should hide close button when closable is false', async () => {

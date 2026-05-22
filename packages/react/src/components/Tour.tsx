@@ -20,6 +20,8 @@ import {
 import { StatusIcon } from './shared/icons'
 
 export interface TourProps extends CoreTourProps {
+  /** Callback when open state changes */
+  onOpenChange?: (open: boolean) => void
   /** Callback when close button is clicked or tour finishes */
   onClose?: () => void
   /** Callback when tour finishes (last step "Next") */
@@ -38,6 +40,7 @@ export const Tour: React.FC<TourProps> = ({
   closable = true,
   showIndicators = true,
   className,
+  onOpenChange,
   onClose,
   onFinish,
   onChange
@@ -84,17 +87,19 @@ export const Tour: React.FC<TourProps> = ({
       goTo(currentStep + 1)
     } else {
       onFinish?.()
+      onOpenChange?.(false)
       onClose?.()
     }
-  }, [currentStep, steps.length, goTo, onFinish, onClose])
+  }, [currentStep, steps.length, goTo, onFinish, onOpenChange, onClose])
 
   const prev = useCallback(() => {
     if (currentStep > 0) goTo(currentStep - 1)
   }, [currentStep, goTo])
 
   const close = useCallback(() => {
+    onOpenChange?.(false)
     onClose?.()
-  }, [onClose])
+  }, [onOpenChange, onClose])
 
   if (!open || !step) return null
   if (!isBrowser()) return null

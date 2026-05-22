@@ -80,7 +80,7 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 | Vue Event      | React Callback | Description  |
 | -------------- | -------------- | ------------ |
-| `@update:open` | -              | 显示状态变更 |
+| `@update:open` | `onOpenChange` | 显示状态变更 |
 | `@close`       | `onClose`      | 关闭事件     |
 | `@after-enter` | `onAfterEnter` | 打开动画结束 |
 | `@after-leave` | `onAfterLeave` | 关闭动画结束 |
@@ -352,13 +352,13 @@ description: Shared props definitions for feedback components - Drawer, Loading,
 
 ### Events
 
-| Vue Event         | React Prop | Payload             | Description      |
-| ----------------- | ---------- | ------------------- | ---------------- |
-| `@update:open`    | -          | `boolean`           | 显示状态变更     |
-| `@update:current` | -          | `number`            | 当前步骤索引变更 |
-| `@close`          | `onClose`  | -                   | 关闭事件         |
-| `@change`         | `onChange` | `(current: number)` | 步骤切换         |
-| `@finish`         | `onFinish` | -                   | 引导完成         |
+| Vue Event         | React Prop     | Payload             | Description      |
+| ----------------- | -------------- | ------------------- | ---------------- |
+| `@update:open`    | `onOpenChange` | `boolean`           | 显示状态变更     |
+| `@update:current` | -              | `number`            | 当前步骤索引变更 |
+| `@close`          | `onClose`      | -                   | 关闭事件         |
+| `@change`         | `onChange`     | `(current: number)` | 步骤切换         |
+| `@finish`         | `onFinish`     | -                   | 引导完成         |
 
 > **Vue**: 支持 `v-model:open` 和 `v-model:current` 双向绑定
 

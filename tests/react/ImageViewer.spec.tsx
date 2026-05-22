@@ -86,6 +86,14 @@ describe('ImageViewer', () => {
       await fireEvent.click(closeBtn)
       expect(onClose).toHaveBeenCalledTimes(1)
     })
+
+    it('calls onOpenChange with false on close button click', async () => {
+      const onOpenChange = vi.fn()
+      render(<ImageViewer images={images} open onOpenChange={onOpenChange} />)
+      const closeBtn = screen.getAllByLabelText('Close').find((el) => el.tagName === 'BUTTON')!
+      await fireEvent.click(closeBtn)
+      expect(onOpenChange).toHaveBeenCalledWith(false)
+    })
   })
 
   describe('Navigation', () => {

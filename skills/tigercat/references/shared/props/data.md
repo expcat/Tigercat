@@ -13,43 +13,43 @@ description: Shared props definitions for data display components - Calendar, Im
 
 ### Props
 
-| Prop              | Type                                          | Default     | Vue | React | Description             |
-| ----------------- | --------------------------------------------- | ----------- | :-: | :---: | ----------------------- |
-| columns           | `TableColumn[]`                               | required    |  ✓  |   ✓   | 列配置                  |
-| dataSource        | `T[]`                                         | `[]`        |  ✓  |   ✓   | 数据源                  |
-| rowKey            | `string \| ((record: T) => string \| number)` | `'id'`      |  ✓  |   ✓   | 行唯一键                |
-| size              | `'sm' \| 'md' \| 'lg'`                        | `'md'`      |  ✓  |   ✓   | 尺寸                    |
-| bordered          | `boolean`                                     | `false`     |  ✓  |   ✓   | 显示边框                |
-| striped           | `boolean`                                     | `false`     |  ✓  |   ✓   | 斑马纹                  |
-| hoverable         | `boolean`                                     | `true`      |  ✓  |   ✓   | 行悬停高亮              |
-| loading           | `boolean`                                     | `false`     |  ✓  |   ✓   | 加载状态                |
-| emptyText         | `string`                                      | `'No data'` |  ✓  |   ✓   | 空数据文案              |
-| sort              | `SortState`                                   | -           |  ✓  |   ✓   | 受控排序状态            |
-| defaultSort       | `SortState`                                   | -           |  ✓  |   ✓   | 非受控默认排序          |
-| filters           | `Record<string, unknown>`                     | -           |  ✓  |   ✓   | 受控筛选状态            |
-| defaultFilters    | `Record<string, unknown>`                     | -           |  ✓  |   ✓   | 非受控默认筛选          |
-| pagination        | `PaginationConfig \| false`                   | `{...}`     |  ✓  |   ✓   | 分页配置，false 禁用    |
-| rowSelection      | `RowSelectionConfig`                          | -           |  ✓  |   ✓   | 行选择配置              |
-| expandable        | `ExpandableConfig`                            | -           |  ✓  |   ✓   | 行展开配置              |
-| rowClassName      | `string \| ((record, index) => string)`       | -           |  ✓  |   ✓   | 自定义行 class          |
-| stickyHeader      | `boolean`                                     | `false`     |  ✓  |   ✓   | 固定表头                |
-| maxHeight         | `string \| number`                            | -           |  ✓  |   ✓   | 最大高度（启用滚动）    |
-| tableLayout       | `'auto' \| 'fixed'`                           | `'auto'`    |  ✓  |   ✓   | 表格布局算法            |
-| virtual           | `boolean`                                     | `false`     |  ✓  |   ✓   | 启用 Table 滚动视口     |
-| virtualHeight     | `number`                                      | `400`       |  ✓  |   ✓   | virtual 视口高度        |
-| virtualItemHeight | `number`                                      | `40`        |  ✓  |   ✓   | virtual 行高提示        |
-| virtualThreshold  | `number`                                      | `1000`      |  ✓  |   ✓   | 大数据 virtual 推荐阈值 |
-| columnLockable    | `boolean`                                     | `false`     |  ✓  |   ✓   | 显示列锁定按钮          |
-| exportable        | `boolean`                                     | `false`     |  ✓  |   ✓   | 显示 CSV 导出按钮       |
-| exportFilename    | `string`                                      | `'export'`  |  ✓  |   ✓   | CSV 导出文件名          |
-| editable          | `boolean`                                     | `false`     |  ✓  |   ✓   | 启用单元格编辑          |
-| editableCells     | `Map<string, Set<number>>`                    | -           |  ✓  |   ✓   | 可编辑单元格集合        |
-| filterMode        | `'basic' \| 'advanced'`                       | `'basic'`   |  ✓  |   ✓   | 筛选模式                |
-| advancedFilterRules | `FilterRule[]`                              | -           |  ✓  |   ✓   | 高级筛选规则            |
-| columnDraggable   | `boolean`                                     | `false`     |  ✓  |   ✓   | 启用列拖拽排序          |
-| summaryRow        | `{ show: boolean; data: Record<string, unknown> }` | -      |  ✓  |   ✓   | 汇总行配置              |
-| groupBy           | `string`                                      | -           |  ✓  |   ✓   | 按列键分组              |
-| className         | `string`                                      | -           |  ✗  |   ✓   | 额外 CSS class（React） |
+| Prop                | Type                                               | Default     | Vue | React | Description             |
+| ------------------- | -------------------------------------------------- | ----------- | :-: | :---: | ----------------------- |
+| columns             | `TableColumn[]`                                    | required    |  ✓  |   ✓   | 列配置                  |
+| dataSource          | `T[]`                                              | `[]`        |  ✓  |   ✓   | 数据源                  |
+| rowKey              | `string \| ((record: T) => string \| number)`      | `'id'`      |  ✓  |   ✓   | 行唯一键                |
+| size                | `'sm' \| 'md' \| 'lg'`                             | `'md'`      |  ✓  |   ✓   | 尺寸                    |
+| bordered            | `boolean`                                          | `false`     |  ✓  |   ✓   | 显示边框                |
+| striped             | `boolean`                                          | `false`     |  ✓  |   ✓   | 斑马纹                  |
+| hoverable           | `boolean`                                          | `true`      |  ✓  |   ✓   | 行悬停高亮              |
+| loading             | `boolean`                                          | `false`     |  ✓  |   ✓   | 加载状态                |
+| emptyText           | `string`                                           | `'No data'` |  ✓  |   ✓   | 空数据文案              |
+| sort                | `SortState`                                        | -           |  ✓  |   ✓   | 受控排序状态            |
+| defaultSort         | `SortState`                                        | -           |  ✓  |   ✓   | 非受控默认排序          |
+| filters             | `Record<string, unknown>`                          | -           |  ✓  |   ✓   | 受控筛选状态            |
+| defaultFilters      | `Record<string, unknown>`                          | -           |  ✓  |   ✓   | 非受控默认筛选          |
+| pagination          | `PaginationConfig \| false`                        | `{...}`     |  ✓  |   ✓   | 分页配置，false 禁用    |
+| rowSelection        | `RowSelectionConfig`                               | -           |  ✓  |   ✓   | 行选择配置              |
+| expandable          | `ExpandableConfig`                                 | -           |  ✓  |   ✓   | 行展开配置              |
+| rowClassName        | `string \| ((record, index) => string)`            | -           |  ✓  |   ✓   | 自定义行 class          |
+| stickyHeader        | `boolean`                                          | `false`     |  ✓  |   ✓   | 固定表头                |
+| maxHeight           | `string \| number`                                 | -           |  ✓  |   ✓   | 最大高度（启用滚动）    |
+| tableLayout         | `'auto' \| 'fixed'`                                | `'auto'`    |  ✓  |   ✓   | 表格布局算法            |
+| virtual             | `boolean`                                          | `false`     |  ✓  |   ✓   | 启用 Table 滚动视口     |
+| virtualHeight       | `number`                                           | `400`       |  ✓  |   ✓   | virtual 视口高度        |
+| virtualItemHeight   | `number`                                           | `40`        |  ✓  |   ✓   | virtual 行高提示        |
+| virtualThreshold    | `number`                                           | `1000`      |  ✓  |   ✓   | 大数据 virtual 推荐阈值 |
+| columnLockable      | `boolean`                                          | `false`     |  ✓  |   ✓   | 显示列锁定按钮          |
+| exportable          | `boolean`                                          | `false`     |  ✓  |   ✓   | 显示 CSV 导出按钮       |
+| exportFilename      | `string`                                           | `'export'`  |  ✓  |   ✓   | CSV 导出文件名          |
+| editable            | `boolean`                                          | `false`     |  ✓  |   ✓   | 启用单元格编辑          |
+| editableCells       | `Map<string, Set<number>>`                         | -           |  ✓  |   ✓   | 可编辑单元格集合        |
+| filterMode          | `'basic' \| 'advanced'`                            | `'basic'`   |  ✓  |   ✓   | 筛选模式                |
+| advancedFilterRules | `FilterRule[]`                                     | -           |  ✓  |   ✓   | 高级筛选规则            |
+| columnDraggable     | `boolean`                                          | `false`     |  ✓  |   ✓   | 启用列拖拽排序          |
+| summaryRow          | `{ show: boolean; data: Record<string, unknown> }` | -           |  ✓  |   ✓   | 汇总行配置              |
+| groupBy             | `string`                                           | -           |  ✓  |   ✓   | 按列键分组              |
+| className           | `string`                                           | -           |  ✗  |   ✓   | 额外 CSS class（React） |
 
 > Table 不会自动打开 virtual，以避免布局行为突变；当 `dataSource.length >= virtualThreshold` 且未启用 `virtual` 时，组件会在根节点提供 `data-tiger-virtual-recommended="true"` 作为可检测建议。超大数据表优先使用 `VirtualTable`。
 
@@ -283,7 +283,7 @@ description: Shared props definitions for data display components - Calendar, Im
 
 | Vue Event              | React Callback  | Payload   | Description      |
 | ---------------------- | --------------- | --------- | ---------------- |
-| `@update:open`         | -               | `boolean` | 显示状态变更     |
+| `@update:open`         | `onOpenChange`  | `boolean` | 显示状态变更     |
 | `@update:currentIndex` | `onIndexChange` | `number`  | 当前图片索引变更 |
 | `@close`               | `onClose`       | -         | 关闭事件         |
 

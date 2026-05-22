@@ -12,7 +12,7 @@ const PHOTOS = [
   'https://picsum.photos/seed/tiger6/600/400'
 ]
 
-const previewVisible = ref(false)
+const previewOpen = ref(false)
 
 const basicSnippet = `<div class="flex gap-4 flex-wrap">
   <Image src="${PHOTOS[0]}" alt="示例图片" :width="200" :height="150" />
@@ -69,12 +69,12 @@ const groupSnippet = `<!-- ImageGroup：多图关联预览 -->
   </div>
 </ImageGroup>`
 
-const standalonePreviewSnippet = `<button @click="previewVisible = true">打开预览</button>
-<ImagePreview v-model:visible="previewVisible" :images="photos" :current-index="0" />`
+const standalonePreviewSnippet = `<button @click="previewOpen = true">打开预览</button>
+<ImagePreview v-model:open="previewOpen" :images="photos" :current-index="0" />`
 
 const standalonePreviewScriptSnippet = `import { ref } from 'vue'
 
-const previewVisible = ref(false)`
+const previewOpen = ref(false)`
 
 const noPreviewSnippet = `<!-- 关闭预览 -->
 <Image src="${PHOTOS[0]}" :width="200" :height="150" :preview="false" alt="无预览" />`
@@ -97,7 +97,7 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
     <DemoBlock title="适配模式" description="fit 属性控制图片在容器中的适配方式" :code="fitSnippet">
       <div class="flex gap-4 flex-wrap">
         <div
-          v-for="mode in (['contain', 'cover', 'fill', 'none', 'scale-down'] as const)"
+          v-for="mode in ['contain', 'cover', 'fill', 'none', 'scale-down'] as const"
           :key="mode"
           class="text-center">
           <Image
@@ -113,16 +113,26 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
       </div>
     </DemoBlock>
 
-    <DemoBlock title="加载失败回退" description="设置 fallbackSrc 或使用 error 插槽自定义错误状态" :code="fallbackSnippet">
+    <DemoBlock
+      title="加载失败回退"
+      description="设置 fallbackSrc 或使用 error 插槽自定义错误状态"
+      :code="fallbackSnippet">
       <div class="flex gap-4 items-start">
         <div class="text-center">
-          <Image src="/broken.jpg" :fallback-src="PHOTOS[0]" :width="150" :height="100" alt="回退示例" :preview="false" />
+          <Image
+            src="/broken.jpg"
+            :fallback-src="PHOTOS[0]"
+            :width="150"
+            :height="100"
+            alt="回退示例"
+            :preview="false" />
           <p class="text-xs text-gray-500 mt-1">fallbackSrc 回退</p>
         </div>
         <div class="text-center">
           <Image src="/broken.jpg" :width="150" :height="100" alt="错误插槽" :preview="false">
             <template #error>
-              <div class="flex items-center justify-center w-full h-full bg-gray-100 text-gray-400 text-sm rounded">
+              <div
+                class="flex items-center justify-center w-full h-full bg-gray-100 text-gray-400 text-sm rounded">
                 加载失败
               </div>
             </template>
@@ -132,11 +142,15 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
       </div>
     </DemoBlock>
 
-    <DemoBlock title="懒加载" description="lazy 属性开启 IntersectionObserver 懒加载" :code="lazySnippet">
+    <DemoBlock
+      title="懒加载"
+      description="lazy 属性开启 IntersectionObserver 懒加载"
+      :code="lazySnippet">
       <div class="flex gap-4">
         <Image :src="PHOTOS[2]" :width="200" :height="150" lazy alt="懒加载" :preview="false">
           <template #placeholder>
-            <div class="flex items-center justify-center w-full h-full bg-gray-100 text-gray-400 text-sm animate-pulse rounded">
+            <div
+              class="flex items-center justify-center w-full h-full bg-gray-100 text-gray-400 text-sm animate-pulse rounded">
               加载中…
             </div>
           </template>
@@ -156,11 +170,17 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
       </div>
     </DemoBlock>
 
-    <DemoBlock title="关闭预览" description="设置 :preview=&quot;false&quot; 禁用点击预览" :code="noPreviewSnippet">
+    <DemoBlock
+      title="关闭预览"
+      description='设置 :preview="false" 禁用点击预览'
+      :code="noPreviewSnippet">
       <Image :src="PHOTOS[0]" :width="200" :height="150" :preview="false" alt="无预览" />
     </DemoBlock>
 
-    <DemoBlock title="图片组 ImageGroup" description="用 ImageGroup 包裹多张 Image，点击任一图片进入多图预览" :code="groupSnippet">
+    <DemoBlock
+      title="图片组 ImageGroup"
+      description="用 ImageGroup 包裹多张 Image，点击任一图片进入多图预览"
+      :code="groupSnippet">
       <ImageGroup>
         <div class="flex gap-4 flex-wrap">
           <Image
@@ -181,10 +201,10 @@ const noPreviewSnippet = `<!-- 关闭预览 -->
       :script="standalonePreviewScriptSnippet">
       <button
         class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-        @click="previewVisible = true">
+        @click="previewOpen = true">
         打开预览
       </button>
-      <ImagePreview v-model:visible="previewVisible" :images="PHOTOS" :current-index="0" />
+      <ImagePreview v-model:open="previewOpen" :images="PHOTOS" :current-index="0" />
     </DemoBlock>
   </div>
 </template>

@@ -101,29 +101,37 @@ import { Button } from '@expcat/tigercat-react'
 ## Icon 图标
 
 ```tsx
-{/* 基础用法（默认 md / currentColor） */}
-<Icon>
+{
+  /* 基础用法（默认 md / currentColor） */
+}
+;<Icon>
   <svg viewBox="0 0 24 24">
     <path d="M5 12h14" />
   </svg>
 </Icon>
 
-{/* 尺寸 + 颜色 */}
-<Icon size="xl" color="#f00">
+{
+  /* 尺寸 + 颜色 */
+}
+;<Icon size="xl" color="#f00">
   <svg viewBox="0 0 24 24">
     <path d="M6 6l12 12M18 6l-12 12" />
   </svg>
 </Icon>
 
-{/* 填充图标（覆盖 SVG 默认值） */}
-<Icon size="lg">
+{
+  /* 填充图标（覆盖 SVG 默认值） */
+}
+;<Icon size="lg">
   <svg viewBox="0 0 20 20" fill="currentColor" stroke="none">
     <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
   </svg>
 </Icon>
 
-{/* 语义化图标（a11y） */}
-<Icon aria-label="搜索">
+{
+  /* 语义化图标（a11y） */
+}
+;<Icon aria-label="搜索">
   <svg viewBox="0 0 24 24">
     <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
   </svg>
@@ -334,22 +342,30 @@ import { Empty, Button } from '@expcat/tigercat-react'
 ```tsx
 import { Result, Button } from '@expcat/tigercat-react'
 
-{/* 成功 */}
-<Result
+{
+  /* 成功 */
+}
+;<Result
   status="success"
   title="操作成功"
   subTitle="订单已提交"
   extra={<Button variant="primary">返回首页</Button>}
 />
 
-{/* 错误 */}
-<Result status="error" title="提交失败" subTitle="请检查输入内容" />
+{
+  /* 错误 */
+}
+;<Result status="error" title="提交失败" subTitle="请检查输入内容" />
 
-{/* 404 */}
-<Result status="404" title="404" subTitle="页面不存在" />
+{
+  /* 404 */
+}
+;<Result status="404" title="404" subTitle="页面不存在" />
 
-{/* 自定义图标 */}
-<Result status="info" title="提示" icon={<span>💡</span>} />
+{
+  /* 自定义图标 */
+}
+;<Result status="info" title="提示" icon={<span>💡</span>} />
 ```
 
 ---
@@ -359,14 +375,20 @@ import { Result, Button } from '@expcat/tigercat-react'
 ```tsx
 import { QRCode } from '@expcat/tigercat-react'
 
-{/* 基本用法 */}
-<QRCode value="https://example.com" />
+{
+  /* 基本用法 */
+}
+;<QRCode value="https://example.com" />
 
-{/* 自定义尺寸与颜色 */}
-<QRCode value="hello" size={200} color="#1677ff" />
+{
+  /* 自定义尺寸与颜色 */
+}
+;<QRCode value="hello" size={200} color="#1677ff" />
 
-{/* 过期状态 + 刷新 */}
-<QRCode value="expired" status="expired" onRefresh={handleRefresh} />
+{
+  /* 过期状态 + 刷新 */
+}
+;<QRCode value="expired" status="expired" onRefresh={handleRefresh} />
 ```
 
 ---
@@ -400,23 +422,35 @@ import { Rate } from '@expcat/tigercat-react'
 
 const [score, setScore] = useState(3)
 
-{/* 基本用法 */}
-<Rate value={score} onChange={setScore} />
+{
+  /* 基本用法 */
+}
+;<Rate value={score} onChange={setScore} />
 
-{/* 半选 */}
-<Rate value={score} onChange={setScore} allowHalf />
+{
+  /* 半选 */
+}
+;<Rate value={score} onChange={setScore} allowHalf />
 
-{/* 自定义字符 */}
-<Rate value={score} onChange={setScore} character="❤" />
+{
+  /* 自定义字符 */
+}
+;<Rate value={score} onChange={setScore} character="❤" />
 
-{/* 尺寸 */}
-<Rate value={score} onChange={setScore} size="lg" />
+{
+  /* 尺寸 */
+}
+;<Rate value={score} onChange={setScore} size="lg" />
 
-{/* 禁用 */}
-<Rate value={4} disabled />
+{
+  /* 禁用 */
+}
+;<Rate value={4} disabled />
 
-{/* 事件 */}
-<Rate value={score} onChange={setScore} onHoverChange={handleHover} />
+{
+  /* 事件 */
+}
+;<Rate value={score} onChange={setScore} onHoverChange={handleHover} />
 ```
 
 ---
@@ -434,17 +468,25 @@ const options = [
   { value: 'monthly', label: '月' }
 ]
 
-{/* 基本用法 */}
-<Segmented value={selected} onChange={setSelected} options={options} />
+{
+  /* 基本用法 */
+}
+;<Segmented value={selected} onChange={setSelected} options={options} />
 
-{/* 尺寸 */}
-<Segmented value={selected} onChange={setSelected} options={options} size="sm" />
+{
+  /* 尺寸 */
+}
+;<Segmented value={selected} onChange={setSelected} options={options} size="sm" />
 
-{/* 撑满容器 */}
-<Segmented value={selected} onChange={setSelected} options={options} block />
+{
+  /* 撑满容器 */
+}
+;<Segmented value={selected} onChange={setSelected} options={options} block />
 
-{/* 禁用 */}
-<Segmented value={selected} onChange={setSelected} options={options} disabled />
+{
+  /* 禁用 */
+}
+;<Segmented value={selected} onChange={setSelected} options={options} disabled />
 ```
 
 ---
@@ -454,23 +496,31 @@ const options = [
 ```tsx
 import { Watermark } from '@expcat/tigercat-react'
 
-{/* 文字水印 */}
-<Watermark content="Tigercat">
+{
+  /* 文字水印 */
+}
+;<Watermark content="Tigercat">
   <div style={{ height: 300 }}>内容区域</div>
 </Watermark>
 
-{/* 多行文字 */}
-<Watermark content={['Tigercat', '2026-05-06']}>
+{
+  /* 多行文字 */
+}
+;<Watermark content={['Tigercat', '2026-05-06']}>
   <div style={{ height: 300 }}>内容区域</div>
 </Watermark>
 
-{/* 图片水印 */}
-<Watermark image="/logo.png" width={80} height={40}>
+{
+  /* 图片水印 */
+}
+;<Watermark image="/logo.png" width={80} height={40}>
   <div style={{ height: 300 }}>内容区域</div>
 </Watermark>
 
-{/* 自定义字体 */}
-<Watermark content="Confidential" font={{ fontSize: 20, color: 'rgba(255,0,0,0.1)' }}>
+{
+  /* 自定义字体 */
+}
+;<Watermark content="Confidential" font={{ fontSize: 20, color: 'rgba(255,0,0,0.1)' }}>
   <div style={{ height: 300 }}>内容区域</div>
 </Watermark>
 ```
@@ -483,17 +533,17 @@ import { Watermark } from '@expcat/tigercat-react'
 import { useState } from 'react'
 import { ImageViewer, Button } from '@expcat/tigercat-react'
 
-const [visible, setVisible] = useState(false)
+const [open, setOpen] = useState(false)
 const images = ['/a.jpg', '/b.jpg', '/c.jpg']
 
-<Button onClick={() => setVisible(true)}>打开查看器</Button>
+<Button onClick={() => setOpen(true)}>打开查看器</Button>
 
 {/* 基本用法 */}
-<ImageViewer open={visible} images={images} onClose={() => setVisible(false)} />
+<ImageViewer open={open} images={images} onOpenChange={setOpen} />
 
 {/* 禁用旋转 */}
-<ImageViewer open={visible} images={images} rotatable={false} onClose={() => setVisible(false)} />
+<ImageViewer open={open} images={images} rotatable={false} onOpenChange={setOpen} />
 
 {/* 自定义缩放范围 */}
-<ImageViewer open={visible} images={images} minZoom={0.2} maxZoom={5} onClose={() => setVisible(false)} />
+<ImageViewer open={open} images={images} minZoom={0.2} maxZoom={5} onOpenChange={setOpen} />
 ```
